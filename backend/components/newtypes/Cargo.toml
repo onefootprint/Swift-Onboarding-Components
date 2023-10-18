@@ -23,7 +23,6 @@ async-trait = { workspace = true }
 crypto = { path = "../enclave/crypto" }
 lazy_static = "1.0"
 uuid = { workspace = true }
-schemars = { workspace = true }
 itertools = { workspace = true }
 reqwest = { workspace = true }
 serde_with = "2.2.0"
@@ -32,8 +31,8 @@ mime = "0.3.16"
 futures-util = { workspace = true }
 futures = { workspace = true }
 card-validate = "2.3"
-enum_variant_type = {workspace = true}
-
+enum_variant_type = { workspace = true }
+macros = { path = "../macros" }
 # diesel
 diesel = { workspace = true }
 diesel-derive-newtype = { workspace = true }

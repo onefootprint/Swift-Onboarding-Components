@@ -1,20 +1,9 @@
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use schemars::JsonSchema;
+
 use strum_macros::{AsRefStr, Display, EnumString};
 
 #[derive(
-    Debug,
-    Clone,
-    Display,
-    Copy,
-    PartialEq,
-    Eq,
-    Hash,
-    AsExpression,
-    FromSqlRow,
-    EnumString,
-    AsRefStr,
-    JsonSchema,
+    Debug, Clone, Display, Copy, PartialEq, Eq, Hash, AsExpression, FromSqlRow, EnumString, AsRefStr,
 )]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]

@@ -21,6 +21,5 @@ base64 = { workspace = true }
 async-trait = { workspace = true }
 derive_more = { workspace = true }
 url = { workspace = true }
-schemars = { workspace = true }
 macros = { path = "../../macros" }
 paperclip = { workspace = true }

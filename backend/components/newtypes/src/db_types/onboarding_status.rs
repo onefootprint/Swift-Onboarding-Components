@@ -1,9 +1,8 @@
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use itertools::Itertools;
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use serde::{Deserialize, Serialize};
-use strum::{Display, EnumIter, IntoEnumIterator};
+use strum::{Display, EnumIter};
 use strum_macros::{AsRefStr, EnumString};
 
 use crate::DecisionStatus;
@@ -61,9 +60,7 @@ impl OnboardingStatus {
 
 crate::util::impl_enum_str_diesel!(OnboardingStatus);
 
-#[derive(
-    Debug, Display, Clone, Copy, PartialEq, Eq, Deserialize, EnumString, AsRefStr, Apiv2Schema, JsonSchema,
-)]
+#[derive(Debug, Display, Clone, Copy, PartialEq, Eq, Deserialize, EnumString, AsRefStr, Apiv2Schema)]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum OnboardingStatusFilter {
@@ -99,31 +96,5 @@ impl From<DecisionStatus> for OnboardingStatus {
             DecisionStatus::Pass => OnboardingStatus::Pass,
             DecisionStatus::StepUp => OnboardingStatus::Incomplete,
         }
-    }
-}
-
-impl schemars::JsonSchema for OnboardingStatus {
-    fn schema_name() -> String {
-        "OnboardingStatus".to_owned()
-    }
-
-    fn json_schema(_gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
-        let all = OnboardingStatus::iter()
-            .map(|s| serde_json::Value::String(s.to_string()))
-            .collect_vec();
-
-        schemars::_private::apply_metadata(
-            schemars::schema::Schema::Object(schemars::schema::SchemaObject {
-                instance_type: Some(schemars::schema::InstanceType::String.into()),
-                enum_values: Some(all),
-                ..Default::default()
-            }),
-            schemars::schema::Metadata {
-                description: Some("Represents status of an onboarding.".to_owned()),
-                default: Some(serde_json::Value::String(Self::default().to_string())),
-                examples: vec![serde_json::Value::String(Self::default().to_string())],
-                ..Default::default()
-            },
-        )
     }
 }

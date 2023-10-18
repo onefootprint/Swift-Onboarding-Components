@@ -1,8 +1,6 @@
 use crate::*;
 
-export_schema!(TriggerInfo);
-
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct TriggerRequest {
     pub trigger: TriggerInfo,
@@ -10,12 +8,8 @@ pub struct TriggerRequest {
     pub note: Option<String>,
 }
 
-export_schema!(TriggerRequest);
-
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct TriggerKycRequest {
     pub onboarding_config_key: ObConfigurationKey,
 }
-
-export_schema!(TriggerKycRequest);

@@ -1,6 +1,6 @@
 use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use schemars::JsonSchema;
+
 use strum_macros::{AsRefStr, EnumString};
 
 #[derive(
@@ -16,7 +16,7 @@ use strum_macros::{AsRefStr, EnumString};
     FromSqlRow,
     EnumString,
     AsRefStr,
-    JsonSchema,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]

@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Debug, Clone, Apiv2Schema, JsonSchema, Deserialize)]
+#[derive(Debug, Clone, Apiv2Schema, Deserialize)]
 pub struct ApexCipReportRequest {
     /// the footprint user id on behalf of which to send the request
     pub fp_user_id: FpId,
@@ -10,9 +10,7 @@ pub struct ApexCipReportRequest {
     pub default_approver: PiiString,
 }
 
-export_schema!(ApexCipReportRequest);
-
-#[derive(Debug, Clone, Apiv2Schema, JsonSchema, Serialize)]
+#[derive(Debug, Clone, Apiv2Schema, Serialize)]
 pub struct ApexCheckedKycData {
     pub customer_name: PiiString,
     pub tax_id: Option<PiiString>,
@@ -20,7 +18,7 @@ pub struct ApexCheckedKycData {
     pub date_of_birth: PiiString,
 }
 
-#[derive(Debug, Clone, Apiv2Schema, JsonSchema, Serialize)]
+#[derive(Debug, Clone, Apiv2Schema, Serialize)]
 pub struct ApexSelfReportedData {
     pub occupation: Option<PiiString>,
     pub employment_status: Option<PiiString>,
@@ -35,7 +33,7 @@ pub struct ApexSelfReportedData {
     pub citizenships: Option<PiiString>,
 }
 
-#[derive(Debug, Clone, Apiv2Schema, JsonSchema, Serialize)]
+#[derive(Debug, Clone, Apiv2Schema, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ApexCipResult {
     Clear,
@@ -50,7 +48,7 @@ impl From<alpaca::CipResult> for ApexCipResult {
         }
     }
 }
-#[derive(Debug, Clone, Apiv2Schema, JsonSchema, Serialize)]
+#[derive(Debug, Clone, Apiv2Schema, Serialize)]
 pub struct ApexCipSummaryResults {
     pub user_id: FpId,
     pub checked_data: ApexCheckedKycData,
@@ -71,7 +69,3 @@ pub struct ApexCipSummaryResults {
     pub tax_id: ApexCipResult,
     pub tax_id_breakdown: Vec<Vendor>,
 }
-export_schema!(ApexCheckedKycData);
-export_schema!(ApexSelfReportedData);
-export_schema!(ApexCipResult);
-export_schema!(ApexCipSummaryResults);

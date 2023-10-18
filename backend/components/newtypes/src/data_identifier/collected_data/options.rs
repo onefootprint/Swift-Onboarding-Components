@@ -63,28 +63,6 @@ pub enum CollectedDataOption {
 
 crate::util::impl_enum_string_diesel!(CollectedDataOption);
 
-impl schemars::JsonSchema for CollectedDataOption {
-    fn schema_name() -> String {
-        "CollectedDataOption".to_owned()
-    }
-
-    fn json_schema(_gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
-        schemars::_private::apply_metadata(
-            schemars::schema::Schema::Object(schemars::schema::SchemaObject {
-                instance_type: Some(schemars::schema::InstanceType::String.into()),
-                // TODO enumerate enum values when we have this in a public-facing API
-                // enum_values: Some(Self::api_examples()),
-                ..Default::default()
-            }),
-            schemars::schema::Metadata {
-                description: Some("Represents a bundle of data that is collected together.".to_owned()),
-                examples: vec![serde_json::Value::String(Self::FullAddress.to_string())],
-                ..Default::default()
-            },
-        )
-    }
-}
-
 impl std::fmt::Display for CollectedDataOption {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         match self {

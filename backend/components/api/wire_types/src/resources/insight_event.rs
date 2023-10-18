@@ -1,8 +1,8 @@
 use crate::*;
 
 /// Describes a device insight event with locations and IP of the event
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
-#[schemars(rename_all = "camelCase")]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+
 pub struct InsightEvent {
     pub timestamp: DateTime<Utc>,
     pub ip_address: Option<String>,
@@ -17,4 +17,3 @@ pub struct InsightEvent {
     pub time_zone: Option<String>,
     pub user_agent: Option<String>,
 }
-export_schema!(InsightEvent);

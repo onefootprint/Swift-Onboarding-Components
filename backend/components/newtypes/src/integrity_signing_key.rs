@@ -1,13 +1,12 @@
 use std::str::FromStr;
 
 use derive_more::{From, Into};
-use schemars::JsonSchema;
+
 use serde::{Deserialize, Deserializer, Serialize};
 
 /// A secret api key wrapper around a string
-#[derive(Clone, Hash, PartialEq, Eq, From, Into, Default, JsonSchema)]
-#[serde(transparent)]
-pub struct IntegritySigningKey(#[schemars(with = "String")] Vec<u8>);
+#[derive(Clone, Hash, PartialEq, Eq, From, Into, Default)]
+pub struct IntegritySigningKey(Vec<u8>);
 
 impl IntegritySigningKey {
     /// leak the signing key

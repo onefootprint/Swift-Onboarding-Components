@@ -1,7 +1,6 @@
 use chrono::{DateTime, Utc};
 use newtypes::{Declaration, PiiJsonValue, PiiString};
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CreateAccountRequest {
@@ -71,7 +70,7 @@ pub struct Identity {
     pub extra: Option<PiiJsonValue>, //	object
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 /// It is your responsibility as the service provider to denote if the account owner falls under each category defined by FINRA rules. We recommend asking these questions at any point of the onboarding process of each account owner in the form of Y/N and Radio Buttons.
 pub struct Disclosures {
     /// Whether user holds a controlling position in a publicly traded company, member of the board of directors or has policy making abilities in a publicly traded company.
@@ -104,7 +103,7 @@ impl Disclosures {
     }
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 /// If you utilize Alpaca for KYCaaS, additional information will need to be submitted if the user identifies with any of the disclosures before the account can be approved. This information can be sent through the context object to speed up the time to approve their account.
 pub struct DisclosureContext {
     pub context_type: ContextType, // "AFFILIATE_FIRM",
@@ -126,7 +125,7 @@ pub struct DisclosureContext {
     pub family_name: PiiString,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 /// In order to comply with Alpaca’s terms of service, each account owner must be presented the following agreements.
 pub struct Agreement {
     pub agreement: Agreements,
@@ -146,7 +145,7 @@ pub struct Document {
     pub mime_type: String, // "image/jpeg"
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 /// This model input is optional. However, the client should make reasonable effort to obtain the trusted contact information. See more details in FINRA Notice 17-11
 pub struct TrustedContact {
     pub given_name: PiiString,  //"Jane",
@@ -161,7 +160,7 @@ pub struct TrustedContact {
     pub country: Option<PiiString>,     //If street_address is chosen
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub enum AssetClass {
     UsEquity,
@@ -244,7 +243,7 @@ pub enum FundingSource {
 }
 
 #[allow(non_camel_case_types)]
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema)]
 pub enum ContextType {
     CONTROLLED_FIRM,          // Controlled firm. Recommened to use when is_control_person = true
     AFFILIATE_FIRM,           //	Affiliated firm. Recommened to use when is_affiliated_exchange_or_finra = true
@@ -253,7 +252,7 @@ pub enum ContextType {
 
 #[allow(non_camel_case_types)]
 #[allow(clippy::upper_case_acronyms)]
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema)]
 pub enum EmploymentStatus {
     UNEMPLOYED, //	Unemployed
     EMPLOYED,   //	Employed
@@ -261,14 +260,14 @@ pub enum EmploymentStatus {
     RETIRED,    //	Retired
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub enum Agreements {
     CustomerAgreement, //	Customer agreement
     CryptoAgreement,   //	Crypto agreement
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub enum DocumentType {
     IdentityVerification,    //	Identity verification

@@ -1,5 +1,5 @@
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use strum_macros::{Display, EnumString};
 
 #[derive(
@@ -12,9 +12,9 @@ use strum_macros::{Display, EnumString};
     serde_with::SerializeDisplay,
     serde_with::DeserializeFromStr,
     Apiv2Schema,
-    JsonSchema,
     EnumString,
     Display,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]

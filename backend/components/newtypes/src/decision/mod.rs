@@ -1,5 +1,5 @@
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use strum::Display;
 
 #[derive(Debug, Clone, PartialEq, Eq, Display)]
@@ -30,7 +30,7 @@ pub enum RuleSetName {
     Apiv2Schema,
     Ord,
     PartialOrd,
-    JsonSchema,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]

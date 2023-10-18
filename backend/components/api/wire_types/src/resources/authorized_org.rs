@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(serde::Serialize, Apiv2Schema, JsonSchema)]
+#[derive(serde::Serialize, Apiv2Schema)]
 pub struct AuthorizedOrg {
     pub org_name: String,
     pub logo_url: Option<String>,

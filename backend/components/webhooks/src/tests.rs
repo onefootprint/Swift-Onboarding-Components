@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::events::*;
 use chrono::Utc;
 use newtypes::{FpId, OnboardingStatus};
-use schemars::{gen::SchemaSettings, JsonSchema};
+use schemars::gen::SchemaSettings;
 use strum::{EnumMessage, IntoEnumIterator};
 
 #[test]
@@ -34,13 +34,13 @@ fn generate_event_type_schema() {
     }
 }
 
-fn generate<T: JsonSchema>(name: &str, _t: T) {
+fn generate<T: schemars::JsonSchema>(name: &str, _t: T) {
     let generator = schemars::gen::SchemaGenerator::new(SchemaSettings::draft07());
     let schema = generator.into_root_schema_for::<T>();
     export_type_schema(schema, name);
 }
 
-fn generate_json_value<T: JsonSchema>(_t: T) -> serde_json::Value {
+fn generate_json_value<T: schemars::JsonSchema>(_t: T) -> serde_json::Value {
     let generator = schemars::gen::SchemaGenerator::new(SchemaSettings::draft07());
     let schema = generator.into_root_schema_for::<T>();
     serde_json::to_value(&schema).expect("serialize schema")

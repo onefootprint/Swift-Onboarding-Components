@@ -1,17 +1,17 @@
 use std::collections::HashMap;
 
-use crate::{util::export_schema, InsightEvent, WatchlistCheck};
+use crate::{InsightEvent, WatchlistCheck};
 use chrono::{DateTime, Utc};
 use newtypes::{DataIdentifier, FpId, PiiString, SandboxId, TenantId, VaultKind};
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use serde::Serialize;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum_macros::EnumString;
 
 /// Details for a specific Entity
-#[derive(Debug, Clone, Serialize, JsonSchema, Apiv2Schema)]
-#[schemars(rename_all = "camelCase")]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+
 pub struct Entity {
     pub id: FpId,
     pub sandbox_id: Option<SandboxId>,
@@ -43,7 +43,7 @@ pub struct Entity {
     Apiv2Schema,
     EnumString,
     strum_macros::Display,
-    JsonSchema,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
@@ -55,12 +55,10 @@ pub enum EntityStatus {
     Pending,
 }
 
-#[derive(Debug, Clone, Serialize, JsonSchema, Apiv2Schema)]
-#[schemars(rename_all = "camelCase")]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+
 pub struct SuperAdminEntity {
     pub id: FpId,
     pub is_live: bool,
     pub tenant_id: TenantId,
 }
-
-export_schema!(Entity);

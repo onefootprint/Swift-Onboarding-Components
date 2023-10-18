@@ -1,7 +1,7 @@
 use crate::*;
 
 /// RiskSignal information, including severity, impacted scopes, and more.
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct RiskSignal {
     pub id: RiskSignalId,
     pub onboarding_decision_id: Option<OnboardingDecisionId>, // TODO: remove this ??
@@ -13,10 +13,8 @@ pub struct RiskSignal {
     pub timestamp: chrono::DateTime<Utc>,
 }
 
-export_schema!(RiskSignal);
-
 /// RiskSignal information, including severity, impacted scopes, and more.
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct PublicRiskSignal {
     pub reason_code: FootprintReasonCode,
     pub note: String,
@@ -27,7 +25,7 @@ pub struct PublicRiskSignal {
 }
 
 /// Non-public RiskSignal serialization that has additional information (at the moment just AML stuff about specific hits)
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct RiskSignalDetail {
     pub id: RiskSignalId,
     pub onboarding_decision_id: Option<OnboardingDecisionId>,
@@ -40,9 +38,7 @@ pub struct RiskSignalDetail {
     pub has_aml_hits: bool,
 }
 
-export_schema!(RiskSignalDetail);
-
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct PublicRiskSignalDescription {
     pub reason_code: FootprintReasonCode,
     /// Short description of the reason code

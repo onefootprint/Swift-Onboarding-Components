@@ -442,7 +442,6 @@ dependencies = [
  "newtypes",
  "paperclip",
  "reqwest",
- "schemars",
  "serde",
  "serde_json",
  "strum",
@@ -1194,10 +1193,10 @@ dependencies = [
  "alpaca",
  "chrono",
  "derive_more",
+ "macros",
  "newtypes",
  "paperclip",
  "paste",
- "schemars",
  "serde",
  "serde_json",
  "serde_with",
@@ -4901,12 +4900,12 @@ dependencies = [
  "futures-util",
  "itertools",
  "lazy_static",
+ "macros",
  "mime",
  "paperclip",
  "phonenumber",
  "regex",
  "reqwest",
- "schemars",
  "serde",
  "serde_derive",
  "serde_json",
@@ -6653,24 +6652,22 @@ dependencies = [
 
 [[package]]
 name = "schemars"
-version = "0.8.11"
+version = "0.8.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a5fb6c61f29e723026dc8e923d94c694313212abbecbbe5f55a7748eec5b307"
+checksum = "1f7b0ce13155372a76ee2e1c5ffba1fe61ede73fbea5630d61eee6fac4929c0c"
 dependencies = [
  "chrono",
  "dyn-clone",
- "indexmap 1.9.1",
  "schemars_derive",
  "serde",
  "serde_json",
- "uuid 1.4.1",
 ]
 
 [[package]]
 name = "schemars_derive"
-version = "0.8.11"
+version = "0.8.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f188d036977451159430f3b8dc82ec76364a42b7e289c2b18a9a18f4470058e9"
+checksum = "e85e2a16b12bdb763244c69ab79363d71db2b4b918a2def53f80b02e0574b13c"
 dependencies = [
  "proc-macro2 1.0.66",
  "quote 1.0.33",

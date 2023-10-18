@@ -2,7 +2,7 @@ use crate::{Base64Data, PiiBytes};
 
 use super::super::api_schema_helper::string_api_data_type_alias;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use schemars::JsonSchema;
+
 use serde::{Deserialize, Serialize};
 use std::{
     fmt::{Debug, Display},
@@ -10,9 +10,7 @@ use std::{
 };
 
 /// Represents a string that hides PII
-#[derive(
-    Clone, Deserialize, Serialize, Default, PartialEq, Eq, Hash, JsonSchema, AsExpression, FromSqlRow,
-)]
+#[derive(Clone, Deserialize, Serialize, Default, PartialEq, Eq, Hash, AsExpression, FromSqlRow)]
 #[diesel(sql_type = Text)]
 #[serde(transparent)]
 pub struct PiiString(pub(super) String);

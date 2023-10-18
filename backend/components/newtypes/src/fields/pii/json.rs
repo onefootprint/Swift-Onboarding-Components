@@ -1,11 +1,10 @@
-use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
 use crate::{PiiBytes, PiiString, VResult, VaultDataFormat};
 
 /// Wrapper to hide PII around serde_json::Value that contains all variants of values
-#[derive(Clone, Default, PartialEq, Eq, Deserialize, Serialize, JsonSchema)]
+#[derive(Clone, Default, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(transparent)]
 pub struct PiiJsonValue(pub(super) serde_json::Value);
 

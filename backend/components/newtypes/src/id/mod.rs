@@ -25,7 +25,6 @@ macro_rules! define_newtype_id {
             serde::Deserialize,
             Default,
             DieselNewType,
-            schemars::JsonSchema,
             derive_more::Deref,
         )]
         #[serde(transparent)]

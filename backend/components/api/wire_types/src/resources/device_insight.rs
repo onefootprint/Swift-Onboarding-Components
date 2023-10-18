@@ -1,8 +1,8 @@
 use crate::*;
 
 /// Describes a device insight event
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
-#[schemars(rename_all = "camelCase")]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+
 pub struct AuthEvent {
     pub id: AuthEventId,
     /// represents user agent and IP information
@@ -13,9 +13,9 @@ pub struct AuthEvent {
     pub created_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
-#[schemars(rename_all = "camelCase")]
+
 pub struct AttestedDeviceData {
     pub app_bundle_id: String,
     pub model: Option<String>,
@@ -25,25 +25,19 @@ pub struct AttestedDeviceData {
     // TODO: more here
 }
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
-#[schemars(rename_all = "camelCase")]
+
 pub enum DeviceFraudRiskLevel {
     Low,
     Medium,
     High,
 }
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
-#[schemars(rename_all = "camelCase")]
+
 pub enum DeviceType {
     Ios,
     Android,
 }
-
-export_schema!(AuthEvent);
-export_schema!(AttestedDeviceData);
-export_schema!(DeviceFraudRiskLevel);
-
-export_schema!(DeviceType);

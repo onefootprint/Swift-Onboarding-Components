@@ -2,7 +2,7 @@ use crate::util::impl_enum_str_diesel;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use serde::{Deserialize, Serialize};
 use serde_json;
 use strum_macros::{AsRefStr, EnumString};
@@ -19,7 +19,6 @@ use strum_macros::{AsRefStr, EnumString};
     FromSqlRow,
     EnumString,
     AsRefStr,
-    JsonSchema,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "PascalCase")]
@@ -40,7 +39,7 @@ impl Default for LivenessSource {
 
 impl_enum_str_diesel!(LivenessSource);
 
-#[derive(Eq, PartialEq, Serialize, Deserialize, Debug, Clone, Apiv2Schema, JsonSchema, Default, AsJsonb)]
+#[derive(Eq, PartialEq, Serialize, Deserialize, Debug, Clone, Apiv2Schema, Default, AsJsonb)]
 pub struct LivenessAttributes {
     pub issuers: Vec<LivenessIssuer>,
     pub device: Option<String>,
@@ -48,9 +47,7 @@ pub struct LivenessAttributes {
     pub metadata: Option<serde_json::Value>,
 }
 
-#[derive(
-    Eq, PartialEq, Serialize, Deserialize, Debug, Clone, Apiv2Schema, EnumString, AsRefStr, JsonSchema,
-)]
+#[derive(Eq, PartialEq, Serialize, Deserialize, Debug, Clone, Apiv2Schema, EnumString, AsRefStr)]
 #[serde(rename_all = "snake_case")]
 pub enum LivenessIssuer {
     Apple,

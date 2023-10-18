@@ -6,7 +6,7 @@ use crate::{DbActor, WorkflowId};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use serde::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::Display;
@@ -22,7 +22,6 @@ use strum::EnumDiscriminants;
     strum_macros::EnumString,
     AsExpression,
     FromSqlRow,
-    JsonSchema,
 ))]
 #[strum_discriminants(strum(serialize_all = "snake_case"))]
 #[strum_discriminants(diesel(sql_type = Text))]

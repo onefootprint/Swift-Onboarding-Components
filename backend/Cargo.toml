@@ -116,8 +116,6 @@ reqwest-retry = "0.2.2"
 reqwest-tracing = "0.4.5"
 retry-policies = "0.1.2"
 
-schemars = { version = "0.8", features = ["chrono", "uuid1", "preserve_order"] }
-
 aws-types = "0.56.1"
 aws-config = "0.56.1"
 aws-sdk-s3 = "0.33.0"

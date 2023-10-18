@@ -1,6 +1,6 @@
 use crate::util::impl_enum_str_diesel;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use schemars::JsonSchema;
+
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::AsRefStr;
 use strum_macros::{Display, EnumString};
@@ -18,7 +18,6 @@ use strum_macros::{Display, EnumString};
     FromSqlRow,
     EnumString,
     AsRefStr,
-    JsonSchema,
     Hash,
 )]
 #[strum(serialize_all = "snake_case")]

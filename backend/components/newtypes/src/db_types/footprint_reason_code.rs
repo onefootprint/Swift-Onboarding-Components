@@ -1,7 +1,7 @@
 use crate::{MatchLevel, SignalScope};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
@@ -1323,16 +1323,6 @@ impl FootprintReasonCode {
     }
 }
 
-impl JsonSchema for FootprintReasonCode {
-    fn schema_name() -> String {
-        "FootprintReasonCode".to_owned()
-    }
-
-    fn json_schema(_gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
-        schemars::schema::Schema::Bool(false)
-    }
-}
-
 impl FootprintReasonCode {
     pub fn is_watchlist(&self) -> bool {
         matches!(
@@ -1354,9 +1344,7 @@ impl FootprintReasonCode {
     }
 }
 
-#[derive(
-    Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize, Apiv2Schema, JsonSchema, Hash,
-)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize, Apiv2Schema, Hash)]
 #[serde(rename_all = "snake_case")]
 pub enum SignalSeverity {
     Info,

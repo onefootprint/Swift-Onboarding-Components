@@ -12,9 +12,7 @@ use serde::{Deserialize, Serialize};
 use strum::{EnumIter, EnumMessage};
 
 /// Defines supported webhook event types and payloads
-#[derive(
-    Debug, strum::Display, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema, EnumIter, EnumMessage,
-)]
+#[derive(Debug, strum::Display, Clone, Eq, PartialEq, Serialize, Deserialize, EnumIter, EnumMessage)]
 #[serde(untagged)]
 pub enum WebhookEvent {
     #[strum(serialize = "footprint.onboarding.completed")]
@@ -36,47 +34,98 @@ mod payloads {
 
     use super::*;
 
-    #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema, Default)]
+    #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Default, JsonSchema)]
     #[schemars(example = "OnboardingCompletedPayload::example")]
     pub struct OnboardingCompletedPayload {
         /// the footprint id of the entity that completed onboarding
+        #[schemars(with = "String")]
         pub fp_id: FpId,
         /// deprecated (replaced by fp_id)        
         #[schemars(skip)]
         #[serde(skip_serializing_if = "Option::is_none")]
         pub footprint_user_id: Option<FpId>,
         pub timestamp: DateTime<Utc>,
+        #[schemars(with = "OnboardingStatusShadow")]
         pub status: OnboardingStatus,
         pub requires_manual_review: bool,
     }
 
-    #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema, Default)]
+    #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Default, JsonSchema)]
     #[schemars(example = "OnboardingStatusChangedPayload::example")]
 
     pub struct OnboardingStatusChangedPayload {
         /// the footprint id of the entity that completed onboarding
+        #[schemars(with = "String")]
         pub fp_id: FpId,
         /// deprecated (replaced by fp_id)        
         #[schemars(skip)]
         #[serde(skip_serializing_if = "Option::is_none")]
         pub footprint_user_id: Option<FpId>,
         pub timestamp: DateTime<Utc>,
+        #[schemars(with = "OnboardingStatusShadow")]
         pub new_status: OnboardingStatus,
     }
 
-    #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema, Default)]
+    #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Default, JsonSchema)]
     #[schemars(example = "WatchlistCheckCompletedPayload::example")]
 
     pub struct WatchlistCheckCompletedPayload {
         /// the footprint id of the entity that completed onboarding
+        #[schemars(with = "String")]
         pub fp_id: FpId,
         /// deprecated (replaced by fp_id)        
         #[schemars(skip)]
         #[serde(skip_serializing_if = "Option::is_none")]
         pub footprint_user_id: Option<FpId>,
         pub timestamp: DateTime<Utc>,
+        #[schemars(with = "WatchlistCheckStatusKindShadow")]
         pub status: WatchlistCheckStatusKind,
+        #[schemars(with = "Option<WatchlistCheckErrorShadow>")]
         pub error: Option<WatchlistCheckError>,
+    }
+
+    // This is just a copy of the remote data structure that Schemars can use to
+    // create a suitable JsonSchema impl.
+    #[derive(JsonSchema)]
+    #[serde(remote = "OnboardingStatus")]
+    #[serde(rename_all = "snake_case")]
+    enum OnboardingStatusShadow {
+        #[allow(unused)]
+        /// Passed all checks
+        Pass,
+        #[allow(unused)]
+        /// Failed one or more check
+        Fail,
+        #[allow(unused)]
+        /// The user has not yet finished entering all information
+        Incomplete,
+        #[allow(unused)]
+        /// All required data has been collected. We are waiting for a firm decision
+        Pending,
+    }
+
+    #[derive(JsonSchema)]
+    #[serde(remote = "WatchlistCheckStatusKind")]
+    #[serde(rename_all = "snake_case")]
+    enum WatchlistCheckStatusKindShadow {
+        #[allow(unused)]
+        Pending,
+        #[allow(unused)]
+        Pass,
+        #[allow(unused)]
+        Fail,
+        #[allow(unused)]
+        Error,
+        #[allow(unused)]
+        NotNeeded,
+    }
+
+    #[derive(JsonSchema)]
+    #[serde(remote = "WatchlistCheckError")]
+    #[serde(rename_all = "snake_case")]
+    enum WatchlistCheckErrorShadow {
+        #[allow(unused)]
+        RequiredDataNotPresent,
     }
 }
 

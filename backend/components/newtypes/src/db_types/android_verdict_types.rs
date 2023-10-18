@@ -1,5 +1,5 @@
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use schemars::JsonSchema;
+
 use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 
 #[derive(
@@ -18,7 +18,6 @@ use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
     AsExpression,
     FromSqlRow,
     AsRefStr,
-    JsonSchema,
     Default,
 )]
 #[strum(serialize_all = "snake_case")]
@@ -48,7 +47,6 @@ crate::util::impl_enum_str_diesel!(AndroidAppRecognition);
     AsExpression,
     FromSqlRow,
     AsRefStr,
-    JsonSchema,
     Default,
 )]
 #[strum(serialize_all = "snake_case")]
@@ -78,7 +76,6 @@ crate::util::impl_enum_str_diesel!(AndroidAppLicense);
     AsExpression,
     FromSqlRow,
     AsRefStr,
-    JsonSchema,
     Default,
 )]
 #[strum(serialize_all = "snake_case")]

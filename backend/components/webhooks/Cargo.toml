@@ -21,6 +21,6 @@ strum_macros = { workspace = true }
 strum = { workspace = true, features = ["derive"] }
 chrono = { workspace = true }
 tokio = { workspace = true }
-tracing = { workspace = true}
-schemars = { workspace = true }
+tracing = { workspace = true }
 mockall = { workspace = true }
+schemars = { version = "0.8.15", features = ["chrono"] }

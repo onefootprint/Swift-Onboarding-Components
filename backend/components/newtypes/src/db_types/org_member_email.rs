@@ -1,5 +1,5 @@
 use paperclip::v2::schema::TypedData;
-use schemars::JsonSchema;
+
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::str::FromStr;
 
@@ -7,7 +7,15 @@ use crate::email::Email;
 
 // TODO just use Email
 #[derive(
-    Debug, Clone, DeserializeFromStr, SerializeDisplay, DieselNewType, Default, JsonSchema, Eq, PartialEq,
+    Debug,
+    Clone,
+    DeserializeFromStr,
+    SerializeDisplay,
+    DieselNewType,
+    Default,
+    Eq,
+    PartialEq,
+    macros::SerdeAttr,
 )]
 #[serde(transparent)]
 pub struct OrgMemberEmail(pub String);

@@ -1,7 +1,7 @@
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use serde::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum_macros::{AsRefStr, Display, EnumString};
@@ -19,7 +19,6 @@ use strum_macros::{AsRefStr, Display, EnumString};
     Serialize,
     AsRefStr,
     Apiv2Schema,
-    JsonSchema,
     AsJsonb,
 )]
 #[strum(serialize_all = "snake_case")]
@@ -50,7 +49,7 @@ pub enum WatchlistCheckStatus {
     EnumString,
     AsRefStr,
     Apiv2Schema,
-    JsonSchema,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
@@ -99,7 +98,7 @@ impl Default for WatchlistCheckStatusKind {
     EnumString,
     AsRefStr,
     Apiv2Schema,
-    JsonSchema,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
@@ -126,7 +125,7 @@ crate::util::impl_enum_str_diesel!(WatchlistCheckError);
     EnumString,
     AsRefStr,
     Apiv2Schema,
-    JsonSchema,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]

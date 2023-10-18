@@ -3,10 +3,10 @@ use std::collections::HashMap;
 use crate::{CollectedDataOption, DocumentRequestId, IdDocKind, Iso3166TwoDigitCountryCode};
 use chrono::{DateTime, Utc};
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use strum::EnumDiscriminants;
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema, EnumDiscriminants, JsonSchema)]
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema, EnumDiscriminants)]
 #[strum_discriminants(name(OnboardingRequirementKind))]
 #[strum_discriminants(derive(strum_macros::Display, strum_macros::EnumIter))]
 #[serde(tag = "kind")]
@@ -119,7 +119,7 @@ impl OnboardingRequirement {
     }
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, JsonSchema)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct AuthorizeFields {
     pub collected_data: Vec<CollectedDataOption>,
     pub document_types: Vec<IdDocKind>,

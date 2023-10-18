@@ -17,7 +17,6 @@ use paperclip::actix::Apiv2Schema;
     serde::Deserialize,
     Default,
     DieselNewType,
-    schemars::JsonSchema,
     Apiv2Schema,
     // This is implemented separately because we need to derive Copy...
     Copy,

@@ -1,7 +1,6 @@
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 /// Embeds extra information in the d2p token to pass from the desktop to handoff session.
 /// NOTE: changes to this struct should be backwards-compatible since we may use this struct
 /// to deserialize old versions

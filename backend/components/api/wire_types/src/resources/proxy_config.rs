@@ -1,8 +1,7 @@
 use crate::*;
 
 /// Proxy configuration
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
-#[schemars(rename_all = "camelCase")]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 
 pub struct ProxyConfigBasic {
     pub id: ProxyConfigId,
@@ -16,8 +15,7 @@ pub struct ProxyConfigBasic {
 }
 
 /// Proxy configuration
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
-#[schemars(rename_all = "camelCase")]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 
 pub struct ProxyConfigDetailed {
     pub id: ProxyConfigId,
@@ -58,14 +56,10 @@ pub struct ProxyConfigDetailed {
 }
 
 /// a secret header to forward to the proxy
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, JsonSchema)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct OmittedSecretCustomHeader {
     /// identifier for the secret header
     pub id: ProxyConfigSecretHeaderId,
     /// header name
     pub name: String,
 }
-
-export_schema!(ProxyConfigBasic);
-export_schema!(ProxyConfigDetailed);
-export_schema!(OmittedSecretCustomHeader);

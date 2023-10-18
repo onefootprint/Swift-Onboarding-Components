@@ -4,7 +4,7 @@ use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use serde::{Deserialize, Serialize};
 use serde_json;
 use strum::IntoEnumIterator;
@@ -22,7 +22,6 @@ use strum_macros::{AsRefStr, EnumIter, EnumString};
     FromSqlRow,
     EnumString,
     AsRefStr,
-    JsonSchema,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "PascalCase")]
@@ -47,9 +46,9 @@ impl_enum_str_diesel!(ApiKeyStatus);
     FromSqlRow,
     EnumString,
     AsRefStr,
-    JsonSchema,
     serde_with::DeserializeFromStr,
     Apiv2Schema,
+    macros::SerdeAttr,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
@@ -113,7 +112,6 @@ impl EnhancedAmlOption {
     EnumString,
     EnumIter,
     AsRefStr,
-    JsonSchema,
     serde_with::DeserializeFromStr,
     Serialize,
 )]
@@ -140,7 +138,7 @@ impl AdverseMediaListKind {
     }
 }
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize, Eq, PartialEq, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize, Eq, PartialEq, Apiv2Schema)]
 pub struct EnhancedAml {
     pub enhanced_aml: bool,
     pub ofac: bool,

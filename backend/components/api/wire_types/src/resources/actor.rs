@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind")]
 pub enum Actor {
@@ -9,5 +9,3 @@ pub enum Actor {
     Organization { member: String },
     ApiKey { id: TenantApiKeyId, name: String },
 }
-
-export_schema!(Actor);

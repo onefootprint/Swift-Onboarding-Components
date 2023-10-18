@@ -1,7 +1,7 @@
 use crate::util::impl_enum_string_diesel;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum_macros::{Display, EnumString};
 
@@ -18,7 +18,7 @@ use strum_macros::{Display, EnumString};
     EnumString,
     Display,
     Apiv2Schema,
-    JsonSchema,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]

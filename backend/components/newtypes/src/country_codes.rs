@@ -1,6 +1,7 @@
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use macros::SerdeAttr;
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{Display, IntoEnumIterator};
 use strum_macros::{AsRefStr, EnumIter, EnumString};
@@ -16,12 +17,12 @@ use strum_macros::{AsRefStr, EnumIter, EnumString};
     Display,
     DeserializeFromStr,
     Apiv2Schema,
-    JsonSchema,
     EnumIter,
     FromSqlRow,
     AsExpression,
     EnumString,
     AsRefStr,
+    macros::SerdeAttr,
 )]
 #[serde(rename_all = "UPPERCASE")]
 #[strum(serialize_all = "UPPERCASE")]
@@ -291,15 +292,15 @@ crate::util::impl_enum_str_diesel!(Iso3166TwoDigitCountryCode);
     Display,
     DeserializeFromStr,
     Apiv2Schema,
-    JsonSchema,
     EnumIter,
     FromSqlRow,
     AsExpression,
     EnumString,
     AsRefStr,
+    SerdeAttr,
 )]
-#[serde(rename_all = "UPPERCASE")]
 #[strum(serialize_all = "UPPERCASE")]
+#[serde(rename_all = "UPPERCASE")]
 #[diesel(sql_type = Text)]
 /// list of valid iso3166-alpha-2 country codes, from https://datahub.io/core/country-codes#data
 /// eventually we should maybe just pony up and pay for the subscription to iso: https://www.iso.org/publication/PUB500001.html

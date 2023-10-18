@@ -1,7 +1,7 @@
-use crate::{export_schema, Apiv2Schema, JsonSchema, Serialize};
+use crate::{Apiv2Schema, Serialize};
 use newtypes::{BusinessOwnerKind, FpId, OnboardingStatus};
 
-#[derive(Debug, Clone, Serialize, JsonSchema, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct BusinessOwner {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<FpId>,
@@ -10,5 +10,3 @@ pub struct BusinessOwner {
     pub ownership_stake: Option<u32>,
     pub kind: BusinessOwnerKind,
 }
-
-export_schema!(BusinessOwner);

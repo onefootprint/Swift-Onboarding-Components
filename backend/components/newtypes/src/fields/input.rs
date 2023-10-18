@@ -1,13 +1,13 @@
 use crate::api_schema_helper::string_api_data_type_alias;
 use crate::{DataIdentifier, TenantRoleId, TenantScope};
 use derive_more::Deref;
-use schemars::JsonSchema;
+
 use serde::de::IntoDeserializer;
 use serde::de::{self, DeserializeOwned};
 use serde::Deserialize;
 
 /// Represents a comma-separated list of type `T` with a Deserialize implementation.
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Deserialize, Default, Deref, JsonSchema)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Deserialize, Default, Deref)]
 pub struct Csv<T>(#[serde(deserialize_with = "deserialize_stringified_list")] pub Vec<T>)
 where
     T: DeserializeOwned;

@@ -1,15 +1,13 @@
 use crypto::{random::gen_random_alphanumeric_code, sha256};
 use derive_more::{Display, Into};
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use serde::{Deserialize, Serialize};
 
 use crate::{AuthTokenHash, PiiString};
 
 /// An cryptographically generated auth token to authenticate a session
-#[derive(
-    Clone, Hash, PartialEq, Eq, Display, Into, Serialize, Deserialize, Default, Apiv2Schema, JsonSchema,
-)]
+#[derive(Clone, Hash, PartialEq, Eq, Display, Into, Serialize, Deserialize, Default, Apiv2Schema)]
 #[serde(transparent)]
 pub struct SessionAuthToken(String);
 

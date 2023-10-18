@@ -2,7 +2,7 @@ use crate::{CollectedDataOption, InvokeVaultProxyPermission, TenantRoleKindDiscr
 use diesel::{AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use strum::{AsRefStr, EnumDiscriminants};
 
 #[derive(
@@ -14,7 +14,6 @@ use strum::{AsRefStr, EnumDiscriminants};
     AsRefStr,
     EnumDiscriminants,
     Apiv2Schema,
-    JsonSchema,
     serde::Serialize,
     serde::Deserialize,
     AsJsonb,

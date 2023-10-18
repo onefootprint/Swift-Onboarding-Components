@@ -1,6 +1,6 @@
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::Display;
 use strum_macros::{AsRefStr, EnumString};
@@ -22,7 +22,7 @@ use strum_macros::{AsRefStr, EnumString};
     FromSqlRow,
     EnumString,
     AsRefStr,
-    JsonSchema,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(serialize_all = "snake_case")]

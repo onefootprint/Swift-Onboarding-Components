@@ -1,8 +1,7 @@
 use crate::*;
 
 /// OnboardingConfiguration that was created
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
-#[schemars(rename_all = "camelCase")]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 
 pub struct OnboardingConfiguration {
     pub id: ObConfigurationId,
@@ -26,11 +25,8 @@ pub struct OnboardingConfiguration {
     pub doc_scan_for_optional_ssn: Option<CollectedDataOption>,
 }
 
-export_schema!(OnboardingConfiguration);
-
 /// The public onboarding configuration
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
-#[schemars(rename_all = "camelCase")]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 
 pub struct PublicOnboardingConfiguration {
     pub name: String,
@@ -62,5 +58,3 @@ pub struct PublicOnboardingConfiguration {
     /// allow list of origins permitted to host the embedded flow
     pub allowed_origins: Option<Vec<String>>,
 }
-
-export_schema!(PublicOnboardingConfiguration);

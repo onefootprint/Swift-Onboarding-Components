@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Debug, Clone, Apiv2Schema, JsonSchema, Deserialize)]
+#[derive(Debug, Clone, Apiv2Schema, Deserialize)]
 pub struct AlpacaCipRequest {
     /// the footprint user id on behalf of which to send the request
     pub fp_user_id: FpId,
@@ -23,16 +23,11 @@ pub struct AlpacaCipRequest {
     pub account_id: String,
 }
 
-export_schema!(AlpacaCipRequest);
-
-#[derive(Debug, Clone, Apiv2Schema, JsonSchema, Serialize)]
+#[derive(Debug, Clone, Apiv2Schema, Serialize)]
 pub struct AlpacaCipResponse {
     /// alpaca response HTTP status code
     pub status_code: u16,
 
     /// response from alpaca
-    #[schemars(with = "serde_json::Value")]
     pub alpaca_response: PiiJsonValue,
 }
-
-export_schema!(AlpacaCipResponse);

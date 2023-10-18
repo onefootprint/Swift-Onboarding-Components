@@ -1,5 +1,5 @@
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
-use schemars::JsonSchema;
+
 use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 
 /// The type of requirement
@@ -19,8 +19,8 @@ use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
     AsExpression,
     FromSqlRow,
     AsRefStr,
-    JsonSchema,
     Default,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]

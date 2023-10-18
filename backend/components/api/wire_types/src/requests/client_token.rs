@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use crate::*;
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub enum ClientTokenScopeKind {
     Vault,
@@ -10,9 +10,7 @@ pub enum ClientTokenScopeKind {
     DecryptDownload,
 }
 
-export_schema!(ClientTokenScopeKind);
-
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct ClientTokenRequest {
     /// List of data identifiers to which this token will have access. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`
@@ -26,9 +24,7 @@ pub struct ClientTokenRequest {
     pub decrypt_reason: Option<String>,
 }
 
-export_schema!(ClientTokenRequest);
-
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct ClientTokenResponse {
     /// The short-lived token that gives temporary access to perform operations for this user
@@ -36,5 +32,3 @@ pub struct ClientTokenResponse {
     /// The time at which the token expires
     pub expires_at: DateTime<Utc>,
 }
-
-export_schema!(ClientTokenResponse);

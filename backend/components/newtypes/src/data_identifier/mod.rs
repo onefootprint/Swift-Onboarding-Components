@@ -194,30 +194,6 @@ impl DataIdentifier {
     }
 }
 
-impl schemars::JsonSchema for DataIdentifier {
-    fn schema_name() -> String {
-        "DataIdentifier".to_owned()
-    }
-
-    fn json_schema(_gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
-        schemars::_private::apply_metadata(
-            schemars::schema::Schema::Object(schemars::schema::SchemaObject {
-                instance_type: Some(schemars::schema::InstanceType::String.into()),
-                enum_values: Some(Self::api_examples()),
-                ..Default::default()
-            }),
-            schemars::schema::Metadata {
-                description: Some("Represents the kind of data.".to_owned()),
-                examples: vec![serde_json::Value::String(
-                    DataIdentifier::Id(IdentityDataKind::Ssn9).to_string(),
-                )],
-
-                ..Default::default()
-            },
-        )
-    }
-}
-
 impl paperclip::v2::schema::Apiv2Schema for DataIdentifier {
     fn name() -> Option<String> {
         Some("DataIdentifier".to_string())

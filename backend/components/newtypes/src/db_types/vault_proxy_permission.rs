@@ -1,9 +1,9 @@
 use crate::ProxyConfigId;
-use schemars::JsonSchema;
+
 use serde::{Deserialize, Serialize};
 use strum::EnumDiscriminants;
 
-#[derive(Debug, Clone, Eq, PartialEq, Hash, JsonSchema, Serialize, Deserialize, EnumDiscriminants)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize, EnumDiscriminants)]
 #[strum_discriminants(name(InvokeVaultProxyPermissionKind), derive(strum_macros::Display))]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind")]

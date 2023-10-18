@@ -2,7 +2,7 @@ use newtypes::input::deserialize_stringified_list;
 
 use crate::*;
 
-#[derive(Debug, Clone, Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct ListEntitiesRequest {
     pub kind: Option<VaultKind>,
@@ -17,12 +17,8 @@ pub struct ListEntitiesRequest {
     pub show_all: Option<bool>,
 }
 
-export_schema!(ListEntitiesRequest);
-
-#[derive(Debug, Clone, Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct SearchUsersRequest {
     pub search: Option<PiiString>,
 }
-
-export_schema!(SearchUsersRequest);

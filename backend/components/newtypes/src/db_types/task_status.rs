@@ -3,7 +3,7 @@ use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use serde::{Deserialize, Serialize};
 use strum::EnumDiscriminants;
 use strum_macros::{AsRefStr, EnumString};
@@ -31,7 +31,6 @@ use crate::{
     EnumString,
     AsRefStr,
     Apiv2Schema,
-    JsonSchema,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
@@ -114,7 +113,7 @@ pub enum WebhookEvent {
     OnboardingStatusChanged(OnboardingStatusChangedPayload),
     WatchlistCheckCompleted(WatchlistCheckCompletedPayload),
 }
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct OnboardingCompletedPayload {
     pub fp_id: FpId,
     pub footprint_user_id: Option<FpId>,
@@ -123,7 +122,7 @@ pub struct OnboardingCompletedPayload {
     pub requires_manual_review: bool,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct OnboardingStatusChangedPayload {
     pub fp_id: FpId,
     pub footprint_user_id: Option<FpId>,

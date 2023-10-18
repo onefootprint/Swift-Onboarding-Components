@@ -213,7 +213,7 @@ mod test {
 
     impl<T> SessionContext<T> {
         pub(in crate::auth) fn create_fixture(data: T, session_data: AuthSessionData) -> Self {
-            let map = HeaderMap::new();
+            let _map = HeaderMap::new();
             let auth_token = SessionAuthToken::generate();
             let session = AuthSession {
                 key: auth_token.id(),

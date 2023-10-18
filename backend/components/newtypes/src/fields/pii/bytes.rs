@@ -1,12 +1,12 @@
 use crate::{Base64Data, PiiString};
 
 use paperclip::v2::schema::TypedData;
-use schemars::JsonSchema;
+
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
 /// Represents a Vec<u8> that hides PII
-#[derive(Clone, Deserialize, Serialize, Default, PartialEq, Eq, Hash, JsonSchema)]
+#[derive(Clone, Deserialize, Serialize, Default, PartialEq, Eq, Hash)]
 #[serde(transparent)]
 pub struct PiiBytes(pub(super) Vec<u8>);
 

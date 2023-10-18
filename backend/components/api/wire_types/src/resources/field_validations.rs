@@ -2,8 +2,7 @@ use newtypes::decision::MatchLevel;
 
 use crate::*;
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
-#[schemars(rename_all = "snake_case")]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct FieldValidationDetail {
     pub reason_code: FootprintReasonCode,
     pub note: String,
@@ -12,15 +11,13 @@ pub struct FieldValidationDetail {
     pub match_level: MatchLevel,
 }
 /// A risk event
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
-#[schemars(rename_all = "snake_case")]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct FieldValidation {
     pub match_level: MatchLevel,
     pub signals: Vec<FieldValidationDetail>,
 }
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
-#[schemars(rename_all = "snake_case")]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct GetFieldValidationResponse {
     pub email: Option<FieldValidation>,
     pub phone: Option<FieldValidation>,
@@ -36,5 +33,3 @@ pub struct GetFieldValidationResponse {
     pub business_beneficial_owners: Option<FieldValidation>,
     pub business_dba: Option<FieldValidation>,
 }
-
-export_schema!(GetFieldValidationResponse);

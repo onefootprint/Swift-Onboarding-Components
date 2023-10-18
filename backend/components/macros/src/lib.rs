@@ -521,3 +521,11 @@ pub fn hidden_debug(input: TokenStream) -> TokenStream {
     }
     .into()
 }
+
+/// Ask elliott or alex: basically paperclip sucks
+/// and forces us to declare a dummy proc attr in order
+/// to rename fields for ApiSchemaV2
+#[proc_macro_derive(SerdeAttr, attributes(serde))]
+pub fn serde_dummy_attr(_: TokenStream) -> TokenStream {
+    TokenStream::new()
+}

@@ -1,14 +1,14 @@
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use serde::Deserialize;
 use serde_with::SerializeDisplay;
 use strum_macros::{Display, EnumDiscriminants};
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Deserialize, Apiv2Schema, JsonSchema, EnumDiscriminants)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Deserialize, Apiv2Schema, EnumDiscriminants)]
 #[strum_discriminants(
     name(TriggerKind),
     vis(pub),
-    derive(Display, SerializeDisplay, Apiv2Schema, JsonSchema),
+    derive(Display, SerializeDisplay, Apiv2Schema),
     strum(serialize_all = "snake_case")
 )]
 #[serde(rename_all = "snake_case")]

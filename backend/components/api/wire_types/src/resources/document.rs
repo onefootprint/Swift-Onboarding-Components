@@ -3,7 +3,7 @@ use crate::*;
 use serde_with::SerializeDisplay;
 pub use strum_macros::Display;
 
-#[derive(Debug, Display, SerializeDisplay, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Display, SerializeDisplay, Apiv2Schema)]
 #[strum(serialize_all = "snake_case")]
 pub enum UploadSource {
     Desktop,
@@ -20,8 +20,7 @@ impl From<DocumentScanDeviceType> for UploadSource {
     }
 }
 
-#[derive(Debug, Serialize, Apiv2Schema, JsonSchema)]
-#[schemars(rename_all = "snake_case")]
+#[derive(Debug, Serialize, Apiv2Schema)]
 pub struct Document {
     pub kind: IdDocKind,
     /// Non-null for images uploaded via the UI
@@ -36,8 +35,7 @@ pub struct Document {
     pub upload_source: UploadSource,
 }
 
-#[derive(Debug, Serialize, Apiv2Schema, JsonSchema)]
-#[schemars(rename_all = "snake_case")]
+#[derive(Debug, Serialize, Apiv2Schema)]
 pub struct DocumentUpload {
     pub timestamp: DateTime<Utc>,
     pub side: DocumentSide,
@@ -48,10 +46,9 @@ pub struct DocumentUpload {
     pub is_extra_compressed: bool,
 }
 
-#[derive(Debug, Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Serialize, Apiv2Schema)]
 pub struct PublicDocument {
     /// Document type of the successfully uploaded document. Can be used to fetch from vault
     pub document_type: IdDocKind,
     pub created_at: DateTime<Utc>,
 }
-export_schema!(Document);

@@ -1,8 +1,7 @@
 use crate::*;
 
 /// Secret API key
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
-#[schemars(rename_all = "camelCase")]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 
 pub struct SecretApiKey {
     pub id: TenantApiKeyId,
@@ -15,5 +14,3 @@ pub struct SecretApiKey {
     pub is_live: bool,
     pub role: OrganizationRole,
 }
-
-export_schema!(SecretApiKey);

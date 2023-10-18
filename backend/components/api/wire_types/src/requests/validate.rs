@@ -2,52 +2,42 @@ use crate::*;
 
 /// Request containing a short-lived validation token that is used to verify auth and the end of
 /// an onboarding session.
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, Apiv2Schema)]
 pub struct ValidateRequest {
     pub validation_token: SessionAuthToken,
 }
 
-export_schema!(ValidateRequest);
-
 /// Validates the onboarding token and returns the associated stable fp_id token with status information
-#[derive(Debug, Clone, serde::Serialize, JsonSchema)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct ValidateResponse {
     pub user: EntityValidateResponse,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub business: Option<EntityValidateResponse>,
 
     // Legacy fields that are deprecated
-    #[schemars(skip)]
     #[serde(skip_serializing_if = "Option::is_none")]
     /// Deprecated
     pub footprint_user_id: Option<FpId>,
-    #[schemars(skip)]
     #[serde(skip_serializing_if = "Option::is_none")]
     /// Deprecated
     pub status: Option<OnboardingStatus>,
-    #[schemars(skip)]
     #[serde(skip_serializing_if = "Option::is_none")]
     /// Deprecated
     pub requires_manual_review: Option<bool>,
-    #[schemars(skip)]
     #[serde(skip_serializing_if = "Option::is_none")]
     /// Deprecated
     pub onboarding_configuration_id: Option<ObConfigurationId>,
-    #[schemars(skip)]
     #[serde(skip_serializing_if = "Option::is_none")]
     /// Deprecated
     pub timestamp: Option<DateTime<Utc>>,
 }
 
-export_schema!(ValidateResponse);
-
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 pub struct EntityValidateResponse {
     pub fp_id: FpId,
     pub requires_manual_review: bool,
     pub status: OnboardingStatus,
 }
-export_schema!(EntityValidateResponse);
 
 // Manually implement Apiv2Schema for ValidateResponse since we can't otherwise hide the deprecated fields
 

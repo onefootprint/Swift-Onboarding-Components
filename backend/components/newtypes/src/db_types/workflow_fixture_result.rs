@@ -1,6 +1,6 @@
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use strum_macros::{AsRefStr, Display, EnumString};
 
 use crate::SandboxId;
@@ -18,8 +18,8 @@ use crate::SandboxId;
     EnumString,
     AsRefStr,
     PartialEq,
-    JsonSchema,
     Eq,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]

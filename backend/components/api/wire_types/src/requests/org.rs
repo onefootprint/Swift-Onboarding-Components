@@ -2,7 +2,7 @@ use newtypes::input::Csv;
 
 use crate::*;
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct UpdateTenantRequest {
     pub name: Option<String>,
     pub website_url: Option<String>,
@@ -12,21 +12,15 @@ pub struct UpdateTenantRequest {
     pub allow_domain_access: Option<bool>,
 }
 
-export_schema!(UpdateTenantRequest);
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct OrgMemberFilters {
     pub role_ids: Option<Csv<TenantRoleId>>,
     pub search: Option<String>,
     pub is_invite_pending: Option<bool>,
 }
 
-export_schema!(OrgMemberFilters);
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct OrgRoleFilters {
     pub search: Option<String>,
     pub kind: Option<TenantRoleKindDiscriminant>,
 }
-
-export_schema!(OrgRoleFilters);

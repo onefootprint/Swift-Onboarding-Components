@@ -5,8 +5,7 @@ fn is_false(b: &bool) -> bool {
 }
 
 /// Member of an organization
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
-#[schemars(rename_all = "camelCase")]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 
 pub struct OrganizationMember {
     pub id: TenantUserId,
@@ -19,11 +18,10 @@ pub struct OrganizationMember {
     // Optional since FirmEmployee sessions don't have a rolebinding
     pub rolebinding: Option<OrganizationRolebinding>,
 }
-export_schema!(OrganizationMember);
 
 /// Member of an organization
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
-#[schemars(rename_all = "camelCase")]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+
 /// Info on the currently authed user
 pub struct AuthOrgMember {
     pub id: TenantUserId,
@@ -37,4 +35,3 @@ pub struct AuthOrgMember {
     pub scopes: Vec<TenantScope>,
     pub tenant: Organization,
 }
-export_schema!(AuthOrgMember);

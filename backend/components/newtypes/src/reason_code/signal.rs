@@ -1,22 +1,11 @@
 use crate::SignalScope;
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use serde::{Deserialize, Serialize};
 use strum_macros::Display;
 
 #[derive(
-    Debug,
-    Display,
-    Clone,
-    Copy,
-    Ord,
-    PartialOrd,
-    Eq,
-    PartialEq,
-    Apiv2Schema,
-    JsonSchema,
-    Serialize,
-    Deserialize,
+    Debug, Display, Clone, Copy, Ord, PartialOrd, Eq, PartialEq, Apiv2Schema, Serialize, Deserialize,
 )]
 pub enum OldSignalSeverity {
     TODO,

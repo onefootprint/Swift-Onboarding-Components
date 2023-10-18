@@ -2,7 +2,7 @@ use crate::util::impl_enum_str_diesel;
 use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 use strum_macros::{AsRefStr, EnumIter, EnumString};
@@ -21,7 +21,6 @@ use strum_macros::{AsRefStr, EnumIter, EnumString};
     FromSqlRow,
     EnumString,
     AsRefStr,
-    JsonSchema,
     Hash,
     Ord,
     PartialOrd,
@@ -58,7 +57,6 @@ impl_enum_str_diesel!(Vendor);
     EnumIter,
     EnumString,
     AsRefStr,
-    JsonSchema,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]

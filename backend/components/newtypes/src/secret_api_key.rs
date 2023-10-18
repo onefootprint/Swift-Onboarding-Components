@@ -3,15 +3,13 @@ use std::fmt::Debug;
 use async_trait::async_trait;
 use derive_more::{From, Into};
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use serde::{Deserialize, Serialize};
 
 use crate::{Fingerprint, SealedVaultBytes, VaultPublicKey};
 
 /// A secret api key wrapper around a string
-#[derive(
-    Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default, Apiv2Schema, JsonSchema,
-)]
+#[derive(Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default, Apiv2Schema)]
 #[serde(transparent)]
 pub struct SecretApiKey(String);
 

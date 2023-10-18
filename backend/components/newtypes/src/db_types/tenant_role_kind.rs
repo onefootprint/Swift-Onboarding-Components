@@ -1,6 +1,6 @@
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use strum_macros::{AsRefStr, Display, EnumDiscriminants, EnumString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumDiscriminants)]
@@ -13,7 +13,6 @@ use strum_macros::{AsRefStr, Display, EnumDiscriminants, EnumString};
     AsExpression,
     FromSqlRow,
     EnumString,
-    JsonSchema,
 ))]
 #[strum_discriminants(vis(pub))]
 #[strum_discriminants(name(TenantRoleKindDiscriminant))]

@@ -1,8 +1,7 @@
 use crate::*;
 
 /// Organization
-#[derive(Debug, Clone, Serialize, Apiv2Schema, JsonSchema)]
-#[schemars(rename_all = "camelCase")]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 
 pub struct Organization {
     pub id: TenantId,
@@ -22,4 +21,3 @@ pub struct Organization {
     pub is_prod_kyc_playbook_restricted: bool,
     pub is_prod_kyb_playbook_restricted: bool,
 }
-export_schema!(Organization);

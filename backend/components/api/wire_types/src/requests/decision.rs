@@ -1,13 +1,13 @@
 use crate::*;
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct DecisionRequest {
     pub annotation: CreateAnnotationRequest,
     pub status: TerminalDecisionStatus,
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub enum TerminalDecisionStatus {
     Fail,
@@ -32,5 +32,3 @@ impl From<TerminalDecisionStatus> for OnboardingStatus {
         }
     }
 }
-
-export_schema!(DecisionRequest);

@@ -1,8 +1,6 @@
-use crate::{export_schema, Actor, Apiv2Schema, JsonSchema, Serialize};
+use crate::{Actor, Apiv2Schema, Serialize};
 
-#[derive(Debug, Clone, Serialize, JsonSchema, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct VaultCreated {
     pub actor: Actor,
 }
-
-export_schema!(VaultCreated);

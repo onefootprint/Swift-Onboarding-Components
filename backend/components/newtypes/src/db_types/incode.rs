@@ -1,7 +1,7 @@
 use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, EnumIter, EnumString};
 
@@ -19,7 +19,7 @@ use crate::FootprintReasonCode;
     EnumString,
     EnumIter,
     AsRefStr,
-    JsonSchema,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
@@ -72,7 +72,6 @@ impl IncodeVerificationSessionState {
     EnumIter,
     AsRefStr,
     Apiv2Schema,
-    JsonSchema,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
@@ -154,7 +153,7 @@ impl IncodeFailureReason {
     EnumString,
     EnumIter,
     AsRefStr,
-    JsonSchema,
+    macros::SerdeAttr,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]

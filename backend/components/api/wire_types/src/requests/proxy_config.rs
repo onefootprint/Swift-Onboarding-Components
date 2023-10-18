@@ -1,13 +1,13 @@
 use crate::*;
 
 /// Create a new proxy configuration
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct GetProxyConfigRequest {
     pub status: Option<ApiKeyStatus>,
 }
 
 /// Create a new proxy configuration
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct CreateProxyConfigRequest {
     /// a friendly name for this proxy config
     pub name: String,
@@ -46,7 +46,7 @@ pub struct CreateProxyConfigRequest {
 }
 
 /// PEM encoded client certificate and key
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize)]
 pub struct ClientIdentity {
     /// PEM encoded x509 cert
     pub certificate: String,
@@ -55,7 +55,7 @@ pub struct ClientIdentity {
 }
 
 /// a plain header to forward to the proxy
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize)]
 pub struct PlainCustomHeader {
     /// header name
     pub name: String,
@@ -64,7 +64,7 @@ pub struct PlainCustomHeader {
 }
 
 /// a secret header to forward to the proxy
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize)]
 pub struct SecretCustomHeader {
     /// header name
     pub name: String,
@@ -73,7 +73,7 @@ pub struct SecretCustomHeader {
 }
 
 /// A proxy ingress parsing and vaulting rule
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize)]
 pub struct IngressSettings {
     /// Ingress content type
     pub content_type: ProxyIngressContentType,
@@ -83,9 +83,8 @@ pub struct IngressSettings {
 }
 
 /// A proxy ingress parsing and vaulting rule
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize)]
 pub struct ProxyIngressRule {
-    #[schemars(with = "String")]
     /// the token data identifier to vault as
     pub token: DataIdentifier,
     /// the target path to extract
@@ -93,7 +92,7 @@ pub struct ProxyIngressRule {
 }
 
 /// Patch a new proxy configuration
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct PatchProxyConfigRequest {
     /// enable or disable the config
     pub status: Option<ApiKeyStatus>,
@@ -134,10 +133,3 @@ pub struct PatchProxyConfigRequest {
     /// omit to not change, set to null to remove
     pub ingress_settings: Option<Option<IngressSettings>>,
 }
-
-export_schema!(CreateProxyConfigRequest);
-export_schema!(ClientIdentity);
-export_schema!(PlainCustomHeader);
-export_schema!(SecretCustomHeader);
-export_schema!(ProxyIngressRule);
-export_schema!(PatchProxyConfigRequest);

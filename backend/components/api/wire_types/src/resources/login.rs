@@ -1,13 +1,11 @@
 use crate::*;
 
-#[derive(serde::Deserialize, Apiv2Schema, JsonSchema)]
+#[derive(serde::Deserialize, Apiv2Schema)]
 pub struct OrgLoginRequest {
     pub code: String,
 }
 
-export_schema!(OrgLoginRequest);
-
-#[derive(serde::Serialize, Apiv2Schema, JsonSchema)]
+#[derive(serde::Serialize, Apiv2Schema)]
 pub struct OrgLoginResponse {
     /// Whether a new tenant was created for the authed user
     pub created_new_tenant: bool,
@@ -24,5 +22,3 @@ pub struct OrgLoginResponse {
     pub user: Option<OrganizationMember>,
     pub tenant: Option<Organization>,
 }
-
-export_schema!(OrgLoginResponse);

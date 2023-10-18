@@ -22,7 +22,6 @@ lazy_static! {
     serde::Serialize,
     Default,
     DieselNewType,
-    schemars::JsonSchema,
     derive_more::Deref,
     // This is the unique part - use FromStr to validate the alias
     serde_with::DeserializeFromStr,
@@ -80,7 +79,6 @@ impl KvDataKey {
     serde::Serialize,
     Default,
     DieselNewType,
-    schemars::JsonSchema,
     derive_more::Deref,
     // This is the unique part - use FromStr to validate the alias
     serde_with::DeserializeFromStr,

@@ -1,5 +1,5 @@
 use paperclip::actix::Apiv2Schema;
-use schemars::JsonSchema;
+
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum_macros::{AsRefStr, Display, EnumString};
 
@@ -14,9 +14,9 @@ use strum_macros::{AsRefStr, Display, EnumString};
     Display,
     DeserializeFromStr,
     Apiv2Schema,
-    JsonSchema,
     EnumString,
     AsRefStr,
+    macros::SerdeAttr,
 )]
 #[serde(rename_all = "UPPERCASE")]
 #[strum(serialize_all = "UPPERCASE")]
