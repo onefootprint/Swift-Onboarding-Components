@@ -20,7 +20,7 @@ const createUseRouterSpy = () => {
     asPath,
     pathname,
     push = jest.fn(),
-    query,
+    query = {},
     replace = jest.fn(),
     route,
     isReady = true,

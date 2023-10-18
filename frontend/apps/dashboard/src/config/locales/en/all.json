@@ -425,6 +425,7 @@
             "auth-method-not-supported": "{{tenantName}} has disabled the ability to log in using this auth method. Please retry using another method."
           }
         },
+        "admin-mode": "Log in as Super Admin",
         "log-out": "Log out"
       },
       "mode-switcher": {
@@ -444,6 +445,7 @@
       },
       "assume-banner": {
         "title": "You're logged into {{orgName}} as a firm employee.",
+        "switch": "Switch tenant",
         "log-out": "Log out"
       }
     },

@@ -153,6 +153,7 @@ export { RoleKind, RoleScopeKind, supportedRoleKinds } from './role';
 export type { Rolebinding } from './rolebinding';
 export { IdDocOutcomes, OverallOutcomes } from './sandbox-outcomes-type';
 export { default as SessionStatus } from './session-status';
+export type { Tenant } from './tenant';
 export type {
   CollectedDataEvent,
   CollectedDataEventData,

@@ -25,7 +25,7 @@ describe('<Layout />', () => {
 
   describe('when the user is NOT logged', () => {
     beforeEach(() => {
-      useRouterSpy({ pathname: '/login' });
+      useRouterSpy({ pathname: '/login', query: {} });
       useStore.setState(originalState);
     });
 
@@ -37,7 +37,7 @@ describe('<Layout />', () => {
 
   describe('when the user is logged', () => {
     beforeEach(() => {
-      useRouterSpy({ pathname: '/users' });
+      useRouterSpy({ pathname: '/users', query: {} });
       asAdminUser();
       withOrgAuthRoles();
     });

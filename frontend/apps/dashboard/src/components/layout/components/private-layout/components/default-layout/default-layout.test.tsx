@@ -29,6 +29,7 @@ describe('<DefaultLayout />', () => {
   beforeEach(() => {
     useRouterSpy({
       pathname: '/users',
+      query: {},
     });
     withEntities();
     withOrgAuthRoles();

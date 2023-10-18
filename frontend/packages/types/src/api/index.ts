@@ -86,6 +86,7 @@ export type {
   GetRiskSignalDetailsResponse,
 } from './get-risk-signal-details';
 export type { GetRolesRequest, GetRolesResponse } from './get-roles';
+export type { GetTenantsRequest, GetTenantsResponse } from './get-tenants';
 export type { GetTimelineRequest, GetTimelineResponse } from './get-timeline';
 export type { IdentifyRequest, IdentifyResponse } from './identify';
 export { AUTH_HEADER, SANDBOX_ID_HEADER } from './identify';

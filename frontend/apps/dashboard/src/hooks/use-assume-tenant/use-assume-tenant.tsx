@@ -1,7 +1,7 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import request, { getErrorMessage } from '@onefootprint/request';
 import type { Organization } from '@onefootprint/types';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
@@ -28,12 +28,18 @@ const useAssumeTenant = () => {
   const { authHeaders } = useSession();
   const session = useSession();
   const showErrorToast = useRequestErrorToast();
+  const queryClient = useQueryClient();
 
   return useMutation(
     (data: PostAssumeRequest) =>
       postAssumeTenantReadOnly(authHeaders, data.tenantId),
     {
-      onSuccess: session.refreshUserPermissions,
+      onMutate: () => {
+        queryClient.invalidateQueries();
+      },
+      onSuccess: () => {
+        session.refreshUserPermissions();
+      },
       onError: (error: unknown) => {
         console.error(`Assuming tenant failed`, getErrorMessage(error));
         showErrorToast(error);

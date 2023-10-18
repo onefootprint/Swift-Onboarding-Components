@@ -1,14 +1,18 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Banner } from '@onefootprint/ui';
-import { useRouter } from 'next/router';
 import React from 'react';
+import useRouter from 'src/hooks/use-router';
 import useSession from 'src/hooks/use-session';
 
 const AssumeBanner = () => {
   const { t } = useTranslation('components.private-layout.assume-banner');
   const { data } = useSession();
   const router = useRouter();
+
+  const handleSwitch = () => {
+    router.pushQuery({ admin: true });
+  };
 
   const handleLogout = () => {
     router.push({
@@ -21,6 +25,10 @@ const AssumeBanner = () => {
     <AssumeBannerContainer>
       <Banner variant="info">
         {t('title', { orgName: data.org?.name })}
+        <button type="button" onClick={handleSwitch}>
+          {t('switch')}
+        </button>{' '}
+        ·
         <button type="button" onClick={handleLogout}>
           {t('log-out')}
         </button>

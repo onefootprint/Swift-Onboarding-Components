@@ -1,0 +1,24 @@
+{
+  "page-title": "Switch tenant",
+  "title": "Tenants",
+  "subtitle": "Select a tenant to view as Super Admin ",
+  "table": {
+    "aria-label": "Tenants table",
+    "search-placeholder": "Search by name...",
+    "empty-state": "No tenants found",
+    "header": {
+      "name": "Name",
+      "id": "Id",
+      "live-users": "Live users",
+      "sandbox-users": "Sandbox users",
+      "created-at": "Created at"
+    },
+    "row": {
+      "assume": "View as Super Admin",
+      "notification": {
+        "title": "Success!",
+        "description": "You are now viewing {{tenantName}} as a Super Admin."
+      }
+    }
+  }
+}

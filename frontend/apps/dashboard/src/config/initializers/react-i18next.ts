@@ -1,16 +1,22 @@
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-import en from '../locales/english.json';
+import en from '../locales/en/all.json';
+import superAdmin from '../locales/en/super-admin.json';
 
 const configureReactI18next = () => {
   const resources = {
-    en: { translation: en },
+    en: {
+      default: en,
+      'super-admin': superAdmin,
+    },
   };
-
   const I18NOptions = {
     resources,
     lng: 'en',
+    defaultNS: 'default',
+    ns: ['default', 'super-admin'],
+    returnNull: false,
     interpolation: {
       escapeValue: false,
     },
