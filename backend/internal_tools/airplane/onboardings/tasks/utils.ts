@@ -33,6 +33,17 @@ export async function pg_query(dbUrl, query) {
   return res.rows;
 }
 
+export const tenant_name_to_emoji = new Map([
+  ['findigs.com', ':findigs:'],
+  ['Flexcar', ':flexcar:'],
+  ['Coba', ':coba:'],
+  ['Composer', ':composer:'],
+  ['Fractional', ':fractional:'],
+  ['Basic Capital', ':basic-capital:'],
+  ['Trayd', ':trayd:'],
+  ['Footprint Live', ':footprint:'],
+]);
+
 export function rows_to_message(rows) {
   let cols = [
     // 'completed_at',
@@ -47,17 +58,6 @@ export function rows_to_message(rows) {
     'doc_failure_reasons',
     'document_type',
   ];
-
-  let tenant_name_to_emoji = new Map([
-    ['findigs.com', ':findigs:'],
-    ['Flexcar', ':flexcar:'],
-    ['Coba', ':coba:'],
-    ['Composer', ':composer:'],
-    ['Fractional', ':fractional:'],
-    ['Basic Capital', ':basic-capital:'],
-    ['Trayd', ':trayd:'],
-    ['Footprint Live', ':footprint:'],
-  ]);
 
   function fieldString(col, value) {
     if (value === null) {

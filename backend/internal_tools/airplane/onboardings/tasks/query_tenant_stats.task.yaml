@@ -1,0 +1,5 @@
+slug: query_tenant_stats
+name: query_tenant_stats
+sql:
+  resource: 'prod_ro_db'
+  entrypoint: query_tenant_stats.sql
