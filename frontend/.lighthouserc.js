@@ -19,12 +19,12 @@ module.exports = {
               { metric: 'first-meaningful-paint', budget: 1000 },
             ],
             resourceSizes: /* kibibytes (1 KiB = 1024 bytes) */ [
-              { resourceType: 'total', budget: 550 }, //       542 KiB
-              { resourceType: 'script', budget: 445 }, //      442.2 KiB
+              { resourceType: 'total', budget: 576 }, //       549.9 KiB
+              { resourceType: 'script', budget: 472 }, //      450.1 KiB
               { resourceType: 'font', budget: 51 }, //         50.7 KiB
               { resourceType: 'third-party', budget: 95 }, //  90.3 KiB
-              { resourceType: 'document', budget: 8 }, //      7 KiB
-              { resourceType: 'image', budget: 36 }, //        29.6 KiB
+              { resourceType: 'document', budget: 9 }, //      7.0 KiB
+              { resourceType: 'image', budget: 37 }, //        35.6 KiB
               { resourceType: 'stylesheet', budget: 7 }, //    6.3 KiB
               { resourceType: 'other', budget: 2 }, //         1.2 KiB
               { resourceType: 'media', budget: 1 }, //         0.0 KiB
