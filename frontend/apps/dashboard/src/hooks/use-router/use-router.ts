@@ -4,7 +4,9 @@ const useRouter = () => {
   const router = useNextRouter();
 
   const pushQuery = (query: Record<string, any>) =>
-    router.push({ query }, undefined, { shallow: true });
+    router.push({ pathname: router.pathname, query }, undefined, {
+      shallow: true,
+    });
 
   const resetQuery = () => {
     router.push({ query: {} }, undefined, { shallow: true });
