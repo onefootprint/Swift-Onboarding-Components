@@ -68,9 +68,9 @@ const FloatingBox = ({
               deviceInfo.instantApp,
               deviceInfo.appClip,
             )
-          : t('vault-only.title')}
+          : t('no-insights.title')}
       </Typography>
-      {hasInsights ? (
+      {hasInsights && (
         <>
           {ipAddress && (
             <Row role="row" aria-label={t('ip-address')}>
@@ -162,13 +162,6 @@ const FloatingBox = ({
             </Row>
           )}
         </>
-      ) : (
-        <Typography
-          variant="body-2"
-          sx={{ margin: 3, marginTop: 0, textAlign: 'center' }}
-        >
-          {t('vault-only.message')}
-        </Typography>
       )}
     </Container>
   );

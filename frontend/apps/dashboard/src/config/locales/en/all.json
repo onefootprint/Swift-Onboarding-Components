@@ -1257,9 +1257,8 @@
             "disclaimer": "This is just a preview and no real data will be collected."
           }
         },
-        "vault-only": {
-          "title": "No device insights available",
-          "message": "This user was created via API, so we don't have any device insights available."
+        "no-insights": {
+          "title": "No device insights available"
         }
       },
       "truncated-text": {

@@ -79,11 +79,6 @@ describe('<FloatingBox/>', () => {
 
       const title = screen.getByText('No device insights available');
       expect(title).toBeInTheDocument();
-
-      const bodyText = screen.getByText(
-        "This user was created via API, so we don't have any device insights available.",
-      );
-      expect(bodyText).toBeInTheDocument();
     });
 
     it('should not show information related with ip, region and country', () => {
