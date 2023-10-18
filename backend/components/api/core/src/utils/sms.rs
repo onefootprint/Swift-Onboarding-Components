@@ -1,7 +1,6 @@
 use aws_credential_types::provider::SharedCredentialsProvider;
 use std::fmt::Debug;
 use tokio::sync::oneshot::{self, Receiver, Sender};
-use tracing::Span;
 
 use crate::{
     errors::{challenge::ChallengeError, user::UserError, ApiError, ApiResult},
@@ -157,8 +156,7 @@ impl SmsClient {
         .enforce_and_update()
         .await?;
         let message_body = PiiString::from(format!("{}\n\nSent via Footprint", message_body.leak()));
-        let span = tracing::Span::current();
-        self._send_message(message_body, destination.e164(), None, None, span)
+        self._send_message(message_body, destination.e164(), None, None)
             .await?;
         Ok(())
     }
@@ -188,22 +186,19 @@ impl SmsClient {
         let message_body = PiiString::from(format!("{}\n\nSent via Footprint", message_body.leak()));
         let e164 = destination.e164();
         let client = self.clone();
-        let span = tracing::Span::current();
         tokio::spawn(async move {
             let _ = client
-                ._send_message(message_body, e164, Some(tx), session_id, span)
-                .await;
+                ._send_message(message_body, e164, Some(tx), session_id)
+                .await
+                .map_err(|err| {
+                    tracing::error!(?err, "Failed to send SMS message");
+                });
         });
         Ok(())
     }
 
     /// Sends the message_body to the provided destination, choosing which vendor to use if any
-    #[tracing::instrument(
-        "SmsClient::_send_message",
-        skip(self, message_body, destination, tx),
-        follows_from=[cause],
-        err
-    )]
+    #[tracing::instrument("SmsClient::_send_message", skip(self, message_body, destination, tx))]
     async fn _send_message(
         &self,
         message_body: PiiString,
@@ -211,8 +206,6 @@ impl SmsClient {
         mut tx: Option<Sender<ApiError>>,
         // Optional for logging
         session_id: Option<SessionId>,
-        // Parent span that called this
-        cause: Span,
     ) -> ApiResult<()> {
         let message = Message {
             client: self,

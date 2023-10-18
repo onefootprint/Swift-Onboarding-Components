@@ -160,13 +160,11 @@ impl SendgridClient {
             .await
     }
 
-    #[tracing::instrument(skip_all, err, follows_from=[cause])]
     pub async fn send_email_otp_verify_email(
         &self,
         to_email: PiiString,
         code: String,
         tenant_url: String,
-        cause: tracing::Span,
     ) -> ApiResult<()> {
         let template_data = HashMap::from([
             ("code".to_string(), code.into()),

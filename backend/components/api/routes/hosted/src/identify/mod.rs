@@ -180,12 +180,14 @@ pub fn send_email_challenge_non_blocking(
 
     let state = state.clone();
     let email2 = email.email.clone();
-    let span = tracing::Span::current();
     tokio::spawn(async move {
         let _ = state
             .sendgrid_client
-            .send_email_otp_verify_email(email2, code, tenant_url, span)
-            .await;
+            .send_email_otp_verify_email(email2, code, tenant_url)
+            .await
+            .map_err(|err| {
+                tracing::error!(?err, "Failed to send email challenge");
+            });
     });
 
     Ok(ChallengeData::Email(PhoneEmailChallengeState {
