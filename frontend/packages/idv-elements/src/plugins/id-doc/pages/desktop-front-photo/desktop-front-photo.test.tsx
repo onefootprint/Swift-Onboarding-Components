@@ -44,7 +44,7 @@ describe('<DesktopFrontPhoto />', () => {
         'file-input',
       ) as HTMLInputElement;
       expect(uploadInput).toBeInTheDocument();
-      expect(uploadInput.getAttribute('accept')).toEqual('image/*,.heic,.heif');
+      expect(uploadInput.getAttribute('accept')).toEqual('image/*');
     });
   });
 

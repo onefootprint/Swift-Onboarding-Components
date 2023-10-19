@@ -3,6 +3,7 @@ import styled, { css } from '@onefootprint/styled';
 import { IdDocImageUploadError } from '@onefootprint/types';
 import React, { useRef, useState } from 'react';
 
+import useProcessImage from '../../../../hooks/use-process-image';
 import handleFileUpload from '../../utils/handle-file-upload';
 
 type DraggableInputFieldProps = {
@@ -24,6 +25,7 @@ const DraggableInputField = ({
 }: DraggableInputFieldProps) => {
   const [dragActive, setDragActive] = useState(false);
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
+  const { acceptedFileFormats } = useProcessImage();
 
   const handleFileDrop = (ev: React.DragEvent<HTMLDivElement>) => {
     ev.preventDefault();
@@ -88,7 +90,7 @@ const DraggableInputField = ({
       <StyledInput
         ref={uploadPhotoRef as React.RefObject<HTMLInputElement>}
         type="file"
-        accept="image/*,.heic,.heif"
+        accept={acceptedFileFormats}
         onChange={handleImageUpload}
         aria-label="file-input"
       />

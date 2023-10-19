@@ -44,7 +44,7 @@ const DesktopPhotoPrompt = ({
   const [state, send] = useIdDocMachine();
   const { hasBadConnectivity } = state.context;
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
-  const { processImageFile } = useProcessImage();
+  const { processImageFile, acceptedFileFormats } = useProcessImage();
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -157,7 +157,7 @@ const DesktopPhotoPrompt = ({
         <StyledInput
           ref={uploadPhotoRef as React.RefObject<HTMLInputElement>}
           type="file"
-          accept="image/*,.heic,.heif"
+          accept={acceptedFileFormats}
           onClick={onFileInputClick}
           onChange={handleImageUpload}
         />

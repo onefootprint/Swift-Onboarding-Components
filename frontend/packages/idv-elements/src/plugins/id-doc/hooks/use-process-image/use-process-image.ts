@@ -44,20 +44,21 @@ const runProcessFileScript = async (
   file: File,
   extraCompress?: boolean,
 ): Promise<ProcessedImageFile | undefined> => {
-  let converted: File;
+  let converted: File | undefined;
   try {
-    converted =
-      isHeicType(file.type) && imageProcessors?.heic
-        ? await imageProcessors
-            .heic({ blob: file, toType: 'image/jpeg' })
-            .then(res => {
-              const blob = Array.isArray(res) ? res : [res];
-              return new File(blob, file.name, {
-                type: 'image/jpeg',
-                lastModified: file.lastModified,
-              });
-            })
-        : file;
+    if (!isHeicType(file.type)) {
+      converted = file;
+    } else if (imageProcessors?.heic && imageProcessors.heicLoading) {
+      converted = await imageProcessors
+        .heic({ blob: file, toType: 'image/jpeg' })
+        .then(res => {
+          const blob = Array.isArray(res) ? res : [res];
+          return new File(blob, file.name, {
+            type: 'image/jpeg',
+            lastModified: file.lastModified,
+          });
+        });
+    }
   } catch (e) {
     onError(ImageProcessingStepError.heic, e);
     return undefined;
@@ -146,6 +147,11 @@ const useProcessImage = () => {
   const imageProcessors = useImgProcessorsContext();
   const handleError = errorHandler(toast);
 
+  const acceptedFileFormats = ['image/*'];
+  if (imageProcessors?.heic) {
+    acceptedFileFormats.push('.heic', '.heif');
+  }
+
   return {
     convertImageFileToStrippedBase64: partial(
       convertImageFileToStrippedBase64,
@@ -156,6 +162,7 @@ const useProcessImage = () => {
       imageProcessors,
     ]),
     processImageUrl: partial(processImageUrl, [handleError]),
+    acceptedFileFormats: acceptedFileFormats.join(','),
   };
 };
 
