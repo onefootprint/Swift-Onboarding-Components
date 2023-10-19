@@ -1,26 +1,26 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { IdDocOutcomes, OverallOutcomes } from '@onefootprint/types';
+import { IdDocOutcome, OverallOutcome } from '@onefootprint/types';
 import { Box, Typography } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import OutcomeSelect from '../outcome-select';
 
-const OverallOutcome = () => {
+const OverallOutcomeSelect = () => {
   const { t } = useTranslation('pages.sandbox-outcome.overall-outcome');
   const { control, watch, setValue } = useFormContext();
   const watchIdDocOutcome = watch('outcomes.idDocOutcome');
   const [hint, setHint] = useState('');
 
   useEffect(() => {
-    if (watchIdDocOutcome === IdDocOutcomes.fail) {
-      setValue('outcomes.overallOutcome', OverallOutcomes.fail);
+    if (watchIdDocOutcome === IdDocOutcome.fail) {
+      setValue('outcomes.overallOutcome', OverallOutcome.fail);
       setHint(t('hint.id-doc-fail'));
       return;
     }
-    if (watchIdDocOutcome === IdDocOutcomes.real) {
-      setValue('outcomes.overallOutcome', OverallOutcomes.documentDecision);
+    if (watchIdDocOutcome === IdDocOutcome.real) {
+      setValue('outcomes.overallOutcome', OverallOutcome.documentDecision);
       setHint(t('hint.id-doc-real'));
       return;
     }
@@ -40,23 +40,23 @@ const OverallOutcome = () => {
               options={[
                 {
                   title: t('outcome.options.success.title'),
-                  value: OverallOutcomes.success,
+                  value: OverallOutcome.success,
                 },
                 {
                   title: t('outcome.options.manual-review.title'),
-                  value: OverallOutcomes.manualReview,
+                  value: OverallOutcome.manualReview,
                 },
                 {
                   title: t('outcome.options.fail.title'),
-                  value: OverallOutcomes.fail,
+                  value: OverallOutcome.fail,
                 },
               ]}
               value={field.value}
               onChange={field.onChange}
               testID="overallOutcomeOption"
               disabled={
-                watchIdDocOutcome === IdDocOutcomes.fail ||
-                watchIdDocOutcome === IdDocOutcomes.real
+                watchIdDocOutcome === IdDocOutcome.fail ||
+                watchIdDocOutcome === IdDocOutcome.real
               }
             />
             {hint && (
@@ -83,4 +83,4 @@ const Container = styled.div`
   `}
 `;
 
-export default OverallOutcome;
+export default OverallOutcomeSelect;

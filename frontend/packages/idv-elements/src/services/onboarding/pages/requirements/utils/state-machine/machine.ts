@@ -1,6 +1,7 @@
 import type {
-  IdDocOutcomes,
+  IdDocOutcome,
   IdvBootstrapData,
+  OverallOutcome,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
@@ -16,18 +17,13 @@ export type OnboardingRequirementsMachineArgs = {
   authToken: string;
   bootstrapData?: IdvBootstrapData;
   isTransfer?: boolean;
-  idDocOutcome?: IdDocOutcomes;
+  idDocOutcome?: IdDocOutcome;
+  overallOutcome?: OverallOutcome;
 };
 
-const createOnboardingRequirementsMachine = ({
-  userFound,
-  device,
-  authToken,
-  bootstrapData,
-  isTransfer,
-  idDocOutcome,
-  config,
-}: OnboardingRequirementsMachineArgs) =>
+const createOnboardingRequirementsMachine = (
+  args: OnboardingRequirementsMachineArgs,
+) =>
   createMachine(
     {
       predictableActionArguments: true,
@@ -40,15 +36,7 @@ const createOnboardingRequirementsMachine = ({
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'checkRequirements',
       context: {
-        onboardingContext: {
-          userFound,
-          device,
-          authToken,
-          config,
-          bootstrapData,
-          isTransfer,
-          idDocOutcome,
-        },
+        onboardingContext: { ...args },
         requirements: [],
         startedDataCollection: false,
       },

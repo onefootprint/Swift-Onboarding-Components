@@ -40,7 +40,7 @@ export const onboardingConfigFixture = {
 export const withOnboardingConfig = (data = onboardingConfigFixture) =>
   mockRequest({
     method: 'get',
-    path: '/org/onboarding_config',
+    path: '/hosted/onboarding/config',
     response: {
       data,
     },

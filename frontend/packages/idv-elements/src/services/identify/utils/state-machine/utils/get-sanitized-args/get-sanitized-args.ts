@@ -8,6 +8,7 @@ const getSanitizedArgs = ({
   sandboxId,
   bootstrapData,
   initialAuthToken,
+  overallOutcome,
   obConfigAuth,
   showLogo,
 }: IdentifyMachineArgs): MachineContext => {
@@ -28,6 +29,7 @@ const getSanitizedArgs = ({
     identify: {
       sandboxId,
     },
+    overallOutcome,
     challenge: {},
     showLogo,
     initialAuthToken,

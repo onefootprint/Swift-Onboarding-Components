@@ -51,7 +51,7 @@ export const getKycOnboardingConfig = (isLive?: boolean) => ({
 export const withOnboardingConfig = (data: any) =>
   mockRequest({
     method: 'get',
-    path: '/org/onboarding_config',
+    path: '/hosted/onboarding/config',
     response: data,
   });
 

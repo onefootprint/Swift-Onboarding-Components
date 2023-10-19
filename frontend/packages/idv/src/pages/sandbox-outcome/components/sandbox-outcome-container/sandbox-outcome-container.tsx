@@ -2,15 +2,15 @@ import { useTranslation } from '@onefootprint/hooks';
 import { HeaderTitle, NavigationHeader } from '@onefootprint/idv-elements';
 import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import { IdDocOutcomes, OverallOutcomes } from '@onefootprint/types';
+import { IdDocOutcome, OverallOutcome } from '@onefootprint/types';
 import { Box, Button } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import type { SandboxOutcomeFormData } from '../../types';
 import getRandomID from '../../utils/get-random-id';
-import IdDocOutcome from '../id-doc-outcome';
-import OverallOutcome from '../overall-outcome';
+import IdDocOutcomeSelect from '../id-doc-outcome-select';
+import OverallOutcomeSelect from '../overall-outcome-select';
 import TestIdInput from '../test-id-input';
 
 export const SandboxOutcomeContainer = ({
@@ -25,10 +25,8 @@ export const SandboxOutcomeContainer = ({
   const formMethods = useForm<SandboxOutcomeFormData>({
     defaultValues: {
       outcomes: {
-        overallOutcome: OverallOutcomes.success,
-        idDocOutcome: shouldShowIdDocOutcome
-          ? IdDocOutcomes.success
-          : undefined,
+        overallOutcome: OverallOutcome.success,
+        idDocOutcome: shouldShowIdDocOutcome ? IdDocOutcome.success : undefined,
       },
       testID: getRandomID(),
     },
@@ -46,11 +44,11 @@ export const SandboxOutcomeContainer = ({
       <FormProvider {...formMethods}>
         <Form onSubmit={handleSubmit(onSubmit)}>
           {shouldShowIdDocOutcome && (
-            <IdDocOutcome
+            <IdDocOutcomeSelect
               allowRealOutcome={config?.canMakeRealDocScanCallsInSandbox}
             />
           )}
-          <OverallOutcome />
+          <OverallOutcomeSelect />
           <TestIdInput />
           <Button fullWidth type="submit" disabled={!!errors?.testID}>
             {t('cta')}

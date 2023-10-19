@@ -22,6 +22,7 @@ const EmailIdentification = () => {
     obConfigAuth,
     config: { logoUrl, orgName },
     showLogo,
+    overallOutcome,
   } = state.context;
   const identifyMutation = useIdentify();
   const { isLoading } = identifyMutation;
@@ -86,7 +87,10 @@ const EmailIdentification = () => {
         isLoading={isLoading}
       />
       <LegalFooter />
-      <SandboxOutcomeFooter sandboxId={sandboxId} />
+      <SandboxOutcomeFooter
+        sandboxId={sandboxId}
+        overallOutcome={overallOutcome}
+      />
     </>
   );
 };

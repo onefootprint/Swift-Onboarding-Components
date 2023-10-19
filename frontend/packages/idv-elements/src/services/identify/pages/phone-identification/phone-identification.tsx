@@ -24,6 +24,7 @@ const PhoneIdentification = () => {
     identify: { phoneNumber, email, sandboxId },
     obConfigAuth,
     showLogo,
+    overallOutcome,
     config: { logoUrl, orgName, isLive },
   } = state.context;
   const identifyMutation = useIdentify();
@@ -100,7 +101,10 @@ const PhoneIdentification = () => {
           options={options}
         />
       </Stack>
-      <SandboxOutcomeFooter sandboxId={sandboxId} />
+      <SandboxOutcomeFooter
+        sandboxId={sandboxId}
+        overallOutcome={overallOutcome}
+      />
     </>
   );
 };

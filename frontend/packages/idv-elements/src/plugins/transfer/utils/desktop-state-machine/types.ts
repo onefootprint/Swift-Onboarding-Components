@@ -1,7 +1,4 @@
-import type {
-  IdDocOutcomes,
-  PublicOnboardingConfig,
-} from '@onefootprint/types';
+import type { IdDocOutcome, PublicOnboardingConfig } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 import type { TransferRequirements } from '../../types';
@@ -13,7 +10,7 @@ export type MachineContext = {
   device?: DeviceInfo;
   missingRequirements: TransferRequirements;
   config?: PublicOnboardingConfig;
-  idDocOutcome?: IdDocOutcomes;
+  idDocOutcome?: IdDocOutcome;
 };
 
 export type MachineEvents =
@@ -24,7 +21,7 @@ export type MachineEvents =
         device: DeviceInfo;
         config: PublicOnboardingConfig;
         missingRequirements: TransferRequirements;
-        idDocOutcome?: IdDocOutcomes;
+        idDocOutcome?: IdDocOutcome;
       };
     }
   | {

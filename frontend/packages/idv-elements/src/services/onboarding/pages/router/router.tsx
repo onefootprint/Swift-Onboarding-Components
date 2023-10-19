@@ -23,6 +23,7 @@ const Router = ({ onDone }: RouterProps) => {
     authToken,
     bootstrapData,
     isTransfer,
+    overallOutcome,
     validationToken,
     idDocOutcome,
   } = state.context;
@@ -46,6 +47,7 @@ const Router = ({ onDone }: RouterProps) => {
           authToken={authToken}
           bootstrapData={bootstrapData}
           isTransfer={isTransfer}
+          overallOutcome={overallOutcome}
           idDocOutcome={idDocOutcome}
           onDone={() => send({ type: 'requirementsCompleted' })}
         />

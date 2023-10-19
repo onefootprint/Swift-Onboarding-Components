@@ -3,7 +3,7 @@ import type {
   IdDocImageProcessingError,
   IdDocImageTypes,
   IdDocImageUploadError,
-  IdDocOutcomes,
+  IdDocOutcome,
   IdDocRequirement,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
@@ -33,7 +33,7 @@ export type MachineContext = {
   };
   id?: string;
   errors?: IdDocImageErrorType[];
-  sandboxOutcome?: IdDocOutcomes;
+  sandboxOutcome?: IdDocOutcome;
   supportedCountryAndDocTypes: Partial<
     Record<CountryCode, SupportedIdDocTypes[]>
   >;

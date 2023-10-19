@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { IdDocOutcomes } from '@onefootprint/types';
+import { IdDocOutcome } from '@onefootprint/types';
 import { Radio, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -22,7 +22,7 @@ const RealOutcome = ({ onSelect, isSelected }: RealOutcomeProps) => {
         render={({ field }) => (
           <Radio
             label={t('real-outcome.title')}
-            value={IdDocOutcomes.real}
+            value={IdDocOutcome.real}
             onChange={ev => {
               onSelect();
               field.onChange(ev);

@@ -16,7 +16,7 @@ export type ProcessProps = {
 const Process = ({ onDone }: ProcessProps) => {
   const [state] = useOnboardingRequirementsMachine();
   const {
-    onboardingContext: { authToken },
+    onboardingContext: { authToken, overallOutcome },
   } = state.context;
   const processMutation = useOnboardingProcess();
   const { isError } = processMutation;
@@ -26,7 +26,7 @@ const Process = ({ onDone }: ProcessProps) => {
       return;
     }
     processMutation.mutate(
-      { authToken },
+      { authToken, fixtureResult: overallOutcome },
       {
         onSuccess: onDone,
         onError: (error: unknown) => {

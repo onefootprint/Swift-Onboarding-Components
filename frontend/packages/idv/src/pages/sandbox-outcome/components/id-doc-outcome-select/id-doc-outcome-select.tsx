@@ -6,11 +6,11 @@ import React, { useState } from 'react';
 import RealOutcome from './components/real-outcome';
 import SimulatedOutcomes from './components/simulated-outcomes';
 
-type IdDocOutcomeProps = {
+type IdDocOutcomeSelectProps = {
   allowRealOutcome?: boolean;
 };
 
-const IdDocOutcome = ({ allowRealOutcome }: IdDocOutcomeProps) => {
+const IdDocOutcomeSelect = ({ allowRealOutcome }: IdDocOutcomeSelectProps) => {
   const { t } = useTranslation('pages.sandbox-outcome.id-doc-outcome');
   const [isSimulated, setIsSimulated] = useState(true);
 
@@ -51,4 +51,4 @@ const OutcomesContainer = styled.div`
   `}
 `;
 
-export default IdDocOutcome;
+export default IdDocOutcomeSelect;

@@ -1,4 +1,3 @@
-import type { IdDocOutcomes } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
 import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
@@ -18,7 +17,6 @@ export type DonePayload = {
   userFound: boolean;
   email?: string;
   phoneNumber?: string;
-  idDocOutcome?: IdDocOutcomes;
 };
 
 type RouterProps = Pick<IdentifyProps, 'onDone'>;
@@ -30,7 +28,6 @@ const Router = ({ onDone }: RouterProps) => {
     initialAuthToken,
     challenge: { authToken },
     identify: { userFound, email, phoneNumber },
-    idDocOutcome,
   } = state.context;
   useLogStateMachine('identify', state);
 
@@ -44,7 +41,6 @@ const Router = ({ onDone }: RouterProps) => {
         userFound: !!userFound,
         email,
         phoneNumber,
-        idDocOutcome,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

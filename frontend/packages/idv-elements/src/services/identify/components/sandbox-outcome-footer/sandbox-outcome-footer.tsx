@@ -1,26 +1,35 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
+import { OverallOutcome } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
-import parseSuffix from './utils/parse-suffix';
-
 type SandboxOutcomeFooterProps = {
   sandboxId?: string;
+  overallOutcome?: OverallOutcome;
 };
 
-const SandboxOutcomeFooter = ({ sandboxId }: SandboxOutcomeFooterProps) => {
+const SandboxOutcomeFooter = ({
+  sandboxId,
+  overallOutcome = OverallOutcome.success,
+}: SandboxOutcomeFooterProps) => {
   const { t } = useTranslation('components.sandbox-outcome-footer');
+  const outcomeLabels: Record<OverallOutcome, string> = {
+    [OverallOutcome.success]: t('outcome.options.success'),
+    [OverallOutcome.manualReview]: t('outcome.options.manual-review'),
+    [OverallOutcome.fail]: t('outcome.options.fail'),
+    [OverallOutcome.documentDecision]: t('outcome.options.document-decision'),
+  };
 
   return sandboxId ? (
     <Container>
       <Inner>
         <Column>
           <Typography variant="label-4" color="tertiary">
-            {t('outcome')}
+            {t('outcome.label')}
           </Typography>
           <Typography variant="label-4" color="secondary">
-            {parseSuffix(sandboxId).outcome}
+            {outcomeLabels[overallOutcome]}
           </Typography>
         </Column>
         <Column>
@@ -28,7 +37,7 @@ const SandboxOutcomeFooter = ({ sandboxId }: SandboxOutcomeFooterProps) => {
             {t('testID')}
           </Typography>
           <Typography variant="label-4" color="secondary">
-            {parseSuffix(sandboxId).testID}
+            {sandboxId}
           </Typography>
         </Column>
       </Inner>

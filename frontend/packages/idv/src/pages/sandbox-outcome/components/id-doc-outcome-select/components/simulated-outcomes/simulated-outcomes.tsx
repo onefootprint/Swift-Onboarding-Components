@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { IdDocOutcomes } from '@onefootprint/types';
+import { IdDocOutcome } from '@onefootprint/types';
 import { Box, Radio } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -33,7 +33,7 @@ const SimulatedOutcomes = ({
               value="simulated"
               onChange={() => {
                 onSelect();
-                field.onChange(IdDocOutcomes.success);
+                field.onChange(IdDocOutcome.success);
               }}
               checked={isSelected}
             />
@@ -50,11 +50,11 @@ const SimulatedOutcomes = ({
               options={[
                 {
                   title: t('simulated-outcome.options.success.title'),
-                  value: IdDocOutcomes.success,
+                  value: IdDocOutcome.success,
                 },
                 {
                   title: t('simulated-outcome.options.fail.title'),
-                  value: IdDocOutcomes.fail,
+                  value: IdDocOutcome.fail,
                 },
               ]}
               disabled={!isSelected}

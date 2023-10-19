@@ -7,9 +7,9 @@ import {
 } from '@onefootprint/test-utils';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import {
-  IdDocOutcomes,
+  IdDocOutcome,
   OnboardingConfigStatus,
-  OverallOutcomes,
+  OverallOutcome,
 } from '@onefootprint/types';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
@@ -43,8 +43,8 @@ const getOnboardingConfig = (
 let submittedFormData: SandboxOutcomeFormData = {
   testID: '',
   outcomes: {
-    overallOutcome: OverallOutcomes.fail,
-    idDocOutcome: IdDocOutcomes.fail,
+    overallOutcome: OverallOutcome.fail,
+    idDocOutcome: IdDocOutcome.fail,
   },
 };
 
@@ -267,7 +267,9 @@ describe('<SandboxOutcome/>', () => {
       expect((overallFailOption as any).selected).toBeFalsy();
 
       await userEvent.click(continueButton);
-      expect(submittedFormData.outcomes.overallOutcome).toEqual('manualreview');
+      expect(submittedFormData.outcomes.overallOutcome).toEqual(
+        'manual_review',
+      );
 
       await userEvent.click(overallFailOption);
       expect((overallSuccessOption as any).selected).toBeFalsy();

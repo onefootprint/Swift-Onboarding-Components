@@ -3,7 +3,7 @@ import { getSessionId } from '@onefootprint/dev-tools';
 import { getErrorMessage } from '@onefootprint/request';
 import type {
   D2PGenerateResponse,
-  IdDocOutcomes,
+  IdDocOutcome,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { useEffect } from 'react';
@@ -17,7 +17,7 @@ type GenerateScopedAuthTokenArgs = {
   device?: DeviceInfo;
   config?: PublicOnboardingConfig;
   onSuccess?: (data: D2PGenerateResponse) => void;
-  idDocOutcome?: IdDocOutcomes;
+  idDocOutcome?: IdDocOutcome;
 };
 
 const useGenerateScopedAuthToken = ({

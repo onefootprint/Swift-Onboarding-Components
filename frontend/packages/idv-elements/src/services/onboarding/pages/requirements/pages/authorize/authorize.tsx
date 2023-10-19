@@ -36,7 +36,7 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
   const { t } = useTranslation('pages.authorize');
   const [state] = useOnboardingRequirementsMachine();
   const {
-    onboardingContext: { authToken, config },
+    onboardingContext: { authToken, config, overallOutcome },
     requirements,
   } = state.context;
   const authorizeRequirement = getRequirement(
@@ -86,7 +86,7 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
     }
 
     processMutation.mutate(
-      { authToken },
+      { authToken, fixtureResult: overallOutcome },
       {
         onSuccess: onDone,
         onError: (error: unknown) => {

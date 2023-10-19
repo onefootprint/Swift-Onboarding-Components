@@ -1,8 +1,9 @@
 import type { DeviceInfo } from '@onefootprint/idv-elements';
 import type {
-  IdDocOutcomes,
+  IdDocOutcome,
   IdvBootstrapData,
   ObConfigAuth,
+  OverallOutcome,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 
@@ -18,8 +19,9 @@ export type MachineContext = {
   userFound?: boolean;
   showCompletionPage?: boolean;
   showLogo?: boolean;
-  idDocOutcome?: IdDocOutcomes;
+  idDocOutcome?: IdDocOutcome;
   sandboxId?: string;
+  overallOutcome?: OverallOutcome;
   onClose?: () => void;
   onComplete?: (validationToken?: string, delay?: number) => void; // Generated
 };
@@ -38,8 +40,9 @@ export type MachineEvents =
   | {
       type: 'sandboxOutcomeSubmitted';
       payload: {
-        idDocOutcome?: IdDocOutcomes;
-        sandboxId?: string;
+        idDocOutcome?: IdDocOutcome;
+        sandboxId: string;
+        overallOutcome: OverallOutcome;
       };
     }
   | {
@@ -49,7 +52,6 @@ export type MachineEvents =
         userFound: boolean;
         email?: string;
         phoneNumber?: string;
-        idDocOutcome?: IdDocOutcomes;
       };
     }
   | {

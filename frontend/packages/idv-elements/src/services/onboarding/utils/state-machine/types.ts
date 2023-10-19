@@ -1,6 +1,7 @@
 import type {
   IdDIData,
-  IdDocOutcomes,
+  IdDocOutcome,
+  OverallOutcome,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 
@@ -14,7 +15,8 @@ export type MachineContext = {
   userFound?: boolean;
   isTransfer?: boolean;
   validationToken?: string;
-  idDocOutcome?: IdDocOutcomes;
+  idDocOutcome?: IdDocOutcome;
+  overallOutcome?: OverallOutcome;
   onClose?: () => void;
   onComplete?: (validationToken?: string, delay?: number) => void;
 };

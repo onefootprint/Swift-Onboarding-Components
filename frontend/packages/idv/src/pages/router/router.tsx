@@ -36,6 +36,7 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
     validationToken,
     obConfigAuth,
     idDocOutcome,
+    overallOutcome,
     sandboxId,
     onClose,
     onComplete,
@@ -97,6 +98,7 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
           config={config}
           device={device}
           sandboxId={sandboxId}
+          overallOutcome={overallOutcome}
           initialAuthToken={authToken}
           obConfigAuth={obConfigAuth}
           bootstrapData={getIdentifyBootstrapData(bootstrapData)}
@@ -113,6 +115,7 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
           userFound={userFound}
           bootstrapData={bootstrapData}
           isTransfer={isTransfer}
+          overallOutcome={overallOutcome}
           idDocOutcome={idDocOutcome}
           onClose={onClose}
           onComplete={onComplete}

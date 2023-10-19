@@ -1,7 +1,8 @@
 import type {
-  IdDocOutcomes,
+  IdDocOutcome,
   IdvBootstrapData,
   OnboardingRequirement,
+  OverallOutcome,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 
@@ -15,7 +16,8 @@ export type MachineContext = {
     authToken: string;
     isTransfer?: boolean;
     bootstrapData?: IdvBootstrapData;
-    idDocOutcome?: IdDocOutcomes;
+    idDocOutcome?: IdDocOutcome;
+    overallOutcome?: OverallOutcome;
   };
   /// The first time the router sends to a page, we'll mark `startedDataCollection` as true.
   /// There are a few pieces of logic that behave differently after we've started collecting data

@@ -1,10 +1,10 @@
 import type {
   ChallengeData,
   ChallengeKind,
-  IdDocOutcomes,
   Identifier,
   IdentifyBootstrapData,
   ObConfigAuth,
+  OverallOutcome,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 
@@ -18,7 +18,7 @@ export type MachineContext = {
   identify: IdentifyResult;
   challenge: MachineChallengeContext;
   showLogo?: boolean;
-  idDocOutcome?: IdDocOutcomes;
+  overallOutcome?: OverallOutcome;
   initialAuthToken?: string;
 };
 

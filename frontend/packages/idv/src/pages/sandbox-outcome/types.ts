@@ -1,9 +1,9 @@
-import type { IdDocOutcomes, OverallOutcomes } from '@onefootprint/types';
+import type { IdDocOutcome, OverallOutcome } from '@onefootprint/types';
 
 export type SandboxOutcomeFormData = {
   testID: string;
   outcomes: {
-    overallOutcome: OverallOutcomes;
-    idDocOutcome: IdDocOutcomes;
+    overallOutcome: OverallOutcome;
+    idDocOutcome: IdDocOutcome;
   };
 };

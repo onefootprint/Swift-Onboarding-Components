@@ -1,5 +1,5 @@
 import type {
-  IdDocOutcomes,
+  IdDocOutcome,
   IdvBootstrapData,
   ObConfigAuth,
 } from '@onefootprint/types';
@@ -17,7 +17,7 @@ export type IdvMachineArgs = {
   bootstrapData?: IdvBootstrapData;
   isTransfer?: boolean;
   showCompletionPage?: boolean;
-  idDocOutcome?: IdDocOutcomes;
+  idDocOutcome?: IdDocOutcome;
   showLogo?: boolean;
   onClose?: () => void;
   onComplete?: (validationToken?: string, delay?: number) => void;
@@ -151,6 +151,7 @@ const createIdvMachine = (args: IdvMachineArgs) =>
           ...context,
           idDocOutcome: event.payload.idDocOutcome,
           sandboxId: event.payload.sandboxId,
+          overallOutcome: event.payload.overallOutcome,
         })),
         assignUserFound: assign((context, event) => ({
           ...context,

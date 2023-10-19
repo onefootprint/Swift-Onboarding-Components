@@ -1,5 +1,5 @@
 import type {
-  IdDocOutcomes,
+  IdDocOutcome,
   IdDocRequirement,
   PublicOnboardingConfig,
   RegisterPasskeyRequirement,
@@ -15,7 +15,7 @@ export type TransferRequirements = {
 export type TransferCustomData = {
   config: PublicOnboardingConfig;
   missingRequirements: TransferRequirements;
-  idDocOutcome?: IdDocOutcomes;
+  idDocOutcome?: IdDocOutcome;
 };
 
 export type TransferProps = BasePluginProps<TransferCustomData>;

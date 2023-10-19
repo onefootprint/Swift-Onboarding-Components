@@ -1,6 +1,7 @@
 import type {
   IdentifyBootstrapData,
   ObConfigAuth,
+  OverallOutcome,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
@@ -16,6 +17,7 @@ export type IdentifyMachineArgs = {
   config: PublicOnboardingConfig;
   device: DeviceInfo;
   sandboxId?: string;
+  overallOutcome?: OverallOutcome;
   bootstrapData?: IdentifyBootstrapData;
   // When provided, acts as the sole identifier for a user.
   // We will skip requesting email and phone, and we will optionally step up if the provded auth

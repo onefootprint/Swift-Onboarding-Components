@@ -1,7 +1,15 @@
 {
   "components": {
     "sandbox-outcome-footer": {
-      "outcome": "Test outcome:",
+      "outcome": {
+        "label": "Test outcome:",
+        "options": {
+          "success": "Success",
+          "fail": "Failure",
+          "manual-review": "Manual Review",
+          "document-decision": "ID Doc Decision"
+        }
+      },
       "testID": "Test ID:"
     },
     "legal-footer": {

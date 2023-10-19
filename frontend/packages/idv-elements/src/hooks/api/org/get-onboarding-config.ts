@@ -11,7 +11,7 @@ const getOnboardingConfig = async (payload: GetOnboardingConfigRequest) => {
   const { obConfigAuth, authToken } = payload;
   const response = await request<GetPublicOnboardingConfigResponse>({
     method: 'GET',
-    url: '/org/onboarding_config',
+    url: '/hosted/onboarding/config',
     headers: obConfigAuth ?? {
       [AUTH_HEADER]: authToken,
     },

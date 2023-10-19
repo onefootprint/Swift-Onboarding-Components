@@ -1,6 +1,7 @@
 import type {
   IdDIData,
-  IdDocOutcomes,
+  IdDocOutcome,
+  OverallOutcome,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
@@ -15,7 +16,8 @@ export type OnboardingMachineArgs = {
   bootstrapData?: IdDIData; // TODO: generalize this more in the next iteration
   userFound?: boolean;
   isTransfer?: boolean;
-  idDocOutcome?: IdDocOutcomes;
+  idDocOutcome?: IdDocOutcome;
+  overallOutcome?: OverallOutcome;
   onClose?: () => void;
   onComplete?: (validationToken?: string, delay?: number) => void;
 };
@@ -28,6 +30,7 @@ const createOnboardingMachine = ({
   userFound,
   isTransfer,
   idDocOutcome,
+  overallOutcome,
   onClose,
   onComplete,
 }: OnboardingMachineArgs) =>
@@ -50,6 +53,7 @@ const createOnboardingMachine = ({
         userFound,
         isTransfer,
         idDocOutcome,
+        overallOutcome,
         onClose,
         onComplete,
       },

@@ -9,11 +9,17 @@ const SandboxOutcome = () => {
   const { config } = state.context;
 
   const handleAfterSubmit = (formData: SandboxOutcomeFormData) => {
+    const {
+      testID,
+      outcomes: { overallOutcome, idDocOutcome },
+    } = formData;
+
     send({
       type: 'sandboxOutcomeSubmitted',
       payload: {
-        sandboxId: `${formData.outcomes.overallOutcome}${formData.testID}`,
-        idDocOutcome: formData.outcomes.idDocOutcome,
+        sandboxId: testID,
+        idDocOutcome,
+        overallOutcome,
       },
     });
   };

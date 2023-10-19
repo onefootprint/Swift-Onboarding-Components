@@ -1,10 +1,10 @@
-import type { IdDocOutcomes, IdDocRequirement } from '@onefootprint/types';
+import type { IdDocOutcome, IdDocRequirement } from '@onefootprint/types';
 
 import type { BasePluginProps } from '../base-plugin';
 
 export type IdDocCustomData = {
   requirement: IdDocRequirement;
-  sandboxOutcome?: IdDocOutcomes;
+  sandboxOutcome?: IdDocOutcome;
 };
 
 export type IdDocProps = BasePluginProps<IdDocCustomData>;

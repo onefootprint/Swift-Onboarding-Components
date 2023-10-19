@@ -47,7 +47,7 @@ export const noPhoneOnboardingConfigFixture = getOnboardingConfig(true, true);
 export const withOnboardingConfig = (data = sandboxOnboardingConfigFixture) =>
   mockRequest({
     method: 'get',
-    path: '/org/onboarding_config',
+    path: '/hosted/onboarding/config',
     response: data,
   });
 
