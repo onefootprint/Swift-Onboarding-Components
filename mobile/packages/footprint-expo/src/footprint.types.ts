@@ -164,24 +164,6 @@ export enum FootprintPublicEvent {
   canceled = 'canceled',
 }
 
-export const FOOTPRINT_OPTIONS_KEYS = ['showCompletionPage'];
-
-export const FOOTPRINT_USER_DATA_KEYS = [
-  'id.email',
-  'id.phone_number',
-  'id.first_name',
-  'id.last_name',
-  'id.dob',
-  'id.address_line1',
-  'id.address_line2',
-  'id.city',
-  'id.state',
-  'id.country',
-  'id.zip',
-  'id.ssn9',
-  'id.ssn4',
-];
-
 export type FootprintUserData = Partial<{
   'id.email': string;
   'id.phone_number': string;
@@ -197,6 +179,10 @@ export type FootprintUserData = Partial<{
   'id.ssn9': string;
   'id.ssn4': string;
   'id.nationality': string; // 2 letter country code
+  'id.us_legal_status': string;
+  'id.citizenships': string[]; // array of 2 letter country codes
+  'id.visa_kind': string;
+  'id.visa_expiration_date': string;
 }>;
 
 export type FootprintOptions = {
