@@ -1,6 +1,7 @@
 use aws_credential_types::provider::SharedCredentialsProvider;
 use std::fmt::Debug;
 use tokio::sync::oneshot::{self, Receiver, Sender};
+use tracing::Instrument;
 
 use crate::{
     errors::{challenge::ChallengeError, user::UserError, ApiError, ApiResult},
@@ -186,19 +187,17 @@ impl SmsClient {
         let message_body = PiiString::from(format!("{}\n\nSent via Footprint", message_body.leak()));
         let e164 = destination.e164();
         let client = self.clone();
-        tokio::spawn(async move {
+        let fut = async move {
             let _ = client
                 ._send_message(message_body, e164, Some(tx), session_id)
-                .await
-                .map_err(|err| {
-                    tracing::error!(?err, "Failed to send SMS message");
-                });
-        });
+                .await;
+        };
+        tokio::spawn(fut.in_current_span());
         Ok(())
     }
 
     /// Sends the message_body to the provided destination, choosing which vendor to use if any
-    #[tracing::instrument("SmsClient::_send_message", skip(self, message_body, destination, tx))]
+    #[tracing::instrument("SmsClient::_send_message", skip(self, message_body, destination, tx), err)]
     async fn _send_message(
         &self,
         message_body: PiiString,

@@ -160,6 +160,7 @@ impl SendgridClient {
             .await
     }
 
+    #[tracing::instrument(skip_all, err)]
     pub async fn send_email_otp_verify_email(
         &self,
         to_email: PiiString,

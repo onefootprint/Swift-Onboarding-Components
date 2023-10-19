@@ -16,6 +16,7 @@ use newtypes::ContactInfoKind;
 use newtypes::PiiString;
 use newtypes::SandboxId;
 use strum::EnumDiscriminants;
+use tracing::Instrument;
 pub mod signup_challenge;
 pub mod verify;
 use crate::errors::ApiError;
@@ -180,15 +181,13 @@ pub fn send_email_challenge_non_blocking(
 
     let state = state.clone();
     let email2 = email.email.clone();
-    tokio::spawn(async move {
+    let fut = async move {
         let _ = state
             .sendgrid_client
             .send_email_otp_verify_email(email2, code, tenant_url)
-            .await
-            .map_err(|err| {
-                tracing::error!(?err, "Failed to send email challenge");
-            });
-    });
+            .await;
+    };
+    tokio::spawn(fut.in_current_span());
 
     Ok(ChallengeData::Email(PhoneEmailChallengeState {
         vault_id,
