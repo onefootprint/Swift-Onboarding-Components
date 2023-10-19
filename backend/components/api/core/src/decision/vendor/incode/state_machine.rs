@@ -174,6 +174,7 @@ impl IncodeStateMachine {
                 ignored_failure_reasons: session.ignored_failure_reasons,
                 // TODO: be more intelligent about using incode classified doc type here.. but do we trust it?
                 document_type: ctx.docv_data.document_type.ok_or(UserError::NoDocumentType)?,
+                hard_errored: session.latest_hard_error.is_some(),
             }
         };
 
@@ -270,7 +271,7 @@ impl IncodeStateMachine {
             ff_client: state.feature_flag_client.clone(),
             failed_attempts_for_side: 0, // !! this is the one thing that is hard coded here that would differ from the existing code path that inits a IVS. We could have this method pass in DocumentSide and calculate this for real and then also call this init method from /upload and consolidate code paths
             disable_selfie,
-            is_re_run: false,
+            is_re_run: true,
         };
         let is_sandbox = id_doc.fixture_result.is_some();
         let should_collect_selfie = doc_req.should_collect_selfie && !id_doc.should_skip_selfie();

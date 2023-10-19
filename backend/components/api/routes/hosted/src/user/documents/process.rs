@@ -5,7 +5,7 @@ use api_core::auth::user::UserWfAuthContext;
 use api_core::decision::vendor::build_request::build_docv_data_from_identity_doc;
 use api_core::decision::vendor::incode::states::save_incode_fixtures;
 use api_core::decision::vendor::incode::{get_config_id, IncodeContext, IncodeStateMachine};
-use api_core::decision::{self, vendor};
+use api_core::decision::{self};
 use api_core::errors::AssertionError;
 use api_core::types::JsonApiResponse;
 use api_core::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
@@ -14,16 +14,17 @@ use api_wire_types::{DocumentImageError, DocumentResponse};
 use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::DocumentRequest;
 use db::models::document_upload::DocumentUpload;
-use db::models::identity_document::IdentityDocument;
-use db::models::incode_verification_session::IncodeVerificationSession;
+use db::models::identity_document::{IdentityDocument, IdentityDocumentUpdate};
+use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
 use db::models::ob_configuration::ObConfiguration;
+use db::DbPool;
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
-use newtypes::WorkflowGuard;
 use newtypes::{
     DecisionIntentId, DecisionIntentKind, DocumentSide, IdentityDocumentId, IncodeVerificationSessionState,
     TenantId, WorkflowId,
 };
+use newtypes::{IdentityDocumentStatus, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web};
 use std::sync::Arc;
 
@@ -115,6 +116,7 @@ pub async fn post(
             state.feature_flag_client.clone(),
             failed_attempts,
             false,
+            missing_sides,
         )
         .await?
     } else {
@@ -151,11 +153,11 @@ pub async fn handle_incode_request(
     ff_client: Arc<dyn FeatureFlagClient>,
     failed_attempts_for_side: Option<i64>,
     is_re_run: bool,
+    missing_sides: Vec<DocumentSide>, //kinda dumb
 ) -> Result<DocumentResponse, ApiError> {
     let docv_data = build_docv_data_from_identity_doc(state, identity_document_id.clone()).await?; // TODO: handle this with better requirement checking
     let vault_country = uvw.get_decrypted_country(state).await?;
-    let sv_id = doc_request.scoped_vault_id.clone();
-    let vault_id = uvw.vault.id.clone();
+    let sv_id: newtypes::ScopedVaultId = doc_request.scoped_vault_id.clone();
     let id_doc_id = identity_document_id.clone();
     let disable_selfie = state
         .feature_flag_client
@@ -164,7 +166,7 @@ pub async fn handle_incode_request(
     let ctx = IncodeContext {
         di_id: decision_intent_id.clone(),
         sv_id: sv_id.clone(),
-        id_doc_id: identity_document_id,
+        id_doc_id,
         wf_id: workflow_id.clone(),
         obc: obc.clone(),
         vault: uvw.vault.clone(),
@@ -186,50 +188,101 @@ pub async fn handle_incode_request(
         ctx,
         is_sandbox,
     )
-    .await?; // TODO: handle this with better requirement checking
+    .await;
 
-    let (machine_state_name, retry_reasons) =
-        match machine.run(&state.db_pool, &state.vendor_clients.incode).await {
-            Ok((machine, retry_reasons)) => (machine.state.name(), retry_reasons),
-            Err(err) => {
-                tracing::error!(?err, "IncodeMachineError");
+    let successful_machine_response = match machine {
+        Err(err) => {
+            on_incode_hard_error(&state.db_pool, err, &identity_document_id).await?;
+            None
+        }
+        Ok(machine) => {
+            if machine.session.hard_errored && !is_re_run {
+                None
+            } else {
+                match machine.run(&state.db_pool, &state.vendor_clients.incode).await {
+                    Ok((machine, retry_reasons)) => Some((machine.state.name(), retry_reasons)),
+                    Err(err) => {
+                        on_incode_hard_error(&state.db_pool, err.error, &identity_document_id).await?;
+                        None
+                    }
+                }
+            }
+        }
+    };
 
-                state
-                    .db_pool
-                    .db_transaction(move |conn| -> ApiResult<_> {
-                        vendor::incode::states::Fail::enter(
-                            conn,
-                            &decision_intent_id,
-                            &sv_id,
-                            &vault_id,
-                            &id_doc_id,
-                        )?;
-
-                        Ok(())
-                    })
-                    .await?;
-
-                (IncodeVerificationSessionState::Fail, vec![])
+    if let Some((machine_state_name, retry_reasons)) = successful_machine_response {
+        let next_side_to_collect = match machine_state_name {
+            IncodeVerificationSessionState::AddFront => Some(DocumentSide::Front),
+            IncodeVerificationSessionState::AddBack => Some(DocumentSide::Back),
+            IncodeVerificationSessionState::AddConsent => Some(DocumentSide::Selfie),
+            IncodeVerificationSessionState::AddSelfie => Some(DocumentSide::Selfie),
+            IncodeVerificationSessionState::Fail => None,
+            IncodeVerificationSessionState::Complete => None,
+            IncodeVerificationSessionState::GetOnboardingStatus => None, // this would indicate we timed out while polling Incode
+            // We shouldn't cleanly break from the machine in any other state
+            s => {
+                return Err(AssertionError(&format!("Can't determine next document side from {}", s)).into())
             }
         };
+        let is_retry_limit_exceeded = machine_state_name == IncodeVerificationSessionState::Fail;
+        let errors = retry_reasons.into_iter().map(DocumentImageError::from).collect();
+        Ok(DocumentResponse {
+            next_side_to_collect,
+            errors,
+            is_retry_limit_exceeded,
+        })
+    } else {
+        let next_side_to_collect = vec![DocumentSide::Front, DocumentSide::Back, DocumentSide::Selfie]
+            .into_iter()
+            .find(|s| missing_sides.contains(s));
+        if next_side_to_collect.is_none() {
+            let id_doc_id = identity_document_id.clone();
+            state
+                .db_pool
+                .db_transaction(move |conn| -> ApiResult<_> {
+                    // mb lock??
+                    let (iddoc, _) = IdentityDocument::get(conn, &id_doc_id)?;
+                    if iddoc.status == IdentityDocumentStatus::Pending {
+                        IdentityDocument::update(
+                            conn,
+                            &id_doc_id,
+                            IdentityDocumentUpdate {
+                                status: Some(IdentityDocumentStatus::Complete),
+                                ..Default::default()
+                            },
+                        )?;
+                    }
+                    Ok(())
+                })
+                .await?;
+        }
+        Ok(DocumentResponse {
+            next_side_to_collect,
+            errors: vec![],
+            is_retry_limit_exceeded: false,
+        })
+    }
+}
 
-    let next_side_to_collect = match machine_state_name {
-        IncodeVerificationSessionState::AddFront => Some(DocumentSide::Front),
-        IncodeVerificationSessionState::AddBack => Some(DocumentSide::Back),
-        IncodeVerificationSessionState::AddConsent => Some(DocumentSide::Selfie),
-        IncodeVerificationSessionState::AddSelfie => Some(DocumentSide::Selfie),
-        IncodeVerificationSessionState::Fail => None,
-        IncodeVerificationSessionState::Complete => None,
-        IncodeVerificationSessionState::GetOnboardingStatus => None, // this would indicate we timed out while polling Incode
-        // We shouldn't cleanly break from the machine in any other state
-        s => return Err(AssertionError(&format!("Can't determine next document side from {}", s)).into()),
-    };
-    let is_retry_limit_exceeded = machine_state_name == IncodeVerificationSessionState::Fail;
-    let errors = retry_reasons.into_iter().map(DocumentImageError::from).collect();
-    let result = DocumentResponse {
-        next_side_to_collect,
-        errors,
-        is_retry_limit_exceeded,
-    };
-    Ok(result)
+async fn on_incode_hard_error(
+    db_pool: &DbPool,
+    err: ApiError,
+    id_doc_id: &IdentityDocumentId,
+) -> ApiResult<()> {
+    tracing::error!(?err, "IncodeMachineError");
+    let id_doc_id = id_doc_id.clone();
+    db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let ivs = IncodeVerificationSession::get(conn, &id_doc_id)?;
+            if let Some(ivs) = ivs {
+                IncodeVerificationSession::update(
+                    conn,
+                    &ivs.id,
+                    UpdateIncodeVerificationSession::set_hard_error(format!("{:?}", err)),
+                )?;
+            }
+            Ok(())
+        })
+        .await?;
+    Ok(())
 }

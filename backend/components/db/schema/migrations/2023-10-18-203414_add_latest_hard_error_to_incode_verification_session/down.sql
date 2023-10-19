@@ -1,0 +1,1 @@
+ALTER TABLE incode_verification_session DROP COLUMN latest_hard_error;

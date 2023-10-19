@@ -107,7 +107,8 @@ pub async fn post(
             RunIncodeMachineAndWorkflowResult::WorkflowRan => {}
         },
         Err(err) => {
-            tracing::error!(?err, "Error running incode machine or workflow in /process")
+            tracing::error!(?err, "Error running incode machine or workflow in /process");
+            enqueue_run_incode_stuck_workflow_task(&state.db_pool, &wf.id).await?;
         }
     }
 

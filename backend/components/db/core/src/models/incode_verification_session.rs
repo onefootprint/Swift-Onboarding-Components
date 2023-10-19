@@ -37,6 +37,7 @@ pub struct IncodeVerificationSession {
     // When set, this IVS was replaced with a re-run via the manual private endpoint
     pub deactivated_at: Option<DateTime<Utc>>,
     pub incode_environment: Option<IncodeEnvironment>,
+    pub latest_hard_error: Option<String>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -63,9 +64,17 @@ pub struct UpdateIncodeVerificationSession {
     pub state: Option<IncodeVerificationSessionState>,
     pub latest_failure_reasons: Option<Vec<IncodeFailureReason>>,
     pub ignored_failure_reasons: Option<Vec<IncodeFailureReason>>,
+    pub latest_hard_error: Option<String>,
 }
 
 impl UpdateIncodeVerificationSession {
+    pub fn set_hard_error(latest_hard_error: String) -> Self {
+        Self {
+            latest_hard_error: Some(latest_hard_error),
+            ..Self::default()
+        }
+    }
+
     pub fn set_state(
         state: IncodeVerificationSessionState,
         failure_reasons: Vec<IncodeFailureReason>,

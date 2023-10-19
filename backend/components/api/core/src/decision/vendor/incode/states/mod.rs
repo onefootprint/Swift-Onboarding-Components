@@ -69,6 +69,7 @@ pub struct VerificationSession {
     pub credentials: IncodeCredentialsWithToken,
     pub ignored_failure_reasons: Vec<IncodeFailureReason>,
     pub document_type: IdDocKind,
+    pub hard_errored: bool,
 }
 
 impl VerificationSession {
@@ -79,6 +80,7 @@ impl VerificationSession {
             credentials: self.credentials,
             ignored_failure_reasons: incode_verification_session.ignored_failure_reasons.clone(),
             document_type: self.document_type,
+            hard_errored: incode_verification_session.latest_hard_error.is_some(),
         }
     }
 }

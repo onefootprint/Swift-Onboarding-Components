@@ -180,7 +180,7 @@ where
                         // handle those cases. For now, we can only allow ignoring certain
                         // errors
                         let can_ignore_all_errors = unhandled_failure_reasons.iter().all(|s| s.can_ignore());
-                        if !can_ignore_all_errors {
+                        if !can_ignore_all_errors && !ctx.is_re_run {
                             // Fail if theres an unhandled error
                             Fail::enter(conn, &ctx.di_id, &ctx.sv_id, &ctx.vault.id, &ctx.id_doc_id)?;
                             ((StepResult::Ready, Fail::new(), None), true)

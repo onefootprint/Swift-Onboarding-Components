@@ -40,20 +40,18 @@ pub enum IncodeVerificationSessionState {
 }
 
 impl IncodeVerificationSessionState {
-    // Indicates the current state is not a state contingent on user input but rather a state involving processing the doc with Incode
-    pub fn is_processing_state(&self) -> bool {
+    pub fn is_terminal(&self) -> bool {
         match self {
             Self::StartOnboarding
             | Self::AddFront
             | Self::AddBack
             | Self::AddSelfie
-            | Self::Complete
-            | Self::Fail => false,
-            Self::GetOnboardingStatus
+            | Self::GetOnboardingStatus
             | Self::FetchScores
             | Self::AddConsent
             | Self::ProcessId
-            | Self::ProcessFace => true,
+            | Self::ProcessFace => false,
+            Self::Fail | Self::Complete => true,
         }
     }
 }
@@ -95,7 +93,7 @@ pub enum IncodeFailureReason {
     #[strum(serialize = "ID_TYPE_UNACCEPTABLE")]
     IdTypeNotAcceptable,
     #[strum(serialize = "UNEXPECTED_ERROR_OCCURRED")]
-    UnexpectedErrorOccurred,
+    UnexpectedErrorOccurred, // TODO: its kinda wack we just synthetically produce this ourselves as well... need to audit what kinds of errors we are swallowing in here (this will cause us to ask user to re-upload, even if its some transient Incode nonsense and not a actual validation issue)
     // These aren't deserialized with strum
     UnsupportedDocumentType,
     DocTypeMismatch,

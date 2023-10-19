@@ -142,15 +142,16 @@ pub async fn run_incode_machine_and_workflow(
         .await??;
 
     if let Some(ivs) = ivs {
-        if ivs.state.is_processing_state() {
+        if !ivs.state.is_terminal() {
             let machine = IncodeStateMachine::init_from_existing(state, ivs).await?;
+            // TODO: should or could this call handle_incode_request instead..?  yeah def cause then it can do the new logic of setting latest_hard_error
             let (machine, _) = machine
                 .run(&state.db_pool, &state.vendor_clients.incode)
                 .await
                 .map_err(|e| e.error)?;
-            if machine.state.name().is_processing_state() {
+            if !machine.state.name().is_terminal() {
                 // we still timed out polling Incode and shouldn't proceed with running the workflow
-                tracing::error!("Incode processing timed out, not running Workflow");
+                tracing::error!("Re-running Incode machine did not succeed, not running Workflow");
                 return Ok(RunIncodeMachineAndWorkflowResult::IncodeStuck);
             }
         }

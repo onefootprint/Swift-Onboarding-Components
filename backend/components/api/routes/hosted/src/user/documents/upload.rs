@@ -279,6 +279,7 @@ pub async fn post(
             state.feature_flag_client.clone(),
             failed_attempts_for_side,
             false,
+            missing_sides,
         )
         .await?
     } else {

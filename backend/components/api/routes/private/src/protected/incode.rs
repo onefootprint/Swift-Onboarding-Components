@@ -93,6 +93,7 @@ pub async fn rerun_machine(
         state.feature_flag_client.clone(),
         Some(0),
         true,
+        vec![],
     )
     .await?;
     ResponseData::ok(response).json()
