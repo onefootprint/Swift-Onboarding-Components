@@ -23,6 +23,7 @@ const CaptureButton = ({
         aria-disabled={disabled}
         data-disabled={disabled}
         onClick={onClick}
+        disabled={disabled}
       >
         Take photo
       </Button>

@@ -299,7 +299,7 @@ const Camera = ({
           <StickyBottomBox>
             <CaptureButton
               onClick={() => handleClick('manual')}
-              disabled={!canCapture}
+              disabled={!canCapture || !isCameraVisible}
               variant="default"
             />
           </StickyBottomBox>
