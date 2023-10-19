@@ -48,7 +48,7 @@ const runProcessFileScript = async (
   try {
     if (!isHeicType(file.type)) {
       converted = file;
-    } else if (imageProcessors?.heic && imageProcessors.heicLoading) {
+    } else if (imageProcessors?.heic && !imageProcessors.heicLoading) {
       converted = await imageProcessors
         .heic({ blob: file, toType: 'image/jpeg' })
         .then(res => {
