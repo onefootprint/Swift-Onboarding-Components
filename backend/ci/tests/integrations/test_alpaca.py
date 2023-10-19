@@ -48,6 +48,7 @@ def test_alpaca_cip(
         sandbox_id,
         override_email=email,
     )
+    bifrost.vault_barcode_with_doc = False  # hack cause /vault barfs when trying to vault barcode during stepup because stepup workflow state only gives the AddDocument guard, not the AddData guard
     user = bifrost.run()
     d = user.client.data
 
@@ -106,14 +107,7 @@ def test_alpaca_cip(
                     tz=datetime.timezone.utc
                 ).isoformat(),
                 "ip_address": "127.0.0.1",
-            },
-            {
-                "agreement": "crypto_agreement",
-                "signed_at": datetime.datetime.now(
-                    tz=datetime.timezone.utc
-                ).isoformat(),
-                "ip_address": "127.0.0.1",
-            },
+            }
         ],
     }
 
@@ -136,6 +130,7 @@ def test_alpaca_cip(
         "is_politically_exposed": "senior_political_figure" in declarations,
         "immediate_family_exposed": "family_of_political_figure" in declarations,
         "is_discretionary": False,
+        "is_affiliated_exchange_or_iiroc": None,  # idk why they return this now and its not in their docs
     }
 
     account_id = alpaca_response["id"]

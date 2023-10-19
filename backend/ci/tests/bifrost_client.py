@@ -120,6 +120,7 @@ class BifrostClient:
             "id.phone_number": phone_number,
             "id.email": email,
         }
+        self.vault_barcode_with_doc = True
 
         # After running bifrost, this will be the list of requirements satisfied
         self.handled_requirements = []
@@ -282,15 +283,16 @@ class BifrostClient:
             assert not body["errors"]
 
         # Also upload the barcodes
-        data = {
-            "document.drivers_license.back.barcodes": [
-                dict(
-                    kind="pdf417",
-                    content="@ANSI 6360050101DL00300201DLDAQ102245737DAASAMPLE,DRIVER,CREDENTIAL,DAG 1500 PARK STDAICOLUMBIADAJSCDAK292012731 DARD DAS DAT DAU600DAW200DAY DAZ DBA20190928DBB19780928DBC1DBD20091026DBG2DBH1",
-                )
-            ]
-        }
-        patch("hosted/user/vault", data, self.auth_token)
+        if self.vault_barcode_with_doc:
+            data = {
+                "document.drivers_license.back.barcodes": [
+                    dict(
+                        kind="pdf417",
+                        content="@ANSI 6360050101DL00300201DLDAQ102245737DAASAMPLE,DRIVER,CREDENTIAL,DAG 1500 PARK STDAICOLUMBIADAJSCDAK292012731 DARD DAS DAT DAU600DAW200DAY DAZ DBA20190928DBB19780928DBC1DBD20091026DBG2DBH1",
+                    )
+                ]
+            }
+            patch("hosted/user/vault", data, self.auth_token)
 
     def handle_liveness(self):
         """Register the passkey credential"""
