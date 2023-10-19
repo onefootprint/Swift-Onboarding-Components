@@ -8,14 +8,14 @@ authors = { workspace = true }
 doctest = false
 
 [dependencies]
-api_route_org = { path = "../org"}
+api_route_org = { path = "../org" }
 api_route_index = { path = "../index" }
 api_route_vault_proxy = { path = "../vault_proxy" }
-api_route_onboarding = { path = "../onboarding"}
-api_route_users = { path = "../users"}
+api_route_onboarding = { path = "../onboarding" }
+api_route_users = { path = "../users" }
 api_route_entities = { path = "../entities" }
-api_route_hosted = { path = "../hosted" }
+api_route_hosted = { path = "../hosted/_root" }
 api_route_businesses = { path = "../businesses" }
 api_route_webhooks = { path = "../webhooks" }
-api_route_integrations = { path = "../integrations"}
+api_route_integrations = { path = "../integrations" }
 paperclip = { workspace = true }

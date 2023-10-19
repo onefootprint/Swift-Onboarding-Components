@@ -10,7 +10,18 @@ members = [
     "components/api/core",
     "components/api/server",
     "components/api/wire_types",
-    "components/api/routes/*",
+    "components/api/routes/_root",
+    "components/api/routes/businesses",
+    "components/api/routes/entities",
+    "components/api/routes/hosted/*",
+    "components/api/routes/index",
+    "components/api/routes/integrations",
+    "components/api/routes/onboarding",
+    "components/api/routes/org",
+    "components/api/routes/private",
+    "components/api/routes/users",
+    "components/api/routes/vault_proxy",
+    "components/api/routes/webhooks",
     "components/enclave/crypto",
     "components/enclave/enclave",
     "components/enclave/proxy",
@@ -29,7 +40,6 @@ members = [
     "external_tools/hooky",
     "internal_tools/scripts/workos",
 ]
-
 [workspace.dependencies]
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0" }

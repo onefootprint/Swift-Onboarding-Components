@@ -1,14 +1,16 @@
 use super::{ChallengeKind, UserChallengeData};
-use crate::identify::{self, ChallengeData};
-use crate::types::response::ResponseData;
-use crate::utils::challenge::Challenge;
+use crate::send_email_challenge_non_blocking;
+use crate::ChallengeData;
+use crate::ChallengeState;
 use crate::State;
-use crate::{errors::ApiError, identify::ChallengeState};
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::errors::challenge::ChallengeError;
+use api_core::errors::ApiError;
 use api_core::errors::{ApiResult, AssertionError};
 use api_core::telemetry::RootSpan;
+use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
+use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::{SandboxId, TelemetryHeaders};
 use api_core::utils::sms::rx_background_error;
 use api_core::utils::vault_wrapper::{InitialVaultData, VaultContext, VaultWrapper};
@@ -106,7 +108,7 @@ pub async fn post(
             };
 
             let challenge_data =
-                identify::send_email_challenge_non_blocking(&state, &email, uv.id, tenant, sandbox_id)?;
+                send_email_challenge_non_blocking(&state, &email, uv.id, tenant, sandbox_id)?;
 
             let challenge_state = ChallengeState { data: challenge_data };
 

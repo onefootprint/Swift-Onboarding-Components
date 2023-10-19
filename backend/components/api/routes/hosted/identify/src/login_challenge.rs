@@ -1,23 +1,23 @@
 use super::{BiometricChallengeState, ChallengeKind, UserChallengeData};
-use crate::errors::challenge::ChallengeError;
-use crate::errors::onboarding::OnboardingError;
-use crate::identify;
-use crate::identify::get_user_challenge_context;
-use crate::identify::ChallengeData;
-use crate::types::response::ResponseData;
-use crate::utils::challenge::Challenge;
-use crate::utils::liveness::WebauthnConfig;
+use crate::send_email_challenge_non_blocking;
+use crate::ChallengeData;
+use crate::ChallengeState;
 use crate::State;
-use crate::{errors::ApiError, identify::ChallengeState};
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::user::UserAuth;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
+use api_core::errors::challenge::ChallengeError;
+use api_core::errors::onboarding::OnboardingError;
+use api_core::errors::ApiError;
 use api_core::fingerprinter::VaultIdentifier;
 use api_core::telemetry::RootSpan;
 use api_core::types::JsonApiResponse;
+use api_core::types::ResponseData;
+use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::headers::TelemetryHeaders;
+use api_core::utils::liveness::WebauthnConfig;
 use api_core::utils::sms::rx_background_error;
 use api_wire_types::IdentifyId;
 use crypto::serde_cbor;
@@ -82,7 +82,7 @@ pub async fn post(
 
     // Look up existing user vault by identifier
     let (uvw, creds, _) = if let Some(user_challenge_context) =
-        get_user_challenge_context(&state, identifier, ob_context, root_span).await?
+        crate::get_user_challenge_context(&state, identifier, ob_context, root_span).await?
     {
         user_challenge_context
     } else {
@@ -140,9 +140,8 @@ pub async fn post(
                 let email = uvw.get_decrypted_verified_email(&state).await?;
                 let tenant = tenant.ok_or(OnboardingError::MissingObPkAuth)?;
 
-                let challenge_data = identify::send_email_challenge_non_blocking(
-                    &state, &email, vault_id, tenant, sandbox_id,
-                )?;
+                let challenge_data =
+                    send_email_challenge_non_blocking(&state, &email, vault_id, tenant, sandbox_id)?;
 
                 (
                     None,

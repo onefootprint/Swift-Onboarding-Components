@@ -1,13 +1,13 @@
 use crate::auth::user::UserAuthGuard;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiResult;
-use crate::onboarding::get_requirements;
-use crate::onboarding::GetRequirementsArgs;
 use crate::types::response::ResponseData;
 use crate::State;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
+use api_core::utils::requirements::get_requirements;
+use api_core::utils::requirements::GetRequirementsArgs;
 use db::models::workflow::Workflow;
 use db::models::workflow::WorkflowUpdate;
 use itertools::Itertools;

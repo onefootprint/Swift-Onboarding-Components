@@ -1,20 +1,54 @@
+use std::collections::HashMap;
 use std::pin::Pin;
 
-use crate::business::index::{decrypt_basic_business_info, BasicBusinessInfo};
+use crate::auth::session::ob_config::BoSession;
+use crate::errors::business::BusinessError;
+use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiResult;
+use crate::utils::email::BoInviteEmailInfo;
+use crate::utils::session::AuthSession;
+use crate::utils::sms::BoSessionSmsInfo;
+use crate::utils::vault_wrapper::{Business, DecryptedBusinessOwners, TenantVw, VaultWrapper};
 use crate::State;
-use api_core::auth::session::ob_config::BoSession;
-use api_core::errors::business::BusinessError;
-use api_core::errors::onboarding::OnboardingError;
-use api_core::utils::email::BoInviteEmailInfo;
-use api_core::utils::session::AuthSession;
-use api_core::utils::sms::BoSessionSmsInfo;
-use api_core::utils::vault_wrapper::{Business, DecryptedBusinessOwners, TenantVw, VaultWrapper};
 use db::models::business_owner::BusinessOwner;
 use db::models::tenant::Tenant;
 use db::models::workflow::Workflow;
 use futures::FutureExt;
-use newtypes::{BusinessOwnerKind, OnboardingStatus, PiiString};
+use newtypes::{BoLinkId, BusinessDataKind as BDK};
+use newtypes::{BusinessOwnerKind, KycedBusinessOwnerData, OnboardingStatus, PiiString};
+
+pub struct BasicBusinessInfo {
+    pub business_name: PiiString,
+    pub primary_bo: KycedBusinessOwnerData,
+    pub secondary_bos: HashMap<BoLinkId, KycedBusinessOwnerData>,
+}
+
+pub async fn decrypt_basic_business_info(
+    state: &State,
+    bvw: &TenantVw<Business>,
+) -> ApiResult<BasicBusinessInfo> {
+    let bos: Vec<KycedBusinessOwnerData> = bvw
+        .decrypt_unchecked_single(&state.enclave_client, BDK::KycedBeneficialOwners.into())
+        .await?
+        .ok_or(BusinessError::NoBos)?
+        .deserialize()?;
+    let business_name = bvw.get_p_data(BDK::Name).ok_or(BusinessError::NoName)?.clone();
+
+    // TODO: could this differ from the actual primary BO's first name + last name?
+    // I don't think so by the client, but maybe on the backend we should compare and enforce
+    let primary_bo = bos.get(0).ok_or(BusinessError::NoBos)?.clone();
+    let secondary_bos = bos
+        .into_iter()
+        .skip(1)
+        .map(|bo| (bo.link_id.clone(), bo))
+        .collect();
+    let info = BasicBusinessInfo {
+        business_name,
+        primary_bo,
+        secondary_bos,
+    };
+    Ok(info)
+}
 
 /// Given a list of new secondary_bos, send each of them a link to fill out their own KYC form
 pub async fn send_secondary_bo_links(

@@ -1,7 +1,4 @@
 use super::ChallengeKind;
-use crate::identify::get_user_challenge_context;
-use crate::types::response::ResponseData;
-use crate::State;
 
 use api_core::{
     auth::{
@@ -12,8 +9,8 @@ use api_core::{
     errors::challenge::ChallengeError,
     fingerprinter::VaultIdentifier,
     telemetry::RootSpan,
-    types::JsonApiResponse,
-    utils::headers::SandboxId,
+    types::{JsonApiResponse, ResponseData},
+    utils::headers::SandboxId, State,
 };
 use api_wire_types::IdentifyRequest;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
@@ -59,7 +56,7 @@ pub async fn post(
 
     // Look up existing user vault by identifier
     let (_, creds, kinds) =
-        if let Some(ctx) = get_user_challenge_context(&state, identifier, ob_context, root_span).await? {
+        if let Some(ctx) = crate::get_user_challenge_context(&state, identifier, ob_context, root_span).await? {
             ctx
         } else {
             // The user vault doesn't exist. Just return that the user wasn't found

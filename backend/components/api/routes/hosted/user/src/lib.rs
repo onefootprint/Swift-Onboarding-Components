@@ -11,6 +11,8 @@ mod token;
 mod upload;
 mod vault;
 
+use api_core::*;
+
 #[cfg(test)]
 mod tests;
 

@@ -1,7 +1,7 @@
 #[allow(clippy::module_inception)]
 pub mod identify;
 pub mod login_challenge;
-use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
+use api_core::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::errors::ApiResult;
 use api_core::fingerprinter::VaultIdentifier;
@@ -19,9 +19,9 @@ use strum::EnumDiscriminants;
 use tracing::Instrument;
 pub mod signup_challenge;
 pub mod verify;
-use crate::errors::ApiError;
-use crate::utils::challenge::ChallengeToken;
-use crate::State;
+use api_core::errors::ApiError;
+use api_core::utils::challenge::ChallengeToken;
+use api_core::State;
 use chrono::{DateTime, Duration, Utc};
 use newtypes::VaultId;
 use paperclip::actix::{web, Apiv2Schema};

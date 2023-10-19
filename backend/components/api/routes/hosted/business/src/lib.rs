@@ -1,8 +1,9 @@
 use paperclip::actix::web;
 
 mod index;
-pub mod utils;
 mod vault;
+
+use api_core::*;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config

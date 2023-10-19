@@ -1,9 +1,6 @@
 use crate::auth::user::UserAuthGuard;
-use crate::business;
 use crate::decision;
 use crate::errors::onboarding::OnboardingError;
-use crate::onboarding::get_requirements;
-use crate::onboarding::GetRequirementsArgs;
 use crate::types::response::ResponseData;
 use crate::State;
 use api_core::auth::user::CheckUserWfAuthContext;
@@ -22,6 +19,7 @@ use api_core::errors::ApiResult;
 use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
 use api_core::utils::actix::OptionalJson;
+use api_core::utils::requirements::GetRequirementsArgs;
 use api_wire_types::ProcessRequest;
 use chrono::Duration;
 use chrono::Utc;
@@ -52,7 +50,9 @@ pub async fn post(
     let fixture_result = request.into_inner().and_then(|r| r.fixture_result);
 
     // Verify there are no unmet requirements
-    let reqs = get_requirements(&state, GetRequirementsArgs::from(&user_auth)?).await?;
+    let reqs =
+        api_core::utils::requirements::get_requirements(&state, GetRequirementsArgs::from(&user_auth)?)
+            .await?;
     let unmet_reqs = reqs
         .into_iter()
         .filter(|r| !r.is_met())
@@ -158,7 +158,7 @@ async fn run_kyb_if_needed(state: &State, user_auth: CheckUserWfAuthContext) -> 
             .db_pool
             .db_query(move |conn| DbWorkflow::get(conn, &wf_id))
             .await??;
-        let should_run_kyb = business::utils::should_run_kyb(state, &biz_wf, &tenant).await?;
+        let should_run_kyb = api_core::utils::kyb_utils::should_run_kyb(state, &biz_wf, &tenant).await?;
         tracing::info!(should_run_kyb, "should_run_kyb");
         if should_run_kyb {
             let ww = WorkflowWrapper::init(state, biz_wf.clone()).await?;

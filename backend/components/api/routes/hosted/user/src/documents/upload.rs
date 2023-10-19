@@ -2,7 +2,6 @@ use crate::auth::user::UserAuthGuard;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
-use crate::user::documents::process::handle_incode_request;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::{decision, State};
 use actix_multipart::Multipart;
@@ -265,7 +264,7 @@ pub async fn post(
     let response = if let Some((di, doc_request, id_doc_id, failed_attempts_for_side)) = created_reqs {
         // Not sandbox - make our request to vendors!
         let t_id = user_auth.scoped_user.tenant_id.clone();
-        handle_incode_request(
+        api_core::utils::incode_helper::handle_incode_request(
             &state,
             id_doc_id,
             t_id,
@@ -297,7 +296,7 @@ pub async fn post(
     ResponseData::ok(response).json()
 }
 
-pub(in crate::user) fn save_vres_for_fixture_risk_signals(
+pub(crate) fn save_vres_for_fixture_risk_signals(
     conn: &mut TxnPgConn,
     sv_id: &ScopedVaultId,
     vault: &Vault,

@@ -1,15 +1,13 @@
-use std::collections::HashMap;
-
 use crate::errors::ApiResult;
 use crate::types::JsonApiResponse;
 use crate::State;
+use api_core::auth::ob_config::BoSessionAuth;
 use api_core::errors::business::BusinessError;
 use api_core::types::ResponseData;
-use api_core::utils::vault_wrapper::{Business, VaultWrapper};
-use api_core::{auth::ob_config::BoSessionAuth, utils::vault_wrapper::TenantVw};
+use api_core::utils::kyb_utils::{decrypt_basic_business_info, BasicBusinessInfo};
+use api_core::utils::vault_wrapper::VaultWrapper;
 use api_wire_types::hosted::business::{HostedBusiness, Invited, Inviter};
 use db::models::workflow::Workflow;
-use newtypes::{BoLinkId, BusinessDataKind as BDK, KycedBusinessOwnerData, PiiString};
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
@@ -54,37 +52,4 @@ pub async fn get(state: web::Data<State>, business_auth: BoSessionAuth) -> JsonA
         invited,
     };
     ResponseData::ok(result).json()
-}
-
-pub struct BasicBusinessInfo {
-    pub business_name: PiiString,
-    pub primary_bo: KycedBusinessOwnerData,
-    pub secondary_bos: HashMap<BoLinkId, KycedBusinessOwnerData>,
-}
-
-pub async fn decrypt_basic_business_info(
-    state: &State,
-    bvw: &TenantVw<Business>,
-) -> ApiResult<BasicBusinessInfo> {
-    let bos: Vec<KycedBusinessOwnerData> = bvw
-        .decrypt_unchecked_single(&state.enclave_client, BDK::KycedBeneficialOwners.into())
-        .await?
-        .ok_or(BusinessError::NoBos)?
-        .deserialize()?;
-    let business_name = bvw.get_p_data(BDK::Name).ok_or(BusinessError::NoName)?.clone();
-
-    // TODO: could this differ from the actual primary BO's first name + last name?
-    // I don't think so by the client, but maybe on the backend we should compare and enforce
-    let primary_bo = bos.get(0).ok_or(BusinessError::NoBos)?.clone();
-    let secondary_bos = bos
-        .into_iter()
-        .skip(1)
-        .map(|bo| (bo.link_id.clone(), bo))
-        .collect();
-    let info = BasicBusinessInfo {
-        business_name,
-        primary_bo,
-        secondary_bos,
-    };
-    Ok(info)
 }

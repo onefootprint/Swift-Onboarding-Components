@@ -20,7 +20,7 @@ pub(super) fn link_webauthn_credential(
     Ok(creds
         .into_iter()
         .filter_map(|cred| {
-            let attestation: crate::user::passkey::SavedAttestationData =
+            let attestation: crate::passkey::SavedAttestationData =
                 serde_cbor::from_slice(&cred.attestation_data).ok()?;
 
             // match by the raw attestation blob

@@ -1,10 +1,9 @@
+use crate::auth::user::UserAuthGuard;
 use crate::errors::ApiError;
-use crate::onboarding::get_requirements;
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use crate::{auth::user::UserAuthGuard, onboarding::GetRequirementsArgs};
-use api_core::auth::user::UserWfAuthContext;
+use api_core::{auth::user::UserWfAuthContext, utils::requirements::GetRequirementsArgs};
 use api_wire_types::hosted::onboarding_status::{ApiOnboardingRequirement, OnboardingStatusResponse};
 use itertools::Itertools;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -17,7 +16,9 @@ pub async fn get(
 ) -> actix_web::Result<Json<ResponseData<OnboardingStatusResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
 
-    let reqs = get_requirements(&state, GetRequirementsArgs::from(&user_auth)?).await?;
+    let reqs =
+        api_core::utils::requirements::get_requirements(&state, GetRequirementsArgs::from(&user_auth)?)
+            .await?;
     let all_requirements = reqs
         .into_iter()
         .map(|r| ApiOnboardingRequirement {

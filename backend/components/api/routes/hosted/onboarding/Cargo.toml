@@ -1,0 +1,48 @@
+[package]
+name = "api_route_hosted_onboarding"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
+
+[lib]
+doctest = false
+
+[dependencies]
+api_core = { path = "../../../core" }
+crypto = { path = "../../../../enclave/crypto" }
+enclave_proxy = { path = "../../../../enclave/proxy" }
+newtypes = { path = "../../../../newtypes" }
+app-attest = { path = "../../../../app_attest" }
+db = { path = "../../../../db/core" }
+twilio = { path = "../../../../twilio" }
+idv = { path = "../../../../idv" }
+privacy_pass = { path = "../../../../privacy_pass" }
+feature_flag = { path = "../../../../feature_flag" }
+webhooks = { path = "../../../../webhooks" }
+billing = { path = "../../../../billing" }
+api_wire_types = { path = "../../../wire_types" }
+macros = { path = "../../../../macros" }
+
+actix-web = { workspace = true }
+paperclip = { workspace = true }
+log = "0.4.14"
+tracing = { workspace = true }
+either = { workspace = true }
+tokio = { workspace = true }
+futures-util = { workspace = true }
+futures = { workspace = true }
+serde = { workspace = true }
+serde_with = "2.2.0"
+
+derive_more = { workspace = true }
+aws-config = { workspace = true }
+aws-sdk-s3 = { workspace = true }
+aws-sdk-kms = { workspace = true }
+
+itertools = { workspace = true }
+chrono = { workspace = true }
+strum = { workspace = true }
+reqwest = { workspace = true }
+
+thiserror = { workspace = true }
+serde_json = { workspace = true }
