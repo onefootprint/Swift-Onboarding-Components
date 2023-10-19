@@ -67,6 +67,9 @@ const runProcessFileScript = async (
     onError(ImageProcessingStepError.heic);
     return undefined;
   }
+  Logger.info(
+    `Converted image size (before resizing): ${converted.size} bytes`,
+  );
 
   let resized;
   try {
@@ -79,6 +82,9 @@ const runProcessFileScript = async (
     onError(ImageProcessingStepError.resize);
     return undefined;
   }
+  Logger.info(
+    `Image size after resizing before compression: ${resized.size} bytes`,
+  );
 
   let compressed;
   try {
@@ -91,13 +97,17 @@ const runProcessFileScript = async (
     onError(ImageProcessingStepError.compress);
     return undefined;
   }
+  const extraCompressed =
+    resized.size > compressed.size &&
+    !!extraCompress &&
+    compressed.size <= COMPRESS_EXTRA_MAX_SIZE_MB;
+  Logger.info(
+    `Image size after compression: ${compressed.size} bytes, extraCompressed: ${extraCompressed}`,
+  );
 
   return {
     file: compressed,
-    extraCompressed:
-      resized.size > compressed.size &&
-      !!extraCompress &&
-      compressed.size <= COMPRESS_EXTRA_MAX_SIZE_MB,
+    extraCompressed,
   };
 };
 
@@ -132,6 +142,9 @@ const processImageUrl = async (
     Logger.error(str, 'use-process-image');
     return undefined;
   }
+  Logger.info(
+    `Image file size read from url (getFilefromDataUrl): ${file.size} bytes`,
+  );
 
   const output = await runProcessFileScript(
     onError,
