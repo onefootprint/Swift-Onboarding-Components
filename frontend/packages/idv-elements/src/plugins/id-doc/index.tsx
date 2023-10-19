@@ -4,6 +4,7 @@ import { OpenCvProvider } from 'opencv-react-ts';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 
+import { ImgProcessorsContextProvider } from './components/image-processors';
 import { MachineProvider } from './components/machine-provider';
 import { MissingPermissionsSheetProvider } from './components/missing-permissions-sheet';
 import configureI18next from './config/initializers/i18next';
@@ -45,7 +46,9 @@ const App = ({ context, onDone }: IdDocProps) => {
           <MissingPermissionsSheetProvider>
             <FaceModelProvider selfieRequired={isSelfieRequired}>
               <OpenCvProvider>
-                <Router onDone={onDone} />
+                <ImgProcessorsContextProvider>
+                  <Router onDone={onDone} />
+                </ImgProcessorsContextProvider>
               </OpenCvProvider>
             </FaceModelProvider>
           </MissingPermissionsSheetProvider>
