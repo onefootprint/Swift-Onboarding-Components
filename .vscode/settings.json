@@ -129,5 +129,10 @@
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
   "rust-analyzer.cargo.features": [],
-  "rust-analyzer.check.command": "clippy"
+  "rust-analyzer.check.command": "clippy",
+  // Separate cargo build directory so vscode can do in parallel
+  "rust-analyzer.cargo.extraArgs": [
+    "--target-dir",
+    "vscode-target"
+  ],
 }
