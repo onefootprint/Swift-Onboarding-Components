@@ -5,6 +5,17 @@ import type { Article } from './media.types';
 const getStaticProps: GetStaticProps = () => {
   const articles: Article[] = [
     {
+      id: '10',
+      url: 'https://www.primary.vc/firstedition/posts/focal-fintech-25-startups-to-watch',
+      imageUrl: '/media/primary-vc.png',
+      imageAlt: 'Focal Fintech: 25 Startups to Watch',
+      publishedAt: 'Oct 19, 2023',
+      website: 'Primary Ventures',
+      title: 'Focal Fintech: 25 Startups to Watch',
+      excerpt:
+        "Meet NYC's up-and-coming startup leaders transforming financial services—from banking and payments to retirement planning.",
+    },
+    {
       id: '9',
       url: 'https://www.businessinsider.com/top-best-fintech-startups-according-to-vc-2023',
       imageUrl: '/media/business-insider.png',
