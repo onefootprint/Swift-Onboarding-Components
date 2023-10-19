@@ -97,7 +97,7 @@ impl ManualReview {
     }
 
     #[tracing::instrument("ManualReview::find_completed", skip_all)]
-    pub fn find_completed(
+    pub fn latest_completed_for_workflow(
         conn: &mut PgConn,
         workflow_id: &WorkflowId,
     ) -> DbResult<Option<(ManualReview, OnboardingDecision)>> {
@@ -106,7 +106,7 @@ impl ManualReview {
             .filter(not(manual_review::completed_at.is_null()))
             .inner_join(
                 onboarding_decision::table
-                    .on(manual_review::workflow_id.eq(onboarding_decision::workflow_id)),
+                    .on(manual_review::completed_by_decision_id.eq(onboarding_decision::id.nullable())),
             )
             .order_by(manual_review::completed_at.desc())
             .select((manual_review::all_columns, onboarding_decision::all_columns))

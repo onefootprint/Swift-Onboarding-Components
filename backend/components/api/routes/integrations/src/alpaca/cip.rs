@@ -114,7 +114,7 @@ pub(crate) async fn create_cip_request(
                     DecisionStatus::Pass => (risk_signals, None, None),
                     DecisionStatus::Fail | DecisionStatus::StepUp => {
                         // footprint decided as fail, see if a manual decision override exists
-                        let (mr, obd_manual) = ManualReview::find_completed(conn, &wf.id)?
+                        let (mr, obd_manual) = ManualReview::latest_completed_for_workflow(conn, &wf.id)?
                             .ok_or(CipError::EntityDecisionStatusNotPass)?;
 
                         if obd_manual.status != DecisionStatus::Pass {

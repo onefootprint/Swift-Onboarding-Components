@@ -32,7 +32,6 @@ def alpaca_kyc_ob_config(sandbox_tenant, must_collect_data, can_access_data):
         ("fail", "The entity must have an approved decision status"),
     ],
 )
-@pytest.mark.skip(reason="alpaca currently 422ing for us")
 def test_alpaca_cip(
     sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_outcome, expected_error
 ):
