@@ -76,3 +76,24 @@ export const EMBEDDED_COMPONENTS_BASE_URL = createGetProjectUrl({
   previewAlias: 'components',
   prodAlias: 'components',
 })(env, branchName);
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const LAUNCH_DARKLY_CLIENT_SIDE_ID_PROD =
+  process.env.NEXT_PUBLIC_LAUNCH_DARKLY_CLIENT_SIDE_ID_PROD;
+const LAUNCH_DARKLY_CLIENT_SIDE_ID_PREVIEW =
+  process.env.NEXT_PUBLIC_LAUNCH_DARKLY_CLIENT_SIDE_ID_PREVIEW;
+const LAUNCH_DARKLY_CLIENT_SIDE_ID_DEV =
+  process.env.NEXT_PUBLIC_LAUNCH_DARKLY_CLIENT_SIDE_ID_DEV;
+
+const getLaunchDarklyClientSideId = () => {
+  const baseUrl = API_BASE_URL ?? '';
+  if (baseUrl.includes('localhost')) {
+    return LAUNCH_DARKLY_CLIENT_SIDE_ID_DEV ?? '';
+  }
+  if (baseUrl?.includes('preview')) {
+    return LAUNCH_DARKLY_CLIENT_SIDE_ID_PREVIEW ?? '';
+  }
+  return LAUNCH_DARKLY_CLIENT_SIDE_ID_PROD ?? '';
+};
+
+export const LAUNCH_DARKLY_CLIENT_SIDE_ID = getLaunchDarklyClientSideId();

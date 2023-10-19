@@ -1,4 +1,5 @@
 import type { SupportedLocale } from '@onefootprint/footprint-js';
+import type { CountryRecord } from '@onefootprint/global-constants';
 import type { CountryCode } from '@onefootprint/types';
 
 import type { BaseSelectOption } from '../internal/base-select/base-select.types';
@@ -16,6 +17,7 @@ export type PhoneInputProps = Omit<
   searchPlaceholder?: string;
   selectEmptyStateText?: string;
   value?: string;
+  options?: CountryRecord[];
 };
 
 export type PhoneSelectOption = BaseSelectOption<CountryCode>;

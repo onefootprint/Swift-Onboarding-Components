@@ -1,6 +1,7 @@
 import getCustomAppearance from '@onefootprint/appearance';
 import { useObserveCollector } from '@onefootprint/dev-tools';
 import type { FootprintVariant } from '@onefootprint/footprint-js';
+import { LAUNCH_DARKLY_CLIENT_SIDE_ID } from '@onefootprint/global-constants';
 import Idv from '@onefootprint/idv';
 import {
   AppErrorBoundary,
@@ -8,6 +9,7 @@ import {
   useLogStateMachine,
 } from '@onefootprint/idv-elements';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
+import { withLDProvider } from 'launchdarkly-react-client-sdk';
 import * as LogRocket from 'logrocket';
 import type { GetServerSideProps } from 'next';
 import React from 'react';
@@ -94,4 +96,14 @@ export const getServerSideProps: GetServerSideProps = async ({
   return { props: response };
 };
 
-export default Root;
+export default withLDProvider({
+  clientSideID: LAUNCH_DARKLY_CLIENT_SIDE_ID,
+  options: {
+    streaming: false,
+    allAttributesPrivate: true,
+    disableSyncEventPost: true,
+  },
+  reactOptions: {
+    useCamelCaseFlagKeys: false,
+  },
+})(Root);

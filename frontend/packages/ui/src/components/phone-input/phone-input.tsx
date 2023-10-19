@@ -21,6 +21,7 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
       selectEmptyStateText,
       value,
       locale,
+      options,
       ...props
     }: PhoneInputProps,
     ref,
@@ -47,7 +48,7 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
         hint={hint}
         onChange={handleCountryChange}
         OptionComponent={Option}
-        options={COUNTRIES}
+        options={options ?? COUNTRIES}
         renderTrigger={trigger => (
           <Input
             {...props}

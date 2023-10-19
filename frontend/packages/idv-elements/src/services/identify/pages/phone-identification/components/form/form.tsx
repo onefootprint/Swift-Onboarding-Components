@@ -1,3 +1,4 @@
+import type { CountryRecord } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Button, PhoneInput } from '@onefootprint/ui';
@@ -13,9 +14,16 @@ export type FormProps = {
   isLoading?: boolean;
   onSubmit: (formData: FormData) => void;
   validator?: (phone: string) => boolean;
+  options?: CountryRecord[];
 };
 
-const Form = ({ defaultPhone, isLoading, onSubmit, validator }: FormProps) => {
+const Form = ({
+  defaultPhone,
+  isLoading,
+  onSubmit,
+  validator,
+  options,
+}: FormProps) => {
   const { t } = useTranslation('pages.phone-identification.form');
   const {
     control,
@@ -68,6 +76,7 @@ const Form = ({ defaultPhone, isLoading, onSubmit, validator }: FormProps) => {
             value={value}
             onChange={onChange}
             onBlur={onBlur}
+            options={options}
           />
         )}
       />
