@@ -630,7 +630,8 @@ impl GetOnboardingStatusResponse {
                     self.onboarding_status == *"FACE_VALIDATION_FINISHED"
                 } else {
                     (self.onboarding_status == *"ID_VALIDATION_FINISHED")
-                        || (self.onboarding_status == *"POST_PROCESSING_FINISHED")
+                        || (self.onboarding_status == *"POST_PROCESSING_FINISHED"
+                            || self.onboarding_status == *"FACE_VALIDATION_FINISHED")
                 }
             }
         }
