@@ -441,6 +441,14 @@ fn validate_for_cip(kind: CipKind, must_collect_data: &[CDO]) -> Result<(), Tena
         .collect_vec();
     if !missing_cdos.is_empty() {
         Err(TenantError::MissingCdosForCip(missing_cdos.into(), kind))
+    } else if kind == CipKind::Alpaca
+        && must_collect_data
+            .iter()
+            .any(|cdo| matches!(cdo, CDO::Document(_)))
+    {
+        Err(TenantError::ValidationError(
+            "Cannot specify documents in Playbook and be using an Alpaca CIP".to_owned(),
+        ))
     } else {
         Ok(())
     }
