@@ -203,6 +203,33 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
         raise last_exception
 
 
+def step_up_user(twilio, token, recipient_phone_number):
+    """
+    Step up a token from unauthed, "identified" to authed with sign_up scope
+    """
+    # Token should start with no scopes
+    body = get("hosted/user/token", None, token)
+    assert not body["scopes"]
+
+    body = identify_user(None, token)
+    assert "sms" in body["available_challenge_kinds"]
+    challenge_data = challenge_user(recipient_phone_number, "sms", token)
+
+    # Log in as the user
+    new_token = identify_verify(
+        twilio,
+        recipient_phone_number,
+        challenge_data["challenge_token"],
+        token,
+    )
+
+    # Now, token should have scopes
+    body = get("hosted/user/token", None, token)
+    assert set(body["scopes"]) >= {"sign_up"}
+
+    return new_token
+
+
 def inherit_user(twilio, phone_number, *headers):
     body = identify_user(dict(phone_number=phone_number), *headers)
     assert "sms" in body["available_challenge_kinds"]
@@ -257,6 +284,7 @@ def inherit_user_email(user):
         dict(
             challenge_response=INTEGRATION_SANDBOX_EMAIL_OTP_PIN,
             challenge_token=body["challenge_data"]["challenge_token"],
+            scope="sign_up",
         ),
         user.client.ob_config.key,
         *sandbox_id_h,
@@ -303,6 +331,7 @@ def biometric_challenge_response(challenge_data, user, *headers):
         "challenge_response": json.dumps(attestation),
         "challenge_kind": "biometric",
         "challenge_token": challenge_data["challenge_token"],
+        "scope": "sign_up",
     }
     body = post("hosted/identify/verify", data, *headers)
     return body
@@ -310,9 +339,7 @@ def biometric_challenge_response(challenge_data, user, *headers):
 
 def identify_user(identifier, *headers):
     def identify():
-        data = dict(
-            identifier=identifier,
-        )
+        data = dict(identifier=identifier)
         body = post("hosted/identify", data, *headers)
         assert body["user_found"]
         assert body["available_challenge_kinds"]
@@ -322,9 +349,8 @@ def identify_user(identifier, *headers):
 
 
 def challenge_user(phone_number, challenge_kind, *headers):
-    identifier = dict(phone_number=phone_number)
-    # Support sandbox phone numbers being passed in
-    real_phone_number = phone_number.split("#")[0]
+    # Some challenges may be invoked via token instead of phone_number
+    identifier = dict(phone_number=phone_number) if phone_number else None
 
     def challenge():
         data = dict(
@@ -337,7 +363,7 @@ def challenge_user(phone_number, challenge_kind, *headers):
             data.pop("identifier")
 
         body = post("hosted/identify/login_challenge", data, *headers)
-        last_two = real_phone_number[-2:]
+        last_two = phone_number[-2:]
         assert (
             body["challenge_data"]["scrubbed_phone_number"]
             == f"+1 (***) ***-**{last_two}"
@@ -360,6 +386,7 @@ def identify_verify(
             "challenge_response": code,
             "challenge_kind": "sms",
             "challenge_token": challenge_token,
+            "scope": "sign_up",
         }
         body = post("hosted/identify/verify", data, *headers)
         return FpAuth(body["auth_token"])
