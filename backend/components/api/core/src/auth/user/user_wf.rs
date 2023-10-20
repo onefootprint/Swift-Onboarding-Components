@@ -150,6 +150,8 @@ impl UserWfSession {
     }
 
     pub fn tenant(&self) -> &Tenant {
+        // Don't use the tenant from the user_session since that comes from the OBC.
+        // Always use the tenant from the SV
         &self.tenant
     }
 

@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use super::{AuthActor, CanCheckTenantGuard, TenantAuth};
+use super::{AuthActor, CanCheckTenantGuard, GetFirmEmployee, TenantAuth};
 use crate::{
     auth::{
         session::{
@@ -159,3 +159,13 @@ impl TenantAuth for SessionContext<TenantRbAuth> {
 // Allow calling SessionContext<T>::update for T=ParsedTenantRbAuth, only for mutating a token to be used
 // for impersonation
 impl AllowSessionUpdate for ParsedTenantRbAuth {}
+
+impl GetFirmEmployee for TenantRbAuthContext {
+    fn firm_employee_user(&self) -> ApiResult<TenantUser> {
+        let tu = &self.0.tenant_user;
+        if !tu.is_firm_employee {
+            return Err(AuthError::NotFirmEmployee.into());
+        }
+        Ok(tu.clone())
+    }
+}

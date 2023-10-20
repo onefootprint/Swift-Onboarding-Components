@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use db::{
-    models::{scoped_vault::ScopedVault, vault::Vault},
+    models::{ob_configuration::ObConfiguration, scoped_vault::ScopedVault, tenant::Tenant, vault::Vault},
     PgConn,
 };
 use itertools::Itertools;
@@ -28,6 +28,7 @@ pub struct UserSessionContext {
     pub scopes: Vec<UserAuthScope>,
     /// the auth method that was used
     pub auth_factors: Vec<AuthFactor>,
+    pub(super) obc: Option<(ObConfiguration, Tenant)>,
     pub(super) scoped_user: Option<ScopedVault>,
     pub(super) sb_id: Option<ScopedVaultId>,
     pub(super) obc_id: Option<ObConfigurationId>,
@@ -103,6 +104,14 @@ impl UserSessionContext {
     pub fn scoped_business_id(&self) -> Option<ScopedVaultId> {
         self.sb_id.clone()
     }
+
+    pub fn ob_config(&self) -> Option<&ObConfiguration> {
+        self.obc.as_ref().map(|(obc, _)| obc)
+    }
+
+    pub fn tenant(&self) -> Option<&Tenant> {
+        self.obc.as_ref().map(|(_, t)| t)
+    }
 }
 
 /// Nests a private UserSession and implements traits required to extract this session from an
@@ -155,6 +164,10 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     // Conservatively confirm that the onboarding in the auth token belongs to the user
                     .map(|id| ScopedVault::get(conn, (id, &vault.id)))
                     .transpose()?;
+                let obc = obc_id
+                    .as_ref()
+                    .map(|id| ObConfiguration::get(conn, id))
+                    .transpose()?;
 
                 if let Some(su) = scoped_user.as_ref() {
                     // Every few minutes, set the heartbeat when a user auth session authenticates
@@ -172,6 +185,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     sb_id,
                     wf_id,
                     scoped_user,
+                    obc,
                     obc_id,
                     scopes,
                     auth_factors,

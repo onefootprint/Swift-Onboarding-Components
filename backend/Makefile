@@ -109,7 +109,7 @@ run-local: run-enclave-local
 	@cargo run -p api_server
 
 watch-local: run-enclave-local
-	@cargo watch -x 'run -p api_server' -i ci
+	@cargo watch -x 'run -p api_server' -i ci -i vscode-target
 
 watch: watch-local
 

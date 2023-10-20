@@ -1,12 +1,12 @@
 #[allow(clippy::module_inception)]
 pub mod identify;
 pub mod login_challenge;
-use api_core::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::errors::ApiResult;
 use api_core::fingerprinter::VaultIdentifier;
 use api_core::telemetry::RootSpan;
 use api_core::utils::sms::PhoneEmailChallengeState;
+use api_core::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use db::errors::OptionalExtension;
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;

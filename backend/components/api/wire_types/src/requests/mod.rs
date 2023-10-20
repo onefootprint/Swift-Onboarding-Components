@@ -13,6 +13,9 @@ pub use self::private_tenants::*;
 pub mod document_request;
 pub use self::document_request::*;
 
+mod token;
+pub use token::*;
+
 mod decrypt;
 pub use decrypt::*;
 
