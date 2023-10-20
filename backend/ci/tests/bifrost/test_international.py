@@ -65,7 +65,6 @@ def test_user_without_documents_international(
     )
 
     # now we have to collect a document since they are non-US
-    assert len(doc_requirement_after["supported_countries"]) > 1
     country_doc_mapping = doc_requirement_after["supported_country_and_doc_types"]
     n_countries = 0
     for country, doc_types in country_doc_mapping.items():
@@ -101,7 +100,6 @@ def test_with_documents_handles_international_address(
     )
     assert doc_requirement["should_collect_selfie"]
     # we'll accept any country
-    assert len(doc_requirement["supported_countries"]) > 1
 
     country_doc_mapping = doc_requirement["supported_country_and_doc_types"]
     n_countries = 0
@@ -138,7 +136,6 @@ def test_with_documents_handles_international_address_restricted_documents(
         "collect_document", status["all_requirements"]
     )
     assert doc_requirement["should_collect_selfie"]
-    assert len(doc_requirement["supported_countries"]) == 249
 
     country_doc_mapping = doc_requirement["supported_country_and_doc_types"]
     assert country_doc_mapping["MX"] == ["passport"]
@@ -189,7 +186,6 @@ def test_with_documents_handles_international_address_restricted_documents_with_
         "collect_document", status["all_requirements"]
     )
     assert doc_requirement["should_collect_selfie"]
-    assert len(doc_requirement["supported_countries"]) == 249
 
     country_doc_mapping = doc_requirement["supported_country_and_doc_types"]
     assert country_doc_mapping["MX"] == ["passport"]

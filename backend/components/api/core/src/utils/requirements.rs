@@ -328,8 +328,6 @@ fn get_requirement_inner(
                     || id_doc
                         .into_iter()
                         .any(|d| d.status == IdentityDocumentStatus::Pending);
-                let supported_countries = get_collect_document_supported_countries(ob_config);
-                // TODO remove only_us_obc once the frontend is reading supported_countries
                 let supported_country_and_doc_types =
                     ob_config.supported_country_mapping_for_document(country);
 
@@ -337,7 +335,6 @@ fn get_requirement_inner(
                     document_request_id: dr.id,
                     should_collect_selfie: dr.should_collect_selfie,
                     should_collect_consent: user_consent.is_none(),
-                    supported_countries,
                     supported_country_and_doc_types: supported_country_and_doc_types.0,
                 })
             } else {
@@ -405,11 +402,4 @@ fn get_requirement_inner(
         }
     };
     Ok(req)
-}
-
-fn get_collect_document_supported_countries(obc: &ObConfiguration) -> Vec<Iso3166TwoDigitCountryCode> {
-    obc.supported_country_mapping_for_document(None)
-        .keys()
-        .cloned()
-        .collect()
 }
