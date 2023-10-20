@@ -3462,9 +3462,9 @@ dependencies = [
  "log",
  "reqwest",
  "reqwest-middleware",
- "reqwest-retry",
+ "reqwest-retry 0.2.2",
  "reqwest-tracing",
- "retry-policies",
+ "retry-policies 0.1.2",
  "rpc",
  "serde",
  "serde_cbor",
@@ -4375,6 +4375,8 @@ dependencies = [
  "mockall",
  "newtypes",
  "reqwest",
+ "reqwest-middleware",
+ "reqwest-retry 0.3.0",
  "serde",
  "serde_json",
  "serde_with",
@@ -6421,9 +6423,9 @@ dependencies = [
 
 [[package]]
 name = "reqwest-middleware"
-version = "0.2.2"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4531c89d50effe1fac90d095c8b133c20c5c714204feee0bfc3fd158e784209d"
+checksum = "ff44108c7925d082f2861e683a88618b68235ad9cdc60d64d9d1188efc951cdb"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -6450,7 +6452,30 @@ dependencies = [
  "parking_lot 0.11.2",
  "reqwest",
  "reqwest-middleware",
- "retry-policies",
+ "retry-policies 0.1.2",
+ "task-local-extensions",
+ "tokio",
+ "tracing",
+ "wasm-timer",
+]
+
+[[package]]
+name = "reqwest-retry"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9af20b65c2ee9746cc575acb6bd28a05ffc0d15e25c992a8f4462d8686aacb4f"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "chrono",
+ "futures",
+ "getrandom 0.2.7",
+ "http",
+ "hyper",
+ "parking_lot 0.11.2",
+ "reqwest",
+ "reqwest-middleware",
+ "retry-policies 0.2.1",
  "task-local-extensions",
  "tokio",
  "tracing",
@@ -6484,6 +6509,17 @@ name = "retry-policies"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e09bbcb5003282bcb688f0bae741b278e9c7e8f378f561522c9806c58e075d9b"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "rand 0.8.5",
+]
+
+[[package]]
+name = "retry-policies"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "17dd00bff1d737c40dbcd47d4375281bf4c17933f9eef0a185fc7bacca23ecbd"
 dependencies = [
  "anyhow",
  "chrono",

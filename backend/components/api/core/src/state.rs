@@ -194,12 +194,6 @@ impl State {
             panic!("config.incode.base_url cannot end with /")
         }
 
-        // let out = hmac_client
-        //     .signed_hash(&vec![0xde, 0xad, 0xbe, 0xef])
-        //     .await
-        //     .unwrap();
-        // dbg!(crypto::hex::encode(&out));
-
         let footprint_vendor_http_client =
             FootprintVendorHttpClient::new().expect("failed to build vendor client");
 
