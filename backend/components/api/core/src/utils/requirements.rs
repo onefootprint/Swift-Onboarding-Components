@@ -1,4 +1,4 @@
-use std::{str::FromStr, sync::Arc};
+use std::str::FromStr;
 
 use crate::utils::vault_wrapper::{Business, Person, VaultWrapper, VwArgs};
 use crate::{
@@ -15,14 +15,13 @@ use db::{
     },
     PgConn,
 };
-use feature_flag::{BoolFlag, FeatureFlagClient};
 use itertools::Itertools;
 use newtypes::{
     AuthorizeFields, DocumentCdoInfo, IdentityDocumentStatus, Iso3166TwoDigitCountryCode, LivenessSource,
     OnboardingRequirement, OnboardingRequirementKind, Selfie, UsLegalStatus,
 };
 use newtypes::{
-    CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind, IdDocKind,
+    CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind,
     IdentityDataKind as IDK, InvestorProfileKind as IPK, ScopedVaultId,
 };
 
@@ -83,11 +82,10 @@ pub async fn get_requirements(
         .await??;
     let decrypted_values = GetRequirementsArgs::get_decrypted_values(state, &uvw).await?;
 
-    let ff_client = state.feature_flag_client.clone();
     let requirements = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let requirements = get_requirements_inner(conn, uvw, args, decrypted_values, ff_client)?;
+            let requirements = get_requirements_inner(conn, uvw, args, decrypted_values)?;
             Ok(requirements)
         })
         .await??;
@@ -206,10 +204,7 @@ pub fn get_requirements_inner(
     uvw: VaultWrapper<Person>,
     args: GetRequirementsArgs,
     decrypted_values: DecryptUncheckedResultForReqs,
-    ff_client: Arc<dyn FeatureFlagClient>,
 ) -> ApiResult<Vec<OnboardingRequirement>> {
-    let only_us_dl = ff_client.flag(BoolFlag::RestrictToUsDriversLicense(&args.ob_config.tenant_id));
-
     // Depending on the workflow that we are running, we only want to show a subset of requirements
     let relevant_requirement_kinds = args.workflow.state.relevant_requirements();
 
@@ -217,7 +212,7 @@ pub fn get_requirements_inner(
     // necessary
     let requirements = relevant_requirement_kinds
         .into_iter()
-        .map(|k| get_requirement_inner(k, conn, &uvw, &args, &decrypted_values, only_us_dl))
+        .map(|k| get_requirement_inner(k, conn, &uvw, &args, &decrypted_values))
         .collect::<ApiResult<Vec<_>>>()?
         .into_iter()
         .flatten()
@@ -236,7 +231,6 @@ fn get_requirement_inner(
     uvw: &VaultWrapper<Person>,
     args: &GetRequirementsArgs,
     decrypted_values: &DecryptUncheckedResultForReqs,
-    only_us_dl: bool,
 ) -> ApiResult<Option<OnboardingRequirement>> {
     let ob_config = &args.ob_config;
     let req = match k {
@@ -336,7 +330,6 @@ fn get_requirement_inner(
                         .any(|d| d.status == IdentityDocumentStatus::Pending);
                 let supported_countries = get_collect_document_supported_countries(ob_config);
                 // TODO remove only_us_obc once the frontend is reading supported_countries
-                let only_us_obc = supported_countries == vec![Iso3166TwoDigitCountryCode::US];
                 let supported_country_and_doc_types =
                     ob_config.supported_country_mapping_for_document(country);
 
@@ -344,14 +337,6 @@ fn get_requirement_inner(
                     document_request_id: dr.id,
                     should_collect_selfie: dr.should_collect_selfie,
                     should_collect_consent: user_consent.is_none(),
-                    // TODO remove only_us_dl feature flag when all of flexcar is migrated.
-                    // For now, regardless of what's on the DR for flexcar, restrict to US
-                    only_us_supported: only_us_obc || only_us_dl,
-                    supported_document_types: if only_us_dl {
-                        vec![IdDocKind::DriversLicense]
-                    } else {
-                        get_collect_document_supported_doc_types(country, ob_config)
-                    },
                     supported_countries,
                     supported_country_and_doc_types: supported_country_and_doc_types.0,
                 })
@@ -426,17 +411,5 @@ fn get_collect_document_supported_countries(obc: &ObConfiguration) -> Vec<Iso316
     obc.supported_country_mapping_for_document(None)
         .keys()
         .cloned()
-        .collect()
-}
-
-fn get_collect_document_supported_doc_types(
-    country: Option<Iso3166TwoDigitCountryCode>,
-    obc: &ObConfiguration,
-) -> Vec<IdDocKind> {
-    obc.supported_country_mapping_for_document(country)
-        .iter()
-        .flat_map(|(_, id_doc_kinds)| id_doc_kinds)
-        .cloned()
-        .unique()
         .collect()
 }

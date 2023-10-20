@@ -39,10 +39,6 @@ pub enum OnboardingRequirement {
         document_request_id: DocumentRequestId,
         should_collect_selfie: bool,
         should_collect_consent: bool,
-        /// When true, should only allow collecting documents from the US
-        /// To be deprecated
-        only_us_supported: bool,
-        supported_document_types: Vec<IdDocKind>,
         supported_countries: Vec<Iso3166TwoDigitCountryCode>,
         supported_country_and_doc_types: HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>>,
     },
@@ -109,8 +105,6 @@ impl OnboardingRequirement {
                 document_request_id: _,
                 should_collect_consent: _,
                 should_collect_selfie: _,
-                only_us_supported: _,
-                supported_document_types: _,
                 supported_countries: _,
                 supported_country_and_doc_types: _,
             } => false,

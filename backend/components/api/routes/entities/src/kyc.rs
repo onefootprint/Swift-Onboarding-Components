@@ -14,8 +14,8 @@ use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::task;
 use api_core::utils::db2api::DbToApi;
-use api_core::utils::requirements::GetRequirementsArgs;
 use api_core::utils::requirements::get_requirements_inner;
+use api_core::utils::requirements::GetRequirementsArgs;
 use api_core::utils::vault_wrapper::Person;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
@@ -70,7 +70,6 @@ pub async fn post(
     let decrypted_values = GetRequirementsArgs::get_decrypted_values(&state, &uvw).await?;
 
     let tenant_id = auth.tenant().id.clone();
-    let ff_client = state.feature_flag_client.clone();
     let wf = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -125,7 +124,7 @@ pub async fn post(
                 sb_id: biz_wf.map(|ob| ob.scoped_vault_id),
             };
             // /kyc endpoint currently does not properly handle IPK doc requirements!
-            let reqs = get_requirements_inner(conn, uvw, args, decrypted_values, ff_client)?;
+            let reqs = get_requirements_inner(conn, uvw, args, decrypted_values)?;
             // TODO: consolidate with /authorize code
             let unmet_reqs = reqs
                 .into_iter()

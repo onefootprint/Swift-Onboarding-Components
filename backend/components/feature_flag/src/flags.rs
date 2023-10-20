@@ -33,8 +33,6 @@ pub enum BoolFlag<'a> {
     CreateOnboardingWorkflows(&'a ObConfigurationKey),
     #[strum(to_string = "IsAlpacaTenant")]
     IsAlpacaTenant(&'a TenantId),
-    #[strum(to_string = "RestrictToUsDriversLicense")]
-    RestrictToUsDriversLicense(&'a TenantId),
     #[strum(to_string = "IsAppClipEnabled")]
     IsAppClipEnabled(&'a TenantId),
     #[strum(to_string = "IsInstantAppEnabled")]
@@ -89,7 +87,6 @@ impl<'a> BoolFlag<'a> {
             Self::CanCleanUpTenant(k) => Some(k.to_string()),
             Self::CreateOnboardingWorkflows(k) => Some(k.to_string()),
             Self::IsAlpacaTenant(k) => Some(k.to_string()),
-            Self::RestrictToUsDriversLicense(k) => Some(k.to_string()),
             Self::IsAppClipEnabled(k) => Some(k.to_string()),
             Self::IsInstantAppEnabled(k) => Some(k.to_string()),
             Self::CanMakeDemoIncodeRequestsInSandbox(k) => Some(k.to_string()),
@@ -125,7 +122,6 @@ impl<'a> BoolFlag<'a> {
             Self::CanCleanUpTenant(_) => false,
             Self::CreateOnboardingWorkflows(_) => false,
             Self::IsAlpacaTenant(_) => false,
-            Self::RestrictToUsDriversLicense(_) => false,
             Self::IsAppClipEnabled(_) => false,
             Self::IsInstantAppEnabled(_) => false,
             Self::CanMakeDemoIncodeRequestsInSandbox(_) => false,

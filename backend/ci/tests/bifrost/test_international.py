@@ -65,8 +65,6 @@ def test_user_without_documents_international(
     )
 
     # now we have to collect a document since they are non-US
-    assert doc_requirement_after["supported_document_types"] == ["passport"]
-    # we'll allow any country
     assert len(doc_requirement_after["supported_countries"]) > 1
     country_doc_mapping = doc_requirement_after["supported_country_and_doc_types"]
     n_countries = 0
@@ -102,7 +100,6 @@ def test_with_documents_handles_international_address(
         "collect_document", status["all_requirements"]
     )
     assert doc_requirement["should_collect_selfie"]
-    assert doc_requirement["supported_document_types"] == ["passport"]
     # we'll accept any country
     assert len(doc_requirement["supported_countries"]) > 1
 
@@ -141,7 +138,6 @@ def test_with_documents_handles_international_address_restricted_documents(
         "collect_document", status["all_requirements"]
     )
     assert doc_requirement["should_collect_selfie"]
-    assert doc_requirement["supported_document_types"] == ["passport"]
     assert len(doc_requirement["supported_countries"]) == 249
 
     country_doc_mapping = doc_requirement["supported_country_and_doc_types"]
@@ -174,9 +170,6 @@ def test_with_documents_handles_international_address_restricted_documents_with_
     doc_requirement_before_address = get_requirement_from_requirements(
         "collect_document", status_before_address["all_requirements"]
     )
-    assert set(doc_requirement_before_address["supported_document_types"]) == set(
-        ["passport", "drivers_license"]
-    )
     country_doc_mapping_before_address = doc_requirement_before_address[
         "supported_country_and_doc_types"
     ]
@@ -196,7 +189,6 @@ def test_with_documents_handles_international_address_restricted_documents_with_
         "collect_document", status["all_requirements"]
     )
     assert doc_requirement["should_collect_selfie"]
-    assert doc_requirement["supported_document_types"] == ["passport"]
     assert len(doc_requirement["supported_countries"]) == 249
 
     country_doc_mapping = doc_requirement["supported_country_and_doc_types"]
