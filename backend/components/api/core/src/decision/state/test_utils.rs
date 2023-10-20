@@ -446,9 +446,6 @@ pub async fn mock_incode_doc_collection(
                     ref_id: None,
                     workflow_id: wf_id.clone(),
                     should_collect_selfie: false,
-                    global_doc_types_accepted: None,
-                    country_restrictions: vec![],
-                    country_doc_type_restrictions: None,
                 };
                 DocumentRequest::create(conn, args).unwrap();
             }

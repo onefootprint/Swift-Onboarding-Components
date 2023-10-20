@@ -211,9 +211,5 @@ fn default_stepup_doc_args(
         ref_id: None,
         workflow_id: workflow_id.clone(),
         should_collect_selfie,
-        // TODO: Deprecated - None of these are used
-        global_doc_types_accepted: None,
-        country_restrictions: vec![],
-        country_doc_type_restrictions: None,
     }
 }

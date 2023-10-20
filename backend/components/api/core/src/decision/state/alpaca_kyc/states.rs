@@ -17,8 +17,8 @@ use either::Either;
 use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
-    AlpacaKycConfig, DecisionIntentKind, DecisionStatus, FootprintReasonCode, Iso3166TwoDigitCountryCode,
-    Locked, OnboardingStatus, ReviewReason, RiskSignalGroupKind, VendorAPI,
+    AlpacaKycConfig, DecisionIntentKind, DecisionStatus, FootprintReasonCode, Locked, OnboardingStatus,
+    ReviewReason, RiskSignalGroupKind, VendorAPI,
 };
 
 use crate::{
@@ -321,9 +321,6 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                     workflow_id: self.wf_id.clone(),
                     // TODO: should come from a config
                     should_collect_selfie: true,
-                    global_doc_types_accepted: None,
-                    country_restrictions: vec![Iso3166TwoDigitCountryCode::US],
-                    country_doc_type_restrictions: None,
                 };
                 DocumentRequest::create(conn, args)?;
 
@@ -716,9 +713,11 @@ fn get_review_reasons(wc_reason_codes: &[FootprintReasonCode], collected_doc: bo
         .iter()
         .any(|rs| rs == &FootprintReasonCode::AdverseMediaHit);
 
-    let wl_hit = [FootprintReasonCode::WatchlistHitOfac,
+    let wl_hit = [
+        FootprintReasonCode::WatchlistHitOfac,
         FootprintReasonCode::WatchlistHitNonSdn,
-        FootprintReasonCode::WatchlistHitPep]
+        FootprintReasonCode::WatchlistHitPep,
+    ]
     .iter()
     .any(|r| wc_reason_codes.contains(r));
 

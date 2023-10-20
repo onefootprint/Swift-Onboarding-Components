@@ -11,8 +11,8 @@ use db::{
     TxnPgConn,
 };
 use newtypes::{
-    CollectedDataOption, CountryRestriction, EncryptedVaultPrivateKey, Iso3166TwoDigitCountryCode,
-    ScopedVaultId, Selfie, VaultId, VaultKind, VaultPublicKey, WorkflowFixtureResult,
+    CollectedDataOption, EncryptedVaultPrivateKey, ScopedVaultId, Selfie, VaultId, VaultKind, VaultPublicKey,
+    WorkflowFixtureResult,
 };
 
 use crate::errors::ApiResult;
@@ -114,23 +114,11 @@ pub fn create_doc_request_if_needed(
         })
         .next()
     {
-        // Create a `DocumentRequest` if specified in the ob config.
-        // To prevent duplicate document requests, only create a doc request if the onboarding is new
-        let doc_type_restriction = doc_info.restricted_id_doc_kinds();
-
         let args = NewDocumentRequestArgs {
             scoped_vault_id: wf.scoped_vault_id.clone(),
             ref_id: None,
             workflow_id: wf.id.clone(),
             should_collect_selfie: doc_info.selfie() == Selfie::RequireSelfie,
-            // TODO: Drop these columns on doc request
-            global_doc_types_accepted: doc_type_restriction,
-            country_restrictions: vec![(doc_info.country_restriction() == CountryRestriction::UsOnly)
-                .then_some(Iso3166TwoDigitCountryCode::US)]
-            .into_iter()
-            .flatten()
-            .collect(),
-            country_doc_type_restrictions: None,
         };
         DocumentRequest::create(conn, args)?;
     }

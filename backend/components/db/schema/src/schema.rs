@@ -208,9 +208,6 @@ table! {
         _updated_at -> Timestamptz,
         should_collect_selfie -> Bool,
         workflow_id -> Text,
-        global_doc_types_accepted -> Nullable<Array<Text>>,
-        country_restrictions -> Nullable<Array<Text>>,
-        country_doc_type_restrictions -> Nullable<Jsonb>,
     }
 }
 

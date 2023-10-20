@@ -123,10 +123,6 @@ pub async fn post(
                         ref_id: None,
                         workflow_id: wf.id.clone(),
                         should_collect_selfie: collect_selfie,
-                        // TODO should these come from the last doc request? or be tenant-specific? or from workflow?
-                        global_doc_types_accepted: None,
-                        country_restrictions: vec![],
-                        country_doc_type_restrictions: None,
                     };
                     DocumentRequest::create(conn, args)?;
                     wf
