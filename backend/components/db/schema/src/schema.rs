@@ -648,6 +648,7 @@ table! {
         is_billable -> Bool,
         last_heartbeat_at -> Timestamptz,
         show_in_search -> Bool,
+        snapshot_seqno -> Int8,
     }
 }
 

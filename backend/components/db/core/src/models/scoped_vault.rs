@@ -9,6 +9,7 @@ use super::vault::NewVaultArgs;
 use super::vault::Vault;
 use super::watchlist_check::WatchlistCheck;
 use super::workflow::Workflow;
+use crate::models::data_lifetime::DataLifetime;
 use crate::PgConn;
 use crate::{DbError, DbResult, TxnPgConn};
 use chrono::{DateTime, Duration, Utc};
@@ -18,8 +19,8 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    DbActor, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingStatus, ScopedVaultId, TenantId,
-    VaultCreatedInfo, VaultId, WorkflowId,
+    DataLifetimeSeqno, DbActor, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingStatus,
+    ScopedVaultId, TenantId, VaultCreatedInfo, VaultId, WorkflowId,
 };
 
 /// Creates a unique identifier specific to each onboarding configuration.
@@ -48,6 +49,9 @@ pub struct ScopedVault {
     pub last_heartbeat_at: DateTime<Utc>,
     /// Temporary flag that will hide users without verified credentials from search
     pub show_in_search: bool,
+    /// The seqno at which the SV was created or refreshed.
+    /// Data _before_ this seqno and tenat-scoped data _after_ this seqno are used to contruct the VW
+    pub snapshot_seqno: DataLifetimeSeqno,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -62,6 +66,7 @@ struct NewScopedVault {
     is_billable: bool,
     last_heartbeat_at: DateTime<Utc>,
     show_in_search: bool,
+    snapshot_seqno: DataLifetimeSeqno,
 }
 
 #[derive(Debug, Clone, Default, AsChangeset)]
@@ -164,6 +169,7 @@ impl ScopedVault {
             return Ok(scoped_vault);
         }
         // Row doesn't exist for vault_id, tenant_id - create a new one
+        let seqno = DataLifetime::get_current_seqno(conn)?;
         let new = NewScopedVault {
             id: ScopedVaultId::generate(uv.kind),
             fp_id: FpId::generate(uv.kind, uv.is_live),
@@ -176,6 +182,7 @@ impl ScopedVault {
             is_billable: false,
             last_heartbeat_at: Utc::now(),
             show_in_search: true,
+            snapshot_seqno: seqno,
         };
         let sv = diesel::insert_into(scoped_vault::table)
             .values(new)
@@ -200,6 +207,7 @@ impl ScopedVault {
             return Err(DbError::CannotCreatedScopedUser);
         }
         let su = if is_new_vault {
+            let seqno = DataLifetime::get_current_seqno(conn)?;
             let new = NewScopedVault {
                 id: ScopedVaultId::generate(uv.kind),
                 fp_id: FpId::generate(uv.kind, uv.is_live),
@@ -211,6 +219,7 @@ impl ScopedVault {
                 is_billable: true,
                 last_heartbeat_at: Utc::now(),
                 show_in_search: true,
+                snapshot_seqno: seqno,
             };
             let sv: ScopedVault = diesel::insert_into(scoped_vault::table)
                 .values(new)
