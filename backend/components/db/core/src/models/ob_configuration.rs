@@ -75,6 +75,20 @@ impl ObConfiguration {
         &self,
         residential_country: Option<Iso3166TwoDigitCountryCode>,
     ) -> SupportedDocumentAndCountryMapping {
+        if let Some(cip) = self.cip_kind.as_ref() {
+            match cip {
+                CipKind::Alpaca => {
+                    // In the general case, we need to accept a document that might have address
+                    let alpaca_doc_types = vec![IdDocKind::DriversLicense, IdDocKind::IdCard];
+
+                    return SupportedDocumentAndCountryMapping(HashMap::from_iter(vec![(
+                        Iso3166TwoDigitCountryCode::US,
+                        alpaca_doc_types,
+                    )]));
+                }
+                CipKind::Apex => todo!(),
+            }
+        }
         let id_doc_kinds = if let Some(kinds) = self
             .restricted_id_doc_kinds()
             .or(self.optional_ssn_restricted_id_doc_kinds())
@@ -575,7 +589,7 @@ mod tests {
     use crate::tests::prelude::*;
     use chrono::Utc;
     use macros::db_test;
-    use newtypes::AdverseMediaListKind;
+    use newtypes::{AdverseMediaListKind, CipKind};
     use newtypes::{
         ApiKeyStatus, CollectedDataOption, DocumentCdoInfo, EnhancedAmlOption, IdDocKind,
         Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, TenantId,
@@ -828,6 +842,54 @@ mod tests {
         };
 
         obc.optional_ssn_restricted_id_doc_kinds()
+    }
+
+    #[test_case(None)]
+    #[test_case(Some(CipKind::Alpaca))]
+    fn test_cip_kind_documents(cip: Option<CipKind>) {
+        let obc = ObConfiguration {
+            id: ObConfigurationId::from_str("1234").unwrap(),
+            key: ObConfigurationKey::from_str("obk1").unwrap(),
+            name: "obc".into(),
+            tenant_id: TenantId::from_str("t_1234").unwrap(),
+            _created_at: Utc::now(),
+            _updated_at: Utc::now(),
+            is_live: true,
+            status: ApiKeyStatus::Enabled,
+            created_at: Utc::now(),
+            must_collect_data: vec![],
+            can_access_data: vec![],
+            appearance_id: None,
+            // Testing this!!!
+            cip_kind: cip,
+            optional_data: vec![],
+            is_no_phone_flow: false,
+            is_doc_first: false,
+            allow_international_residents: false,
+            international_country_restrictions: None,
+            author: None,
+            skip_kyc: false,
+            doc_scan_for_optional_ssn: None,
+            enhanced_aml: EnhancedAmlOption::No,
+            allow_us_residents: true,
+            allow_us_territory_residents: false,
+        };
+
+        let mapping = obc.supported_country_mapping_for_document(None).0;
+        if let Some(c) = cip {
+            match c {
+                CipKind::Alpaca => {
+                    assert!(mapping.keys().len() == 1);
+                    assert_eq!(
+                        mapping.get(&Iso3166TwoDigitCountryCode::US).unwrap().clone(),
+                        vec![IdDocKind::DriversLicense, IdDocKind::IdCard,]
+                    );
+                }
+                CipKind::Apex => unimplemented!(),
+            }
+        } else {
+            assert!(mapping.keys().len() > 1);
+        }
     }
 
     #[db_test]
