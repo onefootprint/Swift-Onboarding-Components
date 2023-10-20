@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 import {
   clickOnContinue,
   confirmData,
+  doLivenessCheck,
   fillAddress,
   fillEmail,
   fillNameAndDoB,
@@ -22,7 +23,12 @@ const city = 'Seward';
 const zipCode = '99664';
 const ssn = '418437970';
 
-test('E2E.KYC.Investor #ci', async ({ browserName, page, browser }) => {
+test('E2E.KYC.Investor #ci', async ({
+  browserName,
+  page,
+  browser,
+  isMobile,
+}) => {
   test.setTimeout(120000);
   const context = await browser.newContext();
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
@@ -104,7 +110,11 @@ test('E2E.KYC.Investor #ci', async ({ browserName, page, browser }) => {
     .catch(() => false);
   await page.waitForLoadState();
 
-  await context.close();
+  if (!isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
+    await doLivenessCheck({ page, frame, browser }, { flowId });
+    await page.waitForLoadState();
+  }
 
+  await context.close();
   return expect(1).toBe(1);
 });

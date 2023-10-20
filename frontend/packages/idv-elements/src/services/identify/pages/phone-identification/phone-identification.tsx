@@ -1,7 +1,7 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
-import type { IdentifyResponse } from '@onefootprint/types';
+import type { CountryCode, IdentifyResponse } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
@@ -30,9 +30,10 @@ const PhoneIdentification = () => {
   const identifyMutation = useIdentify();
   const { isLoading } = identifyMutation;
   const showRequestErrorToast = useRequestErrorToast();
-  const flags = useFlags();
-  const { IdvPhoneInputRestrictedCountries } = flags;
-  const restrictedCountries = new Set(IdvPhoneInputRestrictedCountries);
+  const { IdvPhoneInputRestrictedCountries } = useFlags();
+  const restrictedCountries = new Set<CountryCode>(
+    IdvPhoneInputRestrictedCountries,
+  );
   const options = COUNTRIES.filter(
     country => !restrictedCountries.has(country.value),
   );

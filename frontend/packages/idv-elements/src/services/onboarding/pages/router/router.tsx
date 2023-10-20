@@ -1,3 +1,4 @@
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import React, { useEffect } from 'react';
 
 import useLogStateMachine from '../../../../hooks/ui/use-log-state-machine';
@@ -27,6 +28,9 @@ const Router = ({ onDone }: RouterProps) => {
     validationToken,
     idDocOutcome,
   } = state.context;
+  const { IdvTransferFromDesktopDisabled } = useFlags();
+  const orgIds = new Set<string>(IdvTransferFromDesktopDisabled);
+  const isTransferOnDesktopDisabled = orgIds.has(config.orgId);
 
   const isDone = state.matches('complete');
   useEffect(() => {
@@ -50,6 +54,7 @@ const Router = ({ onDone }: RouterProps) => {
           overallOutcome={overallOutcome}
           idDocOutcome={idDocOutcome}
           onDone={() => send({ type: 'requirementsCompleted' })}
+          isTransferOnDesktopDisabled={isTransferOnDesktopDisabled}
         />
       )}
       {state.matches('validate') && <Validate />}

@@ -19,11 +19,20 @@ export type OnboardingRequirementsMachineArgs = {
   isTransfer?: boolean;
   idDocOutcome?: IdDocOutcome;
   overallOutcome?: OverallOutcome;
+  isTransferOnDesktopDisabled?: boolean;
 };
 
-const createOnboardingRequirementsMachine = (
-  args: OnboardingRequirementsMachineArgs,
-) =>
+const createOnboardingRequirementsMachine = ({
+  userFound,
+  config,
+  device,
+  authToken,
+  bootstrapData,
+  isTransfer,
+  idDocOutcome,
+  overallOutcome,
+  isTransferOnDesktopDisabled,
+}: OnboardingRequirementsMachineArgs) =>
   createMachine(
     {
       predictableActionArguments: true,
@@ -36,9 +45,19 @@ const createOnboardingRequirementsMachine = (
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'checkRequirements',
       context: {
-        onboardingContext: { ...args },
+        onboardingContext: {
+          userFound,
+          config,
+          device,
+          authToken,
+          isTransfer,
+          bootstrapData,
+          idDocOutcome,
+          overallOutcome,
+        },
         requirements: [],
         startedDataCollection: false,
+        isTransferOnDesktopDisabled,
       },
       states: {
         checkRequirements: {

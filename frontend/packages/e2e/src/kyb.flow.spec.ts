@@ -12,6 +12,7 @@ import {
   fillPhoneNumber,
   selectOutcomeOptional,
   verifyPhoneNumber,
+  doLivenessCheck,
 } from './utils/commands';
 
 const firstName = 'Jane';
@@ -32,7 +33,7 @@ const beneficialOwner1Phone = '6178408644';
 const businessName = 'Business name';
 const businessNameOptional = 'Optional name';
 
-test('E2E.KYB.flow #ci', async ({ browser, browserName, page }) => {
+test('E2E.KYB.flow #ci', async ({ browser, browserName, page, isMobile }) => {
   test.setTimeout(120000);
   const context = await browser.newContext();
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
@@ -133,6 +134,11 @@ test('E2E.KYB.flow #ci', async ({ browser, browserName, page }) => {
   );
   await clickOnContinue({ frame });
   await page.waitForLoadState();
+
+  if (!isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
+    await doLivenessCheck({ page, frame, browser }, { flowId });
+    await page.waitForLoadState();
+  }
 
   await context.close();
 

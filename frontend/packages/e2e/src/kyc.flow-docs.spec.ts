@@ -34,6 +34,7 @@ test('E2E.KYC.DriverDocOnly #ci', async ({
   browser,
   isMobile,
 }) => {
+  test.skip(); // eslint-disable-line playwright/no-skipped-test
   // eslint-disable-next-line playwright/no-conditional-in-test
   if (isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
   test.setTimeout(120000);

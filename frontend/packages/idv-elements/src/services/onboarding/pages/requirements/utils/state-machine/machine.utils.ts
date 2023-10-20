@@ -132,19 +132,18 @@ const shouldRunTransfer = (context: MachineContext): boolean => {
     },
     didRunTransfer,
     requirements,
+    isTransferOnDesktopDisabled,
   } = context;
+  if (isTransferOnDesktopDisabled) return false;
   if (didRunTransfer || isNoPhoneFlow) return false;
   if (isTransfer) return false;
-
-  const firstKind = requirements[0]?.kind;
-  const nextRequirementIsLiveness = isLivenessKind(firstKind);
-  const nextRequirementIsIdDoc = isDocKind(firstKind);
 
   if (type === 'mobile') {
     return false; // TODO: this used to do transfer for liveness req, revive when flexcar browser issue is fixed
   }
 
-  const hasPendingDoc = requirements.some(x => !x.isMet && isDocKind(x.kind));
-
-  return nextRequirementIsIdDoc || (nextRequirementIsLiveness && hasPendingDoc);
+  const firstKind = requirements[0]?.kind;
+  const nextRequirementIsLiveness = isLivenessKind(firstKind);
+  const nextRequirementIsIdDoc = isDocKind(firstKind);
+  return nextRequirementIsIdDoc || nextRequirementIsLiveness;
 };

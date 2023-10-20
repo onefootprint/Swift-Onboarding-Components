@@ -10,6 +10,7 @@ import {
   fillSSN,
   selectOutcomeOptional,
   verifyPhoneNumber,
+  doLivenessCheck,
 } from './utils/commands';
 
 const firstName = 'Jane';
@@ -26,6 +27,7 @@ test('KYC for env.NEXT_PUBLIC_E2E_TENANT_PK #ci', async ({
   browserName,
   page,
   browser,
+  isMobile,
 }) => {
   test.setTimeout(120000);
   const context = await browser.newContext();
@@ -79,6 +81,11 @@ test('KYC for env.NEXT_PUBLIC_E2E_TENANT_PK #ci', async ({
   );
   await clickOnContinue({ frame });
   await page.waitForLoadState();
+
+  if (!isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
+    await doLivenessCheck({ page, frame, browser }, { flowId });
+    await page.waitForLoadState();
+  }
 
   await context.close();
   return expect(frame.getByTestId('result').innerText).toBeDefined();

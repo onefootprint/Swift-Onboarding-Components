@@ -735,6 +735,25 @@ describe('<Idv />', () => {
       withUserToken();
     });
 
+    it('transfers when there is a liveness requirement', async () => {
+      withRequirements([
+        {
+          kind: OnboardingRequirementKind.registerPasskey,
+          isMet: false,
+        },
+      ]);
+
+      renderIdv({
+        obConfigAuth: defaultObConfigAuth,
+        authToken: 'token',
+        showCompletionPage: true,
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText('Liveness check')).toBeInTheDocument();
+      });
+    });
+
     it('transfers when there is an id doc requirement', async () => {
       withRequirements([
         {
