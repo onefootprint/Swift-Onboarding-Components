@@ -11,7 +11,7 @@ use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
-    description = "Creates a new user vault, optionally initializing with the provided data",
+    description = "Creates a new user, optionally initializing with the provided data",
     tags(Users, Vault, PublicApi)
 )]
 #[post("/users")]
@@ -22,7 +22,7 @@ pub async fn post(
     insight: InsightHeaders,
     idempotency_id: IdempotencyId,
     root_span: RootSpan,
-) -> ApiResult<ResponseData<api_wire_types::UserId>> {
+) -> ApiResult<ResponseData<api_wire_types::LiteUser>> {
     let result = create_non_portable_vault(
         state,
         request,

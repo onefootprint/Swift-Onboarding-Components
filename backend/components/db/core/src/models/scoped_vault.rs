@@ -154,9 +154,6 @@ impl ScopedVault {
         if uv.is_live != ob_config.is_live {
             return Err(DbError::SandboxMismatch);
         }
-        if !uv.is_portable {
-            return Err(DbError::CannotCreatedScopedUser);
-        }
         // Has to be inside locked txn, otherwise this could be a stale read.
         // Still protected by uniqueness constraints, but those are clunkier
         let scoped_vault = scoped_vault::table
@@ -167,6 +164,12 @@ impl ScopedVault {
         if let Some(scoped_vault) = scoped_vault {
             // TODO if SV already exists, we should make a new workflow rather than an onboarding
             return Ok(scoped_vault);
+        }
+        if !uv.is_portable {
+            // Shouldn't be creating SVs for non-portable vaults here - use `get_or_create_non_portable` below
+            // One day, we'll want to allow this when an initially "non-portable" user one-click
+            // onboards onto a new tenant!
+            return Err(DbError::CannotCreatedScopedUser);
         }
         // Row doesn't exist for vault_id, tenant_id - create a new one
         let seqno = DataLifetime::get_current_seqno(conn)?;

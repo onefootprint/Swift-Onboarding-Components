@@ -22,7 +22,7 @@ pub async fn post(
     insight: InsightHeaders,
     idempotency_id: IdempotencyId,
     root_span: RootSpan,
-) -> ApiResult<ResponseData<api_wire_types::UserId>> {
+) -> ApiResult<ResponseData<api_wire_types::LiteUser>> {
     let result = create_non_portable_vault(
         state,
         request,

@@ -1,11 +1,15 @@
 use crate::utils::db2api::DbToApi;
-use db::models::{manual_review::ManualReview, scoped_vault::ScopedVault};
+use db::models::{manual_review::ManualReview, scoped_vault::ScopedVault, vault::Vault};
 
-impl DbToApi<ScopedVault> for api_wire_types::UserId {
-    fn from_db(target: ScopedVault) -> Self {
-        let ScopedVault { fp_id, .. } = target;
+impl DbToApi<(ScopedVault, Vault)> for api_wire_types::LiteUser {
+    fn from_db((sv, vault): (ScopedVault, Vault)) -> Self {
+        let ScopedVault { fp_id, .. } = sv;
+        let Vault { sandbox_id, .. } = vault;
 
-        Self { id: fp_id }
+        Self {
+            id: fp_id,
+            sandbox_id,
+        }
     }
 }
 

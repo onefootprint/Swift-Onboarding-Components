@@ -3,14 +3,13 @@ use crate::send_email_challenge_non_blocking;
 use crate::ChallengeData;
 use crate::ChallengeState;
 use crate::State;
+use crate::VaultIdentifier;
 use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::user::UserAuth;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
 use api_core::errors::challenge::ChallengeError;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::ApiError;
-use api_core::fingerprinter::VaultIdentifier;
 use api_core::telemetry::RootSpan;
 use api_core::types::JsonApiResponse;
 use api_core::types::ResponseData;
@@ -71,7 +70,7 @@ pub async fn post(
     let identifier = match (user_auth, identifier) {
         (Some(user_auth), None) => {
             let user_auth = user_auth.check_guard(Any)?;
-            VaultIdentifier::AuthenticatedId(user_auth.user_vault_id().clone())
+            VaultIdentifier::AuthenticatedId(user_auth)
         }
         (None, Some(id)) => VaultIdentifier::IdentifyId(id, sandbox_id.0),
         (None, None) | (Some(_), Some(_)) => return Err(ChallengeError::OnlyOneIdentifier.into()),

@@ -2,7 +2,7 @@ use strum_macros::Display;
 
 use crate::IdentityDataKind;
 
-#[derive(Debug, Display, Clone)]
+#[derive(Debug, Display, Clone, Copy, Eq, PartialEq)]
 pub enum ContactInfoKind {
     Phone,
     Email,

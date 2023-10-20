@@ -1,13 +1,12 @@
-use api_core::errors::ApiError;
-use api_core::types::response::ResponseData;
-use api_core::State;
 use actix_web::{post, web, web::Json};
 use api_core::auth::custodian::CustodianAuthContext;
+use api_core::errors::ApiError;
 use api_core::errors::{ApiResult, AssertionError};
-use api_core::fingerprinter::VaultIdentifier;
+use api_core::types::response::ResponseData;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::vault_wrapper::{Any, VaultWrapper, VwArgs};
 use api_core::ApiErrorKind;
+use api_core::State;
 use api_wire_types::IdentifyId;
 use db::models::tenant::Tenant;
 use db::models::vault::Vault;
@@ -41,8 +40,9 @@ async fn post(
             ensure_phone_number_allowed(&state, &phone_number)?;
 
             // Use e164 with suffix to compute fingerprint
-            let id = VaultIdentifier::IdentifyId(IdentifyId::PhoneNumber(phone_number), sandbox_id.0);
-            state.find_vault(id, None).await?
+            state
+                .find_vault(IdentifyId::PhoneNumber(phone_number), sandbox_id.0, None)
+                .await?
         }
         Request::Email(email) => {
             // only allow footprint emails to be cleanable
@@ -50,9 +50,7 @@ async fn post(
                 return Err(AssertionError("Cannot clean up provided email").into());
             }
             let id = IdentifyId::Email(email);
-            let uv = state
-                .find_vault(VaultIdentifier::IdentifyId(id, sandbox_id.0), None)
-                .await?;
+            let uv = state.find_vault(id, sandbox_id.0, None).await?;
 
             // this check above is not sufficient because the email may not be verified
             // but attached to someone else's vault (rare -- but technically possible)

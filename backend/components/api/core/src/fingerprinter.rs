@@ -7,7 +7,7 @@ use itertools::Itertools;
 use newtypes::{
     fingerprinter::{FingerprintScopable, FingerprintScope, Fingerprinter, GlobalFingerprintKind},
     secret_api_key::ApiKeyFingerprinter,
-    DataIdentifier, Fingerprint, IdentityDataKind as IDK, PiiString, TenantId, VaultId,
+    DataIdentifier, Fingerprint, IdentityDataKind as IDK, PiiString, TenantId,
 };
 
 use crate::{errors::kms::KmsSignError, ApiError, State};
@@ -86,65 +86,51 @@ impl Fingerprinter for State {
     }
 }
 
-#[derive(Debug)]
-pub enum VaultIdentifier {
-    IdentifyId(IdentifyId, Option<SandboxId>),
-    AuthenticatedId(VaultId),
-}
-
 impl State {
     /// This is a helper function for finding vaults by using fingerprinted data.
     /// If t_id is provided, we will also look up users by tenant-scoped fingerprints.
     #[tracing::instrument(skip(self))]
     pub async fn find_vault(
         &self,
-        identifier: VaultIdentifier,
+        id: IdentifyId,
+        sandbox_id: Option<SandboxId>,
         t_id: Option<&TenantId>,
     ) -> Result<Option<Vault>, ApiError> {
-        let existing_user = match identifier {
-            VaultIdentifier::IdentifyId(id, sandbox_id) => {
-                // Search via fingerprint
-                let (scopes, data) = match id {
-                    IdentifyId::PhoneNumber(phone_number) => (
-                        vec![
-                            Some(GlobalFingerprintKind::PhoneNumber.scope()),
-                            t_id.map(|id| {
-                                FingerprintScope::Tenant(&DataIdentifier::Id(IDK::PhoneNumber), id)
-                            }),
-                        ],
-                        phone_number.e164(),
-                    ),
-                    IdentifyId::Email(email) => (
-                        vec![
-                            Some(GlobalFingerprintKind::Email.scope()),
-                            t_id.map(|id| FingerprintScope::Tenant(&DataIdentifier::Id(IDK::Email), id)),
-                        ],
-                        email.email,
-                    ),
-                };
-                // For now, default to the sandbox id provided inline in the phone or email,
-                // otherwise, default to the one provided via a header
-                let fps: Vec<_> = scopes
-                    .into_iter()
-                    .flatten()
-                    .zip(std::iter::repeat(&data))
-                    .map(|(s, v)| ((), s, v))
-                    .collect();
-                let sh_datas = self
-                    .compute_fingerprints(fps)
-                    .await?
-                    .into_iter()
-                    .map(|(_, fp)| fp)
-                    .collect_vec();
-                self.db_pool
-                    .db_query(move |conn| Vault::find_portable(conn, &sh_datas, sandbox_id))
-                    .await??
-            }
-            VaultIdentifier::AuthenticatedId(id) => {
-                // Look up by id
-                Some(self.db_pool.db_query(move |conn| Vault::get(conn, &id)).await??)
-            }
+        // Search via fingerprint
+        let (scopes, data) = match id {
+            IdentifyId::PhoneNumber(phone_number) => (
+                vec![
+                    Some(GlobalFingerprintKind::PhoneNumber.scope()),
+                    t_id.map(|id| FingerprintScope::Tenant(&DataIdentifier::Id(IDK::PhoneNumber), id)),
+                ],
+                phone_number.e164(),
+            ),
+            IdentifyId::Email(email) => (
+                vec![
+                    Some(GlobalFingerprintKind::Email.scope()),
+                    t_id.map(|id| FingerprintScope::Tenant(&DataIdentifier::Id(IDK::Email), id)),
+                ],
+                email.email,
+            ),
         };
+        // For now, default to the sandbox id provided inline in the phone or email,
+        // otherwise, default to the one provided via a header
+        let fps: Vec<_> = scopes
+            .into_iter()
+            .flatten()
+            .zip(std::iter::repeat(&data))
+            .map(|(s, v)| ((), s, v))
+            .collect();
+        let sh_datas = self
+            .compute_fingerprints(fps)
+            .await?
+            .into_iter()
+            .map(|(_, fp)| fp)
+            .collect_vec();
+        let existing_user = self
+            .db_pool
+            .db_query(move |conn| Vault::find_portable(conn, &sh_datas, sandbox_id))
+            .await??;
 
         Ok(existing_user)
     }

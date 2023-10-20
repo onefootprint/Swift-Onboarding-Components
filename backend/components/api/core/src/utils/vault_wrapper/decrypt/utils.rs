@@ -20,7 +20,7 @@ impl<Type> VaultWrapper<Type> {
         state: &State,
         kind: ContactInfoKind,
     ) -> ApiResult<Option<(PiiString, ContactInfo)>> {
-        if let Some(di_id) = self.get(IDK::from(kind.clone())) {
+        if let Some(di_id) = self.get(IDK::from(kind)) {
             let di_id = di_id.lifetime_id().clone();
             let ci = state
                 .db_pool
@@ -28,7 +28,7 @@ impl<Type> VaultWrapper<Type> {
                 .await??;
 
             let data = self
-                .decrypt_unchecked_single(&state.enclave_client, IDK::from(kind.clone()).into())
+                .decrypt_unchecked_single(&state.enclave_client, IDK::from(kind).into())
                 .await?
                 .ok_or(ApiError::from(DbError::ObjectNotFound))?;
             Ok(Some((data, ci)))
@@ -44,11 +44,13 @@ impl<Type> VaultWrapper<Type> {
         kind: ContactInfoKind,
     ) -> ApiResult<PiiString> {
         let (data, ci) = self
-            .decrypt_contact_info(state, kind.clone())
+            .decrypt_contact_info(state, kind)
             .await?
-            .ok_or(ApiErrorKind::ContactInfoKindNotInVault(kind.clone()))?;
+            .ok_or(ApiErrorKind::ContactInfoKindNotInVault(kind))?;
 
-        if !ci.is_otp_verified {
+        // TODO we're moving away from needing to send things to verified contact info. Can we get
+        // rid of this check for portable vaults too?
+        if self.vault.is_portable && !ci.is_otp_verified {
             // Many of the communications we send out give either OTPs or links that allow authing
             // as the user. So, we want to make sure a tenant can't update the user's phone number/email
             // and then send themselves OTPs. First, check that the phone number/email is verified to

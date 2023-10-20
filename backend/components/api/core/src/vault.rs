@@ -34,7 +34,7 @@ pub async fn create_non_portable_vault(
     idempotency_id: IdempotencyId,
     vault_kind: VaultKind,
     root_span: RootSpan,
-) -> ApiResult<ResponseData<api_wire_types::UserId>> {
+) -> ApiResult<ResponseData<api_wire_types::LiteUser>> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
     let principal = auth.actor().into();
@@ -75,10 +75,10 @@ pub async fn create_non_portable_vault(
 
     let actor = auth.actor().into();
     let source = auth.source();
-    let scoped_user = state
+    let (scoped_user, vault) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let (su, _) =
+            let (su, vault) =
                 ScopedVault::get_or_create_non_portable(conn, new_user, tenant_id, idempotency_id.0, actor)?;
 
             if let Some((targets, request)) = request_info {
@@ -100,10 +100,13 @@ pub async fn create_non_portable_vault(
                 .create(conn)?;
             }
 
-            Ok(su)
+            Ok((su, vault))
         })
         .await?;
     root_span.record("fp_id", scoped_user.fp_id.to_string());
 
-    Ok(ResponseData::ok(api_wire_types::UserId::from_db(scoped_user)))
+    Ok(ResponseData::ok(api_wire_types::LiteUser::from_db((
+        scoped_user,
+        vault,
+    ))))
 }

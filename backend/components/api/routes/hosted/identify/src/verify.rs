@@ -4,8 +4,8 @@ use crate::{ChallengeData, ChallengeState};
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::session::user::{AuthFactor, UserSession, UserSessionArgs};
 use api_core::auth::session::UpdateSession;
-use api_core::auth::user::UserAuthContext;
 use api_core::auth::user::UserAuthScope;
+use api_core::auth::user::{CheckedUserAuthContext, UserAuthContext};
 use api_core::auth::Any;
 use api_core::config::Config;
 use api_core::errors::business::BusinessError;
@@ -107,13 +107,15 @@ pub async fn post(
     let auth_token = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
+            let obc_auth = ob_pk_auth.as_ref();
+            let ua = user_auth.as_ref();
             let (uv_id, auth_factor, event_kind, passkey_cred_id) = match challenge_state.data {
                 ChallengeData::Sms(s) => {
-                    let tok = validate(conn, s, ob_pk_auth.as_ref(), &c_response, IDK::PhoneNumber.into())?;
+                    let tok = validate(conn, s, obc_auth, ua, &c_response, IDK::PhoneNumber.into())?;
                     (tok, AuthFactor::Sms, AuthEventKind::Sms, None)
                 }
                 ChallengeData::Email(s) => {
-                    let tok = validate(conn, s, ob_pk_auth.as_ref(), &c_response, IDK::Email.into())?;
+                    let tok = validate(conn, s, obc_auth, ua, &c_response, IDK::Email.into())?;
                     (tok, AuthFactor::Email, AuthEventKind::Email, None)
                 }
                 ChallengeData::Passkey(context) => {
@@ -266,6 +268,7 @@ fn validate(
     conn: &mut TxnPgConn,
     challenge_state: PhoneEmailChallengeState,
     ob_pk_auth: Option<&ObConfigAuth>,
+    user_auth: Option<&CheckedUserAuthContext>,
     challenge_response: &str,
     di: DataIdentifier,
 ) -> Result<VaultId, ApiError> {
@@ -274,16 +277,18 @@ fn validate(
         return Err(ChallengeError::IncorrectPin.into());
     };
 
-    // We're on the new codepath where the vault was pre-created in the signup challenge.
-    if let Some(obc) = ob_pk_auth {
-        let tenant_id = &obc.tenant().id;
-        let sv = ScopedVault::get(conn, (&vault_id, tenant_id)).optional()?;
-        if let Some(sv) = sv {
-            // For bifrost logins that already have a SV (likely created in the signup challenge),
-            // we can mark the contact info as OTP verified
-            let vw = VaultWrapper::<Person>::lock_for_onboarding(conn, &sv.id)?;
-            vw.on_otp_verified(conn, di)?;
-        }
+    let existing_sv = if let Some(existing_su_id) = user_auth.and_then(|ua| ua.scoped_user_id()) {
+        Some(ScopedVault::get(conn, &existing_su_id)?)
+    } else if let Some(ob_pk_auth) = ob_pk_auth {
+        ScopedVault::get(conn, (&vault_id, &ob_pk_auth.tenant().id)).optional()?
+    } else {
+        None
+    };
+    if let Some(existing_sv) = existing_sv {
+        // For bifrost logins that already have a SV (likely created in the signup challenge),
+        // we can mark the contact info as OTP verified
+        let vw = VaultWrapper::<Person>::lock_for_onboarding(conn, &existing_sv.id)?;
+        vw.on_otp_verified(conn, di)?;
     }
 
     Ok(vault_id)

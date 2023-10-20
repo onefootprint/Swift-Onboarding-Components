@@ -1,8 +1,10 @@
 use crate::*;
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
-pub struct UserId {
+pub struct LiteUser {
     pub id: FpId,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sandbox_id: Option<SandboxId>,
 }
 
 /// Basic information about a user

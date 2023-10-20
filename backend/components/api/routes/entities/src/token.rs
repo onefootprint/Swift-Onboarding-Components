@@ -5,9 +5,8 @@ use crate::State;
 use actix_web::web::Json;
 use api_core::auth::session::user::UserSession;
 use api_core::auth::session::user::UserSessionArgs;
-use api_core::auth::tenant::GetFirmEmployee;
+use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::auth::tenant::TenantGuard;
-use api_core::auth::tenant::TenantSessionAuth;
 use api_core::errors::ApiResult;
 use api_core::utils::session::AuthSession;
 use api_wire_types::TokenRequest;
@@ -15,9 +14,15 @@ use api_wire_types::TokenResponse;
 use chrono::Duration;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
+use macros::route_alias;
 use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, post, web};
 
+#[route_alias(post(
+    "/users/{fp_id}/token",
+    tags(Users, Private),
+    description = "Create an unauthorized, identified token for the provided fp_id.",
+))]
 #[api_v2_operation(
     description = "Create an unauthorized, identified token for the provided fp_id.",
     tags(Entities, Private)
@@ -27,11 +32,10 @@ pub async fn post(
     state: web::Data<State>,
     fp_id: web::Path<FpId>,
     request: Json<TokenRequest>,
-    // For now, only accept firm employee auth
-    auth: TenantSessionAuth,
+    auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<TokenResponse> {
-    auth.firm_employee_user()?; // Make sure the user is a firm employee for now
-    let auth = auth.check_guard(TenantGuard::TriggerKyc)?;
+    // TODO actually what guard do we use here
+    let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let TokenRequest { key } = request.into_inner();
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

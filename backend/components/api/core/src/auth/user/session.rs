@@ -152,7 +152,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     auth_factors,
                 } = data;
                 let vault = Vault::get(conn, &user_vault_id)?;
-                if !vault.is_portable {
+                if !vault.is_portable && su_id.is_none() {
                     return Err(AuthError::NonPortableVault.into());
                 }
                 if vault.kind != VaultKind::Person {

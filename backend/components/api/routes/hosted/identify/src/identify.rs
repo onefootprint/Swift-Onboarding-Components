@@ -1,16 +1,14 @@
+use crate::VaultIdentifier;
+
 use super::ChallengeKind;
 
 use api_core::{
-    auth::{
-        ob_config::ObConfigAuth,
-        user::{UserAuth, UserAuthContext},
-        Any,
-    },
+    auth::{ob_config::ObConfigAuth, user::UserAuthContext, Any},
     errors::challenge::ChallengeError,
-    fingerprinter::VaultIdentifier,
     telemetry::RootSpan,
     types::{JsonApiResponse, ResponseData},
-    utils::headers::SandboxId, State,
+    utils::headers::SandboxId,
+    State,
 };
 use api_wire_types::IdentifyRequest;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
@@ -48,26 +46,27 @@ pub async fn post(
     let identifier = match (user_auth, identifier) {
         (Some(user_auth), None) => {
             let user_auth = user_auth.check_guard(Any)?;
-            VaultIdentifier::AuthenticatedId(user_auth.user_vault_id().clone())
+            VaultIdentifier::AuthenticatedId(user_auth)
         }
         (None, Some(id)) => VaultIdentifier::IdentifyId(id, sandbox_id.0),
         (None, None) | (Some(_), Some(_)) => return Err(ChallengeError::OnlyOneIdentifier.into()),
     };
 
     // Look up existing user vault by identifier
-    let (_, creds, kinds) =
-        if let Some(ctx) = crate::get_user_challenge_context(&state, identifier, ob_context, root_span).await? {
-            ctx
-        } else {
-            // The user vault doesn't exist. Just return that the user wasn't found
-            return Ok(Json(ResponseData {
-                data: IdentifyResponse {
-                    user_found: false,
-                    available_challenge_kinds: None,
-                    has_syncable_pass_key: false,
-                },
-            }));
-        };
+    let (_, creds, kinds) = if let Some(ctx) =
+        crate::get_user_challenge_context(&state, identifier, ob_context, root_span).await?
+    {
+        ctx
+    } else {
+        // The user vault doesn't exist. Just return that the user wasn't found
+        return Ok(Json(ResponseData {
+            data: IdentifyResponse {
+                user_found: false,
+                available_challenge_kinds: None,
+                has_syncable_pass_key: false,
+            },
+        }));
+    };
 
     let available_challenge_kinds: Option<Vec<ChallengeKind>> = Some(kinds);
 
