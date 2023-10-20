@@ -5,7 +5,6 @@ use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
 use crate::State;
 use api_core::auth::user::UserAuthGuard;
 use api_core::utils::vault_wrapper::Person;
-use api_core::ApiErrorKind;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -49,14 +48,7 @@ pub async fn handler(
         })
         .await??;
 
-    let phone_number = match uvw.get_decrypted_verified_primary_phone_optional(&state).await? {
-        Some(phone) => phone,
-        None => {
-            return Err(
-                ApiErrorKind::AssertionError("User does not have a phone number in the vault".into()).into(),
-            )
-        }
-    };
+    let phone_number = uvw.get_decrypted_verified_primary_phone(&state).await?;
 
     let time_before_retry_s = state
         .sms_client

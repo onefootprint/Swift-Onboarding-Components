@@ -368,10 +368,11 @@ def challenge_user(phone_number, challenge_kind, *headers):
 
         body = post("hosted/identify/login_challenge", data, *headers)
         last_two = phone_number[-2:]
-        assert (
-            body["challenge_data"]["scrubbed_phone_number"]
-            == f"+1 (***) ***-**{last_two}"
-        )
+        if challenge_kind == "sms":
+            assert (
+                body["challenge_data"]["scrubbed_phone_number"]
+                == f"+1 (***) ***-**{last_two}"
+            )
         assert body["challenge_data"]["challenge_kind"] == challenge_kind
         return body["challenge_data"]
 

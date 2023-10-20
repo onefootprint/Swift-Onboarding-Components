@@ -65,22 +65,6 @@ impl<Type> VaultWrapper<Type> {
             .and_then(|p| PhoneNumber::parse(p).map_err(ApiError::from))
     }
 
-    pub async fn get_decrypted_verified_primary_phone_optional(
-        &self,
-        state: &State,
-    ) -> ApiResult<Option<PhoneNumber>> {
-        let phone = match self
-            .decrypt_verified_contact_info(state, ContactInfoKind::Phone)
-            .await
-        {
-            Ok(phone) => phone,
-            Err(e) if matches!(e.kind(), ApiErrorKind::ContactInfoKindNotInVault(_)) => return Ok(None),
-            Err(e) => return Err(e),
-        };
-
-        Ok(Some(PhoneNumber::parse(phone)?))
-    }
-
     pub async fn get_decrypted_verified_email(&self, state: &State) -> ApiResult<Email> {
         self.decrypt_verified_contact_info(state, ContactInfoKind::Email)
             .await

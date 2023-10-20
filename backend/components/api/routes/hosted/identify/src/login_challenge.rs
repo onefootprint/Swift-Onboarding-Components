@@ -109,17 +109,9 @@ pub async fn post(
     let (rx, challenge_state_data, time_before_retry_s, phone_number, biometric_challenge_json) =
         match challenge_kind {
             ChallengeKind::Biometric => {
-                // NOTE: it's possible we don't have a phone number, so don't fail here outright
-                let phone_number = uvw.get_decrypted_verified_primary_phone_optional(&state).await?;
                 let challenge = initiate_biometric_challenge_for_user(&state, &uvw.vault.id, creds).await?;
                 let challenge_data = ChallengeData::Passkey(challenge.state);
-                (
-                    None,
-                    challenge_data,
-                    0,
-                    phone_number,
-                    Some(challenge.challenge_json),
-                )
+                (None, challenge_data, 0, None, Some(challenge.challenge_json))
             }
             ChallengeKind::Sms => {
                 let phone_number = uvw.get_decrypted_verified_primary_phone(&state).await?;
