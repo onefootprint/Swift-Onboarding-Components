@@ -98,7 +98,9 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
     # Should be able to use the BO token in identify flow for same user
     phone_number = secondary_bo.client.data["id.phone_number"]
     sandbox_id = secondary_bo.client.sandbox_id
-    inherit_user(twilio, phone_number, secondary_bo_token, SandboxId(sandbox_id))
+    inherit_user(
+        twilio, phone_number, "onboarding", secondary_bo_token, SandboxId(sandbox_id)
+    )
 
     # But not for a different user
     phone_number = primary_bo.client.data["id.phone_number"]
@@ -113,6 +115,7 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
         twilio,
         phone_number,
         challenge_data["challenge_token"],
+        "onboarding",
         expected_error="This business owner has already started KYC",
         *[secondary_bo_token, sandbox_id_h],
     )

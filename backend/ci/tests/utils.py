@@ -220,6 +220,7 @@ def step_up_user(twilio, token, recipient_phone_number):
         twilio,
         recipient_phone_number,
         challenge_data["challenge_token"],
+        "onboarding",
         token,
     )
 
@@ -230,7 +231,7 @@ def step_up_user(twilio, token, recipient_phone_number):
     return new_token
 
 
-def inherit_user(twilio, phone_number, *headers):
+def inherit_user(twilio, phone_number, scope, *headers):
     body = identify_user(dict(phone_number=phone_number), *headers)
     assert "sms" in body["available_challenge_kinds"]
     challenge_data = challenge_user(phone_number, "sms", *headers)
@@ -240,6 +241,7 @@ def inherit_user(twilio, phone_number, *headers):
         twilio,
         phone_number,
         challenge_data["challenge_token"],
+        scope,
         *headers,
     )
 
@@ -257,7 +259,7 @@ def inherit_user_biometric(user):
         phone_number, "biometric", user.client.ob_config.key, *sandbox_id_h
     )
     body = biometric_challenge_response(
-        challenge_data, user, user.client.ob_config.key, *sandbox_id_h
+        challenge_data, user, "onboarding", user.client.ob_config.key, *sandbox_id_h
     )
     return FpAuth(body["auth_token"])
 
@@ -293,7 +295,7 @@ def inherit_user_email(user):
     return FpAuth(verify_res["auth_token"])
 
 
-def step_up_user_biometric(auth_token, user):
+def step_up_user_biometric(auth_token, user, scope):
     # Don't technically need to pass in the phone number to step up, but the util takes it in
     phone_number = user.client.data["id.phone_number"]
     sandbox_id = user.client.sandbox_id
@@ -301,11 +303,13 @@ def step_up_user_biometric(auth_token, user):
     challenge_data = challenge_user(
         phone_number, "biometric", auth_token, *sandbox_id_h
     )
-    body = biometric_challenge_response(challenge_data, user, auth_token, *sandbox_id_h)
+    body = biometric_challenge_response(
+        challenge_data, user, scope, auth_token, *sandbox_id_h
+    )
     assert body["auth_token"] == auth_token.value
 
 
-def biometric_challenge_response(challenge_data, user, *headers):
+def biometric_challenge_response(challenge_data, user, scope, *headers):
     # do webauthn
     chal = json.loads(challenge_data["biometric_challenge_json"])
     chal["publicKey"]["challenge"] = _b64_decode(chal["publicKey"]["challenge"])
@@ -331,7 +335,7 @@ def biometric_challenge_response(challenge_data, user, *headers):
         "challenge_response": json.dumps(attestation),
         "challenge_kind": "biometric",
         "challenge_token": challenge_data["challenge_token"],
-        "scope": "onboarding",
+        "scope": scope,
     }
     body = post("hosted/identify/verify", data, *headers)
     return body
@@ -378,6 +382,7 @@ def identify_verify(
     twilio,
     phone_number,
     challenge_token,
+    scope,
     *headers,
     expected_error=None,
 ):
@@ -386,7 +391,7 @@ def identify_verify(
             "challenge_response": code,
             "challenge_kind": "sms",
             "challenge_token": challenge_token,
-            "scope": "onboarding",
+            "scope": scope,
         }
         body = post("hosted/identify/verify", data, *headers)
         return FpAuth(body["auth_token"])
@@ -459,7 +464,9 @@ def create_user(twilio, phone_number, email, *headers) -> str:
     )  # Rate limiting may take a while
 
     # Respond to the challenge and create the user
-    return identify_verify(twilio, phone_number, challenge_token, *headers)
+    return identify_verify(
+        twilio, phone_number, challenge_token, "onboarding", *headers
+    )
 
 
 def create_tenant(org_data, ob_conf_data):

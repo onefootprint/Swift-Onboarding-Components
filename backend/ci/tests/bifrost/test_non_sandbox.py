@@ -132,7 +132,9 @@ def test_concurrent_signup_unique_fingerprint(twilio, tenant, sandbox_tenant):
     challenge_token2 = try_until_success(lambda: initiate_challenge(ob_config_key), 20)
 
     # Should be able to complete challenge at only one tenant
-    identify_verify(twilio, LIVE_PHONE_NUMBER, challenge_token2, ob_config_key)
+    identify_verify(
+        twilio, LIVE_PHONE_NUMBER, challenge_token2, "onboarding", ob_config_key
+    )
 
     # This isn't necessarily desired behavior, but useful to assert that this is the current
     # behavior.
@@ -140,6 +142,7 @@ def test_concurrent_signup_unique_fingerprint(twilio, tenant, sandbox_tenant):
         twilio,
         LIVE_PHONE_NUMBER,
         challenge_token1,
+        "onboarding",
         tenant.default_ob_config.key,
         expected_error="Operation not allowed: unique constraint violation",
     )

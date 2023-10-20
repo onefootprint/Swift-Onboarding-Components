@@ -45,7 +45,9 @@ class BifrostClient:
         """
         ob_config_auth = override_ob_config_auth or ob_config.key
         sandbox_id_header = [SandboxId(sandbox_id)] if sandbox_id else []
-        auth = inherit_user(twilio, phone_number, ob_config_auth, *sandbox_id_header)
+        auth = inherit_user(
+            twilio, phone_number, "onboarding", ob_config_auth, *sandbox_id_header
+        )
         return BifrostClient(ob_config, auth, phone_number, sandbox_id)
 
     def create(
