@@ -205,7 +205,7 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
 
 def step_up_user(twilio, token, recipient_phone_number):
     """
-    Step up a token from unauthed, "identified" to authed with sign_up scope
+    Step up a token from unauthed, "identified" to authed with onboarding scope
     """
     # Token should start with no scopes
     body = get("hosted/user/token", None, token)
@@ -225,7 +225,7 @@ def step_up_user(twilio, token, recipient_phone_number):
 
     # Now, token should have scopes
     body = get("hosted/user/token", None, token)
-    assert set(body["scopes"]) >= {"sign_up"}
+    assert set(body["scopes"]) >= {"onboarding"}
 
     return new_token
 
@@ -284,7 +284,7 @@ def inherit_user_email(user):
         dict(
             challenge_response=INTEGRATION_SANDBOX_EMAIL_OTP_PIN,
             challenge_token=body["challenge_data"]["challenge_token"],
-            scope="sign_up",
+            scope="onboarding",
         ),
         user.client.ob_config.key,
         *sandbox_id_h,
@@ -331,7 +331,7 @@ def biometric_challenge_response(challenge_data, user, *headers):
         "challenge_response": json.dumps(attestation),
         "challenge_kind": "biometric",
         "challenge_token": challenge_data["challenge_token"],
-        "scope": "sign_up",
+        "scope": "onboarding",
     }
     body = post("hosted/identify/verify", data, *headers)
     return body
@@ -386,7 +386,7 @@ def identify_verify(
             "challenge_response": code,
             "challenge_kind": "sms",
             "challenge_token": challenge_token,
-            "scope": "sign_up",
+            "scope": "onboarding",
         }
         body = post("hosted/identify/verify", data, *headers)
         return FpAuth(body["auth_token"])
