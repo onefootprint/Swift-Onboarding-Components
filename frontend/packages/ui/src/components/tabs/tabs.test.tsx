@@ -23,7 +23,7 @@ const defaultChildren = (
 
 describe('<Tabs />', () => {
   const renderTab = ({ children = defaultChildren }: Partial<TabsProps>) =>
-    customRender(<Tabs variant="pill">{children}</Tabs>);
+    customRender(<Tabs>{children}</Tabs>);
 
   it('should render the tab items', () => {
     renderTab({

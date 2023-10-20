@@ -19,7 +19,7 @@ const AllComponents = () => {
 
   return (
     <Container>
-      <Tabs variant="underlined">
+      <Tabs>
         {Object.values(FootprintComponentKind).map(
           (k: FootprintComponentKind) => (
             <Tab key={k} selected={k === kind} onClick={() => setKind(k)}>

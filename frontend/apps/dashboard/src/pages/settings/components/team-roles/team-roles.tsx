@@ -35,7 +35,7 @@ const TeamRoles = () => {
       <SectionHeader title={t('header.title')} subtitle={t('header.subtitle')}>
         <div id="team-roles-actions" />
       </SectionHeader>
-      <Tabs variant="underlined">
+      <Tabs>
         {tabs.map(({ value, label }) => (
           <Tab
             as="button"

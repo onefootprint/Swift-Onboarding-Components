@@ -1,10 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  IcoArrowRightSmall16,
-  IcoSettings16,
-  IcoUser16,
-  IcoUsers16,
-} from '@onefootprint/icons';
+import { IcoArrowRightSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
   Container,
@@ -28,19 +23,16 @@ const StoreData = () => {
       label: t('sections.users'),
       value: 'users',
       image: usersImage,
-      icon: IcoUsers16,
     },
     {
       label: t('sections.user-details'),
       value: 'user-details',
       image: userDetailsImage,
-      icon: IcoUser16,
     },
     {
       label: t('sections.settings'),
       value: 'settings',
       image: settingsImage,
-      icon: IcoSettings16,
     },
   ];
 
@@ -74,14 +66,13 @@ const StoreData = () => {
           {t('learn-more')}
         </LinkButton>
       </TitleContainer>
-      <Tabs variant="pill">
-        {options.map(({ value, label, icon }) => (
+      <Tabs>
+        {options.map(({ value, label }) => (
           <Tab
             as="button"
             key={value}
             onClick={() => handleChange(value)}
             selected={segment === value}
-            icon={icon}
           >
             {label}
           </Tab>

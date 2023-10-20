@@ -39,18 +39,16 @@ const CollectionAndScopes = ({
 
   return (
     <Container>
-      <Tabs variant="underlined">
-        <TabContainer>
-          {options.map(({ value, label }) => (
-            <Tab
-              key={value}
-              onClick={() => handleChange(value)}
-              selected={tab === value}
-            >
-              {label}
-            </Tab>
-          ))}
-        </TabContainer>
+      <Tabs>
+        {options.map(({ value, label }) => (
+          <Tab
+            key={value}
+            onClick={() => handleChange(value)}
+            selected={tab === value}
+          >
+            {label}
+          </Tab>
+        ))}
       </Tabs>
       {tab === 'data' && (
         <DataCollection
@@ -87,14 +85,6 @@ const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[8]};
-  `}
-`;
-
-const TabContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: row;
     gap: ${theme.spacing[8]};
   `}
 `;

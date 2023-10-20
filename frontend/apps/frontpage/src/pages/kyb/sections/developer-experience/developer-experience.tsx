@@ -76,14 +76,13 @@ const DeveloperExperience = () => {
       </TitleContainer>
       <Scrubber>
         <Pop>
-          <Tabs variant="underlined">
-            {options.map(({ value, label, icon }) => (
+          <Tabs>
+            {options.map(({ value, label }) => (
               <Tab
                 as="button"
                 key={value}
                 onClick={() => handleChange(value)}
                 selected={segment === value}
-                icon={icon}
               >
                 {label}
               </Tab>

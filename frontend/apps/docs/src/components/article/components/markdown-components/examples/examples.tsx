@@ -16,7 +16,7 @@ const Examples = () => {
 
   return (
     <>
-      <Tabs variant="underlined">
+      <Tabs>
         {Object.values(options).map(option => (
           <Tab
             key={option.name}

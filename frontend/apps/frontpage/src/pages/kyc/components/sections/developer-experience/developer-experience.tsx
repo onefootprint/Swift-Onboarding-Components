@@ -1,10 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  IcoArrowRightSmall16,
-  IcoFileText16,
-  IcoPencil16,
-  IcoSettings16,
-} from '@onefootprint/icons';
+import { IcoArrowRightSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
   Container,
@@ -28,19 +23,16 @@ const DeveloperExperience = () => {
       label: t('sections.configuration'),
       value: 'configuration',
       image: configurationImage,
-      icon: IcoSettings16,
     },
     {
       label: t('sections.customization'),
       value: 'customization',
       image: customizationImage,
-      icon: IcoPencil16,
     },
     {
       label: t('sections.documentation'),
       value: 'documentation',
       image: documentationImage,
-      icon: IcoFileText16,
     },
   ];
 
@@ -76,14 +68,13 @@ const DeveloperExperience = () => {
       </TitleContainer>
       <Scrubber>
         <Pop>
-          <Tabs variant="pill">
-            {options.map(({ value, label, icon }) => (
+          <Tabs>
+            {options.map(({ value, label }) => (
               <Tab
                 as="button"
                 key={value}
                 onClick={() => handleChange(value)}
                 selected={segment === value}
-                icon={icon}
               >
                 {label}
               </Tab>
