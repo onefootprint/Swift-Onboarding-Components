@@ -41,11 +41,18 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        isMobile: false,
+        permissions: ['camera'],
+      },
     },
     {
       name: 'mobile-safari',
-      use: { ...devices['iPhone 13'] },
+      use: {
+        ...devices['iPhone 13'],
+        isMobile: true,
+      },
     },
   ],
 

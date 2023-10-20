@@ -3,12 +3,18 @@ import { expect, test } from '@playwright/test';
 import {
   clickOnContinue,
   confirmData,
+  continueOnAgree,
+  continueOnConfirm,
+  continueOnDesktop,
+  continueOnTakePhoto,
+  doLivenessCheck,
   fillAddress,
-  fillNameAndDoB,
   fillEmail,
+  fillNameAndDoB,
   fillPhoneNumber,
   fillSSN,
   selectOutcomeOptional,
+  uploadImage,
   verifyPhoneNumber,
 } from './utils/commands';
 
@@ -22,17 +28,22 @@ const city = 'Seward';
 const zipCode = '99664';
 const ssn = '418437970';
 
-test('KYC for env.NEXT_PUBLIC_E2E_TENANT_PK #ci', async ({
+test('E2E.KYC.DriverDocOnly #ci', async ({
   browserName,
   page,
   browser,
+  isMobile,
 }) => {
+  // eslint-disable-next-line playwright/no-conditional-in-test
+  if (isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
   test.setTimeout(120000);
   const context = await browser.newContext();
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
+  const key = 'ob_test_0DNRM31nSBCSqHLJQTeWi9';
 
+  await context.grantPermissions(['camera']);
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(`/e2e?&flow=${flowId}`);
+  await page.goto(`/preview?ob_key=${key}&flow=${flowId}`);
   await page.waitForLoadState();
 
   const verifyBtn = page.locator('.footprint-verify-button').first();
@@ -77,6 +88,60 @@ test('KYC for env.NEXT_PUBLIC_E2E_TENANT_PK #ci', async ({
     { frame },
     { firstName, lastName, dob, addressLine1, city, zipCode },
   );
+  await clickOnContinue({ frame });
+  await page.waitForLoadState();
+
+  if (!isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
+    await doLivenessCheck({ page, frame, browser }, { flowId });
+    await page.waitForLoadState();
+  }
+
+  if (!isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
+    await continueOnDesktop({ frame });
+    await page.waitForLoadState();
+  }
+
+  await clickOnContinue({ frame });
+  await page.waitForLoadState();
+
+  if (isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
+    await page.waitForTimeout(1000); // eslint-disable-line playwright/no-wait-for-timeout
+    await clickOnContinue({ frame });
+
+    await page.waitForTimeout(1000); // eslint-disable-line playwright/no-wait-for-timeout
+    await clickOnContinue({ frame });
+  }
+
+  await frame
+    .getByText(/Optional/i)
+    .first()
+    .scrollIntoViewIfNeeded();
+
+  await continueOnAgree({ frame });
+  await page.waitForLoadState();
+
+  await uploadImage(
+    { frame, page, isMobile },
+    /Choose file to upload/i,
+    'driver-front.png',
+  );
+  await clickOnContinue({ frame });
+  await page.waitForLoadState();
+
+  await uploadImage(
+    { frame, page, isMobile },
+    /Choose file to upload/i,
+    'driver-back.png',
+  );
+  await clickOnContinue({ frame });
+  await page.waitForTimeout(1000); // eslint-disable-line playwright/no-wait-for-timeout
+
+  await continueOnTakePhoto({ frame });
+  await page.waitForTimeout(1000); // eslint-disable-line playwright/no-wait-for-timeout
+
+  await continueOnConfirm({ frame });
+  await page.waitForTimeout(1000); // eslint-disable-line playwright/no-wait-for-timeout
+
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 

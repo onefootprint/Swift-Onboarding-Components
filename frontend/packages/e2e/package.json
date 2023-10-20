@@ -4,13 +4,13 @@
   "version": "0.0.0",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint src --fix",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "lint:ci": "eslint src",
+    "lint": "eslint src --fix",
     "postinstall": "npx playwright install",
-    "test:e2e": "npx playwright test --ui",
-    "test:e2e:ci": "npx playwright test",
-    "test:e2e:debug": "E2E_BASE_URL=https://demos-dx3dtxvb8.preview.onefootprint.com IS_E2E=true CI=true npx playwright test --debug -g \"KYB\"",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+    "test:e2e:ci": "npx playwright test -g \"#ci\"",
+    "test:e2e:debug": "E2E_BASE_URL=http://localhost:3002 IS_E2E=true CI=true npx playwright test --project mobile-safari --debug -g \"#debug\"",
+    "test:e2e": "E2E_BASE_URL=http://localhost:3002/ IS_E2E=true CI=true npx playwright test --ui"
   },
   "keywords": [],
   "author": "",

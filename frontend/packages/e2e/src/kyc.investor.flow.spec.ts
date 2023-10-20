@@ -22,13 +22,14 @@ const city = 'Seward';
 const zipCode = '99664';
 const ssn = '418437970';
 
-test('KYC.Investor', async ({ browserName, page, browser }) => {
+test('E2E.KYC.Investor #ci', async ({ browserName, page, browser }) => {
   test.setTimeout(120000);
   const context = await browser.newContext();
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
+  const key = 'ob_test_3xYoHcfrkxuOGNy8vILxh4';
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto('/preview?ob_key=ob_test_3xYoHcfrkxuOGNy8vILxh4');
+  await page.goto(`/preview?ob_key=${key}&flow=${flowId}`);
   await page.waitForLoadState();
 
   await page.getByRole('button', { name: 'Verify with Footprint' }).click();
@@ -103,7 +104,6 @@ test('KYC.Investor', async ({ browserName, page, browser }) => {
     .catch(() => false);
   await page.waitForLoadState();
 
-  console.log(`end of -> KYC.Investor:${flowId}`);
   await context.close();
 
   return expect(1).toBe(1);

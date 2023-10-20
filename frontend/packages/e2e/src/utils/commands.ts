@@ -6,12 +6,30 @@ import readQrCode from './qr-code';
 
 type WithFrame = { frame: FrameLocator | Page };
 type WithPage = { page: Page };
-type Outcome = 'Success' | 'Manual Review' | 'Fail';
+type PageNFrame = WithFrame & WithPage;
+type Outcome = 'Success' | 'Manual Review' | 'Fail' | 'Real outcome';
 
-const hasContinueText = { hasText: /continue/i };
 const attachedState = { state: 'attached' as const, timeout: 2000 };
-// const () => true = () => true;
-// const () => false = () => false;
+
+const clickOn = async (
+  hasText: RegExp,
+  { frame }: WithFrame,
+): Promise<boolean> => {
+  const btn = frame.getByRole('button').filter({ hasText }).first();
+  try {
+    await btn.waitFor(attachedState);
+    await btn.click();
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+export const clickOnContinue = clickOn.bind(null, /continue/i);
+export const continueOnAgree = clickOn.bind(null, /agree/i);
+export const continueOnDesktop = clickOn.bind(null, /continue on desktop/i);
+export const continueOnTakePhoto = clickOn.bind(null, /take photo/i);
+export const continueOnConfirm = clickOn.bind(null, /confirm/i);
 
 export const selectOutcomeOptional = async (
   { frame }: WithFrame,
@@ -25,13 +43,21 @@ export const selectOutcomeOptional = async (
     .catch(() => false);
 };
 
-export const clickOnContinue = async ({ frame }: WithFrame) => {
-  const btn = frame.getByRole('button').filter(hasContinueText).first();
-  return btn
-    .waitFor(attachedState)
-    .then(() => btn.click())
-    .then(() => true)
-    .catch(() => false);
+export const uploadImage = async (
+  { frame, page, isMobile }: PageNFrame & { isMobile: boolean },
+  cta: RegExp,
+  fileName: string,
+) => {
+  const filePath = path.join(__dirname, `../upload/${fileName}`);
+  const fileChooserPromise = page.waitForEvent('filechooser');
+  if (isMobile) {
+    await frame.locator('button[radius="56"]').first().click();
+  } else {
+    await frame.getByText(cta).first().click();
+  }
+  const fileDriverFrontBlurredChooser = await fileChooserPromise;
+
+  return fileDriverFrontBlurredChooser.setFiles(filePath);
 };
 
 export const fillEmail = async (
@@ -58,10 +84,7 @@ export const fillPhoneNumber = async (
     .catch(() => false);
 };
 
-export const verifyPhoneNumber = async ({
-  frame,
-  page,
-}: WithFrame & WithPage) => {
+export const verifyPhoneNumber = async ({ frame, page }: PageNFrame) => {
   await expect(frame.getByText('Verify your phone number')).toBeAttached();
 
   // eslint-disable-next-line playwright/no-wait-for-timeout
@@ -221,16 +244,19 @@ export const doLivenessCheck = async (
   }: { frame: FrameLocator; page: Page; browser: Browser },
   { flowId }: { flowId: string },
 ) => {
-  const header = frame.getByText('Liveness check').first();
-  await header
+  const header = frame.getByText('Liveness check & ID document').first();
+  const hasHeader = await header
     .waitFor({ state: 'attached', timeout: 10000 })
-    .catch(() => false); // Increasing the waiting time for CI
+    .then(() => true)
+    .catch(() => false);
+
+  if (!hasHeader) return;
 
   // eslint-disable-next-line playwright/no-wait-for-timeout
   await page.waitForTimeout(4000); // We need to give a moment for the QR code to be generated
 
   await frame
-    .locator('#idv-body-content-container svg')
+    .locator('p + svg')
     .first()
     .screenshot({ path: `./src/media/qr-${flowId}.png` });
 

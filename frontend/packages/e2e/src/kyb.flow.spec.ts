@@ -32,11 +32,7 @@ const beneficialOwner1Phone = '6178408644';
 const businessName = 'Business name';
 const businessNameOptional = 'Optional name';
 
-test('KYB for ob_test_5zu2usM1ilTzDnqQpaZ6Sg', async ({
-  browser,
-  browserName,
-  page,
-}) => {
+test('E2E.KYB.flow #ci', async ({ browser, browserName, page }) => {
   test.setTimeout(120000);
   const context = await browser.newContext();
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
@@ -138,7 +134,6 @@ test('KYB for ob_test_5zu2usM1ilTzDnqQpaZ6Sg', async ({
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  console.log(`end of -> KYB for ob_test_5zu2usM1ilTzDnqQpaZ6Sg:${flowId}`);
   await context.close();
 
   return expect(1).toBe(1);
