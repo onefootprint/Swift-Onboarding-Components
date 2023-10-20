@@ -225,7 +225,7 @@ def step_up_user(twilio, token, recipient_phone_number):
 
     # Now, token should have scopes
     body = get("hosted/user/token", None, token)
-    assert set(body["scopes"]) >= {"onboarding"}
+    assert set(body["scopes"]) >= {"sign_up"}
 
     return new_token
 
