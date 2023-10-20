@@ -1,7 +1,7 @@
 import { Frame, VisionCameraProxy } from 'react-native-vision-camera';
 
 const getPlugin = (name: string) =>
-  VisionCameraProxy.getFrameProcessorPlugin(name);
+  VisionCameraProxy.initFrameProcessorPlugin(name);
 
 const detectDocumentPlugin = getPlugin('detectDocument');
 const detectFacePlugin = getPlugin('detectFace');
@@ -17,10 +17,6 @@ type DetectFaceResponse = {
   isFaceStraight: boolean;
   isStable: boolean;
 };
-
-// type DetectBarcodeResponse = {
-//   barcodes: any[];
-// };
 
 export const detectDocument = (frame: Frame) => {
   'worklet';

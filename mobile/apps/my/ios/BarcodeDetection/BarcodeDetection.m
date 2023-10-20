@@ -7,16 +7,4 @@
 #import "my-Swift.h"
 #endif
 
-@interface BarcodeDetectionPlugin (FrameProcessorPluginLoader)
-@end
-
-@implementation BarcodeDetectionPlugin (FrameProcessorPluginLoader)
-
-+ (void)initialize {
-  [FrameProcessorPluginRegistry addFrameProcessorPlugin:@"detectBarcodes"
-                                        withInitializer:^FrameProcessorPlugin* _Nonnull(NSDictionary* _Nullable options) {
-    return [[BarcodeDetectionPlugin alloc] init];
-  }];
-}
-
-@end
+VISION_EXPORT_SWIFT_FRAME_PROCESSOR(BarcodeDetectionPlugin, detectBarcodes)

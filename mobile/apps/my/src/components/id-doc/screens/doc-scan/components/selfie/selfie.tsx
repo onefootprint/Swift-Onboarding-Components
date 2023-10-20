@@ -27,6 +27,9 @@ const Selfie = () => {
     data: {},
   });
   const setObjectJs = Worklets.createRunInJsFn(setObject);
+  const setDetectorJs = Worklets.createRunInJsFn((value: boolean) => {
+    detector.value = value;
+  });
   const frameProcessor = useFrameProcessor(
     frame => {
       'worklet';
@@ -34,10 +37,10 @@ const Selfie = () => {
       const options = { width, height };
       const result = detectFace(frame, options);
       if (result.hasFace && result.isFaceInCenter && result.isFaceStraight) {
-        detector.value = true;
+        setDetectorJs(true);
         setObjectJs(detected);
       } else {
-        detector.value = false;
+        setDetectorJs(false);
         const data = {
           hasFace: result.hasFace,
           isFaceInCenter: result.hasFace,

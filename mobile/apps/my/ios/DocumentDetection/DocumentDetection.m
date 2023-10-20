@@ -9,16 +9,4 @@
 #import "my-Swift.h"
 #endif
 
-@interface DocumentDetectionPlugin (FrameProcessorPluginLoader)
-@end
-
-@implementation DocumentDetectionPlugin (FrameProcessorPluginLoader)
-
-+ (void)initialize {
-  [FrameProcessorPluginRegistry addFrameProcessorPlugin:@"detectDocument"
-                                        withInitializer:^FrameProcessorPlugin* _Nonnull(NSDictionary* _Nullable options) {
-    return [[DocumentDetectionPlugin alloc] init];
-  }];
-}
-
-@end
+VISION_EXPORT_SWIFT_FRAME_PROCESSOR(DocumentDetectionPlugin, detectDocument)

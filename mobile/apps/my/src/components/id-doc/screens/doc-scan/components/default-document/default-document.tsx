@@ -34,18 +34,22 @@ const DefaultDocument = ({ side, type }: DefaultDocumentProps) => {
     feedback: '',
     data: {},
   });
-  const setObjectJs = Worklets.createRunInJsFn(setObject);
   const detector = useSharedValue(false);
+  const setObjectJs = Worklets.createRunInJsFn(setObject);
+  const setDetectorJs = Worklets.createRunInJsFn((value: boolean) => {
+    detector.value = value;
+  });
+
   const frameProcessor = useFrameProcessor(
     frame => {
       'worklet';
 
       const result = detectDocument(frame);
       if (result.isDocument) {
-        detector.value = true;
+        setDetectorJs(true);
         setObjectJs(detected);
       } else {
-        detector.value = false;
+        setDetectorJs(false);
         setObjectJs({
           isDetected: false,
           feedback: 'Position the document in view',

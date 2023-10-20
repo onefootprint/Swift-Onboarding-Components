@@ -10,8 +10,8 @@ public class FaceDetectionPlugin: FrameProcessorPlugin {
   private static let motionManager = CMMotionManager()
   private static let motionThreshold: Double = 0.05
   
-  @objc public init(withOptions options: [AnyHashable : Any]) {
-    super.init()
+  public override init(options: [AnyHashable: Any]! = [:]) {
+    super.init(options: options)
   }
   
   public static func isDeviceStable() -> Bool {

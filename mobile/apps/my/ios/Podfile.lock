@@ -376,11 +376,12 @@ PODS:
     - React-Core
   - RNReactNativeHapticFeedback (2.2.0):
     - React-Core
-  - RNReanimated (2.17.0):
+  - RNReanimated (3.5.4):
     - DoubleConversion
     - FBLazyVector
     - FBReactNativeSpec
     - glog
+    - hermes-engine
     - RCT-Folly
     - RCTRequired
     - RCTTypeSafety
@@ -390,6 +391,7 @@ PODS:
     - React-Core/RCTWebSocket
     - React-CoreModules
     - React-cxxreact
+    - React-hermes
     - React-jsi
     - React-jsiexecutor
     - React-jsinspector
@@ -414,7 +416,7 @@ PODS:
   - Sentry/HybridSDK (8.11.0):
     - SentryPrivate (= 8.11.0)
   - SentryPrivate (8.11.0)
-  - VisionCamera (3.3.1):
+  - VisionCamera (3.5.1):
     - React
     - React-callinvoker
     - React-Core
@@ -629,15 +631,15 @@ SPEC CHECKSUMS:
   RNDeviceInfo: bf8a32acbcb875f568217285d1793b0e8588c974
   RNFlashList: 236646d48f224a034f35baa0242e1b77db063b1e
   RNReactNativeHapticFeedback: ec56a5f81c3941206fd85625fa669ffc7b4545f9
-  RNReanimated: d4f363f4987ae0ade3e36ff81c94e68261bf4b8d
+  RNReanimated: b9215243fd801b2b874bd0218767eed434de994c
   RNScreens: 85d3880b52d34db7b8eeebe2f1a0e807c05e69fa
   RNSentry: 11917f7bf3e28806aca4c2791c6ba7522d8f09fe
   RNSVG: d00c8f91c3cbf6d476451313a18f04d220d4f396
   Sentry: 39d57e691e311bdb73bc1ab5bbebbd6bc890050d
   SentryPrivate: 48712023cdfd523735c2edb6b06bedf26c4730a3
-  VisionCamera: f649cd0c0fa6266f1cd5e0787a7c9583ca143b3a
+  VisionCamera: 2f5f9841150719f73b9efb9e0c8fa48fe8556f2d
   Yoga: 135109c9b8c5d1a8af3a58d21cd4c7aa7f3bf555
 
 PODFILE CHECKSUM: 9ccdc7d352535b1f0b24fe8ce9711e2b1989a8c3
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.13.0

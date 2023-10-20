@@ -31,6 +31,10 @@ const DriversLicense = ({ side }: DriversLicenseProps) => {
   const requiresCode =
     side === UploadDocumentSide.Back && country.value === 'US';
   const setObjectJs = Worklets.createRunInJsFn(setObject);
+  const setDetectorJs = Worklets.createRunInJsFn((value: boolean) => {
+    detector.value = value;
+  });
+
   const frameProcessor = useFrameProcessor(frame => {
     'worklet';
 
@@ -51,7 +55,7 @@ const DriversLicense = ({ side }: DriversLicenseProps) => {
       },
     });
 
-    detector.value = isDetected;
+    setDetectorJs(isDetected);
   }, []);
 
   return (

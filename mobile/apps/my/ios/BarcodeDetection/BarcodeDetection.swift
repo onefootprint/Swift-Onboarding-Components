@@ -7,8 +7,8 @@ import CoreMotion
 
 @objc(BarcodeDetectionPlugin)
 public class BarcodeDetectionPlugin: FrameProcessorPlugin {
-  @objc public init(withOptions options: [AnyHashable : Any]) {
-    super.init()
+  public override init(options: [AnyHashable: Any]! = [:]) {
+    super.init(options: options)
   }
   
   @available(iOS 13.0, *)

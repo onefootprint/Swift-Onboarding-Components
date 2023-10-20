@@ -9,18 +9,4 @@
 #import "my-Swift.h"
 #endif
 
-@interface FaceDetectionPlugin (FrameProcessorPluginLoader)
-@end
-
-@implementation FaceDetectionPlugin (FrameProcessorPluginLoader)
-
-+ (void)initialize {
-  [FrameProcessorPluginRegistry addFrameProcessorPlugin:@"detectFace"
-                                        withInitializer:^FrameProcessorPlugin* _Nonnull(NSDictionary* _Nullable options) {
-    return [[FaceDetectionPlugin alloc] init];
-  }];
-}
-
-@end
-
-
+VISION_EXPORT_SWIFT_FRAME_PROCESSOR(FaceDetectionPlugin, detectFace)

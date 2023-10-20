@@ -10,8 +10,8 @@ public class DocumentDetectionPlugin: FrameProcessorPlugin {
   private static let MINIMUM_DOCUMENT_ASPECT_RATIO: CGFloat = 1.3
   private static let MAXIMUM_DOCUMENT_ASPECT_RATIO: CGFloat = 1.8
   
-  @objc public init(withOptions options: [AnyHashable : Any]) {
-    super.init()
+  public override init(options: [AnyHashable: Any]! = [:]) {
+    super.init(options: options)
   }
 
   public static func isDocumentCentered(_ imageSize: CGSize, documentBoundingBox: CGRect, margin: CGFloat = 0.1) -> Bool {
