@@ -1,0 +1,1 @@
+ALTER TABLE scoped_vault ALTER COLUMN snapshot_seqno SET DEFAULT nextval('data_lifetime_seqno');
