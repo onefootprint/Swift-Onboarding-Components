@@ -1,4 +1,4 @@
-use crate::auth::ProtectedAuth;
+use crate::ProtectedAuth;
 use actix_web::post;
 use actix_web::web::{self, Json};
 use api_core::decision::engine;

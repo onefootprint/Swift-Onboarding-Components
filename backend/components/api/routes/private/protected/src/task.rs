@@ -1,9 +1,9 @@
-use crate::auth::ProtectedAuth;
+use crate::ProtectedAuth;
+use actix_web::{post, web, web::Json};
 use api_core::errors::ApiError;
 use api_core::types::response::ResponseData;
-use api_core::{task, State};
-use actix_web::{post, web, web::Json};
 use api_core::types::{EmptyResponse, JsonApiResponse};
+use api_core::{task, State};
 use chrono::Utc;
 use db::models::task::{Task, TaskCreateArgs};
 use db::models::watchlist_check::WatchlistCheck;

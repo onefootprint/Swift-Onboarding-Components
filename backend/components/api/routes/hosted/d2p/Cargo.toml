@@ -1,5 +1,5 @@
 [package]
-name = "api_route_hosted_onboarding"
+name = "api_route_hosted_d2p"
 version = { workspace = true }
 edition = { workspace = true }
 authors = { workspace = true }

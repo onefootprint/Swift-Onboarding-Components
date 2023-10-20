@@ -1,4 +1,4 @@
-use crate::auth::ProtectedAuth;
+use crate::ProtectedAuth;
 use actix_web::{post, web, web::Json};
 use api_core::{
     errors::{ApiResult, AssertionError},

@@ -2,7 +2,6 @@ use paperclip::actix::web;
 
 mod authorize;
 mod config;
-mod d2p;
 mod fingerprint_visit;
 mod index;
 mod pat;
@@ -30,5 +29,4 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(config::get);
 
     config::configure_get_aliases(config);
-    d2p::routes(config);
 }

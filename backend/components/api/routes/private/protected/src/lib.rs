@@ -8,9 +8,10 @@ mod workflow;
 
 use actix_web::web;
 
-use crate::auth::ProtectedAuth;
+pub use api_core::auth::protected_auth::ProtectedAuth;
+pub use api_core::State;
 
-pub fn routes(config: &mut web::ServiceConfig) {
+pub fn configure(config: &mut web::ServiceConfig) {
     config
         .service(check)
         .service(risk::make_vendor_calls)

@@ -11,6 +11,7 @@ pub mod protected_custodian;
 pub mod tenant;
 pub mod user;
 pub use guard::*;
+pub mod protected_auth;
 
 #[derive(Debug, Error)]
 pub enum AuthError {

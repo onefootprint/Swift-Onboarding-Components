@@ -18,7 +18,7 @@ members = [
     "components/api/routes/integrations",
     "components/api/routes/onboarding",
     "components/api/routes/org",
-    "components/api/routes/private",
+    "components/api/routes/private/*",
     "components/api/routes/users",
     "components/api/routes/vault_proxy",
     "components/api/routes/webhooks",
@@ -99,7 +99,7 @@ deadpool = { version = "0.9.5", features = [
 
 actix-web = "4.3.1"
 
-paperclip = { version = "0.8.0", features = [
+paperclip = { version = "0.8.2", features = [
     "actix4",
     "actix4-validator",
     "actix-multipart",
@@ -150,3 +150,5 @@ byteorder = "1.4"
 opentelemetry_api = { version = "0.19.0", features = ["metrics"] }
 
 enum_variant_type = "0.3.1"
+
+actix-multipart = "0.6.1"

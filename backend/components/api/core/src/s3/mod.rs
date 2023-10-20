@@ -267,7 +267,13 @@ pub enum S3Error {
     #[error("Missing upload location")]
     EmptyS3UploadLocation,
     #[error("Multipart upload error")]
-    MultipartUpload(#[from] actix_multipart::MultipartError),
+    MultipartUpload(String),
+}
+
+impl From<actix_multipart::MultipartError> for S3Error {
+    fn from(value: actix_multipart::MultipartError) -> Self {
+        Self::MultipartUpload(format!("{:?}", &value))
+    }
 }
 
 #[cfg(test)]

@@ -86,7 +86,7 @@ gethostname = "0.4.0"
 
 jsonpath_lib = "0.3.0"
 urlencoding = "2.1.2"
-actix-multipart = "0.5.0"
+actix-multipart = { workspace = true }
 
 webhooks = { path = "../../webhooks" }
 billing = { path = "../../billing" }

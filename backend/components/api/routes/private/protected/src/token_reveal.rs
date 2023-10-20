@@ -1,4 +1,4 @@
-use crate::{auth::ProtectedAuth, State};
+use crate::{ProtectedAuth, State};
 use actix_web::{post, web, web::Json};
 use api_core::{
     auth::session::AuthSessionData,

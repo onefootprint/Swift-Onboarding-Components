@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use crate::auth::ProtectedAuth;
+use crate::ProtectedAuth;
 use actix_web::{post, web};
 use api_core::State;
 use api_core::{

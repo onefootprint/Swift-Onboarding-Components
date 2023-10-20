@@ -131,7 +131,8 @@ async fn run_server(config: Config) -> std::io::Result<()> {
             .app_data(query_cfg)
             .app_data(form_cfg)
             // exclude from openapi spec generation
-            .configure(api_route_private::configure)
+            .configure(api_route_private_root::configure)
+            .configure(api_route_private_protected::configure)
             .wrap_api_with_spec(spec)
             .configure(api_routes_root::configure)
             .with_json_spec_at("docs-spec")

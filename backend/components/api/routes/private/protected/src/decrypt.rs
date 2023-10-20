@@ -8,7 +8,7 @@ use db::models::{vault::Vault, verification_result::VerificationResult};
 use db::DbResult;
 use newtypes::{PiiJsonValue, VerificationResultId};
 
-use crate::auth::ProtectedAuth;
+use crate::ProtectedAuth;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct DecryptVresRequest {
