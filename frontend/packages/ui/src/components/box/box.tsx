@@ -62,7 +62,9 @@ const StyledBox = styled('div').attrs<{ as: BoxTag }>(({ as, ...props }) => ({
     position: ${props.position || 'relative'};
     display: ${props.display};
     text-align: ${props.textAlign};
-    border-radius: ${props.borderRadius};
+    border-radius: ${theme.borderRadius[
+      props.borderRadius ? props.borderRadius : 'none'
+    ]};
     width: ${props.width};
     height: ${props.height};
     overflow: ${props.overflow};

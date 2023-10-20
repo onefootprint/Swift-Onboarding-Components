@@ -17,10 +17,10 @@ const SecurityLogHeader = ({ accessEvent }: SecurityLogHeaderProps) => (
     marginTop={2}
   >
     <FieldTagList targets={accessEvent.targets} />
-    <Typography variant="body-3">
+    <Typography variant="body-4">
       {accessEvent.targets.length > 1 ? 'were' : 'was'} accessed by
     </Typography>
-    <Typography variant="body-3">
+    <Typography variant="label-4">
       {accessEvent.principal || 'an automated process'}{' '}
     </Typography>
   </Stack>

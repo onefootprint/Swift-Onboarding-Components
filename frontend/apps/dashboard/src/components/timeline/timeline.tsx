@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { LoadingIndicator, Typography } from '@onefootprint/ui';
+import { Box, LoadingIndicator, Stack, Typography } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
 
 import type { TimelineItemTimeData } from './components/timeline-item-time';
@@ -38,7 +38,7 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
 
   return (
     <>
-      <TimelineContainer>
+      <Stack direction="column">
         {items.map((item: TimelineItem, i: number) => {
           const key = `${getKeyForItemTime(item.time)}-${i}`;
           const { iconComponent, headerComponent, bodyComponent } = item;
@@ -46,143 +46,108 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
           const last = i === items.length - 1;
 
           return (
-            <Fragment key={key}>
-              <Row>
-                <TimeContainer>
-                  {item.time && <TimelineItemTime time={item.time} />}
-                </TimeContainer>
-                <IconAndLine>
-                  <Line data-last={last} data-dashed={hasDashedBorder} />
-                  {iconComponent && (
-                    <IconContainer>{iconComponent}</IconContainer>
-                  )}
-                </IconAndLine>
-                <Content>
-                  <Header>{headerComponent}</Header>
-                  {bodyComponent && (
-                    <BodyContainer>{bodyComponent}</BodyContainer>
-                  )}
-                </Content>
-              </Row>
-            </Fragment>
+            <StepContainer key={key}>
+              <TimeContainer direction="row" gap={2} minHeight="40px">
+                {item.time && <TimelineItemTime time={item.time} />}
+              </TimeContainer>
+              <Line
+                data-last={last}
+                data-dashed={hasDashedBorder}
+                last={last}
+              />
+              {iconComponent && (
+                <Icon
+                  align="center"
+                  justify="center"
+                  paddingTop={4}
+                  paddingBottom={4}
+                  backgroundColor="primary"
+                  minHeight="40px"
+                >
+                  {iconComponent}
+                </Icon>
+              )}
+              <Header
+                align="center"
+                justify="start"
+                marginLeft={2}
+                marginTop={0}
+              >
+                {headerComponent}
+              </Header>
+              <Body
+                direction="column"
+                gap={2}
+                width="100%"
+                marginLeft={5}
+                paddingBottom={7}
+              >
+                {bodyComponent && <Box paddingLeft={5}>{bodyComponent}</Box>}
+              </Body>
+            </StepContainer>
           );
         })}
-      </TimelineContainer>
+      </Stack>
       {isLoading && (
-        <LoadingContainer>
+        <Box marginBottom={4}>
           <LoadingIndicator />
-        </LoadingContainer>
+        </Box>
       )}
     </>
   );
 };
 
-const TimelineContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const TimeContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  height: ${HEADER_HEIGHT};
-  flex-shrink: 0;
-  min-width: 150px;
-`;
-
-const Content = styled.div`
+const StepContainer = styled.div`
   ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
+    display: grid;
+    grid-template-columns: 150px 16px 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+      'time icon header'
+      'empty line body';
     gap: ${theme.spacing[2]};
-    width: 100%;
-    margin-left: ${theme.spacing[5]};
-    padding-bottom: ${theme.spacing[7]};
+    align-items: start;
+    justify-content: start;
   `}
 `;
 
-const Header = styled.div`
+const Body = styled(Stack)`
+  grid-area: body;
+`;
+
+const Icon = styled(Stack)`
+  grid-area: icon;
+`;
+
+const TimeContainer = styled(Stack)`
+  grid-area: time;
+`;
+
+const Header = styled(Stack)`
   ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
+    grid-area: header;
     min-height: ${HEADER_HEIGHT};
-    margin-left: ${theme.spacing[1]};
-
-    & > * {
-      max-width: 100%;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: flex-start;
-      flex-wrap: wrap;
-      line-height: ${HEADER_HEIGHT};
-    }
+    gap: ${theme.spacing[2]};
   `};
 `;
 
-const BodyContainer = styled.div`
-  ${({ theme }) => css`
-    padding-left: ${theme.spacing[5]};
-  `};
-`;
-
-const LoadingContainer = styled.div`
-  ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[4]};
-  `};
-`;
-
-const Row = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: flex-start;
-  height: auto;
-  align-items: stretch;
-  position: relative;
-`;
-
-const IconAndLine = styled.div`
-  position: relative;
-  align-items: stretch;
-  min-width: 16px;
-  flex-shrink: 0;
-`;
-
-const IconContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
+const Line = styled.div<{ last: boolean }>`
+  ${({ theme, last }) => css`
+    grid-area: icon / line / line;
     position: relative;
-    align-items: flex-start;
-    justify-content: center;
-    padding: ${theme.spacing[4]} 0;
-    background: ${theme.backgroundColor.primary};
-    z-index: 3;
-  `};
-`;
-
-const Line = styled.div`
-  ${({ theme }) => css`
-    position: absolute;
-    z-index: 0;
-    top: 0;
-    left: 50%;
-    width: 0px;
     height: 100%;
-    transform: translateX(-50%);
-    border-left: ${theme.borderWidth[2]} solid ${theme.borderColor.primary};
 
-    &[data-last='true'] {
-      border-left: ${theme.borderWidth[2]} solid
-        ${theme.backgroundColor.transparent};
-    }
-
-    &[data-dashed='true'] {
-      border-left: ${theme.borderWidth[2]} dashed ${theme.borderColor.primary};
-    }
+    ${!last &&
+    css`
+      &:before {
+        content: '';
+        display: block;
+        width: 1px;
+        height: 100%;
+        background-color: ${theme.borderColor.primary};
+        margin: 0 auto;
+      }
+    `}
   `}
 `;
 

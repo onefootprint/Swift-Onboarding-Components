@@ -12,39 +12,41 @@ type SecurityLogBodyProps = {
 const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
   <AccessEventBodyContainer>
     <div>
-      <Typography variant="label-3">User</Typography>
+      <Typography variant="label-4">User</Typography>
       <DataGrid>
-        <Typography variant="body-3" color="tertiary">
+        <Typography variant="body-4" color="tertiary">
           Footprint token
         </Typography>
         <CodeContainer>
-          <CodeInline isPrivate>{accessEvent.fpId}</CodeInline>
+          <CodeInline size="compact" isPrivate>
+            {accessEvent.fpId}
+          </CodeInline>
         </CodeContainer>
       </DataGrid>
     </div>
     {accessEvent.insightEvent && (
       <div>
-        <Typography variant="label-3">Metadata</Typography>
+        <Typography variant="label-4">Metadata</Typography>
         <DataGrid>
-          <Typography variant="body-3" color="tertiary">
+          <Typography variant="body-4" color="tertiary">
             Region
           </Typography>
-          <Typography variant="body-3" isPrivate>
+          <Typography variant="body-4" isPrivate>
             {getRegionForInsightEvent(accessEvent.insightEvent) || '-'}
           </Typography>
-          <Typography variant="body-3" color="tertiary">
+          <Typography variant="body-4" color="tertiary">
             IP Address
           </Typography>
-          <Typography variant="body-3" isPrivate>
+          <Typography variant="body-4" isPrivate>
             {accessEvent.insightEvent.ipAddress || '-'}
           </Typography>
-          <Typography variant="body-3" color="tertiary">
+          <Typography variant="body-4" color="tertiary">
             Country
           </Typography>
-          <Typography variant="body-3" isPrivate>
+          <Typography variant="body-4" isPrivate>
             {accessEvent.insightEvent.country || '-'}
           </Typography>
-          <Typography variant="body-3" color="tertiary">
+          <Typography variant="body-4" color="tertiary">
             Device/OS
           </Typography>
           <Box
@@ -53,24 +55,26 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
               gridArea: '2 / 4 / span 2 / span 1',
             }}
           >
-            <Typography variant="body-3" sx={{ overflow: 'hidden' }} isPrivate>
+            <Typography variant="body-4" sx={{ overflow: 'hidden' }} isPrivate>
               {displayForUserAgent(accessEvent.insightEvent.userAgent || '')}
             </Typography>
           </Box>
-          <Typography variant="body-3" color="tertiary">
+          <Typography variant="body-4" color="tertiary">
             Zip code
           </Typography>
-          <Typography variant="body-3" isPrivate>
+          <Typography variant="body-4" isPrivate>
             {accessEvent.insightEvent.postalCode || '-'}
           </Typography>
         </DataGrid>
       </div>
     )}
     <div>
-      <Box marginBottom={5}>
-        <Typography variant="body-3">Reason</Typography>
+      <Box marginBottom={3}>
+        <Typography variant="label-4">Reason</Typography>
       </Box>
-      <Typography variant="body-3">{accessEvent.reason || '-'}</Typography>
+      <Typography variant="body-4" color="secondary">
+        {accessEvent.reason || '-'}
+      </Typography>
     </div>
   </AccessEventBodyContainer>
 );
@@ -79,8 +83,8 @@ const DataGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   ${({ theme }) => css`
-    row-gap: ${theme.spacing[3]};
-    margin-top: ${theme.spacing[5]};
+    row-gap: ${theme.spacing[2]};
+    margin-top: ${theme.spacing[4]};
   `};
 `;
 
@@ -88,7 +92,7 @@ const AccessEventBodyContainer = styled.div`
   display: flex;
   flex-direction: column;
   ${({ theme }) => css`
-    gap: ${theme.spacing[9]};
+    gap: ${theme.spacing[8]};
     margin: ${theme.spacing[5]} 0 ${theme.spacing[9]}
       calc(-1 * ${theme.spacing[3]});
   `};
