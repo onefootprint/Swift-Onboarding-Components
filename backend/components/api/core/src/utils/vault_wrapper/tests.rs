@@ -121,6 +121,117 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
 }
 
 #[db_test]
+fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
+    // Tests that we properly apply DLs spread across multiple tenants in the correct order.
+    let tenant = db::tests::fixtures::tenant::create(conn);
+    let ob_config = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, true);
+    let tenant2 = db::tests::fixtures::tenant::create(conn);
+    let ob_config2 = db::tests::fixtures::ob_configuration::create(conn, &tenant2.id, true);
+
+    let uv = db::tests::fixtures::vault::create_person(conn, true);
+    let su = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
+    let su2 = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &ob_config2.id);
+
+    // Chronologically create data across two different tenants
+    let data = vec![
+        // Add portable Dob data at tenant 1
+        (
+            &su.id,
+            true,
+            vec![NewVaultData {
+                kind: IDK::Dob.into(),
+                e_data: SealedVaultBytes(vec![0]),
+                p_data: None,
+                format: VaultDataFormat::String,
+            }],
+        ),
+        // Add speculative Dob and Nationality data at tenant 2
+        (
+            &su2.id,
+            false,
+            vec![
+                NewVaultData {
+                    kind: IDK::Dob.into(),
+                    e_data: SealedVaultBytes(vec![1]),
+                    p_data: None,
+                    format: VaultDataFormat::String,
+                },
+                NewVaultData {
+                    kind: IDK::Nationality.into(),
+                    e_data: SealedVaultBytes(vec![2]),
+                    p_data: None,
+                    format: VaultDataFormat::String,
+                },
+            ],
+        ),
+        // Add speculative Dob at tenant 1 - not visible at tenant 2
+        (
+            &su.id,
+            false,
+            vec![NewVaultData {
+                kind: IDK::Dob.into(),
+                e_data: SealedVaultBytes(vec![3]),
+                p_data: None,
+                format: VaultDataFormat::String,
+            }],
+        ),
+        // Add portable Nationality at tenant 1
+        (
+            &su.id,
+            true,
+            vec![NewVaultData {
+                kind: IDK::Nationality.into(),
+                e_data: SealedVaultBytes(vec![4]),
+                p_data: None,
+                format: VaultDataFormat::String,
+            }],
+        ),
+    ];
+    for (su_id, portablize, data) in data {
+        let seqno = DataLifetime::get_next_seqno(conn).unwrap();
+        let source = DataLifetimeSource::Unknown;
+        let vds = VaultData::bulk_create(conn, &uv.id, su_id, data, seqno, source).unwrap();
+        if portablize {
+            let ids = vds.into_iter().map(|vd| vd.lifetime_id).collect();
+            DataLifetime::bulk_portablize_for_tenant(conn, ids, su_id, seqno).unwrap();
+        }
+    }
+
+    // Vault wrapper for tenant 1
+    let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su.id)).unwrap();
+    let tests = vec![
+        (IDK::Dob, Some(SealedVaultBytes(vec![3]))),
+        (IDK::Nationality, Some(SealedVaultBytes(vec![4]))),
+    ];
+    for test in tests {
+        let (attribute, expected_value) = test;
+        assert_eq!(uvw.get_e_data(attribute), expected_value.as_ref());
+    }
+
+    // Vault wrapper for tenant 2
+    let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su2.id)).unwrap();
+    let tests = vec![
+        (IDK::Dob, Some(SealedVaultBytes(vec![1]))),
+        (IDK::Nationality, Some(SealedVaultBytes(vec![4]))),
+    ];
+    for test in tests {
+        let (attribute, expected_value) = test;
+        assert_eq!(uvw.get_e_data(attribute), expected_value.as_ref());
+    }
+
+    // build_for_user should only show the portable data
+    let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Vault(&uv.id)).unwrap();
+    let tests = vec![
+        (IDK::Dob, Some(SealedVaultBytes(vec![0]))),
+        (IDK::Nationality, Some(SealedVaultBytes(vec![4]))),
+    ];
+    for test in tests {
+        let (attribute, expected_value) = test;
+        assert_eq!(uvw.get_e_data(attribute), expected_value.as_ref());
+    }
+}
+
+#[db_test]
 fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
     let bv = db::tests::fixtures::vault::create_business(conn);
     let tenant = db::tests::fixtures::tenant::create(conn);

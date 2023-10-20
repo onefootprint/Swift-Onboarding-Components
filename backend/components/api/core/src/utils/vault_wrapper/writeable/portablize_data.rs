@@ -10,10 +10,13 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultUpdate;
 use db::models::user_timeline::UserTimeline;
 use db::TxnPgConn;
+use either::Either;
+use itertools::Itertools;
 use newtypes::CollectedDataOption;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DbUserTimelineEventKind;
+use std::collections::HashMap;
 use std::collections::HashSet;
 
 struct CurrentData {
@@ -49,7 +52,7 @@ fn decide_data_to_portablize(data: CurrentData) -> DataToPortablize {
             Some(full_cdo) => {
                 let portable_has_full_variant = portable.contains(&full_cdo);
                 if portable_has_full_variant {
-                    log::info!(
+                    tracing::info!(
                         "Trying to portablize partial CDO {} when full CDO {} is portable",
                         speculative_cdo,
                         full_cdo
@@ -86,88 +89,90 @@ impl WriteableVw<Person> {
         // Use the same seqno to deactivate old data and portablize new data
         let seqno = DataLifetime::get_next_seqno(conn)?;
 
-        // NOTE: this does nothing to Custom data or Identity documents since they don't fit into
-        // the CollectedDataOption model
+        //
+        // Compute what data we'll be committing and deactivating
+        //
+        // Note: speculative and portable could have overlapping DIs if a piece of speculative data
+        // is replacing a piece of portable data
+        let (speculative, portable): (HashMap<_, _>, HashMap<_, _>) = uvw
+            .all_data
+            .iter()
+            .flat_map(|(di, datas)| datas.iter().map(|d| (di.clone(), d)))
+            .partition_map(|(di, d)| {
+                if d.is_portable() {
+                    Either::Right((di, d))
+                } else {
+                    Either::Left((di, d))
+                }
+            });
         let d = decide_data_to_portablize(CurrentData {
-            speculative: CollectedDataOption::list_from(uvw.speculative.populated_dis()),
-            portable: CollectedDataOption::list_from(uvw.portable.populated_dis()),
+            speculative: CollectedDataOption::list_from(speculative.keys().cloned().collect()),
+            portable: CollectedDataOption::list_from(portable.keys().cloned().collect()),
         });
-        let speculative_kinds_to_portablize: Vec<_> = d
+        let to_portablize: Vec<_> = d
             .to_portablize
             .into_iter()
             // Purposefully only take IDKs because we only want to portablize identity fields
             .flat_map(|o| o.data_identifiers().unwrap_or_default())
-            .filter_map(|di| if let DataIdentifier::Id(idk) = di { Some(idk) } else { None})
+            .filter(|di| matches!(di, DataIdentifier::Id(_)))
             .collect();
-        let speculative_kinds_to_deactivate: Vec<_> = d
+        let to_deactivate: Vec<_> = d
             .to_deactivate
             .into_iter()
             // Purposefully only take IDKs because we only want to portablize identity fields
             .flat_map(|o| o.data_identifiers().unwrap_or_default())
-            .filter_map(|di| if let DataIdentifier::Id(idk) = di { Some(idk) } else { None})
+            .filter(|di| matches!(di, DataIdentifier::Id(_)))
             .collect();
 
         //
         // Deactivate all existing, portable data that is about to be replaced by speculative data.
         // Also deactivate speculative data that we don't want to keep.
         //
-        let lifetime_ids_to_deactivate = {
+        let to_deactivate = {
             // For everything that we're about to portablize, deactivate the old data if exists
-            let portable_lifetimes_to_deactivate = uvw
-                .portable
-                .get_lifetimes(speculative_kinds_to_portablize.clone());
-            let is_all_data_portable = portable_lifetimes_to_deactivate
-                .iter()
-                .all(|l| l.portablized_seqno.is_some());
-            if !is_all_data_portable {
+            let portable_to_deactivate = to_portablize.iter().flat_map(|di| portable.get(di)).collect_vec();
+            if !portable_to_deactivate.iter().all(|l| l.is_portable()) {
                 // Everything we are deactivating should be portable already
                 return Err(AssertionError("Lifetime to deactivate is not portable").into());
             }
             // And, grab the IDs of speculative data that we're deactivating.
-            let speculative_lifetimes_to_deactivate =
-                uvw.speculative.get_lifetimes(speculative_kinds_to_deactivate);
-            if !speculative_lifetimes_to_deactivate.is_empty() {
-                // For now, we only deactivate speculative data if portablizeting it would otherwise
+            let spec_to_deactivate: Vec<_> =
+                to_deactivate.iter().flat_map(|di| speculative.get(di)).collect();
+            if !spec_to_deactivate.is_empty() {
+                // For now, we only deactivate speculative data if portablizing it would otherwise
                 // replace more full data on the user vault.
                 // This only happens in an onboarding race condition - let's just track when it happens
-                let ids: Vec<_> = speculative_lifetimes_to_deactivate
-                    .iter()
-                    .map(|l| &l.id)
-                    .collect();
-                log::error!("Deactivating speculative data due to race condition: {:?}", ids,);
+                tracing::error!(
+                    "Deactivating speculative data due to race condition: {:?}",
+                    spec_to_deactivate.iter().map(|d| &d.lifetime.id).collect_vec()
+                );
             }
-            portable_lifetimes_to_deactivate
+            portable_to_deactivate
                 .into_iter()
-                .chain(speculative_lifetimes_to_deactivate.into_iter())
-                .map(|l| l.id.clone())
+                .chain(spec_to_deactivate.into_iter())
+                .map(|d| d.lifetime.id.clone())
                 .collect()
         };
-        DataLifetime::bulk_deactivate(conn, lifetime_ids_to_deactivate, seqno)?;
+        DataLifetime::bulk_deactivate(conn, to_deactivate, seqno)?;
 
         //
-        // Portablize speculative lifetimes. This could portablize data across any number of tables.
+        // Portablize speculative lifetimes.
         //
-        // NOTE: this isn't portablizeing identity documents since we never return IdentityDocument
-        // from get_populated_fields
-        let lifetime_ids_to_portablize = {
-            let speculative_lifetimes_to_portablize =
-                uvw.speculative.get_lifetimes(speculative_kinds_to_portablize);
-            let all_data_is_speculative_and_belongs_to_scoped_user = speculative_lifetimes_to_portablize
-                .iter()
-                .all(|l| l.portablized_seqno.is_none() && l.scoped_vault_id == scoped_vault_id);
-            if !all_data_is_speculative_and_belongs_to_scoped_user {
-                // Just a sanity check filter that we don't portablize other data - all results should match
-                // this filter
-                return Err(AssertionError(
-                    "About to portablize data that is not speculative or does not belong to tenant",
-                )
-                .into());
-            }
-            speculative_lifetimes_to_portablize
-                .into_iter()
-                .map(|l| l.id.clone())
-                .collect()
-        };
+        // NOTE: this isn't portablizing identity documents.
+        let to_portablize: Vec<_> = to_portablize.iter().flat_map(|di| speculative.get(di)).collect();
+        let all_data_is_speculative_and_belongs_to_scoped_user = to_portablize
+            .iter()
+            .all(|d| d.is_speculative() && d.lifetime.scoped_vault_id == scoped_vault_id);
+        if !all_data_is_speculative_and_belongs_to_scoped_user {
+            // Just a sanity check filter that we don't portablize other data - all results should match
+            // this filter
+            return Err(AssertionError(
+                "About to portablize data that is not speculative or does not belong to tenant",
+            )
+            .into());
+        }
+
+        let lifetime_ids_to_portablize = to_portablize.into_iter().map(|d| d.lifetime.id.clone()).collect();
         DataLifetime::bulk_portablize_for_tenant(conn, lifetime_ids_to_portablize, &scoped_vault_id, seqno)?;
 
         // Portablize any data collection timeline events from the duration of this onboarding.

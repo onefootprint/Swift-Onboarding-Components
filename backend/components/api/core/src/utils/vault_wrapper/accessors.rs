@@ -3,7 +3,6 @@ use db::models::data_lifetime::DataLifetime;
 use db::models::vault::Vault;
 use db::HasLifetime;
 use db::VaultedData;
-use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::IsDataIdentifierDiscriminant;
 use newtypes::PiiString;
@@ -15,12 +14,7 @@ impl<Type> VaultWrapper<Type> {
     }
 
     pub fn populated_dis(&self) -> Vec<DataIdentifier> {
-        self.speculative
-            .populated_dis()
-            .into_iter()
-            .chain(self.portable.populated_dis())
-            .unique()
-            .collect()
+        self.all_data.keys().cloned().collect()
     }
 
     pub fn populated<T>(&self) -> Vec<T>
@@ -43,18 +37,17 @@ impl<Type> VaultWrapper<Type> {
     /// Dispatch queries for a piece of data with a given identifier to the underlying data
     /// model that actually stores this data.
     /// If exists, returns a trait object that allows reading the underlying data.
+    /// TODO make this take in a reference
     pub fn get<T>(&self, id: T) -> Option<&dyn HasLifetime>
     where
         T: Into<DataIdentifier> + Clone,
     {
-        self.speculative.get(id.clone()).or_else(|| self.portable.get(id))
+        self.data(&id.into()).map(|d| d.data())
     }
 
     /// Returns the visible liftime for the given DI, if exists
     pub fn get_lifetime<T: Into<DataIdentifier> + Clone>(&self, id: T) -> Option<&DataLifetime> {
-        self.speculative
-            .get_lifetime(id.clone())
-            .or_else(|| self.portable.get_lifetime(id))
+        self.data(&id.into()).map(|d| &d.lifetime)
     }
 
     /// If the provided DI is a document, return the mime type
@@ -62,9 +55,9 @@ impl<Type> VaultWrapper<Type> {
     where
         T: Into<DataIdentifier> + Clone,
     {
-        self.speculative
-            .get_mime_type(id.clone())
-            .or_else(|| self.portable.get_mime_type(id))
+        self.data(&id.into())
+            .and_then(|d| d.doc())
+            .map(|d| d.mime_type.leak())
     }
 
     /// Get the plaintext data for the provided data identifier.

@@ -63,9 +63,7 @@ impl<Type> VaultWrapper<Type> {
         // This is weird - get the mime type from the document row
         if let &DataIdentifier::Document(DocumentKind::MimeType(doc_kind, side)) = &di {
             let di: DataIdentifier = DocumentKind::from_id_doc_kind(doc_kind, side).into();
-            let speculative_doc = self.speculative.documents.iter().find(|d| d.kind == di);
-            let portable_doc = || self.portable.documents.iter().find(|d| d.kind == di);
-            let document = speculative_doc.or_else(portable_doc)?;
+            let document = self.data(&di)?.doc()?;
             return Some(VaultedData::NonPrivate(
                 &document.mime_type,
                 VaultDataFormat::String,

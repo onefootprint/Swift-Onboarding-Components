@@ -49,10 +49,14 @@ impl<Type> VaultWrapper<Type> {
             let vault_already_has_di = if check_portable_and_speculative {
                 // Some fields we are not allowed to update as soon as they are set on the vault,
                 // whether speculative or portablized
-                self.get(di.clone()).is_some()
+                self.data(&di).is_some()
             } else {
                 // Other fields we only cannot replace if they are portablized
-                self.portable.get(di.clone()).is_some()
+                if let Some(data) = self.data(&di) {
+                    data.is_portable()
+                } else {
+                    false
+                }
             };
             if update_has_di && vault_already_has_di {
                 // We don't currently support adding a phone/email

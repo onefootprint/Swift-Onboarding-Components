@@ -14,10 +14,13 @@ impl<Type> TenantVw<Type> {
         tracing::info!(dis=%Csv::from(dis.clone()), "Deleting DIs");
         let (dis, dls) = dis
             .into_iter()
-            // Only allow deleting speculative data so we don't accidentally affect other tenants'
-            // view of the world.
-            .filter_map(|di| self.speculative.get(di.clone()).map(|vd| (di, vd)))
-            .map(|(di, vd)| (di, vd.lifetime_id().clone()))
+            .flat_map(|di| self.data(&di).map(|d| (di, d)))
+            // Only allow deleting data that hasn't been portablized so we don't accidentally
+            // affect other tenants' view of the world.
+            .filter(|(_, d)| d.is_speculative())
+            // And to be extra safe, make sure this tenant added the data
+            .filter(|(_, d)| d.lifetime.scoped_vault_id == self.scoped_vault.id)
+            .map(|(di, d)| (di, d.lifetime.id.clone()))
             .unzip();
 
         let seqno = DataLifetime::get_next_seqno(conn.conn())?;
