@@ -259,7 +259,7 @@ describe('<SandboxOutcome/>', () => {
       expect((overallFailOption as any).selected).toBeFalsy();
 
       await userEvent.click(continueButton);
-      expect(submittedFormData.outcomes.overallOutcome).toEqual('');
+      expect(submittedFormData.outcomes.overallOutcome).toEqual('pass');
 
       await userEvent.click(overallManualReviewOption);
       expect((overallSuccessOption as any).selected).toBeFalsy();

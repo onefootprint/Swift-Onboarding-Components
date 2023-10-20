@@ -1,5 +1,5 @@
 export enum OverallOutcome {
-  success = '',
+  success = 'pass',
   manualReview = 'manual_review',
   fail = 'fail',
   documentDecision = 'document_decision',
