@@ -2,13 +2,17 @@
   "name": "@onefootprint/footprint-react-native",
   "private": false,
   "type": "module",
-  "version": "1.2.0-beta.2",
+  "version": "1.2.1",
   "main": "./dist/footprint-react-native.cjs",
   "module": "./dist/footprint-react-native.js",
-  "unpkg": "./dist/footprint-react-native.js",
   "types": "./dist/footprint-react-native.d.ts",
-  "sideEffects": false,
-  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./dist/footprint-react-native.js",
+      "require": "./dist/footprint-react-native.cjs",
+      "types": "./dist/footprint-react-native.d.ts"
+    }
+  },
   "files": [
     "dist"
   ],
