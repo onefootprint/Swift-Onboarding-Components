@@ -37,7 +37,7 @@ pub struct Kyc {
 
     pub applicant_name: PiiString,
     pub email_address: PiiString,
-    pub nationality: PiiString,
+    pub nationality: Option<PiiString>,
 
     /// Government issued ID number of applicant
     pub id_number: Option<PiiString>,
@@ -282,7 +282,7 @@ pub mod fixtures {
                     id: fp_id_test(),
                     applicant_name: pii!("Carl Cassanova"),
                     email_address: pii!("carl.casanova@gmail.com"),
-                    nationality: pii!("american"),
+                    nationality: Some(pii!("american")),
                     id_number: None,
                     date_of_birth: pii!("1992-02-02"),
                     address: pii!("1 Penguin Place, Philadelphia PA"),

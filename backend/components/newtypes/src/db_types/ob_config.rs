@@ -63,7 +63,7 @@ impl_enum_str_diesel!(CipKind);
 impl CipKind {
     pub fn required_cdos(&self) -> Vec<CDO> {
         match self {
-            CipKind::Alpaca => vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress, CDO::Nationality],
+            CipKind::Alpaca => vec![CDO::Name, CDO::Dob, CDO::Ssn9, CDO::FullAddress],
             CipKind::Apex => vec![],
         }
     }

@@ -290,7 +290,7 @@ fn kyc(
             decrypted_data.get_di(LastName)?
         ),
         email_address: decrypted_data.get_di(Email)?,
-        nationality: decrypted_data.get_di(Nationality)?,
+        nationality: decrypted_data.get_di(Nationality).ok(),
         date_of_birth: decrypted_data.get_di(Dob)?,
         address: if let Ok(address2) = decrypted_data.get_di(AddressLine2) {
             format_pii!("{} {}", decrypted_data.get_di(AddressLine1)?, address2)
