@@ -26,4 +26,6 @@ pub enum UserError {
     SandboxMismatch,
     #[error("Invalid auth session: {0}")]
     InvalidAuthSession(String),
+    #[error("Must provide either a playbook public key or a user auth with a playbook attached in order to create a sign_up token")]
+    ObConfigRequiredForSignUp,
 }

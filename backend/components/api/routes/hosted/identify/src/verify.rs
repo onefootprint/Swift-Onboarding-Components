@@ -10,6 +10,7 @@ use api_core::auth::Any;
 use api_core::config::Config;
 use api_core::errors::business::BusinessError;
 use api_core::errors::challenge::ChallengeError;
+use api_core::errors::user::UserError;
 use api_core::errors::{ApiError, ApiResult};
 use api_core::telemetry::RootSpan;
 use api_core::types::response::ResponseData;
@@ -31,8 +32,8 @@ use db::models::vault::Vault;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::TxnPgConn;
 use newtypes::{
-    AuthEventKind, DataIdentifier, IdentityDataKind as IDK, ScopedVaultId, SessionAuthToken, VaultId,
-    WebauthnCredentialId,
+    AuthEventKind, DataIdentifier, IdentityDataKind as IDK, ObConfigurationId, ScopedVaultId,
+    SessionAuthToken, VaultId, WebauthnCredentialId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -41,6 +42,16 @@ pub struct VerifyRequest {
     /// Opaque challenge state token
     challenge_token: ChallengeToken,
     challenge_response: String,
+    /// Determines which scopes the issued auth token will have. Request the correct scopes for
+    /// your use case in order to get the least permissions required
+    scope: Option<IdentifyScope>,
+}
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum IdentifyScope {
+    My1fp,
+    Onboarding,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -69,9 +80,27 @@ pub async fn post(
     let VerifyRequest {
         challenge_token,
         challenge_response: c_response,
+        scope,
     } = request.into_inner();
     let challenge_state =
         Challenge::<ChallengeState>::unseal(&state.challenge_sealing_key, &challenge_token)?.data;
+
+    let user_auth = user_auth.map(|a| a.check_guard(Any)).transpose()?;
+
+    // Support old clients that aren't telling us what kind of token they want
+    if scope.is_none() {
+        // Metrics so we know when we can deprecate
+        root_span.record("meta", "no_scope_provided");
+    } else {
+        root_span.record("meta", "scope_provided");
+    }
+    let scope = scope.unwrap_or_else(|| {
+        if ob_pk_auth.is_some() {
+            IdentifyScope::Onboarding
+        } else {
+            IdentifyScope::My1fp
+        }
+    });
 
     let config = state.config.clone();
     let session_key = state.session_sealing_key.clone();
@@ -105,36 +134,44 @@ pub async fn post(
             let sensitive_scope =
                 matches!(auth_factor, AuthFactor::Passkey(_)).then_some(UserAuthScope::SensitiveProfile);
 
-            // Determine whether to issue onboardig scopes or my1fp scopes
-            let (args, scopes, duration, scoped_vault_id) = if let Some(ob_pk_auth) = ob_pk_auth {
-                let obc_id = ob_pk_auth.ob_config().id.clone();
-                let (su, sb_id) = onboarding_identifiers(conn, ob_pk_auth, &uv_id)?;
-                let duration = Duration::hours(1); // Onboarding is shorter
-                let args = UserSessionArgs {
-                    su_id: Some(su.id.clone()),
-                    sb_id,
-                    obc_id: Some(obc_id),
-                    // wf_id will be added later in POST /hosted/onboarding
-                    wf_id: None,
-                };
-                root_span.record("fp_id", su.fp_id.to_string());
-                root_span.record("tenant_id", su.tenant_id.to_string());
-                root_span.record("is_live", su.is_live);
-                (args, vec![Some(UserAuthScope::SignUp)], duration, Some(su.id))
-            } else {
-                let scopes = vec![Some(UserAuthScope::BasicProfile)];
-                // TODO we currently infer that a token is for my1fp just because ob config auth
-                // isn't provided - but with step up, there are also some auths here that have no
-                // ob config auth but are also not my1fp
-                let duration = Duration::hours(8); // Issue my1fp token for a long time
-                let args = UserSessionArgs::default();
-                (args, scopes, duration, None)
+            // Determine whether to issue onboarding scopes or my1fp scopes
+            let (args, scopes, duration, scoped_vault_id) = match scope {
+                IdentifyScope::Onboarding => {
+                    let bo = ob_pk_auth.as_ref().and_then(|a| a.business_owner());
+                    let user_auth_obc_id = user_auth
+                        .as_ref()
+                        .and_then(|a| a.ob_config())
+                        .map(|obc| obc.id.clone());
+                    let ob_pk_obc_id = ob_pk_auth.as_ref().map(|a| a.ob_config().id.clone());
+                    let obc_id = user_auth_obc_id
+                        .or(ob_pk_obc_id)
+                        .ok_or(UserError::ObConfigRequiredForSignUp)?;
+                    // TOOD we should migrate the BO tokens to use these new un-authed, identified tokens
+                    let (su, sb_id) = onboarding_identifiers(conn, obc_id.clone(), bo, &uv_id)?;
+                    let duration = Duration::hours(1); // Onboarding is shorter
+                    let args = UserSessionArgs {
+                        su_id: Some(su.id.clone()),
+                        sb_id,
+                        obc_id: Some(obc_id),
+                        // wf_id will be added later in POST /hosted/onboarding
+                        wf_id: None,
+                    };
+                    root_span.record("fp_id", su.fp_id.to_string());
+                    root_span.record("tenant_id", su.tenant_id.to_string());
+                    root_span.record("is_live", su.is_live);
+                    (args, vec![Some(UserAuthScope::SignUp)], duration, Some(su.id))
+                }
+                IdentifyScope::My1fp => {
+                    let scopes = vec![Some(UserAuthScope::BasicProfile)];
+                    let duration = Duration::hours(8); // Issue my1fp token for a long time
+                    let args = UserSessionArgs::default();
+                    (args, scopes, duration, None)
+                }
             };
             let scopes = scopes.into_iter().chain([sensitive_scope]).flatten().collect();
 
             let auth_token = if let Some(user_auth) = user_auth {
                 // Add the scopes / args to the existing auth token
-                let user_auth = user_auth.check_guard(Any)?;
                 let token = user_auth.auth_token.clone();
                 let data = user_auth.data.clone().update(args, scopes, Some(auth_factor))?;
                 user_auth.update_session(conn, &session_key, data)?;
@@ -168,19 +205,19 @@ pub async fn post(
 /// Determines the identifiers to add to the auth token to allow a user to complete onboarding
 fn onboarding_identifiers(
     conn: &mut TxnPgConn,
-    ob_pk_auth: ObConfigAuth,
+    obc_id: ObConfigurationId,
+    bo: Option<&BusinessOwner>,
     uv_id: &VaultId,
 ) -> ApiResult<(ScopedVault, Option<ScopedVaultId>)> {
-    let obc = ob_pk_auth.ob_config();
     // Since only some codepaths above will create a SU, we need to always get_or_create a SU if
     // created with an ob config. This will create a SU when we are one-clicking onto this tenant
     let uv = Vault::lock(conn, uv_id)?;
-    let su = ScopedVault::get_or_create(conn, &uv, obc.id.clone())?;
+    let su = ScopedVault::get_or_create(conn, &uv, obc_id)?;
 
     // If we verified with a BoSessionAuth, update the corresponding BO
-    let sb_id = if let Some(bo) = ob_pk_auth.business_owner() {
+    let sb_id = if let Some(bo) = bo {
         let bo = BusinessOwner::lock(conn, &bo.id)?.into_inner();
-        let scoped_business = ScopedVault::get(conn, (&bo.business_vault_id, &obc.tenant_id))?;
+        let scoped_business = ScopedVault::get(conn, (&bo.business_vault_id, &su.tenant_id))?;
         if let Some(existing_uv_id) = bo.user_vault_id.as_ref() {
             // If uv on the BO, make sure it is the same UV that was located in identify flow
             if existing_uv_id != &uv.id {
