@@ -181,15 +181,6 @@ const Customers = () => {
                 accessor: 'should_collect_selfie',
               },
               {
-                accessor: 'global_doc_types_accepted',
-              },
-              {
-                accessor: 'country_restrictions',
-              },
-              {
-                accessor: 'country_doc_type_restrictions',
-              },
-              {
                 accessor: 'id_id',
               },
               {

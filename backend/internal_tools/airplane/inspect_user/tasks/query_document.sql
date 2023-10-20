@@ -4,9 +4,6 @@ select
     dr.ref_id,
     dr.created_at dr_created_at,
     dr.should_collect_selfie,
-    dr.global_doc_types_accepted,
-    dr.country_restrictions,
-    dr.country_doc_type_restrictions,
 	
 	id.id id_id,
     id.document_type,

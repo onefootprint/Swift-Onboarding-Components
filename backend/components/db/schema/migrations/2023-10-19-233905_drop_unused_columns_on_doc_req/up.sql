@@ -1,0 +1,3 @@
+ALTER TABLE document_request DROP COLUMN global_doc_types_accepted;
+ALTER TABLE document_request DROP COLUMN country_restrictions;
+ALTER TABLE document_request DROP COLUMN country_doc_type_restrictions;
