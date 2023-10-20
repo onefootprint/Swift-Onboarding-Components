@@ -1,6 +1,7 @@
 import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import type { OnboardingStatusResponse } from '@onefootprint/types';
+import { OnboardingRequirementKind } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
@@ -8,6 +9,7 @@ import { useEffectOnce } from 'usehooks-ts';
 import { useGetOnboardingStatus } from '../../../../../../hooks/api';
 import Logger from '../../../../../../utils/logger';
 import Error from '../../../../components/error';
+import useOnboardingProcess from '../../hooks/use-onboarding-process';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import useOnboarding from './hooks/use-onboarding';
 import computeRequirementsToShow from './utils/compute-requirements-to-show';
@@ -21,6 +23,7 @@ const CheckRequirements = () => {
   } = state.context;
   const [error, setError] = useState(false);
   const onboardingMutation = useOnboarding();
+  const processMutation = useOnboardingProcess();
   const onboardingInitialized =
     startedDataCollection || onboardingMutation.isSuccess;
 
@@ -56,10 +59,33 @@ const CheckRequirements = () => {
       { collectedKycData: !!collectedKycData },
       response,
     );
-    send({
-      type: 'onboardingRequirementsReceived',
-      payload,
-    });
+
+    // Process is a requirement for making an API call - just run it here if it is the next requirement
+    // Then refetch status and move on.
+    if (
+      !isTransfer &&
+      payload.length &&
+      payload[0].kind === OnboardingRequirementKind.process
+    ) {
+      processMutation.mutate(
+        { authToken },
+        {
+          onSuccess: refetch,
+          onError: (processErr: unknown) => {
+            console.error(
+              'Error while running process from check-requirements page',
+              getErrorMessage(processErr),
+            );
+            setError(true);
+          },
+        },
+      );
+    } else {
+      send({
+        type: 'onboardingRequirementsReceived',
+        payload,
+      });
+    }
   };
 
   const handleOnboardingStatusError = (err: unknown) => {
@@ -76,7 +102,7 @@ const CheckRequirements = () => {
     setError(true);
   };
 
-  useGetOnboardingStatus({
+  const { refetch } = useGetOnboardingStatus({
     authToken,
     enabled: onboardingInitialized,
     options: {
