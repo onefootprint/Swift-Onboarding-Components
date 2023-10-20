@@ -25,7 +25,7 @@ const IdvApp = () => {
 
   return isPreview ? (
     <QueryClientProvider client={queryClient}>
-      <AnalyticsProvider>
+      <AnalyticsProvider debug>
         <Preview isDemo={isDemo} isDebug={isDebug} />
       </AnalyticsProvider>
     </QueryClientProvider>
