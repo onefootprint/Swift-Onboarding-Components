@@ -22,12 +22,10 @@ const VisaFields = () => {
   const errorType = errors.visa?.expirationDate?.type;
   const errorMessage = errorType ? t(`visa-expiration.error.${errorType}`) : '';
 
-  const options = Object.keys(VisaKind)
-    .filter(el => Number.isNaN(Number(el)))
-    .map(key => ({
-      label: t(`visa-kind.mapping.${key}`),
-      value: key,
-    }));
+  const options = Object.values(VisaKind).map(value => ({
+    label: t(`visa-kind.mapping.${value}`),
+    value,
+  }));
 
   return (
     <>
