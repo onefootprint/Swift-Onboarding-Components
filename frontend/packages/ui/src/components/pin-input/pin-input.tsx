@@ -1,6 +1,6 @@
 import styled, { css } from '@onefootprint/styled';
 import identity from 'lodash/identity';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Hint from '../internal/hint';
 import Input from '../internal/input';
@@ -14,6 +14,7 @@ export type PinInputProps = {
   onComplete: (value: string) => void;
   testID?: string;
   disabled?: boolean;
+  autoFocus?: boolean;
 };
 
 const PinInput = ({
@@ -22,9 +23,15 @@ const PinInput = ({
   onComplete,
   testID,
   disabled,
+  autoFocus,
 }: PinInputProps) => {
   const [enteredPin, setEnteredPin] = useState<string[]>([]);
   const pinInputs = usePinInputRefs(INPUT_FIELDS_COUNT);
+
+  useEffect(() => {
+    const firstPinInput = pinInputs.get(0);
+    if (firstPinInput && !disabled && autoFocus) firstPinInput.focus();
+  }, [autoFocus, disabled, pinInputs]);
 
   const updatePin = (nextValue: string, pinIndex: number) => {
     const nextValues = [...enteredPin];

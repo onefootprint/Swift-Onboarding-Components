@@ -55,6 +55,7 @@ const Form = ({
         hasError={hasError}
         hint={hasError ? t('error') : undefined}
         testID="verification-form-pin-input"
+        autoFocus
       />
       <ResendButton
         isResendLoading={isResendLoading}

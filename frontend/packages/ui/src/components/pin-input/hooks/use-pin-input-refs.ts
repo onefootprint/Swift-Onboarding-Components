@@ -1,15 +1,26 @@
 import type { MutableRefObject } from 'react';
-import { createRef, useEffect, useState } from 'react';
+import { createRef, useCallback, useEffect, useMemo, useState } from 'react';
 
 const usePinInputRefs = (pinInputCount: number) => {
   const [refs, setRefs] = useState<MutableRefObject<HTMLInputElement>[]>([]);
 
-  const previous = (
-    referenceIndex: number,
-  ): HTMLInputElement | null | undefined => refs[referenceIndex - 1]?.current;
+  const previous = useCallback(
+    (referenceIndex: number): HTMLInputElement | null | undefined =>
+      refs[referenceIndex - 1]?.current,
+    [refs],
+  );
 
-  const next = (referenceIndex: number): HTMLInputElement | null | undefined =>
-    refs[referenceIndex + 1]?.current;
+  const next = useCallback(
+    (referenceIndex: number): HTMLInputElement | null | undefined =>
+      refs[referenceIndex + 1]?.current,
+    [refs],
+  );
+
+  const get = useCallback(
+    (referenceIndex: number): HTMLInputElement | null | undefined =>
+      refs[referenceIndex]?.current,
+    [refs],
+  );
 
   useEffect(() => {
     setRefs(elRefs =>
@@ -19,7 +30,10 @@ const usePinInputRefs = (pinInputCount: number) => {
     );
   }, [pinInputCount]);
 
-  return { refs, previous, next };
+  return useMemo(
+    () => ({ refs, previous, next, get }),
+    [get, next, previous, refs],
+  );
 };
 
 export default usePinInputRefs;

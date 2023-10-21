@@ -159,7 +159,9 @@ export const fillChallengePin = async () => {
 
   const firstInput = document.getElementsByTagName('input')[0];
   expect(firstInput).toBeInTheDocument();
-  firstInput.focus();
+  await waitFor(() => {
+    expect(document.activeElement === firstInput).toBeTruthy();
+  });
 
   await userEvent.keyboard('123456');
   await waitFor(() => {

@@ -1,4 +1,9 @@
-import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import {
+  customRender,
+  screen,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { PinInputProps } from './pin-input';
@@ -10,6 +15,7 @@ describe('<PinInput />', () => {
     hint,
     onComplete = jest.fn(),
     testID = 'pin-input-test-id',
+    autoFocus,
   }: Partial<PinInputProps>) =>
     customRender(
       <PinInput
@@ -17,6 +23,7 @@ describe('<PinInput />', () => {
         hint={hint}
         onComplete={onComplete}
         testID={testID}
+        autoFocus={autoFocus}
       />,
     );
 
@@ -52,6 +59,14 @@ describe('<PinInput />', () => {
   });
 
   describe('when typing', () => {
+    it('should focus when autofocus is on and input is not disabled', async () => {
+      renderPinInput({ autoFocus: true });
+      const firstInput = document.getElementsByTagName('input')[0];
+      await waitFor(() => {
+        expect(document.activeElement === firstInput).toBeTruthy();
+      });
+    });
+
     it('should move the focus frontwards when the user press a number', async () => {
       renderPinInput({});
 
