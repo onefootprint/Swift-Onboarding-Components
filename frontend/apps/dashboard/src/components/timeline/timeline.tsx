@@ -108,6 +108,7 @@ const StepContainer = styled.div`
     gap: ${theme.spacing[2]};
     align-items: start;
     justify-content: start;
+    overflow: hidden;
   `}
 `;
 
