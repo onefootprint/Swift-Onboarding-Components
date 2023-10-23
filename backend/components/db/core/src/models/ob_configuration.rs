@@ -221,6 +221,10 @@ impl ObConfiguration {
             self.enhanced_aml.clone()
         }
     }
+
+    pub fn is_stepup_enabled(&self) -> bool {
+        matches!(self.cip_kind, Some(CipKind::Alpaca))
+    }
 }
 
 trait SupportedCountriesForDocType {

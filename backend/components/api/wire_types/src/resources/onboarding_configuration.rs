@@ -57,4 +57,5 @@ pub struct PublicOnboardingConfiguration {
     #[serde(skip_serializing_if = "Option::is_none")]
     /// allow list of origins permitted to host the embedded flow
     pub allowed_origins: Option<Vec<String>>,
+    pub is_stepup_enabled: bool,
 }

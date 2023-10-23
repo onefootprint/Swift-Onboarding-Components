@@ -24,6 +24,7 @@ pub type ObConfigInfo = (
 impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
     fn from_db((ob_config, tenant, tenant_client_config, appearance, ff_client): ObConfigInfo) -> Self {
         let supported_countries = ob_config.supported_countries_for_residential_address();
+        let is_stepup_enabled = ob_config.is_stepup_enabled();
 
         let ObConfiguration {
             name,
@@ -58,6 +59,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
         let requires_id_doc = must_collect_data
             .iter()
             .any(|cdo| cdo.parent().data_identifier_kind() == DataIdentifierDiscriminant::Document);
+
         Self {
             name,
             key,
@@ -79,6 +81,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             allow_international_residents,
             supported_countries,
             doc_scan_required_if_ssn_skipped,
+            is_stepup_enabled,
         }
     }
 }
