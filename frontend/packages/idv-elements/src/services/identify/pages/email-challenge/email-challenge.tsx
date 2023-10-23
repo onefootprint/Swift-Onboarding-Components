@@ -16,10 +16,11 @@ const EmailChallenge = () => {
   const [state, send] = useIdentifyMachine();
   const {
     bootstrapData,
-    identify: { userFound, email = '' },
+    identify: { userFound, email = '', isUnverified },
   } = state.context;
   const isBootstrap = !!bootstrapData?.email;
-  const title = userFound ? t('welcome-back-title') : t('title');
+  const shouldShowWelcomeBack = userFound && !isUnverified;
+  const title = shouldShowWelcomeBack ? t('welcome-back-title') : t('title');
 
   const handleChallengeSuceed = (authToken: string) => {
     setTimeout(() => {

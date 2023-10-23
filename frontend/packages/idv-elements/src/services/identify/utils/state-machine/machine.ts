@@ -357,12 +357,14 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
             email,
             phoneNumber,
             userFound,
+            isUnverified,
             availableChallengeKinds,
             successfulIdentifier,
             hasSyncablePassKey,
           } = event.payload;
           context.challenge.hasSyncablePassKey = hasSyncablePassKey;
           context.identify.userFound = userFound;
+          context.identify.isUnverified = isUnverified;
           const isEmailChanged = email && context.identify.email !== email;
           const isPhoneChanged =
             phoneNumber && context.identify.phoneNumber !== phoneNumber;

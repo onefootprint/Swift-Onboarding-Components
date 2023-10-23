@@ -26,6 +26,7 @@ export type IdentifyResult = {
   phoneNumber?: string;
   email?: string;
   userFound?: boolean;
+  isUnverified?: boolean;
   successfulIdentifier?: Identifier;
   sandboxId?: string;
 };
@@ -57,6 +58,7 @@ export type MachineEvents =
         phoneNumber?: string;
         successfulIdentifier?: Identifier;
         userFound: boolean;
+        isUnverified: boolean;
         availableChallengeKinds?: ChallengeKind[];
         hasSyncablePassKey?: boolean;
       };

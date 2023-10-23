@@ -139,6 +139,7 @@ export const withIdentify = (userFound?: boolean) =>
     path: '/hosted/identify',
     response: {
       userFound,
+      isUnverified: false,
       availableChallengeKinds: [ChallengeKind.biometric],
       hasSyncablePassKey: true,
     },

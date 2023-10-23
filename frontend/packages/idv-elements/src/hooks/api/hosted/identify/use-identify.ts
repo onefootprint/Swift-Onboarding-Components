@@ -21,11 +21,16 @@ const identifyRequest = async (payload: IdentifyRequest) => {
     data,
     headers,
   });
-  const { userFound, availableChallengeKinds, hasSyncablePassKey } =
-    response.data;
+  const {
+    userFound,
+    availableChallengeKinds,
+    hasSyncablePassKey,
+    isUnverified,
+  } = response.data;
 
   return {
     userFound,
+    isUnverified,
     availableChallengeKinds,
     hasSyncablePassKey,
   };

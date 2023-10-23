@@ -43,6 +43,7 @@ const EmailIdentification = () => {
       {
         onSuccess: ({
           userFound,
+          isUnverified,
           availableChallengeKinds,
           hasSyncablePassKey,
         }: IdentifyResponse) => {
@@ -50,6 +51,7 @@ const EmailIdentification = () => {
             type: 'identified',
             payload: {
               userFound,
+              isUnverified,
               email: emailFromForm,
               successfulIdentifier: { email: emailFromForm },
               hasSyncablePassKey,

@@ -66,6 +66,7 @@ describe('Identify Machine Tests', () => {
           email: 'belce@onefootprint.com',
           successfulIdentifier: { email: 'belce@onefootprint.com' },
           userFound: true,
+          isUnverified: false,
           availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
           hasSyncablePassKey: true,
         },
@@ -73,6 +74,7 @@ describe('Identify Machine Tests', () => {
       expect(state.context.identify).toEqual({
         email: 'belce@onefootprint.com',
         userFound: true,
+        isUnverified: false,
         successfulIdentifier: { email: 'belce@onefootprint.com' },
       });
       expect(state.context.challenge).toEqual({
@@ -97,11 +99,13 @@ describe('Identify Machine Tests', () => {
         payload: {
           email: 'belce@onefootprint.com',
           userFound: false,
+          isUnverified: false,
         },
       });
       expect(state.context.identify).toEqual({
         email: 'belce@onefootprint.com',
         userFound: false,
+        isUnverified: false,
       });
       expect(state.context.challenge).toEqual({});
       expect(state.value).toEqual('phoneIdentification');
@@ -112,6 +116,7 @@ describe('Identify Machine Tests', () => {
           phoneNumber: '+16509878899',
           successfulIdentifier: { phoneNumber: '+16509878899' },
           userFound: true,
+          isUnverified: false,
           availableChallengeKinds: [ChallengeKind.sms],
           hasSyncablePassKey: false,
         },
@@ -120,6 +125,7 @@ describe('Identify Machine Tests', () => {
         email: 'belce@onefootprint.com',
         phoneNumber: '+16509878899',
         userFound: true,
+        isUnverified: false,
         successfulIdentifier: { phoneNumber: '+16509878899' },
       });
       expect(state.context.challenge).toEqual({
@@ -144,11 +150,13 @@ describe('Identify Machine Tests', () => {
         payload: {
           email: 'belce@onefootprint.com',
           userFound: false,
+          isUnverified: false,
         },
       });
       expect(state.context.identify).toEqual({
         email: 'belce@onefootprint.com',
         userFound: false,
+        isUnverified: false,
       });
       expect(state.context.challenge).toEqual({});
       expect(state.value).toEqual('phoneIdentification');
@@ -159,6 +167,7 @@ describe('Identify Machine Tests', () => {
           phoneNumber: '+16509878899',
           successfulIdentifier: { phoneNumber: '+16509878899' },
           userFound: true,
+          isUnverified: false,
           availableChallengeKinds: [ChallengeKind.sms],
           hasSyncablePassKey: false,
         },
@@ -167,6 +176,7 @@ describe('Identify Machine Tests', () => {
         email: 'belce@onefootprint.com',
         phoneNumber: '+16509878899',
         userFound: true,
+        isUnverified: false,
         successfulIdentifier: { phoneNumber: '+16509878899' },
       });
       expect(state.context.challenge).toEqual({
@@ -206,11 +216,13 @@ describe('Identify Machine Tests', () => {
         payload: {
           email: 'belce@onefootprint.com',
           userFound: false,
+          isUnverified: false,
         },
       });
       expect(state.context.identify).toEqual({
         email: 'belce@onefootprint.com',
         userFound: false,
+        isUnverified: false,
       });
       expect(state.context.challenge).toEqual({});
       expect(state.value).toEqual('phoneIdentification');
@@ -220,12 +232,14 @@ describe('Identify Machine Tests', () => {
         payload: {
           phoneNumber: '+16509878899',
           userFound: false,
+          isUnverified: false,
         },
       });
       expect(state.context.identify).toEqual({
         email: 'belce@onefootprint.com',
         phoneNumber: '+16509878899',
         userFound: false,
+        isUnverified: false,
       });
       expect(state.context.challenge).toEqual({});
       expect(state.value).toEqual('smsChallenge');
@@ -241,6 +255,7 @@ describe('Identify Machine Tests', () => {
         payload: {
           phoneNumber: '+16509878899',
           userFound: false,
+          isUnverified: false,
         },
       });
       expect(state.value).toEqual('smsChallenge');
@@ -261,11 +276,13 @@ describe('Identify Machine Tests', () => {
         payload: {
           email: 'belce@onefootprint.com',
           userFound: false,
+          isUnverified: false,
         },
       });
       expect(state.context.identify).toEqual({
         email: 'belce@onefootprint.com',
         userFound: false,
+        isUnverified: false,
       });
       expect(state.context.challenge).toEqual({});
       expect(state.value).toEqual('phoneIdentification');
@@ -289,6 +306,7 @@ describe('Identify Machine Tests', () => {
           email: 'belce@onefootprint.com',
           successfulIdentifier: { email: 'belce@onefootprint.com' },
           userFound: true,
+          isUnverified: false,
           availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
           hasSyncablePassKey: true,
         },
@@ -296,6 +314,7 @@ describe('Identify Machine Tests', () => {
       expect(state.context.identify).toEqual({
         email: 'belce@onefootprint.com',
         userFound: true,
+        isUnverified: false,
         successfulIdentifier: { email: 'belce@onefootprint.com' },
       });
       expect(state.context.challenge).toEqual({
@@ -325,6 +344,7 @@ describe('Identify Machine Tests', () => {
         payload: {
           email: 'belce@onefootprint.com',
           userFound: true,
+          isUnverified: false,
           successfulIdentifier: { email: 'belce@onefootprint.com' },
           availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
           hasSyncablePassKey: false,
@@ -335,6 +355,7 @@ describe('Identify Machine Tests', () => {
       expect(state.context.identify).toEqual({
         email: 'belce@onefootprint.com',
         userFound: true,
+        isUnverified: false,
         successfulIdentifier: { email: 'belce@onefootprint.com' },
       });
       expect(state.context.challenge).toEqual({
@@ -366,6 +387,7 @@ describe('Identify Machine Tests', () => {
         payload: {
           email: 'belce@onefootprint.com',
           userFound: true,
+          isUnverified: false,
           successfulIdentifier: { email: 'belce@onefootprint.com' },
           availableChallengeKinds: [ChallengeKind.sms, ChallengeKind.biometric],
           hasSyncablePassKey: true,
@@ -374,6 +396,7 @@ describe('Identify Machine Tests', () => {
       expect(state.context.identify).toEqual({
         email: 'belce@onefootprint.com',
         userFound: true,
+        isUnverified: false,
         successfulIdentifier: { email: 'belce@onefootprint.com' },
       });
       expect(state.context.challenge).toEqual({

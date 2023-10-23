@@ -21,11 +21,17 @@ const SmsChallenge = () => {
     bootstrapData,
     challenge: { challengeData, hasSyncablePassKey, availableChallengeKinds },
     device,
-    identify: { phoneNumber = '', successfulIdentifier, userFound },
+    identify: {
+      phoneNumber = '',
+      successfulIdentifier,
+      userFound,
+      isUnverified,
+    },
   } = state.context;
   const isBootstrap = !!(bootstrapData?.email || bootstrapData?.phoneNumber);
   const hasInitialAuthToken = !!initialAuthToken;
-  const title = userFound ? t('welcome-back-title') : t('title');
+  const shouldShowWelcomeBack = userFound && !isUnverified;
+  const title = shouldShowWelcomeBack ? t('welcome-back-title') : t('title');
 
   // Either scrub the phone number collected from the previous steps, or use the
   // challenge data scrubbed number

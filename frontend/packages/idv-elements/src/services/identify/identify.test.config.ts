@@ -54,12 +54,14 @@ export const withOnboardingConfig = (data = sandboxOnboardingConfigFixture) =>
 export const withIdentify = (
   userFound?: boolean,
   availableChallengeKinds?: string[],
+  isUnverified?: boolean,
 ) =>
   mockRequest({
     method: 'post',
     path: '/hosted/identify',
     response: {
       userFound,
+      isUnverified: isUnverified ?? false,
       availableChallengeKinds: availableChallengeKinds ?? ['sms', 'biometric'],
       hasSyncablePassKey: true,
     },
@@ -180,6 +182,9 @@ export const bootstrapNewUser = async (isNoPhone?: boolean) => {
         isNoPhone ? 'Verify your email' : 'Verify your phone number',
       ),
     ).toBeInTheDocument();
+  });
+  await waitFor(() => {
+    expect(screen.queryByText('Welcome back! 🎉')).toBeNull();
   });
   await waitFor(() => {
     expect(screen.getByTestId('navigation-close-button')).toBeInTheDocument();

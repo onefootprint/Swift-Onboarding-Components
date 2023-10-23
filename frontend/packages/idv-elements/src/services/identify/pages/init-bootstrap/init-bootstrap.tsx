@@ -34,11 +34,18 @@ const InitBootstrap = () => {
         );
       });
 
-    if (authTokenIdentify?.userFound) {
+    const {
+      userFound,
+      isUnverified,
+      hasSyncablePassKey = false,
+      availableChallengeKinds,
+    } = authTokenIdentify || {};
+    if (userFound) {
       return {
+        isUnverified,
         successfulIdentifier: identifier,
-        hasSyncablePassKey: !!authTokenIdentify.hasSyncablePassKey,
-        availableChallengeKinds: authTokenIdentify.availableChallengeKinds,
+        hasSyncablePassKey,
+        availableChallengeKinds,
       };
     }
 
@@ -92,12 +99,14 @@ const InitBootstrap = () => {
       successfulIdentifier,
       availableChallengeKinds,
       hasSyncablePassKey,
+      isUnverified = false,
     } = identifyResult;
 
     send({
       type: 'identified',
       payload: {
         userFound: true,
+        isUnverified,
         email,
         phoneNumber,
         successfulIdentifier,

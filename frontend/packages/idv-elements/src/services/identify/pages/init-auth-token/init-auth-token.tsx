@@ -28,14 +28,21 @@ const InitAuthToken = ({ authToken }: InitAuthTokenProps) => {
         sandboxId,
         identifier,
       });
-      if (authTokenIdentify.userFound) {
+      const {
+        userFound,
+        isUnverified,
+        availableChallengeKinds,
+        hasSyncablePassKey = false,
+      } = authTokenIdentify || {};
+      if (userFound) {
         send({
           type: 'identified',
           payload: {
-            userFound: true,
+            userFound,
+            isUnverified,
             successfulIdentifier: identifier,
-            availableChallengeKinds: authTokenIdentify.availableChallengeKinds,
-            hasSyncablePassKey: !!authTokenIdentify.hasSyncablePassKey,
+            availableChallengeKinds,
+            hasSyncablePassKey,
           },
         });
         return;

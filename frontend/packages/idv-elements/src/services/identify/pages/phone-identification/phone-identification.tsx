@@ -56,6 +56,7 @@ const PhoneIdentification = () => {
       {
         onSuccess: ({
           userFound,
+          isUnverified,
           availableChallengeKinds,
           hasSyncablePassKey,
         }: IdentifyResponse) => {
@@ -64,6 +65,7 @@ const PhoneIdentification = () => {
             payload: {
               phoneNumber: phoneFromForm,
               userFound,
+              isUnverified,
               successfulIdentifier: { phoneNumber: phoneFromForm },
               availableChallengeKinds,
               hasSyncablePassKey,

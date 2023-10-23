@@ -170,6 +170,32 @@ describe('<Identify />', () => {
   });
 
   describe('When running a live onboarding config', () => {
+    describe('When onboarding for API-only user', () => {
+      beforeEach(() => {
+        withIdentify(true, [ChallengeKind.sms], true);
+        withUserTokenInsufficientScopes();
+        withIdentifyVerify();
+        withLoginChallenge(ChallengeKind.sms);
+      });
+
+      it('initiates a step up challenge using SMS', async () => {
+        const authToken = 'tok_1234';
+        const onDone = jest.fn();
+
+        renderIdentify({
+          initialAuthToken: authToken,
+          config: liveOnboardingConfigFixture,
+          onDone,
+        });
+
+        await expectShimmer();
+        await bootstrapNewUser();
+        await waitFor(() => {
+          expect(onDone).toHaveBeenCalled();
+        });
+      });
+    });
+
     describe('When there is bootstrap email', () => {
       describe('When user found', () => {
         beforeEach(() => {
