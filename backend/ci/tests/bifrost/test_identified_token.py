@@ -23,9 +23,8 @@ def test_onboarded_vault(twilio, progressive_ob_config, sandbox_user, sandbox_te
     body = post(f"entities/{sandbox_user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
-    auth_token = step_up_user(
-        twilio, auth_token, sandbox_user.client.data["id.phone_number"]
-    )
+    phone_number = sandbox_user.client.data["id.phone_number"]
+    auth_token = step_up_user(twilio, auth_token, phone_number, False)
 
     # re-run Bifrost with the token from the link we sent to user
     bifrost = BifrostClient.raw_auth(
@@ -51,7 +50,7 @@ def test_api_vault(twilio, progressive_ob_config, sandbox_tenant):
     body = post(f"entities/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
-    auth_token = step_up_user(twilio, auth_token, FIXTURE_PHONE_NUMBER)
+    auth_token = step_up_user(twilio, auth_token, FIXTURE_PHONE_NUMBER, True)
 
     # re-run Bifrost with the token from the link we sent to user
     bifrost = BifrostClient.raw_auth(
@@ -73,7 +72,7 @@ def test_redo_onboard(twilio, progressive_ob_config, sandbox_tenant):
     body = post(f"entities/{user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
-    auth_token = step_up_user(twilio, auth_token, FIXTURE_PHONE_NUMBER)
+    auth_token = step_up_user(twilio, auth_token, FIXTURE_PHONE_NUMBER, False)
 
     bifrost2 = BifrostClient.raw_auth(
         progressive_ob_config,

@@ -3,6 +3,7 @@ use crate::send_email_challenge_non_blocking;
 use crate::ChallengeData;
 use crate::ChallengeState;
 use crate::State;
+use crate::UserChallengeContext;
 use crate::VaultIdentifier;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::user::UserAuthContext;
@@ -80,18 +81,19 @@ pub async fn post(
     let twilio_client = &state.sms_client;
 
     // Look up existing user vault by identifier
-    let (uvw, creds, _) = if let Some(user_challenge_context) =
-        crate::get_user_challenge_context(&state, identifier, ob_context, root_span).await?
-    {
-        user_challenge_context
-    } else {
+    let Some(ctx) = crate::get_user_challenge_context(&state, identifier, ob_context, root_span).await? else {
         // The user vault doesn't exist. Just return that the user wasn't found
         return Err(ChallengeError::LoginChallengeUserNotFound.into());
     };
+    let UserChallengeContext {
+        vw,
+        webauthn_creds: creds,
+        ..
+    } = ctx;
 
     // If we need to create a challenge, extract the phone number for the user
-    let sandbox_id = uvw.vault.sandbox_id.clone();
-    let vault_id = uvw.vault.id.clone();
+    let sandbox_id = vw.vault.sandbox_id.clone();
+    let vault_id = vw.vault.id.clone();
 
     let challenge_kind = match preferred_challenge_kind {
         // Fall back to SMS if the user requested webauthn but doesn't have any creds
@@ -108,12 +110,12 @@ pub async fn post(
     let (rx, challenge_state_data, time_before_retry_s, phone_number, biometric_challenge_json) =
         match challenge_kind {
             ChallengeKind::Biometric => {
-                let challenge = initiate_biometric_challenge_for_user(&state, &uvw.vault.id, creds).await?;
+                let challenge = initiate_biometric_challenge_for_user(&state, &vw.vault.id, creds).await?;
                 let challenge_data = ChallengeData::Passkey(challenge.state);
                 (None, challenge_data, 0, None, Some(challenge.challenge_json))
             }
             ChallengeKind::Sms => {
-                let phone_number = uvw.get_decrypted_verified_primary_phone(&state).await?;
+                let phone_number = vw.get_decrypted_verified_primary_phone(&state).await?;
                 let s_id = telemetry_headers.session_id;
                 let (rx, challenge_state, time_before_retry_s) = twilio_client
                     .send_challenge_non_blocking(&state, tenant, &phone_number, vault_id, sandbox_id, s_id)
@@ -128,7 +130,7 @@ pub async fn post(
                 )
             }
             ChallengeKind::Email => {
-                let email = uvw.get_decrypted_verified_email(&state).await?;
+                let email = vw.get_decrypted_verified_email(&state).await?;
                 let tenant = tenant.ok_or(OnboardingError::MissingObPkAuth)?;
 
                 let challenge_data =

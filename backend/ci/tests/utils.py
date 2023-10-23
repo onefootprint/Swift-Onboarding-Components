@@ -203,7 +203,7 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
         raise last_exception
 
 
-def step_up_user(twilio, token, recipient_phone_number):
+def step_up_user(twilio, token, recipient_phone_number, expect_unverified):
     """
     Step up a token from unauthed, "identified" to authed with onboarding scope
     """
@@ -213,6 +213,7 @@ def step_up_user(twilio, token, recipient_phone_number):
 
     body = identify_user(None, token)
     assert "sms" in body["available_challenge_kinds"]
+    assert body["is_unverified"] == expect_unverified
     challenge_data = challenge_user(recipient_phone_number, "sms", token)
 
     # Log in as the user

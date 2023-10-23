@@ -113,6 +113,12 @@ pub enum VaultIdentifier {
     IdentifyId(IdentifyId, Option<SandboxId>),
     AuthenticatedId(CheckedUserAuthContext),
 }
+pub struct UserChallengeContext {
+    vw: VaultWrapper<Person>,
+    webauthn_creds: Vec<WebauthnCredential>,
+    challenge_kinds: Vec<ChallengeKind>,
+    is_unverified: bool,
+}
 
 #[allow(clippy::type_complexity)]
 #[tracing::instrument(skip(state, root_span))]
@@ -121,7 +127,7 @@ async fn get_user_challenge_context(
     identifier: VaultIdentifier,
     obc: Option<ObConfigAuth>,
     root_span: RootSpan,
-) -> Result<Option<(VaultWrapper<Person>, Vec<WebauthnCredential>, Vec<ChallengeKind>)>, ApiError> {
+) -> Result<Option<UserChallengeContext>, ApiError> {
     // Look up existing user vault by identifier
     let t_id = obc.as_ref().map(|obc| &obc.tenant().id);
     let (existing_user, sv_id) = match identifier {
@@ -194,14 +200,21 @@ async fn get_user_challenge_context(
     if !creds.is_empty() {
         kinds.push(ChallengeKind::Biometric);
     }
-    if kinds.is_empty() && cis.iter().any(|(k, _)| *k == ContactInfoKind::Phone) && !uvw.vault.is_portable {
+    let is_unverified =
+        kinds.is_empty() && !uvw.vault.is_portable && cis.iter().any(|(k, _)| *k == ContactInfoKind::Phone);
+    if is_unverified {
         // If this is a non-portable vault with a phone, allow initiating a challenge to the phone
         // We would _only_ get here if an unauthed, identified token is passed into identify
-        // TODO return more context to the client
         kinds.push(ContactInfoKind::Phone.into());
     }
 
-    Ok(Some((uvw, creds, kinds)))
+    let ctx = UserChallengeContext {
+        vw: uvw,
+        webauthn_creds: creds,
+        challenge_kinds: kinds,
+        is_unverified,
+    };
+    Ok(Some(ctx))
 }
 
 pub fn send_email_challenge_non_blocking(

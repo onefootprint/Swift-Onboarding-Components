@@ -1,4 +1,4 @@
-use crate::VaultIdentifier;
+use crate::{UserChallengeContext, VaultIdentifier};
 
 use super::ChallengeKind;
 
@@ -21,6 +21,7 @@ pub struct IdentifyResponse {
     /// signals that one or more biometric credentials
     /// support syncing and may be available to use on desktop/other devices
     has_syncable_pass_key: bool,
+    is_unverified: bool,
 }
 
 #[api_v2_operation(
@@ -53,28 +54,30 @@ pub async fn post(
     };
 
     // Look up existing user vault by identifier
-    let (_, creds, kinds) = if let Some(ctx) =
-        crate::get_user_challenge_context(&state, identifier, ob_context, root_span).await?
-    {
-        ctx
-    } else {
+    let Some(ctx) = crate::get_user_challenge_context(&state, identifier, ob_context, root_span).await? else {
         // The user vault doesn't exist. Just return that the user wasn't found
         return Ok(Json(ResponseData {
             data: IdentifyResponse {
                 user_found: false,
+                is_unverified: false,
                 available_challenge_kinds: None,
                 has_syncable_pass_key: false,
             },
         }));
     };
 
-    let available_challenge_kinds: Option<Vec<ChallengeKind>> = Some(kinds);
+    let UserChallengeContext {
+        vw: _,
+        webauthn_creds,
+        challenge_kinds,
+        is_unverified,
+    } = ctx;
 
-    let has_syncable_pass_key = creds.iter().any(|cred| cred.backup_state);
-
+    let has_syncable_pass_key = webauthn_creds.iter().any(|cred| cred.backup_state);
     let response = IdentifyResponse {
+        is_unverified,
         user_found: true,
-        available_challenge_kinds,
+        available_challenge_kinds: Some(challenge_kinds),
         has_syncable_pass_key,
     };
     ResponseData::ok(response).json()
