@@ -18,7 +18,7 @@ const CheckRequirements = () => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
     startedDataCollection,
-    onboardingContext: { authToken, isTransfer },
+    onboardingContext: { authToken, isTransfer, overallOutcome },
     collectedKycData,
   } = state.context;
   const [error, setError] = useState(false);
@@ -68,7 +68,7 @@ const CheckRequirements = () => {
       payload[0].kind === OnboardingRequirementKind.process
     ) {
       processMutation.mutate(
-        { authToken },
+        { authToken, fixtureResult: overallOutcome },
         {
           onSuccess: refetch,
           onError: (processErr: unknown) => {
