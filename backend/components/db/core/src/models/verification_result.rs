@@ -2,10 +2,12 @@ use crate::DbError;
 use crate::{DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{decision_intent, verification_request, verification_result};
+use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::Insertable;
 use newtypes::{
-    ScrubbedPiiJsonValue, SealedVaultBytes, VendorAPI, VerificationRequestId, VerificationResultId,
+    ScopedVaultId, ScrubbedPiiJsonValue, SealedVaultBytes, VendorAPI, VerificationRequestId,
+    VerificationResultId,
 };
 
 use super::decision_intent::DecisionIntent;
@@ -105,6 +107,23 @@ impl VerificationResult {
             .inner_join(verification_result::table)
             .filter(verification_result::id.eq(id))
             .first(conn)?;
+        Ok(res)
+    }
+
+    #[tracing::instrument("VerificationResult::get_latest_successful_by_vendor_api", skip_all)]
+    pub fn get_latest_successful_by_vendor_api(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+        vendor_api: &VendorAPI,
+    ) -> DbResult<Option<RequestAndResult>> {
+        let res = verification_request::table
+            .inner_join(verification_result::table)
+            .filter(verification_request::scoped_vault_id.eq(sv_id))
+            .filter(verification_request::vendor_api.eq(vendor_api))
+            .filter(not(verification_result::is_error))
+            .order_by(verification_result::timestamp.desc())
+            .first(conn)
+            .optional()?;
         Ok(res)
     }
 }

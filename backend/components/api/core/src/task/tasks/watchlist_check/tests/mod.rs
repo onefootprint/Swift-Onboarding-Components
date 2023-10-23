@@ -8,6 +8,7 @@ use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
 use db::models::task::Task;
 use db::models::user_timeline::UserTimeline;
+use db::models::vault::Vault;
 use db::models::verification_request::{RequestAndMaybeResult, VerificationRequest};
 use db::models::watchlist_check::WatchlistCheck;
 use db::tests::fixtures;
@@ -16,8 +17,13 @@ use db::DbPool;
 use db::DbResult;
 use idv::idology::pa::{IdologyPaAPIResponse, IdologyPaRequest};
 use idv::incode::response::OnboardingStartResponse;
+use idv::incode::watchlist::response::UpdatedWatchlistResultResponse;
+use idv::incode::IncodeAPIResult;
 use idv::incode::IncodeResponse;
 use idv::incode::IncodeStartOnboardingRequest;
+use idv::ParsedResponse;
+use idv::VendorResponse;
+use newtypes::DecisionIntentKind;
 use newtypes::EnhancedAmlOption;
 use newtypes::RiskSignalGroupKind;
 use newtypes::TaskId;
@@ -96,6 +102,31 @@ async fn run_task(state: &mut State, sv_id: &ScopedVaultId, task_id: &TaskId) ->
         scoped_vault_id: sv_id.clone(),
     };
     wct.execute(&args).await
+}
+
+async fn save_existing_watchlist_check_vres(state: &mut State, sv_id: &ScopedVaultId) {
+    let sv_id = sv_id.clone();
+    let res = idv::tests::fixtures::incode::watchlist_result_response(vec![]);
+    let vr = Ok(VendorResponse {
+        response: ParsedResponse::IncodeWatchlistCheck(res.result.into_success().unwrap()),
+        raw_response: res.raw_response,
+    });
+    state
+        .db_pool
+        .db_query(move |conn| {
+            let v = Vault::get(conn, &sv_id).unwrap();
+            let di = DecisionIntent::create(conn, DecisionIntentKind::OnboardingKyc, &sv_id, None).unwrap();
+            let (_vreq, _vres) = crate::decision::vendor::verification_result::save_vreq_and_vres(
+                conn,
+                &v.public_key,
+                &sv_id,
+                &di.id,
+                vr,
+            )
+            .unwrap();
+        })
+        .await
+        .unwrap()
 }
 
 async fn get_data(
@@ -193,6 +224,50 @@ fn mock_incode_watchlist_check(state: &mut State, vendor_result: &VendorRes) {
         .times(1)
         .return_once(move |_| res);
     state.set_incode_watchlist_check(Arc::new(mock_incode_watchlist_check));
+}
+
+fn mock_incode_updated_watchlist_result(state: &mut State, vendor_result: &VendorRes) {
+    let res = match vendor_result {
+        VendorRes::Hit => Ok(idv::tests::fixtures::incode::watchlist_result_response(vec![
+            "sanction".to_owned(),
+        ])),
+        VendorRes::NoHit => Ok(idv::tests::fixtures::incode::watchlist_result_response(vec![])),
+        VendorRes::Error => Ok(idv::tests::fixtures::incode::watchlist_result_error_response()),
+    }
+    // To convert from WatchlistResultResponse -> UpdatedWatchlistResultResponse
+    .map(|r| match r.result {
+        IncodeAPIResult::Success(v) => IncodeResponse {
+            result: IncodeAPIResult::Success(UpdatedWatchlistResultResponse(v)),
+            raw_response: r.raw_response,
+        },
+        IncodeAPIResult::ResponseError(e) => IncodeResponse {
+            result: IncodeAPIResult::ResponseError(e),
+            raw_response: r.raw_response,
+        },
+    });
+
+    let mut mock_incode_start_onboarding = MockVendorAPICall::<
+        IncodeStartOnboardingRequest,
+        IncodeResponse<OnboardingStartResponse>,
+        idv::incode::error::Error,
+    >::new();
+    mock_incode_start_onboarding
+        .expect_make_request()
+        .times(1)
+        .return_once(move |_| Ok(idv::tests::fixtures::incode::start_onboarding_response()));
+    state.set_incode_start_onboarding(Arc::new(mock_incode_start_onboarding));
+
+    let mut mock_incode_updated_watchlist_result = MockVendorAPICall::<
+        idv::incode::watchlist::IncodeUpdatedWatchlistResultRequest,
+        IncodeResponse<idv::incode::watchlist::response::UpdatedWatchlistResultResponse>,
+        idv::incode::error::Error,
+    >::new();
+
+    mock_incode_updated_watchlist_result
+        .expect_make_request()
+        .times(1)
+        .return_once(move |_| res);
+    state.set_incode_updated_watchlist_result(Arc::new(mock_incode_updated_watchlist_result));
 }
 
 fn expect_webhook(state: &mut State, status: WatchlistCheckStatusKind, error: Option<WatchlistCheckError>) {

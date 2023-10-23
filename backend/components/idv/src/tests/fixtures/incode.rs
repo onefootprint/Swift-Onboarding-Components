@@ -1,11 +1,9 @@
-use newtypes::{PiiJsonValue, PiiString};
-use serde_json::json;
-
 use crate::incode::{
     response::{self, OnboardingStartResponse},
     watchlist::response::{Content, Data, Doc, Hit, WatchlistResultResponse},
     IncodeAPIResult, IncodeResponse,
 };
+use newtypes::{PiiJsonValue, PiiString};
 
 pub fn start_onboarding_response() -> IncodeResponse<OnboardingStartResponse> {
     let result = OnboardingStartResponse {
@@ -33,7 +31,7 @@ pub fn watchlist_result_response(list_types: Vec<String>) -> IncodeResponse<Watc
     let content = Content {
         data: Some(Data {
             id: None,
-            ref_: None,
+            ref_: Some("ref123abc".to_owned().into()),
             filters: None,
             hits: Some(vec![Hit {
                 score: Some(3.3),
@@ -66,25 +64,27 @@ pub fn watchlist_result_response(list_types: Vec<String>) -> IncodeResponse<Watc
             share_url: None,
         }),
     };
+    let res = WatchlistResultResponse {
+        status: Some("sucess".to_owned()),
+        content: Some(content),
+        error: None,
+    };
     IncodeResponse {
-        result: IncodeAPIResult::Success(WatchlistResultResponse {
-            status: Some("sucess".to_owned()),
-            content: Some(content),
-            error: None,
-        }),
-        raw_response: PiiJsonValue::from(json!({})),
+        result: IncodeAPIResult::Success(res.clone()),
+        raw_response: PiiJsonValue::from(serde_json::to_value(&res).unwrap()),
     }
 }
 
 pub fn watchlist_result_error_response() -> IncodeResponse<WatchlistResultResponse> {
+    let res = response::Error {
+        timestamp: 16953352387367i64,
+        status: 4040,
+        error: "Something bad happened yo".to_owned(),
+        message: None,
+        path: None,
+    };
     IncodeResponse {
-        result: IncodeAPIResult::ResponseError(response::Error {
-            timestamp: 16953352387367i64,
-            status: 4040,
-            error: "Something bad happened yo".to_owned(),
-            message: None,
-            path: None,
-        }),
-        raw_response: PiiJsonValue::from(json!({})),
+        result: IncodeAPIResult::ResponseError(res.clone()),
+        raw_response: PiiJsonValue::from(serde_json::to_value(&res).unwrap()),
     }
 }

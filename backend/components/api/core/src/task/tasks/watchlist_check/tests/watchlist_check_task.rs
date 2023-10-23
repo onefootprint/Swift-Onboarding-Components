@@ -1,9 +1,10 @@
 use crate::task::tasks::watchlist_check::tests::*;
-
 use crate::task::TaskError;
 use crate::State;
 use db::test_helpers::assert_have_same_elements;
+use db::tests::test_db_pool::TestDbPool;
 use feature_flag::MockFeatureFlagClient;
+use macros::test_state;
 use macros::test_state_case;
 use newtypes::FootprintReasonCode;
 use newtypes::VendorAPI;
@@ -186,10 +187,13 @@ async fn active_users(
     if vault_kind.expects_idology() {
         mock_idology_pa(state, &vendor_res);
     } else {
+        // Simulate there being an existing search we just need to re-ping, since this is the most common case
+        save_existing_watchlist_check_vres(state, &sv.id).await;
+
         let mut mock_ff_client = MockFeatureFlagClient::new();
         mock_ff_client.expect_flag().return_once(move |_| true);
         state.set_ff_client(Arc::new(mock_ff_client));
-        mock_incode_watchlist_check(state, &vendor_res);
+        mock_incode_updated_watchlist_result(state, &vendor_res);
     }
     expect_webhook(state, expected_status, None);
 
@@ -214,14 +218,48 @@ async fn active_users(
         assert!(vreqs[0].1.is_some());
         assert!(!vreqs[0].1.as_ref().unwrap().is_error);
     } else {
-        assert_eq!(2, vreqs.len()); //1 for start onboarding, 1 for watchlist call
+        assert_eq!(2, vreqs.len()); //1 for start onboarding, 1 for IncodeUpdatedWatchlistResultcall. NO calls to IncodeWatchlistCheck itself!
         let vreq_vres = vreqs
             .iter()
-            .find(|v| v.0.vendor_api == VendorAPI::IncodeWatchlistCheck)
+            .find(|v| v.0.vendor_api == VendorAPI::IncodeUpdatedWatchlistResult)
             .unwrap();
         assert!(vreq_vres.1.is_some());
         assert!(!vreq_vres.1.as_ref().unwrap().is_error);
     }
+}
+
+#[test_state]
+async fn incode_no_existing_watchlist_check_vres(state: &mut State) {
+    // SETUP
+    let (sv, task) = create_user_and_task(
+        &state.db_pool,
+        VaultKind::Portable(enhanced_aml_option_yes()),
+        true,
+        OnboardingStatus::Pass,
+        full_vault(),
+    )
+    .await;
+
+    // No vres for IncodeWatchlistCheck exists! Theoretically an impossible scenario (cause we should have made such a call when the sv was onboarded) but still good to handle and this will be extended to handle 2 more cases where a fresh search must be performed: (1) if its been >365d
+    let mut mock_ff_client = MockFeatureFlagClient::new();
+    mock_ff_client.expect_flag().return_once(move |_| true);
+    state.set_ff_client(Arc::new(mock_ff_client));
+    mock_incode_watchlist_check(state, &VendorRes::NoHit);
+
+    // expect_webhook(state, expected_status, None);
+
+    // RUN
+    let _ = run_task(state, &sv.id, &task.id).await;
+
+    // ASSERTIONS
+    let (_, _, vreqs, _, _) = get_data(&state.db_pool, sv.id).await;
+
+    assert_eq!(2, vreqs.len()); //1 for start onboarding, 1 for watchlist call
+    let vreq_vres = vreqs
+        .iter()
+        .find(|v| v.0.vendor_api == VendorAPI::IncodeWatchlistCheck)
+        .unwrap();
+    assert!(vreq_vres.1.is_some());
 }
 
 fn enhanced_aml_option_yes() -> EnhancedAmlOption {
