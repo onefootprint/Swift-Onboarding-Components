@@ -14,7 +14,10 @@ export type BasicData = Required<
 > &
   Pick<
     BusinessDIData,
-    BusinessDI.doingBusinessAs | BusinessDI.phoneNumber | BusinessDI.website
+    | BusinessDI.doingBusinessAs
+    | BusinessDI.corporationType
+    | BusinessDI.phoneNumber
+    | BusinessDI.website
   >;
 
 export type BusinessAddressData = Required<

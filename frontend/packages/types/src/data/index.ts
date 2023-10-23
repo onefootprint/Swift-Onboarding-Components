@@ -41,6 +41,7 @@ export {
   documentCdoFor,
 } from './collected-data-option';
 export { default as ComplianceStatus } from './compliance-status';
+export { default as CorporationType } from './corporation-type';
 export type { CountryCode, CountryCode3 } from './countries';
 export { isCountryCode } from './countries';
 export type { D2PMeta } from './d2p-meta';

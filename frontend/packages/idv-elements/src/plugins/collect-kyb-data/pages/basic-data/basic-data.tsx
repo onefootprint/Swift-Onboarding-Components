@@ -32,7 +32,7 @@ const BasicData = ({
   const { authToken, config, data, kybRequirement } = state.context;
   const { missingAttributes } = kybRequirement || {};
   const { mutation, syncData } = useSyncData();
-  const { t } = useTranslation('pages.basic-data');
+  const { t, allT } = useTranslation('pages.basic-data');
 
   const handleSubmit = (basicData: BasicDataFields) => {
     const handleSuccess = () => {
@@ -67,24 +67,39 @@ const BasicData = ({
     });
   };
 
+  const corpTypeValue = data?.[BusinessDI.corporationType];
   const defaultValues = {
     name: data?.[BusinessDI.name],
     doingBusinessAs: data?.[BusinessDI.doingBusinessAs],
     tin: data?.[BusinessDI.tin],
+    corporationType: corpTypeValue
+      ? {
+          value: corpTypeValue,
+          label: allT(
+            `pages.basic-data.form.corporation-type.mapping.${corpTypeValue}`,
+          ),
+        }
+      : undefined,
     phoneNumber: data?.[BusinessDI.phoneNumber],
     website: data?.[BusinessDI.website],
   };
+
   const optionalFields = missingAttributes
     .filter(
       attr =>
+        attr === CollectedKybDataOption.corporationType ||
         attr === CollectedKybDataOption.phoneNumber ||
         attr === CollectedKybDataOption.website,
     )
     .map(attr => CollectedKybDataOptionToRequiredAttributes[attr])
-    .flat() as (BusinessDI.phoneNumber | BusinessDI.website)[];
+    .flat() as (
+    | BusinessDI.corporationType
+    | BusinessDI.phoneNumber
+    | BusinessDI.website
+  )[];
 
   return (
-    <Stack direction="column" gap={7}>
+    <Stack direction="column" gap={7} sx={{ width: '100%' }}>
       {!hideHeader && (
         <>
           <CollectKybDataNavigationHeader />

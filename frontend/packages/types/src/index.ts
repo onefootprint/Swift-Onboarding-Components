@@ -299,6 +299,7 @@ export {
   CollectedKycDataOption,
   CollectedKycDataOptionToRequiredAttributes,
   ComplianceStatus,
+  CorporationType,
   D2PStatus,
   D2PStatusUpdate,
   DataIdentifierKeys,

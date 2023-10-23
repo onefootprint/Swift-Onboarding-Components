@@ -195,6 +195,7 @@
         "business": {
           "name": "Name",
           "dba": "Doing Business As",
+          "corporation_type": "Legal entity type",
           "website": "Website",
           "phone_number": "Phone number",
           "tin": "Taxpayer Identification Number (TIN)",

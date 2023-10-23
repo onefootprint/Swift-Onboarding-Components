@@ -137,6 +137,10 @@ const SecurityLogsFilters = () => {
                   value: BusinessDI.tin,
                 },
                 {
+                  label: allT(`di.${BusinessDI.corporationType}`),
+                  value: BusinessDI.corporationType,
+                },
+                {
                   label: allT(`di.${BusinessDI.phoneNumber}`),
                   value: BusinessDI.phoneNumber,
                 },

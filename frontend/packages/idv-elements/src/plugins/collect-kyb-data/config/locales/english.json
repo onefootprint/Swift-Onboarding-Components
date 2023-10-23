@@ -47,6 +47,23 @@
             "pattern": "TIN has to be in the format 12-3456789"
           }
         },
+        "corporation-type": {
+          "label": "Legal entity type",
+          "mapping": {
+            "agent": "Agent",
+            "c_corporation": "C Corporation",
+            "s_corporation": "S Corporation",
+            "b_corporation": "B Corporation",
+            "llc": "LLC",
+            "llp": "LLP",
+            "non_profit": "Non-profit",
+            "partnership": "Partnership",
+            "sole_proprietorship": "Sole proprietorship",
+            "trust": "Trust",
+            "unknown": "Unknown"
+          },
+          "error": "Legal entity type cannot be empty or is invalid"
+        },
         "website": {
           "label": "Website",
           "placeholder": "https://www.acmebank.com",
@@ -184,6 +201,7 @@
         "business-name": "Business name",
         "doing-business-as": "Doing Business As (optional)",
         "tin": "Taxpayer Identification Number (TIN)",
+        "corporation-type": "Legal entity type",
         "website": "Website",
         "phone-number": "Phone number"
       },

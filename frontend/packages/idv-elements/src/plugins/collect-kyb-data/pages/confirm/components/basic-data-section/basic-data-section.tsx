@@ -44,6 +44,16 @@ const BasicDataSection = () => {
     });
   }
 
+  const corporationType = data[BusinessDI.corporationType];
+  if (corporationType) {
+    basicInfo.push({
+      text: t('corporation-type'),
+      subtext: allT(
+        `pages.basic-data.form.corporation-type.mapping.${corporationType}`,
+      ),
+    });
+  }
+
   const website = data[BusinessDI.website];
   if (website) {
     basicInfo.push({

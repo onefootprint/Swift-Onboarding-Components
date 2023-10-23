@@ -1,8 +1,9 @@
 import { useInputMask, useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import { BusinessDI } from '@onefootprint/types';
-import { PhoneInput, Stack, TextInput } from '@onefootprint/ui';
+import { BusinessDI, CorporationType } from '@onefootprint/types';
+import type { SelectOption } from '@onefootprint/ui';
+import { PhoneInput, Select, Stack, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import type { UseFormSetError } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
@@ -16,6 +17,7 @@ type FormData = {
   name: string;
   tin: string;
   doingBusinessAs?: string;
+  corporationType?: SelectOption;
   phoneNumber?: string;
   website?: string;
 };
@@ -27,7 +29,11 @@ type T = ReturnType<typeof useTranslation>['t'];
 
 export type BasicDataFormProps = {
   defaultValues?: Partial<FormData>;
-  optionalFields?: (BusinessDI.phoneNumber | BusinessDI.website)[];
+  optionalFields?: (
+    | BusinessDI.corporationType
+    | BusinessDI.phoneNumber
+    | BusinessDI.website
+  )[];
   isLoading: boolean;
   onSubmit: (data: BasicData) => void;
   onCancel?: () => void;
@@ -98,6 +104,7 @@ const BasicDataForm = ({
         ? formData.doingBusinessAs
         : undefined,
       [BusinessDI.tin]: formData.tin,
+      [BusinessDI.corporationType]: formData.corporationType?.value,
       [BusinessDI.phoneNumber]: formData.phoneNumber,
       [BusinessDI.website]: formData.website,
     };
@@ -111,6 +118,11 @@ const BasicDataForm = ({
 
     onSubmit(basicData);
   };
+
+  const corporationTypeOptions = Object.values(CorporationType).map(value => ({
+    label: t(`corporation-type.mapping.${value}`),
+    value,
+  }));
 
   return (
     <Form onSubmit={handleSubmit(onSubmitFormData)}>
@@ -148,6 +160,36 @@ const BasicDataForm = ({
             },
           })}
         />
+
+        {optionalFields?.includes(BusinessDI.corporationType) && (
+          <Controller
+            data-private
+            control={control}
+            name="corporationType"
+            rules={{
+              required: {
+                value: true,
+                message: t('corporation-type.error'),
+              },
+            }}
+            render={({
+              field: { onChange, onBlur, value, name },
+              fieldState: { error },
+            }) => (
+              <Select
+                data-private
+                hasError={!!error}
+                label={t('corporation-type.label')}
+                options={corporationTypeOptions}
+                name={name}
+                onBlur={onBlur}
+                onChange={onChange}
+                value={value}
+              />
+            )}
+          />
+        )}
+
         {optionalFields?.includes(BusinessDI.website) && (
           <TextInput
             data-private

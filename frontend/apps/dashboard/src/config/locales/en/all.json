@@ -287,6 +287,7 @@
     "business": {
       "name": "Name",
       "dba": "Doing Business As",
+      "corporation_type": "Legal entity type",
       "website": "Website",
       "phone_number": "Phone number",
       "tin": "Taxpayer Identification Number (TIN)",
@@ -347,7 +348,7 @@
     "business_address": "Registered business address",
     "business_phone_number": "Business phone number",
     "business_website": "Business website",
-    "business_corporation_type": "Business corporation type",
+    "business_corporation_type": "Legal entity type",
     "business_beneficial_owners": "Business beneficial owners",
     "business_kyced_beneficial_owners": "Business beneficial owners (Fully-KYCed)",
     "investor_profile": "Investor profile",
@@ -1462,7 +1463,20 @@
       },
       "vault": {
         "basic": {
-          "title": "Basic data"
+          "title": "Basic data",
+          "corporation-type": {
+            "agent": "Agent",
+            "c_corporation": "C Corporation",
+            "s_corporation": "S Corporation",
+            "b_corporation": "B Corporation",
+            "llc": "LLC",
+            "llp": "LLP",
+            "non_profit": "Non-profit",
+            "partnership": "Partnership",
+            "sole_proprietorship": "Sole proprietorship",
+            "trust": "Trust",
+            "unknown": "Unknown"
+          }
         },
         "bos": {
           "title": "Beneficial owners",
