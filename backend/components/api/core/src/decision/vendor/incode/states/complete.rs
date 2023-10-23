@@ -24,7 +24,6 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::RiskSignal;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
-use db::models::workflow::Workflow;
 use db::DbPool;
 use db::TxnPgConn;
 use idv::incode::doc::response::FetchOCRResponse;
@@ -170,7 +169,6 @@ impl Complete {
         let uvw = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
         let (id_doc, doc_request) = IdentityDocument::get(conn, id_doc_id)?;
         let (obc, _) = ObConfiguration::get(conn, &doc_request.workflow_id)?;
-        let wf = Workflow::get(conn, &doc_request.workflow_id)?;
 
         // Create a timeline event
         let info = newtypes::IdentityDocumentUploadedInfo {
@@ -271,7 +269,7 @@ impl Complete {
         let mut validate_args = ValidateArgs::for_bifrost(vault.is_live);
         validate_args.allow_dangling_keys = true;
         // For doc-first onboardings, populate identity data
-        let id_data: Vec<(DataIdentifier, PiiString)> = if obc.is_doc_first && !wf.config.is_redo() {
+        let id_data = if obc.is_doc_first {
             if barcode_read_successfully {
                 doc_first_id_data(&fetch_ocr_response, validate_args)
                         .into_iter()

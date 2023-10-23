@@ -23,16 +23,6 @@ impl WorkflowConfig {
             Self::Kyb(_) => WorkflowKind::Kyb,
         }
     }
-
-    // If this is a Workflow that is not the first onboarding for the user
-    pub fn is_redo(&self) -> bool {
-        match self {
-            WorkflowConfig::Kyc(c) => c.is_redo,
-            WorkflowConfig::AlpacaKyc(c) => c.is_redo,
-            WorkflowConfig::Document(_) => true,
-            WorkflowConfig::Kyb(_) => false,
-        }
-    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
