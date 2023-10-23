@@ -36,6 +36,20 @@ def test_aml(sandbox_tenant, twilio, alpaca_kyc_ob_config):
                 None,
                 *sandbox_tenant.db_auths,
             )
+
+            access_events = get(
+                "org/access_events",
+                dict(search=user.fp_id),
+                *sandbox_tenant.db_auths,
+            )
+            access_event = access_events["data"][0]
+            assert ("Reviewing AML information", access_event["reason"])
+            assert ("decrypt", access_event["kind"])
+            assert (
+                ["id.first_name", "id.last_name", "id.dob"],
+                access_event["targets"],
+            )
+
             assert (
                 aml["share_url"]
                 == "https://app.eu.complyadvantage.com/public/search/abc/123"

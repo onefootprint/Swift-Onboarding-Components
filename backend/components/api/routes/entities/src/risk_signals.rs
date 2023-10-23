@@ -5,9 +5,16 @@ use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::auth::Either;
-
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
+use api_core::auth::CanDecrypt;
+use api_core::utils::headers::InsightHeaders;
+use db::models::access_event::NewAccessEvent;
+use db::models::insight_event::CreateInsightEvent;
+use newtypes::AccessEventKind;
+use newtypes::AccessEventPurpose;
+use newtypes::DataIdentifier;
+use newtypes::IdentityDataKind as IDK;
 
 use crate::utils::db2api::DbToApi;
 use crate::State;
@@ -17,6 +24,9 @@ use api_core::decision::vendor::vendor_result::VendorResult;
 use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::telemetry::RootSpan;
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::utils::vault_wrapper::VwArgs;
 use api_wire_types::AmlHit;
 use api_wire_types::AmlHitMedia;
 use api_wire_types::RiskSignalFilters;
@@ -27,6 +37,7 @@ use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::verification_request::RequestAndResult;
+use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::models::workflow::Workflow;
 use db::DbResult;
@@ -151,6 +162,8 @@ pub async fn get_detail(
     ResponseData::ok(api_wire_types::RiskSignalDetail::from_db((rs, has_aml_hits))).json()
 }
 
+const DECRYPT_AML_HITS_ACCESS_EVENT_REASON: &str = "Reviewing AML information";
+
 #[api_v2_operation(
     description = "Decrypts structured information about the AML hits for a AML risk signal.",
     tags(Entities, Private)
@@ -160,19 +173,59 @@ pub async fn decrypt_aml_hits(
     state: web::Data<State>,
     request: web::Path<(FpId, RiskSignalId)>,
     auth: TenantSessionAuth,
+    insights: InsightHeaders,
 ) -> JsonApiResponse<api_wire_types::AmlDetail> {
-    let auth = auth.check_guard(TenantGuard::Read)?;
-    let tenant_id = auth.tenant().id.clone();
-    let is_live = auth.is_live()?;
+    let read_auth = auth.clone().check_guard(TenantGuard::Read)?;
+    let tenant_id = read_auth.tenant().id.clone();
+    let is_live = read_auth.is_live()?;
     let (fp_id, risk_signal_id) = request.into_inner();
 
     // TODO: assert decrypt permissions + write AccessEvent. maybe just shoehorn into existing structs as (FirstName, MiddleName, LastName, Dob) or need to rework some of this stuff to not be so DI dependent
 
     let (_rs, aml_detail) =
-        get_risk_signal_and_maybe_aml_detail(&state, risk_signal_id, fp_id, tenant_id, is_live).await?;
-    let Some(aml_detail) = aml_detail else {
+        get_risk_signal_and_maybe_aml_detail(&state, risk_signal_id, fp_id, tenant_id.clone(), is_live)
+            .await?;
+    let Some((aml_detail, vreq)) = aml_detail else {
         Err(AssertionError("No AML hit data for risk signal"))?
     };
+
+    // Populate the vault with the seqno of the time of the AML call we made and figure out which of FirstName/LastName/Dob we would have sent to Incode
+    let sv_id = vreq.scoped_vault_id.clone();
+    let uvw = state
+        .db_pool
+        .db_query(move |conn| {
+            VaultWrapper::<Any>::build(
+                conn,
+                VwArgs::Historical(&vreq.scoped_vault_id, vreq.uvw_snapshot_seqno),
+            )
+        })
+        .await??;
+    let mut dis_searched: Vec<DataIdentifier> = vec![
+        IDK::FirstName.into(),
+        IDK::MiddleName.into(),
+        IDK::LastName.into(),
+        IDK::Dob.into(),
+    ];
+    dis_searched.retain(|i| uvw.has_field(i.clone()));
+
+    // check that auth has Decrypt permissions for these DIs. Note we don't check check_ob_config_access here- this seems unnecessary and we should never allow an OBC that makes AML calls but then doesn't allow the user to view the results
+    let auth = auth.check_guard(CanDecrypt::new(dis_searched.clone()))?;
+
+    // write an AccessEvent
+    let principal = auth.actor().into();
+    let insight = CreateInsightEvent::from(insights);
+    let event = NewAccessEvent {
+        scoped_vault_id: sv_id,
+        tenant_id,
+        is_live,
+        reason: Some(DECRYPT_AML_HITS_ACCESS_EVENT_REASON.to_owned()),
+        principal,
+        insight,
+        kind: AccessEventKind::Decrypt,
+        targets: dis_searched,
+        purpose: AccessEventPurpose::Api,
+    };
+    state.db_pool.db_query(|conn| event.create(conn)).await??;
 
     ResponseData::ok(aml_detail).json()
 }
@@ -183,7 +236,10 @@ async fn get_risk_signal_and_maybe_aml_detail(
     fp_id: FpId,
     tenant_id: TenantId,
     is_live: bool,
-) -> ApiResult<(RiskSignal, Option<api_wire_types::AmlDetail>)> {
+) -> ApiResult<(
+    RiskSignal,
+    Option<(api_wire_types::AmlDetail, VerificationRequest)>,
+)> {
     let (rs, vreq_vres_key_obc) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -209,7 +265,9 @@ async fn get_risk_signal_and_maybe_aml_detail(
         .await??;
 
     let aml_detail = if let Some((vreq_vres, key, obc)) = vreq_vres_key_obc {
-        get_aml_hits(state, &obc.enhanced_aml(), vreq_vres, key).await?
+        get_aml_hits(state, &obc.enhanced_aml(), vreq_vres.clone(), key)
+            .await?
+            .map(|a| (a, vreq_vres.0))
     } else {
         None
     };
