@@ -103,6 +103,21 @@ const vue: Option = {
   ],
 };
 
+const angular: Option = {
+  name: 'AngularJS',
+  links: [
+    {
+      name: 'AngularJS',
+      href: 'https://github.com/onefootprint/examples/tree/master/frontend-angular',
+      img: {
+        src: '/examples/angular.png',
+        height: 32,
+        width: 32,
+      },
+    },
+  ],
+};
+
 const mobile: Option = {
   name: 'Mobile',
   links: [
@@ -166,7 +181,7 @@ const customized: Option = {
   ],
 };
 
-const allOptions = [vanilla, customized, mobile, react, vue, go];
+const allOptions = [vanilla, customized, mobile, react, vue, angular, go];
 
 const getAllLinksAndRemovedDuplicated = () => {
   const links = allOptions.map(option => option.links).flat();

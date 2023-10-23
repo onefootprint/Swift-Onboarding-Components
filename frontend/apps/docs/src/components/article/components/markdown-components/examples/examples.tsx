@@ -32,8 +32,6 @@ const Examples = () => {
           const parts = img.src.split('/');
           const filename = parts.pop();
           const themedPath = `${parts.join('/')}/${theme}/${filename}`;
-
-          console.log(themedPath);
           return (
             <Item
               href={href}
