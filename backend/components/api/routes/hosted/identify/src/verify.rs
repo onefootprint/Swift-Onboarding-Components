@@ -174,10 +174,13 @@ pub async fn post(
             let scopes = scopes.into_iter().chain([sensitive_scope]).flatten().collect();
 
             let auth_token = if let Some(user_auth) = user_auth {
-                // Add the scopes / args to the existing auth token
-                let token = user_auth.auth_token.clone();
+                // Add the new scopes and args to the existing scopes and args on the auth token
                 let data = user_auth.data.clone().update(args, scopes, Some(auth_factor))?;
-                user_auth.update_session(conn, &session_key, data)?;
+                // TODO soon let's remove the ability to update the existing user session and
+                // instead require making a new session
+                // For backcompat, we'll also mutate the existing session for now
+                user_auth.update_session(conn, &session_key, data.clone())?;
+                let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
                 token
             } else {
                 // Otherwise, create a new token with these scopes / args
