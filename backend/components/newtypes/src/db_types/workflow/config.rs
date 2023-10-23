@@ -38,6 +38,7 @@ impl WorkflowConfig {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 
 pub struct KycConfig {
+    /// This isn't really used in many places anymore, can maybe rm
     pub is_redo: bool,
 }
 
@@ -50,6 +51,7 @@ impl From<KycConfig> for WorkflowConfig {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 
 pub struct AlpacaKycConfig {
+    /// This isn't really used in many places anymore, can maybe rm
     pub is_redo: bool,
 }
 

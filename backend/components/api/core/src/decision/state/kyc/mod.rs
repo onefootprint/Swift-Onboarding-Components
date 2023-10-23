@@ -25,7 +25,6 @@ use newtypes::{ScopedVaultId, TenantId, WorkflowId};
 #[derive(Clone)]
 pub struct KycDataCollection {
     wf_id: WorkflowId,
-    is_redo: bool,
     sv_id: ScopedVaultId,
     t_id: TenantId,
 }
@@ -33,7 +32,6 @@ pub struct KycDataCollection {
 #[derive(Clone)]
 pub struct KycVendorCalls {
     wf_id: WorkflowId,
-    is_redo: bool,
     sv_id: ScopedVaultId,
     t_id: TenantId,
 }
@@ -42,8 +40,6 @@ pub struct KycVendorCalls {
 pub struct KycDecisioning {
     #[allow(unused)]
     wf_id: WorkflowId,
-    #[allow(unused)]
-    is_redo: bool,
     #[allow(unused)]
     sv_id: ScopedVaultId,
     t_id: TenantId,

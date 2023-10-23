@@ -28,21 +28,18 @@ use newtypes::{ScopedVaultId, TenantId, WorkflowId};
 #[derive(Clone)]
 pub struct AlpacaKycDataCollection {
     wf_id: WorkflowId,
-    is_redo: bool,
     sv_id: ScopedVaultId,
     t_id: TenantId,
 }
 #[derive(Clone)]
 pub struct AlpacaKycVendorCalls {
     wf_id: WorkflowId,
-    is_redo: bool,
     sv_id: ScopedVaultId,
     t_id: TenantId,
 }
 #[derive(Clone)]
 pub struct AlpacaKycDecisioning {
     wf_id: WorkflowId,
-    is_redo: bool,
     sv_id: ScopedVaultId,
     t_id: TenantId,
     vendor_results: Vec<VendorResult>,
@@ -61,8 +58,6 @@ impl HasRuleGroup for AlpacaKycDecisioning {
 #[derive(Clone)]
 pub struct AlpacaKycWatchlistCheck {
     wf_id: WorkflowId, // TODO: make a common ctx type of dealio for all these shared things each state is using
-    #[allow(unused)]
-    is_redo: bool,
     sv_id: ScopedVaultId,
     t_id: TenantId,
 }
@@ -87,7 +82,6 @@ pub struct AlpacaKycPendingReview {
 #[derive(Clone)]
 pub struct AlpacaKycDocCollection {
     wf_id: WorkflowId,
-    is_redo: bool,
     sv_id: ScopedVaultId,
     t_id: TenantId,
 }

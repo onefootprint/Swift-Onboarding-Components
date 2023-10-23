@@ -46,12 +46,11 @@ use crate::{
 /// ////////////////
 impl KycDataCollection {
     #[tracing::instrument("KycDataCollection::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, config: KycConfig) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, _: KycConfig) -> ApiResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KycDataCollection {
             wf_id: workflow.id,
-            is_redo: config.is_redo,
             sv_id: workflow.scoped_vault_id.clone(),
             t_id: sv.tenant_id,
         })
@@ -80,7 +79,6 @@ impl OnAction<Authorize, KycState> for KycDataCollection {
 
         Ok(KycState::from(KycVendorCalls {
             wf_id: self.wf_id,
-            is_redo: self.is_redo,
             sv_id: self.sv_id,
             t_id: self.t_id,
         }))
@@ -102,12 +100,11 @@ impl WorkflowState for KycDataCollection {
 /// ////////////////
 impl KycVendorCalls {
     #[tracing::instrument("KycVendorCalls::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, config: KycConfig) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, _: KycConfig) -> ApiResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KycVendorCalls {
             wf_id: workflow.id,
-            is_redo: config.is_redo,
             sv_id: workflow.scoped_vault_id.clone(),
             t_id: sv.tenant_id,
         })
@@ -223,7 +220,6 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
 
         Ok(KycState::from(KycDecisioning {
             wf_id: self.wf_id,
-            is_redo: self.is_redo,
             sv_id: self.sv_id,
             t_id: self.t_id,
         }))
@@ -245,12 +241,11 @@ impl WorkflowState for KycVendorCalls {
 /// ////////////////
 impl KycDecisioning {
     #[tracing::instrument("KycDecisioning::init", skip_all)]
-    pub async fn init(state: &State, workflow: DbWorkflow, config: KycConfig) -> ApiResult<Self> {
+    pub async fn init(state: &State, workflow: DbWorkflow, _: KycConfig) -> ApiResult<Self> {
         let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
 
         Ok(KycDecisioning {
             wf_id: workflow.id,
-            is_redo: config.is_redo,
             sv_id: workflow.scoped_vault_id.clone(),
             t_id: sv.tenant_id,
         })
