@@ -12,9 +12,9 @@ use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::utils::session::AuthSession;
-use api_wire_types::ClientTokenRequest;
-use api_wire_types::ClientTokenResponse;
 use api_wire_types::ClientTokenScopeKind;
+use api_wire_types::CreateClientTokenRequest;
+use api_wire_types::CreateClientTokenResponse;
 use chrono::Duration;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
@@ -35,11 +35,11 @@ use paperclip::actix::{api_v2_operation, post, web};
 pub async fn post(
     state: web::Data<State>,
     fp_id: web::Path<FpId>,
-    request: web::Json<ClientTokenRequest>,
+    request: web::Json<CreateClientTokenRequest>,
     // For now, only accept tenant API key
     auth: SecretTenantAuthContext,
-) -> JsonApiResponse<ClientTokenResponse> {
-    let ClientTokenRequest {
+) -> JsonApiResponse<CreateClientTokenResponse> {
+    let CreateClientTokenRequest {
         fields,
         ttl,
         scopes,
@@ -141,5 +141,5 @@ pub async fn post(
         .await??;
 
     let expires_at = session.expires_at;
-    ResponseData::ok(ClientTokenResponse { token, expires_at }).json()
+    ResponseData::ok(CreateClientTokenResponse { token, expires_at }).json()
 }

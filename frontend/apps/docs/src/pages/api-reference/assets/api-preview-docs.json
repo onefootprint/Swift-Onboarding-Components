@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "537423906403ad7beebe73cc4fbf92b78b90b90d"
+        "version": "3519c54b9140ca7bf3944db811520d2622ad5a77"
     },
     "servers": [
         {
@@ -286,7 +286,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/components/schemas/UserId"
+                                                "$ref": "#/components/schemas/LiteUser"
                                             }
                                         },
                                         "meta": {
@@ -390,6 +390,53 @@
                                     "items": {
                                         "$ref": "#/components/schemas/PublicRiskSignal"
                                     }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/token": {
+            "post": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nCreate an unauthorized, identified token for the provided fp_id. This token may be passed into Footprint.js to bootstrap a user's onboarding with known information.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TokenRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenResponse"
                                 }
                             }
                         }
@@ -5986,6 +6033,20 @@
                     }
                 }
             },
+            "LiteUser": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "sandbox_id": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id"
+                ]
+            },
             "PublicDocument": {
                 "type": "object",
                 "properties": {
@@ -6714,6 +6775,35 @@
                     "severity"
                 ]
             },
+            "TokenRequest": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "key"
+                ]
+            },
+            "TokenResponse": {
+                "type": "object",
+                "properties": {
+                    "expires_at": {
+                        "description": "The time at which the token expires",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "token": {
+                        "description": "The short-lived token that gives temporary access to perform operations for this user",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "expires_at",
+                    "token"
+                ]
+            },
             "TriggerKycRequest": {
                 "type": "object",
                 "properties": {
@@ -6723,17 +6813,6 @@
                 },
                 "required": [
                     "onboarding_config_key"
-                ]
-            },
-            "UserId": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "id"
                 ]
             }
         }

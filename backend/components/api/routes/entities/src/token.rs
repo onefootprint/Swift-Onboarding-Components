@@ -20,11 +20,11 @@ use paperclip::actix::{api_v2_operation, post, web};
 
 #[route_alias(post(
     "/users/{fp_id}/token",
-    tags(Users, Private),
-    description = "Create an unauthorized, identified token for the provided fp_id.",
+    tags(Users, Preview),
+    description = "Create an unauthorized, identified token for the provided fp_id. This token may be passed into Footprint.js to bootstrap a user's onboarding with known information.",
 ))]
 #[api_v2_operation(
-    description = "Create an unauthorized, identified token for the provided fp_id.",
+    description = "Create an unauthorized, identified token for the provided fp_id. This token may be passed into Footprint.js to bootstrap a user's onboarding with known information.",
     tags(Entities, Private)
 )]
 #[post("/entities/{fp_id}/token")]

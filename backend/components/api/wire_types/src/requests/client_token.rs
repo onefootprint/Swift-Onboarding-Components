@@ -12,7 +12,7 @@ pub enum ClientTokenScopeKind {
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
-pub struct ClientTokenRequest {
+pub struct CreateClientTokenRequest {
     /// List of data identifiers to which this token will have access. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`
     pub fields: HashSet<DataIdentifier>,
     /// Time to live until this token expires, provided in seconds. Defaults to 30 minutes. Must be at least 60 seconds, at most 1 day
@@ -26,7 +26,7 @@ pub struct ClientTokenRequest {
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
-pub struct ClientTokenResponse {
+pub struct CreateClientTokenResponse {
     /// The short-lived token that gives temporary access to perform operations for this user
     pub token: SessionAuthToken,
     /// The time at which the token expires
