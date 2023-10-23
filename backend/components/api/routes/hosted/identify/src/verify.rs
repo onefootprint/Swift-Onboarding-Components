@@ -157,6 +157,7 @@ pub async fn post(
                         obc_id: Some(obc_id),
                         // wf_id will be added later in POST /hosted/onboarding
                         wf_id: None,
+                        is_from_api: false,
                     };
                     root_span.record("fp_id", su.fp_id.to_string());
                     root_span.record("tenant_id", su.tenant_id.to_string());

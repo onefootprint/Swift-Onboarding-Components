@@ -24,9 +24,13 @@ pub struct UserSession {
     pub obc_id: Option<ObConfigurationId>,
     /// The workflow for the auth session, if any
     pub wf_id: Option<WorkflowId>,
+    /// Permissions that this auth token is given
     pub scopes: Vec<UserAuthScope>,
     /// the auth method that was used
     pub auth_factors: Vec<AuthFactor>,
+    /// When true, the auth token was initially issued as an unauthed, identified token
+    #[serde(default)]
+    pub is_from_api: bool,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -42,6 +46,7 @@ pub struct UserSessionArgs {
     pub sb_id: Option<ScopedVaultId>,
     pub obc_id: Option<ObConfigurationId>,
     pub wf_id: Option<WorkflowId>,
+    pub is_from_api: bool,
 }
 
 impl UserSession {
@@ -62,6 +67,7 @@ impl UserSession {
             sb_id,
             obc_id,
             wf_id,
+            is_from_api,
         } = args;
         let session = AuthSessionData::User(Self {
             user_vault_id,
@@ -71,6 +77,7 @@ impl UserSession {
             wf_id,
             scopes,
             auth_factors,
+            is_from_api,
         });
         Ok(session)
     }

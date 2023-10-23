@@ -33,6 +33,8 @@ pub struct UserSessionContext {
     pub(super) sb_id: Option<ScopedVaultId>,
     pub(super) obc_id: Option<ObConfigurationId>,
     pub(super) wf_id: Option<WorkflowId>,
+    /// When true, the auth token was initially issued as an unauthed, identified token
+    pub(super) is_from_api: bool,
 }
 
 impl UserSessionContext {
@@ -85,6 +87,7 @@ impl UserSessionContext {
             sb_id: new_args.sb_id.or(self.sb_id),
             obc_id: new_args.obc_id.or(self.obc_id),
             wf_id: new_args.wf_id.or(self.wf_id),
+            is_from_api: new_args.is_from_api || self.is_from_api,
         };
         UserSession::make(self.user.id, args, new_scopes, new_factors)
     }
@@ -150,6 +153,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     obc_id,
                     scopes,
                     auth_factors,
+                    is_from_api,
                 } = data;
                 let vault = Vault::get(conn, &user_vault_id)?;
                 if !vault.is_portable && su_id.is_none() {
@@ -189,6 +193,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     obc_id,
                     scopes,
                     auth_factors,
+                    is_from_api,
                 };
                 Ok(ParsedUserSessionContext(data))
             }

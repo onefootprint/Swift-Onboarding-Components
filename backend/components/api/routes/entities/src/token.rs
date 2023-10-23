@@ -55,6 +55,7 @@ pub async fn post(
             let args = UserSessionArgs {
                 su_id: Some(sv.id),
                 obc_id: Some(obc.id),
+                is_from_api: true,
                 ..Default::default()
             };
             let data = UserSession::make(sv.vault_id, args, scopes, auth_factors)?;
