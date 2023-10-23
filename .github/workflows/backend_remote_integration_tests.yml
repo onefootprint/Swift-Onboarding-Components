@@ -57,7 +57,7 @@ jobs:
       PR_NUMBER: ${{ inputs.prNumber }}
       TEST_URL: ${{ inputs.testUrl }}
       EXPECTED_SERVER_VERSION: ${{ inputs.expectedCommitHash || github.sha }}
-      IT_PHONE_NUMBERS: ${{ var.IT_PHONE_NUMBERS }}
+      IT_PHONE_NUMBERS: ${{ secrets.IT_PHONE_NUMBERS }}
       IT_TWILIO_ACCOUNT_SID: ${{ secrets.IT_TWILIO_ACCOUNT_SID }}
       IT_TWILIO_SECRET_AUTH_TOKEN: ${{ secrets.IT_TWILIO_SECRET_AUTH_TOKEN }}
       DITTO_URL: 'https://ditto.footprint.dev'
