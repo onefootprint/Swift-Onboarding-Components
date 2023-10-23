@@ -32,9 +32,15 @@ const Hits = ({ hits }: HitsProps) => {
         const flattenedHit = flattenHit(hit);
         return (
           <HitContainer key={JSON.stringify(flattenedHit)}>
-            <IcoUserCircle16 />
+            <IconContainer>
+              <IcoUserCircle16 />
+            </IconContainer>
             {flattenedHit.map(({ key, value }) => (
-              <HitFieldRow key={key} fieldName={key} fieldValue={value} />
+              <HitFieldRow
+                key={key}
+                fieldName={key === 'locationurl' ? 'locationUrl' : key}
+                fieldValue={value}
+              />
             ))}
           </HitContainer>
         );
@@ -43,12 +49,18 @@ const Hits = ({ hits }: HitsProps) => {
   );
 };
 
+const IconContainer = styled.div`
+  ${({ theme }) => css`
+    margin-bottom: ${theme.spacing[2]};
+  `}
+`;
+
 const HitContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[3]};
-    margin: ${theme.spacing[4]} 0;
+    gap: ${theme.spacing[4]};
+    margin: ${theme.spacing[3]} 0;
     padding: ${theme.spacing[5]} ${theme.spacing[5]} ${theme.spacing[4]};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     border-radius: ${theme.borderRadius.default};

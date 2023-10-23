@@ -55,7 +55,7 @@ const HitFieldRow = ({ fieldName, fieldValue }: HitFieldRowProps) => {
   let valueElement;
   if (fieldName === 'matchTypes') {
     valueElement = renderMatchTypes(fieldValue as string[]);
-  } else if (fieldName === 'locationurl' || fieldName === 'relatedUrl') {
+  } else if (fieldName === 'locationUrl' || fieldName === 'relatedUrl') {
     valueElement = renderLocationUrlValue(fieldValue as string);
   } else {
     valueElement = renderGeneralValue(fieldValue as string);

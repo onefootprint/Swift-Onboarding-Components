@@ -14,6 +14,7 @@ import React from 'react';
 import usePermissions from 'src/hooks/use-permissions';
 
 import Hits from './components/hits';
+import HitsShimmer from './components/hits-shimmer';
 import ProtectedDetails from './components/protected-details';
 import useCachedRiskSignalAmlHint from './hooks/use-cached-risk-signal-aml-hint';
 import useRiskSignalAmlHits from './hooks/use-risk-signal-aml-hits';
@@ -45,44 +46,49 @@ const Matches = ({ riskSignalId }: MatchesProps) => {
   return (
     <MatchesSection data-is-decrypted={!!aml}>
       {!aml && (
-        <ProtectedDetails
-          canDecrypt={hasPermission(RoleScopeKind.orgSettings)}
-          onClick={handleDecrypt}
-          isLoading={decryptMutation.isLoading}
-        />
-      )}
-      {aml?.shareUrl && (
         <>
-          <Typography
-            variant="label-3"
-            color="tertiary"
-            sx={{ marginBottom: 2 }}
-          >
-            {t('source-url.label')}
-          </Typography>
-          <Stack align="center" justify="space-between">
-            <SourceUrl>{aml.shareUrl}</SourceUrl>
-            <CopyButton
-              ariaLabel={t('source-url.copy')}
-              contentToCopy={aml.shareUrl}
-              tooltipPosition="bottom"
-            >
-              <IcoCopy16 />
-            </CopyButton>
-          </Stack>
-          <LinkButton
-            size="tiny"
-            iconComponent={IcoArrowRightSmall16}
-            iconPosition="right"
-            href={aml.shareUrl}
-            target="_blank"
-            sx={{ marginTop: 5, marginBottom: 5 }}
-          >
-            {t('source-url.read-full-report')}
-          </LinkButton>
+          <ProtectedDetails
+            canDecrypt={hasPermission(RoleScopeKind.orgSettings)}
+            onClick={handleDecrypt}
+            isLoading={decryptMutation.isLoading}
+          />
+          <HitsShimmer />
         </>
       )}
-      {aml?.hits && aml.hits.length > 0 && <Hits hits={aml.hits} />}
+      {aml?.shareUrl && (
+        <AmlSection>
+          <Stack direction="column" sx={{ width: '100%' }}>
+            <Typography
+              variant="label-3"
+              color="tertiary"
+              sx={{ marginBottom: 2 }}
+            >
+              {t('source-url.label')}
+            </Typography>
+            <Stack align="center" justify="space-between">
+              <SourceUrl>{aml.shareUrl}</SourceUrl>
+              <CopyButton
+                ariaLabel={t('source-url.copy')}
+                contentToCopy={aml.shareUrl}
+                tooltipPosition="bottom"
+              >
+                <IcoCopy16 />
+              </CopyButton>
+            </Stack>
+            <LinkButton
+              size="tiny"
+              iconComponent={IcoArrowRightSmall16}
+              iconPosition="right"
+              href={aml.shareUrl}
+              target="_blank"
+              sx={{ marginTop: 5, marginBottom: 5 }}
+            >
+              {t('source-url.read-full-report')}
+            </LinkButton>
+          </Stack>
+          {aml?.hits && aml.hits.length > 0 && <Hits hits={aml.hits} />}
+        </AmlSection>
+      )}
     </MatchesSection>
   );
 };
@@ -91,13 +97,17 @@ const MatchesSection = styled.section`
   ${({ theme }) => css`
     height: 100%;
     margin-top: ${theme.spacing[5]};
+    position: relative;
 
     &[data-is-decrypted='false'] {
-      margin: 0;
-      display: flex;
-      align-items: center;
+      overflow: hidden;
     }
   `}
+`;
+
+const AmlSection = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
 const SourceUrl = styled.p`
