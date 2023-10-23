@@ -24,6 +24,7 @@ describe('usePropsFromUrl', () => {
       l10n: undefined,
       options: {},
       userData: {},
+      authToken: '',
     });
   });
 
@@ -41,6 +42,7 @@ describe('usePropsFromUrl', () => {
       l10n: undefined,
       options: {},
       userData: {},
+      authToken: '',
     });
   });
 
@@ -59,6 +61,7 @@ describe('usePropsFromUrl', () => {
       l10n: {},
       options: {},
       userData: {},
+      authToken: '',
     });
   });
 
@@ -94,6 +97,7 @@ describe('usePropsFromUrl', () => {
         showLogo: true,
       },
       l10n: undefined,
+      authToken: '',
     });
   });
 
@@ -129,6 +133,7 @@ describe('usePropsFromUrl', () => {
         showLogo: true,
       },
       l10n: undefined,
+      authToken: '',
     });
   });
 
@@ -164,6 +169,7 @@ describe('usePropsFromUrl', () => {
         showLogo: true,
       },
       l10n: { locale: 'es-MX' },
+      authToken: '',
     });
   });
 });

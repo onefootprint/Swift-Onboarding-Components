@@ -47,11 +47,15 @@ describe('Bifrost Machine Tests', () => {
       payload: {
         config: { ...testOnboardingConfig },
         bootstrapData: { ...testBootstrapData },
+        authToken: '',
       },
     });
     expect(state.context).toEqual({
       config: { ...testOnboardingConfig },
       bootstrapData: testBootstrapData,
+      l10n: undefined,
+      showCompletionPage: undefined,
+      showLogo: undefined,
     });
     expect(state.value).toEqual('idv');
   });
@@ -66,11 +70,15 @@ describe('Bifrost Machine Tests', () => {
       payload: {
         config: { ...testOnboardingConfig, isLive: false },
         bootstrapData: { ...testBootstrapData },
+        authToken: '',
       },
     });
     expect(state.context).toEqual({
       config: { ...testOnboardingConfig, isLive: false },
       bootstrapData: testBootstrapData,
+      l10n: undefined,
+      showCompletionPage: undefined,
+      showLogo: undefined,
     });
     expect(state.value).toEqual('idv');
   });

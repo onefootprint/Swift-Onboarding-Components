@@ -4,7 +4,6 @@ import {
   useFootprintProvider,
 } from '@onefootprint/idv-elements';
 import React from 'react';
-import useTenantPublicKey from 'src/hooks/use-tenant-public-key';
 
 import { useBifrostMachine } from '../bifrost-machine-provider';
 
@@ -16,7 +15,6 @@ type LayoutProps = {
 const Layout = ({ children, variant }: LayoutProps) => {
   const footprint = useFootprintProvider();
   const [state] = useBifrostMachine();
-  const tenantPk = useTenantPublicKey();
   const { config } = state.context;
   const isSandbox = config?.isLive === false;
   const handleClose = () => {
@@ -29,7 +27,7 @@ const Layout = ({ children, variant }: LayoutProps) => {
       variant={variant}
       options={{ hasDesktopBorderRadius: true }}
       isSandbox={isSandbox}
-      tenantPk={tenantPk}
+      tenantPk={config?.key}
       onClose={handleClose}
     >
       {children}

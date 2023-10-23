@@ -25,6 +25,7 @@ export const getLegacyData = (path: string): BifrostProps | undefined => {
     userData: parseLegacyUserData(getParsedProps(part1) as IdvBootstrapData),
     options: getParsedProps(part2 || ''),
     l10n: part3 ? getParsedProps(part3) : undefined,
+    authToken: '',
   };
 };
 

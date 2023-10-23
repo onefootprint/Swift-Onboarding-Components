@@ -28,7 +28,8 @@ const Root = ({ variant }: RootProps) => {
   const footprint = useFootprintProvider();
   const [state, send] = useBifrostMachine();
   const tenantPk = useTenantPublicKey();
-  const { bootstrapData, l10n, showCompletionPage, showLogo } = state.context;
+  const { bootstrapData, l10n, showCompletionPage, showLogo, authToken } =
+    state.context;
 
   const observeCollector = useObserveCollector();
   useLogStateMachine('bifrost', state);
@@ -39,8 +40,6 @@ const Root = ({ variant }: RootProps) => {
       });
     });
   });
-
-  const obConfigAuth = { [CLIENT_PUBLIC_KEY_HEADER]: tenantPk };
 
   const handleComplete = (validationToken?: string, delay?: number) => {
     if (validationToken) {
@@ -62,7 +61,10 @@ const Root = ({ variant }: RootProps) => {
         {state.matches('init') && <Init />}
         {state.matches('idv') && (
           <Idv
-            obConfigAuth={obConfigAuth}
+            authToken={authToken}
+            obConfigAuth={
+              tenantPk ? { [CLIENT_PUBLIC_KEY_HEADER]: tenantPk } : undefined
+            }
             bootstrapData={bootstrapData}
             onComplete={handleComplete}
             onClose={handleClose}

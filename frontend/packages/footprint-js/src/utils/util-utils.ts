@@ -13,13 +13,13 @@ const getURL = (props: Props) => {
 };
 
 const getBifrostURL = (props: VerifyProps) => {
-  const { appearance, publicKey, variant, kind } = props;
+  const { appearance, variant, kind } = props;
   const { fontSrc, rules, variables } = getEncodedAppearance(appearance);
   const url = process.env.BIFROST_URL;
   const searchParams = new URLSearchParams();
 
-  if (publicKey) {
-    searchParams.append('public_key', publicKey);
+  if ('publicKey' in props) {
+    searchParams.append('public_key', props.publicKey);
   }
   if (variables) {
     searchParams.append('variables', variables);

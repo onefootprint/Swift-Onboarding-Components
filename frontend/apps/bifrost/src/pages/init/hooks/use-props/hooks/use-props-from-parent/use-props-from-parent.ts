@@ -77,6 +77,7 @@ const usePropsFromParent = (
         userData: legacyUserData || props?.userData,
         options: legacyOptions || props?.options,
         l10n: props?.l10n,
+        authToken: props?.authToken ?? '',
       });
     }
   }, [legacyUserData, legacyOptions, props, isLoaded]); // eslint-disable-line react-hooks/exhaustive-deps

@@ -23,6 +23,7 @@ export type MachineEvents =
         showCompletionPage?: boolean;
         showLogo?: boolean;
         l10n?: L10n;
+        authToken?: string;
       };
     }
   | {

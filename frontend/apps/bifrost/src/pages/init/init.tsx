@@ -19,14 +19,15 @@ import type { BifrostProps } from './hooks/use-props/types';
 
 const Init = () => {
   const tenantPk = useTenantPublicKey();
-  const [, send] = useBifrostMachine();
+  const [state, send] = useBifrostMachine();
+  const { authToken: authTokenContext } = state.context;
   const observeCollector = useObserveCollector();
   const obConfigAuth = tenantPk
     ? { [CLIENT_PUBLIC_KEY_HEADER]: tenantPk }
     : undefined;
 
   useGetOnboardingConfig(
-    { obConfigAuth },
+    { obConfigAuth, authToken: authTokenContext },
     {
       onSuccess: (config: PublicOnboardingConfig) => {
         const { orgName, orgId, key } = config;
@@ -59,7 +60,7 @@ const Init = () => {
   );
 
   useProps((props: BifrostProps) => {
-    const { userData, options, l10n } = props;
+    const { userData, options, l10n, authToken } = props;
     const { showCompletionPage, showLogo } = options || {};
     send({
       type: 'initContextUpdated',
@@ -68,6 +69,7 @@ const Init = () => {
         showCompletionPage,
         showLogo,
         l10n,
+        authToken,
       },
     });
   });

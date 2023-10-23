@@ -28,6 +28,7 @@ describe('isContextReady', () => {
       const context: MachineContext = {
         config: { ...testOnboardingConfig },
         bootstrapData: {},
+        authToken: '',
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',
@@ -39,6 +40,7 @@ describe('isContextReady', () => {
     it('when some data is in the machine context and some in the event payload', () => {
       const context: MachineContext = {
         bootstrapData: {},
+        authToken: '',
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',
@@ -51,8 +53,22 @@ describe('isContextReady', () => {
   });
 
   describe('when init context is incomplete', () => {
-    it('when context and payload have missing data', () => {
+    it('when context and payload have missing config data', () => {
       const context: MachineContext = {};
+      const event: MachineEvents = {
+        type: 'initContextUpdated',
+        payload: {
+          bootstrapData: {},
+          authToken: '',
+        },
+      };
+      expect(isContextReady(context, event)).toEqual(false);
+    });
+
+    it('when context and payload are missing auth token', () => {
+      const context: MachineContext = {
+        config: { ...testOnboardingConfig },
+      };
       const event: MachineEvents = {
         type: 'initContextUpdated',
         payload: {

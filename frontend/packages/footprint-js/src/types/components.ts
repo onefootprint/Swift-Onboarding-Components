@@ -1,14 +1,14 @@
 import type { Appearance } from './appearance';
 import type { FootprintUserData as UserData } from './user-data';
 
-export interface Footprint {
+export type Footprint = {
   init: (props: Props) => Component;
-}
+};
 
-export interface Component {
+export type Component = {
   render: () => Promise<void>;
   destroy: () => void;
-}
+};
 
 export type SupportedLocale = 'en-US' | 'es-MX';
 export type L10n = { locale?: SupportedLocale };
@@ -23,46 +23,52 @@ export enum ComponentKind {
 
 export type Variant = 'modal' | 'drawer' | 'inline';
 
-export interface PropsBase {
+export type PropsBase = {
   kind: ComponentKind;
   appearance?: Appearance;
   variant?: Variant;
   containerId?: string;
   l10n?: L10n;
-}
+};
 
 export type VerifyOptions = {
   showCompletionPage?: boolean;
   showLogo?: boolean;
 };
 
-export interface VerifyProps extends PropsBase {
-  kind: ComponentKind.Verify;
-  variant?: 'modal' | 'drawer';
+export type VerifyAuthToken = {
+  authToken: string;
+};
+
+export type VerifyPublicKey = {
   publicKey: string;
+};
+
+export type VerifySharedProps = (VerifyAuthToken | VerifyPublicKey) & {
   userData?: UserData;
   options?: VerifyOptions;
   onComplete?: (validationToken: string) => void;
   onCancel?: () => void;
   onClose?: () => void;
-}
+};
 
-export interface VerifyButtonProps extends PropsBase {
-  kind: ComponentKind.VerifyButton;
-  variant: 'inline';
-  containerId: string;
-  dialogVariant?: 'modal' | 'drawer';
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  label?: string;
-  publicKey?: string;
-  userData?: UserData;
-  options?: VerifyOptions;
-  onComplete?: (validationToken: string) => void;
-  onCancel?: () => void;
-  onClose?: () => void;
-}
+export type VerifyProps = PropsBase &
+  VerifySharedProps & {
+    kind: ComponentKind.Verify;
+    variant?: 'modal' | 'drawer';
+  };
 
-export interface RenderProps extends PropsBase {
+export type VerifyButtonProps = PropsBase &
+  Partial<VerifySharedProps> & {
+    kind: ComponentKind.VerifyButton;
+    variant: 'inline';
+    containerId: string;
+    dialogVariant?: 'modal' | 'drawer';
+    onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+    label?: string;
+  };
+
+export type RenderProps = PropsBase & {
   kind: ComponentKind.Render;
   authToken: string;
   id: string; // a valid data identifier
@@ -72,7 +78,7 @@ export interface RenderProps extends PropsBase {
   defaultHidden?: boolean;
   variant: 'inline';
   containerId: string;
-}
+};
 
 export type FormOptions = {
   hideFootprintLogo?: boolean;
@@ -83,7 +89,7 @@ export type FormRef = {
   save: () => Promise<void>;
 };
 
-export interface FormProps extends PropsBase {
+export type FormProps = PropsBase & {
   kind: ComponentKind.Form;
   authToken: string;
   title?: string;
@@ -94,4 +100,4 @@ export interface FormProps extends PropsBase {
   onComplete?: () => void;
   onCancel?: () => void;
   onClose?: () => void;
-}
+};

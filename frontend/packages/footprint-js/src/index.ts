@@ -20,9 +20,11 @@ export type {
   PropsBase as FootprintPropsBase,
   RenderProps as FootprintRenderProps,
   Variant as FootprintVariant,
+  VerifyAuthToken as FootprintVerifyAuthToken,
   VerifyButtonProps as FootprintVerifyButtonProps,
   VerifyOptions as FootprintVerifyOptions,
   VerifyProps as FootprintVerifyProps,
+  VerifyPublicKey as FootprintVerifyPublicKey,
   L10n,
   SupportedLocale,
 } from './types/components';

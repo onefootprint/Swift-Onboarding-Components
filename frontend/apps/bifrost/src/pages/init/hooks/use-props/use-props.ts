@@ -18,6 +18,12 @@ where bootstrap data keys are IdDIs.
 Bifrost receives 'propsReceived' event from footprint-js where props are userData and options.
 userData keys are IdDIs.
 
+3. As of footprint-js > 3.5.0
+Bifrost receives l10n as part of the propsReceived event.
+
+4. As of footprint-js > 3.7.0
+Bifrost receives authToken as part of the propsReceived event.
+
 On mobile:
 1. For versions < 2.0.0
 The args are passed in the URL fragment: <URL_BASE>#<ENCODED_USER_DATA>
@@ -59,6 +65,7 @@ const useProps = (onSuccess: (props: BifrostProps) => void) => {
       userData: {},
       options: {},
       l10n: {},
+      authToken: '',
     });
   };
   usePropsFromParent(handlePropsFromParent, handleTimeout);

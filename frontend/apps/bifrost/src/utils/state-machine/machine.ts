@@ -1,6 +1,5 @@
 import { assign, createMachine } from 'xstate';
 
-import type { Typegen0 } from './machine.typegen';
 import type { MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
 
@@ -15,7 +14,8 @@ export const createBifrostMachine = () =>
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as Typegen0,
+      // eslint-disable-next-line
+      tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {},
       on: {
@@ -51,8 +51,14 @@ export const createBifrostMachine = () =>
       actions: {
         resetContext: assign(() => ({})),
         assignInitContext: assign((context: MachineContext, event) => {
-          const { bootstrapData, config, l10n, showCompletionPage, showLogo } =
-            event.payload;
+          const {
+            bootstrapData,
+            config,
+            l10n,
+            showCompletionPage,
+            showLogo,
+            authToken,
+          } = event.payload;
 
           context.config = isUndefined(config) ? context.config : config;
           context.l10n = isUndefined(l10n) ? context.l10n : l10n;
@@ -68,6 +74,10 @@ export const createBifrostMachine = () =>
           context.showLogo = isUndefined(showLogo)
             ? context.showLogo
             : showLogo;
+
+          if (authToken) {
+            context.authToken = authToken;
+          }
 
           return context;
         }),
