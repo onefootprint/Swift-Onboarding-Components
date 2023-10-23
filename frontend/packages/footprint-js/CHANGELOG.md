@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.7.0
+
+### Minor Changes
+
+- 2fb5fe8d5: Add authToken for verify components & update userData keys for citizenship/nationality fields in verify
+
 ## 3.6.0
 
 ### Minor Changes

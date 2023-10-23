@@ -1,5 +1,16 @@
 # @onefootprint/footprint-react
 
+## 6.1.0
+
+### Minor Changes
+
+- 2fb5fe8d5: Add authToken for verify components & update userData keys for citizenship/nationality fields in verify
+
+### Patch Changes
+
+- Updated dependencies [2fb5fe8d5]
+  - @onefootprint/footprint-js@3.7.0
+
 ## 6.0.0
 
 ### Minor Changes
@@ -12,13 +23,6 @@
 - Updated dependencies [933980417]
 - Updated dependencies [b9915eff4]
   - @onefootprint/footprint-js@3.6.0
-
-## 6.0.0
-
-### Patch Changes
-
-- Updated dependencies [5249e151d]
-  - @onefootprint/footprint-js@3.5.0
 
 ## 5.4.0
 
