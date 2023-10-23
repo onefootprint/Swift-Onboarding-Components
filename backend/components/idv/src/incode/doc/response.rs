@@ -5,6 +5,7 @@ use crate::{
     test_fixtures::{self, DocTestOpts},
 };
 use chrono::{NaiveDate, NaiveDateTime, Utc};
+use itertools::Itertools;
 use newtypes::{
     incode::{IncodeDocumentRestriction, IncodeDocumentType, IncodeStatus, IncodeTest},
     IdentityDocumentFixtureResult, IncodeFailureReason, IncodeVerificationSessionKind,
@@ -353,11 +354,14 @@ impl AddSelfieResponse {
     pub fn failure_reasons(&self) -> Vec<IncodeFailureReason> {
         [
             (self.confidence == Some(1.0)).then_some(IncodeFailureReason::SelfieLowConfidence),
+            // currently Incode was a weird bug where if `confidence` is missing from the response then that indicates an internal "UNSATISFIED_BRIGHTNESS_LEVEL" error on their end. so for now we treat the same as brightness check failing
+            (self.confidence.is_none()).then_some(IncodeFailureReason::SelfieTooDark),
             (self.is_bright == Some(false)).then_some(IncodeFailureReason::SelfieTooDark),
             (self.has_lenses == Some(true)).then_some(IncodeFailureReason::SelfieHasLenses),
             (self.has_face_mask == Some(true)).then_some(IncodeFailureReason::SelfieHasFaceMask),
         ]
         .into_iter()
+        .unique()
         .flatten()
         .collect()
     }
