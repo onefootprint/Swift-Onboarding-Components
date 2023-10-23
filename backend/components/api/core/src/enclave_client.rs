@@ -14,8 +14,9 @@ use enclave_proxy::{
 use futures::TryFutureExt;
 use itertools::Itertools;
 use newtypes::{
-    fingerprinter::FingerprintScopable, EncryptedVaultPrivateKey, Fingerprint, PiiBytes, PiiString, S3Url,
-    SealedVaultBytes, SealedVaultDataKey, VaultPublicKey,
+    fingerprinter::{FingerprintScopable, FingerprintScope},
+    EncryptedVaultPrivateKey, Fingerprint, PiiBytes, PiiString, S3Url, SealedVaultBytes, SealedVaultDataKey,
+    VaultPublicKey,
 };
 use std::hash::Hash;
 use std::{collections::HashMap, sync::Arc};
@@ -287,16 +288,16 @@ impl EnclaveClient {
     }
 
     /// Requests the enclave to fingerprint sealed data (which it decrypts first)
-    pub async fn batch_fingerprint_sealed<S: FingerprintScopable + Send + Sync>(
-        &self,
+    pub async fn batch_fingerprint_sealed<'a>(
+        &'a self,
         sealed_key: &EncryptedVaultPrivateKey,
-        sealed_data: Vec<(S, &SealedVaultBytes)>,
+        sealed_data: Vec<(FingerprintScope<'a>, &SealedVaultBytes)>,
     ) -> Result<Vec<Fingerprint>, EnclaveError> {
         let requests = sealed_data
             .into_iter()
-            .map(|(di, sealed_data)| {
+            .map(|(scope, sealed_data)| {
                 Ok(DecryptThenSignRequest {
-                    scope: di.scope().bytes(),
+                    scope: scope.bytes(),
                     sealed_data: EciesP256Sha256AesGcmSealed::from_bytes(sealed_data.as_ref())?,
                 })
             })

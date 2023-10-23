@@ -261,6 +261,9 @@ pub fn save_kyc_decision(
 }
 
 #[tracing::instrument(skip(state))]
+/// Write new fingerprints as needed
+/// - Tenant-scoped fingerprints for data visible to the tenant
+/// - Globally-scoped fingerprints for newly portablized data
 pub async fn write_authorized_fingerprints(state: &State, wf_id: &WorkflowId) -> ApiResult<()> {
     let wf_id = wf_id.clone();
     let (obc, vw) = state

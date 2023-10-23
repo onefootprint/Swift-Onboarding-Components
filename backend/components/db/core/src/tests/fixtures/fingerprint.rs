@@ -20,7 +20,7 @@ pub fn create(
         lifetime_id,
         is_unique: false,
         scope,
-        version: FingerprintVersion::V1,
+        version: FingerprintVersion::current(),
     };
     Fingerprint::bulk_create(conn, vec![fingerprint]).unwrap();
 }

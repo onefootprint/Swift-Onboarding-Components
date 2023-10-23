@@ -65,6 +65,14 @@ impl Fingerprint {
         Ok(())
     }
 
+    #[tracing::instrument("Fingerprint::bulk_get", skip_all)]
+    pub fn bulk_get(conn: &mut PgConn, lifetime_ids: Vec<DataLifetimeId>) -> DbResult<Vec<Self>> {
+        let results = fingerprint::table
+            .filter(fingerprint::lifetime_id.eq_any(lifetime_ids))
+            .get_results(conn)?;
+        Ok(results)
+    }
+
     // for tests
     #[tracing::instrument("Fingerprint::_list_for_scoped_vault", skip_all)]
     pub fn _list_for_scoped_vault(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Vec<Self>> {

@@ -7,11 +7,12 @@ use async_trait::async_trait;
 use strum::EnumIter;
 use strum::IntoEnumIterator;
 
+use crate::FingerprintScopeKind;
 use crate::{
     BusinessDataKind as BDK, DataIdentifier, Fingerprint, IdentityDataKind as IDK, PiiString, TenantId,
 };
 
-/// The scope to fingerprint data to
+/// The scope to which we will fingerprint data
 #[derive(Debug, Clone)]
 pub enum FingerprintScope<'a> {
     /// Searchable across all tenants
@@ -35,6 +36,13 @@ impl<'a> FingerprintScope<'a> {
                 .concat(),
             )
             .to_vec(),
+        }
+    }
+
+    pub fn kind(&self) -> FingerprintScopeKind {
+        match self {
+            Self::Global(_) => FingerprintScopeKind::Global,
+            Self::Tenant(_, _) => FingerprintScopeKind::Tenant,
         }
     }
 }
