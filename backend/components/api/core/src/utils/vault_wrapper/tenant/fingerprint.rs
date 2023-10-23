@@ -4,6 +4,7 @@ use db::{
     models::{
         fingerprint::{Fingerprint, NewFingerprint},
         ob_configuration::ObConfiguration,
+        vault::Vault,
     },
     VaultedData,
 };
@@ -83,18 +84,9 @@ impl<Type> TenantVw<Type> {
 
         // Filter out fingerprints that already exist
         let l_ids = data_to_fp.iter().map(|((_, id, _), _)| (*id).clone()).collect();
-        let existing_fps = state
-            .db_pool
-            .db_query(move |conn| Fingerprint::bulk_get(conn, l_ids))
-            .await??;
-        let existing_fps = existing_fps
-            .iter()
-            .map(|fp| (fp.kind.clone(), &fp.lifetime_id, fp.scope))
-            .collect::<HashSet<_>>();
-        let data_to_fp = data_to_fp.into_iter().filter(|(k, _)| !existing_fps.contains(k));
 
         // Get the new fingerprints from the enclave
-        let (keys, e_data): (Vec<_>, Vec<_>) = data_to_fp.unzip();
+        let (keys, e_data): (Vec<_>, Vec<_>) = data_to_fp.into_iter().unzip();
         let fingerprints = state
             .enclave_client
             .batch_fingerprint_sealed(&self.uvw.vault.e_private_key, e_data)
@@ -114,9 +106,24 @@ impl<Type> TenantVw<Type> {
                 version: FingerprintVersion::current(),
             })
             .collect::<Vec<_>>();
+
+        let v_id = self.vault.id.clone();
         state
             .db_pool
-            .db_transaction(move |conn| Fingerprint::bulk_create(conn, fingerprints))
+            .db_transaction(move |conn| -> ApiResult<_> {
+                Vault::lock(conn, &v_id)?;
+                let existing_fps: HashSet<_> = Fingerprint::bulk_get(conn, l_ids)?
+                    .into_iter()
+                    .map(|fp| fp.sh_data)
+                    .collect();
+                // Prevent creating a duplicate global fingerprint or duplicate tenant-scoped fingerprint
+                let fingerprints = fingerprints
+                    .into_iter()
+                    .filter(|fp| !existing_fps.contains(&fp.sh_data))
+                    .collect();
+                Fingerprint::bulk_create(conn, fingerprints)?;
+                Ok(())
+            })
             .await?;
 
         Ok(())

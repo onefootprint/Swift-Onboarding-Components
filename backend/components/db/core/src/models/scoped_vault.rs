@@ -162,14 +162,7 @@ impl ScopedVault {
             .first(conn.conn())
             .optional()?;
         if let Some(scoped_vault) = scoped_vault {
-            // TODO if SV already exists, we should make a new workflow rather than an onboarding
             return Ok(scoped_vault);
-        }
-        if uv.is_created_via_api {
-            // Shouldn't be creating SVs for api vaults here - use `get_or_create_non_portable` below
-            // One day, we'll want to allow this when an initially "non-portable" user one-click
-            // onboards onto a new tenant!
-            return Err(DbError::CannotCreatedScopedUser);
         }
         // Row doesn't exist for vault_id, tenant_id - create a new one
         let seqno = DataLifetime::get_current_seqno(conn)?;
