@@ -2,7 +2,7 @@ use newtypes::{PiiJsonValue, PiiString};
 use serde_json::json;
 
 use crate::incode::{
-    response::OnboardingStartResponse,
+    response::{self, OnboardingStartResponse},
     watchlist::response::{Content, Data, Doc, Hit, WatchlistResultResponse},
     IncodeAPIResult, IncodeResponse,
 };
@@ -71,6 +71,19 @@ pub fn watchlist_result_response(list_types: Vec<String>) -> IncodeResponse<Watc
             status: Some("sucess".to_owned()),
             content: Some(content),
             error: None,
+        }),
+        raw_response: PiiJsonValue::from(json!({})),
+    }
+}
+
+pub fn watchlist_result_error_response() -> IncodeResponse<WatchlistResultResponse> {
+    IncodeResponse {
+        result: IncodeAPIResult::ResponseError(response::Error {
+            timestamp: 16953352387367i64,
+            status: 4040,
+            error: "Something bad happened yo".to_owned(),
+            message: None,
+            path: None,
         }),
         raw_response: PiiJsonValue::from(json!({})),
     }

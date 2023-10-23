@@ -11,9 +11,14 @@ use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::{RequestAndMaybeResult, VerificationRequest};
 use db::models::watchlist_check::WatchlistCheck;
 use db::tests::fixtures;
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::DbPool;
 use db::DbResult;
 use idv::idology::pa::{IdologyPaAPIResponse, IdologyPaRequest};
+use idv::incode::response::OnboardingStartResponse;
+use idv::incode::IncodeResponse;
+use idv::incode::IncodeStartOnboardingRequest;
+use newtypes::EnhancedAmlOption;
 use newtypes::RiskSignalGroupKind;
 use newtypes::TaskId;
 use newtypes::WatchlistCheckError;
@@ -29,30 +34,51 @@ mod watchlist_check_task;
 //
 // Test Helpers
 //
+#[derive(Clone)]
+enum VaultKind {
+    NonPortable,
+    Portable(EnhancedAmlOption),
+}
+
+impl VaultKind {
+    pub fn expects_idology(&self) -> bool {
+        matches!(
+            self,
+            VaultKind::NonPortable | VaultKind::Portable(EnhancedAmlOption::No)
+        )
+    }
+}
 
 async fn create_user_and_task(
     db_pool: &DbPool,
-    is_portable: bool,
+    vault_kind: VaultKind,
     is_live: bool,
     onboarding_status: OnboardingStatus,
     idks: Vec<IDK>,
 ) -> (ScopedVault, Task) {
     let (sv, task) = db_pool
         .db_transaction(move |conn| -> DbResult<_> {
-            let sv = if is_portable {
-                let (_, _, sv, _) = crate::tests::fixtures::lib::create_user_and_onboarding(
-                    conn,
-                    is_live,
-                    onboarding_status,
-                    idks,
-                );
-                sv
-            } else {
-                let tenant = fixtures::tenant::create(conn);
-                let (_uv, sv) = crate::tests::fixtures::lib::create_user_and_populate_vault(
-                    conn, is_live, tenant.id, None, idks,
-                );
-                sv
+            let sv = match vault_kind {
+                VaultKind::NonPortable => {
+                    let tenant = fixtures::tenant::create(conn);
+                    let (_uv, sv) = crate::tests::fixtures::lib::create_user_and_populate_vault(
+                        conn, is_live, tenant.id, None, idks,
+                    );
+                    sv
+                }
+                VaultKind::Portable(enhanced_aml) => {
+                    let (_, _, sv, _) = crate::tests::fixtures::lib::create_user_and_onboarding(
+                        conn,
+                        ObConfigurationOpts {
+                            is_live,
+                            enhanced_aml,
+                            ..Default::default()
+                        },
+                        onboarding_status,
+                        idks,
+                    );
+                    sv
+                }
             };
 
             let task = fixtures::task::create_watchlist_check(conn, &sv.id);
@@ -134,6 +160,39 @@ fn mock_idology_pa(state: &mut State, vendor_result: &VendorRes) {
     };
     mock.expect_make_request().times(1).return_once(|_| res);
     state.set_idology_pa(Arc::new(mock));
+}
+
+fn mock_incode_watchlist_check(state: &mut State, vendor_result: &VendorRes) {
+    let res = match vendor_result {
+        VendorRes::Hit => Ok(idv::tests::fixtures::incode::watchlist_result_response(vec![
+            "sanction".to_owned(),
+        ])),
+        VendorRes::NoHit => Ok(idv::tests::fixtures::incode::watchlist_result_response(vec![])),
+        VendorRes::Error => Ok(idv::tests::fixtures::incode::watchlist_result_error_response()),
+    };
+
+    let mut mock_incode_start_onboarding = MockVendorAPICall::<
+        IncodeStartOnboardingRequest,
+        IncodeResponse<OnboardingStartResponse>,
+        idv::incode::error::Error,
+    >::new();
+    mock_incode_start_onboarding
+        .expect_make_request()
+        .times(1)
+        .return_once(move |_| Ok(idv::tests::fixtures::incode::start_onboarding_response()));
+    state.set_incode_start_onboarding(Arc::new(mock_incode_start_onboarding));
+
+    let mut mock_incode_watchlist_check = MockVendorAPICall::<
+        idv::incode::watchlist::IncodeWatchlistCheckRequest,
+        IncodeResponse<idv::incode::watchlist::response::WatchlistResultResponse>,
+        idv::incode::error::Error,
+    >::new();
+
+    mock_incode_watchlist_check
+        .expect_make_request()
+        .times(1)
+        .return_once(move |_| res);
+    state.set_incode_watchlist_check(Arc::new(mock_incode_watchlist_check));
 }
 
 fn expect_webhook(state: &mut State, status: WatchlistCheckStatusKind, error: Option<WatchlistCheckError>) {

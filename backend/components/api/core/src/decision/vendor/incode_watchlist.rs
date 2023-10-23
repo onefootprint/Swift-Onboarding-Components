@@ -35,7 +35,7 @@ use crate::{errors::ApiResult, ApiError, State};
 #[tracing::instrument(skip(db_pool, res, user_vault_public_key, api_or_vreq_id))]
 async fn save_vres_and_maybe_vreq<T: APIResponseToIncodeError + serde::Serialize>(
     db_pool: &DbPool,
-    res: IncodeResponse<T>,
+    res: IncodeResponse<T>, // TODO: if we have "hard" errors that don't parse into an IncodeResponse then we won't save a vres with the error here!
     sv_id: &ScopedVaultId,
     di_id: &DecisionIntentId,
     user_vault_public_key: &VaultPublicKey,

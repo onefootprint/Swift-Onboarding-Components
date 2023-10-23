@@ -3,8 +3,7 @@ use crate::task::tasks::watchlist_check::tests::*;
 use crate::task::TaskError;
 use crate::State;
 use db::test_helpers::assert_have_same_elements;
-use db::tests::test_db_pool::TestDbPool;
-use macros::test_state;
+use feature_flag::MockFeatureFlagClient;
 use macros::test_state_case;
 use newtypes::FootprintReasonCode;
 use newtypes::VendorAPI;
@@ -39,8 +38,14 @@ async fn sandbox_and_inactive_users(
     expected_reason: WatchlistCheckNotNeededReason,
 ) {
     // SETUP
-    let (sv, task) =
-        create_user_and_task(&state.db_pool, true, is_live, onboarding_status, full_vault()).await;
+    let (sv, task) = create_user_and_task(
+        &state.db_pool,
+        VaultKind::Portable(enhanced_aml_option_yes()),
+        is_live,
+        onboarding_status,
+        full_vault(),
+    )
+    .await;
 
     // RUN
     run_task(state, &sv.id, &task.id).await.unwrap();
@@ -60,14 +65,19 @@ async fn sandbox_and_inactive_users(
     assert!(rs.is_empty());
 }
 
-#[test_state_case(true)]
-#[test_state_case(false)]
+#[test_state_case(VaultKind::Portable(EnhancedAmlOption::No))]
+#[test_state_case(VaultKind::Portable(enhanced_aml_option_yes()))]
+#[test_state_case(VaultKind::NonPortable)]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
-async fn insufficient_data_in_vault(state: &mut State, is_portable: bool) {
+async fn insufficient_data_in_vault(state: &mut State, vault_kind: VaultKind) {
     // SETUP
-    let idks = vec![IDK::FirstName, IDK::LastName]; // Idology requires Address as well. TODO: when we add Incode they only require first + last so tests will get more fun
+    let idks = if vault_kind.expects_idology() {
+        vec![IDK::FirstName, IDK::LastName] // Idology requires address too
+    } else {
+        vec![] // Incode only requires first+last name
+    };
     let (sv, task) =
-        create_user_and_task(&state.db_pool, is_portable, true, OnboardingStatus::Pass, idks).await;
+        create_user_and_task(&state.db_pool, vault_kind, true, OnboardingStatus::Pass, idks).await;
 
     expect_webhook(
         state,
@@ -89,12 +99,28 @@ async fn insufficient_data_in_vault(state: &mut State, is_portable: bool) {
     assert!(rs.is_empty());
 }
 
-#[test_state]
-async fn vendor_error(state: &mut State) {
+#[test_state_case(VaultKind::Portable(EnhancedAmlOption::No))]
+#[test_state_case(VaultKind::Portable(enhanced_aml_option_yes()))]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+async fn vendor_error(state: &mut State, vault_kind: VaultKind) {
     // SETUP
-    let (sv, task) =
-        create_user_and_task(&state.db_pool, true, true, OnboardingStatus::Pass, full_vault()).await;
-    mock_idology_pa(state, &VendorRes::Error);
+    let (sv, task) = create_user_and_task(
+        &state.db_pool,
+        vault_kind.clone(),
+        true,
+        OnboardingStatus::Pass,
+        full_vault(),
+    )
+    .await;
+
+    if vault_kind.expects_idology() {
+        mock_idology_pa(state, &VendorRes::Error);
+    } else {
+        let mut mock_ff_client = MockFeatureFlagClient::new();
+        mock_ff_client.expect_flag().return_once(move |_| true);
+        state.set_ff_client(Arc::new(mock_ff_client));
+        mock_incode_watchlist_check(state, &VendorRes::Error);
+    }
 
     expect_no_webhook(state);
 
@@ -107,42 +133,64 @@ async fn vendor_error(state: &mut State) {
     let TaskError::ApiError(e) = res.err().unwrap() else {
         panic!();
     };
-    assert!(matches!(e.kind(), crate::ApiErrorKind::VendorRequestFailed(_)));
+    assert!(matches!(
+        e.kind(),
+        crate::ApiErrorKind::VendorRequestFailed(_) | crate::ApiErrorKind::IdvError(_)
+    ));
 
     assert_eq!(WatchlistCheckStatusKind::Pending, wc.status);
     assert!(ut.is_none());
-
+    assert!(rs.is_empty());
     assert!(di.is_some());
     // vreq + vres is saved with is_error=true
-    assert_eq!(1, vreqs.len());
-    assert_eq!(VendorAPI::IdologyPa, vreqs[0].0.vendor_api);
-    assert!(vreqs[0].1.is_some());
-    assert!(vreqs[0].1.as_ref().unwrap().is_error);
-    assert!(rs.is_empty());
+    if vault_kind.expects_idology() {
+        assert_eq!(1, vreqs.len());
+        assert_eq!(VendorAPI::IdologyPa, vreqs[0].0.vendor_api);
+        assert!(vreqs[0].1.is_some());
+        assert!(vreqs[0].1.as_ref().unwrap().is_error);
+    } else {
+        assert_eq!(2, vreqs.len()); //1 for start onboarding, 1 for watchlist call
+        let vreq_vres = vreqs
+            .iter()
+            .find(|v| v.0.vendor_api == VendorAPI::IncodeWatchlistCheck)
+            .unwrap();
+        assert!(vreq_vres.1.is_some());
+        assert!(vreq_vres.1.as_ref().unwrap().is_error);
+    }
 }
 
-#[test_state_case(true, OnboardingStatus::Pass, VendorRes::Hit, (WatchlistCheckStatusKind::Fail, vec![FootprintReasonCode::WatchlistHitOfac]))]
-#[test_state_case(true, OnboardingStatus::Pass, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
-#[test_state_case(false, OnboardingStatus::Pass, VendorRes::Hit, (WatchlistCheckStatusKind::Fail, vec![FootprintReasonCode::WatchlistHitOfac]))]
-#[test_state_case(false, OnboardingStatus::Pass, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
+#[test_state_case(VaultKind::Portable(EnhancedAmlOption::No), OnboardingStatus::Pass, VendorRes::Hit, (WatchlistCheckStatusKind::Fail, vec![FootprintReasonCode::WatchlistHitOfac]))]
+#[test_state_case(VaultKind::Portable(enhanced_aml_option_yes()), OnboardingStatus::Pass, VendorRes::Hit, (WatchlistCheckStatusKind::Fail, vec![FootprintReasonCode::WatchlistHitOfac]))]
+#[test_state_case(VaultKind::Portable(EnhancedAmlOption::No), OnboardingStatus::Pass, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
+#[test_state_case(VaultKind::Portable(enhanced_aml_option_yes()), OnboardingStatus::Pass, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
+#[test_state_case(VaultKind::NonPortable, OnboardingStatus::Pass, VendorRes::Hit, (WatchlistCheckStatusKind::Fail, vec![FootprintReasonCode::WatchlistHitOfac]))]
+#[test_state_case(VaultKind::NonPortable, OnboardingStatus::Pass, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
 // Non portable vaults always have checks run even if they are in non-Pass states. although.. TODO: we should probably still skip checks for NPV's that are Fail?
-#[test_state_case(false, OnboardingStatus::Incomplete, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
-#[test_state_case(false, OnboardingStatus::Pending, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
-#[test_state_case(false, OnboardingStatus::Fail, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
+#[test_state_case(VaultKind::NonPortable, OnboardingStatus::Incomplete, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
+#[test_state_case(VaultKind::NonPortable, OnboardingStatus::Pending, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
+#[test_state_case(VaultKind::NonPortable, OnboardingStatus::Fail, VendorRes::NoHit, (WatchlistCheckStatusKind::Pass, vec![]))]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn active_users(
     state: &mut State,
-    is_portable: bool,
+    vault_kind: VaultKind,
     status: OnboardingStatus,
     vendor_res: VendorRes,
     expect: (WatchlistCheckStatusKind, Vec<FootprintReasonCode>),
 ) {
     let (expected_status, expected_reason_codes) = expect;
     // SETUP
-    let (sv, task) = create_user_and_task(&state.db_pool, is_portable, true, status, full_vault()).await;
+    let (sv, task) =
+        create_user_and_task(&state.db_pool, vault_kind.clone(), true, status, full_vault()).await;
 
     // Mock vendor + expect webhooks
-    mock_idology_pa(state, &vendor_res);
+    if vault_kind.expects_idology() {
+        mock_idology_pa(state, &vendor_res);
+    } else {
+        let mut mock_ff_client = MockFeatureFlagClient::new();
+        mock_ff_client.expect_flag().return_once(move |_| true);
+        state.set_ff_client(Arc::new(mock_ff_client));
+        mock_incode_watchlist_check(state, &vendor_res);
+    }
     expect_webhook(state, expected_status, None);
 
     // RUN
@@ -153,15 +201,35 @@ async fn active_users(
 
     assert_eq!(expected_status, wc.status);
     assert_eq!(Some(expected_reason_codes.clone()), wc.reason_codes);
-    assert!(ut.is_some());
-
-    assert!(di.is_some());
-    assert_eq!(1, vreqs.len());
-    assert_eq!(VendorAPI::IdologyPa, vreqs[0].0.vendor_api);
-    assert!(vreqs[0].1.is_some());
-    assert!(!vreqs[0].1.as_ref().unwrap().is_error);
     assert_have_same_elements(
         expected_reason_codes,
         rs.into_iter().map(|r| r.reason_code).collect(),
     );
+    assert!(ut.is_some());
+    assert!(di.is_some());
+
+    if vault_kind.expects_idology() {
+        assert_eq!(1, vreqs.len());
+        assert_eq!(VendorAPI::IdologyPa, vreqs[0].0.vendor_api);
+        assert!(vreqs[0].1.is_some());
+        assert!(!vreqs[0].1.as_ref().unwrap().is_error);
+    } else {
+        assert_eq!(2, vreqs.len()); //1 for start onboarding, 1 for watchlist call
+        let vreq_vres = vreqs
+            .iter()
+            .find(|v| v.0.vendor_api == VendorAPI::IncodeWatchlistCheck)
+            .unwrap();
+        assert!(vreq_vres.1.is_some());
+        assert!(!vreq_vres.1.as_ref().unwrap().is_error);
+    }
+}
+
+fn enhanced_aml_option_yes() -> EnhancedAmlOption {
+    EnhancedAmlOption::Yes {
+        ofac: true,
+        pep: true,
+        adverse_media: true,
+        continuous_monitoring: true,
+        adverse_media_lists: None,
+    }
 }

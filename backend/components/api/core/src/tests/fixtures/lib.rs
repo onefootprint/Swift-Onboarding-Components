@@ -5,9 +5,12 @@ use db::models::tenant::Tenant;
 use db::models::vault::Vault;
 use db::models::workflow::{Workflow, WorkflowUpdate};
 use db::tests::fixtures;
+use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::TxnPgConn;
 use itertools::Itertools;
-use newtypes::{DataIdentifier, IdentityDataKind as IDK, OnboardingStatus, PiiString};
+use newtypes::{
+    DataIdentifier, IdentityDataKind as IDK, KycState, OnboardingStatus, PiiString, WorkflowState, Locked,
+};
 use newtypes::{TenantId, VaultKind};
 use rand::Rng;
 
@@ -67,12 +70,13 @@ pub fn create_user_and_populate_vault(
 
 pub fn create_user_and_onboarding(
     conn: &mut TxnPgConn,
-    is_live: bool,
+    obc_opts: ObConfigurationOpts,
     onboarding_status: OnboardingStatus,
     idks: Vec<IDK>,
 ) -> (Tenant, Vault, ScopedVault, Workflow) {
+    let is_live = obc_opts.is_live;
     let tenant = fixtures::tenant::create(conn);
-    let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, is_live);
+    let ob_config = fixtures::ob_configuration::create_with_opts(conn, &tenant.id, obc_opts);
     let ob_config_id = ob_config.id.clone();
 
     let tenant_id = tenant.id.clone();
@@ -83,6 +87,14 @@ pub fn create_user_and_onboarding(
     let wf = Workflow::lock(conn, &wf.id).unwrap();
     let update = WorkflowUpdate::set_status(onboarding_status);
     let wf = Workflow::update(wf, conn, update).unwrap();
+    let wf_id = Locked::new(wf.id.clone());
+    let wf = Workflow::update_state(
+        conn,
+        wf_id,
+        WorkflowState::Kyc(KycState::DataCollection),
+        WorkflowState::Kyc(KycState::Complete),
+    )
+    .unwrap();
 
     (tenant, uv, su, wf)
 }

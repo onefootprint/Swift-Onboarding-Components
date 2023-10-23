@@ -1,7 +1,7 @@
 use crate::decision::utils;
 use crate::tests::fixtures;
 use crate::State;
-use db::tests::test_db_pool::TestDbPool;
+use db::tests::{fixtures::ob_configuration::ObConfigurationOpts, test_db_pool::TestDbPool};
 use db::DbResult;
 use feature_flag::{BoolFlag, MockFeatureFlagClient};
 use macros::test_state;
@@ -17,8 +17,15 @@ async fn test_handle_setup(state: &mut State) {
     let (tenant, vault, wf) = state
         .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
-            let (tenant, vault, _, wf) =
-                fixtures::lib::create_user_and_onboarding(conn, true, OnboardingStatus::Pass, vec![]);
+            let (tenant, vault, _, wf) = fixtures::lib::create_user_and_onboarding(
+                conn,
+                ObConfigurationOpts {
+                    is_live: true,
+                    ..Default::default()
+                },
+                OnboardingStatus::Pass,
+                vec![],
+            );
             Ok((tenant, vault, wf))
         })
         .await
@@ -48,8 +55,15 @@ async fn test_handle_setup(state: &mut State) {
     let (tenant, vault, wf) = state
         .db_pool
         .db_transaction(move |conn| -> db::DbResult<_> {
-            let (tenant, vault, _, wf) =
-                fixtures::lib::create_user_and_onboarding(conn, true, OnboardingStatus::Pass, vec![]);
+            let (tenant, vault, _, wf) = fixtures::lib::create_user_and_onboarding(
+                conn,
+                ObConfigurationOpts {
+                    is_live: true,
+                    ..Default::default()
+                },
+                OnboardingStatus::Pass,
+                vec![],
+            );
             Ok((tenant, vault, wf))
         })
         .await
