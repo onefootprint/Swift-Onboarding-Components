@@ -18,7 +18,7 @@ use db::models::{
 use feature_flag::BoolFlag;
 use idv::VendorResponse;
 use itertools::Itertools;
-use newtypes::{VendorAPI, WorkflowId};
+use newtypes::{RuleName, VendorAPI, WorkflowId};
 use std::future::Future;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
@@ -121,15 +121,19 @@ pub async fn run_kyc_waterfall(
         .feature_flag_client
         .flag(BoolFlag::IsKycWaterfallOnRuleFailureEnabled(&tenant_id))
     {
+        // If a user does not provide SSN, we don't necessarily need to waterfall if that's the only failing rule
+        let mut rules = rule_sets::kyc::kyc_rules();
+        rules.retain(|r| r.name != RuleName::SsnNotProvided); // a little sketch to use name here
+
         WaterfallRuleConfig::Enabled {
             // TODO: rework HasRuleGroup and instead get rules based on OBC and use that here instead of hardcoding to rule_sets::kyc::kyc_rules(). And split kyc vs aml vs doc rules so we can get just the configured kyc rules here.
             // or mb we have separate rules for waterfall determination
-            // ^ TODO: dont waterfall if rule failure is ssn_not_provided/phone_not_provided
             rule_group: KycRuleGroup {
-                kyc_rules: rule_sets::kyc::kyc_rules(),
+                kyc_rules: rules,
                 doc_rules: vec![],
                 aml_rules: vec![],
             },
+
             rule_config: KycRuleExecutionConfig::for_kyc_only(),
             vw,
             obc,
