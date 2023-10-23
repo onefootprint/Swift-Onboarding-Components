@@ -156,9 +156,6 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     is_from_api,
                 } = data;
                 let vault = Vault::get(conn, &user_vault_id)?;
-                if !vault.is_portable && su_id.is_none() {
-                    return Err(AuthError::NonPortableVault.into());
-                }
                 if vault.kind != VaultKind::Person {
                     return Err(AuthError::NonPersonVault.into());
                 }

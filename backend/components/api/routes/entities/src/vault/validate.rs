@@ -78,17 +78,17 @@ async fn post_inner(
     let is_live = auth.is_live()?;
 
     let request = request.clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
-    let uvw = state
+    let request = request.no_fingerprints(); // No fingerprints to check speculatively
+    state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
-            Ok(uvw)
+            request.assert_allowable_identifiers(uvw.vault.kind)?;
+            uvw.validate_request(conn, request)?;
+            Ok(())
         })
         .await??;
-    request.assert_allowable_identifiers(uvw.vault.kind)?;
-    let request = request.no_fingerprints(); // No fingerprints to check speculatively
-    uvw.validate_request(request)?;
 
     EmptyResponse::ok().json()
 }

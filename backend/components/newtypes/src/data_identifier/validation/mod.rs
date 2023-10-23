@@ -89,6 +89,8 @@ pub enum Error {
     PartialUpdateNotAllowed(CollectedDataOption),
     #[error("This piece of data is already set and cannot be replaced.")]
     CannotReplaceData,
+    #[error("Cannot replace verified contact information via API.")]
+    CannotReplaceVerifiedContactInfo,
     #[error("Expected string value, received JSON value.")]
     ExpectedStringFormat,
     #[error("Expected {0} value, received {1} value.")]

@@ -200,8 +200,9 @@ async fn get_user_challenge_context(
     if !creds.is_empty() {
         kinds.push(ChallengeKind::Biometric);
     }
-    let is_unverified =
-        kinds.is_empty() && !uvw.vault.is_portable && cis.iter().any(|(k, _)| *k == ContactInfoKind::Phone);
+    let is_unverified = kinds.is_empty()
+        && uvw.vault.is_created_via_api
+        && cis.iter().any(|(k, _)| *k == ContactInfoKind::Phone);
     if is_unverified {
         // If this is a non-portable vault with a phone, allow initiating a challenge to the phone
         // We would _only_ get here if an unauthed, identified token is passed into identify

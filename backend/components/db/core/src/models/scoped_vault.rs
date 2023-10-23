@@ -165,8 +165,8 @@ impl ScopedVault {
             // TODO if SV already exists, we should make a new workflow rather than an onboarding
             return Ok(scoped_vault);
         }
-        if !uv.is_portable {
-            // Shouldn't be creating SVs for non-portable vaults here - use `get_or_create_non_portable` below
+        if uv.is_created_via_api {
+            // Shouldn't be creating SVs for api vaults here - use `get_or_create_non_portable` below
             // One day, we'll want to allow this when an initially "non-portable" user one-click
             // onboards onto a new tenant!
             return Err(DbError::CannotCreatedScopedUser);
@@ -206,7 +206,7 @@ impl ScopedVault {
         // make sure they are scoped per tenant
         let idempotency_id = idempotency_id.map(|id| IdempotencyId::from(format!("{}.{}", tenant_id, id)));
         let (uv, is_new_vault) = Vault::insert(conn, new_user, idempotency_id)?;
-        if uv.is_portable {
+        if !uv.is_created_via_api {
             return Err(DbError::CannotCreatedScopedUser);
         }
         let su = if is_new_vault {

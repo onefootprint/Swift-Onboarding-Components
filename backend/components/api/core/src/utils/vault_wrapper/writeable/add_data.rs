@@ -55,7 +55,7 @@ impl<Type> WriteableVw<Type> {
         let kyced_bos = request.get(&BDK::KycedBeneficialOwners.into()).cloned();
         let (new_ci, seqno) = if !request.is_empty() {
             // Must do this validation here inside the locked, WriteableUvw
-            let request = self.validate_request(request)?;
+            let request = self.validate_request(conn, request)?;
             let (vds, seqno) = request.save(conn, self.vault(), self.scoped_vault_id.clone(), source)?;
             let new_ci = Self::create_contact_info_if_needed(conn, vds)?;
             (new_ci, seqno)

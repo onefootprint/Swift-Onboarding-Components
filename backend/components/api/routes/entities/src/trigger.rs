@@ -73,7 +73,8 @@ pub async fn post(
             if vw.vault.kind != VaultKind::Person {
                 return Err(TenantError::IncorrectVaultKindForRedoKyc.into());
             }
-            if !vw.vault.is_portable {
+            if vw.vault.is_created_via_api {
+                // TODO We'll support this soon
                 return Err(TenantError::CannotTriggerKycForNonPortable.into());
             }
 

@@ -83,9 +83,6 @@ impl WriteableVw<Person> {
         // TODO also only portablize the _exact_ data that was sent off to be verified. It's possible
         // the data has been changed via API in between sending VReqs and now.
         let Self { uvw, scoped_vault_id } = self;
-        if !uvw.vault.is_portable {
-            return Err(AssertionError("Cannot portabalize data in a non-portable vault").into());
-        }
         // Use the same seqno to deactivate old data and portablize new data
         let seqno = DataLifetime::get_next_seqno(conn)?;
 

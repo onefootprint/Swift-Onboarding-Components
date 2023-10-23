@@ -65,8 +65,6 @@ pub enum AuthError {
     NotRiskOpsFirmEmployee,
     #[error("Not allowed: ob config doesn't require collecting business")]
     BusinessNotRequired,
-    #[error("Cannot log in as a non-portable vault unless initiated via a tenant token context")]
-    NonPortableVault,
     #[error("Cannot log in as a non-person vault")]
     NonPersonVault,
     #[error("Your organization administrator has disabled the ability to log in using this auth method. Please retry using another auth method.")]

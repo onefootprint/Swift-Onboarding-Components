@@ -7,7 +7,7 @@ use crate::State;
 use api_core::auth::user::{UserAuthContext, UserAuthGuard, UserWfAuthContext};
 use api_core::auth::AuthError;
 use api_core::decision::features::risk_signals::ssn_optional_and_missing;
-use api_core::utils::vault_wrapper::{Any, Person, TenantVw, VwArgs};
+use api_core::utils::vault_wrapper::{Any, Person, VwArgs};
 use db::models::document_request::{DocumentRequest, NewDocumentRequestArgs};
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
@@ -76,12 +76,15 @@ pub async fn post_validate(
     };
     let request = request.into_inner().clean_and_validate(opts)?;
     let request = request.no_fingerprints(); // No fingerprints to check speculatively
-    let uvw: TenantVw = state
+    state
         .db_pool
-        .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &su_id))
+        .db_query(move |conn| -> ApiResult<_> {
+            let vw = VaultWrapper::<Person>::build_for_tenant(conn, &su_id)?;
+            request.assert_allowable_identifiers(vw.vault.kind)?;
+            vw.validate_request(conn, request)?;
+            Ok(())
+        })
         .await??;
-    request.assert_allowable_identifiers(uvw.vault.kind)?;
-    uvw.validate_request(request)?;
 
     EmptyResponse::ok().json()
 }

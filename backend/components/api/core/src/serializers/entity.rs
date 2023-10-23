@@ -83,6 +83,7 @@ impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
         api_wire_types::Entity {
             id: fp_id,
             sandbox_id,
+            // TODO does the client read this?
             is_portable,
             kind,
             attributes,

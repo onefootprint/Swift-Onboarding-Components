@@ -6,12 +6,13 @@ use crate::{
 };
 use db::{
     models::{
+        contact_info::ContactInfo,
         data_lifetime::DataLifetime,
         fingerprint::{Fingerprint, NewFingerprint},
         vault::Vault,
         vault_data::{NewVaultData, VaultData},
     },
-    TxnPgConn,
+    PgConn, TxnPgConn,
 };
 use itertools::Itertools;
 use newtypes::{
@@ -30,37 +31,34 @@ pub struct ValidatedDataRequest {
 impl<Type> VaultWrapper<Type> {
     /// Given a DataRequest, validate some invariants before allowing it to be written to the vault.
     /// These invariants are also a function of the data in the vault at the time
-    pub fn validate_request(&self, request: DataRequest<Fingerprints>) -> ApiResult<ValidatedDataRequest> {
+    pub fn validate_request(
+        &self,
+        conn: &mut PgConn,
+        request: DataRequest<Fingerprints>,
+    ) -> ApiResult<ValidatedDataRequest> {
         // Don't allow replacing some pieces of info
-        let irreplaceable_dis = if self.vault.is_portable {
-            // TODO should implement this now
-            // TODO really just want to avoid replacing verified phone and email
-            vec![
-                (IDK::PhoneNumber.into(), true),
-                (IDK::Email.into(), false),
-                (BDK::KycedBeneficialOwners.into(), true),
-            ]
-        } else {
-            vec![(BDK::KycedBeneficialOwners.into(), true)]
-        };
         let mut validation_errors = HashMap::<DataIdentifier, newtypes::Error>::new();
 
-        for (di, check_portable_and_speculative) in irreplaceable_dis {
-            let update_has_di = request.keys().any(|x| x == &di);
-            let vault_already_has_di = if check_portable_and_speculative {
-                // Some fields we are not allowed to update as soon as they are set on the vault,
-                // whether speculative or portablized
-                self.data(&di).is_some()
-            } else {
-                // Other fields we only cannot replace if they are portablized
-                if let Some(data) = self.data(&di) {
-                    data.is_portable()
-                } else {
-                    false
-                }
+        let irreplaceable_ci = [IDK::PhoneNumber.into(), IDK::Email.into()];
+        for di in irreplaceable_ci {
+            let Some(dl_id) = self.data(&IDK::Email.into()).map(|d| &d.lifetime.id) else {
+                continue;
             };
+            let ci = ContactInfo::get(conn, dl_id)?;
+            let update_has_di = request.keys().any(|x| x == &di);
+            if ci.is_otp_verified && update_has_di {
+                validation_errors.insert(
+                    di.clone(),
+                    ValidationError::CannotReplaceVerifiedContactInfo.into(),
+                );
+            }
+        }
+
+        let irreplaceable_dis = vec![BDK::KycedBeneficialOwners.into()];
+        for di in irreplaceable_dis {
+            let update_has_di = request.keys().any(|x| x == &di);
+            let vault_already_has_di = self.data(&di).is_some();
             if update_has_di && vault_already_has_di {
-                // We don't currently support adding a phone/email
                 validation_errors.insert(di.clone(), ValidationError::CannotReplaceData.into());
             }
         }

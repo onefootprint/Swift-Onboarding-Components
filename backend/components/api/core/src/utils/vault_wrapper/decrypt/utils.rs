@@ -50,7 +50,7 @@ impl<Type> VaultWrapper<Type> {
 
         // TODO we're moving away from needing to send things to verified contact info. Can we get
         // rid of this check for portable vaults too?
-        if self.vault.is_portable && !ci.is_otp_verified {
+        if !self.vault.is_created_via_api && !ci.is_otp_verified {
             // Many of the communications we send out give either OTPs or links that allow authing
             // as the user. So, we want to make sure a tenant can't update the user's phone number/email
             // and then send themselves OTPs. First, check that the phone number/email is verified to

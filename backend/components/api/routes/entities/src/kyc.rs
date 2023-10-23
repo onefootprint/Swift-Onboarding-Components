@@ -63,7 +63,7 @@ pub async fn post(
     if uvw.vault.kind != VaultKind::Person {
         return Err(TenantError::IncorrectVaultKindForKyc.into());
     }
-    if uvw.vault.is_portable {
+    if !uvw.vault.is_created_via_api {
         return Err(TenantError::CannotRunKycForPortable.into());
     }
 

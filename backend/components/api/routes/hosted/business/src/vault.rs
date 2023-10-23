@@ -44,15 +44,15 @@ pub async fn post_validate(
     let request = request.clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;
     let request = request.no_fingerprints(); // No fingerprints to check speculatively
 
-    let bvw = state
+    state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let bvw: TenantVw<Business> = VaultWrapper::build_for_tenant(conn, &sb_id)?;
-            Ok(bvw)
+            request.assert_allowable_identifiers(bvw.vault.kind)?;
+            bvw.validate_request(conn, request)?;
+            Ok(())
         })
         .await??;
-    request.assert_allowable_identifiers(bvw.vault.kind)?;
-    bvw.validate_request(request)?;
 
     EmptyResponse::ok().json()
 }
