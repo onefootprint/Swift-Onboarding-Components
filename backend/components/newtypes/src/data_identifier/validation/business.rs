@@ -43,8 +43,12 @@ impl Validate for BDK {
 #[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString)]
 #[strum(serialize_all = "snake_case")]
 enum CorporationType {
-    Corporation,
+    Corporation, // No longer used in the frontend
+    CCorporation,
+    SCorporation,
+    BCorporation,
     Llc,
+    Llp,
     Partnership,
     SoleProprietorship,
     NonProfit,
