@@ -46,8 +46,8 @@ pub fn get_or_start_onboarding(
         let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, sv_id)?;
         let is_all_visible_data_added_by_tenant = vw.populated_dis().into_iter().all(|di| {
             let Some(dl) = vw.get_lifetime(di.clone()) else {
-            return false; // Shouldn't happen
-        };
+                return false; // Shouldn't happen
+            };
             // Data must be added by tenant AND already decryptable
             &dl.scoped_vault_id == sv_id && vw.can_decrypt(di)
         });

@@ -68,7 +68,6 @@ pub async fn post(
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let (wf_id, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(
                 conn,
-                // TODO do we always create a new WF when there isn't one attached? or do we sometimes inherit???
                 user_auth.workflow_id(),
                 user_auth.is_from_api,
                 &scoped_user.vault_id,
