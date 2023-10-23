@@ -33,6 +33,7 @@ impl<Type> VaultWrapper<Type> {
     pub fn validate_request(&self, request: DataRequest<Fingerprints>) -> ApiResult<ValidatedDataRequest> {
         // Don't allow replacing some pieces of info
         let irreplaceable_dis = if self.vault.is_portable {
+            // TODO should implement this now
             // TODO really just want to avoid replacing verified phone and email
             vec![
                 (IDK::PhoneNumber.into(), true),

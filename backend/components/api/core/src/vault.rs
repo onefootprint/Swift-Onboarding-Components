@@ -46,11 +46,11 @@ pub async fn create_non_portable_vault(
         public_key,
         e_private_key,
         is_live,
-        is_portable: false,
         kind: vault_kind,
         is_fixture: false,
         // TODO allow providing sandbox ID in a header
         sandbox_id: (!is_live).then(SandboxId::new),
+        is_created_via_api: true,
     };
 
     // Parse optional request

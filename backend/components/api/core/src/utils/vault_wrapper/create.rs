@@ -88,10 +88,10 @@ impl VaultWrapper<Person> {
             e_private_key,
             public_key,
             is_live: obc.is_live, // Must derive is_live from the ob config used to create it
-            is_portable: true,
             kind: VaultKind::Person,
             is_fixture: is_fixture_data,
             sandbox_id,
+            is_created_via_api: false,
         };
         let uv = Vault::create(conn, new_user_vault)?;
         let su = ScopedVault::get_or_create(conn, &uv, obc.id)?;

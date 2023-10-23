@@ -81,10 +81,10 @@ pub fn get_or_start_onboarding(
                 public_key: new_biz_args.public_key,
                 e_private_key: new_biz_args.e_private_key,
                 is_live: user_vault.is_live,
-                is_portable: true,
                 kind: VaultKind::Business,
                 is_fixture: false,
                 sandbox_id: user_vault.sandbox_id.clone(), // Use the same sandbox ID for business vault
+                is_created_via_api: false,
             };
             let business_vault = Vault::create(conn, args)?;
             BusinessOwner::create_primary(conn, user_vault.id.clone(), business_vault.id.clone())?;

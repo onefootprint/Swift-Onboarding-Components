@@ -27,7 +27,7 @@ pub struct Vault {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub is_live: IsLive, // true IFF sandbox_id is null
-    /// True if the user was created via bifrost. False if the user was made via API and won't be portablized
+    /// True if the user can be found in /identify
     pub is_portable: bool,
     pub kind: VaultKind,
     /// A subset of the sandbox, non-is-live users are "fixture" users created specifically with
@@ -39,6 +39,8 @@ pub struct Vault {
     /// The sandbox identifier helps to differentiate multiple sandbox vaults made with the same
     /// phone number / email.
     pub sandbox_id: Option<SandboxId>, // is_none() IFF is_live
+    /// True if the user was created via tenant-facing API rather than via bifrost
+    pub is_created_via_api: Option<bool>,
 }
 
 pub enum VaultIdentifier<'a> {
@@ -171,21 +173,23 @@ impl Vault {
             e_private_key,
             public_key,
             is_live,
-            is_portable,
             kind,
             is_fixture,
             sandbox_id,
+            is_created_via_api,
         } = new_user;
         let new_user = NewVaultRow {
             id: VaultId::generate(kind),
             e_private_key,
             public_key,
             is_live,
-            is_portable,
             kind,
             is_fixture,
             idempotency_id: idempotency_id.clone(),
             sandbox_id,
+            is_created_via_api,
+            // Vault isn't portable if it starts out created via API
+            is_portable: !is_created_via_api,
         };
 
         let vault = diesel::insert_into(vault::table)
@@ -270,14 +274,15 @@ struct NewVaultRow {
     is_fixture: IsFixture,
     idempotency_id: Option<IdempotencyId>,
     sandbox_id: Option<SandboxId>,
+    is_created_via_api: bool,
 }
 
 pub struct NewVaultArgs {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,
     pub is_live: IsLive,
-    pub is_portable: bool,
     pub kind: VaultKind,
     pub is_fixture: IsFixture,
     pub sandbox_id: Option<SandboxId>,
+    pub is_created_via_api: bool,
 }

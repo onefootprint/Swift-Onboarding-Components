@@ -110,10 +110,10 @@ mod test {
             e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
             public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
             is_live: false,
-            is_portable: true,
             kind: VaultKind::Person,
             is_fixture: false,
             sandbox_id: Some(SandboxId::new()),
+            is_created_via_api: false,
         };
         pool.db_transaction(|conn| -> DbResult<_> {
             let result = Vault::create(conn, new_user)?.into_inner();

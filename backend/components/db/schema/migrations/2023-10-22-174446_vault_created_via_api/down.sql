@@ -1,0 +1,1 @@
+ALTER TABLE vault DROP COLUMN is_created_via_api;

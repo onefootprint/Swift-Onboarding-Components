@@ -22,9 +22,9 @@ pub fn new_vault_args(kind: VaultKind, sandbox_id: Option<String>, is_portable: 
         public_key: VaultPublicKey::from_raw_uncompressed(&public_key_bytes).unwrap(),
         is_live: sandbox_id.is_none(),
         sandbox_id: sandbox_id.map(SandboxId::from),
-        is_portable,
         kind,
         is_fixture: false,
+        is_created_via_api: !is_portable,
     }
 }
 
