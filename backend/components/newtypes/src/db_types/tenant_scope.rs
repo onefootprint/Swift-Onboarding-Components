@@ -60,6 +60,8 @@ pub enum TenantScope {
     TriggerKyc,
     /// Create new vaults and update existing vaults' information
     WriteEntities,
+    /// Create an auth token that can be used to launch Footprint.js for a given user
+    AuthToken,
     /// Perform actions related to onboarding users - create short-lived onboarding sessions and validate tokens returned from Footprint.js
     Onboarding,
 
@@ -102,6 +104,7 @@ impl TenantScope {
             Self::InvokeVaultProxy { .. } => vec![ApiKey],
             Self::TriggerKyc => vec![ApiKey],
             Self::WriteEntities => vec![ApiKey],
+            Self::AuthToken => vec![ApiKey],
             Self::Onboarding => vec![ApiKey],
         }
     }

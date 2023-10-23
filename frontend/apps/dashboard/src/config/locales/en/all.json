@@ -1768,6 +1768,7 @@
           "manual_review": "Perform manual review",
           "write_entities": "Create and update users",
           "trigger_kyc": "Manually initiate KYC",
+          "auth_token": "Create auth tokens",
           "decrypt_all": "Everything",
           "decrypt_custom": "Custom attributes",
           "decrypt_documents": "Documents",
@@ -1799,6 +1800,7 @@
             "manual_review": "Make new decisions, add annotations, re-trigger KYC",
             "write_entities": "Create new vaults and update existing vaults' information",
             "trigger_kyc": "Run KYC checks on an existing vaulted user",
+            "auth_token": "Generate user-scoped auth tokens for Footprint.js",
             "onboarding": "Create short-lived onboarding sessions, validate tokens from Footprint.js",
             "manage_webhooks": "Configure webhook endpoints",
             "decrypt": "Decrypt the specified attributes"

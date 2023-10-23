@@ -15,6 +15,7 @@ export enum RoleScopeKind {
   decryptCustom = 'decrypt_custom',
   cipIntegration = 'cip_integration',
   triggerKyc = 'trigger_kyc',
+  authToken = 'auth_token',
   manageVaultProxy = 'manage_vault_proxy',
   onboarding = 'onboarding',
   manageWebhooks = 'manage_webhooks',
@@ -40,6 +41,7 @@ export const supportedRoleKinds: Record<RoleScopeKind, RoleKind[]> = {
   [RoleScopeKind.cipIntegration]: [RoleKind.apiKey],
   [RoleScopeKind.invokeVaultProxy]: [RoleKind.apiKey],
   [RoleScopeKind.triggerKyc]: [RoleKind.apiKey],
+  [RoleScopeKind.authToken]: [RoleKind.apiKey],
   [RoleScopeKind.writeEntities]: [RoleKind.apiKey],
   [RoleScopeKind.onboarding]: [RoleKind.apiKey],
 

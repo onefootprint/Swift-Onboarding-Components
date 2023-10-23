@@ -34,8 +34,7 @@ pub async fn post(
     request: Json<TokenRequest>,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<TokenResponse> {
-    // TODO actually what guard do we use here
-    let auth = auth.check_guard(TenantGuard::WriteEntities)?;
+    let auth = auth.check_guard(TenantGuard::AuthToken)?;
     let TokenRequest { key } = request.into_inner();
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
