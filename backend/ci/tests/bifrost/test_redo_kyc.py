@@ -13,9 +13,8 @@ from tests.bifrost_client import BifrostClient
 
 def extract_trigger_sms(twilio, phone_number, id):
     def inner():
-        real_phone_number = phone_number.split("#")[0]
-        messages = twilio.messages.list(to=real_phone_number, limit=25)
-        print(f"Searching for message with id {id}")
+        messages = twilio.messages.list(to=phone_number, limit=25)
+        print(f"Searching for message with id {id} sent to {phone_number}")
         message = next(
             m for m in messages if f"{id}\n\nRe-verify your identity for" in m.body
         )

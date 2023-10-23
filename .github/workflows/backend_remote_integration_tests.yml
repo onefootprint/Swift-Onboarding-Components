@@ -36,7 +36,7 @@ on:
         required: true
 
     secrets:
-      INTEGRATION_TEST_PHONE_NUMBER:
+      IT_PHONE_NUMBERS:
         required: true
       IT_TWILIO_ACCOUNT_SID:
         required: true
@@ -57,7 +57,7 @@ jobs:
       PR_NUMBER: ${{ inputs.prNumber }}
       TEST_URL: ${{ inputs.testUrl }}
       EXPECTED_SERVER_VERSION: ${{ inputs.expectedCommitHash || github.sha }}
-      INTEGRATION_TEST_PHONE_NUMBER: ${{ secrets.INTEGRATION_TEST_PHONE_NUMBER }}
+      IT_PHONE_NUMBERS: ${{ var.IT_PHONE_NUMBERS }}
       IT_TWILIO_ACCOUNT_SID: ${{ secrets.IT_TWILIO_ACCOUNT_SID }}
       IT_TWILIO_SECRET_AUTH_TOKEN: ${{ secrets.IT_TWILIO_SECRET_AUTH_TOKEN }}
       DITTO_URL: 'https://ditto.footprint.dev'

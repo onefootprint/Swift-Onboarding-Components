@@ -1,6 +1,6 @@
 import pytest
 
-from tests.headers import SandboxId, PublishableOnboardingKey, IsLive
+from tests.headers import PublishableOnboardingKey, IsLive
 from tests.constants import EMAIL, LIVE_PHONE_NUMBER
 from tests.bifrost_client import BifrostClient
 from tests.utils import (

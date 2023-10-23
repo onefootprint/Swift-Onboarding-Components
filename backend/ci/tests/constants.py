@@ -2,6 +2,7 @@ import json
 import os
 from .headers import CustodianAuth
 from dotenv import load_dotenv
+import random
 
 load_dotenv()
 
@@ -23,8 +24,12 @@ url = lambda path: "{}/{}".format(TEST_URL, path)
 IT_TWILIO_ACCOUNT_SID = get_secret("IT_TWILIO_ACCOUNT_SID")
 IT_TWILIO_SECRET_AUTH_TOKEN = get_secret("IT_TWILIO_SECRET_AUTH_TOKEN")
 # This is a real phone number - we send real SMSes to this phone number.
-# This phone number exists on the twilio account defined by the credentials above
-LIVE_PHONE_NUMBER = get_secret("INTEGRATION_TEST_PHONE_NUMBER")
+# This phone number exists on the twilio account defined by the credentials above.
+# Some environments with lots of concurrency have multiple phone numbers - select one randomly
+ALL_PHONE_NUMBERS = json.loads(get_secret("IT_PHONE_NUMBERS"))
+phone_idx = random.randint(0, len(ALL_PHONE_NUMBERS) - 1)
+LIVE_PHONE_NUMBER = ALL_PHONE_NUMBERS[phone_idx]
+print(f"USING LIVE PHONE NUMBER: {LIVE_PHONE_NUMBER}")
 
 # This phone number can only be used in sandbox. It will always yield a PIN code of 000000 in the identify flow and we never send SMS messages to it.
 # However, users created with this phone number can never be identified at another tenant.
