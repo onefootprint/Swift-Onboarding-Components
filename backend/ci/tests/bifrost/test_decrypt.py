@@ -7,8 +7,9 @@ def biometric_sandbox_user_auth(sandbox_user):
     """
     auth token for sandbox_user from logging in via biometric credential
     """
-    step_up_user_biometric(sandbox_user.client.auth_token, sandbox_user, "onboarding")
-    return sandbox_user.client.auth_token
+    return step_up_user_biometric(
+        sandbox_user.client.auth_token, sandbox_user, "onboarding"
+    )
 
 
 @pytest.mark.parametrize(

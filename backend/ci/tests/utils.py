@@ -226,8 +226,12 @@ def step_up_user(twilio, token, recipient_phone_number, expect_unverified):
     )
 
     # Now, token should have scopes
-    body = get("hosted/user/token", None, token)
+    body = get("hosted/user/token", None, new_token)
     assert set(body["scopes"]) >= {"sign_up"}
+    assert (
+        new_token.value != token.value
+    ), "Verify should give us a new token with permissions"
+    # TODO eventually, enforce that the old token's scopes did not increase
 
     return new_token
 
@@ -307,7 +311,8 @@ def step_up_user_biometric(auth_token, user, scope):
     body = biometric_challenge_response(
         challenge_data, user, scope, auth_token, *sandbox_id_h
     )
-    # assert body["auth_token"] == auth_token.value
+    assert body["auth_token"] != auth_token.value
+    return FpAuth(body["auth_token"])
 
 
 def biometric_challenge_response(challenge_data, user, scope, *headers):
