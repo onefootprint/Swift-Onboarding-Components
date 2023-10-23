@@ -215,6 +215,16 @@ impl Vault {
         }
     }
 
+    #[tracing::instrument("Vault::find_portable", skip_all)]
+    /// Mark the provided vault is portable
+    pub fn mark_portable(conn: &mut TxnPgConn, id: &VaultId) -> DbResult<()> {
+        diesel::update(vault::table)
+            .filter(vault::id.eq(id))
+            .set(vault::is_portable.eq(true))
+            .execute(conn.conn())?;
+        Ok(())
+    }
+
     /// Look for the portable user vault with a matching fingerprint
     #[tracing::instrument("Vault::find_portable", skip_all)]
     pub fn find_portable(

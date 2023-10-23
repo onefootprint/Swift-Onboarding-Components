@@ -9,6 +9,7 @@ use db::models::fingerprint::Fingerprint;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultUpdate;
 use db::models::user_timeline::UserTimeline;
+use db::models::vault::Vault;
 use db::TxnPgConn;
 use either::Either;
 use itertools::Itertools;
@@ -85,6 +86,13 @@ impl WriteableVw<Person> {
         let Self { uvw, scoped_vault_id } = self;
         // Use the same seqno to deactivate old data and portablize new data
         let seqno = DataLifetime::get_next_seqno(conn)?;
+
+        if !uvw.vault.is_portable {
+            // If the vault wasn't initially portable, mark it as portable now
+            // TODO we might be able to remove is_portable as a flag since non-portable vaults
+            // won't even have global fingerprints
+            Vault::mark_portable(conn, &uvw.vault.id)?;
+        }
 
         //
         // Compute what data we'll be committing and deactivating
