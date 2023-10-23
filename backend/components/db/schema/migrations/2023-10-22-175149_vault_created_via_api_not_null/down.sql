@@ -1,0 +1,1 @@
+ALTER TABLE vault ALTER COLUMN is_created_via_api DROP NOT NULL;

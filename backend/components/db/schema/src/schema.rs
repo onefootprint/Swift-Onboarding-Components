@@ -901,7 +901,7 @@ table! {
         is_fixture -> Bool,
         idempotency_id -> Nullable<Text>,
         sandbox_id -> Nullable<Text>,
-        is_created_via_api -> Nullable<Bool>,
+        is_created_via_api -> Bool,
     }
 }
 

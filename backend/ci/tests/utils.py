@@ -398,6 +398,7 @@ def identify_verify(
         body = post("hosted/identify/verify", data, *headers)
         return FpAuth(body["auth_token"])
 
+    result = None
     if phone_number == FIXTURE_PHONE_NUMBER:
         # The code for the fixture number in sandbox is fixed
         try:

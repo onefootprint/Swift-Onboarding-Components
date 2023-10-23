@@ -1,0 +1,1 @@
+UPDATE vault SET is_created_via_api = not is_portable where is_created_via_api IS NULL;

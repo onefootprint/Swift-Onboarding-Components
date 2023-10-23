@@ -40,7 +40,7 @@ pub struct Vault {
     /// phone number / email.
     pub sandbox_id: Option<SandboxId>, // is_none() IFF is_live
     /// True if the user was created via tenant-facing API rather than via bifrost
-    pub is_created_via_api: Option<bool>,
+    pub is_created_via_api: bool,
 }
 
 pub enum VaultIdentifier<'a> {
@@ -229,7 +229,8 @@ impl Vault {
             .filter(fingerprint::sh_data.eq_any(sh_data))
             .filter(not(data_lifetime::portablized_seqno.is_null()))
             .filter(data_lifetime::deactivated_seqno.is_null())
-            // Never allow finding a vault-only, non-portable user vault created via API
+            // Never allow identifying a user that is not marked as portable. API-only vaults start
+            // as non-portable
             .filter(vault::is_portable.eq(true))
             .into_boxed();
 
