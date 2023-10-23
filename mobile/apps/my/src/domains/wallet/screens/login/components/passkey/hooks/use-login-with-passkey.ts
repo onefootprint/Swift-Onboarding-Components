@@ -51,10 +51,14 @@ const generateDeviceResponse = async (challenge: string) => {
 };
 
 const identifyVerify = async (payload: IdentifyVerifyRequest) => {
+  const data = {
+    ...payload,
+    scope: 'my1fp',
+  };
   const response = await request<IdentifyVerifyResponse>({
     method: 'POST',
     url: '/hosted/identify/verify',
-    data: payload,
+    data,
   });
   return response.data;
 };

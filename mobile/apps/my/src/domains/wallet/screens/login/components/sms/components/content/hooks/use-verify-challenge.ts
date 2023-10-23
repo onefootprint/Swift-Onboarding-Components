@@ -11,12 +11,16 @@ import useTranslation from '@/hooks/use-translation';
 const identifyVerify = async (
   payload: IdentifyVerifyRequest & { isApple: boolean },
 ) => {
-  const { isApple, ...data } = payload;
+  const { isApple, ...remainingPayload } = payload;
   if (isApple) {
     return {
       authToken: 'tok_apple',
     };
   }
+  const data = {
+    ...remainingPayload,
+    scope: 'my1fp',
+  };
 
   const response = await request<IdentifyVerifyResponse>({
     method: 'POST',

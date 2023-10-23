@@ -20,6 +20,7 @@ const identifyVerifyRequest = async (payload: IdentifyVerifyRequest) => {
     data: {
       challengeResponse,
       challengeToken,
+      scope: 'onboarding',
     },
     headers: {
       [AUTH_HEADER]: authToken,
