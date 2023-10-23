@@ -12,7 +12,7 @@ use db::{
 };
 use newtypes::{
     CollectedDataOption, EncryptedVaultPrivateKey, ScopedVaultId, Selfie, VaultId, VaultKind, VaultPublicKey,
-    WorkflowFixtureResult,
+    WorkflowFixtureResult, WorkflowId,
 };
 
 use crate::errors::ApiResult;
@@ -27,38 +27,42 @@ pub struct NewBusinessVaultArgs {
 
 pub fn get_or_start_onboarding(
     conn: &mut TxnPgConn,
+    existing_wf_id: Option<WorkflowId>,
     v_id: &VaultId,
     sv_id: &ScopedVaultId,
     obc: &ObConfiguration,
     insight_event: Option<CreateInsightEvent>,
     new_biz_args: Option<NewBusinessVaultArgs>, // has to be generated async outside the `conn`. We also currently don't support KYB for NPV's but could one day
-) -> ApiResult<(Workflow, Option<Workflow>)> {
+) -> ApiResult<(WorkflowId, Option<Workflow>)> {
     let user_vault = Vault::lock(conn, v_id)?;
-
-    let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, sv_id)?;
-    let is_all_visible_data_added_by_tenant = vw.populated_dis().into_iter().all(|di| {
-        let Some(dl) = vw.get_lifetime(di.clone()) else {
-            return false; // Shouldn't happen
-        };
-        // Data must be added by tenant AND already decryptable
-        &dl.scoped_vault_id == sv_id && vw.can_decrypt(di)
-    });
-
-    // Create the workflow for this scoped user
-    let ob_create_args = OnboardingWorkflowArgs {
-        scoped_vault_id: sv_id.clone(),
-        ob_configuration_id: obc.id.clone(),
-        insight_event: insight_event.clone(),
-        // If all visible data was added by this tenant, we can immediately mark the Workflow as authorized.
-        authorized: is_all_visible_data_added_by_tenant,
-    };
-
     // TODO rm this when fixture result is passed in process
     let fixture_result = WorkflowFixtureResult::from_sandbox_id(user_vault.sandbox_id.as_ref());
-    let (wf, is_new_ob) = Workflow::get_or_create_onboarding(conn, ob_create_args, fixture_result)?;
-    if is_new_ob {
-        create_doc_request_if_needed(conn, &wf, obc)?;
-    }
+
+    let wf_id = if let Some(wf_id) = existing_wf_id {
+        wf_id
+    } else {
+        let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, sv_id)?;
+        let is_all_visible_data_added_by_tenant = vw.populated_dis().into_iter().all(|di| {
+            let Some(dl) = vw.get_lifetime(di.clone()) else {
+            return false; // Shouldn't happen
+        };
+            // Data must be added by tenant AND already decryptable
+            &dl.scoped_vault_id == sv_id && vw.can_decrypt(di)
+        });
+        // Create the workflow for this scoped user
+        let ob_create_args = OnboardingWorkflowArgs {
+            scoped_vault_id: sv_id.clone(),
+            ob_configuration_id: obc.id.clone(),
+            insight_event: insight_event.clone(),
+            // If all visible data was added by this tenant, we can immediately mark the Workflow as authorized.
+            authorized: is_all_visible_data_added_by_tenant,
+        };
+        let (wf, is_new_ob) = Workflow::get_or_create_onboarding(conn, ob_create_args, fixture_result)?;
+        if is_new_ob {
+            create_doc_request_if_needed(conn, &wf, obc)?;
+        }
+        wf.id
+    };
 
     // If the ob config has business fields, create a business vault, scoped vault, and ob
     let biz_wf = if let Some(new_biz_args) = new_biz_args {
@@ -96,7 +100,7 @@ pub fn get_or_start_onboarding(
         None
     };
 
-    Ok((wf, biz_wf))
+    Ok((wf_id, biz_wf))
 }
 
 /// Create a DocumentRequest associated with the provided wf if the obc requires document collection

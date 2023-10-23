@@ -63,11 +63,13 @@ pub async fn post(
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
     let obc = ob_config.clone();
-    let wf = state
+    state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let (wf, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(
+            let (wf_id, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(
                 conn,
+                // TODO do we always create a new WF when there isn't one attached? or do we sometimes inherit???
+                user_auth.workflow_id(),
                 &scoped_user.vault_id,
                 &scoped_user.id,
                 &obc,
@@ -77,20 +79,16 @@ pub async fn post(
 
             // Update auth token with new identifiers
             let args = UserSessionArgs {
-                wf_id: user_auth.workflow_id().is_none().then_some(wf.id.clone()),
+                wf_id: user_auth.workflow_id().is_none().then_some(wf_id.clone()),
                 sb_id: biz_wf.map(|wf| wf.scoped_vault_id),
                 ..Default::default()
             };
             let data = user_auth.data.clone().update(args, vec![], None)?;
             user_auth.update_session(conn, &session_key, data)?;
 
-            Ok(wf)
+            Ok(())
         })
         .await?;
-
-    // This log line will be used to link su_id to a session_id. Then, for a given scoped vault,
-    // we can see which other requests the user made
-    tracing::info!(sv_id=%wf.scoped_vault_id, wf_id=%wf.id, "Starting onboarding");
 
     let ff_client = state.feature_flag_client.clone();
     let onboarding_config =

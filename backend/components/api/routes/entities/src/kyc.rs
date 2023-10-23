@@ -88,8 +88,9 @@ pub async fn post(
                 return Err(TenantError::MissingCanAccessCdos(unaccessable_cdos.into()).into());
             }
 
-            let (wf, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(
+            let (wf_id, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(
                 conn,
+                None,
                 &sv.vault_id,
                 &sv.id,
                 &obc,
@@ -98,7 +99,7 @@ pub async fn post(
             )?;
 
             // TODO: consolidate with /authorize code
-            let wf = Workflow::lock(conn, &wf.id)?;
+            let wf = Workflow::lock(conn, &wf_id)?;
             let wf = if wf.authorized_at.is_none() {
                 Workflow::update(wf, conn, WorkflowUpdate::is_authorized())?
             } else {

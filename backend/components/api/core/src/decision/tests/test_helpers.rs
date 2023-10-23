@@ -59,8 +59,9 @@ pub async fn create_user_and_onboarding(
 
             let (uv, su) = create_user_and_populate_vault(conn, ob_config.clone(), kyc_fixture_result);
 
-            let (wf, biz_wf) = utils::onboarding::get_or_start_onboarding(
+            let (wf_id, biz_wf) = utils::onboarding::get_or_start_onboarding(
                 conn,
+                None,
                 &uv.id,
                 &su.id,
                 &ob_config,
@@ -71,7 +72,7 @@ pub async fn create_user_and_onboarding(
 
             // Mark the onboardings as authorized since they would be authorized in prod by the
             // time they're used here
-            let wf = Workflow::lock(conn, &wf.id)?;
+            let wf = Workflow::lock(conn, &wf_id)?;
             let wf = Workflow::update(wf, conn, WorkflowUpdate::is_authorized())?;
 
             let biz_wf = biz_wf
