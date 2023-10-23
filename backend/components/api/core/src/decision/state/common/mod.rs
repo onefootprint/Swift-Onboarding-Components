@@ -26,6 +26,7 @@ use crate::{
         utils::{should_execute_rules_for_document_only, FixtureDecision},
         vendor::{
             self,
+            incode_watchlist::WatchlistCheckKind,
             vendor_api::{
                 vendor_api_response::build_vendor_response_map_from_vendor_results,
                 vendor_api_struct::{ExperianPreciseID, IdologyExpectID, IncodeFetchOCR},
@@ -101,7 +102,7 @@ pub async fn run_aml_call(
     t_id: &TenantId,
 ) -> ApiResult<(VerificationResultId, WatchlistResultResponse)> {
     let wfid = wf_id.clone();
-    let (wf, v, di) = state
+    let (wf, obc, v, di) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let (wf, v) = Workflow::get_with_vault(conn, &wfid)?;
@@ -111,7 +112,8 @@ pub async fn run_aml_call(
                 &wfid,
                 DecisionIntentKind::WatchlistCheck,
             )?;
-            Ok((wf, v, di))
+            let (obc, _) = ObConfiguration::get(conn, &wfid)?;
+            Ok((wf, obc, v, di))
         })
         .await?;
     let ff_client = state.feature_flag_client.clone();
@@ -128,7 +130,9 @@ pub async fn run_aml_call(
         .await
         .map(|(vr, wr)| (vr.id, wr))
     } else {
-        vendor::incode_watchlist::run_watchlist_check(state, &di, &wf.id).await
+        // maybe in future it might make sense to also re-use an existing search for AML calls we make from workflows?
+        vendor::incode_watchlist::run_watchlist_check(state, &di, &obc.key, WatchlistCheckKind::MakeNewSearch)
+            .await
     }
 }
 

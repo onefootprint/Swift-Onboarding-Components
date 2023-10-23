@@ -31,6 +31,7 @@ use idv::{
     experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse},
     idology::pa::{IdologyPaAPIResponse, IdologyPaRequest},
     idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
+    incode::watchlist::{response::UpdatedWatchlistResultResponse, IncodeUpdatedWatchlistResultRequest},
     incode::{
         doc::{
             response::{
@@ -488,6 +489,18 @@ impl State {
         >,
     ) {
         self.vendor_clients.incode.incode_watchlist_check = incode_watchlist_check;
+    }
+
+    #[cfg(test)]
+    pub fn set_incode_updated_watchlist_result(
+        &mut self,
+        incode_updated_watchlist_result: VendorClient<
+            IncodeUpdatedWatchlistResultRequest,
+            IncodeResponse<UpdatedWatchlistResultResponse>,
+            idv::incode::error::Error,
+        >,
+    ) {
+        self.vendor_clients.incode.incode_updated_watchlist_result = incode_updated_watchlist_result;
     }
 
     #[cfg(test)]

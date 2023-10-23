@@ -1,5 +1,4 @@
 use db::models::decision_intent::DecisionIntent;
-use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::RequestAndMaybeResult;
 use db::models::{verification_request::VerificationRequest, verification_result::VerificationResult};
@@ -7,6 +6,7 @@ use db::DbPool;
 use either::Either;
 use feature_flag::BoolFlag;
 use idv::incode::watchlist::response::WatchlistResultResponse;
+use idv::incode::watchlist::IncodeUpdatedWatchlistResultRequest;
 use idv::incode::APIResponseToIncodeError;
 use idv::incode::{
     response::OnboardingStartResponse, watchlist::IncodeWatchlistCheckRequest, IncodeResponse,
@@ -18,12 +18,12 @@ use newtypes::{
     ScopedVaultId, VendorAPI,
 };
 use newtypes::{
-    EncryptedVaultPrivateKey, IncodeEnvironment, ObConfigurationKey, PiiJsonValue, VaultPublicKey,
-    VerificationRequestId, VerificationResultId, WorkflowId,
+    EncryptedVaultPrivateKey, IncodeEnvironment, IncodeWatchlistResultRef, ObConfigurationKey, PiiJsonValue,
+    VaultPublicKey, VerificationRequestId, VerificationResultId,
 };
 
 use super::vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results;
-use super::vendor_api::vendor_api_struct::IncodeWatchlistCheck;
+use super::vendor_api::vendor_api_struct::{IncodeUpdatedWatchlistResult, IncodeWatchlistCheck};
 use super::vendor_result::VendorResult;
 use super::verification_result;
 use super::{build_request, tenant_vendor_control::TenantVendorControl};
@@ -119,14 +119,14 @@ async fn call_watchlist_result(
     sv_id: &ScopedVaultId,
     di_id: &DecisionIntentId,
     user_vault_public_key: &VaultPublicKey,
+    kind: WatchlistCheckKind,
 ) -> ApiResult<(VerificationResult, WatchlistResultResponse)> {
     let svid = sv_id.clone();
     let diid = di_id.clone();
+    let vendor_api: VendorAPI = kind.clone().into();
     let vreq = state
         .db_pool
-        .db_query(move |conn| {
-            VerificationRequest::create(conn, &svid, &diid, VendorAPI::IncodeWatchlistCheck)
-        })
+        .db_query(move |conn| VerificationRequest::create(conn, &svid, &diid, vendor_api))
         .await??;
     let vreq_id = vreq.id.clone();
 
@@ -136,33 +136,63 @@ async fn call_watchlist_result(
         build_request::build_idv_data_from_verification_request(&state.db_pool, &state.enclave_client, vreq)
             .await?;
 
-    let req = IncodeWatchlistCheckRequest {
-        credentials,
-        idv_data,
+    let (vres, res) = match kind {
+        WatchlistCheckKind::MakeNewSearch => {
+            let res = state
+                .vendor_clients
+                .incode
+                .incode_watchlist_check
+                .make_request(IncodeWatchlistCheckRequest {
+                    credentials,
+                    idv_data,
+                })
+                .await
+                .map_err(|e| ApiError::from(idv::Error::from(e)))?;
+            let vres = save_vres_and_maybe_vreq(
+                &state.db_pool,
+                res.clone(),
+                sv_id,
+                di_id,
+                user_vault_public_key,
+                Either::Right(vreq_id),
+            )
+            .await?;
+            let res = res
+                .result
+                .into_success()
+                .map_err(|e| ApiError::from(idv::Error::from(e)))?;
+            (vres, res)
+        }
+
+        WatchlistCheckKind::GetUpdatedResults(ref_) => {
+            let res = state
+                .vendor_clients
+                .incode
+                .incode_updated_watchlist_result
+                .make_request(IncodeUpdatedWatchlistResultRequest {
+                    credentials,
+                    ref_: ref_.clone(),
+                })
+                .await
+                .map_err(|e| ApiError::from(idv::Error::from(e)))?;
+            let vres = save_vres_and_maybe_vreq(
+                &state.db_pool,
+                res.clone(),
+                sv_id,
+                di_id,
+                user_vault_public_key,
+                Either::Right(vreq_id),
+            )
+            .await?;
+            let res = res
+                .result
+                .into_success()
+                .map_err(|e| ApiError::from(idv::Error::from(e)))?
+                .0;
+            (vres, res)
+        }
     };
 
-    let res = state
-        .vendor_clients
-        .incode
-        .incode_watchlist_check
-        .make_request(req)
-        .await
-        .map_err(|e| ApiError::from(idv::Error::from(e)))?;
-
-    let vres = save_vres_and_maybe_vreq(
-        &state.db_pool,
-        res.clone(),
-        sv_id,
-        di_id,
-        user_vault_public_key,
-        Either::Right(vreq_id),
-    )
-    .await?;
-
-    let res = res
-        .result
-        .into_success()
-        .map_err(|e| ApiError::from(idv::Error::from(e)))?;
     Ok((vres, res))
 }
 
@@ -172,7 +202,8 @@ pub async fn make_watchlist_result_call(
     tvc: &TenantVendorControl,
     sv_id: &ScopedVaultId,
     di_id: &DecisionIntentId,
-    user_vault_public_key: &VaultPublicKey, // TODO: pass in stuff like this and tvc or query for it on the fly? i never know
+    user_vault_public_key: &VaultPublicKey,
+    kind: WatchlistCheckKind,
 ) -> ApiResult<(VerificationResult, WatchlistResultResponse)> {
     let res = call_start_onboarding(state, tvc, sv_id, di_id, user_vault_public_key).await?;
 
@@ -182,8 +213,31 @@ pub async fn make_watchlist_result_call(
         authentication_token: token,
     };
 
-    let res = call_watchlist_result(state, incode_credentials, sv_id, di_id, user_vault_public_key).await?;
+    let res = call_watchlist_result(
+        state,
+        incode_credentials,
+        sv_id,
+        di_id,
+        user_vault_public_key,
+        kind,
+    )
+    .await?;
     Ok(res)
+}
+
+#[derive(Debug, Clone)]
+pub enum WatchlistCheckKind {
+    MakeNewSearch,
+    GetUpdatedResults(IncodeWatchlistResultRef),
+}
+
+impl From<WatchlistCheckKind> for VendorAPI {
+    fn from(value: WatchlistCheckKind) -> Self {
+        match value {
+            WatchlistCheckKind::MakeNewSearch => VendorAPI::IncodeWatchlistCheck,
+            WatchlistCheckKind::GetUpdatedResults(_) => VendorAPI::IncodeUpdatedWatchlistResult,
+        }
+    }
 }
 
 // TODO: code share/new abstraction to consolidate this with run_kyc_vendor_calls
@@ -191,12 +245,12 @@ pub async fn make_watchlist_result_call(
 pub async fn run_watchlist_check(
     state: &State,
     di: &DecisionIntent,
-    wf_id: &WorkflowId,
+    obc_key: &ObConfigurationKey,
+    kind: WatchlistCheckKind,
 ) -> ApiResult<(VerificationResultId, WatchlistResultResponse)> {
     let svid = di.scoped_vault_id.clone();
     let diid = di.id.clone();
-    let wf_id = wf_id.clone();
-    let (latest_results, tenant_id, vw, obc_key) = state
+    let (latest_results, tenant_id, vw) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
@@ -206,16 +260,18 @@ pub async fn run_watchlist_check(
 
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
 
-            let ob_configuration_key: ObConfigurationKey = ObConfiguration::get(conn, &wf_id)?.0.key;
-
-            Ok((latest_results, sv.tenant_id, vw, ob_configuration_key))
+            Ok((latest_results, sv.tenant_id, vw))
         })
         .await??;
 
     // Check if a successful result already exists and idempotently return that if so
-    let existing_res =
-        existing_watchlist_check_response(&state.enclave_client, &vw.vault.e_private_key, latest_results)
-            .await?;
+    let existing_res = existing_watchlist_check_response(
+        &state.enclave_client,
+        &vw.vault.e_private_key,
+        latest_results,
+        kind.clone(),
+    )
+    .await?;
     if let Some(existing_res) = existing_res {
         return Ok(existing_res);
     }
@@ -227,11 +283,18 @@ pub async fn run_watchlist_check(
     if state.config.service_config.is_production()
         || state
             .feature_flag_client
-            .flag(BoolFlag::EnableIncodeWatchlistCheckInNonProd(&obc_key))
+            .flag(BoolFlag::EnableIncodeWatchlistCheckInNonProd(obc_key))
     {
-        make_watchlist_result_call(state, &tvc, &di.scoped_vault_id, &di.id, &vw.vault.public_key)
-            .await
-            .map(|(vr, wr)| (vr.id, wr)) //we return vres.id instead of vres just because we currently only get vres_id from our VendorAPIResponseIdentifiersMap
+        make_watchlist_result_call(
+            state,
+            &tvc,
+            &di.scoped_vault_id,
+            &di.id,
+            &vw.vault.public_key,
+            kind,
+        )
+        .await
+        .map(|(vr, wr)| (vr.id, wr)) //we return vres.id instead of vres just because we currently only get vres_id from our VendorAPIResponseIdentifiersMap
     } else {
         save_canned_response(
             state,
@@ -247,6 +310,7 @@ async fn existing_watchlist_check_response(
     enclave_client: &EnclaveClient,
     vault_private_key: &EncryptedVaultPrivateKey,
     latest_results: Vec<RequestAndMaybeResult>,
+    kind: WatchlistCheckKind,
 ) -> ApiResult<Option<(VerificationResultId, WatchlistResultResponse)>> {
     let latest_results =
         VendorResult::hydrate_vendor_results(latest_results, enclave_client, vault_private_key).await?;
@@ -258,10 +322,18 @@ async fn existing_watchlist_check_response(
 
     let (vres_map, vres_ids_map) = build_vendor_response_map_from_vendor_results(&vendor_results)?;
 
-    if let (Some(wr), Some(ids)) = (
-        vres_map.get(&IncodeWatchlistCheck),
-        vres_ids_map.get(&IncodeWatchlistCheck),
-    ) {
+    let (wr, ids) = match kind {
+        WatchlistCheckKind::MakeNewSearch => (
+            vres_map.get(&IncodeWatchlistCheck),
+            vres_ids_map.get(&IncodeWatchlistCheck),
+        ),
+        WatchlistCheckKind::GetUpdatedResults(_) => (
+            vres_map.get(&IncodeUpdatedWatchlistResult).map(|u| &u.0),
+            vres_ids_map.get(&IncodeUpdatedWatchlistResult),
+        ),
+    };
+
+    if let (Some(wr), Some(ids)) = (wr, ids) {
         Ok(Some((ids.verification_result_id.clone(), wr.clone())))
     } else {
         Ok(None)

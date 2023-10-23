@@ -24,7 +24,7 @@ use super::tenant::Tenant;
 use super::workflow_event::WorkflowEvent;
 use crate::models::vault::Vault;
 use crate::{DbResult, PgConn, TxnPgConn};
-use db_schema::schema::workflow;
+use db_schema::schema::{ob_configuration, workflow};
 use newtypes::KycState;
 
 #[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
@@ -311,6 +311,21 @@ impl Workflow {
         let res = workflow::table
             .filter(workflow::id.eq(workflow_id))
             .get_result(conn)?;
+
+        Ok(res)
+    }
+
+    #[tracing::instrument("Workflow::get", skip_all)]
+    pub fn list_by_completed_at(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+    ) -> DbResult<Vec<(Self, Option<ObConfiguration>)>> {
+        let res = workflow::table
+            .filter(workflow::scoped_vault_id.eq(sv_id))
+            .filter(not(workflow::completed_at.is_null()))
+            .left_join(ob_configuration::table)
+            .order_by(workflow::completed_at.asc())
+            .get_results(conn)?;
 
         Ok(res)
     }

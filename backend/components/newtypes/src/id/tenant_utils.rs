@@ -12,4 +12,8 @@ impl TenantId {
     pub fn is_coba(&self) -> bool {
         self.0 == *"org_5lwSs95mU5v3gOU9xdSaml"
     }
+
+    pub fn is_fractional(&self) -> bool {
+        self.0 == *"org_PtnIJT4VR35BS9xy0wITgF"
+    }
 }

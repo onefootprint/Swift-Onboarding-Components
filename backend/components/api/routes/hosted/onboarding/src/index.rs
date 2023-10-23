@@ -80,7 +80,7 @@ pub async fn post(
 
             // Update auth token with new identifiers
             let args = UserSessionArgs {
-                wf_id: user_auth.workflow_id().is_none().then_some(wf_id.clone()),
+                wf_id: user_auth.workflow_id().is_none().then_some(wf_id),
                 sb_id: biz_wf.map(|wf| wf.scoped_vault_id),
                 ..Default::default()
             };

@@ -19,7 +19,10 @@ use idv::{
             IncodeProcessIdRequest,
         },
         response::OnboardingStartResponse,
-        watchlist::{response::WatchlistResultResponse, IncodeWatchlistCheckRequest},
+        watchlist::{
+            response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
+            IncodeUpdatedWatchlistResultRequest, IncodeWatchlistCheckRequest,
+        },
         IncodeResponse, IncodeStartOnboardingRequest,
     },
     middesk::{
@@ -77,7 +80,11 @@ pub struct IncodeClients {
         IncodeResponse<WatchlistResultResponse>,
         idv::incode::error::Error,
     >,
-
+    pub incode_updated_watchlist_result: VendorClient<
+        IncodeUpdatedWatchlistResultRequest,
+        IncodeResponse<UpdatedWatchlistResultResponse>,
+        idv::incode::error::Error,
+    >,
     pub incode_get_onboarding_status: VendorClient<
         IncodeGetOnboardingStatusRequest,
         IncodeResponse<GetOnboardingStatusResponse>,
@@ -150,6 +157,11 @@ impl IncodeClients {
                 IncodeResponse<WatchlistResultResponse>,
                 idv::incode::error::Error,
             >::new()),
+            incode_updated_watchlist_result: Arc::new(MockVendorAPICall::<
+                IncodeUpdatedWatchlistResultRequest,
+                IncodeResponse<UpdatedWatchlistResultResponse>,
+                idv::incode::error::Error,
+            >::new()),
         }
     }
 
@@ -166,6 +178,7 @@ impl IncodeClients {
             incode_add_selfie: footprint_client.clone(),
             incode_process_face: footprint_client.clone(),
             incode_watchlist_check: footprint_client.clone(),
+            incode_updated_watchlist_result: footprint_client.clone(),
             incode_get_onboarding_status: footprint_client,
         }
     }

@@ -42,7 +42,7 @@ use crate::{
         },
         utils::FixtureDecision,
         vendor::{
-            self, tenant_vendor_control::TenantVendorControl,
+            self, incode_watchlist::WatchlistCheckKind, tenant_vendor_control::TenantVendorControl,
             vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results,
             vendor_result::VendorResult,
         },
@@ -425,6 +425,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                     &self.sv_id,
                     &di.id,
                     &v.public_key,
+                    WatchlistCheckKind::MakeNewSearch,
                 )
                 .await?,
             )
