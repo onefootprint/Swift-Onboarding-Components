@@ -34,7 +34,7 @@ pub struct UserSessionContext {
     pub(super) obc_id: Option<ObConfigurationId>,
     pub(super) wf_id: Option<WorkflowId>,
     /// When true, the auth token was initially issued as an unauthed, identified token
-    pub(super) is_from_api: bool,
+    pub is_from_api: bool,
 }
 
 impl UserSessionContext {

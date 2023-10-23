@@ -25,9 +25,11 @@ pub struct NewBusinessVaultArgs {
     pub should_create_workflow: bool,
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn get_or_start_onboarding(
     conn: &mut TxnPgConn,
     existing_wf_id: Option<WorkflowId>,
+    force_create: bool,
     v_id: &VaultId,
     sv_id: &ScopedVaultId,
     obc: &ObConfiguration,
@@ -57,7 +59,8 @@ pub fn get_or_start_onboarding(
             // If all visible data was added by this tenant, we can immediately mark the Workflow as authorized.
             authorized: is_all_visible_data_added_by_tenant,
         };
-        let (wf, is_new_ob) = Workflow::get_or_create_onboarding(conn, ob_create_args, fixture_result)?;
+        let (wf, is_new_ob) =
+            Workflow::get_or_create_onboarding(conn, ob_create_args, fixture_result, force_create)?;
         if is_new_ob {
             create_doc_request_if_needed(conn, &wf, obc)?;
         }
@@ -92,7 +95,8 @@ pub fn get_or_start_onboarding(
                 authorized: true,
                 insight_event,
             };
-            let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, fixture_result)?;
+            let (biz_wf, _) =
+                Workflow::get_or_create_onboarding(conn, ob_create_args, fixture_result, false)?;
             biz_wf
         };
         Some(biz_wf)

@@ -70,6 +70,7 @@ pub async fn post(
                 conn,
                 // TODO do we always create a new WF when there isn't one attached? or do we sometimes inherit???
                 user_auth.workflow_id(),
+                user_auth.is_from_api,
                 &scoped_user.vault_id,
                 &scoped_user.id,
                 &obc,

@@ -91,6 +91,7 @@ pub async fn post(
             let (wf_id, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(
                 conn,
                 None,
+                false,
                 &sv.vault_id,
                 &sv.id,
                 &obc,

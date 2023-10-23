@@ -62,6 +62,7 @@ pub async fn create_user_and_onboarding(
             let (wf_id, biz_wf) = utils::onboarding::get_or_start_onboarding(
                 conn,
                 None,
+                false,
                 &uv.id,
                 &su.id,
                 &ob_config,
