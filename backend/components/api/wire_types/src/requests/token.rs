@@ -2,13 +2,14 @@ use crate::*;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
-pub struct TokenRequest {
+pub struct CreateTokenRequest {
+    /// The publishable key of the playbook onto which you would like this user to onboard. The user will be asked to provide any missing information required by playbook.
     pub key: ObConfigurationKey,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
-pub struct TokenResponse {
+pub struct CreateTokenResponse {
     /// The short-lived token that gives temporary access to perform operations for this user
     pub token: SessionAuthToken,
     /// The time at which the token expires

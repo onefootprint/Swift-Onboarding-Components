@@ -9,8 +9,8 @@ use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::auth::tenant::TenantGuard;
 use api_core::errors::ApiResult;
 use api_core::utils::session::AuthSession;
-use api_wire_types::TokenRequest;
-use api_wire_types::TokenResponse;
+use api_wire_types::CreateTokenRequest;
+use api_wire_types::CreateTokenResponse;
 use chrono::Duration;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
@@ -31,11 +31,11 @@ use paperclip::actix::{api_v2_operation, post, web};
 pub async fn post(
     state: web::Data<State>,
     fp_id: web::Path<FpId>,
-    request: Json<TokenRequest>,
+    request: Json<CreateTokenRequest>,
     auth: SecretTenantAuthContext,
-) -> JsonApiResponse<TokenResponse> {
+) -> JsonApiResponse<CreateTokenResponse> {
     let auth = auth.check_guard(TenantGuard::AuthToken)?;
-    let TokenRequest { key } = request.into_inner();
+    let CreateTokenRequest { key } = request.into_inner();
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
@@ -64,5 +64,5 @@ pub async fn post(
         .await??;
 
     let expires_at = session.expires_at;
-    ResponseData::ok(TokenResponse { token, expires_at }).json()
+    ResponseData::ok(CreateTokenResponse { token, expires_at }).json()
 }

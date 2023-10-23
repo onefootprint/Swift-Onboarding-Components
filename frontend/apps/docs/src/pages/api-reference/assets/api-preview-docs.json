@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "3519c54b9140ca7bf3944db811520d2622ad5a77"
+        "version": "9ae44982c8ee48bc695a6bfd769e61f0fb99e8cf"
     },
     "servers": [
         {
@@ -424,7 +424,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/TokenRequest"
+                                "$ref": "#/components/schemas/CreateTokenRequest"
                             }
                         }
                     },
@@ -436,7 +436,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TokenResponse"
+                                    "$ref": "#/components/schemas/CreateTokenResponse"
                                 }
                             }
                         }
@@ -1043,6 +1043,36 @@
                     "tax_id",
                     "tax_id_breakdown",
                     "user_id"
+                ]
+            },
+            "CreateTokenRequest": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "description": "The publishable key of the playbook onto which you would like this user to onboard. The user will be asked to provide any missing information required by playbook.",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "key"
+                ]
+            },
+            "CreateTokenResponse": {
+                "type": "object",
+                "properties": {
+                    "expires_at": {
+                        "description": "The time at which the token expires",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "token": {
+                        "description": "The short-lived token that gives temporary access to perform operations for this user",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "expires_at",
+                    "token"
                 ]
             },
             "EntityValidateResponse": {
@@ -6773,35 +6803,6 @@
                     "reason_code",
                     "scopes",
                     "severity"
-                ]
-            },
-            "TokenRequest": {
-                "type": "object",
-                "properties": {
-                    "key": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "key"
-                ]
-            },
-            "TokenResponse": {
-                "type": "object",
-                "properties": {
-                    "expires_at": {
-                        "description": "The time at which the token expires",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "token": {
-                        "description": "The short-lived token that gives temporary access to perform operations for this user",
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "expires_at",
-                    "token"
                 ]
             },
             "TriggerKycRequest": {
