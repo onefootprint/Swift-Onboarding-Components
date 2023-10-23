@@ -17,7 +17,7 @@ export type RowProps = {
 };
 
 const Row = ({ apiKey }: RowProps) => {
-  const { t } = useTranslation('pages.api-keys.table.manage');
+  const { t } = useTranslation('pages.api-keys.table');
   const reveal = useReveal(apiKey);
   const status = useUpdateStatus(apiKey);
   const isEnabled = apiKey.status === 'enabled';
@@ -32,7 +32,9 @@ const Row = ({ apiKey }: RowProps) => {
       <td>{apiKey.lastUsedAt || '--'}</td>
       <td>{apiKey.createdAt}</td>
       <td>
-        <Badge variant={isEnabled ? 'success' : 'error'}>{apiKey.status}</Badge>
+        <Badge variant={isEnabled ? 'success' : 'error'}>
+          {t(`statuses.${apiKey.status}`)}
+        </Badge>
       </td>
       <td>
         {hasPermission(RoleScopeKind.orgSettings) ? (
@@ -46,18 +48,20 @@ const Row = ({ apiKey }: RowProps) => {
           <Dropdown.Root>
             <PermissionGate
               scopeKind={RoleScopeKind.apiKeys}
-              fallbackText={t('not-allowed')}
+              fallbackText={t('manage.not-allowed')}
             >
-              <Dropdown.Trigger aria-label={t('aria-label')}>
+              <Dropdown.Trigger aria-label={t('manage.aria-label')}>
                 <IcoDotsHorizontal24 />
               </Dropdown.Trigger>
             </PermissionGate>
             <Dropdown.Content align="end">
               <Dropdown.Item onSelect={reveal.toggle}>
-                {apiKey.key ? t('reveal.hide') : t('reveal.show')}
+                {apiKey.key ? t('manage.reveal.hide') : t('manage.reveal.show')}
               </Dropdown.Item>
               <Dropdown.Item onSelect={status.toggle}>
-                {isEnabled ? t('status.disable') : t('status.enable')}
+                {isEnabled
+                  ? t('manage.status.disable')
+                  : t('manage.status.enable')}
               </Dropdown.Item>
             </Dropdown.Content>
           </Dropdown.Root>

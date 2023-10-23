@@ -2298,6 +2298,10 @@
             "title": "Access control"
           }
         },
+        "statuses": {
+          "enabled": "Enabled",
+          "disabled": "Disabled"
+        },
         "manage": {
           "aria-label": "Manage secret key",
           "not-allowed": "You're not allowed to manage API keys",
