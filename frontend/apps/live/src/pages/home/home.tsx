@@ -11,16 +11,16 @@ import React from 'react';
 import SEO from '../../components/seo';
 import Footer from './components/footer';
 
-const kycPublicKey = process.env.NEXT_PUBLIC_KYC_TENANT_KEY;
-const kybPublicKey = process.env.NEXT_PUBLIC_KYB_TENANT_KEY;
-const kycIdDocPublicKey = process.env.NEXT_PUBLIC_KYC_ID_DOC_TENANT_KEY;
+const kycPublicKey = process.env.NEXT_PUBLIC_KYC_TENANT_KEY ?? '';
+const kybPublicKey = process.env.NEXT_PUBLIC_KYB_TENANT_KEY ?? '';
+const kycIdDocPublicKey = process.env.NEXT_PUBLIC_KYC_ID_DOC_TENANT_KEY ?? '';
 
 const Live = () => {
   const { t } = useTranslation('home');
   const router = useRouter();
   const type = router?.query.type;
 
-  const getPublicKey = () => {
+  const getPublicKey = (): string => {
     switch (type) {
       case 'kyb':
         return kybPublicKey;

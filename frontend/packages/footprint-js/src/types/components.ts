@@ -38,10 +38,12 @@ export type VerifyOptions = {
 
 export type VerifyAuthToken = {
   authToken: string;
+  publicKey?: never;
 };
 
 export type VerifyPublicKey = {
   publicKey: string;
+  authToken?: never;
 };
 
 export type VerifySharedProps = (VerifyAuthToken | VerifyPublicKey) & {

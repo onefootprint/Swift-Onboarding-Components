@@ -2,16 +2,30 @@ import type { FootprintVerifyProps } from '@onefootprint/footprint-js';
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import React from 'react';
 
+type NoToken = {
+  authToken?: never;
+  publicKey?: never;
+};
+
+type PublicKeyOnly = {
+  authToken?: never;
+  publicKey: string;
+};
+
+type AuthTokenOnly = {
+  authToken: string;
+  publicKey?: never;
+};
+
 export type VerifyButtonProps = Omit<
   FootprintVerifyProps,
-  'kind' | 'variant' | 'publicKey'
+  'kind' | 'variant' | 'publicKey' | 'authToken'
 > & {
-  publicKey?: string;
   testID?: string;
   label?: string;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   dialogVariant?: 'modal' | 'drawer';
-};
+} & (NoToken | PublicKeyOnly | AuthTokenOnly);
 
 const VerifyButton = ({
   appearance,
@@ -20,7 +34,8 @@ const VerifyButton = ({
   onClick,
   onComplete,
   onClose,
-  publicKey,
+  publicKey = undefined,
+  authToken = undefined,
   userData,
   options,
   dialogVariant,
@@ -29,9 +44,20 @@ const VerifyButton = ({
 }: VerifyButtonProps) => {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     onClick?.(event);
-    if (!publicKey) {
+
+    let tokenProps = {};
+    if (authToken) {
+      tokenProps = {
+        authToken,
+      };
+    } else if (publicKey) {
+      tokenProps = {
+        publicKey,
+      };
+    } else {
       return;
     }
+
     const component = footprint.init({
       kind: FootprintComponentKind.Verify,
       variant: dialogVariant,
@@ -39,11 +65,12 @@ const VerifyButton = ({
       onCancel,
       onComplete,
       onClose,
-      publicKey,
       userData,
       options,
       l10n,
-    });
+      ...tokenProps,
+    } as FootprintVerifyProps);
+
     component.render();
   };
 

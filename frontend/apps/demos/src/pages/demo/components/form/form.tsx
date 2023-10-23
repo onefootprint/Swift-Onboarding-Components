@@ -26,7 +26,7 @@ type FormData = {
   name?: string;
 };
 
-const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY as string;
+const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY ?? '';
 
 type FormProps = {
   html: string;

@@ -17,7 +17,7 @@ import {
   getDataProps,
   getSanitizedProps,
 } from '../prop-utils';
-import getURL from '../util-utils';
+import getURL from '../url-utils';
 import type { Iframe } from './types';
 
 const initIframe = (rawProps: Props): Iframe => {

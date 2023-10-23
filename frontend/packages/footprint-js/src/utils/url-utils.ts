@@ -18,7 +18,7 @@ const getBifrostURL = (props: VerifyProps) => {
   const url = process.env.BIFROST_URL;
   const searchParams = new URLSearchParams();
 
-  if ('publicKey' in props) {
+  if ('publicKey' in props && props.publicKey) {
     searchParams.append('public_key', props.publicKey);
   }
   if (variables) {
