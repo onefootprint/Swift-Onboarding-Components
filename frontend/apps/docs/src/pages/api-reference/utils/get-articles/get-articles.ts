@@ -1,3 +1,5 @@
+export const isClientApi = (path: string) => path.startsWith('/users/vault');
+
 export const getId = (method: string, path: string) => {
   const elements = path.split('/').map(element => element.replace(/_/g, '-'));
   const filteredElements = elements
@@ -7,7 +9,7 @@ export const getId = (method: string, path: string) => {
     )
     .map(e => e.replace('_', '-'));
   const joinedElements = filteredElements.join('-');
-  const client = path.startsWith('/users/vault') ? '-client' : '';
+  const client = isClientApi(path) ? '-client' : '';
   return `${method}-${joinedElements}${client}`;
 };
 

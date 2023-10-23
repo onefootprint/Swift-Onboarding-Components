@@ -1,4 +1,4 @@
-import { getId } from '../get-articles/get-articles';
+import { getId, isClientApi } from '../get-articles/get-articles';
 
 const getNavigation = (data: any) => {
   const paths = Object.keys(data.paths);
@@ -9,7 +9,8 @@ const getNavigation = (data: any) => {
         element !== '' && !element.startsWith('{') && !element.endsWith('}'),
     );
     const entities = filteredElements.join(' ');
-    const title = filteredElements[0];
+    // TODO one day pull this from the tags on the open API spec
+    const title = isClientApi(path) ? 'Users (client)' : filteredElements[0];
     const methods = Object.keys(data.paths[path]);
     const subsections = methods.map(method => {
       const id = getId(method, path);
