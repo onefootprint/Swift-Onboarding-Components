@@ -147,7 +147,8 @@ incode_reason_code_enum! {
         IssueDateValidity,
         // Confirms the document is not expired
         #[ser = "documentExpired"]
-        #[footprint_reason_code = Some(IncodeRCH::new(FRC::DocumentNotExpired, FRC::DocumentExpired))]
+        // We turned off expiration check so it wouldn't impact the doc score and we manually compute this reason code ourselves
+        #[footprint_reason_code = None]
         DocumentExpired,
         #[ser = "documentSeriesExpired"]
         #[footprint_reason_code = None]

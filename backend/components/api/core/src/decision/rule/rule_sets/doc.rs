@@ -6,6 +6,7 @@ use newtypes::{RuleAction, RuleName};
 
 use newtypes::{FootprintReasonCode, RuleSetName};
 
+// what is this
 pub fn incode_base_rules() -> Vec<Rule<IncodeDocumentFeatures>> {
     vec![
         Rule {
@@ -65,12 +66,19 @@ pub fn incode_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
             action: RuleAction::ManualReview,
         },
         Rule {
+            rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::DocumentExpired) },
+            name: RuleName::DocumentExpired,
+            action: RuleAction::Fail,
+        },
+        Rule {
             rule: {
                 |f: &Vec<FootprintReasonCode>| {
                     f.iter().any(|rc| {
-                        [FootprintReasonCode::DocumentTypeMismatch,
+                        [
+                            FootprintReasonCode::DocumentTypeMismatch,
                             FootprintReasonCode::DocumentUnknownCountryCode,
-                            FootprintReasonCode::DocumentCountryCodeMismatch]
+                            FootprintReasonCode::DocumentCountryCodeMismatch,
+                        ]
                         .contains(rc)
                     })
                 }

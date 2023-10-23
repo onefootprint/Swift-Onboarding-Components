@@ -1,3 +1,4 @@
+use chrono::{NaiveDateTime, Utc};
 use idv::incode::doc::response::{FetchScoresResponse, FetchOCRResponse, IncodeOcrFixtureResponseFields};
 use itertools::Itertools;
 use newtypes::{
@@ -183,7 +184,19 @@ pub fn reason_codes_from_ocr_response(res: &FetchOCRResponse, vault_data: Incode
     let dob_matches = dob_matches(res, &vault_data);
     let name_matches = first_name_matches.and_then(|x| last_name_matches.map(|y| x && y));
     
-    reason_codes_from_matching(first_name_matches,last_name_matches,name_matches, dob_matches)
+    let mut reason_codes = reason_codes_from_matching(first_name_matches,last_name_matches,name_matches, dob_matches);
+    if let Some(expired_frc) = doc_expired_reason_code(res) {
+        reason_codes.push(expired_frc);
+    }
+    reason_codes
+}
+
+fn doc_expired_reason_code(res: &FetchOCRResponse) -> Option<FootprintReasonCode> {
+    res.expire_at.as_ref().and_then(|e| e.leak().parse::<i64>().ok()).and_then(|d| NaiveDateTime::from_timestamp_opt(d/1000,0)).map(|d| if Utc::now().naive_utc() > d {
+        FootprintReasonCode::DocumentExpired
+    } else {
+        FootprintReasonCode::DocumentNotExpired
+    })
 }
 
 fn first_name_matches(parsed: &ParsedIncodeNames, vault: &IncodeOcrComparisonDataFields) -> Option<bool> {
@@ -419,7 +432,7 @@ impl ParsedIncodeNames {
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
-
+    use newtypes::ScrubbedPiiString;
     use db::test_helpers::assert_have_same_elements;
     use idv::{incode::doc::response::{FetchScoresResponse, OCRName}, test_fixtures::{DocTestOpts, OcrTestOpts, self}};
     use newtypes::{
@@ -594,72 +607,72 @@ mod tests {
     #[test_case(
         ("Rob", "Roberto", "1990-01-01"), 
         (Some("Rob".into()),Some("Roberto".into()),Some("1990-01-01".into())),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches]
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired]
     ; "name and dob match")]
     #[test_case(
         ("ROB", "    roBERTo", "1990-01-01"), 
         (Some("rob".into()), Some("roberto".into()), Some("       1990-01-01".into())),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches]
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired]
     ; "whitespace/mixed case matches name")]
     #[test_case(
         ("Robby", "Roberto", "1990-01-01"), 
         (Some("Bob".into()),Some("Roberto".into()), Some("1980-01-01".into())),
-        vec![DocumentOcrNameDoesNotMatch, DocumentOcrFirstNameDoesNotMatch, DocumentOcrLastNameMatches, DocumentOcrDobDoesNotMatch]; "first name doesn't match and DOBs don't match"
+        vec![DocumentOcrNameDoesNotMatch, DocumentOcrFirstNameDoesNotMatch, DocumentOcrLastNameMatches, DocumentOcrDobDoesNotMatch, DocumentNotExpired]; "first name doesn't match and DOBs don't match"
     )]
     #[test_case(
         ("Bob", "Roberti", "1990-01-01"), 
         (Some("Bob".into()),Some("Roberto".into()),Some("  1980-01-01".into())),
-        vec![DocumentOcrNameDoesNotMatch, DocumentOcrFirstNameMatches, DocumentOcrLastNameDoesNotMatch, DocumentOcrDobDoesNotMatch]; "last name doesn't match and DOBs don't match"
+        vec![DocumentOcrNameDoesNotMatch, DocumentOcrFirstNameMatches, DocumentOcrLastNameDoesNotMatch, DocumentOcrDobDoesNotMatch, DocumentNotExpired]; "last name doesn't match and DOBs don't match"
     )]
     #[test_case(
         ("Bob", "Roberto", "1990-01-01"), 
         (Some("Crob".into()),Some("Croberto".into()),Some("1980-01-01".into())),
-        vec![DocumentOcrNameDoesNotMatch, DocumentOcrFirstNameDoesNotMatch, DocumentOcrLastNameDoesNotMatch, DocumentOcrDobDoesNotMatch]; "all doesn't match"
+        vec![DocumentOcrNameDoesNotMatch, DocumentOcrFirstNameDoesNotMatch, DocumentOcrLastNameDoesNotMatch, DocumentOcrDobDoesNotMatch, DocumentNotExpired]; "all doesn't match"
     )]
     #[test_case(
         ("Bob", "Roberto", "1990-01-01"), 
         (Some("Bob".into()),Some("Roberto".into()),None),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches]; "dob missing"
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentNotExpired]; "dob missing"
     )]
     #[test_case(
         ("Bob", "Roberto", "1990-01-01"), 
         (None, Some("Roberto".into()), Some("1990-01-01".into())),
-        vec![DocumentOcrLastNameMatches, DocumentOcrDobMatches]; "first name missing"
+        vec![DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired]; "first name missing"
     )]
     #[test_case(
         ("Rob", "Robèrto", "1990-01-01"), 
         (Some("Rob".into()),Some("Roberto".into()),Some("1990-01-01".into())),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches]; "unicode"
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired]; "unicode"
     )]
     #[test_case(
         ("RöbÀÑ", "RÓbèrtõ", "1990-01-01"), 
         (Some("Roban".into()),Some("ROBERTO".into()),Some("1990-01-01".into())),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches]; "more unicode"
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired]; "more unicode"
     )]
     #[test_case(
         ("B'ob", "Bo'berto", "1990-01-01"), 
         (Some("B'ob".into()),Some("Bo'berto".into()),Some("1990-01-01".into())),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches]; "apostraphies in both names"
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired]; "apostraphies in both names"
     )]
     #[test_case(
         ("B'ob", "Bo'berto", "1990-01-01"), 
         (Some("Bob".into()),Some("Boberto".into()),Some("1990-01-01".into())),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches]; "apostraphies in OCR names"
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired]; "apostraphies in OCR names"
     )]
     #[test_case(
         ("Bob", "Boberto", "1990-01-01"), 
         (Some("B'ob".into()),Some("Bo'berto".into()),Some("1990-01-01".into())),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches]; "apostraphies in keyed in names"
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired]; "apostraphies in keyed in names"
     )]
     #[test_case(
         ("Bob", "Bo'  berto", "1990-01-01"), 
         (Some("B' ob".into()),Some("Bo'berto".into()),Some("1990-01-01".into())),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches]; "apostraphies and spaces"
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired]; "apostraphies and spaces"
     )]
     #[test_case(
         ("Bob", "Boberto-Jones", "1990-01-01"), 
         (Some("Bob".into()),Some("Boberto Jones".into()),Some("1990-01-01".into())),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches]; "hyphen"
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired]; "hyphen"
     )]
     fn test_reason_codes_from_ocr_response(raw_ocr: (&str, &str, &str), raw_vault_data: (Option<PiiString>, Option<PiiString>, Option<PiiString>), expected: Vec<FootprintReasonCode>) {
         let (first_ocr, last_ocr, dob_ocr) = raw_ocr;
@@ -690,7 +703,6 @@ mod tests {
             DocumentVisiblePhotoFeaturesVerified,
             DocumentPhotoIsNotPaperCapture,
             DocumentNoImageTampering,
-            DocumentNotExpired,
             DocumentVerified,
             DocumentBarcodeCouldBeRead,
             DocumentBarcodeDetected,
@@ -729,7 +741,6 @@ mod tests {
                 DocumentVisiblePhotoFeaturesNotVerified,
                 DocumentPhotoIsPaperCapture,
                 DocumentPossibleImageTampering,
-                DocumentExpired,
                 DocumentNotVerified,
                 DocumentBarcodeCouldNotBeRead,
                 DocumentBarcodeCouldNotBeDetected,
@@ -767,7 +778,6 @@ mod tests {
             vec![
                 DocumentPhotoIsNotScreenCapture,
                 DocumentPhotoIsNotPaperCapture,
-                DocumentNotExpired,
                 DocumentNotVerified,
                 DocumentNoImageTampering,
                 DocumentVisiblePhotoFeaturesVerified,
@@ -793,7 +803,6 @@ mod tests {
                     DocumentVisiblePhotoFeaturesVerified,
                     DocumentPhotoIsNotPaperCapture,
                     DocumentNoImageTampering,
-                    DocumentNotExpired,
                     DocumentVerified,
                     DocumentBarcodeCouldBeRead,
                     DocumentBarcodeDetected,
@@ -858,4 +867,13 @@ mod tests {
         }).collect()
     }
     
+
+    #[test_case(FetchOCRResponse { ..Default::default()} => None)]
+    #[test_case(FetchOCRResponse { expire_at: Some(ScrubbedPiiString::from("1663459200000")), ..Default::default()} => Some(FootprintReasonCode::DocumentExpired))]
+    #[test_case(FetchOCRResponse { expire_at: Some(ScrubbedPiiString::from("2663459200000")), ..Default::default()} => Some(FootprintReasonCode::DocumentNotExpired))]
+    fn test_doc_expired_reason_code(res: FetchOCRResponse) -> Option<FootprintReasonCode> {
+        doc_expired_reason_code(&res) 
+    }
+    
+
 }

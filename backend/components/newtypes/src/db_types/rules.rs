@@ -98,6 +98,7 @@ pub enum RuleName {
     NoBusinessAddressMatch,
     BoNonPassingKyc,
     DocumentWasLearnerPermit,
+    DocumentExpired,
 }
 
 impl_enum_str_diesel!(RuleName);
