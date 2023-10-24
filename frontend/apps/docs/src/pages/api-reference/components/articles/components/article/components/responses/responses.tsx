@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Badge, createFontStyles } from '@onefootprint/ui';
+import { Badge, createFontStyles, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import type { Content } from '@/api-reference/api-reference.types';
@@ -22,9 +22,19 @@ const Responses = ({ responses }: ResponsesProps) => {
         const schema = getSchemaFromComponent(response as Content);
         return (
           <ResponseContainer key={code}>
-            <Badge variant={code === '200' ? 'success' : 'neutral'}>
-              {code}
-            </Badge>
+            <Header>
+              <Badge variant={code === '200' ? 'success' : 'neutral'}>
+                {code}
+              </Badge>
+              {schema?.type && (
+                <>
+                  <Separator>·</Separator>
+                  <Typography variant="caption-4" color="quaternary">
+                    {schema?.type}
+                  </Typography>
+                </>
+              )}
+            </Header>
             {schema && <Schema schema={schema} isInBrackets />}
           </ResponseContainer>
         );
@@ -32,6 +42,14 @@ const Responses = ({ responses }: ResponsesProps) => {
     </Container>
   );
 };
+
+const Separator = styled.span`
+  ${({ theme }) => css`
+    ${createFontStyles('label-3')}
+    color: ${theme.color.secondary};
+    padding: 0 ${theme.spacing[2]};
+  `}
+`;
 
 const Container = styled.div`
   ${({ theme }) => css`
@@ -56,6 +74,14 @@ const ResponseContainer = styled.div`
     gap: ${theme.spacing[4]};
     margin: ${theme.spacing[4]} 0 0 ${theme.spacing[3]};
   `}
+`;
+
+const Header = styled.div`
+  ${({ theme }) => css`
+    align-items: center;
+    display: flex;
+    gap: ${theme.spacing[2]};
+  `};
 `;
 
 export default Responses;
