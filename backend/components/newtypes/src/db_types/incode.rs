@@ -119,7 +119,7 @@ pub enum IncodeFailureReason {
 
 impl IncodeFailureReason {
     pub fn can_ignore(&self) -> bool {
-        true
+        !matches!(self, Self::IdTypeNotAcceptable)
     }
 
     pub fn reason_code(&self) -> Option<FootprintReasonCode> {
