@@ -50,13 +50,19 @@ yarn add @onefootprint/footprint-js
 
 <inline-alert variant='info'>Make sure your application's permissions and content security policies are configured correctly to allow the Footprint integration. More info can be found [here](/integrate/content-security-policy).</inline-alert>
 
-4. Embed the Footprint button.
+4. Render Footprint
+
+In order to use our onboarding flows, you can either render a Footprint button, or use your own button and trigger Footprint when clicked.
+
+### Vanilla HTML
+
+If you would like to use a pre-built Footprint button, below is what your integration would look like for Vanilla HTML:
 
 ```html
 <div data-footprint data-public-key="ob_test_VMooXd04EUlnu3AvMYKjMW"></div>
 ```
 
-5. Add your Footprint completion handler
+Make sure to add Footprint completion handlers on the `window` object:
 
 ```javascript
 window.footprintCallbacks = {
@@ -66,7 +72,58 @@ window.footprintCallbacks = {
 };
 ```
 
-6. To customize the button placement, the easiest way is to wrap the button in a div and apply the styles to this div:
+Please refer to our guide for [Javascript](https://docs.onefootprint.com/sdks/javascript#verify-component-integration) for more details.
+
+### React
+
+If your app is built using React, you can use our React integration:
+
+```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import { FootprintVerifyButton } from '@onefootprint/footprint-react';
+
+const Page = () => {
+  const handleCancel = () => {
+    console.log('user canceled');
+  };
+
+  const handleComplete = (validationToken: string) => {
+    console.log(validationToken);
+  };
+
+  return (
+    <main>
+      <FootprintVerifyButton
+        publicKey="ob_test_VMooXd04EUlnu3AvMYKjMW"
+        onComplete={handleComplete}
+        onCancel={handleCancel}
+      />
+    </main>
+  );
+};
+```
+
+Please refer to our guide for [React](https://docs.onefootprint.com/sdks/react#footprint-verify-button-integration) for more details.
+
+### Using your custom button
+
+If you would like to use your own button and trigger Footprint, you can execute the following on click:
+
+```javascript
+const handleClick = () => {
+  const component = footprint.init({
+    kind: 'verify',
+    publicKey,
+    userData,
+    onComplete: validationToken => {
+      // TODO: Post the token to Footprint server to exchange with Footprint user ID
+    },
+  });
+  component.render();
+};
+```
+
+5. To customize the button placement, the easiest way is to wrap the button in a div and apply the styles to this div:
 
 ```html
 <style>
