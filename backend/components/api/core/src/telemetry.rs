@@ -99,7 +99,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             country,
             region_name: _,
             latitude,
-            longitude: _,
+            longitude,
             postal_code: _,
             time_zone: _,
             user_agent,
@@ -148,7 +148,11 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             // I would get rid of these fields next
             api_key_id = tracing::field::Empty,
             tenant_user_id = tracing::field::Empty,
-            latitude,
+            lat_lng = format!(
+                "{},{}",
+                latitude.unwrap_or_default(),
+                longitude.unwrap_or_default()
+            ),
             "Root span"
         );
         span
