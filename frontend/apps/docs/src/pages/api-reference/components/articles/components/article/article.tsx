@@ -9,13 +9,15 @@ import type {
   SecurityTypes,
 } from '@/api-reference/api-reference.types';
 
+import TypeBadge from '../../../type-badge/type-badge';
 import DemoCode from './components/demo-code';
 import Description from './components/description';
 import Parameters from './components/parameters';
-import Path from './components/path';
 import RequestBody from './components/request-body';
 import Responses from './components/responses';
 import Security from './components/security';
+
+const API_BASE_URL = 'api.onefootprint.com';
 
 const Article = ({
   id,
@@ -34,7 +36,19 @@ const Article = ({
     <ArticleContainer id={encodedId} name={encodedId}>
       <ContentColumn>
         <TitleContainer direction="column" gap={3}>
-          {method && path && <Path type={method} url={path} />}
+          {method && path && (
+            <Stack direction="row" gap={2}>
+              <TypeBadge type={method} />
+              <Stack direction="row" gap={1}>
+                <Typography variant="label-2" as="h3" color="tertiary">
+                  {API_BASE_URL}
+                </Typography>
+                <Typography variant="label-2" as="h3">
+                  {path}
+                </Typography>
+              </Stack>
+            </Stack>
+          )}
           {description && <Description>{description}</Description>}
         </TitleContainer>
         {security && (

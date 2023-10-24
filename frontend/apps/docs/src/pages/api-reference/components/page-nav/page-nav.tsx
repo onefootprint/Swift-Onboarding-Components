@@ -5,6 +5,7 @@ import {
   createFontStyles,
   Divider,
   media,
+  Stack,
   ThemeToggle,
 } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
@@ -13,6 +14,7 @@ import NavigationFooter from 'src/components/navigation-footer';
 import NavigationLogo from 'src/components/navigation-logo';
 import NavigationSectionTitle from 'src/components/navigation-section-title';
 
+import TypeBadge from '../type-badge';
 import NavigationScrollLink from './components/navigation-scroll-link';
 import type { Navigation } from './page-nav.types';
 
@@ -59,8 +61,10 @@ const PageNav = ({ navigation, navigationPreviewSection }: PageNavProps) => {
               <NavigationSectionTitle>{title}</NavigationSectionTitle>
               {subsections.map(({ method, path, id }) => (
                 <NavigationScrollLink key={id} id={id}>
-                  <Method>{method}</Method>
-                  <Entities>{path}</Entities>
+                  <Stack justify="center">
+                    <TypeBadge skinny type={method} />
+                  </Stack>
+                  <PathLabel>{path}</PathLabel>
                 </NavigationScrollLink>
               ))}
             </div>
@@ -75,8 +79,10 @@ const PageNav = ({ navigation, navigationPreviewSection }: PageNavProps) => {
               <NavigationSectionTitle>{title}</NavigationSectionTitle>
               {subsections.map(({ method, path, id }) => (
                 <NavigationScrollLink key={id} id={id}>
-                  <Method>{method}</Method>
-                  <Entities>{path}</Entities>
+                  <Stack justify="center">
+                    <TypeBadge skinny type={method} />
+                  </Stack>
+                  <PathLabel>{path}</PathLabel>
                 </NavigationScrollLink>
               ))}
             </div>
@@ -87,6 +93,15 @@ const PageNav = ({ navigation, navigationPreviewSection }: PageNavProps) => {
     </PageNavContainer>
   );
 };
+
+const PathLabel = styled.span`
+  text-transform: lowercase;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 100%;
+  display: block;
+  overflow: hidden;
+`;
 
 const PageNavContainer = styled.aside`
   ${({ theme }) => css`
@@ -145,29 +160,6 @@ const Header = styled.header<{ isScrolled: boolean }>`
     padding: ${theme.spacing[6]};
     border-bottom: ${theme.borderWidth[1]} solid
       ${isScrolled ? theme.borderColor.tertiary : 'transparent'};
-  `}
-`;
-
-const Method = styled.span`
-  ${({ theme }) => css`
-    ${createFontStyles('snippet-2')};
-    color: ${theme.color.secondary};
-    text-transform: uppercase;
-    margin-right: ${theme.spacing[2]};
-  `}
-`;
-
-const Entities = styled.p`
-  ${({ theme }) => css`
-    ${createFontStyles('snippet-2')};
-    color: ${theme.color.tertiary};
-    display: inline-block;
-    text-transform: lowercase;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    max-width: 100%;
-    margin: 0;
   `}
 `;
 
