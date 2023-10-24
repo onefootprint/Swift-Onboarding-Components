@@ -13,20 +13,17 @@ type HeaderProps = {
 const Header = ({ title, type, isRequired, isInBrackets }: HeaderProps) => {
   const { t } = useTranslation('pages.api-reference');
 
+  const typeLabel = !isRequired
+    ? `${t('optional').toLowerCase()} ${type}`
+    : type;
+
   return (
     <StyledStack align="center" justify="flex-start" gap={3}>
       <Column isInBrackets={isInBrackets}>
         <CodeInline disabled>{title}</CodeInline>
         <Separator>·</Separator>
-        <Type>{type}</Type>
+        <Type>{typeLabel}</Type>
       </Column>
-
-      <Separator>·</Separator>
-      {isRequired ? (
-        <RequiredType data-required="true">{t('required')}</RequiredType>
-      ) : (
-        <RequiredType>{t('optional')}</RequiredType>
-      )}
     </StyledStack>
   );
 };
@@ -78,16 +75,6 @@ const Separator = styled.span`
 const Type = styled.div`
   ${({ theme }) => css`
     color: ${theme.color.secondary};
-  `}
-`;
-
-const RequiredType = styled.div`
-  ${({ theme }) => css`
-    color: ${theme.color.quaternary};
-
-    &[data-required='true'] {
-      color: ${theme.color.warning};
-    }
   `}
 `;
 

@@ -81,9 +81,12 @@ where
 pub struct CursorPaginatedResponseMeta<C> {
     /// The cursor to be provided in the next request to fetch the next page
     // TODO need a reasonable openapi example. This doesn't work for every C
-    #[openapi(example = "12345")]
+    #[openapi(example = "1234")]
+    /// The `cursor` parameter to provide in order to request the next page of results
     pub next: Option<C>,
-    #[openapi(example = "11")]
+    #[openapi(example = "10000")]
+    // TODO why is this optional
+    /// The total number of results
     pub count: Option<i64>,
 }
 
@@ -115,7 +118,7 @@ where
     C: TypedData,
 {
     fn name() -> Option<String> {
-        T::name().map(|n| format!("PageResponse<{}>", n))
+        T::name().map(|n| format!("CursorPaginated{}", n))
     }
 
     fn description() -> &'static str {
@@ -140,6 +143,8 @@ where
             "meta".into(),
             Box::new(CursorPaginatedResponseMeta::<C>::raw_schema()),
         );
+        schema.required.insert("data".into());
+        schema.required.insert("meta".into());
 
         schema
     }
@@ -177,8 +182,7 @@ where
     T: paperclip::v2::schema::Apiv2Schema,
 {
     fn name() -> Option<String> {
-        let name = T::name().unwrap_or("Response".to_owned());
-        Some(format!("OffsetPaginated{}", name))
+        T::name().map(|n| format!("OffsetPaginated{}", n))
     }
 
     fn description() -> &'static str {
@@ -196,10 +200,10 @@ where
         schema
             .properties
             .insert("data".into(), Vec::<T>::raw_schema().into());
-        schema.required.insert("data".into());
         schema
             .properties
             .insert("meta".into(), OffsetPaginatedResponseMeta::raw_schema().into());
+        schema.required.insert("data".into());
         schema.required.insert("meta".into());
         schema
     }

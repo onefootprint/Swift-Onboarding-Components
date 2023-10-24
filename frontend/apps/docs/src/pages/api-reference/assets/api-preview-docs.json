@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "7bd771b43e5eb859bf601959787e61846325c1d1"
+        "version": "710ef02cde93ece2d500858f092cc84979b90fa2"
     },
     "servers": [
         {
@@ -286,7 +286,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/components/schemas/LiteUser"
+                                                "$ref": "#/components/schemas/DUMMYLiteUser"
                                             }
                                         },
                                         "meta": {
@@ -294,19 +294,24 @@
                                             "type": "object",
                                             "properties": {
                                                 "count": {
-                                                    "example": 11,
+                                                    "example": 10000,
+                                                    "description": "The total number of results",
                                                     "type": "integer",
                                                     "format": "int64"
                                                 },
                                                 "next": {
-                                                    "example": 12345,
-                                                    "description": "The cursor to be provided in the next request to fetch the next page",
+                                                    "example": 1234,
+                                                    "description": "The cursor to be provided in the next request to fetch the next page\n The `cursor` parameter to provide in order to request the next page of results",
                                                     "type": "integer",
                                                     "format": "int64"
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
                                 }
                             }
                         }
@@ -1128,6 +1133,18 @@
                 "required": [
                     "expires_at",
                     "token"
+                ]
+            },
+            "DUMMYLiteUser": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "example": "fp_id_7p793EF07xKXHqAeg5VGPj",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id"
                 ]
             },
             "EntityValidateResponse": {
@@ -6116,20 +6133,10 @@
                     "<value>": {
                         "type": "object"
                     }
-                }
-            },
-            "LiteUser": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    },
-                    "sandbox_id": {
-                        "type": "string"
-                    }
                 },
                 "required": [
-                    "id"
+                    "<key>",
+                    "<value>"
                 ]
             },
             "OffsetPaginatedPublicAuthEvent": {

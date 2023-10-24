@@ -15,12 +15,19 @@ type RequestBodyProps = {
 const RequestBody = ({ requestBody }: RequestBodyProps) => {
   const { t } = useTranslation('pages.api-reference');
   const schema = getSchemaFromComponent(requestBody);
-  // TODO we should show when the body is optional
-  // const isRequired = !!requestBody?.required;
+  const isOptional = !requestBody?.required;
 
   return schema ? (
     <Box>
-      <Title>{t('request-body')}</Title>
+      <Header>
+        <Title>{t('request-body')}</Title>
+        {isOptional && (
+          <>
+            <Separator>·</Separator>
+            <Optional>{t('optional')}</Optional>
+          </>
+        )}
+      </Header>
       <Schema schema={schema} isInBrackets />
     </Box>
   ) : null;
@@ -31,6 +38,29 @@ const Title = styled.h3`
     ${createFontStyles('label-3')}
     color: ${theme.color.secondary};
     margin-bottom: ${theme.spacing[2]};
+  `}
+`;
+
+const Header = styled.div`
+  ${({ theme }) => css`
+    align-items: center;
+    display: flex;
+    gap: ${theme.spacing[2]};
+  `};
+`;
+
+const Separator = styled.span`
+  ${({ theme }) => css`
+    ${createFontStyles('label-3')}
+    color: ${theme.color.secondary};
+    padding: 0 ${theme.spacing[2]};
+  `}
+`;
+
+const Optional = styled.div`
+  ${({ theme }) => css`
+    ${createFontStyles('caption-4')}
+    color: ${theme.color.quaternary};
   `}
 `;
 

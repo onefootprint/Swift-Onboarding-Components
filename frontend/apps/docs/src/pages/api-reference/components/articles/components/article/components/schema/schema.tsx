@@ -59,13 +59,19 @@ const Schema = ({ schema, isInBrackets = false }: SchemaProps) => {
             ) : null}
             {property.enum ? <Enum enums={property.enum} /> : null}
             {property.properties && (
-              <Properties properties={property.properties} />
+              <Properties
+                properties={property.properties}
+                required={property.required}
+              />
             )}
             {property.items ? (
               <Box>
                 {property.items.enum && <Enum enums={property.items.enum} />}
                 {property.items.properties && (
-                  <Properties properties={property.items.properties} />
+                  <Properties
+                    properties={property.items.properties}
+                    required={property.items?.required}
+                  />
                 )}
               </Box>
             ) : null}

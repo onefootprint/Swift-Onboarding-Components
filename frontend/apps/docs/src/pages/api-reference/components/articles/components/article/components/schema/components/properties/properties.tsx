@@ -7,12 +7,18 @@ import Property from './components/property';
 
 export type PropertiesProps = {
   properties: Record<string, ContentSchema>;
+  required?: string[];
 };
 
-const Properties = ({ properties }: PropertiesProps) => (
+const Properties = ({ properties, required }: PropertiesProps) => (
   <Container>
     {Object.entries(properties).map(([title, property]) => (
-      <Property key={title} property={property} title={title} />
+      <Property
+        key={title}
+        property={property}
+        title={title}
+        isRequired={required?.includes(title)}
+      />
     ))}
   </Container>
 );

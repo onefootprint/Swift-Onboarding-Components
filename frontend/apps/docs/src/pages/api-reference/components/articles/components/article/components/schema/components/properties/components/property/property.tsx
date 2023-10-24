@@ -29,6 +29,10 @@ const Properties = ({
     setExpanded(currentExpanded => !currentExpanded);
   };
 
+  const typeLabel = !isRequired
+    ? `${t('optional').toLowerCase()} ${property.type}`
+    : property.type;
+
   return (
     <Box>
       <TitleContainer>
@@ -48,9 +52,8 @@ const Properties = ({
               {title}
             </CodeInline>
             <Separator>·</Separator>
-            <Type>{property.type}</Type>
+            <Type>{typeLabel}</Type>
           </Button>
-          {isRequired && <Required>{t('required')}</Required>}
         </Header>
         {property.description || property.enum ? (
           <Content data-level={level}>
@@ -98,13 +101,6 @@ const TitleContainer = styled.div`
 const Header = styled.div`
   display: flex;
   justify-content: space-between;
-`;
-
-const Required = styled.div`
-  ${({ theme }) => css`
-    ${createFontStyles('caption-4')}
-    color: ${theme.color.warning};
-  `}
 `;
 
 const Button = styled.button`

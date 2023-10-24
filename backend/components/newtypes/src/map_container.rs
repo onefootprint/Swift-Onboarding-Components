@@ -61,6 +61,9 @@ pub mod declare_map_container {
                     schema
                         .properties
                         .insert("<value>".into(), Box::new(<$value>::raw_schema()));
+                    // Not really true, just depends how these are being rendered
+                    schema.required.insert("<key>".into());
+                    schema.required.insert("<value>".into());
 
                     schema.name = Self::name();
                     schema
