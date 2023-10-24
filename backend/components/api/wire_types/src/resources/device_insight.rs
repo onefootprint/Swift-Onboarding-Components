@@ -1,14 +1,20 @@
 use crate::*;
 
-/// Describes a device insight event
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 
 pub struct AuthEvent {
-    pub id: AuthEventId,
-    /// represents user agent and IP information
+    /// Information on from where the auth occurred
     pub insight: Option<InsightEvent>,
-    /// a list of assoicated attested devices
+    /// A list of assoicated attested devices
     pub linked_attestations: Vec<AttestedDeviceData>,
+    pub kind: AuthEventKind,
+    pub created_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+pub struct PublicAuthEvent {
+    /// Information on from where the auth occurred
+    pub insight: Option<PublicInsightEvent>,
     pub kind: AuthEventKind,
     pub created_at: DateTime<Utc>,
 }

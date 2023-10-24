@@ -36,3 +36,28 @@ impl DbToApi<InsightEvent> for api_wire_types::InsightEvent {
         }
     }
 }
+
+impl DbToApi<InsightEvent> for api_wire_types::PublicInsightEvent {
+    fn from_db(e: InsightEvent) -> Self {
+        let InsightEvent {
+            timestamp,
+            ip_address,
+            city,
+            country,
+            region,
+            postal_code,
+            user_agent,
+            ..
+        } = e;
+
+        api_wire_types::PublicInsightEvent {
+            timestamp,
+            ip_address,
+            city,
+            country,
+            region,
+            postal_code,
+            user_agent,
+        }
+    }
+}

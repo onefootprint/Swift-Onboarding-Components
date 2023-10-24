@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "9ae44982c8ee48bc695a6bfd769e61f0fb99e8cf"
+        "version": "7bd771b43e5eb859bf601959787e61846325c1d1"
     },
     "servers": [
         {
@@ -307,6 +307,61 @@
                                             }
                                         }
                                     }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/auth_events": {
+            "get": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nView a user's recent device insights",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OffsetPaginatedPublicAuthEvent"
                                 }
                             }
                         }
@@ -6075,6 +6130,96 @@
                 },
                 "required": [
                     "id"
+                ]
+            },
+            "OffsetPaginatedPublicAuthEvent": {
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "created_at": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                },
+                                "insight": {
+                                    "description": "Information on from where the auth occurred",
+                                    "type": "object",
+                                    "properties": {
+                                        "city": {
+                                            "example": "San Francisco",
+                                            "type": "string"
+                                        },
+                                        "country": {
+                                            "example": "United States",
+                                            "type": "string"
+                                        },
+                                        "ip_address": {
+                                            "type": "string"
+                                        },
+                                        "postal_code": {
+                                            "example": 94117,
+                                            "type": "string"
+                                        },
+                                        "region": {
+                                            "example": "CA",
+                                            "type": "string"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "user_agent": {
+                                            "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "timestamp"
+                                    ]
+                                },
+                                "kind": {
+                                    "type": "string",
+                                    "enum": [
+                                        "sms",
+                                        "email",
+                                        "passkey"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "created_at",
+                                "kind"
+                            ]
+                        }
+                    },
+                    "meta": {
+                        "type": "object",
+                        "properties": {
+                            "count": {
+                                "example": 10000,
+                                "description": "The total number of results",
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "next_page": {
+                                "example": 2,
+                                "description": "The `page` parameter to provide in order to request the next page of results",
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        },
+                        "required": [
+                            "count"
+                        ]
+                    }
+                },
+                "required": [
+                    "data",
+                    "meta"
                 ]
             },
             "PublicDocument": {

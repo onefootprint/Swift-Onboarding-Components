@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "9ae44982c8ee48bc695a6bfd769e61f0fb99e8cf"
+        "version": "7bd771b43e5eb859bf601959787e61846325c1d1"
     },
     "servers": [
         {

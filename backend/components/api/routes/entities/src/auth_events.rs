@@ -27,7 +27,7 @@ pub async fn get(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let events = AuthEvent::list(conn, &sv.id)?;
+            let (events, _) = AuthEvent::list(conn, &sv.id, None)?;
             Ok(events)
         })
         .await??;

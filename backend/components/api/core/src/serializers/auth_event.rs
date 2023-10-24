@@ -11,7 +11,7 @@ impl DbToApi<LoadedAuthEvent> for api_wire_types::AuthEvent {
             attested_devices,
         } = event;
 
-        let AuthEvent { id, created_at, .. } = event;
+        let AuthEvent { created_at, .. } = event;
 
         let linked_attestations = if let Some(attested_devices) = attested_devices {
             attested_devices
@@ -54,10 +54,26 @@ impl DbToApi<LoadedAuthEvent> for api_wire_types::AuthEvent {
         };
 
         Self {
-            id,
             created_at,
             insight: insight.map(api_wire_types::InsightEvent::from_db),
             linked_attestations,
+            kind: event.kind,
+        }
+    }
+}
+
+impl DbToApi<LoadedAuthEvent> for api_wire_types::PublicAuthEvent {
+    fn from_db(event: LoadedAuthEvent) -> Self {
+        let LoadedAuthEvent {
+            event,
+            insight,
+            attested_devices: _,
+        } = event;
+        let AuthEvent { created_at, .. } = event;
+
+        Self {
+            created_at,
+            insight: insight.map(api_wire_types::PublicInsightEvent::from_db),
             kind: event.kind,
         }
     }

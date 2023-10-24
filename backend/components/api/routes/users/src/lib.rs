@@ -1,6 +1,7 @@
 use api_core::*;
 use paperclip::actix::web;
 
+mod auth_events;
 mod detail;
 mod documents;
 mod get;
@@ -13,5 +14,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(get::get)
         .service(documents::get)
         .service(risk_signals::get)
+        .service(auth_events::get)
         .service(detail::detail);
 }

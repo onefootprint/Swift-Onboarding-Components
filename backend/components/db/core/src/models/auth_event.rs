@@ -5,6 +5,8 @@ use newtypes::AuthEventKind;
 use newtypes::WebauthnCredentialId;
 use crate::DbError;
 use crate::DbResult;
+use crate::NextPage;
+use crate::OffsetPagination;
 use db_schema::schema::auth_event;
 use chrono::{DateTime, Utc};
 use crate::PgConn;
@@ -66,13 +68,34 @@ pub struct LinkedDeviceAttestation {
 }
 
 impl AuthEvent {
+    #[tracing::instrument("AuthEvent::count", skip_all)]
+    pub fn count(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<i64> {
+        let count = auth_event::table
+            .filter(auth_event::scoped_vault_id.eq(sv_id))
+            .count()
+            .get_result(conn)?;
+        Ok(count)
+    }
+
+
     #[tracing::instrument("AuthEvent::list", skip_all)]
-    pub fn list(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Vec<LoadedAuthEvent>> {
-        let results: Vec<(AuthEvent, Option<InsightEvent>)> = auth_event::table
+    pub fn list(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+        pagination: Option<OffsetPagination>,
+    ) -> DbResult<(Vec<LoadedAuthEvent>, NextPage)> {
+        let mut query = auth_event::table
             .left_join(schema::insight_event::table)
             .filter(auth_event::scoped_vault_id.eq(sv_id))
             .order(auth_event::created_at.desc())
-            .load(conn)?;
+            .into_boxed();
+        if let Some(pagination) = pagination.as_ref() {
+            query = query.limit(pagination.limit());
+            if let Some(offset) = pagination.offset() {
+                query = query.offset(offset);
+            }
+        }
+        let results: Vec<(AuthEvent, Option<InsightEvent>)> = query.load(conn)?;
 
         // This is a bit hacky, but we may have >1 attestation per passkey cred
         // so we collect them together.
@@ -117,6 +140,12 @@ impl AuthEvent {
                 }
             })
             .collect();
-        Ok(results)
+
+        // This is very atypical to optionally support pagination
+        if let Some(pagination) = pagination {
+            Ok(pagination.results(results))
+        } else {
+            Ok((results, None))
+        }
     }
 }

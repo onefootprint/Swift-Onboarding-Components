@@ -17,3 +17,23 @@ pub struct InsightEvent {
     pub time_zone: Option<String>,
     pub user_agent: Option<String>,
 }
+
+/// Describes a device insight event with locations and IP of the event
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+
+pub struct PublicInsightEvent {
+    pub timestamp: DateTime<Utc>,
+    pub ip_address: Option<String>,
+    #[openapi(example = "San Francisco")]
+    pub city: Option<String>,
+    #[openapi(example = "United States")]
+    pub country: Option<String>,
+    #[openapi(example = "CA")]
+    pub region: Option<String>,
+    #[openapi(example = "94117")]
+    pub postal_code: Option<String>,
+    #[openapi(
+        example = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15"
+    )]
+    pub user_agent: Option<String>,
+}

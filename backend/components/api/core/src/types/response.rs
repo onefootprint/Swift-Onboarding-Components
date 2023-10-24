@@ -109,20 +109,6 @@ impl<T, C: Clone> CursorPaginatedResponseInner<T, C> {
     }
 }
 
-/*
-impl<T, C> Responder for CursorPaginatedResponseInner<T, C>
-where
-    T: Serialize,
-    C: Serialize,
-{
-    type Body = actix_web::body::BoxBody;
-
-    fn respond_to(self, _req: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
-        actix_web::HttpResponse::build(actix_web::http::StatusCode::OK).json(self)
-    }
-}
-*/
-
 impl<T, C> paperclip::v2::schema::Apiv2Schema for CursorPaginatedResponseInner<T, C>
 where
     T: paperclip::v2::schema::Apiv2Schema,
@@ -167,15 +153,16 @@ where
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
-/// Metadata required for an offset-paginated response.
 pub struct OffsetPaginatedResponseMeta {
-    #[openapi(example = "12345")]
+    #[openapi(example = "2")]
+    /// The `page` parameter to provide in order to request the next page of results
     pub next_page: Option<usize>,
-    #[openapi(example = "11")]
+    #[openapi(example = "10000")]
+    /// The total number of results
     pub count: i64,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize)]
 /// Wraps the response data with metadata needed for an offset-paginated result.
 /// Offset pagination requests take in a page number and page size and use postgres's OFFSET
 /// in order to fetch the requested page.
@@ -183,6 +170,39 @@ pub struct OffsetPaginatedResponseMeta {
 pub struct OffsetPaginatedResponse<T> {
     pub data: Vec<T>,
     pub meta: OffsetPaginatedResponseMeta,
+}
+
+impl<T> paperclip::v2::schema::Apiv2Schema for OffsetPaginatedResponse<T>
+where
+    T: paperclip::v2::schema::Apiv2Schema,
+{
+    fn name() -> Option<String> {
+        let name = T::name().unwrap_or("Response".to_owned());
+        Some(format!("OffsetPaginated{}", name))
+    }
+
+    fn description() -> &'static str {
+        T::description()
+    }
+
+    fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
+        let mut schema = paperclip::v2::models::DefaultSchemaRaw {
+            name: Self::name(),
+            description: Some(Self::description().to_owned()),
+            example: None,
+            data_type: Some(DataType::Object),
+            ..Default::default()
+        };
+        schema
+            .properties
+            .insert("data".into(), Vec::<T>::raw_schema().into());
+        schema.required.insert("data".into());
+        schema
+            .properties
+            .insert("meta".into(), OffsetPaginatedResponseMeta::raw_schema().into());
+        schema.required.insert("meta".into());
+        schema
+    }
 }
 
 impl<T> OffsetPaginatedResponse<T> {

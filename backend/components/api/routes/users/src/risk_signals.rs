@@ -19,6 +19,7 @@ type RiskSignalsListResponse = Vec<api_wire_types::PublicRiskSignal>;
 
 #[api_v2_operation(
     description = "Lists the risk signals for a Footprint user.",
+    // TODO don't take out of preview unless we paginate this API
     tags(Users, Preview)
 )]
 #[get("/users/{fp_id}/risk_signals")]
