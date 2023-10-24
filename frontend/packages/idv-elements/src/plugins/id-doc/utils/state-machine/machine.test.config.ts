@@ -14,13 +14,6 @@ export const requirement: IdDocRequirement = {
   isMet: false,
   shouldCollectSelfie: true,
   shouldCollectConsent: true,
-  onlyUsSupported: false,
-  supportedDocumentTypes: [
-    SupportedIdDocTypes.driversLicense,
-    SupportedIdDocTypes.idCard,
-    SupportedIdDocTypes.passport,
-  ],
-  supportedCountries: ['US', 'CA'],
   supportedCountryAndDocTypes: {
     us: [
       SupportedIdDocTypes.driversLicense,

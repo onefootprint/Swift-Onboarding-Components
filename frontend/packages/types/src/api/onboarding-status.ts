@@ -1,4 +1,3 @@
-import type { CountryCode } from '../data';
 import type {
   CollectedDataOption,
   CollectedInvestorProfileDataOption,
@@ -43,9 +42,6 @@ export type IdDocRequirement = {
   isMet: boolean;
   shouldCollectSelfie: boolean;
   shouldCollectConsent: boolean;
-  onlyUsSupported: boolean;
-  supportedDocumentTypes: SupportedIdDocTypes[];
-  supportedCountries: CountryCode[];
   supportedCountryAndDocTypes: Record<string, SupportedIdDocTypes[]>;
 };
 

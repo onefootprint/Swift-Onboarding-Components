@@ -696,9 +696,6 @@ describe('<Idv />', () => {
           isMet: false,
           shouldCollectConsent: false,
           shouldCollectSelfie: false,
-          onlyUsSupported: false,
-          supportedDocumentTypes: [],
-          supportedCountries: ['US', 'CA'],
           supportedCountryAndDocTypes: {
             us: [
               SupportedIdDocTypes.driversLicense,
@@ -761,9 +758,6 @@ describe('<Idv />', () => {
           isMet: false,
           shouldCollectConsent: false,
           shouldCollectSelfie: false,
-          onlyUsSupported: false,
-          supportedDocumentTypes: [],
-          supportedCountries: ['US', 'CA'],
           supportedCountryAndDocTypes: {
             us: [
               SupportedIdDocTypes.driversLicense,

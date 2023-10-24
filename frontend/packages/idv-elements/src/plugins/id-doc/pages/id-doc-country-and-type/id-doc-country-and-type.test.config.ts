@@ -19,17 +19,6 @@ export const initialContextAllDocTypes: MachineContext = {
     kind: OnboardingRequirementKind.idDoc,
     shouldCollectSelfie: true,
     shouldCollectConsent: true,
-    onlyUsSupported: false,
-    supportedDocumentTypes: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-      SupportedIdDocTypes.residenceDocument,
-      SupportedIdDocTypes.visa,
-      SupportedIdDocTypes.workPermit,
-      SupportedIdDocTypes.voterIdentification,
-    ],
-    supportedCountries: ['US', 'CA'],
     supportedCountryAndDocTypes: {
       us: [
         SupportedIdDocTypes.driversLicense,
@@ -81,13 +70,6 @@ export const initialContextSomeDocTypes: MachineContext = {
     kind: OnboardingRequirementKind.idDoc,
     shouldCollectSelfie: true,
     shouldCollectConsent: true,
-    onlyUsSupported: false,
-    supportedDocumentTypes: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-    ],
-    supportedCountries: ['US', 'CA'],
     supportedCountryAndDocTypes: {
       us: [
         SupportedIdDocTypes.driversLicense,
@@ -123,13 +105,6 @@ export const initialContextOnlyUS: MachineContext = {
     kind: OnboardingRequirementKind.idDoc,
     shouldCollectSelfie: true,
     shouldCollectConsent: true,
-    onlyUsSupported: true,
-    supportedDocumentTypes: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-    ],
-    supportedCountries: ['US'],
     supportedCountryAndDocTypes: {
       us: [
         SupportedIdDocTypes.driversLicense,
@@ -163,9 +138,6 @@ export const initialContextBD: MachineContext = {
     kind: OnboardingRequirementKind.idDoc,
     shouldCollectSelfie: true,
     shouldCollectConsent: true,
-    onlyUsSupported: true,
-    supportedDocumentTypes: [SupportedIdDocTypes.passport],
-    supportedCountries: ['BD'],
     supportedCountryAndDocTypes: {
       bd: [SupportedIdDocTypes.passport],
     },
@@ -191,13 +163,6 @@ export const initialContextNoSupportedDoc: MachineContext = {
     kind: OnboardingRequirementKind.idDoc,
     shouldCollectSelfie: true,
     shouldCollectConsent: true,
-    onlyUsSupported: true,
-    supportedDocumentTypes: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-    ],
-    supportedCountries: ['US'],
     supportedCountryAndDocTypes: {
       us: [
         SupportedIdDocTypes.driversLicense,

@@ -27,9 +27,6 @@ const idDocRequirement: IdDocRequirement = {
   isMet: false,
   shouldCollectSelfie: true,
   shouldCollectConsent: true,
-  onlyUsSupported: false,
-  supportedDocumentTypes: [],
-  supportedCountries: ['US', 'CA'],
   supportedCountryAndDocTypes: {
     us: [
       SupportedIdDocTypes.driversLicense,

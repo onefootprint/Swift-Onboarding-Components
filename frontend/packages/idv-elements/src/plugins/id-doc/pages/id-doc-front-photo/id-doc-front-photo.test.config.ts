@@ -18,17 +18,6 @@ export const initialContextDL: MachineContext = {
     kind: OnboardingRequirementKind.idDoc,
     shouldCollectSelfie: true,
     shouldCollectConsent: true,
-    onlyUsSupported: false,
-    supportedDocumentTypes: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-      SupportedIdDocTypes.residenceDocument,
-      SupportedIdDocTypes.visa,
-      SupportedIdDocTypes.workPermit,
-      SupportedIdDocTypes.voterIdentification,
-    ],
-    supportedCountries: ['US', 'CA'],
     supportedCountryAndDocTypes: {
       us: [
         SupportedIdDocTypes.driversLicense,
@@ -80,17 +69,6 @@ export const initialContextNoConsent: MachineContext = {
     kind: OnboardingRequirementKind.idDoc,
     shouldCollectSelfie: true,
     shouldCollectConsent: false,
-    onlyUsSupported: false,
-    supportedDocumentTypes: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-      SupportedIdDocTypes.residenceDocument,
-      SupportedIdDocTypes.visa,
-      SupportedIdDocTypes.workPermit,
-      SupportedIdDocTypes.voterIdentification,
-    ],
-    supportedCountries: ['US', 'CA'],
     supportedCountryAndDocTypes: {
       us: [
         SupportedIdDocTypes.driversLicense,

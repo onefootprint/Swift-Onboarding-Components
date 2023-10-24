@@ -68,8 +68,6 @@ describe.skip('<IdDoc />', () => {
     shouldCollectSelfie?: boolean,
     shouldCollectConsent?: boolean,
     device?: DeviceInfo,
-    onlyUsSupported?: boolean,
-    supportedDocumentTypes?: SupportedIdDocTypes[],
   ): PluginContext<IdDocCustomData> => ({
     authToken: 'token',
     customData: {
@@ -78,13 +76,6 @@ describe.skip('<IdDoc />', () => {
         isMet: false,
         shouldCollectSelfie: shouldCollectSelfie ?? false,
         shouldCollectConsent: shouldCollectConsent ?? false,
-        onlyUsSupported: onlyUsSupported || false,
-        supportedDocumentTypes: supportedDocumentTypes ?? [
-          SupportedIdDocTypes.driversLicense,
-          SupportedIdDocTypes.idCard,
-          SupportedIdDocTypes.passport,
-        ],
-        supportedCountries: ['US', 'CA'],
         supportedCountryAndDocTypes: {
           us: [
             SupportedIdDocTypes.driversLicense,

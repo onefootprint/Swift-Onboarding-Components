@@ -19,16 +19,6 @@ const contextWithSelfieErrors: MachineContext = {
     kind: OnboardingRequirementKind.idDoc,
     shouldCollectSelfie: true,
     shouldCollectConsent: true,
-    onlyUsSupported: false,
-    supportedDocumentTypes: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-      SupportedIdDocTypes.residenceDocument,
-      SupportedIdDocTypes.visa,
-      SupportedIdDocTypes.workPermit,
-    ],
-    supportedCountries: ['US', 'CA'],
     supportedCountryAndDocTypes: {
       us: [
         SupportedIdDocTypes.driversLicense,

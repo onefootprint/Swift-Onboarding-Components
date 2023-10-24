@@ -18,15 +18,6 @@ const selfiePromptStateContext: MachineContext = {
     kind: OnboardingRequirementKind.idDoc,
     shouldCollectSelfie: true,
     shouldCollectConsent: true,
-    onlyUsSupported: false,
-    supportedDocumentTypes: [
-      SupportedIdDocTypes.driversLicense,
-      SupportedIdDocTypes.idCard,
-      SupportedIdDocTypes.passport,
-      SupportedIdDocTypes.residenceDocument,
-      SupportedIdDocTypes.visa,
-      SupportedIdDocTypes.workPermit,
-    ],
     supportedCountryAndDocTypes: {
       us: [
         SupportedIdDocTypes.driversLicense,
@@ -42,7 +33,6 @@ const selfiePromptStateContext: MachineContext = {
         SupportedIdDocTypes.passport,
       ],
     },
-    supportedCountries: ['US', 'CA'],
   },
   idDoc: {
     country: 'US',
