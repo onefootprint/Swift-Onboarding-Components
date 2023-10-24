@@ -7,13 +7,11 @@ use db_schema::schema::vault;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use diesel_as_jsonb::AsJsonb;
-use itertools::Itertools;
 use newtypes::AndroidAppLicense;
 use newtypes::AndroidAppRecognition;
 use newtypes::AndroidDeviceIntegrityLevel;
-use newtypes::FpId;
 use newtypes::GoogleDeviceAttestationId;
-use newtypes::TenantId;
+use newtypes::ScopedVaultId;
 use newtypes::VaultId;
 use newtypes::WebauthnCredentialId;
 use serde::{Deserialize, Serialize};
@@ -98,41 +96,17 @@ impl NewGoogleDeviceAttestation {
     }
 }
 
-pub type UniqueVaultsAssociatedByAttestation = i64;
-
 impl GoogleDeviceAttestation {
-    #[tracing::instrument("GoogleDeviceAttestation::list_for_scoped_user", skip_all)]
-    pub fn list_for_scoped_user(
-        conn: &mut PgConn,
-        fp_id: &FpId,
-        tenant_id: &TenantId,
-        is_live: bool,
-    ) -> DbResult<(Vec<Self>, UniqueVaultsAssociatedByAttestation)> {
+    #[tracing::instrument("GoogleDeviceAttestation::list", skip_all)]
+    pub fn list(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
         let attestations: Vec<Self> = google_device_attestation::table
             .inner_join(vault::table)
             .inner_join(scoped_vault::table.on(scoped_vault::vault_id.eq(vault::id)))
-            .filter(scoped_vault::tenant_id.eq(tenant_id))
-            .filter(scoped_vault::fp_id.eq(fp_id))
-            .filter(scoped_vault::is_live.eq(is_live))
+            .filter(scoped_vault::id.eq(sv_id))
             .select(google_device_attestation::all_columns)
             .load(conn)?;
 
-        let widevine_ids: Vec<_> = attestations
-            .iter()
-            .flat_map(|a| a.widevine_id.as_ref())
-            .collect_vec();
-
-        let unique_vaults = google_device_attestation::table
-            .filter(google_device_attestation::widevine_id.eq_any(&widevine_ids))
-            .filter(google_device_attestation::widevine_security_level.eq("L1")) // only get the high sec level IDs
-            .inner_join(vault::table)
-            .filter(vault::is_live.eq(is_live))
-            .select(google_device_attestation::vault_id)
-            .distinct()
-            .count()
-            .get_result(conn)?;
-
-        Ok((attestations, unique_vaults))
+        Ok(attestations)
     }
 
     pub fn count_associated_vaults(&self, conn: &mut PgConn, is_live: bool) -> DbResult<i64> {
