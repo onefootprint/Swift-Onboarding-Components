@@ -22,9 +22,9 @@ describe('usePropsFromUrl', () => {
     expect(result.current).toBe(undefined);
     expect(onSuccess).toHaveBeenCalledWith({
       l10n: undefined,
-      options: {},
-      userData: {},
-      authToken: '',
+      options: undefined,
+      userData: undefined,
+      authToken: undefined,
     });
   });
 
@@ -40,9 +40,9 @@ describe('usePropsFromUrl', () => {
     expect(result.current).toBe(undefined);
     expect(onSuccess).toHaveBeenCalledWith({
       l10n: undefined,
-      options: {},
-      userData: {},
-      authToken: '',
+      options: undefined,
+      userData: undefined,
+      authToken: undefined,
     });
   });
 
@@ -58,10 +58,10 @@ describe('usePropsFromUrl', () => {
 
     expect(result.current).toBe(undefined);
     expect(onSuccess).toHaveBeenCalledWith({
-      l10n: {},
-      options: {},
-      userData: {},
-      authToken: '',
+      l10n: undefined,
+      options: undefined,
+      userData: undefined,
+      authToken: undefined,
     });
   });
 
@@ -97,7 +97,7 @@ describe('usePropsFromUrl', () => {
         showLogo: true,
       },
       l10n: undefined,
-      authToken: '',
+      authToken: undefined,
     });
   });
 
@@ -133,7 +133,7 @@ describe('usePropsFromUrl', () => {
         showLogo: true,
       },
       l10n: undefined,
-      authToken: '',
+      authToken: undefined,
     });
   });
 
@@ -169,7 +169,7 @@ describe('usePropsFromUrl', () => {
         showLogo: true,
       },
       l10n: { locale: 'es-MX' },
-      authToken: '',
+      authToken: undefined,
     });
   });
 });

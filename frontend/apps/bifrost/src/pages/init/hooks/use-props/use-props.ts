@@ -1,7 +1,7 @@
-import { Logger } from '@onefootprint/idv-elements';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import usePropsFromParent from './hooks/use-props-from-parent';
+import usePropsFromParentLegacy from './hooks/use-props-from-parent/use-props-from-parent-legacy';
 import usePropsFromUrl from './hooks/use-props-from-url';
 import type { BifrostProps } from './types';
 
@@ -35,58 +35,48 @@ where ENCODED_USER_DATA keys are IdDIs
 */
 
 const useProps = (onSuccess: (props: BifrostProps) => void) => {
-  const [providerProps, setProviderProps] = useState<
-    BifrostProps | undefined
-  >();
-  const [urlProps, setUrlProps] = useState<BifrostProps | undefined>();
+  const onSuccessCalled = useRef(false); // Whether on success has been called with props
+  // We need all 3 of the hooks below to have resolved before we can move on
+  const [timeoutCounter, setTimeoutCounter] = useState(0);
+  const incrementTimeoutCounter = () => {
+    setTimeoutCounter(currCounter => currCounter + 1);
+  };
 
-  usePropsFromUrl((props: BifrostProps) => {
-    if (!urlProps) {
-      setUrlProps(props);
+  const complete = (props: BifrostProps) => {
+    // If already received props, ignore
+    if (onSuccessCalled.current) {
+      return;
+    }
+    onSuccessCalled.current = true;
+    onSuccess(props);
+  };
+
+  // For react-native / expo SDKs that only pass args via the URL
+  usePropsFromUrl((props?: BifrostProps) => {
+    if (props) {
+      complete(props);
+    } else {
+      // Meaning we didn't find any params in the url - treat this as a "timeout"
+      incrementTimeoutCounter();
     }
   });
 
-  const handlePropsFromParent = (props: BifrostProps) => {
-    if (!providerProps) {
-      setProviderProps(props);
-    }
-  };
-  const handleTimeout = () => {
-    if (!urlProps) {
-      Logger.warn(
-        'Getting props from url timed out on bifrost while the url prop is also empty.',
-        'birost-use-props',
-      );
-      console.warn(
-        'Getting provider prop from parent iFrame timed out on bifrost while the url prop is also empty.',
-      );
-    }
-    setProviderProps({
-      userData: {},
-      options: {},
-      l10n: {},
-      authToken: '',
-    });
-  };
-  usePropsFromParent(handlePropsFromParent, handleTimeout);
+  // For new versions of web SDKs
+  usePropsFromParent(complete, () => {
+    incrementTimeoutCounter();
+  });
+  // For older versions of web SDKs
+  usePropsFromParentLegacy(complete, () => {
+    incrementTimeoutCounter();
+  });
 
   useEffect(() => {
-    if (!urlProps || !providerProps) {
+    // If all 3 hooks timed out, we should return with empty props
+    if (timeoutCounter < 3) {
       return;
     }
-
-    if (urlProps && Object.keys(urlProps).length > 0) {
-      onSuccess(urlProps);
-      return;
-    }
-    if (providerProps && Object.keys(providerProps).length > 0) {
-      onSuccess(providerProps);
-      return;
-    }
-    onSuccess({} as BifrostProps);
-  }, [urlProps, providerProps]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  return providerProps;
+    complete({});
+  }, [timeoutCounter]);
 };
 
 export default useProps;

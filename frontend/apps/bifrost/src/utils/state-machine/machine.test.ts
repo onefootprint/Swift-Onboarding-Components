@@ -53,6 +53,7 @@ describe('Bifrost Machine Tests', () => {
     expect(state.context).toEqual({
       config: { ...testOnboardingConfig },
       bootstrapData: testBootstrapData,
+      authToken: '',
       l10n: undefined,
       showCompletionPage: undefined,
       showLogo: undefined,
@@ -76,6 +77,7 @@ describe('Bifrost Machine Tests', () => {
     expect(state.context).toEqual({
       config: { ...testOnboardingConfig, isLive: false },
       bootstrapData: testBootstrapData,
+      authToken: '',
       l10n: undefined,
       showCompletionPage: undefined,
       showLogo: undefined,

@@ -75,9 +75,9 @@ export const createBifrostMachine = () =>
             ? context.showLogo
             : showLogo;
 
-          if (authToken) {
-            context.authToken = authToken;
-          }
+          context.authToken = isUndefined(authToken)
+            ? context.authToken
+            : authToken;
 
           return context;
         }),

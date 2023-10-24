@@ -1,6 +1,9 @@
 import { Logger } from '@onefootprint/idv-elements';
 
-const getParsedProps = (props: string) => {
+const getParsedProps = (props?: string): Record<string, any> | undefined => {
+  if (!props) {
+    return undefined;
+  }
   let parsedProps;
   try {
     parsedProps = JSON.parse(decodeURIComponent(props));
@@ -11,7 +14,7 @@ const getParsedProps = (props: string) => {
     );
   }
 
-  return parsedProps || {};
+  return parsedProps;
 };
 
 export default getParsedProps;

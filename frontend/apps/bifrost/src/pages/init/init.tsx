@@ -59,9 +59,25 @@ const Init = () => {
     },
   );
 
+  const isPropsSaved = () => {
+    const { bootstrapData, showCompletionPage, showLogo, l10n, authToken } =
+      state.context;
+    return (
+      bootstrapData !== undefined &&
+      showCompletionPage !== undefined &&
+      showLogo !== undefined &&
+      l10n !== undefined &&
+      authToken !== undefined
+    );
+  };
+
   useProps((props: BifrostProps) => {
-    const { userData, options, l10n, authToken } = props;
-    const { showCompletionPage, showLogo } = options || {};
+    if (isPropsSaved()) {
+      return;
+    }
+
+    const { userData = {}, options = {}, l10n = {}, authToken = '' } = props;
+    const { showCompletionPage = false, showLogo = false } = options || {};
     send({
       type: 'initContextUpdated',
       payload: {

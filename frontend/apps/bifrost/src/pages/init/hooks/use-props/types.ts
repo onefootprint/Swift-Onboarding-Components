@@ -7,4 +7,4 @@ export type BifrostProps = Pick<
   FootprintVerifyProps,
   'userData' | 'options' | 'l10n'
 > &
-  FootprintVerifyAuthToken;
+  Partial<FootprintVerifyAuthToken>;
