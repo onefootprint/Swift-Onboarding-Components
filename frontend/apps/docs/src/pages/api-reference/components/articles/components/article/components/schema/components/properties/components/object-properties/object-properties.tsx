@@ -12,14 +12,14 @@ import Enum from '../../../enum';
 export type PropertyProps = {
   isRequired?: boolean;
   level?: number;
-  property: ContentSchema;
+  schema: ContentSchema;
   title: string;
 };
 
-const Properties = ({
+const ObjectProperties = ({
   isRequired,
   title,
-  property,
+  schema,
   level = 0,
 }: PropertyProps) => {
   const { t } = useTranslation('pages.api-reference');
@@ -30,20 +30,22 @@ const Properties = ({
   };
 
   const typeLabel = !isRequired
-    ? `${t('optional').toLowerCase()} ${property.type}`
-    : property.type;
+    ? `${t('optional').toLowerCase()} ${schema.type}`
+    : schema.type;
+
+  const hasDescription = schema.description || schema.enum;
 
   return (
     <Box>
       <TitleContainer>
         <Header>
-          <Button disabled={!property.properties} onClick={handleToggle}>
+          <Button disabled={!schema.properties} onClick={handleToggle}>
             <Connector
               aria-hidden
-              data-has-children={!!property.properties}
+              data-has-children={!!schema.properties}
               data-level={level}
             />
-            {property.properties && (
+            {schema.properties && (
               <IconBounds expanded={expanded}>
                 <IcoChevronRight16 color="tertiary" />
               </IconBounds>
@@ -55,27 +57,25 @@ const Properties = ({
             <Type>{typeLabel}</Type>
           </Button>
         </Header>
-        {property.description || property.enum ? (
+        {hasDescription && (
           <Content data-level={level}>
-            {property.description ? (
-              <Description>{property.description}</Description>
-            ) : null}
-            {property.enum && <Enum enums={property.enum} />}
+            {schema.description && (
+              <Description>{schema.description}</Description>
+            )}
+            {schema.enum && <Enum enums={schema.enum} />}
           </Content>
-        ) : null}
+        )}
       </TitleContainer>
-      {property.properties && expanded && (
+      {schema.properties && expanded && (
         <Child>
-          {Object.entries(property.properties).map(
-            ([childTitle, childProperty]) => (
-              <Properties
-                title={childTitle}
-                property={childProperty}
-                level={level + 1}
-                isRequired={property.required?.includes(childTitle)}
-              />
-            ),
-          )}
+          {Object.entries(schema.properties).map(([childTitle, property]) => (
+            <ObjectProperties
+              title={childTitle}
+              schema={property}
+              level={level + 1}
+              isRequired={schema.required?.includes(childTitle)}
+            />
+          ))}
         </Child>
       )}
     </Box>
@@ -166,4 +166,4 @@ const Child = styled.div`
   `}
 `;
 
-export default Properties;
+export default ObjectProperties;

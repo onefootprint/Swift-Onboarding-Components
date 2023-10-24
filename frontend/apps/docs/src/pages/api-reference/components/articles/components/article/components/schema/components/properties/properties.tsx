@@ -1,27 +1,54 @@
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
+import { evaluateSchemaRef } from 'src/pages/api-reference/utils/get-schemas';
 
 import type { ContentSchema } from '@/api-reference/api-reference.types';
 
-import Property from './components/property';
+import Enum from '../enum';
+import ObjectProperties from './components/object-properties';
 
 export type PropertiesProps = {
-  properties: Record<string, ContentSchema>;
-  required?: string[];
+  schema: ContentSchema;
 };
 
-const Properties = ({ properties, required }: PropertiesProps) => (
-  <Container>
-    {Object.entries(properties).map(([title, property]) => (
-      <Property
-        key={title}
-        property={property}
-        title={title}
-        isRequired={required?.includes(title)}
-      />
-    ))}
-  </Container>
-);
+// NOTE: The field name and description are rendered by the caller.
+const Properties = ({ schema }: PropertiesProps) => {
+  // Render referenced schema
+  if (schema.$ref) {
+    const referencedSchema = evaluateSchemaRef(schema.$ref);
+    if (referencedSchema) {
+      return <Properties schema={referencedSchema} />;
+    }
+  }
+  // Render array by rendering the array's elements
+  if (schema.items) {
+    return <Properties schema={schema.items} />;
+  }
+
+  // Render enum by rendering values
+  if (schema.enum) {
+    return <Enum enums={schema.enum} />;
+  }
+
+  // Render object by rendering each of its fields
+  if (schema.properties) {
+    return (
+      <Container>
+        {Object.entries(schema.properties).map(([title, property]) => (
+          <ObjectProperties
+            key={title}
+            schema={property}
+            title={title}
+            isRequired={schema.required?.includes(title)}
+          />
+        ))}
+      </Container>
+    );
+  }
+
+  console.warn('Cannot render properties', schema);
+  return null;
+};
 
 const Container = styled.div`
   ${({ theme }) => css`
