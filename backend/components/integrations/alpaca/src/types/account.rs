@@ -16,6 +16,8 @@ pub struct CreateAccountRequest {
     pub documents: Option<Vec<Document>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub trusted_contact: Option<TrustedContact>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_type: Option<AccountType>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -277,4 +279,12 @@ pub enum DocumentType {
     AccountApprovalLetter,   //	407 approval letter
     W8ben,                   //	W-8 BEN tax form
     W9,                      //	W9 tax form
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Copy, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub enum AccountType {
+    Trading,      // Typical brokerage account
+    Custodial, // Trading account opened on behalf of a minor and ownership will be transferred to the minor when they reach the age of majority
+    DonorAdvised, // Trading account established at a public charity which allows donors to receive tax benefits from their charitable contributions
 }

@@ -1,4 +1,4 @@
-use alpaca::types::account::{Agreement, AssetClass, Disclosures, TrustedContact};
+use alpaca::types::account::{AccountType, Agreement, AssetClass, Disclosures, TrustedContact};
 
 use crate::*;
 
@@ -21,6 +21,7 @@ pub struct AlpacaCreateAccountRequest {
     pub disclosures: Option<Disclosures>,
     pub agreements: Option<Vec<Agreement>>,
     pub trusted_contact: Option<TrustedContact>,
+    pub account_type: Option<AccountType>,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, Serialize)]

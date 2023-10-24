@@ -184,6 +184,7 @@ async fn create_create_account_request(
         agreements: req.agreements,
         documents,
         trusted_contact: req.trusted_contact,
+        account_type: req.account_type,
     })
 }
 
