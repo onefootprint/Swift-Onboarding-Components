@@ -59,7 +59,7 @@ pub async fn just_in_time(
     description = "Invoke the vault proxy by configuration id to securely send and receive data to a target destination",
     tags(VaultProxy, PublicApi)
 )]
-#[post("/vault_proxy/{proxy_id}")]
+#[post("/vault_proxy/{id}")]
 pub async fn id(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
