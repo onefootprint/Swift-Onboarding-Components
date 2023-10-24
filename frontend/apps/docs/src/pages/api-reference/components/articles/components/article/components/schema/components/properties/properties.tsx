@@ -46,7 +46,6 @@ const Properties = ({ schema }: PropertiesProps) => {
     );
   }
 
-  console.warn('Cannot render properties', schema);
   return null;
 };
 
