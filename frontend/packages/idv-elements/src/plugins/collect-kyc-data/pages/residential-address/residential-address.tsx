@@ -1,5 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import type { CountryCode } from '@onefootprint/types';
 import { IdDI, isCountryCode } from '@onefootprint/types';
 import { Grid, Stack } from '@onefootprint/ui';
@@ -96,7 +95,11 @@ const ResidentialAddress = ({
     <>
       {!hideHeader && <NavigationHeader />}
       <FormProvider {...methods}>
-        <Form onSubmit={handleSubmit(onSubmitFormData)}>
+        <Grid.Container
+          as="form"
+          rowGap={7}
+          onSubmit={handleSubmit(onSubmitFormData)}
+        >
           {!hideHeader && (
             <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
           )}
@@ -106,14 +109,10 @@ const ResidentialAddress = ({
               onChange={handleCountryChange}
             />
             <AddressLines />
-            <Grid.Row>
-              <Grid.Column col={6}>
-                <CityField />
-              </Grid.Column>
-              <Grid.Column col={6}>
-                <ZipField />
-              </Grid.Column>
-            </Grid.Row>
+            <Grid.Container columns={['1fr', '1fr']} columnGap={5}>
+              <CityField />
+              <ZipField />
+            </Grid.Container>
             <StateField />
           </Stack>
           <EditableFormButtonContainer
@@ -121,17 +120,10 @@ const ResidentialAddress = ({
             onCancel={onCancel}
             ctaLabel={ctaLabel}
           />
-        </Form>
+        </Grid.Container>
       </FormProvider>
     </>
   );
 };
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[7]};
-  `}
-`;
 
 export default ResidentialAddress;

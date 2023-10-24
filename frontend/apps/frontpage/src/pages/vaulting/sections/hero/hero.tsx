@@ -6,7 +6,7 @@ import {
   IcoUsers24,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Container, media } from '@onefootprint/ui';
+import { Container, Grid, media } from '@onefootprint/ui';
 import React from 'react';
 
 import FeatureCard from '../../components/feature-card';
@@ -45,7 +45,12 @@ const Hero = () => {
         <SectionTitle variant="display-1">{t('title')}</SectionTitle>
         <SectionSubtitle maxWidth={640}>{t('subtitle')}</SectionSubtitle>
       </Title>
-      <Grid>
+      <FeatureCardsGrid
+        width="100%"
+        columns={['1fr']}
+        rows={['repeat(4, 1fr)']}
+        marginTop={11}
+      >
         {featureCards.map(card => (
           <FeatureCard
             key={card.id}
@@ -54,7 +59,7 @@ const Hero = () => {
             icon={card.icon}
           />
         ))}
-      </Grid>
+      </FeatureCardsGrid>
     </StyledContainer>
   );
 };
@@ -85,20 +90,12 @@ const Title = styled.div`
   `}
 `;
 
-const Grid = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    width: 100%;
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(4, 1fr);
-    margin-top: ${theme.spacing[11]};
-
-    ${media.greaterThan('md')`
+const FeatureCardsGrid = styled(Grid.Container)`
+  ${media.greaterThan('md')`
       grid-template-columns: repeat(4, 1fr);
       grid-template-rows: 1fr;
       grid-template-areas: 'confidential trusted vaulted built-in';
     `}
-  `}
 `;
 
 export default Hero;

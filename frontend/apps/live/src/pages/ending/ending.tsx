@@ -10,8 +10,9 @@ import styled, { css } from '@onefootprint/styled';
 import {
   Box,
   Container,
-  createFontStyles,
+  Grid,
   media,
+  Stack,
   Typography,
 } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
@@ -32,7 +33,19 @@ const Ending = () => {
       <Navigation />
       <StyledContainer>
         <HeadingContainer>
-          <Chip>{t('chip')}</Chip>
+          <Stack
+            fontStyle="label-4"
+            borderWidth={1}
+            borderColor="tertiary"
+            borderRadius="full"
+            paddingTop={1}
+            paddingBottom={1}
+            paddingLeft={5}
+            paddingRight={5}
+            marginBottom={4}
+          >
+            {t('chip')}
+          </Stack>
           <Typography as="h1" variant="display-2" color="primary">
             {t('title')}
           </Typography>
@@ -46,7 +59,15 @@ const Ending = () => {
           </Typography>
         </HeadingContainer>
         <Illustration />
-        <SectionContainer>
+        <Stack
+          direction="column"
+          align="center"
+          justify="center"
+          textAlign="center"
+          gap={4}
+          marginTop={10}
+          maxWidth="856px"
+        >
           <Typography as="h3" variant="display-3" color="primary">
             {t('new-approach.title')}
           </Typography>
@@ -60,13 +81,23 @@ const Ending = () => {
           </Typography>
           <Box marginBottom={5} />
           <FeaturesContainer>
-            <TitleContainer>
+            <Stack
+              direction="column"
+              align="center"
+              justify="center"
+              textAlign="center"
+              gap={5}
+            >
               <IcoShield40 />
               <Typography as="h2" variant="heading-2">
                 {t('features.title')}
               </Typography>
-            </TitleContainer>
-            <FeaturesGrid>
+            </Stack>
+            <FeaturesGrid
+              columns={['repeat(1, 1fr)']}
+              paddingTop={4}
+              paddingBottom={4}
+            >
               <FeatureCard
                 title={t('features.zero-trust.title')}
                 description={t('features.zero-trust.description')}
@@ -93,12 +124,18 @@ const Ending = () => {
               </FeatureCard>
             </FeaturesGrid>
           </FeaturesContainer>
-        </SectionContainer>
+        </Stack>
       </StyledContainer>
       <Footer />
     </>
   );
 };
+
+const FeaturesGrid = styled(Grid.Container)`
+  ${media.greaterThan('sm')`
+      grid-template-columns: repeat(2, 1fr);
+    `}
+`;
 
 const StyledContainer = styled(Container)`
   ${({ theme }) => css`
@@ -110,16 +147,6 @@ const StyledContainer = styled(Container)`
   `};
 `;
 
-const Chip = styled.div`
-  ${({ theme }) => css`
-    ${createFontStyles('label-4')};
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary}};
-    border-radius: ${theme.borderRadius.full};
-    padding: ${theme.spacing[1]} ${theme.spacing[5]};
-    margin-bottom: ${theme.spacing[4]};
-  `}
-`;
-
 const HeadingContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
@@ -128,18 +155,6 @@ const HeadingContainer = styled.div`
     gap: ${theme.spacing[2]};
     text-align: center;
   `}
-`;
-
-const SectionContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: ${theme.spacing[4]};
-    margin-top: ${theme.spacing[10]};
-    max-width: 856px;
-  `};
 `;
 
 const FeaturesContainer = styled(motion.div)`
@@ -159,30 +174,6 @@ const FeaturesContainer = styled(motion.div)`
 
     ${media.greaterThan('md')`
       padding: ${theme.spacing[9]};
-    `}
-  `};
-`;
-
-const TitleContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: ${theme.spacing[5]};
-  `}
-`;
-
-const FeaturesGrid = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    grid-template-columns: repeat(1, 1fr);
-    padding: 0 ${theme.spacing[5]};
-    padding: 0 ${theme.spacing[4]};
-
-    ${media.greaterThan('sm')`
-      grid-template-columns: repeat(2, 1fr);
     `}
   `};
 `;

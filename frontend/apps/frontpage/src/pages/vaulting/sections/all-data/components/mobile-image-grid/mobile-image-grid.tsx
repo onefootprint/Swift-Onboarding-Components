@@ -1,5 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
-import { media } from '@onefootprint/ui';
+import { Grid, media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import React from 'react';
@@ -25,7 +25,20 @@ const imageVariants = {
 
 const MobileImageGrid = ({ isDecrypted }: MobileImageGridProps) => (
   <Container>
-    <Grid>
+    <ImagesGrid
+      position="absolute"
+      top={0}
+      gap={5}
+      rows={['auto']}
+      columns={['340px']}
+      templateAreas={[
+        'basic-data',
+        'id-data',
+        'address',
+        'payment-data',
+        'custom-data',
+      ]}
+    >
       <ImageContainer
         gridArea="basic-data"
         key={isDecrypted ? 'decrypted' : 'encrypted'}
@@ -111,27 +124,13 @@ const MobileImageGrid = ({ isDecrypted }: MobileImageGridProps) => (
           priority
         />
       </ImageContainer>
-    </Grid>
+    </ImagesGrid>
   </Container>
 );
 
-const Grid = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    gap: ${theme.spacing[5]};
-    grid-template-rows: auto;
-    grid-template-columns: 340px;
-    grid-template-areas:
-      'basic-data'
-      'id-data'
-      'address'
-      'payment-data'
-      'custom-data';
-  `}
+const ImagesGrid = styled(Grid.Container)`
+  transform: translateX(-50%);
+  left: 50%;
 `;
 
 const ImageContainer = styled(motion.div)<{ gridArea: string }>`

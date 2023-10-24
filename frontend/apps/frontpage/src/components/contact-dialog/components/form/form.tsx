@@ -1,6 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
-import { TextArea, TextInput, Typography } from '@onefootprint/ui';
+import { Grid, TextArea, TextInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -27,7 +26,12 @@ const Form = ({ onSubmit }: FormProps) => {
   const formId = 'support-dialog-id';
 
   return (
-    <Container id={formId} onSubmit={handleSubmit(onSubmit)}>
+    <Grid.Container
+      rowGap={7}
+      id={formId}
+      as="form"
+      onSubmit={handleSubmit(onSubmit)}
+    >
       <Typography variant="body-2">{t('description')}</Typography>
       <TextInput
         hasError={!!errors[FormField.name]}
@@ -80,15 +84,8 @@ const Form = ({ onSubmit }: FormProps) => {
           },
         })}
       />
-    </Container>
+    </Grid.Container>
   );
 };
-
-const Container = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[7]};
-  `}
-`;
 
 export default Form;

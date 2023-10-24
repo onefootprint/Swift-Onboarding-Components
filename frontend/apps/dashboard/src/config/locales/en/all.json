@@ -1530,6 +1530,15 @@
         "date-range": {
           "label": "Date"
         }
+      },
+      "body": {
+        "footprint-token": "Footprint Token",
+        "metadata": "Metadata",
+        "region": "Region",
+        "ip-address": "IP address",
+        "country": "Country",
+        "device-os": "Device/OS",
+        "user": "User"
       }
     },
     "settings": {

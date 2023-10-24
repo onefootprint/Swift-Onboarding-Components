@@ -1,5 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
-import { media } from '@onefootprint/ui';
+import { Grid, media } from '@onefootprint/ui';
 import type { FormHTMLAttributes } from 'react';
 import React from 'react';
 
@@ -27,17 +27,16 @@ const CustomForm = ({
   title,
 }: OptionsContainerProps) => (
   // eslint-disable-next-line react/jsx-props-no-spreading
-  <StyledForm {...formAttributes}>
+  <Form {...formAttributes}>
     <HeaderTitle title={title} subtitle={subtitle} />
     <Container data-private>{children}</Container>
     {error && <Error label={error} />}
     <ContinueButton isLoading={isLoading} label={ctaLabel} />
-  </StyledForm>
+  </Form>
 );
 
-const Container = styled.div`
+const Container = styled(Grid.Container)`
   ${({ theme }) => css`
-    display: grid;
     gap: ${theme.spacing[6]};
 
     ${media.greaterThan('md')`
@@ -46,11 +45,11 @@ const Container = styled.div`
   `}
 `;
 
-const StyledForm = styled.form`
+const Form = styled.form`
   ${({ theme }) => css`
     display: grid;
     row-gap: ${theme.spacing[7]};
-  `}
+  `};
 `;
 
 export default CustomForm;

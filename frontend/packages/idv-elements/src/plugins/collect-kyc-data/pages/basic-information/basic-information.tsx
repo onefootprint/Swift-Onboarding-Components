@@ -1,11 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import {
   CollectedKycDataOption,
   IdDI,
   isCountryCode,
 } from '@onefootprint/types';
-import { Stack } from '@onefootprint/ui';
+import { Grid, Stack } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -116,7 +115,11 @@ const BasicInformation = ({
         </>
       )}
       <FormProvider {...methods}>
-        <Form onSubmit={methods.handleSubmit(onSubmitFormData)}>
+        <Grid.Container
+          rowGap={7}
+          as="form"
+          onSubmit={methods.handleSubmit(onSubmitFormData)}
+        >
           <Stack direction="column" gap={5}>
             {requiresName && <NameFields disabled={isNameDisabled} />}
             {requiresDob && <DobField disabled={isDobDisabled} />}
@@ -129,17 +132,10 @@ const BasicInformation = ({
             onCancel={onCancel}
             ctaLabel={ctaLabel}
           />
-        </Form>
+        </Grid.Container>
       </FormProvider>
     </Stack>
   );
 };
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[7]};
-  `}
-`;
 
 export default BasicInformation;

@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { IdDI, UsLegalStatus } from '@onefootprint/types';
 import type { CountrySelectOption } from '@onefootprint/ui';
-import { Divider, media } from '@onefootprint/ui';
+import { Divider, Grid, media } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -116,7 +116,7 @@ const LegalStatus = ({
         </>
       )}
       <FormProvider {...methods}>
-        <Form onSubmit={methods.handleSubmit(handleBeforeSubmit)}>
+        <Form as="form" onSubmit={methods.handleSubmit(handleBeforeSubmit)}>
           <StatusFields handleStatusChange={handleStatusChange} />
           {selectedOption && selectedOption !== UsLegalStatus.citizen && (
             <>
@@ -137,10 +137,9 @@ const LegalStatus = ({
   );
 };
 
-const Form = styled.form`
+const Form = styled(Grid.Container)`
   ${({ theme }) => css`
     width: 100%;
-    display: grid;
     row-gap: ${theme.spacing[5]};
 
     ${media.lessThan('sm')`

@@ -5,7 +5,7 @@ import {
   CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
 } from '@onefootprint/types';
-import { Box, Checkbox, Typography } from '@onefootprint/ui';
+import { Box, Checkbox, Grid, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -41,7 +41,7 @@ const Person = ({ playbook, meta }: PersonProps) => {
     <Sections>
       <ScopeSection>
         <Typography variant="label-3">{t('basic-information')}</Typography>
-        <OptionsContainer>
+        <Grid.Container gap={3} columns={['repeat(2, 1fr)']} width="100%">
           <Checkbox disabled checked label={allT('cdo.email')} />
           {phoneNumber && (
             <Checkbox disabled checked label={allT('cdo.phone_number')} />
@@ -58,12 +58,12 @@ const Person = ({ playbook, meta }: PersonProps) => {
             label={allT('cdo.full_address')}
             {...register(CollectedKycDataOption.address)}
           />
-        </OptionsContainer>
+        </Grid.Container>
       </ScopeSection>
       {(ssn || usLegalStatus || idDocKind.length > 0) && allowUS && (
         <ScopeSection>
           <Typography variant="label-3">{t('us-residents')}</Typography>
-          <OptionsContainer>
+          <Grid.Container gap={3} columns={['repeat(2, 1fr)']} width="100%">
             {usLegalStatus && (
               <Checkbox
                 label={allT('cdo.us_legal_status')}
@@ -94,13 +94,13 @@ const Person = ({ playbook, meta }: PersonProps) => {
                 />
               </Box>
             )}
-          </OptionsContainer>
+          </Grid.Container>
         </ScopeSection>
       )}
       {allowInternational && (
         <ScopeSection>
           <Typography variant="label-3">{t('non-us-residents')}</Typography>
-          <OptionsContainer>
+          <Grid.Container gap={3} columns={['repeat(2, 1fr)']} width="100%">
             <Box>
               <Checkbox
                 label={`${allT('cdo.passport')} & ${allT('cdo.selfie')}`}
@@ -108,32 +108,23 @@ const Person = ({ playbook, meta }: PersonProps) => {
                 checked
               />
             </Box>
-          </OptionsContainer>
+          </Grid.Container>
         </ScopeSection>
       )}
       {isCollectingInvestorProfile && (
         <ScopeSection>
           <Typography variant="label-3">{t('investor-profile')}</Typography>
-          <OptionsContainer>
+          <Grid.Container gap={3} columns={['repeat(2, 1fr)']} width="100%">
             <Checkbox
               label={t('investor-profile-questions')}
               {...register(CollectedInvestorProfileDataOption.investorProfile)}
             />
-          </OptionsContainer>
+          </Grid.Container>
         </ScopeSection>
       )}
     </Sections>
   );
 };
-
-const OptionsContainer = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[3]};
-    grid-template-columns: repeat(2, 1fr);
-    width: 100%;
-  `}
-`;
 
 const Sections = styled.div`
   ${({ theme }) => css`

@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import React, { Fragment } from 'react';
 import { useForm } from 'react-hook-form';
 
 import Checkbox from '../../../../../checkbox';
+import Grid from '../../../../../grid';
 import Radio from '../../../../../radio';
 import type {
   FilterMultiSelect,
@@ -45,7 +45,12 @@ const SelectForm = ({
   };
 
   return (
-    <Form id="filter-form" onSubmit={handleSubmit(handleAfterSubmit)}>
+    <Grid.Container
+      gap={3}
+      as="form"
+      id="filter-form"
+      onSubmit={handleSubmit(handleAfterSubmit)}
+    >
       {options.map(option => (
         <Fragment key={`${option.label}-${option.value}`}>
           {kind === SelectFormKind.multiSelect && (
@@ -64,15 +69,8 @@ const SelectForm = ({
           )}
         </Fragment>
       ))}
-    </Form>
+    </Grid.Container>
   );
 };
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[3]};
-  `}
-`;
 
 export default SelectForm;

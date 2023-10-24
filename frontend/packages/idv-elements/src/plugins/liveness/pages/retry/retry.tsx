@@ -1,7 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
-import styled, { css } from '@onefootprint/styled';
-import { Button } from '@onefootprint/ui';
+import { Button, Grid } from '@onefootprint/ui';
 import React from 'react';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
@@ -77,13 +76,13 @@ const Retry = () => {
   };
 
   return (
-    <Container>
+    <Grid.Container as="form" rowGap={8}>
       <NavigationHeader />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       {biometricInitMutation.isSuccess ? (
         <LivenessSuccess />
       ) : (
-        <ButtonsContainer>
+        <Grid.Container rowGap={4}>
           <Button
             onClick={handleRetry}
             loading={biometricInitMutation.isLoading}
@@ -105,24 +104,10 @@ const Retry = () => {
           >
             {t('skip')}
           </Button>
-        </ButtonsContainer>
+        </Grid.Container>
       )}
-    </Container>
+    </Grid.Container>
   );
 };
-
-const Container = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[8]};
-  `}
-`;
-
-const ButtonsContainer = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[4]};
-  `}
-`;
 
 export default Retry;

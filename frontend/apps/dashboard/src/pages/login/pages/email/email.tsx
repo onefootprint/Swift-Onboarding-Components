@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { ThemedLogoFpDefault } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
+import styled from '@onefootprint/styled';
 import type { OrgAuthMagicLinkRequest } from '@onefootprint/types';
-import { Button, Stack, TextInput, Typography } from '@onefootprint/ui';
+import { Button, Grid, Stack, TextInput, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -48,7 +48,7 @@ const EmailLogin = () => {
       <BackButton />
       <Container>
         <Form onSubmit={handleSubmit(onSubmit)}>
-          <Inner>
+          <Grid.Container gap={7}>
             <Stack align="center" justify="center" gap={7} direction="column">
               <ThemedLogoFpDefault />
               <Typography variant="label-1" color="primary">
@@ -86,7 +86,7 @@ const EmailLogin = () => {
             >
               {t('instructions')}
             </Typography>
-          </Inner>
+          </Grid.Container>
         </Form>
       </Container>
     </>
@@ -103,13 +103,6 @@ const Container = styled.div`
 
 const Form = styled.form`
   width: 350px;
-`;
-
-const Inner = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[7]};
-  `}
 `;
 
 export default EmailLogin;

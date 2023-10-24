@@ -4,6 +4,7 @@ import {
   Box,
   FormControl,
   FormLabel,
+  Grid,
   LinkButton,
   NativeSelect,
   TextInput,
@@ -75,7 +76,7 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
           <FormGrid>
             {fields.map((field, index) => (
               <Box key={field.id}>
-                <Box sx={{ display: 'grid' }} gap={5} marginBottom={3}>
+                <Grid.Container gap={5} marginBottom={3}>
                   <FormControl>
                     <FormLabel htmlFor={`token-${index}`}>
                       {t('vaulting-rules.token.label')}
@@ -107,7 +108,7 @@ const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
                       })}
                     />
                   </FormControl>
-                </Box>
+                </Grid.Container>
                 {fields.length >= 2 && (
                   <LinkButton
                     onClick={handleRemove(index)}

@@ -1,6 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { media, Typography } from '@onefootprint/ui';
+import { Grid, media, Typography } from '@onefootprint/ui';
 import rgba from 'polished/lib/color/rgba';
 import React from 'react';
 
@@ -25,7 +25,7 @@ const Values = ({ title, description, items }: ValuesProps) => (
         {description}
       </Typography>
     </TitleContainer>
-    <ItemsContainer>
+    <ItemsContainer as="ul" gap={5}>
       {items.map(item => {
         const Icon = item.iconComponent;
         return (
@@ -52,16 +52,12 @@ const TitleContainer = styled.div`
   `}
 `;
 
-const ItemsContainer = styled.ul`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[5]};
-    grid-template-columns: repeat(1, 1fr);
+const ItemsContainer = styled(Grid.Container)`
+  grid-template-columns: repeat(1, 1fr);
 
-    ${media.greaterThan('lg')`
+  ${media.greaterThan('lg')`
       grid-template-columns: repeat(2, 1fr);
     `}
-  `}
 `;
 
 const Item = styled.li`

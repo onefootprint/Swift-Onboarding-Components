@@ -1,9 +1,8 @@
 import { useInputMask, useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { BusinessDI, CorporationType } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
-import { PhoneInput, Select, Stack, TextInput } from '@onefootprint/ui';
+import { Grid, PhoneInput, Select, Stack, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import type { UseFormSetError } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
@@ -125,7 +124,12 @@ const BasicDataForm = ({
   }));
 
   return (
-    <Form onSubmit={handleSubmit(onSubmitFormData)}>
+    <Grid.Container
+      as="form"
+      rowGap={7}
+      width="100%"
+      onSubmit={handleSubmit(onSubmitFormData)}
+    >
       <Stack gap={5} direction="column">
         <TextInput
           data-private
@@ -243,16 +247,8 @@ const BasicDataForm = ({
         isLoading={isLoading}
         ctaLabel={ctaLabel}
       />
-    </Form>
+    </Grid.Container>
   );
 };
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[7]};
-    width: 100%;
-  `}
-`;
 
 export default BasicDataForm;

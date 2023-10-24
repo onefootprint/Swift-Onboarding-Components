@@ -3,9 +3,10 @@ import type { Property } from 'csstype';
 import styled, { css } from 'styled-components';
 
 import type { SXStyleProps } from '../../hooks';
+import type { BoxProps } from '../box';
 import Box from '../box';
 
-export type StackProps = {
+export type StackProps = BoxProps & {
   gap?: Spacing;
   flexWrap?: Property.FlexWrap;
   direction?: Property.FlexDirection;

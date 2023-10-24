@@ -1,8 +1,8 @@
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
 import Checkbox from '../../../../../checkbox';
+import Grid from '../../../../../grid';
 import Typography from '../../../../../typography';
 import type {
   FilterMultiSelectGrouped,
@@ -35,9 +35,14 @@ const MultiSelectGroupedForm = ({
   };
 
   return (
-    <Form id="filter-form" onSubmit={handleSubmit(handleAfterSubmit)}>
+    <Grid.Container
+      as="form"
+      gap={7}
+      id="filter-form"
+      onSubmit={handleSubmit(handleAfterSubmit)}
+    >
       {options.map(group => (
-        <Fieldset key={group.label}>
+        <Grid.Container as="fieldset" gap={3} key={group.label}>
           <Typography variant="label-3" sx={{ marginBottom: 3 }}>
             {group.label}
           </Typography>
@@ -49,24 +54,10 @@ const MultiSelectGroupedForm = ({
               {...register('filter')}
             />
           ))}
-        </Fieldset>
+        </Grid.Container>
       ))}
-    </Form>
+    </Grid.Container>
   );
 };
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[7]};
-  `}
-`;
-
-const Fieldset = styled.fieldset`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[3]};
-  `}
-`;
 
 export default MultiSelectGroupedForm;

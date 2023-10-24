@@ -1,4 +1,5 @@
-import styled, { css } from '@onefootprint/styled';
+import styled from '@onefootprint/styled';
+import { Grid } from '@onefootprint/ui';
 import React from 'react';
 
 import Fieldset from '../fieldset';
@@ -13,7 +14,11 @@ const BusinessVault = () => {
   const { basic, bos, address } = useFieldsets();
 
   return (
-    <Grid>
+    <Grid.Container
+      gap={5}
+      columns={['repeat(2, 1fr)']}
+      templateAreas={['basic address', 'bos address']}
+    >
       <Basic>
         <Fieldset
           fields={basic.fields}
@@ -38,31 +43,19 @@ const BusinessVault = () => {
           footer={<RiskSignalsOverview type="basic" />}
         />
       </Address>
-    </Grid>
+    </Grid.Container>
   );
 };
 
-const Grid = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    display: grid;
-    gap: ${theme.spacing[5]};
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-areas:
-      'basic address'
-      'bos address';
-  `}
-`;
-
-const Basic = styled.div`
+const Basic = styled(Grid.Item)`
   grid-area: basic;
 `;
 
-const Address = styled.div`
+const Address = styled(Grid.Item)`
   grid-area: address;
 `;
 
-const Bos = styled.div`
+const Bos = styled(Grid.Item)`
   grid-area: bos;
 `;
 

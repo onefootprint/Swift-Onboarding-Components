@@ -1,7 +1,6 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
-import { Button, PhoneInput } from '@onefootprint/ui';
+import { Button, Grid, PhoneInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -49,7 +48,11 @@ const Form = ({
   };
 
   return (
-    <StyledForm onSubmit={handleSubmit(handleBeforeSubmit)}>
+    <Grid.Container
+      as="form"
+      rowGap={7}
+      onSubmit={handleSubmit(handleBeforeSubmit)}
+    >
       <Controller
         control={control}
         name="phoneNumber"
@@ -83,15 +86,8 @@ const Form = ({
       <Button fullWidth loading={isLoading} type="submit">
         {t('cta')}
       </Button>
-    </StyledForm>
+    </Grid.Container>
   );
 };
-
-const StyledForm = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[7]};
-  `}
-`;
 
 export default Form;

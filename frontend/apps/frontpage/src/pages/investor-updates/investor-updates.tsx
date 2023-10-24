@@ -1,6 +1,6 @@
 import { useIntl, useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
-import { Container, Divider, media } from '@onefootprint/ui';
+import styled from '@onefootprint/styled';
+import { Container, Divider, Grid, media } from '@onefootprint/ui';
 import React from 'react';
 import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';
 import SubscribeToNewsletter from 'src/components/writing-layout/components/subscribe-to-newsletter';
@@ -33,7 +33,7 @@ const InvestorUpdates = ({ posts }: InvestorUpdatesProps) => {
             description={t('breadcrumb.description')}
             twitterLabel={t('breadcrumb.twitter')}
           />
-          <Posts>
+          <Posts gap={7} marginBottom={8}>
             {posts.map((post, index) => (
               <InvestorUpdatePreview
                 index={posts.length - index}
@@ -61,16 +61,10 @@ const InvestorsContent = styled.div`
   margin: auto;
 `;
 
-const Posts = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    grid-gap: ${theme.spacing[7]};
-    margin-bottom: ${theme.spacing[8]};
-
-    ${media.greaterThan('md')`
+const Posts = styled(Grid.Container)`
+  ${media.greaterThan('md')`
         grid-gap: 0;
     `}
-  `}
 `;
 
 export default InvestorUpdates;

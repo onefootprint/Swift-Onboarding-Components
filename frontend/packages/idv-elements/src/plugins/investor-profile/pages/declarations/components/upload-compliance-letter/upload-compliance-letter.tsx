@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText24, IcoWarning16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Divider, Typography } from '@onefootprint/ui';
+import { Divider, Grid, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import UploadFiles from './components/upload-files';
@@ -20,7 +20,7 @@ const UploadComplianceLetter = ({
   return (
     <>
       <Divider />
-      <Container>
+      <Grid.Container gap={4}>
         <UploadFilesLabel>
           <IcoFileText24 />
           <Typography variant="label-3" color="secondary">
@@ -39,7 +39,7 @@ const UploadComplianceLetter = ({
         <Typography variant="caption-4" color="tertiary">
           {t('disclaimer')}
         </Typography>
-      </Container>
+      </Grid.Container>
       <Divider />
     </>
   );
@@ -57,13 +57,6 @@ const ErrorContainer = styled.div`
     align-items: center;
     display: flex;
     gap: ${theme.spacing[3]};
-  `}
-`;
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[4]};
   `}
 `;
 

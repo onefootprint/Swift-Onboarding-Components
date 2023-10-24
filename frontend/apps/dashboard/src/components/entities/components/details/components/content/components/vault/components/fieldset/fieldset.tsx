@@ -84,6 +84,7 @@ const Container = styled.fieldset`
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     display: flex;
     flex-direction: column;
+    width: 100%;
     height: 100%;
     justify-content: space-between;
   `};

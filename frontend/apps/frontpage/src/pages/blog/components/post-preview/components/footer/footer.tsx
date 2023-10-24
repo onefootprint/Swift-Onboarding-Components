@@ -1,5 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
-import { createFontStyles, media } from '@onefootprint/ui';
+import { createFontStyles, Grid, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 
@@ -32,9 +32,8 @@ const Footer = ({ authors, publishedAt }: FooterProps) => {
   );
 };
 
-const Container = styled.div<{ verticalStack: boolean }>`
+const Container = styled(Grid.Container)<{ verticalStack: boolean }>`
   ${({ theme, verticalStack }) => css`
-    display: grid;
     grid-template-columns: repeat(4, max-content);
     gap: ${theme.spacing[2]};
     grid-template-rows: 1fr;

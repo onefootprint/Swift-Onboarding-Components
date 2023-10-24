@@ -2,7 +2,14 @@ import { COUNTRIES } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckSmall16, IcoInfo16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Button, media, Stack, Tooltip, Typography } from '@onefootprint/ui';
+import {
+  Button,
+  Grid,
+  media,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@onefootprint/ui';
 import React from 'react';
 
 import SEO from '../../components/seo';
@@ -18,16 +25,37 @@ const SupportedIdDocuments = () => {
     <>
       <SEO title={t('html-title')} slug="/supported-id-documents" />
       <Container>
-        <HeroContainer>
+        <Grid.Container gap={5} marginBottom={10} textAlign="center">
           <Typography variant="display-2" as="h1">
             {t('title')}
           </Typography>
           <Typography variant="display-4" as="h1">
             {t('subtitle')}
           </Typography>
-        </HeroContainer>
-        <TableContainer>
-          <TableHeader>
+        </Grid.Container>
+        <Grid.Container
+          borderColor="tertiary"
+          borderWidth={1}
+          borderRadius="default"
+          gap={5}
+          marginBottom={11}
+          overflow="hidden"
+        >
+          <Grid.Container
+            as="th"
+            height="40px"
+            backgroundColor="secondary"
+            columns={[
+              'minmax(116px, 2fr)',
+              'minmax(80px, 1fr)',
+              'minmax(80px, 1fr)',
+              'minmax(80px, 1fr)',
+            ]}
+            borderPosition="bottom"
+            borderWidth={1}
+            borderColor="tertiary"
+            align="center"
+          >
             <HeaderCell data-align="left">
               <Typography variant="caption-3" color="secondary" as="h4">
                 {t('table-headers.country')}
@@ -56,9 +84,20 @@ const SupportedIdDocuments = () => {
                 {t('table-headers.drivers-license')}
               </Typography>
             </HeaderCell>
-          </TableHeader>
+          </Grid.Container>
           {COUNTRIES.map(({ label, passport, idCard, driversLicense }) => (
-            <TableRow key={label}>
+            <TableRow
+              as="tr"
+              height="40px"
+              columns={[
+                'minmax(116px, 2fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr)',
+              ]}
+              key={label}
+              borderPosition="bottom"
+              borderWidth={1}
+              borderColor="tertiary"
+              alignItems="center"
+            >
               <TableCell data-align="left">
                 <Typography variant="body-3">{label}</Typography>
               </TableCell>
@@ -69,8 +108,14 @@ const SupportedIdDocuments = () => {
               </TableCell>
             </TableRow>
           ))}
-        </TableContainer>
-        <ContactContainer>
+        </Grid.Container>
+        <ContactContainer
+          align="center"
+          direction="column"
+          marginBottom={10}
+          textAlign="center"
+          backgroundColor="primary"
+        >
           <Typography variant="label-1" sx={{ marginBottom: 3 }}>
             {t('contact.title')}
           </Typography>
@@ -102,55 +147,10 @@ const Container = styled.div`
   `}
 `;
 
-const HeroContainer = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[5]};
-    margin-bottom: ${theme.spacing[10]};
-    text-align: center;
-  `}
-`;
-
-const TableContainer = styled.div`
-  ${({ theme }) => css`
-    border: 1px solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.default};
-    margin-bottom: ${theme.spacing[11]};
-    overflow: hidden;
-  `}
-`;
-
-const TableRow = styled.tr`
-  ${({ theme }) => css`
-    height: 40px;
-    display: grid;
-    grid-template-columns:
-      minmax(116px, 2fr)
-      minmax(80px, 1fr)
-      minmax(80px, 1fr)
-      minmax(80px, 1fr);
-    border-bottom: 1px solid ${theme.borderColor.tertiary};
-    align-items: center;
-
-    &:last-of-type {
-      border-bottom: none;
-    }
-  `}
-`;
-
-const TableHeader = styled.div`
-  ${({ theme }) => css`
-    height: 40px;
-    background-color: ${theme.backgroundColor.secondary};
-    display: grid;
-    grid-template-columns:
-      minmax(116px, 2fr)
-      minmax(80px, 1fr)
-      minmax(80px, 1fr)
-      minmax(80px, 1fr);
-    border-bottom: 1px solid ${theme.borderColor.tertiary};
-    align-items: center;
-  `}
+const TableRow = styled(Grid.Container)`
+  &:last-of-type {
+    border-bottom: none;
+  }
 `;
 
 const TableCell = styled.td`
@@ -196,15 +196,9 @@ const HeaderCell = styled.div`
     }
   `}
 `;
-const ContactContainer = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: ${theme.spacing[10]};
-    text-align: center;
-    background-color: ${theme.backgroundColor.primary};
 
+const ContactContainer = styled(Stack)`
+  ${({ theme }) => css`
     ${media.greaterThan('lg')`
       margin-bottom: ${theme.spacing[11]};
     `};

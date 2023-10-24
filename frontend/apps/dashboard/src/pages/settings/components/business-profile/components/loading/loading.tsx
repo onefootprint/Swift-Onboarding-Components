@@ -1,4 +1,4 @@
-import { Box, Shimmer } from '@onefootprint/ui';
+import { Box, Grid, Shimmer } from '@onefootprint/ui';
 import React from 'react';
 
 const Loading = () => (
@@ -6,10 +6,10 @@ const Loading = () => (
     <Box marginBottom={9}>
       <Avatar />
     </Box>
-    <Box sx={{ display: 'grid' }} gap={2}>
+    <Grid.Container gap={2}>
       <Label />
       <Value />
-    </Box>
+    </Grid.Container>
   </Box>
 );
 

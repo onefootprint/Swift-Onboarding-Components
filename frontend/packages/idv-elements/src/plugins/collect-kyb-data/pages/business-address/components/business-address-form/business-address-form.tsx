@@ -1,6 +1,5 @@
 import { STATES } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import type { CountryCode } from '@onefootprint/types';
 import { BusinessDI } from '@onefootprint/types';
 import type { CountrySelectOption, SelectOption } from '@onefootprint/ui';
@@ -142,7 +141,12 @@ const BusinessAddressForm = ({
 
   return (
     <FormProvider {...methods}>
-      <Form onSubmit={handleSubmit(onSubmitFormData)}>
+      <Grid.Container
+        as="form"
+        gap={7}
+        width="100%"
+        onSubmit={handleSubmit(onSubmitFormData)}
+      >
         <Stack gap={5} direction="column">
           <CountryField onChange={handleCountryChange} data-private />
           <AddressInput
@@ -162,14 +166,10 @@ const BusinessAddressForm = ({
             placeholder={t('address-line-2.placeholder')}
             {...register('addressLine2')}
           />
-          <Grid.Row>
-            <Grid.Column col={6}>
-              <CityField />
-            </Grid.Column>
-            <Grid.Column col={6}>
-              <ZipField countryCode={country.value} />
-            </Grid.Column>
-          </Grid.Row>
+          <Grid.Container gap={5} columns={['1fr', '1fr']}>
+            <CityField />
+            <ZipField countryCode={country.value} />
+          </Grid.Container>
           <StateField countryCode={country.value} />
         </Stack>
         <EditableFormButtonContainer
@@ -177,17 +177,9 @@ const BusinessAddressForm = ({
           isLoading={isLoading}
           ctaLabel={ctaLabel}
         />
-      </Form>
+      </Grid.Container>
     </FormProvider>
   );
 };
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[7]};
-    width: 100%;
-  `}
-`;
 
 export default BusinessAddressForm;

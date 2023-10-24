@@ -1,7 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { HeaderTitle, NavigationHeader } from '@onefootprint/idv-elements';
-import styled, { css } from '@onefootprint/styled';
-import { Button } from '@onefootprint/ui';
+import { Button, Grid } from '@onefootprint/ui';
 import React from 'react';
 
 import useHandoffMachine from '../../hooks/use-handoff-machine';
@@ -18,7 +17,7 @@ const Expired = () => {
   return (
     <>
       <NavigationHeader />
-      <Container>
+      <Grid.Container as="form" rowGap={8}>
         <HeaderTitle
           title={t('title')}
           subtitle={
@@ -30,16 +29,9 @@ const Expired = () => {
             {t('cta')}
           </Button>
         )}
-      </Container>
+      </Grid.Container>
     </>
   );
 };
-
-const Container = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[8]};
-  `}
-`;
 
 export default Expired;

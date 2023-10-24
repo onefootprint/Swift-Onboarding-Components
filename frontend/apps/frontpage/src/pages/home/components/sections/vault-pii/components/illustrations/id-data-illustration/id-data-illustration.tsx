@@ -1,6 +1,6 @@
 import { primitives } from '@onefootprint/design-tokens';
 import styled from '@onefootprint/styled';
-import { media } from '@onefootprint/ui';
+import { Grid, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 
@@ -12,28 +12,38 @@ const IdDataIllustration = () => (
       height={480}
       width={640}
     />
-    <CardGrid>
-      <CardTopLeft
-        src="/home/vault-pii/id-data/basic-data.png"
-        alt="decorative"
-        width={408}
-        height={180}
-        priority
-      />
-      <CardBottomLeft
-        src="/home/vault-pii/id-data/id-data.png"
-        alt="decorative"
-        width={408}
-        height={180}
-        priority
-      />
-      <CardRight
-        src="/home/vault-pii/id-data/address.png"
-        alt="decorative"
-        width={408}
-        height={376}
-        priority
-      />
+    <CardGrid
+      columns={['1fr 1fr']}
+      rows={['180px 180px']}
+      templateAreas={['top-left right', 'bottom-left right']}
+    >
+      <Grid.Item gridArea="top-left">
+        <Image
+          src="/home/vault-pii/id-data/basic-data.png"
+          alt="decorative"
+          width={408}
+          height={180}
+          priority
+        />
+      </Grid.Item>
+      <Grid.Item gridArea="bottom-left">
+        <Image
+          src="/home/vault-pii/id-data/id-data.png"
+          alt="decorative"
+          width={408}
+          height={180}
+          priority
+        />
+      </Grid.Item>
+      <Grid.Item gridArea="right">
+        <Image
+          src="/home/vault-pii/id-data/address.png"
+          alt="decorative"
+          width={408}
+          height={376}
+          priority
+        />
+      </Grid.Item>
     </CardGrid>
   </>
 );
@@ -63,15 +73,9 @@ const BackgroundDots = styled(Image)`
     `}
 `;
 
-const CardGrid = styled.div`
-  display: grid;
+const CardGrid = styled(Grid.Container)`
   gap: 14px;
   scale: 0.8;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 180px 180px;
-  grid-template-areas:
-    'top-left right'
-    'bottom-left right';
 
   ${media.greaterThan('md')`
       position: absolute;
@@ -79,21 +83,10 @@ const CardGrid = styled.div`
       top: 50%;
       transform: translateY(-50%);
   `}
-`;
 
-const CardTopLeft = styled(Image)`
-  grid-area: top-left;
-  z-index: 1;
-`;
-
-const CardBottomLeft = styled(Image)`
-  grid-area: bottom-left;
-  z-index: 1;
-`;
-
-const CardRight = styled(Image)`
-  grid-area: right;
-  z-index: 1;
+  & > * {
+    z-index: 1;
+  }
 `;
 
 export default IdDataIllustration;

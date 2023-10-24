@@ -1,12 +1,11 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import type {
   BeneficialOwner,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
-import { Divider, Typography, useToast } from '@onefootprint/ui';
+import { Divider, Grid, Typography, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 
@@ -133,7 +132,13 @@ const Form = ({
 
   return (
     <FormProvider {...methods}>
-      <StyledForm onSubmit={handleSubmit(onSubmitFormData)} ref={animate}>
+      <Grid.Container
+        as="form"
+        rowGap={6}
+        width="100%"
+        onSubmit={handleSubmit(onSubmitFormData)}
+        ref={animate}
+      >
         {fields.map((field, index) => (
           <React.Fragment key={field.id}>
             <Fields
@@ -158,17 +163,9 @@ const Form = ({
           isLoading={isLoading}
           ctaLabel={ctaLabel}
         />
-      </StyledForm>
+      </Grid.Container>
     </FormProvider>
   );
 };
-
-const StyledForm = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[6]};
-    width: 100%;
-  `}
-`;
 
 export default Form;

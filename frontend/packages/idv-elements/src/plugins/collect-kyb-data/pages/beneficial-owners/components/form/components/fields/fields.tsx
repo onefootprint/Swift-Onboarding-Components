@@ -2,7 +2,7 @@ import type { L10n } from '@onefootprint/footprint-js';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
-import { InlineAlert, Typography } from '@onefootprint/ui';
+import { Grid, InlineAlert, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import Email from './components/email';
@@ -26,7 +26,13 @@ const Fields = ({ index, onRemove, config, l10n }: FieldsProps) => {
   };
 
   return (
-    <Container>
+    <Container
+      rowGap={4}
+      padding={5}
+      borderWidth={1}
+      borderColor="tertiary"
+      borderRadius="default"
+    >
       <Header shouldShowRemove={index > 0} onRemove={handleRemove} />
       {index === 0 && (
         <InlineAlert variant="info">
@@ -43,14 +49,9 @@ const Fields = ({ index, onRemove, config, l10n }: FieldsProps) => {
   );
 };
 
-const Container = styled.div`
+const Container = styled(Grid.Container)`
   ${({ theme }) => css`
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.default};
     box-shadow: ${theme.elevation[1]};
-    padding: ${theme.spacing[5]};
-    display: grid;
-    row-gap: ${theme.spacing[4]};
   `}
 `;
 

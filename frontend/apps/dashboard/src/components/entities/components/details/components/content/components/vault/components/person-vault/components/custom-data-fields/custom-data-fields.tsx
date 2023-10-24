@@ -1,7 +1,13 @@
 import { useTranslation } from '@onefootprint/hooks';
 import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Box, CodeInline, LinkButton, Typography } from '@onefootprint/ui';
+import {
+  Box,
+  CodeInline,
+  Grid,
+  LinkButton,
+  Typography,
+} from '@onefootprint/ui';
 import React from 'react';
 import { getCustomDIs } from 'src/components/entities/utils/get-dis';
 
@@ -68,9 +74,18 @@ const CustomDataFields = ({
             </LinkButton>
           )}
         </Header>
-        <FieldsContainer>
+        <Grid.Container
+          columnGap={12}
+          rowGap={4}
+          width="100%"
+          columns={['repeat(2, 1fr)']}
+          paddingTop={5}
+          paddingBottom={5}
+          paddingRight={7}
+          paddingLeft={7}
+        >
           {customDIs.map(di => renderField({ di }))}
-        </FieldsContainer>
+        </Grid.Container>
       </Box>
     </Container>
   ) : null;
@@ -104,17 +119,6 @@ const Header = styled.header`
     justify-content: space-between;
     gap: ${theme.spacing[4]};
     padding: ${theme.spacing[3]} ${theme.spacing[5]};
-  `};
-`;
-
-const FieldsContainer = styled.div`
-  ${({ theme }) => css`
-    column-gap: ${theme.spacing[12]};
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    padding: ${theme.spacing[5]} ${theme.spacing[7]};
-    row-gap: ${theme.spacing[4]};
-    width: 100%;
   `};
 `;
 

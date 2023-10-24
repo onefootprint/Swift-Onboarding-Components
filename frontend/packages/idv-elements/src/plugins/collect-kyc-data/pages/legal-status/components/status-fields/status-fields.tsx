@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { UsLegalStatus } from '@onefootprint/types';
-import { media, Radio } from '@onefootprint/ui';
+import { Grid, media, Radio } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -37,10 +37,9 @@ const StatusFields = ({ handleStatusChange }: StatusFieldsProps) => {
   );
 };
 
-const Container = styled.div`
+const Container = styled(Grid.Container)`
   ${({ theme }) => css`
     width: 100%;
-    display: grid;
     row-gap: ${theme.spacing[5]};
 
     ${media.lessThan('sm')`

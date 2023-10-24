@@ -49,23 +49,20 @@ const CustomHeaderValues = ({ id, onSubmit, values }: StepProps) => {
         {fields.map((field, index) => (
           <Box key={field.id}>
             <Box marginBottom={5}>
-              <Grid.Row>
-                <Grid.Column col={6}>
-                  <TextInput
-                    autoFocus
-                    label={t('name.label')}
-                    placeholder={t('name.label')}
-                    {...register(`headers.${index}.name`)}
-                  />
-                </Grid.Column>
-                <Grid.Column col={6}>
-                  <TextInput
-                    label={t('value.label')}
-                    placeholder={t('value.label')}
-                    {...register(`headers.${index}.value`)}
-                  />
-                </Grid.Column>
-              </Grid.Row>
+              <Grid.Container columns={['1fr', '1fr']}>
+                <TextInput
+                  autoFocus
+                  label={t('name.label')}
+                  placeholder={t('name.label')}
+                  {...register(`headers.${index}.name`)}
+                />
+
+                <TextInput
+                  label={t('value.label')}
+                  placeholder={t('value.label')}
+                  {...register(`headers.${index}.value`)}
+                />
+              </Grid.Container>
             </Box>
             <Stack align="center" justify="space-between">
               <Checkbox

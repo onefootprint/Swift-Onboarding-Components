@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Button, media, Typography } from '@onefootprint/ui';
+import { Button, Grid, media, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 import Accordion from 'src/components/accordion';
 
@@ -54,14 +54,14 @@ const Faq = () => {
     <>
       <SEO title={t('html-title')} slug="/faq" />
       <Container>
-        <HeroContainer>
+        <Grid.Container gap={5} marginBottom={10} textAlign="center">
           <Typography variant="display-1" as="h1">
             {t('title')}
           </Typography>
           <Typography variant="display-4" as="h2" color="secondary">
             {t('subtitle')}
           </Typography>
-        </HeroContainer>
+        </Grid.Container>
         <Accordion.List>
           {items.map(({ id, title, content }) => {
             const isContentArray = Array.isArray(content);
@@ -70,7 +70,7 @@ const Faq = () => {
             ) : null;
           })}
         </Accordion.List>
-        <ContactContainer>
+        <ContactContainer direction="column" align="center" textAlign="center">
           <Typography variant="label-1" sx={{ marginBottom: 3 }}>
             {t('contact.title')}
           </Typography>
@@ -102,22 +102,9 @@ const Container = styled.div`
   `}
 `;
 
-const HeroContainer = styled.div`
+const ContactContainer = styled(Stack)`
   ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[5]};
     margin-bottom: ${theme.spacing[10]};
-    text-align: center;
-  `}
-`;
-
-const ContactContainer = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: ${theme.spacing[10]};
-    text-align: center;
 
     ${media.greaterThan('lg')`
       margin-bottom: ${theme.spacing[11]};

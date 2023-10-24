@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
-import { Box, Button, Divider } from '@onefootprint/ui';
+import styled from '@onefootprint/styled';
+import { Box, Button, Divider, Grid } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
 
 import FileEntry from '../file-entry';
@@ -88,7 +88,7 @@ const UploadFiles = ({ onChange }: UploadFilesProps) => {
       {files.length > 0 && (
         <>
           <Divider />
-          <FilesContainer>
+          <Grid.Container gap={2}>
             {files.map(file => (
               <FileEntry
                 // We enforce unique file names, so there won't be duplicate keys
@@ -101,7 +101,7 @@ const UploadFiles = ({ onChange }: UploadFilesProps) => {
                 }}
               />
             ))}
-          </FilesContainer>
+          </Grid.Container>
         </>
       )}
     </Box>
@@ -110,13 +110,6 @@ const UploadFiles = ({ onChange }: UploadFilesProps) => {
 
 const HiddenInput = styled.input`
   display: none;
-`;
-
-const FilesContainer = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[2]};
-  `}
 `;
 
 export default UploadFiles;

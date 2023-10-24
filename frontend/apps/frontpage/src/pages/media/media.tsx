@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { media, Typography } from '@onefootprint/ui';
+import { Grid, media, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import SEO from '../../components/seo';
@@ -18,15 +18,23 @@ const Media = ({ articles }: MediaProps) => {
     <>
       <SEO title={t('html-title')} slug="/media" />
       <Container>
-        <Hero>
+        <Grid.Container
+          gap={5}
+          marginBottom={10}
+          paddingTop={0}
+          paddingBottom={0}
+          paddingLeft={5}
+          paddingRight={5}
+          textAlign="center"
+        >
           <Typography variant="display-2" as="h1">
             {t('title')}
           </Typography>
           <Typography variant="display-4" as="h2" color="secondary">
             {t('subtitle')}
           </Typography>
-        </Hero>
-        <Articles>
+        </Grid.Container>
+        <Articles direction="column">
           {articles.map(article => (
             <ArticleItem
               publishedAt={article.publishedAt}
@@ -57,21 +65,8 @@ const Container = styled.div`
   `}
 `;
 
-const Hero = styled.div`
+const Articles = styled(Stack)`
   ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[5]};
-    margin-bottom: ${theme.spacing[10]};
-    padding: 0 ${theme.spacing[5]};
-    text-align: center;
-  `}
-`;
-
-const Articles = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-
     article:not(:last-child) {
       border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     }

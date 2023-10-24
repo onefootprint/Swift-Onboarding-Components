@@ -8,7 +8,7 @@ import {
   IcoShield40,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Container, media, Typography } from '@onefootprint/ui';
+import { Grid, media, Stack, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
 
@@ -54,12 +54,24 @@ const TenantPage = ({ tenant }: TenantPageProps) => {
           />
         ) : null}
       </Head>
-      <StyledContainer>
+      <StyledContainer
+        align="center"
+        justify="center"
+        gap={10}
+        paddingTop={10}
+        paddingBottom={12}
+      >
         <PartnersLogos
           tenantName={tenant.name}
           tenantLogoUrl={tenant.logoUrl}
         />
-        <HeadingContainer>
+        <HeadingContainer
+          align="center"
+          justify="center"
+          textAlign="center"
+          gap={5}
+          maxWidth="600px"
+        >
           <Typography as="h1" variant="display-2">
             {t('title')}
           </Typography>
@@ -67,14 +79,34 @@ const TenantPage = ({ tenant }: TenantPageProps) => {
             {t('subtitle', { tenantName: tenant.name })}
           </Typography>
         </HeadingContainer>
-        <FeaturesContainer>
-          <TitleContainer>
+        <FeaturesContainer
+          align="center"
+          justify="center"
+          maxWidth="856px"
+          paddingTop={9}
+          paddingBottom={9}
+          paddingLeft={5}
+          paddingRight={5}
+          borderRadius="default"
+          gap={8}
+        >
+          <Stack
+            direction="column"
+            align="center"
+            justify="center"
+            textAlign="center"
+            gap={5}
+          >
             <IcoShield40 />
             <Typography as="h2" variant="heading-2">
               {t('features.title')}
             </Typography>
-          </TitleContainer>
-          <FeaturesGrid>
+          </Stack>
+          <FeaturesGrid
+            columns={['repeat(1, 1fr)']}
+            paddingTop={4}
+            paddingBottom={4}
+          >
             <FeatureCard
               title={t('features.feature-1.title')}
               description={t('features.feature-1.description')}
@@ -106,20 +138,16 @@ const TenantPage = ({ tenant }: TenantPageProps) => {
   );
 };
 
-const StyledContainer = styled(Container)`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: ${theme.spacing[10]} 0 ${theme.spacing[12]} 0;
-    gap: ${theme.spacing[10]};
-    background: radial-gradient(
-      70% 40% at 60% 60%,
-      #e9e3ff 4%,
-      transparent 80%
-    );
+const FeaturesGrid = styled(Grid.Container)`
+  ${media.greaterThan('sm')`
+      grid-template-columns: repeat(2, 1fr);
+    `}
+`;
 
-    ${media.greaterThan('md')`
+const StyledContainer = styled(Stack)`
+  background: radial-gradient(70% 40% at 60% 60%, #e9e3ff 4%, transparent 80%);
+
+  ${media.greaterThan('md')`
       background: radial-gradient(
           30% 60% at 70% 60%,
           #e9e3ff 4%,
@@ -127,62 +155,21 @@ const StyledContainer = styled(Container)`
         ),
         radial-gradient(30% 50% at 20% 50%, #f6ffe8 0%, transparent 100%);
     `};
-  `}
 `;
 
-const HeadingContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    max-width: 600px;
-    margin: 0 auto;
-    gap: ${theme.spacing[5]};
-  `}
+const HeadingContainer = styled(Stack)`
+  margin: 0 auto;
 `;
 
-const FeaturesContainer = styled.div`
+const FeaturesContainer = styled(Stack)`
   ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    max-width: 856px;
     margin: 0 auto;
-    padding: ${theme.spacing[9]} ${theme.spacing[5]};
     box-shadow: ${theme.elevation[2]};
-    border-radius: ${theme.borderRadius.default};
-    gap: ${theme.spacing[8]};
     background-color: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(20px);
 
     ${media.greaterThan('md')`
       padding: ${theme.spacing[9]};
-    `}
-  `};
-`;
-
-const TitleContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: ${theme.spacing[5]};
-  `}
-`;
-
-const FeaturesGrid = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    grid-template-columns: repeat(1, 1fr);
-    padding: 0 ${theme.spacing[5]};
-    padding: 0 ${theme.spacing[4]};
-
-    ${media.greaterThan('sm')`
-      grid-template-columns: repeat(2, 1fr);
     `}
   `};
 `;

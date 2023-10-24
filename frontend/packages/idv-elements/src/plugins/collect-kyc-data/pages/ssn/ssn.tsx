@@ -1,7 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
-import { Stack, useConfirmationDialog } from '@onefootprint/ui';
+import { Grid, Stack, useConfirmationDialog } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -102,7 +101,11 @@ const SSN = ({
     <>
       {!hideHeader && <NavigationHeader />}
       <FormProvider {...methods}>
-        <Form onSubmit={methods.handleSubmit(onSubmitForm)}>
+        <Grid.Container
+          as="form"
+          rowGap={7}
+          onSubmit={methods.handleSubmit(onSubmitForm)}
+        >
           {!hideHeader && <HeaderTitle title={title} subtitle={subtitle} />}
           <Stack gap={5} direction="column">
             {ssnKind === 'ssn9' ? (
@@ -119,18 +122,10 @@ const SSN = ({
             skipLabel={t('skip.cta')}
             submitButtonTestID="ssn-save-edit-button"
           />
-        </Form>
+        </Grid.Container>
       </FormProvider>
     </>
   );
 };
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[7]};
-    width: 100%;
-  `}
-`;
 
 export default SSN;

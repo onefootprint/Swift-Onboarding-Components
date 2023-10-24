@@ -1,7 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import { SupportedIdDocTypes } from '@onefootprint/types';
-import { Box, Checkbox, Divider, Typography } from '@onefootprint/ui';
+import { Box, Checkbox, Divider, Grid, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -16,7 +15,7 @@ const IdDocPicker = ({ unselectedIDDoc }: IdDocPickerProps) => {
 
   return (
     <>
-      <Grid>
+      <Grid.Container gap={3}>
         <Checkbox
           value={SupportedIdDocTypes.driversLicense}
           label={t('id-doc.drivers_license')}
@@ -52,7 +51,7 @@ const IdDocPicker = ({ unselectedIDDoc }: IdDocPickerProps) => {
             {t('id-doc.no-id-doc-selected')}
           </Typography>
         )}
-      </Grid>
+      </Grid.Container>
       {idDocKind?.length > 0 && (
         <>
           <Box marginTop={5} marginBottom={5}>
@@ -69,12 +68,5 @@ const IdDocPicker = ({ unselectedIDDoc }: IdDocPickerProps) => {
     </>
   );
 };
-
-const Grid = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[3]};
-  `}
-`;
 
 export default IdDocPicker;

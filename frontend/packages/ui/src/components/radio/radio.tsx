@@ -3,6 +3,7 @@ import React, { forwardRef, useId, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';
 
 import { createFontStyles } from '../../utils/mixins';
+import Grid from '../grid';
 import { createCheckedStyled, createPseudoStyles } from './radio.utils';
 
 export type RadioProps = {
@@ -58,6 +59,7 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
             aria-checked={checked}
             aria-disabled={disabled}
             aria-required={required}
+            as="input"
             checked={checked}
             data-has-error={hasError}
             defaultChecked={defaultChecked}
@@ -107,13 +109,12 @@ const Label = styled.label`
   `}
 `;
 
-const Input = styled.input<Pick<RadioProps, 'hasError'>>`
+const Input = styled(Grid.Container)<Pick<RadioProps, 'hasError'>>`
   ${({ theme }) => css`
     appearance: none;
     background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.spacing[4]};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
-    display: grid;
     height: 16px;
     margin: 0;
     outline-offset: ${theme.spacing[2]};

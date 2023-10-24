@@ -30,48 +30,44 @@ const Loading = () => (
           />
         </Box>
       </Box>
-      <Grid.Row>
-        <Grid.Column col={6}>
-          <Box id="severity" marginBottom={7}>
-            <Box marginBottom={2}>
-              <Shimmer
-                sx={{
-                  width: '58px',
-                  height: '20px',
-                }}
-              />
-            </Box>
-            <Box>
-              <Shimmer
-                sx={{
-                  width: '28px',
-                  height: '20px',
-                }}
-              />
-            </Box>
+      <Grid.Container columns={['1fr', '1fr']} gap={3}>
+        <Box id="severity" marginBottom={7}>
+          <Box marginBottom={2}>
+            <Shimmer
+              sx={{
+                width: '58px',
+                height: '20px',
+              }}
+            />
           </Box>
-        </Grid.Column>
-        <Grid.Column col={6}>
-          <Box id="scope" marginBottom={7}>
-            <Box marginBottom={2}>
-              <Shimmer
-                sx={{
-                  width: '45px',
-                  height: '20px',
-                }}
-              />
-            </Box>
-            <Box>
-              <Shimmer
-                sx={{
-                  width: '58px',
-                  height: '20px',
-                }}
-              />
-            </Box>
+          <Box>
+            <Shimmer
+              sx={{
+                width: '28px',
+                height: '20px',
+              }}
+            />
           </Box>
-        </Grid.Column>
-      </Grid.Row>
+        </Box>
+        <Box id="scope" marginBottom={7}>
+          <Box marginBottom={2}>
+            <Shimmer
+              sx={{
+                width: '45px',
+                height: '20px',
+              }}
+            />
+          </Box>
+          <Box>
+            <Shimmer
+              sx={{
+                width: '58px',
+                height: '20px',
+              }}
+            />
+          </Box>
+        </Box>
+      </Grid.Container>
       <Box id="note" marginBottom={6}>
         <Box marginBottom={2}>
           <Shimmer

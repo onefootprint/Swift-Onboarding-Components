@@ -1,7 +1,7 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { IcoArrowUpRight16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { media, Tab, Tabs, Typography } from '@onefootprint/ui';
+import { Grid, media, Tab, Tabs, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
@@ -27,7 +27,14 @@ const Examples = () => {
           </Tab>
         ))}
       </Tabs>
-      <List ref={animatedList}>
+      <List
+        gap={5}
+        columns={['repeat(2,1fr)']}
+        marginTop={8}
+        marginBottom={8}
+        width="100%"
+        ref={animatedList}
+      >
         {tab.links.map(({ name, img, href }) => {
           const parts = img.src.split('/');
           const filename = parts.pop();
@@ -67,18 +74,10 @@ const Examples = () => {
   );
 };
 
-const List = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    grid-gap: ${theme.spacing[5]};
-    grid-template-columns: repeat(2, 1fr);
-    margin: ${theme.spacing[8]} 0;
-    width: 100%;
-
-    ${media.greaterThan('md')`
+const List = styled(Grid.Container)`
+  ${media.greaterThan('md')`
       grid-template-columns: repeat(3, 1fr);
     `}
-  `};
 `;
 
 const Item = styled(Link)`

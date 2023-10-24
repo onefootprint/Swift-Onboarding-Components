@@ -38,14 +38,10 @@ const Address = () => {
     <>
       <CountryField onChange={handleCountryChange} />
       <AddressLines countryCode={countryValue} />
-      <Grid.Row>
-        <Grid.Column col={6}>
-          <CityField />
-        </Grid.Column>
-        <Grid.Column col={6}>
-          <ZipField countryCode={countryValue} />
-        </Grid.Column>
-      </Grid.Row>
+      <Grid.Container>
+        <CityField />
+        <ZipField countryCode={countryValue} />
+      </Grid.Container>
       <StateField inputKind={countryValue === 'US' ? 'dropdown' : 'text'} />
     </>
   );

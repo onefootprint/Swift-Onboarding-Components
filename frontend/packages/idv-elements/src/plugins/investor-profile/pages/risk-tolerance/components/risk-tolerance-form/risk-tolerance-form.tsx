@@ -1,11 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import type { InvestorProfileData } from '@onefootprint/types';
 import {
   InvestorProfileDI,
   InvestorProfileRiskTolerance,
 } from '@onefootprint/types';
-import { Radio } from '@onefootprint/ui';
+import { Grid, Radio } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -52,39 +51,32 @@ const RiskToleranceForm = ({
       }}
       isLoading={isLoading}
     >
-      <RadioContainer>
+      <Grid.Container gap={2}>
         <Radio
           value={InvestorProfileRiskTolerance.conservative}
           label={t(`${InvestorProfileRiskTolerance.conservative}.label`)}
           hint={t(`${InvestorProfileRiskTolerance.conservative}.description`)}
           {...register('riskTolerance')}
         />
-      </RadioContainer>
-      <RadioContainer>
+      </Grid.Container>
+      <Grid.Container gap={2}>
         <Radio
           value={InvestorProfileRiskTolerance.moderate}
           label={t(`${InvestorProfileRiskTolerance.moderate}.label`)}
           hint={t(`${InvestorProfileRiskTolerance.moderate}.description`)}
           {...register('riskTolerance')}
         />
-      </RadioContainer>
-      <RadioContainer>
+      </Grid.Container>
+      <Grid.Container gap={2}>
         <Radio
           value={InvestorProfileRiskTolerance.aggressive}
           label={t(`${InvestorProfileRiskTolerance.aggressive}.label`)}
           hint={t(`${InvestorProfileRiskTolerance.aggressive}.description`)}
           {...register('riskTolerance')}
         />
-      </RadioContainer>
+      </Grid.Container>
     </CustomForm>
   );
 };
-
-const RadioContainer = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[2]};
-  `}
-`;
 
 export default RiskToleranceForm;

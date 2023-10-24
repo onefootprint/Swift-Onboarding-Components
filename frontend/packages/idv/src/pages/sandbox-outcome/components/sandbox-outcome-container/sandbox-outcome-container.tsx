@@ -1,9 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { HeaderTitle, NavigationHeader } from '@onefootprint/idv-elements';
-import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDocOutcome, OverallOutcome } from '@onefootprint/types';
-import { Box, Button } from '@onefootprint/ui';
+import { Box, Button, Grid } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -42,7 +41,12 @@ export const SandboxOutcomeContainer = ({
       <NavigationHeader leftButton={{ variant: 'close' }} />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <FormProvider {...formMethods}>
-        <Form onSubmit={handleSubmit(onSubmit)}>
+        <Grid.Container
+          as="form"
+          marginTop={7}
+          gap={5}
+          onSubmit={handleSubmit(onSubmit)}
+        >
           {shouldShowIdDocOutcome && (
             <IdDocOutcomeSelect
               allowRealOutcome={config?.canMakeRealDocScanCallsInSandbox}
@@ -53,18 +57,10 @@ export const SandboxOutcomeContainer = ({
           <Button fullWidth type="submit" disabled={!!errors?.testID}>
             {t('cta')}
           </Button>
-        </Form>
+        </Grid.Container>
       </FormProvider>
     </Box>
   );
 };
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    margin-top: ${theme.spacing[7]};
-    display: grid;
-    gap: ${theme.spacing[5]};
-  `}
-`;
 
 export default SandboxOutcomeContainer;

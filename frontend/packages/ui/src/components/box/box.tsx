@@ -3,10 +3,8 @@ import React, { forwardRef } from 'react';
 
 import useSX from '../../hooks/use-sx';
 import { createFontStyles } from '../../utils/mixins';
-import type { BoxProps, BoxPropsStyles } from './box.types';
+import type { BoxProps, BoxPropsStyles, BoxTag } from './box.types';
 import { getBorders, getMargin, getPadding } from './box.utils';
-
-type BoxTag = 'div' | 'section' | 'article' | 'aside' | 'span' | 'main';
 
 const Box = forwardRef<HTMLElement, BoxProps>(
   (
@@ -19,6 +17,7 @@ const Box = forwardRef<HTMLElement, BoxProps>(
       role,
       testID,
       className,
+      fontStyle,
       sx,
       ...props
     }: BoxProps,
@@ -36,6 +35,7 @@ const Box = forwardRef<HTMLElement, BoxProps>(
         sx={sxStyles}
         role={role}
         className={className}
+        fontStyle={fontStyle}
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...props}
       >
@@ -75,6 +75,11 @@ const StyledBox = styled('div').attrs<{ as: BoxTag }>(({ as, ...props }) => ({
     visibility: ${props.visibility};
     overflow: ${props.overflow};
     gap: ${props.gap ? theme.spacing[props.gap] : '0'};
+    top: ${props.top ? theme.spacing[props.top] : undefined};
+    bottom: ${props.bottom ? theme.spacing[props.bottom] : undefined};
+    left: ${props.left ? theme.spacing[props.left] : undefined};
+    right: ${props.right ? theme.spacing[props.right] : undefined};
+    z-index: ${props.zIndex};
   `}
 `;
 

@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import {
   Dialog,
+  Grid,
   TextArea,
   TextInput,
   Typography,
@@ -88,7 +88,12 @@ const SupportDialog = ({
         disabled: submitFormMutation.isLoading,
       }}
     >
-      <Form id="support-dialog-id" onSubmit={handleSubmit(onSubmit)}>
+      <Grid.Container
+        as="form"
+        rowGap={7}
+        id="support-dialog-id"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         {submitFormMutation.isError && (
           <Typography variant="body-2" color="error">
             {t('form.submit-error')}
@@ -133,16 +138,9 @@ const SupportDialog = ({
             },
           })}
         />
-      </Form>
+      </Grid.Container>
     </Dialog>
   );
 };
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[7]};
-  `}
-`;
 
 export default SupportDialog;

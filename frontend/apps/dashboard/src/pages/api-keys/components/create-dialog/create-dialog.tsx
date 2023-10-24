@@ -70,48 +70,44 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
         onSubmit={handleSubmit(handleBeforeSubmit)}
         id="create-secret-key-form"
       >
-        <Grid.Row>
-          <Grid.Column col={8}>
-            <TextInput
-              autoFocus
-              hasError={!!errors.name}
-              hint={errors?.name?.message}
-              label={t('form.name.label')}
-              placeholder={t('form.name.placeholder')}
-              {...register('name', {
-                required: {
-                  value: true,
-                  message: t('form.name.errors.required'),
-                },
-              })}
+        <Grid.Container columns={['1fr', '2fr']} gap={7}>
+          <TextInput
+            autoFocus
+            hasError={!!errors.name}
+            hint={errors?.name?.message}
+            label={t('form.name.label')}
+            placeholder={t('form.name.placeholder')}
+            {...register('name', {
+              required: {
+                value: true,
+                message: t('form.name.errors.required'),
+              },
+            })}
+          />
+          {rolesQuery.isLoading && <Loading />}
+          {rolesQuery.data && (
+            <Controller
+              control={control}
+              name="role"
+              rules={{ required: true }}
+              render={select => (
+                <Select
+                  label={t('form.access-control.label')}
+                  hasError={!!select.fieldState.error}
+                  hint={
+                    select.fieldState.error &&
+                    t('form.access-control.errors.required')
+                  }
+                  options={rolesQuery.options}
+                  onBlur={select.field.onBlur}
+                  onChange={select.field.onChange}
+                  value={select.field.value}
+                  placeholder={t('form.access-control.placeholder')}
+                />
+              )}
             />
-          </Grid.Column>
-          <Grid.Column col={4}>
-            {rolesQuery.isLoading && <Loading />}
-            {rolesQuery.data && (
-              <Controller
-                control={control}
-                name="role"
-                rules={{ required: true }}
-                render={select => (
-                  <Select
-                    label={t('form.access-control.label')}
-                    hasError={!!select.fieldState.error}
-                    hint={
-                      select.fieldState.error &&
-                      t('form.access-control.errors.required')
-                    }
-                    options={rolesQuery.options}
-                    onBlur={select.field.onBlur}
-                    onChange={select.field.onChange}
-                    value={select.field.value}
-                    placeholder={t('form.access-control.placeholder')}
-                  />
-                )}
-              />
-            )}
-          </Grid.Column>
-        </Grid.Row>
+          )}
+        </Grid.Container>
       </form>
     </Dialog>
   );

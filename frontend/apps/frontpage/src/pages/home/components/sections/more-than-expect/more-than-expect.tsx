@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoHeart24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Container, media } from '@onefootprint/ui';
+import { Grid, media } from '@onefootprint/ui';
 import React from 'react';
 
 import FeatureCard from '../../feature-card';
@@ -22,7 +22,7 @@ const MoreThanExpect = () => {
         subtitle={t('subtitle')}
         icon={IcoHeart24}
       />
-      <Grid>
+      <Layout columns={['1fr']} rows={['420px']} marginTop={10}>
         <FeatureCard
           size="compact"
           title={t('appclip.title')}
@@ -72,7 +72,7 @@ const MoreThanExpect = () => {
           <ManualReview />
         </FeatureCard>
         <Divider gridArea="divider" />
-      </Grid>
+      </Layout>
     </>
   );
 };
@@ -88,12 +88,8 @@ const Divider = styled.div<{ gridArea: string }>`
   `}
 `;
 
-const Grid = styled(Container)`
+const Layout = styled(Grid.Container)`
   ${({ theme }) => css`
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 420px;
-    margin-top: ${theme.spacing[10]};
     position: relative;
     grid-template-areas:
       'app-clip'

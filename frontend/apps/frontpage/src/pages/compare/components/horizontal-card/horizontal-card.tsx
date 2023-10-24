@@ -1,5 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
-import { createFontStyles, media, Typography } from '@onefootprint/ui';
+import { createFontStyles, Grid, media, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 
@@ -48,10 +48,9 @@ const HorizontalCard = ({
   </CardContainer>
 );
 
-const CardContainer = styled.div`
+const CardContainer = styled(Grid.Container)`
   ${({ theme }) => css`
     position: relative;
-    display: grid;
     background-color: rgba(252, 252, 252, 0.6);
     border-radius: ${theme.borderRadius.large};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};

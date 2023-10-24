@@ -4,7 +4,36 @@ import type { AriaRole } from 'react';
 
 import type { SXStyleProps, SXStyles } from '../../hooks';
 
-type BoxTag = 'div' | 'section' | 'article' | 'aside' | 'span' | 'main';
+export type BoxTag =
+  | 'div'
+  | 'section'
+  | 'article'
+  | 'aside'
+  | 'span'
+  | 'main'
+  | 'form'
+  | 'ul'
+  | 'li'
+  | 'ol'
+  | 'nav'
+  | 'header'
+  | 'footer'
+  | 'button'
+  | 'input'
+  | 'select'
+  | 'textarea'
+  | 'label'
+  | 'fieldset'
+  | 'legend'
+  | 'table'
+  | 'caption'
+  | 'tbody'
+  | 'thead'
+  | 'tfoot'
+  | 'tr'
+  | 'td'
+  | 'th'
+  | 'img';
 
 export type BoxPropsStyles = {
   sx?: SXStyles;
@@ -39,6 +68,11 @@ export type BoxPropsStyles = {
   maxHeight?: string;
   gap?: keyof Theme['spacing'];
   elevation?: keyof Theme['elevation'];
+  top?: keyof Theme['spacing'];
+  left?: keyof Theme['spacing'];
+  right?: keyof Theme['spacing'];
+  bottom?: keyof Theme['spacing'];
+  zIndex?: keyof Theme['zIndex'];
 };
 
 export type BoxProps = BoxPropsStyles & {

@@ -1,10 +1,10 @@
 import styled, { css } from '@onefootprint/styled';
-import { Box, Shimmer } from '@onefootprint/ui';
+import { Box, Grid, Shimmer } from '@onefootprint/ui';
 import times from 'lodash/times';
 import React from 'react';
 
 const Loading = () => (
-  <Container data-testid="business-owners-loading">
+  <Grid.Container gap={4} data-testid="business-owners-loading">
     {times(2).map(value => (
       <Field key={value}>
         <LabelContainer>
@@ -16,15 +16,8 @@ const Loading = () => (
         </Box>
       </Field>
     ))}
-  </Container>
+  </Grid.Container>
 );
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[4]};
-  `};
-`;
 
 const Field = styled.div`
   display: flex;

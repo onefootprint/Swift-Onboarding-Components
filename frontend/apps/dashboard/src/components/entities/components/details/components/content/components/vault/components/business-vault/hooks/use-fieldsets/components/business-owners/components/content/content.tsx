@@ -6,7 +6,7 @@ import {
   isVaultDataEmpty,
   isVaultDataEncrypted,
 } from '@onefootprint/types';
-import { Box, Stack, Typography } from '@onefootprint/ui';
+import { Box, Grid, Stack, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import { FieldOrPlaceholder } from 'src/components';
@@ -87,7 +87,7 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
 
   return (
     <Box testID="business-owners-content">
-      <Grid>
+      <Grid.Container gap={4}>
         {businessOwners.map((businessOwner, index) => (
           <FieldContainer
             key={businessOwner.id || index}
@@ -102,7 +102,7 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
             />
           </FieldContainer>
         ))}
-      </Grid>
+      </Grid.Container>
     </Box>
   );
 };
@@ -115,13 +115,6 @@ const FieldContainer = styled.div<{ hideCheckbox: boolean }>`
         visibility: hidden;
       }
     `}
-`;
-
-const Grid = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[4]};
-  `}
 `;
 
 export default BusinessOwnersField;

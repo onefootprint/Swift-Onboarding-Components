@@ -1,6 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Stack, Typography } from '@onefootprint/ui';
+import { Grid, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 export type InfoBoxProps = {
@@ -9,9 +9,18 @@ export type InfoBoxProps = {
 };
 
 const InfoBox = ({ items, variant }: InfoBoxProps) => (
-  <Container data-variant={variant} aria-label="infoBox">
+  <Grid.Container
+    width="100%"
+    as="ul"
+    backgroundColor="secondary"
+    borderRadius="default"
+    data-variant={variant}
+    aria-label="infoBox"
+    gap={variant === 'compact' ? 4 : 7}
+    padding={variant === 'compact' ? 4 : 5}
+  >
     {items.map(({ title, description, Icon }) => (
-      <Item title={title} key={title}>
+      <Stack as="li" direction="row" gap={3} title={title} key={title}>
         <IconContainer>
           <Icon color="primary" />
         </IconContainer>
@@ -25,37 +34,10 @@ const InfoBox = ({ items, variant }: InfoBoxProps) => (
             </Typography>
           )}
         </Stack>
-      </Item>
+      </Stack>
     ))}
-  </Container>
+  </Grid.Container>
 );
-
-const Container = styled.ul`
-  ${({ theme }) => css`
-    background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius.default};
-    display: grid;
-    width: 100%;
-
-    &[data-variant='default'] {
-      gap: ${theme.spacing[7]};
-      padding: ${theme.spacing[5]};
-    }
-
-    &[data-variant='compact'] {
-      gap: ${theme.spacing[4]};
-      padding: ${theme.spacing[4]};
-    }
-  `}
-`;
-
-const Item = styled.li`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: row;
-    gap: ${theme.spacing[3]};
-  `}
-`;
 
 const IconContainer = styled.div`
   ${({ theme }) => css`

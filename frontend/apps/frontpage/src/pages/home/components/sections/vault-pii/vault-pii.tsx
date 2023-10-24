@@ -7,7 +7,7 @@ import {
   IcoUserCircle16,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Container, media } from '@onefootprint/ui';
+import { Grid, media } from '@onefootprint/ui';
 import React from 'react';
 
 import SectionTitle from '../../section-title/section-title';
@@ -31,7 +31,12 @@ const VaultPii = () => {
         isOnDarkSection
         href="/vaulting"
       />
-      <Grid>
+      <CardLayouts
+        marginTop={10}
+        columns={['1fr']}
+        rows={['fit-content']}
+        gap={5}
+      >
         <HorizontalCard
           gridArea="top"
           title={t('identity-data.title')}
@@ -59,7 +64,7 @@ const VaultPii = () => {
         <Outer speed={10} delay={0} diameter={1300} />
         <Center speed={5} delay={1} diameter={1100} />
         <Inner speed={5} delay={3} diameter={800} />
-      </Grid>
+      </CardLayouts>
     </Section>
   );
 };
@@ -74,19 +79,12 @@ const Section = styled.div`
   `}
 `;
 
-const Grid = styled(Container)`
-  ${({ theme }) => css`
-    margin-top: ${theme.spacing[10]};
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: fit-content;
-    gap: ${theme.spacing[5]};
-    isolation: isolate;
-    grid-template-areas:
-      'top'
-      'bottom-1'
-      'bottom-2';
-  `}
+const CardLayouts = styled(Grid.Container)`
+  isolation: isolate;
+  grid-template-areas:
+    'top'
+    'bottom-1'
+    'bottom-2';
 
   ${media.greaterThan('md')`
     grid-template-columns: 1fr 1fr;

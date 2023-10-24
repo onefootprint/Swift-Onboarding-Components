@@ -1,10 +1,10 @@
 import { useCountdown, useTranslation } from '@onefootprint/hooks';
 import { IcoSmartphone224 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import type { D2PGenerateResponse } from '@onefootprint/types';
 import {
   Button,
   Divider,
+  Grid,
   Shimmer,
   Stack,
   Typography,
@@ -115,7 +115,7 @@ const QRRegister = () => {
   return (
     <>
       <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
-      <Container>
+      <Grid.Container rowGap={7} textAlign="center">
         <HeaderTitle
           title={t(`${translationSource}.title`)}
           subtitle={t('subtitle')}
@@ -154,17 +154,9 @@ const QRRegister = () => {
         </Stack>
         <Divider variant="secondary" />
         <ContinueOnDesktop />
-      </Container>
+      </Grid.Container>
     </>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[7]};
-    text-align: center;
-  `}
-`;
 
 export default QRRegister;

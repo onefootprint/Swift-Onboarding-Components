@@ -10,7 +10,7 @@ import {
   IcoWarning24,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Container, media } from '@onefootprint/ui';
+import { Container, Grid, media, Stack } from '@onefootprint/ui';
 import React from 'react';
 
 import FeatureCard from '../../components/feature-card';
@@ -59,14 +59,27 @@ const AllFeatures = () => {
     <StyledContainer>
       <Title>
         <TitleIllustration />
-        <TitleContainer>
+        <TitleContainer direction="column" gap={3}>
           <SectionTitle variant="display-1" maxWidth={460} multiline>
             {t('title')}
           </SectionTitle>
           <SectionSubtitle maxWidth={500}>{t('subtitle')}</SectionSubtitle>
         </TitleContainer>
       </Title>
-      <Grid>
+      <FeatureCardGrid
+        columns={['1fr']}
+        rows={['repeat(8, 1fr)']}
+        templateAreas={[
+          'manual-review',
+          'auth-iam',
+          'fraud-risk',
+          'security-logs',
+          'watchlists',
+          'kyc-retrigger',
+          'free-form-notes',
+          'field-validations',
+        ]}
+      >
         {featureCards.map(card => (
           <FeatureCard
             key={card.id}
@@ -76,7 +89,7 @@ const AllFeatures = () => {
             gridArea={card.id}
           />
         ))}
-      </Grid>
+      </FeatureCardGrid>
     </StyledContainer>
   );
 };
@@ -101,21 +114,7 @@ const Title = styled.div`
   `}
 `;
 
-const Grid = styled.div`
-  display: grid;
-  width: 100%;
-  grid-template-columns: 1fr;
-  grid-template-rows: repeat(8, 1fr);
-  grid-template-areas:
-    'manual-review'
-    'auth-iam'
-    'fraud-risk'
-    'security-logs'
-    'watchlists'
-    'kyc-retrigger'
-    'free-form-notes'
-    'field-validations';
-
+const FeatureCardGrid = styled(Grid.Container)`
   ${media.greaterThan('md')`
       grid-template-columns: repeat(4, 1fr);
       grid-template-rows: repeat(2, 1fr);
@@ -125,12 +124,9 @@ const Grid = styled.div`
     `}
 `;
 
-const TitleContainer = styled.div`
+const TitleContainer = styled(Stack)`
   ${({ theme }) => css`
     margin-top: calc(-1 * ${theme.spacing[10]});
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[3]};
     z-index: 2;
   `}
 `;

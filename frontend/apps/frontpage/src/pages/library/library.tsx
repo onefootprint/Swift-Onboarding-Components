@@ -1,6 +1,6 @@
 import { useIntl, useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Container, Divider, media } from '@onefootprint/ui';
+import { Container, Divider, Grid, media } from '@onefootprint/ui';
 import React from 'react';
 import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';
 import WritingLayout from 'src/components/writing-layout';
@@ -32,7 +32,7 @@ const Library = ({ posts }: InvestorUpdatesProps) => {
             description={t('breadcrumb.description')}
             twitterLabel={t('breadcrumb.twitter')}
           />
-          <Posts>
+          <Posts gap={9}>
             {posts.map(post => (
               <LibraryPostPreview
                 href={`/library/${post.slug}`}
@@ -64,15 +64,10 @@ const StyledDivider = styled(Divider)`
   `}
 `;
 
-const Posts = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[9]};
-
-    ${media.greaterThan('md')`
+const Posts = styled(Grid.Container)`
+  ${media.greaterThan('md')`
       grid-template-columns: repeat(2, 1fr);
     `}
-  `}
 `;
 
 export default Library;

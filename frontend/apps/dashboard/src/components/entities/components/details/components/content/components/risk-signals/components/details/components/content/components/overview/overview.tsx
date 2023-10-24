@@ -29,18 +29,14 @@ const Overview = ({ description, scopes, severity }: OverviewProps) => {
         <Typography variant="label-2">{t('title')}</Typography>
       </Header>
       <Fieldset>
-        <Grid.Row>
-          <Grid.Column col={6}>
-            <Field label={t('severity')}>
-              <SeverityBadge severity={severity} />
-            </Field>
-          </Grid.Column>
-          <Grid.Column col={6}>
-            <Field label={t('scopes')}>
-              {createCapitalStringList(scopesList)}
-            </Field>
-          </Grid.Column>
-        </Grid.Row>
+        <Grid.Container columns={['1fr', '1fr']} gap={5}>
+          <Field label={t('severity')}>
+            <SeverityBadge severity={severity} />
+          </Field>
+          <Field label={t('scopes')}>
+            {createCapitalStringList(scopesList)}
+          </Field>
+        </Grid.Container>
         <Field label={t('description')}>{description}</Field>
       </Fieldset>
     </section>

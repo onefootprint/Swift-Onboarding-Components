@@ -2,7 +2,7 @@ import { FootprintVerifyButton } from '@onefootprint/footprint-react';
 import { useTranslation } from '@onefootprint/hooks';
 import { LogoFpDefault } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { media, Typography } from '@onefootprint/ui';
+import { Grid, media, Stack, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -37,9 +37,30 @@ const Live = () => {
   return (
     <>
       <SEO title={t(`${translationsKey}.html-title`)} />
-      <BlurredBackground>
-        <Wrapper>
-          <Nav>
+      <BlurredBackground
+        align="center"
+        justify="center"
+        width="100vw"
+        minHeight="100vh"
+        overflow="hidden"
+      >
+        <Stack
+          direction="column"
+          align="center"
+          justify="center"
+          width="100%"
+          height="100%"
+        >
+          <Stack
+            position="absolute"
+            width="100%"
+            height="100px"
+            top={0}
+            left={0}
+            direction="row"
+            justify="center"
+            align="center"
+          >
             <Link
               href="https://onefootprint.com/"
               target="_blank"
@@ -47,16 +68,35 @@ const Live = () => {
             >
               <LogoFpDefault />
             </Link>
-          </Nav>
-          <HeroContainer>
-            <TextContainer>
+          </Stack>
+          <HeroContainer
+            maxWidth="90%"
+            paddingTop={11}
+            paddingBottom={3}
+            gap={4}
+            columns={['1fr 1fr']}
+            rows={['0.3fr 1fr']}
+            templateAreas={['image image', 'content content']}
+          >
+            <TextContainer
+              gridArea="content"
+              direction="column"
+              gap={5}
+              textAlign="center"
+              justify="center"
+            >
               <Typography as="h1" variant="display-2">
                 {t(`${translationsKey}.title`)}
               </Typography>
               <Typography as="h1" variant="display-4">
                 {t(`${translationsKey}.subtitle`)}
               </Typography>
-              <ActionsContainer>
+              <ActionsContainer
+                direction="column"
+                justify="center"
+                gap={6}
+                marginTop={6}
+              >
                 <FootprintVerifyButton
                   publicKey={publicKey}
                   label={t(`${translationsKey}.cta`)}
@@ -69,7 +109,12 @@ const Live = () => {
                 </Typography>
               </ActionsContainer>
             </TextContainer>
-            <ImageContainer>
+            <Grid.Item
+              align="center"
+              gridArea="image"
+              justify="center"
+              position="relative"
+            >
               <ImageOffset>
                 <Image
                   src="/live/fl-devices.png"
@@ -78,22 +123,34 @@ const Live = () => {
                   priority
                 />
               </ImageOffset>
-            </ImageContainer>
+            </Grid.Item>
           </HeroContainer>
           <Footer />
-        </Wrapper>
+        </Stack>
       </BlurredBackground>
     </>
   );
 };
 
-const BlurredBackground = styled.div`
-  width: 100vw;
-  min-height: 100vh;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+const HeroContainer = styled(Grid.Container)`
+  z-index: 1;
+  grid-template-areas:
+    'image image'
+    'content content';
+
+  ${media.greaterThan('md')`
+      margin: 0;
+      grid-template-areas: 
+      'content image'
+      'content image';
+    `};
+
+  ${media.greaterThan('lg')`
+      max-width: 1256px;
+    `}
+`;
+
+const BlurredBackground = styled(Stack)`
   background: linear-gradient(
       180deg,
       rgba(176, 255, 191, 0.4) 0%,
@@ -113,61 +170,8 @@ const BlurredBackground = styled.div`
   }
 `;
 
-const Wrapper = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Nav = styled.nav`
-  width: 100%;
-  height: 100px;
-  position: absolute;
-  top: 0;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-`;
-
-const HeroContainer = styled.div`
+const TextContainer = styled(Grid.Item)`
   ${({ theme }) => css`
-    z-index: 1;
-    padding: ${theme.spacing[11]} 0 ${theme.spacing[3]} 0;
-    max-width: 90%;
-    display: grid;
-    gap: ${theme.spacing[4]};
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 0.3fr 1fr;
-    grid-template-areas:
-      'image image'
-      'content content';
-
-    ${media.greaterThan('md')`
-      margin: 0;
-      grid-template-areas: 
-      'content image'
-      'content image';
-    `};
-
-    ${media.greaterThan('lg')`
-      max-width: 1256px;
-    `}
-  `}
-`;
-
-const TextContainer = styled.div`
-  ${({ theme }) => css`
-    grid-area: content;
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[5]};
-    text-align: center;
-    justify-content: center;
-
     ${media.greaterThan('md')`
       max-width: 720px;
       text-align: left; 
@@ -176,30 +180,14 @@ const TextContainer = styled.div`
   `}
 `;
 
-const ActionsContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: ${theme.spacing[6]};
-    margin-top: ${theme.spacing[6]};
-
-    ${media.greaterThan('md')`
+const ActionsContainer = styled(Stack)`
+  ${media.greaterThan('md')`
       max-width: 90%;
       
       & > * {
         width: fit-content;
       }
     `}
-  `}
-`;
-
-const ImageContainer = styled.div`
-  grid-area: image;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 `;
 
 const ImageOffset = styled.div`

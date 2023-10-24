@@ -1,5 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
-import { Grid, LinkButton, Typography } from '@onefootprint/ui';
+import { LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 export type FieldsetProps = {
@@ -51,12 +51,6 @@ const Content = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[5]};
-
-    ${Grid.Column} {
-      display: flex;
-      flex-direction: column;
-      gap: ${theme.spacing[5]};
-    }
   `};
 `;
 

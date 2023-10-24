@@ -1,4 +1,4 @@
-import styled, { css } from '@onefootprint/styled';
+import { Grid } from '@onefootprint/ui';
 import React from 'react';
 
 import type { FieldProps } from '../field';
@@ -9,7 +9,12 @@ type FieldsListProps = {
 };
 
 const FieldsList = ({ fields }: FieldsListProps) => (
-  <Container>
+  <Grid.Container
+    columns={['1fr 1fr']}
+    rows={['1fr auto']}
+    width="100%"
+    gap={4}
+  >
     {fields.map(field => (
       <Field
         key={field.label}
@@ -17,17 +22,7 @@ const FieldsList = ({ fields }: FieldsListProps) => (
         IconComponent={field.IconComponent}
       />
     ))}
-  </Container>
+  </Grid.Container>
 );
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr auto;
-    width: 100%;
-    gap: ${theme.spacing[4]};
-  `}
-`;
 
 export default FieldsList;

@@ -46,45 +46,39 @@ const UserData = ({ onBack, onComplete }: UserDataProps) => {
           type="email"
           value={dangerouslyCastedData.email}
         />
-        <Grid.Row>
-          <Grid.Column col={6}>
-            <TextInput
-              autoFocus
-              hasError={!!errors.firstName}
-              hint={
-                errors.firstName
-                  ? t('form.first-name.errors.required')
-                  : undefined
-              }
-              label={t('form.first-name.label')}
-              placeholder={t('form.first-name.placeholder')}
-              {...register('firstName', {
-                required: {
-                  value: true,
-                  message: t('form.first-name.errors.required'),
-                },
-              })}
-            />
-          </Grid.Column>
-          <Grid.Column col={6}>
-            <TextInput
-              hasError={!!errors.lastName}
-              hint={
-                errors.lastName
-                  ? t('form.last-name.errors.required')
-                  : undefined
-              }
-              label={t('form.last-name.label')}
-              placeholder={t('form.last-name.placeholder')}
-              {...register('lastName', {
-                required: {
-                  value: true,
-                  message: t('form.last-name.errors.required'),
-                },
-              })}
-            />
-          </Grid.Column>
-        </Grid.Row>
+        <Grid.Container columns={['1fr', '1fr']} gap={5}>
+          <TextInput
+            autoFocus
+            hasError={!!errors.firstName}
+            hint={
+              errors.firstName
+                ? t('form.first-name.errors.required')
+                : undefined
+            }
+            label={t('form.first-name.label')}
+            placeholder={t('form.first-name.placeholder')}
+            {...register('firstName', {
+              required: {
+                value: true,
+                message: t('form.first-name.errors.required'),
+              },
+            })}
+          />
+          <TextInput
+            hasError={!!errors.lastName}
+            hint={
+              errors.lastName ? t('form.last-name.errors.required') : undefined
+            }
+            label={t('form.last-name.label')}
+            placeholder={t('form.last-name.placeholder')}
+            {...register('lastName', {
+              required: {
+                value: true,
+                message: t('form.last-name.errors.required'),
+              },
+            })}
+          />
+        </Grid.Container>
         <ButtonContainer>
           <Button
             disabled={mutation.isLoading}
