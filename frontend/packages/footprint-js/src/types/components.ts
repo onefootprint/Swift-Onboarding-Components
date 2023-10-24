@@ -66,7 +66,7 @@ export type VerifyButtonProps = PropsBase &
     variant: 'inline';
     containerId: string;
     dialogVariant?: 'modal' | 'drawer';
-    onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+    onClick?: () => void;
     label?: string;
   };
 
