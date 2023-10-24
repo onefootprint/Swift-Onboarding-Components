@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.7.1
+
+### Patch Changes
+
+- 4fa99dc2c: Fix dependencies
+
 ## 3.7.0
 
 ### Minor Changes
