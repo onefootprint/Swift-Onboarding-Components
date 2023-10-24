@@ -1,5 +1,4 @@
 import requests
-import os
 import time
 import pytest
 from twilio.rest import Client
@@ -17,6 +16,7 @@ from tests.utils import (
     create_tenant,
     create_ob_config,
     _gen_random_sandbox_id,
+    patch,
 )
 
 
@@ -183,6 +183,17 @@ def sandbox_user(sandbox_tenant, twilio):
         "liveness",
         "process",
     ]
+
+    # Assert we can't replace the verified email
+    data = {"id.phone_number": LIVE_PHONE_NUMBER}
+    body = patch(
+        f"entities/{user.fp_id}/vault", data, sandbox_tenant.sk.key, status_code=400
+    )
+    assert (
+        body["error"]["message"]["id.phone_number"]
+        == "Cannot replace verified contact information via API."
+    )
+
     return user
 
 

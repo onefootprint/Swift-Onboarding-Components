@@ -1,5 +1,5 @@
 import pytest
-from tests.utils import clean_up_user, post, create_ob_config, get, step_up_user
+from tests.utils import clean_up_user, post, create_ob_config, get, step_up_user, patch
 from tests.bifrost_client import BifrostClient
 from tests.headers import FpAuth, SandboxId
 from tests.constants import FIXTURE_PHONE_NUMBER, LIVE_PHONE_NUMBER, EMAIL
@@ -50,11 +50,10 @@ def test_onboarded_vault(twilio, ob_config, sandbox_tenant):
 
 
 def test_api_vault(twilio, sandbox_tenant, ob_config):
-    data = {
+    initial_data = {
         "id.phone_number": FIXTURE_PHONE_NUMBER,
-        "id.email": "elliott.for@gmail.com",
     }
-    body = post("users", data, sandbox_tenant.sk.key)
+    body = post("users", initial_data, sandbox_tenant.sk.key)
     fp_id = body["id"]
     sandbox_id = body["sandbox_id"]
 
@@ -63,6 +62,14 @@ def test_api_vault(twilio, sandbox_tenant, ob_config):
     auth_token = FpAuth(body["token"])
 
     auth_token = step_up_user(twilio, auth_token, FIXTURE_PHONE_NUMBER, True)
+    # Ensure we can't edit the phone number once it's been verified
+    body = patch(
+        f"entities/{fp_id}/vault", initial_data, sandbox_tenant.sk.key, status_code=400
+    )
+    assert (
+        body["error"]["message"]["id.phone_number"]
+        == "Cannot replace verified contact information via API."
+    )
 
     # re-run Bifrost with the token from the link we sent to user
     bifrost = BifrostClient.raw_auth(
@@ -114,7 +121,6 @@ def test_redo_onboard(twilio, ob_config, sandbox_tenant):
 def test_portablize_api_vault(twilio, sandbox_tenant, foo_sandbox_tenant, ob_config):
     data = {
         "id.phone_number": LIVE_PHONE_NUMBER,
-        "id.email": "elliott.for@gmail.com",
     }
     body = post("users", data, sandbox_tenant.sk.key)
     fp_id = body["id"]

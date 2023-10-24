@@ -41,16 +41,13 @@ impl<Type> VaultWrapper<Type> {
 
         let irreplaceable_ci = [IDK::PhoneNumber.into(), IDK::Email.into()];
         for di in irreplaceable_ci {
-            let Some(dl_id) = self.data(&IDK::Email.into()).map(|d| &d.lifetime.id) else {
+            let Some(dl_id) = self.data(&di).map(|d| &d.lifetime.id) else {
                 continue;
             };
             let ci = ContactInfo::get(conn, dl_id)?;
             let update_has_di = request.keys().any(|x| x == &di);
             if ci.is_otp_verified && update_has_di {
-                validation_errors.insert(
-                    di.clone(),
-                    ValidationError::CannotReplaceVerifiedContactInfo.into(),
-                );
+                validation_errors.insert(di, ValidationError::CannotReplaceVerifiedContactInfo.into());
             }
         }
 
@@ -59,7 +56,7 @@ impl<Type> VaultWrapper<Type> {
             let update_has_di = request.keys().any(|x| x == &di);
             let vault_already_has_di = self.data(&di).is_some();
             if update_has_di && vault_already_has_di {
-                validation_errors.insert(di.clone(), ValidationError::CannotReplaceData.into());
+                validation_errors.insert(di, ValidationError::CannotReplaceData.into());
             }
         }
 

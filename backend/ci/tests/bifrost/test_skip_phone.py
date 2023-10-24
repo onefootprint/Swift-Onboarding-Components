@@ -5,7 +5,7 @@ from tests.headers import FpAuth
 from tests.constants import FIXTURE_PHONE_NUMBER, INTEGRATION_SANDBOX_EMAIL_OTP_PIN
 from tests.utils import _gen_random_sandbox_id
 from tests.constants import EMAIL
-from tests.utils import post
+from tests.utils import post, patch
 from tests.utils import get_requirement_from_requirements
 from tests.bifrost_client import BifrostClient
 from tests.utils import create_ob_config
@@ -46,7 +46,17 @@ def no_phone_user(skip_phone_obc):
         FIXTURE_PHONE_NUMBER,
         sandbox_id,
     )
-    return bifrost.run()
+    user = bifrost.run()
+
+    # Assert we can't replace the verified email
+    data = {"id.email": EMAIL}
+    key = skip_phone_obc.tenant.sk.key
+    body = patch(f"entities/{user.fp_id}/vault", data, key, status_code=400)
+    assert (
+        body["error"]["message"]["id.email"]
+        == "Cannot replace verified contact information via API."
+    )
+    return user
 
 
 def test_new_user(skip_phone_obc):
