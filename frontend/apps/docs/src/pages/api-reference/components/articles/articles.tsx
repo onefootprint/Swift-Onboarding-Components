@@ -11,8 +11,10 @@ export type ArticlesProps = {
 
 const Articles = ({ articles, previewArticles }: ArticlesProps) => (
   <ArticleList id="articles-container">
-    {articles?.map(article => <Article article={article} />)}
-    {previewArticles?.map(article => <Article article={article} />)}
+    {articles?.map(article => <Article key={article.id} article={article} />)}
+    {previewArticles?.map(article => (
+      <Article key={article.id} article={article} />
+    ))}
   </ArticleList>
 );
 

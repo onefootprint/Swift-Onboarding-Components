@@ -64,7 +64,9 @@ const Schema = ({ schema, isInBrackets = false }: SchemaProps) => {
   }
 
   // We don't yet have any other top-level schema types (like an HTTP response that's just an enum)
-  console.warn('Cannot render schema', schema);
+  if (schema.type !== 'object') {
+    console.warn('Cannot render schema', schema);
+  }
   return null;
 };
 
