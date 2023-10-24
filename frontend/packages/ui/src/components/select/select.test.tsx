@@ -196,4 +196,16 @@ describe('<Select />', () => {
       expect(trigger.disabled).toBeTruthy();
     });
   });
+
+  describe('when it has description', () => {
+    it('should render the description', async () => {
+      const options = [
+        { value: 'Step up', label: 'step_up', description: 'Lorem ipsum' },
+      ];
+      renderSelect({ options });
+      const trigger = screen.getByRole('button', { name: 'Select' });
+      await userEvent.click(trigger);
+      expect(screen.getByText('Lorem ipsum')).toBeInTheDocument();
+    });
+  });
 });

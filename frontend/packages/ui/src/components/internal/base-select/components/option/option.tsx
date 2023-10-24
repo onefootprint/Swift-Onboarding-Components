@@ -5,20 +5,23 @@ import Highlighter from 'react-highlight-words';
 import type { CommonPropsAndClassName, GroupBase } from 'react-select';
 
 import { createFontStyles } from '../../../../../utils/mixins';
+import Typography from '../../../../typography';
+import type { BaseSelectOption } from '../../base-select.types';
 
 export type OptionProps<
-  Option = unknown,
+  Option extends BaseSelectOption,
   IsMulti extends boolean = boolean,
   Group extends GroupBase<Option> = GroupBase<Option>,
 > = CommonPropsAndClassName<Option, IsMulti, Group> & {
   innerProps: JSX.IntrinsicElements['div'];
   label: string;
+  data: Option;
   isFocused: boolean;
   isSelected: boolean;
 };
 
 const Option = <
-  Option,
+  Option extends BaseSelectOption,
   IsMulti extends boolean,
   Group extends GroupBase<Option>,
 >({
@@ -27,6 +30,7 @@ const Option = <
   isFocused,
   innerProps,
   label,
+  data,
 }: OptionProps<Option, IsMulti, Group>) => {
   const { inputValue } = selectProps;
 
@@ -51,6 +55,11 @@ const Option = <
         >
           {label}
         </Highlighter>
+        {data.description && (
+          <Typography variant="caption-2" color="tertiary">
+            {data.description}
+          </Typography>
+        )}
       </Content>
       {isSelected && <IcoCheck16 color="primary" />}
     </OptionContainer>
@@ -86,8 +95,12 @@ const OptionContainer = styled.div`
 `;
 
 const Content = styled.div`
-  display: flex;
-  align-items: center;
+  ${({ theme }) => css`
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[1]};
+  `}
 `;
 
 export default Option;

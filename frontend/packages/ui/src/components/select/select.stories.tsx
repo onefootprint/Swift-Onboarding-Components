@@ -59,3 +59,26 @@ Base.args = {
   searchPlaceholder: 'Search',
   value: undefined,
 };
+
+export const Custom = Template.bind({});
+Custom.args = {
+  disabled: false,
+  hasError: false,
+  hint: '',
+  label: 'Outcome',
+  onChange: console.log, // eslint-disable-line no-console
+  options: [
+    { label: 'Success', value: 'success' },
+    { label: 'Fail', value: 'fail' },
+    { label: 'Manual Review', value: 'manual_review' },
+    {
+      label: 'Step up',
+      value: 'step_up',
+      description:
+        'Users will upload ID photos if not initially required by the configuration.',
+    },
+  ],
+  placeholder: 'Select',
+  searchPlaceholder: 'Search',
+  value: undefined,
+};

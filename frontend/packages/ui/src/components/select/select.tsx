@@ -7,6 +7,7 @@ import BaseSelectTrigger from '../internal/base-select-trigger';
 export type SelectOption<T extends StringOrNumber = string> = {
   label: string;
   value: T;
+  description?: string;
 };
 
 export type SelectProps<Option extends SelectOption = SelectOption> =

@@ -176,7 +176,7 @@ const BasicDataForm = ({
               field: { onChange, onBlur, value, name },
               fieldState: { error },
             }) => (
-              <Select
+              <Select<{ label: string; value: string }>
                 data-private
                 hasError={!!error}
                 label={t('corporation-type.label')}
