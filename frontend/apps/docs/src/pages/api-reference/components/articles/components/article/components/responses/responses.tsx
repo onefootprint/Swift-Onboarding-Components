@@ -29,7 +29,7 @@ const Responses = ({ responses }: ResponsesProps) => {
               {schema?.type && (
                 <>
                   <Separator>·</Separator>
-                  <Typography variant="caption-4" color="quaternary">
+                  <Typography variant="snippet-3" color="quaternary">
                     {schema?.type}
                   </Typography>
                 </>

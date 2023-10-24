@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Box, createFontStyles } from '@onefootprint/ui';
+import { Box, createFontStyles, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import type { Content } from '@/api-reference/api-reference.types';
@@ -24,7 +24,9 @@ const RequestBody = ({ requestBody }: RequestBodyProps) => {
         {isOptional && (
           <>
             <Separator>·</Separator>
-            <Optional>{t('optional')}</Optional>
+            <Typography variant="snippet-3" color="quaternary">
+              {t('optional')}
+            </Typography>
           </>
         )}
       </Header>
@@ -37,7 +39,6 @@ const Title = styled.h3`
   ${({ theme }) => css`
     ${createFontStyles('label-3')}
     color: ${theme.color.secondary};
-    margin-bottom: ${theme.spacing[2]};
   `}
 `;
 
@@ -46,6 +47,7 @@ const Header = styled.div`
     align-items: center;
     display: flex;
     gap: ${theme.spacing[2]};
+    margin-bottom: ${theme.spacing[2]};
   `};
 `;
 
@@ -54,13 +56,6 @@ const Separator = styled.span`
     ${createFontStyles('label-3')}
     color: ${theme.color.secondary};
     padding: 0 ${theme.spacing[2]};
-  `}
-`;
-
-const Optional = styled.div`
-  ${({ theme }) => css`
-    ${createFontStyles('caption-4')}
-    color: ${theme.color.quaternary};
   `}
 `;
 

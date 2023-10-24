@@ -1,7 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronRight16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Box, CodeInline, createFontStyles } from '@onefootprint/ui';
+import {
+  Box,
+  CodeInline,
+  createFontStyles,
+  Typography,
+} from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import type { ContentSchema } from '@/api-reference/api-reference.types';
@@ -30,7 +35,7 @@ const ObjectProperties = ({
   };
 
   const typeLabel = !isRequired
-    ? `${t('optional').toLowerCase()} ${schema.type}`
+    ? `${t('optional')} ${schema.type}`
     : schema.type;
 
   const hasDescription = schema.description || schema.enum;
@@ -54,7 +59,9 @@ const ObjectProperties = ({
               {title}
             </CodeInline>
             <Separator>·</Separator>
-            <Type>{typeLabel}</Type>
+            <Typography variant="snippet-3" color="quaternary">
+              {typeLabel}
+            </Typography>
           </Button>
         </Header>
         {hasDescription && (
@@ -140,13 +147,6 @@ const Separator = styled.span`
     ${createFontStyles('label-3')}
     color: ${theme.color.secondary};
     padding: 0 ${theme.spacing[2]};
-  `}
-`;
-
-const Type = styled.div`
-  ${({ theme }) => css`
-    ${createFontStyles('snippet-2')}
-    color: ${theme.color.secondary};
   `}
 `;
 

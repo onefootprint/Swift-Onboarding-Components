@@ -1,6 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { CodeInline, createFontStyles, Stack } from '@onefootprint/ui';
+import {
+  CodeInline,
+  createFontStyles,
+  Stack,
+  Typography,
+} from '@onefootprint/ui';
 import React from 'react';
 
 type HeaderProps = {
@@ -13,16 +18,16 @@ type HeaderProps = {
 const Header = ({ title, type, isRequired, isInBrackets }: HeaderProps) => {
   const { t } = useTranslation('pages.api-reference');
 
-  const typeLabel = !isRequired
-    ? `${t('optional').toLowerCase()} ${type}`
-    : type;
+  const typeLabel = !isRequired ? `${t('optional')} ${type}` : type;
 
   return (
     <StyledStack align="center" justify="flex-start" gap={3}>
       <Column isInBrackets={isInBrackets}>
         <CodeInline disabled>{title}</CodeInline>
         <Separator>·</Separator>
-        <Type>{typeLabel}</Type>
+        <Typography variant="snippet-3" color="quaternary">
+          {typeLabel}
+        </Typography>
       </Column>
     </StyledStack>
   );
@@ -69,12 +74,6 @@ const Separator = styled.span`
     ${createFontStyles('label-3')}
     color: ${theme.color.secondary};
     padding: 0 ${theme.spacing[2]};
-  `}
-`;
-
-const Type = styled.div`
-  ${({ theme }) => css`
-    color: ${theme.color.secondary};
   `}
 `;
 
