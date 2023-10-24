@@ -38,7 +38,7 @@ export const typography: Typographies = {
   },
   'heading-3': {
     fontWeight: 600,
-    fontSize: '1.236rem',
+    fontSize: '1.1875rem',
     lineHeight: '152%',
   },
   'body-1': {
