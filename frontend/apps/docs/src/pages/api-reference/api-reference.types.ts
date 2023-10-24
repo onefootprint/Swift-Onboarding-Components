@@ -35,25 +35,22 @@ export type ParameterProps = {
   style: string;
 };
 
-export type ArticleProps = {
-  id: string;
+export type Article = {
   description?: string;
-  method?: string;
   parameters?: ParameterProps[];
-  path?: string;
   responses?: Record<string, Content>;
   requestBody?: Content;
   security?: SecurityTypes[];
   tags?: string[];
+  // These are added on top of the open API spec
+  id: string;
+  method: string;
+  path: string;
+  section: string;
 };
 
 export type ParametersProps = {
   parameters: ParameterProps[];
-};
-
-export type ArticlesProps = {
-  staticArticles: ArticleProps[];
-  staticPreviewArticles: ArticleProps[];
 };
 
 // TODO consolidate some of these types even more?

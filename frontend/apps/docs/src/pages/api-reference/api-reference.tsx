@@ -9,10 +9,7 @@ import staticPreviewAPIData from './assets/api-preview-docs.json';
 import Articles from './components/articles/articles';
 import PageNav from './components/page-nav';
 import getArticles from './utils/get-articles';
-import getNavigation from './utils/get-navigation/get-navigation';
 
-const staticNavigation = getNavigation(staticAPIData);
-const staticPreviewNavigation = getNavigation(staticPreviewAPIData);
 const staticArticles = getArticles(staticAPIData);
 const staticPreviewArticles = getArticles(staticPreviewAPIData);
 
@@ -24,12 +21,12 @@ const ApiReference = () => {
       <Seo title={t('html-title')} slug="/api-reference" />
       <Layout>
         <PageNav
-          navigation={staticNavigation}
-          navigationPreviewSection={staticPreviewNavigation}
+          articles={staticArticles}
+          previewArticles={staticPreviewArticles}
         />
         <Articles
-          staticArticles={staticArticles}
-          staticPreviewArticles={staticPreviewArticles}
+          articles={staticArticles}
+          previewArticles={staticPreviewArticles}
         />
       </Layout>
     </Box>

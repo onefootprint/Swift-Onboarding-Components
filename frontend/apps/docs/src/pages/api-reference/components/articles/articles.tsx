@@ -1,39 +1,18 @@
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
-import type { ArticlesProps } from '../../api-reference.types';
+import type { Article as ApiReferenceArticle } from '../../api-reference.types';
 import Article from './components/article';
 
-const Articles = ({ staticArticles, staticPreviewArticles }: ArticlesProps) => (
+export type ArticlesProps = {
+  articles: ApiReferenceArticle[];
+  previewArticles: ApiReferenceArticle[];
+};
+
+const Articles = ({ articles, previewArticles }: ArticlesProps) => (
   <ArticleList id="articles-container">
-    {staticArticles?.map(article => (
-      <Article
-        id={article.id}
-        parameters={article.parameters}
-        description={article.description}
-        method={article.method}
-        path={article.path}
-        security={article.security}
-        responses={article.responses}
-        requestBody={article.requestBody}
-        key={article.id}
-        tags={article.tags}
-      />
-    ))}
-    {staticPreviewArticles?.map(article => (
-      <Article
-        id={article.id}
-        parameters={article.parameters}
-        description={article.description}
-        method={article.method}
-        path={article.path}
-        security={article.security}
-        responses={article.responses}
-        requestBody={article.requestBody}
-        key={article.id}
-        tags={article.tags}
-      />
-    ))}
+    {articles?.map(article => <Article article={article} />)}
+    {previewArticles?.map(article => <Article article={article} />)}
   </ArticleList>
 );
 

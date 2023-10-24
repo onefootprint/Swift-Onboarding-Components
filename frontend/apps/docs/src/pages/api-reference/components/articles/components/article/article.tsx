@@ -5,7 +5,7 @@ import React from 'react';
 import { Element } from 'react-scroll';
 
 import type {
-  ArticleProps,
+  Article as ApiReferenceArticle,
   SecurityTypes,
 } from '@/api-reference/api-reference.types';
 
@@ -19,17 +19,22 @@ import Security from './components/security';
 
 const API_BASE_URL = 'api.onefootprint.com';
 
-const Article = ({
-  id,
-  parameters,
-  description,
-  method,
-  path,
-  security,
-  responses,
-  requestBody,
-}: ArticleProps) => {
+type ArticleProps = {
+  article: ApiReferenceArticle;
+};
+
+const Article = ({ article }: ArticleProps) => {
   const { t } = useTranslation('pages.api-reference');
+  const {
+    id,
+    parameters,
+    description,
+    method,
+    path,
+    security,
+    responses,
+    requestBody,
+  } = article;
   const encodedId = encodeURIComponent(id);
 
   return (
