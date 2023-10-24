@@ -4,6 +4,7 @@ use crate::auth::tenant::TenantSessionAuth;
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::errors::ApiResult;
 use api_core::types::JsonApiResponse;
 use db::models::auth_event::AuthEvent;
@@ -16,7 +17,7 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 pub async fn get(
     state: web::Data<State>,
     request: web::Path<FpId>,
-    auth: TenantSessionAuth,
+    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<Vec<api_wire_types::AuthEvent>> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
