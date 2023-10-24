@@ -37,9 +37,30 @@ const DataCollection = ({
     docType => documentsAsString?.includes(docType),
   );
   const selfie = !!documentsAsString?.includes('selfie');
+  const hasInvestorProfile = mustCollectData.includes('investor_profile');
+  const isKYB = mustCollectData.includes(
+    'business_name' ||
+      'business_address' ||
+      'business_tin' ||
+      'business_kyced_beneficial_owners' ||
+      'business_tin',
+  );
 
   return (
     <Container>
+      {isKYB && (
+        <CollectedInformation
+          title={t('kyb.title')}
+          options={{
+            businessName: mustCollectData.includes('business_name'),
+            businessAddress: mustCollectData.includes('business_address'),
+            businessTin: mustCollectData.includes('business_tin'),
+            businessOwnersKyc: mustCollectData.includes(
+              'business_kyced_beneficial_owners',
+            ),
+          }}
+        />
+      )}
       <CollectedInformation
         title={t('basic-information')}
         options={{
@@ -84,6 +105,12 @@ const DataCollection = ({
         <CollectedInformation
           title={t('non-us-residents.title')}
           subtitle={t('non-us-residents.empty')}
+        />
+      )}
+      {hasInvestorProfile && (
+        <CollectedInformation
+          title={t('investor_profile.title')}
+          subtitle={t('investor_profile.subtitle')}
         />
       )}
       {isDocFirstFlow && (

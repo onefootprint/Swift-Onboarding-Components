@@ -19,6 +19,10 @@ export type Option = Partial<{
   countriesRestrictions: CountryRecord[];
   internationalCountryRestrictions: CountryCode[] | null;
   ssnDocScanStepUp: boolean | null;
+  businessName: boolean;
+  businessAddress: boolean;
+  businessTin: boolean;
+  businessOwnersKyc: boolean;
 
   // AML
   enhancedAml: boolean;
