@@ -124,6 +124,7 @@ impl FirmEmployeeAssumeAuth {
                 TenantScope::ManualReview,
                 TenantScope::OnboardingConfiguration,
                 TenantScope::ApiKeys,
+                TenantScope::ManageWebhooks,
             ]
         } else {
             vec![]
@@ -191,6 +192,7 @@ mod test {
         TenantScope::ManualReview,
         TenantScope::OnboardingConfiguration,
         TenantScope::ApiKeys,
+        TenantScope::ManageWebhooks,
     ])]
     fn test_roles(conn: &mut TestPgConn, is_risk_ops: bool) -> Vec<TenantScope> {
         let tenant = db::tests::fixtures::tenant::create(conn);
