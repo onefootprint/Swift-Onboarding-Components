@@ -68,7 +68,7 @@ fn vault_complete_images(
         .into_iter()
         .map(|u| {
             let mime_type = vw
-                .get_mime_type(DocumentKind::Image(dk, u.side))
+                .get_mime_type(DocumentKind::LatestUpload(dk, u.side))
                 .unwrap_or("image/png");
             let file_extension = mime_type_to_extension(mime_type).unwrap_or("png");
             let kind = DocumentKind::from_id_doc_kind(dk, u.side).into();
