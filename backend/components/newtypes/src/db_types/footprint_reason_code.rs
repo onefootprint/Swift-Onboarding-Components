@@ -684,7 +684,7 @@ footprint_reason_code_enum! {
         DocumentRequiresReview,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
-        #[note = "Document expired", severity = SignalSeverity::Medium,  description = "The document is expired."]
+        #[note = "Document expired", severity = SignalSeverity::High,  description = "The document is expired."]
         DocumentExpired,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
