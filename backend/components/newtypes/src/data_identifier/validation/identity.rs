@@ -131,7 +131,7 @@ fn clean_and_validate_ssn9(input: PiiString) -> VResult<PiiString> {
     Ok(input)
 }
 
-#[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString)]
+#[derive(Debug, Clone, Copy, DeserializeFromStr, EnumString, PartialEq, Eq)]
 #[strum(serialize_all = "snake_case")]
 pub enum UsLegalStatus {
     Citizen,

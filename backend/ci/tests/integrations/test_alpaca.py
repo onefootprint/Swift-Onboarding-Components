@@ -7,22 +7,57 @@ from tests.constants import FIXTURE_PHONE_NUMBER
 import json
 from alpaca.broker.client import BrokerClient
 import datetime
+from enum import Enum, auto
 
 ALPACA_SANDBOX_API_KEY = "CK9ANXZG595Q7CHXAXX3"
 ALPACA_SANDBOX_API_SECRET = "WBJf7VgZmE0oFBdFFCItK49p41jwpdLX9tcg9gsV"
 
 
-@pytest.fixture(scope="session")
-def alpaca_kyc_ob_config(sandbox_tenant, must_collect_data, can_access_data):
+def alpaca_kyc_ob_config(sandbox_tenant, must_collect_data):
     return create_ob_config(
         sandbox_tenant,
         "Alpaca",
-        must_collect_data + ["investor_profile"],
-        can_access_data + ["investor_profile"],
+        must_collect_data,
+        must_collect_data,
         "alpaca",
     )
 
 
+class NationalityConfig(Enum):
+    UsLegalStatusCitizen = (
+        auto()
+    )  # Tenant is configured to collect UseLegalStatus and the user is a citizen
+    UsLegalStatusPermanentResidence = (
+        auto()
+    )  # Tenant is configured to collect UseLegalStatus and the user is not a citizen
+    Nationality = auto()  # Tenant is configured to collect Nationality
+    Neither = (
+        auto()
+    )  # Tenant is not configured to collect either Nationality or UsLegalStatus (like Bloom)
+
+
+def cdos_for_nationality_config(nationality_config):
+    # oh man our CLI is still python 3.9 which doesnt support match statements
+    if (
+        nationality_config == NationalityConfig.UsLegalStatusCitizen
+        or nationality_config == NationalityConfig.UsLegalStatusPermanentResidence
+    ):
+        return ["us_legal_status"]
+    elif nationality_config == NationalityConfig.Nationality:
+        return ["nationality"]
+    elif nationality_config == NationalityConfig.Neither:
+        return []
+
+
+@pytest.mark.parametrize(
+    "nationality_config",
+    [
+        (NationalityConfig.UsLegalStatusCitizen),
+        (NationalityConfig.UsLegalStatusPermanentResidence),
+        (NationalityConfig.Nationality),
+        (NationalityConfig.Neither),
+    ],
+)
 @pytest.mark.parametrize(
     "sandbox_outcome,expected_error",
     [
@@ -33,21 +68,56 @@ def alpaca_kyc_ob_config(sandbox_tenant, must_collect_data, can_access_data):
     ],
 )
 def test_alpaca_cip(
-    sandbox_tenant, twilio, alpaca_kyc_ob_config, sandbox_outcome, expected_error
+    sandbox_tenant,
+    twilio,
+    sandbox_outcome,
+    expected_error,
+    nationality_config,
 ):
     # create a new user that has onboarded
     # Alpaca doesn't allow duplicate emails, so we create a nonce'd one
     seed = _gen_random_n_digit_number(10)
     sandbox_id = f"{sandbox_outcome}{seed}"
     email = f"footprint.user.dev.{_gen_random_n_digit_number(10)}@gmail.com"
+    obc = alpaca_kyc_ob_config(
+        sandbox_tenant,
+        [
+            "name",
+            "ssn9",
+            "full_address",
+            "email",
+            "phone_number",
+            "dob",
+            "investor_profile",
+        ]
+        + cdos_for_nationality_config(nationality_config),
+    )
     bifrost = BifrostClient.create(
-        alpaca_kyc_ob_config,
+        obc,
         twilio,
         FIXTURE_PHONE_NUMBER,
         sandbox_id,
         override_email=email,
     )
     bifrost.vault_barcode_with_doc = False  # hack cause /vault barfs when trying to vault barcode during stepup because stepup workflow state only gives the AddDocument guard, not the AddData guard
+
+    # handle nationality option
+    expected_nationality = None
+    if nationality_config == NationalityConfig.UsLegalStatusCitizen:
+        bifrost.data.pop("id.nationality")
+        bifrost.data["id.us_legal_status"] = "citizen"
+        expected_nationality = "US"
+    elif nationality_config == NationalityConfig.UsLegalStatusPermanentResidence:
+        bifrost.data["id.us_legal_status"] = "permanent_resident"
+        bifrost.data["id.nationality"] = "ZA"
+        bifrost.data["id.citizenships"] = ["ZA"]
+        expected_nationality = "ZA"
+    elif nationality_config == NationalityConfig.Nationality:
+        bifrost.data["id.nationality"] = "ZA"
+        expected_nationality = "ZA"
+    elif nationality_config == NationalityConfig.Neither:
+        pass
+
     user = bifrost.run()
     d = user.client.data
 
@@ -166,6 +236,8 @@ def test_alpaca_cip(
             body["alpaca_response"]["kyc"]["applicant_name"]
             == f"{d['id.first_name']} {d['id.last_name']}"
         )
+
+        assert body["alpaca_response"]["kyc"]["nationality"] == expected_nationality
 
         expected_approved_reason = None
         if sandbox_outcome == "stepup":

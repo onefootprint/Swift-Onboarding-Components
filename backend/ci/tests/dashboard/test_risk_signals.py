@@ -5,10 +5,10 @@ from tests.utils import get, post
 from tests.integrations.test_alpaca import alpaca_kyc_ob_config
 
 
-def test_aml(sandbox_tenant, twilio, alpaca_kyc_ob_config):
+def test_aml(sandbox_tenant, twilio, must_collect_data):
     sandbox_id = f"manualreview{_gen_random_n_digit_number(10)}"
     bifrost = BifrostClient.create(
-        alpaca_kyc_ob_config,
+        alpaca_kyc_ob_config(sandbox_tenant, must_collect_data + ["investor_profile"]),
         twilio,
         FIXTURE_PHONE_NUMBER,
         sandbox_id,

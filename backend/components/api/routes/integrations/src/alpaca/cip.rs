@@ -182,6 +182,7 @@ pub(crate) async fn create_cip_request(
                 Id(AddressLine1),
                 Id(AddressLine2),
                 Id(Nationality),
+                Id(UsLegalStatus),
                 Id(Zip),
                 Id(Country),
                 Document(OcrData(IdDocKind::DriversLicense, OcrDataKind::DocumentNumber)),
@@ -282,6 +283,20 @@ fn kyc(
     .flat_map(|id| decrypted_data.get_di(id).ok())
     .next();
 
+    let nationality = if let Ok(nationality) = decrypted_data.get_di(Nationality) {
+        Some(nationality)
+    } else if let Ok(us_legal_status) = decrypted_data.get_di(UsLegalStatus) {
+        if newtypes::UsLegalStatus::try_from(us_legal_status.leak()).ok()
+            == Some(newtypes::UsLegalStatus::Citizen)
+        {
+            Some(PiiString::from("US")) // for now we treat citizen as meaning nationality US. soon we will explicitly capture nationality for citizens too
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+
     let kyc = alpaca::Kyc {
         id: scoped_vault.fp_id.clone(),
         applicant_name: format_pii!(
@@ -290,7 +305,7 @@ fn kyc(
             decrypted_data.get_di(LastName)?
         ),
         email_address: decrypted_data.get_di(Email)?,
-        nationality: decrypted_data.get_di(Nationality).ok(),
+        nationality,
         date_of_birth: decrypted_data.get_di(Dob)?,
         address: if let Ok(address2) = decrypted_data.get_di(AddressLine2) {
             format_pii!("{} {}", decrypted_data.get_di(AddressLine1)?, address2)
