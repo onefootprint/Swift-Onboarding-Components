@@ -3,7 +3,8 @@ import { HeaderTitle, NavigationHeader } from '@onefootprint/idv-elements';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDocOutcome, OverallOutcome } from '@onefootprint/types';
 import { Box, Button, Grid } from '@onefootprint/ui';
-import React from 'react';
+import { noop } from 'lodash';
+import React, { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import type { SandboxOutcomeFormData } from '../../types';
@@ -20,7 +21,10 @@ export const SandboxOutcomeContainer = ({
   config?: PublicOnboardingConfig;
 }) => {
   const { t } = useTranslation('pages.sandbox-outcome');
-  const shouldShowIdDocOutcome = config?.requiresIdDoc;
+  const requiresIdDoc = !!config?.requiresIdDoc;
+  const shouldShowStepUp = !!config?.isStepupEnabled;
+  const [shouldShowStepUpIdDocOutcome] = useState<boolean>(false);
+  const shouldShowIdDocOutcome = shouldShowStepUpIdDocOutcome || requiresIdDoc;
   const formMethods = useForm<SandboxOutcomeFormData>({
     defaultValues: {
       outcomes: {
@@ -47,12 +51,17 @@ export const SandboxOutcomeContainer = ({
           gap={5}
           onSubmit={handleSubmit(onSubmit)}
         >
+          <OverallOutcomeSelect
+            shouldShowStepUp={shouldShowStepUp}
+            requiresIdDoc={requiresIdDoc}
+            onStepUpSelect={noop} // TODO: show id-doc outcome selector when BE is ready
+            onStepUpDeselect={noop} // TODO: show id-doc outcome selector when BE is ready
+          />
           {shouldShowIdDocOutcome && (
             <IdDocOutcomeSelect
               allowRealOutcome={config?.canMakeRealDocScanCallsInSandbox}
             />
           )}
-          <OverallOutcomeSelect />
           <TestIdInput />
           <Button fullWidth type="submit" disabled={!!errors?.testID}>
             {t('cta')}

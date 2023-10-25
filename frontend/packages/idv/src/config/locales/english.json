@@ -35,6 +35,9 @@
             },
             "fail": {
               "title": "Fail"
+            },
+            "step-up": {
+              "title": "Step up"
             }
           }
         },

@@ -30,6 +30,7 @@ export type PublicOnboardingConfig = {
   allowInternationalResidents: boolean;
   supportedCountries?: CountryCode[];
   canMakeRealDocScanCallsInSandbox?: boolean;
+  isStepupEnabled?: boolean;
 };
 
 // Used in the dashboard context

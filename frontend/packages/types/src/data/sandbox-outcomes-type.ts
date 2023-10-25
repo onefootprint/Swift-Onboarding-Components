@@ -3,6 +3,7 @@ export enum OverallOutcome {
   manualReview = 'manual_review',
   fail = 'fail',
   documentDecision = 'document_decision',
+  stepUp = 'step_up',
 }
 
 export enum IdDocOutcome {

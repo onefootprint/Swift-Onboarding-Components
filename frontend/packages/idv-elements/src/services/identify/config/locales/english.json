@@ -7,7 +7,8 @@
           "success": "Success",
           "fail": "Failure",
           "manual-review": "Manual Review",
-          "document-decision": "ID Doc Decision"
+          "document-decision": "ID Doc Decision",
+          "step-up": "ID Doc Decision"
         }
       },
       "testID": "Test ID:"

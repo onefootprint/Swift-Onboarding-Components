@@ -7,19 +7,38 @@ import { Controller, useFormContext } from 'react-hook-form';
 
 import OutcomeSelect from '../outcome-select';
 
-const OverallOutcomeSelect = () => {
+type OverallOutcomeSelectProps = {
+  shouldShowStepUp: boolean;
+  requiresIdDoc: boolean;
+  onStepUpSelect: () => void;
+  onStepUpDeselect: () => void;
+};
+
+const OverallOutcomeSelect = ({
+  shouldShowStepUp,
+  requiresIdDoc,
+  onStepUpSelect,
+  onStepUpDeselect,
+}: OverallOutcomeSelectProps) => {
   const { t } = useTranslation('pages.sandbox-outcome.overall-outcome');
   const { control, watch, setValue } = useFormContext();
   const watchIdDocOutcome = watch('outcomes.idDocOutcome');
+  const watchOverallOutcome = watch('outcomes.overallOutcome');
   const [hint, setHint] = useState('');
 
   useEffect(() => {
-    if (watchIdDocOutcome === IdDocOutcome.fail) {
+    if (
+      watchIdDocOutcome === IdDocOutcome.fail &&
+      watchOverallOutcome !== OverallOutcome.stepUp
+    ) {
       setValue('outcomes.overallOutcome', OverallOutcome.fail);
       setHint(t('hint.id-doc-fail'));
       return;
     }
-    if (watchIdDocOutcome === IdDocOutcome.real) {
+    if (
+      watchIdDocOutcome === IdDocOutcome.real &&
+      watchOverallOutcome !== OverallOutcome.stepUp
+    ) {
       setValue('outcomes.overallOutcome', OverallOutcome.documentDecision);
       setHint(t('hint.id-doc-real'));
       return;
@@ -27,6 +46,40 @@ const OverallOutcomeSelect = () => {
     setHint('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setValue, watchIdDocOutcome]);
+
+  useEffect(() => {
+    if (watchOverallOutcome === OverallOutcome.stepUp) {
+      onStepUpSelect();
+      if (watchIdDocOutcome === undefined)
+        setValue('outcomes.idDocOutcome', IdDocOutcome.success);
+    } else {
+      onStepUpDeselect();
+      if (!requiresIdDoc) setValue('outcomes.idDocOutcome', undefined);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setValue, watchIdDocOutcome, watchOverallOutcome]);
+
+  const options = [
+    {
+      title: t('outcome.options.success.title'),
+      value: OverallOutcome.success,
+    },
+    {
+      title: t('outcome.options.manual-review.title'),
+      value: OverallOutcome.manualReview,
+    },
+    {
+      title: t('outcome.options.fail.title'),
+      value: OverallOutcome.fail,
+    },
+  ];
+
+  if (shouldShowStepUp) {
+    options.push({
+      title: t('outcome.options.step-up.title'),
+      value: OverallOutcome.stepUp,
+    });
+  }
 
   return (
     <Container>
@@ -37,20 +90,7 @@ const OverallOutcomeSelect = () => {
         render={({ field }) => (
           <Box>
             <OutcomeSelect
-              options={[
-                {
-                  title: t('outcome.options.success.title'),
-                  value: OverallOutcome.success,
-                },
-                {
-                  title: t('outcome.options.manual-review.title'),
-                  value: OverallOutcome.manualReview,
-                },
-                {
-                  title: t('outcome.options.fail.title'),
-                  value: OverallOutcome.fail,
-                },
-              ]}
+              options={options}
               value={field.value}
               onChange={field.onChange}
               testID="overallOutcomeOption"

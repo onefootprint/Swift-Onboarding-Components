@@ -19,6 +19,7 @@ const SandboxOutcomeFooter = ({
     [OverallOutcome.manualReview]: t('outcome.options.manual-review'),
     [OverallOutcome.fail]: t('outcome.options.fail'),
     [OverallOutcome.documentDecision]: t('outcome.options.document-decision'),
+    [OverallOutcome.stepUp]: t('outcome.options.step-up'),
   };
 
   return sandboxId ? (
