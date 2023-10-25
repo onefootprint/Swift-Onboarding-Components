@@ -10,6 +10,7 @@ use db::models::task::Task;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::models::verification_request::{RequestAndMaybeResult, VerificationRequest};
+use db::models::verification_result::VerificationResult;
 use db::models::watchlist_check::WatchlistCheck;
 use db::tests::fixtures;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
@@ -104,7 +105,7 @@ async fn run_task(state: &mut State, sv_id: &ScopedVaultId, task_id: &TaskId) ->
     wct.execute(&args).await
 }
 
-async fn save_existing_watchlist_check_vres(state: &mut State, sv_id: &ScopedVaultId) {
+async fn save_existing_watchlist_check_vres(state: &mut State, sv_id: &ScopedVaultId) -> VerificationResult {
     let sv_id = sv_id.clone();
     let res = idv::tests::fixtures::incode::watchlist_result_response(vec![]);
     let vr = Ok(VendorResponse {
@@ -116,7 +117,7 @@ async fn save_existing_watchlist_check_vres(state: &mut State, sv_id: &ScopedVau
         .db_query(move |conn| {
             let v = Vault::get(conn, &sv_id).unwrap();
             let di = DecisionIntent::create(conn, DecisionIntentKind::OnboardingKyc, &sv_id, None).unwrap();
-            let (_vreq, _vres) = crate::decision::vendor::verification_result::save_vreq_and_vres(
+            let (_vreq, vres) = crate::decision::vendor::verification_result::save_vreq_and_vres(
                 conn,
                 &v.public_key,
                 &sv_id,
@@ -124,6 +125,7 @@ async fn save_existing_watchlist_check_vres(state: &mut State, sv_id: &ScopedVau
                 vr,
             )
             .unwrap();
+            vres
         })
         .await
         .unwrap()

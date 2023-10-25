@@ -9,7 +9,7 @@ use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::TxnPgConn;
 use itertools::Itertools;
 use newtypes::{
-    DataIdentifier, IdentityDataKind as IDK, KycState, OnboardingStatus, PiiString, WorkflowState, Locked,
+    DataIdentifier, IdentityDataKind as IDK, KycState, Locked, OnboardingStatus, PiiString, WorkflowState,
 };
 use newtypes::{TenantId, VaultKind};
 use rand::Rng;
@@ -87,7 +87,7 @@ pub fn create_user_and_onboarding(
     let wf = Workflow::lock(conn, &wf.id).unwrap();
     let update = WorkflowUpdate::set_status(onboarding_status);
     let wf = Workflow::update(wf, conn, update).unwrap();
-    let wf_id = Locked::new(wf.id.clone());
+    let wf_id = Locked::new(wf.id);
     let wf = Workflow::update_state(
         conn,
         wf_id,

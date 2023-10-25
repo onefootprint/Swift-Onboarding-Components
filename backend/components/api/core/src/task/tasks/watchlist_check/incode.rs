@@ -3,6 +3,7 @@ use crate::decision::vendor::vendor_result::VendorResult;
 use crate::decision::{self};
 use crate::errors::ApiResult;
 use crate::State;
+use chrono::{Duration, Utc};
 use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::NewRiskSignalInfo;
@@ -39,12 +40,18 @@ pub async fn complete_vendor_call(
 
     // TODO: check 365 days
     // TODO: check if vault data has changed
-    let latest_watchlist_check_ref =
+    let latest_watchlist_check =
         watchlist_check_ref_from_latest_vres(state, user_vault_private_key, latest_watchlist_check_vres)
             .await?;
 
-    let kind = match latest_watchlist_check_ref {
-        Some(ref_) => WatchlistCheckKind::GetUpdatedResults(ref_),
+    let kind = match latest_watchlist_check {
+        Some((vres, ref_)) => {
+            if Utc::now() > vres.timestamp + Duration::days(365) {
+                WatchlistCheckKind::MakeNewSearch
+            } else {
+                WatchlistCheckKind::GetUpdatedResults(ref_)
+            }
+        }
         None => WatchlistCheckKind::MakeNewSearch,
     };
 
@@ -65,7 +72,7 @@ async fn watchlist_check_ref_from_latest_vres(
     state: &State,
     user_vault_private_key: &EncryptedVaultPrivateKey,
     latest_watchlist_check_vres: Option<RequestAndResult>,
-) -> ApiResult<Option<IncodeWatchlistResultRef>> {
+) -> ApiResult<Option<(VerificationResult, IncodeWatchlistResultRef)>> {
     let watchlist_ref = if let Some(latest_watchlist_check_vres) = latest_watchlist_check_vres {
         let vreq_vres = VendorResult::hydrate_vendor_result(
             latest_watchlist_check_vres,
@@ -76,9 +83,11 @@ async fn watchlist_check_ref_from_latest_vres(
         if let Some(vres) = vreq_vres.vres {
             if let Some(res) = vres.response {
                 if let ParsedResponse::IncodeWatchlistCheck(wc) = res.response {
-                    wc.content
-                        .as_ref()
-                        .and_then(|c| c.data.as_ref().and_then(|d| d.ref_.clone()))
+                    wc.content.as_ref().and_then(|c| {
+                        c.data
+                            .as_ref()
+                            .and_then(|d| d.ref_.clone().map(|r| (vres.vres.clone(), r)))
+                    })
                 } else {
                     None
                 }

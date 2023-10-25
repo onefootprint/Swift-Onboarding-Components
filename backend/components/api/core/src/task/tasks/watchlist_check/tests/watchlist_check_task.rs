@@ -1,10 +1,12 @@
 use crate::task::tasks::watchlist_check::tests::*;
 use crate::task::TaskError;
 use crate::State;
+use chrono::Duration;
+use chrono::Utc;
 use db::test_helpers::assert_have_same_elements;
-use db::tests::test_db_pool::TestDbPool;
+use db_schema::schema::verification_result;
+use diesel::prelude::*;
 use feature_flag::MockFeatureFlagClient;
-use macros::test_state;
 use macros::test_state_case;
 use newtypes::FootprintReasonCode;
 use newtypes::VendorAPI;
@@ -228,8 +230,15 @@ async fn active_users(
     }
 }
 
-#[test_state]
-async fn incode_no_existing_watchlist_check_vres(state: &mut State) {
+enum ExistingSearchCase {
+    NoVres,
+    VresOlderThan365Days,
+}
+
+#[test_state_case(ExistingSearchCase::NoVres)]
+#[test_state_case(ExistingSearchCase::VresOlderThan365Days)]
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+async fn incode_no_existing_watchlist_check_vres(state: &mut State, case: ExistingSearchCase) {
     // SETUP
     let (sv, task) = create_user_and_task(
         &state.db_pool,
@@ -239,6 +248,24 @@ async fn incode_no_existing_watchlist_check_vres(state: &mut State) {
         full_vault(),
     )
     .await;
+
+    match case {
+        ExistingSearchCase::NoVres => {}
+        ExistingSearchCase::VresOlderThan365Days => {
+            let vres = save_existing_watchlist_check_vres(state, &sv.id).await;
+            state
+                .db_pool
+                .db_query(move |conn| {
+                    diesel::update(verification_result::table)
+                        .filter(verification_result::id.eq(vres.id))
+                        .set(verification_result::timestamp.eq(Utc::now() - Duration::days(366)))
+                        .execute(conn)
+                        .unwrap();
+                })
+                .await
+                .unwrap();
+        }
+    }
 
     // No vres for IncodeWatchlistCheck exists! Theoretically an impossible scenario (cause we should have made such a call when the sv was onboarded) but still good to handle and this will be extended to handle 2 more cases where a fresh search must be performed: (1) if its been >365d
     let mut mock_ff_client = MockFeatureFlagClient::new();

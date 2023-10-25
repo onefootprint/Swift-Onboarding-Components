@@ -124,7 +124,16 @@ mockall = { workspace = true }
 opentelemetry_api = { workspace = true }
 
 criterion = { version = "0.5.1", features = ["html_reports"] }
-
+# i-implement-a-third-party-backend-and-opt-into-breaking-changes only needed for our InstrumentedPgConnection
+diesel = { workspace = true, features = [
+    "extras",
+    "uuid",
+    "postgres",
+    "i-implement-a-third-party-backend-and-opt-into-breaking-changes",
+] }
+diesel-derive-newtype = { workspace = true }
+diesel_migrations = { workspace = true }
+db_schema = { path = "../../db/schema" }
 
 [[bench]]
 name = "api_error"
