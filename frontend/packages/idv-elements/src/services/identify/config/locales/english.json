@@ -86,7 +86,8 @@
       "label": "Email",
       "title": "Verify your email",
       "welcome-back-title": "Welcome back! 🎉",
-      "prompt": "Enter the 6-digit code sent to {{email}}."
+      "prompt-with-email": "Enter the 6-digit code sent to {{email}}.",
+      "prompt-without-email": "Enter the 6-digit code sent to your email."
     },
     "biometric-challenge": {
       "label": "Passkey",

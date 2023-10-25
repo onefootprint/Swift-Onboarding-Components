@@ -58,10 +58,6 @@ pub async fn post(
     telemetry_headers: TelemetryHeaders,
     root_span: RootSpan,
 ) -> JsonApiResponse<LoginChallengeResponse> {
-    // TODO do we want to make this more similar to signup_challenge and have it return an unauthed token?
-    let tenant = ob_context.as_ref().map(|obc| obc.tenant().clone());
-    let tenant = tenant.as_ref();
-
     let AuthChallengeRequest {
         identifier,
         preferred_challenge_kind,
@@ -88,6 +84,7 @@ pub async fn post(
     let UserChallengeContext {
         vw,
         webauthn_creds: creds,
+        tenant,
         ..
     } = ctx;
 
@@ -117,8 +114,9 @@ pub async fn post(
             ChallengeKind::Sms => {
                 let phone_number = vw.get_decrypted_verified_primary_phone(&state).await?;
                 let s_id = telemetry_headers.session_id;
+                let t = tenant.as_ref();
                 let (rx, challenge_state, time_before_retry_s) = twilio_client
-                    .send_challenge_non_blocking(&state, tenant, &phone_number, vault_id, sandbox_id, s_id)
+                    .send_challenge_non_blocking(&state, t, &phone_number, vault_id, sandbox_id, s_id)
                     .await?;
                 let challenge_data = ChallengeData::Sms(challenge_state);
                 (
@@ -131,10 +129,10 @@ pub async fn post(
             }
             ChallengeKind::Email => {
                 let email = vw.get_decrypted_verified_email(&state).await?;
-                let tenant = tenant.ok_or(OnboardingError::MissingObPkAuth)?;
+                let tenant = tenant.ok_or(OnboardingError::NoTenantForEmailChallenge)?;
 
                 let challenge_data =
-                    send_email_challenge_non_blocking(&state, &email, vault_id, tenant, sandbox_id)?;
+                    send_email_challenge_non_blocking(&state, &email, vault_id, &tenant, sandbox_id)?;
 
                 (
                     None,

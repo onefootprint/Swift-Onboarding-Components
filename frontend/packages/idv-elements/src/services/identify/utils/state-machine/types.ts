@@ -38,6 +38,19 @@ export type MachineChallengeContext = {
   authToken?: string;
 };
 
+export type IdentifiedEvent = {
+  type: 'identified';
+  payload: {
+    email?: string;
+    phoneNumber?: string;
+    successfulIdentifier?: Identifier;
+    userFound: boolean;
+    isUnverified: boolean;
+    availableChallengeKinds?: ChallengeKind[];
+    hasSyncablePassKey?: boolean;
+  };
+};
+
 export type MachineEvents =
   | {
       type: 'bootstrapDataInvalid';
@@ -51,18 +64,7 @@ export type MachineEvents =
   | {
       type: 'authTokenInvalid';
     }
-  | {
-      type: 'identified';
-      payload: {
-        email?: string;
-        phoneNumber?: string;
-        successfulIdentifier?: Identifier;
-        userFound: boolean;
-        isUnverified: boolean;
-        availableChallengeKinds?: ChallengeKind[];
-        hasSyncablePassKey?: boolean;
-      };
-    }
+  | IdentifiedEvent
   | {
       type: 'identifyFailed';
       payload: {

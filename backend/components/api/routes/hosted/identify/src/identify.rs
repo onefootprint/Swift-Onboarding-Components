@@ -67,10 +67,10 @@ pub async fn post(
     };
 
     let UserChallengeContext {
-        vw: _,
         webauthn_creds,
         challenge_kinds,
         is_unverified,
+        ..
     } = ctx;
 
     let has_syncable_pass_key = webauthn_creds.iter().any(|cred| cred.backup_state);

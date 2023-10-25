@@ -1,6 +1,5 @@
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::user::CheckedUserAuthContext;
-use api_core::errors::ApiError;
 use api_core::errors::ApiResult;
 use api_core::telemetry::RootSpan;
 use api_core::utils::challenge::ChallengeToken;
@@ -61,6 +60,7 @@ impl From<ContactInfoKind> for ChallengeKind {
 pub struct UserChallengeData {
     challenge_kind: ChallengeKind,
     challenge_token: ChallengeToken,
+    /// For login challenges, provide some context on where the challenge was sent
     scrubbed_phone_number: Option<PiiString>,
     biometric_challenge_json: Option<String>,
     time_before_retry_s: i64,
@@ -118,6 +118,7 @@ pub struct UserChallengeContext {
     webauthn_creds: Vec<WebauthnCredential>,
     challenge_kinds: Vec<ChallengeKind>,
     is_unverified: bool,
+    tenant: Option<Tenant>,
 }
 
 #[allow(clippy::type_complexity)]
@@ -127,7 +128,7 @@ async fn get_user_challenge_context(
     identifier: VaultIdentifier,
     obc: Option<ObConfigAuth>,
     root_span: RootSpan,
-) -> Result<Option<UserChallengeContext>, ApiError> {
+) -> ApiResult<Option<UserChallengeContext>> {
     // Look up existing user vault by identifier
     let t_id = obc.as_ref().map(|obc| &obc.tenant().id);
     let (existing_user, sv_id) = match identifier {
@@ -143,16 +144,18 @@ async fn get_user_challenge_context(
     // Record some properties on the root span
     root_span.record("vault_id", existing_user.id.to_string());
 
-    let (uvw, creds) = state
+    let (uvw, creds, tenant) = state
         .db_pool
-        .db_query(move |conn| -> Result<_, ApiError> {
+        .db_query(move |conn| -> ApiResult<_> {
             // Add some log fields to the root span. Prefer info from the sv_id, otherwise look
             // through the obc
-            if let Some(sv_id) = sv_id.as_ref() {
+            let tenant = if let Some(sv_id) = sv_id.as_ref() {
                 let sv = ScopedVault::get(conn, sv_id)?;
                 root_span.record("tenant_id", sv.tenant_id.to_string());
                 root_span.record("is_live", sv.is_live);
                 root_span.record("fp_id", sv.fp_id.to_string());
+                let tenant = Tenant::get(conn, &sv.tenant_id)?;
+                Some(tenant)
             } else if let Some(obc) = obc {
                 root_span.record("tenant_id", obc.tenant().id.to_string());
                 root_span.record("is_live", obc.ob_config().is_live);
@@ -161,7 +164,11 @@ async fn get_user_challenge_context(
                 if let Some(sv) = ScopedVault::get(conn, (&existing_user.id, t_id)).optional()? {
                     root_span.record("fp_id", sv.fp_id.to_string());
                 }
-            }
+                let tenant = Tenant::get(conn, t_id)?;
+                Some(tenant)
+            } else {
+                None
+            };
 
             let args = if let Some(sv_id) = sv_id.as_ref() {
                 // If we have already identified a specific SV, create a UVW that sees all
@@ -175,7 +182,7 @@ async fn get_user_challenge_context(
             let uvw = VaultWrapper::build(conn, args)?;
 
             let creds = WebauthnCredential::list(conn, &uvw.vault.id)?;
-            Ok((uvw, creds))
+            Ok((uvw, creds, tenant))
         })
         .await??;
 
@@ -214,6 +221,7 @@ async fn get_user_challenge_context(
         webauthn_creds: creds,
         challenge_kinds: kinds,
         is_unverified,
+        tenant,
     };
     Ok(Some(ctx))
 }

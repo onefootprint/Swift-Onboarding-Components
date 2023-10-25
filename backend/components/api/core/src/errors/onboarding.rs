@@ -42,6 +42,10 @@ pub enum OnboardingError {
     MissingBoOnboardingDecision(Csv<WorkflowId>),
     #[error("Need to provide onboarding public key auth in order to start a sign-up session")]
     MissingObPkAuth,
+    #[error(
+        "Need to provide onboarding public key or identified auth in order to initiate an email challenge"
+    )]
+    NoTenantForEmailChallenge,
     #[error("Not expecting a selfie image to be uploaded")]
     NotExpectingSelfie,
     #[error("Unsupported document country. Supported document countries: {0}")]

@@ -262,6 +262,7 @@ impl Vault {
                 return Ok(unique.into_iter().next());
             }
 
+            // NOTE: i have seen this happen with an email fingerprint
             // in this case, more than 1 vault have non-verified claims for this email address
             // so we cannot be sure which user vault we are trying to identify
             // TODO add actual information so we can debug this

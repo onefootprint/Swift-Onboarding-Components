@@ -8,7 +8,7 @@ import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 import { getCanChallengeBiometrics } from '../biometrics';
-import type { MachineContext, MachineEvents } from './types';
+import type { IdentifiedEvent, MachineContext, MachineEvents } from './types';
 import validateMachineArgs from './utils/get-sanitized-args';
 import shouldBootstrap from './utils/should-bootstrap';
 import shouldChallengeEmail from './utils/should-challenge-email';
@@ -28,6 +28,36 @@ export type IdentifyMachineArgs = {
   obConfigAuth?: ObConfigAuth;
   showLogo?: boolean;
 };
+
+const InitiateChallengeTransitions = [
+  {
+    target: 'emailChallenge',
+    actions: ['assignIdentifySuccessResult'],
+    description: 'Initiate a signup challenge for the email in no-phone flows',
+    cond: (context: MachineContext, event: IdentifiedEvent) =>
+      shouldChallengeEmail(
+        !!context.config.isNoPhoneFlow,
+        event.payload.availableChallengeKinds,
+      ),
+  },
+  {
+    target: 'biometricChallenge',
+    actions: ['assignIdentifySuccessResult'],
+    cond: (context: MachineContext, event: IdentifiedEvent) => {
+      const { device } = context;
+      const { availableChallengeKinds, hasSyncablePassKey } = event.payload;
+      return !!getCanChallengeBiometrics(
+        availableChallengeKinds,
+        hasSyncablePassKey,
+        device,
+      );
+    },
+  },
+  {
+    target: 'smsChallenge',
+    actions: ['assignIdentifySuccessResult'],
+  },
+];
 
 const createIdentifyMachine = (args: IdentifyMachineArgs) =>
   createMachine(
@@ -65,26 +95,7 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
             authTokenInvalid: {
               target: 'authTokenInvalid',
             },
-            identified: [
-              {
-                target: 'biometricChallenge',
-                actions: ['assignIdentifySuccessResult'],
-                cond: (context, event) => {
-                  const { device } = context;
-                  const { availableChallengeKinds, hasSyncablePassKey } =
-                    event.payload;
-                  return !!getCanChallengeBiometrics(
-                    availableChallengeKinds,
-                    hasSyncablePassKey,
-                    device,
-                  );
-                },
-              },
-              {
-                target: 'smsChallenge',
-                actions: ['assignIdentifySuccessResult'],
-              },
-            ],
+            identified: InitiateChallengeTransitions,
           },
         },
         initBootstrap: {
@@ -123,37 +134,7 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
                 cond: (context, event) => !event.payload.phoneNumber,
               },
             ],
-            identified: [
-              {
-                target: 'emailChallenge',
-                actions: ['assignIdentifySuccessResult'],
-                description:
-                  'Initiate a signup challenge for the email in no-phone flows',
-                cond: (context, event) =>
-                  shouldChallengeEmail(
-                    !!context.config.isNoPhoneFlow,
-                    event.payload.availableChallengeKinds,
-                  ),
-              },
-              {
-                target: 'biometricChallenge',
-                actions: ['assignIdentifySuccessResult'],
-                cond: (context, event) => {
-                  const { device } = context;
-                  const { availableChallengeKinds, hasSyncablePassKey } =
-                    event.payload;
-                  return !!getCanChallengeBiometrics(
-                    availableChallengeKinds,
-                    hasSyncablePassKey,
-                    device,
-                  );
-                },
-              },
-              {
-                target: 'smsChallenge',
-                actions: ['assignIdentifySuccessResult'],
-              },
-            ],
+            identified: InitiateChallengeTransitions,
           },
         },
         emailIdentification: {
@@ -210,26 +191,7 @@ const createIdentifyMachine = (args: IdentifyMachineArgs) =>
               target: 'emailIdentification',
               actions: ['reset'],
             },
-            identified: [
-              {
-                target: 'biometricChallenge',
-                actions: ['assignIdentifySuccessResult'],
-                cond: (context, event) => {
-                  const { device } = context;
-                  const { availableChallengeKinds, hasSyncablePassKey } =
-                    event.payload;
-                  return !!getCanChallengeBiometrics(
-                    availableChallengeKinds,
-                    hasSyncablePassKey,
-                    device,
-                  );
-                },
-              },
-              {
-                target: 'smsChallenge',
-                actions: ['assignIdentifySuccessResult'],
-              },
-            ],
+            identified: InitiateChallengeTransitions,
           },
         },
         smsChallenge: {

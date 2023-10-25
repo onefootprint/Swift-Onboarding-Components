@@ -8,7 +8,7 @@ from tests.constants import EMAIL
 from tests.utils import post, patch
 from tests.utils import get_requirement_from_requirements
 from tests.bifrost_client import BifrostClient
-from tests.utils import create_ob_config
+from tests.utils import create_ob_config, challenge_user
 
 
 @pytest.fixture(scope="session")
@@ -155,3 +155,34 @@ def test_trigger(no_phone_user):
         dict(trigger=dict(kind="redo_kyc"), note="yo"),
         *no_phone_user.tenant.db_auths,
     )
+
+
+def test_step_up(no_phone_user, sandbox_tenant):
+    data = dict(key=no_phone_user.client.ob_config.key.value)
+    body = post(f"entities/{no_phone_user.fp_id}/token", data, sandbox_tenant.sk.key)
+    auth_token = FpAuth(body["token"])
+
+    # Step up the auth token using an email challenge
+    challenge_data = challenge_user(None, "email", auth_token)
+    data = dict(
+        challenge_response=INTEGRATION_SANDBOX_EMAIL_OTP_PIN,
+        challenge_token=challenge_data["challenge_token"],
+        scope="onboarding",
+    )
+    body = post("hosted/identify/verify", data, auth_token)
+    auth_token = FpAuth(body["auth_token"])
+
+    # And use the auth token to onboard
+    bifrost2 = BifrostClient.raw_auth(
+        sandbox_tenant.default_ob_config,
+        auth_token,
+        FIXTURE_PHONE_NUMBER,
+        no_phone_user.client.sandbox_id,
+    )
+    user2 = bifrost2.run()
+    assert user2.fp_id == no_phone_user.fp_id
+    assert set(i["kind"] for i in bifrost2.already_met_requirements) == {
+        "collect_data",
+        "authorize",
+    }
+    assert [i["kind"] for i in bifrost2.handled_requirements] == ["process"]

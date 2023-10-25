@@ -16,7 +16,7 @@ const EmailChallenge = () => {
   const [state, send] = useIdentifyMachine();
   const {
     bootstrapData,
-    identify: { userFound, email = '', isUnverified },
+    identify: { userFound, email = '', isUnverified, successfulIdentifier },
   } = state.context;
   const isBootstrap = !!bootstrapData?.email;
   const shouldShowWelcomeBack = userFound && !isUnverified;
@@ -39,14 +39,19 @@ const EmailChallenge = () => {
     });
   };
 
+  // If we enter the email challenge via an auth token identifier, we won't have an email to display
+  const formTitle = email
+    ? t('prompt-with-email', { email })
+    : t('prompt-without-email');
+
   return (
     <Container>
       <ChallengeHeader shouldShowBack={!isBootstrap} title={title} />
       <PinVerification
-        title={t('prompt', { email })}
+        title={formTitle}
         onChallengeSucceed={handleChallengeSuceed}
         preferredChallengeKind={ChallengeKind.email}
-        identifier={{ email }}
+        identifier={successfulIdentifier ?? { email }}
       />
       {isBootstrap && <DifferentAccount onClick={handleLoginWithDifferent} />}
     </Container>
