@@ -1,5 +1,7 @@
 use crate::task::tasks::watchlist_check::tests::*;
 use crate::task::TaskError;
+use crate::utils::vault_wrapper::Any;
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use chrono::Duration;
 use chrono::Utc;
@@ -9,6 +11,7 @@ use diesel::prelude::*;
 use feature_flag::MockFeatureFlagClient;
 use macros::test_state_case;
 use newtypes::FootprintReasonCode;
+use newtypes::PiiString;
 use newtypes::VendorAPI;
 use newtypes::WatchlistCheckError;
 use newtypes::WatchlistCheckNotNeededReason;
@@ -233,12 +236,19 @@ async fn active_users(
 enum ExistingSearchCase {
     NoVres,
     VresOlderThan365Days,
+    VaultDataChangedSinceVres(VaultDataChange),
+}
+enum VaultDataChange {
+    Dob,
+    Name,
 }
 
 #[test_state_case(ExistingSearchCase::NoVres)]
 #[test_state_case(ExistingSearchCase::VresOlderThan365Days)]
+#[test_state_case(ExistingSearchCase::VaultDataChangedSinceVres(VaultDataChange::Dob))]
+#[test_state_case(ExistingSearchCase::VaultDataChangedSinceVres(VaultDataChange::Name))]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
-async fn incode_no_existing_watchlist_check_vres(state: &mut State, case: ExistingSearchCase) {
+async fn incode_new_search_needed(state: &mut State, case: ExistingSearchCase) {
     // SETUP
     let (sv, task) = create_user_and_task(
         &state.db_pool,
@@ -261,6 +271,29 @@ async fn incode_no_existing_watchlist_check_vres(state: &mut State, case: Existi
                         .set(verification_result::timestamp.eq(Utc::now() - Duration::days(366)))
                         .execute(conn)
                         .unwrap();
+                })
+                .await
+                .unwrap();
+        }
+        ExistingSearchCase::VaultDataChangedSinceVres(data_changed) => {
+            let svid = sv.id.clone();
+            state
+                .db_pool
+                .db_transaction(move |conn| -> DbResult<()> {
+                    let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &svid).unwrap();
+                    let data = match data_changed {
+                        VaultDataChange::Dob => {
+                            vec![(IDK::Dob.into(), PiiString::new("1944-01-03".to_owned()))]
+                        }
+                        VaultDataChange::Name => {
+                            vec![
+                                (IDK::FirstName.into(), PiiString::new("Carl".to_owned())),
+                                (IDK::LastName.into(), PiiString::new("Carlito".to_owned())),
+                            ]
+                        }
+                    };
+                    uvw.patch_data_test(conn, data, true).unwrap();
+                    Ok(())
                 })
                 .await
                 .unwrap();

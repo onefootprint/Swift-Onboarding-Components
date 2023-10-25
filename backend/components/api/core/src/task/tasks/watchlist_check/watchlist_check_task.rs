@@ -196,14 +196,8 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
                     &VendorAPI::IncodeWatchlistCheck,
                     uvw.populated().as_slice(),
                 ) {
-                    let reason_codes = incode::complete_vendor_call(
-                        &self.state,
-                        &sv.id,
-                        &di_id,
-                        obc,
-                        &uvw.vault.e_private_key,
-                    )
-                    .await?;
+                    let reason_codes =
+                        incode::complete_vendor_call(&self.state, &sv.id, &di_id, obc, &uvw).await?;
                     WatchlistVendorResult::Completed(reason_codes)
                 } else {
                     WatchlistVendorResult::InsufficientData
