@@ -61,5 +61,8 @@ pub use process::*;
 mod onboarding_configs;
 pub use onboarding_configs::*;
 
+mod reonboard;
+pub use reonboard::*;
+
 mod apex_cip_report_request;
 pub use apex_cip_report_request::*;

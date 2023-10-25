@@ -6,6 +6,7 @@ mod detail;
 mod documents;
 mod get;
 mod post;
+mod reonboard;
 mod risk_signals;
 
 pub fn routes(config: &mut web::ServiceConfig) {
@@ -15,5 +16,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(documents::get)
         .service(risk_signals::get)
         .service(auth_events::get)
+        .service(reonboard::post)
         .service(detail::detail);
 }

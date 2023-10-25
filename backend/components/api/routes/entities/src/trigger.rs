@@ -151,7 +151,7 @@ pub async fn post(
         })
         .await?;
 
-    let link: newtypes::PiiString = state
+    let link = state
         .config
         .service_config
         .generate_verify_link(auth_token, "user");

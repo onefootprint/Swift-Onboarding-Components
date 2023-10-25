@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "4acbeb625796d365a3d81453210ce4b5634c576f"
+        "version": "ca92c407dda31e023fc7cf8e96f75d3ba96083ba"
     },
     "servers": [
         {
@@ -422,6 +422,43 @@
                 ]
             }
         },
+        "/users/{fp_id}/reonboard": {
+            "post": {
+                "tags": [
+                    "Entities",
+                    "Preview"
+                ],
+                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nGenerate a link that can be sent to the user to ask them to reonboard to the last playbook they onboarded onto.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ReonboardResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/users/{fp_id}/risk_signals": {
             "get": {
                 "tags": [
@@ -674,6 +711,14 @@
             "AlpacaCreateAccountRequest": {
                 "type": "object",
                 "properties": {
+                    "account_type": {
+                        "type": "string",
+                        "enum": [
+                            "trading",
+                            "custodial",
+                            "donor_advised"
+                        ]
+                    },
                     "agreements": {
                         "type": "array",
                         "items": {
@@ -6955,6 +7000,25 @@
                     "reason_code",
                     "scopes",
                     "severity"
+                ]
+            },
+            "ReonboardResponse": {
+                "type": "object",
+                "properties": {
+                    "expires_at": {
+                        "description": "The time at which the token expires",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "link": {
+                        "example": "https://verify.onefootprint.com/?type=user#tok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt",
+                        "description": "A Footprint link specific to this user that can be sent to reonboard the user",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "expires_at",
+                    "link"
                 ]
             },
             "TriggerKycRequest": {

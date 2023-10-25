@@ -315,7 +315,7 @@ impl Workflow {
         Ok(res)
     }
 
-    #[tracing::instrument("Workflow::get", skip_all)]
+    #[tracing::instrument("Workflow::list_by_completed_at", skip_all)]
     pub fn list_by_completed_at(
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
@@ -330,7 +330,7 @@ impl Workflow {
         Ok(res)
     }
 
-    #[tracing::instrument("Workflow::get", skip_all)]
+    #[tracing::instrument("Workflow::get_all", skip_all)]
     pub fn get_all<'a, T: Into<WorkflowIdentifier<'a>>>(
         conn: &mut PgConn,
         id: T,

@@ -39,6 +39,7 @@
     "opentelemetry",
     "pinpointemail",
     "pulumi",
+    "Reonboard",
     "repr",
     "scopable",
     "sqlx",
