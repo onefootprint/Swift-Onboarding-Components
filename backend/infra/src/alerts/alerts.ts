@@ -14,12 +14,13 @@ export interface Alert {
   pageThreshold?: Threshold;
 }
 
-/// Generally higher-latency HTTP requests that we want to have a higher alert threshold
+/// Endpoints whose latency we never want to alert on
 const IGNORE_LATENT_HTTP_ROUTES: string[] = [
-  '/hosted/user/documents/{id}/upload/{side}',
+  '/hosted/user/documents/{id}/upload/{side}', // Latency can be a function of user network connection :/
   '/private/invoices',
 ];
-const LATENT_HTTP_ROUTES: string[] = [];
+/// Generally higher-latency HTTP requests that we want to have a higher alert threshold
+const LATENT_HTTP_ROUTES: string[] = ['/hosted/user/documents/{id}/process'];
 
 /// Note, add alert runbooks at: https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25
 const staticAlerts: Alert[] = [
