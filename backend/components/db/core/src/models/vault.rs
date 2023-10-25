@@ -1,3 +1,4 @@
+use crate::models::fingerprint::Fingerprint as DbFingerprint;
 use crate::{DbError, PgConn};
 use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
@@ -250,27 +251,50 @@ impl Vault {
             query.filter(vault::sandbox_id.is_null())
         };
 
-        let results = query.select(vault::all_columns).get_results::<Vault>(conn)?;
+        let results: Vec<_> = query
+            .select((vault::all_columns, fingerprint::all_columns))
+            .get_results::<(Vault, DbFingerprint)>(conn)?;
 
         tracing::info!("searched portable vaults, found: {}", results.len());
 
         // we found more than 1 vault on this fingerprint
         if results.len() > 1 {
-            // find the unique vaults for this fingerprint
-            let unique: Vec<_> = results.into_iter().unique_by(|uv| uv.id.clone()).collect();
+            // If multiple fingerprints match but it's just one UV, return that vault
+            let unique = results.iter().unique_by(|(uv, _)| uv.id.clone()).collect_vec();
             if unique.len() == 1 {
-                return Ok(unique.into_iter().next());
+                return Ok(unique.into_iter().next().map(|(uv, _)| uv.clone()));
+            }
+            let vaults = results
+                .iter()
+                .map(|(uv, fp)| (uv.id.clone(), uv.is_created_via_api, uv._created_at, fp.is_unique))
+                .collect_vec();
+            tracing::warn!(vaults=?vaults, "found more than one vault for fingerprint");
+
+            // Otherwise, return the user with a unique fingerprint. We may hit this case if the
+            // user has a portable vault they made on bifrost and another tenant made a vault with
+            // the same phone number that became portable
+            if let Some(r) = results.iter().find(|(_, fp)| fp.is_unique) {
+                tracing::warn!("returning user with unique fp");
+                return Ok(Some(r.0.clone()));
             }
 
             // NOTE: i have seen this happen with an email fingerprint
             // in this case, more than 1 vault have non-verified claims for this email address
             // so we cannot be sure which user vault we are trying to identify
-            // TODO add actual information so we can debug this
-            tracing::info!("found more than one vault for fingerprint");
-            return Ok(None);
+
+            // So, arbitrarily choose a user:
+            // - Choose created via bifrost over created via tenant API
+            // - Then choose earliest created
+            let user = results
+                .iter()
+                .sorted_by_key(|(uv, _)| (uv.is_created_via_api, uv._created_at))
+                .next()
+                .map(|(uv, _)| uv.clone());
+            tracing::info!(uv_id=?user.as_ref().map(|uv| &uv.id), "returning arbitrary uv");
+            return Ok(user);
         }
 
-        Ok(results.into_iter().next())
+        Ok(results.into_iter().next().map(|v| v.0))
     }
 }
 
