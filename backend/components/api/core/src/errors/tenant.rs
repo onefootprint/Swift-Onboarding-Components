@@ -21,8 +21,6 @@ pub enum TenantError {
     IncorrectVaultKindForRedoKyc,
     #[error("Invalid trigger")]
     InvalidTriggerKind,
-    #[error("Cannot trigger KYC for non-portable vault")]
-    CannotTriggerKycForNonPortable,
     #[error("Cannot redo KYC with no previous KYC")]
     CannotRedoKyc,
     #[error("Cannot run KYC for portable vault")]

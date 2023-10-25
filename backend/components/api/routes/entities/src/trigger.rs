@@ -6,16 +6,12 @@ use crate::auth::tenant::TenantSessionAuth;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
-use api_core::auth::session::user::AuthFactor;
 use api_core::auth::session::user::UserSession;
 use api_core::auth::session::user::UserSessionArgs;
-use api_core::auth::user::UserAuthScope;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::user::UserError;
 use api_core::errors::ApiResult;
 use api_core::types::EmptyResponse;
-use api_core::utils;
-use api_core::utils::contact::{EmailMessage, SmsMessage};
 use api_core::utils::email::SendgridClient;
 use api_core::utils::session::AuthSession;
 use api_core::utils::vault_wrapper::Any;
@@ -28,8 +24,10 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
 use db::models::workflow::NewWorkflowArgs;
 use db::models::workflow::Workflow;
+use newtypes::ContactInfoKind;
 use newtypes::DocumentConfig;
 use newtypes::FpId;
+use newtypes::PhoneNumber;
 use newtypes::PiiString;
 use newtypes::TriggerInfo;
 use newtypes::TriggerKind;
@@ -68,13 +66,8 @@ pub async fn post(
             if vw.vault.kind != VaultKind::Person {
                 return Err(TenantError::IncorrectVaultKindForRedoKyc.into());
             }
-            if vw.vault.is_created_via_api {
-                // TODO We'll support this soon
-                return Err(TenantError::CannotTriggerKycForNonPortable.into());
-            }
 
-            let duration = Duration::days(1);
-            let (event, auth_token) = match trigger {
+            let (event, auth_args) = match trigger {
                 TriggerInfo::RedoKyc => {
                     let (_, obc) = Workflow::list_by_completed_at(conn, &sv.id)?
                         .into_iter()
@@ -82,22 +75,18 @@ pub async fn post(
                         .filter_map(|(wf, obc)| wf.completed_at.map(|t| (t, obc)))
                         .max_by_key(|(completed_at, _)| *completed_at)
                         .ok_or(UserError::NoCompleteOnboardings)?;
-                    let scopes = vec![];
-                    let auth_factors = vec![];
                     let args = UserSessionArgs {
                         su_id: Some(sv.id.clone()),
                         obc_id: Some(obc.id.clone()),
                         is_from_api: true,
                         ..Default::default()
                     };
-                    let data = UserSession::make(sv.vault_id.clone(), args, scopes, auth_factors)?;
-                    let (auth_token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
                     let event = WorkflowTriggeredInfo {
                         workflow_id: None,
                         ob_config_id: Some(obc.id),
                         actor,
                     };
-                    (event, auth_token)
+                    (event, args)
                 }
                 // TODO deprecate this type of trigger - it's weird to not be associated with any
                 // playbook, and weird to have to create the wf inline here
@@ -124,25 +113,25 @@ pub async fn post(
                     };
                     DocumentRequest::create(conn, args)?;
 
-                    // TODO should we drop the SignUp scope here since step up has been implemented?
-                    let scopes = vec![UserAuthScope::SignUp];
                     let args = UserSessionArgs {
                         su_id: Some(wf.scoped_vault_id),
                         wf_id: Some(wf.id.clone()),
                         obc_id: wf.ob_configuration_id,
                         ..Default::default()
                     };
-                    let data = UserSession::make(sv.vault_id.clone(), args, scopes, vec![AuthFactor::Sms])?;
-                    let (auth_token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
                     let event = WorkflowTriggeredInfo {
                         workflow_id: Some(wf.id.clone()),
                         ob_config_id: None,
                         actor,
                     };
-                    (event, auth_token)
+                    (event, args)
                 }
                 TriggerInfo::RedoKyb => return Err(TenantError::InvalidTriggerKind.into()), // not yet supported
             };
+            // No scopes or auth factors - require the user to re-auth
+            let duration = Duration::days(1);
+            let data = UserSession::make(sv.vault_id.clone(), auth_args, vec![], vec![])?;
+            let (auth_token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             // Create a timeline event logging that the workflow was triggered
             UserTimeline::create(conn, event, sv.vault_id.clone(), sv.id.clone())?;
             // Create an auth token for this workflow that we will send to the user
@@ -156,20 +145,30 @@ pub async fn post(
         .generate_verify_link(auth_token, "user");
     let org_name = auth.tenant().name.clone();
 
-    let trigger_message = TriggerMessage {
+    let msg = TriggerMessage {
         note,
         org_name,
         trigger_kind,
         link,
     };
 
-    utils::contact::send_to_primary_verified_contact_info(
-        &state,
-        &vw,
-        trigger_message.clone(),
-        trigger_message,
-    )
-    .await?;
+    if let Some(phone) = vw.decrypt_contact_info(&state, ContactInfoKind::Phone).await? {
+        let msg = SmsMessage::from(msg);
+        let scope = msg.rate_limit_scope;
+        let phone = PhoneNumber::parse(phone.0)?;
+        state
+            .sms_client
+            .send_message(&state, msg.message_body, &phone, scope)
+            .await?;
+    } else if let Some(email) = vw.decrypt_contact_info(&state, ContactInfoKind::Email).await? {
+        let msg = EmailMessage::from(msg);
+        state
+            .sendgrid_client
+            .send_template(email.0, msg.template_id, msg.template_data)
+            .await?;
+    } else {
+        return Err(UserError::NoContactInfoForUser.into());
+    }
 
     ResponseData::ok(EmptyResponse {}).json()
 }
@@ -214,6 +213,16 @@ impl TriggerMessage {
             )),
         }
     }
+}
+
+pub struct SmsMessage<'a> {
+    pub message_body: PiiString,
+    pub rate_limit_scope: &'a str,
+}
+
+pub struct EmailMessage<'a> {
+    pub template_id: &'a str,
+    pub template_data: HashMap<String, PiiString>,
 }
 
 impl<'a> From<TriggerMessage> for SmsMessage<'a> {
