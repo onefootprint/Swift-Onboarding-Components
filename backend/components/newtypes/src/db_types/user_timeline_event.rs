@@ -2,7 +2,7 @@ use crate::{
     util::impl_enum_string_diesel, AnnotationId, CollectedDataOption, IdentityDocumentId, LivenessEventId,
     OnboardingDecisionId, WatchlistCheckId, WebauthnCredentialId,
 };
-use crate::{DbActor, WorkflowId};
+use crate::{DbActor, ObConfigurationId, WorkflowId};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
@@ -131,6 +131,9 @@ pub struct VaultCreatedInfo {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkflowTriggeredInfo {
-    pub workflow_id: WorkflowId,
+    /// Old format when triggers would create Workflows inline
+    pub workflow_id: Option<WorkflowId>,
+    /// New format when triggers simply reonboard to a playbook
+    pub ob_config_id: Option<ObConfigurationId>,
     pub actor: DbActor,
 }

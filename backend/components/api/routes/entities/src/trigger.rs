@@ -11,13 +11,12 @@ use api_core::auth::session::user::UserSession;
 use api_core::auth::session::user::UserSessionArgs;
 use api_core::auth::user::UserAuthScope;
 use api_core::errors::tenant::TenantError;
+use api_core::errors::user::UserError;
 use api_core::errors::ApiResult;
-use api_core::errors::AssertionError;
 use api_core::types::EmptyResponse;
 use api_core::utils;
 use api_core::utils::contact::{EmailMessage, SmsMessage};
 use api_core::utils::email::SendgridClient;
-use api_core::utils::onboarding::create_doc_request_if_needed;
 use api_core::utils::session::AuthSession;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
@@ -25,15 +24,12 @@ use api_wire_types::TriggerRequest;
 use chrono::Duration;
 use db::models::document_request::DocumentRequest;
 use db::models::document_request::NewDocumentRequestArgs;
-use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
 use db::models::workflow::NewWorkflowArgs;
 use db::models::workflow::Workflow;
-use newtypes::AlpacaKycConfig;
 use newtypes::DocumentConfig;
 use newtypes::FpId;
-use newtypes::KycConfig;
 use newtypes::PiiString;
 use newtypes::TriggerInfo;
 use newtypes::TriggerKind;
@@ -69,7 +65,6 @@ pub async fn post(
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv.id)?;
 
-            // TODO: Other validation conditions to trigger RedoKyc
             if vw.vault.kind != VaultKind::Person {
                 return Err(TenantError::IncorrectVaultKindForRedoKyc.into());
             }
@@ -78,35 +73,37 @@ pub async fn post(
                 return Err(TenantError::CannotTriggerKycForNonPortable.into());
             }
 
-            let last_alpaca_kyc_wf = Workflow::latest_by_kind(conn, &sv.id, WorkflowKind::AlpacaKyc)?;
-            let last_kyc_wf = Workflow::latest_by_kind(conn, &sv.id, WorkflowKind::Kyc)?;
-
-            let wf = match trigger {
+            let duration = Duration::days(1);
+            let (event, auth_token) = match trigger {
                 TriggerInfo::RedoKyc => {
-                    let (config, last_wf) = match (last_alpaca_kyc_wf, last_kyc_wf) {
-                        (Some(wf), _) => (AlpacaKycConfig { is_redo: true }.into(), wf),
-                        (None, Some(wf)) => (KycConfig { is_redo: true }.into(), wf),
-                        (None, None) => return Err(TenantError::CannotRedoKyc.into()),
+                    let (_, obc) = Workflow::list_by_completed_at(conn, &sv.id)?
+                        .into_iter()
+                        .filter_map(|(wf, obc)| obc.map(|obc| (wf, obc)))
+                        .filter_map(|(wf, obc)| wf.completed_at.map(|t| (t, obc)))
+                        .max_by_key(|(completed_at, _)| *completed_at)
+                        .ok_or(UserError::NoCompleteOnboardings)?;
+                    let scopes = vec![];
+                    let auth_factors = vec![];
+                    let args = UserSessionArgs {
+                        su_id: Some(sv.id.clone()),
+                        obc_id: Some(obc.id.clone()),
+                        is_from_api: true,
+                        ..Default::default()
                     };
-
-                    let args = NewWorkflowArgs {
-                        scoped_vault_id: sv.id.clone(),
-                        config,
-                        fixture_result: last_wf.fixture_result,
-                        ob_configuration_id: last_wf.ob_configuration_id,
-                        insight_event_id: None,
-                        authorized: false,
+                    let data = UserSession::make(sv.vault_id.clone(), args, scopes, auth_factors)?;
+                    let (auth_token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
+                    let event = WorkflowTriggeredInfo {
+                        workflow_id: None,
+                        ob_config_id: Some(obc.id),
+                        actor,
                     };
-                    let wf = Workflow::create(conn, args)?;
-                    let obc_id = wf
-                        .ob_configuration_id
-                        .as_ref()
-                        .ok_or(AssertionError("KYC workflow without OBC"))?;
-                    let (obc, _) = ObConfiguration::get(conn, obc_id)?;
-                    create_doc_request_if_needed(conn, &wf, &obc)?;
-                    wf
+                    (event, auth_token)
                 }
+                // TODO deprecate this type of trigger - it's weird to not be associated with any
+                // playbook, and weird to have to create the wf inline here
                 TriggerInfo::IdDocument { collect_selfie } => {
+                    let last_alpaca_kyc_wf = Workflow::latest_by_kind(conn, &sv.id, WorkflowKind::AlpacaKyc)?;
+                    let last_kyc_wf = Workflow::latest_by_kind(conn, &sv.id, WorkflowKind::Kyc)?;
                     let last_wf = last_alpaca_kyc_wf
                         .or(last_kyc_wf)
                         .ok_or(TenantError::CannotRedoKyc)?;
@@ -126,27 +123,29 @@ pub async fn post(
                         should_collect_selfie: collect_selfie,
                     };
                     DocumentRequest::create(conn, args)?;
-                    wf
+
+                    // TODO should we drop the SignUp scope here since step up has been implemented?
+                    let scopes = vec![UserAuthScope::SignUp];
+                    let args = UserSessionArgs {
+                        su_id: Some(wf.scoped_vault_id),
+                        wf_id: Some(wf.id.clone()),
+                        obc_id: wf.ob_configuration_id,
+                        ..Default::default()
+                    };
+                    let data = UserSession::make(sv.vault_id.clone(), args, scopes, vec![AuthFactor::Sms])?;
+                    let (auth_token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
+                    let event = WorkflowTriggeredInfo {
+                        workflow_id: Some(wf.id.clone()),
+                        ob_config_id: None,
+                        actor,
+                    };
+                    (event, auth_token)
                 }
                 TriggerInfo::RedoKyb => return Err(TenantError::InvalidTriggerKind.into()), // not yet supported
             };
             // Create a timeline event logging that the workflow was triggered
-            let event = WorkflowTriggeredInfo {
-                workflow_id: wf.id.clone(),
-                actor,
-            };
             UserTimeline::create(conn, event, sv.vault_id.clone(), sv.id.clone())?;
             // Create an auth token for this workflow that we will send to the user
-            let scopes = vec![UserAuthScope::SignUp];
-            let duration = Duration::days(1);
-            let args = UserSessionArgs {
-                su_id: Some(wf.scoped_vault_id),
-                wf_id: Some(wf.id),
-                obc_id: wf.ob_configuration_id,
-                ..Default::default()
-            };
-            let data = UserSession::make(sv.vault_id, args, scopes, vec![AuthFactor::Sms])?;
-            let (auth_token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             Ok((vw, auth_token))
         })
         .await?;

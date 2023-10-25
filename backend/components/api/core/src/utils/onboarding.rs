@@ -108,11 +108,7 @@ pub fn get_or_start_onboarding(
 }
 
 /// Create a DocumentRequest associated with the provided wf if the obc requires document collection
-pub fn create_doc_request_if_needed(
-    conn: &mut TxnPgConn,
-    wf: &Workflow,
-    obc: &ObConfiguration,
-) -> ApiResult<()> {
+fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObConfiguration) -> ApiResult<()> {
     if let Some(doc_info) = obc
         .must_collect_data
         .iter()

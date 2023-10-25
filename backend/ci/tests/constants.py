@@ -29,7 +29,7 @@ IT_TWILIO_SECRET_AUTH_TOKEN = get_secret("IT_TWILIO_SECRET_AUTH_TOKEN")
 ALL_PHONE_NUMBERS = json.loads(get_secret("IT_PHONE_NUMBERS"))
 phone_idx = random.randint(0, len(ALL_PHONE_NUMBERS) - 1)
 LIVE_PHONE_NUMBER = ALL_PHONE_NUMBERS[phone_idx]
-print(f"USING LIVE PHONE NUMBER: {LIVE_PHONE_NUMBER}")
+print(f"\nUSING LIVE PHONE NUMBER: {LIVE_PHONE_NUMBER}")
 
 # This phone number can only be used in sandbox. It will always yield a PIN code of 000000 in the identify flow and we never send SMS messages to it.
 # However, users created with this phone number can never be identified at another tenant.

@@ -60,7 +60,7 @@ pub enum SaturatedTimelineEvent {
     Annotation(AnnotationInfo),
     WatchlistCheck(WatchlistCheck),
     VaultCreated(SaturatedActor),
-    WorkflowTriggered((Workflow, SaturatedActor)),
+    WorkflowTriggered((Option<Workflow>, SaturatedActor)),
 }
 
 pub type IsFromOtherTenant = bool;
@@ -180,7 +180,7 @@ impl UserTimeline {
             IdentityDocument::get_bulk_with_requests(conn, identity_document_ids.collect())?;
         let actors: HashMap<_, _> = saturate_actors(conn, db_actors.collect())?.into_iter().collect();
         let watchlist_checks = WatchlistCheck::get_bulk(conn, watchlist_check_ids.collect())?;
-        let workflows = Workflow::get_bulk(conn, workflow_ids.collect())?;
+        let workflows = Workflow::get_bulk(conn, workflow_ids.flatten().collect())?;
 
         // Join the UserTimeline events with the saturated info we fetched from different tables
         let results = results
@@ -243,10 +243,10 @@ impl UserTimeline {
                             .clone(),
                     ),
                     DbUserTimelineEvent::WorkflowTriggered(ref e) => {
-                        let workflow = workflows
-                            .get(&e.workflow_id)
-                            .ok_or(DbError::RelatedObjectNotFound)?
-                            .clone();
+                        let workflow = e
+                            .workflow_id
+                            .as_ref()
+                            .and_then(|wf_id| workflows.get(wf_id).cloned());
                         let actor = actors
                             .get(&e.actor)
                             .ok_or(DbError::RelatedObjectNotFound)?

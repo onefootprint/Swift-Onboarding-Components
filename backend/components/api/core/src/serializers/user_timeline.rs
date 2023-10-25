@@ -1,4 +1,5 @@
 use db::models::user_timeline::{SaturatedTimelineEvent, UserTimeline, UserTimelineInfo};
+use newtypes::TriggerKind;
 
 use crate::utils::db2api::DbToApi;
 
@@ -53,8 +54,15 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                 actor: api_wire_types::Actor::from_db(actor),
             }),
             SaturatedTimelineEvent::WorkflowTriggered((workflow, actor)) => {
+                // Some weird logic for backcompat to determine the trigger type
+                let workflow = if let Some(wf) = workflow {
+                    api_wire_types::Workflow::from_db(wf)
+                } else {
+                    let kind = TriggerKind::RedoKyc;
+                    api_wire_types::Workflow { kind }
+                };
                 Self::WorkflowTriggered(api_wire_types::WorkflowTriggered {
-                    workflow: api_wire_types::Workflow::from_db(workflow),
+                    workflow,
                     actor: api_wire_types::Actor::from_db(actor),
                 })
             }
