@@ -17,6 +17,12 @@ const Footer = () => {
 
   const links: Link[] = [
     {
+      label: t('links.what-is-this'),
+      href: tenantPk
+        ? `${FRONTPAGE_BASE_URL}/tenant?ob-key=${tenantPk}`
+        : FRONTPAGE_BASE_URL,
+    },
+    {
       label: t('links.privacy'),
       href: `${FRONTPAGE_BASE_URL}/privacy-policy`,
     },
@@ -25,13 +31,6 @@ const Footer = () => {
       href: 'https://onefootprint.com/terms-of-service',
     },
   ];
-
-  if (tenantPk) {
-    links.unshift({
-      label: t('links.what-is-this'),
-      href: `${FRONTPAGE_BASE_URL}/tenant?ob-key=${tenantPk}`,
-    });
-  }
 
   return (
     <Container>

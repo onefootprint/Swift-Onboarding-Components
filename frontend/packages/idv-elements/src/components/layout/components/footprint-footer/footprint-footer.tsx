@@ -32,17 +32,16 @@ const FootprintFooter = ({ hideOnDesktop, tenantPk }: FootprintFooterProps) => {
 
   const links: Link[] = [
     {
+      label: "What's this?",
+      href: tenantPk
+        ? `${FRONTPAGE_BASE_URL}/tenant?ob-key=${tenantPk}`
+        : FRONTPAGE_BASE_URL,
+    },
+    {
       label: 'Privacy',
       href: `${FRONTPAGE_BASE_URL}/privacy-policy`,
     },
   ];
-
-  if (tenantPk) {
-    links.unshift({
-      label: "What's this?",
-      href: `${FRONTPAGE_BASE_URL}/tenant?ob-key=${tenantPk}`,
-    });
-  }
 
   return (
     <FootprintFooterContainer
