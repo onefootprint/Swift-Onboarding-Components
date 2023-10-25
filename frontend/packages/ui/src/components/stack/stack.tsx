@@ -3,20 +3,21 @@ import type { Property } from 'csstype';
 import styled, { css } from 'styled-components';
 
 import type { SXStyleProps } from '../../hooks';
-import type { BoxProps } from '../box';
+import type { BoxProps, BoxPropsStyles } from '../box';
 import Box from '../box';
 
-export type StackProps = BoxProps & {
-  gap?: Spacing;
-  flexWrap?: Property.FlexWrap;
-  direction?: Property.FlexDirection;
-  align?: Property.AlignItems;
-  justify?: Property.JustifyContent;
-  flexGrow?: Property.FlexGrow;
-  inline?: boolean;
-  visibility?: Property.Visibility;
-  sx?: SXStyleProps;
-};
+export type StackProps = BoxProps &
+  BoxPropsStyles & {
+    gap?: Spacing;
+    flexWrap?: Property.FlexWrap;
+    direction?: Property.FlexDirection;
+    align?: Property.AlignItems;
+    justify?: Property.JustifyContent;
+    flexGrow?: Property.FlexGrow;
+    inline?: boolean;
+    visibility?: Property.Visibility;
+    sx?: SXStyleProps;
+  };
 
 const Stack = styled(Box)<StackProps>`
   ${({

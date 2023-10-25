@@ -2,7 +2,7 @@ import type { Spacing } from '@onefootprint/design-tokens';
 import styled, { css } from '@onefootprint/styled';
 import type * as CSS from 'csstype';
 
-import type { BoxProps } from '../box';
+import type { BoxProps, BoxPropsStyles } from '../box';
 import Box from '../box';
 import Stack from '../stack';
 
@@ -12,15 +12,16 @@ type ItemProps = {
   row?: string;
 };
 
-type ContainerProps = BoxProps & {
-  columns?: string[];
-  rows?: string[];
-  columnGap?: Spacing;
-  rowGap?: Spacing;
-  gap?: Spacing;
-  templateAreas?: string[];
-  alignItems?: CSS.Property.AlignItems;
-};
+type ContainerProps = BoxProps &
+  BoxPropsStyles & {
+    columns?: string[];
+    rows?: string[];
+    columnGap?: Spacing;
+    rowGap?: Spacing;
+    gap?: Spacing;
+    templateAreas?: string[];
+    alignItems?: CSS.Property.AlignItems;
+  };
 
 const createColumns = (columns?: string | string[]) => {
   if (typeof columns === 'string') {
