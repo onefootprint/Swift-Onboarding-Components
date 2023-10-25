@@ -619,6 +619,9 @@ impl APIResponseToIncodeError for FetchOCRResponse {
 #[serde(rename_all = "camelCase")]
 pub struct GetOnboardingStatusResponse {
     pub onboarding_status: String,
+
+    #[serde(flatten)]
+    pub error: Option<Error>,
 }
 impl GetOnboardingStatusResponse {
     pub fn ready(&self, session_kind: &IncodeVerificationSessionKind, wait_for_selfie: bool) -> bool {
@@ -646,7 +649,7 @@ impl APIResponseToIncodeError for GetOnboardingStatusResponse {
     // no custom error codes here
     // TODO: in future PR handle http errors
     fn to_error(&self) -> Option<Error> {
-        None
+        self.error.clone()
     }
 
     fn custom_failure_reasons(_error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
@@ -667,15 +670,19 @@ pub struct ProcessFaceResponse {
     pub name_matched: Option<bool>,
     // In case the session does have an externalId which can be assigned at start call.
     pub existing_external_id: Option<String>,
+
+    #[serde(flatten)]
+    pub error: Option<Error>,
 }
 impl APIResponseToIncodeError for ProcessFaceResponse {
     // no custom error codes here
     // TODO: in future PR handle http errors
     fn to_error(&self) -> Option<Error> {
-        None
+        self.error.clone()
     }
 
     fn custom_failure_reasons(_error: crate::incode::response::Error) -> Option<Vec<IncodeFailureReason>> {
+        // does this need to be something???
         None
     }
 }
@@ -713,7 +720,10 @@ mod tests {
     };
 
     use crate::{
-        incode::{doc::response::AddSelfieResponse, IncodeAPIResult},
+        incode::{
+            doc::response::{AddSelfieResponse, ProcessFaceResponse},
+            IncodeAPIResult,
+        },
         test_fixtures::{self, DocTestOpts},
     };
 
@@ -875,6 +885,16 @@ mod tests {
             {"timestamp":1695335887367i64,"status":4019,"error":"Face not found.","path":"/omni/add/face/third-party"}
         );
         let res = IncodeAPIResult::<AddSelfieResponse>::try_from(raw_response).unwrap();
+        let e = res.into_success().unwrap_err();
+        assert!(matches!(e, crate::incode::error::Error::APIResponseError(_)));
+    }
+
+    #[test]
+    fn test_process_face_error() {
+        let raw_response = serde_json::json!(
+            {"timestamp":1698201468377i64,"status":6000,"error":"Processing error","path":"/omni/process/face"}
+        );
+        let res = IncodeAPIResult::<ProcessFaceResponse>::try_from(raw_response).unwrap();
         let e = res.into_success().unwrap_err();
         assert!(matches!(e, crate::incode::error::Error::APIResponseError(_)));
     }
