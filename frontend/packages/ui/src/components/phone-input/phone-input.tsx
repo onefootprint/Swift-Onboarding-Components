@@ -4,12 +4,13 @@ import React, { forwardRef, useRef, useState } from 'react';
 import mergeRefs from 'react-merge-refs';
 import { useUpdateEffect } from 'usehooks-ts';
 
+import { getCountryCodeFromLocale } from '../../utils';
 import type { BaseSelectOption } from '../internal/base-select';
 import BaseSelect from '../internal/base-select';
 import Input from './components/input';
 import Option from './components/option';
 import type { PhoneInputProps, PhoneSelectOption } from './phone-input.types';
-import { getCountryCode, getCountryFromPhoneNumber } from './phone-input.utils';
+import { getCountryFromPhoneNumber } from './phone-input.utils';
 
 const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
   (
@@ -28,7 +29,7 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
   ) => {
     const localRef = useRef<HTMLInputElement>(null);
     const [selectedCountry, setCountry] = useState<PhoneSelectOption>(() =>
-      getCountryFromPhoneNumber(value, getCountryCode(locale)),
+      getCountryFromPhoneNumber(value, getCountryCodeFromLocale(locale)),
     );
 
     const countryCode = selectedCountry.value;

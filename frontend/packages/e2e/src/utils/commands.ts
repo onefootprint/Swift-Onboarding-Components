@@ -43,6 +43,14 @@ export const selectOutcomeOptional = async (
     .catch(() => false);
 };
 
+export const waitForVerifyButton = async ({ page }: WithPage) => {
+  const btn = page.locator('.footprint-verify-button').first();
+  await btn
+    .waitFor({ state: 'attached', timeout: 20000 })
+    .then(() => true)
+    .catch(() => false);
+};
+
 export const uploadImage = async (
   { frame, page, isMobile }: PageNFrame & { isMobile: boolean },
   cta: RegExp,
@@ -138,7 +146,7 @@ export const fillAddress = async (
   await frame.getByLabel('City').first().fill(payload.city);
   await frame.getByLabel('Zip code').first().fill(payload.zipCode);
   await frame
-    .getByRole('button', { name: 'State', disabled: false }) // For KYC is "State"
+    .getByRole('button', { name: 'State', disabled: false, exact: true })
     .first()
     .click();
   await page.keyboard.press('ArrowDown');
@@ -153,7 +161,7 @@ export const fillAddressKYB = async (
   await frame.getByLabel('City').first().fill(payload.city);
   await frame.getByLabel('Zip code').first().fill(payload.zipCode);
   await frame
-    .getByRole('button', { name: 'Select', disabled: false }) // For KYB is "Select"
+    .getByRole('button', { name: 'Select', disabled: false })
     .first()
     .click();
   await page.keyboard.press('ArrowDown');
@@ -244,7 +252,7 @@ export const doLivenessCheck = async (
   }: { frame: FrameLocator; page: Page; browser: Browser },
   { flowId }: { flowId: string },
 ) => {
-  const header = frame.getByText('Liveness check & ID document').first();
+  const header = frame.getByText(/liveness check/i).first();
   const hasHeader = await header
     .waitFor({ state: 'attached', timeout: 10000 })
     .then(() => true)

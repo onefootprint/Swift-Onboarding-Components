@@ -3,6 +3,8 @@ import { CountrySelect } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
+import { useL10nContext } from '../../../../../../components/l10n-provider';
+
 type CountryFieldProps = {
   onChange: () => void;
 };
@@ -10,6 +12,7 @@ type CountryFieldProps = {
 const CountryField = ({ onChange }: CountryFieldProps) => {
   const { control } = useFormContext();
   const { t } = useTranslation('pages.business-address.form.country');
+  const l10n = useL10nContext();
 
   return (
     <Controller
@@ -29,6 +32,7 @@ const CountryField = ({ onChange }: CountryFieldProps) => {
           // hardcode disabled until we support other countries
           disabled
           hint={t('us-only-hint')}
+          locale={l10n?.locale}
         />
       )}
     />

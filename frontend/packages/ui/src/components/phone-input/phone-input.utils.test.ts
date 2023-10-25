@@ -1,5 +1,4 @@
 import {
-  getCountryCode,
   getCountryFromPhoneNumber,
   getNationalNumber,
 } from './phone-input.utils';
@@ -19,17 +18,6 @@ describe('getCountryFromPhoneNumber', () => {
   });
 });
 
-describe('getCountryCode', () => {
-  it.each`
-    locale     | output
-    ${'ab-CD'} | ${'CD'}
-    ${'ab-cd'} | ${'CD'}
-    ${'ab_CD'} | ${'CD'}
-    ${'ab_cd'} | ${'CD'}
-  `(`should return $output`, ({ locale, output }) => {
-    expect(getCountryCode(locale)).toBe(output);
-  });
-});
 describe('getNationalNumber', () => {
   it.each`
     prefix       | value             | output

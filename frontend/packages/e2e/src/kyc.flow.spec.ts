@@ -11,6 +11,7 @@ import {
   selectOutcomeOptional,
   verifyPhoneNumber,
   doLivenessCheck,
+  waitForVerifyButton,
 } from './utils/commands';
 
 const firstName = 'Jane';
@@ -37,11 +38,7 @@ test('KYC for env.NEXT_PUBLIC_E2E_TENANT_PK #ci', async ({
   await page.goto(`/e2e?&flow=${flowId}`);
   await page.waitForLoadState();
 
-  const verifyBtn = page.locator('.footprint-verify-button').first();
-  await verifyBtn
-    .waitFor({ state: 'attached', timeout: 20000 })
-    .then(() => true)
-    .catch(() => false);
+  await waitForVerifyButton({ page });
 
   await page.getByRole('button', { name: 'Verify with Footprint' }).click();
   await page.waitForLoadState();

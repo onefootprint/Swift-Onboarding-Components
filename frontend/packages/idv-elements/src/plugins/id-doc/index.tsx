@@ -4,6 +4,7 @@ import { OpenCvProvider } from 'opencv-react-ts';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 
+import { useL10nContext } from '../../components/l10n-provider';
 import { ImgProcessorsContextProvider } from './components/image-processors';
 import { MachineProvider } from './components/machine-provider';
 import { MissingPermissionsSheetProvider } from './components/missing-permissions-sheet';
@@ -12,10 +13,12 @@ import queryClient from './config/initializers/react-query';
 import { FaceModelProvider } from './hooks/use-face-model-loader';
 import Router from './pages/router';
 import type { IdDocProps } from './types';
+import { getCountryCodeFromLocale } from './utils/get-country-from-code';
 import getSupportedCountryDocTypes from './utils/get-supported-country-doc-types';
 import type { MachineContext } from './utils/state-machine';
 
 const App = ({ context, onDone }: IdDocProps) => {
+  const l10n = useL10nContext();
   const { authToken, device, customData } = context;
   if (!customData) {
     return null;
@@ -30,7 +33,7 @@ const App = ({ context, onDone }: IdDocProps) => {
     currSide: IdDocImageTypes.front,
     requirement: customData.requirement,
     idDoc: {
-      country: undefined,
+      country: getCountryCodeFromLocale(l10n?.locale),
       type: undefined,
     },
     sandboxOutcome,

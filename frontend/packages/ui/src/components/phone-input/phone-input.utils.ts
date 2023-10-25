@@ -1,4 +1,3 @@
-import type { SupportedLocale } from '@onefootprint/footprint-js';
 import { COUNTRIES, DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import type { CountryCode } from '@onefootprint/types';
 import { PhoneNumberUtil } from 'google-libphonenumber';
@@ -24,6 +23,3 @@ export const getNationalNumber = (prefix: string, value = '') => {
   if (!value) return value;
   return value.replace(prefix, '');
 };
-
-export const getCountryCode = (l?: SupportedLocale) =>
-  l ? (l.slice(-2).toUpperCase() as CountryCode) : undefined;

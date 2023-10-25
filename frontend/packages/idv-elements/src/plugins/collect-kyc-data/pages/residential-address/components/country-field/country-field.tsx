@@ -4,6 +4,7 @@ import { CountrySelect } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
+import { useL10nContext } from '../../../../../../components/l10n-provider';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import type { FormData } from '../../types';
 
@@ -20,6 +21,7 @@ const CountryField = ({ onChange, disabled }: CountryFieldProps) => {
   const { control, watch } = useFormContext<FormData>();
   const country = watch('country');
   const { t } = useTranslation('pages.residential-address.form.country');
+  const l10n = useL10nContext();
   const allowedCountries = new Set(config.supportedCountries);
   const shouldDisable = disabled || allowedCountries.size === 1;
   const options = COUNTRIES.filter(entry => allowedCountries.has(entry.value));
@@ -46,6 +48,7 @@ const CountryField = ({ onChange, disabled }: CountryFieldProps) => {
           }}
           placeholder={t('placeholder')}
           value={field.value}
+          locale={l10n?.locale}
         />
       )}
     />

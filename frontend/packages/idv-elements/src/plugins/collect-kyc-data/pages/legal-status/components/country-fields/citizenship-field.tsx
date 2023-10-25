@@ -5,6 +5,8 @@ import { CountrySelect, IconButton } from '@onefootprint/ui';
 import React from 'react';
 import type { ControllerRenderProps, FieldValues } from 'react-hook-form';
 
+import { useL10nContext } from '../../../../../../components/l10n-provider';
+
 type CitizenshipFieldProps = {
   field: ControllerRenderProps<FieldValues, `citizenships.${number}`>;
   onChange: (nextValue: object) => void;
@@ -23,6 +25,7 @@ const CitizenshipField = ({
   hint,
 }: CitizenshipFieldProps) => {
   const { t } = useTranslation('pages.legal-status.form');
+  const l10n = useL10nContext();
 
   const citizenshipSelect = (
     <CountrySelect
@@ -33,6 +36,7 @@ const CitizenshipField = ({
       value={field.value}
       hasError={hasError}
       hint={hint}
+      locale={l10n?.locale}
     />
   );
 

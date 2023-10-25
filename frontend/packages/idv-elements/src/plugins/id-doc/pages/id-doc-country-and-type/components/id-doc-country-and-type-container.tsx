@@ -18,6 +18,7 @@ import {
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
+import { useL10nContext } from '../../../../../components/l10n-provider';
 import HeaderTitle from '../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
 import StickyBottomBox from '../../../../../components/layout/components/sticky-bottom-box/sticky-bottom-box';
@@ -58,6 +59,7 @@ const IdDocCountryAndTypeContainer = ({
   const { t } = useTranslation('pages.country-and-type-selection');
   const [state] = useIdDocMachine();
   const submitDocTypeMutation = useSubmitDocType();
+  const l10n = useL10nContext();
   const {
     idDoc: defaultCountryDoc,
     authToken,
@@ -180,6 +182,7 @@ const IdDocCountryAndTypeContainer = ({
               : undefined
           }
           testID="country-selector"
+          locale={l10n?.locale}
         />
         <Divider />
         {options.length > 0 ? (

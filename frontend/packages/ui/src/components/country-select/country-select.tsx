@@ -1,8 +1,10 @@
+import type { SupportedLocale } from '@onefootprint/footprint-js';
 import { COUNTRIES } from '@onefootprint/global-constants';
 import styled, { css } from '@onefootprint/styled';
 import type { CountryCode } from '@onefootprint/types';
 import React from 'react';
 
+import { getCountryCodeFromLocale } from '../../utils';
 import Flag from '../flag';
 import type {
   BaseSelectOption,
@@ -17,6 +19,7 @@ export type CountrySelectProps = Omit<
   BaseSelectProps<CountrySelectOption>,
   'options' | 'renderTrigger'
 > & {
+  locale?: SupportedLocale;
   options?: CountrySelectOption[];
   placeholder?: string;
 };
@@ -35,43 +38,52 @@ const CountrySelect = ({
   placeholder = 'Select',
   testID,
   value,
-}: CountrySelectProps) => (
-  <BaseSelect<BaseSelectOption<CountryCode>>
-    disabled={disabled}
-    emptyStateText={emptyStateText}
-    hasError={hasError}
-    hint={hint}
-    id={id}
-    label={label}
-    name={name}
-    onBlur={onBlur}
-    onChange={onChange}
-    OptionComponent={Option}
-    options={options}
-    testID={testID}
-    value={value}
-    renderTrigger={({
-      isOpen,
-      selectedOption,
-      onClick,
-      testID: triggerTestID,
-    }) => (
-      <BaseSelectTrigger
-        disabled={disabled}
-        hasError={hasError}
-        hasFocus={isOpen}
-        isPrivate
-        onClick={onClick}
-        testID={triggerTestID}
-      >
-        {selectedOption?.value && (
-          <StyledFlag code={selectedOption.value} disabled={disabled} />
-        )}
-        <LabelContainer>{selectedOption?.label || placeholder}</LabelContainer>
-      </BaseSelectTrigger>
-    )}
-  />
-);
+  locale,
+}: CountrySelectProps) => {
+  const localeCountry = getCountryCodeFromLocale(locale);
+  const currentValue =
+    !value && locale ? options.find(o => o.value === localeCountry) : value;
+
+  return (
+    <BaseSelect<BaseSelectOption<CountryCode>>
+      disabled={disabled}
+      emptyStateText={emptyStateText}
+      hasError={hasError}
+      hint={hint}
+      id={id}
+      label={label}
+      name={name}
+      onBlur={onBlur}
+      onChange={onChange}
+      OptionComponent={Option}
+      options={options}
+      testID={testID}
+      value={currentValue}
+      renderTrigger={({
+        isOpen,
+        selectedOption,
+        onClick,
+        testID: triggerTestID,
+      }) => (
+        <BaseSelectTrigger
+          disabled={disabled}
+          hasError={hasError}
+          hasFocus={isOpen}
+          isPrivate
+          onClick={onClick}
+          testID={triggerTestID}
+        >
+          {selectedOption?.value && (
+            <StyledFlag code={selectedOption.value} disabled={disabled} />
+          )}
+          <LabelContainer>
+            {selectedOption?.label || placeholder}
+          </LabelContainer>
+        </BaseSelectTrigger>
+      )}
+    />
+  );
+};
 
 const LabelContainer = styled.div`
   text-overflow: ellipsis;

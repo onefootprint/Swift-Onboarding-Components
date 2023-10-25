@@ -82,6 +82,7 @@ const Template: Story<CountrySelectProps> = ({
   searchPlaceholder,
   testID,
   value,
+  locale,
 }: CountrySelectProps) => {
   const [selectedOption, setSelectedOption] = useState<
     CountrySelectOption | undefined
@@ -107,6 +108,7 @@ const Template: Story<CountrySelectProps> = ({
       searchPlaceholder={searchPlaceholder}
       testID={testID}
       value={selectedOption}
+      locale={locale}
     />
   );
 };
@@ -123,5 +125,6 @@ Base.args = {
   placeholder: 'Select...',
   searchPlaceholder: 'Search',
   testID: 'select-test-id',
+  locale: 'es-MX',
   value: undefined,
 };

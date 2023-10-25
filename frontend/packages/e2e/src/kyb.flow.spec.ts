@@ -13,6 +13,7 @@ import {
   selectOutcomeOptional,
   verifyPhoneNumber,
   doLivenessCheck,
+  waitForVerifyButton,
 } from './utils/commands';
 
 const firstName = 'Jane';
@@ -40,8 +41,10 @@ test('E2E.KYB.flow #ci', async ({ browser, browserName, page, isMobile }) => {
   const key = 'ob_test_5zu2usM1ilTzDnqQpaZ6Sg';
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(`/preview?ob_key=${key}&flow=${flowId}`);
+  await page.goto(`/e2e?ob_key=${key}&flow=${flowId}`);
   await page.waitForLoadState();
+
+  await waitForVerifyButton({ page });
 
   await page.getByRole('button', { name: 'Verify with Footprint' }).click();
   await page.waitForLoadState();

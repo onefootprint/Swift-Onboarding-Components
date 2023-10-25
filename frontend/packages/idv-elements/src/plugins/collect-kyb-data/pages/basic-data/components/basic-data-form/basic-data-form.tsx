@@ -237,6 +237,7 @@ const BasicDataForm = ({
                   setValue('phoneNumber', undefined);
                 }}
                 value={value}
+                locale={l10n?.locale}
               />
             )}
           />

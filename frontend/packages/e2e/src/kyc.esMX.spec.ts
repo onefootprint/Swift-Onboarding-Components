@@ -3,46 +3,39 @@ import { expect, test } from '@playwright/test';
 import {
   clickOnContinue,
   confirmData,
-  continueOnAgree,
   continueOnDesktop,
   doLivenessCheck,
   fillAddress,
   fillEmail,
   fillNameAndDoB,
   fillPhoneNumber,
-  fillSSN,
   selectOutcomeOptional,
-  uploadImage,
   verifyPhoneNumber,
   waitForVerifyButton,
 } from './utils/commands';
 
-const firstName = 'Jane';
-const lastName = 'Doe';
-const dob = '01/01/1990';
-const email = 'janedoe@acme.com';
+const firstName = 'Jorge';
+const lastName = 'Mejia';
+const dob = '25/12/1990';
+const email = 'jorge@mejia.com';
 const phoneNumber = '5555550100';
 const addressLine1 = '432 3rd Ave';
 const city = 'Seward';
 const zipCode = '99664';
-const ssn = '418437970';
 
-test('E2E.KYC.DriverDocOnly #ci', async ({
+test('E2E.es-MX.KYC.Docs #NOT-YET-CI', async ({
   browserName,
   page,
   browser,
-  isMobile,
 }) => {
-  // eslint-disable-next-line playwright/no-conditional-in-test
-  if (isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
   test.setTimeout(120000);
   const context = await browser.newContext();
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
-  const key = 'ob_test_0DNRM31nSBCSqHLJQTeWi9';
+  const key = 'ob_test_yHlPBcaJ6lnxwkkD1YLStx';
+  const locale = 'es-MX';
 
-  await context.grantPermissions(['camera']);
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(`/e2e?ob_key=${key}&flow=${flowId}`);
+  await page.goto(`/e2e?ob_key=${key}&locale=${locale}&flow=${flowId}`);
   await page.waitForLoadState();
 
   await waitForVerifyButton({ page });
@@ -60,6 +53,13 @@ test('E2E.KYC.DriverDocOnly #ci', async ({
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
+  await frame.getByRole('button').filter({ hasText: '+52' }).first().click();
+  await page.keyboard.press('u');
+  await page.keyboard.press('n');
+  await page.keyboard.press('i');
+  await page.keyboard.press('t');
+  await page.keyboard.press('Enter');
+
   await fillPhoneNumber({ frame }, { phoneNumber });
   await clickOnContinue({ frame });
   await page.waitForLoadState();
@@ -75,10 +75,6 @@ test('E2E.KYC.DriverDocOnly #ci', async ({
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  await fillSSN({ frame }, { ssn });
-  await clickOnContinue({ frame });
-  await page.waitForLoadState();
-
   await confirmData(
     { frame },
     { firstName, lastName, dob, addressLine1, city, zipCode },
@@ -86,50 +82,13 @@ test('E2E.KYC.DriverDocOnly #ci', async ({
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  if (!isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
-    await doLivenessCheck({ page, frame, browser }, { flowId });
-    await page.waitForLoadState();
-  }
-
-  if (!isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
-    await continueOnDesktop({ frame });
-    await page.waitForLoadState();
-  }
-
-  await clickOnContinue({ frame });
+  await doLivenessCheck({ page, frame, browser }, { flowId });
   await page.waitForLoadState();
 
-  if (isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
-    await page.waitForTimeout(1000); // eslint-disable-line playwright/no-wait-for-timeout
-    await clickOnContinue({ frame });
-
-    await page.waitForTimeout(1000); // eslint-disable-line playwright/no-wait-for-timeout
-    await clickOnContinue({ frame });
-  }
-
-  await frame
-    .getByText(/Optional/i)
-    .first()
-    .scrollIntoViewIfNeeded();
-
-  await continueOnAgree({ frame });
+  await continueOnDesktop({ frame });
   await page.waitForLoadState();
 
-  await uploadImage(
-    { frame, page, isMobile },
-    /Choose file to upload/i,
-    'driver-front.png',
-  );
-  await clickOnContinue({ frame });
-  await page.waitForLoadState();
-
-  await uploadImage(
-    { frame, page, isMobile },
-    /Choose file to upload/i,
-    'driver-back.png',
-  );
-  await clickOnContinue({ frame });
+  await expect(frame.getByRole('button', { name: 'Mexico' })).toBeVisible();
 
   await context.close();
-  return expect(1).toBe(1);
 });

@@ -17,6 +17,7 @@ const Template: Story<PhoneInputProps> = ({
   onChangeText,
   onReset,
   value: initialValue,
+  locale,
 }: PhoneInputProps) => {
   const [value, setValue] = useState<string | undefined>(initialValue);
 
@@ -37,6 +38,7 @@ const Template: Story<PhoneInputProps> = ({
       hint={hint}
       label="Phone"
       name="phone"
+      locale={locale}
       onChange={handleChange}
       onChangeText={onChangeText}
       onReset={handleReset}
@@ -53,6 +55,7 @@ Base.args = {
   onChange: console.log,
   onChangeText: console.log,
   value: '',
+  locale: 'es-MX',
   onReset: () => {
     console.log('onReset'); // eslint-disable-line no-console
   },

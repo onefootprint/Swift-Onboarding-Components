@@ -156,6 +156,7 @@ export {
   createOverlayBackground,
   createTypography,
   DesignSystemProvider,
+  getCountryCodeFromLocale,
   LoadFonts,
   media,
   useConfirmationDialog,

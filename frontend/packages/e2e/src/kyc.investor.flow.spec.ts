@@ -11,6 +11,7 @@ import {
   fillSSN,
   selectOutcomeOptional,
   verifyPhoneNumber,
+  waitForVerifyButton,
 } from './utils/commands';
 
 const firstName = 'Jane';
@@ -35,8 +36,10 @@ test('E2E.KYC.Investor #ci', async ({
   const key = 'ob_test_3xYoHcfrkxuOGNy8vILxh4';
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(`/preview?ob_key=${key}&flow=${flowId}`);
+  await page.goto(`/e2e?ob_key=${key}&flow=${flowId}`);
   await page.waitForLoadState();
+
+  await waitForVerifyButton({ page });
 
   await page.getByRole('button', { name: 'Verify with Footprint' }).click();
   await page.waitForLoadState();
