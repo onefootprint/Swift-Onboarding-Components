@@ -53,6 +53,32 @@ impl_enum_str_diesel!(ApiKeyStatus);
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
+pub enum ObConfigurationKind {
+    Kyc,
+    Kyb,
+    Auth,
+}
+
+impl_enum_str_diesel!(ObConfigurationKind);
+
+#[derive(
+    Eq,
+    PartialEq,
+    Debug,
+    Display,
+    Clone,
+    Copy,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
+    AsRefStr,
+    serde_with::DeserializeFromStr,
+    Apiv2Schema,
+    macros::SerdeAttr,
+)]
+#[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
+#[diesel(sql_type = Text)]
 pub enum CipKind {
     Alpaca,
     Apex,

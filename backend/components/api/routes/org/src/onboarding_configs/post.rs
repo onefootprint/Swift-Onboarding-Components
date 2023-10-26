@@ -10,7 +10,9 @@ use api_core::errors::AssertionError;
 use db::models::ob_configuration::ObConfiguration;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use newtypes::{AdverseMediaListKind, CipKind, DataIdentifierDiscriminant, EnhancedAml, TenantId};
+use newtypes::{
+    AdverseMediaListKind, CipKind, DataIdentifierDiscriminant, EnhancedAml, ObConfigurationKind, TenantId,
+};
 use newtypes::{CollectedData as CD, Iso3166TwoDigitCountryCode};
 use newtypes::{CollectedDataOption as CDO, EnhancedAmlOption};
 use paperclip::actix::Apiv2Schema;
@@ -42,6 +44,7 @@ pub struct CreateOnboardingConfigurationRequest {
     allow_us_residents: Option<bool>,
     // TODO: drop this option
     allow_us_territory_residents: Option<bool>,
+    kind: Option<ObConfigurationKind>,
 }
 
 impl CreateOnboardingConfigurationRequest {
@@ -224,10 +227,17 @@ impl CreateOnboardingConfigurationRequest {
     fn validate(&self) -> ApiResult<()> {
         self.validate_inner()?;
 
-        let required_fields = if self.is_no_phone_flow.unwrap_or(false) {
-            vec![CDO::Name, CDO::FullAddress, CDO::Email]
-        } else {
-            vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber]
+        let required_fields = match self.kind {
+            Some(ObConfigurationKind::Auth) => {
+                vec![CDO::Email, CDO::PhoneNumber]
+            }
+            _ => {
+                if self.is_no_phone_flow.unwrap_or(false) {
+                    vec![CDO::Name, CDO::FullAddress, CDO::Email]
+                } else {
+                    vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber]
+                }
+            }
         };
 
         self.validate_enhanced_aml()?;
@@ -239,7 +249,7 @@ impl CreateOnboardingConfigurationRequest {
             .collect();
         if !missing_required_fields.is_empty() {
             return Err(TenantError::ValidationError(format!(
-                "All ob configurations must require {:?}",
+                "Playbook must collect {:?}",
                 missing_required_fields
             ))
             .into());
@@ -306,6 +316,32 @@ impl CreateOnboardingConfigurationRequest {
     }
 
     fn validate_flags(&self, state: &State, tenant_id: &TenantId) -> ApiResult<()> {
+        if matches!(self.kind, Some(ObConfigurationKind::Auth)) {
+            // Not strictly necessary, but just a warm-up for better per-config-kind validation
+            let unallowed_flags = vec![
+                (self.is_no_phone_flow == Some(true), "is_no_phone_flow"),
+                (self.is_doc_first_flow, "is_doc_first_flow"),
+                (
+                    self.allow_international_residents,
+                    "allow_international_residents",
+                ),
+                (
+                    self.international_country_restrictions.is_some(),
+                    "international_country_restrictions",
+                ),
+                (self.skip_kyc, "skip_kyc"),
+                (
+                    self.enhanced_aml.as_ref().is_some_and(|e| e.enhanced_aml),
+                    "enhanced_aml",
+                ),
+            ];
+            if let Some((_, f)) = unallowed_flags.into_iter().find(|(v, _)| *v) {
+                return Err(
+                    TenantError::ValidationError(format!("Cannot provide {} on auth playbook", f)).into(),
+                );
+            }
+        }
+
         let is_alpaca_tenant = state
             .feature_flag_client
             .flag(BoolFlag::IsAlpacaTenant(tenant_id));
@@ -370,6 +406,7 @@ pub async fn post(
         enhanced_aml,
         allow_us_residents,
         allow_us_territory_residents,
+        kind,
     } = request.into_inner();
     let is_live = auth.is_live()?;
     let tenant_id = tenant.id.clone();
@@ -385,6 +422,13 @@ pub async fn post(
     if is_live && tenant.is_prod_kyb_playbook_restricted && is_kyb {
         return Err(TenantError::CannotCreateProdKybPlaybook.into());
     }
+    // Newer auth playbooks will have the kind specified in API
+    // TODO deprecate this when we start receiving the kind from all requests
+    let kind = kind.unwrap_or(if is_kyc {
+        ObConfigurationKind::Kyc
+    } else {
+        ObConfigurationKind::Kyb
+    });
 
     // Hard coded for now until we expose in playbooks. TODO: could maybe have "tenant defaults" expressed in our code where we could map tenants to default invariants for them
     // like Coba should always have skip_kyc=true. Probably better than doing this purely via PG or via feature flags
@@ -422,6 +466,7 @@ pub async fn post(
                 // TODO: remove these once frontend is merged
                 allow_us_residents.unwrap_or(true),
                 allow_us_territory_residents.unwrap_or(false),
+                kind,
             )?;
             let obc = db::actor::saturate_actor_nullable(conn, obc)?;
             Ok(obc)
@@ -522,6 +567,7 @@ mod test {
             enhanced_aml: Some(EnhancedAml::default()),
             allow_us_residents: Some(true),
             allow_us_territory_residents: Some(false),
+            kind: Some(ObConfigurationKind::Kyc),
         };
         req.validate_inner().is_ok()
     }
@@ -550,6 +596,7 @@ mod test {
             enhanced_aml: Some(EnhancedAml::default()),
             allow_us_residents: Some(true),
             allow_us_territory_residents: Some(false),
+            kind: Some(ObConfigurationKind::Kyc),
         };
         req.validate().is_ok()
     }
@@ -577,6 +624,7 @@ mod test {
             enhanced_aml: Some(EnhancedAml::default()),
             allow_us_residents: Some(true),
             allow_us_territory_residents: Some(false),
+            kind: Some(ObConfigurationKind::Kyc),
         };
         req.validate().is_ok()
     }
@@ -600,6 +648,7 @@ mod test {
             enhanced_aml: Some(EnhancedAml::default()),
             allow_us_residents: Some(true),
             allow_us_territory_residents: Some(false),
+            kind: Some(ObConfigurationKind::Kyc),
         };
         req.validate().is_ok()
     }

@@ -20,6 +20,7 @@ use newtypes::DocumentCdoInfo;
 use newtypes::EnhancedAmlOption;
 use newtypes::IdDocKind;
 use newtypes::Iso3166TwoDigitCountryCode;
+use newtypes::ObConfigurationKind;
 use newtypes::WorkflowId;
 use newtypes::{ApiKeyStatus, CipKind, DataIdentifierDiscriminant, DbActor};
 use newtypes::{CollectedDataOption as CDO, ObConfigurationId, ObConfigurationKey, TenantId};
@@ -55,6 +56,7 @@ pub struct ObConfiguration {
     pub enhanced_aml: EnhancedAmlOption,
     pub allow_us_residents: bool,
     pub allow_us_territory_residents: bool,
+    pub kind: Option<ObConfigurationKind>,
 }
 
 #[derive(derive_more::Deref)]
@@ -306,8 +308,9 @@ struct NewObConfiguration {
     skip_kyc: bool,
     doc_scan_for_optional_ssn: Option<CDO>,
     enhanced_aml: EnhancedAmlOption,
-    pub allow_us_residents: bool,
-    pub allow_us_territory_residents: bool,
+    allow_us_residents: bool,
+    allow_us_territory_residents: bool,
+    kind: ObConfigurationKind,
 }
 
 #[derive(Debug)]
@@ -497,6 +500,7 @@ impl ObConfiguration {
         enhanced_aml: EnhancedAmlOption,
         allow_us_residents: bool,
         allow_us_territory_residents: bool,
+        kind: ObConfigurationKind,
     ) -> DbResult<Self> {
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
@@ -519,6 +523,7 @@ impl ObConfiguration {
             enhanced_aml,
             allow_us_residents,
             allow_us_territory_residents,
+            kind,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)
@@ -593,7 +598,7 @@ mod tests {
     use crate::tests::prelude::*;
     use chrono::Utc;
     use macros::db_test;
-    use newtypes::{AdverseMediaListKind, CipKind};
+    use newtypes::{AdverseMediaListKind, CipKind, ObConfigurationKind};
     use newtypes::{
         ApiKeyStatus, CollectedDataOption, DocumentCdoInfo, EnhancedAmlOption, IdDocKind,
         Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, TenantId,
@@ -640,6 +645,7 @@ mod tests {
             enhanced_aml: EnhancedAmlOption::No,
             allow_us_residents,
             allow_us_territory_residents,
+            kind: Some(ObConfigurationKind::Kyc),
         };
 
         assert_have_same_elements(
@@ -681,6 +687,7 @@ mod tests {
             enhanced_aml: EnhancedAmlOption::No,
             allow_us_residents: true,
             allow_us_territory_residents: false,
+            kind: Some(ObConfigurationKind::Kyc),
         }
     }
 
@@ -843,6 +850,7 @@ mod tests {
             enhanced_aml: EnhancedAmlOption::No,
             allow_us_residents: true,
             allow_us_territory_residents: false,
+            kind: Some(ObConfigurationKind::Kyc),
         };
 
         obc.optional_ssn_restricted_id_doc_kinds()
@@ -877,6 +885,7 @@ mod tests {
             enhanced_aml: EnhancedAmlOption::No,
             allow_us_residents: true,
             allow_us_territory_residents: false,
+            kind: Some(ObConfigurationKind::Kyc),
         };
 
         let mapping = obc.supported_country_mapping_for_document(None).0;

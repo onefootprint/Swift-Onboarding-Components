@@ -486,6 +486,7 @@ table! {
         enhanced_aml -> Jsonb,
         allow_us_residents -> Bool,
         allow_us_territory_residents -> Bool,
+        kind -> Nullable<Text>,
     }
 }
 

@@ -1,6 +1,7 @@
 use crate::PgConn;
 use newtypes::{
-    CipKind, CollectedDataOption as CDO, DbActor, EnhancedAmlOption, Iso3166TwoDigitCountryCode, TenantId,
+    CipKind, CollectedDataOption as CDO, DbActor, EnhancedAmlOption, Iso3166TwoDigitCountryCode,
+    ObConfigurationKind, TenantId,
 };
 
 use crate::models::ob_configuration::ObConfiguration;
@@ -25,6 +26,7 @@ pub fn create(conn: &mut PgConn, tenant_id: &TenantId, is_live: bool) -> ObConfi
         EnhancedAmlOption::No,
         true,
         false,
+        ObConfigurationKind::Kyc,
     )
     .expect("Could not create ob config")
 }
@@ -91,6 +93,7 @@ pub fn create_with_opts(
         opts.enhanced_aml,
         true,
         false,
+        ObConfigurationKind::Kyc,
     )
     .expect("Could not create ob config")
 }
