@@ -64,7 +64,7 @@ const Container = styled(Box)<ContainerProps>`
     width,
   }) => css`
     display: grid;
-    width:${width};
+    width: ${width};
     grid-template-columns: ${createColumns(columns)};
     grid-template-rows: ${createRows(rows)};
     grid-gap: ${gap ? theme.spacing[gap] : undefined};
