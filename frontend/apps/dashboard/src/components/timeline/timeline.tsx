@@ -1,6 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Box, LoadingIndicator, Stack, Typography } from '@onefootprint/ui';
+import {
+  Box,
+  Grid,
+  LoadingIndicator,
+  Stack,
+  Typography,
+} from '@onefootprint/ui';
 import React, { Fragment } from 'react';
 
 import type { TimelineItemTimeData } from './components/timeline-item-time';
@@ -67,23 +73,24 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
                   {iconComponent}
                 </Icon>
               )}
-              <Header
-                align="center"
-                justify="start"
-                marginLeft={2}
-                marginTop={0}
-              >
-                {headerComponent}
-              </Header>
-              <Body
-                direction="column"
-                gap={2}
-                width="100%"
-                marginLeft={5}
-                paddingBottom={7}
-              >
-                {bodyComponent && <Box paddingLeft={5}>{bodyComponent}</Box>}
-              </Body>
+              <Content direction="column">
+                <Header
+                  align="center"
+                  justify="start"
+                  marginLeft={5}
+                  marginTop={0}
+                >
+                  {headerComponent}
+                </Header>
+                <Stack
+                  direction="column"
+                  gap={2}
+                  width="100%"
+                  paddingBottom={7}
+                >
+                  {bodyComponent && <Box paddingLeft={5}>{bodyComponent}</Box>}
+                </Stack>
+              </Content>
             </StepContainer>
           );
         })}
@@ -103,8 +110,8 @@ const StepContainer = styled.div`
     grid-template-columns: 150px 16px 1fr;
     grid-template-rows: auto;
     grid-template-areas:
-      'time icon header'
-      'empty line body';
+      'time icon content'
+      'empty line content';
     gap: ${theme.spacing[2]};
     align-items: start;
     justify-content: start;
@@ -112,19 +119,19 @@ const StepContainer = styled.div`
   `}
 `;
 
-const Body = styled(Stack)`
-  grid-area: body;
+const Content = styled(Grid.Item)`
+  grid-area: content;
 `;
 
-const Icon = styled(Stack)`
+const Icon = styled(Grid.Item)`
   grid-area: icon;
 `;
 
-const TimeContainer = styled(Stack)`
+const TimeContainer = styled(Grid.Item)`
   grid-area: time;
 `;
 
-const Header = styled(Stack)`
+const Header = styled(Grid.Item)`
   ${({ theme }) => css`
     grid-area: header;
     min-height: ${HEADER_HEIGHT};
@@ -132,7 +139,7 @@ const Header = styled(Stack)`
   `};
 `;
 
-const Line = styled.div<{ last: boolean }>`
+const Line = styled(Grid.Item)<{ last: boolean }>`
   ${({ theme, last }) => css`
     grid-area: icon / line / line;
     position: relative;
