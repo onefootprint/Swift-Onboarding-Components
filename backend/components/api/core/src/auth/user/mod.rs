@@ -18,7 +18,10 @@ pub use user_wf::*;
 #[serde(rename = "snake_case")]
 // WARNING: changing this could break existing user auth sessions
 pub enum UserAuthScope {
+    /// For adding new data in bifrost
     SignUp,
+    /// For adding auth data
+    Auth,
     // We don't currently issue a token with this - was for my1fp
     BasicProfile,
     SensitiveProfile,

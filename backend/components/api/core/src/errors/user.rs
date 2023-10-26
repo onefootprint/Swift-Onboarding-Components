@@ -28,6 +28,8 @@ pub enum UserError {
     InvalidAuthSession(String),
     #[error("Must provide either a playbook public key or a user auth with a playbook attached in order to create an onboarding token")]
     ObConfigRequiredForSignUp,
+    #[error("Must provide an auth playbook public key to create an auth token")]
+    PlaybookMissingForAuth,
     #[error("Cannot reonboard user - user has no complete onboardings.")]
     NoCompleteOnboardings,
 }

@@ -32,8 +32,8 @@ use db::models::vault::Vault;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::TxnPgConn;
 use newtypes::{
-    AuthEventKind, DataIdentifier, IdentityDataKind as IDK, ObConfigurationId, ScopedVaultId,
-    SessionAuthToken, VaultId, WebauthnCredentialId,
+    AuthEventKind, DataIdentifier, IdentifyScope, IdentityDataKind as IDK, ObConfigurationId,
+    ObConfigurationKind, ScopedVaultId, SessionAuthToken, VaultId, WebauthnCredentialId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -45,13 +45,6 @@ pub struct VerifyRequest {
     /// Determines which scopes the issued auth token will have. Request the correct scopes for
     /// your use case in order to get the least permissions required
     scope: Option<IdentifyScope>,
-}
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum IdentifyScope {
-    My1fp,
-    Onboarding,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -136,25 +129,50 @@ pub async fn post(
             let sensitive_scope =
                 matches!(auth_factor, AuthFactor::Passkey(_)).then_some(UserAuthScope::SensitiveProfile);
 
-            // Determine whether to issue onboarding scopes or my1fp scopes
+            // Determine which scopes to issue on the auth token
             let (args, scopes, duration, scoped_vault_id) = match scope {
+                IdentifyScope::Auth => {
+                    let obc = ob_pk_auth
+                        .as_ref()
+                        .map(|a| a.ob_config())
+                        .ok_or(UserError::PlaybookMissingForAuth)?;
+                    if obc.kind != ObConfigurationKind::Auth {
+                        return Err(ChallengeError::IncorrectPlaybookKind(obc.kind, scope).into());
+                    }
+                    let uv = Vault::lock(conn, &uv_id)?;
+                    let su = ScopedVault::get_or_create(conn, &uv, obc.id.clone())?;
+
+                    let duration = Duration::hours(1);
+                    let args = UserSessionArgs {
+                        su_id: Some(su.id.clone()),
+                        obc_id: Some(obc.id.clone()),
+                        wf_id: None,
+                        sb_id: None,
+                        is_from_api: false,
+                    };
+                    root_span.record("fp_id", su.fp_id.to_string());
+                    root_span.record("tenant_id", su.tenant_id.to_string());
+                    root_span.record("is_live", su.is_live);
+                    // No permissions to auth
+                    (args, vec![Some(UserAuthScope::Auth)], duration, Some(su.id))
+                }
                 IdentifyScope::Onboarding => {
                     let bo = ob_pk_auth.as_ref().and_then(|a| a.business_owner());
-                    let user_auth_obc_id = user_auth
-                        .as_ref()
-                        .and_then(|a| a.ob_config())
-                        .map(|obc| obc.id.clone());
-                    let ob_pk_obc_id = ob_pk_auth.as_ref().map(|a| a.ob_config().id.clone());
-                    let obc_id = user_auth_obc_id
-                        .or(ob_pk_obc_id)
+                    let user_auth_obc = user_auth.as_ref().and_then(|a| a.ob_config());
+                    let ob_pk_obc = ob_pk_auth.as_ref().map(|a| a.ob_config());
+                    let obc = user_auth_obc
+                        .or(ob_pk_obc)
                         .ok_or(UserError::ObConfigRequiredForSignUp)?;
+                    if obc.kind == ObConfigurationKind::Auth {
+                        return Err(ChallengeError::IncorrectPlaybookKind(obc.kind, scope).into());
+                    }
                     // TOOD we should migrate the BO tokens to use these new un-authed, identified tokens
-                    let (su, sb_id) = onboarding_identifiers(conn, obc_id.clone(), bo, &uv_id)?;
+                    let (su, sb_id) = onboarding_identifiers(conn, obc.id.clone(), bo, &uv_id)?;
                     let duration = Duration::hours(1); // Onboarding is shorter
                     let args = UserSessionArgs {
                         su_id: Some(su.id.clone()),
                         sb_id,
-                        obc_id: Some(obc_id),
+                        obc_id: Some(obc.id.clone()),
                         // wf_id will be added later in POST /hosted/onboarding
                         wf_id: None,
                         is_from_api: false,
@@ -162,16 +180,17 @@ pub async fn post(
                     root_span.record("fp_id", su.fp_id.to_string());
                     root_span.record("tenant_id", su.tenant_id.to_string());
                     root_span.record("is_live", su.is_live);
-                    (args, vec![Some(UserAuthScope::SignUp)], duration, Some(su.id))
+                    let scopes = vec![Some(UserAuthScope::SignUp), sensitive_scope];
+                    (args, scopes, duration, Some(su.id))
                 }
                 IdentifyScope::My1fp => {
-                    let scopes = vec![Some(UserAuthScope::BasicProfile)];
+                    let scopes = vec![Some(UserAuthScope::BasicProfile), sensitive_scope];
                     let duration = Duration::hours(8); // Issue my1fp token for a long time
                     let args = UserSessionArgs::default();
                     (args, scopes, duration, None)
                 }
             };
-            let scopes = scopes.into_iter().chain([sensitive_scope]).flatten().collect();
+            let scopes = scopes.into_iter().flatten().collect();
 
             let auth_token = if let Some(user_auth) = user_auth {
                 // Add the new scopes and args to the existing scopes and args on the auth token
@@ -190,6 +209,7 @@ pub async fn post(
             };
 
             // record the new auth event
+            // TODO include auth event scope here too - what scopes were requested?
             let insight = CreateInsightEvent::from(insight_headers).insert_with_conn(conn)?;
             NewAuthEvent {
                 vault_id: uv_id,
