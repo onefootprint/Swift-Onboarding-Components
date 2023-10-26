@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
+import type { IdDocImageTypes } from '@onefootprint/types';
 import { LoadingIndicator, media } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { useCountdown, useTimeout } from 'usehooks-ts';
@@ -39,6 +40,7 @@ type CameraProps = {
   outlineHeightRatio: number; // with respect to the video width (not height since width is smaller)
   autocaptureKind: AutocaptureKind;
   deviceKind: DeviceKind;
+  imageType: IdDocImageTypes;
 };
 
 const Camera = ({
@@ -49,6 +51,7 @@ const Camera = ({
   outlineHeightRatio,
   autocaptureKind,
   deviceKind,
+  imageType,
 }: CameraProps) => {
   const { t } = useTranslation('components.camera');
   const canvasRef = useRef<HTMLCanvasElement>();
@@ -262,6 +265,7 @@ const Camera = ({
                 outlineWidth={outlineWidth}
                 outlineHeight={outlineHeight}
                 isCameraVisible={isCameraVisible}
+                imageType={imageType}
                 timerAnimationVal={
                   isTimerRunning ? autoCaptureTimerVal : undefined
                 }

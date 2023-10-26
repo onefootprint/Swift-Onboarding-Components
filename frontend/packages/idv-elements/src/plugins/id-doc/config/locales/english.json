@@ -217,7 +217,7 @@
       },
       "overlay": {
         "document": {
-          "title": "Place front of your driver's license here",
+          "title": "Place {{side}} of your driver's license here",
           "subtitle": "We'll scan it automatically"
         },
         "face": {

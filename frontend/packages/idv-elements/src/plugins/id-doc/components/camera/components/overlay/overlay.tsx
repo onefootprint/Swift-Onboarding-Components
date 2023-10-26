@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
+import type { IdDocImageTypes } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React from 'react';
@@ -19,6 +20,7 @@ type OverlayProps = {
   outlineHeight: number;
   isCameraVisible: boolean;
   timerAnimationVal?: number;
+  imageType: IdDocImageTypes;
 };
 
 const transitionDelayInSeconds = FRAME_INSTRUCTION_TRANSITION_DELAY / 1000;
@@ -44,6 +46,7 @@ const Overlay = ({
   outlineHeight,
   isCameraVisible,
   timerAnimationVal,
+  imageType,
 }: OverlayProps) => {
   const { t } = useTranslation('components.camera.overlay');
   return (
@@ -124,7 +127,7 @@ const Overlay = ({
             variants={overlayBackgroundVariants}
           >
             <Typography variant="label-3" sx={{ textAlign: 'center' }}>
-              {t('document.title')}
+              {t('document.title', { side: imageType })}
             </Typography>
             <Typography variant="body-3" sx={{ textAlign: 'center' }}>
               {t('document.subtitle')}

@@ -200,6 +200,7 @@ const PhotoCapture = ({
         outlineHeightRatio={outlineHeightRatio}
         autocaptureKind={autocaptureKind}
         deviceKind={deviceKind}
+        imageType={imageType}
       />
       <Instructions
         onClose={() => setShowInstructions(false)}
