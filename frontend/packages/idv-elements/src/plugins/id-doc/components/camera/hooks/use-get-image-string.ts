@@ -13,6 +13,8 @@ type GetImageStringProps = {
   desiredImageWidth: number;
   desiredImageHeight: number;
   autocaptureKind: AutocaptureKind;
+  centerOffsetX?: number;
+  centerOffsetY?: number;
 };
 
 const useGetImageString = () => {
@@ -26,6 +28,8 @@ const useGetImageString = () => {
     desiredImageWidth,
     desiredImageHeight,
     autocaptureKind,
+    centerOffsetX,
+    centerOffsetY,
   }: GetImageStringProps) => {
     if (!videoRef.current || !canvasRef.current) return null;
 
@@ -34,6 +38,8 @@ const useGetImageString = () => {
       mediaStream,
       desiredImageWidth,
       desiredImageHeight,
+      centerOffsetX,
+      centerOffsetY,
     });
 
     context.imageSmoothingEnabled = true;

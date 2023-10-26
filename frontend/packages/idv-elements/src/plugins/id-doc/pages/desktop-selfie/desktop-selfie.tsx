@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IdDocImageTypes } from '@onefootprint/types';
 import React from 'react';
 
 import PhotoCapture from '../../components/photo-capture/photo-capture';
@@ -33,7 +34,6 @@ const DesktopSelfie = () => {
       outlineHeightRatio={FACE_OUTLINE_TO_WIDTH_RATIO}
       outlineWidthRatio={FACE_OUTLINE_TO_WIDTH_RATIO}
       cameraKind="front"
-      outlineKind="corner"
       onComplete={onComplete}
       autocaptureKind="face"
       deviceKind="desktop"
@@ -42,6 +42,7 @@ const DesktopSelfie = () => {
         preview: t('header.title.preview'),
       }}
       subtitle={{ camera: t('header.subtitle.camera') }}
+      imageType={IdDocImageTypes.selfie}
     />
   ) : (
     <DesktopCameraPermission permissionState={permissionState} />

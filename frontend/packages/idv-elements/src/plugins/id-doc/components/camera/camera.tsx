@@ -7,13 +7,15 @@ import { useCountdown, useTimeout } from 'usehooks-ts';
 import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
 import Logger from '../../../../utils/logger';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
-import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';
+import {
+  AUTOCAPTURE_RESTART_DELAY,
+  AUTOCAPTURE_TIMER_INTERVAL,
+  FRAME_INSTRUCTION_TRANSITION_DELAY,
+} from '../../constants/transition-delay.constants';
 import type { CaptureKind } from '../../utils/state-machine';
 import CaptureButton from './components/capture-button';
 import CountdownTimer from './components/countdown-timer';
 import Feedback from './components/feedback';
-import Flash from './components/flash';
-import type { OutlineKind } from './components/overlay';
 import Overlay from './components/overlay';
 import UploadButton from './components/upload-button';
 import type { AutocaptureKind } from './hooks/use-auto-capture';
@@ -26,7 +28,8 @@ import getOutlineDimensions from './utils/get-outline-dimensions';
 
 export type DeviceKind = 'mobile' | 'desktop';
 const AUTOCAPTURE_TIMER_START_VAL = 3;
-const AUTOCAPTURE_TIMER_INTERVAL = 850; // in milliseconds
+const FEEFBACK_POSITION_FROM_BOTTOM_MOBILE = 150;
+const FEEDBACK_POSITION_FROM_BOTTOM_DESKTOP = 50;
 
 type CameraProps = {
   onCapture: (image: string, captureKind: CaptureKind) => void;
@@ -34,7 +37,6 @@ type CameraProps = {
   cameraKind: CameraKind;
   outlineWidthRatio: number; // with respect to the video width
   outlineHeightRatio: number; // with respect to the video width (not height since width is smaller)
-  outlineKind: OutlineKind;
   autocaptureKind: AutocaptureKind;
   deviceKind: DeviceKind;
 };
@@ -45,7 +47,6 @@ const Camera = ({
   cameraKind,
   outlineWidthRatio,
   outlineHeightRatio,
-  outlineKind,
   autocaptureKind,
   deviceKind,
 }: CameraProps) => {
@@ -54,8 +55,7 @@ const Camera = ({
   const videoRef = useRef<HTMLVideoElement>();
   const videoSize = useSize(videoRef);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const [isFlashing, setIsFlashing] = useState(false);
-  const [startCaptureTimer, setStartCaptureTimer] = useState(false);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [
     autoCaptureTimerVal,
     { startCountdown, stopCountdown, resetCountdown },
@@ -65,13 +65,12 @@ const Camera = ({
   });
   const [autocaptureFeedback, setAutocaptureFeedback] = useState<
     string | undefined
-  >();
+  >('detecting');
   const [isImageProcessing, setIsImageProcessing] = useState(false);
-  const [shouldDetect, setShouldDetect] = useState(true); // TODO: Completely remove the use of this hook by moving the image processing to the processing component
-  const [shouldShowInstructions, setShouldShowInstruction] = useState(true);
-  const [canCapture, setCanCapture] = useState(true);
+  const [shouldDetect, setShouldDetect] = useState(false);
   const [isCaptured, setIsCaptured] = useState(false);
   const getImageStringFromVideo = useGetImageString();
+  const autocaptureRestartTimeout = useRef<NodeJS.Timeout>();
 
   const mediaStream = useUserMedia(cameraKind, onError);
   const isCameraVisible = !!mediaStream && isVideoPlaying;
@@ -81,27 +80,25 @@ const Camera = ({
     outlineWidthRatio,
     deviceKind,
   });
+  const feedbackPositionFromBottom =
+    deviceKind === 'mobile'
+      ? FEEFBACK_POSITION_FROM_BOTTOM_MOBILE
+      : FEEDBACK_POSITION_FROM_BOTTOM_DESKTOP;
+  const feedbackTop =
+    deviceKind === 'mobile'
+      ? (videoSize?.height ?? 0) - FEEFBACK_POSITION_FROM_BOTTOM_MOBILE
+      : (videoSize?.height ?? 0) - FEEDBACK_POSITION_FROM_BOTTOM_DESKTOP;
 
   if (mediaStream && videoRef.current && !videoRef.current.srcObject) {
     videoRef.current.srcObject = mediaStream;
   }
 
-  // Initially we show the instruction text for 1.5 seconds
-  useEffect(() => {
-    setAutocaptureFeedback(`init-${autocaptureKind}`);
-  }, [autocaptureKind]);
-
-  // During the 1.5 seconds when we show instruction text, we do the following:
-  // We don't allow changing the feedback text until the 1.5 seconds have passed
-  // Detection may start working before 1.5 seconds if everything (video, model, etc) is initialized
-  // After 1.5 seconds, we let the detection algorithm change the feedback text
-  // Since detection algorithm might have a delay before the current iteration completes, we set the feedback text to "detecting ..."
+  // We don't detect for 7.5 seconds while we show instruction texts
   useTimeout(
     () => {
-      setShouldShowInstruction(false);
-      if (autocaptureFeedback === 'init') setAutocaptureFeedback('detecting');
+      setShouldDetect(true);
     },
-    isCameraVisible ? TRANSITION_DELAY_DEFAULT : null,
+    isCameraVisible ? FRAME_INSTRUCTION_TRANSITION_DELAY : null,
   );
 
   const handleCanPlay = () => {
@@ -132,9 +129,6 @@ const Camera = ({
       return;
     }
 
-    setIsFlashing(true);
-    setCanCapture(false);
-
     // We capture the full width
     // We keep the captured width/height spect ratio same as the outline aspect ratio
     // In case maintaining the aspect ratio overflows the height, we take the full height (Math.min)
@@ -144,10 +138,6 @@ const Camera = ({
       videoRef.current.clientWidth * (outlineHeightRatio / outlineWidthRatio),
     );
 
-    // Capture the image when the flash starts but only call the onCapture
-    // callback when flash animation is done This gives animation enough time
-    // to complete. Taking the photo at the end of the animation would be
-    // buggy if the user moved during the flash.
     const imageString = getImageStringFromVideo({
       context,
       videoRef,
@@ -156,13 +146,12 @@ const Camera = ({
       desiredImageWidth,
       desiredImageHeight,
       autocaptureKind,
+      centerOffsetY: -feedbackPositionFromBottom / 2, // Negative y direction (upward)
     });
 
     if (imageString) {
       setIsCaptured(true);
       onCapture(imageString, captureKind);
-    } else {
-      setCanCapture(true); // if the no picture was taken successfully, reenable the capture button
     }
     clearCanvas();
   };
@@ -191,13 +180,13 @@ const Camera = ({
   }, [autoCaptureTimerVal]);
 
   const onAutoDetectionComplete = () => {
-    setStartCaptureTimer(true);
+    setIsTimerRunning(true);
     startCountdown();
   };
 
   const resetTimer = () => {
     resetCountdown();
-    setStartCaptureTimer(false);
+    setIsTimerRunning(false);
   };
 
   useAutoCapture({
@@ -210,9 +199,9 @@ const Camera = ({
     onStatusChange: setAutocaptureFeedback,
     autocaptureKind,
     shouldDetect,
-    shouldShowInstructions,
     isCaptured,
     onReset: resetTimer,
+    outlineOffsetY: -feedbackPositionFromBottom / 2, // Negative Y direction (upward)
   });
 
   const onImageUpload = () => {
@@ -224,6 +213,22 @@ const Camera = ({
     setIsImageProcessing(false);
     setShouldDetect(true);
   };
+
+  const onMobileCaptureClick = () => {
+    if (isTimerRunning) {
+      resetTimer();
+      setShouldDetect(false); // We can cancel the countdown
+      const restartTimeout = setTimeout(
+        () => setShouldDetect(true),
+        AUTOCAPTURE_RESTART_DELAY,
+      ); // We wait 1s before re-detecting and starting the countdown again
+      autocaptureRestartTimeout.current = restartTimeout;
+    } else {
+      handleClick('manual');
+    }
+  };
+
+  useEffect(() => () => clearTimeout(autocaptureRestartTimeout.current), []);
 
   return (
     <>
@@ -251,27 +256,32 @@ const Camera = ({
             <>
               <Overlay
                 width={videoSize?.width ?? 0}
-                height={videoSize?.height ?? 0}
-                outlineKind={outlineKind}
+                height={feedbackTop}
+                videoHeight={videoSize?.height ?? 0}
+                captureKind={autocaptureKind}
                 outlineWidth={outlineWidth}
                 outlineHeight={outlineHeight}
+                isCameraVisible={isCameraVisible}
+                timerAnimationVal={
+                  isTimerRunning ? autoCaptureTimerVal : undefined
+                }
               />
               <Canvas
                 ref={canvasRef as React.Ref<HTMLCanvasElement>}
                 width={videoSize?.width}
                 height={videoSize?.height}
               />
-              <Flash flash={isFlashing} />
-              {shouldDetect && autocaptureFeedback && (
-                <Feedback deviceKind={deviceKind}>
-                  {t(`autocapture.feedback.${autocaptureFeedback}`)}
+              {autocaptureFeedback && (
+                <Feedback deviceKind={deviceKind} top={feedbackTop}>
+                  {t(
+                    `autocapture.feedback.${autocaptureKind}.${autocaptureFeedback}`,
+                  )}
                 </Feedback>
               )}
               {deviceKind === 'mobile' && (
                 <CaptureButton
-                  onClick={() => handleClick('manual')}
-                  disabled={!canCapture}
-                  variant="round"
+                  onClick={onMobileCaptureClick}
+                  variant={isTimerRunning ? 'stop' : 'round'}
                 />
               )}
               {autocaptureKind === 'document' && (
@@ -280,8 +290,8 @@ const Camera = ({
                   onComplete={onUploadComplete}
                 />
               )}
-              {startCaptureTimer && (
-                <TimerContainer deviceKind={deviceKind}>
+              {isTimerRunning && (
+                <TimerContainer height={feedbackTop}>
                   <CountdownTimer
                     current={autoCaptureTimerVal}
                     start={AUTOCAPTURE_TIMER_START_VAL}
@@ -299,7 +309,7 @@ const Camera = ({
           <StickyBottomBox>
             <CaptureButton
               onClick={() => handleClick('manual')}
-              disabled={!canCapture || !isCameraVisible}
+              disabled={!isCameraVisible}
               variant="default"
             />
           </StickyBottomBox>
@@ -417,14 +427,14 @@ const ProcessingContainer = styled.div`
   `}
 `;
 
-const TimerContainer = styled.div<{ deviceKind: DeviceKind }>`
-  ${({ theme, deviceKind }) => css`
+const TimerContainer = styled.div<{ height: number }>`
+  ${({ height }) => css`
     width: 100%;
     display: flex;
+    height: ${height}px;
     justify-content: center;
     align-items: center;
     position: absolute;
-    bottom: ${deviceKind === 'mobile' ? theme.spacing[11] : theme.spacing[6]};
     border: none;
     background: none;
   `}

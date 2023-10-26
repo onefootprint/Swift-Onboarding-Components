@@ -5,6 +5,8 @@ type GetSourceDImensionsProps = {
   mediaStream: MediaStream | null;
   desiredImageWidth: number;
   desiredImageHeight: number;
+  centerOffsetX?: number;
+  centerOffsetY?: number;
 };
 
 const getScalingFactor = (
@@ -32,6 +34,8 @@ const getSourceDimensions = ({
   mediaStream,
   desiredImageWidth,
   desiredImageHeight,
+  centerOffsetX = 0,
+  centerOffsetY = 0,
 }: GetSourceDImensionsProps) => {
   const initialDimensions = {
     sx: 0,
@@ -74,10 +78,12 @@ const getSourceDimensions = ({
   // and go half the desired image height (scaled) to upward direction
   // and we get our sx, sy
   const sx = Math.floor(
-    ((scaledWidth - desiredImageWidth) / 2) * (videoWidth / scaledWidth),
+    ((scaledWidth - desiredImageWidth) / 2 + centerOffsetX) *
+      (videoWidth / scaledWidth),
   );
   const sy = Math.floor(
-    ((scaledHeight - desiredImageHeight) / 2) * (videoHeight / scaledHeight),
+    ((scaledHeight - desiredImageHeight) / 2 + centerOffsetY) *
+      (videoHeight / scaledHeight),
   );
 
   return {

@@ -7,10 +7,11 @@ import type { DeviceKind } from '../../camera';
 type FeedbackProps = {
   children: string;
   deviceKind: DeviceKind;
+  top: number;
 };
 
-const Feedback = ({ children, deviceKind }: FeedbackProps) => (
-  <Container deviceKind={deviceKind}>
+const Feedback = ({ children, deviceKind, top }: FeedbackProps) => (
+  <Container data-device={deviceKind} top={top}>
     <FeedbackText>
       <Typography variant="label-4" color="quinary">
         {children}
@@ -19,14 +20,14 @@ const Feedback = ({ children, deviceKind }: FeedbackProps) => (
   </Container>
 );
 
-const Container = styled.div<{ deviceKind: DeviceKind }>`
-  ${({ theme, deviceKind }) => css`
+const Container = styled.div<{ top: number }>`
+  ${({ top }) => css`
     display: flex;
     align-items: center;
     justify-content: center;
     position: absolute;
-    top: ${deviceKind === 'mobile' ? theme.spacing[11] : theme.spacing[3]};
     width: 100%;
+    top: ${top}px;
   `}
 `;
 

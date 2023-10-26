@@ -33,19 +33,24 @@ describe('Id Doc Machine Tests', () => {
   });
 
   describe('Transitions to the correct state after country and doc', () => {
-    it('Should transition frontImageMobile state for mobile', () => {
+    it('Should transition frontImageCaptureMobile state for mobile', () => {
       const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
       machine.start();
 
-      const state = machine.send({
-        type: 'receivedCountryAndType',
-        payload: {
-          type: SupportedIdDocTypes.driversLicense,
-          country: 'US',
-          id: 'id',
+      const state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: {
+            type: SupportedIdDocTypes.driversLicense,
+            country: 'US',
+            id: 'id',
+          },
         },
-      });
-      expect(state.value).toEqual('frontImageMobile');
+        {
+          type: 'consentReceived',
+        },
+      ]);
+      expect(state.value).toEqual('frontImageCaptureMobile');
     });
     it('Should transition to consentDesktop state for desktop', () => {
       const machine = interpret(createIdDocMachine(getArgsRegularDesktop()));
@@ -68,15 +73,20 @@ describe('Id Doc Machine Tests', () => {
       const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
       machine.start();
 
-      let state = machine.send({
-        type: 'receivedCountryAndType',
-        payload: {
-          type: SupportedIdDocTypes.driversLicense,
-          country: 'US',
-          id: 'id',
+      let state = machine.send([
+        {
+          type: 'receivedCountryAndType',
+          payload: {
+            type: SupportedIdDocTypes.driversLicense,
+            country: 'US',
+            id: 'id',
+          },
         },
-      });
-      expect(state.value).toEqual('frontImageMobile');
+        {
+          type: 'consentReceived',
+        },
+      ]);
+      expect(state.value).toEqual('frontImageCaptureMobile');
       expect(state.context.idDoc.country).toEqual('US');
 
       expect(state.context.idDoc.type).toEqual(
@@ -97,18 +107,6 @@ describe('Id Doc Machine Tests', () => {
           },
         },
         {
-          type: 'consentReceived',
-        },
-        {
-          type: 'startImageCapture',
-        },
-        {
-          type: 'navigatedToPrev',
-        },
-        {
-          type: 'startImageCapture',
-        },
-        {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
@@ -126,12 +124,9 @@ describe('Id Doc Machine Tests', () => {
           nextSideToCollect: 'back',
         },
       });
-      expect(state.value).toEqual('backImageMobile');
+      expect(state.value).toEqual('backImageCaptureMobile');
 
       state = machine.send([
-        {
-          type: 'startImageCapture',
-        },
         {
           type: 'receivedImage',
           payload: {
@@ -149,11 +144,6 @@ describe('Id Doc Machine Tests', () => {
         payload: {
           nextSideToCollect: 'selfie',
         },
-      });
-      expect(state.value).toEqual('selfiePromptMobile');
-
-      state = machine.send({
-        type: 'startImageCapture',
       });
       expect(state.value).toEqual('selfieImageMobile');
 
@@ -393,9 +383,6 @@ describe('Id Doc Machine Tests', () => {
           type: 'consentReceived',
         },
         {
-          type: 'startImageCapture',
-        },
-        {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
@@ -425,7 +412,7 @@ describe('Id Doc Machine Tests', () => {
           },
         },
       ]);
-      expect(state.value).toEqual('backImageMobile');
+      expect(state.value).toEqual('backImageCaptureMobile');
       expect(state.context.errors).toEqual([]);
     });
 
@@ -509,9 +496,6 @@ describe('Id Doc Machine Tests', () => {
           type: 'consentReceived',
         },
         {
-          type: 'startImageCapture',
-        },
-        {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
@@ -554,9 +538,6 @@ describe('Id Doc Machine Tests', () => {
           type: 'consentReceived',
         },
         {
-          type: 'startImageCapture',
-        },
-        {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
@@ -569,7 +550,7 @@ describe('Id Doc Machine Tests', () => {
           },
         },
       ]);
-      expect(state.value).toEqual('selfiePromptMobile');
+      expect(state.value).toEqual('selfieImageMobile');
     });
 
     it('Allows uploading any side/selfie based nextSideToCollect out of order on desktop', () => {
@@ -587,9 +568,6 @@ describe('Id Doc Machine Tests', () => {
         },
         {
           type: 'consentReceived',
-        },
-        {
-          type: 'startImageCapture',
         },
         {
           type: 'receivedImage',
@@ -622,9 +600,6 @@ describe('Id Doc Machine Tests', () => {
         },
         {
           type: 'consentReceived',
-        },
-        {
-          type: 'startImageCapture',
         },
         {
           type: 'receivedImage',
@@ -674,7 +649,7 @@ describe('Id Doc Machine Tests', () => {
       expect(state.value).toEqual('complete');
     });
 
-    it('Goes back to front image if camera errored', () => {
+    it('Goes back to country and doc selection if camera errored', () => {
       const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
       machine.start();
 
@@ -689,18 +664,15 @@ describe('Id Doc Machine Tests', () => {
         },
         {
           type: 'consentReceived',
-        },
-        {
-          type: 'startImageCapture',
         },
         {
           type: 'cameraErrored',
         },
       ]);
-      expect(state.value).toEqual('frontImageMobile');
+      expect(state.value).toEqual('countryAndType');
     });
 
-    it('Goes back to back image if camera errored', () => {
+    it('Stays on back image capture if camera errored', () => {
       const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
       machine.start();
 
@@ -715,9 +687,6 @@ describe('Id Doc Machine Tests', () => {
         },
         {
           type: 'consentReceived',
-        },
-        {
-          type: 'startImageCapture',
         },
         {
           type: 'receivedImage',
@@ -732,16 +701,13 @@ describe('Id Doc Machine Tests', () => {
           },
         },
         {
-          type: 'startImageCapture',
-        },
-        {
           type: 'cameraErrored',
         },
       ]);
-      expect(state.value).toEqual('backImageMobile');
+      expect(state.value).toEqual('backImageCaptureMobile');
     });
 
-    it('Goes back to selfie prompt if camera errored', () => {
+    it('Stays on the selfie capture if camera errored', () => {
       const machine = interpret(createIdDocMachine(getArgsRegularMobile()));
       machine.start();
 
@@ -758,9 +724,6 @@ describe('Id Doc Machine Tests', () => {
           type: 'consentReceived',
         },
         {
-          type: 'startImageCapture',
-        },
-        {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
@@ -773,13 +736,10 @@ describe('Id Doc Machine Tests', () => {
           },
         },
         {
-          type: 'startImageCapture',
-        },
-        {
           type: 'cameraErrored',
         },
       ]);
-      expect(state.value).toEqual('selfiePromptMobile');
+      expect(state.value).toEqual('selfieImageMobile');
     });
 
     it('Does not start front image capture if consent was not provided', () => {
@@ -799,20 +759,14 @@ describe('Id Doc Machine Tests', () => {
             id: 'id',
           },
         },
-        {
-          type: 'startImageCapture',
-        },
       ]);
 
-      expect(state.value).toEqual('frontImageMobile');
+      expect(state.value).toEqual('countryAndType');
       expect(state.context.requirement.shouldCollectConsent).toEqual(true);
 
       state = machine.send([
         {
           type: 'consentReceived',
-        },
-        {
-          type: 'startImageCapture',
         },
       ]);
       expect(state.value).toEqual('frontImageCaptureMobile');
@@ -833,9 +787,6 @@ describe('Id Doc Machine Tests', () => {
         },
         {
           type: 'consentReceived',
-        },
-        {
-          type: 'startImageCapture',
         },
         {
           type: 'receivedImage',

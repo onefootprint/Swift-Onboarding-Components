@@ -25,9 +25,14 @@ const IdDocCountryAndType = () => {
     });
   };
 
+  const handleConsentSubmit = () => {
+    send({ type: 'consentReceived' });
+  };
+
   return (
     <IdDocCountryAndTypeContainer
       onSubmitDocTypeSuccess={handleSubmitDocTypeSuccess}
+      onConsentSubmit={handleConsentSubmit}
     />
   );
 };

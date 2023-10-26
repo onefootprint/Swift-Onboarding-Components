@@ -23,6 +23,7 @@ import HeaderTitle from '../../../../../components/layout/components/header-titl
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
 import StickyBottomBox from '../../../../../components/layout/components/sticky-bottom-box/sticky-bottom-box';
 import Logger from '../../../../../utils/logger';
+import ConsentMobile from '../../../components/id-doc-photo-prompt/components/consent-mobile';
 import { useIdDocMachine } from '../../../components/machine-provider';
 import { getCountryFromCode } from '../../../utils/get-country-from-code';
 import useOptionsByDocType from '../hooks/use-options-by-doc-type';
@@ -35,6 +36,7 @@ type IdDocCountryAndTypeContainerProps = {
     country: CountryRecord,
     docType: SupportedIdDocTypes,
   ) => void;
+  onConsentSubmit: () => void;
 };
 
 const getDefaultCountry = (
@@ -55,10 +57,12 @@ const getRecordKeys = <T extends object>(object: T) =>
 
 const IdDocCountryAndTypeContainer = ({
   onSubmitDocTypeSuccess,
+  onConsentSubmit,
 }: IdDocCountryAndTypeContainerProps) => {
   const { t } = useTranslation('pages.country-and-type-selection');
   const [state] = useIdDocMachine();
   const submitDocTypeMutation = useSubmitDocType();
+  const [consentVisible, setConsentVisible] = useState(false);
   const l10n = useL10nContext();
   const {
     idDoc: defaultCountryDoc,
@@ -66,6 +70,7 @@ const IdDocCountryAndTypeContainer = ({
     sandboxOutcome,
     device,
     supportedCountryAndDocTypes,
+    requirement: { shouldCollectConsent: consentRequired },
   } = state.context;
   const { country: defaultCountry, type: defaultType } = defaultCountryDoc;
   const supportedCountries = new Set(
@@ -130,7 +135,12 @@ const IdDocCountryAndTypeContainer = ({
         skipSelfie: !hasWebcam,
       },
       {
-        onSuccess: data => onSubmitDocTypeSuccess(data, country, docType),
+        onSuccess: data => {
+          if (consentRequired && device.type === 'mobile') {
+            setConsentVisible(true);
+          }
+          onSubmitDocTypeSuccess(data, country, docType);
+        },
         onError: err => {
           console.error(
             `Failed to submit doc type and country. Selected doctype: ${docType}, country ${selectedCountry}. Error: ${getErrorMessage(
@@ -149,6 +159,14 @@ const IdDocCountryAndTypeContainer = ({
     );
   };
 
+  const handleConsentClose = () => {
+    setConsentVisible(false);
+  };
+
+  const handleConsent = () => {
+    onConsentSubmit();
+  };
+
   const optionsByDocType = useOptionsByDocType(types);
 
   // We only show the doc types supported by both the country and onboarding config
@@ -157,7 +175,7 @@ const IdDocCountryAndTypeContainer = ({
     .filter((option): option is RadioSelectOptionFields => !!option);
 
   return (
-    <Container>
+    <Container data-mobile={device.type === 'mobile'}>
       <NavigationHeader
         leftButton={
           device.type !== 'mobile'
@@ -202,6 +220,11 @@ const IdDocCountryAndTypeContainer = ({
           </Typography>
         )}
       </InputsContainer>
+      <ConsentMobile
+        open={consentVisible}
+        onClose={handleConsentClose}
+        onConsent={handleConsent}
+      />
       {options.length > 0 && (
         <StickyBottomBox>
           <Button fullWidth onClick={handleSubmit}>
@@ -235,6 +258,10 @@ const Container = styled.div`
     row-gap: ${theme.spacing[7]};
     justify-content: center;
     align-items: center;
+
+    &[data-mobile='true'] {
+      margin-top: calc(-1 * ${theme.spacing[5]});
+    }
   `}
 `;
 

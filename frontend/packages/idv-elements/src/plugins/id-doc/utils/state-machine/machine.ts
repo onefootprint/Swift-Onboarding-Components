@@ -32,18 +32,36 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
           on: {
             receivedCountryAndType: [
               {
-                target: 'frontImageMobile',
-                cond: context => context.device.type === 'mobile',
+                target: 'frontImageCaptureMobile',
+                cond: context =>
+                  context.device.type === 'mobile' &&
+                  !context.requirement.shouldCollectConsent,
                 actions: ['assignCountryAndType', 'assignId', 'resetSide'],
               },
               {
                 target: 'frontImageDesktop',
-                cond: context => !context.requirement.shouldCollectConsent,
+                cond: context =>
+                  context.device.type !== 'mobile' &&
+                  !context.requirement.shouldCollectConsent,
                 actions: ['assignCountryAndType', 'assignId', 'resetSide'],
               },
               {
                 target: 'consentDesktop',
+                cond: context => context.device.type !== 'mobile',
                 actions: ['assignCountryAndType', 'assignId', 'resetSide'],
+              },
+              {
+                actions: ['assignCountryAndType', 'assignId', 'resetSide'],
+              },
+            ],
+            consentReceived: [
+              {
+                target: 'frontImageCaptureMobile',
+                cond: context => !!context.id,
+                actions: 'assignConsent',
+              },
+              {
+                actions: 'assignConsent',
               },
             ],
           },
@@ -56,20 +74,6 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             consentReceived: {
               target: 'frontImageDesktop',
               actions: 'assignConsent',
-            },
-          },
-        },
-        frontImageMobile: {
-          on: {
-            navigatedToPrev: {
-              target: 'countryAndType',
-            },
-            consentReceived: {
-              actions: 'assignConsent',
-            },
-            startImageCapture: {
-              target: 'frontImageCaptureMobile',
-              cond: context => !context.requirement.shouldCollectConsent,
             },
           },
         },
@@ -92,10 +96,10 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
         frontImageCaptureMobile: {
           on: {
             navigatedToPrev: {
-              target: 'frontImageMobile',
+              target: 'countryAndType',
             },
             cameraErrored: {
-              target: 'frontImageMobile',
+              target: 'countryAndType',
             },
             receivedImage: {
               target: 'processingMobile',
@@ -134,13 +138,6 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             },
           },
         },
-        backImageMobile: {
-          on: {
-            startImageCapture: {
-              target: 'backImageCaptureMobile',
-            },
-          },
-        },
         backImageDesktop: {
           on: {
             receivedImage: {
@@ -156,10 +153,7 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
         backImageCaptureMobile: {
           on: {
             navigatedToPrev: {
-              target: 'backImageMobile',
-            },
-            cameraErrored: {
-              target: 'backImageMobile',
+              target: 'countryAndType',
             },
             receivedImage: {
               target: 'processingMobile',
@@ -198,20 +192,10 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             },
           },
         },
-        selfiePromptMobile: {
-          on: {
-            startImageCapture: {
-              target: 'selfieImageMobile',
-            },
-          },
-        },
         selfieImageMobile: {
           on: {
             navigatedToPrev: {
-              target: 'selfiePromptMobile',
-            },
-            cameraErrored: {
-              target: 'selfiePromptMobile',
+              target: 'countryAndType',
             },
             receivedImage: {
               target: 'processingMobile',

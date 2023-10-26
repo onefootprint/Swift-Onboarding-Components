@@ -34,6 +34,8 @@ const useFaceDetection = () => {
     frameDimensions: {
       width: number;
       height: number;
+      frameOffsetX: number;
+      frameOffsetY: number;
     },
   ) => {
     if (!modelsLoaded) {
@@ -69,7 +71,12 @@ const useFaceDetection = () => {
       height,
     });
 
-    const { width: frameWidth, height: frameHeight } = frameDimensions;
+    const {
+      width: frameWidth,
+      height: frameHeight,
+      frameOffsetX,
+      frameOffsetY,
+    } = frameDimensions;
     const {
       x: faceX,
       y: faceY,
@@ -93,6 +100,8 @@ const useFaceDetection = () => {
         faceHeight,
         faceX,
         faceY,
+        frameOffsetX,
+        frameOffsetY,
       })
     )
       return FaceStatus.faceOutsideTheFrame;

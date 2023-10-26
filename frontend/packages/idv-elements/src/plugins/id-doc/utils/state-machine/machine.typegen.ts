@@ -28,7 +28,6 @@ export interface Typegen0 {
   matchesStates:
     | 'backImageCaptureMobile'
     | 'backImageDesktop'
-    | 'backImageMobile'
     | 'backImageRetryDesktop'
     | 'backImageRetryMobile'
     | 'complete'
@@ -37,7 +36,6 @@ export interface Typegen0 {
     | 'failure'
     | 'frontImageCaptureMobile'
     | 'frontImageDesktop'
-    | 'frontImageMobile'
     | 'frontImageRetryDesktop'
     | 'frontImageRetryMobile'
     | 'init'
@@ -46,7 +44,6 @@ export interface Typegen0 {
     | 'selfieImageDesktop'
     | 'selfieImageMobile'
     | 'selfieImageRetryDesktop'
-    | 'selfieImageRetryMobile'
-    | 'selfiePromptMobile';
+    | 'selfieImageRetryMobile';
   tags: never;
 }

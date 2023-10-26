@@ -8,6 +8,7 @@ import {
 } from '@onefootprint/test-utils';
 import type { SubmitDocTypeResponse } from '@onefootprint/types';
 import { SupportedIdDocTypes } from '@onefootprint/types';
+import { noop } from 'lodash';
 import React from 'react';
 import { act } from 'react-dom/test-utils';
 
@@ -44,6 +45,7 @@ const renderFrontCountryAndDoc = (context: MachineContext) =>
     context,
     <IdDocCountryAndTypeContainer
       onSubmitDocTypeSuccess={handleSubmitDocTypeSuccess}
+      onConsentSubmit={noop}
     />,
   );
 

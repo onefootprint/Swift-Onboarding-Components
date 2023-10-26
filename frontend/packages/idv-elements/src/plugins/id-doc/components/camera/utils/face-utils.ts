@@ -39,7 +39,6 @@ export const isFaceCloseEnough = (dimensions: {
 };
 
 // Nothing fancy
-// We simply assume that the frame outline is centered in the video
 // And we find the left, right, top, bottom given the width and height of the frame and the video
 // Face API already gives us the face location and dimensions
 export const isFaceInTheFrame = (dimensions: {
@@ -51,6 +50,8 @@ export const isFaceInTheFrame = (dimensions: {
   faceHeight: number;
   faceX: number;
   faceY: number;
+  frameOffsetX: number;
+  frameOffsetY: number;
 }) => {
   const {
     videoWidth,
@@ -61,6 +62,8 @@ export const isFaceInTheFrame = (dimensions: {
     faceHeight,
     faceX,
     faceY,
+    frameOffsetX,
+    frameOffsetY,
   } = dimensions;
 
   const faceLeft = faceX;
@@ -68,9 +71,9 @@ export const isFaceInTheFrame = (dimensions: {
   const faceTop = faceY;
   const faceBottom = faceY + faceHeight;
 
-  const frameLeft = Math.abs(videoWidth - frameWidth) / 2;
+  const frameLeft = Math.abs(videoWidth - frameWidth) / 2 + frameOffsetX;
   const frameRight = frameLeft + frameWidth;
-  const frameTop = Math.abs(videoHeight - frameHeight) / 2;
+  const frameTop = Math.abs(videoHeight - frameHeight) / 2 + frameOffsetY;
   const frameBottom = frameTop + frameHeight;
 
   const leftOffset = faceLeft - frameLeft;

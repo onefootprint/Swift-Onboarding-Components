@@ -132,7 +132,6 @@ const DesktopPhotoPrompt = ({
               imageType={imageType}
               docType={type}
               countryName={countryName ?? country}
-              backgroundColor="secondary"
             />
           </Box>
         )}

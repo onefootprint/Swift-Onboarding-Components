@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoWarning16 } from '@onefootprint/icons';
+import { IcoForbid40 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 import {
@@ -11,26 +11,17 @@ import React from 'react';
 
 import Logger from '../../../../utils/logger';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
-import { imageIcons } from '../../constants/image-types';
 import getImageSideLabel from '../../utils/get-image-side-label';
 import type { IdDocImageErrorType } from '../../utils/state-machine';
-import FeedbackIcon from '../feedback-icon';
 
 type ErrorProps = {
   imageType: IdDocImageTypes;
   errors: IdDocImageErrorType[];
   docType: SupportedIdDocTypes;
   countryName: string;
-  backgroundColor?: 'primary' | 'secondary';
 };
 
-const Error = ({
-  errors,
-  imageType,
-  docType,
-  countryName,
-  backgroundColor = 'primary',
-}: ErrorProps) => {
+const Error = ({ errors, imageType, docType, countryName }: ErrorProps) => {
   const { t } = useTranslation('components.error');
 
   const side = getImageSideLabel(imageType, docType);
@@ -60,14 +51,7 @@ const Error = ({
 
   return (
     <Container>
-      <FeedbackIcon
-        imageIcon={{ component: imageIcons[imageType], color: 'error' }}
-        statusIndicator={{
-          component: <IcoWarning16 color="error" />,
-          status: 'error',
-          backgroundColor,
-        }}
-      />
+      <IcoForbid40 color="error" />
       <ErrorMessage>
         <Typography
           variant="label-1"

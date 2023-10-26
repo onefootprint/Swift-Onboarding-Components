@@ -30,10 +30,10 @@ const Loading = ({
           {t(`title.${step}-${imageType}`)}
         </Typography>
         <Typography
-          variant="body-4"
+          variant="body-2"
           sx={{
             textAlign: 'center',
-            color: showSlowConnectionMessage ? 'error' : 'tertiary',
+            color: showSlowConnectionMessage ? 'error' : 'secondary',
           }}
         >
           {showSlowConnectionMessage ? t('slow-connection') : t('subtitle')}

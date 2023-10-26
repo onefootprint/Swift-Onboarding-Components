@@ -50,12 +50,12 @@ const ImageConsent = forwardRef<ImageConsentHandler, {}>((props, ref) => {
 
   return (
     <>
-      <HeaderTitle
-        title={t('title')}
-        subtitle={t('subtitle')}
-        sx={{ marginBottom: 5 }}
-      />
-      <Typography variant="body-4" color="secondary" sx={{ marginBottom: 5 }}>
+      <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+      <Typography
+        variant="body-4"
+        color="secondary"
+        sx={{ marginBottom: 5, marginTop: 7 }}
+      >
         <Trans
           i18nKey="components.image-consent.description"
           components={{

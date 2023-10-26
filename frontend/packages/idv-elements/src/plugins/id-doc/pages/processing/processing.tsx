@@ -207,8 +207,6 @@ const Processing = () => {
         }
         successComponent={
           <Success
-            imageType={currSide}
-            docType={type}
             onComplete={
               mode === 'success' && !nextSide ? onSuccessComplete : undefined
             }

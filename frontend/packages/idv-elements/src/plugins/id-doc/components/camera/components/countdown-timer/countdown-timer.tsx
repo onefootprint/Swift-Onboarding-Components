@@ -7,48 +7,29 @@ type CountdownTimerProps = {
   start: number;
 };
 
+const COUNTDOWN_TIMER_SIZE = 76;
+
 const CountdownTimer = ({ current, start }: CountdownTimerProps) => {
-  if (start < current || current < 0 || start <= 0) return null;
-  const fullAngle = 360;
-  const progress = start - current;
-  const angleInterval = fullAngle / start;
-  const remainingAngle = fullAngle - angleInterval * progress;
+  if (start < current || current <= 0 || start <= 0) return null;
 
   return (
-    <Container>
-      <Progress angle={remainingAngle}>
-        <Typography variant="label-2" color="quinary">
-          {current}
-        </Typography>
-      </Progress>
+    <Container size={COUNTDOWN_TIMER_SIZE}>
+      <Typography variant="display-2" color="quinary">
+        {current}
+      </Typography>
     </Container>
   );
 };
 
-const Container = styled.div`
-  ${({ theme }) => css`
+const Container = styled.div<{ size: number }>`
+  ${({ theme, size }) => css`
     display: flex;
     justify-content: center;
     align-items: center;
-    width: ${theme.spacing[9]};
-    height: ${theme.spacing[9]};
+    width: ${size}px;
+    height: ${size}px;
     border-radius: ${theme.borderRadius.full};
     background-color: #00000059;
-  `}
-`;
-
-const Progress = styled.div<{ angle: number }>`
-  ${({ theme, angle }) => css`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: ${theme.spacing[9]};
-    height: ${theme.spacing[9]};
-    border-radius: ${theme.borderRadius.full};
-    background: conic-gradient(
-      ${theme.backgroundColor.transparent} ${`${angle}deg`},
-      #ffffff29 ${`${angle}deg`}
-    );
   `}
 `;
 

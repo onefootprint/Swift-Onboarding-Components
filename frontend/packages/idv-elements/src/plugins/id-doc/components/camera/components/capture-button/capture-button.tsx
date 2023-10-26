@@ -8,7 +8,7 @@ const DEFAULT_INNER_RADIUS = 56;
 type CaptureButtonProps = {
   onClick: () => void;
   disabled?: boolean;
-  variant: 'default' | 'round';
+  variant: 'default' | 'round' | 'stop';
 };
 
 const CaptureButton = ({
@@ -28,18 +28,22 @@ const CaptureButton = ({
         Take photo
       </Button>
     )}
-    {variant === 'round' && (
+    {(variant === 'round' || variant === 'stop') && (
       <RoundButton
         aria-disabled={disabled}
         data-disabled={disabled}
         onClick={onClick}
         outerRadius={DEFAULT_OUTER_RADIUS}
       >
-        <InnerCircle
-          aria-disabled={disabled}
-          data-disabled={disabled}
-          innerRadius={DEFAULT_INNER_RADIUS}
-        />
+        {variant === 'round' ? (
+          <InnerCircle
+            aria-disabled={disabled}
+            data-disabled={disabled}
+            innerRadius={DEFAULT_INNER_RADIUS}
+          />
+        ) : (
+          <InnerSquare />
+        )}
       </RoundButton>
     )}
   </>
@@ -66,6 +70,10 @@ const RoundButton = styled.div<{
       pointer-events: none;
     }
 
+    &[data-disabled='true'] {
+      border-color: ${theme.backgroundColor.secondary};
+    }
+
     &:hover {
       cursor: pointer;
     }
@@ -90,6 +98,17 @@ const InnerCircle = styled.button<{
     &:active {
       background-color: ${theme.backgroundColor.secondary};
     }
+  `}
+`;
+
+const InnerSquare = styled.button`
+  ${({ theme }) => css`
+    height: ${theme.spacing[7]};
+    width: ${theme.spacing[7]};
+    background-color: ${theme.backgroundColor.primary};
+    border: none;
+    border-radius: ${theme.borderRadius.compact};
+    box-shadow: ${theme.elevation[2]};
   `}
 `;
 

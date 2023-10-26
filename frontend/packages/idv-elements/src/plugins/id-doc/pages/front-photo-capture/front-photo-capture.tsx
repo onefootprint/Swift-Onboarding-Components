@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { SupportedIdDocTypes } from '@onefootprint/types';
+import { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 import React from 'react';
 
 import PhotoCapture from '../../components/photo-capture/photo-capture';
@@ -54,7 +54,6 @@ const FrontPhotoCapture = () => {
       outlineHeightRatio={ID_OUTLINE_HEIGHT_RATIO}
       outlineWidthRatio={ID_OUTLINE_WIDTH_RATIO}
       cameraKind="back"
-      outlineKind="full-frame"
       onComplete={onComplete}
       autocaptureKind="document"
       deviceKind="mobile"
@@ -64,6 +63,7 @@ const FrontPhotoCapture = () => {
       }}
       subtitle={{ preview: t(`subtitle.preview`) }}
       onBack={handleClickBack}
+      imageType={IdDocImageTypes.front}
     />
   );
 };

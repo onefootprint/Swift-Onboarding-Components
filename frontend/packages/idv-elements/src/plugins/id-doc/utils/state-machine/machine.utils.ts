@@ -18,17 +18,17 @@ const assignCurrSide = (
 
 export const NextSideTargetsMobile: MachineTarget[] = [
   {
-    target: 'frontImageMobile',
+    target: 'frontImageCaptureMobile',
     cond: (context, event) => event.payload.nextSideToCollect === 'front',
     actions: assignCurrSide,
   },
   {
-    target: 'backImageMobile',
+    target: 'backImageCaptureMobile',
     cond: (context, event) => event.payload.nextSideToCollect === 'back',
     actions: assignCurrSide,
   },
   {
-    target: 'selfiePromptMobile',
+    target: 'selfieImageMobile',
     cond: (context, event) => event.payload.nextSideToCollect === 'selfie',
     actions: assignCurrSide,
   },

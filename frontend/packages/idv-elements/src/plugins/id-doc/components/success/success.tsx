@@ -1,28 +1,16 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoCheck16 } from '@onefootprint/icons';
-import styled from '@onefootprint/styled';
-import type { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
+import { IcoCheck24 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 
-import { imageIcons } from '../../constants/image-types';
 import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';
-import getImageSideLabel from '../../utils/get-image-side-label';
-import FeedbackIcon from '../feedback-icon';
 
 type SuccessProps = {
-  imageType: IdDocImageTypes;
-  docType: SupportedIdDocTypes;
-  backgroundColor?: 'primary' | 'secondary';
   onComplete?: () => void;
 };
 
-const Success = ({
-  imageType,
-  onComplete,
-  docType,
-  backgroundColor = 'primary',
-}: SuccessProps) => {
+const Success = ({ onComplete }: SuccessProps) => {
   const { t } = useTranslation('components.success');
 
   useEffect(() => {
@@ -32,26 +20,33 @@ const Success = ({
     }
   }, [onComplete]);
 
-  const side = getImageSideLabel(imageType, docType);
-
   return (
     <Container>
-      <FeedbackIcon
-        imageIcon={{ component: imageIcons[imageType] }}
-        statusIndicator={{
-          component: <IcoCheck16 color="success" />,
-          status: 'success',
-          backgroundColor,
-        }}
-      />
-      <Typography variant="label-1" sx={{ textAlign: 'center', marginTop: 5 }}>
-        {t('title', {
-          side,
-        })}
+      <SuccessIconContainer>
+        <IcoCheck24 color="quinary" />
+      </SuccessIconContainer>
+      <Typography
+        variant="label-1"
+        sx={{ textAlign: 'center', marginTop: 5 }}
+        color="success"
+      >
+        {t('title')}
       </Typography>
     </Container>
   );
 };
+
+const SuccessIconContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: ${theme.spacing[9]};
+    height: ${theme.spacing[9]};
+    background-color: ${theme.backgroundColor.successInverted};
+    border-radius: ${theme.borderRadius.full};
+  `}
+`;
 
 const Container = styled.div`
   display: flex;

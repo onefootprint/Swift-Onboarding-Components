@@ -1,73 +1,163 @@
+import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
+import { Typography } from '@onefootprint/ui';
+import { motion } from 'framer-motion';
 import React from 'react';
 
-export type OutlineKind = 'full-frame' | 'corner';
+import {
+  AUTOCAPTURE_TIMER_INTERVAL,
+  FRAME_INSTRUCTION_TRANSITION_DELAY,
+} from '../../../../constants/transition-delay.constants';
+import type { AutocaptureKind } from '../../hooks/use-auto-capture';
 
 type OverlayProps = {
   width: number; // Fits the size of video
   height: number;
-  outlineKind: OutlineKind;
+  videoHeight: number;
+  captureKind: AutocaptureKind;
   outlineWidth: number;
   outlineHeight: number;
+  isCameraVisible: boolean;
+  timerAnimationVal?: number;
+};
+
+const transitionDelayInSeconds = FRAME_INSTRUCTION_TRANSITION_DELAY / 1000;
+
+const overlayBackgroundVariants = {
+  visible: { backgroundColor: '#FFFFFFCC' },
+  hidden: {
+    opacity: [1, 0],
+    transition: {
+      type: 'tween',
+      duration: transitionDelayInSeconds,
+      times: [0.75, 1],
+    },
+  },
 };
 
 const Overlay = ({
   width,
   height,
-  outlineKind,
+  videoHeight,
+  captureKind,
   outlineWidth,
   outlineHeight,
-}: OverlayProps) => (
-  <Container width={width} height={height}>
-    {outlineKind === 'corner' && (
-      <>
-        <CornerOutline
+  isCameraVisible,
+  timerAnimationVal,
+}: OverlayProps) => {
+  const { t } = useTranslation('components.camera.overlay');
+  return (
+    <Container width={width} height={height} videoHeight={videoHeight}>
+      {captureKind === 'face' && (
+        <>
+          <FullFrameOutline
+            width={width}
+            height={height}
+            $outlineWidth={outlineWidth}
+            $outlineHeight={outlineHeight}
+          >
+            <InstructionContainer
+              initial="visible"
+              animate={isCameraVisible ? 'hidden' : ''}
+              variants={overlayBackgroundVariants}
+            >
+              <Typography variant="label-3" sx={{ textAlign: 'center' }}>
+                {t('face.title')}
+              </Typography>
+              <Typography variant="body-3" sx={{ textAlign: 'center' }}>
+                {t('face.subtitle')}
+              </Typography>
+            </InstructionContainer>
+            {timerAnimationVal && (
+              <TimerAnimation
+                key={timerAnimationVal}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [1, 0] }}
+                transition={{
+                  type: 'tween',
+                  duration: AUTOCAPTURE_TIMER_INTERVAL / 1000,
+                }}
+              />
+            )}
+          </FullFrameOutline>
+          <CornerOutline
+            width={width}
+            height={height}
+            $outlineWidth={outlineWidth}
+            $outlineHeight={outlineHeight}
+            corner="top-left"
+          />
+          <CornerOutline
+            width={width}
+            height={height}
+            $outlineWidth={outlineWidth}
+            $outlineHeight={outlineHeight}
+            corner="top-right"
+          />
+          <CornerOutline
+            width={width}
+            height={height}
+            $outlineWidth={outlineWidth}
+            $outlineHeight={outlineHeight}
+            corner="bottom-left"
+          />
+          <CornerOutline
+            width={width}
+            height={height}
+            $outlineWidth={outlineWidth}
+            $outlineHeight={outlineHeight}
+            corner="bottom-right"
+          />
+        </>
+      )}
+      {captureKind === 'document' && (
+        <FullFrameOutline
           width={width}
           height={height}
           $outlineWidth={outlineWidth}
           $outlineHeight={outlineHeight}
-          corner="top-left"
-        />
-        <CornerOutline
-          width={width}
-          height={height}
-          $outlineWidth={outlineWidth}
-          $outlineHeight={outlineHeight}
-          corner="top-right"
-        />
-        <CornerOutline
-          width={width}
-          height={height}
-          $outlineWidth={outlineWidth}
-          $outlineHeight={outlineHeight}
-          corner="bottom-left"
-        />
-        <CornerOutline
-          width={width}
-          height={height}
-          $outlineWidth={outlineWidth}
-          $outlineHeight={outlineHeight}
-          corner="bottom-right"
-        />
-      </>
-    )}
-    {outlineKind === 'full-frame' && (
-      <FullFrameOutline
-        width={width}
-        height={height}
-        $outlineWidth={outlineWidth}
-        $outlineHeight={outlineHeight}
-      />
-    )}
-  </Container>
-);
+          data-show-border
+        >
+          <InstructionContainer
+            initial="visible"
+            animate={isCameraVisible ? 'hidden' : ''}
+            variants={overlayBackgroundVariants}
+          >
+            <Typography variant="label-3" sx={{ textAlign: 'center' }}>
+              {t('document.title')}
+            </Typography>
+            <Typography variant="body-3" sx={{ textAlign: 'center' }}>
+              {t('document.subtitle')}
+            </Typography>
+          </InstructionContainer>
+          {timerAnimationVal && (
+            <TimerAnimation
+              key={timerAnimationVal}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [1, 0] }}
+              transition={{
+                duration: AUTOCAPTURE_TIMER_INTERVAL / 1000,
+              }}
+            />
+          )}
+        </FullFrameOutline>
+      )}
+    </Container>
+  );
+};
 
-const Container = styled.div<{ width: number; height: number }>`
-  ${({ width, height }) => css`
+const Container = styled.div<{
+  width: number;
+  height: number;
+  videoHeight: number;
+}>`
+  ${({ width, theme, videoHeight }) => css`
     position: relative;
     width: ${width}px;
-    height: ${height}px;
-    margin-top: calc(-1 * ${height}px); // Show overlay on top of the video
+    height: ${videoHeight}px;
+    margin-top: calc(-1 * ${videoHeight}px); // Show overlay on top of the video
+    overflow: hidden;
+    border-radius: ${theme.borderRadius.default};
   `}
 `;
 
@@ -130,8 +220,35 @@ const FullFrameOutline = styled.div<{
     height: ${$outlineHeight}px;
     width: ${$outlineWidth}px;
     position: absolute;
-    border: ${theme.spacing[2]} solid ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.large};
+    box-shadow: 0 0 0 1000px #0000004d;
+
+    &[data-show-border='true'] {
+      border: ${theme.spacing[2]} solid ${theme.backgroundColor.primary};
+    }
+  `}
+`;
+
+const InstructionContainer = styled(motion.div)`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: calc(2 * ${theme.borderRadius.default});
+  `}
+`;
+
+const TimerAnimation = styled(motion.div)`
+  ${({ theme }) => css`
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    border-radius: ${theme.borderRadius.large};
+    background: #00000080;
   `}
 `;
 

@@ -12,14 +12,11 @@ import DesktopProcessing from '../desktop-processing';
 import DesktopSelfie from '../desktop-selfie';
 import DesktopSelfieRetry from '../desktop-selfie-retry';
 import FrontPhotoCapture from '../front-photo-capture';
-import IdDocBackPhoto from '../id-doc-back-photo';
 import IdDocBackPhotoRetry from '../id-doc-back-photo-retry';
 import IdDocCountryAndType from '../id-doc-country-and-type';
-import IdDocFrontPhoto from '../id-doc-front-photo';
 import IdDocFrontPhotoRetry from '../id-doc-front-photo-retry';
 import Processing from '../processing';
 import SelfiePhoto from '../selfie-photo';
-import SelfiePrompt from '../selfie-prompt';
 import SelfieRetryPrompt from '../selfie-retry-prompt';
 
 type RouterProps = {
@@ -45,10 +42,6 @@ const Router = ({ onDone }: RouterProps) => {
     return <DesktopConsent />;
   }
 
-  if (state.matches('frontImageMobile')) {
-    return <IdDocFrontPhoto />;
-  }
-
   if (state.matches('frontImageCaptureMobile')) {
     return <FrontPhotoCapture />;
   }
@@ -65,10 +58,6 @@ const Router = ({ onDone }: RouterProps) => {
     return <DesktopFrontPhotoRetry />;
   }
 
-  if (state.matches('backImageMobile')) {
-    return <IdDocBackPhoto />;
-  }
-
   if (state.matches('backImageCaptureMobile')) {
     return <BackPhotoCapture />;
   }
@@ -83,10 +72,6 @@ const Router = ({ onDone }: RouterProps) => {
 
   if (state.matches('backImageRetryDesktop')) {
     return <DesktopBackPhotoRetry />;
-  }
-
-  if (state.matches('selfiePromptMobile')) {
-    return <SelfiePrompt />;
   }
 
   if (state.matches('selfieImageMobile')) {

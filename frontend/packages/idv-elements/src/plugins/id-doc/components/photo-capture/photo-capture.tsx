@@ -1,5 +1,7 @@
+import { IcoInfo24 } from '@onefootprint/icons';
+import type { IdDocImageTypes } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 
 import {
   HeaderTitle,
@@ -12,10 +14,11 @@ import useProcessImage from '../../hooks/use-process-image';
 import type { CaptureKind } from '../../utils/state-machine';
 import Camera from '../camera';
 import type { DeviceKind } from '../camera/camera';
-import type { OutlineKind } from '../camera/components/overlay/overlay';
 import type { AutocaptureKind } from '../camera/hooks/use-auto-capture';
 import type { CameraKind } from '../camera/utils/get-camera-options';
+import Loading from '../loading';
 import Preview from '../preview';
+import Instructions from './components/instructions';
 
 type HeaderTextType = {
   camera: string;
@@ -26,7 +29,6 @@ type PhotoCaptureProps = {
   outlineWidthRatio: number; // with respect to the video width
   outlineHeightRatio: number; // with respect to the video width (not height)
   cameraKind: CameraKind;
-  outlineKind: OutlineKind;
   onComplete: (
     imageFile: File,
     extraCompressed: boolean,
@@ -37,10 +39,10 @@ type PhotoCaptureProps = {
   onBack?: () => void;
   title: HeaderTextType;
   subtitle?: Partial<HeaderTextType>;
+  imageType: IdDocImageTypes;
 };
 
 const PhotoCapture = ({
-  outlineKind,
   outlineWidthRatio,
   outlineHeightRatio,
   cameraKind,
@@ -50,6 +52,7 @@ const PhotoCapture = ({
   onBack,
   title,
   subtitle,
+  imageType,
 }: PhotoCaptureProps) => {
   const [state, send] = useIdDocMachine();
   const { hasBadConnectivity } = state.context;
@@ -57,6 +60,7 @@ const PhotoCapture = ({
   const { processImageUrl } = useProcessImage();
   const [isLoading, setIsLoading] = useState(false);
   const [captureKind, setCaptureKind] = useState<CaptureKind>();
+  const [showInstructions, setShowInstructions] = useState(false);
   const {
     footer: { set: updateFooter },
   } = useLayoutOptions();
@@ -121,6 +125,11 @@ const PhotoCapture = ({
     });
   };
 
+  useEffect(() => {
+    if (image && deviceKind === 'mobile') handleConfirm();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [image]);
+
   const handleCapture = (newImage: string, newCaptureKind: CaptureKind) => {
     setImage(newImage);
     setCaptureKind(newCaptureKind);
@@ -129,27 +138,36 @@ const PhotoCapture = ({
   return image ? (
     <>
       {deviceKind === 'desktop' && (
-        <Box marginBottom={7}>
-          <NavigationHeader
-            leftButton={{ variant: 'close', confirmClose: true }}
+        <>
+          <Box marginBottom={7}>
+            <NavigationHeader
+              leftButton={{ variant: 'close', confirmClose: true }}
+            />
+            <HeaderTitle title={title.preview} />
+          </Box>
+          <Preview
+            imageSrc={image}
+            onRetake={handleRetake}
+            onConfirm={handleConfirm}
+            isLoading={isLoading}
+            cameraKind={cameraKind}
+            deviceKind={deviceKind}
           />
-          <HeaderTitle title={title.preview} />
-        </Box>
+        </>
       )}
       {deviceKind === 'mobile' && (
-        <Box marginBottom={7}>
-          <NavigationHeader leftButton={{ variant: 'back', onBack }} />
-          <HeaderTitle title={title.preview} subtitle={subtitle?.preview} />
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            height: '100%',
+            justifyContent: 'center',
+          }}
+        >
+          <Loading step="process" imageType={imageType} />
         </Box>
       )}
-      <Preview
-        imageSrc={image}
-        onRetake={handleRetake}
-        onConfirm={handleConfirm}
-        isLoading={isLoading}
-        cameraKind={cameraKind}
-        deviceKind={deviceKind}
-      />
     </>
   ) : (
     <>
@@ -163,16 +181,15 @@ const PhotoCapture = ({
       )}
       {deviceKind === 'mobile' && (
         <NavigationHeader
-          leftButton={{ variant: 'back', onBack, color: 'quinary' }}
+          leftButton={{ variant: 'back', onBack }}
+          rightButton={{
+            icon: IcoInfo24,
+            onClick: () => setShowInstructions(true),
+          }}
           content={{
             kind: 'static',
             title: title.camera,
           }}
-          style={{
-            fontColor: 'quinary',
-            backgroundVariant: 'dark-glass',
-          }}
-          position="floating"
         />
       )}
       <Camera
@@ -181,9 +198,13 @@ const PhotoCapture = ({
         cameraKind={cameraKind}
         outlineWidthRatio={outlineWidthRatio}
         outlineHeightRatio={outlineHeightRatio}
-        outlineKind={outlineKind}
         autocaptureKind={autocaptureKind}
         deviceKind={deviceKind}
+      />
+      <Instructions
+        onClose={() => setShowInstructions(false)}
+        isOpen={showInstructions}
+        autocaptureKind={autocaptureKind}
       />
     </>
   );

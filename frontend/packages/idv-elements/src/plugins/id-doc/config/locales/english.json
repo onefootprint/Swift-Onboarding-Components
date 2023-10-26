@@ -87,7 +87,7 @@
         "analyze-back": "Analyzing image...",
         "analyze-selfie": "Analyzing selfie..."
       },
-      "subtitle": "This can take a few seconds",
+      "subtitle": "Hang tight! It'll be done soon.",
       "slow-connection": "Your internet connection seems unstable. This might take longer than usual."
     },
     "error": {
@@ -127,7 +127,7 @@
       }
     },
     "success": {
-      "title": "Successfully uploaded {{side}} image"
+      "title": "Success!"
     },
     "id-doc-photo-upload-buttons": {
       "take-photo": {
@@ -143,18 +143,52 @@
       "back": "Now the back side",
       "selfie": "Now we need a selfie"
     },
+    "photo-capture": {
+      "instructions": {
+        "title": "Instructions",
+        "background": {
+          "title": "Find a background with good contrast",
+          "description": "High contrast helps with document detection, avoiding errors."
+        },
+        "position-document": {
+          "title": "Position the document in the frame",
+          "description": "Make sure that the whole document is positioned, as indicated, in the frame."
+        },
+        "position-face": {
+          "title": "Position your face in the frame",
+          "description": "Make sure that the whole face is positioned, as indicated, in the frame."
+        },
+        "steady": {
+          "title": "Hold steady",
+          "description": "Hold your camera steady to avoid any blur or glare."
+        },
+        "autocapture-document": {
+          "title": "Image will be captured automatically",
+          "description": "We'll show a 3-second countdown before it's captured."
+        },
+        "autocapture-face": {
+          "title": "Selfie will be captured automatically",
+          "description": "We'll show a 3-second countdown before it's captured."
+        }
+      }
+    },
     "camera": {
       "take": "Take photo",
       "autocapture": {
         "feedback": {
-          "init-document": "Align document to the frame",
-          "init-face": "Align your face to the frame",
-          "ok": "Hold still . . .",
-          "detecting": "Detecting . . .",
-          "face-too-far": "Face is too far from the camera",
-          "face-outside-the-frame": "Face is outside the frame outline",
-          "head-not-straight": "Face is tilted or looking other way",
-          "blurry": "Image is blurry, find better lighting or move your camera"
+          "face": {
+            "ok": "Hold still...",
+            "detecting": "Position your face in the frame",
+            "face-too-far": "Face is too far from the camera",
+            "face-outside-the-frame": "Face is outside the frame outline",
+            "head-not-straight": "Face is tilted or looking other way",
+            "blurry": "Image is blurry, find better lighting or move your camera"
+          },
+          "document": {
+            "ok": "Hold still...",
+            "detecting": "Position the document in the frame",
+            "blurry": "Image is blurry, find better lighting or move your camera"
+          }
         }
       },
       "guidelines": {
@@ -180,6 +214,16 @@
       "manual-enabled-toast": {
         "title": "Manual capture enabled",
         "description": "We noticed it's taking you a while to trigger the automatic capture, so you can now take the picture manually."
+      },
+      "overlay": {
+        "document": {
+          "title": "Place front of your driver's license here",
+          "subtitle": "We'll scan it automatically"
+        },
+        "face": {
+          "title": "Place your face here",
+          "subtitle": "We'll scan it automatically"
+        }
       }
     },
     "preview": {
@@ -232,13 +276,13 @@
     "front-photo-capture": {
       "title": {
         "camera": {
-          "driversLicense": "Driver's license · Front side",
-          "idCard": "ID card · Front side",
-          "passport": "Passport · Photo page",
-          "visa": "Visa · Photo page",
-          "workPermit": "EAD card · Front side",
-          "residenceDocument": "Green card · Front side",
-          "voterIdentification": "Voter identification · Front side"
+          "driversLicense": "Driver's license (Front)",
+          "idCard": "ID card (Front)",
+          "passport": "Passport (Photo page)",
+          "visa": "Visa (Photo page)",
+          "workPermit": "EAD card (Front)",
+          "residenceDocument": "Green card (Front)",
+          "voterIdentification": "Voter identification (Front)"
         },
         "preview": {
           "driversLicense": "Driver's license",
@@ -257,13 +301,13 @@
     "back-photo-capture": {
       "title": {
         "camera": {
-          "driversLicense": "Driver's license · Back side",
-          "idCard": "ID card · Back side",
-          "passport": "Passport · Photo page",
-          "visa": "Visa · Photo page",
-          "workPermit": "EAD card · Back side",
-          "residenceDocument": "Green card · Back side",
-          "voterIdentification": "Voter identification · Back side"
+          "driversLicense": "Driver's license (Back)",
+          "idCard": "ID card (Back)",
+          "passport": "Passport (Photo page)",
+          "visa": "Visa (Photo page)",
+          "workPermit": "EAD card (Back)",
+          "residenceDocument": "Green card (Back)",
+          "voterIdentification": "Voter identification (Back)"
         },
         "preview": {
           "driversLicense": "Driver's license",

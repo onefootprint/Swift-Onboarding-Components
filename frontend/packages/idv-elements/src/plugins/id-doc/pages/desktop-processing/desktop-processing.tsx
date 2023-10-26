@@ -197,13 +197,7 @@ const DeskTopProcessing = () => {
               showSlowConnectionMessage={showSlowConnectionMessage}
             />
           }
-          successComponent={
-            <Success
-              imageType={currSide}
-              docType={type}
-              backgroundColor="secondary"
-            />
-          }
+          successComponent={<Success />}
           mode={mode}
           hasNextSide={false} // Although we might have next side, we don't want to show it in the animation for desktop
         />
