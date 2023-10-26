@@ -4,6 +4,7 @@ import { media } from '@onefootprint/ui';
 import React from 'react';
 
 import SEO from '../../components/seo';
+import CustomersLogos from './components/customers-logos';
 import Customizable from './components/sections/customizable';
 import Hero from './components/sections/hero';
 import MoreThanExpect from './components/sections/more-than-expect';
@@ -19,6 +20,8 @@ const Home = () => {
     <>
       <SEO title={t('html-title')} slug="/hero" />
       <Hero />
+      <SectionSpacer />
+      <CustomersLogos />
       <SectionSpacer />
       <NewApproach />
       <SectionSpacer />

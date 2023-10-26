@@ -22,6 +22,7 @@ type ContainerProps = BoxProps &
     gap?: Spacing;
     templateAreas?: string[];
     alignItems?: CSS.Property.AlignItems;
+    justifyContent?: CSS.Property.JustifyContent;
     width?: string;
   };
 
@@ -59,9 +60,9 @@ const Container = styled(Box)<ContainerProps>`
     gap,
     templateAreas,
     alignItems,
+    justifyContent,
     width,
   }) => css`
-    {props...}
     display: grid;
     width:${width};
     grid-template-columns: ${createColumns(columns)};
@@ -69,10 +70,11 @@ const Container = styled(Box)<ContainerProps>`
     grid-gap: ${gap ? theme.spacing[gap] : undefined};
     grid-column-gap: ${columnGap ? theme.spacing[columnGap] : undefined};
     grid-row-gap: ${rowGap ? theme.spacing[rowGap] : undefined};
-    align-items:${alignItems};
-    grid-template-areas: ${
-      templateAreas ? `"${templateAreas.join('"\n"')}"` : undefined
-    };
+    align-items: ${alignItems};
+    justify-content: ${justifyContent};
+    grid-template-areas: ${templateAreas
+      ? `"${templateAreas.join('"\n"')}"`
+      : undefined};
   `}
 `;
 
