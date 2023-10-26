@@ -99,6 +99,9 @@ export function rows_to_message(rows) {
 }
 
 export function pad(s, n = 18) {
+  if (s == null) {
+    s = '';
+  }
   let o = '';
   for (let i = 0; i < Math.ceil((n - s.length) / 2.0); i++) {
     o += ' ';

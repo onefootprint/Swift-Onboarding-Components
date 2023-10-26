@@ -33,7 +33,7 @@ export default airplane.task(
       where 
         completed_at > now() - interval '24 hour'
       group by 1,2,3
-      order by 1, 3 desc
+      order by 1, 4 desc
     `;
 
     const rows = await pg_query(dbUrl, query);
