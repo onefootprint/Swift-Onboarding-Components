@@ -128,6 +128,7 @@ const SSN = ({
           as="form"
           rowGap={7}
           onSubmit={methods.handleSubmit(onSubmitForm)}
+          width="100%"
         >
           {!hideHeader && <HeaderTitle title={title} subtitle={subtitle} />}
           <Stack gap={5} direction="column">

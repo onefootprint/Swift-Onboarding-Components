@@ -107,7 +107,7 @@ const BasicInformation = ({
   };
 
   return (
-    <Stack direction="column" gap={7}>
+    <Stack direction="column" gap={7} width="100%">
       {hideHeader ? null : (
         <>
           <NavigationHeader />

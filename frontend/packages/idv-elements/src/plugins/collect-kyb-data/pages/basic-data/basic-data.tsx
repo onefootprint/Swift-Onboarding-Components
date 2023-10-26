@@ -99,7 +99,7 @@ const BasicData = ({
   )[];
 
   return (
-    <Stack direction="column" gap={7} sx={{ width: '100%' }}>
+    <Stack direction="column" gap={7} width="100%">
       {!hideHeader && (
         <>
           <CollectKybDataNavigationHeader />
