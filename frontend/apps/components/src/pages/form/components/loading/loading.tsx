@@ -1,7 +1,9 @@
-import { Grid, ScrollArea, Shimmer, Stack } from '@onefootprint/ui';
+import styled, { css } from '@onefootprint/styled';
+import { ScrollArea, Shimmer } from '@onefootprint/ui';
 import React from 'react';
 
 import Container from '../container';
+import Grid from '../grid';
 
 const Loading = () => (
   <Container
@@ -12,33 +14,35 @@ const Loading = () => (
       </>
     }
     footer={
-      <Stack justify="end" align="center" width="100%">
-        <Stack direction="row" gap={4} position="relative" overflow="hidden">
+      <FooterWrapper>
+        <ButtonsContainer>
           <Button />
           <Button />
-        </Stack>
-      </Stack>
+        </ButtonsContainer>
+      </FooterWrapper>
     }
   >
     <div style={{ flexGrow: 1 }}>
       <ScrollArea>
-        <Grid.Container rowGap={5}>
+        <Form>
           <SectionTitle />
-          <Grid.Container templateAreas={['number number', 'date cvc']} gap={5}>
-            <Grid.Item gridArea="number">
+          <Grid.Row>
+            <Grid.Column col={12}>
               <Label />
               <CardNumberInput />
-            </Grid.Item>
-            <Grid.Item gridArea="date">
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column col={6}>
               <Label />
               <CardExpDateInput />
-            </Grid.Item>
-            <Grid.Item gridArea="cvc">
+            </Grid.Column>
+            <Grid.Column col={6}>
               <Label />
               <CardCvc />
-            </Grid.Item>
-          </Grid.Container>
-        </Grid.Container>
+            </Grid.Column>
+          </Grid.Row>
+        </Form>
       </ScrollArea>
     </div>
   </Container>
@@ -70,6 +74,28 @@ const CardExpDateInput = () => (
 
 const CardCvc = () => <Shimmer sx={{ width: '100%', height: '40px' }} />;
 
+const Form = styled.div`
+  ${({ theme }) => css`
+    display: grid;
+    row-gap: ${theme.spacing[5]};
+  `}
+`;
+
 const Button = () => <Shimmer sx={{ width: '100px', height: '40px' }} />;
+
+const ButtonsContainer = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    gap: ${theme.spacing[4]};
+    overflow: hidden;
+    position: relative;
+  `}
+`;
+const FooterWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+`;
 
 export default Loading;
