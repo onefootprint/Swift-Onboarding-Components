@@ -1154,13 +1154,10 @@
                 "type": "object",
                 "properties": {
                     "key": {
-                        "description": "The publishable key of the playbook onto which you would like this user to onboard. The user will be asked to provide any missing information required by playbook.",
+                        "description": "The publishable key of the playbook onto which you would like this user to onboard.\n The user will be asked to provide any missing information required by playbook.\n If you provide the key here, you can omit providing it in your frontend Footprint.js integration.",
                         "type": "string"
                     }
-                },
-                "required": [
-                    "key"
-                ]
+                }
             },
             "CreateTokenResponse": {
                 "type": "object",

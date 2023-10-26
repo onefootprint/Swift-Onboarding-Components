@@ -47,10 +47,15 @@ pub async fn post(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let (obc, _) = ObConfiguration::get(conn, (&key, &tenant_id, is_live))?;
-            if obc.kind == ObConfigurationKind::Auth {
-                return Err(OnboardingError::CannotOnboardOntoAuthPlaybook.into());
-            }
+            let obc_id = if let Some(key) = key {
+                let (obc, _) = ObConfiguration::get(conn, (&key, &tenant_id, is_live))?;
+                if obc.kind == ObConfigurationKind::Auth {
+                    return Err(OnboardingError::CannotOnboardOntoAuthPlaybook.into());
+                }
+                Some(obc.id)
+            } else {
+                None
+            };
             // Explicitly create with no scopes in order to require the user to verify their
             // phone number when they log in
             let scopes = vec![];
@@ -58,7 +63,7 @@ pub async fn post(
             let duration = Duration::days(1);
             let args = UserSessionArgs {
                 su_id: Some(sv.id),
-                obc_id: Some(obc.id),
+                obc_id,
                 is_from_api: true,
                 ..Default::default()
             };

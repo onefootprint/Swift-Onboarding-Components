@@ -8,6 +8,7 @@ use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
+use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::session::user::UserSessionArgs;
 use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
@@ -27,18 +28,22 @@ use paperclip::actix::{self, api_v2_operation, web};
 pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
+    ob_pk_auth: Option<ObConfigAuth>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<OnboardingResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
 
     let scoped_user_id = user_auth.scoped_user_id().ok_or(AuthError::MissingScopedUser)?;
     let uv_id = user_auth.user_vault_id().clone();
-    let obc_id = user_auth.ob_configuration_id();
+    let pk_obc_id = ob_pk_auth.map(|ob_pk| ob_pk.ob_config().id.clone());
+    let obc_id = user_auth
+        .ob_configuration_id()
+        .or(pk_obc_id)
+        .ok_or(OnboardingError::NoObConfig)?;
     let (scoped_user, ob_config, tenant) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let su = ScopedVault::get(conn, (&scoped_user_id, &uv_id))?;
-            let obc_id = obc_id.ok_or(OnboardingError::NoObConfig)?;
             // Check that the ob configuration is still active
             let (ob_config, tenant) = ObConfiguration::get_enabled(conn, &obc_id)?;
             Ok((su, ob_config, tenant))
