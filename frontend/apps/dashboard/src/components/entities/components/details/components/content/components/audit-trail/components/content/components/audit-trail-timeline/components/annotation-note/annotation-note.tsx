@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoQuoteLeft16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { Annotation } from '@onefootprint/types';
-import { Toggle } from '@onefootprint/ui';
+import { Stack, Toggle } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 
 import TruncatedText from '@/entities/components/details/components/truncated-text';
@@ -35,7 +35,18 @@ const AnnotationNote = ({ annotation }: AnnotationNoteProps) => {
   };
 
   return annotation ? (
-    <NoteContainer>
+    <NoteContainer
+      direction="column"
+      width="100%"
+      position="relative"
+      align="flex-start"
+      padding={0}
+      backgroundColor="primary"
+      borderRadius="default"
+      borderColor="tertiary"
+      borderPosition="all"
+      borderWidth={1}
+    >
       <QuoteIconContainer>
         <IcoQuoteLeft16 />
       </QuoteIconContainer>
@@ -51,7 +62,18 @@ const AnnotationNote = ({ annotation }: AnnotationNoteProps) => {
           color: 'secondary',
         }}
       />
-      <PinButtonContainer>
+      <PinButtonContainer
+        width="100%"
+        borderColor="tertiary"
+        borderPosition="top"
+        borderWidth={1}
+        backgroundColor="secondary"
+        paddingTop={3}
+        paddingBottom={3}
+        paddingLeft={5}
+        paddingRight={5}
+        height="36px"
+      >
         <Toggle
           checked={isNotePinned}
           onChange={handlePinNoteChange}
@@ -64,16 +86,8 @@ const AnnotationNote = ({ annotation }: AnnotationNoteProps) => {
   ) : null;
 };
 
-const NoteContainer = styled.div`
+const NoteContainer = styled(Stack)`
   ${({ theme }) => css`
-    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.default};
-    background-color: ${theme.backgroundColor.primary};
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: ${theme.spacing[0]};
     margin-left: calc(-1 * ${theme.spacing[5]});
 
     &::before {
@@ -106,14 +120,8 @@ const NoteContainer = styled.div`
   `};
 `;
 
-const PinButtonContainer = styled.div`
+const PinButtonContainer = styled(Stack)`
   ${({ theme }) => css`
-    display: flex;
-    padding: ${theme.spacing[3]} ${theme.spacing[5]};
-    width: 100%;
-    height: 36px;
-    background: ${theme.backgroundColor.secondary};
-    border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     border-radius: ${theme.borderRadius.none} ${theme.borderRadius.none}
       ${theme.borderRadius.default} ${theme.borderRadius.default};
   `}
