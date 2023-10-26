@@ -252,7 +252,7 @@ fn kyc(
     // find the right approver
     let approved_by = actor
         .and_then(|a| match a {
-            db::actor::SaturatedActor::TenantUser(user) => Some(pii!(user.email.to_string())),
+            db::actor::SaturatedActor::TenantUser(user) => user.name(),
             db::actor::SaturatedActor::TenantApiKey(_)
             | db::actor::SaturatedActor::FirmEmployee(_)
             | db::actor::SaturatedActor::Footprint => None,

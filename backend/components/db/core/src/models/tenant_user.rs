@@ -4,7 +4,7 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::tenant_user;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{Locked, OrgMemberEmail, TenantUserId, INTEGRATION_TEST_USER_EMAIL};
+use newtypes::{Locked, OrgMemberEmail, PiiString, TenantUserId, INTEGRATION_TEST_USER_EMAIL};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = tenant_user)]
@@ -109,6 +109,17 @@ impl TenantUser {
             .for_no_key_update()
             .first(conn.conn())?;
         Ok(Locked::new(user))
+    }
+}
+
+impl TenantUser {
+    pub fn name(&self) -> Option<PiiString> {
+        match (self.first_name.as_ref(), self.last_name.as_ref()) {
+            (None, None) => None,
+            (None, Some(l)) => Some(l.into()),
+            (Some(f), None) => Some(f.into()),
+            (Some(f), Some(l)) => Some(format!("{} {}", f, l).into()),
+        }
     }
 }
 
