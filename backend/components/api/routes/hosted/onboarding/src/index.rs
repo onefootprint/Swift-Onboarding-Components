@@ -16,7 +16,7 @@ use api_wire_types::hosted::onboarding::OnboardingResponse;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
-use newtypes::DataIdentifierDiscriminant;
+use newtypes::ObConfigurationKind;
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
@@ -47,8 +47,8 @@ pub async fn post(
 
     // TODO don't always create a new business vault - once we have portable businesses,
     // we should display to the client an ability to select the business they want to use
-    let should_create_new_business_vault = ob_config.must_collect(DataIdentifierDiscriminant::Business)
-        && user_auth.scoped_business_id().is_none();
+    let should_create_new_business_vault =
+        ob_config.kind == ObConfigurationKind::Kyb && user_auth.scoped_business_id().is_none();
     let maybe_new_biz_args = if should_create_new_business_vault {
         // If we're going to make a new business vault,
         let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;

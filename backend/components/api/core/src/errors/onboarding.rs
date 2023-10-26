@@ -64,4 +64,6 @@ pub enum OnboardingError {
     NoStatusForWorkflow,
     #[error("Can only provide one image at a time")]
     OnlyOneImageAllowed,
+    #[error("Cannot create an onboarding workflow for an auth playbook")]
+    CannotOnboardOntoAuthPlaybook,
 }

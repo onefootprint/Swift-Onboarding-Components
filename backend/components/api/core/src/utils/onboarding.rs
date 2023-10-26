@@ -11,11 +11,11 @@ use db::{
     TxnPgConn,
 };
 use newtypes::{
-    CollectedDataOption, EncryptedVaultPrivateKey, ScopedVaultId, Selfie, VaultId, VaultKind, VaultPublicKey,
-    WorkflowFixtureResult, WorkflowId,
+    CollectedDataOption, EncryptedVaultPrivateKey, ObConfigurationKind, ScopedVaultId, Selfie, VaultId,
+    VaultKind, VaultPublicKey, WorkflowFixtureResult, WorkflowId,
 };
 
-use crate::errors::ApiResult;
+use crate::errors::{onboarding::OnboardingError, ApiResult};
 
 use super::vault_wrapper::{Any, TenantVw, VaultWrapper};
 
@@ -39,6 +39,9 @@ pub fn get_or_start_onboarding(
     let user_vault = Vault::lock(conn, v_id)?;
     // TODO rm this when fixture result is passed in process
     let fixture_result = WorkflowFixtureResult::from_sandbox_id(user_vault.sandbox_id.as_ref());
+    if obc.kind == ObConfigurationKind::Auth {
+        return Err(OnboardingError::CannotOnboardOntoAuthPlaybook.into());
+    }
 
     let wf_id = if let Some(wf_id) = existing_wf_id {
         wf_id

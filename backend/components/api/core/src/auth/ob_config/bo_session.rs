@@ -12,7 +12,7 @@ use db::{
     PgConn,
 };
 use feature_flag::FeatureFlagClient;
-use newtypes::DataIdentifierDiscriminant;
+use newtypes::ObConfigurationKind;
 use paperclip::actix::Apiv2Security;
 
 #[derive(Debug, Clone, Apiv2Security)]
@@ -50,7 +50,7 @@ impl ExtractableAuthSession for ParsedBoSession {
             }
         };
         let (ob_config, tenant) = ObConfiguration::get_enabled(conn, &data.ob_config_id)?;
-        if !ob_config.must_collect(DataIdentifierDiscriminant::Business) {
+        if ob_config.kind != ObConfigurationKind::Kyb {
             return Err(AuthError::BusinessNotRequired.into());
         }
         let bo = BusinessOwner::get(conn, &data.bo_id)?;

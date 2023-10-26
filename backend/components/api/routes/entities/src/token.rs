@@ -7,6 +7,7 @@ use api_core::auth::session::user::UserSession;
 use api_core::auth::session::user::UserSessionArgs;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::auth::tenant::TenantGuard;
+use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::ApiResult;
 use api_core::utils::session::AuthSession;
 use api_wire_types::CreateTokenRequest;
@@ -16,6 +17,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
 use newtypes::FpId;
+use newtypes::ObConfigurationKind;
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[route_alias(post(
@@ -46,6 +48,9 @@ pub async fn post(
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let (obc, _) = ObConfiguration::get(conn, (&key, &tenant_id, is_live))?;
+            if obc.kind == ObConfigurationKind::Auth {
+                return Err(OnboardingError::CannotOnboardOntoAuthPlaybook.into());
+            }
             // Explicitly create with no scopes in order to require the user to verify their
             // phone number when they log in
             let scopes = vec![];

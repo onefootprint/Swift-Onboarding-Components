@@ -48,12 +48,8 @@ pub async fn post(
                 return Err(TenantError::IncorrectVaultKindForRedoKyc.into());
             }
 
-            let (_, obc) = Workflow::list_by_completed_at(conn, &sv.id)?
-                .into_iter()
-                .filter_map(|(wf, obc)| obc.map(|obc| (wf, obc)))
-                .filter_map(|(wf, obc)| wf.completed_at.map(|t| (t, obc)))
-                .max_by_key(|(completed_at, _)| *completed_at)
-                .ok_or(UserError::NoCompleteOnboardings)?;
+            let (_, obc) =
+                Workflow::latest_reonboardable_wf(conn, &sv.id)?.ok_or(UserError::NoCompleteOnboardings)?;
 
             let scopes = vec![];
             let auth_factors = vec![];

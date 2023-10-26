@@ -14,7 +14,7 @@ use db::models::manual_review::ManualReview;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::{Workflow, WorkflowIdentifier};
-use newtypes::{DataIdentifierDiscriminant, VaultKind};
+use newtypes::{ObConfigurationKind, VaultKind};
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
@@ -48,7 +48,7 @@ pub async fn post(
                 .as_ref()
                 .ok_or(OnboardingError::NoObcForWorkflow)?;
             let (ob_config, _) = ObConfiguration::get(conn, obc_id)?;
-            let biz_wf = if ob_config.must_collect(DataIdentifierDiscriminant::Business) {
+            let biz_wf = if ob_config.kind == ObConfigurationKind::Kyb {
                 let id = WorkflowIdentifier::BusinessOwner {
                     owner_vault_id: &sv.vault_id,
                     ob_config_id: &ob_config.id,

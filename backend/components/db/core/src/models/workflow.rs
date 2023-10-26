@@ -6,7 +6,7 @@ use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::{
     AlpacaKycConfig, AlpacaKycState, CipKind, DbActor, DocumentState, FireWebhookArgs, InsightEventId,
-    KybConfig, KybState, KycConfig, OnboardingCompletedPayload, OnboardingStatus,
+    KybConfig, KybState, KycConfig, ObConfigurationKind, OnboardingCompletedPayload, OnboardingStatus,
     OnboardingStatusChangedPayload, TaskData, TenantId, TenantScope, VaultId, VaultKind, WebhookEvent,
     WorkflowFixtureResult,
 };
@@ -326,6 +326,24 @@ impl Workflow {
             .left_join(ob_configuration::table)
             .order_by(workflow::completed_at.asc())
             .get_results(conn)?;
+
+        Ok(res)
+    }
+
+    /// Gets the latest workflow that the user completed that is "reonboard-able"
+    #[tracing::instrument("Workflow::list_by_completed_at", skip_all)]
+    pub fn latest_reonboardable_wf(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+    ) -> DbResult<Option<(Self, ObConfiguration)>> {
+        let res = workflow::table
+            .inner_join(ob_configuration::table)
+            .filter(workflow::scoped_vault_id.eq(sv_id))
+            .filter(not(workflow::completed_at.is_null()))
+            .filter(not(ob_configuration::kind.eq(ObConfigurationKind::Auth)))
+            .order_by(workflow::completed_at.desc())
+            .first(conn)
+            .optional()?;
 
         Ok(res)
     }
