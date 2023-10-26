@@ -1,0 +1,1 @@
+ALTER TABLE auth_event ALTER COLUMN scope DROP NOT NULL;

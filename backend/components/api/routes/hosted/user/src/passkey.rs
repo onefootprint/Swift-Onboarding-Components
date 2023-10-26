@@ -16,7 +16,11 @@ use api_core::{
 
 use chrono::{Duration, Utc};
 
-use db::models::{auth_event::NewAuthEvent, insight_event::CreateInsightEvent, user_timeline::UserTimeline};
+use db::models::{
+    auth_event::{AuthEvent, NewAuthEvent},
+    insight_event::CreateInsightEvent,
+    user_timeline::UserTimeline,
+};
 use db::models::{
     liveness_event::NewLivenessEvent,
     vault::Vault,
@@ -24,7 +28,9 @@ use db::models::{
 };
 use macros::route_alias;
 
-use newtypes::{AttestationType, AuthEventKind, LivenessAttributes, LivenessInfo, LivenessIssuer};
+use newtypes::{
+    AttestationType, AuthEventKind, IdentifyScope, LivenessAttributes, LivenessInfo, LivenessIssuer,
+};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
 
@@ -239,6 +245,15 @@ pub async fn complete_post(
             }
             .save(conn)?;
 
+            let scope = if let Some(id) = user_auth.auth_event_id.as_ref() {
+                AuthEvent::get(conn, id)?.scope
+            } else {
+                // Don't want to error this whole endpoint for an annotation, but this should never
+                // happen
+                tracing::error!("Registering a passkey in auth context without an auth_event_id");
+                IdentifyScope::Onboarding
+            };
+
             // record our registration of a passkey as an auth event
             // this is done here for (a) consistency with SMS first-time registration/auth
             // and (b) so we can later link a device attestation to this passkey
@@ -251,8 +266,7 @@ pub async fn complete_post(
                 kind: AuthEventKind::Passkey,
                 webauthn_credential_id: Some(credential.id),
                 created_at: Utc::now(),
-                // TODO should eventually include the scope originally requested for this auth session
-                scope: None,
+                scope,
             }
             .create(conn.conn())?;
 

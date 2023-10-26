@@ -201,7 +201,7 @@ pub async fn post(
                 kind: event_kind,
                 webauthn_credential_id: passkey_cred_id,
                 created_at: Utc::now(),
-                scope: Some(scope),
+                scope,
             }
             .create(conn.conn())?;
 

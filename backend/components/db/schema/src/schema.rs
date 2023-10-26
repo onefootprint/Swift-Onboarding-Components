@@ -86,7 +86,7 @@ table! {
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        scope -> Nullable<Text>,
+        scope -> Text,
     }
 }
 

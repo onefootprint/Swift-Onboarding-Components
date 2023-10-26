@@ -34,7 +34,7 @@ pub struct AuthEvent {
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub scope: Option<IdentifyScope>,
+    pub scope: IdentifyScope,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -46,7 +46,7 @@ pub struct NewAuthEvent {
     pub kind: AuthEventKind,
     pub webauthn_credential_id: Option<WebauthnCredentialId>,
     pub created_at: DateTime<Utc>,
-    pub scope: Option<IdentifyScope>,
+    pub scope: IdentifyScope,
 }
 
 impl NewAuthEvent {
@@ -71,6 +71,14 @@ pub struct LinkedDeviceAttestation {
 }
 
 impl AuthEvent {
+    #[tracing::instrument("AuthEvent::get", skip_all)]
+    pub fn get(conn: &mut PgConn, id: &AuthEventId) -> DbResult<Self> {
+        let result = auth_event::table
+            .filter(auth_event::id.eq(id))
+            .get_result(conn)?;
+        Ok(result)
+    }
+
     #[tracing::instrument("AuthEvent::count", skip_all)]
     pub fn count(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<i64> {
         let count = auth_event::table
@@ -79,7 +87,6 @@ impl AuthEvent {
             .get_result(conn)?;
         Ok(count)
     }
-
 
     #[tracing::instrument("AuthEvent::list", skip_all)]
     pub fn list(
