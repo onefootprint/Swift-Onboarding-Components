@@ -2,6 +2,7 @@ use db_schema::schema;
 
 use newtypes::AuthEventId;
 use newtypes::AuthEventKind;
+use newtypes::IdentifyScope;
 use newtypes::WebauthnCredentialId;
 use crate::DbError;
 use crate::DbResult;
@@ -33,6 +34,7 @@ pub struct AuthEvent {
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub scope: Option<IdentifyScope>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -44,6 +46,7 @@ pub struct NewAuthEvent {
     pub kind: AuthEventKind,
     pub webauthn_credential_id: Option<WebauthnCredentialId>,
     pub created_at: DateTime<Utc>,
+    pub scope: Option<IdentifyScope>,
 }
 
 impl NewAuthEvent {

@@ -209,7 +209,6 @@ pub async fn post(
             };
 
             // record the new auth event
-            // TODO include auth event scope here too - what scopes were requested?
             let insight = CreateInsightEvent::from(insight_headers).insert_with_conn(conn)?;
             NewAuthEvent {
                 vault_id: uv_id,
@@ -218,6 +217,7 @@ pub async fn post(
                 kind: event_kind,
                 webauthn_credential_id: passkey_cred_id,
                 created_at: Utc::now(),
+                scope: Some(scope),
             }
             .create(conn.conn())?;
 

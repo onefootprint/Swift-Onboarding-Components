@@ -242,13 +242,17 @@ pub async fn complete_post(
             // record our registration of a passkey as an auth event
             // this is done here for (a) consistency with SMS first-time registration/auth
             // and (b) so we can later link a device attestation to this passkey
-            let _ = NewAuthEvent {
+            // TODO should we be storing this in the auth session and reporting at the end of an
+            // auth session all of the credentials used?
+            NewAuthEvent {
                 vault_id: user_auth.user_vault_id().clone(),
                 scoped_vault_id: user_auth.scoped_user_id(),
                 insight_event_id: Some(insight_event.id),
                 kind: AuthEventKind::Passkey,
                 webauthn_credential_id: Some(credential.id),
                 created_at: Utc::now(),
+                // TODO should eventually include the scope originally requested for this auth session
+                scope: None,
             }
             .create(conn.conn())?;
 

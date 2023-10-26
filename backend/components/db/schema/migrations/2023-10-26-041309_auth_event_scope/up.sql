@@ -1,0 +1,1 @@
+ALTER TABLE auth_event ADD COLUMN scope TEXT;
