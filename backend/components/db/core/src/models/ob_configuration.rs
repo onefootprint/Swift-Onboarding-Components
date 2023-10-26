@@ -57,6 +57,7 @@ pub struct ObConfiguration {
     pub allow_us_residents: bool,
     pub allow_us_territory_residents: bool,
     pub kind: ObConfigurationKind,
+    pub skip_kyb: bool,
 }
 
 #[derive(derive_more::Deref)]
@@ -311,6 +312,7 @@ struct NewObConfiguration {
     allow_us_residents: bool,
     allow_us_territory_residents: bool,
     kind: ObConfigurationKind,
+    skip_kyb: bool,
 }
 
 #[derive(Debug)]
@@ -501,6 +503,7 @@ impl ObConfiguration {
         allow_us_residents: bool,
         allow_us_territory_residents: bool,
         kind: ObConfigurationKind,
+        skip_kyb: bool,
     ) -> DbResult<Self> {
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
@@ -524,6 +527,7 @@ impl ObConfiguration {
             allow_us_residents,
             allow_us_territory_residents,
             kind,
+            skip_kyb,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)
@@ -646,6 +650,7 @@ mod tests {
             allow_us_residents,
             allow_us_territory_residents,
             kind: ObConfigurationKind::Kyc,
+            skip_kyb: false,
         };
 
         assert_have_same_elements(
@@ -688,6 +693,7 @@ mod tests {
             allow_us_residents: true,
             allow_us_territory_residents: false,
             kind: ObConfigurationKind::Kyc,
+            skip_kyb: false,
         }
     }
 
@@ -851,6 +857,7 @@ mod tests {
             allow_us_residents: true,
             allow_us_territory_residents: false,
             kind: ObConfigurationKind::Kyc,
+            skip_kyb: false,
         };
 
         obc.optional_ssn_restricted_id_doc_kinds()
@@ -886,6 +893,7 @@ mod tests {
             allow_us_residents: true,
             allow_us_territory_residents: false,
             kind: ObConfigurationKind::Kyc,
+            skip_kyb: false,
         };
 
         let mapping = obc.supported_country_mapping_for_document(None).0;

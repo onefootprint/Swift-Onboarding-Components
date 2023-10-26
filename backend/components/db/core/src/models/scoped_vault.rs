@@ -20,7 +20,7 @@ use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
     DataLifetimeSeqno, DbActor, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingStatus,
-    ScopedVaultId, TenantId, VaultCreatedInfo, VaultId, WorkflowId,
+    ScopedVaultId, TenantId, VaultCreatedInfo, VaultId, VaultKind, WorkflowId,
 };
 
 /// Creates a unique identifier specific to each onboarding configuration.
@@ -343,7 +343,7 @@ impl ScopedVault {
     }
 
     #[tracing::instrument("ScopedVault::update", skip_all)]
-    pub fn update(conn: &mut PgConn, id: &ScopedVaultId, update: ScopedVaultUpdate) -> DbResult<()> {
+    pub fn update(conn: &mut TxnPgConn, id: &ScopedVaultId, update: ScopedVaultUpdate) -> DbResult<()> {
         let ScopedVaultUpdate {
             is_billable,
             status,
@@ -355,7 +355,33 @@ impl ScopedVault {
         diesel::update(scoped_vault::table)
             .filter(scoped_vault::id.eq(id))
             .set(update)
-            .execute(conn)?;
+            .execute(conn.conn())?;
+        Ok(())
+    }
+
+    #[tracing::instrument("ScopedVault::clear_status", skip_all)]
+    /// Used to clear the status of a business vault going through a skip_kyb workflow.
+    pub fn clear_business_status(conn: &mut TxnPgConn, wf_id: &WorkflowId) -> DbResult<()> {
+        let (wf, v) = Workflow::get_with_vault(conn, wf_id)?;
+        if v.kind != VaultKind::Business {
+            return Err(DbError::ValidationError(
+                "Not allowed to clear status of non-business vault".into(),
+            ));
+        }
+        use db_schema::schema::workflow;
+        let count_wf = workflow::table
+            .filter(workflow::scoped_vault_id.eq(&wf.scoped_vault_id))
+            .count()
+            .execute(conn.conn())?;
+        if count_wf > 1 {
+            return Err(DbError::ValidationError(
+                "Not allowed to clear status of a business with multiple workflows".into(),
+            ));
+        }
+        diesel::update(scoped_vault::table)
+            .filter(scoped_vault::id.eq(&wf.scoped_vault_id))
+            .set(scoped_vault::status.eq(Option::<OnboardingStatus>::None))
+            .execute(conn.conn())?;
         Ok(())
     }
 

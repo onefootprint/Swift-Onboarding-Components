@@ -1,0 +1,2 @@
+ALTER TABLE ob_configuration ADD COLUMN skip_kyb BOOLEAN DEFAULT FALSE NOT NULL;
+ALTER TABLE ob_configuration ALTER COLUMN skip_kyb DROP DEFAULT;

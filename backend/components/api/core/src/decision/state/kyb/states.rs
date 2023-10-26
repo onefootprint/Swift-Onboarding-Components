@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
@@ -126,13 +127,21 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
         _async_res: (),
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<KybState> {
-        let update = WorkflowUpdate::set_status(OnboardingStatus::Pending);
-        DbWorkflow::update(wf, conn, update)?;
+        let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 
-        Ok(KybState::from(KybVendorCalls {
-            wf_id: self.wf_id,
-            t_id: self.t_id,
-        }))
+        if obc.skip_kyb {
+            // Handling skip_kyb flow
+            // Since we're not running KYB, let's set the sv status to None
+            ScopedVault::clear_business_status(conn, &wf.id)?;
+            Ok(KybState::from(KybComplete {}))
+        } else {
+            let update = WorkflowUpdate::set_status(OnboardingStatus::Pending);
+            DbWorkflow::update(wf, conn, update)?;
+            Ok(KybState::from(KybVendorCalls {
+                wf_id: self.wf_id,
+                t_id: self.t_id,
+            }))
+        }
     }
 }
 

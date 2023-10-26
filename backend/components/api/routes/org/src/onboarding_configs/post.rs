@@ -446,6 +446,7 @@ pub async fn post(
     let obc = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
+            let skip_kyb = false;
             let obc = ObConfiguration::create(
                 conn,
                 name,
@@ -467,6 +468,7 @@ pub async fn post(
                 allow_us_residents.unwrap_or(true),
                 allow_us_territory_residents.unwrap_or(false),
                 kind,
+                skip_kyb,
             )?;
             let obc = db::actor::saturate_actor_nullable(conn, obc)?;
             Ok(obc)
