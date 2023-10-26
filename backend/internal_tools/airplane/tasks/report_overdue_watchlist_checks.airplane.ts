@@ -24,31 +24,41 @@ export default airplane.task(
     const dbUrl = process.env.DATABASE_URL;
 
     let query = `
-      with max_decision_made_at_per_sv_id as (
-        select workflow.scoped_vault_id, max(workflow.decision_made_at) as max_decision_made_at
-        from workflow
-        where kind in ('kyc', 'alpaca_kyc')
+      with max_wf_completed_at_at_per_sv_id as (
+        select wf.scoped_vault_id, max(wf.completed_at) as max_completed_at
+        from workflow wf
+        inner join scoped_vault sv on wf.scoped_vault_id = sv.id
+        left join ob_configuration obc on wf.ob_configuration_id = obc.id
+        where 
+          wf.completed_at is not null and
+          (	
+            sv.tenant_id = 'org_PtnIJT4VR35BS9xy0wITgF'
+            or obc.enhanced_aml->'data'->>'continuous_monitoring' = 'true'
+          )
         group by 1
       )
       select 
         sv.tenant_id,
         sv.id sv_id,
-        wf.max_decision_made_at wf_max_decision_made_at,
+        wf.max_completed_at wf_max_completed_at,
         wc.completed_at latest_watchlist_check_completed_at
       from 
         scoped_vault sv
         inner join vault v
           on sv.vault_id = v.id
-        left join max_decision_made_at_per_sv_id wf
+        left join max_wf_completed_at_at_per_sv_id wf
           on wf.scoped_vault_id = sv.id
         left join watchlist_check wc
           on wc.scoped_vault_id = sv.id and wc.deactivated_at is null and wc.completed_at is not null
       where
         sv.is_live 
         and v.kind = 'person'
-        and sv.tenant_id in ('org_PtnIJT4VR35BS9xy0wITgF')
+        and sv.tenant_id not in ('org_e2FHVfOM5Hd3Ce492o5Aat', 'org_hyZP3ksCvsT0AlLqMZsgrI') and sv.tenant_id not like '_private_it_org_%'
         and (wc.completed_at is null or wc.completed_at < now() - interval '31 day')
-        and (wf.max_decision_made_at is not null and wf.max_decision_made_at < now() - interval '31 day');
+        and (
+            (sv.tenant_id = 'org_PtnIJT4VR35BS9xy0wITgF' and wf.max_completed_at is null)
+            or (wf.max_completed_at is not null and wf.max_completed_at < now() - interval '31 day')
+      )
     `;
 
     const rows = await pg_query(dbUrl, query);
