@@ -5,7 +5,7 @@ use db::{
     PgConn,
 };
 use itertools::Itertools;
-use newtypes::{ObConfigurationId, ScopedVaultId, VaultId, VaultKind, WorkflowId};
+use newtypes::{AuthEventId, ObConfigurationId, ScopedVaultId, VaultId, VaultKind, WorkflowId};
 use paperclip::actix::Apiv2Security;
 
 use super::{UserAuthGuard, UserAuthScope};
@@ -33,6 +33,7 @@ pub struct UserSessionContext {
     pub(super) sb_id: Option<ScopedVaultId>,
     pub(super) obc_id: Option<ObConfigurationId>,
     pub(super) wf_id: Option<WorkflowId>,
+    pub(super) auth_event_id: Option<AuthEventId>,
     /// When true, the auth token was initially issued as an unauthed, identified token
     pub is_from_api: bool,
 }
@@ -56,7 +57,7 @@ impl AllowSessionUpdate for UserSessionContext {}
 
 impl UserSessionContext {
     pub fn session_with_added_scopes(self, new_scopes: Vec<UserAuthScope>) -> ApiResult<AuthSessionData> {
-        self.update(UserSessionArgs::default(), new_scopes, None)
+        self.update(UserSessionArgs::default(), new_scopes, None, None)
     }
 
     pub fn update(
@@ -64,6 +65,7 @@ impl UserSessionContext {
         new_args: UserSessionArgs,
         new_scopes: Vec<UserAuthScope>,
         new_auth_factor: Option<AuthFactor>,
+        new_auth_event_id: Option<AuthEventId>,
     ) -> ApiResult<AuthSessionData> {
         // Merge args, scopes, and auth factors and create a new session with these merged fields
         let new_scope_kinds = new_scopes.iter().map(UserAuthGuard::from).collect_vec();
@@ -89,7 +91,8 @@ impl UserSessionContext {
             wf_id: new_args.wf_id.or(self.wf_id),
             is_from_api: new_args.is_from_api || self.is_from_api,
         };
-        UserSession::make(self.user.id, args, new_scopes, new_factors)
+        let new_auth_event_id = new_auth_event_id.or(self.auth_event_id);
+        UserSession::make(self.user.id, args, new_scopes, new_factors, new_auth_event_id)
     }
 
     pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {
@@ -154,6 +157,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     scopes,
                     auth_factors,
                     is_from_api,
+                    auth_event_id,
                 } = data;
                 let vault = Vault::get(conn, &user_vault_id)?;
                 if vault.kind != VaultKind::Person {
@@ -191,6 +195,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     scopes,
                     auth_factors,
                     is_from_api,
+                    auth_event_id,
                 };
                 Ok(ParsedUserSessionContext(data))
             }

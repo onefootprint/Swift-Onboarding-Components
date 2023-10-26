@@ -1,3 +1,4 @@
+use newtypes::AuthEventId;
 use newtypes::ContactInfoId;
 use newtypes::ObConfigurationId;
 use newtypes::ScopedVaultId;
@@ -27,9 +28,12 @@ pub struct UserSession {
     /// Permissions that this auth token is given
     pub scopes: Vec<UserAuthScope>,
     /// the auth method that was used
+    /// TODO can probably rm this in favor of auth_event_id
     pub auth_factors: Vec<AuthFactor>,
-    /// When true, the auth token was initially issued as an unauthed, identified token
+    /// The auth event created when this token was issued
     #[serde(default)]
+    pub auth_event_id: Option<AuthEventId>,
+    /// When true, the auth token was initially issued as an unauthed, identified token
     pub is_from_api: bool,
 }
 
@@ -55,6 +59,7 @@ impl UserSession {
         args: UserSessionArgs,
         scopes: Vec<UserAuthScope>,
         auth_factors: Vec<AuthFactor>,
+        auth_event_id: Option<AuthEventId>,
     ) -> ApiResult<AuthSessionData> {
         if scopes.iter().any(|s| matches!(s, UserAuthScope::SignUp)) && args.su_id.is_none() {
             return Err(UserError::InvalidAuthSession(
@@ -78,6 +83,7 @@ impl UserSession {
             scopes,
             auth_factors,
             is_from_api,
+            auth_event_id,
         });
         Ok(session)
     }

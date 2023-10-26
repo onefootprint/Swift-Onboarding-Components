@@ -130,7 +130,7 @@ pub async fn post(
             };
             // No scopes or auth factors - require the user to re-auth
             let duration = Duration::days(1);
-            let data = UserSession::make(sv.vault_id.clone(), auth_args, vec![], vec![])?;
+            let data = UserSession::make(sv.vault_id.clone(), auth_args, vec![], vec![], None)?;
             let (auth_token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             // Create a timeline event logging that the workflow was triggered
             UserTimeline::create(conn, event, sv.vault_id.clone(), sv.id.clone())?;

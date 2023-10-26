@@ -64,7 +64,7 @@ pub async fn post(
                 is_from_api: true,
                 ..Default::default()
             };
-            let data = UserSession::make(sv.vault_id, args, scopes, auth_factors)?;
+            let data = UserSession::make(sv.vault_id, args, scopes, auth_factors, None)?;
             let (auth_token, session) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             Ok((auth_token, session))
         })
