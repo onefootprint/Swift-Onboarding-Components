@@ -3,12 +3,13 @@ import { Box, Shimmer } from '@onefootprint/ui';
 import React from 'react';
 
 const InitShimmer = () => (
-  <Box testID="init-shimmer" paddingTop={7}>
+  <Box testID="init-shimmer">
+    <NavHeader />
     <TitleContainer>
       <Title />
       <Subtitle />
     </TitleContainer>
-    <Box marginBottom={7}>
+    <Box marginBottom={5}>
       <Label />
       <Input />
     </Box>
@@ -23,8 +24,13 @@ const TitleContainer = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
-    margin-bottom: ${theme.spacing[8]};
+    margin-bottom: ${theme.spacing[3]};
   `}
+`;
+
+const NavHeader = styled.div`
+  width: 100%;
+  height: var(--navigation-header-height);
 `;
 
 const Title = () => (
@@ -43,6 +49,6 @@ const Button = () => (
   <Shimmer sx={{ width: '100%', height: '48px', marginBottom: 5 }} />
 );
 
-const TermsOfService = () => <Shimmer sx={{ width: '100%', height: '16px' }} />;
+const TermsOfService = () => <Shimmer sx={{ width: '100%', height: '30px' }} />;
 
 export default InitShimmer;
