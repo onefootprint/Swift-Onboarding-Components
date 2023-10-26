@@ -10,6 +10,7 @@ type ItemProps = {
   gridArea?: string;
   column?: string;
   row?: string;
+  width?: string;
 };
 
 type ContainerProps = BoxProps &
@@ -21,6 +22,7 @@ type ContainerProps = BoxProps &
     gap?: Spacing;
     templateAreas?: string[];
     alignItems?: CSS.Property.AlignItems;
+    width?: string;
   };
 
 const createColumns = (columns?: string | string[]) => {
@@ -48,25 +50,38 @@ const createRows = (rows?: string | string[]) => {
 };
 
 const Container = styled(Box)<ContainerProps>`
-  ${({ theme, columns, rows, columnGap, rowGap, gap, templateAreas }) => css`
+  ${({
+    theme,
+    columns,
+    rows,
+    columnGap,
+    rowGap,
+    gap,
+    templateAreas,
+    alignItems,
+    width,
+  }) => css`
+    {props...}
     display: grid;
+    width:${width};
     grid-template-columns: ${createColumns(columns)};
     grid-template-rows: ${createRows(rows)};
     grid-gap: ${gap ? theme.spacing[gap] : undefined};
     grid-column-gap: ${columnGap ? theme.spacing[columnGap] : undefined};
     grid-row-gap: ${rowGap ? theme.spacing[rowGap] : undefined};
-    align-items:;
-    grid-template-areas: ${templateAreas
-      ? `"${templateAreas.join('"\n"')}"`
-      : undefined};
+    align-items:${alignItems};
+    grid-template-areas: ${
+      templateAreas ? `"${templateAreas.join('"\n"')}"` : undefined
+    };
   `}
 `;
 
 const Item = styled(Stack)<ItemProps>`
-  ${({ gridArea, column, row }) => css`
+  ${({ gridArea, column, row, width }) => css`
     grid-area: ${gridArea};
     grid-column: ${column};
     grid-row: ${row};
+    width: ${width};
   `}
 `;
 

@@ -10,27 +10,27 @@ export default {
   argTypes: {
     columns: {
       control: 'array',
-      description: 'Array of column widths',
+      description: 'Array of number of columns & widths',
       name: 'Columns',
     },
     rows: {
       control: 'array',
-      description: 'Array of row heights',
+      description: 'Array of number of rows & heights',
       name: 'Rows',
     },
     gap: {
       control: 'number',
-      description: 'Gap between columns',
+      description: 'Gap between columns and rows',
       name: 'Gap',
     },
     columnGap: {
       control: 'number',
-      description: 'Gap between columns',
+      description: 'Gap between columns only',
       name: 'Column Gap',
     },
     rowGap: {
       control: 'number',
-      description: 'Gap between rows',
+      description: 'Gap between rows only',
       name: 'Row Gap',
     },
     gridAreas: {
@@ -40,39 +40,6 @@ export default {
     },
   },
 };
-
-const items = [
-  {
-    id: '1',
-    content: 'Header 1',
-    gridArea: 'header',
-  },
-  {
-    id: '2',
-    content: 'Header 2',
-    gridArea: 'header',
-  },
-  {
-    id: '3',
-    content: 'Header 3',
-    gridArea: 'header',
-  },
-  {
-    id: '4',
-    content: 'Sidebar 4',
-    gridArea: 'sidebar',
-  },
-  {
-    id: '5',
-    content: 'Content 5',
-    gridArea: 'content',
-  },
-  {
-    id: '6',
-    content: 'Footer 6',
-    gridArea: 'footer',
-  },
-];
 
 const Template: Story<ContainerProps & ItemProps> = ({
   columns,
@@ -110,8 +77,8 @@ const Template: Story<ContainerProps & ItemProps> = ({
   </Grid.Container>
 );
 
-export const Base = Template.bind({});
-Base.args = {
+export const Container = Template.bind({});
+Container.args = {
   columns: ['1fr', '1fr', '200px'],
   rows: ['1fr', '100px', '1fr'],
   gap: 2,
@@ -121,3 +88,36 @@ Base.args = {
     'footer footer footer',
   ],
 };
+
+const items = [
+  {
+    id: '1',
+    content: 'Header 1',
+    gridArea: 'header',
+  },
+  {
+    id: '2',
+    content: 'Header 2',
+    gridArea: 'header',
+  },
+  {
+    id: '3',
+    content: 'Header 3',
+    gridArea: 'header',
+  },
+  {
+    id: '4',
+    content: 'Sidebar 4',
+    gridArea: 'sidebar',
+  },
+  {
+    id: '5',
+    content: 'Content 5',
+    gridArea: 'content',
+  },
+  {
+    id: '6',
+    content: 'Footer 6',
+    gridArea: 'footer',
+  },
+];
