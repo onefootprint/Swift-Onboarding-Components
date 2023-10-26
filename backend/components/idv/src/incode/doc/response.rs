@@ -358,7 +358,6 @@ impl AddSelfieResponse {
             (self.confidence.is_none()).then_some(IncodeFailureReason::SelfieTooDark),
             (self.is_bright == Some(false)).then_some(IncodeFailureReason::SelfieTooDark),
             (self.has_lenses == Some(true)).then_some(IncodeFailureReason::SelfieHasLenses),
-            (self.has_face_mask == Some(true)).then_some(IncodeFailureReason::SelfieHasFaceMask),
         ]
         .into_iter()
         .unique()
@@ -865,7 +864,7 @@ mod tests {
         });
 
         let parsed: AddSelfieResponse = serde_json::from_value(raw_response_with_failure).unwrap();
-        assert_eq!(parsed.failure_reasons(), vec![SelfieTooDark, SelfieHasFaceMask]);
+        assert_eq!(parsed.failure_reasons(), vec![SelfieTooDark]);
 
         // No failure
         let raw_response = serde_json::json!({
