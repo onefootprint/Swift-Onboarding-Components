@@ -8,6 +8,7 @@ import EditableFormButtonContainer from '../../../../components/editable-form-bu
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
+import type { SyncDataFieldErrors } from '../../hooks/use-sync-data';
 import useSyncData from '../../hooks/use-sync-data';
 import { getSsnKind } from '../../utils/ssn-utils';
 import SSN4 from './components/ssn4';
@@ -21,6 +22,11 @@ type SSNProps = {
   ctaLabel?: string;
   hideDisclaimer?: boolean;
   hideHeader?: boolean;
+};
+
+const fieldByDi: Partial<Record<IdDI, keyof FormData>> = {
+  [IdDI.ssn4]: 'ssn4',
+  [IdDI.ssn9]: 'ssn9',
 };
 
 const SSN = ({
@@ -53,9 +59,25 @@ const SSN = ({
       ssn4: data[IdDI.ssn4]?.value,
     },
   });
-  const { getValues } = methods;
+  const { getValues, setError } = methods;
   const isSsn4Disabled = data?.[IdDI.ssn4]?.disabled;
   const isSsn9Disabled = data?.[IdDI.ssn9]?.disabled;
+
+  const handleSyncDataError = (error: SyncDataFieldErrors) => {
+    Object.entries(error).forEach(([k, message]) => {
+      const di = k as IdDI;
+      const field = fieldByDi[di];
+      if (field) {
+        setError(
+          field,
+          { message },
+          {
+            shouldFocus: true,
+          },
+        );
+      }
+    });
+  };
 
   const onSubmitForm = (formData: FormData) => {
     const convertedData = convertFormData(formData);
@@ -69,6 +91,7 @@ const SSN = ({
         });
         onComplete?.();
       },
+      onError: handleSyncDataError,
     });
   };
 

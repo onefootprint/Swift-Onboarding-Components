@@ -20,6 +20,17 @@ const SSN9 = ({ hideDisclaimer, disabled }: SSN9Props) => {
     formState: { errors },
   } = useFormContext();
 
+  const getHint = () => {
+    if (!errors.ssn9) {
+      return undefined;
+    }
+    const { message } = errors.ssn9;
+    if (message && typeof message === 'string') {
+      return message;
+    }
+    return t('form.error');
+  };
+
   return (
     <>
       <TextInput
@@ -27,7 +38,7 @@ const SSN9 = ({ hideDisclaimer, disabled }: SSN9Props) => {
         data-private
         hasError={!!errors.ssn9}
         disabled={disabled}
-        hint={errors.ssn9 && t('form.error')}
+        hint={getHint()}
         label={t('form.label')}
         mask={inputMasks.ssn}
         placeholder={t('form.placeholder')}

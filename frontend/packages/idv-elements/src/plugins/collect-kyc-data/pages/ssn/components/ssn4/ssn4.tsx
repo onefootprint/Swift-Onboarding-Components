@@ -16,13 +16,24 @@ const SSN4 = ({ disabled }: SSN4Props) => {
     formState: { errors },
   } = useFormContext();
 
+  const getHint = () => {
+    if (!errors.ssn4) {
+      return undefined;
+    }
+    const { message } = errors.ssn4;
+    if (message && typeof message === 'string') {
+      return message;
+    }
+    return t('form.error');
+  };
+
   return (
     <TextInput
       autoFocus
       data-private
       hasError={!!errors.ssn4}
       disabled={disabled}
-      hint={errors.ssn4 && t('form.error')}
+      hint={getHint()}
       label={t('form.label')}
       mask={inputMasks.lastFourSsn}
       placeholder={t('form.placeholder')}

@@ -10,7 +10,10 @@ import {
 import type { KycData } from '../../utils/data-types';
 import type { MachineContext } from '../../utils/state-machine';
 
-export const getInitialContext = (data: KycData): MachineContext => ({
+export const getInitialContext = (
+  data: KycData,
+  ssnKind: 'ssn4' | 'ssn9',
+): MachineContext => ({
   authToken: 'token',
   device: {
     type: 'mobile',
@@ -38,10 +41,10 @@ export const getInitialContext = (data: KycData): MachineContext => ({
   requirement: {
     kind: OnboardingRequirementKind.collectKycData,
     isMet: false,
-    missingAttributes: [
-      CollectedKycDataOption.name,
-      CollectedKycDataOption.dob,
-    ],
+    missingAttributes:
+      ssnKind === 'ssn4'
+        ? [CollectedKycDataOption.ssn4]
+        : [CollectedKycDataOption.ssn9],
     populatedAttributes: [],
     optionalAttributes: [],
   } as CollectKycDataRequirement,
@@ -61,18 +64,21 @@ export const withUserVaultValidate = () => {
   });
 };
 
-export const withUserVaultValidateError = () => {
+export const withUserVaultValidateError = (kind: 'ssn4' | 'ssn9') => {
   mockRequest({
     method: 'post',
     path: '/hosted/user/vault/validate',
     statusCode: 400,
     response: {
       error: {
-        message: {
-          [IdDI.firstName]: 'First name error',
-          [IdDI.lastName]: 'Last name error',
-          [IdDI.dob]: 'Date of birth error',
-        },
+        message:
+          kind === 'ssn4'
+            ? {
+                [IdDI.ssn4]: 'Invalid SSN',
+              }
+            : {
+                [IdDI.ssn9]: 'Invalid SSN',
+              },
       },
     },
   });
