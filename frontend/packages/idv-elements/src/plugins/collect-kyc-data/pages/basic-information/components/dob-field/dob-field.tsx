@@ -46,6 +46,7 @@ const DobField = ({ disabled }: DobFieldProps) => {
       hasError={!!errors.dob}
       hint={getErrorMessage()}
       label={t('label')}
+      inputMode="numeric"
       mask={inputMasks.dob}
       placeholder={inputMasks.dob.placeholder}
       value={getValues('dob')}
