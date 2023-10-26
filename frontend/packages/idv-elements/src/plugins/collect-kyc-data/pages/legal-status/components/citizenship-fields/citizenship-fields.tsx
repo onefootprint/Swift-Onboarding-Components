@@ -10,9 +10,8 @@ import type {
 import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
 
 import CitizenshipField from './citizenship-field';
-import CountryOfBirthField from './country-of-birth-field';
 
-const CountryFields = () => {
+const CitizenshipFields = () => {
   const { t } = useTranslation('pages.legal-status.form');
   const { control } = useFormContext();
   const { append, fields, remove } = useFieldArray({
@@ -20,8 +19,12 @@ const CountryFields = () => {
     control,
   });
 
-  const getErrorMessage = (error?: FieldError) => {
+  const getHint = (error?: FieldError) => {
     if (error) {
+      const { message } = error;
+      if (message && typeof message === 'string') {
+        return message;
+      }
       if (error.type === 'empty') {
         return t('citizenship.empty-error');
       }
@@ -55,7 +58,7 @@ const CountryFields = () => {
     ) : null;
   };
 
-  const renderCitizenshipFields = (
+  const renderCitizenshipField = (
     index: number,
     field: ControllerRenderProps<FieldValues, `citizenships.${number}`>,
     error?: FieldError,
@@ -64,7 +67,7 @@ const CountryFields = () => {
       value: { value },
       onChange,
     } = field;
-    const errorMessage = getErrorMessage(error);
+    const errorMessage = getHint(error);
 
     return (
       <>
@@ -83,7 +86,6 @@ const CountryFields = () => {
 
   return (
     <>
-      <CountryOfBirthField />
       {fields.map((citizenshipField, index) => (
         <Controller
           key={citizenshipField.id}
@@ -98,7 +100,7 @@ const CountryFields = () => {
             },
           }}
           render={({ field, fieldState: { error } }) =>
-            renderCitizenshipFields(index, field, error)
+            renderCitizenshipField(index, field, error)
           }
         />
       ))}
@@ -106,4 +108,4 @@ const CountryFields = () => {
   );
 };
 
-export default CountryFields;
+export default CitizenshipFields;

@@ -12,7 +12,7 @@ const useConvertFormData = () => (formData: FormData) => {
       value: usLegalStatus,
     },
     [IdDI.nationality]: {
-      value: undefined,
+      value: nationality.value,
     },
     [IdDI.citizenships]: {
       value: undefined,
@@ -29,11 +29,6 @@ const useConvertFormData = () => (formData: FormData) => {
     return convertedData;
   }
 
-  if (nationality) {
-    convertedData[IdDI.nationality] = {
-      value: nationality.value,
-    };
-  }
   const citizenshipValues = uniq(
     citizenships
       ?.filter(({ value }) => !!value)

@@ -2,7 +2,7 @@ import type { CountryCode, UsLegalStatus, VisaKind } from '@onefootprint/types';
 
 export type FormData = {
   usLegalStatus: UsLegalStatus;
-  nationality?: CountrySelectOptionOrPlaceholder;
+  nationality: CountrySelectOptionOrPlaceholder;
   citizenships?: CountrySelectOptionOrPlaceholder[];
   visa?: VisaFormData;
 };

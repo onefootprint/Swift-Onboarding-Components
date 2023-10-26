@@ -19,13 +19,28 @@ const VisaFields = () => {
   const l10n = useL10nContext();
   const inputMasks = useInputMask(l10n?.locale);
 
-  const errorType = errors.visa?.expirationDate?.type;
-  const errorMessage = errorType ? t(`visa-expiration.error.${errorType}`) : '';
-
   const options = Object.values(VisaKind).map(value => ({
     label: t(`visa-kind.mapping.${value}`),
     value,
   }));
+
+  const getHint = (field: string) => {
+    if (errors.visa) {
+      const { message } = errors.visa;
+      if (message && typeof message === 'string') {
+        return message;
+      }
+      if (field === 'kind' && errors.visa.kind) {
+        return t('visa-kind.error');
+      }
+      if (field === 'expirationDate' && errors.visa.expirationDate) {
+        return t(`visa-expiration.error.${errors.visa.expirationDate.type}`);
+      }
+    }
+    return undefined;
+  };
+  const kindErrorMessage = getHint('kind');
+  const expirationErrorMessage = getHint('expirationDate');
 
   return (
     <>
@@ -34,15 +49,15 @@ const VisaFields = () => {
         control={control}
         name="visa.kind"
         rules={{ required: true }}
-        render={({ field, fieldState: { error } }) => (
+        render={({ field }) => (
           <Select
             data-private
             label={t('visa-kind.label')}
             onBlur={field.onBlur}
             options={options}
             onChange={field.onChange}
-            hint={error && t('visa-kind.error')}
-            hasError={!!error}
+            hint={kindErrorMessage}
+            hasError={!!kindErrorMessage}
             placeholder={t('visa-kind.placeholder')}
             value={field.value}
             testID="visa-kind-select"
@@ -51,8 +66,8 @@ const VisaFields = () => {
       />
       <TextInput
         data-private
-        hasError={!!errorMessage}
-        hint={errorMessage}
+        hasError={!!expirationErrorMessage}
+        hint={expirationErrorMessage}
         label={t('visa-expiration.label')}
         mask={inputMasks.visaExpiration}
         placeholder={inputMasks.visaExpiration.placeholder}

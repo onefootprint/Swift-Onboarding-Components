@@ -6,7 +6,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
 type StatusFieldsProps = {
-  handleStatusChange: () => void;
+  handleStatusChange: (newStatus: UsLegalStatus) => void;
 };
 
 const StatusFields = ({ handleStatusChange }: StatusFieldsProps) => {
@@ -18,19 +18,25 @@ const StatusFields = ({ handleStatusChange }: StatusFieldsProps) => {
       <Radio
         value={UsLegalStatus.citizen}
         label={t('citizen')}
-        {...register('usLegalStatus', { onChange: handleStatusChange })}
+        {...register('usLegalStatus', {
+          onChange: e => handleStatusChange(e.target.value),
+        })}
         testID="citizen-radio"
       />
       <Radio
         value={UsLegalStatus.permanentResident}
         label={t('permanent-resident')}
-        {...register('usLegalStatus', { onChange: handleStatusChange })}
+        {...register('usLegalStatus', {
+          onChange: e => handleStatusChange(e.target.value),
+        })}
         testID="permanent-resident-radio"
       />
       <Radio
         value={UsLegalStatus.visa}
         label={t('visa')}
-        {...register('usLegalStatus', { onChange: handleStatusChange })}
+        {...register('usLegalStatus', {
+          onChange: e => handleStatusChange(e.target.value),
+        })}
         testID="visa-radio"
       />
     </Container>

@@ -1,3 +1,4 @@
+import { COUNTRIES } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { IdDI, UsLegalStatus } from '@onefootprint/types';
@@ -12,7 +13,8 @@ import NavigationHeader from '../../components/navigation-header';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import type { KycData } from '../../utils/data-types';
-import CountryFields from './components/country-fields';
+import CitizenshipFields from './components/citizenship-fields';
+import CountryOfBirthField from './components/country-of-birth-field';
 import StatusFields from './components/status-fields';
 import VisaFields from './components/visa-fields';
 import useConvertFormData from './hooks/use-convert-form-data';
@@ -42,9 +44,15 @@ const LegalStatus = ({
   const { t } = useTranslation('pages.legal-status');
   const convertFormData = useConvertFormData();
 
+  const usCountryRecord = COUNTRIES.find(country => country.value === 'US');
+  const usCountrySelectOption = {
+    label: usCountryRecord?.label,
+    value: usCountryRecord?.value,
+  };
+
   const emptyFieldValues: FormData = {
     usLegalStatus: UsLegalStatus.citizen,
-    nationality: { label: '', value: undefined },
+    nationality: usCountrySelectOption,
     citizenships: [
       { label: '', value: undefined },
     ] as CountrySelectOptionOrPlaceholder[],
@@ -69,7 +77,9 @@ const LegalStatus = ({
 
   const usLegalStatus =
     data[IdDI.usLegalStatus]?.value ?? emptyFieldValues.usLegalStatus;
-  const nationality = getCountrySelectOption(data[IdDI.nationality]?.value);
+  const nationality =
+    getCountrySelectOption(data[IdDI.nationality]?.value) ??
+    emptyFieldValues.nationality;
   const methods = useForm<FormData>({
     defaultValues: {
       usLegalStatus,
@@ -81,8 +91,13 @@ const LegalStatus = ({
   const { clearErrors, watch, setValue } = methods;
   const selectedOption = watch('usLegalStatus');
 
-  const handleStatusChange = () => {
-    setValue('nationality', emptyFieldValues.nationality);
+  const handleStatusChange = (newStatus: UsLegalStatus) => {
+    setValue(
+      'nationality',
+      newStatus === UsLegalStatus.citizen
+        ? usCountrySelectOption
+        : { label: '', value: undefined },
+    );
     setValue('citizenships', emptyFieldValues.citizenships);
     setValue('visa', emptyFieldValues.visa);
     clearErrors(['nationality', 'citizenships', 'visa']);
@@ -118,11 +133,10 @@ const LegalStatus = ({
       <FormProvider {...methods}>
         <Form as="form" onSubmit={methods.handleSubmit(handleBeforeSubmit)}>
           <StatusFields handleStatusChange={handleStatusChange} />
+          <Divider />
+          <CountryOfBirthField />
           {selectedOption && selectedOption !== UsLegalStatus.citizen && (
-            <>
-              <Divider />
-              <CountryFields />
-            </>
+            <CitizenshipFields />
           )}
           {selectedOption === UsLegalStatus.visa && <VisaFields />}
           <EditableFormButtonContainer

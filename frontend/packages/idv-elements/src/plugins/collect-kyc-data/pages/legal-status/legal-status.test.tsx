@@ -43,7 +43,7 @@ describe('LegalStatus', () => {
   });
 
   describe('when the page is initially shown', () => {
-    it('only the three status options should be present', async () => {
+    it('only the three status fields and the country of birth field should be present', async () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext);
 
@@ -57,9 +57,12 @@ describe('LegalStatus', () => {
 
       const visaRadio = screen.getByTestId('visa-radio');
       expect(visaRadio).toBeInTheDocument();
+
+      const nationalitySelect = screen.getByTestId('nationality-select');
+      expect(nationalitySelect).toBeInTheDocument();
     });
 
-    it('the citizen status option should be selected by default', async () => {
+    it('the citizen status option and the US country of birth should be selected by default', async () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext);
 
@@ -67,6 +70,9 @@ describe('LegalStatus', () => {
         .getByTestId('citizen-radio')
         .querySelector('input') as HTMLInputElement;
       expect(citizenInput.checked).toBe(true);
+
+      const usaText = screen.getByText('United States of America');
+      expect(usaText).toBeInTheDocument();
     });
 
     it('any existing data should be filled by default', async () => {
@@ -106,18 +112,23 @@ describe('LegalStatus', () => {
   });
 
   describe('when the citizen status option is selected', () => {
-    it('no country or visa fields should be present', async () => {
+    it('no citizenship or visa fields should be present', async () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext);
 
-      const nationalitySelect = screen.queryByTestId('nationality-select');
-      expect(nationalitySelect).toBeNull();
-
       const citizenshipSelects = screen.queryAllByText('Citizenship');
       expect(citizenshipSelects).toHaveLength(0);
+
+      const visaKindSelect = screen.queryByTestId('visa-kind-select');
+      expect(visaKindSelect).not.toBeInTheDocument();
+
+      const visaExpirationTextInput = screen.queryByTestId(
+        'visa-expiration-textinput',
+      );
+      expect(visaExpirationTextInput).not.toBeInTheDocument();
     });
 
-    it('should submit the status without any country or visa fields', async () => {
+    it('should submit the default status and country of birth without any citizenship or visa fields', async () => {
       const onComplete = jest.fn();
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext, onComplete);
@@ -133,7 +144,7 @@ describe('LegalStatus', () => {
             value: UsLegalStatus.citizen,
           },
           [IdDI.nationality]: {
-            value: undefined,
+            value: 'US',
           },
           [IdDI.citizenships]: {
             value: undefined,
@@ -163,7 +174,7 @@ describe('LegalStatus', () => {
       expect(triggers).toHaveLength(3);
 
       const nationalityTrigger = triggers[0];
-      await selectEvents.select(nationalityTrigger, 'United States of America');
+      await selectEvents.select(nationalityTrigger, 'Albania');
       const visaTypeTrigger = triggers[2];
       await selectEvents.select(visaTypeTrigger, 'L-1');
 
@@ -183,7 +194,7 @@ describe('LegalStatus', () => {
             value: UsLegalStatus.citizen,
           },
           [IdDI.nationality]: {
-            value: undefined,
+            value: 'US',
           },
           [IdDI.citizenships]: {
             value: undefined,
@@ -217,7 +228,7 @@ describe('LegalStatus', () => {
       expect(citizenshipSelects).toHaveLength(1);
     });
 
-    it('the country fields should both be required', async () => {
+    it('the country fields should be required', async () => {
       const initialContext = getInitialContext();
       renderLegalStatus(initialContext);
 
