@@ -1,5 +1,6 @@
 import { useInputMask, useTranslation } from '@onefootprint/hooks';
 import { IcoShield24 } from '@onefootprint/icons';
+import styled, { css } from '@onefootprint/styled';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -53,19 +54,29 @@ const SSN9 = ({ hideDisclaimer, disabled }: SSN9Props) => {
         })}
       />
       {!hideDisclaimer && (
-        <InfoBox
-          items={[
-            {
-              title: t('disclaimer.security.title'),
-              description: t('disclaimer.security.description'),
-              Icon: IcoShield24,
-            },
-          ]}
-          variant="default"
-        />
+        <DisclaimerContainer>
+          <InfoBox
+            items={[
+              {
+                title: t('disclaimer.security.title'),
+                description: t('disclaimer.security.description'),
+                Icon: IcoShield24,
+              },
+            ]}
+            variant="default"
+          />
+        </DisclaimerContainer>
       )}
     </>
   );
 };
+
+const DisclaimerContainer = styled.div`
+  ${({ theme }) => css`
+    background-color: ${theme.backgroundColor.secondary};
+    border-radius: ${theme.borderRadius.default};
+    padding: ${theme.spacing[5]};
+  `}
+`;
 
 export default SSN9;

@@ -131,7 +131,7 @@ const SSN = ({
           width="100%"
         >
           {!hideHeader && <HeaderTitle title={title} subtitle={subtitle} />}
-          <Stack gap={5} direction="column">
+          <Stack gap={7} direction="column">
             {ssnKind === 'ssn9' ? (
               <SSN9 hideDisclaimer={hideDisclaimer} disabled={isSsn9Disabled} />
             ) : (
