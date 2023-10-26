@@ -11,7 +11,7 @@ import { getCanChallengeBiometrics } from '../../utils/biometrics';
 import getScrubbedPhoneNumber from '../../utils/get-scrubbed-phone-number';
 
 const IS_TEST = typeof jest !== 'undefined';
-const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 0 : 1500;
+const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 100 : 1500;
 
 const SmsChallenge = () => {
   const { t } = useTranslation('pages.sms-challenge');
@@ -48,7 +48,7 @@ const SmsChallenge = () => {
     ? t('prompt-with-phone', { scrubbedPhoneNumber })
     : t('prompt-without-phone');
 
-  const handleChallengeSuceed = (authToken: string) => {
+  const handleChallengeSucceed = (authToken: string) => {
     setTimeout(() => {
       send({
         type: 'challengeSucceeded',
@@ -78,7 +78,7 @@ const SmsChallenge = () => {
       <ChallengeHeader shouldShowBack={shouldShowBack} title={title} />
       <PinVerification
         title={formTitle}
-        onChallengeSucceed={handleChallengeSuceed}
+        onChallengeSucceed={handleChallengeSucceed}
         preferredChallengeKind={ChallengeKind.sms}
         identifier={successfulIdentifier ?? { phoneNumber }}
       />

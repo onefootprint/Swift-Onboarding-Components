@@ -9,7 +9,7 @@ import type {
   SignupChallengeResponse,
 } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
 import useIdentifyVerify from '../../../../hooks/api/hosted/identify/use-identify-verify';
@@ -51,16 +51,20 @@ const PinVerification = ({
     signupChallengeMutation.data?.challengeData;
   const identifyVerifyMutation = useIdentifyVerify();
   const userEmailMutation = useUserEmail();
-  const [isSuccess, setSuccess] = useState(false);
   const isLoading =
     loginChallengeMutation.isLoading || signupChallengeMutation.isLoading;
   const isPending = isLoading || !challengeData;
   const isVerifying =
     identifyVerifyMutation.isLoading || userEmailMutation.isLoading;
 
-  const complete = (authToken: string) => {
-    setSuccess(true);
-    onChallengeSucceed(authToken);
+  const getIsSuccess = () => {
+    if (!identifyVerifyMutation.isSuccess) {
+      return false;
+    }
+    if (userFound || 'email' in identifier) {
+      return true;
+    }
+    return userEmailMutation.isSuccess;
   };
 
   const registerNewUserEmail = (authToken: string) => {
@@ -92,8 +96,8 @@ const PinVerification = ({
             'pin-verification',
           );
         },
-        onSettled: () => {
-          complete(authToken);
+        onSuccess: () => {
+          onChallengeSucceed(authToken);
         },
       },
     );
@@ -117,7 +121,7 @@ const PinVerification = ({
     // If the new user signup challenge was initiated with an email OTP,
     // the backend will automatically save the email to the vault for us
     if (userFound || 'email' in identifier) {
-      complete(authToken);
+      onChallengeSucceed(authToken);
       return;
     }
 
@@ -312,7 +316,7 @@ const PinVerification = ({
       title={title}
       isPending={isPending}
       isVerifying={isVerifying}
-      isSuccess={isSuccess}
+      isSuccess={getIsSuccess()}
       hasError={identifyVerifyMutation.isError}
       onComplete={verifyPin}
       resendDisabledUntil={challengeData?.retryDisabledUntil}

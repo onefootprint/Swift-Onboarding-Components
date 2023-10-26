@@ -9,7 +9,7 @@ import { useIdentifyMachine } from '../../components/machine-provider';
 import PinVerification from '../../components/pin-verification';
 
 const IS_TEST = typeof jest !== 'undefined';
-const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 0 : 1500;
+const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 100 : 1500;
 
 const EmailChallenge = () => {
   const { t } = useTranslation('pages.email-challenge');
@@ -22,7 +22,7 @@ const EmailChallenge = () => {
   const shouldShowWelcomeBack = userFound && !isUnverified;
   const title = shouldShowWelcomeBack ? t('welcome-back-title') : t('title');
 
-  const handleChallengeSuceed = (authToken: string) => {
+  const handleChallengeSucceed = (authToken: string) => {
     setTimeout(() => {
       send({
         type: 'challengeSucceeded',
@@ -49,7 +49,7 @@ const EmailChallenge = () => {
       <ChallengeHeader shouldShowBack={!isBootstrap} title={title} />
       <PinVerification
         title={formTitle}
-        onChallengeSucceed={handleChallengeSuceed}
+        onChallengeSucceed={handleChallengeSucceed}
         preferredChallengeKind={ChallengeKind.email}
         identifier={successfulIdentifier ?? { email }}
       />

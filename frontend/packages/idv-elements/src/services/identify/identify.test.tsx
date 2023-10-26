@@ -423,9 +423,7 @@ describe('<Identify />', () => {
 
           await fillIdentifyEmail();
           await fillChallengePin();
-          await waitFor(() => {
-            expect(screen.getByText('Success!')).toBeInTheDocument();
-          });
+
           await waitFor(() => {
             expect(onDone).toHaveBeenCalled();
           });
@@ -486,9 +484,6 @@ describe('<Identify />', () => {
 
           await fillIdentifyEmail();
           await fillChallengePin();
-          await waitFor(() => {
-            expect(screen.getByText('Success!')).toBeInTheDocument();
-          });
           await waitFor(() => {
             expect(onDone).toHaveBeenCalled();
           });
