@@ -4,7 +4,6 @@ export { default as DeviceSignals } from './device-signals';
 export type { CompletePayload, FootprintClient } from './footprint-provider';
 export {
   default as FootprintProvider,
-  LegacyFootprintInternalEvent,
   useFootprintProvider,
 } from './footprint-provider';
 export { default as configureFootprint } from './footprint-provider/adapters';

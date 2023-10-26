@@ -26,7 +26,6 @@ export {
   InitShimmer,
   Layout,
   LayoutOptionsProvider,
-  LegacyFootprintInternalEvent,
   NAVIGATION_HEADER_PORTAL_ID,
   NAVIGATION_HEADER_PORTAL_SELECTOR,
   NavigationHeader,

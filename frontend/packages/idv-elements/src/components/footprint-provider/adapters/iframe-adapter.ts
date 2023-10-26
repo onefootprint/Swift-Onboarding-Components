@@ -4,11 +4,9 @@ import {
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
 import Postmate from '@onefootprint/postmate';
-import type { IdvBootstrapData, IdvOptions } from '@onefootprint/types';
 
 import Logger from '../../../utils/logger';
 import type { CompletePayload, FootprintClient } from '../types';
-import { LegacyFootprintInternalEvent } from '../types';
 import EventEmitter from '../utils/event-emitter/event-emmiter';
 
 class IframeAdapter implements FootprintClient {
@@ -21,23 +19,6 @@ class IframeAdapter implements FootprintClient {
       // Listen for the new events
       [FootprintPrivateEvent.propsReceived]: (props: FootprintProps) => {
         this.eventEmitter.emit(FootprintPrivateEvent.propsReceived, props);
-      },
-
-      // We still support listening for the legacy events in bifrost but
-      // these shouldn't be used for new features since they will get deprecated
-      [LegacyFootprintInternalEvent.bootstrapDataReceived]: (
-        data?: IdvBootstrapData,
-      ) => {
-        this.eventEmitter.emit(
-          LegacyFootprintInternalEvent.bootstrapDataReceived,
-          data,
-        );
-      },
-      [LegacyFootprintInternalEvent.optionsReceived]: (data?: IdvOptions) => {
-        this.eventEmitter.emit(
-          LegacyFootprintInternalEvent.optionsReceived,
-          data,
-        );
       },
     });
     this.postmate = postmate;
@@ -53,10 +34,7 @@ class IframeAdapter implements FootprintClient {
   }
 
   start() {
-    // Send both new and legacy start message to the SDK client (since
-    // we don't know which version it is running)
     this.sendEvent(FootprintPrivateEvent.started);
-    this.sendEvent(LegacyFootprintInternalEvent.started);
   }
 
   complete({ validationToken, closeDelay = 0 }: CompletePayload) {
