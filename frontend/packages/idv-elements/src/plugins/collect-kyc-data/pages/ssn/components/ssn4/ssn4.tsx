@@ -18,6 +18,7 @@ const SSN4 = ({ disabled }: SSN4Props) => {
 
   return (
     <TextInput
+      autoFocus
       data-private
       hasError={!!errors.ssn4}
       disabled={disabled}

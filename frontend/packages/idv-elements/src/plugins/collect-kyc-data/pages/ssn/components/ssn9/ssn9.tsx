@@ -23,6 +23,7 @@ const SSN9 = ({ hideDisclaimer, disabled }: SSN9Props) => {
   return (
     <>
       <TextInput
+        autoFocus
         data-private
         hasError={!!errors.ssn9}
         disabled={disabled}

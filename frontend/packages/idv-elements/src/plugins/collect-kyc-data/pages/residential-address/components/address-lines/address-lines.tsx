@@ -69,6 +69,7 @@ const AddressLines = () => {
   return (
     <>
       <AddressInput
+        autoFocus
         data-private
         country={country.value}
         hasError={!!errors.addressLine1}

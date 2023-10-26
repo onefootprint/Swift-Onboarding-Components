@@ -30,6 +30,7 @@ const Name = ({ index }: NameProps) => {
     <>
       <Row columns={2}>
         <TextInput
+          autoFocus
           data-private
           hasError={hasFirstNameError}
           hint={hasFirstNameError ? t('first-name.error') : undefined}

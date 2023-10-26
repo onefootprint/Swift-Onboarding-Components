@@ -67,6 +67,7 @@ const Form = ({
           fieldState: { error },
         }) => (
           <PhoneInput
+            autoFocus
             name={name}
             data-private
             hasError={!!error}

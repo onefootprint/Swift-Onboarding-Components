@@ -132,6 +132,7 @@ const BasicDataForm = ({
     >
       <Stack gap={5} direction="column">
         <TextInput
+          autoFocus
           data-private
           hasError={!!errors.name}
           hint={errors.name ? t('business-name.error') : undefined}

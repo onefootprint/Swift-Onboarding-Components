@@ -73,6 +73,7 @@ const NameFields = ({ disabled }: NameFieldsProps) => {
     <>
       <Row columns={2}>
         <TextInput
+          autoFocus
           data-private
           disabled={disabled}
           hasError={!!errors.firstName}

@@ -41,6 +41,7 @@ const DobField = ({ disabled }: DobFieldProps) => {
 
   return (
     <TextInput
+      autoFocus
       data-private
       disabled={disabled}
       hasError={!!errors.dob}

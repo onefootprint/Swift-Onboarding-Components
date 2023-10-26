@@ -150,6 +150,7 @@ const BusinessAddressForm = ({
         <Stack gap={5} direction="column">
           <CountryField onChange={handleCountryChange} data-private />
           <AddressInput
+            autoFocus
             data-private
             country={country.value}
             hasError={!!errors.addressLine1}

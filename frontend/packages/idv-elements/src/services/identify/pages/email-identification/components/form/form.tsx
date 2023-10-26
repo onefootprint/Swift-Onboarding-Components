@@ -28,6 +28,7 @@ const Form = ({ defaultEmail, isLoading, onSubmit }: FormProps) => {
     <form onSubmit={handleSubmit(onSubmit)}>
       <Box marginBottom={7}>
         <TextInput
+          autoFocus
           data-private
           hasError={hasError}
           hint={hint}
