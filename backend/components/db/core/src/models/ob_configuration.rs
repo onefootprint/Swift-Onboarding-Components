@@ -56,7 +56,7 @@ pub struct ObConfiguration {
     pub enhanced_aml: EnhancedAmlOption,
     pub allow_us_residents: bool,
     pub allow_us_territory_residents: bool,
-    pub kind: Option<ObConfigurationKind>,
+    pub kind: ObConfigurationKind,
 }
 
 #[derive(derive_more::Deref)]
@@ -645,7 +645,7 @@ mod tests {
             enhanced_aml: EnhancedAmlOption::No,
             allow_us_residents,
             allow_us_territory_residents,
-            kind: Some(ObConfigurationKind::Kyc),
+            kind: ObConfigurationKind::Kyc,
         };
 
         assert_have_same_elements(
@@ -687,7 +687,7 @@ mod tests {
             enhanced_aml: EnhancedAmlOption::No,
             allow_us_residents: true,
             allow_us_territory_residents: false,
-            kind: Some(ObConfigurationKind::Kyc),
+            kind: ObConfigurationKind::Kyc,
         }
     }
 
@@ -850,7 +850,7 @@ mod tests {
             enhanced_aml: EnhancedAmlOption::No,
             allow_us_residents: true,
             allow_us_territory_residents: false,
-            kind: Some(ObConfigurationKind::Kyc),
+            kind: ObConfigurationKind::Kyc,
         };
 
         obc.optional_ssn_restricted_id_doc_kinds()
@@ -885,7 +885,7 @@ mod tests {
             enhanced_aml: EnhancedAmlOption::No,
             allow_us_residents: true,
             allow_us_territory_residents: false,
-            kind: Some(ObConfigurationKind::Kyc),
+            kind: ObConfigurationKind::Kyc,
         };
 
         let mapping = obc.supported_country_mapping_for_document(None).0;

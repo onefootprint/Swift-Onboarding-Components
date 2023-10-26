@@ -23,6 +23,7 @@ pub struct OnboardingConfiguration {
     pub skip_kyc: bool,
     pub enhanced_aml: EnhancedAml,
     pub doc_scan_for_optional_ssn: Option<CollectedDataOption>,
+    pub kind: ObConfigurationKind,
 }
 
 /// The public onboarding configuration
@@ -58,4 +59,5 @@ pub struct PublicOnboardingConfiguration {
     /// allow list of origins permitted to host the embedded flow
     pub allowed_origins: Option<Vec<String>>,
     pub is_stepup_enabled: bool,
+    pub kind: ObConfigurationKind,
 }

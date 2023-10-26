@@ -35,6 +35,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             must_collect_data,
             allow_international_residents,
             doc_scan_for_optional_ssn,
+            kind,
             ..
         } = ob_config;
         let Tenant {
@@ -82,6 +83,7 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             supported_countries,
             doc_scan_required_if_ssn_skipped,
             is_stepup_enabled,
+            kind,
         }
     }
 }
@@ -107,6 +109,7 @@ impl DbToApi<(ObConfiguration, Option<SaturatedActor>)> for api_wire_types::Onbo
             allow_us_residents,
             allow_us_territory_residents,
             doc_scan_for_optional_ssn,
+            kind,
             ..
         } = ob_config;
         Self {
@@ -129,6 +132,7 @@ impl DbToApi<(ObConfiguration, Option<SaturatedActor>)> for api_wire_types::Onbo
             allow_us_residents,
             allow_us_territory_residents,
             doc_scan_for_optional_ssn,
+            kind,
         }
     }
 }

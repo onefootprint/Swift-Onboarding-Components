@@ -47,6 +47,7 @@ impl_enum_str_diesel!(ApiKeyStatus);
     EnumString,
     AsRefStr,
     serde_with::DeserializeFromStr,
+    serde_with::SerializeDisplay,
     Apiv2Schema,
     macros::SerdeAttr,
 )]
