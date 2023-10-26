@@ -123,6 +123,7 @@ const CheckRequirements = () => {
 const Container = styled.div`
   align-items: center;
   display: flex;
+  height: 100%;
   flex-direction: column;
   min-height: var(--loading-container-min-height);
   justify-content: center;

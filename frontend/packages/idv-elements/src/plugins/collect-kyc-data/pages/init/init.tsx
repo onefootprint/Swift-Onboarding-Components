@@ -60,6 +60,7 @@ const Container = styled.div`
   align-items: center;
   display: flex;
   flex-direction: column;
+  height: 100%;
   min-height: var(--loading-container-min-height);
   justify-content: center;
   text-align: center;

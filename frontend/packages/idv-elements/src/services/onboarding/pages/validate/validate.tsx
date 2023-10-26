@@ -54,6 +54,7 @@ const Container = styled.div`
     flex-direction: column;
     row-gap: ${theme.spacing[7]};
     min-height: var(--loading-container-min-height);
+    height: 100%;
     justify-content: center;
     text-align: center;
   `}
