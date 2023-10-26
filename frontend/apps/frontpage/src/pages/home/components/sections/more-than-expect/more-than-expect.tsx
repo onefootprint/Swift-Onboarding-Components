@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoHeart24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Grid, media } from '@onefootprint/ui';
+import { Container, Grid, media } from '@onefootprint/ui';
 import React from 'react';
 
 import FeatureCard from '../../feature-card';
@@ -22,57 +22,59 @@ const MoreThanExpect = () => {
         subtitle={t('subtitle')}
         icon={IcoHeart24}
       />
-      <Layout columns={['1fr']} rows={['420px']} marginTop={10}>
-        <FeatureCard
-          size="compact"
-          title={t('appclip.title')}
-          subtitle={t('appclip.subtitle')}
-          gridArea="app-clip"
-        >
-          <AppClip />
-        </FeatureCard>
-        <FeatureCard
-          size="compact"
-          title={t('fraud-risk.title')}
-          subtitle={t('fraud-risk.subtitle')}
-          gridArea="fraud-risk"
-        >
-          <FraudRisk />
-        </FeatureCard>
-        <FeatureCard
-          size="compact"
-          title={t('security-logs.title')}
-          subtitle={t('security-logs.subtitle')}
-          gridArea="security-logs"
-        >
-          <SecurityLogs />
-        </FeatureCard>
-        <FeatureCard
-          size="compact"
-          title={t('id-scan.title')}
-          subtitle={t('id-scan.subtitle')}
-          gridArea="id-scans"
-        >
-          <IdScans />
-        </FeatureCard>
-        <FeatureCard
-          size="compact"
-          title={t('auth.title')}
-          subtitle={t('auth.subtitle')}
-          gridArea="auth"
-        >
-          <Auth />
-        </FeatureCard>
-        <FeatureCard
-          size="compact"
-          title={t('manual-review.title')}
-          subtitle={t('manual-review.subtitle')}
-          gridArea="manual-review"
-        >
-          <ManualReview />
-        </FeatureCard>
-        <Divider gridArea="divider" />
-      </Layout>
+      <Container>
+        <Layout columns={['1fr']} rows={['420px']} marginTop={10}>
+          <FeatureCard
+            size="compact"
+            title={t('appclip.title')}
+            subtitle={t('appclip.subtitle')}
+            gridArea="app-clip"
+          >
+            <AppClip />
+          </FeatureCard>
+          <FeatureCard
+            size="compact"
+            title={t('fraud-risk.title')}
+            subtitle={t('fraud-risk.subtitle')}
+            gridArea="fraud-risk"
+          >
+            <FraudRisk />
+          </FeatureCard>
+          <FeatureCard
+            size="compact"
+            title={t('security-logs.title')}
+            subtitle={t('security-logs.subtitle')}
+            gridArea="security-logs"
+          >
+            <SecurityLogs />
+          </FeatureCard>
+          <FeatureCard
+            size="compact"
+            title={t('id-scan.title')}
+            subtitle={t('id-scan.subtitle')}
+            gridArea="id-scans"
+          >
+            <IdScans />
+          </FeatureCard>
+          <FeatureCard
+            size="compact"
+            title={t('auth.title')}
+            subtitle={t('auth.subtitle')}
+            gridArea="auth"
+          >
+            <Auth />
+          </FeatureCard>
+          <FeatureCard
+            size="compact"
+            title={t('manual-review.title')}
+            subtitle={t('manual-review.subtitle')}
+            gridArea="manual-review"
+          >
+            <ManualReview />
+          </FeatureCard>
+          <Divider gridArea="divider" />
+        </Layout>
+      </Container>
     </>
   );
 };

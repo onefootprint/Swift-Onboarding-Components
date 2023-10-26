@@ -7,7 +7,7 @@ import {
   IcoUserCircle16,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Grid, media } from '@onefootprint/ui';
+import { Container, Grid, media } from '@onefootprint/ui';
 import React from 'react';
 
 import SectionTitle from '../../section-title/section-title';
@@ -31,40 +31,42 @@ const VaultPii = () => {
         isOnDarkSection
         href="/vaulting"
       />
-      <CardLayouts
-        marginTop={10}
-        columns={['1fr']}
-        rows={['fit-content']}
-        gap={5}
-      >
-        <HorizontalCard
-          gridArea="top"
-          title={t('identity-data.title')}
-          subtitle={t('identity-data.subtitle')}
-          icon={IcoUserCircle16}
+      <Container>
+        <CardLayouts
+          marginTop={10}
+          columns={['1fr']}
+          rows={['fit-content']}
+          gap={5}
         >
-          <IdDataIllustration />
-        </HorizontalCard>
-        <VerticalCard
-          gridArea="bottom-1"
-          title={t('card-data.title')}
-          subtitle={t('card-data.subtitle')}
-          iconComponent={IcoCreditcard16}
-        >
-          <PaymentCardData />
-        </VerticalCard>
-        <VerticalCard
-          gridArea="bottom-2"
-          title={t('custom-data.title')}
-          subtitle={t('custom-data.subtitle')}
-          iconComponent={IcoFileText16}
-        >
-          <CustomDataIllustration />
-        </VerticalCard>
-        <Outer speed={10} delay={0} diameter={1300} />
-        <Center speed={5} delay={1} diameter={1100} />
-        <Inner speed={5} delay={3} diameter={800} />
-      </CardLayouts>
+          <HorizontalCard
+            gridArea="top"
+            title={t('identity-data.title')}
+            subtitle={t('identity-data.subtitle')}
+            icon={IcoUserCircle16}
+          >
+            <IdDataIllustration />
+          </HorizontalCard>
+          <VerticalCard
+            gridArea="bottom-1"
+            title={t('card-data.title')}
+            subtitle={t('card-data.subtitle')}
+            iconComponent={IcoCreditcard16}
+          >
+            <PaymentCardData />
+          </VerticalCard>
+          <VerticalCard
+            gridArea="bottom-2"
+            title={t('custom-data.title')}
+            subtitle={t('custom-data.subtitle')}
+            iconComponent={IcoFileText16}
+          >
+            <CustomDataIllustration />
+          </VerticalCard>
+          <Outer speed={10} delay={0} diameter={1300} />
+          <Center speed={5} delay={1} diameter={1100} />
+          <Inner speed={5} delay={3} diameter={800} />
+        </CardLayouts>
+      </Container>
     </Section>
   );
 };
