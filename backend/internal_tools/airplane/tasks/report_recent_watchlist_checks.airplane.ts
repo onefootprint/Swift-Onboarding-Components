@@ -48,7 +48,7 @@ export default airplane.task(
     const message = `*Continuous Monitoring WatchlistCheck's*
 :penguin-chill: *\`${pad('_  tenant   ')}|${pad('status')}|${pad(
       'reason_codes',
-    )}|${pad('fail')}|${pad('count (past 1d)')}\`*
+    )}|${pad('count (past 1d)')}\`*
 ${rows.map(r => row_to_string(r)).join('\n')}`;
     console.log('message', message);
 
