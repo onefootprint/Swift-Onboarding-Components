@@ -5,7 +5,7 @@ use crate::models::watchlist_check::NewWatchlistCheck;
 use crate::models::watchlist_check::WatchlistCheck;
 use crate::models::workflow::Workflow;
 use crate::models::workflow::WorkflowUpdate;
-use crate::test_helpers::have_same_elements;
+use crate::test_helpers::assert_have_same_elements;
 use crate::tests::fixtures;
 use crate::tests::prelude::*;
 use chrono::DateTime;
@@ -14,6 +14,7 @@ use chrono::Utc;
 use macros::db_test;
 use newtypes::DbActor;
 use newtypes::DecisionStatus;
+use newtypes::EnhancedAmlOption;
 use newtypes::ScopedVaultId;
 use newtypes::TaskData;
 use newtypes::TaskStatus;
@@ -23,21 +24,59 @@ use newtypes::WatchlistCheckArgs;
 use newtypes::WatchlistCheckStatus;
 use newtypes::WatchlistCheckStatusKind;
 
+use super::fixtures::ob_configuration::ObConfigurationOpts;
+
 #[db_test]
 fn test_watchlist_check(conn: &mut TestPgConn) {
     // SETUP
     let tenant = fixtures::tenant::create(conn);
     let tenant_id = tenant.id.clone();
 
+    let tenant2 = fixtures::tenant::create(conn);
+    let tenant2_id = tenant2.id.clone();
+
     let ten_days_ago = Utc::now() - Duration::days(10);
     let twenty_days_ago = Utc::now() - Duration::days(20);
     let forty_days_ago = Utc::now() - Duration::days(40);
     let fifty_days_ago = Utc::now() - Duration::days(50);
 
-    let sv1 = make_vault(conn, &tenant_id, true, true, Some(forty_days_ago), vec![]);
-    let _sv2 = make_vault(conn, &tenant_id, true, true, Some(twenty_days_ago), vec![]);
-    let _sv3 = make_vault(conn, &tenant_id, false, true, Some(forty_days_ago), vec![]);
-    let _sv4 = make_vault(conn, &tenant_id, false, true, Some(twenty_days_ago), vec![]);
+    // Legacy fractional cases
+    let sv1 = make_vault(
+        conn,
+        &tenant_id,
+        true,
+        true,
+        Some(forty_days_ago),
+        vec![],
+        EnhancedAmlOption::No,
+    );
+    let _sv2 = make_vault(
+        conn,
+        &tenant_id,
+        true,
+        true,
+        Some(twenty_days_ago),
+        vec![],
+        EnhancedAmlOption::No,
+    );
+    let _sv3 = make_vault(
+        conn,
+        &tenant_id,
+        false,
+        true,
+        Some(forty_days_ago),
+        vec![],
+        EnhancedAmlOption::No,
+    );
+    let _sv4 = make_vault(
+        conn,
+        &tenant_id,
+        false,
+        true,
+        Some(twenty_days_ago),
+        vec![],
+        EnhancedAmlOption::No,
+    );
     let sv5 = make_vault(
         conn,
         &tenant_id,
@@ -45,6 +84,7 @@ fn test_watchlist_check(conn: &mut TestPgConn) {
         true,
         Some(forty_days_ago),
         vec![forty_days_ago],
+        EnhancedAmlOption::No,
     );
 
     let _sv6 = make_vault(
@@ -54,6 +94,7 @@ fn test_watchlist_check(conn: &mut TestPgConn) {
         true,
         Some(forty_days_ago),
         vec![twenty_days_ago],
+        EnhancedAmlOption::No,
     );
     let _sv7 = make_vault(
         conn,
@@ -62,6 +103,7 @@ fn test_watchlist_check(conn: &mut TestPgConn) {
         true,
         Some(forty_days_ago),
         vec![ten_days_ago, twenty_days_ago, forty_days_ago],
+        EnhancedAmlOption::No,
     );
     let _sv8 = make_vault(
         conn,
@@ -70,6 +112,7 @@ fn test_watchlist_check(conn: &mut TestPgConn) {
         true,
         Some(twenty_days_ago),
         vec![forty_days_ago, fifty_days_ago],
+        EnhancedAmlOption::No,
     );
     let _sv9 = make_vault(
         conn,
@@ -78,15 +121,105 @@ fn test_watchlist_check(conn: &mut TestPgConn) {
         false,
         None,
         vec![ten_days_ago, twenty_days_ago],
+        EnhancedAmlOption::No,
     );
-    let sv10 = make_vault(conn, &tenant_id, true, false, None, vec![forty_days_ago]);
-    let sv11 = make_vault(conn, &tenant_id, true, false, None, vec![]);
+    let sv10 = make_vault(
+        conn,
+        &tenant_id,
+        true,
+        false,
+        None,
+        vec![forty_days_ago],
+        EnhancedAmlOption::No,
+    );
+    let sv11 = make_vault(conn, &tenant_id, true, false, None, vec![], EnhancedAmlOption::No);
+
+    // Enhanced AML cases
+    let sv12 = make_vault(
+        conn,
+        &tenant2_id,
+        true,
+        true,
+        Some(forty_days_ago),
+        vec![],
+        EnhancedAmlOption::Yes {
+            ofac: false,
+            pep: false,
+            adverse_media: false,
+            continuous_monitoring: true,
+            adverse_media_lists: None,
+        },
+    );
+
+    let _sv13 = make_vault(
+        conn,
+        &tenant2_id,
+        false,
+        true,
+        Some(forty_days_ago),
+        vec![],
+        EnhancedAmlOption::Yes {
+            ofac: false,
+            pep: false,
+            adverse_media: false,
+            continuous_monitoring: true,
+            adverse_media_lists: None,
+        },
+    );
+
+    let sv14 = make_vault(
+        conn,
+        &tenant2_id,
+        true,
+        true,
+        Some(forty_days_ago),
+        vec![],
+        EnhancedAmlOption::Yes {
+            ofac: false,
+            pep: false,
+            adverse_media: false,
+            continuous_monitoring: true,
+            adverse_media_lists: None,
+        },
+    );
+
+    let _sv15 = make_vault(
+        conn,
+        &tenant2_id,
+        true,
+        true,
+        Some(twenty_days_ago),
+        vec![forty_days_ago, fifty_days_ago],
+        EnhancedAmlOption::Yes {
+            ofac: false,
+            pep: false,
+            adverse_media: false,
+            continuous_monitoring: true,
+            adverse_media_lists: None,
+        },
+    );
+
+    let _sv16 = make_vault(
+        conn,
+        &tenant2_id,
+        true,
+        true,
+        Some(forty_days_ago),
+        vec![],
+        EnhancedAmlOption::Yes {
+            ofac: false,
+            pep: false,
+            adverse_media: false,
+            continuous_monitoring: false,
+            adverse_media_lists: None,
+        },
+    );
 
     // RUN
-    let svids = WatchlistCheck::get_overdue_scoped_vaults(conn, tenant.id).unwrap();
+    let svids = WatchlistCheck::get_overdue_scoped_vaults(conn, tenant.id, 100).unwrap();
 
     // ASSERTIONS
-    assert!(have_same_elements(vec![sv1, sv5, sv10, sv11], svids))
+    assert_have_same_elements(vec![sv1, sv5, sv10, sv11, sv12, sv14], svids);
 }
 
 // arg not being able to re-use the api test fixtures here is kinda goofy. probably should just move all tests to api or something
@@ -97,9 +230,18 @@ fn make_vault(
     is_portable: bool,
     ob_decision_made_at: Option<DateTime<Utc>>,
     watchlist_checks_created_at: Vec<DateTime<Utc>>,
+    enhanced_aml: EnhancedAmlOption,
 ) -> ScopedVaultId {
     let sv = if is_portable {
-        let ob_config = fixtures::ob_configuration::create(conn, tenant_id, is_live);
+        let ob_config = fixtures::ob_configuration::create_with_opts(
+            conn,
+            tenant_id,
+            ObConfigurationOpts {
+                is_live,
+                enhanced_aml,
+                ..Default::default()
+            },
+        );
         let uv = fixtures::vault::create_person(conn, is_live);
         let uvid = uv.id.clone();
         let sv = fixtures::scoped_vault::create(conn, &uvid, &ob_config.id);
@@ -125,7 +267,10 @@ fn make_vault(
             use diesel::prelude::*;
             diesel::update(workflow::table)
                 .filter(workflow::id.eq(&wf.id))
-                .set(workflow::decision_made_at.eq(ob_decision_made_at))
+                .set((
+                    workflow::decision_made_at.eq(ob_decision_made_at),
+                    workflow::completed_at.eq(ob_decision_made_at),
+                ))
                 .execute(conn.conn())
                 .unwrap();
         }

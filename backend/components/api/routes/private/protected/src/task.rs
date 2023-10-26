@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::ProtectedAuth;
 use actix_web::{post, web, web::Json};
 use api_core::errors::ApiError;
@@ -54,7 +56,7 @@ async fn create_task(
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct CreateOverdueWatchlistCheckTasksRequest {
-    pub tenant_id: TenantId,
+    pub limit: i64, // to help with testing/slow rollout/not overloading PG
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -63,18 +65,22 @@ pub struct CreateOverdueWatchlistCheckTasksResponse {
     pub created_tasks: Vec<TaskId>,
 }
 
+const LEGACY_NON_ENHANCED_AML_TENANT_ID: &str = "org_PtnIJT4VR35BS9xy0wITgF";
+
 #[post("/private/protected/task/create_overdue_watchlist_check_tasks")]
 async fn create_overdue_watchlist_check_tasks(
     state: web::Data<State>,
     _: ProtectedAuth,
     request: Json<CreateOverdueWatchlistCheckTasksRequest>,
 ) -> actix_web::Result<Json<ResponseData<CreateOverdueWatchlistCheckTasksResponse>>, ApiError> {
-    let CreateOverdueWatchlistCheckTasksRequest { tenant_id } = request.into_inner();
+    let CreateOverdueWatchlistCheckTasksRequest { limit } = request.into_inner();
+    #[allow(clippy::unwrap_used)]
+    let tenant_id = TenantId::from_str(LEGACY_NON_ENHANCED_AML_TENANT_ID).unwrap();
 
     let new_tasks = state
         .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
-            let overdue_svs = WatchlistCheck::get_overdue_scoped_vaults(conn, tenant_id)?;
+            let overdue_svs = WatchlistCheck::get_overdue_scoped_vaults(conn, tenant_id, limit)?;
             let now = Utc::now();
             let task_args: Vec<TaskCreateArgs> = overdue_svs
                 .into_iter()

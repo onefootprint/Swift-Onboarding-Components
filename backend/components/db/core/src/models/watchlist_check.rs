@@ -2,7 +2,9 @@ use std::collections::HashMap;
 
 use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Duration, Utc};
+use db_schema::schema::{ob_configuration, workflow};
 use db_schema::schema::{scoped_vault, task, vault, watchlist_check};
+use diesel::dsl::max;
 use diesel::{
     dsl::{count, count_star, not},
     prelude::*,
@@ -198,20 +200,45 @@ impl WatchlistCheck {
     }
 
     #[tracing::instrument("WatchlistCheck::get_overdue_scoped_vaults", skip_all)]
-    pub fn get_overdue_scoped_vaults(conn: &mut PgConn, tenant_id: TenantId) -> DbResult<Vec<ScopedVaultId>> {
+    pub fn get_overdue_scoped_vaults(
+        conn: &mut PgConn,
+        legacy_non_enhanced_aml_tenant_id: TenantId,
+        limit: i64,
+    ) -> DbResult<Vec<ScopedVaultId>> {
         let thirty_days_ago = Utc::now() - Duration::days(30);
-        use db_schema::schema::workflow;
+
+        let (npv_wf, enhanced_wf) = diesel::alias!(workflow as npv_wf, workflow as enhanced_wf);
 
         let res = scoped_vault::table
-            .filter(scoped_vault::tenant_id.eq(tenant_id))
             .filter(scoped_vault::is_live.eq(true))
             .inner_join(vault::table)
             .filter(vault::kind.eq(VaultKind::Person))
+            .filter(not(scoped_vault::tenant_id.eq_any(vec!["org_e2FHVfOM5Hd3Ce492o5Aat", "org_hyZP3ksCvsT0AlLqMZsgrI"]))) // footprint live + acme
+            .filter(not(scoped_vault::tenant_id.like("_private_it_org_%")))
             .left_join(
-                workflow::table.on(workflow::scoped_vault_id
+                // we supported running watchlist checks on NPVs with no workflows/onboardings for Fractional but no longer want to do this for new users (at least at the time of writing this lol)
+                npv_wf.on(npv_wf
+                    .field(workflow::scoped_vault_id)
                     .eq(scoped_vault::id)
-                    .and(workflow::kind.eq_any(&[WorkflowKind::Kyc, WorkflowKind::AlpacaKyc]))
-                    .and(workflow::decision_made_at.ge(thirty_days_ago))),
+                    .and(scoped_vault::tenant_id.eq(legacy_non_enhanced_aml_tenant_id.clone()))
+                    .and(
+                        npv_wf
+                            .field(workflow::kind)
+                            .eq_any(&[WorkflowKind::Kyc, WorkflowKind::AlpacaKyc]),
+                    )
+                    .and(not(npv_wf.field(workflow::completed_at).is_null()))),
+            )
+            .left_join(
+                // check for vaults that have a completed workflow with enhanced_aml.continuous_monitoring = true
+                enhanced_wf.inner_join(ob_configuration::table).on(enhanced_wf
+                    .field(workflow::scoped_vault_id)
+                    .eq(scoped_vault::id)
+                    .and(not(enhanced_wf.field(workflow::completed_at).is_null()))
+                    .and(
+                        ob_configuration::enhanced_aml
+                            .retrieve_by_path_as_text(vec!["data", "continuous_monitoring"])
+                            .eq("true"),
+                    )),
             )
             .left_join(
                 watchlist_check::table.on(watchlist_check::scoped_vault_id
@@ -230,15 +257,26 @@ impl WatchlistCheck {
                     .and(task::created_at.ge(thirty_days_ago))),
             )
             .select(scoped_vault::id)
-            .group_by(scoped_vault::id)
+            .group_by((scoped_vault::id, scoped_vault::tenant_id))
             .having(
-                // No KYC workflow with a decision made more recently than 30 days ago
-                count(workflow::id)
-                    .eq(0)
-                    // No watchlist check created more recently than 30 days ago AND
-                    // No watchlist_check task created more recently than 30 days ago
-                    .and(count(watchlist_check::id).eq(0).and(count(task::id).eq(0))),
+                // No watchlist check created more recently than 30 days ago AND
+                // No watchlist_check task created more recently than 30 days ago
+                count(watchlist_check::id).eq(0).and(count(task::id).eq(0)).and(
+                    // Either a Fractional vault
+                    scoped_vault::tenant_id
+                        .eq(legacy_non_enhanced_aml_tenant_id)
+                        .and(
+                            max(npv_wf.field(workflow::completed_at))
+                                .is_null()
+                                .or(max(npv_wf.field(workflow::completed_at)).le(thirty_days_ago)),
+                        )
+                         // or a vault thats completed a workflow with enhanced_aml.continuous_monitoring=true
+                        .or(count(enhanced_wf.field(workflow::id)).gt(0).and(
+                            max(enhanced_wf.field(workflow::completed_at)).le(thirty_days_ago),
+                        )),
+                ),
             )
+            .limit(limit)
             .get_results(conn)?;
 
         Ok(res)
