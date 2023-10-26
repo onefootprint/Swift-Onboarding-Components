@@ -1,5 +1,5 @@
 import airplane from 'airplane';
-import { tenant_name_to_emoji } from './utils';
+import { pad, tenant_name_to_emoji } from './utils';
 
 export default airplane.task(
   {
@@ -19,18 +19,6 @@ export default airplane.task(
   async params => {
     const run = await airplane.execute('query_tenant_stats', {});
     let rows = (run.output as object)['Q1'];
-
-    function pad(s) {
-      let o = '';
-      for (let i = 0; i < Math.ceil((18 - s.length) / 2.0); i++) {
-        o += ' ';
-      }
-      o += s;
-      for (let i = 0; i < Math.floor((18 - s.length) / 2.0); i++) {
-        o += ' ';
-      }
-      return o;
-    }
 
     function row_to_string(row) {
       let emoji = tenant_name_to_emoji.get(row['tenant']) ?? '';

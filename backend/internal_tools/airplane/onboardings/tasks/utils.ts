@@ -97,3 +97,15 @@ export function rows_to_message(rows) {
     .join('\n')}`;
   return message;
 }
+
+export function pad(s, n = 18) {
+  let o = '';
+  for (let i = 0; i < Math.ceil((n - s.length) / 2.0); i++) {
+    o += ' ';
+  }
+  o += s;
+  for (let i = 0; i < Math.floor((n - s.length) / 2.0); i++) {
+    o += ' ';
+  }
+  return o;
+}
