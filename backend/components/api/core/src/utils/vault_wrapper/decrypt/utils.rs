@@ -89,6 +89,7 @@ impl<Type> VaultWrapper<Type> {
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug)]
 pub enum DecryptedBusinessOwners {
+    KybWithoutBos, // for Apiture we are introducing the concept of running KYB without any BO's
     // Either a Single-KYC or Multi-KYC KYB flow was started and a new Business Vault was created and a BusinessOwner and Person Vault/ScopedVault/Onboarding was created for the Primary BO
     // However, they dropped off before they submitted the BO's information so we have no BO VaultData for either the Primary or potential Secondary BO's
     KYBStart {
@@ -193,14 +194,18 @@ impl VaultWrapper<Business> {
                 if bos.len() > 1 {
                     return Err(BusinessError::TooManyBos.into());
                 }
-                let pbo = bos.pop().ok_or(BusinessError::BoNotFound)?;
-                let primary_bo = pbo.0;
-                let primary_bo_vault = pbo.1.ok_or(BusinessError::PrimaryBoHasNoVault)?;
+                let pbo = bos.pop();
+                if let Some(pbo) = pbo {
+                    let primary_bo = pbo.0;
+                    let primary_bo_vault = pbo.1.ok_or(BusinessError::PrimaryBoHasNoVault)?;
 
-                Ok(DecryptedBusinessOwners::KYBStart {
-                    primary_bo,
-                    primary_bo_vault,
-                })
+                    Ok(DecryptedBusinessOwners::KYBStart {
+                        primary_bo,
+                        primary_bo_vault,
+                    })
+                } else {
+                    Ok(DecryptedBusinessOwners::KybWithoutBos)
+                }
             }
             (Some(_), Some(_)) => Err(BusinessError::KycedAndNonKycedBos.into()),
         }

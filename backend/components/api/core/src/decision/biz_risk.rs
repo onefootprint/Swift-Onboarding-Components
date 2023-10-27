@@ -60,6 +60,7 @@ pub async fn get_bo_obds(
             v.extend(secondary_bo_wfs);
             Ok(v)
         }
+        DecryptedBusinessOwners::KybWithoutBos => Ok(vec![]),
     }?;
 
     let obc_id = wf.ob_configuration_id.ok_or(OnboardingError::NoObcForWorkflow)?;

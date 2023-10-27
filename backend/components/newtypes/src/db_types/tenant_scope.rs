@@ -56,6 +56,8 @@ pub enum TenantScope {
     CipIntegration,
     /// Invoke the specified vault proxies
     InvokeVaultProxy { data: InvokeVaultProxyPermission },
+    /// Run KYB checks on a vaulted business
+    TriggerKyb,
     /// Run KYC checks on a vaulted user
     TriggerKyc,
     /// Create new vaults and update existing vaults' information
@@ -102,6 +104,7 @@ impl TenantScope {
 
             Self::CipIntegration => vec![ApiKey],
             Self::InvokeVaultProxy { .. } => vec![ApiKey],
+            Self::TriggerKyb => vec![ApiKey],
             Self::TriggerKyc => vec![ApiKey],
             Self::WriteEntities => vec![ApiKey],
             Self::AuthToken => vec![ApiKey],

@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::pin::Pin;
 
 use crate::auth::session::ob_config::BoSession;
+use crate::decision::state::{Authorize, BoKycCompleted, WorkflowActions, WorkflowWrapper};
 use crate::errors::business::BusinessError;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiResult;
@@ -14,7 +15,7 @@ use db::models::business_owner::BusinessOwner;
 use db::models::tenant::Tenant;
 use db::models::workflow::Workflow;
 use futures::FutureExt;
-use newtypes::{BoLinkId, BusinessDataKind as BDK};
+use newtypes::{BoLinkId, BusinessDataKind as BDK, KybState, WorkflowState};
 use newtypes::{BusinessOwnerKind, KycedBusinessOwnerData, OnboardingStatus, PiiString};
 
 pub struct BasicBusinessInfo {
@@ -196,7 +197,51 @@ pub async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -
                     .into_iter()
                     .all(|b| b.2.map(|d| has_decision(d.0.status)).unwrap_or(false))
         }
+        DecryptedBusinessOwners::KybWithoutBos => {
+            tracing::info!(?biz_wf, "[should_run_kyb] KybWithoutBos");
+            // For cases where kyb is manually run via /kyb without BOs, we allow running KYB
+            true
+        }
     };
 
     Ok(bo_kyc_is_complete)
+}
+
+#[tracing::instrument(skip(state))]
+pub async fn run_kyb(state: &State, tenant: &Tenant, biz_wf: Workflow) -> ApiResult<()> {
+    let wf_id = biz_wf.id.clone();
+
+    // First see if we have to run authorize
+    if matches!(biz_wf.state, WorkflowState::Kyb(KybState::DataCollection)) {
+        // Authorize is kind of a misnomer now - it doesn't actually mark the workflow as
+        // authorized - it just does some processing that normally happens after authorize
+        let ww = WorkflowWrapper::init(state, biz_wf.clone()).await?;
+        let _ = ww
+            .run(state, WorkflowActions::Authorize(Authorize {}))
+            .await
+            .map_err(|err| tracing::error!(?err, "Error running Authorize on KYB workflow"));
+    }
+
+    // Refresh the wf since it may have changed above
+    let biz_wf = state
+        .db_pool
+        .db_query(move |conn| Workflow::get(conn, &wf_id))
+        .await??;
+    let should_run_kyb = should_run_kyb(state, &biz_wf, tenant).await?;
+    tracing::info!(should_run_kyb, "should_run_kyb");
+    if should_run_kyb {
+        let ww = WorkflowWrapper::init(state, biz_wf.clone()).await?;
+        let res = ww
+            .run(state, WorkflowActions::BoKycCompleted(BoKycCompleted {}))
+            .await;
+        match res {
+            Ok(ww) => {
+                tracing::info!(new_state = ?newtypes::WorkflowState::from(&ww.state), "Ran KYB workflow BoKycCompleted");
+            }
+            Err(err) => {
+                tracing::error!(?err, "Error running BoKycCompleted on KYB workflow");
+            }
+        };
+    }
+    Ok(())
 }

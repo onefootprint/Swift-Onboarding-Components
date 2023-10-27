@@ -9,7 +9,6 @@ use api_core::decision::state::actions::WorkflowActions;
 use api_core::decision::state::alpaca_kyc::AlpacaKycState;
 use api_core::decision::state::document::DocumentState;
 use api_core::decision::state::kyc::KycState;
-use api_core::decision::state::BoKycCompleted;
 use api_core::decision::state::DocCollected;
 use api_core::decision::state::RunIncodeMachineAndWorkflowResult;
 use api_core::decision::state::WorkflowKind;
@@ -28,12 +27,10 @@ use db::models::workflow::Workflow as DbWorkflow;
 use db::DbPool;
 use decision::state::Authorize;
 use itertools::Itertools;
-use newtypes::KybState;
 use newtypes::OnboardingRequirement;
 use newtypes::RunIncodeStuckWorkflowArgs;
 use newtypes::TaskData;
 use newtypes::WorkflowId;
-use newtypes::WorkflowState;
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
@@ -140,40 +137,7 @@ async fn run_kyb_if_needed(state: &State, user_auth: CheckUserWfAuthContext) -> 
         .await??;
 
     if let Some(biz_wf) = biz_wf {
-        let wf_id = biz_wf.id.clone();
-
-        // First see if we have to run authorize
-        if matches!(biz_wf.state, WorkflowState::Kyb(KybState::DataCollection)) {
-            // Authorize is kind of a misnomer now - it doesn't actually mark the workflow as
-            // authorized - it just does some processing that normally happens after authorize
-            let ww = WorkflowWrapper::init(state, biz_wf.clone()).await?;
-            let _ = ww
-                .run(state, WorkflowActions::Authorize(Authorize {}))
-                .await
-                .map_err(|err| tracing::error!(?err, "Error running Authorize on KYB workflow"));
-        }
-
-        // Refresh the wf since it may have changed above
-        let biz_wf = state
-            .db_pool
-            .db_query(move |conn| DbWorkflow::get(conn, &wf_id))
-            .await??;
-        let should_run_kyb = api_core::utils::kyb_utils::should_run_kyb(state, &biz_wf, &tenant).await?;
-        tracing::info!(should_run_kyb, "should_run_kyb");
-        if should_run_kyb {
-            let ww = WorkflowWrapper::init(state, biz_wf.clone()).await?;
-            let res = ww
-                .run(state, WorkflowActions::BoKycCompleted(BoKycCompleted {}))
-                .await;
-            match res {
-                Ok(ww) => {
-                    tracing::info!(new_state = ?newtypes::WorkflowState::from(&ww.state), "Ran KYB workflow BoKycCompleted");
-                }
-                Err(err) => {
-                    tracing::error!(?err, "Error running BoKycCompleted on KYB workflow");
-                }
-            };
-        }
+        api_core::utils::kyb_utils::run_kyb(state, &tenant, biz_wf).await?;
     }
     Ok(())
 }

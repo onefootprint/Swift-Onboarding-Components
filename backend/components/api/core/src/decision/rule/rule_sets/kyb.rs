@@ -5,12 +5,7 @@ use newtypes::{DecisionStatus, FootprintReasonCode, RuleAction, RuleName, RuleSe
 
 pub fn bos_pass_kyc_rule_set() -> RuleSet<KybFeatureVector> {
     let rules = vec![Rule {
-        rule: {
-            |f: &KybFeatureVector| {
-                f.bo_obds.iter().any(|o| o.status != DecisionStatus::Pass) || f.bo_obds.is_empty()
-                // is_empty should be validated elsewhere, but extra check doesn't hurt here
-            }
-        },
+        rule: { |f: &KybFeatureVector| f.bo_obds.iter().any(|o| o.status != DecisionStatus::Pass) },
         name: RuleName::BoNonPassingKyc,
         action: RuleAction::Fail,
     }];
@@ -45,8 +40,10 @@ pub fn middesk_base_rule_set() -> RuleSet<KybFeatureVector> {
             rule: {
                 |f: &KybFeatureVector| {
                     !f.footprint_reason_codes.iter().any(|rc| {
-                        [FootprintReasonCode::BusinessNameMatch,
-                            FootprintReasonCode::BusinessNameSimilarMatch]
+                        [
+                            FootprintReasonCode::BusinessNameMatch,
+                            FootprintReasonCode::BusinessNameSimilarMatch,
+                        ]
                         .contains(rc)
                     })
                 }
@@ -58,9 +55,11 @@ pub fn middesk_base_rule_set() -> RuleSet<KybFeatureVector> {
             rule: {
                 |f: &KybFeatureVector| {
                     !f.footprint_reason_codes.iter().any(|rc| {
-                        [FootprintReasonCode::BusinessAddressMatch,
+                        [
+                            FootprintReasonCode::BusinessAddressMatch,
                             FootprintReasonCode::BusinessAddressCloseMatch,
-                            FootprintReasonCode::BusinessAddressSimilarMatch]
+                            FootprintReasonCode::BusinessAddressSimilarMatch,
+                        ]
                         .contains(rc)
                     })
                 }

@@ -13,3 +13,10 @@ pub struct TriggerRequest {
 pub struct TriggerKycRequest {
     pub onboarding_config_key: ObConfigurationKey,
 }
+
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct TriggerKybRequest {
+    pub onboarding_config_key: ObConfigurationKey,
+    pub fixture_result: Option<WorkflowFixtureResult>,
+}

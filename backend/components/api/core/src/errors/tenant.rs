@@ -23,9 +23,13 @@ pub enum TenantError {
     InvalidTriggerKind,
     #[error("Cannot redo KYC with no previous KYC")]
     CannotRedoKyc,
-    #[error("Cannot run KYC for portable vault")]
+    #[error("Cannot run KYB for a vault that was not created via API")]
+    CannotRunKybForPortable,
+    #[error("Cannot run KYC for a vault that was not created via API")]
     CannotRunKycForPortable,
-    #[error("Incorrect entity kind for KYC")]
+    #[error("Incorrect entity kind for KYB (must be a business vault)")]
+    IncorrectVaultKindForKyb,
+    #[error("Incorrect entity kind for KYC  (must be a user vault)")]
     IncorrectVaultKindForKyc,
     #[error("Token must be active for at least one minute and at most one day")]
     InvalidExpiry,

@@ -251,6 +251,8 @@ pub async fn build_business_data_from_verification_request(
              let res: Vec<(PiiString, PiiString)> = futures::future::join_all(decrypt_futs).await.into_iter().collect::<Result<Vec<_>, _>>()?;
              res.into_iter().map(|(first_name, last_name)| BoData { first_name, last_name}).collect()
         },
+        DecryptedBusinessOwners::KybWithoutBos => vec![]
+
     };
     
     // Get remaining Business vault data

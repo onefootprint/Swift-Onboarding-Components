@@ -1,0 +1,47 @@
+import pytest
+from tests.utils import create_ob_config, post, get
+from tests.constants import BUSINESS_DATA
+
+
+@pytest.mark.parametrize(
+    "sandbox_outcome",
+    [
+        ("pass"),
+        ("manual_review"),
+        ("fail"),
+    ],
+)
+def test_no_bos(sandbox_tenant, kyb_sandbox_ob_config, sandbox_outcome):
+    # make API-created Business vault with no BO data present
+    vault_data = BUSINESS_DATA.copy()
+    vault_data.pop("business.kyced_beneficial_owners")
+    vault_data.pop("business.beneficial_owners")
+
+    vault = post("businesses/", vault_data, sandbox_tenant.sk.key)
+    fp_id = vault["id"]
+
+    # run KYB
+    kyb = post(
+        f"businesses/{fp_id}/kyb",
+        dict(
+            onboarding_config_key=kyb_sandbox_ob_config.key.value,
+            fixture_result=sandbox_outcome,
+        ),
+        sandbox_tenant.sk.key,
+    )
+
+    if sandbox_outcome == "manual_review":
+        assert kyb["requires_manual_review"] == True
+        assert kyb["status"] == "fail"
+    else:
+        assert kyb["requires_manual_review"] == False
+        assert kyb["status"] == sandbox_outcome
+
+    # confirm OBD timeline event created
+    timeline = get(
+        f"entities/{fp_id}/timeline",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+    obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
+    assert len(obds) == 1

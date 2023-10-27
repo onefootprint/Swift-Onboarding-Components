@@ -96,5 +96,6 @@ fn business_owner_infos(decrypted_bos: DecryptedBusinessOwners) -> Vec<BusinessO
             );
             v
         }
+        DecryptedBusinessOwners::KybWithoutBos => vec![],
     }
 }
