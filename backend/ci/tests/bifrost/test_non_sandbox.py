@@ -92,7 +92,8 @@ def test_onboarding_authorize(tenant, bifrost, sandbox_tenant):
     post("onboarding/session/validate", data, sandbox_tenant.sk.key, status_code=400)
     body = post("onboarding/session/validate", data, tenant.sk.key)
     fp_id = body["user"]["fp_id"]
-    assert body["user"]["status"]
+    assert body["user"]["status"] == "pass"
+    assert body["user"]["requires_manual_review"] == False
 
     # Make sure the fp_id works
     body = get(f"entities/{fp_id}/timeline", None, *tenant.db_auths)
