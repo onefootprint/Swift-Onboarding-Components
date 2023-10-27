@@ -1,18 +1,23 @@
 use std::sync::Arc;
 
 use db::{
-    models::{ob_configuration::ObConfiguration, scoped_vault::ScopedVault, tenant::Tenant, vault::Vault},
+    models::{
+        auth_event::AuthEvent, ob_configuration::ObConfiguration, scoped_vault::ScopedVault, tenant::Tenant,
+        vault::Vault,
+    },
     PgConn,
 };
 use itertools::Itertools;
-use newtypes::{AuthEventId, ObConfigurationId, ScopedVaultId, VaultId, VaultKind, WorkflowId};
+use newtypes::{
+    AuthEventId, AuthEventKind, ObConfigurationId, ScopedVaultId, VaultId, VaultKind, WorkflowId,
+};
 use paperclip::actix::Apiv2Security;
 
 use super::{UserAuthGuard, UserAuthScope};
 use crate::{
     auth::{
         session::{
-            user::{AuthFactor, UserSession, UserSessionArgs},
+            user::{UserSession, UserSessionArgs},
             AllowSessionUpdate, AuthSessionData, ExtractableAuthSession, RequestInfo,
         },
         user::UserAuth,
@@ -26,23 +31,24 @@ use feature_flag::FeatureFlagClient;
 pub struct UserSessionContext {
     pub user: Vault,
     pub scopes: Vec<UserAuthScope>,
-    /// the auth method that was used
-    pub auth_factors: Vec<AuthFactor>,
     pub(super) obc: Option<(ObConfiguration, Tenant)>,
     pub(super) scoped_user: Option<ScopedVault>,
     pub(super) sb_id: Option<ScopedVaultId>,
     pub(super) obc_id: Option<ObConfigurationId>,
     pub(super) wf_id: Option<WorkflowId>,
+    // TODO we should support multiple auth events...
     pub auth_event_id: Option<AuthEventId>,
     /// When true, the auth token was initially issued as an unauthed, identified token
     pub is_from_api: bool,
 }
 
 impl UserSessionContext {
-    pub fn did_use_passkey(&self) -> bool {
-        self.auth_factors
-            .iter()
-            .any(|factor| matches!(factor, AuthFactor::Passkey(_)))
+    pub fn did_use_passkey(&self, conn: &mut PgConn) -> ApiResult<bool> {
+        let Some(ae_id) = self.auth_event_id.as_ref() else {
+            return Ok(false);
+        };
+        let ae = AuthEvent::get(conn, ae_id)?;
+        Ok(ae.kind == AuthEventKind::Passkey)
     }
 }
 
@@ -57,14 +63,13 @@ impl AllowSessionUpdate for UserSessionContext {}
 
 impl UserSessionContext {
     pub fn session_with_added_scopes(self, new_scopes: Vec<UserAuthScope>) -> ApiResult<AuthSessionData> {
-        self.update(UserSessionArgs::default(), new_scopes, None, None)
+        self.update(UserSessionArgs::default(), new_scopes, None)
     }
 
     pub fn update(
         self,
         new_args: UserSessionArgs,
         new_scopes: Vec<UserAuthScope>,
-        new_auth_factor: Option<AuthFactor>,
         new_auth_event_id: Option<AuthEventId>,
     ) -> ApiResult<AuthSessionData> {
         // Merge args, scopes, and auth factors and create a new session with these merged fields
@@ -78,12 +83,6 @@ impl UserSessionContext {
             .unique()
             .collect();
 
-        let new_factors = if let Some(auth_factor) = new_auth_factor {
-            self.auth_factors.into_iter().chain(vec![auth_factor]).collect()
-        } else {
-            self.auth_factors
-        };
-
         let args = UserSessionArgs {
             su_id: new_args.su_id.or(self.scoped_user.map(|su| su.id)),
             sb_id: new_args.sb_id.or(self.sb_id),
@@ -92,7 +91,7 @@ impl UserSessionContext {
             is_from_api: new_args.is_from_api || self.is_from_api,
         };
         let new_auth_event_id = new_auth_event_id.or(self.auth_event_id);
-        UserSession::make(self.user.id, args, new_scopes, new_factors, new_auth_event_id)
+        UserSession::make(self.user.id, args, new_scopes, new_auth_event_id)
     }
 
     pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {
@@ -155,7 +154,6 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     wf_id,
                     obc_id,
                     scopes,
-                    auth_factors,
                     is_from_api,
                     auth_event_id,
                 } = data;
@@ -193,7 +191,6 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     obc,
                     obc_id,
                     scopes,
-                    auth_factors,
                     is_from_api,
                     auth_event_id,
                 };

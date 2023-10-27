@@ -64,23 +64,25 @@ pub async fn init_post(
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<WebAuthnInitResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp.or(UserAuthGuard::Handoff))?;
-
-    let user_vault_id = user_auth.user_vault_id().clone();
-    let creds = state
+    let vault_id = user_auth.user_vault_id().clone();
+    let (creds, did_use_passkey) = state
         .db_pool
-        .db_query(move |conn| WebauthnCredential::list(conn, &user_vault_id))
+        .db_query(move |conn| -> ApiResult<_> {
+            let creds = WebauthnCredential::list(conn, user_auth.user_vault_id())?;
+            let did_use_passkey = user_auth.did_use_passkey(conn)?;
+            Ok((creds, did_use_passkey))
+        })
         .await??;
 
     // only allow registering webauthn credentials if you have no previous credentials OR if
     // you logged into this session via webauthn. Otherwise, someone who SIM swaps you can register
     // their own webauthn creds
-    if !creds.is_empty() && !user_auth.did_use_passkey() {
+    if !creds.is_empty() && !did_use_passkey {
         return Err(ChallengeError::BiometricCredentialAlreadyExists.into());
     }
 
     // generate the challenge and return it
     let webauthn = WebauthnConfig::new(&state.config);
-    let vault_id = user_auth.user_vault_id();
     let (challenge, reg_state) = webauthn.webauthn().generate_challenge_register_options(
         vault_id.to_string().as_bytes(),
         "Footprint",
@@ -141,7 +143,14 @@ pub async fn complete_post(
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp.or(UserAuthGuard::Handoff))?;
-    let did_use_passkey = user_auth.did_use_passkey();
+    let vault_id = user_auth.user_vault_id().clone();
+    let (did_use_passkey, user_auth) = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let did_use_passkey = user_auth.did_use_passkey(conn)?;
+            Ok((did_use_passkey, user_auth))
+        })
+        .await??;
 
     let challenge_data = Challenge::unseal(&state.challenge_sealing_key, &request.challenge_token)?;
     let reg_state = challenge_data.data;
@@ -207,8 +216,8 @@ pub async fn complete_post(
             // only allow registering webauthn credentials if you have no previous credentials OR if
             // you logged into this session via webauthn. Otherwise, someone who SIM swaps you can register
             // their own webauthn creds
-            Vault::lock(conn, user_auth.user_vault_id())?;
-            let creds = WebauthnCredential::list(conn, user_auth.user_vault_id())?;
+            Vault::lock(conn, &vault_id)?;
+            let creds = WebauthnCredential::list(conn, &vault_id)?;
             if !creds.is_empty() && !did_use_passkey {
                 return Err(ChallengeError::BiometricCredentialAlreadyExists.into());
             }
@@ -229,12 +238,12 @@ pub async fn complete_post(
                     let info = LivenessInfo {
                         id: liveness_event.id,
                     };
-                    UserTimeline::create(conn, info, user_auth.user_vault_id().clone(), su_id)?;
+                    UserTimeline::create(conn, info, vault_id.clone(), su_id)?;
                 }
             }
 
             let credential = NewWebauthnCredential {
-                vault_id: user_auth.user_vault_id().clone(),
+                vault_id: vault_id.clone(),
                 credential_id: cred.cred_id.0,
                 public_key,
                 attestation_data,
@@ -260,7 +269,7 @@ pub async fn complete_post(
             // TODO should we be storing this in the auth session and reporting at the end of an
             // auth session all of the credentials used?
             NewAuthEvent {
-                vault_id: user_auth.user_vault_id().clone(),
+                vault_id,
                 scoped_vault_id: user_auth.scoped_user_id(),
                 insight_event_id: Some(insight_event.id),
                 kind: AuthEventKind::Passkey,

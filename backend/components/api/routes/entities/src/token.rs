@@ -59,7 +59,6 @@ pub async fn post(
             // Explicitly create with no scopes in order to require the user to verify their
             // phone number when they log in
             let scopes = vec![];
-            let auth_factors = vec![];
             let duration = Duration::days(1);
             let args = UserSessionArgs {
                 su_id: Some(sv.id),
@@ -67,7 +66,7 @@ pub async fn post(
                 is_from_api: true,
                 ..Default::default()
             };
-            let data = UserSession::make(sv.vault_id, args, scopes, auth_factors, None)?;
+            let data = UserSession::make(sv.vault_id, args, scopes, None)?;
             let (auth_token, session) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             Ok((auth_token, session))
         })

@@ -207,10 +207,7 @@ pub async fn post(
 
             let auth_token = if let Some(user_auth) = user_auth {
                 // Add the new scopes and args to the existing scopes and args on the auth token
-                let data = user_auth
-                    .data
-                    .clone()
-                    .update(args, scopes, Some(auth_factor), Some(event.id))?;
+                let data = user_auth.data.clone().update(args, scopes, Some(event.id))?;
                 // TODO soon let's remove the ability to update the existing user session and
                 // instead require making a new session
                 // For backcompat, we'll also mutate the existing session for now
@@ -219,7 +216,7 @@ pub async fn post(
                 token
             } else {
                 // Otherwise, create a new token with these scopes / args
-                let data = UserSession::make(uv_id.clone(), args, scopes, vec![auth_factor], Some(event.id))?;
+                let data = UserSession::make(uv_id.clone(), args, scopes, Some(event.id))?;
                 let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
                 token
             };

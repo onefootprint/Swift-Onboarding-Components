@@ -27,11 +27,7 @@ pub struct UserSession {
     pub wf_id: Option<WorkflowId>,
     /// Permissions that this auth token is given
     pub scopes: Vec<UserAuthScope>,
-    /// the auth method that was used
-    /// TODO can probably rm this in favor of auth_event_id
-    pub auth_factors: Vec<AuthFactor>,
     /// The auth event created when this token was issued
-    #[serde(default)]
     pub auth_event_id: Option<AuthEventId>,
     /// When true, the auth token was initially issued as an unauthed, identified token
     pub is_from_api: bool,
@@ -58,7 +54,6 @@ impl UserSession {
         user_vault_id: VaultId,
         args: UserSessionArgs,
         scopes: Vec<UserAuthScope>,
-        auth_factors: Vec<AuthFactor>,
         auth_event_id: Option<AuthEventId>,
     ) -> ApiResult<AuthSessionData> {
         if scopes.iter().any(|s| matches!(s, UserAuthScope::SignUp)) && args.su_id.is_none() {
@@ -81,7 +76,6 @@ impl UserSession {
             obc_id,
             wf_id,
             scopes,
-            auth_factors,
             is_from_api,
             auth_event_id,
         });
