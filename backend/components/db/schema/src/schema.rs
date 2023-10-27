@@ -758,6 +758,7 @@ table! {
         app_clip_experience_id -> Text,
         is_prod_kyb_playbook_restricted -> Bool,
         domains -> Array<Text>,
+        is_prod_auth_playbook_restricted -> Bool,
     }
 }
 

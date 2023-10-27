@@ -48,6 +48,7 @@ impl
             allow_domain_access,
             is_prod_ob_config_restricted,
             is_prod_kyb_playbook_restricted,
+            is_prod_auth_playbook_restricted,
             ..
         } = t;
         Self {
@@ -64,6 +65,7 @@ impl
             is_auth_method_supported: is_auth_method_supported.map(|i| i.0),
             is_prod_kyc_playbook_restricted: is_prod_ob_config_restricted,
             is_prod_kyb_playbook_restricted,
+            is_prod_auth_playbook_restricted,
         }
     }
 }

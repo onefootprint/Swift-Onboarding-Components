@@ -56,6 +56,8 @@ pub struct Tenant {
     /// We only allow specifying a single domain at creation, but additional domains can be added
     /// manually in case the tenant has more than one
     pub domains: Vec<String>,
+    // When true, don't allow creating auth playbooks in prod
+    pub is_prod_auth_playbook_restricted: bool,
 }
 
 impl Tenant {

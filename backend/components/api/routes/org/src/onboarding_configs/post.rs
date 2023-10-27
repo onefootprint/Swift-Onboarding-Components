@@ -416,15 +416,6 @@ pub async fn post(
     let is_kyc = must_collect_data
         .iter()
         .all(|d| d.parent().data_identifier_kind() != DataIdentifierDiscriminant::Business);
-    let is_kyb = must_collect_data
-        .iter()
-        .any(|d| d.parent().data_identifier_kind() == DataIdentifierDiscriminant::Business);
-    if is_live && tenant.is_prod_ob_config_restricted && is_kyc {
-        return Err(TenantError::CannotCreateProdKycPlaybook.into());
-    }
-    if is_live && tenant.is_prod_kyb_playbook_restricted && is_kyb {
-        return Err(TenantError::CannotCreateProdKybPlaybook.into());
-    }
     // Newer auth playbooks will have the kind specified in API
     // TODO deprecate this when we start receiving the kind from all requests
     let kind = kind.unwrap_or(if is_kyc {
@@ -433,6 +424,16 @@ pub async fn post(
         ObConfigurationKind::Kyb
     });
 
+    let restrictions = vec![
+        (tenant.is_prod_ob_config_restricted, ObConfigurationKind::Kyc),
+        (tenant.is_prod_kyb_playbook_restricted, ObConfigurationKind::Kyb),
+        (tenant.is_prod_auth_playbook_restricted, ObConfigurationKind::Auth),
+    ];
+    for (is_restricted, restricted_kind) in restrictions {
+        if is_live && is_restricted && kind == restricted_kind {
+            return Err(TenantError::CannotCreateProdPlaybook(kind).into());
+        }
+    }
     request.validate(kind)?;
 
     // Hard coded for now until we expose in playbooks. TODO: could maybe have "tenant defaults" expressed in our code where we could map tenants to default invariants for them

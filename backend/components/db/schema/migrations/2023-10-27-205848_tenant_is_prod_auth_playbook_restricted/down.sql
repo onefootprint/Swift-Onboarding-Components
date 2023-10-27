@@ -1,0 +1,1 @@
+ALTER TABLE TENANT DROP COLUMN is_prod_auth_playbook_restricted;

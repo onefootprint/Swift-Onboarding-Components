@@ -60,6 +60,7 @@ pub fn create_in_memory(public_key: VaultPublicKey, e_private_key: EncryptedVaul
         pinned_api_version: None,
         is_prod_ob_config_restricted: false,
         is_prod_kyb_playbook_restricted: false,
+        is_prod_auth_playbook_restricted: false,
         allow_domain_access: false,
         supported_auth_methods: None,
         app_clip_experience_id: AppClipExperienceId::test_data("test".into()),

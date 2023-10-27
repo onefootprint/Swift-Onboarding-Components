@@ -20,4 +20,5 @@ pub struct Organization {
     pub is_auth_method_supported: Option<bool>,
     pub is_prod_kyc_playbook_restricted: bool,
     pub is_prod_kyb_playbook_restricted: bool,
+    pub is_prod_auth_playbook_restricted: bool,
 }
