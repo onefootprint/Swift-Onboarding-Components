@@ -236,6 +236,8 @@ def step_up_user(twilio, token, recipient_phone_number, expect_unverified):
     return new_token
 
 
+# TODO we're probably pretty close to needing an IdentifyClient like bifrost client to orchestrate
+# all of this logic :P
 def inherit_user(twilio, phone_number, scope, *headers):
     body = identify_user(dict(phone_number=phone_number), *headers)
     assert "sms" in body["available_challenge_kinds"]
@@ -251,20 +253,28 @@ def inherit_user(twilio, phone_number, scope, *headers):
     )
 
 
-def inherit_user_biometric(user):
+def inherit_user_biometric(user, token_kind, *headers):
     phone_number = user.client.data["id.phone_number"]
     sandbox_id = user.client.sandbox_id
     sandbox_id_h = [SandboxId(sandbox_id)] if sandbox_id else []
 
     body = identify_user(
-        dict(phone_number=phone_number), user.client.ob_config.key, *sandbox_id_h
+        dict(phone_number=phone_number),
+        user.client.ob_config.key,
+        *sandbox_id_h,
+        *headers,
     )
     assert "biometric" in body["available_challenge_kinds"]
     challenge_data = challenge_user(
-        phone_number, "biometric", user.client.ob_config.key, *sandbox_id_h
+        phone_number, "biometric", user.client.ob_config.key, *sandbox_id_h, *headers
     )
     body = biometric_challenge_response(
-        challenge_data, user, "onboarding", user.client.ob_config.key, *sandbox_id_h
+        challenge_data,
+        user,
+        token_kind,
+        user.client.ob_config.key,
+        *sandbox_id_h,
+        *headers,
     )
     return FpAuth(body["auth_token"])
 
@@ -461,21 +471,18 @@ def identify_verify(
     return try_until_success(inner, 60)
 
 
-def create_user(twilio, phone_number, email, *headers) -> str:
+def create_user(twilio, phone_number, email, token_kind, *headers) -> str:
     # Initiate the challenge to a sandbox phone number
     def initiate_challenge():
         data = dict(phone_number=phone_number, email=email)
         body = post("hosted/identify/signup_challenge", data, *headers)
         return body["challenge_data"]["challenge_token"]
 
-    challenge_token = try_until_success(
-        initiate_challenge, 20
-    )  # Rate limiting may take a while
+    # Rate limiting may take a while
+    challenge_token = try_until_success(initiate_challenge, 20)
 
     # Respond to the challenge and create the user
-    return identify_verify(
-        twilio, phone_number, challenge_token, "onboarding", *headers
-    )
+    return identify_verify(twilio, phone_number, challenge_token, token_kind, *headers)
 
 
 def create_tenant(org_data, ob_conf_data):
@@ -512,6 +519,7 @@ def create_ob_config(
     allow_international_residents=False,
     international_country_restrictions=None,
     doc_scan_for_optional_ssn=None,
+    kind=None,
 ):
     ob_conf_data = {
         "name": name,
@@ -524,6 +532,7 @@ def create_ob_config(
         "allow_international_residents": allow_international_residents,
         "international_country_restrictions": international_country_restrictions,
         "doc_scan_for_optional_ssn": doc_scan_for_optional_ssn,
+        "kind": kind,
     }
     # TODO also make this get or create?
     body = post("org/onboarding_configs", ob_conf_data, *tenant.db_auths)

@@ -21,3 +21,7 @@ def test_entity_created_after_signup_challenge(sandbox_tenant):
     entity = next(e for e in body["data"] if e["sandbox_id"] == sandbox_id)
     assert set(entity["decryptable_attributes"]) == {"id.email", "id.phone_number"}
     assert entity["status"] == "in_progress"
+
+
+def test_hi(sandbox_user):
+    print("user token", sandbox_user.client.auth_token.value)

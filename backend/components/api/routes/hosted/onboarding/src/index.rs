@@ -65,6 +65,7 @@ pub async fn post(
     } else {
         None
     };
+
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
     let obc = ob_config.clone();
@@ -86,6 +87,7 @@ pub async fn post(
             // TODO should we issue a new token here for good measure?
             let args = UserSessionArgs {
                 wf_id: user_auth.workflow_id().is_none().then_some(wf_id),
+                obc_id: user_auth.ob_configuration_id().is_none().then_some(obc.id.clone()),
                 sb_id: biz_wf.map(|wf| wf.scoped_vault_id),
                 ..Default::default()
             };

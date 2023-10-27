@@ -30,6 +30,10 @@ def ob_config(sandbox_tenant, must_collect_data):
 
 
 def test_onboarded_vault(twilio, ob_config, sandbox_tenant):
+    """
+    Test creating a token for a user who has already onboarded onto a KYC playbook.
+    Run that token through bifrost.
+    """
     bifrost = BifrostClient.new(ob_config, twilio)
     user = bifrost.run()
 
@@ -42,7 +46,7 @@ def test_onboarded_vault(twilio, ob_config, sandbox_tenant):
     body = get("hosted/user/token", None, auth_token)
     assert set(body["scopes"]) >= {"sign_up"}
 
-    # re-run Bifrost with the token from the link we sent to user
+    # Run bifrost
     bifrost2 = BifrostClient.raw_auth(
         sandbox_tenant.default_ob_config,
         auth_token,
@@ -59,6 +63,9 @@ def test_onboarded_vault(twilio, ob_config, sandbox_tenant):
 
 
 def test_api_vault(twilio, sandbox_tenant, ob_config):
+    """
+    Test creating a token for a user created via API. Run that token through bifrost.
+    """
     initial_data = {
         "id.phone_number": FIXTURE_PHONE_NUMBER,
     }
@@ -81,7 +88,7 @@ def test_api_vault(twilio, sandbox_tenant, ob_config):
         == "Cannot replace verified contact information via API."
     )
 
-    # re-run Bifrost with the token from the link we sent to user
+    # Run bifrost
     bifrost = BifrostClient.raw_auth(
         ob_config,
         auth_token,
@@ -99,6 +106,9 @@ def test_api_vault(twilio, sandbox_tenant, ob_config):
 
 
 def test_redo_onboard(twilio, ob_config, sandbox_tenant):
+    """
+    Test creating a token to onboard a user onto the same KYC playbook they already onboarded onto
+    """
     bifrost1 = BifrostClient.new(ob_config, twilio)
     user = bifrost1.run()
 
@@ -130,7 +140,46 @@ def test_redo_onboard(twilio, ob_config, sandbox_tenant):
     assert len(obds) == 2
 
 
+def test_provide_publishable_key_on_client(twilio, sandbox_tenant, ob_config):
+    """
+    Test omitting the publishable key when creating the user-specific token.
+    Add the publishable key via POST /hosted/onboarding
+    """
+    bifrost1 = BifrostClient.new(ob_config, twilio)
+    user = bifrost1.run()
+
+    from tests.headers import BaseAuth
+
+    # Create a token not linked to an OBC
+    body = post(f"entities/{user.fp_id}/token", dict(), sandbox_tenant.sk.key)
+    auth_token = FpAuth(body["token"])
+
+    # Should immediately have onboarding scopes because auth was implied
+    body = get("hosted/user/token", None, auth_token)
+    assert set(body["scopes"]) >= {"sign_up"}
+
+    # Should require passing obc key
+    body = post("hosted/onboarding", None, auth_token, status_code=400)
+    assert body["error"]["message"] == "No onboarding config provided for onboarding"
+    body = post(
+        "hosted/onboarding", None, auth_token, sandbox_tenant.default_ob_config.key
+    )
+
+    # Run bifrost
+    bifrost = BifrostClient.raw_auth(
+        ob_config,
+        auth_token,
+        FIXTURE_PHONE_NUMBER,
+        user.client.sandbox_id,
+    )
+    bifrost.run()
+
+
 def test_portablize_api_vault(twilio, sandbox_tenant, foo_sandbox_tenant, ob_config):
+    """
+    Using the LIVE_PHONE_NUMBER that we can send SMS to, test that we can portablize data on a vault
+    initially created via API. We test this by one-click authing onto the user via another tenant
+    """
     data = {
         "id.phone_number": LIVE_PHONE_NUMBER,
     }

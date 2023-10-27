@@ -108,7 +108,12 @@ def test_config_create(sandbox_tenant, twilio):
 
     sandbox_id = _gen_random_sandbox_id()
     auth_token = create_user(
-        twilio, FIXTURE_PHONE_NUMBER, EMAIL, ob_config_key, SandboxId(sandbox_id)
+        twilio,
+        FIXTURE_PHONE_NUMBER,
+        EMAIL,
+        "onboarding",
+        ob_config_key,
+        SandboxId(sandbox_id),
     )
     post("hosted/onboarding", None, ob_config_key, auth_token)
 

@@ -122,7 +122,7 @@ def test_identify_login_repeat_customer_biometric(sandbox_user):
     assert set(body["available_challenge_kinds"]) == {"sms", "biometric"}
 
     # Inherit the user via biometric
-    auth_token = inherit_user_biometric(sandbox_user)
+    auth_token = inherit_user_biometric(sandbox_user, "onboarding")
 
     # Should be able to use the auth token
     post("hosted/onboarding", None, auth_token)

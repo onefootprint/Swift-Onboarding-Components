@@ -65,7 +65,12 @@ class BifrostClient:
         sandbox_id_header = [SandboxId(sandbox_id)] if sandbox_id else []
         email = override_email or EMAIL
         auth_token = create_user(
-            twilio, phone_number, email, ob_config_auth, *sandbox_id_header
+            twilio,
+            phone_number,
+            email,
+            "onboarding",
+            ob_config_auth,
+            *sandbox_id_header,
         )
         return BifrostClient(
             ob_config, auth_token, phone_number, sandbox_id, override_email
@@ -78,7 +83,12 @@ class BifrostClient:
         ob_config_auth = override_ob_config_auth or ob_config.key
         sandbox_id = _gen_random_sandbox_id()
         auth_token = create_user(
-            twilio, FIXTURE_PHONE_NUMBER, EMAIL, ob_config_auth, SandboxId(sandbox_id)
+            twilio,
+            FIXTURE_PHONE_NUMBER,
+            EMAIL,
+            "onboarding",
+            ob_config_auth,
+            SandboxId(sandbox_id),
         )
         return BifrostClient(ob_config, auth_token, FIXTURE_PHONE_NUMBER, sandbox_id)
 
@@ -334,8 +344,21 @@ class BifrostClient:
         tenant_sk = self.ob_config.tenant.sk
         data = dict(validation_token=validation_token)
         body = post("onboarding/session/validate", data, tenant_sk.key)
+
+        # Check user
+        assert body["user"]["fp_id"]
+        assert body["user"]["requires_manual_review"] is not None
+        assert body["user"]["status"] in {"pass", "fail", "pending"}
+        # Check user_auth
+        assert body["user_auth"]["fp_id"] == body["user"]["fp_id"]
+        assert body["user_auth"]["auth_events"]
+        assert all(
+            e["kind"] in {"sms", "email", "passkey"}
+            for e in body["user_auth"]["auth_events"]
+        )
+        assert all(e["timestamp"] for e in body["user_auth"]["auth_events"])
+
         self.validate_response = body
-        # The response body looks different for business onboardings
         return (body["user"]["fp_id"], body.get("business", {}).get("fp_id"))
 
     def run(self):

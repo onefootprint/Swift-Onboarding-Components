@@ -68,6 +68,6 @@ pub enum OnboardingError {
     Validation(String),
     #[error("Can only provide one image at a time")]
     OnlyOneImageAllowed,
-    #[error("Cannot create an onboarding workflow for an auth playbook")]
+    #[error("Cannot onboard onto an auth playbook")]
     CannotOnboardOntoAuthPlaybook,
 }
