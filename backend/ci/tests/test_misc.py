@@ -4,8 +4,17 @@ from requests.auth import HTTPBasicAuth
 from tests.utils import post, get, patch, url
 from tests.constants import CUSTODIAN_AUTH
 from tests.bifrost_client import BifrostClient
-from tests.constants import FIXTURE_PHONE_NUMBER
+from tests.constants import FIXTURE_PHONE_NUMBER, ENVIRONMENT
 from tests.utils import _gen_random_n_digit_number
+
+
+def test_environment():
+    assert ENVIRONMENT in {
+        "local",
+        "ci",
+        "dev",
+        "production",
+    }, f"Unknown environment: {ENVIRONMENT}"
 
 
 def test_tenant_create():

@@ -10,7 +10,7 @@ from tests.utils import (
 )
 from tests.bifrost_client import BifrostClient
 from tests.headers import FpAuth, SandboxId
-from tests.constants import FIXTURE_PHONE_NUMBER, LIVE_PHONE_NUMBER, EMAIL
+from tests.constants import FIXTURE_PHONE_NUMBER, LIVE_PHONE_NUMBER, EMAIL, ENVIRONMENT
 
 
 @pytest.fixture(scope="module", autouse="true")
@@ -240,6 +240,35 @@ def test_portablize_api_vault(twilio, sandbox_tenant, foo_sandbox_tenant, ob_con
     ]:
         body = get("/entities", dict(search=LIVE_PHONE_NUMBER), *t.db_auths)
         assert any(i["id"] == fp_id for i in body["data"])
+
+
+@pytest.mark.skipif(ENVIRONMENT == "ci", reason="Cannot expect historical users in ci")
+def test_no_implied_auth_for_stale(sandbox_tenant):
+    """
+    Here, we check that auth cannot be implied if the user hasn't logged in recently.
+    NOTE: this is an inherently flaky test, but is very necessary to test a critical auth functionality.
+    It will probably be fine in CI for dev/prod but could be problematic locally.
+    There's probably a better, less-flaky way to test this.
+    But, please don't remove this test without getting coverage for this elsewhere.
+    """
+    # Get an old user, who probably hasn't had any auths recently
+    filters = dict(timestamp_lte=arrow.now().shift(hours=-1, minutes=-5))
+    body = get("entities", filters, *sandbox_tenant.db_auths)
+    users_made_via_bifrost = [i for i in body["data"] if not i["is_created_via_api"]]
+    if not users_made_via_bifrost:
+        assert (
+            False
+        ), "No old user to use to test implied auth timeout. If you get this error running tests locally, it's likely safe to ignore. See the comment in this test"
+
+    # Create a token and make sure it does not have implied auth
+    fp_id = users_made_via_bifrost[0]["id"]
+    data = dict(key=sandbox_tenant.default_ob_config.key.value)
+    body = post(f"entities/{fp_id}/token", data, sandbox_tenant.sk.key)
+    auth_token = FpAuth(body["token"])
+
+    # Should immediately have onboarding scopes because auth was implied
+    body = get("hosted/user/token", None, auth_token)
+    assert not body["scopes"]
 
 
 # TODO: test when we make a new vault via API that is already portable elsewhere...
