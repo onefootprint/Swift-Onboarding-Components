@@ -37,7 +37,7 @@ pub async fn post(
         .ok_or(OnboardingError::ValidateTokenInvalidOrNotFound)?
         .data;
 
-    let AuthSessionData::ValidateUserToken(ValidateUserToken { wf_id, auth_event_ids }) = session else {
+    let AuthSessionData::ValidateUserToken(ValidateUserToken { sv_id: _, wf_id, auth_event_ids }) = session else {
         return Err(OnboardingError::ValidateTokenInvalidOrNotFound.into());
     };
 

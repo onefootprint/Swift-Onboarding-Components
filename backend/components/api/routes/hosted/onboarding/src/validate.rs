@@ -7,7 +7,7 @@ use api_core::{
         session::{user::ValidateUserToken, AuthSessionData},
         user::{UserAuthContext, UserWfAuthContext},
     },
-    errors::ApiResult,
+    errors::{ApiResult, AssertionError},
     types::JsonApiResponse,
     utils::session::AuthSession,
 };
@@ -61,6 +61,9 @@ pub async fn post(
         // collecting phone
         (None, user_auth.data)
     };
+    let sv_id = user_auth
+        .scoped_user_id()
+        .ok_or(AssertionError("No scoped user associated with auth session"))?;
     let session_key = state.session_sealing_key.clone();
     let validation_token = state
         .db_pool
@@ -71,12 +74,9 @@ pub async fn post(
                 // This should never happen, but will add logging for now and rm this branch later
                 // TODO rm this logic and always use from token. assert there's always an auth event
                 tracing::error!("No auth event ID associated with auth token");
-                let sv_id = user_auth.scoped_user_id().ok_or(OnboardingError::Validation(
-                    "No scoped user associated with auth session".into(),
-                ))?;
                 let (events, _) = AuthEvent::list(conn, &sv_id, None)?;
                 if events.is_empty() {
-                    return Err(OnboardingError::Validation("No auth events found for user".into()).into());
+                    return Err(AssertionError("No auth events found for user").into());
                 }
                 events.first().into_iter().map(|e| e.event.id.clone()).collect()
             };
@@ -85,23 +85,22 @@ pub async fn post(
             // But once the tenant has the validation token, they cannot do anything if it fails
             let auth_events = AuthEvent::get_bulk(conn, &auth_event_ids)?;
             if !auth_events.iter().any(|ae| ae.scoped_vault_id.is_some()) {
-                return Err(OnboardingError::Validation("Auth event must have scoped vault".into()).into());
+                return Err(AssertionError("Auth event must have scoped vault").into());
             }
-            if let Some(wf) = wf.as_ref() {
-                if auth_events
-                    .iter()
-                    .filter_map(|ae| ae.scoped_vault_id.as_ref())
-                    .any(|sv_id| sv_id != &wf.scoped_vault_id)
-                {
-                    return Err(OnboardingError::Validation(
-                        "Auth event has different user than workflow".into(),
-                    )
-                    .into());
-                }
+            if auth_events
+                .iter()
+                .filter_map(|ae| ae.scoped_vault_id.as_ref())
+                .any(|ae_sv_id| ae_sv_id != &sv_id)
+            {
+                return Err(AssertionError("Auth event has different user").into());
+            }
+            if wf.as_ref().is_some_and(|wf| wf.scoped_vault_id != sv_id) {
+                return Err(AssertionError("Workflow has different user").into());
             }
             let data = AuthSessionData::ValidateUserToken(ValidateUserToken {
-                wf_id: wf.map(|wf| wf.id),
+                sv_id: Some(sv_id),
                 auth_event_ids,
+                wf_id: wf.map(|wf| wf.id),
             });
             let (validation_token, _) =
                 AuthSession::create_sync(conn, &session_key, data, Duration::minutes(15))?;
