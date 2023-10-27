@@ -56,10 +56,6 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
         }
       },
       onError: error => {
-        console.warn(
-          'Validating user session failed with error: ',
-          getErrorMessage(error),
-        );
         Logger.warn(
           `Validating user session failed with error: ${getErrorMessage(
             error,

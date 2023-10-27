@@ -31,9 +31,6 @@ const useCameraPermission = () => {
         )
           setPermissionState('notAllowed');
 
-        console.warn(
-          `Error while retrieving camera permission. Error: ${error.name}`,
-        );
         Logger.warn(
           `Error while retrieving camera permission. Error: ${error.name}`,
           'desktop-selfie',

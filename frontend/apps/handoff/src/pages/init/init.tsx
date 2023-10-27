@@ -75,10 +75,6 @@ const Init = () => {
             )}`,
             'handoff-init',
           );
-          console.warn(
-            'Updating the d2p status to in progress failed: ',
-            getErrorMessage(error),
-          );
         },
       },
     );
@@ -122,10 +118,6 @@ const Init = () => {
         }
       },
       onError: (error: unknown) => {
-        console.error(
-          'Fetching d2p status failed on handoff init page:',
-          getErrorMessage(error),
-        );
         Logger.warn(
           `Fetching d2p status failed on handoff init page: ${getErrorMessage(
             error,
@@ -160,10 +152,6 @@ const Init = () => {
         }
       },
       onError: (error: unknown) => {
-        console.error(
-          'Fetching onboarding status failed on handoff init page:',
-          getErrorMessage(error),
-        );
         Logger.warn(
           `Fetching onboarding status failed on handoff init page: ${getErrorMessage(
             error,

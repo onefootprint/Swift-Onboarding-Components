@@ -74,9 +74,6 @@ class IframeAdapter implements FootprintClient {
     if (this.postmate) {
       this.postmate.emit(eventName, data);
     } else {
-      console.warn(
-        `Footprint.js must be initialized in order to dispatch the event "${eventName}"`,
-      );
       Logger.warn(
         `Footprint.js must be initialized in order to dispatch the event "${eventName}"`,
         'bifrost-iframe-adapter',

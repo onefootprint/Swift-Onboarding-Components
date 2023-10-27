@@ -58,7 +58,6 @@ const useFaceDetection = () => {
       box: { width: detectionBoxWidth, height: detectionBoxHeight },
     } = detection;
     if (!detectionBoxWidth || !detectionBoxHeight) {
-      console.warn('FaceApi detection box has null or zero dimensions');
       Logger.warn(
         'FaceApi detection box has null or zero dimensions',
         'use-face-detection',

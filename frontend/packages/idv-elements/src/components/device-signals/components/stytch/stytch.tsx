@@ -38,9 +38,6 @@ const Stytch = ({ fpAuthToken }: StytchProps) => {
         sendTelemetry.mutate({ telemetryId });
       });
     } else {
-      console.warn(
-        'Stytch public token not available. Skipping sending Stytch telemetry',
-      );
       Logger.warn(
         'Stytch public token not available. Skipping sending Stytch telemetry',
         'device-signals',

@@ -31,12 +31,10 @@ const useNewTabStatusUpdate = () => {
   };
 
   const handleError = (error: unknown) => {
-    console.warn(
-      'Encountered error while polling for status on transfer plugin on mobile, likely indicating expired session.',
-      getErrorMessage(error),
-    );
     Logger.warn(
-      'Encountered error while polling for status on transfer plugin on mobile, likely indicating expired session.',
+      `Encountered error while polling for status on transfer plugin on mobile, likely indicating expired session. ${getErrorMessage(
+        error,
+      )}`,
       'transfer-mobile',
     );
     tab?.close();

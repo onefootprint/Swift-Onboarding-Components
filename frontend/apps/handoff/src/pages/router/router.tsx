@@ -59,10 +59,6 @@ const Router = ({ variant }: RouterProps) => {
         }
       },
       onError: error => {
-        console.warn(
-          'Fetching d2p status failed with error, likely indicating expired session:',
-          error,
-        );
         Logger.warn(
           `Fetching d2p status failed with error, likely indicating expired session: ${getErrorMessage(
             error,

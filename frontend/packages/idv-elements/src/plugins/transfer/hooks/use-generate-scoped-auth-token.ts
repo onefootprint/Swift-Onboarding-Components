@@ -53,12 +53,6 @@ const useGenerateScopedAuthToken = ({
       {
         onSuccess,
         onError: (error: unknown) => {
-          console.warn(
-            `Error while generating d2p token in transfer plugin on ${
-              device?.type ?? 'NA'
-            } device type`,
-            getErrorMessage(error),
-          );
           Logger.warn(
             `Error while generating d2p token in transfer plugin on ${
               device?.type ?? 'NA'

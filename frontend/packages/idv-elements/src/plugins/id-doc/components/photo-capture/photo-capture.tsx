@@ -88,9 +88,6 @@ const PhotoCapture = ({
 
   const handleConfirm = async () => {
     if (!image) {
-      console.warn(
-        'Captured image could not be confirmed and submitted - retaking the image',
-      );
       Logger.warn(
         'Captured image could not be confirmed and submitted - retaking the image',
         'photo-capture',
@@ -104,9 +101,6 @@ const PhotoCapture = ({
       // An error occurred, directly prompt user to re-take the image
       setIsLoading(false);
       handleRetake();
-      console.warn(
-        'Captured image could not be processed - retaking the image',
-      );
       Logger.warn(
         'Captured image could not be processed - retaking the image',
         'photo-capture',

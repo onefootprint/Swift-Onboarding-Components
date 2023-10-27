@@ -159,13 +159,11 @@ const Camera = ({
 
   const clearCanvas = () => {
     if (!canvasRef.current) {
-      console.warn('Canvas could not be cleared. Ref undefined');
       Logger.warn('Canvas could not be cleared. Ref undefined', 'camera');
       return;
     }
     const context = canvasRef.current.getContext('2d');
     if (!context) {
-      console.warn('Canvas could not be cleared. Context undefined');
       Logger.warn('Canvas could not be cleared. Context undefined', 'camera');
       return;
     }
