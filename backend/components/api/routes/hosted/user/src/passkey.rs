@@ -254,7 +254,7 @@ pub async fn complete_post(
             }
             .save(conn)?;
 
-            let scope = if let Some(id) = user_auth.auth_event_id.as_ref() {
+            let scope = if let Some(id) = user_auth.auth_event_ids.first() {
                 AuthEvent::get(conn, id)?.scope
             } else {
                 // Don't want to error this whole endpoint for an annotation, but this should never
@@ -275,6 +275,7 @@ pub async fn complete_post(
                 kind: AuthEventKind::Passkey,
                 webauthn_credential_id: Some(credential.id),
                 created_at: Utc::now(),
+                // Use same scope as any of the auth events on this auth token
                 scope,
             }
             .create(conn.conn())?;

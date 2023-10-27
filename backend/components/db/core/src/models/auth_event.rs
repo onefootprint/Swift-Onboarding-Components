@@ -79,6 +79,14 @@ impl AuthEvent {
         Ok(result)
     }
 
+    #[tracing::instrument("AuthEvent::get_bulk", skip_all)]
+    pub fn get_bulk(conn: &mut PgConn, ids: &[AuthEventId]) -> DbResult<Vec<Self>> {
+        let results = auth_event::table
+            .filter(auth_event::id.eq_any(ids))
+            .get_results(conn)?;
+        Ok(results)
+    }
+
     #[tracing::instrument("AuthEvent::count", skip_all)]
     pub fn count(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<i64> {
         let count = auth_event::table

@@ -36,19 +36,20 @@ pub struct UserSessionContext {
     pub(super) sb_id: Option<ScopedVaultId>,
     pub(super) obc_id: Option<ObConfigurationId>,
     pub(super) wf_id: Option<WorkflowId>,
-    // TODO we should support multiple auth events...
-    pub auth_event_id: Option<AuthEventId>,
+    pub auth_event_ids: Vec<AuthEventId>,
     /// When true, the auth token was initially issued as an unauthed, identified token
     pub is_from_api: bool,
 }
 
 impl UserSessionContext {
     pub fn did_use_passkey(&self, conn: &mut PgConn) -> ApiResult<bool> {
-        let Some(ae_id) = self.auth_event_id.as_ref() else {
-            return Ok(false);
-        };
-        let ae = AuthEvent::get(conn, ae_id)?;
-        Ok(ae.kind == AuthEventKind::Passkey)
+        let aes = self.auth_events(conn)?;
+        Ok(aes.iter().any(|ae| ae.kind == AuthEventKind::Passkey))
+    }
+
+    pub fn auth_events(&self, conn: &mut PgConn) -> ApiResult<Vec<AuthEvent>> {
+        let aes = AuthEvent::get_bulk(conn, &self.auth_event_ids)?;
+        Ok(aes)
     }
 }
 
@@ -62,10 +63,6 @@ impl UserAuth for UserSessionContext {
 impl AllowSessionUpdate for UserSessionContext {}
 
 impl UserSessionContext {
-    pub fn session_with_added_scopes(self, new_scopes: Vec<UserAuthScope>) -> ApiResult<AuthSessionData> {
-        self.update(UserSessionArgs::default(), new_scopes, None)
-    }
-
     pub fn update(
         self,
         new_args: UserSessionArgs,
@@ -90,8 +87,8 @@ impl UserSessionContext {
             wf_id: new_args.wf_id.or(self.wf_id),
             is_from_api: new_args.is_from_api || self.is_from_api,
         };
-        let new_auth_event_id = new_auth_event_id.or(self.auth_event_id);
-        UserSession::make(self.user.id, args, new_scopes, new_auth_event_id)
+        let ae_ids = self.auth_event_ids.into_iter().chain(new_auth_event_id).collect();
+        UserSession::make(self.user.id, args, new_scopes, ae_ids)
     }
 
     pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {
@@ -156,6 +153,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     scopes,
                     is_from_api,
                     auth_event_id,
+                    auth_event_ids,
                 } = data;
                 let vault = Vault::get(conn, &user_vault_id)?;
                 if vault.kind != VaultKind::Person {
@@ -183,6 +181,8 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     }
                 }
 
+                // Merge auth event ids for backcompat for now
+                let auth_event_ids = auth_event_ids.into_iter().chain(auth_event_id).unique().collect();
                 let data = UserSessionContext {
                     user: vault,
                     sb_id,
@@ -192,7 +192,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     obc_id,
                     scopes,
                     is_from_api,
-                    auth_event_id,
+                    auth_event_ids,
                 };
                 Ok(ParsedUserSessionContext(data))
             }

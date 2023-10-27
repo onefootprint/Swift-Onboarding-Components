@@ -29,6 +29,9 @@ pub struct UserSession {
     pub scopes: Vec<UserAuthScope>,
     /// The auth event created when this token was issued
     pub auth_event_id: Option<AuthEventId>,
+    /// The auths that give this token its permissions
+    #[serde(default)]
+    pub auth_event_ids: Vec<AuthEventId>,
     /// When true, the auth token was initially issued as an unauthed, identified token
     pub is_from_api: bool,
 }
@@ -54,7 +57,7 @@ impl UserSession {
         user_vault_id: VaultId,
         args: UserSessionArgs,
         scopes: Vec<UserAuthScope>,
-        auth_event_id: Option<AuthEventId>,
+        auth_event_ids: Vec<AuthEventId>,
     ) -> ApiResult<AuthSessionData> {
         if scopes.iter().any(|s| matches!(s, UserAuthScope::SignUp)) && args.su_id.is_none() {
             return Err(UserError::InvalidAuthSession(
@@ -77,7 +80,8 @@ impl UserSession {
             wf_id,
             scopes,
             is_from_api,
-            auth_event_id,
+            auth_event_id: auth_event_ids.first().cloned(),
+            auth_event_ids,
         });
         Ok(session)
     }

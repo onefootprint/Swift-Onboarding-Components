@@ -216,7 +216,7 @@ pub async fn post(
                 token
             } else {
                 // Otherwise, create a new token with these scopes / args
-                let data = UserSession::make(uv_id.clone(), args, scopes, Some(event.id))?;
+                let data = UserSession::make(uv_id.clone(), args, scopes, vec![event.id])?;
                 let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
                 token
             };
