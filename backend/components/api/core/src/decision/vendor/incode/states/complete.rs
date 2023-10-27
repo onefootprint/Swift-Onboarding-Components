@@ -2,7 +2,7 @@ use super::IncodeStateTransition;
 use super::VerificationSession;
 use crate::decision::features::incode_docv;
 use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
-use crate::decision::features::incode_docv::ParsedIncodeNames;
+use crate::decision::features::incode_utils::ParsedIncodeNames;
 use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::state_machine::IncodeContext;

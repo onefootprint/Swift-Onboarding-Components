@@ -3,7 +3,7 @@ use itertools::Itertools;
 use newtypes::{vendor_reason_code_enum, AdverseMediaListKind, EnhancedAmlOption, FootprintReasonCode};
 use strum_macros::EnumString;
 
-use super::incode_docv::pii_strings_match_name_normalized;
+use super::incode_utils::pii_strings_match_name_normalized;
 
 vendor_reason_code_enum! {
     #[derive(Debug, strum::Display, Clone, Eq, PartialEq, serde::Deserialize, EnumString, Hash)]
