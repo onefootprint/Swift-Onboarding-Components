@@ -382,7 +382,11 @@ def test_data_integrity_check(sandbox_tenant):
     [
         ([], [], None),
         (["dob"], [], "Invalid onboarding configuration for Vault"),
-        ([], ["id.ssn9"], "Unmet onboarding requirements: CollectData"),
+        (
+            [],
+            ["id.ssn9"],
+            "Unmet onboarding requirements: CollectData",
+        ),  # TODO: these are not great user facing errors
     ],
 )
 def test_kyc(

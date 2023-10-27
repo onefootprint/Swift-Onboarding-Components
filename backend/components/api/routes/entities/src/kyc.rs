@@ -16,7 +16,7 @@ use api_core::task;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::requirements::get_requirements_inner;
 use api_core::utils::requirements::GetRequirementsArgs;
-use api_core::utils::vault_wrapper::Person;
+use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
 use api_wire_types::EntityValidateResponse;
@@ -55,7 +55,7 @@ pub async fn post(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&sv.id))?;
+            let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
             Ok((uvw, sv))
         })
         .await??;
@@ -88,7 +88,7 @@ pub async fn post(
                 return Err(TenantError::MissingCanAccessCdos(unaccessable_cdos.into()).into());
             }
 
-            let (wf_id, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(
+            let (wf_id, _) = api_core::utils::onboarding::get_or_start_onboarding(
                 conn,
                 None,
                 false,
@@ -120,13 +120,10 @@ pub async fn post(
                     TenantError::UnsupportedObcForNpv("Investor Profile not allowed".to_owned()).into(),
                 );
             }
-            let args = GetRequirementsArgs {
-                ob_config: obc.clone(),
-                workflow: wf.clone(),
-                sb_id: biz_wf.map(|ob| ob.scoped_vault_id),
-            };
+
             // /kyc endpoint currently does not properly handle IPK doc requirements!
-            let reqs = get_requirements_inner(conn, uvw, args, decrypted_values)?;
+            // Also does not check any requirements for the Business vault if this person is a primary BO for a Business
+            let reqs = get_requirements_inner(conn, uvw, &obc, &wf, decrypted_values)?;
             // TODO: consolidate with /authorize code
             let unmet_reqs = reqs
                 .into_iter()

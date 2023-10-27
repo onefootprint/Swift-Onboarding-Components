@@ -9,7 +9,8 @@ use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::task;
 use api_core::utils::db2api::DbToApi;
-use api_core::utils::vault_wrapper::Business;
+use api_core::utils::requirements::GetRequirementsArgs;
+use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
 use api_wire_types::EntityValidateResponse;
@@ -20,7 +21,9 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::OnboardingWorkflowArgs;
 use db::models::workflow::Workflow;
 use db::DbError;
+use itertools::Itertools;
 use newtypes::FpId;
+use newtypes::OnboardingRequirement;
 use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web};
 
@@ -55,7 +58,7 @@ pub async fn post(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sb = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sb.id))?;
+            let bvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sb.id))?;
             Ok((bvw, sb))
         })
         .await??;
@@ -68,7 +71,7 @@ pub async fn post(
         return Err(TenantError::CannotRunKybForPortable.into());
     }
 
-    // let decrypted_values = GetRequirementsArgs::get_decrypted_values(&state, &bvw).await?;
+    let decrypted_values = GetRequirementsArgs::get_decrypted_values(&state, &bvw).await?;
 
     let tenant_id = auth.tenant().id.clone();
     let biz_wf = state
@@ -80,6 +83,16 @@ pub async fn post(
                 Err(DbError::ApiKeyNotFound)?
             }
 
+            let unaccessable_cdos: Vec<_> = obc
+                .must_collect_data
+                .clone()
+                .into_iter()
+                .filter(|c| !obc.can_access_data.contains(c))
+                .collect();
+            if !unaccessable_cdos.is_empty() {
+                return Err(TenantError::MissingCanAccessCdos(unaccessable_cdos.into()).into());
+            }
+
             // we currently only create WF's for Businesses at the same time that we create the Workflow for the primary BO. Here we need to manually create just a business WF
             let ob_create_args = OnboardingWorkflowArgs {
                 scoped_vault_id: sb.id,
@@ -89,6 +102,25 @@ pub async fn post(
             };
             let (biz_wf, _) =
                 Workflow::get_or_create_onboarding(conn, ob_create_args, fixture_result, false)?;
+
+            // Check requirements for this Business vault w.r.t the OBC
+            let reqs = api_core::utils::requirements::get_requirements_inner(
+                conn,
+                bvw,
+                &obc,
+                &biz_wf,
+                decrypted_values,
+            )?;
+            // TODO: consolidate with /authorize code
+            let unmet_reqs = reqs
+                .into_iter()
+                .filter(|r| !r.is_met())
+                .filter(|r| !matches!(r, OnboardingRequirement::Process))
+                .collect_vec();
+            if !unmet_reqs.is_empty() {
+                let unmet_reqs = unmet_reqs.into_iter().map(|x| x.into()).collect_vec();
+                return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
+            }
 
             Ok(biz_wf)
         })

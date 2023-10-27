@@ -47,9 +47,11 @@ pub async fn post(
     let fixture_result = request.into_inner().and_then(|r| r.fixture_result);
 
     // Verify there are no unmet requirements
-    let reqs =
-        api_core::utils::requirements::get_requirements(&state, GetRequirementsArgs::from(&user_auth)?)
-            .await?;
+    let reqs = api_core::utils::requirements::get_requirements_for_person_and_maybe_business(
+        &state,
+        GetRequirementsArgs::from(&user_auth)?,
+    )
+    .await?;
     let unmet_reqs = reqs
         .into_iter()
         .filter(|r| !r.is_met())

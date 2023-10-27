@@ -1,12 +1,11 @@
 use std::str::FromStr;
 
-use crate::utils::vault_wrapper::{Business, Person, VaultWrapper, VwArgs};
+use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
 use crate::{
-    auth::{user::CheckUserWfAuthContext, AuthError},
-    errors::ApiResult,
-    utils::vault_wrapper::DecryptUncheckedResult,
+    auth::user::CheckUserWfAuthContext, errors::ApiResult, utils::vault_wrapper::DecryptUncheckedResult,
     State,
 };
+use db::models::workflow::WorkflowIdentifier;
 use db::{
     models::{
         document_request::DocumentRequest, identity_document::IdentityDocument,
@@ -18,25 +17,30 @@ use db::{
 use itertools::Itertools;
 use newtypes::{
     AuthorizeFields, DocumentCdoInfo, IdentityDocumentStatus, Iso3166TwoDigitCountryCode, LivenessSource,
-    OnboardingRequirement, OnboardingRequirementKind, Selfie, UsLegalStatus,
+    OnboardingRequirement, OnboardingRequirementKind, Selfie, UsLegalStatus, VaultId,
 };
 use newtypes::{
     CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind,
     IdentityDataKind as IDK, InvestorProfileKind as IPK, ScopedVaultId,
 };
 
+use super::vault_wrapper::Any;
+
+#[derive(Clone)]
 pub struct GetRequirementsArgs {
-    pub ob_config: ObConfiguration,
-    pub workflow: Workflow,
-    pub sb_id: Option<ScopedVaultId>,
+    pub person_obc: ObConfiguration,
+    pub person_workflow: Workflow,
+    pub person_vault_id: VaultId,
+    pub business_sv: Option<ScopedVaultId>,
 }
 
 impl GetRequirementsArgs {
     pub fn from(value: &CheckUserWfAuthContext) -> ApiResult<Self> {
         Ok(Self {
-            ob_config: value.ob_config()?.clone(),
-            workflow: value.workflow().clone(),
-            sb_id: value.scoped_business_id(),
+            person_obc: value.ob_config()?.clone(),
+            person_workflow: value.workflow().clone(),
+            person_vault_id: value.user().id.clone(),
+            business_sv: value.scoped_business_id().clone(),
         })
     }
 }
@@ -50,46 +54,93 @@ impl GetRequirementsArgs {
     /// Fetch various values from the vault that may conditionally affect requirements
     pub async fn get_decrypted_values(
         state: &State,
-        uvw: &VaultWrapper<Person>,
+        vw: &VaultWrapper<Any>,
     ) -> ApiResult<DecryptUncheckedResultForReqs> {
         let values = vec![
             IPK::Declarations.into(),
             IDK::UsLegalStatus.into(),
             IDK::Country.into(),
         ];
-        let decrypted_values = uvw.decrypt_unchecked(&state.enclave_client, &values).await?;
+        let decrypted_values = vw.decrypt_unchecked(&state.enclave_client, &values).await?;
         Ok(DecryptUncheckedResultForReqs(decrypted_values))
     }
 }
 
 #[tracing::instrument(skip_all)]
-/// Gets a list of requirements to onboard onto this ob config.
+/// Gets a list of requirements for the Person Vault for the onboarding.
+/// If the Person Vault is the Primary BO of some ongoing Business onboarding, then this also includes the requirements of that Business Vault
 /// NOTE: this returns a list of both met and unmet requirements - you should check.
 /// TODO: for now, this is guaranteed to return all unmet requirements, but will only return some
 /// met requirements
-pub async fn get_requirements(
+pub async fn get_requirements_for_person_and_maybe_business(
     state: &State,
     args: GetRequirementsArgs,
 ) -> ApiResult<Vec<OnboardingRequirement>> {
     // Fetch the UVW and use it to decrypt IPK::Declarations, if they exist
-    let su_id = args.workflow.scoped_vault_id.clone();
-    let uvw = state
-        .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
-            let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su_id))?;
-            Ok(uvw)
-        })
-        .await??;
-    let decrypted_values = GetRequirementsArgs::get_decrypted_values(state, &uvw).await?;
+    let GetRequirementsArgs {
+        person_obc,
+        person_workflow,
+        person_vault_id,
+        business_sv,
+    } = args;
 
-    let requirements = state
+    let su_id = person_workflow.scoped_vault_id.clone();
+    let sb_id = business_sv.clone();
+    let (uvw, bvw_wf) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let requirements = get_requirements_inner(conn, uvw, args, decrypted_values)?;
-            Ok(requirements)
+            let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&su_id))?;
+            let bvw = if let Some(sb_id) = sb_id {
+                let bvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sb_id))?;
+                let (business_workflow, _) = Workflow::get_all(
+                    conn,
+                    WorkflowIdentifier::ScopedBusinessId {
+                        sb_id: &sb_id,
+                        vault_id: &person_vault_id,
+                    },
+                )?;
+                Some((bvw, business_workflow))
+            } else {
+                None
+            };
+            Ok((uvw, bvw))
         })
         .await??;
-    Ok(requirements)
+    let person_decrypted_values = GetRequirementsArgs::get_decrypted_values(state, &uvw).await?;
+    // technically not needed, but safer mb
+    let bvw_wf_decrypted_values = if let Some((bvw, biz_wf)) = bvw_wf {
+        let business_decrypted_values = GetRequirementsArgs::get_decrypted_values(state, &bvw).await?;
+        Some((bvw, biz_wf, business_decrypted_values))
+    } else {
+        None
+    };
+
+    state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<Vec<_>> {
+            let person_requirements =
+                get_requirements_inner(conn, uvw, &person_obc, &person_workflow, person_decrypted_values)?;
+
+            let business_requirements =
+                if let Some((bvw, business_workflow, business_decrypted_values)) = bvw_wf_decrypted_values {
+                    // Technically for this case, the business's OBC should be the same as the person's and it'd be a bit more clear to see business_obc here. But they should be same and this is the existing logic so may as well keep as is
+                    get_requirements_inner(
+                        conn,
+                        bvw,
+                        &person_obc,
+                        &business_workflow,
+                        business_decrypted_values,
+                    )?
+                } else {
+                    vec![]
+                };
+
+            Ok(business_requirements
+                .into_iter()
+                .chain(person_requirements.into_iter())
+                .collect())
+        })
+        .await?
 }
 
 struct RequirementProgress {
@@ -198,28 +249,30 @@ fn get_progress<Type>(
     }
 }
 
+// gets oustanding requirements for a Vault with respect to a specific OBC/WF
 #[tracing::instrument(skip_all)]
 pub fn get_requirements_inner(
     conn: &mut PgConn,
-    uvw: VaultWrapper<Person>,
-    args: GetRequirementsArgs,
+    vw: VaultWrapper<Any>,
+    obc: &ObConfiguration,
+    wf: &Workflow,
     decrypted_values: DecryptUncheckedResultForReqs,
 ) -> ApiResult<Vec<OnboardingRequirement>> {
     // Depending on the workflow that we are running, we only want to show a subset of requirements
-    let relevant_requirement_kinds = args.workflow.state.relevant_requirements();
+    let relevant_requirement_kinds = wf.state.relevant_requirements();
 
     // For each requirement kind that might be shown by this workflow, generate a requirement if
     // necessary
     let requirements = relevant_requirement_kinds
         .into_iter()
-        .map(|k| get_requirement_inner(k, conn, &uvw, &args, &decrypted_values))
+        .map(|k| get_requirement_inner(k, conn, &vw, obc, wf, &decrypted_values))
         .collect::<ApiResult<Vec<_>>>()?
         .into_iter()
         .flatten()
-        .sorted_by_key(|r| OnboardingRequirementKind::from(r).priority(args.ob_config.is_doc_first))
+        .sorted_by_key(|r| OnboardingRequirementKind::from(r).priority(obc.is_doc_first))
         .collect();
 
-    tracing::info!(workflow_id=%args.workflow.id, requirements=%format!("{:?}", requirements), scoped_user_id=%args.workflow.scoped_vault_id, "get_requirements result");
+    tracing::info!(workflow_id=%wf.id, requirements=%format!("{:?}", requirements), scoped_user_id=%wf.scoped_vault_id, "get_requirements result");
 
     Ok(requirements)
 }
@@ -228,41 +281,40 @@ pub fn get_requirements_inner(
 fn get_requirement_inner(
     k: OnboardingRequirementKind,
     conn: &mut PgConn,
-    uvw: &VaultWrapper<Person>,
-    args: &GetRequirementsArgs,
+    vw: &VaultWrapper<Any>,
+    obc: &ObConfiguration,
+    wf: &Workflow,
     decrypted_values: &DecryptUncheckedResultForReqs,
 ) -> ApiResult<Option<OnboardingRequirement>> {
-    let ob_config = &args.ob_config;
     let req = match k {
         OnboardingRequirementKind::CollectData => {
-            ob_config.must_collect(DID::Id).then(|| {
+            obc.must_collect(DID::Id).then(|| {
                 let RequirementProgress {
                     populated_attributes,
                     missing_attributes,
-                } = get_progress(uvw, ob_config, DID::Id, decrypted_values);
+                } = get_progress(vw, obc, DID::Id, decrypted_values);
                 // if ob config needs to collect id data
                 OnboardingRequirement::CollectData {
                     missing_attributes,
-                    optional_attributes: ob_config.optional_data.clone(),
+                    optional_attributes: obc.optional_data.clone(),
                     populated_attributes,
                 }
             })
         }
         OnboardingRequirementKind::CollectInvestorProfile => {
-            ob_config
-                .must_collect(DID::InvestorProfile)
+            obc.must_collect(DID::InvestorProfile)
                 .then(|| -> ApiResult<_> {
                     let RequirementProgress {
                         populated_attributes,
                         missing_attributes,
-                    } = get_progress(uvw, ob_config, DID::InvestorProfile, decrypted_values);
+                    } = get_progress(vw, obc, DID::InvestorProfile, decrypted_values);
                     let declarations = decrypted_values.get_di(IPK::Declarations).ok();
                     let missing_document = if let Some(declarations) = declarations {
                         let declarations: Vec<Declaration> = declarations.deserialize()?;
                         // The finra compliance doc is missing if any of the declarations require a doc and we don't
                         // yet have one on file
                         declarations.iter().any(|d| d.requires_finra_compliance_doc())
-                            && !uvw.has_field(DocumentKind::FinraComplianceLetter)
+                            && !vw.has_field(DocumentKind::FinraComplianceLetter)
                     } else {
                         false
                     };
@@ -274,49 +326,43 @@ fn get_requirement_inner(
                 })
                 .transpose()?
         }
-        OnboardingRequirementKind::CollectBusinessData => {
-            ob_config
-                .must_collect(DID::Business)
-                .then(|| -> ApiResult<_> {
-                    // Use the bvw to determine which fields still need to be collected
-                    let sb_id = args.sb_id.clone().ok_or(AuthError::MissingBusiness)?;
-                    let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sb_id))?;
-                    let RequirementProgress {
-                        populated_attributes,
-                        missing_attributes,
-                    } = get_progress(&bvw, ob_config, DID::Business, decrypted_values);
-                    Ok(OnboardingRequirement::CollectBusinessData {
-                        missing_attributes,
-                        populated_attributes,
-                    })
+        OnboardingRequirementKind::CollectBusinessData => obc
+            .must_collect(DID::Business)
+            .then(|| -> ApiResult<_> {
+                let RequirementProgress {
+                    populated_attributes,
+                    missing_attributes,
+                } = get_progress(vw, obc, DID::Business, decrypted_values);
+                Ok(OnboardingRequirement::CollectBusinessData {
+                    missing_attributes,
+                    populated_attributes,
                 })
-                .transpose()?
-        }
+            })
+            .transpose()?,
         // The below requirements we will never include when met
         // (kind of confusing in that we are checking in real-time if they've been satisifed)
         OnboardingRequirementKind::RegisterPasskey => {
             // skip passkey registration on no-phone flows
-            if ob_config.is_no_phone_flow {
+            if obc.is_no_phone_flow {
                 None
             } else {
-                let credentials = WebauthnCredential::list(conn, &uvw.vault().id)?;
+                let credentials = WebauthnCredential::list(conn, &vw.vault().id)?;
 
                 // Note: we should probably represent this another way, but for now we can determine if we want to skip passkey reg
                 // by checking for this liveness event on the scoped_vault
-                let liveness_skip_events =
-                    LivenessEvent::get_by_scoped_vault_id(conn, &args.workflow.scoped_vault_id)?
-                        .into_iter()
-                        .filter(|evt| matches!(evt.liveness_source, LivenessSource::Skipped))
-                        .collect_vec();
+                let liveness_skip_events = LivenessEvent::get_by_scoped_vault_id(conn, &wf.scoped_vault_id)?
+                    .into_iter()
+                    .filter(|evt| matches!(evt.liveness_source, LivenessSource::Skipped))
+                    .collect_vec();
 
                 (liveness_skip_events.is_empty() && credentials.is_empty())
                     .then_some(OnboardingRequirement::RegisterPasskey)
             }
         }
         OnboardingRequirementKind::CollectDocument => {
-            let dr = DocumentRequest::get(conn, &args.workflow.id)?;
+            let dr = DocumentRequest::get(conn, &wf.id)?;
             if let Some(dr) = dr {
-                let user_consent = UserConsent::get_for_workflow(conn, &args.workflow.id)?;
+                let user_consent = UserConsent::get_for_workflow(conn, &wf.id)?;
                 let id_doc = IdentityDocument::list_by_request_id(conn, &dr.id)?;
                 let country = decrypted_values
                     .get(&IDK::Country.into())
@@ -328,8 +374,7 @@ fn get_requirement_inner(
                     || id_doc
                         .into_iter()
                         .any(|d| d.status == IdentityDocumentStatus::Pending);
-                let supported_country_and_doc_types =
-                    ob_config.supported_country_mapping_for_document(country);
+                let supported_country_and_doc_types = obc.supported_country_mapping_for_document(country);
 
                 should_render.then_some(OnboardingRequirement::CollectDocument {
                     document_request_id: dr.id,
@@ -342,9 +387,9 @@ fn get_requirement_inner(
             }
         }
         OnboardingRequirementKind::Authorize => {
-            let (document_types, skipped_selfie) = if ob_config.can_access_document() {
+            let (document_types, skipped_selfie) = if obc.can_access_document() {
                 // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
-                let id_docs = IdentityDocument::list_by_wf_id(conn, &args.workflow.id)?;
+                let id_docs = IdentityDocument::list_by_wf_id(conn, &wf.id)?;
                 let doc_types = id_docs
                         .iter()
                         // check we've actually completed the document, it's not just an empty id doc
@@ -360,15 +405,15 @@ fn get_requirement_inner(
                 (vec![], false)
             };
 
-            let collected_data = ob_config
+            let collected_data = obc
                 .can_access_data
                 .iter()
                 .filter(|cdo| {
                     // Only include CDO's from optional_data if they were collected
-                    if ob_config.optional_data.contains(cdo) {
+                    if obc.optional_data.contains(cdo) {
                         cdo.required_data_identifiers()
                             .into_iter()
-                            .all(|di| uvw.has_field(di))
+                            .all(|di| vw.has_field(di))
                     } else {
                         true
                     }
@@ -389,11 +434,11 @@ fn get_requirement_inner(
             };
             Some(OnboardingRequirement::Authorize {
                 fields_to_authorize,
-                authorized_at: args.workflow.authorized_at,
+                authorized_at: wf.authorized_at,
             })
         }
         OnboardingRequirementKind::Process => {
-            if args.workflow.state.requires_user_input() {
+            if wf.state.requires_user_input() {
                 // If the worfklow is in a state that requires user input, make a Process requirement
                 Some(OnboardingRequirement::Process)
             } else {

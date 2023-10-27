@@ -6,7 +6,7 @@ use crate::State;
 use api_core::auth::user::UserWfAuthContext;
 use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
-use api_core::utils::requirements::get_requirements;
+use api_core::utils::requirements::get_requirements_for_person_and_maybe_business;
 use api_core::utils::requirements::GetRequirementsArgs;
 use db::models::workflow::Workflow;
 use db::models::workflow::WorkflowUpdate;
@@ -30,7 +30,8 @@ pub async fn post(user_auth: UserWfAuthContext, state: web::Data<State>) -> Json
     span.record("workflow_id", &format!("{}", user_auth.workflow().id));
 
     // Verify there are no unmet requirements
-    let reqs = get_requirements(&state, GetRequirementsArgs::from(&user_auth)?).await?;
+    let reqs = get_requirements_for_person_and_maybe_business(&state, GetRequirementsArgs::from(&user_auth)?)
+        .await?;
     let unmet_reqs = reqs
         .into_iter()
         .filter(|r| !r.is_met())

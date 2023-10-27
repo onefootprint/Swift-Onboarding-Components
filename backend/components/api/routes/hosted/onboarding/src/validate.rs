@@ -34,7 +34,7 @@ pub async fn post(
         let user_wf_auth = user_wf_auth.check_guard(UserAuthGuard::SignUp)?;
 
         // Verify there are no unmet requirements
-        let reqs = api_core::utils::requirements::get_requirements(
+        let reqs = api_core::utils::requirements::get_requirements_for_person_and_maybe_business(
             &state,
             api_core::utils::requirements::GetRequirementsArgs::from(&user_wf_auth)?,
         )

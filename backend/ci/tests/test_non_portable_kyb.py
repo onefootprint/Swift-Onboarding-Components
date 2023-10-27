@@ -4,14 +4,15 @@ from tests.constants import BUSINESS_DATA, CDO_TO_DIS
 
 
 @pytest.mark.parametrize(
-    "sandbox_outcome",
+    "sandbox_outcome,missing_data",
     [
-        ("pass"),
-        ("manual_review"),
-        ("fail"),
+        ("pass", True),
+        ("pass", False),
+        ("manual_review", False),
+        ("fail", False),
     ],
 )
-def test_no_bos(sandbox_tenant, sandbox_outcome):
+def test_no_bos(sandbox_tenant, sandbox_outcome, missing_data):
     must_collect_data = [
         "business_name",
         "business_tin",
@@ -27,6 +28,11 @@ def test_no_bos(sandbox_tenant, sandbox_outcome):
         for di in CDO_TO_DIS[cdo]:
             vault_data[di] = BUSINESS_DATA[di]
 
+    expected_error = None
+    if missing_data:
+        vault_data.pop("business.name")
+        expected_error = "Unmet onboarding requirements: CollectBusinessData"  # TODO: these are not great user facing errors
+
     vault = post("businesses/", vault_data, sandbox_tenant.sk.key)
     fp_id = vault["id"]
 
@@ -38,7 +44,11 @@ def test_no_bos(sandbox_tenant, sandbox_outcome):
             fixture_result=sandbox_outcome,
         ),
         sandbox_tenant.sk.key,
+        status_code=200 if expected_error is None else 400,
     )
+    if expected_error:
+        assert expected_error in kyb["error"]["message"]
+        return
 
     if sandbox_outcome == "manual_review":
         assert kyb["requires_manual_review"] == True
