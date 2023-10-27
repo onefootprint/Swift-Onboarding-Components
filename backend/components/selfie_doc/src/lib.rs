@@ -103,11 +103,16 @@ impl AwsSelfieDocClient {
             .await?;
 
         let Some(source_face) = res.source_image_face() else {
-            return Ok(CompareResult::NoSourceFace)
+            return Ok(CompareResult::NoSourceFace);
         };
 
-        let Some(target_face) = res.face_matches().unwrap_or_default().iter().next() else {
-            return Ok(CompareResult::NoMatchingFace)
+        let Some(target_face) = res
+            .face_matches()
+            .unwrap_or_default()
+            .iter()
+            .max_by(|f1, f2| max_f32(f1.similarity(), f2.similarity()))
+        else {
+            return Ok(CompareResult::NoMatchingFace);
         };
 
         if res.face_matches().unwrap_or_default().len() + res.unmatched_faces().unwrap_or_default().len() > 1
@@ -162,10 +167,27 @@ impl AwsSelfieDocClient {
         }
 
         let Some(res) = res.iter().next() else {
-            return Ok(AnalyzeIdResult::NoIdentityDocument)
+            return Ok(AnalyzeIdResult::NoIdentityDocument);
         };
 
         Ok(AnalyzeIdResult::FoundIdentityDocumentMetadata(res.into()))
+    }
+}
+
+fn max_f32(f1: Option<f32>, f2: Option<f32>) -> std::cmp::Ordering {
+    match (f1, f2) {
+        (Some(s1), Some(s2)) => {
+            if s1 > s2 {
+                std::cmp::Ordering::Greater
+            } else if s1 == s2 {
+                std::cmp::Ordering::Equal
+            } else {
+                std::cmp::Ordering::Less
+            }
+        }
+        (None, Some(_)) => std::cmp::Ordering::Less,
+        (Some(_), None) => std::cmp::Ordering::Greater,
+        (None, None) => std::cmp::Ordering::Equal,
     }
 }
 
