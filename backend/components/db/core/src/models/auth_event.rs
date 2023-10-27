@@ -1,3 +1,4 @@
+use chrono::Duration;
 use db_schema::schema;
 
 use newtypes::AuthEventId;
@@ -80,6 +81,22 @@ pub struct LinkedDeviceAttestation {
 }
 
 impl AuthEvent {
+    const AUTH_EVENT_EXPIRY_H: i64 = 1;
+
+    #[tracing::instrument("AuthEvent::list_recent", skip_all)]
+    /// Return auth events at this tenant in the last Self::AUTH_EVENT_EXPIRY_H hours.
+    /// These auth events are proof that the end user has authenticated with footprint recently.
+    /// If these auth events exist, the tenant is allowed to create an authed token for the user
+    pub fn list_recent(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
+        let min_timestamp = Utc::now() - Duration::hours(Self::AUTH_EVENT_EXPIRY_H);
+        let results = auth_event::table
+            .filter(auth_event::scoped_vault_id.eq(sv_id))
+            .filter(auth_event::created_at.gt(min_timestamp))
+            .get_results(conn)?;
+        Ok(results)
+    }
+
+
     #[tracing::instrument("AuthEvent::get", skip_all)]
     pub fn get(conn: &mut PgConn, id: &AuthEventId) -> DbResult<Self> {
         let result = auth_event::table

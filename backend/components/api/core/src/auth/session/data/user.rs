@@ -3,7 +3,6 @@ use newtypes::ContactInfoId;
 use newtypes::ObConfigurationId;
 use newtypes::ScopedVaultId;
 use newtypes::VaultId;
-use newtypes::WebauthnCredentialId;
 use newtypes::WorkflowId;
 
 use crate::auth::user::UserAuthScope;
@@ -34,13 +33,11 @@ pub struct UserSession {
     pub auth_event_ids: Vec<AuthEventId>,
     /// When true, the auth token was initially issued as an unauthed, identified token
     pub is_from_api: bool,
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
-pub enum AuthFactor {
-    Passkey(WebauthnCredentialId),
-    Email,
-    Sms,
+    /// When true, the auth events that occurred at this tenant were inherited to form this token,
+    /// rather than proof of auth being exchanged physically
+    #[serde(default)]
+    #[allow(unused)]
+    pub is_implied_auth: bool,
 }
 
 #[derive(Default)]
@@ -50,6 +47,7 @@ pub struct UserSessionArgs {
     pub obc_id: Option<ObConfigurationId>,
     pub wf_id: Option<WorkflowId>,
     pub is_from_api: bool,
+    pub is_implied_auth: bool,
 }
 
 impl UserSession {
@@ -71,6 +69,7 @@ impl UserSession {
             obc_id,
             wf_id,
             is_from_api,
+            is_implied_auth,
         } = args;
         let session = AuthSessionData::User(Self {
             user_vault_id,
@@ -82,6 +81,7 @@ impl UserSession {
             is_from_api,
             auth_event_id: auth_event_ids.first().cloned(),
             auth_event_ids,
+            is_implied_auth,
         });
         Ok(session)
     }

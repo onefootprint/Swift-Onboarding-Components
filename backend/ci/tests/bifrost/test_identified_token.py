@@ -1,5 +1,13 @@
+import arrow
 import pytest
-from tests.utils import clean_up_user, post, create_ob_config, get, step_up_user, patch
+from tests.utils import (
+    clean_up_user,
+    post,
+    create_ob_config,
+    get,
+    step_up_user,
+    patch,
+)
 from tests.bifrost_client import BifrostClient
 from tests.headers import FpAuth, SandboxId
 from tests.constants import FIXTURE_PHONE_NUMBER, LIVE_PHONE_NUMBER, EMAIL
@@ -30,8 +38,9 @@ def test_onboarded_vault(twilio, ob_config, sandbox_tenant):
     body = post(f"entities/{user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
-    phone_number = user.client.data["id.phone_number"]
-    auth_token = step_up_user(twilio, auth_token, phone_number, False)
+    # Should immediately have onboarding scopes because auth was implied
+    body = get("hosted/user/token", None, auth_token)
+    assert set(body["scopes"]) >= {"sign_up"}
 
     # re-run Bifrost with the token from the link we sent to user
     bifrost2 = BifrostClient.raw_auth(
@@ -61,6 +70,7 @@ def test_api_vault(twilio, sandbox_tenant, ob_config):
     body = post(f"entities/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
+    # Should require step up because auth was not implied for API vault
     auth_token = step_up_user(twilio, auth_token, FIXTURE_PHONE_NUMBER, True)
     # Ensure we can't edit the phone number once it's been verified
     body = patch(
@@ -97,7 +107,9 @@ def test_redo_onboard(twilio, ob_config, sandbox_tenant):
     body = post(f"entities/{user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
-    auth_token = step_up_user(twilio, auth_token, FIXTURE_PHONE_NUMBER, False)
+    # Should immediately have onboarding scopes because auth was implied
+    body = get("hosted/user/token", None, auth_token)
+    assert set(body["scopes"]) >= {"sign_up"}
 
     bifrost2 = BifrostClient.raw_auth(
         sandbox_tenant.default_ob_config,

@@ -31,6 +31,7 @@ pub struct Entity {
     pub status: Option<EntityStatus>,
     pub insight_event: Option<InsightEvent>,
     pub requires_manual_review: bool,
+    pub is_created_via_api: bool,
 }
 
 /// Mostly just OnboardingStatus but with other statuses that don't exist in OnboardingStatus

@@ -2,9 +2,9 @@ use super::{BiometricChallengeState, PhoneEmailChallengeState};
 use crate::State;
 use crate::{ChallengeData, ChallengeState};
 use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::session::user::{AuthFactor, UserSession, UserSessionArgs};
+use api_core::auth::session::user::{UserSession, UserSessionArgs};
 use api_core::auth::session::UpdateSession;
-use api_core::auth::user::UserAuthScope;
+use api_core::auth::user::allowed_user_scopes;
 use api_core::auth::user::{CheckedUserAuthContext, UserAuthContext};
 use api_core::auth::Any;
 use api_core::config::Config;
@@ -102,35 +102,23 @@ pub async fn post(
         .db_transaction(move |conn| -> ApiResult<_> {
             let obc_auth = ob_pk_auth.as_ref();
             let ua = user_auth.as_ref();
-            let (uv_id, auth_factor, event_kind, passkey_cred_id) = match challenge_state.data {
+            let (uv_id, event_kind, passkey_cred_id) = match challenge_state.data {
                 ChallengeData::Sms(s) => {
-                    let tok = validate(conn, s, obc_auth, ua, &c_response, IDK::PhoneNumber.into())?;
-                    (tok, AuthFactor::Sms, AuthEventKind::Sms, None)
+                    let vault_id = validate(conn, s, obc_auth, ua, &c_response, IDK::PhoneNumber.into())?;
+                    (vault_id, AuthEventKind::Sms, None)
                 }
                 ChallengeData::Email(s) => {
-                    let tok = validate(conn, s, obc_auth, ua, &c_response, IDK::Email.into())?;
-                    (tok, AuthFactor::Email, AuthEventKind::Email, None)
+                    let vault_id = validate(conn, s, obc_auth, ua, &c_response, IDK::Email.into())?;
+                    (vault_id, AuthEventKind::Email, None)
                 }
                 ChallengeData::Passkey(context) => {
-                    let (tok, cred) = validate_biometric_challenge(conn, &config, context, &c_response)?;
-                    (
-                        tok,
-                        AuthFactor::Passkey(cred.clone()),
-                        AuthEventKind::Passkey,
-                        Some(cred),
-                    )
+                    let (vault_id, cred) = validate_biometric_challenge(conn, &config, context, &c_response)?;
+                    (vault_id, AuthEventKind::Passkey, Some(cred))
                 }
             };
 
-            // Record some properties on the root span
-            root_span.record("vault_id", uv_id.to_string());
-
-            // If you authed with passkey, you also get SensitiveProfile
-            let sensitive_scope =
-                matches!(auth_factor, AuthFactor::Passkey(_)).then_some(UserAuthScope::SensitiveProfile);
-
             // Determine which scopes to issue on the auth token
-            let (args, scopes, duration, scoped_vault_id) = match scope {
+            let (args, duration, su) = match scope {
                 IdentifyScope::Auth => {
                     let obc = ob_pk_auth
                         .as_ref()
@@ -146,15 +134,9 @@ pub async fn post(
                     let args = UserSessionArgs {
                         su_id: Some(su.id.clone()),
                         obc_id: Some(obc.id.clone()),
-                        wf_id: None,
-                        sb_id: None,
-                        is_from_api: false,
+                        ..Default::default()
                     };
-                    root_span.record("fp_id", su.fp_id.to_string());
-                    root_span.record("tenant_id", su.tenant_id.to_string());
-                    root_span.record("is_live", su.is_live);
-                    // No permissions to auth
-                    (args, vec![Some(UserAuthScope::Auth)], duration, Some(su.id))
+                    (args, duration, Some(su))
                 }
                 IdentifyScope::Onboarding => {
                     let bo = ob_pk_auth.as_ref().and_then(|a| a.business_owner());
@@ -166,7 +148,7 @@ pub async fn post(
                     if obc.kind == ObConfigurationKind::Auth {
                         return Err(ChallengeError::IncorrectPlaybookKind(obc.kind, scope).into());
                     }
-                    // TOOD we should migrate the BO tokens to use these new un-authed, identified tokens
+                    // TODO we should migrate the BO tokens to use these new un-authed, identified tokens
                     let (su, sb_id) = onboarding_identifiers(conn, obc.id.clone(), bo, &uv_id)?;
                     let duration = Duration::hours(1); // Onboarding is shorter
                     let args = UserSessionArgs {
@@ -174,29 +156,30 @@ pub async fn post(
                         sb_id,
                         obc_id: Some(obc.id.clone()),
                         // wf_id will be added later in POST /hosted/onboarding
-                        wf_id: None,
-                        is_from_api: false,
+                        ..Default::default()
                     };
-                    root_span.record("fp_id", su.fp_id.to_string());
-                    root_span.record("tenant_id", su.tenant_id.to_string());
-                    root_span.record("is_live", su.is_live);
-                    let scopes = vec![Some(UserAuthScope::SignUp), sensitive_scope];
-                    (args, scopes, duration, Some(su.id))
+                    (args, duration, Some(su))
                 }
                 IdentifyScope::My1fp => {
-                    let scopes = vec![Some(UserAuthScope::BasicProfile), sensitive_scope];
                     let duration = Duration::hours(8); // Issue my1fp token for a long time
                     let args = UserSessionArgs::default();
-                    (args, scopes, duration, None)
+                    (args, duration, None)
                 }
             };
-            let scopes = scopes.into_iter().flatten().collect();
+
+            // Record some properties on the root span
+            root_span.record("vault_id", uv_id.to_string());
+            if let Some(su) = su.as_ref() {
+                root_span.record("fp_id", su.fp_id.to_string());
+                root_span.record("tenant_id", su.tenant_id.to_string());
+                root_span.record("is_live", su.is_live);
+            }
 
             // record the new auth event
             let insight = CreateInsightEvent::from(insight_headers).insert_with_conn(conn)?;
             let event = NewAuthEvent {
                 vault_id: uv_id.clone(),
-                scoped_vault_id,
+                scoped_vault_id: su.map(|su| su.id),
                 insight_event_id: Some(insight.id),
                 kind: event_kind,
                 webauthn_credential_id: passkey_cred_id,
@@ -204,6 +187,8 @@ pub async fn post(
                 scope,
             }
             .create(conn.conn())?;
+
+            let scopes = allowed_user_scopes(vec![event.kind], scope, false);
 
             let auth_token = if let Some(user_auth) = user_auth {
                 // Add the new scopes and args to the existing scopes and args on the auth token

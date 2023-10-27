@@ -1,4 +1,6 @@
-use newtypes::VaultId;
+use std::collections::HashSet;
+
+use newtypes::{AuthEventKind, IdentifyScope, VaultId};
 use paperclip::actix::Apiv2Schema;
 
 mod session;
@@ -37,9 +39,59 @@ pub trait UserAuth {
     fn user_vault_id(&self) -> &VaultId;
 }
 
+/// Computes the list of scopes to be granted to an auth token for a user.
+/// - `auth_events`: the auths that this user has performed
+/// - `scope`: the requested IdentifyScope
+/// - `is_implied_auth`: whether the auth events at this tenant were inherited virtually rather than physically
+/// The result is the intersection of the scopes requested and the scopes allowed by the auth methods
+pub fn allowed_user_scopes(
+    auth_events: Vec<AuthEventKind>,
+    scope: IdentifyScope,
+    is_implied_auth: bool,
+) -> Vec<UserAuthScope> {
+    let requested_scopes = match scope {
+        IdentifyScope::Auth => vec![UserAuthScope::Auth],
+        IdentifyScope::Onboarding => vec![UserAuthScope::SignUp, UserAuthScope::SensitiveProfile],
+        IdentifyScope::My1fp => vec![UserAuthScope::BasicProfile, UserAuthScope::SensitiveProfile],
+    };
+    let allowed_scopes: HashSet<_> = auth_events
+        .iter()
+        .flat_map(auth_event_to_scopes)
+        // Don't allow inherited auth to get sensitive profile
+        .filter(|s| !is_implied_auth || *s != UserAuthScope::SensitiveProfile)
+        .collect();
+    // Filter the requested scopes to what is allowed by the provided auth_events
+    requested_scopes
+        .into_iter()
+        .filter(|f| allowed_scopes.contains(f))
+        .collect()
+}
+
+/// Returns the list of UserAuthScopes that are allowed to be granted for the auth method provided
+fn auth_event_to_scopes(k: &AuthEventKind) -> Vec<UserAuthScope> {
+    match k {
+        AuthEventKind::Sms | AuthEventKind::Email => vec![
+            UserAuthScope::SignUp,
+            UserAuthScope::Auth,
+            UserAuthScope::BasicProfile,
+            UserAuthScope::Handoff,
+        ],
+        AuthEventKind::Passkey => vec![
+            UserAuthScope::SignUp,
+            UserAuthScope::Auth,
+            UserAuthScope::BasicProfile,
+            UserAuthScope::SensitiveProfile,
+            UserAuthScope::Handoff,
+        ],
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::UserAuthScope;
+    use newtypes::AuthEventKind;
+    use newtypes::IdentifyScope;
+    use test_case::test_case;
 
     #[test]
     fn test_serialize() {
@@ -56,5 +108,27 @@ mod test {
 
         let serialized = serde_json::ser::to_string(&modern_value).unwrap();
         assert_eq!(serialized, modern_value_str)
+    }
+
+    #[test_case(vec![AuthEventKind::Sms], IdentifyScope::My1fp, false => vec![UserAuthScope::BasicProfile])]
+    #[test_case(vec![AuthEventKind::Email], IdentifyScope::My1fp, false => vec![UserAuthScope::BasicProfile])]
+    #[test_case(vec![AuthEventKind::Passkey], IdentifyScope::My1fp, false => vec![UserAuthScope::BasicProfile, UserAuthScope::SensitiveProfile])]
+    #[test_case(vec![AuthEventKind::Sms, AuthEventKind::Passkey], IdentifyScope::My1fp, false => vec![UserAuthScope::BasicProfile, UserAuthScope::SensitiveProfile])]
+    #[test_case(vec![AuthEventKind::Sms], IdentifyScope::Auth, false => vec![UserAuthScope::Auth])]
+    #[test_case(vec![AuthEventKind::Email], IdentifyScope::Auth, false => vec![UserAuthScope::Auth])]
+    #[test_case(vec![AuthEventKind::Passkey], IdentifyScope::Auth, false => vec![UserAuthScope::Auth])]
+    #[test_case(vec![AuthEventKind::Sms, AuthEventKind::Passkey], IdentifyScope::Auth, false => vec![UserAuthScope::Auth])]
+    #[test_case(vec![AuthEventKind::Sms], IdentifyScope::Onboarding, false => vec![UserAuthScope::SignUp])]
+    #[test_case(vec![AuthEventKind::Email], IdentifyScope::Onboarding, false => vec![UserAuthScope::SignUp])]
+    #[test_case(vec![AuthEventKind::Passkey], IdentifyScope::Onboarding, false => vec![UserAuthScope::SignUp, UserAuthScope::SensitiveProfile])]
+    #[test_case(vec![AuthEventKind::Sms, AuthEventKind::Passkey], IdentifyScope::Onboarding, false => vec![UserAuthScope::SignUp, UserAuthScope::SensitiveProfile])]
+    // Even with passkey auth, if auth is inherited, can't get sensitive profile
+    #[test_case(vec![AuthEventKind::Sms, AuthEventKind::Passkey], IdentifyScope::Onboarding, true => vec![UserAuthScope::SignUp])]
+    fn test_allowed_scopes(
+        kinds: Vec<AuthEventKind>,
+        scope: IdentifyScope,
+        is_implied_auth: bool,
+    ) -> Vec<UserAuthScope> {
+        super::allowed_user_scopes(kinds, scope, is_implied_auth)
     }
 }

@@ -59,6 +59,7 @@ impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
             is_portable,
             kind,
             sandbox_id,
+            is_created_via_api,
             ..
         } = vw.vault.clone();
 
@@ -95,6 +96,7 @@ impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
             status,
             insight_event: insight_event.map(api_wire_types::InsightEvent::from_db),
             requires_manual_review,
+            is_created_via_api,
         }
     }
 }
