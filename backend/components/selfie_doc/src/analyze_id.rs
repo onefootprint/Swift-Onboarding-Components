@@ -1,7 +1,6 @@
-use std::collections::HashMap;
-
-use aws_sdk_textract::types::IdentityDocument;
+use aws_sdk_textract::types::IdentityDocument as SdkIdentityDocument;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
@@ -18,7 +17,10 @@ pub struct AnalyzeIdMetadata {
 
 impl AnalyzeIdMetadata {
     pub fn scores(&self) -> HashMap<String, f32> {
-        self.values.iter().map(|(k,v)| (k.clone(), v.value_confidence)).collect()
+        self.values
+            .iter()
+            .map(|(k, v)| (k.clone(), v.value_confidence))
+            .collect()
     }
 
     pub fn dob(&self) -> Option<&IdFieldValue> {
@@ -72,7 +74,6 @@ impl AnalyzeIdMetadata {
     pub fn expiration_date(&self) -> Option<&IdFieldValue> {
         self.values.get("EXPIRATION_DATE")
     }
-
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -81,25 +82,24 @@ pub struct IdFieldValue {
     pub value_confidence: f32,
 }
 
-impl From<&IdentityDocument> for AnalyzeIdMetadata {
-    fn from(value: &IdentityDocument) -> Self {
+impl From<&SdkIdentityDocument> for AnalyzeIdMetadata {
+    fn from(value: &SdkIdentityDocument) -> Self {
         let mut values = HashMap::new();
 
         // for field in value.identity_document_fields().unwrap_or_default() {}
-        for f in value.identity_document_fields().unwrap_or_default() {        
+        for f in value.identity_document_fields().unwrap_or_default() {
             let Some((kind, value)) = || -> Option<(String, IdFieldValue)> {
-                    Some((
-                        f.r#type()?.text()?.to_string(), 
-                        IdFieldValue {
-                            value: f.value_detection()?.text()?.to_string(),
-                            value_confidence: f.value_detection()?.confidence()?,
-                        }
-                    ))
-                    
-                }() else {
-                    continue
-                };
-                
+                Some((
+                    f.r#type()?.text()?.to_string(),
+                    IdFieldValue {
+                        value: f.value_detection()?.text()?.to_string(),
+                        value_confidence: f.value_detection()?.confidence()?,
+                    },
+                ))
+            }() else {
+                continue;
+            };
+
             values.insert(kind, value);
         }
 

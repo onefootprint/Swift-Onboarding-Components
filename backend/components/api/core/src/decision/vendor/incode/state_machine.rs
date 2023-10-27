@@ -24,6 +24,7 @@ use newtypes::{
     IncodeConfigurationId, IncodeEnvironment, IncodeFailureReason, IncodeVerificationSessionKind,
     IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, ScopedVaultId, TenantId, WorkflowId,
 };
+use selfie_doc::AwsSelfieDocClient;
 
 pub type IsReady = bool;
 
@@ -46,6 +47,7 @@ pub struct IncodeContext {
     pub disable_selfie: bool,
     /// When true, the machine is running specifically inside the private, manual incode re-run endpoint
     pub is_re_run: bool,
+    pub aws_selfie_client: AwsSelfieDocClient,
 }
 
 impl IncodeState {
@@ -272,6 +274,7 @@ impl IncodeStateMachine {
             failed_attempts_for_side: 0, // !! this is the one thing that is hard coded here that would differ from the existing code path that inits a IVS. We could have this method pass in DocumentSide and calculate this for real and then also call this init method from /upload and consolidate code paths
             disable_selfie,
             is_re_run: true,
+            aws_selfie_client: state.aws_selfie_doc_client.clone(),
         };
         let is_sandbox = id_doc.fixture_result.is_some();
         let should_collect_selfie = doc_req.should_collect_selfie && !id_doc.should_skip_selfie();

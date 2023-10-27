@@ -90,6 +90,8 @@ pub enum VendorAPI {
     IncodeProcessFace,
     StytchLookup,
     FootprintDeviceAttestation,
+    AwsRekognition,
+    AwsTextract,
 }
 impl_enum_str_diesel!(VendorAPI);
 
@@ -123,6 +125,8 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::IncodeProcessFace => Self::Incode,
             VendorAPI::StytchLookup => Self::Stytch,
             VendorAPI::FootprintDeviceAttestation => Self::Footprint,
+            VendorAPI::AwsRekognition => Self::Footprint,
+            VendorAPI::AwsTextract => Self::Footprint,
         }
     }
 }
@@ -162,6 +166,8 @@ impl VendorAPI {
             | VendorAPI::IncodeProcessFace
             | VendorAPI::SocureIdPlus
             | VendorAPI::StytchLookup
+            | VendorAPI::AwsRekognition
+            | VendorAPI::AwsTextract
             | VendorAPI::FootprintDeviceAttestation => false,
         }
     }
@@ -194,7 +200,9 @@ impl VendorAPI {
             | VendorAPI::SocureIdPlus
             | VendorAPI::ExperianPreciseId
             | VendorAPI::StytchLookup
-            | VendorAPI::FootprintDeviceAttestation => false,
+            | VendorAPI::FootprintDeviceAttestation
+            | VendorAPI::AwsRekognition
+            | VendorAPI::AwsTextract => false,
         }
     }
 }

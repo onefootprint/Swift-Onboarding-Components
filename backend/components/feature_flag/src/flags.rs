@@ -64,6 +64,8 @@ pub enum BoolFlag<'a> {
     UseIncodeDemoCredentialsInLivemode(&'a TenantId),
     #[strum(to_string = "IsKycWaterfallOnRuleFailureEnabled")]
     IsKycWaterfallOnRuleFailureEnabled(&'a TenantId),
+    #[strum(to_string = "RunAwsRekognition")]
+    RunAwsRekognition(&'a TenantId),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -103,6 +105,7 @@ impl<'a> BoolFlag<'a> {
             Self::DisableSelfieChecking(k) => Some(k.to_string()),
             Self::UseIncodeDemoCredentialsInLivemode(k) => Some(k.to_string()),
             Self::IsKycWaterfallOnRuleFailureEnabled(k) => Some(k.to_string()),
+            Self::RunAwsRekognition(k) => Some(k.to_string()),
         }
     }
 
@@ -138,6 +141,7 @@ impl<'a> BoolFlag<'a> {
             Self::DisableSelfieChecking(_) => false,
             Self::UseIncodeDemoCredentialsInLivemode(_) => false,
             Self::IsKycWaterfallOnRuleFailureEnabled(_) => false,
+            Self::RunAwsRekognition(_) => false,
         }
     }
 }

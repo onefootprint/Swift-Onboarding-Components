@@ -5,15 +5,26 @@ use super::{
 use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::{state::TransitionResult, IncodeContext};
+use crate::decision::vendor::verification_result::save_vreq_and_vres;
+use crate::enclave_client::EnclaveClient;
 use crate::errors::{ApiResult, AssertionError};
-use crate::utils::vault_wrapper::{Person, TenantVw, VaultWrapper};
+use crate::utils::vault_wrapper::{EnclaveDecryptOperation, Person, Pii, TenantVw, VaultWrapper};
 use crate::vendor_clients::IncodeClients;
+use crate::ApiErrorKind;
 use async_trait::async_trait;
+use db::models::decision_intent::DecisionIntent;
+use db::models::identity_document::IdentityDocument;
 use db::models::ob_configuration::ObConfiguration;
 use db::{DbPool, TxnPgConn};
+use feature_flag::BoolFlag;
 use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse};
 use idv::incode::doc::{IncodeFetchOCRRequest, IncodeFetchScoresRequest};
-use newtypes::{VendorAPI, VerificationResultId};
+use idv::{ParsedResponse, VendorResponse};
+use newtypes::{
+    DataIdentifier, DecisionIntentKind, DocumentKind, DocumentSide, IdDocKind, IdentityDocumentId,
+    PiiJsonValue, ScopedVaultId, VendorAPI, VerificationResultId, WorkflowId,
+};
+use selfie_doc::{compare::CompareFacesResponse, AwsSelfieDocClient};
 
 pub struct FetchScores {
     ocr_response: FetchOCRResponse,
@@ -21,6 +32,7 @@ pub struct FetchScores {
     vault_data: Option<IncodeOcrComparisonDataFields>,
     score_verification_result_id: VerificationResultId,
     ocr_verification_result_id: VerificationResultId,
+    document_kind: IdDocKind,
 }
 
 #[async_trait]
@@ -88,23 +100,8 @@ impl IncodeStateTransition for FetchScores {
             None
         };
 
-        Ok(Some(Self {
-            score_response,
-            ocr_response,
-            vault_data,
-            score_verification_result_id: score_vres.id,
-            ocr_verification_result_id: ocr_vres.id,
-        }))
-    }
-
-    fn transition(
-        self,
-        conn: &mut TxnPgConn,
-        ctx: &IncodeContext,
-        session: &VerificationSession,
-    ) -> ApiResult<TransitionResult> {
-        let type_of_id = self.ocr_response.type_of_id.as_ref();
-        let country_code = self.ocr_response.issuing_country.as_ref();
+        let type_of_id = ocr_response.type_of_id.as_ref();
+        let country_code = ocr_response.issuing_country.as_ref();
         let dk = match super::parse_type_of_id(ctx, type_of_id, country_code)? {
             Ok(dk) => dk,
             Err(_) => {
@@ -116,13 +113,44 @@ impl IncodeStateTransition for FetchScores {
             }
         };
 
+        // Run AWS if we have a selfie
+        // TODO: integrate doc extraction
+        if ctx.ff_client.flag(BoolFlag::RunAwsRekognition(&ctx.tenant_id)) && session.kind.requires_selfie() {
+            match run_aws_rekognition(db_pool, ctx).await {
+                Ok(selfie_res) => {
+                    tracing::info!(
+                        incode_result = score_response.selfie_match().1.map(|i| i.to_string()),
+                        aws_result = selfie_res.similarity,
+                        "incode aws selfie result"
+                    )
+                }
+                Err(e) => tracing::error!(error=%e.to_string(), "error running aws rekognition"),
+            }
+        }
+
+        Ok(Some(Self {
+            score_response,
+            ocr_response,
+            vault_data,
+            score_verification_result_id: score_vres.id,
+            ocr_verification_result_id: ocr_vres.id,
+            document_kind: dk,
+        }))
+    }
+
+    fn transition(
+        self,
+        conn: &mut TxnPgConn,
+        ctx: &IncodeContext,
+        session: &VerificationSession,
+    ) -> ApiResult<TransitionResult> {
         // TODO could represent enter inside the state transition
         Complete::enter(
             conn,
             &ctx.vault,
             &ctx.sv_id,
             &ctx.id_doc_id,
-            dk,
+            self.document_kind,
             session.ignored_failure_reasons.clone(),
             self.ocr_response,
             self.score_response,
@@ -137,4 +165,89 @@ impl IncodeStateTransition for FetchScores {
     fn next_state(_: &VerificationSession) -> IncodeState {
         Complete::new()
     }
+}
+
+#[tracing::instrument(skip_all)]
+pub async fn run_aws_rekognition(db_pool: &DbPool, ctx: &IncodeContext) -> ApiResult<CompareFacesResponse> {
+    let enclave_client = ctx.enclave_client.clone();
+    let pool = db_pool.clone();
+    let id_doc_id = ctx.id_doc_id.clone();
+    let sv_id = ctx.sv_id.clone();
+    let wf_id = ctx.wf_id.clone();
+    let aws_client = ctx.aws_selfie_client.clone();
+
+    // Run AWS selfie<>doc comparison in order to compare results
+    run_aws_inner(&pool, &enclave_client, aws_client, sv_id, wf_id, id_doc_id).await
+}
+
+async fn run_aws_inner(
+    db_pool: &DbPool,
+    enclave_client: &EnclaveClient,
+    client: AwsSelfieDocClient,
+    sv_id: ScopedVaultId,
+    wf_id: WorkflowId,
+    id_doc_id: IdentityDocumentId,
+) -> ApiResult<CompareFacesResponse> {
+    let sv_id2 = sv_id.clone();
+    let (id_doc, vw) = db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let (id_doc, _) = IdentityDocument::get(conn, &id_doc_id)?;
+            let vw = VaultWrapper::<crate::utils::vault_wrapper::Any>::build_for_tenant(conn, &sv_id2)?;
+
+            Ok((id_doc, vw))
+        })
+        .await??;
+
+    // At this point, until we reach `Complete`, we have not vaulted the images under the DocumentKind::Image DIs
+    let doc_id_op: EnclaveDecryptOperation = DataIdentifier::Document(DocumentKind::LatestUpload(
+        id_doc.document_type,
+        DocumentSide::Front,
+    ))
+    .into();
+
+    // make this conditional
+    let selfie_id_op: EnclaveDecryptOperation = DataIdentifier::Document(DocumentKind::LatestUpload(
+        id_doc.document_type,
+        DocumentSide::Selfie,
+    ))
+    .into();
+
+    let results = vw
+        .fn_decrypt_unchecked_raw(enclave_client, vec![doc_id_op.clone(), selfie_id_op.clone()])
+        .await?;
+
+    let doc_pii_bytes = match results.get(&doc_id_op).ok_or(ApiErrorKind::ResourceNotFound)? {
+        Pii::Bytes(bytes) => bytes,
+        _ => return Err(ApiErrorKind::AssertionError("unexpected pii type".into()))?,
+    };
+    let selfie_pii_bytes = match results.get(&selfie_id_op).ok_or(ApiErrorKind::ResourceNotFound)? {
+        Pii::Bytes(bytes) => bytes,
+        _ => return Err(ApiErrorKind::AssertionError("unexpected pii type".into()))?,
+    };
+
+    let comparison_result = client
+        .doc_to_selfie(doc_pii_bytes, selfie_pii_bytes, None)
+        .await?;
+    let comparison_result2 = comparison_result.clone();
+
+    db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let di = DecisionIntent::create(conn, DecisionIntentKind::DocScan, &sv_id, Some(&wf_id))?;
+            let pii_json_compare = PiiJsonValue::new(serde_json::to_value(&comparison_result)?);
+            let _ = save_vreq_and_vres(
+                conn,
+                &vw.vault.public_key.clone(),
+                &sv_id,
+                &di.id,
+                Ok(VendorResponse {
+                    raw_response: pii_json_compare.clone(),
+                    response: ParsedResponse::AwsRekognition(pii_json_compare),
+                }),
+            )?;
+
+            Ok(())
+        })
+        .await??;
+
+    Ok(comparison_result2)
 }

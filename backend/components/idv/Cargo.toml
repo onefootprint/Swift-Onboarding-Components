@@ -9,6 +9,7 @@ doctest = false
 
 [dependencies]
 newtypes = { path = "../newtypes" }
+selfie_doc = { path = "../selfie_doc" }
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

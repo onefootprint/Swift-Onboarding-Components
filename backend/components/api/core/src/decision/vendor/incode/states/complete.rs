@@ -15,7 +15,6 @@ use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::utils::vault_wrapper::WriteableVw;
 use crate::vendor_clients::IncodeClients;
-
 use async_trait::async_trait;
 use db::models::data_lifetime::DataLifetime;
 use db::models::identity_document::IdentityDocument;

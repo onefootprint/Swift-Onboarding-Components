@@ -59,6 +59,7 @@ pub async fn handle_incode_request(
         failed_attempts_for_side: failed_attempts_for_side.unwrap_or(0),
         disable_selfie,
         is_re_run,
+        aws_selfie_client: state.aws_selfie_doc_client.clone(),
     };
     let machine = IncodeStateMachine::init(
         state,

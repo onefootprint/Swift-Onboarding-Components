@@ -127,6 +127,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
         failed_attempts_for_side: 0,
         disable_selfie: false,
         is_re_run: false,
+        aws_selfie_client: state.aws_selfie_doc_client.clone(),
     };
     let config_id = get_config_id(state, is_selfie, false, &tenant.id);
     let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx, false)
@@ -372,6 +373,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
         failed_attempts_for_side: 0,
         disable_selfie: false,
         is_re_run: false,
+        aws_selfie_client: state.aws_selfie_doc_client.clone(),
     };
     let config_id = get_config_id(state, is_selfie, false, &tenant.id);
     let machine = IncodeStateMachine::init(state, tenant.id.clone(), config_id.clone(), ctx, false)

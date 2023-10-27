@@ -37,6 +37,8 @@ pub enum WrappedVendorAPI {
     IncodeProcessFace,
     StytchLookup,
     FootprintDeviceAttestation,
+    AwsRekognition,
+    AwsTextract,
 }
 impl From<VendorAPI> for WrappedVendorAPI {
     fn from(value: VendorAPI) -> Self {
@@ -68,6 +70,8 @@ impl From<VendorAPI> for WrappedVendorAPI {
             VendorAPI::IncodeProcessFace => Self::IncodeProcessFace,
             VendorAPI::StytchLookup => Self::StytchLookup,
             VendorAPI::FootprintDeviceAttestation => Self::FootprintDeviceAttestation,
+            VendorAPI::AwsRekognition => Self::AwsRekognition,
+            VendorAPI::AwsTextract => Self::AwsTextract,
         }
     }
 }
@@ -102,6 +106,8 @@ impl From<WrappedVendorAPI> for VendorAPI {
             WrappedVendorAPI::IncodeProcessFace => VendorAPI::IncodeProcessFace,
             WrappedVendorAPI::StytchLookup => VendorAPI::StytchLookup,
             WrappedVendorAPI::FootprintDeviceAttestation => VendorAPI::FootprintDeviceAttestation,
+            WrappedVendorAPI::AwsRekognition => VendorAPI::AwsRekognition,
+            WrappedVendorAPI::AwsTextract => VendorAPI::AwsTextract,
         }
     }
 }

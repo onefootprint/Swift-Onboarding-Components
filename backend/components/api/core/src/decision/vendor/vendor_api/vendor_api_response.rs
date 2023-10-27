@@ -118,6 +118,8 @@ pub fn scrub_raw_error_vendor_response(
         VendorAPI::IncodeProcessFace => scrub_response::<IncodeProcessFace>(raw_response),
         VendorAPI::StytchLookup => scrub_response::<StytchLookup>(raw_response),
         VendorAPI::FootprintDeviceAttestation => scrub_response::<FootprintDeviceAttestation>(raw_response),
+        VendorAPI::AwsRekognition => scrub_response::<AwsRekognition>(raw_response),
+        VendorAPI::AwsTextract => scrub_response::<AwsTextract>(raw_response),
     }
 }
 
@@ -180,6 +182,8 @@ fn build_parsed_vendor_response_map_entry(
         VendorAPI::FootprintDeviceAttestation => {
             insert_map_entry(map, FootprintDeviceAttestation, raw_response)?
         }
+        VendorAPI::AwsRekognition => insert_map_entry(map, AwsRekognition, raw_response)?,
+        VendorAPI::AwsTextract => insert_map_entry(map, AwsTextract, raw_response)?,
     };
 
     Ok(())
@@ -222,6 +226,8 @@ fn build_verification_identifier_map_entry(
         VendorAPI::IncodeProcessFace => map.insert(IncodeProcessFace, request_and_result),
         VendorAPI::StytchLookup => map.insert(StytchLookup, request_and_result),
         VendorAPI::FootprintDeviceAttestation => map.insert(FootprintDeviceAttestation, request_and_result),
+        VendorAPI::AwsRekognition => map.insert(AwsRekognition, request_and_result),
+        VendorAPI::AwsTextract => map.insert(AwsTextract, request_and_result),
     };
 }
 
@@ -382,6 +388,12 @@ impl TypedMapKey<VendorAPIResponseMarker> for StytchLookup {
 impl TypedMapKey<VendorAPIResponseMarker> for FootprintDeviceAttestation {
     type Value = serde_json::Value;
 }
+impl TypedMapKey<VendorAPIResponseMarker> for AwsRekognition {
+    type Value = serde_json::Value;
+}
+impl TypedMapKey<VendorAPIResponseMarker> for AwsTextract {
+    type Value = serde_json::Value;
+}
 
 /// Verification Request and Result map, used in conjunction with the above map for reason codes
 impl TypedMapKey<VendorAPIResponseIdsMarker> for IdologyExpectID {
@@ -463,6 +475,12 @@ impl TypedMapKey<VendorAPIResponseIdsMarker> for StytchLookup {
     type Value = VerificationRequestAndResult;
 }
 impl TypedMapKey<VendorAPIResponseIdsMarker> for FootprintDeviceAttestation {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for AwsRekognition {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for AwsTextract {
     type Value = VerificationRequestAndResult;
 }
 

@@ -70,6 +70,8 @@ pub enum ParsedResponse {
     IncodeProcessFace(ProcessFaceResponse),
     StytchLookup(stytch::response::LookupResponse),
     FootprintDeviceAttestation(footprint::FootprintDeviceAttestationData),
+    AwsTextract(PiiJsonValue),
+    AwsRekognition(PiiJsonValue),
 }
 
 impl ParsedResponse {
@@ -299,6 +301,8 @@ impl From<&ParsedResponse> for VendorAPI {
             ParsedResponse::IncodeProcessFace(_) => VendorAPI::IncodeProcessFace,
             ParsedResponse::StytchLookup(_) => VendorAPI::StytchLookup,
             ParsedResponse::FootprintDeviceAttestation(_) => VendorAPI::FootprintDeviceAttestation,
+            ParsedResponse::AwsTextract(_) => VendorAPI::AwsTextract,
+            ParsedResponse::AwsRekognition(_) => VendorAPI::AwsRekognition,
         }
     }
 }

@@ -13,7 +13,7 @@ use aws_sdk_textract::{
     Client as TexClient,
 };
 use aws_types::SdkConfig;
-use compare::{CompareResult, FaceCompareDetails};
+use compare::{CompareFacesResponse, CompareResult, FaceCompareDetails};
 use newtypes::{PiiBytes, PiiString};
 
 use crate::face::FaceResult;
@@ -173,6 +173,34 @@ impl AwsSelfieDocClient {
         Ok(AnalyzeIdResult::FoundIdentityDocumentMetadata(res.into()))
     }
 }
+impl AwsSelfieDocClient {
+    #[tracing::instrument(skip_all)]
+    /// finds a face in the image
+    pub async fn doc_to_selfie(
+        &self,
+        doc_bytes: &PiiBytes,
+        selfie_bytes: &PiiBytes,
+        similarity_threshold: Option<f32>,
+    ) -> SResult<CompareFacesResponse> {
+        let res = self
+            .rek_client
+            .compare_faces()
+            .set_similarity_threshold(similarity_threshold)
+            // .set_quality_filter(Some(aws_sdk_rekognition::types::QualityFilter::Auto))
+            .set_source_image(Some(
+                Image::builder().bytes(Blob::new(doc_bytes.leak_slice())).build(),
+            ))
+            .set_target_image(Some(
+                Image::builder()
+                    .bytes(Blob::new(selfie_bytes.leak_slice()))
+                    .build(),
+            ))
+            .send()
+            .await?;
+
+        Ok(CompareFacesResponse::from(res))
+    }
+}
 
 fn max_f32(f1: Option<f32>, f2: Option<f32>) -> std::cmp::Ordering {
     match (f1, f2) {
@@ -194,6 +222,8 @@ fn max_f32(f1: Option<f32>, f2: Option<f32>) -> std::cmp::Ordering {
 #[cfg(test)]
 mod tests {
 
+    use crate::face::BoundingBox;
+
     use super::*;
 
     async fn run_test(doc: PiiBytes, selfie: PiiBytes) {
@@ -205,7 +235,7 @@ mod tests {
         println!("Detect Face: {}", serde_json::to_string_pretty(&res).unwrap());
 
         let res = client
-            .compare_doc_to_selfie(&doc, &selfie, None)
+            .doc_to_selfie(&doc, &selfie, None)
             .await
             .expect("failed to compare");
 
@@ -257,5 +287,67 @@ mod tests {
         let res = client.extract_document_data(&doc).await.expect("failed to run");
 
         println!("Analyze ID: {}", serde_json::to_string_pretty(&res).unwrap());
+    }
+
+    // DO NOT REMOVE THIS TEST, OR IGNORE IT.
+    #[test]
+    fn test_compare_faces_struct_serialization_do_not_remove_this_test() {
+        // deserialize from raw Value
+        let compare_face_schema_v1_deserialized: CompareFacesResponse =
+            serde_json::from_value(compare_face_schema()).unwrap();
+        // construct struct
+        let compare_face_struct_v1 = CompareFacesResponse {
+            source_bounding_box: Some(BoundingBox {
+                width: Some(0.16606712),
+                height: Some(0.3187712),
+                left: Some(0.17314644),
+                top: Some(0.40029877),
+            }),
+            source_face_confidence: Some(99.999725),
+            similarity: Some(99.97052),
+            target_bounding_box: Some(BoundingBox {
+                width: Some(0.4916357),
+                height: Some(0.41334277),
+                left: Some(0.37403238),
+                top: Some(0.15058655),
+            }),
+            target_face_confidence: Some(99.999954),
+            target_brightness: Some(86.964264),
+            target_sharpness: Some(95.51619),
+        };
+        // serialized raw json == manually constructed Struct
+        assert_eq!(compare_face_schema_v1_deserialized, compare_face_struct_v1);
+
+        // serialize the struct
+        let compare_face_struct_v1_serialized = serde_json::to_value(compare_face_struct_v1.clone()).unwrap();
+        // deser the serialize struct
+        let compare_face_struct_v1_serialized_then_deserialized: CompareFacesResponse =
+            serde_json::from_value(compare_face_struct_v1_serialized).unwrap();
+        assert_eq!(
+            compare_face_struct_v1_serialized_then_deserialized,
+            compare_face_struct_v1
+        )
+    }
+
+    fn compare_face_schema() -> serde_json::Value {
+        serde_json::json!({
+          "source_bounding_box": {
+            "width": 0.16606712,
+            "height": 0.3187712,
+            "left": 0.17314644,
+            "top": 0.40029877
+          },
+          "source_face_confidence": 99.999725,
+          "similarity": 99.97052,
+          "target_bounding_box": {
+            "width": 0.4916357,
+            "height": 0.41334277,
+            "left": 0.37403238,
+            "top": 0.15058655
+          },
+          "target_face_confidence": 99.999954,
+          "target_brightness": 86.964264,
+          "target_sharpness": 95.51619
+        })
     }
 }

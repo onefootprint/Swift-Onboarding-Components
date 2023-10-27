@@ -26,7 +26,7 @@ pub struct FaceDetails {
     pub gender: Option<Gender>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct BoundingBox {
     pub width: Option<f32>,
     pub height: Option<f32>,

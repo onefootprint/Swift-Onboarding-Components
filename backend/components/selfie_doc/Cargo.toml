@@ -14,6 +14,7 @@ async-trait = { workspace = true }
 thiserror = { workspace= true }
 newtypes = { path = "../newtypes"}
 serde = { workspace = true, features = ["derive"] }
+serde_json = {workspace = true}
 tracing = { workspace = true }
 
 [dev-dependencies]
