@@ -7,18 +7,32 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import React from 'react';
+import type { ContentSchema } from 'src/pages/api-reference/api-reference.types';
 
 type HeaderProps = {
   title: string;
-  type: string;
+  schema: ContentSchema;
   isRequired?: boolean;
   isInBrackets?: boolean;
 };
 
-const Header = ({ title, type, isRequired, isInBrackets }: HeaderProps) => {
+// One day we could have better logic  here
+const plural = (v: string) => `${v}s`;
+
+const Header = ({ title, schema, isRequired, isInBrackets }: HeaderProps) => {
   const { t } = useTranslation('pages.api-reference');
 
-  const typeLabel = !isRequired ? `${t('optional')} ${type}` : type;
+  const typeLabelParts = [];
+  if (!isRequired) {
+    typeLabelParts.push(t('optional'));
+  }
+  if (schema.items !== undefined) {
+    typeLabelParts.push(t('array'));
+    typeLabelParts.push(plural(schema.items?.type));
+  } else {
+    typeLabelParts.push(schema.type);
+  }
+  const typeLabel = typeLabelParts.join(' ');
 
   return (
     <StyledStack align="center" justify="flex-start" gap={3}>

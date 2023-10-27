@@ -223,7 +223,8 @@
       "required": "Required",
       "show-all": "Show all",
       "show-less": "Show less",
-      "optional": "optional"
+      "optional": "optional",
+      "array": "array of"
     },
     "404": {
       "title": "Oops! Page couldn't be found.",

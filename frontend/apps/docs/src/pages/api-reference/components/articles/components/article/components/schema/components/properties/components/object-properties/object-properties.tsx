@@ -19,13 +19,18 @@ export type PropertyProps = {
   level?: number;
   schema: ContentSchema;
   title: string;
+  isArray?: boolean;
 };
+
+// One day we could have better logic  here
+const plural = (v: string) => `${v}s`;
 
 const ObjectProperties = ({
   isRequired,
   title,
   schema,
   level = 0,
+  isArray = false,
 }: PropertyProps) => {
   const { t } = useTranslation('pages.api-reference');
   const [expanded, setExpanded] = useState(false);
@@ -34,11 +39,31 @@ const ObjectProperties = ({
     setExpanded(currentExpanded => !currentExpanded);
   };
 
-  const typeLabel = !isRequired
-    ? `${t('optional')} ${schema.type}`
-    : schema.type;
+  const typeLabelParts = [];
+  if (!isRequired) {
+    typeLabelParts.push(t('optional'));
+  }
+  if (isArray) {
+    typeLabelParts.push(t('array'));
+    typeLabelParts.push(plural(schema.type));
+  } else {
+    typeLabelParts.push(schema.type);
+  }
+  const typeLabel = typeLabelParts.join(' ');
 
   const hasDescription = schema.description || schema.enum;
+
+  if (schema.items) {
+    return (
+      <ObjectProperties
+        schema={schema.items}
+        title={title}
+        isRequired={isRequired}
+        level={level}
+        isArray
+      />
+    );
+  }
 
   return (
     <Box>

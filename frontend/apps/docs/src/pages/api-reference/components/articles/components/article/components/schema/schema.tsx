@@ -48,7 +48,7 @@ const Schema = ({ schema, isInBrackets = false }: SchemaProps) => {
             <Grid>
               <Header
                 title={title}
-                type={property.type}
+                schema={property}
                 isRequired={required.length > 0 && required.includes(title)}
                 isInBrackets={isInBrackets}
               />
