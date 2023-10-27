@@ -122,7 +122,6 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
                 onChange={nextValue => {
                   field.onChange(nextValue);
                   resetSsnDocStepUp();
-                  resetDocs();
                 }}
                 checked={field.value}
                 label={t('ssn.toggle')}
@@ -154,7 +153,6 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
                 {...register('personal.ssnOptional', {
                   onChange: () => {
                     resetSsnDocStepUp();
-                    resetDocs();
                   },
                 })}
               />

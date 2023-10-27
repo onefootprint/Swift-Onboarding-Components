@@ -253,35 +253,6 @@ describe('<Editing />', () => {
           expect(dl).not.toBeChecked();
         });
       });
-
-      describe('when selecting DL, then un-selecting "Allow users without an SSN to proceed with the verification" and selecting it again', () => {
-        it('should unselect any id doc that was previously selected', async () => {
-          renderEditing({});
-
-          const ssnOptional = screen.getByLabelText(
-            'Allow users without an SSN to proceed with the verification',
-          );
-          await userEvent.click(ssnOptional);
-
-          const stepUp = screen.getByLabelText('Do document scan step-up');
-          await userEvent.click(stepUp);
-
-          const dl = screen.getByRole('checkbox', {
-            name: "Driver's license",
-          });
-          await userEvent.click(dl);
-          expect(dl).toBeChecked();
-
-          // un-select
-          await userEvent.click(ssnOptional);
-
-          // select again
-          await userEvent.click(ssnOptional);
-          await userEvent.click(stepUp);
-
-          expect(dl).not.toBeChecked();
-        });
-      });
     });
   });
 
