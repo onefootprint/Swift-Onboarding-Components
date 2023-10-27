@@ -98,7 +98,7 @@ pub async fn post(
                 return Err(AssertionError("Workflow has different user").into());
             }
             let data = AuthSessionData::ValidateUserToken(ValidateUserToken {
-                sv_id: Some(sv_id),
+                sv_id,
                 auth_event_ids,
                 wf_id: wf.map(|wf| wf.id),
             });

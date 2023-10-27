@@ -92,9 +92,7 @@ impl UserSession {
 pub struct ValidateUserToken {
     pub wf_id: Option<WorkflowId>,
     pub auth_event_ids: Vec<AuthEventId>,
-    // TODO make this required
-    #[serde(default)]
-    pub sv_id: Option<ScopedVaultId>,
+    pub sv_id: ScopedVaultId,
 }
 
 /// Longer-lived session that is sent out in emails to verify ownership

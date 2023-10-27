@@ -37,22 +37,15 @@ pub async fn post(
         .ok_or(OnboardingError::ValidateTokenInvalidOrNotFound)?
         .data;
 
-    let AuthSessionData::ValidateUserToken(ValidateUserToken { sv_id: _, wf_id, auth_event_ids }) = session else {
+    let AuthSessionData::ValidateUserToken(ValidateUserToken { sv_id, wf_id, auth_event_ids }) = session else {
         return Err(OnboardingError::ValidateTokenInvalidOrNotFound.into());
     };
 
     let (sv, auth_events, wf, biz_wf) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let auth_events = AuthEvent::get_bulk(conn, &auth_event_ids)?;
-            let sv_id = auth_events
-                .iter()
-                .filter_map(|ae| ae.scoped_vault_id.clone())
-                .next()
-                .ok_or(OnboardingError::Validation(
-                    "No scoped vault in auth event".into(),
-                ))?;
             let sv = ScopedVault::get(conn, &sv_id)?;
+            let auth_events = AuthEvent::get_bulk(conn, &auth_event_ids)?;
             let (wf, biz_wf) = if let Some(wf_id) = wf_id {
                 let (wf, _) = Workflow::get_all(conn, &wf_id)?;
                 let user_mr = ManualReview::get_active(conn, &wf_id)?;
