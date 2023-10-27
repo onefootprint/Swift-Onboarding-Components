@@ -130,6 +130,11 @@ const Header = styled.header<{
       css`
         background: ${theme.backgroundColor.transparent};
       `}
+
+      ${theme.components.bifrost.container.bg &&
+      css`
+        background: ${theme.components.bifrost.container.bg};
+      `}
     }
   `}
 
@@ -149,6 +154,11 @@ const Header = styled.header<{
       &:empty {
         border: none;
       }
+
+      ${theme.components.bifrost.container.bg &&
+      css`
+        border-bottom: 1px solid ${theme.components.bifrost.container.border};
+      `}
     `}
 `;
 
