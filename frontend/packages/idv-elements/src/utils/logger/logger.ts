@@ -188,7 +188,7 @@ const warn = (message: string, location?: string) => {
 };
 
 const error = (message: string, location?: string) => {
-  console.error(error);
+  console.error(message);
 
   if (IS_LOGGING_ENABLED) {
     LogRocket.error(message, location);
