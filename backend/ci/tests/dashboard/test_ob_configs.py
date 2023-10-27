@@ -483,3 +483,28 @@ def test_config_update(sandbox_tenant, ob_configuration):
 
     # Verify we can't use the disabled ob config for anything anymore
     get("org/onboarding_config", None, ob_configuration.key, status_code=401)
+
+
+def test_no_phone_obc(sandbox_tenant):
+    collect_data = [
+        "business_name",
+        "business_tin",
+        "business_address",
+        "business_phone_number",
+        "business_website",
+        "business_beneficial_owners",
+    ]
+    data = dict(
+        name="Let's skip the phone",
+        must_collect_data=collect_data,
+        can_access_data=collect_data,
+    )
+    res = post(
+        "org/onboarding_configs",
+        data,
+        *sandbox_tenant.db_auths,
+        status_code=200,
+    )
+
+    assert res["must_collect_data"] == collect_data
+    assert res["can_access_data"] == collect_data

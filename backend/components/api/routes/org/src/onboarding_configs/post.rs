@@ -224,14 +224,17 @@ impl CreateOnboardingConfigurationRequest {
         Ok(())
     }
 
-    fn validate(&self) -> ApiResult<()> {
+    fn validate(&self, kind: ObConfigurationKind) -> ApiResult<()> {
         self.validate_inner()?;
 
-        let required_fields = match self.kind {
-            Some(ObConfigurationKind::Auth) => {
+        let required_fields = match kind {
+            ObConfigurationKind::Auth => {
                 vec![CDO::Email, CDO::PhoneNumber]
             }
-            _ => {
+            ObConfigurationKind::Kyb => {
+                vec![CDO::BusinessName, CDO::BusinessAddress]
+            }
+            ObConfigurationKind::Kyc => {
                 if self.is_no_phone_flow.unwrap_or(false) {
                     vec![CDO::Name, CDO::FullAddress, CDO::Email]
                 } else {
@@ -388,7 +391,7 @@ pub async fn post(
     request: Json<CreateOnboardingConfigurationRequest>,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::OnboardingConfiguration>>, ApiError> {
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?;
-    request.validate()?;
+
     let tenant = auth.tenant().clone();
     request.validate_flags(&state, &tenant.id)?;
     let CreateOnboardingConfigurationRequest {
@@ -407,7 +410,7 @@ pub async fn post(
         allow_us_residents,
         allow_us_territory_residents,
         kind,
-    } = request.into_inner();
+    } = request.clone();
     let is_live = auth.is_live()?;
     let tenant_id = tenant.id.clone();
     let is_kyc = must_collect_data
@@ -429,6 +432,8 @@ pub async fn post(
     } else {
         ObConfigurationKind::Kyb
     });
+
+    request.validate(kind)?;
 
     // Hard coded for now until we expose in playbooks. TODO: could maybe have "tenant defaults" expressed in our code where we could map tenants to default invariants for them
     // like Coba should always have skip_kyc=true. Probably better than doing this purely via PG or via feature flags
@@ -600,7 +605,7 @@ mod test {
             allow_us_territory_residents: Some(false),
             kind: Some(ObConfigurationKind::Kyc),
         };
-        req.validate().is_ok()
+        req.validate(ObConfigurationKind::Kyc).is_ok()
     }
 
     #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber, CDO::Document(DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None))], vec![], false => true)]
@@ -628,7 +633,7 @@ mod test {
             allow_us_territory_residents: Some(false),
             kind: Some(ObConfigurationKind::Kyc),
         };
-        req.validate().is_ok()
+        req.validate(ObConfigurationKind::Kyc).is_ok()
     }
 
     #[test_case(vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber], true => true)]
@@ -652,7 +657,7 @@ mod test {
             allow_us_territory_residents: Some(false),
             kind: Some(ObConfigurationKind::Kyc),
         };
-        req.validate().is_ok()
+        req.validate(ObConfigurationKind::Kyc).is_ok()
     }
 
     #[test_case(CipKind::Alpaca, vec![CDO::Name, CDO::Dob] => false)]

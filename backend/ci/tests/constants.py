@@ -85,6 +85,7 @@ BUSINESS_DATA = {
     "business.website": "https://foobar.com",
     "business.phone_number": FIXTURE_PHONE_NUMBER,
     "business.address_line1": "1 Hayes St",
+    "business.address_line2": "#30",
     "business.city": "SF",
     "business.state": "CA",
     "business.zip": "94117",

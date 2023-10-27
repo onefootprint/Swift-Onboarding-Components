@@ -1,6 +1,6 @@
 import pytest
 from tests.utils import create_ob_config, post, get
-from tests.constants import BUSINESS_DATA
+from tests.constants import BUSINESS_DATA, CDO_TO_DIS
 
 
 @pytest.mark.parametrize(
@@ -11,11 +11,21 @@ from tests.constants import BUSINESS_DATA
         ("fail"),
     ],
 )
-def test_no_bos(sandbox_tenant, kyb_sandbox_ob_config, sandbox_outcome):
+def test_no_bos(sandbox_tenant, sandbox_outcome):
+    must_collect_data = [
+        "business_name",
+        "business_tin",
+        "business_address",
+    ]
+    obc = create_ob_config(
+        sandbox_tenant, "Business-only config", must_collect_data, must_collect_data
+    )
+
     # make API-created Business vault with no BO data present
-    vault_data = BUSINESS_DATA.copy()
-    vault_data.pop("business.kyced_beneficial_owners")
-    vault_data.pop("business.beneficial_owners")
+    vault_data = {}
+    for cdo in must_collect_data:
+        for di in CDO_TO_DIS[cdo]:
+            vault_data[di] = BUSINESS_DATA[di]
 
     vault = post("businesses/", vault_data, sandbox_tenant.sk.key)
     fp_id = vault["id"]
@@ -24,7 +34,7 @@ def test_no_bos(sandbox_tenant, kyb_sandbox_ob_config, sandbox_outcome):
     kyb = post(
         f"businesses/{fp_id}/kyb",
         dict(
-            onboarding_config_key=kyb_sandbox_ob_config.key.value,
+            onboarding_config_key=obc.key.value,
             fixture_result=sandbox_outcome,
         ),
         sandbox_tenant.sk.key,
