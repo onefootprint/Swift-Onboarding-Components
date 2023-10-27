@@ -1,6 +1,5 @@
 use crate::util::impl_enum_str_diesel;
 use crate::CollectedDataOption as CDO;
-use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
@@ -8,7 +7,7 @@ use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 use serde_json;
 use strum::IntoEnumIterator;
-use strum_macros::{AsRefStr, EnumIter, EnumString};
+use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 
 #[derive(
     Eq,
@@ -66,13 +65,13 @@ impl_enum_str_diesel!(ObConfigurationKind);
     Eq,
     PartialEq,
     Debug,
-    Display,
     Clone,
     Copy,
     AsExpression,
     FromSqlRow,
     EnumString,
     AsRefStr,
+    Display,
     serde_with::DeserializeFromStr,
     Apiv2Schema,
     macros::SerdeAttr,
@@ -131,7 +130,6 @@ impl EnhancedAmlOption {
     Eq,
     PartialEq,
     Debug,
-    Display,
     Clone,
     Copy,
     AsExpression,

@@ -46,6 +46,7 @@ def test_config_list(sandbox_tenant, ob_configuration, inactive_ob_configuration
     assert config["must_collect_data"] == ob_configuration.must_collect_data
     assert config["can_access_data"] == ob_configuration.can_access_data
     assert config["status"] == ob_configuration.status
+    assert config["kind"] == "kyc"
     assert config["created_at"]
 
     config = next(
