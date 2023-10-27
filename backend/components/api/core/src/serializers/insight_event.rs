@@ -47,6 +47,8 @@ impl DbToApi<InsightEvent> for api_wire_types::PublicInsightEvent {
             region,
             postal_code,
             user_agent,
+            latitude,
+            longitude,
             ..
         } = e;
 
@@ -58,6 +60,8 @@ impl DbToApi<InsightEvent> for api_wire_types::PublicInsightEvent {
             region,
             postal_code,
             user_agent,
+            latitude,
+            longitude,
         }
     }
 }

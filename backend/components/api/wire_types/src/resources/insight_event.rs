@@ -36,4 +36,8 @@ pub struct PublicInsightEvent {
         example = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15"
     )]
     pub user_agent: Option<String>,
+    #[openapi(example = "37.7703")]
+    pub latitude: Option<f64>,
+    #[openapi(example = "-122.4407")]
+    pub longitude: Option<f64>,
 }
