@@ -162,7 +162,6 @@ class BifrostClient:
         """
         self.handled_requirements = []
         body = self.get_status()
-        print(body)
         self.already_met_requirements = [
             r for r in body["all_requirements"] if r["is_met"]
         ]

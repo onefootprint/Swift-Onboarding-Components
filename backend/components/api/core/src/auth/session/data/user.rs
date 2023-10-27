@@ -91,8 +91,6 @@ impl UserSession {
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct ValidateUserToken {
     pub wf_id: Option<WorkflowId>,
-    // TODO make non-null
-    #[serde(default)]
     pub auth_event_ids: Vec<AuthEventId>,
 }
 

@@ -29,7 +29,7 @@ pub async fn post(
     user_auth: UserAuthContext,
     user_wf_auth: Option<UserWfAuthContext>,
 ) -> JsonApiResponse<HostedValidateResponse> {
-    let (wf_id, user_auth) = if let Some(user_wf_auth) = user_wf_auth {
+    let (wf, user_auth) = if let Some(user_wf_auth) = user_wf_auth {
         // Token from onboarding
         let user_wf_auth = user_wf_auth.check_guard(UserAuthGuard::SignUp)?;
 
@@ -45,8 +45,8 @@ pub async fn post(
             return Err(OnboardingError::UnmetRequirements(unmet_reqs.into()).into());
         }
 
-        let wf_id = user_wf_auth.workflow().id.clone();
-        (Some(wf_id), user_wf_auth.data.user_session)
+        let wf = user_wf_auth.workflow().clone();
+        (Some(wf), user_wf_auth.data.user_session)
     } else {
         // Token from auth
         let user_auth = user_auth.check_guard(UserAuthGuard::Auth)?;
@@ -69,7 +69,7 @@ pub async fn post(
                 user_auth.auth_event_ids
             } else {
                 // This should never happen, but will add logging for now and rm this branch later
-                // TODO rm this logic and always use from token
+                // TODO rm this logic and always use from token. assert there's always an auth event
                 tracing::error!("No auth event ID associated with auth token");
                 let sv_id = user_auth.scoped_user_id().ok_or(OnboardingError::Validation(
                     "No scoped user associated with auth session".into(),
@@ -80,9 +80,27 @@ pub async fn post(
                 }
                 events.first().into_iter().map(|e| e.event.id.clone()).collect()
             };
-            // TODO Assert auth event matches wf?
+            // Validate as much as possible in this API instead of in the tenant-facing API.
+            // If this fails, the user may be able to retry and get a new validation token.
+            // But once the tenant has the validation token, they cannot do anything if it fails
+            let auth_events = AuthEvent::get_bulk(conn, &auth_event_ids)?;
+            if !auth_events.iter().any(|ae| ae.scoped_vault_id.is_some()) {
+                return Err(OnboardingError::Validation("Auth event must have scoped vault".into()).into());
+            }
+            if let Some(wf) = wf.as_ref() {
+                if auth_events
+                    .iter()
+                    .filter_map(|ae| ae.scoped_vault_id.as_ref())
+                    .any(|sv_id| sv_id != &wf.scoped_vault_id)
+                {
+                    return Err(OnboardingError::Validation(
+                        "Auth event has different user than workflow".into(),
+                    )
+                    .into());
+                }
+            }
             let data = AuthSessionData::ValidateUserToken(ValidateUserToken {
-                wf_id,
+                wf_id: wf.map(|wf| wf.id),
                 auth_event_ids,
             });
             let (validation_token, _) =

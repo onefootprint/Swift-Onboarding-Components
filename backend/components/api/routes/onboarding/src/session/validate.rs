@@ -44,19 +44,17 @@ pub async fn post(
     let (sv, auth_events, wf, biz_wf) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            // TODO clean up this logic a ton after we don't have to support backwards compatibility
-            let (ae_sv, auth_events) = if !auth_event_ids.is_empty() {
-                let aes = AuthEvent::get_bulk(conn, &auth_event_ids)?;
-                let sv_id = aes.first().and_then(|ae| ae.scoped_vault_id.clone()).ok_or(
-                    OnboardingError::Validation("No scoped vault in auth event".into()),
-                )?;
-                let sv = ScopedVault::get(conn, &sv_id)?;
-                (Some(sv), aes)
-            } else {
-                (None, vec![])
-            };
-            let (wf_sv, wf, biz_wf) = if let Some(wf_id) = wf_id {
-                let (wf, sv) = Workflow::get_all(conn, &wf_id)?;
+            let auth_events = AuthEvent::get_bulk(conn, &auth_event_ids)?;
+            let sv_id = auth_events
+                .iter()
+                .filter_map(|ae| ae.scoped_vault_id.clone())
+                .next()
+                .ok_or(OnboardingError::Validation(
+                    "No scoped vault in auth event".into(),
+                ))?;
+            let sv = ScopedVault::get(conn, &sv_id)?;
+            let (wf, biz_wf) = if let Some(wf_id) = wf_id {
+                let (wf, _) = Workflow::get_all(conn, &wf_id)?;
                 let user_mr = ManualReview::get_active(conn, &wf_id)?;
                 let obc_id = wf
                     .ob_configuration_id
@@ -74,13 +72,10 @@ pub async fn post(
                 } else {
                     None
                 };
-                (Some(sv), Some((wf, user_mr)), biz_wf)
+                (Some((wf, user_mr)), biz_wf)
             } else {
-                (None, None, None)
+                (None, None)
             };
-            let sv = ae_sv.or(wf_sv).ok_or(OnboardingError::Validation(
-                "No scoped vault in auth event or workflow".into(),
-            ))?;
             Ok((sv, auth_events, wf, biz_wf))
         })
         .await??;

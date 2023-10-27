@@ -10,7 +10,6 @@ pub struct ValidateRequest {
 /// Validates the onboarding token and returns the associated stable fp_id token with status information
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct ValidateResponse {
-    // TODO make this non-optional
     pub user_auth: UserAuthResponse,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<EntityValidateResponse>,
