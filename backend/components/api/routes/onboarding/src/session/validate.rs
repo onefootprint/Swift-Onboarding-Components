@@ -9,7 +9,10 @@ use api_core::auth::tenant::{CheckTenantGuard, TenantGuard};
 use api_core::errors::ApiResult;
 use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
-use api_wire_types::{EntityValidateResponse, ValidateRequest, ValidateResponse};
+use api_wire_types::{
+    EntityValidateResponse, UserAuthResponse, ValidateAuthEvent, ValidateRequest, ValidateResponse,
+};
+use db::models::auth_event::AuthEvent;
 use db::models::manual_review::ManualReview;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
@@ -34,32 +37,51 @@ pub async fn post(
         .ok_or(OnboardingError::ValidateTokenInvalidOrNotFound)?
         .data;
 
-    let AuthSessionData::ValidateUserToken(ValidateUserToken { wf_id }) = session else {
+    let AuthSessionData::ValidateUserToken(ValidateUserToken { wf_id, auth_event_ids }) = session else {
         return Err(OnboardingError::ValidateTokenInvalidOrNotFound.into());
     };
 
-    let (wf, sv, user_mr, biz_wf) = state
+    let (sv, auth_events, wf, biz_wf) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let (wf, sv) = Workflow::get_all(conn, &wf_id)?;
-            let user_mr = ManualReview::get_active(conn, &wf_id)?;
-            let obc_id = wf
-                .ob_configuration_id
-                .as_ref()
-                .ok_or(OnboardingError::NoObcForWorkflow)?;
-            let (ob_config, _) = ObConfiguration::get(conn, obc_id)?;
-            let biz_wf = if ob_config.kind == ObConfigurationKind::Kyb {
-                let id = WorkflowIdentifier::BusinessOwner {
-                    owner_vault_id: &sv.vault_id,
-                    ob_config_id: &ob_config.id,
-                };
-                let (biz_wf, biz_sv) = Workflow::get_all(conn, id)?;
-                let biz_mr = ManualReview::get_active(conn, &biz_wf.id)?;
-                Some((biz_sv, biz_wf, biz_mr))
+            // TODO clean up this logic a ton after we don't have to support backwards compatibility
+            let (ae_sv, auth_events) = if !auth_event_ids.is_empty() {
+                let aes = AuthEvent::get_bulk(conn, &auth_event_ids)?;
+                let sv_id = aes.first().and_then(|ae| ae.scoped_vault_id.clone()).ok_or(
+                    OnboardingError::Validation("No scoped vault in auth event".into()),
+                )?;
+                let sv = ScopedVault::get(conn, &sv_id)?;
+                (Some(sv), aes)
             } else {
-                None
+                (None, vec![])
             };
-            Ok((wf, sv, user_mr, biz_wf))
+            let (wf_sv, wf, biz_wf) = if let Some(wf_id) = wf_id {
+                let (wf, sv) = Workflow::get_all(conn, &wf_id)?;
+                let user_mr = ManualReview::get_active(conn, &wf_id)?;
+                let obc_id = wf
+                    .ob_configuration_id
+                    .as_ref()
+                    .ok_or(OnboardingError::NoObcForWorkflow)?;
+                let (ob_config, _) = ObConfiguration::get(conn, obc_id)?;
+                let biz_wf = if ob_config.kind == ObConfigurationKind::Kyb {
+                    let id = WorkflowIdentifier::BusinessOwner {
+                        owner_vault_id: &sv.vault_id,
+                        ob_config_id: &ob_config.id,
+                    };
+                    let (biz_wf, biz_sv) = Workflow::get_all(conn, id)?;
+                    let biz_mr = ManualReview::get_active(conn, &biz_wf.id)?;
+                    Some((biz_sv, biz_wf, biz_mr))
+                } else {
+                    None
+                };
+                (Some(sv), Some((wf, user_mr)), biz_wf)
+            } else {
+                (None, None, None)
+            };
+            let sv = ae_sv.or(wf_sv).ok_or(OnboardingError::Validation(
+                "No scoped vault in auth event or workflow".into(),
+            ))?;
+            Ok((sv, auth_events, wf, biz_wf))
         })
         .await??;
 
@@ -69,10 +91,10 @@ pub async fn post(
         if auth.tenant().uses_legacy_serialization() {
             (
                 Some(sv.fp_id.clone()),
-                Some(wf.status.ok_or(OnboardingError::NoStatusForWorkflow)?),
-                Some(user_mr.is_some()),
-                wf.ob_configuration_id.clone(),
-                Some(wf.created_at),
+                Some(wf.as_ref().and_then(|(wf, _)| wf.status).ok_or(OnboardingError::NoStatusForWorkflow)?),
+                Some(wf.as_ref().and_then(|(_, mr)| mr.as_ref()).is_some()),
+                wf.as_ref().and_then(|(wf, _)| wf.ob_configuration_id.clone()),
+                wf.as_ref().map(|(wf, _)| wf.created_at),
             )
         } else {
             (None, None, None, None, None)
@@ -104,12 +126,24 @@ pub async fn post(
         let response = api_wire_types::EntityValidateResponse::from_db((status, sv, mr));
         Ok(response)
     };
-    let user = validate_and_serialize(sv, user_mr, wf, VaultKind::Person)?;
+    let user_auth = UserAuthResponse {
+        fp_id: sv.fp_id.clone(),
+        auth_events: auth_events
+            .into_iter()
+            .map(|ae| ValidateAuthEvent {
+                kind: ae.kind,
+                timestamp: ae.created_at,
+            })
+            .collect(),
+    };
+    let user = wf
+        .map(|(wf, mr)| validate_and_serialize(sv, mr, wf, VaultKind::Person))
+        .transpose()?;
     let business = biz_wf
         .map(|(sv, wf, mr)| validate_and_serialize(sv, mr, wf, VaultKind::Business))
         .transpose()?;
-
     let response = ValidateResponse {
+        user_auth,
         user,
         business,
         footprint_user_id,

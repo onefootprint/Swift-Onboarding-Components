@@ -51,7 +51,16 @@ pub struct NewAuthEvent {
 
 impl NewAuthEvent {
     #[tracing::instrument("NewAuthEvent::create", skip_all)]
-    pub fn create(self, conn: &mut PgConn) -> Result<AuthEvent, DbError> {
+    pub fn create(self, conn: &mut PgConn) -> DbResult<AuthEvent> {
+        match &self.scope {
+            IdentifyScope::My1fp => (),
+            IdentifyScope::Onboarding | IdentifyScope::Auth => {
+                // We depend upon this in the validate API
+                if self.scoped_vault_id.is_none() {
+                    return Err(DbError::ValidationError(format!("Auth event of type {} must have a scoped_vault_id", self.scope)));
+                }
+            }
+        }
         let ev = diesel::insert_into(auth_event::table)
             .values(self)
             .get_result(conn)?;

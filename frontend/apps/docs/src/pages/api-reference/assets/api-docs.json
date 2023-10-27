@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "ca92c407dda31e023fc7cf8e96f75d3ba96083ba"
+        "version": "0f7faae168a2884cb156bb72ab52f096ecb95170"
     },
     "servers": [
         {
@@ -3333,6 +3333,7 @@
                 "type": "object",
                 "properties": {
                     "business": {
+                        "description": "Information on the business and its onboarding session. Provided for KYB playbook sessions",
                         "type": "object",
                         "properties": {
                             "fp_id": {
@@ -3358,6 +3359,7 @@
                         ]
                     },
                     "user": {
+                        "description": "Information on the user and their onboarding session. Provided for KYC and KYB playbook sessions",
                         "type": "object",
                         "properties": {
                             "fp_id": {
@@ -3381,10 +3383,47 @@
                             "requires_manual_review",
                             "status"
                         ]
+                    },
+                    "user_auth": {
+                        "description": "Information on the authenticated user and the auth method they used",
+                        "type": "object",
+                        "properties": {
+                            "auth_events": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "kind": {
+                                            "type": "string",
+                                            "enum": [
+                                                "sms",
+                                                "email",
+                                                "passkey"
+                                            ]
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    },
+                                    "required": [
+                                        "kind",
+                                        "timestamp"
+                                    ]
+                                }
+                            },
+                            "fp_id": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "auth_events",
+                            "fp_id"
+                        ]
                     }
                 },
                 "required": [
-                    "user"
+                    "user_auth"
                 ]
             }
         }

@@ -90,7 +90,10 @@ impl UserSession {
 /// Short-lived token that represents the completion of an onboarding
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct ValidateUserToken {
-    pub wf_id: WorkflowId,
+    pub wf_id: Option<WorkflowId>,
+    // TODO make non-null
+    #[serde(default)]
+    pub auth_event_ids: Vec<AuthEventId>,
 }
 
 /// Longer-lived session that is sent out in emails to verify ownership

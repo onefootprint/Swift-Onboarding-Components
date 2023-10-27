@@ -10,7 +10,10 @@ pub struct ValidateRequest {
 /// Validates the onboarding token and returns the associated stable fp_id token with status information
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct ValidateResponse {
-    pub user: EntityValidateResponse,
+    // TODO make this non-optional
+    pub user_auth: UserAuthResponse,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub user: Option<EntityValidateResponse>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub business: Option<EntityValidateResponse>,
 
@@ -37,6 +40,18 @@ pub struct EntityValidateResponse {
     pub fp_id: FpId,
     pub requires_manual_review: bool,
     pub status: OnboardingStatus,
+}
+
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+pub struct UserAuthResponse {
+    pub fp_id: FpId,
+    pub auth_events: Vec<ValidateAuthEvent>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+pub struct ValidateAuthEvent {
+    pub kind: AuthEventKind,
+    pub timestamp: DateTime<Utc>,
 }
 
 // Manually implement Apiv2Schema for ValidateResponse since we can't otherwise hide the deprecated fields
@@ -66,7 +81,12 @@ impl paperclip::actix::OperationModifier for ValidateResponse {}
 #[derive(Apiv2Schema)]
 struct ShadowValidateResponse {
     #[allow(unused)]
-    user: EntityValidateResponse,
+    /// Information on the authenticated user and the auth method they used
+    user_auth: UserAuthResponse,
     #[allow(unused)]
+    /// Information on the user and their onboarding session. Provided for KYC and KYB playbook sessions
+    user: Option<EntityValidateResponse>,
+    #[allow(unused)]
+    /// Information on the business and its onboarding session. Provided for KYB playbook sessions
     business: Option<EntityValidateResponse>,
 }

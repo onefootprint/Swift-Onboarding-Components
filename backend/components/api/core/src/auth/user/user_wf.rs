@@ -31,7 +31,7 @@ use super::{ParsedUserSessionContext, UserAuthScope, UserSessionContext};
 /// We preload information for the scoped vault and onboarding that is commonly used by HTTP handlers
 #[derive(Debug, Clone)]
 pub struct UserWfSession {
-    user_session: UserSessionContext,
+    pub user_session: UserSessionContext,
     pub scoped_user: ScopedVault,
     ob_config: Option<ObConfiguration>,
     tenant: Tenant,
