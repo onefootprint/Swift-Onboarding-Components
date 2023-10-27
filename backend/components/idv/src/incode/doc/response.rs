@@ -701,7 +701,7 @@ pub struct OCRName {
     pub last_name_mrz: Option<ScrubbedPiiString>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct OCRAddress {
     pub street: Option<ScrubbedPiiString>,

@@ -53,6 +53,10 @@ impl PiiString {
     pub fn safe_compare(&self, other: &PiiString) -> bool {
         crypto::sha256(self.leak().as_bytes()) == crypto::sha256(other.leak().as_bytes())
     }
+
+    pub fn map(self, f: fn(String) -> String) -> PiiString {
+        f(self.leak_to_string()).into()
+    }
 }
 
 impl<T> From<T> for PiiString

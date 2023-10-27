@@ -1,9 +1,10 @@
 use idv::incode::doc::response::FetchOCRResponse;
 use itertools::Itertools;
-use newtypes::PiiString;
+use newtypes::{PiiString, ScrubbedPiiString, IdentityDataKind};
 use regex::Regex;
+use levenshtein::levenshtein;
 
-use super::incode_docv::IncodeOcrComparisonDataFields;
+use super::incode_docv::{IncodeOcrComparisonDataFields, IncodeOcrAddress};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ParsedIncodeNames {
@@ -169,6 +170,61 @@ impl ParsedIncodeNames {
     }
 }
 
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ParsedIncodeAddress {
+    pub city: Option<PiiString>,
+    pub state: Option<PiiString>,
+    pub zip: Option<PiiString>,
+    pub street: Option<PiiString>,
+    pub full_address: Option<PiiString>
+}
+
+impl ParsedIncodeAddress {
+    pub fn new(city: Option<PiiString>, state:  Option<PiiString>, zip: Option<PiiString>, street: Option<PiiString>, full_address: Option<PiiString>) -> Self {
+        let full_derived = vec![street.clone(), city.clone(), state.clone(), zip.clone()]
+        .into_iter()
+        .flatten()
+        .map(|s| s.leak_to_string())
+        .join(" ");
+        
+        let full_address = if let Some(a) = full_address {
+            a
+        } else {
+            full_derived.into()
+        };
+
+        Self {
+            city,
+            state,
+            zip,
+            street,
+            full_address: Some(full_address)
+        }
+    }
+
+    fn normalize_zip(z: PiiString) -> PiiString {
+        z.map(|x| if x.len() >=5 {  
+            x[..5].to_string() 
+        } else {
+            x
+        })
+    }
+
+    pub fn from_fetch_ocr_res(ocr: &FetchOCRResponse) ->  ParsedIncodeAddress {
+        let fields = ocr.address_fields.as_ref();
+        // fields, full address
+        let city = scrubbed_to_pii(fields.and_then(|f| f.city.as_ref()));
+        let state = scrubbed_to_pii(fields.and_then(|f| f.state.as_ref()));
+        // Incode sometimes returns zips in Zip9 format
+        let zip = scrubbed_to_pii(fields.and_then(|f| f.postal_code.as_ref())).map(Self::normalize_zip);
+        let street =  scrubbed_to_pii(fields.and_then(|f| f.street.as_ref()));
+
+        ParsedIncodeAddress::new(city, state, zip, street, scrubbed_to_pii(ocr.address.as_ref()))
+
+    }
+}
+
 fn merge<'a>(a: Option<&'a PiiString>, b: Option<&'a PiiString>) -> Option<(&'a PiiString, &'a PiiString)> {
     a.and_then(|a| b.map(|b| (a, b)))
 }
@@ -197,22 +253,105 @@ pub(crate) fn dob_matches(ocr: &FetchOCRResponse, vault_data: &IncodeOcrComparis
     vault_data.dob.clone().and_then(|dob| dob_ocr.as_ref().map(|ocr_dob| pii_strings_match(ocr_dob, &dob)))
 }
 
+#[derive(Debug, PartialEq, Eq)]
+pub struct AddressMatchResult {
+    pub did_not_match: Vec<IdentityDataKind>,
+    pub matched: Vec<IdentityDataKind>, 
+    pub could_not_match: Vec<IdentityDataKind>,
+}
+impl AddressMatchResult {
+
+    pub fn matched(&self) -> Option<bool> {
+        if !self.could_not_match.is_empty() {
+            None
+        } else if !self.did_not_match.is_empty() {
+            Some(false)
+        } else if !self.matched.is_empty() {
+            Some(true)
+        } else {
+            None
+        }
+    }
+}
+
+pub fn address_matches(ocr: &ParsedIncodeAddress, vault_data: &IncodeOcrAddress) -> AddressMatchResult {
+    let city_matches = (IdentityDataKind::City, city_matches(ocr, vault_data));
+    let state_matches = (IdentityDataKind::State, state_matches(ocr, vault_data));
+    let zip_matches = (IdentityDataKind::Zip, zip_matches(ocr, vault_data));
+    let street_matches = (IdentityDataKind::AddressLine1, street_matches(ocr, vault_data));
+
+    let (could_not_match, rest): (Vec<_>, Vec<_>) = vec![city_matches, state_matches, zip_matches, street_matches].into_iter().partition(|(_, res)| res.is_none());
+
+    let (matched, did_not_match): (Vec<_>, Vec<_>) = rest.into_iter().partition(|(_, res)| res.unwrap_or(false));
+
+    AddressMatchResult {
+        did_not_match: did_not_match.into_iter().map(|(idk, _)| idk).collect(),
+        matched: matched.into_iter().map(|(idk, _)| idk).collect(),
+        could_not_match: could_not_match.into_iter().map(|(idk, _)| idk).collect(),
+    }
+}
+
+// Match city w/i edit distance
+fn city_matches(ocr: &ParsedIncodeAddress, vault_data: &IncodeOcrAddress) -> Option<bool> {
+    merge(vault_data.city.as_ref(), ocr.city.as_ref()).map(|(a, b)| pii_strings_match_normalized(a, b, levinstein_distance_matches(2)))
+}
+
+// state exact matches
+fn state_matches(ocr: &ParsedIncodeAddress, vault_data: &IncodeOcrAddress) -> Option<bool> {
+    merge(vault_data.state.as_ref(), ocr.state.as_ref()).map(|(a, b)| pii_strings_match_normalized(a, b, pii_strings_match))
+}
+
+// zip5 exact match
+fn zip_matches(ocr: &ParsedIncodeAddress, vault_data: &IncodeOcrAddress) -> Option<bool> {
+    merge(vault_data.zip.as_ref(), ocr.zip.as_ref()).map(|(a, b)| pii_strings_match_normalized(a, b, pii_strings_match))
+}
+
+// street match w/i edit distance
+// TODO: handle address line 2
+fn street_matches(ocr: &ParsedIncodeAddress, vault_data: &IncodeOcrAddress) -> Option<bool> {
+    merge(vault_data.street.as_ref(), ocr.street.as_ref()).map(|(a, b)| pii_strings_match_normalized(a, b, levinstein_distance_matches(4)))
+}
+
 pub fn pii_strings_match_name_normalized(name1: &PiiString, name2: &PiiString) -> bool {
     // deunicode is guaranteed to only produce 0-127 ascii chars
-    let normalized_name1 = convert_unicode_and_remove_non_alphabetic_chars(&deunicode::deunicode(name1.leak()).into());
-    let normalized_name2 = convert_unicode_and_remove_non_alphabetic_chars(&deunicode::deunicode(name2.leak()).into());
+    let normalized_name1 = convert_unicode_and_remove_chars(&deunicode::deunicode(name1.leak()).into(), non_alphabetic_regex());
+    let normalized_name2 = convert_unicode_and_remove_chars(&deunicode::deunicode(name2.leak()).into(), non_alphabetic_regex());
 
     pii_strings_match(name1, name2) || pii_strings_match(&normalized_name1, &normalized_name2)
 }
 
+pub fn pii_strings_match_normalized(s1: &PiiString, s2: &PiiString, f_match: impl Fn(&PiiString, &PiiString) -> bool ) -> bool {
+    // deunicode is guaranteed to only produce 0-127 ascii chars
+    let normalized_s1 = convert_unicode_and_remove_chars(&deunicode::deunicode(s1.leak()).into(), non_alphanumeric_regex());
+    let normalized_s2 = convert_unicode_and_remove_chars(&deunicode::deunicode(s2.leak()).into(), non_alphanumeric_regex());
+
+    f_match(s1, s2) || f_match(&normalized_s1, &normalized_s2)
+}
+
+fn levinstein_distance_matches(threshold: usize) -> impl Fn(&PiiString, &PiiString) -> bool {
+    move |p1: &PiiString, p2: &PiiString| -> bool {
+        levenshtein(p1.leak(), p2.leak()) <= threshold
+    }
+    
+}
 
 fn non_alphabetic_regex() -> Regex {
     #[allow(clippy::unwrap_used)]
     Regex::new(r"[^a-zA-Z]+").unwrap()
 }
 
-fn convert_unicode_and_remove_non_alphabetic_chars(s: &PiiString) -> PiiString {
-    non_alphabetic_regex().replace_all(s.leak(), "").to_string().into()
+fn non_alphanumeric_regex() -> Regex {
+    #[allow(clippy::unwrap_used)]
+    Regex::new(r"[^a-zA-Z0-9]+").unwrap()
+}
+
+fn scrubbed_to_pii(s: Option<&ScrubbedPiiString>) -> Option<PiiString> {
+    s.map(|p| p.leak_to_string().trim().into())
+}
+
+
+fn convert_unicode_and_remove_chars(s: &PiiString, regex: Regex) -> PiiString {
+    regex.replace_all(s.leak(), "").to_string().trim().to_lowercase().into()
 }
 
 fn pii_strings_match(p1: &PiiString, p2: &PiiString) -> bool {
@@ -220,7 +359,6 @@ fn pii_strings_match(p1: &PiiString, p2: &PiiString) -> bool {
     let normalized_p2 = normalize_pii(p2);
     (normalized_p1.leak() == normalized_p2.leak()) && !(normalized_p1.leak().is_empty() || normalized_p2.leak().is_empty())
 }
-
 
 fn normalize_pii(p: &PiiString) -> PiiString {
     p.leak().trim().to_lowercase().into()
@@ -231,7 +369,9 @@ fn normalize_pii(p: &PiiString) -> PiiString {
 mod tests {
     use test_case::test_case;
     use super::*;
-    use idv::incode::doc::response::OCRName;
+    use idv::incode::doc::response::{OCRName, OCRAddress};
+    use crate::decision::features::incode_docv::IncodeOcrAddress;
+    use newtypes::IdentityDataKind as IDK;
 
     #[test_case(
         OCRName {
@@ -390,5 +530,382 @@ mod tests {
             name: Some(name),
             ..Default::default()
         })
+    }
+
+    //
+    // ZIP
+    // 
+    #[test_case(
+        OCRAddress {
+            postal_code: Some("12345".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            zip: Some("12345".into()),
+            ..Default::default()
+        } => Some(true) ; "matches"
+    )]
+    #[test_case(
+        OCRAddress {
+            postal_code: Some("123456789".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            zip: Some("12345".into()),
+            ..Default::default()
+        } => Some(true) ; "matches zip5"
+    )]
+    #[test_case(
+        OCRAddress {
+            postal_code: Some("67891".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            zip: Some("12345".into()),
+            ..Default::default()
+        } => Some(false) ; "does not match"
+    )]
+    #[test_case(
+        OCRAddress {
+            postal_code: Some("123".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            zip: Some("12345".into()),
+            ..Default::default()
+        } => Some(false) ; "does not match <5"
+    )]
+    #[test_case(
+        OCRAddress {
+            postal_code: None,
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            zip: Some("12345".into()),
+            ..Default::default()
+        } => None ; "does not match missing OCR"
+    )]
+    #[test_case(
+        OCRAddress {
+            postal_code: Some("12345".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            zip: None,
+            ..Default::default()
+        } => None ; "does not match missing Vault"
+    )]
+    fn test_zip_matching(ocr_address: OCRAddress, vault_address: IncodeOcrAddress) -> Option<bool> {
+        let ocr = FetchOCRResponse {
+            address_fields: Some(ocr_address),
+            ..Default::default()
+        };
+        let parsed_address = ParsedIncodeAddress::from_fetch_ocr_res(&ocr);
+        zip_matches(&parsed_address, &vault_address)
+    }
+
+    //
+    // CITY
+    // 
+    #[test_case(
+        OCRAddress {
+            city: Some("Bobtown".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            city: Some("BOBTOWN".into()),
+            ..Default::default()
+        } => Some(true) ; "matches"
+    )]
+    #[test_case(
+        OCRAddress {
+            city: Some("bobtown".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            city: Some("bobtow".into()),
+            ..Default::default()
+        } => Some(true) ; "matches close city"
+    )]
+    #[test_case(
+        OCRAddress {
+            city: Some("Bobtown".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            city: Some("Northport".into()),
+            ..Default::default()
+        } => Some(false) ; "does not match"
+    )]
+    #[test_case(
+        OCRAddress {
+            city: Some("Bobtown".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            city: Some("Bob".into()),
+            ..Default::default()
+        } => Some(false) ; "does not too high edit distance"
+    )]
+    #[test_case(
+        OCRAddress {
+            city: None,
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            city: Some("bob".into()),
+            ..Default::default()
+        } => None ; "does not match missing OCR"
+    )]
+    #[test_case(
+        OCRAddress {
+            city: Some("bob".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            city: None,
+            ..Default::default()
+        } => None ; "does not match missing Vault"
+    )]
+    fn test_city_matching(ocr_address: OCRAddress, vault_address: IncodeOcrAddress) -> Option<bool> {
+        let ocr = FetchOCRResponse {
+            address_fields: Some(ocr_address),
+            ..Default::default()
+        };
+        let parsed_address = ParsedIncodeAddress::from_fetch_ocr_res(&ocr);
+        city_matches(&parsed_address, &vault_address)
+    }
+
+    //
+    // STATE
+    // 
+    #[test_case(
+        OCRAddress {
+            state: Some("NY".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            state: Some("NY".into()),
+            ..Default::default()
+        } => Some(true) ; "matches"
+    )]
+    #[test_case(
+        OCRAddress {
+            state: Some("GA".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            state: Some("NY".into()),
+            ..Default::default()
+        } => Some(false) ; "does not match"
+    )]
+    #[test_case(
+        OCRAddress {
+            state: None,
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            state: Some("NY".into()),
+            ..Default::default()
+        } => None ; "does not match missing ocr"
+    )]
+    #[test_case(
+        OCRAddress {
+            state: Some("GA".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            state: None,
+            ..Default::default()
+        } => None ; "does not match missing vault"
+    )]
+    fn test_state_matching(ocr_address: OCRAddress, vault_address: IncodeOcrAddress) -> Option<bool> {
+        let ocr = FetchOCRResponse {
+            address_fields: Some(ocr_address),
+            ..Default::default()
+        };
+        let parsed_address = ParsedIncodeAddress::from_fetch_ocr_res(&ocr);
+        state_matches(&parsed_address, &vault_address)
+    }
+
+    // 
+    // STREET
+    // 
+    #[test_case(
+        OCRAddress {
+            street: Some("1 main St".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            street: Some("1 MAIN St.".into()),
+            ..Default::default()
+        } => Some(true) ; "matches"
+    )]
+    #[test_case(
+        OCRAddress {
+            street: Some("1 main St".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            street: Some("    1 MAIN st           %@%@".into()),
+            ..Default::default()
+        } => Some(true)
+    )]
+    #[test_case(
+        OCRAddress {
+            street: Some("1 Main Street".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            street: Some("1 MAIN St.".into()),
+            ..Default::default()
+        } => Some(true) ; "matches street, close match"
+    )]
+    #[test_case(
+        OCRAddress {
+            street: Some("1 Main Street".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            street: Some("11 Main Street".into()),
+            ..Default::default()
+        } => Some(true) ; "matches different number"
+    )]
+    #[test_case(
+        OCRAddress {
+            street: Some("1 Street".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            street: Some("1 Main St".into()),
+            ..Default::default()
+        } => Some(false) ; "does not match"
+    )]
+    #[test_case(
+        OCRAddress {
+            street: None,
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            street: Some("main".into()),
+            ..Default::default()
+        } => None ; "does not match missing OCR"
+    )]
+    #[test_case(
+        OCRAddress {
+            street: Some("main".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            street: None,
+            ..Default::default()
+        } => None ; "does not match missing Vault"
+    )]
+    fn test_street_matching(ocr_address: OCRAddress, vault_address: IncodeOcrAddress) -> Option<bool> {
+        let ocr = FetchOCRResponse {
+            address_fields: Some(ocr_address),
+            ..Default::default()
+        };
+        let parsed_address = ParsedIncodeAddress::from_fetch_ocr_res(&ocr);
+        street_matches(&parsed_address, &vault_address)
+    }
+
+    fn address_mr(matched: Vec<IDK>, did_not_match: Vec<IDK>, could_not_match: Vec<IDK>) -> AddressMatchResult {
+        AddressMatchResult {
+            matched,
+            did_not_match,
+            could_not_match
+        }
+    }
+    #[test_case(
+        OCRAddress {
+            street: Some("13 Main St.".into()),
+            postal_code: Some("12345".into()),
+            city: Some("Boston".into()),
+            state: Some("MA".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            street: Some("13 Main St.".into()),
+            zip: Some("12345".into()),
+            city: Some("BOSTON".into()),
+            state: Some("MA".into()),
+        } => (address_mr(vec![IDK::City, IDK::State, IDK::Zip, IDK::AddressLine1], vec![], vec![]), Some(true)) ; "address matches"
+    )]
+    #[test_case(
+        OCRAddress {
+            // slight mispelling + strange character
+            street: Some("13 Mane St.@".into()),
+            // zip>5
+            postal_code: Some("123456789".into()),
+            // off by 1
+            city: Some("Bosto".into()),
+            state: Some("MA".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            street: Some("13 Main St.".into()),
+            zip: Some("12345".into()),
+            city: Some("BOSTON".into()),
+            state: Some("MA".into()),
+        } => (address_mr(vec![IDK::City, IDK::State, IDK::Zip, IDK::AddressLine1], vec![], vec![]), Some(true)); "address normalized matches"
+    )]
+    #[test_case(
+        OCRAddress {
+            // slight mispelling +
+            street: Some("13 Mane St.+".into()),
+            // zip>5
+            postal_code: Some("123456789".into()),
+            // off by 1
+            city: Some("Bosto".into()),
+            // Wrong city though
+            state: Some("GA".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            street: Some("13 Main St.".into()),
+            zip: Some("12345".into()),
+            city: Some("BOSTON".into()),
+            state: Some("MA".into()),
+        } => (address_mr(vec![IDK::City, IDK::Zip, IDK::AddressLine1], vec![IDK::State], vec![]), Some(false)) ; "address normalized does not match"
+    )]
+    #[test_case(
+        OCRAddress {
+            street: Some("567 Brain street".into()),
+            postal_code: Some("555".into()),
+            city: Some("Camptown".into()),
+            // Wrong city though
+            state: Some("GA".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            street: Some("13 Main St.".into()),
+            zip: Some("12345".into()),
+            city: Some("BOSTON".into()),
+            state: Some("MA".into()),
+        } => (address_mr(vec![], vec![IDK::City, IDK::State, IDK::Zip, IDK::AddressLine1], vec![]), Some(false)) ; "nothing matches"
+    )]
+    #[test_case(
+        OCRAddress {
+            street: Some("567 Brain street".into()),
+            postal_code: Some("555".into()),
+            ..Default::default()
+            
+        }, IncodeOcrAddress {
+            street: Some("13 Main St.".into()),
+            zip: Some("12345".into()),
+            city: Some("BOSTON".into()),
+            state: Some("MA".into()),
+        } => (address_mr(vec![], vec![IDK::Zip, IDK::AddressLine1], vec![IDK::City, IDK::State]), None) ; "missing a few fields, so match returns None"
+    )]
+    fn test_address_matching(ocr_address: OCRAddress, vault_address: IncodeOcrAddress) ->  (AddressMatchResult, Option<bool>) {
+        let ocr = FetchOCRResponse {
+            address_fields: Some(ocr_address),
+            ..Default::default()
+        };
+        let parsed_address = ParsedIncodeAddress::from_fetch_ocr_res(&ocr);
+        let res = address_matches(&parsed_address, &vault_address);
+        let matched = res.matched();
+        (res, matched)
     }
 }

@@ -14,17 +14,26 @@ use crate::{
     errors::ApiResult
 };
 
+#[derive(Default, Clone, PartialEq, Eq)]
+pub struct IncodeOcrAddress {
+    pub city: Option<PiiString>,
+    pub state: Option<PiiString>,
+    pub zip: Option<PiiString>,
+    pub street: Option<PiiString>,
+}
+
 #[derive(Default, Clone)]
 pub struct IncodeOcrComparisonDataFields {
     pub first_name: Option<PiiString>,
     pub middle_name: Option<PiiString>,
     pub last_name: Option<PiiString>,
     pub dob: Option<PiiString>,
+    pub address: IncodeOcrAddress
 }
 
 impl From<IncodeOcrComparisonDataFields> for IncodeOcrFixtureResponseFields {
     fn from(value: IncodeOcrComparisonDataFields) -> Self {
-        let IncodeOcrComparisonDataFields { first_name, middle_name:_ , last_name, dob } = value;
+        let IncodeOcrComparisonDataFields { first_name, middle_name:_ , last_name, dob, address: _ } = value;
         Self { first_name, last_name, dob}
     }
 }
@@ -35,6 +44,10 @@ impl IncodeOcrComparisonDataFields {
             DataIdentifier::Id(IdentityDataKind::FirstName),
             DataIdentifier::Id(IdentityDataKind::LastName),
             DataIdentifier::Id(IdentityDataKind::Dob),
+            DataIdentifier::Id(IdentityDataKind::City),
+            DataIdentifier::Id(IdentityDataKind::State),
+            DataIdentifier::Id(IdentityDataKind::Zip),
+            DataIdentifier::Id(IdentityDataKind::AddressLine1),
             
         ];
         let vd = vw.decrypt_unchecked(enclave_client, fields).await?;
@@ -43,11 +56,18 @@ impl IncodeOcrComparisonDataFields {
     }
 
     pub fn from_decrypted_values(vd: &DecryptUncheckedResult) -> Self {
+        let address = IncodeOcrAddress {
+            city: vd.get_di(IdentityDataKind::City).ok(),
+            state: vd.get_di(IdentityDataKind::State).ok(),
+            zip: vd.get_di(IdentityDataKind::Zip).ok(),
+            street: vd.get_di(IdentityDataKind::AddressLine1).ok(), // TODO: handle line 2
+        };
         IncodeOcrComparisonDataFields {
             first_name: vd.get_di(IdentityDataKind::FirstName).ok(),
             middle_name: vd.get_di(IdentityDataKind::MiddleName).ok(),
             last_name: vd.get_di(IdentityDataKind::LastName).ok(),
             dob: vd.get_di(IdentityDataKind::Dob).ok(),
+            address
         }
     }
 }
@@ -179,13 +199,16 @@ pub fn reason_codes_from_score_response(res: &FetchScoresResponse, expect_selfie
     
 pub fn reason_codes_from_ocr_response(res: &FetchOCRResponse, vault_data: IncodeOcrComparisonDataFields) -> Vec<FootprintReasonCode> {
     let parsed_names = ParsedIncodeNames::from_fetch_ocr_res(res);
+    let parsed_address = ParsedIncodeAddress::from_fetch_ocr_res(res);
     
     let first_name_matches = first_name_matches(&parsed_names, &vault_data);
     let last_name_matches = last_name_matches(&parsed_names, &vault_data);
     let dob_matches = dob_matches(res, &vault_data);
     let name_matches = first_name_matches.and_then(|x| last_name_matches.map(|y| x && y));
+    let address_matches = address_matches(&parsed_address, &vault_data.address).matched();
+
     
-    let mut reason_codes = reason_codes_from_matching(first_name_matches,last_name_matches,name_matches, dob_matches);
+    let mut reason_codes = reason_codes_from_matching(first_name_matches,last_name_matches,name_matches, dob_matches, address_matches);
     if let Some(expired_frc) = doc_expired_reason_code(res) {
         reason_codes.push(expired_frc);
     }
@@ -200,12 +223,13 @@ fn doc_expired_reason_code(res: &FetchOCRResponse) -> Option<FootprintReasonCode
     })
 }
 
-fn reason_codes_from_matching(first_name_matches: Option<bool>, last_name_matches: Option<bool>, name_matches: Option<bool>, dob_matches: Option<bool>) -> Vec<FootprintReasonCode> {
+fn reason_codes_from_matching(first_name_matches: Option<bool>, last_name_matches: Option<bool>, name_matches: Option<bool>, dob_matches: Option<bool>, address_matches: Option<bool>) -> Vec<FootprintReasonCode> {
     [
         (first_name_matches, FootprintReasonCode::DocumentOcrFirstNameMatches, FootprintReasonCode::DocumentOcrFirstNameDoesNotMatch),
         (last_name_matches, FootprintReasonCode::DocumentOcrLastNameMatches, FootprintReasonCode::DocumentOcrLastNameDoesNotMatch),
         (name_matches, FootprintReasonCode::DocumentOcrNameMatches, FootprintReasonCode::DocumentOcrNameDoesNotMatch),
         (dob_matches, FootprintReasonCode::DocumentOcrDobMatches, FootprintReasonCode::DocumentOcrDobDoesNotMatch),
+        (address_matches, FootprintReasonCode::DocumentOcrAddressMatches, FootprintReasonCode::DocumentOcrAddressDoesNotMatch)
     ]
     .into_iter()
     .filter_map(|(is_match, match_signal, mismatch_signal)| is_match.map(|is_match| if is_match {
@@ -215,7 +239,6 @@ fn reason_codes_from_matching(first_name_matches: Option<bool>, last_name_matche
     }))
     .collect()
 }
-
 
 fn get_frc_from_test(value: (&IncodeTest, &IncodeStatus)) -> Option<(FootprintReasonCode, (bool, bool))> {
     let (t, s) = value;
@@ -328,6 +351,7 @@ mod tests {
             middle_name: None,
             last_name: last,
             dob,
+            address: IncodeOcrAddress::default()
         };
         let raw = test_fixtures::incode_fetch_ocr_response(Some(ocr_opts));
         let parsed: FetchOCRResponse = serde_json::from_value(raw).unwrap();
@@ -513,9 +537,4 @@ mod tests {
     fn test_doc_expired_reason_code(res: FetchOCRResponse) -> Option<FootprintReasonCode> {
         doc_expired_reason_code(&res) 
     }
-
-
-
-    
-
 }

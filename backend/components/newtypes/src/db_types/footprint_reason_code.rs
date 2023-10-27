@@ -841,6 +841,14 @@ footprint_reason_code_enum! {
         DocumentOcrNameMatches,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
+        #[note = "Document address does not match input", severity = SignalSeverity::Low,  description = "The document name address does not match the name that was input."]
+        DocumentOcrAddressDoesNotMatch,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
+        #[note = "Document address matches input", severity = SignalSeverity::Info,  description = "The document address matches the name that was input."]
+        DocumentOcrAddressMatches,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
         #[note = "Document first name does not match input", severity = SignalSeverity::Medium,  description = "The document first name does not match the name that was input."]
         DocumentOcrFirstNameDoesNotMatch,
 
