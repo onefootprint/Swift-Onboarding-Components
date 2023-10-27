@@ -57,10 +57,6 @@ const EmailCollect = ({
         onComplete(email);
       },
       onError: (error: unknown) => {
-        console.error(
-          'Error while speculatively syncing email on kyc email-collect page',
-          getErrorMessage(error),
-        );
         Logger.error(
           `Error while speculatively syncing email on kyc email-collect page, ${getErrorMessage(
             error,

@@ -114,7 +114,6 @@ const Camera = ({
 
   const handleClick = (captureKind: CaptureKind) => {
     if (!canvasRef.current || !videoRef.current) {
-      console.error('Video ref or canvas not initialized for camera capture');
       Logger.error(
         `Video ref or canvas not initialized for camera capture for capture kind: ${captureKind}`,
         'camera',
@@ -124,7 +123,6 @@ const Camera = ({
 
     const context = canvasRef.current.getContext('2d');
     if (!context) {
-      console.error('Canvas context is undefined for camera capture');
       Logger.error(
         `Canvas context is undefined for camera capture for capture kind: ${captureKind}`,
         'camera',

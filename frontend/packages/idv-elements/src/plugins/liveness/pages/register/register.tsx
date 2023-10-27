@@ -32,10 +32,6 @@ const Register = () => {
           }, SUCCESS_TRANSITION_DELAY_MS);
         },
         onError(error: unknown) {
-          console.error(
-            'Failed to register passkeys for user',
-            getErrorMessage(error),
-          );
           Logger.error(
             `Failed to register passkeys for user: ${getErrorMessage(error)}`,
             'liveness-register',

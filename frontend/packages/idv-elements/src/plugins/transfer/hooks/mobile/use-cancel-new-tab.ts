@@ -22,12 +22,10 @@ const useCancelNewTab = () => {
           send({ type: 'newTabRegisterCanceled' });
         },
         onError: (error: unknown) => {
-          console.error(
-            'Failed to cancel D2P session from mobile bifrost',
-            getErrorMessage(error),
-          );
           Logger.error(
-            'Failed to cancel D2P session from mobile bifrost',
+            `Failed to cancel D2P session from mobile bifrost. ${getErrorMessage(
+              error,
+            )}`,
             'transfer-mobile',
           );
         },

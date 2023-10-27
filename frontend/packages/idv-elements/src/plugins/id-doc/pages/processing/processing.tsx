@@ -46,9 +46,10 @@ const Processing = () => {
     // If we are moving on from the current side, we show success
     // If there is no next side, the flow is complete
     if (isRetryLimitExceeded) {
-      const errorMessage = `Image upload retry limit exceeded. Side: ${currSide}, doc id: ${id}`;
-      console.error(errorMessage);
-      Logger.error(errorMessage, 'processing');
+      Logger.error(
+        `Image upload retry limit exceeded. Side: ${currSide}, doc id: ${id}`,
+        'processing',
+      );
       setRetryLimitExceeded(true);
     } else if (nextSideToCollect === state.context.currSide) {
       send({
@@ -82,20 +83,20 @@ const Processing = () => {
   };
 
   const handleProcessDocError = (error: unknown) => {
-    const errorMessage = `Error while processing id-doc image ${id}: ${getErrorMessage(
-      error,
-    )}`;
-    console.error(errorMessage);
-    Logger.error(errorMessage, 'processing');
+    Logger.error(
+      `Error while processing id-doc image ${id}: ${getErrorMessage(error)}`,
+      'processing',
+    );
     handleError(error);
   };
 
   const handleSubmitDocError = (error: unknown) => {
-    const errorMessage = `Id-doc image submit failed on phone flow. Side: ${currSide}, upload session id: ${id}. Error: ${getErrorMessage(
-      error,
-    )}`;
-    console.error(errorMessage);
-    Logger.error(errorMessage, 'processing');
+    Logger.error(
+      `Id-doc image submit failed on phone flow. Side: ${currSide}, upload session id: ${id}. Error: ${getErrorMessage(
+        error,
+      )}`,
+      'processing',
+    );
     handleError(error);
   };
 
@@ -127,7 +128,6 @@ const Processing = () => {
       }, country: ${country ? 'OK' : 'undefined'}, current side: ${
         currSide ? 'OK' : 'undefined'
       }, id: ${id || 'undefined'}`;
-      console.error(error);
       Logger.error(error, 'processing');
       return;
     }

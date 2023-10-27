@@ -60,10 +60,6 @@ const EmailIdentification = () => {
           });
         },
         onError: error => {
-          console.error(
-            'Error while identifying user on email-identification page',
-            getErrorMessage(error),
-          );
           Logger.error(
             `Error while identifying user on email-identification page: ${getErrorMessage(
               error,

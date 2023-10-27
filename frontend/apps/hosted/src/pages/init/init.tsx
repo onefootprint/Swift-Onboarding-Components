@@ -31,7 +31,6 @@ const Init = () => {
       });
     },
     onError: (error: string) => {
-      console.error(error);
       Logger.error(error, 'hosted-init');
       send({
         type: 'invalidUrlReceived',
@@ -52,12 +51,10 @@ const Init = () => {
         });
       },
       onError: error => {
-        console.error(
-          'Hosted app init page fetching business details failed:',
-          getErrorMessage(error),
-        );
         Logger.error(
-          'Hosted app init page fetching business details failed',
+          `Hosted app init page fetching business details failed: ${getErrorMessage(
+            error,
+          )}`,
           'hosted-init',
         );
         showRequestError(error);
@@ -91,12 +88,10 @@ const Init = () => {
         });
       },
       onError: error => {
-        console.error(
-          'Hosted app init page fetching onboarding config failed:',
-          getErrorMessage(error),
-        );
         Logger.error(
-          'Hosted app init page fetching onboarding config failed',
+          `Hosted app init page fetching onboarding config failed: ${getErrorMessage(
+            error,
+          )}`,
           'hosted-init',
         );
         showRequestError(error);

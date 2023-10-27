@@ -90,10 +90,6 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
       {
         onSuccess: onDone,
         onError: (error: unknown) => {
-          console.error(
-            'Error while processing onboarding on authorize page',
-            getErrorMessage(error),
-          );
           Logger.error(
             `Error while processing onboarding on authorize page: ${getErrorMessage(
               error,
@@ -115,10 +111,6 @@ const Authorize = ({ onDone }: AuthorizeProps) => {
       {
         onSuccess: handleAuthorizeSuccess,
         onError: (error: unknown) => {
-          console.error(
-            'Error while authorizing onboarding on authorize page',
-            getErrorMessage(error),
-          );
           Logger.error(
             `Error while authorizing onboarding on authorize page: ${getErrorMessage(
               error,

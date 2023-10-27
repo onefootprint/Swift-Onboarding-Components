@@ -28,10 +28,6 @@ const Unavailable = () => {
           });
         },
         onError: (error: unknown) => {
-          console.error(
-            'Error while skipping liveness in liveness unavailable page.',
-            getErrorMessage(error),
-          );
           Logger.error(
             `Error while skipping liveness in liveness unavailable page: ${getErrorMessage(
               error,

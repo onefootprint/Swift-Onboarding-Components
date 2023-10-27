@@ -44,12 +44,10 @@ const Init = () => {
         });
       },
       onError: error => {
-        console.error(
-          'Fetching onboarding config in IDV init page failed with error:',
-          getErrorMessage(error),
-        );
         Logger.error(
-          'Fetching onboarding config in IDV init page failed',
+          `Fetching onboarding config in IDV init page failed: ${getErrorMessage(
+            error,
+          )}`,
           'idv-init',
         );
         send({

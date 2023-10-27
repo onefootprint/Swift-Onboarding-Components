@@ -54,10 +54,6 @@ const Declarations = () => {
               sendDeclarationData(declarationData);
             },
             onError: (error: unknown) => {
-              console.error(
-                'Encountered error while uploading declarations files',
-                getErrorMessage(error),
-              );
               Logger.error(
                 `Encountered error while uploading declarations files: ${getErrorMessage(
                   error,
@@ -69,9 +65,6 @@ const Declarations = () => {
         );
       },
       onError: (error: string) => {
-        console.error(
-          `Encountered error while vaulting data on investor profile declarations page ${error}`,
-        );
         Logger.error(
           `Encountered error while vaulting data on investor profile declarations page: ${error}`,
           'investor-profile-declarations',
@@ -91,9 +84,6 @@ const Declarations = () => {
         commitData(declarationData, files);
       },
       onError: (error: unknown) => {
-        console.error(
-          `Encountered error while speculatively saving data on investor profile declarations page: ${error}`,
-        );
         Logger.error(
           `Encountered error while speculatively saving data on investor profile declarations page: ${error}`,
           'investor-profile-declarations',

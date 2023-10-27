@@ -142,11 +142,6 @@ const IdDocCountryAndTypeContainer = ({
           onSubmitDocTypeSuccess(data, country, docType);
         },
         onError: err => {
-          console.error(
-            `Failed to submit doc type and country. Selected doctype: ${docType}, country ${selectedCountry}. Error: ${getErrorMessage(
-              err,
-            )}`,
-          );
           Logger.error(
             `Failed to submit doc type and country. Selected doctype: ${docType}, country ${selectedCountry}. Error: ${getErrorMessage(
               err,

@@ -24,16 +24,10 @@ const SkipLiveness = () => {
           });
         },
         onError: (error: unknown) => {
-          console.error(
-            `Error while skipping liveness on transfer plugin running on mobile. Webauthn availability: ${
-              device.hasSupportForWebauthn ? 'available' : 'none'
-            }`,
-            getErrorMessage(error),
-          );
           Logger.error(
             `Error while skipping liveness on transfer plugin running on mobile. Webauthn availability: ${
               device.hasSupportForWebauthn ? 'available' : 'none'
-            }`,
+            }. ${getErrorMessage(error)}`,
             'transfer-skip-liveness',
           );
         },

@@ -52,7 +52,6 @@ const useHandleCameraError = () => {
       // other errors
       showErrorToast(t('other-error'));
     }
-    console.error(`Camera error: ${err}`);
     Logger.error(`Camera error: ${err}`, 'camera');
   };
 };

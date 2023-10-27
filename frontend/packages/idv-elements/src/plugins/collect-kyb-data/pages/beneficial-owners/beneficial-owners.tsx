@@ -66,9 +66,6 @@ const BeneficialOwners = ({
     };
 
     const handleError = (error: string) => {
-      console.error(
-        `Speculatively vaulting data failed in kyb beneficial-owners page: ${error}}`,
-      );
       Logger.error(
         `Speculatively vaulting data failed in kyb beneficial-owners page: ${error}}`,
         'kyb-beneficial-owners',

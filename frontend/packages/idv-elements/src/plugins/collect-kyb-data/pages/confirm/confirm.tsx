@@ -27,7 +27,6 @@ const Confirm = () => {
         });
       },
       onError: (error: string) => {
-        console.error(`Vaulting data failed in kyb confirm page: ${error}`);
         Logger.error(
           `Vaulting data failed in kyb confirm page: ${error}`,
           'kyb-confirm',

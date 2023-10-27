@@ -13,9 +13,6 @@ const getSanitizedArgs = ({
   showLogo,
 }: IdentifyMachineArgs): MachineContext => {
   if (!obConfigAuth && !initialAuthToken) {
-    console.error(
-      'Error initializing Identify machine: obConfigAuth must be provided if initialAuthToken is absent',
-    );
     Logger.error(
       'Error initializing Identify machine: obConfigAuth must be provided if initialAuthToken is absent',
       'identify',

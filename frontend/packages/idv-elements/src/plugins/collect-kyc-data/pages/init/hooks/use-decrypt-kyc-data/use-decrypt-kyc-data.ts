@@ -97,12 +97,6 @@ const useDecryptKycData = ({
       {
         onSuccess: handleDecryptedData,
         onError: (error: unknown) => {
-          console.error(
-            `useDecryptKycData failed to decrypt user data (${fields.join(
-              ', ',
-            )}) for KYC`,
-            getErrorMessage(error),
-          );
           Logger.error(
             `useDecryptKycData failed to decrypt user data (${fields.join(
               ', ',
@@ -120,10 +114,6 @@ const useDecryptKycData = ({
     {
       onSuccess: handleTokenSuccess,
       onError: (error: unknown) => {
-        console.error(
-          'useDecryptKycData failed to fetch user token info',
-          getErrorMessage(error),
-        );
         Logger.error(
           `useDecryptKycData failed to fetch user token info, ${getErrorMessage(
             error,

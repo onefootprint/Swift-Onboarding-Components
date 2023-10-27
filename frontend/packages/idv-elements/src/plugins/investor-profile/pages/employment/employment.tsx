@@ -38,9 +38,6 @@ const Employment = () => {
         });
       },
       onError: (error: unknown) => {
-        console.error(
-          `Encountered error while speculatively syncing data on investor-profile employment page ${error}`,
-        );
         Logger.error(
           `Encountered error while speculatively syncing data on investor-profile employment page ${error}`,
           'investor-profile-employment',

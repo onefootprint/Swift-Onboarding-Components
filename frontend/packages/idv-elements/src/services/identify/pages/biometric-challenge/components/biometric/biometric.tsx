@@ -30,9 +30,6 @@ const Biometric = () => {
 
   const handleComplete = () => {
     if (!successfulIdentifier) {
-      console.error(
-        'No successful identifier found while initiating login biometric challenge',
-      );
       Logger.error(
         'No successful identifier found while initiating login biometric challenge',
         'biometric-challenge',
@@ -56,10 +53,6 @@ const Biometric = () => {
           handleRequestChallengeSuccess(payload, successfulIdentifier);
         },
         onError: (error: unknown) => {
-          console.error(
-            'Error while requesting login biometric challenge',
-            getErrorMessage(error),
-          );
           Logger.error(
             `Error while requesting login biometric challenge: ${getErrorMessage(
               error,
@@ -80,9 +73,6 @@ const Biometric = () => {
       payload.challengeData || {};
 
     if (challengeKind !== ChallengeKind.biometric) {
-      console.error(
-        'Received sms challenge after requesting login biometric challenge',
-      );
       Logger.error(
         'Received sms challenge after requesting login biometric challenge',
         'biometric-challenge',
@@ -100,7 +90,6 @@ const Biometric = () => {
         biometricChallengeJson,
       );
     } catch (e) {
-      console.error(e);
       Logger.error(
         `Unable to generate biometric challenge response ${
           typeof e === 'string' ? e : JSON.stringify(e)
@@ -136,10 +125,6 @@ const Biometric = () => {
           });
         },
         onError: (error: unknown) => {
-          console.error(
-            'Error while verifying biometric challenge',
-            getErrorMessage(error),
-          );
           Logger.error(
             `Error while verifying biometric challenge: ${getErrorMessage(
               error,

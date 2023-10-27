@@ -48,10 +48,11 @@ const Init = () => {
         });
       },
       onError: error => {
-        const errorMessage = `Fetching onboarding config in bifrost init failed with error: 
-        ${getErrorMessage(error)}`;
-        console.error(errorMessage);
-        Logger.error(errorMessage, 'bifrost-init');
+        Logger.error(
+          `Fetching onboarding config in bifrost init failed with error: 
+        ${getErrorMessage(error)}`,
+          'bifrost-init',
+        );
         send({
           type: 'configRequestFailed',
         });

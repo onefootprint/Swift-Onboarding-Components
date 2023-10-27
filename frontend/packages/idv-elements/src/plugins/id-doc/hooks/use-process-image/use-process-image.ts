@@ -29,7 +29,6 @@ const stringify = (x: unknown) =>
 const errorHandler =
   (toast: Toast) => (step: ImageProcessingStepError, error?: unknown) => {
     if (error) {
-      console.error(error);
       Logger.error(stringify(error), 'use-process-image');
     }
     toast.show({
@@ -138,7 +137,6 @@ const processImageUrl = async (
   }
   if (!file) {
     const str = 'Image files undefined after image compression';
-    console.error(str);
     Logger.error(str, 'use-process-image');
     return undefined;
   }

@@ -146,12 +146,10 @@ const IdentitySection = () => {
       {
         onSuccess: handleDecryptSuccess,
         onError: (error: unknown) => {
-          console.error(
-            'Decrypting SSN after step up failed in kyc confirm page',
-            getErrorMessage(error),
-          );
           Logger.error(
-            'Decrypting SSN after step up failed in kyc confirm page',
+            `Decrypting SSN after step up failed in kyc confirm page. ${getErrorMessage(
+              error,
+            )}`,
             'kyc-confirm',
           );
           showRequestErrorToast(error);
@@ -170,10 +168,6 @@ const IdentitySection = () => {
     device,
     onSuccess: handleStepUpSuccess,
     onError: (error: unknown) => {
-      console.error(
-        'useStepUp hook in kyc confirm page failed',
-        getErrorMessage(error),
-      );
       Logger.error(
         `useStepUp hook in kyc confirm page failed, ${getErrorMessage(error)}`,
         'kyc-confirm',
@@ -189,9 +183,6 @@ const IdentitySection = () => {
     } else if (shouldTriggerStepUp) {
       stepUp();
     } else {
-      console.error(
-        'Attempted to reveal SSN on confirm page when step up is not available',
-      );
       Logger.error(
         'Attempted to reveal SSN on confirm page when step up is not available',
         'kyc-confirm',

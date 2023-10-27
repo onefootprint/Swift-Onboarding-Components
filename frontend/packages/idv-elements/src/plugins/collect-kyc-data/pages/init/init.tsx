@@ -25,11 +25,6 @@ const Init = () => {
     // If we fail to decrypt the existing information on the vault, it's no big deal - we can move
     // forward and just have the user re-enter their info instead of taking the already portable info
     // But log anyways because this shouldn't happen :)
-    console.error(
-      `Kyc init page failed to decrypt data fields (${populatedCdos.join(
-        ', ',
-      )}) requested.`,
-    );
     Logger.error(
       `Kyc init page failed to decrypt data fields (${populatedCdos.join(
         ', ',

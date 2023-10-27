@@ -174,27 +174,25 @@ const setup = (appName: string) => {
 };
 
 const info = (...args: any[]) => {
-  if (!IS_LOGGING_ENABLED) {
-    return;
+  if (IS_LOGGING_ENABLED) {
+    LogRocket.info(...args);
   }
-
-  LogRocket.info(...args);
 };
 
 const warn = (message: string, location?: string) => {
-  if (!IS_LOGGING_ENABLED) {
-    return;
-  }
+  console.warn(message);
 
-  LogRocket.warn(message, location);
+  if (IS_LOGGING_ENABLED) {
+    LogRocket.warn(message, location);
+  }
 };
 
 const error = (message: string, location?: string) => {
-  if (!IS_LOGGING_ENABLED) {
-    return;
-  }
+  console.error(error);
 
-  LogRocket.error(message, location);
+  if (IS_LOGGING_ENABLED) {
+    LogRocket.error(message, location);
+  }
 };
 
 const track = (eventName: string, customData: PrimitiveData) => {

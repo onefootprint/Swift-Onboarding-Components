@@ -61,9 +61,6 @@ const DesktopPhotoPrompt = ({
     if (!processResult) {
       onProcessingDone();
       handleUploadError([IdDocImageUploadError.unknownUploadError]);
-      console.error(
-        'Image upload failed on desktop mode. Uploaded image could not be processed',
-      );
       Logger.error(
         'Image upload failed on desktop mode. Uploaded image could not be processed',
         'desktop-photo-prompt',

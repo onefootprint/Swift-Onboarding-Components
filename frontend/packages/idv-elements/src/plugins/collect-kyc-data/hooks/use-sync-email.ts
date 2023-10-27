@@ -24,9 +24,6 @@ const useSyncEmail = () => {
     onError,
   }: SyncEmailArgs) => {
     if (!email) {
-      console.error(
-        'Found empty email while syncing email from collect-kyc-data.',
-      );
       Logger.error(
         'Found empty email while syncing email from collect-kyc-data.',
         'collect-kyc-data',
@@ -34,9 +31,6 @@ const useSyncEmail = () => {
       return;
     }
     if (!authToken) {
-      console.error(
-        'Found empty auth token while syncing email from collect-kyc-data.',
-      );
       Logger.error(
         'Found empty auth token while syncing email from collect-kyc-data.',
         'collect-kyc-data',
@@ -54,12 +48,10 @@ const useSyncEmail = () => {
         onSuccess,
         onError: (error: unknown) => {
           showRequestErrorToast(error);
-          console.error(
-            'Failed email verification request from collect-kyc-data: ',
-            getErrorMessage(error),
-          );
           Logger.error(
-            'Failed email verification request from collect-kyc-data: ',
+            `Failed email verification request from collect-kyc-data: ${getErrorMessage(
+              error,
+            )}`,
             'collect-kyc-data',
           );
           onError?.(error);

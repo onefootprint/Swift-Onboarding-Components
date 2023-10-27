@@ -36,10 +36,6 @@ const CheckRequirements = () => {
       { authToken },
       {
         onError: (err: unknown) => {
-          console.error(
-            'Error while initiating onboarding.',
-            getErrorMessage(err),
-          );
           Logger.error(
             `Error while initiating onboarding. ${getErrorMessage(err)}`,
             'onboarding-check-requirements',
@@ -89,10 +85,6 @@ const CheckRequirements = () => {
   };
 
   const handleOnboardingStatusError = (err: unknown) => {
-    console.error(
-      'Error while checking requirements from onboarding status',
-      getErrorMessage(err),
-    );
     Logger.error(
       `Error while checking requirements from onboarding status: ${getErrorMessage(
         err,

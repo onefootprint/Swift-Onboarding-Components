@@ -69,9 +69,6 @@ const PinVerification = ({
 
   const registerNewUserEmail = (authToken: string) => {
     if (!email) {
-      console.error(
-        'Found empty email while sending registering email for new user',
-      );
       Logger.error(
         'Found empty email while sending registering email for new user',
         'pin-verification',
@@ -87,10 +84,6 @@ const PinVerification = ({
       { data: { email }, authToken },
       {
         onError: (error: unknown) => {
-          console.error(
-            'Failed email verification request:',
-            getErrorMessage(error),
-          );
           Logger.error(
             `Failed email verification request: ${getErrorMessage(error)}`,
             'pin-verification',
@@ -107,9 +100,6 @@ const PinVerification = ({
     authToken,
   }: IdentifyVerifyResponse) => {
     if (!authToken) {
-      console.error(
-        'Received empty auth token from successful challenge pin verification.',
-      );
       Logger.error(
         'Received empty auth token from successful challenge pin verification.',
         'pin-verification',
@@ -130,7 +120,6 @@ const PinVerification = ({
 
   const verifyPin = (pin: string) => {
     if (!challengeData) {
-      console.error('No challenge data found after completing pin');
       Logger.error('No challenge data found after completing pin');
       return;
     }
@@ -173,7 +162,6 @@ const PinVerification = ({
     }
 
     if (payload.challengeData.challengeKind !== preferredChallengeKind) {
-      console.error('Received incorrect login challenge kind');
       Logger.error(
         'Received incorrect login challenge kind',
         'pin-verification',
@@ -189,9 +177,6 @@ const PinVerification = ({
 
   const initiateSignupChallenge = () => {
     if (!obConfigAuth) {
-      console.error(
-        'Cannot initiate signup challenge challenge without obConfigAuth',
-      );
       Logger.error(
         'Cannot initiate signup challenge challenge without obConfigAuth',
         'pin-verification',
@@ -199,9 +184,6 @@ const PinVerification = ({
       return;
     }
     if ('authToken' in identifier) {
-      console.error(
-        'Cannot initiate signup challenge challenge with an authToken',
-      );
       Logger.error(
         'Cannot initiate signup challenge challenge with an authToken',
         'pin-verification',
@@ -222,10 +204,6 @@ const PinVerification = ({
       {
         onSuccess: handleRequestChallengeSuccess,
         onError: (error: unknown) => {
-          console.error(
-            'Failed to initiate signup challenge:',
-            getErrorMessage(error),
-          );
           Logger.error(
             `Failed to initiate signup challenge: ${getErrorMessage(error)}`,
             'pin-verification',
@@ -253,10 +231,6 @@ const PinVerification = ({
       {
         onSuccess: handleRequestChallengeSuccess,
         onError: (error: unknown) => {
-          console.error(
-            'Failed to initiate login challenge:',
-            getErrorMessage(error),
-          );
           Logger.error(
             `Failed to initiate login challenge: ${getErrorMessage(error)}`,
             'pin-verification',
@@ -269,7 +243,6 @@ const PinVerification = ({
 
   const initiateChallenge = () => {
     if (!identifier) {
-      console.error('No identifier found while initiating challenge');
       Logger.error('No identifier found while initiating challenge');
       return;
     }

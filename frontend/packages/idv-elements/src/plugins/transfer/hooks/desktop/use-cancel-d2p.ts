@@ -21,12 +21,10 @@ const useCancelD2P = () => {
           send({ type: 'qrCodeCanceled' });
         },
         onError: (error: unknown) => {
-          console.error(
-            'Failed to cancel D2P session from desktop bifrost',
-            getErrorMessage(error),
-          );
           Logger.error(
-            'Failed to cancel D2P session from desktop bifrost',
+            `Failed to cancel D2P session from desktop bifrost. ${getErrorMessage(
+              error,
+            )}`,
             'transfer-desktop',
           );
         },

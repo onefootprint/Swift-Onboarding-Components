@@ -31,10 +31,6 @@ const Retry = () => {
           send({ type: 'skipped' });
         },
         onError: (error: unknown) => {
-          console.error(
-            'Failed to skip liveness after retrying registering passkeys',
-            getErrorMessage(error),
-          );
           Logger.error(
             `Failed to skip liveness after retrying registering passkeys: ${getErrorMessage(
               error,
@@ -59,10 +55,6 @@ const Retry = () => {
           }, SUCCESS_TRANSITION_DELAY_MS);
         },
         onError(error: unknown) {
-          console.error(
-            'Failed to register passkeys for user while retrying',
-            getErrorMessage(error),
-          );
           Logger.error(
             `Failed to register passkeys for user while retrying: ${getErrorMessage(
               error,

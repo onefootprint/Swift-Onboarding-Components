@@ -31,7 +31,6 @@ const Init = () => {
       }
     },
     onError: () => {
-      console.error('Parsing handoff URL failed on init page');
       Logger.error('Parsing handoff URL failed on init page', 'handoff-init');
     },
   });
@@ -49,7 +48,6 @@ const Init = () => {
 
   const updateD2PStatus = () => {
     if (!authToken) {
-      console.error('Found empty auth token while updating d2p');
       Logger.error('Found empty auth token while updating d2p', 'handoff-init');
       return;
     }

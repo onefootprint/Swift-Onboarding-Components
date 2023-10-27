@@ -31,12 +31,10 @@ const useStepUp = ({
     { authToken },
     {
       onError: (error: unknown) => {
-        console.error(
-          'Failed to get user token info for step up',
-          getErrorMessage(error),
-        );
         Logger.error(
-          'Failed to get user token info for step up',
+          `Failed to get user token info for step up. ${getErrorMessage(
+            error,
+          )}`,
           'kyc-confirm',
         );
         onError?.(error);
@@ -58,10 +56,6 @@ const useStepUp = ({
       { authToken },
       {
         onError: (error: unknown) => {
-          console.error(
-            'Failed to identify user for step up',
-            getErrorMessage(error),
-          );
           Logger.error(
             `Failed to identify user for step up, ${getErrorMessage(error)}`,
             'kyc-confirm',
@@ -120,7 +114,6 @@ const useStepUp = ({
         biometricChallengeJson,
       );
     } catch (e) {
-      console.error(e);
       Logger.error(
         `Failed to get biometric challenge response, ${e}`,
         'kyc-confirm',
@@ -149,10 +142,6 @@ const useStepUp = ({
           onSuccess?.(steppedUpAuthToken);
         },
         onError: (error: unknown) => {
-          console.error(
-            'Encountered error while verifying login challenge for step up: ',
-            getErrorMessage(error),
-          );
           Logger.error(
             `Encountered error while verifying login challenge for step up: ${getErrorMessage(
               error,
@@ -192,10 +181,6 @@ const useStepUp = ({
       {
         onSuccess: handleLoginChallengeSuccess,
         onError: (error: unknown) => {
-          console.error(
-            'Encountered error while requesting login challenge for step up: ',
-            getErrorMessage(error),
-          );
           Logger.error(
             `Encountered error while requesting login challenge for step up: ${getErrorMessage(
               error,

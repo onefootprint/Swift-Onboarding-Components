@@ -30,7 +30,6 @@ const ConsentMobile = ({ open, onConsent, onClose }: ConsentMobileProps) => {
     const consentInfo = consentRef.current?.getConsentInfo();
     if (!authToken || !consentInfo) {
       if (!authToken) {
-        console.error("Could not submit consent - auth token doesn't exist");
         Logger.error(
           "Could not submit consent - auth token doesn't exist",
           'consent-mobile',
@@ -38,9 +37,6 @@ const ConsentMobile = ({ open, onConsent, onClose }: ConsentMobileProps) => {
       }
 
       if (!consentInfo) {
-        console.error(
-          'Could not submit consent - consent language is empty or undefined',
-        );
         Logger.error(
           'Could not submit consent - consent language is empty or undefined',
           'consent-mobile',
@@ -60,9 +56,6 @@ const ConsentMobile = ({ open, onConsent, onClose }: ConsentMobileProps) => {
       {
         onSuccess: onConsent,
         onError: err => {
-          console.error(
-            `Could not submit consent language. Error: ${getErrorMessage(err)}`,
-          );
           Logger.error(
             `Could not submit consent language. Error: ${getErrorMessage(err)}`,
             'consent-mobile',

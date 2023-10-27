@@ -30,7 +30,6 @@ const useSyncData = () => {
   const toast = useToast();
 
   const logError = (errorMessage: string) => {
-    console.error(errorMessage);
     Logger.error(errorMessage, 'kyc-use-sync-data');
   };
 

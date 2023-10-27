@@ -79,12 +79,10 @@ const Confirm = () => {
       speculative: false,
       onSuccess: handleSyncData,
       onError: (error: unknown) => {
-        console.error(
-          'Speculatively sycing email data on kyc confirm page failed.',
-          getErrorMessage(error),
-        );
         Logger.error(
-          'Speculatively sycing email data on kyc confirm page failed.',
+          `Speculatively sycing email data on kyc confirm page failed. ${getErrorMessage(
+            error,
+          )}`,
           'kyc-confirm',
         );
         showRequestErrorToast(error);

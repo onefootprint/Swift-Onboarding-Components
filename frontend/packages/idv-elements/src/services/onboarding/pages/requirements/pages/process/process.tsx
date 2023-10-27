@@ -30,10 +30,6 @@ const Process = ({ onDone }: ProcessProps) => {
       {
         onSuccess: onDone,
         onError: (error: unknown) => {
-          console.error(
-            'Error while processing onboarding on authorize page',
-            getErrorMessage(error),
-          );
           Logger.error(
             `Error while processing onboarding on authorize page. ${getErrorMessage(
               error,

@@ -30,9 +30,6 @@ const NetWorth = () => {
         });
       },
       onError: (error: unknown) => {
-        console.error(
-          `Encountered error while speculatively syncing data on investor profile net worth page: ${error}`,
-        );
         Logger.error(
           `Encountered error while speculatively syncing data on investor profile net worth page: ${error}`,
           'investor-profile-net-worth',

@@ -48,10 +48,6 @@ const InitAuthToken = ({ authToken }: InitAuthTokenProps) => {
         return;
       }
     } catch (e) {
-      console.error(
-        'Identifying user by auth token failed in init-auth-token page in identify',
-        getErrorMessage(e),
-      );
       Logger.error(
         `Identifying user by auth token failed in init-auth-token page in identify ${getErrorMessage(
           e,
@@ -75,12 +71,8 @@ const InitAuthToken = ({ authToken }: InitAuthTokenProps) => {
         }
       },
       onError: error => {
-        console.error(
-          'Fetching token in InitAuthToken failed with error:',
-          getErrorMessage(error),
-        );
         Logger.error(
-          'Fetching token in InitAuthToken failed',
+          `Fetching token in InitAuthToken failed. ${getErrorMessage(error)}`,
           'identify-init-auth-token',
         );
         send({ type: 'authTokenInvalid' });

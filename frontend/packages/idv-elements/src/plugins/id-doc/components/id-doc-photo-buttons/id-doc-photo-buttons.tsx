@@ -33,7 +33,6 @@ const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
     const { files } = event.target;
     if (!files?.length) {
       onProcessingDone();
-      console.error('Image upload failed. No image files detected');
       Logger.error(
         'Image upload failed. No image files detected',
         'id-doc-photo-buttons',
@@ -43,9 +42,6 @@ const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
 
     const processResult = await processImageFile(files[0], hasBadConnectivity);
     if (!processResult) {
-      console.error(
-        'Image upload failed. Uploaded image could not be processed',
-      );
       Logger.error(
         'Image upload failed. Uploaded image could not be processed',
         'id-doc-photo-buttons',
