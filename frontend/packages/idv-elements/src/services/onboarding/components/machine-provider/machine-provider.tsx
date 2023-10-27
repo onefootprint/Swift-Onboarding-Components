@@ -1,3 +1,4 @@
+import type { L10n } from '@onefootprint/footprint-js';
 import { useMachine } from '@xstate/react';
 import constate from 'constate';
 
@@ -6,10 +7,14 @@ import createOnboardingMachine from '../../utils/state-machine';
 
 type OnboardingMachineProviderArgs = {
   args: OnboardingMachineArgs;
+  l10n?: L10n;
 };
 
-const useLocalOnboardingMachine = ({ args }: OnboardingMachineProviderArgs) =>
-  useMachine(() => createOnboardingMachine(args));
+const useLocalOnboardingMachine = ({
+  args,
+  l10n,
+}: OnboardingMachineProviderArgs) =>
+  useMachine(() => createOnboardingMachine(args, l10n));
 
 export const [OnboardingMachineProvider, useOnboardingMachine] = constate(
   useLocalOnboardingMachine,

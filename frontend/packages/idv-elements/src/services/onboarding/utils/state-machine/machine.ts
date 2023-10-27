@@ -1,3 +1,4 @@
+import type { L10n } from '@onefootprint/footprint-js';
 import type {
   IdDIData,
   IdDocOutcome,
@@ -8,6 +9,7 @@ import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
 import type { MachineContext, MachineEvents } from './types';
+import validateBootstrapData from './utils/validate-bootstrap-data';
 
 export type OnboardingMachineArgs = {
   config: PublicOnboardingConfig;
@@ -22,18 +24,21 @@ export type OnboardingMachineArgs = {
   onComplete?: (validationToken?: string, delay?: number) => void;
 };
 
-const createOnboardingMachine = ({
-  config,
-  device,
-  authToken,
-  bootstrapData = {},
-  userFound,
-  isTransfer,
-  idDocOutcome,
-  overallOutcome,
-  onClose,
-  onComplete,
-}: OnboardingMachineArgs) =>
+const createOnboardingMachine = (
+  {
+    config,
+    device,
+    authToken,
+    bootstrapData = {},
+    userFound,
+    isTransfer,
+    idDocOutcome,
+    overallOutcome,
+    onClose,
+    onComplete,
+  }: OnboardingMachineArgs,
+  l10n?: L10n,
+) =>
   createMachine(
     {
       predictableActionArguments: true,
@@ -49,7 +54,7 @@ const createOnboardingMachine = ({
         config,
         device,
         authToken,
-        bootstrapData,
+        bootstrapData: validateBootstrapData(bootstrapData, l10n?.locale),
         userFound,
         isTransfer,
         idDocOutcome,

@@ -14,7 +14,7 @@ const Onboarding = ({ onDone, l10n, ...args }: OnboardingProps) => (
   <I18nextProvider i18n={configureI18next()}>
     <L10nContextProvider l10n={l10n}>
       <QueryClientProvider client={queryClient}>
-        <OnboardingMachineProvider args={args}>
+        <OnboardingMachineProvider args={args} l10n={l10n}>
           <Router onDone={onDone} />
           <DeviceSignals fpAuthToken={args.authToken} />
         </OnboardingMachineProvider>
