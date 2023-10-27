@@ -242,7 +242,9 @@ def test_portablize_api_vault(twilio, sandbox_tenant, foo_sandbox_tenant, ob_con
         assert any(i["id"] == fp_id for i in body["data"])
 
 
-@pytest.mark.skipif(ENVIRONMENT == "ci", reason="Cannot expect historical users in ci")
+@pytest.mark.skipif(
+    ENVIRONMENT in {"ci", "dev"}, reason="Cannot expect historical users in ci"
+)
 def test_no_implied_auth_for_stale(sandbox_tenant):
     """
     Here, we check that auth cannot be implied if the user hasn't logged in recently.
