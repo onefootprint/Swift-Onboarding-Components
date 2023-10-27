@@ -211,6 +211,7 @@ async fn create_tenant(
         sandbox_restricted: true,
         is_prod_ob_config_restricted: true,
         is_prod_kyb_playbook_restricted: true,
+        is_prod_auth_playbook_restricted: true,
         domains: domain.into_iter().collect(),
         allow_domain_access: false, // false by default on creation, has to become true manually with PATCH /org
     };

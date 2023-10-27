@@ -1,0 +1,1 @@
+ALTER TABLE TENANT ALTER COLUMN is_prod_auth_playbook_restricted SET DEFAULT 't';

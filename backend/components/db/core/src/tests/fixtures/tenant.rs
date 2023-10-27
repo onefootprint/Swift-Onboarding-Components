@@ -14,6 +14,7 @@ pub fn create(conn: &mut TxnPgConn) -> Tenant {
         sandbox_restricted: false,
         is_prod_ob_config_restricted: false,
         is_prod_kyb_playbook_restricted: false,
+        is_prod_auth_playbook_restricted: true,
         domains: vec!["Test domain".to_owned()],
         allow_domain_access: false,
     };
@@ -34,6 +35,7 @@ pub fn create_with_keys(
         sandbox_restricted: false,
         is_prod_ob_config_restricted: false,
         is_prod_kyb_playbook_restricted: false,
+        is_prod_auth_playbook_restricted: true,
         domains: vec!["Test domain".to_owned()],
         allow_domain_access: false,
     };

@@ -84,6 +84,7 @@ async fn post(
                         is_demo_tenant: true,
                         is_prod_ob_config_restricted: false,
                         is_prod_kyb_playbook_restricted: false,
+                        is_prod_auth_playbook_restricted: false,
                         domains: vec![],
                         allow_domain_access: false,
                     };

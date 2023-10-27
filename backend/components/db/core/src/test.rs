@@ -99,6 +99,7 @@ mod test {
             sandbox_restricted: true,
             is_prod_ob_config_restricted: true,
             is_prod_kyb_playbook_restricted: true,
+            is_prod_auth_playbook_restricted: true,
             domains: vec![],
             allow_domain_access: false,
         };
