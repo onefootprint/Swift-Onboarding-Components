@@ -50,7 +50,7 @@ pub struct UserAuthResponse {
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 pub struct ValidateAuthEvent {
-    pub kind: AuthEventKind,
+    pub kind: ModernAuthEventKind,
     pub timestamp: DateTime<Utc>,
 }
 

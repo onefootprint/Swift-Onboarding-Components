@@ -131,7 +131,7 @@ pub async fn post(
         auth_events: auth_events
             .into_iter()
             .map(|ae| ValidateAuthEvent {
-                kind: ae.kind,
+                kind: ae.kind.into(),
                 timestamp: ae.created_at,
             })
             .collect(),
