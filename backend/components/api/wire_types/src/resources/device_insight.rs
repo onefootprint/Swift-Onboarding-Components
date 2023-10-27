@@ -15,7 +15,7 @@ pub struct AuthEvent {
 pub struct PublicAuthEvent {
     /// Information on from where the auth occurred
     pub insight: Option<PublicInsightEvent>,
-    pub kind: AuthEventKind,
+    pub kind: ModernAuthEventKind,
     pub created_at: DateTime<Utc>,
 }
 

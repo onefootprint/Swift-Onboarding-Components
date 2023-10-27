@@ -74,7 +74,7 @@ impl DbToApi<LoadedAuthEvent> for api_wire_types::PublicAuthEvent {
         Self {
             created_at,
             insight: insight.map(api_wire_types::PublicInsightEvent::from_db),
-            kind: event.kind,
+            kind: event.kind.into(),
         }
     }
 }
