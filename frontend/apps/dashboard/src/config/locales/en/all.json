@@ -1969,7 +1969,13 @@
             "subtitle": "Investor profiling questions will be part of the onboarding process."
           },
           "kyb": {
-            "title": "Business information"
+            "business": "Business",
+            "basic_information": "Basic information",
+            "other": "Other",
+            "business_beneficial_owners": "Beneficial owners",
+            "entity-type": "Entity type",
+            "business_website": "Business website",
+            "business_phone": "Business phone"
           }
         },
         "authorized-scopes": {
@@ -2250,7 +2256,13 @@
         "business-address": "Registered business address",
         "business-name": "Legal business name",
         "business-tin": "Taxpayer Identification Number (TIN)",
-        "business-owners-kyc": "KYC of a beneficial owner"
+        "business": "Business",
+        "basic_information": "Basic information",
+        "other": "Other",
+        "business-beneficial-owners": "Beneficial owners",
+        "business-type": "Legal entity type",
+        "business-website": "Business website",
+        "business-phone-number": "Business phone"
       }
     },
     "api-keys": {

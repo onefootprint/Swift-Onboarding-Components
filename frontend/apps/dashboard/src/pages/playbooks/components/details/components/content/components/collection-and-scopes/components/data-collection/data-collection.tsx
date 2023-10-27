@@ -1,7 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import { type CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
-import { InlineAlert } from '@onefootprint/ui';
+import { InlineAlert, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import CollectedInformation from '@/playbooks/components/collected-information';
@@ -47,85 +46,106 @@ const DataCollection = ({
   );
 
   return (
-    <Container>
+    <Stack direction="column" gap={8}>
       {isKYB && (
-        <CollectedInformation
-          title={t('kyb.title')}
-          options={{
-            businessName: mustCollectData.includes('business_name'),
-            businessAddress: mustCollectData.includes('business_address'),
-            businessTin: mustCollectData.includes('business_tin'),
-            businessOwnersKyc: mustCollectData.includes(
-              'business_kyced_beneficial_owners',
-            ),
-          }}
-        />
+        <Stack direction="column" gap={7}>
+          <Typography variant="label-3" color="secondary">
+            {t('kyb.business')}
+          </Typography>
+          <Stack direction="column" gap={5}>
+            <CollectedInformation
+              title={t('kyb.basic_information')}
+              options={{
+                businessName: mustCollectData.includes('business_name'),
+                businessAddress: mustCollectData.includes('business_address'),
+                businessBeneficialOwners: mustCollectData.includes(
+                  'business_beneficial_owners',
+                ),
+                businessTin: mustCollectData.includes('business_tin'),
+              }}
+            />
+            <CollectedInformation
+              title={t('kyb.other')}
+              options={{
+                businessPhoneNumber: mustCollectData.includes(
+                  'business_phone_number',
+                ),
+                businessWebsite: mustCollectData.includes('business_website'),
+                businessType: mustCollectData.includes(
+                  'business_corporation_type',
+                ),
+              }}
+            />
+          </Stack>
+        </Stack>
       )}
-      <CollectedInformation
-        title={t('basic-information')}
-        options={{
-          name: true,
-          email: mustCollectData.includes('email'),
-          phoneNumber: mustCollectData.includes('phone_number'),
-          dob: mustCollectData.includes('dob'),
-          fullAddress: mustCollectData.includes('full_address'),
-        }}
-      />
-      {allowUsResidents ? (
-        <CollectedInformation
-          title={t('us-residents.title')}
-          options={{
-            ssn: {
-              active: requiresSSN || optionalSSN,
-              kind: mustCollectData.includes('ssn9') ? 'ssn9' : 'ssn4',
-              optional: optionalSSN,
-            },
-            usLegalStatus: mustCollectData.includes('us_legal_status'),
-            idDocKind: idDocKinds,
-            selfie,
-            ssnDocScanStepUp: !!docScanForOptionalSsn,
-          }}
-        />
-      ) : (
-        <CollectedInformation
-          title={t('us-residents.title')}
-          subtitle={t('us-residents.empty')}
-        />
-      )}
-      {allowInternationalResidents ? (
-        <CollectedInformation
-          title={t('non-us-residents.title')}
-          options={{
-            internationalCountryRestrictions,
-            idDocKind: [SupportedIdDocTypes.passport],
-            selfie: true,
-          }}
-        />
-      ) : (
-        <CollectedInformation
-          title={t('non-us-residents.title')}
-          subtitle={t('non-us-residents.empty')}
-        />
-      )}
-      {hasInvestorProfile && (
-        <CollectedInformation
-          title={t('investor_profile.title')}
-          subtitle={t('investor_profile.subtitle')}
-        />
-      )}
+      <Stack direction="column" gap={7}>
+        {isKYB && (
+          <Typography variant="label-3" color="secondary">
+            {t('kyb.business_beneficial_owners')}
+          </Typography>
+        )}
+        <Stack direction="column" gap={5}>
+          <CollectedInformation
+            title={t('basic-information')}
+            options={{
+              name: true,
+              email: mustCollectData.includes('email'),
+              phoneNumber: mustCollectData.includes('phone_number'),
+              dob: mustCollectData.includes('dob'),
+              fullAddress: mustCollectData.includes('full_address'),
+            }}
+          />
+          {allowUsResidents ? (
+            <CollectedInformation
+              title={t('us-residents.title')}
+              options={{
+                ssn: {
+                  active: requiresSSN || optionalSSN,
+                  kind: mustCollectData.includes('ssn9') ? 'ssn9' : 'ssn4',
+                  optional: optionalSSN,
+                },
+                usLegalStatus: mustCollectData.includes('us_legal_status'),
+                idDocKind: idDocKinds,
+                selfie,
+                ssnDocScanStepUp: !!docScanForOptionalSsn,
+              }}
+            />
+          ) : (
+            <CollectedInformation
+              title={t('us-residents.title')}
+              subtitle={t('us-residents.empty')}
+            />
+          )}
+          {allowInternationalResidents ? (
+            <CollectedInformation
+              title={t('non-us-residents.title')}
+              options={{
+                internationalCountryRestrictions,
+                idDocKind: [SupportedIdDocTypes.passport],
+                selfie: true,
+              }}
+            />
+          ) : (
+            <CollectedInformation
+              title={t('non-us-residents.title')}
+              subtitle={t('non-us-residents.empty')}
+            />
+          )}
+
+          {hasInvestorProfile && (
+            <CollectedInformation
+              title={t('investor_profile.title')}
+              subtitle={t('investor_profile.subtitle')}
+            />
+          )}
+        </Stack>
+      </Stack>
       {isDocFirstFlow && (
         <InlineAlert variant="info">{t('id-doc-first')}</InlineAlert>
       )}
-    </Container>
+    </Stack>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[8]};
-  `}
-`;
 
 export default DataCollection;

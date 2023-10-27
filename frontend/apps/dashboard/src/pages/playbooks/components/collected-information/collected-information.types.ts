@@ -23,6 +23,11 @@ export type Option = Partial<{
   businessAddress: boolean;
   businessTin: boolean;
   businessOwnersKyc: boolean;
+  businessPhoneNumber: boolean;
+  businessWebsite: boolean;
+  businessType: boolean;
+  businessDoingBusinessAs: boolean;
+  businessBeneficialOwners: boolean;
 
   // AML
   enhancedAml: boolean;
