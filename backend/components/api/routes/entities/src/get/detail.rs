@@ -45,6 +45,7 @@ pub async fn get(
         kind: None,
         // Show these entities in detail view
         only_visible: false,
+        is_created_via_api: None,
     };
     let (entity, vw) = state
         .db_pool

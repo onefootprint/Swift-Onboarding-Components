@@ -30,6 +30,7 @@ pub struct ScopedVaultListQueryParams<TSearch = (PiiString, Vec<Fingerprint>)> {
     pub kind: Option<VaultKind>,
     /// Temporary - only show vaults that are visible to be shown in search
     pub only_visible: bool,
+    pub is_created_via_api: Option<bool>,
 }
 
 impl ScopedVaultListQueryParams {
@@ -46,6 +47,7 @@ impl ScopedVaultListQueryParams {
             watchlist_hit,
             kind,
             only_visible,
+            is_created_via_api,
         } = self;
 
         let matching_vaults = if let Some((search, fingerprints)) = search.as_ref() {
@@ -67,6 +69,7 @@ impl ScopedVaultListQueryParams {
             watchlist_hit,
             kind,
             only_visible,
+            is_created_via_api,
         };
         Ok(result)
     }
@@ -89,6 +92,10 @@ macro_rules! list_query {
 
         if $params.only_visible {
             query = query.filter(scoped_vault::show_in_search.eq(true));
+        }
+
+        if let Some(is_created_via_api) = $params.is_created_via_api {
+            query = query.filter(vault::is_created_via_api.eq(is_created_via_api));
         }
 
         // Filter on whether user is in manual review

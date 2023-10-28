@@ -52,6 +52,7 @@ pub async fn get(
         timestamp_lte,
         timestamp_gte,
         show_all,
+        is_created_via_api,
     } = filters.into_inner();
 
     let (search, fp_id) = parse_search(&state, search, &tenant.id).await?;
@@ -69,6 +70,7 @@ pub async fn get(
         timestamp_gte,
         kind,
         only_visible: !show_all.unwrap_or_default(),
+        is_created_via_api,
     };
     let (scoped_vaults, mut entities, vws, count) = state
         .db_pool

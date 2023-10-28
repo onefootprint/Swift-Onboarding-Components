@@ -13,12 +13,6 @@ from tests.headers import FpAuth, SandboxId
 from tests.constants import FIXTURE_PHONE_NUMBER, LIVE_PHONE_NUMBER, EMAIL, ENVIRONMENT
 
 
-@pytest.fixture(scope="module", autouse="true")
-def cleanup():
-    # Cleanup the non-sandbox user that is used across all integration test runs
-    clean_up_user(LIVE_PHONE_NUMBER, EMAIL)
-
-
 @pytest.fixture(scope="session")
 def ob_config(sandbox_tenant, must_collect_data):
     ob_conf_data = {
@@ -180,6 +174,9 @@ def test_portablize_api_vault(twilio, sandbox_tenant, foo_sandbox_tenant, ob_con
     Using the LIVE_PHONE_NUMBER that we can send SMS to, test that we can portablize data on a vault
     initially created via API. We test this by one-click authing onto the user via another tenant
     """
+    # Cleanup the non-sandbox user that is used across all integration test runs
+    clean_up_user(LIVE_PHONE_NUMBER, EMAIL)
+
     data = {
         "id.phone_number": LIVE_PHONE_NUMBER,
     }
@@ -242,9 +239,7 @@ def test_portablize_api_vault(twilio, sandbox_tenant, foo_sandbox_tenant, ob_con
         assert any(i["id"] == fp_id for i in body["data"])
 
 
-@pytest.mark.skipif(
-    ENVIRONMENT in {"ci", "dev"}, reason="Cannot expect historical users in ci"
-)
+@pytest.mark.skipif(ENVIRONMENT == "ci", reason="Cannot expect historical users in ci")
 def test_no_implied_auth_for_stale(sandbox_tenant):
     """
     Here, we check that auth cannot be implied if the user hasn't logged in recently.
@@ -254,16 +249,19 @@ def test_no_implied_auth_for_stale(sandbox_tenant):
     But, please don't remove this test without getting coverage for this elsewhere.
     """
     # Get an old user, who probably hasn't had any auths recently
-    filters = dict(timestamp_lte=arrow.now().shift(hours=-1, minutes=-5))
+    filters = dict(
+        timestamp_lte=arrow.now().shift(hours=-1, minutes=-5),
+        is_created_via_api="false",
+    )
     body = get("entities", filters, *sandbox_tenant.db_auths)
-    users_made_via_bifrost = [i for i in body["data"] if not i["is_created_via_api"]]
-    if not users_made_via_bifrost:
+    assert all([not i["is_created_via_api"] for i in body["data"]])
+    if not body["data"]:
         assert (
             False
         ), "No old user to use to test implied auth timeout. If you get this error running tests locally, it's likely safe to ignore. See the comment in this test"
 
     # Create a token and make sure it does not have implied auth
-    fp_id = users_made_via_bifrost[0]["id"]
+    fp_id = body["data"][0]["id"]
     data = dict(key=sandbox_tenant.default_ob_config.key.value)
     body = post(f"entities/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
