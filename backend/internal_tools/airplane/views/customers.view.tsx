@@ -56,9 +56,6 @@ const OrgList = ({ onlyCorporate }: { onlyCorporate: boolean }) => {
       id="customers"
       title="Customers"
       defaultPageSize={25}
-      columns={[
-        { accessor: '_created_at', label: 'created', type: 'datetime' },
-      ]}
       task={{
         slug: 'dbquery',
         params: {
