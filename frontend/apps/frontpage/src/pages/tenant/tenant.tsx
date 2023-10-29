@@ -57,6 +57,7 @@ const TenantPage = ({ tenant }: TenantPageProps) => {
       <StyledContainer
         align="center"
         justify="center"
+        direction="column"
         gap={10}
         paddingTop={10}
         paddingBottom={12}
@@ -69,6 +70,7 @@ const TenantPage = ({ tenant }: TenantPageProps) => {
           align="center"
           justify="center"
           textAlign="center"
+          direction="column"
           gap={5}
           maxWidth="600px"
         >
@@ -83,6 +85,7 @@ const TenantPage = ({ tenant }: TenantPageProps) => {
           align="center"
           justify="center"
           maxWidth="856px"
+          direction="column"
           paddingTop={9}
           paddingBottom={9}
           paddingLeft={5}
