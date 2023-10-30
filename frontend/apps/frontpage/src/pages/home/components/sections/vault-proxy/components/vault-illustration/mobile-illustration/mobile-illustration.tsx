@@ -5,6 +5,7 @@ import { createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 
 import VerticalBeam from '../../../../../vertical-beam';
+import Grid from '../components/grid';
 import Knob from '../components/knob';
 
 const values = {
@@ -24,6 +25,7 @@ const values = {
 
 const TabletIllustration = () => (
   <Container>
+    <Grid />
     <VerticalBeam
       path="M1 0L1 95.0915C1 99.5098 4.58172 103.091 9 103.091H52C56.4183 103.091 60 106.673 60 111.091L60 287.612C60 292.03 63.5817 295.612 68 295.612H138C142.418 295.612 146 299.193 146 303.612V640"
       height={640}

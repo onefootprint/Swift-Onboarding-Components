@@ -1,8 +1,7 @@
-import { primitives } from '@onefootprint/design-tokens';
 import { IcoFootprint40 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
+import { media } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import React from 'react';
 
 type KnobProps = {
@@ -12,94 +11,112 @@ type KnobProps = {
 
 const rings = [
   {
-    delay: 0,
+    key: 5,
     diameter: 1.7,
   },
   {
-    delay: 2,
+    key: 4,
+    diameter: 2.2,
+  },
+  {
+    key: 3,
+    diameter: 1.8,
+  },
+  {
+    key: 2,
     diameter: 1.4,
   },
   {
-    delay: 4,
-    diameter: 1.2,
-  },
-  {
-    delay: 6,
-    diameter: 1,
-  },
-  {
-    delay: 8,
+    key: 1,
     diameter: 0.7,
   },
 ];
 
 const Knob = ({ width, className }: KnobProps) => (
   <Container className={className} width={width}>
-    {rings.map(({ delay, diameter }) => (
-      <Ring
-        key={delay}
-        diameter={width * diameter}
-        initial={{
-          width,
-          height: width,
-          opacity: 0,
-          transform: 'translate(-50%, -50%)',
-        }}
-        animate={{
-          transform: 'translate(-50%, -50%)',
-          width: width * 2,
-          height: width * 2,
-          opacity: [0, 0.8, 0],
-        }}
-        transition={{
-          repeat: Infinity,
-          ease: 'easeInOut',
-          duration: 10,
-          delay,
-        }}
-      />
+    {rings.map(({ key, diameter }) => (
+      <Ring key={key} diameter={width * diameter} data-order={key} />
     ))}
     <CenterKnob>
       <Center diameter={width * 0.9} />
-      <Grid
-        src="/home/vault-proxy/knob/grid.svg"
-        height={400}
-        width={400}
-        style={{ opacity: 0.9 }}
-        alt="Knob"
-        priority
-      />
     </CenterKnob>
     <IcoFootprint40 color="quinary" />
   </Container>
 );
 
-const Ring = styled(motion.div)<{ diameter?: number }>`
+const Ring = styled(motion.div)<{ diameter: number }>`
   ${({ diameter }) => css`
-    height: ${diameter}px;
-    width: ${diameter}px;
-    background-color: rgba(255, 255, 255, 0.2);
+    height: ${diameter / 1.4}px;
+    width: ${diameter / 1.4}px;
     background-blend-mode: soft-light;
-    box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.2) inset;
-    border-radius: 50%;
+    border-radius: 100%;
+
+    ${media.greaterThan('sm')`
+      height: ${diameter}px;
+      width: ${diameter}px;
+    `}
+
+    &[data-order='2'] {
+      background-color: rgba(0, 0, 0, 0.2);
+      fill: radial-gradient(
+        147.73% 147.73% at 50% 50%,
+        rgba(26, 30, 40, 0.8) 0%,
+        transparent 100%
+      );
+      box-shadow:
+        0px 1px 0px 0px rgba(255, 255, 255, 0.2) inset,
+        0px 1px 0px 1px rgba(0, 0, 0, 0.1);
+      filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.5)), blur(1px);
+    }
+
+    &[data-order='3'] {
+      background-color: rgba(0, 0, 0, 0.2);
+      fill: radial-gradient(
+        147.73% 147.73% at 50% 50%,
+        rgba(26, 30, 40, 0.8) 0%,
+        transparent 100%
+      );
+      box-shadow:
+        0px 1px 0px 0px rgba(255, 255, 255, 0.2) inset,
+        0px 1px 0px 1px rgba(0, 0, 0, 0.1);
+      filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.5)), blur(1px);
+    }
+
+    &[data-order='4'] {
+      background-color: rgba(0, 0, 0, 0.2);
+      fill: radial-gradient(
+        147.73% 147.73% at 50% 50%,
+        rgba(26, 30, 40, 0.8) 0%,
+        transparent 100%
+      );
+      box-shadow:
+        0px 1px 0px 0px rgba(255, 255, 255, 0.2) inset,
+        0px 1px 0px 1px rgba(0, 0, 0, 0.2);
+      filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.5)), blur(1px);
+    }
   `}
 `;
 
-const Center = styled.div<{ diameter?: number }>`
+const Center = styled.div<{ diameter: number }>`
   ${({ diameter, theme }) => css`
-    height: ${diameter}px;
-    width: ${diameter}px;
+    height: ${diameter / 1.4}px;
+    width: ${diameter / 1.4}px;
     border-radius: ${theme.borderRadius.full};
     background: linear-gradient(
         180deg,
-        ${primitives.Gray1000} 0%,
-        ${primitives.Gray800} 100%
+        rgba(0, 0, 50, 0.2) 0%,
+        rgba(0, 0, 0, 0.5) 100%
       ),
-      ${primitives.Gray1000};
+      rgba(0, 0, 0, 0.5);
     box-shadow:
       0.3px 0.5px 0px 0px rgba(255, 255, 255, 0.1) inset,
-      -0.3px -0.5px 0px 0px rgba(255, 255, 255, 0.4) inset,
-      1px 1px 4px 0px ${primitives.Gray1000} inset;
+      -0px -0.5px 0px 0px rgba(255, 255, 255, 0.1) inset,
+      1px 1px 4px 0px rgba(0, 0, 0, 0.5) inset;
+
+    ${media.greaterThan('sm')`
+  height: ${diameter}px;
+    width: ${diameter}px;
+  `}
   `}
 `;
 
@@ -123,20 +140,6 @@ const Container = styled.div<{ width?: number }>`
       transform: translate(-50%, -50%);
     }
   `}
-`;
-
-const Grid = styled(Image)`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  mask: radial-gradient(
-    50% 40% at 50% 50%,
-    transparent 0%,
-    black 80%,
-    transparent 90%
-  );
-  mask-mode: alpha;
 `;
 
 const CenterKnob = styled.div`

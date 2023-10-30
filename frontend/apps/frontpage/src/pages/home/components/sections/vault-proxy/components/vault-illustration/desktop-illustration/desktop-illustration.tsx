@@ -5,6 +5,7 @@ import { createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 
 import HorizontalBeam from '../../../../../horizontal-beam';
+import Grid from '../components/grid';
 import Knob from '../components/knob';
 
 const values = {
@@ -24,6 +25,7 @@ const values = {
 
 const DesktopIllustration = () => (
   <Container>
+    <Grid />
     <Beams>
       <HorizontalBeam
         width={950}
