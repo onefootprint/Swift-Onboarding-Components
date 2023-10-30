@@ -1,3 +1,4 @@
+import { primitives } from '@onefootprint/design-tokens';
 import { IcoCreditcard24, IcoIdCard24, IcoPin24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media } from '@onefootprint/ui';
@@ -49,15 +50,15 @@ const TabletIllustration = () => (
     />
     <Knob width={180} />
     <Label data-id="snn">
-      <IcoIdCard24 color="primary" />
+      <IcoIdCard24 color="quinary" />
       {values.snn.value}
     </Label>
     <Label data-id="credit-card">
-      <IcoCreditcard24 color="primary" />
+      <IcoCreditcard24 color="quinary" />
       {values.cc.value}
     </Label>
     <Label data-id="address">
-      <IcoPin24 color="primary" />
+      <IcoPin24 color="quinary" />
       {values.address.value}
     </Label>
     <Label data-id="token-snn">{values.snn.token}</Label>
@@ -120,13 +121,13 @@ const Container = styled.div`
 const Label = styled.div`
   ${({ theme }) => css`
     ${createFontStyles('snippet-2', 'code')}
-    color: ${theme.color.primary};
+    color: ${primitives.Gray0};
     display: flex;
     align-items: center;
     justify-content: center;
     position: absolute;
     gap: ${theme.spacing[4]};
-    background-color: ${theme.backgroundColor.secondary};
+    background-color: ${primitives.Gray800};
     padding: ${theme.spacing[2]} ${theme.spacing[3]};
     border-radius: ${theme.borderRadius.full};
     opacity: 1;
@@ -137,9 +138,9 @@ const Label = styled.div`
       position: absolute;
       width: 100%;
       height: 100%;
-      background-color: ${theme.backgroundColor.secondary};
+      background-color: ${primitives.Gray800};
       z-index: -1;
-      border: 1px solid ${theme.borderColor.tertiary};
+      border: ${theme.borderWidth[1]} solid ${primitives.Gray700};
       border-radius: ${theme.borderRadius.default};
     }
 
