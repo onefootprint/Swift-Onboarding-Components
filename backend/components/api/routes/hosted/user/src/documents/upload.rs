@@ -112,6 +112,12 @@ pub async fn post(
             Ok((id_doc, doc_request, uvw, user_consent, obc))
         })
         .await??;
+
+    if id_doc.status != IdentityDocumentStatus::Pending {
+        // Do not change this error - the frontend is relying upon it
+        return Err(OnboardingError::IdentityDocumentNotPending.into());
+    }
+
     let vault = uvw.vault.clone();
     // We support the flow
     let should_collect_selfie = doc_request.should_collect_selfie && !id_doc.should_skip_selfie();
@@ -143,9 +149,6 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let uvw = VaultWrapper::lock_for_onboarding(conn, &su_id)?;
-            if id_doc.status != IdentityDocumentStatus::Pending {
-                return Err(OnboardingError::IdentityDocumentNotPending.into());
-            }
             // Vault the images under latest uploads
 
             let source = DataLifetimeSource::Hosted;

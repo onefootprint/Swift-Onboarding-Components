@@ -24,6 +24,7 @@ pub enum OnboardingError {
     MissingAttributes(Csv<CollectedDataOption>),
     #[error("Onboarding is not in a terminal state")]
     NonTerminalState,
+    /// Do not change this error message - the frontend is relying upon it
     #[error("Identity document is not pending upload")]
     IdentityDocumentNotPending,
     #[error("Cannot create a document when no document request exists")]
