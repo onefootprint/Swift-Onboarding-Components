@@ -28,7 +28,7 @@ const Provider = ({ debug, children }: AnalyticsProps) => {
     const mixpanel = new Mixpanel(MIXPANEL_TOKEN, trackAutomaticEvents);
     mixpanel.init();
     setAnalytics(mixpanel);
-  }, []);
+  }, [debug]);
 
   return (
     <AnalyticsContext.Provider value={analytics}>

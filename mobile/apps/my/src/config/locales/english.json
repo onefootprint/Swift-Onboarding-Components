@@ -248,7 +248,7 @@
       "user-not-found": {
         "title": "User not found",
         "description": "Sorry, we couldn't find an account associated to this email.",
-        "cta": "Create account"
+        "cta": "Close"
       }
     },
     "login": {

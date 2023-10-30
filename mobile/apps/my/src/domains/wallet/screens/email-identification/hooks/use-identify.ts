@@ -2,7 +2,6 @@ import request from '@onefootprint/request';
 import { IdentifyRequest, IdentifyResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation } from '@tanstack/react-query';
-import { Linking } from 'react-native';
 
 import useTranslation from '@/hooks/use-translation';
 
@@ -37,9 +36,6 @@ const useIdentify = () => {
           description: t('user-not-found.description'),
           cta: {
             label: t('user-not-found.cta'),
-            onPress: () => {
-              Linking.openURL('https://live.onefootprint.com/');
-            },
           },
         });
       }

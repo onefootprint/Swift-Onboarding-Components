@@ -2,7 +2,7 @@ import { D2PStatusUpdate } from '@onefootprint/types';
 import { Container, LoadingIndicator } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 
-import { Events, AnalyticsTimeEvents, useAnalytics } from '@/utils/analytics';
+import { AnalyticsTimeEvents, Events, useAnalytics } from '@/utils/analytics';
 
 import useUpdateD2PStatus from '../../hooks/use-update-d2p-status';
 
