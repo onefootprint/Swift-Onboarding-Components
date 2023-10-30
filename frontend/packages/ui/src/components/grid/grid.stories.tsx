@@ -1,8 +1,8 @@
 import type { Story } from '@storybook/react';
 import React from 'react';
 
-import type { ContainerProps, ItemProps } from './grid';
 import Grid from './grid';
+import type { GridContainerProps, ItemProps } from './grid.types';
 
 export default {
   component: Grid,
@@ -41,14 +41,14 @@ export default {
   },
 };
 
-const Template: Story<ContainerProps & ItemProps> = ({
+const Template: Story<GridContainerProps & ItemProps> = ({
   columns,
   rowGap,
   columnGap,
   templateAreas,
   rows,
   gap,
-}: ContainerProps & ItemProps) => (
+}: GridContainerProps & ItemProps) => (
   <Grid.Container
     columns={columns}
     rows={rows}

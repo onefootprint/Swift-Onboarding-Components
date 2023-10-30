@@ -1,2 +1,2 @@
-export type { ContainerProps, ItemProps } from './grid';
 export { default } from './grid';
+export type { GridContainerProps, GridTag } from './grid.types';

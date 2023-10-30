@@ -1,6 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoEye16, IcoWarningSmall16 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import type { EntityStatus } from '@onefootprint/types';
 import { Badge, Stack, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
@@ -26,13 +25,13 @@ const StatusBadge = ({
   const badgeVariant = getBadgeVariantByStatus(status, requiresManualReview);
 
   return (
-    <StatusContainer>
+    <Stack align="center">
       <Badge variant={badgeVariant} sx={{ whiteSpace: 'nowrap' }}>
         {t(status)}
         {requiresManualReview && (
-          <IconContainer>
+          <Stack marginLeft={2}>
             <IcoWarningSmall16 color={badgeVariant} testID="manualReviewIcon" />
-          </IconContainer>
+          </Stack>
         )}
       </Badge>
       <Stack gap={2} align="center">
@@ -42,7 +41,7 @@ const StatusBadge = ({
               <Stack
                 align="center"
                 marginLeft={watchlistLabel ? 5 : 2}
-                testID="watchlistFailIcon"
+                data-testid="watchlistFailIcon"
               >
                 <IcoEye16 color="error" />
               </Stack>
@@ -55,20 +54,8 @@ const StatusBadge = ({
           </>
         )}
       </Stack>
-    </StatusContainer>
+    </Stack>
   );
 };
-
-const IconContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    margin-left: ${theme.spacing[2]};
-  `};
-`;
-
-const StatusContainer = styled.div`
-  display: flex;
-  align-items: center;
-`;
 
 export default StatusBadge;

@@ -115,7 +115,7 @@ const QRRegister = () => {
   return (
     <>
       <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
-      <Grid.Container rowGap={7} textAlign="center">
+      <Grid.Container gap={7} textAlign="center">
         <HeaderTitle
           title={t(`${translationSource}.title`)}
           subtitle={t('subtitle')}

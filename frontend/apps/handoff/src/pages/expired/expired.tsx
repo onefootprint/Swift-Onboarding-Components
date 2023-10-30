@@ -17,7 +17,7 @@ const Expired = () => {
   return (
     <>
       <NavigationHeader />
-      <Grid.Container as="form" rowGap={8}>
+      <Grid.Container as="form" gap={8}>
         <HeaderTitle
           title={t('title')}
           subtitle={

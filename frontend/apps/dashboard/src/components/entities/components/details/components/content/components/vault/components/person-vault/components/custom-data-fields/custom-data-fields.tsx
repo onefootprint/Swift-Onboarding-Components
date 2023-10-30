@@ -76,7 +76,7 @@ const CustomDataFields = ({
         </Header>
         <Grid.Container
           columnGap={12}
-          rowGap={4}
+          gap={4}
           width="100%"
           columns={['repeat(2, 1fr)']}
           paddingTop={5}

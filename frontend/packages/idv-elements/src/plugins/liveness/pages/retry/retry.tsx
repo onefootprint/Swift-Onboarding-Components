@@ -68,13 +68,13 @@ const Retry = () => {
   };
 
   return (
-    <Grid.Container as="form" rowGap={8}>
+    <Grid.Container as="form" gap={8}>
       <NavigationHeader />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       {biometricInitMutation.isSuccess ? (
         <LivenessSuccess />
       ) : (
-        <Grid.Container rowGap={4}>
+        <Grid.Container gap={4}>
           <Button
             onClick={handleRetry}
             loading={biometricInitMutation.isLoading}

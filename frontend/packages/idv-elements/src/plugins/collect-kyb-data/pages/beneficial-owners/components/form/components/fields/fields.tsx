@@ -27,7 +27,7 @@ const Fields = ({ index, onRemove, config, l10n }: FieldsProps) => {
 
   return (
     <Container
-      rowGap={4}
+      gap={4}
       padding={5}
       borderWidth={1}
       borderColor="tertiary"

@@ -134,7 +134,7 @@ const Form = ({
     <FormProvider {...methods}>
       <Grid.Container
         as="form"
-        rowGap={6}
+        gap={6}
         width="100%"
         onSubmit={handleSubmit(onSubmitFormData)}
         ref={animate}

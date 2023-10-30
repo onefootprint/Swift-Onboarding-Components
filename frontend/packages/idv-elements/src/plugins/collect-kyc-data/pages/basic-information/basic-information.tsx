@@ -116,7 +116,7 @@ const BasicInformation = ({
       )}
       <FormProvider {...methods}>
         <Grid.Container
-          rowGap={7}
+          gap={7}
           as="form"
           onSubmit={methods.handleSubmit(onSubmitFormData)}
         >

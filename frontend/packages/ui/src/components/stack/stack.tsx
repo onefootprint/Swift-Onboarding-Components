@@ -1,46 +1,53 @@
-import type { Spacing } from '@onefootprint/design-tokens';
-import type { Property } from 'csstype';
 import styled, { css } from 'styled-components';
 
-import type { SXStyleProps } from '../../hooks';
-import type { BoxProps, BoxPropsStyles } from '../box';
-import Box from '../box';
+import { createFontStyles } from '../../utils/mixins';
+import type { StackProps, StackTag } from './stack.types';
+import { getBorders, getMargin, getPadding } from './stack.utils';
 
-export type StackProps = BoxProps &
-  BoxPropsStyles & {
-    gap?: Spacing;
-    flexWrap?: Property.FlexWrap;
-    direction?: Property.FlexDirection;
-    align?: Property.AlignItems;
-    justify?: Property.JustifyContent;
-    flexGrow?: Property.FlexGrow;
-    inline?: boolean;
-    visibility?: Property.Visibility;
-    sx?: SXStyleProps;
-  };
+const Stack = styled('div').attrs<{ as: StackTag }>(({ as, ...props }) => ({
+  as,
+  ...props,
+}))<StackProps>`
+  ${({ theme, sx, ...props }) => css`
+    display: ${props.inline ? 'inline-flex' : 'flex'};
+    gap: ${theme.spacing[props.gap || 0]};
+    flex-direction: ${props.direction};
+    align-items: ${props.align};
+    justify-content: ${props.justify};
+    flex-wrap: ${props.flexWrap};
+    flex-grow: ${props.flexGrow};
+    visibility: ${props.visibility};
 
-const Stack = styled(Box)<StackProps>`
-  ${({
-    theme,
-    gap,
-    visibility = 'visible',
-    direction = 'row',
-    align = 'unset',
-    justify = 'flex-start',
-    flexWrap = 'nowrap',
-    flexGrow = 0,
-    inline,
-    sx,
-  }) => css`
-    sx=${sx};
-    display: ${inline ? 'inline-flex' : 'flex'};
-    gap: ${theme.spacing[gap || 0]};
-    flex-direction: ${direction};
-    align-items: ${align};
-    justify-content: ${justify};
-    flex-wrap: ${flexWrap};
-    flex-grow: ${flexGrow};
-    visibility: ${visibility};
+    /* Box */
+    ${getBorders(props as StackProps, theme)};
+    padding: ${getPadding(props as StackProps, theme)};
+    margin: ${getMargin(props as StackProps, theme)};
+    ${props.fontStyle && createFontStyles(props.fontStyle)};
+    box-shadow: ${props.elevation ? theme.elevation[props.elevation] : 'none'};
+    background-color: ${(props.backgroundColor &&
+      theme.backgroundColor[props.backgroundColor]) ||
+    (props.surfaceColor && theme.surfaceColor[props.surfaceColor])};
+    position: ${props.position || 'relative'};
+    display: ${props.display};
+    text-align: ${props.textAlign};
+    border-radius: ${theme.borderRadius[
+      props.borderRadius ? props.borderRadius : 'none'
+    ]};
+    width: ${props.width};
+    height: ${props.height};
+    overflow: ${props.overflow};
+    min-with: ${props.minWidth};
+    min-height: ${props.minHeight};
+    max-width: ${props.maxWidth};
+    max-height: ${props.maxHeight};
+    visibility: ${props.visibility};
+    overflow: ${props.overflow};
+    gap: ${props.gap ? theme.spacing[props.gap] : '0'};
+    top: ${props.top ? theme.spacing[props.top] : undefined};
+    bottom: ${props.bottom ? theme.spacing[props.bottom] : undefined};
+    left: ${props.left ? theme.spacing[props.left] : undefined};
+    right: ${props.right ? theme.spacing[props.right] : undefined};
+    z-index: ${props.zIndex};
   `}
 `;
 

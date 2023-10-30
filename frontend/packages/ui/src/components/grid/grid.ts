@@ -1,30 +1,9 @@
-import type { Spacing } from '@onefootprint/design-tokens';
 import styled, { css } from '@onefootprint/styled';
-import type * as CSS from 'csstype';
 
-import type { BoxProps, BoxPropsStyles } from '../box';
-import Box from '../box';
+import { createFontStyles } from '../../utils/mixins';
 import Stack from '../stack';
-
-type ItemProps = {
-  gridArea?: string;
-  column?: string;
-  row?: string;
-  width?: string;
-};
-
-type ContainerProps = BoxProps &
-  BoxPropsStyles & {
-    columns?: string[];
-    rows?: string[];
-    columnGap?: Spacing;
-    rowGap?: Spacing;
-    gap?: Spacing;
-    templateAreas?: string[];
-    alignItems?: CSS.Property.AlignItems;
-    justifyContent?: CSS.Property.JustifyContent;
-    width?: string;
-  };
+import type { GridContainerProps, GridTag, ItemProps } from './grid.types';
+import { getBorders, getMargin, getPadding } from './grid.utils';
 
 const createColumns = (columns?: string | string[]) => {
   if (typeof columns === 'string') {
@@ -50,31 +29,59 @@ const createRows = (rows?: string | string[]) => {
   return undefined;
 };
 
-const Container = styled(Box)<ContainerProps>`
-  ${({
-    theme,
-    columns,
-    rows,
-    columnGap,
-    rowGap,
-    gap,
-    templateAreas,
-    alignItems,
-    justifyContent,
-    width,
-  }) => css`
+const Container = styled('div').attrs<{ as: GridTag }>(({ as, ...props }) => ({
+  as,
+  ...props,
+}))<GridContainerProps>`
+  ${({ theme, sx, ...props }) => css`
+    {...props}
+    sx=${sx};
     display: grid;
-    width: ${width};
-    grid-template-columns: ${createColumns(columns)};
-    grid-template-rows: ${createRows(rows)};
-    grid-gap: ${gap ? theme.spacing[gap] : undefined};
-    grid-column-gap: ${columnGap ? theme.spacing[columnGap] : undefined};
-    grid-row-gap: ${rowGap ? theme.spacing[rowGap] : undefined};
-    align-items: ${alignItems};
-    justify-content: ${justifyContent};
-    grid-template-areas: ${templateAreas
-      ? `"${templateAreas.join('"\n"')}"`
-      : undefined};
+    width: ${props.width};
+    grid-template-columns: ${createColumns(props.columns)};
+    grid-template-rows: ${createRows(props.rows)};
+    grid-gap: ${props.gap ? theme.spacing[props.gap] : undefined};
+    grid-column-gap: ${
+      props.columnGap ? theme.spacing[props.columnGap] : undefined
+    };
+    grid-row-gap: ${props.rowGap ? theme.spacing[props.rowGap] : undefined};
+    align-items: ${props.alignItems};
+    justify-content: ${props.justifyContent};
+    grid-template-areas: ${
+      props.templateAreas ? `"${props.templateAreas.join('"\n"')}"` : undefined
+    };
+
+    /* Box */
+    ${getBorders(props, theme)};
+    padding: ${getPadding(props, theme)};
+    margin: ${getMargin(props, theme)};
+    ${props.fontStyle && createFontStyles(props.fontStyle)};
+    box-shadow: ${props.elevation ? theme.elevation[props.elevation] : 'none'};
+    background-color: ${
+      (props.backgroundColor && theme.backgroundColor[props.backgroundColor]) ||
+      (props.surfaceColor && theme.surfaceColor[props.surfaceColor])
+    };
+    position: ${props.position || 'relative'};
+    display: ${props.display};
+    text-align: ${props.textAlign};
+    border-radius: ${
+      theme.borderRadius[props.borderRadius ? props.borderRadius : 'none']
+    };
+    width: ${props.width};
+    height: ${props.height};
+    overflow: ${props.overflow};
+    min-with: ${props.minWidth};
+    min-height: ${props.minHeight};
+    max-width: ${props.maxWidth};
+    max-height: ${props.maxHeight};
+    visibility: ${props.visibility};
+    overflow: ${props.overflow};
+    gap: ${props.gap ? theme.spacing[props.gap] : '0'};
+    top: ${props.top ? theme.spacing[props.top] : undefined};
+    bottom: ${props.bottom ? theme.spacing[props.bottom] : undefined};
+    left: ${props.left ? theme.spacing[props.left] : undefined};
+    right: ${props.right ? theme.spacing[props.right] : undefined};
+    z-index: ${props.zIndex};
   `}
 `;
 
@@ -87,5 +94,5 @@ const Item = styled(Stack)<ItemProps>`
   `}
 `;
 
-export type { ContainerProps, ItemProps };
+export type { GridContainerProps, ItemProps };
 export default { Container, Item };

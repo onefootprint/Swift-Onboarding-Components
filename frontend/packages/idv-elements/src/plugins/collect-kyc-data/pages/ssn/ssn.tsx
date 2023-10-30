@@ -126,7 +126,7 @@ const SSN = ({
       <FormProvider {...methods}>
         <Grid.Container
           as="form"
-          rowGap={7}
+          gap={7}
           onSubmit={methods.handleSubmit(onSubmitForm)}
           width="100%"
         >

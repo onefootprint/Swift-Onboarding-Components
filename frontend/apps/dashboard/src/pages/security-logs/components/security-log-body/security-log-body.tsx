@@ -30,7 +30,7 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => {
       {accessEvent.insightEvent && (
         <Stack direction="column" gap={5}>
           <Typography variant="label-4">{t('metadata')}</Typography>
-          <Grid.Container columns={['repeat(4, minmax(0, 1fr))']} rowGap={2}>
+          <Grid.Container columns={['repeat(4, minmax(0, 1fr))']} gap={2}>
             <Typography variant="body-4" color="tertiary">
               {t('region')}
             </Typography>

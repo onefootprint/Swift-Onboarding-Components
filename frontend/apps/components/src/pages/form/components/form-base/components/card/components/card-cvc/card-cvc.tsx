@@ -45,6 +45,7 @@ const CardCvc = forwardRef<HTMLInputElement, CardCvcProps>(
     return (
       <InternalInput
         {...props}
+        width="100%"
         autoComplete="cc-csc"
         className="fp-input-cvc"
         hasError={hasError}

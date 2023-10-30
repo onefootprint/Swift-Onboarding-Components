@@ -97,7 +97,7 @@ const ResidentialAddress = ({
       <FormProvider {...methods}>
         <Grid.Container
           as="form"
-          rowGap={7}
+          gap={7}
           onSubmit={handleSubmit(onSubmitFormData)}
         >
           {!hideHeader && (
@@ -109,7 +109,7 @@ const ResidentialAddress = ({
               onChange={handleCountryChange}
             />
             <AddressLines />
-            <Grid.Container columns={['1fr', '1fr']} columnGap={5}>
+            <Grid.Container columns={['1fr', '1fr']} gap={5}>
               <CityField />
               <ZipField />
             </Grid.Container>

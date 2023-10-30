@@ -21,7 +21,7 @@ const RadioSelect = ({
   size,
 }: RadioSelectProps) =>
   options.length > 0 ? (
-    <OptionsContainer testID={testID} direction="column" gap={3}>
+    <OptionsContainer data-testid={testID} direction="column" gap={3}>
       {options.map(
         ({
           title,

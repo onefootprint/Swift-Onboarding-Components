@@ -6,7 +6,6 @@ import { Box, Button, Grid } from '@onefootprint/ui';
 import { noop } from 'lodash';
 import React, { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import styled, { css } from 'styled-components';
 
 import type { SandboxOutcomeFormData } from '../../types';
 import getRandomID from '../../utils/get-random-id';
@@ -46,7 +45,12 @@ export const SandboxOutcomeContainer = ({
       <NavigationHeader leftButton={{ variant: 'close' }} />
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <FormProvider {...formMethods}>
-        <Form as="form" gap={5} onSubmit={handleSubmit(onSubmit)}>
+        <Grid.Container
+          as="form"
+          gap={5}
+          onSubmit={handleSubmit(onSubmit)}
+          marginTop={7}
+        >
           <OverallOutcomeSelect
             shouldShowStepUp={shouldShowStepUp}
             requiresIdDoc={requiresIdDoc}
@@ -62,16 +66,10 @@ export const SandboxOutcomeContainer = ({
           <Button fullWidth type="submit" disabled={!!errors?.testID}>
             {t('cta')}
           </Button>
-        </Form>
+        </Grid.Container>
       </FormProvider>
     </Box>
   );
 };
-
-const Form = styled(Grid.Container)`
-  ${({ theme }) => css`
-    margin-top: ${theme.spacing[7]};
-  `}
-`;
 
 export default SandboxOutcomeContainer;

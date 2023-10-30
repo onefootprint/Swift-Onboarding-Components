@@ -50,7 +50,7 @@ const Form = ({
   return (
     <Grid.Container
       as="form"
-      rowGap={7}
+      gap={7}
       onSubmit={handleSubmit(handleBeforeSubmit)}
     >
       <Controller

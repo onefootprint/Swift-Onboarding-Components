@@ -2,7 +2,7 @@ import { Portal, Shimmer, Stack } from '@onefootprint/ui';
 import React from 'react';
 
 const Loading = () => (
-  <Stack aria-busy testID="onboarding-invite-loading">
+  <Stack aria-busy data-testid="onboarding-invite-loading">
     <Stack gap={4} marginBottom={5}>
       <Stack direction="column" gap={3} id="email-shimmer">
         <Shimmer sx={{ height: '20px', width: '92px' }} />
