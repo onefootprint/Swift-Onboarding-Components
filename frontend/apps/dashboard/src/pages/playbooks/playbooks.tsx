@@ -7,9 +7,10 @@ import React, { useEffect, useState } from 'react';
 import PermissionGate from 'src/components/permission-gate';
 import WaveAnimation from 'src/components/wave-animation';
 
+import CreateDialog from './components/create-dialog';
 import Details from './components/details';
-import Dialog from './components/dialog';
 import Table from './components/table';
+import useFilters from './hooks/use-filters';
 import usePlaybooks from './hooks/use-playbooks';
 
 const Playbooks = () => {
@@ -22,9 +23,19 @@ const Playbooks = () => {
     isLoading,
     pagination,
   } = usePlaybooks();
+  const filters = useFilters();
 
-  const onCreatePlaybook = () => {
+  const handleOpen = () => {
     setDialogOpen(true);
+  };
+
+  const handleClose = () => {
+    setDialogOpen(false);
+  };
+
+  const handleCreate = () => {
+    setDialogOpen(false);
+    filters.clear();
   };
 
   useEffect(() => {
@@ -53,7 +64,7 @@ const Playbooks = () => {
             <Button
               size="small"
               sx={{ whiteSpace: 'nowrap' }}
-              onClick={onCreatePlaybook}
+              onClick={handleOpen}
             >
               {t('create-button')}
             </Button>
@@ -80,7 +91,11 @@ const Playbooks = () => {
         )}
       </Stack>
       <Details />
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
+      <CreateDialog
+        open={dialogOpen}
+        onClose={handleClose}
+        onCreate={handleCreate}
+      />
     </Container>
   );
 };

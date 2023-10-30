@@ -20,11 +20,11 @@ import getStep from './utils/get-step';
 import processPlaybook from './utils/process-playbook';
 import useCreatePlaybook from './utils/use-create-playbook';
 
-type RouterProps = {
-  onClose: () => void;
+export type RouterProps = {
+  onCreate: () => void;
 };
 
-const Router = ({ onClose }: RouterProps) => {
+const Router = ({ onCreate }: RouterProps) => {
   const [state, send] = useMachine(playbookMachine);
   const { kind } = state.context;
   const { t } = useTranslation('pages.playbooks.dialog');
@@ -84,7 +84,7 @@ const Router = ({ onClose }: RouterProps) => {
             title: t('feedback.success.title'),
             description: t('feedback.success.description'),
           });
-          onClose();
+          onCreate();
         },
         onError: (error: unknown) => {
           console.error('Failed to create playbook', getErrorMessage(error));

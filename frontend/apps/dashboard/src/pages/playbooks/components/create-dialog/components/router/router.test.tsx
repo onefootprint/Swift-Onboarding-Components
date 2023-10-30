@@ -6,6 +6,7 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
+import type { RouterProps } from './router';
 import Router from './router';
 import {
   createPlaybook,
@@ -14,15 +15,19 @@ import {
   withCreateOnboardingConfigs,
 } from './router.test.config';
 
-const renderRouter = ({ onClose }: { onClose: () => void }) =>
-  customRender(<Router onClose={onClose} />);
+const renderRouter = (
+  { onCreate }: RouterProps = {
+    onCreate: jest.fn(),
+  },
+) => customRender(<Router onCreate={onCreate} />);
 
 describe('<Router />', () => {
   describe('when doing KYC', () => {
     describe('when the request to create an ob config succeeds', () => {
       it('should create an onboarding config and show a confirmation', async () => {
+        const onCreate = jest.fn();
         withCreateOnboardingConfigs();
-        renderRouter({ onClose: jest.fn() });
+        renderRouter({ onCreate });
 
         // Who to onboard
         await moveForward();
@@ -49,12 +54,16 @@ describe('<Router />', () => {
           );
           expect(confirmation).toBeInTheDocument();
         });
+
+        await waitFor(() => {
+          expect(onCreate).toHaveBeenCalled();
+        });
       });
     });
 
     describe('when in the "Residency" step', () => {
       it('should go to "Who to onboard" when clicking "Back"', async () => {
-        renderRouter({ onClose: jest.fn() });
+        renderRouter({ onCreate: jest.fn() });
 
         // Who to onboard
         await moveForward();
@@ -71,7 +80,7 @@ describe('<Router />', () => {
 
     describe('when in the "Name your Playbook" step', () => {
       it('should go to "Residency" when clicking "Back"', async () => {
-        renderRouter({ onClose: jest.fn() });
+        renderRouter({ onCreate: jest.fn() });
 
         // Who to onboard
         await moveForward();
@@ -93,7 +102,7 @@ describe('<Router />', () => {
 
     describe('when in the "Summary" step', () => {
       it('should go to "Name your Playbook" when clicking "Back"', async () => {
-        renderRouter({ onClose: jest.fn() });
+        renderRouter({ onCreate: jest.fn() });
 
         // Who to onboard
         await moveForward();
@@ -117,7 +126,7 @@ describe('<Router />', () => {
 
     describe('when in the "Authorized scopes" step', () => {
       it('should go to "Summary" when clicking "Back"', async () => {
-        renderRouter({ onClose: jest.fn() });
+        renderRouter({ onCreate: jest.fn() });
 
         // Who to onboard
         await moveForward();
@@ -144,7 +153,7 @@ describe('<Router />', () => {
 
     describe('when in the "AML" step', () => {
       it('should go to "Authorized scopes" when clicking "Back"', async () => {
-        renderRouter({ onClose: jest.fn() });
+        renderRouter({ onCreate: jest.fn() });
 
         // Who to onboard
         await moveForward();
@@ -180,7 +189,7 @@ describe('<Router />', () => {
     describe('when the request to create an ob config succeeds', () => {
       it('should create an onboarding config and show a confirmation', async () => {
         withCreateOnboardingConfigs();
-        renderRouter({ onClose: jest.fn() });
+        renderRouter({ onCreate: jest.fn() });
 
         // Who to onboard
         const option = screen.getByRole('button', {
@@ -216,7 +225,7 @@ describe('<Router />', () => {
 
     describe('when in the "Name your Playbook" step', () => {
       it('should go to "Who to onboard" when clicking "Back"', async () => {
-        renderRouter({ onClose: jest.fn() });
+        renderRouter({ onCreate: jest.fn() });
 
         // Who to onboard
         const option = screen.getByRole('button', {
@@ -237,7 +246,7 @@ describe('<Router />', () => {
 
     describe('when in the "Summary" step', () => {
       it('should go to "Name your Playbook" when clicking "Back"', async () => {
-        renderRouter({ onClose: jest.fn() });
+        renderRouter({ onCreate: jest.fn() });
 
         // Who to onboard
         const option = screen.getByRole('button', {
@@ -262,7 +271,7 @@ describe('<Router />', () => {
 
     describe('when in the "Authorized scopes" step', () => {
       it('should go to "Summary" when clicking "Back"', async () => {
-        renderRouter({ onClose: jest.fn() });
+        renderRouter({ onCreate: jest.fn() });
 
         // Who to onboard
         const option = screen.getByRole('button', {
@@ -290,7 +299,7 @@ describe('<Router />', () => {
 
     describe('when in the "AML" step', () => {
       it('should go to "Authorized scopes" when clicking "Back"', async () => {
-        renderRouter({ onClose: jest.fn() });
+        renderRouter({ onCreate: jest.fn() });
 
         // Who to onboard
         await moveForward();
