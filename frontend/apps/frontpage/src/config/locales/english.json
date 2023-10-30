@@ -47,7 +47,7 @@
     },
     "navbar": {
       "login": "Login",
-      "sign-up": "Sign up",
+      "sign-up": "Sign up for free",
       "nav-toggle": {
         "open": "Open navigation",
         "close": "Close navigation"
@@ -713,7 +713,7 @@
         "title": "Bundle and save",
         "subtitle": "If you use 2 or more services (eg: Onboarding and Security) you'll enjoy great discounts. Reach out to us to know more.",
         "schedule-call": "Schedule a call",
-        "get-started": "Get started"
+        "get-started": "Sign up for free"
       }
     },
     "compare": {

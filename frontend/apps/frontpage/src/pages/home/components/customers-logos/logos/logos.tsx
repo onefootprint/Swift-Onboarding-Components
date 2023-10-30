@@ -2,10 +2,10 @@ import styled, { css, useTheme } from '@onefootprint/styled';
 import { media, Stack } from '@onefootprint/ui';
 import React from 'react';
 
+import CobaLogo from './companies/coba/coba';
 import ComposerLogo from './companies/composer';
 import FindigsLogo from './companies/findigs';
 import FlexcarLogo from './companies/flexcar';
-import Fractional from './companies/fractional';
 import GridLogo from './companies/grid';
 
 const Logos = () => {
@@ -25,7 +25,7 @@ const Logos = () => {
         <FindigsLogo color={theme.color.tertiary} />
       </Stack>
       <Stack justify="center" align="center" padding={2}>
-        <Fractional color={theme.color.tertiary} />
+        <CobaLogo color={theme.color.tertiary} />
       </Stack>
     </Container>
   );

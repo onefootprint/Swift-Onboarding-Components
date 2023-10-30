@@ -1,5 +1,5 @@
 import styled from '@onefootprint/styled';
-import { Button, media, Stack, Typography } from '@onefootprint/ui';
+import { Button, Container, media, Stack, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 
@@ -20,14 +20,13 @@ const PenguinBanner = ({
   onClickPrimaryButton,
   onClickSecondaryButton,
 }: PenguinBannerProps) => (
-  <Stack align="center">
+  <Container>
     <Stack
       direction="column"
       align="center"
       gap={10}
       marginTop={11}
       marginBottom={12}
-      maxWidth="90%"
     >
       <Image
         src="/pricing/banner.png"
@@ -64,7 +63,7 @@ const PenguinBanner = ({
         </ResponsiveStack>
       </Stack>
     </Stack>
-  </Stack>
+  </Container>
 );
 
 const ResponsiveStack = styled(Stack)`
