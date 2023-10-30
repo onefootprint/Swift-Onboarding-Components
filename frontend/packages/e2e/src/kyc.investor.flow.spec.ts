@@ -75,7 +75,17 @@ test('E2E.KYC.Investor #ci', async ({
 
   await confirmData(
     { frame },
-    { firstName, lastName, dob, addressLine1, city, zipCode },
+    {
+      firstName,
+      lastName,
+      dob,
+      addressLine1,
+      city,
+      state: 'AL',
+      zipCode,
+      country: 'US',
+      ssn,
+    },
   );
   await clickOnContinue({ frame });
   await page.waitForLoadState();

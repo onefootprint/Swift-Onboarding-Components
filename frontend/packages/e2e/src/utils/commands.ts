@@ -232,16 +232,31 @@ export const confirmData = async (
     lastName: string;
     dob: string;
     addressLine1: string;
+    addressLine2?: string;
     city: string;
+    state: string;
+    country: string;
     zipCode: string;
+    ssn?: string;
   },
 ) => {
   await expect(frame.getByText(payload.firstName).first()).toBeAttached();
   await expect(frame.getByText(payload.lastName).first()).toBeAttached();
   await expect(frame.getByText(payload.dob).first()).toBeAttached();
   await expect(frame.getByText(payload.addressLine1).first()).toBeAttached();
+  if (payload.addressLine2) {
+    await expect(frame.getByText(payload.addressLine2).first()).toBeAttached();
+  }
   await expect(frame.getByText(payload.city).first()).toBeAttached();
+  await expect(frame.getByText(payload.state).first()).toBeAttached();
   await expect(frame.getByText(payload.zipCode).first()).toBeAttached();
+  await expect(frame.getByText(payload.country).first()).toBeAttached();
+  if (payload.ssn) {
+    // SSN value should be scrubbed by default
+    await expect(
+      frame.getByText('•'.repeat(payload.ssn.length)).first(),
+    ).toBeAttached();
+  }
 };
 
 export const doLivenessCheck = async (

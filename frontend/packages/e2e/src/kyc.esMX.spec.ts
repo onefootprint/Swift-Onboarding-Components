@@ -77,7 +77,16 @@ test('E2E.es-MX.KYC.Docs #NOT-YET-CI', async ({
 
   await confirmData(
     { frame },
-    { firstName, lastName, dob, addressLine1, city, zipCode },
+    {
+      firstName,
+      lastName,
+      dob,
+      addressLine1,
+      city,
+      state: 'AL',
+      zipCode,
+      country: 'US',
+    },
   );
   await clickOnContinue({ frame });
   await page.waitForLoadState();

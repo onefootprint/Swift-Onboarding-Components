@@ -133,7 +133,17 @@ test('E2E.KYB.flow #ci', async ({ browser, browserName, page, isMobile }) => {
 
   await confirmData(
     { frame },
-    { firstName, lastName, dob, addressLine1, city, zipCode },
+    {
+      firstName,
+      lastName,
+      dob,
+      addressLine1,
+      city,
+      state: 'AL',
+      zipCode,
+      country: 'US',
+      ssn,
+    },
   );
   await clickOnContinue({ frame });
   await page.waitForLoadState();
