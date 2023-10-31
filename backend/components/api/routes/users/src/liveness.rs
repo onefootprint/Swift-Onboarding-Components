@@ -19,7 +19,7 @@ pub async fn get(
     request: web::Path<FpId>,
     auth: SecretTenantAuthContext,
 ) -> actix_web::Result<Json<ResponseData<Vec<api_wire_types::LivenessEvent>>>, ApiError> {
-    auth.check_preview_guard(PreviewApi::LivenessList)?;
+    auth.check_preview_guard(PreviewApi::LivenessList, true)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

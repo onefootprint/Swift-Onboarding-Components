@@ -17,6 +17,7 @@ use chrono::Duration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
 use newtypes::FpId;
+use newtypes::PreviewApi;
 use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web};
 
@@ -30,6 +31,7 @@ pub async fn post(
     fp_id: web::Path<FpId>,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<ReonboardResponse> {
+    auth.check_preview_guard(PreviewApi::ReonboardUser, false)?;
     let auth = auth.check_guard(TenantGuard::AuthToken)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

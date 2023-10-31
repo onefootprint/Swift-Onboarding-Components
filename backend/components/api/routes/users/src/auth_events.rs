@@ -10,6 +10,7 @@ use db::models::auth_event::AuthEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::OffsetPagination;
 use newtypes::FpId;
+use newtypes::PreviewApi;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[api_v2_operation(description = "View a user's recent device insights", tags(Users, Preview))]
@@ -20,6 +21,7 @@ pub async fn get(
     auth: SecretTenantAuthContext,
     pagination: web::Query<OffsetPaginationRequest>,
 ) -> ApiResult<Json<OffsetPaginatedResponse<api_wire_types::PublicAuthEvent>>> {
+    auth.check_preview_guard(PreviewApi::AuthEventsList, false)?;
     // For now, the only consumer of this is coba to get the IP address from where onboarding occurred
     // We might want to migrate them to a /cip_metadata endpoint
     let auth = auth.check_guard(TenantGuard::Read)?;

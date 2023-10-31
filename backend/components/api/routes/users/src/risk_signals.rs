@@ -13,6 +13,7 @@ use itertools::Itertools;
 use newtypes::FootprintReasonCode;
 use newtypes::FpId;
 
+use newtypes::PreviewApi;
 use paperclip::actix::{api_v2_operation, get, web};
 
 type RiskSignalsListResponse = Vec<api_wire_types::PublicRiskSignal>;
@@ -28,6 +29,7 @@ pub async fn get(
     request: web::Path<FpId>,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<RiskSignalsListResponse> {
+    auth.check_preview_guard(PreviewApi::RiskSignalsList, false)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

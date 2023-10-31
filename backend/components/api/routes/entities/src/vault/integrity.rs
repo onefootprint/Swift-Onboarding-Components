@@ -8,7 +8,7 @@ use api_core::utils::headers::InsightHeaders;
 use macros::route_alias;
 use newtypes::{
     flat_api_object_map_type, FilterFunction, FpId, HmacSha256Args, IntegritySigningKey, PiiBytes,
-    PiiJsonValue, VersionedDataIdentifier,
+    PiiJsonValue, PreviewApi, VersionedDataIdentifier,
 };
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
@@ -48,6 +48,7 @@ pub async fn post(
     insights: InsightHeaders,
     root_span: RootSpan,
 ) -> JsonApiResponse<IntegrityResponse> {
+    auth.check_preview_guard(PreviewApi::VaultIntegrity, false)?;
     // TODO: should we add a separate guard for checking integrity?
     // This is incorrect - won't change though since we are deprecating this soon
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;

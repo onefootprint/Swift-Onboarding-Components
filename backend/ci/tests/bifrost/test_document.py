@@ -67,7 +67,7 @@ def test_upload_documents(doc_request_sandbox_ob_config, twilio):
     assert len([i for i in body if i["kind"] == "id_card"]) == 1
     assert len([i for i in body if i["kind"] == "drivers_license"]) == 1
 
-    users_docs = get(f"users/{fp_id}/documents", None, *tenant.db_auths)
+    users_docs = get(f"users/{fp_id}/documents", None, tenant.sk.key)
     assert users_docs[0]["document_type"] == "drivers_license"
 
 
@@ -108,7 +108,7 @@ def test_upload_documents_with_ob_config_restriction_legacy_version(
     user = bifrost.run()
     fp_id = user.fp_id
     tenant = bifrost.ob_config.tenant
-    users_docs = get(f"users/{fp_id}/documents", None, *tenant.db_auths)
+    users_docs = get(f"users/{fp_id}/documents", None, tenant.sk.key)
     assert users_docs[0]["document_type"] == "drivers_license"
 
 
