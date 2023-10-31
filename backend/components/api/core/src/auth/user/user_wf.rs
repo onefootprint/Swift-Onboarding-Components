@@ -97,6 +97,7 @@ impl ExtractableAuthSession for ParsedUserWfSession {
         root_span.record("fp_id", &self.0.scoped_user.fp_id.to_string());
         root_span.record("vault_id", &self.0.user_vault_id().to_string());
         root_span.record("is_live", self.0.scoped_user.is_live);
+        root_span.record("auth_method", "user_wf");
     }
 }
 

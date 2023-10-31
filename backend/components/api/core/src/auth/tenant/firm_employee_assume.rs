@@ -95,8 +95,8 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAssumeAuth {
 
     fn log_authed_principal(&self, root_span: tracing_actix_web::RootSpan) {
         root_span.record("tenant_id", &self.0.tenant.id.to_string());
-        root_span.record("tenant_user_id", &self.0.tenant_user.id.to_string());
         root_span.record("is_live", self.0.is_live);
+        root_span.record("auth_method", "firm_employee_assume");
     }
 }
 

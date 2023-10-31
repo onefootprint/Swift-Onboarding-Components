@@ -137,6 +137,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             fp_id = tracing::field::Empty, // maybe replace with scoped_vault_id, available in more places
             vault_id = tracing::field::Empty,
             is_live = tracing::field::Empty,
+            auth_method = tracing::field::Empty,
             // Free-form data to be added by individual APIs if they choose
             meta = tracing::field::Empty,
             client_version,
@@ -148,7 +149,6 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             server_git_hash,
             is_integration_test_req,
             // I would get rid of these fields next
-            tenant_user_id = tracing::field::Empty,
             lat_lng = format!(
                 "{},{}",
                 latitude.unwrap_or_default(),

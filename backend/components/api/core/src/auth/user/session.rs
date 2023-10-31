@@ -201,6 +201,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
             root_span.record("fp_id", su.fp_id.to_string());
             root_span.record("is_live", su.is_live);
         }
+        root_span.record("auth_method", "user_session");
     }
 }
 

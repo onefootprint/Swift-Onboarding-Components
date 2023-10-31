@@ -41,25 +41,25 @@ impl ExtractableAuthSession for WorkOsSessionData {
         _: RequestInfo,
     ) -> ApiResult<Self> {
         let data = match auth_session {
-            AuthSessionData::WorkOs(data) => {
-                let WorkOsSession {
-                    tenant_user_id,
-                    auth_method,
-                } = data;
-                Self {
-                    tenant_user_id,
-                    auth_method,
-                }
-            }
+            AuthSessionData::WorkOs(data) => data,
             _ => {
                 return Err(AuthError::SessionTypeError.into());
             }
+        };
+        tracing::info!(tenant_user_id=%data.tenant_user_id, "authenticated");
+        let WorkOsSession {
+            tenant_user_id,
+            auth_method,
+        } = data;
+        let data = Self {
+            tenant_user_id,
+            auth_method,
         };
         Ok(data)
     }
 
     fn log_authed_principal(&self, root_span: tracing_actix_web::RootSpan) {
-        root_span.record("tenant_user_id", &self.tenant_user_id.to_string());
+        root_span.record("auth_method", "workos");
     }
 }
 

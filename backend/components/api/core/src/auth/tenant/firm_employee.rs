@@ -80,7 +80,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
     }
 
     fn log_authed_principal(&self, root_span: tracing_actix_web::RootSpan) {
-        root_span.record("tenant_user_id", &self.0.tenant_user.id.to_string());
+        root_span.record("auth_method", "firm_employee");
     }
 }
 
