@@ -1,0 +1,79 @@
+use crate::auth::tenant::CheckTenantGuard;
+use crate::auth::tenant::TenantGuard;
+use crate::auth::tenant::TenantSessionAuth;
+use crate::types::JsonApiResponse;
+use crate::types::ResponseData;
+use crate::State;
+use api_core::errors::ApiResult;
+use chrono::Utc;
+use db::scoped_vault::count_for_tenant;
+use db::scoped_vault::ScopedVaultListQueryParams;
+use newtypes::OnboardingStatusFilter;
+use newtypes::VaultKind;
+use paperclip::actix::{api_v2_operation, get, web};
+
+#[api_v2_operation(
+    tags(OrgSettings, Private),
+    description = "Returns metrics to display on the dashboard home page."
+)]
+#[get("/org/metrics")]
+async fn get(
+    state: web::Data<State>,
+    auth: TenantSessionAuth,
+) -> JsonApiResponse<api_wire_types::OrgMetrics> {
+    let auth = auth.check_guard(TenantGuard::Read)?;
+    let tenant_id = auth.tenant().id.clone();
+    let is_live = auth.is_live()?;
+    let start_timestamp = billing::interval::get_billing_interval(Utc::now().date_naive())?.start;
+
+    let search_params = move |statuses: Vec<OnboardingStatusFilter>| -> ScopedVaultListQueryParams {
+        ScopedVaultListQueryParams {
+            tenant_id: tenant_id.clone(),
+            is_live,
+            kind: Some(VaultKind::Person),
+            search: None,
+            fp_id: None,
+            timestamp_lte: None,
+            timestamp_gte: Some(start_timestamp),
+            requires_manual_review: None,
+            watchlist_hit: None,
+            // TODO this could drift easily. Be careful changing this since it could affect the
+            // pass rate we display if we start also looking for vaults that aren't verified
+            only_visible: true,
+            is_created_via_api: None,
+            statuses,
+        }
+    };
+
+    let result = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let new_user_vaults = count_for_tenant(conn, search_params(vec![]))?;
+            // All except None
+            let total_filters = search_params(vec![
+                OnboardingStatusFilter::Pass,
+                OnboardingStatusFilter::Fail,
+                OnboardingStatusFilter::Incomplete,
+                OnboardingStatusFilter::Pending,
+            ]);
+            let total_user_onboardings = count_for_tenant(conn, total_filters)?;
+            let failed_user_onboardings =
+                count_for_tenant(conn, search_params(vec![OnboardingStatusFilter::Fail]))?;
+            let successful_user_onboardings =
+                count_for_tenant(conn, search_params(vec![OnboardingStatusFilter::Pass]))?;
+            let incomplete_user_onboardings =
+                count_for_tenant(conn, search_params(vec![OnboardingStatusFilter::Incomplete]))?;
+            let result = api_wire_types::OrgMetrics {
+                new_user_vaults,
+                total_user_onboardings,
+                failed_user_onboardings,
+                successful_user_onboardings,
+                incomplete_user_onboardings,
+                start_timestamp,
+            };
+            Ok(result)
+        })
+        .await??;
+
+    ResponseData::ok(result).json()
+}

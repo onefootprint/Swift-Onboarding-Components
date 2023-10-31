@@ -6,6 +6,8 @@ mod index;
 mod logo;
 mod member;
 mod members;
+// Weird module name, but there's a metrics module inside api_core too...
+mod metrics_api;
 mod onboarding_configs;
 mod proxy_configs;
 mod risk_signals;
@@ -35,6 +37,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(risk_signals::get)
         .service(access_events::get)
         .service(logo::put)
+        .service(metrics_api::get)
         .service(webhook_portal::get)
         .service(client_security_config::get)
         .service(client_security_config::patch);

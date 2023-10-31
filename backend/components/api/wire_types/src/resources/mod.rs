@@ -1,6 +1,9 @@
 mod insight_event;
 pub use self::insight_event::*;
 
+mod org_metrics;
+pub use org_metrics::*;
+
 mod risk_severity;
 pub use self::risk_severity::*;
 

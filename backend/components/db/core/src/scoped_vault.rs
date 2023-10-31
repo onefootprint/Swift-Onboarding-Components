@@ -302,6 +302,13 @@ pub fn list_authorized_for_tenant(
     list(conn, params, cursor, page_size)
 }
 
+#[instrument(skip_all)]
+pub fn count_for_tenant(conn: &mut PgConn, params: ScopedVaultListQueryParams) -> DbResult<i64> {
+    let params = &params.map_search(conn)?;
+    let count = list_query!(params).count().get_result(conn)?;
+    Ok(count)
+}
+
 /// List and count all scoped vaults matching the search params. Use this if you need both the
 /// count of results and the results themselves - this util saves and reuses some intermediate
 /// computation
