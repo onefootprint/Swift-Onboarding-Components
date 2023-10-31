@@ -7,6 +7,14 @@ pub struct DecisionRequest {
     pub status: TerminalDecisionStatus,
 }
 
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct CreateUserDecisionRequest {
+    /// Human-readable explanation for the manual review that will be displayed in the user timeline on the dashboard.
+    pub annotation: String,
+    pub status: TerminalDecisionStatus,
+}
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub enum TerminalDecisionStatus {

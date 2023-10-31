@@ -2,6 +2,7 @@ use api_core::*;
 use paperclip::actix::web;
 
 mod auth_events;
+mod decisions;
 mod detail;
 mod documents;
 mod get;
@@ -21,5 +22,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(liveness::get)
         .service(auth_events::get)
         .service(reonboard::post)
+        .service(decisions::post)
         .service(detail::detail);
 }

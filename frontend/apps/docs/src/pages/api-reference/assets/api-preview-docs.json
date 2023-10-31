@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "8af5afbbce41b92e4e5ff3238c919894703cad42"
+        "version": "39e5ac914d46258abef291b14ea98724899ae5bc"
     },
     "servers": [
         {
@@ -339,10 +339,57 @@
                 ]
             }
         },
+        "/users/{fp_id}/decisions": {
+            "post": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nCreates a new manual review decision for a user, overriding any previous decision and clearing any outstanding manual review.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateUserDecisionRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/users/{fp_id}/documents": {
             "get": {
                 "tags": [
-                    "Entities",
+                    "Users",
                     "Preview"
                 ],
                 "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nView the successfully uploaded documents uploaded for this user.",
@@ -373,9 +420,6 @@
                     }
                 },
                 "security": [
-                    {
-                        "Dashboard Token": []
-                    },
                     {
                         "Secret API Key": []
                     }
@@ -1261,6 +1305,26 @@
                     "token"
                 ]
             },
+            "CreateUserDecisionRequest": {
+                "type": "object",
+                "properties": {
+                    "annotation": {
+                        "description": "Human-readable explanation for the manual review that will be displayed in the user timeline on the dashboard.",
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "fail",
+                            "pass"
+                        ]
+                    }
+                },
+                "required": [
+                    "annotation",
+                    "status"
+                ]
+            },
             "DUMMYLiteUser": {
                 "type": "object",
                 "properties": {
@@ -1272,6 +1336,9 @@
                 "required": [
                     "id"
                 ]
+            },
+            "EmptyResponse": {
+                "type": "object"
             },
             "EntityValidateResponse": {
                 "type": "object",
