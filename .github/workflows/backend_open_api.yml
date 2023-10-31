@@ -109,7 +109,7 @@ jobs:
 
       - name: Compare OpenAPI files
         id: compare_openapi
-        uses: docker://openapitools/openapi-diff:4d755a6aa22f06936bad7b1a8fdaa07182976632
+        uses: docker://openapitools/openapi-diff:2.0.1
         with:
           args: --fail-on-incompatible base_open_api.json head_open_api.json --text incompat_raw.txt
 

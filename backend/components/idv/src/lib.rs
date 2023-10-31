@@ -17,7 +17,6 @@ use incode::watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResul
 use middesk::response::business::BusinessResponse;
 use middesk::response::webhook::{MiddeskBusinessUpdateWebhookResponse, MiddeskTinRetriedWebhookResponse};
 use newtypes::{PiiJsonValue, VendorAPI};
-
 use socure::response::SocureIDPlusResponse;
 
 pub mod experian;
