@@ -5,7 +5,7 @@ use crate::types::JsonApiResponse;
 use crate::types::ResponseData;
 use crate::State;
 use api_core::errors::ApiResult;
-use chrono::Utc;
+use api_wire_types::OrgMetricsRequest;
 use db::scoped_vault::count_for_tenant;
 use db::scoped_vault::ScopedVaultListQueryParams;
 use newtypes::OnboardingStatusFilter;
@@ -20,11 +20,15 @@ use paperclip::actix::{api_v2_operation, get, web};
 async fn get(
     state: web::Data<State>,
     auth: TenantSessionAuth,
+    filters: web::Query<OrgMetricsRequest>,
 ) -> JsonApiResponse<api_wire_types::OrgMetrics> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
-    let start_timestamp = billing::interval::get_billing_interval(Utc::now().date_naive())?.start;
+    let OrgMetricsRequest {
+        timestamp_gte,
+        timestamp_lte,
+    } = filters.into_inner();
 
     let search_params = move |statuses: Vec<OnboardingStatusFilter>| -> ScopedVaultListQueryParams {
         ScopedVaultListQueryParams {
@@ -33,8 +37,8 @@ async fn get(
             kind: Some(VaultKind::Person),
             search: None,
             fp_id: None,
-            timestamp_lte: None,
-            timestamp_gte: Some(start_timestamp),
+            timestamp_lte,
+            timestamp_gte,
             requires_manual_review: None,
             watchlist_hit: None,
             // TODO this could drift easily. Be careful changing this since it could affect the
@@ -69,7 +73,6 @@ async fn get(
                 failed_user_onboardings,
                 successful_user_onboardings,
                 incomplete_user_onboardings,
-                start_timestamp,
             };
             Ok(result)
         })

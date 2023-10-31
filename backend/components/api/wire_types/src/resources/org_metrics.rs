@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use paperclip::actix::Apiv2Schema;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 
@@ -12,5 +12,11 @@ pub struct OrgMetrics {
     pub successful_user_onboardings: i64,
     pub failed_user_onboardings: i64,
     pub incomplete_user_onboardings: i64,
-    pub start_timestamp: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
+
+pub struct OrgMetricsRequest {
+    pub timestamp_gte: Option<DateTime<Utc>>,
+    pub timestamp_lte: Option<DateTime<Utc>>,
 }
