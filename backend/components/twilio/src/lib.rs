@@ -1,5 +1,7 @@
 use std::time::Duration;
 
+use crate::error::Error;
+use crate::response::message::Status;
 use newtypes::PiiString;
 use request::send_message::SendMessage;
 use reqwest::{IntoUrl, Method};
@@ -15,9 +17,6 @@ pub mod response;
 use tokio_retry::strategy::jitter;
 use tokio_retry::strategy::FixedInterval;
 use tokio_retry::Retry;
-
-use crate::error::Error;
-use crate::response::message::Status;
 
 #[derive(Clone)]
 pub struct Client {

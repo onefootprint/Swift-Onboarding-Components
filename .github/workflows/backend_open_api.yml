@@ -72,6 +72,15 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.base.ref }}
+      
+      - id: get_merge_base
+        run: 
+          MERGE_BASE=$(git merge-base --fork-point ${{ github.event.pull_request.base.ref }})
+          echo "merge_base=$MERGE_BASE" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.get_merge_base.outputs.merge_base }}
 
       - uses: ./.github/actions/backend_run_local
         id: backend_run_local
