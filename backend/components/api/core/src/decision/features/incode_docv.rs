@@ -136,7 +136,7 @@ pub fn reason_codes_from_score_response(res: &FetchScoresResponse, expect_selfie
             vec![FootprintReasonCode::DocumentOcrSuccessful]
         },
         None => {
-            tracing::error!("missing incode ocr score");
+            tracing::warn!("missing incode ocr score");
             vec![FootprintReasonCode::DocumentOcrNotSuccessful]
         }
     };

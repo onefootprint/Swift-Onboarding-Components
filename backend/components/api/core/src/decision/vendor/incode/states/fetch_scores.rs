@@ -124,7 +124,7 @@ impl IncodeStateTransition for FetchScores {
                         "incode aws selfie result"
                     )
                 }
-                Err(e) => tracing::error!(err=?e, "error running aws rekognition"),
+                Err(e) => tracing::warn!(err=?e, "error running aws rekognition"),
             }
         }
 
