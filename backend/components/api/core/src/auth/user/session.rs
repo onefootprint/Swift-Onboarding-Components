@@ -146,7 +146,6 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     obc_id,
                     scopes,
                     is_from_api,
-                    auth_event_id,
                     auth_event_ids,
                     is_implied_auth,
                 } = data;
@@ -177,7 +176,6 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                 }
 
                 // Merge auth event ids for backcompat for now
-                let auth_event_ids = auth_event_ids.into_iter().chain(auth_event_id).unique().collect();
                 let data = UserSessionContext {
                     user: vault,
                     sb_id,

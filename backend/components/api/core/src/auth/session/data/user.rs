@@ -26,10 +26,7 @@ pub struct UserSession {
     pub wf_id: Option<WorkflowId>,
     /// Permissions that this auth token is given
     pub scopes: Vec<UserAuthScope>,
-    /// The auth event created when this token was issued
-    pub auth_event_id: Option<AuthEventId>,
     /// The auths that give this token its permissions
-    #[serde(default)]
     pub auth_event_ids: Vec<AuthEventId>,
     /// When true, the auth token was initially issued as an unauthed, identified token
     pub is_from_api: bool,
@@ -79,7 +76,6 @@ impl UserSession {
             wf_id,
             scopes,
             is_from_api,
-            auth_event_id: auth_event_ids.first().cloned(),
             auth_event_ids,
             is_implied_auth,
         });
