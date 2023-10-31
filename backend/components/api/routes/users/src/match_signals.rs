@@ -1,14 +1,9 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantSessionAuth;
-use crate::auth::Either;
-
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
-
 use crate::State;
-
 use api_core::decision::field_validations::create_field_validation_results;
 use api_wire_types::GetFieldValidationResponse;
 use db::models::risk_signal::IncludeHidden;
@@ -16,19 +11,18 @@ use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
 use db::DbResult;
 use newtypes::FpId;
-
 use newtypes::SignalScope;
 use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(
-    description = "Lists the match signals for a footprint user.",
-    tags(Entities, Private)
+    description = "Lists the match signals for the provided user.",
+    tags(Users, Preview)
 )]
-#[get("/entities/{fp_id}/match_signals")]
+#[get("/users/{fp_id}/match_signals")]
 pub async fn get(
     state: web::Data<State>,
     request: web::Path<FpId>,
-    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
+    auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<GetFieldValidationResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();

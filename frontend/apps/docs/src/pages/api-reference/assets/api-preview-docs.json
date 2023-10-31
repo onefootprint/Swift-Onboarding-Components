@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "84063baf5802843ad1f654e8591b96c8262eb759"
+        "version": "8af5afbbce41b92e4e5ff3238c919894703cad42"
     },
     "servers": [
         {
@@ -51,93 +51,6 @@
                     }
                 },
                 "security": [
-                    {
-                        "Secret API Key": []
-                    }
-                ]
-            }
-        },
-        "/entities/{fp_id}/kyc": {
-            "post": {
-                "tags": [
-                    "Entities",
-                    "Preview"
-                ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nTrigger KYC on the provided user.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "fp_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/TriggerKycRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EntityValidateResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Secret API Key": []
-                    }
-                ]
-            }
-        },
-        "/entities/{fp_id}/match_signals": {
-            "get": {
-                "tags": [
-                    "Entities",
-                    "Preview"
-                ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nLists the match signals for a footprint user.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "fp_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/GetFieldValidationResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    },
                     {
                         "Secret API Key": []
                     }
@@ -469,6 +382,130 @@
                 ]
             }
         },
+        "/users/{fp_id}/kyc": {
+            "post": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nTrigger KYC on the provided user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TriggerKycRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EntityValidateResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/liveness": {
+            "get": {
+                "tags": [
+                    "Entities",
+                    "Preview"
+                ],
+                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nLists the liveness signals for the provided user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/LivenessEvent"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/match_signals": {
+            "get": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nLists the match signals for the provided user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetFieldValidationResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/users/{fp_id}/reonboard": {
             "post": {
                 "tags": [
@@ -552,7 +589,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nCreate an unauthorized, identified token for the provided fp_id. This token may be passed into Footprint.js to bootstrap a user's onboarding with known information.",
+                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nCreate an identified token for the provided fp_id. This token may be passed into Footprint.js to bootstrap a user's onboarding with known information. Re-auth will be required if the user hasn't logged into your tenant recently.",
                 "parameters": [
                     {
                         "in": "path",
@@ -6252,6 +6289,102 @@
                 "required": [
                     "<key>",
                     "<value>"
+                ]
+            },
+            "LivenessEvent": {
+                "description": "Describes a liveness event that took place",
+                "type": "object",
+                "properties": {
+                    "attributes": {
+                        "type": "object",
+                        "properties": {
+                            "device": {
+                                "type": "string"
+                            },
+                            "issuers": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "enum": [
+                                        "apple",
+                                        "google",
+                                        "cloudflare",
+                                        "footprint"
+                                    ]
+                                }
+                            },
+                            "metadata": {
+                                "type": "object"
+                            },
+                            "os": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "issuers"
+                        ]
+                    },
+                    "insight_event": {
+                        "description": "Describes a device insight event with locations and IP of the event",
+                        "type": "object",
+                        "properties": {
+                            "city": {
+                                "type": "string"
+                            },
+                            "country": {
+                                "type": "string"
+                            },
+                            "ip_address": {
+                                "type": "string"
+                            },
+                            "latitude": {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            "longitude": {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            "metro_code": {
+                                "type": "string"
+                            },
+                            "postal_code": {
+                                "type": "string"
+                            },
+                            "region": {
+                                "type": "string"
+                            },
+                            "region_name": {
+                                "type": "string"
+                            },
+                            "time_zone": {
+                                "type": "string"
+                            },
+                            "timestamp": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            "user_agent": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "timestamp"
+                        ]
+                    },
+                    "source": {
+                        "type": "string",
+                        "enum": [
+                            "skipped",
+                            "webauthn_attestation",
+                            "privacy_pass",
+                            "apple_device_attestation",
+                            "google_device_attestation"
+                        ]
+                    }
+                },
+                "required": [
+                    "source"
                 ]
             },
             "OffsetPaginatedPublicAuthEvent": {
