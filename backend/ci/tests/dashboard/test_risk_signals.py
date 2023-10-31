@@ -43,12 +43,11 @@ def test_aml(sandbox_tenant, twilio, must_collect_data):
                 *sandbox_tenant.db_auths,
             )
             access_event = access_events["data"][0]
-            assert ("Reviewing AML information", access_event["reason"])
-            assert ("decrypt", access_event["kind"])
-            assert (
-                ["id.first_name", "id.last_name", "id.dob"],
-                access_event["targets"],
-            )
+            assert "Reviewing AML information" == access_event["reason"]
+            assert "decrypt" == access_event["kind"]
+            assert ["id.first_name", "id.last_name", "id.dob"] == access_event[
+                "targets"
+            ]
 
             assert (
                 aml["share_url"]
