@@ -54,7 +54,8 @@ const Camera = ({
   imageType,
 }: CameraProps) => {
   const { t } = useTranslation('components.camera');
-  const canvasRef = useRef<HTMLCanvasElement>();
+  const canvasRefAutoCapture = useRef<HTMLCanvasElement>();
+  const canvasRefImageCapture = useRef<HTMLCanvasElement>();
   const videoRef = useRef<HTMLVideoElement>();
   const videoSize = useSize(videoRef);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
@@ -113,7 +114,7 @@ const Camera = ({
   };
 
   const handleClick = (captureKind: CaptureKind) => {
-    if (!canvasRef.current || !videoRef.current) {
+    if (!canvasRefImageCapture.current || !videoRef.current) {
       Logger.error(
         `Video ref or canvas not initialized for camera capture for capture kind: ${captureKind}`,
         'camera',
@@ -121,7 +122,7 @@ const Camera = ({
       return;
     }
 
-    const context = canvasRef.current.getContext('2d');
+    const context = canvasRefImageCapture.current.getContext('2d');
     if (!context) {
       Logger.error(
         `Canvas context is undefined for camera capture for capture kind: ${captureKind}`,
@@ -130,24 +131,38 @@ const Camera = ({
       return;
     }
 
-    // We capture the full width
-    // We keep the captured width/height spect ratio same as the outline aspect ratio
+    if (!videoSize) {
+      Logger.error(
+        `Cannot capture - videoSize not initilized: ${captureKind}`,
+        'camera',
+      );
+      return;
+    }
+
+    const desiredImageWidth = videoSize.width; // We capture the full width
+    let desiredImageHeight = videoSize.height; // We capture the full height for selfie
+
+    // For document capture, we keep the captured width/height spect ratio same as the outline aspect ratio
     // In case maintaining the aspect ratio overflows the height, we take the full height (Math.min)
-    const desiredImageWidth = videoRef.current.clientWidth;
-    const desiredImageHeight = Math.min(
-      videoRef.current.clientHeight,
-      videoRef.current.clientWidth * (outlineHeightRatio / outlineWidthRatio),
-    );
+    if (autocaptureKind === 'document') {
+      desiredImageHeight = Math.min(
+        videoSize.height,
+        videoSize.width * (outlineHeightRatio / outlineWidthRatio),
+      );
+    }
+
+    const yOffset =
+      autocaptureKind === 'document' ? -feedbackPositionFromBottom / 2 : 0;
 
     const imageString = getImageStringFromVideo({
       context,
       videoRef,
-      canvasRef,
+      canvasRef: canvasRefImageCapture,
       mediaStream,
       desiredImageWidth,
       desiredImageHeight,
       autocaptureKind,
-      centerOffsetY: -feedbackPositionFromBottom / 2, // Negative y direction (upward)
+      centerOffsetY: yOffset,
     });
 
     if (imageString) {
@@ -158,16 +173,21 @@ const Camera = ({
   };
 
   const clearCanvas = () => {
-    if (!canvasRef.current) {
+    if (!canvasRefImageCapture.current) {
       Logger.warn('Canvas could not be cleared. Ref undefined', 'camera');
       return;
     }
-    const context = canvasRef.current.getContext('2d');
+    const context = canvasRefImageCapture.current.getContext('2d');
     if (!context) {
       Logger.warn('Canvas could not be cleared. Context undefined', 'camera');
       return;
     }
-    context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    context.clearRect(
+      0,
+      0,
+      canvasRefImageCapture.current.width,
+      canvasRefImageCapture.current.height,
+    );
   };
 
   useEffect(() => {
@@ -190,7 +210,7 @@ const Camera = ({
 
   useAutoCapture({
     videoRef,
-    canvasRef,
+    canvasRef: canvasRefAutoCapture,
     mediaStream,
     outlineWidth,
     outlineHeight,
@@ -267,7 +287,12 @@ const Camera = ({
                 }
               />
               <Canvas
-                ref={canvasRef as React.Ref<HTMLCanvasElement>}
+                ref={canvasRefImageCapture as React.Ref<HTMLCanvasElement>}
+                width={videoSize?.width}
+                height={videoSize?.height}
+              />
+              <Canvas
+                ref={canvasRefAutoCapture as React.Ref<HTMLCanvasElement>}
                 width={videoSize?.width}
                 height={videoSize?.height}
               />
@@ -282,6 +307,7 @@ const Camera = ({
                 <CaptureButton
                   onClick={onMobileCaptureClick}
                   variant={isTimerRunning ? 'stop' : 'round'}
+                  disabled={!isCameraVisible || !videoSize}
                 />
               )}
               {autocaptureKind === 'document' && (
@@ -309,7 +335,7 @@ const Camera = ({
           <StickyBottomBox>
             <CaptureButton
               onClick={() => handleClick('manual')}
-              disabled={!isCameraVisible}
+              disabled={!isCameraVisible || !videoSize}
               variant="default"
             />
           </StickyBottomBox>

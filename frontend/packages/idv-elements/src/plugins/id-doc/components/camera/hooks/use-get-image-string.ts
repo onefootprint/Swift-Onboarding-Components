@@ -1,6 +1,7 @@
 import { useOpenCv } from 'opencv-react-ts';
 import type { MutableRefObject } from 'react';
 
+import Logger from '../../../../../utils/logger';
 import getSourceDimensions from '../utils/get-source-dimensions';
 import { sharpenImage } from '../utils/graphics-utils/graphics-processing-utils';
 import type { AutocaptureKind } from './use-auto-capture';
@@ -42,18 +43,27 @@ const useGetImageString = () => {
       centerOffsetY,
     });
 
+    const { sx, sy, sWidth, sHeight } = sourceDimensions;
+
+    if (sx < 0 || sy < 0 || sWidth <= 0 || sHeight <= 0) {
+      Logger.error(
+        `Computed desired image dimensions is 0 or negative number - sx: ${sx}, sy: ${sy}, width: ${sWidth}, height: ${sHeight}`,
+      );
+      return null;
+    }
+
     context.imageSmoothingEnabled = true;
     context.imageSmoothingQuality = 'high';
 
-    canvasRef.current.setAttribute('width', `${sourceDimensions.sWidth}`);
-    canvasRef.current.setAttribute('height', `${sourceDimensions.sHeight}`);
+    canvasRef.current.setAttribute('width', `${sWidth}`);
+    canvasRef.current.setAttribute('height', `${sHeight}`);
 
     context.drawImage(
       videoRef.current,
-      sourceDimensions.sx,
-      sourceDimensions.sy,
-      sourceDimensions.sWidth,
-      sourceDimensions.sHeight,
+      sx,
+      sy,
+      sWidth,
+      sHeight,
       0,
       0,
       canvasRef.current?.clientWidth,

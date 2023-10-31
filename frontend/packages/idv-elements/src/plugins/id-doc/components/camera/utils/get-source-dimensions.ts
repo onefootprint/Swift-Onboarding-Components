@@ -69,7 +69,7 @@ const getSourceDimensions = ({
   const scaledWidth = mediaWidth * scalingFactor;
   const scaledHeight = mediaHeight * scalingFactor;
 
-  // Now we find the dimensions of the scales height and scaled width after clipping that will be shown in the videoRef
+  // Now we find the dimensions of the scaled height and scaled width after clipping that will be shown in the videoRef
   const sWidth = Math.floor(videoWidth * (desiredImageWidth / scaledWidth));
   const sHeight = Math.floor(videoHeight * (desiredImageHeight / scaledHeight));
 
