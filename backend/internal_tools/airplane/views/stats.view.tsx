@@ -66,6 +66,7 @@ const Stats = () => {
         <GraphCard
           title={'PIDs last 30 days'}
           transform={null}
+          colors={null}
           query={`
           SELECT "day", "new vaults" from (SELECT to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day", count(*) as "new vaults" FROM scoped_vault
           INNER JOIN vault on scoped_vault.vault_id = vault.id
@@ -78,6 +79,14 @@ const Stats = () => {
         ></GraphCard>
         <GraphCard
           title={'PIDs this week (by org)'}
+          colors={{
+            'findigs.com': 'blue',
+            Flexcar: 'teal',
+            Composer: 'orange',
+            Coba: 'green',
+            Fractional: 'yellow',
+            Bloom: 'lime',
+          }}
           transform={data => {
             let map = {};
             let tenants = {};
@@ -126,6 +135,7 @@ const Stats = () => {
         <GraphCard
           title={'Not (yet) Portable IDs last 30 days'}
           transform={null}
+          colors={null}
           query={`
           SELECT "day", "new vaults" from (SELECT to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day", count(*) as "new vaults" FROM scoped_vault
           INNER JOIN vault on scoped_vault.vault_id = vault.id
@@ -214,7 +224,7 @@ const OverviewCard = ({ title, query }) => {
   );
 };
 
-const GraphCard = ({ title, query, transform }) => {
+const GraphCard = ({ title, query, transform, colors }) => {
   const { output, loading, error } = useTaskQuery({
     slug: 'dbquery',
     params: {
@@ -236,6 +246,7 @@ const GraphCard = ({ title, query, transform }) => {
           <Chart
             type="bar"
             xAxis="day"
+            colors={colors}
             data={transform !== null ? transform(output) : output}
           />
         )}
