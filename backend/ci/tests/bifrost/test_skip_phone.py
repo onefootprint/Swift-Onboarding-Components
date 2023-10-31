@@ -36,6 +36,7 @@ def no_phone_user(skip_phone_obc):
         dict(
             challenge_response=INTEGRATION_SANDBOX_EMAIL_OTP_PIN,
             challenge_token=challenge_token,
+            scope="onboarding",
         ),
         *headers,
     )
@@ -69,7 +70,11 @@ def test_new_user(skip_phone_obc):
     # incorrect PIN fails
     res = post(
         "hosted/identify/verify",
-        dict(challenge_response="323232", challenge_token=challenge_token),
+        dict(
+            challenge_response="323232",
+            challenge_token=challenge_token,
+            scope="onboarding",
+        ),
         *headers,
         status_code=400,
     )
@@ -80,6 +85,7 @@ def test_new_user(skip_phone_obc):
         dict(
             challenge_response=INTEGRATION_SANDBOX_EMAIL_OTP_PIN,
             challenge_token=challenge_token,
+            scope="onboarding",
         ),
         *headers,
     )

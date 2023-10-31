@@ -44,7 +44,7 @@ pub struct VerifyRequest {
     challenge_response: String,
     /// Determines which scopes the issued auth token will have. Request the correct scopes for
     /// your use case in order to get the least permissions required
-    scope: Option<IdentifyScope>,
+    scope: IdentifyScope,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -79,21 +79,6 @@ pub async fn post(
         Challenge::<ChallengeState>::unseal(&state.challenge_sealing_key, &challenge_token)?.data;
 
     let user_auth = user_auth.map(|a| a.check_guard(Any)).transpose()?;
-
-    // Support old clients that aren't telling us what kind of token they want
-    if scope.is_none() {
-        // Metrics so we know when we can deprecate
-        root_span.record("meta", "no_scope_provided");
-    } else {
-        root_span.record("meta", "scope_provided");
-    }
-    let scope = scope.unwrap_or_else(|| {
-        if ob_pk_auth.is_some() {
-            IdentifyScope::Onboarding
-        } else {
-            IdentifyScope::My1fp
-        }
-    });
 
     let config = state.config.clone();
     let session_key = state.session_sealing_key.clone();
