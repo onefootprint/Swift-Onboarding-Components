@@ -12,3 +12,13 @@ impl<'a> From<AssertionError<'a>> for ApiError {
         ApiError::from(ApiErrorKind::AssertionError(value.0.to_string()))
     }
 }
+
+#[derive(Debug)]
+/// Shorthand to make it convenient to make an HTTP 400 validation error.
+pub struct ValidationError<'a>(pub &'a str);
+
+impl<'a> From<ValidationError<'a>> for ApiError {
+    fn from(value: ValidationError<'a>) -> Self {
+        ApiError::from(ApiErrorKind::ValidationError(value.0.to_string()))
+    }
+}

@@ -58,7 +58,7 @@ pub fn get(
             } else {
                 None
             };
-            let client_config = TenantClientConfig::get(conn, tenant_id, is_live)?;
+            let client_config = TenantClientConfig::get(conn, &tenant_id, is_live)?;
 
             Ok((appearance, client_config))
         })

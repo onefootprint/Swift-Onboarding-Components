@@ -10,6 +10,10 @@ class FpAuth(BaseAuth):
     HEADER_NAME = "x-fp-authorization"
 
 
+class SdkArgs(BaseAuth):
+    HEADER_NAME = "x-fp-sdk-args-token"
+
+
 class PublishableOnboardingKey(BaseAuth):
     HEADER_NAME = "X-Onboarding-Config-Key"
 

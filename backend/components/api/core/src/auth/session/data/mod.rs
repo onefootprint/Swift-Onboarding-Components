@@ -1,4 +1,5 @@
 pub mod ob_config;
+pub mod sdk_args;
 pub mod tenant;
 pub mod user;
 
@@ -47,11 +48,20 @@ pub enum AuthSessionData {
 
     /// Used to initialize an onboarding session to KYC an owner of a business
     BusinessOwner(ob_config::BoSession),
+
+    /// Used to pass information into bifrost from the Footprint.js SDK
+    SdkArgs(sdk_args::SdkArgsData),
 }
 
 impl From<ob_config::BoSession> for AuthSessionData {
     fn from(value: ob_config::BoSession) -> Self {
         Self::BusinessOwner(value)
+    }
+}
+
+impl From<sdk_args::SdkArgsData> for AuthSessionData {
+    fn from(value: sdk_args::SdkArgsData) -> Self {
+        Self::SdkArgs(value)
     }
 }
 
@@ -68,6 +78,7 @@ impl HasSessionKind for AuthSessionData {
             Self::ValidateUserToken(_) => SessionKind::ValidateUserToken,
             Self::OnboardingSession(_) => SessionKind::OnboardingSession,
             Self::BusinessOwner(_) => SessionKind::BusinessOwner,
+            Self::SdkArgs(_) => SessionKind::SdkArgs,
         }
     }
 }

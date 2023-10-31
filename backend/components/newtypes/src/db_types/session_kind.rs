@@ -41,6 +41,7 @@ pub enum SessionKind {
     ValidateUserToken,
     OnboardingSession,
     BusinessOwner,
+    SdkArgs,
 }
 
 impl_enum_str_diesel!(SessionKind);

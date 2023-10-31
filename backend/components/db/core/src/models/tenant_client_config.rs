@@ -48,7 +48,7 @@ impl TenantClientConfig {
     #[tracing::instrument("TenantClientConfig::get", skip_all)]
     pub fn get(
         conn: &mut PgConn,
-        tenant_id: TenantId,
+        tenant_id: &TenantId,
         is_live: bool,
     ) -> Result<Option<Self>, crate::DbError> {
         let control: Option<Self> = tenant_client_config::table
