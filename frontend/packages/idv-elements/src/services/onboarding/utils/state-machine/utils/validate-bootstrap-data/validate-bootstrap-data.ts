@@ -9,7 +9,7 @@ import {
 } from '@onefootprint/types';
 import { isFuture } from 'date-fns';
 import { PhoneNumberUtil } from 'google-libphonenumber';
-import IsEmail from 'isemail';
+import { validate as isEmail } from 'isemail';
 
 import {
   fromUSDateToISO8601Format,
@@ -39,8 +39,7 @@ const validateUserData = (
     return {};
   }
 
-  const isEmailValid = (email: any) =>
-    isValidString(email) && IsEmail.validate(email);
+  const isEmailValid = (email: any) => isValidString(email) && isEmail(email);
 
   const isPhoneValid = (phoneNumber: any) => {
     if (!isValidString(phoneNumber)) {

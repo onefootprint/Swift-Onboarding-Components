@@ -1,8 +1,8 @@
 import { PhoneNumberUtil } from 'google-libphonenumber';
-import IsEmail from 'isemail';
+import { validate as isEmail } from 'isemail';
 
 const validateUserData = (email?: string, phoneNumber?: string) => {
-  const isEmailValid = IsEmail.validate(email ?? '');
+  const isEmailValid = isEmail(email ?? '');
 
   let isPhoneValid = false;
   if (phoneNumber) {

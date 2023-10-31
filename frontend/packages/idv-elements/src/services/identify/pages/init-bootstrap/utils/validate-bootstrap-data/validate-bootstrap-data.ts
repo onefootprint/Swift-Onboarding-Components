@@ -1,6 +1,6 @@
 import type { IdentifyBootstrapData } from '@onefootprint/types';
 import { PhoneNumberUtil } from 'google-libphonenumber';
-import IsEmail from 'isemail';
+import { validate as isEmail } from 'isemail';
 
 const SANDBOX_NUMBER = '+1 555-555-0100';
 
@@ -10,7 +10,7 @@ const validateBootstrapData = (bootstrapData?: IdentifyBootstrapData) => {
   }
 
   const { email, phoneNumber } = bootstrapData;
-  const isEmailValid = email && IsEmail.validate(email ?? '');
+  const isEmailValid = email && isEmail(email ?? '');
 
   // Check if phone number is valid unless we are in sandbox mode
   // (since we have a special test number for sandbox)
