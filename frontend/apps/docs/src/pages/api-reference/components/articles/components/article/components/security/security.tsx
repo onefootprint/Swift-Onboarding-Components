@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronDown16, IcoShield16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Box, CodeInline, createFontStyles, Divider } from '@onefootprint/ui';
+import { CodeInline, createFontStyles, Divider } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import type { SecurityProps } from '@/api-reference/api-reference.types';
@@ -29,12 +29,6 @@ const Security = ({ type }: SecurityProps) => {
           <Description>
             {securityComponentContent[type].description}
             <br />
-            <Box as="span" display="inline-block">
-              {t('what-is-api-key')}{' '}
-              <CodeInline disabled>
-                {securityComponentContent[type].name}
-              </CodeInline>
-            </Box>
             <Example>
               {t('example')}:{' '}
               <CodeInline disabled>
