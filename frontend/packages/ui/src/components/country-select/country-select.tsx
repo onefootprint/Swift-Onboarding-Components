@@ -31,14 +31,15 @@ const CountrySelect = ({
   hint,
   id,
   label,
+  locale,
   name,
   onBlur,
   onChange,
   options = COUNTRIES,
   placeholder = 'Select',
+  size,
   testID,
   value,
-  locale,
 }: CountrySelectProps) => {
   const localeCountry = getCountryCodeFromLocale(locale);
   const currentValue =
@@ -57,12 +58,10 @@ const CountrySelect = ({
       onChange={onChange}
       OptionComponent={Option}
       options={options}
-      testID={testID}
-      value={currentValue}
       renderTrigger={({
         isOpen,
-        selectedOption,
         onClick,
+        selectedOption,
         testID: triggerTestID,
       }) => (
         <BaseSelectTrigger
@@ -71,6 +70,7 @@ const CountrySelect = ({
           hasFocus={isOpen}
           isPrivate
           onClick={onClick}
+          size={size}
           testID={triggerTestID}
         >
           {selectedOption?.value && (
@@ -81,6 +81,9 @@ const CountrySelect = ({
           </LabelContainer>
         </BaseSelectTrigger>
       )}
+      size={size}
+      testID={testID}
+      value={currentValue}
     />
   );
 };

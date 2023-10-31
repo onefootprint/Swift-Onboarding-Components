@@ -16,6 +16,8 @@ import EmptyState from './components/empty-state';
 import MenuList from './components/menu-list';
 import Option from './components/option';
 
+export type BaseSelectSize = 'compact' | 'default';
+
 export type BaseSelectProps<Option extends BaseSelectOption> = {
   disabled?: boolean;
   emptyStateText?: string;
@@ -28,13 +30,15 @@ export type BaseSelectProps<Option extends BaseSelectOption> = {
   onBlur?: React.FocusEventHandler<HTMLInputElement>;
   onChange?: (newOption: Option) => void;
   options: Option[];
-  searchPlaceholder?: string;
   renderTrigger?: (options: {
     isOpen: boolean;
     onClick: () => void;
     selectedOption?: Option;
+    size?: BaseSelectSize;
     testID?: string;
   }) => React.ReactNode;
+  searchPlaceholder?: string;
+  size?: BaseSelectSize;
   value?: Option;
   OptionComponent?: React.ComponentType<OptionProps<any, false, any>>;
   testID?: string;
@@ -55,6 +59,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
   options,
   renderTrigger,
   searchPlaceholder = 'Search',
+  size = 'default',
   testID,
   value,
 }: BaseSelectProps<Option>) => {
@@ -104,10 +109,11 @@ const BaseSelect = <Option extends BaseSelectOption>({
       )}
       <div ref={setReferenceElement}>
         {renderTrigger?.({
-          testID: internalId,
           isOpen,
           onClick: toggleDropdown,
           selectedOption: value,
+          size,
+          testID: internalId,
         })}
       </div>
       {isOpen && (

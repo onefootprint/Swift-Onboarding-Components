@@ -24,6 +24,7 @@ const Select = <Option extends SelectOption = SelectOption>({
   hasError,
   hint,
   id,
+  isPrivate,
   label,
   labelTooltip,
   name,
@@ -33,9 +34,9 @@ const Select = <Option extends SelectOption = SelectOption>({
   options,
   placeholder = 'Select',
   searchPlaceholder,
+  size,
   testID,
   value,
-  isPrivate,
   renderTrigger = ({
     onClick,
     isOpen,
@@ -46,9 +47,10 @@ const Select = <Option extends SelectOption = SelectOption>({
       disabled={disabled}
       hasError={hasError}
       hasFocus={isOpen}
-      onClick={onClick}
-      testID={triggerTestID}
       isPrivate={isPrivate}
+      onClick={onClick}
+      size={size}
+      testID={triggerTestID}
     >
       {selectedOption?.label || placeholder}
     </BaseSelectTrigger>
@@ -69,6 +71,7 @@ const Select = <Option extends SelectOption = SelectOption>({
     options={options}
     renderTrigger={renderTrigger}
     searchPlaceholder={searchPlaceholder}
+    size={size}
     testID={testID}
     value={value}
   />

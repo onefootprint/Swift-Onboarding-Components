@@ -2,12 +2,24 @@ import { STATES } from '@onefootprint/global-constants';
 import type { ComponentMeta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
+import Box from '../box';
 import type { SelectOption, SelectProps } from './select';
 import Select from './select';
 
 export default {
   title: 'Components/Select',
   component: Select,
+  argTypes: {
+    size: {
+      control: {
+        type: 'select',
+      },
+      type: { name: 'string', required: false },
+      description: 'Size',
+      options: ['default', 'compact'],
+      table: { defaultValue: { summary: 'default' } },
+    },
+  },
 } as ComponentMeta<typeof Select>;
 
 const Template: Story<SelectProps> = ({
@@ -18,8 +30,9 @@ const Template: Story<SelectProps> = ({
   onChange,
   options = STATES,
   placeholder,
-  value,
   searchPlaceholder,
+  size,
+  value,
 }: SelectProps) => {
   const [selectedOption, setSelectedOption] = useState<
     SelectOption | undefined
@@ -33,17 +46,20 @@ const Template: Story<SelectProps> = ({
   };
 
   return (
-    <Select
-      disabled={disabled}
-      hasError={hasError}
-      hint={hint}
-      label={label}
-      onChange={handleSelect}
-      options={options}
-      placeholder={placeholder}
-      searchPlaceholder={searchPlaceholder}
-      value={selectedOption}
-    />
+    <Box width="300px">
+      <Select
+        disabled={disabled}
+        hasError={hasError}
+        hint={hint}
+        label={label}
+        onChange={handleSelect}
+        options={options}
+        placeholder={placeholder}
+        searchPlaceholder={searchPlaceholder}
+        size={size}
+        value={selectedOption}
+      />
+    </Box>
   );
 };
 
@@ -52,9 +68,28 @@ Base.args = {
   disabled: false,
   hasError: false,
   hint: '',
+  size: 'default',
   label: 'State',
   onChange: console.log, // eslint-disable-line no-console
   options: STATES,
+  placeholder: 'Select',
+  searchPlaceholder: 'Search',
+  value: undefined,
+};
+
+export const Small = Template.bind({});
+Small.args = {
+  disabled: false,
+  hasError: false,
+  hint: '',
+  size: 'compact',
+  label: 'State',
+  onChange: console.log, // eslint-disable-line no-console
+  options: [
+    { label: 'Month to date', value: '1' },
+    { label: 'Previous month', value: '2' },
+    { label: 'All time', value: '3' },
+  ],
   placeholder: 'Select',
   searchPlaceholder: 'Search',
   value: undefined,
@@ -65,6 +100,7 @@ Custom.args = {
   disabled: false,
   hasError: false,
   hint: '',
+  size: 'default',
   label: 'Outcome',
   onChange: console.log, // eslint-disable-line no-console
   options: [

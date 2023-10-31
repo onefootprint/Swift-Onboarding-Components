@@ -2,7 +2,7 @@ import { IcoChevronDown16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React, { forwardRef } from 'react';
 
-import { createFontStyles } from '../../../utils/mixins';
+import { createTypography } from '../../../utils/mixins';
 import Stack from '../../stack';
 
 type BaseSelectTriggerProps = {
@@ -10,9 +10,10 @@ type BaseSelectTriggerProps = {
   disabled?: boolean;
   hasError?: boolean;
   hasFocus?: boolean;
-  onClick?: () => void;
-  testID?: string;
   isPrivate?: boolean;
+  onClick?: () => void;
+  size?: 'compact' | 'default';
+  testID?: string;
 };
 
 const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
@@ -24,6 +25,7 @@ const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
       hasFocus,
       isPrivate,
       onClick,
+      size,
       testID,
     }: BaseSelectTriggerProps,
     ref,
@@ -31,11 +33,12 @@ const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
     <BaseSelectTriggerContainer
       data-has-error={hasError}
       data-has-focus={hasFocus}
-      data-testid={testID}
       data-private={isPrivate}
+      data-testid={testID}
       disabled={disabled}
       onClick={onClick}
       ref={ref}
+      size={size}
       type="button"
       /** Do not change/remove these classes */
       className="fp-input fp-custom-appearance"
@@ -51,11 +54,15 @@ const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
 );
 
 const BaseSelectTriggerContainer = styled.button<BaseSelectTriggerProps>`
-  ${({ theme }) => {
+  ${({ theme, size }) => {
     const { input } = theme.components;
 
     return css`
-      ${createFontStyles('body-3')};
+      ${createTypography(
+        size === 'default'
+          ? input.size.default.typography
+          : input.size.compact.typography,
+      )};
       align-items: center;
       background: ${input.state.default.initial.bg};
       border-color: ${input.state.default.initial.border};
@@ -64,7 +71,9 @@ const BaseSelectTriggerContainer = styled.button<BaseSelectTriggerProps>`
       border-width: ${input.global.borderWidth};
       color: ${input.global.color};
       display: flex;
-      height: ${input.size.default.height};
+      height: ${size === 'default'
+        ? input.size.default.height
+        : input.size.compact.height};
       justify-content: space-between;
       outline: none;
       padding: 0 ${theme.spacing[5]};
