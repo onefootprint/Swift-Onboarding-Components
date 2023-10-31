@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoSmartphone24 } from '@onefootprint/icons';
 import { Button, Stack } from '@onefootprint/ui';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
 
 import ChallengeHeader from '../../components/challenge-header';
@@ -11,8 +12,11 @@ import Biometric from './components/biometric';
 const BiometricChallenge = () => {
   const { t } = useTranslation('pages.biometric-challenge');
   const [state, send] = useIdentifyMachine();
-  const { initialAuthToken, bootstrapData } = state.context;
+  const { initialAuthToken, bootstrapData, config } = state.context;
   const isBootstrap = !!(bootstrapData?.email || bootstrapData?.phoneNumber);
+  const { ShouldHideBootstrappedLoginWithDifferent } = useFlags();
+  const orgIds = new Set<string>(ShouldHideBootstrappedLoginWithDifferent);
+  const loginWithDifferent = !orgIds.has(config.orgId) && isBootstrap;
   const title = t('title');
   const hasInitialAuthToken = !!initialAuthToken;
 
@@ -53,7 +57,9 @@ const BiometricChallenge = () => {
           {t('login-with-sms')}
         </Button>
       </Stack>
-      {isBootstrap && <DifferentAccount onClick={handleLoginWithDifferent} />}
+      {loginWithDifferent && (
+        <DifferentAccount onClick={handleLoginWithDifferent} />
+      )}
     </Stack>
   );
 };

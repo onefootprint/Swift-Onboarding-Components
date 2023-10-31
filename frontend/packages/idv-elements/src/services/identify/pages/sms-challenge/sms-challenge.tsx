@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { ChallengeKind } from '@onefootprint/types';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
 
 import ChallengeHeader from '../../components/challenge-header';
@@ -19,6 +20,7 @@ const SmsChallenge = () => {
   const {
     initialAuthToken,
     bootstrapData,
+    config,
     challenge: { challengeData, hasSyncablePassKey, availableChallengeKinds },
     device,
     identify: {
@@ -29,6 +31,9 @@ const SmsChallenge = () => {
     },
   } = state.context;
   const isBootstrap = !!(bootstrapData?.email || bootstrapData?.phoneNumber);
+  const { ShouldHideBootstrappedLoginWithDifferent } = useFlags();
+  const orgIds = new Set<string>(ShouldHideBootstrappedLoginWithDifferent);
+  const loginWithDifferent = !orgIds.has(config.orgId) && isBootstrap;
   const hasInitialAuthToken = !!initialAuthToken;
   const shouldShowWelcomeBack = userFound && !isUnverified;
   const title = shouldShowWelcomeBack ? t('welcome-back-title') : t('title');
@@ -82,7 +87,9 @@ const SmsChallenge = () => {
         preferredChallengeKind={ChallengeKind.sms}
         identifier={successfulIdentifier ?? { phoneNumber }}
       />
-      {isBootstrap && <DifferentAccount onClick={handleLoginWithDifferent} />}
+      {loginWithDifferent && (
+        <DifferentAccount onClick={handleLoginWithDifferent} />
+      )}
     </Container>
   );
 };

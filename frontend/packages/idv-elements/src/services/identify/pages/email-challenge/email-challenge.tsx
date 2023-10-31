@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { ChallengeKind } from '@onefootprint/types';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
 
 import ChallengeHeader from '../../components/challenge-header';
@@ -16,9 +17,13 @@ const EmailChallenge = () => {
   const [state, send] = useIdentifyMachine();
   const {
     bootstrapData,
+    config,
     identify: { userFound, email = '', isUnverified, successfulIdentifier },
   } = state.context;
   const isBootstrap = !!bootstrapData?.email;
+  const { ShouldHideBootstrappedLoginWithDifferent } = useFlags();
+  const orgIds = new Set<string>(ShouldHideBootstrappedLoginWithDifferent);
+  const loginWithDifferent = !orgIds.has(config.orgId) && isBootstrap;
   const shouldShowWelcomeBack = userFound && !isUnverified;
   const title = shouldShowWelcomeBack ? t('welcome-back-title') : t('title');
 
@@ -53,7 +58,9 @@ const EmailChallenge = () => {
         preferredChallengeKind={ChallengeKind.email}
         identifier={successfulIdentifier ?? { email }}
       />
-      {isBootstrap && <DifferentAccount onClick={handleLoginWithDifferent} />}
+      {loginWithDifferent && (
+        <DifferentAccount onClick={handleLoginWithDifferent} />
+      )}
     </Container>
   );
 };
