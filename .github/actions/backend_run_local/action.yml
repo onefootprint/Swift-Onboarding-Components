@@ -8,6 +8,7 @@ inputs:
     required: true
 outputs:
   server_pid:
+    description: "This composite action will leave the server running under this PID. Use this PID to kill the server when you are done talking to it"
     value: ${{ steps.run_server.outputs.server_pid }}
 runs:
   using: "composite"

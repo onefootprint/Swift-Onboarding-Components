@@ -1,0 +1,151 @@
+name: Backend Open API
+
+on:
+  pull_request:
+    paths:
+      - 'backend/**'
+
+env:
+  CARGO_TERM_COLOR: always
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}-ci-open-api
+  cancel-in-progress: true
+
+jobs:
+  compute_open_api_head:
+    runs-on: 16core
+    environment: dev
+    services:
+      postgres:
+        image: postgres:14.3
+        env:
+          POSTGRES_USER: 'runner'
+          POSTGRES_HOST_AUTH_METHOD: 'trust'
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ./.github/actions/backend_run_local
+        id: backend_run_local
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_region: ${{ secrets.AWS_REGION }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Fetch open API schema
+        working-directory: ./backend
+        run: |
+          set -x
+          curl http://localhost:8000/docs-spec-v3 | jq > ../head_open_api.json
+          kill ${{ steps.backend_run_local.outputs.server_pid }}
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: head-open-api
+          path: head_open_api.json
+  
+
+  compute_open_api_base:
+    runs-on: 16core
+    environment: dev
+    services:
+      postgres:
+        image: postgres:14.3
+        env:
+          POSTGRES_USER: 'runner'
+          POSTGRES_HOST_AUTH_METHOD: 'trust'
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+
+      - uses: ./.github/actions/backend_run_local
+        id: backend_run_local
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_region: ${{ secrets.AWS_REGION }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Fetch open API schema
+        working-directory: ./backend
+        run: |
+          set -x
+          curl http://localhost:8000/docs-spec-v3 | jq > ../base_open_api.json
+          kill ${{ steps.backend_run_local.outputs.server_pid }}
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: base-open-api
+          path: base_open_api.json
+
+
+  compare_open_api:
+    runs-on: 16core
+    needs: [compute_open_api_head, compute_open_api_base]
+    steps:
+      - name: Download head
+        uses: actions/download-artifact@v3
+        with:
+          name: head-open-api
+
+      - name: Download base
+        uses: actions/download-artifact@v3
+        with:
+          name: base-open-api
+
+      - name: Compare OpenAPI files
+        id: compare_openapi
+        uses: docker://openapitools/openapi-diff:4d755a6aa22f06936bad7b1a8fdaa07182976632
+        with:
+          args: --fail-on-incompatible base_open_api.json head_open_api.json --text incompat_raw.txt
+
+      - name: Print incompat.txt
+        if: ${{ success() || failure() }}
+        run: |
+          set -x
+          echo '### Open API Incompat Report' >> incompat.txt
+          echo '```' >> incompat.txt
+          cat incompat_raw.txt >> incompat.txt
+          echo '```' >> incompat.txt
+          cat incompat.txt
+
+      - name: Find local comment
+        uses: peter-evans/find-comment@1769778a0c5bd330272d749d12c036d65e70d39d
+        id: fc
+        if: ${{ success() || failure() }}
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: "Open API Incompat Report"
+
+      - name: Create or update comment with incompat
+        uses: peter-evans/create-or-update-comment@3383acd359705b10cb1eeef05c0e88c056ea4666
+        if: ${{ steps.compare_openapi.outcome == 'failure' && (success() || failure()) }}
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-path: incompat.txt
+          edit-mode: replace
+
+      - name: Create or update comment with success
+        uses: peter-evans/create-or-update-comment@3383acd359705b10cb1eeef05c0e88c056ea4666
+        if: ${{ steps.compare_openapi.outcome == 'success' && (success() || failure()) }}
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: ### Open API Incompat Report \nNo Open API incompatibilities detected 👍
+          edit-mode: replace

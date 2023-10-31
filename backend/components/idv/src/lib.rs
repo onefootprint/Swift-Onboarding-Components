@@ -1,6 +1,5 @@
 // for test fixture vendor responses json
 #![recursion_limit = "256"]
-
 use std::fmt::Debug;
 
 use ::twilio::response::lookup::LookupV2Response;
@@ -17,7 +16,6 @@ use incode::response::OnboardingStartResponse;
 use incode::watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse};
 use middesk::response::business::BusinessResponse;
 use middesk::response::webhook::{MiddeskBusinessUpdateWebhookResponse, MiddeskTinRetriedWebhookResponse};
-
 use newtypes::{PiiJsonValue, VendorAPI};
 
 use socure::response::SocureIDPlusResponse;

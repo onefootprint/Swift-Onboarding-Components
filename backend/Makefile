@@ -139,6 +139,9 @@ set-dot-env:
 	@echo "created .env:"
 	@cat .env
 
+open-api:
+	@MONOREPO_DIR=../ python3 ci/scripts/update_open_api.py
+
 setup-integration-tests:
 	@python3 -m venv ~/.virtualenvs/fpc
 	@source ~/.virtualenvs/fpc/bin/activate
