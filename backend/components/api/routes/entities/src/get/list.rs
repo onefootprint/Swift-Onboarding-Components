@@ -18,6 +18,8 @@ use api_wire_types::ListEntitiesRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::scoped_vault::ScopedVaultListQueryParams;
 use itertools::Itertools;
+use newtypes::fingerprinter::FingerprintScope;
+use newtypes::fingerprinter::GlobalFingerprintKind;
 use newtypes::DataIdentifier;
 use newtypes::FpId;
 use newtypes::PhoneNumber;
@@ -161,15 +163,34 @@ async fn compute_fingerprint_for_search(
     state: &State,
     search: PiiString,
     tenant_id: &TenantId,
-) -> Result<Vec<Fingerprint>, ApiError> {
+) -> ApiResult<Vec<Fingerprint>> {
     let searchable_idks = IDK::searchable().into_iter().map(DataIdentifier::from);
     let searchable_bdks = BDK::searchable().into_iter().map(DataIdentifier::from);
-    let searchable = searchable_idks
+    let data = searchable_idks
         .chain(searchable_bdks)
         .map(|di| (di, &search))
-        .collect::<Vec<_>>();
+        .collect_vec();
 
-    state
-        .compute_fingerprints_by_tenant(searchable.as_slice(), tenant_id.clone())
-        .await
+    let tenant_scoped = data
+        .iter()
+        .map(|(di, pii)| ((), FingerprintScope::Tenant(di, tenant_id), *pii))
+        .collect_vec();
+    let global = data
+        .iter()
+        .filter_map(|(di, pii)| {
+            GlobalFingerprintKind::try_from(di.clone())
+                .ok()
+                .map(|gdi| (gdi, pii))
+        })
+        .map(|(gdi, pii)| ((), FingerprintScope::Global(gdi), *pii))
+        .collect_vec();
+    let data = tenant_scoped.into_iter().chain(global).collect_vec();
+
+    let fps = state
+        .compute_fingerprints(data)
+        .await?
+        .into_iter()
+        .map(|(_, fp)| fp)
+        .collect();
+    Ok(fps)
 }

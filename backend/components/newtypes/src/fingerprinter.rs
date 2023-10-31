@@ -129,27 +129,6 @@ pub trait Fingerprinter: std::marker::Sync {
             .ok_or(crate::Error::Custom("missing fingerprints".into()))?
             .1)
     }
-
-    /// Helper to compute fingperirnts tied to a tenant id
-    async fn compute_fingerprints_by_tenant(
-        &self,
-        data: &[(DataIdentifier, &PiiString)],
-        tenant_id: TenantId,
-    ) -> Result<Vec<Fingerprint>, Self::Error> {
-        let scopable: Vec<_> = data
-            .iter()
-            .map(|(di, pii)| ((), (di, &tenant_id), *pii))
-            .collect();
-
-        let fps = self
-            .compute_fingerprints(scopable)
-            .await?
-            .into_iter()
-            .map(|(_, fp)| fp)
-            .collect();
-
-        Ok(fps)
-    }
 }
 
 #[cfg(test)]
