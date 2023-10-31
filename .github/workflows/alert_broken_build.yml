@@ -16,7 +16,7 @@ jobs:
           running-workflow-name: 'Wait for checks'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 10
-          allowed-conclusions: success,skipped
+          allowed-conclusions: success,skipped,cancelled
 
   alert:
     if: failure()
