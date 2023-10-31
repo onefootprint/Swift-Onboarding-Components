@@ -324,7 +324,7 @@ async function createCdnFrontedLoadBalancer(
       conditions: [
         {
           pathPattern: {
-            values: [`*/${metricsEndpointPath}*`],
+            values: [`/${metricsEndpointPath}`],
           },
         },
       ],
@@ -555,10 +555,7 @@ function createTaskContainerRole(
               Version: '2012-10-17',
               Statement: [
                 {
-                  Action: [
-                    'rekognition:*',
-                    'textract:*'
-                  ],
+                  Action: ['rekognition:*', 'textract:*'],
                   Effect: 'Allow',
                   Resource: '*',
                 },
