@@ -759,6 +759,7 @@ table! {
         is_prod_kyb_playbook_restricted -> Bool,
         domains -> Array<Text>,
         is_prod_auth_playbook_restricted -> Bool,
+        allowed_preview_apis -> Array<Text>,
     }
 }
 

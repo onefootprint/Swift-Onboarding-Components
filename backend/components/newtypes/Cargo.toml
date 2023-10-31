@@ -32,6 +32,7 @@ futures-util = { workspace = true }
 futures = { workspace = true }
 card-validate = "2.3"
 enum_variant_type = { workspace = true }
+tracing = { workspace = true }
 macros = { path = "../macros" }
 # diesel
 diesel = { workspace = true }

@@ -9,7 +9,7 @@ use db::models::tenant_api_key::TenantApiKey;
 use db::models::tenant_role::TenantRole;
 use futures_util::Future;
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::{DataLifetimeSource, TenantScope};
+use newtypes::{DataLifetimeSource, PreviewApi, TenantScope};
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
 use tracing_actix_web::RootSpan;
@@ -101,6 +101,15 @@ fn parse_auth_key(req: &actix_web::HttpRequest) -> Result<SecretApiKey, ApiError
         .ok_or_else(|| AuthError::MissingHeader(HEADER_NAME.to_owned()))?;
 
     Ok(tenant_sk_input)
+}
+
+impl SecretTenantAuthContext {
+    pub fn check_preview_guard(&self, api: PreviewApi) -> Result<(), ApiError> {
+        if !self.0.tenant.allowed_preview_apis.contains(&api) {
+            return Err(AuthError::CannotAccessPreviewApi.into());
+        }
+        Ok(())
+    }
 }
 
 impl TenantAuth for CheckedSecretTenantAuth {

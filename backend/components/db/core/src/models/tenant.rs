@@ -16,8 +16,8 @@ use diesel::query_builder::QueryId;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    AppClipExperienceId, CompanySize, EncryptedVaultPrivateKey, ScopedVaultId, StripeCustomerId, TenantId,
-    TenantRoleKind, TenantRoleKindDiscriminant, VaultId, VaultPublicKey, WorkosAuthMethod,
+    AppClipExperienceId, CompanySize, EncryptedVaultPrivateKey, PreviewApi, ScopedVaultId, StripeCustomerId,
+    TenantId, TenantRoleKind, TenantRoleKindDiscriminant, VaultId, VaultPublicKey, WorkosAuthMethod,
 };
 
 use super::tenant_role::{ImmutableRoleKind, NewTenantRoleRow};
@@ -58,6 +58,9 @@ pub struct Tenant {
     pub domains: Vec<String>,
     // When true, don't allow creating auth playbooks in prod
     pub is_prod_auth_playbook_restricted: bool,
+    /// Certain preview APIs we want to restrict to only be visible by certain tenants.
+    /// Eventually, we'll use this to hide inaccessible preview APIs from docs too
+    pub allowed_preview_apis: Vec<PreviewApi>,
 }
 
 impl Tenant {

@@ -72,6 +72,8 @@ pub enum AuthError {
     UnsupportedAuthMethod,
     #[error("Workflow state does not allow {0}")]
     MissingWorkflowGuard(newtypes::WorkflowGuard),
+    #[error("You are not allowed to access this preview API. Please contact us if you'd like to use this functionality.")]
+    CannotAccessPreviewApi,
     #[error("Workflow is deactivated. Cannot perform {0}")]
     WorkflowDeactivated(newtypes::WorkflowGuard),
 }

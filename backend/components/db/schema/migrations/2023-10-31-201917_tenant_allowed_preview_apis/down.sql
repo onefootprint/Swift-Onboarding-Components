@@ -1,0 +1,1 @@
+ALTER TABLE tenant DROP COLUMN allowed_preview_apis;

@@ -6,6 +6,7 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use newtypes::FpId;
+use newtypes::PreviewApi;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[api_v2_operation(
@@ -18,6 +19,7 @@ pub async fn get(
     request: web::Path<FpId>,
     auth: SecretTenantAuthContext,
 ) -> actix_web::Result<Json<ResponseData<Vec<api_wire_types::LivenessEvent>>>, ApiError> {
+    auth.check_preview_guard(PreviewApi::LivenessList)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
