@@ -105,8 +105,9 @@ fn parse_auth_key(req: &actix_web::HttpRequest) -> Result<SecretApiKey, ApiError
 
 impl SecretTenantAuthContext {
     pub fn check_preview_guard(&self, api: PreviewApi, enforce: bool) -> Result<(), ApiError> {
-        if !self.0.tenant.allowed_preview_apis.contains(&api) {
-            tracing::error!(tenant_id=%self.0.tenant.id, tenant_name=%self.0.tenant.name, api=%api, "Tenant attempting to use unallowed preview API");
+        let tenant = &self.0.tenant;
+        if !tenant.is_demo_tenant && !tenant.allowed_preview_apis.contains(&api) {
+            tracing::error!(tenant_id=%tenant.id, tenant_name=%tenant.name, api=%api, "Tenant attempting to use unallowed preview API");
             if enforce {
                 // We don't always want to enforce the guards yet while we are still configuring them
                 return Err(AuthError::CannotAccessPreviewApi.into());

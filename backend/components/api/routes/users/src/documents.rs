@@ -12,7 +12,7 @@ use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(
     description = "View the successfully uploaded documents uploaded for this user.",
-    tags(Entities, Preview)
+    tags(Users, Preview)
 )]
 #[get("/users/{fp_id}/documents")]
 pub async fn get(
