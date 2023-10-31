@@ -278,6 +278,10 @@ task_enum! {
         #[strum(serialize = "Partially Active")]
         PartiallyActive,
 
+        #[footprint_reason_code = Some(FootprintReasonCode::SosFilingPartiallyActive)]
+        #[strum(serialize = "Partially Inactive")]
+        PartiallyInactive,
+
         #[footprint_reason_code = Some(FootprintReasonCode::SosFilingNoActiveFound)]
         #[strum(serialize = "Inactive")]
         Inactive,
