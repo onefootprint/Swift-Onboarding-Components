@@ -5,7 +5,10 @@ use std::fmt::Debug;
 
 use ::twilio::response::lookup::LookupV2Response;
 use experian::cross_core::response::CrossCoreAPIResponse;
+use idology::expectid::response::ExpectIDResponse;
 use idology::pa::response::PaResponse;
+use idology::scan_onboarding::response::ScanOnboardingAPIResponse;
+use idology::scan_verify::response::{ScanVerifyAPIResponse, ScanVerifySubmissionAPIResponse};
 use incode::doc::response::{
     AddConsentResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse,
     GetOnboardingStatusResponse, ProcessFaceResponse, ProcessIdResponse,
@@ -14,10 +17,6 @@ use incode::response::OnboardingStartResponse;
 use incode::watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse};
 use middesk::response::business::BusinessResponse;
 use middesk::response::webhook::{MiddeskBusinessUpdateWebhookResponse, MiddeskTinRetriedWebhookResponse};
-
-use idology::expectid::response::ExpectIDResponse;
-use idology::scan_onboarding::response::ScanOnboardingAPIResponse;
-use idology::scan_verify::response::{ScanVerifyAPIResponse, ScanVerifySubmissionAPIResponse};
 
 use newtypes::{PiiJsonValue, VendorAPI};
 

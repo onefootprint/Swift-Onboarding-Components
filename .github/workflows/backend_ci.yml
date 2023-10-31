@@ -108,87 +108,28 @@ jobs:
       ENVIRONMENT: ci
     if: success()
     steps:
-      - name: Install libpq + libssl
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libssl-dev libpq-dev
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Create footprint db
-        run: |
-          psql -h localhost -c 'create database footprint_db;'
-
       - uses: actions/checkout@v3
 
-      - name: Set dot env
-        working-directory: ./backend
-        run: make set-dot-env
-
-      - name: rust-toolchain
-        uses: dtolnay/rust-toolchain@1.73.0
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@dd05243424bd5c0e585e4b55eb2d7615cdd32f1f
+      - uses: ./.github/actions/backend_run_local
+        id: backend_run_local
         with:
-          workspaces: |
-            backend
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_region: ${{ secrets.AWS_REGION }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Setup Python # Set Python version
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install python deps
+      - name: Run local integration tests
         working-directory: ./backend/ci
         run: |
+          set -ox pipefail
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      - uses: rui314/setup-mold@7f56dbde35ee02a3fe0287e7ddd310922eb5f553
-        with:
-          mold-version: 2.0.0
-          make-default: false
-
-      - name: Run local integration tests
-        working-directory: ./backend
-        run: |
-          cargo build -p enclave
-          cargo build -p enclave_proxy
-          cargo build -p api_server
-                    
-          make run-local &> server_output.txt &
-          server_pid=$!
-
-          attempt_counter=0
-          max_attempts=6
-
-          until $(curl --output /dev/null --silent --fail http://localhost:8000); do
-              if [ ${attempt_counter} -eq ${max_attempts} ];then
-                echo "Max attempts reached"
-                echo server_output.txt
-                exit 1
-              fi
-
-              printf '.'
-              attempt_counter=$(($attempt_counter+1))
-              sleep 10
-          done
-
-          # We pass the integration test number in explicitly - remove the one we use locally
-          cat .env | grep -v INTEGRATION_TEST_PHONE_NUMBER > .env2
-          rm .env
-          mv .env2 .env
-
-          cd ci
-          set -o pipefail
           pytest tests/ 2>&1 | tee integration_test_output.txt
-          kill $server_pid
+          kill ${{ steps.backend_run_local.outputs.server_pid }}
 
       - name: Create results for PR
         id: test_results
