@@ -43,9 +43,7 @@ const BiometricChallenge = () => {
         gap={5}
         align="center"
         justify="center"
-        sx={{
-          width: '100%',
-        }}
+        width="100%"
       >
         <Biometric />
         <Button
