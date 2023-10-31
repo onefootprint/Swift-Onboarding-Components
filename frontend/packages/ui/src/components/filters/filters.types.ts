@@ -35,6 +35,7 @@ export type FilterDate = {
 };
 
 export type FilterControl = {
+  disabled?: boolean;
   loading?: boolean;
   query: string;
   label: string;

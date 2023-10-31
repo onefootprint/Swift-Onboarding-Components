@@ -15,26 +15,35 @@ export type PillProps = {
     | 'listbox'
     | 'tree';
   children?: React.ReactNode;
+  disabled?: boolean;
   label?: () => void;
   onClick?: () => void;
 };
 
 const Pill = styled.button<PillProps>`
   ${({ theme }) => css`
-    ${createFontStyles('body-4')};
+    ${createFontStyles('label-4')};
     align-items: center;
-    background: ${theme.backgroundColor.primary};
-    border-color: ${theme.borderColor.primary};
+    border-color: ${theme.borderColor.tertiary};
     border-radius: ${theme.borderRadius.default};
     border-width: ${theme.borderWidth[1]};
     border-style: solid;
-    color: ${theme.color.tertiary};
-    cursor: pointer;
+    color: ${theme.color.secondary};
     display: flex;
     display: flex;
     gap: ${theme.spacing[2]};
-    padding: ${theme.spacing[2]} ${theme.spacing[3]};
+    padding: ${theme.spacing[3]} ${theme.spacing[4]};
     white-space: nowrap;
+    height: 32px;
+
+    &:enabled {
+      cursor: pointer;
+      background: ${theme.backgroundColor.primary};
+    }
+
+    &:disabled {
+      background: ${theme.backgroundColor.secondary};
+    }
 
     @media (hover: hover) {
       &:hover {

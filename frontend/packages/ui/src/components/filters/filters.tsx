@@ -28,7 +28,12 @@ const Filters = ({
     <FilterContainer>
       <Controls>
         {controls.map(control => (
-          <Control control={control} key={control.query} onChange={onChange} />
+          <Control
+            control={control}
+            disabled={control.disabled}
+            key={control.query}
+            onChange={onChange}
+          />
         ))}
       </Controls>
       {hasSelectedOptions && (

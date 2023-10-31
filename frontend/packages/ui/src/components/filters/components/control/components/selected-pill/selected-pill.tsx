@@ -5,18 +5,20 @@ import type { PillProps } from '../pill';
 import Pill from '../pill';
 
 const SelectedPill = ({
-  children,
-  onClick,
   'aria-controls': ariaControls,
   'aria-expanded': ariaExpanded,
   'aria-haspopup': ariaHaspopup,
+  children,
+  disabled,
+  onClick,
 }: PillProps) => (
   <Pill
-    onClick={onClick}
-    type="button"
     aria-controls={ariaControls}
     aria-expanded={ariaExpanded}
     aria-haspopup={ariaHaspopup}
+    disabled={disabled}
+    onClick={onClick}
+    type="button"
   >
     {children}
     <IcoChevronDown16 color="tertiary" />

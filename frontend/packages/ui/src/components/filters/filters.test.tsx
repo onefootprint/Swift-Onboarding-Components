@@ -14,7 +14,7 @@ import Filters from './filters';
 
 const testDate = new Date('2023-01-04');
 
-describe.skip('<Filters />', () => {
+describe('<Filters />', () => {
   beforeAll(() => {
     MockDate.set(testDate);
   });
@@ -473,6 +473,34 @@ describe.skip('<Filters />', () => {
         const popover = screen.queryByRole('dialog');
         expect(popover).not.toBeInTheDocument();
       });
+    });
+  });
+
+  describe('when it is disabled', () => {
+    it('should not open the popover when clicking on the filter label', async () => {
+      renderFilters({
+        controls: [
+          {
+            query: 'status',
+            label: 'Status',
+            kind: 'multi-select',
+            disabled: true,
+            options: [
+              { label: 'Verified', value: 'verified' },
+              { label: 'Failed', value: 'failed' },
+              { label: 'Review required', value: 'review_required' },
+              { label: 'Id required', value: 'id_required' },
+            ],
+            selectedOptions: [],
+          },
+        ],
+      });
+
+      const trigger = screen.getByRole('button', { name: 'Status' });
+      await userEvent.click(trigger);
+
+      const popover = screen.queryByRole('dialog');
+      expect(popover).not.toBeInTheDocument();
     });
   });
 });

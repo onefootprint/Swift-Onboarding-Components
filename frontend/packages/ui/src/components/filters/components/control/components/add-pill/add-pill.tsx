@@ -5,8 +5,8 @@ import React from 'react';
 import type { PillProps } from '../pill';
 import Pill from '../pill';
 
-const AddPill = ({ children, onClick }: PillProps) => (
-  <StyledPill onClick={onClick} type="button">
+const AddPill = ({ children, onClick, disabled }: PillProps) => (
+  <StyledPill onClick={onClick} type="button" disabled={disabled}>
     <IcoPlusSmall16 color="tertiary" />
     {children}
   </StyledPill>

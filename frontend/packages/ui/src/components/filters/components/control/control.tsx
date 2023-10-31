@@ -22,13 +22,14 @@ import getSingleSelectLabel from './utils/get-single-select-label';
 
 export type ControlProps = {
   control: FilterControl;
+  disabled?: boolean;
   onChange: (
     query: string,
     newSelectedOptions: FilterSelectedOption | FilterSelectedOption[],
   ) => void;
 };
 
-const Control = ({ control, onChange }: ControlProps) => {
+const Control = ({ control, disabled, onChange }: ControlProps) => {
   const [open, setOpen] = useState(false);
   const popoverId = useId();
   const dateOptions = useDateOptions();
@@ -59,7 +60,9 @@ const Control = ({ control, onChange }: ControlProps) => {
     <Box ref={setReferenceElement} position="relative" aria-busy={loading}>
       {hasSelectedOptions ? (
         <PillGroup>
-          <ClearPill onClick={clear}>{label}</ClearPill>
+          <ClearPill onClick={clear} disabled={disabled}>
+            {label}
+          </ClearPill>
           <SelectedPillMotion
             isVisible={hasSelectedOptions}
             from="left"
@@ -69,6 +72,7 @@ const Control = ({ control, onChange }: ControlProps) => {
               aria-controls={popoverId}
               aria-expanded={open}
               aria-haspopup="dialog"
+              disabled={disabled}
               onClick={handleToggle}
             >
               {kind === 'single-select' &&
@@ -87,11 +91,11 @@ const Control = ({ control, onChange }: ControlProps) => {
           aria-expanded={open}
           aria-haspopup="dialog"
           onClick={handleToggle}
+          disabled={disabled}
         >
           {label}
         </AddPill>
       )}
-
       {open ? (
         <StyledFade
           isVisible={open}

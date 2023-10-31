@@ -1,12 +1,12 @@
-import { IcoCloseSmall16 } from '@onefootprint/icons';
+import { IcoClose16 } from '@onefootprint/icons';
 import React from 'react';
 
 import type { PillProps } from '../pill';
 import Pill from '../pill';
 
-const ClearPill = ({ children, onClick }: PillProps) => (
-  <Pill onClick={onClick} type="button">
-    <IcoCloseSmall16 color="tertiary" />
+const ClearPill = ({ children, disabled, onClick }: PillProps) => (
+  <Pill onClick={onClick} disabled={disabled} type="button">
+    <IcoClose16 color="tertiary" />
     {children}
   </Pill>
 );
