@@ -6,16 +6,24 @@ use api_core::{
     auth::{
         session::{user::ValidateUserToken, AuthSessionData},
         user::{UserAuthContext, UserWfAuthContext},
+        Any,
     },
     errors::{ApiResult, AssertionError},
     types::JsonApiResponse,
-    utils::session::AuthSession,
+    utils::{
+        requirements::{
+            get_data_collection_progress, get_requirements_for_person_and_maybe_business,
+            DecryptUncheckedResultForReqs, GetRequirementsArgs,
+        },
+        session::AuthSession,
+        vault_wrapper::{VaultWrapper, VwArgs},
+    },
 };
 use api_wire_types::hosted::validate::HostedValidateResponse;
 use chrono::Duration;
 use db::models::auth_event::AuthEvent;
 use itertools::Itertools;
-use newtypes::ObConfigurationKind;
+use newtypes::{output::Csv, DataIdentifierDiscriminant, ObConfigurationKind};
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
@@ -29,16 +37,13 @@ pub async fn post(
     user_auth: UserAuthContext,
     user_wf_auth: Option<UserWfAuthContext>,
 ) -> JsonApiResponse<HostedValidateResponse> {
-    let (wf, user_auth) = if let Some(user_wf_auth) = user_wf_auth {
+    let (wf, sv_id, user_auth) = if let Some(user_wf_auth) = user_wf_auth {
         // Token from onboarding
         let user_wf_auth = user_wf_auth.check_guard(UserAuthGuard::SignUp)?;
 
         // Verify there are no unmet requirements
-        let reqs = api_core::utils::requirements::get_requirements_for_person_and_maybe_business(
-            &state,
-            api_core::utils::requirements::GetRequirementsArgs::from(&user_wf_auth)?,
-        )
-        .await?;
+        let args = GetRequirementsArgs::from(&user_wf_auth)?;
+        let reqs = get_requirements_for_person_and_maybe_business(&state, args).await?;
         let unmet_reqs = reqs.into_iter().filter(|r| !r.is_met()).collect_vec();
         if !unmet_reqs.is_empty() {
             let unmet_reqs = unmet_reqs.into_iter().map(|x| x.into()).collect_vec();
@@ -46,7 +51,8 @@ pub async fn post(
         }
 
         let wf = user_wf_auth.workflow().clone();
-        (Some(wf), user_wf_auth.data.user_session)
+        let sv_id = user_wf_auth.scoped_user.id.clone();
+        (Some(wf), sv_id, user_wf_auth.data.user_session)
     } else {
         // Token from auth
         let user_auth = user_auth.check_guard(UserAuthGuard::Auth)?;
@@ -56,14 +62,22 @@ pub async fn post(
         if ob_config.kind != ObConfigurationKind::Auth {
             return Err(OnboardingError::ObConfigKindNotAuth.into());
         }
-        // TODO assert there are no "requirements" remaining for the auth playbook here.
-        // Maybe just assert that everything is collected that must be collected, in case we start
-        // collecting phone
-        (None, user_auth.data)
+        let sv_id = user_auth
+            .scoped_user_id()
+            .ok_or(AssertionError("No scoped user associated with auth session"))?;
+        // Primitive requirement checking for auth playbooks, which don't have many requirements
+        let sv_id2 = sv_id.clone();
+        let vw = state
+            .db_pool
+            .db_query(move |conn| VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv_id2)))
+            .await??;
+        let args = DecryptUncheckedResultForReqs::for_auth();
+        let progress = get_data_collection_progress(&vw, ob_config, DataIdentifierDiscriminant::Id, &args);
+        if !progress.missing_attributes.is_empty() {
+            return Err(OnboardingError::MissingAttributes(Csv(progress.missing_attributes)).into());
+        }
+        (None, sv_id, user_auth.data)
     };
-    let sv_id = user_auth
-        .scoped_user_id()
-        .ok_or(AssertionError("No scoped user associated with auth session"))?;
     let session_key = state.session_sealing_key.clone();
     let validation_token = state
         .db_pool

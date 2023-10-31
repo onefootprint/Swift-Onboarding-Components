@@ -20,7 +20,7 @@ pub enum OnboardingError {
     TenantMismatch,
     #[error("Unmet onboarding requirements: {0}")]
     UnmetRequirements(Csv<OnboardingRequirementKind>),
-    #[error("Required attributes are not set: {0}")]
+    #[error("Some attributes have not been collected: {0}")]
     MissingAttributes(Csv<CollectedDataOption>),
     #[error("Onboarding is not in a terminal state")]
     NonTerminalState,

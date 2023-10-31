@@ -66,6 +66,13 @@ impl GetRequirementsArgs {
     }
 }
 
+impl DecryptUncheckedResultForReqs {
+    /// Auth playbooks don't require complex checking of what's populated
+    pub fn for_auth() -> Self {
+        Self(DecryptUncheckedResult::default())
+    }
+}
+
 #[tracing::instrument(skip_all)]
 /// Gets a list of requirements for the Person Vault for the onboarding.
 /// If the Person Vault is the Primary BO of some ongoing Business onboarding, then this also includes the requirements of that Business Vault
@@ -143,9 +150,9 @@ pub async fn get_requirements_for_person_and_maybe_business(
         .await?
 }
 
-struct RequirementProgress {
-    populated_attributes: Vec<CollectedDataOption>,
-    missing_attributes: Vec<CollectedDataOption>,
+pub struct RequirementProgress {
+    pub populated_attributes: Vec<CollectedDataOption>,
+    pub missing_attributes: Vec<CollectedDataOption>,
 }
 
 /// Returns if the provided CDO is met by the data in the VW. Some CDOs have conditional
@@ -219,7 +226,7 @@ pub(crate) fn should_skip_us_only_cdos(
     }
 }
 
-fn get_progress<Type>(
+pub fn get_data_collection_progress<Type>(
     vw: &VaultWrapper<Type>,
     ob_config: &ObConfiguration,
     di_kind: DID,
@@ -292,7 +299,7 @@ fn get_requirement_inner(
                 let RequirementProgress {
                     populated_attributes,
                     missing_attributes,
-                } = get_progress(vw, obc, DID::Id, decrypted_values);
+                } = get_data_collection_progress(vw, obc, DID::Id, decrypted_values);
                 // if ob config needs to collect id data
                 OnboardingRequirement::CollectData {
                     missing_attributes,
@@ -307,7 +314,7 @@ fn get_requirement_inner(
                     let RequirementProgress {
                         populated_attributes,
                         missing_attributes,
-                    } = get_progress(vw, obc, DID::InvestorProfile, decrypted_values);
+                    } = get_data_collection_progress(vw, obc, DID::InvestorProfile, decrypted_values);
                     let declarations = decrypted_values.get_di(IPK::Declarations).ok();
                     let missing_document = if let Some(declarations) = declarations {
                         let declarations: Vec<Declaration> = declarations.deserialize()?;
@@ -332,7 +339,7 @@ fn get_requirement_inner(
                 let RequirementProgress {
                     populated_attributes,
                     missing_attributes,
-                } = get_progress(vw, obc, DID::Business, decrypted_values);
+                } = get_data_collection_progress(vw, obc, DID::Business, decrypted_values);
                 Ok(OnboardingRequirement::CollectBusinessData {
                     missing_attributes,
                     populated_attributes,
