@@ -7,11 +7,12 @@ import Toggle from './toggle';
 
 describe('<Toggle />', () => {
   const renderToggle = ({
-    label,
     checked,
     defaultChecked,
     disabled,
+    hint,
     id,
+    label,
     name,
     onBlur,
     onChange = jest.fn(),
@@ -21,11 +22,12 @@ describe('<Toggle />', () => {
   }: Partial<ToggleProps>) =>
     customRender(
       <Toggle
-        label={label}
         checked={checked}
         defaultChecked={defaultChecked}
         disabled={disabled}
+        hint={hint}
         id={id}
+        label={label}
         name={name}
         onBlur={onBlur}
         onChange={onChange}
@@ -56,6 +58,16 @@ describe('<Toggle />', () => {
           width: '30px',
           height: '20px',
         });
+      });
+    });
+
+    describe('when it has a hint', () => {
+      it('should have the hint', () => {
+        renderToggle({
+          hint: 'Toggle hint',
+        });
+        const hint = screen.getByText('Toggle hint');
+        expect(hint).toBeInTheDocument();
       });
     });
 

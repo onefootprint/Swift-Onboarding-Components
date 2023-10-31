@@ -6,12 +6,14 @@ import mergeRefs from 'react-merge-refs';
 import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import useSX from '../../hooks/use-sx';
 import { createFontStyles, createOverlayBackground } from '../../utils/mixins';
+import Box from '../box';
 
 export type ToggleProps = {
   checked?: boolean;
   defaultChecked?: boolean;
-  fullWidth?: boolean;
   disabled?: boolean;
+  fullWidth?: boolean;
+  hint?: string;
   id?: string;
   label?: string;
   labelPlacement?: 'left' | 'right';
@@ -20,17 +22,18 @@ export type ToggleProps = {
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onFocus?: (event: React.FocusEvent<HTMLButtonElement>) => void;
   required?: boolean;
-  sx?: SXStyleProps;
   size?: 'default' | 'compact';
+  sx?: SXStyleProps;
 };
 
-const Switch = forwardRef<HTMLInputElement, ToggleProps>(
+const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
   (
     {
       label,
-      labelPlacement = 'left',
+      labelPlacement = 'right',
       checked: initialChecked,
       fullWidth = false,
+      hint,
       defaultChecked,
       disabled,
       id: possibleId,
@@ -76,26 +79,21 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
       <ToggleContainer
         data-placement={labelPlacement}
         data-full-width={fullWidth}
+        data-align-center={!hint}
         sx={sxStyles}
       >
-        {label && (
-          <Label data-placement={labelPlacement} htmlFor={id} size={size}>
-            {label}
-          </Label>
-        )}
-        <Input
-          aria-hidden="true"
-          checked={isControlled ? checked : undefined}
-          defaultChecked={isControlled ? undefined : defaultChecked}
-          disabled={disabled}
-          id={id}
-          name={name}
-          onChange={onChange}
-          ref={mergeRefs([localRef, ref])}
-          required={required}
-          tabIndex={-1}
-          type="checkbox"
-        />
+        <Box>
+          {label && (
+            <Label htmlFor={id} data-size={size}>
+              {label}
+            </Label>
+          )}
+          {hint && (
+            <Hint id={`${id}-hint`} data-size={size}>
+              {hint}
+            </Hint>
+          )}
+        </Box>
         <Button
           aria-checked={checked}
           aria-label={label}
@@ -123,6 +121,19 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
             layout
           />
         </Button>
+        <Input
+          aria-hidden="true"
+          checked={isControlled ? checked : undefined}
+          defaultChecked={isControlled ? undefined : defaultChecked}
+          disabled={disabled}
+          id={id}
+          name={name}
+          onChange={onChange}
+          ref={mergeRefs([localRef, ref])}
+          required={required}
+          tabIndex={-1}
+          type="checkbox"
+        />
       </ToggleContainer>
     );
   },
@@ -131,44 +142,46 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
 const ToggleContainer = styled.div<{
   sx: SXStyles;
 }>`
-  display: flex;
-  align-items: center;
+  ${({ theme }) => css`
+    display: inline-flex;
+    gap: ${theme.spacing[4]};
 
-  &[data-full-width='false'] {
-    justify-content: center;
-  }
+    &[data-full-width='false'] {
+      justify-content: center;
+    }
 
-  &[data-full-width='true'] {
-    justify-content: space-between;
-  }
+    &[data-full-width='true'] {
+      justify-content: space-between;
+    }
 
-  &[data-placement='left'] {
-    flex-direction: row;
-  }
+    &[data-placement='left'] {
+      flex-direction: row;
+    }
 
-  &[data-placement='right'] {
-    flex-direction: row-reverse;
-  }
+    &[data-placement='right'] {
+      flex-direction: row-reverse;
+    }
 
+    &[data-align-center='true'] {
+      align-items: center;
+    }
+  `}
   ${({ sx }) => css`
     ${sx}
   `}
 `;
 
-const Label = styled.label<{ size: 'default' | 'compact' }>`
-  ${({ theme, size }) => css`
-    ${size === 'compact'
-      ? createFontStyles('body-4')
-      : createFontStyles('body-3')};
+const Label = styled.label`
+  ${({ theme }) => css`
     color: ${theme.color.primary};
     cursor: pointer;
 
-    &[data-placement='left'] {
-      margin-right: ${theme.spacing[3]};
+    &[data-size='compact'] {
+      ${createFontStyles('body-4')};
     }
 
-    &[data-placement='right'] {
-      margin-left: ${theme.spacing[3]};
+    &[data-size='default'] {
+      ${createFontStyles('body-3')};
     }
   `}
 `;
@@ -237,4 +250,23 @@ const StyledIcoToggleKnob16 = styled(motion.div)<{
   `}
 `;
 
-export default Switch;
+const Hint = styled.div`
+  ${({ theme }) => {
+    const { hint } = theme.components;
+
+    return css`
+      color: ${hint.states.default.color};
+      text-align: left;
+
+      &[data-size='compact'] {
+        ${createFontStyles('body-4')};
+      }
+
+      &[data-size='default'] {
+        ${createFontStyles('body-3')};
+      }
+    `;
+  }}
+`;
+
+export default Toggle;

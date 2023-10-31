@@ -77,7 +77,6 @@ const AnnotationNote = ({ annotation }: AnnotationNoteProps) => {
         <Toggle
           checked={isNotePinned}
           onChange={handlePinNoteChange}
-          labelPlacement="right"
           size="compact"
           label={t('org-overwrite.drawer.pin-note')}
         />

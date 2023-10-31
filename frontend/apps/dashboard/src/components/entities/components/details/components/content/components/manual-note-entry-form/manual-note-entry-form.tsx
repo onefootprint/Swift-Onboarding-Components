@@ -59,7 +59,6 @@ const ManualNoteEntryForm = ({
               }}
               checked={field.value}
               label={t('toggle.label')}
-              labelPlacement="right"
             />
           </ToggleContainer>
         )}

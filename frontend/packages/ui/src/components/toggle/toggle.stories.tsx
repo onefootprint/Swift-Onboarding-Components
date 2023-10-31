@@ -1,6 +1,7 @@
 import type { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
+import Box from '../box';
 import type { ToggleProps } from './toggle';
 import Toggle from './toggle';
 
@@ -51,7 +52,12 @@ export default {
       type: { name: 'string', required: false },
       description: 'Label placement',
       options: ['left', 'right'],
-      table: { defaultValue: { summary: 'left' } },
+      table: { defaultValue: { summary: 'right' } },
+    },
+    hint: {
+      control: 'text',
+      description: 'Toggle hint',
+      required: false,
     },
     required: {
       control: 'boolean',
@@ -91,6 +97,7 @@ const Template: Story<ToggleProps> = ({
   defaultChecked,
   disabled,
   fullWidth,
+  hint,
   id,
   label,
   labelPlacement,
@@ -104,25 +111,28 @@ const Template: Story<ToggleProps> = ({
   const [checked, setChecked] = useState<boolean | undefined>(initialChecked);
 
   return (
-    <Toggle
-      checked={checked}
-      defaultChecked={defaultChecked}
-      disabled={disabled}
-      fullWidth={fullWidth}
-      id={id}
-      label={label}
-      labelPlacement={labelPlacement}
-      name={name}
-      onBlur={onBlur}
-      onChange={event => {
-        const nextValue = event.target.checked;
-        setChecked(nextValue);
-        onChange?.(event);
-      }}
-      onFocus={onFocus}
-      required={required}
-      size={size}
-    />
+    <Box>
+      <Toggle
+        checked={checked}
+        defaultChecked={defaultChecked}
+        disabled={disabled}
+        fullWidth={fullWidth}
+        hint={hint}
+        id={id}
+        label={label}
+        labelPlacement={labelPlacement}
+        name={name}
+        onBlur={onBlur}
+        onChange={event => {
+          const nextValue = event.target.checked;
+          setChecked(nextValue);
+          onChange?.(event);
+        }}
+        onFocus={onFocus}
+        required={required}
+        size={size}
+      />
+    </Box>
   );
 };
 
@@ -132,9 +142,10 @@ Base.args = {
   defaultChecked: false,
   disabled: false,
   fullWidth: false,
+  hint: 'Toggle hint',
   id: 'toggle-id',
   label: 'Toggle',
-  labelPlacement: 'left',
+  labelPlacement: 'right',
   name: 'toggle',
   onBlur: console.log, // eslint-disable-line no-console
   onChange: console.log, // eslint-disable-line no-console

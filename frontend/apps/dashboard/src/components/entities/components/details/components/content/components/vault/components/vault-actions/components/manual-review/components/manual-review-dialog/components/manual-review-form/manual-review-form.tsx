@@ -63,7 +63,6 @@ const ManualReviewForm = ({ status, onSubmit }: ManualReviewFormProps) => {
               }}
               checked={field.value}
               label={t('dialog.form.toggle.label')}
-              labelPlacement="right"
             />
           </ToggleContainer>
         )}

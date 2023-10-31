@@ -45,7 +45,6 @@ const Editing = ({ onStopEditing }: EditingProps) => {
                 }}
                 checked={field.value}
                 label={t('legal-entity-type.toggle')}
-                labelPlacement="right"
               />
             </ToggleContainer>
           )}
@@ -66,7 +65,6 @@ const Editing = ({ onStopEditing }: EditingProps) => {
                 defaultChecked={false}
                 checked={field.value}
                 label={t('website.toggle')}
-                labelPlacement="right"
               />
             </ToggleContainer>
           )}
@@ -86,7 +84,6 @@ const Editing = ({ onStopEditing }: EditingProps) => {
                 }}
                 checked={field.value}
                 label={t('phone-number.toggle')}
-                labelPlacement="right"
               />
             </ToggleContainer>
           )}

@@ -54,6 +54,7 @@ const TopMenuBar = () => {
         position="bottom"
       >
         <Toggle
+          labelPlacement="left"
           size="compact"
           checked={sandbox.isSandbox}
           disabled={!sandbox.canToggle}

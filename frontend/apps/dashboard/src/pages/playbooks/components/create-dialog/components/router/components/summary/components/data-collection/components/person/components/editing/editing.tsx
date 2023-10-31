@@ -99,7 +99,6 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
                   }}
                   checked={field.value}
                   label={t('phone.toggle')}
-                  labelPlacement="right"
                 />
               </ToggleContainer>
             )}
@@ -125,7 +124,6 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
                 }}
                 checked={field.value}
                 label={t('ssn.toggle')}
-                labelPlacement="right"
               />
             </ToggleContainer>
           )}
@@ -203,7 +201,6 @@ const Editing = ({ onStopEditing, meta }: EditingProps) => {
                 checked={field.value}
                 disabled={shouldStepUpIdDoc}
                 label={t('id-doc.toggle')}
-                labelPlacement="right"
                 onBlur={field.onBlur}
                 onChange={nextValue => {
                   field.onChange(nextValue);
