@@ -245,6 +245,18 @@ impl CreateOnboardingConfigurationRequest {
 
         self.validate_enhanced_aml()?;
 
+        if kind == ObConfigurationKind::Auth
+            && self
+                .must_collect_data
+                .iter()
+                .any(|cdo| !matches!(cdo, CDO::Email | CDO::PhoneNumber))
+        {
+            return Err(TenantError::ValidationError(
+                "Auth playbooks can only collect phone and email for now".into(),
+            )
+            .into());
+        }
+
         // Check for required fields
         let missing_required_fields: Vec<_> = required_fields
             .into_iter()
@@ -257,6 +269,7 @@ impl CreateOnboardingConfigurationRequest {
             ))
             .into());
         }
+
         Ok(())
     }
 
