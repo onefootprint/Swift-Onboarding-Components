@@ -39,6 +39,7 @@ pub struct IncodeResponse<T: APIResponseToIncodeError + serde::Serialize> {
 pub enum IncodeAPIResult<T: APIResponseToIncodeError> {
     Success(T),
     ResponseError(response::Error),
+    ResponseErrorOther(String),
 }
 
 impl<T: APIResponseToIncodeError + serde::Serialize> IncodeAPIResult<T> {
@@ -46,6 +47,7 @@ impl<T: APIResponseToIncodeError + serde::Serialize> IncodeAPIResult<T> {
         match self {
             IncodeAPIResult::Success(s) => Ok(s),
             IncodeAPIResult::ResponseError(e) => Err(error::Error::APIResponseError(e)),
+            IncodeAPIResult::ResponseErrorOther(s) => Err(error::Error::SendError(s)),
         }
     }
 
@@ -61,6 +63,7 @@ impl<T: APIResponseToIncodeError + serde::Serialize> IncodeAPIResult<T> {
         let res = match self {
             IncodeAPIResult::Success(s) => ScrubbedPiiJsonValue::scrub(s),
             IncodeAPIResult::ResponseError(e) => ScrubbedPiiJsonValue::scrub(e),
+            IncodeAPIResult::ResponseErrorOther(s) => ScrubbedPiiJsonValue::scrub(s),
         }?;
 
         Ok(res)
@@ -70,6 +73,7 @@ impl<T: APIResponseToIncodeError + serde::Serialize> IncodeAPIResult<T> {
         match self {
             IncodeAPIResult::Success(_) => false,
             IncodeAPIResult::ResponseError(_) => true,
+            IncodeAPIResult::ResponseErrorOther(_) => true,
         }
     }
 }
@@ -83,6 +87,52 @@ impl<T: DeserializeOwned + APIResponseToIncodeError> TryFrom<serde_json::Value> 
             Ok(IncodeAPIResult::<T>::ResponseError(error))
         } else {
             Ok(IncodeAPIResult::<T>::Success(raw))
+        }
+    }
+}
+
+pub async fn from_response<T>(response: reqwest::Response) -> IncodeAPIResult<T>
+where
+    T: DeserializeOwned + APIResponseToIncodeError,
+{
+    let (cl, s) = (response.content_length(), response.status());
+    let response_json: Result<serde_json::Value, reqwest::Error> = response.json().await;
+    match response_json {
+        Ok(j) => {
+            let raw: Result<T, serde_json::Error> = serde_json::from_value(j.clone());
+            match raw {
+                Ok(deser_json) => {
+                    // If request was successful and we deserialized
+                    // TODO: all options so what to do here...
+                    if s.is_success() {
+                        IncodeAPIResult::<T>::Success(deser_json)
+                    // 4xx
+                    } else if s.is_client_error() {
+                        // look for custom error codes
+                        if let Some(error) = deser_json.to_error() {
+                            IncodeAPIResult::<T>::ResponseError(error)
+                        // otherwise, we just return whatever the body has as an error
+                        } else {
+                            IncodeAPIResult::<T>::ResponseErrorOther(j.to_string())
+                        }
+                    // if we are is non-2xx/4xx
+                    // we should have retried in reqwest middleware already, 5xx w/ a body is weird, but for completeness
+                    } else {
+                        IncodeAPIResult::<T>::ResponseErrorOther(j.to_string())
+                    }
+                }
+                // if we had issues deserializing something is up
+                Err(e) => {
+                    tracing::error!(http_status=%s, content_length=?cl, error=?e, "error deserializing incode response");
+                    IncodeAPIResult::<T>::ResponseErrorOther(e.to_string())
+                }
+            }
+        }
+        // if we can't deserialize as json, we probably have a 5xx
+        Err(err) => {
+            tracing::error!(http_status=%s, content_length=?cl, ?err, "error parsing incode response as json");
+
+            IncodeAPIResult::<T>::ResponseErrorOther(err.to_string())
         }
     }
 }
