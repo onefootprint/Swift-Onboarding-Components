@@ -13,10 +13,12 @@ pub struct TelemetryHeaders {
     /// that occured in the same "session"
     pub session_id: Option<SessionId>,
     pub is_integration_test_req: bool,
+    pub client_version: Option<String>,
 }
 
 impl TelemetryHeaders {
     pub const SESSION_HEADER_NAME: &str = "x-fp-session-id";
+    const CLIENT_VERSION_HEADER_NAME: &str = "x-fp-client-version";
     const INTEGRATION_TESTS_HEADER_NAME: &str = "x-fp-integration-test";
 
     pub fn parse_from_request(headers: &HeaderMap) -> Self {
@@ -27,11 +29,13 @@ impl TelemetryHeaders {
             .unwrap_or(None)
             .map(|uuid| uuid.to_string())
             .map(SessionId::from);
+        let client_version = get_header(Self::CLIENT_VERSION_HEADER_NAME, headers);
         let is_integration_test_req =
             get_bool_header(Self::INTEGRATION_TESTS_HEADER_NAME, headers).unwrap_or_default();
         Self {
             session_id,
             is_integration_test_req,
+            client_version,
         }
     }
 }

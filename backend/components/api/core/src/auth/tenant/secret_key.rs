@@ -74,7 +74,6 @@ impl FromRequest for SecretTenantAuthContext {
             tracing::info!(tenant_id=%tenant.id, api_key_id=%api_key.id, role_id=%role.id, "authenticated");
 
             root_span.record("tenant_id", &tenant.id.to_string());
-            root_span.record("api_key_id", &api_key.id.to_string());
             root_span.record("is_live", api_key.is_live);
 
             Ok(SecretTenantAuthContext(CheckedSecretTenantAuth {

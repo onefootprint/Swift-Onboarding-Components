@@ -123,6 +123,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
         let TelemetryHeaders {
             session_id,
             is_integration_test_req,
+            client_version,
         } = TelemetryHeaders::parse_from_request(request.headers());
         let session_id = session_id.map(|s| format!("{}", s));
 
@@ -138,6 +139,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             is_live = tracing::field::Empty,
             // Free-form data to be added by individual APIs if they choose
             meta = tracing::field::Empty,
+            client_version,
             route,
             ip_address,
             country,
@@ -146,7 +148,6 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             server_git_hash,
             is_integration_test_req,
             // I would get rid of these fields next
-            api_key_id = tracing::field::Empty,
             tenant_user_id = tracing::field::Empty,
             lat_lng = format!(
                 "{},{}",
