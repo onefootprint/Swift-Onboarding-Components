@@ -147,5 +147,5 @@ jobs:
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
-          body: ### Open API Incompat Report \nNo Open API incompatibilities detected 👍
+          body: "### Open API Incompat Report\nNo Open API incompatibilities detected 👍"
           edit-mode: replace

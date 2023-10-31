@@ -1,8 +1,7 @@
-use std::sync::Arc;
-
 use launchdarkly_server_sdk::{Client, ConfigBuilder, ContextBuilder};
 use mockall::{automock, predicate::*};
 use newtypes::Uuid;
+use std::sync::Arc;
 use thiserror::Error;
 
 mod flags;
