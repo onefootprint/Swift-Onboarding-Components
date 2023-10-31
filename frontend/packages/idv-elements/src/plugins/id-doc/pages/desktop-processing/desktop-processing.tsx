@@ -16,11 +16,13 @@ import Loading from '../../components/loading';
 import RetryLimitExceeded from '../../components/retry-limit-exceeded';
 import Success from '../../components/success';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
+import {
+  NOT_PENDING_UPLOAD_ERROR,
+  SLOW_CONNECTION_MESSAGE_TIMEOUT,
+} from '../../constants/processing.constants';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import useProcessDoc from '../../hooks/use-process-doc';
 import useSubmitDoc from '../../hooks/use-submit-doc';
-
-const SLOW_CONNECTION_MESSAGE_TIMEOUT = 15000;
 
 const DeskTopProcessing = () => {
   const { t } = useTranslation('pages.desktop-processing');
@@ -95,10 +97,21 @@ const DeskTopProcessing = () => {
   };
 
   const handleSubmitDocError = (error: unknown) => {
+    const errorMessage = getErrorMessage(error);
+
+    // This part of code may seem a little counter-intuitive
+    // Sometimes the processing request might erroneously fail although BE successfully processes it
+    // In those case we ask the user to upload the doc again which fails with the following error message
+    // In reality the user completed the flow and should be able to move on in such cases
+    // This piece of code ensures that
+    if (errorMessage === NOT_PENDING_UPLOAD_ERROR) {
+      setNextSide(undefined);
+      setMode('success');
+      return;
+    }
+
     Logger.error(
-      `Id-doc image submit failed on phone flow. Side: ${currSide}, upload session id: ${id}. Error: ${getErrorMessage(
-        error,
-      )}`,
+      `Id-doc image submit failed on phone flow. Side: ${currSide}, upload session id: ${id}. Error: ${errorMessage}`,
       'processing',
     );
     handleError(error);

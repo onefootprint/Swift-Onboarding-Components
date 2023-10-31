@@ -19,6 +19,6 @@ const processDoc = async (payload: ProcessDocRequest) => {
   return response.data;
 };
 
-const useProcessDoc = () => useMutation(processDoc);
+const useProcessDoc = () => useMutation(processDoc, { retry: 2 }); // Sometimes the processing request might erroneously fail although BE successfully processes it, so we try twice
 
 export default useProcessDoc;
