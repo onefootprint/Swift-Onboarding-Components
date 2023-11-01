@@ -11,7 +11,7 @@ use crate::{
 };
 use api_core::{
     auth::{user::UserAuthGuard, IsGuardMet},
-    errors::ApiResult,
+    errors::{ApiResult, AssertionError},
 };
 
 use chrono::{Duration, Utc};
@@ -28,9 +28,7 @@ use db::models::{
 };
 use macros::route_alias;
 
-use newtypes::{
-    AttestationType, AuthEventKind, IdentifyScope, LivenessAttributes, LivenessInfo, LivenessIssuer,
-};
+use newtypes::{AttestationType, AuthEventKind, LivenessAttributes, LivenessInfo, LivenessIssuer};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
 
@@ -254,14 +252,11 @@ pub async fn complete_post(
             }
             .save(conn)?;
 
-            let scope = if let Some(id) = user_auth.auth_event_ids.first() {
-                AuthEvent::get(conn, id)?.scope
-            } else {
-                // Don't want to error this whole endpoint for an annotation, but this should never
-                // happen
-                tracing::error!("Registering a passkey in auth context without an auth_event_id");
-                IdentifyScope::Onboarding
-            };
+            let auth_event_id = user_auth
+                .auth_event_ids
+                .first()
+                .ok_or(AssertionError("No auth events found for user"))?;
+            let existing_auth_event = AuthEvent::get(conn, auth_event_id)?;
 
             // record our registration of a passkey as an auth event
             // this is done here for (a) consistency with SMS first-time registration/auth
@@ -276,7 +271,7 @@ pub async fn complete_post(
                 webauthn_credential_id: Some(credential.id),
                 created_at: Utc::now(),
                 // Use same scope as any of the auth events on this auth token
-                scope,
+                scope: existing_auth_event.scope,
             }
             .create(conn.conn())?;
 

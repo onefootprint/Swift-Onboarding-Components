@@ -82,22 +82,13 @@ pub async fn post(
     let validation_token = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let auth_event_ids = if !user_auth.auth_event_ids.is_empty() {
-                user_auth.auth_event_ids
-            } else {
-                // This should never happen, but will add logging for now and rm this branch later
-                // TODO rm this logic and always use from token. assert there's always an auth event
-                tracing::error!("No auth event ID associated with auth token");
-                let (events, _) = AuthEvent::list(conn, &sv_id, None)?;
-                if events.is_empty() {
-                    return Err(AssertionError("No auth events found for user").into());
-                }
-                events.first().into_iter().map(|e| e.event.id.clone()).collect()
-            };
+            if user_auth.auth_event_ids.is_empty() {
+                return Err(AssertionError("No auth events found for user").into());
+            }
             // Validate as much as possible in this API instead of in the tenant-facing API.
             // If this fails, the user may be able to retry and get a new validation token.
             // But once the tenant has the validation token, they cannot do anything if it fails
-            let auth_events = AuthEvent::get_bulk(conn, &auth_event_ids)?;
+            let auth_events = AuthEvent::get_bulk(conn, &user_auth.auth_event_ids)?;
             if !auth_events.iter().any(|ae| ae.scoped_vault_id.is_some()) {
                 return Err(AssertionError("Auth event must have scoped vault").into());
             }
@@ -113,7 +104,7 @@ pub async fn post(
             }
             let data = AuthSessionData::ValidateUserToken(ValidateUserToken {
                 sv_id,
-                auth_event_ids,
+                auth_event_ids: user_auth.auth_event_ids,
                 wf_id: wf.map(|wf| wf.id),
             });
             let (validation_token, _) =
