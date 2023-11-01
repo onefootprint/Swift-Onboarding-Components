@@ -1,21 +1,18 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { EntityKind } from '@onefootprint/types';
 import Head from 'next/head';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { EntitiesList, EntitiesTable } from 'src/components/entities';
 
 import Row from './components/row';
 
 const List = () => {
-  const { t } = useTranslation('pages.users');
+  const { t } = useTranslation('users');
   const columns = [
-    { text: t('table.header.name'), width: '14%' },
-    { text: t('table.header.token'), width: '18%' },
-    { text: t('table.header.status'), width: '12%' },
-    { text: t('table.header.email'), width: '20%' },
-    { text: t('table.header.ssn'), width: '12%' },
-    { text: t('table.header.phone-number'), width: '15%' },
-    { text: t('table.header.start'), width: '15%' },
+    { text: t('table.header.id'), width: '25%' },
+    { text: t('table.header.status'), width: '20%' },
+    { text: t('table.header.other'), width: '42.5%' },
+    { text: t('table.header.created'), width: '15%' },
   ];
 
   return (

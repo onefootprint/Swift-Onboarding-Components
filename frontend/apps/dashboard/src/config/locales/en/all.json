@@ -715,8 +715,8 @@
             "none": "None"
           }
         },
-        "date-range": {
-          "label": "Date range"
+        "created": {
+          "label": "Created"
         },
         "on-watchlist": {
           "label": "On a watchlist",
@@ -1312,31 +1312,6 @@
         }
       },
       "error": "Please <refresh>refresh</refresh> this page."
-    },
-    "users": {
-      "page-title": "Footprint | Users",
-      "header": {
-        "title": "Users"
-      },
-      "table": {
-        "aria-label": "Users table",
-        "search-placeholder": "Search by name, email or phone number...",
-        "empty-state": "No users found",
-        "header": {
-          "name": "Name",
-          "token": "Footprint Token",
-          "status": "KYC status",
-          "email": "Email",
-          "ssn": "SSN",
-          "phone-number": "Phone number",
-          "start": "Date"
-        },
-        "row": {
-          "status": {
-            "on-watchlist": "This user is on a watchlist"
-          }
-        }
-      }
     },
     "user": {
       "page-title": "Footprint | User",

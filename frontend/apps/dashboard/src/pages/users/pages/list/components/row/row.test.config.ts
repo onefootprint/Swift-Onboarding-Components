@@ -6,7 +6,7 @@ import {
   WatchlistCheckStatus,
 } from '@onefootprint/types';
 
-export const entityPassed: Entity = {
+export const entityPassedFixture: Entity = {
   id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
   isPortable: true,
   kind: EntityKind.person,
@@ -34,25 +34,35 @@ export const entityPassed: Entity = {
   watchlistCheck: null,
 };
 
-export const entityFailed: Entity = {
-  ...entityPassed,
+export const entityFailedFixture: Entity = {
+  ...entityPassedFixture,
   status: EntityStatus.failed,
 };
-export const entityIncomplete: Entity = {
-  ...entityPassed,
+export const entityIncompleteFixture: Entity = {
+  ...entityPassedFixture,
   status: EntityStatus.incomplete,
 };
 
-export const entityVaultOnly: Entity = {
-  ...entityPassed,
+export const entityInProgressFixture: Entity = {
+  ...entityPassedFixture,
+  status: EntityStatus.inProgress,
+};
+
+export const entityVaultOnlyFixture: Entity = {
+  ...entityPassedFixture,
   status: EntityStatus.none,
 };
 
-export const entityOnWatchlist: Entity = {
-  ...entityPassed,
+export const entityOnWatchlistFixture: Entity = {
+  ...entityPassedFixture,
   watchlistCheck: {
     id: 'id',
     status: WatchlistCheckStatus.fail,
     reasonCodes: [WatchlistCheckReasonCode.watchlistHitOfac],
   },
+};
+
+export const entityManualReviewFixture: Entity = {
+  ...entityPassedFixture,
+  requiresManualReview: true,
 };

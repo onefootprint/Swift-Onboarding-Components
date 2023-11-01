@@ -48,7 +48,7 @@ const Filters = () => {
         },
         {
           query: 'date_range',
-          label: t('date-range.label'),
+          label: t('created.label'),
           kind: 'date',
           selectedOptions: filters.values.dateRange,
         },

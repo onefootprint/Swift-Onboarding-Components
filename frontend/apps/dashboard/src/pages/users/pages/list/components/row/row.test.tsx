@@ -4,11 +4,13 @@ import React from 'react';
 
 import Row from './row';
 import {
-  entityFailed,
-  entityIncomplete,
-  entityOnWatchlist,
-  entityPassed,
-  entityVaultOnly,
+  entityFailedFixture,
+  entityIncompleteFixture,
+  entityInProgressFixture,
+  entityManualReviewFixture,
+  entityOnWatchlistFixture,
+  entityPassedFixture,
+  entityVaultOnlyFixture,
 } from './row.test.config';
 
 describe('User table row <Row />', () => {
@@ -23,36 +25,59 @@ describe('User table row <Row />', () => {
       </table>,
     );
 
-  it('should show FP token', () => {
-    renderRow(entityPassed);
+  it('should show the FP token', () => {
+    renderRow(entityPassedFixture);
     expect(
       screen.getByText('fp_bid_VXND11zUVRYQKKUxbUN3KD'),
     ).toBeInTheDocument();
   });
 
-  it('should show Verified when the user is verified', () => {
-    renderRow(entityPassed);
-    expect(screen.getByText('Verified')).toBeInTheDocument();
+  describe('when the user is verified', () => {
+    it('should show as "Verified"', () => {
+      renderRow(entityPassedFixture);
+      expect(screen.getByText('Verified')).toBeInTheDocument();
+    });
   });
 
-  it('should show Failed when the user could not be verified', () => {
-    renderRow(entityFailed);
-    expect(screen.getByText('Failed')).toBeInTheDocument();
+  describe('when the user could not be verified', () => {
+    it('should show "Failed"', () => {
+      renderRow(entityFailedFixture);
+      expect(screen.getByText('Failed')).toBeInTheDocument();
+    });
   });
 
-  it('should show None when the user has no KYC status', () => {
-    renderRow(entityVaultOnly);
-    expect(screen.getByText('None')).toBeInTheDocument();
+  describe('when the user has no KYC status', () => {
+    it('should show "None"', () => {
+      renderRow(entityVaultOnlyFixture);
+      expect(screen.getByText('None')).toBeInTheDocument();
+    });
   });
 
-  it('should show Incomplete when the user status is incomplete', () => {
-    renderRow(entityIncomplete);
-    expect(screen.getByText('Incomplete')).toBeInTheDocument();
+  describe('when the user status is incomplete', () => {
+    it('should show "Incomplete"', () => {
+      renderRow(entityIncompleteFixture);
+      expect(screen.getByText('Incomplete')).toBeInTheDocument();
+    });
   });
 
-  it('should show watchlist fail icon if the user is in watchlist', () => {
-    renderRow(entityOnWatchlist);
-    const watchlistFailIcon = screen.getByTestId('watchlistFailIcon');
-    expect(watchlistFailIcon).toBeInTheDocument();
+  describe('when the user status is in progress', () => {
+    it('should show "In progress"', () => {
+      renderRow(entityInProgressFixture);
+      expect(screen.getByText('In progress')).toBeInTheDocument();
+    });
+  });
+
+  describe('when the user is on watchlist', () => {
+    it('should show "Watchlist"', () => {
+      renderRow(entityOnWatchlistFixture);
+      expect(screen.getByText('Watchlist')).toBeInTheDocument();
+    });
+  });
+
+  describe('when the user is on manual review', () => {
+    it('should show "Manual review"', () => {
+      renderRow(entityManualReviewFixture);
+      expect(screen.getByText('Manual review')).toBeInTheDocument();
+    });
   });
 });

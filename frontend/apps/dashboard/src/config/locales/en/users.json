@@ -1,0 +1,23 @@
+{
+  "page-title": "Footprint | Users",
+  "header": {
+    "title": "Users"
+  },
+  "table": {
+    "aria-label": "Users table",
+    "search-placeholder": "Search by name, email or phone number...",
+    "empty-state": "No users found",
+    "header": {
+      "id": "Id",
+      "status": "Onboarding Status",
+      "other": "Other detail",
+      "created": "Created"
+    },
+    "row": {
+      "status": {
+        "on-watchlist": "Watchlist",
+        "on-review": "Manual review"
+      }
+    }
+  }
+}
