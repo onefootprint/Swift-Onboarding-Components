@@ -57,7 +57,6 @@ const Main = styled.main`
     overflow: auto;
     padding: ${theme.spacing[8]};
     max-width: 1600px;
-    margin: auto;
   `}
 `;
 
