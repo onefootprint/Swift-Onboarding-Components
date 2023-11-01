@@ -8,9 +8,9 @@ import type {
 import { getAppearanceForVanilla } from './utils/appearance-utils';
 import getUniqueId from './utils/get-unique-id';
 import {
-  checkIsKindValid,
-  checkIsVariantValid,
   getDefaultVariantForKind,
+  validateComponentKind,
+  validateComponentVariant,
 } from './utils/prop-utils';
 
 const defer = (callback: () => void) => {
@@ -45,12 +45,12 @@ const vanillaIntegration = (footprint: Footprint) => {
 
   const renderComponent = (container: HTMLElement) => {
     const kind = container.getAttribute('data-kind') as ComponentKind;
-    checkIsKindValid(kind);
+    validateComponentKind(kind);
 
     const variant =
       (container.getAttribute('data-variant') as Variant) ??
       getDefaultVariantForKind(kind);
-    checkIsVariantValid(kind, variant);
+    validateComponentVariant(kind, variant);
 
     const appearance = getAppearanceForVanilla();
     const callbacks = getCallbacks(kind);

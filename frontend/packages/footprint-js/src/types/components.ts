@@ -6,32 +6,37 @@ export type Footprint = {
 };
 
 export type Component = {
-  render: () => Promise<void>;
   destroy: () => void;
+  render: () => Promise<void>;
 };
 
 export type SupportedLocale = 'en-US' | 'es-MX';
 export type L10n = { locale?: SupportedLocale };
-export type Props = FormProps | VerifyProps | VerifyButtonProps | RenderProps;
+export type Variant = 'modal' | 'drawer' | 'inline';
+export type Props =
+  | AuthProps
+  | FormProps
+  | RenderProps
+  | VerifyButtonProps
+  | VerifyProps;
 
 export enum ComponentKind {
-  Verify = 'verify',
+  Auth = 'auth',
   Form = 'form',
   Render = 'render',
+  Verify = 'verify',
   VerifyButton = 'verify-button',
 }
 
-export type Variant = 'modal' | 'drawer' | 'inline';
-
 export type PropsBase = {
-  kind: ComponentKind;
   appearance?: Appearance;
-  variant?: Variant;
   containerId?: string;
+  kind: ComponentKind;
   l10n?: L10n;
+  variant?: Variant;
 };
 
-export type VerifyOptions = {
+export type Options = {
   showCompletionPage?: boolean;
   showLogo?: boolean;
 };
@@ -47,11 +52,12 @@ export type VerifyPublicKey = {
 };
 
 export type VerifySharedProps = (VerifyAuthToken | VerifyPublicKey) & {
-  userData?: UserData;
-  options?: VerifyOptions;
-  onComplete?: (validationToken: string) => void;
   onCancel?: () => void;
   onClose?: () => void;
+  onComplete?: (validationToken: string) => void;
+  options?: Options;
+  publicKey: string;
+  userData?: UserData;
 };
 
 export type VerifyProps = PropsBase &
@@ -62,29 +68,29 @@ export type VerifyProps = PropsBase &
 
 export type VerifyButtonProps = PropsBase &
   Partial<VerifySharedProps> & {
-    kind: ComponentKind.VerifyButton;
-    variant: 'inline';
     containerId: string;
     dialogVariant?: 'modal' | 'drawer';
-    onClick?: () => void;
+    kind: ComponentKind.VerifyButton;
     label?: string;
+    onClick?: () => void;
+    variant: 'inline';
   };
 
 export type RenderProps = PropsBase & {
-  kind: ComponentKind.Render;
   authToken: string;
-  id: string; // a valid data identifier
-  label?: string; // defaults to a nice string chosen for that data identifier
   canCopy?: boolean;
-  showHiddenToggle?: boolean;
-  defaultHidden?: boolean;
-  variant: 'inline';
   containerId: string;
+  defaultHidden?: boolean;
+  id: string; // a valid data identifier
+  kind: ComponentKind.Render;
+  label?: string; // defaults to a nice string chosen for that data identifier
+  showHiddenToggle?: boolean;
+  variant: 'inline';
 };
 
 export type FormOptions = {
-  hideFootprintLogo?: boolean;
   hideButtons?: boolean;
+  hideFootprintLogo?: boolean;
 };
 
 export type FormRef = {
@@ -92,14 +98,25 @@ export type FormRef = {
 };
 
 export type FormProps = PropsBase & {
-  kind: ComponentKind.Form;
   authToken: string;
-  title?: string;
   containerId?: string; // required for inline variant
-  variant?: Variant; // supports all variants, falls back to modal, so optional
-  options?: FormOptions;
   getRef?: (ref: FormRef) => void; // returns a ref on mount that the tenants can trigger form actions from
-  onComplete?: () => void;
+  kind: ComponentKind.Form;
   onCancel?: () => void;
   onClose?: () => void;
+  onComplete?: () => void;
+  options?: FormOptions;
+  title?: string;
+  variant?: Variant; // supports all variants, falls back to modal, so optional
+};
+
+export type AuthProps = PropsBase & {
+  kind: ComponentKind.Auth;
+  onCancel?: () => void;
+  onClose?: () => void;
+  onComplete?: (validationToken: string) => void;
+  options?: Options;
+  publicKey: string;
+  userData?: Pick<UserData, 'id.email' | 'id.phone_number'>;
+  variant?: 'modal' | 'drawer';
 };

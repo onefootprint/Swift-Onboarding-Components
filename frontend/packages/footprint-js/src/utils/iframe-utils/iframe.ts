@@ -14,117 +14,140 @@ import {
 import getUniqueId from '../get-unique-id';
 import {
   getCallbackProps,
-  getDataProps,
-  getSanitizedProps,
+  omitCallbacksAndRefs,
+  sanitizeAndValidateProps,
 } from '../prop-utils';
 import getURL from '../url-utils';
 import type { Iframe } from './types';
 
-const initIframe = (rawProps: Props): Iframe => {
-  let child: Postmate.ParentAPI | null = null;
-  let isRendered = false;
-  const props = getSanitizedProps(rawProps);
-  const { variant, containerId } = props;
-  const hasOverlay = variant === 'modal' || variant === 'drawer';
-  let onDestroy: (() => void) | undefined;
-  let onRenderSecondary: ((secondaryProps: Props) => void) | undefined;
-  const id = getUniqueId();
+type Child = Postmate.ParentAPI;
+type OnDestroy = (() => void) | undefined;
+type OnRenderSecondary = ((secondaryProps: Props) => void) | undefined;
+type InnerEvents = 'renderSecondary' | 'destroy';
 
-  const registerCallbackProps = () => {
-    if (!child) {
-      throw new Error(
-        'Footprint should be initialized in order to listen events',
-      );
-    }
+export const registerCallbackProps = (
+  child: Child | null,
+  props: Props,
+  onDestroy: OnDestroy,
+  onRenderSecondary: OnRenderSecondary,
+): Child | never => {
+  if (!child) {
+    throw new Error(
+      'Footprint should be initialized in order to listen events',
+    );
+  }
 
-    const callbackProps = getCallbackProps(props, onDestroy, onRenderSecondary);
-    Object.entries(callbackProps).forEach(([event, callback]) => {
-      child?.on(event, callback);
-    });
-  };
+  const callbackProps = getCallbackProps(props, onDestroy, onRenderSecondary);
+  Object.entries(callbackProps).forEach(([event, callback]) => {
+    child?.on(event, callback);
+  });
 
-  const setUpRefs = () => {
-    if (!child) {
-      throw new Error(
-        'Footprint should be initialized in order to set up refs',
-      );
-    }
-    // For now we only support refs on the form component
-    const { kind } = props;
-    if (kind !== ComponentKind.Form) {
-      return;
-    }
-    const { getRef } = props;
-    if (!getRef) {
-      return;
-    }
-    const formRef: FormRef = {
-      save: () => {
-        if (!child) {
-          throw new Error(
-            'Footprint should be initialized to call ref methods',
-          );
-        }
-        return new Promise(resolve => {
-          child?.call(PrivateEvent.formSaved);
-          child?.on(PrivateEvent.formSaveComplete, () => {
-            resolve();
-          });
+  return child;
+};
+
+export const setUpFormRefs = (
+  child: Child | null,
+  props: Props,
+): never | void => {
+  if (!child) {
+    throw new Error('Footprint should be initialized in order to set up refs');
+  }
+  // For now we only support refs on the form component
+  const { kind } = props;
+  if (kind !== ComponentKind.Form) {
+    return;
+  }
+
+  const { getRef } = props;
+  if (!getRef) {
+    return;
+  }
+
+  const formRef: FormRef = {
+    save: () => {
+      if (!child) {
+        throw new Error('Footprint should be initialized to call ref methods');
+      }
+      return new Promise(resolve => {
+        child?.call(PrivateEvent.formSaved);
+        child?.on(PrivateEvent.formSaveComplete, () => {
+          resolve();
         });
-      },
-    };
-    getRef(formRef);
+      });
+    },
   };
+  getRef(formRef);
+};
 
-  const sendDataProps = () => {
-    if (!child) {
-      throw new Error(
-        'Footprint should be initialized in order to receive props',
-      );
-    }
-    const dataProps = getDataProps(props);
-    child.call(PrivateEvent.propsReceived, dataProps);
-  };
+export const sendDataProps = (child: Child | null, props: Props): void => {
+  if (!child) {
+    throw new Error(
+      'Footprint should be initialized in order to receive props',
+    );
+  }
+  const dataProps = omitCallbacksAndRefs(props);
+  child.call(PrivateEvent.propsReceived, dataProps);
+};
 
-  const getOrCreateContainer = (): HTMLElement | null => {
-    if (hasOverlay) {
-      return createOverlayContainer(id);
-    }
-    if (!containerId) {
-      throw new Error('containerId is required when rendering inline');
-    }
+const getOrCreateContainer = (
+  { variant, containerId }: Props,
+  id: string,
+): HTMLElement | null => {
+  const hasOverlay = variant === 'modal' || variant === 'drawer';
+  if (hasOverlay) {
+    return createOverlayContainer(id);
+  }
+  if (!containerId) {
+    throw new Error('containerId is required when rendering inline');
+  }
 
-    // If rendering inline, find the client parent div
-    const clientParent = document.getElementById(containerId);
-    if (!clientParent) {
-      throw new Error(
-        `Could not find container with id ${containerId} while rendering footprint`,
-      );
-    }
-    return createInlineContainer(id, clientParent);
-  };
+  // If rendering inline, find the client parent div
+  const clientParent = document.getElementById(containerId);
+  if (!clientParent) {
+    throw new Error(
+      `Could not find container with id ${containerId} while rendering footprint`,
+    );
+  }
+  return createInlineContainer(id, clientParent);
+};
 
-  const setLoading = (container: HTMLElement, isLoading?: boolean) => {
-    if (!isLoading) {
-      removeLoader(id);
-      child?.frame.classList.remove(`footprint-${variant}-loading`);
-      child?.frame.classList.add(`footprint-${variant}-loaded`);
-      return;
-    }
+const setLoading = (
+  child: Child | null,
+  { variant }: Props,
+  id: string,
+  container: HTMLElement,
+  isLoading?: boolean,
+) => {
+  const hasOverlay = variant === 'modal' || variant === 'drawer';
+  if (!isLoading) {
+    removeLoader(id);
+    child?.frame.classList.remove(`footprint-${variant}-loading`);
+    child?.frame.classList.add(`footprint-${variant}-loaded`);
+    return;
+  }
 
-    if (hasOverlay) {
-      const overlay = createOverlay(container, id);
-      createLoader(overlay, id);
-    } else {
-      createLoader(container, id);
-    }
-  };
+  if (hasOverlay) {
+    const overlay = createOverlay(container, id);
+    createLoader(overlay, id);
+  } else {
+    createLoader(container, id);
+  }
+};
+
+const initIframe = (rawProps: Props): Iframe => {
+  let child: Child | null = null;
+  let isRendered = false;
+  let onDestroy: OnDestroy;
+  let onRenderSecondary: OnRenderSecondary;
+  const props = sanitizeAndValidateProps(rawProps);
+  const { variant } = props;
+  const id = getUniqueId();
 
   const render = async () => {
     if (isRendered) {
       return;
     }
-    const container = getOrCreateContainer();
+    const container = getOrCreateContainer(props, id);
     if (!container) {
       return;
     }
@@ -135,7 +158,7 @@ const initIframe = (rawProps: Props): Iframe => {
     const url = getURL(props);
     isRendered = true;
 
-    setLoading(container, true);
+    setLoading(child, props, id, container, true);
     child = await new Postmate({
       classListArray: [`footprint-${variant}`, `footprint-${variant}-loading`],
       container,
@@ -144,12 +167,12 @@ const initIframe = (rawProps: Props): Iframe => {
       allow:
         'otp-credentials; publickey-credentials-get *; camera *; clipboard-write;',
     });
-    setLoading(container, false);
+    setLoading(child, props, id, container, false);
 
-    registerCallbackProps();
+    child = registerCallbackProps(child, props, onDestroy, onRenderSecondary);
     child.on(PrivateEvent.started, () => {
-      sendDataProps();
-      setUpRefs();
+      sendDataProps(child, props);
+      setUpFormRefs(child, props);
     });
   };
 
@@ -166,9 +189,11 @@ const initIframe = (rawProps: Props): Iframe => {
   };
 
   const registerEvent = (
-    event: 'renderSecondary' | 'destroy',
+    event: InnerEvents,
     callback: (args?: any) => void,
   ) => {
+    if (!callback || typeof callback !== 'function') return;
+
     if (event === 'renderSecondary') {
       onRenderSecondary = callback;
     } else if (event === 'destroy') {

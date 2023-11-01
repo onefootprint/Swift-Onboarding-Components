@@ -3,30 +3,38 @@ import { PublicEvent } from '../types/events';
 
 export const ComponentCallbacksByEvent: Record<
   ComponentKind,
-  Partial<Record<PublicEvent, string>>
+  Partial<
+    Record<PublicEvent, 'onCancel' | 'onClick' | 'onClose' | 'onComplete'>
+  >
 > = {
-  [ComponentKind.Form]: {
-    [PublicEvent.closed]: 'onClose',
+  [ComponentKind.Auth]: {
     [PublicEvent.canceled]: 'onCancel',
+    [PublicEvent.closed]: 'onClose',
+    [PublicEvent.completed]: 'onComplete',
+  },
+  [ComponentKind.Form]: {
+    [PublicEvent.canceled]: 'onCancel',
+    [PublicEvent.closed]: 'onClose',
     [PublicEvent.completed]: 'onComplete',
   },
   [ComponentKind.Verify]: {
-    [PublicEvent.closed]: 'onClose',
     [PublicEvent.canceled]: 'onCancel',
+    [PublicEvent.closed]: 'onClose',
     [PublicEvent.completed]: 'onComplete',
   },
   [ComponentKind.VerifyButton]: {
+    [PublicEvent.canceled]: 'onCancel',
     [PublicEvent.clicked]: 'onClick',
     [PublicEvent.closed]: 'onClose',
-    [PublicEvent.canceled]: 'onCancel',
     [PublicEvent.completed]: 'onComplete',
   },
   [ComponentKind.Render]: {},
 };
 
 export const RequiredCallbacksByComponent: Record<ComponentKind, string[]> = {
+  [ComponentKind.Auth]: [],
   [ComponentKind.Form]: [],
-  [ComponentKind.Verify]: [],
   [ComponentKind.Render]: [],
+  [ComponentKind.Verify]: [],
   [ComponentKind.VerifyButton]: [],
 };

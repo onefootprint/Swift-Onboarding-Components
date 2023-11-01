@@ -12,7 +12,7 @@ const getURL = (props: Props) => {
   return getComponentsURL(props);
 };
 
-const getBifrostURL = (props: VerifyProps) => {
+const getBifrostURL = (props: VerifyProps): string => {
   const { appearance, variant, kind } = props;
   const { fontSrc, rules, variables } = getEncodedAppearance(appearance);
   const url = process.env.BIFROST_URL;
@@ -36,7 +36,7 @@ const getBifrostURL = (props: VerifyProps) => {
   return `${url}?${searchParamsStr}`;
 };
 
-const getComponentsURL = (props: Props) => {
+const getComponentsURL = (props: Props): string => {
   const { appearance, kind, variant } = props;
   const { fontSrc, rules, variables } = getEncodedAppearance(appearance);
   const url = process.env.COMPONENTS_URL;

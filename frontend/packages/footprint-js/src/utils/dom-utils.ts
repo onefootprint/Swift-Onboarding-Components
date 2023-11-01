@@ -16,7 +16,7 @@ export const removeDOMElements = async (uniqueId: string) => {
   await removeOverlayContainer(uniqueId);
 };
 
-export const createOverlayContainer = (uniqueId: string) => {
+export const createOverlayContainer = (uniqueId: string): HTMLElement => {
   const id = getDomElementId(OVERLAY_CONTAINER_ID_PREFIX, uniqueId);
   const possibleContainer = document.getElementById(id);
   if (possibleContainer) {

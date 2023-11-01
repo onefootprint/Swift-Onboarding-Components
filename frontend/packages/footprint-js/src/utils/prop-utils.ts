@@ -1,17 +1,54 @@
 import { ComponentCallbacksByEvent } from '../constants/callbacks';
 import RefsByComponent from '../constants/refs';
-import type { Props, Variant, VerifyProps } from '../types/components';
+import type {
+  AuthProps,
+  FormProps,
+  Props,
+  RenderProps,
+  Variant,
+  VerifyButtonProps,
+  VerifyProps,
+} from '../types/components';
 import { ComponentKind } from '../types/components';
 import { PublicEvent } from '../types/events';
 
-const VariantsByKind: Record<ComponentKind, Variant[]> = {
-  [ComponentKind.Verify]: ['modal', 'drawer'],
-  [ComponentKind.VerifyButton]: ['inline'],
-  [ComponentKind.Form]: ['inline', 'modal', 'drawer'],
-  [ComponentKind.Render]: ['inline'],
+type CallbackKeys = 'onCancel' | 'onClick' | 'onClose' | 'onComplete';
+type ExtractOnProps<T> = {
+  [K in keyof T as K extends `on${string}` ? K : never]: Function;
 };
 
-export const checkIsVariantValid = (kind: ComponentKind, variant?: any) => {
+type PossibleCallbacks = ExtractOnProps<AuthProps> &
+  ExtractOnProps<FormProps> &
+  ExtractOnProps<RenderProps> &
+  ExtractOnProps<VerifyButtonProps> &
+  ExtractOnProps<VerifyProps>;
+
+const VariantsByKind: Record<ComponentKind, Variant[]> = {
+  [ComponentKind.Auth]: ['inline', 'modal', 'drawer'],
+  [ComponentKind.Form]: ['inline', 'modal', 'drawer'],
+  [ComponentKind.Render]: ['inline'],
+  [ComponentKind.Verify]: ['modal', 'drawer'],
+  [ComponentKind.VerifyButton]: ['inline'],
+};
+
+const publicEventList: PublicEvent[] = Object.values(PublicEvent);
+const noop = (...args: unknown[]) => undefined; // eslint-disable-line @typescript-eslint/no-unused-vars
+
+const validateContainerIdForVariant = (
+  variant: Variant,
+  containerId?: string,
+): void | never => {
+  if (variant === 'inline' && !containerId) {
+    throw new Error(
+      `Inline component requires a containerId. Received ${containerId}`,
+    );
+  }
+};
+
+export const validateComponentVariant = (
+  kind: ComponentKind,
+  variant?: Variant,
+): void | never => {
   if (!variant) {
     return;
   }
@@ -27,7 +64,9 @@ export const checkIsVariantValid = (kind: ComponentKind, variant?: any) => {
   }
 };
 
-export const getDefaultVariantForKind = (kind: ComponentKind): Variant => {
+export const getDefaultVariantForKind = (
+  kind: ComponentKind,
+): Variant | never => {
   const supportedVariants = VariantsByKind[kind] ?? [];
   if (!supportedVariants.length) {
     throw new Error(`Invalid kind: ${kind}`);
@@ -35,36 +74,23 @@ export const getDefaultVariantForKind = (kind: ComponentKind): Variant => {
   return supportedVariants[0];
 };
 
-export const checkIsKindValid = (kind: ComponentKind) => {
+export const validateComponentKind = (kind: ComponentKind): void | never => {
   if (!kind) {
     throw new Error('Kind is required');
   }
-  const isValid = Object.values(ComponentKind).includes(kind);
+  const validKinds = Object.values(ComponentKind);
+  const isValid = validKinds.includes(kind);
   if (!isValid) {
     throw new Error(
-      `Invalid kind: ${kind}. Valid kinds are: ${Object.values(
-        ComponentKind,
-      ).join(', ')}}`,
+      `Invalid kind: ${kind}. Valid kinds are: ${validKinds.join(', ')}`,
     );
   }
 };
 
-export const checkIsContainerIdValid = (
-  variant: Variant,
-  containerId?: string,
-) => {
-  if (variant === 'inline' && !containerId) {
-    throw new Error(
-      `Inline component requires a containerId. Received ${containerId}`,
-    );
-  }
-};
-
-const getSecondaryProps = (props: Props): Props | undefined => {
-  const { kind } = props;
-  if (kind === ComponentKind.VerifyButton) {
+export const transformVerifyButtonProps = (props: Props): Props | undefined => {
+  if (props.kind === ComponentKind.VerifyButton) {
     const {
-      kind: buttonKind,
+      kind,
       appearance,
       variant,
       dialogVariant,
@@ -83,14 +109,25 @@ const getSecondaryProps = (props: Props): Props | undefined => {
   return undefined;
 };
 
-export const getRefProps = (props: Props) => {
-  const { kind } = props;
-  const refs = RefsByComponent[kind] ?? [];
-  return refs;
+export const getRefProps = ({ kind }: Props) => RefsByComponent[kind] ?? [];
+
+export const getCallbackFunction = (
+  obj: PossibleCallbacks,
+  key: CallbackKeys,
+) => {
+  const callbackFunction =
+    Object.prototype.hasOwnProperty.call(obj, key) &&
+    typeof obj[key] === 'function'
+      ? obj[key]
+      : undefined;
+
+  return callbackFunction || noop;
 };
 
-// Certain callbacks need to destroy the iframe, and others might trigger a
-// secondary iframe to launch, like a new modal when a button is clicked
+/**
+ * Certain callbacks need to destroy the iframe, and others might trigger
+ * a secondary iframe to launch, like a new modal when a button is clicked
+ */
 export const getCallbackProps = (
   props: Props,
   onDestroy?: () => void,
@@ -99,20 +136,17 @@ export const getCallbackProps = (
   const { kind } = props;
   const callbacks = ComponentCallbacksByEvent[kind] ?? {};
   const modifiedCallbacks: Partial<Record<PublicEvent, () => void>> = {};
+  const secondaryProps = transformVerifyButtonProps(props);
 
   Object.entries(callbacks).forEach(([event, callbackPropName]) => {
     const publicEvent = event as PublicEvent;
-    if (!Object.values(PublicEvent).includes(publicEvent)) {
+    if (!publicEventList.includes(publicEvent)) {
       return;
     }
 
     // Even if the user didn't specify a callback, we might still
     // need to listen for events that should trigger other things
-    let callback = (props as any)[callbackPropName];
-    if (!callback || typeof callback !== 'function') {
-      callback = () => {};
-    }
-
+    const callback = getCallbackFunction(props, callbackPropName);
     const shouldDestroy =
       publicEvent === PublicEvent.closed ||
       publicEvent === PublicEvent.canceled;
@@ -122,12 +156,11 @@ export const getCallbackProps = (
       publicEvent === PublicEvent.clicked;
 
     // Make sure to pass any callback arguments through
-    modifiedCallbacks[publicEvent] = (args?: any) => {
-      callback(args);
+    modifiedCallbacks[publicEvent] = (callbackArgs?: any) => {
+      callback(callbackArgs);
       if (shouldDestroy) {
         onDestroy?.();
       }
-      const secondaryProps = getSecondaryProps(props);
       if (shouldLaunchChild && secondaryProps) {
         onLaunchChild?.(secondaryProps);
       }
@@ -137,33 +170,34 @@ export const getCallbackProps = (
   return modifiedCallbacks;
 };
 
-// Get the data props that will be sent over via post messages to the child iframe
-// We need to omit kind, appearance, ref and callback props from the props sent to the iframe
-// Functions cannot be sent via post message and appearance is already sent via URL
-export const getDataProps = (props: Props): Partial<Props> => {
-  const { kind, appearance, containerId, ...customProps } = props;
+/**
+ * Get the data props that will be sent over via post messages to the child iframe
+ * We need to omit kind, appearance, ref and callback props from the props sent to the iframe
+ * Functions cannot be sent via post message and appearance is already sent via URL
+ */
+export const omitCallbacksAndRefs = (props: Props): Partial<Props> => {
+  const { kind, appearance, containerId, ...rest } = props;
   const callbacks = ComponentCallbacksByEvent[kind] ?? {};
   const callbackPropNames = Object.values(callbacks);
 
   const refs = getRefProps(props);
   const refPropNames = Object.values(refs);
 
-  const dataProps = Object.fromEntries(
-    Object.entries(customProps).filter(
+  return Object.fromEntries(
+    Object.entries(rest).filter(
       ([key]) =>
-        !callbackPropNames.includes(key) && !refPropNames.includes(key),
+        !callbackPropNames.includes(key as CallbackKeys) &&
+        !refPropNames.includes(key),
     ),
   );
-
-  return dataProps;
 };
 
-export const getSanitizedProps = (props: Props): Props => {
+export const sanitizeAndValidateProps = (props: Props): Props => {
   const { kind, variant: rawVariant, containerId } = props;
-  checkIsKindValid(kind);
-  checkIsVariantValid(kind, rawVariant);
   const variant = rawVariant || getDefaultVariantForKind(kind);
-  checkIsContainerIdValid(variant, containerId);
+  validateComponentKind(kind);
+  validateComponentVariant(kind, rawVariant);
+  validateContainerIdForVariant(variant, containerId);
 
   return {
     ...props,

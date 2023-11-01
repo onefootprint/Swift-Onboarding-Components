@@ -1,5 +1,5 @@
 import type { Props } from '../../types/components';
-import { getSanitizedProps } from '../prop-utils';
+import { sanitizeAndValidateProps } from '../prop-utils';
 import type { Iframe } from './types';
 
 type Iframes = Record<string, IframeEntry>;
@@ -10,21 +10,23 @@ type IframeEntry = {
 
 type IframeManager = {
   getOrCreate: (iframe: Iframe) => Iframe;
-  remove: (iframe: Iframe) => void;
   getOrCreateSecondary: (primary: Iframe, secondary: Iframe) => Iframe;
+  remove: (iframe: Iframe) => void;
   removeSecondary: (primary: Iframe, secondary: Iframe) => void;
 };
 
-const getIframeKey = (props: Props) => {
-  const sanitizedProps = getSanitizedProps(props);
+export const getIframeKey = (props: Props): string => {
+  const sanitizedProps = sanitizeAndValidateProps(props);
   return JSON.stringify(sanitizedProps);
 };
 
-// Needed to support iframes launching other iframes (e.g. clicking a
-// notification banner launches a modal). Keeps track of primary and
-// secondaryIframes iframes to destroy all secondaryIframes when the primary is destroyed
+/**
+ * Needed to support iframes launching other iframes (e.g. clicking a
+ * notification banner launches a modal). Keeps track of primary and
+ * secondaryIframes iframes to destroy all secondaryIframes when the primary is destroyed
+ */
 const initIframeManager = (): IframeManager => {
-  const iframes: Iframes = {};
+  const iframes: Iframes = Object.create(null);
 
   const getOrCreate = (iframe: Iframe): Iframe => {
     const key = getIframeKey(iframe.props);
@@ -39,6 +41,7 @@ const initIframeManager = (): IframeManager => {
       iframe,
       secondaryIframes: {},
     };
+
     return iframe;
   };
 
@@ -97,8 +100,8 @@ const initIframeManager = (): IframeManager => {
 
   return {
     getOrCreate,
-    remove,
     getOrCreateSecondary,
+    remove,
     removeSecondary,
   };
 };
