@@ -1,7 +1,8 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, IncodeStateTransition, SaveVerificationResultArgs,
-    VerificationSession,
+    map_to_api_err, save_incode_verification_result, GetOnboardingStatus, IncodeStateTransition,
+    SaveVerificationResultArgs, VerificationSession,
 };
+use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::{state::TransitionResult, IncodeContext};
 use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
@@ -29,9 +30,13 @@ impl IncodeStateTransition for ProcessFace {
         self,
         _: &mut TxnPgConn,
         _: &IncodeContext,
-        _: &VerificationSession,
+        session: &VerificationSession,
     ) -> ApiResult<TransitionResult> {
-        Ok(TransitionResult::default())
+        Ok(Self::next_state(session).into())
+    }
+
+    fn next_state(_: &VerificationSession) -> IncodeState {
+        GetOnboardingStatus::new()
     }
 }
 

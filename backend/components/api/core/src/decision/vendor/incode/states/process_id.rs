@@ -1,7 +1,8 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, IncodeStateTransition, SaveVerificationResultArgs,
-    VerificationSession,
+    map_to_api_err, save_incode_verification_result, GetOnboardingStatus, IncodeStateTransition, ProcessFace,
+    SaveVerificationResultArgs, VerificationSession,
 };
+use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::{state::TransitionResult, IncodeContext};
 use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
@@ -29,9 +30,19 @@ impl IncodeStateTransition for ProcessId {
         self,
         _: &mut TxnPgConn,
         _: &IncodeContext,
-        _: &VerificationSession,
+        session: &VerificationSession,
     ) -> ApiResult<TransitionResult> {
-        Ok(TransitionResult::default())
+        let next = Self::next_state(session);
+        Ok(next.into())
+    }
+
+    // After processing the ID portion, we move on to selfie if applicable, or start polling for scores
+    fn next_state(session: &VerificationSession) -> IncodeState {
+        if session.kind.requires_selfie() {
+            ProcessFace::new()
+        } else {
+            GetOnboardingStatus::new()
+        }
     }
 }
 
