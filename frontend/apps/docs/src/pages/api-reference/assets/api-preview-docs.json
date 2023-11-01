@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "39e5ac914d46258abef291b14ea98724899ae5bc"
+        "version": "f8d178f696c804cf0489e7ebdc44c3f39e7cd97e"
     },
     "servers": [
         {
@@ -16,7 +16,7 @@
                     "Entities",
                     "Preview"
                 ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nTrigger KYB on the provided business.",
+                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nTriggers KYB on the provided business. KYB can only be run once per Business vault.",
                 "parameters": [
                     {
                         "in": "path",
@@ -7313,9 +7313,7 @@
                         "enum": [
                             "fail",
                             "pass",
-                            "manual_review",
-                            "step_up",
-                            "document_decision"
+                            "manual_review"
                         ]
                     },
                     "onboarding_config_key": {

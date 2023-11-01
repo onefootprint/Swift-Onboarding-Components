@@ -25,10 +25,11 @@ use itertools::Itertools;
 use newtypes::FpId;
 use newtypes::OnboardingRequirement;
 use newtypes::VaultKind;
+use newtypes::WorkflowFixtureResult;
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
-    description = "Trigger KYB on the provided business.",
+    description = "Triggers KYB on the provided business. KYB can only be run once per Business vault.",
     tags(Entities, Preview)
 )]
 #[post("/businesses/{fp_id}/kyb")]
@@ -44,8 +45,9 @@ pub async fn post(
     let fp_id = fp_id.into_inner();
     let TriggerKybRequest {
         onboarding_config_key,
-        fixture_result, // TODO: could technically restrict this to not allow stepup?
+        fixture_result,
     } = request.into_inner();
+    let fixture_result = fixture_result.map(WorkflowFixtureResult::from);
 
     if fixture_result.is_some() && is_live {
         return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
