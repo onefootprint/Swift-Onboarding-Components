@@ -9,6 +9,10 @@ use crate::decision::state::MakeDecision;
 use crate::decision::state::MakeWatchlistCheckCall;
 use crate::decision::state::WorkflowActions;
 use crate::decision::state::WorkflowWrapper;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::tenant::Tenant;
+use db::models::tenant_user::TenantUser;
+use diesel::prelude::*;
 
 use crate::{decision::state::alpaca_kyc::*, State};
 use api_wire_types::{CreateAnnotationRequest, DecisionRequest, TerminalDecisionStatus};
@@ -20,6 +24,7 @@ use db::models::workflow::{NewWorkflowArgs, Workflow};
 use db::test_helpers::assert_have_same_elements;
 
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use db_schema::schema::workflow;
 use feature_flag::BoolFlag;
 
 use feature_flag::MockFeatureFlagClient;
@@ -27,7 +32,7 @@ use feature_flag::MockFeatureFlagClient;
 use itertools::Itertools;
 use macros::test_state_case;
 use newtypes::{
-    AlpacaKycConfig, AlpacaKycState, CipKind, DbActor, DecisionStatus, ObConfigurationKey, ReviewReason,
+    AlpacaKycConfig, AlpacaKycState, CipKind, DbActor, DecisionStatus, KycConfig, KycState, ReviewReason,
     VendorAPI,
 };
 use newtypes::{EnhancedAmlOption, OnboardingStatus};
@@ -37,22 +42,83 @@ use newtypes::WorkflowState;
 
 use std::sync::Arc;
 
-#[test_state_case(UserKind::Demo)]
-#[test_state_case(UserKind::Sandbox(WorkflowFixtureResult::Pass))]
-#[test_state_case(UserKind::Live)]
+#[derive(Clone, Copy)]
+enum WFKind {
+    Alpaca,
+    Kyc,
+}
+
+fn enhanced_aml_option_yes() -> EnhancedAmlOption {
+    EnhancedAmlOption::Yes {
+        ofac: true,
+        pep: true,
+        adverse_media: true,
+        continuous_monitoring: true,
+        adverse_media_lists: None,
+    }
+}
+
+// The current get_or_start_onboarding will create an AlpacaKyc WF if obc.cip_kind = alpaca. For now, we'll keep this code path in tact but do this hack here in the test
+// to manually set the Workflow to be a regular Kyc WF so we can test replicating AlpacaKyc functionality in the existing Kyc WF
+async fn set_workflow_to_kyc_kind(state: &State, wf: Workflow) -> Workflow {
+    let wf_id = wf.id.clone();
+    state
+        .db_pool
+        .db_query(move |conn| {
+            diesel::update(workflow::table)
+                .filter(workflow::id.eq(wf_id))
+                .set((
+                    workflow::kind.eq(newtypes::WorkflowKind::Kyc),
+                    workflow::state.eq(newtypes::WorkflowState::Kyc(newtypes::KycState::DataCollection)),
+                    workflow::config.eq(newtypes::WorkflowConfig::Kyc(newtypes::KycConfig {
+                        is_redo: false,
+                    })),
+                ))
+                .get_result(conn)
+                .unwrap()
+        })
+        .await
+        .unwrap()
+}
+
+async fn setup(
+    state: &State,
+    wf_kind: WFKind,
+    obc_opts: ObConfigurationOpts,
+    fixture_result: Option<WorkflowFixtureResult>,
+) -> (Workflow, Tenant, ObConfiguration, TenantUser) {
+    let (wf, tenant, obc, tu) = setup_data(state, obc_opts, fixture_result).await;
+
+    let wf = match wf_kind {
+        WFKind::Alpaca => wf,
+        WFKind::Kyc => set_workflow_to_kyc_kind(state, wf).await,
+    };
+    (wf, tenant, obc, tu)
+}
+
+#[test_state_case(WFKind::Alpaca, UserKind::Demo)]
+#[test_state_case(WFKind::Alpaca, UserKind::Sandbox(WorkflowFixtureResult::Pass))]
+#[test_state_case(WFKind::Alpaca, UserKind::Live)]
+// TODO: turn these on when Kyc workflow produces correct Alpaca sandbox risk signals (or we make both alpaca and non-alpaca cases produce the same set of all-matching risk signals)
+// #[test_state_case(WFKind::Kyc, UserKind::Demo)]
+// #[test_state_case(WFKind::Kyc, UserKind::Sandbox(WorkflowFixtureResult::Pass))]
+#[test_state_case(WFKind::Kyc, UserKind::Live)]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
-async fn pass(state: &mut State, user_kind: UserKind) {
+async fn pass(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
     // DATA SETUP
-    let (wf, tenant, obc, _tu) = setup_data(
+    let (wf, tenant, _obc, _tu) = setup(
         state,
+        wf_kind,
         ObConfigurationOpts {
             is_live: user_kind.is_live(),
             cip_kind: Some(CipKind::Alpaca),
+            enhanced_aml: enhanced_aml_option_yes(),
             ..Default::default()
         },
         user_kind.fixture_result(),
     )
     .await;
+
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
 
@@ -63,7 +129,6 @@ async fn pass(state: &mut State, user_kind: UserKind) {
 
     mock_ff_client
         .expect_flag()
-        .times(4)
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant.id))
         .return_const(matches!(user_kind, UserKind::Demo));
 
@@ -72,12 +137,17 @@ async fn pass(state: &mut State, user_kind: UserKind) {
         UserKind::Demo | UserKind::Sandbox(_) => {}
         // Mock vendor calls for Live users
         UserKind::Live => {
-            let ob_config_key = obc.key.clone();
             // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
             mock_ff_client
                 .expect_flag()
-                .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
-                .return_once(move |_| true);
+                .withf(move |f| {
+                    matches!(
+                        &f,
+                        BoolFlag::EnableIdologyInNonProd(_)
+                            | BoolFlag::EnableIncodeWatchlistCheckInNonProd(_)
+                    )
+                })
+                .return_const(true);
 
             // TODO: fix this up later sorry in a rush
             mock_ff_client
@@ -87,7 +157,7 @@ async fn pass(state: &mut State, user_kind: UserKind) {
                 .return_const(false);
 
             mock_idology(state, WithQualifier(None));
-            mock_incode(state, WithHit(vec![]));
+            mock_incode(state, WithHit(vec![]))
         }
     };
     state.set_ff_client(Arc::new(mock_ff_client));
@@ -108,7 +178,11 @@ async fn pass(state: &mut State, user_kind: UserKind) {
 
     let (wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
     assert!(wf.authorized_at.is_some());
-    assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state);
+
+    match wf_kind {
+        WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state),
+        WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::VendorCalls), wf.state),
+    }
     assert!(!fps.is_empty()); //fingerprints were written
 
     // MakeVendorCalls
@@ -122,19 +196,6 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     assert!(rs.iter().all(|r| !r.hidden));
 
     // MakeDecision
-    let (ww, _) = ww
-        .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
-        .await
-        .unwrap();
-
-    let (_, _, mr, obd, _, _) = query_data(state, &svid, &wfid).await;
-    // Assert no OBD is created yet and ob status is pending
-    assert!(obd.is_none());
-    assert_eq!(OnboardingStatus::Pending, wf.status.unwrap());
-    assert!(mr.is_none());
-
-    // MakeWatchlistCheckCall
-    // Expect Webhooks
     mock_webhooks(
         state,
         vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pass))],
@@ -143,16 +204,37 @@ async fn pass(state: &mut State, user_kind: UserKind) {
             ExpectedRequiresManualReview(false),
         )],
     );
-    let (_, _) = ww
-        .action(
-            state,
-            WorkflowActions::MakeWatchlistCheckCall(MakeWatchlistCheckCall {}),
-        )
+
+    let (ww, _) = ww
+        .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
         .await
         .unwrap();
 
+    match wf_kind {
+        WFKind::Kyc => {} // KYC Workflow will have gone from MakeDecision -> Complete
+        WFKind::Alpaca => {
+            // For Alpaca, we need to run the MakeWatchlistCheckCall action next, then it will proceed to Complete
+            let (_, _, mr, obd, _, _) = query_data(state, &svid, &wfid).await;
+            // Assert no OBD is created yet and ob status is pending
+            assert!(obd.is_none());
+            assert_eq!(OnboardingStatus::Pending, wf.status.unwrap());
+            assert!(mr.is_none());
+
+            let (_, _) = ww
+                .action(
+                    state,
+                    WorkflowActions::MakeWatchlistCheckCall(MakeWatchlistCheckCall {}),
+                )
+                .await
+                .unwrap();
+        }
+    }
+
     let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
-    assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
+    match wf_kind {
+        WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state),
+        WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state),
+    }
     assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
     let obd = obd.unwrap();
     assert!(obd.status == DecisionStatus::Pass);
@@ -190,35 +272,46 @@ async fn pass(state: &mut State, user_kind: UserKind) {
     };
 }
 
-#[test_state_case(UserKind::Live, TerminalDecisionStatus::Pass)]
-#[test_state_case(UserKind::Live, TerminalDecisionStatus::Fail)]
+#[test_state_case(WFKind::Alpaca, UserKind::Live, TerminalDecisionStatus::Pass)]
+#[test_state_case(WFKind::Alpaca, UserKind::Live, TerminalDecisionStatus::Fail)]
 #[test_state_case(
+    WFKind::Alpaca,
     UserKind::Sandbox(WorkflowFixtureResult::ManualReview),
     TerminalDecisionStatus::Pass
 )]
 #[test_state_case(
+    WFKind::Alpaca,
     UserKind::Sandbox(WorkflowFixtureResult::ManualReview),
     TerminalDecisionStatus::Fail
 )]
+// TODO: turn on these when we add review_reason's and proper Alpaca fixture risk signals to the Kyc workflow
+// #[test_state_case(WFKind::Kyc, UserKind::Live, TerminalDecisionStatus::Pass)]
+// #[test_state_case(WFKind::Kyc, UserKind::Live, TerminalDecisionStatus::Fail)]
+// #[test_state_case(
+//     WFKind::Kyc,
+//     UserKind::Sandbox(WorkflowFixtureResult::ManualReview),
+//     TerminalDecisionStatus::Pass
+// )]
+// #[test_state_case(
+//     WFKind::Kyc,
+//     UserKind::Sandbox(WorkflowFixtureResult::ManualReview),
+//     TerminalDecisionStatus::Fail
+// )]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn pass_then_watchlist_hit(
     state: &mut State,
+    wf_kind: WFKind,
     user_kind: UserKind,
     review_decision: TerminalDecisionStatus,
 ) {
     // DATA SETUP
-    let (wf, tenant, obc, tu) = setup_data(
+    let (wf, tenant, _obc, tu) = setup(
         state,
+        wf_kind,
         ObConfigurationOpts {
             is_live: user_kind.is_live(),
             cip_kind: Some(CipKind::Alpaca),
-            enhanced_aml: EnhancedAmlOption::Yes {
-                ofac: true,
-                pep: true,
-                adverse_media: true,
-                continuous_monitoring: true,
-                adverse_media_lists: None,
-            },
+            enhanced_aml: enhanced_aml_option_yes(),
             ..Default::default()
         },
         user_kind.fixture_result(),
@@ -235,7 +328,6 @@ async fn pass_then_watchlist_hit(
     let tenant_id = tenant.id.clone();
     mock_ff_client
         .expect_flag()
-        .times(4)
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
         .return_const(matches!(user_kind, UserKind::Demo));
 
@@ -244,12 +336,17 @@ async fn pass_then_watchlist_hit(
         UserKind::Demo | UserKind::Sandbox(_) => {}
         // Mock vendor calls for Live users
         UserKind::Live => {
-            let ob_config_key = obc.key.clone();
             // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
             mock_ff_client
                 .expect_flag()
-                .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
-                .return_once(move |_| true);
+                .withf(move |f| {
+                    matches!(
+                        &f,
+                        BoolFlag::EnableIdologyInNonProd(_)
+                            | BoolFlag::EnableIncodeWatchlistCheckInNonProd(_)
+                    )
+                })
+                .return_const(true);
 
             // TODO: fix this up later sorry in a rush
             mock_ff_client
@@ -280,7 +377,10 @@ async fn pass_then_watchlist_hit(
 
     let (wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
     assert!(wf.authorized_at.is_some());
-    assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state);
+    match wf_kind {
+        WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state),
+        WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::VendorCalls), wf.state),
+    }
     assert!(!fps.is_empty()); //fingerprints were written
 
     // MakeVendorCalls
@@ -294,21 +394,6 @@ async fn pass_then_watchlist_hit(
     assert!(rs.iter().all(|r| !r.hidden));
 
     // MakeDecision
-    let (ww, _) = ww
-        .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
-        .await
-        .unwrap();
-
-    let (_, _, mr, obd, _, _) = query_data(state, &svid, &wfid).await;
-    // Assert no OBD is created yet and ob status is pending
-
-    assert_eq!(OnboardingStatus::Pending, wf.status.unwrap());
-    assert!(obd.is_none());
-    assert!(mr.is_none());
-    // Some risk signals are unhidden now
-    let rs = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
-    assert!(!rs.is_empty());
-    assert!(rs.iter().all(|r| !r.hidden));
 
     // Expect Webhooks
     mock_webhooks(
@@ -319,21 +404,51 @@ async fn pass_then_watchlist_hit(
             ExpectedRequiresManualReview(true),
         )],
     );
-
-    // MakeWatchlistCheckCall
     let (ww, _) = ww
-        .action(
-            state,
-            WorkflowActions::MakeWatchlistCheckCall(MakeWatchlistCheckCall {}),
-        )
+        .action(state, WorkflowActions::MakeDecision(MakeDecision {}))
         .await
         .unwrap();
 
+    let ww = match wf_kind {
+        WFKind::Kyc => ww, // KYC Workflow will have gone from MakeDecision -> Complete
+        WFKind::Alpaca => {
+            // For Alpaca, we need to run the MakeWatchlistCheckCall action next, then it will proceed to Complete
+
+            let (_, _, mr, obd, _, _) = query_data(state, &svid, &wfid).await;
+            // Assert no OBD is created yet and ob status is pending
+
+            assert_eq!(OnboardingStatus::Pending, wf.status.unwrap());
+            assert!(obd.is_none());
+            assert!(mr.is_none());
+            // Some risk signals are unhidden now
+            let rs = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
+            assert!(!rs.is_empty());
+            assert!(rs.iter().all(|r| !r.hidden));
+
+            // MakeWatchlistCheckCall
+            let (ww, _) = ww
+                .action(
+                    state,
+                    WorkflowActions::MakeWatchlistCheckCall(MakeWatchlistCheckCall {}),
+                )
+                .await
+                .unwrap();
+            ww
+        }
+    };
+
     let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
-    assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state);
+    match wf_kind {
+        WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state),
+        WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state),
+    }
     assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
-    // we commit in this case
-    assert!(obd.unwrap().seqno.is_some());
+    // if non-sandbox, we should have portabalized data
+    match user_kind {
+        UserKind::Demo | UserKind::Live => assert!(obd.unwrap().seqno.is_some()),
+        UserKind::Sandbox(_) => assert!(obd.unwrap().seqno.is_none()),
+    }
+
     // manual_review should exist and have correct review_reasons
     let mr = mr.unwrap();
     assert_eq!(
@@ -362,6 +477,8 @@ async fn pass_then_watchlist_hit(
     );
 
     // ReviewCompleted
+    // For the AlpacaKyc workflow, we have a PendingReview state that the WF remains in until the review is completed./
+    // For the regular Kyc workflow, we will continue to have no such state and instead just produce the review and have it completed without involvement of the workflow
     // Expect Webhooks
     match review_decision {
         TerminalDecisionStatus::Pass => {
@@ -375,25 +492,47 @@ async fn pass_then_watchlist_hit(
         TerminalDecisionStatus::Fail => {}
     }
 
-    let (_, _) = ww
-        .action(
-            state,
-            WorkflowActions::ReviewCompleted(crate::decision::state::ReviewCompleted {
-                decision: DecisionRequest {
-                    annotation: CreateAnnotationRequest {
-                        note: "yo".to_owned(),
-                        is_pinned: false,
-                    },
-                    status: review_decision,
-                },
-                actor: AuthActor::TenantUser(tu.id),
-            }),
-        )
-        .await
-        .unwrap();
+    let review_decision_req = DecisionRequest {
+        annotation: CreateAnnotationRequest {
+            note: "yo".to_owned(),
+            is_pinned: false,
+        },
+        status: review_decision,
+    };
+    let review_actor = AuthActor::TenantUser(tu.id);
+    match wf_kind {
+        WFKind::Kyc => {
+            let wfid = wf.id.clone();
+            state
+                .db_pool
+                // TODO how does this work when there are multiple KYC workflows for one scoped vault?
+                .db_transaction(move |conn| -> ApiResult<_> {
+                    let wf = Workflow::lock(conn, &wfid)?;
+                    crate::decision::review::save_review_decision(conn, wf, review_decision_req, review_actor)?;
+                    Ok(())
+                })
+                .await.unwrap();
+            crate::task::execute_webhook_tasks(state.clone());
+        }
+        WFKind::Alpaca => {
+            let (_, _) = ww
+                .action(
+                    state,
+                    WorkflowActions::ReviewCompleted(crate::decision::state::ReviewCompleted {
+                        decision: review_decision_req,
+                        actor: review_actor,
+                    }),
+                )
+                .await
+                .unwrap();
+        }
+    }
 
     let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
-    assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
+    match wf_kind {
+        WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state),
+        WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state),
+    }
     assert!(mr.is_none()); // kinda weird but Onboarding::get returns only the current active review and now the review has been completed
     match review_decision {
         TerminalDecisionStatus::Pass => {
@@ -409,23 +548,28 @@ async fn pass_then_watchlist_hit(
                 // TODO: we don't really currently provide a way to specicfy fixtures for a Redo flow
                 UserKind::Demo | UserKind::Sandbox(_) => {}
                 UserKind::Live => {
-                    redo_and_pass(state, user_kind, &wf, &obd.unwrap(), &tenant.id, &obc.key).await;
+                    redo_and_pass(state, wf_kind, user_kind, &wf, &obd.unwrap(), &tenant.id).await;
                 }
             }
         }
     }
 }
 
-#[test_state_case(UserKind::Live)]
-#[test_state_case(UserKind::Sandbox(WorkflowFixtureResult::StepUp))]
+#[test_state_case(WFKind::Alpaca, UserKind::Live)]
+#[test_state_case(WFKind::Alpaca, UserKind::Sandbox(WorkflowFixtureResult::StepUp))]
+// TODO: turn these on when Kyc workflow can support stepup
+// #[test_state_case(WFKind::Kyc, UserKind::Live)]
+// #[test_state_case(WFKind::Kyc, UserKind::Sandbox(WorkflowFixtureResult::StepUp))]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
-async fn step_up(state: &mut State, user_kind: UserKind) {
+async fn step_up(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
     // DATA SETUP
-    let (wf, tenant, obc, tu) = setup_data(
+    let (wf, tenant, _obc, tu) = setup(
         state,
+        wf_kind,
         ObConfigurationOpts {
             is_live: user_kind.is_live(),
             cip_kind: Some(CipKind::Alpaca),
+            enhanced_aml: enhanced_aml_option_yes(),
             ..Default::default()
         },
         user_kind.fixture_result(),
@@ -442,7 +586,6 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
 
     mock_ff_client
         .expect_flag()
-        .times(4)
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant.id))
         .return_const(matches!(user_kind, UserKind::Demo));
 
@@ -453,12 +596,17 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
         }
         // Mock vendor calls for Live users
         UserKind::Live => {
-            let ob_config_key = obc.key.clone();
             // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
             mock_ff_client
                 .expect_flag()
-                .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
-                .return_once(move |_| true);
+                .withf(move |f| {
+                    matches!(
+                        &f,
+                        BoolFlag::EnableIdologyInNonProd(_)
+                            | BoolFlag::EnableIncodeWatchlistCheckInNonProd(_)
+                    )
+                })
+                .return_const(true);
 
             // TODO: fix this up later sorry in a rush
             mock_ff_client
@@ -526,7 +674,12 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
     assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state);
     assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
     let obd = obd.unwrap();
-    assert!(obd.seqno.is_some());
+    // if non-sandbox, we should have portabalized data
+    match user_kind {
+        UserKind::Demo | UserKind::Live => assert!(obd.seqno.is_some()),
+        UserKind::Sandbox(_) => assert!(obd.seqno.is_none()),
+    }
+
     // manual_review should exist and have correct review_reasons
     let mr = mr.unwrap();
     assert_eq!(vec![ReviewReason::Document], mr.review_reasons);
@@ -602,16 +755,21 @@ async fn step_up(state: &mut State, user_kind: UserKind) {
     assert!(!rs.is_empty()); // sanity check since we made a new OBD
 }
 
-#[test_state_case(UserKind::Sandbox(WorkflowFixtureResult::Fail))]
-#[test_state_case(UserKind::Live)]
+#[test_state_case(WFKind::Alpaca, UserKind::Sandbox(WorkflowFixtureResult::Fail))]
+#[test_state_case(WFKind::Alpaca, UserKind::Live)]
+// TODO: turn on when Kyc workflow can produce proper Alpaca fixture risk signals
+// #[test_state_case(WFKind::Kyc, UserKind::Sandbox(WorkflowFixtureResult::Fail))]
+#[test_state_case(WFKind::Kyc, UserKind::Live)]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
-async fn fail(state: &mut State, user_kind: UserKind) {
+async fn fail(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
     // DATA SETUP
-    let (wf, tenant, obc, _tu) = setup_data(
+    let (wf, tenant, _obc, _tu) = setup(
         state,
+        wf_kind,
         ObConfigurationOpts {
             is_live: user_kind.is_live(),
             cip_kind: Some(CipKind::Alpaca),
+            enhanced_aml: enhanced_aml_option_yes(),
             ..Default::default()
         },
         user_kind.fixture_result(),
@@ -628,7 +786,6 @@ async fn fail(state: &mut State, user_kind: UserKind) {
     let tenant_id = tenant.id.clone();
     mock_ff_client
         .expect_flag()
-        .times(3)
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
         .return_const(matches!(user_kind, UserKind::Demo));
 
@@ -637,12 +794,17 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         UserKind::Demo | UserKind::Sandbox(_) => {}
         // Mock vendor calls for Live users
         UserKind::Live => {
-            let ob_config_key = obc.key.clone();
             // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
             mock_ff_client
                 .expect_flag()
-                .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
-                .return_once(move |_| true);
+                .withf(move |f| {
+                    matches!(
+                        &f,
+                        BoolFlag::EnableIdologyInNonProd(_)
+                            | BoolFlag::EnableIncodeWatchlistCheckInNonProd(_)
+                    )
+                })
+                .return_const(true);
 
             // TODO: fix this up later sorry in a rush
             mock_ff_client
@@ -655,6 +817,12 @@ async fn fail(state: &mut State, user_kind: UserKind) {
                 state,
                 WithQualifier(Some("resultcode.ssn.does.not.match".to_owned())),
             );
+
+            // the AlpacaKyc workflow currently does not make the watchlist call if there is a "hard fail". But the Kyc workflow will always make the call alongside the other Kyc calls
+            match wf_kind {
+                WFKind::Kyc => mock_incode(state, WithHit(vec![])),
+                WFKind::Alpaca => {}
+            }
         }
     };
     state.set_ff_client(Arc::new(mock_ff_client));
@@ -675,7 +843,10 @@ async fn fail(state: &mut State, user_kind: UserKind) {
 
     let (wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
     assert!(wf.authorized_at.is_some());
-    assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state);
+    match wf_kind {
+        WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::VendorCalls), wf.state),
+        WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state),
+    }
     assert!(!fps.is_empty()); //fingerprints were written
 
     // MakeVendorCalls
@@ -686,15 +857,6 @@ async fn fail(state: &mut State, user_kind: UserKind) {
     let rs = query_risk_signals(state, &svid, RiskSignalGroupKind::Kyc).await;
     assert!(!rs.is_empty());
     assert!(rs.iter().all(|r| !r.hidden));
-
-    // Expect Webhook
-    let _expect_review = match user_kind {
-        UserKind::Demo | UserKind::Sandbox(_) => false,
-        UserKind::Live => {
-            // TODO: this is wrong! When we add proper Alpaca rules then we should not be raising a review
-            true
-        }
-    };
 
     // Expect Webhooks
     mock_webhooks(
@@ -713,7 +875,10 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         .unwrap();
 
     let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
-    assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
+    match wf_kind {
+        WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state),
+        WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state),
+    }
     let obd = obd.unwrap();
     assert!(obd.status == DecisionStatus::Fail);
     assert!(matches!(obd.actor, DbActor::Footprint));
@@ -750,18 +915,18 @@ async fn fail(state: &mut State, user_kind: UserKind) {
         // TODO: we don't really currently provide a way to specicfy fixtures for a Redo flow
         UserKind::Demo | UserKind::Sandbox(_) => {}
         UserKind::Live => {
-            redo_and_pass(state, user_kind, &wf, &obd, &tenant.id, &obc.key).await;
+            redo_and_pass(state, wf_kind, user_kind, &wf, &obd, &tenant.id).await;
         }
     }
 }
 
 async fn redo_and_pass(
     state: &mut State,
+    wf_kind: WFKind,
     user_kind: UserKind,
     prior_wf: &Workflow,
     prior_obd: &OnboardingDecision,
     tenant_id: &TenantId,
-    ob_config_key: &ObConfigurationKey,
 ) {
     // Trigger Redo workflow
     let sv_id = prior_wf.scoped_vault_id.clone();
@@ -770,9 +935,13 @@ async fn redo_and_pass(
     let wf = state
         .db_pool
         .db_transaction(move |conn| {
+            let config = match wf_kind {
+                WFKind::Alpaca => AlpacaKycConfig { is_redo: true }.into(),
+                WFKind::Kyc => KycConfig { is_redo: true }.into(),
+            };
             let args = NewWorkflowArgs {
                 scoped_vault_id: sv_id,
-                config: AlpacaKycConfig { is_redo: true }.into(),
+                config,
                 fixture_result,
                 ob_configuration_id: obc_id,
                 insight_event_id: None,
@@ -793,7 +962,6 @@ async fn redo_and_pass(
     let tenant_id = tenant_id.clone();
     mock_ff_client
         .expect_flag()
-        .times(4)
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
         .return_const(matches!(user_kind, UserKind::Demo));
 
@@ -802,12 +970,17 @@ async fn redo_and_pass(
         UserKind::Demo | UserKind::Sandbox(_) => {}
         // Mock vendor calls for Live users
         UserKind::Live => {
-            let ob_config_key = ob_config_key.clone();
             // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
             mock_ff_client
                 .expect_flag()
-                .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
-                .return_once(move |_| true);
+                .withf(move |f| {
+                    matches!(
+                        &f,
+                        BoolFlag::EnableIdologyInNonProd(_)
+                            | BoolFlag::EnableIncodeWatchlistCheckInNonProd(_)
+                    )
+                })
+                .return_const(true);
 
             // TODO: fix this up later sorry in a rush
             mock_ff_client
@@ -840,7 +1013,10 @@ async fn redo_and_pass(
         .unwrap();
 
     let (wf, _, _, obd, rs, _) = query_data(state, &svid, &wfid).await;
-    assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
+    match wf_kind {
+        WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state),
+        WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state),
+    }
     // new obd was written
     let obd = obd.unwrap();
     assert!(obd.id != prior_obd.id);

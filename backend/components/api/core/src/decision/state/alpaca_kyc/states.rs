@@ -509,7 +509,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         } else {
             Decision {
                 decision_status: DecisionStatus::Fail,
-                should_commit: true,
+                should_commit: !is_sandbox, // To be consistent with the Kyc workflow which currently does not commit data if the decision is Fail
                 create_manual_review: true,
                 // TODO: fix this when this goes to rules
                 vendor_apis: vec![VendorAPI::IncodeWatchlistCheck],
