@@ -224,7 +224,7 @@ const FullFrameOutline = styled.div<{
     width: ${$outlineWidth}px;
     position: absolute;
     border-radius: ${theme.borderRadius.large};
-    box-shadow: 0 0 0 1000px #0000004d;
+    box-shadow: 0 0 0 1000px #00000066;
 
     &[data-show-border='true'] {
       border: ${theme.spacing[2]} solid ${theme.backgroundColor.primary};
