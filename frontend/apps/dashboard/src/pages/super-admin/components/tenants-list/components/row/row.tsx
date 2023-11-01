@@ -3,6 +3,7 @@ import { Button, CodeInline, Stack } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { DEFAULT_PUBLIC_ROUTE } from 'src/config/constants';
 import useAssumeTenant from 'src/hooks/use-assume-tenant';
 import useSession from 'src/hooks/use-session';
 
@@ -22,7 +23,7 @@ const Row = ({ tenant }: TenantProps) => {
       {
         onSuccess: async () => {
           await refreshUserPermissions();
-          router.push('/users');
+          router.push(DEFAULT_PUBLIC_ROUTE);
         },
       },
     );

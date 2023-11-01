@@ -27,7 +27,7 @@ const useOrgMetrics = () => {
   const { requestParams, isReady } = useFilters();
 
   return useQuery(
-    ['org', 'metrics', requestParams],
+    ['org', 'metrics', requestParams, authHeaders],
     () => getOrgMetrics(authHeaders, { ...requestParams }),
     {
       enabled: isReady,
@@ -37,7 +37,9 @@ const useOrgMetrics = () => {
           data.successfulUserOnboardings === 0
             ? 0
             : (
-                (data.successfulUserOnboardings / data.totalUserOnboardings) *
+                (data.successfulUserOnboardings /
+                  (data.successfulUserOnboardings +
+                    data.failedUserOnboardings)) *
                 100
               ).toFixed(1);
         formattedMetrics.push(

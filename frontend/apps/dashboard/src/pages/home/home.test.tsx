@@ -150,7 +150,7 @@ describe('<Home />', () => {
         const passRate = screen.getByRole('group', {
           name: 'Pass rate',
         });
-        expect(within(passRate).getByText('97.9%')).toBeInTheDocument();
+        expect(within(passRate).getByText('98.4%')).toBeInTheDocument();
 
         const newUserVaults = screen.getByRole('group', {
           name: 'New user vaults',
