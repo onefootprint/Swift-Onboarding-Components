@@ -18,6 +18,8 @@ type GetImageStringProps = {
   centerOffsetY?: number;
 };
 
+const ERROR_MARGIN = -10; // to avoid rouding error, we are using this value for now. TODO: test the dimension logic more to understand why rounding errors may occur in the first place.
+
 const useGetImageString = () => {
   const { cv, loaded } = useOpenCv();
 
@@ -45,7 +47,7 @@ const useGetImageString = () => {
 
     const { sx, sy, sWidth, sHeight } = sourceDimensions;
 
-    if (sx < 0 || sy < 0 || sWidth <= 0 || sHeight <= 0) {
+    if (sx < ERROR_MARGIN || sy < ERROR_MARGIN || sWidth <= 0 || sHeight <= 0) {
       Logger.error(
         `Computed desired image dimensions is 0 or negative number - sx: ${sx}, sy: ${sy}, width: ${sWidth}, height: ${sHeight}`,
       );
