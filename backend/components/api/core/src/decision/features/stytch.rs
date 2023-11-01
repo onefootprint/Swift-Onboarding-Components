@@ -30,6 +30,8 @@ fn reason_to_footprint_reason_code(value: &Reason) -> Option<FootprintReasonCode
         Reason::IpRateLimitExceededCritical => None,
         Reason::TuningRuleMatch => None,
         Reason::AwsDatacenterIp => Some(FootprintReasonCode::IpAlertDataCenter),
+        Reason::PossibleFakeAppleChromeOrMitm => None,
+        Reason::PossibleTlsMitm => None,
     }
 }
 
