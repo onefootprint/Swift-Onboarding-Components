@@ -55,6 +55,8 @@ export type {
   GetOnboardingConfigResponse,
   GetOnboardingConfigsRequest,
   GetOnboardingConfigsResponse,
+  GetOrgMetricsRequest,
+  GetOrgMetricsResponse,
   GetOrgRequest,
   GetOrgResponse,
   GetPinnedAnnotationsRequest,

@@ -4,6 +4,7 @@ import { Container } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { DEFAULT_PUBLIC_ROUTE } from 'src/config/constants';
 import useSession from 'src/hooks/use-session';
 
 import Form from './components/form';
@@ -20,7 +21,7 @@ const Onboarding = () => {
 
   const handleCompleted = () => {
     session.completeOnboarding();
-    router.push('/users');
+    router.push(DEFAULT_PUBLIC_ROUTE);
   };
 
   return session.data.user ? (

@@ -2,6 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoBook16,
   IcoFileText16,
+  IcoHome16,
   IcoKey16,
   IcoLayer0116,
   IcoPencil16,
@@ -22,6 +23,11 @@ const useRoutes = (manualReviewCount?: number): Route[] => {
     {
       title: '',
       items: [
+        {
+          href: '/home',
+          Icon: IcoHome16,
+          text: t('home'),
+        },
         {
           href: '/users',
           Icon: IcoUsers16,

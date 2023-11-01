@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
+import { DEFAULT_PUBLIC_ROUTE } from 'src/config/constants';
 
 import usePermissionsByRoute from './hooks/use-permissions';
 
@@ -30,7 +31,7 @@ const Gate = ({ children }: GateProps) => {
         next();
       },
       onError: () => {
-        redirect('/users');
+        redirect(DEFAULT_PUBLIC_ROUTE);
       },
     },
     privateRoute: {
@@ -46,7 +47,7 @@ const Gate = ({ children }: GateProps) => {
           redirect('/onboarding');
           return;
         }
-        redirect('/users');
+        redirect(DEFAULT_PUBLIC_ROUTE);
       },
     },
   });

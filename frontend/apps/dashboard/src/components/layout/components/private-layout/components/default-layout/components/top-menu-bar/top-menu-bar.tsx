@@ -6,6 +6,7 @@ import { omit } from 'lodash';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { DEFAULT_PUBLIC_ROUTE } from 'src/config/constants';
 import useOrgSession from 'src/hooks/use-org-session';
 
 const TopMenuBar = () => {
@@ -38,7 +39,7 @@ const TopMenuBar = () => {
     router.pathname.startsWith('/businesses/[id]');
   return (
     <Container direction="row" justify="space-between" align="center">
-      <Link href="/users" aria-label={t('users')}>
+      <Link href={DEFAULT_PUBLIC_ROUTE} aria-label={t('home')}>
         <Footprint>
           <ThemedLogoFpCompact color="primary" />
         </Footprint>

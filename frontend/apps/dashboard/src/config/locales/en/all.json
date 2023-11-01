@@ -394,6 +394,7 @@
     },
     "private-layout": {
       "nav": {
+        "home": "Home",
         "users": "Users",
         "businesses": "Businesses",
         "security-logs": "Security logs",
@@ -1288,6 +1289,29 @@
           "reason": "Reason"
         }
       }
+    },
+    "home": {
+      "page-title": "Footprint | Home",
+      "header": {
+        "title": "Home"
+      },
+      "onboarding-metrics": {
+        "title": "Onboarding metrics",
+        "filter": {
+          "month-to-date": "Month to date",
+          "previous-month": "Previous month",
+          "all-time": "All time"
+        },
+        "metrics": {
+          "successfulUserOnboardings": "Successful onboardings",
+          "failedUserOnboardings": "Failed onboardings",
+          "incompleteUserOnboardings": "Incomplete onboardings",
+          "totalUserOnboardings": "Total onboardings",
+          "passRate": "Pass rate",
+          "newUserVaults": "New user vaults"
+        }
+      },
+      "error": "Please <refresh>refresh</refresh> this page."
     },
     "users": {
       "page-title": "Footprint | Users",

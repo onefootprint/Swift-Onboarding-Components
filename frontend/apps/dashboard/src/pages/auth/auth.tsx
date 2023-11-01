@@ -4,6 +4,7 @@ import { Box, useToast } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { DEFAULT_PUBLIC_ROUTE } from 'src/config/constants';
 import useSession from 'src/hooks/use-session';
 
 import Loading from './components/loading';
@@ -59,7 +60,9 @@ const Auth = () => {
               },
             });
             waitForAnimation(() => {
-              router.push(requiresOnboarding ? '/onboarding' : '/users');
+              router.push(
+                requiresOnboarding ? '/onboarding' : DEFAULT_PUBLIC_ROUTE,
+              );
             });
           }
         },

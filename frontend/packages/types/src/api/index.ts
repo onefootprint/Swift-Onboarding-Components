@@ -66,6 +66,10 @@ export type {
 } from './get-onboarding-configs';
 export type { GetOrgRequest, GetOrgResponse } from './get-org';
 export type {
+  GetOrgMetricsRequest,
+  GetOrgMetricsResponse,
+} from './get-org-metrics';
+export type {
   GetPinnedAnnotationsRequest,
   GetPinnedAnnotationsResponse,
 } from './get-pinned-annotations';

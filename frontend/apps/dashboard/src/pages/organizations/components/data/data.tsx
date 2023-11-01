@@ -4,6 +4,7 @@ import type { GetAuthRolesOrg } from '@onefootprint/types';
 import { Tooltip, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
+import { DEFAULT_PUBLIC_ROUTE } from 'src/config/constants';
 import useAssumeAuthRole from 'src/hooks/use-assume-auth-role';
 import useSession from 'src/hooks/use-session';
 
@@ -27,7 +28,7 @@ const Data = ({ authToken, organizations }: DataProps) => {
       {
         async onSuccess() {
           await logIn({ auth: authToken });
-          router.push('/users');
+          router.push(DEFAULT_PUBLIC_ROUTE);
         },
         onError: showErrorToast,
       },
