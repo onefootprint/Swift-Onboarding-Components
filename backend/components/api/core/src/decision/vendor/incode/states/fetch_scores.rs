@@ -6,6 +6,7 @@ use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::{state::TransitionResult, IncodeContext};
 use crate::decision::vendor::verification_result::save_vreq_and_vres;
+use crate::decision::vendor::VendorAPIError;
 use crate::enclave_client::EnclaveClient;
 use crate::errors::{ApiResult, AssertionError};
 use crate::utils::vault_wrapper::{EnclaveDecryptOperation, Person, Pii, TenantVw, VaultWrapper};
@@ -15,6 +16,7 @@ use async_trait::async_trait;
 use db::models::decision_intent::DecisionIntent;
 use db::models::identity_document::IdentityDocument;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::verification_result::VerificationResult;
 use db::{DbPool, TxnPgConn};
 use feature_flag::BoolFlag;
 use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse};
@@ -120,7 +122,7 @@ impl IncodeStateTransition for FetchScores {
                 Ok(selfie_res) => {
                     tracing::info!(
                         incode_result = score_response.selfie_match().1.map(|i| i.to_string()),
-                        aws_result = selfie_res.similarity,
+                        aws_result = ?selfie_res.map(|s| s.0.similarity),
                         "incode aws selfie result"
                     )
                 }
@@ -168,7 +170,10 @@ impl IncodeStateTransition for FetchScores {
 }
 
 #[tracing::instrument(skip_all)]
-pub async fn run_aws_rekognition(db_pool: &DbPool, ctx: &IncodeContext) -> ApiResult<CompareFacesResponse> {
+pub async fn run_aws_rekognition(
+    db_pool: &DbPool,
+    ctx: &IncodeContext,
+) -> ApiResult<Option<(CompareFacesResponse, VerificationResult)>> {
     let enclave_client = ctx.enclave_client.clone();
     let pool = db_pool.clone();
     let id_doc_id = ctx.id_doc_id.clone();
@@ -187,7 +192,7 @@ async fn run_aws_inner(
     sv_id: ScopedVaultId,
     wf_id: WorkflowId,
     id_doc_id: IdentityDocumentId,
-) -> ApiResult<CompareFacesResponse> {
+) -> ApiResult<Option<(CompareFacesResponse, VerificationResult)>> {
     let sv_id2 = sv_id.clone();
     let (id_doc, vw) = db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -225,29 +230,41 @@ async fn run_aws_inner(
         _ => return Err(ApiErrorKind::AssertionError("unexpected pii type".into()))?,
     };
 
-    let comparison_result = client
-        .doc_to_selfie(doc_pii_bytes, selfie_pii_bytes, None)
-        .await?;
-    let comparison_result2 = comparison_result.clone();
+    let comparison_result = client.doc_to_selfie(doc_pii_bytes, selfie_pii_bytes, None).await;
+    let (result, res_to_save) = match comparison_result {
+        Ok(r) => {
+            let j: PiiJsonValue = serde_json::to_value(r.clone())?.into();
+            (
+                Some(r),
+                Ok(VendorResponse {
+                    raw_response: j.clone(),
+                    response: ParsedResponse::AwsRekognition(j),
+                }),
+            )
+        }
+        Err(e) => {
+            tracing::error!(err=?e, "error making aws rekognition request");
 
-    db_pool
+            let err = idv::Error::from(e);
+            (
+                None,
+                Err(VendorAPIError {
+                    vendor_api: VendorAPI::AwsRekognition,
+                    error: err,
+                }),
+            )
+        }
+    };
+
+    let vres = db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let di = DecisionIntent::create(conn, DecisionIntentKind::DocScan, &sv_id, Some(&wf_id))?;
-            let pii_json_compare = PiiJsonValue::new(serde_json::to_value(&comparison_result)?);
-            let _ = save_vreq_and_vres(
-                conn,
-                &vw.vault.public_key.clone(),
-                &sv_id,
-                &di.id,
-                Ok(VendorResponse {
-                    raw_response: pii_json_compare.clone(),
-                    response: ParsedResponse::AwsRekognition(pii_json_compare),
-                }),
-            )?;
+            let (_, vres) =
+                save_vreq_and_vres(conn, &vw.vault.public_key.clone(), &sv_id, &di.id, res_to_save)?;
 
-            Ok(())
+            Ok(vres)
         })
         .await??;
 
-    Ok(comparison_result2)
+    Ok(result.map(|r| (r, vres)))
 }

@@ -264,6 +264,8 @@ pub enum Error {
     AssertionError(String),
     #[error("Stytch error: {0}")]
     StytchError(#[from] stytch::error::Error),
+    #[error("Aws Rekognition error: {0}")]
+    AwsRekognitionError(#[from] selfie_doc::AwsSelfieDocError),
 }
 
 impl From<&ParsedResponse> for VendorAPI {
