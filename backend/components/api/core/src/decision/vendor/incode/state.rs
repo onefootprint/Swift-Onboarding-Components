@@ -31,21 +31,12 @@ impl<T> Uninitialized<T> {
     }
 }
 
+#[derive(Default)]
 pub struct TransitionResult {
     /// Any failure reasons experienced during the handling of this state
     pub failure_reasons: Vec<IncodeFailureReason>,
     /// The side being handled by this step of the Incode machine. It will be cleared if there is an error.
     pub side: Option<DocumentSide>,
-}
-
-impl From<IncodeState> for TransitionResult {
-    /// Shorthand for the common case that has no possibility to fail
-    fn from(_value: IncodeState) -> Self {
-        Self {
-            failure_reasons: vec![],
-            side: None,
-        }
-    }
 }
 
 // Get the benefits of one simple trait to implement for each state!
@@ -79,8 +70,6 @@ pub trait IncodeStateTransition: Sized {
     {
         Uninitialized::<Self>::new().into()
     }
-
-    fn next_state(session: &VerificationSession) -> IncodeState;
 }
 
 #[async_trait]

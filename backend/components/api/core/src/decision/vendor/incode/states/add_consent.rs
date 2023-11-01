@@ -1,8 +1,8 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, IncodeStateTransition, ProcessId,
-    SaveVerificationResultArgs, VerificationSession,
+    map_to_api_err, save_incode_verification_result, IncodeStateTransition, SaveVerificationResultArgs,
+    VerificationSession,
 };
-use crate::decision::vendor::incode::state::{IncodeState, TransitionResult};
+use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::errors::{ApiResult, AssertionError};
 use crate::vendor_clients::IncodeClients;
@@ -88,14 +88,8 @@ impl IncodeStateTransition for AddConsent {
         self,
         _: &mut TxnPgConn,
         _: &IncodeContext,
-        session: &VerificationSession,
+        _: &VerificationSession,
     ) -> ApiResult<TransitionResult> {
-        let next = Self::next_state(session);
-        Ok(next.into())
-    }
-
-    // We always add consent, so if this is a selfie, continue, or poll
-    fn next_state(_: &VerificationSession) -> IncodeState {
-        ProcessId::new()
+        Ok(TransitionResult::default())
     }
 }

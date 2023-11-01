@@ -1,8 +1,8 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, AddConsent, IncodeStateTransition,
-    SaveVerificationResultArgs, VerificationSession,
+    map_to_api_err, save_incode_verification_result, IncodeStateTransition, SaveVerificationResultArgs,
+    VerificationSession,
 };
-use crate::decision::vendor::incode::state::{IncodeState, TransitionResult};
+use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::IncodeContext;
 use crate::errors::ApiResult;
 use crate::vendor_clients::IncodeClients;
@@ -57,10 +57,6 @@ impl IncodeStateTransition for AddSelfie {
             side: Some(DocumentSide::Selfie),
         };
         Ok(result)
-    }
-
-    fn next_state(_: &VerificationSession) -> IncodeState {
-        AddConsent::new()
     }
 }
 
