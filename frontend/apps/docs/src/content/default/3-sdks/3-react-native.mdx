@@ -60,7 +60,7 @@ cd ios && pod install && cd ..
 
 ## Integration
 
-1. Start by getting your Onboarding Publishable Key, for instance, `ob_test_VMooXd04EUlnu3AvMYKjMW`.
+1. Start by getting your Onboarding Publishable Key, for instance, `pb_test_VMooXd04EUlnu3AvMYKjMW`.
 
 2. Next, import the styles file and embed the Footprint button, ensuring you pass both the Publishable Key and the callback functions:
 
@@ -72,7 +72,7 @@ import footprint from '@onefootprint/footprint-react-native';
 export default function App() {
   const handleButtonPress = async () => {
     footprint.open({
-      publicKey: 'ob_test_ilBQgKtvrgQrQNV8U2rb7e',
+      publicKey: 'pb_test_ilBQgKtvrgQrQNV8U2rb7e',
       onComplete: validationToken => {
         alert(validationToken);
       },
@@ -111,7 +111,7 @@ import { View, Button } from 'react-native';
 const Screen = () => {
   const handlePress = () => {
     footprint.open({
-      publicKey: 'ob_test_VMooXd04EUlnu3AvMYKjMW',
+      publicKey: 'pb_test_VMooXd04EUlnu3AvMYKjMW',
       appearance: {
         fontSrc:
           'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap',
@@ -174,7 +174,7 @@ import { View, Button } from 'react-native';
 const Screen = () => {
   const handlePress = () => {
     footprint.open({
-      publicKey: 'ob_test_VMooXd04EUlnu3AvMYKjMW',
+      publicKey: 'pb_test_VMooXd04EUlnu3AvMYKjMW',
       userData: {
         'id.email': 'jane.doe@acme.com',
         'id.phone_number': '+12025550179',

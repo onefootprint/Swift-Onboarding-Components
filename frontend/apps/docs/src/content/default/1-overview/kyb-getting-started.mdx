@@ -18,7 +18,7 @@ meta:
    - On the "Your Playbook" screen, click the edit button to change the fields you plan to collect from beneficial owners and businesses.
    - On the "Authorized scopes" screen, select the fields you require access to decrypt.
 
-2. Grab the Onboarding Publishable Key, for example `ob_test_VMooXd04EUlnu3AvMYKjMW`.
+2. Grab the Onboarding Publishable Key, for example `pb_test_VMooXd04EUlnu3AvMYKjMW`.
 
 3. Add the `footprint.js` script to your app.
 
@@ -59,7 +59,7 @@ In order to use our onboarding flows, you can either render a Footprint button, 
 If you would like to use a pre-built Footprint button, below is what your integration would look like for Vanilla HTML:
 
 ```html
-<div data-footprint data-public-key="ob_test_VMooXd04EUlnu3AvMYKjMW"></div>
+<div data-footprint data-public-key="pb_test_VMooXd04EUlnu3AvMYKjMW"></div>
 ```
 
 Make sure to add Footprint completion handlers on the `window` object:
@@ -94,7 +94,7 @@ const Page = () => {
   return (
     <main>
       <FootprintVerifyButton
-        publicKey="ob_test_VMooXd04EUlnu3AvMYKjMW"
+        publicKey="pb_test_VMooXd04EUlnu3AvMYKjMW"
         onComplete={handleComplete}
         onCancel={handleCancel}
       />
@@ -139,7 +139,7 @@ const handleClick = () => {
   <div
     data-footprint
     data-kind="verify-button"
-    data-props='{"publicKey": "ob_test_VMooXd04EUlnu3AvMYKjMW"}'
+    data-props='{"publicKey": "pb_test_VMooXd04EUlnu3AvMYKjMW"}'
   ></div>
 </div>
 ```

@@ -28,7 +28,7 @@ export const playbookDetailsFixture: OnboardingConfig = {
   isDocFirstFlow: false,
   isLive: false,
   isNoPhoneFlow: false,
-  key: 'ob_config_pk_9VSl6Z7Ax9IQRIFkihw4lm',
+  key: 'pb_live_cp5NX9wDbxkldd52hnJuRB',
   kind: OnboardingConfigKind.kyc,
   mustCollectData: [CollectedKycDataOption.name],
   name: 'Test playbook',

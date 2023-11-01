@@ -64,7 +64,7 @@ export const entitiesFixture: Entity[] = [
 export const obConfigsFixture: GetOnboardingConfigsResponse = [
   {
     id: 'ob_config_id_7TU1EGLHwjoioStPuRyWpm',
-    key: 'ob_live_wkkZyAbY92huSqp83SEOzw',
+    key: 'pb_live_wkkZyAbY92huSqp83SEOzw',
     name: 'User ID verification',
     mustCollectData: [
       CollectedKycDataOption.name,

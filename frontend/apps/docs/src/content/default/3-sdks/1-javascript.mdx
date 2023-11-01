@@ -46,7 +46,7 @@ yarn add @onefootprint/footprint-js
 
 This is our onboarding flow that can be rendered in a modal or drawer.
 
-1. Grab the Onboarding Publishable Key, for example, `ob_test_VMooXd04EUlnu3AvMYKjMW`.
+1. Grab the Onboarding Publishable Key, for example, `pb_test_VMooXd04EUlnu3AvMYKjMW`.
 
 2. Import the styles file and embed the component, passing the Publishable Key and the callback functions:
 
@@ -88,7 +88,7 @@ This is our onboarding flow that can be rendered in a modal or drawer.
       <div
         data-footprint
         data-kind="verify"
-        data-props='{"publicKey":"ob_test_WNgSBRR7uxoT8JRDBBflgw"}'
+        data-props='{"publicKey":"pb_test_WNgSBRR7uxoT8JRDBBflgw"}'
       ></div>
     </main>
     <script
@@ -125,7 +125,7 @@ import footprint from '@onefootprint/footprint-js';
   <div
     data-footprint
     data-kind="verify"
-    data-props='{"publicKey":"ob_test_WNgSBRR7uxoT8JRDBBflgw"}'
+    data-props='{"publicKey":"pb_test_WNgSBRR7uxoT8JRDBBflgw"}'
   ></div>
 </template>
 ```
@@ -146,7 +146,7 @@ export default {
     handleClick() {
       const component = footprint.init({
         kind: 'verify',
-        publicKey: 'ob_test_WNgSBRR7uxoT8JRDBBflgw',
+        publicKey: 'pb_test_WNgSBRR7uxoT8JRDBBflgw',
       });
       component.render();
     },
@@ -168,7 +168,7 @@ Footprint provides some events based on some actions performed by the user. To l
 ```typescript
 const component = footprint.init({
   kind: 'verify',
-  publicKey: 'ob_test_WNgSBRR7uxoT8JRDBBflgw',
+  publicKey: 'pb_test_WNgSBRR7uxoT8JRDBBflgw',
   onComplete: validationToken => {
     console.log(validationToken);
   },

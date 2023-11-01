@@ -13,10 +13,10 @@ fn generate_random_id(prefix: &str, length: usize) -> String {
 
 impl ObConfigurationKey {
     /// prefixed on LIVE keys
-    pub const LIVE_PREFIX: &'static str = "ob_live";
+    pub const LIVE_PREFIX: &'static str = "pb_live";
 
     /// prefix on sandbox keys
-    pub const SANDBOX_PREFIX: &'static str = "ob_test";
+    pub const SANDBOX_PREFIX: &'static str = "pb_test";
 
     const LENGTH: usize = 22;
 

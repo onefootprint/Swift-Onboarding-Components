@@ -8,7 +8,7 @@ def test_sdk_args_fail_validation():
     post("/org/sdk_args", {"kind": "verify_v1", "data": {}}, status_code=400)
     post(
         "/org/sdk_args",
-        {"kind": "verify_v1", "data": {"public_key": "ob_test123455"}},
+        {"kind": "verify_v1", "data": {"public_key": "pb_test123455"}},
         status_code=404,
     )
 

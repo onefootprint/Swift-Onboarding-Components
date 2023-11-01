@@ -42,7 +42,7 @@ yarn add @onefootprint/footprint-react
 
 `<FootprintVerifyButton />` is a button that launches our onboarding flow when clicked. The flow can be rendered in a modal or drawer.
 
-1. Grab the Onboarding Publishable Key, for example `ob_test_VMooXd04EUlnu3AvMYKjMW`.
+1. Grab the Onboarding Publishable Key, for example `pb_test_VMooXd04EUlnu3AvMYKjMW`.
 
 2. Import the styles file and embed the Footprint button, passing the Publishable Key and the callback functions:
 
@@ -62,7 +62,7 @@ const Page = () => {
   return (
     <main>
       <FootprintVerifyButton
-        publicKey="ob_test_VMooXd04EUlnu3AvMYKjMW"
+        publicKey="pb_test_VMooXd04EUlnu3AvMYKjMW"
         onComplete={handleComplete}
         onCancel={handleCancel}
       />
@@ -88,7 +88,7 @@ const Page = () => {
   return (
     <main>
       <FootprintVerifyButton
-        publicKey="ob_test_VMooXd04EUlnu3AvMYKjMW"
+        publicKey="pb_test_VMooXd04EUlnu3AvMYKjMW"
         userData={{
           'id.email': 'jane.doe@acme.com',
           'id.phone_number': '+12025550179',
@@ -190,7 +190,7 @@ const Page = () => {
   return (
     <main>
       <FootprintVerifyButton
-        publicKey="ob_test_VMooXd04EUlnu3AvMYKjMW"
+        publicKey="pb_test_VMooXd04EUlnu3AvMYKjMW"
         appearance={appearance}
       />
       <FootprintForm
