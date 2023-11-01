@@ -56,6 +56,8 @@ const Main = styled.main`
     min-height: 100%;
     overflow: auto;
     padding: ${theme.spacing[8]};
+    max-width: 1600px;
+    margin: auto;
   `}
 `;
 
