@@ -34,7 +34,7 @@ const Select = <Option extends SelectOption = SelectOption>({
   options,
   placeholder = 'Select',
   searchPlaceholder,
-  size,
+  size = 'default',
   testID,
   value,
   renderTrigger = ({

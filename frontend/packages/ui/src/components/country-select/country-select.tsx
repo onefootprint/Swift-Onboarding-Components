@@ -37,7 +37,7 @@ const CountrySelect = ({
   onChange,
   options = COUNTRIES,
   placeholder = 'Select',
-  size,
+  size = 'default',
   testID,
   value,
 }: CountrySelectProps) => {
