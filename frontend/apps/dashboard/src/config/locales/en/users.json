@@ -8,9 +8,9 @@
     "search-placeholder": "Search by name, email or phone number...",
     "empty-state": "No users found",
     "header": {
-      "id": "Id",
-      "status": "Onboarding Status",
-      "other": "Other detail",
+      "id": "Footprint ID",
+      "status": "Onboarding status",
+      "other": "Other details",
       "created": "Created"
     },
     "row": {

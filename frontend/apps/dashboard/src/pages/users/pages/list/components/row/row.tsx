@@ -23,12 +23,6 @@ const Row = ({ entity }: RowProps) => (
       />
     </td>
     <td>
-      <Tags
-        onWatchlist={entity.watchlistCheck?.status === 'fail'}
-        onManualReview={entity.requiresManualReview}
-      />
-    </td>
-    <td>
       <Typography
         variant="body-3"
         color="primary"
@@ -46,6 +40,12 @@ const Row = ({ entity }: RowProps) => (
           minute: 'numeric',
         })}
       </Typography>
+    </td>
+    <td>
+      <Tags
+        onWatchlist={entity.watchlistCheck?.status === 'fail'}
+        onManualReview={entity.requiresManualReview}
+      />
     </td>
   </>
 );

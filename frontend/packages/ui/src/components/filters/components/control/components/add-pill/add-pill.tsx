@@ -7,7 +7,7 @@ import Pill from '../pill';
 
 const AddPill = ({ children, onClick, disabled }: PillProps) => (
   <StyledPill onClick={onClick} type="button" disabled={disabled}>
-    <IcoPlusSmall16 color="tertiary" />
+    <IcoPlusSmall16 color={disabled ? 'quaternary' : 'tertiary'} />
     {children}
   </StyledPill>
 );

@@ -1,3 +1,4 @@
+import { EntityStatus } from '@onefootprint/types';
 import last from 'lodash/last';
 import useBaseFilters, {
   getSearchParams,
@@ -7,7 +8,8 @@ import useBaseFilters, {
 import getDateRange from 'src/utils/get-date-range';
 
 export type EntitiesQueryParams = {
-  status?: string | string[];
+  state?: string;
+  verification?: string;
   date_range?: string | string[];
   watchlist_hit?: string;
   search?: string;
@@ -18,7 +20,8 @@ export type EntitiesQueryParams = {
 };
 
 const defaultQueryParams: EntitiesQueryParams = {
-  status: undefined,
+  state: undefined,
+  verification: undefined,
   date_range: undefined,
   search: undefined,
   cursor: undefined,
@@ -29,34 +32,72 @@ const defaultQueryParams: EntitiesQueryParams = {
 
 const useFilters = () => {
   const filters = useBaseFilters<EntitiesQueryParams>(defaultQueryParams);
+
+  const getStatusAndManualReviewParams = (
+    state?: string,
+    verification?: string,
+  ) => {
+    if (!state && !verification) {
+      return {};
+    }
+    if (state === EntityStatus.incomplete) {
+      return {
+        statuses: queryToString([
+          EntityStatus.incomplete,
+          EntityStatus.pending,
+        ]),
+        requiresManualReview: false,
+      };
+    }
+    if (!verification) {
+      return {
+        statuses: queryToString([
+          EntityStatus.pass,
+          EntityStatus.failed,
+          EntityStatus.none,
+        ]),
+        requiresManualReview: false,
+      };
+    }
+    if (verification === EntityStatus.manualReview) {
+      return {
+        statuses: undefined,
+        requiresManualReview: true,
+      };
+    }
+    return {
+      statuses: verification,
+      requiresManualReview: false,
+    };
+  };
+
   const values = {
+    state: filters.query.state,
+    verification: filters.query.verification,
     cursor: queryToArray(filters.query.cursor),
     dateRange: queryToArray(filters.query.date_range),
     pageSize: filters.query.page_size || '15',
     search: filters.query.search,
-    status: queryToArray(filters.query.status),
     watchlist_hit: filters.query.watchlist_hit,
-    requires_manual_review: filters.query.requires_manual_review,
   };
   const { from, to } = getDateRange(values.dateRange);
   const requestParams = {
     cursor: last(values.cursor),
     search: values.search,
     page_size: values.pageSize,
-    statuses: queryToString(values.status),
     timestamp_gte: from,
     timestamp_lte: to,
     watchlist_hit: values.watchlist_hit,
-    requires_manual_review: values.requires_manual_review,
+    ...getStatusAndManualReviewParams(values.state, values.verification),
   };
   const searchParams = getSearchParams({
     cursor: filters.query.cursor,
     dateRange: filters.query.date_range,
     pageSize: filters.query.page_size,
     search: filters.query.search,
-    status: filters.query.status,
     watchlist_hit: filters.query.watchlist_hit,
-    requires_manual_review: filters.query.requires_manual_review,
+    state: filters.query.state,
+    verification: filters.query.verification,
   });
   return {
     ...filters,

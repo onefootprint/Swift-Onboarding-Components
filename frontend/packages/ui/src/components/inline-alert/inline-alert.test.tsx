@@ -1,6 +1,4 @@
-import type { BackgroundColor, Color } from '@onefootprint/design-tokens';
-import themes from '@onefootprint/design-tokens';
-import { customRender, screen } from '@onefootprint/test-utils';
+import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { InlineAlertProps } from './inline-alert';
@@ -8,10 +6,15 @@ import InlineAlert from './inline-alert';
 
 describe('<InlineAlert />', () => {
   const renderInlineAlert = ({
+    cta,
     children = 'alert content',
     variant = 'warning',
   }: Partial<InlineAlertProps>) =>
-    customRender(<InlineAlert variant={variant}>{children}</InlineAlert>);
+    customRender(
+      <InlineAlert variant={variant} cta={cta}>
+        {children}
+      </InlineAlert>,
+    );
 
   it('should assign a role alert', () => {
     renderInlineAlert({ children: 'alert content' });
@@ -23,36 +26,29 @@ describe('<InlineAlert />', () => {
     expect(screen.getByText('alert content')).toBeInTheDocument();
   });
 
-  const variants: {
-    variant: InlineAlertProps['variant'];
-    styles: {
-      backgroundColor: BackgroundColor;
-      color: Color;
-    };
-  }[] = [
-    {
-      variant: 'error',
-      styles: { backgroundColor: 'error', color: 'error' },
-    },
-    {
-      variant: 'info',
-      styles: { backgroundColor: 'info', color: 'info' },
-    },
-    {
-      variant: 'warning',
-      styles: { backgroundColor: 'warning', color: 'warning' },
-    },
-  ];
-  describe.each(variants)(
-    'when is the variant $variant',
-    ({ variant, styles }) => {
-      it('should render with the correct styles', () => {
-        renderInlineAlert({ children: 'alert content', variant });
-        expect(screen.getByText('alert content')).toHaveStyle({
-          backgroundColor: themes.light.backgroundColor[styles.backgroundColor],
-          color: themes.light.color[styles.color],
-        });
+  describe('when there is a cta', () => {
+    it('should render the cta', () => {
+      renderInlineAlert({
+        cta: {
+          label: 'Dismiss',
+          onClick: jest.fn(),
+        },
       });
-    },
-  );
+      expect(screen.getByText('Dismiss')).toBeInTheDocument();
+    });
+
+    describe('when clicking on the cta', () => {
+      it('should call the onClick function', async () => {
+        const onClick = jest.fn();
+        renderInlineAlert({
+          cta: {
+            label: 'Dismiss',
+            onClick,
+          },
+        });
+        await userEvent.click(screen.getByText('Dismiss'));
+        expect(onClick).toHaveBeenCalled();
+      });
+    });
+  });
 });

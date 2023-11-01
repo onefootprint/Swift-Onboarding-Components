@@ -3,6 +3,7 @@ import {
   customRender,
   screen,
   waitFor,
+  within,
 } from '@onefootprint/test-utils';
 import React from 'react';
 import { asAdminUser, resetUser } from 'src/config/tests';
@@ -16,7 +17,7 @@ import {
 
 const useRouterSpy = createUseRouterSpy();
 
-describe.skip('<List />', () => {
+describe('<List />', () => {
   beforeEach(() => {
     asAdminUser();
     useRouterSpy({
@@ -46,6 +47,30 @@ describe.skip('<List />', () => {
     beforeEach(() => {
       withEntities();
     });
+
+    it.each`
+      id                                 | status        | createdAt
+      ${'fp_bid_VXND11zUVRYQKKUxbUN3KD'} | ${'Verified'} | ${'3/27/23, 2:43 PM'}
+      ${'fp_id_tvfUNdGqmk2kJyyka9gX22'}  | ${'Failed'}   | ${'10/19/23, 3:38 AM'}
+    `(
+      'should show the id, onboarding status, created and other details for id=$id, status=$status, createdAt=$createdAt',
+      async ({ id, status, createdAt }) => {
+        await renderListAndWaitData();
+
+        const row = screen.getByRole('row', {
+          name: id,
+        });
+
+        const foundId = within(row).getByText(id);
+        expect(foundId).toBeInTheDocument();
+
+        const foundStatus = within(row).getByText(status);
+        expect(foundStatus).toBeInTheDocument();
+
+        const foundCreatedAt = within(row).getByText(createdAt);
+        expect(foundCreatedAt).toBeInTheDocument();
+      },
+    );
 
     it('should show an empty state if no results are found', async () => {
       withEntities([]);

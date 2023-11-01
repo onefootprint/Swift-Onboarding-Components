@@ -9,10 +9,10 @@ import Row from './components/row';
 const List = () => {
   const { t } = useTranslation('users');
   const columns = [
-    { text: t('table.header.id'), width: '25%' },
-    { text: t('table.header.status'), width: '20%' },
-    { text: t('table.header.other'), width: '42.5%' },
-    { text: t('table.header.created'), width: '15%' },
+    { text: t('table.header.id'), width: '30%' },
+    { text: t('table.header.status'), width: '25%' },
+    { text: t('table.header.created'), width: '25%' },
+    { text: t('table.header.other'), width: '20%' },
   ];
 
   return (

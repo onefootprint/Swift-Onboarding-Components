@@ -27,7 +27,7 @@ const StatusBadge = ({
   return (
     <Stack align="center">
       <Badge variant={badgeVariant} sx={{ whiteSpace: 'nowrap' }}>
-        {t(status)}
+        <span>{t(status)}</span>
         {requiresManualReview && (
           <Stack marginLeft={2}>
             <IcoWarningSmall16 color={badgeVariant} testID="manualReviewIcon" />

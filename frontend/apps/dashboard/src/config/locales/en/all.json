@@ -706,14 +706,17 @@
         }
       },
       "filters": {
+        "kind": {
+          "person": "Users",
+          "business": "Businesses"
+        },
         "status": {
-          "label": "Status",
-          "options": {
-            "verified": "Verified",
-            "failed": "Failed",
-            "incomplete": "Unfinished",
-            "none": "None"
-          }
+          "complete": "Complete",
+          "incomplete": "Incomplete",
+          "pass": "Verified",
+          "failed": "Failed",
+          "none": "None",
+          "manual-review": "Manual review"
         },
         "created": {
           "label": "Created"
@@ -725,12 +728,14 @@
             "no": "No"
           }
         },
-        "requires-manual-review": {
-          "label": "Requires manual review",
-          "options": {
-            "yes": "Yes",
-            "no": "No"
-          }
+        "info": {
+          "cta": "Don't show again",
+          "complete": "{{kind}} in the ’Complete’ state finished the onboarding.",
+          "incomplete": "{{kind}} in the 'Incomplete' state either left without verifying their basic personal data or are still working on it.",
+          "failed": "{{kind}} in the 'Failed' status failed the onboarding.",
+          "pass": "{{kind}} in the 'Verified' status have successfully completed the onboarding.",
+          "none": "{{kind}} in the onboarding status 'None' have only linked their email and phone number to their accounts ",
+          "manual-review": "{{kind}} in the ’Manual review’ onboarding status need your assessment before they can be verified or marked as failed"
         }
       }
     },
@@ -1271,25 +1276,6 @@
         "see-less": "See less"
       }
     },
-    "manual-review": {
-      "page-title": "Footprint | Manual Review",
-      "header": {
-        "title": "Pending manual reviews",
-        "subtitle": "Users that need to be manually reviewed to either be onboarded or able to keep using your service."
-      },
-      "table": {
-        "aria-label": "Manual review table",
-        "empty-state": "No pending manual reviews",
-        "header": {
-          "name": "Name",
-          "token": "Footprint Token",
-          "status": "Status",
-          "email": "Email",
-          "pending-since": "Pending since",
-          "reason": "Reason"
-        }
-      }
-    },
     "home": {
       "page-title": "Footprint | Home",
       "header": {
@@ -1432,29 +1418,6 @@
         },
         "id-documents-and-selfie": {
           "title": "ID documents & Selfie"
-        }
-      }
-    },
-    "businesses": {
-      "page-title": "Footprint | Businesses",
-      "header": {
-        "title": "Businesses"
-      },
-      "table": {
-        "aria-label": "Businesses table",
-        "search-placeholder": "Search by name...",
-        "empty-state": "No businesses found",
-        "header": {
-          "name": "Name",
-          "token": "Footprint Token",
-          "status": "KYB status",
-          "submitted-by": "Submitted by (beneficial owner)",
-          "start": "Date"
-        },
-        "row": {
-          "status": {
-            "on-watchlist": "This business is on a watchlist"
-          }
         }
       }
     },

@@ -51,6 +51,7 @@ const List = ({
 
   return (
     <Provider
+      kind={kind}
       data={response?.data}
       errorMessage={errorMessage}
       initialSearch={filters.query.search}

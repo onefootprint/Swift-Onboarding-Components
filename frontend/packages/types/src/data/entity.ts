@@ -28,11 +28,13 @@ export enum ApiEntityStatus {
 /// status of an entity.
 /// Realistically, all but the `none` status exist on the backend as EntityStatuses
 export enum EntityStatus {
+  complete = 'complete',
   failed = 'fail',
   incomplete = 'incomplete',
   inProgress = 'in_progress',
-  pending = 'pending',
+  manualReview = 'manual_review',
   pass = 'pass',
+  pending = 'pending',
   none = 'none', // Onboarding hasn't started for this vault
 }
 

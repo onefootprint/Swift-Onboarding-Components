@@ -5,7 +5,6 @@ import {
   IcoHome16,
   IcoKey16,
   IcoLayer0116,
-  IcoPencil16,
   IcoSettings16,
   IcoStore16,
   IcoUsers16,
@@ -17,7 +16,7 @@ type Route = {
   items: { href: string; Icon: any; text: string; badgeCount?: number }[];
 };
 
-const useRoutes = (manualReviewCount?: number): Route[] => {
+const useRoutes = (): Route[] => {
   const { t } = useTranslation('components.private-layout.nav');
   const routes = [
     {
@@ -38,12 +37,7 @@ const useRoutes = (manualReviewCount?: number): Route[] => {
           Icon: IcoStore16,
           text: t('businesses'),
         },
-        {
-          href: '/manual-review',
-          Icon: IcoPencil16,
-          text: t('manual-reviews'),
-          badgeCount: manualReviewCount,
-        },
+
         {
           href: '/security-logs',
           Icon: IcoFileText16,

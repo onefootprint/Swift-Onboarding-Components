@@ -12,7 +12,7 @@ const getManualReview = async (authHeaders: AuthHeaders) => {
     method: 'GET',
     url: '/entities',
     headers: authHeaders,
-    params: { requiresManualReview: true },
+    params: { requiresManualReview: true, kind: 'person' },
   });
 
   return response;

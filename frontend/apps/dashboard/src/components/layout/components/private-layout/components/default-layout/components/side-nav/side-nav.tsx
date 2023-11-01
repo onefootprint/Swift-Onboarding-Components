@@ -11,7 +11,6 @@ import useSession from 'src/hooks/use-session';
 
 import NavDropdown from './components/nav-dropdown';
 import NavLink from './components/nav-link';
-import useManualReview from './hooks/use-manual-review';
 import useRoutes from './hooks/use-routes/use-routes';
 import moveTenantToFront from './utils/move-tenant-to-front';
 
@@ -20,8 +19,7 @@ const Nav = () => {
   const { dangerouslyCastedData, logIn } = useSession();
   const assumeRoleMutation = useAssumeAuthRole();
   const showErrorToast = useRequestErrorToast();
-  const manualReviewQuery = useManualReview();
-  const routes = useRoutes(manualReviewQuery.data?.meta.count ?? 0);
+  const routes = useRoutes();
   const tenantsQuery = useAuthRoles(dangerouslyCastedData.auth);
   const currTenantId = dangerouslyCastedData.org.id;
   const userName = `${dangerouslyCastedData.user.firstName} ${dangerouslyCastedData.user.lastName}`;

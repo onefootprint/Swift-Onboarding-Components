@@ -26,7 +26,12 @@ export default {
 const Template: Story<InlineAlertProps> = ({
   children,
   variant,
-}: InlineAlertProps) => <InlineAlert variant={variant}>{children}</InlineAlert>;
+  cta,
+}: InlineAlertProps) => (
+  <InlineAlert cta={cta} variant={variant}>
+    {children}
+  </InlineAlert>
+);
 
 export const Base = Template.bind({});
 Base.args = {
@@ -44,6 +49,16 @@ export const Info = Template.bind({});
 Info.args = {
   children: 'Info message goes here.',
   variant: 'info',
+};
+
+export const WithCta = Template.bind({});
+WithCta.args = {
+  children: 'Info message goes here.',
+  variant: 'info',
+  cta: {
+    label: 'Dismiss',
+    onClick: () => {},
+  },
 };
 
 export const WithLink = Template.bind({});

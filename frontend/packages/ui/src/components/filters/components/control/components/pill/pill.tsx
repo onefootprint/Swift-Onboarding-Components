@@ -28,7 +28,6 @@ const Pill = styled.button<PillProps>`
     border-radius: ${theme.borderRadius.default};
     border-width: ${theme.borderWidth[1]};
     border-style: solid;
-    color: ${theme.color.secondary};
     display: flex;
     display: flex;
     gap: ${theme.spacing[2]};
@@ -39,10 +38,12 @@ const Pill = styled.button<PillProps>`
     &:enabled {
       cursor: pointer;
       background: ${theme.backgroundColor.primary};
+      color: ${theme.color.secondary};
     }
 
     &:disabled {
       background: ${theme.backgroundColor.secondary};
+      color: ${theme.color.quaternary};
     }
 
     @media (hover: hover) {

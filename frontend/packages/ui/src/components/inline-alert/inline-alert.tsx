@@ -4,6 +4,7 @@ import React from 'react';
 import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import useSX from '../../hooks/use-sx';
 import { createFontStyles } from '../../utils/mixins';
+import Box from '../box';
 import Stack from '../stack';
 import type { InlineAlertVariant } from './inline-alert.types';
 import { createVariantStyles, getIconForVariant } from './inline-alert.utils';
@@ -12,9 +13,18 @@ export type InlineAlertProps = {
   children: React.ReactNode;
   variant: InlineAlertVariant;
   sx?: SXStyleProps;
+  cta?: {
+    label: string;
+    onClick: () => void;
+  };
 };
 
-const InlineAlert = ({ children, variant = 'info', sx }: InlineAlertProps) => {
+const InlineAlert = ({
+  cta,
+  children,
+  variant = 'info',
+  sx,
+}: InlineAlertProps) => {
   const IconComponent = getIconForVariant(variant);
   const sxStyles = useSX(sx);
   return (
@@ -22,7 +32,14 @@ const InlineAlert = ({ children, variant = 'info', sx }: InlineAlertProps) => {
       <Stack marginRight={3}>
         <IconComponent color={variant} />
       </Stack>
-      <ContentContainer variant={variant}>{children}</ContentContainer>
+      <ContentContainer variant={variant}>
+        <Box>{children}</Box>
+        {cta && (
+          <button onClick={cta.onClick} type="button">
+            {cta.label}
+          </button>
+        )}
+      </ContentContainer>
     </InlineAlertContainer>
   );
 };
@@ -32,7 +49,9 @@ const ContentContainer = styled.div<{
 }>`
   ${({ variant }) => css`
     ${createVariantStyles(variant)};
-    display: inline-block;
+    display: inline-flex;
+    justify-content: space-between;
+    width: 100%;
   `};
 `;
 
@@ -71,9 +90,11 @@ const InlineAlertContainer = styled.div<{
     }
   `};
 
-  ${({ sx }) => css`
-    ${sx};
-  `}
+  ${({ sx }) =>
+    sx &&
+    css`
+      ${sx};
+    `}
 `;
 
 export default InlineAlert;

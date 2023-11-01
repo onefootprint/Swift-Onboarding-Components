@@ -1,7 +1,8 @@
-import type { Entity } from '@onefootprint/types';
+import type { Entity, EntityKind } from '@onefootprint/types';
 import constate from 'constate';
 
 type UseEntitiesContext = {
+  kind: EntityKind;
   data?: Entity[];
   errorMessage?: string;
   initialSearch?: string;
