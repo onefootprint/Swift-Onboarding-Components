@@ -20,9 +20,10 @@ use db::DbPool;
 use feature_flag::FeatureFlagClient;
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    DecisionIntentId, DecisionIntentKind, DocVData, DocumentRequestId, IdentityDocumentId,
-    IncodeConfigurationId, IncodeEnvironment, IncodeFailureReason, IncodeVerificationSessionKind,
-    IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, ScopedVaultId, TenantId, WorkflowId,
+    DecisionIntentId, DecisionIntentKind, DocVData, DocumentRequestId, DocumentSide, IdDocKind,
+    IdentityDocumentId, IncodeConfigurationId, IncodeEnvironment, IncodeFailureReason,
+    IncodeVerificationSessionKind, IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, ScopedVaultId,
+    TenantId, WorkflowId,
 };
 use selfie_doc::AwsSelfieDocClient;
 
@@ -181,21 +182,7 @@ impl IncodeStateMachine {
         };
 
         // Recover the session session and pick up where we left off
-        let initial_state = match session.state {
-            IncodeVerificationSessionState::AddFront => AddFront::new(),
-            IncodeVerificationSessionState::AddBack => AddBack::new(),
-            IncodeVerificationSessionState::AddConsent => AddConsent::new(),
-            IncodeVerificationSessionState::AddSelfie => AddSelfie::new(),
-            IncodeVerificationSessionState::ProcessId => ProcessId::new(),
-            IncodeVerificationSessionState::ProcessFace => ProcessFace::new(),
-            IncodeVerificationSessionState::FetchScores => FetchScores::new(),
-            IncodeVerificationSessionState::GetOnboardingStatus => GetOnboardingStatus::new(),
-            IncodeVerificationSessionState::Complete => Complete::new(),
-            IncodeVerificationSessionState::Fail => Fail::new(),
-            IncodeVerificationSessionState::StartOnboarding => {
-                return Err(AssertionError("Should have already run StartOnboarding").into())
-            }
-        };
+        let initial_state = IncodeState::try_from(session.state)?;
 
         Ok(Self {
             state: initial_state,
@@ -286,5 +273,157 @@ impl IncodeStateMachine {
             is_sandbox,
         )
         .await
+    }
+}
+
+impl TryFrom<IncodeVerificationSessionState> for IncodeState {
+    type Error = ApiError;
+
+    fn try_from(value: IncodeVerificationSessionState) -> Result<Self, Self::Error> {
+        match value {
+            IncodeVerificationSessionState::AddFront => Ok(AddFront::new()),
+            IncodeVerificationSessionState::AddBack => Ok(AddBack::new()),
+            IncodeVerificationSessionState::AddConsent => Ok(AddConsent::new()),
+            IncodeVerificationSessionState::AddSelfie => Ok(AddSelfie::new()),
+            IncodeVerificationSessionState::ProcessId => Ok(ProcessId::new()),
+            IncodeVerificationSessionState::ProcessFace => Ok(ProcessFace::new()),
+            IncodeVerificationSessionState::FetchScores => Ok(FetchScores::new()),
+            IncodeVerificationSessionState::GetOnboardingStatus => Ok(GetOnboardingStatus::new()),
+            IncodeVerificationSessionState::Complete => Ok(Complete::new()),
+            IncodeVerificationSessionState::Fail => Ok(Fail::new()),
+            IncodeVerificationSessionState::StartOnboarding => {
+                Err(AssertionError("Should have already run StartOnboarding").into())
+            }
+        }
+    }
+}
+
+fn state_ordering(
+    document_type: IdDocKind,
+    kind: IncodeVerificationSessionKind,
+) -> Vec<IncodeVerificationSessionState> {
+    vec![
+        Some(IncodeVerificationSessionState::AddFront),
+        document_type
+            .sides()
+            .contains(&DocumentSide::Back)
+            .then_some(IncodeVerificationSessionState::AddBack),
+        kind.requires_selfie()
+            .then_some(IncodeVerificationSessionState::AddSelfie),
+        Some(IncodeVerificationSessionState::AddConsent),
+        Some(IncodeVerificationSessionState::ProcessId),
+        Some(IncodeVerificationSessionState::GetOnboardingStatus),
+        Some(IncodeVerificationSessionState::FetchScores),
+        Some(IncodeVerificationSessionState::Complete),
+    ]
+    .into_iter()
+    .flatten()
+    .collect()
+}
+
+pub fn next_state(
+    current_state_name: IncodeVerificationSessionState,
+    kind: IncodeVerificationSessionKind,
+    document_type: IdDocKind,
+) -> Option<IncodeState> {
+    let ordering = state_ordering(document_type, kind);
+
+    match ordering.iter().position(|s| *s == current_state_name) {
+        Some(idx) => {
+            let next_idx = idx + 1;
+            if next_idx < ordering.len() {
+                ordering
+                    .get(next_idx)
+                    .cloned()
+                    .and_then(|ivsn| IncodeState::try_from(ivsn).ok())
+            } else {
+                None
+            }
+        }
+        None => None,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use newtypes::{
+        IdDocKind as IDDK, IncodeVerificationSessionKind as IVSK, IncodeVerificationSessionState as IVS,
+    };
+    use test_case::test_case;
+    #[test_case(IVSK::IdDocument, IDDK::DriversLicense => vec![
+        IVS::AddFront,
+        IVS::AddBack,
+        IVS::AddConsent,
+        IVS::ProcessId,
+        IVS::GetOnboardingStatus,
+        IVS::FetchScores,
+        IVS::Complete,
+    ])]
+    #[test_case(IVSK::IdDocument, IDDK::IdCard => vec![
+        IVS::AddFront,
+        IVS::AddBack,
+        IVS::AddConsent,
+        IVS::ProcessId,
+        IVS::GetOnboardingStatus,
+        IVS::FetchScores,
+        IVS::Complete,
+    ])]
+    #[test_case(IVSK::IdDocument, IDDK::Passport => vec![
+        IVS::AddFront,
+        IVS::AddConsent,
+        IVS::ProcessId,
+        IVS::GetOnboardingStatus,
+        IVS::FetchScores,
+        IVS::Complete,
+    ])]
+    #[test_case(IVSK::Selfie, IDDK::DriversLicense => vec![
+        IVS::AddFront,
+        IVS::AddBack,
+        IVS::AddSelfie,
+        IVS::AddConsent,
+        IVS::ProcessId,
+        IVS::GetOnboardingStatus,
+        IVS::FetchScores,
+        IVS::Complete,
+    ])]
+    #[test_case(IVSK::Selfie, IDDK::IdCard => vec![
+        IVS::AddFront,
+        IVS::AddBack,
+        IVS::AddSelfie,
+        IVS::AddConsent,
+        IVS::ProcessId,
+        IVS::GetOnboardingStatus,
+        IVS::FetchScores,
+        IVS::Complete,
+    ])]
+    #[test_case(IVSK::Selfie, IDDK::Passport => vec![
+        IVS::AddFront,
+        IVS::AddSelfie,
+        IVS::AddConsent,
+        IVS::ProcessId,
+        IVS::GetOnboardingStatus,
+        IVS::FetchScores,
+        IVS::Complete,
+    ])]
+    fn test_ordering(session_kind: IVSK, id_doc_kind: IDDK) -> Vec<IVS> {
+        super::state_ordering(id_doc_kind, session_kind)
+    }
+
+    #[test_case(IVSK::Selfie, IDDK::Passport, IVS::AddFront => Some(IVS::AddSelfie))]
+    #[test_case(IVSK::Selfie, IDDK::Passport, IVS::AddConsent => Some(IVS::ProcessId))]
+    #[test_case(IVSK::Selfie, IDDK::Passport, IVS::ProcessId => Some(IVS::GetOnboardingStatus))]
+    #[test_case(IVSK::Selfie, IDDK::Passport, IVS::GetOnboardingStatus => Some(IVS::FetchScores))]
+    #[test_case(IVSK::Selfie, IDDK::Passport, IVS::FetchScores => Some(IVS::Complete))]
+    #[test_case(IVSK::Selfie, IDDK::Passport, IVS::Complete => None)]
+    #[test_case(IVSK::Selfie, IDDK::DriversLicense, IVS::AddFront => Some(IVS::AddBack))]
+    #[test_case(IVSK::IdDocument, IDDK::DriversLicense, IVS::AddFront => Some(IVS::AddBack))]
+    #[test_case(IVSK::IdDocument, IDDK::DriversLicense, IVS::AddBack => Some(IVS::AddConsent))]
+    #[test_case(IVSK::IdDocument, IDDK::DriversLicense, IVS::AddConsent => Some(IVS::ProcessId))]
+    #[test_case(IVSK::IdDocument, IDDK::DriversLicense, IVS::ProcessId => Some(IVS::GetOnboardingStatus))]
+    #[test_case(IVSK::IdDocument, IDDK::DriversLicense, IVS::GetOnboardingStatus => Some(IVS::FetchScores))]
+    #[test_case(IVSK::IdDocument, IDDK::DriversLicense, IVS::FetchScores => Some(IVS::Complete))]
+    #[test_case(IVSK::IdDocument, IDDK::DriversLicense, IVS::Complete => None)]
+    fn test_next_state(session_kind: IVSK, id_doc_kind: IDDK, current_state: IVS) -> Option<IVS> {
+        super::next_state(current_state, session_kind, id_doc_kind).map(|s| s.name())
     }
 }

@@ -1,11 +1,15 @@
 use super::{
+    next_state,
     states::{
         AddBack, AddConsent, AddFront, AddSelfie, Complete, Fail, FetchScores, GetOnboardingStatus,
         ProcessFace, ProcessId, VerificationSession,
     },
     IncodeContext,
 };
-use crate::{errors::ApiResult, vendor_clients::IncodeClients};
+use crate::{
+    errors::{ApiResult, AssertionError},
+    vendor_clients::IncodeClients,
+};
 use async_trait::async_trait;
 use db::{
     models::{
@@ -116,9 +120,16 @@ where
         ctx: IncodeContext,
         session: VerificationSession,
     ) -> ApiResult<(IncodeState, StepResult, IncodeContext, VerificationSession)> {
-        let starting_state = self.into();
+        let starting_state: IncodeState = self.into();
         // we know what we'll transition to, based properties of the session
-        let default_next_state = T::next_state(&session);
+        let default_next_state = next_state(starting_state.name(), session.kind, session.document_type)
+            .ok_or(AssertionError(
+                format!(
+                    "cannot derive next state from current state: {}",
+                    starting_state.name()
+                )
+                .as_str(),
+            ))?;
         let init_state = T::run(db_pool, clients, &ctx, &session).await?;
         let Some(init_state) = init_state else {
             // First, check if the state is ready to run. It's possible we're in a state like
