@@ -27,7 +27,7 @@ const NavigationCloseButton = ({
 
     confirmationDialog.open({
       title: 'Are you sure?',
-      description: 'Leaving this flow will not save your data.',
+      description: 'Closing this will not save your data.',
       primaryButton: {
         label: 'Yes',
         onClick: onClose,
