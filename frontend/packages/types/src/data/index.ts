@@ -122,7 +122,10 @@ export type {
   OnboardingConfig,
   PublicOnboardingConfig,
 } from './onboarding-config';
-export { OnboardingConfigStatus } from './onboarding-config';
+export {
+  OnboardingConfigKind,
+  OnboardingConfigStatus,
+} from './onboarding-config';
 export type { OnboardingDecision } from './onboarding-decision';
 export { default as OnboardingStatus } from './onboarding-status';
 export type { Member } from './org-member';

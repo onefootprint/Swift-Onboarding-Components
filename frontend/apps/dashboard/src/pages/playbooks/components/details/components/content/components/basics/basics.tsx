@@ -6,7 +6,6 @@ import { RoleScopeKind } from '@onefootprint/types';
 import { CodeInline, LinkButton, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import PermissionGate from 'src/components/permission-gate';
-import isKybPlaybook from 'src/pages/playbooks/components/table/components/row/utils/is-kyb-playbook';
 
 import EditName from './components/edit-name';
 
@@ -16,8 +15,6 @@ export type BasicsProps = {
 
 const Basics = ({ playbook }: BasicsProps) => {
   const { t } = useTranslation('pages.playbooks.details.basics');
-  const isKYB = isKybPlaybook(playbook);
-  const kind = isKYB ? 'kyb' : 'kyc';
   const [showForm, setShowForm] = useState(false);
 
   const handleShowForm = () => {
@@ -59,7 +56,9 @@ const Basics = ({ playbook }: BasicsProps) => {
             <Typography variant="body-3" color="tertiary">
               {t('type.label')}
             </Typography>
-            <Typography variant="body-3">{t(`type.${kind}`)}</Typography>
+            <Typography variant="body-3">
+              {t(`type.${playbook.kind}`)}
+            </Typography>
           </Item>
           <Item>
             <Typography variant="body-3" color="tertiary">

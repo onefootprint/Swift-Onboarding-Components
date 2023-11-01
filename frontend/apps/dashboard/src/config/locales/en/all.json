@@ -1914,7 +1914,8 @@
         "row": {
           "type": {
             "kyc": "KYC",
-            "kyb": "KYB"
+            "kyb": "KYB",
+            "auth": "Auth"
           },
           "status": {
             "enabled": "Enabled",
@@ -1939,7 +1940,8 @@
           "type": {
             "label": "Type",
             "kyc": "KYC",
-            "kyb": "KYB"
+            "kyb": "KYB",
+            "auth": "Auth"
           },
           "name": "Playbook name",
           "publishable-key": "Publishable key"
@@ -2586,7 +2588,7 @@
       "loading": "Loading..."
     },
     "dialog-test-onboarding": {
-      "heading": "Test Playbook",
+      "heading": "Test playbook'",
       "title": "One last recommendation:",
       "subtitle": "Test your Playbook to see how it looks and feels",
       "step-1": {
@@ -2599,7 +2601,7 @@
         "title": "See onboarded users' details",
         "subtitle": "When users complete onboardings, they will appear on the 'Users' page. You can select a specific user and decrypt their data afterwards."
       },
-      "cta": "Test Playbook",
+      "cta": "Test playbook'",
       "cancel": "Cancel"
     }
   }

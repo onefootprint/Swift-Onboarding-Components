@@ -8,6 +8,12 @@ export enum OnboardingConfigStatus {
   disabled = 'disabled',
 }
 
+export enum OnboardingConfigKind {
+  kyc = 'kyc',
+  kyb = 'kyb',
+  auth = 'auth',
+}
+
 // Used in the IDV context
 export type PublicOnboardingConfig = {
   name: string;
@@ -42,29 +48,27 @@ export type OnboardingConfig = {
   createdAt: string;
   status: OnboardingConfigStatus;
   appearance?: FootprintAppearance;
-
-  orgName: string;
-  logoUrl: string | null;
-  privacyPolicyUrl: string | null;
-
   mustCollectData: CollectedDataOption[];
   canAccessData: CollectedDataOption[];
   optionalData: CollectedDataOption[];
-  isAppClipEnabled: boolean;
-  appClipExperienceId: string;
-  isInstantAppEnabled: boolean;
   isNoPhoneFlow: boolean;
   allowUsResidents: boolean;
   allowInternationalResidents: boolean;
   internationalCountryRestrictions: null | CountryCode[];
+  allowUsTerritoryResidents: boolean;
   supportedCountries?: CountryCode[];
   isDocFirstFlow: boolean;
   docScanForOptionalSsn?: string;
-
   enhancedAml: {
     enhancedAml: boolean;
     ofac: boolean;
     pep: boolean;
     adverseMedia: boolean;
+  };
+  skipKyc: boolean;
+  kind: OnboardingConfigKind;
+  author: {
+    kind: string;
+    member: string;
   };
 };

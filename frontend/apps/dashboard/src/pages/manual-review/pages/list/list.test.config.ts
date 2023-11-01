@@ -7,6 +7,7 @@ import {
   EntityStatus,
   OnboardingConfigStatus,
 } from '@onefootprint/types';
+import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';
 
 export const entitiesFixture: Entity[] = [
   {
@@ -65,9 +66,6 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
     id: 'ob_config_id_7TU1EGLHwjoioStPuRyWpm',
     key: 'ob_live_wkkZyAbY92huSqp83SEOzw',
     name: 'User ID verification',
-    orgName: 'Acme Inc.',
-    logoUrl: null,
-    privacyPolicyUrl: null,
     mustCollectData: [
       CollectedKycDataOption.name,
       CollectedKycDataOption.email,
@@ -88,20 +86,24 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
     createdAt: '2023-04-11T17:59:54.816474Z',
     status: OnboardingConfigStatus.enabled,
     optionalData: [],
-    isAppClipEnabled: false,
-    isInstantAppEnabled: false,
-    appClipExperienceId: 'app_exp_9KlTyouGLSNKMgJmpUdBAF',
     isNoPhoneFlow: false,
     allowInternationalResidents: false,
     isDocFirstFlow: false,
     allowUsResidents: true,
     internationalCountryRestrictions: null,
+    allowUsTerritoryResidents: false,
+    skipKyc: false,
+    author: {
+      kind: 'organization',
+      member: 'Jane doe',
+    },
     enhancedAml: {
       enhancedAml: false,
       ofac: false,
       pep: false,
       adverseMedia: false,
     },
+    kind: OnboardingConfigKind.kyc,
   },
 ];
 

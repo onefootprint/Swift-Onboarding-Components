@@ -3,37 +3,37 @@ import {
   CollectedKycDataOption,
   OnboardingConfigStatus,
 } from '@onefootprint/types';
+import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';
 
 const onboardingConfigFixture: OnboardingConfig = {
-  id: 'test id',
-  name: 'Lucas Playbook',
-  key: 'ob_config_pk_9VSl6Z7Ax9IQRIFkihw4lm',
-  isLive: false,
-  createdAt: '',
-  appearance: undefined,
-
-  orgName: 'Acme Bank',
-  logoUrl: null,
-  privacyPolicyUrl: null,
-
-  status: OnboardingConfigStatus.enabled,
-  isNoPhoneFlow: false,
-  mustCollectData: [CollectedKycDataOption.name],
-  optionalData: [],
-  canAccessData: [],
-  isAppClipEnabled: false,
-  appClipExperienceId: 'app_exp_9KlTyouGLSNKMgJmpUdBAF',
-  isInstantAppEnabled: false,
-  allowInternationalResidents: false,
-  isDocFirstFlow: false,
-  allowUsResidents: true,
-  internationalCountryRestrictions: null,
-  enhancedAml: {
-    enhancedAml: true,
-    ofac: true,
-    pep: true,
-    adverseMedia: true,
+  author: {
+    kind: 'organization',
+    member: 'Jane doe',
   },
+  allowInternationalResidents: false,
+  allowUsResidents: true,
+  allowUsTerritoryResidents: false,
+  appearance: undefined,
+  canAccessData: [],
+  createdAt: '',
+  enhancedAml: {
+    enhancedAml: false,
+    ofac: false,
+    pep: false,
+    adverseMedia: false,
+  },
+  id: 'ob_config_id_7TU1EGLHwjoioStPuRyWpm',
+  internationalCountryRestrictions: null,
+  isDocFirstFlow: false,
+  isLive: false,
+  isNoPhoneFlow: false,
+  key: 'ob_config_pk_9VSl6Z7Ax9IQRIFkihw4lm',
+  kind: OnboardingConfigKind.kyc,
+  mustCollectData: [CollectedKycDataOption.name],
+  name: 'Test playbook',
+  optionalData: [],
+  skipKyc: false,
+  status: OnboardingConfigStatus.enabled,
 };
 
 export default onboardingConfigFixture;

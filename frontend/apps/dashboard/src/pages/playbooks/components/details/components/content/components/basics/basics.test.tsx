@@ -30,7 +30,7 @@ describe('<InfoSection />', () => {
     expect(screen.getByText('Type')).toBeInTheDocument();
     expect(screen.getByText('KYC')).toBeInTheDocument();
     expect(screen.getByText('Playbook name')).toBeInTheDocument();
-    expect(screen.getByText('Lucas Playbook')).toBeInTheDocument();
+    expect(screen.getByText('Test playbook')).toBeInTheDocument();
     expect(screen.getByText('Publishable key')).toBeInTheDocument();
     expect(
       screen.getByText('ob_config_pk_9VSl6Z7Ax9IQRIFkihw4lm'),

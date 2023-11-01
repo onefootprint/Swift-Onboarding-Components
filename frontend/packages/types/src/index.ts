@@ -341,6 +341,7 @@ export {
   LivenessKind,
   LivenessSource,
   MatchLevel,
+  OnboardingConfigKind,
   OnboardingConfigStatus,
   OnboardingStatus,
   OrganizationSize,

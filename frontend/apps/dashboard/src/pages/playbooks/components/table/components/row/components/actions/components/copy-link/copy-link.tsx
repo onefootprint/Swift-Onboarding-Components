@@ -4,7 +4,6 @@ import type { OnboardingConfig } from '@onefootprint/types';
 import { Box, Button, Dialog, TextInput, Typography } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 
-import isKybPlaybook from '../../../../utils/is-kyb-playbook';
 import getPermanentLink from '../../utils/get-permanent-link';
 
 export type CopyLinkHandler = {
@@ -21,7 +20,6 @@ const CopyLink = forwardRef<CopyLinkHandler, CopyLinkProps>(
     const permanentLink = getPermanentLink(playbook);
     const [showSuccess, setShowSuccess] = useState(false);
 
-    const type = isKybPlaybook(playbook) ? 'kyb' : 'kyc';
     const { t } = useTranslation('pages.playbooks.table.actions.copy-link');
     useImperativeHandle(
       ref,
@@ -55,12 +53,14 @@ const CopyLink = forwardRef<CopyLinkHandler, CopyLinkProps>(
     return (
       <Dialog
         size="compact"
-        title={t(`${type}.title`)}
+        title={t(`${playbook.kind}.title`)}
         open={open}
         onClose={handleClose}
       >
         <Content>
-          <Typography variant="body-2">{t(`${type}.description`)}</Typography>
+          <Typography variant="body-2">
+            {t(`${playbook.kind}.description`)}
+          </Typography>
           <InputContainer>
             <TextInput
               autoFocus

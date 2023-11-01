@@ -3,12 +3,12 @@ import { useIntl, useTranslation } from '@onefootprint/hooks';
 import { IcoArrowTopRight24 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
 import type { OnboardingConfig } from '@onefootprint/types';
+import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';
 import { Badge, CodeInline, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 import useOrgSession from 'src/hooks/use-org-session';
 
 import Actions from './components/actions';
-import isKybPlaybook from './utils/is-kyb-playbook';
 
 export type RowProps = {
   playbook: OnboardingConfig;
@@ -18,7 +18,6 @@ const Row = ({ playbook }: RowProps) => {
   const { t } = useTranslation('pages.playbooks.table.row');
   const { formatDateWithTime } = useIntl();
   const { name, key, status, createdAt } = playbook;
-  const isKyb = isKybPlaybook(playbook);
   const { sandbox } = useOrgSession();
 
   return (
@@ -44,7 +43,11 @@ const Row = ({ playbook }: RowProps) => {
           name
         )}
       </td>
-      <td>{isKyb ? t('type.kyb') : t('type.kyc')}</td>
+      <td>
+        {playbook.kind === OnboardingConfigKind.kyc && t('type.kyc')}
+        {playbook.kind === OnboardingConfigKind.kyb && t('type.kyb')}
+        {playbook.kind === OnboardingConfigKind.auth && t('type.auth')}
+      </td>
       <td>
         <CodeInline truncate>{key}</CodeInline>
       </td>
