@@ -5,12 +5,16 @@ import { Platform } from 'react-native';
 import { OpenFootprint } from './footprint.types';
 import getURL from './utils/create-url';
 
-const getDeepLink = () => {
-  const scheme = 'footprint';
+const getDeepLink = (baseScheme?: string) => {
+  let scheme = 'footprint';
+  if (Platform.OS === 'android' && baseScheme) {
+    scheme = baseScheme;
+  }
   return Platform.OS === 'android' ? `${scheme}://callback/` : `${scheme}://`;
 };
 
 const open = async ({
+  scheme,
   appearance,
   publicKey,
   userData,
@@ -19,7 +23,7 @@ const open = async ({
   options,
   l10n,
 }: OpenFootprint) => {
-  const deepLink = getDeepLink();
+  const deepLink = getDeepLink(scheme);
   const url = getURL({
     publicKey,
     userData,

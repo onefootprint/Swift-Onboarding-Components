@@ -5,8 +5,11 @@ import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 import { OpenFootprint } from './footprint.types';
 import getURL from './utils/create-url';
 
-const getDeepLink = () => {
-  const scheme = 'footprint';
+const getDeepLink = (baseScheme?: string) => {
+  let scheme = 'footprint';
+  if (Platform.OS === 'android' && baseScheme) {
+    scheme = baseScheme;
+  }
   return Platform.OS === 'android' ? `${scheme}://callback/` : `${scheme}://`;
 };
 

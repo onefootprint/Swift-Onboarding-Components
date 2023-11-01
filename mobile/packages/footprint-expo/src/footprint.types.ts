@@ -144,6 +144,7 @@ export type FootprintAppearance = {
 };
 
 export type OpenFootprint = {
+  scheme?: string;
   appearance?: FootprintAppearance;
   onCanceled?: () => void;
   onCompleted?: (validationToken: string) => void;
