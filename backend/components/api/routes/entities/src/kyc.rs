@@ -82,6 +82,14 @@ pub async fn post(
         .db_transaction(move |conn| -> ApiResult<_> {
             let (obc, tenant) = ObConfiguration::get_enabled(conn, &onboarding_config_key)
                 .map_err(|_| DbError::ApiKeyNotFound)?;
+
+            if obc.is_live != is_live {
+                return Err(TenantError::UnsupportedObcForNpv(
+                    "Playbook and vault environment must match.".to_owned(),
+                )
+                .into());
+            }
+
             if tenant.id != tenant_id {
                 Err(DbError::ApiKeyNotFound)?
             }
