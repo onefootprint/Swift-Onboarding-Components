@@ -1,115 +1,123 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDocOutcome, OverallOutcome } from '@onefootprint/types';
-import { Box, Typography } from '@onefootprint/ui';
-import React, { useEffect, useState } from 'react';
+import { Box, Radio, Select, Typography } from '@onefootprint/ui';
+import React, { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import OutcomeSelect from '../outcome-select';
+import useSandboxOutcomeOptions from '../../hooks/use-sandbox-outcome-options';
 
 type OverallOutcomeSelectProps = {
-  shouldShowStepUp: boolean;
-  requiresIdDoc: boolean;
-  onStepUpSelect: () => void;
-  onStepUpDeselect: () => void;
+  config?: PublicOnboardingConfig;
 };
 
-const OverallOutcomeSelect = ({
-  shouldShowStepUp,
-  requiresIdDoc,
-  onStepUpSelect,
-  onStepUpDeselect,
-}: OverallOutcomeSelectProps) => {
+const OverallOutcomeSelect = ({ config }: OverallOutcomeSelectProps) => {
   const { t } = useTranslation('pages.sandbox-outcome.overall-outcome');
+  const {
+    overallOutcomeOptions: {
+      overallOutcomeSuccess,
+      overallOutcomeFail,
+      overallOutcomeManualReview,
+      overallOutcomeStepUp,
+      overallOutcomeDocumentDecision,
+    },
+    idDocOutcomeOptions: {
+      simulatedOutcomeOptions: { idDocOutcomeSuccess },
+    },
+  } = useSandboxOutcomeOptions();
   const { control, watch, setValue } = useFormContext();
   const watchIdDocOutcome = watch('outcomes.idDocOutcome');
   const watchOverallOutcome = watch('outcomes.overallOutcome');
-  const [hint, setHint] = useState('');
+  const requiresIdDoc = !!config?.requiresIdDoc;
+  const shouldShowStepUp = !!config?.isStepupEnabled;
+  const variant = requiresIdDoc ? 'select' : 'radio';
+
+  const options = [
+    overallOutcomeSuccess,
+    overallOutcomeFail,
+    overallOutcomeManualReview,
+  ];
+  if (shouldShowStepUp) options.push(overallOutcomeStepUp);
 
   useEffect(() => {
+    // We change the overall outcome selection to fail if id-doc outcome is selected to be fail
+    // However, if we are showing id-doc outcome because step-up was selected for overall outcome, we keep the overall outcome selection as step-up
     if (
-      watchIdDocOutcome === IdDocOutcome.fail &&
-      watchOverallOutcome !== OverallOutcome.stepUp
+      watchIdDocOutcome?.value === IdDocOutcome.fail &&
+      watchOverallOutcome.value !== OverallOutcome.stepUp
     ) {
-      setValue('outcomes.overallOutcome', OverallOutcome.fail);
-      setHint(t('hint.id-doc-fail'));
+      setValue('outcomes.overallOutcome', overallOutcomeFail);
       return;
     }
+    // We change the overall outcome selection to document-decision if id-doc outcome is selected to be real
+    // However, if we are showing id-doc outcome because step-up was selected for overall outcome, we keep the overall outcome selection as step-up
     if (
-      watchIdDocOutcome === IdDocOutcome.real &&
-      watchOverallOutcome !== OverallOutcome.stepUp
+      watchIdDocOutcome?.value === IdDocOutcome.real &&
+      watchOverallOutcome.value !== OverallOutcome.stepUp
     ) {
-      setValue('outcomes.overallOutcome', OverallOutcome.documentDecision);
-      setHint(t('hint.id-doc-real'));
-      return;
+      setValue('outcomes.overallOutcome', overallOutcomeDocumentDecision);
     }
-    setHint('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setValue, watchIdDocOutcome]);
 
   useEffect(() => {
-    if (watchOverallOutcome === OverallOutcome.stepUp) {
-      onStepUpSelect();
-      if (watchIdDocOutcome === undefined)
-        setValue('outcomes.idDocOutcome', IdDocOutcome.success);
-    } else {
-      onStepUpDeselect();
-      if (!requiresIdDoc) setValue('outcomes.idDocOutcome', undefined);
-    }
+    // This piece of code handles the case when id-doc selector shows up on step up select
+    // We don't do it (show id doc on step up select) yet since BE isn't ready
+    // TODO: update the comment when it's fully implemented
+    if (watchOverallOutcome.value === OverallOutcome.stepUp) {
+      if (watchIdDocOutcome?.value === undefined)
+        setValue('outcomes.idDocOutcome', idDocOutcomeSuccess);
+    } else if (!requiresIdDoc) setValue('outcomes.idDocOutcome', undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setValue, watchIdDocOutcome, watchOverallOutcome]);
 
-  const options = [
-    {
-      title: t('outcome.options.success.title'),
-      value: OverallOutcome.success,
-    },
-    {
-      title: t('outcome.options.manual-review.title'),
-      value: OverallOutcome.manualReview,
-    },
-    {
-      title: t('outcome.options.fail.title'),
-      value: OverallOutcome.fail,
-    },
-  ];
+  const hasValueInOptions = (value: OverallOutcome) =>
+    options.some(option => option.value === value);
 
-  if (shouldShowStepUp) {
-    options.push({
-      title: t('outcome.options.step-up.title'),
-      value: OverallOutcome.stepUp,
-    });
-  }
+  const isDisabled =
+    watchIdDocOutcome?.value === IdDocOutcome.fail ||
+    watchIdDocOutcome?.value === IdDocOutcome.real;
 
   return (
-    <Container>
-      <Typography variant="label-3">{t('title')}</Typography>
+    <Container data-variant={variant}>
+      <Typography variant="label-2">{t('title')}</Typography>
       <Controller
         control={control}
         name="outcomes.overallOutcome"
-        render={({ field }) => (
-          <Box>
-            <OutcomeSelect
-              options={options}
-              value={field.value}
-              onChange={field.onChange}
-              testID="overallOutcomeOption"
-              disabled={
-                watchIdDocOutcome === IdDocOutcome.fail ||
-                watchIdDocOutcome === IdDocOutcome.real
-              }
-            />
-            {hint && (
-              <Typography
-                variant="body-4"
-                color="quaternary"
-                sx={{ marginTop: 3 }}
-              >
-                {hint}
-              </Typography>
-            )}
-          </Box>
-        )}
+        render={({ field }) =>
+          variant === 'select' ? (
+            <Box width="172px">
+              <Select
+                options={options}
+                value={
+                  hasValueInOptions(field.value.value) ? field.value : null
+                }
+                onChange={field.onChange}
+                testID="overallOutcomeOption"
+                disabled={isDisabled}
+                placeholder="-"
+                size="compact"
+              />
+            </Box>
+          ) : (
+            <>
+              {options.map(option => (
+                <Radio
+                  key={option.value}
+                  label={option.label}
+                  value={option.value}
+                  testID={`overallOutcomeRadioOption-${option.value}`}
+                  onChange={() => {
+                    setValue('outcomes.overallOutcome', option);
+                  }}
+                  checked={watchOverallOutcome.value === option.value}
+                  disabled={isDisabled}
+                />
+              ))}
+            </>
+          )
+        }
       />
     </Container>
   );
@@ -119,7 +127,18 @@ const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[4]};
+
+    &[data-variant='select'] {
+      flex-direction: row;
+      justify-content: space-between;
+      gap: ${theme.spacing[3]};
+      align-items: center;
+    }
+
+    &[data-variant='radio'] {
+      flex-direction: column;
+      gap: ${theme.spacing[4]};
+    }
   `}
 `;
 

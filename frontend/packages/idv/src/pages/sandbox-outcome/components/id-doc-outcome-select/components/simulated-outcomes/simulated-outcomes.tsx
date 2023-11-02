@@ -1,11 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoInfo16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { IdDocOutcome } from '@onefootprint/types';
-import { Box, Radio } from '@onefootprint/ui';
+import { Box, Radio, Select, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import OutcomeSelect from '../../../outcome-select';
+import useSandboxOutcomeOptions from '../../../../hooks/use-sandbox-outcome-options';
 
 type SimulatedOutcomesProps = {
   onSelect: () => void;
@@ -19,57 +19,97 @@ const SimulatedOutcomes = ({
   allowRealOutcome,
 }: SimulatedOutcomesProps) => {
   const { t } = useTranslation('pages.sandbox-outcome.id-doc-outcome');
-  const { control } = useFormContext();
+  const {
+    overallOutcomeOptions: { overallOutcomeSuccess },
+    idDocOutcomeOptions: {
+      simulatedOutcomeOptions: { idDocOutcomeSuccess, idDocOutcomeFail },
+    },
+  } = useSandboxOutcomeOptions();
+  const { control, setValue, watch } = useFormContext();
+  const watchIdDocOutcome = watch('outcomes.idDocOutcome');
+
+  const options = [idDocOutcomeSuccess, idDocOutcomeFail];
+
+  const handleOutcomeTypeChange = () => {
+    onSelect();
+    if (!isSelected) {
+      setValue('outcomes.idDocOutcome', idDocOutcomeSuccess);
+      setValue('outcomes.overallOutcome', overallOutcomeSuccess);
+    }
+  };
 
   return (
     <Container>
-      {allowRealOutcome && (
-        <Controller
-          control={control}
-          name="outcomes.idDocOutcome"
-          render={({ field }) => (
-            <Radio
-              label={t('simulated-outcome.title')}
-              value="simulated"
-              onChange={() => {
-                onSelect();
-                field.onChange(IdDocOutcome.success);
-              }}
-              checked={isSelected}
+      {allowRealOutcome ? (
+        <>
+          <Box display="flex" gap={2} sx={{ alignItems: 'center' }}>
+            <Controller
+              control={control}
+              name="outcomes.idDocOutcome"
+              render={() => (
+                <Radio
+                  label={t('simulated-outcome.title')}
+                  onChange={handleOutcomeTypeChange}
+                  checked={isSelected}
+                />
+              )}
             />
-          )}
-        />
-      )}
-
-      <Controller
-        control={control}
-        name="outcomes.idDocOutcome"
-        render={({ field }) => (
-          <Box marginLeft={allowRealOutcome ? 7 : 0} paddingLeft={2}>
-            <OutcomeSelect
-              options={[
-                {
-                  title: t('simulated-outcome.options.success.title'),
-                  value: IdDocOutcome.success,
-                },
-                {
-                  title: t('simulated-outcome.options.fail.title'),
-                  value: IdDocOutcome.fail,
-                },
-              ]}
-              disabled={!isSelected}
-              value={field.value}
-              onChange={field.onChange}
-              testID="simulatedOutcomeOptions"
-            />
+            <Tooltip
+              text={t('simulated-outcome.description')}
+              alignment="start"
+              position="top"
+            >
+              <IcoInfo16 />
+            </Tooltip>
           </Box>
-        )}
-      />
+          <Controller
+            control={control}
+            name="outcomes.idDocOutcome"
+            render={({ field }) => (
+              <Box width="172px">
+                <Select
+                  options={options}
+                  disabled={!isSelected}
+                  value={isSelected ? field.value : null}
+                  onChange={field.onChange}
+                  testID="simulatedOutcomeOptions"
+                  placeholder="-"
+                  size="compact"
+                />
+              </Box>
+            )}
+          />
+        </>
+      ) : (
+        <RadioOptionsConatiner data-testid="simulatedOutcomeOptions">
+          {options.map(option => (
+            <Radio
+              key={option.value}
+              label={option.label}
+              value={option.value}
+              testID={`overallOutcomeRadioOption-${option.value}`}
+              onChange={() => {
+                setValue('outcomes.idDocOutcome', option);
+              }}
+              checked={watchIdDocOutcome.value === option.value}
+            />
+          ))}
+        </RadioOptionsConatiner>
+      )}
     </Container>
   );
 };
 
 const Container = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    gap: ${theme.spacing[3]};
+    align-items: center;
+  `}
+`;
+
+const RadioOptionsConatiner = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;

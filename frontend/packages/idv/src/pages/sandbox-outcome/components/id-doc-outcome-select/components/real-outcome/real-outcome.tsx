@@ -1,9 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoInfo16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { IdDocOutcome } from '@onefootprint/types';
-import { Radio, Typography } from '@onefootprint/ui';
+import { Radio, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+
+import useSandboxOutcomeOptions from '../../../../hooks/use-sandbox-outcome-options';
 
 type RealOutcomeProps = {
   onSelect: () => void;
@@ -12,32 +14,37 @@ type RealOutcomeProps = {
 
 const RealOutcome = ({ onSelect, isSelected }: RealOutcomeProps) => {
   const { t } = useTranslation('pages.sandbox-outcome.id-doc-outcome');
-  const { control } = useFormContext();
+  const {
+    idDocOutcomeOptions: { idDocOutcomeReal },
+  } = useSandboxOutcomeOptions();
+  const { control, setValue } = useFormContext();
+
+  const onChange = () => {
+    onSelect();
+    if (!isSelected) setValue('outcomes.idDocOutcome', idDocOutcomeReal);
+  };
 
   return (
     <Container>
       <Controller
         control={control}
         name="outcomes.idDocOutcome"
-        render={({ field }) => (
+        render={() => (
           <Radio
-            label={t('real-outcome.title')}
-            value={IdDocOutcome.real}
-            onChange={ev => {
-              onSelect();
-              field.onChange(ev);
-            }}
+            label={idDocOutcomeReal.label}
+            value={idDocOutcomeReal}
+            onChange={onChange}
             checked={isSelected}
           />
         )}
       />
-      <Typography
-        variant="body-3"
-        color="tertiary"
-        sx={{ marginLeft: 7, paddingLeft: 2 }}
+      <Tooltip
+        text={t('real-outcome.description')}
+        alignment="start"
+        position="top"
       >
-        {t('real-outcome.description')}
-      </Typography>
+        <IcoInfo16 />
+      </Tooltip>
     </Container>
   );
 };
@@ -45,7 +52,6 @@ const RealOutcome = ({ onSelect, isSelected }: RealOutcomeProps) => {
 const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
-    flex-direction: column;
     gap: ${theme.spacing[2]};
   `}
 `;

@@ -37,31 +37,33 @@
               "title": "Fail"
             },
             "step-up": {
-              "title": "Step up"
+              "title": "Step up",
+              "description": "Users will upload ID photos if not initially required by the configuration."
+            },
+            "document-decision": {
+              "title": "ID Doc Decision"
             }
           }
-        },
-        "hint": {
-          "id-doc-fail": "Failing Photo ID verification will force this outcome to fail as well.",
-          "id-doc-real": "Outcome will be determined based on the the Photo ID decision."
         }
       },
       "id-doc-outcome": {
-        "title": "Photo ID",
+        "title": "ID doc images",
         "simulated-outcome": {
           "title": "Simulated outcome",
+          "description": "Mocked outcome independent of the uploaded image",
           "options": {
             "success": {
               "title": "Success"
             },
             "fail": {
-              "title": "Fail"
+              "title": "Fail",
+              "description": "General outcome will fail if ID-doc image fails."
             }
           }
         },
         "real-outcome": {
           "title": "Real outcome",
-          "description": "The result will be the one our provider, Incode, responds with after submitting the images."
+          "description": "We'll run uploaded images through the same processor used in production and outcomes will reflect the real response."
         }
       },
       "test-id": {

@@ -18,8 +18,8 @@ const SandboxOutcome = () => {
       type: 'sandboxOutcomeSubmitted',
       payload: {
         sandboxId: testID,
-        idDocOutcome,
-        overallOutcome,
+        idDocOutcome: idDocOutcome?.value,
+        overallOutcome: overallOutcome.value,
       },
     });
   };

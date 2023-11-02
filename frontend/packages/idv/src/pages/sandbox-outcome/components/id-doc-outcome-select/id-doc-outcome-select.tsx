@@ -20,7 +20,7 @@ const IdDocOutcomeSelect = ({ allowRealOutcome }: IdDocOutcomeSelectProps) => {
 
   return (
     <Container>
-      <Typography variant="label-3">{t('title')}</Typography>
+      <Typography variant="label-2">{t('title')}</Typography>
       <OutcomesContainer>
         <SimulatedOutcomes
           onSelect={outcomeTypeChange}

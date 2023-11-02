@@ -51,7 +51,7 @@ const TestIdInput = () => {
   return (
     <InputContainer>
       <InputTitle>
-        <Typography variant="label-3">{t('test-id.label')}</Typography>
+        <Typography variant="label-2">{t('test-id.label')}</Typography>
         <Tooltip
           text={t('test-id.description')}
           alignment="start"

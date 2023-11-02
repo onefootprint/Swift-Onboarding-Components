@@ -1,8 +1,11 @@
 import { Layout } from '@onefootprint/idv-elements';
 import {
   customRender,
+  fireEvent,
   screen,
+  selectEvents,
   userEvent,
+  waitFor,
   within,
 } from '@onefootprint/test-utils';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
@@ -40,18 +43,20 @@ const getOnboardingConfig = (
   canMakeRealDocScanCallsInSandbox,
 });
 
-let submittedFormData: SandboxOutcomeFormData = {
+let submittedFormData = {
   testID: '',
-  outcomes: {
-    overallOutcome: OverallOutcome.fail,
-    idDocOutcome: IdDocOutcome.fail,
-  },
+  overallOutcome: OverallOutcome.fail,
+  idDocOutcome: IdDocOutcome.fail,
 };
 
 const mockHandleFormSubmit = jest
   .fn()
   .mockImplementation((formData: SandboxOutcomeFormData) => {
-    submittedFormData = formData;
+    submittedFormData = {
+      testID: formData.testID,
+      overallOutcome: formData.outcomes.overallOutcome.value,
+      idDocOutcome: formData.outcomes.idDocOutcome.value,
+    };
   });
 
 const SandboxOutcomeWrapper = ({
@@ -88,21 +93,24 @@ const renderSandbox = ({
 
 describe('<SandboxOutcome/>', () => {
   describe('contains all the initial elements', () => {
-    it('with id doc case:', () => {
+    it('with id doc case:', async () => {
       renderSandbox({ requiresIdDoc: true });
 
       const overallOutcomeOption = screen.getByTestId('overallOutcomeOption');
       expect(overallOutcomeOption).toBeInTheDocument();
 
       const overallSuccessOption =
-        within(overallOutcomeOption).getByLabelText('Success');
-      const overallManualReviewOption =
-        within(overallOutcomeOption).getByLabelText('Manual review');
-      const overallFailOption =
-        within(overallOutcomeOption).getByLabelText('Fail');
+        within(overallOutcomeOption).getByText('Success');
       expect(overallSuccessOption).toBeInTheDocument();
-      expect(overallManualReviewOption).toBeInTheDocument();
+      let trigger = within(overallOutcomeOption).getByRole('button', {
+        name: 'Success',
+      });
+      await selectEvents.openMenu(trigger);
+      const overallFailOption = within(overallOutcomeOption).getByText('Fail');
+      const overallManualReviewOption =
+        within(overallOutcomeOption).getByText('Manual review');
       expect(overallFailOption).toBeInTheDocument();
+      expect(overallManualReviewOption).toBeInTheDocument();
 
       const simulateOutcomeRadioOption =
         screen.getByLabelText('Simulated outcome');
@@ -113,14 +121,18 @@ describe('<SandboxOutcome/>', () => {
       );
       expect(sandboxSimulatedOutcomes).toBeInTheDocument();
 
-      const simulatedSuccessOption = within(
-        sandboxSimulatedOutcomes,
-      ).getByLabelText('Success');
-      const simulatedFailOption = within(
-        sandboxSimulatedOutcomes,
-      ).getByLabelText('Fail');
+      const simulatedSuccessOption = within(sandboxSimulatedOutcomes).getByText(
+        'Success',
+      );
       expect(simulatedSuccessOption).toBeInTheDocument();
-      expect(simulatedFailOption).toBeInTheDocument();
+      trigger = within(sandboxSimulatedOutcomes).getByRole('button', {
+        name: 'Success',
+      });
+      await selectEvents.openMenu(trigger);
+      const idDocFailOption = within(sandboxSimulatedOutcomes).getByText(
+        'Fail',
+      );
+      expect(idDocFailOption).toBeInTheDocument();
 
       const realOutcomeOption = screen.getByLabelText('Real outcome');
       expect(realOutcomeOption).toBeInTheDocument();
@@ -147,15 +159,15 @@ describe('<SandboxOutcome/>', () => {
     it('without id doc case:', () => {
       renderSandbox({ requiresIdDoc: false });
 
-      const overallOutcomeOption = screen.getByTestId('overallOutcomeOption');
-      expect(overallOutcomeOption).toBeInTheDocument();
-
-      const overallSuccessOption =
-        within(overallOutcomeOption).getByLabelText('Success');
-      const overallManualReviewOption =
-        within(overallOutcomeOption).getByLabelText('Manual review');
-      const overallFailOption =
-        within(overallOutcomeOption).getByLabelText('Fail');
+      const overallSuccessOption = screen.getByTestId(
+        'overallOutcomeRadioOption-pass',
+      );
+      const overallManualReviewOption = screen.getByTestId(
+        'overallOutcomeRadioOption-manual_review',
+      );
+      const overallFailOption = screen.getByTestId(
+        'overallOutcomeRadioOption-fail',
+      );
       expect(overallSuccessOption).toBeInTheDocument();
       expect(overallManualReviewOption).toBeInTheDocument();
       expect(overallFailOption).toBeInTheDocument();
@@ -210,15 +222,15 @@ describe('<SandboxOutcome/>', () => {
 
     const overallOutcomeOption = screen.getByTestId('overallOutcomeOption');
     const overallSuccessOption =
-      within(overallOutcomeOption).getByLabelText('Success');
+      within(overallOutcomeOption).getByText('Success');
     const overallManualReviewOption =
-      within(overallOutcomeOption).getByLabelText('Manual review');
+      within(overallOutcomeOption).queryAllByText('Manual review');
     const overallFailOption =
-      within(overallOutcomeOption).getByLabelText('Fail');
+      within(overallOutcomeOption).queryAllByText('Fail');
 
-    expect((overallSuccessOption as any).selected).toBeTruthy();
-    expect((overallManualReviewOption as any).selected).toBeFalsy();
-    expect((overallFailOption as any).selected).toBeFalsy();
+    expect(overallSuccessOption).toBeInTheDocument();
+    expect(overallManualReviewOption).toHaveLength(0);
+    expect(overallFailOption).toHaveLength(0);
 
     const simulateOutcomeRadioOption =
       screen.getByLabelText('Simulated outcome');
@@ -229,14 +241,14 @@ describe('<SandboxOutcome/>', () => {
     const sandboxSimulatedOutcomes = screen.getByTestId(
       'simulatedOutcomeOptions',
     );
-    const simulatedSuccessOption = within(
-      sandboxSimulatedOutcomes,
-    ).getByLabelText('Success');
-    const simulatedFailOption = within(sandboxSimulatedOutcomes).getByLabelText(
+    const simulatedSuccessOption = within(sandboxSimulatedOutcomes).getByText(
+      'Success',
+    );
+    const simulatedFailOption = within(sandboxSimulatedOutcomes).queryAllByText(
       'Fail',
     );
-    expect((simulatedSuccessOption as any).selected).toBeTruthy();
-    expect((simulatedFailOption as any).selected).toBeFalsy();
+    expect(simulatedSuccessOption).toBeInTheDocument();
+    expect(simulatedFailOption).toHaveLength(0);
 
     const realOutcomeOption = screen.getByLabelText('Real outcome');
     expect((realOutcomeOption as HTMLInputElement).checked).toBeFalsy();
@@ -249,35 +261,47 @@ describe('<SandboxOutcome/>', () => {
       const continueButton = screen.getByText('Continue');
       const overallOutcomeOption = screen.getByTestId('overallOutcomeOption');
       const overallSuccessOption =
-        within(overallOutcomeOption).getByLabelText('Success');
+        within(overallOutcomeOption).getByText('Success');
+      let overallManualReviewOptions =
+        within(overallOutcomeOption).queryAllByText('Manual review');
+      const overallFailOptions =
+        within(overallOutcomeOption).queryAllByText('Fail');
+
+      expect(overallSuccessOption).toBeInTheDocument();
+      expect(overallManualReviewOptions).toHaveLength(0);
+      expect(overallFailOptions).toHaveLength(0);
+
+      await userEvent.click(continueButton);
+      expect(submittedFormData.overallOutcome).toEqual('pass');
+
+      let trigger = within(overallOutcomeOption).getByRole('button', {
+        name: 'Success',
+      });
+      await selectEvents.openMenu(trigger);
       const overallManualReviewOption =
-        within(overallOutcomeOption).getByLabelText('Manual review');
-      const overallFailOption =
-        within(overallOutcomeOption).getByLabelText('Fail');
-      expect((overallSuccessOption as any).selected).toBeTruthy();
-      expect((overallManualReviewOption as any).selected).toBeFalsy();
-      expect((overallFailOption as any).selected).toBeFalsy();
-
+        within(overallOutcomeOption).getByText('Manual review');
+      fireEvent.click(overallManualReviewOption);
+      await waitFor(() => {
+        const overallSuccessOptions =
+          within(overallOutcomeOption).queryAllByText('Success');
+        expect(overallSuccessOptions).toHaveLength(0);
+      });
       await userEvent.click(continueButton);
-      expect(submittedFormData.outcomes.overallOutcome).toEqual('pass');
+      expect(submittedFormData.overallOutcome).toEqual('manual_review');
 
-      await userEvent.click(overallManualReviewOption);
-      expect((overallSuccessOption as any).selected).toBeFalsy();
-      expect((overallManualReviewOption as any).selected).toBeTruthy();
-      expect((overallFailOption as any).selected).toBeFalsy();
-
+      trigger = within(overallOutcomeOption).getByRole('button', {
+        name: 'Manual review',
+      });
+      await selectEvents.openMenu(trigger);
+      const overallFailOption = within(overallOutcomeOption).getByText('Fail');
+      fireEvent.click(overallFailOption);
+      await waitFor(() => {
+        overallManualReviewOptions =
+          within(overallOutcomeOption).queryAllByText('Manual review');
+        expect(overallManualReviewOptions).toHaveLength(0);
+      });
       await userEvent.click(continueButton);
-      expect(submittedFormData.outcomes.overallOutcome).toEqual(
-        'manual_review',
-      );
-
-      await userEvent.click(overallFailOption);
-      expect((overallSuccessOption as any).selected).toBeFalsy();
-      expect((overallManualReviewOption as any).selected).toBeFalsy();
-      expect((overallFailOption as any).selected).toBeTruthy();
-
-      await userEvent.click(continueButton);
-      expect(submittedFormData.outcomes.overallOutcome).toEqual('fail');
+      expect(submittedFormData.overallOutcome).toEqual('fail');
     });
 
     it('Can change the sandbox outcome options', async () => {
@@ -289,99 +313,105 @@ describe('<SandboxOutcome/>', () => {
       expect(
         (simulateOutcomeRadioOption as HTMLInputElement).checked,
       ).toBeTruthy();
+      await userEvent.click(continueButton);
+      expect(submittedFormData.idDocOutcome).toEqual('pass');
 
       const sandboxSimulatedOutcomes = screen.getByTestId(
         'simulatedOutcomeOptions',
       );
-      const simulatedSuccessOption = within(
-        sandboxSimulatedOutcomes,
-      ).getByLabelText('Success');
-      const simulatedFailOption = within(
-        sandboxSimulatedOutcomes,
-      ).getByLabelText('Fail');
+      const trigger = within(sandboxSimulatedOutcomes).getByRole('button', {
+        name: 'Success',
+      });
+      await selectEvents.openMenu(trigger);
+      const idDocFailOption = within(sandboxSimulatedOutcomes).getByText(
+        'Fail',
+      );
+      fireEvent.click(idDocFailOption);
+      await waitFor(() => {
+        const idDocSuccessOptions = within(
+          sandboxSimulatedOutcomes,
+        ).queryAllByText('Success');
+        expect(idDocSuccessOptions).toHaveLength(0);
+      });
+      await userEvent.click(continueButton);
+      expect(submittedFormData.idDocOutcome).toEqual('fail');
+
       const realOutcomeOption = screen.getByLabelText('Real outcome');
-      await userEvent.click(continueButton);
-      expect(submittedFormData.outcomes.idDocOutcome).toEqual('pass');
-
-      await userEvent.click(simulatedFailOption);
-      expect((simulatedSuccessOption as any).selected).toBeFalsy();
-      expect((simulatedFailOption as any).selected).toBeTruthy();
-      expect((realOutcomeOption as HTMLInputElement).checked).toBeFalsy();
-
-      await userEvent.click(continueButton);
-      expect(submittedFormData.outcomes.idDocOutcome).toEqual('fail');
-
       await userEvent.click(realOutcomeOption);
       expect((realOutcomeOption as HTMLInputElement).checked).toBeTruthy();
       expect(
         (simulateOutcomeRadioOption as HTMLInputElement).checked,
       ).toBeFalsy();
-      expect((simulatedSuccessOption as any).disabled).toBeTruthy();
-      expect((simulatedFailOption as any).disabled).toBeTruthy();
-
+      expect(
+        (
+          within(sandboxSimulatedOutcomes).getByRole('button', {
+            name: '-',
+          }) as HTMLButtonElement
+        ).disabled,
+      ).toBeTruthy();
       await userEvent.click(continueButton);
-      expect(submittedFormData.outcomes.idDocOutcome).toEqual('real');
+      expect(submittedFormData.idDocOutcome).toEqual('real');
 
       await userEvent.click(simulateOutcomeRadioOption); // everything goes back to prev state when simulated outcome radio button is clicked again
-      expect((simulatedSuccessOption as any).selected).toBeTruthy();
-      expect((simulatedFailOption as any).selected).toBeFalsy();
       expect((realOutcomeOption as HTMLInputElement).checked).toBeFalsy();
-
+      const idDocSuccessOption = within(sandboxSimulatedOutcomes).getByText(
+        'Success',
+      );
+      expect(idDocSuccessOption).toBeInTheDocument();
       await userEvent.click(continueButton);
-      expect(submittedFormData.outcomes.idDocOutcome).toEqual('pass');
+      expect(submittedFormData.idDocOutcome).toEqual('pass');
     });
 
     it('Overall outcome is disabled and set to failed when sandbox outcome is selected to be failed', async () => {
       renderSandbox({ requiresIdDoc: true });
 
       const overallOutcomeOption = screen.getByTestId('overallOutcomeOption');
-      const overallSuccessOption =
-        within(overallOutcomeOption).getByLabelText('Success');
-      const overallManualReviewOption =
-        within(overallOutcomeOption).getByLabelText('Manual review');
-      const overallFailOption =
-        within(overallOutcomeOption).getByLabelText('Fail');
-
       const continueButton = screen.getByText('Continue');
       const sandboxSimulatedOutcomes = screen.getByTestId(
         'simulatedOutcomeOptions',
       );
-      const simulatedFailOption = within(
-        sandboxSimulatedOutcomes,
-      ).getByLabelText('Fail');
+      const trigger = within(sandboxSimulatedOutcomes).getByRole('button', {
+        name: 'Success',
+      });
+      await selectEvents.openMenu(trigger);
+      const idDocFailOption = within(sandboxSimulatedOutcomes).getByText(
+        'Fail',
+      );
+      fireEvent.click(idDocFailOption);
+      await waitFor(() => {
+        const idDocSuccessOptions = within(
+          sandboxSimulatedOutcomes,
+        ).queryAllByText('Success');
+        expect(idDocSuccessOptions).toHaveLength(0);
+      });
 
-      await userEvent.click(simulatedFailOption);
-      expect((overallSuccessOption as any).disabled).toBeTruthy();
-      expect((overallManualReviewOption as any).disabled).toBeTruthy();
-      expect((overallFailOption as any).disabled).toBeTruthy();
+      expect(
+        (
+          within(overallOutcomeOption).getByRole('button', {
+            name: 'Fail',
+          }) as HTMLButtonElement
+        ).disabled,
+      ).toBeTruthy();
 
       await userEvent.click(continueButton);
-      expect(submittedFormData.outcomes.overallOutcome).toEqual('fail');
+      expect(submittedFormData.overallOutcome).toEqual('fail');
     });
 
     it('Overall outcome is disabled and set to document_decisions when sandbox outcome is selected to be real', async () => {
       renderSandbox({ requiresIdDoc: true });
-
       const overallOutcomeOption = screen.getByTestId('overallOutcomeOption');
-      const overallSuccessOption =
-        within(overallOutcomeOption).getByLabelText('Success');
-      const overallManualReviewOption =
-        within(overallOutcomeOption).getByLabelText('Manual review');
-      const overallFailOption =
-        within(overallOutcomeOption).getByLabelText('Fail');
-
       const continueButton = screen.getByText('Continue');
       const realOutcomeOption = screen.getByLabelText('Real outcome');
-
       await userEvent.click(realOutcomeOption);
-      expect((overallSuccessOption as any).disabled).toBeTruthy();
-      expect((overallManualReviewOption as any).disabled).toBeTruthy();
-      expect((overallFailOption as any).disabled).toBeTruthy();
-
+      expect(
+        (
+          within(overallOutcomeOption).getByRole('button', {
+            name: '-',
+          }) as HTMLButtonElement
+        ).disabled,
+      ).toBeTruthy();
       await userEvent.click(continueButton);
-      expect(submittedFormData.outcomes.overallOutcome).toEqual(
-        'document_decision',
-      );
+      expect(submittedFormData.overallOutcome).toEqual('document_decision');
     });
   });
 
