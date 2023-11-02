@@ -305,7 +305,7 @@ pub async fn maybe_generate_ocr_reason_codes(
     let Some(fetch_ocr) = vendor_map.get(&IncodeFetchOCR) else {
         return Ok(None);
     };
-    let Some(vres) = vendor_result_id_map.get(&IncodeFetchOCR) else{
+    let Some(vres) = vendor_result_id_map.get(&IncodeFetchOCR) else {
         return Ok(None);
     };
 

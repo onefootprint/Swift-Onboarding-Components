@@ -455,23 +455,12 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                     .map(|r| (r, VendorAPI::IncodeWatchlistCheck, vres.id.clone()))
                     .collect::<Vec<_>>()
             }
-            Either::Right((vres, fixture_decision)) => match fixture_decision.0 {
-                // For Alpaca sandbox fixtures, we treat "#fail" as meaning there was a watchlist hit. If we stepup (or pass), we don't simulate watchlist hits
-                DecisionStatus::StepUp | DecisionStatus::Pass => vec![],
-                DecisionStatus::Fail => vec![
-                    // TODO: probably does make sense to just parse these instead from the dummy vres
-                    (
-                        FootprintReasonCode::WatchlistHitOfac,
-                        VendorAPI::IncodeWatchlistCheck,
-                        vres.id.clone(),
-                    ),
-                    (
-                        FootprintReasonCode::AdverseMediaHit,
-                        VendorAPI::IncodeWatchlistCheck,
-                        vres.id.clone(),
-                    ),
-                ],
-            },
+            Either::Right((vres, fixture_decision)) => {
+                decision::sandbox::get_fixture_aml_reason_codes(fixture_decision, &obc)
+                    .into_iter()
+                    .map(|(r, v)| (r, v, vres.id.clone()))
+                    .collect()
+            }
         };
 
         // write reason codes from Incode watchlist/am

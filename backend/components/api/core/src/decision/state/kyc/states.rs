@@ -12,8 +12,7 @@ use db::models::{
 use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
-    EnhancedAmlOption, KycConfig, Locked, OnboardingStatus, RiskSignalGroupKind, VaultKind,
-    VerificationResultId,
+    EnhancedAmlOption, KycConfig, Locked, OnboardingStatus, RiskSignalGroupKind, VerificationResultId,
 };
 
 use super::{
@@ -22,7 +21,8 @@ use super::{
 use crate::decision::{
     features::risk_signals::{
         create_risk_signals_from_vendor_results, fetch_latest_risk_signals_map,
-        risk_signal_group_struct::Kyc, save_risk_signals, RiskSignalGroupStruct,
+        risk_signal_group_struct::{Aml, Kyc},
+        save_risk_signals, RiskSignalGroupStruct,
     },
     state::{
         actions::{Authorize, WorkflowActions},
@@ -179,13 +179,12 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             RiskSignal::bulk_add(conn, ocr_reason_codes, false, rsg.id)?;
         }
 
+        let fixture_decision =
+            decision::utils::get_fixture_data_decision(ff_client, &vw.vault, &wf, &self.t_id)?;
         // Save KYC risk signals, if we made KYC calls
         if let Some(kyc_vendor_results) = &kyc_vendor_results {
-            let fixture_decision =
-                decision::utils::get_fixture_data_decision(ff_client, &vw.vault, &wf, &self.t_id)?;
             let kyc_risk_signals = if let Some(fd) = fixture_decision {
-                let reason_codes =
-                    decision::sandbox::get_fixture_reason_codes(fd, VaultKind::Person, Some((&vw, &obc)));
+                let reason_codes = decision::sandbox::get_fixture_kyc_reason_codes(fd, &vw, &obc);
                 let vres_id = get_vres_id_for_fixture(kyc_vendor_results)?;
 
                 RiskSignalGroupStruct {
@@ -207,11 +206,23 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
 
         // Save AML risk signals from Aml call or Kyc call (or save nothing if neither called)
         if let Some((watchlist_vres_id, watchlist_result_response)) = aml_vendor_result {
-            let aml_risk_signals = common::get_aml_risk_signals_from_aml_call(
-                &obc,
-                &watchlist_vres_id,
-                &watchlist_result_response,
-            );
+            let aml_risk_signals = if let Some(fixture_decision) = fixture_decision {
+                let reason_codes = decision::sandbox::get_fixture_aml_reason_codes(&fixture_decision, &obc);
+
+                RiskSignalGroupStruct {
+                    footprint_reason_codes: reason_codes
+                        .into_iter()
+                        .map(|r| (r.0, r.1, watchlist_vres_id.clone()))
+                        .collect(),
+                    group: Aml,
+                }
+            } else {
+                common::get_aml_risk_signals_from_aml_call(
+                    &obc,
+                    &watchlist_vres_id,
+                    &watchlist_result_response,
+                )
+            };
             save_risk_signals(conn, &self.sv_id, &aml_risk_signals, false)?;
         } else if let Some(kyc_vendor_results) = kyc_vendor_results {
             let aml_risk_signals = common::get_aml_risk_signals_from_kyc_call(obc, vw, &kyc_vendor_results)?;

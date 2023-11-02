@@ -11,7 +11,7 @@ use db::{
 };
 use idv::{incode::watchlist::response::WatchlistResultResponse, ParsedResponse, VendorResponse};
 use newtypes::{
-    DecisionIntentId, DecisionStatus, FootprintReasonCode, ScopedVaultId, SignalSeverity, VaultKind,
+    CipKind, DecisionIntentId, DecisionStatus, FootprintReasonCode, ScopedVaultId, SignalSeverity, VaultKind,
     VaultPublicKey, VendorAPI,
 };
 use rand::seq::SliceRandom;
@@ -90,21 +90,49 @@ pub async fn save_fixture_vendor_result(
         .await?
 }
 
-pub fn get_fixture_reason_codes(
+// TODO: get_fixture_kyb_reason_codes
+pub fn get_fixture_kyb_reason_codes(
+    fixture_decision: FixtureDecision,
+) -> Vec<(FootprintReasonCode, VendorAPI)> {
+    make_random_kyc_reason_codes_for_fixture_decision(fixture_decision, VaultKind::Business)
+        .into_iter()
+        .map(|r| (r, VendorAPI::MiddeskBusinessUpdateWebhook))
+        .collect()
+}
+
+pub fn get_fixture_kyc_reason_codes(
+    fixture_decision: FixtureDecision,
+    vw: &VaultWrapper,
+    obc: &ObConfiguration,
+) -> Vec<(FootprintReasonCode, VendorAPI)> {
+    match obc.cip_kind {
+        // We produce specific fixtures for Alpaca to better simulate the 3 canonical use cases that Alpaca always asks for
+        Some(CipKind::Alpaca) => get_fixture_reason_codes_alpaca(fixture_decision, vw, obc),
+        // For non-alpaca cases, we just produce an assortment of reasonable random risk signals
+        Some(CipKind::Apex) | None => {
+            let reason_codes =
+                make_random_kyc_reason_codes_for_fixture_decision(fixture_decision, VaultKind::Person);
+            // Still create the expected user input based risk signals to make the Sandbox experience as fun and lifelike as possible for the eager Tenant-to-be
+            let user_input_risk_signals = features::risk_signals::user_input_based_risk_signals(vw, obc);
+
+            reason_codes
+                .into_iter()
+                .chain(user_input_risk_signals)
+                .map(|r| (r, VendorAPI::IdologyExpectId))
+                .collect()
+        }
+    }
+}
+
+pub fn make_random_kyc_reason_codes_for_fixture_decision(
     fixture_decision: FixtureDecision,
     vault_kind: VaultKind,
-    vw_obc: Option<(&VaultWrapper, &ObConfiguration)>,
-) -> Vec<(FootprintReasonCode, VendorAPI)> {
+) -> Vec<FootprintReasonCode> {
     let reason_code_map = build_reason_code_map(vault_kind);
     let (decision_status, create_manual_review) = fixture_decision;
 
-    let vendor_api = match vault_kind {
-        VaultKind::Person => VendorAPI::IdologyExpectId,
-        VaultKind::Business => VendorAPI::MiddeskBusinessUpdateWebhook,
-    };
-
     // Create some mock risk signals that are somewhat consistent with the mock decision
-    let reason_codes: Vec<FootprintReasonCode> = match (decision_status, create_manual_review) {
+    match (decision_status, create_manual_review) {
         // Straight out rejection
         (DecisionStatus::Fail, false) => choose_random_reason_codes(reason_code_map, SignalSeverity::High, 3),
         // Manual review
@@ -115,19 +143,7 @@ pub fn get_fixture_reason_codes(
         (DecisionStatus::StepUp, _) => choose_random_reason_codes(reason_code_map, SignalSeverity::Medium, 3),
         // Approved
         (DecisionStatus::Pass, _) => choose_random_reason_codes(reason_code_map, SignalSeverity::Info, 4),
-    };
-
-    // Still create the expected user input based risk signals to make the Sandbox experience as fun and lifelike as possible for the eager Tenant-to-be
-    let user_input_risk_signals = if let Some((vw, obc)) = vw_obc {
-        features::risk_signals::user_input_based_risk_signals(vw, obc)
-    } else {
-        vec![]
-    };
-    reason_codes
-        .into_iter()
-        .chain(user_input_risk_signals)
-        .map(|r| (r, vendor_api))
-        .collect()
+    }
 }
 
 // For AlpacaKYC workflow, we want fixtures to be:
@@ -213,6 +229,36 @@ fn build_reason_code_map(vault_kind: VaultKind) -> HashMap<SignalSeverity, Vec<F
             acc.entry(severity).or_default().push(frc);
             acc
         })
+}
+
+pub fn get_fixture_aml_reason_codes(
+    fixture_decision: &FixtureDecision,
+    obc: &ObConfiguration,
+) -> Vec<(FootprintReasonCode, VendorAPI)> {
+    match obc.cip_kind {
+        // For Alpaca, for the manual_review fixture, we want to simulate a watchlist hit
+        Some(CipKind::Alpaca) => {
+            let (decision_status, create_manual_review) = fixture_decision;
+
+            match (decision_status, create_manual_review) {
+                (DecisionStatus::Fail, true) => vec![
+                    (
+                        FootprintReasonCode::WatchlistHitOfac,
+                        VendorAPI::IncodeWatchlistCheck,
+                    ),
+                    (
+                        FootprintReasonCode::AdverseMediaHit,
+                        VendorAPI::IncodeWatchlistCheck,
+                    ),
+                ],
+                _ => vec![],
+            }
+        }
+        // For non-alpaca cases, we don't really currently provide a way to fixture watchlist hits in particular
+        _ => {
+            vec![]
+        }
+    }
 }
 
 impl From<FixtureDecision> for OnboardingRulesDecisionOutput {
