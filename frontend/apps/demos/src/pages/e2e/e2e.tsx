@@ -15,16 +15,22 @@ const Demo = () => {
     ob_key: obKey,
     user_data: rawUserData,
   } = router.query;
-  const publicKey = typeof obKey === 'string' ? obKey : publicKeyEnv;
-  let userData = {};
-  try {
-    userData =
-      typeof rawUserData === 'string'
-        ? JSON.parse(decodeURIComponent(rawUserData))
-        : {};
-  } catch (_) {
-    // do nothing
-  }
+
+  const getArgs = () => {
+    const publicKey = typeof obKey === 'string' ? obKey : publicKeyEnv;
+    let userData = {};
+    try {
+      userData =
+        typeof rawUserData === 'string'
+          ? JSON.parse(decodeURIComponent(rawUserData))
+          : {};
+    } catch (_) {
+      // do nothing
+    }
+    return { userData, publicKey };
+  };
+
+  const { userData, publicKey } = getArgs();
 
   const onComplete = (validationToken: string) => {
     const el = document.querySelector('[data-testid="result"]');
