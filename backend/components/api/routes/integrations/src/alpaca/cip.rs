@@ -297,6 +297,9 @@ fn kyc(
     } else {
         None
     };
+    if nationality.is_none() {
+        tracing::error!("Alpaca CIP call made with Nationality missing");
+    }
 
     let kyc = alpaca::Kyc {
         id: scoped_vault.fp_id.clone(),
