@@ -69,8 +69,9 @@ vendor_reason_code_enum! {
         InputAddressNotOnFile,
         // The issues date of the SSN provided on the GLB inquiry cannot be verified by the Social Security Administration (SSA).
         // Experian classification = *HIGH RISK SSN Indicators*
+        // This is simply produced for all SSN's issued post July 2011. So young folks + immigrants who've been issued a SSN since then, Experian will not be able to know the issue date of those SSN's (some new SSA rule or something). This isn't really an indicator of anything interesting. The only implication afaict is that Experian just wont be able to confirm "ssn issue date > dob" for these cases. So for now we just don't turn this into a risk signal
         #[ser = "04", description = "Input SSN Issue Date Cannot Be Verified"]
-        #[footprint_reason_code = Some(FootprintReasonCode::SsnIssueDateCannotBeVerified)]
+        #[footprint_reason_code = None]
         InputSSNIssueDataCannotBeVerified,
         // The SSA has reported that death benefits GLB are being paid on this SSN submitted on the inquiry.
         // Experian classification = *HIGH RISK SSN Indicators*
@@ -154,8 +155,9 @@ vendor_reason_code_enum! {
         BestLocatedSSNDeceased,
         // The issues date of the best on-file SSN GLB cannot be verified by the SSA.
         // Experian classification = *HIGH RISK SSN Indicators*
+        // see comment for "04"
         #[ser = "26", description = "Best On-File SSN Issue Date Cannot Be Verified"]
-        #[footprint_reason_code = Some(FootprintReasonCode::SsnIssueDateCannotBeVerified)]
+        #[footprint_reason_code = None]
         BestLocatedSSNCannotBeVerified,
         // According to File One, the SSN used is FCRA more frequently reported for another consumer.
         // Experian classification = *HIGH RISK SSN Indicators*
