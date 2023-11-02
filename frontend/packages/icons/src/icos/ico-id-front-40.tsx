@@ -64,7 +64,7 @@ const IcoIdFront40 = ({
         height={30}
         rx={5}
         stroke={theme.color[color]}
-        strokeWidth={3.5}
+        strokeWidth={3}
       />
     </svg>
   );

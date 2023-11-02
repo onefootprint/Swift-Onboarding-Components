@@ -31,7 +31,7 @@ const IcoFaceid40 = ({
       <path
         d="M13.552 3h-1.173A9.38 9.38 0 0 0 3 12.38v1.172M13.552 37h-1.173A9.38 9.38 0 0 1 3 27.62v-1.172M26.448 3h1.173C32.8 3 37 7.2 37 12.38v1.172M26.448 37h1.173C32.8 37 37 32.8 37 27.62v-1.172m-24.62-4.69s.585 5.863 7.62 5.863c7.034 0 7.62-5.863 7.62-5.863"
         stroke={theme.color[color]}
-        strokeWidth={3.948}
+        strokeWidth={3}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

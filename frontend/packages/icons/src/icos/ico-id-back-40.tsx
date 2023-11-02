@@ -27,7 +27,7 @@ const IcoIdBack40 = ({
         rx={5}
         transform="matrix(1 0 0 -1 5 35)"
         stroke={theme.color[color]}
-        strokeWidth={3.5}
+        strokeWidth={3}
       />
       <rect
         x={10}

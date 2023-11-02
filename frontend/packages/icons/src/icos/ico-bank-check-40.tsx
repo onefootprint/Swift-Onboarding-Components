@@ -75,7 +75,7 @@ const IcoBankCheck40 = ({
         rx={5}
         transform="matrix(1 0 0 -1 2 34)"
         stroke={theme.color[color]}
-        strokeWidth={3.5}
+        strokeWidth={3}
       />
     </svg>
   );

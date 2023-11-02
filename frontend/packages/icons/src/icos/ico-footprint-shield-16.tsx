@@ -23,15 +23,10 @@ const IcoFootprintShield16 = ({
     >
       <g clipPath="url(#prefix__a)">
         <path
-          d="M8 1 1.018 4.138S1.608 15 8 15c6.393 0 6.982-10.862 6.982-10.862L8 1Z"
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M.5 3.862 8 .5l7.5 3.362S14.867 15.5 8 15.5.5 3.862.5 3.862Zm9.833 5.013H9.167c-.806 0-1.459.653-1.459 1.459V11.5H5.667v-7h4.666v1.324a1.167 1.167 0 1 0 0 2.019v1.032Z"
           fill={theme.color[color]}
-          stroke={theme.color[color]}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M9.167 8.875h1.166V7.843a1.167 1.167 0 1 1 0-2.019V4.5H5.667v7h2.041v-1.166c0-.806.653-1.459 1.459-1.459Z"
-          fill="#fff"
         />
       </g>
       <defs>

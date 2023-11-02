@@ -3,7 +3,7 @@ import React from 'react';
 
 import type { IconProps } from '../types';
 
-const IcoCheckCircle40 = ({
+const IcoFootprintShield40 = ({
   'aria-label': ariaLabel,
   color = 'primary',
   className,
@@ -24,10 +24,10 @@ const IcoCheckCircle40 = ({
       <path
         fillRule="evenodd"
         clipRule="evenodd"
-        d="M20.005 4.85c-8.37 0-15.155 6.785-15.155 15.155s6.785 15.154 15.155 15.154 15.154-6.785 15.154-15.154c0-8.37-6.785-15.155-15.154-15.155ZM7.85 20.005c0-6.713 5.442-12.155 12.155-12.155 6.713 0 12.154 5.442 12.154 12.155 0 6.713-5.441 12.154-12.154 12.154S7.85 26.718 7.85 20.005Zm17.693-3.491a1.5 1.5 0 1 0-2.602-1.493l-4.32 7.528a.383.383 0 0 1-.68-.028l-.816-1.74a1.5 1.5 0 1 0-2.716 1.273l.817 1.741c1.163 2.479 4.635 2.622 5.998.247l4.32-7.529Z"
+        d="M3 10.62 20 3l17 7.62S35.565 37 20 37 3 10.62 3 10.62Zm22.51 11.446h-2.755a3.444 3.444 0 0 0-3.444 3.444v2.754h-4.82V11.736h11.018v3.126a2.737 2.737 0 0 0-1.377-.371 2.755 2.755 0 1 0 1.377 5.137v2.438Z"
         fill={theme.color[color]}
       />
     </svg>
   );
 };
-export default IcoCheckCircle40;
+export default IcoFootprintShield40;

@@ -5,5 +5,5 @@
 <rect x="11" y="27.5" width="3" height="2" rx="1" fill="black"/>
 <rect x="15" y="27.5" width="3" height="2" rx="1" fill="black"/>
 <rect x="19" y="27.5" width="3" height="2" rx="1" fill="black"/>
-<rect width="36" height="28" rx="5" transform="matrix(1 0 0 -1 2 34)" stroke="black" stroke-width="3.5"/>
+<rect width="36" height="28" rx="5" transform="matrix(1 0 0 -1 2 34)" stroke="black" stroke-width="3"/>
 </svg>
