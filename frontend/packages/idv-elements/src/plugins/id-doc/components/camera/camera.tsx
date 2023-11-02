@@ -146,7 +146,7 @@ const Camera = ({
     // In case maintaining the aspect ratio overflows the height, we take the full height (Math.min)
     if (autocaptureKind === 'document') {
       desiredImageHeight = Math.min(
-        videoSize.height,
+        videoSize.height - feedbackPositionFromBottom,
         videoSize.width * (outlineHeightRatio / outlineWidthRatio),
       );
     }

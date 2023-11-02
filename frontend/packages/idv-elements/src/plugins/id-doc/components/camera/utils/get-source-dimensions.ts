@@ -9,6 +9,8 @@ type GetSourceDImensionsProps = {
   centerOffsetY?: number;
 };
 
+const ERROR_MARGIN = -10; // to avoid rouding error
+
 const getScalingFactor = (
   mediaWidth: number,
   mediaHeight: number,
@@ -77,14 +79,18 @@ const getSourceDimensions = ({
   // We use the mid-point of the original video, go half the desired image height (scaled) to left
   // and go half the desired image height (scaled) to upward direction
   // and we get our sx, sy
-  const sx = Math.floor(
+  let sx = Math.ceil(
     ((scaledWidth - desiredImageWidth) / 2 + centerOffsetX) *
       (videoWidth / scaledWidth),
   );
-  const sy = Math.floor(
+  let sy = Math.ceil(
     ((scaledHeight - desiredImageHeight) / 2 + centerOffsetY) *
       (videoHeight / scaledHeight),
   );
+
+  // Just in case any fractional calculation yielded small negative numbers
+  if (sx < ERROR_MARGIN) sx = 0;
+  if (sy < ERROR_MARGIN) sy = 0;
 
   return {
     sx,

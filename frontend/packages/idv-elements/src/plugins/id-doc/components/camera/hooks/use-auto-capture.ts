@@ -139,7 +139,7 @@ const useAutoCapture = ({
       );
       const desiredImageHeight = Math.min(
         outlineHeight + HEIGHT_ERROR_OFFSET,
-        videoSize.height,
+        videoSize.height + (outlineOffsetY ?? 0) * 2, // This gives us the height above the status feedback where the outline is centered
       );
 
       if (autocaptureKind === 'document') {
