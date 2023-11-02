@@ -5,7 +5,6 @@ import {
   selectOutcomeOptional,
   verifyPhoneNumber,
   confirmData,
-  doLivenessCheck,
 } from './utils/commands';
 
 const email = 'piip@onefootprint.com';
