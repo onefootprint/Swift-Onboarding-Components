@@ -10,6 +10,7 @@ pub(crate) struct RequestData {
     first_name: PiiString,
     last_name: PiiString,
     address: PiiString,
+    address2: Option<PiiString>,
     city: Option<PiiString>,
     /// 2-digit state code
     state: Option<PiiString>,
@@ -34,7 +35,7 @@ impl RequestData {
             middle_name: _, // Idology doesn't utilize middle name
             last_name,
             address_line1,
-            address_line2: _, // TODO
+            address_line2, // TODO
             city,
             state,
             zip,
@@ -66,6 +67,7 @@ impl RequestData {
             first_name,
             last_name,
             address,
+            address2: address_line2,
             city,
             state,
             zip,
@@ -101,6 +103,7 @@ mod tests {
                 first_name: PiiString::from("bob".to_owned()),
                 last_name: PiiString::from("boberto".to_owned()),
                 address: PiiString::from("123 Main St".to_owned()),
+                address2: Some(PiiString::from("Apt. 321".to_owned())),
                 city: None,
                 state: None,
                 zip: None,
@@ -124,6 +127,7 @@ mod tests {
               "firstName": "bob",
               "lastName": "boberto",
               "address": "123 Main St",
+              "address2": "Apt. 321",
               "city": null,
               "state": null,
               "zip": null,
