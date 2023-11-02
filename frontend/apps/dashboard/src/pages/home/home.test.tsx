@@ -3,6 +3,7 @@ import {
   customRender,
   screen,
   waitFor,
+  waitForElementToBeRemoved,
   within,
 } from '@onefootprint/test-utils';
 import React from 'react';
@@ -38,15 +39,25 @@ describe('<Home />', () => {
 
   const renderHomeAndWaitNotLoading = async () => {
     renderHome();
-    await waitFor(() => {
-      const loading = screen.queryByRole('progressbar', {
-        name: 'Loading home',
-      });
-      expect(loading).not.toBeInTheDocument();
-    });
+    await waitForElementToBeRemoved(() =>
+      screen.queryByRole('progressbar', {
+        name: 'Loading home...',
+      }),
+    );
   };
 
   describe('when the request to fetch the org metrics succeeds', () => {
+    it('should show a loading screen while the data is being fetched', async () => {
+      withOrgMetrics();
+      renderHome();
+      await waitFor(() => {
+        const loader = screen.getByRole('progressbar', {
+          name: 'Loading home...',
+        });
+        expect(loader).toBeInTheDocument();
+      });
+    });
+
     describe('when all metric values are 0', () => {
       beforeEach(() => {
         withOrgMetrics(emptyOrgMetricsFixture);
@@ -58,7 +69,7 @@ describe('<Home />', () => {
         expect(metricBoxes).toHaveLength(6);
       });
 
-      it('should the first row of metrics with values of 0', async () => {
+      it('should show the first row of metrics with values of 0', async () => {
         await renderHomeAndWaitData();
 
         const successfulOnboardings = screen.getByRole('group', {
@@ -81,7 +92,7 @@ describe('<Home />', () => {
         ).toBeInTheDocument();
       });
 
-      it('should the second row of metrics with values of 0', async () => {
+      it('should show the second row of metrics with values of 0', async () => {
         await renderHomeAndWaitData();
 
         const totalOnboardings = screen.getByRole('group', {
@@ -112,7 +123,7 @@ describe('<Home />', () => {
         expect(metricBoxes).toHaveLength(6);
       });
 
-      it('should the first row of metrics with correct values', async () => {
+      it('should show the first row of metrics with correct values', async () => {
         await renderHomeAndWaitData();
 
         const successfulOnboardings = screen.getByRole('group', {
@@ -137,7 +148,7 @@ describe('<Home />', () => {
         ).toBeInTheDocument();
       });
 
-      it('should the second row of metrics with correct values', async () => {
+      it('should show the second row of metrics with correct values', async () => {
         await renderHomeAndWaitData();
 
         const totalOnboardings = screen.getByRole('group', {
