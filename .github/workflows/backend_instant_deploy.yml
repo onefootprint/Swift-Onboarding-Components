@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       commitHash:
-        description: 'Hash of commit that we will be deploying. Can be long or short hash. But, ensure that there is an image built for this commit'
+        description: 'Long hash of commit that we will be deploying. But, ensure that there is an image built for this commit'
         type: string
         required: true
 
