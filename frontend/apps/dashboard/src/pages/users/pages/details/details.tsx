@@ -5,7 +5,7 @@ import React from 'react';
 import { EntityDetails } from 'src/components/entities';
 
 const Details = () => {
-  const { t } = useTranslation('pages.users');
+  const { t } = useTranslation('pages.user');
 
   return (
     <>

@@ -35,10 +35,10 @@ const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
       data-has-focus={hasFocus}
       data-private={isPrivate}
       data-testid={testID}
+      data-size={size}
       disabled={disabled}
       onClick={onClick}
       ref={ref}
-      size={size}
       type="button"
       /** Do not change/remove these classes */
       className="fp-input fp-custom-appearance"
@@ -54,15 +54,10 @@ const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
 );
 
 const BaseSelectTriggerContainer = styled.button<BaseSelectTriggerProps>`
-  ${({ theme, size }) => {
+  ${({ theme }) => {
     const { input } = theme.components;
 
     return css`
-      ${createTypography(
-        size === 'default'
-          ? input.size.default.typography
-          : input.size.compact.typography,
-      )};
       align-items: center;
       background: ${input.state.default.initial.bg};
       border-color: ${input.state.default.initial.border};
@@ -71,14 +66,22 @@ const BaseSelectTriggerContainer = styled.button<BaseSelectTriggerProps>`
       border-width: ${input.global.borderWidth};
       color: ${input.global.color};
       display: flex;
-      height: ${size === 'default'
-        ? input.size.default.height
-        : input.size.compact.height};
       justify-content: space-between;
       outline: none;
-      padding: 0 ${theme.spacing[5]};
       text-align: left;
       width: 100%;
+
+      &[data-size='default'] {
+        ${createTypography(input.size.default.typography)};
+        height: ${input.size.default.height};
+        padding: 0 ${theme.spacing[5]};
+      }
+
+      &[data-size='compact'] {
+        ${createTypography(input.size.compact.typography)};
+        height: ${input.size.compact.height};
+        padding: 0 ${theme.spacing[4]};
+      }
 
       &[data-has-error='false'] {
         @media (hover: hover) {

@@ -1,7 +1,7 @@
 import { useIntl, useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { Document } from '@onefootprint/types';
-import { Select, Typography } from '@onefootprint/ui';
+import { Box, Select, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import { getDocumentVersion } from '../../../../utils';
@@ -17,7 +17,7 @@ const SessionSelect = ({
   activeDocumentVersion,
   onActiveDocumentVersionChange,
 }: SessionSelectProps) => {
-  const { formatUtcDate } = useIntl();
+  const { formatDateWithTime } = useIntl();
   const { t } = useTranslation(
     'pages.entity.fieldset.document.drawer.session-selector',
   );
@@ -28,7 +28,7 @@ const SessionSelect = ({
     return null;
   }
   const documentOptions = sessionsToRender.map((document, index) => ({
-    label: `${t('session')} ${index + 1} (${formatUtcDate(
+    label: `${t('session')} ${index + 1} (${formatDateWithTime(
       new Date(document.startedAt as string),
     )})`,
     value: getDocumentVersion(document, documents),
@@ -41,12 +41,15 @@ const SessionSelect = ({
   return (
     <SelectContainer>
       <Typography variant="label-2">{t('title')}</Typography>
-      <Select
-        placeholder={currentOption?.label || ''}
-        options={documentOptions}
-        onChange={newOption => onActiveDocumentVersionChange(newOption.value)}
-        value={currentOption}
-      />
+      <Box width="250px">
+        <Select
+          onChange={newOption => onActiveDocumentVersionChange(newOption.value)}
+          options={documentOptions}
+          placeholder={currentOption?.label || ''}
+          size="compact"
+          value={currentOption}
+        />
+      </Box>
     </SelectContainer>
   );
 };
