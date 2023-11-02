@@ -11,6 +11,7 @@ import { isFuture } from 'date-fns';
 import { PhoneNumberUtil } from 'google-libphonenumber';
 import { validate as isEmail } from 'isemail';
 
+import Logger from '../../../../../../utils/logger';
 import {
   fromUSDateToISO8601Format,
   strInputToUSDate,
@@ -167,6 +168,19 @@ const validateUserData = (
     }
     return !!ValidatorByField[key as IdDI](value);
   });
+
+  const validatedData = Object.fromEntries(validatedEntries);
+  const validatedKeys = new Set(Object.keys(validatedData));
+  const allKeys = Object.keys(userData) as IdDI[];
+  const invalidKeys = allKeys.filter(key => !validatedKeys.has(key));
+  if (invalidKeys.length) {
+    Logger.warn(
+      `Filtering out invalid bootstrapped user data for keys: ${invalidKeys.join(
+        ', ',
+      )}`,
+      'validate-bootstrap-data',
+    );
+  }
 
   return Object.fromEntries(validatedEntries);
 };
