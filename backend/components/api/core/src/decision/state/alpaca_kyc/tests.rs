@@ -447,13 +447,12 @@ async fn pass_then_watchlist_hit(
         UserKind::Sandbox(_) => assert!(obd.unwrap().seqno.is_none()),
     }
 
-    // TODO: turn on this when we add review_reason's to the Kyc workflow
     // manual_review should exist and have correct review_reasons
-    // let mr = mr.unwrap();
-    // assert_eq!(
-    //     vec![ReviewReason::AdverseMediaHit, ReviewReason::WatchlistHit],
-    //     mr.review_reasons
-    // );
+    let mr = mr.unwrap();
+    assert_eq!(
+        vec![ReviewReason::AdverseMediaHit, ReviewReason::WatchlistHit],
+        mr.review_reasons
+    );
 
     assert_have_same_elements(
         vec![

@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use db::models::{
+    document_request::DocumentRequest,
     ob_configuration::ObConfiguration,
     risk_signal::{NewRiskSignalInfo, RiskSignal},
     risk_signal_group::RiskSignalGroup,
@@ -296,6 +297,8 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let execute_rules_for_real_document_decision_only = should_execute_rules_for_document_only(&v, &wf)?;
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
 
+        let doc_collected = DocumentRequest::get(conn, &wf.id)?.is_some();
+        let review_reasons = common::get_review_reasons(&risk_signals, doc_collected, &obc);
         let decision = if let Some(fixture_decision) = fixture_decision {
             if execute_rules_for_real_document_decision_only || obc.skip_kyc {
                 common::get_decision(&self, conn, risk_signals, &wf, &v)?
@@ -316,7 +319,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
                 .collect(),
             decision.into(),
             fixture_decision.is_some(),
-            vec![],
+            review_reasons,
         )?;
         Ok(KycState::from(KycComplete))
     }
