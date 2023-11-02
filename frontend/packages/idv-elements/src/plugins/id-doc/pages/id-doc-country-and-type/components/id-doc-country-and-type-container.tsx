@@ -62,6 +62,7 @@ const IdDocCountryAndTypeContainer = ({
   const { t } = useTranslation('pages.country-and-type-selection');
   const [state] = useIdDocMachine();
   const submitDocTypeMutation = useSubmitDocType();
+  const { isLoading: isDocTypeSubmissionLoading } = submitDocTypeMutation;
   const [consentVisible, setConsentVisible] = useState(false);
   const l10n = useL10nContext();
   const {
@@ -222,7 +223,11 @@ const IdDocCountryAndTypeContainer = ({
       />
       {options.length > 0 && (
         <StickyBottomBox>
-          <Button fullWidth onClick={handleSubmit}>
+          <Button
+            fullWidth
+            onClick={handleSubmit}
+            loading={isDocTypeSubmissionLoading}
+          >
             {t('form.cta')}
           </Button>
         </StickyBottomBox>
