@@ -1,12 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 
 import usePropsFromParent from './hooks/use-props-from-parent';
+import usePropsFromParentLegacy from './hooks/use-props-from-parent/use-props-from-parent-legacy';
 import usePropsFromUrl from './hooks/use-props-from-url';
 import type { BifrostProps } from './types';
 
 /*
 On web:
-All of our tenants are integrated with >= v 3.2.0 of footprint-js.
+1. For footprint-js < 2.0.0 
+Used by fractinonal. Bifrost receives 'bootstrapReceived' with 'email' and 'phoneNumber'.
+
+2. For footprint-js < 3.0.0
+Bifrost receives 'bootstrapReceived' and 'optionsReceived' events from footprint-js
+where bootstrap data keys are IdDIs.
 
 3. As of footprint-js > 3.0.0
 Bifrost receives 'propsReceived' event from footprint-js where props are userData and options.
@@ -59,10 +65,14 @@ const useProps = (onSuccess: (props: BifrostProps) => void) => {
   usePropsFromParent(complete, () => {
     incrementTimeoutCounter();
   });
+  // For older versions of web SDKs
+  usePropsFromParentLegacy(complete, () => {
+    incrementTimeoutCounter();
+  });
 
   useEffect(() => {
-    // If both hooks timed out, we should return with empty props
-    if (timeoutCounter < 2) {
+    // If all 3 hooks timed out, we should return with empty props
+    if (timeoutCounter < 3) {
       return;
     }
     complete({});

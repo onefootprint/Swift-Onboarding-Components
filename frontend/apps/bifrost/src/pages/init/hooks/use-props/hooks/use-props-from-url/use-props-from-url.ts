@@ -1,14 +1,16 @@
+import type { IdvBootstrapData } from '@onefootprint/types';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
 import type { BifrostProps } from '../../types';
 import getParsedProps from '../../utils/get-parsed-props';
+import parseUserData from '../../utils/parse-user-data';
 
 const FRAGMENT_DIVIDER = '__';
 
 /**
  * Extract Bifrost properties from a encoded URL string
- * @param {String} path We expect URLs to be formatted like this: <URL_BASE>#<ENCODED_USER_DATA>__<ENCODED_OPTIONS>__<ENCODED_L10N>
+ * @param {String} path We expect URLs to be formatted like this: <URL_BASE>#<ENCODED_LEGACY_USER_DATA>__<ENCODED_LEGACY_OPTIONS>__<ENCODED_LEGACY_L10N>
  * @returns {BifrostProps | undefined} BifrostProps | undefined
  */
 export const getData = (path: string): BifrostProps | undefined => {
@@ -19,7 +21,7 @@ export const getData = (path: string): BifrostProps | undefined => {
   const [part1, part2, part3] = fragment.split(FRAGMENT_DIVIDER);
 
   return {
-    userData: getParsedProps(part1),
+    userData: parseUserData(getParsedProps(part1) as IdvBootstrapData),
     options: getParsedProps(part2),
     l10n: getParsedProps(part3),
     authToken: undefined,

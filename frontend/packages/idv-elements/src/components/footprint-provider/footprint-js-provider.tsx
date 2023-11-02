@@ -10,3 +10,4 @@ export const useFootprintProvider = () => useBareFootprintProvider();
 
 export default Provider;
 export type { CompletePayload, FootprintClient } from './types';
+export { LegacyFootprintInternalEvent } from './types';
