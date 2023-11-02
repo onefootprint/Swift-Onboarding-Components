@@ -42,6 +42,7 @@ export const tenant_name_to_emoji = new Map([
   ['Basic Capital', ':basic-capital:'],
   ['Trayd', ':trayd:'],
   ['Footprint Live', ':footprint:'],
+  ['Bloom', ':bloom:'],
 ]);
 
 export function rows_to_message(rows) {
