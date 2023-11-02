@@ -9,6 +9,8 @@ import {
   useOnClickOutside,
 } from 'usehooks-ts';
 
+import type { SXStyleProps, SXStyles } from '../../hooks';
+import { useSX } from '../../hooks';
 import { media } from '../../utils';
 import IconButton from '../icon-button';
 import Overlay from '../overlay';
@@ -22,9 +24,11 @@ export type DrawerProps = {
   closeAriaLabel?: string;
   closeIconComponent?: Icon;
   onClose: () => void;
+  onClickOutside?: () => void;
   open?: boolean;
   testID?: string;
   title: string;
+  sx?: SXStyleProps;
 };
 
 const Drawer = ({
@@ -32,14 +36,17 @@ const Drawer = ({
   closeAriaLabel = 'Close',
   closeIconComponent: CloseIconComponent = IcoClose24,
   onClose,
+  onClickOutside,
   open,
   testID,
   title,
   headerComponent,
+  sx,
 }: DrawerProps) => {
+  const sxStyles = useSX(sx);
   const state = useOpenAnimation(open);
   const DrawerRef = useRef<HTMLDivElement>(null);
-  useOnClickOutside(DrawerRef, onClose);
+  useOnClickOutside(DrawerRef, onClickOutside ?? onClose);
   useLockedBody(open);
   useEventListener('keydown', event => {
     if (event.key === 'Escape') {
@@ -61,6 +68,7 @@ const Drawer = ({
             onClick={(event: React.MouseEvent<HTMLDivElement>) => {
               event.stopPropagation();
             }}
+            sx={sxStyles}
           >
             <DrawerSurface>
               <Header>
@@ -93,8 +101,8 @@ const DrawerSurface = styled.div`
   `}
 `;
 
-const DrawerContainer = styled.div`
-  ${({ theme }) => css`
+const DrawerContainer = styled.div<{ sx?: SXStyles }>`
+  ${({ theme, sx }) => css`
     height: 100vh;
     width: calc(500px + 2 * ${theme.spacing[3]});
     position: fixed;
@@ -118,6 +126,8 @@ const DrawerContainer = styled.div`
     &.closing {
       transform: translateX(100%);
     }
+
+    ${sx};
   `}
 `;
 

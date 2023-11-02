@@ -70,7 +70,7 @@ const ProtectedSection = styled.section`
   `}
 `;
 
-const InstructionsBox = styled.p`
+const InstructionsBox = styled.div`
   ${({ theme }) => css`
     padding: ${theme.spacing[4]};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};

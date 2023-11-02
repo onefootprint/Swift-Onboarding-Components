@@ -2,7 +2,7 @@ import { Box, Grid, Shimmer, Stack } from '@onefootprint/ui';
 import React from 'react';
 
 const Loading = () => (
-  <Box testID="risk-signal-details-loading" aria-busy>
+  <Box role="progressbar" aria-label="Loading details...">
     <Box id="overview-shimmer" marginBottom={9}>
       <Box id="overview-title" marginBottom={6}>
         <Shimmer

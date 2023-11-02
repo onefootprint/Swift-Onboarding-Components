@@ -60,6 +60,14 @@ export default {
         type: { summary: 'function', required: false },
       },
     },
+    onClickOutside: {
+      control: 'function',
+      description:
+        'Function called when the user clicks anywhere outside the drawer (in case this functionality is different than onClose)',
+      table: {
+        type: { summary: 'function', required: false },
+      },
+    },
   },
 } as Meta;
 
@@ -105,6 +113,9 @@ Base.args = {
   closeIconComponent: IcoClose24,
   onClose: () => {
     console.log('close'); // eslint-disable-line no-console
+  },
+  onClickOutside: () => {
+    console.log('clicked outside'); // eslint-disable-line no-console
   },
   open: false,
   testID: 'drawer-test-id',

@@ -1,6 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoChevronLeft24, IcoClose24 } from '@onefootprint/icons';
+import type { AmlHitMedia } from '@onefootprint/types';
 import { Drawer } from '@onefootprint/ui';
-import React from 'react';
+import React, { useState } from 'react';
 import { Error } from 'src/components';
 import { createCapitalStringList } from 'src/utils/create-string-list';
 
@@ -15,20 +17,46 @@ const Details = () => {
   const { query, clear } = useRiskSignalsFilters();
   const isOpen = !!query.risk_signal_id;
   const { data, isLoading, error } = useRiskSignalDetails(query.risk_signal_id);
+  const [amlMedia, setAmlMedia] = useState([] as AmlHitMedia[]);
 
   const getDrawerTitle = () => {
     if (data) {
-      return data.scopes.length
-        ? createCapitalStringList(data.scopes)
-        : data.note;
+      if (data.scopes.length) {
+        const scopesTitle = createCapitalStringList(data.scopes);
+        return amlMedia.length
+          ? `${t(
+              'pages.entity.risk-signals.details.matches.hits-media.drawer-title',
+            )} • ${scopesTitle}`
+          : scopesTitle;
+      }
+      return data.note;
     }
     return isLoading ? t('notifications.loading') : t('notifications.error');
   };
 
+  const handleHideAmlMedia = () => setAmlMedia([]);
+
+  const handleClickOutside = () => {
+    clear();
+    if (amlMedia.length) handleHideAmlMedia();
+  };
+
   return (
-    <Drawer open={isOpen} title={getDrawerTitle()} onClose={clear}>
+    <Drawer
+      open={isOpen}
+      title={getDrawerTitle()}
+      onClickOutside={handleClickOutside}
+      onClose={amlMedia.length ? handleHideAmlMedia : clear}
+      closeIconComponent={amlMedia.length ? IcoChevronLeft24 : IcoClose24}
+    >
       <>
-        {data && <Content riskSignal={data} />}
+        {data && (
+          <Content
+            riskSignal={data}
+            handleShowAmlMedia={setAmlMedia}
+            amlMedia={amlMedia}
+          />
+        )}
         {isLoading && <Loading />}
         {error && <Error error={error} />}
       </>

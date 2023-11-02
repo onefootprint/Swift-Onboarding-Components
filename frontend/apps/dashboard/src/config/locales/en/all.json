@@ -1224,13 +1224,24 @@
             },
             "source-url": {
               "label": "Source URL",
-              "read-full-report": "Read full match report"
+              "read-full-report": "Read full match report",
+              "copy": "Copy source url"
             },
             "hits": {
-              "media": {
-                "label": "Relevant media",
-                "value": "See more"
-              }
+              "show-all": {
+                "label_one": "{{count}} more data match",
+                "label_other": "{{count}} more data matches",
+                "value": "Show all"
+              },
+              "media": "See more",
+              "copy": "Copy source url"
+            },
+            "hits-media": {
+              "drawer-title": "Relevant media",
+              "date": "Date",
+              "title": "Title",
+              "snippet": "Snippet",
+              "url": "Go to article"
             }
           }
         }

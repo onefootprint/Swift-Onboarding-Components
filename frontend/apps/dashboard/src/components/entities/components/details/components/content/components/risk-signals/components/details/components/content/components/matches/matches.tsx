@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoArrowRightSmall16, IcoCopy16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
+import type { AmlHit, AmlHitMedia } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
 import {
   CopyButton,
@@ -13,7 +14,7 @@ import {
 import React from 'react';
 import usePermissions from 'src/hooks/use-permissions';
 
-import Hits from './components/hits';
+import HitItem from './components/hit-item';
 import HitsShimmer from './components/hits-shimmer';
 import ProtectedDetails from './components/protected-details';
 import useCachedRiskSignalAmlHint from './hooks/use-cached-risk-signal-aml-hint';
@@ -21,13 +22,14 @@ import useRiskSignalAmlHits from './hooks/use-risk-signal-aml-hits';
 
 type MatchesProps = {
   riskSignalId: string;
+  handleShowAmlMedia: (media: AmlHitMedia[]) => void;
 };
 
-const Matches = ({ riskSignalId }: MatchesProps) => {
+const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
   const { t } = useTranslation('pages.entity.risk-signals.details.matches');
-  const cachedAmlHint = useCachedRiskSignalAmlHint(riskSignalId);
+  const cachedAmlHit = useCachedRiskSignalAmlHint(riskSignalId);
   const decryptMutation = useRiskSignalAmlHits();
-  const aml = decryptMutation.data || cachedAmlHint;
+  const aml = decryptMutation.data || cachedAmlHit;
   const { hasPermission } = usePermissions();
   const toast = useToast();
 
@@ -55,8 +57,8 @@ const Matches = ({ riskSignalId }: MatchesProps) => {
           <HitsShimmer />
         </>
       )}
-      {aml?.shareUrl && (
-        <AmlSection>
+      <AmlSection>
+        {aml?.shareUrl && (
           <Stack direction="column" sx={{ width: '100%' }}>
             <Typography
               variant="label-3"
@@ -86,9 +88,15 @@ const Matches = ({ riskSignalId }: MatchesProps) => {
               {t('source-url.read-full-report')}
             </LinkButton>
           </Stack>
-          {aml?.hits && aml.hits.length > 0 && <Hits hits={aml.hits} />}
-        </AmlSection>
-      )}
+        )}
+        {aml?.hits.map((hit: AmlHit) => (
+          <HitItem
+            key={JSON.stringify(hit)}
+            hit={hit}
+            handleShowAmlMedia={handleShowAmlMedia}
+          />
+        ))}
+      </AmlSection>
     </MatchesSection>
   );
 };
@@ -96,11 +104,10 @@ const Matches = ({ riskSignalId }: MatchesProps) => {
 const MatchesSection = styled.section`
   ${({ theme }) => css`
     height: 100%;
-    margin-top: ${theme.spacing[5]};
     position: relative;
 
-    &[data-is-decrypted='false'] {
-      overflow: hidden;
+    &[data-is-decrypted='true'] {
+      margin-top: ${theme.spacing[5]};
     }
   `}
 `;

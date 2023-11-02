@@ -2,8 +2,9 @@ import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { RiskSignal } from '@onefootprint/types';
 import { Grid, Typography } from '@onefootprint/ui';
-import React from 'react';
+import React, { useRef } from 'react';
 import { createCapitalStringList } from 'src/utils/create-string-list';
+import { useEffectOnce } from 'usehooks-ts';
 
 import SeverityBadge from '../../../../../severity-badge';
 import Field from './components/field';
@@ -23,8 +24,13 @@ const Overview = ({ description, scopes, severity }: OverviewProps) => {
     allT(`signal-attributes.${scope}`),
   );
 
+  const overviewRef = useRef<HTMLDivElement>(null);
+  useEffectOnce(() => {
+    overviewRef.current?.scrollIntoView();
+  });
+
   return (
-    <section>
+    <OverviewSection ref={overviewRef}>
       <Header>
         <Typography variant="label-2">{t('title')}</Typography>
       </Header>
@@ -39,9 +45,15 @@ const Overview = ({ description, scopes, severity }: OverviewProps) => {
         </Grid.Container>
         <Field label={t('description')}>{description}</Field>
       </Fieldset>
-    </section>
+    </OverviewSection>
   );
 };
+
+const OverviewSection = styled.section`
+  ${({ theme }) => css`
+    scroll-margin: ${theme.spacing[7]};
+  `}
+`;
 
 const Header = styled.header`
   ${({ theme }) => css`

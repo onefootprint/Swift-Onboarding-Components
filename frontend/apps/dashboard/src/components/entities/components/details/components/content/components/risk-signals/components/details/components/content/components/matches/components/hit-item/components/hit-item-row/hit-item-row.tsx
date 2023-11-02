@@ -1,10 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCopy16 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
+import type { AmlHitMedia } from '@onefootprint/types';
 import {
   Box,
   CopyButton,
   createFontStyles,
+  LinkButton,
   Stack,
   Typography,
 } from '@onefootprint/ui';
@@ -12,12 +14,19 @@ import React from 'react';
 
 import toReadableString from './utils/to-readable-string';
 
-type HitFieldRowProps = {
+type HitItemRowProps = {
   fieldName: string;
-  fieldValue: string | string[];
+  fieldValue: string | string[] | AmlHitMedia[] | number;
+  handleShowAllFields: () => void;
+  handleShowAmlMedia: (media: AmlHitMedia[]) => void;
 };
 
-const HitFieldRow = ({ fieldName, fieldValue }: HitFieldRowProps) => {
+const HitItemRow = ({
+  fieldName,
+  fieldValue,
+  handleShowAllFields,
+  handleShowAmlMedia,
+}: HitItemRowProps) => {
   const { t } = useTranslation(
     'pages.entity.risk-signals.details.matches.hits',
   );
@@ -27,9 +36,9 @@ const HitFieldRow = ({ fieldName, fieldValue }: HitFieldRowProps) => {
 
   const renderLocationUrlValue = (url: string) => (
     <Stack align="center" justify="space-between">
-      <SourceUrl>{url}</SourceUrl>
+      <Url>{url}</Url>
       <CopyButton
-        ariaLabel={t('source-url.copy')}
+        ariaLabel={t('copy')}
         contentToCopy={url}
         tooltipPosition="bottom"
       >
@@ -52,23 +61,45 @@ const HitFieldRow = ({ fieldName, fieldValue }: HitFieldRowProps) => {
     </Typography>
   );
 
+  const renderShowAllValue = () => (
+    <LinkButton size="compact" onClick={handleShowAllFields}>
+      {t('show-all.value')}
+    </LinkButton>
+  );
+
+  const renderMediaValue = (media: AmlHitMedia[]) => (
+    <LinkButton size="compact" onClick={() => handleShowAmlMedia(media)}>
+      {t('media')}
+    </LinkButton>
+  );
+
   let valueElement;
   if (fieldName === 'matchTypes') {
     valueElement = renderMatchTypes(fieldValue as string[]);
-  } else if (fieldName === 'locationUrl' || fieldName === 'relatedUrl') {
+  } else if (fieldName === 'locationurl' || fieldName === 'relatedUrl') {
     valueElement = renderLocationUrlValue(fieldValue as string);
+  } else if (fieldName === 'showAll') {
+    valueElement = renderShowAllValue();
+  } else if (fieldName === 'relevantMedia') {
+    valueElement = renderMediaValue(fieldValue as AmlHitMedia[]);
   } else {
     valueElement = renderGeneralValue(fieldValue as string);
   }
+
+  const labelText =
+    fieldName === 'showAll'
+      ? t('show-all.label', { count: fieldValue })
+      : toReadableString(fieldName);
   return (
     <Box
-      key={fieldName}
       sx={{
         alignItems: 'center',
         justifyContent: 'space-between',
       }}
       display="flex"
       gap={9}
+      role="group"
+      aria-label={fieldName}
     >
       <LabelContainer>
         <Typography
@@ -76,7 +107,7 @@ const HitFieldRow = ({ fieldName, fieldValue }: HitFieldRowProps) => {
           color="tertiary"
           sx={{ textAlign: 'left', width: 'fit-content' }}
         >
-          {toReadableString(fieldName)}
+          {labelText}
         </Typography>
       </LabelContainer>
       <ValueContainer>{valueElement}</ValueContainer>
@@ -97,7 +128,7 @@ const ValueContainer = styled.div`
   overflow: hidden;
 `;
 
-const SourceUrl = styled.div`
+const Url = styled.div`
   width: 90%;
   ${createFontStyles('body-3')};
   white-space: nowrap;
@@ -105,4 +136,4 @@ const SourceUrl = styled.div`
   overflow: hidden;
 `;
 
-export default HitFieldRow;
+export default HitItemRow;

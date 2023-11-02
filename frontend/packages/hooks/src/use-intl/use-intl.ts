@@ -1,4 +1,12 @@
 const useIntl = (locale = 'en-US') => {
+  const formatDateWithShortMonth = (date: Date) => {
+    // Eg: 02 Aug. 2023
+    const day = date.toLocaleString('default', { day: '2-digit' });
+    const month = date.toLocaleString('default', { month: 'short' });
+    const year = date.toLocaleString('default', { year: 'numeric' });
+    return `${day} ${month}. ${year}`;
+  };
+
   const formatDateWithLongMonth = (date: Date) =>
     new Intl.DateTimeFormat(locale, {
       day: 'numeric',
@@ -63,6 +71,7 @@ const useIntl = (locale = 'en-US') => {
   };
 
   return {
+    formatDateWithShortMonth,
     formatDateWithLongMonth,
     formatDateWithTime,
     formatUtcDate,

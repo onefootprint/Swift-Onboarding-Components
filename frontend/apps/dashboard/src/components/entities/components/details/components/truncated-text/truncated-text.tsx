@@ -42,7 +42,7 @@ const TruncatedText = ({
       sx={textSxStyle}
     >
       <bdi>{currShownText}</bdi>
-      {shownTextState !== ShownTextState.FULL_WITHIN_MAX_HEIGHT ? (
+      {shownTextState !== ShownTextState.FULL_WITHIN_MAX_HEIGHT && (
         <LinkButton
           variant={seeMoreButtonVariant}
           onClick={showMoreOrLessText}
@@ -53,7 +53,7 @@ const TruncatedText = ({
             ? t('see-more')
             : t('see-less')}
         </LinkButton>
-      ) : null}
+      )}
     </Typography>
   );
 };
