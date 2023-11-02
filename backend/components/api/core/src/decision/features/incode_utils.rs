@@ -212,13 +212,21 @@ impl ParsedIncodeAddress {
     }
 
     pub fn from_fetch_ocr_res(ocr: &FetchOCRResponse) ->  ParsedIncodeAddress {
-        let fields = ocr.address_fields.as_ref();
-        // fields, full address
-        let city = scrubbed_to_pii(fields.and_then(|f| f.city.as_ref()));
-        let state = scrubbed_to_pii(fields.and_then(|f| f.state.as_ref()));
-        // Incode sometimes returns zips in Zip9 format
-        let zip = scrubbed_to_pii(fields.and_then(|f| f.postal_code.as_ref())).map(Self::normalize_zip);
-        let street =  scrubbed_to_pii(fields.and_then(|f| f.street.as_ref()));
+        // first check broken out fields
+        let (city, state, zip, street) = match ocr.address_fields.as_ref().or(ocr.checked_address_bean.as_ref()) {
+            Some(a) => {
+                // fields, full address
+                let city = scrubbed_to_pii(a.city.as_ref());
+                let state = scrubbed_to_pii(a.state.as_ref());
+                // Incode sometimes returns zips in Zip9 format
+                let zip = scrubbed_to_pii(a.postal_code.as_ref()).map(Self::normalize_zip);
+                let street =  scrubbed_to_pii(a.street.as_ref());
+
+                (city, state, zip, street)
+            },
+            None => (None, None, None, None)
+        };
+        
 
         ParsedIncodeAddress::new(city, state, zip, street, scrubbed_to_pii(ocr.address.as_ref()))
 
@@ -253,7 +261,7 @@ pub(crate) fn dob_matches(ocr: &FetchOCRResponse, vault_data: &IncodeOcrComparis
     vault_data.dob.clone().and_then(|dob| dob_ocr.as_ref().map(|ocr_dob| pii_strings_match(ocr_dob, &dob)))
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct AddressMatchResult {
     pub did_not_match: Vec<IdentityDataKind>,
     pub matched: Vec<IdentityDataKind>, 
@@ -830,7 +838,7 @@ mod tests {
             zip: Some("12345".into()),
             city: Some("BOSTON".into()),
             state: Some("MA".into()),
-        } => (address_mr(vec![IDK::City, IDK::State, IDK::Zip, IDK::AddressLine1], vec![], vec![]), Some(true)) ; "address matches"
+        }, (address_mr(vec![IDK::City, IDK::State, IDK::Zip, IDK::AddressLine1], vec![], vec![]), Some(true)) ; "address matches"
     )]
     #[test_case(
         OCRAddress {
@@ -848,7 +856,7 @@ mod tests {
             zip: Some("12345".into()),
             city: Some("BOSTON".into()),
             state: Some("MA".into()),
-        } => (address_mr(vec![IDK::City, IDK::State, IDK::Zip, IDK::AddressLine1], vec![], vec![]), Some(true)); "address normalized matches"
+        }, (address_mr(vec![IDK::City, IDK::State, IDK::Zip, IDK::AddressLine1], vec![], vec![]), Some(true)); "address normalized matches"
     )]
     #[test_case(
         OCRAddress {
@@ -867,7 +875,7 @@ mod tests {
             zip: Some("12345".into()),
             city: Some("BOSTON".into()),
             state: Some("MA".into()),
-        } => (address_mr(vec![IDK::City, IDK::Zip, IDK::AddressLine1], vec![IDK::State], vec![]), Some(false)) ; "address normalized does not match"
+        }, (address_mr(vec![IDK::City, IDK::Zip, IDK::AddressLine1], vec![IDK::State], vec![]), Some(false)) ; "address normalized does not match"
     )]
     #[test_case(
         OCRAddress {
@@ -883,7 +891,7 @@ mod tests {
             zip: Some("12345".into()),
             city: Some("BOSTON".into()),
             state: Some("MA".into()),
-        } => (address_mr(vec![], vec![IDK::City, IDK::State, IDK::Zip, IDK::AddressLine1], vec![]), Some(false)) ; "nothing matches"
+        }, (address_mr(vec![], vec![IDK::City, IDK::State, IDK::Zip, IDK::AddressLine1], vec![]), Some(false)) ; "nothing matches"
     )]
     #[test_case(
         OCRAddress {
@@ -896,16 +904,27 @@ mod tests {
             zip: Some("12345".into()),
             city: Some("BOSTON".into()),
             state: Some("MA".into()),
-        } => (address_mr(vec![], vec![IDK::Zip, IDK::AddressLine1], vec![IDK::City, IDK::State]), None) ; "missing a few fields, so match returns None"
+        }, (address_mr(vec![], vec![IDK::Zip, IDK::AddressLine1], vec![IDK::City, IDK::State]), None) ; "missing a few fields, so match returns None"
     )]
-    fn test_address_matching(ocr_address: OCRAddress, vault_address: IncodeOcrAddress) ->  (AddressMatchResult, Option<bool>) {
+    fn test_address_matching(ocr_address: OCRAddress, vault_address: IncodeOcrAddress, result: (AddressMatchResult, Option<bool>)) {
+        // let (expected_res, expected_match) = result;
+        
         let ocr = FetchOCRResponse {
-            address_fields: Some(ocr_address),
+            address_fields: Some(ocr_address.clone()),
             ..Default::default()
         };
+        let ocr2 = FetchOCRResponse {
+            checked_address_bean: Some(ocr_address),
+            ..Default::default()
+        };
+        
         let parsed_address = ParsedIncodeAddress::from_fetch_ocr_res(&ocr);
+        let parsed_address2 = ParsedIncodeAddress::from_fetch_ocr_res(&ocr2);
         let res = address_matches(&parsed_address, &vault_address);
+        let res2 = address_matches(&parsed_address2, &vault_address);
         let matched = res.matched();
-        (res, matched)
+        let matched2 = res.matched();
+        assert_eq!((res, matched), result.clone());
+        assert_eq!((res2, matched2), result.clone());
     }
 }
