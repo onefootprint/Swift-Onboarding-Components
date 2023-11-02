@@ -1,9 +1,8 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
 import { IdDI, UsLegalStatus } from '@onefootprint/types';
 import type { CountrySelectOption } from '@onefootprint/ui';
-import { Divider, Grid, media } from '@onefootprint/ui';
+import { Divider, Grid } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -123,15 +122,17 @@ const LegalStatus = ({
       {hideHeader ? null : (
         <>
           <NavigationHeader />
-          <HeaderTitle
-            title={t('title')}
-            subtitle={t('subtitle')}
-            sx={{ marginBottom: 7 }}
-          />
+          <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         </>
       )}
       <FormProvider {...methods}>
-        <Form as="form" onSubmit={methods.handleSubmit(handleBeforeSubmit)}>
+        <Grid.Container
+          as="form"
+          onSubmit={methods.handleSubmit(handleBeforeSubmit)}
+          marginTop={7}
+          width="100%"
+          gap={6}
+        >
           <StatusFields handleStatusChange={handleStatusChange} />
           <Divider />
           <CountryOfBirthField />
@@ -145,21 +146,10 @@ const LegalStatus = ({
             ctaLabel={ctaLabel}
             submitButtonTestID="continue-button"
           />
-        </Form>
+        </Grid.Container>
       </FormProvider>
     </>
   );
 };
-
-const Form = styled(Grid.Container)`
-  ${({ theme }) => css`
-    width: 100%;
-    row-gap: ${theme.spacing[5]};
-
-    ${media.lessThan('sm')`
-      row-gap: ${theme.spacing[6]};
-    `}
-  `}
-`;
 
 export default LegalStatus;
