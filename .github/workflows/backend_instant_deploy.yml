@@ -1,23 +1,12 @@
-name: Backend Instant Deploy Stack
+name: Backend Instant Deploy Production
 
 on:
   workflow_dispatch:
     inputs:
-      environment:
-        description: 'secrets environment to use'
-        type: environment
-        required: true
-
-      stackName:
-        description: 'stack or possibly ephemeral stack name, i.e. dev'
+      commitHash:
+        description: 'Hash of commit that we will be deploying. Can be long or short hash. But, ensure that there is an image built for this commit'
         type: string
         required: true
-
-      shortHashVersion:
-        description: 'Short SHA of API server image version (or latest)'
-        type: string
-        required: false
-        default: 'latest'
 
 jobs:
   instant_deploy_stack:
@@ -25,11 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       url: 'https://${{ steps.constants.outputs.url }}'
-    environment:
-      name: ${{ inputs.environment }}
-      url: 'https://${{ steps.constants.outputs.url }}'
+      versionLong: '${{ steps.constants.outputs.versionLong }}'
+    environment: production
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${{ inputs.commitHash }}
+          # We extract all commits here to make sure we're pulling the right commit hash
+          fetch-depth: 0
 
       # pulumi setup
       - uses: actions/setup-node@v2
@@ -51,35 +43,39 @@ jobs:
       - run: yarn install
         working-directory: ./backend/infra
 
-      # get environment constants
       - name: Extract Constants
         shell: bash
-        working-directory: ./backend/infra
-        run: |
-          sub=$(pulumi config --stack ${{ inputs.stackName }} get --path constants.domain.prefix)
-          base=$(pulumi config --stack ${{ inputs.stackName }} get --path constants.domain.base)
-          url="${sub}${base}"
-          version="${branch}-${{ inputs.shortHashVersion }}"
-          echo "##[set-output name=url;]$(echo ${url})"
-          echo "##[set-output name=componentVersion;]$(echo ${version})"
         id: constants
-
-      - name: select stack
-        working-directory: ./backend/infra
-        run: pulumi stack select "${{ inputs.stackName }}"
-
-      - name: 'set api/enclave image version'
         working-directory: ./backend/infra
         run: |
-          pulumi config set --path constants.containers.apiVersion ${{ steps.constants.outputs.componentVersion }}
-          pulumi config set --path constants.containers.enclaveVersion ${{ steps.constants.outputs.componentVersion }}
+          pulumi stack select prod
+
+          sub=$(pulumi config get --path constants.domain.prefix)
+          base=$(pulumi config get --path constants.domain.base)
+          url="${sub}${base}"
+
+          git --version
+          versionLong=$(git rev-parse HEAD)
+          apiVersion="master-$(git rev-parse --short HEAD)"
+          enclaveVersion="master-$(git log -n 1 --format="%h" ../components/enclave)"
+
+          echo "url is ${url}"
+          echo "api is ${apiVersion}"
+          echo "enclave is ${enclaveVersion}"
+
+          pulumi config set --path constants.containers.apiVersion $apiVersion
+          pulumi config set --path constants.containers.enclaveVersion $enclaveVersion
+
+          echo "##[set-output name=url;]$(echo ${url})"
+          echo "##[set-output name=componentVersion;]$(echo ${apiVersion})"
+          echo "##[set-output name=versionLong;]$(echo ${versionLong})"
 
       # bring up the stack
       - uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
         with:
           command: up
           work-dir: ./backend/infra
-          stack-name: '${{ inputs.stackName }}'
+          stack-name: prod
           message: 'Deployed to https://${{ steps.constants.outputs.url }} with component ${{ steps.constants.outputs.componentVersion }}'
           cloud-url: ${{ secrets.PULUMI_CLOUD_URL }}
 
@@ -92,7 +88,8 @@ jobs:
       contents: write
       pull-requests: write
     with:
-      testUrl: '${{ needs.deploy_stack_dev.outputs.url }}'
+      testUrl: '${{ needs.instant_deploy_stack.outputs.url }}'
+      expectedCommitHash: ${{ needs.instant_deploy_stack.outputs.versionLong }}
       isPR: false
       waitForDeploy: true
       environment: ${{ inputs.environment }}
