@@ -20,8 +20,8 @@ pub enum UserError {
     #[error("Document type not provided")]
     NoDocumentType,
 
-    #[error("Cannot use fixture phone number in non-sandbox mode.")]
-    FixtureNumberInLive,
+    #[error("Cannot use fixture email or phone number in non-sandbox mode.")]
+    FixtureCIInLive,
     #[error("Cannot provide sandbox data in live mode or live data in sandbox mode.")]
     SandboxMismatch,
     #[error("Invalid auth session: {0}")]

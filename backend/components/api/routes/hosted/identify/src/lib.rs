@@ -1,5 +1,6 @@
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::user::CheckedUserAuthContext;
+use api_core::errors::user::UserError;
 use api_core::errors::ApiResult;
 use api_core::telemetry::RootSpan;
 use api_core::utils::challenge::ChallengeToken;
@@ -235,9 +236,11 @@ pub fn send_email_challenge_non_blocking(
 ) -> ApiResult<ChallengeData> {
     // Send non-blocking to prevent us from returning the challenge data to the frontend while
     // we wait for sendrid latency
-    let code = if tenant.id.is_integration_test_tenant() && sandbox_id.is_some() {
-        // we can't currently view sent emails from our integration tests, so this temporarily allows us to still OTP emails from integration tests. sandbox check as a lil extra precaution
-        "424242".to_owned()
+    if email.is_fixture() && sandbox_id.is_none() {
+        return Err(UserError::FixtureCIInLive.into());
+    }
+    let code = if email.is_fixture() {
+        "000000".to_owned()
     } else {
         crypto::random::gen_rand_n_digit_code(6)
     };

@@ -37,3 +37,15 @@ def foo_sandbox_tenant():
     }
 
     return create_tenant(org_data, ob_conf_data)
+
+
+@pytest.fixture(scope="session")
+def skip_phone_obc(sandbox_tenant):
+    return create_ob_config(
+        sandbox_tenant,
+        "skip phone",
+        must_collect_data=["full_address", "name", "email"],
+        can_access_data=["full_address", "name", "email"],
+        optional_data=[],
+        is_no_phone_flow=True,
+    )

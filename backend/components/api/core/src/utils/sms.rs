@@ -273,7 +273,7 @@ impl SmsClient {
         // Send non-blocking to prevent us from returning the challenge data to the frontend while
         // we wait for twilio latency
         if destination.is_fixture_phone_number() && sandbox_id.is_none() {
-            return Err(UserError::FixtureNumberInLive.into());
+            return Err(UserError::FixtureCIInLive.into());
         }
         let code = if destination.is_fixture_phone_number() {
             // For our one fixture number in sandbox mode, we want the 2fac code to be fixed

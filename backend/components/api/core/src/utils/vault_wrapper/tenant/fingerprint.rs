@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::{collections::HashSet, str::FromStr};
 
 use db::{
     models::{
@@ -10,6 +10,7 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
+    email::Email,
     fingerprinter::{FingerprintScopable, FingerprintScope, GlobalFingerprintKind},
     FingerprintVersion, IdentityDataKind as IDK, PhoneNumber,
 };
@@ -52,9 +53,15 @@ impl<Type> TenantVw<Type> {
         let phone_number = self
             .decrypt_unchecked_single(&state.enclave_client, IDK::PhoneNumber.into())
             .await?;
+        let email = self
+            .decrypt_unchecked_single(&state.enclave_client, IDK::Email.into())
+            .await?;
         let is_fixture = phone_number
             .and_then(|p| PhoneNumber::parse(p).ok())
-            .is_some_and(|p| p.is_fixture_phone_number());
+            .is_some_and(|p| p.is_fixture_phone_number())
+            || email
+                .and_then(|e| Email::from_str(e.leak()).ok())
+                .is_some_and(|e| e.is_fixture());
         let global_scope_fps = if !is_fixture {
             ob_config
                 .must_collect_data
@@ -63,7 +70,7 @@ impl<Type> TenantVw<Type> {
                 .filter_map(|di| GlobalFingerprintKind::try_from(di).ok())
                 .collect_vec()
         } else {
-            // No global fingerprints for the fixture phone number
+            // No global fingerprints for the fixture phone number or email
             vec![]
         };
         let global_scope_fps = global_scope_fps.iter().filter_map(|fpk| -> Option<_> {

@@ -31,11 +31,19 @@ class BifrostClient:
     BifrostClient simulates Footprint hosted frontend's requests to the backend APIs.
     """
 
-    def raw_auth(ob_config, auth_token, phone_number, sandbox_id):
+    def raw_auth(
+        ob_config,
+        auth_token,
+        phone_number,
+        sandbox_id,
+        override_email=None,
+    ):
         """
         Create an instance of BifrostClient that uses the provided auth token.
         """
-        return BifrostClient(ob_config, auth_token, phone_number, sandbox_id)
+        return BifrostClient(
+            ob_config, auth_token, phone_number, sandbox_id, override_email
+        )
 
     def inherit(
         ob_config, twilio, phone_number, sandbox_id, override_ob_config_auth=None

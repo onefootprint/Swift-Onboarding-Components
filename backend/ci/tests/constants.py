@@ -36,6 +36,9 @@ ENVIRONMENT = get_secret("ENVIRONMENT")
 # This phone number can only be used in sandbox. It will always yield a PIN code of 000000 in the identify flow and we never send SMS messages to it.
 # However, users created with this phone number can never be identified at another tenant.
 FIXTURE_PHONE_NUMBER = "+15555550100"
+# This email can only be used in sandbox. It will always yield a PIN code of 000000 in the identify flow and we never send emails to it.
+# However, users created with this email can never be identified at another tenant.
+FIXTURE_EMAIL = f"sandbox@onefootprint.com"
 
 live_phone_number_hash = hash(LIVE_PHONE_NUMBER)
 EMAIL = f"footprint.user.dev+{live_phone_number_hash}@gmail.com"
@@ -44,7 +47,7 @@ CUSTODIAN_KEY = get_secret("CUSTODIAN_KEY") or "onefootprint"
 CUSTODIAN_AUTH = CustodianAuth(CUSTODIAN_KEY)
 SVIX_AUTH_TOKEN = get_secret("SVIX_AUTH_TOKEN")
 
-INTEGRATION_SANDBOX_EMAIL_OTP_PIN = "424242"
+FIXTURE_EMAIL_OTP_PIN = "000000"
 
 FIELDS_TO_DECRYPT = [
     ["id.last_name", "id.ssn9"],

@@ -2,9 +2,9 @@ import pytest
 from tests.utils import inherit_user_email
 from tests.headers import SandboxId
 from tests.headers import FpAuth
-from tests.constants import FIXTURE_PHONE_NUMBER, INTEGRATION_SANDBOX_EMAIL_OTP_PIN
+from tests.constants import FIXTURE_PHONE_NUMBER, FIXTURE_EMAIL_OTP_PIN
 from tests.utils import _gen_random_sandbox_id
-from tests.constants import EMAIL
+from tests.constants import FIXTURE_EMAIL
 from tests.utils import post, patch
 from tests.utils import get_requirement_from_requirements
 from tests.bifrost_client import BifrostClient
@@ -12,29 +12,17 @@ from tests.utils import create_ob_config, challenge_user
 
 
 @pytest.fixture(scope="session")
-def skip_phone_obc(sandbox_tenant):
-    return create_ob_config(
-        sandbox_tenant,
-        "KYC with optional ssn",
-        must_collect_data=["full_address", "name", "email"],
-        can_access_data=["full_address", "name", "email"],
-        optional_data=[],
-        is_no_phone_flow=True,
-    )
-
-
-@pytest.fixture(scope="session")
 def no_phone_user(skip_phone_obc):
     sandbox_id = _gen_random_sandbox_id()
     headers = [skip_phone_obc.key, SandboxId(sandbox_id)]
 
-    res = post("hosted/identify/signup_challenge", dict(email=EMAIL), *headers)
+    res = post("hosted/identify/signup_challenge", dict(email=FIXTURE_EMAIL), *headers)
     challenge_token = res["challenge_data"]["challenge_token"]
 
     res = post(
         "hosted/identify/verify",
         dict(
-            challenge_response=INTEGRATION_SANDBOX_EMAIL_OTP_PIN,
+            challenge_response=FIXTURE_EMAIL_OTP_PIN,
             challenge_token=challenge_token,
             scope="onboarding",
         ),
@@ -46,11 +34,12 @@ def no_phone_user(skip_phone_obc):
         FpAuth(res["auth_token"]),
         FIXTURE_PHONE_NUMBER,
         sandbox_id,
+        override_email=FIXTURE_EMAIL,
     )
     user = bifrost.run()
 
     # Assert we can't replace the verified email
-    data = {"id.email": EMAIL}
+    data = {"id.email": FIXTURE_EMAIL}
     key = skip_phone_obc.tenant.sk.key
     body = patch(f"entities/{user.fp_id}/vault", data, key, status_code=400)
     assert (
@@ -64,7 +53,7 @@ def test_new_user(skip_phone_obc):
     collect_data = ["full_address", "name", "email"]
     headers = [skip_phone_obc.key, SandboxId(_gen_random_sandbox_id())]
 
-    res = post("hosted/identify/signup_challenge", dict(email=EMAIL), *headers)
+    res = post("hosted/identify/signup_challenge", dict(email=FIXTURE_EMAIL), *headers)
     challenge_token = res["challenge_data"]["challenge_token"]
 
     # incorrect PIN fails
@@ -83,7 +72,7 @@ def test_new_user(skip_phone_obc):
     res = post(
         "hosted/identify/verify",
         dict(
-            challenge_response=INTEGRATION_SANDBOX_EMAIL_OTP_PIN,
+            challenge_response=FIXTURE_EMAIL_OTP_PIN,
             challenge_token=challenge_token,
             scope="onboarding",
         ),
@@ -171,7 +160,7 @@ def test_step_up(no_phone_user, sandbox_tenant):
     # Step up the auth token using an email challenge
     challenge_data = challenge_user(None, "email", auth_token)
     data = dict(
-        challenge_response=INTEGRATION_SANDBOX_EMAIL_OTP_PIN,
+        challenge_response=FIXTURE_EMAIL_OTP_PIN,
         challenge_token=challenge_data["challenge_token"],
         scope="onboarding",
     )

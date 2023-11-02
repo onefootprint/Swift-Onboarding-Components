@@ -12,6 +12,8 @@ pub struct Email {
 string_api_data_type_alias!(Email);
 
 impl Email {
+    const FIXTURE_EMAIL: &str = "sandbox@onefootprint.com";
+
     pub fn leak(&self) -> &str {
         self.email.leak()
     }
@@ -25,6 +27,10 @@ impl Email {
         email_address::EmailAddress::new_unchecked(self.leak())
             .domain()
             .to_string()
+    }
+
+    pub fn is_fixture(&self) -> bool {
+        self.email.leak() == Self::FIXTURE_EMAIL
     }
 }
 

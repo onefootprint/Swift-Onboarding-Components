@@ -1,8 +1,8 @@
 import pytest
 from tests.utils import _gen_random_sandbox_id, post, create_ob_config
-from tests.headers import SandboxId
+from tests.headers import SandboxId, IsLive
 from tests.bifrost_client import BifrostClient
-from tests.constants import FIXTURE_PHONE_NUMBER
+from tests.constants import FIXTURE_PHONE_NUMBER, FIXTURE_EMAIL
 
 
 @pytest.fixture(scope="session")
@@ -88,20 +88,41 @@ def test_one_click_same_tenant_no_decryption_bleeding(
     }
 
 
-def test_identify_fixture_phone_number_non_sandbox(sandbox_tenant):
+@pytest.mark.parametrize(
+    "identifier", [dict(phone_number=FIXTURE_PHONE_NUMBER), dict(email=FIXTURE_EMAIL)]
+)
+def test_identify_fixture_non_sandbox(sandbox_tenant, identifier, skip_phone_obc):
+    if "phone_number" in identifier:
+        sandbox_obc = sandbox_tenant.default_ob_config
+    if "email" in identifier:
+        sandbox_obc = skip_phone_obc
     # Should work with sandbox id
     sandbox_id = _gen_random_sandbox_id()
     post(
         "hosted/identify/signup_challenge",
-        dict(phone_number=FIXTURE_PHONE_NUMBER),
-        sandbox_tenant.default_ob_config.key,
+        identifier,
+        sandbox_obc.key,
         SandboxId(sandbox_id),
     )
 
+    # Have to make a live OBC to test using the fixture numebr in live mode
+    live_obc = create_ob_config(
+        sandbox_tenant,
+        "skip phone",
+        must_collect_data=["full_address", "name", "email"],
+        can_access_data=["full_address", "name", "email"],
+        optional_data=[],
+        is_no_phone_flow=True,
+        override_auths=[sandbox_tenant.auth_token, IsLive("true")],
+    )
     # Fixture number shouldn't even work in prod
-    post(
+    body = post(
         "hosted/identify/signup_challenge",
-        dict(phone_number=FIXTURE_PHONE_NUMBER),
-        sandbox_tenant.default_ob_config.key,
+        identifier,
+        live_obc.key,
         status_code=400,
+    )
+    assert (
+        body["error"]["message"]
+        == "Cannot use fixture email or phone number in non-sandbox mode."
     )

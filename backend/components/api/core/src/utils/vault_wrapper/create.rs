@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use super::{Any, PatchDataResult, Person, VaultWrapper};
 use crate::enclave_client::VaultKeyPair;
 use crate::errors::onboarding::OnboardingError;
@@ -9,6 +11,7 @@ use db::models::scoped_vault::{ScopedVault, ScopedVaultUpdate};
 use db::models::vault::NewVaultArgs;
 use db::models::vault::Vault;
 use db::TxnPgConn;
+use newtypes::email::Email;
 use newtypes::{
     DataIdentifier as DI, DataLifetimeSource, DataRequest, Fingerprint, FingerprintRequest,
     FingerprintScopeKind, OnboardingStatus, PhoneNumber, PiiString, SandboxId,
@@ -34,10 +37,11 @@ pub struct InitialVaultData {
 
 impl InitialVaultData {
     fn is_fixture(&self) -> ApiResult<bool> {
-        if self.di != DI::from(IDK::PhoneNumber) {
-            return Ok(false);
-        }
-        let is_fixture = PhoneNumber::parse(self.value.clone())?.is_fixture_phone_number();
+        let is_fixture = match self.di {
+            DI::Id(IDK::PhoneNumber) => PhoneNumber::parse(self.value.clone())?.is_fixture_phone_number(),
+            DI::Id(IDK::Email) => Email::from_str(self.value.leak())?.is_fixture(),
+            _ => false,
+        };
         Ok(is_fixture)
     }
 }
@@ -70,7 +74,7 @@ impl VaultWrapper<Person> {
             .into_iter()
             .any(|x| x);
         if obc.is_live && is_fixture_data {
-            return Err(UserError::FixtureNumberInLive.into());
+            return Err(UserError::FixtureCIInLive.into());
         }
 
         if initial_data

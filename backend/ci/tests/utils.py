@@ -10,11 +10,10 @@ from tests.headers import SandboxId
 from tests.types import ObConfiguration, SecretApiKey, Tenant
 from tests.headers import DashboardAuth, FpAuth, IsLive
 from tests.constants import (
-    EMAIL,
     CUSTODIAN_AUTH,
     TEST_URL,
     FIXTURE_PHONE_NUMBER,
-    INTEGRATION_SANDBOX_EMAIL_OTP_PIN,
+    FIXTURE_EMAIL_OTP_PIN,
 )
 
 url = lambda path: "{}/{}".format(TEST_URL, path.strip("/"))
@@ -299,7 +298,7 @@ def inherit_user_email(user):
     verify_res = post(
         "hosted/identify/verify",
         dict(
-            challenge_response=INTEGRATION_SANDBOX_EMAIL_OTP_PIN,
+            challenge_response=FIXTURE_EMAIL_OTP_PIN,
             challenge_token=body["challenge_data"]["challenge_token"],
             scope="onboarding",
         ),
@@ -520,6 +519,7 @@ def create_ob_config(
     international_country_restrictions=None,
     doc_scan_for_optional_ssn=None,
     kind=None,
+    override_auths=None,
 ):
     ob_conf_data = {
         "name": name,
@@ -535,7 +535,8 @@ def create_ob_config(
         "kind": kind,
     }
     # TODO also make this get or create?
-    body = post("org/onboarding_configs", ob_conf_data, *tenant.db_auths)
+    auths = override_auths if override_auths else tenant.db_auths
+    body = post("org/onboarding_configs", ob_conf_data, *auths)
     ob_config = ObConfiguration.from_response(body, tenant)
     print("\n======org onboarding info======")
     print(body)

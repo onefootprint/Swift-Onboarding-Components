@@ -4,10 +4,12 @@ use crate::State;
 use crate::{auth::session::AuthSessionData, errors::ApiResult};
 use crypto::random::gen_random_alphanumeric_code;
 use feature_flag::BoolFlag;
+use newtypes::email::Email;
 use newtypes::{ContactInfoId, PiiString, TenantId};
 use paperclip::actix::web;
 use reqwest::StatusCode;
 use std::collections::HashMap;
+use std::str::FromStr;
 
 use super::session::AuthSession;
 
@@ -182,6 +184,13 @@ impl SendgridClient {
         template_id: &str,
         template_data: HashMap<String, PiiString>,
     ) -> ApiResult<()> {
+        if Email::from_str(to_email.leak())
+            .ok()
+            .is_some_and(|e| e.is_fixture())
+        {
+            // Don't rate limit send emails to the fixture email number
+            return Ok(());
+        }
         let template_data = template_data
             .into_iter()
             .map(|(k, v)| (k, v.leak_to_string()))
