@@ -1,180 +1,59 @@
 import { CountryRecord } from '@onefootprint/global-constants';
-import { getErrorMessage } from '@onefootprint/request';
-import {
-  IdDocRequirement,
-  SupportedIdDocTypes,
-  UploadDocumentSide,
-} from '@onefootprint/types';
-import React, { useEffect, useMemo, useState } from 'react';
-import type { PhotoFile } from 'react-native-vision-camera';
-
-import { PREVIEW_AUTH_TOKEN } from '@/config/constants';
-import useTranslation from '@/hooks/use-translation';
-import { Events, useAnalytics } from '@/utils/analytics';
+import { SupportedIdDocTypes, UploadDocumentSide } from '@onefootprint/types';
+import React from 'react';
 
 import DefaultDocument from './components/default-document';
 import DriversLicense from './components/drivers-license';
 import Passport from './components/passport';
-import Context from './components/scan-context';
 import Selfie from './components/selfie';
-import ConsentDialog from './components/selfie/components/consent-dialog';
-import useUploadDoc from './hooks/use-upload-doc';
-import getPreviewNextSide from './utils/get-preview-next-side';
+import Upload from './components/upload';
 
 export type DocScanProps = {
   authToken: string;
   country: CountryRecord;
   docId: string;
   onBack?: () => void;
-  onConsentCompleted: () => void;
   onDone: (nextSideToCollect: UploadDocumentSide) => void;
   onRetryLimitExceeded: () => void;
-  requirement: IdDocRequirement;
   side: UploadDocumentSide;
   type: SupportedIdDocTypes;
 };
 
-const delayToShowConsentMS = 500;
-
 const DocScan = ({
-  authToken,
   country,
+  authToken,
   docId,
   onBack,
-  onConsentCompleted,
-  onDone,
   onRetryLimitExceeded,
-  requirement,
+  onDone,
   side,
   type,
 }: DocScanProps) => {
-  const { t, allT } = useTranslation('components.scan.preview.errors');
-  const [errors, setErrors] = useState([]);
-  const [showConsent, setShowConsent] = useState(false);
-  const { shouldCollectConsent } = requirement;
-  const isPreview = PREVIEW_AUTH_TOKEN === authToken;
-  const uploadMutation = useUploadDoc();
-  const analytics = useAnalytics();
-
-  useEffect(() => {
-    setTimeout(() => {
-      if (shouldCollectConsent) {
-        setShowConsent(true);
-      }
-    }, delayToShowConsentMS);
-  }, []);
-
-  const handleResetErrors = () => {
-    setErrors([]);
-  };
-
-  const handleSubmit = (
-    photoFile: PhotoFile,
-    meta: Record<string, boolean>,
-  ) => {
-    if (isPreview) {
-      onDone(getPreviewNextSide(side, type));
-    } else {
-      const data = new FormData();
-      // @ts-ignore
-      data.append('file', {
-        name: 'file.jpg',
-        type: 'image/jpeg',
-        uri: photoFile.path,
-      });
-      uploadMutation.mutate(
-        {
-          authToken,
-          data,
-          docId,
-          meta,
-          side,
-        },
-        {
-          onSuccess: response => {
-            if (response.errors.length > 0) {
-              analytics.track(Events.DocUploadFailed, {
-                side,
-                type,
-                docId,
-                error: response.errors,
-              });
-
-              const documentType = allT(`id-doc.${type}`);
-              const docSide = allT(`side.${side}`);
-              setErrors(
-                response.errors.map(error =>
-                  t(error, {
-                    documentType,
-                    countryName: country.label,
-                    side: docSide,
-                  }),
-                ),
-              );
-              if (response.isRetryLimitExceeded) {
-                onRetryLimitExceeded();
-              }
-            } else {
-              analytics.track(Events.DocUploadSucceeded, {
-                side,
-                type,
-                docId,
-              });
-
-              setTimeout(() => {
-                onDone(response.nextSideToCollect);
-              }, 1500);
-            }
-          },
-          onError: (error: unknown) => {
-            analytics.track(Events.DocUploadFailed, {
-              side,
-              type,
-              docId,
-              error: getErrorMessage(error),
-            });
-            setErrors([getErrorMessage(error)]);
-          },
-        },
-      );
+  const renderDocumentType = () => {
+    if (side === UploadDocumentSide.Selfie) {
+      return <Selfie />;
     }
+    if (type === SupportedIdDocTypes.passport) {
+      return <Passport onBack={onBack} />;
+    }
+    if (type === SupportedIdDocTypes.driversLicense) {
+      return <DriversLicense country={country} onBack={onBack} side={side} />;
+    }
+    return <DefaultDocument onBack={onBack} side={side} type={type} />;
   };
-
-  const contextValues = useMemo(
-    () => ({
-      country,
-      authToken,
-      errors,
-      isError: errors.length > 0,
-      isLoading: uploadMutation.isLoading,
-      isSuccess:
-        uploadMutation.isSuccess && uploadMutation.data.errors.length === 0,
-      onSubmit: handleSubmit,
-      onResetErrors: handleResetErrors,
-      onBack,
-    }),
-    [authToken, country, errors, uploadMutation],
-  );
-
-  const isPassport = type === SupportedIdDocTypes.passport;
-  const isDriversLicense = type === SupportedIdDocTypes.driversLicense;
-  const isDefaultDocument = !isPassport && !isDriversLicense;
 
   return (
-    <Context.Provider value={contextValues}>
-      {showConsent && (
-        <ConsentDialog authToken={authToken} onCompleted={onConsentCompleted} />
-      )}
-      {side === UploadDocumentSide.Selfie ? (
-        <Selfie />
-      ) : (
-        <>
-          {isPassport && <Passport side={side} />}
-          {isDriversLicense && <DriversLicense side={side} />}
-          {isDefaultDocument && <DefaultDocument type={type} side={side} />}
-        </>
-      )}
-    </Context.Provider>
+    <Upload
+      authToken={authToken}
+      country={country}
+      docId={docId}
+      onRetryLimitExceeded={onRetryLimitExceeded}
+      onSuccess={onDone}
+      side={side}
+      type={type}
+    >
+      {renderDocumentType()}
+    </Upload>
   );
 };
 

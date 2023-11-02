@@ -27,6 +27,11 @@ const theme: Theme = {
     success: t.primitivesGreen50,
     warning: t.primitivesYellow50,
     neutral: t.primitivesGray50,
+    infoInverted: t.primitivesBlue100,
+    successInverted: t.primitivesGreen200,
+    warningInverted: t.primitivesYellow200,
+    neutralInverted: t.primitivesGray100,
+    errorInverted: t.primitivesRed100,
   },
   borderColor: {
     transparent: 'transparent',
@@ -49,6 +54,11 @@ const theme: Theme = {
     success: t.primitivesGreen600,
     warning: t.primitivesYellow800,
     neutral: t.primitivesGray800,
+    successInverted: t.primitivesGreen700,
+    warningInverted: t.primitivesYellow700,
+    errorInverted: t.primitivesRed700,
+    infoInverted: t.primitivesBlue700,
+    neutralInverted: t.primitivesGray700,
   },
   components,
 };

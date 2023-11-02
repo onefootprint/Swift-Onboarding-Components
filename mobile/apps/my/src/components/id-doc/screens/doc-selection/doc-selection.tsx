@@ -1,10 +1,6 @@
 import { CountryRecord, DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { getErrorMessage } from '@onefootprint/request';
-import {
-  CountryCode,
-  IdDocRequirement,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
 import {
   Box,
   Button,
@@ -24,30 +20,36 @@ import { Events, useAnalytics } from '@/utils/analytics';
 
 import getSupportedCountryByCode from '../../utils/get-supported-country-by-code';
 import useSubmitDocType from '../doc-scan/hooks/use-submit-doc-type';
+import ConsentDialog from './components/consent-dialog';
 import PermissionsDialog from './components/permissions-dialog';
 import useCountryOptions from './hooks/use-country-options';
 import useDocumentOptions from './hooks/use-document-options';
 
 export type DocSelectionProps = {
-  requirement: IdDocRequirement;
-  defaultType?: SupportedIdDocTypes;
+  authToken: string;
   defaultCountry?: CountryRecord;
+  defaultType?: SupportedIdDocTypes;
+  onConsentCompleted: () => void;
   onSubmit: (
     countryCode: CountryCode,
     docType: SupportedIdDocTypes,
     docId: string,
   ) => void;
-  authToken: string;
+  shouldCollectConsent: boolean;
+  supportedCountryAndDocTypes: any;
 };
 
 const DocSelection = ({
-  requirement: { supportedCountryAndDocTypes },
-  defaultType,
-  defaultCountry = DEFAULT_COUNTRY,
   authToken,
+  defaultCountry = DEFAULT_COUNTRY,
+  defaultType,
+  onConsentCompleted,
   onSubmit,
+  shouldCollectConsent,
+  supportedCountryAndDocTypes,
 }: DocSelectionProps) => {
-  const { t } = useTranslation('components.scan.doc-selection');
+  const { t } = useTranslation('scan.doc-selection');
+  const [showConsent, setShowConsent] = useState(false);
   const app = useApp();
   const docTypeMutation = useSubmitDocType();
   const [country, setCountry] = useState<CountryRecord>(defaultCountry);
@@ -65,6 +67,7 @@ const DocSelection = ({
     Object.keys(supportedCountryAndDocTypes).length === 1;
   const countrySelectHint =
     oneCountrySupported && t('country-select.hint', { country: country.label });
+  const isPreview = authToken === PREVIEW_AUTH_TOKEN;
 
   const handleCountryChange = (newCountry: SelectOption<CountryRecord>) => {
     setCountry(newCountry);
@@ -77,13 +80,26 @@ const DocSelection = ({
     }
   };
 
-  const handleSubmit = () => {
+  const handleContinue = () => {
+    if (shouldCollectConsent && !showConsent) {
+      setShowConsent(true);
+    } else {
+      submit();
+    }
+  };
+
+  const handleConsentSubmit = () => {
+    onConsentCompleted();
+    submit();
+  };
+
+  const submit = () => {
     analytics.track(Events.DocSelectionSubmitted, {
       docType,
       countryCode: country.value,
     });
 
-    if (authToken === PREVIEW_AUTH_TOKEN) {
+    if (isPreview) {
       onSubmit(country.value, docType, '1234512345');
     } else {
       docTypeMutation.mutate(
@@ -111,8 +127,8 @@ const DocSelection = ({
   return (
     <ScrollLayout
       Footer={
-        <PermissionsDialog onContinue={handleSubmit}>
-          <Button onPress={handleSubmit}>{t('cta')}</Button>
+        <PermissionsDialog onGranted={handleContinue}>
+          <Button onPress={handleContinue}>{t('cta')}</Button>
         </PermissionsDialog>
       }
     >
@@ -140,6 +156,9 @@ const DocSelection = ({
           />
         </Box>
       </Box>
+      {showConsent && (
+        <ConsentDialog authToken={authToken} onSubmit={handleConsentSubmit} />
+      )}
     </ScrollLayout>
   );
 };

@@ -1,79 +1,53 @@
 import { SupportedIdDocTypes, UploadDocumentSide } from '@onefootprint/types';
 import kebabCase from 'lodash/kebabCase';
-import React, { useContext, useState } from 'react';
-import { useSharedValue } from 'react-native-reanimated';
-import { useFrameProcessor } from 'react-native-vision-camera';
+import React from 'react';
 
 import useTranslation from '@/hooks/use-translation';
-import { detectDocument } from '@/utils/vision-camera';
 
-import Frame from '../default-frame';
-import Instructions from '../default-instructions';
-import Scan from '../scan';
-import type { ScanObject } from '../scan/scan.types';
-import ScanContext from '../scan-context';
+import type { Document } from '../../doc-scan.types';
+import Camera from '../camera';
+import Countdown from '../countdown';
+import Frame from '../frame';
+import useFrameProcessor from './hooks/use-frame-processor';
 
 const DEFAULT_ASPECT_RATIO = 1.586;
 
 export type DefaultDocumentProps = {
+  onBack?: () => void;
+  onSubmit?: (doc: Document) => void;
   side: UploadDocumentSide;
   type: SupportedIdDocTypes;
 };
 
-const detected = {
-  isDetected: true,
-  feedback: '',
-  data: {},
-};
-
-const DefaultDocument = ({ side, type }: DefaultDocumentProps) => {
-  const { t, allT } = useTranslation(`components.scan.${kebabCase(type)}`);
-  const { country } = useContext(ScanContext);
-  const [object, setObject] = useState<ScanObject>({
-    isDetected: false,
-    feedback: '',
-    data: {},
-  });
-  const detector = useSharedValue(false);
-  const setObjectJs = Worklets.createRunInJsFn(setObject);
-  const setDetectorJs = Worklets.createRunInJsFn((value: boolean) => {
-    detector.value = value;
-  });
-
-  const frameProcessor = useFrameProcessor(
-    frame => {
-      'worklet';
-
-      const result = detectDocument(frame);
-      if (result.isDocument) {
-        setDetectorJs(true);
-        setObjectJs(detected);
-      } else {
-        setDetectorJs(false);
-        setObjectJs({
-          isDetected: false,
-          feedback: 'Position the document in view',
-          data: {},
-        });
-      }
-    },
-    [detector],
-  );
+const DefaultDocument = ({
+  onBack,
+  onSubmit,
+  side,
+  type,
+}: DefaultDocumentProps) => {
+  const { t } = useTranslation(`scan.${kebabCase(type)}`);
+  const { object, detector, frameProcessor } = useFrameProcessor();
+  const hasBackButton = side === UploadDocumentSide.Front;
 
   return (
-    <Instructions
-      side={side}
-      title={t(`instructions.${side}`, { country: country.value3 })}
+    <Camera
+      frameProcessor={frameProcessor}
+      object={object}
+      onBack={hasBackButton ? onBack : undefined}
+      onSubmit={onSubmit}
+      title={t(`title-${side}`)}
     >
-      <Scan
-        frameProcessor={frameProcessor}
-        object={object}
-        subtitle={allT(`doc-side.${side}`)}
-        title={t('title')}
-      >
-        <Frame detector={detector} aspectRatio={DEFAULT_ASPECT_RATIO} />
-      </Scan>
-    </Instructions>
+      {value => (
+        <Frame
+          aspectRatio={DEFAULT_ASPECT_RATIO}
+          description={t('instructions.description')}
+          detector={detector}
+          title={t(`instructions.title-${side}`)}
+        >
+          {value && <Countdown value={value} />}
+        </Frame>
+      )}
+    </Camera>
   );
 };
 

@@ -7,17 +7,12 @@ import useTranslation from '@/hooks/use-translation';
 import { Events, useAnalytics } from '@/utils/analytics';
 
 type PermissionsDialogProps = {
-  onContinue: () => void;
+  onGranted: () => void;
   children: React.ReactNode;
 };
 
-const PermissionsDialog = ({
-  children,
-  onContinue,
-}: PermissionsDialogProps) => {
-  const { t } = useTranslation(
-    'components.scan.doc-selection.permissions-dialog',
-  );
+const PermissionsDialog = ({ children, onGranted }: PermissionsDialogProps) => {
+  const { t } = useTranslation('scan.doc-selection.permissions-dialog');
   const [open, setOpen] = useState(false);
   const [permissions, setPermission] = useState<CameraPermissionStatus | null>(
     null,
@@ -42,7 +37,7 @@ const PermissionsDialog = ({
       const response = await Camera.requestCameraPermission();
       if (response === 'granted') {
         analytics.track(Events.DocCameraPermissionsGranted);
-        onContinue();
+        onGranted();
       }
       if (response === 'denied') {
         analytics.track(Events.DocCameraPermissionsDenied);

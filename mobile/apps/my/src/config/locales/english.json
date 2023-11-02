@@ -1,8 +1,4 @@
 {
-  "doc-side": {
-    "front": "Front side",
-    "back": "Back side"
-  },
   "side": {
     "front": "front",
     "back": "back"
@@ -70,156 +66,175 @@
       "success": {
         "title": "Biometric authentication successful!"
       }
-    },
-    "scan": {
-      "doc-selection": {
-        "title": "We need a photo of your ID",
-        "subtitle": "Select the option that works best for you",
-        "country-select": {
-          "hint": "Only documents issued by {{country}} are accepted"
-        },
-        "options": {
-          "dl": "Driver's license",
-          "id": "Identity card",
-          "passport": "Passport",
-          "residence-document": "Residence card / Green card",
-          "voter-identification": "Voter Identification",
-          "permit": "Work permit / EAD card",
-          "visa": "Visa"
-        },
-        "permissions-dialog": {
-          "title": "Allow access to your camera",
-          "description": "We will need you to take photos of your document to properly verify your identity.",
-          "continue": "Continue",
-          "open-settings": "Open settings",
-          "cta": "Continue"
-        },
+    }
+  },
+  "scan": {
+    "doc-selection": {
+      "title": "We need a photo of your ID",
+      "subtitle": "Select the option that works best for you",
+      "country-select": {
+        "hint": "Only documents issued by {{country}} are accepted"
+      },
+      "options": {
+        "dl": "Driver's license",
+        "id": "Identity card",
+        "passport": "Passport",
+        "residence-document": "Residence card / Green card",
+        "voter-identification": "Voter Identification",
+        "permit": "Work permit / EAD card",
+        "visa": "Visa"
+      },
+      "permissions-dialog": {
+        "title": "Allow access to your camera",
+        "description": "We will need you to take photos of your document to properly verify your identity.",
+        "continue": "Continue",
+        "open-settings": "Open settings",
         "cta": "Continue"
       },
+      "cta": "Continue"
+    },
+    "instructions": {
+      "title": "Instructions",
+      "bg": {
+        "title": "Find a background with good contrast",
+        "description": "High contrast helps with document detection, avoiding errors."
+      },
+      "frame": {
+        "title": "Position the document in the frame",
+        "description": "Make sure that the whole document is positioned, as indicated, in the frame."
+      },
+      "hold": {
+        "title": "Hold steady",
+        "description": "Hold your camera steady to avoid any blur or glare."
+      },
+      "auto": {
+        "title": "Image will be captured automatically",
+        "description": "We'll show a 3-second countdown before it's captured."
+      }
+    },
+    "upload": {
+      "errors": {
+        "title": "We couldn't process your image",
+        "cta": "Retake",
+        "doc_type_mismatch": "Document type didn't match. Please upload your {{documentType}} from {{countryName}}.",
+        "unknown_document_type": "We couldn't classify this document. Please upload your {{documentType}} from {{countryName}}.",
+        "unsupported_document_type": "Unfortunately the uploaded document type is not supported. Please upload your {{documentType}} from {{countryName}}.",
+        "wrong_document_side": "It looks like you uploaded the wrong side of your document. Please flip your ID and upload the {{side}} of your {{documentType}} from {{countryName}}.",
+        "wrong_one_sided_document": "Incorrect document type detected. Please upload your {{documentType}} from {{countryName}}.",
+        "document_not_readable": "Your document could not be read. Please try again.",
+        "document_glare": "Your document's picture had too much glare. Please adjust the lighting and try again.",
+        "document_sharpness": "The document image was blurry. Please upload or capture a sharper image.",
+        "id_type_not_acceptable": "Invalid document type detected. Please upload your {{documentType}} from {{countryName}}.",
+        "unable_to_align_document": "One or more corners of the document is not within the borders of the image. Please center the document in the frame and try again.",
+        "unknown_country_code": "We couldn't detect the issuer country from your document. Please upload your {{documentType}} from {{countryName}}.",
+        "country_code_mismatch": "The {{documentType}} issuer country didn't match. Please upload your {{documentType}} from {{countryName}}.",
+        "selfie_face_not_found": "We could not detect a face in the selfie. Please try again and make sure that your face is in the frame.",
+        "selfie_low_confidence": "We could not verify your selfie. Please try again.",
+        "selfie_too_dark": "Your image was too dark. Please adjust the lighting and try again.",
+        "selfie_glare": "Your selfie had too much glare. Please adjust the lighting and try again.",
+        "selfie_has_lenses": "We detected glasses in your selfie. Please remove your glasses and try again.",
+        "selfie_has_face_mask": "We detected a face mask in your selfie. Please remove all face coverings and try again.",
+        "selfie_blurry": "Your selfie was too blurry. Please try again.",
+        "selfie_image_size_unsupported": "Your selfie image was too small. Please try again with a higher resolution picture.",
+        "selfie_image_orientation_incorrect": "Your selfie image has the wrong orientation. Please ensure the picture submitted is in portrait format and try again.",
+        "selfie_bad_image_compression": "Your selfie image has the incorrect image compression. Please try again.",
+        "drivers_license_permit_not_allowed": "Driver's license permits are not allowed, please retry with a full driver's license or reach out to the business for support.",
+        "unknown_error": "An error occurred. Please try again.",
+        "face_not_found": "We could not detect a face in the document provided. Please try again and make sure that you a capturing a clear image."
+      },
+      "loading": {
+        "title": "Processing image",
+        "description": "Hang tight! It'll be done soon."
+      },
+      "success": {
+        "title": "Success!"
+      },
+      "too-many-attempts": {
+        "title": "Too many attempts",
+        "description": "Sorry, we can't continue onboarding as you've tried to submit your document images too many times. We'll reach out if we need more info."
+      }
+    },
+    "consent": {
+      "title": "Consent to use your images",
+      "subtitle": "Consent and Written Release for Collection, Use, Disclosure and Storage of Personal Data (including Biometric Information and Identifiers)",
+      "description": "By clicking Agree and continuing and providing One Footprint, Inc. (hereinafter referred to as \"Company\") with your Personal Data, including your Biometric Information and government identification information, you consent to Company's and Incode Technologies, Inc. (hereinafter \"Incode\")’s collection, storage, retention, use and disclosure of such information to provide the identity verification services, consistent with Company's Privacy Notice and Terms of Use you may find at https://www.onefootprint.com/privacy-policy and https://www.onefootprint.com/terms-of-service. Even if you consent, you can subsequently withdraw consent at any time.\n\nIn order to verify that you are the person depicted in your government-issued identification (\"Services\"), Company uses third-party technology from Incode to collect personal data from or about you, including biometric information and biometric identifiers such as your faceprint (\"Biometric Information\"), a selfie, and government-issued identification, including information obtained, for example and where applicable, by scanning the barcode (collectively with Biometric Information, \"Personal Data\"). Specifically, you will be asked to take a selfie through the Incode platform. Incode will then scan and map your facial features in comparison with the picture on your government-issued identification to allow you to create and/or access your account with Company. Please note the processing of your Personal Data, namely of your Biometric Information by Incode, shall include a comparison of the picture in your ID document with your selfie (1:1) which shall then be compared against the Company database for fraud prevention purposes (1:N). For the Services, Incode will also collect other information that is on the front and back of your identification documentation, including where it exists and permitted by law, by scanning the barcode and collecting information derived from it (e.g., name, date of birth, height). Incode uses this information to verify your identity and to prevent fraud. Incode may also, with your consent, use this information to improve its products and services. Company or Incode on behalf of Company, may also share your Personal Data with third-party service providers or governmental entities that enable us to provide our Services (e.g. cloud hosting providers, fraudsters data base or the Department of Motor Vehicles if you provide a US identification card) and other third parties where required by law. \n\nUse of your Personal Data: Your Personal Data, including Biometric Information, may be used for the following purposes (as applicable depending on your consent), in each case as further described in Company's Privacy Policy and/or Incode's Privacy Policy:\n \n• To provide the services for which the Personal Data was requested;\n • To improve or modify Incode's products and services; and\n• To comply with Company's or Incode's obligations under applicable law.\n\nYou can request the deletion of your Personal Data, and exercise any other rights under applicable data protection laws, at any time by emailing Company at support@onefootprint.com or Incode at dataprotection@incode.com. If you request deletion of your Personal Data, we will not be able to recover it at a later point. Company or Incode, as applicable, will permanently delete Biometric Information processed (if any) for its own purposes by the earlier of: (i) the time at which the purpose for which it was collected has been satisfied; or (ii) three years from the moment you provide consent. Incode will do likewise with the Biometric Information that it processes on behalf of, and as instructed by, Company.\n",
+      "scroll-to-agree": "Scroll to agree",
+      "agree-and-continue": "Agree and continue",
+      "continue": "Continue",
+      "third-party": "Optional:  By ticking this box and providing Incode with your Personal Data, including your Biometric Information and government identification information, you consent to and provide a written release to Incode for the collection, storage, retention, use and disclosure of such information to improve, modify or update Incode’s products or services (including its algorithm), in accordance with its Privacy Notice. You can exercise your rights under applicable privacy laws, including withdrawal of consent, by contacting dataprotection@incode.com. IMPORTANT: Your consent is voluntary, even if you do not consent you will still be able to access Company's services.",
+      "consent-bottomsheet": {
+        "submit-button": {
+          "disabled-title": "Scroll to agree",
+          "enabled-title": "Agree and continue"
+        }
+      }
+    },
+    "drivers-license": {
+      "title-front": "Driver's license - Front",
+      "title-back": "Driver's license - Back",
       "instructions": {
-        "document": {
-          "contrast": "Find a background with good contrast",
-          "in-view": "Position the document in view",
-          "steady": "Hold your device steady",
-          "auto-capture": "Image will be captured automatically",
-          "cta": "Continue"
-        },
-        "selfie": {
-          "title": "Take a selfie",
-          "subtitle": "This will allow us to validate the ID you uploaded in the previous step.",
-          "frame": "Position your face within the frame",
-          "steady": "Hold your device steady",
-          "auto-capture": "Selfie will be captured automatically",
-          "cta": "Continue"
-        }
-      },
-      "preview": {
-        "cta": "Confirm",
-        "cta-loading": "Submitting photo...",
-        "cta-success": "Photo submitted",
-        "retake": "Retake",
-        "errors": {
-          "title": "We couldn't process your image",
-          "doc_type_mismatch": "Document type didn't match. Please upload your {{documentType}} from {{countryName}}.",
-          "unknown_document_type": "We couldn't classify this document. Please upload your {{documentType}} from {{countryName}}.",
-          "unsupported_document_type": "Unfortunately the uploaded document type is not supported. Please upload your {{documentType}} from {{countryName}}.",
-          "wrong_document_side": "It looks like you uploaded the wrong side of your document. Please flip your ID and upload the {{side}} of your {{documentType}} from {{countryName}}.",
-          "wrong_one_sided_document": "Incorrect document type detected. Please upload your {{documentType}} from {{countryName}}.",
-          "document_not_readable": "Your document could not be read. Please try again.",
-          "document_glare": "Your document's picture had too much glare. Please adjust the lighting and try again.",
-          "document_sharpness": "The document image was blurry. Please upload or capture a sharper image.",
-          "id_type_not_acceptable": "Invalid document type detected. Please upload your {{documentType}} from {{countryName}}.",
-          "unable_to_align_document": "One or more corners of the document is not within the borders of the image. Please center the document in the frame and try again.",
-          "unknown_country_code": "We couldn't detect the issuer country from your document. Please upload your {{documentType}} from {{countryName}}.",
-          "country_code_mismatch": "The {{documentType}} issuer country didn't match. Please upload your {{documentType}} from {{countryName}}.",
-          "selfie_face_not_found": "We could not detect a face in the selfie. Please try again and make sure that your face is in the frame.",
-          "selfie_low_confidence": "We could not verify your selfie. Please try again.",
-          "selfie_too_dark": "Your image was too dark. Please adjust the lighting and try again.",
-          "selfie_glare": "Your selfie had too much glare. Please adjust the lighting and try again.",
-          "selfie_has_lenses": "We detected glasses in your selfie. Please remove your glasses and try again.",
-          "selfie_has_face_mask": "We detected a face mask in your selfie. Please remove all face coverings and try again.",
-          "selfie_blurry": "Your selfie was too blurry. Please try again.",
-          "selfie_image_size_unsupported": "Your selfie image was too small. Please try again with a higher resolution picture.",
-          "selfie_image_orientation_incorrect": "Your selfie image has the wrong orientation. Please ensure the picture submitted is in portrait format and try again.",
-          "selfie_bad_image_compression": "Your selfie image has the incorrect image compression. Please try again.",
-          "drivers_license_permit_not_allowed": "Driver's license permits are not allowed, please retry with a full driver's license or reach out to the business for support.",
-          "unknown_error": "An error occurred. Please try again.",
-          "face_not_found": "We could not detect a face in the document provided. Please try again and make sure that you a capturing a clear image."
-        },
-        "too-many-attempts": {
-          "title": "Too many attempts",
-          "description": "Sorry, we can't continue onboarding as you've tried to submit your document images too many times. We'll reach out if we need more info."
-        }
-      },
-      "drivers-license": {
-        "title": "Driver's license",
-        "instructions": {
-          "front": "Scan the front side of your driver's license ({{country}})",
-          "back": "Scan the back side of your driver's license ({{country}})"
-        }
-      },
-      "passport": {
-        "title": "Passport",
-        "instructions": "Scan the photo page of your passport ({{country}})"
-      },
-      "id-card": {
-        "title": "ID card",
-        "instructions": {
-          "front": "Scan the front side of your id card ({{country}})",
-          "back": "Scan the back side of your id card ({{country}})"
-        }
-      },
-      "voter-identification": {
-        "title": "Voter Identification",
-        "instructions": {
-          "front": "Scan the front side of your voter identification ({{country}})",
-          "back": "Scan the back side of your voter identification ({{country}})"
-        }
-      },
-      "residence-document": {
-        "title": "Residence card",
-        "instructions": {
-          "front": "Scan the front side of your residence card / Green card ({{country}})",
-          "back": "Scan the back side of your residence card / Green card ({{country}})"
-        }
-      },
-      "permit": {
-        "title": "EAD card",
-        "instructions": {
-          "front": "Scan the front side of your work permit / EAD card ({{country}})",
-          "back": "Scan the back side of your work permit / EAD card ({{country}})"
-        }
-      },
-      "visa": {
-        "title": "Visa",
-        "instructions": {
-          "front": "Scan the photo page of your Visa ({{country}})",
-          "back": "Scan the back side of your Visa ({{country}})"
-        }
-      },
-      "selfie": {
-        "title": "Selfie",
-        "instructions": "Scan the photo page of your passport",
-        "warnings": {
-          "no-face": "Unable to detect a face",
-          "not-centralized": "Center your face",
-          "not-straight": "Straighten your face"
-        },
-        "consent": {
-          "title": "Consent to use your images",
-          "subtitle": "Consent and Written Release for Collection, Use, Disclosure and Storage of Personal Data (including Biometric Information and Identifiers)",
-          "description": "By clicking Agree and continuing and providing One Footprint, Inc. (hereinafter referred to as \"Company\") with your Personal Data, including your Biometric Information and government identification information, you consent to Company's and Incode Technologies, Inc. (hereinafter \"Incode\")’s collection, storage, retention, use and disclosure of such information to provide the identity verification services, consistent with Company's Privacy Notice and Terms of Use you may find at https://www.onefootprint.com/privacy-policy and https://www.onefootprint.com/terms-of-service. Even if you consent, you can subsequently withdraw consent at any time.\n\nIn order to verify that you are the person depicted in your government-issued identification (\"Services\"), Company uses third-party technology from Incode to collect personal data from or about you, including biometric information and biometric identifiers such as your faceprint (\"Biometric Information\"), a selfie, and government-issued identification, including information obtained, for example and where applicable, by scanning the barcode (collectively with Biometric Information, \"Personal Data\"). Specifically, you will be asked to take a selfie through the Incode platform. Incode will then scan and map your facial features in comparison with the picture on your government-issued identification to allow you to create and/or access your account with Company. Please note the processing of your Personal Data, namely of your Biometric Information by Incode, shall include a comparison of the picture in your ID document with your selfie (1:1) which shall then be compared against the Company database for fraud prevention purposes (1:N). For the Services, Incode will also collect other information that is on the front and back of your identification documentation, including where it exists and permitted by law, by scanning the barcode and collecting information derived from it (e.g., name, date of birth, height). Incode uses this information to verify your identity and to prevent fraud. Incode may also, with your consent, use this information to improve its products and services. Company or Incode on behalf of Company, may also share your Personal Data with third-party service providers or governmental entities that enable us to provide our Services (e.g. cloud hosting providers, fraudsters data base or the Department of Motor Vehicles if you provide a US identification card) and other third parties where required by law. \n\nUse of your Personal Data: Your Personal Data, including Biometric Information, may be used for the following purposes (as applicable depending on your consent), in each case as further described in Company's Privacy Policy and/or Incode's Privacy Policy:\n \n• To provide the services for which the Personal Data was requested;\n • To improve or modify Incode's products and services; and\n• To comply with Company's or Incode's obligations under applicable law.\n\nYou can request the deletion of your Personal Data, and exercise any other rights under applicable data protection laws, at any time by emailing Company at support@onefootprint.com or Incode at dataprotection@incode.com. If you request deletion of your Personal Data, we will not be able to recover it at a later point. Company or Incode, as applicable, will permanently delete Biometric Information processed (if any) for its own purposes by the earlier of: (i) the time at which the purpose for which it was collected has been satisfied; or (ii) three years from the moment you provide consent. Incode will do likewise with the Biometric Information that it processes on behalf of, and as instructed by, Company.\n",
-          "scroll-to-agree": "Scroll to agree",
-          "agree-and-continue": "Agree and continue",
-          "continue": "Continue",
-          "third-party": "Optional:  By ticking this box and providing Incode with your Personal Data, including your Biometric Information and government identification information, you consent to and provide a written release to Incode for the collection, storage, retention, use and disclosure of such information to improve, modify or update Incode’s products or services (including its algorithm), in accordance with its Privacy Notice. You can exercise your rights under applicable privacy laws, including withdrawal of consent, by contacting dataprotection@incode.com. IMPORTANT: Your consent is voluntary, even if you do not consent you will still be able to access Company's services.",
-          "consent-bottomsheet": {
-            "submit-button": {
-              "disabled-title": "Scroll to agree",
-              "enabled-title": "Agree and continue"
-            }
-          }
-        }
+        "title-front": "Place front of your driver's license here",
+        "title-back": "Place back of your driver's license here",
+        "description": "We'll scan it automatically"
+      }
+    },
+    "passport": {
+      "title": "Passport",
+      "instructions": {
+        "title": "Place passport here",
+        "description": "We'll scan it automatically"
+      }
+    },
+    "id-card": {
+      "title-front": "ID Card - Front",
+      "title-back": "ID Card - Back",
+      "instructions": {
+        "title-front": "Place front of your id card here",
+        "title-back": "Place back of your id card here",
+        "description": "We'll scan it automatically"
+      }
+    },
+    "voter-identification": {
+      "title-front": "Voter ID - Front",
+      "title-back": "Voter ID - Back",
+      "instructions": {
+        "title-front": "Place front of your voter id here",
+        "title-back": "Place back of your voter id here",
+        "description": "We'll scan it automatically"
+      }
+    },
+    "residence-document": {
+      "title-front": "Residence Card - Front",
+      "title-back": "Residence Card - Back",
+      "instructions": {
+        "title-front": "Place front of residence card here",
+        "title-back": "Place back of residence card here",
+        "description": "We'll scan it automatically"
+      }
+    },
+    "permit": {
+      "title-front": "EAD Card - Front",
+      "title-back": "EAD Card - Back",
+      "instructions": {
+        "title-front": "Place front of EAD card here",
+        "title-back": "Place back of EAD card here",
+        "description": "We'll scan it automatically"
+      }
+    },
+    "visa": {
+      "title-front": "Visa - Front",
+      "title-back": "Visa - Back",
+      "instructions": {
+        "title-front": "Place front of your visa here",
+        "title-back": "Place back of your visa here",
+        "description": "We'll scan it automatically"
+      }
+    },
+    "selfie": {
+      "title": "Selfie",
+      "instructions": {
+        "title": "Place your face here",
+        "description": "We'll scan it automatically"
       }
     }
   },

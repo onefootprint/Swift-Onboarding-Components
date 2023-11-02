@@ -28,7 +28,10 @@ export * from './di';
 export * from './entity';
 export * from './id-di-data';
 export { default as IdDocBadImageError } from './id-doc-bad-image-error';
-export { default as IdDocImageError } from './id-doc-image-error-incode';
+export {
+  type IdDocImageProcessingError,
+  type IdDocImageUploadError,
+} from './id-doc-image-error';
 export * from './id-doc-info';
 export * from './id-doc-type';
 export * from './identifier';
@@ -45,6 +48,7 @@ export * from './onboarding-decision';
 export { default as OnboardingStatus } from './onboarding-status';
 export * from './org-member';
 export * from './organization';
+export type { ProcessDocRequest, ProcessDocResponse } from './process-doc';
 export * from './proxy';
 export { default as ReviewStatus } from './review-status';
 export * from './risk-signal';

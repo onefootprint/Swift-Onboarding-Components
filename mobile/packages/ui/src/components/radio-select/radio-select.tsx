@@ -19,21 +19,18 @@ const RadioSelect = <T extends StringOrNumber = string>({
 }: RadioSelectProps<T>) => {
   return options.length > 0 ? (
     <Box {...props} gap={3}>
-      {options.map(
-        ({ title, description, IconComponent, value: optionValue }) => (
-          <Option
-            key={optionValue}
-            value={optionValue}
-            title={title}
-            description={description}
-            IconComponent={IconComponent}
-            onPress={() => {
-              onChange?.(optionValue);
-            }}
-            selected={optionValue === value}
-          />
-        ),
-      )}
+      {options.map(({ title, IconComponent, value: optionValue }) => (
+        <Option
+          key={optionValue}
+          value={optionValue}
+          title={title}
+          IconComponent={IconComponent}
+          onPress={() => {
+            onChange?.(optionValue);
+          }}
+          selected={optionValue === value}
+        />
+      ))}
     </Box>
   ) : null;
 };

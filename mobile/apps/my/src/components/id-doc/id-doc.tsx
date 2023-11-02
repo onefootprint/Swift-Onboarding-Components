@@ -10,7 +10,6 @@ import { Events, useAnalytics } from '@/utils/analytics';
 
 import DocScan from './screens/doc-scan';
 import DocSelection from './screens/doc-selection';
-import TooManyAttempts from './screens/too-many-attempts';
 import createMachine from './utils/state-machine';
 
 export type IdDocProps = {
@@ -22,6 +21,9 @@ export type IdDocProps = {
 const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
   const [state, send] = useMachine(() => createMachine(requirement));
   const { currentSide, collectingDocumentMeta } = state.context;
+  const { shouldCollectConsent, supportedCountryAndDocTypes } =
+    state.context.requirement;
+
   const analytics = useAnalytics();
   const country = getCountryFromCode(
     collectingDocumentMeta?.countryCode ?? DEFAULT_COUNTRY.value,
@@ -36,22 +38,23 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
     }
   }, [state, onDone]);
 
-  if (state.matches('tooManyAttempts')) {
-    return <TooManyAttempts />;
-  }
-
   if (state.matches('docSelection')) {
     return (
       <DocSelection
-        requirement={requirement}
         authToken={authToken}
-        defaultType={collectingDocumentMeta.type}
         defaultCountry={country}
+        defaultType={collectingDocumentMeta.type}
+        onConsentCompleted={() => {
+          analytics.track(Events.DocConsentAccepted);
+          send('consentCompleted');
+        }}
         onSubmit={(countryCode, documentType, docId) => {
           send('countryAndTypeSubmitted', {
             payload: { countryCode, documentType, docId },
           });
         }}
+        shouldCollectConsent={shouldCollectConsent}
+        supportedCountryAndDocTypes={supportedCountryAndDocTypes}
       />
     );
   }
@@ -63,25 +66,18 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
   ) {
     return (
       <DocScan
-        docId={collectingDocumentMeta.docId}
-        key={currentSide}
         authToken={authToken}
         country={country}
-        requirement={state.context.requirement}
-        onDone={nextSideToCollect => {
-          send('imageSubmitted', {
-            payload: { nextSideToCollect },
-          });
-        }}
+        docId={collectingDocumentMeta.docId}
+        key={currentSide}
         onBack={() => {
           send('backButtonTapped');
         }}
+        onDone={nextSideToCollect => {
+          send('imageSubmitted', { payload: { nextSideToCollect } });
+        }}
         onRetryLimitExceeded={() => {
           send('retryLimitExceeded');
-        }}
-        onConsentCompleted={() => {
-          analytics.track(Events.DocConsentAccepted);
-          send('consentCompleted');
         }}
         side={currentSide}
         type={collectingDocumentMeta.type}

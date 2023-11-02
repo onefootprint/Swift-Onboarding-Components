@@ -7,7 +7,6 @@ export * from './design-system-provider';
 export * from './dialog';
 export * from './dismiss-keyboard';
 export * from './divider';
-export * from './fade-in';
 export * from './feedback-button';
 export * from './hint';
 export * from './icon-button';

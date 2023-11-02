@@ -1,77 +1,53 @@
+import { CountryRecord } from '@onefootprint/global-constants';
 import { UploadDocumentSide } from '@onefootprint/types';
-import React, { useContext, useState } from 'react';
-import { useSharedValue } from 'react-native-reanimated';
-import { useFrameProcessor } from 'react-native-vision-camera';
+import React from 'react';
 
 import useTranslation from '@/hooks/use-translation';
-import { detectBarcodes, detectDocument } from '@/utils/vision-camera';
 
-import Frame from '../default-frame';
-import Instructions from '../default-instructions';
-import Scan from '../scan';
-import type { ScanObject } from '../scan/scan.types';
-import ScanContext from '../scan-context';
+import type { Document } from '../../doc-scan.types';
+import Camera from '../camera';
+import Countdown from '../countdown';
+import Frame from '../frame';
+import useFrameProcessor from './hooks/use-frame-processor';
 
 export type DriversLicenseProps = {
+  country: CountryRecord;
+  onBack?: () => void;
+  onSubmit?: (doc: Document) => void;
   side: UploadDocumentSide;
 };
 
 const DEFAULT_ASPECT_RATIO = 1.586;
-const DEFAULT_BARCODE_RESULT = { barcodes: [] };
 
-const DriversLicense = ({ side }: DriversLicenseProps) => {
-  const { t, allT } = useTranslation('components.scan.drivers-license');
-  const { country } = useContext(ScanContext);
-  const detector = useSharedValue(false);
-  const [object, setObject] = useState<ScanObject>({
-    isDetected: false,
-    feedback: '',
-    data: {},
-  });
-  const requiresCode =
-    side === UploadDocumentSide.Back && country.value === 'US';
-  const setObjectJs = Worklets.createRunInJsFn(setObject);
-  const setDetectorJs = Worklets.createRunInJsFn((value: boolean) => {
-    detector.value = value;
-  });
-
-  const frameProcessor = useFrameProcessor(frame => {
-    'worklet';
-
-    const documentResult = detectDocument(frame);
-    const barcodeResult = requiresCode
-      ? detectBarcodes(frame)
-      : DEFAULT_BARCODE_RESULT;
-
-    const hasBarcode = barcodeResult.barcodes.length > 0;
-    const isDetected =
-      documentResult.isDocument && (requiresCode ? hasBarcode : true);
-
-    setObjectJs({
-      isDetected,
-      feedback: isDetected ? '' : 'Position the document in view',
-      data: {
-        barcodes: barcodeResult.barcodes,
-      },
-    });
-
-    setDetectorJs(isDetected);
-  }, []);
+const DriversLicense = ({
+  country,
+  onBack,
+  onSubmit,
+  side,
+}: DriversLicenseProps) => {
+  const { t } = useTranslation('scan.drivers-license');
+  const { object, detector, frameProcessor } = useFrameProcessor(side, country);
+  const hasBackButton = side === UploadDocumentSide.Front;
 
   return (
-    <Instructions
-      side={side}
-      title={t(`instructions.${side}`, { country: country.value3 })}
+    <Camera
+      frameProcessor={frameProcessor}
+      object={object}
+      onBack={hasBackButton ? onBack : undefined}
+      onSubmit={onSubmit}
+      title={t(`title-${side}`)}
     >
-      <Scan
-        frameProcessor={frameProcessor}
-        object={object}
-        subtitle={allT(`doc-side.${side}`)}
-        title={t('title')}
-      >
-        <Frame detector={detector} aspectRatio={DEFAULT_ASPECT_RATIO} />
-      </Scan>
-    </Instructions>
+      {value => (
+        <Frame
+          aspectRatio={DEFAULT_ASPECT_RATIO}
+          description={t('instructions.description')}
+          detector={detector}
+          title={t(`instructions.title-${side}`)}
+        >
+          {value && <Countdown value={value} />}
+        </Frame>
+      )}
+    </Camera>
   );
 };
 

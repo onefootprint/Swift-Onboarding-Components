@@ -20,7 +20,7 @@ const useDocumentOptions = (
   supportedCountryAndDocTypes: IdDocSupportedCountryAndDocTypes,
   country: CountryRecord,
 ) => {
-  const { t } = useTranslation('components.scan.doc-selection');
+  const { t } = useTranslation('scan.doc-selection');
   const availableDocTypes = getSupportedCountryByCode(
     supportedCountryAndDocTypes,
     country.value,

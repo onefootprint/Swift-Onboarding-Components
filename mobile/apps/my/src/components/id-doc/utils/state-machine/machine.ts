@@ -42,16 +42,15 @@ const createIdDocMachine = (requirement: IdDocRequirement) =>
               target: 'frontImage',
               actions: 'assignCountryAndType',
             },
+            consentCompleted: {
+              actions: 'assignConsent',
+            },
           },
         },
-        tooManyAttempts: {},
         frontImage: {
           on: {
             backButtonTapped: {
               target: 'docSelection',
-            },
-            consentCompleted: {
-              actions: 'assignConsent',
             },
             retryLimitExceeded: {
               target: 'tooManyAttempts',
@@ -77,9 +76,6 @@ const createIdDocMachine = (requirement: IdDocRequirement) =>
         },
         backImage: {
           on: {
-            consentCompleted: {
-              actions: 'assignConsent',
-            },
             retryLimitExceeded: {
               target: 'tooManyAttempts',
             },
@@ -99,9 +95,6 @@ const createIdDocMachine = (requirement: IdDocRequirement) =>
         },
         selfie: {
           on: {
-            consentCompleted: {
-              actions: 'assignConsent',
-            },
             retryLimitExceeded: {
               target: 'tooManyAttempts',
             },
@@ -112,6 +105,9 @@ const createIdDocMachine = (requirement: IdDocRequirement) =>
               },
             ],
           },
+        },
+        tooManyAttempts: {
+          type: 'final',
         },
         completed: {
           type: 'final',
@@ -127,6 +123,7 @@ const createIdDocMachine = (requirement: IdDocRequirement) =>
           };
         }),
         assignConsent: assign(context => {
+          console.log('assign consent');
           return {
             ...context,
             requirement: {
@@ -136,6 +133,7 @@ const createIdDocMachine = (requirement: IdDocRequirement) =>
           };
         }),
         assignCountryAndType: assign((context, { payload }) => {
+          console.log('assignCountryAndType');
           return {
             ...context,
             currentSide: UploadDocumentSide.Front,

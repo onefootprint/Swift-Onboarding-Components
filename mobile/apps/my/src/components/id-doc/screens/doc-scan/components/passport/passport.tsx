@@ -1,71 +1,43 @@
-import { UploadDocumentSide } from '@onefootprint/types';
-import React, { useContext, useState } from 'react';
-import { useSharedValue } from 'react-native-reanimated';
-import { useFrameProcessor } from 'react-native-vision-camera';
+import React from 'react';
 
 import useTranslation from '@/hooks/use-translation';
-import { detectDocument } from '@/utils/vision-camera';
 
-import Frame from '../default-frame';
-import Instructions from '../default-instructions';
-import Scan from '../scan';
-import type { ScanObject } from '../scan/scan.types';
-import ScanContext from '../scan-context';
+import { Document } from '../../doc-scan.types';
+import Camera from '../camera';
+import Countdown from '../countdown';
+import Frame from '../frame';
+import useFrameProcessor from './hooks/use-frame-processor';
 
 const DEFAULT_ASPECT_RATIO = 1.42;
 
 export type PassportProps = {
-  side: UploadDocumentSide;
+  onBack?: () => void;
+  onSubmit?: (doc: Document) => void;
 };
 
-const detected = {
-  isDetected: true,
-  feedback: '',
-  data: {},
-};
-
-const Passport = ({ side }: PassportProps) => {
-  const { t } = useTranslation('components.scan.passport');
-  const { country } = useContext(ScanContext);
-  const detector = useSharedValue(false);
-  const [object, setObject] = useState<ScanObject>({
-    isDetected: false,
-    feedback: '',
-    data: {},
-  });
-  const setObjectJs = Worklets.createRunInJsFn(setObject);
-  const setDetectorJs = Worklets.createRunInJsFn((value: boolean) => {
-    detector.value = value;
-  });
-  const frameProcessor = useFrameProcessor(
-    frame => {
-      'worklet';
-
-      const result = detectDocument(frame);
-      if (result.isDocument) {
-        setDetectorJs(true);
-        setObjectJs(detected);
-      } else {
-        setDetectorJs(false);
-        setObjectJs({
-          isDetected: false,
-          feedback: 'Position the document in view',
-          data: {},
-        });
-      }
-    },
-    [detector],
-  );
+const Passport = ({ onBack, onSubmit }: PassportProps) => {
+  const { t } = useTranslation('scan.passport');
+  const { object, detector, frameProcessor } = useFrameProcessor();
 
   return (
-    <Instructions
-      side={side}
-      title={t('instructions', { country: country.value3 })}
+    <Camera
+      frameProcessor={frameProcessor}
+      object={object}
+      onBack={onBack}
+      onSubmit={onSubmit}
+      title={t('title')}
     >
-      <Scan object={object} frameProcessor={frameProcessor} title={t('title')}>
-        <Frame detector={detector} aspectRatio={DEFAULT_ASPECT_RATIO} />
-      </Scan>
-    </Instructions>
+      {value => (
+        <Frame
+          aspectRatio={DEFAULT_ASPECT_RATIO}
+          description={t('instructions.description')}
+          detector={detector}
+          title={t('instructions.title')}
+        >
+          {value && <Countdown value={value} />}
+        </Frame>
+      )}
+    </Camera>
   );
 };
 

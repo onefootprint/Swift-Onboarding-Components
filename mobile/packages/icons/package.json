@@ -12,9 +12,7 @@
     "lint:fix": "eslint src --fix",
     "format:fix": "prettier --write \"./**/*.{ts,tsx,md}\"",
     "typecheck": "yarn tsc --noEmit",
-    "generate:flags": "node ./src/scripts/flags/generate.js",
-    "generate:icos": "node ./src/scripts/icos/generate.js",
-    "generate": "yarn generate:icos && yarn generate:flags",
+    "generate": "node ./src/scripts/icos/generate.js",
     "postgenerate": "yarn lint:fix && yarn format:fix"
   },
   "dependencies": {

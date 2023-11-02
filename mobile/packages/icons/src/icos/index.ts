@@ -18,6 +18,7 @@ export { default as IcoFaceid24 } from './ico-faceid-24';
 export { default as IcoFaceid40 } from './ico-faceid-40';
 export { default as IcoFileText216 } from './ico-file-text-2-16';
 export { default as IcoFootprint24 } from './ico-footprint-24';
+export { default as IcoForbid40 } from './ico-forbid-40';
 export { default as IcoGreenCard24 } from './ico-green-card-24';
 export { default as IcoIdBack40 } from './ico-id-back-40';
 export { default as IcoIdCard24 } from './ico-id-card-24';
