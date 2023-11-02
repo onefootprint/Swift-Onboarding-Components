@@ -28,6 +28,7 @@ pub async fn post(
     auth: SecretTenantAuthContext,
     request: Json<AlpacaCreateAccountRequest>,
 ) -> JsonApiResponse<AlpacaCreateAccountResponse> {
+    tracing::info!(%request.fp_user_id, %request.hostname, "/integrations/alpaca/cip request");
     // TODO: do we also want to validate here that the user is `Pass` like we do in the CIP endpoint?
     let auth = auth.check_guard(TenantGuard::CipIntegration)?;
     let tenant_id = auth.tenant().id.clone();

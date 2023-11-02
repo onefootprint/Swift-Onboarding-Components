@@ -53,6 +53,7 @@ pub async fn post(
     auth: SecretTenantAuthContext,
     request: Json<AlpacaCipRequest>,
 ) -> JsonApiResponse<AlpacaCipResponse> {
+    tracing::info!(%request.fp_user_id, %request.hostname, %request.account_id, "/integrations/alpaca/cip request");
     let request = request.into_inner();
     let auth = auth.check_guard(TenantGuard::CipIntegration)?;
     let is_live = auth.is_live()?;
@@ -445,9 +446,10 @@ fn watchlist(
         .ok_or(CipError::WatchlistResultsNotFoundError)?
         .response
         .response
-        .clone() else {
-            Err(CipError::WatchlistResultsNotFoundError)?
-        };
+        .clone()
+    else {
+        Err(CipError::WatchlistResultsNotFoundError)?
+    };
 
     // For now, we just serialize the raw leaked json blob we get from Incode for each watchlist hit
     let leaked_hits = decision::features::incode_watchlist::get_hits(&wc, &obc.enhanced_aml())
