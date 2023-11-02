@@ -2,7 +2,6 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
-use actix_web::web::Json;
 use api_core::auth::session::user::UserSession;
 use api_core::auth::session::user::UserSessionArgs;
 use api_core::auth::tenant::SecretTenantAuthContext;
@@ -10,6 +9,7 @@ use api_core::auth::tenant::TenantGuard;
 use api_core::auth::user::allowed_user_scopes;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::ApiResult;
+use api_core::utils::actix::OptionalJson;
 use api_core::utils::session::AuthSession;
 use api_wire_types::CreateTokenRequest;
 use api_wire_types::CreateTokenResponse;
@@ -37,11 +37,11 @@ use paperclip::actix::{api_v2_operation, post, web};
 pub async fn post(
     state: web::Data<State>,
     fp_id: web::Path<FpId>,
-    request: Json<CreateTokenRequest>,
+    request: OptionalJson<CreateTokenRequest>,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<CreateTokenResponse> {
     let auth = auth.check_guard(TenantGuard::AuthToken)?;
-    let CreateTokenRequest { key } = request.into_inner();
+    let key = request.0.and_then(|r| r.key);
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
