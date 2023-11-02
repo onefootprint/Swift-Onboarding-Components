@@ -23,6 +23,18 @@ const ssn9 = '123412345';
 
 const LegacySdks = [
   {
+    version: '3.2.0',
+    baseUrl: 'https://footprint-js-3-2-0.preview.onefootprint.com',
+  },
+  {
+    version: '3.4.0',
+    baseUrl: 'https://footprint-js-3-4-0.preview.onefootprint.com',
+  },
+  {
+    version: '3.6.0',
+    baseUrl: 'https://footprint-js-3-6-0.preview.onefootprint.com',
+  },
+  {
     version: '3.7.1',
     baseUrl: 'https://footprint-js-3-7-1.preview.onefootprint.com',
   },
