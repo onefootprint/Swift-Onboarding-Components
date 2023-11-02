@@ -57,6 +57,16 @@ const Main = styled.main`
     overflow: auto;
     padding: ${theme.spacing[8]};
     max-width: 1600px;
+    margin: 0 auto;
+    /* hiding scrollbar */
+    -ms-overflow-style: none;
+    /* IE 10+ */
+    scrollbar-width: none;
+    /* Firefox */
+    ::-webkit-scrollbar {
+      /* Safari and Chrome */
+      display: none;
+    }
   `}
 `;
 
