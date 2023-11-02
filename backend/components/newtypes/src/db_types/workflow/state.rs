@@ -56,7 +56,7 @@ impl WorkflowState {
     pub fn is_complete(&self) -> bool {
         match self {
             Self::Kyc(s) => matches!(s, KycState::Complete),
-            Self::AlpacaKyc(s) => matches!(s, AlpacaKycState::Complete),
+            Self::AlpacaKyc(s) => matches!(s, AlpacaKycState::PendingReview | AlpacaKycState::Complete),
             Self::Document(s) => matches!(s, DocumentState::Complete),
             Self::Kyb(s) => matches!(s, KybState::Complete),
         }
