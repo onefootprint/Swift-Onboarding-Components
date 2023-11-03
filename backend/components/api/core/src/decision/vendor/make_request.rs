@@ -6,7 +6,6 @@ use super::tenant_vendor_control::TenantVendorControl;
 use super::vendor_trait::VendorAPIResponse;
 use super::*;
 use crate::errors::ApiErrorKind;
-use crate::metrics;
 use crate::vendor_clients::VendorClient;
 use crate::{errors::ApiError, State};
 use db::models::vault::Vault;
@@ -26,7 +25,6 @@ use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
 use idv::{idology::expectid::response::ExpectIDResponse, ParsedResponse, VendorResponse};
 use newtypes::idology::IdologyScanOnboardingCaptureResult;
 use newtypes::{DocVData, IdvData, ObConfigurationKey, PiiString, VendorAPI, WorkflowId};
-use prometheus::labels;
 
 
 
@@ -240,38 +238,6 @@ pub async fn send_idology_idv_request(
     if is_production || ff_client.flag(BoolFlag::EnableIdologyInNonProd(&ob_configuration_key)) {
         let res = idology_api_call.make_request(request).await;
 
-        match res {
-            Ok(ref vr) => {
-                let summary_result = vr
-                    .parsed_response
-                    .response
-                    .summary_result
-                    .as_ref()
-                    .map(|k| k.key.clone())
-                    .unwrap_or_default();
-                let results = vr
-                    .parsed_response
-                    .response
-                    .results
-                    .as_ref()
-                    .map(|k| k.key.clone())
-                    .unwrap_or_default();
-                if let Ok(metric) = metrics::IDOLOGY_EXPECT_ID_SUCCESS.get_metric_with(
-                    &labels! {"summary_result" => summary_result.as_str(), "results" => results.as_str()},
-                ) {
-                    metric.inc();
-                }
-            }
-            Err(ref e) => {
-                let error = format!("{}", e);
-                if let Ok(metric) =
-                    metrics::IDOLOGY_EXPECT_ID_ERROR.get_metric_with(&labels! {"error" => error.as_str()})
-                {
-                    metric.inc();
-                }
-            }
-        }
-
         res.map(|r| {
             let parsed_response = r.parsed_response();
             let raw_response = r.raw_response();
@@ -319,12 +285,6 @@ pub async fn send_socure_idv_request(
                 ip_address: socure_data.ip_address,
             })
             .await;
-
-        if let Ok(r) = &res {
-            if let Some(score) = r.parsed_response.sigma_fraud_score() {
-                metrics::SOCURE_SIGMA_FRAUD_SCORE.observe(score.into());
-            }
-        }
 
         res.map(|r| {
             // TODO: later delete VendorResponse and just replace with VendorAPIResponse

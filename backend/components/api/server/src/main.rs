@@ -47,8 +47,8 @@ fn main() -> std::io::Result<()> {
 async fn run_server(config: Config) -> std::io::Result<()> {
     // telemetry
     let _controller = telemetry::init(&config).expect("failed to init telemetry layers");
+    // TODO can i rm this?
     let prom = prometheus::init(&config);
-    metrics::deprecated_register_all_metrics(&prom.registry).expect("Prometheus metrics failed to register");
 
     let state: State = State::init_or_die(config.clone()).await;
 

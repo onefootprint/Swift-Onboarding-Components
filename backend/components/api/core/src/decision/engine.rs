@@ -18,7 +18,6 @@ use super::{
 use crate::{
     enclave_client::EnclaveClient,
     errors::{ApiError, ApiErrorKind, ApiResult},
-    metrics,
     utils::vault_wrapper::VaultWrapper,
     State,
 };
@@ -38,7 +37,6 @@ use itertools::Itertools;
 use newtypes::{
     PiiJsonValue, ReviewReason, ScopedVaultId, VerificationRequestId, VerificationResultId, WorkflowId,
 };
-use prometheus::labels;
 
 pub async fn save_vendor_responses(
     db_pool: &DbPool,
@@ -289,13 +287,6 @@ pub fn save_onboarding_decision(
         &final_decision.decision,
         review_reasons,
     )?;
-
-    let status = final_decision.decision.decision_status.to_string();
-    if let Ok(metric) =
-        metrics::DECISION_ENGINE_ONBOARDING_DECISION.get_metric_with(&labels! {"status" => status.as_str()})
-    {
-        metric.inc();
-    }
 
     if !is_sandbox {
         // Log our canonical line

@@ -5,7 +5,6 @@ use crate::{auth::custodian::CustodianAuthContext, types::JsonApiResponse};
 use actix_web::cookie::time::Instant;
 use api_core::errors::AssertionError;
 
-use api_core::metrics;
 use newtypes::{EncryptedVaultPrivateKey, SealedVaultBytes};
 use paperclip::actix::{api_v2_errors, api_v2_operation, get, web, Apiv2Schema};
 
@@ -55,7 +54,6 @@ async fn status2() -> Result<String, CustomError> {
 #[tracing::instrument(name = "status", skip(state))]
 #[get("/status")]
 async fn status(state: web::Data<State>) -> StringResponse {
-    metrics::GET_STATUS_COUNTER.inc();
     let context = opentelemetry_api::Context::current();
     state.metrics.get_status_counter.add(&context, 1, &[]);
 
