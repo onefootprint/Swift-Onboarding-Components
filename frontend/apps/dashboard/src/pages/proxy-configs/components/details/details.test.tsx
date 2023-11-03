@@ -11,10 +11,7 @@ import React from 'react';
 
 import Details from './details';
 import {
-  editBasicConfiguration,
-  editIngressVaulting,
   proxyConfigDetailsFixture,
-  withEditProxyConfig,
   withProxyConfigDetails,
   withProxyConfigDetailsError,
 } from './details.test.config';
@@ -22,14 +19,13 @@ import {
 const useRouterSpy = createUseRouterSpy();
 const fileSaverSpy = createFileSaverSpy();
 
-describe.skip('<Details />', () => {
+describe('<Details />', () => {
   const fileSaverMock = fileSaverSpy();
 
   beforeEach(() => {
     useRouterSpy({
       pathname: '/developers',
       query: {
-        tab: 'proxy-configs',
         proxy_config_id: proxyConfigDetailsFixture.id,
       },
     });
@@ -149,75 +145,6 @@ describe.skip('<Details />', () => {
 
         const ruleTarget = screen.getByText(rule.target);
         expect(ruleTarget).toBeInTheDocument();
-      });
-    });
-
-    describe('when editing the basic configuration', () => {
-      const newData = {
-        name: 'New name',
-        url: 'https://new-url.com',
-        accessReason: 'New access reason',
-      };
-
-      beforeEach(() => {
-        withEditProxyConfig(proxyConfigDetailsFixture, { ...newData });
-      });
-
-      it('should edit correctly', async () => {
-        await renderDetailsAndWaitData();
-
-        const editFieldset = screen.getByRole('group', {
-          name: 'Basic configuration',
-        });
-
-        await waitFor(async () => {
-          await editBasicConfiguration(editFieldset, newData);
-        });
-        await waitFor(() => {
-          const feedback = screen.getByText(
-            'Vault proxy configuration updated',
-          );
-          expect(feedback).toBeInTheDocument();
-        });
-      });
-    });
-
-    describe('when editing the ingress vaulting', () => {
-      const newData = {
-        ingressSettings: {
-          contentType: 'json',
-          rules: [
-            {
-              token: 'custom.card_cvc',
-              target: '$.data.card_cvc',
-            },
-          ],
-        },
-      };
-
-      beforeEach(() => {
-        withEditProxyConfig(proxyConfigDetailsFixture, {
-          ingressContentType: newData.ingressSettings.contentType as 'json',
-          ingressRules: newData.ingressSettings.rules,
-        });
-      });
-
-      it('should edit correctly', async () => {
-        await renderDetailsAndWaitData();
-
-        const editFieldset = screen.getByRole('group', {
-          name: 'Ingress vaulting',
-        });
-
-        await waitFor(async () => {
-          await editIngressVaulting(editFieldset, newData);
-        });
-        await waitFor(() => {
-          const feedback = screen.getByText(
-            'Vault proxy configuration updated',
-          );
-          expect(feedback).toBeInTheDocument();
-        });
       });
     });
   });

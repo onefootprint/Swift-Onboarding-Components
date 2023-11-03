@@ -33,7 +33,6 @@ const useCreateProxyConfig = () => {
     mutationFn: (payload: CreateProxyConfigRequest) =>
       createProxyConfig(session.authHeaders, payload),
     onError: (error: unknown) => {
-      console.error('Creating proxy config failed', getErrorMessage(error));
       toast.show({
         title: t('error.title'),
         description: getErrorMessage(error),

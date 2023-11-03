@@ -22,13 +22,11 @@ import ProxyConfigs from './proxy-configs';
 
 const useRouterSpy = createUseRouterSpy();
 
-describe.skip('<ProxyConfigs />', () => {
+describe('<ProxyConfigs />', () => {
   beforeEach(() => {
     useRouterSpy({
-      pathname: '/developers',
-      query: {
-        tab: 'proxy-configs',
-      },
+      pathname: '/proxy-configs',
+      query: {},
     });
   });
 
@@ -72,10 +70,8 @@ describe.skip('<ProxyConfigs />', () => {
         const push = jest.fn();
         useRouterSpy({
           push,
-          pathname: '/developers',
-          query: {
-            tab: 'proxy-configs',
-          },
+          pathname: '/proxy-configs',
+          query: {},
         });
 
         await renderProxyConfigsAndWaitData();
@@ -88,7 +84,6 @@ describe.skip('<ProxyConfigs />', () => {
         expect(push).toHaveBeenCalledWith(
           {
             query: {
-              tab: 'proxy-configs',
               proxy_config_id: proxyConfigDetailsFixture.id,
             },
           },
@@ -102,9 +97,8 @@ describe.skip('<ProxyConfigs />', () => {
       beforeEach(() => {
         withProxyConfigDetails(proxyConfigDetailsFixture.id);
         useRouterSpy({
-          pathname: '/developers',
+          pathname: '/proxy-configs',
           query: {
-            tab: 'proxy-configs',
             proxy_config_id: proxyConfigDetailsFixture.id,
           },
         });

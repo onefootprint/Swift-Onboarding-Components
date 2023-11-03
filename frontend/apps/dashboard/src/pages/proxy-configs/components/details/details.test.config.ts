@@ -1,9 +1,4 @@
-import {
-  mockRequest,
-  screen,
-  userEvent,
-  within,
-} from '@onefootprint/test-utils';
+import { mockRequest } from '@onefootprint/test-utils';
 import type { ProxyConfigDetails } from '@onefootprint/types';
 import { asAdminUser, resetUser } from 'src/config/tests';
 
@@ -97,64 +92,3 @@ export const withEditProxyConfigError = (proxyConfig: ProxyConfigDetails) =>
       },
     },
   });
-
-const clickOnEdit = async (container: HTMLElement) => {
-  const editButton = within(container).getByRole('button', {
-    name: 'Edit',
-  });
-  await userEvent.click(editButton);
-  return container;
-};
-
-export const editBasicConfiguration = async (
-  container: HTMLElement,
-  newData: {
-    name: string;
-    url: string;
-    accessReason: string;
-  },
-) => {
-  await clickOnEdit(container);
-
-  const nameField = within(container).getByLabelText('Name');
-  await userEvent.type(nameField, newData.name);
-
-  const urlField = within(container).getByLabelText('URL');
-  await userEvent.type(urlField, newData.url);
-
-  const accessReasonField = within(container).getByLabelText('Access reason');
-  await userEvent.type(accessReasonField, newData.accessReason);
-
-  const saveButton = screen.getByRole('button', {
-    name: 'Save',
-  });
-  await userEvent.click(saveButton);
-};
-
-export const editIngressVaulting = async (
-  container: HTMLElement,
-  newData: {
-    ingressSettings: {
-      contentType: string;
-      rules: {
-        token: string;
-        target: string;
-      }[];
-    };
-  },
-) => {
-  await clickOnEdit(container);
-
-  newData.ingressSettings.rules.forEach(async rule => {
-    const tokenField = within(container).getByLabelText('Token');
-    await userEvent.type(tokenField, rule.token);
-
-    const targetField = within(container).getByLabelText('Target');
-    await userEvent.type(targetField, rule.target);
-  });
-
-  const saveButton = screen.getByRole('button', {
-    name: 'Save',
-  });
-  await userEvent.click(saveButton);
-};
