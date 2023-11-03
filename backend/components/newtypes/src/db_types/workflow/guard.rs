@@ -12,12 +12,15 @@ pub enum WorkflowGuard {
 impl WorkflowState {
     pub fn allowed_guards(&self) -> Vec<WorkflowGuard> {
         match self {
-            Self::Kyc(KycState::DataCollection) | Self::AlpacaKyc(AlpacaKycState::DataCollection) => {
+            Self::AlpacaKyc(AlpacaKycState::DocCollection)
+            | Self::Kyc(KycState::DataCollection)
+            | Self::AlpacaKyc(AlpacaKycState::DataCollection) => {
                 vec![WorkflowGuard::AddData, WorkflowGuard::AddDocument]
             }
             Self::Kyb(KybState::DataCollection) => vec![WorkflowGuard::AddData],
-            Self::AlpacaKyc(AlpacaKycState::DocCollection)
-            | Self::Document(DocumentState::DataCollection) => vec![WorkflowGuard::AddDocument],
+            Self::Document(DocumentState::DataCollection) => {
+                vec![WorkflowGuard::AddDocument]
+            }
             Self::Kyc(KycState::Complete)
             | Self::Kyc(KycState::Decisioning)
             | Self::Kyc(KycState::VendorCalls)
