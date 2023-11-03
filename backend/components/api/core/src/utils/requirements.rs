@@ -16,8 +16,9 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    AuthorizeFields, DocumentCdoInfo, IdentityDocumentStatus, Iso3166TwoDigitCountryCode, LivenessSource,
-    OnboardingRequirement, OnboardingRequirementKind, Selfie, UsLegalStatus, VaultId,
+    AlpacaKycState, AuthorizeFields, DocumentCdoInfo, IdentityDocumentStatus, Iso3166TwoDigitCountryCode,
+    LivenessSource, OnboardingRequirement, OnboardingRequirementKind, Selfie, UsLegalStatus, VaultId,
+    WorkflowState,
 };
 use newtypes::{
     CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind,
@@ -276,6 +277,20 @@ pub fn get_requirements_inner(
         .collect::<ApiResult<Vec<_>>>()?
         .into_iter()
         .flatten()
+        .filter(|r| {
+            let is_id_or_ip_req = matches!(
+                OnboardingRequirementKind::from(r),
+                OnboardingRequirementKind::CollectData | OnboardingRequirementKind::CollectInvestorProfile
+            );
+            let is_in_alpaca_stepup =
+                matches!(wf.state, WorkflowState::AlpacaKyc(AlpacaKycState::DocCollection));
+            if is_in_alpaca_stepup && r.is_met() && is_id_or_ip_req {
+                // Omit the confirm screen when an alpaca user is in step up
+                false
+            } else {
+                true
+            }
+        })
         .sorted_by_key(|r| OnboardingRequirementKind::from(r).priority(obc.is_doc_first))
         .collect();
 
