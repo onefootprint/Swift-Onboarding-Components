@@ -20,10 +20,8 @@ const Preview = ({ obConfig }: PreviewProps) => {
 
   const handleOpen = () => {
     const fp = footprint.init({
-      kind:
-        obConfig.kind === 'auth'
-          ? FootprintComponentKind.Auth
-          : FootprintComponentKind.Verify,
+      kind: FootprintComponentKind.Auth,
+      variant: 'modal',
       publicKey: obConfig.key,
       onComplete: validationToken => {
         console.log('validationToken', validationToken);
