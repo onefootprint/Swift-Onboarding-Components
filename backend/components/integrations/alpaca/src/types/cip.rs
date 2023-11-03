@@ -112,8 +112,8 @@ pub struct DocumentPhotoId {
 
     pub first_name: PiiString,
     pub last_name: PiiString,
-    pub gender: PiiString,
-    pub date_of_birth: PiiString,
+    pub gender: Option<PiiString>,
+    pub date_of_birth: PiiString, // TODO: might need to make these optional too
     pub date_of_expiry: PiiString,
     pub issuing_country: PiiString,
     pub document_numbers: Vec<PiiString>,
@@ -304,7 +304,7 @@ pub mod fixtures {
                     created_at: Utc::now(),
                     first_name: pii!("Carl"),
                     last_name: pii!("Casanova"),
-                    gender: pii!("Male"),
+                    gender: Some(pii!("Male")),
                     date_of_birth: pii!("1992-02-02"),
                     date_of_expiry: pii!("2025-02-02"),
                     issuing_country: pii!("USA"),

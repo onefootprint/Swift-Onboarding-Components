@@ -544,10 +544,7 @@ fn document_and_photo(
             ocr_name.paternal_last_name.as_ref().map(|p| (**p).clone()),
             "last name missing".into(),
         )?,
-        gender: ok_or(
-            ocr_response.gender.as_ref().map(|p| (**p).clone()),
-            "missing gender".into(),
-        )?,
+        gender: ocr_response.gender.as_ref().map(|p| (**p).clone()),
         date_of_birth: dob.into(),
         date_of_expiry: ocr_response
             .expiration_date()
