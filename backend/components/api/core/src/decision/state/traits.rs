@@ -1,7 +1,6 @@
 use super::actions::WorkflowActions;
 use super::StateError;
 use super::WorkflowKind;
-use crate::decision::onboarding::rules::KycRuleGroup;
 use crate::task;
 use crate::{errors::ApiResult, State};
 use async_trait::async_trait;
@@ -22,10 +21,6 @@ pub(super) trait WorkflowState: std::marker::Send + std::marker::Sync + 'static 
     fn name(&self) -> newtypes::WorkflowState;
 
     fn default_action(&self) -> Option<WorkflowActions>;
-}
-
-pub trait HasRuleGroup {
-    fn rule_group(&self) -> KycRuleGroup;
 }
 
 /// Implement this for a State to indicate that when in that State, the workflow responds to action A.

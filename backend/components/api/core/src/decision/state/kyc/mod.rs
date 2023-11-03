@@ -5,14 +5,9 @@ mod tests;
 
 use super::{
     actions::{MakeDecision, MakeVendorCalls},
-    traits::HasRuleGroup,
     DoAction, StateError, Workflow, WorkflowActions, WorkflowKind, WorkflowState,
 };
-use crate::{
-    decision::{onboarding::rules::KycRuleGroup, rule::rule_sets},
-    errors::ApiResult,
-    State,
-};
+use crate::{errors::ApiResult, State};
 use async_trait::async_trait;
 use db::models::workflow::Workflow as DbWorkflow;
 use enum_dispatch::enum_dispatch;
@@ -50,16 +45,6 @@ pub struct KycDocCollection {
     wf_id: WorkflowId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
-}
-
-impl HasRuleGroup for KycDecisioning {
-    fn rule_group(&self) -> KycRuleGroup {
-        KycRuleGroup {
-            kyc_rules: rule_sets::kyc::kyc_rules(),
-            doc_rules: rule_sets::doc::incode_rules(),
-            aml_rules: rule_sets::common::aml_rules(),
-        }
-    }
 }
 
 #[derive(Clone)]

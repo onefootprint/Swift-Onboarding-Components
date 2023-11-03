@@ -11,16 +11,11 @@ use newtypes::{ScopedVaultId, TenantId, WorkflowId};
 
 use super::{DocumentState, MakeDecision};
 use crate::decision::features::risk_signals::fetch_latest_risk_signals_map;
-use crate::decision::utils::should_execute_rules_for_document_only;
-use crate::decision::{
-    onboarding::rules::KycRuleGroup,
-    state::{
-        actions::{DocCollected, WorkflowActions},
-        common,
-        traits::HasRuleGroup,
-        WorkflowState,
-    },
+use crate::decision::state::{
+    actions::{DocCollected, WorkflowActions},
+    common, WorkflowState,
 };
+use crate::decision::utils::should_execute_rules_for_document_only;
 use crate::{
     decision::{
         self,
@@ -48,12 +43,6 @@ pub struct DocumentDecisioning {
     wf_id: WorkflowId,
     sv_id: ScopedVaultId,
     t_id: TenantId,
-}
-
-impl HasRuleGroup for DocumentDecisioning {
-    fn rule_group(&self) -> KycRuleGroup {
-        KycRuleGroup::default()
-    }
 }
 
 #[derive(Clone)]

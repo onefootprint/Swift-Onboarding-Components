@@ -3,14 +3,9 @@ pub mod states;
 #[cfg(test)]
 mod tests;
 
-use super::{
-    traits::HasRuleGroup, DoAction, StateError, Workflow, WorkflowActions, WorkflowKind, WorkflowState,
-};
+use super::{DoAction, StateError, Workflow, WorkflowActions, WorkflowKind, WorkflowState};
 use crate::{
-    decision::{
-        features::risk_signals::RiskSignalsForDecision, onboarding::rules::KycRuleGroup, rule::rule_sets,
-        vendor::vendor_result::VendorResult,
-    },
+    decision::{features::risk_signals::RiskSignalsForDecision, vendor::vendor_result::VendorResult},
     errors::ApiResult,
     State,
 };
@@ -46,15 +41,6 @@ pub struct AlpacaKycDecisioning {
     risk_signals: RiskSignalsForDecision,
 }
 
-impl HasRuleGroup for AlpacaKycDecisioning {
-    fn rule_group(&self) -> KycRuleGroup {
-        KycRuleGroup {
-            kyc_rules: rule_sets::alpaca::alpaca_rules(),
-            doc_rules: vec![], // everything goes to review
-            aml_rules: vec![], // WL handled in state
-        }
-    }
-}
 #[derive(Clone)]
 pub struct AlpacaKycWatchlistCheck {
     wf_id: WorkflowId, // TODO: make a common ctx type of dealio for all these shared things each state is using
@@ -62,16 +48,6 @@ pub struct AlpacaKycWatchlistCheck {
     t_id: TenantId,
 }
 
-impl HasRuleGroup for AlpacaKycWatchlistCheck {
-    fn rule_group(&self) -> KycRuleGroup {
-        // don't use rules for this really, maybe this trait is not right..
-        KycRuleGroup {
-            kyc_rules: rule_sets::alpaca::alpaca_rules(),
-            doc_rules: vec![], // everything goes to review
-            aml_rules: vec![], // WL handled in state
-        }
-    }
-}
 #[derive(Clone)]
 pub struct AlpacaKycPendingReview {
     #[allow(unused)]
@@ -103,10 +79,10 @@ pub enum AlpacaKycState {
 impl AlpacaKycState {
     pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
         let newtypes::WorkflowState::AlpacaKyc(s) = workflow.state else {
-            return Err(StateError::UnexpectedStateForWorkflow(workflow.state, workflow.id).into())
+            return Err(StateError::UnexpectedStateForWorkflow(workflow.state, workflow.id).into());
         };
         let newtypes::WorkflowConfig::AlpacaKyc(config) = workflow.config.clone() else {
-            return Err(StateError::UnexpectedConfigForWorkflow(workflow.config, workflow.id).into())
+            return Err(StateError::UnexpectedConfigForWorkflow(workflow.config, workflow.id).into());
         };
         // TODO could get rid of this with enum_dispatch
         match s {
