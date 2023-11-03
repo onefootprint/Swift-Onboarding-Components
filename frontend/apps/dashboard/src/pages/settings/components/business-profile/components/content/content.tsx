@@ -3,20 +3,22 @@ import type { Organization } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
 
+import Id from './components/id';
 import Logo from './components/logo';
 import Name from './components/name';
 import Website from './components/website';
 
-type DataProps = {
+type ContentProps = {
   organization: Organization;
 };
 
-const Data = ({ organization }: DataProps) => (
+const Content = ({ organization }: ContentProps) => (
   <Box testID="business-profile-data">
     <Logo organization={organization} />
     <Grid>
       <Name value={organization.name} />
       <Website value={organization.websiteUrl} />
+      <Id value={organization.id} />
     </Grid>
   </Box>
 );
@@ -29,4 +31,5 @@ const Grid = styled.div`
     margin-top: ${theme.spacing[8]};
   `}
 `;
-export default Data;
+
+export default Content;

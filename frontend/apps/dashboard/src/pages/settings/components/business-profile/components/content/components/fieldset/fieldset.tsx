@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import type { UpdateOrgRequest } from '@onefootprint/types';
-import { Box } from '@onefootprint/ui';
+import { Stack } from '@onefootprint/ui';
 import React, { useId, useState } from 'react';
 import useUpdateOrg from 'src/hooks/use-update-org';
 
@@ -38,7 +38,7 @@ const Fieldset = ({ children, label, value }: FieldsetProps) => {
   };
 
   return (
-    <Box>
+    <Stack direction="column" gap={1} justify="center">
       <Label cta={value ? { label: editText, onClick: openDialog } : undefined}>
         {label}
       </Label>
@@ -52,7 +52,7 @@ const Fieldset = ({ children, label, value }: FieldsetProps) => {
       >
         {children({ id, handleSubmit })}
       </FormDialog>
-    </Box>
+    </Stack>
   );
 };
 export default Fieldset;

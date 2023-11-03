@@ -17,7 +17,7 @@ const Label = ({ children, cta }: LabelProps) => {
   const { t } = useTranslation('pages.settings.business-profile');
 
   return (
-    <Stack align="center" gap={3} height="32px" marginBottom={2}>
+    <Stack align="center" gap={3} height="32px">
       <Typography variant="label-3" color="tertiary">
         {children}
       </Typography>

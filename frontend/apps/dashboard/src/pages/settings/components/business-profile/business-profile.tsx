@@ -6,7 +6,7 @@ import React from 'react';
 import SectionHeader from 'src/components/section-header';
 import useOrg from 'src/hooks/use-org';
 
-import Data from './components/data';
+import Content from './components/content';
 import Error from './components/error';
 import Loading from './components/loading';
 
@@ -27,7 +27,7 @@ const BusinessProfile = () => {
         <>
           {isLoading && <Loading />}
           {error && <Error message={getErrorMessage(error)} />}
-          {data && <Data organization={data} />}
+          {data && <Content organization={data} />}
         </>
       </Container>
     </section>

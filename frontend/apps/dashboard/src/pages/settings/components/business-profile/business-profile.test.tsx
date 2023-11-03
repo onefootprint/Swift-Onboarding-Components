@@ -68,7 +68,7 @@ describe('<BusinessProfile />', () => {
       withOrganization();
     });
 
-    it('should show the org name, logo and website', async () => {
+    it('should show the org name, id, logo and website', async () => {
       await renderBusinessProfileAndWaitData();
 
       await waitFor(() => {
@@ -84,6 +84,11 @@ describe('<BusinessProfile />', () => {
       await waitFor(() => {
         const website = screen.getByText('https://acme.com');
         expect(website).toBeInTheDocument();
+      });
+
+      await waitFor(() => {
+        const id = screen.getByText('org_9L42CAdpXhDeSmi1DI8Qks');
+        expect(id).toBeInTheDocument();
       });
 
       await waitFor(() => {

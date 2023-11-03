@@ -1532,6 +1532,9 @@
           "cta": "Change logo",
           "not-allowed": "You are not allowed to change the organization logo"
         },
+        "id": {
+          "label": "Organization id"
+        },
         "name": {
           "label": "Company name",
           "form": {
