@@ -17,11 +17,16 @@ jobs:
       versionLong: '${{ steps.constants.outputs.versionLong }}'
     environment: production
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           ref: ${{ inputs.commitHash }}
           # We extract all commits here to make sure we're pulling the right commit hash
           fetch-depth: 0
+
+      - uses: ./.github/actions/backend_extract_commit_hash
+        id: components
+        with:
+          commitHash: ${{ inputs.commitHash }}
 
       # pulumi setup
       - uses: actions/setup-node@v2
@@ -56,19 +61,13 @@ jobs:
 
           git --version
           versionLong=$(git rev-parse HEAD)
-          apiVersion="master-$(git rev-parse --short HEAD)"
-          enclaveVersion="master-$(git log -n 1 --format="%h" ../components/enclave)"
 
           echo "url is ${url}"
-          echo "api is ${apiVersion}"
-          echo "enclave is ${enclaveVersion}"
+          echo "api is ${{ steps.components.outputs.apiComponentVersion }}"
+          echo "enclave is ${{ steps.components.outputs.enclaveComponentVersion }}"
 
-          pulumi config set --path constants.containers.apiVersion $apiVersion
-          pulumi config set --path constants.containers.enclaveVersion $enclaveVersion
-
-          echo "##[set-output name=url;]$(echo ${url})"
-          echo "##[set-output name=componentVersion;]$(echo ${apiVersion})"
-          echo "##[set-output name=versionLong;]$(echo ${versionLong})"
+          pulumi config set --path constants.containers.apiVersion ${{ steps.components.outputs.apiComponentVersion }}
+          pulumi config set --path constants.containers.enclaveVersion ${{ steps.components.outputs.enclaveComponentVersion }}
 
       # bring up the stack
       - uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
@@ -76,7 +75,7 @@ jobs:
           command: up
           work-dir: ./backend/infra
           stack-name: prod
-          message: 'Deployed to https://${{ steps.constants.outputs.url }} with component ${{ steps.constants.outputs.componentVersion }}'
+          message: 'Deployed to https://${{ steps.constants.outputs.url }} with api(${{ steps.constants.outputs.componentVersion }}) and enclave(${{ steps.components.outputs.enclaveComponentVersion }})'
           cloud-url: ${{ secrets.PULUMI_CLOUD_URL }}
 
   run_tests:

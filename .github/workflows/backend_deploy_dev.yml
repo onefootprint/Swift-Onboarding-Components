@@ -48,8 +48,8 @@ jobs:
       baseStackName: dev
       stackName: dev
       commitHash: ${{ needs.extract_commit_hash.outputs.commitHashToDeploy }}
-      apiComponentVersion: $${{ needs.extract_commit_hash.outputs.apiComponentVersion }}
-      enclaveComponentVersion: $${{ needs.extract_commit_hash.outputs.enclaveComponentVersion }}
+      apiComponentVersion: ${{ needs.extract_commit_hash.outputs.apiComponentVersion }}
+      enclaveComponentVersion: ${{ needs.extract_commit_hash.outputs.enclaveComponentVersion }}
 
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
