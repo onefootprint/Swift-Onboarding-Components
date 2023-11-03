@@ -25,6 +25,7 @@ Our SDKs support a variety of component kinds.
 | --------- | ----------------------------------------------------------------------------------------------------------------- |
 | `verify`  | Our onboarding flow that launches in a modal or drawer.                                                           |
 | `form`    | A PCI-compliant form to collect user data for specific fields. It can be rendered inline, in a modal or a drawer. |
+| `auth`    | Our authentication flow that launches in a modal or drawer.                                                       |
 
 You will find more information on each of these below:
 
@@ -312,6 +313,152 @@ component.render();
 | onComplete | Triggered after user completes the form and data is saved to the user vault.                                                       |
 | onCancel   | Triggered when the user abandons the flow. This can be triggered when the user clicks on close or cancel buttons inside our iframe |
 | onClose    | Triggered when the user abandons the flow. This can be triggered when the user clicks on close or cancel buttons inside our iframe |
+
+## Auth Component Integration
+
+This is our authentication flow that can be rendered in a modal or drawer.
+
+1. Grab the Publishable Key, for example, `pb_test_VMooXd04EUlnu3AvMYKjMW`.
+
+2. Import the styles file and embed the component, passing the Publishable Key and the callback functions:
+
+```html
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <title>Footprint | Vanilla</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@onefootprint/footprint-js@latest/dist/footprint-js.css"
+    />
+    <script>
+      window.footprintCallbacks = {
+        onComplete: function (validationToken) {
+          // TODO: Post the token to your server
+          console.log(validationToken);
+        },
+        onCancel: function () {
+          console.log('canceled');
+        },
+      };
+    </script>
+    <style>
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <main>
+      <div
+        data-footprint
+        data-kind="auth"
+        data-props='{"publicKey":"pb_test_WNgSBRR7uxoT8JRDBBflgw"}'
+      ></div>
+    </main>
+    <script
+      src="https://unpkg.com/@onefootprint/footprint-js@latest/dist/footprint-js.umd.js"
+      crossorigin
+    ></script>
+  </body>
+</html>
+```
+
+What's happening under the hood?
+
+1. Footprint will identify all elements with `data-footprint` attribute, and will render the component with the kind passed into the `data-kind` attribute inside it. It parses the variant from `data-variant` and component props from the `data-props` attribute. Later, it will start the auth flow using your onboarding configuration.
+
+   - `data-kind` attribute determines the kind of the component to render
+   - `data-variant` attribute determines whether onboarding should launch in a modal or drawer
+   - `data-props` are the stringified props objects that will be passed into your component
+
+2. Once the user completes the flow, you'll receive the `validationToken` through the `onComplete` fuction defined on `window.footprintCallbacks`. From there,
+   you can post it to your backend.
+
+Click [here](https://github.com/onefootprint/examples/tree/master/frontend-vanilla-js) to check out a full example.
+
+### Usage with frameworks
+
+Let's imagine your app was written using [Vue](https://vuejs.org/) (could be any framework or library). To integrate with Footprint,
+you can render a Footprint auth button that launches the authentication flow when clicked. You can either pass the props directly to the container div, or call our `init` and `render` methods on footprint to launch the verification dialog.
+
+```vue
+<script>
+import footprint from '@onefootprint/footprint-js';
+
+<template>
+  <div
+    data-footprint
+    data-kind="auth"
+    data-props='{"publicKey":"pb_test_WNgSBRR7uxoT8JRDBBflgw"}'
+  ></div>
+</template>
+```
+
+Alternatively, you can render a button and initialize the authentication flow in the click callback. To do that, just call the `init` (with any props) and `render` methods on footprint in the event handler.
+
+```vue
+<script>
+import footprint from '@onefootprint/footprint-js';
+
+export default {
+  mounted() {
+    const button = document.getElementById('my-button');
+    button.addEventListener('click', this.handleClick);
+  },
+
+  methods: {
+    handleClick() {
+      const component = footprint.init({
+        kind: 'auth',
+        publicKey: 'pb_test_WNgSBRR7uxoT8JRDBBflgw',
+        variant: 'modal',
+        containerId: 'footprint-auth-container',
+        onCancel: () => {},
+        onClose: () => {},
+        onComplete: (validationToken: string) => {},
+        options: { showLogo: true },
+      });
+      component.render();
+    },
+  },
+};
+</script>
+
+<template>
+  <div id="my-button"></div>
+</template>
+```
+
+Click [here](https://github.com/onefootprint/examples/tree/master/frontend-vite-vue) to check out a full example.
+
+### Listening to events
+
+Footprint provides some events based on some actions performed by the user. To listen to event, just pass it from the `init` method.
+
+```typescript
+const component = footprint.init({
+  kind: 'auth',
+  publicKey: 'pb_test_WNgSBRR7uxoT8JRDBBflgw',
+  onComplete: validationToken => {
+    console.log(validationToken);
+  },
+});
+component.render();
+```
+
+| Name         | Description                                                                                                                                                                                                                      |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `onComplete` | Triggered after completing the authentication flow. You'll receive a `validationToken`, You must verify this validation token on your backend and exchange it for the exact fp_id (unique identifier) of the authenticated user. |
+| `onCancel`   | Triggered when the user abandons the flow. This can be triggered when the user clicks on the close button inside our iframe                                                                                                      |
+| `onClose`    | Triggered when the user closes the flow (either completed or canceled).                                                                                                                                                          |
 
 ## Browser support
 

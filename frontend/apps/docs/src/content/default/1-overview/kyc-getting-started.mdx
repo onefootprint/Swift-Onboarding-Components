@@ -150,7 +150,7 @@ Click [here](https://github.com/onefootprint/examples/tree/master/frontend-vanil
 
 ### Setup and authentication
 
-Go to the Footprint developer dashboard and generate a new Secret API Key. This will look something like `sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv`. Add this to the credential manager of your server-side app. To learn more about server-side API authentication, read the short guide on [API Authentication](/integrate/api-auth).
+Get or create a Secret API Key on your [developer dashboard](https://dashboard.onefootprint.com/api-keys). The key will look something like `sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv`. Add this to the credential manager of your server-side app. To learn more about server-side API authentication, read the short guide on [API Authentication](/integrate/api-auth).
 
 ### Validate the onboarding token (from Step 5 above)
 
@@ -162,7 +162,7 @@ curl -X POST https://api.onefootprint.com/onboarding/session/validate \
    -d '{"validation_token": "vtok_udLaWUxPBo3fss603v8kY8k9ssjboxfwI"}'
 ```
 
-Footprint will give you some information from this onboarding session. We’ll also give you a `fp_id`, which looks like `fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX`
+Footprint will give you some information from this onboarding session. We’ll also give you a `fp_id`, which looks like `fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX`.
 
 ```json
 {
@@ -170,9 +170,12 @@ Footprint will give you some information from this onboarding session. We’ll a
     "fp_id": "fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX",
     "status": "pass",
     "requires_manual_review": false
-  }
+  },
+  ...
 }
 ```
+
+You can find more info on the validate API [here](/api-reference#post-onboarding-session-validate).
 
 <inline-alert variant="info">
   Save the `fp_id` in your database tied to the individual user. It is the
