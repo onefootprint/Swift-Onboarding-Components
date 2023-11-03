@@ -18,7 +18,7 @@ vendor_reason_code_enum! {
         Warning,
 
         #[ser = "fitness-probity", description = ""]
-        #[footprint_reason_code = Some(FootprintReasonCode::WatchlistHitNonSdn)]
+        #[footprint_reason_code = None]
         FitnessProbity,
 
         #[ser = "pep", description = ""]
@@ -174,11 +174,7 @@ pub fn type_to_frc(s: String) -> Option<FootprintReasonCode> {
     let watchlist_type = IncodeWatchlistType::try_from(s.trim());
     match watchlist_type {
         Ok(t) => {
-            let frc = Into::<Option<FootprintReasonCode>>::into(&t);
-            if frc.is_none() {
-                tracing::error!(incode_watchlist_type=?t, "Could not parse FootprintReasonCode from IncodeWatchlistType");
-            }
-            frc
+            Into::<Option<FootprintReasonCode>>::into(&t)
         }
         Err(err) => {
             tracing::error!(?err, s = s, "Could not parse IncodeWatchlistType");
