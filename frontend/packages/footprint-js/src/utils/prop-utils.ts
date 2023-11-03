@@ -24,7 +24,7 @@ type PossibleCallbacks = ExtractOnProps<AuthProps> &
   ExtractOnProps<VerifyProps>;
 
 const VariantsByKind: Record<ComponentKind, Variant[]> = {
-  [ComponentKind.Auth]: ['inline', 'modal', 'drawer'],
+  [ComponentKind.Auth]: ['modal', 'drawer'],
   [ComponentKind.Form]: ['inline', 'modal', 'drawer'],
   [ComponentKind.Render]: ['inline'],
   [ComponentKind.Verify]: ['modal', 'drawer'],

@@ -21,9 +21,8 @@ const Preview = ({ obConfig }: PreviewProps) => {
   const handleOpen = () => {
     const fp = footprint.init({
       kind: FootprintComponentKind.Auth,
-      variant: 'modal',
       publicKey: obConfig.key,
-      onComplete: validationToken => {
+      onComplete: (validationToken: string) => {
         console.log('validationToken', validationToken);
         setConfirmation(true);
       },

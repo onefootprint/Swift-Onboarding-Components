@@ -136,7 +136,7 @@ describe('getRefProps', () => {
 describe('getDefaultVariantForKind', () => {
   it.each`
     kind               | output
-    ${'auth'}          | ${'inline'}
+    ${'auth'}          | ${'modal'}
     ${'form'}          | ${'inline'}
     ${'render'}        | ${'inline'}
     ${'verify-button'} | ${'inline'}
@@ -158,7 +158,6 @@ describe('validateComponentVariant', () => {
     kind               | variant     | output
     ${'auth'}          | ${''}       | ${undefined}
     ${'auth'}          | ${'drawer'} | ${undefined}
-    ${'auth'}          | ${'inline'} | ${undefined}
     ${'auth'}          | ${'modal'}  | ${undefined}
     ${'form'}          | ${''}       | ${undefined}
     ${'form'}          | ${'drawer'} | ${undefined}

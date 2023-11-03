@@ -1,23 +1,20 @@
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import styled, { css } from '@onefootprint/styled';
-import { Typography } from '@onefootprint/ui';
+import { FootprintButton } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
-import { useEffectOnce } from 'usehooks-ts';
 
 const AcmeDevAuthKey = 'ob_test_2TwubGlrWdKaJnWsQQKQYl';
 const AcmePropLiveKey = 'pb_live_qULwuLO9VARXqBG1tbd0yM';
 
-const AuthDevAcme = () => {
-  useEffectOnce(() => {
+const AuthDemo = () => {
+  const handleClick = () => {
     const component = footprint.init({
       kind: FootprintComponentKind.Auth,
       variant: 'modal',
-      appearance: { variant: 'inline' },
-      containerId: 'footprint-auth-form',
       onCancel: () => console.log('demo onCancel'),
       onClose: () => console.log('demo onClose'),
-      onComplete: (x: unknown) => console.log('demo onComplete', x),
+      onComplete: (validationToken: string) => console.log(validationToken),
       options: { showLogo: true, showCompletionPage: true },
       publicKey: AcmeDevAuthKey || AcmePropLiveKey,
       userData: {},
@@ -28,24 +25,19 @@ const AuthDevAcme = () => {
     return () => {
       component.destroy();
     };
-  });
+  };
 
-  return <div id="footprint-auth-form" style={{ height: '100%' }} />;
-};
-
-const AuthDemo = () => (
-  <Container>
-    <Inner>
+  return (
+    <>
       <Head>
-        <title>Footprint Components Demo</title>
+        <title>Footprint Auth Demo</title>
       </Head>
-      <Typography variant="heading-2" sx={{ marginBottom: 7 }}>
-        Auth Demo
-      </Typography>
-      <AuthDevAcme />
-    </Inner>
-  </Container>
-);
+      <Container>
+        <FootprintButton text="Sign in with Footprint" onClick={handleClick} />
+      </Container>
+    </>
+  );
+};
 
 const Container = styled.div`
   ${({ theme }) => css`
@@ -57,17 +49,6 @@ const Container = styled.div`
     justify-content: center;
     overflow: hidden;
     width: 100%;
-  `}
-`;
-
-const Inner = styled.div`
-  ${({ theme }) => css`
-    background: ${theme.backgroundColor.primary};
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    width: 100%;
-    height: 100%;
   `}
 `;
 
