@@ -247,7 +247,8 @@ fn make_vault(
         let sv = fixtures::scoped_vault::create(conn, &uvid, &ob_config.id);
         let svid = sv.id.clone();
         if let Some(ob_decision_made_at) = ob_decision_made_at {
-            let wf = fixtures::workflow::create(conn, svid, ob_config.id, None);
+            let wf =
+                fixtures::workflow::create(conn, crate::tests::mock_ff_client(), svid, ob_config.id, None);
 
             let decision = NewDecisionArgs {
                 vault_id: uv.id.clone(),

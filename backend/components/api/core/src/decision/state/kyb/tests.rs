@@ -43,8 +43,7 @@ async fn setup(
         CDO::BusinessBeneficialOwners,
     ];
     let (t, wf, _v, _sv, obc, biz_wf) = test_helpers::create_kyb_user_and_onboarding(
-        &state.db_pool,
-        &state.enclave_client,
+        state,
         ObConfigurationOpts {
             is_live,
             must_collect_data: cdos.clone(),

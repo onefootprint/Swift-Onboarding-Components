@@ -1,8 +1,10 @@
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use chrono::{DateTime, Utc};
 use diesel::dsl::{count_star, not};
 use diesel::prelude::*;
+use feature_flag::{BoolFlag, FeatureFlagClient};
 use itertools::Itertools;
 use newtypes::{
     AlpacaKycConfig, AlpacaKycState, CipKind, DbActor, DocumentState, FireWebhookArgs, InsightEventId,
@@ -196,6 +198,7 @@ impl Workflow {
     #[tracing::instrument("Workflow::get_or_create_onboarding", skip_all)]
     pub fn get_or_create_onboarding(
         conn: &mut TxnPgConn,
+        ff_client: Arc<dyn FeatureFlagClient>,
         args: OnboardingWorkflowArgs,
         fixture_result: Option<WorkflowFixtureResult>,
         force_create: bool,
@@ -241,7 +244,11 @@ impl Workflow {
         let config = match v.kind {
             VaultKind::Person => {
                 if matches!(obc.cip_kind, Some(CipKind::Alpaca)) {
-                    AlpacaKycConfig { is_redo: false }.into()
+                    if ff_client.flag(BoolFlag::CreateKycWorkflowForAlpacaOnboardings(&obc.key)) {
+                        KycConfig { is_redo: false }.into()
+                    } else {
+                        AlpacaKycConfig { is_redo: false }.into()
+                    }
                 } else {
                     KycConfig { is_redo: false }.into()
                 }

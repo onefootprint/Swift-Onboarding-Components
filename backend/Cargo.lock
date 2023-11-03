@@ -3096,6 +3096,7 @@ dependencies = [
  "diesel_as_jsonb",
  "diesel_migrations",
  "dotenv",
+ "feature_flag",
  "hex",
  "ipnetwork",
  "itertools",

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use db::{
     models::{
         business_owner::BusinessOwner,
@@ -10,6 +12,7 @@ use db::{
     },
     TxnPgConn,
 };
+use feature_flag::FeatureFlagClient;
 use newtypes::{
     CollectedDataOption, EncryptedVaultPrivateKey, ObConfigurationKind, ScopedVaultId, Selfie, VaultId,
     VaultKind, VaultPublicKey, WorkflowFixtureResult, WorkflowId, WorkflowSource,
@@ -28,6 +31,7 @@ pub struct NewBusinessVaultArgs {
 #[allow(clippy::too_many_arguments)]
 pub fn get_or_start_onboarding(
     conn: &mut TxnPgConn,
+    ff_client: Arc<dyn FeatureFlagClient>,
     existing_wf_id: Option<WorkflowId>,
     force_create: bool,
     v_id: &VaultId,
@@ -64,8 +68,13 @@ pub fn get_or_start_onboarding(
             authorized: is_all_visible_data_added_by_tenant,
             source,
         };
-        let (wf, is_new_ob) =
-            Workflow::get_or_create_onboarding(conn, ob_create_args, fixture_result, force_create)?;
+        let (wf, is_new_ob) = Workflow::get_or_create_onboarding(
+            conn,
+            ff_client.clone(),
+            ob_create_args,
+            fixture_result,
+            force_create,
+        )?;
         if is_new_ob {
             create_doc_request_if_needed(conn, &wf, obc)?;
         }
@@ -102,7 +111,7 @@ pub fn get_or_start_onboarding(
                 source,
             };
             let (biz_wf, _) =
-                Workflow::get_or_create_onboarding(conn, ob_create_args, fixture_result, false)?;
+                Workflow::get_or_create_onboarding(conn, ff_client, ob_create_args, fixture_result, false)?;
             biz_wf
         };
         Some(biz_wf)

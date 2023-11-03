@@ -45,7 +45,7 @@ async fn sandbox_and_inactive_users(
 ) {
     // SETUP
     let (sv, task) = create_user_and_task(
-        &state.db_pool,
+        state,
         VaultKind::Portable(enhanced_aml_option_yes()),
         is_live,
         onboarding_status,
@@ -82,8 +82,7 @@ async fn insufficient_data_in_vault(state: &mut State, vault_kind: VaultKind) {
     } else {
         vec![] // Incode only requires first+last name
     };
-    let (sv, task) =
-        create_user_and_task(&state.db_pool, vault_kind, true, OnboardingStatus::Pass, idks).await;
+    let (sv, task) = create_user_and_task(state, vault_kind, true, OnboardingStatus::Pass, idks).await;
 
     expect_webhook(
         state,
@@ -111,7 +110,7 @@ async fn insufficient_data_in_vault(state: &mut State, vault_kind: VaultKind) {
 async fn vendor_error(state: &mut State, vault_kind: VaultKind) {
     // SETUP
     let (sv, task) = create_user_and_task(
-        &state.db_pool,
+        state,
         vault_kind.clone(),
         true,
         OnboardingStatus::Pass,
@@ -185,8 +184,7 @@ async fn active_users(
 ) {
     let (expected_status, expected_reason_codes) = expect;
     // SETUP
-    let (sv, task) =
-        create_user_and_task(&state.db_pool, vault_kind.clone(), true, status, full_vault()).await;
+    let (sv, task) = create_user_and_task(state, vault_kind.clone(), true, status, full_vault()).await;
 
     // Mock vendor + expect webhooks
     if vault_kind.expects_idology() {
@@ -251,7 +249,7 @@ enum VaultDataChange {
 async fn incode_new_search_needed(state: &mut State, case: ExistingSearchCase) {
     // SETUP
     let (sv, task) = create_user_and_task(
-        &state.db_pool,
+        state,
         VaultKind::Portable(enhanced_aml_option_yes()),
         true,
         OnboardingStatus::Pass,

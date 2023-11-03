@@ -138,9 +138,7 @@ pub async fn setup_data(
     obc_opts: ObConfigurationOpts,
     fixture_result: Option<WorkflowFixtureResult>,
 ) -> (Workflow, Tenant, ObConfiguration, TenantUser) {
-    let (tenant, wf, _, _, obc) =
-        test_helpers::create_kyc_user_and_wf(&state.db_pool, &state.enclave_client, obc_opts, fixture_result)
-            .await;
+    let (tenant, wf, _, _, obc) = test_helpers::create_kyc_user_and_wf(state, obc_opts, fixture_result).await;
 
     let tid = tenant.id.clone();
     let tu = state

@@ -35,8 +35,7 @@ use std::sync::Arc;
 
 async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
     let (_, _, _, sv, obc) = test_helpers::create_kyc_user_and_wf(
-        &state.db_pool,
-        &state.enclave_client,
+        state,
         ObConfigurationOpts {
             is_live: true,
             ..Default::default()

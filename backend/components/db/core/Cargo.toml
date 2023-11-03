@@ -21,7 +21,7 @@ tokio = { workspace = true }
 dotenv = { workspace = true }
 openssl = { workspace = true }
 log = { workspace = true }
-
+feature_flag = { path = "../../feature_flag" }
 strum_macros = { workspace = true }
 strum = { workspace = true }
 chrono = { workspace = true }

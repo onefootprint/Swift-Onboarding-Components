@@ -66,6 +66,8 @@ pub enum BoolFlag<'a> {
     IsKycWaterfallOnRuleFailureEnabled(&'a TenantId),
     #[strum(to_string = "RunAwsRekognition")]
     RunAwsRekognition(&'a TenantId),
+    #[strum(to_string = "CreateKycWorkflowForAlpacaOnboardings")]
+    CreateKycWorkflowForAlpacaOnboardings(&'a ObConfigurationKey),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -106,6 +108,7 @@ impl<'a> BoolFlag<'a> {
             Self::UseIncodeDemoCredentialsInLivemode(k) => Some(k.to_string()),
             Self::IsKycWaterfallOnRuleFailureEnabled(k) => Some(k.to_string()),
             Self::RunAwsRekognition(k) => Some(k.to_string()),
+            Self::CreateKycWorkflowForAlpacaOnboardings(k) => Some(k.to_string()),
         }
     }
 
@@ -142,6 +145,7 @@ impl<'a> BoolFlag<'a> {
             Self::UseIncodeDemoCredentialsInLivemode(_) => false,
             Self::IsKycWaterfallOnRuleFailureEnabled(_) => false,
             Self::RunAwsRekognition(_) => false,
+            Self::CreateKycWorkflowForAlpacaOnboardings(_) => false,
         }
     }
 }

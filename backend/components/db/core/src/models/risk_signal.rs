@@ -331,7 +331,8 @@ mod tests {
         let obc = fixtures::ob_configuration::create(conn, &t.id, true);
         let uv = fixtures::vault::create_person(conn, true).into_inner();
         let sv = fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
-        let wf = fixtures::workflow::create(conn, sv.id.clone(), obc.id, None);
+        let wf =
+            fixtures::workflow::create(conn, crate::tests::mock_ff_client(), sv.id.clone(), obc.id, None);
         let di = crate::models::decision_intent::DecisionIntent::get_or_create_for_workflow(
             conn,
             &sv.id,

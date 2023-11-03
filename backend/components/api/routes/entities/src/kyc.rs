@@ -78,6 +78,7 @@ pub async fn post(
     let decrypted_values = GetRequirementsArgs::get_decrypted_values(&state, &uvw).await?;
 
     let tenant_id = auth.tenant().id.clone();
+    let ff_client = state.feature_flag_client.clone();
     let wf = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -106,6 +107,7 @@ pub async fn post(
 
             let (wf_id, _) = api_core::utils::onboarding::get_or_start_onboarding(
                 conn,
+                ff_client,
                 None,
                 false,
                 &sv.vault_id,

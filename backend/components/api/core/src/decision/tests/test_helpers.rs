@@ -9,7 +9,7 @@ use db::{
         workflow::{Workflow, WorkflowUpdate},
     },
     tests::fixtures::{self, ob_configuration::ObConfigurationOpts},
-    DbPool, TxnPgConn,
+    TxnPgConn,
 };
 use newtypes::{
     BusinessDataKind, DataIdentifier, IdentityDataKind, PiiString, ScopedVaultId, VaultKind,
@@ -17,7 +17,6 @@ use newtypes::{
 };
 
 use crate::{
-    enclave_client::EnclaveClient,
     errors::ApiResult,
     tests::fixtures::lib::random_phone_number,
     utils::{
@@ -25,11 +24,11 @@ use crate::{
         onboarding::NewBusinessVaultArgs,
         vault_wrapper::{Any, VaultWrapper},
     },
+    State,
 };
 
 pub async fn create_user_and_onboarding(
-    db_pool: &DbPool,
-    enclave_client: &EnclaveClient,
+    state: &State,
     obc_opts: ObConfigurationOpts,
     kyc_fixture_result: Option<WorkflowFixtureResult>,
     create_business: bool,
@@ -41,9 +40,9 @@ pub async fn create_user_and_onboarding(
     ObConfiguration,
     Option<Workflow>, // Business workflow
 ) {
-    let (pk, tenant_e_key) = enclave_client.generate_sealed_keypair().await.unwrap();
+    let (pk, tenant_e_key) = state.enclave_client.generate_sealed_keypair().await.unwrap();
     let biz_args = if create_business {
-        let (public_key, e_private_key) = enclave_client.generate_sealed_keypair().await.unwrap();
+        let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await.unwrap();
         Some(NewBusinessVaultArgs {
             public_key,
             e_private_key,
@@ -52,7 +51,9 @@ pub async fn create_user_and_onboarding(
     } else {
         None
     };
-    db_pool
+    let ff_client = state.feature_flag_client.clone();
+    state
+        .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let tenant = fixtures::tenant::create_with_keys(conn, pk, tenant_e_key);
             let ob_config = fixtures::ob_configuration::create_with_opts(conn, &tenant.id, obc_opts);
@@ -61,6 +62,7 @@ pub async fn create_user_and_onboarding(
 
             let (wf_id, biz_wf) = utils::onboarding::get_or_start_onboarding(
                 conn,
+                ff_client,
                 None,
                 false,
                 &uv.id,
@@ -97,19 +99,16 @@ pub async fn create_user_and_onboarding(
 }
 
 pub async fn create_kyc_user_and_wf(
-    db_pool: &DbPool,
-    enclave_client: &EnclaveClient,
+    state: &State,
     obc_opts: ObConfigurationOpts,
     fixture_result: Option<WorkflowFixtureResult>,
 ) -> (Tenant, Workflow, Vault, ScopedVault, ObConfiguration) {
-    let (t, wf, v, sv, obc, _) =
-        create_user_and_onboarding(db_pool, enclave_client, obc_opts, fixture_result, false).await;
+    let (t, wf, v, sv, obc, _) = create_user_and_onboarding(state, obc_opts, fixture_result, false).await;
     (t, wf, v, sv, obc)
 }
 
 pub async fn create_kyb_user_and_onboarding(
-    db_pool: &DbPool,
-    enclave_client: &EnclaveClient,
+    state: &State,
     obc_opts: ObConfigurationOpts,
     fixture_result: Option<WorkflowFixtureResult>,
 ) -> (
@@ -120,8 +119,7 @@ pub async fn create_kyb_user_and_onboarding(
     ObConfiguration,
     Workflow, // Business workflow
 ) {
-    let (t, wf, v, sv, obc, biz_wf) =
-        create_user_and_onboarding(db_pool, enclave_client, obc_opts, fixture_result, true).await;
+    let (t, wf, v, sv, obc, biz_wf) = create_user_and_onboarding(state, obc_opts, fixture_result, true).await;
 
     (t, wf, v, sv, obc, biz_wf.unwrap())
 }
