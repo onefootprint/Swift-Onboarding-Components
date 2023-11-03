@@ -243,7 +243,7 @@ async fn run_aws_inner(
             )
         }
         Err(e) => {
-            tracing::error!(err=?e, "error making aws rekognition request");
+            tracing::warn!(err=?e, "error making aws rekognition request");
 
             let err = idv::Error::from(e);
             (
