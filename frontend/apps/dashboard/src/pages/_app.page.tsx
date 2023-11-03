@@ -29,16 +29,16 @@ const App = ({ Component, pageProps }: AppProps) => {
         <meta name="viewport" content="width=900,maximum-scale=1.0" />
       </Head>
       <ObserveCollectorProvider appName="dashboard">
-        <ReactQueryProvider>
-          <CustomDesignSystemProvider>
+        <CustomDesignSystemProvider>
+          <ReactQueryProvider>
             <GlobalStyle hasMinWidth={!isResponsive} />
             <ErrorBoundary>
               <Layout name={pageProps.layout}>
                 <Component />
               </Layout>
             </ErrorBoundary>
-          </CustomDesignSystemProvider>
-        </ReactQueryProvider>
+          </ReactQueryProvider>
+        </CustomDesignSystemProvider>
       </ObserveCollectorProvider>
       <Analytics />
     </>
