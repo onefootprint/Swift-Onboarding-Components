@@ -57,7 +57,11 @@ pub struct ObConfiguration {
     pub allow_us_residents: bool,
     pub allow_us_territory_residents: bool,
     pub kind: ObConfigurationKind,
+    /// When true on a KYB playbook, just collect business info without sending to vendors
     pub skip_kyb: bool,
+    /// When true on a KYC or KYB playbook, allows skipping confirm screen.
+    /// Will still collect all data if it's missing, but skips confirm.
+    pub skip_confirm: bool,
 }
 
 #[derive(derive_more::Deref)]
@@ -313,6 +317,7 @@ struct NewObConfiguration {
     allow_us_territory_residents: bool,
     kind: ObConfigurationKind,
     skip_kyb: bool,
+    skip_confirm: bool,
 }
 
 #[derive(Debug)]
@@ -504,6 +509,7 @@ impl ObConfiguration {
         allow_us_territory_residents: bool,
         kind: ObConfigurationKind,
         skip_kyb: bool,
+        skip_confirm: bool,
     ) -> DbResult<Self> {
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
@@ -528,6 +534,7 @@ impl ObConfiguration {
             allow_us_territory_residents,
             kind,
             skip_kyb,
+            skip_confirm,
         };
         let obc = diesel::insert_into(ob_configuration::table)
             .values(config)
@@ -651,6 +658,7 @@ mod tests {
             allow_us_territory_residents,
             kind: ObConfigurationKind::Kyc,
             skip_kyb: false,
+            skip_confirm: false,
         };
 
         assert_have_same_elements(
@@ -694,6 +702,7 @@ mod tests {
             allow_us_territory_residents: false,
             kind: ObConfigurationKind::Kyc,
             skip_kyb: false,
+            skip_confirm: false,
         }
     }
 
@@ -858,6 +867,7 @@ mod tests {
             allow_us_territory_residents: false,
             kind: ObConfigurationKind::Kyc,
             skip_kyb: false,
+            skip_confirm: false,
         };
 
         obc.optional_ssn_restricted_id_doc_kinds()
@@ -894,6 +904,7 @@ mod tests {
             allow_us_territory_residents: false,
             kind: ObConfigurationKind::Kyc,
             skip_kyb: false,
+            skip_confirm: false,
         };
 
         let mapping = obc.supported_country_mapping_for_document(None).0;

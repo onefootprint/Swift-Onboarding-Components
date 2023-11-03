@@ -489,6 +489,7 @@ table! {
         allow_us_territory_residents -> Bool,
         kind -> Text,
         skip_kyb -> Bool,
+        skip_confirm -> Bool,
     }
 }
 

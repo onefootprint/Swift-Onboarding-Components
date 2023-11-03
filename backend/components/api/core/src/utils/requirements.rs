@@ -41,7 +41,7 @@ impl GetRequirementsArgs {
             person_obc: value.ob_config()?.clone(),
             person_workflow: value.workflow().clone(),
             person_vault_id: value.user().id.clone(),
-            business_sv: value.scoped_business_id().clone(),
+            business_sv: value.scoped_business_id(),
         })
     }
 }
@@ -278,18 +278,25 @@ pub fn get_requirements_inner(
         .into_iter()
         .flatten()
         .filter(|r| {
-            let is_id_or_ip_req = matches!(
+            let is_data_collection_step = matches!(
                 OnboardingRequirementKind::from(r),
-                OnboardingRequirementKind::CollectData | OnboardingRequirementKind::CollectInvestorProfile
+                OnboardingRequirementKind::CollectData
+                    | OnboardingRequirementKind::CollectInvestorProfile
+                    | OnboardingRequirementKind::CollectBusinessData
             );
             let is_in_alpaca_stepup =
                 matches!(wf.state, WorkflowState::AlpacaKyc(AlpacaKycState::DocCollection));
-            if is_in_alpaca_stepup && r.is_met() && is_id_or_ip_req {
-                // Omit the confirm screen when an alpaca user is in step up
-                false
-            } else {
-                true
+            if r.is_met() && is_data_collection_step {
+                if is_in_alpaca_stepup {
+                    // Omit the confirm screen when an alpaca user is in step up
+                    return false;
+                }
+                if obc.skip_confirm {
+                    // Omit the confirm screen when the obc prefers it
+                    return false;
+                }
             }
+            true
         })
         .sorted_by_key(|r| OnboardingRequirementKind::from(r).priority(obc.is_doc_first))
         .collect();

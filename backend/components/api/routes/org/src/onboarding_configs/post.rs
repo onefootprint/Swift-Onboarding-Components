@@ -45,6 +45,7 @@ pub struct CreateOnboardingConfigurationRequest {
     // TODO: drop this option
     allow_us_territory_residents: Option<bool>,
     kind: Option<ObConfigurationKind>,
+    skip_confirm: Option<bool>,
 }
 
 impl CreateOnboardingConfigurationRequest {
@@ -350,6 +351,7 @@ impl CreateOnboardingConfigurationRequest {
                     self.enhanced_aml.as_ref().is_some_and(|e| e.enhanced_aml),
                     "enhanced_aml",
                 ),
+                (self.skip_confirm == Some(true), "skip_confirm"),
             ];
             if let Some((_, f)) = unallowed_flags.into_iter().find(|(v, _)| *v) {
                 return Err(
@@ -423,6 +425,7 @@ pub async fn post(
         allow_us_residents,
         allow_us_territory_residents,
         kind,
+        skip_confirm,
     } = request.clone();
     let is_live = auth.is_live()?;
     let tenant_id = tenant.id.clone();
@@ -488,6 +491,7 @@ pub async fn post(
                 allow_us_territory_residents.unwrap_or(false),
                 kind,
                 skip_kyb,
+                skip_confirm.unwrap_or(false),
             )?;
             let obc = db::actor::saturate_actor_nullable(conn, obc)?;
             Ok(obc)
@@ -589,6 +593,7 @@ mod test {
             allow_us_residents: Some(true),
             allow_us_territory_residents: Some(false),
             kind: Some(ObConfigurationKind::Kyc),
+            skip_confirm: None,
         };
         req.validate_inner().is_ok()
     }
@@ -618,6 +623,7 @@ mod test {
             allow_us_residents: Some(true),
             allow_us_territory_residents: Some(false),
             kind: Some(ObConfigurationKind::Kyc),
+            skip_confirm: None,
         };
         req.validate(ObConfigurationKind::Kyc).is_ok()
     }
@@ -646,6 +652,7 @@ mod test {
             allow_us_residents: Some(true),
             allow_us_territory_residents: Some(false),
             kind: Some(ObConfigurationKind::Kyc),
+            skip_confirm: None,
         };
         req.validate(ObConfigurationKind::Kyc).is_ok()
     }
@@ -670,6 +677,7 @@ mod test {
             allow_us_residents: Some(true),
             allow_us_territory_residents: Some(false),
             kind: Some(ObConfigurationKind::Kyc),
+            skip_confirm: None,
         };
         req.validate(ObConfigurationKind::Kyc).is_ok()
     }

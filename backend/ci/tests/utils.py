@@ -520,6 +520,7 @@ def create_ob_config(
     doc_scan_for_optional_ssn=None,
     kind=None,
     override_auths=None,
+    skip_confirm=None,
 ):
     ob_conf_data = {
         "name": name,
@@ -533,6 +534,7 @@ def create_ob_config(
         "international_country_restrictions": international_country_restrictions,
         "doc_scan_for_optional_ssn": doc_scan_for_optional_ssn,
         "kind": kind,
+        "skip_confirm": skip_confirm,
     }
     # TODO also make this get or create?
     auths = override_auths if override_auths else tenant.db_auths
