@@ -77,19 +77,23 @@ async fn create_create_account_request(
         .await??;
 
     let doc_info = doc.map(|(id, _)| {
+        // Get the document type that we used to vault the verified images. This is how incode
+        // classified the document, which in rare cases may be different from how the user
+        // classified the document
+        let document_kind = id.vaulted_document_type.unwrap_or(id.document_type);
         let di_pairs = id
             .document_type
             .sides()
             .into_iter()
             .map(|s| {
                 (
-                    DI::from(DK::LatestUpload(id.document_type, s)),
-                    DI::from(DK::MimeType(id.document_type, s)),
+                    DI::from(DK::Image(document_kind, s)),
+                    DI::from(DK::MimeType(document_kind, s)),
                 )
             })
             .collect::<Vec<_>>();
         DocInfo {
-            id_doc_kind: id.document_type,
+            id_doc_kind: document_kind,
             di_pairs,
         }
     });
