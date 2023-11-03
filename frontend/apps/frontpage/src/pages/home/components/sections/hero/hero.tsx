@@ -83,7 +83,7 @@ const Hero = () => {
           transition={{ duration: 0.2, ease: 'easeOut', delay: 0.6 }}
         >
           <Row>
-            <LinkingButton href={`${DASHBOARD_BASE_URL}/sign-up`}>
+            <LinkingButton href={`${DASHBOARD_BASE_URL}/sign-up`} size="large">
               {t('primary-button')}
             </LinkingButton>
             <Button

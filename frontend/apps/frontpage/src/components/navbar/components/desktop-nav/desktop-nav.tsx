@@ -119,7 +119,7 @@ const SecondaryNav = styled(NavigationMenu.List)`
 
 const Login = styled(Link)<{ isOnDarkSection?: boolean }>`
   ${({ theme, isOnDarkSection }) => css`
-    ${createFontStyles('label-2')};
+    ${createFontStyles('label-3')};
     color: ${isOnDarkSection ? primitives.Gray0 : theme.color.primary};
     text-decoration: none;
     transition: color 0.2s ease-in-out;

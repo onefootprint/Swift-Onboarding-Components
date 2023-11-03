@@ -248,7 +248,7 @@
         "subtitle": "Embedding KYC, KYB, and PII + Card Vaulting with 5 lines of code, we empower companies to own their onboarding experience and customer data with one-click.",
         "desktop-img-alt": "desktop mockup",
         "mobile-img-alt": "mobile mockup",
-        "primary-button": "Get started",
+        "primary-button": "Sign up for free",
         "secondary-button": "Book a call",
         "tertiary-button": "Watch demo",
         "demo-video-close": "Close"
@@ -438,7 +438,7 @@
       "html-title": "Footprint - KYC",
       "title": "Know Your Customer (KYC)",
       "subtitle": "Verify the people behind the device",
-      "get-started": "Get started",
+      "get-started": "Sign up for free",
       "book-a-demo": "Book a demo",
       "onboard-users": {
         "title": "Onboard new users at speed of light",
@@ -516,7 +516,7 @@
       },
       "banner": {
         "title": "Onboard more customers and enjoy peace of mind. Today.",
-        "get-started": "Get started",
+        "get-started": "Sign up for free",
         "book-a-demo": "Book a demo"
       }
     },
@@ -525,7 +525,7 @@
       "hero": {
         "title": "Know Your Business (KYB)",
         "subtitle": "Verify businesses, and the people behind the business quickly and securely.",
-        "get-started": "Get started",
+        "get-started": "Sign up for free",
         "book-a-demo": "Book a demo"
       },
       "identify-businesses": {
@@ -554,7 +554,7 @@
       },
       "banner": {
         "title": "Onboard more customers and enjoy peace of mind. Today.",
-        "get-started": "Get started",
+        "get-started": "Sign up for free",
         "book-a-demo": "Book a demo"
       }
     },
@@ -1129,7 +1129,7 @@
       },
       "banner": {
         "title": "Onboard more customers and enjoy peace of mind. Today.",
-        "get-started": "Get started",
+        "get-started": "Sign up for free",
         "book-a-demo": "Book a demo"
       }
     }
