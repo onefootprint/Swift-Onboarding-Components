@@ -110,6 +110,7 @@ pub enum KycState {
     VendorCalls,
     Decisioning,
     Complete,
+    DocCollection,
 }
 
 impl From<KycState> for WorkflowState {

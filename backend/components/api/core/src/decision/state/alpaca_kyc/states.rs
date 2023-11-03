@@ -26,7 +26,8 @@ use crate::{
     decision::{
         self,
         features::risk_signals::{
-            create_risk_signals_from_vendor_results, fetch_latest_risk_signals_map,
+            create_risk_signals_from_vendor_results, fetch_latest_kyc_risk_signals,
+            fetch_latest_risk_signals_map,
             risk_signal_group_struct::{self},
             save_risk_signals, RiskSignalGroupStruct,
         },
@@ -198,7 +199,7 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
         save_risk_signals(conn, &self.sv_id, &risk_signals, false)?;
 
         // we might need doc signals here too, so we reload
-        let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
+        let risk_signals = fetch_latest_kyc_risk_signals(conn, &self.sv_id)?;
 
         Ok(AlpacaKycState::from(AlpacaKycDecisioning {
             wf_id: self.wf_id,
@@ -232,7 +233,7 @@ impl AlpacaKycDecisioning {
         let svid = sv.id.clone();
         let risk_signals = state
             .db_pool
-            .db_query(move |conn| fetch_latest_risk_signals_map(conn, &svid))
+            .db_query(move |conn| fetch_latest_kyc_risk_signals(conn, &svid))
             .await??;
 
         Ok(AlpacaKycDecisioning {
@@ -275,7 +276,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
         let decision = if let Some(fixture_decision) = fixture_decision {
             common::alpaca_kyc_decision_from_fixture(fixture_decision)?
         } else {
-            common::get_decision(&self, conn, self.risk_signals.clone(), &wf, &v)?
+            common::get_decision(conn, self.risk_signals.clone(), &wf, &v)?
         };
 
         match decision.final_kyc_decision()?.decision.decision_status {
@@ -479,7 +480,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         let kyc_decision = if let Some((_, fixture_decision)) = watchlist_res.right() {
             common::alpaca_kyc_decision_from_fixture(fixture_decision)?
         } else {
-            common::get_decision(&self, conn, risk_signals, &wf, &v)?
+            common::get_decision(conn, risk_signals, &wf, &v)?
         }
         .final_kyc_decision()?;
 

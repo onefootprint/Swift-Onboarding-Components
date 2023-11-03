@@ -139,7 +139,7 @@ impl From<OnboardingEvaluationResult> for OnboardingRulesDecisionOutput {
         OnboardingRulesDecisionOutput {
             decision: Decision {
                 // TODO: fix this
-                should_commit: should_commit(&result.rules_triggered),
+                should_commit: should_commit(&result.rules_triggered, &result.triggered_action),
                 decision_status,
                 create_manual_review,
                 vendor_apis: result.vendor_apis,
@@ -153,9 +153,11 @@ impl From<OnboardingEvaluationResult> for OnboardingRulesDecisionOutput {
 // For now, we have very simple logic to decide when to commit which is just "if the only thing
 // that failed this user is a watchlist hit, commit"
 // More thoughts: https://www.notion.so/onefootprint/Design-Doc-Portabilization-Decision-71f1cfb945234c58b74e97f005211917?pvs=4
-pub fn should_commit(rules_triggered: &Vec<RuleName>) -> bool {
+pub fn should_commit(rules_triggered: &Vec<RuleName>, triggered_action: &Option<RuleAction>) -> bool {
+    // TODO: codify our own proper set of Rule's for determining should_commit
     rules_triggered.is_empty()
         || (rules_triggered.len() == 1 && rules_triggered.contains(&RuleName::WatchlistHit))
+        || matches!(triggered_action, Some(RuleAction::StepUp)) // TODO: when we handle enforcing that StepUp cannot be a triggered_action if doc was already collected, we can remove this hack
 }
 
 pub fn evaluate_kyb_rules(

@@ -63,10 +63,10 @@ pub enum KybState {
 impl KybState {
     pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
         let newtypes::WorkflowState::Kyb(s) = workflow.state else {
-            return Err(StateError::UnexpectedStateForWorkflow(workflow.state, workflow.id).into())
+            return Err(StateError::UnexpectedStateForWorkflow(workflow.state, workflow.id).into());
         };
         let newtypes::WorkflowConfig::Kyb(c) = workflow.config.clone() else {
-            return Err(StateError::UnexpectedConfigForWorkflow(workflow.config, workflow.id).into())
+            return Err(StateError::UnexpectedConfigForWorkflow(workflow.config, workflow.id).into());
         };
 
         match s {

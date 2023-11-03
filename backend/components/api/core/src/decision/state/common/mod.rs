@@ -20,9 +20,11 @@ use crate::{
             risk_signals::{risk_signal_group_struct::Aml, RiskSignalGroupStruct, RiskSignalsForDecision},
         },
         onboarding::{
-            rules::KycRuleExecutionConfig, Decision, DecisionResult, OnboardingRulesDecision,
-            OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput,
+            rules::{KycRuleExecutionConfig, KycRuleGroup},
+            Decision, DecisionResult, OnboardingRulesDecision, OnboardingRulesDecisionOutput,
+            WaterfallOnboardingRulesDecisionOutput,
         },
+        rule::rule_sets,
         utils::{should_execute_rules_for_document_only, FixtureDecision},
         vendor::{
             self,
@@ -38,8 +40,6 @@ use crate::{
     utils::vault_wrapper::{Any, TenantVw, VaultWrapper, VwArgs},
     State,
 };
-
-use super::traits::HasRuleGroup;
 
 #[tracing::instrument(skip(db_pool))]
 pub async fn get_sv_for_workflow(db_pool: &DbPool, workflow: &Workflow) -> DbResult<ScopedVault> {
@@ -219,13 +219,21 @@ pub fn alpaca_kyc_decision_from_fixture(
 
 #[tracing::instrument(skip_all)]
 pub fn get_decision(
-    rule_group: &impl HasRuleGroup,
     conn: &mut TxnPgConn,
     risk_signals: RiskSignalsForDecision,
     wf: &Workflow,
     vault: &Vault,
 ) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
     let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
+    // later rules will come from Postgres itself
+    let rule_group = match obc.cip_kind {
+        Some(CipKind::Alpaca) => KycRuleGroup {
+            kyc_rules: rule_sets::alpaca::alpaca_rules(),
+            doc_rules: rule_sets::alpaca::doc_rules(),
+            aml_rules: rule_sets::common::aml_rules(),
+        },
+        _ => KycRuleGroup::default(),
+    };
     let include_doc = DocumentRequest::get(conn, &wf.id)?.is_some();
     let document_only = should_execute_rules_for_document_only(vault, wf)?;
     let config = KycRuleExecutionConfig {
@@ -233,7 +241,7 @@ pub fn get_decision(
         document_only,
         skip_kyc: obc.skip_kyc,
     };
-    let rules_output = rule_group.rule_group().evaluate(risk_signals, config)?;
+    let rules_output = rule_group.evaluate(risk_signals, config)?;
     Ok(rules_output)
 }
 

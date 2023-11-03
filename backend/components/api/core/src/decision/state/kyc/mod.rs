@@ -45,6 +45,13 @@ pub struct KycDecisioning {
     t_id: TenantId,
 }
 
+#[derive(Clone)]
+pub struct KycDocCollection {
+    wf_id: WorkflowId,
+    sv_id: ScopedVaultId,
+    t_id: TenantId,
+}
+
 impl HasRuleGroup for KycDecisioning {
     fn rule_group(&self) -> KycRuleGroup {
         KycRuleGroup {
@@ -65,16 +72,17 @@ pub enum KycState {
     VendorCalls(KycVendorCalls),
     Decisioning(KycDecisioning),
     Complete(KycComplete),
+    DocCollection(KycDocCollection),
 }
 
 impl KycState {
     #[tracing::instrument(skip_all)]
     pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
         let newtypes::WorkflowState::Kyc(s) = workflow.state else {
-            return Err(StateError::UnexpectedStateForWorkflow(workflow.state, workflow.id).into())
+            return Err(StateError::UnexpectedStateForWorkflow(workflow.state, workflow.id).into());
         };
         let newtypes::WorkflowConfig::Kyc(c) = workflow.config.clone() else {
-            return Err(StateError::UnexpectedConfigForWorkflow(workflow.config, workflow.id).into())
+            return Err(StateError::UnexpectedConfigForWorkflow(workflow.config, workflow.id).into());
         };
         // TODO could get rid of this with enum_dispatch
         match s {
@@ -88,6 +96,9 @@ impl KycState {
                 KycDecisioning::init(state, workflow, c).await.map(KycState::from)
             }
             newtypes::KycState::Complete => KycComplete::init(state, workflow, c).await.map(KycState::from),
+            newtypes::KycState::DocCollection => KycDocCollection::init(state, workflow, c)
+                .await
+                .map(KycState::from),
         }
     }
 }
@@ -112,6 +123,9 @@ impl Workflow for KycState {
                 s.do_action(state, a, workflow_id).await?
             }
             (Self::Decisioning(s), WorkflowActions::MakeDecision(a)) => {
+                s.do_action(state, a, workflow_id).await?
+            }
+            (Self::DocCollection(s), WorkflowActions::DocCollected(a)) => {
                 s.do_action(state, a, workflow_id).await?
             }
             (_, _) => return Err(StateError::UnexpectedActionForState.into()),

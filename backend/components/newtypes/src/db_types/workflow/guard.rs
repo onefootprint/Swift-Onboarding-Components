@@ -12,7 +12,8 @@ pub enum WorkflowGuard {
 impl WorkflowState {
     pub fn allowed_guards(&self) -> Vec<WorkflowGuard> {
         match self {
-            Self::AlpacaKyc(AlpacaKycState::DocCollection)
+            Self::Kyc(KycState::DocCollection)
+            | Self::AlpacaKyc(AlpacaKycState::DocCollection)
             | Self::Kyc(KycState::DataCollection)
             | Self::AlpacaKyc(AlpacaKycState::DataCollection) => {
                 vec![WorkflowGuard::AddData, WorkflowGuard::AddDocument]
@@ -43,6 +44,7 @@ impl WorkflowState {
         // TODO could one day represent this with guards too
         match self {
             Self::Kyc(KycState::DataCollection)
+            | Self::Kyc(KycState::DocCollection)
             | Self::AlpacaKyc(AlpacaKycState::DataCollection)
             | Self::AlpacaKyc(AlpacaKycState::DocCollection)
             | Self::Document(DocumentState::DataCollection)

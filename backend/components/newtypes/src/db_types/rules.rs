@@ -99,6 +99,7 @@ pub enum RuleName {
     BoNonPassingKyc,
     DocumentWasLearnerPermit,
     DocumentExpired,
+    DocumentCollected,
 }
 
 impl_enum_str_diesel!(RuleName);

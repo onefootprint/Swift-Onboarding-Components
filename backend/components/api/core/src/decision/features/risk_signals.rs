@@ -195,10 +195,7 @@ impl From<VendorResultsAndVault<'_>> for RiskSignalGroupStruct<Kyc> {
         // TODO: incode here? it's done a bit out of band in the incode state machine so may just need this on the read side
 
         RiskSignalGroupStruct {
-            footprint_reason_codes: idology_features
-                .into_iter()
-                .chain(experian_features)
-                .collect(),
+            footprint_reason_codes: idology_features.into_iter().chain(experian_features).collect(),
             group: Kyc,
         }
     }
@@ -239,10 +236,7 @@ impl From<VendorResultsAndVault<'_>> for RiskSignalGroupStruct<Aml> {
             .unwrap_or(vec![]);
 
         RiskSignalGroupStruct {
-            footprint_reason_codes: idology_features
-                .into_iter()
-                .chain(experian_features)
-                .collect(),
+            footprint_reason_codes: idology_features.into_iter().chain(experian_features).collect(),
             group: Aml,
         }
     }
@@ -251,6 +245,21 @@ impl From<VendorResultsAndVault<'_>> for RiskSignalGroupStruct<Aml> {
 //
 // READ
 //
+
+// temp hack for the AlpacaKyc workflow which makes an initial decision purely on KYC risk signals and then later makes the AML vendor call and checks AML risk_signals
+// this prevents scenarios like: A user goes through AlpacaKyc and gets a watchlist hit, the Tenant asks them to redo KYC and enter in their full name. They go through the flow again and enter a new name which doesn't have any watchlist hits associated with it. But we immediatly fail them in AlpacaKycDecisioning because their latest AML risk signals from the first onboarding still exist
+pub fn fetch_latest_kyc_risk_signals(
+    conn: &mut db::PgConn,
+    scoped_vault_id: &ScopedVaultId,
+) -> Result<RiskSignalsForDecision, ApiError> {
+    let rsfd = fetch_latest_risk_signals_map(conn, scoped_vault_id)?;
+    Ok(RiskSignalsForDecision {
+        kyc: rsfd.kyc.clone(),
+        doc: None,
+        kyb: None,
+        aml: None,
+    })
+}
 
 pub fn fetch_latest_risk_signals_map(
     conn: &mut db::PgConn,

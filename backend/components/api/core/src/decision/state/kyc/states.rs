@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use db::models::{
-    document_request::DocumentRequest,
+    document_request::{DocumentRequest, NewDocumentRequestArgs},
     ob_configuration::ObConfiguration,
     risk_signal::{NewRiskSignalInfo, RiskSignal},
     risk_signal_group::RiskSignalGroup,
@@ -13,11 +13,13 @@ use db::models::{
 use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
-    EnhancedAmlOption, KycConfig, Locked, OnboardingStatus, RiskSignalGroupKind, VerificationResultId,
+    DecisionStatus, EnhancedAmlOption, KycConfig, Locked, OnboardingStatus, RiskSignalGroupKind,
+    VerificationResultId,
 };
 
 use super::{
-    KycComplete, KycDataCollection, KycDecisioning, KycState, KycVendorCalls, MakeDecision, MakeVendorCalls,
+    KycComplete, KycDataCollection, KycDecisioning, KycDocCollection, KycState, KycVendorCalls, MakeDecision,
+    MakeVendorCalls,
 };
 use crate::decision::{
     features::risk_signals::{
@@ -28,7 +30,7 @@ use crate::decision::{
     state::{
         actions::{Authorize, WorkflowActions},
         common::{self, get_vres_id_for_fixture},
-        WorkflowState,
+        DocCollected, WorkflowState,
     },
     utils::should_execute_rules_for_document_only,
     vendor::vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results,
@@ -301,27 +303,49 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let review_reasons = common::get_review_reasons(&risk_signals, doc_collected, &obc);
         let decision = if let Some(fixture_decision) = fixture_decision {
             if execute_rules_for_real_document_decision_only || obc.skip_kyc {
-                common::get_decision(&self, conn, risk_signals, &wf, &v)?
+                common::get_decision(conn, risk_signals, &wf, &v)?
             } else {
                 common::kyc_decision_from_fixture(fixture_decision)?
             }
         } else {
-            common::get_decision(&self, conn, risk_signals, &wf, &v)?
+            common::get_decision(conn, risk_signals, &wf, &v)?
         };
 
-        common::save_kyc_decision(
-            conn,
-            &self.sv_id,
-            &wf,
-            latest_vendor_results
-                .iter()
-                .map(|vr| vr.verification_result_id.clone())
-                .collect(),
-            decision.into(),
-            fixture_decision.is_some(),
-            review_reasons,
-        )?;
-        Ok(KycState::from(KycComplete))
+        match decision.final_kyc_decision()?.decision.decision_status {
+            DecisionStatus::Fail | DecisionStatus::Pass => {
+                common::save_kyc_decision(
+                    conn,
+                    &self.sv_id,
+                    &wf,
+                    latest_vendor_results
+                        .iter()
+                        .map(|vr| vr.verification_result_id.clone())
+                        .collect(),
+                    decision.into(),
+                    fixture_decision.is_some(),
+                    review_reasons,
+                )?;
+                Ok(KycState::from(KycComplete))
+            }
+            DecisionStatus::StepUp => {
+                let update = WorkflowUpdate::set_status(OnboardingStatus::Incomplete);
+                DbWorkflow::update(wf, conn, update)?;
+                let args = NewDocumentRequestArgs {
+                    scoped_vault_id: self.sv_id.clone(),
+                    ref_id: None,
+                    workflow_id: self.wf_id.clone(),
+                    // TODO: should come from a config
+                    should_collect_selfie: true,
+                };
+                DocumentRequest::create(conn, args)?;
+
+                Ok(KycState::from(KycDocCollection {
+                    wf_id: self.wf_id,
+                    sv_id: self.sv_id,
+                    t_id: self.t_id,
+                }))
+            }
+        }
     }
 }
 
@@ -352,5 +376,62 @@ impl WorkflowState for KycComplete {
 
     fn default_action(&self) -> Option<WorkflowActions> {
         None
+    }
+}
+
+/////////////////////
+/// DocCollection
+/// ////////////////
+impl KycDocCollection {
+    #[tracing::instrument("AlpacaKycDocCollection::init", skip_all)]
+    pub async fn init(state: &State, workflow: DbWorkflow, _: KycConfig) -> ApiResult<Self> {
+        let sv = common::get_sv_for_workflow(&state.db_pool, &workflow).await?;
+
+        Ok(KycDocCollection {
+            wf_id: workflow.id,
+            sv_id: workflow.scoped_vault_id.clone(),
+            t_id: sv.tenant_id,
+        })
+    }
+}
+
+#[async_trait]
+impl OnAction<DocCollected, KycState> for KycDocCollection {
+    type AsyncRes = ();
+
+    #[tracing::instrument(
+        "OnAction<DocCollected, KycState>::execute_async_idempotent_actions",
+        skip_all
+    )]
+    async fn execute_async_idempotent_actions(
+        &self,
+        _action: DocCollected,
+        _state: &State,
+    ) -> ApiResult<Self::AsyncRes> {
+        Ok(())
+    }
+
+    #[tracing::instrument("OnAction<DocCollected, KycState>::on_commit", skip_all)]
+    fn on_commit(
+        self,
+        _wf: Locked<DbWorkflow>,
+        _async_res: Self::AsyncRes,
+        _conn: &mut db::TxnPgConn,
+    ) -> ApiResult<KycState> {
+        Ok(KycState::from(KycDecisioning {
+            wf_id: self.wf_id,
+            sv_id: self.sv_id,
+            t_id: self.t_id,
+        }))
+    }
+}
+
+impl WorkflowState for KycDocCollection {
+    fn name(&self) -> newtypes::WorkflowState {
+        newtypes::WorkflowState::from(newtypes::KycState::DocCollection)
+    }
+
+    fn default_action(&self) -> Option<WorkflowActions> {
+        None // have to wait for doc collection flow to finish
     }
 }

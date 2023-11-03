@@ -17,8 +17,8 @@ use db::{
 use itertools::Itertools;
 use newtypes::{
     AlpacaKycState, AuthorizeFields, DocumentCdoInfo, IdentityDocumentStatus, Iso3166TwoDigitCountryCode,
-    LivenessSource, OnboardingRequirement, OnboardingRequirementKind, Selfie, UsLegalStatus, VaultId,
-    WorkflowState,
+    KycState, LivenessSource, OnboardingRequirement, OnboardingRequirementKind, Selfie, UsLegalStatus,
+    VaultId, WorkflowState,
 };
 use newtypes::{
     CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind,
@@ -284,10 +284,13 @@ pub fn get_requirements_inner(
                     | OnboardingRequirementKind::CollectInvestorProfile
                     | OnboardingRequirementKind::CollectBusinessData
             );
-            let is_in_alpaca_stepup =
-                matches!(wf.state, WorkflowState::AlpacaKyc(AlpacaKycState::DocCollection));
+            let is_stepup = matches!(
+                wf.state,
+                WorkflowState::Kyc(KycState::DocCollection)
+                    | WorkflowState::AlpacaKyc(AlpacaKycState::DocCollection)
+            );
             if r.is_met() && is_data_collection_step {
-                if is_in_alpaca_stepup {
+                if is_stepup {
                     // Omit the confirm screen when an alpaca user is in step up
                     return false;
                 }

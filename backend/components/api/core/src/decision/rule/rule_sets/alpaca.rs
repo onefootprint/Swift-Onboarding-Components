@@ -43,3 +43,18 @@ fn field_validation_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
         },
     ]
 }
+
+pub fn doc_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
+    vec![Rule {
+        // A little hacky but a way to always raise review if we collected doc, which is the existing spec we implemented for Follow. Soon to be replaced with auto-approval rules.
+        rule: {
+            |f: &Vec<FootprintReasonCode>| {
+                f.contains(&FootprintReasonCode::DocumentNotVerified)
+                    || f.contains(&FootprintReasonCode::DocumentVerified)
+                    || f.contains(&FootprintReasonCode::DocumentUploadFailed)
+            }
+        },
+        name: RuleName::DocumentCollected,
+        action: RuleAction::ManualReview,
+    }]
+}

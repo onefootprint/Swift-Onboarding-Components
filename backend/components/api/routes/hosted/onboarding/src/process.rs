@@ -88,7 +88,8 @@ pub async fn post(
             ww.action(&state, WorkflowActions::Authorize(Authorize {}))
                 .await?
         }
-        WorkflowKind::AlpacaKyc(AlpacaKycState::DocCollection(_))
+        WorkflowKind::Kyc(KycState::DocCollection(_))
+        | WorkflowKind::AlpacaKyc(AlpacaKycState::DocCollection(_))
         | WorkflowKind::Document(DocumentState::DataCollection(_)) => {
             ww.action(&state, WorkflowActions::DocCollected(DocCollected {}))
                 .await?

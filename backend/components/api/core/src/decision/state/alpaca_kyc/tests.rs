@@ -503,13 +503,18 @@ async fn pass_then_watchlist_hit(
             let wfid = wf.id.clone();
             state
                 .db_pool
-                // TODO how does this work when there are multiple KYC workflows for one scoped vault?
                 .db_transaction(move |conn| -> ApiResult<_> {
                     let wf = Workflow::lock(conn, &wfid)?;
-                    crate::decision::review::save_review_decision(conn, wf, review_decision_req, review_actor)?;
+                    crate::decision::review::save_review_decision(
+                        conn,
+                        wf,
+                        review_decision_req,
+                        review_actor,
+                    )?;
                     Ok(())
                 })
-                .await.unwrap();
+                .await
+                .unwrap();
             crate::task::execute_webhook_tasks(state.clone());
         }
         WFKind::Alpaca => {
@@ -555,8 +560,8 @@ async fn pass_then_watchlist_hit(
 
 #[test_state_case(WFKind::Alpaca, UserKind::Live)]
 #[test_state_case(WFKind::Alpaca, UserKind::Sandbox(WorkflowFixtureResult::StepUp))]
-// TODO: turn these on when Kyc workflow can support stepup
-// #[test_state_case(WFKind::Kyc, UserKind::Live)]
+#[test_state_case(WFKind::Kyc, UserKind::Live)]
+// TODO: turn on when stepup infinite looping is handled
 // #[test_state_case(WFKind::Kyc, UserKind::Sandbox(WorkflowFixtureResult::StepUp))]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn step_up(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
@@ -641,7 +646,10 @@ async fn step_up(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
         .unwrap();
 
     let (wf, _, mr, obd, _, fps) = query_data(state, &svid, &wfid).await;
-    assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::DocCollection), wf.state);
+    match wf_kind {
+        WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::DocCollection), wf.state),
+        WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::DocCollection), wf.state),
+    }
     assert!(wf.authorized_at.is_some());
     // Assert no OBD is created yet and ob status is pending
     assert!(obd.is_none());
@@ -669,7 +677,10 @@ async fn step_up(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
         .unwrap();
 
     let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
-    assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state);
+    match wf_kind {
+        WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state),
+        WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state),
+    }
     assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
     let obd = obd.unwrap();
     // if non-sandbox, we should have portabalized data
@@ -719,30 +730,61 @@ async fn step_up(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
     }
 
     // ReviewCompleted
+    // For the AlpacaKyc workflow, we have a PendingReview state that the WF remains in until the review is completed./
+    // For the regular Kyc workflow, we will continue to have no such state and instead just produce the review and have it completed without involvement of the workflow
     mock_webhooks(
         state,
         vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pass))],
         vec![],
     );
-    let (_, _) = ww
-        .action(
-            state,
-            WorkflowActions::ReviewCompleted(crate::decision::state::ReviewCompleted {
-                decision: DecisionRequest {
-                    annotation: CreateAnnotationRequest {
-                        note: "yo".to_owned(),
-                        is_pinned: false,
-                    },
-                    status: TerminalDecisionStatus::Pass,
-                },
-                actor: AuthActor::TenantUser(tu.id),
-            }),
-        )
-        .await
-        .unwrap();
+
+    let review_decision_req = DecisionRequest {
+        annotation: CreateAnnotationRequest {
+            note: "yo".to_owned(),
+            is_pinned: false,
+        },
+        status: TerminalDecisionStatus::Pass,
+    };
+    let review_actor = AuthActor::TenantUser(tu.id);
+
+    match wf_kind {
+        WFKind::Kyc => {
+            let wfid = wf.id.clone();
+            state
+                .db_pool
+                .db_transaction(move |conn| -> ApiResult<_> {
+                    let wf = Workflow::lock(conn, &wfid)?;
+                    crate::decision::review::save_review_decision(
+                        conn,
+                        wf,
+                        review_decision_req,
+                        review_actor,
+                    )?;
+                    Ok(())
+                })
+                .await
+                .unwrap();
+            crate::task::execute_webhook_tasks(state.clone());
+        }
+        WFKind::Alpaca => {
+            let (_, _) = ww
+                .action(
+                    state,
+                    WorkflowActions::ReviewCompleted(crate::decision::state::ReviewCompleted {
+                        decision: review_decision_req,
+                        actor: review_actor,
+                    }),
+                )
+                .await
+                .unwrap();
+        }
+    }
 
     let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
-    assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state);
+    match wf_kind {
+        WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state),
+        WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state),
+    }
     assert!(mr.is_none()); // kinda weird but Onboarding::get returns only the current active review and now the review has been completed
     assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
     let obd = obd.unwrap();

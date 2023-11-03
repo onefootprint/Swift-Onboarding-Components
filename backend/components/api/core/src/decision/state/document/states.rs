@@ -169,14 +169,14 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
 
         let decision = if let Some(fixture_decision) = fixture_decision {
             if execute_rules_for_real_document_decision_only || obc.skip_kyc {
-                common::get_decision(&self, conn, risk_signals, &wf, &v)?
+                common::get_decision(conn, risk_signals, &wf, &v)?
             } else {
                 common::kyc_decision_from_fixture(fixture_decision)?
             }
         } else {
             // Rerun decisioning, but with the latest doc risk signals
             // TODO: what's the review strategy for this case?
-            common::get_decision(&self, conn, risk_signals, &wf, &v)?
+            common::get_decision(conn, risk_signals, &wf, &v)?
         };
 
         common::save_kyc_decision(
