@@ -5,8 +5,6 @@ import { Box, createFontStyles, media, Typography } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
 import type { ArticleSection } from 'src/types/article';
 
-import scrollSpy from './utils/scroll-spy';
-
 type SectionsProps = {
   sections: ArticleSection[];
 };
@@ -19,7 +17,6 @@ const Sections = ({ sections }: SectionsProps) => {
   const { t } = useTranslation('components.article-sections');
 
   useEffect(() => {
-    scrollSpy();
     setActiveSection(sections.length ? sections[0].id : null);
   }, [sections]);
 
