@@ -1,40 +1,29 @@
+import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
+import { useFootprintProvider } from '@onefootprint/idv-elements';
+import noop from 'lodash/noop';
+import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
+import { useEffectOnce } from 'usehooks-ts';
 
-import usePropsFromParent from './hooks/use-props-from-parent';
-import usePropsFromUrl from './hooks/use-props-from-url';
+import useGetSdkArgs from '../hooks/use-get-sdk-args';
 import type { BifrostProps } from './types';
+import getMobilePropsFromUrl from './utils/get-mobile-props-from-url';
+import getPublicKeyFromUrl from './utils/get-public-key-from-url';
 
-/*
-On web:
-All of our tenants are integrated with >= v 3.2.0 of footprint-js.
+// See documentation:
+// https://www.notion.so/onefootprint/SDK-Bifrost-Communication-e5fa05ddbfb34dc593b3e58a1398ad1c
 
-3. As of footprint-js > 3.0.0
-Bifrost receives 'propsReceived' event from footprint-js where props are userData and options.
-userData keys are IdDIs.
-
-3. As of footprint-js > 3.5.0
-Bifrost receives l10n as part of the propsReceived event.
-
-4. As of footprint-js > 3.7.0
-Bifrost receives authToken as part of the propsReceived event.
-
-On mobile:
-1. For versions < 2.0.0
-The args are passed in the URL fragment: <URL_BASE>#<ENCODED_USER_DATA>
-where ENCODED_USER_DATA keys are IdDIs
-
-2. For versions > 2.0.0
-The args are passed in the URL fragment: <URL_BASE>#<ENCODED_USER_DATA>__<ENCODED_OPTIONS>__<ENCODED_LOCALE>
-where ENCODED_USER_DATA keys are IdDIs
-*/
+// For legacy web SDKs that only pass args via postMessage
+// TODO: delete when all customers migrate to v3.8.0+
+const POST_MESSAGE_TIMEOUT = 1000;
 
 const useProps = (onSuccess: (props: BifrostProps) => void) => {
+  const router = useRouter();
+  const [isAdapterLoaded, setIsAdapterLoaded] = useState(false); // whether iframe adapter has loaded
   const onSuccessCalled = useRef(false); // Whether on success has been called with props
-  // We need all 3 of the hooks below to have resolved before we can move on
-  const [timeoutCounter, setTimeoutCounter] = useState(0);
-  const incrementTimeoutCounter = () => {
-    setTimeoutCounter(currCounter => currCounter + 1);
-  };
+  const authTokenFromUrl = router.asPath.split('#')[1] ?? '';
+  const sdkArgsQuery = useGetSdkArgs(authTokenFromUrl);
+  const isSdkArgsLoading = authTokenFromUrl && sdkArgsQuery.isLoading;
 
   const complete = (props: BifrostProps) => {
     // If already received props, ignore
@@ -45,28 +34,79 @@ const useProps = (onSuccess: (props: BifrostProps) => void) => {
     onSuccess(props);
   };
 
-  // For react-native / expo SDKs that only pass args via the URL
-  usePropsFromUrl((props?: BifrostProps) => {
-    if (props) {
-      complete(props);
-    } else {
-      // Meaning we didn't find any params in the url - treat this as a "timeout"
-      incrementTimeoutCounter();
-    }
-  });
+  // For legacy web SDKs that only pass args via postMessage
+  // TODO: delete when all customers migrate to v3.8.0+
+  const footprintProvider = useFootprintProvider();
+  const timerId = useRef<NodeJS.Timeout | undefined>();
 
-  // For new versions of web SDKs
-  usePropsFromParent(complete, () => {
-    incrementTimeoutCounter();
+  useEffectOnce(() => {
+    footprintProvider.load().then(() => {
+      setIsAdapterLoaded(true);
+    });
   });
 
   useEffect(() => {
-    // If both hooks timed out, we should return with empty props
-    if (timeoutCounter < 2) {
-      return;
+    if (!isAdapterLoaded || !router.isReady || isSdkArgsLoading) {
+      return noop;
     }
-    complete({});
-  }, [timeoutCounter]);
+
+    // See if we can retrieve the SDK args from the API (for >=3.8.0 footprint-js integrations only)
+    const sdkArgsData = sdkArgsQuery.isSuccess ? sdkArgsQuery.data : undefined;
+    if (sdkArgsData) {
+      const {
+        args: { data },
+      } = sdkArgsData;
+      complete(data);
+      return noop;
+    }
+
+    // See if we are running against a mobile SDK thta is sending data in URL fragment
+    const publicKeyFromUrl = getPublicKeyFromUrl(router.query);
+    const mobileProps = getMobilePropsFromUrl(router.asPath);
+    if (mobileProps) {
+      complete({
+        publicKey: publicKeyFromUrl,
+        ...mobileProps,
+      });
+      return noop;
+    }
+
+    // If all else fails, we need to wait for post messages (for legacy web sdk integrations)
+    if (timerId.current) {
+      // If we already started a timer, we are already listening for post messages
+      return noop;
+    }
+
+    const unsubscribe = footprintProvider.on(
+      FootprintPrivateEvent.propsReceived,
+      (props: unknown) => {
+        clearTimeout(timerId.current);
+        complete({
+          publicKey: publicKeyFromUrl,
+          ...(props as BifrostProps),
+        });
+      },
+    );
+
+    timerId.current = setTimeout(() => {
+      unsubscribe();
+      complete({
+        publicKey: publicKeyFromUrl,
+      });
+    }, POST_MESSAGE_TIMEOUT);
+
+    return () => {
+      unsubscribe();
+      clearTimeout(timerId.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    isAdapterLoaded,
+    router.isReady,
+    router.query,
+    router.asPath,
+    isSdkArgsLoading,
+  ]);
 };
 
 export default useProps;

@@ -13,19 +13,20 @@ import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 
-import useTenantPublicKey from '../../hooks/use-tenant-public-key';
 import useProps from './hooks/use-props';
 import type { BifrostProps } from './hooks/use-props/types';
 
 const Init = () => {
-  const tenantPk = useTenantPublicKey();
   const [state, send] = useBifrostMachine();
-  const { authToken: authTokenContext } = state.context;
+  const { authToken: authTokenContext, publicKey: publicKeyContext } =
+    state.context;
   const observeCollector = useObserveCollector();
-  const obConfigAuth = tenantPk
-    ? { [CLIENT_PUBLIC_KEY_HEADER]: tenantPk }
+  const obConfigAuth = publicKeyContext
+    ? { [CLIENT_PUBLIC_KEY_HEADER]: publicKeyContext }
     : undefined;
 
+  // TODO: delete this when all customers migrate to footprint-js v 3.8+
+  // When fetching the sdkArgs from API, we will also get back the onboarding config
   useGetOnboardingConfig(
     { obConfigAuth, authToken: authTokenContext },
     {
@@ -77,7 +78,13 @@ const Init = () => {
       return;
     }
 
-    const { userData = {}, options = {}, l10n = {}, authToken = '' } = props;
+    const {
+      userData = {},
+      options = {},
+      l10n = {},
+      authToken = '',
+      publicKey = '',
+    } = props;
     const { showCompletionPage = false, showLogo = false } = options || {};
     send({
       type: 'initContextUpdated',
@@ -87,6 +94,7 @@ const Init = () => {
         showLogo,
         l10n,
         authToken,
+        publicKey,
       },
     });
   });

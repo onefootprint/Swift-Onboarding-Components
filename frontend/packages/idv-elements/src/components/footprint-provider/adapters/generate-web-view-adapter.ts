@@ -1,6 +1,6 @@
 import type { CompletePayload, FootprintClientGenerator } from '../types';
 
-const generateWebView: FootprintClientGenerator = () => {
+const generateWebViewAdapter: FootprintClientGenerator = () => {
   const getRedirectUrl = () => {
     const params = new URLSearchParams(document.location.search);
     return params.get('redirect_url');
@@ -39,4 +39,4 @@ const generateWebView: FootprintClientGenerator = () => {
   };
 };
 
-export default generateWebView;
+export default generateWebViewAdapter;

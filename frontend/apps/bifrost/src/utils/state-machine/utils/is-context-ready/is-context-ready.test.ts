@@ -29,6 +29,7 @@ describe('isContextReady', () => {
         config: { ...testOnboardingConfig },
         bootstrapData: {},
         authToken: '',
+        publicKey: '',
       };
       const event: MachineEvents = {
         type: 'initContextUpdated',
@@ -46,6 +47,7 @@ describe('isContextReady', () => {
         type: 'initContextUpdated',
         payload: {
           config: { ...testOnboardingConfig },
+          publicKey: '',
         },
       };
       expect(isContextReady(context, event)).toEqual(true);

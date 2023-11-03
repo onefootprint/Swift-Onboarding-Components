@@ -1,3 +1,5 @@
+export { default as checkIsInIframe } from './check-is-in-iframe';
+export { default as checkIsInWebView } from './check-is-in-web-view';
 export { default as checkIsPhoneValid } from './check-is-phone-valid';
 export type { BootstrapProps } from './design-system-provider';
 export { DesignSystemProvider } from './design-system-provider';

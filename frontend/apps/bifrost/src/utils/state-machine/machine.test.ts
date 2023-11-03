@@ -48,12 +48,14 @@ describe('Bifrost Machine Tests', () => {
         config: { ...testOnboardingConfig },
         bootstrapData: { ...testBootstrapData },
         authToken: '',
+        publicKey: '',
       },
     });
     expect(state.context).toEqual({
       config: { ...testOnboardingConfig },
       bootstrapData: testBootstrapData,
       authToken: '',
+      publicKey: '',
       l10n: undefined,
       showCompletionPage: undefined,
       showLogo: undefined,
@@ -72,12 +74,14 @@ describe('Bifrost Machine Tests', () => {
         config: { ...testOnboardingConfig, isLive: false },
         bootstrapData: { ...testBootstrapData },
         authToken: '',
+        publicKey: '',
       },
     });
     expect(state.context).toEqual({
       config: { ...testOnboardingConfig, isLive: false },
       bootstrapData: testBootstrapData,
       authToken: '',
+      publicKey: '',
       l10n: undefined,
       showCompletionPage: undefined,
       showLogo: undefined,

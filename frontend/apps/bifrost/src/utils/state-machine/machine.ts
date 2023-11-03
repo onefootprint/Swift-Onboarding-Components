@@ -58,6 +58,7 @@ export const createBifrostMachine = () =>
             showCompletionPage,
             showLogo,
             authToken,
+            publicKey,
           } = event.payload;
 
           context.config = isUndefined(config) ? context.config : config;
@@ -78,6 +79,10 @@ export const createBifrostMachine = () =>
           context.authToken = isUndefined(authToken)
             ? context.authToken
             : authToken;
+
+          context.publicKey = isUndefined(publicKey)
+            ? context.publicKey
+            : publicKey;
 
           return context;
         }),

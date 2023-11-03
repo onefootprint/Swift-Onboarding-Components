@@ -76,6 +76,8 @@ export {
 export { Identify, Onboarding } from './services';
 export type { BootstrapProps } from './utils';
 export {
+  checkIsInIframe,
+  checkIsInWebView,
   checkIsPhoneValid,
   DesignSystemProvider,
   getBiometricChallengeResponse,

@@ -16,10 +16,15 @@ const isContextReady = (context: MachineContext, event: MachineEvents) => {
     ? context.authToken
     : payload.authToken;
 
+  const publicKey = isUndefined(payload.publicKey)
+    ? context.publicKey
+    : payload.publicKey;
+
   return (
     config !== undefined &&
     bootstrapData !== undefined &&
-    authToken !== undefined
+    authToken !== undefined &&
+    publicKey !== undefined
   );
 };
 

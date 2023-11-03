@@ -1,10 +1,11 @@
-import type {
-  FootprintVerifyAuthToken,
-  FootprintVerifyProps,
-} from '@onefootprint/footprint-js';
+import type { FootprintOptions, L10n } from '@onefootprint/footprint-js';
+import type { IdvBootstrapData } from '@onefootprint/types';
 
-export type BifrostProps = Pick<
-  FootprintVerifyProps,
-  'userData' | 'options' | 'l10n'
-> &
-  Partial<FootprintVerifyAuthToken>;
+// Data passed from footprint-js SDK
+export type BifrostProps = {
+  userData?: IdvBootstrapData;
+  options?: FootprintOptions;
+  l10n?: L10n;
+  authToken?: string;
+  publicKey?: string;
+};

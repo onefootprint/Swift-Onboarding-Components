@@ -15,7 +15,6 @@ import type { GetServerSideProps } from 'next';
 import React from 'react';
 import Layout from 'src/components/layout';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
-import useTenantPublicKey from 'src/hooks/use-tenant-public-key';
 import { useEffectOnce } from 'usehooks-ts';
 
 import Init from '../init';
@@ -27,9 +26,17 @@ type RootProps = {
 const Root = ({ variant }: RootProps) => {
   const footprint = useFootprintProvider();
   const [state, send] = useBifrostMachine();
-  const tenantPk = useTenantPublicKey();
-  const { bootstrapData, l10n, showCompletionPage, showLogo, authToken } =
-    state.context;
+  const {
+    bootstrapData,
+    l10n,
+    showCompletionPage,
+    showLogo,
+    authToken,
+    publicKey,
+  } = state.context;
+  const obConfigAuth = publicKey
+    ? { [CLIENT_PUBLIC_KEY_HEADER]: publicKey }
+    : undefined;
 
   const observeCollector = useObserveCollector();
   useLogStateMachine('bifrost', state);
@@ -62,9 +69,7 @@ const Root = ({ variant }: RootProps) => {
         {state.matches('idv') && (
           <Idv
             authToken={authToken}
-            obConfigAuth={
-              tenantPk ? { [CLIENT_PUBLIC_KEY_HEADER]: tenantPk } : undefined
-            }
+            obConfigAuth={obConfigAuth}
             bootstrapData={bootstrapData}
             onComplete={handleComplete}
             onClose={handleClose}

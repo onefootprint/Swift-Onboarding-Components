@@ -6,6 +6,7 @@ import type {
 
 export type MachineContext = {
   authToken?: string;
+  publicKey?: string;
   config?: PublicOnboardingConfig;
   validationToken?: string;
   bootstrapData?: IdvBootstrapData;
@@ -24,6 +25,7 @@ export type MachineEvents =
         showLogo?: boolean;
         l10n?: L10n;
         authToken?: string;
+        publicKey?: string;
       };
     }
   | {
