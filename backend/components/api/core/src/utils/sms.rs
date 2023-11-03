@@ -283,19 +283,10 @@ impl SmsClient {
             crypto::random::gen_rand_n_digit_code(6)
         };
         let message_body = if let Some(tenant) = tenant {
-            if tenant.id.is_integration_test_tenant() {
-                // Twilio seems to have blocked the below copy from being received by its own numbers...
-                // So for integration tests, we use a slightly different copy to get past twilio's
-                // blocking.
-                PiiString::from(format!("Your integration testing verification code for {} is {}. Don't share your code with anyone, we will never contact you to request this code.", tenant.name, &code))
-            } else {
-                // Sadly, safari's auto-fill OTP code feature is pretty sensitive to copy.
-                // Check it works if you change this copy
-                PiiString::from(format!("Your {} verification code is {}. Don't share your code with anyone, we will never contact you to request this code.", tenant.name, &code))
-            }
+            PiiString::from(format!("Your {} verification code is {}. Don't share your code with anyone, we will never contact you to request this code.", tenant.name, &code))
         } else {
             // This copy likely won't work for safari's autofill, but the other one is being blocked by twilio
-            PiiString::from(format!("Your verification code for Footprint is {}. Don't share your code with anyone, we will never contact you to request this code.", &code))
+            PiiString::from(format!("Your Footprint verification code is {}. Don't share your code with anyone, we will never contact you to request this code.", &code))
         };
 
         // Oneshot channel to send an error back from async message sending
