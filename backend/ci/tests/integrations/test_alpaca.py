@@ -55,7 +55,7 @@ def cdos_for_nationality_config(nationality_config):
         (NationalityConfig.UsLegalStatusCitizen),
         (NationalityConfig.UsLegalStatusPermanentResidence),
         (NationalityConfig.Nationality),
-        (NationalityConfig.Neither),
+        # (NationalityConfig.Neither), We no longer intentionally support this now that Alpaca is making it more clear that it is required.
     ],
 )
 @pytest.mark.parametrize(
