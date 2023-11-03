@@ -65,7 +65,13 @@ pub fn save_error_verification_results(
         .map(|(req, response)| {
             let (e_response, scrubbed_response) = if let Some(raw_json) = response {
                 let e_response = encrypt_verification_result_response(raw_json, user_vault_public_key)?;
-                let scrubbed_response = scrub_raw_error_vendor_response(&req.vendor_api, raw_json)?;
+                let scrubbed_response = match scrub_raw_error_vendor_response(&req.vendor_api, raw_json) {
+                    Ok(s) => s,
+                    Err(err) => {
+                        tracing::error!(?err, "Error in scrub_raw_error_vendor_response");
+                        ScrubbedPiiJsonValue::from(raw_json.leak().clone())
+                    }
+                };
                 (Some(e_response), scrubbed_response)
             } else {
                 // response is non-optional on vres. This is a hack
