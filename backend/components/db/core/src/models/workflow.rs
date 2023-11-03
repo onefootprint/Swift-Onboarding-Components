@@ -8,7 +8,7 @@ use newtypes::{
     AlpacaKycConfig, AlpacaKycState, CipKind, DbActor, DocumentState, FireWebhookArgs, InsightEventId,
     KybConfig, KybState, KycConfig, ObConfigurationKind, OnboardingCompletedPayload, OnboardingStatus,
     OnboardingStatusChangedPayload, TaskData, TenantId, TenantScope, VaultId, VaultKind, WebhookEvent,
-    WorkflowFixtureResult,
+    WorkflowFixtureResult, WorkflowSource,
 };
 use newtypes::{
     Locked, ObConfigurationId, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState,
@@ -49,6 +49,7 @@ pub struct Workflow {
     pub completed_at: Option<DateTime<Utc>>,
     /// The time at which the Wf is deactivated by creating a newer workflow for the scoped vault
     pub deactivated_at: Option<DateTime<Utc>>,
+    pub source: WorkflowSource,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -65,6 +66,7 @@ pub struct NewWorkflow {
     pub ob_configuration_id: Option<ObConfigurationId>,
     pub insight_event_id: Option<InsightEventId>,
     pub authorized_at: Option<DateTime<Utc>>,
+    pub source: WorkflowSource,
 }
 
 #[derive(Debug, Clone)]
@@ -76,6 +78,7 @@ pub struct NewWorkflowArgs {
     pub ob_configuration_id: Option<ObConfigurationId>,
     pub insight_event_id: Option<InsightEventId>,
     pub authorized: bool,
+    pub source: WorkflowSource,
 }
 
 #[derive(Debug, Default, AsChangeset)]
@@ -166,6 +169,7 @@ pub struct OnboardingWorkflowArgs {
     pub ob_configuration_id: ObConfigurationId,
     pub insight_event: Option<CreateInsightEvent>,
     pub authorized: bool,
+    pub source: WorkflowSource,
 }
 
 pub type IsNew = bool;
@@ -201,6 +205,7 @@ impl Workflow {
             ob_configuration_id,
             insight_event,
             authorized,
+            source,
         } = args;
 
         let sv = ScopedVault::lock(conn, &scoped_vault_id)?;
@@ -257,6 +262,7 @@ impl Workflow {
             ob_configuration_id: Some(ob_configuration_id),
             authorized,
             insight_event_id,
+            source,
         };
         let wf = Self::create(conn, args)?;
 
@@ -282,6 +288,7 @@ impl Workflow {
             ob_configuration_id,
             insight_event_id,
             authorized,
+            source,
         } = args;
         let kind = config.kind();
         let initial_state = match kind {
@@ -301,6 +308,7 @@ impl Workflow {
             ob_configuration_id,
             insight_event_id,
             authorized_at: authorized.then_some(Utc::now()),
+            source,
         };
 
         Self::insert(conn, new_workflow)
@@ -653,6 +661,7 @@ mod tests {
     use macros::db_test;
     use newtypes::KycConfig;
     use newtypes::KycState;
+    use newtypes::WorkflowSource;
     use std::str::FromStr;
 
     #[db_test]
@@ -673,6 +682,7 @@ mod tests {
                 ob_configuration_id: None,
                 insight_event_id: None,
                 authorized_at: None,
+                source: WorkflowSource::Unknown,
             },
         )
         .unwrap();
@@ -698,6 +708,7 @@ mod tests {
                 ob_configuration_id: None,
                 insight_event_id: None,
                 authorized_at: None,
+                source: WorkflowSource::Unknown,
             },
         )
         .unwrap();

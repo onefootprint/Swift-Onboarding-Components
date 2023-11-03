@@ -26,6 +26,7 @@ use newtypes::FpId;
 use newtypes::OnboardingRequirement;
 use newtypes::VaultKind;
 use newtypes::WorkflowFixtureResult;
+use newtypes::WorkflowSource;
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
@@ -109,6 +110,7 @@ pub async fn post(
                 ob_configuration_id: obc.id.clone(),
                 authorized: true,
                 insight_event: None,
+                source: WorkflowSource::Tenant,
             };
             let (biz_wf, _) =
                 Workflow::get_or_create_onboarding(conn, ob_create_args, fixture_result, false)?;

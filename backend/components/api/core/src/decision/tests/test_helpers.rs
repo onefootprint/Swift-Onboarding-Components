@@ -13,7 +13,7 @@ use db::{
 };
 use newtypes::{
     BusinessDataKind, DataIdentifier, IdentityDataKind, PiiString, ScopedVaultId, VaultKind,
-    WorkflowFixtureResult,
+    WorkflowFixtureResult, WorkflowSource,
 };
 
 use crate::{
@@ -68,6 +68,7 @@ pub async fn create_user_and_onboarding(
                 &ob_config,
                 Some(CreateInsightEvent { ..Default::default() }),
                 biz_args,
+                WorkflowSource::Hosted,
             )
             .unwrap();
 

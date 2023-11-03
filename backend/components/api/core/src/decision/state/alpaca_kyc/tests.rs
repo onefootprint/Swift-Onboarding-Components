@@ -33,7 +33,7 @@ use itertools::Itertools;
 use macros::test_state_case;
 use newtypes::{
     AlpacaKycConfig, AlpacaKycState, CipKind, DbActor, DecisionStatus, KycConfig, KycState, ReviewReason,
-    VendorAPI,
+    VendorAPI, WorkflowSource,
 };
 use newtypes::{EnhancedAmlOption, OnboardingStatus};
 use newtypes::{FootprintReasonCode, RiskSignalGroupKind, WorkflowFixtureResult};
@@ -943,6 +943,7 @@ async fn redo_and_pass(
                 ob_configuration_id: obc_id,
                 insight_event_id: None,
                 authorized: false,
+                source: WorkflowSource::Hosted,
             };
             Workflow::create(conn, args)
         })

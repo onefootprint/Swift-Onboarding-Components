@@ -18,6 +18,7 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use newtypes::ObConfigurationKind;
+use newtypes::WorkflowSource;
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
@@ -81,13 +82,17 @@ pub async fn post(
                 &obc,
                 Some(insight_event.clone()),
                 maybe_new_biz_args,
+                WorkflowSource::Hosted,
             )?;
 
             // Update auth token with new identifiers
             // TODO should we issue a new token here for good measure?
             let args = UserSessionArgs {
                 wf_id: user_auth.workflow_id().is_none().then_some(wf_id),
-                obc_id: user_auth.ob_configuration_id().is_none().then_some(obc.id.clone()),
+                obc_id: user_auth
+                    .ob_configuration_id()
+                    .is_none()
+                    .then_some(obc.id.clone()),
                 sb_id: biz_wf.map(|wf| wf.scoped_vault_id),
                 ..Default::default()
             };

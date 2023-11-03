@@ -1,4 +1,4 @@
-use newtypes::{DbActor, ReviewReason, VerificationResultId, WorkflowId};
+use newtypes::{DbActor, ReviewReason, VerificationResultId, WorkflowId, WorkflowSource};
 
 use db::{
     models::{
@@ -37,7 +37,8 @@ pub fn save_final_decision(
         let uvw = VaultWrapper::lock_for_onboarding(conn, &wf.scoped_vault_id)?;
         let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
         // don't portabalize vaults from no-phone onboardings
-        if !obc.is_no_phone_flow {
+        // and don't portablize vaults from tenant-initiated flows via POST /kyc
+        if !obc.is_no_phone_flow && wf.source != WorkflowSource::Tenant {
             let seqno = uvw.portablize_identity_data(conn)?;
             Some(seqno)
         } else {

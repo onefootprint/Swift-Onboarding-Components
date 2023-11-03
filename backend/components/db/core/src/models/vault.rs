@@ -216,7 +216,7 @@ impl Vault {
         }
     }
 
-    #[tracing::instrument("Vault::find_portable", skip_all)]
+    #[tracing::instrument("Vault::mark_portable", skip_all)]
     /// Mark the provided vault is portable
     pub fn mark_portable(conn: &mut TxnPgConn, id: &VaultId) -> DbResult<()> {
         diesel::update(vault::table)

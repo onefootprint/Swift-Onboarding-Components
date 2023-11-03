@@ -1,67 +1,13 @@
 use crate::{ProtectedAuth, State};
 use actix_web::{post, web, web::Json};
-use api_core::decision::state::actions::WorkflowActions;
+use api_core::decision::state::actions::{WorkflowActions, WorkflowActionsKind};
 use api_core::decision::state::traits::Workflow as TWorkflow;
-use api_core::decision::state::{WorkflowActionsKind, WorkflowWrapper};
+use api_core::decision::state::WorkflowWrapper;
 use api_core::errors::ApiError;
 use api_core::types::response::ResponseData;
 use api_core::ApiErrorKind;
-use chrono::Utc;
-use db::models::workflow::{NewWorkflow, Workflow};
-use db::DbError;
-use newtypes::{OnboardingStatus, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState};
-
-#[derive(Debug, Clone, serde::Deserialize)]
-pub struct CreateWorkflowRequest {
-    pub sv_id: ScopedVaultId,
-    pub wf_kind: WorkflowKind,
-    pub wf_state: WorkflowState,
-    pub wf_config: WorkflowConfig,
-}
-
-#[derive(Debug, Clone, serde::Serialize)]
-pub struct CreateWorkflowResponse {
-    pub workflow_id: WorkflowId,
-}
-
-#[post("/private/protected/workflow/create_workflow")]
-async fn create_workflow(
-    state: web::Data<State>,
-    _: ProtectedAuth,
-    request: Json<CreateWorkflowRequest>,
-) -> actix_web::Result<Json<ResponseData<CreateWorkflowResponse>>, ApiError> {
-    let CreateWorkflowRequest {
-        sv_id,
-        wf_kind,
-        wf_state,
-        wf_config,
-    } = request.into_inner();
-
-    let wf = state
-        .db_pool
-        .db_transaction(move |conn| -> Result<Workflow, DbError> {
-            Workflow::insert(
-                conn,
-                NewWorkflow {
-                    created_at: Utc::now(),
-                    scoped_vault_id: sv_id,
-                    kind: wf_kind,
-                    state: wf_state,
-                    config: wf_config,
-                    fixture_result: None,
-                    status: Some(OnboardingStatus::Incomplete),
-                    ob_configuration_id: None,
-                    insight_event_id: None,
-                    authorized_at: None,
-                },
-            )
-        })
-        .await?;
-
-    Ok(Json(ResponseData::ok(CreateWorkflowResponse {
-        workflow_id: wf.id,
-    })))
-}
+use db::models::workflow::Workflow;
+use newtypes::{WorkflowId, WorkflowState};
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct ProceedRequest {

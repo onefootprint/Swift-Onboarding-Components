@@ -46,6 +46,7 @@ mod vendor;
 mod watchlist_check;
 mod workflow;
 mod workflow_fixture_result;
+mod workflow_source;
 mod workos_auth_method;
 
 pub use self::{
@@ -59,5 +60,5 @@ pub use self::{
     preview_api::*, proxy_ingress_kind::*, risk_signal_group::*, rules::*, sealed_bytes::*, session_kind::*,
     task_status::*, tenant_role_kind::*, tenant_scope::*, user_timeline_event::*, vault_data_format::*,
     vault_key_pair::*, vault_kind::*, vault_proxy_permission::*, vendor::*, watchlist_check::*, workflow::*,
-    workflow_fixture_result::*, workos_auth_method::*,
+    workflow_fixture_result::*, workflow_source::*, workos_auth_method::*,
 };

@@ -34,6 +34,7 @@ use newtypes::DataIdentifierDiscriminant as DID;
 use newtypes::FpId;
 use newtypes::OnboardingRequirement;
 use newtypes::VaultKind;
+use newtypes::WorkflowSource;
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[route_alias(post(
@@ -112,6 +113,7 @@ pub async fn post(
                 &obc,
                 None,
                 None, // currently dont support KYB for NPV
+                WorkflowSource::Tenant,
             )?;
 
             // TODO: consolidate with /authorize code

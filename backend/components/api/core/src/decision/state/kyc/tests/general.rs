@@ -27,7 +27,7 @@ use macros::test_state;
 use macros::test_state_case;
 use newtypes::{
     DbActor, DecisionStatus, FootprintReasonCode, ObConfigurationKey, RiskSignalGroupKind, SignalSeverity,
-    TenantId, VendorAPI, WorkflowConfig,
+    TenantId, VendorAPI, WorkflowConfig, WorkflowSource,
 };
 use newtypes::{KycConfig, OnboardingStatus};
 use newtypes::{KycState, WorkflowFixtureResult, WorkflowId, WorkflowState};
@@ -61,6 +61,7 @@ async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
                     ob_configuration_id: Some(obc.id),
                     insight_event_id: None,
                     authorized_at: None,
+                    source: WorkflowSource::Hosted,
                 },
             )
         })
@@ -554,6 +555,7 @@ async fn redo_and_pass(
                 ob_configuration_id: obc_id,
                 insight_event_id: None,
                 authorized: false,
+                source: WorkflowSource::Hosted,
             };
             Workflow::create(conn, args)
         })

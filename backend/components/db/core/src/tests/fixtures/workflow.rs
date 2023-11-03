@@ -1,4 +1,4 @@
-use newtypes::{ObConfigurationId, ScopedVaultId, WorkflowFixtureResult};
+use newtypes::{ObConfigurationId, ScopedVaultId, WorkflowFixtureResult, WorkflowSource};
 
 use crate::{
     models::{
@@ -19,6 +19,7 @@ pub fn create(
         ob_configuration_id: obc_id,
         authorized: false,
         insight_event: Some(CreateInsightEvent { ..Default::default() }),
+        source: WorkflowSource::Hosted,
     };
     let (wf, _) = Workflow::get_or_create_onboarding(conn, args, fixture_result, false).unwrap();
     wf

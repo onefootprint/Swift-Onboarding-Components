@@ -33,6 +33,7 @@ use newtypes::TriggerInfo;
 use newtypes::TriggerKind;
 use newtypes::VaultKind;
 use newtypes::WorkflowKind;
+use newtypes::WorkflowSource;
 use newtypes::WorkflowTriggeredInfo;
 use paperclip::actix::{api_v2_operation, post, web};
 
@@ -99,6 +100,9 @@ pub async fn post(
                         ob_configuration_id: last_wf.ob_configuration_id,
                         insight_event_id: None,
                         authorized: false,
+                        // I'm going to get rid of this variant of the trigger API soon. Not worth
+                        // differentiating and adding a new source for here
+                        source: WorkflowSource::Unknown,
                     };
                     let wf = Workflow::create(conn, args)?;
                     let args = NewDocumentRequestArgs {

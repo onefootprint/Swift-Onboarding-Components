@@ -22,6 +22,7 @@ use itertools::Itertools;
 use macros::test_state_case;
 use newtypes::{
     DbActor, DecisionStatus, DocumentConfig, FootprintReasonCode, RiskSignalGroupKind, TenantId, VendorAPI,
+    WorkflowSource,
 };
 use newtypes::{KycState, WorkflowState};
 use newtypes::{OnboardingStatus, WorkflowFixtureResult};
@@ -234,6 +235,7 @@ async fn redo_document_and_pass(
                 ob_configuration_id: obc_id,
                 insight_event_id: None,
                 authorized: false,
+                source: WorkflowSource::Hosted,
             };
             Workflow::create(conn, args)
         })

@@ -12,7 +12,7 @@ use db::{
 };
 use newtypes::{
     CollectedDataOption, EncryptedVaultPrivateKey, ObConfigurationKind, ScopedVaultId, Selfie, VaultId,
-    VaultKind, VaultPublicKey, WorkflowFixtureResult, WorkflowId,
+    VaultKind, VaultPublicKey, WorkflowFixtureResult, WorkflowId, WorkflowSource,
 };
 
 use crate::errors::{onboarding::OnboardingError, ApiResult};
@@ -35,6 +35,7 @@ pub fn get_or_start_onboarding(
     obc: &ObConfiguration,
     insight_event: Option<CreateInsightEvent>,
     new_biz_args: Option<NewBusinessVaultArgs>, // has to be generated async outside the `conn`. We also currently don't support KYB for NPV's but could one day
+    source: WorkflowSource,
 ) -> ApiResult<(WorkflowId, Option<Workflow>)> {
     let user_vault = Vault::lock(conn, v_id)?;
     // TODO rm this when fixture result is passed in process
@@ -61,6 +62,7 @@ pub fn get_or_start_onboarding(
             insight_event: insight_event.clone(),
             // If all visible data was added by this tenant, we can immediately mark the Workflow as authorized.
             authorized: is_all_visible_data_added_by_tenant,
+            source,
         };
         let (wf, is_new_ob) =
             Workflow::get_or_create_onboarding(conn, ob_create_args, fixture_result, force_create)?;
@@ -97,6 +99,7 @@ pub fn get_or_start_onboarding(
                 ob_configuration_id: obc.id.clone(),
                 authorized: true,
                 insight_event,
+                source,
             };
             let (biz_wf, _) =
                 Workflow::get_or_create_onboarding(conn, ob_create_args, fixture_result, false)?;

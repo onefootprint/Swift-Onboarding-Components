@@ -1017,6 +1017,7 @@ table! {
         decision_made_at -> Nullable<Timestamptz>,
         completed_at -> Nullable<Timestamptz>,
         deactivated_at -> Nullable<Timestamptz>,
+        source -> Text,
     }
 }
 

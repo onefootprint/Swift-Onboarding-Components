@@ -21,7 +21,6 @@ pub fn configure(config: &mut web::ServiceConfig) {
         .service(task::create_task)
         .service(task::create_overdue_watchlist_check_tasks)
         .service(incode::rerun_machine)
-        .service(workflow::create_workflow)
         .service(workflow::proceed)
         .service(token_reveal::post)
         .service(decrypt::post)
