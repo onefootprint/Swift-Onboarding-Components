@@ -10,7 +10,6 @@ const Stack = styled('div').attrs<{ as: StackTag }>(({ as, ...props }) => ({
 }))<StackProps>`
   ${({ theme, sx, ...props }) => css`
     display: ${props.inline ? 'inline-flex' : 'flex'};
-    gap: ${theme.spacing[props.gap || 0]};
     flex-direction: ${props.direction};
     align-items: ${props.align};
     justify-content: ${props.justify};
@@ -23,16 +22,18 @@ const Stack = styled('div').attrs<{ as: StackTag }>(({ as, ...props }) => ({
     padding: ${getPadding(props as StackProps, theme)};
     margin: ${getMargin(props as StackProps, theme)};
     ${props.fontStyle && createFontStyles(props.fontStyle)};
-    box-shadow: ${props.elevation ? theme.elevation[props.elevation] : 'none'};
+    box-shadow: ${props.elevation
+      ? theme.elevation[props.elevation]
+      : undefined};
     background-color: ${(props.backgroundColor &&
       theme.backgroundColor[props.backgroundColor]) ||
     (props.surfaceColor && theme.surfaceColor[props.surfaceColor])};
     position: ${props.position || 'relative'};
     display: ${props.display};
     text-align: ${props.textAlign};
-    border-radius: ${theme.borderRadius[
-      props.borderRadius ? props.borderRadius : 'none'
-    ]};
+    border-radius: ${props.borderRadius
+      ? theme.borderRadius[props.borderRadius]
+      : undefined};
     width: ${props.width};
     height: ${props.height};
     overflow: ${props.overflow};
@@ -42,7 +43,7 @@ const Stack = styled('div').attrs<{ as: StackTag }>(({ as, ...props }) => ({
     max-height: ${props.maxHeight};
     visibility: ${props.visibility};
     overflow: ${props.overflow};
-    gap: ${props.gap ? theme.spacing[props.gap] : '0'};
+    gap: ${props.gap ? theme.spacing[props.gap] : undefined};
     top: ${props.top ? theme.spacing[props.top] : undefined};
     bottom: ${props.bottom ? theme.spacing[props.bottom] : undefined};
     left: ${props.left ? theme.spacing[props.left] : undefined};

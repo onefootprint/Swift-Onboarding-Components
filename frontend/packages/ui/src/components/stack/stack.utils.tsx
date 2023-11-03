@@ -23,7 +23,7 @@ export const getPadding = (props: StackProps, theme: Theme) => {
   if (props.padding) {
     return `${theme.spacing[props.padding]}`;
   }
-  return '0';
+  return undefined;
 };
 
 export const getMargin = (props: StackProps, theme: Theme) => {
@@ -44,7 +44,7 @@ export const getMargin = (props: StackProps, theme: Theme) => {
   if (props.margin) {
     return `${props.margin}`;
   }
-  return '0';
+  return undefined;
 };
 
 export const getBorders = (props: StackProps, theme: Theme) => {
@@ -63,5 +63,5 @@ export const getBorders = (props: StackProps, theme: Theme) => {
       props.borderColor && theme.borderColor[props.borderColor]
     };`;
   }
-  return null;
+  return undefined;
 };
