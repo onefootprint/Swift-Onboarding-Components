@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "f8d178f696c804cf0489e7ebdc44c3f39e7cd97e"
+        "version": "b2c6ff3fdce6dce48ae698629468adb744cc80e6"
     },
     "servers": [
         {
@@ -16,7 +16,7 @@
                     "Entities",
                     "Preview"
                 ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nTriggers KYB on the provided business. KYB can only be run once per Business vault.",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nTriggers KYB on the provided business. KYB can only be run once per Business vault.",
                 "parameters": [
                     {
                         "in": "path",
@@ -64,7 +64,7 @@
                     "Alpaca",
                     "Preview"
                 ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nCreate an Alpaca account",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nCreate an Alpaca account",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -101,7 +101,7 @@
                     "Alpaca",
                     "Preview"
                 ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nForward CIP information to Alpaca",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nForward CIP information to Alpaca",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -138,7 +138,7 @@
                     "Apex",
                     "Preview"
                 ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nExport CIP information for APEX as a JSON object",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nExport CIP information for APEX as a JSON object",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -173,7 +173,7 @@
                 "tags": [
                     "Preview"
                 ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nList all Footprint Risk Signals",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nList all Footprint Risk Signals",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -205,7 +205,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nGet a list of users, optionally searching by fingerprint",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGet a list of users, optionally searching by fingerprint",
                 "parameters": [
                     {
                         "in": "query",
@@ -290,7 +290,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nView a user's recent device insights",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nView a user's recent device insights",
                 "parameters": [
                     {
                         "in": "path",
@@ -345,7 +345,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nCreates a new manual review decision for a user, overriding any previous decision and clearing any outstanding manual review.",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nCreates a new manual review decision for a user, overriding any previous decision and clearing any outstanding manual review.",
                 "parameters": [
                     {
                         "in": "path",
@@ -392,7 +392,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nView the successfully uploaded documents uploaded for this user.",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nView the successfully uploaded documents uploaded for this user.",
                 "parameters": [
                     {
                         "in": "path",
@@ -432,7 +432,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nTrigger KYC on the provided user.",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nTrigger KYC on the provided user.",
                 "parameters": [
                     {
                         "in": "path",
@@ -479,7 +479,7 @@
                     "Entities",
                     "Preview"
                 ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nLists the liveness signals for the provided user.",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLists the liveness signals for the provided user.",
                 "parameters": [
                     {
                         "in": "path",
@@ -519,7 +519,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nLists the match signals for the provided user.",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLists the match signals for the provided user.",
                 "parameters": [
                     {
                         "in": "path",
@@ -556,7 +556,7 @@
                     "Entities",
                     "Preview"
                 ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nGenerate a link that can be sent to the user to ask them to reonboard to the last playbook they onboarded onto.",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGenerate a link that can be sent to the user to ask them to reonboard to the last playbook they onboarded onto.",
                 "parameters": [
                     {
                         "in": "path",
@@ -593,7 +593,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nLists the risk signals for a Footprint user.",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLists the risk signals for a Footprint user.",
                 "parameters": [
                     {
                         "in": "path",
@@ -633,7 +633,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nCreate an identified token for the provided fp_id. This token may be passed into Footprint.js to bootstrap a user's onboarding with known information. Re-auth will be required if the user hasn't logged into your tenant recently.",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nCreate an identified token for the provided fp_id. This token may be passed into Footprint.js to bootstrap a user's onboarding with known information. Re-auth will be required if the user hasn't logged into your tenant recently.",
                 "parameters": [
                     {
                         "in": "path",
@@ -646,14 +646,14 @@
                     }
                 ],
                 "requestBody": {
+                    "description": "",
                     "content": {
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/CreateTokenRequest"
                             }
                         }
-                    },
-                    "required": true
+                    }
                 },
                 "responses": {
                     "200": {
@@ -681,7 +681,7 @@
                     "Vault",
                     "Preview"
                 ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nChecks if provided data is valid before adding it to the vault.",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nChecks if provided data is valid before adding it to the vault.",
                 "parameters": [
                     {
                         "in": "path",
@@ -728,7 +728,7 @@
                     "VaultProxy",
                     "Preview"
                 ],
-                "description": "This is a preview API. By using this, you consent to potentially breaking API changes.\nDecrypt complex objects in place. Like the vault proxy endpoints, but reflects back the hydrated request to the caller.",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nDecrypt complex objects in place. Like the vault proxy endpoints, but reflects back the hydrated request to the caller.",
                 "parameters": [
                     {
                         "in": "header",

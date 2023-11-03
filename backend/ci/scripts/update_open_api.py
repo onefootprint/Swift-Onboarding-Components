@@ -62,7 +62,7 @@ class Endpoint:
         description = self._path_info.get("description", "")
         if self.identifying_tag == "Preview":
             # Add a disclaimer tag to all Preview APIs
-            description = f"This is a preview API. By using this, you consent to potentially breaking API changes.\n{description}"
+            description = f"This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\n{description}"
         if "Deprecated" in self._path_info["tags"]:
             # Add a disclaimer tag to all Deprecated APIs
             description = f"THIS API IS DEPRECATED.\n\n{description}"
