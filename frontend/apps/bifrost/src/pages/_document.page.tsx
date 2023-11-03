@@ -37,7 +37,7 @@ export default class MyDocument extends Document {
     const { variant, fontSrc } = this.getPageProps();
 
     return (
-      <Html>
+      <Html lang="en">
         <Head>
           <meta name="app-commit-sha" content={COMMIT_SHA} />
           <meta name="app-deployment-url" content={DEPLOYMENT_URL} />

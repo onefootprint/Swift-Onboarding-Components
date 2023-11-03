@@ -29,7 +29,7 @@ export default class MyDocument extends Document {
 
   render() {
     return (
-      <Html>
+      <Html lang="en">
         <Head>
           <LoadFonts />
           <meta name="app-commit-sha" content={COMMIT_SHA} />
