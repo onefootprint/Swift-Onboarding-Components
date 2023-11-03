@@ -53,10 +53,21 @@ jobs:
             echo "ephemeral=false" >> $GITHUB_OUTPUT
           fi
 
+  build_backend:
+    name: build backend
+    needs: [ephemeral_stack]
+    uses: ./.github/workflows/backend_build.yml
+    # don't run for dependabot changes and only run when labeled ephemeral or infra changes detected
+    if: github.actor != 'dependabot[bot]' && (contains( github.event.pull_request.labels.*.name, 'FastEphemeral') || contains( github.event.pull_request.labels.*.name, 'FullEphemeral') || needs.ephemeral_stack.outputs.hasInfraChanges == 'true')
+    secrets:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      IMG_CACHE_AWS_ACCESS_KEY_ID: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
+      IMG_CACHE_AWS_SECRET_ACCESS_KEY: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
+
   deploy_ephemeral_stack:
     name: deploy ephemeral
-    needs: [ephemeral_stack]
-    uses: ./.github/workflows/backend_build_and_deploy.yml
+    needs: [build_backend, ephemeral_stack]
+    uses: ./.github/workflows/backend_deploy.yml
     # don't run for dependabot changes and only run when labeled ephemeral or infra changes detected
     if: github.actor != 'dependabot[bot]' && (contains( github.event.pull_request.labels.*.name, 'FastEphemeral') || contains( github.event.pull_request.labels.*.name, 'FullEphemeral') || needs.ephemeral_stack.outputs.hasInfraChanges == 'true')
     permissions:
@@ -70,7 +81,8 @@ jobs:
       prefixDomain: 'api-${{ needs.ephemeral_stack.outputs.stackName }}.'
       useNeonDB: ${{ !contains(github.event.pull_request.labels.*.name, 'FullEphemeral') && !(needs.ephemeral_stack.outputs.needsFullInfra == 'true') }}
       useEphemeralHoneycombApiKey: true
-
+      apiComponentVersion: ${{ needs.build_backend.outputs.apiComponentVersion}}
+      enclaveComponentVersion: ${{ needs.build_backend.outputs.enclaveComponentVersion}}
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -80,6 +92,8 @@ jobs:
       PULUMI_CLOUD_URL: ${{ secrets.PULUMI_CLOUD_URL }}
       AWS_SECRETS_PROVIDER: ${{ secrets.AWS_SECRETS_PROVIDER }}
       AIRPLANE_API_KEY: ${{ secrets.AIRPLANE_API_KEY }}
+      IMG_CACHE_AWS_ACCESS_KEY_ID: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
+      IMG_CACHE_AWS_SECRET_ACCESS_KEY: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
 
   run_tests:
     name: 'ephemeral integration tests'

@@ -1,0 +1,32 @@
+name: 'Extract Component Commit Hash'
+inputs:
+  commitHash:
+    required: false
+outputs:
+  apiComponentVersion:
+    value: ${{ steps.constants.outputs.apiComponentVersion }}
+  enclaveComponentVersion:
+    value: ${{ steps.constants.outputs.enclaveComponentVersion }}
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ inputs.commitHash }}
+        # We extract all commits here to make sure we're pulling the right commit hash
+        fetch-depth: 0
+    - name: Extract commit hash
+      id: constants
+      shell: bash
+      run: |
+        git --version
+        branch="$(echo ${{ github.head_ref || github.ref_name }} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
+        apiVersion="${branch}-$(git log -n 1 --format="%h" ./backend)"
+        enclaveVersion="${branch}-$(git log -n 1 --format="%h" ./backend/components/enclave)"
+
+        echo "api is ${apiVersion}"
+        echo "enclave is ${enclaveVersion}"
+
+        echo "apiComponentVersion=${apiVersion}" >> $GITHUB_OUTPUT
+        echo "enclaveComponentVersion=${enclaveVersion}" >> $GITHUB_OUTPUT

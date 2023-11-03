@@ -41,7 +41,7 @@ build-enclave-docker:
 	@docker build -f enclave.dockerfile -t enclave .
 
 # Packages the enclave image into an EIF
-build-eif: build-enclave-docker
+build-signed-eif: build-enclave-docker
 	rm -f ./out/enclave.eif
 
 	@echo "building EIF"

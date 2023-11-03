@@ -1,15 +1,10 @@
 name: Backend Deploy Dev
 
 on:
-  push:
-    paths:
-      - 'backend/infra/**'
-      - 'backend/components/**'
-      - 'backend/*.dockerfile'
-      - '.github/workflows/backend_*.yml'
-
-    branches:
-      - master
+  workflow_run:
+    workflows: ['Backend Build Master']
+    types:
+      - completed
 
   workflow_dispatch:
 
@@ -17,13 +12,45 @@ concurrency:
   group: ${{ github.workflow }}-deploy-dev
 
 jobs:
+  extract_commit_hash:
+    # Since the dev deploy job can be triggered by either a successful build or a manual trigger,
+    # we have to extract out the commit hash that is meant to be deployed by each job run.
+    # The special case is when the dev deploy is triggered by a successful build: we look at
+    # the commit that was used to run the successful build.
+    runs-on: ubuntu-latest
+    if: (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || github.event_name == 'workflow_dispatch'
+    name: Compute commit hash
+    outputs:
+      commitHashToDeploy: '${{ steps.constants.outputs.commitHashToDeploy }}'
+      apiComponentVersion: '${{ steps.components.outputs.apiComponentVersion }}'
+      enclaveComponentVersion: '${{ steps.components.outputs.enclaveComponentVersion }}'
+    steps:
+      - name: Hash
+        shell: bash
+        id: constants
+        run: |
+          echo "commit hash from workflow_run ${{ github.event.workflow_run.head_commit.id }}"
+          echo "commit hash over branch HEAD ${{ github.sha }}"
+          commit_hash="${{ github.event.workflow_run.head_commit.id || github.sha }}"
+          echo "##[set-output name=commitHashToDeploy;]$(echo ${commit_hash})"
+          
+      - uses: ./.github/actions/backend_extract_commit_hash
+        id: components
+        with:
+          commitHash: ${{ steps.constants.outputs.commitHashToDeploy }}
+
   deploy_stack_dev:
     name: Deploy stack dev
-    uses: ./.github/workflows/backend_build_and_deploy.yml
+    needs: [extract_commit_hash]
+    uses: ./.github/workflows/backend_deploy.yml
     with:
       environment: dev
       baseStackName: dev
       stackName: dev
+      commitHash: ${{ needs.extract_commit_hash.outputs.commitHashToDeploy }}
+      apiComponentVersion: $${{ needs.extract_commit_hash.outputs.apiComponentVersion }}
+      enclaveComponentVersion: $${{ needs.extract_commit_hash.outputs.enclaveComponentVersion }}
+
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -33,6 +60,8 @@ jobs:
       PULUMI_CLOUD_URL: ${{ secrets.PULUMI_CLOUD_URL }}
       AWS_SECRETS_PROVIDER: ${{ secrets.AWS_SECRETS_PROVIDER }}
       AIRPLANE_API_KEY: ${{ secrets.AIRPLANE_API_KEY }}
+      IMG_CACHE_AWS_ACCESS_KEY_ID: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
+      IMG_CACHE_AWS_SECRET_ACCESS_KEY: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
 
   sentry_release:
     name: 'Sentry Release Integration'

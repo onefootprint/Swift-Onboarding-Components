@@ -49,7 +49,7 @@ const Stats = () => {
           INNER JOIN workflow on onboarding_decision.workflow_id = workflow.id
           INNER JOIN scoped_vault on scoped_vault.id = workflow.scoped_vault_id
           INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
-          WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND onboarding_decision.status = 'pass';
+          WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.is_demo_tenant='f' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND onboarding_decision.status = 'pass';
           `}
         ></OverviewCard>
         <OverviewCard
@@ -58,7 +58,7 @@ const Stats = () => {
           SELECT count(*) FROM scoped_vault 
           INNER JOIN vault on scoped_vault.vault_id = vault.id
           INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
-          WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND vault.is_portable = 'f'
+          WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND tenant.is_demo_tenant='f' AND scoped_vault.is_live = true AND vault.is_portable = 'f'
           `}
         ></OverviewCard>
       </Stack>
@@ -71,7 +71,7 @@ const Stats = () => {
           SELECT "day", "new vaults" from (SELECT to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day", count(*) as "new vaults" FROM scoped_vault
           INNER JOIN vault on scoped_vault.vault_id = vault.id
           INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
-          WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND vault.is_portable = 't'
+          WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.is_demo_tenant='f' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND vault.is_portable = 't'
           GROUP BY "day"
           ORDER BY "day" DESC LIMIT 30) r 
           ORDER BY "day" ASC;
@@ -86,6 +86,9 @@ const Stats = () => {
             Coba: 'green',
             Fractional: 'yellow',
             Bloom: 'lime',
+            'Basic Capital': 'indigo',
+            Trayd: 'black',
+            'Footprint Live': 'blue',
           }}
           transform={data => {
             let map = {};
@@ -118,7 +121,7 @@ const Stats = () => {
           query={`
             WITH live_tenants AS (
               SELECT tenant.id FROM tenant
-              WHERE tenant.sandbox_restricted = false AND tenant.id NOT LIKE '_private_it_org_%'
+              WHERE tenant.sandbox_restricted = false AND tenant.id NOT LIKE '_private_it_org_%' AND tenant.is_demo_tenant='f'
             ), vault_counts_per_day AS (
                 SELECT to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day", tenant.name as "tenant", count(*) as "new_vaults"
                 FROM scoped_vault
@@ -140,7 +143,7 @@ const Stats = () => {
           SELECT "day", "new vaults" from (SELECT to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day", count(*) as "new vaults" FROM scoped_vault
           INNER JOIN vault on scoped_vault.vault_id = vault.id
           INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
-          WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND vault.is_portable = 'f'
+          WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.is_demo_tenant='f' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND vault.is_portable = 'f'
           GROUP BY "day"
           ORDER BY "day" DESC LIMIT 30) r 
           ORDER BY "day" ASC;

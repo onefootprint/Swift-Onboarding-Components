@@ -25,6 +25,8 @@ jobs:
     name: Compute commit hash
     outputs:
       commitHashToDeploy: '${{ steps.constants.outputs.commitHashToDeploy }}'
+      apiComponentVersion: '${{ steps.components.outputs.apiComponentVersion }}'
+      enclaveComponentVersion: '${{ steps.components.outputs.enclaveComponentVersion }}'
     steps:
       - name: Hash
         shell: bash
@@ -35,16 +37,24 @@ jobs:
           commit_hash="${{ github.event.workflow_run.head_commit.id || github.sha }}"
           echo "##[set-output name=commitHashToDeploy;]$(echo ${commit_hash})"
 
+      - uses: ./.github/actions/backend_extract_commit_hash
+        id: components
+        with:
+          commitHash: ${{ steps.constants.outputs.commitHashToDeploy }}
+
   deploy_stack_prod:
     name: Deploy stack
     needs: [extract_commit_hash]
     if: success()
-    uses: ./.github/workflows/backend_build_and_deploy.yml
+    uses: ./.github/workflows/backend_deploy.yml
     with:
       environment: production
       baseStackName: prod
       stackName: prod
       commitHash: ${{ needs.extract_commit_hash.outputs.commitHashToDeploy }}
+      apiComponentVersion: $${{ needs.extract_commit_hash.outputs.apiComponentVersion }}
+      enclaveComponentVersion: $${{ needs.extract_commit_hash.outputs.enclaveComponentVersion }}
+
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -54,6 +64,8 @@ jobs:
       PULUMI_CLOUD_URL: ${{ secrets.PULUMI_CLOUD_URL }}
       AWS_SECRETS_PROVIDER: ${{ secrets.AWS_SECRETS_PROVIDER }}
       AIRPLANE_API_KEY: ${{ secrets.AIRPLANE_API_KEY }}
+      IMG_CACHE_AWS_ACCESS_KEY_ID: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
+      IMG_CACHE_AWS_SECRET_ACCESS_KEY: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
 
   sentry_release:
     name: 'Sentry Release Integration'

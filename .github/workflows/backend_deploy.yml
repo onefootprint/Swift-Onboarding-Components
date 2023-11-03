@@ -1,0 +1,335 @@
+name: Backend Deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'secrets environment to use'
+        type: string
+        required: true
+
+      baseStackName:
+        description: "base stack we're building, i.e. dev"
+        type: string
+        required: true
+
+      stackName:
+        description: 'stack or possibly ephemeral stack name, i.e. dev'
+        type: string
+        required: true
+
+      createStack:
+        description: 'create a new stack'
+        type: boolean
+        default: false
+        required: false
+
+      baseDomain:
+        description: 'override the base domain for the stack'
+        type: string
+        required: false
+
+      prefixDomain:
+        description: 'override the prefix domain for the stack'
+        type: string
+        required: false
+
+      useEphemeralHoneycombApiKey:
+        description: 'override the honeycomb API key for the stack with the ephemeral API key'
+        type: boolean
+        required: false
+        default: false
+
+      commitHash:
+        description: 'hash of commit that we will be deploying'
+        type: string
+        required: false
+
+      useNeonDB:
+        description: 'uses NeonDB for faster ephemeral env'
+        type: boolean
+        required: false
+        default: false
+
+      apiComponentVersion:
+        description: api container version
+        required: true
+        type: string
+
+      enclaveComponentVersion:
+        description: api container version
+        required: true
+        type: string
+
+    outputs:
+      url:
+        description: 'stack url'
+        value: ${{ jobs.deploy_stack.outputs.url }}
+
+    secrets:
+      ENCLAVE_SIGNING_KEY:
+        required: true
+      ENCLAVE_SIGNING_CERT:
+        required: true
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_REGION:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      AWS_SECRETS_PROVIDER:
+        required: true
+      PULUMI_CLOUD_URL:
+        required: true
+      AIRPLANE_API_KEY:
+        required: true
+      IMG_CACHE_AWS_ACCESS_KEY_ID:
+        required: true
+      IMG_CACHE_AWS_SECRET_ACCESS_KEY:
+        required: true
+
+jobs:
+  push_containers:
+    name: Push built containers
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Configure AWS Credentials (Image Cache)
+        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 #1
+        with:
+          aws-access-key-id: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Fetch cached containers
+        run: |
+          account="$(aws sts get-caller-identity --query "Account" --output text)"
+          echo "account is ${account}"
+
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
+
+          docker pull ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${{ inputs.apiComponentVersion }}
+          docker tag ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${{ inputs.apiComponentVersion }} api:${{ inputs.apiComponentVersion }} 
+
+          docker pull ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${{ inputs.enclaveComponentVersion }}
+          docker tag ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${{ inputs.enclaveComponentVersion }} enclave_proxy_pkg:${{ inputs.enclaveComponentVersion }}
+
+      - name: Push containers to Target ECR
+        run: |
+          account="$(aws sts get-caller-identity --query "Account" --output text)"
+          echo "account is ${account}"
+
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
+          apiComponentVersion="${{ inputs.apiComponentVersion }}"
+          enclaveComponentVersion="${{ inputs.enclaveComponentVersion }}"
+
+          docker tag api:${apiComponentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/api:latest
+          docker tag api:${apiComponentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${apiComponentVersion}
+          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${apiComponentVersion}
+          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/api:latest          
+
+          docker tag enclave_proxy_pkg:${enclaveComponentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:latest
+          docker tag enclave_proxy_pkg:${enclaveComponentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${enclaveComponentVersion}
+          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${enclaveComponentVersion}
+          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:latest
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  sign_push_enclave:
+    name: Sign and push enclave
+    runs-on: eif-builder
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Configure AWS Credentials (Image Cache)
+        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 #1
+        with:
+          aws-access-key-id: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Fetch cached containers
+        run: |
+          account="$(aws sts get-caller-identity --query "Account" --output text)"
+          echo "account is ${account}"
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
+
+          docker pull ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${{ inputs.enclaveComponentVersion }}
+          docker tag ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${{ inputs.enclaveComponentVersion }} enclave:${{ inputs.enclaveComponentVersion }}
+
+      - name: Sign EIF and package
+        working-directory: ./backend
+        run: |
+          echo "${{ secrets.ENCLAVE_SIGNING_KEY }}" > ../enclavekey.pem
+          echo "${{ secrets.ENCLAVE_SIGNING_CERT }}" > ../cert.pem
+
+          rm -f ./out/enclave.eif
+
+          # build the eif
+          nitro-cli build-enclave --docker-uri enclave:${{ inputs.enclaveComponentVersion }} --output-file ./out/enclave.eif --private-key ../enclavekey.pem --signing-certificate ../cert.pem
+
+          # package the eif in docker image
+          docker build -t "enclave_pkg:${{inputs.enclaveComponentVersion}}" -f enclave_eif_package.dockerfile .
+
+      # cleanup: remove keys
+      - name: cleanup
+        working-directory: ./backend
+        if: always()
+        run: rm -f ../enclavekey.pem
+
+      - name: Push containers to Target ECR
+        run: |
+          account="$(aws sts get-caller-identity --query "Account" --output text)"
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
+          enclaveComponentVersion="${{ inputs.enclaveComponentVersion }}"
+
+          docker tag enclave_pkg:${enclaveComponentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
+          docker tag enclave_pkg:${enclaveComponentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${enclaveComponentVersion}
+          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${enclaveComponentVersion}
+          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  deploy_stack:
+    name: deploy stack
+    runs-on: ubuntu-latest
+    outputs:
+      url: '${{ steps.pulumi_deploy.outputs.apiUrl }}'
+    environment:
+      name: ${{ inputs.environment }}
+      url: '${{ steps.pulumi_deploy.outputs.apiUrl }}'
+    needs: [push_containers, sign_push_enclave]
+    if: success()
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.commitHash }}
+
+      # pulumi setup
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 18.x
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a #4.0.1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Install Pulumi CLI
+        uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
+
+      - name: Pulumi login
+        run: pulumi login ${{ secrets.PULUMI_CLOUD_URL }}
+
+      - run: yarn install
+        working-directory: ./backend/infra
+
+      # create our stack if needed
+      - name: 'create stack'
+        if: ${{ inputs.createStack }}
+        working-directory: ./backend/infra
+        run: |
+          pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "${{ inputs.baseStackName }}" "${{ inputs.stackName  }}" || true
+          cp Pulumi.${{ inputs.baseStackName }}.yaml Pulumi.${{ inputs.stackName }}.yaml
+
+      - name: select stack
+        working-directory: ./backend/infra
+        run: pulumi stack select "${{ inputs.stackName }}"
+
+      - name: 'use fast ephemeral db'
+        if: ${{ inputs.createStack && inputs.useNeonDB }}
+        working-directory: ./backend/infra
+        run: |
+          pulumi config set useNeonEphemeralDbProjectId bitter-shape-200807
+
+      - name: 'override base domain'
+        if: ${{ inputs.baseDomain || false }}
+        working-directory: ./backend/infra
+        run: |
+          pulumi config set --path constants.domain.base ${{ inputs.baseDomain }}
+
+      - name: 'override prefix domain'
+        if: ${{ inputs.prefixDomain || false }}
+        working-directory: ./backend/infra
+        run: |
+          pulumi config set --path constants.domain.prefix ${{ inputs.prefixDomain }}
+
+      - name: 'override honeycomb API key'
+        if: ${{ inputs.useEphemeralHoneycombApiKey || false }}
+        working-directory: ./backend/infra
+        run: |
+          pulumi config set --secret --path constants.honeycomb.apiKey $(pulumi config get --path constants.honeycomb.ephemeralApiKey)
+
+      - name: 'set api/enclave image version'
+        working-directory: ./backend/infra
+        run: |
+          pulumi config set --path constants.containers.apiVersion ${{ inputs.apiComponentVersion }}
+          pulumi config set --path constants.containers.enclaveVersion ${{ inputs.enclaveComponentVersion }}
+
+      # refresh the state
+      - uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
+        with:
+          command: refresh
+          work-dir: ./backend/infra
+          stack-name: '${{ inputs.stackName }}'
+          cloud-url: ${{ secrets.PULUMI_CLOUD_URL }}
+          comment-on-pr: false
+
+      # preview the stack
+      - uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
+        with:
+          command: preview
+          work-dir: ./backend/infra
+          stack-name: '${{ inputs.stackName }}'
+          comment-on-pr: false
+          cloud-url: ${{ secrets.PULUMI_CLOUD_URL }}
+
+      # deploy the stack
+      - uses: pulumi/actions@4204b4e8a7e703da96ba5dd4c3a667adeee35812
+        id: pulumi_deploy
+        with:
+          command: up
+          work-dir: ./backend/infra
+          stack-name: '${{ inputs.stackName }}'
+          message: 'Deployed component ${{ inputs.apiComponentVersion }} and ${{ inputs.enclaveComponentVersion }}'
+          comment-on-pr: true
+          edit-pr-comment: true
+          cloud-url: ${{ secrets.PULUMI_CLOUD_URL }}
+
+      - name: Update deploy info on pull request
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            // get existing comments
+            const {data: comments} = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            // Find any comment already made by the bot.                                                                                                    
+            const botComment = comments.find(comment => comment.user.id === 41898282 && comment.body.includes('Deployed 🚀'));
+            const commentBody = "**Deployed 🚀**\n\
+            - URL: ${{ steps.pulumi_deploy.outputs.apiUrl }}\n\
+            - Stack name: `${{ steps.pulumi_deploy.outputs.shortStackName }}`\n\
+            - **api**: `${{ inputs.apiComponentVersion }}`\n\
+            - **enclave**: `${{ inputs.enclaveComponentVersion }}`";
+                                                                  
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
