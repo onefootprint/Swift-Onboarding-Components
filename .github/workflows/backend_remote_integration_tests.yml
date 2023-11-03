@@ -56,7 +56,6 @@ jobs:
     env:
       PR_NUMBER: ${{ inputs.prNumber }}
       TEST_URL: ${{ inputs.testUrl }}
-      EXPECTED_SERVER_VERSION: ${{ inputs.expectedCommitHash || github.sha }}
       IT_PHONE_NUMBERS: ${{ secrets.IT_PHONE_NUMBERS }}
       IT_TWILIO_ACCOUNT_SID: ${{ secrets.IT_TWILIO_ACCOUNT_SID }}
       IT_TWILIO_SECRET_AUTH_TOKEN: ${{ secrets.IT_TWILIO_SECRET_AUTH_TOKEN }}
@@ -70,6 +69,11 @@ jobs:
           ref: ${{ inputs.expectedCommitHash || github.sha }}
           # We extract all commits here to make sure we're pulling the right commit hash
           fetch-depth: 0
+
+      - uses: ./.github/actions/backend_extract_commit_hash
+        id: components
+        with:
+          commitHash: ${{ inputs.expectedCommitHash || github.sha }}
 
       - name: Setup Python # Set Python version
         uses: actions/setup-python@v3
@@ -87,6 +91,8 @@ jobs:
         run: |
           set -o pipefail
           pytest tests/ 2>&1 | tee integration_test_output.txt
+        env:
+          EXPECTED_SERVER_VERSION: ${{ steps.components.outputs.apiComponentVersion }}
 
       - name: Create PR comment
         if: ${{ inputs.isPR && (success() || failure()) }}
