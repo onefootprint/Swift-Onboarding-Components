@@ -17,6 +17,7 @@ env:
   CI: true
   IS_E2E: true
   E2E_BASE_URL: http://localhost:3002
+  E2E_BIFROST_BASE_URL: http://localhost:3000
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -123,11 +124,23 @@ jobs:
           fi
           echo "E2E_BASE_URL=${E2E_BASE_URL}" >> $GITHUB_ENV
 
+      - name: Set E2E_BIFROST_BASE_URL
+        run: |
+          if [[ "${{ steps.vercel_bifrost_url.outputs.deployment_state }}" == "CANCELED" ]]; then
+            branch_name="${{ github.head_ref }}"
+            branch_name="${branch_name//\//-}"
+            export E2E_BIFROST_BASE_URL="https://bifrost-git-${branch_name}.preview.onefootprint.com"
+          else
+            export E2E_BIFROST_BASE_URL="https://${{ steps.vercel_bifrost_url.outputs.preview_url }}"
+          fi
+          echo "E2E_BIFROST_BASE_URL=${E2E_BIFROST_BASE_URL}" >> $GITHUB_ENV
+
       - run: sleep 10
       - name: Run Playwright tests
         working-directory: ./frontend
         env:
           E2E_BASE_URL: ${{ env.E2E_BASE_URL }}
+          E2E_BIFROST_BASE_URL: ${{ env.E2E_BIFROST_BASE_URL }}
         run: yarn workspace @onefootprint/e2e test:e2e:ci
 
       - name: Upload artifacts

@@ -21,7 +21,7 @@ const zipCode = '94105';
 const country = 'US';
 const ssn9 = '123412345';
 
-const LegacySdks = [
+const Sdks = [
   {
     version: '3.2.0',
     baseUrl: 'https://footprint-js-3-2-0.preview.onefootprint.com',
@@ -39,8 +39,9 @@ const LegacySdks = [
     baseUrl: 'https://footprint-js-3-7-1.preview.onefootprint.com',
   },
 ];
-for (const { version, baseUrl } of LegacySdks) {
-  test(`E2E.LegacySDKIntegration.${version} #ci`, async ({
+
+for (const { version, baseUrl } of Sdks) {
+  test(`E2E.WebSDKIntegration.${version} #ci`, async ({
     browserName,
     page,
     browser,
