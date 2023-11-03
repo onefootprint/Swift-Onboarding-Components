@@ -2,7 +2,7 @@ use crate::{util::impl_enum_str_diesel, DecisionStatus};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::AsRefStr;
-use strum_macros::{Display, EnumString};
+use strum_macros::{Display, EnumIter, EnumString};
 
 #[derive(
     Display,
@@ -20,6 +20,7 @@ use strum_macros::{Display, EnumString};
     Hash,
     Ord,
     PartialOrd,
+    EnumIter,
 )]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]

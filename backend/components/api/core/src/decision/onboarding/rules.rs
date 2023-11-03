@@ -6,13 +6,12 @@ use crate::decision::features::risk_signals::risk_signal_group_struct::Kyb;
 use crate::decision::onboarding::FeatureVector;
 use crate::decision::rule::rule_set::Rule;
 use crate::decision::rule::rule_sets::RiskSignalRuleEvaluator;
-use crate::errors::ApiResult;
-
 use crate::decision::{
     features::risk_signals::{RiskSignalGroupStruct, RiskSignalsForDecision},
     rule::{rule_sets, rules_engine::OnboardingEvaluationResult},
     RuleError,
 };
+use crate::errors::ApiResult;
 
 use super::{
     Decision, DecisionResult, OnboardingRulesDecision, OnboardingRulesDecisionOutput,
@@ -24,6 +23,7 @@ pub struct KycRuleExecutionConfig {
     pub include_doc: bool,
     pub document_only: bool,
     pub skip_kyc: bool,
+    pub allow_stepup: bool, // If we have already step'd up/otherwise collected a doc for the current workflow, then we don't want StepUp to be a possible chosen action from the rule execution
 }
 
 impl KycRuleExecutionConfig {
@@ -32,6 +32,7 @@ impl KycRuleExecutionConfig {
             include_doc: false,
             document_only: false,
             skip_kyc: false,
+            allow_stepup: true,
         }
     }
 }
@@ -68,7 +69,9 @@ impl KycRuleGroup {
         risk_signals: RiskSignalsForDecision,
         config: KycRuleExecutionConfig,
     ) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
-        let rule_result = self.risk_signal_rule_evaluator().evaluate(risk_signals);
+        let rule_result = self
+            .risk_signal_rule_evaluator()
+            .evaluate(risk_signals, config.allow_stepup);
 
         let kyc_result = if !(config.document_only || config.skip_kyc) {
             // First we evaluate KYC, choosing which of the potentially multiple vendors we might have
@@ -76,7 +79,6 @@ impl KycRuleGroup {
                 .kyc
                 .ok_or(RuleError::MissingInputForKYCRules)
                 .map_err(crate::decision::Error::from)?;
-
             DecisionResult::Evaluated(OnboardingRulesDecisionOutput::from(kyc_result))
         } else {
             DecisionResult::NotRequired
@@ -155,9 +157,9 @@ impl From<OnboardingEvaluationResult> for OnboardingRulesDecisionOutput {
 // More thoughts: https://www.notion.so/onefootprint/Design-Doc-Portabilization-Decision-71f1cfb945234c58b74e97f005211917?pvs=4
 pub fn should_commit(rules_triggered: &Vec<RuleName>, triggered_action: &Option<RuleAction>) -> bool {
     // TODO: codify our own proper set of Rule's for determining should_commit
-    rules_triggered.is_empty()
+    rules_triggered.is_empty() // probs redundant now 
         || (rules_triggered.len() == 1 && rules_triggered.contains(&RuleName::WatchlistHit))
-        || matches!(triggered_action, Some(RuleAction::StepUp)) // TODO: when we handle enforcing that StepUp cannot be a triggered_action if doc was already collected, we can remove this hack
+        || matches!(triggered_action, Some(RuleAction::StepUp) | None) // TODO: when we handle enforcing that StepUp cannot be a triggered_action if doc was already collected, we can remove this hack- ok jk still can't remove this
 }
 
 pub fn evaluate_kyb_rules(

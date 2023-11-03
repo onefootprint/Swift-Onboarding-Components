@@ -11,7 +11,11 @@ from tests.utils import _gen_random_n_digit_number
         ("fail", "fail", False),
         ("blah_123", "pass", False),
         ("manualreview12", "fail", True),
-        ("stepup12", "incomplete", False),
+        (
+            "stepup12",
+            "fail",
+            True,
+        ),  # for now, we always fail with review after stepup in sandbox. later we'll probably let users fixture the post-stepup decision as well
     ],
 )
 def test_deterministic_onboarding(
@@ -28,13 +32,10 @@ def test_deterministic_onboarding(
     )
     bifrost.vault_barcode_with_doc = False  # hack cause /vault barfs when trying to vault barcode during stepup because stepup workflow state only gives the AddDocument guard, not the AddData guard
 
-    if expected_status == "incomplete":
-        bifrost.handle_requirements()  # TODO: remove this branch when we prevent stepup from being an action after stepup (rn this will hit a uniqueness violation constraint on doc_req.wf_id)
-    else:
-        bifrost.run()
+    bifrost.run()
 
-        assert bifrost.validate_response["user"]["status"] == expected_status
-        assert (
-            bifrost.validate_response["user"]["requires_manual_review"]
-            == expected_requires_manual_review
-        )
+    assert bifrost.validate_response["user"]["status"] == expected_status
+    assert (
+        bifrost.validate_response["user"]["requires_manual_review"]
+        == expected_requires_manual_review
+    )

@@ -1,17 +1,25 @@
 use newtypes::{FootprintReasonCode, RuleAction, RuleName, VendorAPI};
 
-use crate::decision::{onboarding::FeatureSet, rule::RULE_LOG_LINE};
-
 use super::{
     rule_set::{Rule, RuleEvaluationSummary, RuleSet, RuleSetResult},
     *,
 };
+use crate::decision::{
+    onboarding::{rules::KycRuleExecutionConfig, FeatureSet},
+    rule::RULE_LOG_LINE,
+};
+use itertools::Itertools;
+use strum::IntoEnumIterator;
 
-pub fn evaluate_onboarding_rule_set<T>(ruleset: RuleSet<T>, rule_input: &T) -> OnboardingEvaluationResult
+pub fn evaluate_onboarding_rule_set<T>(
+    ruleset: RuleSet<T>,
+    rule_input: &T,
+    rule_config: KycRuleExecutionConfig,
+) -> OnboardingEvaluationResult
 where
     T: FeatureSet + Clone,
 {
-    let evaluated_ruleset = ruleset.evaluate(rule_input);
+    let evaluated_ruleset = ruleset.evaluate(rule_input, rule_config.allow_stepup);
     let triggered_action = evaluated_ruleset.action;
 
     // Log evaluation of a single rule set
@@ -29,6 +37,7 @@ pub fn evaluate_reason_code_rules(
     rules: Vec<Rule<Vec<FootprintReasonCode>>>,
     footprint_reason_codes: &Vec<FootprintReasonCode>,
     vendor_apis: Vec<VendorAPI>,
+    allow_stepup: bool,
 ) -> OnboardingEvaluationResult {
     // for the rules in the rule set, evaluate each rule
     let evaluated = rules.iter().cloned().map(|rule| RuleEvaluationSummary {
@@ -41,7 +50,14 @@ pub fn evaluate_reason_code_rules(
     let (rules_triggered, rules_not_triggered): (Vec<_>, Vec<_>) = evaluated.partition(|r| r.triggered);
 
     // overall action for the rule set
-    let action_for_rule_set = rules_triggered.iter().map(|r| r.action).max();
+    let allowed_rule_actions = RuleAction::iter()
+        .filter(|r| allow_stepup || !matches!(r, RuleAction::StepUp))
+        .collect_vec();
+    let action_for_rule_set = rules_triggered
+        .iter()
+        .filter(|r| allowed_rule_actions.contains(&r.action))
+        .map(|r| r.action)
+        .max();
 
     // Build a struct that represents the result of evaluating the rule set
     let evaluated_ruleset = RuleSetResult {
@@ -64,7 +80,11 @@ pub fn evaluate_reason_code_rules(
 }
 
 /// Evaluate a list of rulesets for a given input type T
-pub fn evaluate_onboarding_rules<T>(rulesets: Vec<RuleSet<T>>, rule_input: &T) -> OnboardingEvaluationResult
+pub fn evaluate_onboarding_rules<T>(
+    rulesets: Vec<RuleSet<T>>,
+    rule_input: &T,
+    allow_stepup: bool,
+) -> OnboardingEvaluationResult
 where
     T: FeatureSet + Clone,
 {
@@ -72,7 +92,7 @@ where
         .into_iter()
         .map(|rs| {
             // Evaluate ruleset
-            let evaluated_ruleset = rs.evaluate(rule_input);
+            let evaluated_ruleset = rs.evaluate(rule_input, allow_stepup);
 
             // Log evaluation of a single rule set
             log_ruleset_evaluation(&evaluated_ruleset, rule_input.vendor_apis());
@@ -140,7 +160,7 @@ mod tests {
             triggered_action: Some(RuleAction::Fail),
             vendor_apis: features.vendor_apis(),
         };
-        let result = evaluate_onboarding_rules(vec![test_ruleset_a(), test_ruleset_b()], &features);
+        let result = evaluate_onboarding_rules(vec![test_ruleset_a(), test_ruleset_b()], &features, true);
 
         assert_eq!(expected, result)
     }

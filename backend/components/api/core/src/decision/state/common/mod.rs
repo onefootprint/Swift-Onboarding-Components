@@ -234,12 +234,14 @@ pub fn get_decision(
         },
         _ => KycRuleGroup::default(),
     };
-    let include_doc = DocumentRequest::get(conn, &wf.id)?.is_some();
+    let doc_collected = DocumentRequest::get(conn, &wf.id)?.is_some();
     let document_only = should_execute_rules_for_document_only(vault, wf)?;
+
     let config = KycRuleExecutionConfig {
-        include_doc,
+        include_doc: doc_collected,
         document_only,
         skip_kyc: obc.skip_kyc,
+        allow_stepup: !doc_collected, // Soon we might just add is_stepup_enabled to OBC and then also use that here to determine if StepUp should be an allowed_action
     };
     let rules_output = rule_group.evaluate(risk_signals, config)?;
     Ok(rules_output)

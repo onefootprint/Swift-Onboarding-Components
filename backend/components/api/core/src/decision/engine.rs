@@ -262,6 +262,7 @@ pub fn calculate_decision(
             include_doc: false,
             document_only: false,
             skip_kyc: false,
+            allow_stepup: true,
         },
     )?;
 

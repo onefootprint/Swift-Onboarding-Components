@@ -77,6 +77,7 @@ fn test_evaluate_onboarding_rules(
                 include_doc: false,
                 document_only: false,
                 skip_kyc: false,
+                allow_stepup: true,
             },
         )
         .unwrap()

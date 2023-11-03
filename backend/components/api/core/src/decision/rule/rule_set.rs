@@ -1,6 +1,7 @@
-use newtypes::{RuleAction, RuleName};
-
 use super::RuleSetName;
+use itertools::Itertools;
+use newtypes::{RuleAction, RuleName};
+use strum::IntoEnumIterator;
 
 /// A rule is just a named wrapper around a fn that takes a T and returns a bool
 #[derive(Clone)]
@@ -18,7 +19,7 @@ pub struct RuleSet<T: Clone> {
 }
 
 impl<T: Clone> RuleSet<T> {
-    pub fn evaluate(&self, rule_input: &T) -> RuleSetResult {
+    pub fn evaluate(&self, rule_input: &T, allow_stepup: bool) -> RuleSetResult {
         // for the rules in the rule set, evaluate each rule
         let evaluated = self.rules.iter().cloned().map(|rule| RuleEvaluationSummary {
             name: rule.name,
@@ -30,7 +31,14 @@ impl<T: Clone> RuleSet<T> {
         let (rules_triggered, rules_not_triggered): (Vec<_>, Vec<_>) = evaluated.partition(|r| r.triggered);
 
         // overall action for the rule set
-        let action_for_rule_set = rules_triggered.iter().map(|r| r.action).max();
+        let allowed_rule_actions = RuleAction::iter()
+            .filter(|r| allow_stepup || !matches!(r, RuleAction::StepUp))
+            .collect_vec();
+        let action_for_rule_set = rules_triggered
+            .iter()
+            .filter(|r| allowed_rule_actions.contains(&r.action))
+            .map(|r| r.action)
+            .max();
 
         // Build a struct that represents the result of evaluating the rule set
         RuleSetResult {
@@ -95,7 +103,7 @@ mod tests {
             action: None
         })]
     fn test_rule_set(rule_set: RuleSet<TestFeatures>, input_data: TestFeatures) -> RuleSetResult {
-        rule_set.evaluate(&input_data)
+        rule_set.evaluate(&input_data, true)
     }
 
     #[test_case(RuleAction::StepUp, RuleAction::PassWithManualReview  => Ordering::Greater)]

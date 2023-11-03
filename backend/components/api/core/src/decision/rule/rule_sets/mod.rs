@@ -40,12 +40,17 @@ impl RiskSignalRuleEvaluator {
 }
 
 impl RiskSignalRuleEvaluator {
-    pub fn evaluate(&self, risk_signals_for_decision: RiskSignalsForDecision) -> RiskSignalRuleOutput {
+    pub fn evaluate(
+        &self,
+        risk_signals_for_decision: RiskSignalsForDecision,
+        allow_stepup: bool,
+    ) -> RiskSignalRuleOutput {
         let kyc = risk_signals_for_decision.kyc.as_ref().map(|rsg| {
             Self::evaluate_rsg_rules(
                 self.kyc_rules.clone(),
                 &rsg.footprint_reason_codes(),
                 rsg.vendor_apis(),
+                allow_stepup,
             )
         });
 
@@ -54,6 +59,7 @@ impl RiskSignalRuleEvaluator {
                 self.doc_rules.clone(),
                 &rsg.footprint_reason_codes(),
                 rsg.vendor_apis(),
+                allow_stepup,
             )
         });
 
@@ -62,6 +68,7 @@ impl RiskSignalRuleEvaluator {
                 self.aml_rules.clone(),
                 &rsg.footprint_reason_codes(),
                 rsg.vendor_apis(),
+                allow_stepup,
             )
         });
 
@@ -72,7 +79,8 @@ impl RiskSignalRuleEvaluator {
         rules: Vec<Rule<Vec<FootprintReasonCode>>>,
         footprint_reason_codes: &Vec<FootprintReasonCode>,
         vendor_apis: Vec<VendorAPI>,
+        allow_stepup: bool,
     ) -> OnboardingEvaluationResult {
-        evaluate_reason_code_rules(rules, footprint_reason_codes, vendor_apis)
+        evaluate_reason_code_rules(rules, footprint_reason_codes, vendor_apis, allow_stepup)
     }
 }

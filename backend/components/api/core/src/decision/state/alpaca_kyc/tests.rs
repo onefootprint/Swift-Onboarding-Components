@@ -561,8 +561,7 @@ async fn pass_then_watchlist_hit(
 #[test_state_case(WFKind::Alpaca, UserKind::Live)]
 #[test_state_case(WFKind::Alpaca, UserKind::Sandbox(WorkflowFixtureResult::StepUp))]
 #[test_state_case(WFKind::Kyc, UserKind::Live)]
-// TODO: turn on when stepup infinite looping is handled
-// #[test_state_case(WFKind::Kyc, UserKind::Sandbox(WorkflowFixtureResult::StepUp))]
+#[test_state_case(WFKind::Kyc, UserKind::Sandbox(WorkflowFixtureResult::StepUp))]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn step_up(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
     // DATA SETUP

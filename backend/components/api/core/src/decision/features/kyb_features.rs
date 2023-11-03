@@ -1,6 +1,3 @@
-use db::models::onboarding_decision::OnboardingDecision;
-use newtypes::{DecisionStatus, FootprintReasonCode, RuleAction, VendorAPI};
-
 use crate::{
     decision::{
         onboarding::{
@@ -11,6 +8,8 @@ use crate::{
     },
     errors::ApiResult,
 };
+use db::models::onboarding_decision::OnboardingDecision;
+use newtypes::{DecisionStatus, FootprintReasonCode, RuleAction, VendorAPI};
 
 impl FeatureSet for KybFeatureVector {
     fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode> {
@@ -46,7 +45,7 @@ impl FeatureVector for KybFeatureVector {
             rule_sets::kyb::bos_pass_kyc_rule_set(),
         ];
 
-        let eval_result = rule::rules_engine::evaluate_onboarding_rules(middesk_rules, self);
+        let eval_result = rule::rules_engine::evaluate_onboarding_rules(middesk_rules, self, false);
 
         let (create_manual_review, decision_status) = match eval_result.triggered_action {
             Some(a) => match a {

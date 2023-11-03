@@ -217,6 +217,7 @@ async fn make_decision(
                 include_doc,
                 document_only: false,
                 skip_kyc: false,
+                allow_stepup: true,
             };
             let rules_output = rule_group.evaluate(risk_signals, config)?;
             engine::save_onboarding_decision(
