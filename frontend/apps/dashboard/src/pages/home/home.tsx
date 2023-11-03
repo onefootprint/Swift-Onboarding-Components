@@ -22,11 +22,11 @@ const Home = () => {
   }));
 
   const filterValue = dateRangeOptions.find(
-    ({ value }) => value === filters.values.dateRange,
+    ({ value }) => value === filters.values.date_range,
   );
 
   const handleFilterChange = (newDateRange: OrgMetricsDateRange) => {
-    filters.push({ ...filters.query, dateRange: newDateRange });
+    filters.push({ ...filters.query, date_range: newDateRange });
   };
 
   return (

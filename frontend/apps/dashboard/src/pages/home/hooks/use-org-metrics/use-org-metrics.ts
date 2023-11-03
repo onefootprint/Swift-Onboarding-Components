@@ -33,15 +33,16 @@ const useOrgMetrics = () => {
       enabled: isReady,
       select: data => {
         const formattedMetrics = [];
-        const passRate =
+
+        const passRateValue =
           data.successfulUserOnboardings === 0
             ? 0
-            : (
-                (data.successfulUserOnboardings /
-                  (data.successfulUserOnboardings +
-                    data.failedUserOnboardings)) *
-                100
-              ).toFixed(1);
+            : (data.successfulUserOnboardings /
+                (data.successfulUserOnboardings + data.failedUserOnboardings)) *
+              100;
+        const passRate =
+          passRateValue % 1 === 0 ? passRateValue : passRateValue.toFixed(1);
+
         formattedMetrics.push(
           {
             key: 'successfulUserOnboardings',

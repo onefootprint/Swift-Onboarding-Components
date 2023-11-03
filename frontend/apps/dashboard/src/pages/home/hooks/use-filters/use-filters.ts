@@ -4,19 +4,19 @@ import { OrgMetricsDateRange } from '../../home.types';
 import getDateRange from '../../utils/get-date-range';
 
 export type OrgMetricsQuery = {
-  dateRange?: OrgMetricsDateRange;
+  date_range?: OrgMetricsDateRange;
 };
 
 const defaultQueryParams: OrgMetricsQuery = {
-  dateRange: undefined,
+  date_range: undefined,
 };
 
 const useFilters = () => {
   const filters = useBaseFilters<OrgMetricsQuery>(defaultQueryParams);
   const values = {
-    dateRange: filters.query.dateRange ?? OrgMetricsDateRange.monthToDate,
+    date_range: filters.query.date_range ?? OrgMetricsDateRange.monthToDate,
   };
-  const timestamps = getDateRange(values.dateRange);
+  const timestamps = getDateRange(values.date_range);
   const requestParams = {
     timestamp_gte: timestamps.timestamp_gte,
     timestamp_lte: timestamps.timestamp_lte,
