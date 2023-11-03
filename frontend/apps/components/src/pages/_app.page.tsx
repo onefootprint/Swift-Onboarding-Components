@@ -41,6 +41,7 @@ const App = ({ Component, pageProps }: AppProps) => {
 
 const GlobalStyle = createGlobalStyle`
   html {
+    --navigation-header-height: 56px; // TODO: Move it to higher scope for every usage of Layout Component
     height: 100%;
   }
 

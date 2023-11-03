@@ -19,10 +19,12 @@
   "dependencies": {
     "@onefootprint/appearance": "*",
     "@onefootprint/design-tokens": "*",
+    "@onefootprint/dev-tools": "*",
     "@onefootprint/footprint-js": "*",
     "@onefootprint/global-constants": "*",
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",
+    "@onefootprint/idv-elements": "*",
     "@onefootprint/postmate": "2.1.0",
     "@onefootprint/request": "*",
     "@onefootprint/styled": "*",
@@ -66,5 +68,8 @@
     "setupFiles": [
       "<rootDir>/src/config/initializers/react-i18next-test.ts"
     ]
+  },
+  "browser": {
+    "fs": false
   }
 }

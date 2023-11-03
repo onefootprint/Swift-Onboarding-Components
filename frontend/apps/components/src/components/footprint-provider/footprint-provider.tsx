@@ -10,4 +10,4 @@ export const useFootprintProvider = () => useBareFootprintProvider();
 
 export default Provider;
 
-export * from './types';
+export type { FootprintClient } from './types';

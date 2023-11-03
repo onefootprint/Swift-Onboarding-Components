@@ -7,6 +7,7 @@ import type {
   NavigationHeaderPositionTypes,
 } from '../navigation-header/types';
 
+type Obj = Record<string, unknown>;
 type LayoutOptionsArgs = {
   options?: Options;
   onClose?: () => void;
@@ -27,21 +28,17 @@ const hasUpdatedProp = ({
   newProps,
   oldProps,
 }: {
-  newProps: Object;
-  oldProps: Object;
-}) => {
-  let hasNewPropVal = false;
-  Object.keys(newProps).every(key => {
-    if (
-      oldProps[key as keyof typeof oldProps] !==
-      newProps[key as keyof typeof newProps]
-    ) {
-      hasNewPropVal = true;
-      return false;
+  newProps: Obj;
+  oldProps: Obj;
+}): boolean => {
+  for (const key in newProps) {
+    if (Object.hasOwn(newProps, key) && Object.hasOwn(oldProps, key)) {
+      if (newProps[key] !== oldProps[key]) {
+        return true;
+      }
     }
-    return true;
-  });
-  return hasNewPropVal;
+  }
+  return false;
 };
 
 const useLocalLayoutOptions = ({ options, onClose }: LayoutOptionsArgs) => {

@@ -37,6 +37,7 @@ export type PublicOnboardingConfig = {
   supportedCountries?: CountryCode[];
   canMakeRealDocScanCallsInSandbox?: boolean;
   isStepupEnabled?: boolean;
+  kind?: 'auth' | 'kyb' | 'kyc';
 };
 
 // Used in the dashboard context

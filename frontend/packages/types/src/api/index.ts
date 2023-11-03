@@ -125,6 +125,10 @@ export type {
   OnboardingSubmitResponse,
 } from './onboarding-submit';
 export type {
+  OnboardingValidateRequest,
+  OnboardingValidateResponse,
+} from './onboarding-validate';
+export type {
   OrgApiKeyRevealRequest,
   OrgApiKeyRevealResponse,
 } from './org-api-key-reveal';

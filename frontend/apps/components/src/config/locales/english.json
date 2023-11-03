@@ -4,6 +4,14 @@
   },
   "components": {},
   "pages": {
+    "auth": {
+      "confirm-close-description": "Your changes may not be saved.",
+      "confirm-close-title": "Are you sure?",
+      "invalid-kind-description": "It looks like you're using a non-auth Playbook. Please review and rectify the settings.",
+      "invalid-kind-title": "Invalid configuration",
+      "no": "No",
+      "yes": "Yes"
+    },
     "secure-form": {
       "invalid": {
         "title": "Uh-oh! Something went wrong.",

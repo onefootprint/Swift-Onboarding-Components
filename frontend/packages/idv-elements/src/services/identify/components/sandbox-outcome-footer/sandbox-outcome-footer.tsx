@@ -11,7 +11,7 @@ type SandboxOutcomeFooterProps = {
 
 const SandboxOutcomeFooter = ({
   sandboxId,
-  overallOutcome = OverallOutcome.success,
+  overallOutcome,
 }: SandboxOutcomeFooterProps) => {
   const { t } = useTranslation('components.sandbox-outcome-footer');
   const outcomeLabels: Record<OverallOutcome, string> = {
@@ -27,20 +27,24 @@ const SandboxOutcomeFooter = ({
       <Inner>
         <Column>
           <Typography variant="label-4" color="tertiary">
-            {t('outcome.label')}
-          </Typography>
-          <Typography variant="label-4" color="secondary">
-            {outcomeLabels[overallOutcome]}
-          </Typography>
-        </Column>
-        <Column>
-          <Typography variant="label-4" color="tertiary">
             {t('testID')}
           </Typography>
           <Typography variant="label-4" color="secondary">
             {sandboxId}
           </Typography>
         </Column>
+        {overallOutcome ? (
+          <Column>
+            <Typography variant="label-4" color="tertiary">
+              {t('outcome.label')}
+            </Typography>
+            <Typography variant="label-4" color="secondary">
+              {outcomeLabels[overallOutcome]}
+            </Typography>
+          </Column>
+        ) : (
+          <Column />
+        )}
       </Inner>
     </Container>
   ) : null;

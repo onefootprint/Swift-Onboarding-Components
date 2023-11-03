@@ -8,11 +8,9 @@ import usePropsFromUrl from './use-props-from-url';
 // Wait for a bit for post message to arrive before giving up
 const POST_MESSAGE_TIMEOUT = 500;
 
-type BaseProps = Record<string, any>;
+type Obj = Record<string, unknown>;
 
-const useProps = <T extends BaseProps>(
-  onSuccess?: (props?: T | {}) => void,
-) => {
+const useProps = <T extends Obj>(onSuccess?: (props?: T | {}) => void) => {
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | undefined>();
   const [isLoaded, setIsLoaded] = useState(false);
   const footprintProvider = useFootprintProvider();

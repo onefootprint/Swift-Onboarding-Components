@@ -12,7 +12,7 @@ const ContentSecurityPolicy = `
   frame-src 'self' vercel.live;
   img-src 'self' data: assets.vercel.com vercel.live vercel.com cdn.jsdelivr.net maps.googleapis.com;
   media-src 'self' https;
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' vercel.live vitals.vercel-insights.com maps.googleapis.com;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' vercel.live vitals.vercel-insights.com maps.googleapis.com https://cdn.ingest-lr.com;
   style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;
   worker-src 'self' blob:;
 `;

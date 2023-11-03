@@ -129,6 +129,7 @@ const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
     sendObservePayload(items);
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSendQueue = useCallback(
     debounce(sendQueue, DEBOUNCE_INTERVAL, { maxWait: MAX_DEBOUNCE }),
     [queue],
