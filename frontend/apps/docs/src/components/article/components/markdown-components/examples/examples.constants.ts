@@ -18,7 +18,7 @@ const vanilla: Option = {
   links: [
     {
       name: 'JS',
-      href: 'https://github.com/onefootprint/examples/tree/master/frontend-vanilla-js',
+      href: 'https://github.com/onefootprint/examples/tree/master/idv/frontend-vanilla-js',
       img: {
         src: '/examples/js.png',
         height: 32,
@@ -27,7 +27,7 @@ const vanilla: Option = {
     },
     {
       name: 'Vite + JS',
-      href: 'https://github.com/onefootprint/examples/tree/master/frontend-vite-vanilla',
+      href: 'https://github.com/onefootprint/examples/tree/master/idv/frontend-vite-vanilla',
       img: {
         src: '/examples/js-vite.png',
         height: 32,
@@ -36,7 +36,7 @@ const vanilla: Option = {
     },
     {
       name: 'Go + JS',
-      href: 'https://github.com/onefootprint/examples/tree/master/go-vanilla-js',
+      href: 'https://github.com/onefootprint/examples/tree/master/idv/go-vanilla-js',
       img: {
         src: '/examples/js-go.png',
         height: 32,
@@ -51,7 +51,7 @@ const react: Option = {
   links: [
     {
       name: 'Create React App',
-      href: 'https://github.com/onefootprint/examples/tree/master/frontend-react-cra',
+      href: 'https://github.com/onefootprint/examples/tree/master/idv/frontend-react-cra',
       img: {
         src: '/examples/react.png',
         height: 32,
@@ -60,7 +60,7 @@ const react: Option = {
     },
     {
       name: 'Next',
-      href: 'https://github.com/onefootprint/examples/tree/master/frontend-react-next',
+      href: 'https://github.com/onefootprint/examples/tree/master/idv/frontend-react-next',
       img: {
         src: '/examples/next.png',
         height: 32,
@@ -69,7 +69,7 @@ const react: Option = {
     },
     {
       name: 'Next + Typescript',
-      href: 'https://github.com/onefootprint/examples/tree/master/frontend-react-typescript-next',
+      href: 'https://github.com/onefootprint/examples/tree/master/idv/frontend-react-typescript-next',
       img: {
         src: '/examples/next-ts.png',
         height: 32,
@@ -78,7 +78,7 @@ const react: Option = {
     },
     {
       name: 'React + custom UI',
-      href: 'https://github.com/onefootprint/examples/tree/master/frontend-react-customized',
+      href: 'https://github.com/onefootprint/examples/tree/master/idv/frontend-react-customized',
       img: {
         src: '/examples/react-customization.png',
         height: 32,
@@ -93,7 +93,7 @@ const vue: Option = {
   links: [
     {
       name: 'Vite + Vue',
-      href: 'https://github.com/onefootprint/examples/tree/master/frontend-vite-vue',
+      href: 'https://github.com/onefootprint/examples/tree/master/idv/frontend-vite-vue',
       img: {
         src: '/examples/vite-vue.png',
         height: 32,
@@ -108,7 +108,7 @@ const angular: Option = {
   links: [
     {
       name: 'AngularJS',
-      href: 'https://github.com/onefootprint/examples/tree/master/frontend-angular',
+      href: 'https://github.com/onefootprint/examples/tree/master/idv/frontend-angular',
       img: {
         src: '/examples/angular.png',
         height: 32,
@@ -123,7 +123,7 @@ const mobile: Option = {
   links: [
     {
       name: 'React Native',
-      href: 'https://github.com/onefootprint/examples/tree/master/mobile-react-native',
+      href: 'https://github.com/onefootprint/examples/tree/master/idv/mobile-react-native',
       img: {
         src: '/examples/react.png',
         height: 32,
@@ -132,7 +132,7 @@ const mobile: Option = {
     },
     {
       name: 'Expo + React Native',
-      href: 'https://github.com/onefootprint/examples/tree/master/mobile-expo',
+      href: 'https://github.com/onefootprint/examples/tree/master/idv/mobile-expo',
       img: {
         src: '/examples/react.png',
         height: 32,
@@ -147,7 +147,7 @@ const go: Option = {
   links: [
     {
       name: 'Go + JS',
-      href: 'https://github.com/onefootprint/examples/tree/master/go-vanilla-js',
+      href: 'https://github.com/onefootprint/examples/tree/master/idv/go-vanilla-js',
       img: {
         src: '/examples/js-go.png',
         height: 32,
@@ -162,7 +162,7 @@ const customized: Option = {
   links: [
     {
       name: 'JS + custom UI',
-      href: 'https://github.com/onefootprint/examples/tree/master/frontend-vanilla-js',
+      href: 'https://github.com/onefootprint/examples/tree/master/idv/frontend-vanilla-js',
       img: {
         src: '/examples/js-customization.png',
         height: 32,
@@ -171,7 +171,7 @@ const customized: Option = {
     },
     {
       name: 'React + custom UI',
-      href: 'https://github.com/onefootprint/examples/tree/master/frontend-react-customized',
+      href: 'https://github.com/onefootprint/examples/tree/master/idv/frontend-react-customized',
       img: {
         src: '/examples/react-customization.png',
         height: 32,
