@@ -17,8 +17,8 @@ const getOnboardingConfig = async (params: GetOnboardingConfigRequest) => {
   if (!response.ok) {
     throw new Error(response.statusText);
   }
-  const tenant = await response.json();
-  return tenant;
+  const obConfig = await response.json();
+  return obConfig;
 };
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
@@ -26,8 +26,8 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     return { notFound: true };
   }
   try {
-    const tenant = await getOnboardingConfig({ key: query.ob_key as string });
-    return { props: { tenant } };
+    const obConfig = await getOnboardingConfig({ key: query.ob_key as string });
+    return { props: { obConfig } };
   } catch (error) {
     return { notFound: true };
   }

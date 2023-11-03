@@ -1,24 +1,42 @@
-import { FootprintVerifyButton } from '@onefootprint/footprint-react';
+import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import styled, { css } from '@onefootprint/styled';
-import { Box, media, Typography } from '@onefootprint/ui';
+import type { OnboardingConfigKind } from '@onefootprint/types';
+import { Box, FootprintButton, media, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
 
 type PreviewProps = {
-  tenant: {
+  obConfig: {
     org_name: string;
     logo_url: string;
     key: string;
+    kind: OnboardingConfigKind;
   };
 };
 
-const Preview = ({ tenant }: PreviewProps) => {
+const Preview = ({ obConfig }: PreviewProps) => {
   const [showConfirmation, setConfirmation] = useState(false);
+  const t = obConfig.kind === 'auth' ? translations.auth : translations.verify;
+
+  const handleOpen = () => {
+    const fp = footprint.init({
+      kind:
+        obConfig.kind === 'auth'
+          ? FootprintComponentKind.Auth
+          : FootprintComponentKind.Verify,
+      publicKey: obConfig.key,
+      onComplete: validationToken => {
+        console.log('validationToken', validationToken);
+        setConfirmation(true);
+      },
+    });
+    fp.render();
+  };
 
   return (
     <>
       <Head>
-        <title>Footprint Preview - {tenant.org_name}</title>
+        <title>Footprint Preview - {obConfig.org_name}</title>
       </Head>
       <Container>
         <Inner>
@@ -29,46 +47,51 @@ const Preview = ({ tenant }: PreviewProps) => {
                 sx={{ marginBottom: 7 }}
                 variant="heading-2"
               >
-                Onboarding complete!
+                {t.success.title}
               </Typography>
               <Typography color="secondary" variant="body-1" as="div">
-                Thanks for trying Footprint. If you have any questions or want
-                to learn more about our product, please contact us and we will
-                get back to you as soon as possible.
+                {t.success.body}
               </Typography>
             </Box>
           ) : (
             <>
               <Typography variant="heading-1" as="h1" sx={{ marginBottom: 3 }}>
-                {tenant.org_name}
-              </Typography>
-              <Typography variant="heading-2" as="h2">
-                Help us verify your identity
+                {obConfig.org_name}
               </Typography>
               <Typography variant="body-1" color="secondary">
-                We will need to collect some personal information to confirm and
-                protect your identity when you create your account at{' '}
-                {tenant.org_name}. To learn more about how we process this data,
-                please see our privacy policy.
+                {t.body}
               </Typography>
               <ButtonContainer>
-                <FootprintVerifyButton
-                  publicKey={tenant.key}
-                  onComplete={validationToken => {
-                    console.log('validationToken', validationToken); // eslint-disable-line no-console
-                    setConfirmation(true);
-                  }}
-                />
+                <FootprintButton onClick={handleOpen} text={t.cta} />
               </ButtonContainer>
             </>
           )}
         </Inner>
         <Typography color="tertiary" sx={{ marginTop: 7 }} variant="label-2">
-          Footprint ❤️ {tenant.org_name}
+          Footprint ❤️ {obConfig.org_name}
         </Typography>
       </Container>
     </>
   );
+};
+
+const translations = {
+  auth: {
+    body: ' This is a demo of Footprint’s authentication flow. We will collect some personal information, and the end of flow you will se a validation token printed to the console.',
+    cta: 'Sign in with Footprint',
+    success: {
+      title: 'Authentication complete!',
+      body: 'Thanks for trying Footprint. If you have any questions or want to learn more about our product, please contact us and we will get back to you as soon as possible.',
+    },
+  },
+  verify: {
+    body: 'This is a demo of Footprint’s verification flow. We will collect some personal information, and the end of flow you will se a validation token printed to the console.',
+    cta: 'Verify with Footprint',
+    success: {
+      title: 'Onboarding complete!',
+      body: 'Thanks for trying Footprint. If you have any questions or want to learn more about our product, please contact us and we will get back to you as soon as possible.',
+    },
+  },
 };
 
 const Container = styled.div`
@@ -91,10 +114,10 @@ const Inner = styled.div`
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[9]};
+    gap: ${theme.spacing[7]};
     padding: ${theme.spacing[7]} ${theme.spacing[5]};
     text-align: center;
-    width: 90%;
+    width: 70%;
 
     ${media.greaterThan('sm')`
       max-width: 552px;
