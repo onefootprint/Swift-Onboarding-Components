@@ -32,7 +32,7 @@ describe('usePropsFromUrl', () => {
     useRouterSpy({
       isReady: true,
       pathname: '/path',
-      asPath: '/path#ENCODED_LEGACY_USER_DATA__ENCODED_LEGACY_OPTIONS',
+      asPath: '/path#ENCODED_USER_DATA__ENCODED_OPTIONS',
     });
     const onSuccess = jest.fn();
     const { result } = renderHook(() => usePropsFromUrl(onSuccess));
@@ -50,8 +50,7 @@ describe('usePropsFromUrl', () => {
     useRouterSpy({
       isReady: true,
       pathname: '/path',
-      asPath:
-        '/path#ENCODED_LEGACY_USER_DATA__ENCODED_LEGACY_OPTIONS__ENCODED_LEGACY_L10N',
+      asPath: '/path#ENCODED_USER_DATA__ENCODED_OPTIONS__ENCODED_L10N',
     });
     const onSuccess = jest.fn();
     const { result } = renderHook(() => usePropsFromUrl(onSuccess));

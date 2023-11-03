@@ -1,6 +1,5 @@
 import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
 import Postmate from '@onefootprint/postmate';
-import type { IdvBootstrapData, IdvOptions } from '@onefootprint/types';
 
 import type { FootprintClient } from '../types';
 import EventEmitter from '../utils/event-emitter/event-emmiter';
@@ -31,10 +30,7 @@ class IframeAdapter implements FootprintClient {
     this.sendEventToParent(FootprintPrivateEvent.started);
   }
 
-  on(
-    name: string,
-    callback: ((data: IdvBootstrapData) => void) | ((data: IdvOptions) => void),
-  ) {
+  on(name: string, callback: (data?: unknown) => void) {
     return this.eventEmitter.on(name, callback);
   }
 

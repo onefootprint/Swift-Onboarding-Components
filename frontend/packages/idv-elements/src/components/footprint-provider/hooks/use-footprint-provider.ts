@@ -1,10 +1,6 @@
 import type { FootprintPrivateEvent } from '@onefootprint/footprint-js';
 
-import type {
-  CompletePayload,
-  FootprintClient,
-  LegacyFootprintInternalEvent,
-} from '../types';
+import type { CompletePayload, FootprintClient } from '../types';
 
 type UseFootprintProvider = { client: FootprintClient };
 
@@ -22,8 +18,8 @@ const useFootprintProvider = ({ client }: UseFootprintProvider) => {
   };
 
   const on = (
-    name: LegacyFootprintInternalEvent | FootprintPrivateEvent,
-    callback: (data: unknown) => void,
+    name: FootprintPrivateEvent,
+    callback: (data?: unknown) => void,
   ) => client.on(name, callback);
 
   const load = () => client.load();
