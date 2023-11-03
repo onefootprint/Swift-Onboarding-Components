@@ -2,7 +2,7 @@ import { Box, Divider, Shimmer, Stack } from '@onefootprint/ui';
 import React from 'react';
 
 const Loading = () => (
-  <Box as="section" testID="entity-loading">
+  <Box as="section" testID="entity-loading" paddingTop={7}>
     <Box marginBottom={7}>
       <Breadcrumb />
     </Box>
@@ -67,16 +67,16 @@ const Header = () => (
 const Vault = () => (
   <Box gap={5} sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)' }}>
     <Box>
-      <Shimmer sx={{ height: '317px', width: '632px' }} />
+      <Shimmer sx={{ height: '317px', minWidth: '264px' }} />
     </Box>
     <Box>
-      <Shimmer sx={{ height: '317px', width: '632px' }} />
+      <Shimmer sx={{ height: '317px', minWidth: '264px' }} />
     </Box>
     <Box>
-      <Shimmer sx={{ height: '235px', width: '632px' }} />
+      <Shimmer sx={{ height: '235px', minWidth: '264px' }} />
     </Box>
     <Box>
-      <Shimmer sx={{ height: '235px', width: '632px' }} />
+      <Shimmer sx={{ height: '235px', minWidth: '264px' }} />
     </Box>
   </Box>
 );
