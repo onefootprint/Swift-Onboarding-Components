@@ -19,8 +19,8 @@
     "eslint-config-footprint": "*",
     "prettier": "^2.8.4",
     "turbo": "^1.10.14",
-    "jest": "^29.5.0",
-    "jest-environment-jsdom": "^29.5.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "jest-watch-typeahead": "^2.2.2"
   },
   "resolutions": {
