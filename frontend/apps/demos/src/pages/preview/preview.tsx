@@ -16,11 +16,14 @@ type PreviewProps = {
 
 const Preview = ({ obConfig }: PreviewProps) => {
   const [showConfirmation, setConfirmation] = useState(false);
-  const t = obConfig.kind === 'auth' ? translations.auth : translations.verify;
+  const isAuth = obConfig.kind === 'auth';
+  const t = isAuth ? translations.auth : translations.verify;
 
   const handleOpen = () => {
     const fp = footprint.init({
-      kind: FootprintComponentKind.Auth,
+      kind: isAuth
+        ? FootprintComponentKind.Auth
+        : FootprintComponentKind.Verify,
       publicKey: obConfig.key,
       onComplete: (validationToken: string) => {
         console.log('validationToken', validationToken);
