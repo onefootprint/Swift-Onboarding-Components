@@ -55,7 +55,7 @@ const InstructionsModal = ({ visible, onClose }) => {
         </Box>
         <Box position="absolute" right={16}>
           <Pressable onPress={onClose}>
-            <IcoClose24 onPress={onClose} />
+            <IcoClose24 />
           </Pressable>
         </Box>
       </Box>

@@ -1,4 +1,4 @@
-import { Liveness } from '../data';
+import type { Liveness } from '../data';
 
 export type GetLivenessRequest = {
   id: string;

@@ -1,9 +1,9 @@
 import styled, { css } from '@onefootprint/styled';
 import React, { useState } from 'react';
 
-import { Box } from '../../../box';
-import { Pressable } from '../../../pressable';
-import { Typography } from '../../../typography';
+import Box from '../../../box';
+import Pressable from '../../../pressable';
+import Typography from '../../../typography';
 import type {
   RadioSelectOption,
   StringOrNumber,

@@ -1,11 +1,6 @@
 import React from 'react';
-import {
-  GestureResponderEvent,
-  Pressable as RNPressable,
-  ViewStyle,
-} from 'react-native';
-
-import haptic from '../../utils/haptic';
+import type { GestureResponderEvent, ViewStyle } from 'react-native';
+import { Pressable as RNPressable } from 'react-native';
 
 export type PressableProps = {
   children: React.ReactNode;
@@ -14,7 +9,6 @@ export type PressableProps = {
   onPressIn?: (event: GestureResponderEvent) => void;
   onPressOut?: (event: GestureResponderEvent) => void;
   style?: ViewStyle;
-  withImpact?: boolean;
 };
 
 const Pressable = ({
@@ -24,10 +18,8 @@ const Pressable = ({
   onPressIn,
   onPressOut,
   style = {},
-  withImpact,
 }: PressableProps) => {
   const handlePress = (event: GestureResponderEvent) => {
-    if (withImpact) haptic.impact();
     onPress?.(event);
   };
 

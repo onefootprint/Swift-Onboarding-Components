@@ -1,11 +1,10 @@
-import { Icon } from '@onefootprint/icons';
+import type { Icon } from '@onefootprint/icons';
 import React, { Fragment } from 'react';
 
-import haptic from '../../utils/haptic';
-import { Box } from '../box';
-import { Divider } from '../divider';
-import { Pressable } from '../pressable';
-import { Typography } from '../typography';
+import Box from '../box';
+import Divider from '../divider';
+import Pressable from '../pressable';
+import Typography from '../typography';
 
 export type TableProps = {
   options: { label: string; options: TableOption[] }[];
@@ -49,7 +48,6 @@ const Table = ({ options }: TableProps) => (
               <Fragment key={ariaLabel}>
                 <Pressable
                   onPress={() => {
-                    haptic.impact();
                     onPress?.();
                   }}
                 >

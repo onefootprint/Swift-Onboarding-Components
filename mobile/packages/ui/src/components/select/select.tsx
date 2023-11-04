@@ -1,11 +1,11 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
 import React, { useState } from 'react';
 
-import { Box } from '../box';
-import { Hint } from '../hint';
-import { Label } from '../label';
-import { Pressable } from '../pressable';
-import { Typography } from '../typography';
+import Box from '../box';
+import Hint from '../hint';
+import Label from '../label';
+import Pressable from '../pressable';
+import Typography from '../typography';
 import Picker from './components/picker';
 import type { BaseOption, SelectOption } from './select.types';
 
@@ -70,7 +70,6 @@ const Select = <T extends BaseOption = BaseOption<string>>({
         onPress={showPicker}
         onPressIn={() => setActive(true)}
         onPressOut={() => setActive(false)}
-        withImpact
       >
         <Box
           alignItems="center"

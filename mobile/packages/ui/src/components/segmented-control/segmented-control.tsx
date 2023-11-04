@@ -2,8 +2,10 @@
 import styled, { css } from '@onefootprint/styled';
 import * as React from 'react';
 
-import { Box, BoxProps } from '../box';
-import Option, { OptionFields } from './components/option';
+import type { BoxProps } from '../box';
+import Box from '../box';
+import type { OptionFields } from './components/option';
+import Option from './components/option';
 
 export type SegmentedControlProps = BoxProps & {
   'aria-label': string;

@@ -1,15 +1,16 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import identity from 'lodash/identity';
 import React, { useState } from 'react';
-import {
+import type {
   NativeSyntheticEvent,
   TextInputChangeEventData,
   TextInputKeyPressEventData,
 } from 'react-native';
 
-import { Box } from '../box';
-import { Hint } from '../hint';
-import { TextInput, TextInputProps } from '../text-input';
+import Box from '../box';
+import Hint from '../hint';
+import type { TextInputProps } from '../text-input';
+import TextInput from '../text-input';
 import usePinInputRefs from './hooks/use-pin-input-refs';
 import { INPUT_FIELDS_COUNT, pins } from './pin-input.constants';
 import { getNextValue, isNumber } from './pin-input.utils';

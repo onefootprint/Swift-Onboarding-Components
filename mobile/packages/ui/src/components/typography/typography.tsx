@@ -1,10 +1,11 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Color, FontVariant } from '@onefootprint/design-tokens';
+import type { Color, FontVariant } from '@onefootprint/design-tokens';
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
-import { TextProps } from 'react-native';
+import type { TextProps } from 'react-native';
 
-import { Box, BoxProps } from '../box';
+import type { BoxProps } from '../box';
+import Box from '../box';
 
 export type TypographyProps = BoxProps & {
   style?: TextProps['style'];

@@ -1,5 +1,5 @@
-import { CountryCode } from './countries';
-import { IdDI } from './di';
+import type { CountryCode } from './countries';
+import type { IdDI } from './di';
 
 export type IdDIData = Partial<{
   [IdDI.firstName]: string;

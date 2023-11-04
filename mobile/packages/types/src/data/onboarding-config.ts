@@ -1,6 +1,6 @@
-import { FootprintAppearance } from '@onefootprint/footprint-js';
+import type { FootprintAppearance } from '@onefootprint/footprint-js';
 
-import { CollectedDataOption } from './collected-data-option';
+import type { CollectedDataOption } from './collected-data-option';
 
 export type OnboardingConfig = {
   id: string;

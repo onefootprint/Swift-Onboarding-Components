@@ -1,1 +1,2 @@
-export { default as PinInput, PinInputProps } from './pin-input';
+export type { PinInputProps } from './pin-input';
+export { default } from './pin-input';

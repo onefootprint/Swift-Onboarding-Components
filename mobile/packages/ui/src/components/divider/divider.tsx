@@ -2,7 +2,8 @@
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
-import { Box, BoxProps } from '../box';
+import type { BoxProps } from '../box';
+import Box from '../box';
 
 export type DividerProps = BoxProps;
 

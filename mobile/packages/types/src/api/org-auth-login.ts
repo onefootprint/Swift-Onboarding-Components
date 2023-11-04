@@ -1,4 +1,4 @@
-import { Member, Organization } from '../data';
+import type { Member, Organization } from '../data';
 
 export type OrgAuthLoginResponse = {
   createdNewTenant: boolean;

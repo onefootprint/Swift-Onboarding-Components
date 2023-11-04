@@ -2,7 +2,7 @@ import React from 'react';
 
 import useTranslation from '@/hooks/use-translation';
 
-import { Document } from '../../doc-scan.types';
+import type { Document } from '../../doc-scan.types';
 import Camera from '../camera';
 import Countdown from '../countdown';
 import Frame from '../frame';

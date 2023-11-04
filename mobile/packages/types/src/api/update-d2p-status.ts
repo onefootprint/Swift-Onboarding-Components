@@ -1,4 +1,4 @@
-import { D2PStatusUpdate } from '../data';
+import type { D2PStatusUpdate } from '../data';
 
 export type UpdateD2PStatusRequest = {
   authToken: string; // scoped auth token

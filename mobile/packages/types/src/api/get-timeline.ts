@@ -1,4 +1,4 @@
-import { Timeline } from '../data';
+import type { Timeline } from '../data';
 
 export type GetTimelineRequest = {};
 

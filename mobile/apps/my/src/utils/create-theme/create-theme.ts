@@ -1,9 +1,9 @@
-import { Theme } from '@onefootprint/design-tokens';
+import type { Theme } from '@onefootprint/design-tokens';
 import cloneDeep from 'lodash/cloneDeep';
 import set from 'lodash/set';
 
 import variablesMap from './constants/variables-map';
-import { FootprintAppearanceVariables } from './theme.types';
+import type { FootprintAppearanceVariables } from './theme.types';
 
 const mutateTheme = (options: {
   theme: Theme;

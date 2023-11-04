@@ -1,4 +1,4 @@
-import { BusinessBoKycData, ObConfigAuth } from '../data';
+import type { BusinessBoKycData, ObConfigAuth } from '../data';
 
 export type BusinessRequest = {
   obConfigAuth?: ObConfigAuth;

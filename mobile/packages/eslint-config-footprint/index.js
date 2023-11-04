@@ -29,6 +29,7 @@ module.exports = {
     'global-require': 'off',
     'react/no-unstable-nested-components': 'off',
     'no-use-before-define': 'off',
+    '@typescript-eslint/consistent-type-imports': 'error',
     '@typescript-eslint/no-use-before-define': 'off',
     'react/display-name': 'off',
     'react/prop-types': 'off',

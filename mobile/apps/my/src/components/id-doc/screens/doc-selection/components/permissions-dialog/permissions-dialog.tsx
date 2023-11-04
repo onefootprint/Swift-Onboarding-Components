@@ -1,7 +1,8 @@
 import { Box, Button, Dialog, Typography } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 import { Linking } from 'react-native';
-import { Camera, CameraPermissionStatus } from 'react-native-vision-camera';
+import type { CameraPermissionStatus } from 'react-native-vision-camera';
+import { Camera } from 'react-native-vision-camera';
 
 import useTranslation from '@/hooks/use-translation';
 import { Events, useAnalytics } from '@/utils/analytics';

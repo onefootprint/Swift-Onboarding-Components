@@ -8,7 +8,7 @@ import { useTimeout } from 'usehooks-ts';
 
 import haptic from '@/utils/haptic';
 
-import { Detection, Document } from '../../doc-scan.types';
+import type { Detection, Document } from '../../doc-scan.types';
 import type { CameraType } from './camera.types';
 import CaptureButton from './components/capture-button';
 import Feedback from './components/feedback';
@@ -70,6 +70,7 @@ const Camera = ({
 
   useEffect(() => {
     return () => cameraDetection.reset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const takePhoto = async (meta: Record<string, boolean>) => {

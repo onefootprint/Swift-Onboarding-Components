@@ -2,8 +2,9 @@
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
-import { Box, BoxProps } from '../box';
-import { Pressable } from '../pressable';
+import type { BoxProps } from '../box';
+import Box from '../box';
+import Pressable from '../pressable';
 
 export type LabelProps = BoxProps & {
   children: string;

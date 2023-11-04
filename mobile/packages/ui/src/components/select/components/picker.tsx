@@ -4,11 +4,11 @@ import { FlashList } from '@shopify/flash-list';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Modal } from 'react-native';
 
-import { Box } from '../../box';
-import { IconButton } from '../../icon-button';
-import { Pressable } from '../../pressable';
-import { TextInput } from '../../text-input';
-import { Typography } from '../../typography';
+import Box from '../../box';
+import IconButton from '../../icon-button';
+import Pressable from '../../pressable';
+import TextInput from '../../text-input';
+import Typography from '../../typography';
 import type { BaseOption, SelectOption } from '../select.types';
 import EmptyState from './empty-state';
 import Item from './item';

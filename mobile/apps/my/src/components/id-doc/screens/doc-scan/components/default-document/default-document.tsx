@@ -1,4 +1,5 @@
-import { SupportedIdDocTypes, UploadDocumentSide } from '@onefootprint/types';
+import type { SupportedIdDocTypes } from '@onefootprint/types';
+import { UploadDocumentSide } from '@onefootprint/types';
 import kebabCase from 'lodash/kebabCase';
 import React from 'react';
 

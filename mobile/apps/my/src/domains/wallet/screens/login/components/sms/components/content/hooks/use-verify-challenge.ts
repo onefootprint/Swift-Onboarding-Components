@@ -1,5 +1,5 @@
 import request, { getErrorMessage } from '@onefootprint/request';
-import {
+import type {
   IdentifyVerifyRequest,
   IdentifyVerifyResponse,
 } from '@onefootprint/types';

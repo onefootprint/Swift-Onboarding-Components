@@ -1,4 +1,4 @@
-import { IdDocOutcomes } from './sandbox-outcomes-type';
+import type { IdDocOutcomes } from './sandbox-outcomes-type';
 
 export type D2PMeta = {
   sessionId?: string; // bifrost session id

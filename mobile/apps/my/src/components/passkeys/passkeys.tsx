@@ -1,6 +1,7 @@
 import { getErrorMessage } from '@onefootprint/request';
 import { useMachine } from '@xstate/react';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { Passkey } from 'react-native-passkey';
 
 import { Events, useAnalytics } from '@/utils/analytics';
 
@@ -16,19 +17,24 @@ export type PasskeysProps = {
 const Passkeys = ({ authToken, onDone }: PasskeysProps) => {
   const [state, send] = useMachine(() => createMachine());
   const analytics = useAnalytics();
+  const { isSupported } = Passkey;
+
+  const handleSkip = () => {
+    // TODO: Analytics deprecate
+    analytics.track(Events.PasskeyCompleted, { result: 'skip' });
+    onDone(null);
+  };
+
+  const handleNotSupported = () => {
+    analytics.track(Events.PasskeyCompleted, { result: 'not_supported' });
+    onDone(null);
+  };
 
   const handleSuccess = (deviceResponseJson: string) => {
     analytics.track(Events.PasskeyRegistrationSucceeded);
     // TODO: Analytics deprecate
     analytics.track(Events.PasskeyCompleted, { result: 'success' });
     onDone(deviceResponseJson);
-  };
-
-  const handleSkip = () => {
-    // TODO: Analytics deprecate
-    // TODO: Deprecate
-    analytics.track(Events.PasskeyCompleted, { result: 'skip' });
-    onDone(null);
   };
 
   const handleError = (error: unknown) => {
@@ -38,13 +44,21 @@ const Passkeys = ({ authToken, onDone }: PasskeysProps) => {
     send({ type: 'failed' });
   };
 
-  return (
+  useEffect(() => {
+    if (!isSupported) {
+      handleNotSupported();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSupported]);
+
+  return isSupported ? (
     <>
       {state.matches('register') && (
         <Register
           authToken={authToken}
           onError={handleError}
           onSuccess={handleSuccess}
+          onSkip={handleSkip}
         />
       )}
       {state.matches('retry') && (
@@ -55,7 +69,7 @@ const Passkeys = ({ authToken, onDone }: PasskeysProps) => {
         />
       )}
     </>
-  );
+  ) : null;
 };
 
 export default Passkeys;

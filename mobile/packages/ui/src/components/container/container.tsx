@@ -1,6 +1,6 @@
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
-import { StyleProp, ViewStyle } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export type ContainerProps = {

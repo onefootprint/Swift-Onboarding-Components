@@ -1,4 +1,4 @@
-import { ObConfigAuth } from '../data';
+import type { ObConfigAuth } from '../data';
 
 export type IdentifyVerifyRequest = {
   challengeResponse: string; // either biometric response or the 6 code digit sent via sms

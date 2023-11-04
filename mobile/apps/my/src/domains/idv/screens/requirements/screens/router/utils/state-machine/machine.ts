@@ -1,7 +1,7 @@
 import { assign, createMachine } from 'xstate';
 
 import type { Typegen0 } from './machine.typegen';
-import { MachineContext, MachineEvents } from './types';
+import type { MachineContext, MachineEvents } from './types';
 
 const createRequirementsMachine = () =>
   createMachine({

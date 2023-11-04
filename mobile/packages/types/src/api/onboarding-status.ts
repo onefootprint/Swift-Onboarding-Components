@@ -1,9 +1,9 @@
-import {
+import type {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from '../data/collected-data-option';
-import { SupportedIdDocTypes } from '../data/id-doc-type';
+import type { SupportedIdDocTypes } from '../data/id-doc-type';
 
 export enum OnboardingRequirementKind {
   liveness = 'liveness',

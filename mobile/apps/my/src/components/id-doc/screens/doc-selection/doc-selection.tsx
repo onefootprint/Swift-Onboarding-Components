@@ -1,13 +1,14 @@
-import { CountryRecord, DEFAULT_COUNTRY } from '@onefootprint/global-constants';
+import type { CountryRecord } from '@onefootprint/global-constants';
+import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { getErrorMessage } from '@onefootprint/request';
-import { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
+import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
+import type { SelectOption } from '@onefootprint/ui';
 import {
   Box,
   Button,
   CountrySelect,
   Divider,
   RadioSelect,
-  SelectOption,
   Typography,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';

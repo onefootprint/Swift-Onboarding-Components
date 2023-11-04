@@ -1,11 +1,10 @@
 import request from '@onefootprint/request';
-import {
-  CollectedKycDataOption,
-  GetSharingResponse,
-} from '@onefootprint/types';
+import type { GetSharingResponse } from '@onefootprint/types';
+import { CollectedKycDataOption } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
-import useSession, { AuthHeaders } from '@/domains/wallet/hooks/use-session';
+import type { AuthHeaders } from '@/domains/wallet/hooks/use-session';
+import useSession from '@/domains/wallet/hooks/use-session';
 
 const getSharing = async (authHeaders: AuthHeaders, isApple: boolean) => {
   if (isApple) {

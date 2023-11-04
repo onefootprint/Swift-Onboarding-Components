@@ -1,17 +1,12 @@
+import type { CollectedDataOption } from './collected-data-option';
 import {
-  CollectedDataOption,
   CollectedDocumentDataOption,
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from './collected-data-option';
-import {
-  BusinessDI,
-  DataIdentifier,
-  DocumentDI,
-  IdDI,
-  InvestorProfileDI,
-} from './di';
+import type { DataIdentifier } from './di';
+import { BusinessDI, DocumentDI, IdDI, InvestorProfileDI } from './di';
 
 const CdoToDiMap: Record<CollectedDataOption, DataIdentifier[]> = {
   // Id

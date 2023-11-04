@@ -1,4 +1,4 @@
-import { CountryRecord } from '@onefootprint/global-constants';
+import type { CountryRecord } from '@onefootprint/global-constants';
 import {
   IcoCar24,
   IcoGreenCard24,
@@ -8,10 +8,8 @@ import {
   IcoVoter24,
   IcoWork24,
 } from '@onefootprint/icons';
-import {
-  IdDocSupportedCountryAndDocTypes,
-  SupportedIdDocTypes,
-} from '@onefootprint/types';
+import type { IdDocSupportedCountryAndDocTypes } from '@onefootprint/types';
+import { SupportedIdDocTypes } from '@onefootprint/types';
 
 import getSupportedCountryByCode from '@/components/id-doc/utils/get-supported-country-by-code';
 import useTranslation from '@/hooks/use-translation';

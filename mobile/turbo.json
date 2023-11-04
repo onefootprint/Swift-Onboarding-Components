@@ -18,6 +18,9 @@
     "lint": {},
     "format": {},
     "typecheck": {
+      "dependsOn": [
+        "^build"
+      ],
       "cache": false,
       "outputs": []
     },
@@ -31,6 +34,16 @@
     "test": {
       "outputs": [
         "coverage/**"
+      ]
+    },
+    "test:ci": {
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "lint:ci": {
+      "dependsOn": [
+        "^build"
       ]
     }
   }

@@ -2,8 +2,8 @@ import { IcoCheck24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
-import { Box } from '../box';
-import { Typography } from '../typography';
+import Box from '../box';
+import Typography from '../typography';
 
 export type FeedbackButtonProps = {
   children: string;

@@ -1,4 +1,4 @@
-import ChallengeKind from './challenge-kind';
+import type ChallengeKind from './challenge-kind';
 
 export type ChallengeData = {
   challengeToken: string;

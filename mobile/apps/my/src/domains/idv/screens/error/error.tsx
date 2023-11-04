@@ -10,6 +10,7 @@ const Error = () => {
 
   useEffect(() => {
     analytics.track(Events.Ended, { result: 'error' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

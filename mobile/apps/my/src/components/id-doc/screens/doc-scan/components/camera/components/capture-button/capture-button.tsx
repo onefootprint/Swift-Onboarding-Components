@@ -24,7 +24,7 @@ const CaptureButton = ({ onPress, selected }: CaptureButtonProps) => {
   return (
     <Pressable onPress={onPress}>
       <OuterCircle>
-        <AnimatedInnerCircle style={animatedStyle} />
+        <AnimatedInnerCircle style={animatedStyle} selected={selected} />
       </OuterCircle>
     </Pressable>
   );
@@ -41,14 +41,14 @@ const OuterCircle = styled.View`
   `}
 `;
 
-const AnimatedInnerCircle = styled(Reanimated.View)<{ active: boolean }>`
-  ${({ active, theme }) => css`
-    background-color: ${active
+const AnimatedInnerCircle = styled(Reanimated.View)<{ selected: boolean }>`
+  ${({ selected, theme }) => css`
+    background-color: ${selected
       ? theme.backgroundColor.secondary
       : theme.backgroundColor.primary};
     height: 56px;
     width: 56px;
-    box-shadow: 0px 1px 4px rgba(0, 0, 0, ${active ? 0 : 0.12});
+    box-shadow: 0px 1px 4px rgba(0, 0, 0, ${selected ? 0 : 0.12});
   `}
 `;
 

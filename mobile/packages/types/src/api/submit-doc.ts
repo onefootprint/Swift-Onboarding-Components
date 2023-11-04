@@ -1,4 +1,4 @@
-import {
+import type {
   CountryCode,
   CountryCode3,
   IdDocOutcomes,

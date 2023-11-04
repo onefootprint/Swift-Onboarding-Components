@@ -1,4 +1,4 @@
-import { OnboardingConfig } from '../data';
+import type { OnboardingConfig } from '../data';
 
 export type OrgOnboardingConfigUpdateRequest = Partial<OnboardingConfig> & {
   id: string;

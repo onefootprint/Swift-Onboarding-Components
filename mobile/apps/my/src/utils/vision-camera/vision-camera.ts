@@ -1,4 +1,5 @@
-import { Frame, VisionCameraProxy } from 'react-native-vision-camera';
+import type { Frame } from 'react-native-vision-camera';
+import { VisionCameraProxy } from 'react-native-vision-camera';
 
 const getPlugin = (name: string) =>
   VisionCameraProxy.initFrameProcessorPlugin(name);

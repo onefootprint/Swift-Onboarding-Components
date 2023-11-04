@@ -1,4 +1,4 @@
-import { IdDI, InvestorProfileDI, VaultValue } from '../data';
+import type { IdDI, InvestorProfileDI, VaultValue } from '../data';
 
 export type UserDataRequest = {
   data: Partial<Record<IdDI | InvestorProfileDI, VaultValue>>;

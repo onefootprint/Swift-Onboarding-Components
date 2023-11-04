@@ -10,6 +10,7 @@ const Expired = () => {
 
   useEffect(() => {
     analytics.track(Events.Ended, { result: 'expired' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

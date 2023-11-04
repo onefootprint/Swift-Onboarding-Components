@@ -47,13 +47,14 @@
     },
     "passkeys": {
       "register": {
-        "title": "Confirm liveness using your passkey",
-        "subtitle": "We use this secure method for making sure your data is only accessed by you. ",
-        "cta": "Launch phone's passkeys",
+        "title": "Liveness check",
+        "subtitle": "With a face or touch ID check, we ensure your account is always securely accessed by you, keeping your personal details private and protected.",
+        "cta": "Launch verification",
+        "skip": "Do it later",
         "about": {
           "cta": "More about passkeys",
           "title": "About passkeys",
-          "content": "Passkeys are unique, secure codes replacing traditional usernames and passwords. They're your digital key for registration, streamlining access to our app while enhancing security. Each passkey is distinct, offering you a personalized entry point.",
+          "content": "Passkeys are our way of ditching complicated passwords. They're a simple, secure key to access the app, and they're unique to you! Say goodbye to remembering and typing passwords - your passkey does it all in a tap.",
           "close": "Close"
         }
       },

@@ -1,4 +1,4 @@
-import { D2PStatus } from '@onefootprint/types';
+import type { D2PStatus } from '@onefootprint/types';
 
 export type MachineContext = {
   authToken?: string;

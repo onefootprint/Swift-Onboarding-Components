@@ -1,7 +1,8 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 
-import { Box, BoxProps } from '../box';
+import type { BoxProps } from '../box';
+import Box from '../box';
 import Option from './components/radio-select-option';
 import type { RadioSelectOption, StringOrNumber } from './radio-select.types';
 

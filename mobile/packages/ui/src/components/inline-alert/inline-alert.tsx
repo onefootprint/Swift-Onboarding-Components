@@ -1,8 +1,8 @@
 import { IcoInfo16 } from '@onefootprint/icons';
 import React from 'react';
 
-import { Box } from '../box';
-import { Typography } from '../typography';
+import Box from '../box';
+import Typography from '../typography';
 
 export type InlineAlertProps = {
   children: string;

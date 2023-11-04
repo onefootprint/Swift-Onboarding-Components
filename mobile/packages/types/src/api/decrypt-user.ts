@@ -1,4 +1,4 @@
-import { DataIdentifier } from '../data';
+import type { DataIdentifier } from '../data';
 
 export type DecryptUserRequest = {
   fields: DataIdentifier[];

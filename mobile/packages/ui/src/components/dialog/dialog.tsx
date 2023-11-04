@@ -3,11 +3,11 @@ import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import Modal from 'react-native-modal';
 
-import { Box } from '../box';
-import { Button } from '../button';
-import { IconButton } from '../icon-button';
-import { StatusBar } from '../status-bar';
-import { Typography } from '../typography';
+import Box from '../box';
+import Button from '../button';
+import IconButton from '../icon-button';
+import StatusBar from '../status-bar';
+import Typography from '../typography';
 
 export type DialogProps = {
   children: React.ReactNode;

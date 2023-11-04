@@ -1,4 +1,4 @@
-import { Role } from '../data';
+import type { Role } from '../data';
 
 export type GetRolesRequest = {
   search?: string;

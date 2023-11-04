@@ -1,5 +1,5 @@
 import { IcoFaceid24 } from '@onefootprint/icons';
-import { Identifier } from '@onefootprint/types';
+import type { Identifier } from '@onefootprint/types';
 import { Box, Button } from '@onefootprint/ui';
 import React, { useState } from 'react';
 

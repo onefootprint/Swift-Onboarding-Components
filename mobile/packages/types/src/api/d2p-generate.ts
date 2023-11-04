@@ -1,4 +1,4 @@
-import { D2PMeta } from '../data';
+import type { D2PMeta } from '../data';
 
 export type D2PGenerateRequest = {
   authToken: string;

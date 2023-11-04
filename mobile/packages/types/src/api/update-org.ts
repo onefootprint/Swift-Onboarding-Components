@@ -1,4 +1,4 @@
-import { Organization, OrganizationSize } from '../data';
+import type { Organization, OrganizationSize } from '../data';
 
 export type UpdateOrgRequest = Partial<{
   name: string;

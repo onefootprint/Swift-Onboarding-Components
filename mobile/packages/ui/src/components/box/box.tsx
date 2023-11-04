@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import {
+import type {
   BackgroundColor,
   BorderColor,
   BorderRadius,

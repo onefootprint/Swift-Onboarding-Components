@@ -1,4 +1,4 @@
-import { BusinessDIData } from '../data';
+import type { BusinessDIData } from '../data';
 
 export type BusinessDataRequest = {
   data: BusinessDIData;

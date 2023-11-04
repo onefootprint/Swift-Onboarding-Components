@@ -1,4 +1,4 @@
-import { OnboardingStatus } from '../data';
+import type { OnboardingStatus } from '../data';
 
 export type SessionValidateRequest = {
   validationToken: string;

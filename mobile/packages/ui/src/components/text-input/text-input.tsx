@@ -2,7 +2,7 @@
 import styled, { css, useTheme } from '@onefootprint/styled';
 import React, { forwardRef, useRef, useState } from 'react';
 import mergeRefs from 'react-merge-refs';
-import {
+import type {
   NativeSyntheticEvent,
   TextInput as RNTextInput,
   TextInputFocusEventData,
@@ -10,9 +10,10 @@ import {
 } from 'react-native';
 import { useTimeout } from 'usehooks-ts';
 
-import { Box, BoxProps } from '../box';
-import { Hint } from '../hint';
-import { Label } from '../label';
+import type { BoxProps } from '../box';
+import Box from '../box';
+import Hint from '../hint';
+import Label from '../label';
 
 export type TextInputProps = {
   disabled?: boolean;

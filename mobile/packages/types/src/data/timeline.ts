@@ -1,14 +1,14 @@
-import { Annotation } from './annotation';
-import {
+import type { Annotation } from './annotation';
+import type {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from './collected-data-option';
-import { DecryptedIdDocStatus } from './decrypted-id-doc';
-import { SupportedIdDocTypes } from './id-doc-type';
-import { InsightEvent } from './insight-event';
-import { LivenessAttribute, LivenessSource } from './liveness';
-import { OnboardingDecision } from './onboarding-decision';
+import type { DecryptedIdDocStatus } from './decrypted-id-doc';
+import type { SupportedIdDocTypes } from './id-doc-type';
+import type { InsightEvent } from './insight-event';
+import type { LivenessAttribute, LivenessSource } from './liveness';
+import type { OnboardingDecision } from './onboarding-decision';
 
 export enum TimelineEventKind {
   dataCollected = 'data_collected',

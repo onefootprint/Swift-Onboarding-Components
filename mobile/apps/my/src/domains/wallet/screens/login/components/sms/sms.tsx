@@ -1,4 +1,4 @@
-import { Identifier } from '@onefootprint/types';
+import type { Identifier } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
 import Content from './components/content';
@@ -17,6 +17,8 @@ const Sms = ({ isApple, identifier, onSuccess }: SmsProps) => {
   const createChallenge = () => {
     mutate(identifier);
   };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(createChallenge, []);
 
   return (

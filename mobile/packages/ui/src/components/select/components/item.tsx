@@ -2,9 +2,9 @@ import { IcoCheck24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React, { useState } from 'react';
 
-import { Box } from '../../box';
-import { Pressable } from '../../pressable';
-import { Typography } from '../../typography';
+import Box from '../../box';
+import Pressable from '../../pressable';
+import Typography from '../../typography';
 
 type ItemProps = {
   label: string;
@@ -20,7 +20,6 @@ const Item = ({ label, selected, onPress }: ItemProps) => {
       onPress={onPress}
       onPressIn={() => setActive(true)}
       onPressOut={() => setActive(false)}
-      withImpact
     >
       <ItemContainer active={active}>
         <Label variant="body-4">{label}</Label>

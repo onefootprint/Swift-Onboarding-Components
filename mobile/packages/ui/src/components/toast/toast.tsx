@@ -4,7 +4,6 @@ import FlashMessage, {
   showMessage,
 } from 'react-native-flash-message';
 
-import haptic from '../../utils/haptic';
 import Notification from './components/notification';
 import type { MessageComponentProps, ShowToast } from './toast.types';
 
@@ -29,11 +28,6 @@ export const ToastProvider = () => (
 
 export const useToast = () => {
   const show = ({ description, title, variant, cta }: ShowToast) => {
-    if (variant === 'error') {
-      haptic.error();
-    } else {
-      haptic.impact();
-    }
     return showMessage({ description, message: title, cta, variant } as any);
   };
 

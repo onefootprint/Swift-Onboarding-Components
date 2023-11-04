@@ -68,6 +68,7 @@ const useCameraCountdown = (props: {
         handleNotDetected();
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [object.isDetected, disabled]);
 
   return {

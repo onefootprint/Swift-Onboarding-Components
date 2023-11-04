@@ -1,5 +1,5 @@
+import type { DataIdentifier } from '@onefootprint/types';
 import {
-  DataIdentifier,
   isVaultDataEmpty,
   isVaultDataEncrypted,
   isVaultDataText,

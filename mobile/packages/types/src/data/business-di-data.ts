@@ -1,6 +1,6 @@
-import { BeneficialOwner } from './beneficial-owner';
-import { CountryCode } from './countries';
-import { BusinessDI } from './di';
+import type { BeneficialOwner } from './beneficial-owner';
+import type { CountryCode } from './countries';
+import type { BusinessDI } from './di';
 
 export type BusinessDIData = Partial<{
   [BusinessDI.name]: string;

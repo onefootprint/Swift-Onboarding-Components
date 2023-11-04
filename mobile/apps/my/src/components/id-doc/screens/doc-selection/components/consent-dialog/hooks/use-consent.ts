@@ -1,5 +1,5 @@
 import request, { getErrorMessage } from '@onefootprint/request';
-import { ConsentRequest, ConsentResponse } from '@onefootprint/types';
+import type { ConsentRequest, ConsentResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation } from '@tanstack/react-query';
 

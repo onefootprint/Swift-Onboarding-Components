@@ -1,10 +1,10 @@
 import { IcoCloseSmall24, IcoInfo24, IcoWarning24 } from '@onefootprint/icons';
 import React from 'react';
 
-import { Box } from '../../box';
-import { IconButton } from '../../icon-button';
-import { LinkButton } from '../../link-button';
-import { Typography } from '../../typography';
+import Box from '../../box';
+import IconButton from '../../icon-button';
+import LinkButton from '../../link-button';
+import Typography from '../../typography';
 import type { NotificationVariants } from '../toast.types';
 
 export type NotificationProps = {

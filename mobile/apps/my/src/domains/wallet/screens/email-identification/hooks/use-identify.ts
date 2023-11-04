@@ -1,5 +1,5 @@
 import request from '@onefootprint/request';
-import { IdentifyRequest, IdentifyResponse } from '@onefootprint/types';
+import type { IdentifyRequest, IdentifyResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation } from '@tanstack/react-query';
 
@@ -34,9 +34,6 @@ const useIdentify = () => {
           variant: 'error',
           title: t('user-not-found.title'),
           description: t('user-not-found.description'),
-          cta: {
-            label: t('user-not-found.cta'),
-          },
         });
       }
     },

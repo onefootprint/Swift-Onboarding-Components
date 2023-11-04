@@ -1,4 +1,4 @@
-import { CountryRecord } from '@onefootprint/global-constants';
+import type { CountryRecord } from '@onefootprint/global-constants';
 import { UploadDocumentSide } from '@onefootprint/types';
 import { useState } from 'react';
 import { useSharedValue } from 'react-native-reanimated';

@@ -1,12 +1,9 @@
 import { getCountryFromCode } from '@onefootprint/global-constants';
-import {
-  CountryCode,
-  IdDocRequirement,
-  UploadDocumentSide,
-} from '@onefootprint/types';
+import type { CountryCode, IdDocRequirement } from '@onefootprint/types';
+import { UploadDocumentSide } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import { MachineContext, MachineEvents } from './types';
+import type { MachineContext, MachineEvents } from './types';
 
 const createIdDocMachine = (requirement: IdDocRequirement) =>
   createMachine(
@@ -17,6 +14,7 @@ const createIdDocMachine = (requirement: IdDocRequirement) =>
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       tsTypes: {} as import('./machine.typegen').Typegen0,
       context: {
         requirement,

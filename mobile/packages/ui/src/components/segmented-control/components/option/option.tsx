@@ -1,10 +1,9 @@
-import { Icon } from '@onefootprint/icons';
+import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import * as React from 'react';
 
-import haptic from '../../../../utils/haptic';
-import { Pressable } from '../../../pressable';
-import { Typography } from '../../../typography';
+import Pressable from '../../../pressable';
+import Typography from '../../../typography';
 
 export type OptionFields = {
   value: string;
@@ -25,7 +24,6 @@ const Option = ({
   onPress,
 }: OptionProps) => {
   const handlePress = () => {
-    haptic.impact();
     onPress?.();
   };
 

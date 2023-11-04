@@ -1,8 +1,10 @@
 import request from '@onefootprint/request';
-import { ChallengeKind, DecryptResponse, IdDI } from '@onefootprint/types';
+import type { DecryptResponse } from '@onefootprint/types';
+import { ChallengeKind, IdDI } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
-import useSession, { AuthHeaders } from '@/domains/wallet/hooks/use-session';
+import type { AuthHeaders } from '@/domains/wallet/hooks/use-session';
+import useSession from '@/domains/wallet/hooks/use-session';
 
 const getVaultData = async (
   authHeaders: AuthHeaders,

@@ -1,4 +1,4 @@
-import { Entity } from '../data';
+import type { Entity } from '../data';
 
 export type GetEntityRequest = {
   id: string;

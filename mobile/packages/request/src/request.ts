@@ -1,5 +1,6 @@
 import { DataIdentifierKeys } from '@onefootprint/types';
-import axios, { AxiosError, AxiosRequestConfig as RequestConfig } from 'axios';
+import type { AxiosError, AxiosRequestConfig as RequestConfig } from 'axios';
+import axios from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
 
 const LOGOUT_ERROR = 'Session expired or does not exist';

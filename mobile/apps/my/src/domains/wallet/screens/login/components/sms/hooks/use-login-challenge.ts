@@ -1,9 +1,6 @@
 import request from '@onefootprint/request';
-import {
-  ChallengeKind,
-  Identifier,
-  LoginChallengeResponse,
-} from '@onefootprint/types';
+import type { Identifier, LoginChallengeResponse } from '@onefootprint/types';
+import { ChallengeKind } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 const loginChallenge = async (identifier: Identifier) => {

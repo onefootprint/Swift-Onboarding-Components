@@ -1,4 +1,4 @@
-import {
+import type {
   ImageProps,
   ImageStyle,
   StyleProp,

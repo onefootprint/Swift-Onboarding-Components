@@ -1,5 +1,5 @@
-import { Role } from './role';
-import { Rolebinding } from './rolebinding';
+import type { Role } from './role';
+import type { Rolebinding } from './rolebinding';
 
 export type Member = {
   id: string;

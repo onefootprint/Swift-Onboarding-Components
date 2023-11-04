@@ -2,7 +2,7 @@ import { D2PStatus } from '@onefootprint/types';
 import { createMachine } from 'xstate';
 
 import type { Typegen0 } from './machine.typegen';
-import { MachineContext, MachineEvents } from './types';
+import type { MachineContext, MachineEvents } from './types';
 
 const createHandoffMachine = (authToken: string) =>
   createMachine({

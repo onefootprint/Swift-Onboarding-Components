@@ -1,12 +1,12 @@
 import request, { getErrorMessage } from '@onefootprint/request';
-import {
+import type {
   BiometricLoginChallengeJson,
-  ChallengeKind,
   Identifier,
   IdentifyVerifyRequest,
   IdentifyVerifyResponse,
   LoginChallengeResponse,
 } from '@onefootprint/types';
+import { ChallengeKind } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation } from '@tanstack/react-query';
 import base64url from 'base64url';

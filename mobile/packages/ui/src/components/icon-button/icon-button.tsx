@@ -1,8 +1,8 @@
 import type { Icon } from '@onefootprint/icons';
 import React, { useState } from 'react';
 
-import { Box } from '../box';
-import { Pressable } from '../pressable';
+import Box from '../box';
+import Pressable from '../pressable';
 
 export type IconButtonProps = {
   'aria-label': string;

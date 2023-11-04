@@ -1,4 +1,7 @@
-import { SupportedIdDocTypes, UploadDocumentSide } from '@onefootprint/types';
+import type {
+  SupportedIdDocTypes,
+  UploadDocumentSide,
+} from '@onefootprint/types';
 import { useState } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
 import { useFrameProcessor as useVCFrameProcessor } from 'react-native-vision-camera';

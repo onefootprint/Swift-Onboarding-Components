@@ -1,4 +1,4 @@
-import { Role, RoleScope } from '../data';
+import type { Role, RoleScope } from '../data';
 
 export type UpdateRoleRequest = {
   name: string;

@@ -1,5 +1,5 @@
 import request from '@onefootprint/request';
-import { UploadDocRequest, UploadDocResponse } from '@onefootprint/types';
+import type { UploadDocRequest, UploadDocResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import { Platform } from 'react-native';
 

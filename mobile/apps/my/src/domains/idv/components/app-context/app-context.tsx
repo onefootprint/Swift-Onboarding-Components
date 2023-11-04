@@ -1,4 +1,4 @@
-import { IdDocOutcomes } from '@onefootprint/types';
+import type { IdDocOutcomes } from '@onefootprint/types';
 import { createContext } from 'react';
 
 const AppContext = createContext<{

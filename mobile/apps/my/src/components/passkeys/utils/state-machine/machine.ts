@@ -1,6 +1,6 @@
 import { createMachine } from 'xstate';
 
-import { MachineEvents } from './types';
+import type { MachineEvents } from './types';
 
 export const createPasskeysMachine = () =>
   createMachine({
@@ -9,6 +9,7 @@ export const createPasskeysMachine = () =>
     schema: {
       events: {} as MachineEvents,
     },
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     tsTypes: {} as import('./machine.typegen').Typegen0,
     initial: 'register',
     context: {},

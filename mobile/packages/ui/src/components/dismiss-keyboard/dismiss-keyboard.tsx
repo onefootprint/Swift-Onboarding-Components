@@ -1,7 +1,7 @@
 import React from 'react';
 import { Keyboard, TouchableWithoutFeedback } from 'react-native';
 
-import { Box } from '../box';
+import Box from '../box';
 
 export type DismissKeyboardProps = {
   accessible?: boolean;

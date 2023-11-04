@@ -1,9 +1,11 @@
-import { COUNTRIES, CountryRecord } from '@onefootprint/global-constants';
+import type { CountryRecord } from '@onefootprint/global-constants';
+import { COUNTRIES } from '@onefootprint/global-constants';
 import React from 'react';
 
-import { Box } from '../box';
-import { Select, SelectOption } from '../select';
-import { Typography } from '../typography';
+import Box from '../box';
+import type { SelectOption } from '../select';
+import Select from '../select';
+import Typography from '../typography';
 
 export type CountrySelectProps = {
   disabled?: boolean;

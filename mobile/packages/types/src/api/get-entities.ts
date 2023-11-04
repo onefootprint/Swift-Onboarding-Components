@@ -1,4 +1,4 @@
-import { Entity, EntityKind } from '../data';
+import type { Entity, EntityKind } from '../data';
 
 export type GetEntitiesRequest = {
   kind?: EntityKind;

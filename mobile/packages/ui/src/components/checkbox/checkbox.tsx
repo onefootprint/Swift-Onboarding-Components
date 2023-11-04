@@ -2,9 +2,9 @@ import { IcoCheckSmall16 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
 import React from 'react';
 
-import { Box } from '../box';
-import { Pressable } from '../pressable';
-import { Typography } from '../typography';
+import Box from '../box';
+import Pressable from '../pressable';
+import Typography from '../typography';
 
 export type CheckboxProps = {
   label?: string;

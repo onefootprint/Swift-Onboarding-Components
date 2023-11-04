@@ -1,9 +1,10 @@
 import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React, { useState } from 'react';
-import { GestureResponderEvent, Text } from 'react-native';
+import type { GestureResponderEvent } from 'react-native';
+import { Text } from 'react-native';
 
-import { Pressable } from '../pressable';
+import Pressable from '../pressable';
 import type { LinkButtonSize, LinkButtonVariant } from './link-button.types';
 
 type IconPosition = 'left' | 'right';

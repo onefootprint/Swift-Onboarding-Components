@@ -1,4 +1,4 @@
-import { ReviewStatus } from '../data';
+import type { ReviewStatus } from '../data';
 
 export type SubmitReviewRequest = {
   entityId: string;

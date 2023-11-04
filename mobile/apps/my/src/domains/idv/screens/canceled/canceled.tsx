@@ -10,6 +10,7 @@ const Canceled = () => {
 
   useEffect(() => {
     analytics.track(Events.Ended, { result: 'canceled' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

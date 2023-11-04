@@ -1,4 +1,4 @@
-import { IdDocBadImageError } from '../data';
+import type { IdDocBadImageError } from '../data';
 
 export type GetDocStatusRequest = {
   authToken: string;

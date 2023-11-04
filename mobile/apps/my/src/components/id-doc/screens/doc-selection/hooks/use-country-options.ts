@@ -1,5 +1,5 @@
 import { getCountryFromCode } from '@onefootprint/global-constants';
-import {
+import type {
   CountryCode,
   IdDocSupportedCountryAndDocTypes,
 } from '@onefootprint/types';

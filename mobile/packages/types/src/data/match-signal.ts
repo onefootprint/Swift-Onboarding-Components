@@ -1,4 +1,4 @@
-import { RiskSignalSeverity } from './risk-signal';
+import type { RiskSignalSeverity } from './risk-signal';
 
 export enum MatchLevel {
   NoMatch = 'no_match',

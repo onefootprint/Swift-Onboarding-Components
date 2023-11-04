@@ -1,7 +1,8 @@
-import { DataIdentifier, DocumentDI, InvestorProfileDI } from './di';
-import { Onboarding } from './onboarding';
-import { WatchlistCheckEventData } from './timeline';
-import { VaultValue } from './vault';
+import type { DataIdentifier } from './di';
+import { DocumentDI, InvestorProfileDI } from './di';
+import type { Onboarding } from './onboarding';
+import type { WatchlistCheckEventData } from './timeline';
+import type { VaultValue } from './vault';
 
 export type EntityVault = Partial<Record<DataIdentifier, VaultValue>>;
 

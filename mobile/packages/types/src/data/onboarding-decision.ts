@@ -1,12 +1,12 @@
-import {
+import type {
   ActorApiKey,
   ActorFirmEmployee,
   ActorFootprint,
   ActorOrganization,
 } from './actor';
-import { CollectedDataOption } from './collected-data-option';
-import DecisionStatus from './decision-status';
-import Vendor from './vendor';
+import type { CollectedDataOption } from './collected-data-option';
+import type DecisionStatus from './decision-status';
+import type Vendor from './vendor';
 
 export type DecisionSource =
   | ActorFootprint

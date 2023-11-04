@@ -1,4 +1,4 @@
-import { Organization } from '../data';
+import type { Organization } from '../data';
 
 export type GetOrgRequest = {};
 

@@ -1,4 +1,4 @@
-import { CountryRecord } from '@onefootprint/global-constants';
+import type { CountryRecord } from '@onefootprint/global-constants';
 import { getErrorMessage } from '@onefootprint/request';
 import type {
   SupportedIdDocTypes,
@@ -11,7 +11,7 @@ import { PREVIEW_AUTH_TOKEN } from '@/config/constants';
 import useTranslation from '@/hooks/use-translation';
 import { Events, useAnalytics } from '@/utils/analytics';
 
-import { Document } from '../../doc-scan.types';
+import type { Document } from '../../doc-scan.types';
 import Error from './components/error';
 import Loading from './components/loading';
 import Success from './components/success';

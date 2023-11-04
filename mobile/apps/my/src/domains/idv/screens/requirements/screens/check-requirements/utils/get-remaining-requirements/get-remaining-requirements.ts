@@ -1,7 +1,5 @@
-import {
-  OnboardingRequirement,
-  OnboardingRequirementKind,
-} from '@onefootprint/types';
+import type { OnboardingRequirement } from '@onefootprint/types';
+import { OnboardingRequirementKind } from '@onefootprint/types';
 
 import type { RemainingRequirements } from '../../../../requirement.types';
 

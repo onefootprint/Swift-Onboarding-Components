@@ -1,5 +1,5 @@
-import { InsightEvent } from './insight-event';
-import OnboardingStatus from './onboarding-status';
+import type { InsightEvent } from './insight-event';
+import type OnboardingStatus from './onboarding-status';
 
 export type Onboarding = {
   configId: string;

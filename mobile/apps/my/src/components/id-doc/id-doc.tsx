@@ -2,7 +2,7 @@ import {
   DEFAULT_COUNTRY,
   getCountryFromCode,
 } from '@onefootprint/global-constants';
-import { IdDocRequirement } from '@onefootprint/types';
+import type { IdDocRequirement } from '@onefootprint/types';
 import { useMachine } from '@xstate/react';
 import React, { useEffect } from 'react';
 
@@ -36,6 +36,7 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
       });
       onDone();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, onDone]);
 
   if (state.matches('docSelection')) {

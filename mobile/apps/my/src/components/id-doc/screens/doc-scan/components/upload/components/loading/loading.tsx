@@ -9,7 +9,7 @@ const Loading = () => {
   return (
     <Box gap={5}>
       <Box>
-        <LoadingIndicator size="default" />
+        <LoadingIndicator />
       </Box>
       <Box gap={3} center>
         <Typography variant="label-1">{t('title')}</Typography>

@@ -1,7 +1,7 @@
 import themes from '@onefootprint/design-tokens';
 
 import createTheme, { createTokens } from './create-theme';
-import { FootprintAppearanceVariables } from './theme.types';
+import type { FootprintAppearanceVariables } from './theme.types';
 
 const defaultTheme = themes.light;
 

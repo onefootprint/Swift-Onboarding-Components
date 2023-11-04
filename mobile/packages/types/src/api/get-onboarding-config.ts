@@ -1,4 +1,4 @@
-import { ObConfigAuth, OnboardingConfig } from '../data';
+import type { ObConfigAuth, OnboardingConfig } from '../data';
 
 export type GetOnboardingConfigRequest = {
   obConfigAuth?: ObConfigAuth;

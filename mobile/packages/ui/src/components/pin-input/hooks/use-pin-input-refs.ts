@@ -1,5 +1,6 @@
-import { createRef, MutableRefObject, useEffect, useState } from 'react';
-import { TextInput } from 'react-native';
+import type { MutableRefObject } from 'react';
+import { createRef, useEffect, useState } from 'react';
+import type { TextInput } from 'react-native';
 
 const usePinInputRefs = (pinInputCount: number) => {
   const [refs, setRefs] = useState<MutableRefObject<TextInput>[]>([]);

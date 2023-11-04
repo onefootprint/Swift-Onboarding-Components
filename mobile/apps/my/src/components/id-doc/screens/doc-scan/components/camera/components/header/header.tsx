@@ -25,13 +25,7 @@ const Header = ({ children, onBack }: HeaderProps) => {
   return (
     <>
       <StatusBar height={insets.top} />
-      <Container
-        alignItems="flex-end"
-        flexDirection="row"
-        height={height}
-        justifyContent="space-between"
-        top={insets.top}
-      >
+      <Container height={height} top={insets.top}>
         <Box>
           {onBack ? (
             <Pressable onPress={onBack}>
@@ -72,8 +66,9 @@ const StatusBar = styled.View<{ height: number }>`
 
 const Container = styled.View<{ height: number; top: number }>`
   ${({ theme, height, top }) => css`
-    align-items: center;
-    align-items: center;
+    align-items: flex-end;
+    flex-direction: row;
+    justify-content: space-between;
     background: ${theme.backgroundColor.primary};
     height: ${height}px;
     padding-horizontal: ${theme.spacing[3]};

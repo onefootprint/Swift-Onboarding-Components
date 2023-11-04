@@ -2,7 +2,7 @@ import queryString from 'query-string';
 import { Platform } from 'react-native';
 import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 
-import { OpenFootprint } from './footprint.types';
+import type { OpenFootprint } from './footprint.types';
 import getURL from './utils/create-url';
 
 const getDeepLink = (baseScheme?: string) => {

@@ -8,5 +8,5 @@
       "packages/*/src//.test.tsx",
       "packages/*/src//.test.ts",
       "packages/*/types//"
-    ],
+    ]
   }

@@ -1,5 +1,5 @@
 import styled from '@onefootprint/styled';
-import { CollectedDataOption } from '@onefootprint/types';
+import type { CollectedDataOption } from '@onefootprint/types';
 import { Box, Tag, Typography } from '@onefootprint/ui';
 import React from 'react';
 

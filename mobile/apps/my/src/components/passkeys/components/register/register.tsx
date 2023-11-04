@@ -1,5 +1,11 @@
 import { IcoFaceid40 } from '@onefootprint/icons';
-import { Box, Button, Container, Typography } from '@onefootprint/ui';
+import {
+  Box,
+  Button,
+  Container,
+  LinkButton,
+  Typography,
+} from '@onefootprint/ui';
 import React from 'react';
 
 import useTranslation from '@/hooks/use-translation';
@@ -7,15 +13,15 @@ import { Events, useAnalytics } from '@/utils/analytics';
 
 import useRegisterBiometric from '../../hooks/use-register-biometric';
 import Success from '../success';
-import About from './components/about';
 
 export type RegisterProps = {
   authToken: string;
   onSuccess?: (deviceResponseJson: string) => void;
   onError?: (error: unknown) => void;
+  onSkip?: () => void;
 };
 
-const Register = ({ authToken, onSuccess, onError }: RegisterProps) => {
+const Register = ({ authToken, onSkip, onSuccess, onError }: RegisterProps) => {
   const { t } = useTranslation('components.passkeys.register');
   const registerBiometric = useRegisterBiometric();
   const analytics = useAnalytics();
@@ -41,7 +47,7 @@ const Register = ({ authToken, onSuccess, onError }: RegisterProps) => {
           <Button onPress={handlePress} loading={registerBiometric.isLoading}>
             {t('cta')}
           </Button>
-          <About ctaDisabled={registerBiometric.isLoading} />
+          <LinkButton onPress={onSkip}>{t('skip')}</LinkButton>
         </Box>
       )}
     </Container>

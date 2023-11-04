@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Box } from '../box';
-import { Typography } from '../typography';
+import Box from '../box';
+import Typography from '../typography';
 
 export type TagProps = {
   children: string;

@@ -1,13 +1,15 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Color } from '@onefootprint/design-tokens';
-import { Icon } from '@onefootprint/icons';
+import type { Color } from '@onefootprint/design-tokens';
+import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React, { useState } from 'react';
-import { GestureResponderEvent, Text } from 'react-native';
+import type { GestureResponderEvent } from 'react-native';
+import { Text } from 'react-native';
 
-import { Box, BoxProps } from '../box';
-import { LoadingIndicator } from '../loading-indicator';
-import { Pressable } from '../pressable';
+import type { BoxProps } from '../box';
+import Box from '../box';
+import LoadingIndicator from '../loading-indicator';
+import Pressable from '../pressable';
 import type { ButtonVariant } from './button.types';
 
 export type ButtonProps = BoxProps & {

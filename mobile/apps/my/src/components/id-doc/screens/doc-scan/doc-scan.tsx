@@ -1,4 +1,4 @@
-import { CountryRecord } from '@onefootprint/global-constants';
+import type { CountryRecord } from '@onefootprint/global-constants';
 import { SupportedIdDocTypes, UploadDocumentSide } from '@onefootprint/types';
 import React from 'react';
 

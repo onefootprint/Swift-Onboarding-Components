@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { Box } from '../../box';
-import { LinkButton } from '../../link-button';
-import { Typography } from '../../typography';
+import Box from '../../box';
+import LinkButton from '../../link-button';
+import Typography from '../../typography';
 
 type EmptyStateProps = {
   title: string;
