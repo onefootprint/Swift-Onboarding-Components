@@ -81,19 +81,6 @@ const DocSelection = ({
     }
   };
 
-  const handleContinue = () => {
-    if (shouldCollectConsent && !showConsent) {
-      setShowConsent(true);
-    } else {
-      submit();
-    }
-  };
-
-  const handleConsentSubmit = () => {
-    onConsentCompleted();
-    submit();
-  };
-
   const submit = () => {
     analytics.track(Events.DocSelectionSubmitted, {
       docType,
@@ -125,42 +112,60 @@ const DocSelection = ({
     }
   };
 
+  const handleContinue = () => {
+    if (shouldCollectConsent && !showConsent) {
+      setShowConsent(true);
+    } else {
+      submit();
+    }
+  };
+
+  const handleConsentSubmit = () => {
+    setShowConsent(false);
+    onConsentCompleted();
+    submit();
+  };
+
   return (
-    <ScrollLayout
-      Footer={
-        <PermissionsDialog onGranted={handleContinue}>
-          <Button onPress={handleContinue}>{t('cta')}</Button>
-        </PermissionsDialog>
-      }
-    >
-      <Box center marginBottom={7}>
-        <Typography variant="heading-3" marginTop={7} marginBottom={3}>
-          {t('title')}
-        </Typography>
-        <Typography variant="body-2">{t('subtitle')}</Typography>
-      </Box>
-      <Box justifyContent="space-between" flex={1}>
-        <Box>
-          <CountrySelect
-            disabled={oneCountrySupported}
-            hint={countrySelectHint}
-            onChange={handleCountryChange}
-            options={countryOptions}
-            value={country}
-          />
-          <Divider marginVertical={7} />
-          <RadioSelect<SupportedIdDocTypes>
-            marginBottom={10}
-            onChange={setDocType}
-            options={docTypeOptions}
-            value={docType}
-          />
+    <>
+      <ScrollLayout
+        Footer={
+          <PermissionsDialog onGranted={handleContinue}>
+            <Button onPress={handleContinue}>{t('cta')}</Button>
+          </PermissionsDialog>
+        }
+      >
+        <Box center marginBottom={7}>
+          <Typography variant="heading-3" marginTop={7} marginBottom={3}>
+            {t('title')}
+          </Typography>
+          <Typography variant="body-2">{t('subtitle')}</Typography>
         </Box>
-      </Box>
-      {showConsent && (
-        <ConsentDialog authToken={authToken} onSubmit={handleConsentSubmit} />
-      )}
-    </ScrollLayout>
+        <Box justifyContent="space-between" flex={1}>
+          <Box>
+            <CountrySelect
+              disabled={oneCountrySupported}
+              hint={countrySelectHint}
+              onChange={handleCountryChange}
+              options={countryOptions}
+              value={country}
+            />
+            <Divider marginVertical={7} />
+            <RadioSelect<SupportedIdDocTypes>
+              marginBottom={10}
+              onChange={setDocType}
+              options={docTypeOptions}
+              value={docType}
+            />
+          </Box>
+        </Box>
+      </ScrollLayout>
+      <ConsentDialog
+        authToken={authToken}
+        onSubmit={handleConsentSubmit}
+        open={showConsent}
+      />
+    </>
   );
 };
 

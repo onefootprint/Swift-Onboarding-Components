@@ -11,16 +11,16 @@ import useConsent from './hooks/use-consent';
 export type ConsentDialogProps = {
   authToken: string;
   onSubmit: () => void;
+  open: boolean;
 };
 
 const HEADER_HEIGHT = 56;
 const SHOW_HEADER_THRESHOLD = 30;
 const SHOW_CTA_THRESHOLD = 700;
 
-const ConsentDialog = ({ authToken, onSubmit }: ConsentDialogProps) => {
+const ConsentDialog = ({ open, authToken, onSubmit }: ConsentDialogProps) => {
   const { t } = useTranslation('scan.consent');
   const consentMutation = useConsent();
-  const [open, setOpen] = useState(true);
   const [isThirdPartyConsented, setIsThirdPartyConsented] = useState(false);
   const [hasReadConsent, setHasReadConsent] = useState(false);
   const [showSheetHeader, setShowSheetHeader] = useState(false);
@@ -55,7 +55,6 @@ const ConsentDialog = ({ authToken, onSubmit }: ConsentDialogProps) => {
       { consentLanguageText, authToken },
       {
         onSuccess: () => {
-          setOpen(false);
           onSubmit();
         },
       },

@@ -121,7 +121,6 @@ const createIdDocMachine = (requirement: IdDocRequirement) =>
           };
         }),
         assignConsent: assign(context => {
-          console.log('assign consent');
           return {
             ...context,
             requirement: {

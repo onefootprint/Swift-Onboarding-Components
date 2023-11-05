@@ -18,8 +18,7 @@ const PermissionsDialog = ({ children, onGranted }: PermissionsDialogProps) => {
   const [permissions, setPermission] = useState<CameraPermissionStatus | null>(
     null,
   );
-  const isNonDetermined =
-    permissions === 'not-determined' || permissions === 'denied';
+  const isDenied = permissions === 'denied';
   const analytics = useAnalytics();
 
   const setInitialPermissions = async () => {
@@ -36,8 +35,11 @@ const PermissionsDialog = ({ children, onGranted }: PermissionsDialogProps) => {
   const handleAskPermission = async () => {
     try {
       const response = await Camera.requestCameraPermission();
+      setPermission(response);
+
       if (response === 'granted') {
         analytics.track(Events.DocCameraPermissionsGranted);
+        setOpen(false);
         onGranted();
       }
       if (response === 'denied') {
@@ -71,14 +73,14 @@ const PermissionsDialog = ({ children, onGranted }: PermissionsDialogProps) => {
         open={open}
         onClose={handleClose}
         cta={
-          isNonDetermined
+          isDenied
             ? {
-                label: t('continue'),
-                onPress: handleAskPermission,
-              }
-            : {
                 label: t('open-settings'),
                 onPress: handleOpenSettings,
+              }
+            : {
+                label: t('continue'),
+                onPress: handleAskPermission,
               }
         }
       >
