@@ -129,7 +129,9 @@ const Camera = ({
       <Buttons>
         {isAutoCaptureEnabled && showFeedback ? (
           <>
-            {object.feedback && <Feedback>{object.feedback}</Feedback>}
+            {object.feedback && cameraDetection.countdown < 3 && (
+              <Feedback>{object.feedback}</Feedback>
+            )}
             {object.isDetected && cameraDetection.countdown > 3 && (
               <Feedback>Hold still...</Feedback>
             )}
