@@ -1,5 +1,6 @@
 import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
 import Postmate from '@onefootprint/postmate';
+import type { IdvBootstrapData, IdvOptions } from '@onefootprint/types';
 
 import type { FootprintClient } from '../types';
 import EventEmitter from '../utils/event-emitter/event-emmiter';
@@ -11,7 +12,7 @@ class IframeAdapter implements FootprintClient {
 
   async load() {
     const postmate = await new Postmate.Model({
-      [FootprintPrivateEvent.propsReceived]: (data?: any) => {
+      [FootprintPrivateEvent.propsReceived]: (data?: unknown) => {
         this.eventEmitter.emit(FootprintPrivateEvent.propsReceived, data);
       },
       [FootprintPrivateEvent.formSaved]: () => {
@@ -22,7 +23,7 @@ class IframeAdapter implements FootprintClient {
     this.start();
   }
 
-  send(event: string, data?: any) {
+  send(event: string, data?: unknown) {
     this.sendEventToParent(event, data);
   }
 
@@ -30,11 +31,14 @@ class IframeAdapter implements FootprintClient {
     this.sendEventToParent(FootprintPrivateEvent.started);
   }
 
-  on(name: string, callback: (result: unknown) => void) {
+  on(
+    name: string,
+    callback: ((data: IdvBootstrapData) => void) | ((data: IdvOptions) => void),
+  ) {
     return this.eventEmitter.on(name, callback);
   }
 
-  private sendEventToParent(eventName: string, data?: any) {
+  private sendEventToParent(eventName: string, data?: unknown) {
     if (this.postmate) {
       this.postmate.emit(eventName, data);
     } else {

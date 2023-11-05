@@ -40,6 +40,7 @@ export type BaseSelectProps<Option extends BaseSelectOption> = {
   searchPlaceholder?: string;
   size?: BaseSelectSize;
   value?: Option;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   OptionComponent?: React.ComponentType<OptionProps<any, false, any>>;
   testID?: string;
 };

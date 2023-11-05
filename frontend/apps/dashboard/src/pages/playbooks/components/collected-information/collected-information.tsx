@@ -2,11 +2,13 @@ import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import kebabCase from 'lodash/kebabCase';
+import type { ComponentProps } from 'react';
 import React from 'react';
 
 import type { Option } from './collected-information.types';
 import DisplayValue from './components/display-value';
 
+type DisplayValueProps = ComponentProps<typeof DisplayValue>;
 type CollectedInformationProps = {
   title: string;
   subtitle?: string;
@@ -33,7 +35,10 @@ const CollectedInformation = ({
                 <Label variant="body-3" color="tertiary">
                   {t(kebabCase(name))}
                 </Label>
-                <DisplayValue name={name as any} value={value} />
+                <DisplayValue
+                  name={name as DisplayValueProps['name']}
+                  value={value}
+                />
               </OptionItem>
             );
           })}

@@ -34,7 +34,7 @@ describe('<Table />', () => {
         columns={columns}
         emptyStateText={emptyStateText}
         getAriaLabelForRow={getAriaLabelForRow}
-        getKeyForRow={(item: any) => item.id}
+        getKeyForRow={item => item.id}
         hideThead={hideThead}
         isLoading={isLoading}
         items={items}
@@ -104,7 +104,7 @@ describe('<Table />', () => {
             { id: '1', name: 'John Doe', age: 32 },
             { id: '2', name: 'Jane Doe', age: 31 },
           ],
-          getAriaLabelForRow: (item: any) => item.name,
+          getAriaLabelForRow: item => item.name,
         });
 
         const row = screen.getByRole('row', { name: 'John Doe' });

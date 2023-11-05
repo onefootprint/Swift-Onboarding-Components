@@ -47,9 +47,9 @@ const useUpdateRoleId = () => {
         });
         return { previousApiKeys };
       },
-      onError: (err, updatedApiKey, context: any) => {
+      onError: (err, updatedApiKey, context) => {
         console.error('Updating role id failed', getErrorMessage(err));
-        if (context.previousApiKeys) {
+        if (context?.previousApiKeys) {
           queryClient.setQueryData(
             ['api-keys', authHeaders],
             context.previousApiKeys,

@@ -6,10 +6,10 @@ class WebView implements FootprintClient {
     return params.get('redirect_url');
   }
 
-  setLocation = (data: Record<string, any> = {}) => {
+  setLocation = (data: Record<string, string | boolean> = {}) => {
     const params = new URLSearchParams();
     Object.entries(data).forEach(([key, value]) => {
-      params.set(key, value);
+      params.set(key, value as string);
     });
     window.location.href = `${this.redirectUrl}?${params.toString()}`;
   };

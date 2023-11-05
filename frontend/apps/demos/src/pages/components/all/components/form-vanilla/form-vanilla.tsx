@@ -1,13 +1,15 @@
 import React from 'react';
-import { COMPONENTS_AUTH_TOKEN } from 'src/config/constants';
 import { useEffectOnce } from 'usehooks-ts';
+
+import { COMPONENTS_AUTH_TOKEN } from '../../../../../config/constants';
 
 const FormVanilla = () => {
   useEffectOnce(() => {
     if (!window) {
       return;
     }
-    (window as any).footprintCallbacks = {
+    // @ts-expect-error: footprintCallbacks is custom
+    window.footprintCallbacks = {
       onComplete: () => {
         console.log('complete');
       },

@@ -9,7 +9,10 @@ const order: Record<string, number> = {
   billing_address: 6,
 };
 
-const filter = (attributes: DataIdentifier[], search: any) => {
+const filter = (
+  attributes: DataIdentifier[],
+  search: string | null | undefined,
+) => {
   const hiddenAttributes = [
     'expiration_month',
     'expiration_year',
@@ -47,7 +50,10 @@ export const getCustomDIs = (data: EntityVault) => {
   return filtered as DataIdentifier[];
 };
 
-const getDis = (attributes: DataIdentifier[], search: any) => {
+const getDis = (
+  attributes: DataIdentifier[],
+  search: string | null | undefined,
+) => {
   const filtered = filter(attributes, search);
   const sorted = sort(filtered);
   return sorted;

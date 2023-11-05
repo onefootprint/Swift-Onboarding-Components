@@ -6,7 +6,7 @@ export type Option = Partial<{
   dob: boolean;
   email: boolean;
   fullAddress: boolean;
-  idDocs: any;
+  idDocs: Record<string, unknown>;
   idDocKind: SupportedIdDocTypes[];
   phoneNumber: boolean;
   selfie: boolean;

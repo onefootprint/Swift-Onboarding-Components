@@ -26,6 +26,7 @@ const Nationality = ({ di, entity }: NationalityType) => {
       di={di}
       entity={entity}
       renderValue={value => {
+        // @ts-expect-error: Argument of type 'VaultValue' is not assignable to parameter of type 'string | null | undefined'.
         if (checkCountryCode(value)) {
           return (
             <FlagContainer>

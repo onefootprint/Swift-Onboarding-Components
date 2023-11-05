@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import type { RequestError } from '@onefootprint/request';
 import request, { getErrorMessage } from '@onefootprint/request';
 import type { OrgAuthLoginResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
@@ -21,9 +22,9 @@ const useLogin = () => {
   const toast = useToast();
 
   return useMutation(login, {
-    onError: (e: any) => {
+    onError(e: RequestError): void {
       let description;
-      if (e.response.status === 401) {
+      if (e.response?.status === 401) {
         description = e.response.data.error.message;
       } else {
         description = t('workos-error.description');

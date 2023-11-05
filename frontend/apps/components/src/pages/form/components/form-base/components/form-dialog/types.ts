@@ -3,7 +3,7 @@ export type FormDialogButton = {
   form?: string;
   label: string;
   loading?: boolean;
-  onClick?: (dataSubmitted?: any) => void;
+  onClick?: (dataSubmitted?: unknown) => void;
   type?: 'button' | 'submit' | 'reset';
 };
 

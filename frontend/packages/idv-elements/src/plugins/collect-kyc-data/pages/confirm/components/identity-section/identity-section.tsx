@@ -110,7 +110,8 @@ const IdentitySection = () => {
     const decryptedData: KycData = {};
     Object.entries(payload).forEach(([key, value]) => {
       decryptedData[key as IdDI] = {
-        value: (value as any) ?? '',
+        // @ts-expect-error: fix-me Type 'string | string[]' is not assignable to type 'undefined'.
+        value: value ?? '',
         decrypted: true,
       };
     });

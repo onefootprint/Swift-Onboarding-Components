@@ -21,6 +21,7 @@ const Box = forwardRef<HTMLElement, BoxProps>(
       sx,
       ...props
     }: BoxProps,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ref: any,
   ) => {
     const sxStyles = useSX(sx);

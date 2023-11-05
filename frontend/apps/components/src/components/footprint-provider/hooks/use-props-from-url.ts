@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
-type BaseProps = Record<string, any>;
+type BaseProps = Record<string, unknown>;
 
 const getParsedProps = (props: string) => {
   let parsedProps;
@@ -15,7 +15,7 @@ const getParsedProps = (props: string) => {
   return parsedProps || {};
 };
 
-const isPropsValid = (props: any) =>
+const isPropsValid = (props: unknown) =>
   !!props && typeof props === 'object' && props !== null;
 
 const usePropsFromUrl = <T extends BaseProps>(

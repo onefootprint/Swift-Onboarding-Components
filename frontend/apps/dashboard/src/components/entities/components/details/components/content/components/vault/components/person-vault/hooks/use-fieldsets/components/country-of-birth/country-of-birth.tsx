@@ -23,6 +23,7 @@ const CountryOfBirth = ({ di, entity }: CountryOfBirthType) => {
       di={di}
       entity={entity}
       renderValue={value => {
+        // @ts-expect-error: Argument of type 'VaultValue' is not assignable to parameter of type 'string | null | undefined'.
         if (checkCountryCode(value)) {
           return (
             <Typography variant="body-3" color="primary">

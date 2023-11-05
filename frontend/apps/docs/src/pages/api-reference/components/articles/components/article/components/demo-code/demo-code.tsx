@@ -43,7 +43,7 @@ type BlockProps = {
 };
 
 const Block = ({ title, schema }: BlockProps) => {
-  const example = useMemo(() => getExample(schema), []);
+  const example = useMemo(() => getExample(schema), []); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <CodeBlock language="json" title={title}>
       {JSON.stringify(example, null, 2)}

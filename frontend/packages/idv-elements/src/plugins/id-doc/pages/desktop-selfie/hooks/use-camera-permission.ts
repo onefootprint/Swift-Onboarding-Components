@@ -42,7 +42,8 @@ const useCameraPermission = () => {
     () => {
       if (navigator.permissions) {
         navigator.permissions
-          .query({ name: 'camera' as any })
+          // @ts-expect-error: fix-me Type '"camera"' is not assignable to type 'PermissionName'.
+          .query({ name: 'camera' })
           .then(result => {
             if (result.state === 'granted') {
               setPermissionState('allowed');

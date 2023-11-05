@@ -31,9 +31,9 @@ const mutateTheme = (options: {
 
 const iterateOverVariables = (options: {
   theme: Theme;
-  variables: Record<string, any>;
+  variables: Record<string, unknown>;
   tokenName: string;
-  tokenValue: any;
+  tokenValue: unknown;
 }) => {
   let { theme } = options;
   const { variables, tokenName, tokenValue } = options;
@@ -43,7 +43,7 @@ const iterateOverVariables = (options: {
     theme = mutateTheme({
       theme,
       cssVariable,
-      cssValue: tokenValue,
+      cssValue: tokenValue as string,
     });
     if (definitions.assignDefault) {
       definitions.assignDefault.forEach(innerTokenName => {

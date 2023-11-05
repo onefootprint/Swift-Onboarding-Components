@@ -14,7 +14,7 @@ const useIntl = (locale = 'en-US') => {
       year: 'numeric',
     }).format(date);
 
-  const formatUtcDate = (date: Date, options?: Record<string, any>) =>
+  const formatUtcDate = (date: Date, options?: Record<string, unknown>) =>
     date.toLocaleString(locale, {
       month: '2-digit',
       day: '2-digit',
@@ -23,7 +23,7 @@ const useIntl = (locale = 'en-US') => {
       ...options,
     });
 
-  const formatDateWithTime = (date: Date, options?: Record<string, any>) =>
+  const formatDateWithTime = (date: Date, options?: Record<string, unknown>) =>
     date.toLocaleString(locale, {
       month: 'numeric',
       day: 'numeric',
@@ -33,7 +33,7 @@ const useIntl = (locale = 'en-US') => {
       ...options,
     });
 
-  const formatTime = (date: Date, options?: Record<string, any>) =>
+  const formatTime = (date: Date, options?: Record<string, unknown>) =>
     date.toLocaleString(locale, {
       hour: '2-digit',
       minute: 'numeric',

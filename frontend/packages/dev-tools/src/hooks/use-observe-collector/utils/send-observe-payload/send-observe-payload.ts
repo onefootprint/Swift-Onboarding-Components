@@ -1,4 +1,4 @@
-const sendObservePayload = async (data: Record<string, any>[]) => {
+const sendObservePayload = async (data: Record<string, unknown>[]) => {
   fetch(
     'https://189225732777.collect.observeinc.com/v1/http/?observe_token=ds1FFZo4VU4NEv9yYems:2b8XTbUIjt5vRarHo7bc716EXZSICoDi',
     {

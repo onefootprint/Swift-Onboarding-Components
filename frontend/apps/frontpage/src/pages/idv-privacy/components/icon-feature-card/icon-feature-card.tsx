@@ -8,7 +8,8 @@ type IconFeatureCardProps = {
   title: string;
   description: string;
   icon: Icon;
-  trans?: any;
+  // @ts-ignore: fix me
+  trans?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 };
 
 const IconFeatureCard = ({

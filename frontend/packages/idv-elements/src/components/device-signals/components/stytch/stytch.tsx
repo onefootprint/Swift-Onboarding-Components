@@ -19,7 +19,8 @@ const Stytch = ({ fpAuthToken }: StytchProps) => {
   const sendTelemetry = useTelemetryRequest(fpAuthToken);
 
   const getGetTelemetryID = () => {
-    const { GetTelemetryID } = window as any;
+    // @ts-expect-error: fix-me custom GetTelemetryID
+    const { GetTelemetryID } = window;
     return GetTelemetryID;
   };
 

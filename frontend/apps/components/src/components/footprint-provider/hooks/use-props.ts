@@ -53,6 +53,7 @@ const useProps = <T extends Obj>(onSuccess?: (props?: T | {}) => void) => {
 
   const unsubscribe = footprintProvider.on(
     FootprintPrivateEvent.propsReceived,
+    // @ts-expect-error: fix-me Argument of type '(data: T) => void' is not assignable ...
     (data: T) => {
       setProviderProps(data);
     },

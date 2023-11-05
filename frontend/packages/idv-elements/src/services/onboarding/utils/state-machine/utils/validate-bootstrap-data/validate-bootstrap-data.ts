@@ -17,9 +17,10 @@ import {
   strInputToUSDate,
 } from '../../../../../../utils/string';
 
-const isObject = (obj: any) => typeof obj === 'object' && !!obj;
-const isValidString = (str: any) => str && typeof str === 'string';
-const getIsoDateString = (dateStr: any, locale: SupportedLocale) => {
+const isObject = (obj: unknown) => typeof obj === 'object' && !!obj;
+const isValidString = (x: unknown): boolean =>
+  typeof x === 'string' && x.length > 0;
+const getIsoDateString = (dateStr: string, locale: SupportedLocale) => {
   if (!isValidString(dateStr)) {
     return undefined;
   }
@@ -33,16 +34,17 @@ const getIsoDateString = (dateStr: any, locale: SupportedLocale) => {
 };
 
 const validateUserData = (
-  userData: any,
+  userData: Record<string, unknown>,
   locale: SupportedLocale = 'en-US',
 ): IdvBootstrapData => {
   if (!isObject(userData)) {
     return {};
   }
 
-  const isEmailValid = (email: any) => isValidString(email) && isEmail(email);
+  const isEmailValid = (email: string) =>
+    isValidString(email) && isEmail(email);
 
-  const isPhoneValid = (phoneNumber: any) => {
+  const isPhoneValid = (phoneNumber: string) => {
     if (!isValidString(phoneNumber)) {
       return false;
     }
@@ -64,7 +66,7 @@ const validateUserData = (
     }
   };
 
-  const isNameValid = (name: any, allowEmpty?: boolean) => {
+  const isNameValid = (name: string, allowEmpty?: boolean) => {
     const trimmedName = name?.trim();
     if (!trimmedName?.length && !allowEmpty) {
       return false;
@@ -73,7 +75,7 @@ const validateUserData = (
     return allowedChars.test(trimmedName);
   };
 
-  const isDobValid = (dob: any) => {
+  const isDobValid = (dob: string) => {
     const isoDateString = getIsoDateString(dob, locale);
     if (!isoDateString) {
       return false;
@@ -88,41 +90,41 @@ const validateUserData = (
     return daysOnEarth / 365 >= minValidAge;
   };
 
-  const isSsn9Valid = (ssn9: any) => {
+  const isSsn9Valid = (ssn9: string) => {
     const ssn9Regex =
       /^(?!(000|666|9))(\d{3}-?(?!(00))\d{2}-?(?!(0000))\d{4})$/;
     return isValidString(ssn9) && ssn9Regex.test(ssn9);
   };
 
-  const isSsn4Valid = (ssn4: any) => {
+  const isSsn4Valid = (ssn4: string) => {
     const ssn4Regex = /^((?!(0000))\d{4})$/;
     return isValidString(ssn4) && ssn4Regex.test(ssn4);
   };
 
-  const isAddressLine1Valid = (addressLine1: any) => {
+  const isAddressLine1Valid = (addressLine1: string) => {
     const addressLine1Regex = /^(?!p\.?o\.?\s*?(?:box)?\s*?[0-9]+?).*$/i;
     return isValidString(addressLine1) && addressLine1Regex.test(addressLine1);
   };
 
-  const isStateValid = (state: any, country?: any) => {
+  const isStateValid = (state: string, country?: string): boolean => {
     if (country === 'US') {
-      return STATES.find(elem => elem.value === state);
+      return STATES.some(elem => elem.value === state);
     }
     return isValidString(state);
   };
 
-  const isCitizenshipsValid = (citizenships: any) =>
+  const isCitizenshipsValid = (citizenships: string) =>
     Array.isArray(citizenships) && citizenships.every(c => isCountryCode(c));
 
-  const isVisaKindValid = (visaKind: any) =>
+  const isVisaKindValid = (visaKind: string) =>
     isValidString(visaKind) &&
     Object.values(VisaKind).includes(visaKind as VisaKind);
 
-  const isUsLegalStatusValid = (status: any) =>
+  const isUsLegalStatusValid = (status: string) =>
     isValidString(status) &&
     Object.values(UsLegalStatus).includes(status as UsLegalStatus);
 
-  const isVisaExpirationDateValid = (dateStr: any) => {
+  const isVisaExpirationDateValid = (dateStr: string) => {
     const isoDateString = getIsoDateString(dateStr, locale);
     if (!isoDateString) {
       return false;
@@ -134,9 +136,9 @@ const validateUserData = (
   const ValidatorByField: Record<IdDI, (...args: string[]) => boolean> = {
     [IdDI.email]: isEmailValid,
     [IdDI.phoneNumber]: isPhoneValid,
-    [IdDI.firstName]: (value: any) => isNameValid(value),
-    [IdDI.middleName]: (value: any) => isNameValid(value, true),
-    [IdDI.lastName]: (value: any) => isNameValid(value),
+    [IdDI.firstName]: (value: string) => isNameValid(value),
+    [IdDI.middleName]: (value: string) => isNameValid(value, true),
+    [IdDI.lastName]: (value: string) => isNameValid(value),
     [IdDI.dob]: isDobValid,
     [IdDI.ssn9]: isSsn9Valid,
     [IdDI.ssn4]: isSsn4Valid,
@@ -157,7 +159,7 @@ const validateUserData = (
   // Ignore null or undefined values or invalid keys
   const filledEntries = Object.entries(userData).filter(
     ([key, value]) => key in ValidatorByField && !!value,
-  ) as [string, any][];
+  ) as [string, string][];
   const filledData = Object.fromEntries(filledEntries);
 
   // If the values are provided, they should pass the validators

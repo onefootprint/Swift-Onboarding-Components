@@ -27,6 +27,7 @@ const FieldOrPlaceholder = ({ data }: FieldOrPlaceholderProps) => {
     );
   }
 
+  // @ts-expect-error: fix-me Argument of type 'Object | VaultArrayData<unknown> | VaultDocumentData | VaultImageData | null | undefined'
   if (isVaultDataDocument(data)) {
     return (
       <LinkButton

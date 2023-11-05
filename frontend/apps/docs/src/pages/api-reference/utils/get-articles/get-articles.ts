@@ -38,12 +38,15 @@ const methodPriority = (method: string) => {
 const sectionPriority = (section: string) =>
   section.toLowerCase().replace(' ', '-');
 
-// TODO one day use types for open API specs instead of all this any
-const getArticles = (data: any): Article[] =>
+// TODO: FP-6527 add openapi-typescript for TS generation
+const getArticles = (data: Record<string, unknown>): Article[] =>
   sortBy(
+    // @ts-expect-error: fix-me
     Object.entries(data.paths).flatMap(([path, methods]) =>
-      Object.entries(methods as any).map(([method, entry]) => ({
-        ...(entry as any),
+      // @ts-expect-error: fix-me
+      Object.entries(methods).map(([method, entry]) => ({
+        // @ts-expect-error: fix-me
+        ...entry,
         id: getId(method, path),
         path,
         method,

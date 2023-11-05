@@ -31,7 +31,7 @@ const getEntities = async (
 
 const useEntities = (
   kind: EntityKind,
-  defaultFilters?: Record<string, any>,
+  defaultFilters?: Record<string, unknown>,
 ) => {
   const { authHeaders, isLive } = useSession();
   const filters = useFilters();

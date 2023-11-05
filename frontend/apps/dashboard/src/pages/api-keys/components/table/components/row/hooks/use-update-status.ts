@@ -47,9 +47,9 @@ const useUpdateStatus = (apiKey: ApiKey) => {
         });
         return { previousApiKeys };
       },
-      onError: (err, updatedApiKey, context: any) => {
+      onError: (err, updatedApiKey, context) => {
         console.error('Updating api key failed', getErrorMessage(err));
-        if (context.previousApiKeys) {
+        if (context?.previousApiKeys) {
           queryClient.setQueryData(
             ['api-keys', authHeaders],
             context.previousApiKeys,

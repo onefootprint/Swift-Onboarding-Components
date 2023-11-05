@@ -1,6 +1,6 @@
 import type { Appearance } from '../types/appearance';
 
-const isObject = (obj: any) => typeof obj === 'object' && !!obj;
+const isObject = (obj: unknown) => typeof obj === 'object' && !!obj;
 
 export const getEncodedAppearance = ({
   fontSrc,
@@ -27,6 +27,7 @@ export const getEncodedAppearance = ({
 };
 
 export const getAppearanceForVanilla = (): Appearance => {
+  // @ts-expect-error custom property
   const appearance = window.footprintAppearance;
   if (!appearance || !isObject(appearance)) {
     return {};

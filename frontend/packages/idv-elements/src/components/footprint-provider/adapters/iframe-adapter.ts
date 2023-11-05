@@ -66,11 +66,14 @@ class IframeAdapter implements FootprintClient {
     }, closeDelay);
   }
 
-  on(name: string, callback: (result: unknown) => void) {
+  on(
+    name: string,
+    callback: ((data: IdvBootstrapData) => void) | ((data: IdvOptions) => void),
+  ) {
     return this.eventEmitter.on(name, callback);
   }
 
-  private sendEvent(eventName: string, data?: any) {
+  private sendEvent(eventName: string, data?: unknown) {
     if (this.postmate) {
       this.postmate.emit(eventName, data);
     } else {

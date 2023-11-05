@@ -173,7 +173,7 @@ const setup = (appName: string) => {
   registerErrorHandlers();
 };
 
-const info = (...args: any[]) => {
+const info = (...args: unknown[]) => {
   if (IS_LOGGING_ENABLED) {
     LogRocket.info(...args);
   }

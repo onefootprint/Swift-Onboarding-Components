@@ -83,10 +83,11 @@ const getRequestOptions = (
 
 // Disable transformation when the string matched or satisfied the condition.
 // https://github.com/mpyw/axios-case-converter#preservedkeys-string--function
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const preservedKeys = (input: any) =>
   [...DataIdentifierKeys].includes(input) || input.startsWith('card');
 
-const request = <Response = any>(
+const request = <Response = unknown>(
   requestConfig: AxiosRequestConfig = {},
   extraOptions: { omitSessionId?: boolean } = {},
 ) => {
@@ -95,7 +96,7 @@ const request = <Response = any>(
   return client.request<Response>(options);
 };
 
-export const requestWithoutCaseConverter = <Response = any>(
+export const requestWithoutCaseConverter = <Response = unknown>(
   requestConfig: AxiosRequestConfig = {},
 ) => {
   const client = axios.create();

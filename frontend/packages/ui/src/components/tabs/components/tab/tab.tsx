@@ -1,10 +1,13 @@
 import styled, { css } from '@onefootprint/styled';
+import type { ComponentProps } from 'react';
 import React, { forwardRef } from 'react';
 
 import { createFontStyles } from '../../../../utils';
 
+type TabContainerProps = ComponentProps<typeof TabContainer>;
+
 export type TabProps = {
-  as?: React.ComponentType<any> | string;
+  as?: React.ComponentType<TabContainerProps> | string;
   children: React.ReactNode;
   href?: string;
   onClick?: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement>;

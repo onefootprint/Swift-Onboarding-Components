@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import type { Icon } from '@onefootprint/icons';
 import {
   IcoBook16,
   IcoFileText16,
@@ -13,7 +14,7 @@ import {
 
 type Route = {
   title?: string;
-  items: { href: string; Icon: any; text: string; badgeCount?: number }[];
+  items: { href: string; Icon: Icon; text: string; badgeCount?: number }[];
 };
 
 const useRoutes = (): Route[] => {

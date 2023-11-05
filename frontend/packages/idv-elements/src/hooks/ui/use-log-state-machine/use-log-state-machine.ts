@@ -4,12 +4,14 @@ import type { State } from 'xstate';
 
 import Logger from '../../../utils/logger';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const useLogStateMachine = (name: string, state: any) => {
   const observeCollector = useObserveCollector();
 
   useEffect(() => {
     // For now, only log the state value, the actions and whether done to prevent leaking PII.
     // We might expand this later
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const stateData = (state as State<any, any>).toJSON();
     Logger.track(`${name}-${state.value}`, {
       name,

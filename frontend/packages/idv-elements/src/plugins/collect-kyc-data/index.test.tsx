@@ -69,7 +69,8 @@ describe('<CollectKycData />', () => {
         <ObserveCollectorProvider appName="test">
           <QueryClientProvider client={queryClient}>
             <DesignSystemProvider theme={themes.light}>
-              <FootprintProvider client={null as any}>
+              {/* @ts-expect-error: null */}
+              <FootprintProvider client={null}>
                 <ToastProvider>
                   <Layout>
                     <CollectKycData context={context} onDone={onDone} />

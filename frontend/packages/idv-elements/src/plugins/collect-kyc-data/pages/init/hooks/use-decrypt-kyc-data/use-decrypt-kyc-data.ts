@@ -58,7 +58,8 @@ const useDecryptKycData = ({
     Object.entries(decryptedData).forEach(([di, value]) => {
       if (value) {
         data[di as IdDI] = {
-          value: value as any,
+          // @ts-expect-error: fix-me Type 'string | string[]' is not assignable to type 'undefined'.
+          value,
           decrypted: true,
           scrubbed: false,
         };

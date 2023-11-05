@@ -80,6 +80,7 @@ export default async function handler(req: NextRequest) {
         ],
       },
     );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     console.log(`${e.message}`); // eslint-disable-line no-console
     return new Response(`Failed to generate the image`, {

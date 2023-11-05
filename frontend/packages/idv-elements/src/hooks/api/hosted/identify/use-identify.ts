@@ -9,10 +9,11 @@ const identifyRequest = async (payload: IdentifyRequest) => {
   if (sandboxId) {
     headers[SANDBOX_ID_HEADER] = sandboxId;
   }
-  const data: any = {};
+  const data = {};
   if ('authToken' in identifier) {
     headers[AUTH_HEADER] = identifier.authToken;
   } else {
+    // @ts-expect-error: fix-me Property 'identifier' does not exist on type ...
     data.identifier = identifier;
   }
   const response = await request<IdentifyResponse>({

@@ -12,7 +12,10 @@ type Params = ParsedUrlQuery & {
   slug: string;
 };
 
-export const getStaticProps: GetStaticProps<any, Params> = async context => {
+export const getStaticProps: GetStaticProps<
+  Record<string, unknown>,
+  Params
+> = async context => {
   const { slug } = context.params!;
   const page = await getPageBySlug(slug);
   return page ? { props: { page } } : { notFound: true };

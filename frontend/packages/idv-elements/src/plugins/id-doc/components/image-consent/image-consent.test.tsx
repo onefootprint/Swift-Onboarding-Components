@@ -42,7 +42,7 @@ const renderImageConsent = (onSubmit: (consentInfo: ConsentInfoType) => void) =>
 
 describe('<ImageConsent/>', () => {
   it('Shows the ml consent true when optional checked', async () => {
-    let submittedConsentInfo: any;
+    let submittedConsentInfo: Record<string, unknown> = {};
     const onConsentSubmit = (consentInfo: ConsentInfoType) => {
       submittedConsentInfo = { ...consentInfo };
     };
@@ -58,7 +58,7 @@ describe('<ImageConsent/>', () => {
   });
 
   it('Shows the ml consent false when optional not checked', async () => {
-    let submittedConsentInfo: any;
+    let submittedConsentInfo: Record<string, unknown> = {};
     const onConsentSubmit = (consentInfo: ConsentInfoType) => {
       submittedConsentInfo = { ...consentInfo };
     };

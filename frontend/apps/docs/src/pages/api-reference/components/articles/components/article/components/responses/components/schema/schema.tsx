@@ -7,7 +7,8 @@ import Properties from '../components/properties';
 
 const Schema = ({ schema }: { schema: string }) => {
   const schemaDetails = getSchema(schema);
-  const { properties } = schemaDetails as Record<string, any>;
+  // @ts-expect-error: Property 'properties' does not exist on type 'ContentSchema | undefined'.
+  const { properties } = schemaDetails;
 
   return (
     <Container>

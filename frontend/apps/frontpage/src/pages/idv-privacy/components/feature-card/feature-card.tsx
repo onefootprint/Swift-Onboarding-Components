@@ -6,7 +6,8 @@ import { Trans } from 'react-i18next';
 type FeatureCardProps = {
   title: string;
   description: string;
-  trans?: any;
+  // @ts-ignore: fix me
+  trans?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 };
 
 const FeatureCard = ({ title, description, trans }: FeatureCardProps) => (

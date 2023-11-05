@@ -19,7 +19,7 @@ const RealOutcome = ({ onSelect, isSelected }: RealOutcomeProps) => {
   } = useSandboxOutcomeOptions();
   const { control, setValue } = useFormContext();
 
-  const onChange = () => {
+  const handleChange = () => {
     onSelect();
     if (!isSelected) setValue('outcomes.idDocOutcome', idDocOutcomeReal);
   };
@@ -32,8 +32,8 @@ const RealOutcome = ({ onSelect, isSelected }: RealOutcomeProps) => {
         render={() => (
           <Radio
             label={idDocOutcomeReal.label}
-            value={idDocOutcomeReal}
-            onChange={onChange}
+            value={idDocOutcomeReal.value}
+            onChange={handleChange}
             checked={isSelected}
           />
         )}

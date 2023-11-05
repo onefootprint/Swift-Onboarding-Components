@@ -1,4 +1,6 @@
-import configureGhost from 'src/config/initializers/ghost';
+import type { PostsOrPages } from '@tryghost/content-api';
+
+import configureGhost from '../../config/initializers/ghost';
 
 const ghost = configureGhost();
 
@@ -46,7 +48,7 @@ export const getSlugPrefix = (tagName?: string) => {
   return SlugByPostType.blog;
 };
 
-function filterPosts(posts: any[], type?: PostType) {
+const filterPosts = <T extends PostsOrPages>(posts: T, type?: PostType) => {
   if (type === PostType.blog) {
     return posts.filter(post => {
       const name = post.primary_tag?.name;
@@ -70,7 +72,7 @@ function filterPosts(posts: any[], type?: PostType) {
   }
 
   return posts;
-}
+};
 
 export async function getPostBySlug(slug: string) {
   try {

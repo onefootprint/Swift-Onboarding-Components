@@ -20,7 +20,7 @@ export type RadioProps = {
   readOnly?: boolean;
   required?: boolean;
   testID?: string;
-  value?: any;
+  value?: string;
 };
 
 const Radio = forwardRef<HTMLInputElement, RadioProps>(

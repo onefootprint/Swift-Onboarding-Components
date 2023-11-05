@@ -21,7 +21,8 @@ const generateDeviceResponse = async (challenge: string) => {
     publicKey,
   })) as PublicKeyCredential;
   const attestationObject = base64url.encode(
-    (publicKeyCredential.response as any).attestationObject as Buffer,
+    // @ts-expect-error: fix-me Property 'attestationObject' does not exist on type 'AuthenticatorResponse'....
+    publicKeyCredential.response.attestationObject as Buffer,
   );
   const clientDataJSON = base64url.encode(
     publicKeyCredential.response.clientDataJSON as Buffer,

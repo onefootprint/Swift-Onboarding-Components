@@ -3,10 +3,10 @@
 import type { FootprintRenderDataProps } from '../../types';
 import isValidDI from '../is-valid-di';
 
-const isObject = (obj: any) => typeof obj === 'object';
+const isObject = (obj: unknown) => typeof obj === 'object';
 
 const arePropsValid = (
-  props?: Record<string, any>,
+  props?: Record<string, unknown>,
 ): props is FootprintRenderDataProps => {
   if (!props || !isObject(props)) {
     console.error('Received empty props');

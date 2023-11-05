@@ -1,4 +1,5 @@
 import type { FootprintPrivateEvent } from '@onefootprint/footprint-js';
+import type { IdvBootstrapData, IdvOptions } from '@onefootprint/types';
 
 // TODO: (belce) delete after all customers are migrated to new footprint-js
 // These events might be sent from older NPM version integrations to bifrost
@@ -21,6 +22,6 @@ export type FootprintClient = {
   // Returns unsubscribe callback
   on: (
     name: LegacyFootprintInternalEvent | FootprintPrivateEvent,
-    callback: (data?: any) => void,
+    callback: ((data: IdvBootstrapData) => void) | ((data: IdvOptions) => void),
   ) => () => void;
 };

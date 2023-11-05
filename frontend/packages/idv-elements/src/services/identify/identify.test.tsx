@@ -53,10 +53,10 @@ describe('<Identify />', () => {
     config,
     onDone,
   }: {
-    bootstrapData?: any;
+    bootstrapData?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     initialAuthToken?: string;
-    obConfigAuth?: any;
-    config: any;
+    obConfigAuth?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    config: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     onDone?: () => void;
   }) => {
     customRender(

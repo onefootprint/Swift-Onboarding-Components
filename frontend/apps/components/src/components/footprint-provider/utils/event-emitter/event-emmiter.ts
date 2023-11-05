@@ -20,7 +20,7 @@ class EventEmitter {
     };
   }
 
-  public emit(name: string, ...args: any[]): void {
+  public emit(name: string, ...args: unknown[]): void {
     (this.events[name] || []).forEach(fn => fn(...args));
   }
 }

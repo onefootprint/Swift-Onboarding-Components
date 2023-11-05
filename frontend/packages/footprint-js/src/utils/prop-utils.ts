@@ -156,7 +156,7 @@ export const getCallbackProps = (
       publicEvent === PublicEvent.clicked;
 
     // Make sure to pass any callback arguments through
-    modifiedCallbacks[publicEvent] = (callbackArgs?: any) => {
+    modifiedCallbacks[publicEvent] = (callbackArgs?: unknown) => {
       callback(callbackArgs);
       if (shouldDestroy) {
         onDestroy?.();

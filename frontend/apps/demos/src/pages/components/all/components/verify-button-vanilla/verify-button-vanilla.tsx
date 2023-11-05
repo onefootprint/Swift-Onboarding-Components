@@ -8,7 +8,8 @@ const VerifyButtonVanilla = () => {
     if (!window) {
       return;
     }
-    (window as any).footprintCallbacks = {
+    // @ts-expect-error: footprintCallbacks is custom
+    window.footprintCallbacks = {
       onComplete: (validationToken: string) => {
         console.log('complete ', validationToken);
       },

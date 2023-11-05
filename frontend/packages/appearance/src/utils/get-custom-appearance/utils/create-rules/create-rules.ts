@@ -11,7 +11,7 @@ const createRules = (rules?: FootprintAppearanceRules) => {
 };
 
 export const filterNonWhitelistRules = (
-  rules: Record<string, any>,
+  rules: Record<string, any>, // eslint-disable-line @typescript-eslint/no-explicit-any
   whitelist: string[] = rulesWhitelist,
 ) => {
   const clonedRules = { ...rules };
@@ -36,6 +36,7 @@ export const getSelector = (
   return `.fp-custom-appearance${selectors[selector]}`;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const convertObjectToCSS = (rules: Record<string, any>) => {
   const toKebabCase = (selector: string) =>
     selector
@@ -59,6 +60,7 @@ export const convertObjectToCSS = (rules: Record<string, any>) => {
   );
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createStylesFromRules = (rules: Record<string, any>) => {
   let styles = ` `;
   Object.entries(rules).forEach(([selector, stylesObject]) => {

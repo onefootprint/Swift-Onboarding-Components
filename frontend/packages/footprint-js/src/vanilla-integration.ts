@@ -17,12 +17,13 @@ const defer = (callback: () => void) => {
   window.setTimeout(callback, 0);
 };
 
-const isObject = (obj: any) => typeof obj === 'object' && !!obj;
+const isObject = (obj: unknown) => typeof obj === 'object' && !!obj;
 
 const vanillaIntegration = (footprint: Footprint) => {
   if (typeof window === 'undefined') return; // Don't do anything for SSR
 
   const getCallbacks = (kind: ComponentKind) => {
+    // @ts-expect-error custom property
     const callbacks = window.footprintCallbacks ?? {};
     if (!isObject(callbacks)) {
       throw Error(
@@ -56,7 +57,7 @@ const vanillaIntegration = (footprint: Footprint) => {
     const callbacks = getCallbacks(kind);
 
     const propsAttribute = container.getAttribute('data-props') || '';
-    let props: Record<string, any>;
+    let props: Record<string, unknown>;
     try {
       props = JSON.parse(propsAttribute);
     } catch (_) {

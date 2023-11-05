@@ -5,9 +5,9 @@ type UseFootprintProvider = {
 };
 
 const useFootprintProvider = ({ client }: UseFootprintProvider) => {
-  const send = (name: string, data?: any) => client.send(name, data);
+  const send = (name: string, data?: unknown) => client.send(name, data);
 
-  const on = (name: string, callback: (data?: any) => void) =>
+  const on = (name: string, callback: (data?: unknown) => void) =>
     client.on(name, callback);
 
   const load = () => client.load();

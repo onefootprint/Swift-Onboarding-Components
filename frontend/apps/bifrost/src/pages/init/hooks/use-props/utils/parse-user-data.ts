@@ -3,7 +3,7 @@ import { IdDI } from '@onefootprint/types';
 
 // Support legacy bootstrap data formats (until Fractional migrates over)
 // as well as new user data formats
-const parseUserData = (data: any): IdvBootstrapData => {
+const parseUserData = (data: IdvBootstrapData): IdvBootstrapData => {
   const legacyData = data as
     | { email?: string; phoneNumber?: string }
     | undefined;

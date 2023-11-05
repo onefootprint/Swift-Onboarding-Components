@@ -48,14 +48,14 @@ export const getKycOnboardingConfig = (isLive?: boolean) => ({
   allow_international_residents: false,
 });
 
-export const withOnboardingConfig = (data: any) =>
+export const withOnboardingConfig = (data: unknown) =>
   mockRequest({
     method: 'get',
     path: '/hosted/onboarding/config',
     response: data,
   });
 
-export const withOnboarding = (onboardingConfig: any) =>
+export const withOnboarding = (onboardingConfig: unknown) =>
   mockRequest({
     method: 'post',
     path: '/hosted/onboarding',

@@ -3,6 +3,7 @@ import { media } from '@onefootprint/ui';
 import React from 'react';
 import Cmd from 'src/components/cmd/cmd';
 import type { Article } from 'src/types/article';
+import type { PageNavigation } from 'src/types/page';
 
 import AppHeader from './components/app-header';
 import DesktopNav from './components/nav/desktop-nav';
@@ -11,7 +12,7 @@ import Sections from './components/sections';
 type DocsLayoutProps = {
   children: React.ReactNode;
   article: Article;
-  navigation: any;
+  navigation: PageNavigation;
 };
 
 const DocsLayout = ({ children, navigation, article }: DocsLayoutProps) => (

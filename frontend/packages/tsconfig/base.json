@@ -7,20 +7,21 @@
       "dom.iterable",
       "esnext"
     ],
-    "resolveJsonModule": true,
     "composite": false,
     "declaration": true,
     "declarationMap": true,
+    "downlevelIteration": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "inlineSources": false,
     "isolatedModules": true,
     "moduleResolution": "node",
+    "noImplicitAny": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "preserveWatchOutput": true,
+    "resolveJsonModule": true,
     "skipLibCheck": true,
-    "downlevelIteration": true,
     "strict": true
   },
   "exclude": [

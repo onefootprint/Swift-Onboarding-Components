@@ -4,7 +4,7 @@ import React from 'react';
 import Typography from '../typography';
 
 export type BreadcrumbItemProps = {
-  as?: React.ComponentType<any>;
+  as?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   href?: string;
   children: string;
 };

@@ -1,4 +1,6 @@
+import type { Appearance } from '../types/appearance';
+
 declare interface Window {
-  footprintAppearance?: any;
-  footprintCallbacks?: { [key: string]: () => any };
+  footprintAppearance?: Appearance;
+  footprintCallbacks?: { [key: string]: () => unknown };
 }

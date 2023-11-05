@@ -6,11 +6,11 @@ type Props = Parameters<typeof registerCallbackProps>[1];
 function fakePostMate() {
   const refMap = {};
   return {
-    on: (eventName: string, fn: (data?: any) => void) => {
+    on: (eventName: string, fn: (data?: unknown) => void) => {
       /* @ts-expect-error: string types */
       refMap[eventName] = fn;
     },
-    call: (eventName: string, args?: any) => {
+    call: (eventName: string, args?: unknown) => {
       /* @ts-expect-error: string types */
       refMap[eventName](args);
     },

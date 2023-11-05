@@ -106,7 +106,7 @@ const Form = ({ html, onSuccess }: FormProps) => {
     }
   };
 
-  const debouncedHandleChange = useCallback(debounce(handleChange, 300), []);
+  const debouncedHandleChange = useCallback(debounce(handleChange, 300), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Container>

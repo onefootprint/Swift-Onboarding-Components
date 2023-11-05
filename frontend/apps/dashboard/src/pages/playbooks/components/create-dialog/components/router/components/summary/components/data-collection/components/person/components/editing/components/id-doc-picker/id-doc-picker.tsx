@@ -58,6 +58,7 @@ const IdDocPicker = ({ unselectedIDDoc }: IdDocPickerProps) => {
             <Divider variant="secondary" />
           </Box>
           <Checkbox
+            // @ts-expect-error: fix-me Type 'boolean' is not assignable to type 'string'
             value={false}
             label={t('selfie.label')}
             hint={t('selfie.hint')}

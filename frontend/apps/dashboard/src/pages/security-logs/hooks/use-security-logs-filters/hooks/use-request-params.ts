@@ -10,7 +10,7 @@ const useRequestParams = ({
   search,
 }: SecurityLogsFilterValues) => {
   const requestParams = useMemo(() => {
-    const params: Record<string, any> = {
+    const params: Record<string, unknown> = {
       kind: 'decrypt',
     };
     if (dateRange.length) {

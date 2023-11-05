@@ -42,7 +42,7 @@ export const getExample = (
   schema?: ContentSchema,
   name?: string,
   index = 0,
-): any => {
+): unknown => {
   if (!schema) {
     return null;
   }

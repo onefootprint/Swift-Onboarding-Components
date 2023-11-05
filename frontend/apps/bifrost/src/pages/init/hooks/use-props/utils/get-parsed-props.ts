@@ -1,6 +1,8 @@
 import { Logger } from '@onefootprint/idv-elements';
 
-const getParsedProps = (props?: string): Record<string, any> | undefined => {
+const getParsedProps = (
+  props?: string,
+): Record<string, unknown> | undefined => {
   if (!props) {
     return undefined;
   }

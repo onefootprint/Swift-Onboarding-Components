@@ -4,7 +4,7 @@ import { CodeInline, createFontStyles, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 type PropertiesProps = {
-  properties: Record<string, any>;
+  properties: Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
   title: string;
 };
 

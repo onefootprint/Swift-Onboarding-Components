@@ -25,6 +25,7 @@ module.exports = {
   rules: {
     '@next/next/no-html-link-for-pages': 'off',
     '@typescript-eslint/consistent-type-imports': 'error',
+    '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/no-use-before-define': 'off',
     'class-methods-use-this': [0],
     'import/first': 'error',

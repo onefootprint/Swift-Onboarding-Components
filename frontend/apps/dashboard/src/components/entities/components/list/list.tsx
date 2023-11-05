@@ -16,7 +16,7 @@ export type ListProps = {
   title: string;
   subtitle?: string;
   basePath: string;
-  defaultFilters?: Record<string, any>;
+  defaultFilters?: Record<string, unknown>;
 };
 
 const List = ({

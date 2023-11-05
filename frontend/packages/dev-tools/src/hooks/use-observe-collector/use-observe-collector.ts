@@ -22,9 +22,9 @@ type ObserveCollectorProps = {
 
 const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
   const router = useRouter();
-  const queue: Record<string, any>[] = [];
+  const queue: Record<string, unknown>[] = [];
   const userAgent = new UAParser().getResult();
-  const clientContext: Record<string, any> = IS_LOGGING_DISABLED
+  const clientContext: Record<string, unknown> = IS_LOGGING_DISABLED
     ? {}
     : {
         navigator: getNavigatorProperties(),
@@ -35,7 +35,7 @@ const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
         engine: userAgent.engine,
         cpu: userAgent.cpu,
       };
-  const environment: Record<string, any> = {
+  const environment: Record<string, unknown> = {
     nodeEnv: process.env.NODE_ENV,
     vercelEnv: process.env.NEXT_PUBLIC_VERCEL_ENV || 'local',
     gitCommitRef: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF || '',
@@ -43,14 +43,14 @@ const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
     deploymentUrl: process.env.NEXT_PUBLIC_VERCEL_URL || '',
     apiUrl: process.env.NEXT_PUBLIC_API_BASE_URL || '',
   };
-  let appContext: Record<string, any> = {};
+  let appContext: Record<string, unknown> = {};
 
   if (!IS_LOGGING_DISABLED) {
     // Overwrite console.error and console.warn implementations to also log here
     const consoleError = window.console.error;
-    window.console.error = (...args: any[]) => {
+    window.console.error = (...args: unknown[]) => {
       consoleError(args);
-      const stringArgs = args.map((arg: any) => `${arg}`);
+      const stringArgs = args.map((arg: unknown) => `${arg}`);
       log('error', {
         message: stringArgs.join(' '),
         arguments: stringArgs,
@@ -59,9 +59,9 @@ const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
     };
 
     const consoleWarn = window.console.warn;
-    window.console.warn = (...args: any[]) => {
+    window.console.warn = (...args: unknown[]) => {
       consoleWarn(args);
-      const stringArgs = args.map((arg: any) => `${arg}`);
+      const stringArgs = args.map((arg: unknown) => `${arg}`);
       log('warn', {
         message: stringArgs.join(' '),
         arguments: stringArgs,
@@ -70,7 +70,7 @@ const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
     };
   }
 
-  const addToQueue = (payload: Record<string, any>) => {
+  const addToQueue = (payload: Record<string, unknown>) => {
     if (IS_LOGGING_DISABLED) {
       return;
     }
@@ -90,7 +90,7 @@ const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
     debouncedSendQueue();
   };
 
-  const log = (action: string, data?: Record<string, any>) => {
+  const log = (action: string, data?: Record<string, unknown>) => {
     const payload = {
       action,
       data,
@@ -101,7 +101,7 @@ const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
   const logError = (
     event: Event | string,
     error: Error,
-    extra?: Record<string, any>,
+    extra?: Record<string, unknown>,
   ) => {
     const info = {
       ...getErrorEventInfo(event, error),
@@ -110,6 +110,7 @@ const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
     const existingIndex = queue.findIndex(
       ({ action, data }) =>
         action === 'error' &&
+        // @ts-ignore fix me: Spread types may only be created from object types
         JSON.stringify({ ...data, errorId: '' }) ===
           JSON.stringify({ ...info, errorId: '' }),
     );
@@ -176,7 +177,7 @@ const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
   );
 
   // Allow the apps to set custom context data like tenant name or bifrost session id etc. that can be emitted with each item.
-  const setAppContext = (data?: Record<string, any>) => {
+  const setAppContext = (data?: Record<string, unknown>) => {
     if (IS_LOGGING_DISABLED) {
       return;
     }

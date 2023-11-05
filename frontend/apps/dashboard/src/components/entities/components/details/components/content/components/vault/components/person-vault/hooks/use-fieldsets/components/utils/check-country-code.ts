@@ -1,7 +1,7 @@
 import type { CountryCode } from '@onefootprint/types';
 import { isCountryCode } from '@onefootprint/types';
 
-const checkCountryCode = (value: any): value is CountryCode => {
+const checkCountryCode = (value?: string | null): value is CountryCode => {
   if (!value) return false;
   return isCountryCode(value);
 };

@@ -21,15 +21,15 @@ import getURL from '../url-utils';
 import type { Iframe } from './types';
 
 type Child = Postmate.ParentAPI;
-type OnDestroy = (() => void) | undefined;
-type OnRenderSecondary = ((secondaryProps: Props) => void) | undefined;
-type InnerEvents = 'renderSecondary' | 'destroy';
+type OnDestroy = () => void;
+type OnRenderSecondary = (secondaryProps: Props) => void;
+type RegisterEvent = Iframe['registerEvent'];
 
 export const registerCallbackProps = (
   child: Child | null,
   props: Props,
-  onDestroy: OnDestroy,
-  onRenderSecondary: OnRenderSecondary,
+  onDestroy?: OnDestroy,
+  onRenderSecondary?: OnRenderSecondary,
 ): Child | never => {
   if (!child) {
     throw new Error(
@@ -188,16 +188,13 @@ const initIframe = (rawProps: Props): Iframe => {
     }
   };
 
-  const registerEvent = (
-    event: InnerEvents,
-    callback: (args?: any) => void,
-  ) => {
+  const registerEvent: RegisterEvent = (event, callback) => {
     if (!callback || typeof callback !== 'function') return;
 
     if (event === 'renderSecondary') {
       onRenderSecondary = callback;
     } else if (event === 'destroy') {
-      onDestroy = callback;
+      onDestroy = callback as OnDestroy;
     }
   };
 

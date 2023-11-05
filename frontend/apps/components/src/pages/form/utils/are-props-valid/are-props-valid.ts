@@ -1,9 +1,9 @@
 import type { FootprintFormDataProps } from '../../types';
 
-const isObject = (obj: any) => typeof obj === 'object';
+const isObject = (obj: unknown) => typeof obj === 'object';
 
 const arePropsValid = (
-  props?: Record<string, any>,
+  props?: Record<string, unknown>,
 ): props is FootprintFormDataProps => {
   if (!props || !isObject(props)) {
     console.error('Received empty props');

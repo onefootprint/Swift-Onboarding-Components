@@ -17,10 +17,8 @@ const getInitData = (
   if (bootstrapData) {
     Object.entries(bootstrapData).forEach(([key, value]) => {
       if (value) {
-        data[key as IdDI] = {
-          value: value as any,
-          bootstrap: true,
-        };
+        // @ts-expect-error: fix-me Type 'string' is not assignable to type 'undefined'
+        data[key as IdDI] = { value, bootstrap: true };
       }
     });
   }

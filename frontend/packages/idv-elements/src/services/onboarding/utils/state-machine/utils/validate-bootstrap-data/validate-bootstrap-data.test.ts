@@ -4,7 +4,9 @@ import validateBootstrapData from './validate-bootstrap-data';
 
 describe('validateBootstrapData', () => {
   it('should filter out invalid entries', () => {
+    // @ts-expect-error: null
     expect(validateBootstrapData(null, 'es-MX')).toEqual({});
+    // @ts-expect-error: undefined
     expect(validateBootstrapData(undefined, 'es-MX')).toEqual({});
     expect(validateBootstrapData({}, 'es-MX')).toEqual({});
 

@@ -87,7 +87,7 @@ export const withCreateApiKeysError = () =>
     },
   });
 
-export const withApiReveal = (apiKey: any, key: string) =>
+export const withApiReveal = (apiKey: Record<string, unknown>, key: string) =>
   mockRequest({
     method: 'post',
     path: `/org/api_keys/${apiKey.id}/reveal`,
