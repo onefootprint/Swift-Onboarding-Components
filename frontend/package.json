@@ -30,6 +30,7 @@
     "release": "changeset publish",
     "start": "turbo run start"
   },
+  "dependencies": {},
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
     "esbuild": "^0.19.5",
