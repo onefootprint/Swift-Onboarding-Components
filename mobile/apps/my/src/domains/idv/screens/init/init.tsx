@@ -18,7 +18,7 @@ const Init = ({ authToken, onSuccess, onError }) => {
 
   useEffect(() => {
     if (!authToken) return;
-    analytics.track(Events.Started);
+    analytics.track(Events.FStarted);
     analytics.timeEvent(AnalyticsTimeEvents.handoff);
 
     updateD2PStatusMutation.mutate(

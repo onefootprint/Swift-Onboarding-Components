@@ -1,4 +1,5 @@
 import { IcoFaceid40 } from '@onefootprint/icons';
+import { getErrorMessage } from '@onefootprint/request';
 import {
   Box,
   Button,
@@ -6,12 +7,14 @@ import {
   LinkButton,
   Typography,
 } from '@onefootprint/ui';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { Passkey } from 'react-native-passkey';
 
 import useTranslation from '@/hooks/use-translation';
 import { Events, useAnalytics } from '@/utils/analytics';
 
-import useRegisterBiometric from '../../hooks/use-register-biometric';
+import useRegisterPasskeys from '../../hooks/use-register-passkeys';
+import useSkipPasskeys from '../../hooks/use-skip-passkeys';
 import Success from '../success';
 
 export type RegisterProps = {
@@ -23,13 +26,46 @@ export type RegisterProps = {
 
 const Register = ({ authToken, onSkip, onSuccess, onError }: RegisterProps) => {
   const { t } = useTranslation('components.passkeys.register');
-  const registerBiometric = useRegisterBiometric();
+  const registerMutation = useRegisterPasskeys();
+  const skipMutation = useSkipPasskeys();
   const analytics = useAnalytics();
+  const isSupported = Passkey.isSupported();
 
-  const handlePress = () => {
+  const handleRegister = () => {
     analytics.track(Events.PasskeysRegistrationStarted);
-    registerBiometric.mutate(authToken, { onSuccess, onError });
+    registerMutation.mutate(authToken, {
+      onSuccess: deviceResponseJson => {
+        analytics.track(Events.PasskeyRegistrationSucceeded);
+        analytics.track(Events.FPasskeyCompleted, { result: 'success' });
+        onSuccess(deviceResponseJson);
+      },
+      onError: (error: unknown) => {
+        analytics.track(Events.PasskeyRegistrationFailed, {
+          message: getErrorMessage(error),
+        });
+        onError(error);
+      },
+    });
   };
+
+  const handleSkip = () => {
+    analytics.track(Events.PasskeyRegistrationSkipped);
+    analytics.track(Events.FPasskeyCompleted, { result: 'skip' });
+    skipMutation.mutate({ authToken }, { onSuccess: onSkip });
+  };
+
+  const handleNotSupported = () => {
+    analytics.track(Events.PasskeyRegistrationNotSupported);
+    analytics.track(Events.FPasskeyCompleted, { result: 'not_supported' });
+    skipMutation.mutate({ authToken }, { onSuccess: onSkip });
+  };
+
+  useEffect(() => {
+    if (!isSupported) {
+      handleNotSupported();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Container center>
@@ -40,14 +76,23 @@ const Register = ({ authToken, onSkip, onSuccess, onError }: RegisterProps) => {
       <Typography variant="body-3" marginBottom={9} center color="secondary">
         {t('subtitle')}
       </Typography>
-      {registerBiometric.isSuccess ? (
+      {registerMutation.isSuccess ? (
         <Success />
       ) : (
         <Box width="100%" gap={7}>
-          <Button onPress={handlePress} loading={registerBiometric.isLoading}>
+          <Button
+            onPress={handleRegister}
+            loading={registerMutation.isLoading}
+            disabled={skipMutation.isLoading}
+          >
             {t('cta')}
           </Button>
-          <LinkButton onPress={onSkip}>{t('skip')}</LinkButton>
+          <LinkButton
+            onPress={handleSkip}
+            disabled={skipMutation.isLoading || registerMutation.isLoading}
+          >
+            {t('skip')}
+          </LinkButton>
         </Box>
       )}
     </Container>

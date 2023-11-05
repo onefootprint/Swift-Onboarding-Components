@@ -103,7 +103,7 @@ const ConsentDialog = ({ open, authToken, onSubmit }: ConsentDialogProps) => {
             disabled={!hasReadConsent}
             onPress={handleSubmit}
             marginTop={6}
-            loading={consentMutation.isLoading}
+            loading={consentMutation.isLoading || consentMutation.isSuccess}
           >
             {hasReadConsent ? t('agree-and-continue') : t('scroll-to-agree')}
           </Button>

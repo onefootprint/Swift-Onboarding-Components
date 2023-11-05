@@ -121,7 +121,6 @@ const DocSelection = ({
   };
 
   const handleConsentSubmit = () => {
-    setShowConsent(false);
     onConsentCompleted();
     submit();
   };

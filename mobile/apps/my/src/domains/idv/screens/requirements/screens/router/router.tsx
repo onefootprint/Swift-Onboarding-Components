@@ -46,7 +46,9 @@ const Router = ({ authToken, onDone }: RouterProps) => {
         <Passkeys
           authToken={authToken}
           onDone={deviceResponseJson => {
-            attestDevice(deviceResponseJson);
+            if (deviceResponseJson) {
+              attestDevice(deviceResponseJson);
+            }
             send({ type: 'requirementCompleted' });
           }}
         />

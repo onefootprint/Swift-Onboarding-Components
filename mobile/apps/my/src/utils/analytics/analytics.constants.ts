@@ -1,16 +1,18 @@
 export enum Events {
   // Funnel
-  Started = 'Started',
-  PasskeyCompleted = 'Passkeys completed',
-  IdDocCompleted = 'Id doc completed',
-  Ended = 'Ended',
+  FStarted = 'Started',
+  FPasskeyCompleted = 'Passkeys completed',
+  FIdDocCompleted = 'Id doc completed',
+  FEnded = 'Ended',
 
   // Passkeys
   PasskeysRegistrationStarted = 'Passkeys registration started',
   PasskeysRegistrationRetried = 'Passkeys registration retried',
   PasskeyRegistrationSucceeded = 'Passkeys registration succeeded',
   PasskeyRegistrationFailed = 'Passkeys registration failed',
+  PasskeyRegistrationRetriedFailed = 'Passkeys registration retried failed',
   PasskeyRegistrationSkipped = 'Passkeys registration skipped',
+  PasskeyRegistrationNotSupported = 'Passkeys registration not supported',
 
   // Documents
   DocSelectionSubmitted = 'Doc type and country submitted',

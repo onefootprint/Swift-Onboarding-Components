@@ -31,7 +31,7 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
 
   useEffect(() => {
     if (state.done) {
-      analytics.track(Events.IdDocCompleted, {
+      analytics.track(Events.FIdDocCompleted, {
         result: 'success',
       });
       onDone();

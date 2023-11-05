@@ -59,9 +59,9 @@
         }
       },
       "retry": {
-        "title": "Biometrics not recognized",
-        "subtitle": "You can try biometrics again or you can do this next time you use Footprint.",
-        "cta": "Try biometrics again",
+        "title": "Please try again",
+        "subtitle": "Face/Touch id verification failed. Try again or you can do this next time.",
+        "cta": "Launch verification",
         "skip": "Do it later"
       },
       "success": {

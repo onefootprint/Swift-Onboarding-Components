@@ -1,13 +1,14 @@
 import { IcoFaceid40 } from '@onefootprint/icons';
+import { getErrorMessage } from '@onefootprint/request';
 import { Box, Button, Container, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import useTranslation from '@/hooks/use-translation';
 import { Events, useAnalytics } from '@/utils/analytics';
 
-import useRegisterBiometric from '../../hooks/use-register-biometric';
+import useRegisterPasskeys from '../../hooks/use-register-passkeys';
+import useSkipPasskeys from '../../hooks/use-skip-passkeys';
 import Success from '../success';
-import useSkipPasskeys from './hooks/use-skip-passkeys';
 
 export type RetryProps = {
   authToken: string;
@@ -17,23 +18,29 @@ export type RetryProps = {
 
 const Retry = ({ authToken, onSkip, onSuccess }: RetryProps) => {
   const { t } = useTranslation('components.passkeys.retry');
-  const registerBiometric = useRegisterBiometric();
-  const mutation = useSkipPasskeys();
+  const registerBiometric = useRegisterPasskeys();
+  const skipMutation = useSkipPasskeys();
   const analytics = useAnalytics();
 
   const handleSkip = () => {
-    analytics.track(Events.PasskeysRegistrationRetried);
-    mutation.mutate(
-      { authToken },
-      {
-        onSuccess: onSkip,
-      },
-    );
+    analytics.track(Events.PasskeyRegistrationSkipped);
+    analytics.track(Events.FPasskeyCompleted, { result: 'skip' });
+    skipMutation.mutate({ authToken }, { onSuccess: onSkip });
   };
 
   const handleRegister = () => {
+    analytics.track(Events.PasskeysRegistrationRetried);
     registerBiometric.mutate(authToken, {
-      onSuccess,
+      onSuccess: deviceResponseJson => {
+        analytics.track(Events.PasskeyRegistrationSucceeded);
+        analytics.track(Events.FPasskeyCompleted, { result: 'success' });
+        onSuccess(deviceResponseJson);
+      },
+      onError: (error: unknown) => {
+        analytics.track(Events.PasskeyRegistrationRetriedFailed, {
+          message: getErrorMessage(error),
+        });
+      },
     });
   };
 
@@ -53,12 +60,12 @@ const Retry = ({ authToken, onSkip, onSuccess }: RetryProps) => {
           <Button
             onPress={handleRegister}
             loading={registerBiometric.isLoading}
-            disabled={mutation.isLoading}
+            disabled={skipMutation.isLoading}
           >
             {t('cta')}
           </Button>
           <Button
-            loading={mutation.isLoading}
+            loading={skipMutation.isLoading}
             disabled={registerBiometric.isLoading}
             onPress={handleSkip}
             variant="secondary"

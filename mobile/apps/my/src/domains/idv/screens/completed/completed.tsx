@@ -14,7 +14,7 @@ const Completed = ({ authToken }) => {
   const analytics = useAnalytics();
 
   useEffect(() => {
-    analytics.track(Events.Ended, { result: 'success' });
+    analytics.track(Events.FEnded, { result: 'success' });
     analytics.timeEvent(AnalyticsTimeEvents.handoff);
 
     updateD2PStatusMutation.mutate({
