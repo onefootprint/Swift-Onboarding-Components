@@ -66,11 +66,11 @@ const StatusBar = styled.View<{ height: number }>`
 
 const Container = styled.View<{ height: number; top: number }>`
   ${({ theme, height, top }) => css`
-    align-items: flex-end;
-    flex-direction: row;
-    justify-content: space-between;
+    align-items: center;
     background: ${theme.backgroundColor.primary};
+    flex-direction: row;
     height: ${height}px;
+    justify-content: space-between;
     padding-horizontal: ${theme.spacing[3]};
     position: absolute;
     top: ${top}px;
