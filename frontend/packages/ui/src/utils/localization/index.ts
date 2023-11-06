@@ -1,5 +1,4 @@
-import type { SupportedLocale } from '@onefootprint/footprint-js';
-import type { CountryCode } from '@onefootprint/types';
+import type { CountryCode, SupportedLocale } from '@onefootprint/types';
 
 // eslint-disable-next-line import/prefer-default-export
 export const getCountryCodeFromLocale = (l?: SupportedLocale) =>

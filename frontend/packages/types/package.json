@@ -14,9 +14,6 @@
     "typecheck": "yarn tsc --noEmit",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
-  "dependencies": {
-    "@onefootprint/footprint-js": "*"
-  },
   "devDependencies": {
     "@onefootprint/jest-presets": "*",
     "eslint-config-footprint": "*",

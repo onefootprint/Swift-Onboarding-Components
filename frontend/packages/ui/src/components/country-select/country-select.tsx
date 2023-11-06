@@ -1,7 +1,6 @@
-import type { SupportedLocale } from '@onefootprint/footprint-js';
 import { COUNTRIES } from '@onefootprint/global-constants';
 import styled, { css } from '@onefootprint/styled';
-import type { CountryCode } from '@onefootprint/types';
+import type { CountryCode, SupportedLocale } from '@onefootprint/types';
 import React from 'react';
 
 import { getCountryCodeFromLocale } from '../../utils';

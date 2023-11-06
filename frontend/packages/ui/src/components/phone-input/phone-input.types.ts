@@ -1,6 +1,5 @@
-import type { SupportedLocale } from '@onefootprint/footprint-js';
 import type { CountryRecord } from '@onefootprint/global-constants';
-import type { CountryCode } from '@onefootprint/types';
+import type { CountryCode, SupportedLocale } from '@onefootprint/types';
 
 import type { BaseSelectOption } from '../internal/base-select/base-select.types';
 import type { InputProps as BaseInputProps } from '../internal/input';

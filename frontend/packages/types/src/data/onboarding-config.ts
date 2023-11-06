@@ -1,7 +1,6 @@
-import type { FootprintAppearance } from '@onefootprint/footprint-js';
-
 import type { CollectedDataOption } from './collected-data-option';
 import type { CountryCode } from './countries';
+import type { FootprintAppearance } from './footprint-appearance';
 
 export enum OnboardingConfigStatus {
   enabled = 'enabled',
@@ -24,9 +23,7 @@ export type PublicOnboardingConfig = {
   privacyPolicyUrl: string | null;
   isLive: boolean;
   status: OnboardingConfigStatus;
-
   appearance?: FootprintAppearance;
-
   isAppClipEnabled: boolean;
   isInstantAppEnabled: boolean;
   appClipExperienceId: string;

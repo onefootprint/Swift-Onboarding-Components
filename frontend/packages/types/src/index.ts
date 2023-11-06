@@ -261,6 +261,7 @@ export type {
   Role,
   Rolebinding,
   RoleScope,
+  SupportedLocale,
   Tenant,
   Timeline,
   TimelineEvent,

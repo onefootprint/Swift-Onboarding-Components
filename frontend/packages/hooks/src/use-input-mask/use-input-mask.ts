@@ -1,4 +1,4 @@
-import type { SupportedLocale } from '@onefootprint/footprint-js';
+import type { SupportedLocale } from '@onefootprint/types';
 
 type Mask = {
   dob: {
