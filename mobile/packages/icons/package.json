@@ -19,7 +19,7 @@
     "@onefootprint/design-tokens": "*",
     "@onefootprint/styled": "*",
     "react": "^18.2.0",
-    "react-native": "^0.71.7",
+    "react-native": "^0.72.6",
     "react-native-svg": "^13.9.0"
   },
   "devDependencies": {
