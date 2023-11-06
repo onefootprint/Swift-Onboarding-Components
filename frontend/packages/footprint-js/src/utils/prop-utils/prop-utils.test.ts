@@ -2,7 +2,7 @@ import {
   type AuthProps,
   ComponentKind,
   type VerifyButtonProps,
-} from '../types/components';
+} from '../../types/components';
 import {
   getCallbackProps,
   getDefaultVariantForKind,

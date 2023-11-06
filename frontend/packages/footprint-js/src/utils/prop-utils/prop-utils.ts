@@ -1,5 +1,5 @@
-import { ComponentCallbacksByEvent } from '../constants/callbacks';
-import RefsByComponent from '../constants/refs';
+import { ComponentCallbacksByEvent } from '../../constants/callbacks';
+import RefsByComponent from '../../constants/refs';
 import type {
   AuthProps,
   FormProps,
@@ -8,9 +8,9 @@ import type {
   Variant,
   VerifyButtonProps,
   VerifyProps,
-} from '../types/components';
-import { ComponentKind } from '../types/components';
-import { PublicEvent } from '../types/events';
+} from '../../types/components';
+import { ComponentKind } from '../../types/components';
+import { PublicEvent } from '../../types/events';
 
 type CallbackKeys = 'onCancel' | 'onClick' | 'onClose' | 'onComplete';
 type ExtractOnProps<T> = {
