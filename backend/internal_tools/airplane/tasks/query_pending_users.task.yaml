@@ -1,0 +1,21 @@
+slug: query_pending_users
+name: query_pending_users
+parameters:
+  - name: start_datetime
+    slug: start_datetime
+    type: datetime
+    description: start datetime ISO8601 (yyyy-mm-ddThh:mm:ss.mmmZ) (leave blank to ignore filtering)
+    required: false
+  - name: end_datetime
+    slug: end_datetime
+    type: datetime
+    description: start datetime ISO8601 (yyyy-mm-ddThh:mm:ss.mmmZ) (leave blank to ignore filtering)
+    required: false
+sql:
+  resource: 'prod_ro_db'
+  entrypoint: query_pending_users.sql
+  queryArgs:
+    q: ?
+    start_datetime: '{{params.start_datetime}}'
+    end_datetime: '{{params.end_datetime}}'
+

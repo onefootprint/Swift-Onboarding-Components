@@ -3,15 +3,15 @@ import { pad, tenant_name_to_emoji } from '../onboardings/tasks/utils';
 
 export default airplane.task(
   {
-    slug: 'report_pending_users',
-    name: 'Report Pending Users',
+    slug: 'report_recent_pending_users',
+    name: 'Report Recent Pending Users',
     parameters: {},
     schedules:
       process.env.AIRPLANE_ENV_SLUG === 'prod'
         ? {
-            every_thirty_minutes: {
-              cron: '*/30 * * * *',
-              description: 'Runs every 30 minutes',
+            every_three_minutes: {
+              cron: '*/3 * * * *',
+              description: 'Runs every 3 minutes',
             },
           }
         : {},
@@ -19,7 +19,7 @@ export default airplane.task(
   async params => {
     let end_datetime = new Date().toISOString();
     let start_datetime = new Date(
-      new Date().getTime() - 1000 * 60 * 60 * 24,
+      new Date().getTime() - 1000 * 60 * 3 - 10,
     ).toISOString();
 
     const run = await airplane.execute('query_pending_users', {
@@ -39,7 +39,7 @@ export default airplane.task(
 
       const message = `*${
         rows.length
-      } Users Still Stuck In Pending (showing first 30)*
+      } New Users Stuck In Pending (showing first 30)*
   :penguin-chill: *\`${pad('_  tenant   ', 30)}|${pad('sv_id', 30)}|${pad(
         'wf_id',
         30,
