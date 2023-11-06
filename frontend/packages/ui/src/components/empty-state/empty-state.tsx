@@ -36,7 +36,12 @@ const EmptyState = ({
   title,
   testID,
 }: EmptyStateProps) => (
-  <Stack testID={testID} align="center" justify="center" direction="column">
+  <Stack
+    data-testid={testID}
+    align="center"
+    justify="center"
+    direction="column"
+  >
     {Icon && (
       <Box marginBottom={7}>
         <Icon color="error" />

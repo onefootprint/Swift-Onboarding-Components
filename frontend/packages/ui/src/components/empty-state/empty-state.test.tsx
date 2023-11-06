@@ -1,11 +1,16 @@
 import { IcoArrowRightSmall24 } from '@onefootprint/icons';
-import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import {
+  customRender,
+  screen,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
 import React from 'react';
 
 import type { EmptyStateProps } from './empty-state';
 import EmptyState from './empty-state';
 
-describe.skip('<EmptyState />', () => {
+describe('<EmptyState />', () => {
   const renderEmptyState = ({
     cta = { label: 'cta', onClick: () => {} },
     description = 'warning',
@@ -60,7 +65,9 @@ describe.skip('<EmptyState />', () => {
     const cta = screen.getByText('Go back');
     await userEvent.click(cta);
 
-    expect(onClickMockFn).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onClickMockFn).toHaveBeenCalled();
+    });
   });
 
   describe('when passing an Icon', () => {
@@ -70,8 +77,7 @@ describe.skip('<EmptyState />', () => {
         testID: 'empty-state',
       });
 
-      const emptyState = screen.getByTestId('empty-state');
-      expect(emptyState).toContainHTML('svg');
+      expect(screen.getByTestId('empty-state')).toContainHTML('svg');
     });
   });
 
