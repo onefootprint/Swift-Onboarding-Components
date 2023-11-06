@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "b2c6ff3fdce6dce48ae698629468adb744cc80e6"
+        "version": "6d8ac8e19401dc153b6ddeac9673fe41d523641f"
     },
     "servers": [
         {
@@ -3316,7 +3316,6 @@
                 ]
             },
             "ValidateRequest": {
-                "description": "Request containing a short-lived validation token that is used to verify auth and the end of\n an onboarding session.",
                 "type": "object",
                 "properties": {
                     "validation_token": {
@@ -3329,7 +3328,6 @@
                 ]
             },
             "ValidateResponse": {
-                "description": "Validates the onboarding token and returns the associated stable fp_id token with status information",
                 "type": "object",
                 "properties": {
                     "business": {

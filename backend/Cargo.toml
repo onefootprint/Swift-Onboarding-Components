@@ -99,7 +99,7 @@ deadpool = { version = "0.9.5", features = [
 
 actix-web = "4.3.1"
 
-paperclip = { version = "0.8.2", features = [
+paperclip = { git="https://github.com/onefootprint/paperclip", rev="7b0bb05199f02dc230e314044d308c394665295b", features = [
     "actix4",
     "actix4-validator",
     "actix-multipart",

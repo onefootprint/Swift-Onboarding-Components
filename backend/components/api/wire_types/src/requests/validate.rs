@@ -1,35 +1,40 @@
 use crate::*;
 
-/// Request containing a short-lived validation token that is used to verify auth and the end of
-/// an onboarding session.
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, Apiv2Schema)]
 pub struct ValidateRequest {
     pub validation_token: SessionAuthToken,
 }
 
-/// Validates the onboarding token and returns the associated stable fp_id token with status information
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 pub struct ValidateResponse {
+    /// Information on the authenticated user and the auth method they used
     pub user_auth: UserAuthResponse,
     #[serde(skip_serializing_if = "Option::is_none")]
+    /// Information on the user and their onboarding session. Provided for KYC and KYB playbook sessions
     pub user: Option<EntityValidateResponse>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    /// Information on the business and its onboarding session. Provided for KYB playbook sessions
     pub business: Option<EntityValidateResponse>,
 
     // Legacy fields that are deprecated
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[openapi(skip)]
     /// Deprecated
     pub footprint_user_id: Option<FpId>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[openapi(skip)]
     /// Deprecated
     pub status: Option<OnboardingStatus>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[openapi(skip)]
     /// Deprecated
     pub requires_manual_review: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[openapi(skip)]
     /// Deprecated
     pub onboarding_configuration_id: Option<ObConfigurationId>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[openapi(skip)]
     /// Deprecated
     pub timestamp: Option<DateTime<Utc>>,
 }
@@ -51,41 +56,4 @@ pub struct UserAuthResponse {
 pub struct ValidateAuthEvent {
     pub kind: ModernAuthEventKind,
     pub timestamp: DateTime<Utc>,
-}
-
-// Manually implement Apiv2Schema for ValidateResponse since we can't otherwise hide the deprecated fields
-
-impl paperclip::v2::schema::Apiv2Schema for ValidateResponse {
-    fn name() -> Option<String> {
-        Some("ValidateResponse".to_string())
-    }
-    // These aren't used - only `name()` is used to trick the spec into thinking the API returns
-    // a ValidateResponse instance below
-    fn description() -> &'static str {
-        ShadowValidateResponse::description()
-    }
-    fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
-        let mut schema = ShadowValidateResponse::raw_schema();
-        schema.name = Self::name();
-        schema
-    }
-}
-impl paperclip::actix::OperationModifier for ValidateResponse {}
-
-// This struct isn't used anywhere - its auto-generated Apiv2Schema is simply used in place of
-// autogenerating one for ValidateResponse above - there doesn't seem to be a way to hide the
-// deprecated fields in the open API spec for ValidateResponse...
-
-/// Validates the onboarding token and returns the associated stable fp_id token with status information
-#[derive(Apiv2Schema)]
-struct ShadowValidateResponse {
-    #[allow(unused)]
-    /// Information on the authenticated user and the auth method they used
-    user_auth: UserAuthResponse,
-    #[allow(unused)]
-    /// Information on the user and their onboarding session. Provided for KYC and KYB playbook sessions
-    user: Option<EntityValidateResponse>,
-    #[allow(unused)]
-    /// Information on the business and its onboarding session. Provided for KYB playbook sessions
-    business: Option<EntityValidateResponse>,
 }

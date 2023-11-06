@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "b2c6ff3fdce6dce48ae698629468adb744cc80e6"
+        "version": "6d8ac8e19401dc153b6ddeac9673fe41d523641f"
     },
     "servers": [
         {
@@ -246,7 +246,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/components/schemas/DUMMYLiteUser"
+                                                "$ref": "#/components/schemas/LiteUser"
                                             }
                                         },
                                         "meta": {
@@ -1323,18 +1323,6 @@
                 "required": [
                     "annotation",
                     "status"
-                ]
-            },
-            "DUMMYLiteUser": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "example": "fp_id_7p793EF07xKXHqAeg5VGPj",
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "id"
                 ]
             },
             "EmptyResponse": {
@@ -6356,6 +6344,18 @@
                 "required": [
                     "<key>",
                     "<value>"
+                ]
+            },
+            "LiteUser": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "example": "fp_id_7p793EF07xKXHqAeg5VGPj",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id"
                 ]
             },
             "LivenessEvent": {

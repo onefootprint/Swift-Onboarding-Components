@@ -26,7 +26,7 @@ use paperclip::actix::{api_v2_operation, post, web, web::Json, web::Path};
 use serde::Deserialize;
 use std::collections::{HashMap, HashSet};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Apiv2Schema)]
 pub struct DecryptRequest {
     /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`
     pub(super) fields: HashSet<VersionedDataIdentifier>,
@@ -36,6 +36,7 @@ pub struct DecryptRequest {
     /// A list of filter functions to apply to each decrypted data
     /// Omit or leave empty to apply no filters
     /// DEPRECATED
+    #[openapi(skip)]
     pub(super) filters: Option<Vec<FilterFunction>>,
 
     /// A list of filter and transform functions to apply to each decrypted datum.
@@ -44,41 +45,7 @@ pub struct DecryptRequest {
     pub(super) transforms: Option<Vec<FilterFunctionStr>>,
 }
 
-impl paperclip::v2::schema::Apiv2Schema for DecryptRequest {
-    fn name() -> Option<String> {
-        Some("DecryptRequest".to_string())
-    }
-    fn description() -> &'static str {
-        DONOTUSEUseDecryptRequest::description()
-    }
-    fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
-        let mut schema = DONOTUSEUseDecryptRequest::raw_schema();
-        schema.name = Self::name();
-        schema
-    }
-}
-impl paperclip::actix::OperationModifier for DecryptRequest {}
-
-// This struct isn't used anywhere - its auto-generated Apiv2Schema is simply used in place of
-// autogenerating one for DecryptRequest above - there doesn't seem to be a way to hide the
-// deprecated fields in the open API spec...
-
-#[derive(Apiv2Schema)]
-struct DONOTUSEUseDecryptRequest {
-    /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`
-    #[allow(unused)]
-    fields: HashSet<VersionedDataIdentifier>,
-    /// Reason for the data decryption. This will be logged
-    #[allow(unused)]
-    reason: String,
-    /// A list of filter and transform functions to apply to each decrypted datum.
-    /// Omit or leave empty to apply no transforms.
-    /// Can find more information on allowed transform functions on our docs
-    #[allow(unused)]
-    transforms: Option<Vec<FilterFunctionStr>>,
-}
-
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Apiv2Schema)]
 pub struct ClientDecryptRequest {
     /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`
     fields: HashSet<VersionedDataIdentifier>,
@@ -89,43 +56,13 @@ pub struct ClientDecryptRequest {
     /// Omit or leave empty to apply no filters
     /// DEPRECATED
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[openapi(skip)]
     filters: Option<Vec<FilterFunction>>,
 
     /// A list of filter and transform functions to apply to each decrypted datum.
     /// Omit or leave empty to apply no transforms
     /// Can find more information on allowed transform functions on our docs
     #[serde(default)]
-    transforms: Option<Vec<FilterFunctionStr>>,
-}
-
-impl paperclip::v2::schema::Apiv2Schema for ClientDecryptRequest {
-    fn name() -> Option<String> {
-        Some("ClientDecryptRequest".to_string())
-    }
-    fn description() -> &'static str {
-        DONOTUSEClientDecryptRequest::description()
-    }
-    fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
-        let mut schema = DONOTUSEClientDecryptRequest::raw_schema();
-        schema.name = Self::name();
-        schema
-    }
-}
-impl paperclip::actix::OperationModifier for ClientDecryptRequest {}
-
-#[derive(Apiv2Schema)]
-pub struct DONOTUSEClientDecryptRequest {
-    /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `custom.bank_account`
-    #[allow(unused)]
-    fields: HashSet<VersionedDataIdentifier>,
-    /// Reason for the data decryption. This will be logged.
-    /// The reason must be provided either here or in the client token
-    #[allow(unused)]
-    reason: Option<String>,
-    /// A list of filter and transform functions to apply to each decrypted datum.
-    /// Omit or leave empty to apply no transforms
-    /// Can find more information on allowed transform functions on our docs
-    #[allow(unused)]
     transforms: Option<Vec<FilterFunctionStr>>,
 }
 
