@@ -32,6 +32,7 @@ jobs:
           echo "commit hash from workflow_run ${{ github.event.workflow_run.head_commit.id }}"
           echo "commit hash over branch HEAD ${{ github.sha }}"
           commit_hash="${{ github.event.workflow_run.head_commit.id || github.sha }}"
+          echo "commit hash we will deploy in this workflow: $commit_hash"
           echo "##[set-output name=commitHashToDeploy;]$(echo ${commit_hash})"
       - uses: actions/checkout@v3
       - uses: ./.github/actions/backend_extract_commit_hash
@@ -81,7 +82,7 @@ jobs:
 
   run_tests:
     name: 'integration tests'
-    needs: [deploy_stack_dev]
+    needs: [deploy_stack_dev, extract_commit_hash]
     if: success()
     uses: ./.github/workflows/backend_remote_integration_tests.yml
     permissions:
@@ -91,6 +92,7 @@ jobs:
       testUrl: '${{ needs.deploy_stack_dev.outputs.url }}'
       isPR: false
       waitForDeploy: true
+      expectedCommitHash: ${{ needs.extract_commit_hash.outputs.commitHashToDeploy }}
       environment: dev
     secrets:
       IT_PHONE_NUMBERS: ${{ secrets.IT_PHONE_NUMBERS }}
