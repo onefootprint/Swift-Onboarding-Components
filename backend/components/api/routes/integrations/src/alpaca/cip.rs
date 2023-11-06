@@ -619,8 +619,10 @@ impl<'a> DocumentCipResultHelper<'a> {
                 first_name: first,
                 last_name: last,
                 date_of_birth: dob,
-                // TODO (FP-4619)
-                address: Some(CipResult::Consider),
+                address: Some(CipResult::clear(
+                    self.frcs
+                        .contains(&FootprintReasonCode::DocumentOcrAddressMatches),
+                )),
             },
         )
     }
