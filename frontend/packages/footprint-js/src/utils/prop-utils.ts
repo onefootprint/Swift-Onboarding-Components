@@ -132,7 +132,7 @@ export const getCallbackProps = (
   props: Props,
   onDestroy?: () => void,
   onLaunchChild?: (secondaryProps: Props) => void,
-): Partial<Record<PublicEvent, () => void>> => {
+): Partial<Record<PublicEvent, (callbackArgs?: unknown) => void>> => {
   const { kind } = props;
   const callbacks = ComponentCallbacksByEvent[kind] ?? {};
   const modifiedCallbacks: Partial<Record<PublicEvent, () => void>> = {};

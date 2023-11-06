@@ -24,7 +24,7 @@ const getFootprint = (): Footprint => {
     const renderSecondary = async (secondaryProps: Props) => {
       let secondaryIframe = initIframe(secondaryProps);
       secondaryIframe = manager.getOrCreateSecondary(iframe, secondaryIframe);
-      secondaryIframe.registerEvent('destroy', () => {
+      secondaryIframe.registerOnDestroy(() => {
         destroySecondary(secondaryIframe);
       });
       secondaryIframe.render();
@@ -32,8 +32,8 @@ const getFootprint = (): Footprint => {
 
     const render = async () => {
       iframe = manager.getOrCreate(iframe);
-      iframe.registerEvent('destroy', destroy);
-      iframe.registerEvent('renderSecondary', renderSecondary);
+      iframe.registerOnDestroy(destroy);
+      iframe.registerOnRenderSecondary(renderSecondary);
       await iframe.render();
     };
 
