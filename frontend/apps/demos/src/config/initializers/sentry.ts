@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/browser';
+import * as Sentry from '@sentry/nextjs';
 
 import { COMMIT_SHA, SENTRY_DSN } from '../constants';
 
