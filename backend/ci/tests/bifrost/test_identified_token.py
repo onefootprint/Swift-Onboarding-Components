@@ -99,6 +99,48 @@ def test_api_vault(twilio, sandbox_tenant, ob_config):
     assert user.fp_id == fp_id
 
 
+def test_3p_auth(sandbox_tenant, ob_config):
+    """
+    Test creating a token for a user created via API with third party auth, where the tenant
+    attests that the user authenticated with them.
+    """
+    initial_data = {
+        "id.phone_number": FIXTURE_PHONE_NUMBER,
+    }
+    body = post("users", initial_data, sandbox_tenant.sk.key)
+    fp_id = body["id"]
+    sandbox_id = body["sandbox_id"]
+
+    data = dict(key=ob_config.key.value, third_party_auth=True)
+    body = post(f"entities/{fp_id}/token", data, sandbox_tenant.sk.key)
+    auth_token = FpAuth(body["token"])
+
+    # Should immediately have onboarding scopes through 3p auth
+    body = get("hosted/user/token", None, auth_token)
+    assert set(body["scopes"]) >= {"sign_up"}
+
+    # Run bifrost
+    bifrost = BifrostClient.raw_auth(
+        ob_config,
+        auth_token,
+        FIXTURE_PHONE_NUMBER,
+        sandbox_id,
+    )
+    user = bifrost.run()
+    assert [i["kind"] for i in bifrost.already_met_requirements] == ["authorize"]
+    assert [i["kind"] for i in bifrost.handled_requirements] == [
+        "collect_data",
+        "liveness",
+        "process",
+    ]
+    assert user.fp_id == fp_id
+
+    assert all(
+        i["kind"] == "third_party"
+        for i in user.client.validate_response["user_auth"]["auth_events"]
+    )
+
+
 def test_redo_onboard(twilio, ob_config, sandbox_tenant):
     """
     Test creating a token to onboard a user onto the same KYC playbook they already onboarded onto

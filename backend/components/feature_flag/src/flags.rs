@@ -64,6 +64,8 @@ pub enum BoolFlag<'a> {
     UseIncodeDemoCredentialsInLivemode(&'a TenantId),
     #[strum(to_string = "IsKycWaterfallOnRuleFailureEnabled")]
     IsKycWaterfallOnRuleFailureEnabled(&'a TenantId),
+    #[strum(to_string = "CanProvideThirdPartyAuth")]
+    CanProvideThirdPartyAuth(&'a TenantId),
     #[strum(to_string = "RunAwsRekognition")]
     RunAwsRekognition(&'a TenantId),
     #[strum(to_string = "CreateKycWorkflowForAlpacaOnboardings")]
@@ -107,6 +109,7 @@ impl<'a> BoolFlag<'a> {
             Self::DisableSelfieChecking(k) => Some(k.to_string()),
             Self::UseIncodeDemoCredentialsInLivemode(k) => Some(k.to_string()),
             Self::IsKycWaterfallOnRuleFailureEnabled(k) => Some(k.to_string()),
+            Self::CanProvideThirdPartyAuth(k) => Some(k.to_string()),
             Self::RunAwsRekognition(k) => Some(k.to_string()),
             Self::CreateKycWorkflowForAlpacaOnboardings(k) => Some(k.to_string()),
         }
@@ -144,6 +147,7 @@ impl<'a> BoolFlag<'a> {
             Self::DisableSelfieChecking(_) => false,
             Self::UseIncodeDemoCredentialsInLivemode(_) => false,
             Self::IsKycWaterfallOnRuleFailureEnabled(_) => false,
+            Self::CanProvideThirdPartyAuth(_) => false,
             Self::RunAwsRekognition(_) => false,
             Self::CreateKycWorkflowForAlpacaOnboardings(_) => false,
         }

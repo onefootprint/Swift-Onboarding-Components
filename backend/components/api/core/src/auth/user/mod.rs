@@ -76,7 +76,7 @@ fn auth_event_to_scopes(k: &AuthEventKind) -> Vec<UserAuthScope> {
             UserAuthScope::BasicProfile,
             UserAuthScope::Handoff,
         ],
-        AuthEventKind::Passkey => vec![
+        AuthEventKind::Passkey | AuthEventKind::ThirdParty => vec![
             UserAuthScope::SignUp,
             UserAuthScope::Auth,
             UserAuthScope::BasicProfile,

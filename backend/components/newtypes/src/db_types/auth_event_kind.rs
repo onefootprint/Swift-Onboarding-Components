@@ -35,6 +35,8 @@ pub enum AuthEventKind {
     Sms,
     Email,
     Passkey,
+    /// A third party tenant testification that the user authenticated with them.
+    ThirdParty,
 }
 
 impl_enum_str_diesel!(AuthEventKind);
@@ -56,6 +58,8 @@ pub enum ModernAuthEventKind {
     Sms,
     Email,
     Passkey,
+    #[openapi(skip)]
+    ThirdParty,
 }
 
 impl From<AuthEventKind> for ModernAuthEventKind {
@@ -64,6 +68,7 @@ impl From<AuthEventKind> for ModernAuthEventKind {
             AuthEventKind::Email => Self::Email,
             AuthEventKind::Passkey => Self::Passkey,
             AuthEventKind::Sms => Self::Sms,
+            AuthEventKind::ThirdParty => Self::ThirdParty,
         }
     }
 }

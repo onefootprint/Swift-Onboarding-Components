@@ -361,7 +361,7 @@ class BifrostClient:
         assert body["user_auth"]["fp_id"] == body["user"]["fp_id"]
         assert body["user_auth"]["auth_events"]
         assert all(
-            e["kind"] in {"sms", "email", "passkey"}
+            e["kind"] in {"sms", "email", "passkey", "third_party"}
             for e in body["user_auth"]["auth_events"]
         )
         assert all(e["timestamp"] for e in body["user_auth"]["auth_events"])

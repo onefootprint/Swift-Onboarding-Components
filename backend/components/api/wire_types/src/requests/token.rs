@@ -7,6 +7,9 @@ pub struct CreateTokenRequest {
     /// The user will be asked to provide any missing information required by playbook.
     /// If you provide the key here, you can omit providing it in your frontend Footprint.js integration.
     pub key: Option<ObConfigurationKey>,
+
+    #[openapi(skip)]
+    pub third_party_auth: Option<bool>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
