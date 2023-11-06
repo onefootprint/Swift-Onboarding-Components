@@ -172,26 +172,18 @@ Base.args = {
   children: 'Content',
   headerIcon: {
     component: IcoClose24,
-    onClick: () => {
-      console.log('close'); // eslint-disable-line no-console
-    },
+    onClick: () => console.log('close'), // eslint-disable-line no-console
     ariaLabel: 'Close',
   },
-  onClose: () => {
-    console.log('close'); // eslint-disable-line no-console
-  },
+  onClose: () => console.log('close'), // eslint-disable-line no-console
   open: false,
   primaryButton: {
     label: 'Primary',
-    onClick: () => {
-      alert('Primary button clicked');
-    },
+    onClick: () => alert('Primary button clicked'), // eslint-disable-line no-alert
   },
   secondaryButton: {
     label: 'Secondary',
-    onClick: () => {
-      alert('Secondary button clicked');
-    },
+    onClick: () => alert('Secondary button clicked'), // eslint-disable-line no-alert
   },
   size: 'default',
   testID: 'dialog-test-id',

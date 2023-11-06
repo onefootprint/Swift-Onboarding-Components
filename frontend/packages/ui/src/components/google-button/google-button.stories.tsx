@@ -86,7 +86,7 @@ Base.args = {
   fullWidth: false,
   loading: false,
   loadingAriaLabel: 'Loading',
-  onClick: () => alert('I was clicked'),
+  onClick: () => alert('I was clicked'), // eslint-disable-line no-alert
   size: 'default',
   testID: 'google-button-test-id',
   type: 'button',

@@ -107,7 +107,7 @@ Base.args = {
   loading: false,
   loadingAriaLabel: 'Loading',
   fullWidth: false,
-  onClick: () => alert('I was clicked'),
+  onClick: () => alert('I was clicked'), // eslint-disable-line no-alert
   size: 'default',
   testID: 'button-test-id',
   type: 'button',

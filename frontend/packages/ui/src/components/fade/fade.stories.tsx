@@ -54,5 +54,5 @@ export const Default = Template.bind({});
 Default.args = {
   from: 'left',
   to: 'right',
-  onClick: () => alert('I was clicked'),
+  onClick: () => alert('I was clicked'), // eslint-disable-line no-alert
 };
