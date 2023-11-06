@@ -1,14 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import type { IdDocImageTypes } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React from 'react';
 
-import {
-  AUTOCAPTURE_TIMER_INTERVAL,
-  FRAME_INSTRUCTION_TRANSITION_DELAY,
-} from '../../../../constants/transition-delay.constants';
+import { AUTOCAPTURE_TIMER_INTERVAL } from '../../../../constants/transition-delay.constants';
 import type { AutocaptureKind } from '../../hooks/use-auto-capture';
 
 type OverlayProps = {
@@ -18,24 +12,10 @@ type OverlayProps = {
   captureKind: AutocaptureKind;
   outlineWidth: number;
   outlineHeight: number;
-  isCameraVisible: boolean;
   timerAnimationVal?: number;
-  imageType: IdDocImageTypes;
 };
 
-const transitionDelayInSeconds = FRAME_INSTRUCTION_TRANSITION_DELAY / 1000;
-
-const overlayBackgroundVariants = {
-  visible: { backgroundColor: '#FFFFFFCC' },
-  hidden: {
-    opacity: [1, 0],
-    transition: {
-      type: 'tween',
-      duration: transitionDelayInSeconds,
-      times: [0.75, 1],
-    },
-  },
-};
+const NUM_MS_IN_SEC = 1000;
 
 const Overlay = ({
   width,
@@ -44,110 +24,81 @@ const Overlay = ({
   captureKind,
   outlineWidth,
   outlineHeight,
-  isCameraVisible,
   timerAnimationVal,
-  imageType,
-}: OverlayProps) => {
-  const { t } = useTranslation('components.camera.overlay');
-  return (
-    <Container width={width} height={height} videoHeight={videoHeight}>
-      {captureKind === 'face' && (
-        <>
-          <FullFrameOutline
-            width={width}
-            height={height}
-            $outlineWidth={outlineWidth}
-            $outlineHeight={outlineHeight}
-          >
-            <InstructionContainer
-              initial="visible"
-              animate={isCameraVisible ? 'hidden' : ''}
-              variants={overlayBackgroundVariants}
-            >
-              <Typography variant="label-3" sx={{ textAlign: 'center' }}>
-                {t('face.title')}
-              </Typography>
-              <Typography variant="body-3" sx={{ textAlign: 'center' }}>
-                {t('face.subtitle')}
-              </Typography>
-            </InstructionContainer>
-            {timerAnimationVal && (
-              <TimerAnimation
-                key={timerAnimationVal}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [1, 0] }}
-                transition={{
-                  type: 'tween',
-                  duration: AUTOCAPTURE_TIMER_INTERVAL / 1000,
-                }}
-              />
-            )}
-          </FullFrameOutline>
-          <CornerOutline
-            width={width}
-            height={height}
-            $outlineWidth={outlineWidth}
-            $outlineHeight={outlineHeight}
-            corner="top-left"
-          />
-          <CornerOutline
-            width={width}
-            height={height}
-            $outlineWidth={outlineWidth}
-            $outlineHeight={outlineHeight}
-            corner="top-right"
-          />
-          <CornerOutline
-            width={width}
-            height={height}
-            $outlineWidth={outlineWidth}
-            $outlineHeight={outlineHeight}
-            corner="bottom-left"
-          />
-          <CornerOutline
-            width={width}
-            height={height}
-            $outlineWidth={outlineWidth}
-            $outlineHeight={outlineHeight}
-            corner="bottom-right"
-          />
-        </>
-      )}
-      {captureKind === 'document' && (
+}: OverlayProps) => (
+  <Container width={width} height={height} videoHeight={videoHeight}>
+    {captureKind === 'face' && (
+      <>
         <FullFrameOutline
           width={width}
           height={height}
           $outlineWidth={outlineWidth}
           $outlineHeight={outlineHeight}
-          data-show-border
         >
-          <InstructionContainer
-            initial="visible"
-            animate={isCameraVisible ? 'hidden' : ''}
-            variants={overlayBackgroundVariants}
-          >
-            <Typography variant="label-3" sx={{ textAlign: 'center' }}>
-              {t('document.title', { side: imageType })}
-            </Typography>
-            <Typography variant="body-3" sx={{ textAlign: 'center' }}>
-              {t('document.subtitle')}
-            </Typography>
-          </InstructionContainer>
-          {timerAnimationVal && (
+          {timerAnimationVal ? (
             <TimerAnimation
               key={timerAnimationVal}
               initial={{ opacity: 0 }}
               animate={{ opacity: [1, 0] }}
               transition={{
-                duration: AUTOCAPTURE_TIMER_INTERVAL / 1000,
+                type: 'tween',
+                duration: AUTOCAPTURE_TIMER_INTERVAL / NUM_MS_IN_SEC,
               }}
             />
-          )}
+          ) : null}
         </FullFrameOutline>
-      )}
-    </Container>
-  );
-};
+        <CornerOutline
+          width={width}
+          height={height}
+          $outlineWidth={outlineWidth}
+          $outlineHeight={outlineHeight}
+          corner="top-left"
+        />
+        <CornerOutline
+          width={width}
+          height={height}
+          $outlineWidth={outlineWidth}
+          $outlineHeight={outlineHeight}
+          corner="top-right"
+        />
+        <CornerOutline
+          width={width}
+          height={height}
+          $outlineWidth={outlineWidth}
+          $outlineHeight={outlineHeight}
+          corner="bottom-left"
+        />
+        <CornerOutline
+          width={width}
+          height={height}
+          $outlineWidth={outlineWidth}
+          $outlineHeight={outlineHeight}
+          corner="bottom-right"
+        />
+      </>
+    )}
+    {captureKind === 'document' && (
+      <FullFrameOutline
+        width={width}
+        height={height}
+        $outlineWidth={outlineWidth}
+        $outlineHeight={outlineHeight}
+        data-show-border
+      >
+        {timerAnimationVal && (
+          <TimerAnimation
+            key={timerAnimationVal}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [1, 0] }}
+            transition={{
+              duration: AUTOCAPTURE_TIMER_INTERVAL / 1000,
+            }}
+          />
+        )}
+      </FullFrameOutline>
+    )}
+  </Container>
+);
 
 const Container = styled.div<{
   width: number;
@@ -229,18 +180,6 @@ const FullFrameOutline = styled.div<{
     &[data-show-border='true'] {
       border: ${theme.spacing[2]} solid ${theme.backgroundColor.primary};
     }
-  `}
-`;
-
-const InstructionContainer = styled(motion.div)`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    border-radius: calc(2 * ${theme.borderRadius.default});
   `}
 `;
 

@@ -214,16 +214,6 @@
       "manual-enabled-toast": {
         "title": "Manual capture enabled",
         "description": "We noticed it's taking you a while to trigger the automatic capture, so you can now take the picture manually."
-      },
-      "overlay": {
-        "document": {
-          "title": "Place {{side}} of your driver's license here",
-          "subtitle": "We'll scan it automatically"
-        },
-        "face": {
-          "title": "Place your face here",
-          "subtitle": "We'll scan it automatically"
-        }
       }
     },
     "preview": {

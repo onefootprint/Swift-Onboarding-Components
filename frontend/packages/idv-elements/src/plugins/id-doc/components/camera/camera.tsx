@@ -10,8 +10,8 @@ import Logger from '../../../../utils/logger';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
 import {
   AUTOCAPTURE_RESTART_DELAY,
+  AUTOCAPTURE_START_DELAY,
   AUTOCAPTURE_TIMER_INTERVAL,
-  FRAME_INSTRUCTION_TRANSITION_DELAY,
 } from '../../constants/transition-delay.constants';
 import type { CaptureKind } from '../../utils/state-machine';
 import CaptureButton from './components/capture-button';
@@ -102,7 +102,7 @@ const Camera = ({
     () => {
       setShouldDetect(true);
     },
-    isCameraVisible ? FRAME_INSTRUCTION_TRANSITION_DELAY : null,
+    isCameraVisible ? AUTOCAPTURE_START_DELAY : null,
   );
 
   const handleCanPlay = () => {
@@ -280,8 +280,6 @@ const Camera = ({
                 captureKind={autocaptureKind}
                 outlineWidth={outlineWidth}
                 outlineHeight={outlineHeight}
-                isCameraVisible={isCameraVisible}
-                imageType={imageType}
                 timerAnimationVal={
                   isTimerRunning ? autoCaptureTimerVal : undefined
                 }
