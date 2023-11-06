@@ -52,6 +52,7 @@ const LoadAppearanceInBrowser = ({
 
   useEffect(() => {
     getAppearance();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return theme ? (

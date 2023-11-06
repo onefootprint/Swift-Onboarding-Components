@@ -70,7 +70,7 @@ describe('AddressInput', () => {
     expect(onChangeText).toHaveBeenCalledWith('14 Linda Street');
   });
 
-  it.skip('should render the address suggestions dropdown when the input has a value', async () => {
+  it('should render the address suggestions dropdown when the input has a value', async () => {
     renderAddressInput({
       label: 'Address',
     });
@@ -86,7 +86,7 @@ describe('AddressInput', () => {
     });
   });
 
-  it.skip('should call the onSelect prop when an address suggestion is selected', async () => {
+  it('should call the onSelect prop when an address suggestion is selected', async () => {
     const onSelect = jest.fn();
     renderAddressInput({
       label: 'Address',

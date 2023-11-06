@@ -57,6 +57,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
     useEffect(() => {
       clearCache();
       clearSuggestions();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [country]);
 
     const options = take(data, MAX_OF_RESULTS);
