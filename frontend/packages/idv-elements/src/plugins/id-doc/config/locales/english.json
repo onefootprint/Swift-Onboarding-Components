@@ -186,7 +186,7 @@
           },
           "document": {
             "ok": "Hold still...",
-            "detecting": "Position the document in the frame",
+            "detecting": " Scan the {{side, allCaps}} of your driver's license",
             "blurry": "Image is blurry, find better lighting or move your camera"
           }
         }
@@ -276,13 +276,13 @@
     "front-photo-capture": {
       "title": {
         "camera": {
-          "driversLicense": "Driver's license (Front)",
-          "idCard": "ID card (Front)",
-          "passport": "Passport (Photo page)",
-          "visa": "Visa (Photo page)",
-          "workPermit": "EAD card (Front)",
-          "residenceDocument": "Green card (Front)",
-          "voterIdentification": "Voter identification (Front)"
+          "driversLicense": "Driver's license · FRONT",
+          "idCard": "ID card · FRONT",
+          "passport": "Passport · PHOTO PAGE",
+          "visa": "Visa · PHOTO PAGE",
+          "workPermit": "EAD card · FRONT",
+          "residenceDocument": "Green card · FRONT",
+          "voterIdentification": "Voter identification · FRONT"
         },
         "preview": {
           "driversLicense": "Driver's license",
@@ -301,13 +301,13 @@
     "back-photo-capture": {
       "title": {
         "camera": {
-          "driversLicense": "Driver's license (Back)",
-          "idCard": "ID card (Back)",
-          "passport": "Passport (Photo page)",
-          "visa": "Visa (Photo page)",
-          "workPermit": "EAD card (Back)",
-          "residenceDocument": "Green card (Back)",
-          "voterIdentification": "Voter identification (Back)"
+          "driversLicense": "Driver's license · BACK",
+          "idCard": "ID card · BACK",
+          "passport": "Passport · PHOTO PAGE",
+          "visa": "Visa · PHOTO PAGE",
+          "workPermit": "EAD card · BACK",
+          "residenceDocument": "Green card · BACK",
+          "voterIdentification": "Voter identification · BACK"
         },
         "preview": {
           "driversLicense": "Driver's license",

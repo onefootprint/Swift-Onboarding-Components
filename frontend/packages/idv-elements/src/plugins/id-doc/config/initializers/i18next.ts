@@ -25,6 +25,10 @@ const configureI18next = () => {
     value => `${value.charAt(0).toUpperCase()}${value.slice(1)}`,
   );
 
+  i18nextInstance.services.formatter?.add('allCaps', value =>
+    value.toUpperCase(),
+  );
+
   return i18nextInstance;
 };
 

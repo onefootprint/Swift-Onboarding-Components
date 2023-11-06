@@ -300,6 +300,9 @@ const Camera = ({
                 <Feedback deviceKind={deviceKind} top={feedbackTop}>
                   {t(
                     `autocapture.feedback.${autocaptureKind}.${autocaptureFeedback}`,
+                    {
+                      side: imageType,
+                    },
                   )}
                 </Feedback>
               )}
