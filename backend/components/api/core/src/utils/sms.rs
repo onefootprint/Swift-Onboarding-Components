@@ -188,16 +188,19 @@ impl SmsClient {
         let e164 = destination.e164();
         let client = self.clone();
         let fut = async move {
-            let _ = client
+            let res = client
                 ._send_message(message_body, e164, Some(tx), session_id)
                 .await;
+            if let Err(err) = res {
+                tracing::error!(?err, "Couldn't send SMS asynchronously");
+            }
         };
         tokio::spawn(fut.in_current_span());
         Ok(())
     }
 
     /// Sends the message_body to the provided destination, choosing which vendor to use if any
-    #[tracing::instrument("SmsClient::_send_message", skip(self, message_body, destination, tx), err)]
+    #[tracing::instrument("SmsClient::_send_message", skip(self, message_body, destination, tx))]
     async fn _send_message(
         &self,
         message_body: PiiString,
@@ -236,7 +239,7 @@ impl SmsClient {
                 Ok(_) => return Ok(()),
                 Err(e) => e,
             };
-            tracing::warn!(?preferred_vendor, ?e, "Moving on to next SMS vendor");
+            tracing::warn!(?preferred_vendor, err=%e, "Moving on to next SMS vendor");
             err = if let Some(tx) = tx.take() {
                 // After the first error is encountered, pass the error back on the channel in
                 // case someone is listening
