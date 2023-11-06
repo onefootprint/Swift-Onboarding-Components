@@ -2,6 +2,7 @@ import { IcoImages24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React, { useRef, useState } from 'react';
 
+import Logger from '../../../../../../utils/logger';
 import useProcessImage from '../../../../hooks/use-process-image';
 import { useIdDocMachine } from '../../../machine-provider';
 
@@ -36,10 +37,17 @@ const UploadButton = ({ onUpload, onComplete }: UploadButtonProps) => {
 
     const processResult = await processImageFile(files[0], hasBadConnectivity);
     if (!processResult) {
+      Logger.warn(
+        'Captured image could not be processed - retaking the image',
+        'photo-capture',
+      );
       onProcessingDone();
       return;
     }
 
+    Logger.info(
+      `UploadButton: size of the processed file to be sent in machine event type 'receivedImage' is ${processResult.file.size}, file type ${processResult.file.type}`,
+    );
     send({
       type: 'receivedImage',
       payload: {

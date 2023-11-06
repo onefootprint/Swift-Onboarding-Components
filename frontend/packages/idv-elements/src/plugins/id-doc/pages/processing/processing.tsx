@@ -146,6 +146,9 @@ const Processing = () => {
     }
 
     const { imageFile, extraCompressed, captureKind } = image;
+    Logger.info(
+      `Processing: size of the file to be sent in POST request is ${imageFile.size}, file type ${imageFile.type}`,
+    );
     submitDocMutation.mutate(
       {
         authToken,

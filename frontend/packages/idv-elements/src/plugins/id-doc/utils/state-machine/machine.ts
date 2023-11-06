@@ -4,6 +4,7 @@ import {
 } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
+import Logger from '../../../../utils/logger';
 import { NextSideTargetsDesktop, NextSideTargetsMobile } from './machine.utils';
 import type { MachineContext, MachineEvents } from './types';
 
@@ -306,6 +307,9 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             captureKind: event.payload.captureKind,
             extraCompressed: event.payload.extraCompressed,
           };
+          Logger.info(
+            `IdDocMachine (func assignImage): size of the image file assigned to machine context is ${context.image?.imageFile?.size}, file type ${context.image?.imageFile?.type}`,
+          );
           return context;
         }),
         assignHasBadConnectivity: assign((context, event) => {

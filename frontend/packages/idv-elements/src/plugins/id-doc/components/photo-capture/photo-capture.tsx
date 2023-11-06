@@ -94,6 +94,7 @@ const PhotoCapture = ({
       );
       return;
     }
+    Logger.info(`Photocapture: image URL length ${image.length}`);
 
     setIsLoading(true);
     const processResult = await processImageUrl(image, hasBadConnectivity);
@@ -110,6 +111,9 @@ const PhotoCapture = ({
 
     setIsLoading(false);
     const { file, extraCompressed } = processResult;
+    Logger.info(
+      `Photocapture: size of the processed file to be sent in machine event type 'receivedImage' is ${file.size}, file type ${file.type}`,
+    );
     onComplete(file, extraCompressed, captureKind);
   };
 

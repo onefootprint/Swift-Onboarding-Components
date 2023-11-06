@@ -51,6 +51,10 @@ const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
     }
     const { file, extraCompressed } = processResult;
 
+    Logger.info(
+      `IdDocPhotoButtons: size of the processed file to be sent in machine event type 'receivedImage' is ${file.size}, file type ${file.type}`,
+    );
+
     onComplete(file, extraCompressed);
     onProcessingDone();
   };
