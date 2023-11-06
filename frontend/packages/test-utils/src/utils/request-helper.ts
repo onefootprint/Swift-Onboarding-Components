@@ -20,8 +20,9 @@ export type RequestParams = {
   fullPath?: boolean;
   method?: RequestMethod;
   path: string;
-  response: any;
   statusCode?: number;
+  response: any;
+  once?: boolean;
 };
 
 const requestHelper = ({
@@ -31,12 +32,14 @@ const requestHelper = ({
   method = 'get',
   path,
   response,
+  once,
 }: RequestParams) => {
   const caller = rest[method];
   const URL = fullPath ? path : combineURL(API_BASE_URL ?? '', path);
-  return caller(URL, (_req, res, ctx) =>
-    res(ctx.status(statusCode), ctx.delay(delay), ctx.json(response)),
-  );
+  return caller(URL, (_req, res, ctx) => {
+    const args = [ctx.status(statusCode), ctx.delay(delay), ctx.json(response)];
+    return once ? res.once(...args) : res(...args);
+  });
 };
 
 export default requestHelper;

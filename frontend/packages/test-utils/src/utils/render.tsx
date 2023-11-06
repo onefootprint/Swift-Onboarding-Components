@@ -56,5 +56,14 @@ export const customRenderHook = (render: (initialProps: any) => any) => {
   return renderHook(render, { wrapper: Wrapper });
 };
 
-export * from '@testing-library/react';
+export {
+  screen,
+  within,
+  waitFor,
+  waitForElementToBeRemoved,
+  renderHook,
+  act,
+  render,
+  fireEvent,
+} from '@testing-library/react';
 export { default as userEvent } from '@testing-library/user-event';
