@@ -2,8 +2,17 @@ import { useState } from 'react';
 import { useEffectOnce, useInterval } from 'usehooks-ts';
 
 import Logger from '../../../../../utils/logger';
+import parsePermissionError from '../utils/parse-permission-error';
 
-export type CameraPermissionState = 'undetected' | 'notAllowed' | 'allowed';
+export type CameraPermissionState =
+  | 'undetected'
+  | 'undefined-navigator'
+  | 'not-allowed'
+  | 'allowed'
+  | 'device-not-found'
+  | 'device-busy'
+  | 'no-video-option'
+  | 'other-error';
 const PERMISSION_CHECK_INTERVAL = 100;
 
 const useCameraPermission = () => {
@@ -15,6 +24,7 @@ const useCameraPermission = () => {
     navigator.mediaDevices
       .getUserMedia({
         video: true,
+        audio: false,
       })
       .then(stream => {
         // If there is a stream, we know that permission has been given
@@ -25,11 +35,7 @@ const useCameraPermission = () => {
       })
       .catch(err => {
         const error = err as DOMException;
-        if (
-          error.name === 'NotAllowedError' ||
-          error.name === 'PermissionDeniedError'
-        )
-          setPermissionState('notAllowed');
+        setPermissionState(parsePermissionError(err));
 
         Logger.warn(
           `Error while retrieving camera permission. Error: ${error.name}`,
@@ -48,7 +54,9 @@ const useCameraPermission = () => {
             if (result.state === 'granted') {
               setPermissionState('allowed');
             } else {
-              setPermissionState('notAllowed');
+              setPermissionState(prev =>
+                prev === 'undetected' ? 'not-allowed' : prev,
+              );
             }
           })
           .catch(() => {

@@ -21,7 +21,9 @@ const DesktopCameraPermission = ({
   return (
     <Container>
       <Box>
-        <NavigationHeader />
+        <NavigationHeader
+          leftButton={{ variant: 'close', confirmClose: true }}
+        />
         <HeaderTitle title={t('take-selfie')} />
       </Box>
       <CameraStateContainer height={DESKTOP_INTERACTION_BOX_HEIGHT}>
@@ -30,14 +32,14 @@ const DesktopCameraPermission = ({
         ) : (
           <Box paddingLeft={9} paddingRight={9}>
             <Typography variant="label-2" sx={{ textAlign: 'center' }}>
-              {t('title')}
+              {t(`title.${permissionState}`)}
             </Typography>
             <Typography
               variant="body-2"
               color="tertiary"
               sx={{ textAlign: 'center' }}
             >
-              {t('subtitle')}
+              {t(`subtitle.${permissionState}`)}
             </Typography>
           </Box>
         )}
