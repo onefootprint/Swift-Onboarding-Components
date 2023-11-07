@@ -32,6 +32,8 @@ fn reason_to_footprint_reason_code(value: &Reason) -> Option<FootprintReasonCode
         Reason::AwsDatacenterIp => Some(FootprintReasonCode::IpAlertDataCenter),
         Reason::PossibleFakeAppleChromeOrMitm => None,
         Reason::PossibleTlsMitm => None,
+        Reason::AzureDatacenterIp => Some(FootprintReasonCode::IpAlertDataCenter),
+        Reason::PossibleTamperingDetected => Some(FootprintReasonCode::BrowserTampering),
     }
 }
 

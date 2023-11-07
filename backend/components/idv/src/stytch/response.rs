@@ -65,7 +65,7 @@ impl Verdict {
             .flat_map(|s| match Reason::try_from(s.as_str()) {
                 Ok(r) => Some(r),
                 Err(err) => {
-                    tracing::error!(?err, "Error parsing Stytch Reason");
+                    tracing::error!(?err, reason_string=%s, "Error parsing Stytch Reason");
                     None
                 }
             })
@@ -104,6 +104,8 @@ pub enum Reason {
     AwsDatacenterIp,
     PossibleFakeAppleChromeOrMitm,
     PossibleTlsMitm,
+    AzureDatacenterIp,
+    PossibleTamperingDetected,
 }
 
 #[cfg(test)]
