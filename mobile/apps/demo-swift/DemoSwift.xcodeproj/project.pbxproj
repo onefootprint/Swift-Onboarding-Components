@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,6 +14,7 @@
 		56B6C8712AFA7B12003FEEE5 /* DemoSwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B6C8702AFA7B12003FEEE5 /* DemoSwiftTests.swift */; };
 		56B6C87B2AFA7B12003FEEE5 /* DemoSwiftUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B6C87A2AFA7B12003FEEE5 /* DemoSwiftUITests.swift */; };
 		56B6C87D2AFA7B12003FEEE5 /* DemoSwiftUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B6C87C2AFA7B12003FEEE5 /* DemoSwiftUITestsLaunchTests.swift */; };
+		56B6C88E2AFA8024003FEEE5 /* FootprintPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 56B6C88D2AFA8024003FEEE5 /* FootprintPackage */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				56B6C88E2AFA8024003FEEE5 /* FootprintPackage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -143,6 +145,9 @@
 			dependencies = (
 			);
 			name = DemoSwift;
+			packageProductDependencies = (
+				56B6C88D2AFA8024003FEEE5 /* FootprintPackage */,
+			);
 			productName = DemoSwift;
 			productReference = 56B6C85C2AFA7B11003FEEE5 /* DemoSwift.app */;
 			productType = "com.apple.product-type.application";
@@ -215,6 +220,9 @@
 				Base,
 			);
 			mainGroup = 56B6C8532AFA7B11003FEEE5;
+			packageReferences = (
+				56B6C88C2AFA8024003FEEE5 /* XCLocalSwiftPackageReference "../../packages/footprint-ios" */,
+			);
 			productRefGroup = 56B6C85D2AFA7B11003FEEE5 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -588,6 +596,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		56B6C88C2AFA8024003FEEE5 /* XCLocalSwiftPackageReference "../../packages/footprint-ios" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../packages/footprint-ios";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		56B6C88D2AFA8024003FEEE5 /* FootprintPackage */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FootprintPackage;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 56B6C8542AFA7B11003FEEE5 /* Project object */;
 }
