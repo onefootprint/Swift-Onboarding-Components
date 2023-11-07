@@ -1,6 +1,7 @@
 import type { L10n } from '@onefootprint/footprint-js';
 import {
   AppErrorBoundary,
+  getIdentifyBootstrapData,
   Identify,
   Logger,
   Onboarding,
@@ -17,7 +18,6 @@ import Complete from '../complete';
 import ConfigInvalid from '../config-invalid';
 import Init from '../init';
 import SandboxOutcome from '../sandbox-outcome';
-import getIdentifyBootstrapData from './utils/get-identify-bootstrap-data';
 
 const AUTO_CLOSE_DELAY = 6000;
 

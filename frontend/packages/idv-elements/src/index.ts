@@ -74,6 +74,8 @@ export { Identify, Onboarding } from './services';
 export type { BootstrapProps } from './utils';
 export {
   DesignSystemProvider,
+  getIdentifyBootstrapData,
+  getRandomID,
   Logger,
   default as media,
   withProvider,

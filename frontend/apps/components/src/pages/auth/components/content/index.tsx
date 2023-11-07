@@ -4,7 +4,12 @@ import {
 } from '@onefootprint/footprint-js';
 import { useTranslation } from '@onefootprint/hooks';
 import type { DeviceInfo } from '@onefootprint/idv-elements';
-import { Identify, useDeviceInfo } from '@onefootprint/idv-elements';
+import {
+  getIdentifyBootstrapData,
+  getRandomID,
+  Identify,
+  useDeviceInfo,
+} from '@onefootprint/idv-elements';
 import type { RequestError } from '@onefootprint/request';
 import { getErrorMessage } from '@onefootprint/request';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
@@ -25,30 +30,9 @@ import Notification from '../notification';
 type IdentifyProps = ComponentProps<typeof Identify>;
 type CompleteArgs = Parameters<IdentifyProps['onDone']>[0];
 type ObKeyHeader = { 'X-Onboarding-Config-Key': string };
-type UserData = FootprintAuthDataProps['userData'];
 
 const voidObj: Record<string, never> = {};
 const initialDevice = { hasSupportForWebauthn: false, type: 'unknown' };
-
-// TODO: move it to some shareable place
-const getRandomID = (length = 13): string => {
-  const str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const strLen = str.length;
-
-  let result = '';
-  let counter = 0;
-  while (counter < length) {
-    result += str.charAt(Math.floor(Math.random() * strLen));
-    counter += 1;
-  }
-
-  return result;
-};
-
-const getBootstrapData = (data: UserData) => ({
-  email: data?.['id.email'],
-  phoneNumber: data?.['id.phone_number'],
-});
 
 const onOnboardingConfigError = (error: RequestError) => {
   const base = 'Fetching onboarding config in auth init failed with error';
@@ -127,7 +111,7 @@ const Content = (): JSX.Element | null => {
     >
       {config?.kind === FootprintComponentKind.Auth ? (
         <Identify
-          bootstrapData={getBootstrapData(userData)}
+          bootstrapData={getIdentifyBootstrapData(userData)}
           config={config}
           device={device}
           initialAuthToken={undefined}

@@ -1,12 +1,10 @@
-const ID_LENGTH = 13;
-
-const getRandomID = () => {
+const getRandomID = (length = 13) => {
   let result = '';
   const characters =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const totalCharacters = characters.length;
   let counter = 0;
-  while (counter < ID_LENGTH) {
+  while (counter < length) {
     result += characters.charAt(Math.floor(Math.random() * totalCharacters));
     counter += 1;
   }

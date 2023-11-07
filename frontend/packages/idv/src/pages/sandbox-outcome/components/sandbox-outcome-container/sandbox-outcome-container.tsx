@@ -1,5 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { HeaderTitle, NavigationHeader } from '@onefootprint/idv-elements';
+import {
+  getRandomID,
+  HeaderTitle,
+  NavigationHeader,
+} from '@onefootprint/idv-elements';
 import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDocOutcome } from '@onefootprint/types';
@@ -9,7 +13,6 @@ import { FormProvider, useForm } from 'react-hook-form';
 
 import useSandboxOutcomeOptions from '../../hooks/use-sandbox-outcome-options';
 import type { SandboxOutcomeFormData } from '../../types';
-import getRandomID from '../../utils/get-random-id';
 import IdDocOutcomeSelect from '../id-doc-outcome-select';
 import OverallOutcomeSelect from '../overall-outcome-select';
 import TestIdInput from '../test-id-input';
