@@ -56,17 +56,21 @@ pub type Pool = deadpool::managed::Pool<Manager, deadpool::managed::Object<Manag
 pub struct DbPool(Pool);
 
 impl DbPool {
-    #[tracing::instrument(skip_all)]
     pub async fn db_query<F, R>(&self, f: F) -> Result<R, DbError>
     where
         F: FnOnce(&mut PgConn) -> R + Send + 'static,
         R: Send + 'static,
     {
+        let current_span = tracing::info_span!("db_query::interact");
         let result = self
             .0
             .get()
             .await?
-            .interact(move |conn| f(conn))
+            .interact(move |conn| {
+                // Without adding a span inside here, none of the traces inside f will appear...
+                let _guard = current_span.enter();
+                f(conn)
+            })
             .await
             .map_err(DbError::from)?;
         Ok(result)
