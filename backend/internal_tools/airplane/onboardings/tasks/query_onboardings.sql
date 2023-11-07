@@ -55,6 +55,9 @@ risk_signal_agg as (
     'document_type_mismatch',
     'document_unknown_country_code',
     'document_country_code_mismatch',
+    'document_not_verified',
+    'document_verified',
+    'document_is_permit_or_provisional_license',
     'id_flagged',
     'ssn_issued_prior_to_dob',
     'ssn_not_available',
@@ -67,7 +70,14 @@ risk_signal_agg as (
     'ssn_input_is_invalid',
     'ssn_located_is_invalid',
     'ssn_not_provided',
-    'document_is_permit_or_provisional_license'
+    'address_does_not_match',
+    'address_newer_record_found',
+    'name_does_not_match',
+    'name_partially_matches',
+    'dob_does_not_match',
+    'dob_partial_match',
+    'dob_not_on_file',
+    'dob_could_not_match'
   )
   group by 1
 ),
