@@ -25,6 +25,7 @@ export default airplane.task(
     const run = await airplane.execute('query_onboardings', {
       start_datetime: start_datetime,
       end_datetime: end_datetime,
+      tenant: null,
       status: 'pass',
     });
     let rows = (run.output as object)['Q1'];
