@@ -99,7 +99,6 @@ pub async fn handle_file_upload(
         }
 
         bytes.put(chunk);
-        tracing::info!(buffer_size=%bytes.len(), chunk_size=%chunk_size, "Handled chunk");
     }
 
     let bytes = PiiBytes::new(bytes.to_vec());

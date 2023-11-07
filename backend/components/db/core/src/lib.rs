@@ -62,22 +62,16 @@ impl DbPool {
         F: FnOnce(&mut PgConn) -> R + Send + 'static,
         R: Send + 'static,
     {
-        let current_span = tracing::info_span!("db_query::interact");
-
         let result = self
             .0
             .get()
             .await?
-            .interact(move |conn| {
-                let _guard = current_span.enter();
-                f(conn)
-            })
+            .interact(move |conn| f(conn))
             .await
             .map_err(DbError::from)?;
         Ok(result)
     }
 
-    #[tracing::instrument(skip_all)]
     pub async fn db_transaction<F, R, E>(&self, f: F) -> Result<R, E>
     where
         F: FnOnce(&mut TxnPgConn) -> Result<R, E> + Send + 'static,

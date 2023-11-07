@@ -172,18 +172,6 @@ impl Connection for InstrumentedPgConnection {
         result
     }
 
-    #[instrument(
-        fields(
-            db.name=%self.info.current_database,
-            db.system="postgresql",
-            db.version=%self.info.version,
-            otel.kind="client",
-            net.peer.ip=%self.info.inet_server_addr,
-            net.peer.port=%self.info.inet_server_port,
-            sql=field::Empty,
-        ),
-        skip(self),
-    )]
     fn transaction_state(&mut self) -> &mut Self::TransactionManager {
         self.inner.transaction_state()
     }

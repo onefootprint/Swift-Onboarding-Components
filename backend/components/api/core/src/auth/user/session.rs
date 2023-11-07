@@ -153,7 +153,6 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                 if vault.kind != VaultKind::Person {
                     return Err(AuthError::NonPersonVault.into());
                 }
-                tracing::info!(user_vault_id=%user_vault_id, "user session authenticated");
                 let scoped_user = su_id
                     .as_ref()
                     // Conservatively confirm that the onboarding in the auth token belongs to the user
