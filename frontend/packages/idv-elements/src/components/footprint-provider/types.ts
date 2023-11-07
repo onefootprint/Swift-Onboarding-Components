@@ -14,6 +14,8 @@ export type CompletePayload = {
   closeDelay?: number;
 };
 
+export type FootprintClientGenerator = () => FootprintClient;
+
 export type FootprintClient = {
   load: () => Promise<void>;
   cancel: () => void;

@@ -1,10 +1,10 @@
-import EventEmitter from './event-emmiter';
+import generateEventEmitter from './generate-event-emmiter';
 
-describe('EventEmitter', () => {
+describe('generateEventEmitter', () => {
   it('should subscribe to an event', () => {
     const callbackMockFn = jest.fn();
 
-    const eventEmitter = new EventEmitter();
+    const eventEmitter = generateEventEmitter();
     eventEmitter.on('foo', callbackMockFn);
     eventEmitter.emit('foo');
 
@@ -14,7 +14,7 @@ describe('EventEmitter', () => {
   it('should unsubscribe to an event', () => {
     const callbackMockFn = jest.fn();
 
-    const eventEmitter = new EventEmitter();
+    const eventEmitter = generateEventEmitter();
     const off = eventEmitter.on('foo', callbackMockFn);
     off();
     eventEmitter.emit('foo');

@@ -7,20 +7,19 @@ import Postmate from '@onefootprint/postmate';
 import type { IdvBootstrapData, IdvOptions } from '@onefootprint/types';
 
 import Logger from '../../../utils/logger';
-import type { CompletePayload, FootprintClient } from '../types';
+import type { CompletePayload, FootprintClientGenerator } from '../types';
 import { LegacyFootprintInternalEvent } from '../types';
-import EventEmitter from '../utils/event-emitter/event-emmiter';
+import generateEventEmitter from '../utils/generate-event-emitter';
 
-class IframeAdapter implements FootprintClient {
-  private postmate: Postmate.ChildAPI | null = null;
+const generateIframeAdapter: FootprintClientGenerator = () => {
+  let postmate: Postmate.ChildAPI | null = null;
+  const eventEmitter = generateEventEmitter();
 
-  private eventEmitter = new EventEmitter();
-
-  async load() {
-    const postmate = await new Postmate.Model({
+  const load = async () => {
+    postmate = await new Postmate.Model({
       // Listen for the new events
       [FootprintPrivateEvent.propsReceived]: (props: FootprintProps) => {
-        this.eventEmitter.emit(FootprintPrivateEvent.propsReceived, props);
+        eventEmitter.emit(FootprintPrivateEvent.propsReceived, props);
       },
 
       // We still support listening for the legacy events in bifrost but
@@ -28,61 +27,63 @@ class IframeAdapter implements FootprintClient {
       [LegacyFootprintInternalEvent.bootstrapDataReceived]: (
         data?: IdvBootstrapData,
       ) => {
-        this.eventEmitter.emit(
+        eventEmitter.emit(
           LegacyFootprintInternalEvent.bootstrapDataReceived,
           data,
         );
       },
       [LegacyFootprintInternalEvent.optionsReceived]: (data?: IdvOptions) => {
-        this.eventEmitter.emit(
-          LegacyFootprintInternalEvent.optionsReceived,
-          data,
-        );
+        eventEmitter.emit(LegacyFootprintInternalEvent.optionsReceived, data);
       },
     });
-    this.postmate = postmate;
-    this.start();
-  }
+    start();
+  };
 
-  close() {
-    this.sendEvent(FootprintPublicEvent.closed);
-  }
+  const close = () => {
+    sendEvent(FootprintPublicEvent.closed);
+  };
 
-  cancel() {
-    this.sendEvent(FootprintPublicEvent.canceled);
-  }
+  const cancel = () => {
+    sendEvent(FootprintPublicEvent.canceled);
+  };
 
-  start() {
+  const start = () => {
     // Send both new and legacy start message to the SDK client (since
     // we don't know which version it is running)
-    this.sendEvent(FootprintPrivateEvent.started);
-    this.sendEvent(LegacyFootprintInternalEvent.started);
-  }
+    sendEvent(FootprintPrivateEvent.started);
+    sendEvent(LegacyFootprintInternalEvent.started);
+  };
 
-  complete({ validationToken, closeDelay = 0 }: CompletePayload) {
-    this.sendEvent(FootprintPublicEvent.completed, validationToken);
+  const complete = ({ validationToken, closeDelay = 0 }: CompletePayload) => {
+    sendEvent(FootprintPublicEvent.completed, validationToken);
     setTimeout(() => {
-      this.close();
+      close();
     }, closeDelay);
-  }
+  };
 
-  on(
+  const on = (
     name: string,
     callback: ((data: IdvBootstrapData) => void) | ((data: IdvOptions) => void),
-  ) {
-    return this.eventEmitter.on(name, callback);
-  }
+  ) => eventEmitter.on(name, callback);
 
-  private sendEvent(eventName: string, data?: unknown) {
-    if (this.postmate) {
-      this.postmate.emit(eventName, data);
+  const sendEvent = (eventName: string, data?: unknown) => {
+    if (postmate) {
+      postmate.emit(eventName, data);
     } else {
       Logger.warn(
         `Footprint.js must be initialized in order to dispatch the event "${eventName}"`,
         'bifrost-iframe-adapter',
       );
     }
-  }
-}
+  };
 
-export default IframeAdapter;
+  return {
+    load,
+    cancel,
+    close,
+    complete,
+    on,
+  };
+};
+
+export default generateIframeAdapter;
