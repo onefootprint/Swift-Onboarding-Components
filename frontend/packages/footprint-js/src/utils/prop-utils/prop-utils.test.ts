@@ -1,8 +1,9 @@
-import {
-  type AuthProps,
-  ComponentKind,
-  type VerifyButtonProps,
+import type {
+  AuthProps,
+  Variant,
+  VerifyButtonProps,
 } from '../../types/components';
+import { ComponentKind } from '../../types/components';
 import {
   getCallbackProps,
   getDefaultVariantForKind,
@@ -132,8 +133,11 @@ describe('validateComponentVariant', () => {
   });
 
   it('should throw an exception', () => {
-    // @ts-expect-error: types of arguments
-    const fn = () => validateComponentVariant('verify', 'banana');
+    const fn = () =>
+      validateComponentVariant(
+        ComponentKind.Verify,
+        'banana' as unknown as Variant,
+      );
     expect(fn).toThrow(
       'Invalid variant: "banana". Valid variants for verify are modal, drawer',
     );

@@ -28,6 +28,7 @@ import { Layout } from 'src/components/layout';
 import type { PluginContext } from '../base-plugin';
 import CollectKycData from './index';
 import {
+  mockFootprintProviderClient,
   withIdentify,
   withOnboardingConfig,
   withUserToken,
@@ -69,8 +70,7 @@ describe('<CollectKycData />', () => {
         <ObserveCollectorProvider appName="test">
           <QueryClientProvider client={queryClient}>
             <DesignSystemProvider theme={themes.light}>
-              {/* @ts-expect-error: null */}
-              <FootprintProvider client={null}>
+              <FootprintProvider client={mockFootprintProviderClient}>
                 <ToastProvider>
                   <Layout>
                     <CollectKycData context={context} onDone={onDone} />

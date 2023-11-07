@@ -17,10 +17,9 @@ const usePropsFromParent = (
 
   const unsubscribe = footprintProvider.on(
     FootprintPrivateEvent.propsReceived,
-    // @ts-expect-error: Argument of type '(data: BifrostProps) => void' is not assignable to parameter
-    (data: BifrostProps) => {
+    (data: unknown) => {
       clearTimeout(timerId.current);
-      onSuccess(data);
+      onSuccess(data as BifrostProps);
     },
   );
 

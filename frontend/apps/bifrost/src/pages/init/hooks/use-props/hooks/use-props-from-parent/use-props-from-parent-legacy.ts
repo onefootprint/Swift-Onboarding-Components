@@ -27,16 +27,16 @@ const usePropsFromParentLegacy = (
 
   const unsubscribeLegacyBootstrap = footprintProvider.on(
     LegacyFootprintInternalEvent.bootstrapDataReceived,
-    (data: IdvBootstrapData) => {
-      const parsed = parseLegacyUserData(data);
+    (data: unknown) => {
+      const parsed = parseLegacyUserData(data as IdvBootstrapData);
       setLegacyUserData(parsed);
     },
   );
 
   const unsubscribeLegacyOptions = footprintProvider.on(
     LegacyFootprintInternalEvent.optionsReceived,
-    (data: IdvOptions) => {
-      setLegacyOptions(data);
+    (data: unknown) => {
+      setLegacyOptions(data as IdvOptions);
     },
   );
 

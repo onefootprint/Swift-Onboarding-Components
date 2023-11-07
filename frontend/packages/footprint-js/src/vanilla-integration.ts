@@ -1,3 +1,4 @@
+import type { Window } from './@types/global';
 import { RequiredCallbacksByComponent } from './constants/callbacks';
 import type {
   ComponentKind,
@@ -23,8 +24,7 @@ const vanillaIntegration = (footprint: Footprint) => {
   if (typeof window === 'undefined') return; // Don't do anything for SSR
 
   const getCallbacks = (kind: ComponentKind) => {
-    // @ts-expect-error custom property
-    const callbacks = window.footprintCallbacks ?? {};
+    const callbacks = (window as Window).footprintCallbacks ?? {};
     if (!isObject(callbacks)) {
       throw Error(
         '`window.footprintCallbacks` must be a valid mapping from callback names to functions.',

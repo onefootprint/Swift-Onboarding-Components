@@ -1,5 +1,4 @@
 import type { FootprintPrivateEvent } from '@onefootprint/footprint-js';
-import type { IdvBootstrapData, IdvOptions } from '@onefootprint/types';
 
 import type {
   CompletePayload,
@@ -24,7 +23,7 @@ const useFootprintProvider = ({ client }: UseFootprintProvider) => {
 
   const on = (
     name: LegacyFootprintInternalEvent | FootprintPrivateEvent,
-    callback: ((data: IdvBootstrapData) => void) | ((data: IdvOptions) => void),
+    callback: (data: unknown) => void,
   ) => client.on(name, callback);
 
   const load = () => client.load();

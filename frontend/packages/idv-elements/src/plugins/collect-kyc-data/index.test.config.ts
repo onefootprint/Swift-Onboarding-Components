@@ -66,3 +66,11 @@ export const withIdentify = () =>
       hasSyncablePassKey: true,
     },
   });
+
+export const mockFootprintProviderClient = {
+  load: jest.fn(),
+  cancel: jest.fn(),
+  close: jest.fn(),
+  complete: jest.fn(),
+  on: jest.fn(),
+};

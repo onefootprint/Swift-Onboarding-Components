@@ -17,7 +17,8 @@ import {
   strInputToUSDate,
 } from '../../../../../../utils/string';
 
-const isObject = (obj: unknown) => typeof obj === 'object' && !!obj;
+const isObject = (obj: unknown): obj is Object =>
+  typeof obj === 'object' && !!obj;
 const isValidString = (x: unknown): boolean =>
   typeof x === 'string' && x.length > 0;
 const getIsoDateString = (dateStr: string, locale: SupportedLocale) => {
@@ -34,7 +35,7 @@ const getIsoDateString = (dateStr: string, locale: SupportedLocale) => {
 };
 
 const validateUserData = (
-  userData: Record<string, unknown>,
+  userData: unknown,
   locale: SupportedLocale = 'en-US',
 ): IdvBootstrapData => {
   if (!isObject(userData)) {

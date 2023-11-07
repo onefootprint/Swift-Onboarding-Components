@@ -1,3 +1,4 @@
+import type { Window } from '../@types/global';
 import type { Appearance } from '../types/appearance';
 
 const isObject = (obj: unknown) => typeof obj === 'object' && !!obj;
@@ -27,8 +28,7 @@ export const getEncodedAppearance = ({
 };
 
 export const getAppearanceForVanilla = (): Appearance => {
-  // @ts-expect-error custom property
-  const appearance = window.footprintAppearance;
+  const appearance = (window as Window).footprintAppearance;
   if (!appearance || !isObject(appearance)) {
     return {};
   }
