@@ -19,6 +19,7 @@ const useSandboxOutcomeOptions = () => {
   const overallOutcomeStepUp = {
     label: t('overall-outcome.outcome.options.step-up.title'),
     value: OverallOutcome.stepUp,
+    description: t('overall-outcome.outcome.options.step-up.description'),
   };
   const overallOutcomeDocumentDecision = {
     label: t('overall-outcome.outcome.options.document-decision.title'),

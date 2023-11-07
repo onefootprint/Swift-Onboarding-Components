@@ -38,7 +38,7 @@
             },
             "step-up": {
               "title": "Step up",
-              "description": "Users will upload ID photos if not initially required by the configuration."
+              "description": "Even if not required in playbook, users will upload ID photos."
             },
             "document-decision": {
               "title": "ID Doc Decision"

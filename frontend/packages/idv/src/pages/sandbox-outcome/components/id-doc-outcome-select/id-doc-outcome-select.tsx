@@ -22,14 +22,14 @@ const IdDocOutcomeSelect = ({ allowRealOutcome }: IdDocOutcomeSelectProps) => {
     <Container>
       <Typography variant="label-2">{t('title')}</Typography>
       <OutcomesContainer>
+        {allowRealOutcome && (
+          <RealOutcome onSelect={outcomeTypeChange} isSelected={!isSimulated} />
+        )}
         <SimulatedOutcomes
           onSelect={outcomeTypeChange}
           isSelected={isSimulated}
           allowRealOutcome={allowRealOutcome}
         />
-        {allowRealOutcome && (
-          <RealOutcome onSelect={outcomeTypeChange} isSelected={!isSimulated} />
-        )}
       </OutcomesContainer>
     </Container>
   );

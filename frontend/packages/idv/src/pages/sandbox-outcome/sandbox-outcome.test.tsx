@@ -156,21 +156,24 @@ describe('<SandboxOutcome/>', () => {
       expect(continueButton).toBeInTheDocument();
     });
 
-    it('without id doc case:', () => {
+    it('without id doc case:', async () => {
       renderSandbox({ requiresIdDoc: false });
 
-      const overallSuccessOption = screen.getByTestId(
-        'overallOutcomeRadioOption-pass',
-      );
-      const overallManualReviewOption = screen.getByTestId(
-        'overallOutcomeRadioOption-manual_review',
-      );
-      const overallFailOption = screen.getByTestId(
-        'overallOutcomeRadioOption-fail',
-      );
+      const overallOutcomeOption = screen.getByTestId('overallOutcomeOption');
+      expect(overallOutcomeOption).toBeInTheDocument();
+
+      const overallSuccessOption =
+        within(overallOutcomeOption).getByText('Success');
       expect(overallSuccessOption).toBeInTheDocument();
-      expect(overallManualReviewOption).toBeInTheDocument();
+      const trigger = within(overallOutcomeOption).getByRole('button', {
+        name: 'Success',
+      });
+      await selectEvents.openMenu(trigger);
+      const overallFailOption = within(overallOutcomeOption).getByText('Fail');
+      const overallManualReviewOption =
+        within(overallOutcomeOption).getByText('Manual review');
       expect(overallFailOption).toBeInTheDocument();
+      expect(overallManualReviewOption).toBeInTheDocument();
 
       const simulateOutcomeRadioOption =
         screen.queryAllByLabelText('Simulated outcome');
@@ -316,7 +319,7 @@ describe('<SandboxOutcome/>', () => {
       await userEvent.click(continueButton);
       expect(submittedFormData.idDocOutcome).toEqual('pass');
 
-      const sandboxSimulatedOutcomes = screen.getByTestId(
+      let sandboxSimulatedOutcomes = screen.getByTestId(
         'simulatedOutcomeOptions',
       );
       const trigger = within(sandboxSimulatedOutcomes).getByRole('button', {
@@ -342,22 +345,19 @@ describe('<SandboxOutcome/>', () => {
       expect(
         (simulateOutcomeRadioOption as HTMLInputElement).checked,
       ).toBeFalsy();
-      expect(
-        (
-          within(sandboxSimulatedOutcomes).getByRole('button', {
-            name: '-',
-          }) as HTMLButtonElement
-        ).disabled,
-      ).toBeTruthy();
       await userEvent.click(continueButton);
       expect(submittedFormData.idDocOutcome).toEqual('real');
 
       await userEvent.click(simulateOutcomeRadioOption); // everything goes back to prev state when simulated outcome radio button is clicked again
       expect((realOutcomeOption as HTMLInputElement).checked).toBeFalsy();
-      const idDocSuccessOption = within(sandboxSimulatedOutcomes).getByText(
-        'Success',
-      );
-      expect(idDocSuccessOption).toBeInTheDocument();
+      sandboxSimulatedOutcomes = screen.getByTestId('simulatedOutcomeOptions');
+      await waitFor(() => {
+        const idDocSuccessOption = within(sandboxSimulatedOutcomes).getByText(
+          'Success',
+        );
+        expect(idDocSuccessOption).toBeInTheDocument();
+      });
+      await userEvent.click(continueButton);
       await userEvent.click(continueButton);
       expect(submittedFormData.idDocOutcome).toEqual('pass');
     });

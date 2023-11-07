@@ -6,6 +6,7 @@ export type SandboxOutcomeFormData = {
     overallOutcome: {
       label: string;
       value: OverallOutcome;
+      description?: string;
     };
     idDocOutcome: {
       label: string;

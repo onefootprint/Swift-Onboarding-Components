@@ -62,26 +62,27 @@ const SimulatedOutcomes = ({
               <IcoInfo16 />
             </Tooltip>
           </Box>
-          <Controller
-            control={control}
-            name="outcomes.idDocOutcome"
-            render={({ field }) => (
-              <Box width="172px">
-                <Select
-                  options={options}
-                  disabled={!isSelected}
-                  value={isSelected ? field.value : null}
-                  onChange={field.onChange}
-                  testID="simulatedOutcomeOptions"
-                  placeholder="-"
-                  size="compact"
-                />
-              </Box>
-            )}
-          />
+          {isSelected && (
+            <DropdownOptionsContainer>
+              <Controller
+                control={control}
+                name="outcomes.idDocOutcome"
+                render={({ field }) => (
+                  <Select
+                    options={options}
+                    disabled={!isSelected}
+                    value={isSelected ? field.value : null}
+                    onChange={field.onChange}
+                    testID="simulatedOutcomeOptions"
+                    placeholder="-"
+                  />
+                )}
+              />
+            </DropdownOptionsContainer>
+          )}
         </>
       ) : (
-        <RadioOptionsConatiner data-testid="simulatedOutcomeOptions">
+        <RadioOptionsContainer data-testid="simulatedOutcomeOptions">
           {options.map(option => (
             <Radio
               key={option.value}
@@ -94,7 +95,7 @@ const SimulatedOutcomes = ({
               checked={watchIdDocOutcome.value === option.value}
             />
           ))}
-        </RadioOptionsConatiner>
+        </RadioOptionsContainer>
       )}
     </Container>
   );
@@ -103,13 +104,19 @@ const SimulatedOutcomes = ({
 const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
-    justify-content: space-between;
-    gap: ${theme.spacing[3]};
-    align-items: center;
+    flex-direction: column;
+    justify-content: start;
+    gap: ${theme.spacing[4]};
   `}
 `;
 
-const RadioOptionsConatiner = styled.div`
+const DropdownOptionsContainer = styled.div`
+  ${({ theme }) => css`
+    padding-left: calc(${theme.spacing[5]} + ${theme.spacing[4]});
+  `}
+`;
+
+const RadioOptionsContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
