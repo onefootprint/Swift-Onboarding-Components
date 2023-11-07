@@ -1,6 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import type { OnboardingConfig } from '@onefootprint/types';
+import {
+  type OnboardingConfig,
+  OnboardingConfigKind,
+} from '@onefootprint/types';
 import { Tab, Tabs } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
@@ -32,8 +35,10 @@ const CollectionAndScopes = ({
     { value: 'data', label: t('tabs.data-collection') },
     { value: 'authorized-scopes', label: t('tabs.authorized-scopes') },
     { value: 'aml-monitoring', label: t('tabs.aml-monitoring') },
-    { value: 'rules', label: t('tabs.rules') },
   ];
+  if (kind !== OnboardingConfigKind.auth) {
+    options.push({ value: 'rules', label: t('tabs.rules') });
+  }
   const [tab, setTab] = useState(options[0].value);
 
   const handleChange = (value: string) => {
