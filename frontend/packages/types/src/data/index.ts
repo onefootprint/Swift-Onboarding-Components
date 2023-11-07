@@ -156,6 +156,8 @@ export type {
 } from './role';
 export { RoleKind, RoleScopeKind, supportedRoleKinds } from './role';
 export type { Rolebinding } from './rolebinding';
+export type { Rule } from './rule';
+export { RuleName } from './rule';
 export { IdDocOutcome, OverallOutcome } from './sandbox-outcomes-type';
 export { default as SessionStatus } from './session-status';
 export type { SupportedLocale } from './supported-locale';

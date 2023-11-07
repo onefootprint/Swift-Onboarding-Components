@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import AmlMonitoring from './components/aml-monitoring';
 import AuthorizedScopes from './components/authorized-scopes';
 import DataCollection from './components/data-collection';
+import Rules from './components/rules';
 
 export type CollectionAndScopesProps = {
   playbook: OnboardingConfig;
@@ -23,6 +24,7 @@ const CollectionAndScopes = ({
     isDocFirstFlow,
     mustCollectData,
     optionalData,
+    kind,
   },
 }: CollectionAndScopesProps) => {
   const { t } = useTranslation('pages.playbooks.details');
@@ -30,6 +32,7 @@ const CollectionAndScopes = ({
     { value: 'data', label: t('tabs.data-collection') },
     { value: 'authorized-scopes', label: t('tabs.authorized-scopes') },
     { value: 'aml-monitoring', label: t('tabs.aml-monitoring') },
+    { value: 'rules', label: t('tabs.rules') },
   ];
   const [tab, setTab] = useState(options[0].value);
 
@@ -77,6 +80,7 @@ const CollectionAndScopes = ({
           pep={enhancedAml.pep}
         />
       )}
+      {tab === 'rules' && <Rules playbookKind={kind} />}
     </Container>
   );
 };

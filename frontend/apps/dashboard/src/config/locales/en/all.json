@@ -1925,7 +1925,8 @@
         "tabs": {
           "data-collection": "Data collection",
           "authorized-scopes": "Authorized scopes",
-          "aml-monitoring": "AML Monitoring"
+          "aml-monitoring": "AML monitoring",
+          "rules": "Rules"
         },
         "data-collection": {
           "basic-information": "Basic information",
@@ -1972,6 +1973,31 @@
             "label": "Note:",
             "content": "we run AML checks at the time of onboarding and keep doing it periodically for all of your users onboarded through Footprint."
           }
+        },
+        "rules": {
+          "title": "Rules",
+          "alerts": {
+            "kyb-alert": "These rules are only applied when verifying a Business Owner's identity.",
+            "view-only-alert": "These rules are view-only for the moment — editing is coming soon. Reach out to us for early access.",
+            "view-only-kyb-alert": "These rules are view-only for the moment — editing is coming soon. Reach out to us for early access. Please also note these are only applied when verifying a Business Owner's identity."
+          },
+          "fail": {
+            "title": "Fail",
+            "subtitle": "User will be marked as failed"
+          },
+          "fail-manual-review": {
+            "title": "Fail + Manual review",
+            "subtitle": "User will be marked as failed and flagged for review"
+          },
+          "step-up": {
+            "title": "Step-up",
+            "subtitle": "User will be asked to scan a government-issued ID and take a selfie"
+          },
+          "pass-manual-review": {
+            "title": "Pass + Manual review",
+            "subtitle": "User will be onboarded, but should be manually reviewed"
+          },
+          "risk-signal-mapping": {}
         }
       },
       "dialog": {
