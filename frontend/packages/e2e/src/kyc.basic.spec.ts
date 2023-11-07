@@ -3,14 +3,14 @@ import { expect, test } from '@playwright/test';
 import {
   clickOnContinue,
   confirmData,
-  doLivenessCheck,
   fillAddress,
-  fillEmail,
   fillNameAndDoB,
+  fillEmail,
   fillPhoneNumber,
   fillSSN,
   selectOutcomeOptional,
   verifyPhoneNumber,
+  doLivenessCheck,
   waitForVerifyButton,
 } from './utils/commands';
 
@@ -24,7 +24,7 @@ const city = 'Seward';
 const zipCode = '99664';
 const ssn = '418437970';
 
-test('E2E.KYC.Investor #ci', async ({
+test('KYC for env.NEXT_PUBLIC_E2E_TENANT_PK #ci', async ({
   browserName,
   page,
   browser,
@@ -33,10 +33,9 @@ test('E2E.KYC.Investor #ci', async ({
   test.setTimeout(120000);
   const context = await browser.newContext();
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
-  const key = 'ob_test_3xYoHcfrkxuOGNy8vILxh4';
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(`/e2e?ob_key=${key}&flow=${flowId}`);
+  await page.goto(`/e2e?&flow=${flowId}`);
   await page.waitForLoadState();
 
   await waitForVerifyButton({ page });
@@ -90,44 +89,11 @@ test('E2E.KYC.Investor #ci', async ({
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  await frame.getByLabel('Occupation').first().fill('Occupation');
-  await frame.getByLabel('Employer').first().fill('Employer');
-  await clickOnContinue({ frame });
-  await page.waitForLoadState();
-
-  await frame.getByLabel('$100,001 - $200,000').first().check();
-  await clickOnContinue({ frame });
-  await page.waitForLoadState();
-
-  await page.waitForTimeout(1000); // eslint-disable-line playwright/no-wait-for-timeout
-  await frame.getByLabel('$100,001 - $200,000').first().check();
-  await clickOnContinue({ frame });
-  await page.waitForLoadState();
-
-  await frame.getByLabel('Growth').first().click();
-  await clickOnContinue({ frame });
-  await page.waitForLoadState();
-
-  await frame.getByLabel('Moderate').first().click();
-  await clickOnContinue({ frame });
-  await page.waitForLoadState();
-
-  const noneBtn = frame
-    .getByRole('button')
-    .filter({ hasText: /none/i })
-    .first();
-  await noneBtn
-    .waitFor({ state: 'attached', timeout: 2000 })
-    .then(() => noneBtn.click())
-    .then(() => true)
-    .catch(() => false);
-  await page.waitForLoadState();
-
   if (!isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
     await doLivenessCheck({ page, frame, browser }, { flowId });
     await page.waitForLoadState();
   }
 
   await context.close();
-  return expect(1).toBe(1);
+  return expect(page.getByTestId('result').first()).toContainText('_');
 });

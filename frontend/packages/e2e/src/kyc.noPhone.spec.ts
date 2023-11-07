@@ -4,38 +4,31 @@ import {
   clickOnContinue,
   confirmData,
   fillAddress,
-  fillNameAndDoB,
   fillEmail,
-  fillPhoneNumber,
+  fillNameAndDoB,
   fillSSN,
   selectOutcomeOptional,
-  verifyPhoneNumber,
-  doLivenessCheck,
+  verifyEmail,
   waitForVerifyButton,
 } from './utils/commands';
 
 const firstName = 'Jane';
 const lastName = 'Doe';
 const dob = '01/01/1990';
-const email = 'janedoe@acme.com';
-const phoneNumber = '5555550100';
+const email: 'sandbox@onefootprint.com' = 'sandbox@onefootprint.com';
 const addressLine1 = '432 3rd Ave';
 const city = 'Seward';
 const zipCode = '99664';
 const ssn = '418437970';
 
-test('KYC for env.NEXT_PUBLIC_E2E_TENANT_PK #ci', async ({
-  browserName,
-  page,
-  browser,
-  isMobile,
-}) => {
+test('KYC E2E.NoPhoneFlow #ci', async ({ browserName, page, browser }) => {
   test.setTimeout(120000);
   const context = await browser.newContext();
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
+  const key = 'ob_test_h9Qp2W3Trk1pfIoI7dTD5q';
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(`/e2e?&flow=${flowId}`);
+  await page.goto(`/e2e?ob_key=${key}&flow=${flowId}`);
   await page.waitForLoadState();
 
   await waitForVerifyButton({ page });
@@ -53,11 +46,7 @@ test('KYC for env.NEXT_PUBLIC_E2E_TENANT_PK #ci', async ({
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  await fillPhoneNumber({ frame }, { phoneNumber });
-  await clickOnContinue({ frame });
-  await page.waitForLoadState();
-
-  await verifyPhoneNumber({ frame, page });
+  await verifyEmail({ frame, page });
   await page.waitForLoadState();
 
   await fillNameAndDoB({ frame }, { firstName, lastName, dob });
@@ -88,11 +77,6 @@ test('KYC for env.NEXT_PUBLIC_E2E_TENANT_PK #ci', async ({
   );
   await clickOnContinue({ frame });
   await page.waitForLoadState();
-
-  if (!isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
-    await doLivenessCheck({ page, frame, browser }, { flowId });
-    await page.waitForLoadState();
-  }
 
   await context.close();
   return expect(frame.getByTestId('result').innerText).toBeDefined();

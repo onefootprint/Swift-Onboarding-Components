@@ -92,8 +92,11 @@ export const fillPhoneNumber = async (
     .catch(() => false);
 };
 
-export const verifyPhoneNumber = async ({ frame, page }: PageNFrame) => {
-  await expect(frame.getByText('Verify your phone number')).toBeAttached();
+export const sixDigitChallenger = async (
+  header: string,
+  { frame, page }: PageNFrame,
+) => {
+  await expect(frame.getByText(header)).toBeAttached();
 
   // eslint-disable-next-line playwright/no-wait-for-timeout
   await page.waitForTimeout(3000); // 3 seconds, receiving the SMS
@@ -106,6 +109,12 @@ export const verifyPhoneNumber = async ({ frame, page }: PageNFrame) => {
   await page.keyboard.press('0');
   await page.keyboard.press('0');
 };
+
+export const verifyEmail = sixDigitChallenger.bind(null, 'Verify your email');
+export const verifyPhoneNumber = sixDigitChallenger.bind(
+  null,
+  'Verify your phone number',
+);
 
 export const fillNameAndDoB = async (
   { frame }: WithFrame,

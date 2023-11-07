@@ -155,5 +155,5 @@ test('E2E.KYB.flow #ci', async ({ browser, browserName, page, isMobile }) => {
 
   await context.close();
 
-  return expect(1).toBe(1);
+  return expect(page.getByTestId('result').first()).toContainText('_');
 });

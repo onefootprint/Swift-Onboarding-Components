@@ -3,42 +3,40 @@ import { expect, test } from '@playwright/test';
 import {
   clickOnContinue,
   confirmData,
-  continueOnDesktop,
   doLivenessCheck,
   fillAddress,
   fillEmail,
   fillNameAndDoB,
   fillPhoneNumber,
+  fillSSN,
   selectOutcomeOptional,
   verifyPhoneNumber,
   waitForVerifyButton,
 } from './utils/commands';
 
-const firstName = 'Jorge';
-const lastName = 'Mejia';
-const dob = '25/12/1990';
-const email = 'jorge@mejia.com';
+const firstName = 'Jane';
+const lastName = 'Doe';
+const dob = '01/01/1990';
+const email = 'janedoe@acme.com';
 const phoneNumber = '5555550100';
 const addressLine1 = '432 3rd Ave';
 const city = 'Seward';
 const zipCode = '99664';
+const ssn = '418437970';
 
-test('E2E.es-MX.KYC.Docs #ci', async ({
-  browser,
+test('E2E.KYC.Investor #ci', async ({
   browserName,
-  isMobile,
   page,
+  browser,
+  isMobile,
 }) => {
-  // eslint-disable-next-line playwright/no-conditional-in-test
-  if (isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
   test.setTimeout(120000);
   const context = await browser.newContext();
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
-  const key = 'ob_test_yHlPBcaJ6lnxwkkD1YLStx';
-  const locale = 'es-MX';
+  const key = 'ob_test_3xYoHcfrkxuOGNy8vILxh4';
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
-  await page.goto(`/e2e?ob_key=${key}&locale=${locale}&flow=${flowId}`);
+  await page.goto(`/e2e?ob_key=${key}&flow=${flowId}`);
   await page.waitForLoadState();
 
   await waitForVerifyButton({ page });
@@ -56,13 +54,6 @@ test('E2E.es-MX.KYC.Docs #ci', async ({
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  await frame.getByRole('button').filter({ hasText: '+52' }).first().click();
-  await page.keyboard.press('u');
-  await page.keyboard.press('n');
-  await page.keyboard.press('i');
-  await page.keyboard.press('t');
-  await page.keyboard.press('Enter');
-
   await fillPhoneNumber({ frame }, { phoneNumber });
   await clickOnContinue({ frame });
   await page.waitForLoadState();
@@ -78,6 +69,10 @@ test('E2E.es-MX.KYC.Docs #ci', async ({
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
+  await fillSSN({ frame }, { ssn });
+  await clickOnContinue({ frame });
+  await page.waitForLoadState();
+
   await confirmData(
     { frame },
     {
@@ -89,18 +84,50 @@ test('E2E.es-MX.KYC.Docs #ci', async ({
       state: 'AL',
       zipCode,
       country: 'US',
+      ssn,
     },
   );
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  await doLivenessCheck({ page, frame, browser }, { flowId });
+  await frame.getByLabel('Occupation').first().fill('Occupation');
+  await frame.getByLabel('Employer').first().fill('Employer');
+  await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  await continueOnDesktop({ frame });
+  await frame.getByLabel('$100,001 - $200,000').first().check();
+  await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  await expect(frame.getByRole('button', { name: 'Mexico' })).toBeVisible();
+  await page.waitForTimeout(1000); // eslint-disable-line playwright/no-wait-for-timeout
+  await frame.getByLabel('$100,001 - $200,000').first().check();
+  await clickOnContinue({ frame });
+  await page.waitForLoadState();
+
+  await frame.getByLabel('Growth').first().click();
+  await clickOnContinue({ frame });
+  await page.waitForLoadState();
+
+  await frame.getByLabel('Moderate').first().click();
+  await clickOnContinue({ frame });
+  await page.waitForLoadState();
+
+  const noneBtn = frame
+    .getByRole('button')
+    .filter({ hasText: /none/i })
+    .first();
+  await noneBtn
+    .waitFor({ state: 'attached', timeout: 2000 })
+    .then(() => noneBtn.click())
+    .then(() => true)
+    .catch(() => false);
+  await page.waitForLoadState();
+
+  if (!isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
+    await doLivenessCheck({ page, frame, browser }, { flowId });
+    await page.waitForLoadState();
+  }
 
   await context.close();
+  return expect(page.getByTestId('result').first()).toContainText('_');
 });
