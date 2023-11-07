@@ -229,6 +229,9 @@ impl State {
             stytch_client,
         );
 
+        // Initialize custom prometheus metrics
+        // NOTE: we also have this `prometheus::init` that can be wrapped in actix to emit
+        // metrics for each API request. But we already have enough coverage from otel traces.
         let metrics = crate::metrics::init();
 
         State {

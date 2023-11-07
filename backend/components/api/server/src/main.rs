@@ -47,8 +47,6 @@ fn main() -> std::io::Result<()> {
 async fn run_server(config: Config) -> std::io::Result<()> {
     // telemetry
     let _controller = telemetry::init(&config).expect("failed to init telemetry layers");
-    // TODO can i rm this?
-    let prom = prometheus::init(&config);
 
     let state: State = State::init_or_die(config.clone()).await;
 
@@ -113,7 +111,6 @@ async fn run_server(config: Config) -> std::io::Result<()> {
 
         App::new()
             .app_data(web::Data::new(state.clone()))
-            .wrap(prom.clone())
             .wrap(request_metrics.clone()) // Export otel metrics for each API request
             // TODO also wrap RequestTracing::new()
             .wrap(
