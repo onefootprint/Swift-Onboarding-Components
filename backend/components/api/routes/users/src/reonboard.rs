@@ -31,7 +31,7 @@ pub async fn post(
     fp_id: web::Path<FpId>,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<ReonboardResponse> {
-    auth.check_preview_guard(PreviewApi::ReonboardUser, false)?;
+    auth.check_preview_guard(PreviewApi::ReonboardUser)?;
     let auth = auth.check_guard(TenantGuard::AuthToken)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

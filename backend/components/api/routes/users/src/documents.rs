@@ -20,7 +20,7 @@ pub async fn get(
     request: web::Path<FpId>,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<Vec<api_wire_types::PublicDocument>> {
-    auth.check_preview_guard(PreviewApi::AuthEventsList, false)?;
+    auth.check_preview_guard(PreviewApi::AuthEventsList)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

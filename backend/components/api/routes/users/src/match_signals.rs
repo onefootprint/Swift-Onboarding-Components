@@ -25,7 +25,7 @@ pub async fn get(
     request: web::Path<FpId>,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<GetFieldValidationResponse> {
-    auth.check_preview_guard(PreviewApi::MatchSignalsList, true)?;
+    auth.check_preview_guard(PreviewApi::MatchSignalsList)?;
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
