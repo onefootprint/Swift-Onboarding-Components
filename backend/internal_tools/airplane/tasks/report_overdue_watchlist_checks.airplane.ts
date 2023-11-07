@@ -14,8 +14,8 @@ export default airplane.task(
       process.env.AIRPLANE_ENV_SLUG === 'prod'
         ? {
             once_per_day: {
-              cron: '0 17 * * *',
-              description: 'Runs once per day at 17:00 UTC',
+              cron: '0 19 * * *',
+              description: 'Runs once per day at 19:00 UTC',
             },
           }
         : {},
