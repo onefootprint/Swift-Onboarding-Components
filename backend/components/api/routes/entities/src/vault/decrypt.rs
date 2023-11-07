@@ -17,10 +17,8 @@ use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use macros::route_alias;
 use newtypes::output::Csv;
-use newtypes::{
-    AccessEventPurpose, DataLifetimeSeqno, FilterFunctionName, FilterFunctionStr, VersionedDataIdentifier,
-};
-use newtypes::{FilterFunction, FpId};
+use newtypes::FpId;
+use newtypes::{AccessEventPurpose, DataLifetimeSeqno, FilterFunctionStr, VersionedDataIdentifier};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, web::Path};
 use serde::Deserialize;
@@ -32,12 +30,6 @@ pub struct DecryptRequest {
     pub(super) fields: HashSet<VersionedDataIdentifier>,
     /// Reason for the data decryption. This will be logged
     pub(super) reason: String,
-
-    /// A list of filter functions to apply to each decrypted data
-    /// Omit or leave empty to apply no filters
-    /// DEPRECATED
-    #[openapi(skip)]
-    pub(super) filters: Option<Vec<FilterFunction>>,
 
     /// A list of filter and transform functions to apply to each decrypted datum.
     /// Omit or leave empty to apply no transforms.
@@ -52,12 +44,6 @@ pub struct ClientDecryptRequest {
     /// Reason for the data decryption. This will be logged.
     /// The reason must be provided either here or in the client token
     reason: Option<String>,
-    /// A list of filter functions to apply to each decrypted data
-    /// Omit or leave empty to apply no filters
-    /// DEPRECATED
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[openapi(skip)]
-    filters: Option<Vec<FilterFunction>>,
 
     /// A list of filter and transform functions to apply to each decrypted datum.
     /// Omit or leave empty to apply no transforms
@@ -126,7 +112,6 @@ pub async fn post_client(
     let ClientDecryptRequest {
         fields,
         reason,
-        filters,
         transforms,
     } = request.into_inner();
     let reason = reason
@@ -135,7 +120,6 @@ pub async fn post_client(
     let request = DecryptRequest {
         reason,
         fields,
-        filters,
         transforms,
     };
 
@@ -157,7 +141,6 @@ pub(super) async fn post_inner(
     let DecryptRequest {
         fields,
         reason,
-        filters,
         transforms,
     } = request;
 
@@ -167,20 +150,12 @@ pub(super) async fn post_inner(
         Csv::from(fields.iter().cloned().collect_vec()).to_string(),
     );
 
-    // Parse transforms to apply. We're still supprting a legacy format for now
-    let transforms = if filters.is_some() && transforms.is_none() {
-        let filters = filters.unwrap_or_default();
-        tracing::warn!(filters=%Csv::from(filters.iter().map(FilterFunctionName::from).collect_vec()), "Used legacy filter functions");
-        filters.iter().map(filter_function_to_transform).collect_vec()
-    } else {
-        let transforms = transforms.unwrap_or_default();
-        tracing::warn!(filters=%Csv::from(transforms.iter().map(FilterFunctionName::from).collect_vec()), "Used modern filter functions");
-        transforms
-            .into_iter()
-            .map(|t| t.into_inner())
-            .map(|f| filter_function_to_transform(&f))
-            .collect()
-    };
+    let transforms = transforms
+        .unwrap_or_default()
+        .into_iter()
+        .map(|t| t.into_inner())
+        .map(|f| filter_function_to_transform(&f))
+        .collect_vec();
 
     // Create a VW for each version in fields
     let version_to_targets = fields

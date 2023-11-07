@@ -61,7 +61,6 @@ pub async fn post(
     let req = super::decrypt::DecryptRequest {
         reason: "Compute Integrity HMAC-SHA256".to_string(),
         fields,
-        filters: None,
         transforms: Some(vec![transform.into()]),
     };
 
