@@ -192,7 +192,7 @@ impl SmsClient {
                 ._send_message(message_body, e164, Some(tx), session_id)
                 .await;
             if let Err(err) = res {
-                tracing::error!(?err, "Couldn't send SMS asynchronously");
+                tracing::error!(%err, "Couldn't send SMS asynchronously");
             }
         };
         tokio::spawn(fut.in_current_span());
@@ -420,7 +420,7 @@ pub mod rate_limit {
 pub async fn rx_background_error(rx: Receiver<ApiError>, timeout_s: u64) -> ApiResult<()> {
     match tokio::time::timeout(std::time::Duration::from_secs(timeout_s), rx).await {
         Ok(Ok(err)) => {
-            tracing::info!("Error received");
+            tracing::warn!(err=%err, "Error received");
             Err(err)
         }
         Ok(Err(_)) => {
