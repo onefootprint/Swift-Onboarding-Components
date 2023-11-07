@@ -15,7 +15,7 @@ const AuthDemo = () => {
       onCancel: () => console.log('demo onCancel'),
       onClose: () => console.log('demo onClose'),
       onComplete: (validationToken: string) => console.log(validationToken),
-      options: { showLogo: true, showCompletionPage: true },
+      options: { showLogo: true },
       publicKey: AcmeDevAuthKey || AcmePropLiveKey,
       userData: {},
       l10n: { locale: 'en-US' },

@@ -115,7 +115,7 @@ export type AuthProps = PropsBase & {
   onCancel?: () => void;
   onClose?: () => void;
   onComplete?: (validationToken: string) => void;
-  options?: Options;
+  options?: Pick<Options, 'showLogo'>;
   publicKey: string;
   userData?: Pick<UserData, 'id.email' | 'id.phone_number'>;
   variant?: 'modal' | 'drawer';
