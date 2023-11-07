@@ -36,7 +36,7 @@ def test_sdk_args(sandbox_tenant):
         },
         {
             "kind": "verify_v1",
-            "data": {"public_key": obc_key, "locale": "en-us"},
+            "data": {"public_key": obc_key, "l10n": {"locale": "en-US"}},
         },
     ]
     for data in TESTS:

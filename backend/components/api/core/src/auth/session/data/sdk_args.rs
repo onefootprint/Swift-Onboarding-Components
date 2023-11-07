@@ -25,6 +25,12 @@ pub struct VerifyV1Options {
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
+pub struct L10nV1 {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub locale: Option<String>,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
 pub struct VerifyV1SdkArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub auth_token: Option<PiiString>,
@@ -35,7 +41,7 @@ pub struct VerifyV1SdkArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<VerifyV1Options>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub locale: Option<String>,
+    pub l10n: Option<L10nV1>,
 }
 
 impl VerifyV1SdkArgs {
@@ -116,7 +122,7 @@ mod test {
 
     use super::SdkArgs;
 
-    #[test_case(json!({"kind": "verify_v1", "data": {"auth_token": "tok_1234", "public_key": "ob_1234", "user_data": {"id.first_name": "Hayes", "id.citizenships": ["US", "NO"], "id.state": "Invalid"}, "options": {"show_completion_page": true, "show_logo": false}, "locale": "en-us"}}))]
+    #[test_case(json!({"kind": "verify_v1", "data": {"auth_token": "tok_1234", "public_key": "ob_1234", "user_data": {"id.first_name": "Hayes", "id.citizenships": ["US", "NO"], "id.state": "Invalid"}, "options": {"show_completion_page": true, "show_logo": false}, "l10n": {"locale": "en-US"}}}))]
     #[test_case(json!({"kind": "verify_v1", "data": {"auth_token": "tok_1234"}}))]
     #[test_case(json!({"kind": "verify_v1", "data": {"public_key": "ob_1234", "user_data": {"id.first_name": "Hayes"}, "options": {"show_logo": false}}}))]
     fn test_backcompat(value: serde_json::Value) {
