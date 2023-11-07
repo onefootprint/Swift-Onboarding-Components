@@ -10,8 +10,6 @@ use std::collections::HashSet;
 use strum::Display;
 
 /// Represents a simple permission that is required to execute an HTTP handler.
-/// We don't use TenantScope to represent permissions required by an HTTP handler because some
-/// scopes give access to more than one permission, like Decrypt.
 #[derive(Display)]
 pub enum TenantGuard {
     Admin,

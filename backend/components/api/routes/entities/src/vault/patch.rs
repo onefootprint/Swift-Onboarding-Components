@@ -5,8 +5,8 @@ use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
-use api_core::auth::tenant::{ClientTenantAuthContext, TenantAuth};
-use api_core::auth::CanVault;
+use api_core::auth::tenant::{ClientTenantAuthContext, TenantAuth, TenantSessionAuth};
+use api_core::auth::{CanVault, Either};
 use api_core::errors::AssertionError;
 use api_core::utils::headers::IgnoreLuhnValidation;
 use api_core::utils::vault_wrapper::Any;
@@ -40,7 +40,7 @@ pub async fn patch(
     state: web::Data<State>,
     path: Path<FpId>,
     request: Json<RawDataRequest>,
-    auth: SecretTenantAuthContext,
+    auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insight: InsightHeaders,
     ignore_luhn_validation: IgnoreLuhnValidation,
 ) -> JsonApiResponse<EmptyResponse> {

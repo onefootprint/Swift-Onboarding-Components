@@ -94,6 +94,7 @@ impl TenantScope {
             Self::DecryptDocument => vec![ApiKey, DashboardUser],
             Self::DecryptDocumentAndSelfie => vec![ApiKey, DashboardUser],
             Self::DecryptAll => vec![ApiKey, DashboardUser],
+            Self::WriteEntities => vec![ApiKey, DashboardUser],
 
             Self::ApiKeys => vec![DashboardUser],
             Self::ManageVaultProxy => vec![DashboardUser],
@@ -106,7 +107,6 @@ impl TenantScope {
             Self::InvokeVaultProxy { .. } => vec![ApiKey],
             Self::TriggerKyb => vec![ApiKey],
             Self::TriggerKyc => vec![ApiKey],
-            Self::WriteEntities => vec![ApiKey],
             Self::AuthToken => vec![ApiKey],
             Self::Onboarding => vec![ApiKey],
         }

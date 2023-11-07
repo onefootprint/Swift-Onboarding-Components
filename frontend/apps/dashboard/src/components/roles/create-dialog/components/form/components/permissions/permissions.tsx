@@ -125,6 +125,14 @@ const Permissions = ({ kind }: PermissionsProps) => {
             {...register('scopeKinds')}
           />
         )}
+        {supportedScopeKinds.includes(RoleScopeKind.triggerKyb) && (
+          <Checkbox
+            label={t('scopes.trigger_kyb')}
+            hint={t('scopes.hints.trigger_kyb')}
+            value={RoleScopeKind.triggerKyb}
+            {...register('scopeKinds')}
+          />
+        )}
         {supportedScopeKinds.includes(RoleScopeKind.authToken) && (
           <Checkbox
             label={t('scopes.auth_token')}
