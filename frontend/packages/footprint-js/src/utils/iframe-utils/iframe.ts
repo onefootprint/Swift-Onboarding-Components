@@ -12,11 +12,8 @@ import {
   removeLoader,
 } from '../dom-utils';
 import getUniqueId from '../get-unique-id';
-import {
-  getCallbackProps,
-  omitCallbacksAndRefs,
-  sanitizeAndValidateProps,
-} from '../prop-utils';
+import { getCallbackProps, sanitizeAndValidateProps } from '../prop-utils';
+import sendSdkArgs from '../send-sdk-args';
 import getURL from '../url-utils';
 import type { Iframe, OnDestroy, OnRenderSecondary } from './types';
 
@@ -79,16 +76,6 @@ const initIframe = (rawProps: Props): Iframe => {
     }
   };
 
-  const sendDataProps = () => {
-    if (!child) {
-      throw new Error(
-        'Footprint should be initialized in order to receive props',
-      );
-    }
-    const dataProps = omitCallbacksAndRefs(props);
-    child.call(PrivateEvent.propsReceived, dataProps);
-  };
-
   const setUpFormRefs = () => {
     if (!child) {
       throw new Error(
@@ -130,27 +117,42 @@ const initIframe = (rawProps: Props): Iframe => {
       container.innerHTML = '';
     }
 
-    const url = getURL(props);
     isRendered = true;
-
     setLoading(container, true);
-    child = await new Postmate({
-      classListArray: [`footprint-${variant}`, `footprint-${variant}-loading`],
-      container,
-      name: `footprint-iframe-${id}`,
-      url,
-      allow:
-        'otp-credentials; publickey-credentials-get *; camera *; clipboard-write;',
-    });
-    setLoading(container, false);
 
+    const token = await sendSdkArgs(props);
+    if (!token) {
+      onDestroy();
+      return;
+    }
+
+    const url = getURL(props, token || '');
+    try {
+      child = await new Postmate({
+        classListArray: [
+          `footprint-${variant}`,
+          `footprint-${variant}-loading`,
+        ],
+        container,
+        name: `footprint-iframe-${id}`,
+        url,
+        allow:
+          'otp-credentials; publickey-credentials-get *; camera *; clipboard-write;',
+      });
+    } catch (e) {
+      console.error('Initializing Footprint iframe failed with error: ', e);
+      onDestroy();
+      return;
+    }
+
+    setLoading(container, false);
     registerCallbackProps();
-    child.on(PrivateEvent.started, () => {
-      sendDataProps();
+    child?.on(PrivateEvent.started, () => {
       setUpFormRefs();
     });
   };
 
+  // Only called from parent iframe manager, never to be called inside this iframe.ts file
   const destroy = async () => {
     if (!isRendered) {
       return;

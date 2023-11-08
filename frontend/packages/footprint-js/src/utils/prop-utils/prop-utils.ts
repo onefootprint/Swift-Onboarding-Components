@@ -170,28 +170,6 @@ export const getCallbackProps = (
   return modifiedCallbacks;
 };
 
-/**
- * Get the data props that will be sent over via post messages to the child iframe
- * We need to omit kind, appearance, ref and callback props from the props sent to the iframe
- * Functions cannot be sent via post message and appearance is already sent via URL
- */
-export const omitCallbacksAndRefs = (props: Props): Partial<Props> => {
-  const { kind, appearance, containerId, ...rest } = props;
-  const callbacks = ComponentCallbacksByEvent[kind] ?? {};
-  const callbackPropNames = Object.values(callbacks);
-
-  const refs = getRefProps(props);
-  const refPropNames = Object.values(refs);
-
-  return Object.fromEntries(
-    Object.entries(rest).filter(
-      ([key]) =>
-        !callbackPropNames.includes(key as CallbackKeys) &&
-        !refPropNames.includes(key),
-    ),
-  );
-};
-
 export const sanitizeAndValidateProps = (props: Props): Props => {
   const { kind, variant: rawVariant, containerId } = props;
   const variant = rawVariant || getDefaultVariantForKind(kind);

@@ -7,9 +7,7 @@ import FormJsIntegration from './components/form-js';
 import FormReactIntegration from './components/form-react';
 import FormVanilla from './components/form-vanilla';
 import Title from './components/title';
-import VerifyButtonJsIntegration from './components/verify-button-js';
 import VerifyButtonReactIntegration from './components/verify-button-react';
-import VerifyButtonVanilla from './components/verify-button-vanilla';
 import VerifyJs from './components/verify-js';
 
 const AllComponents = () => {
@@ -45,9 +43,9 @@ const AllComponents = () => {
       <Framework>
         {kind === FootprintComponentKind.Verify && <VerifyJs />}
         {kind === FootprintComponentKind.Form && <FormJsIntegration />}
-        {kind === FootprintComponentKind.VerifyButton && (
+        {/* {kind === FootprintComponentKind.VerifyButton && (
           <VerifyButtonJsIntegration />
-        )}
+        )} */}
         {kind === FootprintComponentKind.Render && (
           <Typography variant="label-1">Coming soon</Typography>
         )}
@@ -61,9 +59,9 @@ const AllComponents = () => {
         {kind === FootprintComponentKind.Verify && (
           <Typography variant="label-1">Coming soon</Typography>
         )}
-        {kind === FootprintComponentKind.VerifyButton && (
+        {/* {kind === FootprintComponentKind.VerifyButton && (
           <VerifyButtonVanilla />
-        )}
+        )} */}
       </Framework>
     </Container>
   );

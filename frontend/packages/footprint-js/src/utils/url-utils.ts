@@ -3,24 +3,20 @@ import { ComponentKind } from '../types/components';
 import { getEncodedAppearance } from './appearance-utils';
 import { getDefaultVariantForKind } from './prop-utils';
 
-// TODO: (belce) in the future combine these onto the same app?
-const getURL = (props: Props) => {
+const getURL = (props: Props, token: string) => {
   const { kind } = props;
   if (kind === ComponentKind.Verify) {
-    return getBifrostURL(props);
+    return getBifrostURL(props, token);
   }
-  return getComponentsURL(props);
+  return getComponentsURL(props, token);
 };
 
-const getBifrostURL = (props: VerifyProps): string => {
+const getBifrostURL = (props: VerifyProps, token: string): string => {
   const { appearance, variant, kind } = props;
   const { fontSrc, rules, variables } = getEncodedAppearance(appearance);
   const url = process.env.BIFROST_URL;
   const searchParams = new URLSearchParams();
 
-  if ('publicKey' in props && props.publicKey) {
-    searchParams.append('public_key', props.publicKey);
-  }
   if (variables) {
     searchParams.append('variables', variables);
   }
@@ -33,10 +29,10 @@ const getBifrostURL = (props: VerifyProps): string => {
   searchParams.append('variant', variant ?? getDefaultVariantForKind(kind));
 
   const searchParamsStr = searchParams.toString();
-  return `${url}?${searchParamsStr}`;
+  return `${url}?${searchParamsStr}#${token}`;
 };
 
-const getComponentsURL = (props: Props): string => {
+const getComponentsURL = (props: Props, token: string): string => {
   const { appearance, kind, variant } = props;
   const { fontSrc, rules, variables } = getEncodedAppearance(appearance);
   const url = process.env.COMPONENTS_URL;
@@ -54,7 +50,7 @@ const getComponentsURL = (props: Props): string => {
   searchParams.append('variant', variant ?? getDefaultVariantForKind(kind));
 
   const searchParamsStr = searchParams.toString();
-  return `${url}/${kind}?${searchParamsStr}`;
+  return `${url}/${kind}?${searchParamsStr}#${token}`;
 };
 
 export default getURL;

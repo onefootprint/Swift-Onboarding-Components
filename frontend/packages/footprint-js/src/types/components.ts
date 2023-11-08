@@ -66,6 +66,11 @@ export type VerifyProps = PropsBase &
     variant?: 'modal' | 'drawer';
   };
 
+export type VerifyDataProps = Pick<
+  VerifyProps,
+  'publicKey' | 'userData' | 'options' | 'authToken' | 'l10n'
+>;
+
 export type VerifyButtonProps = PropsBase &
   Partial<VerifySharedProps> & {
     containerId: string;
@@ -75,6 +80,9 @@ export type VerifyButtonProps = PropsBase &
     onClick?: () => void;
     variant: 'inline';
   };
+
+export type VerifyButtonDataProps = Pick<VerifyButtonProps, 'label'> &
+  VerifyDataProps;
 
 export type RenderProps = PropsBase & {
   authToken: string;
@@ -87,6 +95,16 @@ export type RenderProps = PropsBase & {
   showHiddenToggle?: boolean;
   variant: 'inline';
 };
+
+export type RenderDataProps = Pick<
+  RenderProps,
+  | 'authToken'
+  | 'canCopy'
+  | 'defaultHidden'
+  | 'id'
+  | 'label'
+  | 'showHiddenToggle'
+>;
 
 export type FormOptions = {
   hideButtons?: boolean;
@@ -110,6 +128,11 @@ export type FormProps = PropsBase & {
   variant?: Variant; // supports all variants, falls back to modal, so optional
 };
 
+export type FormDataProps = Pick<
+  FormProps,
+  'authToken' | 'options' | 'title' | 'l10n'
+>;
+
 export type AuthProps = PropsBase & {
   kind: ComponentKind.Auth;
   onCancel?: () => void;
@@ -120,3 +143,8 @@ export type AuthProps = PropsBase & {
   userData?: Pick<UserData, 'id.email' | 'id.phone_number'>;
   variant?: 'modal' | 'drawer';
 };
+
+export type AuthDataProps = Pick<
+  AuthProps,
+  'publicKey' | 'userData' | 'options' | 'l10n'
+>;

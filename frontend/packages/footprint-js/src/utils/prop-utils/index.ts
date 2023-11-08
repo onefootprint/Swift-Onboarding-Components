@@ -3,7 +3,6 @@ export {
   getCallbackProps,
   getDefaultVariantForKind,
   getRefProps,
-  omitCallbacksAndRefs,
   sanitizeAndValidateProps,
   transformVerifyButtonProps,
   validateComponentKind,

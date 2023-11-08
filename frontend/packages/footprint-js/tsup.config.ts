@@ -1,5 +1,7 @@
 import { defineConfig } from 'tsup';
 
+import { version } from './package.json';
+
 const isE2E = process.env.IS_E2E === 'true';
 const forceFootprintToUseLocal =
   process.env.FORCE_FOOTPRINT_JS_TO_USE_LOCAL === 'true';
@@ -74,6 +76,7 @@ export default defineConfig(options => ({
       !!options.watch || forceFootprintToUseLocal,
     ),
     NODE_ENV: options.watch ? 'development' : 'production',
+    SDK_VERSION: JSON.stringify(version || ''),
   },
   outExtension({ format }) {
     if (format === 'cjs') {

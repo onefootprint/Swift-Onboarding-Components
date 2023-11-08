@@ -7,7 +7,6 @@ import { ComponentKind } from '../../types/components';
 import {
   getCallbackProps,
   getDefaultVariantForKind,
-  omitCallbacksAndRefs,
   transformVerifyButtonProps,
   validateComponentKind,
   validateComponentVariant,
@@ -204,41 +203,6 @@ describe('transformVerifyButtonProps', () => {
       kind: 'verify',
       publicKey: 'publicKey',
       variant: 'drawer',
-    });
-  });
-});
-
-describe('omitCallbacksAndRefs', () => {
-  it('should throw an exception when an invalid kind is provided', () => {
-    const result = omitCallbacksAndRefs({
-      kind: ComponentKind.Verify,
-      appearance: {
-        fontSrc: 'https://fonts...',
-        variables: { linkColor: '#000000' },
-        rules: {
-          button: { transition: 'transform 0.1s ease' },
-          'button:active': { transform: 'scale(0.96)' },
-          linkButton: { textDecoration: 'underline' },
-        },
-      },
-      onCancel: jest.fn(),
-      onClose: jest.fn(),
-      onComplete: jest.fn(),
-      options: { showCompletionPage: true, showLogo: true },
-      publicKey: 'publicKey',
-      userData: {},
-      l10n: { locale: 'en-US' },
-      variant: 'modal',
-    });
-    expect(result).toEqual({
-      options: {
-        showCompletionPage: true,
-        showLogo: true,
-      },
-      publicKey: 'publicKey',
-      userData: {},
-      l10n: { locale: 'en-US' },
-      variant: 'modal',
     });
   });
 });
