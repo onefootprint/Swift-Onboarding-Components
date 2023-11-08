@@ -46,7 +46,11 @@ const useCameraPermission = () => {
 
   useInterval(
     () => {
-      if (navigator.permissions) {
+      // Some browsers don't support permissions or query
+      if (
+        navigator.permissions &&
+        typeof navigator.permissions.query === 'function'
+      ) {
         navigator.permissions
           // @ts-expect-error: fix-me Type '"camera"' is not assignable to type 'PermissionName'.
           .query({ name: 'camera' })
@@ -65,6 +69,8 @@ const useCameraPermission = () => {
             // In that case we will let camera component handle the rest
             setPermissionState('allowed');
           });
+      } else {
+        setPermissionState('allowed');
       }
     },
     permissionState !== 'allowed' ? PERMISSION_CHECK_INTERVAL : null,
