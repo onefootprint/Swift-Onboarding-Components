@@ -16,7 +16,7 @@ export interface Typegen0 {
     assignContext: 'receivedContext';
     assignScopedAuthToken: 'scopedAuthTokenGenerated';
     assignTab: 'newTabOpened';
-    clearScopedAuthToken: 'statusPollingErrored';
+    clearScopedAuthToken: 'd2pSessionExpired';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};

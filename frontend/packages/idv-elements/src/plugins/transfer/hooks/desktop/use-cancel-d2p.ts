@@ -27,6 +27,9 @@ const useCancelD2P = () => {
             )}`,
             'transfer-desktop',
           );
+          send({
+            type: 'd2pSessionExpired',
+          });
         },
       },
     );

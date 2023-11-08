@@ -27,7 +27,7 @@ export type MachineEvents =
         scopedAuthToken: string;
       };
     }
-  | { type: 'statusPollingErrored' }
+  | { type: 'd2pSessionExpired' }
   | {
       type: 'newTabOpened';
       payload: {

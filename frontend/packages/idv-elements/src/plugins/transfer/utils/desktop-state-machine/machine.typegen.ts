@@ -15,7 +15,7 @@ export interface Typegen0 {
   eventsCausingActions: {
     assignContext: 'receivedContext';
     assignScopedAuthToken: 'scopedAuthTokenGenerated';
-    clearScopedAuthToken: 'qrCodeCanceled' | 'statusPollingErrored';
+    clearScopedAuthToken: 'd2pSessionExpired' | 'qrCodeCanceled';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};

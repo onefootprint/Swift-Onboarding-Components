@@ -1,6 +1,5 @@
 import { assign, createMachine } from 'xstate';
 
-import type { Typegen0 } from './machine.typegen';
 import type { MachineContext, MachineEvents } from './types';
 
 const createMobileMachine = () =>
@@ -12,7 +11,8 @@ const createMobileMachine = () =>
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as Typegen0,
+      // eslint-disable-next-line
+      tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {
         authToken: '',
@@ -66,7 +66,7 @@ const createMobileMachine = () =>
             newTabRegisterFailed: {
               target: 'skipLiveness',
             },
-            statusPollingErrored: {
+            d2pSessionExpired: {
               target: 'newTabRequest',
               actions: ['clearScopedAuthToken'],
             },

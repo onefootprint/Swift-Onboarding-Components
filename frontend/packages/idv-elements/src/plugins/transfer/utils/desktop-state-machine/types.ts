@@ -38,4 +38,4 @@ export type MachineEvents =
   | { type: 'continueOnMobile' }
   | { type: 'qrRegisterSucceeded' }
   | { type: 'qrRegisterFailed' }
-  | { type: 'statusPollingErrored' };
+  | { type: 'd2pSessionExpired' };

@@ -1,6 +1,5 @@
 import { assign, createMachine } from 'xstate';
 
-import type { Typegen0 } from './machine.typegen';
 import type { MachineContext, MachineEvents } from './types';
 
 const createDesktopMachine = () =>
@@ -12,7 +11,8 @@ const createDesktopMachine = () =>
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as Typegen0,
+      // eslint-disable-next-line
+      tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {
         missingRequirements: {},
@@ -64,7 +64,7 @@ const createDesktopMachine = () =>
             qrRegisterFailed: {
               target: 'failure',
             },
-            statusPollingErrored: {
+            d2pSessionExpired: {
               actions: ['clearScopedAuthToken'],
             },
             continueOnDesktop: {
@@ -97,7 +97,7 @@ const createDesktopMachine = () =>
             qrRegisterFailed: {
               target: 'failure',
             },
-            statusPollingErrored: {
+            d2pSessionExpired: {
               target: 'qrRegister',
               actions: ['clearScopedAuthToken'],
             },
@@ -115,7 +115,7 @@ const createDesktopMachine = () =>
             qrRegisterFailed: {
               target: 'failure',
             },
-            statusPollingErrored: {
+            d2pSessionExpired: {
               target: 'qrRegister',
               actions: ['clearScopedAuthToken'],
             },

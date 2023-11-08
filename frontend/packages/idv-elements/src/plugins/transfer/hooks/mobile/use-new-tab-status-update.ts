@@ -39,7 +39,7 @@ const useNewTabStatusUpdate = () => {
     );
     tab?.close();
     send({
-      type: 'statusPollingErrored',
+      type: 'd2pSessionExpired',
     });
   };
 

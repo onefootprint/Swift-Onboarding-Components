@@ -38,7 +38,7 @@ const useHandleD2PStatusUpdate = () => {
       'transfer-desktop',
     );
     send({
-      type: 'statusPollingErrored',
+      type: 'd2pSessionExpired',
     });
   };
 

@@ -28,6 +28,9 @@ const useCancelNewTab = () => {
             )}`,
             'transfer-mobile',
           );
+          send({
+            type: 'd2pSessionExpired',
+          });
         },
       },
     );
