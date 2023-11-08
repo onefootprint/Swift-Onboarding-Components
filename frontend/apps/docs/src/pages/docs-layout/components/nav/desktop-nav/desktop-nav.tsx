@@ -65,6 +65,12 @@ const NavContainer = styled.div`
     gap: ${theme.spacing[6]};
     overflow: auto;
     padding: ${theme.spacing[7]} ${theme.spacing[3]};
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   `}
 `;
 

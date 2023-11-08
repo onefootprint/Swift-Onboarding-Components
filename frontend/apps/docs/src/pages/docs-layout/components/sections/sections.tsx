@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Box, createFontStyles, media, Typography } from '@onefootprint/ui';
-import React, { useEffect, useRef, useState } from 'react';
+import { Box, createFontStyles, media, Stack } from '@onefootprint/ui';
+import React, { useEffect, useState } from 'react';
 import type { ArticleSection } from 'src/types/article';
 
 type SectionsProps = {
@@ -10,42 +10,36 @@ type SectionsProps = {
 };
 
 const Sections = ({ sections }: SectionsProps) => {
-  const [activeSection, setActiveSection] = useState(
-    sections.length ? sections[0].id : null,
-  );
-  const ref = useRef<HTMLLIElement>(null);
   const { t } = useTranslation('components.article-sections');
+  const [activeSectionID, setActiveSectionID] = useState(sections[0].id);
 
-  useEffect(() => {
-    setActiveSection(sections.length ? sections[0].id : null);
-  }, [sections]);
-
-  useEffect(() => {
-    document.addEventListener('scroll', handleScroll);
-    return () => {
-      document.removeEventListener('scroll', handleScroll);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeSection]);
-
-  useEffect(() => {
-    if (window.location.hash) {
-      const element = document.querySelector(window.location.hash);
+  const scrollToArticle = (id: string) => () => {
+    const sectionTo = sections.find(section => section.id === id);
+    if (sectionTo) {
+      const element = document.getElementById(sectionTo.id);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
       }
     }
-  }, []);
+  };
 
   const handleScroll = () => {
-    const elementActiveClass = document.querySelector('.active');
-    const elementID = elementActiveClass
-      ?.getAttribute('data-scroll-id')
-      ?.valueOf();
-    if (elementID && elementID !== activeSection) {
-      setActiveSection(elementID);
+    const anchoredSections = Array.from(
+      document.querySelectorAll('a[href^="#"]'),
+    ).filter(el => el.id) as HTMLElement[];
+    const firstSectionInView = anchoredSections.find(el => {
+      const rect = el.getBoundingClientRect();
+      return rect.top >= 52 && rect.bottom <= window.innerHeight;
+    });
+    if (firstSectionInView) {
+      setActiveSectionID(firstSectionInView.id);
     }
   };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  });
 
   return (
     <Container>
@@ -53,26 +47,65 @@ const Sections = ({ sections }: SectionsProps) => {
         <Box>
           <IcoFileText16 />
         </Box>
-        <Typography variant="label-4">{t('title')}</Typography>
+        {t('title')}
       </Header>
       <nav>
-        <ul id="article-sections-list" className="article-sections-list">
-          {sections.map(({ level, anchor, label, id }, index) => (
-            <li
-              data-level={level}
-              key={anchor}
-              data-scroll-id={id}
-              className={index === 0 ? 'active' : undefined}
-              ref={ref}
-            >
-              <a href={anchor}>{label}</a>
-            </li>
+        <Stack as="ul" direction="column">
+          {sections.map(({ level, anchor, label, id }) => (
+            <Stack key={id}>
+              <StyledLink
+                level={level}
+                href={`#${anchor}`}
+                onClick={scrollToArticle(id)}
+                active={activeSectionID === id}
+              >
+                {label}
+              </StyledLink>
+              {activeSectionID === id && <ActiveMarker />}
+            </Stack>
           ))}
-        </ul>
+        </Stack>
       </nav>
     </Container>
   );
 };
+
+const ActiveMarker = styled.div`
+  ${({ theme }) => css`
+    background-color: ${theme.color.accent};
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 50%;
+  `};
+`;
+
+const StyledLink = styled.a<{ level: number; active: boolean }>`
+  ${({ theme, level, active }) => css`
+    all: unset;
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    color: ${theme.color.tertiary};
+    margin-left: calc(${level} * ${theme.spacing[4]});
+    padding: ${theme.spacing[1]} 0;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    && {
+      ${createFontStyles('body-3')}
+    }
+
+    ${active &&
+    css`
+      color: ${theme.color.primary};
+    `}
+  `};
+`;
 
 const Container = styled.aside`
   ${({ theme }) => css`
@@ -87,76 +120,6 @@ const Container = styled.aside`
       display: block;
       padding-right: ${theme.spacing[8]};
     `}
-
-    ul {
-      padding-left: ${theme.spacing[5]};
-      position: relative;
-    }
-
-    li {
-      margin-bottom: ${theme.spacing[3]};
-      position: relative;
-
-      a {
-        display: block;
-        overflow: hidden;
-        text-decoration: none;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        color: ${theme.color.tertiary};
-
-        @media (hover: hover) {
-          &:hover {
-            color: ${theme.color.secondary};
-          }
-        }
-      }
-
-      &[data-level='1'] {
-        a {
-          ${createFontStyles('label-4')};
-        }
-      }
-
-      &[data-level='2'] {
-        padding-left: ${theme.spacing[2]};
-
-        a {
-          ${createFontStyles('body-4')};
-        }
-      }
-
-      &[data-level='3'] {
-        padding-left: ${theme.spacing[6]};
-        a {
-          ${createFontStyles('body-4')};
-        }
-      }
-
-      &[data-active='true'] {
-        a {
-          color: ${theme.color.primary};
-        }
-      }
-
-      &.active {
-        a {
-          color: ${theme.color.primary};
-
-          &::before {
-            content: '';
-            position: absolute;
-            width: 3px;
-            height: 60%;
-            left: calc(-1 * ${theme.spacing[5]});
-            top: 50%;
-            transform: translateY(-50%);
-            background-color: ${theme.color.accent};
-            border-radius: ${theme.borderRadius.full};
-          }
-        }
-      }
-    }
   `};
 `;
 

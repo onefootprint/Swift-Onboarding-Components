@@ -70,12 +70,13 @@ const ArticlePage = ({ article }: ArticleProps) => (
       slug={article.data.slug}
       title={article.data.meta.title}
     />
-
     <ArticleHeader
       title={article.data.title}
       subtitle={article.data.readingTime.text}
     />
-    <Container options={{ overrides }}>{article.content}</Container>
+    <Container options={{ overrides }} id="article-content">
+      {article.content}
+    </Container>
   </>
 );
 
