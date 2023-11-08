@@ -102,6 +102,7 @@ const ObjectProperties = ({
         <Child>
           {Object.entries(schema.properties).map(([childTitle, property]) => (
             <ObjectProperties
+              key={childTitle}
               title={childTitle}
               schema={property}
               level={level + 1}

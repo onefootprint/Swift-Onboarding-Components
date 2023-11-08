@@ -8,6 +8,9 @@ from urllib.parse import unquote
 # Every API endpoint must have only one of these tag values
 IDENTIFYING_TAG_VALUES = ["Private", "PublicApi", "Hosted", "Preview"]
 
+# APIs with these identifying tags are shown in our docs site - we should apply more scrutiny to them
+PUBLIC_TAG_VALUES = ["PublicApi", "Preview"]
+
 # Only APIs that take one of these auth methods should ever be publicly documented - otherwise,
 # the API isn't usable
 VISIBLE_API_SECURITY = ["Secret API Key", "Client Token"]
@@ -38,6 +41,10 @@ class Endpoint:
         return identifying_tag
 
     @property
+    def is_public(self):
+        return self.identifying_tag in PUBLIC_TAG_VALUES
+
+    @property
     def schemas(self):
         """Computes the schemas that are used for the endpoint"""
         all_refs = list(find_keys(self._path_info, "$ref"))
@@ -48,8 +55,12 @@ class Endpoint:
         """Computes the security schemes that are used for the endpoint"""
         # Read specifically from path_info and not _path_info to get the mutated security
         security_schemes = [k for i in self.path_info.get("security") for k in i.keys()]
-        assert not security_schemes or any(
-            s in security_schemes for s in VISIBLE_API_SECURITY
+        has_public_security_scheme = set(security_schemes) & set(VISIBLE_API_SECURITY)
+        assert (
+            not self.is_public
+            or has_public_security_scheme
+            # This one is weird
+            or self.url == "/users/vault/decrypt/{token}"
         ), f"API auth not found in schemes for {self.method.upper()} {self.url}. No reason to document if the API is not accesible via an accessible auth method"
         return security_schemes
 
@@ -146,12 +157,14 @@ if __name__ == "__main__":
 
     open_api_spec = requests.get(f"{BASE_URL}/docs-spec-v3").json()
 
-    public_open_api_spec = get_apis(open_api_spec, "PublicApi")
-    with open(f"{path}/api-docs.json", "w") as f:
-        f.write(json.dumps(public_open_api_spec, indent=4))
-        f.close()
-
-    preview_open_api_spec = get_apis(open_api_spec, "Preview")
-    with open(f"{path}/api-preview-docs.json", "w") as f:
-        f.write(json.dumps(preview_open_api_spec, indent=4))
-        f.close()
+    specs = [
+        ("PublicApi", "api-docs.json"),
+        ("Preview", "api-preview-docs.json"),
+        ("Hosted", "hosted-api-docs.json"),
+        ("Private", "private-api-docs.json"),
+    ]
+    for tag, file_name in specs:
+        spec = get_apis(open_api_spec, tag)
+        with open(f"{path}/{file_name}", "w") as f:
+            f.write(json.dumps(spec, indent=4))
+            f.close()

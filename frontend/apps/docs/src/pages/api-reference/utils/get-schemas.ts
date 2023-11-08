@@ -1,6 +1,8 @@
 import type { Content, ContentSchema } from '../api-reference.types';
 import staticAPIData from '../assets/api-docs.json';
 import staticPreviewData from '../assets/api-preview-docs.json';
+import hostedApiData from '../assets/hosted-api-docs.json';
+import privateApiData from '../assets/private-api-docs.json';
 
 export const evaluateSchemaRef = (ref: string) => {
   const parts = ref?.split('/');
@@ -15,8 +17,15 @@ const getSchema = (schemaKey: string) => {
   const previewSchema = staticPreviewData.components.schemas[
     schemaKey as keyof typeof staticPreviewData.components.schemas
   ] as ContentSchema | undefined;
+  // TODO this logic is pretty messy... we shouldn't do this with globals
+  const hostedSchemas = hostedApiData.components.schemas[
+    schemaKey as keyof typeof hostedApiData.components.schemas
+  ] as ContentSchema | undefined;
+  const privateSchema = privateApiData.components.schemas[
+    schemaKey as keyof typeof privateApiData.components.schemas
+  ] as ContentSchema | undefined;
 
-  return schema || previewSchema || undefined;
+  return schema || previewSchema || hostedSchemas || privateSchema || undefined;
 };
 
 export const getSchemaFromComponent = (component?: Content) => {

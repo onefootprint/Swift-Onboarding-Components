@@ -23,6 +23,7 @@ const Schema = ({ schema, isInBrackets = false }: SchemaProps) => {
     if (referencedSchema) {
       return <Schema schema={referencedSchema} isInBrackets={isInBrackets} />;
     }
+    console.warn("Couldn't find referenced schema!", schema.$ref);
   }
   // Render array by rendering the array's elements
   if (schema.type === 'array' && schema.items) {

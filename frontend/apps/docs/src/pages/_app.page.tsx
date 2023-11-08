@@ -7,17 +7,26 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 
 import CustomDesignSystemProvider from '../components/custom-design-system-provider';
-import { API_REFERENCE_PATH } from '../config/constants';
+import {
+  API_REFERENCE_PATH,
+  INTERNAL_API_REFERENCE_PATH,
+} from '../config/constants';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
 import ApiReference from './api-reference';
 import DocsLayout from './docs-layout';
+import InternalApiReference from './internal-api-reference';
 
 configureReactI18next();
 
 const App = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
   const isApiReference = router.asPath.startsWith(API_REFERENCE_PATH);
+  const isInternalApiReference = router.asPath.startsWith(
+    INTERNAL_API_REFERENCE_PATH,
+  );
+  // TODO
+  const isDocsSite = !isApiReference && !isInternalApiReference;
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
@@ -47,9 +56,9 @@ const App = ({ Component, pageProps }: AppProps) => {
       <QueryClientProvider client={queryClient}>
         <CustomDesignSystemProvider>
           <GlobalStyle />
-          {isApiReference ? (
-            <ApiReference />
-          ) : (
+          {isApiReference && <ApiReference />}
+          {isInternalApiReference && <InternalApiReference />}
+          {isDocsSite && (
             <DocsLayout
               article={pageProps.article}
               navigation={pageProps.page?.navigation}
