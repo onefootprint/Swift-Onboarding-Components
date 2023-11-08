@@ -182,7 +182,11 @@ impl Tenant {
             only_with_domains,
         } = filters;
         if let Some(search) = search {
-            query = query.filter(tenant::name.ilike(format!("%{}%", search)));
+            if search.starts_with("org_") || search.starts_with("_private_it_org") {
+                query = query.filter(tenant::id.eq(search));
+            } else {
+                query = query.filter(tenant::name.ilike(format!("%{}%", search)));
+            }
         }
         if let Some(is_live) = is_live {
             query = query.filter(tenant::sandbox_restricted.eq(!is_live));

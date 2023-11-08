@@ -124,7 +124,7 @@ async fn handler(
         (session_data, false, None, None, false)
     };
     // Save tenant login in session data into the DB
-    let auth_token = AuthSession::create(&state, session, Duration::hours(24)).await?;
+    let auth_token = AuthSession::create(&state, session, Duration::days(5)).await?;
     let data = OrgLoginResponse {
         auth_token,
         created_new_tenant,
