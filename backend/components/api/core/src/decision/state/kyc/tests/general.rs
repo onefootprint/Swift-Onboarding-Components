@@ -177,7 +177,14 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
         UserKind::Demo | UserKind::Sandbox(_) => {
             // incode isn't mockable like other vendors atm, so we need to setup some things here
             if let Some(doc_outcome) = document_requested {
-                mock_incode_doc_collection(state, svid2, doc_outcome, wfid.clone(), true).await;
+                mock_incode_doc_collection(
+                    state,
+                    svid2,
+                    doc_outcome.footprint_reason_codes(),
+                    wfid.clone(),
+                    true,
+                )
+                .await;
             }
         }
         // Mock vendor calls for Live users
@@ -199,7 +206,14 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
             mock_idology(state, WithQualifier(None));
 
             if let Some(doc_outcome) = document_requested {
-                mock_incode_doc_collection(state, svid2, doc_outcome, wfid.clone(), true).await;
+                mock_incode_doc_collection(
+                    state,
+                    svid2,
+                    doc_outcome.footprint_reason_codes(),
+                    wfid.clone(),
+                    true,
+                )
+                .await;
             }
         }
     };
@@ -363,7 +377,14 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
         // If Demo or Sandbox we expect no vendor calls to be attempted
         UserKind::Demo | UserKind::Sandbox(_) => {
             if let Some(doc_outcome) = document_requested {
-                mock_incode_doc_collection(state, svid2, doc_outcome, wfid.clone(), true).await;
+                mock_incode_doc_collection(
+                    state,
+                    svid2,
+                    doc_outcome.footprint_reason_codes(),
+                    wfid.clone(),
+                    true,
+                )
+                .await;
             }
         }
         // Mock vendor calls for Live users
@@ -388,7 +409,14 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
             );
 
             if let Some(doc_outcome) = document_requested {
-                mock_incode_doc_collection(state, svid2, doc_outcome, wfid.clone(), true).await;
+                mock_incode_doc_collection(
+                    state,
+                    svid2,
+                    doc_outcome.footprint_reason_codes(),
+                    wfid.clone(),
+                    true,
+                )
+                .await;
             }
         }
     };
@@ -478,11 +506,15 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
                 .all(|rs| rs.reason_code.severity() == severity));
         }
         UserKind::Live => {
-            let doc_reason_code = document_requested.and_then(|outcome| {
-                outcome
-                    .footprint_reason_code()
-                    .map(|frc| (VendorAPI::IncodeFetchScores, frc))
-            });
+            let doc_reason_code = document_requested
+                .map(|outcome| {
+                    outcome
+                        .footprint_reason_codes()
+                        .into_iter()
+                        .map(|frc| (VendorAPI::IncodeFetchScores, frc))
+                        .collect_vec()
+                })
+                .unwrap_or_default();
 
             assert_have_same_elements(
                 vec![
@@ -490,10 +522,10 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
                     Some((VendorAPI::IdologyExpectId, FootprintReasonCode::AddressMatches)),
                     Some((VendorAPI::IdologyExpectId, FootprintReasonCode::NameMatches)),
                     Some((VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches)),
-                    doc_reason_code,
                 ]
                 .into_iter()
                 .flatten()
+                .chain(doc_reason_code.into_iter())
                 .collect(),
                 rs.into_iter()
                     .map(|rs| (rs.vendor_api, rs.reason_code))

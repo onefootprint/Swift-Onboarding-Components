@@ -42,13 +42,19 @@ pub fn incode_rule_set() -> RuleSet<IncodeDocumentFeatures> {
     }
 }
 
-// NEW RULES
-pub fn incode_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
+// we use this base set of Document rules for both Alpaca and regular playbooks. However, precedent for Alpaca currently is to always
+// raise a review if a doc was uploaded. We haven't yet decided with folks that there are cases where they want a document to "hard fail" and not even raise a review
+// so for now, the alpaca rules will pass in always_review=true here and that means would be Fail RuleAction's here are instead RuleAction::ManualReview
+pub fn incode_rules(always_review: bool) -> Vec<Rule<Vec<FootprintReasonCode>>> {
+    let fail_action = match always_review {
+        true => RuleAction::ManualReview,
+        false => RuleAction::Fail,
+    };
     vec![
         Rule {
             rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::DocumentNotVerified) },
             name: RuleName::DocumentNotVerified,
-            action: RuleAction::Fail,
+            action: fail_action,
         },
         Rule {
             rule: {
@@ -58,7 +64,7 @@ pub fn incode_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
                 }
             },
             name: RuleName::SelfieDoesNotMatch,
-            action: RuleAction::Fail,
+            action: fail_action,
         },
         Rule {
             rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::DocumentUploadFailed) },
@@ -68,7 +74,7 @@ pub fn incode_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
         Rule {
             rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::DocumentExpired) },
             name: RuleName::DocumentExpired,
-            action: RuleAction::Fail,
+            action: fail_action,
         },
         Rule {
             rule: {

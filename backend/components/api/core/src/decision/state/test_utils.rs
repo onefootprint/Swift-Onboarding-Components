@@ -75,13 +75,13 @@ pub enum DocumentOutcome {
     PassWithManualReview,
 }
 impl DocumentOutcome {
-    pub fn footprint_reason_code(&self) -> Option<FootprintReasonCode> {
+    pub fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode> {
         match &self {
-            DocumentOutcome::Success => Some(FootprintReasonCode::DocumentVerified),
-            DocumentOutcome::Failure => Some(FootprintReasonCode::DocumentNotVerified),
-            DocumentOutcome::DocUploadFailed => Some(FootprintReasonCode::DocumentUploadFailed),
+            DocumentOutcome::Success => vec![FootprintReasonCode::DocumentVerified],
+            DocumentOutcome::Failure => vec![FootprintReasonCode::DocumentNotVerified],
+            DocumentOutcome::DocUploadFailed => vec![FootprintReasonCode::DocumentUploadFailed],
             DocumentOutcome::PassWithManualReview => {
-                Some(FootprintReasonCode::DocumentIsPermitOrProvisionalLicense)
+                vec![FootprintReasonCode::DocumentIsPermitOrProvisionalLicense]
             }
         }
     }
@@ -428,7 +428,7 @@ pub fn save_vres_for_doc_fixture_risk_signals(
 pub async fn mock_incode_doc_collection(
     state: &State,
     scoped_vault_id: ScopedVaultId,
-    document_outcome: DocumentOutcome,
+    document_frcs: Vec<FootprintReasonCode>,
     wf_id: WorkflowId,
     create_doc_request: bool,
 ) {
@@ -461,15 +461,16 @@ pub async fn mock_incode_doc_collection(
             )
             .unwrap();
 
-            // If we are simulating document not being able to be uploaded, we won't have risk signals saved
-            if let Some(frc) = document_outcome.footprint_reason_code() {
-                let rsg = RiskSignalGroupStruct::<Doc> {
-                    footprint_reason_codes: vec![(frc, VendorAPI::IncodeFetchScores, vres.id)],
-                    group: Doc,
-                };
-                // incode state machine defaults this to not hidden
-                save_risk_signals(conn, &scoped_vault_id, &rsg, false).unwrap();
-            }
+            let footprint_reason_codes = document_frcs
+                .into_iter()
+                .map(|frc| (frc, VendorAPI::IncodeFetchScores, vres.id.clone()))
+                .collect();
+            let rsg = RiskSignalGroupStruct::<Doc> {
+                footprint_reason_codes,
+                group: Doc,
+            };
+            // incode state machine defaults this to not hidden
+            save_risk_signals(conn, &scoped_vault_id, &rsg, false).unwrap();
 
             Ok(())
         })

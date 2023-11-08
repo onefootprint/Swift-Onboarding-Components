@@ -58,7 +58,7 @@ impl Default for KycRuleGroup {
     fn default() -> Self {
         Self {
             kyc_rules: rule_sets::kyc::kyc_rules(),
-            doc_rules: rule_sets::doc::incode_rules(),
+            doc_rules: rule_sets::doc::incode_rules(false),
             aml_rules: rule_sets::common::aml_rules(),
         }
     }

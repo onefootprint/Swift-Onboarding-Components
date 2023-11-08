@@ -2,7 +2,7 @@ use crate::auth::tenant::AuthActor;
 use crate::decision::state::actions::{Authorize, MakeVendorCalls};
 use crate::decision::state::test_utils::{
     mock_idology, mock_incode, mock_incode_doc_collection, mock_webhooks, query_data, query_risk_signals,
-    setup_data, AmlKind, DocumentOutcome, ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted,
+    setup_data, AmlKind, ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted,
     OnboardingStatusChanged, UserKind, WithHit, WithQualifier,
 };
 use crate::decision::state::MakeDecision;
@@ -36,7 +36,7 @@ use newtypes::{
     VendorAPI, WorkflowSource,
 };
 use newtypes::{EnhancedAmlOption, OnboardingStatus};
-use newtypes::{FootprintReasonCode, RiskSignalGroupKind, WorkflowFixtureResult};
+use newtypes::{FootprintReasonCode as FRC, RiskSignalGroupKind, WorkflowFixtureResult};
 
 use newtypes::WorkflowState;
 
@@ -247,10 +247,10 @@ async fn pass(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
         UserKind::Demo | UserKind::Sandbox(_) => {
             assert_have_same_elements(
                 vec![
-                    (VendorAPI::IdologyExpectId, FootprintReasonCode::AddressMatches),
-                    (VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches),
-                    (VendorAPI::IdologyExpectId, FootprintReasonCode::SsnMatches),
-                    (VendorAPI::IdologyExpectId, FootprintReasonCode::NameMatches),
+                    (VendorAPI::IdologyExpectId, FRC::AddressMatches),
+                    (VendorAPI::IdologyExpectId, FRC::DobMatches),
+                    (VendorAPI::IdologyExpectId, FRC::SsnMatches),
+                    (VendorAPI::IdologyExpectId, FRC::NameMatches),
                 ],
                 rs.into_iter()
                     .map(|rs| (rs.vendor_api, rs.reason_code))
@@ -260,10 +260,10 @@ async fn pass(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
         UserKind::Live => {
             assert_have_same_elements(
                 vec![
-                    (VendorAPI::IdologyExpectId, FootprintReasonCode::AddressMatches),
-                    (VendorAPI::IdologyExpectId, FootprintReasonCode::SsnMatches),
-                    (VendorAPI::IdologyExpectId, FootprintReasonCode::NameMatches),
-                    (VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches),
+                    (VendorAPI::IdologyExpectId, FRC::AddressMatches),
+                    (VendorAPI::IdologyExpectId, FRC::SsnMatches),
+                    (VendorAPI::IdologyExpectId, FRC::NameMatches),
+                    (VendorAPI::IdologyExpectId, FRC::DobMatches),
                 ],
                 rs.into_iter()
                     .map(|rs| (rs.vendor_api, rs.reason_code))
@@ -458,18 +458,12 @@ async fn pass_then_watchlist_hit(
 
     assert_have_same_elements(
         vec![
-            (
-                VendorAPI::IncodeWatchlistCheck,
-                FootprintReasonCode::WatchlistHitOfac,
-            ),
-            (
-                VendorAPI::IncodeWatchlistCheck,
-                FootprintReasonCode::AdverseMediaHit,
-            ),
-            (VendorAPI::IdologyExpectId, FootprintReasonCode::AddressMatches),
-            (VendorAPI::IdologyExpectId, FootprintReasonCode::SsnMatches),
-            (VendorAPI::IdologyExpectId, FootprintReasonCode::NameMatches),
-            (VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches),
+            (VendorAPI::IncodeWatchlistCheck, FRC::WatchlistHitOfac),
+            (VendorAPI::IncodeWatchlistCheck, FRC::AdverseMediaHit),
+            (VendorAPI::IdologyExpectId, FRC::AddressMatches),
+            (VendorAPI::IdologyExpectId, FRC::SsnMatches),
+            (VendorAPI::IdologyExpectId, FRC::NameMatches),
+            (VendorAPI::IdologyExpectId, FRC::DobMatches),
         ],
         rs.into_iter()
             .map(|rs| (rs.vendor_api, rs.reason_code))
@@ -560,12 +554,44 @@ async fn pass_then_watchlist_hit(
     }
 }
 
-#[test_state_case(WFKind::Alpaca, UserKind::Live)]
-#[test_state_case(WFKind::Alpaca, UserKind::Sandbox(WorkflowFixtureResult::StepUp))]
-#[test_state_case(WFKind::Kyc, UserKind::Live)]
-#[test_state_case(WFKind::Kyc, UserKind::Sandbox(WorkflowFixtureResult::StepUp))]
+#[derive(Clone, Copy, Debug)]
+enum ExpectedResult {
+    Pass,
+    FailWithReview,
+}
+
+impl ExpectedResult {
+    pub fn status(&self) -> OnboardingStatus {
+        match self {
+            ExpectedResult::Pass => OnboardingStatus::Pass,
+            ExpectedResult::FailWithReview => OnboardingStatus::Fail,
+        }
+    }
+
+    pub fn requires_review(&self) -> bool {
+        match self {
+            ExpectedResult::Pass => false,
+            ExpectedResult::FailWithReview => true,
+        }
+    }
+}
+
+#[test_state_case(WFKind::Alpaca, UserKind::Live, vec![FRC::DocumentVerified], ExpectedResult::FailWithReview)] // the legacy Alpaca workflow always fails with review when a doc is uploaded
+#[test_state_case(WFKind::Alpaca, UserKind::Sandbox(WorkflowFixtureResult::StepUp), vec![FRC::DocumentVerified], ExpectedResult::FailWithReview)]
+#[test_state_case(WFKind::Kyc, UserKind::Sandbox(WorkflowFixtureResult::StepUp), vec![FRC::DocumentVerified], ExpectedResult::FailWithReview)]
+// note: every test will have the KYC calls produce `NamePartiallyMatches`
+#[test_state_case(WFKind::Kyc, UserKind::Live, vec![FRC::DocumentVerified, FRC::DocumentOcrAddressMatches, FRC::DocumentOcrDobMatches, FRC::DocumentOcrNameDoesNotMatch], ExpectedResult::FailWithReview ; "doc name doesn't match")]
+#[test_state_case(WFKind::Kyc, UserKind::Live, vec![FRC::DocumentVerified, FRC::DocumentOcrAddressMatches, FRC::DocumentOcrDobMatches, FRC::DocumentOcrNameMatches], ExpectedResult::Pass ; "doc names matches")]
+#[test_state_case(WFKind::Kyc, UserKind::Live, vec![FRC::DocumentNotVerified, FRC::DocumentOcrAddressMatches, FRC::DocumentOcrDobMatches, FRC::DocumentOcrNameMatches], ExpectedResult::FailWithReview ; "doc names matches but doc not verified")]
+#[test_state_case(WFKind::Kyc, UserKind::Live, vec![FRC::DocumentVerified, FRC::DocumentSelfieDoesNotMatch, FRC::DocumentOcrAddressMatches, FRC::DocumentOcrDobMatches, FRC::DocumentOcrNameMatches], ExpectedResult::FailWithReview ; "doc names matches but selfie doesnt match")]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
-async fn step_up(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
+async fn step_up(
+    state: &mut State,
+    wf_kind: WFKind,
+    user_kind: UserKind,
+    document_frcs: Vec<FRC>,
+    expected_result: ExpectedResult,
+) {
     // DATA SETUP
     let (wf, tenant, _obc, tu) = setup(
         state,
@@ -595,9 +621,7 @@ async fn step_up(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
-        UserKind::Demo | UserKind::Sandbox(_) => {
-            mock_incode_doc_collection(state, svid2, DocumentOutcome::Success, wfid.clone(), false).await;
-        }
+        UserKind::Demo | UserKind::Sandbox(_) => {}
         // Mock vendor calls for Live users
         UserKind::Live => {
             // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
@@ -624,9 +648,12 @@ async fn step_up(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
                 WithQualifier(Some("resultcode.first.name.does.not.match".to_owned())),
             );
             mock_incode(state, WithHit(vec![]));
-            mock_incode_doc_collection(state, svid2, DocumentOutcome::Success, wfid.clone(), false).await;
         }
     };
+
+    // mock Incode doc collection flow
+    mock_incode_doc_collection(state, svid2, document_frcs.clone(), wfid.clone(), false).await;
+
     state.set_ff_client(Arc::new(mock_ff_client));
 
     // TESTS
@@ -661,10 +688,10 @@ async fn step_up(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
     // Expect Webhooks
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Fail))],
+        vec![OnboardingStatusChanged(ExpectedStatus(expected_result.status()))],
         vec![OnboardingCompleted(
-            ExpectedStatus(OnboardingStatus::Fail),
-            ExpectedRequiresManualReview(true),
+            ExpectedStatus(expected_result.status()),
+            ExpectedRequiresManualReview(expected_result.requires_review()),
         )],
     );
 
@@ -682,7 +709,7 @@ async fn step_up(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
         WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state),
         WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state),
     }
-    assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
+    assert_eq!(expected_result.status(), wf.status.unwrap());
     let obd = obd.unwrap();
     // if non-sandbox, we should have portabalized data
     match user_kind {
@@ -690,9 +717,11 @@ async fn step_up(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
         UserKind::Sandbox(_) => assert!(obd.seqno.is_none()),
     }
 
-    // manual_review should exist and have correct review_reasons
-    let mr = mr.unwrap();
-    assert_eq!(vec![ReviewReason::Document], mr.review_reasons);
+    // If FailWithReview, then manual_review should exist and have correct review_reasons
+    if expected_result.requires_review() {
+        let mr = mr.unwrap();
+        assert_eq!(vec![ReviewReason::Document], mr.review_reasons);
+    }
 
     match user_kind {
         UserKind::Demo | UserKind::Sandbox(_) => {
@@ -700,34 +729,34 @@ async fn step_up(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
                 rs.vendor_api,
                 VendorAPI::IdologyExpectId | VendorAPI::IncodeFetchScores
             )));
-            assert!(rs
-                .iter()
-                .any(|rs| rs.reason_code == FootprintReasonCode::SsnMatches));
+            assert!(rs.iter().any(|rs| rs.reason_code == FRC::SsnMatches));
         }
         UserKind::Live => {
             assert_have_same_elements(
                 vec![
-                    (
-                        VendorAPI::IdologyExpectId,
-                        FootprintReasonCode::NamePartiallyMatches,
-                    ),
-                    (
-                        VendorAPI::IdologyExpectId,
-                        FootprintReasonCode::NameFirstDoesNotMatch,
-                    ),
-                    (VendorAPI::IdologyExpectId, FootprintReasonCode::AddressMatches),
-                    (VendorAPI::IdologyExpectId, FootprintReasonCode::SsnMatches),
-                    (VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches),
-                    (
-                        VendorAPI::IncodeFetchScores,
-                        FootprintReasonCode::DocumentVerified,
-                    ),
-                ],
+                    (VendorAPI::IdologyExpectId, FRC::NamePartiallyMatches),
+                    (VendorAPI::IdologyExpectId, FRC::NameFirstDoesNotMatch),
+                    (VendorAPI::IdologyExpectId, FRC::AddressMatches),
+                    (VendorAPI::IdologyExpectId, FRC::SsnMatches),
+                    (VendorAPI::IdologyExpectId, FRC::DobMatches),
+                ]
+                .into_iter()
+                .chain(
+                    document_frcs
+                        .into_iter()
+                        .map(|f| (VendorAPI::IncodeFetchScores, f)),
+                )
+                .collect_vec(),
                 rs.into_iter()
                     .map(|rs| (rs.vendor_api, rs.reason_code))
                     .collect_vec(),
             );
         }
+    }
+
+    // If the expected result is a review was raised, then we simulate completing the review. Else we exit early here (ie the user passed and there's nothing else to simulate/check)
+    if !expected_result.requires_review() {
+        return;
     }
 
     // ReviewCompleted
@@ -929,7 +958,7 @@ async fn fail(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
     match user_kind {
         UserKind::Demo | UserKind::Sandbox(_) => {
             assert_have_same_elements(
-                vec![(VendorAPI::IdologyExpectId, FootprintReasonCode::SsnDoesNotMatch)],
+                vec![(VendorAPI::IdologyExpectId, FRC::SsnDoesNotMatch)],
                 rs.into_iter()
                     .map(|rs| (rs.vendor_api, rs.reason_code))
                     .collect_vec(),
@@ -938,10 +967,10 @@ async fn fail(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
         UserKind::Live => {
             assert_have_same_elements(
                 vec![
-                    (VendorAPI::IdologyExpectId, FootprintReasonCode::AddressMatches),
-                    (VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches),
-                    (VendorAPI::IdologyExpectId, FootprintReasonCode::SsnDoesNotMatch), // does not match
-                    (VendorAPI::IdologyExpectId, FootprintReasonCode::NameMatches),
+                    (VendorAPI::IdologyExpectId, FRC::AddressMatches),
+                    (VendorAPI::IdologyExpectId, FRC::DobMatches),
+                    (VendorAPI::IdologyExpectId, FRC::SsnDoesNotMatch), // does not match
+                    (VendorAPI::IdologyExpectId, FRC::NameMatches),
                 ],
                 rs.into_iter()
                     .map(|rs| (rs.vendor_api, rs.reason_code))
@@ -1068,10 +1097,10 @@ async fn redo_and_pass(
 
     assert_have_same_elements(
         vec![
-            (VendorAPI::IdologyExpectId, FootprintReasonCode::AddressMatches),
-            (VendorAPI::IdologyExpectId, FootprintReasonCode::SsnMatches),
-            (VendorAPI::IdologyExpectId, FootprintReasonCode::NameMatches),
-            (VendorAPI::IdologyExpectId, FootprintReasonCode::DobMatches),
+            (VendorAPI::IdologyExpectId, FRC::AddressMatches),
+            (VendorAPI::IdologyExpectId, FRC::SsnMatches),
+            (VendorAPI::IdologyExpectId, FRC::NameMatches),
+            (VendorAPI::IdologyExpectId, FRC::DobMatches),
         ],
         rs.into_iter()
             .map(|rs| (rs.vendor_api, rs.reason_code))

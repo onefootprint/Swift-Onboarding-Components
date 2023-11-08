@@ -70,7 +70,14 @@ async fn collect_doc_skip_kyc(
     // No Idology/Experian KYC calls are mocked, we expect these to not be called because skip_kyc = true
 
     // only Incode doc calls are mocked
-    mock_incode_doc_collection(state, svid2, document_outcome, wfid.clone(), false).await;
+    mock_incode_doc_collection(
+        state,
+        svid2,
+        document_outcome.footprint_reason_codes(),
+        wfid.clone(),
+        false,
+    )
+    .await;
 
     // TESTS
     //

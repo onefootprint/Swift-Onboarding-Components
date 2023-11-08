@@ -74,7 +74,14 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
         UserKind::Demo | UserKind::Sandbox(_) => {
             // TODO: sandbox tests
             // https://linear.app/footprint/issue/FP-5157/sandbox-fixtures
-            mock_incode_doc_collection(state, svid2, doc_outcome, wfid.clone(), true).await;
+            mock_incode_doc_collection(
+                state,
+                svid2,
+                doc_outcome.footprint_reason_codes(),
+                wfid.clone(),
+                true,
+            )
+            .await;
             // we don't even look at KYC results for this
             expect_committed = false;
         }
@@ -97,7 +104,14 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
             // KYC Passes
             mock_idology(state, WithQualifier(None));
 
-            mock_incode_doc_collection(state, svid2, doc_outcome, wfid.clone(), true).await;
+            mock_incode_doc_collection(
+                state,
+                svid2,
+                doc_outcome.footprint_reason_codes(),
+                wfid.clone(),
+                true,
+            )
+            .await;
         }
     };
     state.set_ff_client(Arc::new(mock_ff_client));
@@ -262,13 +276,15 @@ async fn redo_document_and_pass(
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
         UserKind::Demo | UserKind::Sandbox(_) => {
-            mock_incode_doc_collection(state, svid, Success, wfid.clone(), true).await;
+            mock_incode_doc_collection(state, svid, Success.footprint_reason_codes(), wfid.clone(), true)
+                .await;
             expect_committed = false;
         }
         // Mock vendor calls for Live users
         UserKind::Live => {
             // we aren't re-running KYC, just doc
-            mock_incode_doc_collection(state, svid, Success, wfid.clone(), true).await
+            mock_incode_doc_collection(state, svid, Success.footprint_reason_codes(), wfid.clone(), true)
+                .await
         }
     };
     state.set_ff_client(Arc::new(mock_ff_client));

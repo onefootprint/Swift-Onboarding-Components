@@ -45,16 +45,34 @@ fn field_validation_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
 }
 
 pub fn doc_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
-    vec![Rule {
-        // A little hacky but a way to always raise review if we collected doc, which is the existing spec we implemented for Follow. Soon to be replaced with auto-approval rules.
-        rule: {
-            |f: &Vec<FootprintReasonCode>| {
-                f.contains(&FootprintReasonCode::DocumentNotVerified)
-                    || f.contains(&FootprintReasonCode::DocumentVerified)
-                    || f.contains(&FootprintReasonCode::DocumentUploadFailed)
-            }
+    super::doc::incode_rules(true)
+        .into_iter()
+        .chain(doc_field_validation_rules())
+        .collect()
+}
+
+pub fn doc_field_validation_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
+    vec![
+        // TODO: 🤔 should these technically do stuff like !DocumentOcrNameMatches && !NameDoesNotMatch ?
+        // what happens when the KYC check says DOB matches but then they upload a doc that has a different DOB 🤔. For now we'll just fail with review for these cases but maybe something to explicitly ask Alpaca about
+        Rule {
+            rule: {
+                |f: &Vec<FootprintReasonCode>| !f.contains(&FootprintReasonCode::DocumentOcrAddressMatches)
+            },
+            name: RuleName::DocumentAddressDoesntMatch,
+            action: RuleAction::ManualReview,
         },
-        name: RuleName::DocumentCollected,
-        action: RuleAction::ManualReview,
-    }]
+        Rule {
+            rule: { |f: &Vec<FootprintReasonCode>| !f.contains(&FootprintReasonCode::DocumentOcrDobMatches) },
+            name: RuleName::DocumentDobDoesntMatch,
+            action: RuleAction::ManualReview,
+        },
+        Rule {
+            rule: {
+                |f: &Vec<FootprintReasonCode>| !f.contains(&FootprintReasonCode::DocumentOcrNameMatches)
+            },
+            name: RuleName::DocumentNameDoesntMatch,
+            action: RuleAction::ManualReview,
+        },
+    ]
 }

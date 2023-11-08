@@ -101,6 +101,9 @@ pub enum RuleName {
     DocumentWasLearnerPermit,
     DocumentExpired,
     DocumentCollected,
+    DocumentAddressDoesntMatch,
+    DocumentDobDoesntMatch,
+    DocumentNameDoesntMatch,
 }
 
 impl_enum_str_diesel!(RuleName);
