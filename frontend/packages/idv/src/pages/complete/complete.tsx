@@ -18,7 +18,9 @@ const Complete = () => {
     <Container>
       <NavigationHeader leftButton={{ variant: 'close' }} />
       {isLoading ? (
-        <LoadingIndicator />
+        <LoadingContainer>
+          <LoadingIndicator />
+        </LoadingContainer>
       ) : (
         <>
           <IcoCheckCircle40 color="success" />
@@ -48,6 +50,15 @@ const Container = styled.div`
   flex-direction: column;
   text-align: center;
   position: relative;
+`;
+
+const LoadingContainer = styled.div`
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 export default Complete;
