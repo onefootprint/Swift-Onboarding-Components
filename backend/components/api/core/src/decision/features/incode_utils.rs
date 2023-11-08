@@ -88,10 +88,10 @@ impl ParsedIncodeNames {
             ]
             .iter()
             .flatten()
-            .map(|s| s.leak())
-            .join(" ");
+            .map(|s| Self::remove_hyphens_and_apostrophes(s).leak_to_string())
+            .join("");
             let (first_name, middle_name, last_name) =
-                if all.to_lowercase() == mrz_full_name.leak_to_string().to_lowercase() {
+                if all.to_lowercase() == mrz_full_name.leak_to_string().to_lowercase().split(' ').join("") {
                     (
                         first_name_from_first_name_field,
                         middle_name_from_middle_name_field,
@@ -168,6 +168,19 @@ impl ParsedIncodeNames {
 
         (first_name, middle_name, last_name)
     }
+
+    // unclear if its safe to remove all non-letter characters, so for now just remove hyphens and apostrophes
+    fn remove_hyphens_and_apostrophes(s: &PiiString) -> PiiString {
+        match Regex::new(r#"[-'\"]\s*"#) {
+            Ok(re) => re.replace_all(s.leak(), "").into(),
+            Err(err) => {
+                tracing::error!(?err, "Regex error");
+                s.clone()
+            }
+        }
+        
+    }
+
 }
 
 
@@ -533,6 +546,69 @@ mod tests {
             full_name: Some("CHRIS LEMON".into())
         } ; "MRZ failure + generational suffix"
     )]
+    #[test_case(
+        OCRName {
+            full_name: Some("KARL LOGAN PETERS- WHITE".into()),
+            machine_readable_full_name: Some("KARL LOGAN PETERS WHITE".into()),
+            first_name: Some("KARL".into()),
+            middle_name: Some("LOGAN".into()),
+            given_name: Some("KARL LOGAN".into()),
+            paternal_last_name: Some("PETERS- WHITE".into()),
+            ..Default::default()               
+        } => ParsedIncodeNames {
+            first_name: Some("KARL".into()),
+            middle_name: Some("LOGAN".into()),
+            last_name: Some("PETERS- WHITE".into()),
+            full_name: Some("KARL LOGAN PETERS- WHITE".into())
+        } ; "hyphen (with trailing space) in OCR names but not MRZ name"
+    )]
+    #[test_case(
+        OCRName {
+            full_name: Some("KARL LOGAN PETERS-WHITE".into()),
+            machine_readable_full_name: Some("KARL LOGAN PETERS WHITE".into()),
+            first_name: Some("KARL".into()),
+            middle_name: Some("LOGAN".into()),
+            given_name: Some("KARL LOGAN".into()),
+            paternal_last_name: Some("PETERS-WHITE".into()),
+            ..Default::default()               
+        } => ParsedIncodeNames {
+            first_name: Some("KARL".into()),
+            middle_name: Some("LOGAN".into()),
+            last_name: Some("PETERS-WHITE".into()),
+            full_name: Some("KARL LOGAN PETERS-WHITE".into())
+        } ; "hyphen (without trailing space) in OCR names but not MRZ name"
+    )]
+    #[test_case(
+        OCRName {
+            full_name: Some("BOB O'BERTO".into()),
+            machine_readable_full_name: Some("BOB OBERTO".into()),
+            first_name: Some("BOB".into()),
+            given_name: Some("BOB".into()),
+            paternal_last_name: Some("O'BERTO".into()),
+            ..Default::default()               
+        } => ParsedIncodeNames {
+            first_name: Some("BOB".into()),
+            middle_name: None,
+            last_name: Some("O'BERTO".into()),
+            full_name: Some("BOB O'BERTO".into())
+        } ; "apostrophe in OCR names but not MRZ name"
+    )]
+    #[test_case(
+        OCRName {
+            full_name: Some("BOB O'BERTO".into()),
+            machine_readable_full_name: Some("BOB O BERTO".into()),
+            first_name: Some("BOB".into()),
+            given_name: Some("BOB".into()),
+            paternal_last_name: Some("O'BERTO".into()),
+            ..Default::default()               
+        } => ParsedIncodeNames {
+            first_name: Some("BOB".into()),
+            middle_name: None,
+            last_name: Some("O'BERTO".into()),
+            full_name: Some("BOB O'BERTO".into())
+        } ; "apostrophe in OCR names but not MRZ name, with trailing space in MRZ"
+    )]
+    // TODO: add ^ same case but without trailing space
     fn test_parse_names_from_incode(name: OCRName) ->  ParsedIncodeNames{
         ParsedIncodeNames::from_fetch_ocr_res(&FetchOCRResponse {
             name: Some(name),
