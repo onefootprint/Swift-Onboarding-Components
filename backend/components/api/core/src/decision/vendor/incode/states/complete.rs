@@ -81,7 +81,7 @@ fn vault_complete_images(
             }
         })
         .collect_vec();
-    vw.put_documents_unsafe(conn, docs)?;
+    vw.put_documents_unsafe(conn, docs, None)?;
     Ok(())
 }
 
@@ -293,7 +293,7 @@ impl Complete {
         let data = DataRequest::clean_and_validate_str(data, validate_args)?;
         let data = data.no_fingerprints();
         let source = DataLifetimeSource::Ocr;
-        let seqno = uvw.patch_data(conn, data, source)?.seqno;
+        let seqno = uvw.patch_data(conn, data, source, None)?.seqno;
 
         let (document_score, _) = score_response.document_score();
         let (ocr_confidence_score, _) = score_response.id_ocr_confidence();

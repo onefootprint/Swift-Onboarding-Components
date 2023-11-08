@@ -132,6 +132,7 @@ async fn post_upload_inner(
         utils::vault_wrapper::seal_file_and_upload_to_s3(state, &file, di.clone(), &vault, &scoped_vault.id)
             .await?;
 
+    let actor = auth.actor();
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -159,7 +160,7 @@ async fn post_upload_inner(
                 None
             };
             let docs = vec![Some(doc), derived_doc].into_iter().flatten().collect();
-            let doc = uvw.put_documents_unsafe(conn, docs)?;
+            let doc = uvw.put_documents_unsafe(conn, docs, Some(actor))?;
 
             // Create an access event to show data was added
             NewAccessEvent {

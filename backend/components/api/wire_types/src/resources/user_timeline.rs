@@ -14,6 +14,7 @@ pub struct UserTimeline {
     pub is_from_other_org: bool,
 }
 
+// TODO need Apiv2Schema to generate the oneOf type. Paperclip doesn't support this though...
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]

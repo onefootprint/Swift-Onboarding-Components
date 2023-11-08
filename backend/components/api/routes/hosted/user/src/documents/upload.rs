@@ -160,6 +160,7 @@ pub async fn post(
                 e_data_key,
                 s3_url,
                 source,
+                None,
             )?;
             let args = NewDocumentUploadArgs {
                 document_id: id_doc.id.clone(),

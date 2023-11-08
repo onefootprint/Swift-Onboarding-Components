@@ -126,7 +126,9 @@ pub async fn patch(
 
             // Even though this accepts id.phone_number, it will always error at runtime if we
             // provide id.phone_number since we only allow a vault to have one phone number
-            let new_contact_info = uvw.patch_data(conn, request, DataLifetimeSource::Hosted)?.new_ci;
+            let new_contact_info = uvw
+                .patch_data(conn, request, DataLifetimeSource::Hosted, None)?
+                .new_ci;
             Ok(new_contact_info)
         })
         .await?;

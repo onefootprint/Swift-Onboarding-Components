@@ -73,18 +73,20 @@ pub async fn create_non_portable_vault(
         return Err(TenantError::CannotProvideBodyAndIdempotencyId.into());
     }
 
-    let actor = auth.actor().into();
+    let actor = auth.actor();
     let source = auth.source();
     let (scoped_user, vault) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
+            let i_id = idempotency_id.0;
+            let db_actor = actor.clone().into();
             let (su, vault) =
-                ScopedVault::get_or_create_non_portable(conn, new_user, tenant_id, idempotency_id.0, actor)?;
+                ScopedVault::get_or_create_non_portable(conn, new_user, tenant_id, i_id, db_actor)?;
 
             if let Some((targets, request)) = request_info {
                 // If any initial request data was provided, add it to the vault
                 let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id)?;
-                uvw.patch_data(conn, request, source)?;
+                uvw.patch_data(conn, request, source, Some(actor))?;
                 // Create an access event to show data was added
                 NewAccessEvent {
                     scoped_vault_id: su.id.clone(),

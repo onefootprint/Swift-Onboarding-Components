@@ -87,7 +87,7 @@ pub async fn patch(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb_id)?;
-            bvw.patch_data(conn, request, DataLifetimeSource::Hosted)?;
+            bvw.patch_data(conn, request, DataLifetimeSource::Hosted, None)?;
             Ok(())
         })
         .await?;

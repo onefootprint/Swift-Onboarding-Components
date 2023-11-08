@@ -164,6 +164,7 @@ table! {
         deactivated_seqno -> Nullable<Int8>,
         kind -> Text,
         source -> Text,
+        actor -> Nullable<Jsonb>,
     }
 }
 

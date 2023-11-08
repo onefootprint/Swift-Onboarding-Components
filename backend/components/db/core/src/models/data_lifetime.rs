@@ -8,6 +8,7 @@ use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DataLifetimeSource;
+use newtypes::DbActor;
 use newtypes::ScopedVaultId;
 use newtypes::TenantId;
 use newtypes::{DataLifetimeId, VaultId};
@@ -76,6 +77,8 @@ pub struct DataLifetime {
     pub kind: DataIdentifier,
     /// Inforamation on how the piece of data was added to the vault
     pub source: DataLifetimeSource,
+    /// The actor that added this piece of data to the vault, if not performed by the user
+    pub actor: Option<DbActor>,
 }
 
 #[derive(Clone, Insertable)]
@@ -90,6 +93,7 @@ struct NewDataLifetime {
     created_seqno: DataLifetimeSeqno,
     kind: DataIdentifier,
     source: DataLifetimeSource,
+    actor: Option<DbActor>,
 }
 
 #[derive(Default, AsChangeset)]
@@ -143,6 +147,7 @@ impl DataLifetime {
         kinds: Vec<DataIdentifier>,
         seqno: DataLifetimeSeqno,
         source: DataLifetimeSource,
+        actor: Option<DbActor>,
     ) -> DbResult<Vec<Self>> {
         let new_rows: Vec<NewDataLifetime> = kinds
             .into_iter()
@@ -153,6 +158,7 @@ impl DataLifetime {
                 created_seqno: seqno,
                 kind: k,
                 source,
+                actor: actor.clone(),
             })
             .collect();
         let result = diesel::insert_into(data_lifetime::table)
@@ -170,8 +176,9 @@ impl DataLifetime {
         kind: DataIdentifier,
         seqno: DataLifetimeSeqno,
         source: DataLifetimeSource,
+        actor: Option<DbActor>,
     ) -> DbResult<Self> {
-        let lifetime = Self::bulk_create(conn, vault_id, scoped_vault_id, vec![kind], seqno, source)?
+        let lifetime = Self::bulk_create(conn, vault_id, scoped_vault_id, vec![kind], seqno, source, actor)?
             .into_iter()
             .next()
             .ok_or(DbError::ObjectNotFound)?;

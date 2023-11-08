@@ -12,6 +12,7 @@ use newtypes::DataIdentifier;
 use newtypes::DataLifetimeId;
 use newtypes::DataLifetimeSeqno;
 use newtypes::DataLifetimeSource;
+use newtypes::DbActor;
 use newtypes::DocumentDataId;
 use newtypes::PiiString;
 use newtypes::S3Url;
@@ -61,8 +62,17 @@ impl DocumentData {
         e_data_key: SealedVaultDataKey,
         seqno: DataLifetimeSeqno,
         source: DataLifetimeSource,
+        actor: Option<DbActor>,
     ) -> DbResult<Self> {
-        let dl = DataLifetime::create(conn, vault_id, scoped_vault_id, kind.clone(), seqno, source)?;
+        let dl = DataLifetime::create(
+            conn,
+            vault_id,
+            scoped_vault_id,
+            kind.clone(),
+            seqno,
+            source,
+            actor,
+        )?;
 
         let new_doc = NewDocumentData {
             lifetime_id: dl.id,

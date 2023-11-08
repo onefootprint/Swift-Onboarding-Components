@@ -1,0 +1,1 @@
+ALTER TABLE data_lifetime ADD COLUMN IF NOT EXISTS actor JSONB;

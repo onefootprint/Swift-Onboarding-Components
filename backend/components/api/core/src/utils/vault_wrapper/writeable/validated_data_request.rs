@@ -1,6 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::{
+    auth::tenant::AuthActor,
     errors::{ApiResult, AssertionError},
     utils::vault_wrapper::VaultWrapper,
 };
@@ -127,6 +128,7 @@ impl ValidatedDataRequest {
         user_vault: &Vault,
         scoped_user_id: ScopedVaultId,
         source: DataLifetimeSource,
+        actor: Option<AuthActor>,
     ) -> ApiResult<(Vec<VaultData>, DataLifetimeSeqno)> {
         // Deactivate old VDs that we have overwritten that belong to this tenant.
         // We will only deactivate speculative, uncommitted data here - never portable data
@@ -146,7 +148,9 @@ impl ValidatedDataRequest {
         DataLifetime::bulk_deactivate_speculative(conn, &scoped_user_id, kinds_to_deactivate, seqno)?;
 
         // Create the new VDs
-        let vds = VaultData::bulk_create(conn, &user_vault.id, &scoped_user_id, self.data, seqno, source)?;
+        let v_id = &user_vault.id;
+        let actor = actor.map(|a| a.into());
+        let vds = VaultData::bulk_create(conn, v_id, &scoped_user_id, self.data, seqno, source, actor)?;
 
         // Point fingerprints to the same lifetime used for the corresponding VD row
         let fingerprints: Vec<_> = self

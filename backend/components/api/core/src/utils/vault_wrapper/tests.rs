@@ -67,7 +67,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
     let source = DataLifetimeSource::Unknown;
-    let vds = VaultData::bulk_create(conn, &uv.id, &su.id, data, seqno, source).unwrap();
+    let vds = VaultData::bulk_create(conn, &uv.id, &su.id, data, seqno, source, None).unwrap();
 
     // Portablize the phone as happens in prod
     let phone_data = vds
@@ -190,7 +190,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
     for (su_id, portablize, data) in data {
         let seqno = DataLifetime::get_next_seqno(conn).unwrap();
         let source = DataLifetimeSource::Unknown;
-        let vds = VaultData::bulk_create(conn, &uv.id, su_id, data, seqno, source).unwrap();
+        let vds = VaultData::bulk_create(conn, &uv.id, su_id, data, seqno, source, None).unwrap();
         if portablize {
             let ids = vds.into_iter().map(|vd| vd.lifetime_id).collect();
             DataLifetime::bulk_portablize_for_tenant(conn, ids, su_id, seqno).unwrap();
@@ -260,7 +260,7 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
     let source = DataLifetimeSource::Unknown;
-    VaultData::bulk_create(conn, &bv.id, &sb.id, data, seqno, source).unwrap();
+    VaultData::bulk_create(conn, &bv.id, &sb.id, data, seqno, source, None).unwrap();
 
     let bvw = VaultWrapper::<Business>::build(conn, VwArgs::Tenant(&sb.id)).unwrap();
     let tests = vec![
@@ -892,6 +892,7 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
             newtypes::SealedVaultDataKey(vec![0x01]),
             S3Url::from("test".to_string()),
             DataLifetimeSource::Hosted,
+            None,
         )
         .unwrap();
 

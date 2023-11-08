@@ -13,10 +13,11 @@ pub fn build<T: Into<DataIdentifier>>(
     kind: T,
 ) -> DataLifetime {
     let s = DataLifetimeSource::Unknown;
-    let mut lifetime = DataLifetime::bulk_create(conn, uv_id, su_id, vec![kind.into()], created_seqno, s)
-        .unwrap()
-        .pop()
-        .unwrap();
+    let mut lifetime =
+        DataLifetime::bulk_create(conn, uv_id, su_id, vec![kind.into()], created_seqno, s, None)
+            .unwrap()
+            .pop()
+            .unwrap();
     if let Some(portablized_seqno) = portablized_seqno {
         lifetime = DataLifetime::portablize(conn, &lifetime.id, portablized_seqno).unwrap();
     }

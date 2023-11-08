@@ -142,6 +142,7 @@ pub async fn vault_pii(
         .await?;
 
         let source = auth.source();
+        let actor = auth.actor();
         state
             .db_pool
             .db_transaction(move |conn| -> ApiResult<_> {
@@ -168,7 +169,7 @@ pub async fn vault_pii(
                 // put our data
                 if !data.is_empty() {
                     let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &scoped_vault.id)?;
-                    uvw.patch_data(conn, data, source)?;
+                    uvw.patch_data(conn, data, source, Some(actor.clone()))?;
                 }
 
                 // put our documents
@@ -195,6 +196,7 @@ pub async fn vault_pii(
                                             e_data_key,
                                             s3_url,
                                             source,
+                                            Some(actor.clone()),
                                         )
                                     },
                                 )

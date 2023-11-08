@@ -1,4 +1,5 @@
 use super::WriteableVw;
+use crate::auth::tenant::AuthActor;
 use crate::errors::{ApiResult, AssertionError};
 use crate::utils::file_upload::FileUpload;
 use crate::utils::vault_wrapper::Person;
@@ -48,6 +49,7 @@ impl<Type> WriteableVw<Type> {
         conn: &mut TxnPgConn,
         request: DataRequest<Fingerprints>,
         source: DataLifetimeSource,
+        actor: Option<AuthActor>,
     ) -> ApiResult<PatchDataResult> {
         request.assert_allowable_identifiers(self.vault.kind)?;
         let keys = request.keys().cloned().collect_vec();
@@ -56,7 +58,8 @@ impl<Type> WriteableVw<Type> {
         let (new_ci, seqno) = if !request.is_empty() {
             // Must do this validation here inside the locked, WriteableUvw
             let request = self.validate_request(conn, request)?;
-            let (vds, seqno) = request.save(conn, self.vault(), self.scoped_vault_id.clone(), source)?;
+            let sv_id = self.scoped_vault_id.clone();
+            let (vds, seqno) = request.save(conn, self.vault(), sv_id, source, actor)?;
             let new_ci = Self::create_contact_info_if_needed(conn, vds)?;
             (new_ci, seqno)
         } else {
@@ -192,7 +195,7 @@ mod test {
                 request.no_fingerprints()
             };
             let source = DataLifetimeSource::Unknown;
-            let new_ci = self.patch_data(conn, request, source)?.new_ci;
+            let new_ci = self.patch_data(conn, request, source, None)?.new_ci;
             Ok(new_ci)
         }
     }
@@ -213,6 +216,7 @@ impl WriteableVw<Person> {
         e_data_key: SealedVaultDataKey,
         s3_url: S3Url,
         source: DataLifetimeSource,
+        actor: Option<AuthActor>,
     ) -> ApiResult<(DocumentData, DataLifetimeSeqno)> {
         let new_doc = NewDocument {
             kind,
@@ -223,7 +227,7 @@ impl WriteableVw<Person> {
             source,
         };
 
-        let (docs, seqno) = self.put_documents_unsafe(conn, vec![new_doc])?;
+        let (docs, seqno) = self.put_documents_unsafe(conn, vec![new_doc], actor)?;
         let doc = docs
             .into_iter()
             .next()
@@ -237,6 +241,7 @@ impl WriteableVw<Person> {
         &self,
         conn: &mut TxnPgConn,
         docs: Vec<NewDocument>,
+        actor: Option<AuthActor>,
     ) -> ApiResult<(Vec<DocumentData>, DataLifetimeSeqno)> {
         let vault_id = self.vault.id.clone();
         let su_id = self.scoped_vault_id.clone();
@@ -245,6 +250,7 @@ impl WriteableVw<Person> {
         let kinds = docs.iter().map(|d| d.kind.clone()).collect_vec();
         DataLifetime::bulk_deactivate_speculative(conn, &su_id, kinds, seqno)?;
 
+        let actor = actor.map(|a| a.into());
         let docs = docs
             .into_iter()
             .map(|d| {
@@ -257,7 +263,17 @@ impl WriteableVw<Person> {
                     source,
                 } = d;
                 DocumentData::create(
-                    conn, &vault_id, &su_id, kind, mime_type, filename, s3_url, e_data_key, seqno, source,
+                    conn,
+                    &vault_id,
+                    &su_id,
+                    kind,
+                    mime_type,
+                    filename,
+                    s3_url,
+                    e_data_key,
+                    seqno,
+                    source,
+                    actor.clone(),
                 )
             })
             .collect::<db::DbResult<Vec<_>>>()?;
