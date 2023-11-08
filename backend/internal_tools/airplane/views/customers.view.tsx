@@ -12,6 +12,7 @@ import airplane from 'airplane';
 
 const NON_CORPORATE_DOMAINS = [
   'gmail.com',
+  'icloud.com',
   'yahoo.com',
   'live.com',
   'msn.com',
@@ -22,12 +23,12 @@ const NON_CORPORATE_DOMAINS = [
 
 const Customers = () => {
   const customersTable = useComponentState('customers');
-  const { id: checkboxId, value: onlyCorporate } = useComponentState();
+  const { id: onlyCorporateId, value: onlyCorporate } = useComponentState();
 
   return (
     <Stack>
       <Checkbox
-        id={checkboxId}
+        id={onlyCorporateId}
         label="Only corporate email domains"
         defaultChecked
       ></Checkbox>
@@ -132,11 +133,17 @@ const OrgUsers = ({ tenantId }: OrgUserProps) => {
 
 //
 const Logins = ({ onlyCorporate }: { onlyCorporate: boolean }) => {
-  const extraFilters = onlyCorporate
-    ? NON_CORPORATE_DOMAINS.map(
-        d => `AND tenant_user.email NOT LIKE '%${d}'`,
-      ).join('\n')
-    : '';
+  const { id: onlyNonLiveId, value: onlyNonLive } = useComponentState();
+  const extraFilters: string[] = [];
+  if (onlyCorporate) {
+    NON_CORPORATE_DOMAINS.forEach(d =>
+      extraFilters.push(`AND tenant_user.email NOT LIKE '%${d}'`),
+    );
+  }
+  if (onlyNonLive) {
+    extraFilters.push(`AND tenant.sandbox_restricted ='t'`);
+  }
+  const extraFiltersStr = extraFilters.join('\n');
   return (
     <Stack>
       <h1>Recent activity</h1>
@@ -144,6 +151,11 @@ const Logins = ({ onlyCorporate }: { onlyCorporate: boolean }) => {
         Below is a list of users who have signed up for the dashboard - order by
         "last active" to see who has been active most recently.
       </Label>
+      <Checkbox
+        id={onlyNonLiveId}
+        label="Only logins for non-live customers"
+        defaultChecked
+      ></Checkbox>
       <Table
         id="signups"
         title="Dashboard Logins (corporate emails only)"
@@ -177,7 +189,7 @@ const Logins = ({ onlyCorporate }: { onlyCorporate: boolean }) => {
             INNER JOIN tenant_rolebinding as trb ON trb.tenant_user_id=tenant_user.id
             INNER JOIN tenant on tenant.id=trb.tenant_id
           WHERE tenant.id NOT LIKE '_private_it%'
-          AND tenant_user.email NOT LIKE '%@onefootprint.com' ${extraFilters}
+          AND tenant_user.email NOT LIKE '%@onefootprint.com' ${extraFiltersStr}
           ORDER BY trb.created_at DESC;
           `,
           },
