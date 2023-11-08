@@ -319,3 +319,19 @@ def test_get_annotations(sandbox_user):
         " (integrationtests@onefootprint.com)" in annotation2["source"]["member"]
     )  # I guess there's no way to get the tenant user from Tenant so we just hard code this?
     assert annotation2["is_pinned"] == True
+
+
+def test_update_data(sandbox_user, sandbox_tenant):
+    """
+    Test updating an existing vault from the dashboard
+    """
+    data = {"id.first_name": "Hayes", "id.last_name": "Valley"}
+    patch(f"users/{sandbox_user.fp_id}/vault", data, *sandbox_tenant.db_auths)
+
+    body = get(
+        f"entities/{sandbox_user.fp_id}/timeline", None, *sandbox_tenant.db_auths
+    )
+    event = body[0]["event"]
+    assert event["kind"] == "data_collected"
+    assert event["data"]["attributes"] == ["name"]
+    assert event["data"]["actor"]["kind"] == "organization"
