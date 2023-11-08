@@ -34,7 +34,7 @@ use newtypes::WorkflowId;
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
-    tags(Hosted, Bifrost),
+    tags(Onboarding, Hosted),
     description = "Continue processing the onboarding after user this stage of user input has finished"
 )]
 #[actix::post("/hosted/onboarding/process")]

@@ -16,7 +16,7 @@ use newtypes::ObConfigurationId;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[api_v2_operation(
-    tags(Organization, Private),
+    tags(Playbooks, Organization, Private),
     description = "Returns a list of onboarding configurations owned by the tenant."
 )]
 #[get("/org/onboarding_configs")]
@@ -56,7 +56,7 @@ async fn get_list(
 }
 
 #[api_v2_operation(
-    tags(Organization, Private),
+    tags(Playbooks, Organization, Private),
     description = "Returns a list of onboarding configurations owned by the tenant."
 )]
 #[get("/org/onboarding_configs/{id}")]

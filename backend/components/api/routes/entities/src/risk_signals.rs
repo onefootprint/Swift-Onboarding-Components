@@ -57,7 +57,7 @@ type RiskSignalsListResponse = Vec<api_wire_types::RiskSignal>;
 
 #[api_v2_operation(
     description = "Lists the risk signals for a footprint user.",
-    tags(Entities, Private)
+    tags(EntityDetails, Entities, Private)
 )]
 #[get("/entities/{fp_id}/risk_signals")]
 pub async fn get(
@@ -142,7 +142,7 @@ fn filter_and_sort(signals: Vec<RiskSignal>, filters: RiskSignalFilters) -> Vec<
 
 #[api_v2_operation(
     description = "Lists the risk signals for a footprint user.",
-    tags(Entities, Private)
+    tags(EntityDetails, Entities, Private)
 )]
 #[get("/entities/{fp_id}/risk_signals/{signal_id}")]
 pub async fn get_detail(
@@ -166,7 +166,7 @@ const DECRYPT_AML_HITS_ACCESS_EVENT_REASON: &str = "Reviewing AML information";
 
 #[api_v2_operation(
     description = "Decrypts structured information about the AML hits for a AML risk signal.",
-    tags(Entities, Private)
+    tags(EntityDetails, Entities, Private)
 )]
 #[post("/entities/{fp_id}/decrypt_aml_hits/{signal_id}")]
 pub async fn decrypt_aml_hits(

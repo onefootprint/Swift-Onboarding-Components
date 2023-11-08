@@ -9,7 +9,7 @@ use paperclip::actix::{self, api_v2_operation, web};
 type AuthorizedOrgsResponse = Vec<api_wire_types::AuthorizedOrg>;
 
 #[api_v2_operation(
-    tags(Hosted),
+    tags(My1fp, Hosted),
     description = "Returns a list of organizations onto which the user has onboarded"
 )]
 #[actix::get("/hosted/user/authorized_orgs")]

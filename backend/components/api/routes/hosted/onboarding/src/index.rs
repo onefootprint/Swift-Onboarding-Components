@@ -22,7 +22,7 @@ use newtypes::WorkflowSource;
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
-    tags(Hosted, Bifrost),
+    tags(Onboarding, Hosted),
     description = "Gets or creates the Onboarding for this (user, ob_config) pair."
 )]
 #[actix::post("/hosted/onboarding")]

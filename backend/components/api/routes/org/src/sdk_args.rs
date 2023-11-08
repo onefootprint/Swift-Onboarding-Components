@@ -25,7 +25,7 @@ pub struct GetSdkArgsTokenResponse {
 }
 
 #[api_v2_operation(
-    tags(OrgSettings, Private),
+    tags(SdkArgs, Hosted),
     description = "Create a new session containing args for the SDK."
 )]
 #[post("/org/sdk_args")]
@@ -67,7 +67,7 @@ async fn post(
 }
 
 #[api_v2_operation(
-    tags(OrgSettings, Private),
+    tags(SdkArgs, Hosted),
     description = "Fetch information from an existing SDK args session."
 )]
 #[get("/org/sdk_args")]

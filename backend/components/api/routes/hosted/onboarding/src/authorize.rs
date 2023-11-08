@@ -15,7 +15,7 @@ use newtypes::OnboardingRequirement;
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
-    tags(Hosted, Bifrost),
+    tags(Onboarding, Hosted),
     description = "Mark the onboarding as authorized and initiate IDV checks"
 )]
 #[actix::post("/hosted/onboarding/authorize")]

@@ -16,7 +16,10 @@ struct RedirectUrl {
     redirect_url: String,
 }
 
-#[api_v2_operation(description = "Request to authenticate via Google OAuth.", tags(Private))]
+#[api_v2_operation(
+    description = "Request to authenticate via Google OAuth.",
+    tags(Auth, Private)
+)]
 #[get("/org/auth/google_oauth")]
 async fn handler(
     state: web::Data<State>,

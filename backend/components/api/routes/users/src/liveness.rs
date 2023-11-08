@@ -12,7 +12,7 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[api_v2_operation(
     description = "Lists the liveness signals for the provided user.",
-    tags(Entities, Preview)
+    tags(Users, Preview)
 )]
 #[get("/users/{fp_id}/liveness")]
 pub async fn get(

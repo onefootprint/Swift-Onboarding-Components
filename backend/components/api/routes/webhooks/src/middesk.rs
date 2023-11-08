@@ -9,7 +9,7 @@ use paperclip::actix::Apiv2Header;
 use paperclip::actix::{api_v2_operation, post};
 use std::pin::Pin;
 
-#[api_v2_operation(description = "Handles Middesk webhooks.", tags(Private))]
+#[api_v2_operation(description = "Handles Middesk webhooks.", tags(Webhooks, Private))]
 #[post("/webhooks/middesk/handle_webhook")]
 async fn handle_webhook(
     webhook_signature: MiddeskWebhookSignature,

@@ -13,7 +13,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
     description = "Records a user's consent to collection of their images.",
-    tags(Hosted)
+    tags(User, Hosted)
 )]
 #[actix::post("/hosted/user/consent")]
 pub async fn post(

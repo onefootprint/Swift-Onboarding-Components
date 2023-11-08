@@ -11,7 +11,10 @@ pub struct TokenResponse {
     pub expires_at: DateTime<Utc>,
 }
 
-#[api_v2_operation(tags(Hosted), description = "Returns information about a given auth token.")]
+#[api_v2_operation(
+    tags(User, Hosted),
+    description = "Returns information about a given auth token."
+)]
 #[actix::get("/hosted/user/token")]
 pub async fn get(
     user_auth: UserAuthContext,

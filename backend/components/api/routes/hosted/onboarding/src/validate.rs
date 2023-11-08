@@ -27,7 +27,7 @@ use newtypes::{output::Csv, DataIdentifierDiscriminant, ObConfigurationKind};
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
-    tags(Hosted, Bifrost),
+    tags(Onboarding, Hosted),
     description = "Finish onboarding the user. Returns the validation token that can be exchanged for a permanent Footprint user token."
 )]
 #[actix::post("/hosted/onboarding/validate")]

@@ -82,7 +82,7 @@ impl FromRequest for MetaHeaders {
 
 #[api_v2_operation(
     description = "Upload an image for the given side to the provided ID doc.",
-    tags(Hosted)
+    tags(Document, Hosted)
 )]
 #[actix::post("/hosted/user/documents/{id}/upload/{side}")]
 pub async fn post(

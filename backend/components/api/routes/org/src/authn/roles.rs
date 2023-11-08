@@ -11,7 +11,7 @@ pub type RolesResponse = Vec<Organization>;
 
 #[api_v2_operation(
     description = "Return the list of tenants that can be inherited by the authed user",
-    tags(Private)
+    tags(Auth, Private)
 )]
 #[get("/org/auth/roles")]
 fn get(

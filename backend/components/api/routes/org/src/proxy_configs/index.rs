@@ -17,7 +17,7 @@ type ProxyConfigsResponse = Json<ResponseData<Vec<api_wire_types::ProxyConfigBas
 
 #[api_v2_operation(
     description = "List the organization's proxy configurations",
-    tags(Organization, Private)
+    tags(ProxyConfigs, Organization, Private)
 )]
 #[actix::get("/org/proxy_configs")]
 pub async fn get(
@@ -53,7 +53,7 @@ pub async fn get(
 
 #[api_v2_operation(
     description = "Get a proxy configuration with details",
-    tags(Organization, Private)
+    tags(ProxyConfigs, Organization, Private)
 )]
 #[actix::get("/org/proxy_configs/{proxy_config_id}")]
 pub async fn get_detail(
@@ -76,7 +76,10 @@ pub async fn get_detail(
     ResponseData::ok(api_wire_types::ProxyConfigDetailed::from_db(config)).json()
 }
 
-#[api_v2_operation(description = "Create a new proxy configuration", tags(Organization, Private))]
+#[api_v2_operation(
+    description = "Create a new proxy configuration",
+    tags(ProxyConfigs, Organization, Private)
+)]
 #[actix::post("/org/proxy_configs")]
 pub async fn post(
     state: web::Data<State>,
@@ -183,7 +186,7 @@ pub async fn post(
 
 #[api_v2_operation(
     description = "Update an existing proxy configuration",
-    tags(Organization, Private)
+    tags(ProxyConfigs, Organization, Private)
 )]
 #[actix::patch("/org/proxy_configs/{proxy_config_id}")]
 pub async fn patch(

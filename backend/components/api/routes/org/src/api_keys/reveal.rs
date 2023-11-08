@@ -17,7 +17,7 @@ struct RevealRequest {
 
 #[api_v2_operation(
     description = "Decrypts a specific tenant secret API key.",
-    tags(Organization, Private)
+    tags(ApiKeys, Organization, Private)
 )]
 #[post("/org/api_keys/{id}/reveal")]
 /// Note, we make this a post because it does a decrypt operation. In the future, we may

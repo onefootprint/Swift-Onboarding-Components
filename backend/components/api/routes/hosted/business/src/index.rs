@@ -12,7 +12,7 @@ use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
     description = "Get information about the business for which we started a KYC of a beneficial owner",
-    tags(Hosted, Businesses)
+    tags(Businesses, Hosted)
 )]
 #[actix::get("/hosted/business")]
 pub async fn get(state: web::Data<State>, business_auth: BoSessionAuth) -> JsonApiResponse<HostedBusiness> {

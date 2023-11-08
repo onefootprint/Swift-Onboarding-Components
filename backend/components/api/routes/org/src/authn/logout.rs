@@ -6,7 +6,7 @@ use api_core::types::{EmptyResponse, JsonApiResponse};
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
-    tags(Private),
+    tags(Auth, Private),
     description = "Logs out the authenticated principal and invalidates the session"
 )]
 #[post("/org/auth/logout")]

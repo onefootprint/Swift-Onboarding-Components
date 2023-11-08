@@ -9,7 +9,7 @@ use db::models::fingerprint_visit_event::FingerprintVisitEvent;
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
-    tags(Hosted),
+    tags(Onboarding, Hosted),
     description = "Records a fingerprint visitorID for the Fingerprint SDK in the frontend"
 )]
 #[actix::post("/hosted/onboarding/fp")]

@@ -12,11 +12,11 @@ use paperclip::actix::{api_v2_operation, post, web};
 
 #[route_alias(post(
     "/hosted/onboarding/skip_liveness",
-    tags(Hosted),
+    tags(Onboarding, Hosted),
     description = "Allows skipping passkeys if the device doesn't support it"
 ))] // TODO: remove alias once deploys
 #[api_v2_operation(
-    tags(Hosted),
+    tags(Onboarding, Hosted),
     description = "Tells us that a passkey registration was skipped"
 )]
 #[post("/hosted/onboarding/skip_passkey_register")]

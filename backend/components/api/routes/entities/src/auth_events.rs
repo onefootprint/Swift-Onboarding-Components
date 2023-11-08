@@ -13,7 +13,10 @@ use db::models::scoped_vault::ScopedVault;
 use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
-#[api_v2_operation(description = "View a user's recent device insights", tags(Entities, Private))]
+#[api_v2_operation(
+    description = "View a user's recent device insights",
+    tags(EntityDetails, Entities, Private)
+)]
 #[get("/entities/{fp_id}/auth_events")]
 pub async fn get(
     state: web::Data<State>,

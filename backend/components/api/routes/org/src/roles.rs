@@ -22,7 +22,7 @@ use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 type RolesResponse = Json<OffsetPaginatedResponse<api_wire_types::OrganizationRole>>;
 
 #[api_v2_operation(
-    tags(OrgSettings, Private),
+    tags(Roles, OrgSettings, Private),
     description = "Returns a list of IAM roles for the tenant."
 )]
 #[get("/org/roles")]
@@ -73,7 +73,7 @@ struct CreateTenantRoleRequest {
 }
 
 #[api_v2_operation(
-    tags(OrgSettings, Private),
+    tags(Roles, OrgSettings, Private),
     description = "Create a new IAM role for the tenant."
 )]
 #[post("/org/roles")]
@@ -107,7 +107,10 @@ struct UpdateTenantRoleRequest {
     scopes: Option<Vec<TenantScope>>,
 }
 
-#[api_v2_operation(tags(OrgSettings, Private), description = "Updates the provided IAM role.")]
+#[api_v2_operation(
+    tags(Roles, OrgSettings, Private),
+    description = "Updates the provided IAM role."
+)]
 #[patch("/org/roles/{tenant_role_id}")]
 async fn patch(
     state: web::Data<State>,
@@ -130,7 +133,7 @@ async fn patch(
 }
 
 #[api_v2_operation(
-    tags(OrgSettings, Private),
+    tags(Roles, OrgSettings, Private),
     description = "Deactivates the provided IAM role."
 )]
 #[post("/org/roles/{tenant_role_id}/deactivate")]

@@ -12,7 +12,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 const MAX_DOC_SIZE_BYTES: usize = 5_048_576;
 
-#[api_v2_operation(description = "POSTs a document to the vault", tags(Hosted))]
+#[api_v2_operation(description = "POSTs a document to the vault", tags(Document, Hosted))]
 #[actix::post("/hosted/user/upload/{document_identifier}")]
 pub async fn post(
     state: web::Data<State>,

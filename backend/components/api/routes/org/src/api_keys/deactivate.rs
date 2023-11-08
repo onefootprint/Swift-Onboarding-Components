@@ -12,7 +12,7 @@ use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
 #[api_v2_operation(
     description = "Permanently deactivates an existing tenant API key.",
-    tags(Organization, Private)
+    tags(ApiKeys, Organization, Private)
 )]
 #[post("/org/api_keys/{id}/deactivate")]
 pub async fn post(

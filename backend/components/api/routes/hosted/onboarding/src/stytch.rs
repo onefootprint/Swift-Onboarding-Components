@@ -23,7 +23,7 @@ use newtypes::{DecisionIntentKind, RiskSignalGroupKind, ScopedVaultId, VaultId, 
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
-    tags(Hosted),
+    tags(Onboarding, Hosted),
     description = "Performs a lookup with Stytch on the passed up telemetry_id and records the response + risk signals"
 )]
 #[actix::post("/hosted/onboarding/tel")]

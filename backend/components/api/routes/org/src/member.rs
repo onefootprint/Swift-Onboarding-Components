@@ -15,7 +15,10 @@ use db::models::tenant_user::TenantUserUpdate;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, web};
 
-#[api_v2_operation(tags(OrgSettings, Private), description = "Returns info on the authed user.")]
+#[api_v2_operation(
+    tags(Members, OrgSettings, Private),
+    description = "Returns info on the authed user."
+)]
 #[get("/org/member")]
 async fn get(
     state: web::Data<State>,
@@ -50,7 +53,7 @@ struct UpdateTenantUserRequest {
     last_name: Option<String>,
 }
 
-#[api_v2_operation(tags(OrgSettings, Private), description = "Updates the authed user.")]
+#[api_v2_operation(tags(Members, OrgSettings, Private), description = "Updates the authed user.")]
 #[patch("/org/member")]
 async fn patch(
     state: web::Data<State>,

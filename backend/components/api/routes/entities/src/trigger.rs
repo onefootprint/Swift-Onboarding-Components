@@ -39,7 +39,7 @@ use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
     description = "Trigger a workflow for the provided user.",
-    tags(Entities, Private)
+    tags(EntityDetails, Entities, Private)
 )]
 #[post("/entities/{fp_id}/trigger")]
 pub async fn post(

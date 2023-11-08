@@ -52,10 +52,13 @@ pub struct WebAuthnInitResponse {
 //TODO: remove alias once frontend updates
 #[route_alias(post(
     "/hosted/user/biometric/init",
-    tags(Hosted),
+    tags(Passkey, Hosted, Deprecated),
     description = "Generates a passkey registration challenge",
 ))]
-#[api_v2_operation(description = "Generates a passkey registration challenge.", tags(Hosted))]
+#[api_v2_operation(
+    description = "Generates a passkey registration challenge.",
+    tags(Passkey, Hosted)
+)]
 #[post("/hosted/user/passkey/register")]
 pub async fn init_post(
     user_auth: UserAuthContext,
@@ -126,11 +129,11 @@ pub struct SavedAttestationData {
 //TODO: remove alias once frontend updates
 #[route_alias(post(
     "/hosted/user/biometric",
-    tags(Hosted),
+    tags(Passkey, Hosted, Deprecated),
     description = "Accepts a response to a passkey registration challenge",
 ))]
 #[api_v2_operation(
-    tags(Hosted),
+    tags(Passkey, Hosted),
     description = "Accepts a response to a passkey registration challenge"
 )]
 #[post("/hosted/user/passkey")]

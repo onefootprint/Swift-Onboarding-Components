@@ -19,7 +19,7 @@ pub struct D2pSmsResponse {
 
 #[api_v2_operation(
     operation_id = "hosted-onboarding-d2p-sms",
-    tags(Hosted),
+    tags(D2p, Hosted),
     description = "Send an SMS with a link to the phone onboarding page."
 )]
 #[post("/hosted/onboarding/d2p/sms")]

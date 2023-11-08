@@ -8,7 +8,10 @@ use api_wire_types::hosted::onboarding_status::{ApiOnboardingRequirement, Onboar
 use itertools::Itertools;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
-#[api_v2_operation(tags(Hosted, Bifrost), description = "Returns the status of the onboarding.")]
+#[api_v2_operation(
+    tags(Onboarding, Hosted),
+    description = "Returns the status of the onboarding."
+)]
 #[actix::get("/hosted/onboarding/status")]
 pub async fn get(
     state: web::Data<State>,

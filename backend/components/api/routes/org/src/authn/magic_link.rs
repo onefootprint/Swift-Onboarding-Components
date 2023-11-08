@@ -14,7 +14,7 @@ struct LinkAuthRequest {
     description = "Request to authenticate a user email. WorkOS will send the email a link to \
     login. Once the user clicks the magic link, WorkOs will call the /workos/callback endpoint, \
     at which point we authenticate the user",
-    tags(Private)
+    tags(Auth, Private)
 )]
 #[post("/org/auth/magic_link")]
 fn handler(

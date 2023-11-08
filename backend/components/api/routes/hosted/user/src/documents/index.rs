@@ -18,7 +18,7 @@ use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
     description = "Create a new identity document for this user's outstanding document request",
-    tags(Hosted)
+    tags(Document, Hosted)
 )]
 #[actix::post("/hosted/user/documents")]
 pub async fn post(

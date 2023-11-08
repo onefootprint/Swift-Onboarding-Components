@@ -19,7 +19,7 @@ use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(
     description = "View the documents uploaded for this vault.",
-    tags(Entities, Private)
+    tags(EntityDetails, Entities, Private)
 )]
 #[get("/entities/{fp_id}/documents")]
 pub async fn get(

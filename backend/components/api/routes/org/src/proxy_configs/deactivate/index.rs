@@ -8,7 +8,7 @@ use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
     description = "Delete organization's proxy configurations",
-    tags(Organization, Private)
+    tags(ProxyConfigs, Organization, Private)
 )]
 #[actix::post("/org/proxy_configs/{proxy_config_id}/deactivate")]
 pub async fn post(

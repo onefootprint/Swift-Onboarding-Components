@@ -15,7 +15,7 @@ const MAX_IMAGE_SIZE_BYTES: usize = 1_048_576;
 
 #[api_v2_operation(
     description = "Upload a new logo for the organization.",
-    tags(Organization, Private)
+    tags(OrgSettings, Organization, Private)
 )]
 #[actix::put("/org/logo")]
 pub async fn put(

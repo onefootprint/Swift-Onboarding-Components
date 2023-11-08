@@ -25,7 +25,10 @@ use paperclip::actix::{api_v2_operation, get, patch, post, web};
 
 type AnnotationsListResponse = Vec<api_wire_types::Annotation>;
 
-#[api_v2_operation(description = "Gets the annotations for a user.", tags(Entities, Private))]
+#[api_v2_operation(
+    description = "Gets the annotations for a user.",
+    tags(EntityDetails, Entities, Private)
+)]
 #[get("/entities/{fp_id}/annotations")]
 pub async fn get(
     state: web::Data<State>,
@@ -56,7 +59,10 @@ struct UpdateAnnotationPath {
     annotation_id: AnnotationId,
 }
 
-#[api_v2_operation(description = "Updates an existing annotation.", tags(Entities, Private))]
+#[api_v2_operation(
+    description = "Updates an existing annotation.",
+    tags(EntityDetails, Entities, Private)
+)]
 #[patch("/entities/{fp_id}/annotations/{annotation_id}")]
 async fn patch(
     state: web::Data<State>,
@@ -94,7 +100,10 @@ impl ValidateRequest for CreateAnnotationRequest {
     }
 }
 
-#[api_v2_operation(description = "Creates a new freeform annotation.", tags(Entities, Private))]
+#[api_v2_operation(
+    description = "Creates a new freeform annotation.",
+    tags(EntityDetails, Entities, Private)
+)]
 #[post("/entities/{fp_id}/annotations")]
 pub fn post(
     state: web::Data<State>,

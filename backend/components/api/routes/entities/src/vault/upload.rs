@@ -49,7 +49,7 @@ const TEN_MB: usize = 10 * 1024 * 1024;
 )]
 #[api_v2_operation(
     description = "Works for either person or business entities. Updates data in a vault.",
-    tags(Entities, Vault, Private)
+    tags(Vault, Entities, Private)
 )]
 #[actix::post("/entities/{fp_id}/vault/{identifier}/upload")]
 pub async fn post(

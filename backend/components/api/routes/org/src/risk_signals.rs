@@ -13,7 +13,7 @@ use newtypes::FootprintReasonCode;
 use paperclip::actix::{api_v2_operation, get};
 use strum::IntoEnumIterator;
 
-#[api_v2_operation(description = "List all Footprint Risk Signals", tags(Preview))]
+#[api_v2_operation(description = "List all Footprint Risk Signals", tags(Org, Preview))]
 #[get("/org/risk_signals")]
 pub async fn get(
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,

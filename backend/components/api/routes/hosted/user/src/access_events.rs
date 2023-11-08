@@ -10,7 +10,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
 type AccessEventResponse = Vec<api_wire_types::AccessEvent>;
 
 #[api_v2_operation(
-    tags(Hosted),
+    tags(My1fp, Hosted),
     description = "Returns a list of AccessEvent logs that show which tenants have viewed the \
     logged-in user's data. Optionally allows filtering on data_attribute. Requires user \
     authentication sent in the cookie after a successful /identify/verify call."

@@ -16,7 +16,7 @@ pub struct EmailVerifyRequest {
 }
 
 #[api_v2_operation(
-    tags(Hosted),
+    tags(User, Hosted),
     description = "Used to asynchronously verify a user's email address. Requires the token sent \
     to the users email."
 )]

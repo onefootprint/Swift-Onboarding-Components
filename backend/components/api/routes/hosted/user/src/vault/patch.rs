@@ -56,7 +56,7 @@ async fn parse_auth(
 
 #[api_v2_operation(
     description = "Checks if provided vault data is valid before adding it to the vault",
-    tags(Hosted, Vault, Users)
+    tags(Vault, Hosted, Users)
 )]
 #[actix::post("/hosted/user/vault/validate")]
 pub async fn post_validate(
@@ -89,7 +89,7 @@ pub async fn post_validate(
     EmptyResponse::ok().json()
 }
 
-#[api_v2_operation(description = "Updates data in a user vault", tags(Hosted, Vault, Users))]
+#[api_v2_operation(description = "Updates data in a user vault", tags(Vault, Hosted, Users))]
 #[actix::patch("/hosted/user/vault")]
 pub async fn patch(
     state: web::Data<State>,

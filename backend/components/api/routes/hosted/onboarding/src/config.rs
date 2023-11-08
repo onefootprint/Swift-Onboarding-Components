@@ -16,11 +16,11 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[route_alias(get(
     "/org/onboarding_config",
-    tags(Hosted),
+    tags(Onboarding, Hosted, Deprecated),
     description = "Fetch an onboarding configuration",
 ))] // TODO: remove alias once we migrate the endpoints
 #[api_v2_operation(
-    tags(Organization, Private),
+    tags(Onboarding, Organization, Hosted),
     description = "Get the details of an onboarding configuration."
 )]
 #[get("/hosted/onboarding/config")]

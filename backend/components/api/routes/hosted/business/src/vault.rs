@@ -24,7 +24,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
     description = "Checks if provided vault data is valid before adding it to the business vault",
-    tags(Hosted, Vault, Businesses)
+    tags(Businesses, Hosted, Vault)
 )]
 #[actix::post("/hosted/business/vault/validate")]
 pub async fn post_validate(
@@ -59,7 +59,7 @@ pub async fn post_validate(
 
 #[api_v2_operation(
     description = "Updates data in a business vault. Can be used to update `business.` data",
-    tags(Hosted, Vault, Businesses)
+    tags(Businesses, Hosted, Vault)
 )]
 #[actix::patch("/hosted/business/vault")]
 pub async fn patch(

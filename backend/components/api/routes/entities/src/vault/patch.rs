@@ -33,7 +33,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 )]
 #[api_v2_operation(
     description = "Works for either person or business entities. Updates data in a vault.",
-    tags(Entities, Vault, Private)
+    tags(Vault, Entities, Vault, Private)
 )]
 #[actix::patch("/entities/{fp_id}/vault")]
 pub async fn patch(

@@ -9,7 +9,7 @@ use db::models::socure_device_session::SocureDeviceSession;
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
-    tags(Hosted),
+    tags(Onboarding, Hosted),
     description = "Records a deviceSessionId from the Socure Device SDK in the frontend"
 )]
 #[actix::post("/hosted/onboarding/sds")] // TODO: unsure if we want a clear name like /socure_device_session_id/ or if we want to at least mildly obfuscate this

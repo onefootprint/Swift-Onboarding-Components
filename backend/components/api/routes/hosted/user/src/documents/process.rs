@@ -20,7 +20,7 @@ use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
     description = "Continue processing the ID doc, if any remaining",
-    tags(Hosted)
+    tags(Document, Hosted)
 )]
 #[actix::post("/hosted/user/documents/{id}/process")]
 pub async fn post(

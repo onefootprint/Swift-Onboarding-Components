@@ -18,7 +18,7 @@ use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, web};
 
 #[api_v2_operation(
-    tags(Organization, Private),
+    tags(SecurityConfig, Organization, Private),
     description = "Get the client security configuration."
 )]
 #[get("/org/client_security_config")]
@@ -56,7 +56,7 @@ struct UpdateClientSecurityConfig {
 }
 
 #[api_v2_operation(
-    tags(Organization, Private),
+    tags(SecurityConfig, Organization, Private),
     description = "Update the client security configuration."
 )]
 #[patch("/org/client_security_config")]

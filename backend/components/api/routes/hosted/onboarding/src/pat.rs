@@ -23,7 +23,7 @@ use crate::{
     State,
 };
 
-#[api_v2_operation(tags(Hosted, Bifrost), description = "initiates privacy pass protocol.")]
+#[api_v2_operation(tags(Onboarding, Hosted), description = "initiates privacy pass protocol.")]
 #[get("/hosted/onboarding/privacy_pass")]
 pub async fn get(
     state: web::Data<State>,

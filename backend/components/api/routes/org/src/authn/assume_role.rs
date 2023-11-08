@@ -12,7 +12,7 @@ use paperclip::actix::{api_v2_operation, post, web, web::Json};
 #[api_v2_operation(
     description = "After the user has proven they own an email address, allow them to assume an
     auth role for any tenant, to which the email address has access.",
-    tags(Private)
+    tags(Auth, Private)
 )]
 #[post("/org/auth/assume_role")]
 fn post(

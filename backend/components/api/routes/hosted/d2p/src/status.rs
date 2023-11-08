@@ -12,7 +12,7 @@ use paperclip::actix::{api_v2_operation, get, post, web, web::Json};
 
 #[api_v2_operation(
     operation_id = "hosted-onboarding-d2p-status",
-    tags(Hosted),
+    tags(D2p, Hosted),
     description = "Gets the status of the provided d2p session. Requires the d2p session token as the auth header."
 )]
 #[get("/hosted/onboarding/d2p/status")]
@@ -37,7 +37,7 @@ pub async fn get(
 
 #[api_v2_operation(
     operation_id = "hosted-onboarding-d2p-status-post",
-    tags(Hosted),
+    tags(D2p, Hosted),
     description = "Update the status of the provided d2p session. Only allows updating to certain statuses."
 )]
 #[post("/hosted/onboarding/d2p/status")]

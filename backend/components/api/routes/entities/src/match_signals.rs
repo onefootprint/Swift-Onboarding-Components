@@ -22,7 +22,7 @@ use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(
     description = "Lists the match signals for a footprint user.",
-    tags(Entities, Private)
+    tags(EntityDetails, Entities, Private)
 )]
 #[get("/entities/{fp_id}/match_signals")]
 pub async fn get(

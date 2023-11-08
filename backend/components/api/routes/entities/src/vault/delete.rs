@@ -48,7 +48,7 @@ flat_api_object_map_type!(
 )]
 #[api_v2_operation(
     description = "Works for either person or business entities. Deletes data in a vault.",
-    tags(Entities, Vault, Private)
+    tags(Vault, Entities, Private)
 )]
 #[actix::delete("/entities/{fp_id}/vault")]
 pub async fn delete(

@@ -25,7 +25,7 @@ pub struct IdentifyResponse {
 }
 
 #[api_v2_operation(
-    tags(Hosted, Bifrost),
+    tags(Identify, Hosted),
     description = "Tries to identify an existing user by either phone number or email. If the user \
     is found, returns available challenge kinds."
 )]

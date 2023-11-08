@@ -15,7 +15,10 @@ pub struct GetTenantResponse {
     email_domains: Vec<String>,
 }
 
-#[api_v2_operation(description = "Returns tenant settings.", tags(Organization, Private))]
+#[api_v2_operation(
+    description = "Returns tenant settings.",
+    tags(OrgSettings, Organization, Private)
+)]
 #[actix::get("/org/settings")]
 pub async fn get(
     state: web::Data<State>,

@@ -53,7 +53,7 @@ pub struct VerifyResponse {
 }
 
 #[api_v2_operation(
-    tags(Hosted, Bifrost),
+    tags(Identify, Hosted),
     description = "Verifies the response to either an SMS or biometric challenge. When the \
     challenge response is verified, we will return an auth token for the user. If no user exists \
     (which may only happen after a phone challenge), we will create a new user with the provided \

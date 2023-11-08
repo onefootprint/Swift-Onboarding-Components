@@ -397,7 +397,7 @@ impl CreateOnboardingConfigurationRequest {
 
 #[api_v2_operation(
     description = "Creates a new onboarding configuration.",
-    tags(Organization, Private)
+    tags(Playbooks, Organization, Private)
 )]
 #[post("/org/onboarding_configs")]
 pub async fn post(

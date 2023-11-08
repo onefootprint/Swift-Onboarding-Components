@@ -16,7 +16,7 @@ use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
 #[api_v2_operation(
     operation_id = "hosted-onboarding-d2p-generate",
-    tags(Hosted),
+    tags(D2p, Hosted),
     description = "Generates a new d2p session token for the currently authenticated user. The d2p \
     session token has a limited scope, and also includes some status metadata for syncing state \
     across the phone and desktop."

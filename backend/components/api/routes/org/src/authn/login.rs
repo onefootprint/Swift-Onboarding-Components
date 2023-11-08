@@ -42,7 +42,7 @@ fn get_auth_method(connection_type: &KnownOrUnknown<ConnectionType, String>) -> 
 }
 
 #[api_v2_operation(
-    tags(Private),
+    tags(Auth, Private),
     description = "Called from the front-end with the WorkOS code. Returns the authorization \
     token needed for future requests as well as user information"
 )]

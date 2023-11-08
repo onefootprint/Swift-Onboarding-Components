@@ -33,7 +33,7 @@ pub struct SignupChallengeResponse {
 }
 
 #[api_v2_operation(
-    tags(Hosted, Bifrost),
+    tags(Identify, Hosted),
     description = "Sends a challenge to a phone number or email and returns an HTTP 200. When the \
     challenge is completed through the identify/verify endpoint, the client can begin onboarding the user."
 )]

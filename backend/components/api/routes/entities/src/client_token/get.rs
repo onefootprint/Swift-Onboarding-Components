@@ -15,7 +15,7 @@ pub struct ClientTokenResponse {
 }
 
 #[api_v2_operation(
-    tags(Private),
+    tags(Client, Private),
     description = "Returns information about the provided client auth token."
 )]
 #[actix::get("/entities/client_token")]

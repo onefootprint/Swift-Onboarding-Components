@@ -23,7 +23,7 @@ use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
     description = "Generate a link that can be sent to the user to ask them to reonboard to the last playbook they onboarded onto.",
-    tags(Entities, Preview)
+    tags(Users, Preview)
 )]
 #[post("/users/{fp_id}/reonboard")]
 pub async fn post(
