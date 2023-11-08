@@ -134,7 +134,8 @@
   animation: footprint-rotate 0.8s linear infinite;
 }
 
-.footprint-verify-button {
+.footprint-verify-button,
+.footprint-auth-button {
   align-items: center;
   background: var(--fp-fp-button-initial-bg);
   border-radius: var(--fp-fp-button-border-radius);
@@ -148,14 +149,17 @@
   padding: 0 var(--fp-fp-button-spacing-paddings-horizontal);
 }
 
-.footprint-verify-button:hover {
+.footprint-verify-button:hover,
+.footprint-auth-button:hover {
   background: var(--fp-fp-button-hover-bg);
 }
 
-.footprint-verify-button:active {
+.footprint-verify-button:active,
+.footprint-auth-button:active {
   background: var(--fp-fp-button-active-bg);
 }
 
-.footprint-verify-button svg {
+.footprint-verify-button svg,
+.footprint-auth-button svg {
   margin-right: 8px;
 }

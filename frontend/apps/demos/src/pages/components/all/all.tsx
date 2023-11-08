@@ -20,13 +20,13 @@ const AllComponents = () => {
   return (
     <Container>
       <Tabs>
-        {Object.values(FootprintComponentKind).map(
-          (k: FootprintComponentKind) => (
+        {Object.values(FootprintComponentKind)
+          .filter(k => k !== FootprintComponentKind.Auth)
+          .map((k: FootprintComponentKind) => (
             <Tab key={k} selected={k === kind} onClick={() => setKind(k)}>
               <Typography variant="label-2">{k}</Typography>
             </Tab>
-          ),
-        )}
+          ))}
       </Tabs>
       <Title>React integrations</Title>
       <Framework>
