@@ -19,7 +19,7 @@ const InitBootstrap = () => {
   const identifyMutation = useIdentify();
 
   const tryIdentifier = async (identifier: Identifier) => {
-    const authTokenIdentify = await identifyMutation
+    const identifyResult = await identifyMutation
       .mutateAsync({
         obConfigAuth,
         sandboxId,
@@ -27,9 +27,9 @@ const InitBootstrap = () => {
       })
       .catch((error: unknown) => {
         Logger.error(
-          `Identifying user by auth token failed in in identify ${getErrorMessage(
-            error,
-          )}`,
+          `Identifying user by identifier ${Object.keys(identifier).join(
+            ', ',
+          )} failed in in identify ${getErrorMessage(error)}`,
           'identify-init-bootstrap',
         );
       });
@@ -39,7 +39,7 @@ const InitBootstrap = () => {
       isUnverified,
       hasSyncablePassKey = false,
       availableChallengeKinds,
-    } = authTokenIdentify || {};
+    } = identifyResult || {};
     if (userFound) {
       return {
         isUnverified,
