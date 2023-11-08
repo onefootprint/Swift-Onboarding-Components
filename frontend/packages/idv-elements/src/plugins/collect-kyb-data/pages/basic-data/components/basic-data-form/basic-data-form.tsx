@@ -9,7 +9,7 @@ import { Controller, useForm } from 'react-hook-form';
 
 import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
 import { useL10nContext } from '../../../../../../components/l10n-provider';
-import checkIsPhoneValid from '../../../../../../services/identify/pages/phone-identification/components/form/utils/check-is-phone-valid';
+import checkIsPhoneValid from '../../../../../../utils/check-is-phone-valid';
 import type { BasicData } from '../../../../utils/state-machine/types';
 
 type FormData = {

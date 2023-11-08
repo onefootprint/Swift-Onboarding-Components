@@ -27,6 +27,7 @@ export {
   Layout,
   LayoutOptionsProvider,
   LegacyFootprintInternalEvent,
+  Logo,
   NAVIGATION_HEADER_PORTAL_ID,
   NAVIGATION_HEADER_PORTAL_SELECTOR,
   NavigationHeader,
@@ -36,6 +37,7 @@ export {
   useFootprintProvider,
   useLayoutOptions,
 } from './components';
+export { FullHeightContainer } from './components/layout';
 export type { DeviceInfo } from './hooks';
 export {
   checkDeviceInfo,
@@ -80,3 +82,7 @@ export {
   default as media,
   withProvider,
 } from './utils';
+export { default as checkIsPhoneValid } from './utils/check-is-phone-valid';
+export { default as getCanChallengeBiometrics } from './utils/get-can-challenge-biometrics';
+export { default as shouldChallengeEmail } from './utils/should-challenge-email';
+export { default as validateBootstrapData } from './utils/validate-bootstrap-data';

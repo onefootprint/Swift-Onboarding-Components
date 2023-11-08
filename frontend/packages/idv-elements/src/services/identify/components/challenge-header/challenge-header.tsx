@@ -3,7 +3,7 @@ import React from 'react';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
-import Logo from '../logo';
+import Logo from '../../../../components/logo';
 import { useIdentifyMachine } from '../machine-provider';
 
 type ChallengeHeaderProps = {

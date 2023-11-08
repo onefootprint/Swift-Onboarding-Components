@@ -7,11 +7,11 @@ import type {
 import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../../../hooks/ui/use-device-info';
-import { getCanChallengeBiometrics } from '../biometrics';
+import getCanChallengeBiometrics from '../../../../utils/get-can-challenge-biometrics';
+import shouldChallengeEmail from '../../../../utils/should-challenge-email';
 import type { IdentifiedEvent, MachineContext, MachineEvents } from './types';
 import validateMachineArgs from './utils/get-sanitized-args';
 import shouldBootstrap from './utils/should-bootstrap';
-import shouldChallengeEmail from './utils/should-challenge-email';
 
 export type IdentifyMachineArgs = {
   config: PublicOnboardingConfig;

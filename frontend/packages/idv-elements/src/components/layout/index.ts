@@ -1,3 +1,4 @@
+export { default as FullHeightContainer } from './components/full-height-container';
 export type { HeaderTitleProps } from './components/header-title';
 export {
   HEADER_TITLE_DEFAULT_ID,

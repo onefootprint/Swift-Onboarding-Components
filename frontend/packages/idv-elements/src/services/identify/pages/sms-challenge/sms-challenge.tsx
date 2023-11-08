@@ -4,11 +4,11 @@ import { ChallengeKind } from '@onefootprint/types';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
 
+import getCanChallengeBiometrics from '../../../../utils/get-can-challenge-biometrics';
 import ChallengeHeader from '../../components/challenge-header';
 import DifferentAccount from '../../components/different-account';
 import PinVerification from '../../components/pin-verification';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
-import { getCanChallengeBiometrics } from '../../utils/biometrics';
 import getScrubbedPhoneNumber from '../../utils/get-scrubbed-phone-number';
 
 const IS_TEST = typeof jest !== 'undefined';

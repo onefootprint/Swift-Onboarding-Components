@@ -10,7 +10,7 @@ import useIdentifyVerify from '../../../../../../hooks/api/hosted/identify/use-i
 import useLoginChallenge from '../../../../../../hooks/api/hosted/identify/use-login-challenge';
 import Logger from '../../../../../../utils/logger';
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
-import { getBiometricChallengeResponse } from '../../../../utils/biometrics';
+import getBiometricChallengeResponse from '../../../../utils/biometrics';
 
 const Biometric = () => {
   const { t } = useTranslation('pages.biometric-challenge');

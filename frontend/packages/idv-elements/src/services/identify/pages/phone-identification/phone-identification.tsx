@@ -7,11 +7,11 @@ import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
 
 import useIdentify from '../../../../hooks/api/hosted/identify/use-identify';
+import checkIsPhoneValid from '../../../../utils/check-is-phone-valid';
 import { useIdentifyMachine } from '../../components/machine-provider';
 import SandboxOutcomeFooter from '../../components/sandbox-outcome-footer';
 import EmailPreview from './components/email-preview';
 import Form from './components/form';
-import checkIsPhoneValid from './components/form/utils/check-is-phone-valid';
 import Header from './components/header';
 
 type FormData = {

@@ -6,7 +6,7 @@ import { PhoneInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import checkIsPhoneValid from '../../../../../../../../../../services/identify/pages/phone-identification/components/form/utils/check-is-phone-valid/check-is-phone-valid';
+import checkIsPhoneValid from '../../../../../../../../../../utils/check-is-phone-valid/check-is-phone-valid';
 import type { FormData } from '../../../../types';
 
 type PhoneProps = {

@@ -4,7 +4,7 @@ import React from 'react';
 
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
-import Logo from '../../../../components/logo';
+import Logo from '../../../../../../components/logo';
 
 type HeaderProps = {
   showLogo?: boolean;
