@@ -4,13 +4,12 @@ use std::sync::Arc;
 use chrono::{DateTime, Utc};
 use diesel::dsl::{count_star, not};
 use diesel::prelude::*;
-use feature_flag::{BoolFlag, FeatureFlagClient};
+use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::{
-    AlpacaKycConfig, AlpacaKycState, CipKind, DbActor, DocumentState, FireWebhookArgs, InsightEventId,
-    KybConfig, KybState, KycConfig, ObConfigurationKind, OnboardingCompletedPayload, OnboardingStatus,
-    OnboardingStatusChangedPayload, TaskData, TenantId, TenantScope, VaultId, VaultKind, WebhookEvent,
-    WorkflowFixtureResult, WorkflowSource,
+    AlpacaKycState, DbActor, DocumentState, FireWebhookArgs, InsightEventId, KybConfig, KybState, KycConfig,
+    ObConfigurationKind, OnboardingCompletedPayload, OnboardingStatus, OnboardingStatusChangedPayload,
+    TaskData, TenantId, TenantScope, VaultId, VaultKind, WebhookEvent, WorkflowFixtureResult, WorkflowSource,
 };
 use newtypes::{
     Locked, ObConfigurationId, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState,
@@ -198,7 +197,7 @@ impl Workflow {
     #[tracing::instrument("Workflow::get_or_create_onboarding", skip_all)]
     pub fn get_or_create_onboarding(
         conn: &mut TxnPgConn,
-        ff_client: Arc<dyn FeatureFlagClient>,
+        _ff_client: Arc<dyn FeatureFlagClient>,
         args: OnboardingWorkflowArgs,
         fixture_result: Option<WorkflowFixtureResult>,
         force_create: bool,
@@ -213,7 +212,6 @@ impl Workflow {
 
         let sv = ScopedVault::lock(conn, &scoped_vault_id)?;
         let v = Vault::get(conn.conn(), &scoped_vault_id)?;
-        let (obc, _) = ObConfiguration::get_enabled(conn, &ob_configuration_id)?;
 
         if !force_create {
             // Check if an active or completed workflow exists for this ob config.
@@ -242,17 +240,7 @@ impl Workflow {
         }
 
         let config = match v.kind {
-            VaultKind::Person => {
-                if matches!(obc.cip_kind, Some(CipKind::Alpaca)) {
-                    if ff_client.flag(BoolFlag::CreateKycWorkflowForAlpacaOnboardings(&obc.key)) {
-                        KycConfig { is_redo: false }.into()
-                    } else {
-                        AlpacaKycConfig { is_redo: false }.into()
-                    }
-                } else {
-                    KycConfig { is_redo: false }.into()
-                }
-            }
+            VaultKind::Person => KycConfig { is_redo: false }.into(),
             VaultKind::Business => KybConfig {}.into(),
         };
 

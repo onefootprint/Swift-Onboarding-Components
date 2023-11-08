@@ -60,7 +60,7 @@ fn enhanced_aml_option_yes() -> EnhancedAmlOption {
 
 // The current get_or_start_onboarding will create an AlpacaKyc WF if obc.cip_kind = alpaca. For now, we'll keep this code path in tact but do this hack here in the test
 // to manually set the Workflow to be a regular Kyc WF so we can test replicating AlpacaKyc functionality in the existing Kyc WF
-async fn set_workflow_to_kyc_kind(state: &State, wf: Workflow) -> Workflow {
+async fn set_workflow_to_alpaca_kyc_kind(state: &State, wf: Workflow) -> Workflow {
     let wf_id = wf.id.clone();
     state
         .db_pool
@@ -68,9 +68,11 @@ async fn set_workflow_to_kyc_kind(state: &State, wf: Workflow) -> Workflow {
             diesel::update(workflow::table)
                 .filter(workflow::id.eq(wf_id))
                 .set((
-                    workflow::kind.eq(newtypes::WorkflowKind::Kyc),
-                    workflow::state.eq(newtypes::WorkflowState::Kyc(newtypes::KycState::DataCollection)),
-                    workflow::config.eq(newtypes::WorkflowConfig::Kyc(newtypes::KycConfig {
+                    workflow::kind.eq(newtypes::WorkflowKind::AlpacaKyc),
+                    workflow::state.eq(newtypes::WorkflowState::AlpacaKyc(
+                        newtypes::AlpacaKycState::DataCollection,
+                    )),
+                    workflow::config.eq(newtypes::WorkflowConfig::AlpacaKyc(newtypes::AlpacaKycConfig {
                         is_redo: false,
                     })),
                 ))
@@ -90,8 +92,8 @@ async fn setup(
     let (wf, tenant, obc, tu) = setup_data(state, obc_opts, fixture_result).await;
 
     let wf = match wf_kind {
-        WFKind::Alpaca => wf,
-        WFKind::Kyc => set_workflow_to_kyc_kind(state, wf).await,
+        WFKind::Alpaca => set_workflow_to_alpaca_kyc_kind(state, wf).await,
+        WFKind::Kyc => wf,
     };
     (wf, tenant, obc, tu)
 }

@@ -521,6 +521,7 @@ def create_ob_config(
     kind=None,
     override_auths=None,
     skip_confirm=None,
+    enhanced_aml=None,
 ):
     ob_conf_data = {
         "name": name,
@@ -535,6 +536,7 @@ def create_ob_config(
         "doc_scan_for_optional_ssn": doc_scan_for_optional_ssn,
         "kind": kind,
         "skip_confirm": skip_confirm,
+        "enhanced_aml": enhanced_aml,
     }
     # TODO also make this get or create?
     auths = override_auths if override_auths else tenant.db_auths

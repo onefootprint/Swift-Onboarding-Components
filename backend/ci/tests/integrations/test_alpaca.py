@@ -20,6 +20,12 @@ def alpaca_kyc_ob_config(sandbox_tenant, must_collect_data):
         must_collect_data,
         must_collect_data,
         "alpaca",
+        enhanced_aml={
+            "enhanced_aml": True,
+            "ofac": True,
+            "pep": True,
+            "adverse_media": True,
+        },
     )
 
 
