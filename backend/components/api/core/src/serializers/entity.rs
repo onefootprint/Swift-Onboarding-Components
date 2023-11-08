@@ -8,7 +8,7 @@ use crate::{
         vault_wrapper::{Any, TenantVw},
     },
 };
-use api_wire_types::EntityStatus;
+use api_wire_types::{EntityAttribute, EntityStatus};
 use chrono::{Duration, Utc};
 use db::models::{
     scoped_vault::{ScopedVault, SerializableEntity},
@@ -36,6 +36,15 @@ impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
     fn from_db((entity, vw, auth, decrypted_attrs): EntityDetailMore) -> Self {
         let (sv, watchlist_check, mrs, wfs) = entity;
         let attributes = vw.get_visible_populated_fields();
+        let attribute_sources = vw
+            .get_visible_populated_fields()
+            .into_iter()
+            .filter_map(|di| vw.get_lifetime(di.clone()).map(|l| (di, l)))
+            .map(|(di, l)| EntityAttribute {
+                identifier: di,
+                source: l.source,
+            })
+            .collect();
 
         let auth_scopes = auth.scopes();
         let decryptable_attributes = vw.populated_dis()
@@ -87,10 +96,11 @@ impl<'a> DbToApi<EntityDetailMore<'a>> for api_wire_types::Entity {
             // TODO does the client read this?
             is_portable,
             kind,
-            attributes,
             start_timestamp,
             watchlist_check: watchlist_check.map(api_wire_types::WatchlistCheck::from_db),
             ordering_id,
+            attributes,
+            attribute_sources,
             decrypted_attributes,
             decryptable_attributes,
             status,

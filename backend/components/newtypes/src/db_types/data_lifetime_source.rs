@@ -1,4 +1,5 @@
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use paperclip::actix::Apiv2Schema;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum_macros::{Display, EnumIter, EnumString};
 
@@ -18,8 +19,11 @@ use strum_macros::{Display, EnumIter, EnumString};
     FromSqlRow,
     EnumString,
     EnumIter,
+    Apiv2Schema,
+    macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum DataLifetimeSource {
     /// Vaulted via a hosted flow and entered by the user
