@@ -17,16 +17,18 @@ export const getId = (method: string, path: string) => {
 };
 
 /// Compute the navigation section that a given path will be in
-const getSectionTitle = (path: string) => {
-  const filteredElements = path
-    .split('/')
-    .map(p => p.replace(/_/g, ' '))
-    .filter(
-      element =>
-        element !== '' && !element.startsWith('{') && !element.endsWith('}'),
-    );
-  // TODO one day pull this from the tags on the open API spec
-  return isClientApi(path) ? 'users (client)' : filteredElements[0];
+const getSectionTitle = (entry: unknown) => {
+  // @ts-expect-error: fix-me
+  let sectionTitle = entry.tags[0];
+  if (sectionTitle === 'Client') {
+    sectionTitle = 'Users (Client)';
+  } else {
+    // Split CamelCase into separate words
+    sectionTitle = sectionTitle
+      .replace(/[A-Z]/g, (l: string) => ` ${l.toLowerCase()}`)
+      .trim();
+  }
+  return sectionTitle;
 };
 
 const METHOD_PRIORITY = ['get', 'post', 'patch', 'delete'];
@@ -50,7 +52,7 @@ const getArticles = (data: Record<string, unknown>): Article[] =>
         id: getId(method, path),
         path,
         method,
-        section: getSectionTitle(path),
+        section: getSectionTitle(entry),
       })),
     ),
     a => [sectionPriority(a.section), a.path, methodPriority(a.method)],

@@ -13,7 +13,7 @@
         "/businesses/{fp_id}/kyb": {
             "post": {
                 "tags": [
-                    "Entities",
+                    "Businesses",
                     "Preview"
                 ],
                 "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nTriggers KYB on the provided business. KYB can only be run once per Business vault.",
@@ -171,6 +171,7 @@
         "/org/risk_signals": {
             "get": {
                 "tags": [
+                    "Org",
                     "Preview"
                 ],
                 "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nList all Footprint Risk Signals",
@@ -476,7 +477,7 @@
         "/users/{fp_id}/liveness": {
             "get": {
                 "tags": [
-                    "Entities",
+                    "Users",
                     "Preview"
                 ],
                 "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nLists the liveness signals for the provided user.",
@@ -553,7 +554,7 @@
         "/users/{fp_id}/reonboard": {
             "post": {
                 "tags": [
-                    "Entities",
+                    "Users",
                     "Preview"
                 ],
                 "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGenerate a link that can be sent to the user to ask them to reonboard to the last playbook they onboarded onto.",

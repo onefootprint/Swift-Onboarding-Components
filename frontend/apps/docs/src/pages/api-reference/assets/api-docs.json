@@ -683,6 +683,7 @@
         "/users/{fp_id}/client_token": {
             "post": {
                 "tags": [
+                    "Users",
                     "Client",
                     "PublicApi"
                 ],
