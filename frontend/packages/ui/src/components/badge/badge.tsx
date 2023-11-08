@@ -22,11 +22,9 @@ const Badge = styled.span.attrs<BadgeProps>(({ testID }) => ({
     border: 0;
     color: ${theme.color[variant]};
     padding: ${theme.spacing[2]} ${theme.spacing[3]};
-    text-decoration: none;
-    display: flex;
+    display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: min-content;
     ${sx};
   `}
 `;

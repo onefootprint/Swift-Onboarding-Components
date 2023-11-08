@@ -42,6 +42,10 @@ export type {
   GetBusinessOwnersRequest,
   GetBusinessOwnersResponse,
 } from './get-business-owners';
+export type {
+  GetClientSecurityConfigRequest as GetClientSecurityConfig,
+  GetClientSecurityResponse,
+} from './get-client-security-config';
 export type { GetD2PRequest, GetD2PResponse } from './get-d2p-status';
 export type { GetEntitiesRequest, GetEntitiesResponse } from './get-entities';
 export type { GetEntityRequest, GetEntityResponse } from './get-entity';
@@ -193,6 +197,10 @@ export type {
 } from './submit-review';
 export type { Trigger, TriggerRequest, TriggerResponse } from './trigger';
 export { TriggerKind } from './trigger';
+export type {
+  UpdateClientSecurityConfigRequest,
+  UpdateClientSecurityConfigResponse,
+} from './update-client-security-config';
 export type {
   UpdateD2PStatusRequest,
   UpdateD2PStatusResponse,

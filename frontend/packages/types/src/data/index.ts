@@ -30,6 +30,7 @@ export type { CardBrands } from './card-brands';
 export { default as CdoToAllDisMap } from './cdo-to-di-map';
 export type { ChallengeData } from './challenge-data';
 export { default as ChallengeKind } from './challenge-kind';
+export type { ClientSecurityConfig } from './client-security-config';
 export type { CollectedDataOption } from './collected-data-option';
 export {
   CollectedDocumentDataOption,

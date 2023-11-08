@@ -1,0 +1,38 @@
+{
+  "page-title": "Footprint | Domain restrictions",
+  "header": {
+    "title": "Domain restrictions",
+    "subtitle": "Restrict which can load Footprint iframe by adding them to this list.",
+    "cta": "Add domain"
+  },
+  "restrictions-added": "Restrictions added",
+  "restrictions-not-added": "All domains are allowed",
+  "create-dialog": {
+    "title": "Add allowed domain",
+    "save": "Save",
+    "cancel": "Cancel",
+    "input": {
+      "label": "URL to allow",
+      "placeholder": "https://acme.com",
+      "errors": {
+        "url": "Please enter a complete URL, including http:// or https://",
+        "no-space": "Make sure that the url doesn't contain any spaces in it"
+      }
+    },
+    "duplicate-url": {
+      "title": "Duplicate URL",
+      "description": "URL already exists in the list"
+    },
+    "notifications": {
+      "success": {
+        "title": "Domain added",
+        "description": "Domain has been added to the list"
+      }
+    }
+  },
+  "list": {
+    "not-allowed": "You don't permissions to manage domain access",
+    "actions": "Open actions for {{domain}}",
+    "remove": "Remove"
+  }
+}
