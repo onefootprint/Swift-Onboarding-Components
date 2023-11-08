@@ -24,7 +24,8 @@
     "clean": "rm -rf .turbo && rm -rf node_modules",
     "lint": "eslint src --fix",
     "lint:ci": "eslint src",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "publish:local": "yarn build && yalc publish"
   },
   "devDependencies": {
     "@types/react": "^18.2.8",
