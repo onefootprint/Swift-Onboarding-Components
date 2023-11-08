@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoCode216, IcoFlask16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
@@ -19,8 +18,13 @@ import TypeBadge from '../type-badge';
 import NavigationScrollLink from './components/navigation-scroll-link';
 
 type PageNavProps = {
+  sections: PageNavSection[];
+};
+
+export type PageNavSection = {
+  title: string;
+  isPreview: boolean;
   articles: Article[];
-  previewArticles: Article[];
 };
 
 type Section = {
@@ -49,8 +53,7 @@ const groupBySection = (articles: Article[]) => {
   return sections;
 };
 
-const PageNav = ({ articles, previewArticles }: PageNavProps) => {
-  const { t } = useTranslation('components.navigation-api-reference');
+const PageNav = ({ sections }: PageNavProps) => {
   const navInnerScrollRef = useRef<HTMLDivElement>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
@@ -66,9 +69,6 @@ const PageNav = ({ articles, previewArticles }: PageNavProps) => {
     }
   };
 
-  const navigation = groupBySection(articles);
-  const previewNavigation = groupBySection(previewArticles);
-
   return (
     <PageNavContainer>
       <Header isScrolled={isScrolled}>
@@ -81,40 +81,31 @@ const PageNav = ({ articles, previewArticles }: PageNavProps) => {
         id="nav-container"
       >
         <nav>
-          <SectionTitle>
-            <IcoCode216 color="tertiary" />
-            {t('sections.footprint-api')}
-          </SectionTitle>
-          {navigation.map(({ title, subsections }) => (
-            <div key={title}>
-              <NavigationSectionTitle>{title}</NavigationSectionTitle>
-              {subsections.map(({ method, path, id }) => (
-                <NavigationScrollLink key={id} id={id}>
-                  <Stack justify="center">
-                    <TypeBadge skinny type={method} />
-                  </Stack>
-                  <PathLabel>{path}</PathLabel>
-                </NavigationScrollLink>
+          {sections.map((s, i) => (
+            <React.Fragment key={s.title}>
+              <SectionTitle>
+                {s.isPreview ? (
+                  <IcoFlask16 color="tertiary" />
+                ) : (
+                  <IcoCode216 color="tertiary" />
+                )}
+                {s.title}
+              </SectionTitle>
+              {groupBySection(s.articles).map(({ title, subsections }) => (
+                <div key={title}>
+                  <NavigationSectionTitle>{title}</NavigationSectionTitle>
+                  {subsections.map(({ method, path, id }) => (
+                    <NavigationScrollLink key={id} id={id}>
+                      <Stack justify="center">
+                        <TypeBadge skinny type={method} />
+                      </Stack>
+                      <PathLabel>{path}</PathLabel>
+                    </NavigationScrollLink>
+                  ))}
+                </div>
               ))}
-            </div>
-          ))}
-          <Divider />
-          <SectionTitle>
-            <IcoFlask16 color="tertiary" />
-            {t('sections.footprint-api-preview')}
-          </SectionTitle>
-          {previewNavigation?.map(({ title, subsections }) => (
-            <div key={title}>
-              <NavigationSectionTitle>{title}</NavigationSectionTitle>
-              {subsections.map(({ method, path, id }) => (
-                <NavigationScrollLink key={id} id={id}>
-                  <Stack justify="center">
-                    <TypeBadge skinny type={method} />
-                  </Stack>
-                  <PathLabel>{path}</PathLabel>
-                </NavigationScrollLink>
-              ))}
-            </div>
+              {i !== sections.length - 1 && <Divider />}
+            </React.Fragment>
           ))}
         </nav>
       </NavContainer>

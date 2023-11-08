@@ -1,20 +1,18 @@
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
-import type { Article as ApiReferenceArticle } from '../../api-reference.types';
+import type { PageNavSection } from '../page-nav/page-nav';
 import Article from './components/article';
 
 export type ArticlesProps = {
-  articles: ApiReferenceArticle[];
-  previewArticles: ApiReferenceArticle[];
+  sections: PageNavSection[];
 };
 
-const Articles = ({ articles, previewArticles }: ArticlesProps) => (
+const Articles = ({ sections }: ArticlesProps) => (
   <ArticleList id="articles-container">
-    {articles?.map(article => <Article key={article.id} article={article} />)}
-    {previewArticles?.map(article => (
-      <Article key={article.id} article={article} />
-    ))}
+    {sections.map(s =>
+      s.articles.map(article => <Article key={article.id} article={article} />),
+    )}
   </ArticleList>
 );
 

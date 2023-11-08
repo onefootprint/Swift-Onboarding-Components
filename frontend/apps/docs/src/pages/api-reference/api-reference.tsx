@@ -16,18 +16,25 @@ const staticPreviewArticles = getArticles(staticPreviewAPIData);
 const ApiReference = () => {
   const { t } = useTranslation('pages.api-reference');
 
+  const sections = [
+    {
+      title: t('sections.footprint-api'),
+      isPreview: false,
+      articles: staticArticles,
+    },
+    {
+      title: t('sections.footprint-api-preview'),
+      isPreview: true,
+      articles: staticPreviewArticles,
+    },
+  ];
+
   return (
     <Box>
       <Seo title={t('html-title')} slug="/api-reference" />
       <Layout>
-        <PageNav
-          articles={staticArticles}
-          previewArticles={staticPreviewArticles}
-        />
-        <Articles
-          articles={staticArticles}
-          previewArticles={staticPreviewArticles}
-        />
+        <PageNav sections={sections} />
+        <Articles sections={sections} />
       </Layout>
     </Box>
   );

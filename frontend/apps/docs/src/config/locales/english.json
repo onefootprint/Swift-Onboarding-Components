@@ -92,10 +92,6 @@
       }
     },
     "navigation-api-reference": {
-      "sections": {
-        "footprint-api": "Footprint API",
-        "footprint-api-preview": "Footprint API (Preview)"
-      },
       "navigation": {
         "business": {
           "label": "Businesses",
@@ -223,7 +219,17 @@
       "show-all": "Show all",
       "show-less": "Show less",
       "optional": "optional",
-      "array": "array of"
+      "array": "array of",
+      "sections": {
+        "footprint-api": "Footprint API",
+        "footprint-api-preview": "Footprint API (Preview)"
+      }
+    },
+    "internal-api-reference": {
+      "sections": {
+        "hosted": "Hosted API",
+        "private": "Private API"
+      }
     },
     "404": {
       "title": "Oops! Page couldn't be found.",
