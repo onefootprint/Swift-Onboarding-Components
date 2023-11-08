@@ -17,7 +17,8 @@ import getMaskForId from './utils/get-mask-for-id';
 
 const Render = () => {
   const { t } = useTranslation('pages.secure-render');
-  const props = useProps<FootprintRenderDataProps>();
+  const [props, setProps] = useState<FootprintRenderDataProps>();
+  useProps<FootprintRenderDataProps>(setProps);
   const decryptMutation = useEntitiesVaultDecrypt();
   const {
     authToken = '',

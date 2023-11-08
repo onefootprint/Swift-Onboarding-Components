@@ -3,13 +3,15 @@ import type { FootprintVerifyButtonProps } from '@onefootprint/footprint-js';
 import { FootprintPublicEvent } from '@onefootprint/footprint-js';
 import { FootprintButton } from '@onefootprint/ui';
 import type { GetServerSideProps } from 'next';
-import React from 'react';
+import React, { useState } from 'react';
 import { useFootprintProvider } from 'src/components/footprint-provider';
 
 import useProps from '../../components/footprint-provider/hooks/use-props';
 
 const VerifyButton = () => {
-  const props = useProps<FootprintVerifyButtonProps>();
+  const [props, setProps] = useState<FootprintVerifyButtonProps>();
+  useProps<FootprintVerifyButtonProps>(setProps);
+
   const { label } = props || {};
   const footprintProvider = useFootprintProvider();
   const isValid = typeof label === 'string' || typeof label === 'undefined';

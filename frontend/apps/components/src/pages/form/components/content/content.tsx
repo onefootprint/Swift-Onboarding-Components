@@ -3,7 +3,7 @@ import {
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
 import { getErrorMessage } from '@onefootprint/request';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { useFootprintProvider } from '../../../../components/footprint-provider';
 import useProps from '../../../../components/footprint-provider/hooks/use-props';
@@ -21,7 +21,8 @@ import Invalid from '../invalid';
 
 const Content = () => {
   const footprintProvider = useFootprintProvider();
-  const props = useProps<FootprintFormDataProps>();
+  const [props, setProps] = useState<FootprintFormDataProps>();
+  useProps<FootprintFormDataProps>(setProps);
 
   const { authToken = '', title, variant, options = {} } = props || {};
   const { hideFootprintLogo, hideButtons } = options;

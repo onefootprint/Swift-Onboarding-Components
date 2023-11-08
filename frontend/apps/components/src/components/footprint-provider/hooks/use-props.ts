@@ -1,101 +1,93 @@
 import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
-import { useEffect, useState } from 'react';
+import noop from 'lodash/noop';
+import { useRouter } from 'next/router';
+import { useEffect, useRef, useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { useFootprintProvider } from '../footprint-provider';
-import usePropsFromUrl from './use-props-from-url';
+import useGetSdkArgs from './use-get-sdk-args';
 
 // Wait for a bit for post message to arrive before giving up
 const POST_MESSAGE_TIMEOUT = 500;
 
 type Obj = Record<string, unknown>;
 
-const useProps = <T extends Obj>(onSuccess?: (props?: T | {}) => void) => {
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | undefined>();
-  const [isLoaded, setIsLoaded] = useState(false);
+const useProps = <T extends Obj>(onSuccess?: (props?: T) => void) => {
+  const router = useRouter();
+  const [isAdapterLoaded, setIsAdapterLoaded] = useState(false); // whether iframe adapter has loaded
+  const onSuccessCalled = useRef(false); // Whether on success has been called with props
+  const authTokenFromUrl = router.asPath.split('#')[1] ?? '';
+  const sdkArgsQuery = useGetSdkArgs<T>(authTokenFromUrl);
+  const isSdkArgsLoading = authTokenFromUrl && sdkArgsQuery.isLoading;
+
+  const complete = (props: T) => {
+    // If already received props, ignore
+    if (onSuccessCalled.current) {
+      return;
+    }
+    onSuccessCalled.current = true;
+    onSuccess?.(props);
+  };
+
+  // For legacy web SDKs that only pass args via postMessage
+  // TODO: delete when all customers migrate to v3.8.0+
   const footprintProvider = useFootprintProvider();
-
-  // Will be set to undefined if still waiting on provider
-  // Will be set to {} if not provided
-  const [providerProps, setProviderProps] = useState<T | undefined>();
-  const [urlProps, setUrlProps] = useState<T | undefined>();
-
-  usePropsFromUrl((props: T) => {
-    if (!urlProps) {
-      setUrlProps(props);
-    }
-  });
-
-  const clearTimer = () => {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-  };
-
-  const getEffectiveProps = () => {
-    const hasUrlProps = urlProps && Object.values(urlProps).length > 0;
-    if (hasUrlProps) {
-      return urlProps;
-    }
-    const hasProviderProps =
-      providerProps && Object.values(providerProps).length > 0;
-    if (hasProviderProps) {
-      return providerProps;
-    }
-    return {};
-  };
-
-  const complete = () => {
-    clearTimer();
-    unsubscribe();
-    onSuccess?.(getEffectiveProps());
-  };
-
-  const unsubscribe = footprintProvider.on(
-    FootprintPrivateEvent.propsReceived,
-    // @ts-expect-error: fix-me Argument of type '(data: T) => void' is not assignable ...
-    (data: T) => {
-      setProviderProps(data);
-    },
-  );
+  const timerId = useRef<NodeJS.Timeout | undefined>();
 
   useEffectOnce(() => {
-    footprintProvider
-      .load()
-      .then(() => {
-        setIsLoaded(true);
-      })
-      .catch(() => {
-        console.error('Failed to load footprint provider.');
-      });
+    footprintProvider.load().then(() => {
+      setIsAdapterLoaded(true);
+    });
   });
 
   useEffect(() => {
-    // Wait at least for the router to be ready before timing out
-    if (!urlProps) {
-      return clearTimer;
-    }
-    if (providerProps) {
-      complete();
-      return clearTimer;
-    }
-    if (timeoutId) {
-      return clearTimer;
+    if (!isAdapterLoaded || !router.isReady || isSdkArgsLoading) {
+      return noop;
     }
 
-    // The only case we want a timeout is when we already got props from
-    // url but footprintProvider events haven't triggered
-    // If post message doesn't arrive for a while, assume there is no props
-    const timerId = setTimeout(() => {
-      complete();
+    // See if we can retrieve the SDK args from the API (for >=3.8.0 footprint-js integrations only)
+    const sdkArgsData = sdkArgsQuery.isSuccess ? sdkArgsQuery.data : undefined;
+    if (sdkArgsData) {
+      const {
+        args: { data },
+      } = sdkArgsData;
+      complete(data);
+      return noop;
+    }
+
+    // TODO: delete when all customers migrate to v3.8.0+
+    // If all else fails, we need to wait for post messages (for legacy web sdk integrations)
+    if (timerId.current) {
+      // If we already started a timer, we are already listening for post messages
+      return noop;
+    }
+
+    // TODO: delete when all customers migrate to v3.8.0+
+    const unsubscribe = footprintProvider.on(
+      FootprintPrivateEvent.propsReceived,
+      (props: unknown) => {
+        clearTimeout(timerId.current);
+        complete(props as T);
+      },
+    );
+
+    timerId.current = setTimeout(() => {
+      unsubscribe();
+      complete({} as T);
     }, POST_MESSAGE_TIMEOUT);
-    setTimeoutId(timerId);
 
-    return clearTimer;
+    return () => {
+      unsubscribe();
+      clearTimeout(timerId.current);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoaded, urlProps, providerProps]);
-
-  return providerProps;
+  }, [
+    isAdapterLoaded,
+    router.isReady,
+    router.query,
+    router.asPath,
+    isSdkArgsLoading,
+  ]);
 };
 
 export default useProps;

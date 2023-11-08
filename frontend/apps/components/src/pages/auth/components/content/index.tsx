@@ -47,7 +47,9 @@ const getOnboardConfigurationKey = (key?: string): ObKeyHeader | undefined =>
   key ? { [CLIENT_PUBLIC_KEY_HEADER]: key } : undefined;
 
 const Content = (): JSX.Element | null => {
-  const props = useProps<FootprintAuthDataProps>();
+  const [props, setProps] = useState<FootprintAuthDataProps>();
+  useProps<FootprintAuthDataProps>(setProps);
+
   const { options = voidObj, userData, variant, publicKey } = props || voidObj;
   const footprintProvider = useFootprintProvider();
   const [device, setDevice] = useState<DeviceInfo>(initialDevice);
