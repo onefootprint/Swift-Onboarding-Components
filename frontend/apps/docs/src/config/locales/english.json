@@ -219,7 +219,8 @@
       "show-all": "Show all",
       "show-less": "Show less",
       "optional": "optional",
-      "array": "array of",
+      "array": "array",
+      "of": "of",
       "sections": {
         "footprint-api": "Footprint API",
         "footprint-api-preview": "Footprint API (Preview)"

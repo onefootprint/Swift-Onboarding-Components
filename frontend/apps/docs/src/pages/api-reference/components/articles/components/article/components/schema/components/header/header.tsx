@@ -8,6 +8,7 @@ import {
 } from '@onefootprint/ui';
 import React from 'react';
 import type { ContentSchema } from 'src/pages/api-reference/api-reference.types';
+import { evaluateSchemaRef } from 'src/pages/api-reference/utils/get-schemas';
 
 type HeaderProps = {
   title: string;
@@ -28,7 +29,18 @@ const Header = ({ title, schema, isRequired, isInBrackets }: HeaderProps) => {
   }
   if (schema.items !== undefined) {
     typeLabelParts.push(t('array'));
-    typeLabelParts.push(plural(schema.items?.type));
+    if (schema.items?.type) {
+      typeLabelParts.push(t('of'));
+      typeLabelParts.push(plural(schema.items?.type));
+    } else if (schema.items?.$ref) {
+      // Sometimes the array is of a referenced schema
+      const referencedSchema = evaluateSchemaRef(schema.items?.$ref);
+      if (referencedSchema) {
+        typeLabelParts.push(t('of'));
+        typeLabelParts.push(plural(referencedSchema.type));
+      }
+    }
+    // Just leave the text as "array" if we can't find the type of the object in the array
   } else {
     typeLabelParts.push(schema.type);
   }

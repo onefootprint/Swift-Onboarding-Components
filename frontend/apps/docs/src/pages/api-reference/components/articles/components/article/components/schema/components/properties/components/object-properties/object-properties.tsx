@@ -8,6 +8,7 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { evaluateSchemaRef } from 'src/pages/api-reference/utils/get-schemas';
 
 import type { ContentSchema } from '@/api-reference/api-reference.types';
 
@@ -45,7 +46,18 @@ const ObjectProperties = ({
   }
   if (isArray) {
     typeLabelParts.push(t('array'));
-    typeLabelParts.push(plural(schema.type));
+    if (schema.type) {
+      typeLabelParts.push(t('of'));
+      typeLabelParts.push(plural(schema.type));
+    } else if (schema.$ref) {
+      // Sometimes the array is of a referenced schema
+      const referencedSchema = evaluateSchemaRef(schema.$ref);
+      if (referencedSchema) {
+        typeLabelParts.push(t('of'));
+        typeLabelParts.push(plural(referencedSchema.type));
+      }
+    }
+    // Just leave the text as "array" if we can't find the type of the object in the array
   } else {
     typeLabelParts.push(schema.type);
   }
