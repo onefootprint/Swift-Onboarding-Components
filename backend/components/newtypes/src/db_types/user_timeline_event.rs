@@ -91,6 +91,7 @@ impl From<WorkflowTriggeredInfo> for DbUserTimelineEvent {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DataCollectedInfo {
     pub attributes: Vec<CollectedDataOption>,
+    pub actor: Option<DbActor>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -12,6 +12,7 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::user_timeline;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use newtypes::CollectedDataOption;
 use newtypes::DbUserTimelineEventKind;
 use newtypes::{DbUserTimelineEvent, ScopedVaultId, UserTimelineId, VaultId};
 
@@ -53,7 +54,7 @@ pub struct NewUserTimeline {
 #[allow(clippy::large_enum_variant)]
 /// Mirrors structure of DbUserTimelineEvent but includes resources hydrated from the DB rather than identifiers
 pub enum SaturatedTimelineEvent {
-    DataCollected(newtypes::DataCollectedInfo),
+    DataCollected(Vec<CollectedDataOption>, Option<SaturatedActor>),
     OnboardingDecision(SaturatedOnboardingDecisionInfo, Option<AnnotationInfo>),
     IdentityDocumentUploaded((IdentityDocument, DocumentRequest)),
     Liveness(LivenessEvent, InsightEvent),
@@ -166,6 +167,7 @@ impl UserTimeline {
         let db_actors = results.iter().flat_map(|ut| match ut.event {
             DbUserTimelineEvent::VaultCreated(ref e) => Some(e.actor.clone()),
             DbUserTimelineEvent::WorkflowTriggered(ref e) => Some(e.actor.clone()),
+            DbUserTimelineEvent::DataCollected(ref e) => e.actor.clone(),
             _ => None,
         });
         let workflow_ids = results.iter().flat_map(|ut| match ut.event {
@@ -188,7 +190,12 @@ impl UserTimeline {
             .map(|ut| {
                 let saturated_event = match ut.event {
                     DbUserTimelineEvent::DataCollected(ref e) => {
-                        SaturatedTimelineEvent::DataCollected(e.clone())
+                        let actor = e
+                            .actor
+                            .as_ref()
+                            .map(|a| actors.get(a).cloned().ok_or(DbError::RelatedObjectNotFound))
+                            .transpose()?;
+                        SaturatedTimelineEvent::DataCollected(e.attributes.clone(), actor)
                     }
                     DbUserTimelineEvent::OnboardingDecision(ref e) => {
                         let (obd, ob_config, actor, mr) = decisions

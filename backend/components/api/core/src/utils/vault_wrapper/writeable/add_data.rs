@@ -59,7 +59,7 @@ impl<Type> WriteableVw<Type> {
             // Must do this validation here inside the locked, WriteableUvw
             let request = self.validate_request(conn, request)?;
             let sv_id = self.scoped_vault_id.clone();
-            let (vds, seqno) = request.save(conn, self.vault(), sv_id, source, actor)?;
+            let (vds, seqno) = request.save(conn, self.vault(), sv_id, source, actor.clone())?;
             let new_ci = Self::create_contact_info_if_needed(conn, vds)?;
             (new_ci, seqno)
         } else {
@@ -69,7 +69,7 @@ impl<Type> WriteableVw<Type> {
         };
         self.create_bos_if_needed(conn, kyced_bos)?;
         // Add timeline event for all the newly added data
-        self.add_timeline_event(conn, keys)?;
+        self.add_timeline_event(conn, keys, actor)?;
 
         let result = PatchDataResult { new_ci, seqno };
         Ok(result)
@@ -130,13 +130,19 @@ impl<Type> WriteableVw<Type> {
     }
 
     #[tracing::instrument("WriteableVw::add_timeline_event", skip_all)]
-    fn add_timeline_event(&self, conn: &mut TxnPgConn, keys: Vec<DataIdentifier>) -> ApiResult<()> {
+    fn add_timeline_event(
+        &self,
+        conn: &mut TxnPgConn,
+        keys: Vec<DataIdentifier>,
+        actor: Option<AuthActor>,
+    ) -> ApiResult<()> {
         let cdos = CollectedDataOption::list_from(keys);
         // Add UserTimeline for all the newly added data
         if !cdos.is_empty() {
             // Create a timeline event that shows all the new data that was added
             let info = DataCollectedInfo {
                 attributes: cdos.into_iter().collect(),
+                actor: actor.map(|a| a.into()),
             };
             UserTimeline::create(conn, info, self.vault.id.clone(), self.scoped_vault_id.clone())?;
         }

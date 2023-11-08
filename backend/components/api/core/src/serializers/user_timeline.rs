@@ -19,9 +19,10 @@ impl DbToApi<UserTimelineInfo> for api_wire_types::UserTimeline {
 impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
     fn from_db(target: SaturatedTimelineEvent) -> Self {
         match target {
-            SaturatedTimelineEvent::DataCollected(e) => {
+            SaturatedTimelineEvent::DataCollected(attributes, actor) => {
                 Self::DataCollected(api_wire_types::user_timeline::DataCollectedInfo {
-                    attributes: e.attributes,
+                    attributes,
+                    actor: actor.map(api_wire_types::Actor::from_db),
                 })
             }
             SaturatedTimelineEvent::Liveness(l, i) => {

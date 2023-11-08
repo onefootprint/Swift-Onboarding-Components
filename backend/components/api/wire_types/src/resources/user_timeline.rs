@@ -35,7 +35,9 @@ pub enum UserTimelineEvent {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct DataCollectedInfo {
+    // TODO this isn't really the full picture, we should start storing `Vec<DI>` really...
     pub attributes: Vec<CollectedDataOption>,
+    pub actor: Option<Actor>,
 }
 
 #[derive(Debug, Clone, Serialize)]
