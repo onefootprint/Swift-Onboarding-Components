@@ -58,6 +58,7 @@ pub async fn post(
             .map(|di| (di.clone(), results.remove(&di.into()))),
     );
     let out = DecryptResponse::from(results);
+    out.log_invalid_serializations();
 
     ResponseData::ok(out).json()
 }
