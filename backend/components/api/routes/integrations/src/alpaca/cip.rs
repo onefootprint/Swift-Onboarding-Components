@@ -477,20 +477,12 @@ fn watchlist(
 
 fn document_and_photo(
     scoped_vault: ScopedVault,
-    mr: Option<&ManualReview>,
+    _mr: Option<&ManualReview>,
     vendor_results: &[VendorResult],
     decrypted_data: &DecryptUncheckedResult,
     check_started_at: DateTime<Utc>,
     expect_selfie: bool,
 ) -> ApiResult<(Option<alpaca::DocumentPhotoId>, Option<alpaca::PhotoSelfie>)> {
-    // Validate wrt to mr.review_reasons
-    if !mr
-        .map(|r| r.review_reasons.contains(&ReviewReason::Document))
-        .unwrap_or(false)
-    {
-        Err(CipError::ExpectedReviewReasonNotFound(ReviewReason::Document))?
-    }
-
     let (vendor_map, _) = build_vendor_response_map_from_vendor_results(vendor_results)?;
     let ocr_api = IncodeFetchOCR;
     let scores_api = IncodeFetchScores;
