@@ -234,6 +234,7 @@ impl SmsClient {
         // Iterate through vendors in the order of preference, trying each one until we get a
         // successful response or reach the end of our vendors
         let mut err = None;
+        let mut sent_error_to_caller = false;
         for vendor in ordered_vendors {
             let e = match vendor.send().await {
                 Ok(_) => return Ok(()),
@@ -246,6 +247,9 @@ impl SmsClient {
                 // Don't raise error from sending since it's possible the receiver has hung up
                 let r = tx.send(e);
                 if r.is_ok() {
+                    // Due to a race condition it's possible the error still isn't returned to the
+                    // caller. But not super likely
+                    sent_error_to_caller = true;
                     tracing::info!("Sent error to caller. But not necessarily return from API");
                 }
                 r.err()
@@ -256,7 +260,11 @@ impl SmsClient {
             }
         }
         if let Some(err) = err {
-            return Err(err);
+            if !sent_error_to_caller {
+                // If the error was not sent to the caller, return it here.
+                // If we're running in the foreground, we'll always raise an Err.
+                return Err(err);
+            }
         }
         Ok(())
     }
