@@ -1,12 +1,5 @@
 use std::sync::Arc;
 
-use async_trait::async_trait;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::onboarding_decision::OnboardingDecision;
-use db::models::scoped_vault::ScopedVault;
-use db::models::vault::Vault;
-use db::models::workflow::{Workflow as DbWorkflow, WorkflowUpdate};
-
 use super::{
     KybAwaitingAsyncVendors, KybAwaitingBoKyc, KybComplete, KybDataCollection, KybDecisioning, KybState,
     KybVendorCalls,
@@ -25,6 +18,12 @@ use crate::decision::{
     },
 };
 use crate::{decision::state::OnAction, errors::ApiResult, State};
+use async_trait::async_trait;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::onboarding_decision::OnboardingDecision;
+use db::models::scoped_vault::ScopedVault;
+use db::models::vault::Vault;
+use db::models::workflow::{Workflow as DbWorkflow, WorkflowUpdate};
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::{KybConfig, Locked, OnboardingStatus};

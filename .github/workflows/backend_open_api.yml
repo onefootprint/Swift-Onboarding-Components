@@ -16,6 +16,8 @@ jobs:
   compute_open_api_head:
     runs-on: 16core
     environment: dev
+    outputs:
+      commit: '${{ steps.commit.outputs.commit }}'
     services:
       postgres:
         image: postgres:14.3
@@ -57,11 +59,18 @@ jobs:
         with:
           name: head-open-api
           path: head_open_api.json
+
+      - id: commit
+        run: |
+          set -x
+          echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
   
 
   compute_open_api_base:
     runs-on: 16core
     environment: dev
+    outputs:
+      commit: '${{ steps.commit.outputs.commit }}'
     services:
       postgres:
         image: postgres:14.3
@@ -122,11 +131,26 @@ jobs:
           name: base-open-api
           path: base_open_api.json
 
+      - id: commit
+        run: |
+          set -x
+          echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
 
   compare_open_api:
     runs-on: 16core
     needs: [compute_open_api_head, compute_open_api_base]
     steps:
+      - run: |
+          set -x
+          [[ ! -z "${{ needs.compute_open_api_head.outputs.commit }}" ]]
+          [[ ! -z "${{ needs.compute_open_api_base.outputs.commit }}" ]]
+          if test "${{ needs.compute_open_api_head.outputs.commit }}" = "${{ needs.compute_open_api_base.outputs.commit }}"
+          then
+            echo "Commits being compared are not different..."
+            exit 1
+          fi
+
       - name: Download head
         uses: actions/download-artifact@v3
         with:
