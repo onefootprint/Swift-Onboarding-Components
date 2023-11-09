@@ -136,12 +136,13 @@ impl<Type> WriteableVw<Type> {
         keys: Vec<DataIdentifier>,
         actor: Option<AuthActor>,
     ) -> ApiResult<()> {
-        let cdos = CollectedDataOption::list_from(keys);
         // Add UserTimeline for all the newly added data
-        if !cdos.is_empty() {
+        if !keys.is_empty() {
             // Create a timeline event that shows all the new data that was added
+            let cdos = CollectedDataOption::list_from(keys.clone());
             let info = DataCollectedInfo {
                 attributes: cdos.into_iter().collect(),
+                targets: keys,
                 actor: actor.map(|a| a.into()),
             };
             UserTimeline::create(conn, info, self.vault.id.clone(), self.scoped_vault_id.clone())?;

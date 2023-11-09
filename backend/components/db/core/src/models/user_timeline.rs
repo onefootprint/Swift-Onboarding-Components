@@ -13,6 +13,7 @@ use db_schema::schema::user_timeline;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::CollectedDataOption;
+use newtypes::DataIdentifier;
 use newtypes::DbUserTimelineEventKind;
 use newtypes::{DbUserTimelineEvent, ScopedVaultId, UserTimelineId, VaultId};
 
@@ -54,7 +55,11 @@ pub struct NewUserTimeline {
 #[allow(clippy::large_enum_variant)]
 /// Mirrors structure of DbUserTimelineEvent but includes resources hydrated from the DB rather than identifiers
 pub enum SaturatedTimelineEvent {
-    DataCollected(Vec<CollectedDataOption>, Option<SaturatedActor>),
+    DataCollected(
+        Vec<CollectedDataOption>,
+        Vec<DataIdentifier>,
+        Option<SaturatedActor>,
+    ),
     OnboardingDecision(SaturatedOnboardingDecisionInfo, Option<AnnotationInfo>),
     IdentityDocumentUploaded((IdentityDocument, DocumentRequest)),
     Liveness(LivenessEvent, InsightEvent),
@@ -195,7 +200,7 @@ impl UserTimeline {
                             .as_ref()
                             .map(|a| actors.get(a).cloned().ok_or(DbError::RelatedObjectNotFound))
                             .transpose()?;
-                        SaturatedTimelineEvent::DataCollected(e.attributes.clone(), actor)
+                        SaturatedTimelineEvent::DataCollected(e.attributes.clone(), e.targets.clone(), actor)
                     }
                     DbUserTimelineEvent::OnboardingDecision(ref e) => {
                         let (obd, ob_config, actor, mr) = decisions

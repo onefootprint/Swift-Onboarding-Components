@@ -50,6 +50,7 @@ impl PiiString {
         self.0.is_empty()
     }
 
+    // TODO maybe PiiString Eq should be implemented as a safe_compare
     pub fn safe_compare(&self, other: &PiiString) -> bool {
         crypto::sha256(self.leak().as_bytes()) == crypto::sha256(other.leak().as_bytes())
     }

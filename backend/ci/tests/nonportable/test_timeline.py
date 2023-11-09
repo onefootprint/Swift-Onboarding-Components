@@ -5,7 +5,7 @@ def test_timeline_data_added(sandbox_tenant):
     """
     Test the timeline events created when making a new vault and updating its data.
     """
-    data = {"id.first_name": "Hayes", "id.last_name": "Valley"}
+    data = {"id.first_name": "Hayes", "id.ssn9": "111-11-1111"}
     body = post("users", data, sandbox_tenant.sk.key)
 
     fp_id = body["id"]
@@ -21,6 +21,9 @@ def test_timeline_data_added(sandbox_tenant):
         i["event"] for i in body if i["event"]["kind"] == "data_collected"
     ]
     assert len(data_collected_events) == 2
+    # Include name CDO in edited attributes even though we only changed first name
+    assert set(data_collected_events[1]["data"]["attributes"]) == set(["ssn9", "name"])
+    assert data_collected_events[0]["data"]["attributes"] == ["email"]
     assert all(
         e["data"]["actor"]["id"] == sandbox_tenant.sk.id for e in data_collected_events
     )

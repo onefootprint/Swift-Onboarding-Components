@@ -35,7 +35,7 @@ pub enum UserTimelineEvent {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct DataCollectedInfo {
-    // TODO this isn't really the full picture, we should start storing `Vec<DI>` really...
+    /// The list of CDOs that had a DI that was edited
     pub attributes: Vec<CollectedDataOption>,
     pub actor: Option<Actor>,
 }

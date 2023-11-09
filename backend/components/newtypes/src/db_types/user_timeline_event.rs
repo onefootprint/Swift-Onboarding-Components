@@ -2,7 +2,7 @@ use crate::{
     util::impl_enum_string_diesel, AnnotationId, CollectedDataOption, IdentityDocumentId, LivenessEventId,
     OnboardingDecisionId, WatchlistCheckId, WebauthnCredentialId,
 };
-use crate::{DbActor, ObConfigurationId, WorkflowId};
+use crate::{DataIdentifier, DbActor, ObConfigurationId, WorkflowId};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
@@ -91,6 +91,12 @@ impl From<WorkflowTriggeredInfo> for DbUserTimelineEvent {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DataCollectedInfo {
     pub attributes: Vec<CollectedDataOption>,
+    #[serde(default)]
+    /// This was added more recently since CDOs aren't fully representative when incomplete CDOs
+    /// were added.
+    /// Going to keep `attributes` around for now because I don't want to backfill these timeline
+    /// events...
+    pub targets: Vec<DataIdentifier>,
     pub actor: Option<DbActor>,
 }
 

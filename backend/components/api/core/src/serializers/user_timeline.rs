@@ -1,4 +1,5 @@
 use db::models::user_timeline::{SaturatedTimelineEvent, UserTimeline, UserTimelineInfo};
+use itertools::Itertools;
 use newtypes::TriggerKind;
 
 use crate::utils::db2api::DbToApi;
@@ -19,9 +20,18 @@ impl DbToApi<UserTimelineInfo> for api_wire_types::UserTimeline {
 impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
     fn from_db(target: SaturatedTimelineEvent) -> Self {
         match target {
-            SaturatedTimelineEvent::DataCollected(attributes, actor) => {
+            SaturatedTimelineEvent::DataCollected(attributes, targets, actor) => {
+                let edited_cdos = targets
+                    .into_iter()
+                    .filter_map(|di| di.parent())
+                    .unique()
+                    // Choose the "largest" CDO for the edited CDs
+                    // This is arbitrary, but there aren't many CDs with multiple options
+                    .filter_map(|cd| cd.options().into_iter().last())
+                    .collect_vec();
+                let cdos = attributes.into_iter().chain(edited_cdos).unique().collect_vec();
                 Self::DataCollected(api_wire_types::user_timeline::DataCollectedInfo {
-                    attributes,
+                    attributes: cdos,
                     actor: actor.map(api_wire_types::Actor::from_db),
                 })
             }
