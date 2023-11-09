@@ -37,6 +37,7 @@ const Sections = ({ sections }: SectionsProps) => {
   };
 
   useEffect(() => {
+    handleScroll();
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   });
@@ -54,10 +55,10 @@ const Sections = ({ sections }: SectionsProps) => {
           {sections.map(({ level, anchor, label, id }) => (
             <Stack key={id}>
               <StyledLink
-                level={level}
-                href={`#${anchor}`}
-                onClick={scrollToArticle(id)}
                 active={activeSectionID === id}
+                href={anchor}
+                level={level}
+                onClick={scrollToArticle(id)}
               >
                 {label}
               </StyledLink>

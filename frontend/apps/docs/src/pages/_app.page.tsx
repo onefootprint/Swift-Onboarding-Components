@@ -14,7 +14,7 @@ import {
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
 import ApiReference from './api-reference';
-import DocsLayout from './docs-layout';
+import Docs from './docs';
 import InternalApiReference from './internal-api-reference';
 
 configureReactI18next();
@@ -59,12 +59,12 @@ const App = ({ Component, pageProps }: AppProps) => {
           {isApiReference && <ApiReference />}
           {isInternalApiReference && <InternalApiReference />}
           {isDocsSite && (
-            <DocsLayout
+            <Docs
               article={pageProps.article}
               navigation={pageProps.page?.navigation}
             >
               <Component {...pageProps} />
-            </DocsLayout>
+            </Docs>
           )}
         </CustomDesignSystemProvider>
       </QueryClientProvider>

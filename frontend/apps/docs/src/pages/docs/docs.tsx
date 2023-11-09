@@ -9,13 +9,13 @@ import AppHeader from './components/app-header';
 import DesktopNav from './components/nav/desktop-nav';
 import Sections from './components/sections';
 
-type DocsLayoutProps = {
+type DocsProps = {
   children: React.ReactNode;
   article: Article;
   navigation: PageNavigation;
 };
 
-const DocsLayout = ({ children, navigation, article }: DocsLayoutProps) => (
+const Docs = ({ children, navigation, article }: DocsProps) => (
   <>
     <AppHeader navigation={navigation} />
     <MainContainer>
@@ -69,4 +69,4 @@ const MainContainer = styled.main`
   `}
 `;
 
-export default DocsLayout;
+export default Docs;
