@@ -11,22 +11,70 @@ use api_core::{
     utils::vault_wrapper::{Person, TenantVw, VaultWrapper},
     State,
 };
-use api_wire_types::{AlpacaCreateAccountRequest, AlpacaCreateAccountResponse};
+use api_wire_types::{
+    AlpacaCreateAccountRequest, AlpacaCreateAccountResponse, DeprecatedAlpacaCreateAccountRequest,
+};
 use std::str::FromStr;
 
 use db::models::{identity_document::IdentityDocument, scoped_vault::ScopedVault};
 use newtypes::{
-    email::Email, DataIdentifier as DI, Declaration, DocumentKind as DK, IdDocKind, IdentityDataKind as IDK,
-    InvestorProfileKind as IPK, PhoneNumber, PiiJsonValue, PiiString, TenantId,
+    email::Email, DataIdentifier as DI, Declaration, DocumentKind as DK, FpId, IdDocKind,
+    IdentityDataKind as IDK, InvestorProfileKind as IPK, PhoneNumber, PiiJsonValue, PiiString, TenantId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(description = "Create an Alpaca account", tags(Integrations, Alpaca, Preview))]
-#[actix::post("/integrations/alpaca/account")]
+#[actix::post("/users/{fp_id}/integrations/alpaca/account")]
 pub async fn post(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
     request: Json<AlpacaCreateAccountRequest>,
+    fp_id: web::Path<FpId>,
+) -> JsonApiResponse<AlpacaCreateAccountResponse> {
+    let AlpacaCreateAccountRequest {
+        api_key,
+        api_secret,
+        hostname,
+        enabled_assets,
+        disclosures,
+        agreements,
+        trusted_contact,
+        account_type,
+    } = request.into_inner();
+    let fp_id = fp_id.into_inner();
+    let request = DeprecatedAlpacaCreateAccountRequest {
+        fp_user_id: fp_id,
+        api_key,
+        api_secret,
+        hostname,
+        enabled_assets,
+        disclosures,
+        agreements,
+        trusted_contact,
+        account_type,
+    };
+    let result = post_inner(state, auth, request).await?;
+    Ok(result)
+}
+
+#[api_v2_operation(
+    description = "Create an Alpaca account",
+    tags(Integrations, Alpaca, Deprecated)
+)]
+#[actix::post("/integrations/alpaca/account")]
+pub async fn post_old(
+    state: web::Data<State>,
+    auth: SecretTenantAuthContext,
+    request: Json<DeprecatedAlpacaCreateAccountRequest>,
+) -> JsonApiResponse<AlpacaCreateAccountResponse> {
+    let result = post_inner(state, auth, request.into_inner()).await?;
+    Ok(result)
+}
+
+pub async fn post_inner(
+    state: web::Data<State>,
+    auth: SecretTenantAuthContext,
+    request: DeprecatedAlpacaCreateAccountRequest,
 ) -> JsonApiResponse<AlpacaCreateAccountResponse> {
     tracing::info!(%request.fp_user_id, %request.hostname, "/integrations/alpaca/cip request");
     // TODO: do we also want to validate here that the user is `Pass` like we do in the CIP endpoint?
@@ -43,7 +91,7 @@ pub async fn post(
     .map_err(CipError::from)?;
 
     let request: CreateAccountRequest =
-        create_create_account_request(&state, tenant_id, is_live, request.into_inner()).await?;
+        create_create_account_request(&state, tenant_id, is_live, request).await?;
     let response = alpaca_client
         .create_account(request)
         .await
@@ -64,7 +112,7 @@ async fn create_create_account_request(
     state: &State,
     tenant_id: TenantId,
     is_live: bool,
-    req: AlpacaCreateAccountRequest,
+    req: DeprecatedAlpacaCreateAccountRequest,
 ) -> ApiResult<CreateAccountRequest> {
     let (uvw, doc) = state
         .db_pool

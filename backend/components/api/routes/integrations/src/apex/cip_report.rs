@@ -3,9 +3,12 @@ use api_core::{
     types::{JsonApiResponse, ResponseData},
     State,
 };
-use api_wire_types::{ApexCheckedKycData, ApexCipReportRequest, ApexCipSummaryResults, ApexSelfReportedData};
+use api_wire_types::{
+    ApexCheckedKycData, ApexCipReportRequest, ApexCipSummaryResults, ApexSelfReportedData,
+    OldApexCipReportRequest,
+};
 
-use newtypes::PiiString;
+use newtypes::{FpId, PiiString};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use strum::IntoEnumIterator;
 
@@ -13,13 +16,43 @@ use strum::IntoEnumIterator;
     description = "Export CIP information for APEX as a JSON object",
     tags(Integrations, Apex, Preview)
 )]
-#[actix::post("/integrations/apex/cip_report")]
+#[actix::post("/users/{fp_id}/integrations/apex/cip_report")]
 pub async fn post(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
     request: Json<ApexCipReportRequest>,
+    fp_id: web::Path<FpId>,
 ) -> JsonApiResponse<ApexCipSummaryResults> {
-    let request = request.into_inner();
+    let ApexCipReportRequest { default_approver } = request.into_inner();
+    let fp_id = fp_id.into_inner();
+    let request = OldApexCipReportRequest {
+        default_approver,
+        fp_user_id: fp_id,
+    };
+    let result = post_inner(state, auth, request).await?;
+    Ok(result)
+}
+
+// TODO remove once nobody is using this
+#[api_v2_operation(
+    description = "Export CIP information for APEX as a JSON object",
+    tags(Integrations, Apex, Deprecated)
+)]
+#[actix::post("/integrations/apex/cip_report")]
+pub async fn post_old(
+    state: web::Data<State>,
+    auth: SecretTenantAuthContext,
+    request: Json<OldApexCipReportRequest>,
+) -> JsonApiResponse<ApexCipSummaryResults> {
+    let result = post_inner(state, auth, request.into_inner()).await?;
+    Ok(result)
+}
+
+pub async fn post_inner(
+    state: web::Data<State>,
+    auth: SecretTenantAuthContext,
+    request: OldApexCipReportRequest,
+) -> JsonApiResponse<ApexCipSummaryResults> {
     let auth = auth.check_guard(TenantGuard::CipIntegration)?;
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();

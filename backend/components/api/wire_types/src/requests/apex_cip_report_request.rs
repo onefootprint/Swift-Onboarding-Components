@@ -2,6 +2,13 @@ use crate::*;
 
 #[derive(Debug, Clone, Apiv2Schema, Deserialize)]
 pub struct ApexCipReportRequest {
+    /// The default approver name/email to use for automatically approved users
+    /// This will be overwritten if done by a manual reviewer
+    pub default_approver: PiiString,
+}
+
+#[derive(Debug, Clone, Apiv2Schema, Deserialize)]
+pub struct OldApexCipReportRequest {
     /// the footprint user id on behalf of which to send the request
     pub fp_user_id: FpId,
 

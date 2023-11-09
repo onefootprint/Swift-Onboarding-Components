@@ -22,7 +22,7 @@ use api_core::{
     utils::vault_wrapper::{DecryptUncheckedResult, TenantVw, VaultWrapper},
     ApiError, ApiErrorKind, State,
 };
-use api_wire_types::{AlpacaCipRequest, AlpacaCipResponse};
+use api_wire_types::{AlpacaCipRequest, AlpacaCipResponse, DeprecatedAlpacaCipRequest};
 use chrono::{DateTime, Utc};
 use db::{
     actor::{saturate_actors, SaturatedActor},
@@ -47,14 +47,53 @@ use IdentityDataKind::*;
     description = "Forward CIP information to Alpaca",
     tags(Integrations, Alpaca, Preview)
 )]
-#[actix::post("/integrations/alpaca/cip")]
+#[actix::post("/users/{fp_id}/integrations/alpaca/cip")]
 pub async fn post(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
     request: Json<AlpacaCipRequest>,
+    fp_id: web::Path<FpId>,
+) -> JsonApiResponse<AlpacaCipResponse> {
+    let AlpacaCipRequest {
+        api_key,
+        api_secret,
+        default_approver,
+        hostname,
+        account_id,
+    } = request.into_inner();
+    let fp_id = fp_id.into_inner();
+    let request = DeprecatedAlpacaCipRequest {
+        fp_user_id: fp_id,
+        api_key,
+        api_secret,
+        default_approver,
+        hostname,
+        account_id,
+    };
+    let result = post_inner(state, auth, request).await?;
+    Ok(result)
+}
+
+#[api_v2_operation(
+    description = "Forward CIP information to Alpaca",
+    tags(Integrations, Alpaca, Deprecated)
+)]
+#[actix::post("/integrations/alpaca/cip")]
+pub async fn post_old(
+    state: web::Data<State>,
+    auth: SecretTenantAuthContext,
+    request: Json<DeprecatedAlpacaCipRequest>,
+) -> JsonApiResponse<AlpacaCipResponse> {
+    let result = post_inner(state, auth, request.into_inner()).await?;
+    Ok(result)
+}
+
+pub async fn post_inner(
+    state: web::Data<State>,
+    auth: SecretTenantAuthContext,
+    request: DeprecatedAlpacaCipRequest,
 ) -> JsonApiResponse<AlpacaCipResponse> {
     tracing::info!(%request.fp_user_id, %request.hostname, %request.account_id, "/integrations/alpaca/cip request");
-    let request = request.into_inner();
     let auth = auth.check_guard(TenantGuard::CipIntegration)?;
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();

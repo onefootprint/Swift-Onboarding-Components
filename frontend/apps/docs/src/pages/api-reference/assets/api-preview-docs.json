@@ -57,117 +57,6 @@
                 ]
             }
         },
-        "/integrations/alpaca/account": {
-            "post": {
-                "tags": [
-                    "Integrations",
-                    "Alpaca",
-                    "Preview"
-                ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nCreate an Alpaca account",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/AlpacaCreateAccountRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AlpacaCreateAccountResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Secret API Key": []
-                    }
-                ]
-            }
-        },
-        "/integrations/alpaca/cip": {
-            "post": {
-                "tags": [
-                    "Integrations",
-                    "Alpaca",
-                    "Preview"
-                ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nForward CIP information to Alpaca",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/AlpacaCipRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AlpacaCipResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Secret API Key": []
-                    }
-                ]
-            }
-        },
-        "/integrations/apex/cip_report": {
-            "post": {
-                "tags": [
-                    "Integrations",
-                    "Apex",
-                    "Preview"
-                ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nExport CIP information for APEX as a JSON object",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ApexCipReportRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApexCipSummaryResults"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Secret API Key": []
-                    }
-                ]
-            }
-        },
         "/org/risk_signals": {
             "get": {
                 "tags": [
@@ -415,6 +304,150 @@
                                     "items": {
                                         "$ref": "#/components/schemas/PublicDocument"
                                     }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/integrations/alpaca/account": {
+            "post": {
+                "tags": [
+                    "Integrations",
+                    "Alpaca",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nCreate an Alpaca account",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AlpacaCreateAccountRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AlpacaCreateAccountResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/integrations/alpaca/cip": {
+            "post": {
+                "tags": [
+                    "Integrations",
+                    "Alpaca",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nForward CIP information to Alpaca",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AlpacaCipRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AlpacaCipResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/integrations/apex/cip_report": {
+            "post": {
+                "tags": [
+                    "Integrations",
+                    "Apex",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nExport CIP information for APEX as a JSON object",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ApexCipReportRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApexCipSummaryResults"
                                 }
                             }
                         }
@@ -801,10 +834,6 @@
                         "description": "The default approver name/email to use for automatically approved users\n This will be overwritten if done by a manual reviewer",
                         "type": "string"
                     },
-                    "fp_user_id": {
-                        "description": "the footprint user id on behalf of which to send the request",
-                        "type": "string"
-                    },
                     "hostname": {
                         "description": "Alpaca Hostname to use (i.e. sandbox or production like: )\n for example: `broker-api.sandbox.alpaca.markets`",
                         "type": "string"
@@ -815,7 +844,6 @@
                     "api_key",
                     "api_secret",
                     "default_approver",
-                    "fp_user_id",
                     "hostname"
                 ]
             },
@@ -1006,10 +1034,6 @@
                             ]
                         }
                     },
-                    "fp_user_id": {
-                        "description": "the footprint user id on behalf of which to send the request",
-                        "type": "string"
-                    },
                     "hostname": {
                         "description": "Alpaca Hostname to use (i.e. sandbox or production like: )\n for example: `broker-api.sandbox.alpaca.markets`",
                         "type": "string"
@@ -1056,7 +1080,6 @@
                 "required": [
                     "api_key",
                     "api_secret",
-                    "fp_user_id",
                     "hostname"
                 ]
             },
@@ -1084,15 +1107,10 @@
                     "default_approver": {
                         "description": "The default approver name/email to use for automatically approved users\n This will be overwritten if done by a manual reviewer",
                         "type": "string"
-                    },
-                    "fp_user_id": {
-                        "description": "the footprint user id on behalf of which to send the request",
-                        "type": "string"
                     }
                 },
                 "required": [
-                    "default_approver",
-                    "fp_user_id"
+                    "default_approver"
                 ]
             },
             "ApexCipSummaryResults": {
