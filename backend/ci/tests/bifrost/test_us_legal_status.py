@@ -35,12 +35,12 @@ def legal_status_obc(sandbox_tenant):
         {
             "id.us_legal_status": "permanent_resident",
             "id.nationality": "NO",
-            "id.citizenships": '["NO"]',
+            "id.citizenships": ["NO"],
         },
         {
             "id.us_legal_status": "visa",
             "id.nationality": "NO",
-            "id.citizenships": '["NO", "IT"]',
+            "id.citizenships": ["NO", "IT"],
             "id.visa_kind": "h1b",
             "id.visa_expiration_date": "2050-12-25",
         },
