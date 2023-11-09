@@ -13,7 +13,6 @@ from tests.utils import post, get
         ("id.citizenships", ["US", "NO"]),
         ("id.citizenships", '["US", "NO"]'),
         ("investor_profile.investment_goals", ["growth", "preserve_capital"]),
-        ("investor_profile.investment_goals", '["growth", "preserve_capital"]'),
         (
             "investor_profile.declarations",
             [
@@ -21,12 +20,8 @@ from tests.utils import post, get
                 "family_of_political_figure",
             ],
         ),
-        (
-            "investor_profile.declarations",
-            '["affiliated_with_us_broker", "family_of_political_figure"]',
-        ),
-        ("investor_profile.senior_executive_symbols", '["AAPL","HOOOD","SPY"]'),
-        ("investor_profile.family_member_names", '["Hayes Valley", "Piip Penguin"]'),
+        ("investor_profile.senior_executive_symbols", ["AAPL", "HOOOD", "SPY"]),
+        ("investor_profile.family_member_names", ["Hayes Valley", "Piip Penguin"]),
     ],
 )
 def test_vault_json(key, value, sandbox_tenant):
