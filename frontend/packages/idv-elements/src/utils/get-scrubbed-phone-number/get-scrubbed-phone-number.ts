@@ -10,7 +10,7 @@ const getScrubbedPhoneNumber = ({
   successfulIdentifier,
   phoneNumber,
   challengeData,
-}: GetScrubbedPhoneNumberArgs) => {
+}: GetScrubbedPhoneNumberArgs): string => {
   const identifyPhone =
     successfulIdentifier && 'phoneNumber' in successfulIdentifier
       ? phoneNumber

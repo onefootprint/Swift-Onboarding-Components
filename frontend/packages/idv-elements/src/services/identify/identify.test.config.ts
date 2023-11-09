@@ -6,12 +6,12 @@ import {
 } from '@onefootprint/test-utils';
 import { UserTokenScope } from '@onefootprint/types';
 
-import * as getBiometricChallengeResponse from './utils/biometrics/get-biometric-challenge-response';
+import * as getBiometricChallengeResponse from '../../utils/get-biometric-challenge-response';
 
 // This needs to be mocked here and in the test itself as it is a esModule
-jest.mock('./utils/biometrics/get-biometric-challenge-response', () => ({
+jest.mock('../../utils/get-biometric-challenge-response', () => ({
   __esModule: true,
-  ...jest.requireActual('./utils/biometrics/get-biometric-challenge-response'),
+  ...jest.requireActual('../../utils/get-biometric-challenge-response'),
 }));
 
 const mockGenerateBiometricResponse = (): Promise<string> =>

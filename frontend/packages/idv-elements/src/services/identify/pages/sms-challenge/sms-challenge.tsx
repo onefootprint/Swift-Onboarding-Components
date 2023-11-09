@@ -5,11 +5,11 @@ import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
 
 import getCanChallengeBiometrics from '../../../../utils/get-can-challenge-biometrics';
+import getScrubbedPhoneNumber from '../../../../utils/get-scrubbed-phone-number';
 import ChallengeHeader from '../../components/challenge-header';
 import DifferentAccount from '../../components/different-account';
 import PinVerification from '../../components/pin-verification';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
-import getScrubbedPhoneNumber from '../../utils/get-scrubbed-phone-number';
 
 const IS_TEST = typeof jest !== 'undefined';
 const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 100 : 1500;

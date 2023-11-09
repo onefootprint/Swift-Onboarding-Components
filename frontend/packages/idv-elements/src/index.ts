@@ -75,14 +75,16 @@ export {
 export { Identify, Onboarding } from './services';
 export type { BootstrapProps } from './utils';
 export {
+  checkIsPhoneValid,
   DesignSystemProvider,
+  getBiometricChallengeResponse,
+  getCanChallengeBiometrics,
   getIdentifyBootstrapData,
   getRandomID,
+  getScrubbedPhoneNumber,
   Logger,
   default as media,
+  shouldChallengeEmail,
+  validateBootstrapData,
   withProvider,
 } from './utils';
-export { default as checkIsPhoneValid } from './utils/check-is-phone-valid';
-export { default as getCanChallengeBiometrics } from './utils/get-can-challenge-biometrics';
-export { default as shouldChallengeEmail } from './utils/should-challenge-email';
-export { default as validateBootstrapData } from './utils/validate-bootstrap-data';

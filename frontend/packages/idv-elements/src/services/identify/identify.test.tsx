@@ -32,9 +32,9 @@ import {
   withUserVault,
 } from './identify.test.config';
 
-jest.mock('./utils/biometrics/get-biometric-challenge-response', () => ({
+jest.mock('../../utils/get-biometric-challenge-response', () => ({
   __esModule: true,
-  ...jest.requireActual('./utils/biometrics/get-biometric-challenge-response'),
+  ...jest.requireActual('../../utils/get-biometric-challenge-response'),
 }));
 
 const useRouterSpy = createUseRouterSpy();

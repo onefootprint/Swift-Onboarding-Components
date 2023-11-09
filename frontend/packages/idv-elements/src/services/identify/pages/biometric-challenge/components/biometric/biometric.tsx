@@ -8,9 +8,9 @@ import React, { useState } from 'react';
 
 import useIdentifyVerify from '../../../../../../hooks/api/hosted/identify/use-identify-verify';
 import useLoginChallenge from '../../../../../../hooks/api/hosted/identify/use-login-challenge';
+import getBiometricChallengeResponse from '../../../../../../utils/get-biometric-challenge-response';
 import Logger from '../../../../../../utils/logger';
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
-import getBiometricChallengeResponse from '../../../../utils/biometrics';
 
 const Biometric = () => {
   const { t } = useTranslation('pages.biometric-challenge');
