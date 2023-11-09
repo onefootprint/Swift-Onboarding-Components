@@ -16,7 +16,7 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[route_alias(get(
     "/org/onboarding_config",
-    tags(Onboarding, Hosted, Deprecated),
+    tags(Onboarding, Deprecated),
     description = "Fetch an onboarding configuration",
 ))] // TODO: remove alias once we migrate the endpoints
 #[api_v2_operation(

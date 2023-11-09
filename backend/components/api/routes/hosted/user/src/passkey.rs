@@ -52,7 +52,7 @@ pub struct WebAuthnInitResponse {
 //TODO: remove alias once frontend updates
 #[route_alias(post(
     "/hosted/user/biometric/init",
-    tags(Passkey, Hosted, Deprecated),
+    tags(Passkey, Deprecated),
     description = "Generates a passkey registration challenge",
 ))]
 #[api_v2_operation(
@@ -129,7 +129,7 @@ pub struct SavedAttestationData {
 //TODO: remove alias once frontend updates
 #[route_alias(post(
     "/hosted/user/biometric",
-    tags(Passkey, Hosted, Deprecated),
+    tags(Passkey, Deprecated),
     description = "Accepts a response to a passkey registration challenge",
 ))]
 #[api_v2_operation(

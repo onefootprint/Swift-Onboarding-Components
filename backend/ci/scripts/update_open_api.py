@@ -6,7 +6,7 @@ from urllib.parse import unquote
 
 
 # Every API endpoint must have only one of these tag values
-IDENTIFYING_TAG_VALUES = ["Private", "PublicApi", "Hosted", "Preview"]
+IDENTIFYING_TAG_VALUES = ["Private", "PublicApi", "Hosted", "Preview", "Deprecated"]
 
 # APIs with these identifying tags are shown in our docs site - we should apply more scrutiny to them
 PUBLIC_TAG_VALUES = ["PublicApi", "Preview"]
@@ -74,7 +74,7 @@ class Endpoint:
         if self.identifying_tag == "Preview":
             # Add a disclaimer tag to all Preview APIs
             description = f"This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\n{description}"
-        if "Deprecated" in self._path_info["tags"]:
+        if self.identifying_tag == "Deprecated":
             # Add a disclaimer tag to all Deprecated APIs
             description = f"THIS API IS DEPRECATED.\n\n{description}"
 

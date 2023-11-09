@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "6e61fa6d6bc53ad0fdd6cdf229dcb48f218a8d11"
+        "version": "d9b0dae9660b5e4f8490675406df2bf8a06a308a"
     },
     "servers": [
         {
@@ -17967,6 +17967,15 @@
             "TriggerKycRequest": {
                 "type": "object",
                 "properties": {
+                    "fixture_result": {
+                        "description": "(only valid for sandbox users) choose the desired KYC outcome",
+                        "type": "string",
+                        "enum": [
+                            "fail",
+                            "pass",
+                            "manual_review"
+                        ]
+                    },
                     "onboarding_config_key": {
                         "type": "string"
                     }

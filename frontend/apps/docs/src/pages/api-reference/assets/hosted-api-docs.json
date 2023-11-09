@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "6e61fa6d6bc53ad0fdd6cdf229dcb48f218a8d11"
+        "version": "d9b0dae9660b5e4f8490675406df2bf8a06a308a"
     },
     "servers": [
         {
@@ -948,70 +948,6 @@
                 ]
             }
         },
-        "/hosted/user/biometric": {
-            "post": {
-                "tags": [
-                    "Passkey",
-                    "Hosted",
-                    "Deprecated"
-                ],
-                "description": "THIS API IS DEPRECATED.\n\nAccepts a response to a passkey registration challenge",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/WebauthnRegisterRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "User Token": []
-                    }
-                ]
-            }
-        },
-        "/hosted/user/biometric/init": {
-            "post": {
-                "tags": [
-                    "Passkey",
-                    "Hosted",
-                    "Deprecated"
-                ],
-                "description": "THIS API IS DEPRECATED.\n\nGenerates a passkey registration challenge",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/WebAuthnInitResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "User Token": []
-                    }
-                ]
-            }
-        },
         "/hosted/user/consent": {
             "post": {
                 "tags": [
@@ -1634,42 +1570,6 @@
                     },
                     {
                         "User Onboarding Token": []
-                    }
-                ]
-            }
-        },
-        "/org/onboarding_config": {
-            "get": {
-                "tags": [
-                    "Onboarding",
-                    "Hosted",
-                    "Deprecated"
-                ],
-                "description": "THIS API IS DEPRECATED.\n\nFetch an onboarding configuration",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PublicOnboardingConfiguration"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Onboarding Config Publishable Key": []
-                    },
-                    {
-                        "Onboarding Config Token": []
-                    },
-                    {
-                        "Business Owner Token": []
-                    },
-                    {
-                        "User Token": []
                     }
                 ]
             }
