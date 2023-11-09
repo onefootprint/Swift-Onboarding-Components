@@ -29,6 +29,7 @@ const initIframe = (rawProps: Props): Iframe => {
   let onRenderSecondary: OnRenderSecondary;
   const props = sanitizeAndValidateProps(rawProps);
   const { variant, containerId } = props;
+  const hasOverlay = variant === 'modal' || variant === 'drawer';
   const id = getUniqueId();
 
   const registerCallbackProps = () => {
@@ -45,7 +46,6 @@ const initIframe = (rawProps: Props): Iframe => {
   };
 
   const getOrCreateContainer = (): HTMLElement => {
-    const hasOverlay = variant === 'modal' || variant === 'drawer';
     if (hasOverlay) {
       return createOverlayContainer(id);
     }
@@ -54,7 +54,7 @@ const initIframe = (rawProps: Props): Iframe => {
     }
 
     // If rendering inline, find the client parent div
-    const clientParent = document.getElementById(id);
+    const clientParent = document.getElementById(containerId);
     if (!clientParent) {
       throw new Error(
         `Could not find container with id ${containerId} while rendering footprint`,
@@ -64,7 +64,6 @@ const initIframe = (rawProps: Props): Iframe => {
   };
 
   const setLoading = (container: HTMLElement, isLoading: boolean) => {
-    const hasOverlay = variant === 'modal' || variant === 'drawer';
     if (!isLoading) {
       removeLoader(id);
       child?.frame.classList.remove(`footprint-${variant}-loading`);
