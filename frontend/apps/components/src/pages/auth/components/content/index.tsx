@@ -1,3 +1,7 @@
+import type {
+  FootprintAuthDataProps,
+  FootprintVariant,
+} from '@onefootprint/footprint-js';
 import {
   FootprintComponentKind,
   FootprintPublicEvent,
@@ -14,6 +18,7 @@ import type { RequestError } from '@onefootprint/request';
 import { getErrorMessage } from '@onefootprint/request';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import { useConfirmationDialog } from '@onefootprint/ui';
+import { useRouter } from 'next/router';
 import type { ComponentProps } from 'react';
 import React, { useMemo, useState } from 'react';
 
@@ -23,7 +28,6 @@ import {
   useGetOnboardingConfigDuplicated,
   useOnboardingValidateDuplicated,
 } from '../../hooks';
-import type { FootprintAuthDataProps } from '../../types';
 import Layout from '../layout';
 import Notification from '../notification';
 
@@ -49,8 +53,10 @@ const getOnboardConfigurationKey = (key?: string): ObKeyHeader | undefined =>
 const Content = (): JSX.Element | null => {
   const [props, setProps] = useState<FootprintAuthDataProps>();
   useProps<FootprintAuthDataProps>(setProps);
+  const router = useRouter();
+  const variant = router.query.variant as FootprintVariant;
 
-  const { options = voidObj, userData, variant, publicKey } = props || voidObj;
+  const { options = voidObj, userData, publicKey } = props || voidObj;
   const footprintProvider = useFootprintProvider();
   const [device, setDevice] = useState<DeviceInfo>(initialDevice);
   const [isComplete, setIsComplete] = useState<boolean>(false);

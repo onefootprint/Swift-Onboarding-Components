@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 
-import type { FootprintRenderDataProps } from '../../types';
+import type { FootprintRenderDataProps } from '@onefootprint/footprint-js';
+
 import isValidDI from '../is-valid-di';
 
 const isObject = (obj: unknown) => typeof obj === 'object';

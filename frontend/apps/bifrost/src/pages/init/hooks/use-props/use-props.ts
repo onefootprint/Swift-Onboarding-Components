@@ -1,3 +1,4 @@
+import type { FootprintVerifyDataProps } from '@onefootprint/footprint-js';
 import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
 import { useFootprintProvider } from '@onefootprint/idv-elements';
 import noop from 'lodash/noop';
@@ -6,7 +7,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
 import useGetSdkArgs from '../hooks/use-get-sdk-args';
-import type { BifrostProps } from './types';
 import getMobilePropsFromUrl from './utils/get-mobile-props-from-url';
 import getPublicKeyFromUrl from './utils/get-public-key-from-url';
 
@@ -17,7 +17,7 @@ import getPublicKeyFromUrl from './utils/get-public-key-from-url';
 // TODO: delete when all customers migrate to v3.8.0+
 const POST_MESSAGE_TIMEOUT = 1000;
 
-const useProps = (onSuccess: (props: BifrostProps) => void) => {
+const useProps = (onSuccess: (props: FootprintVerifyDataProps) => void) => {
   const router = useRouter();
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(false); // whether iframe adapter has loaded
   const onSuccessCalled = useRef(false); // Whether on success has been called with props
@@ -25,7 +25,7 @@ const useProps = (onSuccess: (props: BifrostProps) => void) => {
   const sdkArgsQuery = useGetSdkArgs(authTokenFromUrl);
   const isSdkArgsLoading = authTokenFromUrl && sdkArgsQuery.isLoading;
 
-  const complete = (props: BifrostProps) => {
+  const complete = (props: FootprintVerifyDataProps) => {
     // If already received props, ignore
     if (onSuccessCalled.current) {
       return;
@@ -61,7 +61,7 @@ const useProps = (onSuccess: (props: BifrostProps) => void) => {
     }
 
     // See if we are running against a mobile SDK thta is sending data in URL fragment
-    const publicKeyFromUrl = getPublicKeyFromUrl(router.query);
+    const publicKeyFromUrl = getPublicKeyFromUrl(router.query) ?? '';
     const mobileProps = getMobilePropsFromUrl(router.asPath);
     if (mobileProps) {
       complete({
@@ -83,7 +83,7 @@ const useProps = (onSuccess: (props: BifrostProps) => void) => {
         clearTimeout(timerId.current);
         complete({
           publicKey: publicKeyFromUrl,
-          ...(props as BifrostProps),
+          ...(props as Partial<FootprintVerifyDataProps>),
         });
       },
     );

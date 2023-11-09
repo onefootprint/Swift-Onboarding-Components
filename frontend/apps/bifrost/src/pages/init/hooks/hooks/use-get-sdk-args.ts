@@ -1,14 +1,13 @@
+import type { FootprintVerifyDataProps } from '@onefootprint/footprint-js';
 import type { RequestError } from '@onefootprint/request';
 import request from '@onefootprint/request';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
-import type { BifrostProps } from '../use-props/types';
-
 type GetSdkArgsResponse = {
   args: {
     kind: string;
-    data: BifrostProps;
+    data: FootprintVerifyDataProps;
   };
   obConfig?: PublicOnboardingConfig;
 };

@@ -1,4 +1,5 @@
 import { useObserveCollector } from '@onefootprint/dev-tools';
+import type { FootprintVerifyDataProps } from '@onefootprint/footprint-js';
 import {
   InitShimmer,
   Logger,
@@ -14,7 +15,6 @@ import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 
 import useProps from './hooks/use-props';
-import type { BifrostProps } from './hooks/use-props/types';
 
 const Init = () => {
   const [state, send] = useBifrostMachine();
@@ -73,7 +73,7 @@ const Init = () => {
     );
   };
 
-  useProps((props: BifrostProps) => {
+  useProps((props: FootprintVerifyDataProps) => {
     if (isPropsSaved()) {
       return;
     }

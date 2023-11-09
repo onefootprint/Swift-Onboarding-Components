@@ -1,4 +1,4 @@
-import type { FootprintFormDataProps } from '../../types';
+import type { FootprintFormDataProps } from '@onefootprint/footprint-js';
 
 const isObject = (obj: unknown) => typeof obj === 'object';
 
@@ -10,7 +10,7 @@ const arePropsValid = (
     return false;
   }
 
-  const { authToken, title, variant } = props;
+  const { authToken, title } = props;
 
   const isAuthTokenValid = typeof authToken === 'string' && !!authToken;
   if (!isAuthTokenValid) console.error('Valid auth token is required.');
@@ -18,18 +18,7 @@ const arePropsValid = (
   const isTitleValid = typeof title === 'string' || title === undefined;
   if (!isTitleValid) console.error('Title must be a string or undefined.');
 
-  const isVariantValid =
-    variant === undefined ||
-    variant === 'inline' ||
-    variant === 'drawer' ||
-    variant === 'modal';
-  if (!isVariantValid)
-    console.error(
-      'Form variant has to be one of modal, drawer or inline, received: ',
-      variant,
-    );
-
-  return isAuthTokenValid && isTitleValid && isVariantValid;
+  return isAuthTokenValid && isTitleValid;
 };
 
 export default arePropsValid;

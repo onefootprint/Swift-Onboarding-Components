@@ -1,15 +1,19 @@
+import type {
+  FootprintFormDataProps,
+  FootprintVariant,
+} from '@onefootprint/footprint-js';
 import {
   FootprintPrivateEvent,
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
 import { getErrorMessage } from '@onefootprint/request';
+import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
 import { useFootprintProvider } from '../../../../components/footprint-provider';
 import useProps from '../../../../components/footprint-provider/hooks/use-props';
 import useClientTokenFields from '../../hooks/use-client-token-fields';
 import useUsersVault from '../../hooks/use-users-vault';
-import type { FootprintFormDataProps } from '../../types';
 import arePropsValid from '../../utils/are-props-valid';
 import checkIsExpired from '../../utils/check-is-expired';
 import convertFormData from '../../utils/convert-form-data';
@@ -23,8 +27,10 @@ const Content = () => {
   const footprintProvider = useFootprintProvider();
   const [props, setProps] = useState<FootprintFormDataProps>();
   useProps<FootprintFormDataProps>(setProps);
+  const router = useRouter();
+  const variant = router.query.variant as FootprintVariant;
 
-  const { authToken = '', title, variant, options = {} } = props || {};
+  const { authToken = '', title, options = {} } = props || {};
   const { hideFootprintLogo, hideButtons } = options;
   const usersVaultMutation = useUsersVault();
   const clientTokenFields = useClientTokenFields(authToken);

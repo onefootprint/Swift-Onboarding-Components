@@ -1,5 +1,5 @@
 import getCustomAppearance from '@onefootprint/appearance';
-import type { FootprintVerifyButtonProps } from '@onefootprint/footprint-js';
+import type { FootprintVerifyButtonDataProps } from '@onefootprint/footprint-js';
 import { FootprintPublicEvent } from '@onefootprint/footprint-js';
 import { FootprintButton } from '@onefootprint/ui';
 import type { GetServerSideProps } from 'next';
@@ -9,8 +9,8 @@ import { useFootprintProvider } from 'src/components/footprint-provider';
 import useProps from '../../components/footprint-provider/hooks/use-props';
 
 const VerifyButton = () => {
-  const [props, setProps] = useState<FootprintVerifyButtonProps>();
-  useProps<FootprintVerifyButtonProps>(setProps);
+  const [props, setProps] = useState<FootprintVerifyButtonDataProps>();
+  useProps<FootprintVerifyButtonDataProps>(setProps);
 
   const { label } = props || {};
   const footprintProvider = useFootprintProvider();
