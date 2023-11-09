@@ -31,6 +31,12 @@ jobs:
           - 5432:5432
     steps:
       - uses: actions/checkout@v3
+        # Default behavior of actions/checkout is horribly to check out a merge commit of the PR
+        # merged into master...
+        # This checks out the _actual_ commit in the PR
+        # https://github.com/actions/checkout/issues/504
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - uses: ./.github/actions/backend_run_local
         id: backend_run_local
@@ -43,6 +49,7 @@ jobs:
         working-directory: ./backend
         run: |
           set -x
+          git log HEAD -n 1
           curl http://localhost:8000/docs-spec-v3 | jq > ../head_open_api.json
           kill ${{ steps.backend_run_local.outputs.server_pid }}
 
@@ -70,12 +77,25 @@ jobs:
           - 5432:5432
     steps:
       - uses: actions/checkout@v3
+        # Default behavior of actions/checkout is horribly to check out a merge commit of the PR
+        # merged into master...
+        # This checks out the _actual_ commit in the PR
+        # https://github.com/actions/checkout/issues/504
         with:
-          ref: ${{ github.event.pull_request.base.ref }}
-      
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      # Don't compare the current open API against current master, compare it against the base of this PR.
+      # Otherwise, we'll see fake backwards incompatibilities with commits that have landed on master
+      # since this PR was created
       - id: get_merge_base
-        run: 
-          MERGE_BASE=$(git merge-base --fork-point ${{ github.event.pull_request.base.ref }})
+        name: Compute merge base
+        run: |
+          set -x
+          git log HEAD -n 1
+          MERGE_BASE=$(git merge-base ${{ github.event.pull_request.head.sha }} ${{ github.event.pull_request.base.sha }})
+          echo "Merge base $MERGE_BASE"
+          git log $MERGE_BASE -n 1
           echo "merge_base=$MERGE_BASE" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v3
@@ -93,6 +113,7 @@ jobs:
         working-directory: ./backend
         run: |
           set -x
+          git log HEAD -n 1
           curl http://localhost:8000/docs-spec-v3 | jq > ../base_open_api.json
           kill ${{ steps.backend_run_local.outputs.server_pid }}
 
