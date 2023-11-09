@@ -331,6 +331,8 @@ class BifrostClient:
 
     def handle_process(self, **kwargs):
         # Extract the fixture result from the sandbox_id
+        # Bifrost today no longer does this, just haven't updated the BifrostClient to pass
+        # fixture results in another way
         if self.sandbox_id is None:
             fixture_result = None
         elif self.sandbox_id.startswith("fail"):

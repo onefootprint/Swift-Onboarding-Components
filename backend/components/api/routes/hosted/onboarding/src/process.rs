@@ -30,6 +30,7 @@ use itertools::Itertools;
 use newtypes::OnboardingRequirement;
 use newtypes::RunIncodeStuckWorkflowArgs;
 use newtypes::TaskData;
+use newtypes::WorkflowFixtureResult;
 use newtypes::WorkflowId;
 use paperclip::actix::{self, api_v2_operation, web};
 
@@ -112,7 +113,7 @@ pub async fn post(
         }
     }
 
-    run_kyb_if_needed(&state, user_auth).await?;
+    run_kyb_if_needed(&state, user_auth, fixture_result).await?;
 
     ResponseData::ok(EmptyResponse {}).json()
 }
@@ -131,7 +132,11 @@ async fn enqueue_run_incode_stuck_workflow_task(db_pool: &DbPool, workflow_id: &
 }
 
 #[tracing::instrument(skip_all)]
-async fn run_kyb_if_needed(state: &State, user_auth: CheckUserWfAuthContext) -> ApiResult<()> {
+async fn run_kyb_if_needed(
+    state: &State,
+    user_auth: CheckUserWfAuthContext,
+    fixture_result: Option<WorkflowFixtureResult>,
+) -> ApiResult<()> {
     // Run KYB
     let tenant = user_auth.tenant().clone();
     let biz_wf = state
@@ -140,6 +145,13 @@ async fn run_kyb_if_needed(state: &State, user_auth: CheckUserWfAuthContext) -> 
         .await??;
 
     if let Some(biz_wf) = biz_wf {
+        if let Some(r) = fixture_result {
+            let wf_id = biz_wf.id.clone();
+            state
+                .db_pool
+                .db_transaction(move |conn| DbWorkflow::update_fixture_result(conn, &wf_id, r))
+                .await?;
+        }
         api_core::utils::kyb_utils::run_kyb(state, &tenant, biz_wf).await?;
     }
     Ok(())
