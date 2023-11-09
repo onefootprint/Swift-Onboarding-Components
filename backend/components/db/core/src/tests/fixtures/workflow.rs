@@ -25,6 +25,7 @@ pub fn create(
         insight_event: Some(CreateInsightEvent { ..Default::default() }),
         source: WorkflowSource::Hosted,
         fixture_result,
+        is_one_click: false,
     };
     let (wf, _) = Workflow::get_or_create_onboarding(conn, ff_client, args, false).unwrap();
     wf

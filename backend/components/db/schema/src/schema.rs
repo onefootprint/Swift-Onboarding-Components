@@ -1019,6 +1019,7 @@ table! {
         completed_at -> Nullable<Timestamptz>,
         deactivated_at -> Nullable<Timestamptz>,
         source -> Text,
+        is_one_click -> Bool,
     }
 }
 

@@ -1016,6 +1016,7 @@ async fn redo_and_pass(
                 insight_event_id: None,
                 authorized: false,
                 source: WorkflowSource::Hosted,
+                is_one_click: false,
             };
             Workflow::create(conn, args)
         })

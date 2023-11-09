@@ -64,6 +64,7 @@ impl<Type> TenantVw<Type> {
     /// NOTE: our notion of one-click will evolve... it should be playbook-aware so we know which
     /// fields are being one-clicked
     pub fn is_one_click(&self) -> bool {
+        // NOTE: be careful making changes to this. It affects implicit auth and authorization.
         self.populated_dis().into_iter().any(|di| {
             let Some(dl) = self.get_lifetime(di.clone()) else {
                 return true; // Shouldn't happen

@@ -50,16 +50,17 @@ pub fn get_or_start_onboarding(
         wf_id
     } else {
         let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, sv_id)?;
-        let auto_authorize = !vw.is_one_click();
+        let is_one_click = vw.is_one_click();
         // Create the workflow for this scoped user
         let ob_create_args = OnboardingWorkflowArgs {
             scoped_vault_id: sv_id.clone(),
             ob_configuration_id: obc.id.clone(),
             insight_event: insight_event.clone(),
             // If this isn't a one click from another tenant, we can immediately mark the WF as authorized
-            authorized: auto_authorize,
+            authorized: !is_one_click,
             source,
             fixture_result: None,
+            is_one_click,
         };
         let (wf, is_new_ob) =
             Workflow::get_or_create_onboarding(conn, ff_client.clone(), ob_create_args, force_create)?;
@@ -98,6 +99,7 @@ pub fn get_or_start_onboarding(
                 insight_event,
                 source,
                 fixture_result: None,
+                is_one_click: false,
             };
             let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ff_client, ob_create_args, false)?;
             biz_wf

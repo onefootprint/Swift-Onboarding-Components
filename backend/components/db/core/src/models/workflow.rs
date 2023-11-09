@@ -51,6 +51,10 @@ pub struct Workflow {
     /// The time at which the Wf is deactivated by creating a newer workflow for the scoped vault
     pub deactivated_at: Option<DateTime<Utc>>,
     pub source: WorkflowSource,
+    /// When true, there was existing data added by another tenant (or not decryptable).
+    /// This won't always be a full picture of a one-click onboarding - we might want to trac
+    /// which fields specificaly were prefilled
+    pub is_one_click: bool,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -67,6 +71,7 @@ pub struct NewWorkflow {
     pub insight_event_id: Option<InsightEventId>,
     pub authorized_at: Option<DateTime<Utc>>,
     pub source: WorkflowSource,
+    pub is_one_click: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -78,6 +83,7 @@ pub struct NewWorkflowArgs {
     pub insight_event_id: Option<InsightEventId>,
     pub authorized: bool,
     pub source: WorkflowSource,
+    pub is_one_click: bool,
 }
 
 #[derive(Debug, Default, AsChangeset)]
@@ -172,6 +178,7 @@ pub struct OnboardingWorkflowArgs {
     /// Only needs to be provided for workflows created by the tenant.
     /// Workflows created in bifrost will have the fixture result sent in POST /process
     pub fixture_result: Option<WorkflowFixtureResult>,
+    pub is_one_click: bool,
 }
 
 pub type IsNew = bool;
@@ -209,6 +216,7 @@ impl Workflow {
             authorized,
             source,
             fixture_result,
+            is_one_click,
         } = args;
 
         let sv = ScopedVault::lock(conn, &scoped_vault_id)?;
@@ -259,6 +267,7 @@ impl Workflow {
             authorized,
             insight_event_id,
             source,
+            is_one_click,
         };
         let wf = Self::create(conn, args)?;
 
@@ -285,6 +294,7 @@ impl Workflow {
             insight_event_id,
             authorized,
             source,
+            is_one_click,
         } = args;
         let kind = config.kind();
         let initial_state = match kind {
@@ -305,6 +315,7 @@ impl Workflow {
             insight_event_id,
             authorized_at: authorized.then_some(Utc::now()),
             source,
+            is_one_click,
         };
 
         Self::insert(conn, new_workflow)
@@ -679,6 +690,7 @@ mod tests {
                 insight_event_id: None,
                 authorized_at: None,
                 source: WorkflowSource::Unknown,
+                is_one_click: false,
             },
         )
         .unwrap();
@@ -705,6 +717,7 @@ mod tests {
                 insight_event_id: None,
                 authorized_at: None,
                 source: WorkflowSource::Unknown,
+                is_one_click: false,
             },
         )
         .unwrap();

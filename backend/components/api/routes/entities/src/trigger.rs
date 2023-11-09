@@ -103,6 +103,7 @@ pub async fn post(
                         // I'm going to get rid of this variant of the trigger API soon. Not worth
                         // differentiating and adding a new source for here
                         source: WorkflowSource::Unknown,
+                        is_one_click: false,
                     };
                     let wf = Workflow::create(conn, args)?;
                     let args = NewDocumentRequestArgs {
