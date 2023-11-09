@@ -73,6 +73,9 @@ pub async fn create_user_and_onboarding(
                 WorkflowSource::Hosted,
             )
             .unwrap();
+            if let Some(fixture_result) = kyc_fixture_result {
+                Workflow::update_fixture_result(conn, &wf_id, fixture_result).unwrap();
+            }
 
             // Mark the onboardings as authorized since they would be authorized in prod by the
             // time they're used here
@@ -90,6 +93,9 @@ pub async fn create_user_and_onboarding(
             if let Some(biz_wf) = biz_wf.as_ref() {
                 let sbv = ScopedVault::get(conn, &biz_wf.scoped_vault_id)?;
                 populate_business_vault(conn, &sbv.id);
+                if let Some(fixture_result) = kyc_fixture_result {
+                    Workflow::update_fixture_result(conn, &biz_wf.id, fixture_result).unwrap();
+                }
             }
 
             Ok((tenant, wf, uv, su, ob_config, biz_wf))

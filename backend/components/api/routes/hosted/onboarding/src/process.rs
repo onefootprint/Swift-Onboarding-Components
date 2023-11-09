@@ -46,12 +46,6 @@ pub async fn post(
     let user_auth = user_auth.check_guard(UserAuthGuard::SignUp)?;
     let fixture_result = request.into_inner().and_then(|r| r.fixture_result);
 
-    if fixture_result.is_none() && !user_auth.user().is_live {
-        // We'll soon start requiring the fixture_result for all sandbox results. Log here when
-        // it's not provided
-        tracing::error!("Fixture result not provided in /hosted/onboarding/process");
-    }
-
     // Verify there are no unmet requirements
     let reqs = api_core::utils::requirements::get_requirements_for_person_and_maybe_business(
         &state,

@@ -24,7 +24,8 @@ pub fn create(
         authorized: false,
         insight_event: Some(CreateInsightEvent { ..Default::default() }),
         source: WorkflowSource::Hosted,
+        fixture_result,
     };
-    let (wf, _) = Workflow::get_or_create_onboarding(conn, ff_client, args, fixture_result, false).unwrap();
+    let (wf, _) = Workflow::get_or_create_onboarding(conn, ff_client, args, false).unwrap();
     wf
 }

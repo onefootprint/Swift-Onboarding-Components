@@ -15,7 +15,7 @@ use db::{
 use feature_flag::FeatureFlagClient;
 use newtypes::{
     CollectedDataOption, EncryptedVaultPrivateKey, ObConfigurationKind, ScopedVaultId, Selfie, VaultId,
-    VaultKind, VaultPublicKey, WorkflowFixtureResult, WorkflowId, WorkflowSource,
+    VaultKind, VaultPublicKey, WorkflowId, WorkflowSource,
 };
 
 use crate::errors::{onboarding::OnboardingError, ApiResult};
@@ -42,8 +42,6 @@ pub fn get_or_start_onboarding(
     source: WorkflowSource,
 ) -> ApiResult<(WorkflowId, Option<Workflow>)> {
     let user_vault = Vault::lock(conn, v_id)?;
-    // TODO rm this when fixture result is passed in process
-    let fixture_result = WorkflowFixtureResult::from_sandbox_id(user_vault.sandbox_id.as_ref());
     if obc.kind == ObConfigurationKind::Auth {
         return Err(OnboardingError::CannotOnboardOntoAuthPlaybook.into());
     }
@@ -67,14 +65,10 @@ pub fn get_or_start_onboarding(
             // If all visible data was added by this tenant, we can immediately mark the Workflow as authorized.
             authorized: is_all_visible_data_added_by_tenant,
             source,
+            fixture_result: None,
         };
-        let (wf, is_new_ob) = Workflow::get_or_create_onboarding(
-            conn,
-            ff_client.clone(),
-            ob_create_args,
-            fixture_result,
-            force_create,
-        )?;
+        let (wf, is_new_ob) =
+            Workflow::get_or_create_onboarding(conn, ff_client.clone(), ob_create_args, force_create)?;
         if is_new_ob {
             create_doc_request_if_needed(conn, &wf, obc)?;
         }
@@ -109,9 +103,9 @@ pub fn get_or_start_onboarding(
                 authorized: true,
                 insight_event,
                 source,
+                fixture_result: None,
             };
-            let (biz_wf, _) =
-                Workflow::get_or_create_onboarding(conn, ff_client, ob_create_args, fixture_result, false)?;
+            let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ff_client, ob_create_args, false)?;
             biz_wf
         };
         Some(biz_wf)

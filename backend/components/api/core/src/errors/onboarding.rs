@@ -53,11 +53,11 @@ pub enum OnboardingError {
     UnsupportedDocumentCountryForDocumentType(Csv<Iso3166TwoDigitCountryCode>),
     #[error("Unsupported document type. Supported document types: {0}")]
     UnsupportedDocumentType(Csv<IdDocKind>),
-    #[error("Cannot create a fixture result for a non-sandbox Vault")]
+    #[error("Cannot use a fixture result for a non-sandbox Vault")]
     CannotCreateFixtureResultForNonSandbox,
     #[error("User not allowed to set fixture_result=Real")]
     RealDocumentFixtureNotAllowed,
-    #[error("Sandbox vaults must have a fixture result")]
+    #[error("Sandbox vaults must have a fixture_result provided")]
     NoFixtureResultForSandboxUser,
     #[error("Workflow doesn't have an associated onboarding config")]
     NoObcForWorkflow,

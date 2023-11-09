@@ -7310,6 +7310,7 @@
                 "type": "object",
                 "properties": {
                     "fixture_result": {
+                        "description": "(only valid for sandbox businesses) choose the desired KYB outcome",
                         "type": "string",
                         "enum": [
                             "fail",
@@ -7328,6 +7329,15 @@
             "TriggerKycRequest": {
                 "type": "object",
                 "properties": {
+                    "fixture_result": {
+                        "description": "(only valid for sandbox users) choose the desired KYC outcome",
+                        "type": "string",
+                        "enum": [
+                            "fail",
+                            "pass",
+                            "manual_review"
+                        ]
+                    },
                     "onboarding_config_key": {
                         "type": "string"
                     }

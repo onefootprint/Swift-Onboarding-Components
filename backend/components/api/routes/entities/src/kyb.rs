@@ -112,9 +112,9 @@ pub async fn post(
                 authorized: true,
                 insight_event: None,
                 source: WorkflowSource::Tenant,
+                fixture_result,
             };
-            let (biz_wf, _) =
-                Workflow::get_or_create_onboarding(conn, ff_client, ob_create_args, fixture_result, false)?;
+            let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ff_client, ob_create_args, false)?;
 
             // Check requirements for this Business vault w.r.t the OBC
             let reqs = api_core::utils::requirements::get_requirements_inner(

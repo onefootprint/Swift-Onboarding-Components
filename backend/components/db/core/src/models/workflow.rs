@@ -61,7 +61,6 @@ pub struct NewWorkflow {
     pub kind: WorkflowKind,
     pub state: WorkflowState,
     pub config: WorkflowConfig,
-    // One day we'll get rid of this
     pub fixture_result: Option<WorkflowFixtureResult>,
     pub status: Option<OnboardingStatus>,
     pub ob_configuration_id: Option<ObConfigurationId>,
@@ -74,7 +73,6 @@ pub struct NewWorkflow {
 pub struct NewWorkflowArgs {
     pub scoped_vault_id: ScopedVaultId,
     pub config: WorkflowConfig,
-    // One day we'll get rid of this
     pub fixture_result: Option<WorkflowFixtureResult>,
     pub ob_configuration_id: Option<ObConfigurationId>,
     pub insight_event_id: Option<InsightEventId>,
@@ -171,6 +169,9 @@ pub struct OnboardingWorkflowArgs {
     pub insight_event: Option<CreateInsightEvent>,
     pub authorized: bool,
     pub source: WorkflowSource,
+    /// Only needs to be provided for workflows created by the tenant.
+    /// Workflows created in bifrost will have the fixture result sent in POST /process
+    pub fixture_result: Option<WorkflowFixtureResult>,
 }
 
 pub type IsNew = bool;
@@ -199,7 +200,6 @@ impl Workflow {
         conn: &mut TxnPgConn,
         _ff_client: Arc<dyn FeatureFlagClient>,
         args: OnboardingWorkflowArgs,
-        fixture_result: Option<WorkflowFixtureResult>,
         force_create: bool,
     ) -> DbResult<(Self, IsNew)> {
         let OnboardingWorkflowArgs {
@@ -208,6 +208,7 @@ impl Workflow {
             insight_event,
             authorized,
             source,
+            fixture_result,
         } = args;
 
         let sv = ScopedVault::lock(conn, &scoped_vault_id)?;

@@ -12,22 +12,24 @@ pub struct TriggerRequest {
 #[serde(rename_all = "snake_case")]
 pub struct TriggerKycRequest {
     pub onboarding_config_key: ObConfigurationKey,
+    /// (only valid for sandbox users) choose the desired KYC outcome
+    pub fixture_result: Option<SimpleFixtureResult>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Deserialize, Apiv2Schema, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
-pub enum KybFixture {
+pub enum SimpleFixtureResult {
     Fail,
     Pass,
     ManualReview,
 }
 
-impl From<KybFixture> for WorkflowFixtureResult {
-    fn from(value: KybFixture) -> Self {
+impl From<SimpleFixtureResult> for WorkflowFixtureResult {
+    fn from(value: SimpleFixtureResult) -> Self {
         match value {
-            KybFixture::Fail => WorkflowFixtureResult::Fail,
-            KybFixture::Pass => WorkflowFixtureResult::Pass,
-            KybFixture::ManualReview => WorkflowFixtureResult::ManualReview,
+            SimpleFixtureResult::Fail => WorkflowFixtureResult::Fail,
+            SimpleFixtureResult::Pass => WorkflowFixtureResult::Pass,
+            SimpleFixtureResult::ManualReview => WorkflowFixtureResult::ManualReview,
         }
     }
 }
@@ -36,5 +38,6 @@ impl From<KybFixture> for WorkflowFixtureResult {
 #[serde(rename_all = "snake_case")]
 pub struct TriggerKybRequest {
     pub onboarding_config_key: ObConfigurationKey,
-    pub fixture_result: Option<KybFixture>,
+    /// (only valid for sandbox businesses) choose the desired KYB outcome
+    pub fixture_result: Option<SimpleFixtureResult>,
 }

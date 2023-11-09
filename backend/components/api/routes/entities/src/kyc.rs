@@ -20,6 +20,7 @@ use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
 use api_wire_types::EntityValidateResponse;
+use api_wire_types::SimpleFixtureResult;
 use api_wire_types::TriggerKycRequest;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::manual_review::ManualReview;
@@ -57,7 +58,18 @@ pub async fn post(
     let fp_id = fp_id.into_inner();
     let TriggerKycRequest {
         onboarding_config_key,
+        fixture_result,
     } = request.into_inner();
+    if fixture_result.is_some() && is_live {
+        return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
+    }
+    let fixture_result = if fixture_result.is_none() && !is_live {
+        // Eventually error here, but apiture was doing some POC testing and they weren't providing
+        // a fixture result
+        Some(SimpleFixtureResult::Pass)
+    } else {
+        fixture_result
+    };
 
     let (uvw, sv) = state
         .db_pool
@@ -117,6 +129,9 @@ pub async fn post(
                 None, // currently dont support KYB for NPV
                 WorkflowSource::Tenant,
             )?;
+            if let Some(fixture_result) = fixture_result {
+                Workflow::update_fixture_result(conn, &wf_id, fixture_result.into())?;
+            }
 
             // TODO: consolidate with /authorize code
             let wf = Workflow::lock(conn, &wf_id)?;

@@ -47,11 +47,16 @@ pub fn get_fixture_data_decision(
 ) -> ApiResult<Option<FixtureDecision>> {
     let is_demo_tenant = ff_client.flag(BoolFlag::IsDemoTenant(tenant_id));
     if !vault.is_live {
-        let fixture_result = workflow
-            .fixture_result
-            // Ensure that each sandbox vault has a fixture result - we don't want to make real
-            // requests for sandbox vaults
-            .ok_or(OnboardingError::NoFixtureResultForSandboxUser)?;
+        // Ensure that each sandbox vault has a fixture result - we don't want to make real
+        // requests for sandbox vaults
+        let fixture_result = if let Some(r) = workflow.fixture_result {
+            r
+        } else {
+            // TODO error here with OnboardingError::NoFixtureResultForSandboxUser.
+            // Temporarily setting this to Pass until the frontend allows choosing result on auth flows
+            tracing::error!("No fixture result provided");
+            WorkflowFixtureResult::Pass
+        };
         let fixture_decision = decision_status(fixture_result);
         return Ok(Some(fixture_decision));
     }
@@ -69,11 +74,16 @@ pub fn get_fixture_data_decision(
 
 pub fn should_execute_rules_for_document_only(vault: &Vault, workflow: &Workflow) -> ApiResult<bool> {
     if !vault.is_live {
-        let fixture_result = workflow
-            .fixture_result
-            // Ensure that each sandbox vault has a fixture result - we don't want to make real
-            // requests for sandbox vaults
-            .ok_or(OnboardingError::NoFixtureResultForSandboxUser)?;
+        // Ensure that each sandbox vault has a fixture result - we don't want to make real
+        // requests for sandbox vaults
+        let fixture_result = if let Some(r) = workflow.fixture_result {
+            r
+        } else {
+            // TODO error here with OnboardingError::NoFixtureResultForSandboxUser.
+            // Temporarily setting this to Pass until the frontend allows choosing result on auth flows
+            tracing::error!("No fixture result provided");
+            WorkflowFixtureResult::Pass
+        };
         Ok(matches!(fixture_result, WorkflowFixtureResult::DocumentDecision))
     } else {
         // TODO based on OBC
