@@ -14,7 +14,13 @@ use strum_macros::{Display, EnumDiscriminants};
 
 use crate::errors::{ApiResult, ValidationError};
 
-pub type VerifyV1UserData = HashMap<DataIdentifier, PiiJsonValue>;
+pub type UserDataV1 = HashMap<DataIdentifier, PiiJsonValue>;
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
+pub struct L10nV1 {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub locale: Option<String>,
+}
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
 pub struct VerifyV1Options {
@@ -25,21 +31,53 @@ pub struct VerifyV1Options {
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
-pub struct L10nV1 {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub locale: Option<String>,
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
 pub struct VerifyV1SdkArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub auth_token: Option<PiiString>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub public_key: Option<ObConfigurationKey>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_data: Option<VerifyV1UserData>,
+    pub user_data: Option<UserDataV1>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<VerifyV1Options>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub l10n: Option<L10nV1>,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
+pub struct AuthV1Options {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub show_logo: Option<bool>,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
+pub struct AuthV1SdkArgs {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub public_key: Option<ObConfigurationKey>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub user_data: Option<UserDataV1>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub options: Option<AuthV1Options>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub l10n: Option<L10nV1>,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
+pub struct FormV1Options {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hide_buttons: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hide_footprint_logo: Option<bool>,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
+pub struct FormV1SdkArgs {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auth_token: Option<PiiString>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub options: Option<FormV1Options>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub l10n: Option<L10nV1>,
 }
@@ -69,6 +107,44 @@ impl VerifyV1SdkArgs {
     }
 }
 
+impl AuthV1SdkArgs {
+    pub fn validate(&self) -> ApiResult<()> {
+        if self.public_key.is_none() {
+            return Err(ValidationError("Public key must be provided").into());
+        }
+        Ok(())
+    }
+
+    pub fn ob_config(&self, conn: &mut PgConn) -> ApiResult<Option<ObConfigInfo>> {
+        let obc = if let Some(key) = self.public_key.as_ref() {
+            let (obc, tenant) = ObConfiguration::get_enabled(conn, key)?;
+            let appearance = if let Some(appearance_id) = obc.appearance_id.as_ref() {
+                Some(Appearance::get(conn, appearance_id, &tenant.id)?)
+            } else {
+                None
+            };
+            let client_config = TenantClientConfig::get(conn, &tenant.id, obc.is_live)?;
+            Some((obc, tenant, client_config, appearance))
+        } else {
+            None
+        };
+        Ok(obc)
+    }
+}
+
+impl FormV1SdkArgs {
+    pub fn validate(&self) -> ApiResult<()> {
+        if self.auth_token.is_none() {
+            return Err(ValidationError("Auth token must be provided").into());
+        }
+        Ok(())
+    }
+
+    pub fn ob_config(&self, _: &mut PgConn) -> ApiResult<Option<ObConfigInfo>> {
+        Ok(None)
+    }
+}
+
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema, EnumDiscriminants)]
 #[strum_discriminants(name(SdkArgsKind))]
 #[strum_discriminants(derive(Display))]
@@ -82,6 +158,8 @@ impl VerifyV1SdkArgs {
 /// enum variant.
 pub enum SdkArgs {
     VerifyV1(VerifyV1SdkArgs),
+    FormV1(FormV1SdkArgs),
+    AuthV1(AuthV1SdkArgs),
 }
 
 /// This structure is stored encrypted inside the session table
@@ -104,6 +182,8 @@ impl SdkArgs {
     pub fn validate(&self) -> ApiResult<()> {
         match self {
             Self::VerifyV1(args) => args.validate()?,
+            Self::FormV1(args) => args.validate()?,
+            Self::AuthV1(args) => args.validate()?,
         }
         Ok(())
     }
@@ -111,6 +191,8 @@ impl SdkArgs {
     pub fn ob_config(&self, conn: &mut PgConn) -> ApiResult<Option<ObConfigInfo>> {
         match self {
             Self::VerifyV1(args) => args.ob_config(conn),
+            Self::FormV1(args) => args.ob_config(conn),
+            Self::AuthV1(args) => args.ob_config(conn),
         }
     }
 }
@@ -125,6 +207,12 @@ mod test {
     #[test_case(json!({"kind": "verify_v1", "data": {"auth_token": "tok_1234", "public_key": "ob_1234", "user_data": {"id.first_name": "Hayes", "id.citizenships": ["US", "NO"], "id.state": "Invalid"}, "options": {"show_completion_page": true, "show_logo": false}, "l10n": {"locale": "en-US"}}}))]
     #[test_case(json!({"kind": "verify_v1", "data": {"auth_token": "tok_1234"}}))]
     #[test_case(json!({"kind": "verify_v1", "data": {"public_key": "ob_1234", "user_data": {"id.first_name": "Hayes"}, "options": {"show_logo": false}}}))]
+    #[test_case(json!({"kind": "form_v1", "data": {"auth_token": "tok_1234", "title": "My Form", "options": {"hide_buttons": true, "hide_footprint_logo": true}, "l10n": {"locale": "en-US"}}}))]
+    #[test_case(json!({"kind": "form_v1", "data": {"auth_token": "tok_1234"}}))]
+    #[test_case(json!({"kind": "auth_v1", "data": {"public_key": "ob_1234", "options": {"show_logo": false}}}))]
+    #[test_case(json!({"kind": "auth_v1", "data": {"public_key": "ob_1234", "user_data": {"id.first_name": "Hayes"}, "options": {"show_logo": false}}}))]
+    #[test_case(json!({"kind": "auth_v1", "data": {"public_key": "ob_1234", "user_data": {"id.first_name": "Hayes"}}}))]
+    #[test_case(json!({"kind": "auth_v1", "data": {"public_key": "ob_1234"}}))]
     fn test_backcompat(value: serde_json::Value) {
         let args: SdkArgs = serde_json::value::from_value(value.clone()).unwrap();
         args.validate().unwrap();
