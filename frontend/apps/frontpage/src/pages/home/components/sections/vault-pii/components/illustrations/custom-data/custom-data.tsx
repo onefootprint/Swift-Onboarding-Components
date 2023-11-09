@@ -45,7 +45,7 @@ const Container = styled.div`
     background-repeat: repeat;
     background-size: contain;
     background-position: center;
-    opacity: 0.02;
+    opacity: 0.01;
   }
 `;
 

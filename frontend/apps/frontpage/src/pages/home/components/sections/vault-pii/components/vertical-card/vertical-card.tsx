@@ -89,15 +89,15 @@ const ImageContainer = styled.div<{ hideFadeOutMask?: boolean }>`
     display: flex;
     position: relative;
     z-index: 1;
+    background: radial-gradient(
+      80% 50% at 50% 40%,
+      ${primitives.Gray1000} 0%,
+      transparent 100%
+    );
     mask: ${hideFadeOutMask
       ? `linear-gradient(180deg, white 90%, transparent 95%)`
       : `linear-gradient(180deg, white 75%, transparent 100%)`};
     mask-mode: alpha;
-    background: radial-gradient(
-      100% 100% at 100% 30%,
-      rgba(${primitives.Gray900}, 0.2) 0%,
-      transparent 100%
-    );
   `}
 `;
 

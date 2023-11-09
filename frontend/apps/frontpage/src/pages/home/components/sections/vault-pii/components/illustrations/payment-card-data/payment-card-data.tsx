@@ -44,7 +44,7 @@ const Container = styled.div`
     background-repeat: repeat;
     background-size: contain;
     background-position: center;
-    opacity: 0.03;
+    opacity: 0.01;
     z-index: 1;
   }
 `;
@@ -52,7 +52,7 @@ const Container = styled.div`
 const CenterImage = styled.div`
   position: absolute;
   z-index: 2;
-  bottom: 16px;
+  top: 72px;
   left: 50%;
   transform: translate(-50%, 0%);
   width: 90%;
@@ -66,11 +66,13 @@ const CenterImage = styled.div`
   ${media.greaterThan('sm')`
     height: 251px;
     width: 497px;
+    bottom: 16px;
+    top: auto;
   `}
 `;
 
 const LeftImage = styled(Image)`
-  opacity: 0.02;
+  opacity: 0.012;
   object-fit: cover;
   z-index: 1;
   right: 0;

@@ -84,10 +84,9 @@ const TextContainer = styled.div`
 
     ${media.greaterThan('md')`
       padding: ${theme.spacing[10]};
-      background-blend-mode: multiply;
       background: radial-gradient(
           60% 100% at 50% 50%,
-          ${primitives.Gray800} 0%,
+          ${primitives.Gray850} 0%,
           transparent 100%
         );
     `}
