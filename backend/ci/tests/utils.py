@@ -21,7 +21,7 @@ from datetime import datetime, timedelta
 
 
 SERVER_VERSION_HEADER = "x-footprint-server-version"
-INTERGRATION_TESTS_DEFAULT_HEADER = {"x-fp-integration-test": "true"}
+IT_DEFAULT_HEADERS = {"x-fp-integration-test": "true"}
 EXPECTED_SERVER_VERSION_GIT_HASH = os.environ.get("EXPECTED_SERVER_VERSION", None)
 
 
@@ -74,8 +74,17 @@ def _make_request(
     addl_headers=None,
     raw_data=None,
 ):
-    headers = {auth.HEADER_NAME: auth.value for auth in auths}
-    headers = {**headers, **(addl_headers or {}), **INTERGRATION_TESTS_DEFAULT_HEADER}
+    test_name = os.environ.get("PYTEST_CURRENT_TEST")
+    # A bit of an abuse, but use our own custom user-agent header that send the name of the
+    # running test. Helps to debug which test caused an error log
+    IT_DYNAMIC_HEADERS = {"user-agent": f"Footprint Integration Tests: {test_name}"}
+    auth_headers = {auth.HEADER_NAME: auth.value for auth in auths}
+    headers = {
+        **auth_headers,
+        **(addl_headers or {}),
+        **IT_DEFAULT_HEADERS,
+        **IT_DYNAMIC_HEADERS,
+    }
     response = method(
         url(path), headers=headers, json=data, data=raw_data, params=params, files=files
     )
