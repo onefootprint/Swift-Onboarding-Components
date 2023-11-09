@@ -7,6 +7,7 @@ import type {
   useOpenCv,
 } from 'opencv-react-ts';
 
+import Logger from '../../../../../../utils/logger';
 import type { ParamsType } from './params';
 
 export type OpenCVType = Exclude<
@@ -327,14 +328,25 @@ export const getCardCaptureStatus = (
   if (!loaded) return { status: CardCaptureStatus.detecting, paramIndex: -1 }; // If (until) opencv is not initialized, we don't do anything and rely of manual capture fallback
   if (imgSrc.width === 0 || imgSrc.height === 0)
     return { status: CardCaptureStatus.detecting, paramIndex: -1 };
-  const src = cv.imread(imgSrc);
-  return detectCardStatus(
-    cv,
-    src,
-    imgSrc.width,
-    imgSrc.height,
-    params,
-    startParamIndex,
-    batchSize,
-  );
+
+  // In order to avoid unexpected opencv related errors, we wrap the whole detection process in try-catch
+  // If we catch an error, we return detecting status so that the user can move on to manual capture
+  // We still log the error so that we can investigate it later
+  try {
+    const src = cv.imread(imgSrc);
+    return detectCardStatus(
+      cv,
+      src,
+      imgSrc.width,
+      imgSrc.height,
+      params,
+      startParamIndex,
+      batchSize,
+    );
+  } catch (err) {
+    Logger.error(
+      `Error in getCardCaptureStatus. Passed image width ${imgSrc.width}, image height ${imgSrc.height}. Error ${err}. Returning "detecting" status so that the user can move on with the flow and manually capture the card.`,
+    );
+    return { status: CardCaptureStatus.detecting, paramIndex: -1 };
+  }
 };
