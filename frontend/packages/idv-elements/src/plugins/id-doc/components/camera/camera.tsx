@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import type { IdDocImageTypes } from '@onefootprint/types';
+import type { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 import { LoadingIndicator, media } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
 import { useCountdown, useTimeout } from 'usehooks-ts';
@@ -8,6 +8,7 @@ import { useCountdown, useTimeout } from 'usehooks-ts';
 import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
 import Logger from '../../../../utils/logger';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
+import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import {
   AUTOCAPTURE_RESTART_DELAY,
   AUTOCAPTURE_START_DELAY,
@@ -41,6 +42,7 @@ type CameraProps = {
   autocaptureKind: AutocaptureKind;
   deviceKind: DeviceKind;
   imageType: IdDocImageTypes;
+  docType?: SupportedIdDocTypes;
 };
 
 const Camera = ({
@@ -52,6 +54,7 @@ const Camera = ({
   autocaptureKind,
   deviceKind,
   imageType,
+  docType,
 }: CameraProps) => {
   const { t } = useTranslation('components.camera');
   const canvasRefAutoCapture = useRef<HTMLCanvasElement>();
@@ -300,6 +303,7 @@ const Camera = ({
                     `autocapture.feedback.${autocaptureKind}.${autocaptureFeedback}`,
                     {
                       side: imageType,
+                      documentType: docType ? IdDocTypeToLabel[docType] : '',
                     },
                   )}
                 </Feedback>

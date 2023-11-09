@@ -55,7 +55,10 @@ const PhotoCapture = ({
   imageType,
 }: PhotoCaptureProps) => {
   const [state, send] = useIdDocMachine();
-  const { hasBadConnectivity } = state.context;
+  const {
+    hasBadConnectivity,
+    idDoc: { type: docType },
+  } = state.context;
   const [image, setImage] = useState<string | null>(null);
   const { processImageUrl } = useProcessImage();
   const [isLoading, setIsLoading] = useState(false);
@@ -199,6 +202,7 @@ const PhotoCapture = ({
         autocaptureKind={autocaptureKind}
         deviceKind={deviceKind}
         imageType={imageType}
+        docType={docType}
       />
       <Instructions
         onClose={() => setShowInstructions(false)}

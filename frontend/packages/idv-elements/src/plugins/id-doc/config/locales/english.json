@@ -186,7 +186,7 @@
           },
           "document": {
             "ok": "Hold still...",
-            "detecting": " Scan the {{side, allCaps}} of your driver's license",
+            "detecting": " Scan the {{side, allCaps}} of your {{documentType}}",
             "blurry": "Image is blurry, find better lighting or move your camera"
           }
         }
