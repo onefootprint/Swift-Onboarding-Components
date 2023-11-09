@@ -50,20 +50,14 @@ pub fn get_or_start_onboarding(
         wf_id
     } else {
         let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, sv_id)?;
-        let is_all_visible_data_added_by_tenant = vw.populated_dis().into_iter().all(|di| {
-            let Some(dl) = vw.get_lifetime(di.clone()) else {
-                return false; // Shouldn't happen
-            };
-            // Data must be added by tenant AND already decryptable
-            &dl.scoped_vault_id == sv_id && vw.can_decrypt(di)
-        });
+        let auto_authorize = !vw.is_one_click();
         // Create the workflow for this scoped user
         let ob_create_args = OnboardingWorkflowArgs {
             scoped_vault_id: sv_id.clone(),
             ob_configuration_id: obc.id.clone(),
             insight_event: insight_event.clone(),
-            // If all visible data was added by this tenant, we can immediately mark the Workflow as authorized.
-            authorized: is_all_visible_data_added_by_tenant,
+            // If this isn't a one click from another tenant, we can immediately mark the WF as authorized
+            authorized: auto_authorize,
             source,
             fixture_result: None,
         };

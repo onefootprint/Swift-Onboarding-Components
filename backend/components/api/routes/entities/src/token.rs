@@ -12,6 +12,9 @@ use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
 use api_core::utils::actix::OptionalJson;
 use api_core::utils::session::AuthSession;
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::TenantVw;
+use api_core::utils::vault_wrapper::VaultWrapper;
 use api_wire_types::CreateTokenRequest;
 use api_wire_types::CreateTokenResponse;
 use chrono::Duration;
@@ -94,7 +97,27 @@ pub async fn post(
                 .create(conn)?;
             }
 
-            let events = AuthEvent::list_recent(conn, &sv.id)?;
+            // Don't allow inheriting auth if the user was one-clicking from another tenant.
+            // This notably makes the experience worse for users who are one-clicking onto a tenant
+            // who uses us for both auth and verify.
+            // The problem is user-specific tokens in one-click scenarios have more permissions
+            // than the tenant (since we're prefilling info that was added by other tenants).
+            // Tenant who use us for auth AND verify get to see a user-specific token - so we have
+            // to disallow them from using that token to see information they don't have permission
+            // to see.
+            // In the future, we will try to improve that experience by having the auth component
+            // leave a token inside domain-scoped local storage in the browser. The tenant will
+            // never see this intermediate token. The verify component can pick this up as proof
+            // that the user authed directly with Footprint, and this will be used to step up the
+            // token to have permissions to see one-click prefill data.
+            let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
+            let can_inherit_implied_auth = !vw.is_one_click();
+
+            let events = if can_inherit_implied_auth {
+                AuthEvent::list_recent(conn, &sv.id)?
+            } else {
+                vec![]
+            };
             let kinds = events.iter().map(|e| e.kind).collect();
             // Request Onboarding scopes, but if the user hasn't authed to the tenant recently, we
             // will be granted no scopes and the user will be required to re-auth
@@ -104,7 +127,7 @@ pub async fn post(
                 su_id: Some(sv.id),
                 obc_id,
                 is_from_api: true,
-                is_implied_auth: true,
+                is_implied_auth: can_inherit_implied_auth,
                 ..Default::default()
             };
             let event_ids = events.into_iter().map(|e| e.id).collect();

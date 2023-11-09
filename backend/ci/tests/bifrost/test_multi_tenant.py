@@ -1,11 +1,8 @@
 from typing import NamedTuple
 import pytest
-from tests.utils import (
-    get,
-    patch,
-    post,
-)
+from tests.utils import get, patch, post
 from tests.bifrost_client import BifrostClient
+from tests.headers import FpAuth
 
 
 class DualOnboardedUser(NamedTuple):
@@ -28,15 +25,33 @@ def dual_onboarded_user(sandbox_user_real_phone, foo_sandbox_tenant, twilio):
         foo_sandbox_tenant.default_ob_config, twilio, phone_number, sandbox_id
     )
 
-    foo_user = foo_bifrost.run()
-    foo_fp_id = foo_user.fp_id
+    # Before the user finishes onboarding to foo_sandbox_tenant, the tenant shouldn't be able to
+    # make a token that inherits auth
+    body = get("/entities", None, *foo_sandbox_tenant.db_auths)
+    user = next(i for i in body["data"] if i["sandbox_id"] == sandbox_id)
+    assert user["status"] == "in_progress"
+    foo_fp_id = user["id"]
 
+    def get_scopes():
+        body = post(f"users/{foo_fp_id}/token", None, foo_sandbox_tenant.sk.key)
+        auth_token = FpAuth(body["token"])
+        body = get("hosted/user/token", None, auth_token)
+        return body["scopes"]
+
+    # Should have no scopes because auth can't be inherited
+    assert not get_scopes()
+
+    foo_user = foo_bifrost.run()
+    assert foo_user.fp_id == foo_fp_id
     assert [i["kind"] for i in foo_bifrost.handled_requirements] == [
         "authorize",  # Should have authorize here because it's a one-click at another tenant
         "process",
     ]
-
     assert [i["kind"] for i in foo_bifrost.already_met_requirements] == ["collect_data"]
+
+    # Even after running bifrost, we shouldn't be able to make a token with scopes because
+    # foo_tenant's playbook collects less than sandbox_tenant's
+    assert not get_scopes()
 
     return DualOnboardedUser(fp_id, foo_fp_id, sandbox_user_real_phone)
 
