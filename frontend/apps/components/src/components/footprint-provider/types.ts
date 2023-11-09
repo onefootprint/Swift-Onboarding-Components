@@ -1,3 +1,5 @@
+export type FootprintClientGenerator = () => FootprintClient;
+
 export type FootprintClient = {
   load: () => Promise<void>;
   send: (name: string, data?: unknown) => void;
