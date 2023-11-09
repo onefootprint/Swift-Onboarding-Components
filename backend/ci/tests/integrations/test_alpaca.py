@@ -170,7 +170,6 @@ def test_alpaca_cip(
 
     # Create Alpaca Account
     create_account_data = {
-        "fp_user_id": user.fp_id,
         "api_key": ALPACA_SANDBOX_API_KEY,
         "api_secret": ALPACA_SANDBOX_API_SECRET,
         "hostname": "broker-api.sandbox.alpaca.markets",
@@ -187,7 +186,9 @@ def test_alpaca_cip(
     }
 
     create_account_res = post(
-        "integrations/alpaca/account", create_account_data, sandbox_tenant.sk.key
+        f"users/{user.fp_id}/integrations/alpaca/account",
+        create_account_data,
+        sandbox_tenant.sk.key,
     )
     assert create_account_res["status_code"] == 200
     alpaca_response = create_account_res["alpaca_response"]
@@ -212,7 +213,6 @@ def test_alpaca_cip(
 
     # alpaca request
     alpaca_data = {
-        "fp_user_id": user.fp_id,
         "api_key": ALPACA_SANDBOX_API_KEY,
         "api_secret": ALPACA_SANDBOX_API_SECRET,
         "hostname": "broker-api.sandbox.alpaca.markets",
@@ -223,7 +223,7 @@ def test_alpaca_cip(
 
     # send cip
     body = post(
-        "integrations/alpaca/cip",
+        f"users/{user.fp_id}/integrations/alpaca/cip",
         alpaca_data,
         sandbox_tenant.sk.key,
         status_code=200 if expected_error is None else 400,
