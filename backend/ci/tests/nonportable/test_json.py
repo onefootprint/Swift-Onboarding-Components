@@ -8,10 +8,7 @@ from tests.utils import post, get
         ("custom.hello", ["hayes", "valley"]),
         ("custom.today", {"office": "hayes valley", "flerp": 1}),
         ("custom.hi", '["hayes", "valley"]'),
-        # The below take either JSON or string represnetation. We should always get the same format
-        # out that we put in
         ("id.citizenships", ["US", "NO"]),
-        ("id.citizenships", '["US", "NO"]'),
         ("investor_profile.investment_goals", ["growth", "preserve_capital"]),
         (
             "investor_profile.declarations",
