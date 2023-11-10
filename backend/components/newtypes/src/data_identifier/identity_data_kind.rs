@@ -78,6 +78,7 @@ impl IdentityDataKind {
             Self::Email,
             Self::Ssn9,
             Self::FirstName,
+            Self::MiddleName,
             Self::LastName,
         ]
     }

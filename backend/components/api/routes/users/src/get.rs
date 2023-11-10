@@ -7,7 +7,7 @@ use api_core::types::CursorPaginatedResponse;
 use api_core::types::CursorPaginatedResponseInner;
 use api_core::types::CursorPaginationRequest;
 use api_core::utils::db2api::DbToApi;
-use api_route_entities::parse_search;
+use api_core::utils::search_utils::parse_search;
 use api_wire_types::SearchUsersRequest;
 use db::scoped_vault::ScopedVaultListQueryParams;
 use newtypes::VaultKind;

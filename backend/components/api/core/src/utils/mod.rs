@@ -14,6 +14,7 @@ pub mod magic_link;
 pub mod onboarding;
 pub mod paperclip;
 pub mod requirements;
+pub mod search_utils;
 pub mod session;
 pub mod sms;
 pub mod vault_wrapper;

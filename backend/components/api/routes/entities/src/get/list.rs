@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
@@ -13,21 +11,14 @@ use crate::State;
 use api_core::errors::AssertionError;
 use api_core::types::CursorPaginatedResponseInner;
 use api_core::utils::db2api::DbToApi;
+use api_core::utils::search_utils::parse_search;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_wire_types::ListEntitiesRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::scoped_vault::ScopedVaultListQueryParams;
-use itertools::Itertools;
-use newtypes::fingerprinter::FingerprintScope;
-use newtypes::fingerprinter::GlobalFingerprintKind;
-use newtypes::DataIdentifier;
-use newtypes::FpId;
-use newtypes::PhoneNumber;
-use newtypes::PiiString;
 use newtypes::ScopedVaultId;
-use newtypes::TenantId;
-use newtypes::{BusinessDataKind as BDK, Fingerprint, Fingerprinter, IdentityDataKind as IDK};
 use paperclip::actix::{api_v2_operation, get, web};
+use std::collections::HashMap;
 
 #[api_v2_operation(
     description = "View list of entities (business or user) that have started onboarding to the tenant.",
@@ -110,87 +101,4 @@ pub async fn get(
         .map(|(vw, entity)| api_wire_types::Entity::from_db((entity, vw, &auth)))
         .collect();
     CursorPaginatedResponseInner::ok(entities, cursor, Some(count))
-}
-
-/// Given a search string and fp_id, parse into the list of fingerprints and fp_id by which to query
-/// for ScopedVaults
-pub async fn parse_search(
-    state: &State,
-    search: Option<PiiString>,
-    tenant_id: &TenantId,
-) -> ApiResult<(Option<(PiiString, Vec<Fingerprint>)>, Option<FpId>)> {
-    // TODO clean phone number or email
-    let Some(search) = search else {
-        return Ok((None, None));
-    };
-
-    // A bit of a hack: if the user types query that looks like an fp_id, try to look up by identifier instead
-    if search.leak().starts_with("fp_id_") || search.leak().starts_with("fp_bid_") {
-        let fp_id = Some(FpId::from(search.leak_to_string()));
-        Ok((None, fp_id))
-    } else {
-        let search_str = search.clean_for_fingerprint();
-        // See if the search string is a phone number and format it properly for fingerprinting
-        let formatted_phone_numbers = vec![
-            PiiString::new(format!("+1{}", search_str.leak())),
-            search_str.clone(),
-        ]
-        .into_iter()
-        .filter_map(|p| PhoneNumber::parse(p).ok().map(|p| p.e164()));
-        // Tokenize the search_str string by splitting on `\s`. This handles cases like a user typing in a full name
-        let tokenized = search_str
-            .clone()
-            .leak()
-            .split(' ')
-            .map(PiiString::from)
-            .chain([search_str]) // Re-add the full search_str token
-            .chain(formatted_phone_numbers) // Add formatted phone numbers
-            .collect_vec();
-        let fut_fingerprints = tokenized
-            .into_iter()
-            .map(|s| compute_fingerprint_for_search(state, s, tenant_id));
-        let fingerprints = futures::future::try_join_all(fut_fingerprints)
-            .await?
-            .into_iter()
-            .flatten()
-            .collect();
-
-        Ok((Some((search, fingerprints)), None))
-    }
-}
-
-async fn compute_fingerprint_for_search(
-    state: &State,
-    search: PiiString,
-    tenant_id: &TenantId,
-) -> ApiResult<Vec<Fingerprint>> {
-    let searchable_idks = IDK::searchable().into_iter().map(DataIdentifier::from);
-    let searchable_bdks = BDK::searchable().into_iter().map(DataIdentifier::from);
-    let data = searchable_idks
-        .chain(searchable_bdks)
-        .map(|di| (di, &search))
-        .collect_vec();
-
-    let tenant_scoped = data
-        .iter()
-        .map(|(di, pii)| ((), FingerprintScope::Tenant(di, tenant_id), *pii))
-        .collect_vec();
-    let global = data
-        .iter()
-        .filter_map(|(di, pii)| {
-            GlobalFingerprintKind::try_from(di.clone())
-                .ok()
-                .map(|gdi| (gdi, pii))
-        })
-        .map(|(gdi, pii)| ((), FingerprintScope::Global(gdi), *pii))
-        .collect_vec();
-    let data = tenant_scoped.into_iter().chain(global).collect_vec();
-
-    let fps = state
-        .compute_fingerprints(data)
-        .await?
-        .into_iter()
-        .map(|(_, fp)| fp)
-        .collect();
-    Ok(fps)
 }

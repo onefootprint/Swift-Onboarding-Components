@@ -257,11 +257,11 @@ impl DataIdentifier {
     /// Returns true if the DI can be fingerprinted. Will automatically fingerprint non-document
     /// data with these types when added to the vault
     pub fn is_fingerprintable(&self) -> bool {
-        Self::fingerprintable().contains(self)
+        Self::searchable().contains(self)
     }
 
     /// collect fingerprintable DIs
-    pub fn fingerprintable() -> Vec<Self> {
+    pub fn searchable() -> Vec<Self> {
         vec![
             IdentityDataKind::searchable()
                 .into_iter()

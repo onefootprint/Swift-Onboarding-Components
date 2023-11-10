@@ -14,10 +14,11 @@ use newtypes::VaultId;
 use newtypes::VaultKind;
 use newtypes::WatchlistCheckStatusKind;
 use newtypes::{Fingerprint, FpId, TenantId};
+use std::collections::HashMap;
 use tracing::instrument;
 
 #[derive(Debug, Clone, Default)]
-pub struct ScopedVaultListQueryParams<TSearch = (PiiString, Vec<Fingerprint>)> {
+pub struct ScopedVaultListQueryParams<TSearch = SearchQuery> {
     pub tenant_id: TenantId,
     pub is_live: bool,
     pub statuses: Vec<OnboardingStatusFilter>,
@@ -32,6 +33,19 @@ pub struct ScopedVaultListQueryParams<TSearch = (PiiString, Vec<Fingerprint>)> {
     pub only_visible: bool,
     pub is_created_via_api: Option<bool>,
 }
+
+#[derive(Debug, Clone, Default)]
+pub struct SearchQuery {
+    /// Plaintext search query. Will perform an ilike on plaintext data to try to find matches
+    pub search: PiiString,
+    /// Fingerprint search queries. Results will match ANY of the FingerprintQueries, where a
+    /// FingerprintQuery matches if ALL of the fingerprints in the query are matched
+    pub fingerprint_queries: Vec<AndFingerprintQuery>,
+}
+
+#[derive(Debug, Clone, Default)]
+/// Fingerprint search query. For a vault to this query, it must match ALL of the fingerprints in the Vec.
+pub struct AndFingerprintQuery(pub Vec<Fingerprint>);
 
 impl ScopedVaultListQueryParams {
     fn map_search(self, conn: &mut PgConn) -> DbResult<ScopedVaultListQueryParams<Vec<VaultId>>> {
@@ -50,8 +64,8 @@ impl ScopedVaultListQueryParams {
             is_created_via_api,
         } = self;
 
-        let matching_vaults = if let Some((search, fingerprints)) = search.as_ref() {
-            let vault_ids = vaults_matching_search(conn, search, fingerprints, &tenant_id)?;
+        let matching_vaults = if let Some(search) = search {
+            let vault_ids = vaults_matching_search(conn, search, &tenant_id)?;
             Some(vault_ids)
         } else {
             None
@@ -184,86 +198,111 @@ macro_rules! list_query {
 #[instrument(skip_all)]
 fn vaults_matching_search(
     conn: &mut PgConn,
-    search: &PiiString,
-    fingerprints: &[Fingerprint],
+    search: SearchQuery,
     tenant_id: &TenantId,
 ) -> DbResult<Vec<VaultId>> {
     use db_schema::schema::{data_lifetime, fingerprint, scoped_vault, vault_data};
+    let SearchQuery {
+        search,
+        fingerprint_queries,
+    } = search;
     // We have to basically replicate the DataLifetime::get_active inside a SQL query -
     // fingerprints for a piece of data for a given tenant A should be visible if either:
     // - the data is not portablized but was added by tenant A
     // - the data is portablized (could be added by any tenant)
     // These two subqueries handle each case respectively
 
-    // This is extremely specific - gin indexes have really slow performance on large tables when
-    // doing a "contains" operation with 2 or fewer characteres.
-    // So, we cheat a bit and just do a prefix search when the search query is < 2 characters
-    let plaintext_search = if search.len() <= 2 {
-        // Just prefix search
-        format!("{}%", search.leak())
-    } else {
-        // Full contains search
-        format!("%{}%", search.leak())
-    };
-
     // Specifically get the matching vault_ids (the scoped_vault_id might belong to another tenant)
     // Sadly, diesel doesn't let you join on scoped_vault and use it in a subquery on the
     // scoped_vault table... So, we have to actually execute these subqueries
-    let matching_speculative_fp_ids: Vec<VaultId> = fingerprint::table
-        .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
-        // SPECULATIVE visibility filters
-        .filter(data_lifetime::deactivated_seqno.is_null())
-        .filter(data_lifetime::portablized_seqno.is_null())
-        .filter(scoped_vault::tenant_id.eq(tenant_id))
-        // Matching filter
-        .filter(fingerprint::sh_data.eq_any(fingerprints))
-        .select(data_lifetime::vault_id)
-        .get_results(conn)?;
 
-    // TODO we should store the plaintext on the fingerprint table so all searching
-    // happens on one table
-    let matching_speculative_plaintext_ids: Vec<VaultId> = vault_data::table
-        .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
-        // SPECULATIVE visibility filters
-        .filter(data_lifetime::deactivated_seqno.is_null())
-        .filter(data_lifetime::portablized_seqno.is_null())
-        .filter(scoped_vault::tenant_id.eq(tenant_id))
-        // Matching filter
-        // TODO do we want to search every vault_data's p_data, or only certain kinds? i imagine card issuer will get annoying
-        .filter(vault_data::p_data.ilike(&plaintext_search))
-        .select(data_lifetime::vault_id)
-        .get_results(conn)?;
+    let plaintext_results = {
+        // This is extremely specific - gin indexes have really slow performance on large tables when
+        // doing a "contains" operation with 2 or fewer characteres.
+        // So, we cheat a bit and just do a prefix search when the search query is < 2 characters
+        let plaintext_search = if search.len() <= 2 {
+            // Just prefix search
+            format!("{}%", search.leak())
+        } else {
+            // Full contains search
+            format!("%{}%", search.leak())
+        };
 
-    let matching_portable_fp_ids: Vec<VaultId> = fingerprint::table
-        .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
-        // PORTABLE visibility filters
-        .filter(data_lifetime::deactivated_seqno.is_null())
-        .filter(not(data_lifetime::portablized_seqno.is_null()))
-        // Matching filter
-        .filter(fingerprint::sh_data.eq_any(fingerprints))
-        .select(data_lifetime::vault_id)
-        .get_results(conn)?;
+        // TODO should we store the plaintext on the fingerprint table so all searching
+        // happens on one table?
+        let speculative_ids: Vec<VaultId> = vault_data::table
+            .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
+            // SPECULATIVE visibility filters
+            .filter(data_lifetime::deactivated_seqno.is_null())
+            .filter(data_lifetime::portablized_seqno.is_null())
+            .filter(scoped_vault::tenant_id.eq(tenant_id))
+            // Matching filter
+            // TODO do we want to search every vault_data's p_data, or only certain kinds? i imagine card issuer will get annoying
+            .filter(vault_data::p_data.ilike(&plaintext_search))
+            .select(data_lifetime::vault_id)
+            .get_results(conn)?;
 
-    let matching_portable_plaintext_ids: Vec<VaultId> = vault_data::table
-        .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
-        // PORTABLE visibility filters
-        .filter(data_lifetime::deactivated_seqno.is_null())
-        .filter(not(data_lifetime::portablized_seqno.is_null()))
-        // Matching filter
-        .filter(vault_data::p_data.ilike(&plaintext_search))
-        .select(data_lifetime::vault_id)
-        .get_results(conn)?;
+        let portable_ids: Vec<VaultId> = vault_data::table
+            .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
+            // PORTABLE visibility filters
+            .filter(data_lifetime::deactivated_seqno.is_null())
+            .filter(not(data_lifetime::portablized_seqno.is_null()))
+            // Matching filter
+            .filter(vault_data::p_data.ilike(&plaintext_search))
+            .select(data_lifetime::vault_id)
+            .get_results(conn)?;
 
-    let all_ids = vec![
-        matching_speculative_fp_ids.into_iter(),
-        matching_speculative_plaintext_ids.into_iter(),
-        matching_portable_fp_ids.into_iter(),
-        matching_portable_plaintext_ids.into_iter(),
-    ]
-    .into_iter()
-    .flatten()
-    .unique()
-    .collect();
+        speculative_ids.into_iter().chain(portable_ids).collect_vec()
+    };
+
+    let fingerprint_results = {
+        let all_fps = fingerprint_queries.iter().flat_map(|fps| &fps.0).collect_vec();
+        let speculative: Vec<(Fingerprint, VaultId)> = fingerprint::table
+            .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
+            // SPECULATIVE visibility filters
+            .filter(data_lifetime::deactivated_seqno.is_null())
+            .filter(data_lifetime::portablized_seqno.is_null())
+            .filter(scoped_vault::tenant_id.eq(tenant_id))
+            // Matching filter
+            .filter(fingerprint::sh_data.eq_any(all_fps.clone()))
+            .select((fingerprint::sh_data, data_lifetime::vault_id))
+            .get_results(conn)?;
+
+        let portable: Vec<(Fingerprint, VaultId)> = fingerprint::table
+            .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
+            // PORTABLE visibility filters
+            .filter(data_lifetime::deactivated_seqno.is_null())
+            .filter(not(data_lifetime::portablized_seqno.is_null()))
+            // Matching filter
+            .filter(fingerprint::sh_data.eq_any(all_fps))
+            .select((fingerprint::sh_data, data_lifetime::vault_id))
+            .get_results(conn)?;
+
+        // All results matching any of the fingerprints. We can't union these results - we need to
+        // apply the AND filters
+        let results: HashMap<_, _> = speculative.into_iter().chain(portable).into_group_map();
+
+        // Compose the list of vaults that match _any_ of the FingerprintQueries
+        fingerprint_queries
+            .into_iter()
+            .flat_map(|fps| {
+                // Each inner FingerprintQuery represents an AND filter.
+                // Return only the vaults that match all fingerprints.
+                fps.0
+                    .iter()
+                    .cloned()
+                    .map(|fp| results.get(&fp).cloned().unwrap_or_default())
+                    .reduce(|a, b| a.into_iter().filter(|i| b.contains(i)).collect_vec())
+                    .unwrap_or_default()
+            })
+            .unique()
+            .collect_vec()
+    };
+    let all_ids = fingerprint_results
+        .into_iter()
+        .chain(plaintext_results)
+        .unique()
+        .collect();
     Ok(all_ids)
 }
 

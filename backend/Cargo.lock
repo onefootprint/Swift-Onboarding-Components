@@ -1202,7 +1202,6 @@ dependencies = [
  "actix-web",
  "actix-web-httpauth",
  "api_core",
- "api_route_entities",
  "api_wire_types",
  "aws-config",
  "aws-sdk-kms",
