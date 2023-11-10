@@ -4,6 +4,7 @@ import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 
 import type { OpenFootprint } from './footprint.types';
 import getURL from './utils/create-url';
+import sendSdkArgs from './utils/send-sdk-args';
 
 const getDeepLink = (baseScheme?: string) => {
   let scheme = 'footprint';
@@ -22,15 +23,22 @@ const open = async ({
   options,
   l10n,
 }: OpenFootprint) => {
-  const deepLink = getDeepLink();
-  const url = getURL({
+  const token = await sendSdkArgs({
     publicKey,
     userData,
-    appearance,
-    redirectUrl: deepLink,
     options,
     l10n,
   });
+  if (!token) {
+    return;
+  }
+
+  const deepLink = getDeepLink();
+  const url = getURL({
+    appearance,
+    redirectUrl: deepLink,
+  });
+
   try {
     const result = await InAppBrowser.openAuth(url, deepLink);
     if (result.type === 'success' && result.url) {
