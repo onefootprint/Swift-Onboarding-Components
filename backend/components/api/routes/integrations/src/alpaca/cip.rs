@@ -20,7 +20,7 @@ use api_core::{
     errors::{cip_error::CipError, ApiResult},
     types::{JsonApiResponse, ResponseData},
     utils::vault_wrapper::{DecryptUncheckedResult, TenantVw, VaultWrapper},
-    ApiError, ApiErrorKind, State,
+    ApiErrorKind, State,
 };
 use api_wire_types::{AlpacaCipRequest, AlpacaCipResponse, DeprecatedAlpacaCipRequest};
 use chrono::{DateTime, Utc};
@@ -542,11 +542,9 @@ fn document_and_photo(
     let type_of_id = ocr_response.type_of_id.as_ref().ok_or_else(|| {
         idv::Error::IncodeError(idv::incode::error::Error::OcrError("Missing type_of_id".into()))
     })?;
-    let document_type = IdDocKind::try_from(type_of_id)?.try_into()?;
-    let dob = ocr_response
-        .dob()
-        .map_err(|e| ApiError::from(idv::Error::from(e)))?;
-    let over_18_check = ocr_response.age().map_err(idv::Error::from)? >= 18;
+    let document_type = Some(IdDocKind::try_from(type_of_id)?.try_into()?);
+    let dob = ocr_response.dob().map(PiiString::from).ok();
+    let over_18_check = ocr_response.age().ok().map(|a| a >= 18).unwrap_or(true); // If age wasn't OCR'd properly, we assume the reviewer confirmed they are over 18
 
     // Construct all of the breakdown fields
     // TODO: load these once FRC<>VRes migration is done
@@ -567,28 +565,17 @@ fn document_and_photo(
         result: CipResult::Clear,
         status: alpaca::CipStatus::Complete,
         created_at: check_started_at,
-        first_name: ok_or(
-            ocr_name.first_name.as_ref().map(|p| PiiString::from(p.clone())),
-            "first name missing".into(),
-        )?,
-        last_name: ok_or(
-            ocr_name.paternal_last_name.as_ref().map(|p| (**p).clone()),
-            "last name missing".into(),
-        )?,
+        first_name: ocr_name.first_name.as_ref().map(|p| PiiString::from(p.clone())),
+        last_name: ocr_name.paternal_last_name.as_ref().map(|p| (**p).clone()),
         gender: ocr_response.gender.as_ref().map(|p| (**p).clone()),
-        date_of_birth: dob.into(),
-        date_of_expiry: ocr_response
-            .expiration_date()
-            .map_err(|e| ApiError::from(idv::Error::from(e)))?
-            .into(),
-        issuing_country: ok_or(
-            ocr_response.issuing_country.as_ref().map(|p| (*p).clone().into()),
-            "missing issuing_country".into(),
-        )?,
-        document_numbers: vec![ok_or(
-            ocr_response.document_number.as_ref().map(|p| (*p).clone().into()),
-            "missing document_number".into(),
-        )?],
+        date_of_birth: dob,
+        date_of_expiry: ocr_response.expiration_date().ok().map(PiiString::from),
+        issuing_country: ocr_response.issuing_country.as_ref().map(|p| (*p).clone().into()),
+        document_numbers: ocr_response
+            .document_number
+            .as_ref()
+            .map(|p| (*p).clone().into())
+            .map(|d| vec![d]),
         document_type,
         age_validation: CipResult::clear(over_18_check),
         data_comparison: data_comparison_overall,
