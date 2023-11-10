@@ -49,12 +49,33 @@ const Confirm = () => {
         // We can't show the error messages as hints unless the sub-forms are in edit mode
         // For simplicity, just show the field names.
         // Ideally, these errors should be caught in earlier pages anyways (unless bootstrapped)
-        const fields = Object.keys(fieldErrors)
-          .map(di => t(`di.${di}`))
-          .join(', ');
+        if (typeof fieldErrors === 'string') {
+          toast.show({
+            title: t('errors.invalid-inputs.title'),
+            description: t('errors.invalid-inputs.description-with-message', {
+              message: fieldErrors,
+            }),
+            variant: 'error',
+          });
+          return;
+        }
+        const fields = Object.keys(fieldErrors).filter(di =>
+          Object.values(IdDI).includes(di as IdDI),
+        );
+        if (fields.length === 0) {
+          toast.show({
+            title: t('errors.invalid-inputs.title'),
+            description: t('errors.invalid-inputs.description-generic'),
+            variant: 'error',
+          });
+          return;
+        }
+        const fieldNames = fields.map(di => t(`di.${di}`)).join(', ');
         toast.show({
           title: t('errors.invalid-inputs.title'),
-          description: t('errors.invalid-inputs.description', { fields }),
+          description: t('errors.invalid-inputs.description-with-fields', {
+            fields: fieldNames,
+          }),
           variant: 'error',
         });
       },

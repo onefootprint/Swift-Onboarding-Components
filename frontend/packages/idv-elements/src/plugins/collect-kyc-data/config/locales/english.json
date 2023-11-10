@@ -274,7 +274,9 @@
       "errors": {
         "invalid-inputs": {
           "title": "An error occurred",
-          "description": "An error occurred while saving data. Please fix these fields: {{fields}}."
+          "description-with-message": "An error occurred while saving data. {{message}}.",
+          "description-with-fields": "An error occurred while saving data. Please fix these fields: {{fields}}.",
+          "description-generic": "An error occurred while saving data. Please fix the inputs and try again."
         }
       }
     }
