@@ -123,7 +123,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
         None
     };
 
-    state
+    let requirements = state
         .db_pool
         .db_query(move |conn| -> ApiResult<Vec<_>> {
             let person_requirements =
@@ -148,7 +148,8 @@ pub async fn get_requirements_for_person_and_maybe_business(
                 .chain(person_requirements.into_iter())
                 .collect())
         })
-        .await?
+        .await??;
+    Ok(requirements)
 }
 
 pub struct RequirementProgress {
@@ -289,9 +290,11 @@ pub fn get_requirements_inner(
                 WorkflowState::Kyc(KycState::DocCollection)
                     | WorkflowState::AlpacaKyc(AlpacaKycState::DocCollection)
             );
+            let is_completed = wf.completed_at.is_some();
             if r.is_met() && is_data_collection_step {
-                if is_stepup {
+                if is_stepup || is_completed {
                     // Omit the confirm screen when an alpaca user is in step up
+                    // or when the workflow is entirely completed
                     return false;
                 }
                 if obc.skip_confirm {
