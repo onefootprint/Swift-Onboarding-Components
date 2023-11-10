@@ -56,13 +56,7 @@ const PostPreview = ({
             {title}
           </Typography>
         </Header>
-        <Stack
-          direction="column"
-          justify="space-between"
-          sx={{
-            flexGrow: 1,
-          }}
-        >
+        <Stack direction="column" justify="space-between" flexGrow={1}>
           <Body>
             <Typography color="secondary" variant="body-2">
               {excerpt}

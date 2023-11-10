@@ -8,24 +8,11 @@ type BulletItemProps = {
   subtitle?: string;
 };
 const BulletItem = ({ title, subtitle }: BulletItemProps) => (
-  <Stack
-    direction="row"
-    gap={2}
-    justify="flex-start"
-    sx={{
-      height: '100%',
-    }}
-  >
+  <Stack direction="row" gap={2} justify="flex-start" height="100%">
     <IconBounds align="center" justify="center">
       <IcoCheck16 />
     </IconBounds>
-    <Stack
-      direction="column"
-      gap={1}
-      sx={{
-        height: 'fit-content',
-      }}
-    >
+    <Stack direction="column" gap={1} height="fit-content">
       <Typography
         variant="label-2"
         sx={{

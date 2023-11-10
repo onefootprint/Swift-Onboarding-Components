@@ -59,7 +59,7 @@ const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
       )}
       <AmlSection>
         {aml?.shareUrl && (
-          <Stack direction="column" sx={{ width: '100%' }}>
+          <Stack direction="column" width="100%">
             <Typography
               variant="label-3"
               color="tertiary"

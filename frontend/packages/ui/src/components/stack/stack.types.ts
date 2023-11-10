@@ -2,8 +2,6 @@ import type { Spacing, Theme } from '@onefootprint/design-tokens';
 import type * as CSS from 'csstype';
 import type { AriaRole } from 'react';
 
-import type { SXStyleProps, SXStyles } from '../../hooks';
-
 export type StackTag =
   | 'div'
   | 'section'
@@ -78,7 +76,8 @@ export type StackStylesProps = {
   justify?: CSS.Property.JustifyContent;
   flexGrow?: CSS.Property.FlexGrow;
   inline?: boolean;
-  sx?: SXStyles;
+  textOverflow?: CSS.Property.TextOverflow;
+  whiteSpace?: CSS.Property.WhiteSpace;
 };
 
 export type StackProps = StackStylesProps & {
@@ -88,7 +87,6 @@ export type StackProps = StackStylesProps & {
   children?: React.ReactNode;
   id?: string;
   role?: AriaRole;
-  sx?: SXStyleProps;
   testID?: string;
   className?: string;
 };

@@ -8,7 +8,7 @@ const Stack = styled('div').attrs<{ as: StackTag }>(({ as, ...props }) => ({
   as,
   ...props,
 }))<StackProps>`
-  ${({ theme, sx, ...props }) => css`
+  ${({ theme, ...props }) => css`
     display: ${props.inline ? 'inline-flex' : 'flex'};
     flex-direction: ${props.direction};
     align-items: ${props.align};
@@ -16,6 +16,8 @@ const Stack = styled('div').attrs<{ as: StackTag }>(({ as, ...props }) => ({
     flex-wrap: ${props.flexWrap};
     flex-grow: ${props.flexGrow};
     visibility: ${props.visibility};
+    white-space: ${props.whiteSpace};
+    text-overflow: ${props.textOverflow};
 
     /* Box */
     ${getBorders(props as StackProps, theme)};

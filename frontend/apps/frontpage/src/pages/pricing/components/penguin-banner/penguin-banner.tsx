@@ -34,16 +34,12 @@ const PenguinBanner = ({
         width={320}
         height={320}
       />
-      <Stack
-        direction="column"
-        align="center"
-        sx={{ textAlign: 'center' }}
-        gap={9}
-      >
+      <Stack direction="column" align="center" textAlign="center" gap={9}>
         <Stack
           direction="column"
           align="center"
-          sx={{ textAlign: 'center', maxWidth: '600px' }}
+          textAlign="center"
+          maxWidth="600px"
           gap={3}
         >
           <Typography variant="display-3" color="primary">

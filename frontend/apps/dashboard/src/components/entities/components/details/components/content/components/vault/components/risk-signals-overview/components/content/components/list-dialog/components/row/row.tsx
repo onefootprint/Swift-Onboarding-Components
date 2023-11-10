@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronRight24, IcoInfo16 } from '@onefootprint/icons';
+import styled from '@onefootprint/styled';
 import type { RiskSignal } from '@onefootprint/types';
 import { RiskSignalSeverity } from '@onefootprint/types';
 import { Badge, Stack, Tooltip, Typography } from '@onefootprint/ui';
@@ -14,7 +15,7 @@ const Row = ({ riskSignal }: RowProps) => {
 
   return (
     <>
-      <td>
+      <StyledTd>
         {riskSignal.severity === RiskSignalSeverity.High && (
           <Badge variant="error">{t('high')}</Badge>
         )}
@@ -24,16 +25,14 @@ const Row = ({ riskSignal }: RowProps) => {
         {riskSignal.severity === RiskSignalSeverity.Low && (
           <Badge variant="info">{t('low')}</Badge>
         )}
-      </td>
+      </StyledTd>
       <Stack as="td" gap={2} width="100%">
         <Stack
           inline
           align="center"
-          sx={{
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-            textOverflow: 'ellipsis',
-          }}
+          overflow="hidden"
+          whiteSpace="nowrap"
+          textOverflow="ellipsis"
         >
           <Typography variant="label-3">{riskSignal.note}</Typography>
         </Stack>
@@ -49,5 +48,11 @@ const Row = ({ riskSignal }: RowProps) => {
     </>
   );
 };
+
+const StyledTd = styled.td`
+  && {
+    padding-right: 0;
+  }
+`;
 
 export default Row;
