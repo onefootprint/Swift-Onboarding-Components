@@ -35,5 +35,7 @@ export {
   SecuredByFootprint,
   useLayoutOptions,
 } from './layout';
+export type { WhatsThisContentProps } from './layout/components/whats-this-bottom-sheet/components/whats-this-content';
+export { default as WhatsThisContent } from './layout/components/whats-this-bottom-sheet/components/whats-this-content';
 export { default as Logo } from './logo';
 export { default as SessionExpired } from './session-expired';

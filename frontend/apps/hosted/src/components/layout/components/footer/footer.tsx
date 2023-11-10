@@ -2,25 +2,25 @@ import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { SecuredByFootprint } from '@onefootprint/idv-elements';
 import styled, { css } from '@onefootprint/styled';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
-import useHostedMachine from 'src/hooks/use-hosted-machine';
 
-type Link = { label: string; href: string };
+import WhatsThisPopover from '../whats-this-popover';
 
-const Footer = () => {
+type Link = { label: string; href?: string; onClick?: () => void };
+
+type FootprintFooterProps = {
+  config?: PublicOnboardingConfig;
+};
+
+const Footer = ({ config }: FootprintFooterProps) => {
   const { t } = useTranslation('components.layout.footer');
-  const [state] = useHostedMachine();
-  const { onboardingConfig } = state.context;
-  const tenantPk = onboardingConfig?.key;
 
   const links: Link[] = [
     {
       label: t('links.what-is-this'),
-      href: tenantPk
-        ? `${FRONTPAGE_BASE_URL}/tenant?ob-key=${tenantPk}`
-        : FRONTPAGE_BASE_URL,
     },
     {
       label: t('links.privacy'),
@@ -36,15 +36,19 @@ const Footer = () => {
     <Container>
       <SecuredByFootprint />
       <LinksContainer>
-        {links.map(({ href, label }) => (
-          <li key={label}>
-            <a href={href} target="_blank" rel="noreferrer">
-              <Typography variant="caption-1" color="secondary" as="span">
-                {label}
-              </Typography>
-            </a>
-          </li>
-        ))}
+        {links.map(({ href, label }) =>
+          href ? (
+            <li key={label}>
+              <a href={href} target="_blank" rel="noreferrer">
+                <Typography variant="caption-1" color="secondary" as="span">
+                  {label}
+                </Typography>
+              </a>
+            </li>
+          ) : (
+            <WhatsThisPopover config={config} label={label} key={label} />
+          ),
+        )}
         <li>
           <Image
             src="/footer/soc-2-badge.png"

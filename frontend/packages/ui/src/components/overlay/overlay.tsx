@@ -14,9 +14,9 @@ const Overlay = ({ isVisible = true, className }: OverlayProps) => (
         initial={{ opacity: 0 }}
         animate={{
           opacity: 1,
-          transition: { duration: 0.2, ease: 'easeInOut' },
+          transition: { duration: 0.25, ease: 'easeIn' },
         }}
-        exit={{ opacity: 0 }}
+        exit={{ opacity: 0, transition: { duration: 0.1, ease: 'easeOut' } }}
         className={className}
       />
     ) : null}

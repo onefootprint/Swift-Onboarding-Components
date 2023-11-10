@@ -6,6 +6,8 @@ import { useOnClickOutside } from 'usehooks-ts';
 
 import IconButton from '../icon-button';
 import Overlay from '../overlay';
+import ScrollArea from '../scroll-area';
+import Stack from '../stack/stack';
 import Typography from '../typography';
 
 export type BottomSheetProps = {
@@ -84,8 +86,9 @@ const BottomSheet = ({
           role="dialog"
           data-testid={testID}
           ref={bottomSheetRef}
+          direction="column"
         >
-          <Header hasBorder={!!title}>
+          <Header hasBorder={!!title} flexGrow={0}>
             <CloseContainer onClick={onClose}>
               <IconButton aria-label={closeAriaLabel} onClick={onClose}>
                 <IcoClose24 />
@@ -110,7 +113,9 @@ const CloseContainer = styled.div`
   `}
 `;
 
-const Sheet = styled.div`
+const Sheet = styled(Stack)<{
+  customBottom?: string;
+}>`
   ${({ theme }) => css`
     position: fixed;
     left: 0;
@@ -133,7 +138,7 @@ const Sheet = styled.div`
   `}
 `;
 
-const Header = styled.div<{ hasBorder: boolean }>`
+const Header = styled(Stack)<{ hasBorder: boolean }>`
   ${({ theme, hasBorder }) => css`
     height: 52px;
     padding: ${theme.spacing[5]};
@@ -149,7 +154,7 @@ const Header = styled.div<{ hasBorder: boolean }>`
   `}
 `;
 
-const Body = styled.div`
+const Body = styled(ScrollArea)`
   ${({ theme }) => css`
     padding: ${theme.spacing[5]};
   `}

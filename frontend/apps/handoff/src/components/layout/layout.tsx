@@ -13,10 +13,13 @@ const Layout = ({ children, variant }: LayoutProps) => {
   const [state] = useHandoffMachine();
   const { onboardingConfig } = state.context;
   const isSandbox = onboardingConfig?.isLive === false;
-  const { key } = onboardingConfig ?? {};
 
   return (
-    <AppLayout variant={variant} tenantPk={key} isSandbox={isSandbox}>
+    <AppLayout
+      variant={variant}
+      isSandbox={isSandbox}
+      config={onboardingConfig}
+    >
       {children}
     </AppLayout>
   );

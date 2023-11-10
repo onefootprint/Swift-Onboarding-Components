@@ -105,9 +105,9 @@ const Content = (): JSX.Element | null => {
   return !config || isComplete ? null : (
     <Layout
       variant={variant}
-      publicKey={publicKey}
       isSandbox={isSandbox}
       onClose={handlers.confirmCloseAndCancel}
+      config={config}
     >
       {config?.kind === FootprintComponentKind.Auth ? (
         <Identify

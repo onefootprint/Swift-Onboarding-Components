@@ -1,6 +1,6 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import styled, { css } from '@onefootprint/styled';
-import { media, Typography } from '@onefootprint/ui';
+import { media, Stack, Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import useResizeObserver from 'use-resize-observer';
 
@@ -10,12 +10,13 @@ import FooterActions from './components/footer-actions';
 
 type FootprintFooterProps = {
   hideOnDesktop?: boolean;
-  tenantPk?: string;
+  onWhatsThisClick?: () => void;
 };
 
-type Link = { label: string; href: string };
-
-const FootprintFooter = ({ hideOnDesktop, tenantPk }: FootprintFooterProps) => {
+const FootprintFooter = ({
+  hideOnDesktop,
+  onWhatsThisClick,
+}: FootprintFooterProps) => {
   const {
     footer: { options, set: updateFooterOptions },
   } = useLayoutOptions();
@@ -30,19 +31,6 @@ const FootprintFooter = ({ hideOnDesktop, tenantPk }: FootprintFooterProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [height]);
 
-  const links: Link[] = [
-    {
-      label: "What's this?",
-      href: tenantPk
-        ? `${FRONTPAGE_BASE_URL}/tenant?ob-key=${tenantPk}`
-        : FRONTPAGE_BASE_URL,
-    },
-    {
-      label: 'Privacy',
-      href: `${FRONTPAGE_BASE_URL}/privacy-policy`,
-    },
-  ];
-
   return (
     <FootprintFooterContainer
       hideOnDesktop={hideOnDesktop}
@@ -51,23 +39,37 @@ const FootprintFooter = ({ hideOnDesktop, tenantPk }: FootprintFooterProps) => {
       ref={ref}
     >
       <SecuredByFootprint />
-      <LinksContainer>
-        {links.map(({ href, label }) => (
-          <li key={label}>
-            <a href={href} target="_blank" rel="noreferrer">
-              <Typography variant="caption-1" color="secondary" as="span">
-                {label}
-              </Typography>
-            </a>
-          </li>
-        ))}
+      <LinksContainer as="ul" align="center" justify="center" gap={3}>
+        <li>
+          <WhatsThisButton onClick={onWhatsThisClick}>
+            <Typography variant="caption-1" color="secondary" as="span">
+              What`s this?
+            </Typography>
+          </WhatsThisButton>
+        </li>
+        <li>
+          <a
+            href={`${FRONTPAGE_BASE_URL}/privacy-policy`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Typography variant="caption-1" color="secondary" as="span">
+              Privacy
+            </Typography>
+          </a>
+        </li>
       </LinksContainer>
       <ActionsWrapper>
-        <FooterActions links={links} />
+        <FooterActions onWhatsThisClick={onWhatsThisClick} />
       </ActionsWrapper>
     </FootprintFooterContainer>
   );
 };
+
+const WhatsThisButton = styled.button`
+  all: unset;
+  cursor: pointer;
+`;
 
 const FootprintFooterContainer = styled.footer<{
   hideOnDesktop?: boolean;
@@ -101,24 +103,11 @@ const FootprintFooterContainer = styled.footer<{
     `}
 `;
 
-const LinksContainer = styled.ul`
+const LinksContainer = styled(Stack)`
   ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    justify-content: center;
-
     ${media.lessThan('sm')`
       display: none;
     `}
-
-    li {
-      &:not(:last-child) {
-        &:after {
-          content: '·';
-          margin: 0 ${theme.spacing[2]};
-        }
-      }
-    }
 
     a {
       text-decoration: none;

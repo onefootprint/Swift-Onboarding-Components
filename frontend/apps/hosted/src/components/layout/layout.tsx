@@ -17,14 +17,13 @@ const Layout = ({ children, variant }: LayoutProps) => {
   const [state] = useHostedMachine();
   const { onboardingConfig } = state.context;
   const isSandbox = onboardingConfig?.isLive === false;
-  const { key } = onboardingConfig ?? {};
 
   return (
     <Container>
       <SandboxBanner />
       <Content>
         <AppLayout
-          tenantPk={key}
+          config={onboardingConfig}
           variant={variant}
           isSandbox={isSandbox}
           options={{
@@ -36,7 +35,7 @@ const Layout = ({ children, variant }: LayoutProps) => {
           {children}
         </AppLayout>
       </Content>
-      <Footer />
+      <Footer config={onboardingConfig} />
     </Container>
   );
 };

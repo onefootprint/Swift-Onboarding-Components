@@ -1,4 +1,5 @@
 import type { FootprintVariant } from '@onefootprint/footprint-js';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
 import React from 'react';
 
 import Content from './components/content';
@@ -13,18 +14,18 @@ export type LayoutProps = {
   variant?: FootprintVariant;
   children: React.ReactNode;
   options?: Options;
-  tenantPk?: string;
   isSandbox?: boolean;
   onClose?: () => void;
+  config?: PublicOnboardingConfig;
 };
 
 const Layout = ({
   children,
   variant,
   options = {},
-  tenantPk,
   isSandbox,
   onClose,
+  config,
 }: LayoutProps) => (
   <LayoutOptionsProvider options={options} onClose={onClose}>
     <FullHeightContainer
@@ -32,7 +33,7 @@ const Layout = ({
       id={LAYOUT_CONTAINER_ID}
       hasBorderRadius={!!options.hasDesktopBorderRadius}
     >
-      <Content tenantPk={tenantPk} isSandbox={isSandbox}>
+      <Content isSandbox={isSandbox} config={config}>
         {children}
       </Content>
     </FullHeightContainer>

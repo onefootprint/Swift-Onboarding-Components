@@ -27,7 +27,7 @@ const Layout = ({ children, variant }: LayoutProps) => {
       variant={variant}
       options={{ hasDesktopBorderRadius: true }}
       isSandbox={isSandbox}
-      tenantPk={config?.key}
+      config={config}
       onClose={handleClose}
     >
       {children}

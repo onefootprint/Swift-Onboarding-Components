@@ -9,9 +9,17 @@ type ScrollAreaProps = {
   asChild?: boolean;
   children: React.ReactNode;
   sx?: SXStyleProps;
+  className?: string;
+  maxHeight?: string;
 };
 
-const ScrollArea = ({ children, sx, asChild }: ScrollAreaProps) => {
+const ScrollArea = ({
+  children,
+  sx,
+  asChild,
+  className,
+  maxHeight,
+}: ScrollAreaProps) => {
   const viewportRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [viewportHeight, setViewportHeight] = useState(0);
@@ -65,7 +73,13 @@ const ScrollArea = ({ children, sx, asChild }: ScrollAreaProps) => {
       onScroll={handleScroll}
       asChild={asChild}
     >
-      <StyledViewport sx={sxStyles} asChild ref={viewportRef}>
+      <StyledViewport
+        className={className}
+        sx={sxStyles}
+        asChild
+        ref={viewportRef}
+        style={{ maxHeight }}
+      >
         {children}
       </StyledViewport>
       <ScrollAreaRadix.Scrollbar orientation="vertical">

@@ -47,6 +47,10 @@ const Container = styled.div<{ hasBorderRadius: boolean; height: string }>`
     overflow-y: auto;
     position: relative;
 
+    &[data-scroll-lock='true'] {
+      overflow-y: hidden;
+    }
+
     &[data-variant='modal'] {
       height: ${height};
       width: 100%;

@@ -59,6 +59,14 @@ module.exports = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.onefp.net',
+      },
+    ],
+  },
   async headers() {
     return [
       {

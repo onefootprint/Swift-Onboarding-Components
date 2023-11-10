@@ -11,6 +11,7 @@ export type {
   NavigationHeaderRightButtonProps,
   NavigationHeaderStaticContent,
   SandboxBannerHandler,
+  WhatsThisContentProps,
 } from './components';
 export {
   AppErrorBoundary,
@@ -36,6 +37,7 @@ export {
   SessionExpired,
   useFootprintProvider,
   useLayoutOptions,
+  WhatsThisContent,
 } from './components';
 export { FullHeightContainer } from './components/layout';
 export type { DeviceInfo } from './hooks';

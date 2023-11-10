@@ -66,6 +66,14 @@ const nextConfig = {
       },
     ];
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.onefp.net',
+      },
+    ],
+  },
   transpilePackages: [
     '@onefootprint/idv-elements',
     '@onefootprint/idv',

@@ -1,3 +1,4 @@
+import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
@@ -7,27 +8,32 @@ import {
 } from '@onefootprint/ui';
 import React from 'react';
 
-export type Link = { label: string; href: string };
-
 type FooterActionsProps = {
-  links: Link[];
+  onWhatsThisClick?: () => void;
 };
 
-const FooterActions = ({ links }: FooterActionsProps) => (
+const FooterActions = ({ onWhatsThisClick }: FooterActionsProps) => (
   <Dropdown.Root>
     <DropdownTrigger>
       <IcoDotsHorizontal24 />
     </DropdownTrigger>
     <DropdownContent align="end">
-      {links.map(({ href, label }) => (
-        <Anchor href={href} key={label} target="_blank" rel="noreferrer">
-          <Dropdown.Item onClick={event => event.stopPropagation()}>
-            <Typography variant="caption-1" color="secondary" as="span">
-              {label}
-            </Typography>
-          </Dropdown.Item>
-        </Anchor>
-      ))}
+      <Dropdown.Item onClick={onWhatsThisClick}>
+        <Typography variant="caption-1" color="secondary" as="span">
+          What`s this?
+        </Typography>
+      </Dropdown.Item>
+      <Anchor
+        href={`${FRONTPAGE_BASE_URL}/privacy-policy`}
+        target="_blank"
+        rel="noreferrer"
+      >
+        <Dropdown.Item onClick={event => event.stopPropagation()}>
+          <Typography variant="caption-1" color="secondary" as="span">
+            Privacy
+          </Typography>
+        </Dropdown.Item>
+      </Anchor>
     </DropdownContent>
   </Dropdown.Root>
 );

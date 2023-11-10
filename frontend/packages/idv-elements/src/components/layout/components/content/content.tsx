@@ -1,5 +1,6 @@
 import styled, { css } from '@onefootprint/styled';
-import { media } from '@onefootprint/ui';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
+import { media, Stack } from '@onefootprint/ui';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { LAYOUT_CONTAINER_ID } from '../../constants';
@@ -9,16 +10,17 @@ import NavigationHeaderContainer from '../navigation-header/components/navigatio
 import type { SandboxBannerHandler } from '../sandbox-banner';
 import SandboxBanner from '../sandbox-banner';
 import { BOTTOM_ACTION_BOX_PORTAL_ID } from '../sticky-bottom-box/constants';
+import WhatsThisBottomSheet from '../whats-this-bottom-sheet';
 
 export const IDV_BODY_CONTENT_CONTAINER_ID = 'idv-body-content-container';
 
 type ContentProps = {
   children: React.ReactNode;
-  tenantPk?: string;
   isSandbox?: boolean;
+  config?: PublicOnboardingConfig;
 };
 
-const Content = ({ children, tenantPk, isSandbox }: ContentProps) => {
+const Content = ({ children, isSandbox, config }: ContentProps) => {
   const { options, footer } = useLayoutOptions();
   const { hideDesktopSandboxBanner, hideDesktopFooter } = options || {};
   const [sandboxBannerHeight, setSandboxBannerHeight] = useState(0);
@@ -33,6 +35,7 @@ const Content = ({ children, tenantPk, isSandbox }: ContentProps) => {
     const checkOverflow = () => {
       const layoutContainer = document.getElementById(LAYOUT_CONTAINER_ID);
       if (!layoutContainer) return;
+
       const isOverflowing =
         layoutContainer.scrollHeight > layoutContainer.clientHeight;
       setBodyContentOverflowing(isOverflowing);
@@ -61,8 +64,10 @@ const Content = ({ children, tenantPk, isSandbox }: ContentProps) => {
     }
   }, []);
 
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
   return (
-    <Container>
+    <Stack direction="column" height="100%" position="relative">
       {isSandbox && (
         <SandboxBanner
           ref={measuredRef}
@@ -73,31 +78,32 @@ const Content = ({ children, tenantPk, isSandbox }: ContentProps) => {
         top={sandboxBannerHeight}
         containerId={LAYOUT_CONTAINER_ID}
       />
-      <BodyContainer id={IDV_BODY_CONTENT_CONTAINER_ID}>
+      <Stack
+        direction="column"
+        position="relative"
+        flexGrow={1}
+        id={IDV_BODY_CONTENT_CONTAINER_ID}
+      >
         <BodyContent>{children}</BodyContent>
-      </BodyContainer>
+      </Stack>
       <BottomActionContainer
         bottom={footerHeight}
         id={BOTTOM_ACTION_BOX_PORTAL_ID}
         showBorderTop={bodyContentOverflowing}
       />
-      <FootprintFooter hideOnDesktop={hideDesktopFooter} tenantPk={tenantPk} />
-    </Container>
+      <WhatsThisBottomSheet
+        open={isSheetOpen}
+        onClose={() => setIsSheetOpen(false)}
+        containerId={LAYOUT_CONTAINER_ID}
+        config={config}
+      />
+      <FootprintFooter
+        hideOnDesktop={hideDesktopFooter}
+        onWhatsThisClick={() => setIsSheetOpen(true)}
+      />
+    </Stack>
   );
 };
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-`;
-
-const BodyContainer = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-`;
 
 const BodyContent = styled.span`
   ${({ theme }) => css`
