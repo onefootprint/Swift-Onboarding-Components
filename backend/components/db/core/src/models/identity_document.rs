@@ -3,7 +3,7 @@ use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{document_request, document_upload, identity_document};
 
-use diesel::dsl::{count_star, not};
+use diesel::dsl::count_star;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use std::collections::HashMap;
@@ -233,9 +233,9 @@ impl IdentityDocument {
     ) -> DbResult<Option<(IdentityDocument, DocumentRequest)>> {
         let res = identity_document::table
             .inner_join(document_request::table)
-            // TODO should this be only Complete?
-            .filter(not(identity_document::status.eq(IdentityDocumentStatus::Pending)))
+            .filter(identity_document::status.eq(IdentityDocumentStatus::Complete))
             .filter(document_request::scoped_vault_id.eq(sv_id))
+            .order_by(identity_document::completed_seqno.desc())
             .first(conn)
             .optional()?;
 

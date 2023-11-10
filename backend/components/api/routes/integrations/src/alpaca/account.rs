@@ -124,6 +124,8 @@ async fn create_create_account_request(
         })
         .await??;
 
+    tracing::info!(?doc, "create_create_account_request");
+
     let doc_info = doc.map(|(id, _)| {
         // Get the document type that we used to vault the verified images. This is how incode
         // classified the document, which in rare cases may be different from how the user
