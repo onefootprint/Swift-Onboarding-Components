@@ -3,6 +3,7 @@ import {
   IcoDatabase24,
   IcoGridMasonry24,
   IcoIdCard24,
+  // IcoKey24,
   IcoLayer0124,
   IcoStore24,
 } from '@onefootprint/icons';
@@ -11,6 +12,7 @@ import { media } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 import { useHover } from 'usehooks-ts';
 
+// import AuthIllustration from './illustrations/auth-illustration';
 import KybIllustration from './illustrations/kyb-illustration';
 import KycIllustration from './illustrations/kyc-illustration';
 import OtherComponentsIllustration from './illustrations/other-components-illustration';
@@ -25,12 +27,14 @@ const SectionCards = () => {
   const vaultingHover = useRef(null);
   const vaultProxyHover = useRef(null);
   const otherComponentsHover = useRef(null);
+  // const authCardHover = useRef(null);
 
   const isKybHover = useHover(kybHover);
   const isKycHover = useHover(kycHover);
   const isVaultingHover = useHover(vaultingHover);
   const isVaultProxyHover = useHover(vaultProxyHover);
   const isOtherComponentsHover = useHover(otherComponentsHover);
+  // const isAuthCardHover = useHover(authCardHover);
 
   return (
     <Grid>
@@ -89,6 +93,18 @@ const SectionCards = () => {
           <OtherComponentsIllustration isHovered={isOtherComponentsHover} />
         </SectionCard>
       </div>
+      {/* <div ref={authCardHover}>
+        <SectionCard
+          title={t('auth.title')}
+          subtitle={t('auth.description')}
+          // add href when auth is ready
+          href="/"
+          icon={IcoKey24}
+          gridArea="auth"
+        >
+          <AuthIllustration isHovered={isAuthCardHover} />
+        </SectionCard>
+      </div> */}
     </Grid>
   );
 };
@@ -101,18 +117,15 @@ const Grid = styled.div`
     grid-gap: ${theme.spacing[5]};
     grid-template-rows: repeat(2, 1fr);
     grid-template-areas:
-      'kyc'
-      'kyb'
-      'vaulting'
-      'vault-proxy'
-      'components';
+      'kyc' 'kyb' 'vaulting' 'vault-proxy' 'components',
+      'auth';
 
     ${media.greaterThan('sm')`
          grid-template-columns: repeat(2, 1fr);
          grid-template-areas:
       'kyc kyb'
       'vaulting vault-proxy'
-      'components .';
+      'components auth';
       `}
   `}
 `;

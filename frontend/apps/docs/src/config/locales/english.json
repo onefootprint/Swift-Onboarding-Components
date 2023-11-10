@@ -148,6 +148,10 @@
         "embedded-components": {
           "title": "Other Components",
           "description": "Use Footprint's PCI-compliant components to collect and render sensitive data."
+        },
+        "auth": {
+          "title": "Auth",
+          "description": "Authenticate your users with Footprint's authentication API."
         }
       },
       "banner": {
