@@ -1,9 +1,5 @@
 import pytest
-from tests.utils import (
-    create_ob_config,
-    get,
-    post,
-)
+from tests.utils import create_ob_config, get, post, patch
 
 
 @pytest.fixture(scope="function")
@@ -84,3 +80,42 @@ def test_list(sandbox_tenant, obc):
         assert res[i]["rule_expression"] == rules[i]["rule_expression"]
         assert res[i]["action"] == rules[i]["action"]
         assert res[i]["is_shadow"] == rules[i]["is_shadow"]
+
+
+def test_patch(sandbox_tenant, obc):
+    rule = post(
+        f"/org/onboarding_configs/{obc.id}/rule",
+        dict(
+            name="Cool Rule",
+            rule_expression="A or B",
+            action="fail",
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    update1 = patch(
+        f"/org/onboarding_configs/{obc.id}/rule/{rule['rule_id']}",
+        dict(name="New Name"),
+        *sandbox_tenant.db_auths,
+    )
+
+    assert update1["rule_id"] == rule["rule_id"]
+    assert update1["name"] == "New Name"
+
+    update2 = patch(
+        f"/org/onboarding_configs/{obc.id}/rule/{rule['rule_id']}",
+        dict(is_shadow=False, rule_expression="C or J"),
+        *sandbox_tenant.db_auths,
+    )
+
+    assert update2["name"] == "New Name"
+    assert update2["is_shadow"] == False
+    assert update2["rule_expression"] == "C or J"
+
+    rules = get(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+    assert len(rules) == 1
+    assert rules[0]["rule_expression"] == "C or J"

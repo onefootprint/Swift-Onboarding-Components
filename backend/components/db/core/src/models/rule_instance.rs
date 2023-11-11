@@ -1,3 +1,4 @@
+use super::data_lifetime::DataLifetime;
 use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
@@ -11,8 +12,6 @@ use newtypes::DbActor;
 use newtypes::RuleAction;
 use newtypes::{ObConfigurationId, RuleId, RuleInstanceId, TenantId};
 use rand::distributions::{Alphanumeric, DistString};
-
-use super::data_lifetime::DataLifetime;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = rule_instance)]
@@ -95,16 +94,19 @@ impl RuleInstance {
     #[tracing::instrument("RuleInstance::update", skip_all)]
     pub fn update(
         conn: &mut TxnPgConn,
+        ob_configuration_id: &ObConfigurationId,
         actor: DbActor,
         rule_id: &RuleId,
         update: RuleInstanceUpdate,
     ) -> DbResult<Self> {
         // If we had 2 concurrent txn's trying to modify the same User-Facing Rule, then the second transaction would hit an error when trying to write the new Rule row below because it would violate the rule_one_active_per_rule_id constraint. Not a big deal and concurrent edits to the same Rule isn't something we need to try hard to gracefully support. If we used a 2 table representation here (ie Rule + RuleVersion), then row locking on Rule while writing new RuleVersion rows would allow both txn's to succeed.
         let current: RuleInstance = rule_instance::table
+            .filter(rule_instance::ob_configuration_id.eq(ob_configuration_id))
             .filter(rule_instance::rule_id.eq(rule_id))
             .filter(rule_instance::deactivated_at.is_null())
             .for_no_key_update()
             .get_result(conn.conn())?;
+
         // TODO: check if no changes are actually being made and error or no-op in that case? Not a huge deal to just write a new row tho
         let now = Utc::now();
         let seqno = DataLifetime::get_current_seqno(conn)?;
@@ -179,7 +181,7 @@ mod tests {
 
         let rule = RuleInstance::create(
             conn,
-            obc.id,
+            obc.id.clone(),
             DbActor::Footprint,
             Some("name1".to_owned()),
             "A or B".to_owned(),
@@ -189,6 +191,7 @@ mod tests {
 
         let updated_rule = RuleInstance::update(
             conn,
+            &obc.id,
             DbActor::Footprint,
             &rule.rule_id,
             RuleInstanceUpdate {
