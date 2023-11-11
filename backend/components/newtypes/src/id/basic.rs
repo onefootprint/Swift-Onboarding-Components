@@ -228,3 +228,9 @@ define_newtype_id!(
     String,
     "`ref` from an Incode watchlist-result reponse"
 );
+define_newtype_id!(RuleInstanceId, String, "Identifier for a RuleInstance");
+define_newtype_id!(
+    RuleId,
+    String,
+    "Identifier for a user facing rule (represented as a changelog of multiple immutable `rule` rows all with the same rule_id)"
+);
