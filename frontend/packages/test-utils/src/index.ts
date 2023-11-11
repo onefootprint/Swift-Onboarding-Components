@@ -1,7 +1,6 @@
 import './utils/mock-resize-observer';
 import './utils/mock-pointer-events';
 
-export { default as fetchMock } from 'jest-fetch-mock';
 export {
   createClipboardSpy,
   createUseRouterSpy,

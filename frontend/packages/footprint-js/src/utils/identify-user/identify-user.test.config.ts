@@ -1,4 +1,4 @@
-import { mockRequest } from '@onefootprint/test-utils';
+import { mockRequest } from '../test-utils/mock-request';
 
 const baseUrl = process.env.API_BASE_URL ?? '';
 
