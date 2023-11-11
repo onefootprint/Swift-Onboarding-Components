@@ -1,5 +1,6 @@
 use crate::{util::impl_enum_str_diesel, DecisionStatus};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use paperclip::actix::Apiv2Schema;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::AsRefStr;
 use strum_macros::{Display, EnumIter, EnumString};
@@ -21,6 +22,7 @@ use strum_macros::{Display, EnumIter, EnumString};
     Ord,
     PartialOrd,
     EnumIter,
+    Apiv2Schema,
 )]
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]

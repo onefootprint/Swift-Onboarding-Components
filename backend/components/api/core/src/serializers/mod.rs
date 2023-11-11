@@ -19,6 +19,7 @@ mod organization_rolebinding;
 mod private_tenant;
 mod proxy_config;
 mod risk_signal;
+mod rule;
 mod secret_api_key;
 mod user;
 mod user_timeline;

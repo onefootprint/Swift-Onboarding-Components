@@ -66,3 +66,6 @@ pub use reonboard::*;
 
 mod apex_cip_report_request;
 pub use apex_cip_report_request::*;
+
+mod rule;
+pub use rule::*;

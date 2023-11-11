@@ -12,6 +12,7 @@ mod onboarding_configs;
 mod proxy_configs;
 mod risk_signals;
 mod roles;
+mod rules;
 mod sdk_args;
 mod settings;
 mod webhook_portal;
@@ -49,4 +50,5 @@ pub fn routes(config: &mut web::ServiceConfig) {
     authn::routes(config);
     api_keys::routes(config);
     proxy_configs::routes(config);
+    rules::routes(config);
 }

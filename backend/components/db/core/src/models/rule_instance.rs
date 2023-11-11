@@ -2,13 +2,14 @@ use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::{DateTime, Utc};
+use db_schema::schema::ob_configuration;
 use db_schema::schema::rule_instance;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::DataLifetimeSeqno;
 use newtypes::DbActor;
 use newtypes::RuleAction;
-use newtypes::{ObConfigurationId, RuleId, RuleInstanceId};
+use newtypes::{ObConfigurationId, RuleId, RuleInstanceId, TenantId};
 use rand::distributions::{Alphanumeric, DistString};
 
 use super::data_lifetime::DataLifetime;
@@ -137,6 +138,25 @@ impl RuleInstance {
             .filter(rule_instance::deactivated_at.is_null())
             .get_result(conn)?;
 
+        Ok(res)
+    }
+
+    #[tracing::instrument("Rule::list", skip_all)]
+    pub fn list(
+        conn: &mut PgConn,
+        tenant_id: &TenantId,
+        is_live: bool,
+        ob_config_id: &ObConfigurationId,
+    ) -> DbResult<Vec<Self>> {
+        let res = rule_instance::table
+            .inner_join(ob_configuration::table)
+            .filter(ob_configuration::tenant_id.eq(tenant_id))
+            .filter(ob_configuration::is_live.eq(is_live))
+            .filter(ob_configuration::id.eq(ob_config_id))
+            .filter(rule_instance::deactivated_at.is_null())
+            .select(rule_instance::all_columns)
+            .order_by(rule_instance::created_at.asc())
+            .get_results(conn)?;
         Ok(res)
     }
 }
