@@ -39,7 +39,7 @@
     "tsconfig": "*",
     "tsup": "^6.5.0",
     "typescript": "4.9.5",
-    "msw": "^1.1.0"
+    "jest-fetch-mock": "^3.0.3"
   },
   "publishConfig": {
     "access": "public"

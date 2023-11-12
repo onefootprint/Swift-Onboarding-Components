@@ -1,9 +1,14 @@
+import fetchMock from 'jest-fetch-mock';
+
 import identifyUser from './identify-user';
-import { withIdentify, withIdentifyError } from './identify-user.test.config';
 
 describe('identifyUser', () => {
+  beforeAll(() => {
+    fetchMock.enableMocks();
+  });
+
   beforeEach(() => {
-    withIdentifyError();
+    fetchMock.resetMocks();
   });
 
   describe('when nothing is passed', () => {
@@ -14,7 +19,12 @@ describe('identifyUser', () => {
 
   describe('when only email is passed and user is found', () => {
     beforeEach(() => {
-      withIdentify({ userFound: true, availableChallengeKinds: ['sms'] });
+      fetchMock.mockResponseOnce(
+        JSON.stringify({
+          available_challenge_kinds: ['sms'],
+          user_found: true,
+        }),
+      );
     });
 
     it('should return true', async () => {
@@ -24,27 +34,14 @@ describe('identifyUser', () => {
     });
   });
 
-  describe('when email and phoneNumber are passed, and user is found with the phoneNumber', () => {
-    it('should return true', async () => {
-      withIdentify({ userFound: false, once: true });
-      withIdentify({
-        userFound: true,
-        availableChallengeKinds: ['sms'],
-        once: true,
-      });
-
-      await expect(
-        identifyUser({
-          'id.email': 'jane.doe@acme.com',
-          'id.phone_number': '+1-202-555-0130',
-        }),
-      ).resolves.toEqual(true);
-    });
-  });
-
   describe('when only phoneNumber is passed and user is found', () => {
     beforeEach(() => {
-      withIdentify({ userFound: true, availableChallengeKinds: ['sms'] });
+      fetchMock.mockResponseOnce(
+        JSON.stringify({
+          available_challenge_kinds: ['sms'],
+          user_found: true,
+        }),
+      );
     });
 
     it('should return true', async () => {
@@ -54,9 +51,34 @@ describe('identifyUser', () => {
     });
   });
 
+  describe('when email and phoneNumber are passed, and user is found with the phoneNumber', () => {
+    beforeEach(() => {
+      fetchMock.mockResponseOnce(
+        JSON.stringify({ available_challenge_kinds: null, user_found: false }),
+      );
+      fetchMock.mockResponseOnce(
+        JSON.stringify({
+          available_challenge_kinds: ['sms'],
+          user_found: true,
+        }),
+      );
+    });
+
+    it('should return true', async () => {
+      await expect(
+        identifyUser({
+          'id.email': 'jane.doe@acme.com',
+          'id.phone_number': '+1-202-555-0130',
+        }),
+      ).resolves.toEqual(true);
+    });
+  });
+
   describe('when only email is passed and user is not found', () => {
     beforeEach(() => {
-      withIdentify({ userFound: false });
+      fetchMock.mockResponseOnce(
+        JSON.stringify({ available_challenge_kinds: null, user_found: false }),
+      );
     });
 
     it('should return false', async () => {
@@ -68,7 +90,12 @@ describe('identifyUser', () => {
 
   describe('when email and phoneNumber are passed and user is not found', () => {
     beforeEach(() => {
-      withIdentify({ userFound: false });
+      fetchMock.mockResponseOnce(
+        JSON.stringify({ available_challenge_kinds: null, user_found: false }),
+      );
+      fetchMock.mockResponseOnce(
+        JSON.stringify({ available_challenge_kinds: null, user_found: false }),
+      );
     });
 
     it('should return false', async () => {
