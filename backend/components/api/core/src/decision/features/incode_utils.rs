@@ -580,6 +580,22 @@ mod tests {
     )]
     #[test_case(
         OCRName {
+            full_name: Some("LOGAN J HILTON-BERNS".into()),
+            machine_readable_full_name: Some("LOGAN J HILTONBERNS".into()),
+            first_name: Some("LOGAN".into()),
+            middle_name: Some("J".into()),
+            given_name: Some("LOGAN J".into()),
+            paternal_last_name: Some("HILTON-BERNS".into()),
+            ..Default::default()               
+        } => ParsedIncodeNames {
+            first_name: Some("LOGAN".into()),
+            middle_name: Some("J".into()),
+            last_name: Some("HILTON-BERNS".into()),
+            full_name: Some("LOGAN J HILTON-BERNS".into())
+        } ; "hyphen in OCR names and MRZ name collapses hyphenated name into one"
+    )]
+    #[test_case(
+        OCRName {
             full_name: Some("BOB O'BERTO".into()),
             machine_readable_full_name: Some("BOB OBERTO".into()),
             first_name: Some("BOB".into()),
@@ -608,7 +624,6 @@ mod tests {
             full_name: Some("BOB O'BERTO".into())
         } ; "apostrophe in OCR names but not MRZ name, with trailing space in MRZ"
     )]
-    // TODO: add ^ same case but without trailing space
     fn test_parse_names_from_incode(name: OCRName) ->  ParsedIncodeNames{
         ParsedIncodeNames::from_fetch_ocr_res(&FetchOCRResponse {
             name: Some(name),
