@@ -4,3 +4,6 @@
 /mobile @onefootprint/mobile
 /backend @onefootprint/backend
 /backend/components/enclave @agrinman
+
+# An exception to the frontend rule: don't require frontend review when updating open API schema specs
+/frontend/apps/docs/src/pages/api-reference/assets

@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "d9b0dae9660b5e4f8490675406df2bf8a06a308a"
+        "version": "7c614892182c66dae265bb3a3eb097056c3caa60"
     },
     "servers": [
         {
@@ -3918,6 +3918,153 @@
                 ]
             }
         },
+        "/org/onboarding_configs/{id}/rules": {
+            "get": {
+                "tags": [
+                    "Playbooks",
+                    "Organization",
+                    "Private",
+                    "Rules"
+                ],
+                "description": "List all Rules for the playbook",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Rule"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Playbooks",
+                    "Organization",
+                    "Private",
+                    "Rules"
+                ],
+                "description": "Creates a new Rule for the playbook",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateRuleRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Rule"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/org/onboarding_configs/{obc_id}/rules/{rule_id}": {
+            "patch": {
+                "tags": [
+                    "Playbooks",
+                    "Organization",
+                    "Private",
+                    "Rules"
+                ],
+                "description": "Updates a Rule",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "obc_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "rule_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateRuleRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Rule"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/org/proxy_configs": {
             "get": {
                 "tags": [
@@ -6775,6 +6922,30 @@
                     "pinned_server_certificates",
                     "secret_headers",
                     "url"
+                ]
+            },
+            "CreateRuleRequest": {
+                "type": "object",
+                "properties": {
+                    "action": {
+                        "type": "string",
+                        "enum": [
+                            "PassWithManualReview",
+                            "StepUp",
+                            "ManualReview",
+                            "Fail"
+                        ]
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "rule_expression": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "action",
+                    "rule_expression"
                 ]
             },
             "CreateTenantRoleRequest": {
@@ -17853,6 +18024,43 @@
                     "timestamp"
                 ]
             },
+            "Rule": {
+                "type": "object",
+                "properties": {
+                    "action": {
+                        "type": "string",
+                        "enum": [
+                            "PassWithManualReview",
+                            "StepUp",
+                            "ManualReview",
+                            "Fail"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "is_shadow": {
+                        "type": "boolean"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "rule_expression": {
+                        "type": "string"
+                    },
+                    "rule_id": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "action",
+                    "created_at",
+                    "is_shadow",
+                    "rule_expression",
+                    "rule_id"
+                ]
+            },
             "SecretApiKey": {
                 "description": "Secret API key",
                 "type": "object",
@@ -18055,6 +18263,20 @@
                             "disabled",
                             "enabled"
                         ]
+                    }
+                }
+            },
+            "UpdateRuleRequest": {
+                "type": "object",
+                "properties": {
+                    "is_shadow": {
+                        "type": "boolean"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "rule_expression": {
+                        "type": "string"
                     }
                 }
             },

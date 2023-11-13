@@ -41,7 +41,7 @@ def obc(sandbox_tenant, must_collect_data, can_access_data):
 )
 def test_create(sandbox_tenant, data):
     res = post(
-        f"/org/onboarding_configs/{sandbox_tenant.default_ob_config.id}/rule",
+        f"/org/onboarding_configs/{sandbox_tenant.default_ob_config.id}/rules",
         data,
         *sandbox_tenant.db_auths,
     )
@@ -58,7 +58,7 @@ def test_create(sandbox_tenant, data):
 def test_list(sandbox_tenant, obc):
     rules = [
         post(
-            f"/org/onboarding_configs/{obc.id}/rule",
+            f"/org/onboarding_configs/{obc.id}/rules",
             dict(
                 rule_expression="",
                 action="fail",
@@ -84,7 +84,7 @@ def test_list(sandbox_tenant, obc):
 
 def test_patch(sandbox_tenant, obc):
     rule = post(
-        f"/org/onboarding_configs/{obc.id}/rule",
+        f"/org/onboarding_configs/{obc.id}/rules",
         dict(
             name="Cool Rule",
             rule_expression="A or B",
@@ -94,7 +94,7 @@ def test_patch(sandbox_tenant, obc):
     )
 
     update1 = patch(
-        f"/org/onboarding_configs/{obc.id}/rule/{rule['rule_id']}",
+        f"/org/onboarding_configs/{obc.id}/rules/{rule['rule_id']}",
         dict(name="New Name"),
         *sandbox_tenant.db_auths,
     )
@@ -103,7 +103,7 @@ def test_patch(sandbox_tenant, obc):
     assert update1["name"] == "New Name"
 
     update2 = patch(
-        f"/org/onboarding_configs/{obc.id}/rule/{rule['rule_id']}",
+        f"/org/onboarding_configs/{obc.id}/rules/{rule['rule_id']}",
         dict(is_shadow=False, rule_expression="C or J"),
         *sandbox_tenant.db_auths,
     )

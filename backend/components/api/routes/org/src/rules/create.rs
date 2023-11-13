@@ -14,7 +14,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
     description = "Creates a new Rule for the playbook",
     tags(Playbooks, Organization, Private, Rules)
 )]
-#[actix::post("/org/onboarding_configs/{id}/rule")]
+#[actix::post("/org/onboarding_configs/{id}/rules")]
 pub async fn create_rule(
     state: web::Data<State>,
     auth: TenantSessionAuth,
