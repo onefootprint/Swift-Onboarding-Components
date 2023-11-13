@@ -1,0 +1,13 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/idv/*": ["src/domains/idv/*"],
+      "@/wallet/*": ["./src/domains/wallet/*"],
+      "@/scan/*": ["src/components/id-doc/*"],
+    },
+  }
+}
