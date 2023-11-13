@@ -28,7 +28,6 @@ import React from 'react';
 import Idv from './idv';
 import {
   authorizeData,
-  checkAdditionalDataRequired,
   checkComplete,
   confirmKycData,
   getKycOnboardingConfig,
@@ -394,7 +393,6 @@ describe('<Idv />', () => {
         });
 
         await identifyUserByPhone();
-        await checkAdditionalDataRequired();
 
         await waitFor(() => {
           expect(screen.getByText('Basic Data')).toBeInTheDocument();

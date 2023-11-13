@@ -12,7 +12,6 @@ import {
 } from '../../../../../../plugins';
 import Logger from '../../../../../../utils/logger';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
-import AdditionalInfoRequired from '../additional-info-required';
 import Authorize from '../authorize';
 import CheckRequirements from '../check-requirements';
 import Process from '../process';
@@ -69,9 +68,6 @@ const Router = ({ onDone }: RouterProps) => {
 
   if (state.matches('checkRequirements')) {
     return <CheckRequirements />;
-  }
-  if (state.matches('additionalInfoRequired')) {
-    return <AdditionalInfoRequired />;
   }
   if (state.matches('kybData') && kyb) {
     return (

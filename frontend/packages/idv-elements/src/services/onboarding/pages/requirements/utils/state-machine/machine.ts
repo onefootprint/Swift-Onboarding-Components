@@ -7,7 +7,10 @@ import type {
 import { assign, createMachine } from 'xstate';
 
 import type { DeviceInfo } from '../../../../../../hooks/ui/use-device-info';
-import { RequirementTargets, requiresAdditionalInfo } from './machine.utils';
+import {
+  NextRequirementTargets,
+  RequirementCompletedTransition,
+} from './machine.utils';
 import type { MachineContext, MachineEvents } from './types';
 
 export type OnboardingRequirementsMachineArgs = {
@@ -69,88 +72,37 @@ const createOnboardingRequirementsMachine = ({
           },
         },
         router: {
-          always: [
-            {
-              target: 'additionalInfoRequired',
-              cond: context => requiresAdditionalInfo(context),
-            },
-            ...RequirementTargets,
-            {
-              target: 'success',
-            },
-          ],
+          always: NextRequirementTargets,
           // The first time (and every time after) leaving router, mark data collection as started
           exit: ['startDataCollection'],
-        },
-        additionalInfoRequired: {
-          on: {
-            requirementCompleted: [
-              ...RequirementTargets,
-              {
-                target: 'success',
-              },
-            ],
-          },
         },
         kybData: {
           // Since we also collect KYC data inside the KYB plugin, mark KYC data collected
           exit: ['markCollectedKycData'],
-          on: {
-            requirementCompleted: {
-              target: 'checkRequirements',
-            },
-          },
+          on: RequirementCompletedTransition,
         },
         investorProfile: {
-          on: {
-            requirementCompleted: {
-              target: 'checkRequirements',
-            },
-          },
+          on: RequirementCompletedTransition,
         },
         kycData: {
           exit: ['markCollectedKycData'],
-          on: {
-            requirementCompleted: {
-              target: 'checkRequirements',
-            },
-          },
+          on: RequirementCompletedTransition,
         },
         transfer: {
           exit: ['markDidRunTransfer'],
-          on: {
-            requirementCompleted: {
-              target: 'checkRequirements',
-            },
-          },
+          on: RequirementCompletedTransition,
         },
         liveness: {
-          on: {
-            requirementCompleted: {
-              target: 'checkRequirements',
-            },
-          },
+          on: RequirementCompletedTransition,
         },
         idDoc: {
-          on: {
-            requirementCompleted: {
-              target: 'checkRequirements',
-            },
-          },
+          on: RequirementCompletedTransition,
         },
         authorize: {
-          on: {
-            requirementCompleted: {
-              target: 'checkRequirements',
-            },
-          },
+          on: RequirementCompletedTransition,
         },
         process: {
-          on: {
-            requirementCompleted: {
-              target: 'checkRequirements',
-            },
-          },
+          on: RequirementCompletedTransition,
         },
         success: {
           type: 'final',

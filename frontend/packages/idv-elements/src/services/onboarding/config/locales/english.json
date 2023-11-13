@@ -6,11 +6,6 @@
     }
   },
   "pages": {
-    "additional-info-required": {
-      "title": "Additional data is required",
-      "subtitle": "In addition to the data we already have on you, {{tenantName}} requires some more information to verify your identity.",
-      "cta": "Continue"
-    },
     "authorize": {
       "title": "Authorize access",
       "subtitle": "{{tenantName}} will be able to securely view the following data:",

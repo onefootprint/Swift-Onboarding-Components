@@ -1,19 +1,23 @@
-import { getRequirement, OnboardingRequirementKind } from '@onefootprint/types';
+import { OnboardingRequirementKind } from '@onefootprint/types';
+import type { TransitionConfig, TransitionsConfig } from 'xstate';
 
-import type { MachineContext } from './types';
+import type { MachineContext, MachineEvents } from './types';
 
-type MachineTarget = {
-  target: string;
-  cond: (context: MachineContext) => boolean;
+export const RequirementCompletedTransition: TransitionsConfig<
+  MachineContext,
+  MachineEvents
+> = {
+  requirementCompleted: {
+    target: 'checkRequirements',
+  },
 };
-
-const isDocKind = (x: unknown) => x === OnboardingRequirementKind.idDoc;
-const isLivenessKind = (x: unknown) =>
-  x === OnboardingRequirementKind.registerPasskey;
 
 // NOTE: the ordering of these targets actually dictates the order in which requirements are
 // handled by the frontend
-export const RequirementTargets: MachineTarget[] = [
+export const NextRequirementTargets: TransitionConfig<
+  MachineContext,
+  MachineEvents
+>[] = [
   {
     target: 'kybData',
     cond: context => shouldRunCollectKybData(context),
@@ -46,44 +50,10 @@ export const RequirementTargets: MachineTarget[] = [
     target: 'process',
     cond: context => shouldShowProcess(context),
   },
+  {
+    target: 'success',
+  },
 ];
-
-export const requiresAdditionalInfo = (context: MachineContext) => {
-  const {
-    onboardingContext: { userFound, isTransfer },
-    requirements,
-    startedDataCollection,
-  } = context;
-  // If there's an unmet requirement after logging into an existing user, show a screen saying
-  // we need to collect additional info
-  const kyc = getRequirement(
-    requirements,
-    OnboardingRequirementKind.collectKycData,
-  );
-  const kyb = getRequirement(
-    requirements,
-    OnboardingRequirementKind.collectKybData,
-  );
-  const idDoc = getRequirement(requirements, OnboardingRequirementKind.idDoc);
-  const liveness = getRequirement(
-    requirements,
-    OnboardingRequirementKind.registerPasskey,
-  );
-  const investorProfile = getRequirement(
-    requirements,
-    OnboardingRequirementKind.investorProfile,
-  );
-  return (
-    !startedDataCollection &&
-    userFound &&
-    !isTransfer &&
-    ((!!kyc && !kyc.isMet) ||
-      !!idDoc ||
-      !!liveness ||
-      !!investorProfile ||
-      !!kyb)
-  );
-};
 
 const shouldRunCollectKybData = (context: MachineContext) =>
   context.requirements[0]?.kind === OnboardingRequirementKind.collectKybData &&
@@ -122,6 +92,10 @@ const shouldShowProcess = (context: MachineContext) => {
     context.requirements[0]?.kind === OnboardingRequirementKind.process
   );
 };
+
+const isDocKind = (x: unknown) => x === OnboardingRequirementKind.idDoc;
+const isLivenessKind = (x: unknown) =>
+  x === OnboardingRequirementKind.registerPasskey;
 
 const shouldRunTransfer = (context: MachineContext): boolean => {
   const {

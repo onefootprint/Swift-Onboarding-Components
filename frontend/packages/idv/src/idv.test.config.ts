@@ -398,17 +398,6 @@ export const authorizeData = async () => {
   await userEvent.click(authorizeButton);
 };
 
-export const checkAdditionalDataRequired = async () => {
-  await waitFor(() => {
-    expect(screen.getByText('Additional data is required')).toBeInTheDocument();
-  });
-  await userEvent.click(
-    screen.getByRole('button', {
-      name: 'Continue',
-    }),
-  );
-};
-
 export const checkComplete = async () => {
   await waitFor(() => {
     expect(screen.getByText('Submission completed!')).toBeInTheDocument();

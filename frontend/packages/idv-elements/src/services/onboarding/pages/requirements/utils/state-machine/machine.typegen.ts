@@ -3,7 +3,6 @@
 export interface Typegen0 {
   '@@xstate/typegen': true;
   internalEvents: {
-    '': { type: '' };
     'xstate.init': { type: 'xstate.init' };
     'xstate.stop': { type: 'xstate.stop' };
   };
@@ -16,15 +15,14 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignRequirements: 'onboardingRequirementsReceived';
-    markCollectedKycData: 'requirementCompleted' | 'xstate.stop';
-    markDidRunTransfer: 'requirementCompleted' | 'xstate.stop';
-    startDataCollection: '' | 'xstate.stop';
+    markCollectedKycData: 'xstate.stop';
+    markDidRunTransfer: 'xstate.stop';
+    startDataCollection: 'xstate.stop';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
-    | 'additionalInfoRequired'
     | 'authorize'
     | 'checkRequirements'
     | 'idDoc'
