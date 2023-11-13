@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
+    "build:sdk": "sh scripts/build-sdk.sh",
     "postinstall": "cd ../.. && yarn build:packages",
     "android": "react-native run-android",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",

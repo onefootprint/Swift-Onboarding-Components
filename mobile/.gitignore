@@ -36,3 +36,6 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+apps/verify/ios/sdk/Resources/
+apps/verify/ios/sdk/Frameworks/
