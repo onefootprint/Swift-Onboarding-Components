@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.8.0
+
+### Minor Changes
+
+- 4b9876ad1: Migrate to saving SDK args to API instead of post messages
+
 ## 3.7.1
 
 ### Patch Changes
