@@ -26,12 +26,4 @@ module.exports = {
   web: {
     favicon: './assets/favicon.png',
   },
-  plugins: [
-    [
-      'react-native-vision-camera',
-      {
-        cameraPermissionText: '$(PRODUCT_NAME) needs access to your Camera.',
-      },
-    ],
-  ],
 };
