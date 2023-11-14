@@ -10,6 +10,7 @@ use api_core::errors::AssertionError;
 use db::models::ob_configuration::ObConfiguration;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
+use newtypes::output::Csv;
 use newtypes::{
     AdverseMediaListKind, CipKind, DataIdentifierDiscriminant, EnhancedAml, ObConfigurationKind, TenantId,
 };
@@ -229,12 +230,8 @@ impl CreateOnboardingConfigurationRequest {
         self.validate_inner()?;
 
         let required_fields = match kind {
-            ObConfigurationKind::Auth => {
-                vec![CDO::Email, CDO::PhoneNumber]
-            }
-            ObConfigurationKind::Kyb => {
-                vec![CDO::BusinessName, CDO::BusinessAddress]
-            }
+            ObConfigurationKind::Auth => vec![CDO::Email, CDO::PhoneNumber],
+            ObConfigurationKind::Kyb => vec![CDO::BusinessName, CDO::BusinessAddress],
             ObConfigurationKind::Kyc => {
                 if self.is_no_phone_flow.unwrap_or(false) {
                     vec![CDO::Name, CDO::FullAddress, CDO::Email]
@@ -265,8 +262,8 @@ impl CreateOnboardingConfigurationRequest {
             .collect();
         if !missing_required_fields.is_empty() {
             return Err(TenantError::ValidationError(format!(
-                "Playbook must collect {:?}",
-                missing_required_fields
+                "Playbook must collect {}",
+                Csv(missing_required_fields)
             ))
             .into());
         }

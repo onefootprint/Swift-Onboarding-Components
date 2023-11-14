@@ -103,14 +103,7 @@ def test_api_key_list_filters(
     assert not any("key" in key for key in body["data"])
 
 
-def test_api_key_limited_role(
-    sandbox_tenant,
-    admin_role,
-    must_collect_data,
-    can_access_data,
-    sandbox_user,
-    limited_role,
-):
+def test_api_key_limited_role(sandbox_tenant, admin_role, sandbox_user, limited_role):
     data = dict(name="Test secret key", role_id=limited_role["id"])
     body = post("org/api_keys", data, *sandbox_tenant.db_auths)
     key = SecretApiKey.from_response(body)

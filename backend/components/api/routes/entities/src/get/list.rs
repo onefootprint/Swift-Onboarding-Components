@@ -8,14 +8,28 @@ use crate::types::response::CursorPaginatedResponse;
 use crate::types::CursorPaginationRequest;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
+use api_core::auth::tenant::TenantAuth;
 use api_core::errors::AssertionError;
 use api_core::types::CursorPaginatedResponseInner;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::search_utils::parse_search;
+use api_core::utils::vault_wrapper::bulk_decrypt;
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::BulkDecryptReq;
+use api_core::utils::vault_wrapper::DecryptAccessEventInfo;
+use api_core::utils::vault_wrapper::DecryptedData;
+use api_core::utils::vault_wrapper::EnclaveDecryptOperation;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_wire_types::ListEntitiesRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::scoped_vault::ScopedVaultListQueryParams;
+use itertools::Itertools;
+use newtypes::CardDataKind;
+use newtypes::CardInfo;
+use newtypes::CountArgs;
+use newtypes::DataIdentifier;
+use newtypes::FilterFunction;
+use newtypes::IdentityDataKind as IDK;
 use newtypes::ScopedVaultId;
 use paperclip::actix::{api_v2_operation, get, web};
 use std::collections::HashMap;
@@ -79,6 +93,9 @@ pub async fn get(
         })
         .await??;
 
+    let mut decrypted_results = decrypt_visible_attrs(&state, &auth, vws.values().collect()).await?;
+
+    // Always decrypt name and first letter of last name
     // If there are more than page_size results, we should tell the client there's another page
     let cursor = pagination
         .cursor_item(&state, &scoped_vaults)
@@ -94,11 +111,67 @@ pub async fn get(
             let entity = entities
                 .remove(&sv.id)
                 .ok_or(AssertionError("Entity info not found"))?;
-            Ok((vw, entity))
+            let decrypted_data = decrypted_results.remove(&sv.id).unwrap_or_default();
+            Ok((vw, entity, decrypted_data))
         })
         .collect::<ApiResult<Vec<_>>>()?
         .into_iter()
-        .map(|(vw, entity)| api_wire_types::Entity::from_db((entity, vw, &auth)))
+        .map(|(vw, entity, d)| api_wire_types::Entity::from_db((entity, vw, &auth, d)))
         .collect();
     CursorPaginatedResponseInner::ok(entities, cursor, Some(count))
+}
+
+/// Decrypt all of the data for the VWs that is visible by default without an explicit request
+#[allow(clippy::borrowed_box)]
+pub async fn decrypt_visible_attrs(
+    state: &State,
+    auth: &Box<dyn TenantAuth>,
+    vws: Vec<&TenantVw<Any>>,
+) -> ApiResult<HashMap<ScopedVaultId, DecryptedData>> {
+    let reqs = vws
+        .into_iter()
+        .map(|vw| {
+            let sv_id = vw.scoped_vault.id.clone();
+            // Always decrypt card last4
+            let card_dis = vw
+                .populated_dis()
+                .into_iter()
+                .filter(|di| {
+                    matches!(
+                        di,
+                        &DataIdentifier::Card(CardInfo {
+                            kind: CardDataKind::Last4,
+                            ..
+                        })
+                    )
+                })
+                .map(|di| di.into())
+                .collect_vec();
+            // Always decrypt id.first_name and last initial
+            let targets = vec![
+                EnclaveDecryptOperation::new(IDK::FirstName.into(), vec![]),
+                EnclaveDecryptOperation::new(
+                    IDK::LastName.into(),
+                    vec![FilterFunction::Prefix(CountArgs { count: 1 })],
+                ),
+            ]
+            .into_iter()
+            .chain(card_dis)
+            // Filter out attributes that can't be decrypted
+            .filter(|target| auth.actor_can_decrypt(target.identifier.clone()))
+            .filter(|target| vw.tenant_can_decrypt(target.identifier.clone()))
+            .collect();
+
+            let req = BulkDecryptReq { vw, targets };
+            (sv_id, req)
+        })
+        .collect();
+    // TODO it's strange we don't make an access event here, but we would if you requested to
+    // decrypt it
+    let access_event = DecryptAccessEventInfo::NoAccessEvent;
+    let decrypted_results = bulk_decrypt(state, reqs, access_event)
+        .await?
+        .into_iter()
+        .collect::<HashMap<_, _>>();
+    Ok(decrypted_results)
 }

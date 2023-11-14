@@ -4,6 +4,7 @@ use crate::errors::ApiResult;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::bulk_decrypt;
 use crate::utils::vault_wrapper::BulkDecryptReq;
+use crate::utils::vault_wrapper::DecryptAccessEventInfo;
 use crate::utils::vault_wrapper::EnclaveDecryptOperation;
 use crate::utils::vault_wrapper::TenantVw;
 use crate::utils::vault_wrapper::VaultWrapper;
@@ -68,7 +69,13 @@ pub async fn detokenize(
     let reason = reason.unwrap_or_else(|| "Vault Proxy Default Reason".to_string());
     let insight = CreateInsightEvent::from(insight);
     let actor = auth.actor().into();
-    let decrypted_results = bulk_decrypt(state, decrypt_reqs, insight, reason, actor, purpose).await?;
+    let access_event = DecryptAccessEventInfo::AccessEvent {
+        insight,
+        reason,
+        principal: actor,
+        purpose,
+    };
+    let decrypted_results = bulk_decrypt(state, decrypt_reqs, access_event).await?;
 
     let out = decrypted_results
         .into_iter()

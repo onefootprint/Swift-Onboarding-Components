@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use api_core::{
     auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
     types::{JsonApiResponse, ResponseData},
@@ -79,10 +81,14 @@ pub async fn post_inner(
         .chain(IPK::iter().map(Ip))
         .collect::<Vec<_>>();
 
-    let mut vd = uvw
+    let mut vd: HashMap<_, _> = uvw
         .decrypt_unchecked(&state.enclave_client, &attrs)
         .await?
-        .results_by_data_identifier();
+        .results
+        .into_iter()
+        // Ignore the transforms since we didn't use any here
+        .map(|(k, v)| (k.identifier, v))
+        .collect();
 
     let self_reported = ApexSelfReportedData {
         citizenships: vd.remove(&Id(Citizenships)),

@@ -2,7 +2,9 @@ use std::collections::HashMap;
 
 use crate::{InsightEvent, WatchlistCheck};
 use chrono::{DateTime, Utc};
-use newtypes::{DataIdentifier, DataLifetimeSource, FpId, PiiString, SandboxId, TenantId, VaultKind};
+use newtypes::{
+    DataIdentifier, DataLifetimeSource, FilterFunction, FpId, PiiString, SandboxId, TenantId, VaultKind,
+};
 use paperclip::actix::Apiv2Schema;
 
 use serde::Serialize;
@@ -21,15 +23,20 @@ pub struct Entity {
     pub start_timestamp: DateTime<Utc>,
     pub watchlist_check: Option<WatchlistCheck>,
     pub ordering_id: i64,
+    /// DEPRECATED.
     /// The list of attributes populated on this vault.
-    /// DEPRECATED
     pub attributes: Vec<DataIdentifier>,
+    /// DEPRECATED.
     /// The list of attributes populated on this vault and the source of the attribute.
-    pub attribute_sources: Vec<EntityAttribute>,
+    pub attribute_sources: Vec<DeprecatedEntityAttribute>,
+    /// DEPRECATED.
     /// The list of attributes and their values that are decrypted by default
     pub decrypted_attributes: HashMap<DataIdentifier, PiiString>,
+    /// DEPRECATED.
     /// The list of attributes that are allowed to be decrypted by the authed user
     pub decryptable_attributes: Vec<DataIdentifier>,
+    /// Metadata on the data that exists in this vault
+    pub data: Vec<EntityAttribute>,
     // These are a representation of the associated workflows
     pub status: Option<EntityStatus>,
     pub insight_event: Option<InsightEvent>,
@@ -39,6 +46,17 @@ pub struct Entity {
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct EntityAttribute {
+    pub identifier: DataIdentifier,
+    pub source: DataLifetimeSource,
+    pub is_decryptable: bool,
+    /// Decrypted, plaintext value if already decrypted
+    pub value: Option<PiiString>,
+    /// Decrypted transforms of this attribute, if already decrypted
+    pub transforms: HashMap<FilterFunction, PiiString>,
+}
+
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+pub struct DeprecatedEntityAttribute {
     pub identifier: DataIdentifier,
     pub source: DataLifetimeSource,
 }

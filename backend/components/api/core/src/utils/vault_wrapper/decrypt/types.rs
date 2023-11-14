@@ -57,14 +57,6 @@ impl<T> Default for DecryptUncheckedResult<T> {
     }
 }
 
-impl DecryptUncheckedResult {
-    /// convenience method to ignore the transforms
-    /// and just map results to DI <-> PII dictionary
-    pub fn results_by_data_identifier(self) -> HashMap<DataIdentifier, PiiString> {
-        self.results.into_iter().map(|(k, v)| (k.identifier, v)).collect()
-    }
-}
-
 impl DecryptUncheckedResult<Pii> {
     pub(in crate::utils::vault_wrapper) fn map_to_piistrings(
         self,

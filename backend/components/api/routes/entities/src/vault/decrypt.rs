@@ -9,7 +9,9 @@ use api_core::auth::CanDecrypt;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::{ApiResult, AssertionError};
 use api_core::telemetry::RootSpan;
-use api_core::utils::vault_wrapper::{bulk_decrypt, BulkDecryptReq, EnclaveDecryptOperation, TenantVw};
+use api_core::utils::vault_wrapper::{
+    bulk_decrypt, BulkDecryptReq, DecryptAccessEventInfo, EnclaveDecryptOperation, TenantVw,
+};
 use api_wire_types::DecryptResponse;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
@@ -186,7 +188,13 @@ pub(super) async fn post_inner(
     let insight = CreateInsightEvent::from(insights);
     let actor = auth.actor().into();
     let purpose = AccessEventPurpose::Api;
-    let mut decrypted_results = bulk_decrypt(state, reqs, insight, reason, actor, purpose)
+    let access_event = DecryptAccessEventInfo::AccessEvent {
+        insight,
+        reason,
+        principal: actor,
+        purpose,
+    };
+    let mut decrypted_results = bulk_decrypt(state, reqs, access_event)
         .await?
         .into_iter()
         .collect::<HashMap<_, _>>();

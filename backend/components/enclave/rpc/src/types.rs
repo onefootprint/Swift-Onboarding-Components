@@ -34,6 +34,7 @@ pub enum DataTransform {
     Identity,
     /// HMAC-SHA256
     HmacSha256 {
+        // TODO we should have a pii type for this
         key: Vec<u8>,
     },
     /// asymmetric encryption
@@ -69,6 +70,8 @@ impl std::fmt::Debug for DataTransform {
 
 impl std::fmt::Display for DataTransform {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // Since the transforms may have some sensitive information (ie secret keys), just show
+        // the name of the transform, none of the args
         std::fmt::Display::fmt(&DataTransformName::from(self), f)
     }
 }
@@ -76,6 +79,10 @@ impl std::fmt::Display for DataTransform {
 #[derive(Clone, Serialize, Deserialize, PartialEq, Hash, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum EncryptTransformAlgorithm {
+    // Provide explicit serializations here - it's easy for this to drift from the strum
+    // serializations used in the API crate
+    #[serde(rename = "rsa_pkcs1v15")]
     RsaPksc1v15,
+    #[serde(rename = "ecies_p256x963_sha256_aes_gcm")]
     EciesP256X963Sha256AesGcm,
 }

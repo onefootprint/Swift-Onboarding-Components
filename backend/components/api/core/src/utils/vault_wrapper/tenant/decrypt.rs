@@ -15,7 +15,9 @@ impl<Type> TenantVw<Type> {
     ) -> ApiResult<Vec<EnclaveDecryptOperation>> {
         let can_access = targets
             .into_iter()
-            .filter(|x| !self.has_field((x.identifier).clone()) || self.can_decrypt(x.identifier.clone()))
+            .filter(|x| {
+                !self.has_field((x.identifier).clone()) || self.tenant_can_decrypt(x.identifier.clone())
+            })
             .collect_vec();
         Ok(can_access)
     }

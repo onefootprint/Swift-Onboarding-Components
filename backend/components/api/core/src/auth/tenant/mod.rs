@@ -7,6 +7,7 @@ use db::models::tenant::Tenant;
 use db::models::tenant_user::TenantUser;
 
 mod secret_key;
+use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSource;
 use newtypes::WorkosAuthMethod;
 pub use secret_key::*;
@@ -21,6 +22,7 @@ pub use firm_employee::*;
 
 use super::Any;
 use super::AuthError;
+use super::CanDecrypt;
 use super::Either;
 use super::IsGuardMet;
 use super::Or;
@@ -77,6 +79,10 @@ pub trait TenantAuth {
     fn actor(&self) -> AuthActor;
     fn scopes(&self) -> Vec<TenantScope>;
     fn source(&self) -> DataLifetimeSource;
+    /// Returns whether the auth scopes granted to this actor can decrypt the provided DI
+    fn actor_can_decrypt(&self, di: DataIdentifier) -> bool {
+        CanDecrypt::single(di).or_admin().is_met(&self.scopes())
+    }
 }
 
 pub trait GetFirmEmployee {

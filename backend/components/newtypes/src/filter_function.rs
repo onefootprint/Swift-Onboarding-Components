@@ -10,7 +10,16 @@ use crate::PiiBytes;
 
 /// Represents a data transform to apply to underlying plaintext behind a data identifier
 /// Proxy syntax example: `{{ id.first_name | to_lower_case }}
-#[derive(Debug, Clone, EnumDiscriminants, PartialEq, Eq, Hash, serde_with::DeserializeFromStr)]
+#[derive(
+    Debug,
+    Clone,
+    EnumDiscriminants,
+    PartialEq,
+    Eq,
+    Hash,
+    serde_with::DeserializeFromStr,
+    serde_with::SerializeDisplay,
+)]
 #[strum_discriminants(name(FilterFunctionName))]
 #[strum_discriminants(derive(
     serde_with::SerializeDisplay,
@@ -80,9 +89,10 @@ pub struct EncryptArgs {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, strum_macros::Display, EnumString)]
-#[strum(serialize_all = "snake_case")]
 pub enum EncryptFilterAlgorithmName {
+    #[strum(serialize = "rsa_pkcs1v15")]
     RsaPkcs1v15,
+    #[strum(serialize = "ecies_p256x963_sha256_aes_gcm")]
     EciesP256X963Sha256AesGcm,
 }
 

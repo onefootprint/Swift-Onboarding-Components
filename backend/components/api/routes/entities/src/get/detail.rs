@@ -2,6 +2,7 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::errors::ApiError;
+use crate::get::list::decrypt_visible_attrs;
 use crate::get::EntityDetailResponse;
 use crate::types::JsonApiResponse;
 use crate::types::ResponseData;
@@ -12,10 +13,6 @@ use api_core::utils::vault_wrapper::TenantVw;
 use api_core::ApiErrorKind;
 use db::models::scoped_vault::ScopedVault;
 use db::scoped_vault::ScopedVaultListQueryParams;
-use itertools::Itertools;
-use newtypes::CardDataKind;
-use newtypes::CardInfo;
-use newtypes::DataIdentifier;
 use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, get, web};
 
@@ -62,27 +59,12 @@ pub async fn get(
         })
         .await??;
 
-    // Always decrypt card last4.
-    // TODO it's strange we don't make an access event here, but we would if you requested to
-    // decrypt it
-    let additional_visible_dis = vw
-        .populated_dis()
-        .into_iter()
-        .filter(|di| {
-            matches!(
-                di,
-                DataIdentifier::Card(CardInfo {
-                    alias: _,
-                    kind: CardDataKind::Last4,
-                })
-            )
-        })
-        .collect_vec();
-    let additional_visible_attrs = vw
-        .decrypt_unchecked(&state.enclave_client, &additional_visible_dis)
+    let decrypted_results = decrypt_visible_attrs(&state, &auth, vec![&vw])
         .await?
-        .results_by_data_identifier();
+        .into_values()
+        .next()
+        .unwrap_or_default();
 
-    let result = api_wire_types::Entity::from_db((entity, &vw, &auth, additional_visible_attrs));
+    let result = api_wire_types::Entity::from_db((entity, &vw, &auth, decrypted_results));
     ResponseData::ok(result).json()
 }

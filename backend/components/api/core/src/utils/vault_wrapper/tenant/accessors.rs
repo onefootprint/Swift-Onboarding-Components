@@ -40,8 +40,9 @@ impl<Type> TenantVw<Type> {
         }
     }
 
-    /// Determines if a provided DI is decryptable through this VW.
-    pub fn can_decrypt(&self, di: DataIdentifier) -> bool {
+    /// Determines if a provided DI is decryptable through this VW by the provided tenant, checking
+    /// ob config can access rules.
+    pub fn tenant_can_decrypt(&self, di: DataIdentifier) -> bool {
         if self.is_in_must_collect(&di) {
             // If the piece of data was requested to be collected, it is decryptable as long as the
             // workflow was authorized and the field is in can_decrypt
@@ -71,7 +72,7 @@ impl<Type> TenantVw<Type> {
             };
             // This is a one-click onboarding IF there's data added by another scoped vault OR
             // there's exists data that isn't currently decryptable
-            dl.scoped_vault_id != self.scoped_vault.id || !self.can_decrypt(di)
+            dl.scoped_vault_id != self.scoped_vault.id || !self.tenant_can_decrypt(di)
         })
     }
 }

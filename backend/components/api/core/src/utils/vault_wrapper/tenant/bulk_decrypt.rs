@@ -26,14 +26,28 @@ pub struct BulkDecryptReq<'a, T = Any> {
 
 const MAX_ACCESS_EVENTS: usize = 5000;
 
+/// Represents all the info needed to make an access event during decryption
+#[allow(clippy::large_enum_variant)]
+pub enum DecryptAccessEventInfo {
+    // Could use an Option<>, but this forces the caller to explicitly consent to NoAccessEvent
+    AccessEvent {
+        insight: CreateInsightEvent,
+        reason: String,
+        principal: DbActor,
+        purpose: AccessEventPurpose,
+    },
+    NoAccessEvent,
+}
+
+pub type DecryptedData = HashMap<EnclaveDecryptOperation, PiiJsonValue>;
+
 pub async fn bulk_decrypt<'a, TKey, T>(
     state: &State,
     requests: HashMap<TKey, BulkDecryptReq<'a, T>>,
-    insight: CreateInsightEvent,
-    reason: String,
-    principal: DbActor,
-    purpose: AccessEventPurpose,
-) -> ApiResult<Vec<(TKey, HashMap<EnclaveDecryptOperation, PiiJsonValue>)>>
+    // maybe unchecked too so it doesn't error if the user can't decrypt???
+    // integration test for user with role that can't decrypt
+    access_event: DecryptAccessEventInfo,
+) -> ApiResult<Vec<(TKey, DecryptedData)>>
 where
     TKey: Eq + std::hash::Hash + 'static + Clone,
 {
@@ -87,42 +101,50 @@ where
 
     // Bulk save all new access events in the DB. We'll use only one insight event for all of the
     // access events
-    state
-        .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
-            let insight = insight.insert_with_conn(conn)?;
-            let access_events = access_events
-                .into_iter()
-                .map(|(fp_id, targets)| -> ApiResult<_> {
-                    let sv = fp_id_to_sv
-                        .remove(&fp_id)
-                        .ok_or(AssertionError("No ScopedVault for key"))?;
-                    // Combine decrypts for one fp_id into a single access event
-                    let targets = targets.into_iter().flatten().unique().collect();
-                    // NOTE: If we add any more fields to the access event, we might have to lower
-                    // the chunk size below or we'll hit a max size for an insert statement.
-                    let access_event = NewAccessEventRow {
-                        scoped_vault_id: sv.id,
-                        tenant_id: sv.tenant_id,
-                        is_live: sv.is_live,
-                        // TODO: also store the transforms!
-                        targets,
-                        insight_event_id: insight.id.clone(),
-                        reason: Some(reason.clone()),
-                        principal: principal.clone(),
-                        kind: AccessEventKind::Decrypt,
-                        purpose,
-                    };
-                    Ok(access_event)
-                })
-                .collect::<ApiResult<Vec<_>>>()?;
+    if let DecryptAccessEventInfo::AccessEvent {
+        reason,
+        principal,
+        purpose,
+        insight,
+    } = access_event
+    {
+        state
+            .db_pool
+            .db_query(move |conn| -> ApiResult<_> {
+                let insight = insight.insert_with_conn(conn)?;
+                let access_events = access_events
+                    .into_iter()
+                    .map(|(fp_id, targets)| -> ApiResult<_> {
+                        let sv = fp_id_to_sv
+                            .remove(&fp_id)
+                            .ok_or(AssertionError("No ScopedVault for key"))?;
+                        // Combine decrypts for one fp_id into a single access event
+                        let targets = targets.into_iter().flatten().unique().collect();
+                        // NOTE: If we add any more fields to the access event, we might have to lower
+                        // the chunk size below or we'll hit a max size for an insert statement.
+                        let access_event = NewAccessEventRow {
+                            scoped_vault_id: sv.id,
+                            tenant_id: sv.tenant_id,
+                            is_live: sv.is_live,
+                            // TODO: also store the transforms!
+                            targets,
+                            insight_event_id: insight.id.clone(),
+                            reason: Some(reason.clone()),
+                            principal: principal.clone(),
+                            kind: AccessEventKind::Decrypt,
+                            purpose,
+                        };
+                        Ok(access_event)
+                    })
+                    .collect::<ApiResult<Vec<_>>>()?;
 
-            for access_events in access_events.into_iter().chunks(MAX_ACCESS_EVENTS).into_iter() {
-                AccessEvent::bulk_create(conn, access_events.into_iter().collect())?;
-            }
-            Ok(())
-        })
-        .await??;
+                for access_events in access_events.into_iter().chunks(MAX_ACCESS_EVENTS).into_iter() {
+                    AccessEvent::bulk_create(conn, access_events.into_iter().collect())?;
+                }
+                Ok(())
+            })
+            .await??;
+    }
 
     Ok(decrypted_results)
 }

@@ -321,17 +321,60 @@ def test_get_annotations(sandbox_user):
     assert annotation2["is_pinned"] == True
 
 
-def test_update_data(sandbox_user, sandbox_tenant):
+def test_update_data(sandbox_tenant):
     """
     Test updating an existing vault from the dashboard
     """
+    data = {"id.first_name": "Flerp", "id.last_name": "Derp"}
+    fp_id = post("users", data, sandbox_tenant.sk.key)["id"]
     data = {"id.first_name": "Hayes", "id.last_name": "Valley"}
-    patch(f"users/{sandbox_user.fp_id}/vault", data, *sandbox_tenant.db_auths)
+    patch(f"users/{fp_id}/vault", data, *sandbox_tenant.db_auths)
 
-    body = get(
-        f"entities/{sandbox_user.fp_id}/timeline", None, *sandbox_tenant.db_auths
-    )
+    body = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
     event = body[0]["event"]
     assert event["kind"] == "data_collected"
     assert event["data"]["attributes"] == ["name"]
     assert event["data"]["actor"]["kind"] == "organization"
+    # And the initial event that added the name
+    event = body[1]["event"]
+    assert event["kind"] == "data_collected"
+    assert event["data"]["attributes"] == ["name"]
+    assert event["data"]["actor"]["kind"] == "api_key"
+
+
+def test_entity_data(sandbox_user, sandbox_tenant):
+    """
+    Check the data attribute in the GET /entities list and detail endpoints, including the data
+    that is auto decrypted.
+    """
+    body = get("entities", None, *sandbox_tenant.db_auths)
+    user_list = next(u for u in body["data"] if u["id"] == sandbox_user.fp_id)
+    user_detail = get(f"entities/{sandbox_user.fp_id}", None, *sandbox_tenant.db_auths)
+
+    for user in [user_list, user_detail]:
+        first_name = next(d for d in user["data"] if d["identifier"] == "id.first_name")
+        assert (
+            first_name["value"] == sandbox_user.client.decrypted_data["id.first_name"]
+        )
+        assert first_name["source"] == "hosted"
+        assert first_name["is_decryptable"]
+
+        last_name = next(d for d in user["data"] if d["identifier"] == "id.last_name")
+        assert not last_name["value"]
+        assert (
+            last_name["transforms"]["prefix(1)"]
+            == sandbox_user.client.decrypted_data["id.last_name"][0]
+        )
+        assert last_name["source"] == "hosted"
+        assert last_name["is_decryptable"]
+
+        phone_number = next(
+            d for d in user["data"] if d["identifier"] == "id.phone_number"
+        )
+        assert not phone_number["value"]
+        assert not phone_number["transforms"]
+        assert phone_number["source"] == "hosted"
+        assert phone_number["is_decryptable"]
+
+
+# TODO test user without IAM permissions can't see first name
