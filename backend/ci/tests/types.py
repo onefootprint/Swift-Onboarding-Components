@@ -47,8 +47,8 @@ class Tenant(NamedTuple):
     name: str
     db_auths: list
     auth_token: DashboardAuth
-    # The tenant user id for the authed user
-    member_id: str
+    ro_db_auths: list
+    ro_auth_token: DashboardAuth
 
 
 class BasicUser(NamedTuple):

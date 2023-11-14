@@ -43,7 +43,7 @@ pub struct TenantRole {
     pub is_live: Option<IsLive>,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 /// Represents the two immutable roles that every tenant has
 pub enum ImmutableRoleKind {
     Admin,

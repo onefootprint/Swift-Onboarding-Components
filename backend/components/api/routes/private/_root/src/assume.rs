@@ -10,7 +10,7 @@ use api_core::types::{JsonApiResponse, ResponseData};
 use api_core::utils::db2api::DbToApi;
 use api_core::State;
 use db::models::tenant::Tenant;
-use newtypes::{OrgMemberEmail, TenantId, INTEGRATION_TEST_USER_EMAIL};
+use newtypes::{OrgMemberEmail, TenantId};
 
 #[derive(Debug, serde::Deserialize)]
 struct AssumeRequest {
@@ -31,8 +31,11 @@ async fn post(
 
     // We have this custom logic for the integration testing user to limit who they can impersonate.
     // We don't want the integration testing user to be able to have unlimited read access to all tenants.
-    let integration_test_email = OrgMemberEmail::from_str(INTEGRATION_TEST_USER_EMAIL)?;
-    if firm_employee.email == integration_test_email && !tenant_id.is_integration_test_tenant() {
+    let integration_test_email = OrgMemberEmail::from_str(OrgMemberEmail::INTEGRATION_TEST_USER_EMAIL)?;
+    let ro_integration_test_email = OrgMemberEmail::from_str(OrgMemberEmail::INTEGRATION_TEST_RO_USER_EMAIL)?;
+    let is_it_email =
+        firm_employee.email == integration_test_email || firm_employee.email == ro_integration_test_email;
+    if is_it_email && !tenant_id.is_integration_test_tenant() {
         return Err(AuthError::NotFirmEmployee.into());
     }
 

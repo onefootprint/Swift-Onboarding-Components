@@ -223,20 +223,23 @@ def test_update_user_role(sandbox_tenant, tenant_user, limited_role):
     assert user["role"]["id"] == limited_role["id"]
 
 
-def test_cannot_edit_current_user(sandbox_tenant, limited_role):
-    user_id = sandbox_tenant.member_id
+@pytest.fixture
+def authed_member_id(sandbox_tenant):
+    return get("org/member", None, *sandbox_tenant.db_auths)["id"]
+
+
+def test_cannot_edit_current_user(authed_member_id, sandbox_tenant, limited_role):
     patch(
-        f"org/members/{user_id}",
+        f"org/members/{authed_member_id}",
         dict(role_id=limited_role["id"]),
         *sandbox_tenant.db_auths,
         status_code=400,
     )
 
 
-def test_cannot_deactivate_current_user(sandbox_tenant):
-    user_id = sandbox_tenant.member_id
+def test_cannot_deactivate_current_user(authed_member_id, sandbox_tenant):
     post(
-        f"org/members/{user_id}/deactivate",
+        f"org/members/{authed_member_id}/deactivate",
         None,
         *sandbox_tenant.db_auths,
         status_code=400,

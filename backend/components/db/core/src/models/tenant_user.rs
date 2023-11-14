@@ -4,7 +4,7 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::tenant_user;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{Locked, OrgMemberEmail, PiiString, TenantUserId, INTEGRATION_TEST_USER_EMAIL};
+use newtypes::{Locked, OrgMemberEmail, PiiString, TenantUserId};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = tenant_user)]
@@ -96,7 +96,7 @@ impl TenantUser {
     pub fn set_is_firm_employee_testing_only(conn: &mut PgConn, id: &TenantUserId) -> DbResult<Self> {
         let user = diesel::update(tenant_user::table)
             .filter(tenant_user::id.eq(id))
-            .filter(tenant_user::email.eq(INTEGRATION_TEST_USER_EMAIL))
+            .filter(tenant_user::email.eq(OrgMemberEmail::INTEGRATION_TEST_USER_EMAIL))
             .set(tenant_user::is_firm_employee.eq(true))
             .get_result(conn)?;
         Ok(user)

@@ -16,10 +16,7 @@ use db::models::tenant_role::{ImmutableRoleKind, TenantRole};
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::{
-    OrgMemberEmail, SessionAuthToken, TenantId, TenantRoleKind, TenantUserId, WorkosAuthMethod,
-    INTEGRATION_TEST_USER_EMAIL,
-};
+use newtypes::{OrgMemberEmail, SessionAuthToken, TenantId, TenantRoleKind, WorkosAuthMethod};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 struct NewClientRequest {
@@ -36,7 +33,15 @@ struct NewClientResponse {
     org_id: TenantId,
     key: api_wire_types::SecretApiKey,
     auth_token: SessionAuthToken,
-    tenant_user_id: TenantUserId,
+    ro_auth_token: SessionAuthToken,
+}
+
+struct Result {
+    tenant: Tenant,
+    api_key: TenantApiKey,
+    api_key_role: TenantRole,
+    auth_token: SessionAuthToken,
+    ro_auth_token: SessionAuthToken,
 }
 
 #[post("/private/test_tenant")]
@@ -61,7 +66,13 @@ async fn post(
     let secret_api_key = SecretApiKey::generate(is_live);
     let sh_secret_api_key = secret_api_key.fingerprint(state.as_ref()).await?;
 
-    let (tenant, rb, auth_token, api_key, role) = state
+    let Result {
+        tenant,
+        api_key,
+        api_key_role,
+        auth_token,
+        ro_auth_token,
+    } = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             //
@@ -95,60 +106,83 @@ async fn post(
             //
             // Get or create the TenantUser
             //
-            let email = OrgMemberEmail::from_str(INTEGRATION_TEST_USER_EMAIL)?;
-            let user = TenantUser::get_and_update_or_create(
-                conn,
-                email, // Always create with the same email so we find it next time
-                Some("Footprint".to_owned()),
-                Some("Integration Testing".to_owned()),
-            )?;
-            let user = TenantUser::set_is_firm_employee_testing_only(conn, &user.id)?;
-            let admin_irk = ImmutableRoleKind::Admin;
-            let admin_role =
-                TenantRole::get_immutable(conn, &tenant.id, admin_irk, TenantRoleKind::DashboardUser)?;
-            let rb = match TenantRolebinding::get(conn, (&user.id, &tenant.id)) {
-                Ok((_, rb, _, _)) => rb,
-                Err(e) => {
-                    if !e.is_not_found() {
-                        return Err(e.into()); // Real error, return
+            let mut create_auth_token = |email: &str,
+                                         irk: ImmutableRoleKind|
+             -> ApiResult<SessionAuthToken> {
+                let email = OrgMemberEmail::from_str(email)?;
+                let first_name = Some("Footprint".to_owned());
+                let last_name = Some("Integration Testing".to_owned());
+                let user = TenantUser::get_and_update_or_create(conn, email, first_name, last_name)?;
+                let user = if irk == ImmutableRoleKind::Admin {
+                    TenantUser::set_is_firm_employee_testing_only(conn, &user.id)?
+                } else {
+                    // No reason to give read-only user firm employee perms
+                    user
+                };
+                let role = TenantRole::get_immutable(conn, &tenant.id, irk, TenantRoleKind::DashboardUser)?;
+                let rb = match TenantRolebinding::get(conn, (&user.id, &tenant.id)) {
+                    Ok((_, rb, _, _)) => rb,
+                    Err(e) => {
+                        if !e.is_not_found() {
+                            return Err(e.into()); // Real error, return
+                        }
+                        let role_id = role.id.clone();
+                        let tenant_id = role.tenant_id;
+                        let (rb, _) = TenantRolebinding::create(conn, user.id, role_id, tenant_id)?;
+                        rb
                     }
-                    let role_id = admin_role.id.clone();
-                    let tenant_id = admin_role.tenant_id;
-                    let (rb, _) = TenantRolebinding::create(conn, user.id, role_id, tenant_id)?;
-                    rb
-                }
+                };
+                // Create a new tenant RB session for the integration test tenant user
+                let session_data =
+                    TenantRbSession::create(&tenant, rb.id.clone(), WorkosAuthMethod::GoogleOauth)?.into();
+                let (auth_token, _) =
+                    AuthSession::create_sync(conn, &key, session_data, Duration::minutes(30))?;
+                Ok(auth_token)
             };
-            // Create a new workos session for the integration test tenant user
-            let session_data =
-                TenantRbSession::create(&tenant, rb.id.clone(), WorkosAuthMethod::GoogleOauth)?.into();
-            let (auth_token, _) = AuthSession::create_sync(conn, &key, session_data, Duration::minutes(30))?;
+            let auth_token = create_auth_token(
+                OrgMemberEmail::INTEGRATION_TEST_USER_EMAIL,
+                ImmutableRoleKind::Admin,
+            )?;
+            let ro_auth_token = create_auth_token(
+                OrgMemberEmail::INTEGRATION_TEST_RO_USER_EMAIL,
+                ImmutableRoleKind::ReadOnly,
+            )?;
 
             //
-            // Get or create the TenantUser
+            // Get or create the api key
             //
+            let rk = ImmutableRoleKind::Admin;
             let admin_role =
-                TenantRole::get_immutable(conn, &tenant.id, admin_irk, TenantRoleKind::ApiKey { is_live })?;
+                TenantRole::get_immutable(conn, &tenant.id, rk, TenantRoleKind::ApiKey { is_live })?;
             let tenant_api_key_name = "Integration test API key";
-            let (api_key, role) = match TenantApiKey::get(conn, (tenant_api_key_name, &tenant.id, is_live)) {
-                Ok(r) => r,
-                Err(e) => {
-                    if !e.is_not_found() {
-                        return Err(e.into()); // Real error, return
+            let (api_key, api_key_role) =
+                match TenantApiKey::get(conn, (tenant_api_key_name, &tenant.id, is_live)) {
+                    Ok(r) => r,
+                    Err(e) => {
+                        if !e.is_not_found() {
+                            return Err(e.into()); // Real error, return
+                        }
+                        let api_key = TenantApiKey::create(
+                            conn,
+                            // Always create it with the same name so we find it next time
+                            tenant_api_key_name.to_owned(),
+                            sh_secret_api_key,
+                            secret_api_key.seal_to(&tenant.public_key)?,
+                            tenant.id.clone(),
+                            is_live,
+                            admin_role.id.clone(),
+                        )?;
+                        (api_key, admin_role)
                     }
-                    let api_key = TenantApiKey::create(
-                        conn,
-                        // Always create it with the same name so we find it next time
-                        tenant_api_key_name.to_owned(),
-                        sh_secret_api_key,
-                        secret_api_key.seal_to(&tenant.public_key)?,
-                        tenant.id.clone(),
-                        is_live,
-                        admin_role.id.clone(),
-                    )?;
-                    (api_key, admin_role)
-                }
+                };
+            let result = Result {
+                tenant,
+                api_key,
+                api_key_role,
+                auth_token,
+                ro_auth_token,
             };
-            Ok((tenant, rb, auth_token, api_key, role))
+            Ok(result)
         })
         .await?;
 
@@ -159,12 +193,11 @@ async fn post(
         .await?;
     let decrypted_api_key = SecretApiKey::from(decrypted_api_key.leak().to_string());
 
-    Ok(Json(ResponseData {
-        data: NewClientResponse {
-            org_id: tenant.id,
-            key: api_wire_types::SecretApiKey::from_db((api_key, role, Some(decrypted_api_key))),
-            auth_token,
-            tenant_user_id: rb.tenant_user_id,
-        },
-    }))
+    let response = NewClientResponse {
+        org_id: tenant.id,
+        key: api_wire_types::SecretApiKey::from_db((api_key, api_key_role, Some(decrypted_api_key))),
+        auth_token,
+        ro_auth_token,
+    };
+    ResponseData::ok(response).json()
 }

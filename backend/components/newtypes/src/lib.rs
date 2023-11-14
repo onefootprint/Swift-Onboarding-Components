@@ -180,11 +180,6 @@ pub enum EnumDotNotationError {
     CannotParseSuffix(String),
 }
 
-/// The email address of the TenantUser that is used in integration tests.
-/// This tenant user has is_firm_employee set, which is slightly dangerous. So, we use
-/// this hardcoded email address to also gate permissions in some places.
-/// DO NOT CHANGE THIS UNLESS YOU KNOW WHAT YOU ARE DOING.
-pub static INTEGRATION_TEST_USER_EMAIL: &str = "integrationtests@onefootprint.com";
 #[macro_use]
 pub mod util {
     // Derive to_sql using the type's as_ref() method and from_sql with the type's from_str method

@@ -498,6 +498,7 @@ def create_tenant(org_data, ob_conf_data):
     print(body)
     sk = SecretApiKey.from_response(body["key"])
     auth_token = DashboardAuth(body["auth_token"])
+    ro_auth_token = DashboardAuth(body["ro_auth_token"])
     is_live = IsLive("true" if org_data.get("is_live", False) else "false")
     tenant = Tenant(
         id=body["org_id"],
@@ -505,7 +506,8 @@ def create_tenant(org_data, ob_conf_data):
         name=org_data["name"],
         db_auths=[auth_token, is_live],
         auth_token=auth_token,
-        member_id=body["tenant_user_id"],
+        ro_db_auths=[ro_auth_token, is_live],
+        ro_auth_token=ro_auth_token,
         default_ob_config=None,  # Will populate this after making OB config
     )
     ob_config = create_ob_config(tenant, **ob_conf_data)

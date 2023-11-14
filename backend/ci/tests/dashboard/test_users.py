@@ -356,6 +356,7 @@ def test_entity_data(sandbox_user, sandbox_tenant):
         assert (
             first_name["value"] == sandbox_user.client.decrypted_data["id.first_name"]
         )
+        assert not first_name["transforms"]
         assert first_name["source"] == "hosted"
         assert first_name["is_decryptable"]
 
@@ -377,4 +378,15 @@ def test_entity_data(sandbox_user, sandbox_tenant):
         assert phone_number["is_decryptable"]
 
 
-# TODO test user without IAM permissions can't see first name
+def test_entity_data(sandbox_user, sandbox_tenant):
+    """
+    Check the a dashboard user without decrypt permissions cannot see a user's first name decrypted
+    """
+    user = get(f"entities/{sandbox_user.fp_id}", None, *sandbox_tenant.ro_db_auths)
+    first_name = next(d for d in user["data"] if d["identifier"] == "id.first_name")
+    assert not first_name["value"]
+    assert not first_name["transforms"]
+
+    last_name = next(d for d in user["data"] if d["identifier"] == "id.last_name")
+    assert not last_name["value"]
+    assert not last_name["transforms"]
