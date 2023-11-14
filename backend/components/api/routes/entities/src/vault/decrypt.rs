@@ -18,7 +18,7 @@ use itertools::Itertools;
 use macros::route_alias;
 use newtypes::output::Csv;
 use newtypes::FpId;
-use newtypes::{AccessEventPurpose, DataLifetimeSeqno, FilterFunctionStr, VersionedDataIdentifier};
+use newtypes::{AccessEventPurpose, DataLifetimeSeqno, FilterFunction, VersionedDataIdentifier};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, web::Path};
 use serde::Deserialize;
@@ -34,7 +34,7 @@ pub struct DecryptRequest {
     /// A list of filter and transform functions to apply to each decrypted datum.
     /// Omit or leave empty to apply no transforms.
     /// Can find more information on allowed transform functions on our docs
-    pub(super) transforms: Option<Vec<FilterFunctionStr>>,
+    pub(super) transforms: Option<Vec<FilterFunction>>,
 }
 
 #[derive(Debug, Deserialize, Apiv2Schema)]
@@ -49,7 +49,7 @@ pub struct ClientDecryptRequest {
     /// Omit or leave empty to apply no transforms
     /// Can find more information on allowed transform functions on our docs
     #[serde(default)]
-    transforms: Option<Vec<FilterFunctionStr>>,
+    transforms: Option<Vec<FilterFunction>>,
 }
 
 #[tracing::instrument(skip(state, auth, root_span))]
@@ -153,7 +153,6 @@ pub(super) async fn post_inner(
     let transforms = transforms
         .unwrap_or_default()
         .into_iter()
-        .map(|t| t.into_inner())
         .map(|f| filter_function_to_transform(&f))
         .collect_vec();
 

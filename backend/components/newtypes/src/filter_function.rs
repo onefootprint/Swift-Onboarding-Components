@@ -1,5 +1,6 @@
+use crypto::hex::ToHex;
 use itertools::Itertools;
-use paperclip::actix::Apiv2Schema;
+use std::fmt::Display;
 use std::str::FromStr;
 use std::vec::IntoIter;
 use strum_macros::EnumDiscriminants;
@@ -9,7 +10,7 @@ use crate::PiiBytes;
 
 /// Represents a data transform to apply to underlying plaintext behind a data identifier
 /// Proxy syntax example: `{{ id.first_name | to_lower_case }}
-#[derive(Debug, Clone, EnumDiscriminants, PartialEq, Eq, Hash, serde::Deserialize)]
+#[derive(Debug, Clone, EnumDiscriminants, PartialEq, Eq, Hash, serde_with::DeserializeFromStr)]
 #[strum_discriminants(name(FilterFunctionName))]
 #[strum_discriminants(derive(
     serde_with::SerializeDisplay,
@@ -20,7 +21,6 @@ use crate::PiiBytes;
 ))]
 #[strum_discriminants(vis(pub))]
 #[strum_discriminants(strum(serialize_all = "snake_case"))]
-#[serde(rename_all = "snake_case")]
 pub enum FilterFunction {
     ToLowercase,
     ToUppercase,
@@ -31,12 +31,6 @@ pub enum FilterFunction {
     DateFormat(DateFormatArgs),
     HmacSha256(HmacSha256Args),
     Encrypt(EncryptArgs),
-}
-
-impl From<FilterFunction> for FilterFunctionStr {
-    fn from(value: FilterFunction) -> Self {
-        Self(value)
-    }
 }
 
 impl FilterFunctionName {
@@ -55,119 +49,48 @@ impl FilterFunctionName {
     }
 }
 
-impl<'a> From<&'a FilterFunctionStr> for FilterFunctionName {
-    fn from(value: &'a FilterFunctionStr) -> Self {
-        Self::from(&value.0)
-    }
-}
-
-/// Represents a data transform to apply to underlying plaintext behind a data identifier
-/// For example, `to_lower_case` or `replace('Piip','Penguin')`
-#[derive(Debug)]
-pub struct FilterFunctionStr(FilterFunction);
-
-impl<'de> serde::Deserialize<'de> for FilterFunctionStr {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = String::deserialize(deserializer)?;
-        let value = FilterFunction::parse(&s).map_err(serde::de::Error::custom)?;
-        Ok(Self(value))
-    }
-}
-
-impl FilterFunctionStr {
-    pub fn into_inner(self) -> FilterFunction {
-        self.0
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Deserialize, Apiv2Schema)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CountArgs {
     pub count: usize,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Deserialize, Apiv2Schema)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ReplaceArgs {
     pub from: String,
     pub to: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Deserialize, Apiv2Schema)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct DateFormatArgs {
     pub from_format: String,
     pub to_format: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Deserialize, Apiv2Schema)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct HmacSha256Args {
     /// hex-encoded signing key
-    #[serde(with = "crypto::hex")]
     pub key: PiiBytes,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Deserialize, Apiv2Schema)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EncryptArgs {
     pub algorithm: EncryptFilterAlgorithmName,
     /// hex encoded, DER-formatted asymmetric public key
-    #[serde(with = "crypto::hex")]
     pub public_key: PiiBytes,
 }
 
-#[derive(
-    Debug, Clone, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize, EnumString, Apiv2Schema,
-)]
-#[serde(rename_all = "snake_case")]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, strum_macros::Display, EnumString)]
 #[strum(serialize_all = "snake_case")]
 pub enum EncryptFilterAlgorithmName {
     RsaPkcs1v15,
     EciesP256X963Sha256AesGcm,
 }
 
-// docs: work around because paperclipe doesnt yet support `oneOf`
 mod json_schema {
     use super::*;
     use strum::IntoEnumIterator;
 
     impl paperclip::v2::schema::Apiv2Schema for FilterFunction {
-        fn name() -> Option<String> {
-            Some("FilterFunction".to_string())
-        }
-        fn description() -> &'static str {
-            "Represents a data transform to apply to underlying plaintext behind a data identifier. Specify only one of the following fields. See more here: https://docs.onefootprint.com/vault/proxy#filter-functions"
-        }
-        fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
-            use paperclip::v2::models::{DataType, DefaultSchemaRaw};
-            let mut schema = DefaultSchemaRaw {
-                name: Some("FilterFunction".into()),
-                example: None,
-                ..Default::default()
-            };
-            schema.data_type = Some(DataType::Object);
-
-            FilterFunctionName::iter().for_each(|ff| {
-                let s = match ff {
-                    FilterFunctionName::ToLowercase
-                    | FilterFunctionName::ToUppercase
-                    | FilterFunctionName::ToAscii => DefaultSchemaRaw::default(),
-                    FilterFunctionName::Prefix => CountArgs::raw_schema(),
-                    FilterFunctionName::Suffix => CountArgs::raw_schema(),
-                    FilterFunctionName::Replace => ReplaceArgs::raw_schema(),
-                    FilterFunctionName::DateFormat => DateFormatArgs::raw_schema(),
-                    FilterFunctionName::HmacSha256 => HmacSha256Args::raw_schema(),
-                    FilterFunctionName::Encrypt => EncryptArgs::raw_schema(),
-                };
-
-                schema.properties.insert(ff.to_string(), Box::new(s));
-            });
-
-            schema
-        }
-    }
-    impl paperclip::actix::OperationModifier for FilterFunction {}
-
-    impl paperclip::v2::schema::Apiv2Schema for FilterFunctionStr {
         fn name() -> Option<String> {
             Some("FilterFunction".to_string())
         }
@@ -188,7 +111,7 @@ mod json_schema {
             }
         }
     }
-    impl paperclip::actix::OperationModifier for FilterFunctionStr {}
+    impl paperclip::actix::OperationModifier for FilterFunction {}
 }
 
 #[derive(thiserror::Error, Debug, PartialEq)]
@@ -238,9 +161,11 @@ impl FilterFunction {
             | FilterFunction::Replace { .. } => 2,
         }
     }
+}
 
-    /// Parse a single filter functions, i.e. `to_ascii`
-    pub fn parse(raw: &str) -> Result<Self, FilterFunctionParsingError> {
+impl FromStr for FilterFunction {
+    type Err = FilterFunctionParsingError;
+    fn from_str(raw: &str) -> Result<Self, Self::Err> {
         let raw = raw.trim();
 
         // functions can either have arguments or none
@@ -301,6 +226,39 @@ impl FilterFunction {
         }
 
         Ok(func)
+    }
+}
+
+impl Display for FilterFunction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let ff_name = self.name();
+        let args = match self {
+            Self::ToLowercase => None,
+            Self::ToUppercase => None,
+            Self::ToAscii => None,
+            Self::Prefix(CountArgs { count }) => Some(format!("{}", count)),
+            Self::Suffix(CountArgs { count }) => Some(format!("{}", count)),
+            Self::Replace(ReplaceArgs { from, to }) => Some(format!("\"{}\",\"{}\"", from, to)),
+            Self::DateFormat(DateFormatArgs {
+                from_format,
+                to_format,
+            }) => Some(format!("\"{}\",\"{}\"", from_format, to_format)),
+            // NOTE: we are scrubbing the HMAC key
+            Self::HmacSha256(HmacSha256Args { key: _ }) => Some(format!("\"{}\"", "<scrubbed>")),
+            Self::Encrypt(EncryptArgs {
+                algorithm,
+                public_key,
+            }) => Some(format!(
+                "\"{}\",\"{}\"",
+                algorithm,
+                public_key.encode_hex::<String>(), /*algorithm, public_key*/
+            )),
+        };
+        if let Some(args) = args {
+            write!(f, "{}({})", ff_name, args)
+        } else {
+            write!(f, "{}", ff_name)
+        }
     }
 }
 
@@ -403,6 +361,7 @@ mod tests {
     use super::FilterFunction as FF;
     use super::FilterFunctionParsingError::*;
     use super::*;
+    use crypto::hex::FromHex;
     use test_case::test_case;
 
     #[test_case("to_ascii" => Ok(FF::ToAscii))]
@@ -420,7 +379,31 @@ mod tests {
     #[test_case("hmac_sha256('00')" => Ok(FF::HmacSha256(HmacSha256Args { key: PiiBytes::new(vec![0x00]) })))]
     #[test_case("encrypt('rsa_pkcs1v15', '00')" => Ok(FF::Encrypt(EncryptArgs { algorithm: EncryptFilterAlgorithmName::RsaPkcs1v15, public_key: PiiBytes::new(vec![0x00]) })))]
     fn test_filter_function_parsing(input: &str) -> Result<FilterFunction, FilterFunctionParsingError> {
-        FilterFunction::parse(input)
+        FilterFunction::from_str(input)
+    }
+
+    #[test_case(FF::ToLowercase)]
+    #[test_case(FF::ToUppercase)]
+    #[test_case(FF::ToAscii)]
+    #[test_case(FF::Prefix(CountArgs{count: 10}))]
+    #[test_case(FF::Suffix(CountArgs{count: 10}))]
+    #[test_case(FF::Replace(ReplaceArgs{from: "flerp".into(), to: "derp".into()}))]
+    #[test_case(FF::DateFormat(DateFormatArgs{from_format: "flerp".into(), to_format: "derp".into()}))]
+    #[test_case(FF::Encrypt(EncryptArgs{algorithm: EncryptFilterAlgorithmName::EciesP256X963Sha256AesGcm, public_key: PiiBytes::from_hex("deadbeef").unwrap()}))]
+    fn test_display_fromstr(ff: FF) {
+        let ff_str = format!("{}", ff);
+        let ff_parsed = FF::from_str(&ff_str).unwrap();
+        assert_eq!(ff, ff_parsed);
+    }
+
+    #[test]
+    fn test_display_hmac_scrubbed() {
+        // HmacSha256 display should be scrubbed since it contains a private key
+        let ff = FF::HmacSha256(HmacSha256Args {
+            key: PiiBytes::from_hex("ba5eba11").unwrap(),
+        });
+        let ff_str = format!("{}", ff);
+        assert_eq!(ff_str, "hmac_sha256(\"<scrubbed>\")");
     }
 
     #[test_case("hello my name, is", ',' => Some(13))]

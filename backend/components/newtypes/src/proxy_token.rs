@@ -48,7 +48,7 @@ impl ProxyToken {
                 components[0],
                 components[1..]
                     .iter()
-                    .map(|raw| FilterFunction::parse(raw).map_err(crate::Error::from))
+                    .map(|raw| FilterFunction::from_str(raw).map_err(crate::Error::from))
                     .collect::<Result<Vec<_>, _>>()?,
             )
         } else {

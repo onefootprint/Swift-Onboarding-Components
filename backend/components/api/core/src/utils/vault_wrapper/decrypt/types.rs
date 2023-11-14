@@ -85,7 +85,7 @@ impl DecryptUncheckedResult<Pii> {
                     Pii::Value(s) => s.to_piistring()?,
                     Pii::Bytes(b) => {
                         if k.is_identity_transform() {
-                            b.into_leak_base64_pii()
+                            b.into_base64_pii()
                         } else {
                             PiiString::try_from(b)?
                         }
@@ -117,7 +117,7 @@ impl DecryptUncheckedResult<Pii> {
                     Pii::Value(s) => s,
                     Pii::Bytes(b) => {
                         let v_string = if k.is_identity_transform() {
-                            b.into_leak_base64_pii()
+                            b.into_base64_pii()
                         } else {
                             PiiString::try_from(b)?
                         };

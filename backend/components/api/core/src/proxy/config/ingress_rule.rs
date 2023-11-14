@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::errors::{proxy::VaultProxyError, ApiError};
 use actix_web::http::header::HeaderMap;
 use db::models::proxy_config::ProxyConfigIngressRule;
@@ -54,7 +56,7 @@ impl IngressRule {
                 components[0].to_string(),
                 components[1..]
                     .iter()
-                    .map(|raw| FilterFunction::parse(raw))
+                    .map(|raw| FilterFunction::from_str(raw))
                     .collect::<Result<Vec<_>, _>>()
                     .map_err(|e| {
                         VaultProxyError::BadIngressRule(format!("bad filter function on target: {0}", e))

@@ -126,9 +126,9 @@ pub async fn build_docv_data_for_submission_from_verification_request(
     
     Ok(DocVData {
         reference_id: parsed_reference_id,
-        front_image: decrypted.remove(&DocumentSide::Front).map(PiiBytes::into_leak_base64_pii),
-        back_image: decrypted.remove(&DocumentSide::Back).map(PiiBytes::into_leak_base64_pii),
-        selfie_image: decrypted.remove(&DocumentSide::Selfie).map(PiiBytes::into_leak_base64_pii),
+        front_image: decrypted.remove(&DocumentSide::Front).map(PiiBytes::into_base64_pii),
+        back_image: decrypted.remove(&DocumentSide::Back).map(PiiBytes::into_base64_pii),
+        selfie_image: decrypted.remove(&DocumentSide::Selfie).map(PiiBytes::into_base64_pii),
         country_code: Some(doc.country_code.into()),
         document_type: Some(doc.document_type),
         // TODO not populating name here
@@ -165,9 +165,9 @@ pub async fn build_docv_data_from_identity_doc(
     
     Ok(DocVData {
         reference_id: None,
-        front_image: decrypted.remove(&DocumentSide::Front).map(PiiBytes::into_leak_base64_pii),
-        back_image: decrypted.remove(&DocumentSide::Back).map(PiiBytes::into_leak_base64_pii),
-        selfie_image: decrypted.remove(&DocumentSide::Selfie).map(PiiBytes::into_leak_base64_pii),
+        front_image: decrypted.remove(&DocumentSide::Front).map(PiiBytes::into_base64_pii),
+        back_image: decrypted.remove(&DocumentSide::Back).map(PiiBytes::into_base64_pii),
+        selfie_image: decrypted.remove(&DocumentSide::Selfie).map(PiiBytes::into_base64_pii),
         country_code: Some(doc.country_code.into()),
         document_type: Some(doc.document_type),
         first_name: decrypted_name_idks.remove(&IDK::FirstName.into()),
