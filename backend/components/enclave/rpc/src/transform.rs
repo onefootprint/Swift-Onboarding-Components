@@ -90,7 +90,7 @@ impl EncryptTransformAlgorithm {
     pub fn encrypt(&self, public_key_der: &[u8], data: &[u8]) -> Result<Vec<u8>, TransformError> {
         use EncryptTransformAlgorithm::*;
         Ok(match self {
-            RsaPksc1v15 => crypto::rsa_pksc1v15::encrypt(data, public_key_der)?,
+            RsaPkcs1v15 => crypto::rsa_pksc1v15::encrypt(data, public_key_der)?,
             EciesP256X963Sha256AesGcm => {
                 let pub_key = crypto::conversion::public_key_der_to_raw_uncompressed(public_key_der)?;
                 crypto::seal::seal_ecies_p256_x963_sha256_aes_gcm(&pub_key, data.to_vec())?.to_vec()?
@@ -154,7 +154,7 @@ mod tests {
 
         let _ = test_apply_data_tranform(
             vec![Encrypt {
-                algorithm: EncryptTransformAlgorithm::RsaPksc1v15,
+                algorithm: EncryptTransformAlgorithm::RsaPkcs1v15,
                 public_key_der: pk_der,
             }],
             input,

@@ -42,7 +42,7 @@ fn filter_function_to_transform(value: &FilterFunction) -> DataTransform {
         }) => DataTransform::Encrypt {
             algorithm: match algorithm {
                 newtypes::EncryptFilterAlgorithmName::RsaPkcs1v15 => {
-                    enclave_proxy::EncryptTransformAlgorithm::RsaPksc1v15
+                    enclave_proxy::EncryptTransformAlgorithm::RsaPkcs1v15
                 }
                 newtypes::EncryptFilterAlgorithmName::EciesP256X963Sha256AesGcm => {
                     enclave_proxy::EncryptTransformAlgorithm::EciesP256X963Sha256AesGcm

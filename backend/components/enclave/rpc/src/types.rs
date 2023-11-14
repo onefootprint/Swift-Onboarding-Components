@@ -77,12 +77,14 @@ impl std::fmt::Display for DataTransform {
 }
 
 #[derive(Clone, Serialize, Deserialize, PartialEq, Hash, Eq)]
-#[serde(rename_all = "snake_case")]
 pub enum EncryptTransformAlgorithm {
     // Provide explicit serializations here - it's easy for this to drift from the strum
     // serializations used in the API crate
-    #[serde(rename = "rsa_pkcs1v15")]
-    RsaPksc1v15,
+    #[serde(rename = "rsa_pksc1v15")]
+    /// WARNING: the serialization here is DIFFERENT from the name of the enum.
+    /// An old version of code had the serialization incorrect, so we're keeping it until we want
+    /// to migrate.
+    RsaPkcs1v15,
     #[serde(rename = "ecies_p256_x963_sha256_aes_gcm")]
     EciesP256X963Sha256AesGcm,
 }

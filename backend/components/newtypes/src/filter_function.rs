@@ -388,6 +388,7 @@ mod tests {
     #[test_case("replace('\\(my','paren\\)')" => Ok(FF::Replace(ReplaceArgs { from: "(my".into(), to: "paren)".into() })))]
     #[test_case("hmac_sha256('00')" => Ok(FF::HmacSha256(HmacSha256Args { key: PiiBytes::new(vec![0x00]) })))]
     #[test_case("encrypt('rsa_pkcs1v15', '00')" => Ok(FF::Encrypt(EncryptArgs { algorithm: EncryptFilterAlgorithmName::RsaPkcs1v15, public_key: PiiBytes::new(vec![0x00]) })))]
+    #[test_case("encrypt('ecies_p256_x963_sha256_aes_gcm', '00')" => Ok(FF::Encrypt(EncryptArgs { algorithm: EncryptFilterAlgorithmName::EciesP256X963Sha256AesGcm, public_key: PiiBytes::new(vec![0x00]) })))]
     fn test_filter_function_parsing(input: &str) -> Result<FilterFunction, FilterFunctionParsingError> {
         FilterFunction::from_str(input)
     }
