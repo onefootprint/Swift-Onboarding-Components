@@ -38,6 +38,7 @@ pub struct InsightEvent {
     pub http_version: Option<String>,
     pub tls: Option<String>,
     pub session_id: Option<String>,
+    pub origin: Option<String>,
 }
 
 #[derive(Debug, Clone, Queryable, Insertable, Default)]
@@ -67,6 +68,7 @@ pub struct CreateInsightEvent {
     pub http_version: Option<String>,
     pub tls: Option<String>,
     pub session_id: Option<String>,
+    pub origin: Option<String>,
 }
 
 impl CreateInsightEvent {

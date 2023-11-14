@@ -1,0 +1,1 @@
+ALTER TABLE insight_event DROP COLUMN origin;

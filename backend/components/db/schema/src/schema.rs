@@ -409,6 +409,7 @@ table! {
         http_version -> Nullable<Text>,
         tls -> Nullable<Text>,
         session_id -> Nullable<Text>,
+        origin -> Nullable<Text>,
     }
 }
 

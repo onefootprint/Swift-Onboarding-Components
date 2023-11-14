@@ -34,6 +34,7 @@ pub struct InsightHeaders {
     pub forwarded_proto: Option<String>,
     pub http_version: Option<String>,
     pub tls: Option<String>,
+    pub origin: Option<String>,
     pub session_id: Option<String>,
 }
 
@@ -78,6 +79,7 @@ impl InsightHeaders {
             forwarded_proto: get_header("cloudfront-forwarded-proto", headers),
             http_version: get_header("cloudfront-viewer-http-version", headers),
             tls: get_header("cloudfront-viewer-tls", headers),
+            origin: get_header("origin", headers),
             session_id,
         }
     }
@@ -120,6 +122,7 @@ impl From<InsightHeaders> for CreateInsightEvent {
             http_version,
             tls,
             session_id,
+            origin,
         } = i;
 
         let latitude = latitude.and_then(|lat| lat.parse().ok());
@@ -157,6 +160,7 @@ impl From<InsightHeaders> for CreateInsightEvent {
             http_version,
             tls,
             session_id,
+            origin,
         }
     }
 }
