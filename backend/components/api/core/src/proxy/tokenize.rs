@@ -1,4 +1,4 @@
-use super::FilterFunctions;
+use super::get_transformer;
 use super::IngressRule;
 use crate::auth::tenant::TenantAuth;
 use crate::errors::ApiResult;
@@ -15,6 +15,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use either::Either;
 use enclave_proxy::DataTransformer;
+use enclave_proxy::DataTransforms;
 use futures::future::try_join_all;
 use itertools::Itertools;
 use newtypes::AccessEventKind;
@@ -48,14 +49,10 @@ pub async fn vault_pii(
     let values_by_user = values
         .into_iter()
         .map(|(rule, pii)| {
-            (
-                rule.proxy_token.fp_id.clone(),
-                (
-                    rule.proxy_token.identifier,
-                    FilterFunctions(rule.proxy_token.filter_functions),
-                    pii,
-                ),
-            )
+            let fp_id = rule.proxy_token.fp_id.clone();
+            let ffs = get_transformer(&rule.proxy_token.filter_functions);
+            let values = (rule.proxy_token.identifier, ffs, pii);
+            (fp_id, values)
         })
         .into_group_map();
 
@@ -230,7 +227,7 @@ struct EncryptedDocumentToStore {
 async fn encrypt_document(
     state: &State,
     file_data: PiiString,
-    filters: FilterFunctions,
+    filters: DataTransforms,
     doc_kind: DocumentKind,
     mime_type: Option<&String>,
     fp_id: FpId,

@@ -3,9 +3,10 @@ use super::{DecryptUncheckedResult, EnclaveDecryptOperation, Pii};
 use crate::enclave_client::{DecryptReq, EnclaveClient};
 use crate::errors::enclave::EnclaveError;
 use crate::errors::ApiResult;
+use crate::proxy::get_transformer;
 use db::VaultedData;
 use either::Either;
-use enclave_proxy::{DataTransformer, DataTransforms};
+use enclave_proxy::DataTransformer;
 use futures_util::StreamExt;
 use itertools::Itertools;
 use newtypes::output::Csv;
@@ -167,7 +168,7 @@ where
             .map(|((id, op, format), p_data)| -> ApiResult<_> {
                 // We apply the data transforms for p_data outside of the enclave here.
                 let p_data = p_data.leak();
-                let transformed = DataTransforms(op.transforms.clone()).apply_str::<PiiString>(p_data)?;
+                let transformed = get_transformer(&op.transforms).apply_str::<PiiString>(p_data)?;
                 Ok((id, (op, Pii::format(transformed, format))))
             })
             .collect::<ApiResult<Vec<_>>>()?
@@ -216,7 +217,7 @@ where
             .map(|((id, op), pii_bytes)| -> ApiResult<_> {
                 // Apply the document transforms inline since we decrypt the document outside of
                 // the enclave
-                let transformed = DataTransforms(op.transforms.clone()).apply(pii_bytes.into_leak())?;
+                let transformed = get_transformer(&op.transforms).apply(pii_bytes.into_leak())?;
                 let pii = Pii::Bytes(PiiBytes::new(transformed));
                 Ok((id, (op, pii)))
             })

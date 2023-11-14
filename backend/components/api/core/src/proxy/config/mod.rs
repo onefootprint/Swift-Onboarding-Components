@@ -258,7 +258,7 @@ impl ProxyConfig {
                 // decrypt the sealed cert
                 let key_der = state
                     .enclave_client
-                    .decrypt_to_pii_bytes(&e_key, &auth.tenant().e_private_key, vec![])
+                    .decrypt_to_pii_bytes(&e_key, &auth.tenant().e_private_key)
                     .await?;
 
                 // encode to pem and parse

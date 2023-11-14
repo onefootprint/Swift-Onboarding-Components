@@ -8,7 +8,6 @@ use api_core::auth::tenant::{ClientTenantAuthContext, TenantAuth};
 use api_core::auth::CanDecrypt;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::{ApiResult, AssertionError};
-use api_core::proxy::filter_function_to_transform;
 use api_core::telemetry::RootSpan;
 use api_core::utils::vault_wrapper::{bulk_decrypt, BulkDecryptReq, EnclaveDecryptOperation, TenantVw};
 use api_wire_types::DecryptResponse;
@@ -150,20 +149,11 @@ pub(super) async fn post_inner(
         Csv::from(fields.iter().cloned().collect_vec()).to_string(),
     );
 
-    let transforms = transforms
-        .unwrap_or_default()
-        .into_iter()
-        .map(|f| filter_function_to_transform(&f))
-        .collect_vec();
-
     // Create a VW for each version in fields
     let version_to_targets = fields
         .into_iter()
         .map(|f| {
-            let target = EnclaveDecryptOperation {
-                identifier: f.di,
-                transforms: transforms.clone(),
-            };
+            let target = EnclaveDecryptOperation::new(f.di, transforms.clone().unwrap_or_default());
             (f.version, target)
         })
         .into_group_map();

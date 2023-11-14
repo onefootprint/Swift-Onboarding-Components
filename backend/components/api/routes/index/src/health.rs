@@ -97,10 +97,7 @@ async fn enclave(
 
     let seal_time = now.elapsed();
 
-    let unsealed = state
-        .enclave_client
-        .decrypt_to_piistring(&sealed, &sk, vec![])
-        .await?;
+    let unsealed = state.enclave_client.decrypt_to_piistring(&sealed, &sk).await?;
 
     let unseal_time = now.elapsed();
 
@@ -131,10 +128,7 @@ async fn enclave_decrypt(
 
     let seal_time = now.elapsed();
 
-    let unsealed = state
-        .enclave_client
-        .decrypt_to_piistring(&sealed, &sk, vec![])
-        .await?;
+    let unsealed = state.enclave_client.decrypt_to_piistring(&sealed, &sk).await?;
 
     let unseal_time = now.elapsed();
 

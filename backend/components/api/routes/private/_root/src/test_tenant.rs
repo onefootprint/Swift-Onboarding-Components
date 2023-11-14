@@ -155,7 +155,7 @@ async fn post(
     // Get the actual raw API key value
     let decrypted_api_key = state
         .enclave_client
-        .decrypt_to_piistring(&api_key.e_secret_api_key, &tenant.e_private_key, vec![])
+        .decrypt_to_piistring(&api_key.e_secret_api_key, &tenant.e_private_key)
         .await?;
     let decrypted_api_key = SecretApiKey::from(decrypted_api_key.leak().to_string());
 

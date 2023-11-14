@@ -17,9 +17,6 @@ use newtypes::PiiString;
 use newtypes::ProxyToken;
 use std::collections::HashMap;
 
-use super::filter_function_to_transform;
-use super::transform_to_filter_function;
-
 /// turns tokens -> PII
 /// TODO: depending on usage this function can be optimized greatly:
 ///     - concurrent async (dispatch concurrent all per-fpid)
@@ -62,13 +59,7 @@ pub async fn detokenize(
                 .ok_or(TenantError::VaultDoesntExist(fp_id.clone()))?;
             let targets = targets
                 .into_iter()
-                .map(|(identifier, filters)| {
-                    let transforms = filters.iter().map(filter_function_to_transform).collect_vec();
-                    EnclaveDecryptOperation {
-                        identifier,
-                        transforms,
-                    }
-                })
+                .map(|(identifier, transforms)| EnclaveDecryptOperation::new(identifier, transforms))
                 .collect();
             let key = vw.scoped_vault.fp_id.clone();
             Ok((key, BulkDecryptReq { vw, targets }))
@@ -85,15 +76,10 @@ pub async fn detokenize(
             let results = results
                 .into_iter()
                 .map(|(op, pii)| -> ApiResult<_> {
-                    let filter_functions = op
-                        .transforms
-                        .into_iter()
-                        .filter_map(transform_to_filter_function)
-                        .collect();
                     let token = ProxyToken {
                         fp_id: fp_id.clone(),
                         identifier: op.identifier,
-                        filter_functions,
+                        filter_functions: op.transforms,
                     };
                     let pii = pii.to_piistring()?;
                     Ok((token, pii))

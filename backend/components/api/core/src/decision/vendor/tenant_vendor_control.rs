@@ -126,7 +126,7 @@ impl TenantVendorControl {
             vendor_control.as_ref().and_then(|vc| vc.middesk_api_key.clone())
         {
             let middesk_api_key_plaintext = enclave_client
-                .decrypt_to_piistring(&middesk_api_key, &tenant.e_private_key, vec![])
+                .decrypt_to_piistring(&middesk_api_key, &tenant.e_private_key)
                 .await?;
             MiddeskCredentials {
                 api_key: middesk_api_key_plaintext,

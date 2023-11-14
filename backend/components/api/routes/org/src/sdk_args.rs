@@ -82,7 +82,7 @@ async fn get(
     } = session.data.data;
     let sdk_args_str = state
         .enclave_client
-        .decrypt_to_piistring(&e_data, &e_private_key, vec![])
+        .decrypt_to_piistring(&e_data, &e_private_key)
         .await?;
     let args: SdkArgs = serde_json::de::from_str(sdk_args_str.leak())?;
     let (obc, args) = state

@@ -7,7 +7,7 @@ use aws_sdk_pinpointsmsvoicev2::{
     error::SdkError as SmsSdkError, operation::send_text_message::SendTextMessageError,
 };
 use db::errors::DbError;
-use newtypes::{output::Csv, ContactInfoKind, DataIdentifier, ErrorMessage, Uuid};
+use newtypes::{output::Csv, ContactInfoKind, DataIdentifier, ErrorMessage, FilterFunction, Uuid};
 use paperclip::actix::api_v2_errors;
 use thiserror::Error;
 use webauthn_rs_core::error::WebauthnError;
@@ -171,7 +171,7 @@ pub enum ApiErrorKind {
     #[error("{0}")]
     CipIntegrationError(#[from] cip_error::CipError),
     #[error("Required entity data is missing data: {0} {1}")]
-    MissingRequiredEntityData(DataIdentifier, Csv<enclave_proxy::DataTransform>),
+    MissingRequiredEntityData(DataIdentifier, Csv<FilterFunction>),
     #[error("Enclave transform error: {0}")]
     EnclaveDataTransformError(#[from] enclave_proxy::TransformError),
 

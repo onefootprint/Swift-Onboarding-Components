@@ -1,9 +1,8 @@
 use crate::errors::{ApiError, ApiResult};
 use crate::ApiErrorKind;
 use derive_more::{Deref, DerefMut};
-use enclave_proxy::DataTransform;
 use newtypes::output::Csv;
-use newtypes::{DataIdentifier, PiiBytes, PiiJsonValue, PiiString, VaultDataFormat};
+use newtypes::{DataIdentifier, FilterFunction, PiiBytes, PiiJsonValue, PiiString, VaultDataFormat};
 use std::collections::HashMap;
 
 pub enum Pii {
@@ -23,17 +22,17 @@ impl Pii {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EnclaveDecryptOperation {
     pub identifier: DataIdentifier,
-    pub transforms: Vec<DataTransform>,
+    pub transforms: Vec<FilterFunction>,
 }
 
 impl EnclaveDecryptOperation {
     pub fn is_identity_transform(&self) -> bool {
-        self.transforms.is_empty() || self.transforms.iter().all(|t| t == &DataTransform::Identity)
+        self.transforms.is_empty()
     }
 }
 
 impl EnclaveDecryptOperation {
-    pub fn new(identifier: DataIdentifier, transforms: Vec<DataTransform>) -> Self {
+    pub fn new(identifier: DataIdentifier, transforms: Vec<FilterFunction>) -> Self {
         EnclaveDecryptOperation {
             identifier,
             transforms,
@@ -150,7 +149,11 @@ impl DecryptUncheckedResult {
         self.rm(di, vec![])
     }
 
-    fn rm<D: Into<DataIdentifier>>(&mut self, di: D, transforms: Vec<DataTransform>) -> ApiResult<PiiString> {
+    fn rm<D: Into<DataIdentifier>>(
+        &mut self,
+        di: D,
+        transforms: Vec<FilterFunction>,
+    ) -> ApiResult<PiiString> {
         let di = di.into();
         self.results
             .remove(&EnclaveDecryptOperation::new(di.clone(), transforms.clone()))
@@ -162,7 +165,7 @@ impl DecryptUncheckedResult {
         self.get(di, vec![])
     }
 
-    fn get<D: Into<DataIdentifier>>(&self, di: D, transforms: Vec<DataTransform>) -> ApiResult<PiiString> {
+    fn get<D: Into<DataIdentifier>>(&self, di: D, transforms: Vec<FilterFunction>) -> ApiResult<PiiString> {
         let di = di.into();
         self.results
             .get(&EnclaveDecryptOperation::new(di.clone(), transforms.clone()))

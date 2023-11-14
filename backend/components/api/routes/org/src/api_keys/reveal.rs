@@ -41,7 +41,7 @@ async fn post(
     let tenant = auth.tenant();
     let decrypted_secret_key = state
         .enclave_client
-        .decrypt_to_piistring(&key.e_secret_api_key, &tenant.e_private_key, vec![])
+        .decrypt_to_piistring(&key.e_secret_api_key, &tenant.e_private_key)
         .await?;
 
     Ok(Json(ResponseData::ok(api_wire_types::SecretApiKey::from_db((

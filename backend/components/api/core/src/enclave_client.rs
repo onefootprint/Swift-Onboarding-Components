@@ -15,13 +15,15 @@ use futures::TryFutureExt;
 use itertools::Itertools;
 use newtypes::{
     fingerprinter::{FingerprintScopable, FingerprintScope},
-    EncryptedVaultPrivateKey, Fingerprint, PiiBytes, PiiString, S3Url, SealedVaultBytes, SealedVaultDataKey,
-    VaultPublicKey,
+    EncryptedVaultPrivateKey, FilterFunction, Fingerprint, PiiBytes, PiiString, S3Url, SealedVaultBytes,
+    SealedVaultDataKey, VaultPublicKey,
 };
 use std::hash::Hash;
 use std::{collections::HashMap, sync::Arc};
 
-use crate::{config::Config, errors::enclave::EnclaveError, s3::S3Client, ApiError};
+use crate::{
+    config::Config, errors::enclave::EnclaveError, proxy::to_data_transforms, s3::S3Client, ApiError,
+};
 
 #[derive(Debug, Clone)]
 pub struct EnclaveClient {
@@ -42,7 +44,7 @@ pub trait EnclaveClientProxy: Sync + Send + std::fmt::Debug + 'static {
 pub struct DecryptReq<'a>(
     pub &'a EncryptedVaultPrivateKey,
     pub &'a SealedVaultBytes,
-    pub Vec<DataTransform>,
+    pub Vec<FilterFunction>,
 );
 
 pub type VaultKeyPair = (VaultPublicKey, EncryptedVaultPrivateKey);
@@ -158,9 +160,8 @@ impl EnclaveClient {
         &self,
         e_data: &SealedVaultBytes,
         e_key: &EncryptedVaultPrivateKey,
-        transforms: Vec<DataTransform>,
     ) -> Result<PiiString, EnclaveError> {
-        let data = HashMap::from_iter([((), DecryptReq(e_key, e_data, transforms))]);
+        let data = HashMap::from_iter([((), DecryptReq(e_key, e_data, vec![]))]);
         let result = self
             .batch_decrypt_to_piistring(data)
             .await?
@@ -178,7 +179,7 @@ impl EnclaveClient {
         let (ids, sealed_data): (Vec<_>, Vec<_>) = data.into_iter().unzip();
         let requests: Vec<_> = sealed_data
             .into_iter()
-            .map(|DecryptReq(e_key, e_data, transform)| Ok((e_key, e_data, transform)))
+            .map(|DecryptReq(e_key, e_data, transform)| Ok((e_key, e_data, to_data_transforms(&transform))))
             .collect::<Result<_, crypto::Error>>()?;
         let results = self
             .batch_decrypt_to_piibytes(requests)
@@ -195,9 +196,8 @@ impl EnclaveClient {
         &self,
         e_data: &SealedVaultBytes,
         e_key: &EncryptedVaultPrivateKey,
-        transforms: Vec<DataTransform>,
     ) -> Result<PiiBytes, EnclaveError> {
-        self.batch_decrypt_to_piibytes(vec![(e_key, e_data, transforms)])
+        self.batch_decrypt_to_piibytes(vec![(e_key, e_data, vec![])])
             .await?
             .into_iter()
             .next()
