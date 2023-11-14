@@ -5,7 +5,7 @@ import type {
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-import { AUTH_HEADER } from '../../../../config/constants';
+import { AUTH_HEADER } from '../../../../../../config/constants';
 
 const usersVaultRequest = async (payload: UsersVaultRequest) => {
   const { authToken, data } = payload;

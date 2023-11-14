@@ -5,7 +5,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoBuilding24, IcoCreditcard24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Divider, useConfirmationDialog } from '@onefootprint/ui';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useEffectOnce } from 'usehooks-ts';
 
@@ -15,6 +15,7 @@ import Address, { PartialAddress } from './components/address';
 import type { CardData } from './components/card';
 import Card from './components/card';
 import FormDialog from './components/form-dialog';
+import FormErrorMessage from './components/form-error-message';
 import type { NameData } from './components/name';
 import Name from './components/name';
 import Title from './components/title';
@@ -37,6 +38,8 @@ export type FormBaseProps = {
   onClose?: () => void;
   hideFootprintLogo?: boolean;
   hideButtons?: boolean;
+  formErrorMessage?: string;
+  fieldErrors?: Partial<Record<keyof FormData, string>>;
 };
 
 const FORM_ID = 'secure-form';
@@ -51,6 +54,8 @@ const FormBase = ({
   onClose,
   hideFootprintLogo,
   hideButtons,
+  formErrorMessage,
+  fieldErrors = {},
 }: FormBaseProps) => {
   const footprintProvider = useFootprintProvider();
 
@@ -65,7 +70,25 @@ const FormBase = ({
     formState: { isDirty, errors },
     trigger,
     getValues,
+    setError,
   } = methods;
+
+  useEffect(() => {
+    if (!fieldErrors) {
+      return;
+    }
+    Object.entries(fieldErrors).forEach(([key, value]) => {
+      const field = key as keyof FormData;
+      setError(
+        field,
+        { message: value },
+        {
+          shouldFocus: true,
+        },
+      );
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fieldErrors]);
 
   const triggerSave = () => {
     trigger();
@@ -173,6 +196,7 @@ const FormBase = ({
       <FormProvider {...methods}>
         <StyledForm id={FORM_ID} onSubmit={handleSubmit(handleBeforeSubmit)}>
           {renderSections()}
+          <FormErrorMessage text={formErrorMessage} />
         </StyledForm>
       </FormProvider>
     </FormDialog>

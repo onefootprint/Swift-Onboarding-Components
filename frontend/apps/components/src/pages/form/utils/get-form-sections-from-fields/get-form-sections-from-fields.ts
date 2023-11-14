@@ -1,20 +1,12 @@
 import { CardDIField } from '@onefootprint/types';
 
 import type { FormSection } from '../../components/form-base';
+import getCardDiField from '../get-card-di-field';
 
 const SectionsByFields: Partial<Record<FormSection, CardDIField[]>> = {
   name: [CardDIField.name],
   card: [CardDIField.number, CardDIField.expiration, CardDIField.cvc],
   partialAddress: [CardDIField.zip, CardDIField.country],
-};
-
-const getCardDIField = (di: string): CardDIField | null => {
-  try {
-    const [, , ...field] = di.split('.');
-    return field.join('.') as CardDIField;
-  } catch (e) {
-    return null;
-  }
 };
 
 const getFormSectionsFromFields = (vaultFields?: string[]): FormSection[] => {
@@ -26,7 +18,7 @@ const getFormSectionsFromFields = (vaultFields?: string[]): FormSection[] => {
   }
 
   const vaultFieldNames = vaultFields
-    .map(field => getCardDIField(field))
+    .map(field => getCardDiField(field))
     .filter(field => field) as CardDIField[];
 
   const sections: FormSection[] = [];

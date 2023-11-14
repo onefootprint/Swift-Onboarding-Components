@@ -17,7 +17,7 @@ const SecureFormDemo = () => {
     <Container>
       <Inner>
         <Head>
-          <title>Footprint Components Demo</title>
+          <title>Footprint Form Demo</title>
         </Head>
         <Typography variant="heading-2" sx={{ marginBottom: 7 }}>
           Secure Form Demo
