@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useEffectOnce, useInterval } from 'usehooks-ts';
+import { useInterval } from 'usehooks-ts';
 
 import Logger from '../../../../../utils/logger';
 import parsePermissionError from '../utils/parse-permission-error';
@@ -18,9 +18,14 @@ const PERMISSION_CHECK_INTERVAL = 100;
 const useCameraPermission = () => {
   const [permissionState, setPermissionState] =
     useState<CameraPermissionState>('undetected');
+  const [permissionQueryPending, setPermissionQueryPending] =
+    useState<boolean>(false);
+  const shouldQueryPermission =
+    (permissionState === 'undetected' || permissionState === 'not-allowed') &&
+    !permissionQueryPending;
 
-  // We prompt for permission here
-  useEffectOnce(() => {
+  const promptPermission = () => {
+    // We call getUserMedia to prompt the user for permission
     navigator.mediaDevices
       .getUserMedia({
         video: true,
@@ -28,52 +33,71 @@ const useCameraPermission = () => {
       })
       .then(stream => {
         // If there is a stream, we know that permission has been given
-        setPermissionState('allowed');
         stream.getTracks().forEach(track => {
           track.stop();
         });
+        setPermissionState('allowed');
+        setPermissionQueryPending(false);
       })
       .catch(err => {
         const error = err as DOMException;
         setPermissionState(parsePermissionError(err));
+        setPermissionQueryPending(false);
 
         Logger.warn(
           `Error while retrieving camera permission. Error: ${error.name}`,
           'desktop-selfie',
         );
       });
-  });
+  };
 
   useInterval(
     () => {
+      // We set the permission query pending to true so we don't query the permission again
+      // while the previous query is still pending
+      setPermissionQueryPending(true);
+
       // Some browsers don't support permissions or query
       if (
         navigator.permissions &&
         typeof navigator.permissions.query === 'function'
       ) {
+        // We start by checking if the permission has already been granted
         navigator.permissions
           // @ts-expect-error: fix-me Type '"camera"' is not assignable to type 'PermissionName'.
           .query({ name: 'camera' })
           .then(result => {
+            // If the permission has been granted, we don't need to do anything
             if (result.state === 'granted') {
               setPermissionState('allowed');
-            } else {
-              setPermissionState(prev =>
-                prev === 'undetected' ? 'not-allowed' : prev,
-              );
+              return;
             }
+
+            // If permission has not been granted, we check if the permission state is "undetected"
+            // An "undetected" state means that we never queried the permission before
+            // in that case, we set the permission state to "not-allowed"
+            // If the permission was previously queried and set in a previous in interval, we keep the permission state as is
+            // then we prompt the user for permission
+            setPermissionState(prev =>
+              prev === 'undetected' ? 'not-allowed' : prev,
+            );
+            promptPermission();
           })
           .catch(() => {
-            // Technically the permission can still not be allowed;
-            // but the only way we can have an error is if the browser doesn't support this API (e.g. firefox)
-            // In that case we will let camera component handle the rest
-            setPermissionState('allowed');
+            // In some browsers, navigator.permissions is not supported
+            // Or there is an error while querying the permission
+            // In that case, we prompt the user for permission and get the permission state from the returned stream
+            // or the returned error
+            promptPermission();
           });
-      } else {
-        setPermissionState('allowed');
+        return;
       }
+
+      // If navigator.permissions.query is not supported, we prompt the user for permission
+      // and get the permission state from the returned stream or the returned error
+      promptPermission();
     },
-    permissionState !== 'allowed' ? PERMISSION_CHECK_INTERVAL : null,
+    shouldQueryPermission ? PERMISSION_CHECK_INTERVAL : null,
   );
 
   return permissionState;
