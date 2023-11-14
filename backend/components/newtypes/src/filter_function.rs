@@ -11,7 +11,6 @@ use crate::PiiBytes;
 /// Represents a data transform to apply to underlying plaintext behind a data identifier
 /// Proxy syntax example: `{{ id.first_name | to_lower_case }}
 #[derive(
-    Debug,
     Clone,
     EnumDiscriminants,
     PartialEq,
@@ -58,37 +57,37 @@ impl FilterFunctionName {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct CountArgs {
     pub count: usize,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct ReplaceArgs {
     pub from: String,
     pub to: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct DateFormatArgs {
     pub from_format: String,
     pub to_format: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct HmacSha256Args {
     /// hex-encoded signing key
     pub key: PiiBytes,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct EncryptArgs {
     pub algorithm: EncryptFilterAlgorithmName,
     /// hex encoded, DER-formatted asymmetric public key
     pub public_key: PiiBytes,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, strum_macros::Display, EnumString)]
+#[derive(Clone, PartialEq, Eq, Hash, strum_macros::Display, EnumString)]
 pub enum EncryptFilterAlgorithmName {
     #[strum(serialize = "rsa_pkcs1v15")]
     RsaPkcs1v15,
@@ -236,6 +235,35 @@ impl FromStr for FilterFunction {
         }
 
         Ok(func)
+    }
+}
+
+impl std::fmt::Debug for FilterFunction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let ff_name = self.name();
+        let args = match self {
+            Self::ToLowercase => None,
+            Self::ToUppercase => None,
+            Self::ToAscii => None,
+            Self::Prefix(CountArgs { count }) => Some(format!("{}", count)),
+            Self::Suffix(CountArgs { count }) => Some(format!("{}", count)),
+            Self::Replace(ReplaceArgs { from, to }) => Some(format!("\"{}\",\"{}\"", from, to)),
+            Self::DateFormat(DateFormatArgs {
+                from_format,
+                to_format,
+            }) => Some(format!("\"{}\",\"{}\"", from_format, to_format)),
+            // NOTE: we are scrubbing the HMAC key
+            Self::HmacSha256(HmacSha256Args { key: _ }) => Some(format!("\"{}\"", "<scrubbed>")),
+            Self::Encrypt(EncryptArgs {
+                algorithm,
+                public_key: _,
+            }) => Some(format!("\"{}\",\"<scrubbed>\"", algorithm,)),
+        };
+        if let Some(args) = args {
+            write!(f, "{}({})", ff_name, args)
+        } else {
+            write!(f, "{}", ff_name)
+        }
     }
 }
 
@@ -393,6 +421,21 @@ mod tests {
         FilterFunction::from_str(input)
     }
 
+    #[test_case(FF::ToLowercase => "to_lowercase".to_string())]
+    #[test_case(FF::ToUppercase => "to_uppercase".to_string())]
+    #[test_case(FF::ToAscii => "to_ascii".to_string())]
+    #[test_case(FF::Prefix(CountArgs{count: 10}) => "prefix(10)".to_string())]
+    #[test_case(FF::Suffix(CountArgs{count: 11}) => "suffix(11)".to_string())]
+    #[test_case(FF::Replace(ReplaceArgs{from: "flerp".into(), to: "derp".into()}) => "replace(\"flerp\",\"derp\")".to_string())]
+    #[test_case(FF::DateFormat(DateFormatArgs{from_format: "flerp".into(), to_format: "derp".into()}) => "date_format(\"flerp\",\"derp\")".to_string())]
+    // NOTE: Be careful if we start not scrubbing the HMAC key - we may be logging it in places
+    #[test_case(FF::HmacSha256(HmacSha256Args{key: PiiBytes::from_hex("deadbeef").unwrap()}) => "hmac_sha256(\"<scrubbed>\")".to_string())]
+    #[test_case(FF::Encrypt(EncryptArgs{algorithm: EncryptFilterAlgorithmName::RsaPkcs1v15, public_key: PiiBytes::from_hex("deadbeef").unwrap()}) => "encrypt(\"rsa_pkcs1v15\",\"deadbeef\")".to_string())]
+    #[test_case(FF::Encrypt(EncryptArgs{algorithm: EncryptFilterAlgorithmName::EciesP256X963Sha256AesGcm, public_key: PiiBytes::from_hex("ba5eba11").unwrap()}) => "encrypt(\"ecies_p256_x963_sha256_aes_gcm\",\"ba5eba11\")".to_string())]
+    fn test_display(ff: FF) -> String {
+        format!("{}", ff)
+    }
+
     #[test_case(FF::ToLowercase)]
     #[test_case(FF::ToUppercase)]
     #[test_case(FF::ToAscii)]
@@ -405,6 +448,20 @@ mod tests {
         let ff_str = format!("{}", ff);
         let ff_parsed = FF::from_str(&ff_str).unwrap();
         assert_eq!(ff, ff_parsed);
+    }
+
+    #[test_case(FF::ToLowercase => "to_lowercase".to_string())]
+    #[test_case(FF::ToUppercase => "to_uppercase".to_string())]
+    #[test_case(FF::ToAscii => "to_ascii".to_string())]
+    #[test_case(FF::Prefix(CountArgs{count: 10}) => "prefix(10)".to_string())]
+    #[test_case(FF::Suffix(CountArgs{count: 11}) => "suffix(11)".to_string())]
+    #[test_case(FF::Replace(ReplaceArgs{from: "flerp".into(), to: "derp".into()}) => "replace(\"flerp\",\"derp\")".to_string())]
+    #[test_case(FF::DateFormat(DateFormatArgs{from_format: "flerp".into(), to_format: "derp".into()}) => "date_format(\"flerp\",\"derp\")".to_string())]
+    #[test_case(FF::HmacSha256(HmacSha256Args{key: PiiBytes::from_hex("deadbeef").unwrap()}) => "hmac_sha256(\"<scrubbed>\")".to_string())]
+    #[test_case(FF::Encrypt(EncryptArgs{algorithm: EncryptFilterAlgorithmName::RsaPkcs1v15, public_key: PiiBytes::from_hex("deadbeef").unwrap()}) => "encrypt(\"rsa_pkcs1v15\",\"<scrubbed>\")".to_string())]
+    #[test_case(FF::Encrypt(EncryptArgs{algorithm: EncryptFilterAlgorithmName::EciesP256X963Sha256AesGcm, public_key: PiiBytes::from_hex("ba5eba11").unwrap()}) => "encrypt(\"ecies_p256_x963_sha256_aes_gcm\",\"<scrubbed>\")".to_string())]
+    fn test_debug(ff: FF) -> String {
+        format!("{:?}", ff)
     }
 
     #[test]

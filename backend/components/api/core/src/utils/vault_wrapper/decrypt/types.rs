@@ -19,10 +19,20 @@ impl Pii {
 }
 
 /// The operation perfomed by the enclave
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct EnclaveDecryptOperation {
     pub identifier: DataIdentifier,
     pub transforms: Vec<FilterFunction>,
+}
+
+impl std::fmt::Debug for EnclaveDecryptOperation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.identifier)?;
+        for t in &self.transforms {
+            write!(f, " | {:?}", t)?;
+        }
+        Ok(())
+    }
 }
 
 impl EnclaveDecryptOperation {
@@ -164,5 +174,19 @@ impl DecryptUncheckedResult {
             .cloned()
             .ok_or(ApiErrorKind::MissingRequiredEntityData(di, Csv(transforms)))
             .map_err(ApiError::from)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crypto::hex::FromHex;
+    use newtypes::{FilterFunction, HmacSha256Args, IdentityDataKind, PiiBytes};
+    use test_case::test_case;
+
+    #[test_case(EnclaveDecryptOperation::new(DataIdentifier::Id(IdentityDataKind::PhoneNumber), vec![]) => "id.phone_number".to_owned())]
+    #[test_case(EnclaveDecryptOperation::new(DataIdentifier::Id(IdentityDataKind::PhoneNumber), vec![FilterFunction::ToUppercase, FilterFunction::HmacSha256(HmacSha256Args{key: PiiBytes::from_hex("deadbeef").unwrap()})]) => "id.phone_number | to_uppercase | hmac_sha256(\"<scrubbed>\")".to_owned())]
+    fn test_enclave_operation_debug(op: EnclaveDecryptOperation) -> String {
+        format!("{:?}", op)
     }
 }

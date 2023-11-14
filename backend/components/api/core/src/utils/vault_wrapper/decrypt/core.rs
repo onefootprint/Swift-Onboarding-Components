@@ -117,7 +117,7 @@ impl<Type> VaultWrapper<Type> {
         &self,
         ops: Vec<EnclaveDecryptOperation>,
     ) -> Vec<VwDecryptRequest> {
-        tracing::info!(dis=%Csv::from(ops.iter().map(|op| op.identifier.clone()).collect_vec()), "Decrypting DIs");
+        tracing::info!(dis=?Csv::from(ops.clone()), "Decrypting DIs");
 
         // Fetch each DI's underlying data from the vault wrapper's in-memory state
         ops.into_iter()

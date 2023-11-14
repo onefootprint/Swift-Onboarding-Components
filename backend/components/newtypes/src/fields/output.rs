@@ -1,10 +1,10 @@
 use derive_more::Deref;
 use itertools::Itertools;
-use std::fmt::Display;
+use std::fmt::{Debug, Display};
 
 /// Wraps a Vec<T> with a display implementation that joins Vec<T> with a ", ", using T's display
 /// implementation
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Default, Deref)]
+#[derive(Clone, Hash, PartialEq, Eq, Default, Deref)]
 pub struct Csv<T>(pub Vec<T>);
 
 impl<T> From<Vec<T>> for Csv<T> {
@@ -15,7 +15,13 @@ impl<T> From<Vec<T>> for Csv<T> {
 
 impl<T: Display> Display for Csv<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0.iter().join(", "))
+        write!(f, "{}", self.0.iter().map(|i| i.to_string()).join(", "))
+    }
+}
+
+impl<T: Debug> Debug for Csv<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0.iter().map(|i| format!("{:?}", i)).join(", "))
     }
 }
 
