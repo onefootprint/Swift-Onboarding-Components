@@ -9,6 +9,7 @@
     "lint": "eslint src --fix",
     "postinstall": "npx playwright install",
     "test:e2e:ci": "npx playwright test -g \"#ci\"",
+    "test:stress:ci": "npx playwright test -g \"#stress\"",
     "test:e2e:debug": "E2E_BASE_URL=http://localhost:3002 IS_E2E=true npx playwright test --project chromium --debug -g \"#debug\"",
     "test:e2e:real": "E2E_BASE_URL=http://localhost:3002 IS_E2E=true npx playwright test --project chromium --debug -g \"#real\"",
     "test:e2e": "E2E_BASE_URL=http://localhost:3002/ IS_E2E=true npx playwright test --ui"

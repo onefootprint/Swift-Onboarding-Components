@@ -68,6 +68,9 @@
     "test:e2e:ci": {
       "cache": false
     },
+    "test:stress:ci": {
+      "cache": false
+    },
     "start": {},
     "lint": {
       "dependsOn": [
