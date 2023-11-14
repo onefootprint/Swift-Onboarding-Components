@@ -51,7 +51,7 @@
     "logrocket-react": "^5.0.1",
     "lottie-react": "^2.4.0",
     "opencv-react-ts": "^0.0.11",
-    "react-error-boundary": "^4.0.4",
+    "react-error-boundary": "4.0.11",
     "react-hook-form": "^7.47.0",
     "react-i18next": "^12.3.1",
     "react-image-file-resizer": "^0.4.8",
