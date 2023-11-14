@@ -97,12 +97,17 @@ jobs:
       # Don't compare the current open API against current master, compare it against the base of this PR.
       # Otherwise, we'll see fake backwards incompatibilities with commits that have landed on master
       # since this PR was created
+      # TODO: the pull_request.base.sha seems to be fixed in time when the PR is opened, because GH is dumb :(
+      # This could be fixed with some horrible logic to parse the commit message of the merge commit made by the actions/checkout. More info below
+      # https://github.com/orgs/community/discussions/59677
+      # https://onefootprint.slack.com/archives/C044HVC8UM8/p1699653697437509
       - id: get_merge_base
         name: Compute merge base
         run: |
           set -x
           git log HEAD -n 1
           MERGE_BASE=$(git merge-base ${{ github.event.pull_request.head.sha }} ${{ github.event.pull_request.base.sha }})
+          echo "Note: GHA is dumb - this merge base may be incorrect"
           echo "Merge base $MERGE_BASE"
           git log $MERGE_BASE -n 1
           echo "merge_base=$MERGE_BASE" >> "$GITHUB_OUTPUT"
