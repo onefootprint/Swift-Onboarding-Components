@@ -92,7 +92,7 @@ pub struct EncryptArgs {
 pub enum EncryptFilterAlgorithmName {
     #[strum(serialize = "rsa_pkcs1v15")]
     RsaPkcs1v15,
-    #[strum(serialize = "ecies_p256x963_sha256_aes_gcm")]
+    #[strum(serialize = "ecies_p256_x963_sha256_aes_gcm")]
     EciesP256X963Sha256AesGcm,
 }
 

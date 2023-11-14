@@ -83,6 +83,6 @@ pub enum EncryptTransformAlgorithm {
     // serializations used in the API crate
     #[serde(rename = "rsa_pkcs1v15")]
     RsaPksc1v15,
-    #[serde(rename = "ecies_p256x963_sha256_aes_gcm")]
+    #[serde(rename = "ecies_p256_x963_sha256_aes_gcm")]
     EciesP256X963Sha256AesGcm,
 }
