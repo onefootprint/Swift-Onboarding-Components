@@ -1041,6 +1041,7 @@ table! {
         deactivated_at -> Nullable<Timestamptz>,
         source -> Text,
         is_one_click -> Bool,
+        session_validated_at -> Nullable<Timestamptz>,
     }
 }
 

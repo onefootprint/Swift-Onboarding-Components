@@ -7,6 +7,7 @@ use crate::State;
 use api_core::auth::session::user::ValidateUserToken;
 use api_core::auth::tenant::{CheckTenantGuard, TenantGuard};
 use api_core::errors::ApiResult;
+use api_core::telemetry::RootSpan;
 use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_wire_types::{
@@ -29,16 +30,17 @@ pub async fn post(
     state: web::Data<State>,
     request: web::Json<ValidateRequest>,
     auth: SecretTenantAuthContext,
+    root_span: RootSpan,
 ) -> JsonApiResponse<ValidateResponse> {
     let auth = auth.check_guard(TenantGuard::Onboarding)?;
 
     let session = AuthSession::get(&state, &request.validation_token)
         .await?
-        .ok_or(OnboardingError::ValidateTokenInvalidOrNotFound)?
+        .ok_or(OnboardingError::ValidationTokenNotFound)?
         .data;
 
     let AuthSessionData::ValidateUserToken(ValidateUserToken { sv_id, wf_id, auth_event_ids }) = session else {
-        return Err(OnboardingError::ValidateTokenInvalidOrNotFound.into());
+        return Err(OnboardingError::ValidateTokenInvalid.into());
     };
 
     let (sv, auth_events, wf, biz_wf) = state
@@ -72,6 +74,13 @@ pub async fn post(
             Ok((sv, auth_events, wf, biz_wf))
         })
         .await??;
+
+    // Some logging metadata
+    root_span.record("fp_id", sv.fp_id.to_string());
+    root_span.record("vault_id", sv.vault_id.to_string());
+    root_span.record("tenant_id", sv.tenant_id.to_string());
+    root_span.record("is_live", sv.is_live);
+    root_span.record("is_live", sv.is_live);
 
     let (footprint_user_id, status, requires_manual_review, onboarding_configuration_id, timestamp) =
         // Support a version of the API that is backwards-compatible for some tenants that integrated
@@ -124,12 +133,22 @@ pub async fn post(
             })
             .collect(),
     };
+    let wf_id = wf.as_ref().map(|(wf, _)| wf.id.clone());
     let user = wf
         .map(|(wf, mr)| validate_and_serialize(sv, mr, wf, VaultKind::Person))
         .transpose()?;
     let business = biz_wf
         .map(|(sv, wf, mr)| validate_and_serialize(sv, mr, wf, VaultKind::Business))
         .transpose()?;
+
+    if let Some(wf_id) = wf_id {
+        // After all validation has occurred, updated the session_validated_at on the workflow
+        state
+            .db_pool
+            .db_query(move |conn| Workflow::set_session_validated_at(conn, &wf_id))
+            .await??;
+    }
+
     let response = ValidateResponse {
         user_auth,
         user,

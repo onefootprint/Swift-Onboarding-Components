@@ -472,8 +472,7 @@ def identify_verify(
             raise Exception(
                 f"SMS 2fac code is not present",
                 phone_number,
-                arrow.now().isoformat(),
-                [i.body for i in messages],
+                arrow.now().isoformat()
             )
 
     return try_until_success(inner, 60)

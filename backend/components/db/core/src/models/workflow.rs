@@ -55,6 +55,11 @@ pub struct Workflow {
     /// This won't always be a full picture of a one-click onboarding - we might want to trac
     /// which fields specificaly were prefilled
     pub is_one_click: bool,
+    /// The first timestamp at which the tenant used a validation token to "validate" the onboarding
+    /// session and retrieve the fp_id and status.
+    /// Note, note all workflows are expected to be validated.
+    /// And not all historical workflows will have this backfilled
+    pub session_validated_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -608,6 +613,16 @@ impl Workflow {
             .set(workflow::fixture_result.eq(fixture_result))
             .get_result(conn.conn())?;
         Ok(result)
+    }
+
+    #[tracing::instrument("Workflow::set_session_validated_at", skip_all)]
+    pub fn set_session_validated_at(conn: &mut PgConn, id: &WorkflowId) -> DbResult<()> {
+        diesel::update(workflow::table)
+            .filter(workflow::id.eq(id))
+            .filter(workflow::session_validated_at.is_null())
+            .set(workflow::session_validated_at.eq(Utc::now()))
+            .execute(conn)?;
+        Ok(())
     }
 
     #[tracing::instrument("Workflow::get_active", skip_all)]

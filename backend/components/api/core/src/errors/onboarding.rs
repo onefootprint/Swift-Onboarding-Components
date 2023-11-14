@@ -4,8 +4,10 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum OnboardingError {
-    #[error("Token invalid or not found")]
-    ValidateTokenInvalidOrNotFound,
+    #[error("Validation token not found")]
+    ValidationTokenNotFound,
+    #[error("Token invalid")]
+    ValidateTokenInvalid,
     #[error("Webauthn credential not set")]
     WebauthnCredentialsNotSet,
     #[error("Sandbox users must be used in sandbox mode")]
