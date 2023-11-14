@@ -5,7 +5,7 @@ use crate::{
         vault_wrapper::{Any, DecryptedData, TenantVw},
     },
 };
-use api_wire_types::{DeprecatedEntityAttribute, EntityAttribute, EntityStatus};
+use api_wire_types::{EntityAttribute, EntityStatus};
 use chrono::{Duration, Utc};
 use db::models::{
     scoped_vault::{ScopedVault, SerializableEntity},
@@ -72,13 +72,6 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
         // TODO: Remove these when the client has stopped reading them
         //
         let attributes = data.iter().map(|a| a.identifier.clone()).collect();
-        let attribute_sources = data
-            .iter()
-            .map(|a| DeprecatedEntityAttribute {
-                identifier: a.identifier.clone(),
-                source: a.source,
-            })
-            .collect();
         let decryptable_attributes = data
             .iter()
             .filter(|a| a.is_decryptable)
@@ -137,7 +130,6 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
 
             // TODO deprecate all of these
             attributes,
-            attribute_sources,
             decrypted_attributes,
             decryptable_attributes,
         }

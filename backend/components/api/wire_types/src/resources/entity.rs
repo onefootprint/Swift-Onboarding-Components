@@ -27,9 +27,6 @@ pub struct Entity {
     /// The list of attributes populated on this vault.
     pub attributes: Vec<DataIdentifier>,
     /// DEPRECATED.
-    /// The list of attributes populated on this vault and the source of the attribute.
-    pub attribute_sources: Vec<DeprecatedEntityAttribute>,
-    /// DEPRECATED.
     /// The list of attributes and their values that are decrypted by default
     pub decrypted_attributes: HashMap<DataIdentifier, PiiString>,
     /// DEPRECATED.
@@ -53,12 +50,6 @@ pub struct EntityAttribute {
     pub value: Option<PiiString>,
     /// Decrypted transforms of this attribute, if already decrypted
     pub transforms: HashMap<FilterFunction, PiiString>,
-}
-
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
-pub struct DeprecatedEntityAttribute {
-    pub identifier: DataIdentifier,
-    pub source: DataLifetimeSource,
 }
 
 /// Mostly just OnboardingStatus but with other statuses that don't exist in OnboardingStatus
