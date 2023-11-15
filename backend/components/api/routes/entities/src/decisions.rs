@@ -12,13 +12,12 @@ use api_core::decision::state::WorkflowWrapper;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::ApiResult;
 use api_core::task;
-
+use api_core::utils::fp_id_path::FpIdPath;
 use api_core::ApiErrorKind;
 use api_wire_types::DecisionRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
 use db::DbResult;
-use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
@@ -28,7 +27,7 @@ use paperclip::actix::{api_v2_operation, post, web};
 #[post("/entities/{fp_id}/decisions")]
 pub async fn post(
     state: web::Data<State>,
-    fp_id: web::Path<FpId>,
+    fp_id: FpIdPath,
     request: web::Json<DecisionRequest>,
     auth: TenantSessionAuth,
 ) -> JsonApiResponse<EmptyResponse> {

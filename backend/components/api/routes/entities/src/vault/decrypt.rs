@@ -9,6 +9,7 @@ use api_core::auth::CanDecrypt;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::{ApiResult, AssertionError};
 use api_core::telemetry::RootSpan;
+use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::{
     bulk_decrypt, BulkDecryptReq, DecryptAccessEventInfo, EnclaveDecryptOperation, TenantVw,
 };
@@ -21,7 +22,7 @@ use newtypes::output::Csv;
 use newtypes::FpId;
 use newtypes::{AccessEventPurpose, DataLifetimeSeqno, FilterFunction, VersionedDataIdentifier};
 use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{api_v2_operation, post, web, web::Json, web::Path};
+use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use serde::Deserialize;
 use std::collections::{HashMap, HashSet};
 
@@ -72,7 +73,7 @@ pub struct ClientDecryptRequest {
 #[post("/entities/{fp_id}/vault/decrypt")]
 pub async fn post(
     state: web::Data<State>,
-    path: Path<FpId>,
+    path: FpIdPath,
     request: Json<DecryptRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,
@@ -86,7 +87,6 @@ pub async fn post(
     Ok(result)
 }
 
-#[tracing::instrument(skip(state, auth, root_span))]
 #[route_alias(post(
     "/users/vault/decrypt",
     tags(Client, Vault, Users, PublicApi),

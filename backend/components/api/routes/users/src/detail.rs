@@ -6,9 +6,9 @@ use crate::types::ResponseData;
 use crate::State;
 use api_core::errors::ApiResult;
 use api_core::utils::db2api::DbToApi;
+use api_core::utils::fp_id_path::FpIdPath;
 use db::models::manual_review::ManualReview;
 use db::models::scoped_vault::ScopedVault;
-use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(
@@ -18,7 +18,7 @@ use paperclip::actix::{api_v2_operation, get, web};
 #[get("/users/{fp_id:fp_[_A-Za-z0-9]*}")]
 pub async fn detail(
     state: web::Data<State>,
-    fp_id: web::Path<FpId>,
+    fp_id: FpIdPath,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<api_wire_types::User> {
     let auth = auth.check_guard(TenantGuard::Read)?;

@@ -7,7 +7,7 @@ use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
-use newtypes::FpId;
+use api_core::utils::fp_id_path::FpIdPath;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[api_v2_operation(
@@ -17,7 +17,7 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 #[get("/entities/{fp_id}/liveness")]
 pub async fn get(
     state: web::Data<State>,
-    request: web::Path<FpId>,
+    request: FpIdPath,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ResponseData<Vec<api_wire_types::LivenessEvent>>>, ApiError> {
     let auth = auth.check_guard(TenantGuard::Read)?;

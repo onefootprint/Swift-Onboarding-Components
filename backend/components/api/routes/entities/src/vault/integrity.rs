@@ -4,14 +4,15 @@ use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::telemetry::RootSpan;
 use api_core::types::ResponseData;
+use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
 use macros::route_alias;
 use newtypes::{
-    flat_api_object_map_type, FilterFunction, FpId, HmacSha256Args, IntegritySigningKey, PiiBytes,
-    PiiJsonValue, PreviewApi, VersionedDataIdentifier,
+    flat_api_object_map_type, FilterFunction, HmacSha256Args, IntegritySigningKey, PiiBytes, PiiJsonValue,
+    PreviewApi, VersionedDataIdentifier,
 };
 use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
+use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
@@ -42,7 +43,7 @@ flat_api_object_map_type!(
 #[actix::post("/entities/{fp_id}/vault/integrity")]
 pub async fn post(
     state: web::Data<State>,
-    path: Path<FpId>,
+    path: FpIdPath,
     request: Json<IntegrityRequest>,
     auth: SecretTenantAuthContext,
     insights: InsightHeaders,

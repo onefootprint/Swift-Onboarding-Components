@@ -1,17 +1,17 @@
+use actix_web::{get, web};
+use api_core::auth::tenant::{FirmEmployeeAuthContext, FirmEmployeeGuard};
 use api_core::errors::ApiResult;
 use api_core::types::{JsonApiResponse, ResponseData};
 use api_core::utils::db2api::DbToApi;
+use api_core::utils::fp_id_path::FpIdPath;
 use api_core::State;
-use actix_web::{get, web};
-use api_core::auth::tenant::{FirmEmployeeAuthContext, FirmEmployeeGuard};
 use db::models::scoped_vault::{ScopedVault, ScopedVaultIdentifier};
-use newtypes::FpId;
 
 #[get("/private/entities/{fp_id}")]
 async fn get(
     state: web::Data<State>,
     auth: FirmEmployeeAuthContext,
-    fp_id: web::Path<FpId>,
+    fp_id: FpIdPath,
 ) -> JsonApiResponse<api_wire_types::SuperAdminEntity> {
     auth.check_guard(FirmEmployeeGuard::Any)?;
     let fp_id = fp_id.into_inner();

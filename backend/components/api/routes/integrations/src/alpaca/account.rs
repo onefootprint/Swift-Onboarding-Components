@@ -4,6 +4,7 @@ use alpaca::{
     },
     AlpacaCip,
 };
+use api_core::utils::fp_id_path::FpIdPath;
 use api_core::{
     auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
     errors::{cip_error::CipError, ApiResult},
@@ -14,14 +15,13 @@ use api_core::{
 use api_wire_types::{
     AlpacaCreateAccountRequest, AlpacaCreateAccountResponse, DeprecatedAlpacaCreateAccountRequest,
 };
-use std::str::FromStr;
-
 use db::models::{identity_document::IdentityDocument, scoped_vault::ScopedVault};
 use newtypes::{
-    email::Email, DataIdentifier as DI, Declaration, DocumentKind as DK, FpId, IdDocKind,
-    IdentityDataKind as IDK, InvestorProfileKind as IPK, PhoneNumber, PiiJsonValue, PiiString, TenantId,
+    email::Email, DataIdentifier as DI, Declaration, DocumentKind as DK, IdDocKind, IdentityDataKind as IDK,
+    InvestorProfileKind as IPK, PhoneNumber, PiiJsonValue, PiiString, TenantId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use std::str::FromStr;
 
 #[api_v2_operation(description = "Create an Alpaca account", tags(Integrations, Alpaca, Preview))]
 #[actix::post("/users/{fp_id}/integrations/alpaca/account")]
@@ -29,7 +29,7 @@ pub async fn post(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
     request: Json<AlpacaCreateAccountRequest>,
-    fp_id: web::Path<FpId>,
+    fp_id: FpIdPath,
 ) -> JsonApiResponse<AlpacaCreateAccountResponse> {
     let AlpacaCreateAccountRequest {
         api_key,

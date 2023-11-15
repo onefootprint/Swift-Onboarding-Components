@@ -13,6 +13,7 @@ use api_core::errors::user::UserError;
 use api_core::errors::ApiResult;
 use api_core::types::EmptyResponse;
 use api_core::utils::email::SendgridClient;
+use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::session::AuthSession;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
@@ -26,7 +27,6 @@ use db::models::workflow::NewWorkflowArgs;
 use db::models::workflow::Workflow;
 use newtypes::ContactInfoKind;
 use newtypes::DocumentConfig;
-use newtypes::FpId;
 use newtypes::PhoneNumber;
 use newtypes::PiiString;
 use newtypes::TriggerInfo;
@@ -44,7 +44,7 @@ use paperclip::actix::{api_v2_operation, post, web};
 #[post("/entities/{fp_id}/trigger")]
 pub async fn post(
     state: web::Data<State>,
-    fp_id: web::Path<FpId>,
+    fp_id: FpIdPath,
     request: web::Json<TriggerRequest>,
     auth: TenantSessionAuth,
 ) -> JsonApiResponse<EmptyResponse> {

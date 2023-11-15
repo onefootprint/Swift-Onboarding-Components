@@ -5,6 +5,7 @@ pub mod db2api;
 pub mod email;
 pub mod email_domain;
 pub mod file_upload;
+pub mod fp_id_path;
 pub mod headers;
 pub mod incode_helper;
 pub mod kyb_utils;

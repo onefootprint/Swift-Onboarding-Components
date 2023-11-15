@@ -8,6 +8,7 @@ use crate::State;
 use api_core::auth::tenant::{ClientTenantAuthContext, TenantAuth, TenantSessionAuth};
 use api_core::auth::{CanVault, Either};
 use api_core::errors::AssertionError;
+use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::IgnoreLuhnValidation;
 use api_core::utils::vault_wrapper::Any;
 use db::models::access_event::NewAccessEvent;
@@ -17,7 +18,7 @@ use itertools::Itertools;
 use macros::route_alias;
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::{AccessEventKind, AccessEventPurpose, FpId, ValidateArgs};
-use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
+use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[route_alias(
     actix::patch(
@@ -38,7 +39,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 #[actix::patch("/entities/{fp_id}/vault")]
 pub async fn patch(
     state: web::Data<State>,
-    path: Path<FpId>,
+    path: FpIdPath,
     request: Json<RawDataRequest>,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
     insight: InsightHeaders,

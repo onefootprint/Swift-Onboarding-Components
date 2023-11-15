@@ -24,6 +24,7 @@ use api_core::decision::vendor::vendor_result::VendorResult;
 use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
 use api_core::telemetry::RootSpan;
+use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_core::utils::vault_wrapper::VwArgs;
@@ -49,7 +50,6 @@ use newtypes::FootprintReasonCode;
 use newtypes::FpId;
 use newtypes::PiiJsonValue;
 use newtypes::RiskSignalId;
-
 use newtypes::TenantId;
 use paperclip::actix::{api_v2_operation, get, post, web};
 
@@ -62,7 +62,7 @@ type RiskSignalsListResponse = Vec<api_wire_types::RiskSignal>;
 #[get("/entities/{fp_id}/risk_signals")]
 pub async fn get(
     state: web::Data<State>,
-    request: web::Path<FpId>,
+    request: FpIdPath,
     filters: web::Query<RiskSignalFilters>,
     // TODO remove SecretTenantAuthContext here when everyone has migrated to the new GET /users/<>/risk_signals API
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,

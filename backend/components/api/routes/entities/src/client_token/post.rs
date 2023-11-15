@@ -11,6 +11,7 @@ use api_core::auth::CanDecrypt;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
+use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::session::AuthSession;
 use api_wire_types::ClientTokenScopeKind;
 use api_wire_types::CreateClientTokenRequest;
@@ -19,7 +20,6 @@ use chrono::Duration;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use macros::route_alias;
-use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[route_alias(post(
@@ -34,7 +34,7 @@ use paperclip::actix::{api_v2_operation, post, web};
 #[post("/entities/{fp_id}/client_token")]
 pub async fn post(
     state: web::Data<State>,
-    fp_id: web::Path<FpId>,
+    fp_id: FpIdPath,
     request: web::Json<CreateClientTokenRequest>,
     // For now, only accept tenant API key
     auth: SecretTenantAuthContext,

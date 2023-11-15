@@ -9,11 +9,11 @@ use crate::types::ResponseData;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::utils::db2api::DbToApi;
+use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::ApiErrorKind;
 use db::models::scoped_vault::ScopedVault;
 use db::scoped_vault::ScopedVaultListQueryParams;
-use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(
@@ -23,7 +23,7 @@ use paperclip::actix::{api_v2_operation, get, web};
 #[get("/entities/{fp_id}")]
 pub async fn get(
     state: web::Data<State>,
-    fp_id: web::Path<FpId>,
+    fp_id: FpIdPath,
     auth: TenantSessionAuth,
 ) -> JsonApiResponse<EntityDetailResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;

@@ -8,9 +8,9 @@ use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::errors::ApiResult;
 use api_core::types::JsonApiResponse;
+use api_core::utils::fp_id_path::FpIdPath;
 use db::models::auth_event::AuthEvent;
 use db::models::scoped_vault::ScopedVault;
-use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[api_v2_operation(
@@ -20,7 +20,7 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 #[get("/entities/{fp_id}/auth_events")]
 pub async fn get(
     state: web::Data<State>,
-    request: web::Path<FpId>,
+    request: FpIdPath,
     auth: Either<TenantSessionAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<Vec<api_wire_types::AuthEvent>> {
     let auth = auth.check_guard(TenantGuard::Read)?;

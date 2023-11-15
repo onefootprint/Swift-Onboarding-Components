@@ -14,6 +14,7 @@ use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::task;
 use api_core::utils::db2api::DbToApi;
+use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::requirements::get_requirements_inner;
 use api_core::utils::requirements::GetRequirementsArgs;
 use api_core::utils::vault_wrapper::Any;
@@ -32,7 +33,6 @@ use db::DbError;
 use itertools::Itertools;
 use macros::route_alias;
 use newtypes::DataIdentifierDiscriminant as DID;
-use newtypes::FpId;
 use newtypes::OnboardingRequirement;
 use newtypes::VaultKind;
 use newtypes::WorkflowSource;
@@ -48,7 +48,7 @@ use paperclip::actix::{api_v2_operation, post, web};
 #[post("/entities/{fp_id}/kyc")]
 pub async fn post(
     state: web::Data<State>,
-    fp_id: web::Path<FpId>,
+    fp_id: FpIdPath,
     request: web::Json<TriggerKycRequest>,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<EntityValidateResponse> {

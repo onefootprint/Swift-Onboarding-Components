@@ -1,16 +1,13 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
-
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
-use api_wire_types::ListTimelineRequest;
-
 use crate::utils::db2api::DbToApi;
 use crate::State;
-
+use api_core::utils::fp_id_path::FpIdPath;
+use api_wire_types::ListTimelineRequest;
 use db::models::user_timeline::UserTimeline;
-use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, get, web};
 
 type TimelineEventsResponse = Vec<api_wire_types::UserTimeline>;
@@ -22,7 +19,7 @@ type TimelineEventsResponse = Vec<api_wire_types::UserTimeline>;
 #[get("/entities/{fp_id}/timeline")]
 pub async fn get(
     state: web::Data<State>,
-    fp_id: web::Path<FpId>,
+    fp_id: FpIdPath,
     filters: web::Query<ListTimelineRequest>,
     auth: TenantSessionAuth,
 ) -> JsonApiResponse<TimelineEventsResponse> {

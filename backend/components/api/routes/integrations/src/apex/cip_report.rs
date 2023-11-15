@@ -1,5 +1,4 @@
-use std::collections::HashMap;
-
+use api_core::utils::fp_id_path::FpIdPath;
 use api_core::{
     auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
     types::{JsonApiResponse, ResponseData},
@@ -9,9 +8,9 @@ use api_wire_types::{
     ApexCheckedKycData, ApexCipReportRequest, ApexCipSummaryResults, ApexSelfReportedData,
     OldApexCipReportRequest,
 };
-
-use newtypes::{FpId, PiiString};
+use newtypes::PiiString;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use std::collections::HashMap;
 use strum::IntoEnumIterator;
 
 #[api_v2_operation(
@@ -23,7 +22,7 @@ pub async fn post(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
     request: Json<ApexCipReportRequest>,
-    fp_id: web::Path<FpId>,
+    fp_id: FpIdPath,
 ) -> JsonApiResponse<ApexCipSummaryResults> {
     let ApexCipReportRequest { default_approver } = request.into_inner();
     let fp_id = fp_id.into_inner();

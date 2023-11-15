@@ -6,12 +6,13 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::auth::tenant::{ClientTenantAuthContext, TenantAuth};
 use api_core::auth::CanVault;
+use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::TenantVw;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::{FpId, ValidateArgs};
-use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
+use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[route_alias(
     actix::post(
@@ -32,7 +33,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
 #[actix::post("/entities/{fp_id}/vault/validate")]
 pub async fn post(
     state: web::Data<State>,
-    path: Path<FpId>,
+    path: FpIdPath,
     request: Json<RawDataRequest>,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {

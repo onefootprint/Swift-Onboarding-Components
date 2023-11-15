@@ -5,12 +5,12 @@ use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::decision::field_validations::create_field_validation_results;
+use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::GetFieldValidationResponse;
 use db::models::risk_signal::IncludeHidden;
 use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
 use db::DbResult;
-use newtypes::FpId;
 use newtypes::PreviewApi;
 use newtypes::SignalScope;
 use paperclip::actix::{api_v2_operation, get, web};
@@ -22,7 +22,7 @@ use paperclip::actix::{api_v2_operation, get, web};
 #[get("/users/{fp_id}/match_signals")]
 pub async fn get(
     state: web::Data<State>,
-    request: web::Path<FpId>,
+    request: FpIdPath,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<GetFieldValidationResponse> {
     auth.check_preview_guard(PreviewApi::MatchSignalsList)?;

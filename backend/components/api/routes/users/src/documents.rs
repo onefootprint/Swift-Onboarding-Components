@@ -4,10 +4,11 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::errors::ApiResult;
 use api_core::types::JsonApiResponse;
+use api_core::utils::fp_id_path::FpIdPath;
 use db::models::identity_document::IdentityDocument;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
-use newtypes::{FpId, PreviewApi};
+use newtypes::PreviewApi;
 use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(
@@ -17,7 +18,7 @@ use paperclip::actix::{api_v2_operation, get, web};
 #[get("/users/{fp_id}/documents")]
 pub async fn get(
     state: web::Data<State>,
-    request: web::Path<FpId>,
+    request: FpIdPath,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<Vec<api_wire_types::PublicDocument>> {
     auth.check_preview_guard(PreviewApi::AuthEventsList)?;

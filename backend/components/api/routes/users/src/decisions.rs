@@ -9,13 +9,13 @@ use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
 use api_core::task;
+use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::CreateAnnotationRequest;
 use api_wire_types::CreateUserDecisionRequest;
 use api_wire_types::DecisionRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
-use newtypes::FpId;
 use newtypes::PreviewApi;
 use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web};
@@ -27,7 +27,7 @@ use paperclip::actix::{api_v2_operation, post, web};
 #[post("/users/{fp_id}/decisions")]
 pub async fn post(
     state: web::Data<State>,
-    fp_id: web::Path<FpId>,
+    fp_id: FpIdPath,
     request: web::Json<CreateUserDecisionRequest>,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<EmptyResponse> {

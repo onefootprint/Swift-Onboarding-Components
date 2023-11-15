@@ -3,15 +3,13 @@ use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
-use crate::types::EmptyResponse;
-
 use crate::types::response::ResponseData;
+use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
-
 use crate::utils::db2api::DbToApi;
 use crate::State;
-
 use actix_web::web::Json;
+use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::{AnnotationFilters, CreateAnnotationRequest, UpdateAnnotationRequest};
 use db::models::annotation::Annotation;
 use db::models::annotation::AnnotationInfo;
@@ -32,7 +30,7 @@ type AnnotationsListResponse = Vec<api_wire_types::Annotation>;
 #[get("/entities/{fp_id}/annotations")]
 pub async fn get(
     state: web::Data<State>,
-    fp_id: web::Path<FpId>,
+    fp_id: FpIdPath,
     query: web::Query<AnnotationFilters>,
     auth: TenantSessionAuth,
 ) -> JsonApiResponse<AnnotationsListResponse> {
@@ -108,7 +106,7 @@ impl ValidateRequest for CreateAnnotationRequest {
 pub fn post(
     state: web::Data<State>,
     auth: TenantSessionAuth,
-    fp_id: web::Path<FpId>,
+    fp_id: FpIdPath,
     request: Json<CreateAnnotationRequest>,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::Annotation>>, ApiError> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;

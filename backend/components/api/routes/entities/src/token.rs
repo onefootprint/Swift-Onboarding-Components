@@ -11,6 +11,7 @@ use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
 use api_core::utils::actix::OptionalJson;
+use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::session::AuthSession;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::TenantVw;
@@ -26,7 +27,6 @@ use db::models::scoped_vault::ScopedVault;
 use feature_flag::BoolFlag;
 use macros::route_alias;
 use newtypes::AuthEventKind;
-use newtypes::FpId;
 use newtypes::IdentifyScope;
 use newtypes::ObConfigurationKind;
 use paperclip::actix::{api_v2_operation, post, web};
@@ -44,7 +44,7 @@ use paperclip::actix::{api_v2_operation, post, web};
 #[post("/entities/{fp_id}/token")]
 pub async fn post(
     state: web::Data<State>,
-    fp_id: web::Path<FpId>,
+    fp_id: FpIdPath,
     request: OptionalJson<CreateTokenRequest>,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<CreateTokenResponse> {

@@ -6,10 +6,10 @@ use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::errors::ApiResult;
 use api_core::types::OffsetPaginatedResponse;
 use api_core::types::OffsetPaginationRequest;
+use api_core::utils::fp_id_path::FpIdPath;
 use db::models::auth_event::AuthEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::OffsetPagination;
-use newtypes::FpId;
 use newtypes::PreviewApi;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
@@ -17,7 +17,7 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 #[get("/users/{fp_id}/auth_events")]
 pub async fn get(
     state: web::Data<State>,
-    request: web::Path<FpId>,
+    request: FpIdPath,
     auth: SecretTenantAuthContext,
     pagination: web::Query<OffsetPaginationRequest>,
 ) -> ApiResult<Json<OffsetPaginatedResponse<api_wire_types::PublicAuthEvent>>> {

@@ -1,8 +1,7 @@
-use std::collections::HashSet;
-
 use alpaca::{
     AlpacaCip, CipRequest, CipResult, DataComparsionBreakDown, ImageIntegrityBreakdown, VisualAuthenticity,
 };
+use api_core::utils::fp_id_path::FpIdPath;
 use api_core::{
     auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
     decision::{
@@ -39,6 +38,7 @@ use newtypes::{
     Vendor, VendorAPI,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use std::collections::HashSet;
 use DataIdentifier::*;
 use DocumentKind::*;
 use IdentityDataKind::*;
@@ -52,7 +52,7 @@ pub async fn post(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
     request: Json<AlpacaCipRequest>,
-    fp_id: web::Path<FpId>,
+    fp_id: FpIdPath,
 ) -> JsonApiResponse<AlpacaCipResponse> {
     let AlpacaCipRequest {
         api_key,

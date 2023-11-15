@@ -9,6 +9,7 @@ use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::user::UserError;
 use api_core::errors::ApiResult;
+use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::session::AuthSession;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
@@ -16,7 +17,6 @@ use api_wire_types::ReonboardResponse;
 use chrono::Duration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow::Workflow;
-use newtypes::FpId;
 use newtypes::PreviewApi;
 use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web};
@@ -28,7 +28,7 @@ use paperclip::actix::{api_v2_operation, post, web};
 #[post("/users/{fp_id}/reonboard")]
 pub async fn post(
     state: web::Data<State>,
-    fp_id: web::Path<FpId>,
+    fp_id: FpIdPath,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<ReonboardResponse> {
     auth.check_preview_guard(PreviewApi::ReonboardUser)?;

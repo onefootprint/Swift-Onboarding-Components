@@ -5,8 +5,8 @@ use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::types::JsonApiResponse;
+use api_core::utils::fp_id_path::FpIdPath;
 use db::models::liveness_event::LivenessEvent;
-use newtypes::FpId;
 use newtypes::PreviewApi;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
@@ -17,7 +17,7 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 #[get("/users/{fp_id}/liveness")]
 pub async fn get(
     state: web::Data<State>,
-    request: web::Path<FpId>,
+    request: FpIdPath,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<Vec<api_wire_types::LivenessEvent>> {
     auth.check_preview_guard(PreviewApi::LivenessList)?;

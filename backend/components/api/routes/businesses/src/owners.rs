@@ -7,13 +7,13 @@ use crate::State;
 use api_core::errors::ApiResult;
 use api_core::serializers::BusinessOwnerInfo;
 use api_core::utils::db2api::DbToApi;
+use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::Business;
 use api_core::utils::vault_wrapper::DecryptedBusinessOwners;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_wire_types::BusinessOwner as ApiBusinessOwner;
 use db::models::scoped_vault::ScopedVault;
-use newtypes::FpId;
 use paperclip::actix::{api_v2_operation, get, web};
 
 type BusinessOwnerListResponse = Vec<ApiBusinessOwner>;
@@ -25,7 +25,7 @@ type BusinessOwnerListResponse = Vec<ApiBusinessOwner>;
 #[get("/businesses/{fp_id}/owners")]
 pub async fn get(
     state: web::Data<State>,
-    fp_id: web::Path<FpId>,
+    fp_id: FpIdPath,
     auth: TenantSessionAuth,
 ) -> JsonApiResponse<BusinessOwnerListResponse> {
     let auth = auth.check_guard(TenantGuard::Read)?;

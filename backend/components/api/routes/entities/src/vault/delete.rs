@@ -1,26 +1,22 @@
-use std::collections::{HashMap, HashSet};
-
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext};
 use crate::errors::ApiResult;
 use crate::types::JsonApiResponse;
-
 use crate::utils::vault_wrapper::VaultWrapper;
-
 use crate::State;
 use api_core::types::ResponseData;
+use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::vault_wrapper::TenantVw;
-
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
-
-use newtypes::{flat_api_object_map_type, AccessEventKind, AccessEventPurpose, DataIdentifier, FpId};
+use newtypes::{flat_api_object_map_type, AccessEventKind, AccessEventPurpose, DataIdentifier};
 use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{self, api_v2_operation, web, web::Json, web::Path};
+use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use serde::Deserialize;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 pub struct DeleteRequest {
@@ -53,7 +49,7 @@ flat_api_object_map_type!(
 #[actix::delete("/entities/{fp_id}/vault")]
 pub async fn delete(
     state: web::Data<State>,
-    path: Path<FpId>,
+    path: FpIdPath,
     request: Json<DeleteRequest>,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
