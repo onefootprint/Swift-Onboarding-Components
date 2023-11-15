@@ -133,6 +133,11 @@ async fn pass(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant.id))
         .return_const(matches!(user_kind, UserKind::Demo));
 
+    mock_ff_client
+        .expect_flag()
+        .withf(move |f| matches!(f, BoolFlag::StepUpOnAmlHit(_)))
+        .return_const(false);
+
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
         UserKind::Demo | UserKind::Sandbox(_) => {}
@@ -330,6 +335,12 @@ async fn pass_then_watchlist_hit(
         .expect_flag()
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
         .return_const(matches!(user_kind, UserKind::Demo));
+
+    // TODO: cleanup a better way to mock certain flags and use default for others
+    mock_ff_client
+        .expect_flag()
+        .withf(move |f| matches!(f, BoolFlag::StepUpOnAmlHit(_)))
+        .return_const(false);
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
@@ -576,19 +587,35 @@ impl ExpectedResult {
     }
 }
 
-#[test_state_case(WFKind::Alpaca, UserKind::Live, vec![FRC::DocumentVerified], ExpectedResult::FailWithReview)] // the legacy Alpaca workflow always fails with review when a doc is uploaded
-#[test_state_case(WFKind::Alpaca, UserKind::Sandbox(WorkflowFixtureResult::StepUp), vec![FRC::DocumentVerified], ExpectedResult::FailWithReview)]
-#[test_state_case(WFKind::Kyc, UserKind::Sandbox(WorkflowFixtureResult::StepUp), vec![FRC::DocumentVerified], ExpectedResult::FailWithReview)]
+enum StepUpReason {
+    NameDoesntMatch,
+    WatchlistHit,
+}
+
+impl StepUpReason {
+    pub fn expected_review_reasons(&self) -> Vec<ReviewReason> {
+        match self {
+            StepUpReason::NameDoesntMatch => vec![ReviewReason::Document],
+            StepUpReason::WatchlistHit => vec![ReviewReason::Document, ReviewReason::WatchlistHit],
+        }
+    }
+}
+
+#[test_state_case(WFKind::Alpaca, UserKind::Live, StepUpReason::NameDoesntMatch, vec![FRC::DocumentVerified], ExpectedResult::FailWithReview)] // the legacy Alpaca workflow always fails with review when a doc is uploaded
+#[test_state_case(WFKind::Alpaca, UserKind::Sandbox(WorkflowFixtureResult::StepUp),StepUpReason::NameDoesntMatch, vec![FRC::DocumentVerified], ExpectedResult::FailWithReview)]
+#[test_state_case(WFKind::Kyc, UserKind::Sandbox(WorkflowFixtureResult::StepUp),StepUpReason::NameDoesntMatch, vec![FRC::DocumentVerified], ExpectedResult::FailWithReview)]
 // note: every test will have the KYC calls produce `NamePartiallyMatches`
-#[test_state_case(WFKind::Kyc, UserKind::Live, vec![FRC::DocumentVerified, FRC::DocumentOcrAddressMatches, FRC::DocumentOcrDobMatches, FRC::DocumentOcrNameDoesNotMatch], ExpectedResult::FailWithReview ; "doc name doesn't match")]
-#[test_state_case(WFKind::Kyc, UserKind::Live, vec![FRC::DocumentVerified, FRC::DocumentOcrAddressMatches, FRC::DocumentOcrDobMatches, FRC::DocumentOcrNameMatches], ExpectedResult::Pass ; "doc names matches")]
-#[test_state_case(WFKind::Kyc, UserKind::Live, vec![FRC::DocumentNotVerified, FRC::DocumentOcrAddressMatches, FRC::DocumentOcrDobMatches, FRC::DocumentOcrNameMatches], ExpectedResult::FailWithReview ; "doc names matches but doc not verified")]
-#[test_state_case(WFKind::Kyc, UserKind::Live, vec![FRC::DocumentVerified, FRC::DocumentSelfieDoesNotMatch, FRC::DocumentOcrAddressMatches, FRC::DocumentOcrDobMatches, FRC::DocumentOcrNameMatches], ExpectedResult::FailWithReview ; "doc names matches but selfie doesnt match")]
+#[test_state_case(WFKind::Kyc, UserKind::Live,StepUpReason::NameDoesntMatch, vec![FRC::DocumentVerified, FRC::DocumentOcrAddressMatches, FRC::DocumentOcrDobMatches, FRC::DocumentOcrNameDoesNotMatch], ExpectedResult::FailWithReview ; "doc name doesn't match")]
+#[test_state_case(WFKind::Kyc, UserKind::Live,StepUpReason::NameDoesntMatch, vec![FRC::DocumentVerified, FRC::DocumentOcrAddressMatches, FRC::DocumentOcrDobMatches, FRC::DocumentOcrNameMatches], ExpectedResult::Pass ; "doc names matches")]
+#[test_state_case(WFKind::Kyc, UserKind::Live,StepUpReason::NameDoesntMatch, vec![FRC::DocumentNotVerified, FRC::DocumentOcrAddressMatches, FRC::DocumentOcrDobMatches, FRC::DocumentOcrNameMatches], ExpectedResult::FailWithReview ; "doc names matches but doc not verified")]
+#[test_state_case(WFKind::Kyc, UserKind::Live,StepUpReason::NameDoesntMatch, vec![FRC::DocumentVerified, FRC::DocumentSelfieDoesNotMatch, FRC::DocumentOcrAddressMatches, FRC::DocumentOcrDobMatches, FRC::DocumentOcrNameMatches], ExpectedResult::FailWithReview ; "doc names matches but selfie doesnt match")]
+#[test_state_case(WFKind::Kyc, UserKind::Live, StepUpReason::WatchlistHit, vec![FRC::DocumentVerified], ExpectedResult::FailWithReview ; "stepup from AML hit")]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn step_up(
     state: &mut State,
     wf_kind: WFKind,
     user_kind: UserKind,
+    step_up_reason: StepUpReason,
     document_frcs: Vec<FRC>,
     expected_result: ExpectedResult,
 ) {
@@ -643,11 +670,28 @@ async fn step_up(
                 .withf(move |f| matches!(f, BoolFlag::IsKycWaterfallOnRuleFailureEnabled(_)))
                 .return_const(false);
 
-            mock_idology(
-                state,
-                WithQualifier(Some("resultcode.first.name.does.not.match".to_owned())),
-            );
-            mock_incode(state, WithHit(vec![]));
+            match step_up_reason {
+                StepUpReason::NameDoesntMatch => {
+                    mock_ff_client
+                        .expect_flag()
+                        .withf(move |f| matches!(f, BoolFlag::StepUpOnAmlHit(_)))
+                        .return_const(false);
+
+                    mock_idology(
+                        state,
+                        WithQualifier(Some("resultcode.first.name.does.not.match".to_owned())),
+                    );
+                    mock_incode(state, WithHit(vec![]));
+                }
+                StepUpReason::WatchlistHit => {
+                    mock_ff_client
+                        .expect_flag()
+                        .withf(move |f| matches!(f, BoolFlag::StepUpOnAmlHit(_)))
+                        .return_const(true);
+                    mock_idology(state, WithQualifier(None));
+                    mock_incode(state, WithHit(vec![AmlKind::Ofac]));
+                }
+            };
         }
     };
 
@@ -720,7 +764,7 @@ async fn step_up(
     // If FailWithReview, then manual_review should exist and have correct review_reasons
     if expected_result.requires_review() {
         let mr = mr.unwrap();
-        assert_eq!(vec![ReviewReason::Document], mr.review_reasons);
+        assert_have_same_elements(step_up_reason.expected_review_reasons(), mr.review_reasons);
     }
 
     match user_kind {
@@ -732,21 +776,40 @@ async fn step_up(
             assert!(rs.iter().any(|rs| rs.reason_code == FRC::SsnMatches));
         }
         UserKind::Live => {
-            assert_have_same_elements(
-                vec![
-                    (VendorAPI::IdologyExpectId, FRC::NamePartiallyMatches),
-                    (VendorAPI::IdologyExpectId, FRC::NameFirstDoesNotMatch),
-                    (VendorAPI::IdologyExpectId, FRC::AddressMatches),
-                    (VendorAPI::IdologyExpectId, FRC::SsnMatches),
-                    (VendorAPI::IdologyExpectId, FRC::DobMatches),
-                ]
-                .into_iter()
-                .chain(
-                    document_frcs
+            let mut kyc_risk_signals = vec![
+                (VendorAPI::IdologyExpectId, FRC::AddressMatches),
+                (VendorAPI::IdologyExpectId, FRC::SsnMatches),
+                (VendorAPI::IdologyExpectId, FRC::DobMatches),
+            ];
+            match step_up_reason {
+                StepUpReason::NameDoesntMatch => {
+                    kyc_risk_signals = kyc_risk_signals
                         .into_iter()
-                        .map(|f| (VendorAPI::IncodeFetchScores, f)),
-                )
-                .collect_vec(),
+                        .chain(vec![
+                            (VendorAPI::IdologyExpectId, FRC::NamePartiallyMatches),
+                            (VendorAPI::IdologyExpectId, FRC::NameFirstDoesNotMatch),
+                        ])
+                        .collect();
+                }
+                StepUpReason::WatchlistHit => {
+                    kyc_risk_signals = kyc_risk_signals
+                        .into_iter()
+                        .chain(vec![
+                            (VendorAPI::IncodeWatchlistCheck, FRC::WatchlistHitOfac),
+                            (VendorAPI::IdologyExpectId, FRC::NameMatches),
+                        ])
+                        .collect();
+                }
+            };
+            assert_have_same_elements(
+                kyc_risk_signals
+                    .into_iter()
+                    .chain(
+                        document_frcs
+                            .into_iter()
+                            .map(|f| (VendorAPI::IncodeFetchScores, f)),
+                    )
+                    .collect_vec(),
                 rs.into_iter()
                     .map(|rs| (rs.vendor_api, rs.reason_code))
                     .collect_vec(),
@@ -857,6 +920,11 @@ async fn fail(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
         .expect_flag()
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
         .return_const(matches!(user_kind, UserKind::Demo));
+
+    mock_ff_client
+        .expect_flag()
+        .withf(move |f| matches!(f, BoolFlag::StepUpOnAmlHit(_)))
+        .return_const(false);
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
@@ -1035,6 +1103,11 @@ async fn redo_and_pass(
         .expect_flag()
         .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
         .return_const(matches!(user_kind, UserKind::Demo));
+
+    mock_ff_client
+        .expect_flag()
+        .withf(move |f| matches!(f, BoolFlag::StepUpOnAmlHit(_)))
+        .return_const(false);
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted

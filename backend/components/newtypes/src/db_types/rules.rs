@@ -84,6 +84,7 @@ pub enum RuleName {
     SsnIssuedPriorToDob,
     SsnNotProvided,
     WatchlistHit,
+    WatchlistHitStepUp,
     PepHit,
     AdverseMediaHit,
     ThinFile,

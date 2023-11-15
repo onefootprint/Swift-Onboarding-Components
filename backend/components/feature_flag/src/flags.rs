@@ -70,6 +70,8 @@ pub enum BoolFlag<'a> {
     RunAwsRekognition(&'a TenantId),
     #[strum(to_string = "CreateKycWorkflowForAlpacaOnboardings")]
     CreateKycWorkflowForAlpacaOnboardings(&'a ObConfigurationKey),
+    #[strum(to_string = "StepUpOnAmlHit")]
+    StepUpOnAmlHit(&'a ObConfigurationKey),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -112,6 +114,7 @@ impl<'a> BoolFlag<'a> {
             Self::CanProvideThirdPartyAuth(k) => Some(k.to_string()),
             Self::RunAwsRekognition(k) => Some(k.to_string()),
             Self::CreateKycWorkflowForAlpacaOnboardings(k) => Some(k.to_string()),
+            Self::StepUpOnAmlHit(k) => Some(k.to_string()),
         }
     }
 
@@ -150,6 +153,7 @@ impl<'a> BoolFlag<'a> {
             Self::CanProvideThirdPartyAuth(_) => false,
             Self::RunAwsRekognition(_) => false,
             Self::CreateKycWorkflowForAlpacaOnboardings(_) => false,
+            Self::StepUpOnAmlHit(_) => false,
         }
     }
 }

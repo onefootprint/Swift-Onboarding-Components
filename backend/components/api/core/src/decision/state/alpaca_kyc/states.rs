@@ -270,13 +270,14 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<AlpacaKycState> {
         let v = Vault::get(conn, &self.sv_id)?;
-        let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
+        let fixture_decision =
+            decision::utils::get_fixture_data_decision(ff_client.clone(), &v, &wf, &self.t_id)?;
         // TODO: reason_codes are produced in `MakeVendorCalls` on_commit, so untangle this from the util
         // TODO: load risk signals here, and use that to evaluate the rules
         let decision = if let Some(fixture_decision) = fixture_decision {
             common::alpaca_kyc_decision_from_fixture(fixture_decision)?
         } else {
-            common::get_decision(conn, self.risk_signals.clone(), &wf, &v)?
+            common::get_decision(conn, ff_client, self.risk_signals.clone(), &wf, &v)?
         };
 
         match decision.final_kyc_decision()?.decision.decision_status {
@@ -358,6 +359,7 @@ impl AlpacaKycWatchlistCheck {
 #[async_trait]
 impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistCheck {
     type AsyncRes = (
+        Arc<dyn FeatureFlagClient>,
         Either<(VerificationResult, WatchlistResultResponse), (VerificationResult, FixtureDecision)>,
         Vec<VendorResult>,
     );
@@ -396,7 +398,8 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         .await?;
 
         let ff_client = state.feature_flag_client.clone();
-        let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
+        let fixture_decision =
+            decision::utils::get_fixture_data_decision(ff_client.clone(), &v, &wf, &self.t_id)?;
 
         let watchlist_res = if let Some(fixture_decision) = fixture_decision {
             // TODO: since we are now saving a mock incode response, we could make the sandbox reason_code logic in `on_commit` just operate on the mocked vres instead of synthetically deriving from fixture_decision
@@ -426,7 +429,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
 
         let vendor_results = common::get_latest_vendor_results(state, &self.sv_id).await?;
 
-        Ok((watchlist_res, vendor_results))
+        Ok((ff_client, watchlist_res, vendor_results))
     }
 
     #[tracing::instrument("OnAction<MakeWatchlistCheckCall, AlpacaKycState>::on_commit", skip_all)]
@@ -437,7 +440,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<AlpacaKycState> {
         // TODO save Risk Signals + determine if we transition to PendingReview or Complete
-        let (watchlist_res, vendor_results) = res;
+        let (ff_client, watchlist_res, vendor_results) = res;
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
         let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 
@@ -480,7 +483,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         let kyc_decision = if let Some((_, fixture_decision)) = watchlist_res.right() {
             common::alpaca_kyc_decision_from_fixture(fixture_decision)?
         } else {
-            common::get_decision(conn, risk_signals, &wf, &v)?
+            common::get_decision(conn, ff_client, risk_signals, &wf, &v)?
         }
         .final_kyc_decision()?;
 

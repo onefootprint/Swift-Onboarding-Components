@@ -296,7 +296,8 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
         let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 
-        let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
+        let fixture_decision =
+            decision::utils::get_fixture_data_decision(ff_client.clone(), &v, &wf, &self.t_id)?;
         let execute_rules_for_real_document_decision_only = should_execute_rules_for_document_only(&v, &wf)?;
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
 
@@ -304,7 +305,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let review_reasons = common::get_review_reasons(&risk_signals, doc_collected, &obc);
         let decision = if let Some(fixture_decision) = fixture_decision {
             if execute_rules_for_real_document_decision_only || obc.skip_kyc {
-                common::get_decision(conn, risk_signals, &wf, &v)?
+                common::get_decision(conn, ff_client, risk_signals, &wf, &v)?
             } else {
                 let doc_collected = DocumentRequest::get(conn, &wf.id)?.is_some();
                 // we'll hopefully support fixturing the post-stepup decision but for now we just always fail with review if we stepped up
@@ -317,7 +318,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
                 common::kyc_decision_from_fixture(fixture_decision)?
             }
         } else {
-            common::get_decision(conn, risk_signals, &wf, &v)?
+            common::get_decision(conn, ff_client, risk_signals, &wf, &v)?
         };
 
         match decision.final_kyc_decision()?.decision.decision_status {

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use db::{
     models::{
         decision_intent::DecisionIntent, document_request::DocumentRequest,
@@ -6,6 +8,7 @@ use db::{
     },
     DbPool, DbResult, TxnPgConn,
 };
+use feature_flag::{BoolFlag, FeatureFlagClient};
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
     CipKind, DecisionIntentKind, DecisionStatus, EnhancedAmlOption, FootprintReasonCode, ReviewReason,
@@ -220,6 +223,7 @@ pub fn alpaca_kyc_decision_from_fixture(
 #[tracing::instrument(skip_all)]
 pub fn get_decision(
     conn: &mut TxnPgConn,
+    ff_client: Arc<dyn FeatureFlagClient>,
     risk_signals: RiskSignalsForDecision,
     wf: &Workflow,
     vault: &Vault,
@@ -227,11 +231,20 @@ pub fn get_decision(
     let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
     // later rules will come from Postgres itself
     let rule_group = match obc.cip_kind {
-        Some(CipKind::Alpaca) => KycRuleGroup {
-            kyc_rules: rule_sets::alpaca::alpaca_rules(),
-            doc_rules: rule_sets::alpaca::doc_rules(),
-            aml_rules: rule_sets::common::aml_rules(),
-        },
+        Some(CipKind::Alpaca) => {
+            let mut aml_rules = rule_sets::common::aml_rules();
+            if ff_client.flag(BoolFlag::StepUpOnAmlHit(&obc.key)) {
+                aml_rules = aml_rules
+                    .into_iter()
+                    .chain(rule_sets::alpaca::stepup_on_watchlist_hit_rules().into_iter())
+                    .collect();
+            };
+            KycRuleGroup {
+                kyc_rules: rule_sets::alpaca::alpaca_rules(),
+                doc_rules: rule_sets::alpaca::doc_rules(),
+                aml_rules,
+            }
+        }
         _ => KycRuleGroup::default(),
     };
     let doc_collected = DocumentRequest::get(conn, &wf.id)?.is_some();

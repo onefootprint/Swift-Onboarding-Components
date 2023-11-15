@@ -76,3 +76,23 @@ pub fn doc_field_validation_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
         },
     ]
 }
+
+pub fn stepup_on_watchlist_hit_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
+    vec![Rule {
+        rule: {
+            |f: &Vec<FootprintReasonCode>| {
+                f.iter().any(|rc| {
+                    [
+                        FootprintReasonCode::WatchlistHitOfac,
+                        FootprintReasonCode::WatchlistHitNonSdn,
+                        FootprintReasonCode::WatchlistHitPep,
+                        FootprintReasonCode::AdverseMediaHit,
+                    ]
+                    .contains(rc)
+                })
+            }
+        },
+        name: RuleName::WatchlistHitStepUp,
+        action: RuleAction::StepUp,
+    }]
+}
