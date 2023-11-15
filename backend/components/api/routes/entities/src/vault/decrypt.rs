@@ -53,7 +53,6 @@ pub struct ClientDecryptRequest {
     transforms: Option<Vec<FilterFunction>>,
 }
 
-#[tracing::instrument(skip(state, auth, root_span))]
 #[route_alias(
     post(
         "/users/{fp_id}/vault/decrypt",

@@ -52,7 +52,6 @@ pub async fn patch(
     Ok(result)
 }
 
-#[tracing::instrument(skip(state, auth))]
 #[route_alias(actix::patch(
     "/users/vault",
     tags(Client, Vault, Users, PublicApi),

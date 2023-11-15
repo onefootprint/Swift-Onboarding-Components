@@ -42,7 +42,6 @@ pub async fn post(
     Ok(result)
 }
 
-#[tracing::instrument(skip(state, auth))]
 #[route_alias(actix::post(
     "/users/vault/validate",
     tags(Client, Vault, Users, PublicApi),
