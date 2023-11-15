@@ -29,8 +29,8 @@ use strum_macros::{Display, EnumIter, EnumString};
 pub enum RuleAction {
     /// ORDERING MATTERS!!!
     PassWithManualReview,
-    StepUp,
     ManualReview,
+    StepUp,
     Fail,
 }
 

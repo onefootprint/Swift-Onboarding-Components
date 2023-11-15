@@ -108,8 +108,8 @@ mod tests {
 
     #[test_case(RuleAction::StepUp, RuleAction::PassWithManualReview  => Ordering::Greater)]
     #[test_case(RuleAction::ManualReview, RuleAction::PassWithManualReview  => Ordering::Greater)]
-    #[test_case(RuleAction::ManualReview, RuleAction::StepUp => Ordering::Greater)]
-    #[test_case(RuleAction::Fail, RuleAction::ManualReview => Ordering::Greater)]
+    #[test_case(RuleAction::StepUp, RuleAction::ManualReview => Ordering::Greater)]
+    #[test_case(RuleAction::Fail, RuleAction::StepUp => Ordering::Greater)]
     fn test_cmp_action_ordering(s1: RuleAction, s2: RuleAction) -> Ordering {
         // Test ordering since we rely on it to extract minimum status
         s1.cmp(&s2)
