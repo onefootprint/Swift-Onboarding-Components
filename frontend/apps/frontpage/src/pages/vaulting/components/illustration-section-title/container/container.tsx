@@ -8,7 +8,7 @@ type BaseillustrationSectionTitleProps = {
   removeMask?: boolean;
 };
 
-const Container = ({
+const IllustrationSectionTitle = ({
   height = 174,
   width = 360,
   removeMask,
@@ -99,4 +99,4 @@ const Mask = styled.div`
   );
 `;
 
-export default Container;
+export default IllustrationSectionTitle;

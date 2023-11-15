@@ -1085,6 +1085,24 @@
           }
         }
       },
+      "vault-proxy": {
+        "title": "Vault proxy",
+        "subtitle": "Send PII data to third parties from Footprint without having to decrypt it yourself.",
+        "bullets": {
+          "enhanced-security": {
+            "title": "Enhanced security",
+            "subtitle": "Simplify your data management and minimize the amount of sensitive data stored on your systems, reducing the risk of data breaches and other security incidents."
+          },
+          "reduced-liability": {
+            "title": "Reduced liability",
+            "subtitle": "Offload the responsibility of securely storing and managing sensitive data to us, you minimize your exposure to security risks and demonstrate compliance with data privacy regulations."
+          },
+          "less-money": {
+            "title": "Less money and time.",
+            "subtitle": "Protect your sensitive our all-in-one solution. Bundle PII vaulting with Vault Proxy to simplify security management and reduce implementation costs while minimizing providers for better security."
+          }
+        }
+      },
       "device-insights": {
         "title": "Device insights",
         "subtitle": "Goodbye heuristics. Hello real people."

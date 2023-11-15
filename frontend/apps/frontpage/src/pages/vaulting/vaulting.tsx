@@ -9,6 +9,7 @@ import AuditTrail from './sections/audit-trail';
 import DeviceInsights from './sections/device-insights';
 import Hero from './sections/hero';
 import PenguinBanner from './sections/penguin-banner';
+import VaultProxy from './sections/vault-proxy';
 
 const Vaulting = () => {
   const { t } = useTranslation('pages.vaulting');
@@ -19,6 +20,7 @@ const Vaulting = () => {
       <Hero />
       <AllData />
       <AuditTrail />
+      <VaultProxy />
       <DeviceInsights />
       <AllFeatures />
       <PenguinBanner />
