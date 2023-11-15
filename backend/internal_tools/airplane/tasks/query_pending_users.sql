@@ -37,7 +37,8 @@ left join pending_workflows_latest_workflow_event wfe on wf.wf_id = wfe.wf_id
 inner join scoped_vault sv on sv.id = coalesce(psv.sv_id, wf.sv_id)
 inner join tenant t on sv.tenant_id = t.id
 where 
-  t.id != '_private_it_org_2'
+  !t.is_demo_tenant
+  and sv.is_live
   and greatest(psv.sv_created_at, wf.wf_created_at, wfe.wfe_created_at) >= :start_datetime
   and greatest(psv.sv_created_at, wf.wf_created_at, wfe.wfe_created_at) <  :end_datetime
   
