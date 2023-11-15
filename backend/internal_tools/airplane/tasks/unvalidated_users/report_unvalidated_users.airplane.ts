@@ -18,10 +18,10 @@ export default airplane.task(
   },
   async params => {
     let end_datetime = new Date(
-      new Date().getTime() - 1000, // Give a 1m grace period from completion -> validation
+      new Date().getTime() - 1000 * 60, // Give a 1m grace period from completion -> validation
     ).toISOString();
     let start_datetime = new Date(
-      new Date().getTime() - 1000 * 60 * 60, // Look back 1h
+      new Date().getTime() - 1000 * 60 * 35, // Look back 30m + a few min buffer
     ).toISOString();
 
     const run = await airplane.execute('query_unvalidated_users', {
