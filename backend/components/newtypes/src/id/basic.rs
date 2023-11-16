@@ -235,3 +235,4 @@ define_newtype_id!(
     "Identifier for a user facing rule (represented as a changelog of multiple immutable `rule` rows all with the same rule_id)"
 );
 define_newtype_id!(RuleSetResultId, String, "Identifier for a RuleSetResult");
+define_newtype_id!(RuleResultId, String, "Identifier for a RuleResult");
