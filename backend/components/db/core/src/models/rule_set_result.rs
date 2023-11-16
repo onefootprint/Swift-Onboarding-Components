@@ -4,14 +4,14 @@ use super::rule_result::RuleResult;
 use crate::DbResult;
 use crate::TxnPgConn;
 use chrono::{DateTime, Utc};
-use db_schema::schema::rule_set_result;
+use db_schema::schema::{rule_set_result, rule_set_result_risk_signal_junction};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::RuleInstanceId;
 use newtypes::RuleSetResultKind;
 use newtypes::ScopedVaultId;
-use newtypes::{DataLifetimeSeqno, ObConfigurationId, RuleAction, RuleSetResultId, WorkflowId};
+use newtypes::{DataLifetimeSeqno, ObConfigurationId, RiskSignalId, RuleAction, RuleSetResultId, WorkflowId};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = rule_set_result)]
@@ -49,12 +49,21 @@ pub struct NewRuleSetResultArgs<'a> {
     pub kind: RuleSetResultKind,
     pub action_triggered: Option<RuleAction>,
     pub rule_results: Vec<NewRuleResultArgs<'a>>,
+    pub risk_signal_ids: Vec<&'a RiskSignalId>,
 }
 
 #[derive(Debug, Clone)]
 pub struct NewRuleResultArgs<'a> {
     pub rule_instance_id: &'a RuleInstanceId,
     pub result: bool,
+}
+
+#[derive(Debug, Clone, Insertable, Queryable)]
+#[diesel(table_name = rule_set_result_risk_signal_junction)]
+pub struct RuleSetResultRiskSignalJunction {
+    pub created_at: DateTime<Utc>,
+    pub rule_set_result_id: RuleSetResultId,
+    pub risk_signal_id: RiskSignalId,
 }
 
 impl RuleSetResult {
@@ -89,6 +98,19 @@ impl RuleSetResult {
                 .collect_vec(),
         )?;
 
+        let risk_signal_junction_rows = args
+            .risk_signal_ids
+            .into_iter()
+            .map(|rs| RuleSetResultRiskSignalJunction {
+                created_at: now,
+                rule_set_result_id: rule_set_result.id.clone(),
+                risk_signal_id: rs.clone(),
+            })
+            .collect_vec();
+        diesel::insert_into(rule_set_result_risk_signal_junction::table)
+            .values(risk_signal_junction_rows)
+            .execute(conn.conn())?;
+
         Ok((rule_set_result, rule_results))
     }
 }
@@ -96,12 +118,13 @@ impl RuleSetResult {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::models::risk_signal::RiskSignal;
     use crate::models::rule_instance::RuleInstance;
     use crate::test_helpers::assert_have_same_elements;
     use crate::tests::prelude::*;
     use fixtures::ob_configuration::ObConfigurationOpts;
     use macros::db_test;
-    use newtypes::DbActor;
+    use newtypes::{DbActor, DecisionIntentKind, FootprintReasonCode as FRC, RiskSignalGroupKind, VendorAPI};
 
     #[db_test]
     fn test_create(conn: &mut TestPgConn) {
@@ -144,6 +167,25 @@ mod tests {
         )
         .unwrap();
 
+        let di = crate::models::decision_intent::DecisionIntent::create(
+            conn,
+            DecisionIntentKind::OnboardingKyc,
+            &sv.id,
+            None,
+        )
+        .unwrap();
+        let vreq =
+            tests::fixtures::verification_request::create(conn, &sv.id, &di.id, VendorAPI::IdologyExpectId);
+        let vres = tests::fixtures::verification_result::create(conn, &vreq.id, false);
+        let risk_signals = RiskSignal::bulk_create(
+            conn,
+            &sv.id,
+            vec![(FRC::NameDoesNotMatch, vreq.vendor_api, vres.id.clone())],
+            RiskSignalGroupKind::Kyc,
+            false,
+        )
+        .unwrap();
+
         let (rule_set_result, rule_results) = RuleSetResult::create(
             conn,
             NewRuleSetResultArgs {
@@ -166,6 +208,7 @@ mod tests {
                         result: true,
                     },
                 ],
+                risk_signal_ids: risk_signals.iter().map(|rs| &rs.id).collect_vec(),
             },
         )
         .unwrap();
@@ -182,6 +225,16 @@ mod tests {
                 .into_iter()
                 .map(|r| (r.rule_instance_id, r.result))
                 .collect_vec(),
+        );
+
+        let risk_signal_junctions: Vec<RiskSignalId> = rule_set_result_risk_signal_junction::table
+            .filter(rule_set_result_risk_signal_junction::rule_set_result_id.eq(rule_set_result.id))
+            .select(rule_set_result_risk_signal_junction::risk_signal_id)
+            .get_results(conn.conn())
+            .unwrap();
+        assert_have_same_elements(
+            risk_signals.iter().map(|rs| rs.id.clone()).collect_vec(),
+            risk_signal_junctions,
         );
     }
 }

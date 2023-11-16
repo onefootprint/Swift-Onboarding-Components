@@ -692,6 +692,19 @@ table! {
 table! {
     use diesel::sql_types::*;
 
+    rule_set_result_risk_signal_junction (id) {
+        id -> Text,
+        created_at -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        rule_set_result_id -> Text,
+        risk_signal_id -> Text,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+
     scoped_vault (id) {
         id -> Text,
         fp_id -> Text,
@@ -1162,6 +1175,8 @@ joinable!(rule_result -> rule_instance (rule_instance_id));
 joinable!(rule_set_result -> ob_configuration (ob_configuration_id));
 joinable!(rule_set_result -> scoped_vault (scoped_vault_id));
 joinable!(rule_set_result -> workflow (workflow_id));
+joinable!(rule_set_result_risk_signal_junction -> risk_signal (risk_signal_id));
+joinable!(rule_set_result_risk_signal_junction -> rule_set_result (rule_set_result_id));
 joinable!(scoped_vault -> tenant (tenant_id));
 joinable!(scoped_vault -> vault (vault_id));
 joinable!(socure_device_session -> workflow (workflow_id));
@@ -1236,6 +1251,7 @@ allow_tables_to_appear_in_same_query!(
     rule_instance,
     rule_result,
     rule_set_result,
+    rule_set_result_risk_signal_junction,
     scoped_vault,
     session,
     socure_device_session,
