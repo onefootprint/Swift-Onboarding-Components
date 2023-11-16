@@ -73,8 +73,10 @@ done
 
 
 # Install again the pods to run locally
-cd ios
+cd $DIR/ios
 cp Podfile-local Podfile
 pod deintegrate
 pod install
-cd ..
+cd $DIR
+
+cp -R ios/sdk/* ../../packages/verify-ios-sdk/

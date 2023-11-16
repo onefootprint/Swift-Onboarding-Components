@@ -39,3 +39,6 @@ yarn-error.log*
 
 apps/verify/ios/sdk/Resources/
 apps/verify/ios/sdk/Frameworks/
+
+packages/verify-ios-sdk/Resources/
+packages/verify-ios-sdk/Frameworks/
