@@ -29,6 +29,7 @@ pub mod proxy_request_log;
 pub mod risk_signal;
 pub mod risk_signal_group;
 pub mod rule_instance;
+pub mod rule_set_result;
 pub mod scoped_vault;
 pub mod session;
 pub mod socure_device_session;

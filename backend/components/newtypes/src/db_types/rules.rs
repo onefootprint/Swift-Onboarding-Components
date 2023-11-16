@@ -110,3 +110,15 @@ pub enum RuleName {
 }
 
 impl_enum_str_diesel!(RuleName);
+
+#[derive(Debug, Eq, PartialEq, Display, Hash, Clone, Copy, AsExpression, FromSqlRow, EnumString)]
+#[strum(serialize_all = "snake_case")]
+#[diesel(sql_type = Text)]
+pub enum RuleSetResultKind {
+    KycWaterfall,
+    WorkflowDecision,
+    Adhoc,
+    Backtest,
+}
+
+crate::util::impl_enum_string_diesel!(RuleSetResultKind);
