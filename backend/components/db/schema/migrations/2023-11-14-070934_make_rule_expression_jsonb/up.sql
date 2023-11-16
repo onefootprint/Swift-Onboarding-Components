@@ -1,0 +1,1 @@
+ALTER TABLE rule_instance ALTER COLUMN rule_expression TYPE JSONB USING '[{"field":"id_flagged","op":"eq","value":true}]'::JSONB;

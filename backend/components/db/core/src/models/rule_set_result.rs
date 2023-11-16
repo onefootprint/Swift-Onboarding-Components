@@ -142,7 +142,7 @@ mod tests {
             obc.id.clone(),
             DbActor::Footprint,
             None,
-            "".to_owned(),
+            tests::fixtures::rule::example_rule_expression(),
             RuleAction::Fail,
         )
         .unwrap();
@@ -152,7 +152,7 @@ mod tests {
             obc.id.clone(),
             DbActor::Footprint,
             None,
-            "".to_owned(),
+            tests::fixtures::rule::example_rule_expression(),
             RuleAction::Fail,
         )
         .unwrap();
@@ -162,7 +162,7 @@ mod tests {
             obc.id.clone(),
             DbActor::Footprint,
             None,
-            "".to_owned(),
+            tests::fixtures::rule::example_rule_expression(),
             RuleAction::Fail,
         )
         .unwrap();

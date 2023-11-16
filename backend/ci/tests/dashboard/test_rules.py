@@ -14,27 +14,35 @@ def obc(sandbox_tenant, must_collect_data, can_access_data):
     [
         dict(
             name="My awesome rule",
-            rule_expression="A or B",
+            rule_expression=[{"field": "id_flagged", "op": "not_eq", "value": True}],
             action="pass_with_manual_review",
         ),
         dict(
             name="My awesome rule",
-            rule_expression="B or C",
+            rule_expression=[
+                {"field": "name_does_not_match", "op": "eq", "value": True}
+            ],
             action="step_up",
         ),
         dict(
             name="My awesome rule",
-            rule_expression="D and E",
+            rule_expression=[
+                {"field": "dob_does_not_match", "op": "eq", "value": True}
+            ],
             action="manual_review",
         ),
         dict(
             name="My awesome rule",
-            rule_expression="F",
+            rule_expression=[
+                {"field": "address_does_not_match", "op": "eq", "value": True}
+            ],
             action="fail",
         ),
         dict(
             name=None,
-            rule_expression="",
+            rule_expression=[
+                {"field": "ssn_does_not_match", "op": "eq", "value": True}
+            ],
             action="fail",
         ),
     ],
@@ -60,7 +68,7 @@ def test_list(sandbox_tenant, obc):
         post(
             f"/org/onboarding_configs/{obc.id}/rules",
             dict(
-                rule_expression="",
+                rule_expression=[{"field": "id_flagged", "op": "eq", "value": True}],
                 action="fail",
             ),
             *sandbox_tenant.db_auths,
@@ -87,7 +95,9 @@ def test_patch(sandbox_tenant, obc):
         f"/org/onboarding_configs/{obc.id}/rules",
         dict(
             name="Cool Rule",
-            rule_expression="A or B",
+            rule_expression=[
+                {"field": "document_selfie_mask", "op": "eq", "value": True}
+            ],
             action="fail",
         ),
         *sandbox_tenant.db_auths,
@@ -104,13 +114,20 @@ def test_patch(sandbox_tenant, obc):
 
     update2 = patch(
         f"/org/onboarding_configs/{obc.id}/rules/{rule['rule_id']}",
-        dict(is_shadow=False, rule_expression="C or J"),
+        dict(
+            is_shadow=False,
+            rule_expression=[
+                {"field": "document_selfie_glasses", "op": "eq", "value": True}
+            ],
+        ),
         *sandbox_tenant.db_auths,
     )
 
     assert update2["name"] == "New Name"
     assert update2["is_shadow"] == False
-    assert update2["rule_expression"] == "C or J"
+    assert update2["rule_expression"] == [
+        {"field": "document_selfie_glasses", "op": "eq", "value": True}
+    ]
 
     rules = get(
         f"/org/onboarding_configs/{obc.id}/rules",
@@ -118,4 +135,6 @@ def test_patch(sandbox_tenant, obc):
         *sandbox_tenant.db_auths,
     )
     assert len(rules) == 1
-    assert rules[0]["rule_expression"] == "C or J"
+    assert rules[0]["rule_expression"] == [
+        {"field": "document_selfie_glasses", "op": "eq", "value": True}
+    ]

@@ -1,0 +1,1 @@
+ALTER TABLE rule_instance ALTER COLUMN rule_expression TYPE TEXT USING 'A or B';

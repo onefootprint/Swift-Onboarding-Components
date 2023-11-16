@@ -652,7 +652,7 @@ table! {
         ob_configuration_id -> Text,
         actor -> Jsonb,
         name -> Nullable<Text>,
-        rule_expression -> Text,
+        rule_expression -> Jsonb,
         action -> Text,
         is_shadow -> Bool,
     }

@@ -10,6 +10,7 @@ use diesel::{Insertable, Queryable};
 use newtypes::DataLifetimeSeqno;
 use newtypes::DbActor;
 use newtypes::RuleAction;
+use newtypes::RuleExpression;
 use newtypes::{ObConfigurationId, RuleId, RuleInstanceId, TenantId};
 use rand::distributions::{Alphanumeric, DistString};
 
@@ -30,7 +31,7 @@ pub struct RuleInstance {
     pub ob_configuration_id: ObConfigurationId, // later to be replaced by rule_set_id which will in turn have a pointer to OBC
     pub actor: DbActor,
     pub name: Option<String>,
-    pub rule_expression: String, // later will be a type for serializing rule expressions
+    pub rule_expression: RuleExpression,
     pub action: RuleAction,
     pub is_shadow: bool,
 }
@@ -44,7 +45,7 @@ pub struct NewRuleInstance {
     pub ob_configuration_id: ObConfigurationId,
     pub actor: DbActor,
     pub name: Option<String>,
-    pub rule_expression: String,
+    pub rule_expression: RuleExpression,
     pub action: RuleAction,
     pub is_shadow: bool,
 }
@@ -52,7 +53,7 @@ pub struct NewRuleInstance {
 #[derive(Debug, Clone)]
 pub struct RuleInstanceUpdate {
     pub name: Option<Option<String>>,
-    pub rule_expression: Option<String>,
+    pub rule_expression: Option<RuleExpression>,
     pub is_shadow: Option<bool>,
 }
 
@@ -63,7 +64,7 @@ impl RuleInstance {
         ob_configuration_id: ObConfigurationId,
         actor: DbActor,
         name: Option<String>,
-        rule_expression: String,
+        rule_expression: RuleExpression,
         action: RuleAction,
     ) -> DbResult<Self> {
         let seqno = DataLifetime::get_current_seqno(conn)?;
@@ -184,7 +185,7 @@ mod tests {
             obc.id.clone(),
             DbActor::Footprint,
             Some("name1".to_owned()),
-            "A or B".to_owned(),
+            tests::fixtures::rule::example_rule_expression(),
             RuleAction::Fail,
         )
         .unwrap();
@@ -196,7 +197,7 @@ mod tests {
             &rule.rule_id,
             RuleInstanceUpdate {
                 name: Some(Some("name2".to_owned())),
-                rule_expression: Some("C or D".to_owned()),
+                rule_expression: Some(tests::fixtures::rule::example_rule_expression()),
                 is_shadow: Some(false),
             },
         )
@@ -207,7 +208,10 @@ mod tests {
         assert_eq!(rule.action, updated_rule.action);
 
         assert_eq!(Some("name2".to_owned()), updated_rule.name);
-        assert_eq!("C or D".to_owned(), updated_rule.rule_expression);
+        assert_eq!(
+            tests::fixtures::rule::example_rule_expression(),
+            updated_rule.rule_expression
+        );
         assert_eq!(false, updated_rule.is_shadow);
 
         assert_eq!(
