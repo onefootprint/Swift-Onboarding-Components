@@ -343,20 +343,23 @@ impl ScopedVault {
     }
 
     #[tracing::instrument("ScopedVault::update", skip_all)]
-    pub fn update(conn: &mut TxnPgConn, id: &ScopedVaultId, update: ScopedVaultUpdate) -> DbResult<()> {
+    pub fn update(conn: &mut TxnPgConn, id: &ScopedVaultId, update: ScopedVaultUpdate) -> DbResult<Self> {
         let ScopedVaultUpdate {
             is_billable,
             status,
             show_in_search,
         } = &update;
         if is_billable.is_none() && status.is_none() && show_in_search.is_none() {
-            return Ok(());
+            let existing_sv = scoped_vault::table
+                .filter(scoped_vault::id.eq(id))
+                .get_result(conn.conn())?;
+            return Ok(existing_sv);
         }
-        diesel::update(scoped_vault::table)
+        let updated_sv = diesel::update(scoped_vault::table)
             .filter(scoped_vault::id.eq(id))
             .set(update)
-            .execute(conn.conn())?;
-        Ok(())
+            .get_result(conn.conn())?;
+        Ok(updated_sv)
     }
 
     #[tracing::instrument("ScopedVault::clear_status", skip_all)]

@@ -128,6 +128,7 @@ pub struct OnboardingStatusChangedPayload {
     pub footprint_user_id: Option<FpId>,
     pub timestamp: DateTime<Utc>,
     pub new_status: OnboardingStatus,
+    pub requires_manual_review: bool,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]

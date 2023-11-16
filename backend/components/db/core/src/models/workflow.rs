@@ -496,6 +496,7 @@ impl Workflow {
 
     #[tracing::instrument("Workflow::update", skip_all)]
     pub fn update(wf: Locked<Self>, conn: &mut TxnPgConn, update: WorkflowUpdate) -> DbResult<Self> {
+        let requires_manual_review_before_update = ManualReview::get_active(conn, &wf.id)?.is_some();
         if update.update.authorized_at.is_some() {
             let update = ScopedVaultUpdate {
                 is_billable: Some(true),
@@ -544,7 +545,7 @@ impl Workflow {
             let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?;
             let tenant = Tenant::get(conn, &sv.tenant_id)?;
             // !! it's important that code in the same txn that is going to write a review does it before this update call
-            let mr = ManualReview::get_active(conn, &wf.id)?;
+            let requires_manual_review_after_update = ManualReview::get_active(conn, &wf.id)?.is_some();
             // Since the OnboardingCompletedPayload webhook has `requires_manual_review`, its semantics currently really mean we have to fire it when we make a
             // decision for the first time or in a redo flow
             // If the current Workflow status is not pass/fail but the new status is, fire OnboardingCompleted (ie anytime a Workflow completes)
@@ -554,7 +555,7 @@ impl Workflow {
                     footprint_user_id: tenant.uses_legacy_serialization().then(|| sv.fp_id.clone()),
                     timestamp: Utc::now(),
                     status: new_status,
-                    requires_manual_review: mr.is_some(),
+                    requires_manual_review: requires_manual_review_after_update,
                 });
                 let task_data = TaskData::FireWebhook(FireWebhookArgs {
                     scoped_vault_id: wf.scoped_vault_id.clone(),
@@ -565,39 +566,47 @@ impl Workflow {
                 Task::create(conn, Utc::now(), task_data)?;
             };
 
-            let old_sv_status = sv.status;
-            if old_sv_status != Some(new_status) {
-                let old_sv_status_has_decision = match old_sv_status {
-                    None => false,
-                    Some(s) => s.has_decision(),
+            let old_sv_status_has_decision = match sv.status {
+                None => false,
+                Some(s) => s.has_decision(),
+            };
+
+            let status_has_changed = sv.status != Some(new_status);
+            let status_is_decision_or_was_previously_not_decision =
+                !old_sv_status_has_decision || new_status.has_decision();
+
+            let new_sv_status = if status_has_changed && status_is_decision_or_was_previously_not_decision {
+                // Only set to non-decision status if the current status is a non-decision status
+                // This has the effect of never letting the scoped vault status go from a decision to a non-decision status
+                let update = ScopedVaultUpdate {
+                    status: Some(new_status),
+                    ..Default::default()
                 };
+                let updated_sv = ScopedVault::update(conn, &sv.id, update)?;
+                updated_sv.status
+            } else {
+                sv.status
+            };
 
-                if !old_sv_status_has_decision || new_status.has_decision() {
-                    // Only set to non-decision status if the current status is a non-decision status
-                    // This has the effect of never letting the scoped vault status go from a decision to a non-decision status
-                    let update = ScopedVaultUpdate {
-                        status: Some(new_status),
-                        ..Default::default()
-                    };
-                    ScopedVault::update(conn, &sv.id, update)?;
-
-                    // Only fire a OnboardingStatusChanged webhook if the scoped vault staus changes
-                    let webhook_event =
-                        WebhookEvent::OnboardingStatusChanged(OnboardingStatusChangedPayload {
-                            fp_id: sv.fp_id.clone(),
-                            footprint_user_id: tenant.uses_legacy_serialization().then(|| sv.fp_id.clone()),
-                            timestamp: Utc::now(),
-                            new_status,
-                        });
-                    let task_data = TaskData::FireWebhook(FireWebhookArgs {
-                        scoped_vault_id: wf.scoped_vault_id.clone(),
-                        tenant_id: tenant.id,
-                        is_live: sv.is_live,
-                        webhook_event,
-                    });
-                    Task::create(conn, Utc::now(), task_data)?;
-                }
-            }
+            let old_composite_status = (sv.status, requires_manual_review_before_update);
+            let new_composite_status = (new_sv_status, requires_manual_review_after_update);
+            if new_composite_status != old_composite_status {
+                // Only fire a OnboardingStatusChanged webhook if the scoped vault status changes or requires_manual_review changes
+                let webhook_event = WebhookEvent::OnboardingStatusChanged(OnboardingStatusChangedPayload {
+                    fp_id: sv.fp_id.clone(),
+                    footprint_user_id: tenant.uses_legacy_serialization().then(|| sv.fp_id.clone()),
+                    timestamp: Utc::now(),
+                    new_status,
+                    requires_manual_review: requires_manual_review_after_update,
+                });
+                let task_data = TaskData::FireWebhook(FireWebhookArgs {
+                    scoped_vault_id: wf.scoped_vault_id.clone(),
+                    tenant_id: tenant.id,
+                    is_live: sv.is_live,
+                    webhook_event,
+                });
+                Task::create(conn, Utc::now(), task_data)?;
+            };
         }
         Ok(result)
     }

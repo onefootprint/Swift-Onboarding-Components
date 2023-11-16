@@ -122,7 +122,10 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
     // Expect Webhooks
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pending))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(OnboardingStatus::Pending),
+            ExpectedRequiresManualReview(false),
+        )],
         vec![],
     );
     let (ww, _) = ww
@@ -151,9 +154,10 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
     // Expect Webhook
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(
-            doc_outcome.expected_onboarding_decision(),
-        ))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(doc_outcome.expected_onboarding_decision()),
+            ExpectedRequiresManualReview(doc_outcome.expect_manual_review()),
+        )],
         vec![OnboardingCompleted(
             ExpectedStatus(doc_outcome.expected_onboarding_decision()),
             ExpectedRequiresManualReview(doc_outcome.expect_manual_review()),
@@ -295,7 +299,10 @@ async fn redo_document_and_pass(
     // Expect Webhooks
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pass))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(OnboardingStatus::Pass),
+            ExpectedRequiresManualReview(false),
+        )],
         vec![OnboardingCompleted(
             ExpectedStatus(OnboardingStatus::Pass),
             ExpectedRequiresManualReview(false),

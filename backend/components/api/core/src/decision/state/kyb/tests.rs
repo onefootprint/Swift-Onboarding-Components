@@ -60,7 +60,10 @@ async fn setup(
 async fn kyc_bo(state: &mut State, person_wf: &DbWorkflow) {
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pass))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(OnboardingStatus::Pass),
+            ExpectedRequiresManualReview(false),
+        )],
         vec![OnboardingCompleted(
             ExpectedStatus(OnboardingStatus::Pass),
             ExpectedRequiresManualReview(false),
@@ -135,7 +138,10 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
     kyc_bo(state, &person_wf).await;
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pending))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(OnboardingStatus::Pending),
+            ExpectedRequiresManualReview(false),
+        )],
         vec![],
     );
 
@@ -189,7 +195,10 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
     };
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(expected_status))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(expected_status),
+            ExpectedRequiresManualReview(false),
+        )],
         vec![OnboardingCompleted(
             ExpectedStatus(expected_status),
             ExpectedRequiresManualReview(false),
@@ -241,7 +250,10 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
     kyc_bo(state, &person_wf).await;
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pending))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(OnboardingStatus::Pending),
+            ExpectedRequiresManualReview(false),
+        )],
         vec![],
     );
 
@@ -281,7 +293,10 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
     let expected_manual_review = matches!(terminal_status, TerminalDecisionStatus::Fail);
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(expected_status))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(expected_status),
+            ExpectedRequiresManualReview(expected_manual_review),
+        )],
         vec![OnboardingCompleted(
             ExpectedStatus(expected_status),
             ExpectedRequiresManualReview(expected_manual_review),

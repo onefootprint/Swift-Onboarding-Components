@@ -174,7 +174,10 @@ async fn pass(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
     // Expect webhook
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pending))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(OnboardingStatus::Pending),
+            ExpectedRequiresManualReview(false),
+        )],
         vec![],
     );
     let (ww, _) = ww
@@ -204,7 +207,10 @@ async fn pass(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
     // MakeDecision
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pass))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(OnboardingStatus::Pass),
+            ExpectedRequiresManualReview(false),
+        )],
         vec![OnboardingCompleted(
             ExpectedStatus(OnboardingStatus::Pass),
             ExpectedRequiresManualReview(false),
@@ -378,7 +384,10 @@ async fn pass_then_watchlist_hit(
     // Expect Webhooks
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pending))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(OnboardingStatus::Pending),
+            ExpectedRequiresManualReview(false),
+        )],
         vec![],
     );
     let (ww, _) = ww
@@ -409,7 +418,10 @@ async fn pass_then_watchlist_hit(
     // Expect Webhooks
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Fail))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(OnboardingStatus::Fail),
+            ExpectedRequiresManualReview(true),
+        )],
         vec![OnboardingCompleted(
             ExpectedStatus(OnboardingStatus::Fail),
             ExpectedRequiresManualReview(true),
@@ -485,17 +497,14 @@ async fn pass_then_watchlist_hit(
     // For the AlpacaKyc workflow, we have a PendingReview state that the WF remains in until the review is completed./
     // For the regular Kyc workflow, we will continue to have no such state and instead just produce the review and have it completed without involvement of the workflow
     // Expect Webhooks
-    match review_decision {
-        TerminalDecisionStatus::Pass => {
-            mock_webhooks(
-                state,
-                vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pass))],
-                vec![],
-            );
-        }
-        // users status isn't changing, so no webhook
-        TerminalDecisionStatus::Fail => {}
-    }
+    mock_webhooks(
+        state,
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(review_decision.into()),
+            ExpectedRequiresManualReview(false),
+        )],
+        vec![],
+    );
 
     let review_decision_req = DecisionRequest {
         annotation: CreateAnnotationRequest {
@@ -707,8 +716,14 @@ async fn step_up(
     mock_webhooks(
         state,
         vec![
-            OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pending)),
-            OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Incomplete)),
+            OnboardingStatusChanged(
+                ExpectedStatus(OnboardingStatus::Pending),
+                ExpectedRequiresManualReview(false),
+            ),
+            OnboardingStatusChanged(
+                ExpectedStatus(OnboardingStatus::Incomplete),
+                ExpectedRequiresManualReview(false),
+            ),
         ],
         vec![],
     );
@@ -732,7 +747,10 @@ async fn step_up(
     // Expect Webhooks
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(expected_result.status()))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(expected_result.status()),
+            ExpectedRequiresManualReview(expected_result.requires_review()),
+        )],
         vec![OnboardingCompleted(
             ExpectedStatus(expected_result.status()),
             ExpectedRequiresManualReview(expected_result.requires_review()),
@@ -827,7 +845,10 @@ async fn step_up(
     // For the regular Kyc workflow, we will continue to have no such state and instead just produce the review and have it completed without involvement of the workflow
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pass))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(OnboardingStatus::Pass),
+            ExpectedRequiresManualReview(false),
+        )],
         vec![],
     );
 
@@ -970,7 +991,10 @@ async fn fail(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
     // Expect Webhooks
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pending))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(OnboardingStatus::Pending),
+            ExpectedRequiresManualReview(false),
+        )],
         vec![],
     );
     let (ww, _) = ww
@@ -998,7 +1022,10 @@ async fn fail(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
     // Expect Webhooks
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Fail))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(OnboardingStatus::Fail),
+            ExpectedRequiresManualReview(false),
+        )],
         vec![OnboardingCompleted(
             ExpectedStatus(OnboardingStatus::Fail),
             ExpectedRequiresManualReview(false),
@@ -1144,7 +1171,10 @@ async fn redo_and_pass(
     // Expect Webhooks
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pass))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(OnboardingStatus::Pass),
+            ExpectedRequiresManualReview(false),
+        )],
         vec![OnboardingCompleted(
             ExpectedStatus(OnboardingStatus::Pass),
             ExpectedRequiresManualReview(false),

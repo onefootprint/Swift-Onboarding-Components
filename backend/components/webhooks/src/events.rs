@@ -64,6 +64,7 @@ mod payloads {
         pub timestamp: DateTime<Utc>,
         #[schemars(with = "OnboardingStatusShadow")]
         pub new_status: OnboardingStatus,
+        pub requires_manual_review: bool,
     }
 
     #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Default, JsonSchema)]
@@ -151,6 +152,7 @@ mod examples {
                 footprint_user_id: None,
                 timestamp: Utc::now(),
                 new_status: Default::default(),
+                requires_manual_review: false,
             }
         }
     }
@@ -203,6 +205,7 @@ impl From<NTOnboardingStatusChangedPayload> for OnboardingStatusChangedPayload {
             footprint_user_id: value.footprint_user_id,
             timestamp: value.timestamp,
             new_status: value.new_status,
+            requires_manual_review: value.requires_manual_review,
         }
     }
 }

@@ -94,7 +94,10 @@ async fn valid_action(state: &mut State) {
 
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pending))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(OnboardingStatus::Pending),
+            ExpectedRequiresManualReview(false),
+        )],
         vec![],
     );
 
@@ -226,7 +229,10 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
     // Expect Webhook
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pending))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(OnboardingStatus::Pending),
+            ExpectedRequiresManualReview(false),
+        )],
         vec![],
     );
 
@@ -261,7 +267,10 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
     // Expect Webhooks
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pass))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(OnboardingStatus::Pass),
+            ExpectedRequiresManualReview(false),
+        )],
         vec![OnboardingCompleted(
             ExpectedStatus(OnboardingStatus::Pass),
             ExpectedRequiresManualReview(false),
@@ -429,7 +438,10 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
     // Expect Webhooks
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pending))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(OnboardingStatus::Pending),
+            ExpectedRequiresManualReview(false),
+        )],
         vec![],
     );
     let (ww, _) = ww
@@ -464,7 +476,10 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
     let expect_review = matches!(user_kind, UserKind::Sandbox(WorkflowFixtureResult::ManualReview)); //#fail currently indicates hard failing without raising review
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Fail))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(OnboardingStatus::Fail),
+            ExpectedRequiresManualReview(expect_review),
+        )],
         vec![OnboardingCompleted(
             ExpectedStatus(OnboardingStatus::Fail),
             ExpectedRequiresManualReview(expect_review),
@@ -638,7 +653,10 @@ async fn redo_and_pass(
     // Expect Webhooks
     mock_webhooks(
         state,
-        vec![OnboardingStatusChanged(ExpectedStatus(OnboardingStatus::Pass))],
+        vec![OnboardingStatusChanged(
+            ExpectedStatus(OnboardingStatus::Pass),
+            ExpectedRequiresManualReview(false),
+        )],
         vec![OnboardingCompleted(
             ExpectedStatus(OnboardingStatus::Pass),
             ExpectedRequiresManualReview(false),
