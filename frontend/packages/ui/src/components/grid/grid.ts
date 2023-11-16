@@ -70,7 +70,7 @@ const Container = styled('div').attrs<{ as: GridTag }>(({ as, ...props }) => ({
     width: ${props.width};
     height: ${props.height};
     overflow: ${props.overflow};
-    min-with: ${props.minWidth};
+    min-width: ${props.minWidth};
     min-height: ${props.minHeight};
     max-width: ${props.maxWidth};
     max-height: ${props.maxHeight};
