@@ -54,7 +54,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: false,
-          timestamp: '2021-01-01T00:00:00.000Z',
+          timestamp: '2021-01-02T00:00:00.000Z',
         },
         {
           event: {
@@ -64,7 +64,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: false,
-          timestamp: '2021-02-02T00:00:00.000Z',
+          timestamp: '2021-02-01T00:00:00.000Z',
         },
       ];
       const result = mergeAuditTrailTimelineEvents(events);
@@ -77,7 +77,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: false,
-          time: { timestamp: '2021-01-01T00:00:00.000Z' },
+          time: { timestamp: '2021-01-02T00:00:00.000Z' },
         },
         {
           event: {
@@ -87,7 +87,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: false,
-          time: { timestamp: '2021-02-02T00:00:00.000Z' },
+          time: { timestamp: '2021-02-01T00:00:00.000Z' },
         },
       ]);
     });
@@ -104,7 +104,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: false,
-          timestamp: '2021-01-01T00:00:00.000Z',
+          timestamp: '2021-01-02T00:00:00.000Z',
         },
         {
           event: {
@@ -116,7 +116,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: false,
-          timestamp: '2021-02-02T00:00:00.000Z',
+          timestamp: '2021-02-01T00:00:00.000Z',
         },
       ];
       const result = mergeAuditTrailTimelineEvents(events);
@@ -131,7 +131,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: false,
-          time: { timestamp: '2021-01-01T00:00:00.000Z' },
+          time: { timestamp: '2021-01-02T00:00:00.000Z' },
         },
         {
           event: {
@@ -143,7 +143,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: false,
-          time: { timestamp: '2021-02-02T00:00:00.000Z' },
+          time: { timestamp: '2021-02-01T00:00:00.000Z' },
         },
       ]);
     });
@@ -158,7 +158,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: true,
-          timestamp: '2021-01-01T00:00:00.000Z',
+          timestamp: '2021-01-03T00:00:00.000Z',
         },
         {
           event: {
@@ -168,7 +168,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: true,
-          timestamp: '2021-02-02T00:00:00.000Z',
+          timestamp: '2021-01-02T00:00:00.000Z',
         },
         {
           event: {
@@ -178,7 +178,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: true,
-          timestamp: '2021-03-03T00:00:00.000Z',
+          timestamp: '2021-01-01T00:00:00.000Z',
         },
       ];
       const result = mergeAuditTrailTimelineEvents(events);
@@ -197,7 +197,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
           isFromOtherOrg: true,
           time: {
             start: '2021-01-01T00:00:00.000Z',
-            end: '2021-03-03T00:00:00.000Z',
+            end: '2021-01-03T00:00:00.000Z',
           },
         },
       ]);
@@ -213,7 +213,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: true,
-          timestamp: '2021-01-01T00:00:00.000Z',
+          timestamp: '2021-01-03T00:00:00.000Z',
         },
         {
           event: {
@@ -223,7 +223,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: true,
-          timestamp: '2021-02-02T00:00:00.000Z',
+          timestamp: '2021-01-02T00:00:00.000Z',
         },
         {
           event: {
@@ -235,7 +235,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: false,
-          timestamp: '2021-02-02T00:00:00.000Z',
+          timestamp: '2021-01-02T00:00:00.000Z',
         },
         {
           event: {
@@ -245,7 +245,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: true,
-          timestamp: '2021-03-03T00:00:00.000Z',
+          timestamp: '2021-01-01T00:00:00.000Z',
         },
       ];
       const result = mergeAuditTrailTimelineEvents(events);
@@ -262,8 +262,8 @@ describe('mergeAuditTrailTimelineEvents', () => {
           },
           isFromOtherOrg: true,
           time: {
-            start: '2021-01-01T00:00:00.000Z',
-            end: '2021-02-02T00:00:00.000Z',
+            start: '2021-01-02T00:00:00.000Z',
+            end: '2021-01-03T00:00:00.000Z',
           },
         },
         {
@@ -276,7 +276,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: false,
-          time: { timestamp: '2021-02-02T00:00:00.000Z' },
+          time: { timestamp: '2021-01-02T00:00:00.000Z' },
         },
         {
           event: {
@@ -286,7 +286,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: true,
-          time: { timestamp: '2021-03-03T00:00:00.000Z' },
+          time: { timestamp: '2021-01-01T00:00:00.000Z' },
         },
       ]);
     });
@@ -306,7 +306,12 @@ describe('mergeAuditTrailTimelineEvents', () => {
         {
           event: {
             kind: TimelineEventKind.combinedWatchlistChecks,
-            data: [],
+            data: [
+              {
+                watchlistEvent: watchlistCheckEvent1,
+                timestamp: '2021-01-01T00:00:00.000Z',
+              },
+            ],
             latestWatchlistEvent: watchlistCheckEvent1,
           },
           isFromOtherOrg: false,
@@ -320,12 +325,12 @@ describe('mergeAuditTrailTimelineEvents', () => {
         {
           event: watchlistCheckEvent1,
           isFromOtherOrg: false,
-          timestamp: '2021-01-01T00:00:00.000Z',
+          timestamp: '2021-01-02T00:00:00.000Z',
         },
         {
           event: watchlistCheckEvent2,
           isFromOtherOrg: false,
-          timestamp: '2021-01-02T00:00:00.000Z',
+          timestamp: '2021-01-01T00:00:00.000Z',
         },
       ];
       const result = mergeAuditTrailTimelineEvents(events);
@@ -336,10 +341,14 @@ describe('mergeAuditTrailTimelineEvents', () => {
             data: [
               {
                 watchlistEvent: watchlistCheckEvent1,
+                timestamp: '2021-01-02T00:00:00.000Z',
+              },
+              {
+                watchlistEvent: watchlistCheckEvent2,
                 timestamp: '2021-01-01T00:00:00.000Z',
               },
             ],
-            latestWatchlistEvent: watchlistCheckEvent2,
+            latestWatchlistEvent: watchlistCheckEvent1,
           },
           isFromOtherOrg: false,
           time: { timestamp: '2021-01-02T00:00:00.000Z' },
@@ -352,7 +361,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
         {
           event: watchlistCheckEvent1,
           isFromOtherOrg: false,
-          timestamp: '2021-01-01T00:00:00.000Z',
+          timestamp: '2021-01-06T00:00:00.000Z',
         },
         {
           event: {
@@ -362,7 +371,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: false,
-          timestamp: '2021-01-02T00:00:00.000Z',
+          timestamp: '2021-01-05T00:00:00.000Z',
         },
         {
           event: {
@@ -372,17 +381,17 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: false,
-          timestamp: '2021-01-03T00:00:00.000Z',
+          timestamp: '2021-01-04T00:00:00.000Z',
         },
         {
           event: watchlistCheckEvent2,
           isFromOtherOrg: false,
-          timestamp: '2021-01-04T00:00:00.000Z',
+          timestamp: '2021-01-03T00:00:00.000Z',
         },
         {
           event: watchlistCheckEvent3,
           isFromOtherOrg: false,
-          timestamp: '2021-01-05T00:00:00.000Z',
+          timestamp: '2021-01-02T00:00:00.000Z',
         },
         {
           event: {
@@ -392,45 +401,39 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: false,
-          timestamp: '2021-01-06T00:00:00.000Z',
+          timestamp: '2021-01-01T00:00:00.000Z',
         },
       ];
       const result = mergeAuditTrailTimelineEvents(events);
       expect(result).toEqual([
         {
           event: {
-            kind: TimelineEventKind.dataCollected,
-            data: {
-              attributes: [CollectedKycDataOption.dob],
-            },
-          },
-          isFromOtherOrg: false,
-          time: { timestamp: '2021-01-02T00:00:00.000Z' },
-        },
-        {
-          event: {
-            kind: TimelineEventKind.dataCollected,
-            data: {
-              attributes: [CollectedKycDataOption.email],
-            },
-          },
-          isFromOtherOrg: false,
-          time: { timestamp: '2021-01-03T00:00:00.000Z' },
-        },
-        {
-          event: {
             kind: TimelineEventKind.combinedWatchlistChecks,
             data: [
               {
                 watchlistEvent: watchlistCheckEvent1,
-                timestamp: '2021-01-01T00:00:00.000Z',
+                timestamp: '2021-01-06T00:00:00.000Z',
               },
               {
                 watchlistEvent: watchlistCheckEvent2,
-                timestamp: '2021-01-04T00:00:00.000Z',
+                timestamp: '2021-01-03T00:00:00.000Z',
+              },
+              {
+                watchlistEvent: watchlistCheckEvent3,
+                timestamp: '2021-01-02T00:00:00.000Z',
               },
             ],
-            latestWatchlistEvent: watchlistCheckEvent3,
+            latestWatchlistEvent: watchlistCheckEvent1,
+          },
+          isFromOtherOrg: false,
+          time: { timestamp: '2021-01-06T00:00:00.000Z' },
+        },
+        {
+          event: {
+            kind: TimelineEventKind.dataCollected,
+            data: {
+              attributes: [CollectedKycDataOption.dob],
+            },
           },
           isFromOtherOrg: false,
           time: { timestamp: '2021-01-05T00:00:00.000Z' },
@@ -439,11 +442,22 @@ describe('mergeAuditTrailTimelineEvents', () => {
           event: {
             kind: TimelineEventKind.dataCollected,
             data: {
+              attributes: [CollectedKycDataOption.email],
+            },
+          },
+          isFromOtherOrg: false,
+          time: { timestamp: '2021-01-04T00:00:00.000Z' },
+        },
+
+        {
+          event: {
+            kind: TimelineEventKind.dataCollected,
+            data: {
               attributes: [CollectedKycDataOption.address],
             },
           },
           isFromOtherOrg: false,
-          time: { timestamp: '2021-01-06T00:00:00.000Z' },
+          time: { timestamp: '2021-01-01T00:00:00.000Z' },
         },
       ]);
     });
@@ -460,17 +474,17 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: true,
-          timestamp: '2021-01-01T00:00:00.000Z',
+          timestamp: '2021-01-06T00:00:00.000Z',
         },
         {
           event: watchlistCheckEvent1,
           isFromOtherOrg: false,
-          timestamp: '2021-02-02T00:00:00.000Z',
+          timestamp: '2021-01-05T00:00:00.000Z',
         },
         {
           event: watchlistCheckEvent2,
           isFromOtherOrg: false,
-          timestamp: '2021-03-03T00:00:00.000Z',
+          timestamp: '2021-01-04T00:00:00.000Z',
         },
         {
           event: {
@@ -480,7 +494,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: true,
-          timestamp: '2021-04-04T00:00:00.000Z',
+          timestamp: '2021-01-03T00:00:00.000Z',
         },
         {
           event: {
@@ -490,12 +504,12 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: true,
-          timestamp: '2021-05-05T00:00:00.000Z',
+          timestamp: '2021-01-02T00:00:00.000Z',
         },
         {
           event: watchlistCheckEvent3,
           isFromOtherOrg: false,
-          timestamp: '2021-06-06T00:00:00.000Z',
+          timestamp: '2021-01-01T00:00:00.000Z',
         },
       ];
       const result = mergeAuditTrailTimelineEvents(events);
@@ -508,7 +522,29 @@ describe('mergeAuditTrailTimelineEvents', () => {
             },
           },
           isFromOtherOrg: true,
-          time: { timestamp: '2021-01-01T00:00:00.000Z' },
+          time: { timestamp: '2021-01-06T00:00:00.000Z' },
+        },
+        {
+          event: {
+            kind: TimelineEventKind.combinedWatchlistChecks,
+            data: [
+              {
+                watchlistEvent: watchlistCheckEvent1,
+                timestamp: '2021-01-05T00:00:00.000Z',
+              },
+              {
+                watchlistEvent: watchlistCheckEvent2,
+                timestamp: '2021-01-04T00:00:00.000Z',
+              },
+              {
+                watchlistEvent: watchlistCheckEvent3,
+                timestamp: '2021-01-01T00:00:00.000Z',
+              },
+            ],
+            latestWatchlistEvent: watchlistCheckEvent1,
+          },
+          isFromOtherOrg: false,
+          time: { timestamp: '2021-01-05T00:00:00.000Z' },
         },
         {
           event: {
@@ -522,27 +558,9 @@ describe('mergeAuditTrailTimelineEvents', () => {
           },
           isFromOtherOrg: true,
           time: {
-            start: '2021-04-04T00:00:00.000Z',
-            end: '2021-05-05T00:00:00.000Z',
+            start: '2021-01-02T00:00:00.000Z',
+            end: '2021-01-03T00:00:00.000Z',
           },
-        },
-        {
-          event: {
-            kind: TimelineEventKind.combinedWatchlistChecks,
-            data: [
-              {
-                watchlistEvent: watchlistCheckEvent1,
-                timestamp: '2021-02-02T00:00:00.000Z',
-              },
-              {
-                watchlistEvent: watchlistCheckEvent2,
-                timestamp: '2021-03-03T00:00:00.000Z',
-              },
-            ],
-            latestWatchlistEvent: watchlistCheckEvent3,
-          },
-          isFromOtherOrg: false,
-          time: { timestamp: '2021-06-06T00:00:00.000Z' },
         },
       ]);
     });

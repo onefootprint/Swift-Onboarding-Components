@@ -1157,7 +1157,7 @@
               "watchlist_hit_pep": "User was found on PEP watchlist"
             },
             "previous-checks-button": {
-              "label": "See previous checks"
+              "label": "See all checks"
             },
             "previous-checks-drawer": {
               "title": "Watchlist checks"

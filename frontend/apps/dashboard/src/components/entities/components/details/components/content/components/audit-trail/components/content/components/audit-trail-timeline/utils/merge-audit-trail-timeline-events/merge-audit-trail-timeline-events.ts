@@ -15,44 +15,48 @@ const processWatchlistEvent = (
   combinedWatchlistChecksEvent: CombinedWatchlistChecksEvent,
   bufferTimeline: (AuditTrailTimelineEvent | null)[],
   event: TimelineEvent,
-  lastWatchlistEventIndex: number,
+  combinedWatchlistEventIndex: number,
   currIndex: number,
 ) => {
   const currentWatchlistEvent = event.event as WatchlistCheckEvent;
-  const newCombinedWatchlistCheckEvent = {
-    ...combinedWatchlistChecksEvent,
-    latestWatchlistEvent: currentWatchlistEvent,
-  };
-  const {
-    kind: eventKind,
-    latestWatchlistEvent: newLatestWatchlistEvent,
-    data: updatedData,
-  } = newCombinedWatchlistCheckEvent;
-  const newBufferTimeline = [...bufferTimeline];
-  newBufferTimeline.push({
-    event: {
-      kind: eventKind,
-      latestWatchlistEvent: newLatestWatchlistEvent,
-      data: [...updatedData],
-    },
-    isFromOtherOrg: event.isFromOtherOrg,
-    time: {
-      timestamp: event.timestamp,
-    },
-  });
-  if (lastWatchlistEventIndex >= 0) {
-    newBufferTimeline[lastWatchlistEventIndex] = null;
-  }
-  // Push to data after pushing to the tempTimeline so that the current check doesn't included in previous checks
+  const latestWatchlistEvent =
+    combinedWatchlistChecksEvent.latestWatchlistEvent ?? currentWatchlistEvent;
+  const latestWatchlistEventTimestamp =
+    combinedWatchlistChecksEvent.data.length > 0
+      ? combinedWatchlistChecksEvent.data[0].timestamp
+      : event.timestamp;
   combinedWatchlistChecksEvent.data.push({
     watchlistEvent: currentWatchlistEvent,
     timestamp: event.timestamp,
   });
-  const newLastWatchlistEventIndex = currIndex;
+  const newCombinedWatchlistCheckEvent = {
+    ...combinedWatchlistChecksEvent,
+    latestWatchlistEvent,
+  };
+  const newBufferTimeline = [...bufferTimeline];
+  const newTimelineWatchlishEvent: AuditTrailTimelineEvent = {
+    event: {
+      ...newCombinedWatchlistCheckEvent,
+    },
+    isFromOtherOrg: event.isFromOtherOrg,
+    time: {
+      timestamp: latestWatchlistEventTimestamp,
+    },
+  };
+
+  if (combinedWatchlistEventIndex >= 0) {
+    newBufferTimeline[combinedWatchlistEventIndex] = newTimelineWatchlishEvent;
+  } else {
+    newBufferTimeline.push(newTimelineWatchlishEvent);
+  }
+
   return {
     combinedWatchlistChecksEvent: newCombinedWatchlistCheckEvent,
     bufferTimeline: newBufferTimeline,
-    lastWatchlistEventIndex: newLastWatchlistEventIndex,
+    combinedWatchlistEventIndex:
+      combinedWatchlistEventIndex >= 0
+        ? combinedWatchlistEventIndex
+        : currIndex,
   };
 };
 
@@ -86,14 +90,14 @@ const processNonWatchlistEvent = (
   }
   // Merge times
   if ('timestamp' in lastEvent.time) {
-    // Use the last event time as the start time to create a range
+    // Use the last event time as the end time to create a range since we get the events in descending order
     lastEvent.time = {
-      start: lastEvent.time.timestamp,
-      end: event.timestamp,
+      start: event.timestamp,
+      end: lastEvent.time.timestamp,
     };
   } else {
-    // Just update the end rage
-    lastEvent.time.end = event.timestamp;
+    // Just update the start rage
+    lastEvent.time.start = event.timestamp;
   }
   // Merge kyc data (id doc/selfie are not portable for now) & dedupe just in case
   const eventData = event.event.data as CollectedDataEventData;
@@ -108,7 +112,7 @@ const mergeAuditTrailTimelineEvents = (
   events: TimelineEvent[],
 ): AuditTrailTimelineEvent[] => {
   let bufferTimeline: (AuditTrailTimelineEvent | null)[] = [];
-  let lastWatchlistEventIndex = -1;
+  let combinedWatchlistEventIndex = -1;
   let combinedWatchlistChecksEvent: CombinedWatchlistChecksEvent = {
     kind: TimelineEventKind.combinedWatchlistChecks,
     latestWatchlistEvent: null,
@@ -119,12 +123,12 @@ const mergeAuditTrailTimelineEvents = (
       ({
         combinedWatchlistChecksEvent,
         bufferTimeline,
-        lastWatchlistEventIndex,
+        combinedWatchlistEventIndex,
       } = processWatchlistEvent(
         combinedWatchlistChecksEvent,
         bufferTimeline,
         event,
-        lastWatchlistEventIndex,
+        combinedWatchlistEventIndex,
         i,
       ));
       return;
