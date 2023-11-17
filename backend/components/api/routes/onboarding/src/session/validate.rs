@@ -34,6 +34,7 @@ pub async fn post(
 ) -> JsonApiResponse<ValidateResponse> {
     let auth = auth.check_guard(TenantGuard::Onboarding)?;
 
+    root_span.record("auth_token_hash", request.validation_token.id().to_string());
     let session = AuthSession::get(&state, &request.validation_token)
         .await?
         .ok_or(OnboardingError::ValidationTokenNotFound)?

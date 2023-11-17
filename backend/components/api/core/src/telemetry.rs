@@ -95,30 +95,9 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
 
         let InsightHeaders {
             ip_address,
-            city: _,
             country,
-            region_name: _,
-            latitude,
-            longitude,
-            postal_code: _,
-            time_zone: _,
             user_agent,
-            timestamp: _,
-            region: _,
-            metro_code: _,
-            is_android_user: _,
-            is_desktop_viewer: _,
-            is_ios_viewer: _,
-            is_mobile_viewer: _,
-            is_smarttv_viewer: _,
-            is_tablet_viewer: _,
-            asn: _,
-            country_code: _,
-            forwarded_proto: _,
-            http_version: _,
-            tls: _,
-            session_id: _,
-            origin: _,
+            ..
         } = InsightHeaders::parse_from_request(request.headers());
 
         let TelemetryHeaders {
@@ -139,22 +118,18 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             vault_id = tracing::field::Empty,
             is_live = tracing::field::Empty,
             auth_method = tracing::field::Empty,
+            // Allow associating requests made with the same auth token, even if the auth extractor failed
+            auth_token_hash = tracing::field::Empty,
             // Free-form data to be added by individual APIs if they choose
             meta = tracing::field::Empty,
             client_version,
+            session_id,
+            server_git_hash,
+            is_integration_test_req,
             route,
             ip_address,
             country,
             user_agent,
-            session_id,
-            server_git_hash,
-            is_integration_test_req,
-            // I would get rid of these fields next
-            lat_lng = format!(
-                "{},{}",
-                latitude.unwrap_or_default(),
-                longitude.unwrap_or_default()
-            ),
             "Root span"
         );
         span

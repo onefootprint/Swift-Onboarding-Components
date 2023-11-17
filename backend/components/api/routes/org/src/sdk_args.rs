@@ -58,6 +58,7 @@ async fn post(
                 e_data,
             };
             let (auth_token, session) = AuthSession::create_sync(conn, &session_key, data.into(), duration)?;
+            root_span.record("auth_token_hash", auth_token.id().to_string());
             Ok((auth_token, session))
         })
         .await??;

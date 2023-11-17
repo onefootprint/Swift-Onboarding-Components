@@ -114,6 +114,7 @@ where
             let auth_token = auth_token.ok_or_else(|| AuthError::MissingHeader(allowed_headers.clone()))?;
             let auth_token = SessionAuthToken::from(auth_token);
 
+            root_span.record("auth_token_hash", auth_token.id().to_string());
             let session = AuthSession::get(&state, &auth_token)
                 .await?
                 .ok_or(AuthError::NoSessionFound)?;
