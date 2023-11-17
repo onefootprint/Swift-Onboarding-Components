@@ -21,6 +21,30 @@
                 "cta": "Continue"
             }
         },
+        "basic-information": {
+            "title": "Basic data",
+            "subtitle": "Spell your full legal first, middle and last names exactly as shown on your government-issued ID.",
+            "first-name-input": {
+                "label": "First name",
+                "placeholder": "John"
+            },
+            "middle-name-input": {
+                "label": "Middle name (optional)",
+                "placeholder": "Smith"
+            },
+            "last-name-input": {
+                "label": "Last name",
+                "placeholder": "Doe"
+            },
+            "dob-input": {
+                "label": "Date of birth",
+                "placeholder": "MM/DD/YYYY"
+            },
+            "country-input": {
+                "label": "Country of birth"
+            },
+            "cta": "Continue"
+        },
         "sms-challenge": {
             "title": "Verify your phone number",
             "subtitle": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}",
