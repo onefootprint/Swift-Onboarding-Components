@@ -66,6 +66,7 @@ def test_create(sandbox_tenant, data):
 
 
 def test_list(sandbox_tenant, obc):
+    # Note: obc will have a default set of rules it is created with
     rules = [
         post(
             f"/org/onboarding_configs/{obc.id}/rules",
@@ -83,16 +84,20 @@ def test_list(sandbox_tenant, obc):
         None,
         *sandbox_tenant.db_auths,
     )
+    num_default_rules = len(res) - len(rules)
     for i in range(len(rules)):
-        assert res[i]["rule_id"] == rules[i]["rule_id"]
-        assert res[i]["created_at"] == rules[i]["created_at"]
-        assert res[i]["name"] == rules[i]["name"]
-        assert res[i]["rule_expression"] == rules[i]["rule_expression"]
-        assert res[i]["action"] == rules[i]["action"]
-        assert res[i]["is_shadow"] == rules[i]["is_shadow"]
+        assert res[num_default_rules + i]["rule_id"] == rules[i]["rule_id"]
+        assert res[num_default_rules + i]["created_at"] == rules[i]["created_at"]
+        assert res[num_default_rules + i]["name"] == rules[i]["name"]
+        assert (
+            res[num_default_rules + i]["rule_expression"] == rules[i]["rule_expression"]
+        )
+        assert res[num_default_rules + i]["action"] == rules[i]["action"]
+        assert res[num_default_rules + i]["is_shadow"] == rules[i]["is_shadow"]
 
 
 def test_patch(sandbox_tenant, obc):
+    # Note: obc will have a default set of rules it is created with
     rule = post(
         f"/org/onboarding_configs/{obc.id}/rules",
         dict(
@@ -136,8 +141,7 @@ def test_patch(sandbox_tenant, obc):
         None,
         *sandbox_tenant.db_auths,
     )
-    assert len(rules) == 1
-    assert rules[0]["rule_expression"] == [
+    assert rules[-1]["rule_expression"] == [
         {"field": "document_selfie_glasses", "op": "eq", "value": True}
     ]
 
@@ -246,7 +250,7 @@ def test_delete(sandbox_tenant, obc):
             *sandbox_tenant.db_auths,
         )
     ]
-    assert rules == [rule1["rule_id"], rule3["rule_id"]]
+    assert len([r for r in rules if r in [rule1["rule_id"], rule3["rule_id"]]]) == 2
 
     # attempt to patch now deleted rule2 should error
     patch(
@@ -272,11 +276,16 @@ def test_delete(sandbox_tenant, obc):
 
     assert (
         len(
-            get(
-                f"/org/onboarding_configs/{obc.id}/rules",
-                None,
-                *sandbox_tenant.db_auths,
-            )
+            [
+                r
+                for r in get(
+                    f"/org/onboarding_configs/{obc.id}/rules",
+                    None,
+                    *sandbox_tenant.db_auths,
+                )
+                if r["rule_id"]
+                in [rule1["rule_id"], rule2["rule_id"], rule3["rule_id"]]
+            ]
         )
         == 0
     )
