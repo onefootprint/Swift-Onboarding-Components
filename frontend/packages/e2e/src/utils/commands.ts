@@ -7,7 +7,7 @@ import readQrCode from './qr-code';
 type WithFrame = { frame: FrameLocator | Page };
 type WithPage = { page: Page };
 type PageNFrame = WithFrame & WithPage;
-type Outcome = 'Success' | 'Manual Review' | 'Fail' | 'Real outcome';
+type Outcome = 'Success' | 'Manual Review' | 'Fail';
 
 const attachedState = { state: 'attached' as const, timeout: 2000 };
 
@@ -35,7 +35,17 @@ export const selectOutcomeOptional = async (
   { frame }: WithFrame,
   outcome: Outcome,
 ) => {
-  const outcomeBtn = frame.getByLabel(outcome).first();
+  const selectFirstOption = frame
+    .getByRole('button', { name: 'Success' })
+    .first();
+
+  await selectFirstOption
+    .waitFor({ state: 'attached', timeout: 15000 })
+    .then(() => selectFirstOption.click())
+    .then(() => true)
+    .catch(() => false);
+
+  const outcomeBtn = frame.getByRole('button', { name: outcome }).first();
   return outcomeBtn
     .waitFor({ state: 'attached', timeout: 15000 })
     .then(() => outcomeBtn.click())

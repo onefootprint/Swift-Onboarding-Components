@@ -11,7 +11,6 @@ import {
   fillNameAndDoB,
   fillPhoneNumber,
   fillSSN,
-  selectOutcomeOptional,
   uploadImage,
   verifyPhoneNumber,
 } from './utils/commands';
@@ -50,7 +49,13 @@ test('E2E.KYC.DriverDocOnly.Real #real', async ({
 
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
 
-  await selectOutcomeOptional({ frame }, 'Real outcome');
+  const realOutcomeBtn = frame.getByLabel('Real outcome').first();
+  await realOutcomeBtn
+    .waitFor({ state: 'attached', timeout: 15000 })
+    .then(() => realOutcomeBtn.click())
+    .then(() => true)
+    .catch(() => false);
+
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
