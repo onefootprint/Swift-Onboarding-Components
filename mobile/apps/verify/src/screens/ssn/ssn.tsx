@@ -12,7 +12,11 @@ import React from 'react';
 import Header from '@/components/header';
 import useTranslation from '@/hooks/use-translation';
 
-const Ssn = () => {
+export type SsnPros = {
+  onDone: () => void;
+};
+
+const Ssn = ({ onDone }: SsnPros) => {
   const { t } = useTranslation('pages.ssn');
   const ssnKind = 'ssn-full';
 
@@ -22,11 +26,17 @@ const Ssn = () => {
       <Box gap={7}>
         {ssnKind === 'ssn-full' ? (
           <TextInput
+            // autoFocus
+            blurOnSubmit
+            enterKeyHint="send"
             label={t('ssn-input.full-ssn.label')}
             placeholder={t('ssn-input.full-ssn.placeholder')}
           />
         ) : (
           <TextInput
+            // autoFocus
+            blurOnSubmit
+            enterKeyHint="send"
             label={t('ssn-input.last-4.label')}
             placeholder={t('ssn-input.last-4.placeholder')}
           />
@@ -42,7 +52,9 @@ const Ssn = () => {
             </Box>
           </Disclaimer>
         )}
-        <Button variant="primary">{t('cta')}</Button>
+        <Button variant="primary" onPress={onDone}>
+          {t('cta')}
+        </Button>
       </Box>
     </Container>
   );

@@ -11,8 +11,17 @@ import React from 'react';
 import Header from '@/components/header';
 import useTranslation from '@/hooks/use-translation';
 
-const BasicInformation = () => {
+export type BasicInformationProps = {
+  onDone: () => void;
+};
+
+const BasicInformation = ({ onDone }: BasicInformationProps) => {
   const { t } = useTranslation('pages.basic-information');
+
+  const handleSubmit = () => {
+    // TODO: Implement backend call
+    onDone();
+  };
 
   // TODO: we don't always show country of birth, so we should make this dynamic
   return (
@@ -24,26 +33,33 @@ const BasicInformation = () => {
             <TextInput
               label={t('first-name-input.label')}
               placeholder={t('first-name-input.placeholder')}
-              autoFocus
+              enterKeyHint="next"
             />
           </Box>
           <Box flex={1}>
             <TextInput
               label={t('middle-name-input.label')}
               placeholder={t('middle-name-input.placeholder')}
+              enterKeyHint="next"
             />
           </Box>
         </Row>
         <TextInput
           label={t('last-name-input.label')}
           placeholder={t('last-name-input.placeholder')}
+          enterKeyHint="next"
         />
         <TextInput
+          blurOnSubmit
+          enterKeyHint="send"
           label={t('dob-input.label')}
+          onSubmitEditing={handleSubmit}
           placeholder={t('dob-input.placeholder')}
         />
         <CountrySelect />
-        <Button variant="primary">{t('cta')}</Button>
+        <Button variant="primary" onPress={handleSubmit}>
+          {t('cta')}
+        </Button>
       </Box>
     </Container>
   );

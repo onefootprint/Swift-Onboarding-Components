@@ -1,133 +1,133 @@
 {
-    "pages": {
-        "email-identification": {
-            "title": "Hey there! 👋",
-            "subtitle": "Enter your email to get started.",
-            "cta": "Continue",
-            "email-input": {
-                "label": "Email",
-                "placeholder": "your.email@email.com"
-            }
+  "pages": {
+    "email-identification": {
+      "title": "Hey there! 👋",
+      "subtitle": "Enter your email to get started.",
+      "cta": "Continue",
+      "email-input": {
+        "label": "Email",
+        "placeholder": "your.email@email.com"
+      }
+    },
+    "phone-identification": {
+      "title": "Hey there! 👋",
+      "subtitle": "Enter your phone number to proceed.",
+      "email-preview": {
+        "change-email": "Change"
+      },
+      "phone-number-input": {
+        "label": "Phone number",
+        "placeholder": "+1 (234) 567-8900"
+      },
+      "cta": "Continue"
+    },
+    "ssn": {
+      "title": "What's your Social Security Number?",
+      "subtitle": "We're legally required to collect this information.",
+      "ssn-input": {
+        "full-ssn": {
+          "label": "SSN (Full)",
+          "placeholder": "XXX-XX-XXXX"
         },
-        "phone-identification": {
-            "title": "Hey there! 👋",
-            "subtitle": "Enter your phone number to proceed.",
-            "email-preview": {
-                "change-email": "Change"
-            },
-            "phone-number-input": {
-                "label": "Phone number",
-                "placeholder": "+1 (234) 567-8900",
-                "cta": "Continue"
-            }
-        },
-        "ssn": {
-            "title": "What's your Social Security Number?",
-            "subtitle": "We're legally required to collect this information.",
-            "ssn-input": {
-                "full-ssn": {
-                    "label": "SSN (Full)",
-                    "placeholder": "XXX-XX-XXXX"
-                },
-                "last-4": {
-                    "label": "SSN (Last 4)",
-                    "placeholder": "XXXX"
-                }
-            },
-            "disclaimer": {
-                "title": "Your data is safe",
-                "description": "Your SSN is encrypted and protected by a state-of-the-art secure environment"
-            },
-            "cta": "Continue"
-        },
-        "legal-status": {
-            "title": "What's your legal status in the U.S.?",
-            "subtitle": "We're legally required to collect this information.",
-            "statuses": {
-                "citizen": "I'm a citizen",
-                "permanent-resident": "I have a green card/I am a permanent resident",
-                "visa": "I have a visa"
-            },
-            "country-birth-input": {
-                "label": "Country of birth"
-            },
-            "country-citizenship-input": {
-                "label": "Citizenship"
-            },
-            "add-citizenship": "+ Add citizenship",
-            "visa-input": {
-                "type": "Visa type",
-                "visa-expiration": {
-                    "label": "Visa expiration date",
-                    "placeholder": "MM/DD/YYYY"
-                },
-                "visa-kinds": {
-                    "e1": "E-1",
-                    "e2": "E-2",
-                    "e3": "E-3",
-                    "f1": "F-1",
-                    "g4": "G-4",
-                    "h1b": "H-1B",
-                    "l1": "L-1",
-                    "o1": "O-1",
-                    "tn1": "TN-1",
-                    "other": "Other"
-                }
-            },
-            "cta": "Continue"
-        },
-        "residential-address": {
-            "title": "What's your residential address?",
-            "subtitle": "We're legally required to collect this information.",
-            "address-input-1": {
-                "label": "Address line 1",
-                "placeholder": "Street and house number"
-            },
-            "address-input-2": {
-                "label": "Address line 2",
-                "placeholder": "Apartment, suite, etc."
-            },
-            "city-input": {
-                "label": "City",
-                "placeholder": "Brooklyn"
-            },
-            "zip-input": {
-                "label": "ZIP code",
-                "placeholder": "11206"
-            },
-            "state-input": {
-                "label": "State"
-            },
-            "cta": "Continue"
-        },
-        "basic-information": {
-            "title": "Basic data",
-            "subtitle": "Spell your full legal first, middle and last names exactly as shown on your government-issued ID.",
-            "first-name-input": {
-                "label": "First name",
-                "placeholder": "John"
-            },
-            "middle-name-input": {
-                "label": "Middle name (optional)",
-                "placeholder": "Smith"
-            },
-            "last-name-input": {
-                "label": "Last name",
-                "placeholder": "Doe"
-            },
-            "dob-input": {
-                "label": "Date of birth",
-                "placeholder": "MM/DD/YYYY"
-            },
-            "country-input": {
-                "label": "Country of birth"
-            },
-            "cta": "Continue"
-        },
-        "sms-challenge": {
-            "title": "Verify your phone number",
-            "subtitle": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}",
-            "resend-code": "Resend code"
+        "last-4": {
+          "label": "SSN (Last 4)",
+          "placeholder": "XXXX"
         }
+      },
+      "disclaimer": {
+        "title": "Your data is safe",
+        "description": "Your SSN is encrypted and protected by a state-of-the-art secure environment"
+      },
+      "cta": "Continue"
+    },
+    "legal-status": {
+      "title": "What's your legal status in the U.S.?",
+      "subtitle": "We're legally required to collect this information.",
+      "statuses": {
+        "citizen": "I'm a citizen",
+        "permanent-resident": "I have a green card/I am a permanent resident",
+        "visa": "I have a visa"
+      },
+      "country-birth-input": {
+        "label": "Country of birth"
+      },
+      "country-citizenship-input": {
+        "label": "Citizenship"
+      },
+      "add-citizenship": "+ Add citizenship",
+      "visa-input": {
+        "type": "Visa type",
+        "visa-expiration": {
+          "label": "Visa expiration date",
+          "placeholder": "MM/DD/YYYY"
+        },
+        "visa-kinds": {
+          "e1": "E-1",
+          "e2": "E-2",
+          "e3": "E-3",
+          "f1": "F-1",
+          "g4": "G-4",
+          "h1b": "H-1B",
+          "l1": "L-1",
+          "o1": "O-1",
+          "tn1": "TN-1",
+          "other": "Other"
+        }
+      },
+      "cta": "Continue"
+    },
+    "residential-address": {
+      "title": "What's your residential address?",
+      "subtitle": "We're legally required to collect this information.",
+      "address-input-1": {
+        "label": "Address line 1",
+        "placeholder": "Street and house number"
+      },
+      "address-input-2": {
+        "label": "Address line 2",
+        "placeholder": "Apartment, suite, etc."
+      },
+      "city-input": {
+        "label": "City",
+        "placeholder": "Brooklyn"
+      },
+      "zip-input": {
+        "label": "ZIP code",
+        "placeholder": "11206"
+      },
+      "state-input": {
+        "label": "State"
+      },
+      "cta": "Continue"
+    },
+    "basic-information": {
+      "title": "Basic data",
+      "subtitle": "Spell your full legal first, middle and last names exactly as shown on your government-issued ID.",
+      "first-name-input": {
+        "label": "First name",
+        "placeholder": "John"
+      },
+      "middle-name-input": {
+        "label": "Middle name (optional)",
+        "placeholder": "Smith"
+      },
+      "last-name-input": {
+        "label": "Last name",
+        "placeholder": "Doe"
+      },
+      "dob-input": {
+        "label": "Date of birth",
+        "placeholder": "MM/DD/YYYY"
+      },
+      "country-input": {
+        "label": "Country of birth"
+      },
+      "cta": "Continue"
+    },
+    "sms-challenge": {
+      "title": "Verify your phone number",
+      "subtitle": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}",
+      "resend-code": "Resend code"
     }
+  }
 }

@@ -16,6 +16,7 @@ import Hint from '../hint';
 import Label from '../label';
 
 export type TextInputProps = {
+  private?: boolean; // TODO: Implement
   disabled?: boolean;
   hasError?: boolean;
   hint?: string;

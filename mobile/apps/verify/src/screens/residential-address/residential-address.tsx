@@ -13,8 +13,17 @@ import Header from '@/components/header';
 import states from '@/constants/states';
 import useTranslation from '@/hooks/use-translation';
 
-const ResidentialAddress = () => {
+export type ResidentialAddressProps = {
+  onDone: () => void;
+};
+
+const ResidentialAddress = ({ onDone }: ResidentialAddressProps) => {
   const { t } = useTranslation('pages.residential-address');
+
+  const handleSubmit = () => {
+    // TODO: Implement backend call
+    onDone();
+  };
 
   // TODO: we don't always show country of birth, so we should make this dynamic
   return (
@@ -25,28 +34,36 @@ const ResidentialAddress = () => {
         <TextInput
           label={t('address-input-1.label')}
           placeholder={t('address-input-1.placeholder')}
+          autoFocus
+          enterKeyHint="next"
         />
         <TextInput
           label={t('address-input-2.label')}
           placeholder={t('address-input-2.placeholder')}
+          enterKeyHint="next"
         />
         <Row>
           <Box flex={1}>
             <TextInput
               label={t('city-input.label')}
               placeholder={t('city-input.placeholder')}
-              autoFocus
+              enterKeyHint="next"
             />
           </Box>
           <Box flex={1}>
             <TextInput
+              blurOnSubmit
+              enterKeyHint="send"
               label={t('zip-input.label')}
+              onSubmitEditing={handleSubmit}
               placeholder={t('zip-input.placeholder')}
             />
           </Box>
         </Row>
         <Select label={t('state-input.label')} options={states} />
-        <Button variant="primary">{t('cta')}</Button>
+        <Button variant="primary" onPress={handleSubmit}>
+          {t('cta')}
+        </Button>
       </Box>
     </Container>
   );

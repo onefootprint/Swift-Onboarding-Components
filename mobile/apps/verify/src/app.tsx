@@ -8,7 +8,7 @@ import SplashScreen from 'react-native-splash-screen';
 
 import configureReactI18next from './config/initializers/react-i18next';
 import queryClient from './config/initializers/react-query';
-import EmailIdentification from './screens/email-identification';
+import Router from './screens/router';
 
 const App = () => {
   const handleLoad = useCallback(async () => {
@@ -20,7 +20,7 @@ const App = () => {
       <I18nextProvider i18n={configureReactI18next()}>
         <DesignSystemProvider theme={themes.light}>
           <View onLayout={handleLoad}>
-            <EmailIdentification />
+            <Router />
           </View>
         </DesignSystemProvider>
       </I18nextProvider>
