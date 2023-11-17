@@ -493,7 +493,7 @@ pub async fn make_vendor_requests(
 mod tests {
     use super::*;
     use crate::decision::vendor::vendor_trait::MockVendorAPICall;
-    use feature_flag::MockFeatureFlagClient;
+    use db::tests::MockFFClient;
     use idv::idology::{
         expectid::{response::ExpectIDResponse, response::Response},
         IdologyExpectIDAPIResponse,
@@ -514,7 +514,7 @@ mod tests {
         expect_api_call: bool,
     ) {
         let ob_configuration_key = ObConfigurationKey::from_str("obc123").unwrap();
-        let mut mock_ff_client = MockFeatureFlagClient::new();
+        let mut mock_ff_client = MockFFClient::new();
         let mut mock_api = MockVendorAPICall::<
             IdologyExpectIDRequest,
             IdologyExpectIDAPIResponse,
@@ -522,10 +522,11 @@ mod tests {
         >::new();
 
         let ob_config_key = ob_configuration_key.clone();
-        mock_ff_client
-            .expect_flag()
+        mock_ff_client.mock(|c| {
+            c.expect_flag()
             .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
             .return_once(move |_| flag_value);
+        });
 
         if expect_api_call {
             mock_api.expect_make_request().times(1).return_once(|_| {
@@ -552,7 +553,7 @@ mod tests {
             is_production,
             ob_configuration_key,
             Arc::new(mock_api),
-            Arc::new(mock_ff_client),
+            mock_ff_client.into_mock(),
         )
         .await
         .expect("shouldn't error");

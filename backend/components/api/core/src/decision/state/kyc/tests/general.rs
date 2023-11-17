@@ -20,8 +20,8 @@ use db::models::workflow_event::WorkflowEvent;
 use db::test_helpers::assert_have_same_elements;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::tests::test_db_pool::TestDbPool;
+use db::tests::MockFFClient;
 use feature_flag::BoolFlag;
-use feature_flag::MockFeatureFlagClient;
 use itertools::Itertools;
 use macros::test_state;
 use macros::test_state_case;
@@ -31,7 +31,6 @@ use newtypes::{
 };
 use newtypes::{KycConfig, OnboardingStatus};
 use newtypes::{KycState, WorkflowFixtureResult, WorkflowId, WorkflowState};
-use std::sync::Arc;
 
 async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
     let (_, _, _, sv, obc) = test_helpers::create_kyc_user_and_wf(
@@ -168,13 +167,13 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
     // MOCKING
-    let mut mock_ff_client = MockFeatureFlagClient::new();
-
-    mock_ff_client
-        .expect_flag()
-        .times(3)
-        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant.id))
-        .return_const(matches!(user_kind, UserKind::Demo));
+    let mut mock_ff_client = MockFFClient::new();
+    mock_ff_client.mock(|c| {
+        c.expect_flag()
+            .times(3)
+            .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant.id))
+            .return_const(matches!(user_kind, UserKind::Demo));
+    });
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
@@ -195,17 +194,11 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
         UserKind::Live => {
             let ob_config_key = obc.key.clone();
             // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
-            mock_ff_client
-                .expect_flag()
-                .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
-                .return_once(move |_| true);
-
-            // TODO: fix this up later sorry in a rush
-            mock_ff_client
-                .expect_flag()
-                .times(1)
-                .withf(move |f| matches!(f, BoolFlag::IsKycWaterfallOnRuleFailureEnabled(_)))
-                .return_const(false);
+            mock_ff_client.mock(|c| {
+                c.expect_flag()
+                    .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
+                    .return_once(move |_| true);
+            });
 
             mock_idology(state, WithQualifier(None));
 
@@ -221,7 +214,7 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
             }
         }
     };
-    state.set_ff_client(Arc::new(mock_ff_client));
+    state.set_ff_client(mock_ff_client.into_mock());
 
     // TESTS
     //
@@ -374,14 +367,15 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
     // MOCKING
-    let mut mock_ff_client = MockFeatureFlagClient::new();
+    let mut mock_ff_client = MockFFClient::new();
 
     let tenant_id = tenant.id.clone();
-    mock_ff_client
-        .expect_flag()
-        .times(3)
-        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
-        .return_const(matches!(user_kind, UserKind::Demo));
+    mock_ff_client.mock(|c| {
+        c.expect_flag()
+            .times(3)
+            .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
+            .return_const(matches!(user_kind, UserKind::Demo));
+    });
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
@@ -401,17 +395,11 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
         UserKind::Live => {
             let ob_config_key = obc.key.clone();
             // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
-            mock_ff_client
-                .expect_flag()
-                .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
-                .return_once(move |_| true);
-
-            // TODO: fix this up later sorry in a rush
-            mock_ff_client
-                .expect_flag()
-                .times(1)
-                .withf(move |f| matches!(f, BoolFlag::IsKycWaterfallOnRuleFailureEnabled(_)))
-                .return_const(false);
+            mock_ff_client.mock(|c| {
+                c.expect_flag()
+                    .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
+                    .return_once(move |_| true);
+            });
 
             mock_idology(
                 state,
@@ -430,7 +418,7 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
             }
         }
     };
-    state.set_ff_client(Arc::new(mock_ff_client));
+    state.set_ff_client(mock_ff_client.into_mock());
 
     // TESTS
     //
@@ -615,14 +603,15 @@ async fn redo_and_pass(
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
     // MOCKING
-    let mut mock_ff_client = MockFeatureFlagClient::new();
+    let mut mock_ff_client = MockFFClient::new();
 
     let tenant_id = tenant_id.clone();
-    mock_ff_client
-        .expect_flag()
-        .times(3)
-        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
-        .return_const(matches!(user_kind, UserKind::Demo));
+    mock_ff_client.mock(|c| {
+        c.expect_flag()
+            .times(3)
+            .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
+            .return_const(matches!(user_kind, UserKind::Demo));
+    });
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
@@ -631,22 +620,16 @@ async fn redo_and_pass(
         UserKind::Live => {
             let ob_config_key = ob_config_key.clone();
             // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
-            mock_ff_client
-                .expect_flag()
-                .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
-                .return_once(move |_| true);
-
-            // TODO: fix this up later sorry in a rush
-            mock_ff_client
-                .expect_flag()
-                .times(1)
-                .withf(move |f| matches!(f, BoolFlag::IsKycWaterfallOnRuleFailureEnabled(_)))
-                .return_const(false);
+            mock_ff_client.mock(|c| {
+                c.expect_flag()
+                    .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
+                    .return_once(move |_| true);
+            });
 
             mock_idology(state, WithQualifier(None));
         }
     };
-    state.set_ff_client(Arc::new(mock_ff_client));
+    state.set_ff_client(mock_ff_client.into_mock());
     // webhook is specifically not mocked as we should not fire the OnboardingComplete webhook in redo
 
     // run Authorize

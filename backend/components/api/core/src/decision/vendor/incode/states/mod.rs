@@ -285,7 +285,10 @@ fn parse_type_of_id(
     // Validate the country code what the client told us (and what we validated against the
     // doc request)
 
-    let Some(provided_country) = country_code.and_then(|i| Iso3166ThreeDigitCountryCode::from_str(i.leak()).ok()).map(Iso3166TwoDigitCountryCode::from) else {
+    let Some(provided_country) = country_code
+        .and_then(|i| Iso3166ThreeDigitCountryCode::from_str(i.leak()).ok())
+        .map(Iso3166TwoDigitCountryCode::from)
+    else {
         return Ok(Err(IncodeFailureReason::UnknownCountryCode));
     };
 
@@ -340,9 +343,10 @@ impl AddSideResponseHelper {
 #[cfg(test)]
 
 mod tests {
-    use std::{str::FromStr, sync::Arc};
+    use std::str::FromStr;
 
-    use feature_flag::{BoolFlag, MockFeatureFlagClient};
+    use db::tests::MockFFClient;
+    use feature_flag::BoolFlag;
     use newtypes::{incode::IncodeDocumentRestriction, TenantId};
     use test_case::test_case;
 
@@ -358,31 +362,33 @@ mod tests {
         disallow_drivers_license_permits: bool,
         n_attempts: i64,
     ) -> Vec<IncodeDocumentRestriction> {
-        let mut mock_ff_client = MockFeatureFlagClient::new();
+        let mut mock_ff_client = MockFFClient::new();
         // ¯\_(ツ)_/¯
         let t1 = TenantId::from_str("t_1234").unwrap();
         let t2 = t1.clone();
         let t3 = t1.clone();
         let t4 = t1.clone();
 
-        mock_ff_client
-            .expect_flag()
-            .times(1)
-            .withf(move |f| *f == BoolFlag::DisableConservativeGlareForDocument(&t2))
-            .return_once(move |_| disable_check_glare);
+        mock_ff_client.mock(|c| {
+            c.expect_flag()
+                .times(1)
+                .withf(move |f| *f == BoolFlag::DisableConservativeGlareForDocument(&t2))
+                .return_once(move |_| disable_check_glare);
+        });
 
-        mock_ff_client
-            .expect_flag()
-            .times(1)
-            .withf(move |f| *f == BoolFlag::DisableConservativeSharpnessForDocument(&t3))
-            .return_once(move |_| disable_check_sharpness);
+        mock_ff_client.mock(|c| {
+            c.expect_flag()
+                .times(1)
+                .withf(move |f| *f == BoolFlag::DisableConservativeSharpnessForDocument(&t3))
+                .return_once(move |_| disable_check_sharpness);
+        });
 
-        mock_ff_client
-            .expect_flag()
-            .times(1)
-            .withf(move |f| *f == BoolFlag::DisallowDriverLicensePermits(&t4))
-            .return_once(move |_| disallow_drivers_license_permits);
-        let ff_client = Arc::new(mock_ff_client);
-        AddSideResponseHelper::get_restrictions(&t1, ff_client, n_attempts)
+        mock_ff_client.mock(|c| {
+            c.expect_flag()
+                .times(1)
+                .withf(move |f| *f == BoolFlag::DisallowDriverLicensePermits(&t4))
+                .return_once(move |_| disallow_drivers_license_permits);
+        });
+        AddSideResponseHelper::get_restrictions(&t1, mock_ff_client.into_mock(), n_attempts)
     }
 }

@@ -6,9 +6,9 @@ use crate::State;
 use chrono::Duration;
 use chrono::Utc;
 use db::test_helpers::assert_have_same_elements;
+use db::tests::MockFFClient;
 use db_schema::schema::verification_result;
 use diesel::prelude::*;
-use feature_flag::MockFeatureFlagClient;
 use macros::test_state_case;
 use newtypes::FootprintReasonCode;
 use newtypes::PiiString;
@@ -121,9 +121,11 @@ async fn vendor_error(state: &mut State, vault_kind: VaultKind) {
     if vault_kind.expects_idology() {
         mock_idology_pa(state, &VendorRes::Error);
     } else {
-        let mut mock_ff_client = MockFeatureFlagClient::new();
-        mock_ff_client.expect_flag().return_once(move |_| true);
-        state.set_ff_client(Arc::new(mock_ff_client));
+        let mut mock_ff_client = MockFFClient::new();
+        mock_ff_client.mock(|c| {
+            c.expect_flag().return_once(move |_| true);
+        });
+        state.set_ff_client(mock_ff_client.into_mock());
         mock_incode_watchlist_check(state, &VendorRes::Error);
     }
 
@@ -193,9 +195,11 @@ async fn active_users(
         // Simulate there being an existing search we just need to re-ping, since this is the most common case
         save_existing_watchlist_check_vres(state, &sv.id).await;
 
-        let mut mock_ff_client = MockFeatureFlagClient::new();
-        mock_ff_client.expect_flag().return_once(move |_| true);
-        state.set_ff_client(Arc::new(mock_ff_client));
+        let mut mock_ff_client = MockFFClient::new();
+        mock_ff_client.mock(|c| {
+            c.expect_flag().return_once(move |_| true);
+        });
+        state.set_ff_client(mock_ff_client.into_mock());
         mock_incode_updated_watchlist_result(state, &vendor_res);
     }
     expect_webhook(state, expected_status, None);
@@ -299,9 +303,11 @@ async fn incode_new_search_needed(state: &mut State, case: ExistingSearchCase) {
     }
 
     // No vres for IncodeWatchlistCheck exists! Theoretically an impossible scenario (cause we should have made such a call when the sv was onboarded) but still good to handle and this will be extended to handle 2 more cases where a fresh search must be performed: (1) if its been >365d
-    let mut mock_ff_client = MockFeatureFlagClient::new();
-    mock_ff_client.expect_flag().return_once(move |_| true);
-    state.set_ff_client(Arc::new(mock_ff_client));
+    let mut mock_ff_client = MockFFClient::new();
+    mock_ff_client.mock(|c| {
+        c.expect_flag().return_once(move |_| true);
+    });
+    state.set_ff_client(mock_ff_client.into_mock());
     mock_incode_watchlist_check(state, &VendorRes::NoHit);
 
     // expect_webhook(state, expected_status, None);

@@ -16,8 +16,8 @@ use db::models::risk_signal::RiskSignal;
 use db::models::workflow::{NewWorkflowArgs, Workflow};
 use db::test_helpers::assert_have_same_elements;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use db::tests::MockFFClient;
 use feature_flag::BoolFlag;
-use feature_flag::MockFeatureFlagClient;
 use itertools::Itertools;
 use macros::test_state_case;
 use newtypes::{
@@ -26,7 +26,6 @@ use newtypes::{
 };
 use newtypes::{KycState, WorkflowState};
 use newtypes::{OnboardingStatus, WorkflowFixtureResult};
-use std::sync::Arc;
 
 #[test_state_case(UserKind::Live, Failure)]
 #[test_state_case(UserKind::Live, DocUploadFailed)]
@@ -58,14 +57,15 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
     };
 
     // MOCKING
-    let mut mock_ff_client = MockFeatureFlagClient::new();
+    let mut mock_ff_client = MockFFClient::new();
 
     let tenant_id = tenant.id.clone();
-    mock_ff_client
-        .expect_flag()
-        .times(3)
-        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
-        .return_const(matches!(user_kind, UserKind::Demo));
+    mock_ff_client.mock(|c| {
+        c.expect_flag()
+            .times(3)
+            .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
+            .return_const(matches!(user_kind, UserKind::Demo));
+    });
 
     let mut expect_committed = true;
 
@@ -89,17 +89,11 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
         UserKind::Live => {
             let ob_config_key = obc.key.clone();
             // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
-            mock_ff_client
-                .expect_flag()
-                .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
-                .return_once(move |_| true);
-
-            // TODO: fix this up later sorry in a rush
-            mock_ff_client
-                .expect_flag()
-                .times(1)
-                .withf(move |f| matches!(f, BoolFlag::IsKycWaterfallOnRuleFailureEnabled(_)))
-                .return_const(false);
+            mock_ff_client.mock(|c| {
+                c.expect_flag()
+                    .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
+                    .return_once(move |_| true);
+            });
 
             // KYC Passes
             mock_idology(state, WithQualifier(None));
@@ -114,7 +108,7 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
             .await;
         }
     };
-    state.set_ff_client(Arc::new(mock_ff_client));
+    state.set_ff_client(mock_ff_client.into_mock());
 
     // TESTS
     //
@@ -267,14 +261,15 @@ async fn redo_document_and_pass(
     let ww = WorkflowWrapper::init(state, wf.clone()).await.unwrap();
 
     // MOCKING
-    let mut mock_ff_client = MockFeatureFlagClient::new();
+    let mut mock_ff_client = MockFFClient::new();
 
     let tenant_id = tenant_id.clone();
-    mock_ff_client
-        .expect_flag()
-        .times(1)
-        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
-        .return_const(matches!(user_kind, UserKind::Demo));
+    mock_ff_client.mock(|c| {
+        c.expect_flag()
+            .times(1)
+            .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
+            .return_const(matches!(user_kind, UserKind::Demo));
+    });
 
     let mut expect_committed = true;
 
@@ -292,7 +287,7 @@ async fn redo_document_and_pass(
                 .await
         }
     };
-    state.set_ff_client(Arc::new(mock_ff_client));
+    state.set_ff_client(mock_ff_client.into_mock());
     // webhook is specifically not mocked as we should not fire the OnboardingComplete webhook in redo
 
     // run Authorize

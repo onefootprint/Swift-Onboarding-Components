@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use crate::decision::state::actions::Authorize;
 use crate::decision::state::test_utils::{mock_idology_pa_hit, mock_incode, AmlKind, WithHit};
 use crate::decision::state::test_utils::{
@@ -9,7 +7,8 @@ use crate::decision::state::test_utils::{
 use crate::decision::state::{WorkflowActions, WorkflowWrapper};
 use crate::State;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
-use feature_flag::{BoolFlag, MockFeatureFlagClient};
+use db::tests::MockFFClient;
+use feature_flag::BoolFlag;
 use macros::test_state_case;
 use newtypes::VendorAPI;
 use newtypes::{
@@ -66,11 +65,13 @@ async fn test(
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
     // Mock Vendor Calls
-    let mut mock_ff_client = MockFeatureFlagClient::new();
-    mock_ff_client.expect_flag().returning(|f| match f {
-        BoolFlag::EnableIdologyInNonProd(_) => true,
-        BoolFlag::EnableIncodeWatchlistCheckInNonProd(_) => true,
-        _ => f.default(),
+    let mut mock_ff_client = MockFFClient::new();
+    mock_ff_client.mock(|c| {
+        c.expect_flag().returning(|f| match f {
+            BoolFlag::EnableIdologyInNonProd(_) => true,
+            BoolFlag::EnableIncodeWatchlistCheckInNonProd(_) => true,
+            _ => f.default(),
+        });
     });
 
     match kyc_call {
@@ -85,7 +86,7 @@ async fn test(
         }
     };
 
-    state.set_ff_client(Arc::new(mock_ff_client));
+    state.set_ff_client(mock_ff_client.into_mock());
 
     // TEST
     let _ww = ww

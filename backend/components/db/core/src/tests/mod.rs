@@ -48,8 +48,19 @@ mod watchlist_check;
 
 pub mod test_db_pool;
 
-pub fn mock_ff_client() -> Arc<MockFeatureFlagClient> {
-    let mut mock_ff_client = MockFeatureFlagClient::new();
-    mock_ff_client.expect_flag().returning(|f| f.default());
-    Arc::new(mock_ff_client)
+pub struct MockFFClient(MockFeatureFlagClient);
+impl MockFFClient {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self(MockFeatureFlagClient::new())
+    }
+
+    pub fn mock<F: FnOnce(&mut MockFeatureFlagClient)>(&mut self, f: F) {
+        f(&mut self.0);
+    }
+
+    pub fn into_mock(mut self) -> Arc<MockFeatureFlagClient> {
+        self.0.expect_flag().returning(|f| f.default());
+        Arc::new(self.0)
+    }
 }

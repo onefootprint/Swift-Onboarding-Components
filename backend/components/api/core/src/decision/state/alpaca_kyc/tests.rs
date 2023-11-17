@@ -12,6 +12,7 @@ use crate::decision::state::WorkflowWrapper;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::tenant::Tenant;
 use db::models::tenant_user::TenantUser;
+use db::tests::MockFFClient;
 use diesel::prelude::*;
 
 use crate::{decision::state::alpaca_kyc::*, State};
@@ -27,8 +28,6 @@ use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db_schema::schema::workflow;
 use feature_flag::BoolFlag;
 
-use feature_flag::MockFeatureFlagClient;
-
 use itertools::Itertools;
 use macros::test_state_case;
 use newtypes::{
@@ -39,8 +38,6 @@ use newtypes::{EnhancedAmlOption, OnboardingStatus};
 use newtypes::{FootprintReasonCode as FRC, RiskSignalGroupKind, WorkflowFixtureResult};
 
 use newtypes::WorkflowState;
-
-use std::sync::Arc;
 
 #[derive(Clone, Copy)]
 enum WFKind {
@@ -126,17 +123,13 @@ async fn pass(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
     // MOCKING
-    let mut mock_ff_client = MockFeatureFlagClient::new();
+    let mut mock_ff_client = MockFFClient::new();
 
-    mock_ff_client
-        .expect_flag()
-        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant.id))
-        .return_const(matches!(user_kind, UserKind::Demo));
-
-    mock_ff_client
-        .expect_flag()
-        .withf(move |f| matches!(f, BoolFlag::StepUpOnAmlHit(_)))
-        .return_const(false);
+    mock_ff_client.mock(|c| {
+        c.expect_flag()
+            .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant.id))
+            .return_const(matches!(user_kind, UserKind::Demo));
+    });
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
@@ -144,29 +137,23 @@ async fn pass(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
         // Mock vendor calls for Live users
         UserKind::Live => {
             // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
-            mock_ff_client
-                .expect_flag()
-                .withf(move |f| {
-                    matches!(
-                        &f,
-                        BoolFlag::EnableIdologyInNonProd(_)
-                            | BoolFlag::EnableIncodeWatchlistCheckInNonProd(_)
-                    )
-                })
-                .return_const(true);
-
-            // TODO: fix this up later sorry in a rush
-            mock_ff_client
-                .expect_flag()
-                .times(1)
-                .withf(move |f| matches!(f, BoolFlag::IsKycWaterfallOnRuleFailureEnabled(_)))
-                .return_const(false);
+            mock_ff_client.mock(|c| {
+                c.expect_flag()
+                    .withf(move |f| {
+                        matches!(
+                            &f,
+                            BoolFlag::EnableIdologyInNonProd(_)
+                                | BoolFlag::EnableIncodeWatchlistCheckInNonProd(_)
+                        )
+                    })
+                    .return_const(true);
+            });
 
             mock_idology(state, WithQualifier(None));
             mock_incode(state, WithHit(vec![]))
         }
     };
-    state.set_ff_client(Arc::new(mock_ff_client));
+    state.set_ff_client(mock_ff_client.into_mock());
 
     // TESTS
     //
@@ -334,19 +321,14 @@ async fn pass_then_watchlist_hit(
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
     // MOCKING
-    let mut mock_ff_client = MockFeatureFlagClient::new();
+    let mut mock_ff_client = MockFFClient::new();
 
     let tenant_id = tenant.id.clone();
-    mock_ff_client
-        .expect_flag()
-        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
-        .return_const(matches!(user_kind, UserKind::Demo));
-
-    // TODO: cleanup a better way to mock certain flags and use default for others
-    mock_ff_client
-        .expect_flag()
-        .withf(move |f| matches!(f, BoolFlag::StepUpOnAmlHit(_)))
-        .return_const(false);
+    mock_ff_client.mock(|c| {
+        c.expect_flag()
+            .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
+            .return_const(matches!(user_kind, UserKind::Demo));
+    });
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
@@ -354,29 +336,23 @@ async fn pass_then_watchlist_hit(
         // Mock vendor calls for Live users
         UserKind::Live => {
             // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
-            mock_ff_client
-                .expect_flag()
-                .withf(move |f| {
-                    matches!(
-                        &f,
-                        BoolFlag::EnableIdologyInNonProd(_)
-                            | BoolFlag::EnableIncodeWatchlistCheckInNonProd(_)
-                    )
-                })
-                .return_const(true);
-
-            // TODO: fix this up later sorry in a rush
-            mock_ff_client
-                .expect_flag()
-                .times(1)
-                .withf(move |f| matches!(f, BoolFlag::IsKycWaterfallOnRuleFailureEnabled(_)))
-                .return_const(false);
+            mock_ff_client.mock(|c| {
+                c.expect_flag()
+                    .withf(move |f| {
+                        matches!(
+                            &f,
+                            BoolFlag::EnableIdologyInNonProd(_)
+                                | BoolFlag::EnableIncodeWatchlistCheckInNonProd(_)
+                        )
+                    })
+                    .return_const(true);
+            });
 
             mock_idology(state, WithQualifier(None));
             mock_incode(state, WithHit(vec![AmlKind::Ofac, AmlKind::Am]));
         }
     };
-    state.set_ff_client(Arc::new(mock_ff_client));
+    state.set_ff_client(mock_ff_client.into_mock());
 
     // TESTS
     //
@@ -648,12 +624,13 @@ async fn step_up(
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
     // MOCKING
-    let mut mock_ff_client = MockFeatureFlagClient::new();
+    let mut mock_ff_client = MockFFClient::new();
 
-    mock_ff_client
-        .expect_flag()
-        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant.id))
-        .return_const(matches!(user_kind, UserKind::Demo));
+    mock_ff_client.mock(|c| {
+        c.expect_flag()
+            .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant.id))
+            .return_const(matches!(user_kind, UserKind::Demo));
+    });
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
@@ -661,31 +638,20 @@ async fn step_up(
         // Mock vendor calls for Live users
         UserKind::Live => {
             // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
-            mock_ff_client
-                .expect_flag()
-                .withf(move |f| {
-                    matches!(
-                        &f,
-                        BoolFlag::EnableIdologyInNonProd(_)
-                            | BoolFlag::EnableIncodeWatchlistCheckInNonProd(_)
-                    )
-                })
-                .return_const(true);
-
-            // TODO: fix this up later sorry in a rush
-            mock_ff_client
-                .expect_flag()
-                .times(1)
-                .withf(move |f| matches!(f, BoolFlag::IsKycWaterfallOnRuleFailureEnabled(_)))
-                .return_const(false);
+            mock_ff_client.mock(|c| {
+                c.expect_flag()
+                    .withf(move |f| {
+                        matches!(
+                            &f,
+                            BoolFlag::EnableIdologyInNonProd(_)
+                                | BoolFlag::EnableIncodeWatchlistCheckInNonProd(_)
+                        )
+                    })
+                    .return_const(true);
+            });
 
             match step_up_reason {
                 StepUpReason::NameDoesntMatch => {
-                    mock_ff_client
-                        .expect_flag()
-                        .withf(move |f| matches!(f, BoolFlag::StepUpOnAmlHit(_)))
-                        .return_const(false);
-
                     mock_idology(
                         state,
                         WithQualifier(Some("resultcode.first.name.does.not.match".to_owned())),
@@ -693,10 +659,11 @@ async fn step_up(
                     mock_incode(state, WithHit(vec![]));
                 }
                 StepUpReason::WatchlistHit => {
-                    mock_ff_client
-                        .expect_flag()
-                        .withf(move |f| matches!(f, BoolFlag::StepUpOnAmlHit(_)))
-                        .return_const(true);
+                    mock_ff_client.mock(|c| {
+                        c.expect_flag()
+                            .withf(move |f| matches!(f, BoolFlag::StepUpOnAmlHit(_)))
+                            .return_const(true);
+                    });
                     mock_idology(state, WithQualifier(None));
                     mock_incode(state, WithHit(vec![AmlKind::Ofac]));
                 }
@@ -707,7 +674,7 @@ async fn step_up(
     // mock Incode doc collection flow
     mock_incode_doc_collection(state, svid2, document_frcs.clone(), wfid.clone(), false).await;
 
-    state.set_ff_client(Arc::new(mock_ff_client));
+    state.set_ff_client(mock_ff_client.into_mock());
 
     // TESTS
     //
@@ -934,18 +901,14 @@ async fn fail(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
     // MOCKING
-    let mut mock_ff_client = MockFeatureFlagClient::new();
+    let mut mock_ff_client = MockFFClient::new();
 
     let tenant_id = tenant.id.clone();
-    mock_ff_client
-        .expect_flag()
-        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
-        .return_const(matches!(user_kind, UserKind::Demo));
-
-    mock_ff_client
-        .expect_flag()
-        .withf(move |f| matches!(f, BoolFlag::StepUpOnAmlHit(_)))
-        .return_const(false);
+    mock_ff_client.mock(|c| {
+        c.expect_flag()
+            .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
+            .return_const(matches!(user_kind, UserKind::Demo));
+    });
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
@@ -953,23 +916,17 @@ async fn fail(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
         // Mock vendor calls for Live users
         UserKind::Live => {
             // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
-            mock_ff_client
-                .expect_flag()
-                .withf(move |f| {
-                    matches!(
-                        &f,
-                        BoolFlag::EnableIdologyInNonProd(_)
-                            | BoolFlag::EnableIncodeWatchlistCheckInNonProd(_)
-                    )
-                })
-                .return_const(true);
-
-            // TODO: fix this up later sorry in a rush
-            mock_ff_client
-                .expect_flag()
-                .times(1)
-                .withf(move |f| matches!(f, BoolFlag::IsKycWaterfallOnRuleFailureEnabled(_)))
-                .return_const(false);
+            mock_ff_client.mock(|c| {
+                c.expect_flag()
+                    .withf(move |f| {
+                        matches!(
+                            &f,
+                            BoolFlag::EnableIdologyInNonProd(_)
+                                | BoolFlag::EnableIncodeWatchlistCheckInNonProd(_)
+                        )
+                    })
+                    .return_const(true);
+            });
 
             mock_idology(
                 state,
@@ -983,7 +940,7 @@ async fn fail(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
             }
         }
     };
-    state.set_ff_client(Arc::new(mock_ff_client));
+    state.set_ff_client(mock_ff_client.into_mock());
 
     // TESTS
     //
@@ -1123,18 +1080,14 @@ async fn redo_and_pass(
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
 
     // MOCKING
-    let mut mock_ff_client = MockFeatureFlagClient::new();
+    let mut mock_ff_client = MockFFClient::new();
 
     let tenant_id = tenant_id.clone();
-    mock_ff_client
-        .expect_flag()
-        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
-        .return_const(matches!(user_kind, UserKind::Demo));
-
-    mock_ff_client
-        .expect_flag()
-        .withf(move |f| matches!(f, BoolFlag::StepUpOnAmlHit(_)))
-        .return_const(false);
+    mock_ff_client.mock(|c| {
+        c.expect_flag()
+            .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
+            .return_const(matches!(user_kind, UserKind::Demo));
+    });
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
@@ -1142,29 +1095,23 @@ async fn redo_and_pass(
         // Mock vendor calls for Live users
         UserKind::Live => {
             // TODO: later we should just mock is_production=true for these tests and not need this FF mock.
-            mock_ff_client
-                .expect_flag()
-                .withf(move |f| {
-                    matches!(
-                        &f,
-                        BoolFlag::EnableIdologyInNonProd(_)
-                            | BoolFlag::EnableIncodeWatchlistCheckInNonProd(_)
-                    )
-                })
-                .return_const(true);
-
-            // TODO: fix this up later sorry in a rush
-            mock_ff_client
-                .expect_flag()
-                .times(1)
-                .withf(move |f| matches!(f, BoolFlag::IsKycWaterfallOnRuleFailureEnabled(_)))
-                .return_const(false);
+            mock_ff_client.mock(|c| {
+                c.expect_flag()
+                    .withf(move |f| {
+                        matches!(
+                            &f,
+                            BoolFlag::EnableIdologyInNonProd(_)
+                                | BoolFlag::EnableIncodeWatchlistCheckInNonProd(_)
+                        )
+                    })
+                    .return_const(true);
+            });
 
             mock_idology(state, WithQualifier(None));
             mock_incode(state, WithHit(vec![]));
         }
     };
-    state.set_ff_client(Arc::new(mock_ff_client));
+    state.set_ff_client(mock_ff_client.into_mock());
     // webhook is specifically not mocked as we should not fire the OnboardingComplete webhook in redo
 
     // run Authorize

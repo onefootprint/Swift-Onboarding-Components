@@ -18,8 +18,8 @@ use db::models::tenant::Tenant;
 use db::models::workflow::Workflow as DbWorkflow;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::tests::test_db_pool::TestDbPool;
+use db::tests::MockFFClient;
 use feature_flag::BoolFlag;
-use feature_flag::MockFeatureFlagClient;
 use itertools::Itertools;
 use macros::{test_state, test_state_case};
 use newtypes::OnboardingStatus;
@@ -29,7 +29,6 @@ use newtypes::WorkflowFixtureResult;
 use newtypes::WorkflowState;
 use newtypes::{CollectedDataOption as CDO, KybState};
 use newtypes::{DecisionStatus, FootprintReasonCode};
-use std::sync::Arc;
 
 async fn setup(
     state: &State,
@@ -117,7 +116,7 @@ async fn authorize(state: &mut State) {
 #[tokio::test(flavor = "multi_thread")]
 async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
     // SETUP
-    let (wf, tenant, _, person_wf) = setup(state, Some(fixture_result)).await;
+    let (wf, _, _, person_wf) = setup(state, Some(fixture_result)).await;
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
@@ -125,14 +124,6 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
         .action(state, WorkflowActions::Authorize(Authorize {}))
         .await
         .unwrap();
-
-    let mut mock_ff_client = MockFeatureFlagClient::new();
-    mock_ff_client
-        .expect_flag()
-        .times(2)
-        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant.id))
-        .return_const(false);
-    state.set_ff_client(Arc::new(mock_ff_client));
 
     // BoKycCompleted
     kyc_bo(state, &person_wf).await;
@@ -233,18 +224,20 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
     assert_eq!(WorkflowState::Kyb(KybState::AwaitingBoKyc), wf.state);
     assert!(!fingerprints.is_empty());
 
-    let mut mock_ff_client = MockFeatureFlagClient::new();
-    mock_ff_client
-        .expect_flag()
-        .times(2)
-        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant.id))
-        .return_const(false);
-    mock_ff_client
-        .expect_flag()
-        .withf(move |f| *f == BoolFlag::EnableMiddeskInNonProd(&obc.key))
-        .return_once(move |_| true);
+    let mut mock_ff_client = MockFFClient::new();
+    mock_ff_client.mock(|c| {
+        c.expect_flag()
+            .times(2)
+            .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant.id))
+            .return_const(false);
+    });
+    mock_ff_client.mock(|c| {
+        c.expect_flag()
+            .withf(move |f| *f == BoolFlag::EnableMiddeskInNonProd(&obc.key))
+            .return_once(move |_| true);
+    });
 
-    state.set_ff_client(Arc::new(mock_ff_client));
+    state.set_ff_client(mock_ff_client.into_mock());
 
     // BoKycCompleted
     kyc_bo(state, &person_wf).await;

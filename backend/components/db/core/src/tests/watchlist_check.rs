@@ -8,6 +8,7 @@ use crate::models::workflow::WorkflowUpdate;
 use crate::test_helpers::assert_have_same_elements;
 use crate::tests::fixtures;
 use crate::tests::prelude::*;
+use crate::tests::MockFFClient;
 use chrono::DateTime;
 use chrono::Duration;
 use chrono::Utc;
@@ -248,7 +249,7 @@ fn make_vault(
         let svid = sv.id.clone();
         if let Some(ob_decision_made_at) = ob_decision_made_at {
             let wf =
-                fixtures::workflow::create(conn, crate::tests::mock_ff_client(), svid, ob_config.id, None);
+                fixtures::workflow::create(conn, MockFFClient::new().into_mock(), svid, ob_config.id, None);
 
             let decision = NewDecisionArgs {
                 vault_id: uv.id.clone(),

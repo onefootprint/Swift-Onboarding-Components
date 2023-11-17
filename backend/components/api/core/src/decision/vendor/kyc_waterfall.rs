@@ -200,17 +200,19 @@ where
         let vr = waterfall_vec.get(i).cloned();
         let Some((vendor_api, req_res)) = vr else {
             // we have exhausted the waterfall of vendors to try
-            // ugh this sucks but kinda painted myself in a corner here, TODO: refactor/rewrite waterfall_loop so its cleaner now that we've added in rule failure waterfalling    
+            // ugh this sucks but kinda painted myself in a corner here, TODO: refactor/rewrite waterfall_loop so its cleaner now that we've added in rule failure waterfalling
             // we've exhausted vendors to try but the latest (or some) vendor we did try may have had a successful (but rule failing) response and so we want to return that and have the user fail rather than throw an error
             let final_vendor_responses = get_successful_vendor_responses(waterfall_vec);
             if final_vendor_responses.is_empty() {
                 tracing::info!("[waterfall_loop] exhausted vendors and no non-error vendor response was received, erroring");
                 return Err(ApiErrorKind::VendorRequestsFailed.into());
             } else {
-                tracing::info!("[waterfall_loop] exhausted vendors but returning latest non-error vendor response");
+                tracing::info!(
+                    "[waterfall_loop] exhausted vendors but returning latest non-error vendor response"
+                );
                 return Ok(final_vendor_responses.as_slice()[final_vendor_responses.len() - 1..].to_vec());
             }
-		};
+        };
         match next_action(&req_res, have_attempted_call, rule_config.clone()) {
             Action::Done => {
                 tracing::info!(?vendor_api, "[waterfall_loop] Done");
@@ -374,12 +376,11 @@ mod tests {
     use crate::decision::state::test_utils::WithSsnResultCode;
     use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
     use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
-    use feature_flag::MockFeatureFlagClient;
+    use db::tests::MockFFClient;
     use idv::ParsedResponse;
     use macros::test_state_case;
     use newtypes::DecisionIntentKind;
     use newtypes::Vendor;
-    use std::sync::Arc;
 
     struct ExperianEnabled(bool);
     struct IdologyEnabled(bool);
@@ -592,8 +593,10 @@ mod tests {
 
     fn mock_calls(state: &mut State, experian_response: ExperianResponse, idology_response: IdologyResponse) {
         // TODO: maybe by default the state's mock_ff_client could respond to any flag and return their default value (since thats something we specify in enum). Oof but then we gotta solve the whole is_production dealiooo
-        let mut mock_ff_client = MockFeatureFlagClient::new();
-        mock_ff_client.expect_flag().return_const(true);
+        let mut mock_ff_client = MockFFClient::new();
+        mock_ff_client.mock(|c| {
+            c.expect_flag().return_const(true);
+        });
         match idology_response.0 {
             VR::ShouldntCall => (),
             VR::Success(qualifiers) => match qualifiers {
@@ -615,7 +618,7 @@ mod tests {
             },
             VR::Error => test_utils::mock_experian_error(state),
         };
-        state.set_ff_client(Arc::new(mock_ff_client));
+        state.set_ff_client(mock_ff_client.into_mock());
     }
 
     async fn assert_expected_result(

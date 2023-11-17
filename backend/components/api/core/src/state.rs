@@ -84,7 +84,7 @@ impl State {
     #[allow(clippy::expect_used)]
     pub async fn test_state() -> Self {
         use crate::utils::mock_enclave::MockEnclave;
-        use feature_flag::MockFeatureFlagClient;
+        use db::tests::MockFFClient;
         use webhooks::MockWebhookClient;
         let config = Config::load_from_env().expect("failed to load config");
 
@@ -92,9 +92,7 @@ impl State {
         s.enclave_client.replace_proxy_client(Arc::new(MockEnclave));
 
         // by default, the ff_client on a test state will just return the default
-        let mut mock_ff_client = MockFeatureFlagClient::new();
-        mock_ff_client.expect_flag().returning(|f| f.default());
-        s.set_ff_client(Arc::new(mock_ff_client));
+        s.set_ff_client(MockFFClient::new().into_mock());
 
         // by default, the webhook_client on a test state will expect anything
         let mut mock_webhook_client = MockWebhookClient::new();

@@ -3,10 +3,9 @@ use crate::tests::fixtures;
 use crate::State;
 use db::tests::{fixtures::ob_configuration::ObConfigurationOpts, test_db_pool::TestDbPool};
 use db::DbResult;
-use feature_flag::{BoolFlag, MockFeatureFlagClient};
+use feature_flag::BoolFlag;
 use macros::test_state;
 use newtypes::{DecisionStatus, OnboardingStatus};
-use std::sync::Arc;
 
 #[test_state]
 async fn test_handle_setup(state: &mut State) {
@@ -33,16 +32,6 @@ async fn test_handle_setup(state: &mut State) {
         .await
         .unwrap();
     assert!(vault.is_live);
-
-    // set up ff
-    let mut mock_ff_client = MockFeatureFlagClient::new();
-    let tenant_id = tenant.id.clone();
-    mock_ff_client
-        .expect_flag()
-        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
-        .times(1)
-        .return_once(|_| false);
-    state.set_ff_client(Arc::new(mock_ff_client));
 
     let res =
         utils::get_fixture_data_decision(state.feature_flag_client.clone(), &vault, &wf, &tenant.id).unwrap();
@@ -74,14 +63,15 @@ async fn test_handle_setup(state: &mut State) {
         .unwrap();
     assert!(vault.is_live);
     // set up ff
-    let mut mock_ff_client = MockFeatureFlagClient::new();
+    let mut mock_ff_client = db::tests::MockFFClient::new();
     let tenant_id = tenant.id.clone();
-    mock_ff_client
-        .expect_flag()
-        .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
-        .times(1)
-        .return_once(|_| true);
-    state.set_ff_client(Arc::new(mock_ff_client));
+    mock_ff_client.mock(|c| {
+        c.expect_flag()
+            .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
+            .times(1)
+            .return_once(|_| true);
+    });
+    state.set_ff_client(mock_ff_client.into_mock());
 
     let res =
         utils::get_fixture_data_decision(state.feature_flag_client.clone(), &vault, &wf, &tenant.id).unwrap();
