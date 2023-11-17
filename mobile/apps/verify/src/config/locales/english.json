@@ -21,6 +21,42 @@
                 "cta": "Continue"
             }
         },
+        "legal-status": {
+            "title": "What's your legal status in the U.S.?",
+            "subtitle": "We're legally required to collect this information.",
+            "statuses": {
+                "citizen": "I'm a citizen",
+                "permanent-resident": "I have a green card/I am a permanent resident",
+                "visa": "I have a visa"
+            },
+            "country-birth-input": {
+                "label": "Country of birth"
+            },
+            "country-citizenship-input": {
+                "label": "Citizenship"
+            },
+            "add-citizenship": "+ Add citizenship",
+            "visa-input": {
+                "type": "Visa type",
+                "visa-expiration": {
+                    "label": "Visa expiration date",
+                    "placeholder": "MM/DD/YYYY"
+                },
+                "visa-kinds": {
+                    "e1": "E-1",
+                    "e2": "E-2",
+                    "e3": "E-3",
+                    "f1": "F-1",
+                    "g4": "G-4",
+                    "h1b": "H-1B",
+                    "l1": "L-1",
+                    "o1": "O-1",
+                    "tn1": "TN-1",
+                    "other": "Other"
+                }
+            },
+            "cta": "Continue"
+        },
         "residential-address": {
             "title": "What's your residential address?",
             "subtitle": "We're legally required to collect this information.",
