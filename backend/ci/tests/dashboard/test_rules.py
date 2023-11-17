@@ -1,7 +1,7 @@
 import pytest
 from tests.bifrost_client import BifrostClient
 from tests.constants import LIVE_PHONE_NUMBER
-from tests.utils import create_ob_config, get, post, patch
+from tests.utils import create_ob_config, get, post, patch, delete
 
 
 @pytest.fixture(scope="function")
@@ -184,3 +184,98 @@ def test_get_rule_set_result(tenant, twilio, must_collect_data):
     assert rule_set_result["rule_results"][0]["result"] == False
     assert rule_set_result["rule_results"][1]["rule"] == rule2
     assert rule_set_result["rule_results"][1]["result"] == True
+
+
+def test_delete(sandbox_tenant, obc):
+    # Setup a few rules
+    rule1 = post(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            name="Cool Rule",
+            rule_expression=[
+                {"field": "document_selfie_mask", "op": "eq", "value": True}
+            ],
+            action="fail",
+        ),
+        *sandbox_tenant.db_auths,
+    )
+    rule2 = post(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            name="Cool Rule",
+            rule_expression=[
+                {"field": "ssn_does_not_match", "op": "eq", "value": True}
+            ],
+            action="manual_review",
+        ),
+        *sandbox_tenant.db_auths,
+    )
+    rule3 = post(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            name="Cool Rule",
+            rule_expression=[
+                {"field": "name_does_not_match", "op": "eq", "value": True}
+            ],
+            action="fail",
+        ),
+        *sandbox_tenant.db_auths,
+    )
+    # also update rule3 just exercise updates + deletes together
+    patch(
+        f"/org/onboarding_configs/{obc.id}/rules/{rule3['rule_id']}",
+        dict(name="New Name"),
+        *sandbox_tenant.db_auths,
+    )
+
+    # Test DELETE
+
+    # delete rule2
+    delete(
+        f"/org/onboarding_configs/{obc.id}/rules/{rule2['rule_id']}",
+        dict(name="New Name"),
+        *sandbox_tenant.db_auths,
+    )
+
+    rules = [
+        r["rule_id"]
+        for r in get(
+            f"/org/onboarding_configs/{obc.id}/rules",
+            None,
+            *sandbox_tenant.db_auths,
+        )
+    ]
+    assert rules == [rule1["rule_id"], rule3["rule_id"]]
+
+    # attempt to patch now deleted rule2 should error
+    patch(
+        f"/org/onboarding_configs/{obc.id}/rules/{rule2['rule_id']}",
+        dict(name="uhoh"),
+        *sandbox_tenant.db_auths,
+        status_code=404,
+    )
+
+    # delete rule1
+    delete(
+        f"/org/onboarding_configs/{obc.id}/rules/{rule1['rule_id']}",
+        dict(name="New Name"),
+        *sandbox_tenant.db_auths,
+    )
+
+    # delete rule3
+    delete(
+        f"/org/onboarding_configs/{obc.id}/rules/{rule3['rule_id']}",
+        dict(name="New Name"),
+        *sandbox_tenant.db_auths,
+    )
+
+    assert (
+        len(
+            get(
+                f"/org/onboarding_configs/{obc.id}/rules",
+                None,
+                *sandbox_tenant.db_auths,
+            )
+        )
+        == 0
+    )

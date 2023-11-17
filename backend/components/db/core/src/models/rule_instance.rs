@@ -48,6 +48,9 @@ pub struct NewRuleInstance {
     pub rule_expression: RuleExpression,
     pub action: RuleAction,
     pub is_shadow: bool,
+    // These two would only be set when inserting a new rule_instance, when a Rule is being deleted
+    pub deactivated_at: Option<DateTime<Utc>>,
+    pub deactivated_seqno: Option<DataLifetimeSeqno>,
 }
 
 pub struct NewRule {
@@ -58,9 +61,34 @@ pub struct NewRule {
 
 #[derive(Debug, Clone)]
 pub struct RuleInstanceUpdate {
-    pub name: Option<Option<String>>,
-    pub rule_expression: Option<RuleExpression>,
-    pub is_shadow: Option<bool>,
+    name: Option<Option<String>>,
+    rule_expression: Option<RuleExpression>,
+    is_shadow: Option<bool>,
+    deactivate: bool,
+}
+
+impl RuleInstanceUpdate {
+    pub fn update(
+        name: Option<Option<String>>,
+        rule_expression: Option<RuleExpression>,
+        is_shadow: Option<bool>,
+    ) -> Self {
+        Self {
+            name,
+            rule_expression,
+            is_shadow,
+            deactivate: false,
+        }
+    }
+
+    pub fn delete() -> Self {
+        Self {
+            name: None,
+            rule_expression: None,
+            is_shadow: None,
+            deactivate: true,
+        }
+    }
 }
 
 impl RuleInstance {
@@ -85,6 +113,8 @@ impl RuleInstance {
             rule_expression,
             action,
             is_shadow: true, // all rules start in shadow until explicitly promoted to livemode lets say
+            deactivated_at: None,
+            deactivated_seqno: None,
         };
 
         Self::insert(conn, new_rule)
@@ -168,6 +198,8 @@ impl RuleInstance {
             rule_expression: update.rule_expression.unwrap_or(current.rule_expression),
             action: current.action,
             is_shadow: update.is_shadow.unwrap_or(current.is_shadow),
+            deactivated_at: update.deactivate.then_some(now),
+            deactivated_seqno: update.deactivate.then_some(seqno),
         };
 
         Self::insert(conn.conn(), new_rule)
@@ -238,6 +270,7 @@ mod tests {
                 name: Some(Some("name2".to_owned())),
                 rule_expression: Some(tests::fixtures::rule::example_rule_expression()),
                 is_shadow: Some(false),
+                deactivate: false,
             },
         )
         .unwrap();
