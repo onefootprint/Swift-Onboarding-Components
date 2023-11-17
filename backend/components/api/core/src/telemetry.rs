@@ -109,8 +109,11 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
 
         let server_git_hash = crate::GIT_HASH.to_string();
 
+        // Put on the root_span the properties that are must useful to query by/view in aggregate in honeycomb.
+        // We have almost every other attribute logged as an event, rather than as an attribute on the span.
         // Note: It seems we can only provide a fixed number of args to the root_span - you may
         // have to remove some if you add more.
+        // If we can increase the number of attributes on the span, maybe we can put everything here
         let span = root_span!(
             request,
             tenant_id = tracing::field::Empty,

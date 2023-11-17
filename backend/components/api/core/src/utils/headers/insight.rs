@@ -55,8 +55,9 @@ impl InsightHeaders {
             .and_then(|s| s.parse::<SocketAddr>().map(|s| s.ip().to_string()).ok());
         let session_id = get_header(TelemetryHeaders::SESSION_HEADER_NAME, headers);
 
-        InsightHeaders {
+        let headers = InsightHeaders {
             ip_address,
+            timestamp: chrono::Utc::now(),
             city: get_header("cloudfront-viewer-city", headers),
             country: get_header("cloudfront-viewer-country-name", headers),
             region: get_header("cloudfront-viewer-country-region", headers),
@@ -67,7 +68,6 @@ impl InsightHeaders {
             postal_code: get_header("cloudfront-viewer-postal-code", headers),
             time_zone: get_header("cloudfront-viewer-time-zone", headers),
             user_agent: get_header(actix_web::http::header::USER_AGENT.as_str(), headers),
-            timestamp: chrono::Utc::now(),
             is_android_user: get_header("cloudfront-is-android-viewer", headers),
             is_desktop_viewer: get_header("cloudfront-is-desktop-viewer", headers),
             is_ios_viewer: get_header("cloudfront-is-ios-viewer", headers),
@@ -81,7 +81,9 @@ impl InsightHeaders {
             tls: get_header("cloudfront-viewer-tls", headers),
             origin: get_header("origin", headers),
             session_id,
-        }
+        };
+        headers.log();
+        headers
     }
 }
 
@@ -92,6 +94,66 @@ impl InsightHeaders {
             (Some(x), None) | (None, Some(x)) => Some(x.to_owned()),
             (None, None) => None,
         }
+    }
+
+    /// Log all extracted header values
+    fn log(&self) {
+        let Self {
+            ip_address,
+            city,
+            country,
+            region,
+            region_name,
+            latitude,
+            longitude,
+            metro_code,
+            postal_code,
+            time_zone,
+            user_agent,
+            timestamp,
+            is_android_user,
+            is_desktop_viewer,
+            is_ios_viewer,
+            is_mobile_viewer,
+            is_smarttv_viewer,
+            is_tablet_viewer,
+            asn,
+            country_code,
+            forwarded_proto,
+            http_version,
+            tls,
+            origin,
+            session_id,
+            // Add new fields to the tracing::info! call below
+        } = self;
+        tracing::info!(
+            ip_address,
+            city,
+            country,
+            region,
+            region_name,
+            latitude,
+            longitude,
+            metro_code,
+            postal_code,
+            time_zone,
+            user_agent,
+            timestamp=%timestamp,
+            is_android_user,
+            is_desktop_viewer,
+            is_ios_viewer,
+            is_mobile_viewer,
+            is_smarttv_viewer,
+            is_tablet_viewer,
+            asn,
+            country_code,
+            forwarded_proto,
+            http_version,
+            tls,
+            origin,
+            session_id,
+            "Extracted InsightHeaders"
+        );
     }
 }
 
