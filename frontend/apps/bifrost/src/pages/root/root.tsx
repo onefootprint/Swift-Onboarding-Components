@@ -5,6 +5,7 @@ import { LAUNCH_DARKLY_CLIENT_SIDE_ID } from '@onefootprint/global-constants';
 import Idv from '@onefootprint/idv';
 import {
   AppErrorBoundary,
+  Logger,
   useFootprintProvider,
   useLogStateMachine,
 } from '@onefootprint/idv-elements';
@@ -49,6 +50,10 @@ const Root = ({ variant }: RootProps) => {
   });
 
   const handleComplete = (validationToken?: string, delay?: number) => {
+    Logger.info(
+      'IDV flow is complete, sending validation token back to the tenant',
+      validationToken,
+    );
     if (validationToken) {
       footprint.complete({
         validationToken,
@@ -58,6 +63,7 @@ const Root = ({ variant }: RootProps) => {
   };
 
   const handleClose = () => {
+    Logger.info('IDV flow is closed by the user');
     footprint.cancel();
     footprint.close();
   };

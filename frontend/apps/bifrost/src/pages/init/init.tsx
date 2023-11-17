@@ -1,6 +1,7 @@
 import { useObserveCollector } from '@onefootprint/dev-tools';
 import type { FootprintVerifyDataProps } from '@onefootprint/footprint-js';
 import {
+  checkIsInIframe,
   InitShimmer,
   Logger,
   useGetOnboardingConfig,
@@ -31,11 +32,13 @@ const Init = () => {
     { obConfigAuth, authToken: authTokenContext },
     {
       onSuccess: (config: PublicOnboardingConfig) => {
+        const isInIframe = checkIsInIframe();
         const { orgName, orgId, key } = config;
         Logger.identify({
           orgName,
           orgId,
           publicKey: key,
+          iframe: !!isInIframe,
         });
         observeCollector.setAppContext({
           config,

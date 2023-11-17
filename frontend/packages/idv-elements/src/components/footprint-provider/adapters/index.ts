@@ -14,6 +14,7 @@ const configureFootprint = () => {
   if (isInIframe) {
     return generateIframeAdapter();
   }
+  // if not running in webview or iframe, (running directly on id.onefootprint.com)
   return generateWebViewAdapter();
 };
 

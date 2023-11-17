@@ -1,6 +1,6 @@
 import type { FootprintVerifyDataProps } from '@onefootprint/footprint-js';
 import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
-import { useFootprintProvider } from '@onefootprint/idv-elements';
+import { Logger, useFootprintProvider } from '@onefootprint/idv-elements';
 import noop from 'lodash/noop';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
@@ -41,6 +41,7 @@ const useProps = (onSuccess: (props: FootprintVerifyDataProps) => void) => {
 
   useEffectOnce(() => {
     footprintProvider.load().then(() => {
+      Logger.info('Footprint provider successfully loaded');
       setIsAdapterLoaded(true);
     });
   });
@@ -62,8 +63,16 @@ const useProps = (onSuccess: (props: FootprintVerifyDataProps) => void) => {
 
     // See if we are running against a mobile SDK thta is sending data in URL fragment
     const publicKeyFromUrl = getPublicKeyFromUrl(router.query) ?? '';
+    if (publicKeyFromUrl) {
+      Logger.info(`Public key received from URL query: ${publicKeyFromUrl}`);
+    }
     const mobileProps = getMobilePropsFromUrl(router.asPath);
     if (mobileProps) {
+      Logger.info(
+        `Mobile props received from URL fragment with keys: ${Object.keys(
+          mobileProps,
+        ).join(', ')}`,
+      );
       complete({
         publicKey: publicKeyFromUrl,
         ...mobileProps,
@@ -77,9 +86,17 @@ const useProps = (onSuccess: (props: FootprintVerifyDataProps) => void) => {
       return noop;
     }
 
+    Logger.info('Subscribing to post messages for props');
     const unsubscribe = footprintProvider.on(
       FootprintPrivateEvent.propsReceived,
       (props: unknown) => {
+        if (typeof props === 'object') {
+          const keys = Object.keys(props ?? {});
+          Logger.info(
+            `Found props in post message with keys: ${keys.join(', ')}`,
+          );
+        }
+
         clearTimeout(timerId.current);
         complete({
           publicKey: publicKeyFromUrl,
@@ -89,6 +106,7 @@ const useProps = (onSuccess: (props: FootprintVerifyDataProps) => void) => {
     );
 
     timerId.current = setTimeout(() => {
+      Logger.info('Timed out waiting for props from post message');
       unsubscribe();
       complete({
         publicKey: publicKeyFromUrl,

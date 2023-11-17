@@ -14,6 +14,7 @@ const generateIframeAdapter: FootprintClientGenerator = () => {
   const eventEmitter = generateEventEmitter();
 
   const load = async () => {
+    Logger.info('Loading footprint from iframe adapter');
     postmate = await new Postmate.Model({
       // Listen for the new events
       [FootprintPrivateEvent.propsReceived]: (props: FootprintProps) => {
@@ -24,20 +25,27 @@ const generateIframeAdapter: FootprintClientGenerator = () => {
   };
 
   const close = () => {
+    Logger.info('Closing footprint from iframe adapter');
     sendEvent(FootprintPublicEvent.closed);
   };
 
   const cancel = () => {
+    Logger.info('Canceling footprint from iframe adapter');
     sendEvent(FootprintPublicEvent.canceled);
   };
 
   const start = () => {
+    Logger.info('Starting footprint from iframe adapter');
     sendEvent(FootprintPrivateEvent.started);
   };
 
   const complete = ({ validationToken, closeDelay = 0 }: CompletePayload) => {
+    Logger.info('Completing footprint from iframe adapter');
     sendEvent(FootprintPublicEvent.completed, validationToken);
     setTimeout(() => {
+      Logger.info(
+        'Closing footprint after complete timeout from iframe adapter',
+      );
       close();
     }, closeDelay);
   };

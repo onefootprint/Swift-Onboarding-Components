@@ -10,6 +10,7 @@ import {
   Liveness,
   Transfer,
 } from '../../../../../../plugins';
+import Logger from '../../../../../../utils/logger';
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 import AdditionalInfoRequired from '../additional-info-required';
 import Authorize from '../authorize';
@@ -55,6 +56,7 @@ const Router = ({ onDone }: RouterProps) => {
 
   useEffect(() => {
     if (isDone) {
+      Logger.info('Onboarding requirements flow is complete');
       onDone();
     }
   }, [isDone, onDone]);
