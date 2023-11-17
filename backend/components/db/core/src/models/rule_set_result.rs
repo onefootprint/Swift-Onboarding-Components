@@ -17,7 +17,6 @@ use newtypes::{DataLifetimeSeqno, ObConfigurationId, RiskSignalId, RuleAction, R
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = rule_set_result)]
-// TODO: description
 pub struct RuleSetResult {
     pub id: RuleSetResultId,
     pub created_at: DateTime<Utc>,
