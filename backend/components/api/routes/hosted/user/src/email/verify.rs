@@ -25,17 +25,11 @@ pub async fn post(
     state: web::Data<State>,
     request: Json<EmailVerifyRequest>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
-    let session = AuthSession::get(&state, &request.data)
-        .await?
-        .ok_or(ChallengeError::EmailVerificationTokenInvalidOrNotFound)?;
+    let session = AuthSession::get(&state, &request.data).await?;
 
-    let data = if let AuthSessionData::EmailVerify(data) = session.data {
-        Ok(data)
-    } else {
-        Err(ApiError::from(
-            ChallengeError::EmailVerificationTokenInvalidOrNotFound,
-        ))
-    }?;
+    let AuthSessionData::EmailVerify(data) = session.data else {
+        return Err(ChallengeError::EmailVerificationTokenInvalid.into());
+    };
 
     state
         .db_pool

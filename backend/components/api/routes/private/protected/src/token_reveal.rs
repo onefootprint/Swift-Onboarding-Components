@@ -5,6 +5,7 @@ use api_core::{
     types::{JsonApiResponse, ResponseData},
     ApiErrorKind,
 };
+use chrono::{DateTime, Utc};
 use db::models::session::Session;
 use newtypes::{SealedSessionBytes, SessionAuthToken};
 
@@ -17,6 +18,7 @@ pub struct RevealRequest {
 pub struct RevealResponse {
     data: serde_json::Value,
     kind: SessionKind,
+    expires_at: DateTime<Utc>,
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -54,6 +56,10 @@ pub async fn post(
         let serialized = serde_json::value::to_value(data)?;
         (serialized, SessionKind::Sealed)
     };
-    let response = RevealResponse { data, kind };
+    let response = RevealResponse {
+        data,
+        kind,
+        expires_at: session.expires_at,
+    };
     ResponseData::ok(response).json()
 }

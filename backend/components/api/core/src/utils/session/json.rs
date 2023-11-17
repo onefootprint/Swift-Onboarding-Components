@@ -4,7 +4,7 @@ use db::{models::session::Session, PgConn};
 use newtypes::{AuthTokenHash, Base64Data, D2pSessionStatus, HandoffMetadata, HasSessionKind, SessionKind};
 use serde::{de::DeserializeOwned, Serialize};
 
-use crate::errors::ApiError;
+use crate::errors::{ApiError, ApiResult};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RateLimitRecord {
@@ -59,13 +59,18 @@ impl<C> JsonSession<C>
 where
     C: Serialize + DeserializeOwned + HasSessionKind,
 {
-    pub fn get<S: Into<JsonSessionKey>>(conn: &mut PgConn, key: S) -> Result<Option<Self>, ApiError> {
+    pub fn get<S: Into<JsonSessionKey>>(conn: &mut PgConn, key: S) -> ApiResult<Option<Self>> {
         let session = Session::get(conn, key.into().0.into())?;
         let session = if let Some(session) = session {
-            Some(Self {
-                expires_at: session.expires_at,
-                data: serde_json::from_slice(session.data.as_ref())?,
-            })
+            if session.expires_at < Utc::now() {
+                // Don't error when the session is expired, just return nothing
+                None
+            } else {
+                Some(Self {
+                    expires_at: session.expires_at,
+                    data: serde_json::from_slice(session.data.as_ref())?,
+                })
+            }
         } else {
             None
         };

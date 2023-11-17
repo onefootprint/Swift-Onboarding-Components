@@ -4,8 +4,6 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum OnboardingError {
-    #[error("Validation token not found")]
-    ValidationTokenNotFound,
     #[error("Token invalid")]
     ValidateTokenInvalid,
     #[error("Webauthn credential not set")]

@@ -1,3 +1,4 @@
+use crate::DbResult;
 use crate::PgConn;
 use chrono::{DateTime, Utc};
 use db_schema::schema::session;
@@ -27,7 +28,7 @@ pub struct UpdateSession {
 
 impl Session {
     #[tracing::instrument("Session::check_expiration", skip_all)]
-    pub fn check_is_expired(conn: &mut PgConn, key: AuthTokenHash) -> Result<Option<bool>, crate::DbError> {
+    pub fn check_is_expired(conn: &mut PgConn, key: AuthTokenHash) -> DbResult<Option<bool>> {
         let session = session::table
             .filter(session::key.eq(key))
             .first::<Session>(conn)
@@ -42,18 +43,13 @@ impl Session {
     }
 
     #[tracing::instrument("Session::get", skip_all)]
-    pub fn get(conn: &mut PgConn, key: AuthTokenHash) -> Result<Option<Session>, crate::DbError> {
+    /// Return the session with the provided hash.
+    /// NOTE: the returned session may be expired
+    pub fn get(conn: &mut PgConn, key: AuthTokenHash) -> DbResult<Option<Session>> {
         let session = session::table
             .filter(session::key.eq(key))
             .first::<Session>(conn)
             .optional()?;
-        // check session expiration every time we get session
-        if let Some(session) = &session {
-            let now = Utc::now();
-            if session.expires_at <= now {
-                return Ok(None);
-            }
-        }
         Ok(session)
     }
 
@@ -85,7 +81,7 @@ impl Session {
     }
 
     #[tracing::instrument("Session::invalidate", skip_all)]
-    pub fn invalidate(key: AuthTokenHash, conn: &mut PgConn) -> Result<(), crate::DbError> {
+    pub fn invalidate(key: AuthTokenHash, conn: &mut PgConn) -> DbResult<()> {
         let now = Utc::now();
         diesel::update(session::table)
             .filter(session::key.eq(key))

@@ -17,30 +17,34 @@ pub struct AuthSession {
 }
 
 impl AuthSession {
-    pub async fn get(state: &State, auth_token: &SessionAuthToken) -> ApiResult<Option<Self>> {
+    pub async fn get(state: &State, auth_token: &SessionAuthToken) -> ApiResult<Self> {
         let key = auth_token.id();
-        // TODO have this return even expired sessions and log their contents
         let session: Option<Session> = state
             .db_pool
             .db_query(move |conn| Session::get(conn, key))
             .await??;
-        let session = if let Some(session) = session {
-            let data = AuthSessionData::unseal(&state.session_sealing_key, SealedSessionBytes(session.data));
-            let data = if let Err(crypto::Error::Cbor(_)) = data {
-                return Err(AuthError::CouldNotParseSession.into());
-            } else {
-                data?
-            };
-            // Log the Debug implementation of the auth session data.
-            // If auth extractors don't run, this will give us some information we can use to debug
-            tracing::info!(kind=%data.session_kind(), info=?data, "Loaded auth session from DB");
-            Some(Self {
-                key: session.key,
-                expires_at: session.expires_at,
-                data,
-            })
+        let Some(session) = session else {
+            return Err(AuthError::NoSessionFound.into());
+        };
+        let data = AuthSessionData::unseal(&state.session_sealing_key, SealedSessionBytes(session.data));
+        let data = if let Err(crypto::Error::Cbor(_)) = data {
+            return Err(AuthError::CouldNotParseSession.into());
         } else {
-            None
+            data?
+        };
+        // Log the Debug implementation of the auth session data.
+        // If auth extractors don't run, this will give us some information we can use to debug
+        tracing::info!(kind=%data.session_kind(), info=?data, "Loaded auth session from DB");
+
+        // Check session expiration before returning it but after logging info
+        if session.expires_at <= Utc::now() {
+            return Err(AuthError::SessionExpired.into());
+        }
+
+        let session = Self {
+            key: session.key,
+            expires_at: session.expires_at,
+            data,
         };
         Ok(session)
     }

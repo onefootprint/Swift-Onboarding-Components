@@ -9,8 +9,8 @@ pub enum ChallengeError {
     ChallengeExpired,
     #[error("Email is already verified")]
     EmailAlreadyVerified,
-    #[error("Token invalid or not found")]
-    EmailVerificationTokenInvalidOrNotFound,
+    #[error("Email verification token invalid")]
+    EmailVerificationTokenInvalid,
     #[error("Please wait {0} more seconds")]
     RateLimited(i64),
     #[error("Cannot add more than one biometric credential")]

@@ -115,9 +115,7 @@ where
             let auth_token = SessionAuthToken::from(auth_token);
 
             root_span.record("auth_token_hash", auth_token.id().to_string());
-            let session = AuthSession::get(&state, &auth_token)
-                .await?
-                .ok_or(AuthError::NoSessionFound)?;
+            let session = AuthSession::get(&state, &auth_token).await?;
 
             // Explicit type annotation here (T:: try_from) automatically ensures that a malicious user
             // cannot re-use session tokens for different purposes -- the API endpoints declare the session type "T"

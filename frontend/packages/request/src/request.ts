@@ -4,7 +4,11 @@ import type { AxiosError, AxiosRequestConfig } from 'axios';
 import axios from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
 
-const LOGOUT_ERRORS = ['Session expired or does not exist', 'Session invalid'];
+const LOGOUT_ERRORS = [
+  'Session does not exist',
+  'Session is expired',
+  'Session invalid',
+];
 
 export type FootprintServerError = {
   message: string;

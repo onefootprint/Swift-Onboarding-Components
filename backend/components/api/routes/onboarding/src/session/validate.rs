@@ -35,10 +35,7 @@ pub async fn post(
     let auth = auth.check_guard(TenantGuard::Onboarding)?;
 
     root_span.record("auth_token_hash", request.validation_token.id().to_string());
-    let session = AuthSession::get(&state, &request.validation_token)
-        .await?
-        .ok_or(OnboardingError::ValidationTokenNotFound)?
-        .data;
+    let session = AuthSession::get(&state, &request.validation_token).await?.data;
 
     let AuthSessionData::ValidateUserToken(ValidateUserToken { sv_id, wf_id, auth_event_ids }) = session else {
         return Err(OnboardingError::ValidateTokenInvalid.into());

@@ -3,8 +3,6 @@ import type { AxiosError, AxiosRequestConfig as RequestConfig } from 'axios';
 import axios from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
 
-const LOGOUT_ERROR = 'Session expired or does not exist';
-
 export type FootprintServerError = {
   message: string;
   statusCode: number;
@@ -39,14 +37,6 @@ export const isFootprintServerError = (
     return errorData;
   }
   return undefined;
-};
-
-export const isLogoutError = (error: unknown) => {
-  const serverError = isFootprintServerError(error);
-  return !!(
-    serverError?.statusCode === 401 &&
-    serverError?.message?.includes(LOGOUT_ERROR)
-  );
 };
 
 export const getErrorMessage = (error?: unknown | Error): string => {
