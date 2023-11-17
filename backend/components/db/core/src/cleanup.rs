@@ -1,5 +1,8 @@
 use db_schema::schema::apple_device_attestation;
 use db_schema::schema::auth_event;
+use db_schema::schema::rule_result;
+use db_schema::schema::rule_set_result;
+use db_schema::schema::rule_set_result_risk_signal_junction;
 use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::VaultId;
@@ -158,6 +161,21 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
 
         deleted_rows += diesel::delete(decision_intent::table)
             .filter(decision_intent::scoped_vault_id.eq_any(su_ids.clone()))
+            .execute(conn.conn())?;
+
+        // Rule results
+        let rule_set_result_ids = rule_set_result::table
+            .filter(rule_set_result::scoped_vault_id.eq_any(su_ids.clone()))
+            .select(rule_set_result::id);
+
+        deleted_rows += diesel::delete(rule_result::table)
+            .filter(rule_result::rule_set_result_id.eq_any(rule_set_result_ids.clone()))
+            .execute(conn.conn())?;
+        deleted_rows += diesel::delete(rule_set_result_risk_signal_junction::table)
+            .filter(rule_set_result_risk_signal_junction::rule_set_result_id.eq_any(rule_set_result_ids))
+            .execute(conn.conn())?;
+        deleted_rows += diesel::delete(rule_set_result::table)
+            .filter(rule_set_result::scoped_vault_id.eq_any(su_ids.clone()))
             .execute(conn.conn())?;
 
         // Verification requests
