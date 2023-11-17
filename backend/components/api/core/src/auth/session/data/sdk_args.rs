@@ -163,12 +163,18 @@ pub enum SdkArgs {
 }
 
 /// This structure is stored encrypted inside the session table
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, Clone)]
 pub struct SdkArgsData {
     /// The private key encrypted to the enclave that can be used to decrypt the data
     pub e_private_key: EncryptedVaultPrivateKey,
     /// The encrypted token data
     pub e_data: SealedVaultBytes,
+}
+
+impl std::fmt::Debug for SdkArgsData {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "SdkArgsData<scrubbed>")
+    }
 }
 
 pub type ObConfigInfo = (

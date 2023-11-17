@@ -19,6 +19,7 @@ pub struct AuthSession {
 impl AuthSession {
     pub async fn get(state: &State, auth_token: &SessionAuthToken) -> ApiResult<Option<Self>> {
         let key = auth_token.id();
+        // TODO have this return even expired sessions and log their contents
         let session: Option<Session> = state
             .db_pool
             .db_query(move |conn| Session::get(conn, key))
@@ -30,6 +31,9 @@ impl AuthSession {
             } else {
                 data?
             };
+            // Log the Debug implementation of the auth session data.
+            // If auth extractors don't run, this will give us some information we can use to debug
+            tracing::info!(kind=%data.session_kind(), info=?data, "Loaded auth session from DB");
             Some(Self {
                 key: session.key,
                 expires_at: session.expires_at,
