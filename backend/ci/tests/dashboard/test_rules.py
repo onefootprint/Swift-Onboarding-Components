@@ -1,7 +1,7 @@
 import pytest
 from tests.bifrost_client import BifrostClient
-from tests.constants import LIVE_PHONE_NUMBER
-from tests.utils import create_ob_config, get, post, patch, delete
+from tests.constants import LIVE_PHONE_NUMBER, EMAIL
+from tests.utils import create_ob_config, get, post, patch, delete, clean_up_user
 
 
 @pytest.fixture(scope="function")
@@ -146,7 +146,6 @@ def test_patch(sandbox_tenant, obc):
     ]
 
 
-@pytest.mark.skip(reason="Flakey due to SMS code :()")
 def test_get_rule_set_result(tenant, twilio, must_collect_data):
     obc = create_ob_config(tenant, "Rules yo", must_collect_data, must_collect_data)
 
@@ -171,6 +170,8 @@ def test_get_rule_set_result(tenant, twilio, must_collect_data):
         *tenant.db_auths,
     )
 
+    clean_up_user(LIVE_PHONE_NUMBER, EMAIL)
+
     bifrost = BifrostClient.create(
         obc,
         twilio,
@@ -185,10 +186,10 @@ def test_get_rule_set_result(tenant, twilio, must_collect_data):
 
     assert rule_set_result["ob_configuration_id"] == obc.id
     assert rule_set_result["action_triggered"] == "manual_review"
-    assert rule_set_result["rule_results"][0]["rule"] == rule1
-    assert rule_set_result["rule_results"][0]["result"] == False
-    assert rule_set_result["rule_results"][1]["rule"] == rule2
-    assert rule_set_result["rule_results"][1]["result"] == True
+    assert rule_set_result["rule_results"][-2]["rule"] == rule1
+    assert rule_set_result["rule_results"][-2]["result"] == False
+    assert rule_set_result["rule_results"][-1]["rule"] == rule2
+    assert rule_set_result["rule_results"][-1]["result"] == True
 
 
 def test_delete(sandbox_tenant, obc):
