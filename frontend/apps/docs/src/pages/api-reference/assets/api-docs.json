@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "5e77258732d5fb6691274907b51e13eb3030cc77"
+        "version": "4e682bb209027dd9c70b70d3188e83731e075c83"
     },
     "servers": [
         {
@@ -643,7 +643,7 @@
                 ]
             }
         },
-        "/users/{fp_id}": {
+        "/users/{fp_id:fp_[_A-Za-z0-9]*}": {
             "get": {
                 "tags": [
                     "Users",
@@ -656,7 +656,8 @@
                         "name": "fp_id",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "pattern": "fp_[_A-Za-z0-9]*"
                         },
                         "style": "simple"
                     }

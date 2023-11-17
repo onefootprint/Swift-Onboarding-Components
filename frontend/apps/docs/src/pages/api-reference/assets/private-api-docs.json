@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "5e77258732d5fb6691274907b51e13eb3030cc77"
+        "version": "4e682bb209027dd9c70b70d3188e83731e075c83"
     },
     "servers": [
         {
@@ -1741,6 +1741,45 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/RiskSignalDetail"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/entities/{fp_id}/rule_set_result": {
+            "get": {
+                "tags": [
+                    "EntityDetails",
+                    "Entities",
+                    "Private",
+                    "Rules"
+                ],
+                "description": "Retrieves the result of executing rules from the latest workflow decision made",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RuleSetResult"
                                 }
                             }
                         }
@@ -3696,6 +3735,14 @@
                 "parameters": [
                     {
                         "in": "query",
+                        "name": "playbook_id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
                         "name": "timestamp_gte",
                         "schema": {
                             "type": "string",
@@ -4008,6 +4055,52 @@
             }
         },
         "/org/onboarding_configs/{obc_id}/rules/{rule_id}": {
+            "delete": {
+                "tags": [
+                    "Playbooks",
+                    "Organization",
+                    "Private",
+                    "Rules"
+                ],
+                "description": "Deletes a Rule",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "obc_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "rule_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            },
             "patch": {
                 "tags": [
                     "Playbooks",
@@ -6931,8 +7024,8 @@
                         "type": "string",
                         "enum": [
                             "PassWithManualReview",
-                            "StepUp",
                             "ManualReview",
+                            "StepUp",
                             "Fail"
                         ]
                     },
@@ -6940,7 +7033,10 @@
                         "type": "string"
                     },
                     "rule_expression": {
-                        "type": "string"
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 },
                 "required": [
@@ -9095,6 +9191,7 @@
                                         "beneficial_owners_match",
                                         "beneficial_owners_partial_match",
                                         "beneficial_owners_do_not_match",
+                                        "beneficial_owner_failed_kyc",
                                         "sos_active_filing_found",
                                         "sos_filing_no_status",
                                         "sos_filing_partially_active",
@@ -9481,6 +9578,7 @@
                                                 "beneficial_owners_match",
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
+                                                "beneficial_owner_failed_kyc",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -9832,6 +9930,7 @@
                                                 "beneficial_owners_match",
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
+                                                "beneficial_owner_failed_kyc",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -10183,6 +10282,7 @@
                                                 "beneficial_owners_match",
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
+                                                "beneficial_owner_failed_kyc",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -10534,6 +10634,7 @@
                                                 "beneficial_owners_match",
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
+                                                "beneficial_owner_failed_kyc",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -10885,6 +10986,7 @@
                                                 "beneficial_owners_match",
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
+                                                "beneficial_owner_failed_kyc",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -11236,6 +11338,7 @@
                                                 "beneficial_owners_match",
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
+                                                "beneficial_owner_failed_kyc",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -11587,6 +11690,7 @@
                                                 "beneficial_owners_match",
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
+                                                "beneficial_owner_failed_kyc",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -11938,6 +12042,7 @@
                                                 "beneficial_owners_match",
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
+                                                "beneficial_owner_failed_kyc",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -12289,6 +12394,7 @@
                                                 "beneficial_owners_match",
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
+                                                "beneficial_owner_failed_kyc",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -12640,6 +12746,7 @@
                                                 "beneficial_owners_match",
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
+                                                "beneficial_owner_failed_kyc",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -12991,6 +13098,7 @@
                                                 "beneficial_owners_match",
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
+                                                "beneficial_owner_failed_kyc",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -13342,6 +13450,7 @@
                                                 "beneficial_owners_match",
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
+                                                "beneficial_owner_failed_kyc",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -13693,6 +13802,7 @@
                                                 "beneficial_owners_match",
                                                 "beneficial_owners_partial_match",
                                                 "beneficial_owners_do_not_match",
+                                                "beneficial_owner_failed_kyc",
                                                 "sos_active_filing_found",
                                                 "sos_filing_no_status",
                                                 "sos_filing_partially_active",
@@ -17580,6 +17690,7 @@
                             "beneficial_owners_match",
                             "beneficial_owners_partial_match",
                             "beneficial_owners_do_not_match",
+                            "beneficial_owner_failed_kyc",
                             "sos_active_filing_found",
                             "sos_filing_no_status",
                             "sos_filing_partially_active",
@@ -17944,6 +18055,7 @@
                             "beneficial_owners_match",
                             "beneficial_owners_partial_match",
                             "beneficial_owners_do_not_match",
+                            "beneficial_owner_failed_kyc",
                             "sos_active_filing_found",
                             "sos_filing_no_status",
                             "sos_filing_partially_active",
@@ -18044,8 +18156,8 @@
                         "type": "string",
                         "enum": [
                             "PassWithManualReview",
-                            "StepUp",
                             "ManualReview",
+                            "StepUp",
                             "Fail"
                         ]
                     },
@@ -18060,7 +18172,10 @@
                         "type": "string"
                     },
                     "rule_expression": {
-                        "type": "string"
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     },
                     "rule_id": {
                         "type": "string"
@@ -18072,6 +18187,87 @@
                     "is_shadow",
                     "rule_expression",
                     "rule_id"
+                ]
+            },
+            "RuleSetResult": {
+                "type": "object",
+                "properties": {
+                    "action_triggered": {
+                        "type": "string",
+                        "enum": [
+                            "PassWithManualReview",
+                            "ManualReview",
+                            "StepUp",
+                            "Fail"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "ob_configuration_id": {
+                        "type": "string"
+                    },
+                    "rule_results": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "result": {
+                                    "type": "boolean"
+                                },
+                                "rule": {
+                                    "type": "object",
+                                    "properties": {
+                                        "action": {
+                                            "type": "string",
+                                            "enum": [
+                                                "PassWithManualReview",
+                                                "ManualReview",
+                                                "StepUp",
+                                                "Fail"
+                                            ]
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "is_shadow": {
+                                            "type": "boolean"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "rule_expression": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "rule_id": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "action",
+                                        "created_at",
+                                        "is_shadow",
+                                        "rule_expression",
+                                        "rule_id"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "result",
+                                "rule"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "ob_configuration_id",
+                    "rule_results"
                 ]
             },
             "SecretApiKey": {
@@ -18289,7 +18485,10 @@
                         "type": "string"
                     },
                     "rule_expression": {
-                        "type": "string"
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 }
             },
