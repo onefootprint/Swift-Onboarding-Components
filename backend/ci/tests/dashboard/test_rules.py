@@ -170,6 +170,7 @@ def test_get_rule_set_result(tenant, twilio, must_collect_data):
         *tenant.db_auths,
     )
 
+    # Cleanup the non-sandbox user that is used across all integration test runs
     clean_up_user(LIVE_PHONE_NUMBER, EMAIL)
 
     bifrost = BifrostClient.create(

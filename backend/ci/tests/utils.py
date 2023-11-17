@@ -437,45 +437,42 @@ def identify_verify(
             )
         return result
 
-    tried_codes = {}
-
     def inner():
         messages = twilio.messages.list(to=phone_number, limit=25)
-        last_error = None
+        first_error = None
         for message in messages:
-            try:
-                code = str(re.search("\\d{6}", message.body).group(0))
-                if code in tried_codes:
-                    continue
-                tried_codes[code] = True
-            except Exception as e:
-                # No code in this message, move on to the next
+            code = re.search("\\d{6}", message.body).group(0)
+            if not code:
+                # No code in this message, move on
                 continue
 
+            result = None
             try:
+                print(f"Trying {code}")
                 result = verify(code)
             except HttpError as e:
                 if expected_error and expected_error in str(e):
                     # The specific error we expected to see was returned from verify - we can exit
                     return
-                last_error = e
+                if not first_error:
+                    first_error = e
 
             if result and expected_error:
                 raise NotRetryableException(
                     "Expected error in identify verify but got result:", result
                 )
-            return result
+            if result:
+                return result
 
-        if last_error:
-            raise last_error
+        if first_error:
+            raise first_error
         else:
+            ts = arrow.now().isoformat()
             raise Exception(
-                f"SMS 2fac code is not present",
-                phone_number,
-                arrow.now().isoformat()
+                f"SMS 2fac code is not present to {phone_number}. Failed at: {ts}"
             )
 
-    return try_until_success(inner, 60)
+    return try_until_success(inner, 30)
 
 
 def create_user(twilio, phone_number, email, token_kind, *headers) -> str:
@@ -558,7 +555,8 @@ def create_ob_config(
 
 
 def clean_up_user(phone_number, email):
-    # cleanup live user
+    # The cleanup API is picky about spaces...
+    phone_number = phone_number.replace(" ", "")
     post("private/cleanup", dict(phone_number=phone_number), CUSTODIAN_AUTH)
 
     # Make sure the user doesn't exist after cleanup
