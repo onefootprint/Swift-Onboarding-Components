@@ -10,3 +10,17 @@ pub struct Rule {
     pub action: RuleAction,
     pub is_shadow: bool,
 }
+
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+pub struct RuleSetResult {
+    pub created_at: DateTime<Utc>,
+    pub ob_configuration_id: ObConfigurationId,
+    pub action_triggered: Option<RuleAction>,
+    pub rule_results: Vec<RuleResult>,
+}
+
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+pub struct RuleResult {
+    pub rule: Rule,
+    pub result: bool,
+}

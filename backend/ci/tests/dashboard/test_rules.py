@@ -1,4 +1,6 @@
 import pytest
+from tests.bifrost_client import BifrostClient
+from tests.constants import LIVE_PHONE_NUMBER
 from tests.utils import create_ob_config, get, post, patch
 
 
@@ -138,3 +140,47 @@ def test_patch(sandbox_tenant, obc):
     assert rules[0]["rule_expression"] == [
         {"field": "document_selfie_glasses", "op": "eq", "value": True}
     ]
+
+
+def test_get_rule_set_result(tenant, twilio, must_collect_data):
+    obc = create_ob_config(tenant, "Rules yo", must_collect_data, must_collect_data)
+
+    rule1 = post(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            name="My awesome rule",
+            rule_expression=[
+                {"field": "ssn_does_not_match", "op": "eq", "value": True}
+            ],
+            action="fail",
+        ),
+        *tenant.db_auths,
+    )
+    rule2 = post(
+        f"/org/onboarding_configs/{obc.id}/rules",
+        dict(
+            name="My awesome rule",
+            rule_expression=[{"field": "address_matches", "op": "eq", "value": True}],
+            action="manual_review",
+        ),
+        *tenant.db_auths,
+    )
+
+    bifrost = BifrostClient.create(
+        obc,
+        twilio,
+        LIVE_PHONE_NUMBER,
+        None,
+    )
+    user = bifrost.run()
+
+    rule_set_result = get(
+        f"entities/{user.fp_id}/rule_set_result", None, *tenant.db_auths
+    )
+
+    assert rule_set_result["ob_configuration_id"] == obc.id
+    assert rule_set_result["action_triggered"] == "manual_review"
+    assert rule_set_result["rule_results"][0]["rule"] == rule1
+    assert rule_set_result["rule_results"][0]["result"] == False
+    assert rule_set_result["rule_results"][1]["rule"] == rule2
+    assert rule_set_result["rule_results"][1]["result"] == True

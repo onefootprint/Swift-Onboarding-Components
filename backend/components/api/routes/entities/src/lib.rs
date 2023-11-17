@@ -12,6 +12,7 @@ mod kyc;
 mod liveness;
 mod match_signals;
 mod risk_signals;
+mod rule_set_result;
 mod timeline;
 mod token;
 mod trigger;
@@ -42,5 +43,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(kyc::post)
         .service(risk_signals::get_detail)
         .service(risk_signals::decrypt_aml_hits)
-        .service(auth_events::get);
+        .service(auth_events::get)
+        .service(rule_set_result::get);
 }
