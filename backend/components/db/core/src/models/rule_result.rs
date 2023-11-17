@@ -1,12 +1,16 @@
 use crate::DbResult;
+use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::{DateTime, Utc};
+use db_schema::schema::rule_instance;
 use db_schema::schema::rule_result;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::RuleInstanceId;
 use newtypes::RuleResultId;
 use newtypes::RuleSetResultId;
+
+use super::rule_instance::RuleInstance;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = rule_result)]
@@ -39,6 +43,19 @@ impl RuleResult {
         let res = diesel::insert_into(rule_result::table)
             .values(new_rule_results)
             .get_results::<Self>(conn.conn())?;
+        Ok(res)
+    }
+
+    #[tracing::instrument("RuleResult::list", skip_all)]
+    pub(crate) fn list(
+        conn: &mut PgConn,
+        rule_set_result_id: &RuleSetResultId,
+    ) -> DbResult<Vec<(RuleResult, RuleInstance)>> {
+        let res = rule_result::table
+            .filter(rule_result::rule_set_result_id.eq(rule_set_result_id))
+            .inner_join(rule_instance::table)
+            .order_by(rule_instance::created_at.asc())
+            .get_results(conn)?;
         Ok(res)
     }
 }

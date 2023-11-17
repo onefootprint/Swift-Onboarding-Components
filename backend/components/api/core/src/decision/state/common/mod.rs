@@ -12,7 +12,7 @@ use feature_flag::{BoolFlag, FeatureFlagClient};
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
     CipKind, DecisionIntentKind, DecisionStatus, EnhancedAmlOption, FootprintReasonCode, ReviewReason,
-    ScopedVaultId, TenantId, VendorAPI, VerificationResultId, WorkflowId,
+    RuleSetResultKind, ScopedVaultId, TenantId, VendorAPI, VerificationResultId, WorkflowId,
 };
 
 use crate::{
@@ -28,6 +28,7 @@ use crate::{
             WaterfallOnboardingRulesDecisionOutput,
         },
         rule::rule_sets,
+        rule_engine,
         utils::{should_execute_rules_for_document_only, FixtureDecision},
         vendor::{
             self,
@@ -228,7 +229,7 @@ pub fn get_decision(
     wf: &Workflow,
     vault: &Vault,
 ) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
-    let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
+    let (obc, tenant) = ObConfiguration::get(conn, &wf.id)?;
     // later rules will come from Postgres itself
     let rule_group = match obc.cip_kind {
         Some(CipKind::Alpaca) => {
@@ -249,6 +250,22 @@ pub fn get_decision(
     };
     let doc_collected = DocumentRequest::get(conn, &wf.id)?.is_some();
     let document_only = should_execute_rules_for_document_only(vault, wf)?;
+
+    if tenant.id.is_integration_test_tenant() || ff_client.flag(BoolFlag::AlsoEvaluateRulesEngine(&obc.key)) {
+        // If this is an integration test tenant or FF'd OBC, then we do a best effort attempt at evaluating rules using our new Rules Engine
+        match rule_engine::engine::evaluate_rules(
+            conn,
+            &wf.scoped_vault_id,
+            &obc.id,
+            Some(&wf.id),
+            RuleSetResultKind::WorkflowDecision,
+            &risk_signals.risk_signals,
+            !doc_collected,
+        ) {
+            Ok(_) => {}
+            Err(err) => tracing::error!(%err, "Error evaluating Rules Engine"),
+        }
+    }
 
     let config = KycRuleExecutionConfig {
         include_doc: doc_collected,

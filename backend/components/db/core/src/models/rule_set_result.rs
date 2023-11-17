@@ -1,7 +1,9 @@
 use super::data_lifetime::DataLifetime;
+use super::rule_instance::RuleInstance;
 use super::rule_result::NewRuleResult;
 use super::rule_result::RuleResult;
 use crate::DbResult;
+use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::{DateTime, Utc};
 use db_schema::schema::{rule_set_result, rule_set_result_risk_signal_junction};
@@ -112,6 +114,28 @@ impl RuleSetResult {
             .execute(conn.conn())?;
 
         Ok((rule_set_result, rule_results))
+    }
+
+    #[allow(clippy::type_complexity)]
+    #[tracing::instrument("RuleSetResult::latest_workflow_decision", skip_all)]
+    pub fn latest_workflow_decision(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+    ) -> DbResult<Option<(RuleSetResult, Vec<(RuleResult, RuleInstance)>)>> {
+        let rule_set_result: Option<RuleSetResult> = rule_set_result::table
+            .filter(rule_set_result::scoped_vault_id.eq(sv_id))
+            .filter(rule_set_result::kind.eq(RuleSetResultKind::WorkflowDecision))
+            .order_by(rule_set_result::created_seqno.desc())
+            .first(conn)
+            .optional()?;
+
+        let Some(rule_set_result) = rule_set_result else {
+            return Ok(None);
+        };
+
+        let rule_results = RuleResult::list(conn, &rule_set_result.id)?;
+
+        Ok(Some((rule_set_result, rule_results)))
     }
 }
 

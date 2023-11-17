@@ -72,6 +72,8 @@ pub enum BoolFlag<'a> {
     CreateKycWorkflowForAlpacaOnboardings(&'a ObConfigurationKey),
     #[strum(to_string = "StepUpOnAmlHit")]
     StepUpOnAmlHit(&'a ObConfigurationKey),
+    #[strum(to_string = "AlsoEvaluateRulesEngine")]
+    AlsoEvaluateRulesEngine(&'a ObConfigurationKey),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -115,6 +117,7 @@ impl<'a> BoolFlag<'a> {
             Self::RunAwsRekognition(k) => Some(k.to_string()),
             Self::CreateKycWorkflowForAlpacaOnboardings(k) => Some(k.to_string()),
             Self::StepUpOnAmlHit(k) => Some(k.to_string()),
+            Self::AlsoEvaluateRulesEngine(k) => Some(k.to_string()),
         }
     }
 
@@ -154,6 +157,7 @@ impl<'a> BoolFlag<'a> {
             Self::RunAwsRekognition(_) => false,
             Self::CreateKycWorkflowForAlpacaOnboardings(_) => false,
             Self::StepUpOnAmlHit(_) => false,
+            Self::AlsoEvaluateRulesEngine(_) => false,
         }
     }
 }

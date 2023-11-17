@@ -258,6 +258,7 @@ pub fn fetch_latest_kyc_risk_signals(
         doc: None,
         kyb: None,
         aml: None,
+        risk_signals: rsfd.risk_signals.clone(),
     })
 }
 
@@ -273,12 +274,20 @@ pub fn fetch_latest_risk_signals_map(
                 acc
             });
 
+    let risk_signals = db_risk_signals_map.values().flatten().cloned().collect();
+
     let kyc = extract_risk_signal_group(&mut db_risk_signals_map, Kyc);
     let doc = extract_risk_signal_group(&mut db_risk_signals_map, Doc);
     let kyb = extract_risk_signal_group(&mut db_risk_signals_map, Kyb);
     let aml = extract_risk_signal_group(&mut db_risk_signals_map, Aml);
 
-    Ok(RiskSignalsForDecision { kyc, doc, kyb, aml })
+    Ok(RiskSignalsForDecision {
+        kyc,
+        doc,
+        kyb,
+        aml,
+        risk_signals,
+    })
 }
 
 fn extract_risk_signal_group<T>(
@@ -472,4 +481,5 @@ pub struct RiskSignalsForDecision {
     pub doc: Option<RiskSignalGroupStruct<Doc>>,
     pub kyb: Option<RiskSignalGroupStruct<Kyb>>,
     pub aml: Option<RiskSignalGroupStruct<Aml>>,
+    pub risk_signals: Vec<RiskSignal>,
 }

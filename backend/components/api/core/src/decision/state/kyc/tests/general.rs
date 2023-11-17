@@ -13,6 +13,7 @@ use crate::{decision::state::kyc, State};
 use chrono::Utc;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::risk_signal::RiskSignal;
+use db::models::rule_set_result::RuleSetResult;
 use db::models::workflow::Workflow;
 use db::models::workflow::Workflow as DbWorkflow;
 use db::models::workflow::{NewWorkflow, NewWorkflowArgs};
@@ -175,6 +176,12 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
             .return_const(matches!(user_kind, UserKind::Demo));
     });
 
+    mock_ff_client.mock(|c| {
+        c.expect_flag()
+            .withf(move |f| matches!(f, BoolFlag::AlsoEvaluateRulesEngine(_)))
+            .return_const(true);
+    });
+
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
         UserKind::Demo | UserKind::Sandbox(_) => {
@@ -314,6 +321,15 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
                     .map(|rs| (rs.vendor_api, rs.reason_code))
                     .collect_vec(),
             );
+
+            // Rules Engine was run and a result saved and nothing catastrophic happened
+            let _ = state
+                .db_pool
+                .db_query(move |conn| RuleSetResult::latest_workflow_decision(conn, &svid))
+                .await
+                .unwrap()
+                .unwrap()
+                .unwrap();
         }
     };
 }
