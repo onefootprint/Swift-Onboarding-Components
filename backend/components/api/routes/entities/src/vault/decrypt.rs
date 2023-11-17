@@ -212,7 +212,6 @@ pub(super) async fn post_inner(
         }
     }
     let out = DecryptResponse::from(results);
-    out.log_invalid_serializations();
 
     ResponseData::ok(out).json()
 }
