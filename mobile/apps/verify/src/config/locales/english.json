@@ -8,6 +8,18 @@
                 "label": "Email",
                 "placeholder": "your.email@email.com"
             }
+        },
+        "phone-identification": {
+            "title": "Hey there! 👋",
+            "subtitle": "Enter your phone number to proceed.",
+            "email-preview": {
+                "change-email": "Change"
+            },
+            "phone-number-input": {
+                "label": "Phone number",
+                "placeholder": "+1 (234) 567-8900",
+                "cta": "Continue"
+            }
         }
     }
 }
