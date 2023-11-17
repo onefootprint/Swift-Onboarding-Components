@@ -469,10 +469,10 @@ def identify_verify(
         if last_error:
             raise last_error
         else:
+            tried_codes = ",".join(tried_codes)
+            ts = arrow.now().isoformat()
             raise Exception(
-                f"SMS 2fac code is not present",
-                phone_number,
-                arrow.now().isoformat()
+                f"SMS 2fac code is not present to {phone_number}. Tried codes: {tried_codes}. Failed at: {ts}",
             )
 
     return try_until_success(inner, 60)
