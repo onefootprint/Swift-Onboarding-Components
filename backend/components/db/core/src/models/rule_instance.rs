@@ -143,6 +143,8 @@ impl RuleInstance {
                     rule_expression: r.rule_expression,
                     action: r.action,
                     is_shadow: false,
+                    deactivated_at: None,
+                    deactivated_seqno: None,
                 }
             })
             .collect();
