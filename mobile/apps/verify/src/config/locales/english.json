@@ -20,6 +20,11 @@
                 "placeholder": "+1 (234) 567-8900",
                 "cta": "Continue"
             }
+        },
+        "sms-challenge": {
+            "title": "Verify your phone number",
+            "subtitle": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}",
+            "resend-code": "Resend code"
         }
     }
 }
