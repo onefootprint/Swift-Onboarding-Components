@@ -21,6 +21,30 @@
                 "cta": "Continue"
             }
         },
+        "residential-address": {
+            "title": "What's your residential address?",
+            "subtitle": "We're legally required to collect this information.",
+            "address-input-1": {
+                "label": "Address line 1",
+                "placeholder": "Street and house number"
+            },
+            "address-input-2": {
+                "label": "Address line 2",
+                "placeholder": "Apartment, suite, etc."
+            },
+            "city-input": {
+                "label": "City",
+                "placeholder": "Brooklyn"
+            },
+            "zip-input": {
+                "label": "ZIP code",
+                "placeholder": "11206"
+            },
+            "state-input": {
+                "label": "State"
+            },
+            "cta": "Continue"
+        },
         "basic-information": {
             "title": "Basic data",
             "subtitle": "Spell your full legal first, middle and last names exactly as shown on your government-issued ID.",
