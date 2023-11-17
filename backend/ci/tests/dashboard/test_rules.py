@@ -142,6 +142,7 @@ def test_patch(sandbox_tenant, obc):
     ]
 
 
+@pytest.mark.skip(reason="Flakey due to SMS code :()")
 def test_get_rule_set_result(tenant, twilio, must_collect_data):
     obc = create_ob_config(tenant, "Rules yo", must_collect_data, must_collect_data)
 
