@@ -27,21 +27,6 @@ pub struct UpdateSession {
 }
 
 impl Session {
-    #[tracing::instrument("Session::check_expiration", skip_all)]
-    pub fn check_is_expired(conn: &mut PgConn, key: AuthTokenHash) -> DbResult<Option<bool>> {
-        let session = session::table
-            .filter(session::key.eq(key))
-            .first::<Session>(conn)
-            .optional()?;
-        // check session expiration every time we get session
-        if let Some(session) = &session {
-            let now = Utc::now();
-            Ok(Some(session.expires_at <= now))
-        } else {
-            Ok(None)
-        }
-    }
-
     #[tracing::instrument("Session::get", skip_all)]
     /// Return the session with the provided hash.
     /// NOTE: the returned session may be expired

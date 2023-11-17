@@ -49,15 +49,6 @@ impl AuthSession {
         Ok(session)
     }
 
-    pub async fn check_is_expired(state: &State, auth_token: &SessionAuthToken) -> ApiResult<Option<bool>> {
-        let key = auth_token.id();
-        let result = state
-            .db_pool
-            .db_query(move |conn| Session::check_is_expired(conn, key))
-            .await??;
-        Ok(result)
-    }
-
     pub async fn create(
         state: &State,
         data: AuthSessionData,

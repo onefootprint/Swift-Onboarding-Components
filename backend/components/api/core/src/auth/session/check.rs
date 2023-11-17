@@ -1,12 +1,11 @@
 use crate::auth::AuthError;
-
-use crate::{errors::ApiError, utils::session::AuthSession, State};
+use crate::{errors::ApiError, State};
 use actix_web::{web, FromRequest};
-
+use chrono::Utc;
+use db::models::session::Session;
 use futures_util::Future;
 use newtypes::{PiiString, SessionAuthToken};
 use paperclip::actix::Apiv2Security;
-
 use std::pin::Pin;
 
 #[derive(Debug, Clone, Apiv2Security)]
@@ -47,17 +46,21 @@ impl FromRequest for CheckSessionContext {
             let auth_token = auth_token.ok_or_else(|| AuthError::MissingHeader(allowed_headers.clone()))?;
             let auth_token = SessionAuthToken::from(auth_token);
 
-            let is_expired = AuthSession::check_is_expired(&state, &auth_token).await?;
-            Ok(match is_expired {
-                Some(is_expired) => {
-                    if is_expired {
-                        Self::Expired
-                    } else {
-                        Self::Active
-                    }
+            let key = auth_token.id();
+            let session = state
+                .db_pool
+                .db_query(move |conn| Session::get(conn, key))
+                .await??;
+            let result = if let Some(session) = session {
+                if session.expires_at < Utc::now() {
+                    Self::Expired
+                } else {
+                    Self::Active
                 }
-                None => Self::InvalidOrNotFound,
-            })
+            } else {
+                Self::InvalidOrNotFound
+            };
+            Ok(result)
         })
     }
 }
