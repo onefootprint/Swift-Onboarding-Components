@@ -514,3 +514,49 @@ def test_no_phone_obc(sandbox_tenant):
 
     assert res["must_collect_data"] == collect_data
     assert res["can_access_data"] == collect_data
+
+
+def test_default_rules(sandbox_tenant):
+    collect_data = ["name", "full_address", "phone_number", "email"]
+    obc = post(
+        "org/onboarding_configs",
+        dict(
+            name="test_default_rules",
+            must_collect_data=collect_data,
+            can_access_data=collect_data,
+        ),
+        *sandbox_tenant.db_auths,
+    )
+
+    rules = [
+        (r["rule_expression"], r["action"])
+        for r in get(
+            f"/org/onboarding_configs/{obc['id']}/rules",
+            None,
+            *sandbox_tenant.db_auths,
+        )
+    ]
+    expected_rules = [
+        ([{"field": "id_not_located", "op": "eq", "value": True}], "fail"),
+        ([{"field": "id_flagged", "op": "eq", "value": True}], "fail"),
+        ([{"field": "subject_deceased", "op": "eq", "value": True}], "fail"),
+        ([{"field": "address_input_is_po_box", "op": "eq", "value": True}], "fail"),
+        ([{"field": "dob_located_coppa_alert", "op": "eq", "value": True}], "fail"),
+        ([{"field": "multiple_records_found", "op": "eq", "value": True}], "fail"),
+        ([{"field": "ssn_does_not_match", "op": "eq", "value": True}], "fail"),
+        ([{"field": "ssn_partially_matches", "op": "eq", "value": True}], "fail"),
+        ([{"field": "ssn_input_is_invalid", "op": "eq", "value": True}], "fail"),
+        ([{"field": "ssn_located_is_invalid", "op": "eq", "value": True}], "fail"),
+        ([{"field": "ssn_issued_prior_to_dob", "op": "eq", "value": True}], "fail"),
+        (
+            [{"field": "watchlist_hit_ofac", "op": "eq", "value": True}],
+            "manual_review",
+        ),
+        (
+            [{"field": "watchlist_hit_non_sdn", "op": "eq", "value": True}],
+            "manual_review",
+        ),
+    ]
+    assert len(expected_rules) == len(rules) and all(
+        expected_rules.count(x) == rules.count(x) for x in expected_rules
+    )

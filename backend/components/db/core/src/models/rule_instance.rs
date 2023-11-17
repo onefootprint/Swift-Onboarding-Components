@@ -50,6 +50,12 @@ pub struct NewRuleInstance {
     pub is_shadow: bool,
 }
 
+pub struct NewRule {
+    pub rule_expression: RuleExpression,
+    pub action: RuleAction,
+    pub name: Option<String>,
+}
+
 #[derive(Debug, Clone)]
 pub struct RuleInstanceUpdate {
     pub name: Option<Option<String>>,
@@ -82,6 +88,39 @@ impl RuleInstance {
         };
 
         Self::insert(conn, new_rule)
+    }
+
+    #[tracing::instrument("RuleInstance::bulk_create", skip_all)]
+    pub fn bulk_create(
+        conn: &mut TxnPgConn,
+        ob_configuration_id: &ObConfigurationId,
+        actor: DbActor,
+        new_rules: Vec<NewRule>,
+    ) -> DbResult<Vec<Self>> {
+        let seqno = DataLifetime::get_current_seqno(conn)?;
+
+        let new_rules: Vec<_> = new_rules
+            .into_iter()
+            .map(|r| {
+                let rule_id = format!("rule_{}", Alphanumeric.sample_string(&mut rand::thread_rng(), 22));
+                NewRuleInstance {
+                    created_at: Utc::now(), //actually nicer to let each rule have a slightly different created_at so we get consistent ordering when we order by created_at. that being said..  not sure what granularity this clock will have and if subsequent rules here will even have a different created_at :thinkies:
+                    created_seqno: seqno,
+                    rule_id: rule_id.into(),
+                    ob_configuration_id: ob_configuration_id.clone(),
+                    actor: actor.clone(),
+                    name: r.name,
+                    rule_expression: r.rule_expression,
+                    action: r.action,
+                    is_shadow: false,
+                }
+            })
+            .collect();
+
+        let res = diesel::insert_into(rule_instance::table)
+            .values(new_rules)
+            .get_results::<Self>(conn.conn())?;
+        Ok(res)
     }
 
     #[tracing::instrument("RuleInstance::insert", skip_all)]

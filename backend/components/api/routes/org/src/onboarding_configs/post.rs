@@ -6,6 +6,7 @@ use crate::errors::ApiResult;
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::decision::rule_engine;
 use api_core::errors::AssertionError;
 use db::models::ob_configuration::ObConfiguration;
 use feature_flag::BoolFlag;
@@ -462,11 +463,12 @@ pub async fn post(
         .unwrap_or(EnhancedAmlOption::No);
 
     let actor = auth.actor().into();
+    let ff_client = state.feature_flag_client.clone();
     let obc = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> ApiResult<_> {
             let skip_kyb = false;
-            let obc = ObConfiguration::create(
+            let obc: ObConfiguration = ObConfiguration::create(
                 conn,
                 name,
                 tenant_id,
@@ -490,10 +492,16 @@ pub async fn post(
                 skip_kyb,
                 skip_confirm.unwrap_or(false),
             )?;
+
+            match rule_engine::default_rules::save_default_rules_for_obc(conn, &obc, ff_client) {
+                Ok(_) => {}
+                Err(err) => tracing::error!(?err, "Error saving default rules for Playbook"),
+            }
+
             let obc = db::actor::saturate_actor_nullable(conn, obc)?;
             Ok(obc)
         })
-        .await??;
+        .await?;
 
     Ok(Json(ResponseData::ok(
         api_wire_types::OnboardingConfiguration::from_db(obc),

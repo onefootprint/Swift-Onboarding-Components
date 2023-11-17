@@ -1,9 +1,16 @@
 use std::sync::Arc;
 
-use db::models::ob_configuration::ObConfiguration;
+use crate::errors::ApiResult;
+use db::{
+    models::{
+        ob_configuration::ObConfiguration,
+        rule_instance::{NewRule, RuleInstance},
+    },
+    TxnPgConn,
+};
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use newtypes::{
-    BooleanOperator, CipKind, CollectedDataOption as CDO, DataIdentifierDiscriminant as DID,
+    BooleanOperator, CipKind, CollectedDataOption as CDO, DataIdentifierDiscriminant as DID, DbActor,
     EnhancedAmlOption, FootprintReasonCode as FRC, RuleAction as RA, RuleAction, RuleExpression,
     RuleExpressionCondition,
 };
@@ -194,6 +201,38 @@ pub fn default_rules_for_obc(
     }
 
     rules
+}
+
+#[tracing::instrument(skip_all)]
+pub fn save_default_rules_for_obc(
+    conn: &mut TxnPgConn,
+    obc: &ObConfiguration,
+    ff_client: Arc<dyn FeatureFlagClient>,
+) -> ApiResult<()> {
+    let existing_rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id)?;
+    if !existing_rules.is_empty() {
+        tracing::warn!(
+            ?obc,
+            "save_default_rules_for_obc, skipping because there are existing rules"
+        );
+        return Ok(());
+    }
+
+    let rules = default_rules_for_obc(obc, ff_client);
+    let _ = RuleInstance::bulk_create(
+        conn,
+        &obc.id,
+        DbActor::Footprint,
+        rules
+            .into_iter()
+            .map(|(e, a)| NewRule {
+                rule_expression: e,
+                action: a,
+                name: None,
+            })
+            .collect(),
+    )?;
+    Ok(())
 }
 
 fn if_risk_signal(frc: FRC) -> RuleExpression {
