@@ -131,6 +131,10 @@ impl Validate for DataIdentifier {
         args: ValidateArgs,
         all_data: &AllData,
     ) -> NtResult<Vec<(DataIdentifier, PiiString)>> {
+        if value.is_string() && self.expected_json_format() {
+            // TODO make this return a hard validation error at some point
+            tracing::error!(di=%self, "Tried to vault data in incorrect format");
+        }
         match self {
             Self::Id(s) => s.validate(value, args, all_data),
             Self::Custom(s) => s.validate(value, args, all_data),
@@ -326,6 +330,20 @@ impl DataIdentifier {
             | DataIdentifier::Custom(_)
             | DataIdentifier::Card(_) => StorageType::VaultData,
         }
+    }
+
+    /// Returns true if the DI is expected to be stored in JSON
+    pub fn expected_json_format(&self) -> bool {
+        matches!(
+            self,
+            DataIdentifier::Id(IdentityDataKind::Citizenships)
+                | DataIdentifier::Business(BusinessDataKind::BeneficialOwners)
+                | DataIdentifier::Business(BusinessDataKind::KycedBeneficialOwners)
+                | DataIdentifier::InvestorProfile(InvestorProfileKind::InvestmentGoals)
+                | DataIdentifier::InvestorProfile(InvestorProfileKind::Declarations)
+                | DataIdentifier::InvestorProfile(InvestorProfileKind::SeniorExecutiveSymbols)
+                | DataIdentifier::InvestorProfile(InvestorProfileKind::FamilyMemberNames)
+        )
     }
 }
 
