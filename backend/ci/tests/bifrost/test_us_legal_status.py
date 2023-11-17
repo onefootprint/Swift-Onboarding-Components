@@ -67,14 +67,14 @@ def test_us_legal_status(legal_status_obc, twilio, data):
         {
             "id.us_legal_status": "visa",
             "id.nationality": "NO",
-            "id.citizenships": '["NO", "IT"]',
+            "id.citizenships": ["NO", "IT"],
             "id.visa_kind": "h1b",
             # No visa expiration date
         },
         {
             "id.us_legal_status": "visa",
             "id.nationality": "NO",
-            "id.citizenships": '["NO", "IT"]',
+            "id.citizenships": ["NO", "IT"],
             # No visa kind
             "id.visa_expiration_date": "2050-12-25",
         },
