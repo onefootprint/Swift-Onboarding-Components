@@ -2,16 +2,18 @@ use crate::{ProtectedAuth, State};
 use actix_web::{post, web, web::Json};
 use api_core::{
     auth::session::AuthSessionData,
+    errors::ValidationError,
     types::{JsonApiResponse, ResponseData},
     ApiErrorKind,
 };
 use chrono::{DateTime, Utc};
 use db::models::session::Session;
-use newtypes::{SealedSessionBytes, SessionAuthToken};
+use newtypes::{AuthTokenHash, SealedSessionBytes, SessionAuthToken};
 
 #[derive(Debug, serde::Deserialize)]
 pub struct RevealRequest {
-    token: SessionAuthToken,
+    token: Option<SessionAuthToken>,
+    hash: Option<AuthTokenHash>,
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -34,9 +36,13 @@ pub async fn post(
     request: Json<RevealRequest>,
     _: ProtectedAuth,
 ) -> JsonApiResponse<RevealResponse> {
-    let RevealRequest { token } = request.into_inner();
+    let RevealRequest { token, hash } = request.into_inner();
 
-    let token_hash = token.id();
+    let token_hash = match (token, hash) {
+        (Some(token), None) => token.id(),
+        (None, Some(hash)) => hash,
+        _ => return Err(ValidationError("Must provide only one of token or hash").into()),
+    };
     let session = state
         .db_pool
         .db_query(move |conn| Session::get(conn, token_hash))
