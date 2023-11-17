@@ -78,6 +78,7 @@ pub async fn get(
         kind,
         only_visible: !show_all.unwrap_or_default(),
         is_created_via_api,
+        playbook_id: None,
     };
     let (scoped_vaults, mut entities, vws, count) = state
         .db_pool

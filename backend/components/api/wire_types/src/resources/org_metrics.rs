@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use newtypes::ObConfigurationId;
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
@@ -19,4 +20,5 @@ pub struct OrgMetrics {
 pub struct OrgMetricsRequest {
     pub timestamp_gte: Option<DateTime<Utc>>,
     pub timestamp_lte: Option<DateTime<Utc>>,
+    pub playbook_id: Option<ObConfigurationId>,
 }

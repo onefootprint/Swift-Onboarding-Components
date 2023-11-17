@@ -28,6 +28,7 @@ async fn get(
     let OrgMetricsRequest {
         timestamp_gte,
         timestamp_lte,
+        playbook_id,
     } = filters.into_inner();
 
     let search_params = move |statuses: Vec<OnboardingStatusFilter>| -> ScopedVaultListQueryParams {
@@ -46,6 +47,7 @@ async fn get(
             only_visible: true,
             is_created_via_api: None,
             statuses,
+            playbook_id: playbook_id.clone(),
         }
     };
 
