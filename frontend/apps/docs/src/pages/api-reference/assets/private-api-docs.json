@@ -7023,10 +7023,10 @@
                     "action": {
                         "type": "string",
                         "enum": [
-                            "PassWithManualReview",
-                            "ManualReview",
-                            "StepUp",
-                            "Fail"
+                            "pass_with_manual_review",
+                            "manual_review",
+                            "step_up",
+                            "fail"
                         ]
                     },
                     "name": {
@@ -18155,10 +18155,10 @@
                     "action": {
                         "type": "string",
                         "enum": [
-                            "PassWithManualReview",
-                            "ManualReview",
-                            "StepUp",
-                            "Fail"
+                            "pass_with_manual_review",
+                            "manual_review",
+                            "step_up",
+                            "fail"
                         ]
                     },
                     "created_at": {
@@ -18195,10 +18195,10 @@
                     "action_triggered": {
                         "type": "string",
                         "enum": [
-                            "PassWithManualReview",
-                            "ManualReview",
-                            "StepUp",
-                            "Fail"
+                            "pass_with_manual_review",
+                            "manual_review",
+                            "step_up",
+                            "fail"
                         ]
                     },
                     "created_at": {
@@ -18222,10 +18222,10 @@
                                         "action": {
                                             "type": "string",
                                             "enum": [
-                                                "PassWithManualReview",
-                                                "ManualReview",
-                                                "StepUp",
-                                                "Fail"
+                                                "pass_with_manual_review",
+                                                "manual_review",
+                                                "step_up",
+                                                "fail"
                                             ]
                                         },
                                         "created_at": {
