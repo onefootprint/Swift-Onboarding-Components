@@ -105,13 +105,14 @@ const Content = ({ children, isSandbox, config }: ContentProps) => {
   );
 };
 
-const BodyContent = styled.span`
+const BodyContent = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
     box-sizing: content-box;
     padding: ${theme.spacing[5]};
     height: 100%;
+    overflow-x: hidden;
     overflow-y: auto;
 
     ${media.greaterThan('md')`
