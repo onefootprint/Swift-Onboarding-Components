@@ -1,6 +1,5 @@
 import pytest
 from tests.bifrost_client import BifrostClient
-from tests.constants import LIVE_PHONE_NUMBER, EMAIL
 from tests.utils import create_ob_config, get, post, patch, delete, clean_up_user
 
 
@@ -146,7 +145,7 @@ def test_patch(sandbox_tenant, obc):
     ]
 
 
-def test_get_rule_set_result(tenant, twilio, must_collect_data):
+def test_get_rule_set_result(tenant, twilio, must_collect_data, live_phone_number):
     obc = create_ob_config(tenant, "Rules yo", must_collect_data, must_collect_data)
 
     rule1 = post(
@@ -170,15 +169,7 @@ def test_get_rule_set_result(tenant, twilio, must_collect_data):
         *tenant.db_auths,
     )
 
-    # Cleanup the non-sandbox user that is used across all integration test runs
-    clean_up_user(LIVE_PHONE_NUMBER, EMAIL)
-
-    bifrost = BifrostClient.create(
-        obc,
-        twilio,
-        LIVE_PHONE_NUMBER,
-        None,
-    )
+    bifrost = BifrostClient.create(obc, twilio, live_phone_number, None)
     user = bifrost.run()
 
     rule_set_result = get(

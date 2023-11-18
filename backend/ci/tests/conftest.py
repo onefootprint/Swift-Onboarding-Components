@@ -8,6 +8,7 @@ from tests.constants import (
     TENANT_ID2,
     TENANT_ID1,
     LIVE_PHONE_NUMBER,
+    EMAIL,
 )
 from tests.utils import (
     EXPECTED_SERVER_VERSION_GIT_HASH,
@@ -17,6 +18,7 @@ from tests.utils import (
     create_ob_config,
     _gen_random_sandbox_id,
     patch,
+    clean_up_user,
 )
 
 
@@ -185,7 +187,7 @@ def sandbox_user(sandbox_tenant, twilio):
     ]
 
     # Assert we can't replace the verified email
-    data = {"id.phone_number": LIVE_PHONE_NUMBER}
+    data = {"id.phone_number": "+15555555555"}
     body = patch(
         f"entities/{user.fp_id}/vault", data, sandbox_tenant.sk.key, status_code=400
     )
@@ -198,7 +200,11 @@ def sandbox_user(sandbox_tenant, twilio):
 
 
 @pytest.fixture(scope="module")
-def sandbox_user_real_phone(sandbox_tenant, twilio):
+def sandbox_user_real_phone(
+    sandbox_tenant,
+    twilio,
+    live_phone_number,
+):
     """
     Create a user with registered data and webuathn creds and onboard them onto the sandbox_tenant.
     """
@@ -206,6 +212,19 @@ def sandbox_user_real_phone(sandbox_tenant, twilio):
 
     sandbox_id = _gen_random_sandbox_id()
     bifrost = BifrostClient.create(
-        sandbox_tenant.default_ob_config, twilio, LIVE_PHONE_NUMBER, sandbox_id
+        sandbox_tenant.default_ob_config, twilio, live_phone_number, sandbox_id
     )
     return bifrost.run()
+
+
+@pytest.fixture(scope="module")
+def live_phone_number():
+    """
+    A fixture that returns the live phone number. It will also automagically clean up the phone
+    number in each test file before giving it to you.
+    You should use this instead of importing LIVE_PHONE_NUMBER manually since this will clean
+    up the user for you.
+    """
+    # Cleanup the non-sandbox user that is used across all integration test runs
+    clean_up_user(LIVE_PHONE_NUMBER, EMAIL)
+    return LIVE_PHONE_NUMBER

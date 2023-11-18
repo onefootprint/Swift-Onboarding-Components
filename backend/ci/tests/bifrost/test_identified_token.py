@@ -10,7 +10,7 @@ from tests.utils import (
 )
 from tests.bifrost_client import BifrostClient
 from tests.headers import FpAuth, SandboxId
-from tests.constants import FIXTURE_PHONE_NUMBER, LIVE_PHONE_NUMBER, EMAIL, ENVIRONMENT
+from tests.constants import FIXTURE_PHONE_NUMBER, EMAIL, ENVIRONMENT
 
 
 @pytest.fixture(scope="session")
@@ -211,23 +211,22 @@ def test_provide_publishable_key_on_client(twilio, sandbox_tenant, ob_config):
     bifrost.run()
 
 
-def test_portablize_api_vault(twilio, sandbox_tenant, foo_sandbox_tenant, ob_config):
+def test_portablize_api_vault(
+    twilio, sandbox_tenant, foo_sandbox_tenant, ob_config, live_phone_number
+):
     """
-    Using the LIVE_PHONE_NUMBER that we can send SMS to, test that we can portablize data on a vault
+    Using the live_phone_number that we can send SMS to, test that we can portablize data on a vault
     initially created via API. We test this by one-click authing onto the user via another tenant
     """
-    # Cleanup the non-sandbox user that is used across all integration test runs
-    clean_up_user(LIVE_PHONE_NUMBER, EMAIL)
-
     data = {
-        "id.phone_number": LIVE_PHONE_NUMBER,
+        "id.phone_number": live_phone_number,
     }
     body = post("users", data, sandbox_tenant.sk.key)
     fp_id = body["id"]
     sandbox_id = body["sandbox_id"]
 
     # Test that the user isn't visible to be identified via phone number
-    identify_data = dict(identifier=dict(phone_number=LIVE_PHONE_NUMBER))
+    identify_data = dict(identifier=dict(phone_number=live_phone_number))
     sandbox_id_h = SandboxId(sandbox_id)
     body = post("hosted/identify", identify_data, sandbox_id_h)
     assert not body["user_found"]
@@ -236,20 +235,20 @@ def test_portablize_api_vault(twilio, sandbox_tenant, foo_sandbox_tenant, ob_con
     body = post(f"entities/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
-    auth_token = step_up_user(twilio, auth_token, LIVE_PHONE_NUMBER, True)
+    auth_token = step_up_user(twilio, auth_token, live_phone_number, True)
 
     # re-run Bifrost with the token from the link we sent to user
     bifrost = BifrostClient.raw_auth(
         ob_config,
         auth_token,
-        LIVE_PHONE_NUMBER,
+        live_phone_number,
         sandbox_id,
     )
     user = bifrost.run()
     assert user.fp_id == fp_id
 
     # And now check that the user can be identified by phone number
-    # Have to use LIVE_PHONE_NUMBER for this
+    # Have to use live_phone_number for this
     body = post("hosted/identify", identify_data, sandbox_id_h)
     assert body["user_found"]
     assert not body["is_unverified"]
@@ -259,7 +258,7 @@ def test_portablize_api_vault(twilio, sandbox_tenant, foo_sandbox_tenant, ob_con
     bifrost = BifrostClient.inherit(
         foo_sandbox_tenant.default_ob_config,
         twilio,
-        LIVE_PHONE_NUMBER,
+        live_phone_number,
         sandbox_id,
     )
     foo_user = bifrost.run()
@@ -277,7 +276,7 @@ def test_portablize_api_vault(twilio, sandbox_tenant, foo_sandbox_tenant, ob_con
         (sandbox_tenant, user.fp_id),
         (foo_sandbox_tenant, foo_user.fp_id),
     ]:
-        body = get("/entities", dict(search=LIVE_PHONE_NUMBER), *t.db_auths)
+        body = get("/entities", dict(search=live_phone_number), *t.db_auths)
         assert any(i["id"] == fp_id for i in body["data"])
 
 
