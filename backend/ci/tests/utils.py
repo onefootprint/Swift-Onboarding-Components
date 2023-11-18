@@ -438,11 +438,15 @@ def identify_verify(
         return result
 
     def inner():
-        messages = twilio.messages.list(to=phone_number, limit=25)
+        print(
+            f"At {arrow.now().isoformat()}, looking for 2fac code sent to {phone_number}"
+        )
+        messages = twilio.messages.list(to=phone_number, limit=10)
         first_error = None
         for message in messages:
             code = re.search("\\d{6}", message.body).group(0)
             if not code:
+                print("No code in message", message.body)
                 # No code in this message, move on
                 continue
 
