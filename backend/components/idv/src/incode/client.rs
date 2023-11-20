@@ -387,6 +387,22 @@ impl AuthenticatedIncodeClientAdapter {
         Ok(response)
     }
 
+    pub async fn mark_session_complete(
+        &self,
+        footprint_http_client: &FootprintVendorHttpClient,
+    ) -> Result<reqwest::Response, IncodeError> {
+        let url = self.client_adapter.api_url("omni/finish-status")?;
+        let response = footprint_http_client
+            .client
+            .get(url)
+            .headers(self.client_adapter.default_headers.clone())
+            .send()
+            .await
+            .map_err(|err| IncodeError::SendError(err.to_string()))?;
+
+        Ok(response)
+    }
+
     fn session_results_are_not_ready(error: &IncodeError) -> bool {
         matches!(error, IncodeError::ResultsNotReady)
     }

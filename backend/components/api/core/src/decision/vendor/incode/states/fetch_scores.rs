@@ -19,14 +19,19 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::verification_result::VerificationResult;
 use db::{DbPool, TxnPgConn};
 use feature_flag::BoolFlag;
+use http::StatusCode;
+use idv::footprint_http_client::FootprintVendorHttpClient;
+use idv::incode::client::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter};
 use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse};
 use idv::incode::doc::{IncodeFetchOCRRequest, IncodeFetchScoresRequest};
 use idv::{ParsedResponse, VendorResponse};
+use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
     DataIdentifier, DecisionIntentKind, DocumentKind, DocumentSide, IdDocKind, IdentityDocumentId,
     PiiJsonValue, ScopedVaultId, VendorAPI, VerificationResultId, WorkflowId,
 };
 use selfie_doc::{compare::CompareFacesResponse, AwsSelfieDocClient};
+use tracing::Instrument;
 
 pub struct FetchScores {
     ocr_response: FetchOCRResponse,
@@ -129,6 +134,22 @@ impl IncodeStateTransition for FetchScores {
                 Err(e) => tracing::warn!(err=?e, "error running aws rekognition"),
             }
         }
+
+        let creds = session.credentials.clone();
+        let sv_id2 = ctx.sv_id.clone();
+        tokio::spawn(async move {
+            let resp = mark_status_as_complete(creds).await;
+            let log_msg = "error marking incode status as complete";
+
+            match resp {
+                Ok(r) => {
+                    if r.status() != StatusCode::OK {
+                        tracing::warn!(status_code = r.status().to_string(), scoped_vault_id=%sv_id2, log_msg)
+                    }
+                }
+                Err(err) => tracing::warn!(err=?err, scoped_vault_id=%sv_id2, log_msg),
+            }
+        }.in_current_span());
 
         Ok(Some(Self {
             score_response,
@@ -267,4 +288,19 @@ async fn run_aws_inner(
         .await??;
 
     Ok(result.map(|r| (r, vres)))
+}
+
+async fn mark_status_as_complete(credentials: IncodeCredentialsWithToken) -> ApiResult<reqwest::Response> {
+    let http_client = FootprintVendorHttpClient::new()?;
+    let client = IncodeClientAdapter::new(credentials.credentials).map_err(map_to_api_err)?;
+    let authenticated_client =
+        AuthenticatedIncodeClientAdapter::new(client, credentials.authentication_token)
+            .map_err(map_to_api_err)?;
+
+    let res = authenticated_client
+        .mark_session_complete(&http_client)
+        .await
+        .map_err(map_to_api_err)?;
+
+    Ok(res)
 }
