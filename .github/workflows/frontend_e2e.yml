@@ -38,7 +38,7 @@ jobs:
         os: [ubuntu-latest]
     name: 'End-to-End test'
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

@@ -4,13 +4,13 @@ import {
   clickOnContinue,
   clickOnVerifyWithSms,
   confirmData,
-  continueOnDesktop,
-  doLivenessCheck,
+  doTransferFromMobile,
   fillAddress,
   fillEmail,
   fillNameAndDoB,
   fillPhoneNumber,
   selectOutcomeOptional,
+  skipTransferOnDesktop,
   verifyPhoneNumber,
   waitForVerifyButton,
 } from './utils/commands';
@@ -31,9 +31,7 @@ test('E2E.es-MX.KYC.Docs #ci', async ({
   page,
 }) => {
   // eslint-disable-next-line playwright/no-conditional-in-test
-  if (isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
   test.setTimeout(120000);
-  const context = await browser.newContext();
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   const key = 'ob_test_yHlPBcaJ6lnxwkkD1YLStx';
   const locale = 'es-MX';
@@ -95,13 +93,20 @@ test('E2E.es-MX.KYC.Docs #ci', async ({
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  await doLivenessCheck({ page, frame, browser }, { flowId });
-  await page.waitForLoadState();
-
-  await continueOnDesktop({ frame });
-  await page.waitForLoadState();
-
-  await expect(frame.getByRole('button', { name: 'Mexico' })).toBeVisible();
-
-  await context.close();
+  if (isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
+    const newPage = await doTransferFromMobile({
+      frame,
+      browser,
+    });
+    await newPage.waitForLoadState();
+    // TODO (Bruno): locale options need to get sent to the handoff app
+    await expect(
+      newPage.getByRole('button', { name: 'United States of America' }),
+    ).toBeVisible();
+    await newPage.close();
+  } else {
+    await skipTransferOnDesktop({ frame });
+    await page.waitForLoadState();
+    await expect(frame.getByRole('button', { name: 'Mexico' })).toBeVisible();
+  }
 });

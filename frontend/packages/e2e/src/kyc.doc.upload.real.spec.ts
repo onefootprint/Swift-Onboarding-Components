@@ -4,8 +4,7 @@ import {
   clickOnContinue,
   waitForVerifyButton,
   confirmData,
-  continueOnAgree,
-  continueOnDesktop,
+  clickOnAgree,
   fillAddress,
   fillEmail,
   fillNameAndDoB,
@@ -14,6 +13,7 @@ import {
   uploadImage,
   verifyPhoneNumber,
   clickOnVerifyWithSms,
+  doTransferFromDesktop,
 } from './utils/commands';
 
 const firstName = 'Jane';
@@ -100,10 +100,11 @@ test('E2E.KYC.DriverDocOnly.Real #real', async ({
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  await continueOnDesktop({ frame });
-  await page.waitForLoadState();
-
-  await continueOnDesktop({ frame });
+  await doTransferFromDesktop({
+    page,
+    frame,
+    browser,
+  });
   await page.waitForLoadState();
 
   await clickOnContinue({ frame });
@@ -114,7 +115,7 @@ test('E2E.KYC.DriverDocOnly.Real #real', async ({
     .first()
     .scrollIntoViewIfNeeded();
 
-  await continueOnAgree({ frame });
+  await clickOnAgree({ frame });
   await page.waitForLoadState();
 
   //# region Front side blurred

@@ -126,7 +126,6 @@ const shouldShowProcess = (context: MachineContext) => {
 const shouldRunTransfer = (context: MachineContext): boolean => {
   const {
     onboardingContext: {
-      device: { type },
       isTransfer,
       config: { isNoPhoneFlow },
     },
@@ -137,10 +136,6 @@ const shouldRunTransfer = (context: MachineContext): boolean => {
   if (isTransferOnDesktopDisabled) return false;
   if (didRunTransfer || isNoPhoneFlow) return false;
   if (isTransfer) return false;
-
-  if (type === 'mobile') {
-    return false; // TODO: this used to do transfer for liveness req, revive when flexcar browser issue is fixed
-  }
 
   const firstKind = requirements[0]?.kind;
   const nextRequirementIsLiveness = isLivenessKind(firstKind);

@@ -2,8 +2,6 @@ import type { Browser, FrameLocator, Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 import path from 'path';
 
-import readQrCode from './qr-code';
-
 type WithFrame = { frame: FrameLocator | Page };
 type WithPage = { page: Page };
 type PageNFrame = WithFrame & WithPage;
@@ -28,10 +26,9 @@ export const clickOn = async (
 export const clickOnContinue = clickOn.bind(null, /continue/i);
 export const clickOnVerifyWithSms = clickOn.bind(null, /verify with sms/i);
 export const clickOnSave = clickOn.bind(null, /save/i);
-export const continueOnAgree = clickOn.bind(null, /agree/i);
-export const continueOnDesktop = clickOn.bind(null, /continue on desktop/i);
-export const continueOnTakePhoto = clickOn.bind(null, /take photo/i);
-export const continueOnConfirm = clickOn.bind(null, /confirm/i);
+export const clickOnAgree = clickOn.bind(null, /agree/i);
+export const clickOnTakePhoto = clickOn.bind(null, /take photo/i);
+export const clickOnConfirm = clickOn.bind(null, /confirm/i);
 
 export const selectOutcomeOptional = async (
   { frame }: WithFrame,
@@ -280,59 +277,117 @@ export const confirmData = async (
   }
 };
 
-export const doLivenessCheck = async (
-  {
-    frame,
-    page,
-    browser,
-  }: { frame: FrameLocator; page: Page; browser: Browser },
-  { flowId }: { flowId: string },
-) => {
+export const doTransferFromDesktop = async ({
+  frame,
+  page,
+  browser,
+}: {
+  frame: FrameLocator | Page;
+  page: Page;
+  browser: Browser;
+}) => {
+  const requestPromise = page.waitForRequest('**/d2p/sms');
   const header = frame.getByText(/liveness check/i).first();
-  const hasHeader = await header
+  await header
     .waitFor({ state: 'attached', timeout: 10000 })
     .then(() => true)
     .catch(() => false);
 
-  if (!hasHeader) return;
-
   // eslint-disable-next-line playwright/no-wait-for-timeout
   await page.waitForTimeout(4000); // We need to give a moment for the QR code to be generated
 
-  await frame
-    .locator('p + svg')
-    .first()
-    .screenshot({ path: `./src/media/qr-${flowId}.png` });
+  const request = await requestPromise;
+  const handoffUrl = request.postDataJSON().url;
+  expect(handoffUrl).toBeDefined();
 
-  const screenshotPath = path.join(__dirname, `../media/qr-${flowId}.png`);
-  const qrCodeUrl = await readQrCode(screenshotPath).catch(
-    () => 'Error reading QR code',
-  );
-
-  if (qrCodeUrl === 'Error reading QR code' || !qrCodeUrl.includes('http')) {
-    console.warn('Error reading QR code');
-    return frame
-      .getByRole('button')
-      .filter({ hasText: /Continue on desktop/i })
-      .click();
-  }
-
-  const popup = await browser.newPage();
-  await popup.goto(qrCodeUrl);
+  const popup = await browser.newPage({ baseURL: handoffUrl });
+  await popup.goto(handoffUrl);
   await popup.waitForLoadState();
-
-  const testOutcomeH2 = popup.getByText('Test outcomes').first();
-  await testOutcomeH2
-    .waitFor({ state: 'attached', timeout: 3000 })
-    .catch(() => false);
-
-  await selectOutcomeOptional({ frame: popup }, 'Success');
-  await clickOnContinue({ frame: popup });
 
   const popupHeader = popup
     .getByText('Please continue on your computer.')
     .first();
   await popupHeader
-    .waitFor({ state: 'attached', timeout: 1000 })
+    .waitFor({ state: 'attached', timeout: 5000 })
     .catch(() => false); // Increasing the waiting time for CI
+};
+
+export const doTransferFromSocialMediaBrowser = async ({
+  frame,
+  page,
+  browser,
+}: {
+  frame: FrameLocator;
+  page: Page;
+  browser: Browser;
+}) => {
+  const requestPromise = page.waitForRequest('**/d2p/sms');
+  const header = frame.getByText(/check your messages/i).first();
+  await header
+    .waitFor({ state: 'attached', timeout: 10000 })
+    .then(() => true)
+    .catch(() => false);
+
+  const request = await requestPromise;
+  const handoffUrl = request.postDataJSON().url;
+  expect(handoffUrl).toBeDefined();
+
+  const handoffPage = await browser.newPage();
+  await handoffPage.goto(handoffUrl);
+  await handoffPage.waitForLoadState();
+
+  const handoffHeader = handoffPage.getByText(/liveness check/i).first();
+  await handoffHeader
+    .waitFor({ state: 'attached', timeout: 10000 })
+    .then(() => true)
+    .catch(() => false);
+  await clickOn(/launch verification/i, { frame: handoffPage });
+  await clickOn(/do it later/i, { frame: handoffPage });
+
+  return handoffPage;
+};
+
+export const doTransferFromMobile = async ({
+  frame,
+  browser,
+}: {
+  frame: FrameLocator | Page;
+  browser: Browser;
+}) => {
+  const context = browser.contexts()[0];
+  const pagePromise = context.waitForEvent('page');
+  const button = frame
+    .getByRole('button', {
+      name: 'Open new browser tab',
+      disabled: false,
+      exact: true,
+    })
+    .first();
+  await button
+    .waitFor({ state: 'attached', timeout: 10000 })
+    .then(() => button.click())
+    .then(() => true)
+    .catch(() => false);
+
+  const newPage = await pagePromise;
+  await newPage.waitForLoadState();
+
+  const header = newPage.getByText(/liveness check/i).first();
+  await header
+    .waitFor({ state: 'attached', timeout: 10000 })
+    .then(() => true)
+    .catch(() => false);
+  await clickOn(/launch verification/i, { frame: newPage });
+  await clickOn(/do it later/i, { frame: newPage });
+
+  return newPage;
+};
+
+export const skipTransferOnDesktop = async ({
+  frame,
+}: {
+  frame: FrameLocator;
+}) => {
+  await clickOn(/continue on desktop/i, { frame });
+  await clickOn(/continue on desktop/i, { frame });
 };

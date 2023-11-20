@@ -12,9 +12,10 @@ import {
   fillPhoneNumber,
   selectOutcomeOptional,
   verifyPhoneNumber,
-  doLivenessCheck,
   waitForVerifyButton,
   clickOnVerifyWithSms,
+  doTransferFromDesktop,
+  doTransferFromMobile,
 } from './utils/commands';
 
 const firstName = 'Jane';
@@ -37,7 +38,6 @@ const businessNameOptional = 'Optional name';
 
 test('E2E.KYB.flow #ci', async ({ browser, browserName, page, isMobile }) => {
   test.setTimeout(120000);
-  const context = await browser.newContext();
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   const key = 'ob_test_5zu2usM1ilTzDnqQpaZ6Sg';
 
@@ -149,12 +149,21 @@ test('E2E.KYB.flow #ci', async ({ browser, browserName, page, isMobile }) => {
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  if (!isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
-    await doLivenessCheck({ page, frame, browser }, { flowId });
+  if (isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
+    const newPage = await doTransferFromMobile({
+      frame,
+      browser,
+    });
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    await newPage.waitForTimeout(5000); // takes 3 seconds for the new tab to close
+  } else {
+    await doTransferFromDesktop({
+      page,
+      frame,
+      browser,
+    });
     await page.waitForLoadState();
   }
 
-  await context.close();
-
-  return expect(page.getByTestId('result').first()).toContainText('_');
+  await expect(page.getByTestId('result').first()).toContainText('_');
 });

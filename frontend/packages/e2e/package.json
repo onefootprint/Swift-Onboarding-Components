@@ -19,9 +19,7 @@
   "license": "ISC",
   "dependencies": {
     "@playwright/test": "^1.38.1",
-    "dotenv": "^16.3.1",
-    "jimp": "^0.22.8",
-    "qrcode-reader": "^1.0.4"
+    "dotenv": "^16.3.1"
   },
   "devDependencies": {
     "@types/node": "^20.4.4",

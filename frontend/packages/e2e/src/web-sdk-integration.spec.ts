@@ -2,10 +2,11 @@ import { expect, test } from '@playwright/test';
 
 import {
   clickOnContinue,
-  doLivenessCheck,
   selectOutcomeOptional,
   verifyPhoneNumber,
   confirmData,
+  doTransferFromDesktop,
+  doTransferFromMobile,
 } from './utils/commands';
 
 const email = 'piip@onefootprint.com';
@@ -47,8 +48,8 @@ for (const { version, baseUrl } of Sdks) {
     browser,
     isMobile,
   }) => {
+    // eslint-disable-next-line playwright/no-conditional-in-test
     test.setTimeout(120000);
-    const context = await browser.newContext();
     const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 
     await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
@@ -111,13 +112,22 @@ for (const { version, baseUrl } of Sdks) {
     await clickOnContinue({ frame });
     await page.waitForLoadState();
 
-    if (!isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
-      await doLivenessCheck({ page, frame, browser }, { flowId });
+    if (isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
+      const newPage = await doTransferFromMobile({
+        frame,
+        browser,
+      });
+      // eslint-disable-next-line playwright/no-wait-for-timeout
+      await newPage.waitForTimeout(5000); // takes 3 seconds for the new tab to close
+    } else {
+      await doTransferFromDesktop({
+        page,
+        frame,
+        browser,
+      });
       await page.waitForLoadState();
     }
 
-    await context.close();
-
-    return expect(frame.getByTestId('result').innerText).toBeDefined();
+    await expect(frame.getByTestId('result').innerText).toBeDefined();
   });
 }

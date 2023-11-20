@@ -5,7 +5,6 @@ import {
   selectOutcomeOptional,
   verifyPhoneNumber,
   confirmData,
-  doLivenessCheck,
   waitForVerifyButton,
 } from './utils/commands';
 
@@ -22,7 +21,7 @@ const zipCode = '94105';
 const country = 'US';
 const ssn9 = '123412345';
 
-test('E2E.Bootstrap #ci', async ({ browserName, page, browser, isMobile }) => {
+test('E2E.Bootstrap #ci', async ({ browserName, page, browser }) => {
   test.setTimeout(120000);
   const context = await browser.newContext();
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
@@ -87,11 +86,6 @@ test('E2E.Bootstrap #ci', async ({ browserName, page, browser, isMobile }) => {
 
   await clickOnContinue({ frame });
   await page.waitForLoadState();
-
-  if (!isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
-    await doLivenessCheck({ page, frame, browser }, { flowId });
-    await page.waitForLoadState();
-  }
 
   await context.close();
   return expect(1).toBe(1);

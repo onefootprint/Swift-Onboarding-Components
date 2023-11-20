@@ -19,9 +19,3 @@ export const shouldOpenNewTab = (context: MachineContext) =>
   !context.isSocialMediaBrowser &&
   !!context.missingRequirements.liveness &&
   context.device.hasSupportForWebauthn;
-
-// If the user doesn't send an SMS, they can continue with the flow,
-// and liveness will automatically be skipped
-export const canSkipSms = (context: MachineContext) =>
-  !!context.missingRequirements.liveness &&
-  !context.device.hasSupportForWebauthn;
