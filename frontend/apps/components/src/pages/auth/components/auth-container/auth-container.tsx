@@ -17,7 +17,7 @@ import React, { useMemo, useRef, useState } from 'react';
 
 import { useFootprintProvider } from '../../../../components/footprint-provider';
 import useProps from '../../../../components/footprint-provider/hooks/use-props';
-import { useGetOnboardingConfig, useOnboardingValidate } from '../../hooks';
+import { useOnboardingValidate } from '../../hooks';
 import { AuthMachineProvider } from '../../state';
 import type {
   DoneArgs,
@@ -53,13 +53,8 @@ const AuthContainer = ({
   variant: paramVariant,
   fallback,
 }: ContentServerProps): JSX.Element | null => {
-  const [props, setProps] = useState<FootprintAuthDataProps>();
-  useProps<FootprintAuthDataProps>(setProps);
-
-  const { options = voidObj, publicKey, userData, variant } = props || voidObj;
-  const footprintProvider = useFootprintProvider();
-
   const isDoneRef = useRef(false);
+  const [props, setProps] = useState<FootprintAuthDataProps>();
   const [config, setConfig] = useState<PublicOnboardingConfig | undefined>();
   const [device, setDevice] = useState<DeviceInfo>(initialDevice);
   const [sandboxId, setSandboxId] = useState<string>(() => getRandomID(13));
@@ -67,37 +62,36 @@ const AuthContainer = ({
     NotificationProps | undefined
   >();
 
+  useProps<FootprintAuthDataProps>(
+    (authProps, authConfig) => {
+      setProps(authProps);
+      setConfig(authConfig);
+
+      if (!isAuth(authConfig?.kind)) {
+        setNotification({
+          title: t('notification.invalid-kind-title'),
+          subtitle: t('notification.invalid-kind-description'),
+        });
+      }
+    },
+    (error: unknown) => {
+      const base = 'Fetching onboarding config in auth init failed with error';
+      console.error(`${base}: ${getErrorMessage(error)}`);
+      setNotification({
+        title: t('notification.invalid-config-title'),
+        subtitle: t('notification.invalid-config-subtitle'),
+      });
+    },
+  );
+
+  const { options = voidObj, publicKey, userData, variant } = props || voidObj;
+  const footprintProvider = useFootprintProvider();
+
   const { t } = useTranslation('pages.auth');
   const confirmationDialog = useConfirmationDialog();
   const onboardingValidateMutation = useOnboardingValidate();
   const obConfigAuth = getOnboardConfigurationKey(publicKey);
   const isSandbox = !config?.isLive;
-
-  useGetOnboardingConfig(
-    { obConfigAuth },
-    {
-      onError: (error: unknown) => {
-        const base =
-          'Fetching onboarding config in auth init failed with error';
-        console.error(`${base}: ${getErrorMessage(error)}`);
-
-        setNotification({
-          title: t('notification.invalid-config-title'),
-          subtitle: t('notification.invalid-config-subtitle'),
-        });
-      },
-      onSuccess: res => {
-        setConfig(res);
-
-        if (!isAuth(res?.kind)) {
-          setNotification({
-            title: t('notification.invalid-kind-title'),
-            subtitle: t('notification.invalid-kind-description'),
-          });
-        }
-      },
-    },
-  );
 
   useDeviceInfo(setDevice);
 

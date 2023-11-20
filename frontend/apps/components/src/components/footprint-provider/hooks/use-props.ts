@@ -1,4 +1,5 @@
 import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
 import noop from 'lodash/noop';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
@@ -12,7 +13,10 @@ const POST_MESSAGE_TIMEOUT = 500;
 
 type Obj = Record<string, unknown>;
 
-const useProps = <T extends Obj>(onSuccess?: (props?: T) => void) => {
+const useProps = <T extends Obj>(
+  onSuccess?: (props?: T, config?: PublicOnboardingConfig) => void,
+  onError?: (error: unknown) => void,
+) => {
   const router = useRouter();
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(false); // whether iframe adapter has loaded
   const onSuccessCalled = useRef(false); // Whether on success has been called with props
@@ -20,13 +24,13 @@ const useProps = <T extends Obj>(onSuccess?: (props?: T) => void) => {
   const sdkArgsQuery = useGetSdkArgs<T>(authTokenFromUrl);
   const isSdkArgsLoading = authTokenFromUrl && sdkArgsQuery.isLoading;
 
-  const complete = (props: T) => {
+  const complete = (props: T, config?: PublicOnboardingConfig) => {
     // If already received props, ignore
     if (onSuccessCalled.current) {
       return;
     }
     onSuccessCalled.current = true;
-    onSuccess?.(props);
+    onSuccess?.(props, config);
   };
 
   // For legacy web SDKs that only pass args via postMessage
@@ -45,13 +49,14 @@ const useProps = <T extends Obj>(onSuccess?: (props?: T) => void) => {
       return noop;
     }
 
+    if (onError && !isSdkArgsLoading && sdkArgsQuery.error) {
+      onError(sdkArgsQuery.error);
+    }
+
     // See if we can retrieve the SDK args from the API (for >=3.8.0 footprint-js integrations only)
     const sdkArgsData = sdkArgsQuery.isSuccess ? sdkArgsQuery.data : undefined;
     if (sdkArgsData) {
-      const {
-        args: { data },
-      } = sdkArgsData;
-      complete(data);
+      complete(sdkArgsData.args.data, sdkArgsData.obConfig);
       return noop;
     }
 
