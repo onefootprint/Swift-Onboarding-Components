@@ -20,8 +20,6 @@ import Logger from '../../../../utils/logger';
 import { useIdentifyMachine } from '../machine-provider';
 import Form from './components/form';
 
-const isAuthFlow = (x: unknown): x is 'auth' => x === 'auth';
-
 type PinVerificationProps = {
   title: string;
   onChallengeSucceed: (authToken: string) => void;
@@ -38,10 +36,9 @@ const PinVerification = ({
   const { t } = useTranslation('components.pin-verification');
   const [state, send] = useIdentifyMachine();
   const {
-    identify: { email, phoneNumber, sandboxId, userFound },
+    identify: { email, sandboxId, userFound },
     challenge: { challengeData: data },
     obConfigAuth,
-    config: { kind },
   } = state.context;
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
@@ -64,7 +61,7 @@ const PinVerification = ({
     if (!identifyVerifyMutation.isSuccess) {
       return false;
     }
-    if (userFound || 'email' in identifier || (isAuthFlow(kind) && email)) {
+    if (userFound || 'email' in identifier) {
       return true;
     }
     return userEmailMutation.isSuccess;
@@ -113,7 +110,7 @@ const PinVerification = ({
     // If user already had a vault, no need to save the email again
     // If the new user signup challenge was initiated with an email OTP,
     // the backend will automatically save the email to the vault for us
-    if (userFound || 'email' in identifier || (isAuthFlow(kind) && email)) {
+    if (userFound || 'email' in identifier) {
       onChallengeSucceed(authToken);
       return;
     }
@@ -138,10 +135,7 @@ const PinVerification = ({
         challengeToken,
         obConfigAuth,
         sandboxId,
-        scope: isAuthFlow(kind) ? 'auth' : 'onboarding',
-        identifier: isAuthFlow(kind)
-          ? ({ ...identifier, phoneNumber } as Identifier)
-          : identifier,
+        identifier,
       },
       {
         onSuccess: handlePinValidationSucceeded,
@@ -200,13 +194,9 @@ const PinVerification = ({
       return;
     }
 
-    const payload = isAuthFlow(kind)
-      ? ({ ...identifier, email } as typeof identifier)
-      : identifier;
-
     signupChallengeMutation.mutate(
       {
-        ...payload,
+        ...identifier,
         obConfigAuth,
         sandboxId,
       },
