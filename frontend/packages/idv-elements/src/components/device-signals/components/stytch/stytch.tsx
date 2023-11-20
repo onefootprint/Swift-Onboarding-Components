@@ -9,7 +9,9 @@ import STYTCH_PUBLIC_TOKEN from './stytch.constants';
 const IS_TEST = process.env.NODE_ENV === 'test';
 const IS_E2E = process.env.IS_E2E === 'true';
 const IS_CI = process.env.CI === 'true';
-const IS_DISABLED = IS_SERVER || IS_TEST || IS_E2E || IS_CI;
+const IS_VERCEL_PREVIEW = process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview';
+const IS_DISABLED =
+  IS_SERVER || IS_TEST || IS_E2E || IS_CI || IS_VERCEL_PREVIEW;
 
 export type StytchProps = {
   fpAuthToken: string;

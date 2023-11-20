@@ -9,11 +9,8 @@ import UAParser from 'ua-parser-js';
 const BASE_URL_DOMAIN = 'onefootprint.com';
 const LOG_ROCKET_ORG_ID = 'lrswdg/footprint-bifrost-prod';
 
-const IS_TEST = typeof jest !== 'undefined';
-const IS_E2E = process.env.IS_E2E === 'true';
-const IS_CI = process.env.CI === 'true';
 const IS_LOGGING_ENABLED =
-  IS_BROWSER && !IS_TEST && IS_PROD && !IS_E2E && !IS_CI;
+  IS_BROWSER && IS_PROD && process.env.NEXT_PUBLIC_VERCEL_ENV === 'production';
 
 export const COMMIT_SHA = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA;
 export const DEPLOYMENT_URL = process.env.NEXT_PUBLIC_VERCEL_URL;

@@ -88,4 +88,8 @@ module.exports = {
     '@onefootprint/global-constants',
     '@onefootprint/appearance',
   ],
+  env: {
+    CI: process.env.CI,
+    IS_E2E: process.env.IS_E2E,
+  },
 };
