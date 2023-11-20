@@ -1,4 +1,3 @@
-import json
 import time
 import pytest
 from tests.headers import BusinessOwnerAuth, SandboxId
@@ -222,4 +221,5 @@ def extract_bo_session_sms(twilio, phone_number, business_name):
         token = message.body.split("#")[1].split("\n\nSent via Footprint")[0]
         return (message.body, token)
 
+    time.sleep(2)
     return try_until_success(inner, 60)

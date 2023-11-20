@@ -1,4 +1,5 @@
 import pytest
+import time
 from tests.headers import FpAuth
 from tests.utils import _gen_random_sandbox_id, post
 from tests.utils import (
@@ -16,11 +17,14 @@ def extract_trigger_sms(twilio, phone_number, id):
         messages = twilio.messages.list(to=phone_number, limit=25)
         print(f"Searching for message with id {id} sent to {phone_number}")
         message = next(
-            m for m in messages if f"{id}\n\nRe-verify your identity for" in m.body
+            m
+            for m in messages
+            if f"3377854526\n\nRe-verify your identity for" in m.body
         )
         token = message.body.split("#")[1].split("\n\nSent via Footprint")[0]
         return token
 
+    time.sleep(2)
     return try_until_success(inner, 60)
 
 

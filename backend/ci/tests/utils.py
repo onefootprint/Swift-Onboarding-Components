@@ -205,6 +205,7 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
             last_exception = e
             break
         except Exception as e:
+            print("Got exception in try_until_success", e)
             last_exception = e
         time.sleep(retry_interval_s)
     if last_exception:
@@ -476,6 +477,7 @@ def identify_verify(
                 f"SMS 2fac code is not present to {phone_number}. Failed at: {ts}"
             )
 
+    time.sleep(2)
     return try_until_success(inner, 30)
 
 
