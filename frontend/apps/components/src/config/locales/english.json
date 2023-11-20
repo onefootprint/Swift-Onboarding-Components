@@ -7,10 +7,88 @@
     "auth": {
       "confirm-close-description": "Your changes may not be saved.",
       "confirm-close-title": "Are you sure?",
+      "email-legal-footer": "By continuing, I agree to the <termsLink>Terms of Service</termsLink> and \n  acknowledge the <privacyPolicyLink>Privacy Policy</privacyPolicyLink>.",
       "invalid-kind-description": "It looks like you're using a non-auth Playbook. Please review and rectify the settings.",
       "invalid-kind-title": "Invalid configuration",
       "no": "No",
-      "yes": "Yes"
+      "yes": "Yes",
+      "notification": {
+        "invalid-config-title": "Integration incorrectly configured",
+        "invalid-config-subtitle": "It seems like the Verify with Footprint integration is using an invalid integration key. Please contact the owner of this product.",
+        "invalid-kind-title": "Invalid configuration",
+        "invalid-kind-description": "It looks like you're using a non-auth Playbook. Please review and rectify the settings."
+      },
+      "sandbox": {
+        "description": "You can log into a previously created sandbox user by using the Test ID from that corresponding session.",
+        "hint": "Do not use special characters or spaces.",
+        "label": "Test ID",
+        "placeholder": "Enter test ID",
+        "errors": {
+          "required": "Test ID is required",
+          "invalid": "Test ID is invalid. Please remove spaces and special characters."
+        },
+        "button": {
+          "edit": "Edit",
+          "save": "Save",
+          "copy": "Copy",
+          "copy-confirmation": "Copied",
+          "reset": "Reset"
+        }
+      },
+      "email-step": {
+        "header": {
+          "title": "Hey there! 👋",
+          "subtitle": "Enter your email to get started."
+        },
+        "form": {
+          "input-label": "Email",
+          "input-placeholder": "jane.doe@acme.com",
+          "input-required": "Email is required",
+          "cta": "Continue"
+        }
+      },
+      "phone-step": {
+        "change-cta": "Change",
+        "subtitle": "Enter your phone number to proceed.",
+        "title": "Hey there! 👋",
+        "form": {
+          "cta": "Continue",
+          "input-invalid": "Phone number is invalid",
+          "input-label": "Phone number",
+          "input-required": "Phone number cannot be empty"
+        }
+      },
+      "sms-step": {
+        "label": "SMS",
+        "prompt-with-phone": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}.",
+        "prompt-without-phone": "Enter the 6-digit code sent to your phone.",
+        "title": "Verify your phone number",
+        "welcome-back-title": "Welcome back! 🎉"
+      },
+      "pin-verification": {
+        "incorrect-code": "Incorrect code",
+        "new-code-sent-description": "We sent you a new code.",
+        "resend-countdown": "Please wait {{seconds}} seconds to resend it...",
+        "resend-cta": "Resend code",
+        "success": "Success!",
+        "verifying": "Verifying..."
+      },
+      "passkey-challenge": {
+        "cta-retry": "Retry passkey",
+        "cta": "Launch passkey",
+        "label": "Passkey",
+        "loading": "Waiting...",
+        "login-with-sms": "Login with SMS",
+        "success": "Success!",
+        "title": "Welcome back! 🎉"
+      },
+      "email-challenge": {
+        "label": "Email",
+        "prompt-with-email": "Enter the 6-digit code sent to {{email}}.",
+        "prompt-without-email": "Enter the 6-digit code sent to your email.",
+        "title": "Verify your email",
+        "welcome-back-title": "Welcome back! 🎉"
+      }
     },
     "secure-form": {
       "invalid": {

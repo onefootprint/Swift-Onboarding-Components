@@ -223,6 +223,7 @@ export type {
   Entity,
   EntityCard,
   EntityVault,
+  FootprintAppearance,
   FreeFormNoteEvent,
   IdDIData,
   IdDocUploadedEvent,

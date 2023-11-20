@@ -80,6 +80,7 @@ export {
   hasEntityUsLegalStatus,
 } from './entity';
 export type { EntityCard } from './entity-cards';
+export type { FootprintAppearance } from './footprint-appearance';
 export { default as HostedUrlType } from './hosted-url-type';
 export type { IdDIData, ValueTypeForIdDI } from './id-di-data';
 export {

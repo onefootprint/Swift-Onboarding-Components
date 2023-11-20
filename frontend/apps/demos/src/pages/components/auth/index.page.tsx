@@ -2,12 +2,33 @@ import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import styled, { css } from '@onefootprint/styled';
 import { FootprintButton } from '@onefootprint/ui';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import React from 'react';
 
+type RouterReturn = ReturnType<typeof useRouter>;
+
 const AcmeDevAuthKey = 'ob_test_2TwubGlrWdKaJnWsQQKQYl';
-const AcmePropLiveKey = 'pb_live_qULwuLO9VARXqBG1tbd0yM';
+const publicKeyEnv = process.env.NEXT_PUBLIC_TENANT_KEY || AcmeDevAuthKey;
+
+const getQueryArgs = (query: RouterReturn['query']) => {
+  const { ob_key: obKey, user_data: rawUserData } = query;
+  const publicKey = typeof obKey === 'string' ? obKey : publicKeyEnv;
+  let userData = {};
+  try {
+    userData =
+      typeof rawUserData === 'string'
+        ? JSON.parse(decodeURIComponent(rawUserData))
+        : {};
+  } catch (_) {
+    // do nothing
+  }
+  return { userData, publicKey };
+};
 
 const AuthDemo = () => {
+  const router = useRouter();
+  const { userData, publicKey } = getQueryArgs(router.query);
+
   const handleClick = () => {
     const component = footprint.init({
       kind: FootprintComponentKind.Auth,
@@ -15,10 +36,9 @@ const AuthDemo = () => {
       onCancel: () => console.log('demo onCancel'),
       onClose: () => console.log('demo onClose'),
       onComplete: (validationToken: string) => console.log(validationToken),
-      options: { showLogo: true },
-      publicKey: AcmeDevAuthKey || AcmePropLiveKey,
-      userData: {},
-      l10n: { locale: 'en-US' },
+      options: { showLogo: false },
+      publicKey,
+      userData,
     });
     component.render();
 

@@ -13,17 +13,17 @@ type LayoutProps = {
 
 const Layout = ({
   children,
-  variant,
+  config,
   isSandbox,
   onClose,
-  config,
+  variant,
 }: LayoutProps) => (
   <AppLayout
+    config={config}
     isSandbox={isSandbox}
     onClose={onClose}
     options={{ hasDesktopBorderRadius: true }}
     variant={variant}
-    config={config}
   >
     {children}
   </AppLayout>

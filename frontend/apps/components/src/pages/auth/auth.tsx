@@ -1,17 +1,33 @@
 import getCustomAppearance from '@onefootprint/appearance';
 import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
+import type { FootprintVariant } from '@onefootprint/footprint-js';
+import type { FootprintAppearance } from '@onefootprint/types';
 import type { GetServerSideProps } from 'next';
 import React, { Suspense } from 'react';
 
-const Content = React.lazy(() => import('./components/content'));
+import DrawerLoading from './components/loading/drawer-loading';
+import ModalLoading from './components/loading/modal-loading';
 
-const Auth = () => (
-  <ObserveCollectorProvider appName="component-auth">
-    <Suspense fallback={null}>
-      <Content />
-    </Suspense>
-  </ObserveCollectorProvider>
-);
+type Fallback = (() => JSX.Element) | (() => null);
+
+const AuthContainer = React.lazy(() => import('./components/auth-container'));
+
+const getLoadingComponent = (v?: FootprintVariant): Fallback => {
+  if (v === 'modal') return ModalLoading;
+  return v === 'drawer' ? DrawerLoading : () => null;
+};
+
+const Auth = ({ variant }: FootprintAppearance) => {
+  const Loading = getLoadingComponent(variant);
+
+  return (
+    <ObserveCollectorProvider appName="component-auth">
+      <Suspense fallback={<Loading />}>
+        <AuthContainer variant={variant} fallback={<Loading />} />
+      </Suspense>
+    </ObserveCollectorProvider>
+  );
+};
 
 export const getServerSideProps: GetServerSideProps = async ({
   query,

@@ -1,5 +1,7 @@
 import { useTranslation as useTranslationI18next } from 'react-i18next';
 
+export type T = (key: string, options?: {}) => string;
+
 const defaultOptions = { returnObjects: true };
 
 const useTranslation = (namespace?: string) => {
