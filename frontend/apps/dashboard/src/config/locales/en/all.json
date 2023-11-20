@@ -1294,7 +1294,8 @@
       },
       "onboarding-metrics": {
         "title": "Onboarding metrics",
-        "filter": {
+        "filters": {
+          "all-playbooks": "All playbooks",
           "month-to-date": "Month to date",
           "previous-month": "Previous month",
           "all-time": "All time"

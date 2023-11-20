@@ -14,6 +14,7 @@ import {
   emptyOrgMetricsFixture,
   withOrgMetrics,
   withOrgMetricsError,
+  withPlaybooks,
 } from './home.test.config';
 
 const useRouterSpy = createUseRouterSpy();
@@ -25,6 +26,7 @@ describe('<Home />', () => {
       pathname: '/org/metrics',
       query: {},
     });
+    withPlaybooks();
   });
 
   const renderHome = () => customRender(<Home />);
