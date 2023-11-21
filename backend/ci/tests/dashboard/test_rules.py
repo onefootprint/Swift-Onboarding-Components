@@ -1,6 +1,6 @@
 import pytest
 from tests.bifrost_client import BifrostClient
-from tests.utils import create_ob_config, get, post, patch, delete, clean_up_user
+from tests.utils import create_ob_config, get, post, patch, delete
 
 
 @pytest.fixture(scope="function")
@@ -145,8 +145,12 @@ def test_patch(sandbox_tenant, obc):
     ]
 
 
-def test_get_rule_set_result(tenant, twilio, must_collect_data, live_phone_number):
-    obc = create_ob_config(tenant, "Rules yo", must_collect_data, must_collect_data)
+def test_get_rule_set_result(
+    sandbox_tenant, twilio, must_collect_data, live_phone_number
+):
+    obc = create_ob_config(
+        sandbox_tenant, "Rules yo", must_collect_data, must_collect_data
+    )
 
     rule1 = post(
         f"/org/onboarding_configs/{obc.id}/rules",
@@ -157,23 +161,23 @@ def test_get_rule_set_result(tenant, twilio, must_collect_data, live_phone_numbe
             ],
             action="fail",
         ),
-        *tenant.db_auths,
+        *sandbox_tenant.db_auths,
     )
     rule2 = post(
         f"/org/onboarding_configs/{obc.id}/rules",
         dict(
             name="My awesome rule",
-            rule_expression=[{"field": "address_matches", "op": "eq", "value": True}],
+            rule_expression=[{"field": "id_flagged", "op": "not_eq", "value": True}],
             action="manual_review",
         ),
-        *tenant.db_auths,
+        *sandbox_tenant.db_auths,
     )
 
-    bifrost = BifrostClient.create(obc, twilio, live_phone_number, None)
+    bifrost = BifrostClient.new(obc, twilio)
     user = bifrost.run()
 
     rule_set_result = get(
-        f"entities/{user.fp_id}/rule_set_result", None, *tenant.db_auths
+        f"entities/{user.fp_id}/rule_set_result", None, *sandbox_tenant.db_auths
     )
 
     assert rule_set_result["ob_configuration_id"] == obc.id

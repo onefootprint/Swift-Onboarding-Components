@@ -321,17 +321,17 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
                     .map(|rs| (rs.vendor_api, rs.reason_code))
                     .collect_vec(),
             );
-
-            // Rules Engine was run and a result saved and nothing catastrophic happened
-            let _ = state
-                .db_pool
-                .db_query(move |conn| RuleSetResult::latest_workflow_decision(conn, &svid))
-                .await
-                .unwrap()
-                .unwrap()
-                .unwrap();
         }
     };
+
+    // Rules Engine was run and a result saved and nothing catastrophic happened
+    let _ = state
+        .db_pool
+        .db_query(move |conn| RuleSetResult::latest_workflow_decision(conn, &svid))
+        .await
+        .unwrap()
+        .unwrap()
+        .unwrap();
 }
 
 #[test_state_case(

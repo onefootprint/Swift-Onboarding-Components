@@ -157,16 +157,17 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         let execute_rules_for_real_document_decision_only = should_execute_rules_for_document_only(&v, &wf)?;
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
 
+        // Rerun decisioning, but with the latest doc risk signals
+        // TODO: what's the review strategy for this case?
+        let decision = common::get_decision(conn, ff_client, risk_signals, &wf, &v)?;
         let decision = if let Some(fixture_decision) = fixture_decision {
             if execute_rules_for_real_document_decision_only || obc.skip_kyc {
-                common::get_decision(conn, ff_client, risk_signals, &wf, &v)?
+                decision
             } else {
                 common::kyc_decision_from_fixture(fixture_decision)?
             }
         } else {
-            // Rerun decisioning, but with the latest doc risk signals
-            // TODO: what's the review strategy for this case?
-            common::get_decision(conn, ff_client, risk_signals, &wf, &v)?
+            decision
         };
 
         common::save_kyc_decision(

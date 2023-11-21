@@ -303,9 +303,13 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
 
         let doc_collected = DocumentRequest::get(conn, &wf.id)?.is_some();
         let review_reasons = common::get_review_reasons(&risk_signals, doc_collected, &obc);
+
+        // Always execute real Rules, even in sandbox. But below we just use the sandbox fixture decision instead of the decision from these real Rules
+        let decision = common::get_decision(conn, ff_client, risk_signals, &wf, &v)?;
+        // If Sandbox and not doing real decisioning using doc, then replace decision with the fixture decision
         let decision = if let Some(fixture_decision) = fixture_decision {
             if execute_rules_for_real_document_decision_only || obc.skip_kyc {
-                common::get_decision(conn, ff_client, risk_signals, &wf, &v)?
+                decision
             } else {
                 let doc_collected = DocumentRequest::get(conn, &wf.id)?.is_some();
                 // we'll hopefully support fixturing the post-stepup decision but for now we just always fail with review if we stepped up
@@ -318,7 +322,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
                 common::kyc_decision_from_fixture(fixture_decision)?
             }
         } else {
-            common::get_decision(conn, ff_client, risk_signals, &wf, &v)?
+            decision
         };
 
         match decision.final_kyc_decision()?.decision.decision_status {
