@@ -28,6 +28,8 @@ export type {
   DecryptRiskSignalAmlHitsResponse,
   DecryptUserRequest,
   DecryptUserResponse,
+  EditRequest,
+  EditResponse,
   EntitiesVaultDecryptRequest,
   EntitiesVaultDecryptResponse,
   GetAccessEventsRequest,

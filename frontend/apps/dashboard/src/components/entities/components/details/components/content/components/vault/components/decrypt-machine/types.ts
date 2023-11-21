@@ -1,6 +1,6 @@
 import type { DataIdentifier } from '@onefootprint/types';
 
-import type { FormData } from '../../vault.types';
+import type { DecryptFormData } from '../../vault.types';
 
 export enum State {
   idle = 'idle',
@@ -30,7 +30,7 @@ export enum Action {
 
 export type Context = {
   reason?: string;
-  fields?: FormData;
+  fields?: DecryptFormData;
   dis?: DataIdentifier[];
 };
 
@@ -39,7 +39,7 @@ export type MachineEvents =
   | { type: Event.canceled }
   | {
       type: Event.submittedFields;
-      payload: { fields: FormData };
+      payload: { fields: DecryptFormData };
     }
   | {
       type: Event.submittedReason;
@@ -56,27 +56,27 @@ export type MachineStates =
   | {
       value: State.selectingFields;
       context: Context & {
-        fields: FormData;
+        fields: DecryptFormData;
       };
     }
   | {
       value: State.confirmingReason;
       context: Context & {
         reason: string;
-        fields: FormData;
+        fields: DecryptFormData;
       };
     }
   | {
       value: State.decrypting;
       context: Context & {
         reason: string;
-        fields: FormData;
+        fields: DecryptFormData;
       };
     }
   | {
       value: State.decryptFailed;
       context: Context & {
         reason: string;
-        fields: FormData;
+        fields: DecryptFormData;
       };
     };

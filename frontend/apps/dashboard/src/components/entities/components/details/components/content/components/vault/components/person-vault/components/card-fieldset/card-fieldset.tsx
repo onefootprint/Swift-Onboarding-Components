@@ -9,8 +9,8 @@ import FieldOrPlaceholder from 'src/components/field-or-placeholder';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 
 import getDis from '../../../../../../../../../../utils/get-dis';
+import useDecryptForm from '../../../../hooks/use-decrypt-form';
 import useField from '../../../../hooks/use-field';
-import useForm from '../../../../hooks/use-form';
 import type { DiField } from '../../../../vault.types';
 import getCards from '../../../card-fieldset/utils/get-cards';
 import Field from '../../../field';
@@ -29,7 +29,7 @@ const Fieldset = ({
 }: FieldsetProps) => {
   const { t, allT } = useTranslation('pages.entity.fieldset');
   const decrypt = useDecryptControls();
-  const form = useForm();
+  const decryptForm = useDecryptForm();
 
   const cards: EntityCard[] = getCards(entity) ?? [];
   const [selectedCard, setSelectedCard] = useState(cards[0]);
@@ -38,18 +38,18 @@ const Fieldset = ({
 
   const getFieldProps = useField(entity);
   const selectableFields = dis.filter(di => getFieldProps(di).canSelect);
-  const allSelected = selectableFields.every(form.isChecked);
+  const allSelected = selectableFields.every(decryptForm.isChecked);
   const shouldShowSelectAll = decrypt.inProgress && selectableFields.length > 0;
 
   const getCardTitle = (count: number) =>
     `${title} ${t('cards.title', { count })}`;
 
   const handleSelectAll = () => {
-    form.set(selectableFields, true);
+    decryptForm.set(selectableFields, true);
   };
 
   const handleDeselectAll = () => {
-    form.set(selectableFields, false);
+    decryptForm.set(selectableFields, false);
   };
 
   const renderCardIssuer = (value: VaultValue) => {

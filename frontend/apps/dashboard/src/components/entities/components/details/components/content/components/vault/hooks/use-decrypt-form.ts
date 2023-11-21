@@ -2,7 +2,7 @@ import type { DataIdentifier } from '@onefootprint/types';
 import get from 'lodash/get';
 import { useFormContext, useWatch } from 'react-hook-form';
 
-const useForm = () => {
+const useDecryptForm = () => {
   const { setValue, getValues } = useFormContext();
   const values = { ...useWatch(), ...getValues() };
 
@@ -17,4 +17,4 @@ const useForm = () => {
   return { isChecked, set };
 };
 
-export default useForm;
+export default useDecryptForm;

@@ -4,8 +4,8 @@ import React from 'react';
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
 
 import BusinessVault from './components/business-vault';
+import DecryptForm from './components/decrypt-form';
 import DecryptProvider from './components/decrypt-machine';
-import Form from './components/form';
 import PersonVault from './components/person-vault';
 import DecryptControls, {
   useDecryptControls,
@@ -18,13 +18,13 @@ const Vault = () => {
   return (
     <>
       <DecryptControls />
-      <Form onSubmit={decrypt.submitFields}>
+      <DecryptForm onSubmit={decrypt.submitFields}>
         {context.kind === EntityKind.business ? (
           <BusinessVault />
         ) : (
           <PersonVault />
         )}
-      </Form>
+      </DecryptForm>
     </>
   );
 };

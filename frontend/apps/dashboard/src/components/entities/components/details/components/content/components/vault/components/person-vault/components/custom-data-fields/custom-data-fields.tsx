@@ -14,8 +14,8 @@ import { getCustomDIs } from 'src/components/entities/utils/get-dis';
 import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 
+import useDecryptForm from '../../../../hooks/use-decrypt-form';
 import useField from '../../../../hooks/use-field';
-import useForm from '../../../../hooks/use-form';
 import type { DiField } from '../../../../vault.types';
 import Field from '../../../field';
 import { useDecryptControls } from '../../../vault-actions';
@@ -32,20 +32,20 @@ const CustomDataFields = ({
 }: CustomDataFieldsProps) => {
   const { t } = useTranslation('pages.entity.fieldset');
   const decrypt = useDecryptControls();
-  const form = useForm();
+  const decryptForm = useDecryptForm();
   const getFieldProps = useField(entity);
   const { data } = useEntityVault(entity.id, entity);
   const customDIs = getCustomDIs(data || {});
   const selectableFields = customDIs.filter(di => getFieldProps(di).canSelect);
-  const allSelected = selectableFields.every(form.isChecked);
+  const allSelected = selectableFields.every(decryptForm.isChecked);
   const shouldShowSelectAll = decrypt.inProgress && selectableFields.length > 0;
 
   const handleSelectAll = () => {
-    form.set(selectableFields, true);
+    decryptForm.set(selectableFields, true);
   };
 
   const handleDeselectAll = () => {
-    form.set(selectableFields, false);
+    decryptForm.set(selectableFields, false);
   };
 
   const renderField = (field: DiField) => (

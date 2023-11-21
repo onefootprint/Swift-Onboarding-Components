@@ -4,11 +4,16 @@ import type {
   Entity,
   VaultEmptyData,
   VaultEncryptedData,
+  VaultValue,
 } from '@onefootprint/types';
 
-export type FormData = Partial<
+export type DecryptFormData = Partial<
   Record<DataIdentifier, boolean | VaultEncryptedData | VaultEmptyData>
 >;
+
+export type EditFormData = Record<string, Record<string, VaultValue>>;
+
+export type EditSubmitData = Partial<Record<DataIdentifier, VaultValue>>;
 
 export type DiField = {
   di: DataIdentifier;

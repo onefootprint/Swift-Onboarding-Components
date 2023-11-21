@@ -6,9 +6,9 @@ import type {
 import useDocuments from 'src/components/entities/components/details/hooks/use-documents';
 import useEntityId from 'src/components/entities/components/details/hooks/use-entity-id';
 
+import transformResponseToVaultFormat from '../../../utils/transform-response-to-vault-format';
 import useDecryptText from './hooks/use-decrypt';
 import getDocDis from './utils/get-doc-dis';
-import transformResponseToVaultFormat from './utils/transform-response-to-vault-format';
 
 type DecryptPayload = {
   entityId: string;

@@ -6,7 +6,7 @@ import type {
   VaultValue,
 } from '@onefootprint/types';
 
-import type { FormData } from '../../../../vault.types';
+import type { DecryptFormData } from '../../../../vault.types';
 import { Event, State, useDecryptMachine } from '../../../decrypt-machine';
 import useDecryptFields from './hooks/use-decrypt-fields';
 
@@ -32,7 +32,7 @@ const useDecryptControls = () => {
     send(Event.canceled);
   };
 
-  const submitFields = (fields: FormData) => {
+  const submitFields = (fields: DecryptFormData) => {
     send(Event.submittedFields, { payload: { fields } });
   };
 

@@ -1,7 +1,7 @@
 import type { DecryptResponse, EntityVault } from '@onefootprint/types';
 
-import parseDocuments from '../parse-documents';
-import parseStringifiedValues from '../parse-stringified-values';
+import parseDocuments from '../../use-decrypt-controls/hooks/use-decrypt-fields/utils/parse-documents';
+import parseStringifiedValues from '../../use-decrypt-controls/hooks/use-decrypt-fields/utils/parse-stringified-values';
 
 const transformResponseToVaultFormat = (
   response: DecryptResponse,

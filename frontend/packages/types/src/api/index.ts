@@ -25,6 +25,7 @@ export type {
   DecryptRiskSignalAmlHitsResponse,
 } from './decrypt-risk-signal-aml-hits';
 export type { DecryptUserRequest, DecryptUserResponse } from './decrypt-user';
+export type { EditRequest, EditResponse } from './edit';
 export type {
   EntitiesVaultDecryptRequest,
   EntitiesVaultDecryptResponse,

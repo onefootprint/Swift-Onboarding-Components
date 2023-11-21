@@ -6,8 +6,8 @@ import React, { Fragment } from 'react';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
 
+import useDecryptForm from '../../hooks/use-decrypt-form';
 import useField from '../../hooks/use-field';
-import useForm from '../../hooks/use-form';
 import type { DiField } from '../../vault.types';
 import Field from '../field';
 import { useDecryptControls } from '../vault-actions';
@@ -30,19 +30,19 @@ const Fieldset = ({
 }: FieldsetProps) => {
   const { t } = useTranslation('pages.entity.fieldset');
   const decrypt = useDecryptControls();
-  const form = useForm();
+  const decryptForm = useDecryptForm();
   const dis = fields.map(field => field.di);
   const getFieldProps = useField(entity);
   const selectableFields = dis.filter(di => getFieldProps(di).canSelect);
-  const allSelected = selectableFields.every(form.isChecked);
+  const allSelected = selectableFields.every(decryptForm.isChecked);
   const shouldShowSelectAll = decrypt.inProgress && selectableFields.length > 0;
 
   const handleSelectAll = () => {
-    form.set(selectableFields, true);
+    decryptForm.set(selectableFields, true);
   };
 
   const handleDeselectAll = () => {
-    form.set(selectableFields, false);
+    decryptForm.set(selectableFields, false);
   };
 
   const renderField = (field: DiField) => {
