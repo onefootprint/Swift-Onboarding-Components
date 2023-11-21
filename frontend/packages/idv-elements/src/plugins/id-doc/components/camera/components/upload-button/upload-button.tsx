@@ -39,7 +39,7 @@ const UploadButton = ({ onUpload, onComplete }: UploadButtonProps) => {
     if (!processResult) {
       Logger.warn(
         'Captured image could not be processed - retaking the image',
-        'photo-capture',
+        'upload-button',
       );
       onProcessingDone();
       return;

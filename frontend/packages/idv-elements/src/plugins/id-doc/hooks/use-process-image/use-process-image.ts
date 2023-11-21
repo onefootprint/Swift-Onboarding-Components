@@ -90,11 +90,13 @@ const runProcessFileScript = async (
     compressed = await compressImage(resized, extraCompress);
   } catch (e) {
     onError(ImageProcessingStepError.compress, e);
-    return undefined;
+    Logger.warn("Moving on with the image that wasn't compressed");
+    compressed = resized;
   }
   if (!compressed) {
     onError(ImageProcessingStepError.compress);
-    return undefined;
+    Logger.warn("Moving on with the image that wasn't compressed");
+    compressed = resized;
   }
   const extraCompressed =
     resized.size > compressed.size &&
