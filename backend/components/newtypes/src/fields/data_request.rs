@@ -1,5 +1,6 @@
 use crate::data_identifier::ValidationError;
 use crate::fingerprinter::{Fingerprinter, GlobalFingerprintKind};
+use crate::output::Csv;
 use crate::{
     CollectedDataOption, DataIdentifier, Error, Fingerprint, FingerprintScopeKind, PiiJsonValue, PiiString,
     StorageType, TenantId, Validate, VaultKind,
@@ -34,9 +35,32 @@ impl<T> DataRequest<T> {
     pub fn is_empty(&self) -> bool {
         self.data.is_empty()
     }
+}
 
-    pub fn decompose(self) -> (HashMap<DataIdentifier, PiiString>, Vec<DataIdentifier>, T) {
-        (self.data, self.json_fields, self.fingerprints)
+impl DataRequest<HashSet<FingerprintRequest>> {
+    pub fn decompose(
+        self,
+    ) -> (
+        HashMap<DataIdentifier, PiiString>,
+        Vec<DataIdentifier>,
+        HashSet<FingerprintRequest>,
+    ) {
+        let old_fingerprint_kinds = self.fingerprints.iter().map(|fp| fp.kind.clone()).collect_vec();
+        // Only the fingerprints for which there exists data that we'll put in the vault
+        let fingerprints: HashSet<FingerprintRequest> = self
+            .fingerprints
+            .into_iter()
+            .filter(|fp| self.data.contains_key(&fp.kind))
+            .collect();
+        let new_fingerprint_kinds = fingerprints.iter().map(|fp| fp.kind.clone()).collect_vec();
+        if old_fingerprint_kinds.len() != new_fingerprint_kinds.len() {
+            tracing::error!(
+                old_fingerprint_kinds=%Csv::from(old_fingerprint_kinds),
+                new_fingerprint_kinds=%Csv::from(new_fingerprint_kinds),
+                "Fingerprint generated for a DI not in this request"
+            );
+        }
+        (self.data, self.json_fields, fingerprints)
     }
 }
 
