@@ -1,6 +1,6 @@
 import type { FootprintAuthProps } from '@onefootprint/footprint-js';
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 export type AuthButtonProps = Omit<FootprintAuthProps, 'kind' | 'variant'> & {
   dialogVariant?: 'modal' | 'drawer';
@@ -9,20 +9,23 @@ export type AuthButtonProps = Omit<FootprintAuthProps, 'kind' | 'variant'> & {
   testID?: string;
 };
 
-const AuthButton = ({
-  appearance,
-  dialogVariant,
-  l10n,
-  label = 'Auth with Footprint',
-  onCancel,
-  onClick,
-  onClose,
-  onComplete,
-  options,
-  publicKey,
-  testID,
-  userData,
-}: AuthButtonProps) => {
+const AuthButton = (
+  {
+    appearance,
+    dialogVariant,
+    l10n,
+    label = 'Auth with Footprint',
+    onCancel,
+    onClick,
+    onClose,
+    onComplete,
+    options,
+    publicKey,
+    testID,
+    userData,
+  }: AuthButtonProps,
+  ref: React.Ref<HTMLButtonElement> = null,
+) => {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     const config: FootprintAuthProps = {
       kind: FootprintComponentKind.Auth,
@@ -47,6 +50,7 @@ const AuthButton = ({
       type="button"
       onClick={handleClick}
       data-testid={testID}
+      ref={ref}
     >
       <svg
         width="24"
@@ -66,4 +70,4 @@ const AuthButton = ({
   );
 };
 
-export default AuthButton;
+export default forwardRef<HTMLButtonElement, AuthButtonProps>(AuthButton);

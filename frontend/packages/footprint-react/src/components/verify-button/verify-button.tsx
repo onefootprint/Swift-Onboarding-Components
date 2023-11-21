@@ -1,6 +1,6 @@
 import type { FootprintVerifyProps } from '@onefootprint/footprint-js';
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 type NoToken = {
   authToken?: never;
@@ -27,38 +27,38 @@ export type VerifyButtonProps = Omit<
   dialogVariant?: 'modal' | 'drawer';
 } & (NoToken | PublicKeyOnly | AuthTokenOnly);
 
-const VerifyButton = ({
-  appearance,
-  label = 'Verify with Footprint',
-  onCancel,
-  onClick,
-  onComplete,
-  onClose,
-  publicKey = undefined,
-  authToken = undefined,
-  userData,
-  options,
-  dialogVariant,
-  testID,
-  l10n,
-}: VerifyButtonProps) => {
+const VerifyButton = (
+  {
+    appearance,
+    label = 'Verify with Footprint',
+    onCancel,
+    onClick,
+    onComplete,
+    onClose,
+    publicKey = undefined,
+    authToken = undefined,
+    userData,
+    options,
+    dialogVariant,
+    testID,
+    l10n,
+  }: VerifyButtonProps,
+  ref: React.Ref<HTMLButtonElement> = null,
+): JSX.Element => {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     onClick?.(event);
 
     let tokenProps = {};
     if (authToken) {
-      tokenProps = {
-        authToken,
-      };
+      tokenProps = { authToken };
     } else if (publicKey) {
-      tokenProps = {
-        publicKey,
-      };
+      tokenProps = { publicKey };
     } else {
       return;
     }
 
     const component = footprint.init({
+      ...tokenProps,
       kind: FootprintComponentKind.Verify,
       variant: dialogVariant,
       appearance,
@@ -68,7 +68,6 @@ const VerifyButton = ({
       userData,
       options,
       l10n,
-      ...tokenProps,
     } as FootprintVerifyProps);
 
     component.render();
@@ -80,6 +79,7 @@ const VerifyButton = ({
       type="button"
       onClick={handleClick}
       data-testid={testID}
+      ref={ref}
     >
       <svg
         width="24"
@@ -99,4 +99,4 @@ const VerifyButton = ({
   );
 };
 
-export default VerifyButton;
+export default forwardRef<HTMLButtonElement, VerifyButtonProps>(VerifyButton);
