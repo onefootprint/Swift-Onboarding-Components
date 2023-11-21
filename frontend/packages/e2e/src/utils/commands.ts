@@ -27,6 +27,7 @@ const clickOn = async (
 
 export const clickOnContinue = clickOn.bind(null, /continue/i);
 export const clickOnVerifyWithSms = clickOn.bind(null, /verify with sms/i);
+export const clickOnSave = clickOn.bind(null, /save/i);
 export const continueOnAgree = clickOn.bind(null, /agree/i);
 export const continueOnDesktop = clickOn.bind(null, /continue on desktop/i);
 export const continueOnTakePhoto = clickOn.bind(null, /take photo/i);
