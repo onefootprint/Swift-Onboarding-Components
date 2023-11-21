@@ -185,6 +185,8 @@ export const timelineFixture: Timeline = [
             kind: ActorKind.footprint,
           },
           obConfiguration: {
+            id: 'ob_config_id_3o5SdynZVGO1icDm8Z6llC',
+            name: 'My Playbook',
             mustCollectData: [],
           },
           vendors: [Vendor.idology, Vendor.twilio],

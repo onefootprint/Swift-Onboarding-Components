@@ -9,6 +9,8 @@ export type OnboardingDecision = {
   timestamp: Date;
   source: Actor;
   obConfiguration: {
+    id: string;
+    name: string;
     mustCollectData: CollectedDataOption[];
     // TODO: replace with the following
     // TODO: https://linear.app/footprint/issue/FP-1837/use-collected-id-document-types-in-audit-trail-right-now-we-default-to

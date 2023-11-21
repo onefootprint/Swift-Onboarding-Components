@@ -1,4 +1,9 @@
-import { customRender, screen, within } from '@onefootprint/test-utils';
+import {
+  createUseRouterSpy,
+  customRender,
+  screen,
+  within,
+} from '@onefootprint/test-utils';
 import type { TimelineEvent } from '@onefootprint/types';
 import React from 'react';
 import { entityFixture } from 'src/components/entities/components/details/details.test.config';
@@ -6,7 +11,15 @@ import { entityFixture } from 'src/components/entities/components/details/detail
 import AuditTrailTimeline from './audit-trail-timeline';
 import TimelineFixture from './audit-trail-timeline.test.config';
 
+const useRouterSpy = createUseRouterSpy();
+
 describe('<AuditTrailTimeline />', () => {
+  beforeEach(() => {
+    useRouterSpy({
+      pathname: '/users/fp_id_cDsFPmDwz784hdwovghMqt',
+    });
+  });
+
   const renderAuditTrailTimeline = (timeline: TimelineEvent[]) =>
     customRender(
       <AuditTrailTimeline entity={entityFixture} timeline={timeline} />,

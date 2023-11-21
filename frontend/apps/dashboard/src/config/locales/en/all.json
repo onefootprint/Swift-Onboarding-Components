@@ -1089,6 +1089,7 @@
             "could-not-be-verified-by": "Could not be verified by",
             "verified": "Verified",
             "not-verified": "Failed",
+            "onboarded-onto": "Onboarded onto playbook",
             "decision-status": {
               "pass": "Verified",
               "fail": "Failed",
