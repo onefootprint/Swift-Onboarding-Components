@@ -196,7 +196,7 @@ impl ValidatedDataRequest {
                 let vd = vd
                     .iter()
                     .find(|vd| vd.kind == kind)
-                    .ok_or(AssertionError("No lifetime id found"))?;
+                    .ok_or(AssertionError(&format!("No lifetime id found for {}", kind)))?;
 
                 Ok(NewFingerprint {
                     kind: kind.clone(),
