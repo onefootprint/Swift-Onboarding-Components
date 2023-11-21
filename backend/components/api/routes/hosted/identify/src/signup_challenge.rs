@@ -156,9 +156,7 @@ async fn make_vault_context(
 
     let global_sh_data = initial_data
         .iter()
-        .map(|(_, di, v)| -> ApiResult<_> {
-            Ok((di.clone(), GlobalFingerprintKind::try_from(di.clone())?, v))
-        })
+        .map(|(_, di, v)| -> ApiResult<_> { Ok((di.clone(), GlobalFingerprintKind::try_from(di)?, v)) })
         .collect::<ApiResult<Vec<_>>>()?;
     let global_sh = state.compute_fingerprints(global_sh_data).await?;
 

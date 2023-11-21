@@ -15,6 +15,7 @@ use api_core::errors::ApiResult;
 use api_core::task;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
+use api_core::utils::onboarding::NewOnboardingArgs;
 use api_core::utils::requirements::get_requirements_inner;
 use api_core::utils::requirements::GetRequirementsArgs;
 use api_core::utils::vault_wrapper::Any;
@@ -117,18 +118,16 @@ pub async fn post(
                 return Err(TenantError::MissingCanAccessCdos(unaccessable_cdos.into()).into());
             }
 
-            let (wf_id, _) = api_core::utils::onboarding::get_or_start_onboarding(
-                conn,
-                ff_client,
-                None,
-                false,
-                &sv.vault_id,
-                &sv.id,
-                &obc,
-                None,
-                None, // currently dont support KYB for NPV
-                WorkflowSource::Tenant,
-            )?;
+            let args = NewOnboardingArgs {
+                existing_wf_id: None,
+                force_create: false,
+                sv: &sv,
+                obc: &obc,
+                insight_event: None,
+                new_biz_args: None, // currently dont support KYB for NPV
+                source: WorkflowSource::Tenant,
+            };
+            let (wf_id, _) = api_core::utils::onboarding::get_or_start_onboarding(conn, ff_client, args)?;
             if let Some(fixture_result) = fixture_result {
                 Workflow::update_fixture_result(conn, &wf_id, fixture_result.into())?;
             }

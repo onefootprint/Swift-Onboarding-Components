@@ -13,6 +13,7 @@ use api_core::auth::session::user::UserSessionArgs;
 use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::onboarding::NewBusinessVaultArgs;
+use api_core::utils::onboarding::NewOnboardingArgs;
 use api_wire_types::hosted::onboarding::OnboardingResponse;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
@@ -74,18 +75,17 @@ pub async fn post(
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let (wf_id, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(
-                conn,
-                ff_client,
-                user_auth.workflow_id(),
-                user_auth.is_from_api,
-                &scoped_user.vault_id,
-                &scoped_user.id,
-                &obc,
-                Some(insight_event.clone()),
-                maybe_new_biz_args,
-                WorkflowSource::Hosted,
-            )?;
+            let args = NewOnboardingArgs {
+                existing_wf_id: user_auth.workflow_id(),
+                force_create: user_auth.is_from_api,
+                sv: &scoped_user,
+                obc: &obc,
+                insight_event: Some(insight_event.clone()),
+                new_biz_args: maybe_new_biz_args,
+                source: WorkflowSource::Hosted,
+            };
+            let (wf_id, biz_wf) =
+                api_core::utils::onboarding::get_or_start_onboarding(conn, ff_client, args)?;
 
             // Update auth token with new identifiers
             // TODO should we issue a new token here for good measure?

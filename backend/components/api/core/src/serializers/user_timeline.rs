@@ -21,7 +21,17 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
     fn from_db(target: SaturatedTimelineEvent) -> Self {
         match target {
             SaturatedTimelineEvent::DataCollected(attributes, targets, actor) => {
-                let edited_cdos = targets
+                // Get the extra attributes that aren't encompassed by the attributes
+                let dangling_attributes = targets.into_iter().filter(|di| {
+                    !attributes
+                        .iter()
+                        .any(|cdo| cdo.data_identifiers().unwrap_or_default().contains(di))
+                });
+                // And use these to compute some additional CDOs that we'll add to the list in case
+                // only a part of the CDO was updated.
+                // This allows the dashboard to display the name was updated, even if only
+                // id.first_name is edited
+                let edited_cdos = dangling_attributes
                     .into_iter()
                     .filter_map(|di| di.parent())
                     .unique()

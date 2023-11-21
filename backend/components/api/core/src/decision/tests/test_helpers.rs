@@ -21,7 +21,7 @@ use crate::{
     tests::fixtures::lib::random_phone_number,
     utils::{
         self,
-        onboarding::NewBusinessVaultArgs,
+        onboarding::{NewBusinessVaultArgs, NewOnboardingArgs},
         vault_wrapper::{Any, VaultWrapper},
     },
     State,
@@ -60,19 +60,16 @@ pub async fn create_user_and_onboarding(
 
             let (uv, su) = create_user_and_populate_vault(conn, ob_config.clone(), kyc_fixture_result);
 
-            let (wf_id, biz_wf) = utils::onboarding::get_or_start_onboarding(
-                conn,
-                ff_client,
-                None,
-                false,
-                &uv.id,
-                &su.id,
-                &ob_config,
-                Some(CreateInsightEvent { ..Default::default() }),
-                biz_args,
-                WorkflowSource::Hosted,
-            )
-            .unwrap();
+            let args = NewOnboardingArgs {
+                existing_wf_id: None,
+                force_create: false,
+                sv: &su,
+                obc: &ob_config,
+                insight_event: Some(CreateInsightEvent { ..Default::default() }),
+                new_biz_args: biz_args,
+                source: WorkflowSource::Hosted,
+            };
+            let (wf_id, biz_wf) = utils::onboarding::get_or_start_onboarding(conn, ff_client, args).unwrap();
             if let Some(fixture_result) = kyc_fixture_result {
                 Workflow::update_fixture_result(conn, &wf_id, fixture_result).unwrap();
             }

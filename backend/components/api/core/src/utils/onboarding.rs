@@ -14,8 +14,8 @@ use db::{
 };
 use feature_flag::FeatureFlagClient;
 use newtypes::{
-    CollectedDataOption, EncryptedVaultPrivateKey, ObConfigurationKind, ScopedVaultId, Selfie, VaultId,
-    VaultKind, VaultPublicKey, WorkflowId, WorkflowSource,
+    CollectedDataOption, EncryptedVaultPrivateKey, ObConfigurationKind, Selfie, VaultKind, VaultPublicKey,
+    WorkflowId, WorkflowSource,
 };
 
 use crate::errors::{onboarding::OnboardingError, ApiResult};
@@ -28,20 +28,32 @@ pub struct NewBusinessVaultArgs {
     pub should_create_workflow: bool,
 }
 
+pub struct NewOnboardingArgs<'a> {
+    pub existing_wf_id: Option<WorkflowId>,
+    pub force_create: bool,
+    pub sv: &'a ScopedVault,
+    pub obc: &'a ObConfiguration,
+    pub insight_event: Option<CreateInsightEvent>,
+    pub new_biz_args: Option<NewBusinessVaultArgs>, // has to be generated async outside the `conn`. We also currently don't support KYB for NPV's but could one day
+    pub source: WorkflowSource,
+}
+
 #[allow(clippy::too_many_arguments)]
 pub fn get_or_start_onboarding(
     conn: &mut TxnPgConn,
     ff_client: Arc<dyn FeatureFlagClient>,
-    existing_wf_id: Option<WorkflowId>,
-    force_create: bool,
-    v_id: &VaultId,
-    sv_id: &ScopedVaultId,
-    obc: &ObConfiguration,
-    insight_event: Option<CreateInsightEvent>,
-    new_biz_args: Option<NewBusinessVaultArgs>, // has to be generated async outside the `conn`. We also currently don't support KYB for NPV's but could one day
-    source: WorkflowSource,
+    args: NewOnboardingArgs,
 ) -> ApiResult<(WorkflowId, Option<Workflow>)> {
-    let user_vault = Vault::lock(conn, v_id)?;
+    let NewOnboardingArgs {
+        existing_wf_id,
+        force_create,
+        sv,
+        obc,
+        insight_event,
+        new_biz_args,
+        source,
+    } = args;
+    let user_vault = Vault::lock(conn, &sv.vault_id)?;
     if obc.kind == ObConfigurationKind::Auth {
         return Err(OnboardingError::CannotOnboardOntoAuthPlaybook.into());
     }
@@ -49,11 +61,11 @@ pub fn get_or_start_onboarding(
     let wf_id = if let Some(wf_id) = existing_wf_id {
         wf_id
     } else {
-        let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, sv_id)?;
+        let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
         let is_one_click = vw.is_one_click();
         // Create the workflow for this scoped user
         let ob_create_args = OnboardingWorkflowArgs {
-            scoped_vault_id: sv_id.clone(),
+            scoped_vault_id: sv.id.clone(),
             ob_configuration_id: obc.id.clone(),
             insight_event: insight_event.clone(),
             // If this isn't a one click from another tenant, we can immediately mark the WF as authorized

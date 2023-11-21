@@ -67,7 +67,7 @@ impl<Type> TenantVw<Type> {
                 .must_collect_data
                 .into_iter()
                 .flat_map(|cdo| cdo.data_identifiers().unwrap_or_default())
-                .filter_map(|di| GlobalFingerprintKind::try_from(di).ok())
+                .filter_map(|di| GlobalFingerprintKind::try_from(&di).ok())
                 .collect_vec()
         } else {
             // No global fingerprints for the fixture phone number or email

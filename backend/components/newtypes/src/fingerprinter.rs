@@ -94,12 +94,12 @@ impl GlobalFingerprintKind {
     }
 }
 
-impl TryFrom<DataIdentifier> for GlobalFingerprintKind {
+impl<'a> TryFrom<&'a DataIdentifier> for GlobalFingerprintKind {
     type Error = crate::Error;
 
-    fn try_from(value: DataIdentifier) -> Result<Self, Self::Error> {
+    fn try_from(value: &'a DataIdentifier) -> Result<Self, Self::Error> {
         Self::iter()
-            .find(|g| g.data_identifier() == value)
+            .find(|g| &g.data_identifier() == value)
             .ok_or(crate::Error::Custom(
                 "Data is not globally fingerprintable".into(),
             ))
@@ -154,7 +154,7 @@ mod tests {
         let id = DataIdentifier::from_str(di).expect("invalid di");
         let bytes = match scope {
             Global => {
-                let global = GlobalFingerprintKind::try_from(id).expect("invalid global scope");
+                let global = GlobalFingerprintKind::try_from(&id).expect("invalid global scope");
                 FingerprintScope::Global(global).bytes()
             }
             Tenant => {

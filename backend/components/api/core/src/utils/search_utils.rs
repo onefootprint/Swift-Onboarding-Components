@@ -143,7 +143,7 @@ fn all_scopes<'a>(
     let tenant_scopes = dis.iter().map(|di| FingerprintScope::Tenant(di, tenant_id));
     let global_scopes = dis
         .iter()
-        .filter_map(|di| GlobalFingerprintKind::try_from(di.clone()).ok())
+        .filter_map(|di| GlobalFingerprintKind::try_from(di).ok())
         .map(FingerprintScope::Global);
     let all_scopes = tenant_scopes.chain(global_scopes).collect_vec();
     all_scopes.into_iter().map(|s| (s, search)).collect_vec()
