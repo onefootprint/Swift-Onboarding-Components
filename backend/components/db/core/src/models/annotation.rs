@@ -3,11 +3,16 @@ use std::collections::HashMap;
 use crate::PgConn;
 use crate::{actor, actor::SaturatedActor, models::scoped_vault::ScopedVault, DbError, DbResult};
 use chrono::{DateTime, Utc};
-use db_schema::schema::{annotation, scoped_vault};
+use db_schema::schema::{annotation, scoped_vault, user_timeline};
+use diesel::dsl::not;
 use diesel::prelude::*;
-use newtypes::{AnnotationId, DbActor, FpId, ScopedVaultId, TenantId};
+use newtypes::{
+    AnnotationId, DbActor, DbUserTimelineEvent, FpId, OnboardingDecisionId, ScopedVaultId, TenantId,
+};
 
 use serde::{Deserialize, Serialize};
+
+use super::user_timeline::UserTimeline;
 
 #[derive(Debug, Clone, Queryable, Serialize, Deserialize)]
 #[diesel(table_name = annotation)]
@@ -138,5 +143,43 @@ impl Annotation {
         let annotations = results.into_iter().map(|t| t.0).collect();
         let annotations_with_actors = actor::saturate_actors(conn, annotations)?;
         Ok(annotations_with_actors)
+    }
+
+    #[tracing::instrument("Annotation::get_for_obd", skip_all)]
+    pub fn get_for_obd(conn: &mut PgConn, obd_id: &OnboardingDecisionId) -> DbResult<Option<Self>> {
+        // Right now, the only thing linking annotations and OBD's is user_timeline
+        let ut: Option<UserTimeline> = user_timeline::table
+            .filter(
+                user_timeline::event
+                    .retrieve_by_path_as_text(vec!["data", "id"])
+                    .eq(obd_id),
+            )
+            .filter(not(user_timeline::event
+                .retrieve_by_path_as_text(vec!["data", "annotation_id"])
+                .is_null()))
+            .order_by(user_timeline::timestamp.desc())
+            .get_result(conn)
+            .optional()?;
+
+        let res = if let Some(ut) = ut {
+            match ut.event {
+                DbUserTimelineEvent::OnboardingDecision(o) => {
+                    if let Some(annotation_id) = o.annotation_id {
+                        annotation::table
+                            .filter(annotation::id.eq(annotation_id))
+                            .get_result::<Annotation>(conn)
+                            .optional()?
+                    } else {
+                        // technically impossible given above sql query
+                        None
+                    }
+                }
+                _ => None,
+            }
+        } else {
+            None
+        };
+
+        Ok(res)
     }
 }

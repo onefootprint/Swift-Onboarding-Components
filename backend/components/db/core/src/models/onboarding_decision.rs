@@ -1,5 +1,8 @@
 use std::collections::HashMap;
 
+use super::manual_review::ManualReview;
+use super::ob_configuration::ObConfiguration;
+use super::user_timeline::UserTimeline;
 use crate::actor::SaturatedActor;
 use crate::models::workflow::Workflow;
 use crate::PgConn;
@@ -8,21 +11,20 @@ use crate::{actor, DbResult};
 use chrono::{DateTime, Utc};
 use db_schema::schema::manual_review;
 use db_schema::schema::scoped_vault;
+use db_schema::schema::workflow;
 use db_schema::schema::{onboarding_decision, onboarding_decision_verification_result_junction};
+use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::FpId;
 use newtypes::ReviewReason;
+use newtypes::ScopedVaultId;
 use newtypes::TenantId;
 use newtypes::WorkflowId;
 use newtypes::{
     AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, OnboardingDecisionId, OnboardingDecisionInfo,
     VaultId, VerificationResultId,
 };
-
-use super::manual_review::ManualReview;
-use super::ob_configuration::ObConfiguration;
-use super::user_timeline::UserTimeline;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = onboarding_decision)]
@@ -185,6 +187,29 @@ impl OnboardingDecision {
             .filter(scoped_vault::is_live.eq(is_live))
             .order_by(onboarding_decision::created_at.desc())
             .select(onboarding_decision::all_columns)
+            .first(conn)
+            .optional()?;
+        Ok(res)
+    }
+
+    #[tracing::instrument("OnboardingDecision::latest_non_footprint_actor_decision", skip_all)]
+    pub fn latest_non_footprint_actor_decision(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+    ) -> DbResult<Option<(Self, Option<ManualReview>)>> {
+        let res: Option<(OnboardingDecision, Option<ManualReview>)> = onboarding_decision::table
+            .filter(not(onboarding_decision::actor.eq(DbActor::Footprint)))
+            .inner_join(workflow::table.inner_join(scoped_vault::table))
+            .left_join(
+                manual_review::table
+                    .on(manual_review::completed_by_decision_id.eq(onboarding_decision::id.nullable())),
+            )
+            .filter(scoped_vault::id.eq(sv_id))
+            .order_by(onboarding_decision::created_at.desc())
+            .select((
+                onboarding_decision::all_columns,
+                manual_review::all_columns.nullable(),
+            ))
             .first(conn)
             .optional()?;
         Ok(res)

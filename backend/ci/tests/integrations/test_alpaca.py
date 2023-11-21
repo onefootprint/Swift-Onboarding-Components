@@ -65,18 +65,24 @@ def cdos_for_nationality_config(nationality_config):
     ],
 )
 @pytest.mark.parametrize(
-    "sandbox_outcome,expected_error",
+    "sandbox_outcome,manually_mark_as_verified,expected_error",
     [
-        ("pass", None),
-        ("manualreview", None),
-        ("stepup", None),
-        ("fail", "The entity must have an approved decision status"),
+        ("pass", False, None),
+        ("manualreview", True, None),
+        ("stepup", True, None),
+        (
+            "fail",
+            True,
+            None,
+        ),  # weird case where the user hard failed, but the Tenant still marked them as passed and we allow them to make the CIP call
+        ("fail", False, "The entity must have an approved decision status"),
     ],
 )
 def test_alpaca_cip(
     sandbox_tenant,
     twilio,
     sandbox_outcome,
+    manually_mark_as_verified,
     expected_error,
     nationality_config,
 ):
@@ -128,8 +134,8 @@ def test_alpaca_cip(
     d = user.client.data
 
     review_annotation = None
-    if sandbox_outcome == "stepup" or sandbox_outcome == "manualreview":
-        review_annotation = "Piip is very trustworthy"  # extra annotation should not be included in the CIP response
+    if manually_mark_as_verified:
+        review_annotation = "Piip is very trustworthy"  # extra annotation should not be included in the CIP response unless there is no manual review (ie Tenant marked a hard Fail user as verified)
 
     if review_annotation:
         # Complete review
@@ -152,7 +158,7 @@ def test_alpaca_cip(
                     "canned_response": "Document identity verification was manually conducted and approved",
                 }
             ]
-        else:
+        elif sandbox_outcome == "manualreview":
             expected_review_reasons = [
                 {
                     "review_reason": "adverse_media_hit",
@@ -163,10 +169,15 @@ def test_alpaca_cip(
                     "canned_response": "Watchlist hit deemed low risk or false-positive",
                 },
             ]
-        assert (
-            timeline[0]["event"]["data"]["decision"]["manual_review"]["review_reasons"]
-            == expected_review_reasons
-        )
+        else:  # "fail"
+            expected_review_reasons = None
+        if expected_review_reasons:
+            assert (
+                timeline[0]["event"]["data"]["decision"]["manual_review"][
+                    "review_reasons"
+                ]
+                == expected_review_reasons
+            )
 
     # Create Alpaca Account
     create_account_data = {
@@ -252,6 +263,8 @@ def test_alpaca_cip(
             )
         elif sandbox_outcome == "manualreview":
             expected_approved_reason = "Adverse media hit deemed non-detrimental. Watchlist hit deemed low risk or false-positive"
+        elif sandbox_outcome == "fail":
+            expected_approved_reason = review_annotation
 
         if expected_approved_reason:
             assert (
@@ -259,7 +272,8 @@ def test_alpaca_cip(
                 == expected_approved_reason
             )
             # extra check that we aren't sending the internal/non-CR annotations in the CIP
-            assert review_annotation not in str(body["alpaca_response"])
+            if expected_approved_reason != review_annotation:
+                assert review_annotation not in str(body["alpaca_response"])
 
         # sanity check that we aren't accidently scrubbing PII in the alpaca CIP
         assert "SCRUBBED" not in str(body["alpaca_response"])

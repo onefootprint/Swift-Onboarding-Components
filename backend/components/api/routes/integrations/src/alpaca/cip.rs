@@ -23,6 +23,7 @@ use api_core::{
 };
 use api_wire_types::{AlpacaCipRequest, AlpacaCipResponse, DeprecatedAlpacaCipRequest};
 use chrono::{DateTime, Utc};
+use db::models::annotation::Annotation;
 use db::{
     actor::{saturate_actors, SaturatedActor},
     models::{
@@ -137,65 +138,79 @@ pub(crate) async fn create_cip_request(
     tenant_id: TenantId,
     is_live: bool,
 ) -> ApiResult<(CipRequest, TenantVw)> {
-    let (uvw, wf, decision, scoped_vault, obc, actor, mr, risk_signals, insight, vres, collected_document) =
-        state
-            .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
-                let fp_obd =
-                    OnboardingDecision::latest_footprint_actor_decision(conn, &fp_id, &tenant_id, is_live)?
-                        .ok_or(CipError::EntityDecisionDoesNotExist)?;
+    let (
+        uvw,
+        wf,
+        decision,
+        scoped_vault,
+        obc,
+        actor,
+        mr,
+        annotation,
+        risk_signals,
+        insight,
+        vres,
+        collected_document,
+    ) = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let fp_obd =
+                OnboardingDecision::latest_footprint_actor_decision(conn, &fp_id, &tenant_id, is_live)?
+                    .ok_or(CipError::EntityDecisionDoesNotExist)?;
 
-                let risk_signals =
-                    RiskSignal::list_tenant_visible_by_onboarding_decision_id(conn, &fp_obd.id)?;
-                let (wf, sv) = Workflow::get_all(conn, &fp_obd.workflow_id)?;
-                let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
+            let risk_signals = RiskSignal::list_tenant_visible_by_onboarding_decision_id(conn, &fp_obd.id)?;
+            let (wf, sv) = Workflow::get_all(conn, &fp_obd.workflow_id)?;
+            let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 
-                let (risk_signals, mr, manual_obd) = match fp_obd.status {
-                    DecisionStatus::Pass => (risk_signals, None, None),
-                    DecisionStatus::Fail | DecisionStatus::StepUp => {
-                        // footprint decided as fail, see if a manual decision override exists
-                        let (mr, obd_manual) = ManualReview::latest_completed_for_workflow(conn, &wf.id)?
+            let (risk_signals, mr, manual_obd, annotation) = match fp_obd.status {
+                DecisionStatus::Pass => (risk_signals, None, None, None),
+                DecisionStatus::Fail | DecisionStatus::StepUp => {
+                    // footprint decided as fail, see if a manual decision override exists
+                    let (obd_manual, mr) =
+                        OnboardingDecision::latest_non_footprint_actor_decision(conn, &sv.id)?
                             .ok_or(CipError::EntityDecisionStatusNotPass)?;
+                    let annotation = Annotation::get_for_obd(conn, &obd_manual.id)?;
 
-                        if obd_manual.status != DecisionStatus::Pass {
-                            return Err(CipError::EntityDecisionManualReviewStatusNotPass)?;
-                        }
-
-                        (risk_signals, Some(mr), Some(obd_manual))
+                    if obd_manual.status != DecisionStatus::Pass {
+                        return Err(CipError::EntityDecisionManualReviewStatusNotPass)?;
                     }
-                };
 
-                let collected_document = DocumentRequest::get(conn, &wf.id)?.map(|d| d.should_collect_selfie);
-                let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
-                let insight = InsightEvent::get(conn, &wf.id)?;
+                    (risk_signals, mr, Some(obd_manual), annotation)
+                }
+            };
 
-                let decision = manual_obd.unwrap_or(fp_obd);
+            let collected_document = DocumentRequest::get(conn, &wf.id)?.map(|d| d.should_collect_selfie);
+            let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
+            let insight = InsightEvent::get(conn, &wf.id)?;
 
-                // find the actor either via Manaul OBD or the FP OBD.
-                let actor = saturate_actors(conn, vec![decision.clone()])?
-                    .pop()
-                    .map(|(_, actor)| actor);
+            let decision = manual_obd.unwrap_or(fp_obd);
 
-                let vres = VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user(
-                    conn,
-                    sv.id.clone(),
-                )?;
+            // find the actor either via Manaul OBD or the FP OBD.
+            let actor = saturate_actors(conn, vec![decision.clone()])?
+                .pop()
+                .map(|(_, actor)| actor);
 
-                Ok((
-                    uvw,
-                    wf,
-                    decision,
-                    sv,
-                    obc,
-                    actor,
-                    mr,
-                    risk_signals,
-                    insight,
-                    vres,
-                    collected_document,
-                ))
-            })
-            .await??;
+            let vres = VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user(
+                conn,
+                sv.id.clone(),
+            )?;
+
+            Ok((
+                uvw,
+                wf,
+                decision,
+                sv,
+                obc,
+                actor,
+                mr,
+                annotation,
+                risk_signals,
+                insight,
+                vres,
+                collected_document,
+            ))
+        })
+        .await??;
 
     let user_vault_private_key = uvw.vault.e_private_key.clone();
     let document_check_created_at = vres
@@ -241,6 +256,7 @@ pub(crate) async fn create_cip_request(
         actor,
         default_approver,
         mr.as_ref(),
+        annotation.as_ref(),
         &vd,
     )?;
     let watchlist = watchlist(
@@ -287,6 +303,7 @@ fn kyc(
     actor: Option<SaturatedActor>,
     default_approver: PiiString,
     mr: Option<&ManualReview>,
+    annotation: Option<&Annotation>,
     decrypted_data: &DecryptUncheckedResult,
 ) -> ApiResult<alpaca::Kyc> {
     // find the right approver
@@ -309,9 +326,12 @@ fn kyc(
             .map(|rr| rr.canned_response().to_owned())
             .collect::<Vec<_>>();
         review_reason_crs.sort();
-        Some(review_reason_crs.join(". "))
+        review_reason_crs.join(". ")
     } else {
-        None
+        // If there is no MR but there is an anotation (from the manual OBD) then we send this as approved_reason
+        annotation
+            .map(|annotation| annotation.note.clone())
+            .unwrap_or("User was manually reviewed and data verified".to_owned())
     };
     // find a gov't id number if we have one
     let id_number = vec![
@@ -365,7 +385,7 @@ fn kyc(
         approved_by,
         approved_at: decision.created_at,
 
-        approved_reason,
+        approved_reason: Some(approved_reason),
 
         id_number,
     };
@@ -462,6 +482,7 @@ fn watchlist(
     let overall_result = CipResult::clear(!any_consider);
 
     // Validate wrt to mr.review_reasons
+    // TODO: do we really want/need these validations here?
     if adverse_media
         && !mr
             .map(|r| r.review_reasons.contains(&ReviewReason::AdverseMediaHit))
