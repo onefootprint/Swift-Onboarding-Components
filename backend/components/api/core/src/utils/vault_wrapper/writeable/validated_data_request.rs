@@ -181,7 +181,7 @@ impl ValidatedDataRequest {
 
         // Create the new VDs
         let actor = actor.map(|a| a.into());
-        let vd = VaultData::bulk_create(conn, v_id, sv_id, self.data, seqno, source, actor)?;
+        let new_vd = VaultData::bulk_create(conn, v_id, sv_id, self.data, seqno, source, actor)?;
 
         // Point fingerprints to the same lifetime used for the corresponding VD row
         let fingerprints: Vec<_> = self
@@ -193,7 +193,7 @@ impl ValidatedDataRequest {
                     fingerprint,
                     scope,
                 } = req;
-                let vd = vd
+                let vd = new_vd
                     .iter()
                     .find(|vd| vd.kind == kind)
                     .ok_or(AssertionError(&format!("No lifetime id found for {}", kind)))?;
@@ -214,7 +214,7 @@ impl ValidatedDataRequest {
         Fingerprint::bulk_create(conn, fingerprints)?;
 
         // Add contact info for the new CIs added
-        let new_contact_info = vd
+        let new_contact_info = new_vd
             .iter()
             .filter(|vd| {
                 matches!(
@@ -232,7 +232,11 @@ impl ValidatedDataRequest {
             .collect_vec();
         let ci = ContactInfo::bulk_create(conn, new_contact_info)?;
 
-        let saved_data = SavedData { vd, ci, seqno };
+        let saved_data = SavedData {
+            vd: new_vd,
+            ci,
+            seqno,
+        };
         Ok(saved_data)
     }
 }
