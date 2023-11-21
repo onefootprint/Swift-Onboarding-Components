@@ -1,4 +1,3 @@
-use super::validated_data_request::{SavedData, ValidatedDataRequest};
 use super::WriteableVw;
 use crate::auth::tenant::AuthActor;
 use crate::errors::{ApiResult, AssertionError};
@@ -7,17 +6,19 @@ use crate::utils::vault_wrapper::Person;
 use crate::State;
 use crypto::seal::SealedChaCha20Poly1305DataKey;
 use db::models::business_owner::BusinessOwner;
-use db::models::contact_info::ContactInfo;
+use db::models::contact_info::{ContactInfo, NewContactInfoArgs};
 use db::models::data_lifetime::DataLifetime;
 use db::models::document_data::DocumentData;
 use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
+use db::models::vault_data::VaultData;
 use db::TxnPgConn;
 use itertools::Itertools;
+use newtypes::output::Csv;
 use newtypes::{BusinessDataKind as BDK, DataLifetimeSeqno, DataLifetimeSource, S3Url};
 use newtypes::{
-    CollectedDataOption, DataCollectedInfo, DataIdentifier, DataRequest, Fingerprints,
-    KycedBusinessOwnerData, PiiString, ScopedVaultId, SealedVaultDataKey, VaultId,
+    CollectedDataOption, ContactInfoPriority, DataCollectedInfo, DataIdentifier, DataRequest, Fingerprints,
+    IdentityDataKind as IDK, KycedBusinessOwnerData, PiiString, ScopedVaultId, SealedVaultDataKey, VaultId,
 };
 
 type NewContactInfo = (DataIdentifier, ContactInfo);
@@ -50,34 +51,25 @@ impl<Type> WriteableVw<Type> {
         source: DataLifetimeSource,
         actor: Option<AuthActor>,
     ) -> ApiResult<PatchDataResult> {
-        let kyced_bos = request.get(&BDK::KycedBeneficialOwners.into()).cloned();
         request.assert_allowable_identifiers(self.vault.kind)?;
-        let request = self.validate_request(conn, request)?;
-        let result = self.internal_save_data(conn, request, source, actor)?;
+        let keys = request.keys().cloned().collect_vec();
+        tracing::info!(dis=%Csv::from(keys.clone()), "Patching DIs");
+        let kyced_bos = request.get(&BDK::KycedBeneficialOwners.into()).cloned();
+        let (new_ci, seqno) = if !request.is_empty() {
+            // Must do this validation here inside the locked, WriteableUvw
+            let request = self.validate_request(conn, request)?;
+            let sv_id = self.scoped_vault_id.clone();
+            let (vds, seqno) = request.save(conn, self.vault(), sv_id, source, actor.clone())?;
+            let new_ci = Self::create_contact_info_if_needed(conn, vds)?;
+            (new_ci, seqno)
+        } else {
+            // The request was a no-op, no reason to increment the seqno
+            let seqno = DataLifetime::get_current_seqno(conn)?;
+            (vec![], seqno)
+        };
         self.create_bos_if_needed(conn, kyced_bos)?;
-        Ok(result)
-    }
-
-    pub(super) fn internal_save_data(
-        &self,
-        conn: &mut TxnPgConn,
-        request: ValidatedDataRequest,
-        source: DataLifetimeSource,
-        actor: Option<AuthActor>,
-    ) -> ApiResult<PatchDataResult> {
-        let keys = request.data.iter().map(|d| d.kind.clone()).collect_vec();
-        let SavedData { vd, ci, seqno } = request.save(conn, self, source, actor.clone())?;
         // Add timeline event for all the newly added data
         self.add_timeline_event(conn, keys, actor)?;
-
-        // Zip new CIs with their DI
-        let new_ci = ci
-            .into_iter()
-            .filter_map(|ci| -> Option<_> {
-                let vd = vd.iter().find(|vd| vd.lifetime_id == ci.lifetime_id)?;
-                Some((vd.kind.clone(), ci))
-            })
-            .collect();
 
         let result = PatchDataResult { new_ci, seqno };
         Ok(result)
@@ -98,6 +90,43 @@ impl<Type> WriteableVw<Type> {
         BusinessOwner::bulk_create_secondary(conn, bo_ids, self.vault().id.clone())?;
 
         Ok(())
+    }
+
+    #[tracing::instrument("WriteableVw::create_contact_info_if_needed", skip_all)]
+    fn create_contact_info_if_needed(
+        conn: &mut TxnPgConn,
+        new_vds: Vec<VaultData>,
+    ) -> ApiResult<Vec<NewContactInfo>> {
+        // Create ContactInfo rows for new phone numbers/emails
+        let new_contact_info = new_vds
+            .iter()
+            .filter(|vd| {
+                matches!(
+                    vd.kind,
+                    DataIdentifier::Id(IDK::PhoneNumber) | DataIdentifier::Id(IDK::Email)
+                )
+            })
+            .map(|vd| NewContactInfoArgs {
+                is_verified: false,
+                is_otp_verified: false,
+                priority: ContactInfoPriority::Primary,
+                lifetime_id: vd.lifetime_id.clone(),
+            })
+            .collect_vec();
+        let cis = ContactInfo::bulk_create(conn, new_contact_info)?;
+        // Zip CI with corresponding DI
+        let cis = cis
+            .into_iter()
+            .map(|ci| -> ApiResult<_> {
+                let di = new_vds
+                    .iter()
+                    .find(|vd| vd.lifetime_id == ci.lifetime_id)
+                    .map(|vd| vd.kind.clone())
+                    .ok_or(AssertionError("No lifetime ID"))?;
+                Ok((di, ci))
+            })
+            .collect::<ApiResult<Vec<_>>>()?;
+        Ok(cis)
     }
 
     #[tracing::instrument("WriteableVw::add_timeline_event", skip_all)]
