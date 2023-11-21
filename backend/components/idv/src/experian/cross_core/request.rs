@@ -4,7 +4,10 @@ use newtypes::{
     IdvData, PiiString,
 };
 
-use crate::experian::error::{ConversionError, Error};
+use crate::experian::{
+    error::{ConversionError, Error},
+    normalize_address_line_1,
+};
 
 /// This is the top level request to CrossCore
 #[derive(Debug, Clone, serde::Serialize)]
@@ -134,7 +137,9 @@ impl Contact {
 
         let first_name = first_name.ok_or(ConversionError::MissingFirstName)?;
         let last_name = last_name.ok_or(ConversionError::MissingLastName)?;
-        let address = address_line1.ok_or(ConversionError::MissingAddress)?; // TODO
+        let address = address_line1
+            .ok_or(ConversionError::MissingAddress)?
+            .map(|s| normalize_address_line_1(s.as_str()));
         let person_details = if let Some(d) = dob {
             let parsed_dob =
                 NaiveDate::parse_from_str(d.leak(), "%Y-%m-%d").map_err(|_| ConversionError::CantParseDob)?;

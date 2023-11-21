@@ -66,7 +66,7 @@ reqwest-middleware = { workspace = true }
 
 itertools = { workspace = true }
 lazy_static = { workspace = true }
-regex = "1.5"
+regex = { workspace = true }
 strum = { workspace = true }
 
 workos = "0.2"
