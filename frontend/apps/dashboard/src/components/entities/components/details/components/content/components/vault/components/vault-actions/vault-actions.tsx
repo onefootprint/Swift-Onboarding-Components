@@ -6,6 +6,7 @@ import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import {
   DECRYPT_VAULT_FORM_ID,
+  EDIT_VAULT_FORM_ID,
   HEADER_ACTIONS_SELECTOR,
 } from '@/entity/constants';
 
@@ -13,12 +14,14 @@ import Actions from './components/actions';
 import ManualReview from './components/manual-review';
 import ReasonDialog from './components/reason-dialog';
 import useDecryptControls from './hooks/use-decrypt-controls';
+import useEditControls from './hooks/use-edit-controls';
 
 type VaultActionsControlsProps = WithEntityProps;
 
 const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
-  const { allT, t } = useTranslation('pages.entity.decrypt');
+  const { allT, t } = useTranslation('pages.entity');
   const decryptControls = useDecryptControls();
+  const editControls = useEditControls();
   const canDecrypt = !!entity.decryptableAttributes.length;
   const entityVault = useEntityVault(entity.id, entity);
 
@@ -30,8 +33,8 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
 
   return (
     <Portal selector={HEADER_ACTIONS_SELECTOR}>
-      {decryptControls.isIdle && (
-        <Tooltip disabled={canDecrypt} text={t('not-allowed')}>
+      {editControls.isIdle && decryptControls.isIdle && (
+        <Tooltip disabled={canDecrypt} text={t('decrypt.not-allowed')}>
           <Stack gap={3} align="center">
             <Button
               disabled={!canDecrypt}
@@ -39,24 +42,37 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
               size="small"
               variant="secondary"
             >
-              {t('start')}
+              {t('decrypt.start')}
             </Button>
             <ManualReview />
             <Actions />
           </Stack>
         </Tooltip>
       )}
+      {(decryptControls.inProgress || editControls.inProgress) && (
       {decryptControls.inProgress && (
         <Stack gap={3}>
           <Button
             size="small"
             variant="secondary"
-            onClick={decryptControls.cancel}
+            onClick={
+              decryptControls.inProgress
+                ? decryptControls.cancel
+                : editControls.cancel
+            }
           >
             {allT('cancel')}
           </Button>
-          <Button form={DECRYPT_VAULT_FORM_ID} size="small" type="submit">
-            {allT('next')}
+          <Button
+            form={
+              decryptControls.inProgress
+                ? DECRYPT_VAULT_FORM_ID
+                : EDIT_VAULT_FORM_ID
+            }
+            size="small"
+            type="submit"
+          >
+            {decryptControls.inProgress ? allT('next') : allT('save')}
           </Button>
         </Stack>
       )}

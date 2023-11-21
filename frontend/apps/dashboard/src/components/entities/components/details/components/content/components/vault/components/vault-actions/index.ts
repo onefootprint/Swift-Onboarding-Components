@@ -1,7 +1,3 @@
-import withEntity from '@/entity/components/with-entity';
-
-import VaultActionsControls from './vault-actions';
-
 export { default as useDecryptControls } from './hooks/use-decrypt-controls';
-
-export default withEntity(VaultActionsControls);
+export { default as useEditControls } from './hooks/use-edit-controls';
+export { default } from './vault-actions';
