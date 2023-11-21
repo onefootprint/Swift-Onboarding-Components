@@ -50,7 +50,6 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
         </Tooltip>
       )}
       {(decryptControls.inProgress || editControls.inProgress) && (
-      {decryptControls.inProgress && (
         <Stack gap={3}>
           <Button
             size="small"
