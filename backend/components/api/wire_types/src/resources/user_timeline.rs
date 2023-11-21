@@ -2,7 +2,7 @@ use newtypes::CollectedDataOption;
 
 use crate::{
     Actor, Annotation, Apiv2Schema, DateTime, IdentityDocumentTimelineEvent, LivenessEvent,
-    OnboardingDecision, Serialize, Utc, VaultCreated, WatchlistCheck, Workflow,
+    OnboardingDecision, Serialize, TimelinePlaybook, Utc, VaultCreated, WatchlistCheck, Workflow,
 };
 
 /// Describes a liveness event that took place
@@ -31,6 +31,7 @@ pub enum UserTimelineEvent {
     WatchlistCheck(WatchlistCheck),
     VaultCreated(VaultCreated),
     WorkflowTriggered(WorkflowTriggered),
+    WorkflowStarted(WorkflowStarted),
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -44,4 +45,9 @@ pub struct DataCollectedInfo {
 pub struct WorkflowTriggered {
     pub workflow: Workflow,
     pub actor: Actor,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct WorkflowStarted {
+    pub playbook: TimelinePlaybook,
 }

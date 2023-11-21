@@ -36,6 +36,7 @@ pub enum DbUserTimelineEvent {
     WatchlistCheck(WatchlistCheckInfo),
     VaultCreated(VaultCreatedInfo),
     WorkflowTriggered(WorkflowTriggeredInfo),
+    WorkflowStarted(WorkflowStartedInfo),
 }
 
 impl_enum_string_diesel!(DbUserTimelineEventKind);
@@ -85,6 +86,12 @@ impl From<VaultCreatedInfo> for DbUserTimelineEvent {
 impl From<WorkflowTriggeredInfo> for DbUserTimelineEvent {
     fn from(s: WorkflowTriggeredInfo) -> Self {
         Self::WorkflowTriggered(s)
+    }
+}
+
+impl From<WorkflowStartedInfo> for DbUserTimelineEvent {
+    fn from(s: WorkflowStartedInfo) -> Self {
+        Self::WorkflowStarted(s)
     }
 }
 
@@ -143,4 +150,10 @@ pub struct WorkflowTriggeredInfo {
     /// New format when triggers simply reonboard to a playbook
     pub ob_config_id: Option<ObConfigurationId>,
     pub actor: DbActor,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WorkflowStartedInfo {
+    pub workflow_id: WorkflowId,
+    pub pb_id: ObConfigurationId,
 }

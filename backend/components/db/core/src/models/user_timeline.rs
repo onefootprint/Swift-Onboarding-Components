@@ -21,6 +21,7 @@ use super::annotation::AnnotationInfo;
 use super::document_request::DocumentRequest;
 use super::identity_document::IdentityDocument;
 use super::insight_event::InsightEvent;
+use super::ob_configuration::ObConfiguration;
 use super::onboarding_decision::{OnboardingDecision, SaturatedOnboardingDecisionInfo};
 use super::scoped_vault::ScopedVaultIdentifier;
 use super::watchlist_check::WatchlistCheck;
@@ -67,6 +68,7 @@ pub enum SaturatedTimelineEvent {
     WatchlistCheck(WatchlistCheck),
     VaultCreated(SaturatedActor),
     WorkflowTriggered((Option<Workflow>, SaturatedActor)),
+    WorkflowStarted((Workflow, ObConfiguration)),
 }
 
 pub type IsFromOtherTenant = bool;
@@ -175,8 +177,13 @@ impl UserTimeline {
             DbUserTimelineEvent::DataCollected(ref e) => e.actor.clone(),
             _ => None,
         });
+        let ob_config_ids = results.iter().flat_map(|ut| match ut.event {
+            DbUserTimelineEvent::WorkflowStarted(ref e) => Some(e.pb_id.clone()),
+            _ => None,
+        });
         let workflow_ids = results.iter().flat_map(|ut| match ut.event {
-            DbUserTimelineEvent::WorkflowTriggered(ref e) => Some(e.workflow_id.clone()),
+            DbUserTimelineEvent::WorkflowTriggered(ref e) => e.workflow_id.clone(),
+            DbUserTimelineEvent::WorkflowStarted(ref e) => Some(e.workflow_id.clone()),
             _ => None,
         });
 
@@ -187,7 +194,8 @@ impl UserTimeline {
             IdentityDocument::get_bulk_with_requests(conn, identity_document_ids.collect())?;
         let actors: HashMap<_, _> = saturate_actors(conn, db_actors.collect())?.into_iter().collect();
         let watchlist_checks = WatchlistCheck::get_bulk(conn, watchlist_check_ids.collect())?;
-        let workflows = Workflow::get_bulk(conn, workflow_ids.flatten().collect())?;
+        let ob_configs = ObConfiguration::get_bulk(conn, ob_config_ids.collect())?;
+        let workflows = Workflow::get_bulk(conn, workflow_ids.collect())?;
 
         // Join the UserTimeline events with the saturated info we fetched from different tables
         let results = results
@@ -264,6 +272,17 @@ impl UserTimeline {
                             .ok_or(DbError::RelatedObjectNotFound)?
                             .clone();
                         SaturatedTimelineEvent::WorkflowTriggered((workflow, actor))
+                    }
+                    DbUserTimelineEvent::WorkflowStarted(ref e) => {
+                        let workflow = workflows
+                            .get(&e.workflow_id)
+                            .ok_or(DbError::RelatedObjectNotFound)?
+                            .clone();
+                        let ob_config = ob_configs
+                            .get(&e.pb_id)
+                            .ok_or(DbError::RelatedObjectNotFound)?
+                            .clone();
+                        SaturatedTimelineEvent::WorkflowStarted((workflow, ob_config))
                     }
                 };
                 // This will actually display that events from different ob configs at the same

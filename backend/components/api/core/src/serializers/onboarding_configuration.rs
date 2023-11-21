@@ -137,7 +137,7 @@ impl DbToApi<(ObConfiguration, Option<SaturatedActor>)> for api_wire_types::Onbo
     }
 }
 
-impl DbToApi<ObConfiguration> for api_wire_types::TimelineDecisionObConfiguration {
+impl DbToApi<ObConfiguration> for api_wire_types::TimelinePlaybook {
     fn from_db(ob_configuration: ObConfiguration) -> Self {
         let ObConfiguration {
             id,
@@ -145,7 +145,7 @@ impl DbToApi<ObConfiguration> for api_wire_types::TimelineDecisionObConfiguratio
             must_collect_data,
             ..
         } = ob_configuration;
-        api_wire_types::TimelineDecisionObConfiguration {
+        api_wire_types::TimelinePlaybook {
             id,
             name,
             must_collect_data,

@@ -474,6 +474,21 @@ impl ObConfiguration {
         Ok(result)
     }
 
+    #[tracing::instrument("ObConfiguration::get_bulk", skip_all)]
+    pub fn get_bulk(
+        conn: &mut PgConn,
+        ids: Vec<ObConfigurationId>,
+    ) -> DbResult<HashMap<ObConfigurationId, Self>> {
+        let results = ob_configuration::table
+            .filter(ob_configuration::id.eq_any(ids))
+            .get_results::<Self>(conn)?
+            .into_iter()
+            .map(|obc| (obc.id.clone(), obc))
+            .collect();
+
+        Ok(results)
+    }
+
     #[tracing::instrument("ObConfiguration::get_enabled", skip_all)]
     pub fn get_enabled<'a, T>(conn: &mut PgConn, id: T) -> DbResult<(Self, Tenant)>
     where

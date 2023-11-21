@@ -10,6 +10,7 @@ use newtypes::{
     AlpacaKycState, DbActor, DocumentState, FireWebhookArgs, InsightEventId, KybConfig, KybState, KycConfig,
     ObConfigurationKind, OnboardingCompletedPayload, OnboardingStatus, OnboardingStatusChangedPayload,
     TaskData, TenantId, TenantScope, VaultId, VaultKind, WebhookEvent, WorkflowFixtureResult, WorkflowSource,
+    WorkflowStartedInfo,
 };
 use newtypes::{
     Locked, ObConfigurationId, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState,
@@ -22,6 +23,7 @@ use super::onboarding_decision::{NewDecisionArgs, OnboardingDecision};
 use super::scoped_vault::{ScopedVault, ScopedVaultUpdate};
 use super::task::Task;
 use super::tenant::Tenant;
+use super::user_timeline::UserTimeline;
 use super::workflow_event::WorkflowEvent;
 use crate::models::vault::Vault;
 use crate::{DbResult, PgConn, TxnPgConn};
@@ -268,7 +270,7 @@ impl Workflow {
             scoped_vault_id,
             config,
             fixture_result,
-            ob_configuration_id: Some(ob_configuration_id),
+            ob_configuration_id: Some(ob_configuration_id.clone()),
             authorized,
             insight_event_id,
             source,
@@ -285,6 +287,13 @@ impl Workflow {
             ..ScopedVaultUpdate::default()
         };
         ScopedVault::update(conn, &sv.id, update)?;
+
+        // Create a timeline event showing the onboarding started
+        let info = WorkflowStartedInfo {
+            workflow_id: wf.id.clone(),
+            pb_id: ob_configuration_id,
+        };
+        UserTimeline::create(conn, info, sv.vault_id, sv.id)?;
 
         Ok((wf, true))
     }

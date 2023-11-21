@@ -150,6 +150,10 @@ def test_timeline(sandbox_user):
     )
     assert decision_event["event"]["data"]["decision"]["status"] == "pass"
     assert decision_event["event"]["data"]["decision"]["source"]["kind"] == "footprint"
+    workflow_started_event = next(
+        i for i in body if i["event"]["kind"] == "workflow_started"
+    )
+    assert workflow_started_event["event"]["data"]["playbook"]["id"] == sandbox_user.client.ob_config.id
 
     # Test filtering
     body = get(

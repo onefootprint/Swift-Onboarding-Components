@@ -87,6 +87,11 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                     actor: api_wire_types::Actor::from_db(actor),
                 })
             }
+            SaturatedTimelineEvent::WorkflowStarted((_, pb)) => {
+                Self::WorkflowStarted(api_wire_types::WorkflowStarted {
+                    playbook: api_wire_types::TimelinePlaybook::from_db(pb),
+                })
+            }
         }
     }
 }
