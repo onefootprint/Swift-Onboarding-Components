@@ -137,11 +137,18 @@ impl DbToApi<(ObConfiguration, Option<SaturatedActor>)> for api_wire_types::Onbo
     }
 }
 
-impl DbToApi<ObConfiguration> for api_wire_types::LiteObConfiguration {
+impl DbToApi<ObConfiguration> for api_wire_types::TimelineDecisionObConfiguration {
     fn from_db(ob_configuration: ObConfiguration) -> Self {
         let ObConfiguration {
-            must_collect_data, ..
+            id,
+            name,
+            must_collect_data,
+            ..
         } = ob_configuration;
-        api_wire_types::LiteObConfiguration { must_collect_data }
+        api_wire_types::TimelineDecisionObConfiguration {
+            id,
+            name,
+            must_collect_data,
+        }
     }
 }

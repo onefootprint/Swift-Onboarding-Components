@@ -35,7 +35,7 @@ impl DbToApi<OnboardingDecisionInfo> for api_wire_types::OnboardingDecision {
             status,
             timestamp: created_at,
             source: Actor::from_db(saturated_db_actor),
-            ob_configuration: ob_configuration.map(api_wire_types::LiteObConfiguration::from_db),
+            ob_configuration: ob_configuration.map(api_wire_types::TimelineDecisionObConfiguration::from_db),
             manual_review: mr.map(api_wire_types::ManualReview::from_db),
         }
     }
