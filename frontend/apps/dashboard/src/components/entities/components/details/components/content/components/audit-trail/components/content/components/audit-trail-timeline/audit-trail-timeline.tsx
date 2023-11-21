@@ -93,20 +93,22 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       });
     } else if (kind === TimelineEventKind.dataCollected) {
       const eventData = data as CollectedDataEventData;
-      items.push({
-        time,
-        iconComponent: isFromOtherOrg ? (
-          <IcoLayer0116 />
-        ) : (
-          <DataCollectedEventIcon data={eventData} />
-        ),
-        headerComponent: (
-          <DataCollectedEventHeader
-            data={eventData}
-            isFromOtherOrg={isFromOtherOrg}
-          />
-        ),
-      });
+      if (eventData.attributes.length) {
+        items.push({
+          time,
+          iconComponent: isFromOtherOrg ? (
+            <IcoLayer0116 />
+          ) : (
+            <DataCollectedEventIcon data={eventData} />
+          ),
+          headerComponent: (
+            <DataCollectedEventHeader
+              data={eventData}
+              isFromOtherOrg={isFromOtherOrg}
+            />
+          ),
+        });
+      }
     } else if (kind === TimelineEventKind.idDocUploaded) {
       const eventData = data as IdDocUploadedEventData;
       items.push({
