@@ -25,12 +25,7 @@ const Selfie = ({ onSubmit }: SelfieProps) => {
       type="front"
     >
       {value => (
-        <Frame
-          aspectRatio={0.9}
-          description={t('instructions.description')}
-          detector={detector}
-          title={t('instructions.title')}
-        >
+        <Frame aspectRatio={0.9} detector={detector}>
           {value && <Countdown value={value} />}
         </Frame>
       )}

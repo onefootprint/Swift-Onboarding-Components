@@ -27,7 +27,11 @@ const DefaultDocument = ({
   type,
 }: DefaultDocumentProps) => {
   const { t } = useTranslation(`scan.${kebabCase(type)}`);
-  const { object, detector, frameProcessor } = useFrameProcessor();
+  const documentName = t('name');
+  const { object, detector, frameProcessor } = useFrameProcessor({
+    side,
+    documentName,
+  });
   const hasBackButton = side === UploadDocumentSide.Front;
 
   return (
@@ -39,12 +43,7 @@ const DefaultDocument = ({
       title={t(`title-${side}`)}
     >
       {value => (
-        <Frame
-          aspectRatio={DEFAULT_ASPECT_RATIO}
-          description={t('instructions.description')}
-          detector={detector}
-          title={t(`instructions.title-${side}`)}
-        >
+        <Frame aspectRatio={DEFAULT_ASPECT_RATIO} detector={detector}>
           {value && <Countdown value={value} />}
         </Frame>
       )}

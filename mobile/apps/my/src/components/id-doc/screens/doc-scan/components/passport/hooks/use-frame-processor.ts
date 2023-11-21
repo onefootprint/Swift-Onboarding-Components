@@ -36,7 +36,7 @@ const useFrameProcessor = () => {
         setDetectorJs(false);
         setObjectJs({
           isDetected: false,
-          feedback: 'Position the document in view',
+          feedback: 'Scan the PHOTO PAGE of your passport',
           data: {},
         });
       }

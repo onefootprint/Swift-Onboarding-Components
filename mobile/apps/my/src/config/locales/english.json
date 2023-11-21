@@ -171,6 +171,7 @@
       }
     },
     "drivers-license": {
+      "name": "driver's license",
       "title-front": "Driver's license - Front",
       "title-back": "Driver's license - Back",
       "instructions": {
@@ -180,6 +181,7 @@
       }
     },
     "passport": {
+      "name": "passport",
       "title": "Passport",
       "instructions": {
         "title": "Place passport here",
@@ -187,6 +189,7 @@
       }
     },
     "id-card": {
+      "name": "ID Card",
       "title-front": "ID Card - Front",
       "title-back": "ID Card - Back",
       "instructions": {
@@ -196,6 +199,7 @@
       }
     },
     "voter-identification": {
+      "name": "voter ID",
       "title-front": "Voter ID - Front",
       "title-back": "Voter ID - Back",
       "instructions": {
@@ -205,6 +209,7 @@
       }
     },
     "residence-document": {
+      "name": "residence card",
       "title-front": "Residence Card - Front",
       "title-back": "Residence Card - Back",
       "instructions": {
@@ -214,6 +219,7 @@
       }
     },
     "permit": {
+      "name": "EAD card",
       "title-front": "EAD Card - Front",
       "title-back": "EAD Card - Back",
       "instructions": {
@@ -223,6 +229,7 @@
       }
     },
     "visa": {
+      "name": "visa",
       "title-front": "Visa - Front",
       "title-back": "Visa - Back",
       "instructions": {

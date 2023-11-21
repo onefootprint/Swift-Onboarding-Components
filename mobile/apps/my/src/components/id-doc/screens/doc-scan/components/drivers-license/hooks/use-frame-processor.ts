@@ -43,7 +43,9 @@ const useFrameProcessor = (
 
     setObjectJs({
       isDetected,
-      feedback: isDetected ? '' : 'Position the document in view',
+      feedback: isDetected
+        ? ''
+        : `Scan the ${side.toUpperCase()} of your driver's license`,
       data: {
         barcodes: barcodeResult.barcodes,
       },

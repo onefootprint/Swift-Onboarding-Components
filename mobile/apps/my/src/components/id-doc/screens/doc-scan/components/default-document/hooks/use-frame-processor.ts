@@ -1,7 +1,4 @@
-import type {
-  SupportedIdDocTypes,
-  UploadDocumentSide,
-} from '@onefootprint/types';
+import type { UploadDocumentSide } from '@onefootprint/types';
 import { useState } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
 import { useFrameProcessor as useVCFrameProcessor } from 'react-native-vision-camera';
@@ -13,7 +10,7 @@ import type { Detection } from '../../../doc-scan.types';
 
 export type DefaultDocumentProps = {
   side: UploadDocumentSide;
-  type: SupportedIdDocTypes;
+  documentName: string;
 };
 
 const detected = {
@@ -22,7 +19,7 @@ const detected = {
   data: {},
 };
 
-const useFrameProcessor = () => {
+const useFrameProcessor = ({ side, documentName }: DefaultDocumentProps) => {
   const [object, setObject] = useState<Detection>({
     isDetected: false,
     feedback: '',
@@ -46,7 +43,7 @@ const useFrameProcessor = () => {
         setDetectorJs(false);
         setObjectJs({
           isDetected: false,
-          feedback: 'Position the document in view',
+          feedback: `Scan the ${side.toUpperCase()} of your ${documentName}`,
           data: {},
         });
       }

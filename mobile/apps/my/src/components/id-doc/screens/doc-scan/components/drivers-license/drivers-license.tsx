@@ -38,12 +38,7 @@ const DriversLicense = ({
       title={t(`title-${side}`)}
     >
       {value => (
-        <Frame
-          aspectRatio={DEFAULT_ASPECT_RATIO}
-          description={t('instructions.description')}
-          detector={detector}
-          title={t(`instructions.title-${side}`)}
-        >
+        <Frame aspectRatio={DEFAULT_ASPECT_RATIO} detector={detector}>
           {value && <Countdown value={value} />}
         </Frame>
       )}

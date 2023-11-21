@@ -28,12 +28,7 @@ const Passport = ({ onBack, onSubmit }: PassportProps) => {
       title={t('title')}
     >
       {value => (
-        <Frame
-          aspectRatio={DEFAULT_ASPECT_RATIO}
-          description={t('instructions.description')}
-          detector={detector}
-          title={t('instructions.title')}
-        >
+        <Frame aspectRatio={DEFAULT_ASPECT_RATIO} detector={detector}>
           {value && <Countdown value={value} />}
         </Frame>
       )}
