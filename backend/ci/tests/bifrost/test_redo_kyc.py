@@ -17,9 +17,7 @@ def extract_trigger_sms(twilio, phone_number, id):
         messages = twilio.messages.list(to=phone_number, limit=25)
         print(f"Searching for message with id {id} sent to {phone_number}")
         message = next(
-            m
-            for m in messages
-            if f"3377854526\n\nRe-verify your identity for" in m.body
+            m for m in messages if f"{id}\n\nRe-verify your identity for" in m.body
         )
         token = message.body.split("#")[1].split("\n\nSent via Footprint")[0]
         return token
@@ -28,9 +26,6 @@ def extract_trigger_sms(twilio, phone_number, id):
     return try_until_success(inner, 60)
 
 
-@pytest.mark.skip(
-    "Test is pretty consistently failing to not be able to find an SMS..."
-)
 @pytest.mark.parametrize("with_document", [True, False])
 def test_redo_kyc(
     sandbox_tenant, twilio, with_document, doc_first_obc, live_phone_number
