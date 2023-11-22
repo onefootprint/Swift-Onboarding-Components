@@ -41,7 +41,7 @@ const Sdks = [
 ];
 
 for (const { version, baseUrl } of Sdks) {
-  test(`E2E.WebSDKIntegration.${version} #ci`, async ({
+  test(`E2E.WebSDKIntegration.${version}`, async ({
     browserName,
     page,
     browser,
