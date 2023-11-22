@@ -9,9 +9,15 @@ import PhoneIdentification from '../phone-identification';
 import ResidentialAddress from '../residential-address';
 import SmsChallenge from '../sms-challenge';
 import Ssn from '../ssn';
+import WithSdkArgs from './components/with-sdk-args';
 
-const Router = () => {
+type RouterProps = {
+  token: string;
+};
+
+const Router = ({ token }: RouterProps) => {
   const [state, send] = useMachine(() => createMachine());
+  console.log(token);
 
   if (state.matches('emailIdentification')) {
     return (
@@ -76,4 +82,14 @@ const Router = () => {
   return null;
 };
 
-export default Router;
+const RouterWithSdkArgs = () => {
+  return (
+    <WithSdkArgs>
+      {token => {
+        return <Router token={token} />;
+      }}
+    </WithSdkArgs>
+  );
+};
+
+export default RouterWithSdkArgs;

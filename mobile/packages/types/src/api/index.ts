@@ -47,6 +47,7 @@ export * from './org-create-api-key';
 export * from './org-member-response';
 export * from './org-onboarding-configs-create';
 export * from './org-onboarding-configs-update';
+export * from './sdk-args';
 export * from './session-validate';
 export * from './signup-challenge';
 export * from './skip-liveness';
