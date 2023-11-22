@@ -328,7 +328,7 @@ describe('<Identify />', () => {
           expect(
             screen.getByDisplayValue('(234) 567-8999'),
           ).toBeInTheDocument();
-          await userEvent.click(screen.getByText('Continue'));
+          await userEvent.click(screen.getByText('Verify with SMS'));
 
           await fillChallengePin();
 

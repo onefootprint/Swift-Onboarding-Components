@@ -7,6 +7,7 @@ import {
   confirmData,
   fillEmail,
   fillPhoneNumber,
+  clickOnVerifyWithSms,
 } from './utils/commands';
 import getMobileSdkBifrostUrlFragment from './utils/get-mobile-sdk-bifrost-url-fragment';
 
@@ -93,7 +94,7 @@ for (const { format, urlFragment, hasUserData } of SdkUrls) {
       await page.waitForLoadState();
 
       await fillPhoneNumber({ frame: page }, { phoneNumber: '5555550100' });
-      await clickOnContinue({ frame: page });
+      await clickOnVerifyWithSms({ frame: page });
       await page.waitForLoadState();
     }
 

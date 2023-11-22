@@ -13,6 +13,7 @@ import {
   fillSSN,
   uploadImage,
   verifyPhoneNumber,
+  clickOnVerifyWithSms,
 } from './utils/commands';
 
 const firstName = 'Jane';
@@ -64,7 +65,7 @@ test('E2E.KYC.DriverDocOnly.Real #real', async ({
   await page.waitForLoadState();
 
   await fillPhoneNumber({ frame }, { phoneNumber });
-  await clickOnContinue({ frame });
+  await clickOnVerifyWithSms({ frame });
   await page.waitForLoadState();
 
   await verifyPhoneNumber({ frame, page });

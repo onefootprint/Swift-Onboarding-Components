@@ -147,7 +147,7 @@ export const fillIdentifyPhone = async () => {
   });
   const inputPhone = screen.getByText('Phone number');
   await userEvent.type(inputPhone, '6504600799');
-  await userEvent.click(screen.getByText('Continue'));
+  await userEvent.click(screen.getByText('Verify with SMS'));
 };
 
 export const fillChallengePin = async () => {

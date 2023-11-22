@@ -12,6 +12,7 @@ import {
   verifyPhoneNumber,
   doLivenessCheck,
   waitForVerifyButton,
+  clickOnVerifyWithSms,
 } from './utils/commands';
 
 const firstName = 'Jane';
@@ -54,7 +55,7 @@ test('KYC for env.NEXT_PUBLIC_E2E_TENANT_PK #ci', async ({
   await page.waitForLoadState();
 
   await fillPhoneNumber({ frame }, { phoneNumber });
-  await clickOnContinue({ frame });
+  await clickOnVerifyWithSms({ frame });
   await page.waitForLoadState();
 
   await verifyPhoneNumber({ frame, page });

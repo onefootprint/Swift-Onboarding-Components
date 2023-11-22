@@ -72,7 +72,7 @@
             "invalid": "Phone number is invalid"
           }
         },
-        "cta": "Continue"
+        "cta": "Verify with SMS"
       }
     },
     "sms-challenge": {

@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import {
   clickOnContinue,
+  clickOnVerifyWithSms,
   confirmData,
   continueOnDesktop,
   doLivenessCheck,
@@ -64,7 +65,7 @@ test('E2E.es-MX.KYC.Docs #ci', async ({
   await page.keyboard.press('Enter');
 
   await fillPhoneNumber({ frame }, { phoneNumber });
-  await clickOnContinue({ frame });
+  await clickOnVerifyWithSms({ frame });
   await page.waitForLoadState();
 
   await verifyPhoneNumber({ frame, page });

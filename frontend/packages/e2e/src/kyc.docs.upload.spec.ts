@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import {
   clickOnContinue,
+  clickOnVerifyWithSms,
   confirmData,
   continueOnAgree,
   continueOnDesktop,
@@ -61,7 +62,7 @@ test('E2E.KYC.DriverDocOnly #ci', async ({
   await page.waitForLoadState();
 
   await fillPhoneNumber({ frame }, { phoneNumber });
-  await clickOnContinue({ frame });
+  await clickOnVerifyWithSms({ frame });
   await page.waitForLoadState();
 
   await verifyPhoneNumber({ frame, page });

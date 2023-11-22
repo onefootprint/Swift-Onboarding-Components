@@ -14,6 +14,7 @@ import {
   verifyPhoneNumber,
   doLivenessCheck,
   waitForVerifyButton,
+  clickOnVerifyWithSms,
 } from './utils/commands';
 
 const firstName = 'Jane';
@@ -60,7 +61,7 @@ test('E2E.KYB.flow #ci', async ({ browser, browserName, page, isMobile }) => {
   await page.waitForLoadState();
 
   await fillPhoneNumber({ frame }, { phoneNumber });
-  await clickOnContinue({ frame });
+  await clickOnVerifyWithSms({ frame });
   await page.waitForLoadState();
 
   await verifyPhoneNumber({ frame, page });

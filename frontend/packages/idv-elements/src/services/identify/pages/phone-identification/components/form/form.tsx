@@ -1,5 +1,6 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoSmartphone224 } from '@onefootprint/icons';
 import { Button, Grid, PhoneInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -84,7 +85,13 @@ const Form = ({
           />
         )}
       />
-      <Button fullWidth loading={isLoading} type="submit">
+      <Button
+        fullWidth
+        loading={isLoading}
+        type="submit"
+        prefixIcon={IcoSmartphone224}
+        iconColor="quinary"
+      >
         {t('cta')}
       </Button>
     </Grid.Container>
