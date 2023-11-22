@@ -76,7 +76,7 @@ const Field = ({
       {renderValue ? (
         renderValue(field.value, isVaultDataDecrypted(field.value))
       ) : (
-        <FieldOrPlaceholder data={field.value} />
+        <FieldOrPlaceholder data={field.value} transforms={field.transforms} />
       )}
     </Container>
   );

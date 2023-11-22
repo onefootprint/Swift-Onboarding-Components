@@ -7,6 +7,7 @@ export const entityFixture: Entity = {
   isPortable: true,
   kind: EntityKind.person,
   attributes: [],
+  data: [],
   decryptableAttributes: [],
   startTimestamp: '2023-03-27T14:43:47.444716Z',
   requiresManualReview: false,

@@ -1,4 +1,4 @@
-import type { Entity } from '@onefootprint/types';
+import { type Entity, IdDI } from '@onefootprint/types';
 import { CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { StatusBadge } from 'src/components';
@@ -9,8 +9,46 @@ type RowProps = {
   entity: Entity;
 };
 
+const getName = (entity: Entity) => {
+  const attributes = entity.data;
+
+  // find an attribute in attributes that has identifier with value IdDI.fistName
+  const firstNameAttribute = attributes.find(
+    attribute => attribute.identifier === IdDI.firstName,
+  );
+
+  // find an attribute in attributes that has identifier with value IdDI.lastName
+  const lastNameAttribute = attributes.find(
+    attribute => attribute.identifier === IdDI.lastName,
+  );
+
+  if (!firstNameAttribute || !lastNameAttribute) {
+    return '-';
+  }
+
+  const firstName = firstNameAttribute.value;
+  const lastNameInitial = lastNameAttribute.transforms.prefix_1
+    ? `${lastNameAttribute.transforms.prefix_1}.`
+    : '';
+
+  const name = `${firstName} ${lastNameInitial}`;
+  return name;
+};
+
 const Row = ({ entity }: RowProps) => (
   <>
+    <td>
+      <Typography
+        variant="body-3"
+        sx={{
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+      >
+        {getName(entity)}
+      </Typography>
+    </td>
     <td>
       <CodeInline isPrivate truncate>
         {entity.id}

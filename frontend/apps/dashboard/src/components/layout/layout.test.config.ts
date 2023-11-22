@@ -9,6 +9,7 @@ export const entitiesFixture: Entity[] = [
     kind: EntityKind.person,
     requiresManualReview: false,
     status: EntityStatus.pass,
+    data: [],
     attributes: [],
     decryptableAttributes: [],
     startTimestamp: '2023-03-29T23:07:44.435194Z',

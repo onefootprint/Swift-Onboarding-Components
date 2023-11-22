@@ -1,6 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
-import type { EntityVault } from '@onefootprint/types';
+import type { VaultType } from 'src/components/entities/hooks/use-entity-vault-with-transforms';
 
 import type { EditSubmitData } from '../../../../vault.types';
 import { Event, State, useEditMachine } from '../../../edit-machine';
@@ -33,7 +33,7 @@ const useEditControls = () => {
     entityId: string,
     vaultData: EditSubmitData,
     callbacks?: {
-      onSuccess?: (response: EntityVault) => void;
+      onSuccess?: (response: VaultType) => void;
       onError?: (error: unknown) => void;
     },
   ) => {
@@ -43,7 +43,7 @@ const useEditControls = () => {
       {
         onSuccess: () => {
           send(Event.editSucceeded);
-          callbacks?.onSuccess?.(vaultData);
+          callbacks?.onSuccess?.({ vault: vaultData, transforms: {} });
         },
         onError: (error: unknown) => {
           send(Event.editFailed);

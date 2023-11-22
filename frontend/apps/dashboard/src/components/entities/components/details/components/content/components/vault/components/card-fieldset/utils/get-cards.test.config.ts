@@ -5,6 +5,7 @@ const entityFixture: Entity = {
   id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
   isPortable: true,
   kind: EntityKind.business,
+  data: [],
   attributes: [],
   startTimestamp: '2023-03-27T14:43:47.444716Z',
   watchlistCheck: null,

@@ -7,7 +7,7 @@ import {
 } from '@onefootprint/types';
 import React from 'react';
 import { FieldOrPlaceholder } from 'src/components';
-import useEntityVault from 'src/components/entities/hooks/use-entity-vault';
+import useEntityVaultWithTransforms from 'src/components/entities/hooks/use-entity-vault-with-transforms';
 import createStringList, {
   createCapitalStringList,
 } from 'src/utils/create-string-list';
@@ -21,7 +21,8 @@ type InvestorProfileFieldsProps = WithEntityProps;
 
 const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
   const { t } = useTranslation('pages.user.vault.investor-profile');
-  const { data } = useEntityVault(entity.id, entity);
+  const { data } = useEntityVaultWithTransforms(entity.id, entity);
+  const vaultData = data?.vault;
 
   return (
     <Grid>
@@ -133,7 +134,7 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
             }}
           />
           {isVaultDataEmpty(
-            data?.[InvestorProfileDI.brokerageFirmEmployer],
+            vaultData?.[InvestorProfileDI.brokerageFirmEmployer],
           ) ? null : (
             <Field
               di={InvestorProfileDI.brokerageFirmEmployer}
@@ -141,42 +142,52 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
             />
           )}
           {isVaultDataEmpty(
-            data?.[InvestorProfileDI.seniorExecutiveSymbols],
+            vaultData?.[InvestorProfileDI.seniorExecutiveSymbols],
           ) ? null : (
             <Field
               di={InvestorProfileDI.seniorExecutiveSymbols}
               entity={entity}
               renderValue={value => {
                 if (Array.isArray(value)) {
-                  return <FieldOrPlaceholder data={createStringList(value)} />;
+                  return (
+                    <FieldOrPlaceholder
+                      data={createStringList(value as string[])}
+                    />
+                  );
                 }
                 return <FieldOrPlaceholder data={value} />;
               }}
             />
           )}
           {isVaultDataEmpty(
-            data?.[InvestorProfileDI.familyMemberNames],
+            vaultData?.[InvestorProfileDI.familyMemberNames],
           ) ? null : (
             <Field
               di={InvestorProfileDI.familyMemberNames}
               entity={entity}
               renderValue={value => {
                 if (Array.isArray(value)) {
-                  return <FieldOrPlaceholder data={createStringList(value)} />;
+                  return (
+                    <FieldOrPlaceholder
+                      data={createStringList(value as string[])}
+                    />
+                  );
                 }
                 return <FieldOrPlaceholder data={value} />;
               }}
             />
           )}
           {isVaultDataEmpty(
-            data?.[InvestorProfileDI.politicalOrganization],
+            vaultData?.[InvestorProfileDI.politicalOrganization],
           ) ? null : (
             <Field
               di={InvestorProfileDI.politicalOrganization}
               entity={entity}
             />
           )}
-          {isVaultDataEmpty(data?.[DocumentDI.finraComplianceLetter]) ? null : (
+          {isVaultDataEmpty(
+            vaultData?.[DocumentDI.finraComplianceLetter],
+          ) ? null : (
             <Field di={DocumentDI.finraComplianceLetter} entity={entity} />
           )}
         </FieldSection>

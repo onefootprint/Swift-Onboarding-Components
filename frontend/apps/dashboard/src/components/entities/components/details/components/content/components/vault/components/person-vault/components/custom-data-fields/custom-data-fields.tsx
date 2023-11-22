@@ -9,9 +9,9 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import React from 'react';
+import useEntityVaultWithTransforms from 'src/components/entities/hooks/use-entity-vault-with-transforms';
 import { getCustomDIs } from 'src/components/entities/utils/get-dis';
 
-import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 
 import useDecryptForm from '../../../../hooks/use-decrypt-form';
@@ -34,8 +34,12 @@ const CustomDataFields = ({
   const decrypt = useDecryptControls();
   const decryptForm = useDecryptForm();
   const getFieldProps = useField(entity);
-  const { data } = useEntityVault(entity.id, entity);
-  const customDIs = getCustomDIs(data || {});
+  const { data: vaultWithTransforms } = useEntityVaultWithTransforms(
+    entity.id,
+    entity,
+  );
+  const vaultData = vaultWithTransforms?.vault;
+  const customDIs = getCustomDIs(vaultData || {});
   const selectableFields = customDIs.filter(di => getFieldProps(di).canSelect);
   const allSelected = selectableFields.every(decryptForm.isChecked);
   const shouldShowSelectAll = decrypt.inProgress && selectableFields.length > 0;
@@ -57,7 +61,7 @@ const CustomDataFields = ({
     />
   );
 
-  return data ? (
+  return vaultData ? (
     <Container>
       <Box>
         <Header>

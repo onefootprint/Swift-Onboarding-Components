@@ -36,6 +36,7 @@ export const entitiesFixture: Entity[] = [
       BusinessDI.state,
       BusinessDI.tin,
     ],
+    data: [],
     startTimestamp: '2023-03-27T14:43:47.444716Z',
     insightEvent: {
       timestamp: '2023-04-03T17:42:30.799202Z',

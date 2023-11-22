@@ -5,8 +5,7 @@ import {
   isVaultDataDecrypted,
   isVaultDataEncrypted,
 } from '@onefootprint/types';
-
-import useEntityVault from '@/entities/hooks/use-entity-vault';
+import useEntityVaultWithTransforms from 'src/components/entities/hooks/use-entity-vault-with-transforms';
 
 import {
   useDecryptControls,
@@ -15,7 +14,11 @@ import {
 
 const useField = (entity: Entity) => {
   const { t } = useTranslation('di');
-  const entityVault = useEntityVault(entity.id, entity);
+  const entityVaultWithTransforms = useEntityVaultWithTransforms(
+    entity.id,
+    entity,
+  );
+
   const decryptControls = useDecryptControls();
   const editControls = useEditControls();
 
@@ -25,7 +28,7 @@ const useField = (entity: Entity) => {
     entity.decryptableAttributes.includes(di);
 
   const canSelect = (di: DataIdentifier) => {
-    const value = entityVault.data?.[di];
+    const value = entityVaultWithTransforms.data?.vault[di];
     return canDecryptField(di) && isVaultDataEncrypted(value);
   };
 
@@ -50,7 +53,8 @@ const useField = (entity: Entity) => {
   const showEditView = editControls.inProgress;
 
   const getProps = (di: DataIdentifier) => {
-    const value = entityVault.data?.[di];
+    const value = entityVaultWithTransforms.data?.vault[di];
+    const transforms = entityVaultWithTransforms.data?.transforms[di];
     return {
       canDecrypt: canDecryptField(di),
       canSelect: canSelect(di),
@@ -58,7 +62,8 @@ const useField = (entity: Entity) => {
       label: t(di),
       name: di,
       showCheckbox,
-      value: entityVault.data?.[di],
+      value,
+      transforms,
       isDecrypted: isVaultDataDecrypted(value),
       canEditField: canEditField(di),
       showEditView,

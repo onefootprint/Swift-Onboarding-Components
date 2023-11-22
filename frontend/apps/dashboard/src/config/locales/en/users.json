@@ -8,6 +8,7 @@
     "search-placeholder": "Search by name, email or phone number...",
     "empty-state": "No users found",
     "header": {
+      "name": "Name",
       "id": "Footprint ID",
       "status": "Onboarding status",
       "other": "Other details",

@@ -1,7 +1,7 @@
 import type { DataIdentifier, EntityVault } from '@onefootprint/types';
 import { EntityKind } from '@onefootprint/types';
 import React from 'react';
-import useEntityVault from 'src/components/entities/hooks/use-entity-vault';
+import useEntityVaultWithTransforms from 'src/components/entities/hooks/use-entity-vault-with-transforms';
 
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
 
@@ -24,7 +24,7 @@ const Vault = ({ entity }: VaultProps) => {
   const context = useEntityContext();
   const decrypt = useDecryptControls();
   const edit = useEditControls();
-  const entityVault = useEntityVault(entity.id, entity);
+  const entityVault = useEntityVaultWithTransforms(entity.id, entity);
   const showEditForm = context.kind === EntityKind.person && edit.inProgress;
 
   const convertFormData = (

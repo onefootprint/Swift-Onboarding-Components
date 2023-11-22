@@ -2,8 +2,8 @@ import { isVaultDataDecrypted } from '@onefootprint/types';
 import { Box, Stack } from '@onefootprint/ui';
 import React from 'react';
 import useDocuments from 'src/components/entities/components/details/hooks/use-documents';
+import useEntityVaultWithTransforms from 'src/components/entities/hooks/use-entity-vault-with-transforms';
 
-import useEntityVault from '@/entities/hooks/use-entity-vault';
 import type { WithEntityProps } from '@/entity/components/with-entity';
 
 import Field from '../../../field';
@@ -19,7 +19,11 @@ import useDocumentFields from './utils/use-document-fields';
 type DocumentFieldsProps = WithEntityProps;
 
 const DocumentFields = ({ entity }: DocumentFieldsProps) => {
-  const { data: vault } = useEntityVault(entity.id, entity);
+  const { data: vaultWithTransforms } = useEntityVaultWithTransforms(
+    entity.id,
+    entity,
+  );
+  const vault = vaultWithTransforms?.vault;
   const { data: documents } = useDocuments(entity.id);
   const fields = useDocumentFields();
 

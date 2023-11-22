@@ -6,6 +6,7 @@ import {
   isVaultDataEncrypted,
   isVaultDataText,
 } from '@onefootprint/types';
+import type { Transforms } from '@onefootprint/types/src/data/entity';
 import { LinkButton, Typography } from '@onefootprint/ui';
 import { saveAs } from 'file-saver';
 import React from 'react';
@@ -14,9 +15,10 @@ import EncryptedCell from '../encrypted-cell';
 
 export type FieldOrPlaceholderProps = {
   data?: VaultValue;
+  transforms?: Transforms;
 };
 
-const FieldOrPlaceholder = ({ data }: FieldOrPlaceholderProps) => {
+const FieldOrPlaceholder = ({ data, transforms }: FieldOrPlaceholderProps) => {
   const { t } = useTranslation();
 
   if (isVaultDataText(data)) {
@@ -42,7 +44,7 @@ const FieldOrPlaceholder = ({ data }: FieldOrPlaceholderProps) => {
   }
 
   if (isVaultDataEncrypted(data)) {
-    return <EncryptedCell />;
+    return <EncryptedCell prefix={transforms?.prefix_1} />;
   }
 
   if (isVaultDataEmpty(data)) {

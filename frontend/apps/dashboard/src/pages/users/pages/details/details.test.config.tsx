@@ -93,6 +93,7 @@ export const entityFixture: Entity = {
     'card.primary.number_last4',
     'card.primary.name',
   ],
+  data: [],
   startTimestamp: '2023-03-29T23:07:44.435194Z',
   insightEvent: {
     timestamp: '2023-03-29T23:07:46.850237Z',

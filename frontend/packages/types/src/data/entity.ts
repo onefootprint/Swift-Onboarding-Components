@@ -38,12 +38,25 @@ export enum EntityStatus {
   none = 'none', // Onboarding hasn't started for this vault
 }
 
+export type Transforms = {
+  prefix_1?: string;
+};
+
+export type Attribute = {
+  identifier: DataIdentifier;
+  source: string;
+  is_decryptable: boolean;
+  value: VaultValue;
+  transforms: Transforms;
+};
+
 export type Entity<TStatus = EntityStatus> = {
   attributes: DataIdentifier[];
   decryptableAttributes: DataIdentifier[];
   id: string;
   isPortable: boolean;
   kind: EntityKind;
+  data: Attribute[];
   startTimestamp: string;
   decryptedAttributes: EntityVault;
   watchlistCheck: WatchlistCheckEventData | null;
