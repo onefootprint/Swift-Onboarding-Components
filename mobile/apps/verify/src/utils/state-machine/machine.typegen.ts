@@ -18,8 +18,10 @@ export interface Typegen0 {
   eventsCausingServices: {};
   matchesStates:
     | 'basicInformation'
+    | 'completed'
     | 'emailIdentification'
-    | 'final'
+    | 'init'
+    | 'initFailed'
     | 'phoneIdentification'
     | 'residentialAddress'
     | 'smsChallenge'

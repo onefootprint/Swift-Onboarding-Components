@@ -1,50 +1,69 @@
 import { createMachine } from 'xstate';
 
-import type { MachineEvents } from './types';
+import type { MachineContext, MachineEvents } from './types';
 
-export const createPasskeysMachine = () =>
+export const createPasskeysMachine = (authToken: string) =>
   createMachine({
     predictableActionArguments: true,
-    id: 'passkeys',
+    id: 'verify',
     schema: {
+      context: {} as MachineContext,
       events: {} as MachineEvents,
     },
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     tsTypes: {} as import('./machine.typegen').Typegen0,
-    initial: 'emailIdentification',
-    context: {},
+    initial: 'init',
+    context: {
+      authToken,
+    },
     states: {
+      init: {
+        on: {
+          done: {
+            target: 'emailIdentification',
+          },
+          failed: {
+            target: 'initFailed',
+          },
+        },
+      },
+      initFailed: {
+        type: 'final',
+      },
       emailIdentification: {
         on: {
-          proceedToNext: 'phoneIdentification',
+          done: 'phoneIdentification',
         },
       },
       phoneIdentification: {
         on: {
-          proceedToNext: 'smsChallenge',
+          done: 'smsChallenge',
         },
       },
       smsChallenge: {
         on: {
-          proceedToNext: 'basicInformation',
+          done: 'basicInformation',
         },
       },
       basicInformation: {
         on: {
-          proceedToNext: 'residentialAddress',
+          done: 'residentialAddress',
         },
       },
       residentialAddress: {
         on: {
-          proceedToNext: 'ssn',
+          done: 'ssn',
         },
       },
       ssn: {
         on: {
-          proceedToNext: 'final',
+          done: 'completed',
         },
       },
-      final: {},
+
+      completed: {
+        type: 'final',
+      },
     },
   });
 

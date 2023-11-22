@@ -1,5 +1,5 @@
-export type MachineContext = {};
-
-export type MachineEvents = {
-  type: 'proceedToNext';
+export type MachineContext = {
+  authToken: string;
 };
+
+export type MachineEvents = { type: 'failed' } | { type: 'done' };

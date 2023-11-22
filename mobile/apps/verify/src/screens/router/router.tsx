@@ -5,6 +5,8 @@ import createMachine from '@/utils/state-machine/machine';
 
 import BasicInformation from '../basic-information';
 import EmailIdentification from '../email-identification';
+import Init from '../init';
+import InitFailed from '../init-failed';
 import PhoneIdentification from '../phone-identification';
 import ResidentialAddress from '../residential-address';
 import SmsChallenge from '../sms-challenge';
@@ -12,18 +14,37 @@ import Ssn from '../ssn';
 import WithSdkArgs from './components/with-sdk-args';
 
 type RouterProps = {
-  token: string;
+  authToken: string;
 };
 
-const Router = ({ token }: RouterProps) => {
-  const [state, send] = useMachine(() => createMachine());
-  console.log(token);
+const Router = ({ authToken }: RouterProps) => {
+  const [state, send] = useMachine(() => createMachine(authToken));
+
+  if (state.matches('init')) {
+    return (
+      <Init
+        authToken={authToken}
+        onDone={({ error, data }) => {
+          if (data) {
+            send({ type: 'done' });
+          }
+          if (error) {
+            send({ type: 'failed' });
+          }
+        }}
+      />
+    );
+  }
+
+  if (state.matches('initFailed')) {
+    return <InitFailed />;
+  }
 
   if (state.matches('emailIdentification')) {
     return (
       <EmailIdentification
         onDone={() => {
-          send('proceedToNext');
+          send('done');
         }}
       />
     );
@@ -33,7 +54,7 @@ const Router = ({ token }: RouterProps) => {
     return (
       <PhoneIdentification
         onDone={() => {
-          send('proceedToNext');
+          send('done');
         }}
       />
     );
@@ -43,7 +64,7 @@ const Router = ({ token }: RouterProps) => {
     return (
       <SmsChallenge
         onDone={() => {
-          send('proceedToNext');
+          send('done');
         }}
       />
     );
@@ -53,7 +74,7 @@ const Router = ({ token }: RouterProps) => {
     return (
       <BasicInformation
         onDone={() => {
-          send('proceedToNext');
+          send('done');
         }}
       />
     );
@@ -63,7 +84,7 @@ const Router = ({ token }: RouterProps) => {
     return (
       <ResidentialAddress
         onDone={() => {
-          send('proceedToNext');
+          send('done');
         }}
       />
     );
@@ -73,7 +94,7 @@ const Router = ({ token }: RouterProps) => {
     return (
       <Ssn
         onDone={() => {
-          send('proceedToNext');
+          send('done');
         }}
       />
     );
@@ -85,8 +106,8 @@ const Router = ({ token }: RouterProps) => {
 const RouterWithSdkArgs = () => {
   return (
     <WithSdkArgs>
-      {token => {
-        return <Router token={token} />;
+      {authToken => {
+        return <Router authToken={authToken} />;
       }}
     </WithSdkArgs>
   );

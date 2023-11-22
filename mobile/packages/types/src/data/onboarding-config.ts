@@ -1,23 +1,72 @@
-import type { FootprintAppearance } from '@onefootprint/footprint-js';
-
+import type { FootprintAppearance } from './appearance';
 import type { CollectedDataOption } from './collected-data-option';
+import type { CountryCode } from './countries';
 
+export enum OnboardingConfigStatus {
+  enabled = 'enabled',
+  disabled = 'disabled',
+}
+
+export enum OnboardingConfigKind {
+  kyc = 'kyc',
+  kyb = 'kyb',
+  auth = 'auth',
+}
+
+// Used in the IDV context
+export type PublicOnboardingConfig = {
+  name: string;
+  key: string;
+  orgName: string;
+  orgId: string;
+  logoUrl: string | null;
+  privacyPolicyUrl: string | null;
+  isLive: boolean;
+  status: OnboardingConfigStatus;
+  appearance?: FootprintAppearance;
+  isAppClipEnabled: boolean;
+  isInstantAppEnabled: boolean;
+  appClipExperienceId: string;
+  isNoPhoneFlow: boolean;
+  requiresIdDoc: boolean;
+  isKyb: boolean;
+  allowInternationalResidents: boolean;
+  supportedCountries?: CountryCode[];
+  canMakeRealDocScanCallsInSandbox?: boolean;
+  isStepupEnabled?: boolean;
+  kind?: 'auth' | 'kyb' | 'kyc';
+};
+
+// Used in the dashboard context
 export type OnboardingConfig = {
   id: string;
   name: string;
   key: string;
   isLive: boolean;
   createdAt: string;
-  status: 'enabled' | 'disabled';
+  status: OnboardingConfigStatus;
   appearance?: FootprintAppearance;
-
-  orgName: string;
-  logoUrl: string | null;
-  privacyPolicyUrl: string | null;
-
   mustCollectData: CollectedDataOption[];
   canAccessData: CollectedDataOption[];
-  isAppClipEnabled: boolean;
-  isInstantAppEnabled: boolean;
-  appClipExperienceId: string;
+  optionalData: CollectedDataOption[];
+  isNoPhoneFlow: boolean;
+  allowUsResidents: boolean;
+  allowInternationalResidents: boolean;
+  internationalCountryRestrictions: null | CountryCode[];
+  allowUsTerritoryResidents: boolean;
+  supportedCountries?: CountryCode[];
+  isDocFirstFlow: boolean;
+  docScanForOptionalSsn?: string;
+  enhancedAml: {
+    enhancedAml: boolean;
+    ofac: boolean;
+    pep: boolean;
+    adverseMedia: boolean;
+  };
+  skipKyc: boolean;
+  kind: OnboardingConfigKind;
+  author: {
+    kind: string;
+    member: string;
+  };
 };

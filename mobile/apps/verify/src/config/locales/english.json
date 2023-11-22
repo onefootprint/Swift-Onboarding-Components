@@ -1,5 +1,9 @@
 {
   "pages": {
+    "init-failed": {
+      "title": "Session is not valid",
+      "subtitle": "Please go back to the previous page."
+    },
     "email-identification": {
       "title": "Hey there! 👋",
       "subtitle": "Enter your email to get started.",
