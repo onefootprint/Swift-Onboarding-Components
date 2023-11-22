@@ -9,7 +9,6 @@ use db::models::document_request::DocRefId;
 use db::models::document_upload::DocumentUpload;
 use db::models::identity_document::IdentityDocument;
 use db::models::scoped_vault::ScopedVault;
-use db::models::vault::Vault;
 use db::models::verification_request::VerificationRequest;
 use newtypes::{email::Email, IdentityDataKind as IDK, IdvData, PhoneNumber, BusinessDataKind as BDK};
 use newtypes::{DocVData, PiiBytes, DataIdentifier, BusinessData, BoData, ScopedVaultId, PiiString, IdentityDocumentId, DocumentSide, EncryptedVaultPrivateKey};
@@ -90,52 +89,6 @@ async fn decrypt_documents(
     Ok(decrypted_documents)
 }
 
-/// Build a data structure that can be used to submit the images of identity documents (and selfie) to vendors
-#[allow(dead_code)]
-#[tracing::instrument(skip_all)]
-pub async fn build_docv_data_for_submission_from_verification_request(
-    db_pool: &DbPool,
-    enclave_client: &EnclaveClient,
-    request: VerificationRequest,
-) -> Result<DocVData, ApiError> {
-    let Some(identity_doc_id) = request.identity_document_id.clone() else { 
-        return Err(ApiErrorKind::AssertionError(
-            format!("{} is not a document verification vendor", request.vendor_api),
-    ))?};
-
-    let (doc, ref_id, images, vault) = db_pool
-        .db_query(
-            move |conn| -> ApiResult<_> {
-                let (doc, dr) = IdentityDocument::get(conn, &identity_doc_id)?;
-                let images = doc.images(conn, true)?;
-                let vault = Vault::get(conn, &dr.scoped_vault_id)?;
-                Ok((doc, dr.ref_id, images, vault))
-            },
-        )
-        .await??;        
-
-    // decrypt the images and make sure we have at least a front image
-    let mut decrypted = decrypt_documents(&vault.e_private_key, enclave_client, images).await?;
-
-    if decrypted.get(&DocumentSide::Front).is_none() {
-        return Err(AssertionError("Missing at least front part of document").into())
-    }
-
-    // Get the reference id for idology
-    let parsed_reference_id = parse_reference_id_for_scan_verify(ref_id)?;
-    
-    Ok(DocVData {
-        reference_id: parsed_reference_id,
-        front_image: decrypted.remove(&DocumentSide::Front).map(PiiBytes::into_base64_pii),
-        back_image: decrypted.remove(&DocumentSide::Back).map(PiiBytes::into_base64_pii),
-        selfie_image: decrypted.remove(&DocumentSide::Selfie).map(PiiBytes::into_base64_pii),
-        country_code: Some(doc.country_code.into()),
-        document_type: Some(doc.document_type),
-        // TODO not populating name here
-        ..Default::default()
-    })
-}
-
 #[tracing::instrument(skip_all)]
 pub async fn build_docv_data_from_identity_doc(
     state: &State,
@@ -158,11 +111,7 @@ pub async fn build_docv_data_from_identity_doc(
     let mut decrypted_name_idks = uvw.decrypt_unchecked(&state.enclave_client, &name_idks).await?;
     // decrypt the images and make sure we have at least a front image
     let mut decrypted = decrypt_documents(&uvw.vault.e_private_key, &state.enclave_client, images).await?;
-
-    if decrypted.get(&DocumentSide::Front).is_none() {
-        return Err(AssertionError("Missing at least front part of document").into())
-    }
-    
+ 
     Ok(DocVData {
         reference_id: None,
         front_image: decrypted.remove(&DocumentSide::Front).map(PiiBytes::into_base64_pii),
