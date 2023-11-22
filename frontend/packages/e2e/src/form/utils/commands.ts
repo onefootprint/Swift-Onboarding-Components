@@ -70,15 +70,9 @@ export const decryptData = async ({
   });
 };
 
-export const saveFormViaRef = async ({
-  frame,
-  page,
-}: {
-  frame: FrameLocator;
-  page: Page;
-}) => {
+export const saveFormViaRef = async ({ page }: { page: Page }) => {
   const requestPromise = page.waitForRequest('**/users/vault');
-  await clickOn(/custom save via ref/i, { frame });
+  await clickOn(/custom save via ref/i, { frame: page });
 
   const req = await requestPromise;
   const res = await req.response();

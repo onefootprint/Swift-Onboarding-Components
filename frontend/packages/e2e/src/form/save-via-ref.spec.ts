@@ -29,7 +29,7 @@ test('form.save-via-ref #ci', async ({ browserName, page, request }) => {
     frame,
     data: { name, number, cvc, expiration: '12/35', zip, country: 'US' },
   });
-  await saveFormViaRef({ frame, page });
+  await saveFormViaRef({ page });
   await decryptData({
     request,
     fpUserId,
