@@ -52,7 +52,6 @@ const Root = ({ variant }: RootProps) => {
   const handleComplete = (validationToken?: string, delay?: number) => {
     Logger.info(
       'IDV flow is complete, sending validation token back to the tenant',
-      validationToken,
     );
     if (validationToken) {
       footprint.complete({
