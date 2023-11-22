@@ -39,7 +39,10 @@ pub(crate) enum CreateChallengeRequest {
     PhoneNumber(String),
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug, Clone, Eq, PartialEq, Apiv2Schema, serde::Serialize, serde::Deserialize, strum_macros::Display,
+)]
+#[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub(crate) enum ChallengeKind {
     Sms,

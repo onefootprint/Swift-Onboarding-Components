@@ -62,6 +62,7 @@ def test_api_vault(twilio, sandbox_tenant, ob_config):
     """
     initial_data = {
         "id.phone_number": FIXTURE_PHONE_NUMBER,
+        "id.email": EMAIL,
     }
     body = post("users", initial_data, sandbox_tenant.sk.key)
     fp_id = body["id"]
@@ -70,6 +71,11 @@ def test_api_vault(twilio, sandbox_tenant, ob_config):
     data = dict(key=ob_config.key.value)
     body = post(f"entities/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
+
+    # Don't allow email challenge to log in
+    data = dict(preferred_challenge_kind="email")
+    body = post("hosted/identify/login_challenge", data, auth_token, status_code=400)
+    assert body["error"]["message"] == "Cannot initiate a challenge of kind email"
 
     # Should require step up because auth was not implied for API vault
     auth_token = step_up_user(twilio, auth_token, FIXTURE_PHONE_NUMBER, True)

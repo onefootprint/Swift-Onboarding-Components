@@ -85,6 +85,7 @@ pub async fn post(
         vw,
         webauthn_creds: creds,
         tenant,
+        challenge_kinds,
         ..
     } = ctx;
 
@@ -103,6 +104,9 @@ pub async fn post(
         }
         ck => ck,
     };
+    if !challenge_kinds.contains(&challenge_kind) {
+        return Err(OnboardingError::UnsupportedChallengeKind(challenge_kind.to_string()).into());
+    }
 
     let (rx, challenge_state_data, time_before_retry_s, phone_number, biometric_challenge_json) =
         match challenge_kind {

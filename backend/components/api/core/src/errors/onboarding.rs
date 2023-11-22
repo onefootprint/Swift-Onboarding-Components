@@ -57,7 +57,9 @@ pub enum OnboardingError {
     CannotCreateFixtureResultForNonSandbox,
     #[error("User not allowed to set fixture_result=Real")]
     RealDocumentFixtureNotAllowed,
-    #[error("Sandbox vaults must have a fixture_result provided")]
+    #[error("Cannot initiate a challenge of kind {0}")]
+    UnsupportedChallengeKind(String),
+    #[error("Sandbox vaults must have a fixture result")]
     NoFixtureResultForSandboxUser,
     #[error("Workflow doesn't have an associated onboarding config")]
     NoObcForWorkflow,
