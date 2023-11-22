@@ -71,6 +71,7 @@ const EmailIdentification = ({ onDone }) => {
                   label={t('form.email.label')}
                   onBlur={onBlur}
                   onChangeText={onChange}
+                  onSubmitEditing={handleSubmit(onSubmit)}
                   placeholder={t('form.email.placeholder')}
                   private
                   textContentType="emailAddress"
@@ -82,7 +83,7 @@ const EmailIdentification = ({ onDone }) => {
           />
         </Box>
         <Button variant="primary" onPress={handleSubmit(onSubmit)}>
-          {t('cta')}
+          {t('form.cta')}
         </Button>
       </DismissKeyboard>
     </Container>

@@ -3,7 +3,6 @@
     "email-identification": {
       "title": "Hey there! 👋",
       "subtitle": "Enter your email to get started.",
-      "cta": "Continue",
       "form": {
         "email": {
           "label": "Email",
@@ -12,7 +11,8 @@
             "required": "Please enter an email",
             "invalid": "Please enter a valid email"
           }
-        }
+        },
+        "cta": "Continue"
       }
     },
     "phone-identification": {
@@ -21,11 +21,17 @@
       "email-preview": {
         "change-email": "Change"
       },
-      "phone-number-input": {
-        "label": "Phone number",
-        "placeholder": "+1 (234) 567-8900"
-      },
-      "cta": "Continue"
+      "form": {
+        "phone-number": {
+          "label": "Phone number",
+          "placeholder": "+1 (234) 567-8900",
+          "errors": {
+            "required": "Please enter a phone number",
+            "invalid": "Please enter a valid phone number"
+          }
+        },
+        "cta": "Continue"
+      }
     },
     "ssn": {
       "title": "What's your Social Security Number?",
