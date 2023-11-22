@@ -4,9 +4,15 @@
       "title": "Hey there! 👋",
       "subtitle": "Enter your email to get started.",
       "cta": "Continue",
-      "email-input": {
-        "label": "Email",
-        "placeholder": "your.email@email.com"
+      "form": {
+        "email": {
+          "label": "Email",
+          "placeholder": "your.email@email.com",
+          "errors": {
+            "required": "Please enter an email",
+            "invalid": "Please enter a valid email"
+          }
+        }
       }
     },
     "phone-identification": {

@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Box,
   Button,
@@ -7,6 +8,8 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import React from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import * as z from 'zod';
 
 import useTranslation from '@/hooks/use-translation';
 
@@ -14,10 +17,25 @@ export type EmailIdentificationProps = {
   onDone: () => void;
 };
 
+type FormData = {
+  email: string;
+};
+
 const EmailIdentification = ({ onDone }) => {
   const { t } = useTranslation('pages.email-identification');
+  const schema = z.object({
+    email: z
+      .string()
+      .min(1, { message: t('form.email.errors.required') })
+      .email({ message: t('form.email.errors.invalid') }),
+  });
+  const { control, handleSubmit } = useForm<FormData>({
+    defaultValues: { email: '' },
+    resolver: zodResolver(schema),
+  });
 
-  const handleSubmit = () => {
+  const onSubmit = (data: FormData) => {
+    console.log(data);
     // TODO: Implement
     onDone();
   };
@@ -34,21 +52,36 @@ const EmailIdentification = ({ onDone }) => {
           </Typography>
         </Box>
         <Box marginBottom={7}>
-          <TextInput
-            autoCapitalize="none"
-            autoComplete="email"
-            autoCorrect={false}
-            blurOnSubmit
-            enterKeyHint="send"
-            inputMode="email"
-            label={t('email-input.label')}
-            onSubmitEditing={handleSubmit}
-            placeholder={t('email-input.placeholder')}
-            private
-            textContentType="emailAddress"
+          <Controller
+            control={control}
+            render={({
+              field: { onChange, onBlur, value },
+              fieldState: { error },
+            }) => {
+              return (
+                <TextInput
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  autoCorrect={false}
+                  blurOnSubmit
+                  enterKeyHint="send"
+                  hasError={!!error}
+                  hint={error?.message}
+                  inputMode="email"
+                  label={t('form.email.label')}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  placeholder={t('form.email.placeholder')}
+                  private
+                  textContentType="emailAddress"
+                  value={value}
+                />
+              );
+            }}
+            name="email"
           />
         </Box>
-        <Button variant="primary" onPress={handleSubmit}>
+        <Button variant="primary" onPress={handleSubmit(onSubmit)}>
           {t('cta')}
         </Button>
       </DismissKeyboard>

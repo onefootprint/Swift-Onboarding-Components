@@ -19,6 +19,7 @@
     "start": "react-native start"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.3.2",
     "@onefootprint/design-tokens": "*",
     "@onefootprint/global-constants": "*",
     "@onefootprint/icons": "*",
@@ -45,6 +46,7 @@
     "url-parse": "^1.5.10",
     "usehooks-ts": "^2.9.1",
     "xstate": "^4.38.3",
+    "zod": "^3.22.4",
     "zustand": "^4.3.8"
   },
   "devDependencies": {
