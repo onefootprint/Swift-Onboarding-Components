@@ -1,6 +1,6 @@
 import { sortBy } from 'lodash';
 
-import type { Article } from '../../api-reference.types';
+import type { Article } from '../api-reference.types';
 
 export const isClientApi = (path: string) => path.startsWith('/users/vault');
 
@@ -15,6 +15,19 @@ export const getId = (method: string, path: string) => {
   const client = isClientApi(path) ? '-client' : '';
   return `${method}-${joinedElements}${client}`;
 };
+
+export const getPath = (path: string) =>
+  path
+    .split('/')
+    .map(element => {
+      if (element.startsWith('{') && element.endsWith('}')) {
+        // Some APIs include regex inside the variables - remove that
+        const varName = element.replace('{', '').replace('}', '').split(':')[0];
+        return `{${varName}}`;
+      }
+      return element;
+    })
+    .join('/');
 
 /// Compute the navigation section that a given path will be in
 const getSectionTitle = (entry: unknown) => {
@@ -49,8 +62,8 @@ const getArticles = (data: Record<string, unknown>): Article[] =>
       Object.entries(methods).map(([method, entry]) => ({
         // @ts-expect-error: fix-me
         ...entry,
-        id: getId(method, path),
-        path,
+        id: getId(method, getPath(path)),
+        path: getPath(path),
         method,
         section: getSectionTitle(entry),
       })),
