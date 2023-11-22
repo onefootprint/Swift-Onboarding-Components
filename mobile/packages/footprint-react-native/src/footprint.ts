@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 
 import type { OpenFootprint } from './footprint.types';
-import getURL from './utils/create-url';
+import createUrl from './utils/create-url';
 import sendSdkArgs from './utils/send-sdk-args';
 
 const getDeepLink = (baseScheme?: string) => {
@@ -34,9 +34,10 @@ const open = async ({
   }
 
   const deepLink = getDeepLink();
-  const url = getURL({
+  const url = createUrl({
     appearance,
     redirectUrl: deepLink,
+    token,
   });
 
   try {

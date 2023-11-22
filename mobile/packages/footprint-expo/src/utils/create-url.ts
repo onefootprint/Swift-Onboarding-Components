@@ -1,13 +1,17 @@
 import type { OpenFootprint } from '../footprint.types';
 import getAppearance from './get-appearance';
 
-const getURL = (params: {
+const createUrl = ({
+  appearance,
+  redirectUrl,
+  token,
+}: {
   appearance?: OpenFootprint['appearance'];
   redirectUrl?: string;
+  token: string;
 }) => {
   const url = 'http://id.onefootprint.com';
-  const { redirectUrl } = params;
-  const { fontSrc, rules, variables } = getAppearance(params.appearance);
+  const { fontSrc, rules, variables } = getAppearance(appearance);
   const searchParams = new URLSearchParams();
   if (variables) {
     searchParams.append('variables', variables);
@@ -22,7 +26,7 @@ const getURL = (params: {
     searchParams.append('redirect_url', redirectUrl);
   }
 
-  return `${url}?${searchParams.toString()}`;
+  return `${url}?${searchParams.toString()}#${token}`;
 };
 
-export default getURL;
+export default createUrl;

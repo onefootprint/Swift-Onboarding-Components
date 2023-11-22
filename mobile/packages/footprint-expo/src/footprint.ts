@@ -3,7 +3,7 @@ import queryString from 'query-string';
 import { Platform } from 'react-native';
 
 import type { OpenFootprint } from './footprint.types';
-import getURL from './utils/create-url';
+import createUrl from './utils/create-url';
 import sendSdkArgs from './utils/send-sdk-args';
 
 const getDeepLink = (baseScheme?: string) => {
@@ -35,9 +35,10 @@ const open = async ({
   }
 
   const deepLink = getDeepLink(scheme);
-  const url = getURL({
+  const url = createUrl({
     appearance,
     redirectUrl: deepLink,
+    token,
   });
 
   try {
