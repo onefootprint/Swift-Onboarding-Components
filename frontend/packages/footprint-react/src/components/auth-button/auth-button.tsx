@@ -24,7 +24,7 @@ const AuthButton = (
     testID,
     userData,
   }: AuthButtonProps,
-  ref: React.Ref<HTMLButtonElement> = null,
+  ref?: React.Ref<HTMLButtonElement>,
 ) => {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     const config: FootprintAuthProps = {

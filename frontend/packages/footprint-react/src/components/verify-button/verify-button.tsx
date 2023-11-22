@@ -43,7 +43,7 @@ const VerifyButton = (
     testID,
     l10n,
   }: VerifyButtonProps,
-  ref: React.Ref<HTMLButtonElement> = null,
+  ref?: React.Ref<HTMLButtonElement>,
 ): JSX.Element => {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     onClick?.(event);
