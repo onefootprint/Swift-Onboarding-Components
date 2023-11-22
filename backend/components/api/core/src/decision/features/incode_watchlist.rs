@@ -274,6 +274,17 @@ pub fn reason_codes_from_watchlist_result(
         .into_iter()
         .filter_map(type_to_frc)
         .unique()
+        // only save risk signals of kinds that the enhanced_aml config specifies
+        .filter(|r| match enhanced_aml {
+            EnhancedAmlOption::No => true, //shouldn't happen
+            EnhancedAmlOption::Yes {
+                ofac,
+                pep,
+                adverse_media,
+                continuous_monitoring: _,
+                adverse_media_lists: _,
+            } => (*ofac && r.is_watchlist()) || (*pep && r.is_pep()) || (*adverse_media && r.is_adverse_media()),
+        })
         .collect::<Vec<_>>()
 }
 
