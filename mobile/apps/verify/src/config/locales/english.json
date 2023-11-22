@@ -115,26 +115,37 @@
     "basic-information": {
       "title": "Basic data",
       "subtitle": "Spell your full legal first, middle and last names exactly as shown on your government-issued ID.",
-      "first-name-input": {
-        "label": "First name",
-        "placeholder": "John"
-      },
-      "middle-name-input": {
-        "label": "Middle name (optional)",
-        "placeholder": "Smith"
-      },
-      "last-name-input": {
-        "label": "Last name",
-        "placeholder": "Doe"
-      },
-      "dob-input": {
-        "label": "Date of birth",
-        "placeholder": "MM/DD/YYYY"
-      },
-      "country-input": {
-        "label": "Country of birth"
-      },
-      "cta": "Continue"
+      "form": {
+        "first-name": {
+          "label": "First name",
+          "placeholder": "John",
+          "errors": {
+            "required": "Please enter a first name"
+          }
+        },
+        "middle-name": {
+          "label": "Middle name (optional)",
+          "placeholder": "Smith"
+        },
+        "last-name": {
+          "label": "Last name",
+          "placeholder": "Doe",
+          "errors": {
+            "required": "Please enter a last name"
+          }
+        },
+        "dob": {
+          "label": "Date of birth",
+          "placeholder": "MM/DD/YYYY",
+          "errors": {
+            "required": "Please enter a date of birth",
+            "invalid": "Please enter a valid date of birth",
+            "future": "Please enter a date of birth in the past",
+            "min-age": "You must be at least 18 years"
+          }
+        },
+        "cta": "Continue"
+      }
     },
     "sms-challenge": {
       "title": "Verify your phone number",

@@ -63,6 +63,7 @@ const EmailIdentification = ({ onDone }) => {
                   autoCapitalize="none"
                   autoComplete="email"
                   autoCorrect={false}
+                  autoFocus
                   blurOnSubmit
                   enterKeyHint="send"
                   hasError={!!error}

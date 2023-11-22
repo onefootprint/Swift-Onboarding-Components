@@ -53,6 +53,7 @@ const PhoneIdentification = ({ onDone }: PhoneIdentificationProps) => {
             console.log(error);
             return (
               <TextInput
+                autoFocus
                 autoCapitalize="none"
                 autoComplete="tel"
                 autoCorrect={false}
