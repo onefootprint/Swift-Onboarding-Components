@@ -147,11 +147,3 @@ async fn fail_handler() -> StringResponse {
     tracing::debug!("about to fail");
     Err(AssertionError("Hit /fail endpoint").into())
 }
-
-#[api_v2_operation(tags(Private))]
-#[tracing::instrument(name = "panic")]
-#[get("/panic")]
-async fn panic_handler(_: CustodianAuthContext) -> StringResponse {
-    tracing::debug!("about to panic");
-    panic!("at the disco");
-}

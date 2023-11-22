@@ -15,6 +15,5 @@ pub fn routes(config: &mut ServiceConfig) {
         .service(health::status2)
         .service(health::enclave)
         .service(health::enclave_decrypt)
-        .service(health::panic_handler)
         .service(health::fail_handler);
 }
