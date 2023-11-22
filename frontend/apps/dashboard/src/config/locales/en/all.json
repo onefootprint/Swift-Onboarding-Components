@@ -1089,7 +1089,7 @@
             "could-not-be-verified-by": "Could not be verified by",
             "verified": "Verified",
             "not-verified": "Failed",
-            "onboarded-onto": "Onboarded onto playbook",
+            "onboarded-onto": "Onboarded onto",
             "decision-status": {
               "pass": "Verified",
               "fail": "Failed",
@@ -1173,6 +1173,9 @@
               "id_document": "upload ID photo",
               "redo_kyc": "revise KYC data"
             }
+          },
+          "workflow-started-event": {
+            "started-onboarding-onto": "Started onboarding onto"
           }
         }
       },

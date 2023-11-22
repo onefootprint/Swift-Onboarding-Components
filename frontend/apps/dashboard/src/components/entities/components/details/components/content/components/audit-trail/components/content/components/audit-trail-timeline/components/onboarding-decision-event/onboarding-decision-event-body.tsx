@@ -6,13 +6,13 @@ import type {
   OnboardingDecisionEventData,
 } from '@onefootprint/types';
 import { ActorKind, DecisionStatus } from '@onefootprint/types';
-import { LinkButton, Typography } from '@onefootprint/ui';
-import { useRouter } from 'next/router';
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import CdoTagList from 'src/components/cdo-tag-list';
 
 import AnnotationNote from '../annotation-note';
 import EventBodyEntry from '../event-body-entry';
+import PlaybookLink from '../playbook-link';
 import FieldValidationDetails from './components/field-validation-details';
 
 type OnboardingDecisionEventBodyProps = {
@@ -25,18 +25,9 @@ const OnboardingDecisionEventBody = ({
   const { t } = useTranslation(
     'pages.entity.audit-trail.timeline.onboarding-decision-event',
   );
-  const router = useRouter();
   const {
     annotation,
-    decision: {
-      source,
-      status,
-      obConfiguration: {
-        mustCollectData,
-        name: obConfigurationName,
-        id: obConfigurationId,
-      },
-    },
+    decision: { source, status, obConfiguration: playbook },
   } = data;
   const statusStr = t(`decision-status.${status}`);
 
@@ -48,7 +39,9 @@ const OnboardingDecisionEventBody = ({
   let iconComponent;
   if (status === DecisionStatus.pass) {
     iconComponent = IcoCheck16;
-    const collectedDataOptions: CollectedDataOption[] = [...mustCollectData];
+    const collectedDataOptions: CollectedDataOption[] = [
+      ...playbook.mustCollectData,
+    ];
     bodyContent = (
       <Container>
         <Typography variant="body-3" as="span" sx={{ marginRight: 1 }}>
@@ -82,13 +75,6 @@ const OnboardingDecisionEventBody = ({
     iconComponent = IcoClose16;
   }
 
-  const openPlaybook = () => {
-    router.push({
-      pathname: '/playbooks',
-      query: { onboarding_config_id: obConfigurationId },
-    });
-  };
-
   return (
     <>
       {bodyContent && (
@@ -100,14 +86,13 @@ const OnboardingDecisionEventBody = ({
       )}
       <EventBodyEntry
         iconComponent={iconComponent}
+        testID="onboarding-decision-playbook-body"
         content={
           <Container>
             <Typography variant="body-3" as="span">
               {t('onboarded-onto')}
             </Typography>
-            <LinkButton size="compact" onClick={openPlaybook}>
-              {obConfigurationName}
-            </LinkButton>
+            <PlaybookLink playbook={playbook} />
           </Container>
         }
       />

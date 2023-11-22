@@ -145,6 +145,19 @@ const TimelineFixture: Timeline = [
     },
     timestamp: '2022-11-08T20:21:53.771495Z',
   },
+  {
+    event: {
+      kind: TimelineEventKind.workflowStarted,
+      data: {
+        playbook: {
+          id: 'ob_config_id_3o5SdynZVGO1icDm8Z6llC',
+          name: 'My Playbook',
+          mustCollectData: [],
+        },
+      },
+    },
+    timestamp: '2022-11-08T20:21:53.771495Z',
+  },
 ];
 
 export default TimelineFixture;

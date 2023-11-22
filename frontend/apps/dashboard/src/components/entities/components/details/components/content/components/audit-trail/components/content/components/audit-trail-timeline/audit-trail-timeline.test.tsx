@@ -71,6 +71,17 @@ describe('<AuditTrailTimeline />', () => {
       expect(within(body).getByText('Date of birth')).toBeInTheDocument();
       expect(within(body).getByText('SSN (Full)')).toBeInTheDocument();
       expect(within(body).getByText('Address')).toBeInTheDocument();
+
+      const playbookBodies = screen.getAllByTestId(
+        'onboarding-decision-playbook-body',
+      );
+      expect(playbookBodies.length).toEqual(2);
+      expect(
+        within(playbookBodies[0]).getByText('Onboarded onto'),
+      ).toBeInTheDocument();
+      expect(
+        within(playbookBodies[0]).getByText('My Playbook'),
+      ).toBeInTheDocument();
     });
 
     it('should render vault created onboarding decision properly', () => {
@@ -79,7 +90,7 @@ describe('<AuditTrailTimeline />', () => {
       expect(screen.getByText('Production key')).toBeInTheDocument();
     });
 
-    it('should render workflow triger event properly', () => {
+    it('should render workflow trigger event properly', () => {
       renderAuditTrailTimeline(TimelineFixture);
       expect(
         screen.getByText('Piip Penguin (piip@onefootprint.com)'),
@@ -87,6 +98,11 @@ describe('<AuditTrailTimeline />', () => {
       expect(
         screen.getByText('requested user to upload ID photo'),
       ).toBeInTheDocument();
+    });
+
+    it('should render workflow started event properly', () => {
+      renderAuditTrailTimeline(TimelineFixture);
+      expect(screen.getByText('Started onboarding onto')).toBeInTheDocument();
     });
 
     // TODO: implement this after the backend finalizes the data model for manual review fields

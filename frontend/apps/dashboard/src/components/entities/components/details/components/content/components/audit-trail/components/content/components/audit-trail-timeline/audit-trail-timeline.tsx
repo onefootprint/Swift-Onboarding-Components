@@ -21,6 +21,7 @@ import type {
   WorkflowTriggeredEventData,
 } from '@onefootprint/types';
 import { EntityStatus, TimelineEventKind } from '@onefootprint/types';
+import type { WorkflowStartedEventData } from '@onefootprint/types/src/data/timeline';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import type { TimelineItem } from 'src/components/timeline';
@@ -50,6 +51,7 @@ import {
   OnboardingDecisionEventHeader,
   OnboardingDecisionEventIcon,
 } from './components/onboarding-decision-event';
+import PlaybookLink from './components/playbook-link';
 import {
   WatchlistCheckEventBody,
   WatchlistCheckEventHeader,
@@ -187,6 +189,20 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
                 action,
               })}
             </Typography>
+          </>
+        ),
+      });
+    } else if (kind === TimelineEventKind.workflowStarted) {
+      const eventData = data as WorkflowStartedEventData;
+      items.push({
+        time,
+        iconComponent: <IcoWriting16 />,
+        headerComponent: (
+          <>
+            <Typography variant="body-3">
+              {t('timeline.workflow-started-event.started-onboarding-onto')}
+            </Typography>
+            <PlaybookLink playbook={eventData.playbook} />
           </>
         ),
       });

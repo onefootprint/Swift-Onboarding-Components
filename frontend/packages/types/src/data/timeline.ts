@@ -9,7 +9,10 @@ import type {
 import type { IdDocStatus, SupportedIdDocTypes } from './id-doc-type';
 import type { InsightEvent } from './insight-event';
 import type { LivenessAttribute, LivenessSource } from './liveness';
-import type { OnboardingDecision } from './onboarding-decision';
+import type {
+  OnboardingDecision,
+  TimelinePlaybook,
+} from './onboarding-decision';
 
 export enum TimelineEventKind {
   dataCollected = 'data_collected',
@@ -21,6 +24,7 @@ export enum TimelineEventKind {
   combinedWatchlistChecks = 'combined_watchlist_checks',
   vaultCreated = 'vault_created',
   workflowTriggered = 'workflow_triggered',
+  workflowStarted = 'workflow_started',
 }
 
 export type CollectedDataEvent = {
@@ -99,6 +103,15 @@ export type WorkflowTriggeredEvent = {
   data: WorkflowTriggeredEventData;
 };
 
+export type WorkflowStartedEventData = {
+  playbook: TimelinePlaybook;
+};
+
+export type WorkflowStartedEvent = {
+  kind: TimelineEventKind.workflowStarted;
+  data: WorkflowStartedEventData;
+};
+
 export enum WatchlistCheckReasonCode {
   watchlistHitOfac = 'watchlist_hit_ofac',
   watchlistHitPep = 'watchlist_hit_pep',
@@ -138,7 +151,8 @@ export type TimelineEvent = {
     | FreeFormNoteEvent
     | CombinedWatchlistChecksEvent
     | VaultCreatedEvent
-    | WorkflowTriggeredEvent;
+    | WorkflowTriggeredEvent
+    | WorkflowStartedEvent;
   timestamp: string;
   isFromOtherOrg?: boolean;
 };
