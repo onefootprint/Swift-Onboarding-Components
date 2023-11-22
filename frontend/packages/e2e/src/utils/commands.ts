@@ -11,7 +11,7 @@ type Outcome = 'Success' | 'Manual Review' | 'Fail';
 
 const attachedState = { state: 'attached' as const, timeout: 2000 };
 
-const clickOn = async (
+export const clickOn = async (
   hasText: RegExp,
   { frame }: WithFrame,
 ): Promise<boolean> => {

@@ -1,11 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { clickOnContinue } from '../utils/commands';
 import {
   decryptData,
   fillCardData,
   initializeForm,
-  saveForm,
+  saveFormViaRef,
 } from './utils/commands';
 
 const name = 'Piip Penguin';
@@ -13,7 +13,12 @@ const number = '378282246310005';
 const cvc = '1234';
 const zip = '12345';
 
-test('form.basic #ci', async ({ browser, browserName, page, request }) => {
+test('form.save-via-ref #ci', async ({
+  browser,
+  browserName,
+  page,
+  request,
+}) => {
   const fpUserId = 'fp_id_test_xeOIJs8bGpBVfeu1qma1QY';
   const context = await browser.newContext();
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
@@ -29,8 +34,7 @@ test('form.basic #ci', async ({ browser, browserName, page, request }) => {
     frame,
     data: { name, number, cvc, expiration: '12/35', zip, country: 'US' },
   });
-  await saveForm({ frame, page });
-
+  await saveFormViaRef({ frame, page });
   await decryptData({
     request,
     fpUserId,
@@ -46,5 +50,5 @@ test('form.basic #ci', async ({ browser, browserName, page, request }) => {
   });
 
   await context.close();
-  return expect(1).toBe(1);
+  expect(1).toBe(1);
 });
