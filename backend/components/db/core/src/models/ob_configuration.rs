@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use super::tenant::Tenant;
+use super::workflow::Workflow;
 use crate::actor;
 use crate::actor::SaturatedActor;
 use crate::NextPage;
@@ -21,6 +22,7 @@ use newtypes::EnhancedAmlOption;
 use newtypes::IdDocKind;
 use newtypes::Iso3166TwoDigitCountryCode;
 use newtypes::ObConfigurationKind;
+use newtypes::ScopedVaultId;
 use newtypes::WorkflowId;
 use newtypes::{ApiKeyStatus, CipKind, DataIdentifierDiscriminant, DbActor};
 use newtypes::{CollectedDataOption as CDO, ObConfigurationId, ObConfigurationKey, TenantId};
@@ -579,6 +581,34 @@ impl ObConfiguration {
         }
         let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
         Ok(result)
+    }
+
+    #[tracing::instrument("ObConfiguration::get_enhanced_aml_obc_for_sv", skip_all)]
+    pub fn get_enhanced_aml_obc_for_sv(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Option<Self>> {
+        // Get OBC for this scoped vault. This is a little funky now because you can theoretically onboard only multiple Workflow's and each could have a different OBC
+        // For now, we take the first completed WF by completed_at where enhanced_aml = Yes. If none of the WF's have enhanced AML, then we just take the first OBC.
+        let wfs = Workflow::list_by_completed_at(conn, sv_id)?;
+        let obc = if let Some((_, obc)) = wfs.iter().find(|(_, obc)| {
+            obc.as_ref()
+                .map(|o| {
+                    matches!(
+                        &o.enhanced_aml,
+                        EnhancedAmlOption::Yes {
+                            ofac: _,
+                            pep: _,
+                            adverse_media: _,
+                            continuous_monitoring: _,
+                            adverse_media_lists: _
+                        }
+                    )
+                })
+                .unwrap_or(false)
+        }) {
+            obc.clone()
+        } else {
+            wfs.first().and_then(|(_, obc)| obc.clone())
+        };
+        Ok(obc)
     }
 }
 

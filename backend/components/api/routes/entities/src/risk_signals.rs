@@ -31,7 +31,6 @@ use api_core::utils::vault_wrapper::VwArgs;
 use api_wire_types::AmlHit;
 use api_wire_types::AmlHitMedia;
 use api_wire_types::RiskSignalFilters;
-use db::models::decision_intent::DecisionIntent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::IncludeHidden;
 use db::models::risk_signal::RiskSignal;
@@ -40,7 +39,6 @@ use db::models::vault::Vault;
 use db::models::verification_request::RequestAndResult;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
-use db::models::workflow::Workflow;
 use db::DbResult;
 use idv::ParsedResponse;
 use itertools::Itertools;
@@ -246,16 +244,14 @@ async fn get_risk_signal_and_maybe_aml_detail(
             let rs = RiskSignal::get_tenant_visible(conn, &risk_signal_id, &fp_id, &tenant_id, is_live)?;
             let vreq_vres_key = if rs.reason_code.is_aml() {
                 // we only need to read the vres if it was an Aml risk signal and we need to populate the `aml` portion of the response
-                let v = Vault::get(conn, (&fp_id, &tenant_id, is_live))?;
                 let (vreq, vres) = VerificationResult::get(conn, &rs.verification_result_id)?;
-                let di = DecisionIntent::get(conn, &vreq.decision_intent_id)?;
-                let wf = Workflow::get(
-                    conn,
-                    &di.workflow_id
-                        .ok_or(AssertionError("Workflow not found for DecisionIntent"))?,
-                )?;
-                let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
-                Some(((vreq, vres), v.e_private_key, obc))
+                let obc = ObConfiguration::get_enhanced_aml_obc_for_sv(conn, &vreq.scoped_vault_id)?;
+                if let Some(obc) = obc {
+                    let v = Vault::get(conn, (&fp_id, &tenant_id, is_live))?;
+                    Some(((vreq, vres), v.e_private_key, obc))
+                } else {
+                    None
+                }
             } else {
                 None
             };

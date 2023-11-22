@@ -6,11 +6,11 @@ use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use crate::{task, ApiError, State};
 use async_trait::async_trait;
 use chrono::Utc;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::{NewRiskSignalInfo, RiskSignal};
 use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::user_timeline::UserTimeline;
-use db::models::workflow::Workflow;
 use db::models::{
     decision_intent::DecisionIntent, task::Task, verification_request::VerificationRequest,
     watchlist_check::WatchlistCheck,
@@ -92,30 +92,7 @@ impl ExecuteTask<WatchlistCheckArgs> for WatchlistCheckTask {
 
                 let tenant = Tenant::get(conn, &sv.tenant_id)?;
                 let sv = ScopedVault::get(conn, &sv_id)?;
-
-                // Get OBC for this scoped vault. This is a little funky now because you can theoretically onboard only multiple Workflow's and each could have a different OBC
-                // For now, we take the first completed WF by completed_at where enhanced_aml = Yes. If none of the WF's have enhanced AML, then we just take the first OBC (which should only happen for Fractional)
-                let wfs = Workflow::list_by_completed_at(conn, &sv.id)?;
-                let obc = if let Some((_, obc)) = wfs.iter().find(|(_, obc)| {
-                    obc.as_ref()
-                        .map(|o| {
-                            matches!(
-                                &o.enhanced_aml,
-                                EnhancedAmlOption::Yes {
-                                    ofac: _,
-                                    pep: _,
-                                    adverse_media: _,
-                                    continuous_monitoring: _,
-                                    adverse_media_lists: _
-                                }
-                            )
-                        })
-                        .unwrap_or(false)
-                }) {
-                    obc.clone()
-                } else {
-                    wfs.first().and_then(|(_, obc)| obc.clone())
-                };
+                let obc = ObConfiguration::get_enhanced_aml_obc_for_sv(conn, &sv.id)?;
 
                 let existing_vendor_results = if let Some(di_id) = wc.decision_intent_id.as_ref() {
                     VerificationRequest::get_latest_by_vendor_api_for_decision_intent(conn, di_id)?
