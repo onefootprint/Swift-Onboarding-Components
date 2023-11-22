@@ -26,6 +26,17 @@ def test_ssn_vaulting(tenant):
     patch(f"entities/{fp_id}/vault", data, tenant.sk.key)
 
 
+def test_nationality_vaulting(tenant):
+    # Add full US legal status CDO
+    data = {"id.us_legal_status": "citizen"}
+    body = post("users/", data, tenant.sk.key)
+    fp_id = body["id"]
+
+    # Can still update nationality independently
+    data = {"id.nationality": "US"}
+    patch(f"entities/{fp_id}/vault", data, tenant.sk.key)
+
+
 @pytest.mark.parametrize(
     "key, value",
     [

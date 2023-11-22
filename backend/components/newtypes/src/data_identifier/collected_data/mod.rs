@@ -29,6 +29,8 @@ pub enum CollectedData {
     Card,
 
     UsLegalStatus,
+    /// Deprecated for new playbooks, but we have a few legacy playbooks using this in prod
+    Nationality,
 }
 
 impl CollectedData {
@@ -56,8 +58,8 @@ impl CollectedData {
             Self::Card => vec![Card],
             // TODO it would be great if we didn't have to specify this here. could likely wipe this list
             Self::Document => vec![],
-            // TODO Nationality as a CDO is deprecated
-            Self::UsLegalStatus => vec![Nationality, UsLegalStatus],
+            Self::UsLegalStatus => vec![UsLegalStatus],
+            Self::Nationality => vec![Nationality],
         }
     }
 
@@ -76,6 +78,7 @@ impl CollectedData {
             | Self::Address
             | Self::Email
             | Self::PhoneNumber
+            | Self::Nationality
             | Self::UsLegalStatus => DataIdentifierDiscriminant::Id,
             Self::Document => DataIdentifierDiscriminant::Document,
             Self::InvestorProfile => DataIdentifierDiscriminant::InvestorProfile,

@@ -41,6 +41,7 @@ pub enum CollectedDataOption {
     FullAddress,
     Email,
     PhoneNumber,
+    /// Deprecated for new playbooks, but we have a few legacy playbooks using this in prod
     Nationality,
     UsLegalStatus,
 
@@ -136,7 +137,7 @@ impl CollectedDataOption {
             Self::BusinessCorporationType => CollectedData::BusinessCorporationType,
             Self::InvestorProfile => CollectedData::InvestorProfile,
             Self::Card => CollectedData::Card,
-            Self::Nationality => CollectedData::UsLegalStatus,
+            Self::Nationality => CollectedData::Nationality,
             Self::UsLegalStatus => CollectedData::UsLegalStatus,
         }
     }
@@ -294,8 +295,6 @@ impl CollectedDataOption {
         match self {
             Self::Ssn4 => Some(Self::Ssn9),
             Self::BusinessBeneficialOwners => Some(Self::BusinessKycedBeneficialOwners),
-            // TODO just until we deprecate
-            Self::Nationality => Some(Self::UsLegalStatus),
             _ => None,
         }
     }
