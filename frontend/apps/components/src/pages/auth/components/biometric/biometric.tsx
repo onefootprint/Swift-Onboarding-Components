@@ -2,7 +2,7 @@ import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IcoFaceid24 } from '@onefootprint/icons';
 import { getBiometricChallengeResponse } from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
-import type { Identifier, LoginChallengeResponse } from '@onefootprint/types';
+import type { LoginChallengeResponse } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
 import { Button, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
@@ -10,14 +10,11 @@ import React, { useState } from 'react';
 import { useIdentifyVerify, useLoginChallenge } from '../../hooks';
 import { useAuthMachine } from '../../state';
 
-const isAuthFlow = (x: unknown): x is 'auth' => x === 'auth';
-
 const Biometric = () => {
   const [state, send] = useAuthMachine();
   const {
-    identify: { successfulIdentifier, sandboxId, phoneNumber },
+    identify: { successfulIdentifier, sandboxId },
     obConfigAuth,
-    config: { kind },
   } = state.context;
   const { t } = useTranslation('pages.auth.passkey-challenge');
   const showRequestErrorToast = useRequestErrorToast();
@@ -57,16 +54,13 @@ const Biometric = () => {
           );
           showRequestErrorToast(error);
         },
-        onSuccess: payload => {
-          handleRequestChallengeSuccess(payload, successfulIdentifier);
-        },
+        onSuccess: handleRequestChallengeSuccess,
       },
     );
   };
 
   const handleRequestChallengeSuccess = async (
     payload: LoginChallengeResponse,
-    identifier: Identifier,
   ) => {
     const { biometricChallengeJson, challengeToken, challengeKind } =
       payload.challengeData || {};
@@ -110,10 +104,6 @@ const Biometric = () => {
         challengeToken,
         obConfigAuth,
         sandboxId,
-        scope: isAuthFlow(kind) ? 'auth' : 'onboarding',
-        identifier: isAuthFlow(kind)
-          ? ({ ...identifier, phoneNumber } as Identifier)
-          : identifier,
       },
       {
         onSuccess: ({ authToken }) => {

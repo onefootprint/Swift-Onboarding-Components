@@ -1,6 +1,9 @@
 import type { T } from '@onefootprint/hooks';
 import { getScrubbedPhoneNumber } from '@onefootprint/idv-elements';
-import type { ChallengeData } from '@onefootprint/types';
+import type {
+  ChallengeData,
+  Identifier as IdvIdentifier,
+} from '@onefootprint/types';
 
 import type { IdentifyResult } from '../../state';
 
@@ -19,7 +22,9 @@ export const getFormTitle = (
   const scrubbedPhoneNumber = getScrubbedPhoneNumber({
     challengeData,
     phoneNumber: identify.phoneNumber,
-    successfulIdentifier: identify.successfulIdentifier,
+    successfulIdentifier: identify.successfulIdentifier as
+      | IdvIdentifier
+      | undefined,
   });
 
   return scrubbedPhoneNumber

@@ -3,30 +3,33 @@ import type {
   LoginChallengeRequest,
   LoginChallengeResponse,
 } from '@onefootprint/types';
-import { AUTH_HEADER, SANDBOX_ID_HEADER } from '@onefootprint/types';
+import { SANDBOX_ID_HEADER } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import type { EmailAndOrPhone } from '../types';
 import getRetryDisabledUntil from './get-retry-disabled-until';
+
+type Payload = Omit<LoginChallengeRequest, 'identifier'> & {
+  identifier: EmailAndOrPhone;
+};
 
 const QUERY_CACHE_LIMIT = 1000 * 60 * 5; // challenges expire after 5 mins
 
-const loginChallenge = async (payload: LoginChallengeRequest) => {
+const loginChallenge = async (payload: Payload) => {
   const { obConfigAuth, identifier, preferredChallengeKind, sandboxId } =
     payload;
   const headers: Record<string, string> = { ...obConfigAuth };
   if (sandboxId) {
     headers[SANDBOX_ID_HEADER] = sandboxId;
   }
-  const data: Partial<LoginChallengeRequest> = { preferredChallengeKind };
-  if ('authToken' in identifier) {
-    headers[AUTH_HEADER] = identifier.authToken;
-  } else {
-    data.identifier = identifier;
-  }
+
   const response = await request<LoginChallengeResponse>({
     method: 'POST',
     url: '/hosted/identify/login_challenge',
-    data,
+    data: {
+      preferredChallengeKind,
+      identifier,
+    },
     headers,
   });
   const { challengeData, error } = { ...response.data };
@@ -40,7 +43,7 @@ const loginChallenge = async (payload: LoginChallengeRequest) => {
   };
 };
 
-const getQueryKeyForPayload = (payload: LoginChallengeRequest) => {
+const getQueryKeyForPayload = (payload: Payload) => {
   const { identifier, preferredChallengeKind } = payload;
   return ['login-challenge', identifier, preferredChallengeKind];
 };
@@ -49,7 +52,7 @@ const useLoginChallenge = () => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    (challengeRequest: LoginChallengeRequest) => {
+    (challengeRequest: Payload) => {
       const { isResend, ...payload } = challengeRequest;
       const queryKey = getQueryKeyForPayload(payload);
       const queryState =

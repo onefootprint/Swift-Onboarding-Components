@@ -2,12 +2,13 @@ import type { DeviceInfo } from '@onefootprint/idv-elements';
 import type {
   ChallengeData,
   ChallengeKind,
-  Identifier,
   IdentifyBootstrapData,
   ObConfigAuth,
   OverallOutcome,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
+
+import type { EmailAndOrPhone } from '../types';
 
 export type MachineContext = {
   bootstrapData: IdentifyBootstrapData;
@@ -25,7 +26,7 @@ export type IdentifyResult = {
   isUnverified?: boolean;
   phoneNumber?: string;
   sandboxId?: string;
-  successfulIdentifier?: Identifier;
+  successfulIdentifier?: EmailAndOrPhone;
   userFound?: boolean;
 };
 
@@ -41,7 +42,7 @@ export type IdentifiedEvent = {
   payload: {
     email?: string;
     phoneNumber?: string;
-    successfulIdentifier?: Identifier;
+    successfulIdentifier?: EmailAndOrPhone;
     userFound: boolean;
     isUnverified: boolean;
     availableChallengeKinds?: ChallengeKind[];
@@ -50,32 +51,14 @@ export type IdentifiedEvent = {
 };
 
 export type MachineEvents =
-  | { type: 'bootstrapDataInvalid' }
-  | {
-      type: 'hasSufficientScopes';
-      payload: { authToken: string };
-    }
-  | { type: 'authTokenInvalid' }
   | IdentifiedEvent
-  | {
-      type: 'identifyFailed';
-      payload: {
-        email?: string;
-        phoneNumber?: string;
-      };
-    }
-  | { type: 'identifyReset' }
-  | {
-      type: 'challengeReceived';
-      payload: ChallengeData;
-    }
-  | {
-      type: 'challengeSucceeded';
-      payload: { authToken: string };
-    }
-  | {
-      type: 'sandboxIdChanged';
-      payload: { sandboxId: string };
-    }
+  | { type: 'authTokenInvalid' }
+  | { type: 'bootstrapDataInvalid' }
+  | { type: 'challengeReceived'; payload: ChallengeData }
+  | { type: 'challengeSucceeded'; payload: { authToken: string } }
   | { type: 'changeChallengeToSms' }
-  | { type: 'navigatedToPrevPage' };
+  | { type: 'hasSufficientScopes'; payload: { authToken: string } }
+  | { type: 'identifyFailed'; payload: EmailAndOrPhone }
+  | { type: 'identifyReset' }
+  | { type: 'navigatedToPrevPage' }
+  | { type: 'sandboxIdChanged'; payload: { sandboxId: string } };

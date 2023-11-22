@@ -1,14 +1,20 @@
 import request from '@onefootprint/request';
 import type {
-  SignupChallengeRequest,
+  ObConfigAuth,
   SignupChallengeResponse,
 } from '@onefootprint/types';
 import { SANDBOX_ID_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
+import type { EmailAndOrPhone } from '../types';
 import getRetryDisabledUntil from './get-retry-disabled-until';
 
-const signupChallenge = async (payload: SignupChallengeRequest) => {
+type Payload = EmailAndOrPhone & {
+  obConfigAuth: ObConfigAuth;
+  sandboxId?: string;
+};
+
+const signupChallenge = async (payload: Payload) => {
   const { obConfigAuth, sandboxId, ...identifier } = payload;
   const headers: Record<string, string> = { ...obConfigAuth };
   if (sandboxId) {

@@ -3,7 +3,6 @@ import { getErrorMessage } from '@onefootprint/request';
 import type {
   ChallengeData,
   ChallengeKind,
-  Identifier,
   IdentifyVerifyResponse,
   LoginChallengeResponse,
   SignupChallengeResponse,
@@ -15,15 +14,13 @@ import {
   useIdentifyVerify,
   useLoginChallenge,
   useSignupChallenge,
-  useUserEmail,
 } from '../../hooks';
 import { useAuthMachine } from '../../state';
+import type { EmailAndOrPhone } from '../../types';
 import PinForm from '../pin-form';
 
-const isAuthFlow = (x: unknown): x is 'auth' => x === 'auth';
-
 type PinVerificationProps = {
-  identifier: Identifier;
+  identifier: EmailAndOrPhone;
   onChallengeSucceed: (authToken: string) => void;
   onNewChallengeRequested: () => void;
   preferredChallengeKind: ChallengeKind;
@@ -42,56 +39,27 @@ const PinVerification = ({
     identify: { email, phoneNumber, sandboxId, userFound },
     challenge: { challengeData: data },
     obConfigAuth,
-    config: { kind },
   } = state.context;
   const { t } = useTranslation('pages.auth.pin-verification');
   const showRequestErrorToast = useRequestErrorToast();
   const loginChallengeMutation = useLoginChallenge();
   const signupChallengeMutation = useSignupChallenge();
   const identifyVerifyMutation = useIdentifyVerify();
-  const userEmailMutation = useUserEmail();
 
   const challengeData: ChallengeData | undefined =
     data ||
     loginChallengeMutation.data?.challengeData ||
     signupChallengeMutation.data?.challengeData;
+
   const isLoading =
     loginChallengeMutation.isLoading || signupChallengeMutation.isLoading;
+
   const isPending = isLoading || !challengeData;
-  const isVerifying =
-    identifyVerifyMutation.isLoading || userEmailMutation.isLoading;
+  const isVerifying = identifyVerifyMutation.isLoading;
 
-  const getIsSuccess = () => {
+  const isPinFormSuccess = (): boolean => {
     if (!identifyVerifyMutation.isSuccess) return false;
-    if (userFound || 'email' in identifier || (isAuthFlow(kind) && email)) {
-      return true;
-    }
-    return userEmailMutation.isSuccess;
-  };
-
-  const registerNewUserEmail = (authToken: string) => {
-    if (!email) {
-      console.error(
-        'Found empty email while sending registering email for new user',
-      );
-      return;
-    }
-
-    if (userEmailMutation.isLoading) {
-      return;
-    }
-
-    userEmailMutation.mutate(
-      { data: { email }, authToken },
-      {
-        onError: (error: unknown) => {
-          console.error(
-            `Failed email verification request: ${getErrorMessage(error)}`,
-          );
-        },
-        onSuccess: () => onChallengeSucceed(authToken),
-      },
-    );
+    return userFound || Object.hasOwn(identifier, 'email') || Boolean(email);
   };
 
   const handlePinValidationSucceeded = ({
@@ -104,15 +72,7 @@ const PinVerification = ({
       return;
     }
 
-    // If user already had a vault, no need to save the email again
-    // If the new user signup challenge was initiated with an email OTP,
-    // the backend will automatically save the email to the vault for us
-    if (userFound || 'email' in identifier || (isAuthFlow(kind) && email)) {
-      onChallengeSucceed(authToken);
-      return;
-    }
-
-    registerNewUserEmail(authToken);
+    onChallengeSucceed(authToken);
   };
 
   const verifyPin = (pin: string) => {
@@ -132,10 +92,6 @@ const PinVerification = ({
         challengeToken,
         obConfigAuth,
         sandboxId,
-        scope: isAuthFlow(kind) ? 'auth' : 'onboarding',
-        identifier: isAuthFlow(kind)
-          ? ({ ...identifier, phoneNumber } as Identifier)
-          : identifier,
       },
       {
         onError: error => {
@@ -172,24 +128,15 @@ const PinVerification = ({
       );
       return;
     }
-    if ('authToken' in identifier) {
-      console.error(
-        'Cannot initiate signup challenge challenge with an authToken',
-      );
-      return;
-    }
 
     if (signupChallengeMutation.isLoading) {
       return;
     }
 
-    const payload = isAuthFlow(kind)
-      ? ({ ...identifier, email } as typeof identifier)
-      : identifier;
-
     signupChallengeMutation.mutate(
       {
-        ...payload,
+        email,
+        phoneNumber: identifier?.phoneNumber || phoneNumber,
         obConfigAuth,
         sandboxId,
       },
@@ -278,7 +225,7 @@ const PinVerification = ({
       hasError={identifyVerifyMutation.isError}
       isPending={isPending}
       isResendLoading={isLoading}
-      isSuccess={getIsSuccess()}
+      isSuccess={isPinFormSuccess()}
       isVerifying={isVerifying}
       onComplete={verifyPin}
       onResend={handleResend}
