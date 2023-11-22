@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Box, Button, Container, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import validator from 'validator';
+import isMobilePhone from 'validator/es/lib/isMobilePhone';
 import * as z from 'zod';
 
 import useTranslation from '@/hooks/use-translation';
@@ -24,7 +24,7 @@ const PhoneIdentification = ({ onDone }: PhoneIdentificationProps) => {
     phoneNumber: z
       .string()
       .min(1, { message: t('form.phone-number.errors.required') })
-      .refine(validator.isMobilePhone, {
+      .refine(isMobilePhone, {
         message: t('form.phone-number.errors.invalid'),
       }),
   });

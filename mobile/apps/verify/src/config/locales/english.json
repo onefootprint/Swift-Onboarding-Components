@@ -36,21 +36,25 @@
     "ssn": {
       "title": "What's your Social Security Number?",
       "subtitle": "We're legally required to collect this information.",
-      "ssn-input": {
-        "full-ssn": {
+      "form": {
+        "full": {
           "label": "SSN (Full)",
           "placeholder": "XXX-XX-XXXX"
         },
         "last-4": {
           "label": "SSN (Last 4)",
           "placeholder": "XXXX"
-        }
-      },
-      "disclaimer": {
-        "title": "Your data is safe",
-        "description": "Your SSN is encrypted and protected by a state-of-the-art secure environment"
-      },
-      "cta": "Continue"
+        },
+        "errors": {
+          "required": "Please enter a SSN",
+          "invalid": "Please enter a valid SSN"
+        },
+        "disclaimer": {
+          "title": "Your data is safe",
+          "description": "Your SSN is encrypted and protected by a state-of-the-art secure environment"
+        },
+        "cta": "Continue"
+      }
     },
     "legal-status": {
       "title": "What's your legal status in the U.S.?",
