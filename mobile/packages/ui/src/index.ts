@@ -6,7 +6,10 @@ export type { CheckboxProps } from './components/checkbox';
 export { default as Checkbox } from './components/checkbox';
 export type { ContainerProps } from './components/container';
 export { default as Container } from './components/container';
-export type { CountrySelectProps } from './components/country-select';
+export type {
+  CountrySelectOption,
+  CountrySelectProps,
+} from './components/country-select';
 export { default as CountrySelect } from './components/country-select';
 export type { DesignSystemProviderProps } from './components/design-system-provider';
 export { default as DesignSystemProvider } from './components/design-system-provider';
@@ -42,9 +45,8 @@ export type { RadioSelectProps } from './components/radio-select';
 export { default as RadioSelect } from './components/radio-select';
 export type { SegmentedControlProps } from './components/segmented-control';
 export { default as SegmentedControl } from './components/segmented-control';
-export type { SelectProps } from './components/select';
+export type { SelectOption, SelectProps, SelectRef } from './components/select';
 export { default as Select } from './components/select';
-export type { SelectOption } from './components/select/select.types';
 export type { StatusBarProps } from './components/status-bar';
 export { default as StatusBar } from './components/status-bar';
 export type { TableProps } from './components/table';

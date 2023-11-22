@@ -2,6 +2,7 @@ import { IcoClose24, IcoClose32, IcoSearch24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { FlashList } from '@shopify/flash-list';
 import React, { useEffect, useMemo, useState } from 'react';
+import type { TextInputProps } from 'react-native';
 import { Modal } from 'react-native';
 
 import Box from '../../box';
@@ -15,25 +16,25 @@ import Item from './item';
 
 export type PickerProps<T extends BaseOption = BaseOption<string>> = {
   emptyStateResetText: string;
-  emptyStateTitle: string;
+  emptyStateText: string;
   onChange?: (newValue: SelectOption<T>) => void;
   onClose: () => void;
   open: boolean;
   options: SelectOption<T>[];
-  placeholder: string;
-  searchPlaceholder: string;
+  searchInputProps?: TextInputProps;
+  title: string;
   value?: SelectOption<T>;
 };
 
 const Picker = <T extends BaseOption = BaseOption<string>>({
   emptyStateResetText,
-  emptyStateTitle,
+  emptyStateText,
   onChange,
   onClose,
   open,
   options,
-  placeholder,
-  searchPlaceholder,
+  title,
+  searchInputProps = {},
   value,
 }: PickerProps<T>) => {
   const [search, setSearch] = useState('');
@@ -70,7 +71,7 @@ const Picker = <T extends BaseOption = BaseOption<string>>({
     >
       <PickerContainer>
         <Box flexDirection="row" margin={5} center position="relative">
-          <Typography variant="label-2">{placeholder}</Typography>
+          <Typography variant="label-2">{title}</Typography>
           <Box position="absolute" right={0}>
             <IconButton aria-label="Close" onPress={onClose}>
               <IcoClose32 />
@@ -83,13 +84,13 @@ const Picker = <T extends BaseOption = BaseOption<string>>({
           paddingHorizontal={4}
           paddingVertical={5}
         >
-          <StyledTextInput
+          <SearchInput
             autoCorrect={false}
             autoFocus
             onChangeText={setSearch}
-            placeholder={searchPlaceholder}
             blurOnSubmit
             returnKeyType="search"
+            {...searchInputProps}
             value={search}
             prefixComponent={
               <Box marginLeft={4} marginVertical={5}>
@@ -113,7 +114,7 @@ const Picker = <T extends BaseOption = BaseOption<string>>({
           keyboardShouldPersistTaps="always"
           ListEmptyComponent={
             <EmptyState
-              title={emptyStateTitle}
+              title={emptyStateText}
               cta={{
                 label: emptyStateResetText,
                 onPress: resetSearch,
@@ -146,7 +147,7 @@ const PickerContainer = styled(Box)`
   }}
 `;
 
-const StyledTextInput = styled(TextInput)`
+const SearchInput = styled(TextInput)`
   ${({ theme }) => {
     return css`
       padding-left: ${theme.spacing[9]};

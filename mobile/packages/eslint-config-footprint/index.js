@@ -23,7 +23,7 @@ module.exports = {
     'react/jsx-props-no-spreading': [
       'error',
       {
-        exceptions: [],
+        exceptions: ['StyledTextInput', 'SearchInput'],
       },
     ],
     'global-require': 'off',

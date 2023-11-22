@@ -1,56 +1,84 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
 import { COUNTRIES } from '@onefootprint/global-constants';
-import React from 'react';
+import type { ForwardedRef } from 'react';
+import React, { forwardRef } from 'react';
+import type { TextInputProps } from 'react-native';
 
 import Box from '../box';
-import type { SelectOption } from '../select';
+import type { SelectOption, SelectRef } from '../select';
 import Select from '../select';
 import Typography from '../typography';
 
+export type CountrySelectOption = SelectOption<CountryRecord>;
+
 export type CountrySelectProps = {
   disabled?: boolean;
+  emptyStateText?: string;
   hasError?: boolean;
   hint?: string;
-  onChange?: (newValue: SelectOption<CountryRecord>) => void;
+  label?: string;
+  onBlur?: () => void;
+  onChange?: (newValue: CountrySelectOption) => void;
+  onFocus?: () => void;
   options?: CountryRecord[];
-  value?: SelectOption<CountryRecord>;
+  placeholder?: string;
+  searchInputProps?: TextInputProps;
+  searchTitle?: string;
+  value?: CountrySelectOption;
 };
 
-const CountrySelect = ({
-  disabled,
-  hasError,
-  hint,
-  onChange,
-  options = COUNTRIES,
-  value,
-}: CountrySelectProps) => {
-  return (
-    <Select<CountryRecord>
-      disabled={disabled}
-      emptyStateTitle="No countries found"
-      hasError={hasError}
-      hint={hint}
-      label="Country"
-      onChange={onChange}
-      options={options}
-      placeholder="Select country"
-      renderTrigger={(placeholder, selectedOption) => {
-        return selectedOption ? (
-          <Box gap={4} flexDirection="row" center>
-            <Typography
-              variant="body-4"
-              color={disabled ? 'quaternary' : 'primary'}
-            >
-              {selectedOption.label}
-            </Typography>
-          </Box>
-        ) : (
-          <Typography variant="body-4">{placeholder}</Typography>
-        );
-      }}
-      value={value}
-    />
-  );
-};
+const CountrySelect = forwardRef(
+  (
+    {
+      disabled,
+      emptyStateText = 'No countries found',
+      hasError,
+      hint,
+      label = 'Country',
+      onBlur,
+      onChange,
+      onFocus,
+      options = COUNTRIES,
+      placeholder = 'Select country',
+      searchInputProps,
+      searchTitle,
+      value,
+    }: CountrySelectProps,
+    ref: ForwardedRef<SelectRef>,
+  ) => {
+    return (
+      <Select<CountryRecord>
+        disabled={disabled}
+        emptyStateText={emptyStateText}
+        hasError={hasError}
+        hint={hint}
+        label={label}
+        onBlur={onBlur}
+        onChange={onChange}
+        onFocus={onFocus}
+        options={options}
+        placeholder={placeholder}
+        renderTrigger={(triggerPlaceholder, selectedOption) => {
+          return selectedOption ? (
+            <Box gap={4} flexDirection="row" center>
+              <Typography
+                variant="body-4"
+                color={disabled ? 'quaternary' : 'primary'}
+              >
+                {selectedOption.label}
+              </Typography>
+            </Box>
+          ) : (
+            <Typography variant="body-4">{triggerPlaceholder}</Typography>
+          );
+        }}
+        ref={ref}
+        searchInputProps={searchInputProps}
+        searchTitle={searchTitle}
+        value={value}
+      />
+    );
+  },
+);
 
 export default CountrySelect;

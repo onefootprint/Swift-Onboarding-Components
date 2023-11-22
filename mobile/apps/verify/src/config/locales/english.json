@@ -95,26 +95,48 @@
     "residential-address": {
       "title": "What's your residential address?",
       "subtitle": "We're legally required to collect this information.",
-      "address-input-1": {
-        "label": "Address line 1",
-        "placeholder": "Street and house number"
-      },
-      "address-input-2": {
-        "label": "Address line 2",
-        "placeholder": "Apartment, suite, etc."
-      },
-      "city-input": {
-        "label": "City",
-        "placeholder": "Brooklyn"
-      },
-      "zip-input": {
-        "label": "ZIP code",
-        "placeholder": "11206"
-      },
-      "state-input": {
-        "label": "State"
-      },
-      "cta": "Continue"
+      "form": {
+        "country": {
+          "label": "Country",
+          "placeholder": "Search for a country",
+          "errors": {
+            "required": "Country cannot be empty"
+          }
+        },
+        "address-line1": {
+          "label": "Address line 1",
+          "placeholder": "Street and house number",
+          "errors": {
+            "required": "Address cannot be empty and must be a residential address (e.g. cannot be a P.O. Box)"
+          }
+        },
+        "address-line2": {
+          "label": "Address line 2",
+          "placeholder": "Apartment, suite, etc."
+        },
+        "city": {
+          "label": "City",
+          "placeholder": "Brooklyn",
+          "errors": {
+            "required": "City cannot be empty"
+          }
+        },
+        "zip": {
+          "label": "ZIP code",
+          "placeholder": "11206",
+          "errors": {
+            "required": "ZIP code cannot be empty"
+          }
+        },
+        "state": {
+          "label": "State",
+          "placeholder": "Search for a state",
+          "errors": {
+            "required": "State cannot be empty"
+          }
+        },
+        "cta": "Continue"
+      }
     },
     "basic-information": {
       "title": "Basic data",

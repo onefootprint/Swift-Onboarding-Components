@@ -1,5 +1,6 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
-import React, { useState } from 'react';
+import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import type { TextInputProps } from 'react-native';
 
 import Box from '../box';
 import Hint from '../hint';
@@ -12,44 +13,60 @@ import type { BaseOption, SelectOption } from './select.types';
 export type SelectProps<T extends BaseOption = BaseOption<string>> = {
   disabled?: boolean;
   emptyStateResetText?: string;
-  emptyStateTitle?: string;
+  emptyStateText?: string;
   hasError?: boolean;
   hint?: string;
   label?: string;
+  onBlur?: () => void;
   onChange?: (newValue: SelectOption<T>) => void;
+  onFocus?: () => void;
   options?: SelectOption<T>[];
   placeholder?: string;
   renderTrigger?: (
     placeholder: string,
     selectedOption?: SelectOption<T>,
   ) => React.ReactNode;
-  searchPlaceholder?: string;
+  searchInputProps?: TextInputProps;
+  searchTitle?: string;
   value?: SelectOption<T>;
 };
 
-const Select = <T extends BaseOption = BaseOption<string>>({
-  disabled,
-  emptyStateResetText = 'Reset search',
-  emptyStateTitle = 'No results found',
-  hasError,
-  hint,
-  label,
-  onChange,
-  options = [],
-  placeholder = 'Select...',
-  renderTrigger,
-  searchPlaceholder = 'Search...',
-  value,
-}: SelectProps<T>) => {
+export type SelectRef = {
+  focus: () => void;
+  blur: () => void;
+};
+
+const Select = <T extends BaseOption = BaseOption<string>>(
+  {
+    disabled,
+    emptyStateResetText = 'Reset search',
+    emptyStateText = 'No results found',
+    hasError,
+    hint,
+    label,
+    onBlur,
+    onChange,
+    onFocus,
+    options = [],
+    placeholder = 'Select...',
+    renderTrigger,
+    searchInputProps,
+    searchTitle = 'Search...',
+    value,
+  }: SelectProps<T>,
+  ref: React.Ref<SelectRef>,
+) => {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(false);
   const selectedValueText = value ? value.label : placeholder;
 
   const showPicker = () => {
+    onFocus?.();
     setOpen(true);
   };
 
   const hidePicker = () => {
+    onBlur?.();
     setOpen(false);
   };
 
@@ -57,6 +74,11 @@ const Select = <T extends BaseOption = BaseOption<string>>({
     onChange?.(newValue);
     hidePicker();
   };
+
+  useImperativeHandle(ref, () => ({
+    focus: showPicker,
+    blur: hidePicker,
+  }));
 
   return (
     <Box>
@@ -100,17 +122,21 @@ const Select = <T extends BaseOption = BaseOption<string>>({
       )}
       <Picker<T>
         emptyStateResetText={emptyStateResetText}
-        emptyStateTitle={emptyStateTitle}
+        emptyStateText={emptyStateText}
         onChange={handleChange}
         onClose={hidePicker}
         open={open}
         options={options}
-        placeholder={placeholder}
-        searchPlaceholder={searchPlaceholder}
+        searchInputProps={searchInputProps}
+        title={searchTitle}
         value={value}
       />
     </Box>
   );
 };
 
-export default Select;
+export default forwardRef(Select) as <
+  T extends BaseOption = BaseOption<string>,
+>(
+  props: SelectProps<T> & React.RefAttributes<SelectRef>,
+) => JSX.Element;
