@@ -212,6 +212,20 @@ pub(crate) async fn create_cip_request(
         })
         .await??;
 
+    tracing::info!(
+        ?wf,
+        ?decision,
+        ?scoped_vault,
+        ?obc,
+        ?actor,
+        ?mr,
+        ?annotation,
+        ?risk_signals,
+        ?vres,
+        ?collected_document,
+        "create_cip_request data"
+    );
+
     let user_vault_private_key = uvw.vault.e_private_key.clone();
     let document_check_created_at = vres
         .iter()
@@ -448,6 +462,7 @@ fn identity(
 }
 
 /// helper for building the alpaca idenity sub-response
+#[tracing::instrument(skip(vres))]
 fn watchlist(
     scoped_vault: &ScopedVault,
     obc: &ObConfiguration,
@@ -482,22 +497,19 @@ fn watchlist(
     let overall_result = CipResult::clear(!any_consider);
 
     // Validate wrt to mr.review_reasons
-    // TODO: do we really want/need these validations here?
     if adverse_media
         && !mr
             .map(|r| r.review_reasons.contains(&ReviewReason::AdverseMediaHit))
             .unwrap_or(false)
     {
-        Err(CipError::ExpectedReviewReasonNotFound(
-            ReviewReason::AdverseMediaHit,
-        ))?
+        tracing::error!("CIP endpoint ExpectedReviewReasonNotFound: AdverseMediaHit");
     }
     if (pep | ofac | sanctions)
         && !mr
             .map(|r| r.review_reasons.contains(&ReviewReason::WatchlistHit))
             .unwrap_or(false)
     {
-        Err(CipError::ExpectedReviewReasonNotFound(ReviewReason::WatchlistHit))?
+        tracing::error!("CIP endpoint ExpectedReviewReasonNotFound: WatchlistHit");
     }
 
     // We don't currently have a concept of paramaterized RiskSignal's or another way to store watchlist hits,
