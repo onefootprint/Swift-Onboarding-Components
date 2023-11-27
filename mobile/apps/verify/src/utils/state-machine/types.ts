@@ -32,4 +32,5 @@ export type MachineEvents =
   | {
       type: 'identified';
       payload: IdentifyResultProps;
-    };
+    }
+  | { type: 'identifyReset' };

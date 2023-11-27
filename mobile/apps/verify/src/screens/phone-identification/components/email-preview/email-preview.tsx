@@ -6,9 +6,10 @@ import useTranslation from '@/hooks/use-translation';
 
 export type EmailPreviewProps = {
   email?: string;
+  onEdit?: () => void;
 };
 
-const EmailPreview = ({ email }: EmailPreviewProps) => {
+const EmailPreview = ({ email, onEdit }: EmailPreviewProps) => {
   const { t } = useTranslation('pages.phone-identification.email-preview');
 
   return email ? (
@@ -35,7 +36,9 @@ const EmailPreview = ({ email }: EmailPreviewProps) => {
           {email}
         </Typography>
       </Box>
-      <LinkButton size="compact">{t('change-email')}</LinkButton>
+      <LinkButton size="compact" onPress={onEdit}>
+        {t('change-email')}
+      </LinkButton>
     </Box>
   ) : null;
 };

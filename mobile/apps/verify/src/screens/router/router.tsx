@@ -20,7 +20,7 @@ type RouterProps = {
 
 const Router = ({ authToken }: RouterProps) => {
   const [state, send] = useMachine(() => createMachine(authToken));
-  const { obConfigAuth } = state.context;
+  const { obConfigAuth, identify } = state.context;
 
   const handleIdentified = ({
     email,
@@ -78,9 +78,10 @@ const Router = ({ authToken }: RouterProps) => {
   if (state.matches('phoneIdentification')) {
     return (
       <PhoneIdentification
-        onDone={() => {
-          send('done');
-        }}
+        obConfigAuth={obConfigAuth}
+        onComplete={handleIdentified}
+        email={identify.email}
+        onEmailEdit={() => send({ type: 'identifyReset' })}
       />
     );
   }

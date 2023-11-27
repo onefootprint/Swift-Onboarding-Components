@@ -1,6 +1,5 @@
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
-import { assign } from 'lodash';
-import { createMachine } from 'xstate';
+import { assign, createMachine } from 'xstate';
 
 import type { MachineContext, MachineEvents } from './types';
 
@@ -55,7 +54,14 @@ export const createPasskeysMachine = (authToken: string) =>
         },
         phoneIdentification: {
           on: {
-            done: 'smsChallenge',
+            identified: {
+              target: 'smsChallenge',
+              actions: ['assignIdentifyResult'],
+            },
+            identifyReset: {
+              target: 'emailIdentification',
+              actions: ['reset'],
+            },
           },
         },
         smsChallenge: {
@@ -111,6 +117,10 @@ export const createPasskeysMachine = (authToken: string) =>
             event.payload.availableChallengeKinds;
           context.identify.hasSyncablePassKey =
             event.payload.hasSyncablePassKey;
+          return context;
+        }),
+        reset: assign(context => {
+          context.identify = undefined;
           return context;
         }),
       },
