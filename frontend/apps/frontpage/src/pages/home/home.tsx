@@ -3,13 +3,13 @@ import styled from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import React from 'react';
 
+import PenguinBanner from '../../components/penguin-banner';
 import SEO from '../../components/seo';
 import CustomersLogos from './components/customers-logos';
 import Customizable from './components/sections/customizable';
 import Hero from './components/sections/hero';
 import MoreThanExpect from './components/sections/more-than-expect';
 import NewApproach from './components/sections/new-approach';
-import PenguinBanner from './components/sections/penguin-banner';
 import VaultPii from './components/sections/vault-pii';
 import VaultProxy from './components/sections/vault-proxy';
 
@@ -34,8 +34,7 @@ const Home = () => {
       <div id="dark-end" />
       <SectionSpacer />
       <MoreThanExpect />
-      <SectionSpacer />
-      <PenguinBanner />
+      <PenguinBanner section="home" />
     </>
   );
 };

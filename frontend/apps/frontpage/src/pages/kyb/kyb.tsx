@@ -1,13 +1,13 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
+import PenguinBanner from 'src/components/penguin-banner';
 
 import SEO from '../../components/seo';
 import DeveloperExperience from '../kyc/components/sections/developer-experience';
 import Hero from './sections/hero';
 import IdentifyBos from './sections/identify-bos/indentify-bos';
 import IdentifyBusinesss from './sections/identify-businesss';
-import PenguinBanner from './sections/penguin-banner';
 import SecurelyStore from './sections/securely-store';
 
 const KYB = () => {
@@ -22,7 +22,7 @@ const KYB = () => {
       <IdentifyBos />
       <SecurelyStore />
       <DeveloperExperience />
-      <PenguinBanner />
+      <PenguinBanner section="kyb" imgSrc="/kyb/penguin-banner/kyb.svg" />
     </>
   );
 };

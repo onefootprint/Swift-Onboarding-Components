@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import React from 'react';
+import PenguinBanner from 'src/components/penguin-banner';
 
 import SEO from '../../components/seo';
 import AllData from './sections/all-data';
@@ -8,7 +9,6 @@ import AllFeatures from './sections/all-features';
 import AuditTrail from './sections/audit-trail';
 import DeviceInsights from './sections/device-insights';
 import Hero from './sections/hero';
-import PenguinBanner from './sections/penguin-banner';
 import VaultProxy from './sections/vault-proxy';
 
 const Vaulting = () => {
@@ -23,7 +23,10 @@ const Vaulting = () => {
       <VaultProxy />
       <DeviceInsights />
       <AllFeatures />
-      <PenguinBanner />
+      <PenguinBanner
+        section="vaulting"
+        imgSrc="/vaulting/penguin-banner/vaulting.svg"
+      />
     </Container>
   );
 };

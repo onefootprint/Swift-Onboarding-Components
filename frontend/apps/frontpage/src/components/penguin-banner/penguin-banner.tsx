@@ -14,8 +14,16 @@ import React, { useState } from 'react';
 /* eslint-disable import/no-extraneous-dependencies */
 import ContactDialog from 'src/components/contact-dialog';
 
-const PenguinBanner = () => {
-  const { t } = useTranslation('pages.kyb.banner');
+type PenguinBannerProps = {
+  imgSrc?: string;
+  section: 'home' | 'vaulting' | 'kyc' | 'kyb';
+};
+
+const PenguinBanner = ({
+  imgSrc = '/home/penguin-banner/home.svg',
+  section = 'home',
+}: PenguinBannerProps) => {
+  const { t } = useTranslation('components.penguin-banner');
   const [showDialog, setShowDialog] = useState(false);
 
   const GET_FORM_URL =
@@ -30,70 +38,65 @@ const PenguinBanner = () => {
   };
 
   return (
-    <SectionContainer>
-      <StyledContainer>
-        <PenguinImage
-          src="/home/penguin-banner/penguin.svg"
-          height={200}
-          width={365}
-          alt={t('alt-img')}
+    <StyledContainer>
+      <Stack direction="column" gap={10} align="center" justify="center">
+        <Illustration
+          src={imgSrc}
+          height={600}
+          width={900}
+          alt={t(`${section}.alt-img`)}
         />
         <Stack direction="column" gap={9} align="center">
-          <Title>{t('title')}</Title>
+          <Title>{t(`${section}.title`)}</Title>
           <Buttons>
             <Link href={`${DASHBOARD_BASE_URL}/sign-up`}>
-              <Button variant="primary">{t('get-started')}</Button>
+              <Button variant="primary">{t(`${section}.primary`)}</Button>
             </Link>
             <Button variant="secondary" onClick={handleClickTrigger}>
-              {t('book-a-demo')}
+              {t(`${section}.secondary`)}
             </Button>
           </Buttons>
         </Stack>
-      </StyledContainer>
+      </Stack>
       <ContactDialog
         url={GET_FORM_URL}
         open={showDialog}
         onClose={handleClose}
       />
-    </SectionContainer>
+    </StyledContainer>
   );
 };
 
 const StyledContainer = styled(Container)`
   ${({ theme }) => css`
-    padding: ${theme.spacing[13]} 0 ${theme.spacing[12]} 0;
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[10]};
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    padding: ${theme.spacing[9]} 0 ${theme.spacing[10]} 0;
 
     ${media.greaterThan('md')`
-      padding: ${theme.spacing[15]} 0;
+      padding: ${theme.spacing[11]} 0 ${theme.spacing[12]} 0;
     `}
   `}
-`;
-
-const PenguinImage = styled(Image)`
-  max-width: 80%;
-`;
-
-const SectionContainer = styled.section`
-  position: relative;
-  width: 100%;
-  height: 100%;
 `;
 
 const Title = styled.h2`
   ${({ theme }) => css`
     ${createFontStyles('display-3')}
     color: ${theme.color.primary};
+    text-align: center;
 
     ${media.greaterThan('md')`
       ${createFontStyles('display-1')}
       max-width: 967px;
     `}
+  `}
+`;
+
+const Illustration = styled(Image)`
+  object-fit: contain;
+  width: 100%;
+  height: fit-content;
+
+  ${media.greaterThan('md')`
+    width: 967px;
   `}
 `;
 
