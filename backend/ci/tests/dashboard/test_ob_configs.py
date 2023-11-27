@@ -517,7 +517,7 @@ def test_no_phone_obc(sandbox_tenant):
 
 
 def test_default_rules(sandbox_tenant):
-    collect_data = ["name", "full_address", "phone_number", "email"]
+    collect_data = ["name", "full_address", "phone_number", "email", "ssn9"]
     obc = post(
         "org/onboarding_configs",
         dict(
