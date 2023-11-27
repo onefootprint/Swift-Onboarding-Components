@@ -14,6 +14,8 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignConfig: 'sdkArgsReceived';
+    assignIdentifyResult: 'identified';
+    assignObConfigAuth: 'sdkArgsReceived';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};

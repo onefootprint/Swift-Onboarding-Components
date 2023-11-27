@@ -2,6 +2,7 @@ import { useMachine } from '@xstate/react';
 import React from 'react';
 
 import createMachine from '@/utils/state-machine/machine';
+import type { IdentifyResultProps } from '@/utils/state-machine/types';
 
 import BasicInformation from '../basic-information';
 import EmailIdentification from '../email-identification';
@@ -19,6 +20,28 @@ type RouterProps = {
 
 const Router = ({ authToken }: RouterProps) => {
   const [state, send] = useMachine(() => createMachine(authToken));
+  const { obConfigAuth } = state.context;
+
+  const handleIdentified = ({
+    email,
+    phoneNumber,
+    userFound,
+    isUnverified,
+    availableChallengeKinds,
+    hasSyncablePassKey,
+  }: IdentifyResultProps) => {
+    send({
+      type: 'identified',
+      payload: {
+        userFound,
+        isUnverified,
+        email,
+        phoneNumber,
+        hasSyncablePassKey,
+        availableChallengeKinds,
+      },
+    });
+  };
 
   if (state.matches('init')) {
     return (
@@ -46,9 +69,8 @@ const Router = ({ authToken }: RouterProps) => {
   if (state.matches('emailIdentification')) {
     return (
       <EmailIdentification
-        onDone={() => {
-          send('done');
-        }}
+        obConfigAuth={obConfigAuth}
+        onComplete={handleIdentified}
       />
     );
   }

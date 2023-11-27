@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { ObConfigAuth } from '@onefootprint/types';
 import {
   Box,
   Button,
@@ -11,17 +12,24 @@ import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+import useIdentify from '@/hooks/use-identify';
+import useRequestErrorToast from '@/hooks/use-request-error-toast';
 import useTranslation from '@/hooks/use-translation';
+import type { IdentifyResultProps } from '@/utils/state-machine/types';
 
 export type EmailIdentificationProps = {
-  onDone: () => void;
+  onComplete: (result: IdentifyResultProps) => void;
+  obConfigAuth: ObConfigAuth;
 };
 
 type FormData = {
   email: string;
 };
 
-const EmailIdentification = ({ onDone }) => {
+const EmailIdentification = ({
+  onComplete,
+  obConfigAuth,
+}: EmailIdentificationProps) => {
   const { t } = useTranslation('pages.email-identification');
   const schema = z.object({
     email: z
@@ -33,11 +41,35 @@ const EmailIdentification = ({ onDone }) => {
     defaultValues: { email: '' },
     resolver: zodResolver(schema),
   });
+  const { isLoading, mutate } = useIdentify();
+  const showRequestErrorToast = useRequestErrorToast();
 
   const onSubmit = (data: FormData) => {
-    console.log(data);
-    // TODO: Implement
-    onDone();
+    const { email } = data;
+    mutate(
+      {
+        identifier: { email },
+        obConfigAuth,
+      },
+      {
+        onSuccess: response => {
+          const {
+            userFound,
+            isUnverified,
+            availableChallengeKinds,
+            hasSyncablePassKey,
+          } = response;
+          onComplete({
+            userFound,
+            isUnverified,
+            email,
+            hasSyncablePassKey,
+            availableChallengeKinds,
+          });
+        },
+        onError: error => showRequestErrorToast(error),
+      },
+    );
   };
 
   return (
@@ -83,7 +115,11 @@ const EmailIdentification = ({ onDone }) => {
             name="email"
           />
         </Box>
-        <Button variant="primary" onPress={handleSubmit(onSubmit)}>
+        <Button
+          variant="primary"
+          onPress={handleSubmit(onSubmit)}
+          loading={isLoading}
+        >
           {t('form.cta')}
         </Button>
       </DismissKeyboard>

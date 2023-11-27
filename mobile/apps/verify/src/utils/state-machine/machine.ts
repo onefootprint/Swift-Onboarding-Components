@@ -1,3 +1,4 @@
+import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import { assign } from 'lodash';
 import { createMachine } from 'xstate';
 
@@ -23,7 +24,7 @@ export const createPasskeysMachine = (authToken: string) =>
           on: {
             sdkArgsReceived: {
               target: 'emailIdentification',
-              actions: ['assignConfig'],
+              actions: ['assignConfig', 'assignObConfigAuth'],
             },
             failed: {
               target: 'initFailed',
@@ -35,7 +36,21 @@ export const createPasskeysMachine = (authToken: string) =>
         },
         emailIdentification: {
           on: {
-            done: 'phoneIdentification',
+            identified: [
+              // TODO: biometric and email challenge
+              {
+                target: 'phoneIdentification',
+                actions: ['assignIdentifyResult'],
+                cond: (context, event) =>
+                  !event.payload.userFound ||
+                  !event.payload.availableChallengeKinds ||
+                  event.payload.availableChallengeKinds.length === 0,
+              },
+              {
+                target: 'smsChallenge',
+                actions: ['assignIdentifyResult'],
+              },
+            ],
           },
         },
         phoneIdentification: {
@@ -73,6 +88,29 @@ export const createPasskeysMachine = (authToken: string) =>
       actions: {
         assignConfig: assign((context, event) => {
           context.config = event.payload.config;
+          return context;
+        }),
+        assignObConfigAuth: assign((context, event) => {
+          context.obConfigAuth = {
+            [CLIENT_PUBLIC_KEY_HEADER]: event.payload.config.key,
+          };
+          return context;
+        }),
+        assignIdentifyResult: assign((context, event) => {
+          if (!context.identify) {
+            context.identify = event.payload;
+            return;
+          }
+          context.identify.email =
+            context.identify?.email || event.payload.email;
+          context.identify.phoneNumber =
+            context.identify?.phoneNumber || event.payload.phoneNumber;
+          context.identify.userFound = event.payload.userFound;
+          context.identify.isUnverified = event.payload.isUnverified;
+          context.identify.availableChallengeKinds =
+            event.payload.availableChallengeKinds;
+          context.identify.hasSyncablePassKey =
+            event.payload.hasSyncablePassKey;
           return context;
         }),
       },
