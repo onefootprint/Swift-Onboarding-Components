@@ -7,7 +7,7 @@ type EncryptedCellProps = {
 };
 
 const EncryptedCell = ({ prefix }: EncryptedCellProps) => (
-  <Stack align="center" justify="space-between" gap={3} minWidth="88px">
+  <Stack align="center" gap={3} minWidth="88px">
     <Stack align="center" marginRight={2}>
       <IcoLock16 />
     </Stack>
