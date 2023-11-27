@@ -268,7 +268,7 @@ impl KycDecisioning {
 
 #[async_trait]
 impl OnAction<MakeDecision, KycState> for KycDecisioning {
-    type AsyncRes = (Vec<VendorResult>, Arc<dyn FeatureFlagClient>);
+    type AsyncRes = Arc<dyn FeatureFlagClient>;
 
     #[tracing::instrument(
         "OnAction<MakeDecision, KycState>::execute_async_idempotent_actions",
@@ -279,10 +279,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         _action: MakeDecision,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        // TODO: we don't really need the onboarding_decision_verification_result_junction anymore and that's the only reason we retrieve vendor results directly here
-        // can probably rm
-        let latest_vendor_results = common::get_latest_vendor_results(state, &self.sv_id).await?;
-        Ok((latest_vendor_results, state.feature_flag_client.clone()))
+        Ok(state.feature_flag_client.clone())
     }
 
     #[tracing::instrument("OnAction<MakeDecision, KycState>::on_commit", skip_all)]
@@ -292,7 +289,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<KycState> {
-        let (latest_vendor_results, ff_client) = async_res;
+        let ff_client = async_res;
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
         let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 
@@ -303,6 +300,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
 
         let doc_collected = DocumentRequest::get(conn, &wf.id)?.is_some();
         let review_reasons = common::get_review_reasons(&risk_signals, doc_collected, &obc);
+        let vres_ids = risk_signals.verification_result_ids();
 
         // Always execute real Rules, even in sandbox. But below we just use the sandbox fixture decision instead of the decision from these real Rules
         let decision = common::get_decision(conn, ff_client, risk_signals, &wf, &v)?;
@@ -331,10 +329,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
                     conn,
                     &self.sv_id,
                     &wf,
-                    latest_vendor_results
-                        .iter()
-                        .map(|vr| vr.verification_result_id.clone())
-                        .collect(),
+                    vres_ids,
                     decision.into(),
                     fixture_decision.is_some(),
                     review_reasons,

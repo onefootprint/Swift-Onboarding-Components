@@ -483,3 +483,12 @@ pub struct RiskSignalsForDecision {
     pub aml: Option<RiskSignalGroupStruct<Aml>>,
     pub risk_signals: Vec<RiskSignal>,
 }
+
+impl RiskSignalsForDecision {
+    pub fn verification_result_ids(&self) -> Vec<VerificationResultId> {
+        self.risk_signals
+            .iter()
+            .map(|rs| rs.verification_result_id.clone())
+            .collect()
+    }
+}
