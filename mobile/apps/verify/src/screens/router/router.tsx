@@ -26,7 +26,10 @@ const Router = ({ authToken }: RouterProps) => {
         authToken={authToken}
         onDone={({ error, data }) => {
           if (data) {
-            send({ type: 'done' });
+            send({
+              type: 'sdkArgsReceived',
+              payload: { config: data.obConfig },
+            });
           }
           if (error) {
             send({ type: 'failed' });
