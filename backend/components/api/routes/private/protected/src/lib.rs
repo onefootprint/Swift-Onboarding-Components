@@ -1,5 +1,6 @@
 mod aws_selfie_doc;
 mod decrypt;
+mod default_rules;
 mod incode;
 mod risk;
 mod task;
@@ -24,7 +25,8 @@ pub fn configure(config: &mut web::ServiceConfig) {
         .service(workflow::proceed)
         .service(token_reveal::post)
         .service(decrypt::post)
-        .service(aws_selfie_doc::post);
+        .service(aws_selfie_doc::post)
+        .service(default_rules::add_default_rules);
 }
 
 #[actix_web::get("/private/protected/check")]
