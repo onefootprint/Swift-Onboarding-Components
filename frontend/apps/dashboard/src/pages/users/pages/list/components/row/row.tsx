@@ -22,12 +22,16 @@ const getName = (entity: Entity) => {
     attribute => attribute.identifier === IdDI.lastName,
   );
 
-  if (!firstNameAttribute || !lastNameAttribute) {
+  if (!firstNameAttribute) {
     return '-';
   }
 
   const firstName = firstNameAttribute.value;
-  const lastNameInitial = lastNameAttribute.transforms.prefix_1
+  if (!firstName) {
+    return '-';
+  }
+
+  const lastNameInitial = lastNameAttribute?.transforms.prefix_1
     ? `${lastNameAttribute.transforms.prefix_1}.`
     : '';
 
