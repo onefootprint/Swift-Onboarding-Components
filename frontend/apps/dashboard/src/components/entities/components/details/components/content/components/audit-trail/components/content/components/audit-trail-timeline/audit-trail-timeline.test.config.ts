@@ -23,6 +23,7 @@ const TimelineFixture: Timeline = [
           CollectedKycDataOption.email,
           CollectedKycDataOption.phoneNumber,
         ],
+        isPrefill: false,
       },
     },
     timestamp: '2022-11-08T20:21:33.931738Z',

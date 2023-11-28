@@ -51,6 +51,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.dob],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: false,
@@ -61,6 +62,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.email],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: false,
@@ -74,6 +76,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.dob],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: false,
@@ -84,6 +87,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.email],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: false,
@@ -155,6 +159,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.dob],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: true,
@@ -165,6 +170,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.email],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: true,
@@ -175,6 +181,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.address],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: true,
@@ -192,6 +199,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
                 CollectedKycDataOption.email,
                 CollectedKycDataOption.address,
               ],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: true,
@@ -210,6 +218,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.dob],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: true,
@@ -220,6 +229,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.email],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: true,
@@ -242,6 +252,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.address],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: true,
@@ -258,6 +269,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
                 CollectedKycDataOption.dob,
                 CollectedKycDataOption.email,
               ],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: true,
@@ -283,6 +295,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.address],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: true,
@@ -368,6 +381,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.dob],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: false,
@@ -378,6 +392,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.email],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: false,
@@ -398,6 +413,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.address],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: false,
@@ -433,6 +449,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.dob],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: false,
@@ -443,6 +460,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.email],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: false,
@@ -454,6 +472,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.address],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: false,
@@ -471,6 +490,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.dob],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: true,
@@ -491,6 +511,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.email],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: true,
@@ -501,6 +522,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.address],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: true,
@@ -519,6 +541,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
             kind: TimelineEventKind.dataCollected,
             data: {
               attributes: [CollectedKycDataOption.dob],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: true,
@@ -554,6 +577,7 @@ describe('mergeAuditTrailTimelineEvents', () => {
                 CollectedKycDataOption.email,
                 CollectedKycDataOption.address,
               ],
+              isPrefill: false,
             },
           },
           isFromOtherOrg: true,

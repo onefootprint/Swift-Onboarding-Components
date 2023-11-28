@@ -144,6 +144,7 @@ export const timelineFixture: Timeline = [
       kind: TimelineEventKind.dataCollected,
       data: {
         attributes: [CollectedKycDataOption.phoneNumber],
+        isPrefill: false,
       },
     },
     timestamp: '2023-03-29T23:07:44.493561Z',
@@ -154,6 +155,7 @@ export const timelineFixture: Timeline = [
       kind: TimelineEventKind.dataCollected,
       data: {
         attributes: [CollectedKycDataOption.email],
+        isPrefill: false,
       },
     },
     timestamp: '2023-03-29T23:07:44.854515Z',
@@ -169,6 +171,7 @@ export const timelineFixture: Timeline = [
           CollectedKycDataOption.ssn9,
           CollectedKycDataOption.name,
         ],
+        isPrefill: false,
       },
     },
     timestamp: '2023-03-29T23:08:13.960464Z',

@@ -65,10 +65,11 @@ impl<Type> WriteableVw<Type> {
         source: DataLifetimeSource,
         actor: Option<AuthActor>,
     ) -> ApiResult<PatchDataResult> {
+        let is_prefill = request.is_prefill;
         let keys = request.data.iter().map(|d| d.kind.clone()).collect_vec();
         let SavedData { vd, ci, seqno } = request.save(conn, self, source, actor.clone())?;
         // Add timeline event for all the newly added data
-        self.add_timeline_event(conn, keys, actor)?;
+        self.add_timeline_event(conn, keys, actor, is_prefill)?;
 
         // Zip new CIs with their DI
         let new_ci = ci
@@ -106,6 +107,7 @@ impl<Type> WriteableVw<Type> {
         conn: &mut TxnPgConn,
         keys: Vec<DataIdentifier>,
         actor: Option<AuthActor>,
+        is_prefill: bool,
     ) -> ApiResult<()> {
         // Add UserTimeline for all the newly added data
         if !keys.is_empty() {
@@ -115,6 +117,7 @@ impl<Type> WriteableVw<Type> {
                 attributes: cdos.into_iter().collect(),
                 targets: keys,
                 actor: actor.map(|a| a.into()),
+                is_prefill,
             };
             UserTimeline::create(conn, info, self.vault.id.clone(), self.scoped_vault_id.clone())?;
         }

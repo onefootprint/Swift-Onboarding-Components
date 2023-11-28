@@ -94,6 +94,7 @@ export const timelineFixture: Timeline = [
           CollectedKybDataOption.beneficialOwners,
           CollectedKybDataOption.tin,
         ],
+        isPrefill: false,
       },
     },
     timestamp: '2023-04-05T11:16:13.599001Z',

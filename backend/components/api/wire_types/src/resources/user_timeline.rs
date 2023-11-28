@@ -39,6 +39,8 @@ pub struct DataCollectedInfo {
     /// The list of CDOs that had a DI that was edited
     pub attributes: Vec<CollectedDataOption>,
     pub actor: Option<Actor>,
+    /// True when the data added in this timeline event was added via a one-click onboarding
+    pub is_prefill: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]

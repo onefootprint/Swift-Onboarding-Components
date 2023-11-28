@@ -29,6 +29,7 @@ pub struct ValidatedDataRequest {
     old_ci: HashMap<DataIdentifier, ContactInfo>,
     fingerprints: Fingerprints,
     new_cdos: HashSet<CollectedDataOption>,
+    pub(super) is_prefill: bool,
 }
 
 impl<Type> VaultWrapper<Type> {
@@ -157,6 +158,7 @@ impl<Type> VaultWrapper<Type> {
             old_ci: HashMap::new(),
             fingerprints,
             new_cdos,
+            is_prefill: false,
         };
         Ok(req)
     }
@@ -182,6 +184,7 @@ impl<Type> WriteableVw<Type> {
             old_ci,
             new_cdos,
             fingerprints: fingerprints.into_iter().collect(),
+            is_prefill: true,
         };
         Ok(request)
     }

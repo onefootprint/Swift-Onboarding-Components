@@ -1,4 +1,6 @@
-use db::models::user_timeline::{SaturatedTimelineEvent, UserTimeline, UserTimelineInfo};
+use db::models::user_timeline::{
+    SaturatedDataCollectedEvent, SaturatedTimelineEvent, UserTimeline, UserTimelineInfo,
+};
 use itertools::Itertools;
 use newtypes::TriggerKind;
 
@@ -20,7 +22,12 @@ impl DbToApi<UserTimelineInfo> for api_wire_types::UserTimeline {
 impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
     fn from_db(target: SaturatedTimelineEvent) -> Self {
         match target {
-            SaturatedTimelineEvent::DataCollected(attributes, targets, actor) => {
+            SaturatedTimelineEvent::DataCollected(SaturatedDataCollectedEvent {
+                attributes,
+                targets,
+                actor,
+                is_prefill,
+            }) => {
                 // Get the extra attributes that aren't encompassed by the attributes
                 let dangling_attributes = targets.into_iter().filter(|di| {
                     !attributes
@@ -43,6 +50,7 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                 Self::DataCollected(api_wire_types::user_timeline::DataCollectedInfo {
                     attributes: cdos,
                     actor: actor.map(api_wire_types::Actor::from_db),
+                    is_prefill,
                 })
             }
             SaturatedTimelineEvent::Liveness(l, i) => {

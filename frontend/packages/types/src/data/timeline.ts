@@ -33,6 +33,7 @@ export type CollectedDataEvent = {
 };
 
 export type CollectedDataEventData = {
+  isPrefill: boolean;
   attributes: (
     | CollectedKybDataOption
     | CollectedKycDataOption

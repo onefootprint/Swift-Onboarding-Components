@@ -105,6 +105,8 @@ pub struct DataCollectedInfo {
     /// events...
     pub targets: Vec<DataIdentifier>,
     pub actor: Option<DbActor>,
+    #[serde(default)]
+    pub is_prefill: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

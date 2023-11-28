@@ -81,11 +81,11 @@ def test_portable_timeline_events(
         *foo_sandbox_tenant.db_auths,
     )
     collect_data_events = [i for i in body if i["event"]["kind"] == "data_collected"]
-    # TODO test that these timeline events show that the data is from one-click
     assert len(collect_data_events) == 1
     assert set(collect_data_events[0]["event"]["data"]["attributes"]) == set(
         foo_sandbox_tenant.default_ob_config.must_collect_data
     )
+    assert all(e["event"]["data"]["is_prefill"] for e in collect_data_events)
 
 
 def test_cant_see_fp_id(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):

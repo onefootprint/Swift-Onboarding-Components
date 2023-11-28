@@ -19,6 +19,13 @@ const DataCollectedEventHeader = ({
   );
   const { attributes } = data;
 
+  let title = t('title');
+  if (isFromOtherOrg) {
+    title = t('title-from-other-org');
+  } else if (data.isPrefill) {
+    title = t('title-prefill');
+  }
+
   return (
     <Container data-testid="data-collected-event-header">
       <Typography
@@ -26,7 +33,7 @@ const DataCollectedEventHeader = ({
         color={isFromOtherOrg ? 'tertiary' : 'primary'}
         sx={{ marginRight: 1 }}
       >
-        {isFromOtherOrg ? t('title-from-other-org') : t('title')}
+        {title}
       </Typography>
       <CdoTagList cdos={attributes} />
     </Container>
