@@ -290,16 +290,20 @@ pub fn get_requirements_inner(
                 WorkflowState::Kyc(KycState::DocCollection)
                     | WorkflowState::AlpacaKyc(AlpacaKycState::DocCollection)
             );
-            let is_completed = wf.completed_at.is_some();
-            if r.is_met() && is_data_collection_step {
-                if is_stepup || is_completed {
-                    // Omit the confirm screen when an alpaca user is in step up
-                    // or when the workflow is entirely completed
+            if is_data_collection_step {
+                if wf.completed_at.is_some() {
+                    // Omit the confirm screen when the workflow is entirely completed
                     return false;
                 }
-                if obc.skip_confirm {
-                    // Omit the confirm screen when the obc prefers it
-                    return false;
+                if r.is_met() {
+                    if is_stepup {
+                        // Omit the confirm screen when an alpaca user is in step up
+                        return false;
+                    }
+                    if obc.skip_confirm {
+                        // Omit the confirm screen when the obc prefers it
+                        return false;
+                    }
                 }
             }
             true
