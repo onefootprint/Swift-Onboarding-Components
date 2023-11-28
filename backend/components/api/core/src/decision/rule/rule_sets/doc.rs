@@ -1,46 +1,7 @@
-use crate::decision::{
-    features::incode_docv::IncodeDocumentFeatures,
-    rule::rule_set::{Rule, RuleSet},
-};
+use crate::decision::rule::rule_set::Rule;
 use newtypes::{RuleAction, RuleName};
 
-use newtypes::{FootprintReasonCode, RuleSetName};
-
-// what is this
-pub fn incode_base_rules() -> Vec<Rule<IncodeDocumentFeatures>> {
-    vec![
-        Rule {
-            rule: {
-                |f: &IncodeDocumentFeatures| {
-                    f.footprint_reason_codes
-                        .contains(&FootprintReasonCode::DocumentNotVerified)
-                }
-            },
-            name: RuleName::DocumentNotVerified,
-            action: RuleAction::Fail,
-        },
-        Rule {
-            rule: {
-                |f: &IncodeDocumentFeatures| {
-                    f.footprint_reason_codes
-                        .contains(&FootprintReasonCode::DocumentSelfieDoesNotMatch)
-                    // Only written when there's a selfie in the verification session
-                }
-            },
-            name: RuleName::SelfieDoesNotMatch,
-            action: RuleAction::Fail,
-        },
-    ]
-}
-
-pub fn incode_rule_set() -> RuleSet<IncodeDocumentFeatures> {
-    let rules = incode_base_rules();
-
-    RuleSet {
-        rules,
-        name: RuleSetName::IncodeRules,
-    }
-}
+use newtypes::FootprintReasonCode;
 
 // we use this base set of Document rules for both Alpaca and regular playbooks. However, precedent for Alpaca currently is to always
 // raise a review if a doc was uploaded. We haven't yet decided with folks that there are cases where they want a document to "hard fail" and not even raise a review
@@ -65,6 +26,16 @@ pub fn incode_rules(always_review: bool) -> Vec<Rule<Vec<FootprintReasonCode>>> 
             },
             name: RuleName::SelfieDoesNotMatch,
             action: fail_action,
+        },
+        Rule {
+            rule: {
+                |f: &Vec<FootprintReasonCode>| {
+                    f.contains(&FootprintReasonCode::DocumentSelfieNotLiveImage)
+                    // Only written when there's a selfie in the verification session
+                }
+            },
+            name: RuleName::SelfieIsNotLive,
+            action: RuleAction::ManualReview,
         },
         Rule {
             rule: { |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::DocumentUploadFailed) },

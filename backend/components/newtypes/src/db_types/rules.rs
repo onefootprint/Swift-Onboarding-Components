@@ -94,6 +94,7 @@ pub enum RuleName {
     AddressLocatedIsHighRiskAddress,
     MultipleRecordsFound,
     DocumentNotVerified,
+    SelfieIsNotLive,
     SelfieDoesNotMatch,
     DocumentUploadFailed,
     DocumentCollectionErrored,

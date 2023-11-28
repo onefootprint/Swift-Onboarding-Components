@@ -122,6 +122,23 @@ pub fn reason_codes_from_score_response(res: &FetchScoresResponse, expect_selfie
             }
 
         };
+
+    let liveness_score_code = if expect_selfie {
+        match res
+        .liveness_score().1 {
+            Some(s) => if s == IncodeStatus::Fail {
+                vec![FootprintReasonCode::DocumentSelfieNotLiveImage]
+            } else {
+                vec![]
+            },
+            None => {
+                tracing::error!("missing incode liveness score");
+                vec![]
+            }
+
+        }} else {
+            vec![]
+        };
     
 
     // OCR
@@ -193,6 +210,7 @@ pub fn reason_codes_from_score_response(res: &FetchScoresResponse, expect_selfie
         .chain(id_test_frcs)
         .chain(face_codes)
         .chain(barcode_frc)
+        .chain(liveness_score_code)
         .collect()
 }
 
@@ -398,6 +416,7 @@ mod tests {
                 selfie_match: Fail,
                 lenses_and_mask_check: Fail,
                 cross_checks: Fail,
+                liveness: Fail
             }, 
             vec![
                 DocumentPhotoIsScreenCapture,
@@ -420,6 +439,7 @@ mod tests {
                 DocumentDobCheckDigitDoesNotMatch,
                 DocumentSexCrosscheckDoesNotMatch, 
                 DocumentExpirationCheckDigitDoesNotMatch, 
+                DocumentSelfieNotLiveImage,
                 DocumentNumberCrosscheckDoesNotMatch, // barcode stuff is weird here
             ], true; "everything fails")]
         #[test_case(
@@ -437,6 +457,7 @@ mod tests {
                 selfie_match: Fail,
                 lenses_and_mask_check: Ok,
                 cross_checks: Ok,
+                liveness: Ok
             }, 
             vec![
                 DocumentPhotoIsNotScreenCapture,

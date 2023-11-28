@@ -3797,6 +3797,7 @@ pub struct DocTestOpts {
     pub selfie_match: IncodeStatus,
     pub lenses_and_mask_check: IncodeStatus,
     pub cross_checks: IncodeStatus,
+    pub liveness: IncodeStatus,
 }
 impl Default for DocTestOpts {
     fn default() -> Self {
@@ -3814,6 +3815,7 @@ impl Default for DocTestOpts {
             selfie_match: IncodeStatus::Ok,
             lenses_and_mask_check: IncodeStatus::Ok,
             cross_checks: IncodeStatus::Ok,
+            liveness: IncodeStatus::Ok,
         }
     }
 }
@@ -3970,7 +3972,20 @@ pub fn incode_fetch_scores_response(opts: DocTestOpts) -> serde_json::Value {
             "key": null
           }
       },
-      "liveness": null,
+      "liveness": {
+         "overall": {
+            "value": "100.0",
+            "status": opts.liveness.to_string(),
+            "key": null
+         },
+         "photoQuality": {
+            "value": "100.0",
+         },
+         "liveness_score": {
+            "value": "100.0",
+            "status": "OK",
+         }
+      },
       "faceRecognition": {
         "maskCheck": {
           "value": "0.0",

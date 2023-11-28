@@ -759,6 +759,10 @@ footprint_reason_code_enum! {
         #[note = "Selfie was taken wearing glasses", severity = SignalSeverity::Low,  description = "The selfie may have been captured with the person wearing glasses. This could have potentially impacted the comparison with the document image."]
         DocumentSelfieGlasses,
 
+        #[scope = SignalScope::Selfie, additional_scopes = vec![SignalScope::Document], match_level = None]
+        #[note = "Selfie was not captured live", severity = SignalSeverity::High,  description = "The selfie has appearances of not being a live captured image, such as a spoofed input feed or a picture of a picture of a face."]
+        DocumentSelfieNotLiveImage,
+
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "Document image possible fake", severity = SignalSeverity::High,  description = "The image of the document has evidence or appearances of being a fake document. For example: slight difference in layout of the ID, different font or font size."]
         DocumentPossibleFakeImage,

@@ -129,12 +129,11 @@ impl APIResponseToIncodeError for ProcessIdResponse {
 }
 
 /// Response from fetch scores
-// TODO!
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct FetchScoresResponse {
     pub id_validation: Option<IdValidation>,
-    pub liveness: Option<serde_json::Value>,
+    pub liveness: Option<Liveness>,
     pub face_recognition: Option<FaceRecognition>,
     pub id_ocr_confidence: Option<IdOcrConfidence>,
     pub overall: Option<IdTest>,
@@ -143,9 +142,22 @@ pub struct FetchScoresResponse {
     pub error: Option<Error>,
 }
 
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct Liveness {
+    pub overall: Option<IdTest>,
+    pub photo_quality: Option<IdTest>,
+    pub liveness_score: Option<IdTest>,
+}
+
 impl FetchScoresResponse {
     pub fn document_score(&self) -> (Option<f64>, Option<IncodeStatus>) {
         let overall_test = &self.id_validation.as_ref().and_then(|i| i.overall.clone());
+        Self::score_and_status(overall_test)
+    }
+
+    pub fn liveness_score(&self) -> (Option<f64>, Option<IncodeStatus>) {
+        let overall_test = &self.liveness.as_ref().and_then(|i| i.overall.clone());
         Self::score_and_status(overall_test)
     }
 

@@ -46,6 +46,7 @@ pub fn base_doc_rules(always_review: bool) -> Vec<(RuleExpression, RuleAction)> 
     vec![
         (if_risk_signal(FRC::DocumentNotVerified), fail_action),
         (if_risk_signal(FRC::DocumentSelfieDoesNotMatch), fail_action),
+        (if_risk_signal(FRC::DocumentSelfieNotLiveImage), RA::ManualReview),
         (if_risk_signal(FRC::DocumentExpired), fail_action),
         (if_risk_signal(FRC::DocumentUploadFailed), RA::ManualReview),
         (if_risk_signal(FRC::DocumentTypeMismatch), RA::ManualReview),
