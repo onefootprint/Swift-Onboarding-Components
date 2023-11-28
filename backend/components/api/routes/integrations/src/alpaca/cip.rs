@@ -483,24 +483,32 @@ fn watchlist(
         .any(|rs| rs.reason_code == FootprintReasonCode::WatchlistHitPep);
     let pep_result = CipResult::clear(!pep);
 
-    let ofac: bool = risk_signals
-        .iter()
-        .any(|rs: &RiskSignal| rs.reason_code == FootprintReasonCode::WatchlistHitOfac);
-    let ofac_result = CipResult::clear(!ofac);
+    let sanctions: bool = risk_signals.iter().any(|rs: &RiskSignal| {
+        matches!(
+            rs.reason_code,
+            FootprintReasonCode::WatchlistHitOfac | FootprintReasonCode::WatchlistHitNonSdn
+        )
+    });
+    let sanctions_result = CipResult::clear(!sanctions);
 
-    let sanctions: bool = risk_signals
+    let monitored_lists: bool = risk_signals
         .iter()
         .any(|rs: &RiskSignal| rs.reason_code == FootprintReasonCode::WatchlistHitNonSdn);
-    let sanctions_result = CipResult::clear(!sanctions);
+    let monitored_lists_result = CipResult::clear(!monitored_lists);
 
     let adverse_media: bool = risk_signals
         .iter()
         .any(|rs: &RiskSignal| rs.reason_code == FootprintReasonCode::AdverseMediaHit);
     let adverse_media_result = CipResult::clear(!adverse_media);
 
-    let any_consider = [pep_result, ofac_result, sanctions_result, adverse_media_result]
-        .iter()
-        .any(|r| matches!(r, CipResult::Consider));
+    let any_consider = [
+        pep_result,
+        sanctions_result,
+        monitored_lists_result,
+        adverse_media_result,
+    ]
+    .iter()
+    .any(|r| matches!(r, CipResult::Consider));
     let overall_result = CipResult::clear(!any_consider);
 
     // Validate wrt to mr.review_reasons
@@ -511,7 +519,7 @@ fn watchlist(
     {
         tracing::error!("CIP endpoint ExpectedReviewReasonNotFound: AdverseMediaHit");
     }
-    if (pep | ofac | sanctions)
+    if (pep | sanctions | monitored_lists)
         && !mr
             .map(|r| r.review_reasons.contains(&ReviewReason::WatchlistHit))
             .unwrap_or(false)
@@ -547,7 +555,7 @@ fn watchlist(
         status: alpaca::CipStatus::Complete,
         created_at: decision.created_at,
         politically_exposed_person: pep_result,
-        monitored_lists: ofac_result,
+        monitored_lists: monitored_lists_result,
         sanction: sanctions_result,
         adverse_media: adverse_media_result,
         records: records_json,
