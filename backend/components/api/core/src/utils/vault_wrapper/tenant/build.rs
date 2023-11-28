@@ -24,10 +24,26 @@ impl<Type> VaultWrapper<Type> {
         sv_id: &ScopedVaultId,
         version: Option<DataLifetimeSeqno>,
     ) -> ApiResult<TenantVw<Type>> {
-        let args = if let Some(version) = version {
-            VwArgs::Historical(sv_id, version)
-        } else {
-            VwArgs::Tenant(sv_id)
+        Self::build_inner(conn, sv_id, version, false)
+    }
+
+    /// New view of a tenant's VW that only includes data owned by this tenant.
+    /// This will one day replace build_for_tenant
+    pub fn build_owned(conn: &mut PgConn, sv_id: &ScopedVaultId) -> ApiResult<TenantVw<Type>> {
+        // TODO compare the difference between build_for_tenant and build_owned before switching source of truth
+        Self::build_inner(conn, sv_id, None, true)
+    }
+
+    pub fn build_inner(
+        conn: &mut PgConn,
+        sv_id: &ScopedVaultId,
+        version: Option<DataLifetimeSeqno>,
+        only_owned: bool,
+    ) -> ApiResult<TenantVw<Type>> {
+        let args = match (only_owned, version) {
+            (true, _) => VwArgs::OwnedTenant(sv_id),
+            (false, Some(version)) => VwArgs::Historical(sv_id, version),
+            (false, None) => VwArgs::Tenant(sv_id),
         };
         let uvw = Self::build(conn, args)?;
         let workflows = Workflow::bulk_get_for_users(conn, vec![sv_id])?

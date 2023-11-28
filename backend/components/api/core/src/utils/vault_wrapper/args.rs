@@ -21,13 +21,17 @@ pub enum VwArgs<'a> {
     /// Generally used during APIs on the tenant-specific bifrost onboarding path or
     /// in tenant-authed APIs.
     Tenant(&'a ScopedVaultId),
+    /// Will replace Tenant one day - same as Tenant, but just shows data owned by the current tenant
+    /// TODO when we deprecate the other variants, we can simplify some of the DataLifetime fetching code
+    OwnedTenant(&'a ScopedVaultId),
     /// Used to build a VW that sees ALL portable data and speculative data.
     /// Allows reconstructing a VaultWrapper from the view of a given tenant at a historical point
     /// in time.
     Historical(&'a ScopedVaultId, DataLifetimeSeqno),
 }
 
-type Args = (Vault, Option<ScopedVaultId>, Option<DataLifetimeSeqno>);
+type OnlyOwned = bool;
+type Args = (Vault, Option<ScopedVaultId>, Option<DataLifetimeSeqno>, OnlyOwned);
 
 impl<'a> VwArgs<'a> {
     pub(super) fn build(self, conn: &mut PgConn) -> ApiResult<Args> {
@@ -35,15 +39,19 @@ impl<'a> VwArgs<'a> {
             Self::Historical(sv_id, seqno) => {
                 let su = ScopedVault::get(conn, sv_id)?;
                 let uv = Vault::get(conn, &su.vault_id)?;
-                (uv, Some(su.id), Some(seqno))
+                (uv, Some(su.id), Some(seqno), false)
             }
             Self::Vault(uv_id) => {
                 let user_vault = Vault::get(conn, uv_id)?;
-                (user_vault, None, None)
+                (user_vault, None, None, false)
             }
             Self::Tenant(sv_id) => {
                 let uv = Vault::get(conn, sv_id)?;
-                (uv, Some(sv_id.clone()), None)
+                (uv, Some(sv_id.clone()), None, false)
+            }
+            Self::OwnedTenant(sv_id) => {
+                let uv = Vault::get(conn, sv_id)?;
+                (uv, Some(sv_id.clone()), None, true)
             }
         };
         tracing::info!(

@@ -1,7 +1,7 @@
 use super::WriteableVw;
 use crate::errors::ApiResult;
 use crate::utils::vault_wrapper::VwArgs;
-use crate::utils::vault_wrapper::{Person, TenantVw, VaultData, VaultWrapper};
+use crate::utils::vault_wrapper::{Person, TenantVw, VaultWrapper};
 use crate::State;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
@@ -153,8 +153,8 @@ async fn test_prefill_data(state: &mut State) {
             let vw2: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2_id).unwrap();
             vw2.prefill_portable_data(conn, prefill_data, None).unwrap();
 
-            let vw1: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &su1_id).unwrap();
-            let vw2: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &su2_id).unwrap();
+            let vw1: TenantVw<Person> = VaultWrapper::build_owned(conn, &su1_id).unwrap();
+            let vw2: TenantVw<Person> = VaultWrapper::build_owned(conn, &su2_id).unwrap();
 
             Ok((vw1, vw2))
         })
@@ -165,10 +165,7 @@ async fn test_prefill_data(state: &mut State) {
     // For backcompat, tenants' views of data still include other tenants' data.
     // This is a util to filter out data added by other tenants
     assert_have_same_elements(
-        added_by_self(&vw1)
-            .iter()
-            .map(|d| d.lifetime.kind.clone())
-            .collect(),
+        vw1.all_data.iter().map(|(d, _)| d.clone()).collect(),
         vec![
             IDK::Email.into(),
             IDK::PhoneNumber.into(),
@@ -187,10 +184,7 @@ async fn test_prefill_data(state: &mut State) {
         IDK::Ssn4.into(),
     ];
     assert_have_same_elements(
-        added_by_self(&vw2)
-            .iter()
-            .map(|d| d.lifetime.kind.clone())
-            .collect(),
+        vw2.all_data.iter().map(|(d, _)| d.clone()).collect(),
         expected_vw2_data.clone(),
     );
 
@@ -222,7 +216,7 @@ async fn test_prefill_data(state: &mut State) {
             let vw2: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2_id).unwrap();
             vw2.portablize_identity_data(conn).unwrap();
 
-            let vw2: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &su2_id).unwrap();
+            let vw2: TenantVw<Person> = VaultWrapper::build_owned(conn, &su2_id).unwrap();
             Ok(vw2)
         })
         .await
@@ -234,9 +228,9 @@ async fn test_prefill_data(state: &mut State) {
         IDK::LastName.into(),
         IDK::Ssn4.into(),
     ];
-    let vw2_data = added_by_self(&vw2);
+    let vw2_data = vw2.all_data.iter().flat_map(|(_, d)| d).collect_vec();
     assert_have_same_elements(
-        vw2_data.iter().map(|d| d.lifetime.kind.clone()).collect(),
+        vw2.all_data.iter().map(|(d, _)| d.clone()).collect(),
         expected_vw2_data,
     );
     assert!(vw2_data.iter().all(|d| !d.is_portable()));
@@ -274,15 +268,4 @@ fn create_test_data(conn: &mut TxnPgConn) -> TestData {
     vw.on_otp_verified(conn, IDK::PhoneNumber.into()).unwrap();
 
     TestData { su1, su2, pb1, pb2 }
-}
-
-/// Returns the list of VaultData visible to vw that were added by the scoped vault of vw
-fn added_by_self(vw: &TenantVw<Person>) -> Vec<&VaultData> {
-    vw.all_data
-        .iter()
-        .flat_map(|(_, d)| {
-            d.iter()
-                .filter(|d| d.lifetime.scoped_vault_id == vw.scoped_vault.id)
-        })
-        .collect_vec()
 }
