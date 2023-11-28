@@ -63,6 +63,7 @@ risk_signal_agg as (
     'ssn_not_available',
     'ssn_partially_matches',
     'ssn_does_not_match',
+    'document_selfie_not_live_image',
     'ssn_does_not_match_within1_digit',
     'ssn_input_is_itin',
     'ssn_located_is_itin',
