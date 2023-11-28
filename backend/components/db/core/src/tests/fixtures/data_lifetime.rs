@@ -1,4 +1,4 @@
-use crate::models::data_lifetime::DataLifetime;
+use crate::models::data_lifetime::{DataLifetime, NewDataLifetimeArgs};
 use crate::tests::prelude::TestPgConn;
 use newtypes::{DataIdentifier, DataLifetimeSeqno, DataLifetimeSource, ScopedVaultId, VaultId};
 
@@ -13,11 +13,14 @@ pub fn build<T: Into<DataIdentifier>>(
     kind: T,
 ) -> DataLifetime {
     let s = DataLifetimeSource::Unknown;
-    let mut lifetime =
-        DataLifetime::bulk_create(conn, uv_id, su_id, vec![kind.into()], created_seqno, s, None)
-            .unwrap()
-            .pop()
-            .unwrap();
+    let args = NewDataLifetimeArgs {
+        kind: kind.into(),
+        origin_id: None,
+    };
+    let mut lifetime = DataLifetime::bulk_create(conn, uv_id, su_id, vec![args], created_seqno, s, None)
+        .unwrap()
+        .pop()
+        .unwrap();
     if let Some(portablized_seqno) = portablized_seqno {
         lifetime = DataLifetime::portablize(conn, &lifetime.id, portablized_seqno).unwrap();
     }

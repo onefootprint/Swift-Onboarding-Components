@@ -165,6 +165,7 @@ table! {
         kind -> Text,
         source -> Text,
         actor -> Nullable<Jsonb>,
+        origin_id -> Nullable<Text>,
     }
 }
 
@@ -1172,6 +1173,7 @@ joinable!(risk_signal -> verification_result (verification_result_id));
 joinable!(risk_signal_group -> scoped_vault (scoped_vault_id));
 joinable!(rule_instance -> ob_configuration (ob_configuration_id));
 joinable!(rule_result -> rule_instance (rule_instance_id));
+joinable!(rule_result -> rule_set_result (rule_set_result_id));
 joinable!(rule_set_result -> ob_configuration (ob_configuration_id));
 joinable!(rule_set_result -> scoped_vault (scoped_vault_id));
 joinable!(rule_set_result -> workflow (workflow_id));

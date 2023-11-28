@@ -39,30 +39,35 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
             e_data: SealedVaultBytes(vec![1]),
             p_data: None,
             format: VaultDataFormat::String,
+            origin_id: None,
         },
         NewVaultData {
             kind: IDK::LastName.into(),
             e_data: SealedVaultBytes(vec![2]),
             p_data: None,
             format: VaultDataFormat::String,
+            origin_id: None,
         },
         NewVaultData {
             kind: IDK::Ssn4.into(),
             e_data: SealedVaultBytes(vec![3]),
             p_data: None,
             format: VaultDataFormat::String,
+            origin_id: None,
         },
         NewVaultData {
             kind: IDK::Email.into(),
             e_data: SealedVaultBytes(vec![4]),
             p_data: None,
             format: VaultDataFormat::String,
+            origin_id: None,
         },
         NewVaultData {
             kind: IDK::PhoneNumber.into(),
             e_data: SealedVaultBytes(vec![5]),
             p_data: None,
             format: VaultDataFormat::String,
+            origin_id: None,
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
@@ -143,6 +148,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
                 e_data: SealedVaultBytes(vec![0]),
                 p_data: None,
                 format: VaultDataFormat::String,
+                origin_id: None,
             }],
         ),
         // Add speculative Dob and Nationality data at tenant 2
@@ -155,12 +161,14 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
                     e_data: SealedVaultBytes(vec![1]),
                     p_data: None,
                     format: VaultDataFormat::String,
+                    origin_id: None,
                 },
                 NewVaultData {
                     kind: IDK::Nationality.into(),
                     e_data: SealedVaultBytes(vec![2]),
                     p_data: None,
                     format: VaultDataFormat::String,
+                    origin_id: None,
                 },
             ],
         ),
@@ -173,6 +181,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
                 e_data: SealedVaultBytes(vec![3]),
                 p_data: None,
                 format: VaultDataFormat::String,
+                origin_id: None,
             }],
         ),
         // Add portable Nationality at tenant 1
@@ -184,6 +193,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
                 e_data: SealedVaultBytes(vec![4]),
                 p_data: None,
                 format: VaultDataFormat::String,
+                origin_id: None,
             }],
         ),
     ];
@@ -244,18 +254,21 @@ fn test_build_business_user_vault_wrapper(conn: &mut TestPgConn) {
             e_data: SealedVaultBytes(vec![1]),
             p_data: Some(PiiString::from("Acme Inc")),
             format: VaultDataFormat::String,
+            origin_id: None,
         },
         NewVaultData {
             kind: BDK::Website.into(),
             e_data: SealedVaultBytes(vec![2]),
             p_data: None,
             format: VaultDataFormat::String,
+            origin_id: None,
         },
         NewVaultData {
             kind: BDK::PhoneNumber.into(),
             e_data: SealedVaultBytes(vec![3]),
             p_data: None,
             format: VaultDataFormat::String,
+            origin_id: None,
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();

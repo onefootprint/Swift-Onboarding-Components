@@ -20,6 +20,7 @@ use newtypes::VaultId;
 use newtypes::{DataLifetimeId, VdId};
 
 use super::data_lifetime::DataLifetime;
+use super::data_lifetime::NewDataLifetimeArgs;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = vault_data)]
@@ -42,16 +43,17 @@ pub struct NewVaultData {
     pub e_data: SealedVaultBytes,
     pub p_data: Option<PiiString>,
     pub format: VaultDataFormat,
+    pub origin_id: Option<DataLifetimeId>,
 }
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = vault_data)]
-pub struct NewVaultDataRow {
-    pub lifetime_id: DataLifetimeId,
-    pub kind: DataIdentifier,
-    pub e_data: SealedVaultBytes,
-    pub p_data: Option<PiiString>,
-    pub format: VaultDataFormat,
+struct NewVaultDataRow {
+    lifetime_id: DataLifetimeId,
+    kind: DataIdentifier,
+    e_data: SealedVaultBytes,
+    p_data: Option<PiiString>,
+    format: VaultDataFormat,
 }
 
 impl VaultData {
@@ -86,15 +88,15 @@ impl VaultData {
             )));
         }
         // Make a DataLifetime row for each of the new pieces of data being inserted
-        let lifetimes = DataLifetime::bulk_create(
-            conn,
-            user_vault_id,
-            scoped_user_id,
-            data.iter().map(|d| d.kind.clone()).collect(),
-            seqno,
-            source,
-            actor,
-        )?;
+        let dl_data = data
+            .iter()
+            .map(|d| NewDataLifetimeArgs {
+                kind: d.kind.clone(),
+                origin_id: d.origin_id.clone(),
+            })
+            .collect();
+        let lifetimes =
+            DataLifetime::bulk_create(conn, user_vault_id, scoped_user_id, dl_data, seqno, source, actor)?;
         let new_rows: Vec<_> = data
             .into_iter()
             .zip(lifetimes.into_iter())

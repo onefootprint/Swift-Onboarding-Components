@@ -146,6 +146,7 @@ impl<Type> VaultWrapper<Type> {
                     e_data,
                     p_data,
                     format,
+                    origin_id: None,
                 };
                 Ok(vd)
             })

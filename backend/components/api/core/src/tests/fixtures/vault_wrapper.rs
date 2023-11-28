@@ -37,30 +37,35 @@ pub fn create(conn: &mut TestPgConn, uv_is_live: bool) -> VwSetup {
             e_data: SealedVaultBytes(vec![1]),
             p_data: None,
             format: VaultDataFormat::String,
+            origin_id: None,
         },
         NewVaultData {
             kind: IdentityDataKind::LastName.into(),
             e_data: SealedVaultBytes(vec![2]),
             p_data: None,
             format: VaultDataFormat::String,
+            origin_id: None,
         },
         NewVaultData {
             kind: IdentityDataKind::Ssn4.into(),
             e_data: SealedVaultBytes(vec![3]),
             p_data: None,
             format: VaultDataFormat::String,
+            origin_id: None,
         },
         NewVaultData {
             kind: IdentityDataKind::Email.into(),
             e_data: SealedVaultBytes(vec![4]),
             p_data: None,
             format: VaultDataFormat::String,
+            origin_id: None,
         },
         NewVaultData {
             kind: IdentityDataKind::PhoneNumber.into(),
             e_data: SealedVaultBytes(vec![5]),
             p_data: None,
             format: VaultDataFormat::String,
+            origin_id: None,
         },
     ];
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();

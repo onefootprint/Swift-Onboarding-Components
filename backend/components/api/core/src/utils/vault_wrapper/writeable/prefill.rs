@@ -144,6 +144,8 @@ impl<Type> VaultWrapper<Type> {
                 e_data: vd.e_data.clone(),
                 p_data: vd.p_data.clone(),
                 format: vd.format,
+                // Since we're copying the data from elsewhere, save the lifetime ID
+                origin_id: Some(vd.lifetime_id.clone()),
             })
             .collect_vec();
 

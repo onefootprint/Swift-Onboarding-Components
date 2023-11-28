@@ -97,10 +97,13 @@ impl WriteableVw<Person> {
         //
         // Note: speculative and portable could have overlapping DIs if a piece of speculative data
         // is replacing a piece of portable data
+        // TODO eventually we'll assemble the "portable" view as the user-scoped view
         let (speculative, portable): (HashMap<_, _>, HashMap<_, _>) = uvw
             .all_data
             .iter()
             .flat_map(|(di, datas)| datas.iter().map(|d| (di.clone(), d)))
+            // Don't portablize data that was copied into this vault from another
+            .filter(|(_, d)| d.lifetime.origin_id.is_none())
             .partition_map(|(di, d)| {
                 if d.is_portable() {
                     Either::Right((di, d))
@@ -108,6 +111,7 @@ impl WriteableVw<Person> {
                     Either::Left((di, d))
                 }
             });
+
         let d = decide_data_to_portablize(CurrentData {
             speculative: CollectedDataOption::list_from(speculative.keys().cloned().collect()),
             portable: CollectedDataOption::list_from(portable.keys().cloned().collect()),

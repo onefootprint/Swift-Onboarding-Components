@@ -232,18 +232,14 @@ async fn test_prefill_data(state: &mut State) {
         IDK::PhoneNumber.into(),
         IDK::FirstName.into(),
         IDK::LastName.into(),
-        // TODO there's some logic in portablizing that will deactivate partial CDOs if a full
-        // CDO already exists. We shouldn't do this since tenants' data will become isolated.
-        // Will tackle in a follow-up
-        // IDK::Ssn4.into(),
+        IDK::Ssn4.into(),
     ];
     let vw2_data = added_by_self(&vw2);
     assert_have_same_elements(
         vw2_data.iter().map(|d| d.lifetime.kind.clone()).collect(),
         expected_vw2_data,
     );
-    // TODO in a future PR
-    // assert!(vw2_data.iter().all(|d| !d.is_portable()));
+    assert!(vw2_data.iter().all(|d| !d.is_portable()));
 }
 
 fn create_test_data(conn: &mut TxnPgConn) -> TestData {

@@ -79,6 +79,8 @@ pub struct DataLifetime {
     pub source: DataLifetimeSource,
     /// The actor that added this piece of data to the vault, if not performed by the user
     pub actor: Option<DbActor>,
+    /// If this DL was prefilled, the DataLifetime from which it was prefilled
+    pub origin_id: Option<DataLifetimeId>,
 }
 
 #[derive(Clone, Insertable)]
@@ -94,6 +96,12 @@ struct NewDataLifetime {
     kind: DataIdentifier,
     source: DataLifetimeSource,
     actor: Option<DbActor>,
+    origin_id: Option<DataLifetimeId>,
+}
+
+pub struct NewDataLifetimeArgs {
+    pub kind: DataIdentifier,
+    pub origin_id: Option<DataLifetimeId>,
 }
 
 #[derive(Default, AsChangeset)]
@@ -144,21 +152,22 @@ impl DataLifetime {
         conn: &mut TxnPgConn,
         vault_id: &VaultId,
         scoped_vault_id: &ScopedVaultId,
-        kinds: Vec<DataIdentifier>,
+        rows: Vec<NewDataLifetimeArgs>,
         seqno: DataLifetimeSeqno,
         source: DataLifetimeSource,
         actor: Option<DbActor>,
     ) -> DbResult<Vec<Self>> {
-        let new_rows: Vec<NewDataLifetime> = kinds
+        let new_rows: Vec<NewDataLifetime> = rows
             .into_iter()
-            .map(|k| NewDataLifetime {
+            .map(|r| NewDataLifetime {
                 vault_id: vault_id.clone(),
                 scoped_vault_id: scoped_vault_id.clone(),
                 created_at: Utc::now(),
                 created_seqno: seqno,
-                kind: k,
+                kind: r.kind,
                 source,
                 actor: actor.clone(),
+                origin_id: r.origin_id,
             })
             .collect();
         let result = diesel::insert_into(data_lifetime::table)
@@ -178,7 +187,11 @@ impl DataLifetime {
         source: DataLifetimeSource,
         actor: Option<DbActor>,
     ) -> DbResult<Self> {
-        let lifetime = Self::bulk_create(conn, vault_id, scoped_vault_id, vec![kind], seqno, source, actor)?
+        let args = NewDataLifetimeArgs {
+            kind,
+            origin_id: None,
+        };
+        let lifetime = Self::bulk_create(conn, vault_id, scoped_vault_id, vec![args], seqno, source, actor)?
             .into_iter()
             .next()
             .ok_or(DbError::ObjectNotFound)?;
