@@ -117,7 +117,7 @@ const Inner = styled.div`
     gap: ${theme.spacing[7]};
     padding: ${theme.spacing[7]} ${theme.spacing[5]};
     text-align: center;
-    width: 70%;
+    width: calc(100% - ${theme.spacing[7]});
 
     ${media.greaterThan('sm')`
       max-width: 552px;
