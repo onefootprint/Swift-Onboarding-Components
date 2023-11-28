@@ -359,6 +359,15 @@ impl Workflow {
         Ok(res)
     }
 
+    #[tracing::instrument("Workflow::list", skip_all)]
+    pub fn list(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
+        let res = workflow::table
+            .filter(workflow::scoped_vault_id.eq(sv_id))
+            .get_results(conn)?;
+
+        Ok(res)
+    }
+
     /// Gets the latest workflow that the user completed that is "reonboard-able"
     #[tracing::instrument("Workflow::list_by_completed_at", skip_all)]
     pub fn latest_reonboardable_wf(

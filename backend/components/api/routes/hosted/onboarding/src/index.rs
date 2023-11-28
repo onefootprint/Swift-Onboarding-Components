@@ -14,6 +14,9 @@ use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::onboarding::NewBusinessVaultArgs;
 use api_core::utils::onboarding::NewOnboardingArgs;
+use api_core::utils::vault_wrapper::Any;
+use api_core::utils::vault_wrapper::VaultWrapper;
+use api_core::utils::vault_wrapper::VwArgs;
 use api_wire_types::hosted::onboarding::OnboardingResponse;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
@@ -42,13 +45,15 @@ pub async fn post(
         .ob_configuration_id()
         .or(pk_obc_id)
         .ok_or(OnboardingError::NoObConfig)?;
-    let (scoped_user, ob_config, tenant) = state
+    let (scoped_user, ob_config, tenant, vw) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let su = ScopedVault::get(conn, (&scoped_user_id, &uv_id))?;
             // Check that the ob configuration is still active
             let (ob_config, tenant) = ObConfiguration::get_enabled(conn, &obc_id)?;
-            Ok((su, ob_config, tenant))
+            let args = VwArgs::Vault(&su.vault_id);
+            let vw = VaultWrapper::<Any>::build(conn, args)?;
+            Ok((su, ob_config, tenant, vw))
         })
         .await??;
 
@@ -68,6 +73,8 @@ pub async fn post(
         None
     };
 
+    let prefill_data = vw.get_data_to_prefill(&state, &scoped_user, &ob_config).await?;
+
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
     let obc = ob_config.clone();
@@ -83,6 +90,8 @@ pub async fn post(
                 insight_event: Some(insight_event.clone()),
                 new_biz_args: maybe_new_biz_args,
                 source: WorkflowSource::Hosted,
+                actor: None,
+                maybe_prefill_data: Some(prefill_data),
             };
             let (wf_id, biz_wf) =
                 api_core::utils::onboarding::get_or_start_onboarding(conn, ff_client, args)?;

@@ -105,20 +105,6 @@ impl UserTimeline {
         Ok(())
     }
 
-    #[tracing::instrument("UserTimeline::bulk_portablize", skip_all)]
-    pub fn bulk_portablize(
-        conn: &mut PgConn,
-        scoped_vault_id: &ScopedVaultId,
-        kind: DbUserTimelineEventKind,
-    ) -> DbResult<()> {
-        diesel::update(user_timeline::table)
-            .filter(user_timeline::scoped_vault_id.eq(scoped_vault_id))
-            .filter(user_timeline::event_kind.eq(kind))
-            .set(user_timeline::is_portable.eq(true))
-            .execute(conn)?;
-        Ok(())
-    }
-
     #[tracing::instrument("UserTimeline::list", skip_all)]
     pub fn list<'a, T>(
         conn: &mut PgConn,

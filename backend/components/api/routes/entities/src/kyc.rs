@@ -92,6 +92,7 @@ pub async fn post(
 
     let tenant_id = auth.tenant().id.clone();
     let ff_client = state.feature_flag_client.clone();
+    let actor = auth.actor();
     let wf = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -126,6 +127,8 @@ pub async fn post(
                 insight_event: None,
                 new_biz_args: None, // currently dont support KYB for NPV
                 source: WorkflowSource::Tenant,
+                actor: Some(actor),
+                maybe_prefill_data: None,
             };
             let (wf_id, _) = api_core::utils::onboarding::get_or_start_onboarding(conn, ff_client, args)?;
             if let Some(fixture_result) = fixture_result {

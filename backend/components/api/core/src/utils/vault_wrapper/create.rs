@@ -77,10 +77,7 @@ impl VaultWrapper<Person> {
             return Err(UserError::FixtureCIInLive.into());
         }
 
-        if initial_data
-            .iter()
-            .any(|d| !matches!(d.di, DI::Id(IDK::PhoneNumber) | DI::Id(IDK::Email)))
-        {
+        if initial_data.iter().any(|d| !d.di.is_contact_info()) {
             return Err(
                 AssertionError("Cannot create vault with initial data other than phone/email").into(),
             );

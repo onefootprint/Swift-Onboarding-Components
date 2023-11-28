@@ -81,8 +81,11 @@ def test_portable_timeline_events(
         *foo_sandbox_tenant.db_auths,
     )
     collect_data_events = [i for i in body if i["event"]["kind"] == "data_collected"]
-    assert collect_data_events
-    assert all(i["is_from_other_org"] for i in collect_data_events)
+    # TODO test that these timeline events show that the data is from one-click
+    assert len(collect_data_events) == 1
+    assert set(collect_data_events[0]["event"]["data"]["attributes"]) == set(
+        foo_sandbox_tenant.default_ob_config.must_collect_data
+    )
 
 
 def test_cant_see_fp_id(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):
@@ -123,24 +126,21 @@ def test_cant_see_speculative_fingerprints(
 
         # sandbox_tenant should be able to search for the user from its new name
         body = get(f"/entities", data, *sandbox_tenant.db_auths)
-        assert [i for i in body["data"] if i["id"] == fp_id]
+        assert any(i["id"] == fp_id for i in body["data"])
 
         # foo_sandbox_tenant should _not_ be able to find the user by its name at sandbox_tenant
         body = get(f"/entities", data, *foo_sandbox_tenant.db_auths)
-        assert not len(body["data"])
+        assert not any(i["id"] == fp_id for i in body["data"])
 
 
 def test_cant_see_unrequested_portable(dual_onboarded_user, foo_sandbox_tenant):
     # Now, we shouldn't be able to see nationality or ssn9 since they weren't requested by foo_sandbox_tenant
     fp_id = dual_onboarded_user.foo_fp_id
     body = get(f"entities/{fp_id}", None, *foo_sandbox_tenant.db_auths)
-    assert "id.ssn4" in body["attributes"]
-    assert "id.ssn9" not in body["attributes"]
-    assert "id.nationality" not in body["attributes"]
-
-    assert "id.ssn4" in body["decryptable_attributes"]
-    assert "id.ssn9" not in body["decryptable_attributes"]
-    assert "id.nationality" not in body["decryptable_attributes"]
+    ssn4 = next(i for i in body["data"] if i["identifier"] == "id.ssn4")
+    assert ssn4["is_decryptable"]
+    assert not any(i for i in body["data"] if i["identifier"] == "id.ssn9")
+    assert not any(i for i in body["data"] if i["identifier"] == "id.nationality")
 
 
 def test_cant_decrypt_unrequested_portable(dual_onboarded_user, foo_sandbox_tenant):

@@ -1,5 +1,6 @@
-use std::sync::Arc;
-
+use super::vault_wrapper::{Any, PrefillData, TenantVw, VaultWrapper, WriteableVw};
+use crate::auth::tenant::AuthActor;
+use crate::errors::{onboarding::OnboardingError, ApiResult};
 use db::{
     models::{
         business_owner::BusinessOwner,
@@ -12,15 +13,12 @@ use db::{
     },
     TxnPgConn,
 };
-use feature_flag::FeatureFlagClient;
+use feature_flag::{BoolFlag, FeatureFlagClient};
 use newtypes::{
     CollectedDataOption, EncryptedVaultPrivateKey, ObConfigurationKind, Selfie, VaultKind, VaultPublicKey,
     WorkflowId, WorkflowSource,
 };
-
-use crate::errors::{onboarding::OnboardingError, ApiResult};
-
-use super::vault_wrapper::{Any, TenantVw, VaultWrapper};
+use std::sync::Arc;
 
 pub struct NewBusinessVaultArgs {
     pub public_key: VaultPublicKey,
@@ -36,6 +34,8 @@ pub struct NewOnboardingArgs<'a> {
     pub insight_event: Option<CreateInsightEvent>,
     pub new_biz_args: Option<NewBusinessVaultArgs>, // has to be generated async outside the `conn`. We also currently don't support KYB for NPV's but could one day
     pub source: WorkflowSource,
+    pub actor: Option<AuthActor>,
+    pub maybe_prefill_data: Option<PrefillData>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -52,6 +52,8 @@ pub fn get_or_start_onboarding(
         insight_event,
         new_biz_args,
         source,
+        actor,
+        maybe_prefill_data,
     } = args;
     let user_vault = Vault::lock(conn, &sv.vault_id)?;
     if obc.kind == ObConfigurationKind::Auth {
@@ -76,8 +78,21 @@ pub fn get_or_start_onboarding(
         };
         let (wf, is_new_ob) =
             Workflow::get_or_create_onboarding(conn, ff_client.clone(), ob_create_args, force_create)?;
+
         if is_new_ob {
             create_doc_request_if_needed(conn, &wf, obc)?;
+            let existing_wfs = Workflow::list(conn, &sv.id)?;
+            let can_create_prefill_data = ff_client.flag(BoolFlag::SavePrefillData(&sv.tenant_id));
+            if can_create_prefill_data && existing_wfs.iter().all(|i| i.id == wf.id) {
+                // For the first WF created at this tenant, prefill portable data into this tenant.
+                // TODO: the goal is to do this for all WFs in the future. But it's simpler to
+                // start with only prefilling data once
+                if let Some(prefill_data) = maybe_prefill_data {
+                    let tenant_vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &sv.id)?;
+                    tenant_vw.prefill_portable_data(conn, prefill_data, actor)?;
+                }
+                // TODO should we prefill data and use that to determine if one-click happened?
+            }
         }
         wf.id
     };

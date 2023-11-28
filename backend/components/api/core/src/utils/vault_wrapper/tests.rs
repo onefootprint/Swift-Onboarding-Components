@@ -333,10 +333,9 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     assert!(uvw.has_field(IDK::LastName));
     assert!(uvw.has_field(IDK::Email));
 
-    // And the user timeline events should be made portable
+    // Should have added user timeline events
     let timeline_events = UserTimeline::list(conn, &su.id, vec![]).unwrap();
     assert!(!timeline_events.is_empty());
-    assert!(timeline_events.iter().all(|x| x.0.is_portable));
 }
 
 #[db_test]

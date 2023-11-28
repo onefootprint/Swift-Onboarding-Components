@@ -79,6 +79,7 @@ impl FingerprintScopable for GlobalFingerprintKind {
         FingerprintScope::Global(*self)
     }
 }
+
 impl GlobalFingerprintKind {
     pub fn data_identifiers() -> Vec<DataIdentifier> {
         Self::iter().map(|s| s.data_identifier()).collect()

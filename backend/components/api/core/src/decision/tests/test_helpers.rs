@@ -68,6 +68,8 @@ pub async fn create_user_and_onboarding(
                 insight_event: Some(CreateInsightEvent { ..Default::default() }),
                 new_biz_args: biz_args,
                 source: WorkflowSource::Hosted,
+                actor: None,
+                maybe_prefill_data: None,
             };
             let (wf_id, biz_wf) = utils::onboarding::get_or_start_onboarding(conn, ff_client, args).unwrap();
             if let Some(fixture_result) = kyc_fixture_result {

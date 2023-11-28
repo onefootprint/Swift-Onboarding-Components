@@ -13,8 +13,9 @@ use newtypes::{DataLifetimeSeqno, ScopedVaultId, VaultId};
 ///
 /// The VwArgs variants below are used to construct a VaultWrapper specific to the use case.
 pub enum VwArgs<'a> {
-    /// Used to build a VW for a user that sees ALL portable data, or if it's non-portable, just speculative.
-    /// This is generally used in user-authed APIs for my1fp
+    /// Used to build a VW for a user that sees ALL portable data.
+    /// This is generally used to autofill portable data into tenants during one-click and for
+    /// user-authed APIs for my1fp
     Vault(&'a VaultId),
     /// Used to build a VW that sees ALL portable data and speculative data
     /// Generally used during APIs on the tenant-specific bifrost onboarding path or

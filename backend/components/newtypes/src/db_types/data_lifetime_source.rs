@@ -34,6 +34,8 @@ pub enum DataLifetimeSource {
     Tenant,
     /// Vaulted via derived OCR data
     Ocr,
+    /// Vaulted via portable data from another tenant
+    Prefill,
     /// Just for events that aren't backfilled
     Unknown,
 }

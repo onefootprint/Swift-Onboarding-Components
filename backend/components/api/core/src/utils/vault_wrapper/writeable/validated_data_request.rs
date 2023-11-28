@@ -16,17 +16,19 @@ use itertools::Itertools;
 use newtypes::{
     output::Csv, BusinessDataKind as BDK, CollectedDataOption, ContactInfoPriority, DataIdentifier,
     DataLifetimeSeqno, DataLifetimeSource, DataRequest, FingerprintRequest, Fingerprints,
-    IdentityDataKind as IDK, ValidationError, VaultDataFormat,
+    IdentityDataKind as IDK, ScopedVaultId, ValidationError, VaultDataFormat,
 };
 use std::collections::{HashMap, HashSet};
 
-use super::WriteableVw;
+use super::{PrefillData, WriteableVw};
 
 /// DataRequest that has been validated through a UserVaultWrapper
 pub struct ValidatedDataRequest {
     pub(super) data: Vec<NewVaultData>,
-    pub(super) fingerprints: Fingerprints,
-    pub(super) new_cdos: HashSet<CollectedDataOption>,
+    /// On prefilled ValidatedDataRequests, includes the existing CI for any phone/email being prefilled
+    old_ci: HashMap<DataIdentifier, ContactInfo>,
+    fingerprints: Fingerprints,
+    new_cdos: HashSet<CollectedDataOption>,
 }
 
 impl<Type> VaultWrapper<Type> {
@@ -34,6 +36,8 @@ impl<Type> VaultWrapper<Type> {
         &self,
         conn: &mut PgConn,
         data: &[NewVaultData],
+        // None if adding data not for prefill, Some with the sv_id if adding data for prefill
+        prefill_sv_id: Option<&ScopedVaultId>,
     ) -> ApiResult<HashSet<CollectedDataOption>> {
         // Don't allow replacing some pieces of info
         let mut validation_errors = HashMap::<DataIdentifier, newtypes::Error>::new();
@@ -41,13 +45,20 @@ impl<Type> VaultWrapper<Type> {
 
         let irreplaceable_ci = [IDK::PhoneNumber.into(), IDK::Email.into()];
         for di in irreplaceable_ci {
-            let Some(dl_id) = self.data(&di).map(|d| &d.lifetime.id) else {
+            let Some(d) = self.data(&di) else {
                 continue;
             };
-            let ci = ContactInfo::get(conn, dl_id)?;
+            let ci = ContactInfo::get(conn, &d.lifetime.id)?;
             let update_has_di = dis.contains(&&di);
             if ci.is_otp_verified && update_has_di {
-                validation_errors.insert(di, ValidationError::CannotReplaceVerifiedContactInfo.into());
+                if prefill_sv_id.is_none() {
+                    validation_errors.insert(di, ValidationError::CannotReplaceVerifiedContactInfo.into());
+                } else if prefill_sv_id.is_some_and(|sv_id| sv_id == &d.lifetime.scoped_vault_id) {
+                    // With our current prefill logic that only prefills for the first WF for a SV,
+                    // we shouldn't ever get in a position where we're replacing CI.
+                    // Except for a race condition
+                    tracing::error!("Unexpected: replacing CI with prefill data");
+                }
             }
         }
 
@@ -65,10 +76,29 @@ impl<Type> VaultWrapper<Type> {
         let existing_cdos = CollectedDataOption::list_from(self.populated_dis());
         let new_cdos = CollectedDataOption::list_from(dis.iter().map(|x| (*x).clone()).collect());
         for speculative_cdo in &new_cdos {
-            let speculative_cdo_would_replace_full_cdo = speculative_cdo
-                .full_variant()
-                .map(|full_cdo| existing_cdos.contains(&full_cdo))
-                == Some(true);
+            let Some(full_cdo) = speculative_cdo.full_variant() else {
+                continue
+            };
+
+            // Some clunky logic to allow partial updates, which may need to happen while the
+            // tenant-view of the user is still built using portable data from other tenants
+            // TODO rm this after backfill. Maybe switch to dropping partial CDOs for prefill data
+            // if a full CDO already exists
+            if let Some(prefill_sv_id) = prefill_sv_id {
+                let is_full_cdo_added_by_other_tenant = full_cdo
+                    .data_identifiers()
+                    .unwrap_or_default()
+                    .into_iter()
+                    .flat_map(|di| self.data(&di))
+                    .all(|d| &d.lifetime.scoped_vault_id != prefill_sv_id);
+                if is_full_cdo_added_by_other_tenant {
+                    // If the full CDO was added by another tenant and this is prefill data, temporarily allow it
+                    continue;
+                }
+            }
+
+            // If the full CDO was added by this tenant, never want to allow replacing it
+            let speculative_cdo_would_replace_full_cdo = existing_cdos.contains(&full_cdo);
             if speculative_cdo_would_replace_full_cdo {
                 // For each DI in this offending CDO, make a pretty error that shows that the DI
                 // would be overwriting the full CDO that already exists
@@ -111,7 +141,7 @@ impl<Type> VaultWrapper<Type> {
                     VaultDataFormat::String
                 };
                 let vd = NewVaultData {
-                    kind: kind.clone(),
+                    kind,
                     e_data,
                     p_data,
                     format,
@@ -120,14 +150,40 @@ impl<Type> VaultWrapper<Type> {
             })
             .collect::<ApiResult<Vec<_>>>()?;
 
-        let new_cdos = self.validate_adding_dis(conn, &data)?;
+        let new_cdos = self.validate_adding_dis(conn, &data, None)?;
 
         let req = ValidatedDataRequest {
             data,
+            old_ci: HashMap::new(),
             fingerprints,
             new_cdos,
         };
         Ok(req)
+    }
+}
+
+impl<Type> WriteableVw<Type> {
+    /// Given the source user-scoped vault and destination tenant-scoped vault, assembles the
+    /// ValidatedDataRequest that will prefill portable data into the destination vault
+    pub fn validate_prefill_data_request(
+        &self,
+        conn: &mut PgConn,
+        prefill_data: PrefillData,
+    ) -> ApiResult<ValidatedDataRequest> {
+        let PrefillData {
+            data,
+            fingerprints,
+            old_ci,
+            ..
+        } = prefill_data;
+        let new_cdos = self.validate_adding_dis(conn, &data, Some(&self.scoped_vault_id))?;
+        let request = ValidatedDataRequest {
+            data,
+            old_ci,
+            new_cdos,
+            fingerprints: fingerprints.into_iter().collect(),
+        };
+        Ok(request)
     }
 }
 
@@ -214,18 +270,18 @@ impl ValidatedDataRequest {
         // Add contact info for the new CIs added
         let new_contact_info = vd
             .iter()
-            .filter(|vd| {
-                matches!(
-                    vd.kind,
-                    DataIdentifier::Id(IDK::PhoneNumber) | DataIdentifier::Id(IDK::Email)
-                )
-            })
-            // TODO copy this CI from the old CI if any
-            .map(|vd| NewContactInfoArgs {
-                is_verified: false,
-                is_otp_verified: false,
-                priority: ContactInfoPriority::Primary,
-                lifetime_id: vd.lifetime_id.clone(),
+            .filter(|vd| vd.kind.is_contact_info())
+            .map(|vd| {
+                let old_ci = self.old_ci.get(&vd.kind);
+                NewContactInfoArgs {
+                    // Inherit properties of old CI if we are prefilling this CI from portable data
+                    is_verified: old_ci.map(|ci| ci.is_verified).unwrap_or(false),
+                    is_otp_verified: old_ci.map(|ci| ci.is_otp_verified).unwrap_or(false),
+                    priority: old_ci
+                        .map(|ci| ci.priority)
+                        .unwrap_or(ContactInfoPriority::Primary),
+                    lifetime_id: vd.lifetime_id.clone(),
+                }
             })
             .collect_vec();
         let ci = ContactInfo::bulk_create(conn, new_contact_info)?;

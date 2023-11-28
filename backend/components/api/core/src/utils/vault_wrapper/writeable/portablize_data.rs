@@ -8,7 +8,6 @@ use db::models::data_lifetime::DataLifetime;
 use db::models::fingerprint::Fingerprint;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultUpdate;
-use db::models::user_timeline::UserTimeline;
 use db::models::vault::Vault;
 use db::TxnPgConn;
 use either::Either;
@@ -16,7 +15,6 @@ use itertools::Itertools;
 use newtypes::CollectedDataOption;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
-use newtypes::DbUserTimelineEventKind;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
@@ -179,13 +177,6 @@ impl WriteableVw<Person> {
 
         let lifetime_ids_to_portablize = to_portablize.into_iter().map(|d| d.lifetime.id.clone()).collect();
         DataLifetime::bulk_portablize_for_tenant(conn, lifetime_ids_to_portablize, &scoped_vault_id, seqno)?;
-
-        // Portablize any data collection timeline events from the duration of this onboarding.
-        // NOTE: this may include data collection events for fields that we deactivated... It is
-        // tricky to locate the exact timeline events corresponding to each piece of data. Not
-        // worth it for now since we only deactivate speculative data in the rare condition that
-        // there is a race across onboarding onto two tenants
-        UserTimeline::bulk_portablize(conn, &scoped_vault_id, DbUserTimelineEventKind::DataCollected)?;
 
         Ok(seqno)
     }

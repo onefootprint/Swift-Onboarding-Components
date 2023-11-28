@@ -93,13 +93,11 @@ impl<Type> TenantVw<Type> {
         let l_ids = data_to_fp.iter().map(|((_, id, _), _)| (*id).clone()).collect();
 
         // Get the new fingerprints from the enclave
-        let (keys, e_data): (Vec<_>, Vec<_>) = data_to_fp.into_iter().unzip();
         let fingerprints = state
             .enclave_client
-            .batch_fingerprint_sealed(&self.uvw.vault.e_private_key, e_data)
+            .batch_fingerprint_sealed(&self.uvw.vault.e_private_key, data_to_fp)
             .await?;
 
-        let fingerprints = keys.into_iter().zip(fingerprints);
         let fingerprints = fingerprints
             .into_iter()
             .map(|((kind, lifetime_id, scope), sh_data)| NewFingerprint {

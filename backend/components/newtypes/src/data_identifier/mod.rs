@@ -118,6 +118,13 @@ impl DataIdentifier {
     pub fn globally_unique(&self) -> bool {
         matches!(self, Self::Id(IdentityDataKind::PhoneNumber))
     }
+
+    pub fn is_contact_info(&self) -> bool {
+        matches!(
+            self,
+            Self::Id(IdentityDataKind::PhoneNumber) | Self::Id(IdentityDataKind::Email)
+        )
+    }
 }
 
 impl Validate for DataIdentifier {

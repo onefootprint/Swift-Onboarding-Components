@@ -6,11 +6,16 @@ use derive_more::Deref;
 mod add_data;
 mod build;
 mod portablize_data;
+mod prefill;
 mod validated_data_request;
+
+#[cfg(test)]
+mod tests;
 
 pub use add_data::seal_file_and_upload_to_s3;
 pub use add_data::NewDocument;
 pub use add_data::PatchDataResult;
+pub use prefill::PrefillData;
 /// This specific subset variant of VaultWrapper contains all the logic to write new data into a user's vault.
 /// It can only be constructed via a ScopedVaultId.
 ///
