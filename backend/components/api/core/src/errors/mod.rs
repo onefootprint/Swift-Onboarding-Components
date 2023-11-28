@@ -192,6 +192,8 @@ pub enum ApiErrorKind {
 
     #[error("AWS selfie doc error")]
     AwsSelfieDocError(#[from] selfie_doc::AwsSelfieDocError),
+    #[error("Rolling back migration as a dry run")]
+    MigrationDryRun,
 }
 
 impl From<std::convert::Infallible> for ApiError {
@@ -371,6 +373,7 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::Base64Error(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::AttestError(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::AwsSelfieDocError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::MigrationDryRun => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

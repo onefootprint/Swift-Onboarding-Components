@@ -3,7 +3,7 @@
 //!
 //! They usually will involve a combination of DB operations and other async
 //! operations (such as enclave, etc).
-use api_core::{errors::ApiResult, State};
+use api_core::{errors::ApiResult, ApiErrorKind, State};
 use byteorder::{BigEndian, ReadBytesExt};
 use db::{DbError, DbResult, TxnPgConn};
 use diesel::{sql_query, sql_types::BigInt, RunQueryDsl};
@@ -12,6 +12,10 @@ trait CustomMigration {
     type MigrationState;
 
     fn version() -> String;
+
+    fn is_dry_run() -> bool {
+        true
+    }
 
     fn run(self, state: Self::MigrationState, conn: &mut TxnPgConn) -> ApiResult<()>;
 
@@ -57,7 +61,7 @@ where
     let mig_state = M::MigrationState::from(state.clone());
 
     // Run the migration inside a DB TXN
-    state
+    let result = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<()> {
             // 1. take out the lock so no other servers can continue along the txn (we don't need to unlock it as it will be dropped after the txn)
@@ -77,15 +81,25 @@ where
 
             // 2. run the migration
             migration.run(mig_state, conn)?;
+            if M::is_dry_run() {
+                // Some migrations run as a dry run and should never have their changes committed.
+                return Err(ApiErrorKind::MigrationDryRun.into());
+            }
 
             // 3. record the migration
             let _ = db::models::custom_migration::CustomMigration::did_run(M::version(), conn)?;
 
             Ok(())
         })
-        .await?;
-
-    tracing::info!("finished running custom migration {}", M::version());
+        .await;
+    if let Err(e) = result {
+        // Swallow errors of kind MigrationDryRun. This allows the server to start up successfully
+        // after a dry run
+        if !matches!(e.kind(), ApiErrorKind::MigrationDryRun) {
+            return Err(e);
+        }
+    }
+    tracing::info!(dry_run= %M::is_dry_run(), version=%M::version(), "finished running custom migration");
 
     Ok(())
 }
