@@ -24,6 +24,7 @@ use api_core::{
 use api_wire_types::{AlpacaCipRequest, AlpacaCipResponse, DeprecatedAlpacaCipRequest};
 use chrono::{DateTime, Utc};
 use db::models::annotation::Annotation;
+use db::models::risk_signal::IncludeHidden;
 use db::{
     actor::{saturate_actors, SaturatedActor},
     models::{
@@ -158,13 +159,17 @@ pub(crate) async fn create_cip_request(
             let fp_obd =
                 OnboardingDecision::latest_footprint_actor_decision(conn, &fp_id, &tenant_id, is_live)?
                     .ok_or(CipError::EntityDecisionDoesNotExist)?;
-
-            let risk_signals = RiskSignal::list_tenant_visible_by_onboarding_decision_id(conn, &fp_obd.id)?;
             let (wf, sv) = Workflow::get_all(conn, &fp_obd.workflow_id)?;
             let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 
-            let (risk_signals, mr, manual_obd, annotation) = match fp_obd.status {
-                DecisionStatus::Pass => (risk_signals, None, None, None),
+            let risk_signals =
+                RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, IncludeHidden(false))?
+                    .into_iter()
+                    .map(|(_, rs)| rs)
+                    .collect_vec();
+
+            let (mr, manual_obd, annotation) = match fp_obd.status {
+                DecisionStatus::Pass => (None, None, None),
                 DecisionStatus::Fail | DecisionStatus::StepUp => {
                     // footprint decided as fail, see if a manual decision override exists
                     let (obd_manual, mr) =
@@ -176,7 +181,7 @@ pub(crate) async fn create_cip_request(
                         return Err(CipError::EntityDecisionManualReviewStatusNotPass)?;
                     }
 
-                    (risk_signals, mr, Some(obd_manual), annotation)
+                    (mr, Some(obd_manual), annotation)
                 }
             };
 

@@ -226,7 +226,7 @@ impl RiskSignal {
     // This function currently preserves legacy behavior in that it will return RS's created within the context of a certain onboarding_decision_id.
     // Legacy RS's will be retrieved as usual through rs.obd_id, but new RS's are retrieved via the onboarding_decision_verification_result_junction table
     #[tracing::instrument("RiskSignal::list_tenant_visible_by_onboarding_decision_id", skip_all)]
-    pub fn list_tenant_visible_by_onboarding_decision_id(
+    fn list_tenant_visible_by_onboarding_decision_id(
         conn: &mut PgConn,
         onboarding_decision_id: &OnboardingDecisionId,
     ) -> DbResult<Vec<Self>> {
