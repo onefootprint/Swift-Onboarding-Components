@@ -3963,7 +3963,12 @@ pub fn incode_fetch_scores_response(opts: DocTestOpts) -> serde_json::Value {
             "key": "lastNameMatch"
           }
         ],
-        "appliedRule": null
+        "appliedRule": null,
+        "overall": {
+            "value": "100.0",
+            "status": opts.overall.to_string(),
+            "key": null
+          }
       },
       "liveness": null,
       "faceRecognition": {
@@ -3992,7 +3997,7 @@ pub fn incode_fetch_scores_response(opts: DocTestOpts) -> serde_json::Value {
       },
       "overall": {
         "value": "100.0",
-        "status": opts.overall.to_string(),
+        "status": "FAIL",
         "key": null
       }
     })

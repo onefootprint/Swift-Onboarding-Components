@@ -145,11 +145,7 @@ pub struct FetchScoresResponse {
 
 impl FetchScoresResponse {
     pub fn document_score(&self) -> (Option<f64>, Option<IncodeStatus>) {
-        let overall_test = &self
-            .id_validation
-            .as_ref()
-            .and_then(|i| i.overall.clone())
-            .or(self.overall.clone());
+        let overall_test = &self.id_validation.as_ref().and_then(|i| i.overall.clone());
         Self::score_and_status(overall_test)
     }
 
