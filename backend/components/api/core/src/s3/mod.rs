@@ -45,9 +45,9 @@ impl S3Client {
         let delete_objects: Vec<ObjectIdentifier> = keys
             .iter()
             .map(|k| ObjectIdentifier::builder().set_key(Some(k.to_owned())).build())
-            .collect();
+            .collect::<Result<Vec<_>, _>>()?;
 
-        let delete = Delete::builder().set_objects(Some(delete_objects)).build();
+        let delete = Delete::builder().set_objects(Some(delete_objects)).build()?;
 
         self.client
             .delete_objects()
@@ -268,6 +268,8 @@ pub enum S3Error {
     EmptyS3UploadLocation,
     #[error("Multipart upload error")]
     MultipartUpload(String),
+    #[error("Internal parameter error")]
+    BuildError(#[from] aws_sdk_s3::error::BuildError),
 }
 
 impl From<actix_multipart::MultipartError> for S3Error {

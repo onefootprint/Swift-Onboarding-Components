@@ -25,8 +25,8 @@ impl OrgMemberEmail {
     /// This tenant user has is_firm_employee set, which is slightly dangerous. So, we use
     /// this hardcoded email address to also gate permissions in some places.
     /// DO NOT CHANGE THIS UNLESS YOU KNOW WHAT YOU ARE DOING.
-    pub const INTEGRATION_TEST_USER_EMAIL: &str = "integrationtests@onefootprint.com";
-    pub const INTEGRATION_TEST_RO_USER_EMAIL: &str = "integrationtests_ro@onefootprint.com";
+    pub const INTEGRATION_TEST_USER_EMAIL: &'static str = "integrationtests@onefootprint.com";
+    pub const INTEGRATION_TEST_RO_USER_EMAIL: &'static str = "integrationtests_ro@onefootprint.com";
 }
 
 impl FromStr for OrgMemberEmail {

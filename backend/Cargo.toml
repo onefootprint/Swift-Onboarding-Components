@@ -99,7 +99,7 @@ deadpool = { version = "0.9.5", features = [
 
 actix-web = "4.3.1"
 
-paperclip = { git="https://github.com/onefootprint/paperclip", rev="7b0bb05199f02dc230e314044d308c394665295b", features = [
+paperclip = { git = "https://github.com/onefootprint/paperclip", rev = "4d47ddb89bbf9d06d1d270031e5ada24f3eb2098", features = [
     "actix4",
     "actix4-validator",
     "actix-multipart",
@@ -126,14 +126,20 @@ reqwest-retry = "0.2.2"
 reqwest-tracing = "0.4.5"
 retry-policies = "0.1.2"
 
-aws-types = "0.56.1"
-aws-config = "0.56.1"
-aws-sdk-s3 = "0.33.0"
-aws-sdk-kms = "0.33.0"
-aws-sdk-pinpointsmsvoicev2 = "0.33.0"
-aws-sdk-pinpointemail = "0.33.0"
-aws-sdk-pinpoint = "0.33.0"
-aws-credential-types = "0.56.1"
+aws-types = "1.0.0"
+aws-config = { version = "1.0.0", features = ["behavior-version-latest"] }
+aws-sdk-s3 = { version = "0.39.0", features = ["behavior-version-latest"] }
+aws-sdk-kms = { version = "0.39.0", features = ["behavior-version-latest"] }
+aws-sdk-pinpointsmsvoicev2 = { version = "0.39.0", features = [
+    "behavior-version-latest",
+] }
+aws-sdk-pinpointemail = { version = "0.39.0", features = [
+    "behavior-version-latest",
+] }
+aws-sdk-pinpoint = { version = "0.39.0", features = [
+    "behavior-version-latest",
+] }
+aws-credential-types = "1.0.0"
 
 x509-parser = "0.14"
 test-case = "3.0.0"

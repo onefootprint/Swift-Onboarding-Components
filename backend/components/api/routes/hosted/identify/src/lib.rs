@@ -1,3 +1,5 @@
+#![recursion_limit = "256"]
+
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::user::CheckedUserAuthContext;
 use api_core::errors::user::UserError;
@@ -137,7 +139,7 @@ async fn get_user_challenge_context(
     let t_id = obc.as_ref().map(|obc| &obc.tenant().id);
     let (existing_user, sv_id) = match identifier {
         VaultIdentifier::IdentifyId(id, sandbox_id) => {
-            let Some(existing_user) = state.find_vault(id, sandbox_id, t_id).await?  else {
+            let Some(existing_user) = state.find_vault(id, sandbox_id, t_id).await? else {
                 return Ok(None);
             };
             (existing_user, None)

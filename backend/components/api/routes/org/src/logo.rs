@@ -37,7 +37,7 @@ pub async fn put(
 
     // compute a "URL friendly" sub-path for our tenant
     let tenant_url_friendly_hash = crypto::base64::encode_config(
-        crypto::sha256(auth.tenant().id.to_string().as_str().as_bytes()),
+        crypto::sha256(auth.tenant().id.to_string().as_bytes()),
         crypto::base64::URL_SAFE_NO_PAD,
     );
 

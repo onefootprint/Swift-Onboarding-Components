@@ -78,7 +78,6 @@ impl From<CompareFacesOutput> for CompareFacesResponse {
         let source_face = compare_face_response.source_image_face();
         let target_face = compare_face_response
             .face_matches()
-            .unwrap_or_default()
             .iter()
             .max_by(|f1, f2| super::max_f32(f1.similarity(), f2.similarity()));
 

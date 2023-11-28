@@ -8,13 +8,13 @@ authors = { workspace = true }
 [dependencies]
 aws-types = { workspace = true }
 aws-config = { workspace = true }
-aws-sdk-rekognition = "0.33.0"
-aws-sdk-textract = "0.33.0"
+aws-sdk-rekognition = "0.39.0"
+aws-sdk-textract = "0.39.0"
 async-trait = { workspace = true }
-thiserror = { workspace= true }
-newtypes = { path = "../newtypes"}
+thiserror = { workspace = true }
+newtypes = { path = "../newtypes" }
 serde = { workspace = true, features = ["derive"] }
-serde_json = {workspace = true}
+serde_json = { workspace = true }
 tracing = { workspace = true }
 
 [dev-dependencies]

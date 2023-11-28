@@ -37,7 +37,7 @@ runs:
         run: make set-dot-env
 
       - name: rust-toolchain
-        uses: dtolnay/rust-toolchain@1.73.0
+        uses: dtolnay/rust-toolchain@1.74.0
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@dd05243424bd5c0e585e4b55eb2d7615cdd32f1f

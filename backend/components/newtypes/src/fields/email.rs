@@ -12,7 +12,7 @@ pub struct Email {
 string_api_data_type_alias!(Email);
 
 impl Email {
-    const FIXTURE_EMAIL: &str = "sandbox@onefootprint.com";
+    const FIXTURE_EMAIL: &'static str = "sandbox@onefootprint.com";
 
     pub fn leak(&self) -> &str {
         self.email.leak()

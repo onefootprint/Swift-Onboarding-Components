@@ -94,20 +94,24 @@
   "python.formatting.provider": "black",
   "cSpell.diagnosticLevel": "Hint",
   "files.exclude": {
-    "**/target/**": true
+    "**/target/**": true,
+    "**/vscode-target/**": true,
   },
   "files.watcherExclude": {
     "**/target/**": true,
+    "**/vscode-target/**": true,
     "**/.git/objects/**": true,
     "**/.git/subtree-cache/**": true,
     "**/node_modules/*/**": true
   },
   "rust-analyzer.files.excludeDirs": [
-    "**/target/**"
+    "**/target/**",
+    "**/vscode-target/**"
   ],
   "rust-analyzer.rustfmt.overrideCommand": null,
   "search.exclude": {
     "**/target/": true,
+    "**/vscode-target/": true,
     "**/.jest-cache/**": true
   },
   "eslint.workingDirectories": [

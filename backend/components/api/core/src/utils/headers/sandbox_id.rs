@@ -36,7 +36,7 @@ impl Apiv2Schema for SandboxId {
 impl paperclip::actix::OperationModifier for SandboxId {}
 
 impl SandboxId {
-    const HEADER_NAME: &str = "x-sandbox-id";
+    const HEADER_NAME: &'static str = "x-sandbox-id";
 
     pub fn parse_from_request(headers: &HeaderMap) -> ApiResult<Self> {
         let sandbox_id = if let Some(id) = get_header(Self::HEADER_NAME, headers) {

@@ -79,7 +79,7 @@ impl EnclaveClient {
         )
         .expect("failed to build enclave http proxy client");
 
-        let shared_config = aws_config::from_env().load().await;
+        let shared_config = aws_config::defaults(aws_config::BehaviorVersion::v2023_11_09()).load().await;
         let s3_client = crate::s3::S3Client {
             client: aws_sdk_s3::Client::new(&shared_config),
         };

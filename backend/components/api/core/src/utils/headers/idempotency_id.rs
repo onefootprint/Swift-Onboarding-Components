@@ -51,7 +51,7 @@ impl Apiv2Schema for IdempotencyId {
 impl paperclip::actix::OperationModifier for IdempotencyId {}
 
 impl IdempotencyId {
-    const HEADER_NAME: &str = "x-idempotency-id";
+    const HEADER_NAME: &'static str = "x-idempotency-id";
 
     pub fn parse_from_request(headers: &HeaderMap) -> ApiResult<Self> {
         let idempotency_id = if let Some(id) = get_header(Self::HEADER_NAME, headers) {

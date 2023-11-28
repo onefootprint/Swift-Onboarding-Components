@@ -11,7 +11,7 @@ use std::pin::Pin;
 pub struct AllowExtraFieldsHeaders(pub bool);
 
 impl AllowExtraFieldsHeaders {
-    const HEADER_NAME: &str = "x-fp-allow-extra-fields";
+    const HEADER_NAME: &'static str = "x-fp-allow-extra-fields";
 
     pub fn parse_from_request(headers: &HeaderMap) -> Self {
         let allow_extra_fields = get_bool_header(Self::HEADER_NAME, headers).unwrap_or_default();

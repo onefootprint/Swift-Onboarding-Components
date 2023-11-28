@@ -108,14 +108,13 @@ impl AwsSelfieDocClient {
 
         let Some(target_face) = res
             .face_matches()
-            .unwrap_or_default()
             .iter()
             .max_by(|f1, f2| max_f32(f1.similarity(), f2.similarity()))
         else {
             return Ok(CompareResult::NoMatchingFace);
         };
 
-        if res.face_matches().unwrap_or_default().len() + res.unmatched_faces().unwrap_or_default().len() > 1
+        if res.face_matches().len() + res.unmatched_faces().len() > 1
         {
             return Ok(CompareResult::MultipleTargetFaces);
         }
@@ -161,7 +160,7 @@ impl AwsSelfieDocClient {
             .send()
             .await?;
 
-        let res = res.identity_documents().unwrap_or_default();
+        let res = res.identity_documents();
         if res.len() > 1 {
             return Ok(AnalyzeIdResult::FoundMultipleDocuments);
         }
@@ -228,7 +227,7 @@ mod tests {
 
     async fn run_test(doc: PiiBytes, selfie: PiiBytes) {
         let _dotenv = dotenv::dotenv().unwrap();
-        let conf = aws_config::from_env().load().await;
+        let conf = aws_config::defaults(aws_config::BehaviorVersion::v2023_11_09()).load().await;
         let client = AwsSelfieDocClient::new(&conf);
 
         let res = client.detect_face(&selfie).await.expect("failed to compare");
@@ -280,7 +279,7 @@ mod tests {
     #[tokio::test]
     async fn test_doc_extract() {
         let _dotenv = dotenv::dotenv().unwrap();
-        let conf = aws_config::from_env().load().await;
+        let conf = aws_config::defaults(aws_config::BehaviorVersion::v2023_11_09()).load().await;
         let client = AwsSelfieDocClient::new(&conf);
 
         let doc = PiiBytes::new(include_bytes!("../test_vectors/front_a.png").to_vec());

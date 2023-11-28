@@ -292,7 +292,7 @@ pub async fn seal_file_and_upload_to_s3(
 
 fn hash_id<T: ToString>(id: &T) -> String {
     crypto::base64::encode_config(
-        crypto::sha256(id.to_string().as_str().as_bytes()),
+        crypto::sha256(id.to_string().as_bytes()),
         crypto::base64::URL_SAFE_NO_PAD,
     )
 }

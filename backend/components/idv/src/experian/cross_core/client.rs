@@ -339,7 +339,7 @@ impl CrossCoreRequestCredentials {
     #[allow(unused)]
     fn new(pid_username: PiiString, pid_password: PiiString) -> Result<Self, Error> {
         let b64_password =
-            Base64Data::into_string_standard(pid_password.leak_to_string().as_str().as_bytes().to_vec());
+            Base64Data::into_string_standard(pid_password.leak_to_string().as_bytes().to_vec());
 
         Ok(Self {
             pid_username,

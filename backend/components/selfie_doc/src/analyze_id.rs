@@ -86,13 +86,12 @@ impl From<&SdkIdentityDocument> for AnalyzeIdMetadata {
     fn from(value: &SdkIdentityDocument) -> Self {
         let mut values = HashMap::new();
 
-        // for field in value.identity_document_fields().unwrap_or_default() {}
-        for f in value.identity_document_fields().unwrap_or_default() {
+        for f in value.identity_document_fields() {
             let Some((kind, value)) = || -> Option<(String, IdFieldValue)> {
                 Some((
-                    f.r#type()?.text()?.to_string(),
+                    f.r#type()?.text().to_string(),
                     IdFieldValue {
-                        value: f.value_detection()?.text()?.to_string(),
+                        value: f.value_detection()?.text().to_string(),
                         value_confidence: f.value_detection()?.confidence()?,
                     },
                 ))

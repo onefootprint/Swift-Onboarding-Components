@@ -27,7 +27,7 @@ impl Debug for PhoneNumber {
 }
 
 impl PhoneNumber {
-    const FIXTURE_PHONE_NUMBER: &str = "+15555550100";
+    const FIXTURE_PHONE_NUMBER: &'static str = "+15555550100";
 
     pub fn parse(number: PiiString) -> NtResult<Self> {
         let number = phonenumber::parse(None, number.leak()).map_err(Error::from)?;

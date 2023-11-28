@@ -91,7 +91,7 @@ impl FpId {
 
 impl BoLinkId {
     const LENGTH: usize = 22;
-    const PREFIX: &str = "bo_link";
+    const PREFIX: &'static str = "bo_link";
 
     pub fn generate(kind: BusinessOwnerKind) -> Self {
         match kind {
