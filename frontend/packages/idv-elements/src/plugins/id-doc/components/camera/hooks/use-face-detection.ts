@@ -42,18 +42,17 @@ const useFaceDetection = () => {
       return FaceStatus.detecting;
     }
 
-    matchDimensions(videoElement, {
-      width,
-      height,
-    });
+    matchDimensions(videoElement, { width, height });
     const result = await detectSingleFace(
       videoElement,
       options,
     ).withFaceLandmarks();
 
     if (!result) return FaceStatus.detecting;
+
     const { detection } = result;
     if (!detection || !detection.box) return FaceStatus.detecting;
+
     const {
       box: { width: detectionBoxWidth, height: detectionBoxHeight },
     } = detection;
@@ -65,23 +64,19 @@ const useFaceDetection = () => {
       return FaceStatus.detecting;
     }
 
-    const resizedDetections = resizeResults(detection, {
-      width,
-      height,
-    });
-
     const {
       width: frameWidth,
       height: frameHeight,
       frameOffsetX,
       frameOffsetY,
     } = frameDimensions;
-    const {
-      x: faceX,
-      y: faceY,
-      width: faceWidth,
-      height: faceHeight,
-    } = resizedDetections.box;
+
+    const resizedDetections = resizeResults(detection, { width, height });
+    const face = resizedDetections.box;
+    const faceX = Math.floor(face.x);
+    const faceY = Math.floor(face.y);
+    const faceWidth = Math.floor(face.width);
+    const faceHeight = Math.floor(face.height);
 
     // Order matters
     // First priority: face should be close enough
