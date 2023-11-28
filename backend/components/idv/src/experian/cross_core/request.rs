@@ -6,7 +6,7 @@ use newtypes::{
 
 use crate::experian::{
     error::{ConversionError, Error},
-    normalize_address_line_1,
+    normalize_address_line_1, normalize_city, normalize_name,
 };
 
 /// This is the top level request to CrossCore
@@ -135,11 +135,16 @@ impl Contact {
             verification_request_id: _,
         } = d;
 
-        let first_name = first_name.ok_or(ConversionError::MissingFirstName)?;
-        let last_name = last_name.ok_or(ConversionError::MissingLastName)?;
+        let first_name = first_name
+            .ok_or(ConversionError::MissingFirstName)?
+            .map(|s| normalize_name(s.as_str()));
+        let last_name = last_name
+            .ok_or(ConversionError::MissingLastName)?
+            .map(|s| normalize_name(s.as_str()));
         let address = address_line1
             .ok_or(ConversionError::MissingAddress)?
             .map(|s| normalize_address_line_1(s.as_str()));
+        let normalized_city = city.map(|c| c.map(|p| normalize_city(p.as_str())));
         let person_details = if let Some(d) = dob {
             let parsed_dob =
                 NaiveDate::parse_from_str(d.leak(), "%Y-%m-%d").map_err(|_| ConversionError::CantParseDob)?;
@@ -169,7 +174,7 @@ impl Contact {
             address_type: AddressType::Current,
             street: address,
             street2: address_line2,
-            post_town: city,
+            post_town: normalized_city,
             postal: zip,
             state_province_code: state,
             country_code: country,
