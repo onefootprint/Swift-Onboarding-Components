@@ -5,12 +5,16 @@ import useHandleCameraError from '../../../hooks/use-handle-camera-error';
 import type { CameraKind } from '../utils/get-camera-options';
 import getCameraOptions from '../utils/get-camera-options';
 
+const isUndefined = (x: unknown): x is 'undefined' => typeof x === 'undefined';
+
 const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
   const onCameraError = useHandleCameraError();
   const [mediaStream, setMediaStream] = useState<null | MediaStream>(null);
 
   useEffect(() => {
     const enableVideoStream = async () => {
+      if (isUndefined(navigator)) return;
+
       const cameraOptions = await getCameraOptions(cameraKind);
       try {
         const stream = await navigator.mediaDevices.getUserMedia(cameraOptions);
