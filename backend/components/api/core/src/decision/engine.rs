@@ -96,7 +96,7 @@ pub async fn get_latest_verification_requests_and_results(
         .db_query(move |conn| -> Result<Vec<RequestAndMaybeResult>, DbError> {
             // Load our requests and results
             // Importantly, this allows us to save VerificationRequests elsewhere in code and execute them here
-            VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user(conn, suid)
+            VerificationRequest::get_latest_requests_and_maybe_successful_results_for_scoped_user(conn, suid)
         })
         .await??;
 

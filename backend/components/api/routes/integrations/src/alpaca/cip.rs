@@ -240,7 +240,7 @@ pub(crate) async fn create_cip_request(
         .unwrap_or(Utc::now());
 
     let vendor_results = VendorResult::from_verification_results_for_onboarding(
-        vres,
+        vres.into_iter().map(|(vreq, vres)| (vreq, Some(vres))).collect(), // pointless but just to conform to method
         &state.enclave_client,
         &user_vault_private_key,
     )

@@ -100,12 +100,13 @@ impl VerificationRequest {
         Ok(res)
     }
 
-    /// Based on VerificationRequests for the onboarding, get VerificationResults
+    /// Will return the latest Vres per vendor_api, ignoring vres's where is_error = true
+    /// NOTE: if the latest vreq for some vendor_api has no vres, then that will be returned
     #[tracing::instrument(
         "VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user",
         skip_all
     )]
-    pub fn get_latest_requests_and_successful_results_for_scoped_user(
+    pub fn get_latest_requests_and_maybe_successful_results_for_scoped_user(
         conn: &mut PgConn,
         scoped_vault_id: ScopedVaultId,
     ) -> DbResult<Vec<RequestAndMaybeResult>> {
@@ -117,6 +118,30 @@ impl VerificationRequest {
                     .is_null()
                     .or(verification_result::is_error.eq(false)),
             )
+            .order((
+                verification_request::vendor_api,
+                verification_request::uvw_snapshot_seqno.desc(),
+                verification_request::timestamp.desc(), // tie breaker if seq_no has a tie
+            ))
+            .distinct_on(verification_request::vendor_api)
+            .get_results(conn)?;
+
+        Ok(req_and_res)
+    }
+
+    /// Will return the latest Vres per vendor_api, ignoring vreq's without vres's and vres's where is_error = true
+    #[tracing::instrument(
+        "VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user",
+        skip_all
+    )]
+    pub fn get_latest_requests_and_successful_results_for_scoped_user(
+        conn: &mut PgConn,
+        scoped_vault_id: ScopedVaultId,
+    ) -> DbResult<Vec<RequestAndResult>> {
+        let req_and_res: Vec<RequestAndResult> = verification_request::table
+            .filter(verification_request::scoped_vault_id.eq(scoped_vault_id))
+            .inner_join(verification_result::table)
+            .filter(verification_result::is_error.eq(false))
             .order((
                 verification_request::vendor_api,
                 verification_request::uvw_snapshot_seqno.desc(),

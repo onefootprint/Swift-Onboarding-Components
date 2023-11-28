@@ -46,7 +46,8 @@ fn test_get_requests_and_results_for_onboarding(
 
     // Function under test
     let queried_requests_and_results =
-        VerificationRequest::get_latest_requests_and_successful_results_for_scoped_user(conn, su_id).unwrap();
+        VerificationRequest::get_latest_requests_and_maybe_successful_results_for_scoped_user(conn, su_id)
+            .unwrap();
 
     // We expect the last element in the input to be what was returned
     let expected_requests_and_results = input_requests_and_results.pop().unwrap();
