@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import styled, { css } from 'styled-components/native';
 
 export type ContainerProps = {
   center?: boolean;
@@ -28,9 +28,10 @@ const Container = ({
     </ViewContainer>
   ) : (
     <AnimatedScrollView
-      onLayout={onLayout}
+      center={center}
       contentInsetAdjustmentBehavior="automatic"
       keyboardShouldPersistTaps={keyboardShouldPersistTaps}
+      onLayout={onLayout}
       scrollEventThrottle={16}
       showsVerticalScrollIndicator={false}
     >

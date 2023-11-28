@@ -1,7 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
-import styled, { css } from '@onefootprint/styled';
-import type { CountrySelectOption, SelectOption } from '@onefootprint/ui';
+import type {
+  CountrySelectOption,
+  SelectOption,
+  SelectRef,
+} from '@onefootprint/ui';
 import {
   Box,
   Button,
@@ -13,6 +16,7 @@ import {
 import React, { useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { type TextInput as RNTextInput } from 'react-native';
+import styled, { css } from 'styled-components/native';
 import * as z from 'zod';
 
 import Header from '@/components/header';
@@ -71,7 +75,7 @@ const ResidentialAddress = ({ onDone }: ResidentialAddressProps) => {
   const addressLine2Ref = useRef<RNTextInput>(null);
   const cityRef = useRef<RNTextInput>(null);
   const zipRef = useRef<RNTextInput>(null);
-  const stateRef = useRef(null);
+  const stateRef = useRef<SelectRef>(null);
 
   const onSubmit = (formData: FormData) => {
     // TODO: Implement backend call

@@ -9,8 +9,8 @@ export type IdentifyResultProps = {
   phoneNumber?: string;
   userFound: boolean;
   isUnverified: boolean;
-  availableChallengeKinds: ChallengeKind[];
-  hasSyncablePassKey: boolean;
+  availableChallengeKinds?: ChallengeKind[];
+  hasSyncablePassKey?: boolean;
 };
 
 export type MachineContext = {
@@ -33,4 +33,8 @@ export type MachineEvents =
       type: 'identified';
       payload: IdentifyResultProps;
     }
-  | { type: 'identifyReset' };
+  | { type: 'identifyReset' }
+  | {
+      type: 'phoneIdentification';
+      payload: IdentifyResultProps;
+    };

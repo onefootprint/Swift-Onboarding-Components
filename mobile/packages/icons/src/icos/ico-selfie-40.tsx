@@ -1,6 +1,6 @@
-import { useTheme } from '@onefootprint/styled';
 import React from 'react';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
+import { useTheme } from 'styled-components';
 
 import type { IconProps } from '../types';
 

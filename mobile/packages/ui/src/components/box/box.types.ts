@@ -30,7 +30,6 @@ export type BoxProps = ViewProps &
     | 'borderTopRightRadius'
     | 'borderTopStartRadius'
   > & {
-    isSafeArea?: boolean;
     center?: boolean;
     testID?: string;
     children?: React.ReactNode | React.ReactNode[];

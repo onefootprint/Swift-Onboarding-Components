@@ -1,7 +1,7 @@
 import { IcoClose32 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
-import Modal from 'react-native-modal';
+import Modal, { type ModalProps } from 'react-native-modal';
+import styled, { css } from 'styled-components/native';
 
 import Box from '../box';
 import Button from '../button';
@@ -26,18 +26,24 @@ const Dialog = ({
   children,
   cta,
   onClose,
-  open,
+  open = false,
   title,
-  disableClose,
+  disableClose = false,
 }: DialogProps) => {
+  const handleBackdropPress = () => {
+    if (!disableClose && onClose) {
+      onClose();
+    }
+  };
   return (
     <>
       <StatusBar variant={open ? 'on-dialog' : 'default'} />
+      {/* @ts-ignore */}
       <StyledModal
         backdropOpacity={0.3}
         isVisible={open}
-        onBackdropPress={disableClose ? undefined : onClose}
-        onSwipeComplete={disableClose ? undefined : onClose}
+        onBackdropPress={handleBackdropPress}
+        onSwipeComplete={handleBackdropPress}
         swipeDirection={['down']}
         useNativeDriverForBackdrop
       >
@@ -72,7 +78,7 @@ const Dialog = ({
   );
 };
 
-const StyledModal = styled(Modal)`
+const StyledModal = styled(Modal)<ModalProps>`
   ${({ theme }) => css`
     justify-content: flex-end;
     margin-bottom: ${theme.spacing[8]};

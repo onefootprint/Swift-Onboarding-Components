@@ -1,4 +1,3 @@
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import { Dimensions } from 'react-native';
 import { RNHoleView } from 'react-native-hole-view';
@@ -7,6 +6,7 @@ import Reanimated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import styled, { css } from 'styled-components/native';
 import { useTimeout } from 'usehooks-ts';
 
 type FrameProps = {

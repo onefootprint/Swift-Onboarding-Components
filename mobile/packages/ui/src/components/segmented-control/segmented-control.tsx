@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import styled, { css } from '@onefootprint/styled';
 import * as React from 'react';
+import styled, { css } from 'styled-components/native';
 
 import type { BoxProps } from '../box';
 import Box from '../box';

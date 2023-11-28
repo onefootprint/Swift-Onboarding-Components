@@ -1,7 +1,7 @@
 import type { Color } from '@onefootprint/design-tokens';
-import { useTheme } from '@onefootprint/styled';
 import React from 'react';
 import { ActivityIndicator } from 'react-native';
+import { useTheme } from 'styled-components';
 
 export type LoadingIndicatorProps = {
   'aria-label'?: string;

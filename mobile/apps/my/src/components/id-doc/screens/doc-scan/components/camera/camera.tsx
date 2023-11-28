@@ -1,4 +1,4 @@
-import styled, { css } from '@onefootprint/styled';
+import styled, { css } from 'styled-components/native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Camera as VisionCamera,

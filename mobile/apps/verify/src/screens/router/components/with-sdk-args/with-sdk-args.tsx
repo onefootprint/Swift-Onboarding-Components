@@ -1,5 +1,6 @@
 import { Container, LoadingIndicator } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
+import { View } from 'react-native';
 
 import useCreateSdkArgs from './hooks/use-create-sdk-args';
 
@@ -27,7 +28,7 @@ const WithSdkArgs = ({ children }: WithSdkArgsProps) => {
 
   if (sdkArgsMutation.data) {
     const { token } = sdkArgsMutation.data;
-    return children(token);
+    return <View>{children(token)}</View>;
   }
 
   return null;

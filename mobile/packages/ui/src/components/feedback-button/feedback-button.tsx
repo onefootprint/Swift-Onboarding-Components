@@ -1,6 +1,6 @@
 import { IcoCheck24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
+import styled, { css } from 'styled-components/native';
 
 import Box from '../box';
 import Typography from '../typography';

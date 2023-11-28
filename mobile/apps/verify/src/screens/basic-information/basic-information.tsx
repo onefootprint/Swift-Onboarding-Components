@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import styled, { css } from '@onefootprint/styled';
 import { Box, Button, Container, TextInput } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import type { TextInput as RNTextInput } from 'react-native';
+import styled, { css } from 'styled-components/native';
 import * as z from 'zod';
 
 import Header from '@/components/header';

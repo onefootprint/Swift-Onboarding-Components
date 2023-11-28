@@ -1,5 +1,5 @@
-import styled, { css } from '@onefootprint/styled';
 import React, { useState } from 'react';
+import styled, { css } from 'styled-components/native';
 
 import Box from '../../../box';
 import Pressable from '../../../pressable';
@@ -34,7 +34,6 @@ const Option = <T extends StringOrNumber = string>({
       onPressIn={() => setActive(true)}
       onPressOut={() => setActive(false)}
       selected={selected}
-      withImpact
     >
       <IconContainer selected={selected} active={active}>
         <IconComponent color={selected ? 'quinary' : undefined} />

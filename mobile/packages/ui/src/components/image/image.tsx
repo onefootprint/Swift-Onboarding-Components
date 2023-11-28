@@ -1,9 +1,9 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import styled, { css } from '@onefootprint/styled';
 import type { Ref } from 'react';
 import React, { forwardRef, useState } from 'react';
 import type { ImageProps as RNImageProps } from 'react-native';
 import { Image as RNImage } from 'react-native';
+import styled, { css } from 'styled-components/native';
 
 import Box from '../box';
 import LoadingIndicator from '../loading-indicator';

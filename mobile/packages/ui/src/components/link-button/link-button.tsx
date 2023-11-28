@@ -1,8 +1,8 @@
 import type { Icon } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import React, { useState } from 'react';
 import type { GestureResponderEvent } from 'react-native';
 import { Text } from 'react-native';
+import styled, { css } from 'styled-components/native';
 
 import Pressable from '../pressable';
 import type { LinkButtonSize, LinkButtonVariant } from './link-button.types';

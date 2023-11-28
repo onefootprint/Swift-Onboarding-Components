@@ -1,5 +1,5 @@
 import themes from '@onefootprint/design-tokens';
-import styled, { css } from '@onefootprint/styled';
+import styled, { css } from 'styled-components/native';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import React from 'react';
 

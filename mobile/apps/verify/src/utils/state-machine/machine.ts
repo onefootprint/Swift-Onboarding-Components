@@ -105,7 +105,7 @@ export const createPasskeysMachine = (authToken: string) =>
         assignIdentifyResult: assign((context, event) => {
           if (!context.identify) {
             context.identify = event.payload;
-            return;
+            return context;
           }
           context.identify.email =
             context.identify?.email || event.payload.email;

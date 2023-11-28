@@ -48,7 +48,7 @@ const Router = ({ authToken }: RouterProps) => {
       <Init
         authToken={authToken}
         onDone={({ error, data }) => {
-          if (data) {
+          if (data && data.obConfig) {
             send({
               type: 'sdkArgsReceived',
               payload: { config: data.obConfig },
@@ -67,23 +67,27 @@ const Router = ({ authToken }: RouterProps) => {
   }
 
   if (state.matches('emailIdentification')) {
-    return (
-      <EmailIdentification
-        obConfigAuth={obConfigAuth}
-        onComplete={handleIdentified}
-      />
-    );
+    if (obConfigAuth) {
+      return (
+        <EmailIdentification
+          obConfigAuth={obConfigAuth}
+          onComplete={handleIdentified}
+        />
+      );
+    }
   }
 
   if (state.matches('phoneIdentification')) {
-    return (
-      <PhoneIdentification
-        obConfigAuth={obConfigAuth}
-        onComplete={handleIdentified}
-        email={identify.email}
-        onEmailEdit={() => send({ type: 'identifyReset' })}
-      />
-    );
+    if (obConfigAuth && identify) {
+      return (
+        <PhoneIdentification
+          obConfigAuth={obConfigAuth}
+          onComplete={handleIdentified}
+          email={identify.email}
+          onEmailEdit={() => send({ type: 'identifyReset' })}
+        />
+      );
+    }
   }
 
   if (state.matches('smsChallenge')) {

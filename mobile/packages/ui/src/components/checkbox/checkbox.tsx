@@ -1,6 +1,6 @@
 import { IcoCheckSmall16 } from '@onefootprint/icons';
-import styled from '@onefootprint/styled';
 import React from 'react';
+import styled from 'styled-components';
 
 import Box from '../box';
 import Pressable from '../pressable';
@@ -18,7 +18,7 @@ const Checkbox = ({ label, value, onValueChange }: CheckboxProps) => {
   };
 
   return (
-    <StyledPressable onPress={handlePress} withImpact>
+    <StyledPressable onPress={handlePress}>
       <Box gap={4} flexDirection="row">
         <Box
           backgroundColor={value ? 'tertiary' : 'primary'}

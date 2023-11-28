@@ -1,6 +1,6 @@
-import { useTheme } from '@onefootprint/styled';
 import React from 'react';
 import { StatusBar as RNStatusBar } from 'react-native';
+import { useTheme } from 'styled-components';
 
 export type StatusBarProps = {
   variant: 'default' | 'on-dialog' | 'on-camera';

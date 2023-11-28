@@ -1,10 +1,10 @@
-import styled, { css } from '@onefootprint/styled';
 import { Pressable } from '@onefootprint/ui';
 import React from 'react';
 import Reanimated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
+import styled, { css } from 'styled-components/native';
 
 type CaptureButtonProps = {
   onPress?: () => void;

@@ -1,5 +1,4 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import styled, { css, useTheme } from '@onefootprint/styled';
 import React, { forwardRef, useRef, useState } from 'react';
 import mergeRefs from 'react-merge-refs';
 import type {
@@ -8,6 +7,7 @@ import type {
   TextInputFocusEventData,
   TextInputProps as RNTextInputProps,
 } from 'react-native';
+import styled, { css, useTheme } from 'styled-components/native';
 import { useTimeout } from 'usehooks-ts';
 
 import type { BoxProps } from '../box';
@@ -91,6 +91,7 @@ const TextInput = forwardRef<RNTextInput, TextInputProps>(
             onBlur={handleBlur}
             onFocus={handleFocus}
             placeholderTextColor={input.global.placeholderColor}
+            // @ts-ignore
             ref={mergeRefs([ref, localRef])}
             underlineColorAndroid="transparent"
           />

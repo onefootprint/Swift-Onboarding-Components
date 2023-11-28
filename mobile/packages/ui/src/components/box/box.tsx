@@ -6,9 +6,10 @@ import type {
   Elevation,
   Spacing,
 } from '@onefootprint/design-tokens';
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
-import { SafeAreaView, View } from 'react-native';
+import type { ViewStyle } from 'react-native';
+import { View } from 'react-native';
+import styled, { css } from 'styled-components/native';
 
 import type { BoxProps } from './box.types';
 import filterStyleProps from './box.utils';
@@ -17,13 +18,9 @@ const Box = ({ children, ...props }: BoxProps) => {
   return <Container {...props}>{children}</Container>;
 };
 
-const Container = styled(({ style, isSafeArea, ...props }) =>
-  isSafeArea ? (
-    <SafeAreaView {...props} style={style} />
-  ) : (
-    <View {...props} style={style} />
-  ),
-)<BoxProps>`
+const Container = styled(({ style, ...props }: { style: ViewStyle }) => (
+  <View style={style} {...props} />
+))<BoxProps>`
   ${({ theme, ...props }) =>
     css`
       ${props.center && 'justify-content: center; align-items: center;'}

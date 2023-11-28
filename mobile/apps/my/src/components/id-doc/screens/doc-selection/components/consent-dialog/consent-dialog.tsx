@@ -1,4 +1,4 @@
-import styled, { css } from '@onefootprint/styled';
+import styled, { css } from 'styled-components/native';
 import { Box, Button, Checkbox, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';

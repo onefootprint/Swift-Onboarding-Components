@@ -1,10 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import type { Color } from '@onefootprint/design-tokens';
 import type { Icon } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import React, { useState } from 'react';
 import type { GestureResponderEvent } from 'react-native';
 import { Text } from 'react-native';
+import styled, { css } from 'styled-components/native';
 
 import type { BoxProps } from '../box';
 import Box from '../box';

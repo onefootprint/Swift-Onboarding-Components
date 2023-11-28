@@ -1,6 +1,13 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Default",
   "extends": "@tsconfig/react-native/tsconfig.json",
   "compilerOptions": {
+    "target": "ES2021",
+    "lib": [
+      "ES2021",
+      "dom"
+    ],
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true

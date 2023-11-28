@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IcoShield40 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import {
   Box,
   Button,
@@ -10,6 +9,7 @@ import {
 } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import styled, { css } from 'styled-components/native';
 import * as z from 'zod';
 
 import Header from '@/components/header';

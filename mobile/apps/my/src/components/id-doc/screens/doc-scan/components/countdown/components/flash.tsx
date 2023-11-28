@@ -1,6 +1,6 @@
-import styled, { css } from '@onefootprint/styled';
 import React, { useEffect, useMemo } from 'react';
 import { Animated } from 'react-native';
+import styled, { css } from 'styled-components/native';
 
 const Flash = () => {
   const animation = useMemo(() => {

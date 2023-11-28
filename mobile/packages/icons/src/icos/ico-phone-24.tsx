@@ -1,4 +1,4 @@
-import { useTheme } from '@onefootprint/styled';
+import { useTheme } from 'styled-components';
 import React from 'react';
 import Svg, { Path } from 'react-native-svg';
 

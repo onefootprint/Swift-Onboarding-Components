@@ -1,7 +1,7 @@
 /* SVGR has dropped some elements not supported by react-native-svg: filter */
-import { useTheme } from '@onefootprint/styled';
 import React from 'react';
 import Svg, { Defs, G, Path } from 'react-native-svg';
+import { useTheme } from 'styled-components';
 
 import type { IconProps } from '../types';
 

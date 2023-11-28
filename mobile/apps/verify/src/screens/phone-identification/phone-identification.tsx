@@ -3,7 +3,7 @@ import type { ObConfigAuth } from '@onefootprint/types';
 import { Box, Button, Container, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import isMobilePhone from 'validator/es/lib/isMobilePhone';
+import isMobilePhone from 'validator/lib/isMobilePhone';
 import * as z from 'zod';
 
 import useIdentify from '@/hooks/use-identify';

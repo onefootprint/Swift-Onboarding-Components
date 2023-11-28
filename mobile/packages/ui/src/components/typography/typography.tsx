@@ -1,8 +1,8 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import type { Color, FontVariant } from '@onefootprint/design-tokens';
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import type { TextProps } from 'react-native';
+import styled, { css } from 'styled-components/native';
 
 import type { BoxProps } from '../box';
 import Box from '../box';

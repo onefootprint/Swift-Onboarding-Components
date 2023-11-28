@@ -13,7 +13,6 @@
     "test:watch": "jest --watch",
     "test": "jest --ci --bail",
     "test:ci": "jest --ci --bail --runInBand",
-    "typecheck": "yarn tsc --noEmit",
     "build:dev": "npx eas build -p ios --auto-submit --profile testflight",
     "build:prod": "npx eas build -p ios --auto-submit",
     "start": "react-native start"
@@ -23,7 +22,7 @@
     "@onefootprint/global-constants": "*",
     "@onefootprint/icons": "*",
     "@onefootprint/request": "*",
-    "@onefootprint/styled": "*",
+    "styled-components": "6.1.1",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
     "@react-native-async-storage/async-storage": "1.19.3",

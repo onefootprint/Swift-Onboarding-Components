@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import { Container } from '@onefootprint/ui';
 import React from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import styled, { css } from 'styled-components/native';
 
 const ScrollLayout = ({ children, Footer }) => {
   const { bottom } = useSafeAreaInsets();

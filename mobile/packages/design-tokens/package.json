@@ -22,6 +22,7 @@
     "polished": "^4.2.2",
     "style-dictionary": "^3.7.1",
     "token-transformer": "^0.0.27",
+    "tsconfig": "*",
     "typescript": "4.9.5"
   }
 }

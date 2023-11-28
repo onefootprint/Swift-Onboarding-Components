@@ -25,6 +25,7 @@
     "lint": "eslint src --fix",
     "lint:ci": "eslint src",
     "test:watch": "jest --watch",
+    "typecheck": "yarn tsc --noEmit",
     "publish:local": "yarn build && yalc publish"
   },
   "devDependencies": {

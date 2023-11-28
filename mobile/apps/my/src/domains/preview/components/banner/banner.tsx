@@ -1,7 +1,7 @@
-import styled, { css } from '@onefootprint/styled';
 import { Dialog, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import styled, { css } from 'styled-components/native';
 
 import useTranslation from '@/hooks/use-translation';
 

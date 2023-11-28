@@ -1,9 +1,9 @@
 import { IcoClose24, IcoClose32, IcoSearch24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import { FlashList } from '@shopify/flash-list';
 import React, { useEffect, useMemo, useState } from 'react';
 import type { TextInputProps } from 'react-native';
 import { Modal } from 'react-native';
+import styled, { css } from 'styled-components/native';
 
 import Box from '../../box';
 import IconButton from '../../icon-button';
