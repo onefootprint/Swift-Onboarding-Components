@@ -1018,6 +1018,7 @@ dependencies = [
  "futures",
  "futures-util",
  "idv",
+ "itertools",
  "newtypes",
  "paperclip",
  "serde",

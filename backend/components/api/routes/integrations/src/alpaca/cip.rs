@@ -33,6 +33,7 @@ use db::{
     },
 };
 use idv::ParsedResponse;
+use itertools::Itertools;
 use newtypes::{
     format_pii, pii, DataIdentifier, DecisionStatus, DocumentKind, FootprintReasonCode, FpId, IdDocKind,
     IdentityDataKind, MatchLevel, OcrDataKind, PiiJsonValue, PiiString, ReviewReason, SignalScope, TenantId,
@@ -244,6 +245,7 @@ pub(crate) async fn create_cip_request(
             &state.enclave_client,
             &[
                 Id(FirstName),
+                Id(MiddleName),
                 Id(LastName),
                 Id(Email),
                 Id(PhoneNumber),
@@ -376,11 +378,16 @@ fn kyc(
 
     let kyc = alpaca::Kyc {
         id: scoped_vault.fp_id.clone(),
-        applicant_name: format_pii!(
-            "{} {}",
-            decrypted_data.get_di(FirstName)?,
-            decrypted_data.get_di(LastName)?
-        ),
+        applicant_name: vec![
+            decrypted_data.get_di(FirstName),
+            decrypted_data.get_di(MiddleName),
+            decrypted_data.get_di(LastName),
+        ]
+        .into_iter()
+        .flatten()
+        .map(|s| s.leak_to_string())
+        .join(" ")
+        .into(),
         email_address: decrypted_data.get_di(Email)?,
         nationality,
         date_of_birth: decrypted_data.get_di(Dob)?,
