@@ -54,13 +54,15 @@ pub struct VaultWrapper<Type = Any> {
 
 impl<Type> VaultWrapper<Type> {
     /// Get the most recent piece of data for the provided DI
-    fn data(&self, di: &DataIdentifier) -> Option<&VaultData> {
+    /// TODO make this private again after migration
+    pub fn data(&self, di: &DataIdentifier) -> Option<&VaultData> {
         self.all_data.get(di).and_then(|d| d.first())
     }
 }
 
 #[derive(Debug, Clone)]
-struct VaultData {
+/// TODO make this private again after migration
+pub struct VaultData {
     pub lifetime: DataLifetime,
     pub data: PieceOfData,
 }
@@ -94,8 +96,9 @@ impl VaultData {
 
 /// This is unnecessary. We have lots of other enums that represent "Some kind of vaulted data."
 /// We could probably get rid of this one (or other ones now that we've added this)
+/// TODO make this private again after migration
 #[derive(Debug, Clone)]
-pub(super) enum PieceOfData {
+pub enum PieceOfData {
     Vd(DbVaultData),
     Document(DocumentData),
 }

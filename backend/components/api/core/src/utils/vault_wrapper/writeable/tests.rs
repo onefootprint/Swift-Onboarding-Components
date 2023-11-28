@@ -43,7 +43,7 @@ async fn test_prefill_data(state: &mut State) {
     // su1 then goes through onboarding. When su1 triggers onboarding, we'll compose prefill data,
     // but it should be empty since the only data exists at the current tenant
     let prefill_data = vw
-        .get_data_to_prefill(&state, &data.su1, &data.pb1)
+        .get_data_to_prefill(&state.enclave_client, &state.db_pool, &data.su1, &data.pb1)
         .await
         .unwrap();
     assert!(prefill_data.data.is_empty());
@@ -54,7 +54,7 @@ async fn test_prefill_data(state: &mut State) {
     // nothing is portablized - only the phone number because the phone is portablized after it's
     // verified
     let prefill_data = vw
-        .get_data_to_prefill(&state, &data.su2, &data.pb2)
+        .get_data_to_prefill(&state.enclave_client, &state.db_pool, &data.su2, &data.pb2)
         .await
         .unwrap();
     assert_have_same_elements(
@@ -102,7 +102,7 @@ async fn test_prefill_data(state: &mut State) {
 
     // When the user starts onboarding onto tenant2, we should have prefill data!
     let prefill_data = vw
-        .get_data_to_prefill(&state, &data.su2, &data.pb2)
+        .get_data_to_prefill(&state.enclave_client, &state.db_pool, &data.su2, &data.pb2)
         .await
         .unwrap();
 

@@ -85,18 +85,19 @@ pub struct DataLifetime {
 
 #[derive(Clone, Insertable)]
 #[diesel(table_name = data_lifetime)]
-struct NewDataLifetime {
+// TODO not pub
+pub struct NewDataLifetime {
     // This is just denormalized for fast querying.
-    vault_id: VaultId,
+    pub vault_id: VaultId,
     // We might want to not support creating data not linked to a tenant. Right now this is only
     // used for the my1fp login flow
-    scoped_vault_id: ScopedVaultId,
-    created_at: DateTime<Utc>,
-    created_seqno: DataLifetimeSeqno,
-    kind: DataIdentifier,
-    source: DataLifetimeSource,
-    actor: Option<DbActor>,
-    origin_id: Option<DataLifetimeId>,
+    pub scoped_vault_id: ScopedVaultId,
+    pub created_at: DateTime<Utc>,
+    pub created_seqno: DataLifetimeSeqno,
+    pub kind: DataIdentifier,
+    pub source: DataLifetimeSource,
+    pub actor: Option<DbActor>,
+    pub origin_id: Option<DataLifetimeId>,
 }
 
 pub struct NewDataLifetimeArgs {

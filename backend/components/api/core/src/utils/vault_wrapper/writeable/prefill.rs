@@ -1,16 +1,18 @@
 use super::{PatchDataResult, WriteableVw};
 use crate::{
     auth::tenant::AuthActor,
+    enclave_client::EnclaveClient,
     errors::{ApiResult, AssertionError},
     utils::vault_wrapper::{PieceOfData, VaultWrapper},
-    State,
 };
 use db::{
     models::{
-        contact_info::ContactInfo, ob_configuration::ObConfiguration, scoped_vault::ScopedVault,
-        vault_data::NewVaultData,
+        contact_info::ContactInfo,
+        ob_configuration::ObConfiguration,
+        scoped_vault::ScopedVault,
+        vault_data::{NewVaultData, VaultData},
     },
-    TxnPgConn,
+    DbPool, TxnPgConn,
 };
 use itertools::Itertools;
 use newtypes::{
@@ -44,7 +46,8 @@ impl<Type> VaultWrapper<Type> {
     #[tracing::instrument(skip_all)]
     pub async fn get_data_to_prefill<'a>(
         &'a self,
-        state: &'a State,
+        enclave_client: &EnclaveClient,
+        db_pool: &DbPool,
         destination_sv: &'a ScopedVault,
         pb: &'a ObConfiguration,
     ) -> ApiResult<PrefillData> {
@@ -72,7 +75,20 @@ impl<Type> VaultWrapper<Type> {
             // Note: this won't support portable documents
             .filter_map(|d| if let PieceOfData::Vd(d) = &d.data {Some(d)} else { None})
             .collect_vec();
+        let result = self
+            .inner_get_data_to_prefill(enclave_client, db_pool, destination_sv, data)
+            .await?;
+        Ok(result)
+    }
 
+    /// TODO remove this sub-method after the migration
+    pub async fn inner_get_data_to_prefill<'a>(
+        &'a self,
+        enclave_client: &'a EnclaveClient,
+        db_pool: &'a DbPool,
+        destination_sv: &'a ScopedVault,
+        data: Vec<&'a VaultData>,
+    ) -> ApiResult<PrefillData> {
         //
         // Compute the fingerprints for all data we're going to prefill
         //
@@ -97,8 +113,7 @@ impl<Type> VaultWrapper<Type> {
             })
             .collect_vec();
 
-        let fingerprints = state
-            .enclave_client
+        let fingerprints = enclave_client
             .batch_fingerprint_sealed(&self.vault.e_private_key, data_to_fingerprint)
             .await?;
         let fingerprints = fingerprints
@@ -124,8 +139,7 @@ impl<Type> VaultWrapper<Type> {
                 Some((dl.kind.clone(), dl.id.clone()))
             })
             .collect_vec();
-        let old_ci = state
-            .db_pool
+        let old_ci = db_pool
             .db_query(|conn| -> ApiResult<_> {
                 old_ci_dls
                     .into_iter()

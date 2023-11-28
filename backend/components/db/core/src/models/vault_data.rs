@@ -48,12 +48,13 @@ pub struct NewVaultData {
 
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = vault_data)]
-struct NewVaultDataRow {
-    lifetime_id: DataLifetimeId,
-    kind: DataIdentifier,
-    e_data: SealedVaultBytes,
-    p_data: Option<PiiString>,
-    format: VaultDataFormat,
+// TODO not pub
+pub struct NewVaultDataRow {
+    pub lifetime_id: DataLifetimeId,
+    pub kind: DataIdentifier,
+    pub e_data: SealedVaultBytes,
+    pub p_data: Option<PiiString>,
+    pub format: VaultDataFormat,
 }
 
 impl VaultData {
