@@ -7,7 +7,7 @@ use crate::State;
 use api_core::types::ResponseData;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::headers::InsightHeaders;
-use api_core::utils::vault_wrapper::TenantVw;
+use api_core::utils::vault_wrapper::{Any, WriteableVw};
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
@@ -66,8 +66,8 @@ pub async fn delete(
     let deleted_dis = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<HashSet<_>> {
-            let scoped_user = ScopedVault::get(conn.conn(), (&fp_id, &tenant_id, is_live))?;
-            let uvw: TenantVw = VaultWrapper::build_for_tenant(conn.conn(), &scoped_user.id)?;
+            let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let uvw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
             let dis = uvw.soft_delete_vault_data(conn, fields.to_vec())?;
 
             NewAccessEvent {
@@ -81,7 +81,7 @@ pub async fn delete(
                 targets: dis.clone(),
                 purpose: AccessEventPurpose::Api,
             }
-            .create(conn.conn())?;
+            .create(conn)?;
 
             Ok(HashSet::from_iter(dis.into_iter()))
         })

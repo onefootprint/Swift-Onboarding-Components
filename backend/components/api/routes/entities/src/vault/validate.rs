@@ -10,7 +10,7 @@ use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::vault_wrapper::TenantVw;
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
-use newtypes::put_data_request::RawDataRequest;
+use newtypes::put_data_request::{PatchDataRequest, RawDataRequest};
 use newtypes::{FpId, ValidateArgs};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -77,15 +77,16 @@ async fn post_inner(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
 
-    let request = request.clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
-    let request = request.no_fingerprints(); // No fingerprints to check speculatively
+    let PatchDataRequest { updates, .. } =
+        request.clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
+    let updates = updates.no_fingerprints(); // No fingerprints to check speculatively
     state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
-            request.assert_allowable_identifiers(uvw.vault.kind)?;
-            uvw.validate_request(conn, request)?;
+            updates.assert_allowable_identifiers(uvw.vault.kind)?;
+            uvw.validate_request(conn, updates)?;
             Ok(())
         })
         .await??;

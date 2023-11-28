@@ -14,7 +14,7 @@ use db::models::tenant::Tenant;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
 use newtypes::email::Email;
-use newtypes::put_data_request::RawDataRequest;
+use newtypes::put_data_request::{PatchDataRequest, RawDataRequest};
 use newtypes::{
     DataIdentifier, DataLifetimeSource, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, ScopedVaultId,
     ValidateArgs, WorkflowGuard, WorkflowId,
@@ -74,14 +74,14 @@ pub async fn post_validate(
         allow_dangling_keys: *allow_extra_fields,
         is_live: user.is_live,
     };
-    let request = request.into_inner().clean_and_validate(opts)?;
-    let request = request.no_fingerprints(); // No fingerprints to check speculatively
+    let PatchDataRequest { updates, .. } = request.into_inner().clean_and_validate(opts)?;
+    let updates = updates.no_fingerprints(); // No fingerprints to check speculatively
     state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let vw = VaultWrapper::<Person>::build_for_tenant(conn, &su_id)?;
-            request.assert_allowable_identifiers(vw.vault.kind)?;
-            vw.validate_request(conn, request)?;
+            updates.assert_allowable_identifiers(vw.vault.kind)?;
+            vw.validate_request(conn, updates)?;
             Ok(())
         })
         .await??;
@@ -102,20 +102,20 @@ pub async fn patch(
     let (user, su_id, tenant, wf_info) = parse_auth(&state, user_auth, user_wf_auth).await?;
     let is_fixture = user.is_fixture;
     let sv_id2 = su_id.clone();
-    let request = request
+    let PatchDataRequest { updates, .. } = request
         .into_inner()
         .clean_and_validate(ValidateArgs::for_bifrost(user.is_live))?;
 
-    let email = request
+    let email = updates
         .get(&IDK::Email.into())
         .map(|p| Email::from_str(p.leak()))
         .transpose()?;
 
-    let residential_address = request
+    let residential_address = updates
         .get(&IDK::Country.into())
         .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
 
-    let request = request
+    let updates = updates
         .build_global_fingerprints(state.as_ref(), is_fixture)
         .await?;
 
@@ -127,7 +127,7 @@ pub async fn patch(
             // Even though this accepts id.phone_number, it will always error at runtime if we
             // provide id.phone_number since we only allow a vault to have one phone number
             let new_contact_info = uvw
-                .patch_data(conn, request, DataLifetimeSource::Hosted, None)?
+                .patch_data(conn, updates, DataLifetimeSource::Hosted, None)?
                 .new_ci;
             Ok(new_contact_info)
         })

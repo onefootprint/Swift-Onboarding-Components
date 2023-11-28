@@ -16,7 +16,7 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use macros::route_alias;
-use newtypes::put_data_request::RawDataRequest;
+use newtypes::put_data_request::{PatchDataRequest, RawDataRequest};
 use newtypes::{AccessEventKind, AccessEventPurpose, FpId, ValidateArgs};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -128,11 +128,10 @@ async fn patch_inner(
             }
         }
     }
-    let targets = request.keys().cloned().collect_vec();
     let mut args = ValidateArgs::for_non_portable(is_live);
     args.ignore_luhn_validation = ignore_luhn_validation;
-    let request = request.clean_and_validate(args)?;
-    let request = request.build_tenant_fingerprints(state, &tenant_id).await?;
+    let PatchDataRequest { updates, deletions } = request.clean_and_validate(args)?;
+    let updates = updates.build_tenant_fingerprints(state, &tenant_id).await?;
 
     let source = auth.source();
     let actor = auth.actor();
@@ -142,21 +141,41 @@ async fn patch_inner(
             let scoped_user: ScopedVault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
 
             let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &scoped_user.id)?;
-            uvw.patch_data(conn, request, source, Some(actor))?;
+            // TODO one day, delete in `patch_data` below and make a more informative timeline
+            // event with context on what was updated, deleted, and added
+            let deleted_dis = uvw.soft_delete_vault_data(conn, deletions)?;
+            let updated_dis = updates.keys().cloned().collect_vec();
+            uvw.patch_data(conn, updates, source, Some(actor.clone()))?;
 
-            // Create an access event to show data was added
-            NewAccessEvent {
-                scoped_vault_id: scoped_user.id.clone(),
-                tenant_id: scoped_user.tenant_id,
-                is_live: scoped_user.is_live,
-                reason: None,
-                principal,
-                insight,
-                kind: AccessEventKind::Update,
-                targets,
-                purpose: AccessEventPurpose::Api,
+            // Create access events to show data was added/deleted
+            if !updated_dis.is_empty() {
+                NewAccessEvent {
+                    scoped_vault_id: scoped_user.id.clone(),
+                    tenant_id: scoped_user.tenant_id.clone(),
+                    is_live: scoped_user.is_live,
+                    reason: None,
+                    principal,
+                    insight: insight.clone(),
+                    kind: AccessEventKind::Update,
+                    targets: updated_dis,
+                    purpose: AccessEventPurpose::Api,
+                }
+                .create(conn)?;
             }
-            .create(conn)?;
+            if !deleted_dis.is_empty() {
+                NewAccessEvent {
+                    scoped_vault_id: scoped_user.id,
+                    tenant_id: scoped_user.tenant_id,
+                    is_live: scoped_user.is_live,
+                    reason: None,
+                    principal: actor.into(),
+                    insight,
+                    kind: AccessEventKind::Delete,
+                    targets: deleted_dis,
+                    purpose: AccessEventPurpose::Api,
+                }
+                .create(conn)?;
+            }
 
             Ok(())
         })

@@ -2,7 +2,6 @@ mod accessors;
 mod build;
 mod bulk_decrypt;
 mod decrypt;
-mod delete;
 
 use db::models::{scoped_vault::ScopedVault, workflow::WorkflowAndConfig};
 

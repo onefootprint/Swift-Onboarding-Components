@@ -1,6 +1,6 @@
 import pytest
 from tests.headers import IgnoreCardValidation
-from tests.utils import post, patch
+from tests.utils import post, patch, get
 
 
 def test_ssn_vaulting(tenant):
@@ -208,3 +208,34 @@ def test_derived_entries(tenant, entry, derived_entry):
     body = post(f"entities/{fp_id}/vault/decrypt", data, tenant.sk.key)
     for k, v in derived_entry.items():
         assert body[k] == v
+
+
+def test_delete_and_update(tenant):
+    # And should be able to add it to an existing vault
+    body = post("users/", None, tenant.sk.key)
+    fp_id = body["id"]
+
+    # Add some data
+    data = {"id.first_name": "Hayes", "id.last_name": "Valley"}
+    patch(f"users/{fp_id}/vault", data, tenant.sk.key)
+    post(f"users/{fp_id}/vault/validate", data, tenant.sk.key)
+
+    body = get("org/access_events", dict(fp_id=fp_id), *tenant.db_auths)
+    assert any(
+        i["kind"] == "update" and set(i["targets"]) == {"id.first_name", "id.last_name"}
+        for i in body["data"]
+    )
+
+    # Delete some data and update some other data in the same request
+    data = {"id.first_name": None, "id.dob": "1995-01-10"}
+    patch(f"users/{fp_id}/vault", data, tenant.sk.key)
+    post(f"users/{fp_id}/vault/validate", data, tenant.sk.key)
+
+    body = get("org/access_events", dict(fp_id=fp_id), *tenant.db_auths)
+    assert any(
+        i["kind"] == "update" and set(i["targets"]) == {"id.dob"} for i in body["data"]
+    )
+    assert any(
+        i["kind"] == "delete" and set(i["targets"]) == {"id.first_name"}
+        for i in body["data"]
+    )

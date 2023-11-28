@@ -5,6 +5,7 @@ use derive_more::Deref;
 
 mod add_data;
 mod build;
+mod delete;
 mod portablize_data;
 mod prefill;
 mod validated_data_request;

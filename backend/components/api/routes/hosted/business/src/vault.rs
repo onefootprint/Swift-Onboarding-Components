@@ -14,7 +14,7 @@ use api_core::utils::vault_wrapper::{Person, TenantVw};
 use api_core::ApiErrorKind;
 use db::models::business_owner::BusinessOwner;
 use db::models::scoped_vault::ScopedVault;
-use newtypes::put_data_request::RawDataRequest;
+use newtypes::put_data_request::{PatchDataRequest, RawDataRequest};
 use newtypes::{
     BusinessDataKind as BDK, BusinessOwnerKind, DataLifetimeSource, PiiJsonValue, ScopedVaultId,
     WorkflowGuard,
@@ -41,15 +41,16 @@ pub async fn post_validate(
         request.insert(BDK::KycedBeneficialOwners.into(), new_kyced_bos);
     }
 
-    let request = request.clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;
-    let request = request.no_fingerprints(); // No fingerprints to check speculatively
+    let PatchDataRequest { updates, .. } =
+        request.clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;
+    let updates = updates.no_fingerprints(); // No fingerprints to check speculatively
 
     state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let bvw: TenantVw<Business> = VaultWrapper::build_for_tenant(conn, &sb_id)?;
-            request.assert_allowable_identifiers(bvw.vault.kind)?;
-            bvw.validate_request(conn, request)?;
+            updates.assert_allowable_identifiers(bvw.vault.kind)?;
+            bvw.validate_request(conn, updates)?;
             Ok(())
         })
         .await??;
@@ -77,9 +78,10 @@ pub async fn patch(
         request.insert(BDK::KycedBeneficialOwners.into(), new_kyced_bos);
     }
 
-    let request = request.clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;
+    let PatchDataRequest { updates, .. } =
+        request.clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;
     let is_fixture = user_auth.user().is_fixture;
-    let request = request
+    let updates = updates
         .build_global_fingerprints(state.as_ref(), is_fixture)
         .await?;
 
@@ -87,7 +89,7 @@ pub async fn patch(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let bvw = VaultWrapper::<Business>::lock_for_onboarding(conn, &sb_id)?;
-            bvw.patch_data(conn, request, DataLifetimeSource::Hosted, None)?;
+            bvw.patch_data(conn, updates, DataLifetimeSource::Hosted, None)?;
             Ok(())
         })
         .await?;

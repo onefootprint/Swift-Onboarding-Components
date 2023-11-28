@@ -18,6 +18,7 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::NewVaultArgs;
 use itertools::Itertools;
+use newtypes::put_data_request::PatchDataRequest;
 use newtypes::put_data_request::RawDataRequest;
 use newtypes::AccessEventKind;
 use newtypes::AccessEventPurpose;
@@ -57,11 +58,12 @@ pub async fn create_non_portable_vault(
     let request_info = if let Some(request) = request.into_inner() {
         let targets = request.keys().cloned().collect_vec();
         if !targets.is_empty() {
-            let request = request.clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
-            let request = request
+            let PatchDataRequest { updates, .. } =
+                request.clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
+            let updates = updates
                 .build_tenant_fingerprints(state.as_ref(), &tenant_id)
                 .await?;
-            Some((targets, request))
+            Some((targets, updates))
         } else {
             None
         }
