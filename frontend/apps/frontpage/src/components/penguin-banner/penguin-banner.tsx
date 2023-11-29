@@ -92,11 +92,12 @@ const Title = styled.h2`
 
 const Illustration = styled(Image)`
   object-fit: contain;
-  width: 100%;
+  max-height: 420px;
   height: fit-content;
+  width: 100%;
 
   ${media.greaterThan('md')`
-    width: 967px;
+    max-width: 967px;
   `}
 `;
 
