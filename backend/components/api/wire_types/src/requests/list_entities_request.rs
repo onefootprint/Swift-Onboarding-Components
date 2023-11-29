@@ -17,6 +17,7 @@ pub struct ListEntitiesRequest {
     /// When true, shows hidden incomplete vaults that didn't complete a signup challenge
     pub show_all: Option<bool>,
     pub is_created_via_api: Option<bool>,
+    pub has_outstanding_workflow_request: Option<bool>,
 }
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]

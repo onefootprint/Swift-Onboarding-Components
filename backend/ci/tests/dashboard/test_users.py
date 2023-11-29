@@ -100,6 +100,29 @@ def test_get_users_filter(
     assert set(u["id"] for u in scoped_users) >= set(expected_user_ids)
 
 
+def test_get_users_filter_workflow_request(sandbox_user2):
+    tenant = sandbox_user2.tenant
+
+    filters = dict(has_outstanding_workflow_request="false")
+    body = get("entities", filters, *tenant.db_auths)
+    assert any(i["id"] == sandbox_user2.fp_id for i in body["data"])
+
+    filters = dict(has_outstanding_workflow_request="true")
+    body = get("entities", filters, *tenant.db_auths)
+    assert not any(i["id"] == sandbox_user2.fp_id for i in body["data"])
+
+    data = dict(trigger=dict(kind="redo_kyc"), note="Flerp")
+    body = post(f"entities/{sandbox_user2.fp_id}/trigger", data, *tenant.db_auths)
+
+    filters = dict(has_outstanding_workflow_request="true")
+    body = get("entities", filters, *tenant.db_auths)
+    assert any(i["id"] == sandbox_user2.fp_id for i in body["data"])
+
+    filters = dict(has_outstanding_workflow_request="false")
+    body = get("entities", filters, *tenant.db_auths)
+    assert not any(i["id"] == sandbox_user2.fp_id for i in body["data"])
+
+
 def test_get_users_list_pagination(sandbox_user, sandbox_user2):
     sandbox_user2  # Not used, but need the fixture
     tenant = sandbox_user.tenant
@@ -153,7 +176,10 @@ def test_timeline(sandbox_user):
     workflow_started_event = next(
         i for i in body if i["event"]["kind"] == "workflow_started"
     )
-    assert workflow_started_event["event"]["data"]["playbook"]["id"] == sandbox_user.client.ob_config.id
+    assert (
+        workflow_started_event["event"]["data"]["playbook"]["id"]
+        == sandbox_user.client.ob_config.id
+    )
 
     # Test filtering
     body = get(

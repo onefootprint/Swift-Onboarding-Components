@@ -60,6 +60,7 @@ pub async fn get(
         timestamp_gte,
         show_all,
         is_created_via_api,
+        has_outstanding_workflow_request,
     } = filters.into_inner();
 
     let (search, fp_id) = parse_search(&state, search, &tenant.id).await?;
@@ -79,6 +80,7 @@ pub async fn get(
         only_visible: !show_all.unwrap_or_default(),
         is_created_via_api,
         playbook_id: None,
+        has_outstanding_workflow_request,
     };
     let (scoped_vaults, mut entities, vws, count) = state
         .db_pool

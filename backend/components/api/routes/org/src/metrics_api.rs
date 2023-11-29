@@ -48,6 +48,7 @@ async fn get(
             is_created_via_api: None,
             statuses,
             playbook_id: playbook_id.clone(),
+            has_outstanding_workflow_request: None,
         }
     };
 

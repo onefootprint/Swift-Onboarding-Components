@@ -34,6 +34,7 @@ pub struct ScopedVaultListQueryParams<TSearch = SearchQuery> {
     pub only_visible: bool,
     pub is_created_via_api: Option<bool>,
     pub playbook_id: Option<ObConfigurationId>,
+    pub has_outstanding_workflow_request: Option<bool>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -65,6 +66,7 @@ impl ScopedVaultListQueryParams {
             only_visible,
             is_created_via_api,
             playbook_id,
+            has_outstanding_workflow_request,
         } = self;
 
         let matching_vaults = if let Some(search) = search {
@@ -88,6 +90,7 @@ impl ScopedVaultListQueryParams {
             only_visible,
             is_created_via_api,
             playbook_id,
+            has_outstanding_workflow_request,
         };
         Ok(result)
     }
@@ -101,7 +104,9 @@ macro_rules! list_query {
         // Filter out onboardings that haven't been explicitly authorized by the user - these should
         // not be visible in the dashboard since the tenant doesn't have permissions to view anything
         // about the user
-        use db_schema::schema::{manual_review, scoped_vault, vault, watchlist_check, workflow};
+        use db_schema::schema::{
+            manual_review, scoped_vault, vault, watchlist_check, workflow, workflow_request,
+        };
         let mut query = scoped_vault::table
             .inner_join(vault::table)
             .filter(scoped_vault::tenant_id.eq(&$params.tenant_id))
@@ -198,6 +203,18 @@ macro_rules! list_query {
                 .select(workflow::scoped_vault_id)
                 .distinct();
             query = query.filter(scoped_vault::id.eq_any(matching_ids))
+        }
+
+        if let Some(has_outstanding_workflow_request) = $params.has_outstanding_workflow_request.as_ref() {
+            let matching_ids = workflow_request::table
+                .filter(workflow_request::deactivated_at.is_null())
+                .select(workflow_request::scoped_vault_id)
+                .distinct();
+            if *has_outstanding_workflow_request {
+                query = query.filter(scoped_vault::id.eq_any(matching_ids))
+            } else {
+                query = query.filter(not(scoped_vault::id.eq_any(matching_ids)))
+            }
         }
 
         if let Some(vault_ids) = $params.search.as_ref() {
