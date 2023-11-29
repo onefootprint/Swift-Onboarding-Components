@@ -38,6 +38,7 @@ pub async fn run(
                 .inner_join(scoped_vault::table)
                 .filter(vault::is_live.eq(is_live))
                 .select(vault::id)
+                .distinct()
                 .into_boxed();
             if let Some(vault_ids) = vault_ids {
                 query = query.filter(vault::id.eq_any(vault_ids))
