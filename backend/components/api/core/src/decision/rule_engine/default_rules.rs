@@ -72,11 +72,11 @@ pub fn alpaca_kyc_field_validation_rules() -> Vec<(RuleExpression, RuleAction)> 
 pub fn alpaca_doc_field_validation_rules() -> Vec<(RuleExpression, RuleAction)> {
     vec![
         (
-            if_not_risk_signal(FRC::DocumentOcrAddressMatches),
+            if_risk_signal(FRC::DocumentOcrAddressDoesNotMatch),
             RA::ManualReview,
         ),
-        (if_not_risk_signal(FRC::DocumentOcrDobMatches), RA::ManualReview),
-        (if_not_risk_signal(FRC::DocumentOcrNameMatches), RA::ManualReview),
+        (if_risk_signal(FRC::DocumentOcrDobDoesNotMatch), RA::ManualReview),
+        (if_risk_signal(FRC::DocumentOcrNameDoesNotMatch), RA::ManualReview),
     ]
 }
 

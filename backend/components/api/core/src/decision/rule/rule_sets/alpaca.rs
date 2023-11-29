@@ -57,19 +57,23 @@ pub fn doc_field_validation_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
         // what happens when the KYC check says DOB matches but then they upload a doc that has a different DOB 🤔. For now we'll just fail with review for these cases but maybe something to explicitly ask Alpaca about
         Rule {
             rule: {
-                |f: &Vec<FootprintReasonCode>| !f.contains(&FootprintReasonCode::DocumentOcrAddressMatches)
+                |f: &Vec<FootprintReasonCode>| {
+                    f.contains(&FootprintReasonCode::DocumentOcrAddressDoesNotMatch)
+                }
             },
             name: RuleName::DocumentAddressDoesntMatch,
             action: RuleAction::ManualReview,
         },
         Rule {
-            rule: { |f: &Vec<FootprintReasonCode>| !f.contains(&FootprintReasonCode::DocumentOcrDobMatches) },
+            rule: {
+                |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::DocumentOcrDobDoesNotMatch)
+            },
             name: RuleName::DocumentDobDoesntMatch,
             action: RuleAction::ManualReview,
         },
         Rule {
             rule: {
-                |f: &Vec<FootprintReasonCode>| !f.contains(&FootprintReasonCode::DocumentOcrNameMatches)
+                |f: &Vec<FootprintReasonCode>| f.contains(&FootprintReasonCode::DocumentOcrNameDoesNotMatch)
             },
             name: RuleName::DocumentNameDoesntMatch,
             action: RuleAction::ManualReview,
