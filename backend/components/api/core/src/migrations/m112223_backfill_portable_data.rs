@@ -396,27 +396,6 @@ fn create_backfilled_prefill_vd(
     if d.kind.storage_type() != newtypes::StorageType::VaultData {
         return Err(ValidationError("Invalid storage type").into());
     }
-    // If there's an existing active data lifetime that is not portable, we're going to replace it
-    // with our prefill data that is also not portable, which will disobey a uniqueness constraint.
-    // Need to deactivate the existing DL with the same seqno we use to make the new one
-    let existing_dl = data_lifetime::table
-        .filter(data_lifetime::scoped_vault_id.eq(&sv.id))
-        .filter(data_lifetime::portablized_seqno.is_null())
-        .filter(data_lifetime::deactivated_seqno.is_null())
-        .filter(data_lifetime::kind.eq(&d.kind))
-        .get_result::<DataLifetime>(conn.conn())
-        .optional()
-        .map_err(DbError::from)?;
-    if let Some(existing_dl) = existing_dl {
-        if existing_dl.created_seqno > seqno {
-            return Err(
-                ValidationError("Would be deactivating a DL with a seqno before it was created...").into(),
-            );
-        }
-        tracing::info!(dl_id=%existing_dl.id, "Deactivating DL in backfill");
-        DataLifetime::bulk_deactivate_speculative(conn, &sv.id, vec![d.kind.clone()], seqno)?;
-    };
-
     let new_dl = NewDataLifetime {
         vault_id: sv.vault_id.clone(),
         scoped_vault_id: sv.id.clone(),
