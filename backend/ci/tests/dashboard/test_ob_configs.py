@@ -491,7 +491,7 @@ def test_config_update(sandbox_tenant, ob_configuration):
     get("org/onboarding_config", None, ob_configuration.key, status_code=401)
 
 
-def test_no_phone_obc(sandbox_tenant):
+def test_business_only_obc(sandbox_tenant):
     collect_data = [
         "business_name",
         "business_tin",

@@ -16,7 +16,9 @@ def no_phone_user(skip_phone_obc):
     sandbox_id = _gen_random_sandbox_id()
     headers = [skip_phone_obc.key, SandboxId(sandbox_id)]
 
-    res = post("hosted/identify/signup_challenge", dict(email=FIXTURE_EMAIL), *headers)
+    # Should ignore phone number and initiate an email challenge
+    data = dict(email=FIXTURE_EMAIL, phone_number="+15555555555")
+    res = post("hosted/identify/signup_challenge", data, *headers)
     challenge_token = res["challenge_data"]["challenge_token"]
 
     res = post(

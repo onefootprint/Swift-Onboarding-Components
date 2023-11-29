@@ -6,6 +6,7 @@ use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::errors::challenge::ChallengeError;
 use api_core::errors::ApiError;
+use api_core::errors::ValidationError;
 use api_core::errors::{ApiResult, AssertionError};
 use api_core::telemetry::RootSpan;
 use api_core::types::response::ResponseData;
@@ -70,64 +71,67 @@ pub async fn post(
         })
         .await?;
 
-    let (rx, challenge_data) = match (phone_number, email) {
-        (Some(phone_number), _) => {
-            let tenant = ob_context.tenant();
-            let s_id = telemetry_headers.session_id;
-            let (rx, challenge_state_data, time_before_retry_s) = state
-                .sms_client
-                .send_challenge_non_blocking(&state, Some(tenant), &phone_number, uv.id, sandbox_id, s_id)
-                .await?;
+    let (rx, challenge_data) = if !ob_context.ob_config().is_no_phone_flow {
+        // Expect a phone number and initiate an SMS challenge
+        let phone_number = phone_number.ok_or(ValidationError(
+            "Phone number required to initiate sign up challenge",
+        ))?;
+        let tenant = ob_context.tenant();
+        let s_id = telemetry_headers.session_id;
+        let (rx, challenge_state_data, time_before_retry_s) = state
+            .sms_client
+            .send_challenge_non_blocking(&state, Some(tenant), &phone_number, uv.id, sandbox_id, s_id)
+            .await?;
 
-            let challenge_state = ChallengeState {
-                data: ChallengeData::Sms(challenge_state_data),
-            };
+        let challenge_state = ChallengeState {
+            data: ChallengeData::Sms(challenge_state_data),
+        };
 
-            let challenge_token = Challenge {
-                expires_at: challenge_state.expires_at(),
-                data: challenge_state,
-            }
-            .seal(&state.challenge_sealing_key)?;
-            let data = UserChallengeData {
-                challenge_kind: ChallengeKind::Sms,
-                challenge_token,
-                scrubbed_phone_number: Some(phone_number.last_two()),
-                biometric_challenge_json: None,
-                time_before_retry_s: time_before_retry_s.num_seconds(),
-            };
-            (Some(rx), data)
+        let challenge_token = Challenge {
+            expires_at: challenge_state.expires_at(),
+            data: challenge_state,
         }
-        (None, Some(email)) => {
-            let obc = ob_context.ob_config();
-            let tenant = ob_context.tenant();
+        .seal(&state.challenge_sealing_key)?;
+        let data = UserChallengeData {
+            challenge_kind: ChallengeKind::Sms,
+            challenge_token,
+            scrubbed_phone_number: Some(phone_number.last_two()),
+            biometric_challenge_json: None,
+            time_before_retry_s: time_before_retry_s.num_seconds(),
+        };
+        (Some(rx), data)
+    } else {
+        // If obc is no-phone flow, only initiate email challenge
+        let email = email.ok_or(ValidationError(
+            "Email must be provided for no-phone signup challenges",
+        ))?;
+        let obc = ob_context.ob_config();
+        let tenant = ob_context.tenant();
 
-            if !obc.is_no_phone_flow {
-                return Err(ApiError::from(ChallengeError::ChallengeKindNotAllowed(
-                    "email".to_string(),
-                )));
-            };
+        if !obc.is_no_phone_flow {
+            return Err(ApiError::from(ChallengeError::ChallengeKindNotAllowed(
+                "email".to_string(),
+            )));
+        };
 
-            let challenge_data =
-                send_email_challenge_non_blocking(&state, &email, uv.id, tenant, sandbox_id)?;
+        let challenge_data = send_email_challenge_non_blocking(&state, &email, uv.id, tenant, sandbox_id)?;
 
-            let challenge_state = ChallengeState { data: challenge_data };
+        let challenge_state = ChallengeState { data: challenge_data };
 
-            let challenge_token = Challenge {
-                expires_at: challenge_state.expires_at(),
-                data: challenge_state,
-            }
-            .seal(&state.challenge_sealing_key)?;
-
-            let data = UserChallengeData {
-                challenge_kind: ChallengeKind::Email,
-                challenge_token,
-                scrubbed_phone_number: None,
-                biometric_challenge_json: None,
-                time_before_retry_s: state.config.time_s_between_sms_challenges,
-            };
-            (None, data)
+        let challenge_token = Challenge {
+            expires_at: challenge_state.expires_at(),
+            data: challenge_state,
         }
-        (None, None) => return Err(ChallengeError::NoIdentifier.into()),
+        .seal(&state.challenge_sealing_key)?;
+
+        let data = UserChallengeData {
+            challenge_kind: ChallengeKind::Email,
+            challenge_token,
+            scrubbed_phone_number: None,
+            biometric_challenge_json: None,
+            time_before_retry_s: state.config.time_s_between_sms_challenges,
+        };
+        (None, data)
     };
 
     let err = if let Some(rx) = rx {
