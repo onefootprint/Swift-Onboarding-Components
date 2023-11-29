@@ -240,7 +240,7 @@ impl SmsClient {
                 Ok(_) => return Ok(()),
                 Err(e) => e,
             };
-            tracing::warn!(?preferred_vendor, err=%e, "Moving on to next SMS vendor");
+            tracing::warn!(?preferred_vendor, err=%e, err_debug=?e, "Moving on to next SMS vendor");
             err = if let Some(tx) = tx.take() {
                 // After the first error is encountered, pass the error back on the channel in
                 // case someone is listening
