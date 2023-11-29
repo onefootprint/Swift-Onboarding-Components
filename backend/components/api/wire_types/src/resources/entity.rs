@@ -39,6 +39,7 @@ pub struct Entity {
     pub insight_event: Option<InsightEvent>,
     pub requires_manual_review: bool,
     pub is_created_via_api: bool,
+    pub has_outstanding_workflow_request: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

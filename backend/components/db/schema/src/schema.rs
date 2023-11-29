@@ -1108,6 +1108,22 @@ table! {
 table! {
     use diesel::sql_types::*;
 
+    workflow_request (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        timestamp -> Timestamptz,
+        deactivated_at -> Nullable<Timestamptz>,
+        deactivated_by_workflow_id -> Nullable<Text>,
+        scoped_vault_id -> Text,
+        ob_configuration_id -> Text,
+        created_by -> Jsonb,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+
     zip_code (code) {
         code -> Text,
         city -> Text,
@@ -1212,6 +1228,9 @@ joinable!(workflow -> insight_event (insight_event_id));
 joinable!(workflow -> ob_configuration (ob_configuration_id));
 joinable!(workflow -> scoped_vault (scoped_vault_id));
 joinable!(workflow_event -> workflow (workflow_id));
+joinable!(workflow_request -> ob_configuration (ob_configuration_id));
+joinable!(workflow_request -> scoped_vault (scoped_vault_id));
+joinable!(workflow_request -> workflow (deactivated_by_workflow_id));
 
 allow_tables_to_appear_in_same_query!(
     access_event,
@@ -1277,5 +1296,6 @@ allow_tables_to_appear_in_same_query!(
     webauthn_credential,
     workflow,
     workflow_event,
+    workflow_request,
     zip_code,
 );

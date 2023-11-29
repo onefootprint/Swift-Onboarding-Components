@@ -99,6 +99,7 @@ define_newtype_id!(AnnotationId, String, "Identifier for an annotation");
 define_newtype_id!(ManualReviewId, String, "Identifier for a manual review");
 define_newtype_id!(DataLifetimeId, String, "Identifier for a data lifetime");
 define_newtype_id!(VdId, String, "Identifier for a UserVaultData");
+define_newtype_id!(WorkflowRequestId, String, "Identifier for a WorkflowRequest");
 define_newtype_id!(
     FingerprintVisitorId,
     String,

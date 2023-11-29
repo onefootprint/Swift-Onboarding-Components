@@ -25,6 +25,7 @@ use super::task::Task;
 use super::tenant::Tenant;
 use super::user_timeline::UserTimeline;
 use super::workflow_event::WorkflowEvent;
+use super::workflow_request::WorkflowRequest;
 use crate::models::vault::Vault;
 use crate::{DbResult, PgConn, TxnPgConn};
 use db_schema::schema::{ob_configuration, workflow};
@@ -505,10 +506,24 @@ impl Workflow {
             state: new_state,
             completed_at: new_state.is_complete().then_some(e.created_at),
         };
-        let result = diesel::update(workflow::table)
+        let result: Self = diesel::update(workflow::table)
             .filter(workflow::id.eq(&e.workflow_id))
             .set(update)
             .get_result(conn.conn())?;
+
+        if new_state.is_complete() {
+            if let Some(obc_id) = result.ob_configuration_id.as_ref() {
+                // Deactivate any outstanding WorkflowRequest for this playbook
+                // NOTE: this pretty arbitrarily decides to only deactivate a WorkflowRequest
+                // if the request was for this playbook. But you could imagine if the
+                // WorkflowRequest was only to redo KYC and the user onboards onto a KYC playbook,
+                // we might want to mark the WorkflowRequest as complete anyways.
+                // Maybe we'll revisit in the future with more descriptive requirements in the DB
+                let sv_id = &result.scoped_vault_id;
+                WorkflowRequest::deactivate(conn, sv_id, Some(obc_id), Some(result.id.clone()))?;
+            }
+        }
+
         Ok(result)
     }
 

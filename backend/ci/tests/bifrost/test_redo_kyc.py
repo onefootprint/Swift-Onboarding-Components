@@ -56,6 +56,9 @@ def test_redo_kyc(
     note = _gen_random_n_digit_number(10)
     trigger = dict(kind="redo_kyc")
 
+    body = get(f"entities/{sandbox_user.fp_id}", None, *sandbox_user.tenant.db_auths)
+    assert not body["has_outstanding_workflow_request"]
+
     def send_trigger():
         post(
             f"entities/{sandbox_user.fp_id}/trigger",
@@ -64,6 +67,10 @@ def test_redo_kyc(
         )
 
     try_until_success(send_trigger, 15, 3)
+
+    body = get(f"entities/{sandbox_user.fp_id}", None, *sandbox_user.tenant.db_auths)
+    assert body["has_outstanding_workflow_request"]
+
     # find link we sent to user via Twilio
     token = extract_trigger_sms(
         twilio, sandbox_user.client.data["id.phone_number"], note
@@ -96,6 +103,9 @@ def test_redo_kyc(
     user = bifrost.run()
     fp_id = user.fp_id
     tenant = bifrost.ob_config.tenant
+
+    body = get(f"entities/{sandbox_user.fp_id}", None, *sandbox_user.tenant.db_auths)
+    assert not body["has_outstanding_workflow_request"]
 
     # we should have re-run KYC and now have 2 OBDs
     timeline = get(

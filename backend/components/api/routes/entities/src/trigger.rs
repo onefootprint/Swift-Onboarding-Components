@@ -25,7 +25,9 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
 use db::models::workflow::NewWorkflowArgs;
 use db::models::workflow::Workflow;
+use db::models::workflow_request::WorkflowRequest;
 use newtypes::ContactInfoKind;
+use newtypes::DbActor;
 use newtypes::DocumentConfig;
 use newtypes::PhoneNumber;
 use newtypes::PiiString;
@@ -54,7 +56,7 @@ pub async fn post(
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
     let session_key = state.session_sealing_key.clone();
-    let actor = auth.actor().into();
+    let actor = DbActor::from(auth.actor());
 
     // Generate an auth token for the user and send to their phone number on file
     let trigger_kind = trigger.into();
@@ -78,9 +80,11 @@ pub async fn post(
                         is_from_api: true,
                         ..Default::default()
                     };
+                    let wr = WorkflowRequest::create(conn, sv.id.clone(), obc.id.clone(), actor.clone())?;
                     let event = WorkflowTriggeredInfo {
                         workflow_id: None,
                         ob_config_id: Some(obc.id),
+                        workflow_request_id: Some(wr.id),
                         actor,
                     };
                     (event, args)
@@ -123,6 +127,7 @@ pub async fn post(
                     let event = WorkflowTriggeredInfo {
                         workflow_id: Some(wf.id.clone()),
                         ob_config_id: None,
+                        workflow_request_id: None,
                         actor,
                     };
                     (event, args)

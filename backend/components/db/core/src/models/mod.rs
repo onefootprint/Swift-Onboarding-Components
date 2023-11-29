@@ -54,4 +54,5 @@ pub mod watchlist_check;
 pub mod webauthn_credential;
 pub mod workflow;
 pub mod workflow_event;
+pub mod workflow_request;
 pub mod zip_code;

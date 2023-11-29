@@ -24,7 +24,7 @@ pub type EntityDetail<'a> = (
 
 impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
     fn from_db((entity, vw, auth, decrypted_attrs): EntityDetail) -> Self {
-        let (sv, watchlist_check, mrs, wfs) = entity;
+        let (sv, watchlist_check, wr, mrs, wfs) = entity;
 
         // Don't require any permissions to decrypt plaintext attributes - always show them
         let plaintext_attrs = vw
@@ -127,6 +127,8 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             requires_manual_review,
             is_created_via_api,
             data,
+            // TODO maybe we return true here if there's an active document WF
+            has_outstanding_workflow_request: wr.is_some(),
 
             // TODO deprecate all of these
             attributes,

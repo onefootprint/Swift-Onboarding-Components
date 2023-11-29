@@ -1,6 +1,6 @@
 use crate::{
     util::impl_enum_string_diesel, AnnotationId, CollectedDataOption, IdentityDocumentId, LivenessEventId,
-    OnboardingDecisionId, WatchlistCheckId, WebauthnCredentialId,
+    OnboardingDecisionId, WatchlistCheckId, WebauthnCredentialId, WorkflowRequestId,
 };
 use crate::{DataIdentifier, DbActor, ObConfigurationId, WorkflowId};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
@@ -151,6 +151,8 @@ pub struct WorkflowTriggeredInfo {
     pub workflow_id: Option<WorkflowId>,
     /// New format when triggers simply reonboard to a playbook
     pub ob_config_id: Option<ObConfigurationId>,
+    /// Newer format when triggers make a WorkflowRequest
+    pub workflow_request_id: Option<WorkflowRequestId>,
     pub actor: DbActor,
 }
 
