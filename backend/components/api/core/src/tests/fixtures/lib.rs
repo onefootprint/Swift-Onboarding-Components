@@ -81,13 +81,12 @@ pub fn create_user_and_onboarding(
     let is_live = obc_opts.is_live;
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create_with_opts(conn, &tenant.id, obc_opts);
-    let ob_config_id = ob_config.id.clone();
+    let obc_id = ob_config.id.clone();
 
     let tenant_id = tenant.id.clone();
     let (uv, su) = create_user_and_populate_vault(conn, is_live, tenant_id, Some(ob_config), idks);
 
-    let suid = su.id.clone();
-    let wf = fixtures::workflow::create(conn, ff_client, suid, ob_config_id, None);
+    let wf = fixtures::workflow::create(conn, ff_client, &su.id, &obc_id, None);
     let wf = Workflow::lock(conn, &wf.id).unwrap();
     let update = WorkflowUpdate::set_status(onboarding_status);
     let wf = Workflow::update(wf, conn, update).unwrap();

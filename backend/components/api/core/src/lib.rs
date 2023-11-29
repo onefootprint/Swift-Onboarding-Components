@@ -19,6 +19,7 @@ pub mod enclave_client;
 pub mod errors;
 pub mod fingerprinter;
 pub mod metrics;
+pub mod migrations;
 pub mod prometheus;
 pub mod proxy;
 pub mod s3;

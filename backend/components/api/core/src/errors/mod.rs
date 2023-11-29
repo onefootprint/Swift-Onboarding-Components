@@ -26,6 +26,8 @@ mod utils;
 pub mod workflow;
 pub mod workos;
 pub use utils::*;
+mod dry_run;
+pub use dry_run::*;
 
 use crate::{
     decision::vendor::{middesk, VendorAPIError},

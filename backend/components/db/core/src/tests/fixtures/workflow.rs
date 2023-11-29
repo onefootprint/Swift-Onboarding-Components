@@ -14,13 +14,13 @@ use crate::{
 pub fn create(
     conn: &mut TxnPgConn,
     ff_client: Arc<dyn FeatureFlagClient>,
-    sv_id: ScopedVaultId,
-    obc_id: ObConfigurationId,
+    sv_id: &ScopedVaultId,
+    obc_id: &ObConfigurationId,
     fixture_result: Option<WorkflowFixtureResult>,
 ) -> Workflow {
     let args = OnboardingWorkflowArgs {
-        scoped_vault_id: sv_id,
-        ob_configuration_id: obc_id,
+        scoped_vault_id: sv_id.clone(),
+        ob_configuration_id: obc_id.clone(),
         authorized: false,
         insight_event: Some(CreateInsightEvent { ..Default::default() }),
         source: WorkflowSource::Hosted,
