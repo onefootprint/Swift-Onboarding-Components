@@ -13,6 +13,7 @@ use db::models::vault_data::{NewVaultData, NewVaultDataRow, VaultData};
 use db::models::workflow::Workflow;
 use db::{DbError, DbResult, TxnPgConn};
 use db_schema::schema::{data_lifetime, fingerprint, scoped_vault, user_timeline, vault, vault_data};
+use diesel::dsl::{count, not};
 use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::fingerprinter::GlobalFingerprintKind;
@@ -29,32 +30,46 @@ pub async fn run(
     vault_ids: Option<Vec<VaultId>>,
     is_live: bool,
     dry_run: bool,
-) -> ApiResult<usize> {
+    limit: usize,
+) -> ApiResult<Vec<(VaultId, Vec<ScopedVaultId>)>> {
     // Gather the vaults that have multiple scoped_vaults
     let vault_ids = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            let mut query = vault::table
-                .inner_join(scoped_vault::table)
-                .filter(vault::is_live.eq(is_live))
-                .select(vault::id)
-                .distinct()
+            let svs_with_prefill_data = data_lifetime::table
+                .filter(data_lifetime::source.eq(DataLifetimeSource::Prefill))
+                .select(data_lifetime::scoped_vault_id);
+            let mut query = scoped_vault::table
+                .filter(scoped_vault::is_live.eq(is_live))
+                // Filter out SVs that already have prefill data
+                .filter(not(scoped_vault::id.eq_any(svs_with_prefill_data)))
+                .select(scoped_vault::vault_id)
+                // Only get vaults that have more than one scoped vault
+                .group_by(scoped_vault::vault_id)
+                .having(count(scoped_vault::id).gt(1))
+                .order_by(scoped_vault::vault_id)
                 .into_boxed();
             if let Some(vault_ids) = vault_ids {
-                query = query.filter(vault::id.eq_any(vault_ids))
+                query = query.filter(scoped_vault::vault_id.eq_any(vault_ids))
             }
             let vault_ids: Vec<VaultId> = query.get_results(conn).map_err(DbError::from)?;
             Ok(vault_ids)
         })
         .await??;
     tracing::info!(num_vaults=%vault_ids.len(), "Found vaults to maybe backfill");
-    let mut num_rewritten = 0;
+    let mut rewritten = vec![];
     // Backfill each user in a separate transaction so we don't have a large, long-running txn
     // accumulating locks
     for vault_id in vault_ids {
-        num_rewritten += backfill_portable_data_for_vault(state, vault_id, dry_run).await?;
+        let rewritten_svs = backfill_portable_data_for_vault(state, vault_id.clone(), dry_run).await?;
+        if !rewritten_svs.is_empty() {
+            rewritten.push((vault_id, rewritten_svs))
+        }
+        if rewritten.len() > limit {
+            break;
+        }
     }
-    Ok(num_rewritten)
+    Ok(rewritten)
 }
 
 #[tracing::instrument(skip(state))]
@@ -62,11 +77,11 @@ async fn backfill_portable_data_for_vault(
     state: &State,
     vault_id: VaultId,
     dry_run: bool,
-) -> ApiResult<usize> {
+) -> ApiResult<Vec<ScopedVaultId>> {
     let s = state.clone();
     let result = state
         .db_pool
-        .db_transaction(move |conn| -> DryRunResult<usize> {
+        .db_transaction(move |conn| -> DryRunResult<_> {
             // Lock the vault and scoped vaults we will be updating
             vault::table
                 .filter(vault::id.eq(&vault_id))
@@ -78,12 +93,14 @@ async fn backfill_portable_data_for_vault(
                 .for_no_key_update()
                 .get_results(conn.conn())
                 .map_err(DbError::from)?;
-            let mut num_rewritten = 0;
+            let mut rewritten = vec![];
             for sv in svs.iter() {
-                num_rewritten += backfill_portable_data_for_sv(&s, conn, sv, &svs)?;
+                if backfill_portable_data_for_sv(&s, conn, sv, &svs)? {
+                    rewritten.push(sv.id.clone())
+                }
             }
 
-            if num_rewritten > 0 {
+            if !rewritten.is_empty() {
                 // Mark all "portable" timeline events as non-portable. This will hide the weird dashboard
                 // experience that shows collapsed timeline events from other tenants
                 diesel::update(user_timeline::table)
@@ -93,7 +110,7 @@ async fn backfill_portable_data_for_vault(
                     .map_err(DbError::from)?;
             }
 
-            DryRunResult::ok_or_rollback(num_rewritten, dry_run)
+            DryRunResult::ok_or_rollback(rewritten, dry_run)
         })
         .await;
     result.value()
@@ -105,7 +122,7 @@ fn backfill_portable_data_for_sv(
     conn: &mut TxnPgConn,
     sv: &ScopedVault,
     all_svs: &[ScopedVault],
-) -> ApiResult<usize> {
+) -> ApiResult<bool> {
     let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
     let visible_data_from_other_tenants = vw
         .populated_dis()
@@ -121,7 +138,7 @@ fn backfill_portable_data_for_sv(
 
     if visible_data_from_other_tenants.is_empty() {
         tracing::info!("No data to rewrite");
-        return Ok(0);
+        return Ok(false);
     }
 
     // Before we change any data, build a view of all VWs for all tenants for this single vault
@@ -246,7 +263,7 @@ fn backfill_portable_data_for_sv(
 
     compare_vws(conn, vw, new_vw, &sv.id, true)?;
 
-    Ok(1)
+    Ok(true)
 }
 
 #[tracing::instrument(skip(conn, old, new), fields(sv_id=%old.scoped_vault.id))]
@@ -355,7 +372,6 @@ fn compare_vws(
 /// Instead of using the existing VaultData::bulk_create, a custom method to create a new DL and VD
 /// for the prefill data where we use the old_lifetime's portablized seqno as the new lifetime's
 /// created_seqno
-#[tracing::instrument(skip_all, fields(kind=%d.kind, old_lifetime=%old_lifetime.id))]
 fn create_backfilled_prefill_vd(
     conn: &mut TxnPgConn,
     sv: &ScopedVault,
@@ -404,7 +420,7 @@ fn create_backfilled_prefill_vd(
         .values(new_vd)
         .get_result(conn.conn())
         .map_err(DbError::from)?;
-    tracing::info!(id=%vd.id, kind=%vd.kind, "Created vd");
+    tracing::info!(id=%vd.id, kind=%vd.kind, old_lifetime_id=%old_lifetime.id, "Created vd");
     Ok(vd)
 }
 

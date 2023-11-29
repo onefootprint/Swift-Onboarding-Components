@@ -33,12 +33,13 @@ async fn test_backfill(state: &mut State) {
         .await
         .unwrap();
 
-    let result = run(state, None, true, false).await;
+    let result = run(state, None, true, false, 1).await;
     if let Err(e) = &result {
         println!("{}", e);
     }
     // Should have added data to 2 SVs
-    assert_eq!(result.unwrap(), 2);
+    let result = result.unwrap().into_iter().next().unwrap();
+    assert_eq!(result.1.len(), 2);
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
