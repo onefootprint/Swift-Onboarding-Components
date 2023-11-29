@@ -81,6 +81,17 @@ async fn backfill_portable_data_for_vault(
             for sv in svs.iter() {
                 num_rewritten += backfill_portable_data_for_sv(&s, conn, sv, &svs)?;
             }
+
+            if num_rewritten > 0 {
+                // Mark all "portable" timeline events as non-portable. This will hide the weird dashboard
+                // experience that shows collapsed timeline events from other tenants
+                diesel::update(user_timeline::table)
+                    .filter(user_timeline::vault_id.eq(&vault_id))
+                    .set(user_timeline::is_portable.eq(false))
+                    .execute(conn.conn())
+                    .map_err(DbError::from)?;
+            }
+
             DryRunResult::ok_or_rollback(num_rewritten, dry_run)
         })
         .await;
@@ -165,14 +176,6 @@ fn backfill_portable_data_for_sv(
         .map(|(d, lifetime)| create_backfilled_prefill_vd(conn, sv, d, lifetime))
         .collect::<ApiResult<Vec<_>>>()?;
     ValidatedDataRequest::inner_save(conn, &vd, fingerprints.into_iter().collect(), old_ci)?;
-
-    // Mark all "portable" timeline events as non-portable. This will hide the weird dashboard
-    // experience that shows collapsed timeline events from other tenants
-    diesel::update(user_timeline::table)
-        .filter(user_timeline::scoped_vault_id.eq(&sv.id))
-        .set(user_timeline::is_portable.eq(false))
-        .execute(conn.conn())
-        .map_err(DbError::from)?;
 
     // Create a timeline event showing data was prefilled
     create_prefill_timeline_event(conn, sv, vd.into_iter().map(|d| d.kind).collect())?;

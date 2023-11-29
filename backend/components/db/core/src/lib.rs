@@ -79,7 +79,7 @@ impl DbPool {
     pub async fn db_transaction<F, R, E>(&self, f: F) -> Result<R, E>
     where
         F: FnOnce(&mut TxnPgConn) -> Result<R, E> + Send + 'static,
-        E: From<DbError> + Send + 'static,
+        E: From<DbError> + Send + 'static + std::fmt::Debug,
         R: Send + 'static,
     {
         let result = self
@@ -91,8 +91,8 @@ impl DbPool {
                 })
             })
             .await?;
-        if result.is_err() {
-            tracing::info!("Rolling back transaction due to error");
+        if let Err(e) = &result {
+            tracing::info!(e=?e, "Rolling back transaction due to error");
         }
         // Return ApplicationErrors as-is. Map DbErrors to E
         result.map_err(|txn_error| match txn_error {
