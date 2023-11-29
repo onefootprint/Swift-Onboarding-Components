@@ -79,6 +79,7 @@ export const entityFixture: Entity = {
     [BusinessDI.name]: 'Acme Inc.',
   },
   watchlistCheck: null,
+  hasOutstandingWorkflowRequest: false,
 };
 
 export const timelineFixture: Timeline = [

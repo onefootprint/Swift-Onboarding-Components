@@ -17,7 +17,8 @@
     "row": {
       "status": {
         "on-watchlist": "Watchlist",
-        "on-review": "Manual review"
+        "on-review": "Manual review",
+        "outstanding-workflow-request": "Info requested"
       }
     }
   }

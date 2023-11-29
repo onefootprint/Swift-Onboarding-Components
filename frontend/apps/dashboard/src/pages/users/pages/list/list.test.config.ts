@@ -37,6 +37,7 @@ export const entitiesFixture: Entity[] = [
     status: EntityStatus.pass,
     decryptedAttributes: {},
     watchlistCheck: null,
+    hasOutstandingWorkflowRequest: false,
   },
   {
     id: 'fp_id_tvfUNdGqmk2kJyyka9gX22',
@@ -65,6 +66,7 @@ export const entitiesFixture: Entity[] = [
     status: EntityStatus.failed,
     decryptedAttributes: {},
     watchlistCheck: null,
+    hasOutstandingWorkflowRequest: false,
   },
 ];
 

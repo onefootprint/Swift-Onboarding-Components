@@ -1,7 +1,8 @@
 import { useIntl, useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { CodeInline, Typography } from '@onefootprint/ui';
+import { CodeInline, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
+import Tags from 'src/components/entities/components/tags';
 import StatusBadge from 'src/components/status-badge';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
@@ -19,13 +20,16 @@ const Header = ({ entity }: HeaderProps) => {
     <HeaderContainer aria-label={t(`${kind}.title`)}>
       <Row>
         <Typography variant="label-1">{t(`${kind}.title`)}</Typography>
-        <StatusBadge
-          status={entity.status}
-          requiresManualReview={entity.requiresManualReview}
-          isOnWatchlist={entity.watchlistCheck?.status === 'fail'}
-          shouldShowWatchlistLabel
-          watchlistLabel={t(`watchlist.on-watchlist-${kind}`)}
-        />
+        <Stack gap={2}>
+          <StatusBadge
+            status={entity.status}
+            requiresManualReview={entity.requiresManualReview}
+            isOnWatchlist={entity.watchlistCheck?.status === 'fail'}
+            shouldShowWatchlistLabel
+            watchlistLabel={t(`watchlist.on-watchlist-${kind}`)}
+          />
+          <Tags entity={entity} />
+        </Stack>
       </Row>
       <SubHeader>
         <Row>

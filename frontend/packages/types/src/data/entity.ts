@@ -63,6 +63,7 @@ export type Entity<TStatus = EntityStatus> = {
   status: TStatus;
   requiresManualReview: boolean;
   insightEvent?: InsightEvent;
+  hasOutstandingWorkflowRequest: boolean;
 };
 
 export const hasEntityUsLegalStatus = (entity: Entity) =>

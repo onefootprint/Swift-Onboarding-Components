@@ -33,6 +33,7 @@ export const entityPassedFixture: Entity = {
   status: EntityStatus.pass,
   decryptedAttributes: {},
   watchlistCheck: null,
+  hasOutstandingWorkflowRequest: false,
 };
 
 export const entityFailedFixture: Entity = {

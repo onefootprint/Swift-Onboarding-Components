@@ -59,6 +59,7 @@ export const entitiesFixture: Entity[] = [
       [BusinessDI.name]: 'Acme Inc.',
     },
     watchlistCheck: null,
+    hasOutstandingWorkflowRequest: false,
   },
 ];
 

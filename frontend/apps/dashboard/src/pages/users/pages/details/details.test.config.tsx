@@ -112,6 +112,7 @@ export const entityFixture: Entity = {
   },
   decryptedAttributes: {},
   watchlistCheck: null,
+  hasOutstandingWorkflowRequest: false,
 };
 
 export const livenessFixture: Liveness[] = [

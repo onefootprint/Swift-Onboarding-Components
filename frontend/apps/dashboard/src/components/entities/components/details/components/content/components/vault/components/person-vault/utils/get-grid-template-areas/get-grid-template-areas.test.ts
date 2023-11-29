@@ -22,6 +22,7 @@ describe('getGridTemplateAreas', () => {
     status: EntityStatus.pass,
     decryptedAttributes: {},
     watchlistCheck: null,
+    hasOutstandingWorkflowRequest: false,
   });
 
   it('should generate grid template areas for basic, address and identity', () => {

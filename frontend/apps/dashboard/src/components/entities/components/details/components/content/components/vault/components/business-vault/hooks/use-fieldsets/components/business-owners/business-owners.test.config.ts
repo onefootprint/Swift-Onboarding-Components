@@ -38,6 +38,7 @@ export const entityFixture: Entity = {
     [BusinessDI.name]: 'Acme Inc.',
   },
   watchlistCheck: null,
+  hasOutstandingWorkflowRequest: false,
   requiresManualReview: false,
   status: EntityStatus.pass,
   insightEvent: {

@@ -2,8 +2,7 @@ import { type Entity, IdDI } from '@onefootprint/types';
 import { CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { StatusBadge } from 'src/components';
-
-import Tags from './components/tags';
+import Tags from 'src/components/entities/components/tags';
 
 type RowProps = {
   entity: Entity;
@@ -84,10 +83,7 @@ const Row = ({ entity }: RowProps) => (
       </Typography>
     </td>
     <td>
-      <Tags
-        onWatchlist={entity.watchlistCheck?.status === 'fail'}
-        onManualReview={entity.requiresManualReview}
-      />
+      <Tags entity={entity} />
     </td>
   </>
 );

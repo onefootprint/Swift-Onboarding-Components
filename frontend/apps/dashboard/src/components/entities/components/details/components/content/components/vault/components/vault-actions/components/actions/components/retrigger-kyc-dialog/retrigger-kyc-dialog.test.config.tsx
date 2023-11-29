@@ -14,6 +14,7 @@ export const entityFixture: Entity = {
   status: EntityStatus.pass,
   decryptedAttributes: {},
   watchlistCheck: null,
+  hasOutstandingWorkflowRequest: false,
 };
 
 export const withEntity = (entityId: string) =>
