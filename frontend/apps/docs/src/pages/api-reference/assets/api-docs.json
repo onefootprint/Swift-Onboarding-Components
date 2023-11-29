@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "4e682bb209027dd9c70b70d3188e83731e075c83"
+        "version": "7a1cf44711e184e4b80d958aa2a0c050fd10825e"
     },
     "servers": [
         {
@@ -233,6 +233,15 @@
                         "in": "header",
                         "name": "x-idempotency-id",
                         "description": "To safely support retrying requests without accidentally performing the same operation multiple times, provide a client-generated `x-idempotency-id`. Requests made with the same `x-idempotency-id` value will no-op and return the same result. Note, if `x-idempotency-id` is provided, initial data may not be specified in the HTTP body.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-external-id",
+                        "description": "To support attaching external identifiers (like a foreign user id) to this request, provide a client-generated `x-external-id`. Requests made with the same `x-external-id` value will no-op and return the same result. `x-external-id` must be globally unique to your organization. Note, if `x-external-id` is provided, initial data may not be specified in the HTTP body.",
                         "schema": {
                             "type": "string"
                         },
@@ -3299,6 +3308,9 @@
                 "description": "Basic information about a user",
                 "type": "object",
                 "properties": {
+                    "external_id": {
+                        "type": "string"
+                    },
                     "id": {
                         "type": "string"
                     },
