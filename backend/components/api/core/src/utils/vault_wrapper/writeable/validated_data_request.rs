@@ -241,22 +241,9 @@ impl ValidatedDataRequest {
         let actor = actor.map(|a| a.into());
         let vd = VaultData::bulk_create(conn, v_id, sv_id, self.data, seqno, source, actor)?;
 
-        let ci = Self::inner_save(conn, &vd, self.fingerprints, self.old_ci)?;
-        let saved_data = SavedData { vd, ci, seqno };
-        Ok(saved_data)
-    }
-
-    // TODO rm inner method
-    /// For the course of the backfill, separates the functionality to save Fingerprints and
-    /// ContactInfo into a separate method.
-    pub fn inner_save(
-        conn: &mut TxnPgConn,
-        vd: &[VaultData],
-        fingerprints: HashSet<FingerprintRequest>,
-        old_ci: HashMap<DataIdentifier, ContactInfo>,
-    ) -> ApiResult<Vec<ContactInfo>> {
         // Point fingerprints to the same lifetime used for the corresponding VD row
-        let fingerprints: Vec<_> = fingerprints
+        let fingerprints: Vec<_> = self
+            .fingerprints
             .into_iter()
             .map(|req| -> ApiResult<_> {
                 let FingerprintRequest {
@@ -289,7 +276,7 @@ impl ValidatedDataRequest {
             .iter()
             .filter(|vd| vd.kind.is_contact_info())
             .map(|vd| {
-                let old_ci = old_ci.get(&vd.kind);
+                let old_ci = self.old_ci.get(&vd.kind);
                 NewContactInfoArgs {
                     // Inherit properties of old CI if we are prefilling this CI from portable data
                     is_verified: old_ci.map(|ci| ci.is_verified).unwrap_or(false),
@@ -303,6 +290,7 @@ impl ValidatedDataRequest {
             .collect_vec();
         let ci = ContactInfo::bulk_create(conn, new_contact_info)?;
 
-        Ok(ci)
+        let saved_data = SavedData { vd, ci, seqno };
+        Ok(saved_data)
     }
 }

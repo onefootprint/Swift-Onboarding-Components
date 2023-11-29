@@ -1,5 +1,4 @@
 mod aws_selfie_doc;
-mod backfill_dls;
 mod decrypt;
 mod default_rules;
 mod incode;
@@ -25,7 +24,6 @@ pub fn configure(config: &mut web::ServiceConfig) {
         .service(incode::rerun_machine)
         .service(workflow::proceed)
         .service(token_reveal::post)
-        .service(backfill_dls::post)
         .service(decrypt::post)
         .service(aws_selfie_doc::post)
         .service(default_rules::add_default_rules);

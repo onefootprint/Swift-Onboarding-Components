@@ -73,9 +73,7 @@ pub async fn post(
         None
     };
 
-    let prefill_data = vw
-        .get_data_to_prefill(&state.enclave_client, &state.db_pool, &scoped_user, &ob_config)
-        .await?;
+    let prefill_data = vw.get_data_to_prefill(&state, &scoped_user, &ob_config).await?;
 
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();

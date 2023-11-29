@@ -10,9 +10,6 @@ mod portablize_data;
 mod prefill;
 mod validated_data_request;
 
-// TODO not pub
-pub use validated_data_request::ValidatedDataRequest;
-
 #[cfg(test)]
 mod tests;
 

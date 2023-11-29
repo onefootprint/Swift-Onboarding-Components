@@ -58,8 +58,7 @@ impl<Type> WriteableVw<Type> {
         Ok(result)
     }
 
-    // TODO make not pub
-    pub fn internal_save_data(
+    pub(super) fn internal_save_data(
         &self,
         conn: &mut TxnPgConn,
         request: ValidatedDataRequest,
