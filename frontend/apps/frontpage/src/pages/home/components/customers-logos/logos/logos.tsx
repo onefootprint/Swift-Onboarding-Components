@@ -2,6 +2,7 @@ import styled, { css, useTheme } from '@onefootprint/styled';
 import { media, Stack } from '@onefootprint/ui';
 import React from 'react';
 
+import BloomLogo from './companies/bloom/bloom';
 import CobaLogo from './companies/coba/coba';
 import ComposerLogo from './companies/composer';
 import FindigsLogo from './companies/findigs';
@@ -26,6 +27,9 @@ const Logos = () => {
       </Stack>
       <Stack justify="center" align="center" padding={2}>
         <CobaLogo color={theme.color.tertiary} />
+      </Stack>
+      <Stack justify="center" align="center" padding={2}>
+        <BloomLogo color={theme.color.tertiary} />
       </Stack>
     </Container>
   );
