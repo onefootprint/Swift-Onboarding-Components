@@ -5,7 +5,7 @@ use newtypes::FootprintReasonCode as FRC;
 const SSN_DOES_NOT_EXACTLY_MATCH_CODES: [FRC; 2] = [FRC::SsnDoesNotMatch, FRC::SsnPartiallyMatches];
 
 pub fn kyc_rules() -> Vec<Rule<Vec<FRC>>> {
-    let kyc = vec![
+    vec![
         Rule {
             rule: |f: &Vec<FRC>| f.contains(&FRC::IdNotLocated),
             name: RuleName::IdNotLocated,
@@ -72,8 +72,5 @@ pub fn kyc_rules() -> Vec<Rule<Vec<FRC>>> {
             name: RuleName::SsnIssuedPriorToDob,
             action: RuleAction::Fail,
         },
-    ];
-
-    // TODO: rm once we have transitioned to RSG<AML>
-    kyc.into_iter().chain(super::common::aml_rules()).collect()
+    ]
 }
