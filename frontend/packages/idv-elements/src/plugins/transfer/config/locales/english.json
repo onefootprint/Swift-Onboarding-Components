@@ -58,12 +58,12 @@
         "cancel": "Cancel"
       },
       "confirm-continue-on-desktop": {
-        "title": "Other ways to continue",
+        "title": "Are you sure you want to continue on desktop?",
         "subtitle": "In case you don't have a smartphone, you can manually upload the documents we need from your computer for now and finish the rest of the validations later.",
         "warning": "We highly recommend you to continue from your phone, if possible, since it will significantly expedite the identity verification process.",
         "cta": {
-          "mobile": "Continue on mobile",
-          "desktop": "Continue on desktop"
+          "mobile": "No, continue on my smartphone",
+          "desktop": "Yes, continue on desktop"
         }
       }
     }
