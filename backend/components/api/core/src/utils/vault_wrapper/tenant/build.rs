@@ -19,14 +19,7 @@ use std::collections::HashSet;
 impl<Type> VaultWrapper<Type> {
     // TODO support building with any ScopedVaultIdentifier, like fp_id, is_live, and tenant_id
     pub fn build_for_tenant(conn: &mut PgConn, sv_id: &ScopedVaultId) -> ApiResult<TenantVw<Type>> {
-        let vw = Self::build_for_tenant_version(conn, sv_id, None)?;
-        // For now, build the modern version of the VW that only shows DLs owned by the tenant
-        // alongside the legacy version. Log when data doesn't match
-        let modern_vw = Self::build_owned(conn, sv_id)?;
-        if let Err(e) = compare_vws(&vw, &modern_vw) {
-            tracing::error!(sv_id=%sv_id, e);
-        }
-        Ok(vw)
+        Self::build_for_tenant_version(conn, sv_id, None)
     }
 
     pub fn build_for_tenant_version(
@@ -34,13 +27,19 @@ impl<Type> VaultWrapper<Type> {
         sv_id: &ScopedVaultId,
         version: Option<DataLifetimeSeqno>,
     ) -> ApiResult<TenantVw<Type>> {
-        Self::build_inner(conn, sv_id, version, false)
+        let vw = Self::build_inner(conn, sv_id, version, false)?;
+        // For now, build the modern version of the VW that only shows DLs owned by the tenant
+        // alongside the legacy version. Log when data doesn't match
+        let modern_vw = Self::build_inner(conn, sv_id, version, true)?;
+        if let Err(e) = compare_vws(&vw, &modern_vw) {
+            tracing::error!(sv_id=%sv_id, e);
+        }
+        Ok(vw)
     }
 
     /// New view of a tenant's VW that only includes data owned by this tenant.
     /// This will one day replace build_for_tenant
     pub fn build_owned(conn: &mut PgConn, sv_id: &ScopedVaultId) -> ApiResult<TenantVw<Type>> {
-        // TODO compare the difference between build_for_tenant and build_owned before switching source of truth
         Self::build_inner(conn, sv_id, None, true)
     }
 
@@ -51,7 +50,8 @@ impl<Type> VaultWrapper<Type> {
         only_owned: bool,
     ) -> ApiResult<TenantVw<Type>> {
         let args = match (only_owned, version) {
-            (true, _) => VwArgs::OwnedTenant(sv_id),
+            (true, Some(version)) => VwArgs::OwnedHistorical(sv_id, version),
+            (true, None) => VwArgs::OwnedTenant(sv_id),
             (false, Some(version)) => VwArgs::Historical(sv_id, version),
             (false, None) => VwArgs::Tenant(sv_id),
         };

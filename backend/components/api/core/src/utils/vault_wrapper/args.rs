@@ -24,6 +24,7 @@ pub enum VwArgs<'a> {
     /// Will replace Tenant one day - same as Tenant, but just shows data owned by the current tenant
     /// TODO when we deprecate the other variants, we can simplify some of the DataLifetime fetching code
     OwnedTenant(&'a ScopedVaultId),
+    OwnedHistorical(&'a ScopedVaultId, DataLifetimeSeqno),
     /// Used to build a VW that sees ALL portable data and speculative data.
     /// Allows reconstructing a VaultWrapper from the view of a given tenant at a historical point
     /// in time.
@@ -52,6 +53,10 @@ impl<'a> VwArgs<'a> {
             Self::OwnedTenant(sv_id) => {
                 let uv = Vault::get(conn, sv_id)?;
                 (uv, Some(sv_id.clone()), None, true)
+            }
+            Self::OwnedHistorical(sv_id, seqno) => {
+                let uv = Vault::get(conn, sv_id)?;
+                (uv, Some(sv_id.clone()), Some(seqno), true)
             }
         };
         tracing::info!(
