@@ -1,5 +1,6 @@
 import Postmate from '@onefootprint/postmate';
 
+import { version } from '../../../package.json';
 import type { FormRef, Props } from '../../types/components';
 import { ComponentKind } from '../../types/components';
 import { PrivateEvent } from '../../types/events';
@@ -14,13 +15,13 @@ import {
 import getUniqueId from '../get-unique-id';
 import { getCallbackProps, sanitizeAndValidateProps } from '../prop-utils';
 import sendSdkArgs from '../send-sdk-args';
-import getURL from '../url-utils';
+import getURL, { getWindowUrl } from '../url-utils';
 import type { Iframe, OnDestroy, OnRenderSecondary } from './types';
 
-type Child = Postmate.ParentAPI;
+type ParentApi = Postmate.ParentAPI;
 
 const initIframe = (rawProps: Props): Iframe => {
-  let child: Child | null = null;
+  let parentApi: ParentApi | null = null;
   let isRendered = false;
   let onDestroy: OnDestroy;
   let onRenderSecondary: OnRenderSecondary;
@@ -30,7 +31,7 @@ const initIframe = (rawProps: Props): Iframe => {
   const id = getUniqueId();
 
   const registerCallbackProps = () => {
-    if (!child) {
+    if (!parentApi) {
       throw new Error(
         'Footprint should be initialized in order to listen events',
       );
@@ -38,7 +39,7 @@ const initIframe = (rawProps: Props): Iframe => {
 
     const callbackProps = getCallbackProps(props, onDestroy, onRenderSecondary);
     Object.entries(callbackProps).forEach(([event, callback]) => {
-      child?.on(event, callback);
+      parentApi?.on(event, callback);
     });
   };
 
@@ -63,8 +64,8 @@ const initIframe = (rawProps: Props): Iframe => {
   const setLoading = (container: HTMLElement, isLoading: boolean) => {
     if (!isLoading) {
       removeLoader(id);
-      child?.frame.classList.remove(`footprint-${variant}-loading`);
-      child?.frame.classList.add(`footprint-${variant}-loaded`);
+      parentApi?.frame.classList.remove(`footprint-${variant}-loading`);
+      parentApi?.frame.classList.add(`footprint-${variant}-loaded`);
       return;
     }
 
@@ -77,7 +78,7 @@ const initIframe = (rawProps: Props): Iframe => {
   };
 
   const setUpFormRefs = () => {
-    if (!child) {
+    if (!parentApi) {
       throw new Error(
         'Footprint should be initialized in order to set up refs',
       );
@@ -89,14 +90,14 @@ const initIframe = (rawProps: Props): Iframe => {
 
     const formRef: FormRef = {
       save: () => {
-        if (!child) {
+        if (!parentApi) {
           throw new Error(
             'Footprint should be initialized to call ref methods',
           );
         }
         return new Promise(resolve => {
-          child?.call(PrivateEvent.formSaved);
-          child?.on(PrivateEvent.formSaveComplete, () => {
+          parentApi?.call(PrivateEvent.formSaved);
+          parentApi?.on(PrivateEvent.formSaveComplete, () => {
             resolve();
           });
         });
@@ -128,7 +129,7 @@ const initIframe = (rawProps: Props): Iframe => {
 
     const url = getURL(props, token || '');
     try {
-      child = await new Postmate({
+      parentApi = await new Postmate({
         classListArray: [
           `footprint-${variant}`,
           `footprint-${variant}-loading`,
@@ -138,6 +139,10 @@ const initIframe = (rawProps: Props): Iframe => {
         url,
         allow:
           'otp-credentials; publickey-credentials-get *; camera *; clipboard-write;',
+        model: {
+          sdkVersion: version || '',
+          sdkUrl: getWindowUrl(),
+        },
       });
     } catch (e) {
       console.error('Initializing Footprint iframe failed with error: ', e);
@@ -147,7 +152,7 @@ const initIframe = (rawProps: Props): Iframe => {
 
     setLoading(container, false);
     registerCallbackProps();
-    child?.on(PrivateEvent.started, () => {
+    parentApi?.on(PrivateEvent.started, () => {
       setUpFormRefs();
     });
   };
@@ -159,9 +164,9 @@ const initIframe = (rawProps: Props): Iframe => {
     }
     isRendered = false;
     await removeDOMElements(id);
-    if (child) {
-      child.destroy();
-      child = null;
+    if (parentApi) {
+      parentApi.destroy();
+      parentApi = null;
     }
   };
 

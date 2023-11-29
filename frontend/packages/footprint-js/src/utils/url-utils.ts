@@ -3,6 +3,11 @@ import { ComponentKind } from '../types/components';
 import { getEncodedAppearance } from './appearance-utils';
 import { getDefaultVariantForKind } from './prop-utils';
 
+export const getWindowUrl = (): string =>
+  typeof window !== 'undefined'
+    ? window.location?.href || window.location.toString()
+    : '';
+
 const getURL = (props: Props, token: string) => {
   const { kind } = props;
   if (kind === ComponentKind.Verify) {
