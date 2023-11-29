@@ -728,6 +728,13 @@
             "no": "No"
           }
         },
+        "has-outstanding-workflow-request": {
+          "label": "Info requested",
+          "options": {
+            "yes": "Yes",
+            "no": "No"
+          }
+        },
         "info": {
           "cta": "Don't show again",
           "complete": "{{kind}} in the ’Complete’ state finished the onboarding.",

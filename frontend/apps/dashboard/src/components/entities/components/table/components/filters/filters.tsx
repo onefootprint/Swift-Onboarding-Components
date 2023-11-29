@@ -13,6 +13,11 @@ export enum EntityWatchlistHitStatus {
   notOnWatchlist = 'false',
 }
 
+export enum EntityHasOutstandingWorkflowRequestStatus {
+  yes = 'true',
+  no = 'false',
+}
+
 export enum RequiresManualReviewStatus {
   requiresManualReview = 'true',
   doesNotRequireManualReview = 'false',
@@ -90,6 +95,22 @@ const Filters = () => {
                 },
               ],
               selectedOptions: filters.values.watchlist_hit,
+            },
+            {
+              query: 'has_outstanding_workflow_request',
+              label: t('has-outstanding-workflow-request.label'),
+              kind: 'single-select',
+              options: [
+                {
+                  value: EntityHasOutstandingWorkflowRequestStatus.yes,
+                  label: t('has-outstanding-workflow-request.options.yes'),
+                },
+                {
+                  value: EntityHasOutstandingWorkflowRequestStatus.no,
+                  label: t('has-outstanding-workflow-request.options.no'),
+                },
+              ],
+              selectedOptions: filters.values.has_outstanding_workflow_request,
             },
             {
               query: 'date_range',

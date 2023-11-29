@@ -17,6 +17,8 @@ export type EntitiesQueryParams = {
   page_size?: string;
   // this is a boolean but we need to pass as a string for URL; incompatible w/ index signature otherwise
   requires_manual_review?: string;
+  // this is a boolean but we need to pass as a string for URL; incompatible w/ index signature otherwise
+  has_outstanding_workflow_request?: string;
 };
 
 const defaultQueryParams: EntitiesQueryParams = {
@@ -28,6 +30,7 @@ const defaultQueryParams: EntitiesQueryParams = {
   page_size: undefined,
   watchlist_hit: undefined,
   requires_manual_review: undefined,
+  has_outstanding_workflow_request: undefined,
 };
 
 const useFilters = () => {
@@ -79,6 +82,8 @@ const useFilters = () => {
     pageSize: filters.query.page_size || '15',
     search: filters.query.search,
     watchlist_hit: filters.query.watchlist_hit,
+    has_outstanding_workflow_request:
+      filters.query.has_outstanding_workflow_request,
   };
   const { from, to } = getDateRange(values.dateRange);
   const requestParams = {
@@ -88,6 +93,7 @@ const useFilters = () => {
     timestamp_gte: from,
     timestamp_lte: to,
     watchlist_hit: values.watchlist_hit,
+    has_outstanding_workflow_request: values.has_outstanding_workflow_request,
     ...getStatusAndManualReviewParams(values.state, values.verification),
   };
   const searchParams = getSearchParams({
@@ -98,6 +104,8 @@ const useFilters = () => {
     watchlist_hit: filters.query.watchlist_hit,
     state: filters.query.state,
     verification: filters.query.verification,
+    has_outstanding_workflow_request:
+      filters.query.has_outstanding_workflow_request,
   });
   return {
     ...filters,
