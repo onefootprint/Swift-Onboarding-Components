@@ -15,26 +15,17 @@ import { useEffectOnce } from 'usehooks-ts';
 import useIdentifyVerify from '../../../../hooks/api/hosted/identify/use-identify-verify';
 import useLoginChallenge from '../../../../hooks/api/hosted/identify/use-login-challenge';
 import useSignupChallenge from '../../../../hooks/api/hosted/identify/use-signup-challenge';
+import useUserEmail from '../../../../hooks/api/hosted/user/use-user-email';
 import Logger from '../../../../utils/logger';
 import { useIdentifyMachine } from '../machine-provider';
 import Form from './components/form';
 
-type Obj = Record<string, unknown>;
 type PinVerificationProps = {
   title: string;
   onChallengeSucceed: (authToken: string) => void;
   preferredChallengeKind: ChallengeKind;
   identifier: Identifier;
 };
-
-const hasPhoneNumber = (o: Obj): o is { phoneNumber: string } =>
-  Object.hasOwn(o, 'phoneNumber') || Boolean(o.phoneNumber);
-
-const getPhoneNumber = (
-  identifier: Identifier,
-  phoneNumber?: string,
-): string | undefined =>
-  hasPhoneNumber(identifier) ? identifier.phoneNumber : phoneNumber;
 
 const PinVerification = ({
   title,
@@ -59,16 +50,50 @@ const PinVerification = ({
     loginChallengeMutation.data?.challengeData ||
     signupChallengeMutation.data?.challengeData;
   const identifyVerifyMutation = useIdentifyVerify();
+  const userEmailMutation = useUserEmail();
   const isLoading =
     loginChallengeMutation.isLoading || signupChallengeMutation.isLoading;
   const isPending = isLoading || !challengeData;
-  const isVerifying = identifyVerifyMutation.isLoading;
+  const isVerifying =
+    identifyVerifyMutation.isLoading || userEmailMutation.isLoading;
 
-  const getIsSuccess = (): boolean => {
+  const getIsSuccess = () => {
     if (!identifyVerifyMutation.isSuccess) {
       return false;
     }
-    return userFound || 'email' in identifier || Boolean(email);
+    if (userFound || 'email' in identifier) {
+      return true;
+    }
+    return userEmailMutation.isSuccess;
+  };
+
+  const registerNewUserEmail = (authToken: string) => {
+    if (!email) {
+      Logger.error(
+        'Found empty email while sending registering email for new user',
+        'pin-verification',
+      );
+      return;
+    }
+
+    if (userEmailMutation.isLoading) {
+      return;
+    }
+
+    userEmailMutation.mutate(
+      { data: { email }, authToken },
+      {
+        onError: (error: unknown) => {
+          Logger.error(
+            `Failed email verification request: ${getErrorMessage(error)}`,
+            'pin-verification',
+          );
+        },
+        onSuccess: () => {
+          onChallengeSucceed(authToken);
+        },
+      },
+    );
   };
 
   const handlePinValidationSucceeded = ({
@@ -82,7 +107,15 @@ const PinVerification = ({
       return;
     }
 
-    onChallengeSucceed(authToken);
+    // If user already had a vault, no need to save the email again
+    // If the new user signup challenge was initiated with an email OTP,
+    // the backend will automatically save the email to the vault for us
+    if (userFound || 'email' in identifier) {
+      onChallengeSucceed(authToken);
+      return;
+    }
+
+    registerNewUserEmail(authToken);
   };
 
   const verifyPin = (pin: string) => {
@@ -156,19 +189,14 @@ const PinVerification = ({
       );
       return;
     }
+
     if (signupChallengeMutation.isLoading) {
       return;
     }
 
-    const phoneNumber = getPhoneNumber(
-      identifier,
-      state.context.identify.phoneNumber,
-    );
-
     signupChallengeMutation.mutate(
       {
-        ...((email ? { email } : {}) as { email: string }),
-        ...((phoneNumber ? { phoneNumber } : {}) as { phoneNumber: string }),
+        ...identifier,
         obConfigAuth,
         sandboxId,
       },
