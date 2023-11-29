@@ -27,7 +27,7 @@ describe('<FieldOrPlaceholder />', () => {
   describe('when the data is null', () => {
     it('should render an encrypted data', () => {
       renderFieldOrPlaceholder({ data: null });
-      expect(screen.getByText('•••••••••')).toBeInTheDocument();
+      expect(screen.getByText('•••••••')).toBeInTheDocument();
     });
   });
 
