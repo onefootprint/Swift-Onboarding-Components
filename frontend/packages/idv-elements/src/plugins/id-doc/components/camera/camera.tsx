@@ -100,7 +100,7 @@ const Camera = ({
     videoRef.current.srcObject = mediaStream;
   }
 
-  // We don't detect for 7.5 seconds while we show instruction texts
+  // We don't detect for 3 seconds so the camera has time to focus
   useTimeout(
     () => {
       setShouldDetect(true);
