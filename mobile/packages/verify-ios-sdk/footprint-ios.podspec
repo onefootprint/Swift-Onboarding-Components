@@ -1,15 +1,18 @@
 require "json"
 
+package = JSON.parse(File.read(File.join(__dir__, "package.json")))
+
 Pod::Spec.new do |s|
-  s.name         = "footprint-ios"
-  s.module_name  = "footprint-ios"
-  s.version      = "1.0.0"
-  s.summary      = "Footprint SDK for iOS"
-  s.license      = "MIT"
+  s.name         = package['name']
+  s.module_name  = package['name']
+  s.version      = package['version']
+  s.summary      = package['description']
+  s.license      = package['license']
 
-  s.author       = "Footprint"
-  s.homepage     = "https://onefootprint.com"
+  s.author       = package['author']
+  s.homepage     = package['homepage']
 
+  s.source       = { :git => package['repository']['url'] }
   s.vendored_frameworks = "Frameworks/*"
   s.resource_bundles = {
     package['name'] => ["Resources/*"],

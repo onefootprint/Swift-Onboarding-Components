@@ -7,12 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		048EDE3712F96DBFFA88DECA /* libPods-verify.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 99277543AAF2FFE7E5898323 /* libPods-verify.a */; };
 		0755D4814D1D45F1ADC7533D /* DMSans-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = CF08964EF5E0422BB72A7633 /* DMSans-Medium.otf */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		319DDD310C89D3E9AE9A6F09 /* libPods-verify.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB9B7D1DA2123D296513C42 /* libPods-verify.a */; };
 		3E461D99554A48A4959DE609 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* LaunchScreen.storyboard */; };
+		561A236F2B17AC8B0084167C /* Footprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 561A236E2B17AC8B0084167C /* Footprint.swift */; };
 		5673E5AE2A9E0F54009ED260 /* Bridging-Header.h in Headers */ = {isa = PBXBuildFile; fileRef = 5673E5AD2A9E0F54009ED260 /* Bridging-Header.h */; };
 		56B9554E2B02767C0007FDFA /* FootprintIOS.h in Headers */ = {isa = PBXBuildFile; fileRef = 56B9554D2B02767C0007FDFA /* FootprintIOS.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		56B955512B02767C0007FDFA /* FootprintIOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56B9554B2B02767C0007FDFA /* FootprintIOS.framework */; };
@@ -65,18 +66,18 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = verify/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = verify/main.m; sourceTree = "<group>"; };
 		1B5E3EF874FF4C01A02EEAC2 /* DMSans-Regular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "DMSans-Regular.otf"; path = "../assets/fonts/DMSans-Regular.otf"; sourceTree = "<group>"; };
-		26C85297BFFBBC1FF24E73DD /* Pods-verify.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-verify.release.xcconfig"; path = "Target Support Files/Pods-verify/Pods-verify.release.xcconfig"; sourceTree = "<group>"; };
+		4BB9B7D1DA2123D296513C42 /* libPods-verify.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-verify.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4EB5E2706DEB26C51355C37A /* Pods-verify.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-verify.release.xcconfig"; path = "Target Support Files/Pods-verify/Pods-verify.release.xcconfig"; sourceTree = "<group>"; };
+		561A236E2B17AC8B0084167C /* Footprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Footprint.swift; sourceTree = "<group>"; };
 		5673E5AD2A9E0F54009ED260 /* Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
-		56B9553C2B0275F30007FDFA /* FootprintIosSdk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FootprintIosSdk.h; sourceTree = "<group>"; };
 		56B9554B2B02767C0007FDFA /* FootprintIOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FootprintIOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		56B9554D2B02767C0007FDFA /* FootprintIOS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FootprintIOS.h; sourceTree = "<group>"; };
 		56F0BB5E2A028BF1000405D0 /* myDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = myDebug.entitlements; path = verify/verifyDebug.entitlements; sourceTree = "<group>"; };
 		6F7E7669E54F4BAFA4FD90EE /* noop-file.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = "noop-file.swift"; path = "verify/noop-file.swift"; sourceTree = "<group>"; };
-		99277543AAF2FFE7E5898323 /* libPods-verify.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-verify.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA286B85B6C04FC6940260E9 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = verify/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		AE138FBA64A3BDF4D9E57324 /* Pods-verify.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-verify.debug.xcconfig"; path = "Target Support Files/Pods-verify/Pods-verify.debug.xcconfig"; sourceTree = "<group>"; };
 		CF08964EF5E0422BB72A7633 /* DMSans-Medium.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "DMSans-Medium.otf"; path = "../assets/fonts/DMSans-Medium.otf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		EEA3724F871534D181B8CB1E /* Pods-verify.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-verify.debug.xcconfig"; path = "Target Support Files/Pods-verify/Pods-verify.debug.xcconfig"; sourceTree = "<group>"; };
 		F4DC3E575BC04DCA98CAB985 /* DMSans-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "DMSans-Bold.otf"; path = "../assets/fonts/DMSans-Bold.otf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -86,7 +87,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				56B955512B02767C0007FDFA /* FootprintIOS.framework in Frameworks */,
-				048EDE3712F96DBFFA88DECA /* libPods-verify.a in Frameworks */,
+				319DDD310C89D3E9AE9A6F09 /* libPods-verify.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -120,7 +121,7 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				99277543AAF2FFE7E5898323 /* libPods-verify.a */,
+				4BB9B7D1DA2123D296513C42 /* libPods-verify.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -133,18 +134,11 @@
 			path = Modules;
 			sourceTree = "<group>";
 		};
-		56B9553B2B0275F30007FDFA /* FootprintIosSdk */ = {
-			isa = PBXGroup;
-			children = (
-				56B9553C2B0275F30007FDFA /* FootprintIosSdk.h */,
-			);
-			path = FootprintIosSdk;
-			sourceTree = "<group>";
-		};
 		56B9554C2B02767C0007FDFA /* FootprintIOS */ = {
 			isa = PBXGroup;
 			children = (
 				56B9554D2B02767C0007FDFA /* FootprintIOS.h */,
+				561A236E2B17AC8B0084167C /* Footprint.swift */,
 			);
 			path = FootprintIOS;
 			sourceTree = "<group>";
@@ -162,7 +156,6 @@
 				5673E5A62A9E0EB8009ED260 /* Modules */,
 				13B07FAE1A68108700A75B9A /* verify */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
-				56B9553B2B0275F30007FDFA /* FootprintIosSdk */,
 				56B9554C2B02767C0007FDFA /* FootprintIOS */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
@@ -196,8 +189,8 @@
 		D65327D7A22EEC0BE12398D9 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				EEA3724F871534D181B8CB1E /* Pods-verify.debug.xcconfig */,
-				26C85297BFFBBC1FF24E73DD /* Pods-verify.release.xcconfig */,
+				AE138FBA64A3BDF4D9E57324 /* Pods-verify.debug.xcconfig */,
+				4EB5E2706DEB26C51355C37A /* Pods-verify.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -228,7 +221,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "verify" */;
 			buildPhases = (
-				0E43A532529C88B55B7BE424 /* [CP] Check Pods Manifest.lock */,
+				4AE90D603B5F63F338DF1B6B /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
@@ -237,8 +230,8 @@
 				4BF3F4B5EC074364BDEAEA4E /* Embed App Clips */,
 				266C27EE7F62632F79B1CA6D /* Headers */,
 				56B955422B0275F30007FDFA /* Embed Frameworks */,
-				7D1FF0E09400454FABEA0E66 /* [CP] Embed Pods Frameworks */,
-				2914D7A6BD53FC3279EE6F4C /* [CP] Copy Pods Resources */,
+				038C043C7E03F4296C1688C3 /* [CP] Embed Pods Frameworks */,
+				9F29093AB5B37870C606B79D /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -284,6 +277,7 @@
 					56B9554A2B02767C0007FDFA = {
 						CreatedOnToolsVersion = 15.0.1;
 						DevelopmentTeam = 5F264K8AG4;
+						LastSwiftMigration = 1500;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -344,7 +338,29 @@
 			shellPath = /bin/sh;
 			shellScript = "if [[ -f \"$PODS_ROOT/../.xcode.env\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env\"\nfi\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n# The project root by default is one level up from the ios directory\nexport PROJECT_ROOT=\"$PROJECT_DIR\"/..\n\nif [[ \"$CONFIGURATION\" = *Debug* ]]; then\n  export SKIP_BUNDLING=1\nfi\nif [[ -z \"$ENTRY_FILE\" ]]; then\n  # Set the entry JS file using the bundler's entry resolution.\n  export ENTRY_FILE=\"$(\"$NODE_BINARY\" -e \"require('expo/scripts/resolveAppEntry')\" $PROJECT_ROOT ios relative | tail -n 1)\"\nfi\n\n`\"$NODE_BINARY\" --print \"require('path').dirname(require.resolve('react-native/package.json')) + '/scripts/react-native-xcode.sh'\"`\n\n";
 		};
-		0E43A532529C88B55B7BE424 /* [CP] Check Pods Manifest.lock */ = {
+		038C043C7E03F4296C1688C3 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-verify/Pods-verify-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/Flipper-DoubleConversion/double-conversion.framework/double-conversion",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/Flipper-Glog/glog.framework/glog",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/OpenSSL-Universal/OpenSSL.framework/OpenSSL",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/double-conversion.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/glog.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OpenSSL.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-verify/Pods-verify-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4AE90D603B5F63F338DF1B6B /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -366,7 +382,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		2914D7A6BD53FC3279EE6F4C /* [CP] Copy Pods Resources */ = {
+		9F29093AB5B37870C606B79D /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -382,28 +398,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-verify/Pods-verify-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		7D1FF0E09400454FABEA0E66 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-verify/Pods-verify-frameworks.sh",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/Flipper-DoubleConversion/double-conversion.framework/double-conversion",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/Flipper-Glog/glog.framework/glog",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/OpenSSL-Universal/OpenSSL.framework/OpenSSL",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/double-conversion.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/glog.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OpenSSL.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-verify/Pods-verify-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -442,6 +436,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				561A236F2B17AC8B0084167C /* Footprint.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -458,8 +453,9 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = EEA3724F871534D181B8CB1E /* Pods-verify.debug.xcconfig */;
+			baseConfigurationReference = AE138FBA64A3BDF4D9E57324 /* Pods-verify.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = verify/verifyDebug.entitlements;
@@ -499,8 +495,9 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 26C85297BFFBBC1FF24E73DD /* Pods-verify.release.xcconfig */;
+			baseConfigurationReference = 4EB5E2706DEB26C51355C37A /* Pods-verify.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = verify/verify.entitlements;
@@ -539,6 +536,7 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
@@ -590,6 +588,7 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
