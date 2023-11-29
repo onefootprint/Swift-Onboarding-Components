@@ -7,7 +7,7 @@ import type {
   Spacing,
 } from '@onefootprint/design-tokens';
 import React from 'react';
-import type { ViewStyle } from 'react-native';
+import type { ViewProps } from 'react-native';
 import { View } from 'react-native';
 import styled, { css } from 'styled-components/native';
 
@@ -18,9 +18,10 @@ const Box = ({ children, ...props }: BoxProps) => {
   return <Container {...props}>{children}</Container>;
 };
 
-const Container = styled(({ style, ...props }: { style: ViewStyle }) => (
-  <View style={style} {...props} />
-))<BoxProps>`
+const Container = styled((props: ViewProps) => {
+  const { style, ...allProps } = props;
+  return <View {...allProps} style={style} />;
+})<BoxProps>`
   ${({ theme, ...props }) =>
     css`
       ${props.center && 'justify-content: center; align-items: center;'}
