@@ -18,6 +18,9 @@ pub use sandbox_id::*;
 mod ignore_luhn_validation;
 pub use ignore_luhn_validation::*;
 
+mod external_id;
+pub use external_id::*;
+
 use crate::{
     errors::{ApiError, ApiResult},
     ApiErrorKind,

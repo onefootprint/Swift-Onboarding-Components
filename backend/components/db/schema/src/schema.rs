@@ -721,6 +721,7 @@ table! {
         last_heartbeat_at -> Timestamptz,
         show_in_search -> Bool,
         snapshot_seqno -> Int8,
+        external_id -> Nullable<Text>,
     }
 }
 

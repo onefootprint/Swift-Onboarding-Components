@@ -43,7 +43,7 @@ pub enum TenantError {
     InvalidDecryptDownloadExpiry,
     #[error("Missing required data options: {0} for cip: {1}")]
     MissingCdosForCip(Csv<CollectedDataOption>, CipKind),
-    #[error("Cannot provide an HTTP body alongside an idempotency ID - behavior would be undefined if the user already exists.")]
+    #[error("Cannot provide an HTTP body alongside an idempotency or external ID - behavior would be undefined if the user already exists.")]
     CannotProvideBodyAndIdempotencyId,
     #[error("You are not configured to create production {0} playbooks. Feel free to continue in sandbox, or contact us to enable this feature.")]
     CannotCreateProdPlaybook(ObConfigurationKind),

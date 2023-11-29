@@ -49,6 +49,7 @@ async fn get(
             statuses,
             playbook_id: playbook_id.clone(),
             has_outstanding_workflow_request: None,
+            external_id: None,
         }
     };
 

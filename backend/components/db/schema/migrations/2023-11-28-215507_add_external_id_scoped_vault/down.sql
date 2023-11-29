@@ -1,0 +1,1 @@
+ALTER TABLE scoped_vault DROP COLUMN external_id;

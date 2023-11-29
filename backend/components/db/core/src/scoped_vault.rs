@@ -7,6 +7,7 @@ use db_schema::schema;
 use diesel::dsl::not;
 use diesel::prelude::*;
 use itertools::Itertools;
+use newtypes::ExternalId;
 use newtypes::ObConfigurationId;
 use newtypes::OnboardingStatus;
 use newtypes::OnboardingStatusFilter;
@@ -35,6 +36,7 @@ pub struct ScopedVaultListQueryParams<TSearch = SearchQuery> {
     pub is_created_via_api: Option<bool>,
     pub playbook_id: Option<ObConfigurationId>,
     pub has_outstanding_workflow_request: Option<bool>,
+    pub external_id: Option<ExternalId>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -67,6 +69,7 @@ impl ScopedVaultListQueryParams {
             is_created_via_api,
             playbook_id,
             has_outstanding_workflow_request,
+            external_id,
         } = self;
 
         let matching_vaults = if let Some(search) = search {
@@ -91,6 +94,7 @@ impl ScopedVaultListQueryParams {
             is_created_via_api,
             playbook_id,
             has_outstanding_workflow_request,
+            external_id,
         };
         Ok(result)
     }
@@ -231,6 +235,11 @@ macro_rules! list_query {
         if let Some(vault_ids) = $params.search.as_ref() {
             query = query.filter(vault::id.eq_any(vault_ids))
         }
+
+        if let Some(external_id) = $params.external_id.as_ref() {
+            query = query.filter(scoped_vault::external_id.eq(external_id))
+        }
+
         query
     }};
 }

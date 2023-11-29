@@ -20,7 +20,7 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    DataLifetimeSeqno, DbActor, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingStatus,
+    DataLifetimeSeqno, DbActor, ExternalId, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingStatus,
     ScopedVaultId, TenantId, VaultCreatedInfo, VaultId, VaultKind, WorkflowId,
 };
 
@@ -53,6 +53,8 @@ pub struct ScopedVault {
     /// The seqno at which the SV was created or refreshed.
     /// Data _before_ this seqno and tenat-scoped data _after_ this seqno are used to contruct the VW
     pub snapshot_seqno: DataLifetimeSeqno,
+    /// An optional external (customer-specified) identifier for the scoped vault
+    pub external_id: Option<ExternalId>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -68,6 +70,7 @@ struct NewScopedVault {
     last_heartbeat_at: DateTime<Utc>,
     show_in_search: bool,
     snapshot_seqno: DataLifetimeSeqno,
+    external_id: Option<ExternalId>,
 }
 
 #[derive(Debug, Clone, Default, AsChangeset)]
@@ -181,6 +184,9 @@ impl ScopedVault {
             last_heartbeat_at: Utc::now(),
             show_in_search: true,
             snapshot_seqno: seqno,
+            // NOTE: for now we won't support adding an external id to
+            // users created via Verify
+            external_id: None,
         };
         let sv = diesel::insert_into(scoped_vault::table)
             .values(new)
@@ -195,11 +201,16 @@ impl ScopedVault {
         new_user: NewVaultArgs,
         tenant_id: TenantId,
         idempotency_id: Option<String>,
+        external_id: Option<ExternalId>,
         actor: DbActor,
     ) -> DbResult<(Self, Vault)> {
         // Since the idempotency id is stored on the vault, concatenate it with the tenant ID to
         // make sure they are scoped per tenant
-        let idempotency_id = idempotency_id.map(|id| IdempotencyId::from(format!("{}.{}", tenant_id, id)));
+        // if there is no idempotency id provided, but an external id is provided use that instead
+        let idempotency_id = idempotency_id
+            .or(external_id.as_ref().map(|e| e.to_string()))
+            .map(|id| IdempotencyId::from(format!("{}.{}", tenant_id, id)));
+
         let (uv, is_new_vault) = Vault::insert(conn, new_user, idempotency_id)?;
         if !uv.is_created_via_api {
             return Err(DbError::CannotCreatedScopedUser);
@@ -218,6 +229,7 @@ impl ScopedVault {
                 last_heartbeat_at: Utc::now(),
                 show_in_search: true,
                 snapshot_seqno: seqno,
+                external_id,
             };
             let sv: ScopedVault = diesel::insert_into(scoped_vault::table)
                 .values(new)

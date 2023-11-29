@@ -24,4 +24,6 @@ pub struct ListEntitiesRequest {
 #[serde(rename_all = "snake_case")]
 pub struct SearchUsersRequest {
     pub search: Option<PiiString>,
+    /// filter users by an external id
+    pub external_id: Option<ExternalId>,
 }

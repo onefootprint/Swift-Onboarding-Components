@@ -3,7 +3,8 @@ use std::collections::HashMap;
 use crate::{InsightEvent, WatchlistCheck};
 use chrono::{DateTime, Utc};
 use newtypes::{
-    DataIdentifier, DataLifetimeSource, FilterFunction, FpId, PiiString, SandboxId, TenantId, VaultKind,
+    DataIdentifier, DataLifetimeSource, ExternalId, FilterFunction, FpId, PiiString, SandboxId, TenantId,
+    VaultKind,
 };
 use paperclip::actix::Apiv2Schema;
 
@@ -40,6 +41,7 @@ pub struct Entity {
     pub requires_manual_review: bool,
     pub is_created_via_api: bool,
     pub has_outstanding_workflow_request: bool,
+    pub external_id: Option<ExternalId>,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

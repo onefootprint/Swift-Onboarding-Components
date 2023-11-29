@@ -26,7 +26,7 @@ pub async fn get(
 ) -> CursorPaginatedResponse<Vec<api_wire_types::LiteUser>, i64> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
-    let SearchUsersRequest { search } = request.into_inner();
+    let SearchUsersRequest { search, external_id } = request.into_inner();
 
     let (search, fp_id) = parse_search(&state, search, &tenant.id).await?;
     let params = ScopedVaultListQueryParams {
@@ -36,6 +36,7 @@ pub async fn get(
         fp_id,
         kind: Some(VaultKind::Person),
         only_visible: true,
+        external_id,
         ..ScopedVaultListQueryParams::default()
     };
     let cursor = pagination.cursor;

@@ -101,6 +101,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             fp_id,
             start_timestamp,
             ordering_id,
+            external_id,
             ..
         } = sv;
 
@@ -138,6 +139,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             attributes,
             decrypted_attributes,
             decryptable_attributes,
+            external_id,
         }
     }
 }

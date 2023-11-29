@@ -237,3 +237,8 @@ define_newtype_id!(
 );
 define_newtype_id!(RuleSetResultId, String, "Identifier for a RuleSetResult");
 define_newtype_id!(RuleResultId, String, "Identifier for a RuleResult");
+define_newtype_id!(
+    ExternalId,
+    String,
+    "Identifier for a external vault ID referencing footprint ID"
+);

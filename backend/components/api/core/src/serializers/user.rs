@@ -3,12 +3,15 @@ use db::models::{manual_review::ManualReview, scoped_vault::ScopedVault, vault::
 
 impl DbToApi<(ScopedVault, Vault)> for api_wire_types::LiteUser {
     fn from_db((sv, vault): (ScopedVault, Vault)) -> Self {
-        let ScopedVault { fp_id, .. } = sv;
+        let ScopedVault {
+            fp_id, external_id, ..
+        } = sv;
         let Vault { sandbox_id, .. } = vault;
 
         Self {
             id: fp_id,
             sandbox_id,
+            external_id,
         }
     }
 }
@@ -19,6 +22,7 @@ impl DbToApi<(ScopedVault, Vec<ManualReview>)> for api_wire_types::User {
             id: sv.fp_id,
             status: sv.status,
             requires_manual_review: !manual_reviews.is_empty(),
+            external_id: sv.external_id,
         }
     }
 }

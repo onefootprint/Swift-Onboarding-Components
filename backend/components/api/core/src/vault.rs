@@ -7,6 +7,7 @@ use crate::telemetry::RootSpan;
 use crate::types::ResponseData;
 use crate::utils::actix::OptionalJson;
 use crate::utils::db2api::DbToApi;
+use crate::utils::headers::ExternalId;
 use crate::utils::headers::IdempotencyId;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::vault_wrapper::Any;
@@ -27,12 +28,14 @@ use newtypes::ValidateArgs;
 use newtypes::VaultKind;
 use paperclip::actix::web;
 
+#[allow(clippy::too_many_arguments)]
 pub async fn create_non_portable_vault(
     state: web::Data<State>,
     request: OptionalJson<RawDataRequest>,
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
     idempotency_id: IdempotencyId,
+    external_id: ExternalId,
     vault_kind: VaultKind,
     root_span: RootSpan,
 ) -> ApiResult<ResponseData<api_wire_types::LiteUser>> {
@@ -71,7 +74,7 @@ pub async fn create_non_portable_vault(
         None
     };
 
-    if idempotency_id.is_some() && request_info.is_some() {
+    if (external_id.is_some() || idempotency_id.is_some()) && request_info.is_some() {
         return Err(TenantError::CannotProvideBodyAndIdempotencyId.into());
     }
 
@@ -80,10 +83,17 @@ pub async fn create_non_portable_vault(
     let (scoped_user, vault) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let i_id = idempotency_id.0;
+            let idempotency_id = idempotency_id.0;
+            let external_id = external_id.0;
             let db_actor = actor.clone().into();
-            let (su, vault) =
-                ScopedVault::get_or_create_non_portable(conn, new_user, tenant_id, i_id, db_actor)?;
+            let (su, vault) = ScopedVault::get_or_create_non_portable(
+                conn,
+                new_user,
+                tenant_id,
+                idempotency_id,
+                external_id,
+                db_actor,
+            )?;
 
             if let Some((targets, request)) = request_info {
                 // If any initial request data was provided, add it to the vault

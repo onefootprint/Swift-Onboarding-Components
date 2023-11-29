@@ -58,6 +58,10 @@ class IdempotencyId(BaseAuth):
     HEADER_NAME = "x-idempotency-id"
 
 
+class ExternalId(BaseAuth):
+    HEADER_NAME = "x-external-id"
+
+
 class SandboxId(BaseAuth):
     HEADER_NAME = "x-sandbox-id"
 

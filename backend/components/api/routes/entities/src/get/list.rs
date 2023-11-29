@@ -81,6 +81,7 @@ pub async fn get(
         is_created_via_api,
         playbook_id: None,
         has_outstanding_workflow_request,
+        external_id: None,
     };
     let (scoped_vaults, mut entities, vws, count) = state
         .db_pool

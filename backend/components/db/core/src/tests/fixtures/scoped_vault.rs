@@ -18,5 +18,6 @@ pub fn create_non_portable(
     args: NewVaultArgs,
     tenant_id: &TenantId,
 ) -> (ScopedVault, Vault) {
-    ScopedVault::get_or_create_non_portable(conn, args, tenant_id.clone(), None, DbActor::Footprint).unwrap()
+    ScopedVault::get_or_create_non_portable(conn, args, tenant_id.clone(), None, None, DbActor::Footprint)
+        .unwrap()
 }
