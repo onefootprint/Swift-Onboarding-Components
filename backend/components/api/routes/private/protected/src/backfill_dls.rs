@@ -15,6 +15,7 @@ use serde::Deserialize;
 pub struct BackfillDlsRequest {
     is_live: bool,
     vault_ids: Option<Vec<VaultId>>,
+    skip_vault_ids: Option<Vec<VaultId>>,
     dry_run: bool,
     limit: usize,
 }
@@ -28,9 +29,12 @@ pub async fn post(
     let BackfillDlsRequest {
         is_live,
         vault_ids,
+        skip_vault_ids,
         dry_run,
         limit,
     } = request.into_inner();
-    let result = m112223_backfill_portable_data::run(&state, vault_ids, is_live, dry_run, limit).await?;
+    let result =
+        m112223_backfill_portable_data::run(&state, vault_ids, skip_vault_ids, is_live, dry_run, limit)
+            .await?;
     ResponseData::ok(result.into_iter().collect()).json()
 }

@@ -28,6 +28,7 @@ use std::collections::{HashMap, HashSet};
 pub async fn run(
     state: &State,
     vault_ids: Option<Vec<VaultId>>,
+    skip_vault_ids: Option<Vec<VaultId>>,
     is_live: bool,
     dry_run: bool,
     limit: usize,
@@ -51,6 +52,9 @@ pub async fn run(
                 .into_boxed();
             if let Some(vault_ids) = vault_ids {
                 query = query.filter(scoped_vault::vault_id.eq_any(vault_ids))
+            }
+            if let Some(skip_vault_ids) = skip_vault_ids {
+                query = query.filter(not(scoped_vault::vault_id.eq_any(skip_vault_ids)))
             }
             let vault_ids: Vec<VaultId> = query.get_results(conn).map_err(DbError::from)?;
             Ok(vault_ids)

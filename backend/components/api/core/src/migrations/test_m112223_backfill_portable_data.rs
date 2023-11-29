@@ -33,7 +33,7 @@ async fn test_backfill(state: &mut State) {
         .await
         .unwrap();
 
-    let result = run(state, None, true, false, 1).await;
+    let result = run(state, None, None, true, false, 1).await;
     if let Err(e) = &result {
         println!("{}", e);
     }
