@@ -1,6 +1,6 @@
 use idv::incode::doc::response::FetchOCRResponse;
 use itertools::Itertools;
-use newtypes::{PiiString, ScrubbedPiiString, IdentityDataKind};
+use newtypes::{PiiString, ScrubbedPiiString, IdentityDataKind, FootprintReasonCode};
 use regex::Regex;
 use levenshtein::levenshtein;
 
@@ -383,6 +383,54 @@ fn pii_strings_match(p1: &PiiString, p2: &PiiString) -> bool {
 
 fn normalize_pii(p: &PiiString) -> PiiString {
     p.leak().trim().to_lowercase().into()
+}
+
+pub enum IncodeMatchField {
+    FirstName,
+    LastName,
+    Name,
+    Address,
+    Dob
+}
+pub fn reason_codes_from_match_field(field: IncodeMatchField, matches: Option<bool>) -> Vec<FootprintReasonCode> {
+    match (field, matches) {
+        (IncodeMatchField::FirstName, None) => vec![],
+        (IncodeMatchField::FirstName, Some(m)) => if m {
+            vec![FootprintReasonCode::DocumentOcrFirstNameMatches]
+        } else {
+            vec![FootprintReasonCode::DocumentOcrFirstNameDoesNotMatch]
+        },
+        (IncodeMatchField::LastName, None) => vec![],
+        (IncodeMatchField::LastName, Some(m)) => if m {
+            vec![FootprintReasonCode::DocumentOcrLastNameMatches]
+        } else {
+            vec![FootprintReasonCode::DocumentOcrLastNameDoesNotMatch]
+        },
+        (IncodeMatchField::Name, None) => {
+            vec![FootprintReasonCode::DocumentOcrNameDoesNotMatch, FootprintReasonCode::DocumentOcrNameCouldNotMatch]
+        },
+        (IncodeMatchField::Name, Some(m)) => if m {
+            vec![FootprintReasonCode::DocumentOcrNameMatches]
+        } else {
+            vec![FootprintReasonCode::DocumentOcrNameDoesNotMatch]
+        },
+        (IncodeMatchField::Address, None) => {
+            vec![FootprintReasonCode::DocumentOcrAddressDoesNotMatch, FootprintReasonCode::DocumentOcrAddressCouldNotMatch]
+        },
+        (IncodeMatchField::Address, Some(m)) => if m {
+            vec![FootprintReasonCode::DocumentOcrAddressMatches]
+        } else {
+            vec![FootprintReasonCode::DocumentOcrAddressDoesNotMatch]
+        },
+        (IncodeMatchField::Dob, None) => {
+            vec![FootprintReasonCode::DocumentOcrDobDoesNotMatch, FootprintReasonCode::DocumentOcrDobCouldNotMatch]
+        },
+        (IncodeMatchField::Dob, Some(m)) => if m {
+            vec![FootprintReasonCode::DocumentOcrDobMatches]
+        } else {
+            vec![FootprintReasonCode::DocumentOcrDobDoesNotMatch]
+        },
+    }
 }
 
 

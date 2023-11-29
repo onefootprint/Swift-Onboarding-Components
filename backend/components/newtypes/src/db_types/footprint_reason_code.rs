@@ -840,6 +840,10 @@ footprint_reason_code_enum! {
         #[note = "Document name does not match input", severity = SignalSeverity::Medium,  description = "The document name does not match the name that was input."]
         DocumentOcrNameDoesNotMatch,
 
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::CouldNotMatch)]
+        #[note = "Document name could not be matched to input", severity = SignalSeverity::Medium,  description = "The document name could not be matched to input. This is likely because we did not receive a confident OCR result."]
+        DocumentOcrNameCouldNotMatch,
+
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
         #[note = "Document name matches input", severity = SignalSeverity::Info,  description = "The document name matches the name that was input."]
         DocumentOcrNameMatches,
@@ -847,6 +851,10 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
         #[note = "Document address does not match input", severity = SignalSeverity::Low,  description = "The document address does not match the address that was input."]
         DocumentOcrAddressDoesNotMatch,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::CouldNotMatch)]
+        #[note = "Document address could not be matched to input", severity = SignalSeverity::Medium,  description = "The document address could not be matched to input. This is likely because we did not receive a confident OCR result"]
+        DocumentOcrAddressCouldNotMatch,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
         #[note = "Document address matches input", severity = SignalSeverity::Info,  description = "The document address matches the address that was input."]
@@ -871,6 +879,10 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
         #[note = "Document DOB does not match input", severity = SignalSeverity::Medium,  description = "The document DOB does not match the DOB that was input."]
         DocumentOcrDobDoesNotMatch,
+
+        #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::CouldNotMatch)]
+        #[note = "Document DOB could not be matched to input", severity = SignalSeverity::Medium,  description = "The document DOB could not be matched to input. This is likely because we did not receive a confident OCR result"]
+        DocumentOcrDobCouldNotMatch,
 
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = Some(MatchLevel::Exact)]
         #[note = "Document DOB matches input", severity = SignalSeverity::Info,  description = "The document DOB matches the DOB that was input."]
