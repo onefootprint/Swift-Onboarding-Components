@@ -5,6 +5,7 @@ import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import type { BusinessResponse, ObConfigAuth } from '@onefootprint/types';
 import { media, Shimmer } from '@onefootprint/ui';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 
@@ -16,6 +17,8 @@ const Init = () => {
   const { obConfigAuth, authToken } = state.context;
   const showRequestError = useRequestErrorToast();
   const observeCollector = useObserveCollector();
+  const { DoNotRecordTenantOrgIdOnLogRocket } = useFlags();
+  const orgIds = new Set<string>(DoNotRecordTenantOrgIdOnLogRocket);
 
   useParseUrl({
     onSuccess: (
@@ -72,12 +75,15 @@ const Init = () => {
         observeCollector.setAppContext({
           config: onboardingConfig,
         });
-        const { orgName, orgId, key } = onboardingConfig;
-        Logger.identify({
-          orgName,
-          orgId,
-          publicKey: key,
-        });
+        const { orgName, orgId, key, isLive } = onboardingConfig;
+        if (isLive && !orgIds.has(orgId)) {
+          Logger.setupLogRocket('hosted');
+          Logger.identify({
+            orgName,
+            orgId,
+            publicKey: key,
+          });
+        }
 
         send({
           type: 'initContextUpdated',

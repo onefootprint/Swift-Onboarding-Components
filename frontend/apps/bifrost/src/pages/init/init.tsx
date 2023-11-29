@@ -12,6 +12,7 @@ import type {
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 
@@ -22,9 +23,28 @@ const Init = () => {
   const { authToken: authTokenContext, publicKey: publicKeyContext } =
     state.context;
   const observeCollector = useObserveCollector();
+  const { DoNotRecordTenantOrgIdOnLogRocket } = useFlags();
+  const orgIds = new Set<string>(DoNotRecordTenantOrgIdOnLogRocket);
   const obConfigAuth = publicKeyContext
     ? { [CLIENT_PUBLIC_KEY_HEADER]: publicKeyContext }
     : undefined;
+
+  const setupLogger = (config: PublicOnboardingConfig) => {
+    const isInIframe = checkIsInIframe();
+    observeCollector.setAppContext({
+      config,
+    });
+    const { orgName, orgId, key, isLive } = config;
+    if (isLive && !orgIds.has(orgId)) {
+      Logger.setupLogRocket('bifrost');
+      Logger.identify({
+        orgName,
+        orgId,
+        publicKey: key,
+        iframe: !!isInIframe,
+      });
+    }
+  };
 
   // TODO: delete this when all customers migrate to footprint-js v 3.8+
   // When fetching the sdkArgs from API, we will also get back the onboarding config
@@ -32,17 +52,7 @@ const Init = () => {
     { obConfigAuth, authToken: authTokenContext },
     {
       onSuccess: (config: PublicOnboardingConfig) => {
-        const isInIframe = checkIsInIframe();
-        const { orgName, orgId, key } = config;
-        Logger.identify({
-          orgName,
-          orgId,
-          publicKey: key,
-          iframe: !!isInIframe,
-        });
-        observeCollector.setAppContext({
-          config,
-        });
+        setupLogger(config);
 
         send({
           type: 'initContextUpdated',

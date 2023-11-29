@@ -6,8 +6,10 @@ import * as LogRocket from 'logrocket';
 import * as setupLogRocketReact from 'logrocket-react';
 import UAParser from 'ua-parser-js';
 
+const IS_TEST = typeof jest !== 'undefined';
 const BASE_URL_DOMAIN = 'onefootprint.com';
 const LOG_ROCKET_ORG_ID = 'lrswdg/footprint-bifrost-prod';
+const IS_CONSOLE_ENABLED = IS_BROWSER && !IS_TEST;
 
 const IS_LOGGING_ENABLED =
   IS_BROWSER && IS_PROD && process.env.NEXT_PUBLIC_VERCEL_ENV === 'production';
@@ -142,32 +144,39 @@ const configureSentry = () => {
       release: COMMIT_SHA,
       environment: VERCEL_ENV,
       beforeSend(rawEvent) {
-        if (!IS_PROD) {
+        if (!IS_LOGGING_ENABLED) {
           return rawEvent;
         }
         const event = { ...rawEvent };
-        const logRocketSession = LogRocket.sessionURL;
-        if (logRocketSession !== null) {
-          if (!event.extra) {
-            event.extra = {};
-          }
-          event.extra.LogRocket = logRocketSession;
-          return event;
+        if (!event.extra) {
+          event.extra = {};
         }
+        const logRocketSession = LogRocket.sessionURL;
+        if (logRocketSession) {
+          event.extra.LogRocket = logRocketSession;
+        }
+        event.extra.sessionId = getSessionId();
         return event;
       },
     });
   }
 };
 
-const setup = (appName: string) => {
+const setupLogRocket = (appName: string) => {
+  if (!IS_LOGGING_ENABLED) {
+    return;
+  }
+
+  configureLogRocket(appName);
+  registerErrorHandlers();
+};
+
+const setupSentry = () => {
   if (!IS_LOGGING_ENABLED) {
     return;
   }
 
   configureSentry();
-  configureLogRocket(appName);
-  registerErrorHandlers();
 };
 
 const info = (...args: unknown[]) => {
@@ -177,7 +186,9 @@ const info = (...args: unknown[]) => {
 };
 
 const warn = (message: string, location?: string) => {
-  console.warn(message);
+  if (IS_CONSOLE_ENABLED) {
+    console.warn(message);
+  }
 
   if (IS_LOGGING_ENABLED) {
     LogRocket.warn(message, location);
@@ -185,7 +196,9 @@ const warn = (message: string, location?: string) => {
 };
 
 const error = (message: string, location?: string) => {
-  console.error(message);
+  if (IS_CONSOLE_ENABLED) {
+    console.error(message);
+  }
 
   if (IS_LOGGING_ENABLED) {
     LogRocket.error(message, location);
@@ -193,18 +206,17 @@ const error = (message: string, location?: string) => {
 };
 
 const track = (eventName: string, customData: PrimitiveData) => {
-  if (!IS_LOGGING_ENABLED) {
-    return;
+  if (IS_LOGGING_ENABLED) {
+    LogRocket.track(`track-${eventName}`, customData);
   }
-
-  LogRocket.track(`track-${eventName}`, customData);
 };
 
 const Logger = {
   error,
   warn,
   info,
-  setup,
+  setupSentry,
+  setupLogRocket,
   identify,
   track,
 };

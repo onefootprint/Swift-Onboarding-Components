@@ -8,8 +8,12 @@ import {
   useUpdateD2PStatus,
 } from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
-import type { GetD2PResponse } from '@onefootprint/types';
+import type {
+  GetD2PResponse,
+  PublicOnboardingConfig,
+} from '@onefootprint/types';
 import { D2PStatus, D2PStatusUpdate } from '@onefootprint/types';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 
@@ -18,6 +22,8 @@ const Init = () => {
   const { authToken = '' } = state.context;
   const updateD2PStatusMutation = useUpdateD2PStatus();
   const observeCollector = useObserveCollector();
+  const { DoNotRecordTenantOrgIdOnLogRocket } = useFlags();
+  const orgIds = new Set<string>(DoNotRecordTenantOrgIdOnLogRocket);
 
   useParseHandoffUrl({
     onSuccess: (authTokenFromUrl: string) => {
@@ -128,20 +134,28 @@ const Init = () => {
     },
   });
 
+  const setupLogger = (config: PublicOnboardingConfig) => {
+    observeCollector.setAppContext({
+      config,
+    });
+    const { orgName, orgId, key, isLive } = config;
+    if (isLive && !orgIds.has(orgId)) {
+      Logger.setupLogRocket('handoff');
+      Logger.identify({
+        orgName,
+        orgId,
+        publicKey: key,
+      });
+    }
+  };
+
   useGetOnboardingStatus({
     enabled: !state.done,
     authToken,
     options: {
       onSuccess: ({ obConfiguration }) => {
-        observeCollector.setAppContext({
-          config: obConfiguration,
-        });
-        const { orgName, orgId, key } = obConfiguration;
-        Logger.identify({
-          orgName,
-          orgId,
-          publicKey: key,
-        });
+        setupLogger(obConfiguration);
+
         if (!state.done) {
           send({
             type: 'initContextUpdated',
