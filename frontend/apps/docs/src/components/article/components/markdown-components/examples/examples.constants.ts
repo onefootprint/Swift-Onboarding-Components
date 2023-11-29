@@ -43,6 +43,15 @@ const vanilla: Option = {
         width: 76,
       },
     },
+    {
+      name: 'Ruby on Rails + JS',
+      href: 'https://github.com/onefootprint/examples/tree/master/idv/frontend-rails',
+      img: {
+        src: '/examples/ruby.png',
+        height: 32,
+        width: 32,
+      },
+    },
   ],
 };
 
