@@ -14,7 +14,7 @@ vendor_reason_code_enum! {
         Sanction,
 
         #[ser = "warning", description = ""]
-        #[footprint_reason_code = Some(FootprintReasonCode::WatchlistHitNonSdn)]
+        #[footprint_reason_code = Some(FootprintReasonCode::WatchlistHitWarning)]
         Warning,
 
         #[ser = "fitness-probity", description = ""]
@@ -299,6 +299,7 @@ mod test {
     #[test_case("pep" => (Some(IncodeWatchlistType::Pep), Some(FootprintReasonCode::WatchlistHitPep)))]
     #[test_case("pep-class-2" => (Some(IncodeWatchlistType::PepClass2), Some(FootprintReasonCode::WatchlistHitPep)))]
     #[test_case("sanction" => (Some(IncodeWatchlistType::Sanction), Some(FootprintReasonCode::WatchlistHitOfac)))]
+    #[test_case("warning" => (Some(IncodeWatchlistType::Warning), Some(FootprintReasonCode::WatchlistHitWarning)))]
     #[test_case("adverse-media-fraud" => (Some(IncodeWatchlistType::AdverseMediaFraud), Some(FootprintReasonCode::AdverseMediaHit)))]
     #[test_case("adverse-media-v2-terrorism" => (Some(IncodeWatchlistType::AdverseMediaV2Terrorism), Some(FootprintReasonCode::AdverseMediaHit)))]
     #[test_case("yo" => (None, None))]

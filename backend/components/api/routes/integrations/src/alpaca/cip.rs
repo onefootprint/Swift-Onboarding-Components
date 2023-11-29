@@ -498,7 +498,7 @@ fn watchlist(
 
     let monitored_lists: bool = risk_signals
         .iter()
-        .any(|rs: &RiskSignal| rs.reason_code == FootprintReasonCode::WatchlistHitNonSdn);
+        .any(|rs: &RiskSignal| rs.reason_code == FootprintReasonCode::WatchlistHitWarning);
     let monitored_lists_result = CipResult::clear(!monitored_lists);
 
     let adverse_media: bool = risk_signals

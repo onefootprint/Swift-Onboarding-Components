@@ -429,6 +429,7 @@ pub fn get_review_reasons_inner(
     let wl_hit = [
         FootprintReasonCode::WatchlistHitOfac,
         FootprintReasonCode::WatchlistHitNonSdn,
+        FootprintReasonCode::WatchlistHitWarning,
         FootprintReasonCode::WatchlistHitPep,
     ]
     .iter()

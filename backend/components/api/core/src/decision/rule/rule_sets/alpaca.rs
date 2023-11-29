@@ -88,6 +88,7 @@ pub fn stepup_on_watchlist_hit_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
                 f.iter().any(|rc| {
                     [
                         FootprintReasonCode::WatchlistHitOfac,
+                        FootprintReasonCode::WatchlistHitWarning,
                         FootprintReasonCode::WatchlistHitNonSdn,
                         FootprintReasonCode::WatchlistHitPep,
                         FootprintReasonCode::AdverseMediaHit,
