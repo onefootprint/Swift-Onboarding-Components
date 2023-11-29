@@ -14,7 +14,7 @@ use newtypes::PiiString;
 use newtypes::VaultId;
 use newtypes::VaultKind;
 use newtypes::WatchlistCheckStatusKind;
-use newtypes::{Fingerprint, FpId, TenantId};
+use newtypes::{Fingerprint, FpId, TenantId, WorkflowKind};
 use std::collections::HashMap;
 use tracing::instrument;
 
@@ -210,10 +210,21 @@ macro_rules! list_query {
                 .filter(workflow_request::deactivated_at.is_null())
                 .select(workflow_request::scoped_vault_id)
                 .distinct();
+            let matching_ids2 = workflow::table
+                .filter(workflow::kind.eq(WorkflowKind::Document))
+                .filter(workflow::completed_at.is_null())
+                .filter(workflow::deactivated_at.is_null())
+                .select(workflow::scoped_vault_id);
             if *has_outstanding_workflow_request {
-                query = query.filter(scoped_vault::id.eq_any(matching_ids))
+                query = query.filter(
+                    scoped_vault::id
+                        .eq_any(matching_ids)
+                        .or(scoped_vault::id.eq_any(matching_ids2)),
+                )
             } else {
-                query = query.filter(not(scoped_vault::id.eq_any(matching_ids)))
+                query = query
+                    .filter(not(scoped_vault::id.eq_any(matching_ids)))
+                    .filter(not(scoped_vault::id.eq_any(matching_ids2)))
             }
         }
 

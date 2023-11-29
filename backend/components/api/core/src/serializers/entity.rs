@@ -12,7 +12,7 @@ use db::models::{
     vault::Vault,
 };
 use itertools::Itertools;
-use newtypes::OnboardingStatus;
+use newtypes::{OnboardingStatus, WorkflowKind};
 use std::collections::HashMap;
 
 pub type EntityDetail<'a> = (
@@ -107,6 +107,10 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
         // If the latest Workflow has an uncompleted review
         let requires_manual_review = !mrs.is_empty();
 
+        let has_outstanding_doc_wf = wfs.iter().any(|(wf, _)| {
+            wf.kind == WorkflowKind::Document && wf.completed_at.is_none() && wf.deactivated_at.is_none()
+        });
+
         let insight_event = wfs
             .into_iter()
             .filter_map(|wf| wf.1.map(|ie| (wf.0, ie)))
@@ -116,7 +120,6 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
         api_wire_types::Entity {
             id: fp_id,
             sandbox_id,
-            // TODO does the client read this?
             is_portable,
             kind,
             start_timestamp,
@@ -127,8 +130,9 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             requires_manual_review,
             is_created_via_api,
             data,
-            // TODO maybe we return true here if there's an active document WF
-            has_outstanding_workflow_request: wr.is_some(),
+            // Annoying: for now, document-only workflows are a really custom codepath. So we have
+            // to check in another way if there are any outstanding doc-only workflows
+            has_outstanding_workflow_request: has_outstanding_doc_wf || wr.is_some(),
 
             // TODO deprecate all of these
             attributes,
