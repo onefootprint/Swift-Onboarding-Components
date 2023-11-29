@@ -57,6 +57,7 @@ pub trait HasLifetime {
     fn data(&self) -> VaultedData;
 }
 
+#[derive(Debug, Eq, PartialEq)]
 pub enum VaultedData<'a> {
     /// Data that is stored encrypted
     Sealed(&'a SealedVaultBytes, VaultDataFormat),

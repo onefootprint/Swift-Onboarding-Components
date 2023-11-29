@@ -20,26 +20,26 @@ use std::marker::PhantomData;
 /// Sort data by:
 /// - created_seqno if added by this tenant
 /// - portablized_seqno if added by another tenant
-/// And give preference to data added by this tenant over data added by other tenants.
+/// And for now, give preference to data added by other tenants over data added by this tenants.
 fn sort_key(l: &DataLifetime, sv_id: Option<&ScopedVaultId>) -> ApiResult<(DataLifetimeSeqno, bool)> {
     if let Some(sv_id) = sv_id {
         // Building VW for tenant view
         if &l.scoped_vault_id == sv_id {
             // Data was added by this tenant. Order by created_seqno
-            Ok((l.created_seqno, true))
+            Ok((l.created_seqno, false))
         } else {
             // Data was added by another tenant and is portable. Order by portablized_seqno
             let seqno = l.portablized_seqno.ok_or(AssertionError(
                 "Found data added by other tenant without portablized_seqno",
             ))?;
-            Ok((seqno, false))
+            Ok((seqno, true))
         }
     } else {
         // Building VW for my1fp view
         let seqno = l.portablized_seqno.ok_or(AssertionError(
             "Found data in user view without portablized_seqno",
         ))?;
-        Ok((seqno, false))
+        Ok((seqno, true))
     }
 }
 

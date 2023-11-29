@@ -28,7 +28,7 @@ impl<Type> TenantVw<Type> {
 
 impl<Type> TenantVw<Type> {
     /// Determines if the provided DI is visible through this VW.
-    fn can_see(&self, di: DataIdentifier) -> bool {
+    pub(super) fn can_see(&self, di: DataIdentifier) -> bool {
         if self.is_in_must_collect(&di) {
             true
         } else {
