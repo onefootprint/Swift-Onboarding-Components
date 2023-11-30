@@ -1,4 +1,5 @@
 module.exports = {
+  owner: 'onefootprint',
   name: 'Footprint',
   slug: 'my',
   version: '1.0.0',
