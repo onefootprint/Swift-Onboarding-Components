@@ -2,6 +2,7 @@ use super::WriteableVw;
 use crate::errors::ApiResult;
 use crate::errors::AssertionError;
 use crate::utils::vault_wrapper::Person;
+use crate::utils::vault_wrapper::VaultWrapper;
 use db::models::contact_info::ContactInfo;
 use db::models::contact_info::VerificationLevel;
 use db::models::data_lifetime::DataLifetime;
@@ -10,8 +11,6 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultUpdate;
 use db::models::vault::Vault;
 use db::TxnPgConn;
-use either::Either;
-use itertools::Itertools;
 use newtypes::CollectedDataOption;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
@@ -86,37 +85,33 @@ impl WriteableVw<Person> {
             Vault::mark_portable(conn, &uvw.vault.id)?;
         }
 
-        //
-        // Compute what data we'll be committing and deactivating
-        //
-        // Note: speculative and portable could have overlapping DIs if a piece of speculative data
-        // is replacing a piece of portable data
-        // TODO eventually we'll assemble the "portable" view as the user-scoped view
-        let (speculative, portable): (HashMap<_, _>, HashMap<_, _>) = uvw
-            .all_data
-            .iter()
-            .flat_map(|(di, datas)| datas.iter().map(|d| (di.clone(), d)))
-            // Don't portablize data that was copied into this vault from another
-            .filter(|(_, d)| d.lifetime.origin_id.is_none())
-            .partition_map(|(di, d)| {
-                if d.is_portable() {
-                    Either::Right((di, d))
-                } else {
-                    Either::Left((di, d))
-                }
-            });
+        // Compute the portable VW view to see what data is already portable
+        let portable_vw = VaultWrapper::<Person>::build_portable(conn, &uvw.vault.id)?;
+        let portable = portable_vw.populated_dis();
 
+        // Compute the set of data that was added during this onboarding and is not yet portable
+        let mut speculative: HashMap<_, _> = uvw
+            .populated_dis()
+            .into_iter()
+            .filter_map(|di| uvw.data(&di))
+            // Don't portablize data that was prefilled into this vault from another
+            .filter(|d| d.lifetime.origin_id.is_none())
+            .filter(|d| d.is_speculative())
+            .map(|d| (d.lifetime.kind.clone(), d.lifetime.id.clone()))
+            .collect();
+
+        // Determine which CDOs we'll be portablizing, taking care to not portablize a partial CDO
+        // when a full CDO is already portable
         let to_portablize_cdos = decide_data_to_portablize(CurrentData {
             speculative: CollectedDataOption::list_from(speculative.keys().cloned().collect()),
-            portable: CollectedDataOption::list_from(portable.keys().cloned().collect()),
+            portable: CollectedDataOption::list_from(portable),
         });
         let to_portablize_ids: Vec<_> = to_portablize_cdos
             .into_iter()
             // Purposefully only take IDKs because we only want to portablize identity fields
             .flat_map(|o| o.data_identifiers().unwrap_or_default())
             .filter(|di| matches!(di, DataIdentifier::Id(_)))
-            .filter_map(|di| speculative.get(&di))
-            .map(|d| d.lifetime.id.clone())
+            .filter_map(|di| speculative.remove(&di))
             .collect();
 
         DataLifetime::bulk_portablize_for_tenant(conn, to_portablize_ids, &scoped_vault_id, seqno)?;

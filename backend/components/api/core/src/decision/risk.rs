@@ -34,12 +34,12 @@ pub fn save_final_decision(
 
     // If we should commit, portablize all data for the onboarding
     let seqno = if decision.should_commit {
-        let uvw = VaultWrapper::lock_for_onboarding(conn, &wf.scoped_vault_id)?;
+        let vw = VaultWrapper::lock_for_onboarding(conn, &wf.scoped_vault_id)?;
         let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
         // don't portabalize vaults from no-phone onboardings
         // and don't portablize vaults from tenant-initiated flows via POST /kyc
         if !obc.is_no_phone_flow && wf.source != WorkflowSource::Tenant {
-            let seqno = uvw.portablize_identity_data(conn)?;
+            let seqno = vw.portablize_identity_data(conn)?;
             Some(seqno)
         } else {
             None
