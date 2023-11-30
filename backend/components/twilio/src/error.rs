@@ -8,9 +8,9 @@ pub enum Error {
     ReqwestMiddleware(#[from] reqwest_middleware::Error),
     #[error("{0}")]
     Request(#[from] reqwest::Error),
-    #[error("Message delivery failed. Please try resending the message.")]
+    #[error("Message delivery failed. Please try resending the message or use a different phone number.")]
     DeliveryFailed(Status, Option<i64>),
-    #[error("Message unable to be delivered. Please try resending the message or use a different phone number.")]
+    #[error("Message unable to be delivered.")]
     NotDeliveredAfterTimeout(Status, Option<i64>),
     #[error("{0}")]
     Api(ApiErrorResponse),
