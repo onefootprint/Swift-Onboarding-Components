@@ -1,6 +1,5 @@
 import { assign, createMachine } from 'xstate';
 
-import { shouldOpenNewTab, shouldSendSms } from './machine.utils';
 import type { MachineContext, MachineEvents } from './types';
 
 const createMobileMachine = (initialContext: MachineContext) =>
@@ -20,18 +19,38 @@ const createMobileMachine = (initialContext: MachineContext) =>
         init: {
           always: [
             {
+              description: 'If not running on mobile',
+              cond: context => context.device.type !== 'mobile',
               target: 'complete',
-              cond: context =>
-                context.device.type !== 'mobile' ||
-                !context.device.hasSupportForWebauthn,
             },
             {
-              target: 'sms',
-              cond: context => shouldSendSms(context),
+              cond: context => !!context.isSocialMediaBrowser,
+              target: 'socialMediaBrowser',
             },
+            {
+              target: 'nonSocialMediaBrowser',
+            },
+          ],
+        },
+        nonSocialMediaBrowser: {
+          always: [
             {
               target: 'newTabRequest',
-              cond: context => shouldOpenNewTab(context),
+              cond: context =>
+                !!context.missingRequirements.liveness &&
+                context.device.hasSupportForWebauthn,
+            },
+            {
+              target: 'complete',
+            },
+          ],
+        },
+        socialMediaBrowser: {
+          always: [
+            {
+              target: 'sms',
+              description: 'If running in social media',
+              cond: context => !!context.missingRequirements.idDoc,
             },
             {
               target: 'complete',

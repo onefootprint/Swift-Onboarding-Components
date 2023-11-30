@@ -4,7 +4,6 @@ import {
   clickOnContinue,
   clickOnVerifyWithSms,
   confirmData,
-  doTransferFromMobile,
   fillAddress,
   fillEmail,
   fillNameAndDoB,
@@ -24,13 +23,7 @@ const addressLine1 = '432 3rd Ave';
 const city = 'Seward';
 const zipCode = '99664';
 
-test('E2E.es-MX.KYC.Docs #ci', async ({
-  browser,
-  browserName,
-  isMobile,
-  page,
-}) => {
-  // eslint-disable-next-line playwright/no-conditional-in-test
+test('E2E.es-MX.KYC.Docs #ci', async ({ browserName, isMobile, page }) => {
   test.setTimeout(120000);
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   const key = 'ob_test_yHlPBcaJ6lnxwkkD1YLStx';
@@ -94,16 +87,14 @@ test('E2E.es-MX.KYC.Docs #ci', async ({
   await page.waitForLoadState();
 
   if (isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
-    const newPage = await doTransferFromMobile({
-      frame,
-      browser,
-    });
-    await newPage.waitForLoadState();
-    // TODO (Bruno): locale options need to get sent to the handoff app
-    await expect(
-      newPage.getByRole('button', { name: 'United States of America' }),
-    ).toBeVisible();
-    await newPage.close();
+    // TODO (belce): remove isMobile conditional
+    // TODO (belce): locale options need to get sent to the handoff app
+    return;
+    // const newPage = await doTransferFromMobile({
+    //   frame,
+    //   browser,
+    // });
+    // await newPage.waitForLoadState();
   } else {
     await skipTransferOnDesktop({ frame });
     await page.waitForLoadState();

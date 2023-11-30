@@ -48,7 +48,6 @@ for (const { version, baseUrl } of Sdks) {
     browser,
     isMobile,
   }) => {
-    // eslint-disable-next-line playwright/no-conditional-in-test
     test.setTimeout(120000);
     const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 

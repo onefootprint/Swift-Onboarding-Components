@@ -26,7 +26,9 @@ export interface Typegen0 {
     | 'init'
     | 'newTabProcessing'
     | 'newTabRequest'
+    | 'nonSocialMediaBrowser'
     | 'sms'
-    | 'smsProcessing';
+    | 'smsProcessing'
+    | 'socialMediaBrowser';
   tags: never;
 }

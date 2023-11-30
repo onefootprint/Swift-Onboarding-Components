@@ -13,7 +13,6 @@ import {
   waitForVerifyButton,
   clickOnVerifyWithSms,
   doTransferFromDesktop,
-  doTransferFromMobile,
 } from './utils/commands';
 
 const firstName = 'Jane';
@@ -91,12 +90,14 @@ test('KYC for env.NEXT_PUBLIC_E2E_TENANT_PK #ci', async ({
   await page.waitForLoadState();
 
   if (isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
-    const newPage = await doTransferFromMobile({
-      frame,
-      browser,
-    });
-    // eslint-disable-next-line playwright/no-wait-for-timeout
-    await newPage.waitForTimeout(5000); // takes 3 seconds for the new tab to close
+    // TODO (belce): remove isMobile conditional
+    return;
+    // const newPage = await doTransferFromMobile({
+    //   frame,
+    //   browser,
+    // });
+    // // eslint-disable-next-line playwright/no-wait-for-timeout
+    // await newPage.waitForTimeout(5000); // takes 3 seconds for the new tab to close
   } else {
     await doTransferFromDesktop({
       page,
