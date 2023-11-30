@@ -103,7 +103,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
     }
 
     // build_for_user should only show the phone number
-    let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Vault(&uv.id)).unwrap();
+    let uvw = VaultWrapper::<Person>::build_portable(conn, &uv.id).unwrap();
     let tests = vec![
         (IDK::FirstName, None),
         (IDK::LastName, None),
@@ -230,7 +230,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
     }
 
     // build_for_user should only show the portable data
-    let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Vault(&uv.id)).unwrap();
+    let uvw = VaultWrapper::<Person>::build_portable(conn, &uv.id).unwrap();
     let tests = vec![
         (IDK::Dob, Some(SealedVaultBytes(vec![0]))),
         (IDK::Nationality, Some(SealedVaultBytes(vec![4]))),
@@ -323,7 +323,7 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     uvw.patch_data_test(conn, update, true).unwrap();
 
     // Make the user can't see the name and email until it's portable
-    let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Vault(&uv.id)).unwrap();
+    let uvw = VaultWrapper::<Person>::build_portable(conn, &uv.id).unwrap();
     assert!(!uvw.has_field(IDK::FirstName));
     assert!(!uvw.has_field(IDK::LastName));
     assert!(!uvw.has_field(IDK::Email));
@@ -341,7 +341,7 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     uvw.portablize_identity_data(conn).unwrap();
 
     // Now we should see the portable name and email
-    let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Vault(&uv.id)).unwrap();
+    let uvw = VaultWrapper::<Person>::build_portable(conn, &uv.id).unwrap();
     assert!(uvw.has_field(IDK::FirstName));
     assert!(uvw.has_field(IDK::LastName));
     assert!(uvw.has_field(IDK::Email));
@@ -374,7 +374,7 @@ fn test_business_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     uvw.patch_data_test(conn, data, true).unwrap();
 
     // Make sure the vault view can't see the data until its portable
-    let uvw = VaultWrapper::<Business>::build(conn, VwArgs::Vault(&bv.id)).unwrap();
+    let uvw = VaultWrapper::<Business>::build_portable(conn, &bv.id).unwrap();
     assert!(!uvw.has_field(BDK::Name));
     assert!(!uvw.has_field(BDK::PhoneNumber));
 
@@ -772,7 +772,7 @@ fn test_uvw_commit_data_race_condition(conn: &mut TestPgConn) {
     uvw.portablize_identity_data(conn).unwrap();
 
     // Now, when getting portable data, we should still see the ssn9 added for tenant 2
-    let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Vault(&uv.id)).unwrap();
+    let uvw = VaultWrapper::<Person>::build_portable(conn, &uv.id).unwrap();
     assert_eq!(uvw.get_e_data(IDK::Ssn4), ssn4_tenant2);
     assert_eq!(uvw.get_e_data(IDK::Ssn9), ssn9_tenant2);
     // But, we should still have the name that was portable by tenant 1

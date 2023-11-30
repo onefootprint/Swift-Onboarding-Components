@@ -4,7 +4,7 @@ use api_core::errors::ApiError;
 use api_core::errors::{ApiResult, AssertionError};
 use api_core::types::response::ResponseData;
 use api_core::utils::headers::SandboxId;
-use api_core::utils::vault_wrapper::{Any, VaultWrapper, VwArgs};
+use api_core::utils::vault_wrapper::{Any, VaultWrapper};
 use api_core::ApiErrorKind;
 use api_core::State;
 use api_wire_types::IdentifyId;
@@ -61,7 +61,7 @@ async fn post(
             if let Some(uv) = uv {
                 let uvw = state
                     .db_pool
-                    .db_query(move |conn| VaultWrapper::<Any>::build(conn, VwArgs::Vault(&uv.id)))
+                    .db_query(move |conn| VaultWrapper::<Any>::build_portable(conn, &uv.id))
                     .await??;
                 let phone = uvw
                     .decrypt_contact_info(&state, newtypes::ContactInfoKind::Phone)

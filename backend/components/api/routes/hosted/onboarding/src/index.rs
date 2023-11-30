@@ -16,7 +16,6 @@ use api_core::utils::onboarding::NewBusinessVaultArgs;
 use api_core::utils::onboarding::NewOnboardingArgs;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
-use api_core::utils::vault_wrapper::VwArgs;
 use api_wire_types::hosted::onboarding::OnboardingResponse;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
@@ -51,8 +50,7 @@ pub async fn post(
             let su = ScopedVault::get(conn, (&scoped_user_id, &uv_id))?;
             // Check that the ob configuration is still active
             let (ob_config, tenant) = ObConfiguration::get_enabled(conn, &obc_id)?;
-            let args = VwArgs::Vault(&su.vault_id);
-            let vw = VaultWrapper::<Any>::build(conn, args)?;
+            let vw = VaultWrapper::<Any>::build_portable(conn, &su.vault_id)?;
             Ok((su, ob_config, tenant, vw))
         })
         .await??;

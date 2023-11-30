@@ -14,6 +14,7 @@ use itertools::Itertools;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
 use newtypes::ScopedVaultId;
+use newtypes::VaultId;
 use std::collections::HashMap;
 use std::marker::PhantomData;
 
@@ -113,6 +114,11 @@ impl<Type> VaultWrapper<Type> {
             is_hydrated: PhantomData,
         };
         Ok(result)
+    }
+
+    pub fn build_portable(conn: &mut PgConn, v_id: &VaultId) -> ApiResult<Self> {
+        let args = VwArgs::Vault(v_id);
+        Self::build(conn, args)
     }
 
     #[tracing::instrument("VaultWrapper:build", skip_all)]

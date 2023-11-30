@@ -1,6 +1,5 @@
 use super::WriteableVw;
 use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::VwArgs;
 use crate::utils::vault_wrapper::{Person, TenantVw, VaultWrapper};
 use crate::State;
 use db::models::ob_configuration::ObConfiguration;
@@ -33,8 +32,7 @@ async fn test_prefill_data(state: &mut State) {
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let test_data = create_test_data(conn);
-            let args = VwArgs::Vault(&test_data.su1.vault_id);
-            let vw = VaultWrapper::<Person>::build(conn, args)?;
+            let vw = VaultWrapper::<Person>::build_portable(conn, &test_data.su1.vault_id)?;
             Ok((test_data, vw))
         })
         .await
@@ -93,8 +91,7 @@ async fn test_prefill_data(state: &mut State) {
             vw.patch_data_test(conn, data, true).unwrap();
             let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su1.id).unwrap();
             vw.portablize_identity_data(conn).unwrap();
-            let args = VwArgs::Vault(&su1.vault_id);
-            let vw = VaultWrapper::<Person>::build(conn, args).unwrap();
+            let vw = VaultWrapper::<Person>::build_portable(conn, &su1.vault_id).unwrap();
             Ok(vw)
         })
         .await
