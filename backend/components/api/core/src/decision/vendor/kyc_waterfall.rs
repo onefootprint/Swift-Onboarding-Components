@@ -390,6 +390,7 @@ mod tests {
         ShouldntCall,
         Success(Qualifiers),
         Error,
+        HardError,
     }
     enum Qualifiers {
         None,
@@ -480,9 +481,23 @@ mod tests {
     #[test_state_case(
         ExperianEnabled(true),
         IdologyEnabled(true),
+        Run(ExperianResponse(VR::HardError), IdologyResponse(VR::HardError), ExpectedResult::ErrVendorRequestsFailed),
+        Run(ExperianResponse(VR::Success(Qualifiers::None)), IdologyResponse(VR::ShouldntCall), ExpectedResult::SingularSuccessVendorResult(Vendor::Experian))
+        ; "Both, Experian hard errors, Idology hard errors, re-run Experian succeeds"
+    )]
+    #[test_state_case(
+        ExperianEnabled(true),
+        IdologyEnabled(true),
         Run(ExperianResponse(VR::Error), IdologyResponse(VR::Error), ExpectedResult::ErrVendorRequestsFailed),
         Run(ExperianResponse(VR::Error), IdologyResponse(VR::Success(Qualifiers::None)), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
         ; "Both, Experian errors, Idology errors, re-run Experian errors Idology succeeds"
+    )]
+    #[test_state_case(
+        ExperianEnabled(true),
+        IdologyEnabled(true),
+        Run(ExperianResponse(VR::HardError), IdologyResponse(VR::HardError), ExpectedResult::ErrVendorRequestsFailed),
+        Run(ExperianResponse(VR::HardError), IdologyResponse(VR::Success(Qualifiers::None)), ExpectedResult::SingularSuccessVendorResult(Vendor::Idology))
+        ; "Both, Experian hard errors, Idology hard errors, re-run Experian hard errors Idology succeeds"
     )]
     #[test_state_case(
         ExperianEnabled(true),
@@ -607,7 +622,8 @@ mod tests {
                     test_utils::WithQualifier(Some("resultcode.ssn.does.not.match".to_owned())),
                 ),
             },
-            VR::Error => test_utils::mock_idology_error(state),
+            VR::Error => test_utils::mock_idology_parseable_error(state),
+            VR::HardError => test_utils::mock_idology_hard_error(state),
         };
         match experian_response.0 {
             VR::ShouldntCall => (),
@@ -617,7 +633,8 @@ mod tests {
                     test_utils::mock_experian(state, WithSsnResultCode(Some("CY")))
                 }
             },
-            VR::Error => test_utils::mock_experian_error(state),
+            VR::Error => test_utils::mock_experian_parseable_error(state),
+            VR::HardError => test_utils::mock_experian_hard_error(state),
         };
         state.set_ff_client(mock_ff_client.into_mock());
     }

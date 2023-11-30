@@ -41,17 +41,19 @@ pub struct RequestAndMaybeHydratedResult {
 impl RequestAndMaybeHydratedResult {
     pub fn into_vendor_result(self) -> Option<VendorResult> {
         self.vres.and_then(|hvr| {
-            hvr.response.map(|vr| VendorResult {
-                response: vr,
-                verification_result_id: hvr.vres.id,
-                verification_request_id: self.vreq.id,
-            })
+            (!hvr.vres.is_error)
+                .then_some(hvr.response.map(|vr| VendorResult {
+                    response: vr,
+                    verification_result_id: hvr.vres.id,
+                    verification_request_id: self.vreq.id,
+                }))
+                .flatten()
         })
     }
 }
 
 impl VendorResult {
-    // A convenience method that takes (vreq,vres)'s and decryptes and parses the vres (if present) into VendorResponse. Similar to from_verification_results_for_onboarding, but this method preserve the same (vreq, vres) list passed in instead of implicitly filtering to only non-None vres's
+    // A convenience method that takes (vreq,vres)'s and decryptes and parses the vres (if present and non-error) into VendorResponse. Similar to from_verification_results_for_onboarding, but this method preserve the same (vreq, vres) list passed in instead of implicitly filtering to only non-None vres's
     #[tracing::instrument(skip_all)]
     pub async fn hydrate_vendor_results(
         requests_and_results: Vec<RequestAndMaybeResult>,
@@ -81,7 +83,7 @@ impl VendorResult {
                 if let Some(vres) = vres {
                     RequestAndMaybeHydratedResult {
                         vreq,
-                        vres: Some(HydratedVerificationResult {
+                        vres: (!vres.is_error).then_some(HydratedVerificationResult {
                             vres,
                             response: response.cloned(),
                         }),

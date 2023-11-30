@@ -34,11 +34,11 @@ use idv::incode::IncodeStartOnboardingRequest;
 use idv::middesk::{MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse};
 use idv::twilio::TwilioLookupV2APIResponse;
 use idv::twilio::TwilioLookupV2Request;
-use newtypes::OnboardingStatus;
 use newtypes::{
     DecisionIntentKind, FootprintReasonCode, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
     WorkflowFixtureResult, WorkflowId,
 };
+use newtypes::{OnboardingStatus, PiiJsonValue};
 use strum_macros::EnumIter;
 use webhooks::events::WebhookEvent;
 use webhooks::MockWebhookClient;
@@ -289,7 +289,7 @@ pub fn mock_idology_pa_hit(state: &mut State, aml_kinds: Vec<AmlKind>) {
     state.set_idology_expect_id(Arc::new(mock_idology_expect_id));
 }
 
-pub fn mock_idology_error(state: &mut State) {
+fn mock_idology_error(state: &mut State, error: idv::idology::error::Error) {
     let mut mock_idology_expect_id = MockVendorAPICall::<
         IdologyExpectIDRequest,
         IdologyExpectIDAPIResponse,
@@ -298,8 +298,24 @@ pub fn mock_idology_error(state: &mut State) {
     mock_idology_expect_id
         .expect_make_request()
         .times(1)
-        .return_once(move |_| Err(idv::idology::error::Error::UnknownError("oops".to_owned())));
+        .return_once(move |_| Err(error));
     state.set_idology_expect_id(Arc::new(mock_idology_expect_id));
+}
+
+pub fn mock_idology_hard_error(state: &mut State) {
+    mock_idology_error(state, idv::idology::error::Error::UnknownError("oops".to_owned()));
+}
+
+pub fn mock_idology_parseable_error(state: &mut State) {
+    mock_idology_error(
+        state,
+        idv::idology::error::Error::ErrorWithResponse(Box::new(idv::idology::error::ErrorWithResponse {
+            error: idv::idology::error::Error::UnknownError("Last name is too short yo".to_owned()),
+            response: PiiJsonValue::new(
+                serde_json::json!({"response":{"error":"Last name is too short","id-scan":null,"results":null,"id-number":null,"qualifiers":null,"restriction":null,"summary-result":null}}),
+            ),
+        })),
+    );
 }
 
 pub struct WithSsnResultCode(pub Option<&'static str>);
@@ -316,7 +332,7 @@ pub fn mock_experian(state: &mut State, ssn_result_code: WithSsnResultCode) {
     state.set_experian_cross_core(Arc::new(mock_experian));
 }
 
-pub fn mock_experian_error(state: &mut State) {
+fn mock_experian_error(state: &mut State, error: idv::experian::error::Error) {
     let mut mock_experian = MockVendorAPICall::<
         ExperianCrossCoreRequest,
         ExperianCrossCoreResponse,
@@ -325,8 +341,26 @@ pub fn mock_experian_error(state: &mut State) {
     mock_experian
         .expect_make_request()
         .times(1)
-        .return_once(move |_| Err(idv::experian::error::Error::UserNamePasswordError));
+        .return_once(move |_| Err(error));
     state.set_experian_cross_core(Arc::new(mock_experian));
+}
+
+pub fn mock_experian_hard_error(state: &mut State) {
+    mock_experian_error(state, idv::experian::error::Error::UserNamePasswordError);
+}
+
+pub fn mock_experian_parseable_error(state: &mut State) {
+    mock_experian_error(
+        state,
+        idv::experian::error::Error::ErrorWithResponse(Box::new(idv::experian::error::ErrorWithResponse {
+            error: idv::experian::error::Error::ResponseError(
+                idv::experian::error::CrossCoreResponseError::Error("Invalid surname".to_owned()),
+            ),
+            response: PiiJsonValue::new(
+                serde_json::json!({"responseHeader":{"category":null,"tenantId":"abc123","messageTime":"2023-11-29T15:31:06Z","requestType":"PreciseIdOnly","expRequestId":"abc123","responseCode":"R0201","responseType":"INFO","overallResponse":{"score":null,"decision":null,"decisionText":null,"spareObjects":[],"decisionReasons":[],"recommendedNextActions":[]},"responseMessage":"Workflow Complete.","clientReferenceId":"vreq_abc"},"clientResponsePayload":{"decisionElements":[{"matches":null,"decisions":null,"otherData":{"json":{"fraudSolutions":{"response":{"products":{"preciseIdServer":{"error":{"errorCode":"106","reportDate":"11292023","reportTime":"093108","actionIndicator":{"code":"C","value":""},"referenceNumber":"vreq_abc","errorDescription":"Invalid surname"},"header":"<SCRUBBED>","summary":null,"glbDetail":null,"ipAddress":"<SCRUBBED>","onFileSsn":"<SCRUBBED>","sessionId":null,"preciseMatch":null,"pidxmlversion":"06.00"},"customerManagement":null}}}}},"applicantId":"Contact1","serviceName":"PreciseId","warningsErrors":[{"responseCode":"106","responseType":"ERROR","responseMessage":"Invalid surname"}],"normalizedScore":-1}],"orchestrationDecisions":[]}}),
+            ),
+        })),
+    );
 }
 
 pub fn mock_twilio(state: &mut State) {
