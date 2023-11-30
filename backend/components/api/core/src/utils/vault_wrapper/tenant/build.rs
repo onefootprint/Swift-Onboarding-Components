@@ -11,10 +11,8 @@ use db::models::workflow::Workflow;
 use db::HasLifetime;
 use db::PgConn;
 use itertools::Itertools;
-use newtypes::output::Csv;
 use newtypes::{DataLifetimeSeqno, ScopedVaultId, TenantId};
 use std::collections::HashMap;
-use std::collections::HashSet;
 
 impl<Type> VaultWrapper<Type> {
     // TODO support building with any ScopedVaultIdentifier, like fp_id, is_live, and tenant_id
@@ -31,9 +29,7 @@ impl<Type> VaultWrapper<Type> {
         // For now, build the modern version of the VW that only shows DLs owned by the tenant
         // alongside the legacy version. Log when data doesn't match
         let modern_vw = Self::build_inner(conn, sv_id, version, true)?;
-        if let Err(e) = compare_vws(&vw, &modern_vw) {
-            tracing::error!(sv_id=%sv_id, e);
-        }
+        compare_vws(&vw, &modern_vw);
         Ok(vw)
     }
 
@@ -119,42 +115,34 @@ impl<Type> VaultWrapper<Type> {
 
 #[tracing::instrument(skip_all)]
 /// Short-term logic to compare two VWs
-fn compare_vws<Type>(old: &TenantVw<Type>, new: &TenantVw<Type>) -> Result<(), String> {
+fn compare_vws<Type>(old: &TenantVw<Type>, new: &TenantVw<Type>) {
     if old.scoped_vault.id != new.scoped_vault.id {
-        return Err("SV id doesn't match".into());
+        tracing::error!(sv_id=%old.scoped_vault.id, new_sv_id=%new.scoped_vault.id, "SV id doesn't match");
+        return;
     }
-    let old_dis: HashSet<_> = old
+    let old_dis = old
         .populated_dis()
         .into_iter()
-        .filter(|di| old.can_see(di.clone()))
-        .collect();
-    let new_dis: HashSet<_> = new
+        .filter(|di| old.can_see(di.clone()));
+    let new_dis = new
         .populated_dis()
         .into_iter()
-        .filter(|di| new.can_see(di.clone()))
-        .collect();
-    if old_dis != new_dis {
-        return Err(format!(
-            "Visible DIs changed, old: {}, new: {}",
-            Csv::from(old_dis.into_iter().collect_vec()),
-            Csv::from(new_dis.into_iter().collect_vec()),
-        ));
-    }
-    for di in old_dis {
-        let old_data = old.get(di.clone()).ok_or(format!("Old VW missing DI: {}", di))?;
-        let new_data = new.get(di.clone()).ok_or(format!("New VW missing DI: {}", di))?;
+        .filter(|di| new.can_see(di.clone()));
+    let dis = old_dis.chain(new_dis).unique().collect_vec();
+    for di in dis {
+        let Some(old_data) = old.get(di.clone()) else {
+            tracing::error!(sv_id=%old.scoped_vault.id, %di, "Old VW missing DI");
+            continue;
+        };
+        let Some(new_data) = new.get(di.clone()) else {
+            tracing::error!(sv_id=%old.scoped_vault.id, %di, "New VW missing DI");
+            continue;
+        };
         if old_data.data() != new_data.data() {
-            return Err(format!(
-                "Data doesn't match for {}. Old: {:?}, new: {:?}",
-                di,
-                old_data.data(),
-                new_data.data()
-            ));
+            tracing::error!(sv_id=%old.scoped_vault.id, %di, old_data=?old_data.data(), new_data=?new_data.data(), "Data doesn't match");
         }
         if old_data.lifetime_id() != new_data.lifetime_id() {
             tracing::info!(di=%di, "VWs have different lifetime for the same DI");
         }
     }
-
-    Ok(())
 }
