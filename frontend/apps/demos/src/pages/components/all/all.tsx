@@ -22,7 +22,9 @@ const AllComponents = () => {
           .filter(k => k !== FootprintComponentKind.Auth)
           .map((k: FootprintComponentKind) => (
             <Tab key={k} selected={k === kind} onClick={() => setKind(k)}>
-              <Typography variant="label-2">{k}</Typography>
+              <Typography as="span" variant="label-2">
+                {k}
+              </Typography>
             </Tab>
           ))}
       </Tabs>
