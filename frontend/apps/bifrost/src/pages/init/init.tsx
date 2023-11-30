@@ -2,6 +2,7 @@ import { useObserveCollector } from '@onefootprint/dev-tools';
 import type { FootprintVerifyDataProps } from '@onefootprint/footprint-js';
 import {
   checkIsInIframe,
+  checkIsSocialMediaBrowser,
   InitShimmer,
   Logger,
   useGetOnboardingConfig,
@@ -42,6 +43,7 @@ const Init = () => {
         orgId,
         publicKey: key,
         iframe: !!isInIframe,
+        socialMedia: checkIsSocialMediaBrowser(),
       });
     }
   };
