@@ -5,14 +5,8 @@
   "version": "1.5.0",
   "main": "./dist/footprint-expo.cjs",
   "module": "./dist/footprint-expo.js",
+  "unpkg": "./dist/footprint-expo.js",
   "types": "./dist/footprint-expo.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/footprint-expo.js",
-      "require": "./dist/footprint-expo.cjs",
-      "types": "./dist/footprint-expo.d.ts"
-    }
-  },
   "sideEffects": false,
   "license": "MIT",
   "files": [

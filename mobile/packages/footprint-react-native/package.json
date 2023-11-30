@@ -5,14 +5,10 @@
   "version": "1.5.0",
   "main": "./dist/footprint-react-native.cjs",
   "module": "./dist/footprint-react-native.js",
+  "unpkg": "./dist/footprint-react-native.js",
   "types": "./dist/footprint-react-native.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/footprint-react-native.js",
-      "require": "./dist/footprint-react-native.cjs",
-      "types": "./dist/footprint-react-native.d.ts"
-    }
-  },
+  "sideEffects": false,
+  "license": "MIT",
   "files": [
     "dist"
   ],
