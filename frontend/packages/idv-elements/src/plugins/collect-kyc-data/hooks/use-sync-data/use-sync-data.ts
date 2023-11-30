@@ -1,6 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { UserDataError } from '@onefootprint/types';
+import { IdDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import type { AxiosError } from 'axios';
 
@@ -23,6 +24,7 @@ type SyncDataArgs = {
 const useSyncData = () => {
   const { t } = useTranslation('components.sync-data-error');
   const [state] = useCollectKycDataMachine();
+  const showRequestErrorToast = useRequestErrorToast();
   const { authToken, requirement } = state.context;
   const l10n = useL10nContext();
   const locale = l10n?.locale || 'en-US';
@@ -63,9 +65,24 @@ const useSyncData = () => {
         {
           onSuccess,
           onError: (err: unknown) => {
-            const fieldErrors = (err as AxiosError<UserDataError>)?.response
-              ?.data.error.message;
-            if (fieldErrors) {
+            const errors = (err as AxiosError<UserDataError>)?.response?.data
+              .error.message;
+            if (typeof errors === 'string') {
+              showRequestErrorToast(err);
+              logError(
+                `Kyc useSyncData encountered error while syncing data${
+                  speculative ? ' speculatively' : ''
+                } ${getErrorMessage(err)}`,
+              );
+              return;
+            }
+            const validDis = new Set(Object.values(IdDI));
+            const fieldErrors = Object.fromEntries(
+              Object.entries(errors || {}).filter(([key]) =>
+                validDis.has(key as IdDI),
+              ),
+            );
+            if (Object.keys(fieldErrors).length > 0) {
               onError?.(fieldErrors);
             } else {
               toast.show({

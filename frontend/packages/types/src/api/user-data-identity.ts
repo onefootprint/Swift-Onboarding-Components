@@ -4,7 +4,7 @@ export const ALLOW_EXTRA_FIELDS_HEADER = 'x-fp-allow-extra-fields';
 
 export type UserDataError = {
   error: {
-    message: Partial<Record<IdDI, string>>;
+    message: Partial<Record<IdDI, string>> | string;
   };
 };
 
