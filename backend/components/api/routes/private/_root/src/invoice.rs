@@ -95,7 +95,7 @@ pub async fn get_or_create_customer_id(state: &State, tenant: &Tenant) -> ApiRes
     Ok(customer_id)
 }
 
-#[tracing::instrument(skip_all)]
+#[tracing::instrument(skip_all, fields(tenant_id=%tenant.id, billing_date))]
 async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: NaiveDate) -> ApiResult<()> {
     let i = billing::interval::get_billing_interval(billing_date)?;
     let t_id = tenant.id.clone();
