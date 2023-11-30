@@ -11,7 +11,7 @@
         "@pulumi/awsx": "0.40.0",
         "@pulumi/pulumi": "3.48.0",
         "@pulumi/random": "4.4.2",
-        "axios": "^1.2.1",
+        "axios": "^1.6.0",
         "axios-retry": "^3.5.0",
         "crypto-js": "^4.1.1",
         "@pulumi/tailscale": "0.13.2"
