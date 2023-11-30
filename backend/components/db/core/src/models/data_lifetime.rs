@@ -239,6 +239,7 @@ impl DataLifetime {
     /// NOTE: this may deactivate portablized data. When deactivating portablized data, should
     /// generally only do when replacing with other portablized data
     #[tracing::instrument("DataLifetime::bulk_deactivate", skip_all)]
+    // TODO can we rm
     pub fn bulk_deactivate(
         conn: &mut PgConn,
         ids: Vec<DataLifetimeId>,

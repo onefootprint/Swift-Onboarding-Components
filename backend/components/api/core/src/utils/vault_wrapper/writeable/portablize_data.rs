@@ -23,50 +23,44 @@ struct CurrentData {
     portable: HashSet<CollectedDataOption>,
 }
 
-struct DataToPortablize {
-    to_portablize: HashSet<CollectedDataOption>,
-    to_deactivate: HashSet<CollectedDataOption>,
-}
-
 /// Given the set of speculative CollectedDataOptions and portable CollectedDataOptions,
-/// determines which speculative CDOs we will portablize and which we will deactivate.
+/// determines which speculative CDOs we will portablize.
 /// Generally, we will portablize a speculative CDO if it is not replacing a portable CDO that
 /// contains more information.
 /// For example, we will not allow a speculative Ssn4 to replace a portable Ssn9. We will allow
 /// a speculative Ssn9 to replace a portable Ssn9 or portable Ssn4, though.
-fn decide_data_to_portablize(data: CurrentData) -> DataToPortablize {
+fn decide_data_to_portablize(data: CurrentData) -> HashSet<CollectedDataOption> {
     let CurrentData {
         speculative,
         portable,
     } = data;
     // Split the list of speculative CDOs based on whether they should be portable or not
-    let (to_portablize, to_deactivate) = speculative.into_iter().partition(|speculative_cdo| {
-        let full_cdo = speculative_cdo.full_variant();
-        match full_cdo {
-            // Only portablize this piece of speculative data if the full CDO isn't portable
-            // NOTE: we'll rarely have a speculative partial CDO and a portable full CDO since
-            // we normally block these updates from happening when the speculative data is added.
-            // Could only happen due to a race condition. More context at
-            // https://linear.app/footprint/issue/FP-2129/handle-onboarding-race-condition
-            Some(full_cdo) => {
-                let portable_has_full_variant = portable.contains(&full_cdo);
-                if portable_has_full_variant {
-                    tracing::info!(
-                        "Trying to portablize partial CDO {} when full CDO {} is portable",
-                        speculative_cdo,
-                        full_cdo
-                    );
+    speculative
+        .into_iter()
+        .filter(|speculative_cdo| {
+            let full_cdo = speculative_cdo.full_variant();
+            match full_cdo {
+                // Only portablize this piece of speculative data if the full CDO isn't portable
+                // NOTE: we'll rarely have a speculative partial CDO and a portable full CDO since
+                // we normally block these updates from happening when the speculative data is added.
+                // Could only happen due to a race condition. More context at
+                // https://linear.app/footprint/issue/FP-2129/handle-onboarding-race-condition
+                Some(full_cdo) => {
+                    let portable_has_full_variant = portable.contains(&full_cdo);
+                    if portable_has_full_variant {
+                        tracing::info!(
+                            "Trying to portablize partial CDO {} when full CDO {} is portable",
+                            speculative_cdo,
+                            full_cdo
+                        );
+                    }
+                    !portable_has_full_variant
                 }
-                !portable_has_full_variant
+                // Portablize!
+                None => true,
             }
-            // Portablize!
-            None => true,
-        }
-    });
-    DataToPortablize {
-        to_portablize,
-        to_deactivate,
-    }
+        })
+        .collect()
 }
 
 // Can only portablize identity data
@@ -112,75 +106,20 @@ impl WriteableVw<Person> {
                 }
             });
 
-        let d = decide_data_to_portablize(CurrentData {
+        let to_portablize_cdos = decide_data_to_portablize(CurrentData {
             speculative: CollectedDataOption::list_from(speculative.keys().cloned().collect()),
             portable: CollectedDataOption::list_from(portable.keys().cloned().collect()),
         });
-        let to_portablize: Vec<_> = d
-            .to_portablize
+        let to_portablize_ids: Vec<_> = to_portablize_cdos
             .into_iter()
             // Purposefully only take IDKs because we only want to portablize identity fields
             .flat_map(|o| o.data_identifiers().unwrap_or_default())
             .filter(|di| matches!(di, DataIdentifier::Id(_)))
-            .collect();
-        let to_deactivate: Vec<_> = d
-            .to_deactivate
-            .into_iter()
-            // Purposefully only take IDKs because we only want to portablize identity fields
-            .flat_map(|o| o.data_identifiers().unwrap_or_default())
-            .filter(|di| matches!(di, DataIdentifier::Id(_)))
+            .filter_map(|di| speculative.get(&di))
+            .map(|d| d.lifetime.id.clone())
             .collect();
 
-        //
-        // Deactivate all existing, portable data that is about to be replaced by speculative data.
-        // Also deactivate speculative data that we don't want to keep.
-        //
-        let to_deactivate = {
-            // For everything that we're about to portablize, deactivate the old data if exists
-            let portable_to_deactivate = to_portablize.iter().flat_map(|di| portable.get(di)).collect_vec();
-            if !portable_to_deactivate.iter().all(|l| l.is_portable()) {
-                // Everything we are deactivating should be portable already
-                return Err(AssertionError("Lifetime to deactivate is not portable").into());
-            }
-            // And, grab the IDs of speculative data that we're deactivating.
-            let spec_to_deactivate: Vec<_> =
-                to_deactivate.iter().flat_map(|di| speculative.get(di)).collect();
-            if !spec_to_deactivate.is_empty() {
-                // For now, we only deactivate speculative data if portablizing it would otherwise
-                // replace more full data on the user vault.
-                // This only happens in an onboarding race condition - let's just track when it happens
-                tracing::error!(
-                    "Deactivating speculative data due to race condition: {:?}",
-                    spec_to_deactivate.iter().map(|d| &d.lifetime.id).collect_vec()
-                );
-            }
-            portable_to_deactivate
-                .into_iter()
-                .chain(spec_to_deactivate.into_iter())
-                .map(|d| d.lifetime.id.clone())
-                .collect()
-        };
-        DataLifetime::bulk_deactivate(conn, to_deactivate, seqno)?;
-
-        //
-        // Portablize speculative lifetimes.
-        //
-        // NOTE: this isn't portablizing identity documents.
-        let to_portablize: Vec<_> = to_portablize.iter().flat_map(|di| speculative.get(di)).collect();
-        let all_data_is_speculative_and_belongs_to_scoped_user = to_portablize
-            .iter()
-            .all(|d| d.is_speculative() && d.lifetime.scoped_vault_id == scoped_vault_id);
-        if !all_data_is_speculative_and_belongs_to_scoped_user {
-            // Just a sanity check filter that we don't portablize other data - all results should match
-            // this filter
-            return Err(AssertionError(
-                "About to portablize data that is not speculative or does not belong to tenant",
-            )
-            .into());
-        }
-
-        let lifetime_ids_to_portablize = to_portablize.into_iter().map(|d| d.lifetime.id.clone()).collect();
-        DataLifetime::bulk_portablize_for_tenant(conn, lifetime_ids_to_portablize, &scoped_vault_id, seqno)?;
+        DataLifetime::bulk_portablize_for_tenant(conn, to_portablize_ids, &scoped_vault_id, seqno)?;
 
         Ok(seqno)
     }
@@ -214,55 +153,51 @@ impl WriteableVw<Person> {
 
 #[cfg(test)]
 mod test {
+    use std::collections::HashSet;
+
     use super::decide_data_to_portablize;
     use super::CurrentData;
     use newtypes::CollectedDataOption;
-    use std::collections::HashSet;
     use test_case::test_case;
     use CollectedDataOption::*;
 
     #[test_case(
         vec![Name], vec![Name],
-        vec![Name], vec![] => None
+        vec![Name] => None
     )]
     #[test_case(
         vec![Name, Ssn4], vec![Name, Ssn9],
-        // Deactivate partial ssn because we already have full ssn9
-        vec![Name], vec![Ssn4] => None
+        // Don't portablize ssn4 because we already have ssn9
+        vec![Name] => None
     )]
     #[test_case(
         vec![Dob, Ssn9], vec![Ssn9],
         // Allow replacing Ssn9
-        vec![Dob, Ssn9], vec![] => None
+        vec![Dob, Ssn9] => None
     )]
     #[test_case(
         vec![Dob, Ssn9], vec![Ssn4],
         // Allow replacing Ssn4 with an Ssn9
-        vec![Dob, Ssn9], vec![] => None
+        vec![Dob, Ssn9] => None
     )]
     #[test_case(
         vec![FullAddress], vec![FullAddress],
         // Allow replacing full address
-        vec![FullAddress], vec![] => None
+        vec![FullAddress] => None
     )]
     fn test_decide_data_to_portablize(
         speculative: Vec<CollectedDataOption>,
         portable: Vec<CollectedDataOption>,
         expected_to_portablize: Vec<CollectedDataOption>,
-        expected_to_deactivate: Vec<CollectedDataOption>,
     ) -> Option<usize> {
         let current_data = CurrentData {
             speculative: speculative.into_iter().collect(),
             portable: portable.into_iter().collect(),
         };
-        let data = decide_data_to_portablize(current_data);
+        let to_portablize = decide_data_to_portablize(current_data);
         assert_eq!(
-            data.to_portablize,
+            to_portablize,
             HashSet::from_iter(expected_to_portablize.into_iter())
-        );
-        assert_eq!(
-            data.to_deactivate,
-            HashSet::from_iter(expected_to_deactivate.into_iter())
         );
         None
     }
