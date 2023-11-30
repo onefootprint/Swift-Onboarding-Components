@@ -27,7 +27,7 @@ type RouterProps = {
 
 const Router = ({ variant }: RouterProps) => {
   const [state, send] = useHandoffMachine();
-  const { authToken, onboardingConfig, idDocOutcome } = state.context;
+  const { authToken, onboardingConfig, idDocOutcome, l10n } = state.context;
   const tenantPk = onboardingConfig?.key;
 
   const observeCollector = useObserveCollector();
@@ -95,6 +95,7 @@ const Router = ({ variant }: RouterProps) => {
               send({ type: 'idvCompleted' });
             }}
             idDocOutcome={idDocOutcome}
+            l10n={l10n}
           />
         )}
         {state.matches('complete') && <Complete />}

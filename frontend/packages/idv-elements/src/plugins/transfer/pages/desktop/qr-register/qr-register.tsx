@@ -6,6 +6,7 @@ import React from 'react';
 import QRCode from 'react-qr-code';
 
 import { HeaderTitle, NavigationHeader } from '../../../../../components';
+import { useL10nContext } from '../../../../../components/l10n-provider';
 import { useCreateHandoffUrl, useGetD2PStatus } from '../../../../../hooks';
 import SmsButtonWithCountdown from '../../../components/sms-button-with-countdown';
 import useDesktopMachine from '../../../hooks/desktop/use-desktop-machine';
@@ -27,8 +28,8 @@ const QRRegister = () => {
     scopedAuthToken,
     idDocOutcome,
   } = state.context;
+  const l10n = useL10nContext();
   const allTKey = getRequirementsTitleTranslationKey(missingRequirements);
-
   const url = useCreateHandoffUrl({
     authToken: scopedAuthToken,
     onboardingConfig: config,
@@ -39,6 +40,7 @@ const QRRegister = () => {
     device,
     config,
     idDocOutcome,
+    l10n,
     onSuccess: (data: D2PGenerateResponse) => {
       send({
         type: 'scopedAuthTokenGenerated',

@@ -240,6 +240,7 @@ export type {
   InvokeVaultProxyRoleScope,
   InvokeVaultProxyScopeData,
   KycBootstrapData,
+  L10n,
   Liveness,
   LivenessAttestation,
   LivenessAttestationDeviceType,

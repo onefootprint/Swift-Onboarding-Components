@@ -86,15 +86,15 @@ test('E2E.es-MX.KYC.Docs #ci', async ({ browserName, isMobile, page }) => {
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
+  // TODO (belce): remove isMobile conditional
   if (isMobile /* eslint-disable-line playwright/no-conditional-in-test*/) {
-    // TODO (belce): remove isMobile conditional
-    // TODO (belce): locale options need to get sent to the handoff app
     return;
     // const newPage = await doTransferFromMobile({
     //   frame,
     //   browser,
     // });
     // await newPage.waitForLoadState();
+    // await expect(frame.getByRole('button', { name: 'Mexico' })).toBeVisible();
   } else {
     await skipTransferOnDesktop({ frame });
     await page.waitForLoadState();

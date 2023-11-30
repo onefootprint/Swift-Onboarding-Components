@@ -45,11 +45,12 @@ const Init = () => {
     const { meta } = data;
     const opener = meta?.opener ?? 'unknown';
     const bifrostSessionId = meta?.sessionId ?? '';
+    const locale = meta?.l10n?.locale ?? 'en-US';
     observeCollector.setAppContext({
       opener,
       bifrostSessionId,
     });
-    Logger.identify({ opener, bifrostSessionId });
+    Logger.identify({ opener, bifrostSessionId, locale });
   };
 
   const updateD2PStatus = () => {
@@ -98,12 +99,14 @@ const Init = () => {
         if (!state.done) {
           const { meta, status } = data;
           const opener = meta?.opener ?? 'unknown';
+          const l10n = meta?.l10n;
           const { sandboxIdDocOutcome: idDocOutcome } = meta;
           send({
             type: 'initContextUpdated',
             payload: {
               opener,
               idDocOutcome,
+              l10n,
             },
           });
 

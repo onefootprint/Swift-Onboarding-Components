@@ -4,6 +4,7 @@ import { getErrorMessage } from '@onefootprint/request';
 import type {
   D2PGenerateResponse,
   IdDocOutcome,
+  L10n,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { useEffect } from 'react';
@@ -18,6 +19,7 @@ type GenerateScopedAuthTokenArgs = {
   config?: PublicOnboardingConfig;
   onSuccess?: (data: D2PGenerateResponse) => void;
   idDocOutcome?: IdDocOutcome;
+  l10n?: L10n;
 };
 
 const useGenerateScopedAuthToken = ({
@@ -25,6 +27,7 @@ const useGenerateScopedAuthToken = ({
   device,
   onSuccess,
   idDocOutcome,
+  l10n,
 }: GenerateScopedAuthTokenArgs) => {
   const d2pGenerateMutation = useD2PGenerate();
   const sessionId = getSessionId();
@@ -47,6 +50,7 @@ const useGenerateScopedAuthToken = ({
           styleParams,
           sandboxIdDocOutcome: idDocOutcome,
           redirectUrl,
+          l10n,
         },
       },
       {

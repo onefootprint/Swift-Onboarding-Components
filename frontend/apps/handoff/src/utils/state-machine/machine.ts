@@ -1,7 +1,6 @@
 import { D2PStatus } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import type { Typegen0 } from './machine.typegen';
 import type { MachineContext, MachineEvents } from './types';
 import initContextComplete from './utils/init-context-complete';
 
@@ -14,7 +13,8 @@ export const createHandoffMachine = () =>
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as Typegen0,
+      // eslint-disable-next-line
+      tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {},
       on: {
@@ -93,6 +93,7 @@ export const createHandoffMachine = () =>
             opener,
             onboardingConfig,
             idDocOutcome,
+            l10n: locale,
             updatedStatus,
           } = event.payload;
           context.opener = opener !== undefined ? opener : context.opener;
@@ -108,6 +109,7 @@ export const createHandoffMachine = () =>
               : context.idDocOutcome;
           context.updatedStatus =
             updatedStatus !== undefined ? updatedStatus : context.updatedStatus;
+          context.l10n = locale !== undefined ? locale : context.l10n;
           return context;
         }),
         resetContext: assign(() => ({})),

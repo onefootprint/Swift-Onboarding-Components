@@ -103,6 +103,7 @@ export {
   InvestorProfileRiskTolerance,
 } from './investor-data-attribute';
 export type { InvestorProfileData } from './investor-profile-data';
+export type { L10n, SupportedLocale } from './l10n';
 export type {
   InstantAppMetadata,
   Liveness,
@@ -162,7 +163,6 @@ export type { Rule } from './rule';
 export { RuleName } from './rule';
 export { IdDocOutcome, OverallOutcome } from './sandbox-outcomes-type';
 export { default as SessionStatus } from './session-status';
-export type { SupportedLocale } from './supported-locale';
 export type { Tenant } from './tenant';
 export type {
   CollectedDataEvent,

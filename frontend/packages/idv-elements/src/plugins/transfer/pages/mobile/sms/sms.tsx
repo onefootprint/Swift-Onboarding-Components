@@ -3,6 +3,7 @@ import type { D2PGenerateResponse } from '@onefootprint/types';
 import { Grid } from '@onefootprint/ui';
 import React from 'react';
 
+import { useL10nContext } from '../../../../../components/l10n-provider';
 import HeaderTitle from '../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
 import { useCreateHandoffUrl, useGetD2PStatus } from '../../../../../hooks';
@@ -17,7 +18,7 @@ const Sms = () => {
   const [state, send] = useMobileMachine();
   const { config, scopedAuthToken, authToken, device, idDocOutcome } =
     state.context;
-
+  const l10n = useL10nContext();
   const url = useCreateHandoffUrl({
     authToken: scopedAuthToken,
     onboardingConfig: config,
@@ -28,6 +29,7 @@ const Sms = () => {
     device,
     config,
     idDocOutcome,
+    l10n,
     onSuccess: (data: D2PGenerateResponse) => {
       send({
         type: 'scopedAuthTokenGenerated',
