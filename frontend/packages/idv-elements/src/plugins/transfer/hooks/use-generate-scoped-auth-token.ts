@@ -32,7 +32,7 @@ const useGenerateScopedAuthToken = ({
   const styleParams = appearance ? JSON.stringify(appearance) : undefined;
 
   const generateScopedAuthToken = () => {
-    const isMobile = device.type === 'mobile';
+    const isMobile = device.type === 'mobile' || device.type === 'tablet';
     const redirectUrl = isMobile ? window.location.href : undefined;
 
     if (!authToken || d2pGenerateMutation.isLoading) {

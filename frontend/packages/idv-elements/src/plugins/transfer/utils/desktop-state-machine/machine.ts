@@ -20,7 +20,9 @@ const createDesktopMachine = (initialContext: MachineContext) =>
           always: [
             {
               target: 'qrRegister',
-              cond: context => context.device.type !== 'mobile',
+              cond: context =>
+                context.device.type !== 'mobile' &&
+                context.device.type !== 'tablet',
             },
             {
               target: 'complete',

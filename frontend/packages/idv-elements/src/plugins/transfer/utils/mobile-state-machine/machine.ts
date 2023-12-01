@@ -19,8 +19,10 @@ const createMobileMachine = (initialContext: MachineContext) =>
         init: {
           always: [
             {
-              description: 'If not running on mobile',
-              cond: context => context.device.type !== 'mobile',
+              description: 'If not running on mobile or tablet',
+              cond: context =>
+                context.device.type !== 'mobile' &&
+                context.device.type !== 'tablet',
               target: 'complete',
             },
             {

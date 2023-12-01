@@ -16,11 +16,12 @@ const i18n = configureI18next();
 const AppWithMachine = ({ context, onDone }: TransferProps) => {
   const { device, authToken, customData } = context;
   const { config, missingRequirements = {}, idDocOutcome } = customData || {};
+  const isMobile = device.type === 'mobile' || device.type === 'tablet';
 
   return (
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={queryClient}>
-        {device.type === 'mobile' ? (
+        {isMobile ? (
           <MobileMachineProvider
             initialContext={{
               device,

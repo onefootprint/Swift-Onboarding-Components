@@ -52,7 +52,7 @@ const checkDeviceInfo = async (): Promise<PrimitiveData> => {
     osVersion: os.version || '',
     browserName: browser.name || '',
     browserVersion: browser.version || '',
-    hasSupportForWebauthn: !!hasSupportForWebauthn,
+    hasSupportForWebauthn: hasSupportForWebauthn ? 'true' : 'false',
   };
 };
 
