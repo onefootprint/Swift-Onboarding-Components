@@ -1,7 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronDown16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { CodeInline, createFontStyles, Typography } from '@onefootprint/ui';
+import {
+  CodeInline,
+  createFontStyles,
+  Stack,
+  Typography,
+} from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 export type EnumProps = {
@@ -16,18 +21,31 @@ const Enum = ({ enums }: EnumProps) => {
   const shouldShowAllButton = enums.length > THRESHOLD;
   const items = expanded ? enums : enums.slice(0, THRESHOLD);
 
+  const groupedItems = items.reduce((acc: string[][], item: string) => {
+    const [first] = item.split('.');
+    const groupElement = acc.find(group => group[0].startsWith(first));
+    if (groupElement) {
+      groupElement.push(item);
+    } else {
+      acc.push([item]);
+    }
+    return acc;
+  }, []);
+
   return (
     <Container>
       <Typography variant="body-4" color="tertiary">
         {t('allowed-values')}
       </Typography>
-      <List>
-        {items.map((enumValue: string) => (
-          <CodeInline size="compact" key={enumValue} disabled>
-            {enumValue}
-          </CodeInline>
-        ))}
-      </List>
+      {groupedItems.map((group: string[]) => (
+        <List flexWrap="wrap" marginBottom={2} marginTop={2}>
+          {group.map((enumValue: string) => (
+            <CodeInline size="compact" key={enumValue} disabled>
+              {enumValue}
+            </CodeInline>
+          ))}
+        </List>
+      ))}
       <ButtonContainer expanded={expanded}>
         {shouldShowAllButton && (
           <ShowAllButton onClick={() => setExpanded(!expanded)}>
@@ -56,12 +74,10 @@ const Container = styled.div`
   `}
 `;
 
-const List = styled.div`
+const List = styled(Stack)`
   ${({ theme }) => css`
     ${createFontStyles('body-4')}
     color: ${theme.color.primary};
-    display: flex;
-    flex-wrap: wrap;
     gap: ${theme.spacing[2]};
   `}
 `;
