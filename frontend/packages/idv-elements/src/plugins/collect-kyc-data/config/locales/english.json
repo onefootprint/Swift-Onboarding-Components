@@ -210,7 +210,11 @@
         "edit": "Edit",
         "reveal": "Reveal",
         "hide": "Hide",
-        "cta": "Confirm & Continue"
+        "cta": "Confirm & Continue",
+        "reveal-error": {
+          "title": "Something went wrong",
+          "description": "We were not able to reveal your SSN. Please edit your SSN to save it again."
+        }
       },
       "email": {
         "title": "Email address",

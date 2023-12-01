@@ -5,7 +5,6 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import { useUserToken } from '../../../../../../../../hooks/api';
 import type { DeviceInfo } from '../../../../../../../../hooks/ui/use-device-info';
-import Logger from '../../../../../../../../utils/logger';
 import useIdentify from './hooks/use-identify';
 import type { IdentifyVerifyResponse } from './hooks/use-identify-verify';
 import useIdentifyVerify from './hooks/use-identify-verify';
@@ -31,13 +30,11 @@ const useStepUp = ({
     { authToken },
     {
       onError: (error: unknown) => {
-        Logger.error(
+        onError?.(
           `Failed to get user token info for step up. ${getErrorMessage(
             error,
           )}`,
-          'kyc-confirm',
         );
-        onError?.(error);
       },
     },
   );
@@ -56,11 +53,9 @@ const useStepUp = ({
       { authToken },
       {
         onError: (error: unknown) => {
-          Logger.error(
+          onError?.(
             `Failed to identify user for step up, ${getErrorMessage(error)}`,
-            'kyc-confirm',
           );
-          onError?.(error);
         },
       },
     );
@@ -114,10 +109,7 @@ const useStepUp = ({
         biometricChallengeJson,
       );
     } catch (e) {
-      Logger.error(
-        `Failed to get biometric challenge response, ${e}`,
-        'kyc-confirm',
-      );
+      onError?.(`Failed to get biometric challenge response, ${e}`);
     }
 
     if (!challengeResponse) {
@@ -142,13 +134,11 @@ const useStepUp = ({
           onSuccess?.(steppedUpAuthToken);
         },
         onError: (error: unknown) => {
-          Logger.error(
+          onError?.(
             `Encountered error while verifying login challenge for step up: ${getErrorMessage(
               error,
             )}`,
-            'kyc-confirm',
           );
-          onError?.(error);
         },
         onSettled: () => {
           setIsRunningWebauthn(false);
@@ -181,13 +171,11 @@ const useStepUp = ({
       {
         onSuccess: handleLoginChallengeSuccess,
         onError: (error: unknown) => {
-          Logger.error(
+          onError?.(
             `Encountered error while requesting login challenge for step up: ${getErrorMessage(
               error,
             )}`,
-            'kyc-confirm',
           );
-          onError?.(error);
         },
       },
     );

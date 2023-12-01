@@ -1,8 +1,9 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import { IcoUserCircle24 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
 import type { DecryptUserResponse } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
+import { useToast } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
 
 import type {
@@ -37,7 +38,7 @@ const IdentitySection = () => {
   const [editing, setEditing] = useState(false);
   const [state, send] = useCollectKycDataMachine();
   const { authToken, device, data, requirement } = state.context;
-  const showRequestErrorToast = useRequestErrorToast();
+  const toast = useToast();
   const decryptUserMutation = useDecryptUser();
   const ssnKind = getSsnKind(requirement);
   const ssn = getSsnValue(data, ssnKind);
@@ -122,6 +123,14 @@ const IdentitySection = () => {
     });
   };
 
+  const showErrorToast = () => {
+    toast.show({
+      title: t('summary.reveal-error.title'),
+      description: t('summary.reveal-error.description'),
+      variant: 'error',
+    });
+  };
+
   const handleStepUpSuccess = (stepUpAuthToken: string) => {
     send({
       type: 'stepUpCompleted',
@@ -153,7 +162,7 @@ const IdentitySection = () => {
             )}`,
             'kyc-confirm',
           );
-          showRequestErrorToast(error);
+          showErrorToast();
         },
       },
     );
@@ -173,7 +182,7 @@ const IdentitySection = () => {
         `useStepUp hook in kyc confirm page failed, ${getErrorMessage(error)}`,
         'kyc-confirm',
       );
-      showRequestErrorToast(error);
+      showErrorToast();
     },
   });
 
