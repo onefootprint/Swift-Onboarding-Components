@@ -16,8 +16,7 @@ const DobField = ({ disabled }: DobFieldProps) => {
     formState: { errors },
   } = useFormContext();
   const l10n = useL10nContext();
-  const defaultInputMask = useInputMask('en-US');
-  const inputMasks = useInputMask(l10n?.locale) ?? defaultInputMask;
+  const inputMasks = useInputMask(l10n?.locale);
 
   const errorByValidationError: Record<DobValidationError, string> = {
     [DobValidationError.INVALID]: t('error.invalid'),
