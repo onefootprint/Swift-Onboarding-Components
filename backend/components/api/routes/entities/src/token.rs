@@ -97,7 +97,7 @@ pub async fn post(
                 .create(conn)?;
             }
 
-            // Don't allow inheriting auth if the user was one-clicking from another tenant.
+            // Don't allow inheriting auth if the user token has more permissions than the tenant.
             // This notably makes the experience worse for users who are one-clicking onto a tenant
             // who uses us for both auth and verify.
             // The problem is user-specific tokens in one-click scenarios have more permissions
@@ -110,10 +110,20 @@ pub async fn post(
             // never see this intermediate token. The verify component can pick this up as proof
             // that the user authed directly with Footprint, and this will be used to step up the
             // token to have permissions to see one-click prefill data.
+            let portable_vw = VaultWrapper::<Any>::build_portable(conn, &sv.vault_id)?;
+            // This is an approximation of portable_vw.get_data_to_prefill - we can't use that
+            // since we don't know the playbook the user is onboarding onto.
+            // This is might be overly restrictive now - we won't allow inheriting auth if there is
+            // any portable data added by another tenant.
+            let has_prefill_data = portable_vw
+                .populated_dis()
+                .into_iter()
+                .filter_map(|di| portable_vw.get_lifetime(di))
+                .any(|dl| dl.scoped_vault_id != sv.id);
             let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
-            let can_inherit_implied_auth = !vw.is_one_click();
+            let can_auto_authorize = vw.can_auto_authorize(has_prefill_data);
 
-            let events = if can_inherit_implied_auth {
+            let events = if can_auto_authorize {
                 AuthEvent::list_recent(conn, &sv.id)?
             } else {
                 vec![]
@@ -127,7 +137,7 @@ pub async fn post(
                 su_id: Some(sv.id),
                 obc_id,
                 is_from_api: true,
-                is_implied_auth: can_inherit_implied_auth,
+                is_implied_auth: can_auto_authorize,
                 ..Default::default()
             };
             let event_ids = events.into_iter().map(|e| e.id).collect();

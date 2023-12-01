@@ -61,18 +61,17 @@ impl<Type> TenantVw<Type> {
         }
     }
 
-    /// Returns true if there's data on this VW that was added by another tenant
+    /// Returns true if authorizing this workflow won't immediately give additional access to
+    /// anything new.
+    /// When true, we create new Workflows as auto-authorized and skip the authorize screen.
     /// NOTE: our notion of one-click will evolve... it should be playbook-aware so we know which
     /// fields are being one-clicked
-    pub fn is_one_click(&self) -> bool {
-        // NOTE: be careful making changes to this. It affects implicit auth and authorization.
-        self.populated_dis().into_iter().any(|di| {
-            let Some(dl) = self.get_lifetime(di.clone()) else {
-                return true; // Shouldn't happen
-            };
-            // This is a one-click onboarding IF there's data added by another scoped vault OR
-            // there's exists data that isn't currently decryptable
-            dl.scoped_vault_id != self.scoped_vault.id || !self.tenant_can_decrypt(di)
-        })
+    /// NOTE: be careful making changes to this. It affects implicit auth and wf authorization.
+    pub fn can_auto_authorize(&self, has_prefill_data: bool) -> bool {
+        let can_decrypt_all_dis = self
+            .populated_dis()
+            .into_iter()
+            .all(|di| self.tenant_can_decrypt(di));
+        !has_prefill_data && can_decrypt_all_dis
     }
 }

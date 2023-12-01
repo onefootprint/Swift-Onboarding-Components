@@ -64,26 +64,27 @@ pub fn get_or_start_onboarding(
         wf_id
     } else {
         let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
-        let is_one_click = vw.is_one_click();
+        let is_first_wf = Workflow::list(conn, &sv.id)?.is_empty();
+        let has_prefill_data = maybe_prefill_data.as_ref().is_some_and(|pd| !pd.data.is_empty());
+        let can_auto_authorize = vw.can_auto_authorize(has_prefill_data);
         // Create the workflow for this scoped user
         let ob_create_args = OnboardingWorkflowArgs {
             scoped_vault_id: sv.id.clone(),
             ob_configuration_id: obc.id.clone(),
             insight_event: insight_event.clone(),
             // If this isn't a one click from another tenant, we can immediately mark the WF as authorized
-            authorized: !is_one_click,
+            authorized: can_auto_authorize,
             source,
             fixture_result: None,
-            is_one_click,
+            is_one_click: is_first_wf && has_prefill_data,
         };
         let (wf, is_new_ob) =
             Workflow::get_or_create_onboarding(conn, ff_client.clone(), ob_create_args, force_create)?;
 
         if is_new_ob {
             create_doc_request_if_needed(conn, &wf, obc)?;
-            let existing_wfs = Workflow::list(conn, &sv.id)?;
             let can_create_prefill_data = ff_client.flag(BoolFlag::SavePrefillData(&sv.tenant_id));
-            if can_create_prefill_data && existing_wfs.iter().all(|i| i.id == wf.id) {
+            if can_create_prefill_data && is_first_wf {
                 // For the first WF created at this tenant, prefill portable data into this tenant.
                 // TODO: the goal is to do this for all WFs in the future. But it's simpler to
                 // start with only prefilling data once
