@@ -3,7 +3,7 @@ import { IcoFaceid24 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
 import type { Identifier, LoginChallengeResponse } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
-import { Button, Typography } from '@onefootprint/ui';
+import { Button, Typography, useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import useIdentifyVerify from '../../../../../../hooks/api/hosted/identify/use-identify-verify';
@@ -20,10 +20,9 @@ const Biometric = () => {
     obConfigAuth,
   } = state.context;
   const showRequestErrorToast = useRequestErrorToast();
+  const toast = useToast();
   const loginChallengeMutation = useLoginChallenge();
   const identifyVerifyMutation = useIdentifyVerify();
-
-  const [isRetry, setIsRetry] = useState(false);
   const [isRunningWebauthn, setIsRunningWebauthn] = useState(false);
   const isWaiting = isRunningWebauthn || identifyVerifyMutation.isLoading;
   const { isLoading } = loginChallengeMutation;
@@ -96,6 +95,11 @@ const Biometric = () => {
         }`,
         'biometric-challenge',
       );
+      toast.show({
+        title: t('passkey-error.title'),
+        description: t('passkey-error.description'),
+        variant: 'error',
+      });
     }
 
     if (!challengeResponse) {
@@ -131,7 +135,6 @@ const Biometric = () => {
             )}`,
             'biometric-challenge',
           );
-          setIsRetry(true);
         },
         onSettled: () => {
           setIsRunningWebauthn(false);
@@ -155,7 +158,7 @@ const Biometric = () => {
       loading={isLoading}
       prefixIcon={IcoFaceid24}
     >
-      {isRetry ? t('cta-retry') : t('cta')}
+      {t('cta')}
     </Button>
   );
 };

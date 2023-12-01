@@ -93,10 +93,13 @@
       "label": "Passkey",
       "loading": "Waiting...",
       "success": "Success!",
-      "cta": "Launch passkey",
-      "cta-retry": "Retry passkey",
+      "cta": "Login with passkey",
       "title": "Welcome back! 🎉",
-      "login-with-sms": "Login with SMS"
+      "login-with-sms": "Login with SMS",
+      "passkey-error": {
+        "title": "Something went wrong",
+        "description": "This might be because of your device permissions. Please try logging in with SMS instead."
+      }
     }
   }
 }

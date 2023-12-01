@@ -74,13 +74,16 @@
         "verifying": "Verifying..."
       },
       "passkey-challenge": {
-        "cta-retry": "Retry passkey",
-        "cta": "Launch passkey",
+        "cta": "Login with passkey",
         "label": "Passkey",
         "loading": "Waiting...",
         "login-with-sms": "Login with SMS",
         "success": "Success!",
-        "title": "Welcome back! 🎉"
+        "title": "Welcome back! 🎉",
+        "error": {
+          "title": "Something went wrong",
+          "description": "This might be because of your device permissions. Please try logging in with SMS instead."
+        }
       },
       "email-challenge": {
         "label": "Email",

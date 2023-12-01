@@ -210,9 +210,9 @@ export const bootstrapExistingUserWithPasskey = async () => {
     expect(screen.getByTestId('navigation-close-button')).toBeInTheDocument();
   });
   await waitFor(() => {
-    expect(screen.getByText('Launch passkey')).toBeInTheDocument();
+    expect(screen.getByText('Login with passkey')).toBeInTheDocument();
   });
-  await userEvent.click(screen.getByText('Launch passkey'));
+  await userEvent.click(screen.getByText('Login with passkey'));
 };
 
 export const expectShimmer = async () => {

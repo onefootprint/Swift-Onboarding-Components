@@ -4,7 +4,7 @@ import { getBiometricChallengeResponse } from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
 import type { LoginChallengeResponse } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
-import { Button, Typography } from '@onefootprint/ui';
+import { Button, Typography, useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import { useIdentifyVerify, useLoginChallenge } from '../../hooks';
@@ -18,10 +18,9 @@ const Biometric = () => {
   } = state.context;
   const { t } = useTranslation('pages.auth.passkey-challenge');
   const showRequestErrorToast = useRequestErrorToast();
+  const toast = useToast();
   const loginChallengeMutation = useLoginChallenge();
   const identifyVerifyMutation = useIdentifyVerify();
-
-  const [isRetry, setIsRetry] = useState(false);
   const [isRunningWebauthn, setIsRunningWebauthn] = useState(false);
   const isWaiting = isRunningWebauthn || identifyVerifyMutation.isLoading;
   const { isLoading } = loginChallengeMutation;
@@ -87,6 +86,11 @@ const Biometric = () => {
           typeof e === 'string' ? e : JSON.stringify(e)
         }`,
       );
+      toast.show({
+        title: t('error.title'),
+        description: t('error.description'),
+        variant: 'error',
+      });
     }
 
     if (!challengeResponse) {
@@ -115,7 +119,6 @@ const Biometric = () => {
               error,
             )}`,
           );
-          setIsRetry(true);
         },
         onSettled: () => {
           setIsRunningWebauthn(false);
@@ -139,7 +142,7 @@ const Biometric = () => {
       onClick={handleComplete}
       prefixIcon={IcoFaceid24}
     >
-      {isRetry ? t('cta-retry') : t('cta')}
+      {t('cta')}
     </Button>
   );
 };
