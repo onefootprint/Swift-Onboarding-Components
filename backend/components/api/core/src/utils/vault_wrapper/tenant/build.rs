@@ -10,7 +10,6 @@ use db::models::vault_data::VaultData;
 use db::models::workflow::Workflow;
 use db::HasLifetime;
 use db::PgConn;
-use itertools::Itertools;
 use newtypes::{DataLifetimeSeqno, ScopedVaultId, TenantId};
 use std::collections::HashMap;
 
@@ -25,31 +24,23 @@ impl<Type> VaultWrapper<Type> {
         sv_id: &ScopedVaultId,
         version: Option<DataLifetimeSeqno>,
     ) -> ApiResult<TenantVw<Type>> {
-        let vw = Self::build_inner(conn, sv_id, version, false)?;
-        // For now, build the modern version of the VW that only shows DLs owned by the tenant
-        // alongside the legacy version. Log when data doesn't match
-        let modern_vw = Self::build_inner(conn, sv_id, version, true)?;
-        compare_vws(&vw, &modern_vw);
-        Ok(vw)
+        Self::build_inner(conn, sv_id, version)
     }
 
     /// New view of a tenant's VW that only includes data owned by this tenant.
     /// This will one day replace build_for_tenant
     pub fn build_owned(conn: &mut PgConn, sv_id: &ScopedVaultId) -> ApiResult<TenantVw<Type>> {
-        Self::build_inner(conn, sv_id, None, true)
+        Self::build_inner(conn, sv_id, None)
     }
 
     pub fn build_inner(
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
         version: Option<DataLifetimeSeqno>,
-        only_owned: bool,
     ) -> ApiResult<TenantVw<Type>> {
-        let args = match (only_owned, version) {
-            (true, Some(version)) => VwArgs::OwnedHistorical(sv_id, version),
-            (true, None) => VwArgs::OwnedTenant(sv_id),
-            (false, Some(version)) => VwArgs::Historical(sv_id, version),
-            (false, None) => VwArgs::Tenant(sv_id),
+        let args = match version {
+            Some(version) => VwArgs::Historical(sv_id, version),
+            None => VwArgs::Tenant(sv_id),
         };
         let uvw = Self::build(conn, args)?;
         let workflows = Workflow::bulk_get_for_users(conn, vec![sv_id])?
@@ -110,39 +101,5 @@ impl<Type> VaultWrapper<Type> {
             })
             .collect::<ApiResult<_>>()?;
         Ok(results)
-    }
-}
-
-#[tracing::instrument(skip_all)]
-/// Short-term logic to compare two VWs
-fn compare_vws<Type>(old: &TenantVw<Type>, new: &TenantVw<Type>) {
-    if old.scoped_vault.id != new.scoped_vault.id {
-        tracing::error!(sv_id=%old.scoped_vault.id, new_sv_id=%new.scoped_vault.id, "SV id doesn't match");
-        return;
-    }
-    let old_dis = old
-        .populated_dis()
-        .into_iter()
-        .filter(|di| old.can_see(di.clone()));
-    let new_dis = new
-        .populated_dis()
-        .into_iter()
-        .filter(|di| new.can_see(di.clone()));
-    let dis = old_dis.chain(new_dis).unique().collect_vec();
-    for di in dis {
-        let Some(old_data) = old.get(di.clone()) else {
-            tracing::error!(sv_id=%old.scoped_vault.id, %di, "Old VW missing DI");
-            continue;
-        };
-        let Some(new_data) = new.get(di.clone()) else {
-            tracing::error!(sv_id=%old.scoped_vault.id, %di, "New VW missing DI");
-            continue;
-        };
-        if old_data.data() != new_data.data() {
-            tracing::error!(sv_id=%old.scoped_vault.id, %di, old_data=?old_data.data(), new_data=?new_data.data(), "Data doesn't match");
-        }
-        if old_data.lifetime_id() != new_data.lifetime_id() {
-            tracing::info!(di=%di, "VWs have different lifetime for the same DI");
-        }
     }
 }

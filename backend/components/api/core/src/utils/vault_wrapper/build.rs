@@ -123,7 +123,7 @@ impl<Type> VaultWrapper<Type> {
 
     #[tracing::instrument("VaultWrapper:build", skip_all)]
     pub fn build(conn: &mut PgConn, args: VwArgs) -> ApiResult<Self> {
-        let (uv, sv_id, seqno, only_owned) = args.build(conn)?;
+        let (uv, sv_id, seqno) = args.build(conn)?;
         let active_lifetimes = if let Some(seqno) = seqno {
             // We are reconstructing the UVW as it appeared at a given seqno
             DataLifetime::get_active_at(conn, &uv.id, sv_id.as_ref(), seqno)?
@@ -134,8 +134,10 @@ impl<Type> VaultWrapper<Type> {
         let active_lifetimes = active_lifetimes
             .into_iter()
             .filter(|l| {
-                if only_owned {
-                    Some(&l.scoped_vault_id) == sv_id.as_ref()
+                if let Some(sv_id) = sv_id.as_ref() {
+                    // When building a tenant's view of the VW, only use DLs that the tenant created
+                    // TOOD in the future we'll clean up the `get_active` and `get_active_at` utils
+                    &l.scoped_vault_id == sv_id
                 } else {
                     true
                 }

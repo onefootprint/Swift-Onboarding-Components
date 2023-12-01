@@ -1,8 +1,5 @@
 use crate::errors::ApiResult;
-use db::{
-    models::{scoped_vault::ScopedVault, vault::Vault},
-    PgConn,
-};
+use db::{models::vault::Vault, PgConn};
 use newtypes::{DataLifetimeSeqno, ScopedVaultId, VaultId};
 
 /// There are a lot of places we build VWs, under varying circumstances. Things to consider:
@@ -21,42 +18,28 @@ pub enum VwArgs<'a> {
     /// Generally used during APIs on the tenant-specific bifrost onboarding path or
     /// in tenant-authed APIs.
     Tenant(&'a ScopedVaultId),
-    /// Will replace Tenant one day - same as Tenant, but just shows data owned by the current tenant
-    /// TODO when we deprecate the other variants, we can simplify some of the DataLifetime fetching code
-    OwnedTenant(&'a ScopedVaultId),
-    OwnedHistorical(&'a ScopedVaultId, DataLifetimeSeqno),
     /// Used to build a VW that sees ALL portable data and speculative data.
     /// Allows reconstructing a VaultWrapper from the view of a given tenant at a historical point
     /// in time.
     Historical(&'a ScopedVaultId, DataLifetimeSeqno),
 }
 
-type OnlyOwned = bool;
-type Args = (Vault, Option<ScopedVaultId>, Option<DataLifetimeSeqno>, OnlyOwned);
+type Args = (Vault, Option<ScopedVaultId>, Option<DataLifetimeSeqno>);
 
 impl<'a> VwArgs<'a> {
     pub(super) fn build(self, conn: &mut PgConn) -> ApiResult<Args> {
         let args = match self {
-            Self::Historical(sv_id, seqno) => {
-                let su = ScopedVault::get(conn, sv_id)?;
-                let uv = Vault::get(conn, &su.vault_id)?;
-                (uv, Some(su.id), Some(seqno), false)
-            }
             Self::Vault(uv_id) => {
                 let user_vault = Vault::get(conn, uv_id)?;
-                (user_vault, None, None, false)
+                (user_vault, None, None)
             }
             Self::Tenant(sv_id) => {
                 let uv = Vault::get(conn, sv_id)?;
-                (uv, Some(sv_id.clone()), None, false)
+                (uv, Some(sv_id.clone()), None)
             }
-            Self::OwnedTenant(sv_id) => {
+            Self::Historical(sv_id, seqno) => {
                 let uv = Vault::get(conn, sv_id)?;
-                (uv, Some(sv_id.clone()), None, true)
-            }
-            Self::OwnedHistorical(sv_id, seqno) => {
-                let uv = Vault::get(conn, sv_id)?;
-                (uv, Some(sv_id.clone()), Some(seqno), true)
+                (uv, Some(sv_id.clone()), Some(seqno))
             }
         };
         tracing::info!(

@@ -128,6 +128,7 @@ fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {
 #[db_test]
 fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
     // Tests that we properly apply DLs spread across multiple tenants in the correct order.
+    // This test is much less interesting now that tenants have snapshot isolated data
     let tenant = db::tests::fixtures::tenant::create(conn);
     let ob_config = db::tests::fixtures::ob_configuration::create(conn, &tenant.id, true);
     let tenant2 = db::tests::fixtures::tenant::create(conn);
@@ -172,7 +173,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
                 },
             ],
         ),
-        // Add speculative Dob at tenant 1 - not visible at tenant 2
+        // Add speculative Dob at tenant 1
         (
             &su.id,
             false,
@@ -222,7 +223,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
     let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su2.id)).unwrap();
     let tests = vec![
         (IDK::Dob, Some(SealedVaultBytes(vec![1]))),
-        (IDK::Nationality, Some(SealedVaultBytes(vec![4]))),
+        (IDK::Nationality, Some(SealedVaultBytes(vec![2]))),
     ];
     for test in tests {
         let (attribute, expected_value) = test;
