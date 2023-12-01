@@ -12,7 +12,7 @@ use newtypes::ObConfigurationId;
 use newtypes::OnboardingStatus;
 use newtypes::OnboardingStatusFilter;
 use newtypes::PiiString;
-use newtypes::VaultId;
+use newtypes::ScopedVaultId;
 use newtypes::VaultKind;
 use newtypes::WatchlistCheckStatusKind;
 use newtypes::{Fingerprint, FpId, TenantId, WorkflowKind};
@@ -53,7 +53,7 @@ pub struct SearchQuery {
 pub struct AndFingerprintQuery(pub Vec<Fingerprint>);
 
 impl ScopedVaultListQueryParams {
-    fn map_search(self, conn: &mut PgConn) -> DbResult<ScopedVaultListQueryParams<Vec<VaultId>>> {
+    fn map_search(self, conn: &mut PgConn) -> DbResult<ScopedVaultListQueryParams<Vec<ScopedVaultId>>> {
         let Self {
             tenant_id,
             is_live,
@@ -232,8 +232,8 @@ macro_rules! list_query {
             }
         }
 
-        if let Some(vault_ids) = $params.search.as_ref() {
-            query = query.filter(vault::id.eq_any(vault_ids))
+        if let Some(sv_ids) = $params.search.as_ref() {
+            query = query.filter(scoped_vault::id.eq_any(sv_ids))
         }
 
         if let Some(external_id) = $params.external_id.as_ref() {
@@ -249,22 +249,13 @@ fn vaults_matching_search(
     conn: &mut PgConn,
     search: SearchQuery,
     tenant_id: &TenantId,
-) -> DbResult<Vec<VaultId>> {
+) -> DbResult<Vec<ScopedVaultId>> {
     use db_schema::schema::{data_lifetime, fingerprint, scoped_vault, vault_data};
     let SearchQuery {
         search,
         fingerprint_queries,
     } = search;
-    // We have to basically replicate the DataLifetime::get_active inside a SQL query -
-    // fingerprints for a piece of data for a given tenant A should be visible if either:
-    // - the data is not portablized but was added by tenant A
-    // - the data is portablized (could be added by any tenant)
-    // These two subqueries handle each case respectively
-
-    // Specifically get the matching vault_ids (the scoped_vault_id might belong to another tenant)
-    // Sadly, diesel doesn't let you join on scoped_vault and use it in a subquery on the
-    // scoped_vault table... So, we have to actually execute these subqueries
-
+    // Search both plaintext results and fingerprinted results
     let plaintext_results = {
         // This is extremely specific - gin indexes have really slow performance on large tables when
         // doing a "contains" operation with 2 or fewer characteres.
@@ -277,66 +268,36 @@ fn vaults_matching_search(
             format!("%{}%", search.leak())
         };
 
-        // TODO should we store the plaintext on the fingerprint table so all searching
-        // happens on one table?
-        let speculative_ids: Vec<VaultId> = vault_data::table
+        vault_data::table
             .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
-            // SPECULATIVE visibility filters
             .filter(data_lifetime::deactivated_seqno.is_null())
-            .filter(data_lifetime::portablized_seqno.is_null())
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             // Matching filter
-            // TODO do we want to search every vault_data's p_data, or only certain kinds? i imagine card issuer will get annoying
             .filter(vault_data::p_data.ilike(&plaintext_search))
-            .select(data_lifetime::vault_id)
-            .get_results(conn)?;
-
-        let portable_ids: Vec<VaultId> = vault_data::table
-            .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
-            // PORTABLE visibility filters
-            .filter(data_lifetime::deactivated_seqno.is_null())
-            .filter(not(data_lifetime::portablized_seqno.is_null()))
-            // Matching filter
-            .filter(vault_data::p_data.ilike(&plaintext_search))
-            .select(data_lifetime::vault_id)
-            .get_results(conn)?;
-
-        speculative_ids.into_iter().chain(portable_ids).collect_vec()
+            .select(scoped_vault::id)
+            .get_results(conn)?
     };
 
     let fingerprint_results = {
         let all_fps = fingerprint_queries.iter().flat_map(|fps| &fps.0).collect_vec();
-        let speculative: Vec<(Fingerprint, VaultId)> = fingerprint::table
+
+        let results: HashMap<_, _> = fingerprint::table
             .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
-            // SPECULATIVE visibility filters
             .filter(data_lifetime::deactivated_seqno.is_null())
-            .filter(data_lifetime::portablized_seqno.is_null())
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             // Matching filter
             .filter(fingerprint::sh_data.eq_any(all_fps.clone()))
-            .select((fingerprint::sh_data, data_lifetime::vault_id))
-            .get_results(conn)?;
-
-        let portable: Vec<(Fingerprint, VaultId)> = fingerprint::table
-            .inner_join(data_lifetime::table.inner_join(scoped_vault::table))
-            // PORTABLE visibility filters
-            .filter(data_lifetime::deactivated_seqno.is_null())
-            .filter(not(data_lifetime::portablized_seqno.is_null()))
-            // Matching filter
-            .filter(fingerprint::sh_data.eq_any(all_fps))
-            .select((fingerprint::sh_data, data_lifetime::vault_id))
-            .get_results(conn)?;
-
-        // All results matching any of the fingerprints. We can't union these results - we need to
-        // apply the AND filters
-        let results: HashMap<_, _> = speculative.into_iter().chain(portable).into_group_map();
+            .select((fingerprint::sh_data, data_lifetime::scoped_vault_id))
+            .get_results::<(Fingerprint, ScopedVaultId)>(conn)?
+            .into_iter()
+            .into_group_map();
 
         // Compose the list of vaults that match _any_ of the FingerprintQueries
         fingerprint_queries
             .into_iter()
             .flat_map(|fps| {
                 // Each inner FingerprintQuery represents an AND filter.
-                // Return only the vaults that match all fingerprints.
+                // Return only the vaults that match all fingerprints in the FingerprintQuery.
                 fps.0
                     .iter()
                     .cloned()
@@ -358,7 +319,7 @@ fn vaults_matching_search(
 #[instrument(skip_all)]
 fn list(
     conn: &mut PgConn,
-    params: &ScopedVaultListQueryParams<Vec<VaultId>>,
+    params: &ScopedVaultListQueryParams<Vec<ScopedVaultId>>,
     cursor: Option<i64>,
     page_size: i64,
 ) -> DbResult<Vec<(ScopedVault, Vault)>> {

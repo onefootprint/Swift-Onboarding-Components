@@ -63,7 +63,7 @@ def test_fp_id(dual_onboarded_user):
     ), "Onboarding onto different tenants should give different fp_id"
 
 
-def test_portable_timeline_events(
+def test_prefill_timeline_events(
     sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user
 ):
     fp_id = dual_onboarded_user.fp_id
@@ -109,6 +109,21 @@ def test_cant_see_fp_id(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user)
     )
 
 
+def test_search(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):
+    """
+    Make sure we can search by fields that were prefilled
+    """
+    for search_query in ["piip", "penguin"]:
+        data = dict(search=search_query)
+        # Both tenants should be able to find the user based on the search query
+
+        body = get(f"/entities", data, *sandbox_tenant.db_auths)
+        assert any(i["id"] == dual_onboarded_user.fp_id for i in body["data"])
+
+        body = get(f"/entities", data, *foo_sandbox_tenant.db_auths)
+        assert any(i["id"] == dual_onboarded_user.foo_fp_id for i in body["data"])
+
+
 def test_cant_see_speculative_fingerprints(
     sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user
 ):
@@ -126,11 +141,11 @@ def test_cant_see_speculative_fingerprints(
 
         # sandbox_tenant should be able to search for the user from its new name
         body = get(f"/entities", data, *sandbox_tenant.db_auths)
-        assert any(i["id"] == fp_id for i in body["data"])
+        assert any(i["id"] == dual_onboarded_user.fp_id for i in body["data"])
 
         # foo_sandbox_tenant should _not_ be able to find the user by its name at sandbox_tenant
         body = get(f"/entities", data, *foo_sandbox_tenant.db_auths)
-        assert not any(i["id"] == fp_id for i in body["data"])
+        assert not any(i["id"] == dual_onboarded_user.foo_fp_id for i in body["data"])
 
 
 def test_cant_see_unrequested_portable(dual_onboarded_user, foo_sandbox_tenant):
