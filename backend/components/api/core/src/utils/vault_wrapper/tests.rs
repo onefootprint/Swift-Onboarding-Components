@@ -1,4 +1,4 @@
-use super::{Business, VaultWrapper};
+use super::{Any, Business, VaultWrapper, WriteableVw};
 use crate::utils::vault_wrapper::Person;
 use crate::utils::vault_wrapper::VwArgs;
 use db::models::data_lifetime::DataLifetime;
@@ -152,7 +152,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
                 origin_id: None,
             }],
         ),
-        // Add speculative Dob and Nationality data at tenant 2
+        // Add speculative Dob and Email data at tenant 2
         (
             &su2.id,
             false,
@@ -165,7 +165,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
                     origin_id: None,
                 },
                 NewVaultData {
-                    kind: IDK::Nationality.into(),
+                    kind: IDK::Email.into(),
                     e_data: SealedVaultBytes(vec![2]),
                     p_data: None,
                     format: VaultDataFormat::String,
@@ -185,12 +185,12 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
                 origin_id: None,
             }],
         ),
-        // Add portable Nationality at tenant 1
+        // Add portable Email at tenant 1
         (
             &su.id,
             true,
             vec![NewVaultData {
-                kind: IDK::Nationality.into(),
+                kind: IDK::Email.into(),
                 e_data: SealedVaultBytes(vec![4]),
                 p_data: None,
                 format: VaultDataFormat::String,
@@ -212,7 +212,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
     let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su.id)).unwrap();
     let tests = vec![
         (IDK::Dob, Some(SealedVaultBytes(vec![3]))),
-        (IDK::Nationality, Some(SealedVaultBytes(vec![4]))),
+        (IDK::Email, Some(SealedVaultBytes(vec![4]))),
     ];
     for test in tests {
         let (attribute, expected_value) = test;
@@ -223,7 +223,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
     let uvw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su2.id)).unwrap();
     let tests = vec![
         (IDK::Dob, Some(SealedVaultBytes(vec![1]))),
-        (IDK::Nationality, Some(SealedVaultBytes(vec![2]))),
+        (IDK::Email, Some(SealedVaultBytes(vec![2]))),
     ];
     for test in tests {
         let (attribute, expected_value) = test;
@@ -234,7 +234,7 @@ fn test_build_vw_multi_tenant_chronologically(conn: &mut TestPgConn) {
     let uvw = VaultWrapper::<Person>::build_portable(conn, &uv.id).unwrap();
     let tests = vec![
         (IDK::Dob, Some(SealedVaultBytes(vec![0]))),
-        (IDK::Nationality, Some(SealedVaultBytes(vec![4]))),
+        (IDK::Email, Some(SealedVaultBytes(vec![4]))),
     ];
     for test in tests {
         let (attribute, expected_value) = test;
@@ -945,4 +945,96 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
     // But identity data should be portable
     let expected_portable_kinds = HashSet::from_iter([IDK::Ssn4.into()]);
     assert_eq!(expected_portable_kinds, portable);
+}
+
+#[db_test]
+fn test_portable_view(conn: &mut TestPgConn) {
+    // Create a vault that has a portablized address from tenant1, then portablized address from tenant 2.
+    // Make sure we choose the correct address line2
+    let tenant1 = db::tests::fixtures::tenant::create(conn);
+    let tenant2 = db::tests::fixtures::tenant::create(conn);
+    let pb1 = db::tests::fixtures::ob_configuration::create(conn, &tenant1.id, true);
+    let pb2 = db::tests::fixtures::ob_configuration::create(conn, &tenant2.id, true);
+
+    let uv = db::tests::fixtures::vault::create_person(conn, true);
+    let su1 = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &pb1.id);
+    let su2 = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &pb2.id);
+
+    // Add address with line2 to tenant 1
+    let vw1: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su1.id).unwrap();
+    let data = vec![
+        (IDK::AddressLine1.into(), PiiString::new("730 Hayes St".into())),
+        (IDK::AddressLine2.into(), PiiString::new("#A".into())),
+        (IDK::City.into(), PiiString::new("San Francisco".into())),
+        (IDK::State.into(), PiiString::new("CA".into())),
+        (IDK::Country.into(), PiiString::new("US".into())),
+        (IDK::Zip.into(), PiiString::new("94117".into())),
+    ];
+    vw1.patch_data_test(conn, data, true).unwrap();
+    let vw1: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su1.id).unwrap();
+    vw1.portablize_identity_data(conn).unwrap();
+
+    // We should see address line2 in the portable data
+    let vw = VaultWrapper::<Any>::build_portable(conn, &uv.id).unwrap();
+    assert!(vw.get(IDK::AddressLine1).is_some());
+    assert!(vw.get(IDK::AddressLine2).is_some());
+
+    // Add address WITHOUT line2 to tenant 2
+    let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
+    let data = vec![
+        (IDK::AddressLine1.into(), PiiString::new("72 Central Ave".into())),
+        (IDK::City.into(), PiiString::new("San Francisco".into())),
+        (IDK::State.into(), PiiString::new("CA".into())),
+        (IDK::Country.into(), PiiString::new("US".into())),
+        (IDK::Zip.into(), PiiString::new("94117".into())),
+    ];
+    vw.patch_data_test(conn, data, true).unwrap();
+    let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
+    vw.portablize_identity_data(conn).unwrap();
+
+    // Compose the portable view of the VW and make sure we don't have an address line2
+    let vw = VaultWrapper::<Any>::build_portable(conn, &uv.id).unwrap();
+    assert!(vw.get(IDK::AddressLine1).is_some());
+    assert!(vw.get(IDK::AddressLine2).is_none());
+    assert!(vw.get(IDK::City).is_some());
+    assert!(vw.get(IDK::State).is_some());
+    assert!(vw.get(IDK::Zip).is_some());
+    assert!(vw.get(IDK::Country).is_some());
+
+    // Then add address line2 to tenant 2
+    let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
+    let data = vec![
+        (IDK::AddressLine1.into(), PiiString::new("72 Central Ave".into())),
+        (IDK::AddressLine2.into(), PiiString::new("#A".into())),
+        (IDK::City.into(), PiiString::new("San Francisco".into())),
+        (IDK::State.into(), PiiString::new("CA".into())),
+        (IDK::Country.into(), PiiString::new("US".into())),
+        (IDK::Zip.into(), PiiString::new("94117".into())),
+    ];
+    vw.patch_data_test(conn, data, true).unwrap();
+    let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
+    vw.portablize_identity_data(conn).unwrap();
+
+    // We should see address line2 in the portable data now
+    let vw = VaultWrapper::<Any>::build_portable(conn, &uv.id).unwrap();
+    assert!(vw.get(IDK::AddressLine1).is_some());
+    assert!(vw.get(IDK::AddressLine2).is_some());
+
+    // And a new address without line 2 at tenant 2, which should deactivate tenant2's line2
+    let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
+    let data = vec![
+        (IDK::AddressLine1.into(), PiiString::new("72 Central Ave".into())),
+        (IDK::City.into(), PiiString::new("San Francisco".into())),
+        (IDK::State.into(), PiiString::new("CA".into())),
+        (IDK::Country.into(), PiiString::new("US".into())),
+        (IDK::Zip.into(), PiiString::new("94117".into())),
+    ];
+    vw.patch_data_test(conn, data, true).unwrap();
+    let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
+    vw.portablize_identity_data(conn).unwrap();
+
+    // We should see address line2 in the portable data now
+    let vw = VaultWrapper::<Any>::build_portable(conn, &uv.id).unwrap();
+    assert!(vw.get(IDK::AddressLine1).is_some());
+    assert!(vw.get(IDK::AddressLine2).is_none());
 }

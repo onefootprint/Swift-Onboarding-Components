@@ -183,9 +183,9 @@ fn test_my1fp_get_portable(conn: &mut TestPgConn) {
         (&c.v1, c.seqno3, vec![&c.dl2]),
         // DL3 and DL4 portablized
         (&c.v1, c.seqno4, vec![&c.dl2, &c.dl3, &c.dl4]),
-        // DL5 deactivated
-        (&c.v1, c.seqno5, vec![&c.dl2, &c.dl4]),
-        (&c.v1, c.seqno6, vec![&c.dl2, &c.dl4]),
+        // DL3 deactivated, but the portable view doesn't respect deactivated_at
+        (&c.v1, c.seqno5, vec![&c.dl2, &c.dl3, &c.dl4]),
+        (&c.v1, c.seqno6, vec![&c.dl2, &c.dl3, &c.dl4]),
         //
         // v2
         //

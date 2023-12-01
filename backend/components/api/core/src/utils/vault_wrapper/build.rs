@@ -1,3 +1,4 @@
+use super::portable_view::filter_dls_for_portable_view;
 use super::PieceOfData;
 use super::VaultData;
 use super::VaultWrapper;
@@ -129,7 +130,8 @@ impl<Type> VaultWrapper<Type> {
             DataLifetime::bulk_get_active_at(conn, vec![sv_id], seqno)?
         } else {
             // Get all DLs marked as portable by any tenant
-            DataLifetime::get_portable_at(conn, &uv.id, seqno)?
+            let dls = DataLifetime::get_portable_at(conn, &uv.id, seqno)?;
+            filter_dls_for_portable_view(dls)
         };
         let active_lifetime_ids: Vec<_> = active_lifetimes.iter().map(|l| l.id.clone()).collect();
 

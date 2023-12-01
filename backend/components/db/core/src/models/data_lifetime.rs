@@ -234,7 +234,6 @@ impl DataLifetime {
     /// NOTE: this may deactivate portablized data. When deactivating portablized data, should
     /// generally only do when replacing with other portablized data
     #[tracing::instrument("DataLifetime::bulk_deactivate", skip_all)]
-    // TODO can we rm
     pub fn bulk_deactivate(
         conn: &mut PgConn,
         ids: Vec<DataLifetimeId>,
@@ -314,13 +313,6 @@ impl DataLifetime {
             .filter(data_lifetime::vault_id.eq(v_id))
             // Data must be portablized at or before the seqno
             .filter(data_lifetime::portablized_seqno.le(seqno))
-            // And either not deactivated or deactivated after the seqno
-            // TODO in the future we'll update this logic to not care about deactivated DLs
-            .filter(
-                data_lifetime::deactivated_seqno
-                    .gt(seqno)
-                    .or(data_lifetime::deactivated_seqno.is_null()),
-            )
             .get_results(conn)?;
 
         Ok(results)

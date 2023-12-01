@@ -17,6 +17,7 @@ mod create;
 mod decrypt;
 mod tenant;
 mod writeable;
+mod portable_view;
 
 pub use args::VwArgs;
 pub use create::*;
