@@ -19,10 +19,7 @@ impl<Type> WriteableVw<Type> {
         let (dis, dls) = dis
             .into_iter()
             .flat_map(|di| self.data(&di).map(|d| (di, d)))
-            // Only allow deleting data that hasn't been portablized so we don't accidentally
-            // affect other tenants' view of the world.
-            .filter(|(_, d)| d.is_speculative())
-            // And to be extra safe, make sure this tenant added the data
+            // To be extra safe, make sure this tenant added the data
             .filter(|(_, d)| d.lifetime.scoped_vault_id == self.scoped_vault_id)
             .map(|(di, d)| (di, d.lifetime.id.clone()))
             .unzip();
