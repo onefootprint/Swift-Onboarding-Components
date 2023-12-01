@@ -1,4 +1,5 @@
 import { AppearanceProvider } from '@onefootprint/appearance';
+import { Logger } from '@onefootprint/idv-elements';
 import { createGlobalStyle } from '@onefootprint/styled';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
@@ -10,11 +11,10 @@ import configureFootprint from 'src/components/footprint-provider/adapters';
 import { GOOGLE_MAPS_KEY } from '../config/constants';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
-import configureSentry from '../config/initializers/sentry';
 
 const footprint = configureFootprint();
-configureSentry();
 configureReactI18next();
+Logger.setupSentry();
 
 // TODO: add error boundary
 // https://linear.app/footprint/issue/FP-4515/add-nice-error-boundaryfallback-to-embedded-components

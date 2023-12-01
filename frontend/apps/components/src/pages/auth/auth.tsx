@@ -1,9 +1,11 @@
 import getCustomAppearance from '@onefootprint/appearance';
 import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import type { FootprintVariant } from '@onefootprint/footprint-js';
+import { Logger } from '@onefootprint/idv-elements';
 import type { FootprintAppearance } from '@onefootprint/types';
 import type { GetServerSideProps } from 'next';
 import React, { Suspense } from 'react';
+import { useEffectOnce } from 'usehooks-ts';
 
 import DrawerLoading from './components/loading/drawer-loading';
 import ModalLoading from './components/loading/modal-loading';
@@ -19,6 +21,9 @@ const getLoadingComponent = (v?: FootprintVariant): Fallback => {
 
 const Auth = ({ variant }: FootprintAppearance) => {
   const Loading = getLoadingComponent(variant);
+  useEffectOnce(() => {
+    Logger.setupLogRocket('auth');
+  });
 
   return (
     <ObserveCollectorProvider appName="component-auth">

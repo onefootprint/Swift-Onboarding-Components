@@ -7,6 +7,7 @@ import type { DeviceInfo } from '@onefootprint/idv-elements';
 import {
   getIdentifyBootstrapData,
   getRandomID,
+  Logger,
   useDeviceInfo,
 } from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
@@ -34,7 +35,10 @@ import Notification from '../notification';
 import SandboxInput from '../sandbox-input';
 import SandboxOutcomeFooter from '../sandbox-outcome-footer';
 
-type ContentServerProps = { fallback: JSX.Element; variant?: Variant | null };
+type AuthContainerProps = {
+  fallback: JSX.Element;
+  variant?: Variant | null;
+};
 
 const voidObj: Record<string, never> = {};
 const initialDevice = { hasSupportForWebauthn: false, type: 'unknown' };
@@ -52,7 +56,7 @@ const onValidationTokenError = (error: unknown) => {
 const AuthContainer = ({
   variant: paramVariant,
   fallback,
-}: ContentServerProps): JSX.Element | null => {
+}: AuthContainerProps): JSX.Element | null => {
   const isDoneRef = useRef(false);
   const [props, setProps] = useState<FootprintAuthDataProps>();
   const [config, setConfig] = useState<PublicOnboardingConfig | undefined>();
@@ -66,6 +70,14 @@ const AuthContainer = ({
     (authProps, authConfig) => {
       setProps(authProps);
       setConfig(authConfig);
+      if (authConfig) {
+        const { orgName, orgId, key } = authConfig;
+        Logger.identify({
+          orgName,
+          orgId,
+          publicKey: key,
+        });
+      }
 
       if (!isAuth(authConfig?.kind)) {
         setNotification({

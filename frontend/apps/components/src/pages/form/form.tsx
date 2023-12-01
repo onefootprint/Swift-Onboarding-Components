@@ -1,15 +1,23 @@
 import getCustomAppearance from '@onefootprint/appearance';
+import { Logger } from '@onefootprint/idv-elements';
 import type { GetServerSideProps } from 'next';
 import React, { Suspense } from 'react';
+import { useEffectOnce } from 'usehooks-ts';
 
 import Content from './components/content';
 import Loading from './components/loading';
 
-const Form = () => (
-  <Suspense fallback={<Loading />}>
-    <Content />
-  </Suspense>
-);
+const Form = () => {
+  useEffectOnce(() => {
+    Logger.setupLogRocket('form');
+  });
+
+  return (
+    <Suspense fallback={<Loading />}>
+      <Content />
+    </Suspense>
+  );
+};
 
 export const getServerSideProps: GetServerSideProps = async ({
   res,

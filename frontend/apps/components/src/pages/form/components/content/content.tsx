@@ -6,9 +6,10 @@ import {
   FootprintPrivateEvent,
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
+import { Logger } from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useFootprintProvider } from '../../../../components/footprint-provider';
 import useProps from '../../../../components/footprint-provider/hooks/use-props';
@@ -39,18 +40,30 @@ const Content = () => {
 
   const { authToken = '', title, options = {} } = props || {};
   const { hideFootprintLogo, hideButtons } = options;
+  useEffect(() => {
+    Logger.info(
+      `Received form props: title=${title}, hideFootprintLogo=${
+        hideFootprintLogo ? 'true' : 'false'
+      }, hideButtons=${hideButtons ? 'true' : 'false'}. ${
+        authToken ? 'Has' : 'No'
+      } auth token.`,
+    );
+  }, [authToken, title, hideFootprintLogo, hideButtons]);
   const { vaultData, usersVaultMutation } = useVaultData();
   const clientTokenFields = useClientTokenFields(authToken);
 
   const handleCancel = () => {
+    Logger.info('Triggered form cancel');
     footprintProvider.send(FootprintPublicEvent.canceled);
   };
 
   const handleClose = () => {
+    Logger.info('Triggered form close');
     footprintProvider.send(FootprintPublicEvent.closed);
   };
 
   const handleComplete = () => {
+    Logger.info('Triggered form complete');
     // Triggers the onComplete callback on the SDK
     footprintProvider.send(FootprintPublicEvent.completed);
     // Resolves the promise returned from the save ref method
@@ -58,10 +71,12 @@ const Content = () => {
   };
 
   const handleSave = async (formData: FormData) => {
+    Logger.info('Triggered save form data to vault');
     setFieldErrors(undefined);
     setFormErrorMessage(undefined);
 
     if (usersVaultMutation.isLoading) {
+      Logger.info('Vault mutation is already in progress, skipping save');
       return;
     }
 
@@ -71,6 +86,11 @@ const Content = () => {
     }
     const { vaultFields } = clientTokenFields.data;
     const cardAlias = getCardAlias(vaultFields);
+    Logger.info(
+      `Received vaultFields: ${vaultFields.join(
+        ', ',
+      )}. Card alias is ${cardAlias}`,
+    );
     if (!cardAlias) {
       console.error(
         'Cannot extract cardAlias from auth token. Please verify auth token has correct fields set on it.',
@@ -78,18 +98,27 @@ const Content = () => {
       return;
     }
 
+    const convertedData = convertFormData(formData, cardAlias);
+    Logger.info(
+      `Form data has keys: ${Object.keys(formData).join(
+        ', ',
+      )}. Converted data has keys: ${Object.keys(convertedData).join(', ')}`,
+    );
+
     vaultData({
       authToken,
-      data: convertFormData(formData, cardAlias),
+      data: convertedData,
       onSuccess: handleComplete,
       onError: error => {
         if (typeof error === 'string') {
+          Logger.info(`Setting form-wide error, ${error}`);
           setFormErrorMessage(error);
           return;
         }
         if (typeof error === 'object') {
           const processedFieldErrors = processFieldErrors(error);
           setFieldErrors(processedFieldErrors);
+          Logger.info(`Setting field errors: ${JSON.stringify(error)}`);
           return;
         }
         console.error(
@@ -100,9 +129,13 @@ const Content = () => {
   };
 
   const { data, isError, isLoading } = clientTokenFields;
-  if (isLoading || !props) {
-    // Default to a loading state here
-    return null;
+  if (isLoading) {
+    Logger.info('Fetching client token fields');
+    return null; // Default to a loading state here
+  }
+  if (!props) {
+    Logger.info('No props passed to secure form');
+    return null; // Default to a loading state here
   }
 
   if (isError) {

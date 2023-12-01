@@ -46,7 +46,7 @@ const checkDeviceInfo = async (): Promise<PrimitiveData> => {
 
   return {
     deviceModel: device.model || '',
-    deviceType: device.type || 'desktop',
+    deviceType: device.type || 'unknown',
     deviceVendor: device.vendor || '',
     osName: os.name || '',
     osVersion: os.version || '',
