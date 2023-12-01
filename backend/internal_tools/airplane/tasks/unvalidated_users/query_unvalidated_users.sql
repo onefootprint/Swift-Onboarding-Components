@@ -18,6 +18,8 @@ WHERE
     scoped_vault.is_live AND
     tenant.is_demo_tenant = 'f' AND
     tenant.id != 'org_e2FHVfOM5Hd3Ce492o5Aat' AND
+    -- Filter out composer, their integration regularly has unvalidated users https://onefootprint.slack.com/archives/C04QDTDM7TR/p1701142365534979
+    tenant.id != 'org_9QPsH20xLJCvSRRvxgQtFj' AND
     -- Workflows completed within the time range
     workflow.completed_at IS NOT NULL AND
     workflow.completed_at >= :start_datetime AND
