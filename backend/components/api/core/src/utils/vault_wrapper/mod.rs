@@ -46,8 +46,9 @@ pub struct VaultWrapper<Type = Any> {
     /// When there are multiple VaultDatas for one DI, the most recent VaultData comes first.
     /// Generally should use the .data() util instead of accessing this directly
     all_data: HashMap<DataIdentifier, Vec<VaultData>>,
-    /// The seqno used to reconstruct the UVW. If None, constructed with the latest view of the world.
-    _seqno: Option<DataLifetimeSeqno>,
+    /// The seqno used to reconstruct the UVW. May be the latest seqno if we're not constructing
+    /// a historical view.
+    _seqno: DataLifetimeSeqno,
     /// Represents whether we have fetched the appropriate data
     is_hydrated: PhantomData<Type>,
 }

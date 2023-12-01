@@ -1,5 +1,8 @@
 use crate::errors::ApiResult;
-use db::{models::vault::Vault, PgConn};
+use db::{
+    models::{data_lifetime::DataLifetime, vault::Vault},
+    PgConn,
+};
 use newtypes::{DataLifetimeSeqno, ScopedVaultId, VaultId};
 
 /// There are a lot of places we build VWs, under varying circumstances. Things to consider:
@@ -24,11 +27,11 @@ pub enum VwArgs<'a> {
     Historical(&'a ScopedVaultId, DataLifetimeSeqno),
 }
 
-type Args = (Vault, Option<ScopedVaultId>, Option<DataLifetimeSeqno>);
+type Args = (Vault, Option<ScopedVaultId>, DataLifetimeSeqno);
 
 impl<'a> VwArgs<'a> {
     pub(super) fn build(self, conn: &mut PgConn) -> ApiResult<Args> {
-        let args = match self {
+        let (vault, sv_id, seqno) = match self {
             Self::Vault(uv_id) => {
                 let user_vault = Vault::get(conn, uv_id)?;
                 (user_vault, None, None)
@@ -42,10 +45,11 @@ impl<'a> VwArgs<'a> {
                 (uv, Some(sv_id.clone()), Some(seqno))
             }
         };
-        tracing::info!(
-            user_vault_id=%args.0.id, scoped_user_id=%format!("{:?}", args.1), seqno=%format!("{:?}", args.2.as_ref()),
-            "Building VaultWrapper"
-        );
-        Ok(args)
+        // It's often hard to have branching logic to compose for the current seqno, so if we're
+        // not making a historical VW, let's just build it at the current seqno
+        let current_seqno = DataLifetime::get_current_seqno(conn)?;
+        let seqno = seqno.unwrap_or(current_seqno);
+        tracing::info!(user_vault_id=%vault.id, sv_id=?sv_id, seqno=%seqno, "Building VaultWrapper");
+        Ok((vault, sv_id, seqno))
     }
 }

@@ -48,7 +48,7 @@ impl<Type> VaultWrapper<Type> {
     #[allow(clippy::too_many_arguments)]
     pub(super) fn build_internal(
         user_vault: Vault,
-        seqno: Option<DataLifetimeSeqno>,
+        seqno: DataLifetimeSeqno,
         vd: Vec<DbVaultData>,
         documents: Vec<DocumentData>,
         lifetimes: Vec<DataLifetime>,
@@ -124,25 +124,13 @@ impl<Type> VaultWrapper<Type> {
     #[tracing::instrument("VaultWrapper:build", skip_all)]
     pub fn build(conn: &mut PgConn, args: VwArgs) -> ApiResult<Self> {
         let (uv, sv_id, seqno) = args.build(conn)?;
-        let active_lifetimes = if let Some(seqno) = seqno {
-            // We are reconstructing the UVW as it appeared at a given seqno
-            DataLifetime::get_active_at(conn, &uv.id, sv_id.as_ref(), seqno)?
+        let active_lifetimes = if let Some(sv_id) = sv_id.as_ref() {
+            // Get all DLs that belong to this tenant
+            DataLifetime::bulk_get_active_at(conn, vec![sv_id], seqno)?
         } else {
-            // We are constructing the UVW as it appears right now
-            DataLifetime::get_active(conn, &uv.id, sv_id.as_ref())?
+            // Get all DLs marked as portable by any tenant
+            DataLifetime::get_portable_at(conn, &uv.id, seqno)?
         };
-        let active_lifetimes = active_lifetimes
-            .into_iter()
-            .filter(|l| {
-                if let Some(sv_id) = sv_id.as_ref() {
-                    // When building a tenant's view of the VW, only use DLs that the tenant created
-                    // TOOD in the future we'll clean up the `get_active` and `get_active_at` utils
-                    &l.scoped_vault_id == sv_id
-                } else {
-                    true
-                }
-            })
-            .collect_vec();
         let active_lifetime_ids: Vec<_> = active_lifetimes.iter().map(|l| l.id.clone()).collect();
 
         // Fetch all the data related to the active lifetimes

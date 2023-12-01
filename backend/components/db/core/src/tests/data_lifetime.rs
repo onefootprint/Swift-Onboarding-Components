@@ -1,6 +1,7 @@
 use super::fixtures;
 use crate::models::data_lifetime::DataLifetime;
 use crate::tests::prelude::*;
+use itertools::Itertools;
 use macros::db_test;
 use newtypes::{
     DataLifetimeId, DataLifetimeSeqno, DocumentKind, DocumentSide, IdDocKind, IdentityDataKind,
@@ -18,12 +19,19 @@ where
 }
 
 struct TestData {
-    t_id: TenantId,
-    t2_id: TenantId,
-    uv_id: VaultId,
-    uv2_id: VaultId,
-    uvx_id: VaultId,
-    su_id: ScopedVaultId,
+    #[allow(unused)]
+    t1: TenantId,
+    #[allow(unused)]
+    t2: TenantId,
+    v1: VaultId,
+    v2: VaultId,
+    vx: VaultId,
+    /// v1, t1
+    su: ScopedVaultId,
+    /// v2, t1
+    su2: ScopedVaultId,
+    /// v1, t2
+    su3: ScopedVaultId,
     seqno0: DataLifetimeSeqno,
     seqno1: DataLifetimeSeqno,
     seqno2: DataLifetimeSeqno,
@@ -31,33 +39,47 @@ struct TestData {
     seqno4: DataLifetimeSeqno,
     seqno5: DataLifetimeSeqno,
     seqno6: DataLifetimeSeqno,
-    lifetime1: DataLifetime,
-    lifetime2: DataLifetime,
-    lifetime3: DataLifetime,
-    lifetime4: DataLifetime,
-    lifetime5: DataLifetime,
-    lifetime6: DataLifetime,
+    dl1: DataLifetime,
+    dl2: DataLifetime,
+    dl3: DataLifetime,
+    dl4: DataLifetime,
+    dl5: DataLifetime,
+    dl6: DataLifetime,
 }
 
 impl TestData {
+    /**
+    Creates a series of DLs for different users with different lifecycles. The table below shows
+    the owernship and lifecycle of each fixture DL
+    ```
+    |     | v | t | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+    |-----|---|---|---|---|---|---|---|---|---|---|
+    | DL1 | 1 | 1 |   | C |   |   |   |   |   |   |
+    | DL2 | 1 | 1 |   | C |   | P |   |   |   |   |
+    | DL3 | 1 | 1 |   | C |   |   | P | D |   |   |
+    | DL4 | 1 | 2 |   | C |   |   | P |   |   |   |
+    | DL5 | 2 | 1 |   | C |   |   |   |   |   |   |
+    | DL6 | 2 | 1 |   | C |   | P |   |   |   |   |
+    ````
+     */
     fn build(conn: &mut TestPgConn) -> Self {
         // Create tenants
-        let t_id = fixtures::tenant::create(conn).id;
+        let t1_id = fixtures::tenant::create(conn).id;
         let t2_id = fixtures::tenant::create(conn).id;
 
         // Create ob configs
-        let ob_config_id = fixtures::ob_configuration::create(conn, &t_id, true).id;
+        let ob_config_id = fixtures::ob_configuration::create(conn, &t1_id, true).id;
         let ob_config2_id = fixtures::ob_configuration::create(conn, &t2_id, true).id;
 
         // Create user vaults (without phone number)
-        let uv_id = fixtures::vault::create_person(conn, true).into_inner().id;
-        let uv2_id = fixtures::vault::create_person(conn, true).into_inner().id;
-        let uvx_id = fixtures::vault::create_person(conn, true).into_inner().id;
+        let v1_id = fixtures::vault::create_person(conn, true).into_inner().id;
+        let v2_id = fixtures::vault::create_person(conn, true).into_inner().id;
+        let vx_id = fixtures::vault::create_person(conn, true).into_inner().id;
 
         // Create scoped users
-        let su_id = fixtures::scoped_vault::create(conn, &uv_id, &ob_config_id).id;
-        let su2_id = fixtures::scoped_vault::create(conn, &uv2_id, &ob_config_id).id;
-        let su3_id = fixtures::scoped_vault::create(conn, &uv_id, &ob_config2_id).id;
+        let su_id = fixtures::scoped_vault::create(conn, &v1_id, &ob_config_id).id;
+        let su2_id = fixtures::scoped_vault::create(conn, &v2_id, &ob_config_id).id;
+        let su3_id = fixtures::scoped_vault::create(conn, &v1_id, &ob_config2_id).id;
 
         // Timeline of seqnos
         let seqno0 = DataLifetime::get_next_seqno(conn).unwrap();
@@ -69,20 +91,20 @@ impl TestData {
         let seqno6 = DataLifetime::get_next_seqno(conn).unwrap();
 
         // Place some DataLifetimes at various points along the timeline
-        let lifetime1 =
-            fixtures::data_lifetime::build(conn, &uv_id, &su_id, seqno1, None, None, IdentityDataKind::Email);
-        let lifetime2 = fixtures::data_lifetime::build(
+        let dl1 =
+            fixtures::data_lifetime::build(conn, &v1_id, &su_id, seqno1, None, None, IdentityDataKind::Email);
+        let dl2 = fixtures::data_lifetime::build(
             conn,
-            &uv_id,
+            &v1_id,
             &su_id,
             seqno1,
             Some(seqno3),
             None,
             IdentityDataKind::FirstName,
         );
-        let lifetime3 = fixtures::data_lifetime::build(
+        let dl3 = fixtures::data_lifetime::build(
             conn,
-            &uv_id,
+            &v1_id,
             &su_id,
             seqno1,
             Some(seqno4),
@@ -90,9 +112,9 @@ impl TestData {
             IdentityDataKind::LastName,
         );
         // For same user, different scoped user
-        let lifetime4 = fixtures::data_lifetime::build(
+        let dl4 = fixtures::data_lifetime::build(
             conn,
-            &uv_id,
+            &v1_id,
             &su3_id,
             seqno1,
             Some(seqno4),
@@ -100,18 +122,18 @@ impl TestData {
             IdentityDataKind::PhoneNumber,
         );
         // For different user
-        let lifetime5 = fixtures::data_lifetime::build(
+        let dl5 = fixtures::data_lifetime::build(
             conn,
-            &uv2_id,
+            &v2_id,
             &su2_id,
             seqno1,
             None,
             None,
             DocumentKind::Image(IdDocKind::Passport, DocumentSide::Front),
         );
-        let lifetime6 = fixtures::data_lifetime::build(
+        let dl6 = fixtures::data_lifetime::build(
             conn,
-            &uv2_id,
+            &v2_id,
             &su2_id,
             seqno1,
             Some(seqno3),
@@ -120,12 +142,14 @@ impl TestData {
         );
 
         Self {
-            t_id,
-            t2_id,
-            uv_id,
-            uv2_id,
-            uvx_id,
-            su_id,
+            t1: t1_id,
+            t2: t2_id,
+            v1: v1_id,
+            v2: v2_id,
+            vx: vx_id,
+            su: su_id,
+            su2: su2_id,
+            su3: su3_id,
             seqno0,
             seqno1,
             seqno2,
@@ -133,184 +157,96 @@ impl TestData {
             seqno4,
             seqno5,
             seqno6,
-            lifetime1,
-            lifetime2,
-            lifetime3,
-            lifetime4,
-            lifetime5,
-            lifetime6,
+            dl1,
+            dl2,
+            dl3,
+            dl4,
+            dl5,
+            dl6,
         }
     }
 }
 
 #[db_test]
-fn test_get_active(conn: &mut TestPgConn) {
-    let c = TestData::build(conn);
-    // Query for su_id, should return all active lifetimes
-    let results = DataLifetime::get_active(conn, &c.uv_id, Some(&c.su_id)).unwrap();
-    assert_eq!(ids(results), ids(vec![&c.lifetime1, &c.lifetime2, &c.lifetime4]));
-
-    // Query for only portable data (not scoped to any tenant), should only return portable lifetimes
-    let results = DataLifetime::get_active(conn, &c.uv_id, None).unwrap();
-    assert_eq!(ids(results), ids(vec![&c.lifetime2, &c.lifetime4]));
-}
-
-#[db_test]
-fn test_get_bulk_active_for_tenant(conn: &mut TestPgConn) {
-    let c = TestData::build(conn);
-    // View for tenant 1
-    let mut results =
-        DataLifetime::get_bulk_active_for_tenant(conn, vec![&c.uv_id, &c.uv2_id, &c.uvx_id], &c.t_id, None)
-            .unwrap();
-    assert_eq!(
-        ids(results.remove(&c.uv_id).unwrap()),
-        ids(vec![&c.lifetime1, &c.lifetime2, &c.lifetime4]) // lifetime4 visible from other tenant bc portable
-    );
-    assert_eq!(
-        ids(results.remove(&c.uv2_id).unwrap()),
-        ids(vec![&c.lifetime5, &c.lifetime6])
-    );
-    assert!(results.is_empty()); // No other results
-
-    // View for tenant 2
-    let mut results =
-        DataLifetime::get_bulk_active_for_tenant(conn, vec![&c.uv_id, &c.uv2_id, &c.uvx_id], &c.t2_id, None)
-            .unwrap();
-    assert_eq!(
-        ids(results.remove(&c.uv_id).unwrap()),
-        ids(vec![&c.lifetime2, &c.lifetime4]) //lifetime2 visible from other tenant bc portable
-    );
-    assert_eq!(ids(results.remove(&c.uv2_id).unwrap()), ids(vec![&c.lifetime6])); // lifetime6 visible from other tenant bc portable
-    assert!(results.is_empty()); // No other results
-}
-
-#[db_test]
-fn test_get_bulk_active_for_tenant_seqno(conn: &mut TestPgConn) {
+fn test_my1fp_get_portable(conn: &mut TestPgConn) {
+    // Test getting all of the DLs that are visible in a my1fp context - only the portable ones
     let c = TestData::build(conn);
 
     let tests = vec![
-        (Some(c.seqno0), (vec![], vec![]), (vec![], vec![])), // Nothing exists
-        (
-            Some(c.seqno1),
-            (
-                vec![&c.lifetime1, &c.lifetime2, &c.lifetime3],
-                vec![&c.lifetime5, &c.lifetime6],
-            ),
-            (vec![&c.lifetime4], vec![]),
-        ), // 1,2,3 added for (t1, uv1), 5,6 added for (t1, uv2), 4 added for (t2, uv1)
-        (
-            Some(c.seqno3),
-            (
-                vec![&c.lifetime1, &c.lifetime2, &c.lifetime3],
-                vec![&c.lifetime5, &c.lifetime6],
-            ),
-            (vec![&c.lifetime4, &c.lifetime2], vec![&c.lifetime6]),
-        ), // 2,6 portabalized
-        (
-            Some(c.seqno4),
-            (
-                vec![&c.lifetime1, &c.lifetime2, &c.lifetime3, &c.lifetime4],
-                vec![&c.lifetime5, &c.lifetime6],
-            ),
-            (vec![&c.lifetime4, &c.lifetime2, &c.lifetime3], vec![&c.lifetime6]),
-        ), // 3,4 portabalized
-        (
-            Some(c.seqno5),
-            (
-                vec![&c.lifetime1, &c.lifetime2, &c.lifetime4],
-                vec![&c.lifetime5, &c.lifetime6],
-            ),
-            (vec![&c.lifetime4, &c.lifetime2], vec![&c.lifetime6]),
-        ), // 3 deactivated
-        (
-            None,
-            (
-                vec![&c.lifetime1, &c.lifetime2, &c.lifetime4],
-                vec![&c.lifetime5, &c.lifetime6],
-            ),
-            (vec![&c.lifetime4, &c.lifetime2], vec![&c.lifetime6]),
-        ),
+        //
+        // v1
+        //
+        (&c.v1, c.seqno0, vec![]),
+        (&c.v1, c.seqno1, vec![]),
+        (&c.v1, c.seqno2, vec![]),
+        // DL2 portablized
+        (&c.v1, c.seqno3, vec![&c.dl2]),
+        // DL3 and DL4 portablized
+        (&c.v1, c.seqno4, vec![&c.dl2, &c.dl3, &c.dl4]),
+        // DL5 deactivated
+        (&c.v1, c.seqno5, vec![&c.dl2, &c.dl4]),
+        (&c.v1, c.seqno6, vec![&c.dl2, &c.dl4]),
+        //
+        // v2
+        //
+        (&c.v2, c.seqno0, vec![]),
+        (&c.v2, c.seqno1, vec![]),
+        (&c.v2, c.seqno2, vec![]),
+        // DL6 portablized
+        (&c.v2, c.seqno3, vec![&c.dl6]),
+        (&c.v2, c.seqno4, vec![&c.dl6]),
+        (&c.v2, c.seqno5, vec![&c.dl6]),
+        (&c.v2, c.seqno6, vec![&c.dl6]),
+        //
+        // vx
+        //
+        (&c.vx, c.seqno6, vec![]),
     ];
-    for test in tests {
-        let (seqno, (t1_u1_expected, t1_u2_expected), (t2_u1_expected, t2_u2_expected)) = test;
 
-        let mut t1_results = DataLifetime::get_bulk_active_for_tenant(
-            conn,
-            vec![&c.uv_id, &c.uv2_id, &c.uvx_id],
-            &c.t_id,
-            seqno,
-        )
-        .unwrap();
-
-        // View for tenant 1
-        assert_eq!(
-            ids(t1_u1_expected),
-            ids(t1_results.remove(&c.uv_id).unwrap_or_default())
-        );
-        assert_eq!(
-            ids(t1_u2_expected),
-            ids(t1_results.remove(&c.uv2_id).unwrap_or_default())
-        );
-        assert!(t1_results.is_empty()); // No other results
-
-        // View for tenant 2
-        let mut t2_results = DataLifetime::get_bulk_active_for_tenant(
-            conn,
-            vec![&c.uv_id, &c.uv2_id, &c.uvx_id],
-            &c.t2_id,
-            seqno,
-        )
-        .unwrap();
-        assert_eq!(
-            ids(t2_u1_expected),
-            ids(t2_results.remove(&c.uv_id).unwrap_or_default())
-        );
-        assert_eq!(
-            ids(t2_u2_expected),
-            ids(t2_results.remove(&c.uv2_id).unwrap_or_default())
-        );
-        assert!(t2_results.is_empty()); // No other results
+    for (v_id, seqno, expected_dls) in tests {
+        let results = DataLifetime::get_portable_at(conn, v_id, seqno).unwrap();
+        assert_eq!(ids(results), ids(expected_dls));
     }
 }
 
 #[db_test]
-fn test_get_active_at_for_tenant(conn: &mut TestPgConn) {
-    let c = TestData::build(conn);
-    let tests = vec![
-        (c.seqno0, vec![]),                                         // Nothing exists
-        (c.seqno1, vec![&c.lifetime1, &c.lifetime2, &c.lifetime3]), // l1, l2, l3 created for tenant
-        (c.seqno2, vec![&c.lifetime1, &c.lifetime2, &c.lifetime3]), // Nothing happens here
-        (c.seqno3, vec![&c.lifetime1, &c.lifetime2, &c.lifetime3]), // l2 portable
-        (
-            c.seqno4,
-            vec![&c.lifetime1, &c.lifetime2, &c.lifetime3, &c.lifetime4],
-        ), // l3 portable, l4 portable at other tenant
-        (c.seqno5, vec![&c.lifetime1, &c.lifetime2, &c.lifetime4]), // l3 deactivated
-        (c.seqno6, vec![&c.lifetime1, &c.lifetime2, &c.lifetime4]), // Nothing happens here
-    ];
-    for test in tests {
-        let (seqno, expected_results) = test;
-        let results = DataLifetime::get_active_at(conn, &c.uv_id, Some(&c.su_id), seqno).unwrap();
-        assert_eq!(ids(results), ids(expected_results));
-    }
-}
-
-#[db_test]
-fn test_get_active_at_only_portable(conn: &mut TestPgConn) {
+fn test_bulk_get_added_by_tenant(conn: &mut TestPgConn) {
     let c = TestData::build(conn);
 
     let tests = vec![
-        (c.seqno0, vec![]),                                         // Nothing exists
-        (c.seqno1, vec![]),             // l1, l2, l3 created for tenant, not visible yet
-        (c.seqno2, vec![]),             // Nothing happens here
-        (c.seqno3, vec![&c.lifetime2]), // l2 portable
-        (c.seqno4, vec![&c.lifetime2, &c.lifetime3, &c.lifetime4]), // l3 portable, l4 portable at other tenant
-        (c.seqno5, vec![&c.lifetime2, &c.lifetime4]),               // l3 deactivated
-        (c.seqno6, vec![&c.lifetime2, &c.lifetime4]),               // Nothing happens here
+        //
+        // su_id
+        //
+        (&c.su, c.seqno0, vec![]),
+        (&c.su, c.seqno1, vec![&c.dl1, &c.dl2, &c.dl3]),
+        (&c.su, c.seqno2, vec![&c.dl1, &c.dl2, &c.dl3]),
+        (&c.su, c.seqno3, vec![&c.dl1, &c.dl2, &c.dl3]),
+        (&c.su, c.seqno4, vec![&c.dl1, &c.dl2, &c.dl3]),
+        (&c.su, c.seqno5, vec![&c.dl1, &c.dl2]),
+        (&c.su, c.seqno6, vec![&c.dl1, &c.dl2]),
+        //
+        // su2_id
+        //
+        (&c.su2, c.seqno0, vec![]),
+        (&c.su2, c.seqno1, vec![&c.dl5, &c.dl6]),
+        (&c.su2, c.seqno6, vec![&c.dl5, &c.dl6]),
+        //
+        // su3_id
+        //
+        (&c.su3, c.seqno0, vec![]),
+        (&c.su3, c.seqno1, vec![&c.dl4]),
+        (&c.su3, c.seqno6, vec![&c.dl4]),
     ];
-    for test in tests {
-        let (seqno, expected_results) = test;
-        let results = DataLifetime::get_active_at(conn, &c.uv_id, None, seqno).unwrap();
-        assert_eq!(ids(results), ids(expected_results));
+
+    for (sv_id, seqno, expected_dls) in tests {
+        // Test both when we have other users fetched alongside in bulk AND when fetching independently
+        let results = DataLifetime::bulk_get_active_at(conn, vec![sv_id], seqno).unwrap();
+        assert_eq!(ids(results), ids(expected_dls.clone()));
+        let results = DataLifetime::bulk_get_active_at(conn, vec![&c.su, &c.su2, &c.su3], seqno)
+            .unwrap()
+            .into_iter()
+            .filter(|dl| &dl.scoped_vault_id == sv_id)
+            .collect_vec();
+        assert_eq!(ids(results), ids(expected_dls));
     }
 }

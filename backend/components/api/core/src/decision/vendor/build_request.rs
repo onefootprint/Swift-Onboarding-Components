@@ -183,7 +183,7 @@ pub async fn build_business_data_from_verification_request(
             let vaults: Vec<_> = vec![primary_bo_vault].into_iter().chain(secondary_bo_vaults).map(|v| (v.0, v.1)).collect();
  
              let vws: HashMap<ScopedVaultId, TenantVw> = db_pool.db_query(move |conn| {
-                 VaultWrapper::multi_get_for_tenant(conn, vaults, &sv.tenant_id, Some(seqno))
+                 VaultWrapper::multi_get_for_tenant(conn, vaults, Some(seqno))
              
              }).await??;
              // Future optimization would be to bulk decrypt multiple vaults data in one enclave call

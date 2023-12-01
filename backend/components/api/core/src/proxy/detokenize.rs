@@ -44,7 +44,7 @@ pub async fn detokenize(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let svs = ScopedVault::bulk_get(conn, fp_ids, &tenant_id, is_live)?;
-            let vws = VaultWrapper::multi_get_for_tenant(conn, svs, &tenant_id, None)?;
+            let vws = VaultWrapper::multi_get_for_tenant(conn, svs, None)?;
             Ok(vws)
         })
         .await??

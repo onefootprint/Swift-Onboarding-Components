@@ -915,8 +915,9 @@ fn test_dont_commit_non_id_data(conn: &mut TestPgConn) {
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
     uvw.portablize_identity_data(conn).unwrap();
 
+    let seqno = DataLifetime::get_current_seqno(conn).unwrap();
     let (portable, speculative): (HashSet<_>, HashSet<_>) =
-        DataLifetime::get_active(conn, &uv.id, Some(&su.id))
+        DataLifetime::bulk_get_active_at(conn, vec![&su.id], seqno)
             .unwrap()
             .into_iter()
             .partition_map(|dl| {
