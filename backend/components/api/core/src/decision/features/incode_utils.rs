@@ -81,17 +81,23 @@ impl ParsedIncodeNames {
         if let Some(mrz_full_name) = name.machine_readable_full_name {
             let mrz_full_name: PiiString = mrz_full_name.leak_to_string().trim().to_owned().into();
             // if the mrz full name matches the Incode given first/middle/last breakdown, then we can just use Incode's name parsing here (which may be better if they use context of the doc or something more intelligent than splitting on strings?)
-            let all = [
+            let mrz_name_components: Vec<PiiString> = mrz_full_name.leak_to_string().split(' ').map(|s| s.to_lowercase().into()).collect_vec();
+
+            let incode_parsed_name_components: Vec<PiiString> = [
                 first_name_from_first_name_field.clone(),
                 middle_name_from_middle_name_field.clone(),
                 last_name.clone(),
             ]
             .iter()
             .flatten()
-            .map(|s| Self::remove_hyphens_and_apostrophes(s).leak_to_string())
-            .join("");
+            .map(|s| Self::remove_hyphens_and_apostrophes(s).leak_to_string().to_lowercase().into()).collect_vec();
+
+            // We have to compare this way because sometimes Incode is giving us mrz names that are jumbled
+            // eg: name is Alice Bob Cook but mrz_full_name = Cook Alice Bob (even though the non mrz fields are parsed in the right order)
+            let mrz_and_incode_parsed_match = Self::name_components_match(&mrz_name_components, &incode_parsed_name_components);
+
             let (first_name, middle_name, last_name) =
-                if all.to_lowercase() == mrz_full_name.leak_to_string().to_lowercase().split(' ').join("") {
+                if mrz_and_incode_parsed_match {
                     (
                         first_name_from_first_name_field,
                         middle_name_from_middle_name_field,
@@ -120,6 +126,15 @@ impl ParsedIncodeNames {
         };
 
         ParsedIncodeNames::new(first_name, middle_name, last_name)
+    }
+
+    fn name_components_match(v1: &[PiiString], v2: &[PiiString]) -> bool {
+        // Checks if any permutation of concatenating the components of the mrz name (v1) matches any permutation of concatenating the components of the non-mrz names (v2)
+        // This is dumb as hell I know but I couldn't really figure out a better way to handle all combinations of apostrophes/hyphens/trailing white spaces + name jumblings
+        let v1_name_permutations = v1.iter().permutations(v1.len()).map(|p| p.into_iter().map(|s| s.leak_to_string()).join("")).collect_vec();
+        let v2_name_permutations = v2.iter().permutations(v2.len()).map(|p| p.into_iter().map(|s| s.leak_to_string()).join("")).collect_vec();
+
+        v1_name_permutations.iter().any(|v1p| v2_name_permutations.contains(v1p))
     }
 
     // take first token as first name and remaining (if present) as middle name
@@ -671,6 +686,22 @@ mod tests {
             last_name: Some("O'BERTO".into()),
             full_name: Some("BOB O'BERTO".into())
         } ; "apostrophe in OCR names but not MRZ name, with trailing space in MRZ"
+    )]
+    #[test_case(
+        OCRName {
+            full_name: Some("AUSTIN WALLACE HOOK".into()),
+            machine_readable_full_name: Some("HOOK AUSTIN WALLACE".into()),
+            first_name: Some("AUSTIN".into()),
+            middle_name: Some("WALLACE".into()),
+            given_name: Some("AUSTIN WALLACE".into()),
+            paternal_last_name: Some("HOOK".into()),
+            ..Default::default()               
+        } => ParsedIncodeNames {
+            first_name: Some("AUSTIN".into()),
+            middle_name: Some("WALLACE".into()),
+            last_name: Some("HOOK".into()),
+            full_name: Some("AUSTIN WALLACE HOOK".into())
+        } ; "comma in barcode/mrz name but Incode is dropping it so name ordering is ambiguous"
     )]
     fn test_parse_names_from_incode(name: OCRName) ->  ParsedIncodeNames{
         ParsedIncodeNames::from_fetch_ocr_res(&FetchOCRResponse {
