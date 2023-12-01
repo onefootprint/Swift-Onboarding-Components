@@ -1,3 +1,4 @@
+import type { ChallengeData } from '@onefootprint/types';
 import { useMachine } from '@xstate/react';
 import React from 'react';
 
@@ -15,11 +16,14 @@ import Ssn from '../ssn';
 import WithSdkArgs from './components/with-sdk-args';
 
 type RouterProps = {
-  authToken: string;
+  sdkAuthToken: string;
 };
 
-const Router = ({ authToken }: RouterProps) => {
-  const [state, send] = useMachine(() => createMachine(authToken));
+// We show the success screen for a short period of time so that the user can see
+const SUCCESS_EVENT_DELAY_MS = 1500;
+
+const Router = ({ sdkAuthToken }: RouterProps) => {
+  const [state, send] = useMachine(() => createMachine(sdkAuthToken));
   const { obConfigAuth, identify } = state.context;
 
   const handleIdentified = ({
@@ -29,6 +33,7 @@ const Router = ({ authToken }: RouterProps) => {
     isUnverified,
     availableChallengeKinds,
     hasSyncablePassKey,
+    successfulIdentifier,
   }: IdentifyResultProps) => {
     send({
       type: 'identified',
@@ -39,14 +44,26 @@ const Router = ({ authToken }: RouterProps) => {
         phoneNumber,
         hasSyncablePassKey,
         availableChallengeKinds,
+        successfulIdentifier,
       },
     });
+  };
+
+  const handleChallengeSucceed = (authToken: string) => {
+    setTimeout(() => {
+      send({
+        type: 'challengeSucceeded',
+        payload: {
+          authToken,
+        },
+      });
+    }, SUCCESS_EVENT_DELAY_MS);
   };
 
   if (state.matches('init')) {
     return (
       <Init
-        authToken={authToken}
+        authToken={sdkAuthToken}
         onDone={({ error, data }) => {
           if (data && data.obConfig) {
             send({
@@ -83,7 +100,7 @@ const Router = ({ authToken }: RouterProps) => {
         <PhoneIdentification
           obConfigAuth={obConfigAuth}
           onComplete={handleIdentified}
-          email={identify.email}
+          email={identify.identifyResult?.email}
           onEmailEdit={() => send({ type: 'identifyReset' })}
         />
       );
@@ -91,13 +108,21 @@ const Router = ({ authToken }: RouterProps) => {
   }
 
   if (state.matches('smsChallenge')) {
-    return (
-      <SmsChallenge
-        onDone={() => {
-          send('done');
-        }}
-      />
-    );
+    if (obConfigAuth) {
+      return (
+        <SmsChallenge
+          identify={identify}
+          obConfigAuth={obConfigAuth}
+          onComplete={handleChallengeSucceed}
+          onChallengeReceived={(challengeData: ChallengeData) =>
+            send({
+              type: 'challengeReceived',
+              payload: challengeData,
+            })
+          }
+        />
+      );
+    }
   }
 
   if (state.matches('basicInformation')) {
@@ -136,8 +161,8 @@ const Router = ({ authToken }: RouterProps) => {
 const RouterWithSdkArgs = () => {
   return (
     <WithSdkArgs>
-      {authToken => {
-        return <Router authToken={authToken} />;
+      {sdkAuthToken => {
+        return <Router sdkAuthToken={sdkAuthToken} />;
       }}
     </WithSdkArgs>
   );

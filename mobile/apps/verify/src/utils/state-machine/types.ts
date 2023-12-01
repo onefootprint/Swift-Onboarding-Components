@@ -1,5 +1,7 @@
 import type {
+  ChallengeData,
   ChallengeKind,
+  Identifier,
   ObConfigAuth,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
@@ -11,13 +13,20 @@ export type IdentifyResultProps = {
   isUnverified: boolean;
   availableChallengeKinds?: ChallengeKind[];
   hasSyncablePassKey?: boolean;
+  successfulIdentifier: Identifier;
+};
+
+export type IdentifyData = {
+  identifyResult?: IdentifyResultProps;
+  challengeData?: ChallengeData;
+  authToken?: string;
 };
 
 export type MachineContext = {
-  authToken: string;
+  sdkAuthToken: string;
   config?: PublicOnboardingConfig;
   obConfigAuth?: ObConfigAuth;
-  identify?: IdentifyResultProps;
+  identify: IdentifyData;
 };
 
 export type MachineEvents =
@@ -37,4 +46,14 @@ export type MachineEvents =
   | {
       type: 'phoneIdentification';
       payload: IdentifyResultProps;
+    }
+  | {
+      type: 'challengeReceived';
+      payload: ChallengeData;
+    }
+  | {
+      type: 'challengeSucceeded';
+      payload: {
+        authToken: string;
+      };
     };

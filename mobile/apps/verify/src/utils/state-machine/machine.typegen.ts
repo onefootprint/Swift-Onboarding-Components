@@ -13,6 +13,8 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
+    assignAuthToken: 'challengeSucceeded';
+    assignChallengeData: 'challengeReceived';
     assignConfig: 'sdkArgsReceived';
     assignIdentifyResult: 'identified';
     assignObConfigAuth: 'sdkArgsReceived';

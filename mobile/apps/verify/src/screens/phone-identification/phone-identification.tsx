@@ -69,6 +69,7 @@ const PhoneIdentification = ({
             phoneNumber,
             hasSyncablePassKey,
             availableChallengeKinds,
+            successfulIdentifier: { phoneNumber },
           });
         },
         onError: error => showRequestErrorToast(error),

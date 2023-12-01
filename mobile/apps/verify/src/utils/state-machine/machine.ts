@@ -3,7 +3,7 @@ import { assign, createMachine } from 'xstate';
 
 import type { MachineContext, MachineEvents } from './types';
 
-export const createPasskeysMachine = (authToken: string) =>
+export const createPasskeysMachine = (sdkAuthToken: string) =>
   createMachine(
     {
       predictableActionArguments: true,
@@ -16,7 +16,8 @@ export const createPasskeysMachine = (authToken: string) =>
       tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: 'init',
       context: {
-        authToken,
+        sdkAuthToken,
+        identify: {},
       },
       states: {
         init: {
@@ -66,7 +67,13 @@ export const createPasskeysMachine = (authToken: string) =>
         },
         smsChallenge: {
           on: {
-            done: 'basicInformation',
+            challengeReceived: {
+              actions: ['assignChallengeData'],
+            },
+            challengeSucceeded: {
+              target: 'basicInformation',
+              actions: ['assignAuthToken'],
+            },
           },
         },
         basicInformation: {
@@ -103,24 +110,57 @@ export const createPasskeysMachine = (authToken: string) =>
           return context;
         }),
         assignIdentifyResult: assign((context, event) => {
-          if (!context.identify) {
-            context.identify = event.payload;
+          const {
+            email,
+            phoneNumber,
+            isUnverified,
+            availableChallengeKinds,
+            successfulIdentifier,
+            hasSyncablePassKey,
+            userFound,
+          } = event.payload;
+          const isEmailChanged =
+            email && context.identify.identifyResult?.email !== email;
+          const isPhoneChanged =
+            phoneNumber &&
+            context.identify.identifyResult?.phoneNumber !== phoneNumber;
+          if (isEmailChanged || isPhoneChanged) {
+            context.identify.challengeData = undefined;
+          }
+          if (!context.identify.identifyResult) {
+            context.identify.identifyResult = event.payload;
             return context;
           }
-          context.identify.email =
-            context.identify?.email || event.payload.email;
-          context.identify.phoneNumber =
-            context.identify?.phoneNumber || event.payload.phoneNumber;
-          context.identify.userFound = event.payload.userFound;
-          context.identify.isUnverified = event.payload.isUnverified;
-          context.identify.availableChallengeKinds =
-            event.payload.availableChallengeKinds;
-          context.identify.hasSyncablePassKey =
-            event.payload.hasSyncablePassKey;
+          context.identify.identifyResult.userFound = userFound;
+          context.identify.identifyResult.isUnverified = isUnverified;
+          context.identify.identifyResult.hasSyncablePassKey =
+            hasSyncablePassKey;
+          if (email) {
+            context.identify.identifyResult.email = email;
+          }
+          if (phoneNumber) {
+            context.identify.identifyResult.phoneNumber = phoneNumber;
+          }
+          if (availableChallengeKinds) {
+            context.identify.identifyResult.availableChallengeKinds =
+              availableChallengeKinds;
+          }
+          if (successfulIdentifier) {
+            context.identify.identifyResult.successfulIdentifier =
+              successfulIdentifier;
+          }
           return context;
         }),
         reset: assign(context => {
-          context.identify = undefined;
+          context.identify = {};
+          return context;
+        }),
+        assignChallengeData: assign((context, event) => {
+          context.identify.challengeData = event.payload;
+          return context;
+        }),
+        assignAuthToken: assign((context, event) => {
+          context.identify.authToken = event.payload.authToken;
           return context;
         }),
       },

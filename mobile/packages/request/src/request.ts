@@ -70,4 +70,12 @@ const request = <Response = any>(requestConfig: RequestConfig = {}) => {
   return client.request<Response>(options);
 };
 
+export const requestWithoutCaseConverter = <Response = unknown>(
+  requestConfig: RequestConfig = {},
+) => {
+  const clientWithCaseApplied = axios.create();
+  const options = getRequestOptions(requestConfig);
+  return clientWithCaseApplied.request<Response>(options);
+};
+
 export default request;

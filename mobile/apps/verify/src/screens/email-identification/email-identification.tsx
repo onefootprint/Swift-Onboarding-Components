@@ -65,6 +65,7 @@ const EmailIdentification = ({
             email,
             hasSyncablePassKey,
             availableChallengeKinds,
+            successfulIdentifier: { email },
           });
         },
         onError: error => showRequestErrorToast(error),

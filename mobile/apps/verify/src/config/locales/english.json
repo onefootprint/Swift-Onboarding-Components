@@ -180,7 +180,23 @@
     "sms-challenge": {
       "title": "Verify your phone number",
       "subtitle": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}",
-      "resend-code": "Resend code"
+      "toast": {
+        "success": {
+          "title": "Success",
+          "description": "We sent you a new code."
+        },
+        "error": {
+          "title": "Error",
+          "description": "Something went wrong. Please try again."
+        }
+      },
+      "error": "Incorrect code",
+      "success": "Success!",
+      "verifying": "Verifying...",
+      "resend-button": {
+        "cta": "Resend code",
+        "disabled": "Please wait {{seconds}} seconds to resend it..."
+      }
     }
   }
 }
