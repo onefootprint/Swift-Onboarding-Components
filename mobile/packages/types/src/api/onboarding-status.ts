@@ -25,6 +25,7 @@ export type CollectKycDataRequirement = {
   isMet: boolean;
   missingAttributes: CollectedKycDataOption[];
   populatedAttributes: CollectedKycDataOption[];
+  optionalAttributes: CollectedKycDataOption[];
 };
 
 export type CollectInvestorProfileRequirement = {

@@ -1,4 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  type CollectKycDataRequirement,
+  CollectedKycDataOption,
+  IdDI,
+} from '@onefootprint/types';
 import { Box, Button, Container, TextInput } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -7,8 +12,14 @@ import styled, { css } from 'styled-components/native';
 import * as z from 'zod';
 
 import Header from '@/components/header';
+import type { SyncDataFieldErrors } from '@/hooks/use-sync-data';
+import useSyncData from '@/hooks/use-sync-data';
 import useTranslation from '@/hooks/use-translation';
+import type { KycData } from '@/types';
 
+import allAttributes from '../../utils/all-attributes';
+import type { FormData } from './types';
+import convertFormData from './utils/convert-form-data';
 import {
   validateDateFormat,
   validateMinimumAge,
@@ -17,18 +28,35 @@ import {
 } from './utils/validations';
 
 export type BasicInformationProps = {
-  onDone: () => void;
+  requirement: CollectKycDataRequirement;
+  data: KycData;
+  authToken: string;
+  onComplete: (data: KycData) => void;
 };
 
-type FormData = {
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  dob: string;
+const fieldByDi: Partial<Record<IdDI, keyof FormData>> = {
+  [IdDI.firstName]: 'firstName',
+  [IdDI.middleName]: 'middleName',
+  [IdDI.lastName]: 'lastName',
+  [IdDI.dob]: 'dob',
 };
 
-const BasicInformation = ({ onDone }: BasicInformationProps) => {
+const BasicInformation = ({
+  onComplete,
+  requirement,
+  authToken,
+  data,
+}: BasicInformationProps) => {
   const { t } = useTranslation('pages.basic-information');
+  const { mutation, syncData } = useSyncData();
+  const attributes = allAttributes(requirement);
+  const requiresName = attributes.includes(CollectedKycDataOption.name);
+  const requiresDob = attributes.includes(CollectedKycDataOption.dob);
+  const isNameDisabled =
+    data?.[IdDI.firstName]?.disabled || data?.[IdDI.lastName]?.disabled;
+  const isDobDisabled = data?.[IdDI.dob]?.disabled;
+  // TODO: add support to show country of birth
+
   const schema = z.object({
     firstName: z
       .string()
@@ -52,27 +80,121 @@ const BasicInformation = ({ onDone }: BasicInformationProps) => {
         message: t('form.dob.errors.min-age'),
       }),
   });
-  const { control, handleSubmit } = useForm<FormData>({
-    defaultValues: { firstName: '', middleName: '', lastName: '', dob: '' },
+  const { control, handleSubmit, setError } = useForm<FormData>({
+    defaultValues: {
+      firstName: data[IdDI.firstName]?.value,
+      middleName: data[IdDI.middleName]?.value,
+      lastName: data[IdDI.lastName]?.value,
+      dob: data[IdDI.dob]?.value,
+    },
     resolver: zodResolver(schema),
   });
   const middleNameRef = useRef<RNTextInput>(null);
   const lastNameRef = useRef<RNTextInput>(null);
   const dobRef = useRef<RNTextInput>(null);
 
-  const onSubmit = (formData: FormData) => {
-    // TODO: Implement backend call
-    console.log(formData);
-    onDone();
+  const handleSyncDataError = (error: SyncDataFieldErrors) => {
+    Object.entries(error).forEach(([k, message]) => {
+      const di = k as IdDI;
+      const field = fieldByDi[di];
+      if (field) {
+        setError(
+          field,
+          { message },
+          {
+            shouldFocus: true,
+          },
+        );
+      }
+    });
   };
 
-  // TODO: we don't always show country of birth, so we should make this dynamic
+  const onSubmit = (formData: FormData) => {
+    const convertedData = convertFormData({ requirement, data, formData });
+    syncData({
+      data: convertedData,
+      speculative: true,
+      requirement,
+      authToken,
+      onSuccess: () => {
+        onComplete(convertedData);
+      },
+      onError: handleSyncDataError,
+    });
+  };
+
+  // TODO: add support to show country of birth
   return (
     <Container scroll>
       <Header title={t('title')} subtitle={t('subtitle')} />
       <Box gap={7}>
-        <Row>
-          <Box flex={1}>
+        {requiresName && (
+          <>
+            <Row>
+              <Box flex={1}>
+                <Controller
+                  control={control}
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { error },
+                  }) => {
+                    return (
+                      <TextInput
+                        autoComplete="name-given"
+                        autoCorrect={false}
+                        blurOnSubmit={false}
+                        enterKeyHint="next"
+                        hasError={!!error}
+                        hint={error?.message}
+                        inputMode="text"
+                        label={t('form.first-name.label')}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        onSubmitEditing={() => middleNameRef.current?.focus()}
+                        placeholder={t('form.first-name.placeholder')}
+                        private
+                        textContentType="givenName"
+                        value={value}
+                        disabled={isNameDisabled}
+                      />
+                    );
+                  }}
+                  name="firstName"
+                />
+              </Box>
+              <Box flex={1}>
+                <Controller
+                  control={control}
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { error },
+                  }) => {
+                    return (
+                      <TextInput
+                        autoComplete="name-middle-initial"
+                        autoCorrect={false}
+                        blurOnSubmit={false}
+                        enterKeyHint="next"
+                        hasError={!!error}
+                        hint={error?.message}
+                        inputMode="text"
+                        label={t('form.middle-name.label')}
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        onSubmitEditing={() => lastNameRef.current?.focus()}
+                        placeholder={t('form.middle-name.placeholder')}
+                        private
+                        ref={middleNameRef}
+                        textContentType="middleName"
+                        value={value}
+                        disabled={isNameDisabled}
+                      />
+                    );
+                  }}
+                  name="middleName"
+                />
+              </Box>
+            </Row>
             <Controller
               control={control}
               render={({
@@ -81,116 +203,65 @@ const BasicInformation = ({ onDone }: BasicInformationProps) => {
               }) => {
                 return (
                   <TextInput
-                    autoComplete="name-given"
+                    autoComplete="name-family"
                     autoCorrect={false}
                     blurOnSubmit={false}
                     enterKeyHint="next"
                     hasError={!!error}
                     hint={error?.message}
                     inputMode="text"
-                    label={t('form.first-name.label')}
+                    label={t('form.last-name.label')}
                     onBlur={onBlur}
                     onChangeText={onChange}
-                    onSubmitEditing={() => middleNameRef.current?.focus()}
-                    placeholder={t('form.first-name.placeholder')}
+                    onSubmitEditing={() => dobRef.current?.focus()}
+                    placeholder={t('form.last-name.placeholder')}
                     private
-                    textContentType="givenName"
+                    ref={lastNameRef}
+                    textContentType="familyName"
                     value={value}
+                    disabled={isNameDisabled}
                   />
                 );
               }}
-              name="firstName"
+              name="lastName"
             />
-          </Box>
-          <Box flex={1}>
-            <Controller
-              control={control}
-              render={({
-                field: { onChange, onBlur, value },
-                fieldState: { error },
-              }) => {
-                return (
-                  <TextInput
-                    autoComplete="name-middle-initial"
-                    autoCorrect={false}
-                    blurOnSubmit={false}
-                    enterKeyHint="next"
-                    hasError={!!error}
-                    hint={error?.message}
-                    inputMode="text"
-                    label={t('form.middle-name.label')}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    onSubmitEditing={() => lastNameRef.current?.focus()}
-                    placeholder={t('form.middle-name.placeholder')}
-                    private
-                    ref={middleNameRef}
-                    textContentType="middleName"
-                    value={value}
-                  />
-                );
-              }}
-              name="middleName"
-            />
-          </Box>
-        </Row>
-        <Controller
-          control={control}
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => {
-            return (
-              <TextInput
-                autoComplete="name-family"
-                autoCorrect={false}
-                blurOnSubmit={false}
-                enterKeyHint="next"
-                hasError={!!error}
-                hint={error?.message}
-                inputMode="text"
-                label={t('form.last-name.label')}
-                onBlur={onBlur}
-                onChangeText={onChange}
-                onSubmitEditing={() => dobRef.current?.focus()}
-                placeholder={t('form.last-name.placeholder')}
-                private
-                ref={lastNameRef}
-                textContentType="familyName"
-                value={value}
-              />
-            );
-          }}
-          name="lastName"
-        />
-        <Controller
-          control={control}
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => {
-            return (
-              <TextInput
-                autoComplete="birthdate-day"
-                autoCorrect={false}
-                enterKeyHint="send"
-                hasError={!!error}
-                hint={error?.message}
-                inputMode="text"
-                label={t('form.dob.label')}
-                onBlur={onBlur}
-                onChangeText={onChange}
-                onSubmitEditing={handleSubmit(onSubmit)}
-                placeholder={t('form.dob.placeholder')}
-                private
-                ref={dobRef}
-                value={value}
-              />
-            );
-          }}
-          name="dob"
-        />
-        <Button variant="primary" onPress={handleSubmit(onSubmit)}>
+          </>
+        )}
+        {requiresDob && (
+          <Controller
+            control={control}
+            render={({
+              field: { onChange, onBlur, value },
+              fieldState: { error },
+            }) => {
+              return (
+                <TextInput
+                  autoComplete="birthdate-day"
+                  autoCorrect={false}
+                  enterKeyHint="send"
+                  hasError={!!error}
+                  hint={error?.message}
+                  inputMode="text"
+                  label={t('form.dob.label')}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  onSubmitEditing={handleSubmit(onSubmit)}
+                  placeholder={t('form.dob.placeholder')}
+                  private
+                  ref={dobRef}
+                  value={value}
+                  disabled={isDobDisabled}
+                />
+              );
+            }}
+            name="dob"
+          />
+        )}
+        <Button
+          variant="primary"
+          onPress={handleSubmit(onSubmit)}
+          loading={mutation.isLoading}
+        >
           {t('form.cta')}
         </Button>
       </Box>

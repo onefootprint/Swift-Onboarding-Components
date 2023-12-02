@@ -1,6 +1,17 @@
-import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
+import {
+  CLIENT_PUBLIC_KEY_HEADER,
+  CollectedKycDataOption,
+  OnboardingRequirementKind,
+} from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
+import allAttributes from '../all-attributes';
+import isInDomesticFlow from '../is-in-domestic-flow';
+import mergeUpdatedData from '../merge-data/merge-data';
+import {
+  isMissingResidentialAttribute,
+  isMissingSsnAttribute,
+} from '../missing-attributes';
 import type { MachineContext, MachineEvents } from './types';
 
 export const createPasskeysMachine = (sdkAuthToken: string) =>
@@ -18,6 +29,25 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
       context: {
         sdkAuthToken,
         identify: {},
+        // TODO: this is temporary; we will get this data from requirements machine when we implement it
+        kyc: {
+          requirement: {
+            isMet: false,
+            kind: OnboardingRequirementKind.collectKycData,
+            missingAttributes: [
+              CollectedKycDataOption.name,
+              CollectedKycDataOption.dob,
+              CollectedKycDataOption.fullAddress,
+              CollectedKycDataOption.ssn4,
+            ],
+            populatedAttributes: [
+              CollectedKycDataOption.email,
+              CollectedKycDataOption.phoneNumber,
+            ],
+            optionalAttributes: [],
+          },
+          kycData: {},
+        },
       },
       states: {
         init: {
@@ -78,12 +108,49 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
         },
         basicInformation: {
           on: {
-            done: 'residentialAddress',
+            // TODO: add transition to legal status
+            // TODO: add transition to confirm
+            dataSubmitted: [
+              {
+                target: 'residentialAddress',
+                actions: ['assignKycData'],
+                cond: (context, event) => {
+                  const allData = mergeUpdatedData(
+                    context.kyc.kycData ?? {},
+                    event.payload,
+                  );
+                  return isMissingResidentialAttribute(
+                    allAttributes(context.kyc.requirement),
+                    allData,
+                    true,
+                  );
+                },
+              },
+
+              {
+                target: 'ssn',
+                actions: ['assignKycData'],
+                cond: (context, event) => {
+                  const allData = mergeUpdatedData(
+                    context.kyc.kycData ?? {},
+                    event.payload,
+                  );
+                  return (
+                    isInDomesticFlow(allData) &&
+                    isMissingSsnAttribute(
+                      allAttributes(context.kyc.requirement),
+                      allData,
+                      true,
+                    )
+                  );
+                },
+              },
+            ],
           },
         },
         residentialAddress: {
           on: {
-            done: 'ssn',
+            done: 'residentialAddress',
           },
         },
         ssn: {
@@ -161,6 +228,13 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
         }),
         assignAuthToken: assign((context, event) => {
           context.identify.authToken = event.payload.authToken;
+          return context;
+        }),
+        assignKycData: assign((context, event) => {
+          context.kyc.kycData = mergeUpdatedData(
+            context.kyc.kycData ?? {},
+            event.payload,
+          );
           return context;
         }),
       },

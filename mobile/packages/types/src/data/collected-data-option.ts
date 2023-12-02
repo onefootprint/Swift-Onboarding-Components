@@ -30,6 +30,7 @@ export enum CollectedKycDataOption {
   email = 'email',
   phoneNumber = 'phone_number',
   nationality = 'nationality',
+  usLegalStatus = 'us_legal_status',
 }
 
 export enum CollectedDocumentDataOption {
@@ -90,4 +91,5 @@ export const CollectedKycDataOptionToRequiredAttributes: Record<
   [CollectedKycDataOption.email]: [IdDI.email],
   [CollectedKycDataOption.phoneNumber]: [IdDI.phoneNumber],
   [CollectedKycDataOption.nationality]: [IdDI.nationality],
+  [CollectedKycDataOption.usLegalStatus]: [IdDI.usLegalStatus],
 };

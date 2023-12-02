@@ -1,4 +1,4 @@
-import type { ChallengeData } from '@onefootprint/types';
+import { type ChallengeData } from '@onefootprint/types';
 import { useMachine } from '@xstate/react';
 import React from 'react';
 
@@ -24,7 +24,12 @@ const SUCCESS_EVENT_DELAY_MS = 1500;
 
 const Router = ({ sdkAuthToken }: RouterProps) => {
   const [state, send] = useMachine(() => createMachine(sdkAuthToken));
-  const { obConfigAuth, identify } = state.context;
+  const {
+    obConfigAuth,
+    identify,
+    kyc: { kycData, requirement: kycRequirement },
+  } = state.context;
+  const { authToken } = identify;
 
   const handleIdentified = ({
     email,
@@ -49,12 +54,12 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
     });
   };
 
-  const handleChallengeSucceed = (authToken: string) => {
+  const handleChallengeSucceed = (token: string) => {
     setTimeout(() => {
       send({
         type: 'challengeSucceeded',
         payload: {
-          authToken,
+          authToken: token,
         },
       });
     }, SUCCESS_EVENT_DELAY_MS);
@@ -126,13 +131,21 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
   }
 
   if (state.matches('basicInformation')) {
-    return (
-      <BasicInformation
-        onDone={() => {
-          send('done');
-        }}
-      />
-    );
+    if (authToken && kycRequirement && kycData) {
+      return (
+        <BasicInformation
+          requirement={kycRequirement}
+          data={kycData}
+          authToken={authToken}
+          onComplete={data => {
+            send({
+              type: 'dataSubmitted',
+              payload: data,
+            });
+          }}
+        />
+      );
+    }
   }
 
   if (state.matches('residentialAddress')) {

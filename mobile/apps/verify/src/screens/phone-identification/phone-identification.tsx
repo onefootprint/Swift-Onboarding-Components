@@ -88,7 +88,6 @@ const PhoneIdentification = ({
             field: { onChange, onBlur, value },
             fieldState: { error },
           }) => {
-            console.log(error);
             return (
               <TextInput
                 autoFocus

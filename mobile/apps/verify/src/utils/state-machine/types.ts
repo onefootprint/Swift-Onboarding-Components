@@ -1,10 +1,13 @@
 import type {
   ChallengeData,
   ChallengeKind,
+  CollectKycDataRequirement,
   Identifier,
   ObConfigAuth,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
+
+import type { KycData } from '@/types';
 
 export type IdentifyResultProps = {
   email?: string;
@@ -14,6 +17,11 @@ export type IdentifyResultProps = {
   availableChallengeKinds?: ChallengeKind[];
   hasSyncablePassKey?: boolean;
   successfulIdentifier: Identifier;
+};
+
+export type KycDataCollectionProps = {
+  requirement?: CollectKycDataRequirement;
+  kycData?: KycData;
 };
 
 export type IdentifyData = {
@@ -27,6 +35,7 @@ export type MachineContext = {
   config?: PublicOnboardingConfig;
   obConfigAuth?: ObConfigAuth;
   identify: IdentifyData;
+  kyc: KycDataCollectionProps;
 };
 
 export type MachineEvents =
@@ -56,4 +65,8 @@ export type MachineEvents =
       payload: {
         authToken: string;
       };
+    }
+  | {
+      type: 'dataSubmitted';
+      payload: KycData;
     };

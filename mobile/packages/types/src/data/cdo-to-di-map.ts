@@ -8,12 +8,17 @@ import {
 import type { DataIdentifier } from './di';
 import { BusinessDI, DocumentDI, IdDI, InvestorProfileDI } from './di';
 
-const CdoToDiMap: Record<CollectedDataOption, DataIdentifier[]> = {
+// Used as a comprehensive list of CDOs to all associated DIs
+const CdoToAllDisMap: Record<CollectedDataOption, DataIdentifier[]> = {
   // Id
-  [CollectedKycDataOption.name]: [IdDI.firstName, IdDI.lastName],
+  [CollectedKycDataOption.name]: [
+    IdDI.firstName,
+    IdDI.middleName,
+    IdDI.lastName,
+  ],
   [CollectedKycDataOption.dob]: [IdDI.dob],
   [CollectedKycDataOption.ssn4]: [IdDI.ssn4],
-  [CollectedKycDataOption.ssn9]: [IdDI.ssn9, IdDI.ssn4],
+  [CollectedKycDataOption.ssn9]: [IdDI.ssn9],
   [CollectedKycDataOption.fullAddress]: [
     IdDI.addressLine1,
     IdDI.addressLine2,
@@ -25,12 +30,20 @@ const CdoToDiMap: Record<CollectedDataOption, DataIdentifier[]> = {
   [CollectedKycDataOption.email]: [IdDI.email],
   [CollectedKycDataOption.phoneNumber]: [IdDI.phoneNumber],
   [CollectedKycDataOption.nationality]: [IdDI.nationality],
+  [CollectedKycDataOption.usLegalStatus]: [
+    IdDI.usLegalStatus,
+    IdDI.visaKind,
+    IdDI.visaExpirationDate,
+    IdDI.citizenships,
+    IdDI.nationality,
+  ],
 
   // Business
   [CollectedKybDataOption.name]: [BusinessDI.name, BusinessDI.doingBusinessAs],
   [CollectedKybDataOption.tin]: [BusinessDI.tin],
   [CollectedKybDataOption.address]: [
     BusinessDI.addressLine1,
+    BusinessDI.addressLine2,
     BusinessDI.city,
     BusinessDI.state,
     BusinessDI.zip,
@@ -63,4 +76,4 @@ const CdoToDiMap: Record<CollectedDataOption, DataIdentifier[]> = {
   ],
 };
 
-export default CdoToDiMap;
+export default CdoToAllDisMap;

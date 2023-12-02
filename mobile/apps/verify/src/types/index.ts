@@ -1,1 +1,1 @@
-export { default } from './visa-kind';
+export * from './data-types';

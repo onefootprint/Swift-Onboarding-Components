@@ -17,6 +17,7 @@ export interface Typegen0 {
     assignChallengeData: 'challengeReceived';
     assignConfig: 'sdkArgsReceived';
     assignIdentifyResult: 'identified';
+    assignKycData: 'dataSubmitted';
     assignObConfigAuth: 'sdkArgsReceived';
     reset: 'identifyReset';
   };

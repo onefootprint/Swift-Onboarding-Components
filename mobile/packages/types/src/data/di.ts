@@ -27,6 +27,7 @@ export enum InvestorProfileDI {
 
 export enum IdDI {
   firstName = 'id.first_name',
+  middleName = 'id.middle_name',
   lastName = 'id.last_name',
   email = 'id.email',
   phoneNumber = 'id.phone_number',
@@ -40,6 +41,10 @@ export enum IdDI {
   country = 'id.country',
   zip = 'id.zip',
   nationality = 'id.nationality',
+  usLegalStatus = 'id.us_legal_status',
+  visaKind = 'id.visa_kind',
+  visaExpirationDate = 'id.visa_expiration_date',
+  citizenships = 'id.citizenships',
 }
 
 export enum DocumentDI {

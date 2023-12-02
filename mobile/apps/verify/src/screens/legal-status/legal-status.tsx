@@ -1,3 +1,4 @@
+import { VisaKind } from '@onefootprint/types';
 import {
   Box,
   Button,
@@ -11,7 +12,6 @@ import React from 'react';
 
 import Header from '@/components/header';
 import useTranslation from '@/hooks/use-translation';
-import VisaKind from '@/types/visa-kind';
 
 const LegalStatus = () => {
   const { t } = useTranslation('pages.legal-status');
