@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
+import { useOnClickOutside, useTranslation } from '@onefootprint/hooks';
 import { IcoClose16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { media, Overlay, Typography } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 import ReactPlayer from 'react-player';
-import { useLockedBody, useOnClickOutside } from 'usehooks-ts';
+import { useLockedBody } from 'usehooks-ts';
 
 type DemoVideoProps = {
   // title: string;

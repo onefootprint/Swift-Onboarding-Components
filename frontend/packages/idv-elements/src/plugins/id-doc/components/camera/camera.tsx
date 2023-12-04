@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
+import { useCountdownCustom, useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 import { LoadingIndicator, media } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
-import { useCountdown, useTimeout } from 'usehooks-ts';
+import { useTimeout } from 'usehooks-ts';
 
 import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
 import Logger from '../../../../utils/logger';
@@ -66,7 +66,7 @@ const Camera = ({
   const [
     autoCaptureTimerVal,
     { startCountdown, stopCountdown, resetCountdown },
-  ] = useCountdown({
+  ] = useCountdownCustom({
     countStart: AUTOCAPTURE_TIMER_START_VAL,
     intervalMs: AUTOCAPTURE_TIMER_INTERVAL,
   });

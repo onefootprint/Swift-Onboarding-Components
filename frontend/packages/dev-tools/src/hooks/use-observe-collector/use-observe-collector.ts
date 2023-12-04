@@ -4,9 +4,10 @@ import debounce from 'lodash/debounce';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';
 import UAParser from 'ua-parser-js';
-import { useEffectOnce, useEventListener } from 'usehooks-ts';
+import { useEffectOnce } from 'usehooks-ts';
 
 import getSessionId from '../../utils/session-id';
+import useEventListener from '../use-event-listener';
 import getErrorEventInfo from './utils/get-error-event-info';
 import getNavigatorProperties from './utils/get-navigator-properties';
 import sendObservePayload from './utils/send-observe-payload';

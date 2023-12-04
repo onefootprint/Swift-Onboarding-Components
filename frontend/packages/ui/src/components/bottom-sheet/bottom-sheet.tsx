@@ -2,8 +2,8 @@ import { IcoClose24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import FocusTrap from 'focus-trap-react';
 import React, { useEffect, useRef, useState } from 'react';
-import { useOnClickOutside } from 'usehooks-ts';
 
+import { useOnClickOutside } from '../../hooks';
 import IconButton from '../icon-button';
 import Overlay from '../overlay';
 import ScrollArea from '../scroll-area';

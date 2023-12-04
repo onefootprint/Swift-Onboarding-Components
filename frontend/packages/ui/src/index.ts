@@ -149,7 +149,12 @@ export type {
   SXStyles,
   SXStylesKeys,
 } from './hooks';
-export { useMediaQuery, useSX } from './hooks';
+export {
+  useEventListener,
+  useMediaQuery,
+  useOnClickOutside,
+  useSX,
+} from './hooks';
 export type { BootstrapProps } from './utils';
 export {
   createFontStyles,

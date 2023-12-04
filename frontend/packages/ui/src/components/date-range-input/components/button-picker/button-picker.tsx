@@ -9,8 +9,8 @@ import React, {
 } from 'react';
 import mergeRefs from 'react-merge-refs';
 import { usePopper } from 'react-popper';
-import { useOnClickOutside } from 'usehooks-ts';
 
+import { useOnClickOutside } from '../../../../hooks';
 import {
   createFontStyles,
   createOverlayBackground,

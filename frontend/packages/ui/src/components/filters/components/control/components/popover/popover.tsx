@@ -1,12 +1,9 @@
 import styled, { css } from '@onefootprint/styled';
 import FocusTrap from 'focus-trap-react';
 import React, { useId, useRef } from 'react';
-import {
-  useEventListener,
-  useLockedBody,
-  useOnClickOutside,
-} from 'usehooks-ts';
+import { useLockedBody } from 'usehooks-ts';
 
+import { useEventListener, useOnClickOutside } from '../../../../../../hooks';
 import Button from '../../../../../button';
 import ScrollArea from '../../../../../scroll-area';
 import Typography from '../../../../../typography';

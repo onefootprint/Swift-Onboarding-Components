@@ -1,6 +1,6 @@
+import { useInterval } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import React, { useState } from 'react';
-import { useInterval } from 'usehooks-ts';
 
 import range from './components/range';
 import Sparkle from './components/sparkle';

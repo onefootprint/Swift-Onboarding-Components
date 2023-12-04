@@ -1,7 +1,7 @@
+import { useCountdownCustom } from '@onefootprint/hooks';
 import { useOpenCv } from 'opencv-react-ts';
 import type { MutableRefObject } from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { useCountdown } from 'usehooks-ts';
 
 import getSourceDimensions from '../utils/get-source-dimensions';
 import {
@@ -74,7 +74,7 @@ const useAutoCapture = ({
   const { cv, loaded } = useOpenCv();
   const [statusChangeDelayRunning, setStatusChangeDelayTimeRunning] =
     useState(false);
-  const [waitVal, { startCountdown, resetCountdown }] = useCountdown({
+  const [waitVal, { startCountdown, resetCountdown }] = useCountdownCustom({
     countStart: 3, // This is an arbitray value - basically we want a few counts to countdown from and complete the countdown in STATUS_CHANGE_DELAY time
     intervalMs: STATUS_CHANGE_DELAY / 3,
   });

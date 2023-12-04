@@ -3,14 +3,10 @@ import { IcoClose24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import FocusTrap from 'focus-trap-react';
 import React, { useRef } from 'react';
-import {
-  useEventListener,
-  useLockedBody,
-  useOnClickOutside,
-} from 'usehooks-ts';
+import { useLockedBody } from 'usehooks-ts';
 
 import type { SXStyleProps, SXStyles } from '../../hooks';
-import { useSX } from '../../hooks';
+import { useEventListener, useOnClickOutside, useSX } from '../../hooks';
 import { media } from '../../utils';
 import IconButton from '../icon-button';
 import Overlay from '../overlay';

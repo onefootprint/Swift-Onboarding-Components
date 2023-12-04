@@ -1,10 +1,10 @@
+import { useOnClickOutside } from '@onefootprint/hooks';
 import { IcoClose24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { IconButton, Overlay, Stack } from '@onefootprint/ui';
 import FocusTrap from 'focus-trap-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
-import { useOnClickOutside } from 'usehooks-ts';
 
 export type IdvBottomSheetProps = {
   open: boolean;

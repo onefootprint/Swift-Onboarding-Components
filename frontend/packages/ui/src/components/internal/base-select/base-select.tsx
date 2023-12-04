@@ -3,8 +3,8 @@ import React, { useCallback, useId, useRef, useState } from 'react';
 import { usePopper } from 'react-popper';
 import type { OptionProps } from 'react-select';
 import ReactSelect from 'react-select';
-import { useOnClickOutside } from 'usehooks-ts';
 
+import { useOnClickOutside } from '../../../hooks';
 import { createTypography } from '../../../utils/mixins';
 import type { LabelTooltipProps } from '../../label';
 import Label from '../../label';
