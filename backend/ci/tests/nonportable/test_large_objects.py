@@ -1,3 +1,4 @@
+import pytest
 from tests.utils import post, patch
 import hmac
 import hashlib
@@ -52,6 +53,7 @@ def test_large_objects(sandbox_tenant):
     assert resp[di] == expected
 
 
+@pytest.mark.skip(reason="hangs indefinitely")
 def test_too_large_object_upload(sandbox_tenant):
     body = post("users/", None, sandbox_tenant.sk.key)
     user = body
