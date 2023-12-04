@@ -420,7 +420,7 @@ footprint_reason_code_enum! {
         #[note = "Name matches", severity = SignalSeverity::Info,  description = "The located name matches the input name."]
         NameMatches,
         #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
-        #[note = "Name does not matches", severity = SignalSeverity::High,  description = "The located name does not match the input name."]
+        #[note = "Name does not match", severity = SignalSeverity::High,  description = "The located name does not match the input name."]
         NameDoesNotMatch,
         #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
         #[note = "Name partially matches", severity = SignalSeverity::Low,  description = "The located name partially matches the input name."]
