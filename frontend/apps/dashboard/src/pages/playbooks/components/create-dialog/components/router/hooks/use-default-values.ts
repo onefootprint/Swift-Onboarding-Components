@@ -1,25 +1,33 @@
+import { isAuth, isKyb, isKyc } from '@/playbooks/utils/kind';
 import type { MachineContext } from '@/playbooks/utils/machine/types';
 import {
   defaultAmlFormData,
   defaultNameFormData,
+  defaultPlaybookValuesAuth,
   defaultPlaybookValuesKYB,
   defaultPlaybookValuesKYC,
   defaultResidencyFormData,
-  PlaybookKind,
 } from '@/playbooks/utils/machine/types';
 
 const useDefaultValues = (context: MachineContext) => {
-  const defaultPlaybookValuesByKind =
-    context.kind === PlaybookKind.Kyb
-      ? defaultPlaybookValuesKYB
-      : defaultPlaybookValuesKYC;
+  if (isAuth(context.kind)) {
+    return {
+      ...defaultPlaybookValuesAuth,
+      name: context.nameForm || defaultPlaybookValuesAuth.name,
+      playbook: context.playbook || defaultPlaybookValuesAuth.playbook,
+    };
+  }
+
+  const defaultValues = isKyb(context.kind)
+    ? defaultPlaybookValuesKYB
+    : defaultPlaybookValuesKYC;
 
   return {
     aml: context.amlForm || defaultAmlFormData,
     name: context.nameForm || defaultNameFormData,
-    playbook: context.playbook || defaultPlaybookValuesByKind,
+    playbook: context.playbook || defaultValues,
     residency:
-      context.kind === PlaybookKind.Kyc && context.residencyForm
+      isKyc(context.kind) && context.residencyForm
         ? context.residencyForm
         : defaultResidencyFormData,
   };

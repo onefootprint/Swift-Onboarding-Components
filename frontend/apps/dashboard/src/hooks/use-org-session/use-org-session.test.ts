@@ -23,6 +23,7 @@ describe('useOrgSession', () => {
       name: 'Acme',
       isProdKybPlaybookRestricted: false,
       isProdKycPlaybookRestricted: false,
+      isProdAuthPlaybookRestricted: false,
     });
   });
 

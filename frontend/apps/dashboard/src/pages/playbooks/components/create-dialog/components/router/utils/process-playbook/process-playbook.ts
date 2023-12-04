@@ -6,17 +6,16 @@ import {
   CollectedKycDataOption,
 } from '@onefootprint/types';
 
+import { isAuth, isKyb, isKyc } from '@/playbooks/utils/kind';
 import type {
   AuthorizedScopesFormData,
   BusinessInformation,
   NameFormData,
+  PlaybookKind,
   ResidencyFormData,
   SummaryFormData,
 } from '@/playbooks/utils/machine/types';
-import {
-  CountryRestriction,
-  PlaybookKind,
-} from '@/playbooks/utils/machine/types';
+import { CountryRestriction } from '@/playbooks/utils/machine/types';
 
 type ProcessPlaybookProps = {
   playbook: SummaryFormData;
@@ -50,11 +49,14 @@ const processPlaybook = ({
   const mustCollectData: CollectedDataOption[] = [];
   const canAccessData: CollectedDataOption[] = [];
   const optionalData: CollectedDataOption[] = [];
-
   const { personal, businessInformation } = playbook;
 
   const requiredKycFields = getRequiredKycCollectFields();
-  mustCollectData.push(...requiredKycFields);
+  if (isAuth(kind)) {
+    mustCollectData.push(CollectedKycDataOption.email);
+  } else {
+    mustCollectData.push(...requiredKycFields);
+  }
 
   // US Legal Status
   if (personal[CollectedKycDataOption.usLegalStatus]) {
@@ -97,7 +99,7 @@ const processPlaybook = ({
   // investor profile handling
   if (
     playbook?.[CollectedInvestorProfileDataOption.investorProfile] &&
-    kind === PlaybookKind.Kyc
+    isKyc(kind)
   ) {
     mustCollectData.push(CollectedInvestorProfileDataOption.investorProfile);
   }
@@ -129,7 +131,7 @@ const processPlaybook = ({
     CollectedKybDataOption.phoneNumber,
   ];
 
-  if (kind === PlaybookKind.Kyb && businessInformation) {
+  if (isKyb(kind) && businessInformation) {
     const requiredKybFields = getRequiredKybCollectFields();
     mustCollectData.push(...requiredKybFields);
     optionalKYBFields.forEach(field => {

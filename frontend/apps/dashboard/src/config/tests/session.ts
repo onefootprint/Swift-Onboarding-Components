@@ -21,6 +21,7 @@ const baseOrg: OrgSession = {
   isSandboxRestricted: false,
   isLive: false,
   isProdKybPlaybookRestricted: false,
+  isProdAuthPlaybookRestricted: false,
   isProdKycPlaybookRestricted: false,
 };
 

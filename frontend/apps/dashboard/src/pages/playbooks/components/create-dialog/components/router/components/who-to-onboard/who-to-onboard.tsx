@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoStore24, IcoUsers24 } from '@onefootprint/icons';
+import { IcoShield24, IcoStore24, IcoUsers24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Button, RadioSelect, Typography } from '@onefootprint/ui';
 import React from 'react';
@@ -64,6 +64,14 @@ const WhoToOnboard = ({ onSubmit, defaultKind }: WhoToOnboardProps) => {
                   IconComponent: IcoStore24,
                   disabled: org?.isLive && org?.isProdKybPlaybookRestricted,
                   disabledHint: t('kyb.disabled-tooltip'),
+                },
+                {
+                  title: t('auth.title'),
+                  description: t('auth.description'),
+                  value: PlaybookKind.Auth,
+                  IconComponent: IcoShield24,
+                  disabled: org?.isLive && org?.isProdAuthPlaybookRestricted,
+                  disabledHint: t('auth.disabled-tooltip'),
                 },
               ]}
               value={field.value}

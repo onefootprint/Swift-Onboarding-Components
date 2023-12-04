@@ -1,3 +1,4 @@
+import type { OnboardingConfigKind } from '../data';
 import type { CollectedDataOption } from '../data/collected-data-option';
 
 export type OrgOnboardingConfigCreateRequest = {
@@ -21,6 +22,7 @@ export type OrgOnboardingConfigCreateRequest = {
     pep: boolean;
     adverseMedia: boolean;
   };
+  kind: OnboardingConfigKind;
 };
 
 export type OrgOnboardingConfigCreateResponse = string;

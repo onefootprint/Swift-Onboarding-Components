@@ -8,9 +8,10 @@ import {
 } from '@onefootprint/types';
 
 export enum PlaybookKind {
-  Unknown = 'unknown',
+  Auth = 'auth',
   Kyb = 'kyb',
   Kyc = 'kyc',
+  Unknown = 'unknown',
 }
 
 export type SummaryFormData = {
@@ -135,6 +136,31 @@ export const defaultBusinessInformation = {
   [CollectedKybDataOption.phoneNumber]: false,
 };
 
+export const defaultPlaybookValuesAuth = {
+  aml: defaultAmlFormData,
+  name: { kind: PlaybookKind.Auth, name: '' },
+  playbook: {
+    kind: PlaybookKind.Auth,
+    investor_profile: false,
+    personal: {
+      email: true,
+      phone_number: true,
+      dob: false,
+      full_address: false,
+      idDoc: false,
+      idDocKind: [],
+      name: false,
+      ssn: false,
+      us_legal_status: false,
+    },
+  },
+  residency: {
+    allowUsResidents: true,
+    allowUsTerritories: false,
+    allowInternationalResidents: false,
+  },
+};
+
 export const defaultPlaybookValuesKYC: SummaryFormData = {
   kind: PlaybookKind.Kyc,
   personal: {
@@ -169,57 +195,20 @@ export type MachineContext = {
 };
 
 export type MachineEvents =
-  | {
-      type: 'navigationBackward';
-    }
-  | {
-      type: 'nameYourPlaybookSelected';
-    }
-  | {
-      type: 'whoToOnboardSelected';
-    }
-  | {
-      type: 'summarySelected';
-    }
-  | {
-      type: 'authorizedScopesSelected';
-    }
-  | {
-      type: 'whoToOnboardSubmitted';
-      payload: {
-        kind: PlaybookKind;
-      };
-    }
-  | {
-      type: 'nameYourPlaybookSubmitted';
-      payload: {
-        formData: NameFormData;
-      };
-    }
-  | {
-      type: 'residencySubmitted';
-      payload: {
-        formData: ResidencyFormData;
-      };
-    }
-  | {
-      type: 'playbookSubmitted';
-      payload: {
-        formData: SummaryFormData;
-      };
-    }
+  | { type: 'navigationBackward' }
+  | { type: 'nameYourPlaybookSelected' }
+  | { type: 'whoToOnboardSelected' }
+  | { type: 'summarySelected' }
+  | { type: 'authorizedScopesSelected' }
+  | { type: 'whoToOnboardSubmitted'; payload: { kind: PlaybookKind } }
+  | { type: 'nameYourPlaybookSubmitted'; payload: { formData: NameFormData } }
+  | { type: 'residencySubmitted'; payload: { formData: ResidencyFormData } }
+  | { type: 'playbookSubmitted'; payload: { formData: SummaryFormData } }
   | {
       type: 'authorizedScopesSubmitted';
-      payload: {
-        formData: AuthorizedScopesFormData;
-      };
+      payload: { formData: AuthorizedScopesFormData };
     }
-  | {
-      type: 'amlSubmitted';
-      payload: {
-        formData: AMLFormData;
-      };
-    };
+  | { type: 'amlSubmitted'; payload: { formData: AMLFormData } };
 
 export const basicInformationFields: string[] = [
   CollectedKycDataOption.email,

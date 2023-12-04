@@ -2,10 +2,11 @@ import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { InlineAlert } from '@onefootprint/ui';
 import React from 'react';
+import { isAuth, isKyb, isKyc } from 'src/pages/playbooks/utils/kind';
 
 import type { SummaryMeta } from '@/playbooks/utils/machine/types';
-import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
+import Auth from './components/auth';
 import Business from './components/business';
 import Investor from './components/investor';
 import Person from './components/person';
@@ -21,10 +22,10 @@ const DataCollection = ({ meta }: DataCollectionProps) => {
 
   return (
     <Container>
-      {meta.kind === PlaybookKind.Kyb && <Business />}
-      <Person meta={meta} />
-      {meta.kind === PlaybookKind.Kyc && <Investor />}
-      {meta.kind === PlaybookKind.Kyb && (
+      {isKyb(meta.kind) && <Business />}
+      {isAuth(meta.kind) ? <Auth /> : <Person meta={meta} />}
+      {isKyc(meta.kind) && <Investor />}
+      {isKyb(meta.kind) && (
         <InlineAlert variant="info">{t('alert')}</InlineAlert>
       )}
     </Container>

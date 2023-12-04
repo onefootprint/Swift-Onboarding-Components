@@ -1,18 +1,23 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
+import type { OnboardingConfigKind } from '@onefootprint/types';
 import { Stepper, useToast } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import React from 'react';
 
+import { getAuthFixedPayload, isAuth } from '@/playbooks/utils/kind';
 import playbookMachine from '@/playbooks/utils/machine';
-import type { AMLFormData } from '@/playbooks/utils/machine/types';
+import type {
+  AMLFormData,
+  MachineContext,
+} from '@/playbooks/utils/machine/types';
 
 import AML from './components/aml';
 import AuthorizedScopes from './components/authorized-scopes';
 import Name from './components/name-your-playbook';
 import Residency from './components/residency';
-import Config from './components/summary';
+import Summary from './components/summary';
 import WhoToOnboard from './components/who-to-onboard';
 import useDefaultValues from './hooks/use-default-values';
 import useOptions from './hooks/use-options';
@@ -37,13 +42,15 @@ const Router = ({ onCreate }: RouterProps) => {
   const stepperValue = options[step];
   const defaultValues = useDefaultValues(state.context);
 
-  const createPlaybook = (enhancedAml: AMLFormData) => {
-    const { playbook, nameForm, residencyForm, authorizedScopesForm } =
-      state.context;
-
+  const createPlaybook = (
+    context: MachineContext,
+    enhancedAml: AMLFormData,
+  ) => {
+    const { playbook, nameForm, residencyForm, authorizedScopesForm } = context;
     if (!playbook || !nameForm || !authorizedScopesForm || !enhancedAml) {
       return;
     }
+
     const {
       allowInternationalResidents,
       allowUsResidents,
@@ -69,14 +76,15 @@ const Router = ({ onCreate }: RouterProps) => {
         allowUsResidents,
         allowUsTerritories,
         canAccessData,
+        docScanForOptionalSsn,
+        enhancedAml,
         internationalCountryRestrictions,
         isDocFirstFlow,
         isNoPhoneFlow,
+        kind: kind as unknown as OnboardingConfigKind,
         mustCollectData,
         name,
         optionalData,
-        enhancedAml,
-        docScanForOptionalSsn,
       },
       {
         onSuccess: () => {
@@ -151,7 +159,7 @@ const Router = ({ onCreate }: RouterProps) => {
           />
         )}
         {state.matches('summary') && (
-          <Config
+          <Summary
             defaultValues={defaultValues.playbook}
             meta={{
               kind: state.context.kind,
@@ -161,6 +169,15 @@ const Router = ({ onCreate }: RouterProps) => {
               send('navigationBackward');
             }}
             onSubmit={formData => {
+              const { nameForm } = state.context;
+
+              if (isAuth(formData.kind) && nameForm) {
+                const payload = getAuthFixedPayload({ nameForm, ...formData });
+                const { enhancedAml, ...ctx } = payload;
+                createPlaybook(ctx, enhancedAml);
+                return;
+              }
+
               send('playbookSubmitted', { payload: { formData } });
             }}
           />
@@ -188,7 +205,7 @@ const Router = ({ onCreate }: RouterProps) => {
             }}
             onSubmit={formData => {
               send('amlSubmitted', { payload: { formData } });
-              createPlaybook(formData);
+              createPlaybook(state.context, formData);
             }}
             isLoading={mutation.isLoading}
           />

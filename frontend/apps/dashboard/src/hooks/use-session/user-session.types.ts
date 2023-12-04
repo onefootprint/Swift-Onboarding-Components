@@ -21,8 +21,9 @@ export type OrgSession = {
   logoUrl: Organization['logoUrl'];
   isSandboxRestricted: Organization['isSandboxRestricted'];
   isLive: boolean;
-  isProdKycPlaybookRestricted: boolean;
+  isProdAuthPlaybookRestricted?: boolean;
   isProdKybPlaybookRestricted: boolean;
+  isProdKycPlaybookRestricted: boolean;
 };
 
 export type MetaSession = {

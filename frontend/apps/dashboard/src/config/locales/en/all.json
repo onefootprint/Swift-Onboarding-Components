@@ -2030,6 +2030,11 @@
           "nav": "Who to onboard",
           "title": "Who would you like to onboard?",
           "subtitle": "This helps us better recommend which data to collect.",
+          "auth": {
+            "title": "Auth",
+            "description": "Authentication allows your users to create credentials to sign up/log in to your platform",
+            "disabled-tooltip": "You are not configured to create production Auth playbooks. Feel free to continue in sandbox, or contact us to enable this feature."
+          },
           "kyc": {
             "title": "Onboard people",
             "description": "Know Your Customer (KYC) is the obligation of banks, businesses, and other financial institutions to identify and authenticate a person's identity before doing business with them.",
@@ -2060,6 +2065,7 @@
           "nav": "Name your Playbook",
           "title": "Name your playbook",
           "subtitle": "This helps you easily identify your Playbook, especially if you have multiple ones.",
+          "auth": "Auth",
           "kyc": "KYC",
           "kyb": "KYB",
           "form": {
@@ -2195,6 +2201,24 @@
               "business_address": "Registered business address",
               "business_tin": "EIN"
             }
+          },
+          "auth": {
+            "code-sending": "Code sent in an SMS to verified phone",
+            "email-validation-method": "We'll validate it sending a one-time password to users email address.",
+            "email": "Email address",
+            "enabled": "Enabled",
+            "names": "Name and last name",
+            "passkeys-availability": "Available for users who have onboarded onto Footprint using a KYC or KYB playbook in the past.",
+            "passkeys-more": "More about passkeys.",
+            "passkeys": "Passkeys",
+            "phone-number": "Phone number",
+            "signin-method": "Users will sign in using one of the following authenticated methods",
+            "signin": "Sign in",
+            "signup-method": "Users will create an account providing the following data",
+            "signup": "Sign up",
+            "sms-validation-method": "We'll validate it sending a one-time password in an SMS.",
+            "subtitle": "Here's how your auth configuration is going to work",
+            "title": "Auth playbook details"
           }
         },
         "authorized-scopes": {

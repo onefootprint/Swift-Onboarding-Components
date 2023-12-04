@@ -4,6 +4,7 @@ import { Button, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { isAuth } from '@/playbooks/utils/kind';
 import type {
   SummaryFormData,
   SummaryMeta,
@@ -11,33 +12,44 @@ import type {
 
 import DataCollection from './components/data-collection';
 
+type TFunction = ReturnType<typeof useTranslation>['t'];
 type SummaryProps = {
-  meta: SummaryMeta;
-  onSubmit: (data: SummaryFormData) => void;
-  onBack: () => void;
   defaultValues: SummaryFormData;
+  meta: SummaryMeta;
+  onBack: () => void;
+  onSubmit: (data: SummaryFormData) => void;
+};
+
+const getTitle = (t: TFunction, meta: SummaryMeta): string =>
+  isAuth(meta.kind) ? t('auth.title') : t('title');
+
+const getSubtitle = (t: TFunction, meta: SummaryMeta): string => {
+  if (isAuth(meta.kind)) return t('auth.subtitle');
+
+  const internationalOnly =
+    meta.residency?.allowInternationalResidents &&
+    !meta.residency.allowUsResidents;
+
+  return internationalOnly
+    ? t('subtitle-international-only')
+    : t('subtitle-default');
 };
 
 const Summary = ({ meta, onSubmit, onBack, defaultValues }: SummaryProps) => {
   const { t, allT } = useTranslation('pages.playbooks.dialog.summary');
-  const formMethods = useForm<SummaryFormData>({
-    defaultValues,
-  });
+  const formMethods = useForm<SummaryFormData>({ defaultValues });
   const { handleSubmit } = formMethods;
-  const internationalOnly =
-    meta.residency?.allowInternationalResidents &&
-    !meta.residency.allowUsResidents;
+  const title = getTitle(t, meta);
+  const subtitle = getSubtitle(t, meta);
 
   return (
     <Container>
       <Header>
         <Typography variant="label-1" color="secondary">
-          {t('title')}
+          {title}
         </Typography>
         <Typography variant="body-2" color="secondary">
-          {internationalOnly
-            ? t('subtitle-international-only')
-            : t('subtitle-default')}
+          {subtitle}
         </Typography>
       </Header>
       <FormProvider {...formMethods}>
