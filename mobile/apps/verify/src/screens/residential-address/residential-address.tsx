@@ -1,10 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
+import { COUNTRIES } from '@onefootprint/global-constants';
 import type {
-  CountrySelectOption,
-  SelectOption,
-  SelectRef,
-} from '@onefootprint/ui';
+  CollectKycDataRequirement,
+  CountryCode,
+  PublicOnboardingConfig,
+} from '@onefootprint/types';
+import { IdDI, isCountryCode } from '@onefootprint/types';
+import type { SelectRef } from '@onefootprint/ui';
 import {
   Box,
   Button,
@@ -21,24 +23,65 @@ import * as z from 'zod';
 
 import Header from '@/components/header';
 import states from '@/constants/states';
+import type { SyncDataFieldErrors } from '@/hooks/use-sync-data';
+import useSyncData from '@/hooks/use-sync-data';
 import useTranslation from '@/hooks/use-translation';
+import type { KycData } from '@/types';
+import getInitialCountry from '@/utils/get-initial-country';
+import getInitialState from '@/utils/get-initial-state';
+
+import type { FormData } from './types';
+import convertFormData from './utils/convert-form-data';
 
 export type ResidentialAddressProps = {
-  onDone: () => void;
+  requirement: CollectKycDataRequirement;
+  authToken: string;
+  config: PublicOnboardingConfig;
+  kycData: KycData;
+  onComplete: (data: KycData) => void;
 };
 
-type FormData = {
-  addressLine1: string;
-  addressLine2?: string;
-  city: string;
-  country: CountrySelectOption;
-  lastName: string;
-  state: SelectOption<{ value: string; label: string }>;
-  zip: string;
+const fieldByDi: Partial<Record<IdDI, keyof FormData>> = {
+  [IdDI.country]: 'country',
+  [IdDI.state]: 'state',
+  [IdDI.city]: 'city',
+  [IdDI.zip]: 'zip',
+  [IdDI.addressLine1]: 'addressLine1',
+  [IdDI.addressLine2]: 'addressLine2',
 };
 
-const ResidentialAddress = ({ onDone }: ResidentialAddressProps) => {
+const ResidentialAddress = ({
+  requirement,
+  authToken,
+  config,
+  kycData,
+  onComplete,
+}: ResidentialAddressProps) => {
   const { t } = useTranslation('pages.residential-address');
+  const countryFromContext = kycData[IdDI.country]?.value;
+  const {
+    mutation: { isLoading },
+    syncData,
+  } = useSyncData();
+
+  let defaultCountry: CountryCode | undefined;
+  if (countryFromContext && isCountryCode(countryFromContext)) {
+    defaultCountry = countryFromContext;
+  } else if (
+    config.allowInternationalResidents &&
+    config.supportedCountries &&
+    config.supportedCountries.length > 0
+  ) {
+    [defaultCountry] = config.supportedCountries;
+  }
+
+  const allowedCountries = new Set(config.supportedCountries);
+  const shouldDisableCountry = allowedCountries.size === 1;
+  const countryOptions = COUNTRIES.filter(entry =>
+    allowedCountries.has(entry.value),
+  );
+  // TODO: We need to update l10n using locale on country change
+
   const schema = z.object({
     country: z.object({
       label: z.string().min(1, { message: t('form.country.errors.required') }),
@@ -47,6 +90,7 @@ const ResidentialAddress = ({ onDone }: ResidentialAddressProps) => {
     addressLine1: z
       .string()
       .min(1, { message: t('form.address-line1.errors.required') }),
+    addressLine2: z.string(),
     city: z.string().min(1, { message: t('form.city.errors.required') }),
     // TODO:
     // Add validation if country is US
@@ -60,27 +104,61 @@ const ResidentialAddress = ({ onDone }: ResidentialAddressProps) => {
       value: z.string().min(1, { message: t('form.state.errors.required') }),
     }),
   });
-  const { control, handleSubmit } = useForm<FormData>({
-    defaultValues: {
-      addressLine1: undefined,
-      addressLine2: undefined,
-      city: undefined,
-      country: DEFAULT_COUNTRY,
-      state: undefined,
-      zip: undefined,
-    },
-    resolver: zodResolver(schema),
-  });
+  const { control, handleSubmit, resetField, setFocus, setError } =
+    useForm<FormData>({
+      defaultValues: {
+        addressLine1: kycData[IdDI.addressLine1]?.value,
+        addressLine2: kycData[IdDI.addressLine2]?.value,
+        city: kycData[IdDI.city]?.value,
+        country: getInitialCountry(defaultCountry),
+        state: getInitialState(kycData[IdDI.state]?.value),
+        zip: kycData[IdDI.zip]?.value,
+      },
+      resolver: zodResolver(schema),
+    });
   const addressLine1Ref = useRef<RNTextInput>(null);
   const addressLine2Ref = useRef<RNTextInput>(null);
   const cityRef = useRef<RNTextInput>(null);
   const zipRef = useRef<RNTextInput>(null);
   const stateRef = useRef<SelectRef>(null);
 
+  const handleCountryChange = () => {
+    resetField('addressLine1');
+    resetField('addressLine2');
+    resetField('city');
+    resetField('state');
+    resetField('zip');
+    setFocus('addressLine1'); // TODO: this line doesn't have any effect on mobile for some reason. It works on web. Test it.
+  };
+
+  const handleSyncDataError = (error: SyncDataFieldErrors) => {
+    Object.entries(error).forEach(([k, message]) => {
+      const di = k as IdDI;
+      const field = fieldByDi[di];
+      if (field) {
+        setError(
+          field,
+          { message },
+          {
+            shouldFocus: true,
+          },
+        );
+      }
+    });
+  };
+
   const onSubmit = (formData: FormData) => {
-    // TODO: Implement backend call
-    console.log(formData);
-    onDone();
+    const convertedData = convertFormData({ data: kycData, formData });
+    syncData({
+      data: convertedData,
+      speculative: true,
+      requirement,
+      authToken,
+      onSuccess: () => {
+        onComplete(convertedData);
+      },
+      onError: handleSyncDataError,
+    });
   };
 
   return (
@@ -96,12 +174,20 @@ const ResidentialAddress = ({ onDone }: ResidentialAddressProps) => {
             return (
               <CountrySelect
                 hasError={!!error}
-                hint={error?.message}
+                hint={
+                  shouldDisableCountry && value
+                    ? t('form.country.disabled-hint', {
+                        countryName: value.label,
+                      })
+                    : error?.message
+                }
                 label={t('form.country.label')}
                 onBlur={onBlur}
                 value={value}
+                options={countryOptions}
                 onChange={newValue => {
                   onChange(newValue);
+                  handleCountryChange();
                 }}
                 searchInputProps={{
                   placeholder: t('form.country.placeholder'),
@@ -109,6 +195,7 @@ const ResidentialAddress = ({ onDone }: ResidentialAddressProps) => {
                   autoComplete: 'country',
                   textContentType: 'countryName',
                 }}
+                disabled={shouldDisableCountry}
               />
             );
           }}
@@ -160,7 +247,7 @@ const ResidentialAddress = ({ onDone }: ResidentialAddressProps) => {
                 label={t('form.address-line2.label')}
                 onBlur={onBlur}
                 onChangeText={onChange}
-                onSubmitEditing={() => cityRef.current?.focus()}
+                onSubmitEditing={() => addressLine2Ref.current?.focus()}
                 placeholder={t('form.address-line2.placeholder')}
                 private
                 ref={addressLine2Ref}
@@ -265,7 +352,11 @@ const ResidentialAddress = ({ onDone }: ResidentialAddressProps) => {
           name="state"
         />
 
-        <Button variant="primary" onPress={handleSubmit(onSubmit)}>
+        <Button
+          variant="primary"
+          onPress={handleSubmit(onSubmit)}
+          loading={isLoading}
+        >
           {t('form.cta')}
         </Button>
       </Box>

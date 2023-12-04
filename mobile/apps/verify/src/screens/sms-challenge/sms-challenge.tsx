@@ -125,7 +125,7 @@ const SmsChallenge = ({
     if (signupChallengeMutation.isLoading) {
       return;
     }
-    console.log('initiateSignupChallenge', successfulIdentifier);
+
     signupChallengeMutation.mutate(
       {
         phoneNumber,

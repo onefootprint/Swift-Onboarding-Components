@@ -26,6 +26,7 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
   const [state, send] = useMachine(() => createMachine(sdkAuthToken));
   const {
     obConfigAuth,
+    config,
     identify,
     kyc: { kycData, requirement: kycRequirement },
   } = state.context;
@@ -149,13 +150,22 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
   }
 
   if (state.matches('residentialAddress')) {
-    return (
-      <ResidentialAddress
-        onDone={() => {
-          send('done');
-        }}
-      />
-    );
+    if (config && kycData && authToken && kycRequirement) {
+      return (
+        <ResidentialAddress
+          requirement={kycRequirement}
+          config={config}
+          kycData={kycData}
+          authToken={authToken}
+          onComplete={data => {
+            send({
+              type: 'dataSubmitted',
+              payload: data,
+            });
+          }}
+        />
+      );
+    }
   }
 
   if (state.matches('ssn')) {

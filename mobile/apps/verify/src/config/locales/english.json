@@ -121,7 +121,8 @@
           "placeholder": "Search for a country",
           "errors": {
             "required": "Country cannot be empty"
-          }
+          },
+          "disabled-hint": "Only addresses in {{countryName}} are accepted"
         },
         "address-line1": {
           "label": "Address line 1",

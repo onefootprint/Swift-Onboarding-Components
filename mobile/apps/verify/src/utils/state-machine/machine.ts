@@ -150,7 +150,26 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
         },
         residentialAddress: {
           on: {
-            done: 'residentialAddress',
+            dataSubmitted: [
+              {
+                target: 'ssn',
+                actions: ['assignKycData'],
+                cond: (context, event) => {
+                  const allData = mergeUpdatedData(
+                    context.kyc.kycData ?? {},
+                    event.payload,
+                  );
+                  return (
+                    isInDomesticFlow(allData) &&
+                    isMissingSsnAttribute(
+                      allAttributes(context.kyc.requirement),
+                      allData,
+                      true,
+                    )
+                  );
+                },
+              },
+            ],
           },
         },
         ssn: {
