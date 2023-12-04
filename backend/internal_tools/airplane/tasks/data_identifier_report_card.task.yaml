@@ -1,6 +1,0 @@
-slug: data_identifier_report_card
-name: Data identifiers
-description: "Generates stats on use of DataIdentifiers"
-sql:
-  resource: "prod_ro_db"
-  entrypoint: data_identifier_report_card.sql

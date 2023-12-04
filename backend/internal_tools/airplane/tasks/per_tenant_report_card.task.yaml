@@ -1,6 +1,0 @@
-slug: per_tenant_report_card
-name: Per-tenant stats
-description: "Generates some per-tenant statistics"
-sql:
-  resource: "prod_ro_db"
-  entrypoint: per_tenant_report_card.sql
