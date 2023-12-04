@@ -52,7 +52,10 @@ const Button = forwardRef<HTMLButtonElement, SplitButtonProps>(
           variant={variant}
           loading={loading}
           disabled={disabled}
-          onOptionChange={setActiveOption}
+          onOptionChange={(option: Option) => {
+            setActiveOption(option);
+            option.onSelect();
+          }}
           tab-index="1"
         />
       </Stack>

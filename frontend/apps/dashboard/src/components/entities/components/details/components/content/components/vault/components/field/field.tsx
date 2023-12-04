@@ -8,6 +8,7 @@ import { useFormContext } from 'react-hook-form';
 import { FieldOrPlaceholder } from 'src/components';
 
 import useField from '../../hooks/use-field';
+import { useDecryptControls } from '../vault-actions';
 
 export type FieldProps = {
   di: DataIdentifier;
@@ -32,9 +33,11 @@ const Field = ({
   const { t } = useTranslation('pages.entity.decrypt');
   const { register } = useFormContext();
   const field = useField(entity)(di);
+  const decrypt = useDecryptControls();
   const customLabel = renderLabel ? renderLabel() : undefined;
   const label = customLabel ?? field.label;
   const ariaLabel = typeof customLabel === 'string' ? customLabel : field.label;
+  const isChecked = field.isDecrypted || decrypt.inProgressDecryptingAll;
 
   return (
     <Container role="row" aria-label={ariaLabel}>
@@ -46,7 +49,7 @@ const Field = ({
         >
           <Box>
             <Checkbox
-              checked={field.isDecrypted || undefined}
+              checked={isChecked || undefined}
               {...register(field.name)}
               disabled={field.disabled}
               label={label}

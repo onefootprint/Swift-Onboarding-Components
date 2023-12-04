@@ -29,6 +29,9 @@ const useDecryptControls = () => {
     state.matches(State.confirmingDecryptAllReason) ||
     state.matches(State.decrypting) ||
     state.matches(State.decryptingAll);
+  const inProgressDecryptingAll =
+    state.matches(State.confirmingDecryptAllReason) ||
+    state.matches(State.decryptingAll);
 
   const start = () => {
     send(Event.started);
@@ -92,6 +95,7 @@ const useDecryptControls = () => {
     submitFields,
     submitAllFields,
     inProgress,
+    inProgressDecryptingAll,
     decrypt,
   };
 };
