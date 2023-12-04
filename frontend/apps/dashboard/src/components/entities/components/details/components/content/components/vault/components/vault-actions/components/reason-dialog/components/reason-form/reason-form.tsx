@@ -1,5 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import type { SelectOption } from '@onefootprint/ui';
 import {
   Box,
   Divider,
@@ -13,7 +12,7 @@ import React, { useId, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 type FormData = {
-  reason?: SelectOption;
+  reason?: string;
   customReason?: string;
 };
 
@@ -35,7 +34,7 @@ const ReasonForm = ({ onSubmit }: ReasonFormProps) => {
     if (formData.customReason) {
       onSubmit(formData.customReason);
     } else if (formData.reason) {
-      onSubmit(formData.reason.value);
+      onSubmit(formData.reason);
     }
   };
 
@@ -67,7 +66,9 @@ const ReasonForm = ({ onSubmit }: ReasonFormProps) => {
         })}
       >
         {options.map(option => (
-          <option value={option}>{option}</option>
+          <option key={option} value={option}>
+            {option}
+          </option>
         ))}
       </NativeSelect>
       {hasError && (
