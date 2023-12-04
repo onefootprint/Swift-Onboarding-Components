@@ -1,7 +1,7 @@
 import XCTest
-@testable import FootprintPackage
+@testable import FootprintSwift
 
-final class FootprintPackageTests: XCTestCase {
+final class FootprintSwiftTests: XCTestCase {
     func testExample() throws {
         // XCTest Documentation
         // https://developer.apple.com/documentation/xctest
