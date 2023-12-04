@@ -1,6 +1,6 @@
 //
-//  demo_swift_uiApp.swift
-//  demo-swift-ui
+//  demo_swiftApp.swift
+//  demo-swift
 //
 //  Created by Rafael Michels Motta on 04/12/23.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct demo_swift_uiApp: App {
+struct demo_swiftApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
