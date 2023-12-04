@@ -6,7 +6,9 @@ export enum State {
   idle = 'idle',
   selectingFields = 'selectingFields',
   confirmingReason = 'confirmingReason',
+  confirmingDecryptAllReason = 'confirmingDecryptAllReason',
   decrypting = 'decrypting',
+  decryptingAll = 'decryptingAll',
   decryptFailed = 'decryptFailed',
 }
 
@@ -14,6 +16,7 @@ export enum Event {
   started = 'started',
   canceled = 'canceled',
   submittedFields = 'submittedFields',
+  submittedAllFields = 'submittedAllFields',
   submittedReason = 'submittedReason',
   decryptSucceeded = 'decryptSucceeded',
   decryptFailed = 'decryptFailed',
@@ -42,6 +45,10 @@ export type MachineEvents =
       payload: { fields: DecryptFormData };
     }
   | {
+      type: Event.submittedAllFields;
+      payload: { fields: DataIdentifier[] };
+    }
+  | {
       type: Event.submittedReason;
       payload: { reason: string };
     }
@@ -67,7 +74,21 @@ export type MachineStates =
       };
     }
   | {
+      value: State.confirmingDecryptAllReason;
+      context: Context & {
+        reason: string;
+        fields: DecryptFormData;
+      };
+    }
+  | {
       value: State.decrypting;
+      context: Context & {
+        reason: string;
+        fields: DecryptFormData;
+      };
+    }
+  | {
+      value: State.decryptingAll;
       context: Context & {
         reason: string;
         fields: DecryptFormData;

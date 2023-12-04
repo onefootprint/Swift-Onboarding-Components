@@ -1,4 +1,4 @@
-import type { DataIdentifier } from '@onefootprint/types';
+import { type DataIdentifier } from '@onefootprint/types';
 import flat from 'flat';
 import get from 'lodash/get';
 

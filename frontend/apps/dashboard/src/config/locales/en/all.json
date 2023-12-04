@@ -917,7 +917,8 @@
         }
       },
       "decrypt": {
-        "start": "Decrypt data",
+        "start": "Decrypt",
+        "start-all": "Decrypt all",
         "decrypt": "Decrypt",
         "not-allowed": "You're not allowed to decrypt data",
         "status": {

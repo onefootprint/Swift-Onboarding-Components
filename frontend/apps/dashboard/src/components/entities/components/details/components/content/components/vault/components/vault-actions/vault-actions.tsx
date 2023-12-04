@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Button, Portal, Stack, Tooltip } from '@onefootprint/ui';
+import { SplitButton } from '@onefootprint/ui/src/components';
 import React from 'react';
 import useEntityVaultWithTransforms from 'src/components/entities/hooks/use-entity-vault-with-transforms';
 
@@ -40,14 +41,25 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
       {editControls.isIdle && decryptControls.isIdle && (
         <Tooltip disabled={canDecrypt} text={t('decrypt.not-allowed')}>
           <Stack gap={3} align="center">
-            <Button
+            <SplitButton
               disabled={!canDecrypt}
-              onClick={decryptControls.start}
-              size="small"
               variant="secondary"
-            >
-              {t('decrypt.start')}
-            </Button>
+              options={[
+                {
+                  label: t('decrypt.start'),
+                  value: 'start',
+                  onSelect: decryptControls.start,
+                },
+                {
+                  label: t('decrypt.start-all'),
+                  value: 'start-all',
+                  onSelect: () =>
+                    decryptControls.submitAllFields(
+                      entity.decryptableAttributes,
+                    ),
+                },
+              ]}
+            />
             <ManualReview />
             <Actions />
           </Stack>

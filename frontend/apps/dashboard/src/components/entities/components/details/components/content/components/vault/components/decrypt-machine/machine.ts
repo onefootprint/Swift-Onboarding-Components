@@ -16,6 +16,12 @@ export const createDecryptStateMachine = () =>
             [Event.started]: {
               target: State.selectingFields,
             },
+            [Event.submittedAllFields]: [
+              {
+                target: State.confirmingDecryptAllReason,
+                actions: [Action.assignFields],
+              },
+            ],
           },
         },
         [State.selectingFields]: {
@@ -32,7 +38,6 @@ export const createDecryptStateMachine = () =>
             ],
           },
         },
-
         [State.confirmingReason]: {
           on: {
             [Event.canceled]: {
@@ -44,6 +49,17 @@ export const createDecryptStateMachine = () =>
             },
           },
         },
+        [State.confirmingDecryptAllReason]: {
+          on: {
+            [Event.canceled]: {
+              target: State.idle,
+            },
+            [Event.submittedReason]: {
+              target: State.decryptingAll,
+              actions: Action.assignReason,
+            },
+          },
+        },
         [State.decrypting]: {
           on: {
             [Event.decryptSucceeded]: {
@@ -51,6 +67,16 @@ export const createDecryptStateMachine = () =>
             },
             [Event.decryptFailed]: {
               target: State.confirmingReason,
+            },
+          },
+        },
+        [State.decryptingAll]: {
+          on: {
+            [Event.decryptSucceeded]: {
+              target: State.idle,
+            },
+            [Event.decryptFailed]: {
+              target: State.confirmingDecryptAllReason,
             },
           },
         },
@@ -70,6 +96,9 @@ export const createDecryptStateMachine = () =>
         [Action.assignFields]: (context, event) => {
           if (event.type === Event.submittedFields) {
             context.dis = getDiFields(event.payload.fields);
+          }
+          if (event.type === Event.submittedAllFields) {
+            context.dis = event.payload.fields;
           }
         },
         [Action.assignReason]: (context, event) => {

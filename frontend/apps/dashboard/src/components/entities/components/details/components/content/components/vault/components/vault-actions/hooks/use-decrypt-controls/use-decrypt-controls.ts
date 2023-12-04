@@ -16,13 +16,19 @@ const useDecryptControls = () => {
   const decryptFields = useDecryptFields();
   const showRequestErrorToast = useRequestErrorToast();
   const isOpen =
-    state.matches(State.confirmingReason) || state.matches(State.decrypting);
+    state.matches(State.confirmingReason) ||
+    state.matches(State.confirmingDecryptAllReason) ||
+    state.matches(State.decrypting) ||
+    state.matches(State.decryptingAll);
   const isIdle = state.matches(State.idle);
-  const isLoading = state.matches(State.decrypting);
+  const isLoading =
+    state.matches(State.decrypting) || state.matches(State.decryptingAll);
   const inProgress =
     state.matches(State.selectingFields) ||
     state.matches(State.confirmingReason) ||
-    state.matches(State.decrypting);
+    state.matches(State.confirmingDecryptAllReason) ||
+    state.matches(State.decrypting) ||
+    state.matches(State.decryptingAll);
 
   const start = () => {
     send(Event.started);
@@ -34,6 +40,10 @@ const useDecryptControls = () => {
 
   const submitFields = (fields: DecryptFormData) => {
     send(Event.submittedFields, { payload: { fields } });
+  };
+
+  const submitAllFields = (fields: DataIdentifier[]) => {
+    send(Event.submittedAllFields, { payload: { fields } });
   };
 
   const submitReason = (reason: string) => {
@@ -80,6 +90,7 @@ const useDecryptControls = () => {
     isIdle,
     isLoading,
     submitFields,
+    submitAllFields,
     inProgress,
     decrypt,
   };
