@@ -3,9 +3,10 @@ export const checkIsUaSocialMediaBrowser = (userAgent: string) => {
   return (
     userAgent.includes('fban') || // facebook
     lowUserAgent.includes('fban') || // facebook
+    lowUserAgent.includes('facebook') ||
     lowUserAgent.includes('twitter') ||
     lowUserAgent.includes('twitterbot') ||
-    lowUserAgent.includes('facebook') ||
+    lowUserAgent.includes('linkedin') ||
     lowUserAgent.includes('instagram') ||
     lowUserAgent.includes('snapchat') ||
     lowUserAgent.includes('bytedance') || // tiktok
