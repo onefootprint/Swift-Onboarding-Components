@@ -25,6 +25,8 @@ export interface StaticSecrets {
   workosSecretKey: aws.ssm.Parameter;
   twilioApiKey: aws.ssm.Parameter;
   twilioApiKeySecret: aws.ssm.Parameter;
+  twilioApiKeyBackup: aws.ssm.Parameter;
+  twilioApiKeySecretBackup: aws.ssm.Parameter;
   sendgridApiKey: aws.ssm.Parameter;
   idologyUsername: aws.ssm.Parameter;
   idologyPassword: aws.ssm.Parameter;
@@ -69,6 +71,7 @@ interface SecretConstants {
   elastic: ElasticSecrets;
   workos: Workos;
   twilio: Twilio;
+  twilioBackup: Twilio | undefined;
   sendgrid: Sendgrid;
   idology: IDology;
   grafana: Grafana;
@@ -289,6 +292,14 @@ export async function LoadSecrets(
     twilioApiKeySecret: createSecretParameter(
       `twilioApiSecretKey-${stack}`,
       secretConstants.twilio.apiKeySecret,
+    ),
+    twilioApiKeyBackup: createSecretParameter(
+      `twilioApiKeyBackup-${stack}`,
+      secretConstants.twilioBackup.apply(t => t?.apiKey || ''),
+    ),
+    twilioApiKeySecretBackup: createSecretParameter(
+      `twilioApiSecretKeyBackup-${stack}`,
+      secretConstants.twilioBackup.apply(t => t?.apiKeySecret || ''),
     ),
     sendgridApiKey: createSecretParameter(
       `sendgridApiKey-${stack}`,
