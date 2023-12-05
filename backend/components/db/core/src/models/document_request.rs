@@ -6,7 +6,7 @@ use db_schema::schema::document_request;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::WorkflowId;
-use newtypes::{DocumentRequestId, ScopedVaultId};
+use newtypes::{DocumentRequestId, DocumentRequestKind, ScopedVaultId};
 
 pub type DocRefId = String;
 
@@ -22,6 +22,7 @@ pub struct DocumentRequest {
     pub _updated_at: DateTime<Utc>,
     pub should_collect_selfie: bool,
     pub workflow_id: WorkflowId,
+    pub kind: DocumentRequestKind,
 }
 
 impl DocumentRequest {
@@ -32,6 +33,7 @@ impl DocumentRequest {
             ref_id,
             workflow_id,
             should_collect_selfie,
+            kind,
         } = args;
         let new = NewDocumentRequestRow {
             scoped_vault_id,
@@ -39,6 +41,7 @@ impl DocumentRequest {
             created_at: Utc::now(),
             should_collect_selfie,
             workflow_id,
+            kind,
         };
         let result = diesel::insert_into(document_request::table)
             .values(new)
@@ -72,6 +75,7 @@ pub struct NewDocumentRequestArgs {
     pub ref_id: Option<String>,
     pub should_collect_selfie: bool,
     pub workflow_id: WorkflowId,
+    pub kind: DocumentRequestKind,
 }
 
 #[derive(Debug, Clone, Queryable, Insertable)]
@@ -82,4 +86,5 @@ struct NewDocumentRequestRow {
     created_at: DateTime<Utc>,
     should_collect_selfie: bool,
     workflow_id: WorkflowId,
+    kind: DocumentRequestKind,
 }

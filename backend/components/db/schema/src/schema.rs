@@ -211,6 +211,7 @@ table! {
         _updated_at -> Timestamptz,
         should_collect_selfie -> Bool,
         workflow_id -> Text,
+        kind -> Text,
     }
 }
 

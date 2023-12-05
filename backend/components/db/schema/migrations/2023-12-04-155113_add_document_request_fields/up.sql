@@ -1,0 +1,1 @@
+ALTER TABLE document_request ADD COLUMN kind TEXT NOT NULL DEFAULT 'identity';

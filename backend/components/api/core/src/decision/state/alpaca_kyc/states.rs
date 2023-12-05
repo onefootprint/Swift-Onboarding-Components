@@ -17,8 +17,8 @@ use either::Either;
 use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
-    AlpacaKycConfig, DecisionIntentKind, DecisionStatus, Locked, OnboardingStatus, RiskSignalGroupKind,
-    VendorAPI,
+    AlpacaKycConfig, DecisionIntentKind, DecisionStatus, DocumentRequestKind, Locked, OnboardingStatus,
+    RiskSignalGroupKind, VendorAPI,
 };
 
 use crate::{
@@ -314,6 +314,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                     workflow_id: self.wf_id.clone(),
                     // TODO: should come from a config
                     should_collect_selfie: true,
+                    kind: DocumentRequestKind::Identity,
                 };
                 DocumentRequest::create(conn, args)?;
 

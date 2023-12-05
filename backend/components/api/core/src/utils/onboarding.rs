@@ -15,8 +15,8 @@ use db::{
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use newtypes::{
-    CollectedDataOption, EncryptedVaultPrivateKey, ObConfigurationKind, Selfie, VaultKind, VaultPublicKey,
-    WorkflowId, WorkflowSource,
+    CollectedDataOption, DocumentRequestKind, EncryptedVaultPrivateKey, ObConfigurationKind, Selfie,
+    VaultKind, VaultPublicKey, WorkflowId, WorkflowSource,
 };
 use std::sync::Arc;
 
@@ -156,6 +156,7 @@ fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObCon
             ref_id: None,
             workflow_id: wf.id.clone(),
             should_collect_selfie: doc_info.selfie() == Selfie::RequireSelfie,
+            kind: DocumentRequestKind::Identity,
         };
         DocumentRequest::create(conn, args)?;
     }

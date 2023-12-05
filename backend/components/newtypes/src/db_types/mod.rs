@@ -13,6 +13,7 @@ mod d2p_session_status;
 mod data_lifetime_source;
 mod decision_intent_kind;
 mod decision_status;
+mod document_request;
 mod document_scan_device_type;
 mod document_side;
 mod fingerprint;
@@ -54,8 +55,8 @@ pub use self::{
     access_event_kind::*, access_event_purpose::*, actor::*, android_verdict_types::*, apple_attestation::*,
     attestation_type::*, auth_event_kind::*, business_owner_kind::*, company_size::*, compliance_status::*,
     contact_info_priority::*, d2p_session_status::*, d2p_session_status::*, data_lifetime_source::*,
-    decision_intent_kind::*, decision_status::*, document_scan_device_type::*, document_side::*,
-    fingerprint::*, fingerprint_meta::*, footprint_reason_code::*, identify_scope::*,
+    decision_intent_kind::*, decision_status::*, document_request::*, document_scan_device_type::*,
+    document_side::*, fingerprint::*, fingerprint_meta::*, footprint_reason_code::*, identify_scope::*,
     identity_document_fixture_result::*, identity_document_status::*, incode::*, liveness_source::*,
     manual_review::*, middesk_request_state::*, ob_config::*, onboarding_status::*, org_member_email::*,
     preview_api::*, proxy_ingress_kind::*, risk_signal_group::*, rule_expression::*, rules::*,

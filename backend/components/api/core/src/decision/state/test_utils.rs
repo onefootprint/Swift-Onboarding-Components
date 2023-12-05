@@ -35,8 +35,8 @@ use idv::middesk::{MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse};
 use idv::twilio::TwilioLookupV2APIResponse;
 use idv::twilio::TwilioLookupV2Request;
 use newtypes::{
-    DecisionIntentKind, FootprintReasonCode, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
-    WorkflowFixtureResult, WorkflowId,
+    DecisionIntentKind, DocumentRequestKind, FootprintReasonCode, RiskSignalGroupKind, ScopedVaultId,
+    VendorAPI, WorkflowFixtureResult, WorkflowId,
 };
 use newtypes::{OnboardingStatus, PiiJsonValue};
 use strum_macros::EnumIter;
@@ -482,6 +482,7 @@ pub async fn mock_incode_doc_collection(
                     ref_id: None,
                     workflow_id: wf_id.clone(),
                     should_collect_selfie: false,
+                    kind: DocumentRequestKind::Identity,
                 };
                 DocumentRequest::create(conn, args).unwrap();
             }

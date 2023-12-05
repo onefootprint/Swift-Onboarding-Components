@@ -13,8 +13,8 @@ use db::models::{
 use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
-    DecisionStatus, EnhancedAmlOption, KycConfig, Locked, OnboardingStatus, RiskSignalGroupKind,
-    VerificationResultId,
+    DecisionStatus, DocumentRequestKind, EnhancedAmlOption, KycConfig, Locked, OnboardingStatus,
+    RiskSignalGroupKind, VerificationResultId,
 };
 
 use super::{
@@ -337,6 +337,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
                     workflow_id: self.wf_id.clone(),
                     // TODO: should come from a config
                     should_collect_selfie: true,
+                    kind: DocumentRequestKind::Identity,
                 };
                 DocumentRequest::create(conn, args)?;
 

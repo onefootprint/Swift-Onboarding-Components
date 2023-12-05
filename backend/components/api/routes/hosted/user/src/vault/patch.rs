@@ -16,8 +16,8 @@ use db::models::workflow::Workflow;
 use newtypes::email::Email;
 use newtypes::put_data_request::{PatchDataRequest, RawDataRequest};
 use newtypes::{
-    DataIdentifier, DataLifetimeSource, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, ScopedVaultId,
-    ValidateArgs, WorkflowGuard, WorkflowId,
+    DataIdentifier, DataLifetimeSource, DocumentRequestKind, IdentityDataKind as IDK,
+    Iso3166TwoDigitCountryCode, ScopedVaultId, ValidateArgs, WorkflowGuard, WorkflowId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use std::str::FromStr;
@@ -183,7 +183,7 @@ async fn handle_ssn_skipped(
 ) -> ApiResult<()> {
     // bail early if not needed
     let Some(doc_info) = obc.document_cdo_for_optional_ssn() else {
-        return Ok(())
+        return Ok(());
     };
 
     state
@@ -216,5 +216,6 @@ fn default_stepup_doc_args(
         ref_id: None,
         workflow_id: workflow_id.clone(),
         should_collect_selfie,
+        kind: DocumentRequestKind::Identity,
     }
 }

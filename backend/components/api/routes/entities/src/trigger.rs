@@ -29,6 +29,7 @@ use db::models::workflow_request::WorkflowRequest;
 use newtypes::ContactInfoKind;
 use newtypes::DbActor;
 use newtypes::DocumentConfig;
+use newtypes::DocumentRequestKind;
 use newtypes::PhoneNumber;
 use newtypes::PiiString;
 use newtypes::TriggerInfo;
@@ -115,6 +116,7 @@ pub async fn post(
                         ref_id: None,
                         workflow_id: wf.id.clone(),
                         should_collect_selfie: collect_selfie,
+                        kind: DocumentRequestKind::Identity,
                     };
                     DocumentRequest::create(conn, args)?;
 
