@@ -166,18 +166,17 @@ async fn make_decision(
 ) -> actix_web::Result<Json<ResponseData<MakeDecisionResponse>>, ApiError> {
     let MakeDecisionRequest { tenant_id, fp_id } = request.into_inner();
 
-    let (is_sandbox, wf, vw, obc) = state
+    let (wf, vw, obc) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
-            let is_sandbox = !scoped_user.is_live;
             let wf = Workflow::get_active(conn, &scoped_user.id)?.ok_or(OnboardingError::NoWorkflow)?;
 
             let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 
             let vw = VaultWrapper::<_>::build(conn, VwArgs::Tenant(&wf.scoped_vault_id))?;
 
-            Ok((is_sandbox, wf, vw, obc))
+            Ok((wf, vw, obc))
         })
         .await?;
 
@@ -223,9 +222,8 @@ async fn make_decision(
             engine::save_onboarding_decision(
                 conn,
                 &wf,
-                rules_output.into(),
+                rules_output.final_kyc_decision()?.decision,
                 verification_result_ids,
-                is_sandbox,
                 vec![],
             )?;
 

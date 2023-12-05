@@ -4,7 +4,7 @@ use super::{
     features::risk_signals::{create_risk_signals_from_vendor_results, RiskSignalsForDecision},
     onboarding::{
         rules::{KycRuleExecutionConfig, KycRuleGroup},
-        FinalAndAdditionalDecisions, OnboardingRulesDecision, OnboardingRulesDecisionOutput,
+        Decision, OnboardingRulesDecisionOutput,
     },
     vendor::{
         make_request::{VerificationRequestWithVendorError, VerificationRequestWithVendorResponse},
@@ -274,25 +274,18 @@ pub fn calculate_decision(
 pub fn save_onboarding_decision(
     conn: &mut TxnPgConn,
     workflow: &Workflow,
-    rules_output: OnboardingRulesDecision,
+    final_decision: Decision,
     verification_result_ids: Vec<VerificationResultId>,
-    is_sandbox: bool,
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
-    let final_decision = rules_output.final_decision_and_additional_evaluated()?;
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
     risk::save_final_decision(
         conn,
         workflow.id.clone(),
         verification_result_ids,
-        &final_decision.decision,
+        &final_decision,
         review_reasons,
     )?;
-
-    if !is_sandbox {
-        // Log our canonical line
-        log_rule_evaluation(workflow, &final_decision, rule::CANONICAL_ONBOARDING_RULE_LINE);
-    }
 
     Ok(())
 }

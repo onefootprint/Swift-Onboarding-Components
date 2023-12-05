@@ -178,8 +178,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
                 .into_iter()
                 .map(|vr| vr.verification_result_id)
                 .collect(),
-            decision.into(),
-            fixture_decision.is_some(),
+            decision,
             vec![],
         )?;
         Ok(DocumentState::from(DocumentComplete))

@@ -24,8 +24,7 @@ use crate::{
         },
         onboarding::{
             rules::{KycRuleExecutionConfig, KycRuleGroup},
-            Decision, DecisionResult, OnboardingRulesDecision, OnboardingRulesDecisionOutput,
-            WaterfallOnboardingRulesDecisionOutput,
+            Decision, OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput,
         },
         rule::rule_sets,
         rule_engine,
@@ -171,24 +170,13 @@ pub fn get_vres_id_for_fixture(vendor_results: &[VendorResult]) -> ApiResult<Ver
     Ok(idology.or(experian).ok_or(decision::Error::FixtureVresNotFound)?)
 }
 
-pub fn kyc_decision_from_fixture(
-    fixture_decision: FixtureDecision,
-) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
+pub fn kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> ApiResult<Decision> {
     let rules_output = OnboardingRulesDecisionOutput::from(fixture_decision);
-    let output = WaterfallOnboardingRulesDecisionOutput::new(
-        DecisionResult::Evaluated(rules_output),
-        DecisionResult::NotRequired,
-        // TODO: think about this
-        DecisionResult::NotRequired,
-    );
-
-    Ok(output)
+    Ok(rules_output.decision)
 }
 
 #[tracing::instrument(skip_all)]
-pub fn alpaca_kyc_decision_from_fixture(
-    fixture_decision: FixtureDecision,
-) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
+pub fn alpaca_kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> ApiResult<Decision> {
     let decision_status = match fixture_decision {
         // #manualreview -> we want KYC to pass here and then we have a watchlist hit which actually triggers the workflow to go to PendingReview
         (newtypes::DecisionStatus::Fail, true) => DecisionStatus::Pass,
@@ -200,25 +188,14 @@ pub fn alpaca_kyc_decision_from_fixture(
         (newtypes::DecisionStatus::StepUp, _) => DecisionStatus::StepUp,
     };
 
-    let final_decision = OnboardingRulesDecisionOutput {
-        decision: Decision {
-            decision_status,
-            should_commit: false,
-            create_manual_review: false,
-            // not used
-            vendor_apis: vec![VendorAPI::IdologyExpectId],
-        },
-        rules_triggered: vec![],
-        rules_not_triggered: vec![],
+    let decision = Decision {
+        decision_status,
+        should_commit: false,
+        create_manual_review: false,
+        // not used
+        vendor_apis: vec![VendorAPI::IdologyExpectId],
     };
-    let rules_output = WaterfallOnboardingRulesDecisionOutput::new(
-        DecisionResult::Evaluated(final_decision),
-        DecisionResult::NotRequired,
-        // TODO: think about this
-        DecisionResult::NotRequired,
-    );
-
-    Ok(rules_output)
+    Ok(decision)
 }
 
 #[tracing::instrument(skip_all)]
@@ -228,7 +205,7 @@ pub fn get_decision(
     risk_signals: RiskSignalsForDecision,
     wf: &Workflow,
     vault: &Vault,
-) -> ApiResult<WaterfallOnboardingRulesDecisionOutput> {
+) -> ApiResult<Decision> {
     let (obc, tenant) = ObConfiguration::get(conn, &wf.id)?;
     // later rules will come from Postgres itself
     let rule_group = match obc.cip_kind {
@@ -274,7 +251,9 @@ pub fn get_decision(
         allow_stepup: !doc_collected, // Soon we might just add is_stepup_enabled to OBC and then also use that here to determine if StepUp should be an allowed_action
     };
     let rules_output = rule_group.evaluate(risk_signals, config)?;
-    Ok(rules_output)
+    let decision = rules_output.final_kyc_decision()?;
+    engine::log_rule_evaluation(wf, &decision, decision::rule::CANONICAL_ONBOARDING_RULE_LINE);
+    Ok(decision.decision)
 }
 
 #[tracing::instrument(skip(conn))]
@@ -284,8 +263,7 @@ pub fn save_kyc_decision(
     sv_id: &ScopedVaultId,
     workflow: &Workflow,
     verification_result_ids: Vec<VerificationResultId>,
-    rules_output: OnboardingRulesDecision,
-    is_sandbox: bool,
+    rules_output: Decision,
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
     engine::save_onboarding_decision(
@@ -293,7 +271,6 @@ pub fn save_kyc_decision(
         workflow,
         rules_output,
         verification_result_ids,
-        is_sandbox,
         review_reasons,
     )?;
     Ok(())

@@ -6,7 +6,8 @@ use super::{
 };
 use crate::decision::onboarding::rules::evaluate_kyb_rules;
 use crate::decision::onboarding::{
-    KybOnboardingRulesDecisionOutput, OnboardingRulesDecision, OnboardingRulesDecisionOutput,
+    FinalAndAdditionalDecisions, KybOnboardingRulesDecisionOutput, OnboardingRulesDecision,
+    OnboardingRulesDecisionOutput,
 };
 use crate::decision::utils::FixtureDecision;
 use crate::decision::RuleError;
@@ -384,8 +385,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
             &sv.id,
             &wf,
             vres_ids,
-            decision,
-            fixture_decision.is_some(),
+            decision.final_decision_and_additional_evaluated()?.decision,
             vec![],
         )?;
 

@@ -40,10 +40,7 @@ async fn test_prefill_data(state: &mut State) {
 
     // su1 then goes through onboarding. When su1 triggers onboarding, we'll compose prefill data,
     // but it should be empty since the only data exists at the current tenant
-    let prefill_data = vw
-        .get_data_to_prefill(&state, &data.su1, &data.pb1)
-        .await
-        .unwrap();
+    let prefill_data = vw.get_data_to_prefill(state, &data.su1, &data.pb1).await.unwrap();
     assert!(prefill_data.data.is_empty());
     assert!(prefill_data.fingerprints.is_empty());
     assert!(prefill_data.old_ci.is_empty());
@@ -51,10 +48,7 @@ async fn test_prefill_data(state: &mut State) {
     // If the user then tried to onboard onto tenant2, there should be almost no prefill data since
     // nothing is portablized - only the phone number because the phone is portablized after it's
     // verified
-    let prefill_data = vw
-        .get_data_to_prefill(&state, &data.su2, &data.pb2)
-        .await
-        .unwrap();
+    let prefill_data = vw.get_data_to_prefill(state, &data.su2, &data.pb2).await.unwrap();
     assert_have_same_elements(
         prefill_data.data.iter().map(|d| d.kind.clone()).collect(),
         vec![IDK::PhoneNumber.into()],
@@ -98,10 +92,7 @@ async fn test_prefill_data(state: &mut State) {
         .unwrap();
 
     // When the user starts onboarding onto tenant2, we should have prefill data!
-    let prefill_data = vw
-        .get_data_to_prefill(&state, &data.su2, &data.pb2)
-        .await
-        .unwrap();
+    let prefill_data = vw.get_data_to_prefill(state, &data.su2, &data.pb2).await.unwrap();
 
     // Make sure prefill data has what we expect
     assert_have_same_elements(
@@ -162,7 +153,7 @@ async fn test_prefill_data(state: &mut State) {
     // For backcompat, tenants' views of data still include other tenants' data.
     // This is a util to filter out data added by other tenants
     assert_have_same_elements(
-        vw1.all_data.iter().map(|(d, _)| d.clone()).collect(),
+        vw1.all_data.keys().cloned().collect(),
         vec![
             IDK::Email.into(),
             IDK::PhoneNumber.into(),
@@ -180,10 +171,7 @@ async fn test_prefill_data(state: &mut State) {
         IDK::LastName.into(),
         IDK::Ssn4.into(),
     ];
-    assert_have_same_elements(
-        vw2.all_data.iter().map(|(d, _)| d.clone()).collect(),
-        expected_vw2_data.clone(),
-    );
+    assert_have_same_elements(vw2.all_data.keys().cloned().collect(), expected_vw2_data.clone());
 
     // Assert actual values in the vault are identical
     let vw1_data = vw1
@@ -226,10 +214,7 @@ async fn test_prefill_data(state: &mut State) {
         IDK::Ssn4.into(),
     ];
     let vw2_data = vw2.all_data.iter().flat_map(|(_, d)| d).collect_vec();
-    assert_have_same_elements(
-        vw2.all_data.iter().map(|(d, _)| d.clone()).collect(),
-        expected_vw2_data,
-    );
+    assert_have_same_elements(vw2.all_data.keys().cloned().collect(), expected_vw2_data);
     assert!(vw2_data.iter().all(|d| !d.is_portable()));
 }
 

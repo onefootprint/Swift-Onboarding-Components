@@ -323,17 +323,9 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
             decision
         };
 
-        match decision.final_kyc_decision()?.decision.decision_status {
+        match decision.decision_status {
             DecisionStatus::Fail | DecisionStatus::Pass => {
-                common::save_kyc_decision(
-                    conn,
-                    &self.sv_id,
-                    &wf,
-                    vres_ids,
-                    decision.into(),
-                    fixture_decision.is_some(),
-                    review_reasons,
-                )?;
+                common::save_kyc_decision(conn, &self.sv_id, &wf, vres_ids, decision, review_reasons)?;
                 Ok(KycState::from(KycComplete))
             }
             DecisionStatus::StepUp => {

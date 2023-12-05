@@ -27,13 +27,10 @@ use crate::{
         self,
         features::risk_signals::{
             create_risk_signals_from_vendor_results, fetch_latest_kyc_risk_signals,
-            fetch_latest_risk_signals_map,
             risk_signal_group_struct::{self},
             save_risk_signals, RiskSignalGroupStruct,
         },
-        onboarding::{
-            Decision, DecisionResult, OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput,
-        },
+        onboarding::Decision,
         review::save_review_decision,
         state::{
             actions::{MakeDecision, WorkflowActions},
@@ -281,7 +278,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
             decision
         };
 
-        match decision.final_kyc_decision()?.decision.decision_status {
+        match decision.decision_status {
             DecisionStatus::Fail => {
                 // If they hard fail, then we can immediatly save a Fail OBD/update onboarding.status = Fail
                 common::save_kyc_decision(
@@ -292,8 +289,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                         .iter()
                         .map(|vr| vr.verification_result_id.clone())
                         .collect(),
-                    decision.into(),
-                    fixture_decision.is_some(),
+                    decision,
                     vec![],
                 )?;
                 Ok(AlpacaKycState::from(AlpacaKycComplete))
@@ -360,7 +356,6 @@ impl AlpacaKycWatchlistCheck {
 #[async_trait]
 impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistCheck {
     type AsyncRes = (
-        Arc<dyn FeatureFlagClient>,
         Either<(VerificationResult, WatchlistResultResponse), (VerificationResult, FixtureDecision)>,
         Vec<VendorResult>,
     );
@@ -430,7 +425,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
 
         let vendor_results = common::get_latest_vendor_results(state, &self.sv_id).await?;
 
-        Ok((ff_client, watchlist_res, vendor_results))
+        Ok((watchlist_res, vendor_results))
     }
 
     #[tracing::instrument("OnAction<MakeWatchlistCheckCall, AlpacaKycState>::on_commit", skip_all)]
@@ -441,11 +436,8 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<AlpacaKycState> {
         // TODO save Risk Signals + determine if we transition to PendingReview or Complete
-        let (ff_client, watchlist_res, vendor_results) = res;
-        let v = Vault::get(conn, &wf.scoped_vault_id)?;
+        let (watchlist_res, vendor_results) = res;
         let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
-
-        let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
 
         // Watchlist reason codes
         let wc_reason_codes = match &watchlist_res {
@@ -481,13 +473,6 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         // and have these written at the same time as the Watchlist reason codes
         // and our OBD. (In future, we migrate risk_signal to point to VRes and can remove this temp hack)
         let is_sandbox = watchlist_res.is_right();
-        let decision = common::get_decision(conn, ff_client, risk_signals, &wf, &v)?;
-        let kyc_decision = if let Some((_, fixture_decision)) = watchlist_res.right() {
-            common::alpaca_kyc_decision_from_fixture(fixture_decision)?
-        } else {
-            decision
-        }
-        .final_kyc_decision()?;
 
         // If we collected a doc, we go to review and fail OBD even if no hits
         let doc_req = DocumentRequest::get(conn, &self.wf_id)?;
@@ -515,19 +500,6 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
             doc_req.is_some(),
         );
 
-        let decision = OnboardingRulesDecisionOutput {
-            decision: final_decision.clone(),
-            // in future we could have the wc_reason_codes.is_empty expresses as a rule and append that rule result here. This only impacts a log
-            rules_triggered: kyc_decision.rules_triggered.clone(),
-            rules_not_triggered: kyc_decision.rules_not_triggered,
-        };
-
-        let output = WaterfallOnboardingRulesDecisionOutput::new(
-            DecisionResult::Evaluated(decision),
-            DecisionResult::NotRequired,
-            DecisionResult::NotRequired,
-        );
-
         common::save_kyc_decision(
             conn,
             &self.sv_id,
@@ -536,8 +508,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                 .iter()
                 .map(|vr| vr.verification_result_id.clone()) // TODO: a little funky- we maybe dont need the OBD<>VRes junction table anymore 
                 .collect(),
-            output.into(),
-            is_sandbox,
+            final_decision.clone(),
             review_reasons,
         )?;
 
