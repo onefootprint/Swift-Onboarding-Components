@@ -29,6 +29,8 @@ export const clickOnSave = clickOn.bind(null, /save/i);
 export const clickOnAgree = clickOn.bind(null, /agree/i);
 export const clickOnTakePhoto = clickOn.bind(null, /take photo/i);
 export const clickOnConfirm = clickOn.bind(null, /confirm/i);
+export const clickOnCancel = clickOn.bind(null, /cancel/i);
+export const clickOnYes = clickOn.bind(null, /yes/i);
 
 export const selectOutcomeOptional = async (
   { frame }: WithFrame,

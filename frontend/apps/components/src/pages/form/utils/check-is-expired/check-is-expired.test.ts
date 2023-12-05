@@ -1,17 +1,6 @@
 import checkIsExpired from './check-is-expired';
 
 describe('checkIsExpired', () => {
-  let consoleErrorSpy = jest.spyOn(console, 'error');
-
-  beforeEach(() => {
-    consoleErrorSpy = jest.spyOn(console, 'error');
-    consoleErrorSpy.mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    consoleErrorSpy.mockRestore();
-  });
-
   it('should return false if expiresAt is undefined', () => {
     expect(checkIsExpired()).toBe(false);
   });

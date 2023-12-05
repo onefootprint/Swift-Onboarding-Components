@@ -1,3 +1,5 @@
+import { Logger } from '@onefootprint/idv-elements';
+
 const getCardAlias = (vaultFields?: string[]) => {
   if (!vaultFields?.length) {
     return null;
@@ -12,7 +14,7 @@ const getCardAlias = (vaultFields?: string[]) => {
     const [, alias] = fieldParts;
     return alias || null;
   } catch (e) {
-    console.error('Could not get parse card alias from auth token');
+    Logger.error('Could not get parse card alias from auth token');
     return null;
   }
 };

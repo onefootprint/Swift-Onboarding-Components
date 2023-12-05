@@ -121,7 +121,10 @@ describe('<FormBase />', () => {
         screen.getByRole('textbox', { name: 'Card number' }),
         '378282246310005',
       );
-      await userEvent.type(screen.getByRole('textbox', { name: 'CVC' }), '123');
+      await userEvent.type(
+        screen.getByRole('textbox', { name: 'CVC' }),
+        '1234',
+      );
       await userEvent.type(
         screen.getByRole('textbox', { name: 'Expiry date' }),
         '09/29',

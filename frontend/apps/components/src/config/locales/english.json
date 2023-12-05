@@ -114,19 +114,26 @@
           "number": {
             "label": "Card number",
             "placeholder": "1234 5678 9012 3456",
-            "error": "Card number cannot be empty",
-            "invalid": "Invalid card number"
+            "errors": {
+              "required": "Card number cannot be empty",
+              "invalid": "Invalid card number"
+            }
           },
           "expiry": {
             "label": "Expiry date",
             "placeholder": "MM/YY",
-            "error": "Expiry date cannot be empty",
-            "invalid": "Date must be valid and in the future"
+            "errors": {
+              "required": "Expiry date cannot be empty",
+              "invalid": "Date must be valid and in the future"
+            }
           },
           "cvc": {
             "label": "CVC",
             "placeholder": "123",
-            "error": "CVC cannot be empty"
+            "errors": {
+              "required": "CVC cannot be empty",
+              "invalid": "Invalid CVC"
+            }
           }
         }
       },
@@ -159,7 +166,7 @@
           "zip": {
             "label": "Zip code",
             "placeholder": "11206",
-            "error": "Zip code cannot be empty"
+            "error": "Zip code cannot be empty or is invalid"
           }
         }
       },
@@ -184,6 +191,11 @@
           "yes": "Yes",
           "no": "No"
         }
+      },
+      "errors": {
+        "invalid-data": "Please fix the inputs and try again.",
+        "unknown-error": "Something went wrong. Please try again later.",
+        "missing-auth-token": "Something went wrong! Please refresh the page and try again."
       }
     },
     "secure-render": {

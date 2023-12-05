@@ -1,11 +1,12 @@
 import { test, expect } from '@playwright/test';
 
-import { clickOnContinue } from '../utils/commands';
+import { clickOnCancel, clickOnYes } from '../utils/commands';
 import {
   decryptData,
   fillCardData,
   initializeForm,
   saveForm,
+  waitForFormLoad,
 } from './utils/commands';
 
 const name = 'Piip Penguin';
@@ -21,15 +22,15 @@ test('form.basic #ci', async ({ browserName, page, request }) => {
   await page.waitForLoadState();
 
   await initializeForm({ page, fpUserId, flowId });
-  await clickOnContinue({ frame: page });
-
-  const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
+  const frame = await waitForFormLoad({ page });
 
   await fillCardData({
     frame,
     data: { name, number, cvc, expiration: '12/35', zip, country: 'US' },
   });
   await saveForm({ frame, page });
+  const completeToast = page.getByText('Successfully completed form').first();
+  await completeToast.waitFor({ state: 'attached', timeout: 3000 });
 
   await decryptData({
     request,
@@ -44,6 +45,12 @@ test('form.basic #ci', async ({ browserName, page, request }) => {
       country: 'US',
     },
   });
+
+  // Cancel the form if not already cancelled
+  await clickOnCancel({ frame });
+  await clickOnYes({ frame });
+  const cancelToast = page.getByText('User canceled form').first();
+  await cancelToast.waitFor({ state: 'attached', timeout: 3000 });
 
   return expect(1).toBe(1);
 });

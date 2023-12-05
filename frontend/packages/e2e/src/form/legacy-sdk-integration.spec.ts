@@ -3,24 +3,30 @@ import { expect, test } from '@playwright/test';
 import {
   decryptData,
   fillCardData,
-  initializeForm,
   saveFormViaRef,
   waitForFormLoad,
 } from './utils/commands';
+import { API_SECRET_KEY_PROD } from './constants';
 
 const name = 'Piip Penguin';
 const number = '378282246310005';
 const cvc = '1234';
 const zip = '12345';
 
-test('form.save-via-ref #ci', async ({ browserName, page, request }) => {
+test('form.legacy-sdk-integration #debug', async ({
+  browserName,
+  page,
+  request,
+}) => {
   test.setTimeout(120000);
-  const fpUserId = 'fp_id_test_xeOIJs8bGpBVfeu1qma1QY';
+  const fpUserId = 'fp_id_test_LY6hjzRiEQNCsObp4HnNM7'; // From prod acme inc.
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
-  await page.goto(`/components/form?flow=${flowId}`);
+
+  await page.goto(
+    `https://footprint-js-3-7-1.preview.onefootprint.com/form?flow=${flowId}&userId=${fpUserId}&cardAlias=${flowId}#${API_SECRET_KEY_PROD}`,
+  );
   await page.waitForLoadState();
 
-  await initializeForm({ page, fpUserId, flowId });
   const frame = await waitForFormLoad({ page });
 
   // Fill the form and save it
@@ -29,12 +35,13 @@ test('form.save-via-ref #ci', async ({ browserName, page, request }) => {
     data: { name, number, cvc, expiration: '12/35', zip, country: 'US' },
   });
   await saveFormViaRef({ page });
-  const refSuccessToast = page.getByText('Successfully saved via ref').first();
-  await refSuccessToast.waitFor({ state: 'attached', timeout: 3000 });
-  const completeToast = page.getByText('Successfully completed form').first();
-  await completeToast.waitFor({ state: 'attached', timeout: 3000 });
+  await expect(page.getByTestId('result').first()).toContainText('completed');
+  await expect(page.getByTestId('ref-result').first()).toContainText(
+    'saved via ref',
+  );
 
   await decryptData({
+    api: 'prod',
     request,
     fpUserId,
     cardAlias: flowId,

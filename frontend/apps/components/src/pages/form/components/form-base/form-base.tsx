@@ -34,7 +34,8 @@ export type FormBaseProps = {
   sections: FormVariant[];
   variant?: FootprintVariant;
   isLoading?: boolean;
-  onSave?: (data: FormData) => void;
+  onSave?: (data: FormData, savedViaRef?: boolean) => void;
+  onSaveError?: (error: string) => void;
   onCancel?: () => void;
   onClose?: () => void;
   hideFootprintLogo?: boolean;
@@ -51,6 +52,7 @@ const FormBase = ({
   variant = 'modal',
   isLoading,
   onSave,
+  onSaveError,
   onCancel,
   onClose,
   hideFootprintLogo,
@@ -59,16 +61,15 @@ const FormBase = ({
   fieldErrors = {},
 }: FormBaseProps) => {
   const footprintProvider = useFootprintProvider();
-
   const { t } = useTranslation('pages.secure-form');
   const confirmationDialog = useConfirmationDialog();
   const hasCountry =
     sections.includes('fullAddress') || sections.includes('partialAddress');
   const defaultValues = hasCountry ? { country: DEFAULT_COUNTRY } : undefined;
-  const methods = useForm<FormData>({ defaultValues });
+  const methods = useForm<FormData>({ defaultValues, mode: 'onBlur' });
   const {
     handleSubmit,
-    formState: { isDirty, errors },
+    formState: { isDirty },
     trigger,
     getValues,
     setError,
@@ -91,18 +92,18 @@ const FormBase = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fieldErrors]);
 
-  const triggerSave = () => {
-    trigger();
-    if (Object.values(errors).length > 0) {
+  const triggerSave = async () => {
+    const canSave = await trigger();
+    if (!canSave) {
       Logger.info(
         'Triggered form save via ref but form has errors, so not saved.',
       );
       // There were some errors with inputs, don't trigger saving
+      onSaveError?.(t('errors.invalid-data'));
       return;
     }
     Logger.info('Triggered form save via ref');
-    const data = getValues();
-    onSave?.(data);
+    onSave?.(getValues(), true);
   };
 
   useEffectOnce(() => {

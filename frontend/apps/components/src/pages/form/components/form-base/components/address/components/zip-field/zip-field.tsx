@@ -18,6 +18,7 @@ const ZipField = ({ countryCode }: ZipFieldProps) => {
   } = useFormContext();
   const { t } = useTranslation('pages.secure-form.address.form.zip');
   const { zipcode } = useInputValidations(countryCode);
+  const isDomestic = countryCode === 'US';
 
   return (
     <TextInput
@@ -33,7 +34,10 @@ const ZipField = ({ countryCode }: ZipFieldProps) => {
       value={getValues('zip')}
       {...register('zip', {
         required: true,
-        pattern: zipcode.pattern,
+        validate: isDomestic
+          ? (value: string) =>
+              zipcode.pattern ? zipcode.pattern.test(value) : undefined
+          : undefined,
       })}
     />
   );

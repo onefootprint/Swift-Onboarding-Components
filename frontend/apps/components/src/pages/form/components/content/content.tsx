@@ -6,6 +6,7 @@ import {
   FootprintPrivateEvent,
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
+import { useTranslation } from '@onefootprint/hooks';
 import { Logger } from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
 import { useRouter } from 'next/router';
@@ -25,8 +26,13 @@ import type { FormData } from '../form-base';
 import FormBase from '../form-base';
 import Invalid from '../invalid';
 
-const Content = () => {
+type ContentProps = {
+  fallback: JSX.Element;
+};
+
+const Content = ({ fallback }: ContentProps) => {
   const footprintProvider = useFootprintProvider();
+  const { t } = useTranslation('pages.secure-form.card.form');
   const [props, setProps] = useState<FootprintFormDataProps>();
   useProps<FootprintFormDataProps>(setProps);
   const router = useRouter();
@@ -62,6 +68,35 @@ const Content = () => {
     footprintProvider.send(FootprintPublicEvent.closed);
   };
 
+  const handleVaultDataError = (error: unknown, savedViaRef?: boolean) => {
+    if (!error) {
+      return;
+    }
+    if (typeof error === 'string') {
+      if (savedViaRef) {
+        handleRefSaveError(error);
+      }
+      Logger.info(`Setting form-wide error, ${error}`);
+      setFormErrorMessage(error);
+      return;
+    }
+    if (typeof error === 'object') {
+      if (savedViaRef) {
+        handleRefSaveError(t('errors.invalid-data'));
+      }
+      const processedFieldErrors = processFieldErrors(error);
+      setFieldErrors(processedFieldErrors);
+      Logger.info(`Setting field errors: ${JSON.stringify(error)}`);
+      return;
+    }
+    if (savedViaRef) {
+      handleRefSaveError(t('errors.unknown error'));
+    }
+    Logger.error(
+      `Unknown error while vaulting data, ${getErrorMessage(error)}`,
+    );
+  };
+
   const handleComplete = () => {
     Logger.info('Triggered form complete');
     // Triggers the onComplete callback on the SDK
@@ -70,7 +105,12 @@ const Content = () => {
     footprintProvider.send(FootprintPrivateEvent.formSaveComplete);
   };
 
-  const handleSave = async (formData: FormData) => {
+  const handleRefSaveError = (error: string) => {
+    // Rejects the promise returned from the save ref method
+    footprintProvider.send(FootprintPrivateEvent.formSaveFailed, error);
+  };
+
+  const handleSave = async (formData: FormData, savedViaRef?: boolean) => {
     Logger.info('Triggered save form data to vault');
     setFieldErrors(undefined);
     setFormErrorMessage(undefined);
@@ -81,7 +121,7 @@ const Content = () => {
     }
 
     if (!clientTokenFields.data) {
-      console.error('Cannot save to vault without client token fields');
+      Logger.error('Cannot save to vault without client token fields');
       return;
     }
     const { vaultFields } = clientTokenFields.data;
@@ -92,7 +132,7 @@ const Content = () => {
       )}. Card alias is ${cardAlias}`,
     );
     if (!cardAlias) {
-      console.error(
+      Logger.error(
         'Cannot extract cardAlias from auth token. Please verify auth token has correct fields set on it.',
       );
       return;
@@ -109,61 +149,46 @@ const Content = () => {
       authToken,
       data: convertedData,
       onSuccess: handleComplete,
-      onError: error => {
-        if (typeof error === 'string') {
-          Logger.info(`Setting form-wide error, ${error}`);
-          setFormErrorMessage(error);
-          return;
-        }
-        if (typeof error === 'object') {
-          const processedFieldErrors = processFieldErrors(error);
-          setFieldErrors(processedFieldErrors);
-          Logger.info(`Setting field errors: ${JSON.stringify(error)}`);
-          return;
-        }
-        console.error(
-          `Unknown error while vaulting data, ${getErrorMessage(error)}`,
-        );
-      },
+      onError: error => handleVaultDataError(error, savedViaRef),
     });
   };
 
   const { data, isError, isLoading } = clientTokenFields;
   if (isLoading) {
     Logger.info('Fetching client token fields');
-    return null; // Default to a loading state here
+    return fallback; // Default to a loading state here
   }
   if (!props) {
     Logger.info('No props passed to secure form');
-    return null; // Default to a loading state here
+    return fallback; // Default to a loading state here
   }
 
   if (isError) {
-    console.error(`Fetching client token fields failed.`);
+    Logger.error(`Fetching client token fields failed.`);
     return <Invalid onClose={handleClose} />;
   }
 
   const { vaultFields, expiresAt } = data;
   const sections = getFormSectionsFromFields(vaultFields);
   if (!sections.length) {
-    console.error('Auth token is missing fields');
+    Logger.error('Auth token is missing fields');
     return <Invalid onClose={handleClose} />;
   }
 
   const isExpired = checkIsExpired(expiresAt);
   if (isExpired) {
-    console.error('Client auth token is expired, cannot save to vault');
+    Logger.error('Client auth token is expired, cannot save to vault');
     return <Invalid onClose={handleClose} />;
   }
 
   const isValid = arePropsValid(props);
   if (!isValid) {
-    console.error('Invalid props passed to secure form');
+    Logger.error('Invalid props passed to secure form');
     return <Invalid onClose={handleClose} />;
   }
 
   if (!data) {
-    console.error('Received empty response while fetching client token fields');
+    Logger.error('Received empty response while fetching client token fields');
     return <Invalid onClose={handleClose} />;
   }
 
@@ -178,6 +203,7 @@ const Content = () => {
       formErrorMessage={formErrorMessage}
       fieldErrors={fieldErrors}
       onSave={handleSave}
+      onSaveError={handleRefSaveError}
       onCancel={handleCancel}
       onClose={handleClose}
     />

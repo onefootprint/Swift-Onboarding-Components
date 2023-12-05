@@ -1,17 +1,6 @@
 import getFormSectionsFromFields from './get-form-sections-from-fields';
 
 describe('getFormSectionsFromFields', () => {
-  let consoleErrorSpy = jest.spyOn(console, 'error');
-
-  beforeEach(() => {
-    consoleErrorSpy = jest.spyOn(console, 'error');
-    consoleErrorSpy.mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    consoleErrorSpy.mockRestore();
-  });
-
   it('extracts field names correctly', () => {
     expect(
       getFormSectionsFromFields([

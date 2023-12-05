@@ -9,6 +9,11 @@ import { useFormContext } from 'react-hook-form';
 import CardCvc, { CvcLength } from './components/card-cvc';
 import CardExpDateInput from './components/card-exp-date-input';
 import CardNumberInput from './components/card-number-input';
+import {
+  isCardCvcValid,
+  isCardExpiryValid,
+  isCardNumberValid,
+} from './utils/validations';
 
 export type CardData = {
   number: string;
@@ -31,17 +36,34 @@ const Card = () => {
     numDigits = AMEX_CVC_NUM_DIGITS;
   }
 
+  const getHint = (field: keyof CardData) => {
+    const error = errors[field];
+    const { message, type } = error ?? {};
+    if (message && typeof message === 'string') {
+      return message;
+    }
+    if (error) {
+      return t(`${field}.errors.${type}`);
+    }
+    return undefined;
+  };
+
+  const cardNumberError = getHint('number');
+  const cardExpiryError = getHint('expiry');
+  const cardCvcError = getHint('cvc');
+
   return (
     <Grid.Container columns={['1fr 1fr']} rows={['auto']} gap={5}>
       <InputContainer row="1" column="span 2">
         <CardNumberInput
           data-private
-          hasError={!!errors.number}
-          hint={errors.number?.message}
+          hasError={!!cardNumberError}
+          hint={cardNumberError}
           {...register('number', {
-            required: {
-              value: true,
-              message: t('number.error'),
+            required: true,
+            validate: {
+              empty: value => !!value,
+              invalid: value => isCardNumberValid(value),
             },
           })}
         />
@@ -49,12 +71,13 @@ const Card = () => {
       <InputContainer row="2">
         <CardExpDateInput
           data-private
-          hasError={!!errors.expiry}
-          hint={errors.expiry?.message}
+          hasError={!!cardExpiryError}
+          hint={cardExpiryError}
           {...register('expiry', {
-            required: {
-              value: true,
-              message: t('expiry.error'),
+            required: true,
+            validate: {
+              empty: value => !!value,
+              invalid: value => isCardExpiryValid(value),
             },
           })}
         />
@@ -62,13 +85,14 @@ const Card = () => {
       <InputContainer row="2">
         <CardCvc
           data-private
-          hasError={!!errors.cvc}
-          hint={errors.cvc?.message}
+          hasError={!!cardCvcError}
+          hint={cardCvcError}
           numDigits={numDigits}
           {...register('cvc', {
-            required: {
-              value: true,
-              message: t('cvc.error'),
+            required: true,
+            validate: {
+              empty: value => !!value,
+              invalid: value => isCardCvcValid(value, numDigits),
             },
           })}
         />

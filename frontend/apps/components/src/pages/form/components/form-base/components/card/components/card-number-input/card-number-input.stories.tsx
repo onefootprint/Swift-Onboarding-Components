@@ -18,12 +18,6 @@ export default {
       description: 'Display an informative text',
       required: false,
     },
-    invalidMessage: {
-      control: 'text',
-      description:
-        'Message to display when the input is invalid. Useful for i18n',
-      required: false,
-    },
     disabled: {
       control: 'boolean',
       description: 'Disable interactions',
@@ -51,7 +45,6 @@ const Template: Story<CardNumberInputProps> = ({
   disabled,
   hasError,
   hint,
-  invalidMessage,
   onChange,
   onChangeText,
   value: initialValue,
@@ -68,7 +61,6 @@ const Template: Story<CardNumberInputProps> = ({
       disabled={disabled}
       hasError={hasError}
       hint={hint}
-      invalidMessage={invalidMessage}
       onChange={handleChange}
       onChangeText={onChangeText}
       value={value}
@@ -81,7 +73,6 @@ Base.args = {
   disabled: false,
   hasError: false,
   hint: '',
-  invalidMessage: 'Invalid card number',
   onChange: console.log, // eslint-disable-line no-console
   onChangeText: console.log, // eslint-disable-line no-console
   value: '',

@@ -1,17 +1,6 @@
 import arePropsValid from './are-props-valid';
 
 describe('arePropsValid', () => {
-  let consoleErrorSpy = jest.spyOn(console, 'error');
-
-  beforeEach(() => {
-    consoleErrorSpy = jest.spyOn(console, 'error');
-    consoleErrorSpy.mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    consoleErrorSpy.mockRestore();
-  });
-
   it('should return true if props are valid', () => {
     expect(
       arePropsValid({

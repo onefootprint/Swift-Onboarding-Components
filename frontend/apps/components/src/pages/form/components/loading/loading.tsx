@@ -21,6 +21,7 @@ const Loading = () => (
         </ButtonsContainer>
       </FooterWrapper>
     }
+    testID="init-shimmer"
   >
     <div style={{ flexGrow: 1 }}>
       <ScrollArea>

@@ -14,7 +14,7 @@ const Form = () => {
 
   return (
     <Suspense fallback={<Loading />}>
-      <Content />
+      <Content fallback={<Loading />} />
     </Suspense>
   );
 };

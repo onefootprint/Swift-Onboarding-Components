@@ -1,7 +1,12 @@
 import { expect } from '@playwright/test';
 import type { APIRequestContext, FrameLocator, Page } from '@playwright/test';
 import { clickOn, clickOnContinue, clickOnSave } from '../../utils/commands';
-import { API_BASE_URL, API_SECRET_KEY } from '../constants';
+import {
+  API_BASE_URL_DEV,
+  API_BASE_URL_PROD,
+  API_SECRET_KEY_DEV,
+  API_SECRET_KEY_PROD,
+} from '../constants';
 
 type CardData = {
   name: string;
@@ -12,6 +17,21 @@ type CardData = {
   country: string;
 };
 
+export const waitForFormLoad = async ({
+  page,
+}: {
+  page: Page;
+}): Promise<FrameLocator> => {
+  await page.waitForLoadState();
+  const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
+  await page.waitForLoadState();
+
+  const header = frame.getByText('Card information').first();
+  await header.waitFor({ state: 'attached', timeout: 5000 }).catch(() => false);
+
+  return frame;
+};
+
 export const fillCardData = async ({
   frame,
   data,
@@ -19,9 +39,6 @@ export const fillCardData = async ({
   frame: FrameLocator;
   data: CardData;
 }) => {
-  const header = frame.getByText('Card information').first();
-  await header.waitFor({ state: 'attached', timeout: 3000 }).catch(() => false);
-
   await frame.getByLabel('Cardholder name').first().fill(data.name);
   await frame.getByLabel('Card number').first().fill(data.number);
   await frame.getByLabel('CVC').first().fill(data.cvc);
@@ -30,18 +47,22 @@ export const fillCardData = async ({
 };
 
 export const decryptData = async ({
+  api = 'dev',
   request,
   cardAlias,
   fpUserId,
   data: data,
 }: {
+  api?: 'dev' | 'prod';
   request: APIRequestContext;
   cardAlias: string;
   fpUserId: string;
   data: CardData;
 }) => {
   const response = await request.post(
-    `${API_BASE_URL}/users/${fpUserId}/vault/decrypt`,
+    `${
+      api === 'dev' ? API_BASE_URL_DEV : API_BASE_URL_PROD
+    }/users/${fpUserId}/vault/decrypt`,
     {
       data: {
         fields: [
@@ -55,7 +76,8 @@ export const decryptData = async ({
         reason: 'E2E Form Basic test',
       },
       headers: {
-        'X-Footprint-Secret-Key': API_SECRET_KEY,
+        'X-Footprint-Secret-Key':
+          api == 'dev' ? API_SECRET_KEY_DEV : API_SECRET_KEY_PROD,
       },
     },
   );
@@ -109,7 +131,7 @@ export const initializeForm = async ({
   await page
     .getByLabel(/api secret key/i)
     .first()
-    .fill(API_SECRET_KEY);
+    .fill(API_SECRET_KEY_DEV);
   await page
     .getByLabel(/card alias/i)
     .first()

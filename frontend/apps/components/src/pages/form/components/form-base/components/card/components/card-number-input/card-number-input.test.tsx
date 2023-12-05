@@ -4,14 +4,12 @@ import React from 'react';
 import { renderComponents } from '../../../../../../../../config/tests';
 import type { CardNumberInputProps } from './card-number-input';
 import CardNumberInput from './card-number-input';
-import InteractiveCardNumberInput from './card-number-input.test.config';
 
 const renderCardNumberInput = ({
   hasError,
   hint,
   label,
   value,
-  invalidMessage,
 }: Partial<CardNumberInputProps>) =>
   renderComponents(
     <CardNumberInput
@@ -19,15 +17,7 @@ const renderCardNumberInput = ({
       hint={hint}
       label={label}
       value={value}
-      invalidMessage={invalidMessage}
     />,
-  );
-
-const renderInteractiveInput = ({
-  invalidMessage,
-}: Partial<CardNumberInputProps> = {}) =>
-  renderComponents(
-    <InteractiveCardNumberInput invalidMessage={invalidMessage} />,
   );
 
 const getCardNumberInput = () =>
@@ -66,30 +56,14 @@ describe('<CardNumberInput />', () => {
   });
 
   describe('error handling', () => {
-    it('should hide error message when user starts typing again', async () => {
-      renderInteractiveInput();
+    it('should display error message for invalid card number', async () => {
+      const hint = 'This card number is not valid!';
+      renderCardNumberInput({ hint, hasError: true });
       const input = getCardNumberInput();
       await userEvent.type(input, '1111');
       await userEvent.tab();
       await waitFor(() => {
-        const errorMessage = screen.getByText('Invalid card number');
-        expect(errorMessage).toBeInTheDocument();
-      });
-      await userEvent.type(input, '4242');
-      await waitFor(() => {
-        const errorMessage = screen.queryByText('Invalid card number');
-        expect(errorMessage).not.toBeInTheDocument();
-      });
-    });
-
-    it('should display custom error message for invalid card number', async () => {
-      const customInvalidMessage = 'This card number is not valid!';
-      renderInteractiveInput({ invalidMessage: customInvalidMessage });
-      const input = getCardNumberInput();
-      await userEvent.type(input, '1111');
-      await userEvent.tab();
-      await waitFor(() => {
-        const errorMessage = screen.getByText(customInvalidMessage);
+        const errorMessage = screen.getByText(hint);
         expect(errorMessage).toBeInTheDocument();
       });
     });

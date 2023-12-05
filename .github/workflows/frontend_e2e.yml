@@ -6,6 +6,7 @@ on:
       - 'frontend/apps/bifrost/**'
       - 'frontend/apps/demos/**'
       - 'frontend/apps/handoff/**'
+      - 'frontend/apps/components/**'
       - 'frontend/packages/**'
       - '.github/workflows/frontend_e2e.yml'
 
@@ -17,8 +18,10 @@ env:
   CI: true
   E2E_BASE_URL: http://localhost:3002
   E2E_BIFROST_BASE_URL: http://localhost:3000
-  API_BASE_URL: http://api.dev.onefootprint.com
+  API_BASE_URL_DEV: https://api.dev.onefootprint.com
+  API_BASE_URL_PROD: https://api.onefootprint.com
   E2E_ACME_SECRET_API_KEY_DEV: ${{ secrets.E2E_ACME_SECRET_API_KEY_DEV }}
+  E2E_ACME_SECRET_API_KEY_PROD: ${{ secrets.E2E_ACME_SECRET_API_KEY_PROD }}
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -143,7 +146,9 @@ jobs:
           E2E_BASE_URL: ${{ env.E2E_BASE_URL }}
           E2E_BIFROST_BASE_URL: ${{ env.E2E_BIFROST_BASE_URL }}
           E2E_ACME_SECRET_API_KEY_DEV: ${{ secrets.E2E_ACME_SECRET_API_KEY_DEV }}
-          API_BASE_URL: ${{ env.API_BASE_URL }}
+          E2E_ACME_SECRET_API_KEY_PROD: ${{ secrets.E2E_ACME_SECRET_API_KEY_PROD }}
+          API_BASE_URL_DEV: ${{ env.API_BASE_URL_DEV }}
+          API_BASE_URL_PROD: ${{ env.API_BASE_URL_PROD }}
         run: yarn workspace @onefootprint/e2e test:e2e:ci
 
       - name: Upload artifacts

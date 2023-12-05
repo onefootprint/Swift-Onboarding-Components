@@ -1,3 +1,4 @@
+import { Logger } from '@onefootprint/idv-elements';
 import type { DataIdentifier } from '@onefootprint/types';
 import { CardDIField } from '@onefootprint/types';
 
@@ -31,7 +32,7 @@ const processFieldErrors = (
     if (field && cardDI) {
       validatedErrors[field] = value;
     } else {
-      console.error(
+      Logger.error(
         `Could not parse error while vaulting field ${key}: `,
         value,
       );

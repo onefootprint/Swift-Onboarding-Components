@@ -95,11 +95,15 @@ const initIframe = (rawProps: Props): Iframe => {
             'Footprint should be initialized to call ref methods',
           );
         }
-        return new Promise(resolve => {
-          parentApi?.call(PrivateEvent.formSaved);
+        return new Promise((resolve, reject) => {
+          // Make sure to first register the callbacks before triggering save
           parentApi?.on(PrivateEvent.formSaveComplete, () => {
             resolve();
           });
+          parentApi?.on(PrivateEvent.formSaveFailed, (error: string) => {
+            reject(error);
+          });
+          parentApi?.call(PrivateEvent.formSaved);
         });
       },
     };

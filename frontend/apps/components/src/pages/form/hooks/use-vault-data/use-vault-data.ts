@@ -1,3 +1,5 @@
+import { useTranslation } from '@onefootprint/hooks';
+import { Logger } from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
 import type { DataIdentifier, UsersVaultRequest } from '@onefootprint/types';
 import type { AxiosError } from 'axios';
@@ -17,6 +19,7 @@ export type UsersVaultArgs = UsersVaultRequest & {
 };
 
 const useVaultData = () => {
+  const { t } = useTranslation('pages.secure-form.errors');
   const usersVaultMutation = useUsersVault();
 
   const vaultData = ({
@@ -26,8 +29,8 @@ const useVaultData = () => {
     onError,
   }: UsersVaultArgs) => {
     if (!authToken) {
-      onError('Something went wrong! Please refresh the page and try again.');
-      console.error('Found empty auth token while vaulting data.');
+      onError(t('missing-auth-token'));
+      Logger.error('Found empty auth token while vaulting data.');
       return;
     }
 
@@ -44,11 +47,11 @@ const useVaultData = () => {
           if (fieldErrors && typeof fieldErrors === 'object') {
             onError(fieldErrors);
           } else {
-            const message = `Form encountered error while vaulting data ${getErrorMessage(
-              err,
-            )}`;
-            console.error(message);
-            onError(message);
+            const errorMessage = getErrorMessage(err);
+            Logger.error(
+              `Form encountered error while vaulting data: ${errorMessage}`,
+            );
+            onError(errorMessage);
           }
         },
       },

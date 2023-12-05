@@ -1,17 +1,6 @@
 import getCardDIField from './get-card-di-field';
 
 describe('getCardDIField', () => {
-  let consoleErrorSpy = jest.spyOn(console, 'error');
-
-  beforeEach(() => {
-    consoleErrorSpy = jest.spyOn(console, 'error');
-    consoleErrorSpy.mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    consoleErrorSpy.mockRestore();
-  });
-
   it('extracts field names correctly', () => {
     expect(getCardDIField('card.primary.number')).toEqual('number');
 

@@ -54,7 +54,7 @@ const CardCvc = forwardRef<HTMLInputElement, CardCvcProps>(
         label={label ?? t('label')}
         mask={{
           numericOnly: true,
-          blocks: [numDigits],
+          blocks: [numDigits === CvcLength.three ? 3 : 4],
         }}
         onChange={onChange}
         onBlur={onBlur}
