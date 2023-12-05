@@ -226,9 +226,20 @@ pub fn get_decision(
     let doc_collected = DocumentRequest::get(conn, &wf.id)?.is_some();
     let document_only = should_execute_rules_for_document_only(vault, wf)?;
 
+    let config = KycRuleExecutionConfig {
+        include_doc: doc_collected,
+        document_only,
+        skip_kyc: obc.skip_kyc,
+        allow_stepup: !doc_collected, // Soon we might just add is_stepup_enabled to OBC and then also use that here to determine if StepUp should be an allowed_action
+    };
+    let rules_output = rule_group.evaluate(risk_signals.clone(), config)?;
+    let decision = rules_output.final_kyc_decision()?;
+    engine::log_rule_evaluation(wf, &decision, decision::rule::CANONICAL_ONBOARDING_RULE_LINE);
+    let decision = decision.decision;
+
     if tenant.id.is_integration_test_tenant() || ff_client.flag(BoolFlag::AlsoEvaluateRulesEngine(&obc.key)) {
         // If this is an integration test tenant or FF'd OBC, then we do a best effort attempt at evaluating rules using our new Rules Engine
-        match rule_engine::engine::evaluate_rules(
+        match rule_engine::engine::evaluate_workflow_decision(
             conn,
             &wf.scoped_vault_id,
             &obc.id,
@@ -237,21 +248,14 @@ pub fn get_decision(
             &risk_signals.risk_signals,
             !doc_collected,
         ) {
-            Ok(_) => {}
+            Ok(rules_engine_decision) => {
+                tracing::info!(?rules_engine_decision, ?decision, "rules_engine_decision");
+            }
             Err(err) => tracing::error!(%err, "Error evaluating Rules Engine"),
         }
     }
 
-    let config = KycRuleExecutionConfig {
-        include_doc: doc_collected,
-        document_only,
-        skip_kyc: obc.skip_kyc,
-        allow_stepup: !doc_collected, // Soon we might just add is_stepup_enabled to OBC and then also use that here to determine if StepUp should be an allowed_action
-    };
-    let rules_output = rule_group.evaluate(risk_signals, config)?;
-    let decision = rules_output.final_kyc_decision()?;
-    engine::log_rule_evaluation(wf, &decision, decision::rule::CANONICAL_ONBOARDING_RULE_LINE);
-    Ok(decision.decision)
+    Ok(decision)
 }
 
 #[tracing::instrument(skip(conn))]

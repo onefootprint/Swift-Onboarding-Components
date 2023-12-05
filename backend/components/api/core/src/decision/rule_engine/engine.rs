@@ -1,5 +1,5 @@
 use super::eval;
-use crate::errors::ApiResult;
+use crate::{decision::onboarding::Decision, errors::ApiResult};
 use db::{
     models::{
         ob_configuration::ObConfiguration,
@@ -12,6 +12,29 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{ObConfigurationId, RuleSetResultKind, ScopedVaultId, WorkflowId};
+
+#[tracing::instrument(skip_all)]
+pub fn evaluate_workflow_decision(
+    conn: &mut TxnPgConn,
+    sv_id: &ScopedVaultId,
+    obc_id: &ObConfigurationId,
+    wf_id: Option<&WorkflowId>,
+    kind: RuleSetResultKind,
+    risk_signals: &[RiskSignal],
+    allow_stepup: bool, // could maybe query for DocReq in here and not need to pass this in
+) -> ApiResult<Decision> {
+    let (rule_set_result, _rule_results) =
+        evaluate_rules(conn, sv_id, obc_id, wf_id, kind, risk_signals, allow_stepup)?;
+
+    Ok(Decision {
+        decision_status: rule_set_result.action_triggered.into(),
+        should_commit: false, // TODO: implement for real (this isnt' used right now)
+        create_manual_review: rule_set_result
+            .action_triggered
+            .map(|ra| ra.should_create_review())
+            .unwrap_or(false),
+    })
+}
 
 #[tracing::instrument(skip_all)]
 pub fn evaluate_rules(

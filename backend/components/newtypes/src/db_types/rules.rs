@@ -49,6 +49,15 @@ impl From<&RuleAction> for DecisionStatus {
     }
 }
 
+impl From<Option<RuleAction>> for DecisionStatus {
+    fn from(value: Option<RuleAction>) -> Self {
+        match value {
+            Some(ra) => (&ra).into(),
+            None => DecisionStatus::Pass,
+        }
+    }
+}
+
 impl RuleAction {
     pub fn should_create_review(&self) -> bool {
         matches!(self, Self::PassWithManualReview | Self::ManualReview)
