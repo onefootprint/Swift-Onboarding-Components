@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::{
     default_rules::base_kyc_rules,
     eval::{self, Rule},
@@ -14,7 +16,7 @@ use db::{
     TxnPgConn,
 };
 use itertools::Itertools;
-use newtypes::{ObConfigurationId, RuleSetResultKind, ScopedVaultId, WorkflowId};
+use newtypes::{ObConfigurationId, RiskSignalGroupKind, RuleSetResultKind, ScopedVaultId, WorkflowId};
 
 #[tracing::instrument(skip_all)]
 pub fn evaluate_workflow_decision(
@@ -23,11 +25,17 @@ pub fn evaluate_workflow_decision(
     obc_id: &ObConfigurationId,
     wf_id: Option<&WorkflowId>,
     kind: RuleSetResultKind,
-    risk_signals: &[RiskSignal],
-    allow_stepup: bool, // could maybe query for DocReq in here and not need to pass this in
+    risk_signals: HashMap<RiskSignalGroupKind, Vec<RiskSignal>>,
+    doc_collected: bool, // could maybe query for DocReq in here and not need to pass this in
 ) -> ApiResult<Decision> {
+    let risk_signals: Vec<_> = risk_signals
+        .iter()
+        // current logic is that we do not evaluate Doc rules if a doc was not collected stricly as part of the current workflow
+        // TODO: maybe we should just generally only evaluate rules on risk signals generated during the current workflow? 🤔 lots of inter-workflow/inter-playbooks/inter-play thingies to figure out
+        .filter(|(k, _)| doc_collected || !matches!(k, RiskSignalGroupKind::Doc)).flat_map(|(_, v)| v.clone()).collect();
+
     let (rule_set_result, _rule_results) =
-        evaluate_rules(conn, sv_id, obc_id, wf_id, kind, risk_signals, allow_stepup)?;
+        evaluate_rules(conn, sv_id, obc_id, wf_id, kind, &risk_signals, doc_collected)?;
 
     let should_commit_rules: Vec<_> = [base_kyc_rules(), super::default_rules::ssn_rules()]
         .concat()
@@ -40,7 +48,7 @@ pub fn evaluate_workflow_decision(
     let (_, should_commit_action) = eval::evaluate_rule_set(
         should_commit_rules,
         &risk_signals.iter().map(|rs| rs.reason_code.clone()).collect_vec(),
-        allow_stepup,
+        !doc_collected,
     );
 
     Ok(Decision {
@@ -61,7 +69,7 @@ pub fn evaluate_rules(
     wf_id: Option<&WorkflowId>,
     kind: RuleSetResultKind,
     risk_signals: &[RiskSignal],
-    allow_stepup: bool, // could maybe query for DocReq in here and not need to pass this in
+    doc_collected: bool, // could maybe query for DocReq in here and not need to pass this in
 ) -> ApiResult<(RuleSetResult, Vec<RuleResult>)> {
     let (obc, _) = ObConfiguration::get(conn, obc_id)?;
     let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, obc_id)?;
@@ -69,7 +77,7 @@ pub fn evaluate_rules(
     let (rule_results, action_triggered) = eval::evaluate_rule_set(
         rules,
         &risk_signals.iter().map(|rs| rs.reason_code.clone()).collect_vec(),
-        allow_stepup,
+        !doc_collected,
     );
 
     let rule_set_result = RuleSetResult::create(
@@ -118,7 +126,7 @@ mod tests {
             value: true,
         }]),
         RA::Fail,
-    )], vec![FRC::SsnDoesNotMatch], true => Some(RA::Fail))]
+    )], vec![FRC::SsnDoesNotMatch], false => Some(RA::Fail))]
     #[db_test_case(vec![TRule(
         RE(vec![REC::RiskSignal {
             field: FRC::SsnDoesNotMatch,
@@ -133,7 +141,7 @@ mod tests {
             value: true,
         }]),
         RA::StepUp,
-    )], vec![FRC::SsnDoesNotMatch, FRC::NameDoesNotMatch], true => Some(RA::Fail))]
+    )], vec![FRC::SsnDoesNotMatch, FRC::NameDoesNotMatch], false => Some(RA::Fail))]
     #[db_test_case(vec![TRule(
         RE(vec![REC::RiskSignal {
             field: FRC::SsnDoesNotMatch,
@@ -148,7 +156,7 @@ mod tests {
             value: true,
         }]),
         RA::StepUp,
-    )], vec![FRC::NameDoesNotMatch], true => Some(RA::StepUp))]
+    )], vec![FRC::NameDoesNotMatch], false => Some(RA::StepUp))]
     #[db_test_case(vec![TRule(
         RE(vec![REC::RiskSignal {
             field: FRC::SsnDoesNotMatch,
@@ -163,12 +171,12 @@ mod tests {
             value: true,
         }]),
         RA::StepUp,
-    )], vec![FRC::DocumentBarcodeContentDoesNotMatch], true => None)]
+    )], vec![FRC::DocumentBarcodeContentDoesNotMatch], false => None)]
     fn test_evaluate_rules(
         conn: &mut TestPgConn,
         rules: Vec<TRule>,
         risk_signals: Vec<FRC>,
-        allow_stepup: bool,
+        doc_collected: bool,
     ) -> Option<RuleAction> {
         // Setup
         let (sv, obc) = make_user(conn);
@@ -186,7 +194,7 @@ mod tests {
             None,
             RuleSetResultKind::Adhoc,
             &risk_signals,
-            allow_stepup,
+            doc_collected,
         )
         .unwrap();
 

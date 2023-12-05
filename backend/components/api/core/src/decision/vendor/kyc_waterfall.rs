@@ -338,7 +338,7 @@ fn eval_rules(
         doc: None,
         kyb: None,
         aml: None,
-        risk_signals: vec![], // TODO: when we use the new Rules Engine here, we'll need to write hidden risk signals for each vendor
+        risk_signals: HashMap::new(), // TODO: when we use the new Rules Engine here, we'll need to write hidden risk signals for each vendor
     };
 
     let decision_output = rule_group.evaluate(rsfd, rule_config)?.final_kyc_decision()?;

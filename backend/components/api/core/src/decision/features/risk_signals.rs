@@ -274,7 +274,7 @@ pub fn fetch_latest_risk_signals_map(
                 acc
             });
 
-    let risk_signals = db_risk_signals_map.values().flatten().cloned().collect();
+    let risk_signals = db_risk_signals_map.clone();
 
     let kyc = extract_risk_signal_group(&mut db_risk_signals_map, Kyc);
     let doc = extract_risk_signal_group(&mut db_risk_signals_map, Doc);
@@ -481,13 +481,14 @@ pub struct RiskSignalsForDecision {
     pub doc: Option<RiskSignalGroupStruct<Doc>>,
     pub kyb: Option<RiskSignalGroupStruct<Kyb>>,
     pub aml: Option<RiskSignalGroupStruct<Aml>>,
-    pub risk_signals: Vec<RiskSignal>,
+    pub risk_signals: HashMap<RiskSignalGroupKind, Vec<RiskSignal>>,
 }
 
 impl RiskSignalsForDecision {
     pub fn verification_result_ids(&self) -> Vec<VerificationResultId> {
         self.risk_signals
-            .iter()
+            .values()
+            .flatten()
             .map(|rs| rs.verification_result_id.clone())
             .collect()
     }

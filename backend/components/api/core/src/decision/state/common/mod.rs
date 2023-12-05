@@ -245,8 +245,8 @@ pub fn get_decision(
             &obc.id,
             Some(&wf.id),
             RuleSetResultKind::WorkflowDecision,
-            &risk_signals.risk_signals,
-            !doc_collected,
+            risk_signals.risk_signals,
+            doc_collected,
         ) {
             Ok(rules_engine_decision) => {
                 tracing::info!(?rules_engine_decision, ?decision, "rules_engine_decision");
