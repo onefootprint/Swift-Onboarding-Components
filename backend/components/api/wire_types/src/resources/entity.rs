@@ -42,6 +42,7 @@ pub struct Entity {
     pub is_created_via_api: bool,
     pub has_outstanding_workflow_request: bool,
     pub external_id: Option<ExternalId>,
+    pub last_activity_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

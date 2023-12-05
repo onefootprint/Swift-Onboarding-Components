@@ -59,7 +59,7 @@ pub struct ScopedVault {
     /// the dashboard are sorted by this column.
     /// Right now, we'll update this to the current timestamp when vaults are (1) created and (2)
     /// have a workflow complete
-    pub last_activity_at: Option<DateTime<Utc>>,
+    pub last_activity_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, Insertable)]

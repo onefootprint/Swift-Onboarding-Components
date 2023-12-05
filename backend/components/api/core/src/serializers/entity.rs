@@ -102,6 +102,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             start_timestamp,
             ordering_id,
             external_id,
+            last_activity_at,
             ..
         } = sv;
 
@@ -124,6 +125,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             is_portable,
             kind,
             start_timestamp,
+            last_activity_at,
             watchlist_check: watchlist_check.map(api_wire_types::WatchlistCheck::from_db),
             ordering_id,
             status,

@@ -1,0 +1,1 @@
+ALTER TABLE scoped_vault ALTER COLUMN last_activity_at DROP NOT NULL;
