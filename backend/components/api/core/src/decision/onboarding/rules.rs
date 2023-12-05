@@ -144,7 +144,6 @@ impl From<OnboardingEvaluationResult> for OnboardingRulesDecisionOutput {
                 should_commit: should_commit(&result.rules_triggered, &result.triggered_action),
                 decision_status,
                 create_manual_review,
-                vendor_apis: result.vendor_apis,
             },
             rules_triggered: result.rules_triggered.to_owned(),
             rules_not_triggered: result.rules_not_triggered.to_owned(),

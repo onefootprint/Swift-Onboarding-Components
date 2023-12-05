@@ -133,7 +133,6 @@ pub struct Decision {
     pub decision_status: DecisionStatus,
     pub should_commit: bool,
     pub create_manual_review: bool,
-    pub vendor_apis: Vec<VendorAPI>,
 }
 pub trait FeatureVector {
     fn evaluate(&self) -> ApiResult<OnboardingRulesDecision>;
@@ -228,14 +227,12 @@ mod tests {
             decision_status: d_args_1.0,
             should_commit: false,
             create_manual_review: d_args_1.1,
-            vendor_apis: vec![],
         };
 
         let decision2 = Decision {
             decision_status: d_args_2.0,
             should_commit: false,
             create_manual_review: d_args_2.1,
-            vendor_apis: vec![],
         };
 
         decision1.cmp(&decision2)

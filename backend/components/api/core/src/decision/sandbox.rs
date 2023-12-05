@@ -269,8 +269,6 @@ impl From<FixtureDecision> for OnboardingRulesDecisionOutput {
                 decision_status,
                 should_commit: decision_status == DecisionStatus::Pass,
                 create_manual_review,
-                // not used
-                vendor_apis: vec![VendorAPI::IdologyExpectId],
             },
             rules_triggered: vec![],
             rules_not_triggered: vec![],

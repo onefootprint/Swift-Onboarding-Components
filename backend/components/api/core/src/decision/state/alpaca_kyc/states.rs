@@ -484,16 +484,12 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                 decision_status: DecisionStatus::Pass,
                 should_commit: true,
                 create_manual_review: false,
-                // TODO: fix this when this goes to rules
-                vendor_apis: vec![VendorAPI::IncodeWatchlistCheck],
             }
         } else {
             Decision {
                 decision_status: DecisionStatus::Fail,
                 should_commit: !is_sandbox, // To be consistent with the Kyc workflow which currently does not commit data if the decision is Fail
                 create_manual_review: true,
-                // TODO: fix this when this goes to rules
-                vendor_apis: vec![VendorAPI::IncodeWatchlistCheck],
             }
         };
         let review_reasons = common::get_review_reasons_inner(

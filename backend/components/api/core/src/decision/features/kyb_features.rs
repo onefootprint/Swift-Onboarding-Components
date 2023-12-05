@@ -62,7 +62,6 @@ impl FeatureVector for KybFeatureVector {
                 decision_status,
                 should_commit: false, // never commit business data for now
                 create_manual_review,
-                vendor_apis: eval_result.vendor_apis,
             },
             rules_triggered: eval_result.rules_triggered,
             rules_not_triggered: eval_result.rules_not_triggered,

@@ -298,7 +298,6 @@ pub fn log_rule_evaluation(wf: &Workflow, rule_output: &OnboardingRulesDecisionO
        decision=%rule_output.decision.decision_status,
        workflow_id=%wf.id,
        scoped_user_id=%wf.scoped_vault_id,
-       vendor_api=format!("{:?}", rule_output.decision.vendor_apis),
        msg
        // TODO: differentiate KYB vs KYC here
     );
