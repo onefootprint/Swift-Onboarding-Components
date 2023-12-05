@@ -5,7 +5,7 @@ from tests.utils import (
     post,
 )
 from tests.bifrost_client import BifrostClient
-from tests.utils import compare_b64_contents
+from tests.utils import compare_b64_contents, create_ob_config
 
 
 def test_tenant_decrypt(sandbox_user):
@@ -108,3 +108,26 @@ def test_tenant_image_decrypt(
         "document.drivers_license.back.image",
         "document.drivers_license.selfie.image",
     }
+
+
+def test_decrypt_optional(sandbox_tenant, twilio):
+    """
+    Test that we can't decrypt fields that aren't in can_access
+    """
+    obc = create_ob_config(
+        sandbox_tenant,
+        "Doc request config",
+        ["phone_number", "email", "name", "full_address"],
+        ["phone_number"],
+        optional_data=["ssn9"],
+    )
+    bifrost = BifrostClient.new(obc, twilio)
+    user = bifrost.run()
+
+    body = get(f"/entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
+    phone_number = next(i for i in body["data"] if i["identifier"] == "id.phone_number")
+    assert phone_number["is_decryptable"]
+    email = next(i for i in body["data"] if i["identifier"] == "id.email")
+    assert not email["is_decryptable"]
+    ssn = next(i for i in body["data"] if i["identifier"] == "id.ssn9")
+    assert not ssn["is_decryptable"]

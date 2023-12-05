@@ -235,7 +235,10 @@ class BifrostClient:
         Operates on collect_data or collect_investor_profile requirement
         """
         dis_to_provide = [
-            di for cdo in requirement["missing_attributes"] for di in CDO_TO_DIS[cdo]
+            di
+            for cdo in requirement["missing_attributes"]
+            + requirement.get("optional_attributes", [])
+            for di in CDO_TO_DIS[cdo]
         ]
         data = {di: v for (di, v) in self.data.items() if di in dis_to_provide}
         post("/hosted/user/vault/validate", data, self.auth_token)

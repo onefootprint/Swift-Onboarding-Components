@@ -5,20 +5,16 @@ use itertools::Itertools;
 use newtypes::DataIdentifier;
 
 impl<Type> TenantVw<Type> {
-    /// Returns true if the DI was request to be collected by a playbook that has been onboarded onto
-    fn is_collected_by_playbooks(&self, di: &DataIdentifier) -> bool {
-        let must_collect = self
+    /// Determines if a provided DI is decryptable through this VW by the provided tenant, checking
+    /// ob config can_access rules.
+    pub fn tenant_can_decrypt(&self, di: DataIdentifier) -> bool {
+        let collected_cdos = self
             .workflows
             .iter()
             .flat_map(|ob| ob.collection_scopes())
             .collect_vec();
-        CanDecrypt::single(di.clone()).is_met(&must_collect)
-    }
-
-    /// Determines if a provided DI is decryptable through this VW by the provided tenant, checking
-    /// ob config can access rules.
-    pub fn tenant_can_decrypt(&self, di: DataIdentifier) -> bool {
-        if self.is_collected_by_playbooks(&di) {
+        let is_collected_by_playbooks = CanDecrypt::single(di.clone()).is_met(&collected_cdos);
+        if is_collected_by_playbooks {
             // If the piece of data was requested to be collected, it is decryptable as long as the
             // workflow was authorized and the field is in can_decrypt
             let can_decrypt_scopes = self

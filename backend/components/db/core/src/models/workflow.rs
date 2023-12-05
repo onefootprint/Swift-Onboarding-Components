@@ -843,6 +843,7 @@ impl WorkflowAndConfig {
             .must_collect_data
             .clone()
             .into_iter()
+            .chain(self.1.optional_data.clone())
             .map(|cdo| cdo.permission())
             .collect()
     }
