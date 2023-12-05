@@ -19,7 +19,7 @@ const StateField = () => {
     formState: { errors },
   } = useFormContext<FormData>();
   const country = watch('country');
-  const isDomestic = country.value === 'US';
+  const isCountryUs = country.value === 'US';
 
   const shouldCollect =
     COUNTRIES_WITH_STATES.includes(country.value) ||
@@ -28,7 +28,7 @@ const StateField = () => {
     return null;
   }
 
-  return isDomestic ? (
+  return isCountryUs ? (
     <Controller
       control={control}
       name="state"

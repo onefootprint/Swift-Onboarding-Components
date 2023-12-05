@@ -11,7 +11,7 @@ import {
 } from '../missing-attributes';
 import type { Typegen0 } from './machine.typegen';
 import type { MachineContext, MachineEvents } from './types';
-import isInDomesticFlow from './utils/is-in-domestic-flow';
+import isInDomesticFlow from './utils/is-country-us';
 import mergeUpdatedData from './utils/merge-data';
 import mergeInitialData from './utils/merge-initial-data';
 

@@ -23,7 +23,7 @@ import {
   getSsnValue,
   ssnFormatter,
 } from '../../../../utils/ssn-utils';
-import isInDomesticFlow from '../../../../utils/state-machine/utils/is-in-domestic-flow';
+import isInDomesticFlow from '../../../../utils/state-machine/utils/is-country-us';
 import Ssn from '../../../ssn';
 import useStepUp from './hooks/use-step-up';
 
@@ -42,7 +42,7 @@ const IdentitySection = () => {
   const decryptUserMutation = useDecryptUser();
   const ssnKind = getSsnKind(requirement);
   const ssn = getSsnValue(data, ssnKind);
-  const isDomestic = isInDomesticFlow(data);
+  const isCountryUs = isInDomesticFlow(data);
 
   const getSsnValueType = () => {
     if (ssn?.value) {
@@ -227,7 +227,7 @@ const IdentitySection = () => {
     }
   }
 
-  if (!isDomestic || !identity.length) {
+  if (!isCountryUs || !identity.length) {
     return null;
   }
 

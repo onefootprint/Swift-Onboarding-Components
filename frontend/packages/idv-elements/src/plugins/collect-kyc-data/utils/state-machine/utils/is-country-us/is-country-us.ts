@@ -2,7 +2,7 @@ import { IdDI } from '@onefootprint/types';
 
 import type { KycData } from '../../../data-types';
 
-const isInDomesticFlow = (data: KycData) =>
+const isCountryUs = (data: KycData) =>
   !data[IdDI.country] || data[IdDI.country].value === 'US';
 
-export default isInDomesticFlow;
+export default isCountryUs;

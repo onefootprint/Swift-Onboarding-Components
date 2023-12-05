@@ -17,7 +17,7 @@ const AddressLines = () => {
   } = useFormContext<FormData>();
   const country = watch('country');
   const { t } = useTranslation('pages.residential-address.form');
-  const isDomestic = country.value === 'US';
+  const isCountryUs = country.value === 'US';
 
   const handleAddressSelect = async (
     prediction?: google.maps.places.AutocompletePrediction | null,
@@ -49,7 +49,7 @@ const AddressLines = () => {
         setValue('city', result.city);
       }
       if (result.state) {
-        if (isDomestic) {
+        if (isCountryUs) {
           const possibleState = STATES.find(
             stateOption => stateOption.label === result.state,
           );
@@ -75,7 +75,7 @@ const AddressLines = () => {
         hasError={!!errors.addressLine1}
         hint={errors.addressLine1 && t('address-line-1.error')}
         label={
-          isDomestic
+          isCountryUs
             ? t('address-line-1.label')
             : t('address-line-1.international-label')
         }
@@ -90,12 +90,12 @@ const AddressLines = () => {
         data-private
         autoComplete="address-line2"
         label={
-          isDomestic
+          isCountryUs
             ? t('address-line-2.label')
             : t('address-line-2.international-label')
         }
         placeholder={
-          isDomestic
+          isCountryUs
             ? t('address-line-2.placeholder')
             : t('address-line-2.international-placeholder')
         }

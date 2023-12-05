@@ -16,7 +16,7 @@ const ZipField = () => {
   const { t } = useTranslation('pages.residential-address.form.zipCode');
   const country = watch('country');
   const { zipcode } = useInputValidations(country.value);
-  const isDomestic = country.value === 'US';
+  const isCountryUs = country.value === 'US';
 
   return (
     <TextInput
@@ -28,8 +28,8 @@ const ZipField = () => {
       placeholder={t('placeholder')}
       defaultValue={getValues('zip')}
       {...register('zip', {
-        required: isDomestic,
-        validate: isDomestic
+        required: isCountryUs,
+        validate: isCountryUs
           ? (value: string) =>
               zipcode.pattern ? zipcode.pattern.test(value) : undefined
           : undefined,
