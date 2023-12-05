@@ -1991,27 +1991,38 @@
           }
         },
         "rules": {
-          "title": "Rules",
+          "empty-rules": "This playbook does not have rules.",
           "alerts": {
             "kyb-alert": "These rules are only applied when verifying a Business Owner's identity.",
             "view-only-alert": "These rules are view-only for the moment — editing is coming soon. Reach out to us for early access.",
             "view-only-kyb-alert": "These rules are view-only for the moment — editing is coming soon. Reach out to us for early access. Please also note these are only applied when verifying a Business Owner's identity."
           },
-          "fail": {
-            "title": "Fail",
-            "subtitle": "User will be marked as failed"
+          "action-section": {
+            "fail": {
+              "title": "Fail",
+              "subtitle": "User will be marked as failed",
+              "color": "error"
+            },
+            "manual-review": {
+              "title": "Fail + Manual review",
+              "subtitle": "User will be marked as failed and flagged for review",
+              "color": "warning"
+            },
+            "step-up": {
+              "title": "Step-up",
+              "subtitle": "User will be asked to scan a government-issued ID and take a selfie",
+              "color": "info"
+            },
+            "pass-with-manual-review": {
+              "title": "Pass + Manual review",
+              "subtitle": "User will be onboarded, but should be manually reviewed",
+              "color": "success"
+            }
           },
-          "fail-manual-review": {
-            "title": "Fail + Manual review",
-            "subtitle": "User will be marked as failed and flagged for review"
-          },
-          "step-up": {
-            "title": "Step-up",
-            "subtitle": "User will be asked to scan a government-issued ID and take a selfie"
-          },
-          "pass-manual-review": {
-            "title": "Pass + Manual review",
-            "subtitle": "User will be onboarded, but should be manually reviewed"
+          "action-row": {
+            "if": "if",
+            "and": "and",
+            "not": "not"
           },
           "risk-signal-mapping": {}
         }

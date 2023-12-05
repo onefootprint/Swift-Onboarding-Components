@@ -18,6 +18,7 @@ export type CollectionAndScopesProps = {
 
 const CollectionAndScopes = ({
   playbook: {
+    id,
     allowInternationalResidents,
     allowUsResidents,
     canAccessData,
@@ -85,7 +86,7 @@ const CollectionAndScopes = ({
           pep={enhancedAml.pep}
         />
       )}
-      {tab === 'rules' && <Rules playbookKind={kind} />}
+      {tab === 'rules' && <Rules playbookId={id} playbookKind={kind} />}
     </Container>
   );
 };
