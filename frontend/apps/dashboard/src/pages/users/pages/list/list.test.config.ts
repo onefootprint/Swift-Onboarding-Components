@@ -18,6 +18,7 @@ export const entitiesFixture: Entity[] = [
     attributes: [IdDI.firstName, IdDI.lastName, IdDI.email],
     decryptableAttributes: [IdDI.firstName, IdDI.lastName, IdDI.email],
     startTimestamp: '2023-03-27T14:43:47.444716Z',
+    lastActivityAt: '2023-03-27T14:43:47.444716Z',
     insightEvent: {
       timestamp: '2023-03-29T23:07:46.850237Z',
       ipAddress: '73.222.157.30',
@@ -47,6 +48,7 @@ export const entitiesFixture: Entity[] = [
     attributes: [IdDI.firstName, IdDI.lastName, IdDI.email],
     decryptableAttributes: [IdDI.firstName, IdDI.lastName, IdDI.email],
     startTimestamp: '2023-10-19T03:38:23.521861Z',
+    lastActivityAt: '2023-10-19T03:38:23.521861Z',
     insightEvent: {
       timestamp: '2023-03-29T23:07:46.850237Z',
       ipAddress: '73.222.157.30',

@@ -95,6 +95,7 @@ export const entityFixture: Entity = {
   ],
   data: [],
   startTimestamp: '2023-03-29T23:07:44.435194Z',
+  lastActivityAt: '2023-03-27T14:43:47.444716Z',
   insightEvent: {
     timestamp: '2023-03-29T23:07:46.850237Z',
     ipAddress: '73.222.157.30',

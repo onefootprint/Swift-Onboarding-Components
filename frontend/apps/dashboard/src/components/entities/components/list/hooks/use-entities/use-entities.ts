@@ -43,6 +43,7 @@ const useEntities = (
       getEntities(authHeaders, {
         ...requestParams,
         ...defaultFilters,
+        order_by: 'last_activity_at',
         kind,
       }),
     {

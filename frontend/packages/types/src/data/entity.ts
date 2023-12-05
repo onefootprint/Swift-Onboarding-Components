@@ -58,6 +58,7 @@ export type Entity<TStatus = EntityStatus> = {
   kind: EntityKind;
   data: Attribute[];
   startTimestamp: string;
+  lastActivityAt: string;
   decryptedAttributes: EntityVault;
   watchlistCheck: WatchlistCheckEventData | null;
   status: TStatus;

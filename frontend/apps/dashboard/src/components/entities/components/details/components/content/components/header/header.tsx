@@ -1,4 +1,4 @@
-import { useIntl, useTranslation } from '@onefootprint/hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { CodeInline, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
@@ -14,7 +14,6 @@ type HeaderProps = WithEntityProps;
 const Header = ({ entity }: HeaderProps) => {
   const { t } = useTranslation('pages.entity.header');
   const { kind } = useEntityContext();
-  const { formatDateWithTime } = useIntl();
 
   return (
     <HeaderContainer aria-label={t(`${kind}.title`)}>
@@ -33,12 +32,6 @@ const Header = ({ entity }: HeaderProps) => {
       </Row>
       <SubHeader>
         <Row>
-          <Typography variant="body-3" color="primary">
-            {formatDateWithTime(new Date(entity.startTimestamp))}
-          </Typography>
-          <Typography variant="body-3" color="tertiary" as="span">
-            ·
-          </Typography>
           <CodeInline isPrivate>{entity.id}</CodeInline>
         </Row>
         <Row>

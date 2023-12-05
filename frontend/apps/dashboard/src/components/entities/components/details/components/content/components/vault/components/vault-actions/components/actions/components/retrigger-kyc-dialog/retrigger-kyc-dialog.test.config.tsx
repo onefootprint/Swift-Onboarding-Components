@@ -10,6 +10,7 @@ export const entityFixture: Entity = {
   data: [],
   decryptableAttributes: [],
   startTimestamp: '2023-03-27T14:43:47.444716Z',
+  lastActivityAt: '2023-03-27T14:43:47.444716Z',
   requiresManualReview: false,
   status: EntityStatus.pass,
   decryptedAttributes: {},

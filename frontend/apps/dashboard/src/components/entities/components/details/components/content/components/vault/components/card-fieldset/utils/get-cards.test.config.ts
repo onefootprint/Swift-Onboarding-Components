@@ -8,6 +8,7 @@ const entityFixture: Entity = {
   data: [],
   attributes: [],
   startTimestamp: '2023-03-27T14:43:47.444716Z',
+  lastActivityAt: '2023-03-27T14:43:47.444716Z',
   watchlistCheck: null,
   hasOutstandingWorkflowRequest: false,
   status: EntityStatus.pass,

@@ -9,6 +9,7 @@ export type GetEntitiesRequest = {
   timestamp_gte?: string | Date;
   timestamp_lte?: string;
   requires_manual_review?: string;
+  order_by: 'last_activity_at';
 };
 
 export type GetEntitiesResponse = Entity<ApiEntityStatus | undefined>[];

@@ -12,7 +12,8 @@
       "id": "Footprint ID",
       "status": "Onboarding status",
       "other": "Other details",
-      "created": "Created"
+      "last-activity": "Last activity",
+      "last-activity-tooltip": "The timestamp at which the user last onboarded"
     },
     "row": {
       "status": {

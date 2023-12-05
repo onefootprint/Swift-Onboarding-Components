@@ -73,7 +73,7 @@ const Row = ({ entity }: RowProps) => (
           textOverflow: 'ellipsis',
         }}
       >
-        {new Date(entity.startTimestamp).toLocaleString('en-us', {
+        {new Date(entity.lastActivityAt).toLocaleString('en-us', {
           month: 'numeric',
           day: 'numeric',
           year: '2-digit',

@@ -12,7 +12,13 @@ const List = () => {
     { text: t('table.header.name'), width: '16%' },
     { text: t('table.header.id'), width: '25%' },
     { text: t('table.header.status'), width: '17%' },
-    { text: t('table.header.created'), width: '17%' },
+    {
+      text: t('table.header.last-activity'),
+      width: '17%',
+      tooltip: {
+        text: t('table.header.last-activity-tooltip'),
+      },
+    },
     { text: t('table.header.other'), width: '25%' },
   ];
 
