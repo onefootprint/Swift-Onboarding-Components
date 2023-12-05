@@ -68,7 +68,7 @@ pub async fn get(
         })
         .await??;
 
-    let populated = uvw.get_visible_populated_fields();
+    let populated = uvw.populated_dis();
     let keys = if let Some(fields) = fields {
         fields.to_vec()
     } else {

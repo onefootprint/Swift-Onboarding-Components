@@ -54,7 +54,7 @@ pub async fn get(
             // we also have to support rendering documents that only exist in the vault
             // (and not in ID docs)
             let api_docs = vw
-                .get_visible_populated_fields()
+                .populated_dis()
                 .into_iter()
                 .filter_map(|di| {
                     let DataIdentifier::Document(DocumentKind::LatestUpload(kind, side)) = di else {

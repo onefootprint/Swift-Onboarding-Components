@@ -837,8 +837,8 @@ impl WorkflowAndConfig {
         }
     }
 
-    // Returns the TenantScopes that this ObConfiguration requires to be collected
-    pub fn must_collect_scopes(&self) -> Vec<TenantScope> {
+    // Returns the TenantScopes that this ObConfiguration collects
+    pub fn collection_scopes(&self) -> Vec<TenantScope> {
         self.1
             .must_collect_data
             .clone()

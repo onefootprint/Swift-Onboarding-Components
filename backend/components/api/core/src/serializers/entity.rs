@@ -40,7 +40,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
 
         // Assemble all metadata and possible decrypted values for each DI in the vault
         let data = vw
-            .get_visible_populated_fields()
+            .populated_dis()
             .into_iter()
             .filter_map(|di| -> Option<_> {
                 let lifetime = vw.get_lifetime(di.clone())?;
