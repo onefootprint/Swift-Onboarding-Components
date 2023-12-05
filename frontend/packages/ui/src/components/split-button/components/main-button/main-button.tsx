@@ -1,5 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 
 import { createFontStyles } from '../../../../utils';
 import LoadingIndicator from '../../../loading-indicator';
@@ -26,43 +26,32 @@ const MainButton = ({
   loadingAriaLabel = 'Loading',
   children,
   ref,
-}: MainButtonProps) => {
-  const [contentWidth, setContentWidth] = useState(0);
-  const contentRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (contentRef.current) {
-      setContentWidth(contentRef.current.getBoundingClientRect().width);
-    }
-  }, [contentRef]);
-
-  return (
-    <Container
-      /** Do not change/remove these classes */
-      className="fp-button fp-custom-appearance"
-      data-loading={loading}
-      disabled={disabled}
-      onClick={onClick}
-      ref={ref}
-      tabIndex={0}
-      type={type}
-      variant={variant}
-    >
-      <Stack width={`${contentWidth}px`} align="center" justify="center">
-        {loading ? (
-          <LoadingIndicator
-            aria-label={loadingAriaLabel}
-            color={variant === 'primary' ? 'quinary' : 'primary'}
-          />
-        ) : (
-          <Stack as="span" whiteSpace="nowrap" ref={contentRef}>
-            {children}
-          </Stack>
-        )}
-      </Stack>
-    </Container>
-  );
-};
+}: MainButtonProps) => (
+  <Container
+    /** Do not change/remove these classes */
+    className="fp-button fp-custom-appearance"
+    data-loading={loading}
+    disabled={disabled}
+    onClick={onClick}
+    ref={ref}
+    tabIndex={0}
+    type={type}
+    variant={variant}
+  >
+    <Stack align="center" justify="center">
+      {loading ? (
+        <LoadingIndicator
+          aria-label={loadingAriaLabel}
+          color={variant === 'primary' ? 'quinary' : 'primary'}
+        />
+      ) : (
+        <Stack as="span" whiteSpace="nowrap">
+          {children}
+        </Stack>
+      )}
+    </Stack>
+  </Container>
+);
 
 const Container = styled.button<{
   variant: ButtonVariant;
