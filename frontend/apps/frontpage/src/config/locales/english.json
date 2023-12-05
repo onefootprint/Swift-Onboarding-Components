@@ -104,6 +104,11 @@
               "text": "KYB",
               "subtext": "Know Your Business",
               "href": "/kyb"
+            },
+            "auth": {
+              "text": "Auth",
+              "subtext": "Authentication and authorization",
+              "href": "/auth"
             }
           }
         },
@@ -1168,6 +1173,80 @@
       "banner": {
         "title": "Onboard more customers and enjoy peace of mind. Today.",
         "get-started": "Sign up for free",
+        "book-a-demo": "Book a demo"
+      }
+    },
+    "auth": {
+      "html-title": "Footprint - Auth",
+      "hero": {
+        "title": "Auth",
+        "subtitle": "Leverage passkeys to allow for frictionless and secure log-in.",
+        "sign-up-for-free": "Sign up for free",
+        "book-a-demo": "Book a demo"
+      },
+      "sections": {
+        "title": "Secure",
+        "subtitle": "Leverages the newest authentication technologies for fast and secure sign-in",
+        "strong": {
+          "title": "Strong cryptography",
+          "subtitle": "Passkeys are based on the new technology standards of WebAuthn and FIDO2 to use strong public-key cryptography to authenticate people on the internet."
+        },
+        "os-protected": {
+          "title": "OS protected",
+          "subtitle": "Keys are secured by the OS, protected by device-based enclaves and biometrics, and accessible only in secure contexts where keys are bound to domains to prevent phishing"
+        },
+        "phishing-resistant": {
+          "title": "Phishing resistant",
+          "subtitle": "Underlying passkeys are public-private key pairs. Each public-key is uniquely bound to a specific “Relying Party” — or in simple terms a website like acmebank.com. This is great for both people and businesses. \n If you have a Acme Bank account, and then someone tries to phish your account, your keys for the real Acme Bank won’t surface on the fake Acme Bank."
+        },
+        "secure-enclaves": {
+          "title": "Secure enclaves",
+          "subtitle": "Passkeys leverage specialized hardware components called Secure Enclaves on most Apple, Windows, and Android devices. Each has a separate processor with its own secure storage that handles cryptographic operations related to security functions like passkeys."
+        }
+      },
+      "make-it-yours": {
+        "title": "Make it yours",
+        "subtitle": "Customize everything you need to seamlessly integrate it with your app"
+      },
+      "endless-benefits": {
+        "title": "Endless benefits",
+        "subtitle": "Authentication and identity are complex, Footprint Auth makes it easy",
+        "elements": {
+          "no-more-phishing": {
+            "title": "No more phishing",
+            "subtitle": "Phishing is not possible because your device simply won’t return any credentials for a fake website like go0gle.com and because it’s a distributed system where you are in possession of your own cryptographic private key (and no one else) there’s no third-party man-in-the-middle to corrupt like a telco."
+          },
+          "easier-account-recovery": {
+            "title": "Easier Account Recovery",
+            "subtitle": "Passkeys sync across iCloud, meaning even if someone loses their phone or laptop, they would have their passkey as soon as they get a new device that only they could unlock."
+          },
+          "chargeback-disputes": {
+            "title": "Chargeback Disputes",
+            "subtitle": "With passkeys used for KYC and login, we can cryptographically prove the same person who created an account is the same person who logged back in at each session."
+          },
+          "email-and-sms-support": {
+            "title": "Email and SMS support",
+            "subtitle": "While most devices support passkeys today, sometimes users need another option. We make this easy by intelligently picking the right authentication factors that your work for your users. Magic-link email sign-in and SMS-based one-time passcodes add an additional layer and serve as a backstop for all your frictionless authentication needs."
+          },
+          "security-logs": {
+            "title": "Security logs",
+            "subtitle": "Built-in to Footprint are per-user, granular security logs so that you know when, how, and where your users are coming to your product. Footprint intelligently labels authentication data to detect anomalous behavior.",
+            "logs": {
+              "ios": "Logged from iOS 17.1 - Buenos Aires, Argentina",
+              "mac": "Logged from Apple Macintosh, Mac OS 10.15.7",
+              "collected": "Collected: Email, Phone number and Name"
+            }
+          },
+          "device-insights": {
+            "title": "Device insights",
+            "subtitle": "Footprint layers cutting edge device fingerprinting and fraud technologies to detect when nefarious users are trying to access your products and proactively block and limit the damage they can do. Get real-time device insights and behavior analytics with actionable intel."
+          }
+        }
+      },
+      "stronger-auth": {
+        "title": "Stronger Auth: more opportunities",
+        "subtitle": "Whether you want to auto-fill card numbers on a browser or progressively increase credit limits, using passkeys increases the fidelity of an identity over time allowing you to give your users more options as they earn your trust.",
+        "sign-up-for-free": "Sign up for free",
         "book-a-demo": "Book a demo"
       }
     }

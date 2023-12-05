@@ -9,5 +9,11 @@
       "src/*": ["./src/*"]
     }
   },
-  "include": ["src", "next-env.d.ts"]
+  "include": [
+    "src",
+    "next-env.d.ts",
+    "src/pages/auth/components/sections/endless-benefits/components/card-grid/illustrations/.email-and-sms-support",
+    "src/pages/auth/components/sections/endless-benefits/components/card-grid/illustrations/.security-logs",
+    "src/pages/auth/components/sections/endless-benefits/components/card-grid/illustrations/device-insights"
+  ]
 }

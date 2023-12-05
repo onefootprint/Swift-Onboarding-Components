@@ -10,7 +10,7 @@ import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import React from 'react';
 
-import FeatureCard from '../../feature-card/feature-card';
+import FeatureCard from '../../../../../components/feature-card/feature-card';
 import MicroFeatureCard from '../../micro-feature-card/micro-feature-card';
 import SectionTitle from '../../section-title';
 import KybIllustration from './components/illustrations/kyb-illustration';

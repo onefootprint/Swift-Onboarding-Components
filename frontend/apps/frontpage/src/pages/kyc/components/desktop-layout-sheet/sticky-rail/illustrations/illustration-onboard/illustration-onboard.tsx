@@ -1,6 +1,5 @@
-import { IcoBolt24, IcoCirclePlay16, IcoUser24 } from '@onefootprint/icons';
+import { IcoBolt24, IcoUser24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Typography } from '@onefootprint/ui';
 import type { MotionValue } from 'framer-motion';
 import {
   motion,
@@ -8,9 +7,8 @@ import {
   useMotionValueEvent,
   useTransform,
 } from 'framer-motion';
-import Image from 'next/image';
-import React, { useEffect, useRef, useState } from 'react';
-import ReactPlayer from 'react-player';
+import React, { useRef, useState } from 'react';
+import MobileDemoVideo from 'src/components/mobile-demo-video';
 
 type IllustrationOnboardProps = {
   scroll: MotionValue;
@@ -25,9 +23,6 @@ const VISIBLE_RANGE = {
 
 const IllustrationOnboard = ({ scroll }: IllustrationOnboardProps) => {
   const [isVisible, setIsVisible] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isFirstPlay, setIsFirstPlay] = useState(true);
-  const [hasWindow, setHasWindow] = useState(false);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 'all' });
 
@@ -48,77 +43,12 @@ const IllustrationOnboard = ({ scroll }: IllustrationOnboardProps) => {
     }
   });
 
-  useEffect(() => {
-    if (isInView && isFirstPlay) {
-      setIsPlaying(true);
-    } else {
-      setIsPlaying(false);
-    }
-  }, [isInView, isFirstPlay]);
-
-  const handleEnded = () => {
-    setIsPlaying(false);
-    setIsFirstPlay(false);
-  };
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setHasWindow(true);
-    }
-  }, []);
-
   return isVisible ? (
     <Container style={{ opacity }} ref={ref}>
-      <PhoneContainer>
-        <PhoneFrameImage
-          src="/kyc/sticky-rail/iphone.png"
-          alt=""
-          width={375}
-          height={812}
-        />
-        {hasWindow && (
-          <ReactPlayer
-            url="/kyc/sticky-rail/onboarding.mp4"
-            muted
-            config={{
-              file: {
-                attributes: {
-                  crossOrigin: 'true',
-                },
-              },
-            }}
-            playing={isPlaying}
-            onEnded={() => {
-              handleEnded();
-            }}
-            width={312}
-            height={626}
-            style={{
-              position: 'absolute',
-              objectFit: 'contain',
-              zIndex: 0,
-              transform: 'translate(-50%, -50%)',
-              top: '50%',
-              left: '50%',
-              borderRadius: '56px',
-              overflow: 'hidden',
-            }}
-          />
-        )}
-        {!isPlaying && !isFirstPlay && (
-          <Replay
-            onClick={() => setIsPlaying(true)}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <IcoCirclePlay16 color="accent" />
-            <Typography variant="label-2" color="accent">
-              Replay
-            </Typography>
-          </Replay>
-        )}
-      </PhoneContainer>
+      <MobileDemoVideo
+        videoUrl="/kyc/sticky-rail/onboarding.mp4"
+        shouldPlay={isInView}
+      />
       <motion.span
         animate={{
           rotate: [0, 360],
@@ -188,42 +118,6 @@ const Container = styled(motion.div)`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-
-const Replay = styled(motion.button)`
-  ${({ theme }) => css`
-    all: unset;
-    position: absolute;
-    bottom: calc(-1 * ${theme.spacing[10]});
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: ${theme.spacing[2]};
-    cursor: pointer;
-  `}
-`;
-
-const PhoneContainer = styled.div`
-  ${({ theme }) => css`
-    width: 320px;
-    height: 650px;
-    position: absolute;
-    z-index: 1;
-    border-radius: 56px;
-    background-color: ${theme.backgroundColor.primary};
-  `}
-`;
-
-const PhoneFrameImage = styled(Image)`
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 2;
 `;
 
 const Circle = styled(motion.div)<{ diameter: number }>`
