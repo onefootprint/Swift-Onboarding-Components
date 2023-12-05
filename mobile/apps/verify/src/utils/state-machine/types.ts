@@ -20,7 +20,7 @@ export type IdentifyResultProps = {
 };
 
 export type KycDataCollectionProps = {
-  requirement?: CollectKycDataRequirement;
+  requirement: CollectKycDataRequirement;
   kycData?: KycData;
 };
 

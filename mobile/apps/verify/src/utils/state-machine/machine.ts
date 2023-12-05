@@ -174,7 +174,10 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
         },
         ssn: {
           on: {
-            done: 'completed',
+            dataSubmitted: {
+              target: 'completed',
+              actions: ['assignKycData'],
+            },
           },
         },
 

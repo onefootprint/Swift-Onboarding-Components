@@ -169,13 +169,21 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
   }
 
   if (state.matches('ssn')) {
-    return (
-      <Ssn
-        onDone={() => {
-          send('done');
-        }}
-      />
-    );
+    if (authToken && kycRequirement && kycData) {
+      return (
+        <Ssn
+          requirement={kycRequirement}
+          kycData={kycData}
+          authToken={authToken}
+          onComplete={data => {
+            send({
+              type: 'dataSubmitted',
+              payload: data,
+            });
+          }}
+        />
+      );
+    }
   }
 
   return null;

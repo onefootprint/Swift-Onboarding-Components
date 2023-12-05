@@ -23,6 +23,7 @@ import convertFormData from './utils/convert-form-data';
 import {
   validateDateFormat,
   validateMinimumAge,
+  validateName,
   validateNotFutureDate,
   validateYearOfBirth,
 } from './utils/validations';
@@ -60,10 +61,18 @@ const BasicInformation = ({
   const schema = z.object({
     firstName: z
       .string()
-      .min(1, { message: t('form.first-name.errors.required') }),
+      .min(1, { message: t('form.first-name.errors.required') })
+      .regex(/\S/, { message: t('form.first-name.errors.required') })
+      .refine(validateName, {
+        message: t('form.first-name.errors.special-chars'),
+      }),
     lastName: z
       .string()
-      .min(1, { message: t('form.last-name.errors.required') }),
+      .min(1, { message: t('form.last-name.errors.required') })
+      .regex(/\S/, { message: t('form.first-name.errors.required') })
+      .refine(validateName, {
+        message: t('form.first-name.errors.special-chars'),
+      }),
     dob: z
       .string()
       .min(1, { message: t('form.dob.errors.required') })

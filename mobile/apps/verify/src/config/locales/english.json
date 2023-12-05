@@ -167,7 +167,8 @@
           "label": "First name",
           "placeholder": "John",
           "errors": {
-            "required": "Please enter a first name"
+            "required": "Please enter a first name",
+            "special-chars": "First name contains invalid characters."
           }
         },
         "middle-name": {
@@ -178,7 +179,8 @@
           "label": "Last name",
           "placeholder": "Doe",
           "errors": {
-            "required": "Please enter a last name"
+            "required": "Please enter a last name",
+            "special-chars": "Last name contains invalid characters."
           }
         },
         "dob": {
