@@ -1,4 +1,5 @@
 import getCustomAppearance from '@onefootprint/appearance';
+import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import { Logger } from '@onefootprint/idv-elements';
 import type { GetServerSideProps } from 'next';
 import React, { Suspense } from 'react';
@@ -13,9 +14,11 @@ const Form = () => {
   });
 
   return (
-    <Suspense fallback={<Loading />}>
-      <Content fallback={<Loading />} />
-    </Suspense>
+    <ObserveCollectorProvider appName="form">
+      <Suspense fallback={<Loading />}>
+        <Content fallback={<Loading />} />
+      </Suspense>
+    </ObserveCollectorProvider>
   );
 };
 
