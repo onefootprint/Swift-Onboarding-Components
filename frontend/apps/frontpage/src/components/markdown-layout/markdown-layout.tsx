@@ -30,9 +30,6 @@ const MarkdownLayout = ({ children, meta }: MarkdownLayoutProps) => {
             >
               {t(meta.titleKey)}
             </Typography>
-            <Typography variant="label-2" color="tertiary">
-              {t(meta.subtitleKey)}
-            </Typography>
           </Header>
           <Article>{children}</Article>
         </Inner>

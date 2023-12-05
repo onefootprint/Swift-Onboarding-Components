@@ -43,7 +43,7 @@ const FootprintFooter = ({
         <li>
           <WhatsThisButton onClick={onWhatsThisClick}>
             <Typography variant="caption-1" color="secondary" as="span">
-              What`s this?
+              What&apos;s this?
             </Typography>
           </WhatsThisButton>
         </li>

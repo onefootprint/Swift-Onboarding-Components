@@ -20,7 +20,7 @@ const FooterActions = ({ onWhatsThisClick }: FooterActionsProps) => (
     <DropdownContent align="end">
       <Dropdown.Item onClick={onWhatsThisClick}>
         <Typography variant="caption-1" color="secondary" as="span">
-          What`s this?
+          What&apos;s this?
         </Typography>
       </Dropdown.Item>
       <Anchor
