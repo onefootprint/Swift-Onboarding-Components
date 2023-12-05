@@ -92,7 +92,7 @@ pub struct CursorPaginatedResponseMeta<C> {
 
 pub type CursorPaginatedResponse<T, C> = ApiResult<Json<CursorPaginatedResponseInner<T, C>>>;
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, serde::Serialize)]
 /// Wraps the response data with metadata needed for a cursor-paginated result.
 /// Cursor pagination requests take in a cursor that identifies the start of the page (and is
 /// delivered by the last pagination request) using an ordered field.
@@ -103,7 +103,7 @@ pub struct CursorPaginatedResponseInner<T, C> {
     pub meta: CursorPaginatedResponseMeta<C>,
 }
 
-impl<T, C: Clone> CursorPaginatedResponseInner<T, C> {
+impl<T, C> CursorPaginatedResponseInner<T, C> {
     pub fn ok(data: T, next: Option<C>, count: Option<i64>) -> ApiResult<Json<Self>> {
         Ok(Json(Self {
             data,

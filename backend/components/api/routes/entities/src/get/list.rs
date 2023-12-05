@@ -30,6 +30,8 @@ use newtypes::CountArgs;
 use newtypes::DataIdentifier;
 use newtypes::FilterFunction;
 use newtypes::IdentityDataKind as IDK;
+use newtypes::ScopedVaultCursor;
+use newtypes::ScopedVaultCursorKind;
 use newtypes::ScopedVaultId;
 use paperclip::actix::{api_v2_operation, get, web};
 use std::collections::HashMap;
@@ -42,13 +44,14 @@ use std::collections::HashMap;
 pub async fn get(
     state: web::Data<State>,
     filters: web::Query<ListEntitiesRequest>,
-    pagination: web::Query<CursorPaginationRequest<i64>>,
+    // TODO only take last_activity_at cursor once we migrate
+    // But, continue to b64 encode
+    pagination: web::Query<CursorPaginationRequest<String>>,
     auth: TenantSessionAuth,
-) -> CursorPaginatedResponse<EntityListResponse, i64> {
+) -> CursorPaginatedResponse<EntityListResponse, ScopedVaultCursor> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
-    let cursor = pagination.cursor;
     let page_size = pagination.page_size(&state);
     let ListEntitiesRequest {
         kind,
@@ -61,7 +64,14 @@ pub async fn get(
         show_all,
         is_created_via_api,
         has_outstanding_workflow_request,
+        order_by,
     } = filters.into_inner();
+    let order_by = order_by.unwrap_or_default();
+    let cursor = pagination
+        .cursor
+        .as_ref()
+        .map(|c| order_by.parse(c))
+        .transpose()?;
 
     let (search, fp_id) = parse_search(&state, search, &tenant.id).await?;
 
@@ -87,8 +97,9 @@ pub async fn get(
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let page_size = (page_size + 1) as i64;
-            let (svs, count) =
-                db::scoped_vault::list_and_count_authorized_for_tenant(conn, params, cursor, page_size)?;
+            let (svs, count) = db::scoped_vault::list_and_count_authorized_for_tenant(
+                conn, params, cursor, order_by, page_size,
+            )?;
             let vws: HashMap<ScopedVaultId, TenantVw> =
                 VaultWrapper::multi_get_for_tenant(conn, svs.clone(), None)?;
             let scoped_vault_ids: Vec<_> = svs.iter().map(|su| su.0.id.clone()).collect();
@@ -103,7 +114,10 @@ pub async fn get(
     // If there are more than page_size results, we should tell the client there's another page
     let cursor = pagination
         .cursor_item(&state, &scoped_vaults)
-        .map(|(sv, _)| sv.ordering_id);
+        .map(|(sv, _)| match order_by {
+            ScopedVaultCursorKind::OrderingId => ScopedVaultCursor::OrderingId(sv.ordering_id),
+            ScopedVaultCursorKind::LastActivityAt => ScopedVaultCursor::LastActivityAt(sv.last_activity_at),
+        });
 
     // Serialize results
     let entities = scoped_vaults

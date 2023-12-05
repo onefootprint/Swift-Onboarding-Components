@@ -17,6 +17,9 @@ pub use docv::*;
 pub mod decision;
 pub use decision::*;
 
+pub mod scoped_vault_cursor;
+pub use scoped_vault_cursor::*;
+
 pub mod country_codes;
 pub use country_codes::*;
 
@@ -107,10 +110,12 @@ pub enum Error {
     IncompatibleDataIdentifier,
     #[error("{0}")]
     EnumDotNotationError(#[from] EnumDotNotationError),
-    #[error("invalid hex string")]
+    #[error("Invalid hex string")]
     InvalidHex(#[from] crypto::hex::FromHexError),
-    #[error("invalid filter function: {0}")]
+    #[error("Invalid filter function: {0}")]
     FilterFunctionParsingError(#[from] crate::filter_function::FilterFunctionParsingError),
+    #[error("{0}")]
+    ParseIntError(#[from] std::num::ParseIntError),
 }
 
 use std::collections::HashMap;

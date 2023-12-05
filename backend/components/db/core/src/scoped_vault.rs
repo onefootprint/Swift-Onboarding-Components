@@ -12,6 +12,8 @@ use newtypes::ObConfigurationId;
 use newtypes::OnboardingStatus;
 use newtypes::OnboardingStatusFilter;
 use newtypes::PiiString;
+use newtypes::ScopedVaultCursor;
+use newtypes::ScopedVaultCursorKind;
 use newtypes::ScopedVaultId;
 use newtypes::VaultKind;
 use newtypes::WatchlistCheckStatusKind;
@@ -320,17 +322,32 @@ fn vaults_matching_search(
 fn list(
     conn: &mut PgConn,
     params: &ScopedVaultListQueryParams<Vec<ScopedVaultId>>,
-    cursor: Option<i64>,
+    cursor: Option<ScopedVaultCursor>,
+    order_by: ScopedVaultCursorKind,
     page_size: i64,
 ) -> DbResult<Vec<(ScopedVault, Vault)>> {
     let query = list_query!(params);
 
-    let mut scoped_vaults = query
-        .order_by(schema::scoped_vault::ordering_id.desc())
-        .limit(page_size);
+    let mut scoped_vaults = query.limit(page_size);
 
     if let Some(cursor) = cursor {
-        scoped_vaults = scoped_vaults.filter(schema::scoped_vault::ordering_id.le(cursor));
+        match cursor {
+            ScopedVaultCursor::OrderingId(c) => {
+                scoped_vaults = scoped_vaults.filter(schema::scoped_vault::ordering_id.le(c))
+            }
+            ScopedVaultCursor::LastActivityAt(c) => {
+                scoped_vaults = scoped_vaults.filter(schema::scoped_vault::last_activity_at.le(c))
+            }
+        }
+    }
+
+    match order_by {
+        ScopedVaultCursorKind::OrderingId => {
+            scoped_vaults = scoped_vaults.order_by(schema::scoped_vault::ordering_id.desc())
+        }
+        ScopedVaultCursorKind::LastActivityAt => {
+            scoped_vaults = scoped_vaults.order_by(schema::scoped_vault::last_activity_at.desc())
+        }
     }
 
     let results = scoped_vaults
@@ -348,7 +365,8 @@ pub fn list_authorized_for_tenant(
     page_size: i64,
 ) -> DbResult<Vec<(ScopedVault, Vault)>> {
     let params = &params.map_search(conn)?;
-    list(conn, params, cursor, page_size)
+    let cursor = cursor.map(|c| ScopedVaultCursor::OrderingId(c));
+    list(conn, params, cursor, ScopedVaultCursorKind::OrderingId, page_size)
 }
 
 #[instrument(skip_all)]
@@ -365,12 +383,13 @@ pub fn count_for_tenant(conn: &mut PgConn, params: ScopedVaultListQueryParams) -
 pub fn list_and_count_authorized_for_tenant(
     conn: &mut PgConn,
     params: ScopedVaultListQueryParams,
-    cursor: Option<i64>,
+    cursor: Option<ScopedVaultCursor>,
+    order_by: ScopedVaultCursorKind,
     page_size: i64,
 ) -> DbResult<(Vec<(ScopedVault, Vault)>, i64)> {
     let params = &params.map_search(conn)?;
 
-    let results = list(conn, params, cursor, page_size)?;
+    let results = list(conn, params, cursor, order_by, page_size)?;
     let count = list_query!(params).count().get_result(conn)?;
     Ok((results, count))
 }

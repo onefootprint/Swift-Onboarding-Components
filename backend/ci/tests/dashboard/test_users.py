@@ -123,7 +123,7 @@ def test_get_users_filter_workflow_request(sandbox_user2):
     assert not any(i["id"] == sandbox_user2.fp_id for i in body["data"])
 
 
-def test_get_users_list_pagination(sandbox_user, sandbox_user2):
+def test_get_users_list_pagination_legacy(sandbox_user, sandbox_user2):
     sandbox_user2  # Not used, but need the fixture
     tenant = sandbox_user.tenant
     # Test paginated request with filters
@@ -134,6 +134,25 @@ def test_get_users_list_pagination(sandbox_user, sandbox_user2):
     body = get(
         "entities",
         dict(page_size=1, cursor=next_cursor, statuses="pass"),
+        *tenant.db_auths,
+    )
+    assert len(body["data"]) == 1
+
+
+def test_get_users_list_pagination(sandbox_user, sandbox_user2):
+    sandbox_user2  # Not used, but need the fixture
+    tenant = sandbox_user.tenant
+    # Test paginated request with filters
+    pagination = dict(page_size=1, statuses="pass", order_by="last_activity_at")
+    body = get("entities", pagination, *tenant.db_auths)
+    assert len(body["data"]) == 1
+    next_cursor = body["meta"]["next"]
+    assert next_cursor  # Should be more than one page
+    # Make sure the cursor is a nanosecond-encoded timestamp
+    assert arrow.get(int(next_cursor) / 1000) > arrow.now().shift(days=-1)
+    body = get(
+        "entities",
+        dict(cursor=next_cursor, **pagination),
         *tenant.db_auths,
     )
     assert len(body["data"]) == 1
