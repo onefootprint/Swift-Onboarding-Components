@@ -365,7 +365,7 @@ pub fn list_authorized_for_tenant(
     page_size: i64,
 ) -> DbResult<Vec<(ScopedVault, Vault)>> {
     let params = &params.map_search(conn)?;
-    let cursor = cursor.map(|c| ScopedVaultCursor::OrderingId(c));
+    let cursor = cursor.map(ScopedVaultCursor::OrderingId);
     list(conn, params, cursor, ScopedVaultCursorKind::OrderingId, page_size)
 }
 
