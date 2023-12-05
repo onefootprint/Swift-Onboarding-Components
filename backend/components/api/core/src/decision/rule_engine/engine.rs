@@ -4,7 +4,10 @@ use super::{
     default_rules::base_kyc_rules,
     eval::{self, Rule},
 };
-use crate::{decision::onboarding::Decision, errors::ApiResult};
+use crate::{
+    decision::{onboarding::Decision, RuleError},
+    errors::ApiResult,
+};
 use db::{
     models::{
         ob_configuration::ObConfiguration,
@@ -28,6 +31,15 @@ pub fn evaluate_workflow_decision(
     risk_signals: HashMap<RiskSignalGroupKind, Vec<RiskSignal>>,
     doc_collected: bool, // could maybe query for DocReq in here and not need to pass this in
 ) -> ApiResult<Decision> {
+    if doc_collected
+        && !risk_signals
+            .get(&RiskSignalGroupKind::Doc)
+            .map(|rs| !rs.is_empty())
+            .unwrap_or(false)
+    {
+        return Err(crate::decision::Error::from(RuleError::MissingInputForDocRules).into());
+    }
+
     let risk_signals: Vec<_> = risk_signals
         .iter()
         // current logic is that we do not evaluate Doc rules if a doc was not collected stricly as part of the current workflow
