@@ -89,7 +89,7 @@ const DataCollection = ({
           <CollectedInformation
             title={t('basic-information')}
             options={{
-              name: true,
+              name: mustCollectData.includes('name'),
               email: mustCollectData.includes('email'),
               phoneNumber: mustCollectData.includes('phone_number'),
               dob: mustCollectData.includes('dob'),
