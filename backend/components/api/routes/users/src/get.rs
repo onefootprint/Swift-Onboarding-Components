@@ -58,7 +58,7 @@ pub async fn get(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let page_size = (page_size + 1) as i64;
-            let cursor = cursor.map(|c| ScopedVaultCursor::OrderingId(c));
+            let cursor = cursor.map(ScopedVaultCursor::OrderingId);
             let order_by = ScopedVaultCursorKind::OrderingId;
             let (svs, count) = db::scoped_vault::list_and_count_authorized_for_tenant(
                 conn, params, cursor, order_by, page_size,
