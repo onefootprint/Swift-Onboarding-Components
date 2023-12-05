@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.8.1
+
+### Patch Changes
+
+- ec3cf10a8: Reject form save with an error string when failed
+
 ## 3.8.0
 
 ### Minor Changes
