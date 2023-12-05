@@ -55,6 +55,11 @@ pub struct ScopedVault {
     pub snapshot_seqno: DataLifetimeSeqno,
     /// An optional external (customer-specified) identifier for the scoped vault
     pub external_id: Option<ExternalId>,
+    /// An arbitrarily-defined timestamp for when "activity" has occurred on the vault. Users in
+    /// the dashboard are sorted by this column.
+    /// Right now, we'll update this to the current timestamp when vaults are (1) created and (2)
+    /// have a workflow complete
+    pub last_activity_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -71,6 +76,7 @@ struct NewScopedVault {
     show_in_search: bool,
     snapshot_seqno: DataLifetimeSeqno,
     external_id: Option<ExternalId>,
+    last_activity_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, Default, AsChangeset)]
@@ -79,6 +85,7 @@ pub struct ScopedVaultUpdate {
     pub status: Option<OnboardingStatus>,
     pub is_billable: Option<bool>,
     pub show_in_search: Option<bool>,
+    pub last_activity_at: Option<DateTime<Utc>>,
 }
 
 pub enum ScopedVaultIdentifier<'a> {
@@ -171,11 +178,13 @@ impl ScopedVault {
         }
         // Row doesn't exist for vault_id, tenant_id - create a new one
         let seqno = DataLifetime::get_current_seqno(conn)?;
+        let start_timestamp = Utc::now();
         let new = NewScopedVault {
             id: ScopedVaultId::generate(uv.kind),
             fp_id: FpId::generate(uv.kind, uv.is_live),
             vault_id: uv.id.clone(),
-            start_timestamp: Utc::now(),
+            start_timestamp,
+            last_activity_at: start_timestamp,
             tenant_id: ob_config.tenant_id,
             is_live: ob_config.is_live,
             // All vaults created via bifrost start as non-billable. They are marked billable as
@@ -216,11 +225,13 @@ impl ScopedVault {
             return Err(DbError::CannotCreatedScopedUser);
         }
         let su = if is_new_vault {
+            let start_timestamp = Utc::now();
             let seqno = DataLifetime::get_current_seqno(conn)?;
             let new = NewScopedVault {
                 id: ScopedVaultId::generate(uv.kind),
                 fp_id: FpId::generate(uv.kind, uv.is_live),
-                start_timestamp: Utc::now(),
+                start_timestamp,
+                last_activity_at: start_timestamp,
                 tenant_id,
                 is_live: uv.is_live,
                 vault_id: uv.id.clone(),
@@ -368,8 +379,11 @@ impl ScopedVault {
             is_billable,
             status,
             show_in_search,
+            last_activity_at,
         } = &update;
-        if is_billable.is_none() && status.is_none() && show_in_search.is_none() {
+        if is_billable.is_none() && status.is_none() && show_in_search.is_none() && last_activity_at.is_none()
+        {
+            // No-op if the update is empty
             let existing_sv = scoped_vault::table
                 .filter(scoped_vault::id.eq(id))
                 .get_result(conn.conn())?;

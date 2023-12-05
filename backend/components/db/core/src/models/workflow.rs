@@ -522,6 +522,13 @@ impl Workflow {
                 let sv_id = &result.scoped_vault_id;
                 WorkflowRequest::deactivate(conn, sv_id, Some(obc_id), Some(result.id.clone()))?;
             }
+            // Update the scoped vault's last_activity_at to bump them to the top of the sorted
+            // list of users in the dashboard
+            let update = ScopedVaultUpdate {
+                last_activity_at: Some(Utc::now()),
+                ..Default::default()
+            };
+            ScopedVault::update(conn, &result.scoped_vault_id, update)?;
         }
 
         Ok(result)

@@ -722,6 +722,7 @@ table! {
         show_in_search -> Bool,
         snapshot_seqno -> Int8,
         external_id -> Nullable<Text>,
+        last_activity_at -> Nullable<Timestamptz>,
     }
 }
 

@@ -101,6 +101,7 @@ impl VaultWrapper<Person> {
             is_billable: Some(true),
             status: Some(OnboardingStatus::Incomplete),
             show_in_search: Some(false),
+            last_activity_at: None,
         };
         ScopedVault::update(conn, &su.id, update)?;
 

@@ -1,0 +1,1 @@
+ALTER TABLE scoped_vault ADD COLUMN last_activity_at TIMESTAMPTZ;
