@@ -18,7 +18,6 @@ pub struct ListEntitiesRequest {
     pub show_all: Option<bool>,
     pub is_created_via_api: Option<bool>,
     pub has_outstanding_workflow_request: Option<bool>,
-    pub order_by: Option<ScopedVaultCursorKind>,
 }
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
