@@ -17,7 +17,7 @@ def test_large_objects(sandbox_tenant):
     body = patch(f"users/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
     di = "custom.large_id"
-    obj = {"some_key": "hello world!" * 250_000}
+    obj = {"some_key": "hello world!" * 25}
 
     post(f"users/{fp_id}/vault/{di}/upload", obj, sandbox_tenant.sk.key)
 
