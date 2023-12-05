@@ -4,12 +4,27 @@ use newtypes::{BooleanOperator, FootprintReasonCode, RuleAction, RuleExpression,
 
 // pub struct Rule(pub RuleExpression, pub RuleAction);
 
-pub trait Rule {
+pub trait HasRule {
     fn expression(&self) -> RuleExpression;
     fn action(&self) -> RuleAction;
 }
 
-impl Rule for RuleInstance {
+pub struct Rule {
+    pub expression: RuleExpression,
+    pub action: RuleAction,
+}
+
+impl HasRule for Rule {
+    fn expression(&self) -> RuleExpression {
+        self.expression.clone()
+    }
+
+    fn action(&self) -> RuleAction {
+        self.action
+    }
+}
+
+impl HasRule for RuleInstance {
     fn expression(&self) -> RuleExpression {
         self.rule_expression.clone()
     }
@@ -19,7 +34,7 @@ impl Rule for RuleInstance {
     }
 }
 
-pub fn evaluate_rule_set<T: Rule>(
+pub fn evaluate_rule_set<T: HasRule>(
     rules: Vec<T>,
     input: &[FootprintReasonCode],
     // a bit annoying to have to put this here, but this is our one case currently where a ruleset is evaluated but a particular action is not allowed. If we have already collected a document or already step'd up, we want to ensure that we don't chose that action again
@@ -79,7 +94,7 @@ pub mod tests {
 
     // just to avoid having to make RuleInstance's. Also proves that we could use evaluate_rules in a RAM-only way (ie for backtesting or whatever)
     pub struct TRule(pub RE, pub RA);
-    impl Rule for TRule {
+    impl HasRule for TRule {
         fn expression(&self) -> RE {
             self.0.clone()
         }

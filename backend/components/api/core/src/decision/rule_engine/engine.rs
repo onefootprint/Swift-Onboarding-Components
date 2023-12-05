@@ -1,4 +1,7 @@
-use super::eval;
+use super::{
+    default_rules::base_kyc_rules,
+    eval::{self, Rule},
+};
 use crate::{decision::onboarding::Decision, errors::ApiResult};
 use db::{
     models::{
@@ -26,9 +29,23 @@ pub fn evaluate_workflow_decision(
     let (rule_set_result, _rule_results) =
         evaluate_rules(conn, sv_id, obc_id, wf_id, kind, risk_signals, allow_stepup)?;
 
+    let should_commit_rules: Vec<_> = [base_kyc_rules(), super::default_rules::ssn_rules()]
+        .concat()
+        .into_iter()
+        .map(|(re, ra)| Rule {
+            expression: re,
+            action: ra,
+        })
+        .collect();
+    let (_, should_commit_action) = eval::evaluate_rule_set(
+        should_commit_rules,
+        &risk_signals.iter().map(|rs| rs.reason_code.clone()).collect_vec(),
+        allow_stepup,
+    );
+
     Ok(Decision {
         decision_status: rule_set_result.action_triggered.into(),
-        should_commit: false, // TODO: implement for real (this isnt' used right now)
+        should_commit: should_commit_action.is_none(),
         create_manual_review: rule_set_result
             .action_triggered
             .map(|ra| ra.should_create_review())
