@@ -1,6 +1,10 @@
 import getCustomAppearance from '@onefootprint/appearance';
-import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
+import {
+  ObserveCollectorProvider,
+  useObserveCollector,
+} from '@onefootprint/dev-tools';
 import { Logger } from '@onefootprint/idv-elements';
+import * as LogRocket from 'logrocket';
 import type { GetServerSideProps } from 'next';
 import React, { Suspense } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
@@ -9,18 +13,28 @@ import Content from './components/content';
 import Loading from './components/loading';
 
 const Form = () => {
+  const observeCollector = useObserveCollector();
   useEffectOnce(() => {
     Logger.setupLogRocket('form');
+    LogRocket.getSessionURL(logRocketSessionUrl => {
+      observeCollector.setAppContext({
+        logRocketSessionUrl,
+      });
+    });
   });
 
   return (
-    <ObserveCollectorProvider appName="form">
-      <Suspense fallback={<Loading />}>
-        <Content fallback={<Loading />} />
-      </Suspense>
-    </ObserveCollectorProvider>
+    <Suspense fallback={<Loading />}>
+      <Content fallback={<Loading />} />
+    </Suspense>
   );
 };
+
+const FormWithProvider = () => (
+  <ObserveCollectorProvider appName="form">
+    <Form />
+  </ObserveCollectorProvider>
+);
 
 export const getServerSideProps: GetServerSideProps = async ({
   res,
@@ -40,4 +54,4 @@ export const getServerSideProps: GetServerSideProps = async ({
   return { props: { theme, fontSrc, rules, variant } };
 };
 
-export default Form;
+export default FormWithProvider;

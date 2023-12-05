@@ -1,8 +1,12 @@
 import getCustomAppearance from '@onefootprint/appearance';
-import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
+import {
+  ObserveCollectorProvider,
+  useObserveCollector,
+} from '@onefootprint/dev-tools';
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import { Logger } from '@onefootprint/idv-elements';
 import type { FootprintAppearance } from '@onefootprint/types';
+import * as LogRocket from 'logrocket';
 import type { GetServerSideProps } from 'next';
 import React, { Suspense } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
@@ -21,17 +25,27 @@ const getLoadingComponent = (v?: FootprintVariant): Fallback => {
 
 const Auth = ({ variant }: FootprintAppearance) => {
   const Loading = getLoadingComponent(variant);
+  const observeCollector = useObserveCollector();
   useEffectOnce(() => {
     Logger.setupLogRocket('auth');
+    LogRocket.getSessionURL(logRocketSessionUrl => {
+      observeCollector.setAppContext({
+        logRocketSessionUrl,
+      });
+    });
   });
 
   return (
-    <ObserveCollectorProvider appName="component-auth">
-      <Suspense fallback={<Loading />}>
-        <AuthContainer variant={variant} fallback={<Loading />} />
-      </Suspense>
-    </ObserveCollectorProvider>
+    <Suspense fallback={<Loading />}>
+      <AuthContainer variant={variant} fallback={<Loading />} />
+    </Suspense>
   );
+};
+
+const AuthWithProvider = ({ variant }: FootprintAppearance) => {
+  <ObserveCollectorProvider appName="component-auth">
+    <Auth variant={variant} />
+  </ObserveCollectorProvider>;
 };
 
 export const getServerSideProps: GetServerSideProps = async ({
@@ -54,4 +68,4 @@ export const getServerSideProps: GetServerSideProps = async ({
   return { props: response };
 };
 
-export default Auth;
+export default AuthWithProvider;
