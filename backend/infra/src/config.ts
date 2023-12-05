@@ -8,8 +8,6 @@ export interface Config {
   rpId: string;
   workos: Workos;
   twilio: Twilio;
-  /// In prod, the dev credentials
-  twilioBackup?: Twilio;
   s3: S3;
   sendgrid: Sendgrid;
   sentryUrl: string;

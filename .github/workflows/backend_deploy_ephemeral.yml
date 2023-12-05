@@ -97,7 +97,7 @@ jobs:
 
   run_tests:
     name: 'ephemeral integration tests'
-    needs: [build_backend, deploy_ephemeral_stack]
+    needs: [deploy_ephemeral_stack]
     if: success()
     uses: ./.github/workflows/backend_remote_integration_tests.yml
     permissions:
@@ -109,7 +109,6 @@ jobs:
       waitForDeploy: true
       isPR: true
       environment: dev
-      expectedCommitHash: ${{ needs.build_backend.outputs.expectedServerVersion }}
     secrets:
       IT_PHONE_NUMBERS: ${{ secrets.IT_PHONE_NUMBERS }}
       IT_TWILIO_ACCOUNT_SID: ${{ secrets.IT_TWILIO_ACCOUNT_SID }}

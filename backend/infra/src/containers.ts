@@ -122,8 +122,6 @@ export abstract class ServiceContainers {
         secretsStore.workosSecretKey.arn,
         secretsStore.twilioApiKey.arn,
         secretsStore.twilioApiKeySecret.arn,
-        secretsStore.twilioApiKeyBackup.arn,
-        secretsStore.twilioApiKeySecretBackup.arn,
         secretsStore.sendgridApiKey.arn,
         secretsStore.idologyUsername.arn,
         secretsStore.idologyPassword.arn,
@@ -173,8 +171,6 @@ export abstract class ServiceContainers {
           workosSecretKey,
           twilioApiKey,
           twilioApiKeySecret,
-          twilioApiKeyBackup,
-          twilioApiKeySecretBackup,
           sendgridApiKey,
           idologyUsername,
           idologyPassword,
@@ -247,14 +243,6 @@ export abstract class ServiceContainers {
               {
                 name: 'TWILIO_API_KEY_SECRET',
                 valueFrom: twilioApiKeySecret,
-              },
-              {
-                name: 'TWILIO_API_KEY_BACKUP',
-                valueFrom: twilioApiKeyBackup,
-              },
-              {
-                name: 'TWILIO_API_KEY_SECRET_BACKUP',
-                valueFrom: twilioApiKeySecretBackup,
               },
               {
                 name: 'SENDGRID_API_KEY',
@@ -461,14 +449,6 @@ export abstract class ServiceContainers {
               {
                 name: 'TWILIO_PHONE_NUMBER',
                 value: constants.twilio.phoneNumber,
-              },
-              {
-                name: 'TWILIO_ACCOUNT_SID_BACKUP',
-                value: constants.twilioBackup?.accountSid || '',
-              },
-              {
-                name: 'TWILIO_PHONE_NUMBER_BACKUP',
-                value: constants.twilioBackup?.phoneNumber || '',
               },
               {
                 name: 'SENDGRID_FROM_EMAIL',

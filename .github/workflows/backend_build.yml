@@ -23,7 +23,6 @@ jobs:
     name: Extract commit hash
     runs-on: ubuntu-latest
     outputs:
-      expectedServerVersion: '${{ steps.constants.outputs.expectedServerVersion }}'
       apiComponentVersion: '${{ steps.constants.outputs.apiComponentVersion }}'
       enclaveComponentVersion: '${{ steps.constants.outputs.enclaveComponentVersion }}'
     steps:
