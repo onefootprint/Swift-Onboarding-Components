@@ -24,7 +24,6 @@ use db::models::user_timeline::UserTimeline;
 use db::models::workflow::NewWorkflowArgs;
 use db::models::workflow::Workflow;
 use db::models::workflow_request::WorkflowRequest;
-use macros::route_alias;
 use newtypes::ContactInfoKind;
 use newtypes::DbActor;
 use newtypes::DocumentConfig;
@@ -40,11 +39,6 @@ use newtypes::WorkflowTriggeredInfo;
 use paperclip::actix::{api_v2_operation, post, web};
 use std::collections::HashMap;
 
-#[route_alias(post(
-    "/entities/{fp_id}/trigger",
-    tags(EntityDetails, Entities, Deprecated),
-    description = "Trigger a workflow for the provided user."
-))]
 #[api_v2_operation(
     description = "Trigger a workflow for the provided user.",
     tags(EntityDetails, Entities, Private)

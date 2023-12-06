@@ -456,6 +456,7 @@ def identify_verify(
                 print(f"Trying {code}")
                 result = verify(code)
             except HttpError as e:
+                print("  Got error:", e)
                 if expected_error and expected_error in str(e):
                     # The specific error we expected to see was returned from verify - we can exit
                     return

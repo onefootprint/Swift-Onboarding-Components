@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "7a1cf44711e184e4b80d958aa2a0c050fd10825e"
+        "version": "e23a66c35d809dcca3c835521cd0e0aacbd4d73a"
     },
     "servers": [
         {
@@ -2397,6 +2397,14 @@
                         "description": "Embeds extra information in the d2p token to pass from the desktop to handoff session.\n NOTE: changes to this struct should be backwards-compatible since we may use this struct\n to deserialize old versions",
                         "type": "object",
                         "properties": {
+                            "l10n": {
+                                "type": "object",
+                                "properties": {
+                                    "locale": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
                             "opener": {
                                 "type": "string"
                             },
@@ -2458,6 +2466,14 @@
                         "description": "Embeds extra information in the d2p token to pass from the desktop to handoff session.\n NOTE: changes to this struct should be backwards-compatible since we may use this struct\n to deserialize old versions",
                         "type": "object",
                         "properties": {
+                            "l10n": {
+                                "type": "object",
+                                "properties": {
+                                    "locale": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
                             "opener": {
                                 "type": "string"
                             },

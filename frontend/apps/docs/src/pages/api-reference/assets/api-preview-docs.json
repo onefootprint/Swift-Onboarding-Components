@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "7a1cf44711e184e4b80d958aa2a0c050fd10825e"
+        "version": "e23a66c35d809dcca3c835521cd0e0aacbd4d73a"
     },
     "servers": [
         {
@@ -1426,6 +1426,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -1782,6 +1783,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -2138,6 +2140,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -2494,6 +2497,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -2850,6 +2854,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -3206,6 +3211,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -3562,6 +3568,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -3918,6 +3925,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -4274,6 +4282,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -4630,6 +4639,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -4986,6 +4996,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -5342,6 +5353,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -5698,6 +5710,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -6691,6 +6704,7 @@
                         "enum": [
                             "watchlist_hit_ofac",
                             "watchlist_hit_non_sdn",
+                            "watchlist_hit_warning",
                             "watchlist_hit_pep",
                             "adverse_media_hit",
                             "id_not_located",
@@ -7051,6 +7065,7 @@
                         "enum": [
                             "watchlist_hit_ofac",
                             "watchlist_hit_non_sdn",
+                            "watchlist_hit_warning",
                             "watchlist_hit_pep",
                             "adverse_media_hit",
                             "id_not_located",

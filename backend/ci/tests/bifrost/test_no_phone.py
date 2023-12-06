@@ -148,7 +148,7 @@ def test_trigger(no_phone_user):
     # Should not error because the user is missing phone (we should email them instead)
     # TODO: later could use something like mailtrap/mailslurp to strongly assert the email was sent
     post(
-        f"entities/{no_phone_user.fp_id}/trigger",
+        f"entities/{no_phone_user.fp_id}/triggers",
         dict(trigger=dict(kind="redo_kyc"), note="yo"),
         *no_phone_user.tenant.db_auths,
     )

@@ -58,7 +58,7 @@ def test_redo_kyc(
 
     def send_trigger():
         data = dict(trigger=dict(kind="redo_kyc"), note=note)
-        post(f"entities/{fp_id}/trigger", data, *sandbox_user.tenant.db_auths)
+        post(f"entities/{fp_id}/triggers", data, *sandbox_user.tenant.db_auths)
         body = get(f"entities/{fp_id}/timeline", None, *sandbox_user.tenant.db_auths)
         trigger_event = next(
             i["event"] for i in body if i["event"]["kind"] == "workflow_triggered"
@@ -141,7 +141,7 @@ def test_redo_kyc_with_generated_link(sandbox_tenant, twilio):
 
     # trigger RedoKYC
     data = dict(trigger=dict(kind="redo_kyc"), note="Flerp")
-    post(f"entities/{fp_id}/trigger", data, *sandbox_user.tenant.db_auths)
+    post(f"entities/{fp_id}/triggers", data, *sandbox_user.tenant.db_auths)
     body = get(f"entities/{fp_id}/timeline", None, *sandbox_user.tenant.db_auths)
     trigger_event = next(
         i["event"] for i in body if i["event"]["kind"] == "workflow_triggered"
@@ -169,11 +169,11 @@ def test_redo_kyc_with_generated_link(sandbox_tenant, twilio):
     )
     bifrost.run()
 
-    # Make sure the initial auth token can't be used to make another Workflow.
+    # Make sure the token can't be used to make another Workflow.
     # Re-log in using the same auth token
-    # auth_token = step_up_user(twilio, initial_auth_token, live_phone_number, False)
-    post("hosted/onboarding", None, initial_auth_token)
-    body = get("hosted/onboarding/status", None, initial_auth_token)
+    # auth_token = step_up_user(twilio, initial_auth_token, phone_number, False)
+    post("hosted/onboarding", None, auth_token)
+    body = get("hosted/onboarding/status", None, auth_token)
     # Shouldn't even include a met collect_data requirement because we inherited the Workflow
     # that is already completed
     assert not any(i["kind"] == "collect_data" for i in body["all_requirements"])

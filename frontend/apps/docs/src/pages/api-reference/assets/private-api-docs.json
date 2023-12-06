@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "7a1cf44711e184e4b80d958aa2a0c050fd10825e"
+        "version": "e23a66c35d809dcca3c835521cd0e0aacbd4d73a"
     },
     "servers": [
         {
@@ -581,8 +581,7 @@
                         "in": "query",
                         "name": "cursor",
                         "schema": {
-                            "type": "integer",
-                            "format": "int64"
+                            "type": "integer"
                         },
                         "style": "form"
                     },
@@ -624,8 +623,7 @@
                                                 "next": {
                                                     "example": 1234,
                                                     "description": "The cursor to be provided in the next request to fetch the next page\n The `cursor` parameter to provide in order to request the next page of results",
-                                                    "type": "integer",
-                                                    "format": "int64"
+                                                    "type": "integer"
                                                 }
                                             }
                                         }
@@ -1911,7 +1909,7 @@
                 ]
             }
         },
-        "/entities/{fp_id}/trigger": {
+        "/entities/{fp_id}/triggers": {
             "post": {
                 "tags": [
                     "EntityDetails",
@@ -1947,6 +1945,53 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/entities/{fp_id}/triggers/{id}/link": {
+            "post": {
+                "tags": [
+                    "EntityDetails",
+                    "Entities",
+                    "Private"
+                ],
+                "description": "Trigger a workflow for the provided user.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TriggerLinkResponse"
                                 }
                             }
                         }
@@ -8908,6 +8953,10 @@
                             "business"
                         ]
                     },
+                    "last_activity_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
                     "ordering_id": {
                         "type": "integer",
                         "format": "int64"
@@ -8945,6 +8994,7 @@
                                     "enum": [
                                         "watchlist_hit_ofac",
                                         "watchlist_hit_non_sdn",
+                                        "watchlist_hit_warning",
                                         "watchlist_hit_pep",
                                         "adverse_media_hit",
                                         "id_not_located",
@@ -9262,6 +9312,7 @@
                     "is_created_via_api",
                     "is_portable",
                     "kind",
+                    "last_activity_at",
                     "ordering_id",
                     "requires_manual_review",
                     "start_timestamp"
@@ -9337,6 +9388,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -9693,6 +9745,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -10049,6 +10102,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -10405,6 +10459,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -10761,6 +10816,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -11117,6 +11173,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -11473,6 +11530,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -11829,6 +11887,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -12185,6 +12244,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -12541,6 +12601,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -12897,6 +12958,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -13253,6 +13315,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -13609,6 +13672,7 @@
                                             "enum": [
                                                 "watchlist_hit_ofac",
                                                 "watchlist_hit_non_sdn",
+                                                "watchlist_hit_warning",
                                                 "watchlist_hit_pep",
                                                 "adverse_media_hit",
                                                 "id_not_located",
@@ -17501,6 +17565,7 @@
                         "enum": [
                             "watchlist_hit_ofac",
                             "watchlist_hit_non_sdn",
+                            "watchlist_hit_warning",
                             "watchlist_hit_pep",
                             "adverse_media_hit",
                             "id_not_located",
@@ -17870,6 +17935,7 @@
                         "enum": [
                             "watchlist_hit_ofac",
                             "watchlist_hit_non_sdn",
+                            "watchlist_hit_warning",
                             "watchlist_hit_pep",
                             "adverse_media_hit",
                             "id_not_located",
@@ -18466,6 +18532,17 @@
                 },
                 "required": [
                     "onboarding_config_key"
+                ]
+            },
+            "TriggerLinkResponse": {
+                "type": "object",
+                "properties": {
+                    "link": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "link"
                 ]
             },
             "TriggerRequest": {

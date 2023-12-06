@@ -112,7 +112,7 @@ def test_get_users_filter_workflow_request(sandbox_user2):
     assert not any(i["id"] == sandbox_user2.fp_id for i in body["data"])
 
     data = dict(trigger=dict(kind="redo_kyc"), note="Flerp")
-    body = post(f"entities/{sandbox_user2.fp_id}/trigger", data, *tenant.db_auths)
+    body = post(f"entities/{sandbox_user2.fp_id}/triggers", data, *tenant.db_auths)
 
     filters = dict(has_outstanding_workflow_request="true")
     body = get("entities", filters, *tenant.db_auths)
