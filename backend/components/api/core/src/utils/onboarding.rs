@@ -14,7 +14,7 @@ use db::{
     },
     TxnPgConn,
 };
-use feature_flag::{BoolFlag, FeatureFlagClient};
+use feature_flag::FeatureFlagClient;
 use newtypes::{
     CollectedDataOption, DocumentRequestKind, EncryptedVaultPrivateKey, ObConfigurationKind, Selfie,
     VaultKind, VaultPublicKey, WorkflowId, WorkflowRequestId, WorkflowSource,
@@ -95,8 +95,7 @@ pub fn get_or_start_onboarding(
 
         if is_new_ob {
             create_doc_request_if_needed(conn, &wf, obc)?;
-            let can_create_prefill_data = ff_client.flag(BoolFlag::SavePrefillData(&sv.tenant_id));
-            if can_create_prefill_data && is_first_wf {
+            if is_first_wf {
                 // For the first WF created at this tenant, prefill portable data into this tenant.
                 // TODO: the goal is to do this for all WFs in the future. But it's simpler to
                 // start with only prefilling data once
