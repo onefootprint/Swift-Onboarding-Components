@@ -21,6 +21,7 @@ const LegalStatusSelect = ({ value }: LegalStatusSelectProps) => {
     <ValueContainer>
       <NativeSelect
         data-private
+        aria-label="Legal status"
         placeholder="Select"
         defaultValue={(value as string) || EMPTY_SELECT_VALUE}
         {...register(formField, {

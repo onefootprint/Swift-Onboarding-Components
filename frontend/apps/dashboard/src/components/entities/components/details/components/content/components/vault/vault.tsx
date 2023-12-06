@@ -39,36 +39,33 @@ const Vault = ({ entity }: VaultProps) => {
   ) => {
     const convertedData = {} as EditSubmitData;
     Object.keys(formData).forEach((key: string) => {
+      const di = `id.${key}` as DataIdentifier; // Currently only IdDI data is editable
       let value = formData[key];
       if (value === (EMPTY_SELECT_VALUE as VaultValue)) {
         value = null;
       }
-      if (key === editFormFieldName(IdDI.citizenships) && value) {
+      if (di === IdDI.citizenships && value) {
         value = (value as string).split(', ');
       }
 
-      const di = `id.${key}` as DataIdentifier; // Currently only IdDI data is editable
-      const wasDeleted = previousData && previousData[di] && !value;
       const stayedEmpty = (!previousData || !previousData[di]) && !value;
+      let wasDeleted = previousData && previousData[di] && !value;
+      const formCountry = formData[editFormFieldName(IdDI.country)];
+      const isIntl = formCountry && formCountry !== 'US';
+      if (!stayedEmpty && di === IdDI.state && isIntl) {
+        wasDeleted = true;
+      }
       let wasEdited =
         (previousData && previousData[di] !== value) ||
         ((!previousData || !previousData[di]) && value);
-      if (
-        key === editFormFieldName(IdDI.citizenships) &&
-        previousData &&
-        previousData[di]
-      ) {
+      if (di === IdDI.citizenships && previousData && previousData[di]) {
         wasEdited = JSON.stringify(previousData[di]) !== JSON.stringify(value);
       }
 
       if (wasDeleted) {
         convertedData[di] = null;
       } else if (!stayedEmpty && wasEdited) {
-        if (
-          (key === editFormFieldName(IdDI.visaExpirationDate) ||
-            key === editFormFieldName(IdDI.dob)) &&
-          value
-        ) {
+        if ((di === IdDI.visaExpirationDate || di === IdDI.dob) && value) {
           const dateParts = (value as string).split(/[-/]/);
           const year = dateParts[0];
           const month = dateParts[1];

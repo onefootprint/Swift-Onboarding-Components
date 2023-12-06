@@ -1,4 +1,3 @@
-import { COUNTRIES } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import { IdDI, type VaultValue } from '@onefootprint/types';
@@ -17,27 +16,32 @@ const ZipInput = ({ value }: ZipInputProps) => {
   const {
     register,
     watch,
+    getValues,
     formState: { errors },
   } = useFormContext();
   const formField = editFormFieldName(IdDI.zip);
   const hasError = !!errors[formField];
   const formCountryVal = watch(editFormFieldName(IdDI.country));
-  const country = COUNTRIES.find(entry => entry.value === formCountryVal);
-  const options =
-    country?.value === 'US'
-      ? { required: true, pattern: /^\d{5}$/ }
-      : { required: true };
 
   const getHint = () => {
     if (!hasError) {
-      return undefined;
+      return '';
     }
     const message = errors[formField]?.message;
     if (message && typeof message === 'string') {
       return message;
     }
-    if (errors[formField]?.type) {
-      return t(`${errors[formField]?.type}`);
+    return validateZip(getValues(formField));
+  };
+
+  const validateZip = (zip: string) => {
+    if (formCountryVal === 'US') {
+      if (!zip) {
+        return t('required');
+      }
+      if (!/^\d{5}$/.test(zip)) {
+        return t('pattern');
+      }
     }
     return undefined;
   };
@@ -50,9 +54,11 @@ const ZipInput = ({ value }: ZipInputProps) => {
         width="fit-content"
         placeholder=""
         defaultValue={value as string}
-        hasError={!!errors[formField]}
+        hasError={hasError}
         hint={getHint()}
-        {...register(formField, options)}
+        {...register(formField, {
+          validate: (zip: string) => validateZip(zip) === undefined,
+        })}
       />
     </ValueContainer>
   );

@@ -29,71 +29,70 @@ import {
   WatchlistCheckStatus,
 } from '@onefootprint/types';
 
+const decryptableAttributesFixture = [
+  IdDI.phoneNumber,
+  IdDI.email,
+  IdDI.firstName,
+  IdDI.middleName,
+  IdDI.lastName,
+  IdDI.country,
+  IdDI.addressLine1,
+  IdDI.ssn9,
+  IdDI.ssn4,
+  IdDI.dob,
+  IdDI.nationality,
+  IdDI.state,
+  IdDI.city,
+  IdDI.zip,
+  IdDI.usLegalStatus,
+  IdDI.citizenships,
+  IdDI.visaKind,
+  IdDI.visaExpirationDate,
+  InvestorProfileDI.occupation,
+  InvestorProfileDI.employmentStatus,
+  InvestorProfileDI.annualIncome,
+  InvestorProfileDI.netWorth,
+  InvestorProfileDI.riskTolerance,
+  InvestorProfileDI.investmentGoals,
+  InvestorProfileDI.declarations,
+  DocumentDI.finraComplianceLetter,
+  'card.primary.issuer',
+  'card.primary.number',
+  'card.primary.expiration',
+  'card.primary.cvc',
+  'card.primary.number_last4',
+  'card.primary.name',
+] as DataIdentifier[];
+
+const entityDataFixture = decryptableAttributesFixture
+  .map(di =>
+    di === IdDI.lastName
+      ? {
+          identifier: di,
+          source: '',
+          is_decryptable: true,
+          value: null,
+          transforms: { prefix_1: 'D' },
+        }
+      : {
+          identifier: di,
+          source: '',
+          is_decryptable: true,
+          value: null,
+          transforms: {},
+        },
+  )
+  .filter(attr => attr.identifier !== IdDI.middleName);
+
 export const entityFixture: Entity = {
   id: 'fp_id_wL6XIWe26cRinucZrRK1yn',
   isPortable: true,
   kind: EntityKind.person,
   requiresManualReview: false,
   status: EntityStatus.pass,
-  attributes: [
-    IdDI.phoneNumber,
-    IdDI.email,
-    IdDI.firstName,
-    IdDI.middleName,
-    IdDI.lastName,
-    IdDI.country,
-    IdDI.addressLine1,
-    IdDI.ssn9,
-    IdDI.ssn4,
-    IdDI.dob,
-    IdDI.nationality,
-    IdDI.state,
-    IdDI.city,
-    IdDI.zip,
-    InvestorProfileDI.occupation,
-    InvestorProfileDI.annualIncome,
-    InvestorProfileDI.netWorth,
-    InvestorProfileDI.riskTolerance,
-    InvestorProfileDI.investmentGoals,
-    InvestorProfileDI.declarations,
-    DocumentDI.finraComplianceLetter,
-    'card.primary.issuer',
-    'card.primary.number',
-    'card.primary.expiration',
-    'card.primary.cvc',
-    'card.primary.number_last4',
-    'card.primary.name',
-  ],
-  decryptableAttributes: [
-    IdDI.phoneNumber,
-    IdDI.email,
-    IdDI.firstName,
-    IdDI.middleName,
-    IdDI.lastName,
-    IdDI.country,
-    IdDI.addressLine1,
-    IdDI.ssn9,
-    IdDI.ssn4,
-    IdDI.dob,
-    IdDI.nationality,
-    IdDI.state,
-    IdDI.city,
-    IdDI.zip,
-    InvestorProfileDI.occupation,
-    InvestorProfileDI.annualIncome,
-    InvestorProfileDI.netWorth,
-    InvestorProfileDI.riskTolerance,
-    InvestorProfileDI.investmentGoals,
-    InvestorProfileDI.declarations,
-    DocumentDI.finraComplianceLetter,
-    'card.primary.issuer',
-    'card.primary.number',
-    'card.primary.expiration',
-    'card.primary.cvc',
-    'card.primary.number_last4',
-    'card.primary.name',
-  ],
-  data: [],
+  attributes: decryptableAttributesFixture,
+  decryptableAttributes: decryptableAttributesFixture,
+  data: entityDataFixture,
   startTimestamp: '2023-03-29T23:07:44.435194Z',
   lastActivityAt: '2023-03-27T14:43:47.444716Z',
   insightEvent: {
@@ -255,6 +254,13 @@ export const withRiskSignals = (entity = entityFixture, response = []) =>
     response,
   });
 
+export const withDocuments = (entity = entityFixture, response = []) =>
+  mockRequest({
+    method: 'get',
+    path: `/entities/${entity.id}/documents`,
+    response,
+  });
+
 export const withAuthEvents = (
   entity = entityFixture,
   response = livenessFixture,
@@ -277,6 +283,16 @@ export const withDecrypt = (
     },
   });
 
+export const withEdit = (
+  entityId: string,
+  response: Partial<Record<DataIdentifier, VaultValue>>,
+) =>
+  mockRequest({
+    method: 'patch',
+    path: `/entities/${entityId}/vault`,
+    response,
+  });
+
 export const withAnnotations = (entity = entityFixture, response = []) =>
   mockRequest({
     method: 'get',
@@ -295,6 +311,32 @@ export const getTextByRow = ({
 }) => {
   const row = within(container).getByRole('row', { name });
   return within(row).getByText(value, { exact: false });
+};
+
+export const getInputByRow = ({
+  name,
+  container,
+}: {
+  name: string;
+  container: HTMLElement;
+}) => {
+  const row = within(container).getByRole('row', { name });
+  return within(row).getByRole('textbox');
+};
+
+export const getSelectOptionByRow = ({
+  rowName,
+  optionName,
+  container,
+}: {
+  rowName: string;
+  optionName: string;
+  container: HTMLElement;
+}) => {
+  const row = within(container).getByRole('row', { name: rowName });
+  return within(row).getByRole('option', {
+    name: optionName,
+  }) as HTMLOptionElement;
 };
 
 export const decryptFields = async (fields: string[]) => {
@@ -336,7 +378,30 @@ export const decryptFields = async (fields: string[]) => {
   await selectEvents.select(trigger, 'Verifying customer identity');
 
   const submitButton = within(dialog).getByRole('button', {
-    name: 'Next',
+    name: 'Decrypt',
   });
   await userEvent.click(submitButton);
+};
+
+export const openEditView = async () => {
+  await waitFor(() => {
+    screen.getByRole('button', {
+      name: 'Open actions',
+    });
+  });
+  const actionsButton = screen.getByRole('button', {
+    name: 'Open actions',
+  });
+  await userEvent.click(actionsButton);
+
+  const dropdownItem = screen.getByText('Edit user information');
+  await userEvent.click(dropdownItem);
+
+  await waitFor(() => {
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+  });
+
+  await waitFor(() => {
+    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
+  });
 };

@@ -56,6 +56,7 @@ const VisaKindSelect = ({ value }: VisaKindSelectProps) => {
     <ValueContainer>
       <NativeSelect
         data-private
+        aria-label="Visa type"
         defaultValue={(value as string) || EMPTY_SELECT_VALUE}
         {...register(formField, {
           validate: (visaKindVal: string) =>
@@ -78,13 +79,13 @@ const VisaKindSelect = ({ value }: VisaKindSelectProps) => {
 
 const ValueContainer = styled.div`
   ${({ theme }) => css`
-    max-width: 181px;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     flex: 1;
     > select {
       height: ${theme.spacing[8]};
+      max-width: 181px;
     }
     > .fp-hint {
       text-align: right;

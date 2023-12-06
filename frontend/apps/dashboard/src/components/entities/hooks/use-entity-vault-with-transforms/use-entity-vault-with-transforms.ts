@@ -1,8 +1,9 @@
-import type {
-  DataIdentifier,
-  Entity,
-  EntityVault,
-  VaultValue,
+import {
+  type DataIdentifier,
+  type Entity,
+  type EntityVault,
+  IdDI,
+  type VaultValue,
 } from '@onefootprint/types';
 import type { Transforms } from '@onefootprint/types/src/data/entity';
 import type { QueryClient } from '@tanstack/react-query';
@@ -45,13 +46,19 @@ const useEntityVaultWithTransforms = (entityId: string, entity?: Entity) => {
       'vault',
     ]);
 
-    // BE uses null for empty data, but FE uses it for encrypted data
-    // So we convert null to undefined, which FE uses to designate empty data
     const newDataConverted = {} as Partial<Record<DataIdentifier, VaultValue>>;
     Object.keys(newData.vault).forEach((di: string) => {
       const newVal = newData.vault[di as DataIdentifier];
+
+      // BE uses null for empty data, but FE uses it for encrypted data
+      // So we convert null to undefined, which FE uses to designate empty data
       newDataConverted[di as DataIdentifier] =
         newVal === null ? undefined : newVal;
+
+      // BE automatically updates ssn4 if ssn9 is edited, reflect that on the FE
+      if (di === IdDI.ssn9 && newVal) {
+        newDataConverted[IdDI.ssn4] = (newVal as string).slice(-4);
+      }
     });
 
     const newVault = { ...prevData?.vault, ...newDataConverted };

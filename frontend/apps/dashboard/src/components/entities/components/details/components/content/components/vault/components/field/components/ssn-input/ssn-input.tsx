@@ -54,7 +54,7 @@ const SsnInput = ({ fieldName, fieldValue }: SsnInputProps) => {
         type="tel"
         value={getValues(fieldName)}
         {...register(formField, {
-          required: true,
+          required: !!fieldValue,
           pattern,
         })}
       />

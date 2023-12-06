@@ -18,6 +18,7 @@ const AddressCountrySelect = ({ value }: AddressCountrySelectProps) => {
     <ValueContainer>
       <NativeSelect
         data-private
+        aria-label="address country"
         placeholder="Select"
         defaultValue={value as string}
         {...register(formField, {
