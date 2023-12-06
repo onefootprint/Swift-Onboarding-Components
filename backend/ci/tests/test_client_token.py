@@ -76,7 +76,7 @@ def test_decrypt_reason(sandbox_user):
     assert access_event["reason"] == "Hayes valley2"
 
 
-def test_vault(sandbox_user):
+def test_vault(sandbox_user, sandbox_tenant):
     auth_token = client_token_with_scopes(
         sandbox_user,
         fields=["id.first_name", "id.last_name"],
@@ -85,6 +85,7 @@ def test_vault(sandbox_user):
 
     body = get(f"entities/client_token", None, auth_token)
     assert set(body["vault_fields"]) == set(["id.first_name", "id.last_name"])
+    assert body["tenant"]["name"] == sandbox_tenant.name
 
     data = {
         "id.first_name": "Hayes",

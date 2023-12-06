@@ -32,3 +32,17 @@ pub struct CreateClientTokenResponse {
     /// The time at which the token expires
     pub expires_at: DateTime<Utc>,
 }
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
+pub struct GetClientTokenResponse {
+    /// The list of fields that are allowed to be vaulted by this token
+    pub vault_fields: Vec<DataIdentifier>,
+    /// The time at which this token will expire.
+    pub expires_at: DateTime<Utc>,
+    pub tenant: GetClientTokenResponseTenant,
+}
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
+pub struct GetClientTokenResponseTenant {
+    pub name: String,
+}
