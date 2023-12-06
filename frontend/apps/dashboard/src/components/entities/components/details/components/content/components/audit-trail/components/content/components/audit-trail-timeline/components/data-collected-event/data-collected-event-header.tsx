@@ -7,32 +7,22 @@ import CdoTagList from 'src/components/cdo-tag-list';
 
 type DataCollectedEventHeaderProps = {
   data: CollectedDataEventData;
-  isFromOtherOrg?: boolean;
 };
 
-const DataCollectedEventHeader = ({
-  data,
-  isFromOtherOrg,
-}: DataCollectedEventHeaderProps) => {
+const DataCollectedEventHeader = ({ data }: DataCollectedEventHeaderProps) => {
   const { t } = useTranslation(
     'pages.entity.audit-trail.timeline.data-collected-event',
   );
   const { attributes } = data;
 
   let title = t('title');
-  if (isFromOtherOrg) {
-    title = t('title-from-other-org');
-  } else if (data.isPrefill) {
+  if (data.isPrefill) {
     title = t('title-prefill');
   }
 
   return (
     <Container data-testid="data-collected-event-header">
-      <Typography
-        variant="label-3"
-        color={isFromOtherOrg ? 'tertiary' : 'primary'}
-        sx={{ marginRight: 1 }}
-      >
+      <Typography variant="label-3" color="primary" sx={{ marginRight: 1 }}>
         {title}
       </Typography>
       <CdoTagList cdos={attributes} />

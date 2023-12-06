@@ -159,7 +159,6 @@ export type TimelineEvent = {
     | WorkflowTriggeredEvent
     | WorkflowStartedEvent;
   timestamp: string;
-  isFromOtherOrg?: boolean;
 };
 
 export type Timeline = TimelineEvent[];

@@ -1,5 +1,4 @@
 import type {
-  CollectedDataEventData,
   CombinedWatchlistChecksEvent,
   TimelineEvent,
   WatchlistCheckEvent,
@@ -13,7 +12,7 @@ export type AuditTrailTimelineEvent = Omit<TimelineEvent, 'timestamp'> & {
 
 const processWatchlistEvent = (
   combinedWatchlistChecksEvent: CombinedWatchlistChecksEvent,
-  bufferTimeline: (AuditTrailTimelineEvent | null)[],
+  bufferTimeline: AuditTrailTimelineEvent[],
   event: TimelineEvent,
   combinedWatchlistEventIndex: number,
   currIndex: number,
@@ -38,7 +37,6 @@ const processWatchlistEvent = (
     event: {
       ...newCombinedWatchlistCheckEvent,
     },
-    isFromOtherOrg: event.isFromOtherOrg,
     time: {
       timestamp: latestWatchlistEventTimestamp,
     },
@@ -60,58 +58,10 @@ const processWatchlistEvent = (
   };
 };
 
-const processNonWatchlistEvent = (
-  event: TimelineEvent,
-  bufferTimeline: (AuditTrailTimelineEvent | null)[],
-) => {
-  const isEventKycDataCollection =
-    event.event.kind === TimelineEventKind.dataCollected;
-  const lastEvent = bufferTimeline[bufferTimeline.length - 1];
-  const isLastEventKycDataCollection =
-    lastEvent?.event.kind === TimelineEventKind.dataCollected;
-  if (
-    // If the event is not from another tenant, or is not a kyc data collection event, add it as is
-    !event.isFromOtherOrg ||
-    !isEventKycDataCollection ||
-    // If this is the first event, add it as is
-    !bufferTimeline.length ||
-    // If the previously added event is not a kyc data collection event, add the current event as is
-    !lastEvent?.isFromOtherOrg ||
-    !isLastEventKycDataCollection
-  ) {
-    bufferTimeline.push({
-      event: event.event,
-      isFromOtherOrg: event.isFromOtherOrg,
-      time: {
-        timestamp: event.timestamp,
-      },
-    });
-    return;
-  }
-  // Merge times
-  if ('timestamp' in lastEvent.time) {
-    // Use the last event time as the end time to create a range since we get the events in descending order
-    lastEvent.time = {
-      start: event.timestamp,
-      end: lastEvent.time.timestamp,
-    };
-  } else {
-    // Just update the start rage
-    lastEvent.time.start = event.timestamp;
-  }
-  // Merge kyc data (id doc/selfie are not portable for now) & dedupe just in case
-  const eventData = event.event.data as CollectedDataEventData;
-  const lastEventData = lastEvent.event.data as CollectedDataEventData;
-  const mergedAttributes = Array.from(
-    new Set([...lastEventData.attributes, ...eventData.attributes]),
-  );
-  lastEventData.attributes = mergedAttributes;
-};
-
 const mergeAuditTrailTimelineEvents = (
   events: TimelineEvent[],
 ): AuditTrailTimelineEvent[] => {
-  let bufferTimeline: (AuditTrailTimelineEvent | null)[] = [];
+  let bufferTimeline: AuditTrailTimelineEvent[] = [];
   let combinedWatchlistEventIndex = -1;
   let combinedWatchlistChecksEvent: CombinedWatchlistChecksEvent = {
     kind: TimelineEventKind.combinedWatchlistChecks,
@@ -134,13 +84,15 @@ const mergeAuditTrailTimelineEvents = (
       return;
     }
 
-    processNonWatchlistEvent(event, bufferTimeline);
+    bufferTimeline.push({
+      event: event.event,
+      time: {
+        timestamp: event.timestamp,
+      },
+    });
   });
-  const mergedTimeline: AuditTrailTimelineEvent[] = bufferTimeline.filter(
-    event => event !== null,
-  ) as AuditTrailTimelineEvent[];
 
-  return mergedTimeline;
+  return bufferTimeline;
 };
 
 export default mergeAuditTrailTimelineEvents;

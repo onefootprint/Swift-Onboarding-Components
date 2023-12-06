@@ -100,7 +100,6 @@ export const timelineFixture: Timeline = [
       },
     },
     timestamp: '2023-04-05T11:16:13.599001Z',
-    isFromOtherOrg: false,
   },
   {
     event: {
@@ -134,7 +133,6 @@ export const timelineFixture: Timeline = [
       },
     },
     timestamp: '2023-04-05T11:17:06.776409Z',
-    isFromOtherOrg: false,
   },
 ];
 

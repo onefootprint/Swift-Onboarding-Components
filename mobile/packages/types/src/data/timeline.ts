@@ -116,7 +116,6 @@ export type TimelineEvent = {
     | FreeFormNoteEvent
     | CombinedWatchlistChecksEvent;
   timestamp: string;
-  isFromOtherOrg?: boolean;
 };
 
 export type Timeline = TimelineEvent[];

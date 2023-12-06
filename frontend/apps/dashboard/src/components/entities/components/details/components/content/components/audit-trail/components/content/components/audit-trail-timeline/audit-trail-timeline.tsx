@@ -2,7 +2,6 @@ import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoDownload16,
   IcoFileText16,
-  IcoLayer0116,
   IcoWarning16,
   IcoWriting16,
 } from '@onefootprint/icons';
@@ -83,7 +82,6 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
     const {
       event: { kind, data },
       time,
-      isFromOtherOrg,
     } = event;
 
     if (kind === TimelineEventKind.liveness) {
@@ -99,17 +97,8 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       if (eventData.attributes.length) {
         items.push({
           time,
-          iconComponent: isFromOtherOrg ? (
-            <IcoLayer0116 />
-          ) : (
-            <DataCollectedEventIcon data={eventData} />
-          ),
-          headerComponent: (
-            <DataCollectedEventHeader
-              data={eventData}
-              isFromOtherOrg={isFromOtherOrg}
-            />
-          ),
+          iconComponent: <DataCollectedEventIcon data={eventData} />,
+          headerComponent: <DataCollectedEventHeader data={eventData} />,
         });
       }
     } else if (kind === TimelineEventKind.idDocUploaded) {
