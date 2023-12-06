@@ -42,11 +42,11 @@ const Auth = ({ variant }: FootprintAppearance) => {
   );
 };
 
-const AuthWithProvider = ({ variant }: FootprintAppearance) => {
+const AuthWithProvider = ({ variant }: FootprintAppearance) => (
   <ObserveCollectorProvider appName="component-auth">
     <Auth variant={variant} />
-  </ObserveCollectorProvider>;
-};
+  </ObserveCollectorProvider>
+);
 
 export const getServerSideProps: GetServerSideProps = async ({
   query,
