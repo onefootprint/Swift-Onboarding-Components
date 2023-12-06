@@ -2,6 +2,7 @@
   "extends": "tsconfig/library.json",
   "compilerOptions": {
     "rootDir": ".",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "types": ["google.maps"]
   }
 }

@@ -15,6 +15,7 @@
   "devDependencies": {
     "@onefootprint/test-utils": "*",
     "@onefootprint/types": "*",
+    "@types/google.maps": "^3.54.10",
     "@types/lodash": "^4.14.194",
     "@types/react": "^18.2.8",
     "jest-expo": "^48.0.2",
