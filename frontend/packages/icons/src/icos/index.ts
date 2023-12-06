@@ -285,6 +285,8 @@ export { default as IcoSpinner24 } from './ico-spinner-24';
 export { default as IcoSpinner40 } from './ico-spinner-40';
 export { default as IcoSquareFrame16 } from './ico-square-frame-16';
 export { default as IcoSquareFrame24 } from './ico-square-frame-24';
+export { default as IcoSsnCard16 } from './ico-ssn-card-16';
+export { default as IcoSsnCard24 } from './ico-ssn-card-24';
 export { default as IcoStar16 } from './ico-star-16';
 export { default as IcoStar24 } from './ico-star-24';
 export { default as IcoStore16 } from './ico-store-16';
