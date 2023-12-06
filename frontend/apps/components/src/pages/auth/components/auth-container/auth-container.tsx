@@ -27,7 +27,6 @@ import type {
   Variant,
 } from '../../types';
 import sandboxIdEditRules from '../../utils/editable-sandbox-rules';
-import { isSdkUrlAllowed } from '../../utils/verify-allowed-domain';
 import AuthRouter from '../auth-router';
 import DashedLine from '../dashed-line';
 import Layout from '../layout';
@@ -85,11 +84,6 @@ const AuthContainer = ({
           title: t('notification.invalid-kind-title'),
           subtitle: t('notification.invalid-kind-description'),
         });
-      } else if (!isSdkUrlAllowed(fpProvider, authConfig?.allowedOrigins)) {
-        setNotification({
-          title: t('notification.invalid-domain-title'),
-          subtitle: t('notification.invalid-domain-description'),
-        });
       }
     },
     (error: unknown) => {
@@ -103,7 +97,7 @@ const AuthContainer = ({
   );
 
   const { options = voidObj, publicKey, userData, variant } = props || voidObj;
-  const fpProvider = useFootprintProvider();
+  const footprintProvider = useFootprintProvider();
 
   const { t } = useTranslation('pages.auth');
   const confirmationDialog = useConfirmationDialog();
@@ -122,8 +116,11 @@ const AuthContainer = ({
           {
             onError: onValidationTokenError,
             onSuccess: validationToken => {
-              fpProvider.send(FootprintPublicEvent.completed, validationToken);
-              fpProvider.send(FootprintPublicEvent.closed);
+              footprintProvider.send(
+                FootprintPublicEvent.completed,
+                validationToken,
+              );
+              footprintProvider.send(FootprintPublicEvent.closed);
             },
           },
         );
@@ -137,8 +134,8 @@ const AuthContainer = ({
           primaryButton: {
             label: t('yes'),
             onClick: () => {
-              fpProvider.send(FootprintPublicEvent.closed);
-              fpProvider.send(FootprintPublicEvent.canceled);
+              footprintProvider.send(FootprintPublicEvent.closed);
+              footprintProvider.send(FootprintPublicEvent.canceled);
             },
           },
         });

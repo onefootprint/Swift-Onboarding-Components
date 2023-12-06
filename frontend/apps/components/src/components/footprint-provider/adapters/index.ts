@@ -1,9 +1,13 @@
 import generateIframeAdapter from './generate-iframe-adapter';
 import generateWebViewAdapter from './generate-web-view-adapter';
 
+const IS_SSR = typeof window === 'undefined';
+
 const configureFootprint = () => {
-  const IS_SSR = typeof window === 'undefined';
-  return IS_SSR ? generateWebViewAdapter() : generateIframeAdapter();
+  if (IS_SSR) {
+    return generateWebViewAdapter();
+  }
+  return generateIframeAdapter();
 };
 
 export default configureFootprint;

@@ -1,7 +1,6 @@
-import type { WebViewAdapterReturn } from '../types';
+import type { FootprintClientGenerator } from '../types';
 
-const generateWebViewAdapter = (): WebViewAdapterReturn => {
-  let isAdapterLoaded: boolean = false;
+const generateWebViewAdapter: FootprintClientGenerator = () => {
   const getRedirectUrl = () => {
     const params = new URLSearchParams(document.location.search);
     return params.get('redirect_url');
@@ -15,17 +14,18 @@ const generateWebViewAdapter = (): WebViewAdapterReturn => {
     window.location.href = `${getRedirectUrl()}?${params.toString()}`;
   };
 
+  const load = (): Promise<void> => Promise.resolve();
+
+  const send = (event: string) => {
+    setLocation({ [event]: true });
+  };
+
+  const on = () => () => {};
+
   return {
-    getAdapterResponse: () => null,
-    getLoadingStatus: () => isAdapterLoaded,
-    load: () =>
-      Promise.resolve().then(() => {
-        isAdapterLoaded = true;
-      }),
-    on: () => () => {},
-    send: (event: string) => {
-      setLocation({ [event]: true });
-    },
+    on,
+    send,
+    load,
   };
 };
 
