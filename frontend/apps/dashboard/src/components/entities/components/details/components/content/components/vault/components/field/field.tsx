@@ -1,6 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import type { DataIdentifier, Entity, VaultValue } from '@onefootprint/types';
+import {
+  type DataIdentifier,
+  type Entity,
+  type VaultValue,
+} from '@onefootprint/types';
 import { Box, Checkbox, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';

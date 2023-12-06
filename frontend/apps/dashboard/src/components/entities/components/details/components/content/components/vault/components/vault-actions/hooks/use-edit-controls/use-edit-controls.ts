@@ -1,3 +1,4 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { useToast } from '@onefootprint/ui';
 import type { VaultType } from 'src/components/entities/hooks/use-entity-vault-with-transforms';
@@ -7,6 +8,7 @@ import { Event, State, useEditMachine } from '../../../edit-machine';
 import useEditFields from './hooks/use-edit-fields';
 
 const useEditControls = () => {
+  const { t } = useTranslation('pages.entity.edit');
   const [state, send] = useEditMachine();
   const { context } = state;
   const editFields = useEditFields();
@@ -42,6 +44,11 @@ const useEditControls = () => {
         onSuccess: () => {
           send(Event.editSucceeded);
           callbacks?.onSuccess?.({ vault: vaultData, transforms: {} });
+          toast.show({
+            description: t('success-toast.description'),
+            title: t('success-toast.title'),
+            variant: 'default',
+          });
         },
         onError: (error: unknown) => {
           send(Event.editFailed);
@@ -53,7 +60,7 @@ const useEditControls = () => {
           }
           toast.show({
             description: errorMessage,
-            title: 'Uh-oh!',
+            title: t('error-toast.title'),
             variant: 'error',
           });
           callbacks?.onError?.(error);

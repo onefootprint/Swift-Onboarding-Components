@@ -1,10 +1,13 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
+import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { IdDI, type VaultValue } from '@onefootprint/types';
 import { NativeSelect } from '@onefootprint/ui';
+import Hint from '@onefootprint/ui/src/components/internal/hint';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
+import EMPTY_SELECT_VALUE from '../../../../constants';
 import editFormFieldName from '../utils/edit-form-field-name';
 
 export type CountryOfBirthSelectProps = {
@@ -12,33 +15,73 @@ export type CountryOfBirthSelectProps = {
 };
 
 const CountryOfBirthSelect = ({ value }: CountryOfBirthSelectProps) => {
-  const { register } = useFormContext();
+  const { t } = useTranslation('pages.entity.edit');
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = useFormContext();
   const formField = editFormFieldName(IdDI.nationality);
+  const hasError = !!errors[formField];
+  const formLegalStatus = watch(editFormFieldName(IdDI.usLegalStatus));
+
+  const getHint = () => {
+    if (!hasError) {
+      return '';
+    }
+    const message = errors[formField]?.message;
+    if (message && typeof message === 'string') {
+      return message;
+    }
+    if (errors[formField]?.type === 'validate') {
+      return t(`errors.nationality`);
+    }
+    return '';
+  };
+
   return (
     <ValueContainer>
       <NativeSelect
         data-private
         placeholder="Select"
-        defaultValue={value as string}
+        defaultValue={(value as string) || EMPTY_SELECT_VALUE}
         {...register(formField, {
-          required: true,
+          validate: (input: string) => {
+            if (formLegalStatus !== EMPTY_SELECT_VALUE) {
+              return input !== EMPTY_SELECT_VALUE;
+            }
+            return true;
+          },
         })}
       >
+        <option value={EMPTY_SELECT_VALUE}>
+          {t('legal-status.nationality-mapping.none')}
+        </option>
         {COUNTRIES.map(country => (
-          <option value={country.value}>{country.label}</option>
+          <option key={country.value} value={country.value}>
+            {country.label}
+          </option>
         ))}
       </NativeSelect>
+      {hasError && <Hint hasError={hasError}>{getHint()}</Hint>}
     </ValueContainer>
   );
 };
 
 const ValueContainer = styled.div`
   ${({ theme }) => css`
-    height: ${theme.spacing[8]};
+    max-width: 278px;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-  `}
+    flex: 1;
+    > select {
+      height: ${theme.spacing[8]};
+    }
+    > .fp-hint {
+      text-align: right;
+    }
+  `};
 `;
 
 export default CountryOfBirthSelect;

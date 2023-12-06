@@ -13,7 +13,6 @@ import { DocumentDI, IdDI, InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
 
 import type { Fieldset } from '../../../../vault.types';
-import Field from '../../../field';
 import Citizenships from './components/citizenships';
 import CountryOfBirth from './components/country-of-birth';
 import Nationality from './components/nationality';
@@ -122,16 +121,6 @@ const useFieldsets = (excludeNationality?: boolean): Fieldset => {
         },
         {
           di: IdDI.visaExpirationDate,
-          renderCustomField: ({
-            di,
-            entity,
-          }: {
-            di: DataIdentifier;
-            entity: Entity;
-          }) =>
-            entity.attributes.includes(IdDI.visaExpirationDate) ? (
-              <Field di={di} entity={entity} />
-            ) : null,
         },
       ],
     },

@@ -24,7 +24,9 @@ const ZipInput = ({ value }: ZipInputProps) => {
   const formCountryVal = watch(editFormFieldName(IdDI.country));
   const country = COUNTRIES.find(entry => entry.value === formCountryVal);
   const options =
-    country?.value === 'US' ? { required: true, pattern: /^\d{5}$/ } : {};
+    country?.value === 'US'
+      ? { required: true, pattern: /^\d{5}$/ }
+      : { required: true };
 
   const getHint = () => {
     if (!hasError) {

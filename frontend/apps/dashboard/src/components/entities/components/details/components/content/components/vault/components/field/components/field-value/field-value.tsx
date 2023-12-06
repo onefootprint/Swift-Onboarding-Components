@@ -12,13 +12,17 @@ import { FieldOrPlaceholder } from 'src/components';
 
 import AddressCountrySelect from '../address-country-select';
 import AddressLineInput from '../address-line-input';
+import CitizenshipsInput from '../citizenships-input';
 import CityInput from '../city-input';
 import CountryOfBirthSelect from '../country-of-birth-select/country-of-birth-select';
 import DobInput from '../dob-input';
 import EncryptedInput from '../encrypted-input/encrypted-input';
+import LegalStatusSelect from '../legal-status-select';
 import NameInput from '../name-input';
 import SsnInput from '../ssn-input';
 import StateSelect from '../state-select';
+import VisaExpirationInput from '../visa-expiration-input';
+import VisaKindSelect from '../visa-kind-select';
 import ZipInput from '../zip-input';
 
 export type FieldValueProps = {
@@ -89,16 +93,31 @@ const FieldValue = ({ field, renderValue }: FieldValueProps) => {
     if (name === IdDI.zip) {
       return <ZipInput value={value} />;
     }
+
+    if (name === IdDI.usLegalStatus) {
+      return <LegalStatusSelect value={value} />;
+    }
     if (name === IdDI.nationality) {
       return <CountryOfBirthSelect value={value} />;
     }
+    if (name === IdDI.visaKind) {
+      return <VisaKindSelect value={value} />;
+    }
+    if (name === IdDI.visaExpirationDate) {
+      return <VisaExpirationInput value={value} />;
+    }
+    if (name === IdDI.citizenships) {
+      return <CitizenshipsInput citizenships={value as string[] | undefined} />;
+    }
   }
 
-  return renderValue ? (
-    (renderValue(value, isVaultDataDecrypted(value)) as JSX.Element)
-  ) : (
-    <FieldOrPlaceholder data={value} transforms={transforms as Transforms} />
-  );
+  if (isVaultDataEmpty(value) || !renderValue) {
+    return (
+      <FieldOrPlaceholder data={value} transforms={transforms as Transforms} />
+    );
+  }
+
+  return renderValue(value, isVaultDataDecrypted(value)) as JSX.Element;
 };
 
 export default FieldValue;

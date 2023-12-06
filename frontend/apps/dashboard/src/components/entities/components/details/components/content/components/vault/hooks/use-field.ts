@@ -33,22 +33,13 @@ const useField = (entity: Entity) => {
   };
 
   const canEditField = (di: DataIdentifier) => {
-    const isMaybeVerified = di === IdDI.email || di === IdDI.phoneNumber;
-    const isLegalStatusRelated = [
-      IdDI.usLegalStatus,
-      IdDI.visaKind,
-      IdDI.visaExpirationDate,
-      IdDI.citizenships,
-    ].includes(di as IdDI);
-    if (isMaybeVerified || isLegalStatusRelated) {
+    if (di === IdDI.email || di === IdDI.phoneNumber) {
       return false;
     }
-
-    // Don't allow ssn4 edits if there's also an ssn9. BE updates both when ssn9 is changed and errors if only ssn4 is updated.
+    // BE updates both ssn4 and ssn9 when ssn9 is changed and errors if only ssn4 is updated
     if (di === IdDI.ssn4) {
       return !entityVaultWithTransforms.data?.vault[IdDI.ssn9];
     }
-
     return di.startsWith('id');
   };
 

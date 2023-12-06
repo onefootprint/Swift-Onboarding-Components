@@ -1,10 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import type { DataIdentifier, Entity } from '@onefootprint/types';
-import {
-  IdDI,
-  isVaultDataDecrypted,
-  isVaultDataText,
-} from '@onefootprint/types';
+import { isVaultDataDecrypted, isVaultDataText } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import { EncryptedCell } from 'src/components';
@@ -18,7 +14,7 @@ export type UsLegalStatusType = {
 
 const UsLegalStatus = ({ di, entity }: UsLegalStatusType) => {
   const { t } = useTranslation('pages.user.vault');
-  return entity.attributes.includes(IdDI.usLegalStatus) ? (
+  return (
     <Field
       di={di}
       entity={entity}
@@ -33,7 +29,7 @@ const UsLegalStatus = ({ di, entity }: UsLegalStatusType) => {
         return <EncryptedCell />;
       }}
     />
-  ) : null;
+  );
 };
 
 export default UsLegalStatus;

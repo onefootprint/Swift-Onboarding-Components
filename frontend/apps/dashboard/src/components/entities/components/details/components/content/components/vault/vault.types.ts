@@ -11,7 +11,7 @@ export type DecryptFormData = Partial<
   Record<DataIdentifier, boolean | VaultEncryptedData | VaultEmptyData>
 >;
 
-export type EditFormData = Record<string, Record<string, VaultValue>>;
+export type EditFormData = Record<string, VaultValue>;
 
 export type EditSubmitData = Partial<Record<DataIdentifier, VaultValue>>;
 

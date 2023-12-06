@@ -86,6 +86,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
             }
             size="small"
             type="submit"
+            loading={!!editControls.isLoading}
           >
             {decryptControls.inProgress ? allT('next') : allT('save')}
           </Button>

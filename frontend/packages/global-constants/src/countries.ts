@@ -444,8 +444,8 @@ export const COUNTRIES: CountryRecord[] = [
   },
   {
     label: 'Congo (Democratic Republic)',
-    value: 'CG',
-    value3: 'COG',
+    value: 'CD',
+    value3: 'COD',
     passport: true,
     idCard: false,
     driversLicense: false,
@@ -1533,8 +1533,8 @@ export const COUNTRIES: CountryRecord[] = [
   },
   {
     label: 'Palestine (State of)',
-    value: 'PW',
-    value3: 'PLW',
+    value: 'PS',
+    value3: 'PSE',
     passport: true,
     idCard: false,
     driversLicense: false,
@@ -1808,8 +1808,8 @@ export const COUNTRIES: CountryRecord[] = [
   },
   {
     label: 'Sint Maarten',
-    value: 'SG',
-    value3: 'SGP',
+    value: 'SX',
+    value3: 'SXM',
     passport: false,
     idCard: false,
     driversLicense: false,
@@ -2182,7 +2182,7 @@ export const COUNTRIES: CountryRecord[] = [
   },
   {
     label: 'Venezuela',
-    value: 'VU',
+    value: 'VE',
     value3: 'VEN',
     passport: true,
     idCard: false,

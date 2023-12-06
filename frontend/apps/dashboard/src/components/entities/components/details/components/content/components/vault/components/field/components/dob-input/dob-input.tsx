@@ -40,6 +40,9 @@ const DobInput = ({ value }: DobInputProps) => {
     if (errors[formField]?.type === 'required') {
       return t('required');
     }
+    if (errors[formField]?.type === 'pattern') {
+      return t('pattern');
+    }
     const validationError = validateDob(getValues(formField));
     return errorByValidationError[
       validationError ?? DobValidationError.INVALID
@@ -52,13 +55,15 @@ const DobInput = ({ value }: DobInputProps) => {
         data-private
         size="compact"
         width="fit-content"
-        placeholder=""
+        placeholder="YYYY-MM-DD"
         hasError={hasError}
         hint={getHint()}
         defaultValue={value as string}
         inputMode="numeric"
         {...register(formField, {
           required: true,
+          // YYYY-MM-DD or YYYY/MM/DD
+          pattern: /^(?:\d{4}[-/]\d{2}[-/]\d{2})$/,
           validate: (dobVal: string) => !validateDob(dobVal),
         })}
       />
