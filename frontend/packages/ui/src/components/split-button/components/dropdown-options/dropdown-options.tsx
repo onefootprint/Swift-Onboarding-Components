@@ -30,7 +30,7 @@ const DropdownOptions = ({
   onOptionChange,
 }: DropdownOptionsProps) => (
   <DropdownPrimitive.Root>
-    <Trigger variant={variant} loading={loading} disabled={disabled}>
+    <Trigger variant={variant} data-loading={loading} disabled={disabled}>
       <Divider variant={variant} />
       <IcoChevronDown16 color={variant === 'primary' ? 'quinary' : 'primary'} />
     </Trigger>
@@ -93,9 +93,8 @@ const Item = styled(DropdownPrimitive.Item)`
 
 const Trigger = styled(DropdownPrimitive.Trigger)<{
   variant: ButtonVariant;
-  loading?: boolean;
 }>`
-  ${({ theme, variant, loading }) => {
+  ${({ theme, variant }) => {
     const { button } = theme.components;
 
     return css`
@@ -127,8 +126,7 @@ const Trigger = styled(DropdownPrimitive.Trigger)<{
         color: ${button.variant[variant].active.color};
       }
 
-      ${loading &&
-      css`
+      &[data-loading='true'] {
         background-color: ${button.variant[variant].loading.bg};
         color: ${button.variant[variant].loading.color};
         pointer-event: none;
@@ -136,7 +134,7 @@ const Trigger = styled(DropdownPrimitive.Trigger)<{
         path {
           fill: ${button.variant[variant].loading.color};
         }
-      `}
+      }
 
       &:disabled {
         cursor: initial;
