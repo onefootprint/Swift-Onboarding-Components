@@ -26,9 +26,11 @@ describe('<FormBase />', () => {
     onClose,
   }: Partial<FormBaseProps>) => {
     const footprint = {
+      getAdapterResponse: jest.fn(),
+      getLoadingStatus: jest.fn(),
+      load: jest.fn(),
       on: jest.fn(),
       send: jest.fn(),
-      load: jest.fn(),
     };
 
     return render(

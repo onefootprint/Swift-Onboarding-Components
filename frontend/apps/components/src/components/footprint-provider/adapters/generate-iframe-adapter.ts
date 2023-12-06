@@ -1,51 +1,49 @@
 import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
 import Postmate from '@onefootprint/postmate';
 
-import type { FootprintClientGenerator } from '../types';
+import type { CustomChildAPI, IframeAdapterReturn } from '../types';
 import generateEventEmitter from '../utils/generate-event-emitter';
 
-const generateIframeAdapter: FootprintClientGenerator = () => {
-  let postmate: Postmate.ChildAPI | null = null;
+const generateIframeAdapter = (): IframeAdapterReturn => {
+  let isAdapterLoaded: boolean = false;
+  let postmateChildApiRef: CustomChildAPI | null = null;
   const eventEmitter = generateEventEmitter();
 
-  const load = async () => {
-    postmate = await new Postmate.Model({
-      [FootprintPrivateEvent.propsReceived]: (data?: unknown) => {
-        eventEmitter.emit(FootprintPrivateEvent.propsReceived, data);
-      },
-      [FootprintPrivateEvent.formSaved]: () => {
-        eventEmitter.emit(FootprintPrivateEvent.formSaved);
-      },
-    });
-    start();
-  };
-
-  const send = (event: string, data?: unknown) => {
-    sendEventToParent(event, data);
-  };
-
-  const start = () => {
-    sendEventToParent(FootprintPrivateEvent.started);
-  };
-
-  const on = (name: string, callback: (data?: unknown) => void) =>
-    eventEmitter.on(name, callback);
-
-  const sendEventToParent = (eventName: string, data?: unknown) => {
-    if (postmate) {
-      postmate.emit(eventName, data);
-    } else {
-      // eslint-disable-next-line no-console
-      console.warn(
-        `Footprint.js must be initialized in order to dispatch the event "${eventName}"`,
-      );
-    }
-  };
-
   return {
-    load,
-    send,
-    on,
+    getAdapterResponse: () => postmateChildApiRef,
+    getLoadingStatus: () => isAdapterLoaded,
+    on: eventEmitter.on,
+    load: async (): Promise<CustomChildAPI | null> => {
+      if (isAdapterLoaded) {
+        return Promise.resolve(postmateChildApiRef);
+      }
+
+      const { propsReceived, formSaved, started } = FootprintPrivateEvent;
+      const crossContextModel = {
+        [formSaved]: () => eventEmitter.emit(formSaved),
+        [propsReceived]: (data?: unknown) =>
+          eventEmitter.emit(propsReceived, data),
+      };
+
+      try {
+        postmateChildApiRef = await new Postmate.Model(crossContextModel);
+        postmateChildApiRef.emit(started);
+        isAdapterLoaded = true;
+
+        return postmateChildApiRef;
+      } catch (err) {
+        isAdapterLoaded = true;
+        console.error('Footprint.js handshake reply failed', err);
+
+        return null;
+      }
+    },
+    send: (name: string, data?: unknown): void =>
+      postmateChildApiRef
+        ? postmateChildApiRef.emit(name, data)
+        : console.warn(
+            `Footprint.js must be initialized in order to dispatch the event "${name}"`,
+          ),
   };
 };
 
