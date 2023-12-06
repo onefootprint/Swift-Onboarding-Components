@@ -141,6 +141,13 @@ config:
       authToken:
         secure: v1:EB18OjkgS2mqtf8b:ZZXYDnFMxA/wEoYGA40l7yBLtMB7MsZFCbMg402qqSuY9faTZ4AM7yV0i9zOc8MTh8kbAOoI
     twilio:
+      accountSid: ACa14b32002b6d99a8e6c3e5c6344a00ca
+      apiKey:
+        secure: v1:Md3FtwNwl+7bxKrr:ihwacs4t71LgGl8FlkIdS4XuCKbyvVEkaNmUku27OFcThcrr87SuH9GLz1RiTvezia4=
+      apiKeySecret:
+        secure: v1:6Sct1OQ1Y3A0QapO:dA7CqK0HR3NsmSDgJAR/kicJY7+i7k5KLfugEoCHIn1MqTsQ6BFOv0qKbqVWWT27
+      phoneNumber: '+14152129648'
+    twilioBackup:
       accountSid: AC675cd7f6557fb29b4fd3483fe49f6ff0
       apiKey:
         secure: v1:g/Buavshjo4oCE/9:iYXVkuHQxY8XO4HFDPvM69p/Xph/A6VZoYYtwgYJmN7Ofh9mwWxMUQAdl9cmckt25gM=

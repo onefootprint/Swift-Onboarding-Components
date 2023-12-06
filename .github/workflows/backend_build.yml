@@ -11,6 +11,9 @@ on:
         required: true
 
     outputs:
+      expectedServerVersion:
+        description: 'api container version'
+        value: ${{ jobs.extract_commit.outputs.expectedServerVersion }}
       apiComponentVersion:
         description: 'api container version'
         value: ${{ jobs.extract_commit.outputs.apiComponentVersion }}
@@ -23,9 +26,11 @@ jobs:
     name: Extract commit hash
     runs-on: ubuntu-latest
     outputs:
+      expectedServerVersion: '${{ steps.constants.outputs.expectedServerVersion }}'
       apiComponentVersion: '${{ steps.constants.outputs.apiComponentVersion }}'
       enclaveComponentVersion: '${{ steps.constants.outputs.enclaveComponentVersion }}'
     steps:
+      # Need to checkout before running the referenced sub-action
       - uses: actions/checkout@v3
       - uses: ./.github/actions/backend_extract_commit_hash
         id: constants

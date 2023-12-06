@@ -7,7 +7,10 @@ use crate::{
     fingerprinter::AwsHmacClient,
     metrics::Metrics,
     s3,
-    utils::{email::SendgridClient, sms::SmsClient},
+    utils::{
+        email::SendgridClient,
+        sms::{SmsClient, TwilioConfig},
+    },
     vendor_clients::VendorClients,
     GIT_HASH,
 };
@@ -126,7 +129,9 @@ impl State {
 
         let enclave_client = EnclaveClient::new(config.clone()).await;
 
-        let shared_config = aws_config::defaults(aws_config::BehaviorVersion::v2023_11_09()).load().await;
+        let shared_config = aws_config::defaults(aws_config::BehaviorVersion::v2023_11_09())
+            .load()
+            .await;
         let s3_client = s3::S3Client {
             client: aws_sdk_s3::Client::new(&shared_config),
         };
@@ -139,14 +144,25 @@ impl State {
 
         let workos_client = WorkOs::new(&ApiKey::from(config.workos_api_key.as_str()));
 
+        let twilio = TwilioConfig {
+            account_sid: config.twilio_acount_sid.clone(),
+            api_key: config.twilio_api_key.clone(),
+            api_secret: config.twilio_api_key_secret.clone(),
+            source_phone_number: config.twilio_phone_number.clone(),
+        };
+        let twilio_backup = TwilioConfig {
+            account_sid: config.twilio_acount_sid_backup.clone(),
+            api_key: config.twilio_api_key_backup.clone(),
+            api_secret: config.twilio_api_key_secret_backup.clone(),
+            source_phone_number: config.twilio_phone_number_backup.clone(),
+        };
         let twilio_client = SmsClient::new(
-            config.twilio_acount_sid.clone(),
-            config.twilio_api_key.clone(),
-            config.twilio_api_key_secret.clone(),
-            config.twilio_phone_number.clone(),
+            twilio,
+            twilio_backup,
             config.time_s_between_sms_challenges,
             feature_flag_client.clone(),
-        );
+        )
+        .expect("failed to build SMS client");
 
         let sendgrid_client = SendgridClient::new(config.sendgrid_api_key.clone());
 

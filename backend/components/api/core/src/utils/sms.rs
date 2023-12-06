@@ -4,7 +4,7 @@ use tokio::sync::oneshot::{self, Receiver, Sender};
 use tracing::Instrument;
 
 use crate::{
-    errors::{challenge::ChallengeError, user::UserError, ApiError, ApiResult},
+    errors::{challenge::ChallengeError, user::UserError, ApiError, ApiResult, AssertionError},
     State,
 };
 use async_trait::async_trait;
@@ -13,7 +13,7 @@ use crypto::sha256;
 use db::models::tenant::Tenant;
 use feature_flag::{BoolFlag, FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use itertools::Itertools;
-use newtypes::{PhoneNumber, PiiString, VaultId};
+use newtypes::{Base64Data, PhoneNumber, PiiString, VaultId};
 use newtypes::{SandboxId, SessionId};
 
 use self::rate_limit::RateLimit;
@@ -33,6 +33,9 @@ pub struct SmsClient {
     duration_between_challenges: Duration,
     /// Twilio client
     pub twilio_client: twilio::Client,
+    /// In prod, we still load the dev twilio account's credentials in case we need to quickly fall
+    /// back for errors on the prod account.
+    pub twilio_client_backup: Option<twilio::Client>,
     /// AWS pinpoint SMS client
     pinpoint_client: aws_sdk_pinpointsmsvoicev2::Client,
     ff_client: LaunchDarklyFeatureFlagClient,
@@ -51,9 +54,11 @@ struct Message<'a> {
     client: &'a SmsClient,
 }
 
-struct Twilio<'a>(Message<'a>);
+#[derive(derive_more::Deref)]
+struct Twilio<'a>(#[deref] Message<'a>);
 
-struct Pinpoint<'a>(Message<'a>);
+#[derive(derive_more::Deref)]
+struct Pinpoint<'a>(#[deref] Message<'a>);
 
 #[async_trait]
 trait SmsVendor: Send + Sync {
@@ -65,10 +70,19 @@ trait SmsVendor: Send + Sync {
 impl<'a> SmsVendor for Twilio<'a> {
     #[tracing::instrument("Twilio::send", skip_all)]
     async fn send(&self) -> ApiResult<()> {
-        self.0
-            .client
-            .twilio_client
-            .send_message(self.0.destination.clone(), self.0.message.clone())
+        // Don't want to send raw phone number to twilio
+        let h_destination =
+            Base64Data::into_string_standard(sha256(self.destination.leak().as_bytes()).to_vec()).0;
+        let flag = BoolFlag::UseBackupTwilioCredentials(&h_destination);
+        let use_backup_twilio = self.client.ff_client.flag(flag);
+        tracing::info!(%use_backup_twilio, %h_destination, has_backup=%self.client.twilio_client_backup.is_some(), "Choosing twilio client");
+        let twilio_client = match (use_backup_twilio, self.client.twilio_client_backup.as_ref()) {
+            (true, Some(backup_client)) => backup_client,
+            _ => &self.client.twilio_client,
+        };
+
+        twilio_client
+            .send_message(self.destination.clone(), self.message.clone())
             .await?;
         Ok(())
     }
@@ -89,8 +103,8 @@ impl<'a> SmsVendor for Pinpoint<'a> {
             .send_text_message()
             // TODO change number based on environment
             .origination_identity("+17655634600".to_owned())
-            .destination_phone_number(self.0.destination.leak_to_string())
-            .message_body(self.0.message.leak_to_string())
+            .destination_phone_number(self.destination.leak_to_string())
+            .message_body(self.message.leak_to_string())
             .send()
             .await?;
         Ok(())
@@ -101,16 +115,44 @@ impl<'a> SmsVendor for Pinpoint<'a> {
     }
 }
 
+pub struct TwilioConfig {
+    pub account_sid: String,
+    pub api_key: String,
+    pub api_secret: String,
+    pub source_phone_number: String,
+}
+
+impl TwilioConfig {
+    fn make_client(self) -> Option<twilio::Client> {
+        let Self {
+            account_sid,
+            api_key,
+            api_secret,
+            source_phone_number,
+        } = self;
+        if account_sid.is_empty()
+            || api_key.is_empty()
+            || api_secret.is_empty()
+            || source_phone_number.is_empty()
+        {
+            return None;
+        }
+        let client = twilio::Client::new(account_sid, api_key, api_secret, source_phone_number);
+        Some(client)
+    }
+}
+
 impl SmsClient {
     pub fn new(
-        account_sid: String,
-        api_key: String,
-        api_secret: String,
-        source_phone_number: String,
+        twilio: TwilioConfig,
+        twilio_backup: TwilioConfig,
         time_s_between_challenges: i64,
         ff_client: LaunchDarklyFeatureFlagClient,
-    ) -> Self {
-        let client = twilio::Client::new(account_sid, api_key, api_secret, source_phone_number);
+    ) -> ApiResult<Self> {
+        let twilio_client = twilio
+            .make_client()
+            .ok_or(AssertionError("Unable to make twilio client"))?;
+        let twilio_client_backup = twilio_backup.make_client();
         // TODO stop hardcoding this
         // TODO also change the sending number based on environment
         let pinpoint_config = aws_config::SdkConfig::builder()
@@ -126,12 +168,14 @@ impl SmsClient {
             ))
             .build();
         let pinpoint_client = aws_sdk_pinpointsmsvoicev2::Client::new(&pinpoint_config);
-        Self {
+        let client = Self {
             duration_between_challenges: Duration::seconds(time_s_between_challenges),
-            twilio_client: client,
+            twilio_client,
+            twilio_client_backup,
             pinpoint_client,
             ff_client,
-        }
+        };
+        Ok(client)
     }
 
     #[tracing::instrument("SmsClient::send_message", skip_all)]

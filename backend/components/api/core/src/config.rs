@@ -54,15 +54,23 @@ pub struct Config {
 
     #[envconfig(from = "TWILIO_API_KEY")]
     pub twilio_api_key: String,
-
     #[envconfig(from = "TWILIO_ACCOUNT_SID")]
     pub twilio_acount_sid: String,
-
     #[envconfig(from = "TWILIO_API_KEY_SECRET")]
     pub twilio_api_key_secret: String,
-
     #[envconfig(from = "TWILIO_PHONE_NUMBER")]
     pub twilio_phone_number: String,
+
+    /// In prod, we have a separate set of credentials from a backup twilio account in case
+    /// there are problems
+    #[envconfig(from = "TWILIO_API_KEY_BACKUP", default = "")]
+    pub twilio_api_key_backup: String,
+    #[envconfig(from = "TWILIO_ACCOUNT_SID_BACKUP", default = "")]
+    pub twilio_acount_sid_backup: String,
+    #[envconfig(from = "TWILIO_API_KEY_SECRET_BACKUP", default = "")]
+    pub twilio_api_key_secret_backup: String,
+    #[envconfig(from = "TWILIO_PHONE_NUMBER_BACKUP", default = "")]
+    pub twilio_phone_number_backup: String,
 
     #[envconfig(from = "SENDGRID_API_KEY")]
     pub sendgrid_api_key: String,
