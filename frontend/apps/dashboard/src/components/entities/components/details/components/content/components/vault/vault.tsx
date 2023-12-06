@@ -32,15 +32,19 @@ const Vault = ({ entity }: VaultProps) => {
     previousData?: EntityVault,
   ) => {
     const convertedData = {} as EditSubmitData;
-    Object.keys(formData).forEach((diType: string) => {
-      const diObj = formData[diType];
-      Object.keys(diObj).forEach((diName: string) => {
-        const di = `${diType}.${diName}` as DataIdentifier;
-        const value = diObj[diName];
-        if (!previousData || previousData[di] !== value) {
-          convertedData[di] = value;
-        }
-      });
+    Object.keys(formData).forEach((key: string) => {
+      const value = formData[key];
+      const di = `id.${key}` as DataIdentifier; // Currently only IdDI data is editable
+      const wasDeleted = previousData && previousData[di] && !value;
+      const stayedEmpty = (!previousData || !previousData[di]) && !value;
+      const wasEdited =
+        (previousData && previousData[di] !== value) ||
+        ((!previousData || !previousData[di]) && value);
+      if (wasDeleted) {
+        convertedData[di] = undefined;
+      } else if (!stayedEmpty && wasEdited) {
+        convertedData[di] = value;
+      }
     });
     return convertedData;
   };

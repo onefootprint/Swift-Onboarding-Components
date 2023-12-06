@@ -1,14 +1,13 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { DataIdentifier, Entity, VaultValue } from '@onefootprint/types';
-import { isVaultDataDecrypted } from '@onefootprint/types';
 import { Box, Checkbox, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { FieldOrPlaceholder } from 'src/components';
 
 import useField from '../../hooks/use-field';
 import { useDecryptControls } from '../vault-actions';
+import FieldValue from './components/field-value';
 
 export type FieldProps = {
   di: DataIdentifier;
@@ -76,11 +75,7 @@ const Field = ({
           )}
         </LabelContainer>
       )}
-      {renderValue ? (
-        renderValue(field.value, isVaultDataDecrypted(field.value))
-      ) : (
-        <FieldOrPlaceholder data={field.value} transforms={field.transforms} />
-      )}
+      <FieldValue field={field} renderValue={renderValue} />
     </Container>
   );
 };
@@ -89,6 +84,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column wrap;
   justify-content: space-between;
+  align-items: center;
 `;
 
 const LabelContainer = styled.div`
@@ -108,4 +104,5 @@ const LabelAndStatusContainer = styled.div`
     align-items: center;
   `};
 `;
+
 export default Field;

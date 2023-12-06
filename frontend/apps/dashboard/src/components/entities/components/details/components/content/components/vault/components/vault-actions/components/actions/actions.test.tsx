@@ -8,6 +8,7 @@ import {
 } from '@onefootprint/test-utils';
 import React from 'react';
 
+import TestWrapper from '../../../utils/test-wrapper';
 import Actions from './actions';
 import {
   entityId,
@@ -22,9 +23,11 @@ const useRouterSpy = createUseRouterSpy();
 
 const renderActions = async (isNoPhone?: boolean) =>
   customRender(
-    <Actions
-      entity={isNoPhone ? entityWithoutPhoneFixture : entityWithPhoneFixture}
-    />,
+    <TestWrapper>
+      <Actions
+        entity={isNoPhone ? entityWithoutPhoneFixture : entityWithPhoneFixture}
+      />
+    </TestWrapper>,
   );
 
 describe('<Actions />', () => {

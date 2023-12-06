@@ -8,6 +8,7 @@ import type {
 import { Drawer, LinkButton, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
+import { useEditControls } from '../../../../../vault-actions';
 import { getDocumentStatus, getDocumentVersion } from '../../utils';
 import DocumentStatusBadge from '../document-status-badge';
 import ConfidenceScores from './components/confidence-scores';
@@ -33,6 +34,7 @@ const DocumentField = ({
   const [activeDocumentVersion, setActiveDocumentVersion] = useState(
     getDocumentVersion(documents[0], documents),
   );
+  const { inProgress: showEditView } = useEditControls();
   const documentStatus = getDocumentStatus({ documents, documentType });
 
   let currentDocument = documents.find(
@@ -56,9 +58,15 @@ const DocumentField = ({
           </Typography>
           {documentStatus && <DocumentStatusBadge status={documentStatus} />}
         </LabelContainer>
-        <LinkButton size="compact" onClick={show}>
-          {t('see-details')}
-        </LinkButton>
+        {showEditView ? (
+          <Typography variant="body-3" color="tertiary">
+            {t('cannot-edit')}
+          </Typography>
+        ) : (
+          <LinkButton size="compact" onClick={show}>
+            {t('see-details')}
+          </LinkButton>
+        )}
       </Inner>
       <Drawer
         closeAriaLabel={t('close-aria-label')}
@@ -93,6 +101,7 @@ const Inner = styled.div`
   display: flex;
   flex-direction: column wrap;
   justify-content: space-between;
+  align-items: center;
 `;
 
 const DrawerItems = styled.div`

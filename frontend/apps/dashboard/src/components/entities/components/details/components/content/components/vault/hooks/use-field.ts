@@ -33,21 +33,23 @@ const useField = (entity: Entity) => {
   };
 
   const canEditField = (di: DataIdentifier) => {
-    if (di.startsWith('document')) {
+    const isMaybeVerified = di === IdDI.email || di === IdDI.phoneNumber;
+    const isLegalStatusRelated = [
+      IdDI.usLegalStatus,
+      IdDI.visaKind,
+      IdDI.visaExpirationDate,
+      IdDI.citizenships,
+    ].includes(di as IdDI);
+    if (isMaybeVerified || isLegalStatusRelated) {
       return false;
     }
 
-    if (di.startsWith('id')) {
-      const isLegalStatusRelated = [
-        IdDI.usLegalStatus,
-        IdDI.visaKind,
-        IdDI.visaExpirationDate,
-        IdDI.citizenships,
-      ].includes(di as IdDI);
-      return !isLegalStatusRelated;
+    // Don't allow ssn4 edits if there's also an ssn9. BE updates both when ssn9 is changed and errors if only ssn4 is updated.
+    if (di === IdDI.ssn4) {
+      return !entityVaultWithTransforms.data?.vault[IdDI.ssn9];
     }
 
-    return false;
+    return di.startsWith('id');
   };
 
   const showEditView = editControls.inProgress;

@@ -1,4 +1,5 @@
 import {
+  createUseRouterSpy,
   customRender,
   screen,
   userEvent,
@@ -7,9 +8,14 @@ import {
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import React from 'react';
 
+import TestWrapper from '../../../../../utils/test-wrapper';
 import type { DocumentFieldProps } from './document-field';
 import DocumentField from './document-field';
-import driversLicensePartialDIs from './document-field.test.config';
+import driversLicensePartialDIs, {
+  entityId,
+} from './document-field.test.config';
+
+const useRouterSpy = createUseRouterSpy();
 
 const renderDocumentField = ({
   vault,
@@ -18,15 +24,27 @@ const renderDocumentField = ({
   documents,
 }: DocumentFieldProps) =>
   customRender(
-    <DocumentField
-      vault={vault}
-      label={label}
-      documentType={documentType}
-      documents={documents}
-    />,
+    <TestWrapper>
+      <DocumentField
+        vault={vault}
+        label={label}
+        documentType={documentType}
+        documents={documents}
+      />
+      ,
+    </TestWrapper>,
   );
 
 describe('<DocumentField />', () => {
+  beforeEach(() => {
+    useRouterSpy({
+      asPath: `/entities/${entityId}&mode=sandbox`,
+      pathname: '/users/[id]',
+      query: {
+        id: entityId,
+      },
+    });
+  });
   it('should properly open drawer', async () => {
     renderDocumentField({
       vault: driversLicensePartialDIs,
