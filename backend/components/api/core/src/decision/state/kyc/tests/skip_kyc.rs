@@ -7,6 +7,8 @@ use crate::decision::state::test_utils::{
 use crate::decision::state::{WorkflowActions, WorkflowWrapper};
 use crate::State;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
+use db::tests::MockFFClient;
+use feature_flag::BoolFlag;
 use macros::test_state_case;
 use newtypes::{
     CollectedDataOption as CDO, DocumentCdoInfo,
@@ -68,6 +70,12 @@ async fn collect_doc_skip_kyc(
 
     // MOCKING
     // No Idology/Experian KYC calls are mocked, we expect these to not be called because skip_kyc = true
+    let mut mock_ff_client = MockFFClient::new();
+    mock_ff_client.mock(|c| {
+        c.expect_flag()
+            .withf(move |f| matches!(f, BoolFlag::UseRulesEngineDecision(_)))
+            .return_const(true);
+    });
 
     // only Incode doc calls are mocked
     mock_incode_doc_collection(
@@ -99,6 +107,7 @@ async fn collect_doc_skip_kyc(
             ExpectedRequiresManualReview(expected_review.0),
         )],
     );
+    state.set_ff_client(mock_ff_client.into_mock());
 
     let _ww = ww
         .run(state, WorkflowActions::Authorize(Authorize {}))

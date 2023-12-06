@@ -21,7 +21,8 @@ use feature_flag::BoolFlag;
 use itertools::Itertools;
 use macros::test_state_case;
 use newtypes::{
-    DbActor, DecisionStatus, DocumentConfig, FootprintReasonCode, RiskSignalGroupKind, TenantId, VendorAPI,
+    CollectedDataOption as CDO, CountryRestriction, DbActor, DecisionStatus, DocTypeRestriction,
+    DocumentCdoInfo, DocumentConfig, FootprintReasonCode, RiskSignalGroupKind, Selfie, TenantId, VendorAPI,
     WorkflowSource,
 };
 use newtypes::{KycState, WorkflowState};
@@ -38,6 +39,15 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
         state,
         ObConfigurationOpts {
             is_live: user_kind.is_live(),
+            must_collect_data: vec![
+                CDO::PhoneNumber,
+                CDO::Ssn9,
+                CDO::Document(DocumentCdoInfo(
+                    DocTypeRestriction::None,
+                    CountryRestriction::None,
+                    Selfie::None,
+                )),
+            ],
             ..Default::default()
         },
         user_kind.fixture_result(),
@@ -67,7 +77,11 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
             .return_const(matches!(user_kind, UserKind::Demo));
     });
 
-    let mut expect_committed = true;
+    mock_ff_client.mock(|c| {
+        c.expect_flag()
+            .withf(move |f| matches!(f, BoolFlag::UseRulesEngineDecision(_)))
+            .return_const(true);
+    });
 
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
@@ -82,8 +96,6 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
                 true,
             )
             .await;
-            // we don't even look at KYC results for this
-            expect_committed = false;
         }
         // Mock vendor calls for Live users
         UserKind::Live => {
@@ -168,11 +180,7 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     let obd = obd.unwrap();
     assert!(obd.status == expected_status);
-    if expect_committed {
-        assert!(obd.seqno.is_some());
-    } else {
-        assert!(obd.seqno.is_none());
-    }
+    assert!(obd.seqno.is_some());
 
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert_eq!(doc_outcome.expected_onboarding_decision(), wf.status.unwrap());

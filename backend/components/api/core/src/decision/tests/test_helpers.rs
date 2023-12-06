@@ -17,6 +17,7 @@ use newtypes::{
 };
 
 use crate::{
+    decision::rule_engine,
     errors::ApiResult,
     tests::fixtures::lib::random_phone_number,
     utils::{
@@ -57,6 +58,8 @@ pub async fn create_user_and_onboarding(
         .db_transaction(move |conn| -> ApiResult<_> {
             let tenant = fixtures::tenant::create_with_keys(conn, pk, tenant_e_key);
             let ob_config = fixtures::ob_configuration::create_with_opts(conn, &tenant.id, obc_opts);
+            // TODO: need to rework our test utils so they use the same codepaths as our application logic to create things like OBC's and such
+            rule_engine::default_rules::save_default_rules_for_obc(conn, &ob_config, None).unwrap();
 
             let (uv, su) = create_user_and_populate_vault(conn, ob_config.clone(), kyc_fixture_result);
 

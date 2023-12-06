@@ -126,7 +126,7 @@ pub fn base_kyb_rules() -> Vec<(RuleExpression, RuleAction)> {
 #[tracing::instrument(skip_all)]
 pub fn default_rules_for_obc(
     obc: &ObConfiguration,
-    ff_client: Arc<dyn FeatureFlagClient>,
+    ff_client: Option<Arc<dyn FeatureFlagClient>>,
 ) -> Vec<(RuleExpression, RuleAction)> {
     let mut rules = vec![];
 
@@ -196,7 +196,11 @@ pub fn default_rules_for_obc(
         aml_risk_signals.into_iter().for_each(|rs| {
             rules.push((if_risk_signal(rs.clone()), RA::ManualReview));
 
-            if ff_client.flag(BoolFlag::StepUpOnAmlHit(&obc.key)) {
+            if ff_client
+                .clone()
+                .map(|ff| ff.flag(BoolFlag::StepUpOnAmlHit(&obc.key)))
+                .unwrap_or(false)
+            {
                 rules.push((if_risk_signal(rs), RA::StepUp));
             }
         });
@@ -219,7 +223,7 @@ pub fn default_rules_for_obc(
 pub fn save_default_rules_for_obc(
     conn: &mut TxnPgConn,
     obc: &ObConfiguration,
-    ff_client: Arc<dyn FeatureFlagClient>,
+    ff_client: Option<Arc<dyn FeatureFlagClient>>,
 ) -> ApiResult<()> {
     let existing_rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id)?;
     if !existing_rules.is_empty() {
@@ -295,7 +299,7 @@ mod tests {
 
         assert_have_same_elements(
             expected,
-            default_rules_for_obc(&obc, MockFFClient::new().into_mock()),
+            default_rules_for_obc(&obc, Some(MockFFClient::new().into_mock())),
         )
     }
 }

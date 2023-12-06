@@ -493,7 +493,7 @@ pub async fn post(
                 skip_confirm.unwrap_or(false),
             )?;
 
-            match rule_engine::default_rules::save_default_rules_for_obc(conn, &obc, ff_client) {
+            match rule_engine::default_rules::save_default_rules_for_obc(conn, &obc, Some(ff_client)) {
                 Ok(_) => {}
                 Err(err) => tracing::error!(?err, "Error saving default rules for Playbook"),
             }

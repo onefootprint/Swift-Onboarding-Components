@@ -20,7 +20,7 @@ pub async fn add_default_rules(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let (obc, _) = ObConfiguration::get(conn, &path.into_inner())?;
-            rule_engine::default_rules::save_default_rules_for_obc(conn, &obc, ff_client)
+            rule_engine::default_rules::save_default_rules_for_obc(conn, &obc, Some(ff_client))
         })
         .await?;
     EmptyResponse::ok().json()

@@ -1,4 +1,4 @@
-use newtypes::{incode::IncodeDocumentType, Vendor, VendorAPI, VerificationResultId};
+use newtypes::{incode::IncodeDocumentType, ObConfigurationId, Vendor, VendorAPI, VerificationResultId};
 
 pub mod biz_risk;
 pub mod engine;
@@ -54,4 +54,6 @@ pub enum RuleError {
     MissingInputForKYBRules,
     #[error("AssertionError {0}")]
     AssertionError(String),
+    #[error("No rules found for playbook {0}")]
+    NoRulesForPlaybook(ObConfigurationId),
 }

@@ -76,6 +76,8 @@ pub enum BoolFlag<'a> {
     AlsoEvaluateRulesEngine(&'a ObConfigurationKey),
     #[strum(to_string = "UseBackupTwilioCredentials")]
     UseBackupTwilioCredentials(&'a str),
+    #[strum(to_string = "UseRulesEngineDecision")]
+    UseRulesEngineDecision(&'a ObConfigurationKey),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -121,6 +123,7 @@ impl<'a> BoolFlag<'a> {
             Self::StepUpOnAmlHit(k) => Some(k.to_string()),
             Self::AlsoEvaluateRulesEngine(k) => Some(k.to_string()),
             Self::UseBackupTwilioCredentials(k) => Some(k.to_string()),
+            Self::UseRulesEngineDecision(k) => Some(k.to_string()),
         }
     }
 
@@ -162,6 +165,7 @@ impl<'a> BoolFlag<'a> {
             Self::StepUpOnAmlHit(_) => false,
             Self::AlsoEvaluateRulesEngine(_) => false,
             Self::UseBackupTwilioCredentials(_) => false,
+            Self::UseRulesEngineDecision(_) => false,
         }
     }
 }

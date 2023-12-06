@@ -27,7 +27,8 @@ use itertools::Itertools;
 use macros::test_state;
 use macros::test_state_case;
 use newtypes::{
-    DbActor, DecisionStatus, FootprintReasonCode, ObConfigurationKey, RiskSignalGroupKind, SignalSeverity,
+    CollectedDataOption as CDO, CountryRestriction, DbActor, DecisionStatus, DocTypeRestriction,
+    DocumentCdoInfo, FootprintReasonCode, ObConfigurationKey, RiskSignalGroupKind, Selfie, SignalSeverity,
     TenantId, VendorAPI, WorkflowConfig, WorkflowSource,
 };
 use newtypes::{KycConfig, OnboardingStatus};
@@ -178,7 +179,7 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
 
     mock_ff_client.mock(|c| {
         c.expect_flag()
-            .withf(move |f| matches!(f, BoolFlag::AlsoEvaluateRulesEngine(_)))
+            .withf(move |f| matches!(f, BoolFlag::UseRulesEngineDecision(_)))
             .return_const(true);
     });
 
@@ -366,10 +367,19 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: DocumentCollectionKind) {
     // DATA SETUP
+    let mut must_collect_data = vec![CDO::PhoneNumber, CDO::Ssn9];
+    match doc_collection_kind {
+        DocumentCollectionKind::DocumentRequested(_) => must_collect_data.push(CDO::Document(
+            DocumentCdoInfo(DocTypeRestriction::None, CountryRestriction::None, Selfie::None),
+        )),
+        DocumentCollectionKind::DocumentNotRequested => {}
+    }
+
     let (wf, tenant, obc, _tu) = setup_data(
         state,
         ObConfigurationOpts {
             is_live: user_kind.is_live(),
+            must_collect_data,
             ..Default::default()
         },
         user_kind.fixture_result(),
@@ -391,6 +401,12 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
             .times(3)
             .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
             .return_const(matches!(user_kind, UserKind::Demo));
+    });
+
+    mock_ff_client.mock(|c| {
+        c.expect_flag()
+            .withf(move |f| matches!(f, BoolFlag::UseRulesEngineDecision(_)))
+            .return_const(true);
     });
 
     match user_kind {
@@ -627,6 +643,12 @@ async fn redo_and_pass(
             .times(3)
             .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
             .return_const(matches!(user_kind, UserKind::Demo));
+    });
+
+    mock_ff_client.mock(|c| {
+        c.expect_flag()
+            .withf(move |f| matches!(f, BoolFlag::UseRulesEngineDecision(_)))
+            .return_const(true);
     });
 
     match user_kind {

@@ -73,6 +73,11 @@ async fn test(
             _ => f.default(),
         });
     });
+    mock_ff_client.mock(|c| {
+        c.expect_flag()
+            .withf(move |f| matches!(f, BoolFlag::UseRulesEngineDecision(_)))
+            .return_const(true);
+    });
 
     match kyc_call {
         VR::NotExpected => {}

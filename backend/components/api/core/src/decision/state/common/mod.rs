@@ -204,7 +204,7 @@ pub fn get_decision(
     wf: &Workflow,
     vault: &Vault,
 ) -> ApiResult<Decision> {
-    let (obc, tenant) = ObConfiguration::get(conn, &wf.id)?;
+    let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
     // later rules will come from Postgres itself
     let rule_group = match obc.cip_kind {
         Some(CipKind::Alpaca) => {
@@ -237,23 +237,28 @@ pub fn get_decision(
     engine::log_rule_evaluation(wf, &decision, decision::rule::CANONICAL_ONBOARDING_RULE_LINE);
     let decision = decision.decision;
 
-    if tenant.id.is_integration_test_tenant() || ff_client.flag(BoolFlag::AlsoEvaluateRulesEngine(&obc.key)) {
-        // If this is an integration test tenant or FF'd OBC, then we do a best effort attempt at evaluating rules using our new Rules Engine
-        match rule_engine::engine::evaluate_workflow_decision(
-            conn,
-            &wf.scoped_vault_id,
-            &obc.id,
-            Some(&wf.id),
-            RuleSetResultKind::WorkflowDecision,
-            risk_signals.risk_signals,
-            doc_collected,
-        ) {
-            Ok(rules_engine_decision) => {
-                tracing::info!(?rules_engine_decision, ?decision, "rules_engine_decision");
+    let decision = match rule_engine::engine::evaluate_workflow_decision(
+        conn,
+        &wf.scoped_vault_id,
+        &obc.id,
+        Some(&wf.id),
+        RuleSetResultKind::WorkflowDecision,
+        risk_signals.risk_signals,
+        doc_collected,
+    ) {
+        Ok(rules_engine_decision) => {
+            tracing::info!(?rules_engine_decision, ?decision, "rules_engine_decision");
+            if ff_client.flag(BoolFlag::UseRulesEngineDecision(&obc.key)) {
+                rules_engine_decision
+            } else {
+                decision
             }
-            Err(err) => tracing::error!(%err, "Error evaluating Rules Engine"),
         }
-    }
+        Err(err) => {
+            tracing::error!(?err, "Error evaluating Rules Engine");
+            decision
+        }
+    };
 
     Ok(decision)
 }

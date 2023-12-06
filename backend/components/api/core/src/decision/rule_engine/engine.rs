@@ -85,6 +85,9 @@ pub fn evaluate_rules(
 ) -> ApiResult<(RuleSetResult, Vec<RuleResult>)> {
     let (obc, _) = ObConfiguration::get(conn, obc_id)?;
     let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, obc_id)?;
+    if rules.is_empty() {
+        return Err(crate::decision::Error::from(RuleError::NoRulesForPlaybook(obc.id)).into());
+    }
 
     let (rule_results, action_triggered) = eval::evaluate_rule_set(
         rules,
