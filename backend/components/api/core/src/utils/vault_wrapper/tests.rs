@@ -329,10 +329,8 @@ fn test_user_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     assert!(!uvw.has_field(IDK::LastName));
     assert!(!uvw.has_field(IDK::Email));
 
-    // The UserTimeline events shouldn't be portable right now
     let timeline_events = UserTimeline::list(conn, &su.id, vec![]).unwrap();
     assert!(!timeline_events.is_empty());
-    assert!(!timeline_events.iter().any(|x| x.0.is_portable));
 
     // Commit
     let uvw = VaultWrapper::<Person>::lock_for_onboarding(conn, &su.id).unwrap();
@@ -379,10 +377,8 @@ fn test_business_vault_wrapper_add_fields(conn: &mut TestPgConn) {
     assert!(!uvw.has_field(BDK::Name));
     assert!(!uvw.has_field(BDK::PhoneNumber));
 
-    // The UserTimeline events shouldn't be portable right now
     let timeline_events = UserTimeline::list(conn, &sb.id, vec![]).unwrap();
     assert!(!timeline_events.is_empty());
-    assert!(!timeline_events.iter().any(|x| x.0.is_portable));
 
     // We never portablize business data, yet
 }

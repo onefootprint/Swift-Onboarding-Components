@@ -38,8 +38,6 @@ pub struct UserTimeline {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub vault_id: VaultId,
-    /// Designates whether the UserTimeline event can be seen by tenants other than the one that created it
-    pub is_portable: bool,
     pub event_kind: DbUserTimelineEventKind,
 }
 
@@ -50,7 +48,6 @@ pub struct NewUserTimeline {
     pub scoped_vault_id: ScopedVaultId,
     pub event: DbUserTimelineEvent,
     pub timestamp: DateTime<Utc>,
-    pub is_portable: bool,
     pub event_kind: DbUserTimelineEventKind,
 }
 
@@ -100,7 +97,6 @@ impl UserTimeline {
             scoped_vault_id,
             vault_id,
             timestamp: chrono::Utc::now(),
-            is_portable: false,
             event_kind,
         };
         diesel::insert_into(user_timeline::table)
@@ -122,13 +118,7 @@ impl UserTimeline {
         // Fetch all events for user vault to which this footprint_user_id belongs, and events
         // that belong to an onboarding for this tenant
         let mut query = user_timeline::table
-            .filter(user_timeline::vault_id.eq(&su.vault_id))
-            .filter(
-                user_timeline::scoped_vault_id
-                    .is_null()
-                    .or(user_timeline::scoped_vault_id.eq(&su.id))
-                    .or(user_timeline::is_portable),
-            )
+            .filter(user_timeline::scoped_vault_id.eq(&su.id))
             .into_boxed();
 
         if !kinds.is_empty() {

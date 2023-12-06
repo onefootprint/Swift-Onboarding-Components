@@ -1,0 +1,1 @@
+ALTER TABLE user_timeline ALTER COLUMN is_portable DROP DEFAULT;
