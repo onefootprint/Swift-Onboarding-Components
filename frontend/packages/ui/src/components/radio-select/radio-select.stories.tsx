@@ -27,6 +27,18 @@ export default {
       description: 'Event called after selecting an option',
       required: true,
     },
+    options: {
+      description: 'The options to be displayed',
+      required: true,
+    },
+    size: {
+      control: {
+        type: 'select',
+        options: ['compact', 'default'],
+      },
+      description: 'The size of the radio select',
+      required: true,
+    },
   },
 } as Meta;
 
@@ -73,8 +85,62 @@ const compactOptions = [
   },
 ];
 
+const groupedOptions = [
+  {
+    groupTitle: 'Group 1',
+    options: [
+      {
+        title: 'Item 1',
+        description: 'Description 1',
+        IconComponent: IcoBook24,
+        value: 'Item 1',
+      },
+      {
+        title: 'Item 2',
+        description: 'Description 2',
+        IconComponent: IcoHelp24,
+        value: 'Item 2',
+      },
+      {
+        title: 'Item 3',
+        description: 'Description 3',
+        IconComponent: IcoBook24,
+        value: 'Item 3',
+        disabled: true,
+        disabledHint: 'Disabled hint',
+      },
+    ],
+  },
+  {
+    groupTitle: 'Group 2',
+    options: [
+      {
+        title: 'Item 4',
+        description: 'Description 4',
+        IconComponent: IcoBook24,
+        value: 'Item 4',
+      },
+      {
+        title: 'Item 5',
+        description: 'Description 5',
+        IconComponent: IcoHelp24,
+        value: 'Item 5',
+      },
+      {
+        title: 'Item 6',
+        description: 'Description 6',
+        IconComponent: IcoBook24,
+        value: 'Item 6',
+        disabled: true,
+        disabledHint: 'Disabled hint',
+      },
+    ],
+  },
+];
+
 const Template: Story<RadioSelectProps> = ({
   value = 'Item 1',
+  options = defaultOptions,
   onChange,
   testID,
   size,
@@ -87,7 +153,7 @@ const Template: Story<RadioSelectProps> = ({
 
   return (
     <RadioSelect
-      options={size === 'compact' ? compactOptions : defaultOptions}
+      options={options}
       value={selectedValue}
       onChange={handleChange}
       testID={testID}
@@ -101,6 +167,7 @@ Default.args = {
   onChange: console.log, // eslint-disable-line no-console
   testID: 'radio-select-test-id',
   size: 'default',
+  options: defaultOptions,
 };
 
 export const Compact = Template.bind({});
@@ -108,4 +175,13 @@ Compact.args = {
   onChange: console.log, // eslint-disable-line no-console
   testID: 'radio-select-test-id',
   size: 'compact',
+  options: compactOptions,
+};
+
+export const Grouped = Template.bind({});
+Grouped.args = {
+  options: groupedOptions,
+  onChange: console.log, // eslint-disable-line no-console
+  testID: 'radio-select-test-id',
+  size: 'default',
 };

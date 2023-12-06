@@ -15,6 +15,11 @@ export type RadioSelectOptionFields = {
   disabledHint?: string;
 };
 
+export type GroupedRadioSelectOptionFields = {
+  groupTitle: string;
+  options: RadioSelectOptionFields[];
+};
+
 export type RadioSelectOptionProps = RadioSelectOptionFields & {
   onClick: () => void;
   selected: boolean;

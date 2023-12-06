@@ -25,6 +25,7 @@ describe('<RadioSelect />', () => {
         value: 'Item 2',
       },
     ];
+
     return customRender(
       <RadioSelect
         options={options}
@@ -61,6 +62,68 @@ describe('<RadioSelect />', () => {
         await userEvent.click(option);
         expect(onChangeMockFn).toHaveBeenCalled();
       });
+    });
+  });
+});
+
+describe('<GroupedRadioSelect />', () => {
+  const renderGroupedRadioSelect = ({
+    value,
+    testID,
+    onChange = () => {},
+  }: Partial<RadioSelectProps>) => {
+    const groupedOptions = [
+      {
+        groupTitle: 'Group 1',
+        options: [
+          {
+            title: 'Item 1',
+            description: 'Description 1',
+            IconComponent: IcoAndroid16,
+            value: 'Item 1',
+          },
+          {
+            title: 'Item 2',
+            description: 'Description 2',
+            IconComponent: IcoApple16,
+            value: 'Item 2',
+          },
+        ],
+      },
+      {
+        groupTitle: 'Group 2',
+        options: [
+          {
+            title: 'Item 3',
+            description: 'Description 3',
+            IconComponent: IcoAndroid16,
+            value: 'Item 3',
+          },
+          {
+            title: 'Item 4',
+            description: 'Description 4',
+            IconComponent: IcoApple16,
+            value: 'Item 4',
+          },
+        ],
+      },
+    ];
+
+    return customRender(
+      <RadioSelect
+        options={groupedOptions}
+        value={value}
+        onChange={onChange}
+        testID={testID}
+      />,
+    );
+  };
+
+  describe('<GroupedRadioSelect />', () => {
+    it('should render titles for each subgroup', () => {
+      renderGroupedRadioSelect({});
+      expect(screen.getByText('Group 1')).toBeInTheDocument();
+      expect(screen.getByText('Group 2')).toBeInTheDocument();
     });
   });
 });
