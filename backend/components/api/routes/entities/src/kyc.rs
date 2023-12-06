@@ -121,6 +121,7 @@ pub async fn post(
 
             let args = NewOnboardingArgs {
                 existing_wf_id: None,
+                wfr_id: None,
                 force_create: false,
                 sv: &sv,
                 obc: &obc,

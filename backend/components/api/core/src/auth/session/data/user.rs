@@ -4,6 +4,7 @@ use newtypes::ObConfigurationId;
 use newtypes::ScopedVaultId;
 use newtypes::VaultId;
 use newtypes::WorkflowId;
+use newtypes::WorkflowRequestId;
 
 use crate::auth::user::UserAuthScope;
 use crate::errors::user::UserError;
@@ -24,6 +25,9 @@ pub struct UserSession {
     pub obc_id: Option<ObConfigurationId>,
     /// The workflow for the auth session, if any
     pub wf_id: Option<WorkflowId>,
+    /// The workflow request for the auth session, if any. This provides only-once semantics for
+    /// the auth token - we don't allow making a new Workflow if you've already made one
+    pub wfr_id: Option<WorkflowRequestId>,
     /// Permissions that this auth token is given
     pub scopes: Vec<UserAuthScope>,
     /// The auths that give this token its permissions
@@ -43,6 +47,7 @@ pub struct UserSessionArgs {
     pub sb_id: Option<ScopedVaultId>,
     pub obc_id: Option<ObConfigurationId>,
     pub wf_id: Option<WorkflowId>,
+    pub wfr_id: Option<WorkflowRequestId>,
     pub is_from_api: bool,
     pub is_implied_auth: bool,
 }
@@ -65,6 +70,7 @@ impl UserSession {
             sb_id,
             obc_id,
             wf_id,
+            wfr_id,
             is_from_api,
             is_implied_auth,
         } = args;
@@ -74,6 +80,7 @@ impl UserSession {
             sb_id,
             obc_id,
             wf_id,
+            wfr_id,
             scopes,
             is_from_api,
             auth_event_ids,

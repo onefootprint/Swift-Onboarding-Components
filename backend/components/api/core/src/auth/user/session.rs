@@ -10,6 +10,7 @@ use db::{
 use itertools::Itertools;
 use newtypes::{
     AuthEventId, AuthEventKind, ObConfigurationId, ScopedVaultId, VaultId, VaultKind, WorkflowId,
+    WorkflowRequestId,
 };
 use paperclip::actix::Apiv2Security;
 
@@ -36,6 +37,7 @@ pub struct UserSessionContext {
     pub(super) sb_id: Option<ScopedVaultId>,
     pub(super) obc_id: Option<ObConfigurationId>,
     pub(super) wf_id: Option<WorkflowId>,
+    pub wfr_id: Option<WorkflowRequestId>,
     pub(super) is_implied_auth: bool,
     pub auth_event_ids: Vec<AuthEventId>,
     /// When true, the auth token was initially issued as an unauthed, identified token
@@ -78,6 +80,7 @@ impl UserSessionContext {
             sb_id: new_args.sb_id.or(self.sb_id),
             obc_id: new_args.obc_id.or(self.obc_id),
             wf_id: new_args.wf_id.or(self.wf_id),
+            wfr_id: new_args.wfr_id.or(self.wfr_id),
             is_from_api: new_args.is_from_api || self.is_from_api,
             is_implied_auth: new_args.is_implied_auth || self.is_implied_auth,
         };
@@ -143,6 +146,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     su_id,
                     sb_id,
                     wf_id,
+                    wfr_id,
                     obc_id,
                     scopes,
                     is_from_api,
@@ -179,6 +183,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     user: vault,
                     sb_id,
                     wf_id,
+                    wfr_id,
                     scoped_user,
                     obc,
                     obc_id,

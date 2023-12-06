@@ -1117,10 +1117,10 @@ table! {
         _updated_at -> Timestamptz,
         timestamp -> Timestamptz,
         deactivated_at -> Nullable<Timestamptz>,
-        deactivated_by_workflow_id -> Nullable<Text>,
         scoped_vault_id -> Text,
         ob_configuration_id -> Text,
         created_by -> Jsonb,
+        workflow_id -> Nullable<Text>,
     }
 }
 
@@ -1233,7 +1233,6 @@ joinable!(workflow -> scoped_vault (scoped_vault_id));
 joinable!(workflow_event -> workflow (workflow_id));
 joinable!(workflow_request -> ob_configuration (ob_configuration_id));
 joinable!(workflow_request -> scoped_vault (scoped_vault_id));
-joinable!(workflow_request -> workflow (deactivated_by_workflow_id));
 
 allow_tables_to_appear_in_same_query!(
     access_event,

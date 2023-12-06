@@ -75,8 +75,8 @@ def test_redo_kyc(
     token = extract_trigger_sms(
         twilio, sandbox_user.client.data["id.phone_number"], note
     )
-    auth_token = FpAuth(token)
-    auth_token = step_up_user(twilio, auth_token, live_phone_number, False)
+    initial_auth_token = FpAuth(token)
+    auth_token = step_up_user(twilio, initial_auth_token, live_phone_number, False)
 
     # re-run Bifrost with the token from the link we sent to user
     bifrost = BifrostClient.raw_auth(
@@ -97,7 +97,7 @@ def test_redo_kyc(
         assert requirements[0]["kind"] == "collect_data"
         assert requirements[0]["is_met"]
 
-    # Edit some data
+    # Edit some data and finish the onboarding
     data = {"id.ssn9": "999-99-9999"}
     patch("/hosted/user/vault", data, bifrost.auth_token)
     user = bifrost.run()
@@ -106,6 +106,15 @@ def test_redo_kyc(
 
     body = get(f"entities/{sandbox_user.fp_id}", None, *sandbox_user.tenant.db_auths)
     assert not body["has_outstanding_workflow_request"]
+
+    # Make sure the token can't be used to make another Workflow.
+    # Re-log in using the link sent via SMS
+    # auth_token = step_up_user(twilio, initial_auth_token, live_phone_number, False)
+    post("hosted/onboarding", None, initial_auth_token)
+    body = get("hosted/onboarding/status", None, initial_auth_token)
+    # Shouldn't even include a met collect_data requirement because we inherited the Workflow
+    # that is already completed
+    assert not any(i["kind"] == "collect_data" for i in body["all_requirements"])
 
     # we should have re-run KYC and now have 2 OBDs
     timeline = get(

@@ -75,13 +75,14 @@ pub async fn post(
                 TriggerInfo::RedoKyc => {
                     let (_, obc) = Workflow::latest_reonboardable_wf(conn, &sv.id)?
                         .ok_or(UserError::NoCompleteOnboardings)?;
+                    let wr = WorkflowRequest::create(conn, sv.id.clone(), obc.id.clone(), actor.clone())?;
                     let args = UserSessionArgs {
                         su_id: Some(sv.id.clone()),
                         obc_id: Some(obc.id.clone()),
+                        wfr_id: Some(wr.id.clone()),
                         is_from_api: true,
                         ..Default::default()
                     };
-                    let wr = WorkflowRequest::create(conn, sv.id.clone(), obc.id.clone(), actor.clone())?;
                     let event = WorkflowTriggeredInfo {
                         workflow_id: None,
                         ob_config_id: Some(obc.id),

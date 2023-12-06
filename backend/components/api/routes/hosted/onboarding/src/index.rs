@@ -82,6 +82,7 @@ pub async fn post(
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let args = NewOnboardingArgs {
                 existing_wf_id: user_auth.workflow_id(),
+                wfr_id: user_auth.wfr_id.clone(),
                 force_create: user_auth.is_from_api,
                 sv: &scoped_user,
                 obc: &obc,

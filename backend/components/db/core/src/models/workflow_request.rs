@@ -1,4 +1,6 @@
+use crate::DbError;
 use crate::DbResult;
+use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::{DateTime, Utc};
 use db_schema::schema::workflow_request;
@@ -17,10 +19,11 @@ pub struct WorkflowRequest {
     pub _updated_at: DateTime<Utc>,
     pub timestamp: DateTime<Utc>,
     pub deactivated_at: Option<DateTime<Utc>>,
-    pub deactivated_by_workflow_id: Option<WorkflowId>,
     pub scoped_vault_id: ScopedVaultId,
     pub ob_configuration_id: ObConfigurationId,
     pub created_by: DbActor,
+    /// The workflow_id created for this WorkflowRequest
+    pub workflow_id: Option<WorkflowId>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -33,6 +36,14 @@ struct NewWorkflowRequestRow {
 }
 
 impl WorkflowRequest {
+    #[tracing::instrument("WorkflowRequest::get", skip_all)]
+    pub fn get(conn: &mut PgConn, id: &WorkflowRequestId) -> DbResult<Self> {
+        let result = workflow_request::table
+            .filter(workflow_request::id.eq(id))
+            .get_result(conn)?;
+        Ok(result)
+    }
+
     #[tracing::instrument("WorkflowRequest::create", skip_all)]
     pub fn create(
         conn: &mut TxnPgConn,
@@ -41,7 +52,7 @@ impl WorkflowRequest {
         created_by: DbActor,
     ) -> DbResult<Self> {
         // Deactivate old WorkflowRequests when making a new one
-        Self::deactivate(conn, &sv_id, None, None)?;
+        Self::deactivate(conn, &sv_id, None)?;
         let new_row = NewWorkflowRequestRow {
             scoped_vault_id: sv_id,
             ob_configuration_id: obc_id,
@@ -54,12 +65,24 @@ impl WorkflowRequest {
         Ok(result)
     }
 
+    #[tracing::instrument("WorkflowRequest::set_wf_id", skip_all)]
+    pub fn set_wf_id(conn: &mut TxnPgConn, id: &WorkflowRequestId, wf_id: &WorkflowId) -> DbResult<()> {
+        let results = diesel::update(workflow_request::table)
+            .filter(workflow_request::id.eq(id))
+            .filter(workflow_request::workflow_id.is_null())
+            .set(workflow_request::workflow_id.eq(wf_id))
+            .get_results::<Self>(conn.conn())?;
+        if results.is_empty() {
+            return Err(DbError::IncorrectNumberOfRowsUpdated);
+        }
+        Ok(())
+    }
+
     #[tracing::instrument("WorkflowRequest::deactivate", skip_all)]
     pub fn deactivate(
         conn: &mut TxnPgConn,
         sv_id: &ScopedVaultId,
         obc_id: Option<&ObConfigurationId>,
-        wf_id: Option<WorkflowId>,
     ) -> DbResult<()> {
         let mut query = diesel::update(workflow_request::table)
             .filter(workflow_request::scoped_vault_id.eq(sv_id))
@@ -70,11 +93,7 @@ impl WorkflowRequest {
         }
 
         query
-            .set((
-                workflow_request::deactivated_at.eq(Utc::now()),
-                // TODO how does null work here
-                workflow_request::deactivated_by_workflow_id.eq(wf_id),
-            ))
+            .set(workflow_request::deactivated_at.eq(Utc::now()))
             .execute(conn.conn())?;
         Ok(())
     }

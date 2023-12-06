@@ -1,6 +1,7 @@
 use super::vault_wrapper::{Any, PrefillData, TenantVw, VaultWrapper, WriteableVw};
 use crate::auth::tenant::AuthActor;
 use crate::errors::{onboarding::OnboardingError, ApiResult};
+use db::models::workflow_request::WorkflowRequest;
 use db::{
     models::{
         business_owner::BusinessOwner,
@@ -16,7 +17,7 @@ use db::{
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use newtypes::{
     CollectedDataOption, DocumentRequestKind, EncryptedVaultPrivateKey, ObConfigurationKind, Selfie,
-    VaultKind, VaultPublicKey, WorkflowId, WorkflowSource,
+    VaultKind, VaultPublicKey, WorkflowId, WorkflowRequestId, WorkflowSource,
 };
 use std::sync::Arc;
 
@@ -28,6 +29,7 @@ pub struct NewBusinessVaultArgs {
 
 pub struct NewOnboardingArgs<'a> {
     pub existing_wf_id: Option<WorkflowId>,
+    pub wfr_id: Option<WorkflowRequestId>,
     pub force_create: bool,
     pub sv: &'a ScopedVault,
     pub obc: &'a ObConfiguration,
@@ -46,6 +48,7 @@ pub fn get_or_start_onboarding(
 ) -> ApiResult<(WorkflowId, Option<Workflow>)> {
     let NewOnboardingArgs {
         existing_wf_id,
+        wfr_id,
         force_create,
         sv,
         obc,
@@ -60,9 +63,16 @@ pub fn get_or_start_onboarding(
         return Err(OnboardingError::CannotOnboardOntoAuthPlaybook.into());
     }
 
-    let wf_id = if let Some(wf_id) = existing_wf_id {
+    let wfr = wfr_id.map(|id| WorkflowRequest::get(conn, &id)).transpose()?;
+
+    let wf_id = if let Some(wf_id) = wfr.as_ref().and_then(|wfr| wfr.workflow_id.as_ref()) {
+        // This request has already been used to make a Workflow. Return that workflow.
+        wf_id.clone()
+    } else if let Some(wf_id) = existing_wf_id {
+        // The auth token already has a workflow_id in it
         wf_id
     } else {
+        // Make a new workflow
         let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
         let is_first_wf = Workflow::list(conn, &sv.id)?.is_empty();
         let has_prefill_data = maybe_prefill_data.as_ref().is_some_and(|pd| !pd.data.is_empty());
@@ -92,11 +102,17 @@ pub fn get_or_start_onboarding(
                     let tenant_vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &sv.id)?;
                     tenant_vw.prefill_portable_data(conn, prefill_data, actor)?;
                 }
-                // TODO should we prefill data and use that to determine if one-click happened?
             }
         }
         wf.id
     };
+
+    if let Some(wfr) = wfr {
+        if wfr.workflow_id.is_none() {
+            // If we're responding to a WorkflowRequest, save that we've created a WF for the request
+            WorkflowRequest::set_wf_id(conn, &wfr.id, &wf_id)?;
+        }
+    }
 
     // If the ob config has business fields, create a business vault, scoped vault, and ob
     let biz_wf = if let Some(new_biz_args) = new_biz_args {

@@ -62,6 +62,7 @@ pub async fn create_user_and_onboarding(
 
             let args = NewOnboardingArgs {
                 existing_wf_id: None,
+                wfr_id: None,
                 force_create: false,
                 sv: &su,
                 obc: &ob_config,

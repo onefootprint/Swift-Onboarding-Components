@@ -520,7 +520,7 @@ impl Workflow {
                 // we might want to mark the WorkflowRequest as complete anyways.
                 // Maybe we'll revisit in the future with more descriptive requirements in the DB
                 let sv_id = &result.scoped_vault_id;
-                WorkflowRequest::deactivate(conn, sv_id, Some(obc_id), Some(result.id.clone()))?;
+                WorkflowRequest::deactivate(conn, sv_id, Some(obc_id))?;
             }
             // Update the scoped vault's last_activity_at to bump them to the top of the sorted
             // list of users in the dashboard
