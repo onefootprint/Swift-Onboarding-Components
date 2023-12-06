@@ -26,23 +26,17 @@ def extract_trigger_sms(twilio, phone_number, id):
     return try_until_success(inner, 60)
 
 
-# TODO we don't need two tests of the SMS flow, move one of these to just redo via the link
 @pytest.mark.parametrize("with_document", [True, False])
-def test_redo_kyc(
-    sandbox_tenant, twilio, with_document, doc_first_obc, live_phone_number
-):
+def test_redo_kyc(sandbox_tenant, twilio, with_document, doc_first_obc):
     if with_document:
         obc = doc_first_obc
     else:
         obc = sandbox_tenant.default_ob_config
-    sandbox_id = _gen_random_sandbox_id()
-    bifrost = BifrostClient.create(
-        obc,
-        twilio,
-        live_phone_number,  # Have to make with the live phone number in order to receive SMSes
-        sandbox_id,
-    )
+    bifrost = BifrostClient.new(obc, twilio)
     sandbox_user = bifrost.run()
+
+    sandbox_id = bifrost.sandbox_id
+    phone_number = sandbox_user.client.data["id.phone_number"]
     fp_id = sandbox_user.fp_id
 
     # 1 onboarding_decision from initial KYC
@@ -59,34 +53,29 @@ def test_redo_kyc(
     def send_trigger():
         data = dict(trigger=dict(kind="redo_kyc"), note=note)
         post(f"entities/{fp_id}/triggers", data, *sandbox_user.tenant.db_auths)
-        body = get(f"entities/{fp_id}/timeline", None, *sandbox_user.tenant.db_auths)
-        trigger_event = next(
-            i["event"] for i in body if i["event"]["kind"] == "workflow_triggered"
-        )
-        assert trigger_event["data"]["request"]["id"]
-        assert not trigger_event["data"]["request"]["is_deactivated"]
-        assert trigger_event["data"]["actor"]["kind"] == "organization"
 
     try_until_success(send_trigger, 15, 3)
 
     body = get(f"entities/{fp_id}", None, *sandbox_user.tenant.db_auths)
     assert body["has_outstanding_workflow_request"]
 
-    # find link we sent to user via Twilio
-    token = extract_trigger_sms(
-        twilio, sandbox_user.client.data["id.phone_number"], note
+    body = get(f"entities/{fp_id}/timeline", None, *sandbox_user.tenant.db_auths)
+    trigger_event = next(
+        i["event"] for i in body if i["event"]["kind"] == "workflow_triggered"
     )
-    initial_auth_token = FpAuth(token)
-    auth_token = step_up_user(twilio, initial_auth_token, live_phone_number, False)
+    t_id = trigger_event["data"]["request"]["id"]
+    assert not trigger_event["data"]["request"]["is_deactivated"]
+    assert trigger_event["data"]["actor"]["kind"] == "organization"
+
+    # re-generate a link as is done from the dashboard instead of scouring for it via SMS
+    body = post(
+        f"entities/{fp_id}/triggers/{t_id}/link", None, *sandbox_user.tenant.db_auths
+    )
+    initial_auth_token = FpAuth(body["link"].split("#")[1])
+    auth_token = step_up_user(twilio, initial_auth_token, phone_number, False)
 
     # re-run Bifrost with the token from the link we sent to user
-    bifrost = BifrostClient.raw_auth(
-        obc,
-        auth_token,
-        sandbox_user.client.data["id.phone_number"],
-        sandbox_user.client.sandbox_id,
-    )
-
+    bifrost = BifrostClient.raw_auth(obc, auth_token, phone_number, sandbox_id)
     # Check that requirements are what we expect
     requirements = bifrost.get_status()["all_requirements"]
     if with_document:
@@ -129,18 +118,24 @@ def test_redo_kyc(
         assert users_docs[1]["created_at"] > users_docs[0]["created_at"]
 
 
-def test_redo_kyc_with_generated_link(sandbox_tenant, twilio):
+def test_redo_kyc_with_sms_link(sandbox_tenant, twilio, live_phone_number):
     obc = sandbox_tenant.default_ob_config
-    bifrost = BifrostClient.new(
+    sandbox_id = _gen_random_sandbox_id()
+    bifrost = BifrostClient.create(
         obc,
         twilio,
+        live_phone_number,  # Have to make with the live phone number in order to receive SMSes
+        sandbox_id,
     )
     sandbox_user = bifrost.run()
+
+    sandbox_id = bifrost.sandbox_id
     fp_id = sandbox_user.fp_id
     phone_number = sandbox_user.client.data["id.phone_number"]
 
     # trigger RedoKYC
-    data = dict(trigger=dict(kind="redo_kyc"), note="Flerp")
+    note = _gen_random_n_digit_number(10)
+    data = dict(trigger=dict(kind="redo_kyc"), note=note)
     post(f"entities/{fp_id}/triggers", data, *sandbox_user.tenant.db_auths)
     body = get(f"entities/{fp_id}/timeline", None, *sandbox_user.tenant.db_auths)
     trigger_event = next(
@@ -153,20 +148,15 @@ def test_redo_kyc_with_generated_link(sandbox_tenant, twilio):
     body = get(f"entities/{fp_id}", None, *sandbox_user.tenant.db_auths)
     assert body["has_outstanding_workflow_request"]
 
-    # re-generate a link as is done from the dashboard instead of scouring for it via SMS
-    body = post(
-        f"entities/{fp_id}/triggers/{t_id}/link", None, *sandbox_user.tenant.db_auths
+    # find link we sent to user via Twilio
+    token = extract_trigger_sms(
+        twilio, sandbox_user.client.data["id.phone_number"], note
     )
-    initial_auth_token = FpAuth(body["link"].split("#")[1])
+    initial_auth_token = FpAuth(token)
     auth_token = step_up_user(twilio, initial_auth_token, phone_number, False)
 
     # re-run Bifrost with the token
-    bifrost = BifrostClient.raw_auth(
-        obc,
-        auth_token,
-        phone_number,
-        sandbox_user.client.sandbox_id,
-    )
+    bifrost = BifrostClient.raw_auth(obc, auth_token, phone_number, sandbox_id)
     bifrost.run()
 
     # Make sure the token can't be used to make another Workflow.
