@@ -199,6 +199,7 @@ export type {
 } from './submit-review';
 export type { Trigger, TriggerRequest, TriggerResponse } from './trigger';
 export { TriggerKind } from './trigger';
+export type { TriggerLinkRequest } from './trigger-link';
 export type {
   UpdateClientSecurityConfigRequest,
   UpdateClientSecurityConfigResponse,

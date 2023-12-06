@@ -57,6 +57,7 @@ import {
   WatchlistCheckEventHeader,
   WatchlistCheckEventIcon,
 } from './components/watchlist-check-event';
+import WorkflowTriggeredEventBody from './components/workflow-triggered-event';
 import type { AuditTrailTimelineEvent } from './utils/merge-audit-trail-timeline-events';
 import mergeAuditTrailTimelineEvents from './utils/merge-audit-trail-timeline-events';
 
@@ -190,6 +191,9 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
               })}
             </Typography>
           </>
+        ),
+        bodyComponent: (
+          <WorkflowTriggeredEventBody data={eventData} entityId={entity.id} />
         ),
       });
     } else if (kind === TimelineEventKind.workflowStarted) {

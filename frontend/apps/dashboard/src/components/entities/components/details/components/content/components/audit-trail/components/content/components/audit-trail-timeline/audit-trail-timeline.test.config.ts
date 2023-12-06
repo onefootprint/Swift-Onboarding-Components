@@ -1,4 +1,4 @@
-import type { Timeline } from '@onefootprint/types';
+import type { Timeline, TimelineEvent } from '@onefootprint/types';
 import {
   ActorKind,
   CollectedKycDataOption,
@@ -160,5 +160,25 @@ const TimelineFixture: Timeline = [
     timestamp: '2022-11-08T20:21:53.771495Z',
   },
 ];
+
+export const WorkflowTriggeredWithLinkEvent: TimelineEvent = {
+  event: {
+    kind: TimelineEventKind.workflowTriggered,
+    data: {
+      workflow: {
+        kind: TriggerKind.RedoKyc,
+      },
+      request: {
+        id: 'wfr_id',
+        isDeactivated: false,
+      },
+      actor: {
+        kind: ActorKind.organization,
+        member: 'Piip Penguin (piip@onefootprint.com)',
+      },
+    },
+  },
+  timestamp: '2022-11-08T20:21:53.771495Z',
+};
 
 export default TimelineFixture;

@@ -10,7 +10,7 @@ const submitRetriggerKYC = async (
 ) => {
   const response = await request<TriggerResponse>({
     method: 'POST',
-    url: `/entities/${entityId}/trigger`,
+    url: `/entities/${entityId}/triggers`,
     data,
     headers: authHeaders,
   });

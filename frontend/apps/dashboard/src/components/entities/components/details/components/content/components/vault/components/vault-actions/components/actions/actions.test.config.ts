@@ -46,7 +46,7 @@ export const withEntity = (entityFixture: Entity) =>
 export const withTrigger = () =>
   mockRequest({
     method: 'post',
-    path: `/entities/${entityId}/trigger`,
+    path: `/entities/${entityId}/triggers`,
     statusCode: 200,
     response: {},
   });
@@ -54,7 +54,7 @@ export const withTrigger = () =>
 export const withTriggerError = () =>
   mockRequest({
     method: 'post',
-    path: `/entities/${entityId}/trigger`,
+    path: `/entities/${entityId}/triggers`,
     statusCode: 400,
     response: {
       error: {

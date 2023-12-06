@@ -1181,6 +1181,12 @@
             "actions": {
               "id_document": "upload ID photo",
               "redo_kyc": "revise KYC data"
+            },
+            "link-sent": "Link sent to user",
+            "copy-link": "Copy link",
+            "tooltip": {
+              "copied": "Copied!",
+              "couldnt-copy": "Couldn't copy..."
             }
           },
           "workflow-started-event": {

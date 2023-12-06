@@ -1,7 +1,11 @@
 import {
+  createClipboardSpy,
   createUseRouterSpy,
   customRender,
+  mockRequest,
   screen,
+  userEvent,
+  waitFor,
   within,
 } from '@onefootprint/test-utils';
 import type { TimelineEvent } from '@onefootprint/types';
@@ -9,7 +13,9 @@ import React from 'react';
 import { entityFixture } from 'src/components/entities/components/details/details.test.config';
 
 import AuditTrailTimeline from './audit-trail-timeline';
-import TimelineFixture from './audit-trail-timeline.test.config';
+import TimelineFixture, {
+  WorkflowTriggeredWithLinkEvent,
+} from './audit-trail-timeline.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
@@ -98,6 +104,83 @@ describe('<AuditTrailTimeline />', () => {
       expect(
         screen.getByText('requested user to upload ID photo'),
       ).toBeInTheDocument();
+
+      const body = screen.getByTestId('workflow-triggered-event-body');
+      expect(body).toBeInTheDocument();
+      expect(within(body).getByText('Link sent to user')).toBeInTheDocument();
+      expect(within(body).queryByText('Copy link')).not.toBeInTheDocument();
+    });
+
+    describe('when rendering workflow trigger event with link', () => {
+      it('should be able to click link', async () => {
+        const { writeTestMockFn } = createClipboardSpy();
+        mockRequest({
+          method: 'post',
+          path: '/entities/fp_bid_VXND11zUVRYQKKUxbUN3KD/triggers/wfr_id/link',
+          response: { link: 'https://mylink' },
+        });
+
+        renderAuditTrailTimeline([WorkflowTriggeredWithLinkEvent]);
+        expect(
+          screen.getByText('Piip Penguin (piip@onefootprint.com)'),
+        ).toBeInTheDocument();
+        expect(
+          screen.getByText('requested user to revise KYC data'),
+        ).toBeInTheDocument();
+
+        const body = screen.getByTestId('workflow-triggered-event-body');
+        expect(body).toBeInTheDocument();
+        expect(within(body).getByText('Link sent to user')).toBeInTheDocument();
+        const copyButton = within(body).getByText('Copy link');
+        expect(copyButton).toBeInTheDocument();
+
+        await userEvent.click(copyButton);
+
+        await waitFor(() => {
+          expect(writeTestMockFn).toHaveBeenCalledWith('https://mylink');
+        });
+
+        // Should show confirmation of copy
+        await waitFor(() => {
+          const confirmationTooltip = within(body).getByRole('tooltip', {
+            name: 'Copied!',
+          });
+          expect(confirmationTooltip).toBeInTheDocument();
+        });
+
+        // And the confirmation should go away
+        await waitFor(() => {
+          const confirmationTooltip = within(body).queryByRole('tooltip', {
+            name: 'Copied!',
+          });
+          expect(confirmationTooltip).not.toBeInTheDocument();
+        });
+      });
+
+      it('should handle link error', async () => {
+        // Simulate an error generating the link
+        mockRequest({
+          method: 'post',
+          path: '/entities/fp_bid_VXND11zUVRYQKKUxbUN3KD/triggers/wfr_id/link',
+          statusCode: 400,
+          response: {},
+        });
+
+        renderAuditTrailTimeline([WorkflowTriggeredWithLinkEvent]);
+
+        const body = screen.getByTestId('workflow-triggered-event-body');
+        const copyButton = within(body).getByText('Copy link');
+        expect(copyButton).toBeInTheDocument();
+        await userEvent.click(copyButton);
+
+        // Should show confirmation of error
+        await waitFor(() => {
+          const confirmationTooltip = within(body).getByRole('tooltip', {
+            name: `Couldn't copy...`,
+          });
+          expect(confirmationTooltip).toBeInTheDocument();
+        });
+      });
     });
 
     it('should render workflow started event properly', () => {

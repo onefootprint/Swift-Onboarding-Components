@@ -96,6 +96,10 @@ export type WorkflowTriggeredEventData = {
   workflow: {
     kind: TriggerKind;
   };
+  request?: {
+    id: string;
+    isDeactivated: boolean;
+  };
   actor: Actor;
 };
 
