@@ -82,16 +82,18 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
             SaturatedTimelineEvent::VaultCreated(actor) => Self::VaultCreated(api_wire_types::VaultCreated {
                 actor: api_wire_types::Actor::from_db(actor),
             }),
-            SaturatedTimelineEvent::WorkflowTriggered((workflow, actor)) => {
+            SaturatedTimelineEvent::WorkflowTriggered((workflow, actor, wfr)) => {
                 // Some weird logic for backcompat to determine the trigger type
                 let workflow = if let Some(wf) = workflow {
-                    api_wire_types::Workflow::from_db(wf)
+                    api_wire_types::TriggeredWorkflow::from_db(wf)
                 } else {
                     let kind = TriggerKind::RedoKyc;
-                    api_wire_types::Workflow { kind }
+                    api_wire_types::TriggeredWorkflow { kind }
                 };
+                let request = wfr.map(api_wire_types::WorkflowRequest::from_db);
                 Self::WorkflowTriggered(api_wire_types::WorkflowTriggered {
                     workflow,
+                    request,
                     actor: api_wire_types::Actor::from_db(actor),
                 })
             }

@@ -25,7 +25,7 @@ mod user;
 mod user_timeline;
 mod validate;
 mod watchlist_check;
-mod workflow;
+mod workflow_request;
 
 pub use business_owner::BusinessOwnerInfo;
 pub use organization::*;

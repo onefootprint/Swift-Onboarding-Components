@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::DbError;
 use crate::DbResult;
 use crate::PgConn;
@@ -37,11 +39,27 @@ struct NewWorkflowRequestRow {
 
 impl WorkflowRequest {
     #[tracing::instrument("WorkflowRequest::get", skip_all)]
-    pub fn get(conn: &mut PgConn, id: &WorkflowRequestId) -> DbResult<Self> {
+    pub fn get(conn: &mut PgConn, id: &WorkflowRequestId, sv_id: &ScopedVaultId) -> DbResult<Self> {
         let result = workflow_request::table
             .filter(workflow_request::id.eq(id))
+            .filter(workflow_request::scoped_vault_id.eq(sv_id))
             .get_result(conn)?;
         Ok(result)
+    }
+
+    #[tracing::instrument("Workflow::get_bulk", skip_all)]
+    pub fn get_bulk(
+        conn: &mut PgConn,
+        ids: Vec<WorkflowRequestId>,
+    ) -> DbResult<HashMap<WorkflowRequestId, Self>> {
+        let res = workflow_request::table
+            .filter(workflow_request::id.eq_any(ids))
+            .get_results::<Self>(conn)?
+            .into_iter()
+            .map(|wfr| (wfr.id.clone(), wfr))
+            .collect();
+
+        Ok(res)
     }
 
     #[tracing::instrument("WorkflowRequest::create", skip_all)]

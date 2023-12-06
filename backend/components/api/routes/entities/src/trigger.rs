@@ -137,7 +137,7 @@ pub async fn post(
                 }
                 TriggerInfo::RedoKyb => return Err(TenantError::InvalidTriggerKind.into()), // not yet supported
             };
-            // No scopes or auth factors - require the user to re-auth
+            // No scopes or auth factors - require the user to re-auth when using this token
             let duration = Duration::days(1);
             let data = UserSession::make(sv.vault_id.clone(), auth_args, vec![], vec![])?;
             let (auth_token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;

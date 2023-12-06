@@ -26,6 +26,7 @@ use super::onboarding_decision::{OnboardingDecision, SaturatedOnboardingDecision
 use super::scoped_vault::ScopedVaultIdentifier;
 use super::watchlist_check::WatchlistCheck;
 use super::workflow::Workflow;
+use super::workflow_request::WorkflowRequest;
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = user_timeline)]
@@ -70,7 +71,7 @@ pub enum SaturatedTimelineEvent {
     Annotation(AnnotationInfo),
     WatchlistCheck(WatchlistCheck),
     VaultCreated(SaturatedActor),
-    WorkflowTriggered((Option<Workflow>, SaturatedActor)),
+    WorkflowTriggered((Option<Workflow>, SaturatedActor, Option<WorkflowRequest>)),
     WorkflowStarted((Workflow, ObConfiguration)),
 }
 
@@ -176,6 +177,11 @@ impl UserTimeline {
             _ => None,
         });
 
+        let wfr_ids = results.iter().flat_map(|ut| match ut.event {
+            DbUserTimelineEvent::WorkflowTriggered(ref e) => e.workflow_request_id.clone(),
+            _ => None,
+        });
+
         let decisions = OnboardingDecision::get_bulk(conn, decision_ids.collect())?;
         let annotations = Annotation::get_bulk(conn, annotation_ids.collect())?;
         let liveness_events = LivenessEvent::get_bulk(conn, liveness_event_ids.collect())?;
@@ -185,6 +191,7 @@ impl UserTimeline {
         let watchlist_checks = WatchlistCheck::get_bulk(conn, watchlist_check_ids.collect())?;
         let ob_configs = ObConfiguration::get_bulk(conn, ob_config_ids.collect())?;
         let workflows = Workflow::get_bulk(conn, workflow_ids.collect())?;
+        let wfrs = WorkflowRequest::get_bulk(conn, wfr_ids.collect())?;
 
         // Join the UserTimeline events with the saturated info we fetched from different tables
         let results = results
@@ -266,7 +273,11 @@ impl UserTimeline {
                             .get(&e.actor)
                             .ok_or(DbError::RelatedObjectNotFound)?
                             .clone();
-                        SaturatedTimelineEvent::WorkflowTriggered((workflow, actor))
+                        let wfr = e
+                            .workflow_request_id
+                            .as_ref()
+                            .and_then(|id| wfrs.get(id).cloned());
+                        SaturatedTimelineEvent::WorkflowTriggered((workflow, actor, wfr))
                     }
                     DbUserTimelineEvent::WorkflowStarted(ref e) => {
                         let workflow = workflows

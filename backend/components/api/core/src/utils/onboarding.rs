@@ -63,7 +63,9 @@ pub fn get_or_start_onboarding(
         return Err(OnboardingError::CannotOnboardOntoAuthPlaybook.into());
     }
 
-    let wfr = wfr_id.map(|id| WorkflowRequest::get(conn, &id)).transpose()?;
+    let wfr = wfr_id
+        .map(|id| WorkflowRequest::get(conn, &id, &sv.id))
+        .transpose()?;
 
     let wf_id = if let Some(wf_id) = wfr.as_ref().and_then(|wfr| wfr.workflow_id.as_ref()) {
         // This request has already been used to make a Workflow. Return that workflow.
