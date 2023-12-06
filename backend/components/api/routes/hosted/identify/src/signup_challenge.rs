@@ -63,11 +63,11 @@ pub async fn post(
     .collect();
     let sandbox_id = sandbox_id.0;
     let ctx = make_vault_context(&state, Some(&ob_context), initial_data, sandbox_id.clone()).await?;
-    let uv = state
+    let (uv, root_span) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let (uv, _, _) = VaultWrapper::create_unverified(conn, ctx, root_span)?;
-            Ok(uv.into_inner())
+            let (uv, _, _) = VaultWrapper::create_unverified(conn, ctx, &root_span)?;
+            Ok((uv.into_inner(), root_span))
         })
         .await?;
 
@@ -138,6 +138,11 @@ pub async fn post(
         rx_background_error(rx, 2).await.err()
     } else {
         None
+    };
+    // Since these errors return an HTTP 200, log something special on the root span if there's an error
+    match err {
+        Some(_) => root_span.record("meta", "error"),
+        None => root_span.record("meta", "no_error"),
     };
 
     let response = SignupChallengeResponse {

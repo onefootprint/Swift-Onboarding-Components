@@ -147,7 +147,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
 }
 
 /// Wrapper around tracing_actix_web::RootSpan that also implements paperclip Apiv2Schema
-#[derive(derive_more::Deref)]
+#[derive(derive_more::Deref, Clone)]
 pub struct RootSpan(#[deref] tracing_actix_web::RootSpan);
 
 impl FromRequest for RootSpan {

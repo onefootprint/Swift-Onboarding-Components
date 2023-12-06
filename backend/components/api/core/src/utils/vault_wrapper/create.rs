@@ -53,7 +53,7 @@ impl VaultWrapper<Person> {
     pub fn create_unverified(
         conn: &mut TxnPgConn,
         ctx: VaultContext,
-        root_span: RootSpan,
+        root_span: &RootSpan,
     ) -> ApiResult<(Locked<Vault>, ScopedVault, PatchDataResult)> {
         let VaultContext {
             data: initial_data,

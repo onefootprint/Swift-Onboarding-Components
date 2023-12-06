@@ -77,7 +77,7 @@ pub async fn post(
     let twilio_client = &state.sms_client;
 
     // Look up existing user vault by identifier
-    let Some(ctx) = crate::get_user_challenge_context(&state, identifier, ob_context, root_span).await? else {
+    let Some(ctx) = crate::get_user_challenge_context(&state, identifier, ob_context, root_span.clone()).await? else {
         // The user vault doesn't exist. Just return that the user wasn't found
         return Err(ChallengeError::LoginChallengeUserNotFound.into());
     };
@@ -152,6 +152,11 @@ pub async fn post(
         rx_background_error(rx, 2).await.err()
     } else {
         None
+    };
+    // Since these errors return an HTTP 200, log something special on the root span if there's an error
+    match err {
+        Some(_) => root_span.record("meta", "error"),
+        None => root_span.record("meta", "no_error"),
     };
 
     let challenge_state = ChallengeState {
