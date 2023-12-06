@@ -2,7 +2,7 @@ import { route53 } from '@pulumi/aws';
 import * as aws from '@pulumi/aws';
 import * as pulumi from '@pulumi/pulumi';
 import { Certificate } from './certs';
-import { StackMetadata } from './stack_metadata';
+import { StackEnvironment, StackMetadata } from './stack_metadata';
 
 export type CdnConfig = {
   cert: Certificate;
@@ -164,6 +164,8 @@ export function CreateAppCloudfrontDistribution(
     ],
   });
 
+  const logBucket = createLogBucket(config);
+
   const cdn = new aws.cloudfront.Distribution('app-cdn', {
     enabled: true,
     aliases: [config.domain],
@@ -208,7 +210,11 @@ export function CreateAppCloudfrontDistribution(
       cachePolicyId: cachePolicy.id,
       responseHeadersPolicyId: responsePolicy.id,
     },
-
+    loggingConfig: {
+      bucket: logBucket,
+      includeCookies: false,
+      prefix: 'appcdn',
+    },
     restrictions: {
       geoRestriction: {
         restrictionType: 'none',
@@ -231,4 +237,55 @@ export function CreateAppCloudfrontDistribution(
   });
 
   return cdn;
+}
+
+function createLogBucket(config: CdnConfig): pulumi.Output<string> {
+  const bucketName = `app-cdn-logs-${config.stack.shortStackName}`;
+
+  const current = aws.s3.getCanonicalUserId({});
+  const cfId = aws.cloudfront.getLogDeliveryCanonicalUserId({});
+
+  const bucket = new aws.s3.Bucket(bucketName, {
+    forceDestroy: config.stack.environment === StackEnvironment.DevEphemeral,
+    bucket: bucketName,
+    versioning: {
+      enabled: true,
+    },
+  });
+
+  const controls = new aws.s3.BucketOwnershipControls(
+    `${bucketName}-controls`,
+    {
+      bucket: bucket.id,
+      rule: {
+        objectOwnership: 'BucketOwnerPreferred',
+      },
+    },
+  );
+
+  const acl = new aws.s3.BucketAclV2(
+    `${bucketName}-acl`,
+    {
+      bucket: bucket.id,
+      accessControlPolicy: {
+        owner: {
+          id: current.then(current => current.id),
+        },
+        grants: [
+          {
+            grantee: {
+              id: cfId.then(id => id.id),
+              type: 'CanonicalUser',
+            },
+            permission: 'FULL_CONTROL',
+          },
+        ],
+      },
+    },
+    {
+      dependsOn: [controls],
+    },
+  );
+
+  return bucket.bucketDomainName;
 }
