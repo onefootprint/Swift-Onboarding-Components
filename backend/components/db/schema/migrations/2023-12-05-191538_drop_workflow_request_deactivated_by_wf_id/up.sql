@@ -1,0 +1,1 @@
+ALTER TABLE workflow_request DROP COLUMN deactivated_by_workflow_id;
