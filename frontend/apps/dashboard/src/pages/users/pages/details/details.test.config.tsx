@@ -1,7 +1,6 @@
 import {
   mockRequest,
   screen,
-  selectEvents,
   userEvent,
   waitFor,
   within,
@@ -342,11 +341,11 @@ export const getSelectOptionByRow = ({
 export const decryptFields = async (fields: string[]) => {
   await waitFor(() => {
     screen.getByRole('button', {
-      name: 'Decrypt data',
+      name: 'Decrypt',
     });
   });
   const decryptButton = screen.getByRole('button', {
-    name: 'Decrypt data',
+    name: 'Decrypt',
   });
   await userEvent.click(decryptButton);
 
@@ -365,17 +364,10 @@ export const decryptFields = async (fields: string[]) => {
   await userEvent.click(nextButton);
 
   await waitFor(() => {
-    expect(
-      screen.getByRole('dialog', { name: 'Decrypt data' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Decrypt' })).toBeInTheDocument();
   });
 
-  const dialog = screen.getByRole('dialog', { name: 'Decrypt data' });
-
-  const trigger = within(dialog).getByRole('button', {
-    name: 'Select...',
-  });
-  await selectEvents.select(trigger, 'Verifying customer identity');
+  const dialog = screen.getByRole('dialog', { name: 'Decrypt' });
 
   const submitButton = within(dialog).getByRole('button', {
     name: 'Decrypt',

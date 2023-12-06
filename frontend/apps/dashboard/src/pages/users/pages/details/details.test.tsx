@@ -83,7 +83,7 @@ describe('<Details />', () => {
 
     await waitFor(() => {
       const decryptButton = screen.getByRole('button', {
-        name: 'Decrypt data',
+        name: 'Decrypt',
       });
       expect(decryptButton).toBeInTheDocument();
     });
@@ -105,7 +105,7 @@ describe('<Details />', () => {
       expect(listLink.getAttribute('href')).toEqual('/users');
     });
 
-    it('should show a header with the entity status, date, and id', async () => {
+    it('should show a header with the entity status, and id', async () => {
       await renderDetailsAndWaitData();
 
       const header = screen.getByRole('banner', { name: 'User info' });
@@ -113,9 +113,6 @@ describe('<Details />', () => {
 
       const status = within(header).getByText('Verified');
       expect(status).toBeInTheDocument();
-
-      const start = within(header).getByText('3/29/23, 11:07 PM');
-      expect(start).toBeInTheDocument();
 
       const id = within(header).getByText('fp_id_wL6XIWe26cRinucZrRK1yn');
       expect(id).toBeInTheDocument();
@@ -924,11 +921,21 @@ describe('<Details />', () => {
               expect(zip).toHaveValue('AD300');
             });
 
-            const state = within(
-              within(container).getByRole('row', { name: 'State' }),
-            ).getByRole('combobox');
+            const state = within(container).getByRole('combobox', {
+              name: 'state',
+            });
+            const emptyOption = within(state).getByRole('option', {
+              name: 'Select',
+            });
+            await userEvent.selectOptions(state, emptyOption);
             await waitFor(() => {
-              expect(state).toBeDisabled();
+              expect(
+                getSelectOptionByRow({
+                  rowName: 'State',
+                  optionName: 'Select',
+                  container,
+                }).selected,
+              ).toBe(true);
             });
 
             const saveButton = screen.getByRole('button', { name: 'Save' });
