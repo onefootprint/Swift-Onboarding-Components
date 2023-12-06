@@ -3,7 +3,6 @@ use crate::State;
 use crate::{ChallengeData, ChallengeState};
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::session::user::{UserSession, UserSessionArgs};
-use api_core::auth::session::UpdateSession;
 use api_core::auth::user::allowed_user_scopes;
 use api_core::auth::user::{CheckedUserAuthContext, UserAuthContext};
 use api_core::auth::Any;
@@ -175,23 +174,16 @@ pub async fn post(
 
             let scopes = allowed_user_scopes(vec![event.kind], scope, false);
 
-            let auth_token = if let Some(user_auth) = user_auth {
+            let data = if let Some(user_auth) = user_auth {
                 // Add the new scopes and args to the existing scopes and args on the auth token
-                let data = user_auth.data.clone().update(args, scopes, Some(event.id))?;
-                // TODO soon let's remove the ability to update the existing user session and
-                // instead require making a new session
-                // For backcompat, we'll also mutate the existing session for now
-                user_auth.update_session(conn, &session_key, data.clone())?;
-                let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
-                token
+                user_auth.data.clone().update(args, scopes, Some(event.id))?
             } else {
                 // Otherwise, create a new token with these scopes / args
-                let data = UserSession::make(uv_id.clone(), args, scopes, vec![event.id])?;
-                let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
-                token
+                UserSession::make(uv_id.clone(), args, scopes, vec![event.id])?
             };
+            let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
 
-            Ok(auth_token)
+            Ok(token)
         })
         .await?;
 

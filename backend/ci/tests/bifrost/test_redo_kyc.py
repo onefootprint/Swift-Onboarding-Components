@@ -171,7 +171,7 @@ def test_redo_kyc_with_generated_link(sandbox_tenant, twilio):
 
     # Make sure the token can't be used to make another Workflow.
     # Re-log in using the same auth token
-    # auth_token = step_up_user(twilio, initial_auth_token, phone_number, False)
+    auth_token = step_up_user(twilio, initial_auth_token, phone_number, False)
     post("hosted/onboarding", None, auth_token)
     body = get("hosted/onboarding/status", None, auth_token)
     # Shouldn't even include a met collect_data requirement because we inherited the Workflow
