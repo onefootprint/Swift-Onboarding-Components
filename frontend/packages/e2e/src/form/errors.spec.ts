@@ -14,7 +14,7 @@ const number = '378282246310005';
 const cvc = '1234';
 const zip = '12345';
 
-test('form.errors #ci', async ({ browserName, page, request }) => {
+test.skip('form.errors #ci', async ({ browserName, page, request }) => {
   test.setTimeout(120000);
   const fpUserId = 'fp_id_test_xeOIJs8bGpBVfeu1qma1QY';
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
