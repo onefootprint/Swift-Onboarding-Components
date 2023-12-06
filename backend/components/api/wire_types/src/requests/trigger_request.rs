@@ -16,6 +16,12 @@ pub struct TriggerKycRequest {
     pub fixture_result: Option<SimpleFixtureResult>,
 }
 
+#[derive(Debug, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct TriggerLinkResponse {
+    pub link: PiiString,
+}
+
 #[derive(Debug, Clone, serde::Serialize, Deserialize, Apiv2Schema, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum SimpleFixtureResult {

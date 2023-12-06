@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
@@ -26,6 +24,7 @@ use db::models::user_timeline::UserTimeline;
 use db::models::workflow::NewWorkflowArgs;
 use db::models::workflow::Workflow;
 use db::models::workflow_request::WorkflowRequest;
+use macros::route_alias;
 use newtypes::ContactInfoKind;
 use newtypes::DbActor;
 use newtypes::DocumentConfig;
@@ -39,12 +38,18 @@ use newtypes::WorkflowKind;
 use newtypes::WorkflowSource;
 use newtypes::WorkflowTriggeredInfo;
 use paperclip::actix::{api_v2_operation, post, web};
+use std::collections::HashMap;
 
+#[route_alias(post(
+    "/entities/{fp_id}/trigger",
+    tags(EntityDetails, Entities, Deprecated),
+    description = "Trigger a workflow for the provided user."
+))]
 #[api_v2_operation(
     description = "Trigger a workflow for the provided user.",
     tags(EntityDetails, Entities, Private)
 )]
-#[post("/entities/{fp_id}/trigger")]
+#[post("/entities/{fp_id}/triggers")]
 pub async fn post(
     state: web::Data<State>,
     fp_id: FpIdPath,
@@ -94,6 +99,9 @@ pub async fn post(
                 // TODO deprecate this type of trigger - it's weird to not be associated with any
                 // playbook, and weird to have to create the wf inline here
                 TriggerInfo::IdDocument { collect_selfie } => {
+                    // Deactivate any redo KYC flows
+                    WorkflowRequest::deactivate(conn, &sv.id, None)?;
+
                     let last_alpaca_kyc_wf = Workflow::latest_by_kind(conn, &sv.id, WorkflowKind::AlpacaKyc)?;
                     let last_kyc_wf = Workflow::latest_by_kind(conn, &sv.id, WorkflowKind::Kyc)?;
                     let last_wf = last_alpaca_kyc_wf

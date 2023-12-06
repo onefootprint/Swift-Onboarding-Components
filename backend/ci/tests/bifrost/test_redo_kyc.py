@@ -26,6 +26,7 @@ def extract_trigger_sms(twilio, phone_number, id):
     return try_until_success(inner, 60)
 
 
+# TODO we don't need two tests of the SMS flow, move one of these to just redo via the link
 @pytest.mark.parametrize("with_document", [True, False])
 def test_redo_kyc(
     sandbox_tenant, twilio, with_document, doc_first_obc, live_phone_number
@@ -42,33 +43,33 @@ def test_redo_kyc(
         sandbox_id,
     )
     sandbox_user = bifrost.run()
+    fp_id = sandbox_user.fp_id
 
     # 1 onboarding_decision from initial KYC
-    timeline = get(
-        f"entities/{sandbox_user.fp_id}/timeline",
-        None,
-        *sandbox_user.tenant.db_auths,
-    )
+    timeline = get(f"entities/{fp_id}/timeline", None, *sandbox_user.tenant.db_auths)
     obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 1
 
     # trigger RedoKYC
     note = _gen_random_n_digit_number(10)
-    trigger = dict(kind="redo_kyc")
 
-    body = get(f"entities/{sandbox_user.fp_id}", None, *sandbox_user.tenant.db_auths)
+    body = get(f"entities/{fp_id}", None, *sandbox_user.tenant.db_auths)
     assert not body["has_outstanding_workflow_request"]
 
     def send_trigger():
-        post(
-            f"entities/{sandbox_user.fp_id}/trigger",
-            dict(trigger=trigger, note=note),
-            *sandbox_user.tenant.db_auths,
+        data = dict(trigger=dict(kind="redo_kyc"), note=note)
+        post(f"entities/{fp_id}/trigger", data, *sandbox_user.tenant.db_auths)
+        body = get(f"entities/{fp_id}/timeline", None, *sandbox_user.tenant.db_auths)
+        trigger_event = next(
+            i["event"] for i in body if i["event"]["kind"] == "workflow_triggered"
         )
+        assert trigger_event["data"]["request"]["id"]
+        assert not trigger_event["data"]["request"]["is_deactivated"]
+        assert trigger_event["data"]["actor"]["kind"] == "organization"
 
     try_until_success(send_trigger, 15, 3)
 
-    body = get(f"entities/{sandbox_user.fp_id}", None, *sandbox_user.tenant.db_auths)
+    body = get(f"entities/{fp_id}", None, *sandbox_user.tenant.db_auths)
     assert body["has_outstanding_workflow_request"]
 
     # find link we sent to user via Twilio
@@ -104,11 +105,72 @@ def test_redo_kyc(
     fp_id = user.fp_id
     tenant = bifrost.ob_config.tenant
 
-    body = get(f"entities/{sandbox_user.fp_id}", None, *sandbox_user.tenant.db_auths)
+    body = get(f"entities/{fp_id}", None, *sandbox_user.tenant.db_auths)
     assert not body["has_outstanding_workflow_request"]
 
-    # Make sure the token can't be used to make another Workflow.
-    # Re-log in using the link sent via SMS
+    # Assert that the timeline event now has is_deactivated = true
+    body = get(f"entities/{fp_id}/timeline", None, *sandbox_user.tenant.db_auths)
+    trigger_event = next(
+        i["event"] for i in body if i["event"]["kind"] == "workflow_triggered"
+    )
+    assert trigger_event["data"]["request"]["is_deactivated"]
+
+    # we should have re-run KYC and now have 2 OBDs
+    obds = [i for i in body if i["event"]["kind"] == "onboarding_decision"]
+    assert len(obds) == 2
+
+    if with_document:
+        docs = [i for i in body if i["event"]["kind"] == "identity_document_uploaded"]
+        assert len(docs) == 2
+
+        users_docs = get(f"users/{fp_id}/documents", None, tenant.sk.key)
+        assert len(users_docs) == 2
+        assert all(map(lambda x: x["document_type"] == "drivers_license", users_docs))
+        assert users_docs[1]["created_at"] > users_docs[0]["created_at"]
+
+
+def test_redo_kyc_with_generated_link(sandbox_tenant, twilio):
+    obc = sandbox_tenant.default_ob_config
+    bifrost = BifrostClient.new(
+        obc,
+        twilio,
+    )
+    sandbox_user = bifrost.run()
+    fp_id = sandbox_user.fp_id
+    phone_number = sandbox_user.client.data["id.phone_number"]
+
+    # trigger RedoKYC
+    data = dict(trigger=dict(kind="redo_kyc"), note="Flerp")
+    post(f"entities/{fp_id}/trigger", data, *sandbox_user.tenant.db_auths)
+    body = get(f"entities/{fp_id}/timeline", None, *sandbox_user.tenant.db_auths)
+    trigger_event = next(
+        i["event"] for i in body if i["event"]["kind"] == "workflow_triggered"
+    )
+    t_id = trigger_event["data"]["request"]["id"]
+    assert not trigger_event["data"]["request"]["is_deactivated"]
+    assert trigger_event["data"]["actor"]["kind"] == "organization"
+
+    body = get(f"entities/{fp_id}", None, *sandbox_user.tenant.db_auths)
+    assert body["has_outstanding_workflow_request"]
+
+    # re-generate a link as is done from the dashboard instead of scouring for it via SMS
+    body = post(
+        f"entities/{fp_id}/triggers/{t_id}/link", None, *sandbox_user.tenant.db_auths
+    )
+    initial_auth_token = FpAuth(body["link"].split("#")[1])
+    auth_token = step_up_user(twilio, initial_auth_token, phone_number, False)
+
+    # re-run Bifrost with the token
+    bifrost = BifrostClient.raw_auth(
+        obc,
+        auth_token,
+        phone_number,
+        sandbox_user.client.sandbox_id,
+    )
+    bifrost.run()
+
+    # Make sure the initial auth token can't be used to make another Workflow.
+    # Re-log in using the same auth token
     # auth_token = step_up_user(twilio, initial_auth_token, live_phone_number, False)
     post("hosted/onboarding", None, initial_auth_token)
     body = get("hosted/onboarding/status", None, initial_auth_token)
@@ -116,22 +178,13 @@ def test_redo_kyc(
     # that is already completed
     assert not any(i["kind"] == "collect_data" for i in body["all_requirements"])
 
-    # we should have re-run KYC and now have 2 OBDs
-    timeline = get(
-        f"entities/{sandbox_user.fp_id}/timeline",
-        None,
-        *sandbox_user.tenant.db_auths,
+    # Assert that the timeline event now has is_deactivated = true
+    body = get(f"entities/{fp_id}/timeline", None, *sandbox_user.tenant.db_auths)
+    trigger_event = next(
+        i["event"] for i in body if i["event"]["kind"] == "workflow_triggered"
     )
-    obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
+    assert trigger_event["data"]["request"]["is_deactivated"]
+
+    # we should have re-run KYC and now have 2 OBDs
+    obds = [i for i in body if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 2
-
-    if with_document:
-        docs = [
-            i for i in timeline if i["event"]["kind"] == "identity_document_uploaded"
-        ]
-        assert len(docs) == 2
-
-        users_docs = get(f"users/{fp_id}/documents", None, tenant.sk.key)
-        assert len(users_docs) == 2
-        assert all(map(lambda x: x["document_type"] == "drivers_license", users_docs))
-        assert users_docs[1]["created_at"] > users_docs[0]["created_at"]
