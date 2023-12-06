@@ -6,9 +6,8 @@ import {
   waitForVerifyButton,
 } from './utils/commands';
 
-test('E2E.Bootstrap #ci', async ({ browserName, page, browser }) => {
+test('E2E.Bootstrap #ci', async ({ browserName, page }) => {
   test.setTimeout(120000);
-  const context = await browser.newContext();
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   const key = 'ob_test_Twvblr3NUeDzPuFteI1OCh';
 
@@ -40,6 +39,5 @@ test('E2E.Bootstrap #ci', async ({ browserName, page, browser }) => {
     frame.getByText('Login with a different account'),
   ).not.toBeAttached();
 
-  await context.close();
   return expect(1).toBe(1);
 });

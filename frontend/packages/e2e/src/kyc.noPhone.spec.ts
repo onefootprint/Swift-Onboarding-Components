@@ -21,9 +21,8 @@ const city = 'Seward';
 const zipCode = '99664';
 const ssn = '418437970';
 
-test('KYC E2E.NoPhoneFlow #ci', async ({ browserName, page, browser }) => {
+test('KYC E2E.NoPhoneFlow #ci', async ({ browserName, page }) => {
   test.setTimeout(120000);
-  const context = await browser.newContext();
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   const key = 'ob_test_h9Qp2W3Trk1pfIoI7dTD5q';
 
@@ -78,6 +77,5 @@ test('KYC E2E.NoPhoneFlow #ci', async ({ browserName, page, browser }) => {
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  await context.close();
   return expect(frame.getByTestId('result').innerText).toBeDefined();
 });

@@ -21,9 +21,8 @@ const zipCode = '94105';
 const country = 'US';
 const ssn9 = '123412345';
 
-test('E2E.Bootstrap #ci', async ({ browserName, page, browser }) => {
+test('E2E.Bootstrap #ci', async ({ browserName, page }) => {
   test.setTimeout(120000);
-  const context = await browser.newContext();
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
 
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
@@ -87,6 +86,5 @@ test('E2E.Bootstrap #ci', async ({ browserName, page, browser }) => {
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 
-  await context.close();
   return expect(1).toBe(1);
 });

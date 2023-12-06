@@ -13,11 +13,7 @@ const number = '378282246310005';
 const cvc = '1234';
 const zip = '12345';
 
-test('form.legacy-sdk-integration #debug', async ({
-  browserName,
-  page,
-  request,
-}) => {
+test('form.legacy-sdk-integration', async ({ browserName, page, request }) => {
   test.setTimeout(120000);
   const fpUserId = 'fp_id_test_LY6hjzRiEQNCsObp4HnNM7'; // From prod acme inc.
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
