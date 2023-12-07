@@ -24,12 +24,14 @@ use db::models::user_timeline::UserTimeline;
 use db::models::workflow::NewWorkflowArgs;
 use db::models::workflow::Workflow;
 use db::models::workflow_request::WorkflowRequest;
+use db::TxnPgConn;
 use newtypes::ContactInfoKind;
 use newtypes::DbActor;
 use newtypes::DocumentConfig;
 use newtypes::DocumentRequestKind;
 use newtypes::PhoneNumber;
 use newtypes::PiiString;
+use newtypes::ScopedVaultId;
 use newtypes::TriggerInfo;
 use newtypes::TriggerKind;
 use newtypes::VaultKind;
@@ -92,50 +94,15 @@ pub async fn post(
                 }
                 // TODO deprecate this type of trigger - it's weird to not be associated with any
                 // playbook, and weird to have to create the wf inline here
-                TriggerInfo::IdDocument { collect_selfie } => {
-                    // Deactivate any redo KYC flows
-                    WorkflowRequest::deactivate(conn, &sv.id, None)?;
-
-                    let last_alpaca_kyc_wf = Workflow::latest_by_kind(conn, &sv.id, WorkflowKind::AlpacaKyc)?;
-                    let last_kyc_wf = Workflow::latest_by_kind(conn, &sv.id, WorkflowKind::Kyc)?;
-                    let last_wf = last_alpaca_kyc_wf
-                        .or(last_kyc_wf)
-                        .ok_or(TenantError::CannotRedoKyc)?;
-                    let args = NewWorkflowArgs {
-                        scoped_vault_id: sv.id.clone(),
-                        config: DocumentConfig {}.into(),
-                        fixture_result: last_wf.fixture_result,
-                        ob_configuration_id: last_wf.ob_configuration_id,
-                        insight_event_id: None,
-                        authorized: false,
-                        // I'm going to get rid of this variant of the trigger API soon. Not worth
-                        // differentiating and adding a new source for here
-                        source: WorkflowSource::Unknown,
-                        is_one_click: false,
-                    };
-                    let wf = Workflow::create(conn, args)?;
-                    let args = NewDocumentRequestArgs {
-                        scoped_vault_id: sv.id.clone(),
-                        ref_id: None,
-                        workflow_id: wf.id.clone(),
-                        should_collect_selfie: collect_selfie,
-                        kind: DocumentRequestKind::Identity,
-                    };
-                    DocumentRequest::create(conn, args)?;
-
-                    let args = UserSessionArgs {
-                        su_id: Some(wf.scoped_vault_id),
-                        wf_id: Some(wf.id.clone()),
-                        obc_id: wf.ob_configuration_id,
-                        ..Default::default()
-                    };
-                    let event = WorkflowTriggeredInfo {
-                        workflow_id: Some(wf.id.clone()),
-                        ob_config_id: None,
-                        workflow_request_id: None,
-                        actor,
-                    };
-                    (event, args)
+                TriggerInfo::IdDocument { collect_selfie } => handle_trigger_document(
+                    conn,
+                    &sv.id,
+                    DocumentRequestKind::Identity,
+                    collect_selfie,
+                    actor,
+                )?,
+                TriggerInfo::ProofOfSsn => {
+                    handle_trigger_document(conn, &sv.id, DocumentRequestKind::ProofOfSsn, false, actor)?
                 }
                 TriggerInfo::RedoKyb => return Err(TenantError::InvalidTriggerKind.into()), // not yet supported
             };
@@ -222,6 +189,15 @@ impl TriggerMessage {
                 self.org_name,
                 self.link.leak()
             )),
+            TriggerKind::ProofOfSsn => PiiString::from(format!(
+                "{}To verify your SSN for {}, provide a photo proof of SSN here: {}", // TODO: sketch
+                self.note
+                    .as_ref()
+                    .map(|n| format!("{}\n\n", n))
+                    .unwrap_or_default(),
+                self.org_name,
+                self.link.leak()
+            )),
         }
     }
 }
@@ -265,4 +241,56 @@ impl<'a> From<TriggerMessage> for EmailMessage<'a> {
             template_data,
         }
     }
+}
+
+fn handle_trigger_document(
+    conn: &mut TxnPgConn,
+    sv_id: &ScopedVaultId,
+    document_request_kind: DocumentRequestKind,
+    collect_selfie: bool,
+    actor: DbActor,
+) -> ApiResult<(WorkflowTriggeredInfo, UserSessionArgs)> {
+    // Deactivate any redo KYC flows
+    WorkflowRequest::deactivate(conn, sv_id, None)?;
+
+    let last_alpaca_kyc_wf = Workflow::latest_by_kind(conn, sv_id, WorkflowKind::AlpacaKyc)?;
+    let last_kyc_wf = Workflow::latest_by_kind(conn, sv_id, WorkflowKind::Kyc)?;
+    let last_wf = last_alpaca_kyc_wf
+        .or(last_kyc_wf)
+        .ok_or(TenantError::CannotRedoKyc)?;
+    let args = NewWorkflowArgs {
+        scoped_vault_id: sv_id.clone(),
+        config: DocumentConfig {}.into(),
+        fixture_result: last_wf.fixture_result,
+        ob_configuration_id: last_wf.ob_configuration_id,
+        insight_event_id: None,
+        authorized: false,
+        // I'm going to get rid of this variant of the trigger API soon. Not worth
+        // differentiating and adding a new source for here
+        source: WorkflowSource::Unknown,
+        is_one_click: false,
+    };
+    let wf = Workflow::create(conn, args)?;
+    let args = NewDocumentRequestArgs {
+        scoped_vault_id: sv_id.clone(),
+        ref_id: None,
+        workflow_id: wf.id.clone(),
+        should_collect_selfie: collect_selfie,
+        kind: document_request_kind,
+    };
+    DocumentRequest::create(conn, args)?;
+
+    let args = UserSessionArgs {
+        su_id: Some(wf.scoped_vault_id),
+        wf_id: Some(wf.id.clone()),
+        obc_id: wf.ob_configuration_id,
+        ..Default::default()
+    };
+    let event = WorkflowTriggeredInfo {
+        workflow_id: Some(wf.id.clone()),
+        ob_config_id: None,
+        workflow_request_id: None,
+        actor,
+    };
+    Ok((event, args))
 }

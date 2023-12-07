@@ -144,5 +144,4 @@ async fn handle_proof_of_ssn(state: &State, workflow_id: WorkflowId, document_ty
             let id_doc = IdentityDocument::get_or_create(conn, args)?;
             Ok(id_doc.id)
         }).await
-
 }

@@ -20,6 +20,7 @@ pub enum TriggerInfo {
     IdDocument {
         collect_selfie: bool,
     },
+    ProofOfSsn,
     RedoKyb,
     // TODO in the future, support BusinessOwnerLink, FinishKyc?, EditData?
 }
