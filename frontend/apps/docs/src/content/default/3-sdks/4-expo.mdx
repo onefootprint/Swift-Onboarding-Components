@@ -56,6 +56,7 @@ import footprint from '@onefootprint/footprint-expo';
 export default function App() {
   const handleButtonPress = async () => {
     footprint.open({
+      scheme: 'footprint', // this has to match the expo scheme from app.json for Android integration to work
       publicKey: 'pb_test_ilBQgKtvrgQrQNV8U2rb7e',
       onComplete: validationToken => {
         alert(validationToken);
@@ -95,6 +96,7 @@ import { View, Button } from 'react-native';
 const Screen = () => {
   const handlePress = () => {
     footprint.open({
+      scheme: 'footprint', // this has to match the expo scheme from app.json for Android integration to work
       publicKey: 'pb_test_VMooXd04EUlnu3AvMYKjMW',
       appearance: {
         fontSrc:
@@ -158,6 +160,7 @@ import { View, Button } from 'react-native';
 const Screen = () => {
   const handlePress = () => {
     footprint.open({
+      scheme: 'footprint', // this has to match the expo scheme from app.json for Android integration to work
       publicKey: 'pb_test_VMooXd04EUlnu3AvMYKjMW',
       userData: {
         'id.email': 'jane.doe@acme.com',
