@@ -2642,7 +2642,6 @@ describe('<Details />', () => {
     describe('risk signals', () => {
       it('should show the results', async () => {
         await renderDetailsAndWaitData();
-
         const container = screen.getByRole('region', {
           name: 'Risk signals',
         });
@@ -2659,7 +2658,6 @@ describe('<Details />', () => {
     describe('device insights', () => {
       it('should show the user agent', async () => {
         await renderDetailsAndWaitData();
-
         const container = screen.getByRole('region', {
           name: 'Device insights',
         });
@@ -2673,7 +2671,6 @@ describe('<Details />', () => {
 
       it('should show the ip address', async () => {
         await renderDetailsAndWaitData();
-
         const container = screen.getByRole('region', {
           name: 'Device insights',
         });
@@ -2688,7 +2685,6 @@ describe('<Details />', () => {
 
       it('should show the biometrics', async () => {
         await renderDetailsAndWaitData();
-
         const container = screen.getByRole('region', {
           name: 'Device insights',
         });
@@ -2703,7 +2699,6 @@ describe('<Details />', () => {
 
       it('should show the region', async () => {
         await renderDetailsAndWaitData();
-
         const container = screen.getByRole('region', {
           name: 'Device insights',
         });
@@ -2718,7 +2713,6 @@ describe('<Details />', () => {
 
       it('should show the country', async () => {
         await renderDetailsAndWaitData();
-
         const container = screen.getByRole('region', {
           name: 'Device insights',
         });
@@ -2740,7 +2734,6 @@ describe('<Details />', () => {
 
     it('should show an error message', async () => {
       renderDetails();
-
       await waitFor(() => {
         const feedback = screen.getByText('Something went wrong');
         expect(feedback).toBeInTheDocument();

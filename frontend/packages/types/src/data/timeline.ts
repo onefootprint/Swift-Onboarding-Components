@@ -39,6 +39,7 @@ export type CollectedDataEventData = {
     | CollectedKycDataOption
     | CollectedInvestorProfileDataOption
   )[];
+  actor?: Actor;
 };
 
 export type FreeFormNoteEvent = {

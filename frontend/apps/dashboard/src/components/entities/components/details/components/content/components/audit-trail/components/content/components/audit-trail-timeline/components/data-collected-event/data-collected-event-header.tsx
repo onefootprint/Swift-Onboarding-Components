@@ -5,6 +5,8 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import CdoTagList from 'src/components/cdo-tag-list';
 
+import Actor from '../actor';
+
 type DataCollectedEventHeaderProps = {
   data: CollectedDataEventData;
 };
@@ -15,9 +17,16 @@ const DataCollectedEventHeader = ({ data }: DataCollectedEventHeaderProps) => {
   );
   const { attributes } = data;
 
-  let title = t('title');
+  let title = <>{t('title')}</>;
   if (data.isPrefill) {
-    title = t('title-prefill');
+    title = <>{t('title-prefill')}</>;
+  } else if (data.actor) {
+    title = (
+      <>
+        <Actor actor={data.actor} />
+        {t('title-edited')}
+      </>
+    );
   }
 
   return (

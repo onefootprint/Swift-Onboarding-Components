@@ -13,8 +13,8 @@ const Actions = ({ entity }: WithEntityProps) => {
   const editControls = useEditControls();
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const shouldShowActionsDropdown =
-    entity?.isPortable && entity.kind === EntityKind.person;
+  const shouldShowActionsDropdown = entity.kind === EntityKind.person;
+  const shouldShowRetriggerKyc = entity?.isPortable;
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
@@ -34,9 +34,11 @@ const Actions = ({ entity }: WithEntityProps) => {
           <Dropdown.Item onSelect={editControls.start}>
             {t('edit-user.label')}
           </Dropdown.Item>
-          <Dropdown.Item onSelect={handleOpenDialog}>
-            {t('retrigger-kyc.label')}
-          </Dropdown.Item>
+          {shouldShowRetriggerKyc && (
+            <Dropdown.Item onSelect={handleOpenDialog}>
+              {t('retrigger-kyc.label')}
+            </Dropdown.Item>
+          )}
         </Dropdown.Content>
       </Dropdown.Root>
       <RetriggerKYCDialog open={dialogOpen} onClose={handleCloseDialog} />

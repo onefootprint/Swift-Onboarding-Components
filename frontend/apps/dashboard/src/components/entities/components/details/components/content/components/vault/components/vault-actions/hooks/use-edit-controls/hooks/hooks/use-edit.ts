@@ -1,8 +1,10 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
 import { type EditRequest, type EditResponse } from '@onefootprint/types';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
+
+import useEntityId from '@/entity/hooks/use-entity-id';
 
 const edit = async (
   { entityId, fields }: EditRequest,
@@ -21,7 +23,19 @@ const edit = async (
 
 const useEdit = () => {
   const { authHeaders } = useSession();
-  return useMutation((data: EditRequest) => edit(data, authHeaders));
+  const entityId = useEntityId();
+  const queryClient = useQueryClient();
+
+  return useMutation((data: EditRequest) => edit(data, authHeaders), {
+    onSuccess: () => {
+      queryClient.invalidateQueries([
+        'entity',
+        entityId,
+        'timeline',
+        authHeaders,
+      ]);
+    },
+  });
 };
 
 export default useEdit;

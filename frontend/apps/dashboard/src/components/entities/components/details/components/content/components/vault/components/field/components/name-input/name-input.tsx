@@ -24,7 +24,7 @@ const NameInput = ({ fieldName, fieldValue }: NameInputProps) => {
   const formField = editFormFieldName(fieldName);
   const hasError = !!errors[formField];
   const options =
-    fieldName === IdDI.middleName
+    fieldName === IdDI.middleName || !fieldValue
       ? {
           validate: (value: string) =>
             validateName(value) !== NameValidationError.SPECIAL_CHARS,

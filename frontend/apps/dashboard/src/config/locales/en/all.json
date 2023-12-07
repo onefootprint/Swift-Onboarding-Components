@@ -1190,7 +1190,8 @@
           "data-collected-event": {
             "title": "Collected",
             "title-prefill": "Prefilled",
-            "title-from-other-org": "Collected (from other companies) "
+            "title-from-other-org": "Collected (from other companies) ",
+            "title-edited": " edited"
           },
           "onboarding-decision-event": {
             "verified-by": "Verified by",
