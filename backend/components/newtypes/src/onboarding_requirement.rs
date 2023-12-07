@@ -41,6 +41,8 @@ pub enum OnboardingRequirement {
         should_collect_consent: bool,
         supported_country_and_doc_types: HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>>,
     },
+    /// Uses the same struct as CollectDocument in practice
+    CollectProofOfSsn,
     /// The client needs to display the authorization consent page and confirm the user authorizes access
     Authorize {
         fields_to_authorize: AuthorizeFields,
@@ -59,19 +61,21 @@ impl OnboardingRequirementKind {
                 Self::CollectInvestorProfile => 2,
                 Self::RegisterPasskey => 3,
                 Self::CollectDocument => 4,
-                Self::Authorize => 5,
-                Self::Process => 6,
+                Self::CollectProofOfSsn => 5,
+                Self::Authorize => 6,
+                Self::Process => 7,
             }
         } else {
             // For a doc-first config, we show passkey and doc collection first
             match self {
                 Self::RegisterPasskey => 0,
                 Self::CollectDocument => 1,
-                Self::CollectBusinessData => 2,
-                Self::CollectData => 3,
-                Self::CollectInvestorProfile => 4,
-                Self::Authorize => 5,
-                Self::Process => 6,
+                Self::CollectProofOfSsn => 2,
+                Self::CollectBusinessData => 3,
+                Self::CollectData => 4,
+                Self::CollectInvestorProfile => 5,
+                Self::Authorize => 6,
+                Self::Process => 7,
             }
         }
     }
@@ -106,6 +110,7 @@ impl OnboardingRequirement {
                 should_collect_selfie: _,
                 supported_country_and_doc_types: _,
             } => false,
+            Self::CollectProofOfSsn => false,
             Self::Process => false,
         }
     }

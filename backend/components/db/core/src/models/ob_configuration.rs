@@ -201,6 +201,13 @@ impl ObConfiguration {
         }
     }
 
+    pub fn supported_countries_and_doc_types_for_proof_of_ssn(&self) -> SupportedDocumentAndCountryMapping {
+        SupportedDocumentAndCountryMapping(HashMap::from_iter(vec![(
+            Iso3166TwoDigitCountryCode::US,
+            vec![IdDocKind::SsnCard],
+        )]))
+    }
+
     pub fn restricted_id_doc_kinds(&self) -> Option<Vec<IdDocKind>> {
         self.document_cdo().and_then(|cdo| cdo.restricted_id_doc_kinds())
     }

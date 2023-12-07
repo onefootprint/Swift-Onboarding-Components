@@ -55,6 +55,12 @@ impl DocumentRequest {
         Ok(result)
     }
 
+    #[tracing::instrument("DocumentRequest::get_proof_of_ssn", skip_all)]
+    pub fn get_proof_of_ssn(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Option<Self>> {
+        let result = Self::get(conn, wf_id, DocumentRequestKind::ProofOfSsn)?;
+        Ok(result)
+    }
+
     #[tracing::instrument("DocumentRequest::get", skip_all)]
     pub fn get(conn: &mut PgConn, wf_id: &WorkflowId, kind: DocumentRequestKind) -> DbResult<Option<Self>> {
         let result = document_request::table
