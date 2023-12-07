@@ -45,7 +45,7 @@ pub async fn post(
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(
                 conn,
-                db::models::scoped_vault::ScopedVaultIdentifier::SuperAdminView { fp_id: &fp_id },
+                db::models::scoped_vault::ScopedVaultIdentifier::SuperAdminView { identifier: &fp_id },
             )?;
             VaultWrapper::<api_core::utils::vault_wrapper::Any>::build_for_tenant(conn, &sv.id)
         })

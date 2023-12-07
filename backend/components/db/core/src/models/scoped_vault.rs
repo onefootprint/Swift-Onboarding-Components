@@ -110,7 +110,8 @@ pub enum ScopedVaultIdentifier<'a> {
     },
     /// Only used in firm-employee-authed GET /private/entities API
     SuperAdminView {
-        fp_id: &'a FpId,
+        /// Either an fp id or a scoped vault id
+        identifier: &'a str,
     },
 }
 
@@ -286,8 +287,12 @@ impl ScopedVault {
                     .filter(scoped_vault::vault_id.eq(v_id))
                     .filter(scoped_vault::tenant_id.eq(t_id));
             }
-            ScopedVaultIdentifier::SuperAdminView { fp_id } => {
-                query = query.filter(scoped_vault::fp_id.eq(fp_id));
+            ScopedVaultIdentifier::SuperAdminView { identifier } => {
+                query = query.filter(
+                    scoped_vault::id
+                        .eq(identifier)
+                        .or(scoped_vault::fp_id.eq(identifier)),
+                );
             }
         }
         let result = query.first(conn)?;
