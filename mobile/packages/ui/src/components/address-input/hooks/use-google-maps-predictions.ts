@@ -14,7 +14,7 @@ const useGoogleMapsPredictions = (countryCode: string) => {
   const cache = useRef<PredictionCache>({});
 
   const fetchPredictions = async (address: string) => {
-    if (address === '') {
+    if (address.length <= 2) {
       setData([]);
       return;
     }

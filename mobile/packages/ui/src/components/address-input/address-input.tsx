@@ -32,6 +32,7 @@ export type AddressInputProps = {
   placeholder?: string;
   searchInputProps?: TextInputProps;
   searchTitle?: string;
+  value?: string;
 };
 
 const AddressInput = forwardRef<AddressInputRef, AddressInputProps>(
@@ -52,6 +53,7 @@ const AddressInput = forwardRef<AddressInputRef, AddressInputProps>(
       placeholder,
       searchInputProps,
       searchTitle = 'Search...',
+      value,
     },
     ref,
   ) => {
@@ -99,6 +101,7 @@ const AddressInput = forwardRef<AddressInputRef, AddressInputProps>(
           editable={false}
           onPressIn={disabled ? undefined : handleFocus}
           placeholder={placeholder}
+          value={value}
         />
         <Box position="relative" />
         {!!hint && (

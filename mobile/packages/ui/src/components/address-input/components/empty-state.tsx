@@ -6,7 +6,7 @@ import Typography from '../../typography';
 
 type EmptyStateProps = {
   title: string;
-  cta: {
+  cta?: {
     label: string;
     onPress: () => void;
   };
@@ -16,7 +16,7 @@ const EmptyState = ({ title, cta }: EmptyStateProps) => {
   return (
     <Box gap={3} center marginTop={12}>
       <Typography variant="body-3">{title}</Typography>
-      <LinkButton onPress={cta.onPress}>{cta.label}</LinkButton>
+      {cta ? <LinkButton onPress={cta.onPress}>{cta.label}</LinkButton> : null}
     </Box>
   );
 };

@@ -9,6 +9,7 @@ import styled, { css } from 'styled-components/native';
 
 import Box from '../../box';
 import IconButton from '../../icon-button';
+import LoadingIndicator from '../../loading-indicator';
 import Pressable from '../../pressable';
 import TextInput from '../../text-input';
 import Typography from '../../typography';
@@ -45,7 +46,7 @@ const Picker = ({
   },
 }: PickerProps) => {
   const [search, setSearch] = useState('');
-  const { data, mutate, reset } = useGoogleMapsPredictions(country);
+  const { data, isLoading, mutate, reset } = useGoogleMapsPredictions(country);
   const options = take(data, MAX_OF_RESULTS);
 
   useEffect(() => {
@@ -70,6 +71,27 @@ const Picker = ({
   const handleChange = (prediction: AddressPrediction) => {
     onChange?.(prediction);
     onClose();
+  };
+
+  const renderEmptyState = () => {
+    if (isLoading) {
+      return (
+        <Box gap={3} center marginTop={12}>
+          <LoadingIndicator />
+        </Box>
+      );
+    }
+    return search.length > 2 ? (
+      <EmptyState
+        title={emptyStateText}
+        cta={{
+          label: emptyStateResetText,
+          onPress: resetSearch,
+        }}
+      />
+    ) : (
+      <EmptyState title="Type at least 2 letters to start" />
+    );
   };
 
   return (
@@ -121,17 +143,7 @@ const Picker = ({
           data={options}
           estimatedItemSize={48}
           keyboardShouldPersistTaps="always"
-          ListEmptyComponent={
-            search ? (
-              <EmptyState
-                title={emptyStateText}
-                cta={{
-                  label: emptyStateResetText,
-                  onPress: resetSearch,
-                }}
-              />
-            ) : null
-          }
+          ListEmptyComponent={renderEmptyState}
           keyExtractor={item => item.place_id.toString()}
           renderItem={({ item }) => {
             return (

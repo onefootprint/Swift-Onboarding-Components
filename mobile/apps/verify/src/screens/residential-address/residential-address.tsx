@@ -6,8 +6,9 @@ import type {
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 import { IdDI, isCountryCode } from '@onefootprint/types';
-import type { SelectRef } from '@onefootprint/ui';
+import type { AddressPrediction, SelectRef } from '@onefootprint/ui';
 import {
+  AddressInput,
   Box,
   Button,
   Container,
@@ -32,6 +33,7 @@ import getInitialState from '@/utils/get-initial-state';
 
 import type { FormData } from './types';
 import convertFormData from './utils/convert-form-data';
+import getAddressComponent from './utils/get-address-components';
 
 export type ResidentialAddressProps = {
   requirement: CollectKycDataRequirement;
@@ -104,19 +106,27 @@ const ResidentialAddress = ({
       value: z.string().min(1, { message: t('form.state.errors.required') }),
     }),
   });
-  const { control, handleSubmit, resetField, setFocus, setError } =
-    useForm<FormData>({
-      defaultValues: {
-        addressLine1: kycData[IdDI.addressLine1]?.value,
-        addressLine2: kycData[IdDI.addressLine2]?.value,
-        city: kycData[IdDI.city]?.value,
-        country: getInitialCountry(defaultCountry),
-        state: getInitialState(kycData[IdDI.state]?.value),
-        zip: kycData[IdDI.zip]?.value,
-      },
-      resolver: zodResolver(schema),
-    });
-  const addressLine1Ref = useRef<RNTextInput>(null);
+  const {
+    control,
+    setValue,
+    watch,
+    handleSubmit,
+    resetField,
+    setFocus,
+    setError,
+  } = useForm<FormData>({
+    defaultValues: {
+      addressLine1: kycData[IdDI.addressLine1]?.value,
+      addressLine2: kycData[IdDI.addressLine2]?.value,
+      city: kycData[IdDI.city]?.value,
+      country: getInitialCountry(defaultCountry),
+      state: getInitialState(kycData[IdDI.state]?.value),
+      zip: kycData[IdDI.zip]?.value,
+    },
+    resolver: zodResolver(schema),
+  });
+
+  const country = watch('country') ?? defaultCountry;
   const addressLine2Ref = useRef<RNTextInput>(null);
   const cityRef = useRef<RNTextInput>(null);
   const zipRef = useRef<RNTextInput>(null);
@@ -128,7 +138,7 @@ const ResidentialAddress = ({
     resetField('city');
     resetField('state');
     resetField('zip');
-    setFocus('addressLine1'); // TODO: this line doesn't have any effect on mobile for some reason. It works on web. Test it.
+    setFocus('addressLine1');
   };
 
   const handleSyncDataError = (error: SyncDataFieldErrors) => {
@@ -145,6 +155,40 @@ const ResidentialAddress = ({
         );
       }
     });
+  };
+
+  const handleAddressSelect = async (prediction?: AddressPrediction | null) => {
+    if (!prediction) return;
+    resetField('addressLine1');
+    resetField('addressLine2');
+    resetField('city');
+    resetField('state');
+    resetField('zip');
+    const formattedStreetAddress = prediction?.structured_formatting.main_text;
+    if (formattedStreetAddress) {
+      setValue('addressLine1', formattedStreetAddress);
+    }
+    const result = await getAddressComponent(prediction.place_id);
+    if (result) {
+      if (result.city) {
+        setValue('city', result.city);
+      }
+      if (result.state) {
+        if (country.value === 'US') {
+          const possibleState = states.find(
+            stateOption => stateOption.label === result.state,
+          );
+          if (possibleState) {
+            setValue('state', possibleState);
+          }
+        } else {
+          setValue('state', result.state);
+        }
+      }
+      if (result.zip) {
+        setValue('zip', result.zip);
+      }
+    }
   };
 
   const onSubmit = (formData: FormData) => {
@@ -208,22 +252,25 @@ const ResidentialAddress = ({
             fieldState: { error },
           }) => {
             return (
-              <TextInput
-                autoComplete="address-line1"
-                autoFocus
-                blurOnSubmit={false}
-                enterKeyHint="next"
+              <AddressInput
+                country={country.value}
                 hasError={!!error}
                 hint={error?.message}
-                inputMode="text"
                 label={t('form.address-line1.label')}
                 onBlur={onBlur}
+                onChange={handleAddressSelect}
                 onChangeText={onChange}
-                onSubmitEditing={() => addressLine2Ref.current?.focus()}
                 placeholder={t('form.address-line1.placeholder')}
-                private
-                ref={addressLine1Ref}
-                textContentType="streetAddressLine1"
+                searchInputProps={{
+                  autoComplete: 'address-line1',
+                  enterKeyHint: 'next',
+                  placeholder: t('form.address-line1.placeholder'),
+                  textContentType: 'streetAddressLine1',
+                  blurOnSubmit: false,
+                  onSubmitEditing: () => {
+                    addressLine2Ref.current?.focus();
+                  },
+                }}
                 value={value}
               />
             );

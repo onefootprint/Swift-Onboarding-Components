@@ -1,8 +1,13 @@
 export type {
+  AddressGeocoder,
   AddressInputProps,
+  AddressPlace,
   AddressPrediction,
 } from './components/address-input';
-export { default as AddressInput } from './components/address-input';
+export {
+  default as AddressInput,
+  getGoogleMapsAddressDetails,
+} from './components/address-input';
 export type { BoxProps } from './components/box';
 export { default as Box } from './components/box';
 export type { ButtonProps } from './components/button';
