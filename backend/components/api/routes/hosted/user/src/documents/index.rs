@@ -56,7 +56,7 @@ pub async fn post(
         .db_transaction(move |conn| -> ApiResult<_> {
             // If there's no doc requests, nothing to do here
             let doc_request =
-                DbDocumentRequest::get(conn, &wf_id)?.ok_or(OnboardingError::NoDocumentRequestFound)?;
+                DbDocumentRequest::get_identity(conn, &wf_id)?.ok_or(OnboardingError::NoDocumentRequestFound)?;
 
             let (obc, _) = ObConfiguration::get(conn, &wf_id)?;         
             decision::vendor::incode::validate_doc_type_is_allowed(

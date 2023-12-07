@@ -185,7 +185,8 @@ pub(crate) async fn create_cip_request(
                 }
             };
 
-            let collected_document = DocumentRequest::get(conn, &wf.id)?.map(|d| d.should_collect_selfie);
+            let collected_document =
+                DocumentRequest::get_identity(conn, &wf.id)?.map(|d| d.should_collect_selfie);
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             let insight = InsightEvent::get(conn, &wf.id)?;
 

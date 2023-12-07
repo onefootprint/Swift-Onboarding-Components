@@ -210,7 +210,7 @@ async fn make_decision(
             save_risk_signals(conn, &wf.scoped_vault_id, &risk_signals, false)?;
             let rule_group = KycRuleGroup::default();
             let risk_signals = fetch_latest_risk_signals_map(conn, &wf.scoped_vault_id)?;
-            let include_doc = DocumentRequest::get(conn, &wf.id)?.is_some();
+            let include_doc = DocumentRequest::get_identity(conn, &wf.id)?.is_some();
             let config = KycRuleExecutionConfig {
                 include_doc,
                 document_only: false,

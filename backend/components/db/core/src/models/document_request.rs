@@ -49,10 +49,17 @@ impl DocumentRequest {
         Ok(result)
     }
 
+    #[tracing::instrument("DocumentRequest::get_identity", skip_all)]
+    pub fn get_identity(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Option<Self>> {
+        let result = Self::get(conn, wf_id, DocumentRequestKind::Identity)?;
+        Ok(result)
+    }
+
     #[tracing::instrument("DocumentRequest::get", skip_all)]
-    pub fn get(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Option<Self>> {
+    pub fn get(conn: &mut PgConn, wf_id: &WorkflowId, kind: DocumentRequestKind) -> DbResult<Option<Self>> {
         let result = document_request::table
             .filter(document_request::workflow_id.eq(wf_id))
+            .filter(document_request::kind.eq(kind))
             .first(conn)
             .optional()?;
         Ok(result)
@@ -60,7 +67,7 @@ impl DocumentRequest {
 
     #[tracing::instrument("DocumentRequest::get_or_create", skip_all)]
     pub fn get_or_create(conn: &mut TxnPgConn, args: NewDocumentRequestArgs) -> DbResult<Self> {
-        if let Some(existing) = Self::get(conn, &args.workflow_id)? {
+        if let Some(existing) = Self::get(conn, &args.workflow_id, args.kind)? {
             // TODO FP-5894: this is a bit lacking in specificity could be a doc req that is _not_ a selfie, but should be a selfie based on app logic
             Ok(existing)
         } else {

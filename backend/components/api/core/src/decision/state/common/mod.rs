@@ -223,7 +223,7 @@ pub fn get_decision(
         }
         _ => KycRuleGroup::default(),
     };
-    let doc_collected = DocumentRequest::get(conn, &wf.id)?.is_some();
+    let doc_collected = DocumentRequest::get_identity(conn, &wf.id)?.is_some();
     let document_only = should_execute_rules_for_document_only(vault, wf)?;
 
     let config = KycRuleExecutionConfig {

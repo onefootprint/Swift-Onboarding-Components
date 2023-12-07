@@ -399,7 +399,7 @@ fn get_requirement_inner(
             }
         }
         OnboardingRequirementKind::CollectDocument => {
-            let dr = DocumentRequest::get(conn, &wf.id)?;
+            let dr = DocumentRequest::get_identity(conn, &wf.id)?;
             if let Some(dr) = dr {
                 let user_consent = UserConsent::get_for_workflow(conn, &wf.id)?;
                 let id_doc = IdentityDocument::list_by_request_id(conn, &dr.id)?;
