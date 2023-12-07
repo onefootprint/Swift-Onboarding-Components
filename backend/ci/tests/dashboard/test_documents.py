@@ -75,7 +75,8 @@ def test_tenant_document_decrypt(user_with_documents):
     assert resp["document.drivers_license.document_number"] == "Y12341234"
     assert resp["document.drivers_license.issuing_state"] == "CALIFORNIA"
     assert resp["document.drivers_license.expires_at"] == "2024-10-15"
-    assert resp["document.drivers_license.dob"] == "1986-10-16"
+    # by default, we put the id.dob into the OCR response in sandbox
+    assert resp["document.drivers_license.dob"] == "1995-12-25"
 
     access_event = latest_access_event_for(user_with_documents.fp_id, tenant)
     assert set(access_event["targets"]) == set(fields)

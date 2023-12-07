@@ -1,19 +1,18 @@
 use crate::auth::user::UserAuthGuard;
+use crate::documents::utils;
 use crate::errors::ApiResult;
 use crate::types::response::ResponseData;
 use api_core::auth::user::UserWfAuthContext;
+use api_core::decision;
 use api_core::decision::vendor::incode::states::save_incode_fixtures;
-use api_core::decision::{self};
 use api_core::types::JsonApiResponse;
 use api_core::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use api_core::State;
 use api_wire_types::DocumentResponse;
 use db::models::decision_intent::DecisionIntent;
-use db::models::document_upload::DocumentUpload;
 use db::models::identity_document::IdentityDocument;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::ob_configuration::ObConfiguration;
-use itertools::Itertools;
 use newtypes::WorkflowGuard;
 use newtypes::{DecisionIntentKind, DocumentSide, IdentityDocumentId};
 use paperclip::actix::{self, api_v2_operation, web};
@@ -48,31 +47,12 @@ pub async fn post(
             let (id_doc, dr) = IdentityDocument::get(conn, &doc_id)?;
             let side_from_session: Option<DocumentSide> = IncodeVerificationSession::get(conn, &id_doc.id)?
                 .and_then(|session| session.side_from_session());
-            let attempts_for_side = if let Some(side) = side_from_session {
-                DocumentUpload::count_failed_attempts(conn, &id_doc.id)?
-                    .iter()
-                    .filter_map(|(s, n)| (side == *s).then_some(*n))
-                    .next()
-            } else {
-                None
-            };
+
             let uvw: VaultWrapper<Person> = VaultWrapper::build(conn, VwArgs::Tenant(&su_id))?;
             let should_collect_selfie = dr.should_collect_selfie && !id_doc.should_skip_selfie();
-            let existing_sides = id_doc
-                .images(conn, true)?
-                .into_iter()
-                .map(|u| u.side)
-                .collect_vec();
-            let required_sides = id_doc
-                .document_type
-                .sides()
-                .into_iter()
-                .chain(should_collect_selfie.then_some(DocumentSide::Selfie))
-                .collect_vec();
-            let missing_sides = required_sides
-                .into_iter()
-                .filter(|s| !existing_sides.contains(s))
-                .collect_vec();
+            let (missing_sides, attempts_for_side) =
+                utils::get_side_info(conn, &id_doc, should_collect_selfie, side_from_session)?;
+
             Ok((
                 di,
                 id_doc,
@@ -106,17 +86,23 @@ pub async fn post(
             state.feature_flag_client.clone(),
             failed_attempts,
             false,
-            missing_sides,
+            missing_sides.0,
         )
         .await?
     } else {
         // Fixture response - we always complete successfully!
-        let next_side_to_collect = vec![DocumentSide::Front, DocumentSide::Back, DocumentSide::Selfie]
-            .into_iter()
-            .find(|s| missing_sides.contains(s));
+        let next_side_to_collect = missing_sides.next_side_to_collect();
         if next_side_to_collect.is_none() {
-            // Save fixture VRes
-            save_incode_fixtures(&state, &user_auth.scoped_user.id.clone(), &wf.id).await?;
+            // Save fixture VRes and risk signals
+            save_incode_fixtures(
+                &state,
+                &user_auth.scoped_user.id.clone(),
+                &wf.id,
+                obc.is_doc_first,
+                id_doc,
+                should_collect_selfie,
+            )
+            .await?;
         }
         DocumentResponse {
             next_side_to_collect,

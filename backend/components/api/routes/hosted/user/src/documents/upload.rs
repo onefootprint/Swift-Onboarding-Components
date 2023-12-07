@@ -1,6 +1,7 @@
 use crate::auth::user::UserAuthGuard;
+use crate::documents::utils;
 use crate::errors::onboarding::OnboardingError;
-use crate::errors::{ApiError, ApiResult};
+use crate::errors::ApiResult;
 use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::{decision, State};
@@ -8,12 +9,10 @@ use actix_multipart::Multipart;
 use actix_web::HttpRequest;
 use actix_web::{http::header::HeaderMap, FromRequest};
 use api_core::auth::user::UserWfAuthContext;
-use api_core::decision::features::incode_docv::IncodeOcrComparisonDataFields;
-use api_core::decision::vendor;
-use api_core::decision::vendor::incode::states::{save_incode_fixtures, Complete};
+use api_core::decision::vendor::incode::states::save_incode_fixtures;
 use api_core::telemetry::RootSpan;
 use api_core::types::JsonApiResponse;
-use api_core::utils::file_upload::handle_file_upload;
+use api_core::utils::file_upload::{handle_file_upload, FileUpload};
 use api_core::utils::headers::get_bool_header;
 use api_core::utils::vault_wrapper::{seal_file_and_upload_to_s3, Person, VwArgs};
 use api_wire_types::DocumentResponse;
@@ -22,22 +21,18 @@ use db::models::document_upload::{DocumentUpload, NewDocumentUploadArgs};
 use db::models::identity_document::IdentityDocument;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::user_consent::UserConsent;
-use db::models::vault::Vault;
-use db::models::verification_request::VerificationRequest;
-use db::models::verification_result::VerificationResult;
 use db::TxnPgConn;
 use futures_util::Future;
-use itertools::Itertools;
 use newtypes::{
     DataIdentifier, DataLifetimeSource, DecisionIntentKind, DocumentKind, DocumentSide, IdentityDocumentId,
-    IdentityDocumentStatus, WorkflowId,
+    IdentityDocumentStatus, S3Url, SealedVaultDataKey,
 };
-use newtypes::{ScopedVaultId, VendorAPI, WorkflowGuard};
+use newtypes::{ScopedVaultId, WorkflowGuard};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{self, api_v2_operation, web};
 use std::pin::Pin;
 
-#[derive(Debug, Apiv2Schema)]
+#[derive(Debug, Apiv2Schema, Clone)]
 pub struct MetaHeaders {
     pub is_instant_app: Option<bool>,
     pub is_app_clip: Option<bool>,
@@ -112,13 +107,12 @@ pub async fn post(
             Ok((id_doc, doc_request, uvw, user_consent, obc))
         })
         .await??;
+    let meta2 = meta.clone();
 
     if id_doc.status != IdentityDocumentStatus::Pending {
         // Do not change this error - the frontend is relying upon it
         return Err(OnboardingError::IdentityDocumentNotPending.into());
     }
-
-    let vault = uvw.vault.clone();
     // We support the flow
     let should_collect_selfie = doc_request.should_collect_selfie && !id_doc.should_skip_selfie();
 
@@ -137,58 +131,30 @@ pub async fn post(
         seal_file_and_upload_to_s3(&state, &file, di.clone(), user_auth.user(), &su_id).await?;
 
     // Create uploads for the document
-    let vault2 = vault.clone();
     let wf_id = wf.id.clone();
     let wf_id2 = wf.id.clone();
     let is_sandbox = id_doc.fixture_result.is_some();
     // Check if we should be initiating requests (e.g. check if we are testing)
-    let (should_initiate_reqs, ocr_fixture) =
+    let (should_initiate_reqs, _) =
         decision::utils::should_initiate_requests_for_document(&state, &uvw, id_doc.fixture_result).await?;
+    let id_doc2 = id_doc.clone();
 
     let (missing_sides, created_reqs) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let uvw = VaultWrapper::lock_for_onboarding(conn, &su_id)?;
-            // Vault the images under latest uploads
-
-            let source = DataLifetimeSource::Hosted;
-            let (d, seqno) = uvw.put_document_unsafe(
+            create_latest_doc_upload(
                 conn,
+                &su_id,
                 di,
-                file.mime_type,
-                file.filename,
-                e_data_key,
                 s3_url,
-                source,
-                None,
-            )?;
-            let args = NewDocumentUploadArgs {
-                document_id: id_doc.id.clone(),
                 side,
-                s3_url: d.s3_url,
-                e_data_key: d.e_data_key,
-                created_seqno: seqno,
-                is_instant_app: meta.is_instant_app,
-                is_app_clip: meta.is_app_clip,
-                is_manual: meta.is_manual,
-                is_extra_compressed: meta.is_extra_compressed,
-            };
-            DocumentUpload::create(conn, args)?;
-            let existing_sides = id_doc
-                .images(conn, true)?
-                .into_iter()
-                .map(|u| u.side)
-                .collect_vec();
-            let required_sides = id_doc
-                .document_type
-                .sides()
-                .into_iter()
-                .chain(should_collect_selfie.then_some(DocumentSide::Selfie))
-                .collect_vec();
-            let missing_sides = required_sides
-                .into_iter()
-                .filter(|s| !existing_sides.contains(s))
-                .collect_vec();
+                id_doc.id.clone(),
+                file,
+                e_data_key,
+                meta2,
+            )?;
+            let (missing_sides, attempts_for_side) =
+                utils::get_side_info(conn, &id_doc, should_collect_selfie, Some(side))?;
 
             // Now that the document is created, either initiate IDV reqs or create fixture data
             let result = if should_initiate_reqs {
@@ -200,46 +166,8 @@ pub async fn post(
                     DecisionIntentKind::DocScan,
                 )?;
 
-                let attempts_for_side = DocumentUpload::count_failed_attempts(conn, &id_doc.id)?
-                    .iter()
-                    .filter_map(|(s, n)| (side == *s).then_some(*n))
-                    .next();
                 Some((decision_intent, doc_request, id_doc.id, attempts_for_side))
             } else {
-                // TODO could move this into process
-                if missing_sides.is_empty() {
-                    // Create fixture data once all of the sides are uploaded
-                    let ocr =
-                        idv::incode::doc::response::FetchOCRResponse::fixture_response(ocr_fixture.clone());
-                    let ocr = serde_json::from_value(ocr)?;
-
-                    // We need to synthetically set up a vres in order to not get db constraint errors when saving risk signals
-                    let fake_score_response =
-                        idv::incode::doc::response::FetchScoresResponse::fixture_response(
-                            id_doc.fixture_result,
-                        )
-                        .map_err(idv::Error::from)?;
-                    let res = serde_json::to_value(fake_score_response.clone())?;
-                    let vres = save_vres_for_fixture_risk_signals(conn, &su_id, &vault2, &wf_id, res)?;
-                    let id_data = (!obc.is_doc_first)
-                        .then_some(ocr_fixture.unwrap_or(IncodeOcrComparisonDataFields::default()));
-
-                    // Enter the complete state
-                    Complete::enter(
-                        conn,
-                        &vault2,
-                        &su_id,
-                        &id_doc.id,
-                        id_doc.document_type,
-                        vec![],
-                        ocr,
-                        fake_score_response,
-                        id_data,
-                        should_collect_selfie,
-                        vres.id.clone(),
-                        vres.id,
-                    )?;
-                }
                 None
             };
 
@@ -248,9 +176,7 @@ pub async fn post(
         .await?;
 
     // Compose the API response
-    let next_side_to_collect = vec![DocumentSide::Front, DocumentSide::Back, DocumentSide::Selfie]
-        .into_iter()
-        .find(|s| missing_sides.contains(s));
+    let next_side_to_collect = missing_sides.next_side_to_collect();
     if meta.process_separately.unwrap_or_default() {
         // Tracing so we can query for when no requests are being sent with the old API
         tracing::info!("Processing separately");
@@ -282,14 +208,22 @@ pub async fn post(
             state.feature_flag_client.clone(),
             failed_attempts_for_side,
             false,
-            missing_sides,
+            missing_sides.0,
         )
         .await?
     } else {
         // Fixture response - we always complete successfully!
         if next_side_to_collect.is_none() {
             // Save fixture VRes
-            save_incode_fixtures(&state, &user_auth.scoped_user.id.clone(), &wf.id).await?;
+            save_incode_fixtures(
+                &state,
+                &user_auth.scoped_user.id.clone(),
+                &wf.id,
+                obc.is_doc_first,
+                id_doc2,
+                should_collect_selfie,
+            )
+            .await?;
         }
         DocumentResponse {
             next_side_to_collect,
@@ -300,20 +234,42 @@ pub async fn post(
     ResponseData::ok(response).json()
 }
 
-pub(crate) fn save_vres_for_fixture_risk_signals(
+#[allow(clippy::too_many_arguments)]
+fn create_latest_doc_upload(
     conn: &mut TxnPgConn,
     sv_id: &ScopedVaultId,
-    vault: &Vault,
-    wf_id: &WorkflowId,
-    response: serde_json::Value,
-) -> Result<VerificationResult, ApiError> {
-    let di = DecisionIntent::get_or_create_for_workflow(conn, sv_id, wf_id, DecisionIntentKind::DocScan)?;
-    let vreq = VerificationRequest::create(conn, sv_id, &di.id, VendorAPI::IncodeFetchScores)?;
-    let e_response = vendor::verification_result::encrypt_verification_result_response(
-        &response.clone().into(),
-        &vault.public_key,
+    di: DataIdentifier,
+    s3_url: S3Url,
+    side: DocumentSide,
+    identity_document_id: IdentityDocumentId,
+    file: FileUpload,
+    e_data_key: SealedVaultDataKey,
+    meta: MetaHeaders,
+) -> ApiResult<()> {
+    let uvw = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
+    // Vault the images under latest uploads
+    let source = DataLifetimeSource::Hosted;
+    let (d, seqno) = uvw.put_document_unsafe(
+        conn,
+        di,
+        file.mime_type,
+        file.filename,
+        e_data_key,
+        s3_url,
+        source,
+        None,
     )?;
-    let vres = VerificationResult::create(conn, vreq.id, response.into(), e_response, false)?;
-
-    Ok(vres)
+    let args = NewDocumentUploadArgs {
+        document_id: identity_document_id,
+        side,
+        s3_url: d.s3_url,
+        e_data_key: d.e_data_key,
+        created_seqno: seqno,
+        is_instant_app: meta.is_instant_app,
+        is_app_clip: meta.is_app_clip,
+        is_manual: meta.is_manual,
+        is_extra_compressed: meta.is_extra_compressed,
+    };
+    DocumentUpload::create(conn, args)?;
+    Ok(())
 }

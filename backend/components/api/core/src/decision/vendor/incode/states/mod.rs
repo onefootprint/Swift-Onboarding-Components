@@ -4,13 +4,14 @@ use std::sync::Arc;
 use chrono::Utc;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document_upload::DocumentUpload;
+use db::models::identity_document::IdentityDocument;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::verification_request::VerificationRequest;
 
 mod start_onboarding;
 
 use feature_flag::{BoolFlag, FeatureFlagClient};
-use idv::test_fixtures::DocTestOpts;
+use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse};
 use newtypes::incode::{IncodeDocumentRestriction, IncodeDocumentType};
 pub use start_onboarding::*;
 
@@ -173,6 +174,9 @@ pub async fn save_incode_fixtures(
     state: &State,
     scoped_vault_id: &ScopedVaultId,
     wf_id: &WorkflowId,
+    is_doc_first: bool,
+    id_doc: IdentityDocument,
+    should_collect_selfie: bool,
 ) -> ApiResult<()> {
     let suid = scoped_vault_id.clone();
     let suid2 = scoped_vault_id.clone();
@@ -201,15 +205,17 @@ pub async fn save_incode_fixtures(
             )?;
 
             // Save OCR
-            let raw_ocr_response =
-                idv::incode::doc::response::FetchOCRResponse::fixture_response(Some(ocr_data));
+            let raw_ocr_response = FetchOCRResponse::fixture_response(Some(ocr_data.clone()));
             let e_ocr_response = vendor::verification_result::encrypt_verification_result_response(
                 &raw_ocr_response.clone().into(),
                 &uv_public_key,
             )?;
+            let parsed_ocr_response: FetchOCRResponse = serde_json::from_value(raw_ocr_response.clone())?;
 
             // save scores
-            let raw_score_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts::default());
+            let parsed_score_response =
+                FetchScoresResponse::fixture_response(id_doc.fixture_result).map_err(idv::Error::from)?;
+            let raw_score_response = serde_json::to_value(parsed_score_response.clone())?;
             let e_score_response = vendor::verification_result::encrypt_verification_result_response(
                 &raw_score_response.clone().into(),
                 &uv_public_key,
@@ -238,7 +244,27 @@ pub async fn save_incode_fixtures(
                 })
                 .collect();
 
-            let _result = VerificationResult::bulk_create(conn, new_vres)?;
+            let mut result = VerificationResult::bulk_create(conn, new_vres)?;
+            let vres = result
+                .pop()
+                .ok_or(AssertionError("missing vres in incode fixture"))?;
+            let id_data = (!is_doc_first).then_some(ocr_data);
+
+            // Enter the complete state to save risk signals
+            Complete::enter(
+                conn,
+                &uvw.vault,
+                &suid2,
+                &id_doc.id,
+                id_doc.document_type,
+                vec![],
+                parsed_ocr_response,
+                parsed_score_response,
+                id_data,
+                should_collect_selfie,
+                vres.id.clone(),
+                vres.id,
+            )?;
 
             Ok(())
         })

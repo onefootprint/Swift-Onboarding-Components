@@ -105,7 +105,7 @@ pub async fn should_initiate_requests_for_document(
     // We allow identity documents to be tested in sandbox against incode demo environment, if a tenant is flagged in
     // We use a flag since not all tenants should have this enabled by default (they might need to sign incode terms and be advised that they can only do this for testing purposes)
     if !uvw.vault.is_live {
-        // TODO: frontend not merged yet, enable this when it is
+        // TODO: ADD this assertion in main index.rs and remove fixture stuff from here
         // let d = document_decision
         //     // Ensure that each sandbox vault has a fixture result - we don't want to make real
         //     // requests for sandbox vaults
