@@ -497,27 +497,30 @@ def create_user(twilio, phone_number, email, token_kind, *headers) -> str:
 
 
 def create_tenant(org_data, ob_conf_data):
-    body = post("private/test_tenant", org_data, CUSTODIAN_AUTH)
-    print("\n======org info======")
-    print(body)
-    sk = SecretApiKey.from_response(body["key"])
-    auth_token = DashboardAuth(body["auth_token"])
-    ro_auth_token = DashboardAuth(body["ro_auth_token"])
-    is_live = IsLive("true" if org_data.get("is_live", False) else "false")
-    tenant = Tenant(
-        id=body["org_id"],
-        sk=sk,
-        name=org_data["name"],
-        db_auths=[auth_token, is_live],
-        auth_token=auth_token,
-        ro_db_auths=[ro_auth_token, is_live],
-        ro_auth_token=ro_auth_token,
-        default_ob_config=None,  # Will populate this after making OB config
-    )
-    ob_config = create_ob_config(tenant, **ob_conf_data)
-    # Circular reference, but worth it for simplicity of writing tests
-    tenant = tenant._replace(default_ob_config=ob_config)
-    return tenant
+    def inner():
+        body = post("private/test_tenant", org_data, CUSTODIAN_AUTH)
+        print("\n======org info======")
+        print(body)
+        sk = SecretApiKey.from_response(body["key"])
+        auth_token = DashboardAuth(body["auth_token"])
+        ro_auth_token = DashboardAuth(body["ro_auth_token"])
+        is_live = IsLive("true" if org_data.get("is_live", False) else "false")
+        tenant = Tenant(
+            id=body["org_id"],
+            sk=sk,
+            name=org_data["name"],
+            db_auths=[auth_token, is_live],
+            auth_token=auth_token,
+            ro_db_auths=[ro_auth_token, is_live],
+            ro_auth_token=ro_auth_token,
+            default_ob_config=None,  # Will populate this after making OB config
+        )
+        ob_config = create_ob_config(tenant, **ob_conf_data)
+        # Circular reference, but worth it for simplicity of writing tests
+        tenant = tenant._replace(default_ob_config=ob_config)
+        return tenant
+
+    return try_until_success(inner, 10)
 
 
 def create_ob_config(

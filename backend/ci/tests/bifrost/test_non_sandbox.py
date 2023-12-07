@@ -4,22 +4,15 @@ from tests.bifrost_client import BifrostClient
 from tests.utils import get, post, patch, get_requirement_from_requirements
 
 
-@pytest.fixture(scope="module")
-def bifrost(twilio, tenant, live_phone_number):
-    """
-    Bifrost client for a non-sandbox user
-    """
-    bifrost_client = BifrostClient.create(
+def test_onboarding_init(twilio, tenant, live_phone_number, sandbox_tenant):
+    bifrost = BifrostClient.create(
         # Have to use live phone number in non-sandbox mode
         tenant.default_ob_config,
         twilio,
         live_phone_number,
         None,
     )
-    return bifrost_client
 
-
-def test_onboarding_init(bifrost):
     # Already initialized in bifrost client, but try again to make sure this endpoint is
     # idempotent
     body = bifrost.initialize_onboarding()
@@ -43,8 +36,6 @@ def test_onboarding_init(bifrost):
     # Shouldn't be able to complete the onboarding until user data is provided
     bifrost.handle_authorize(status_code=400)
 
-
-def test_collect_data(bifrost):
     # Test failed validation
     data = {"id.email": "flerpderp"}
     post("hosted/user/vault/validate", data, bifrost.auth_token, status_code=400)
@@ -61,12 +52,8 @@ def test_collect_data(bifrost):
     for k, v in data.items():
         bifrost.data[k] = v
 
-
-def test_liveness(bifrost):
     bifrost.handle_requirements(kind="liveness")
 
-
-def test_onboarding_authorize(tenant, bifrost, sandbox_tenant):
     # Manually authorize
     bifrost.handle_requirements(kind="authorize")
     bifrost.handle_requirements(kind="process")

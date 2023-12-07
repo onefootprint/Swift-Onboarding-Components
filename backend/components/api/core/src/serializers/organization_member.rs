@@ -13,6 +13,7 @@ impl DbToApi<(TenantUser, Option<TenantRolebinding>, TenantRole)> for api_wire_t
             first_name,
             last_name,
             is_firm_employee,
+            created_at,
             ..
         } = user;
         let rolebinding = rb.map(api_wire_types::OrganizationRolebinding::from_db);
@@ -25,6 +26,7 @@ impl DbToApi<(TenantUser, Option<TenantRolebinding>, TenantRole)> for api_wire_t
             is_firm_employee,
             role,
             rolebinding,
+            created_at,
         }
     }
 }

@@ -17,6 +17,7 @@ pub struct OrganizationMember {
     pub role: OrganizationRole,
     // Optional since FirmEmployee sessions don't have a rolebinding
     pub rolebinding: Option<OrganizationRolebinding>,
+    pub created_at: DateTime<Utc>,
 }
 
 /// Member of an organization

@@ -24,11 +24,13 @@ use db::models::auth_event::AuthEvent;
 use db::models::auth_event::NewAuthEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
+use db::models::vault::Vault;
 use feature_flag::BoolFlag;
 use macros::route_alias;
 use newtypes::AuthEventKind;
 use newtypes::IdentifyScope;
 use newtypes::ObConfigurationKind;
+use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web};
 
 // TODO should this be named onboarding token?
@@ -70,6 +72,11 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let vault = Vault::get(conn, &sv.vault_id)?;
+            if vault.kind != VaultKind::Person {
+                return Err(ValidationError("Cannot create a token for a non-person vault").into());
+            }
+
             let obc_id = if let Some(key) = key {
                 let (obc, _) = ObConfiguration::get(conn, (&key, &tenant_id, is_live))?;
                 if obc.kind == ObConfigurationKind::Auth {

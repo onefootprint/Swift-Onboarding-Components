@@ -32,7 +32,7 @@ pub enum AuthError {
     MissingHeader(String),
     #[error("Invalid {0}")]
     InvalidHeader(String),
-    #[error("Error loading session for header {0}")]
+    #[error("Error loading session for header {0}: {1}")]
     ErrorLoadingSession(String, String),
     #[error("Invalid request body")]
     InvalidBody,

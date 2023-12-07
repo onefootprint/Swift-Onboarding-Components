@@ -23,7 +23,8 @@ def incomplete_user(sandbox_tenant, twilio):
     phone_number = bifrost.decrypted_data["id.phone_number"]
     # Get the user by searching by fingerprint in the admin API since we can't get the fp_id otherwise
     body = get("entities", dict(search=phone_number), *sandbox_tenant.db_auths)
-    return body["data"][0]["id"]
+    user = next(i for i in body["data"] if i["sandbox_id"] == bifrost.sandbox_id)
+    return user["id"]
 
 
 @pytest.fixture(scope="module")
@@ -41,7 +42,7 @@ def test_get_org(sandbox_user):
 
 def test_get_users_list(incomplete_user, sandbox_user2, vault_user, sandbox_user):
     tenant = sandbox_user.tenant
-    body = get("entities", None, *tenant.db_auths)
+    body = get("entities", dict(page_size=400), *tenant.db_auths)
     scoped_users = body["data"]
     assert len(scoped_users)
 
@@ -88,7 +89,8 @@ def test_get_users_filter(
     expected_user_idxs,
 ):
     tenant = sandbox_user.tenant
-    body = get("entities", filters, *tenant.db_auths)
+    data = dict(page_size=100, **filters)
+    body = get("entities", data, *tenant.db_auths)
     scoped_users = body["data"]
     all_fp_ids = [
         sandbox_user.fp_id,
@@ -103,22 +105,22 @@ def test_get_users_filter(
 def test_get_users_filter_workflow_request(sandbox_user2):
     tenant = sandbox_user2.tenant
 
-    filters = dict(has_outstanding_workflow_request="false")
+    filters = dict(page_size=100, has_outstanding_workflow_request="false")
     body = get("entities", filters, *tenant.db_auths)
     assert any(i["id"] == sandbox_user2.fp_id for i in body["data"])
 
-    filters = dict(has_outstanding_workflow_request="true")
+    filters = dict(page_size=100, has_outstanding_workflow_request="true")
     body = get("entities", filters, *tenant.db_auths)
     assert not any(i["id"] == sandbox_user2.fp_id for i in body["data"])
 
     data = dict(trigger=dict(kind="redo_kyc"), note="Flerp")
     body = post(f"entities/{sandbox_user2.fp_id}/triggers", data, *tenant.db_auths)
 
-    filters = dict(has_outstanding_workflow_request="true")
+    filters = dict(page_size=100, has_outstanding_workflow_request="true")
     body = get("entities", filters, *tenant.db_auths)
     assert any(i["id"] == sandbox_user2.fp_id for i in body["data"])
 
-    filters = dict(has_outstanding_workflow_request="false")
+    filters = dict(page_size=100, has_outstanding_workflow_request="false")
     body = get("entities", filters, *tenant.db_auths)
     assert not any(i["id"] == sandbox_user2.fp_id for i in body["data"])
 

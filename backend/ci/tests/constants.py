@@ -23,10 +23,25 @@ url = lambda path: "{}/{}".format(TEST_URL, path)
 # We use different twilio credentials in integration tests than on the API servers
 IT_TWILIO_ACCOUNT_SID = get_secret("IT_TWILIO_ACCOUNT_SID")
 IT_TWILIO_SECRET_AUTH_TOKEN = get_secret("IT_TWILIO_SECRET_AUTH_TOKEN")
+
 # This is a real phone number - we send real SMSes to this phone number.
 # This phone number exists on the twilio account defined by the credentials above.
 # Some environments with lots of concurrency have multiple phone numbers - select one randomly
 ALL_PHONE_NUMBERS = json.loads(get_secret("IT_PHONE_NUMBERS"))
+
+NUM_WORKERS = os.environ.get("PYTEST_XDIST_WORKER_COUNT")
+if NUM_WORKERS is not None:
+    # When running tests in parallel, we want to choose a different live phone number for each.
+    # Filter the set of phone numbers that could be used by this worker
+    NUM_WORKERS = int(NUM_WORKERS)
+    WORKER_IDX = int(os.environ.get("PYTEST_XDIST_WORKER").removeprefix("gw"))
+    assert (
+        len(ALL_PHONE_NUMBERS) >= NUM_WORKERS
+    ), f"Must have at least as many live phone numbers as there are live workers. Num phone numbers: {len(ALL_PHONE_NUMBERS)}, num workers: {NUM_WORKERS}"
+    ALL_PHONE_NUMBERS = [
+        p for (i, p) in enumerate(ALL_PHONE_NUMBERS) if i % NUM_WORKERS == WORKER_IDX
+    ]
+
 phone_idx = random.randint(0, len(ALL_PHONE_NUMBERS) - 1)
 LIVE_PHONE_NUMBER = ALL_PHONE_NUMBERS[phone_idx]
 print(f"\nUSING LIVE PHONE NUMBER: {LIVE_PHONE_NUMBER}")

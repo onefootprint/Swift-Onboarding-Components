@@ -129,7 +129,7 @@ where
                 .db_pool
                 .db_query(move |conn| {
                     T::try_load_session(raw_session_data, conn, ff_client, req)
-                        .map_err(|e| AuthError::ErrorLoadingSession(allowed_headers, format!("{:?}", e)))
+                        .map_err(|e| AuthError::ErrorLoadingSession(allowed_headers, e.to_string()))
                 })
                 .await??;
             parsed_session_data.log_authed_principal(root_span);

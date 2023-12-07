@@ -47,6 +47,8 @@ pub enum DbError {
     TenantRolebindingAlreadyExists,
     #[error("Role used by this user is deactivated. Please contact your administor for assistance.")]
     TenantRoleDeactivated,
+    #[error("Cannot fetch deactivated role.")]
+    TargetTenantRoleDeactivated,
     #[error("Role with this name already exists")]
     TenantRoleAlreadyExists,
     #[error(

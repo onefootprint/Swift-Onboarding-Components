@@ -299,6 +299,7 @@ def test_no_implied_auth_for_stale(sandbox_tenant):
     filters = dict(
         timestamp_lte=arrow.now().shift(hours=-1, minutes=-5),
         is_created_via_api="false",
+        kind="person",
     )
     body = get("entities", filters, *sandbox_tenant.db_auths)
     assert all([not i["is_created_via_api"] for i in body["data"]])

@@ -1,3 +1,4 @@
+import arrow
 import pytest
 from tests.headers import IsLive
 from tests.utils import (
@@ -16,18 +17,22 @@ def admin_role(sandbox_tenant):
 
 
 @pytest.fixture(autouse=True, scope="session")
-def test_deactivate_roles(sandbox_tenant, limited_role):
+def test_deactivate_old_roles_and_members(sandbox_tenant, limited_role):
     """
     Deactivate roles at this tenant that were created by previous integration testing runs.
     Otherwise, the users you want to see end up on the second page...
     """
     for is_live in ["true", "false"]:
         is_live = IsLive(is_live)
-        body = get(f"org/roles", None, sandbox_tenant.auth_token, is_live)
+        body = get(
+            f"org/roles", dict(page_size=100), sandbox_tenant.auth_token, is_live
+        )
         roles_to_deactivate = (
             i
             for i in body["data"]
-            if not i["is_immutable"] and i["id"] != limited_role["id"]
+            if not i["is_immutable"]
+            and i["id"] != limited_role["id"]
+            and arrow.get(i["created_at"]) < arrow.now().shift(minutes=-5)
         )
 
         for r in roles_to_deactivate:
@@ -54,6 +59,23 @@ def test_deactivate_roles(sandbox_tenant, limited_role):
                 )
             # Deactivate the role
             post(f"org/roles/{r_id}/deactivate", None, *sandbox_tenant.db_auths)
+
+        body = get(
+            f"org/members", dict(page_size=100), sandbox_tenant.auth_token, is_live
+        )
+        users_to_deactivate = (
+            i
+            for i in body["data"]
+            if "custom_it_user" in i["email"]
+            and arrow.get(i["created_at"]) < arrow.now().shift(minutes=-5)
+        )
+        for m in users_to_deactivate:
+            m_id = m["id"]
+            post(
+                f"org/members/{m_id}/deactivate",
+                None,
+                *sandbox_tenant.db_auths,
+            )
 
 
 @pytest.fixture(scope="session")
@@ -97,20 +119,20 @@ def create_tenant_user(tenant, role, email, first_name=None, last_name=None):
 
 
 @pytest.fixture(scope="session")
-def tenant_user(sandbox_tenant, admin_role):
-    email = f"custom_it_user+1@onefootprint.com"
+def tenant_user(sandbox_tenant, admin_role, run_id):
+    email = f"custom_it_user.{run_id}.fixture+1@onefootprint.com"
     return create_tenant_user(sandbox_tenant, admin_role, email, "Flerp", "Grinman")
 
 
 @pytest.fixture(scope="session")
-def tenant_user2(sandbox_tenant, limited_role):
-    email = f"custom_it_user+2@onefootprint.com"
+def tenant_user2(sandbox_tenant, limited_role, run_id):
+    email = f"custom_it_user.{run_id}.fixture+2@onefootprint.com"
     return create_tenant_user(sandbox_tenant, limited_role, email, "Merp", "Wachs")
 
 
 @pytest.fixture(scope="session")
-def tenant_user3(sandbox_tenant, limited_role):
-    email = f"custom_it_user+3@onefootprint.com"
+def tenant_user3(sandbox_tenant, limited_role, run_id):
+    email = f"custom_it_user.{run_id}.fixture+3@onefootprint.com"
     return create_tenant_user(
         sandbox_tenant, limited_role, email, "Piip", "The Warrior"
     )
@@ -140,7 +162,8 @@ def test_get_members(
     expected_user1,
     expected_user2,
 ):
-    body = get(f"org/members", filters, *sandbox_tenant.db_auths)
+    data = dict(page_size=200, **(filters or dict()))
+    body = get(f"org/members", data, *sandbox_tenant.db_auths)
     assert any(u["id"] == tenant_user["id"] for u in body["data"]) == expected_user1
     assert any(u["id"] == tenant_user2["id"] for u in body["data"]) == expected_user2
 
@@ -150,13 +173,14 @@ def test_get_members_pagination(
     tenant_user2,
     tenant_user3,
     sandbox_tenant,
+    run_id,
 ):
     ORDERED_USERS = [tenant_user, tenant_user2, tenant_user3]
     NUM_USERS = len(ORDERED_USERS)
     for i in range(NUM_USERS):
         body = get(
             f"org/members",
-            dict(search="custom_it_user", page_size=1, page=i),
+            dict(search=f"custom_it_user.{run_id}.fixture", page_size=1, page=i),
             *sandbox_tenant.db_auths,
         )
         assert len(body["data"]) == 1
@@ -170,16 +194,29 @@ def test_get_members_pagination(
     # Null page should return first page
     body = get(
         f"org/members",
-        dict(search="custom_it_user", page_size=1),
+        dict(search=f"custom_it_user.{run_id}.fixture", page_size=1),
         *sandbox_tenant.db_auths,
     )
     assert len(body["data"]) == 1
     assert body["data"][0]["id"] == tenant_user["id"]
 
 
-def test_get_members_filter_role_id(tenant_user, tenant_user2, sandbox_tenant):
-    # Test filter on role_id, have to do in separate test bc can't parameterize
-    assert tenant_user["role"]["id"] != tenant_user2["role"]["id"]
+def test_get_members_filter_role_id(run_id, sandbox_tenant, admin_role):
+    suffix = _gen_random_n_digit_number(10)
+    role_data = dict(
+        name=f"Test limited role filter {suffix}",
+        scopes=[{"kind": "read"}, {"kind": "manage_webhooks"}],
+        kind="dashboard_user",
+    )
+    my_role = post("org/roles", role_data, *sandbox_tenant.db_auths)
+
+    email = f"custom_it_user.{run_id}+1111@onefootprint.com"
+    tenant_user = create_tenant_user(
+        sandbox_tenant, admin_role, email, "Flerp", "Grinman"
+    )
+
+    email = f"custom_it_user.{run_id}+2222@onefootprint.com"
+    tenant_user2 = create_tenant_user(sandbox_tenant, my_role, email, "Merp", "Wachs")
 
     tu_role_id = tenant_user["role"]["id"]
     tu2_role_id = tenant_user2["role"]["id"]
@@ -193,7 +230,8 @@ def test_get_members_filter_role_id(tenant_user, tenant_user2, sandbox_tenant):
     ]
 
     for filters, expected_user1, expected_user2 in tests:
-        body = get(f"org/members", filters, *sandbox_tenant.db_auths)
+        data = dict(page_size=100, **filters)
+        body = get(f"org/members", data, *sandbox_tenant.db_auths)
         assert any(u["id"] == tenant_user["id"] for u in body["data"]) == expected_user1
         assert (
             any(u["id"] == tenant_user2["id"] for u in body["data"]) == expected_user2
@@ -213,12 +251,17 @@ def test_update_name(sandbox_tenant):
     assert body["last_name"] == last_name
 
 
-def test_update_user_role(sandbox_tenant, tenant_user, limited_role):
+def test_update_user_role(sandbox_tenant, admin_role, limited_role, run_id):
+    email = f"custom_it_user.{run_id}+111@onefootprint.com"
+    tenant_user = create_tenant_user(
+        sandbox_tenant, admin_role, email, "Flerp", "Grinman"
+    )
+
     user_id = tenant_user["id"]
     user_data = dict(role_id=limited_role["id"])
     patch(f"org/members/{user_id}", user_data, *sandbox_tenant.db_auths)
 
-    body = get(f"org/members", None, *sandbox_tenant.db_auths)
+    body = get(f"org/members", dict(page_size=100), *sandbox_tenant.db_auths)
     user = next(u for u in body["data"] if u["id"] == user_id)
     assert user["role"]["id"] == limited_role["id"]
 
@@ -269,13 +312,13 @@ def test_get_roles(
     tenant_user2
     tenant_user3
 
-    filters = dict(kind="dashboard_user", **filters) if filters else None
+    filters = dict(page_size=100, kind="dashboard_user", **(filters or dict()))
     body = get(f"org/roles", filters, *sandbox_tenant.db_auths)
     assert any(u["id"] == admin_role["id"] for u in body["data"]) == expected_admin_role
     assert (
         any(u["id"] == limited_role["id"] for u in body["data"])
         == expected_limited_role
-    )
+    ), f"""Roles IDs: {",".join([u["id"] for u in body["data"]])}. Looking for: {limited_role["id"]}"""
 
     if expected_limited_role:
         limited_role = next(u for u in body["data"] if u["id"] == limited_role["id"])
@@ -288,11 +331,18 @@ def test_get_roles(
         assert limited_role["num_active_api_keys"] != None
 
 
-def test_update_roles(sandbox_tenant, limited_role, admin_role):
-    role_id = limited_role["id"]
+def test_update_roles(sandbox_tenant, admin_role):
     suffix = _gen_random_n_digit_number(10)
+    role_data = dict(
+        name=f"Test myrole role {suffix}",
+        scopes=[{"kind": "read"}, {"kind": "manage_webhooks"}],
+        kind="dashboard_user",
+    )
+    body = post("org/roles", role_data, *sandbox_tenant.db_auths)
+    role_id = body["id"]
+
     patch_data = dict(
-        name=f"New role name {suffix}",
+        name=f"New myrole name {suffix}",
         scopes=[{"kind": "read"}, {"kind": "onboarding_configuration"}],
     )
     patch(f"org/roles/{role_id}", patch_data, *sandbox_tenant.db_auths)
@@ -322,16 +372,30 @@ def test_cant_update_admin_role(sandbox_tenant, admin_role):
     )
 
 
-def test_deactivate_role_and_user(
-    sandbox_tenant, tenant_user, tenant_user2, tenant_user3, limited_role
-):
-    role_id = limited_role["id"]
+def test_deactivate_role_and_user(sandbox_tenant, run_id):
+    suffix = _gen_random_n_digit_number(10)
+    role_data = dict(
+        name=f"Test myrole role {suffix}",
+        scopes=[{"kind": "read"}, {"kind": "manage_webhooks"}],
+        kind="dashboard_user",
+    )
+    my_role = post("org/roles", role_data, *sandbox_tenant.db_auths)
+
+    email = f"custom_it_user.{run_id}+11@onefootprint.com"
+    tenant_user = create_tenant_user(sandbox_tenant, my_role, email, "Flerp", "Grinman")
+
+    email = f"custom_it_user.{run_id}+22@onefootprint.com"
+    tenant_user2 = create_tenant_user(sandbox_tenant, my_role, email, "Merp", "Wachs")
+
+    email = f"custom_it_user.{run_id}+33@onefootprint.com"
+    tenant_user3 = create_tenant_user(
+        sandbox_tenant, my_role, email, "Piip", "The Warrior"
+    )
+
+    role_id = my_role["id"]
     user_id = tenant_user["id"]
     user_id2 = tenant_user2["id"]
     user_id3 = tenant_user3["id"]
-    # Make sure the tenant_user is using the limited role
-    user_data = dict(role_id=limited_role["id"])
-    patch(f"org/members/{user_id}", user_data, *sandbox_tenant.db_auths)
 
     # Can't deactivate role that has activate users
     post(
@@ -350,9 +414,9 @@ def test_deactivate_role_and_user(
     post(f"org/roles/{role_id}/deactivate", None, *sandbox_tenant.db_auths)
 
     # Make sure the deactivated user isn't displayed anymore
-    body = get("org/members", None, *sandbox_tenant.db_auths)
+    body = get("org/members", dict(page_size=100), *sandbox_tenant.db_auths)
     assert user_id not in set(u["id"] for u in body["data"])
 
     # Make sure the deactivated role isn't displayed anymore
-    body = get("org/roles", None, *sandbox_tenant.db_auths)
+    body = get("org/roles", dict(page_size=100), *sandbox_tenant.db_auths)
     assert role_id not in set(r["id"] for r in body["data"])

@@ -187,7 +187,7 @@ impl TenantRole {
             .for_no_key_update() // Make sure someone doesn't deactivate the role while we are using it
             .first(conn.conn())?;
         if role.deactivated_at.is_some() {
-            return Err(DbError::TenantRoleDeactivated);
+            return Err(DbError::TargetTenantRoleDeactivated);
         }
         Ok(Locked::new(role))
     }

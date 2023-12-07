@@ -83,7 +83,7 @@ def test_search(
     fp_id1, fp_id2, fp_id3, fp_bid, sandbox_tenant, search, expected_fp_ids
 ):
     fp_ids = [fp_id1, fp_id2, fp_id3, fp_bid]
-    data = dict(search=search)
+    data = dict(search=search, page_size=200)
     body = get("entities", data, *sandbox_tenant.db_auths)
     for i, (fp_id, expected) in enumerate(zip(fp_ids, expected_fp_ids)):
         exists = any(i["id"] == fp_id for i in body["data"])

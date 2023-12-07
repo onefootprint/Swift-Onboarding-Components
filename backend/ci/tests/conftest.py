@@ -1,3 +1,4 @@
+import os
 import requests
 import time
 import pytest
@@ -17,9 +18,15 @@ from tests.utils import (
     create_tenant,
     create_ob_config,
     _gen_random_sandbox_id,
+    _gen_random_n_digit_number,
     patch,
     clean_up_user,
 )
+
+
+@pytest.fixture(scope="session")
+def run_id():
+    return os.environ.get("PYTEST_XDIST_TESTRUNUID") or _gen_random_n_digit_number(10)
 
 
 @pytest.fixture(scope="session", autouse="true")
