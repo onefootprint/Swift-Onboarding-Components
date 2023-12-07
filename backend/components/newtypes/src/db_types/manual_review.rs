@@ -29,6 +29,7 @@ pub enum ReviewReason {
     Document,
     AdverseMediaHit,
     WatchlistHit,
+    ProofOfSsnDocument,
 }
 
 impl ReviewReason {
@@ -38,6 +39,7 @@ impl ReviewReason {
             ReviewReason::Document => "Document identity verification was manually conducted and approved",
             ReviewReason::AdverseMediaHit => "Adverse media hit deemed non-detrimental",
             ReviewReason::WatchlistHit => "Watchlist hit deemed low risk or false-positive",
+            ReviewReason::ProofOfSsnDocument => "Proof of SSN was submitted and verified",
         }
     }
 }

@@ -1,12 +1,15 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
+use db::models::identity_document::IdentityDocument;
+use db::models::manual_review::ManualReview;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow as DbWorkflow;
+use db::TxnPgConn;
 
 use feature_flag::FeatureFlagClient;
-use newtypes::{DocumentConfig, Locked};
+use newtypes::{DocKind, DocumentConfig, Locked, ReviewReason};
 use newtypes::{ScopedVaultId, TenantId, WorkflowId};
 
 use super::{DocumentState, MakeDecision};
@@ -156,31 +159,40 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
             decision::utils::get_fixture_data_decision(ff_client.clone(), &v, &wf, &self.t_id)?;
         let execute_rules_for_real_document_decision_only = should_execute_rules_for_document_only(&v, &wf)?;
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
+        let id_docs = IdentityDocument::list_by_wf_id(conn, &wf.id)?;
+        let is_proof_of_ssn = id_docs
+            .iter()
+            .any(|id| DocKind::from(id.document_type) == DocKind::ProofOfSsn);
 
-        // Rerun decisioning, but with the latest doc risk signals
-        // TODO: what's the review strategy for this case?
-        let decision = common::get_decision(conn, ff_client, risk_signals, &wf, &v)?;
-        let decision = if let Some(fixture_decision) = fixture_decision {
-            if execute_rules_for_real_document_decision_only || obc.skip_kyc {
-                decision
-            } else {
-                common::kyc_decision_from_fixture(fixture_decision)?
-            }
+        if is_proof_of_ssn {
+            handle_proof_of_ssn(conn, &wf)?;
         } else {
-            decision
-        };
+            // Rerun decisioning, but with the latest doc risk signals
+            // TODO: what's the review strategy for this case?
+            let decision = common::get_decision(conn, ff_client, risk_signals, &wf, &v)?;
+            let decision = if let Some(fixture_decision) = fixture_decision {
+                if execute_rules_for_real_document_decision_only || obc.skip_kyc {
+                    decision
+                } else {
+                    common::kyc_decision_from_fixture(fixture_decision)?
+                }
+            } else {
+                decision
+            };
 
-        common::save_kyc_decision(
-            conn,
-            &self.sv_id,
-            &wf,
-            vendor_results
-                .into_iter()
-                .map(|vr| vr.verification_result_id)
-                .collect(),
-            decision,
-            vec![],
-        )?;
+            common::save_kyc_decision(
+                conn,
+                &self.sv_id,
+                &wf,
+                vendor_results
+                    .into_iter()
+                    .map(|vr| vr.verification_result_id)
+                    .collect(),
+                decision,
+                vec![],
+            )?;
+        }
+
         Ok(DocumentState::from(DocumentComplete))
     }
 }
@@ -213,4 +225,23 @@ impl WorkflowState for DocumentComplete {
     fn default_action(&self) -> Option<WorkflowActions> {
         None
     }
+}
+
+#[tracing::instrument(skip_all)]
+fn handle_proof_of_ssn(conn: &mut TxnPgConn, wf: &DbWorkflow) -> ApiResult<()> {
+    // Only create a review if there isn't already one, but still fire a webhook regardless
+    // This is a little weird
+    let existing_reviews = ManualReview::get_active_for_sv(conn, &wf.scoped_vault_id)?;
+    if existing_reviews.is_empty() {
+        ManualReview::create(
+            conn,
+            vec![ReviewReason::ProofOfSsnDocument],
+            wf.id.clone(),
+            wf.scoped_vault_id.clone(),
+        )?;
+    }
+
+    // TODO: figure out a strategy to push the fact that there's a MR for SSN Upload now
+
+    Ok(())
 }

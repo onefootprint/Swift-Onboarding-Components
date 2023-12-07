@@ -49,7 +49,7 @@ struct ManualReviewUpdate {
 
 impl ManualReview {
     #[tracing::instrument("ManualReview::create", skip_all)]
-    pub(super) fn create(
+    pub fn create(
         conn: &mut PgConn,
         review_reasons: Vec<ReviewReason>,
         workflow_id: WorkflowId,
