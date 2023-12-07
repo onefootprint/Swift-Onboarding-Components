@@ -1,5 +1,5 @@
 use crate::auth::user::UserAuthGuard;
-use crate::documents::utils;
+use crate::documents::utils::{self, complete_proof_of_ssn};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiResult;
 use crate::types::response::ResponseData;
@@ -24,8 +24,8 @@ use db::models::user_consent::UserConsent;
 use db::TxnPgConn;
 use futures_util::Future;
 use newtypes::{
-    DataIdentifier, DataLifetimeSource, DecisionIntentKind, DocumentKind, DocumentSide, IdentityDocumentId,
-    IdentityDocumentStatus, S3Url, SealedVaultDataKey,
+    DataIdentifier, DataLifetimeSource, DecisionIntentKind, DocKind, DocumentKind, DocumentSide,
+    IdentityDocumentId, IdentityDocumentStatus, S3Url, SealedVaultDataKey,
 };
 use newtypes::{ScopedVaultId, WorkflowGuard};
 use paperclip::actix::Apiv2Schema;
@@ -108,6 +108,8 @@ pub async fn post(
         })
         .await??;
     let meta2 = meta.clone();
+    let doc_kind: DocKind = id_doc.document_type.into();
+    let upload_is_proof_of_ssn = doc_kind == DocKind::ProofOfSsn;
 
     if id_doc.status != IdentityDocumentStatus::Pending {
         // Do not change this error - the frontend is relying upon it
@@ -120,9 +122,7 @@ pub async fn post(
         return Err(OnboardingError::NotExpectingSelfie.into());
     }
 
-    if user_consent.is_none() {
-        return Err(OnboardingError::UserConsentNotFound.into());
-    }
+    check_consent(user_consent, doc_kind)?;
 
     // Upload the image to s3
     let di = DataIdentifier::from(DocumentKind::LatestUpload(id_doc.document_type, side));
@@ -214,16 +214,21 @@ pub async fn post(
     } else {
         // Fixture response - we always complete successfully!
         if next_side_to_collect.is_none() {
-            // Save fixture VRes
-            save_incode_fixtures(
-                &state,
-                &user_auth.scoped_user.id.clone(),
-                &wf.id,
-                obc.is_doc_first,
-                id_doc2,
-                should_collect_selfie,
-            )
-            .await?;
+            let sv_id = user_auth.scoped_user.id.clone();
+            if upload_is_proof_of_ssn {
+                complete_proof_of_ssn(&state, id_doc2, sv_id).await?;
+            } else {
+                // Save fixture VRes
+                save_incode_fixtures(
+                    &state,
+                    &sv_id,
+                    &wf.id,
+                    obc.is_doc_first,
+                    id_doc2,
+                    should_collect_selfie,
+                )
+                .await?;
+            }
         }
         DocumentResponse {
             next_side_to_collect,
@@ -272,4 +277,12 @@ fn create_latest_doc_upload(
     };
     DocumentUpload::create(conn, args)?;
     Ok(())
+}
+
+fn check_consent(user_consent: Option<UserConsent>, doc_kind: DocKind) -> ApiResult<()> {
+    if user_consent.is_none() && doc_kind == DocKind::Identity {
+        Err(OnboardingError::UserConsentNotFound.into())
+    } else {
+        Ok(())
+    }
 }

@@ -1,5 +1,5 @@
 use crate::auth::user::UserAuthGuard;
-use crate::documents::utils;
+use crate::documents::utils::{self, complete_proof_of_ssn};
 use crate::errors::ApiResult;
 use crate::types::response::ResponseData;
 use api_core::auth::user::UserWfAuthContext;
@@ -13,8 +13,8 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::identity_document::IdentityDocument;
 use db::models::incode_verification_session::IncodeVerificationSession;
 use db::models::ob_configuration::ObConfiguration;
-use newtypes::WorkflowGuard;
 use newtypes::{DecisionIntentKind, DocumentSide, IdentityDocumentId};
+use newtypes::{DocKind, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
@@ -67,6 +67,8 @@ pub async fn post(
         .await?;
 
     let is_sandbox = id_doc.fixture_result.is_some();
+    let doc_kind: DocKind = id_doc.document_type.into();
+    let upload_is_proof_of_ssn = doc_kind == DocKind::ProofOfSsn; // TODO: move this to being based on DR i think that's better and more source of truthy sicne we don't get from client
     let (should_initiate_reqs, _) =
         decision::utils::should_initiate_requests_for_document(&state, &uvw, id_doc.fixture_result).await?;
 
@@ -90,19 +92,25 @@ pub async fn post(
         )
         .await?
     } else {
-        // Fixture response - we always complete successfully!
+        // If we are done collecting sides, it means we can either:
+        // 1) write sandbox fixtures
+        // 2) complete the proof of ssn upload
         let next_side_to_collect = missing_sides.next_side_to_collect();
         if next_side_to_collect.is_none() {
-            // Save fixture VRes and risk signals
-            save_incode_fixtures(
-                &state,
-                &user_auth.scoped_user.id.clone(),
-                &wf.id,
-                obc.is_doc_first,
-                id_doc,
-                should_collect_selfie,
-            )
-            .await?;
+            let sv_id = user_auth.scoped_user.id.clone();
+            if upload_is_proof_of_ssn {
+                complete_proof_of_ssn(&state, id_doc, sv_id).await?;
+            } else {
+                save_incode_fixtures(
+                    &state,
+                    &sv_id,
+                    &wf.id,
+                    obc.is_doc_first,
+                    id_doc,
+                    should_collect_selfie,
+                )
+                .await?;
+            }
         }
         DocumentResponse {
             next_side_to_collect,

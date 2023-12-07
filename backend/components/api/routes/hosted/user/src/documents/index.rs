@@ -13,7 +13,7 @@ use db::models::identity_document::{IdentityDocument, NewIdentityDocumentArgs};
 use db::models::ob_configuration::ObConfiguration;
 use db::models::vault::Vault;
 use feature_flag::BoolFlag;
-use newtypes::{WorkflowGuard, IdentityDocumentFixtureResult};
+use newtypes::{WorkflowGuard, IdentityDocumentFixtureResult, IdDocKind, Iso3166TwoDigitCountryCode, DocumentScanDeviceType, IdentityDocumentId, WorkflowId, DocKind};
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
@@ -35,12 +35,19 @@ pub async fn post(
         skip_selfie,
         device_type,
     } = request.into_inner();
-
+    let doc_kind: DocKind = document_type.into();
     let su_id = user_auth.scoped_user.id.clone();
     let su_id2 = su_id.clone();
     let tenant_id = user_auth.tenant().id.clone();
     let wf_id = user_auth.workflow().id.clone();
     let ff_client = state.feature_flag_client.clone();
+
+    // Handle proof of SSN, which doesn't involve a lot of other checks (at this time)
+    if doc_kind == DocKind::ProofOfSsn {
+        let id_doc_id = handle_proof_of_ssn(&state, wf_id, document_type, country_code, device_type).await?;
+        return ResponseData::ok(CreateIdentityDocumentResponse { id: id_doc_id}).json()
+    }
+
     let uvw = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
@@ -113,4 +120,29 @@ pub async fn post(
         })
         .await?;
     ResponseData::ok(CreateIdentityDocumentResponse { id: id_doc.id }).json()
+}
+
+
+async fn handle_proof_of_ssn(state: &State, workflow_id: WorkflowId, document_type: IdDocKind, country_code: Iso3166TwoDigitCountryCode, device_type: Option<DocumentScanDeviceType>) -> ApiResult<IdentityDocumentId> {
+    state
+    .db_pool
+    .db_transaction(move |conn| -> ApiResult<_> {
+        // If there's no doc requests for proof of ssn, nothing to do here
+        let doc_request =
+            DbDocumentRequest::get_proof_of_ssn(conn, &workflow_id)?.ok_or(OnboardingError::NoDocumentRequestFound)?;
+
+
+            let args = NewIdentityDocumentArgs {
+                request_id: doc_request.id,
+                document_type,
+                country_code,
+                fixture_result: None,
+                skip_selfie: None,
+                device_type
+            };
+            
+            let id_doc = IdentityDocument::get_or_create(conn, args)?;
+            Ok(id_doc.id)
+        }).await
+
 }

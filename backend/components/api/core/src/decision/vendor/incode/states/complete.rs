@@ -17,6 +17,7 @@ use crate::utils::vault_wrapper::WriteableVw;
 use crate::vendor_clients::IncodeClients;
 use async_trait::async_trait;
 use db::models::data_lifetime::DataLifetime;
+use db::models::document_data::DocumentData;
 use db::models::identity_document::IdentityDocument;
 use db::models::identity_document::IdentityDocumentUpdate;
 use db::models::ob_configuration::ObConfiguration;
@@ -29,6 +30,7 @@ use idv::incode::doc::response::FetchOCRResponse;
 use idv::incode::doc::response::FetchScoresResponse;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
+use newtypes::DataLifetimeSeqno;
 use newtypes::DataLifetimeSource;
 use newtypes::DataRequest;
 use newtypes::DocumentKind;
@@ -56,12 +58,12 @@ use strum::IntoEnumIterator;
 pub struct Complete {}
 
 /// Now that we have the correct type of the document, add the images to the vault under the correct type
-fn vault_complete_images(
+pub fn vault_complete_images(
     conn: &mut TxnPgConn,
     vw: &WriteableVw<Person>,
     dk: IdDocKind,
     id_doc: &IdentityDocument,
-) -> ApiResult<()> {
+) -> ApiResult<(Vec<DocumentData>, DataLifetimeSeqno)> {
     let docs = id_doc
         .images(conn, true)?
         .into_iter()
@@ -81,8 +83,7 @@ fn vault_complete_images(
             }
         })
         .collect_vec();
-    vw.put_documents_unsafe(conn, docs, None)?;
-    Ok(())
+    vw.put_documents_unsafe(conn, docs, None)
 }
 
 fn ocr_data(r: FetchOCRResponse, dk: IdDocKind) -> Vec<(DataIdentifier, PiiString)> {
