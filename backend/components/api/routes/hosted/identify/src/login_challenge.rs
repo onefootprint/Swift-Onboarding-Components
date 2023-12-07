@@ -149,7 +149,7 @@ pub async fn post(
         };
 
     let err = if let Some(rx) = rx {
-        rx_background_error(rx, 2).await.err()
+        rx_background_error(rx, 3).await.err()
     } else {
         None
     };
