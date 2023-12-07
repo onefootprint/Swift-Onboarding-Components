@@ -105,7 +105,7 @@ impl ObConfiguration {
         {
             kinds
         } else {
-            IdDocKind::iter().collect()
+            IdDocKind::identity_docs()
         };
 
         let doc_country_mapping_helper = self.get_supported_country_struct();
@@ -251,6 +251,7 @@ impl SupportedCountriesForDocType for Findigs {
             IdDocKind::Visa => Iso3166TwoDigitCountryCode::iter().collect(),
             IdDocKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::US],
             IdDocKind::VoterIdentification => vec![],
+            IdDocKind::SsnCard => vec![],
         }
     }
     fn is_override(&self) -> bool {
@@ -268,6 +269,7 @@ impl SupportedCountriesForDocType for Coba {
             IdDocKind::Visa => vec![Iso3166TwoDigitCountryCode::MX],
             IdDocKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::MX],
             IdDocKind::VoterIdentification => vec![Iso3166TwoDigitCountryCode::MX],
+            IdDocKind::SsnCard => vec![],
         }
     }
     fn is_override(&self) -> bool {
@@ -286,6 +288,7 @@ impl SupportedCountriesForDocType for Default {
             IdDocKind::Visa => all_us_and_territories,
             IdDocKind::ResidenceDocument => all_us_and_territories,
             IdDocKind::VoterIdentification => all_us_and_territories,
+            IdDocKind::SsnCard => vec![],
         }
     }
     fn is_override(&self) -> bool {

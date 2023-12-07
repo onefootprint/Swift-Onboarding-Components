@@ -386,9 +386,9 @@ mod tests {
         let incode_doc_types_mapped_to_our_doc_types: Vec<IdDocKind> = IncodeDocumentType::iter()
             .filter_map(|dt| IdDocKind::try_from(&dt).ok())
             .collect();
-        IdDocKind::iter().for_each(|doc_kind| {
+        IdDocKind::identity_docs().iter().for_each(|doc_kind| {
             assert!(
-                incode_doc_types_mapped_to_our_doc_types.contains(&doc_kind),
+                incode_doc_types_mapped_to_our_doc_types.contains(doc_kind),
                 "{}",
                 format!(
                     "Make sure you add {} to TryFrom<&'a IncodeDocumentType> for IdDocKind",

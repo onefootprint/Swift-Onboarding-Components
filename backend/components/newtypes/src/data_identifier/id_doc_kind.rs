@@ -2,14 +2,11 @@ use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 
 use serde_with::{DeserializeFromStr, SerializeDisplay};
+use strum::IntoEnumIterator;
 use strum_macros::{Display, EnumIter, EnumString};
 
 use crate::DocumentSide;
 
-/// This is horrible. In some internal facing APIs and the DB, we serialize driver_license instead
-/// of drivers_license.
-/// The legacy enum is exposed via API and serialized in the DB, so it's a larger project to
-/// migrate away from. But, we want to use the more modern representation in customer-facing APIs
 #[derive(
     Debug,
     Display,
@@ -38,6 +35,28 @@ pub enum IdDocKind {
     Visa,
     ResidenceDocument,
     VoterIdentification,
+    SsnCard,
+}
+
+#[derive(Debug, Display, Clone, Copy, Eq, PartialEq)]
+pub enum DocKind {
+    Identity,
+    ProofOfSsn,
+}
+
+impl From<IdDocKind> for DocKind {
+    fn from(value: IdDocKind) -> Self {
+        match value {
+            IdDocKind::IdCard => Self::Identity,
+            IdDocKind::DriversLicense => Self::Identity,
+            IdDocKind::Passport => Self::Identity,
+            IdDocKind::Permit => Self::Identity,
+            IdDocKind::Visa => Self::Identity,
+            IdDocKind::ResidenceDocument => Self::Identity,
+            IdDocKind::VoterIdentification => Self::Identity,
+            IdDocKind::SsnCard => Self::ProofOfSsn,
+        }
+    }
 }
 
 crate::util::impl_enum_string_diesel!(IdDocKind);
@@ -54,11 +73,18 @@ impl IdDocKind {
             Self::Visa => vec![DocumentSide::Front],
             Self::ResidenceDocument => vec![DocumentSide::Front, DocumentSide::Back],
             Self::VoterIdentification => vec![DocumentSide::Front, DocumentSide::Back],
+            Self::SsnCard => vec![DocumentSide::Front],
         }
     }
 
     pub fn front_only(&self) -> bool {
         self.sides() == vec![DocumentSide::Front]
+    }
+
+    pub fn identity_docs() -> Vec<IdDocKind> {
+        IdDocKind::iter()
+            .filter(|id| DocKind::from(*id) == DocKind::Identity)
+            .collect()
     }
 }
 
@@ -75,20 +101,16 @@ impl TryFrom<IdDocKind> for AlpacaDocumentType {
     type Error = crate::Error;
 
     fn try_from(value: IdDocKind) -> Result<Self, Self::Error> {
+        let msg = "not a supported alpaca document type";
         match value {
             IdDocKind::IdCard => Ok(AlpacaDocumentType::NationalId),
             IdDocKind::DriversLicense => Ok(AlpacaDocumentType::DriversLicense),
             IdDocKind::Passport => Ok(AlpacaDocumentType::Passport),
             IdDocKind::Visa => Ok(AlpacaDocumentType::Visa),
-            IdDocKind::Permit => Err(crate::Error::Custom(
-                "not a supported alpaca document type".into(),
-            )),
-            IdDocKind::ResidenceDocument => Err(crate::Error::Custom(
-                "not a supported alpaca document type".into(),
-            )),
-            IdDocKind::VoterIdentification => Err(crate::Error::Custom(
-                "not a supported alpaca document type".into(),
-            )),
+            IdDocKind::Permit => Err(crate::Error::Custom(msg.into())),
+            IdDocKind::ResidenceDocument => Err(crate::Error::Custom(msg.into())),
+            IdDocKind::VoterIdentification => Err(crate::Error::Custom(msg.into())),
+            IdDocKind::SsnCard => Err(crate::Error::Custom(msg.into())),
         }
     }
 }
