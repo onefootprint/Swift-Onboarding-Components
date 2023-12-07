@@ -140,7 +140,8 @@ impl Contact {
             .map(|s| normalize_name(s.as_str()));
         let last_name = last_name
             .ok_or(ConversionError::MissingLastName)?
-            .map(|s| normalize_name(s.as_str()));
+            .map(|s| normalize_name(s.as_str()))
+            .map(crate::elongate_if_single_letter);
         let address = address_line1
             .ok_or(ConversionError::MissingAddress)?
             .map(|s| normalize_address_line_1(s.as_str()));

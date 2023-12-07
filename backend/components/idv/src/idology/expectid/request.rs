@@ -49,7 +49,9 @@ impl RequestData {
         } = d;
         // these are minimum required fields for idology, so we error.
         let first_name = first_name.ok_or(IdologyError::ConversionError::MissingFirstName)?;
-        let last_name = last_name.ok_or(IdologyError::ConversionError::MissingLastName)?;
+        let last_name = last_name
+            .ok_or(IdologyError::ConversionError::MissingLastName)?
+            .map(crate::elongate_if_single_letter);
         let address = address_line1.ok_or(IdologyError::ConversionError::MissingAddress)?; // TODO
         let (dob_month, dob_year, dob_day) = if let Some(dob) = dob {
             let dob = NaiveDate::parse_from_str(dob.leak(), "%Y-%m-%d")

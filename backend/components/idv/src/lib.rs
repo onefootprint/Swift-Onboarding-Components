@@ -304,3 +304,29 @@ impl From<&ParsedResponse> for VendorAPI {
         }
     }
 }
+
+// Experian and Idology throw a hard error on last names <2 char length. This is a silly hack which will append hyphens to such names so we can at least do a successful
+// vendor call to proceed the workflow and also for the chance that an id can be located (even if we get back name does not reason codes)
+pub fn elongate_if_single_letter(s: String) -> String {
+    if s.is_empty() {
+        "--".to_owned()
+    } else if s.len() == 1 {
+        format!("{}-", s).to_owned()
+    } else {
+        s
+    }
+}
+
+#[cfg(test)]
+mod lib_tests {
+    use super::elongate_if_single_letter;
+    use test_case::test_case;
+
+    #[test_case("boberto" => "boberto")]
+    #[test_case("bo" => "bo")]
+    #[test_case("b" => "b-")]
+    #[test_case("" => "--")]
+    fn test_elongate_if_single_letter(s: &str) -> String {
+        elongate_if_single_letter(s.to_owned())
+    }
+}
