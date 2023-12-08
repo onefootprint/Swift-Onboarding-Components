@@ -16,8 +16,8 @@ use db::{
 };
 use feature_flag::FeatureFlagClient;
 use newtypes::{
-    CollectedDataOption, DocumentRequestKind, EncryptedVaultPrivateKey, ObConfigurationKind, Selfie,
-    VaultKind, VaultPublicKey, WorkflowId, WorkflowRequestId, WorkflowSource,
+    CollectedDataOption, DocumentConfig, DocumentRequestKind, EncryptedVaultPrivateKey, ObConfigurationKind,
+    Selfie, VaultKind, VaultPublicKey, WorkflowConfig, WorkflowId, WorkflowRequestId, WorkflowSource,
 };
 use std::sync::Arc;
 
@@ -74,7 +74,8 @@ pub fn get_or_start_onboarding(
         // The auth token already has a workflow_id in it
         wf_id
     } else {
-        // Make a new workflow
+        // Make a new workflow. The workflow is created either for the playbook specified in the
+        // auth token OR for the config specified in the WorkflowRequest
         let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
         let is_first_wf = Workflow::list(conn, &sv.id)?.is_empty();
         let has_prefill_data = maybe_prefill_data.as_ref().is_some_and(|pd| !pd.data.is_empty());
@@ -89,6 +90,7 @@ pub fn get_or_start_onboarding(
             source,
             fixture_result: None,
             is_one_click: is_first_wf && has_prefill_data,
+            wfr: wfr.clone(),
         };
         let (wf, is_new_ob) =
             Workflow::get_or_create_onboarding(conn, ff_client.clone(), ob_create_args, force_create)?;
@@ -145,6 +147,7 @@ pub fn get_or_start_onboarding(
                 source,
                 fixture_result: None,
                 is_one_click: false,
+                wfr: None,
             };
             let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ff_client, ob_create_args, false)?;
             biz_wf
@@ -159,23 +162,36 @@ pub fn get_or_start_onboarding(
 
 /// Create a DocumentRequest associated with the provided wf if the obc requires document collection
 fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObConfiguration) -> ApiResult<()> {
-    if let Some(doc_info) = obc
-        .must_collect_data
-        .iter()
-        .filter_map(|cdo| match cdo {
-            CollectedDataOption::Document(doc_info) => Some(doc_info),
-            _ => None,
-        })
-        .next()
-    {
-        let args = NewDocumentRequestArgs {
-            scoped_vault_id: wf.scoped_vault_id.clone(),
-            ref_id: None,
-            workflow_id: wf.id.clone(),
-            should_collect_selfie: doc_info.selfie() == Selfie::RequireSelfie,
-            kind: DocumentRequestKind::Identity,
-        };
-        DocumentRequest::create(conn, args)?;
-    }
+    let (kind, should_collect_selfie) = match wf.config {
+        WorkflowConfig::Kyc(_) | WorkflowConfig::AlpacaKyc(_) => {
+            let Some(doc_info) = obc
+                .must_collect_data
+                .iter()
+                .filter_map(|cdo| match cdo {
+                    CollectedDataOption::Document(doc_info) => Some(doc_info),
+                    _ => None,
+                })
+                .next() else {
+                    // No doc request needed
+                    return Ok(());
+                };
+            let should_collect_selfie = doc_info.selfie() == Selfie::RequireSelfie;
+            (DocumentRequestKind::Identity, should_collect_selfie)
+        }
+        WorkflowConfig::Document(DocumentConfig { kind, collect_selfie }) => (kind, collect_selfie),
+        WorkflowConfig::Kyb(_) => {
+            // No doc request needed
+            return Ok(());
+        }
+    };
+
+    let args = NewDocumentRequestArgs {
+        scoped_vault_id: wf.scoped_vault_id.clone(),
+        ref_id: None,
+        workflow_id: wf.id.clone(),
+        should_collect_selfie,
+        kind,
+    };
+    DocumentRequest::create(conn, args)?;
     Ok(())
 }

@@ -114,6 +114,7 @@ pub async fn post(
                 source: WorkflowSource::Tenant,
                 fixture_result,
                 is_one_click: false,
+                wfr: None,
             };
             let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ff_client, ob_create_args, false)?;
 

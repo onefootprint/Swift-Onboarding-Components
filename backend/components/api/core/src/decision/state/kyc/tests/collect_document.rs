@@ -22,8 +22,8 @@ use itertools::Itertools;
 use macros::test_state_case;
 use newtypes::{
     CollectedDataOption as CDO, CountryRestriction, DbActor, DecisionStatus, DocTypeRestriction,
-    DocumentCdoInfo, DocumentConfig, FootprintReasonCode, RiskSignalGroupKind, Selfie, TenantId, VendorAPI,
-    WorkflowSource,
+    DocumentCdoInfo, DocumentConfig, DocumentRequestKind, FootprintReasonCode, RiskSignalGroupKind, Selfie,
+    TenantId, VendorAPI, WorkflowSource,
 };
 use newtypes::{KycState, WorkflowState};
 use newtypes::{OnboardingStatus, WorkflowFixtureResult};
@@ -250,7 +250,11 @@ async fn redo_document_and_pass(
         .db_transaction(move |conn| {
             let args = NewWorkflowArgs {
                 scoped_vault_id: sv_id.clone(),
-                config: DocumentConfig {}.into(),
+                config: DocumentConfig {
+                    kind: DocumentRequestKind::Identity,
+                    collect_selfie: false,
+                }
+                .into(),
                 fixture_result,
                 ob_configuration_id: obc_id,
                 insight_event_id: None,

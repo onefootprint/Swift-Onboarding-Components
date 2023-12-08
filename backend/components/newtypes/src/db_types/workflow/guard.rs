@@ -20,7 +20,8 @@ impl WorkflowState {
             }
             Self::Kyb(KybState::DataCollection) => vec![WorkflowGuard::AddData],
             Self::Document(DocumentState::DataCollection) => {
-                vec![WorkflowGuard::AddDocument]
+                // Needed to upload the barcode
+                vec![WorkflowGuard::AddData, WorkflowGuard::AddDocument]
             }
             Self::Kyc(KycState::Complete)
             | Self::Kyc(KycState::Decisioning)

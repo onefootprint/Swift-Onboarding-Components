@@ -12,6 +12,7 @@ use newtypes::{
     TaskData, TenantId, TenantScope, VaultId, VaultKind, WebhookEvent, WorkflowFixtureResult, WorkflowSource,
     WorkflowStartedInfo,
 };
+use newtypes::{DocumentConfig, WorkflowRequestConfig};
 use newtypes::{
     Locked, ObConfigurationId, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState,
 };
@@ -26,6 +27,7 @@ use super::tenant::Tenant;
 use super::user_timeline::UserTimeline;
 use super::workflow_event::WorkflowEvent;
 use super::workflow_request::WorkflowRequest;
+use crate::errors::ValidationError;
 use crate::models::vault::Vault;
 use crate::{DbResult, PgConn, TxnPgConn};
 use db_schema::schema::{ob_configuration, workflow};
@@ -187,6 +189,8 @@ pub struct OnboardingWorkflowArgs {
     /// Workflows created in bifrost will have the fixture result sent in POST /process
     pub fixture_result: Option<WorkflowFixtureResult>,
     pub is_one_click: bool,
+    /// If starting from a WorkflowRequest, the config
+    pub wfr: Option<WorkflowRequest>,
 }
 
 pub type IsNew = bool;
@@ -225,6 +229,7 @@ impl Workflow {
             source,
             fixture_result,
             is_one_click,
+            wfr,
         } = args;
 
         let sv = ScopedVault::lock(conn, &scoped_vault_id)?;
@@ -256,9 +261,28 @@ impl Workflow {
             }
         }
 
-        let config = match v.kind {
-            VaultKind::Person => KycConfig { is_redo: false }.into(),
-            VaultKind::Business => KybConfig {}.into(),
+        let config = if let Some(wfr_config) = wfr.as_ref().map(|wfr| &wfr.config) {
+            match wfr_config {
+                WorkflowRequestConfig::RedoKyc => {
+                    if v.kind != VaultKind::Person {
+                        return Err(
+                            ValidationError("Cannot create a RedoKyc flow for non-person vault").into(),
+                        );
+                    }
+                    // This is_redo flag can be deprecated - redo flows are treated no differently
+                    KycConfig { is_redo: false }.into()
+                }
+                WorkflowRequestConfig::IdDocument { kind, collect_selfie } => DocumentConfig {
+                    kind: *kind,
+                    collect_selfie: *collect_selfie,
+                }
+                .into(),
+            }
+        } else {
+            match v.kind {
+                VaultKind::Person => KycConfig { is_redo: false }.into(),
+                VaultKind::Business => KybConfig {}.into(),
+            }
         };
 
         // Create a new workflow
@@ -679,21 +703,6 @@ impl Workflow {
         let res = workflow::table
             .filter(workflow::scoped_vault_id.eq(scoped_vault_id))
             .filter(workflow::deactivated_at.is_null())
-            .first(conn)
-            .optional()?;
-        Ok(res)
-    }
-
-    #[tracing::instrument("Workflow::latest_by_kind", skip_all)]
-    pub fn latest_by_kind(
-        conn: &mut PgConn,
-        scoped_vault_id: &ScopedVaultId,
-        kind: WorkflowKind,
-    ) -> DbResult<Option<Self>> {
-        let res = workflow::table
-            .filter(workflow::scoped_vault_id.eq(scoped_vault_id))
-            .filter(workflow::kind.eq(kind))
-            .order_by(workflow::created_at.desc())
             .first(conn)
             .optional()?;
         Ok(res)

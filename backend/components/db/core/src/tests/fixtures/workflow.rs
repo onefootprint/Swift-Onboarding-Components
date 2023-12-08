@@ -26,6 +26,7 @@ pub fn create(
         source: WorkflowSource::Hosted,
         fixture_result,
         is_one_click: false,
+        wfr: None,
     };
     let (wf, _) = Workflow::get_or_create_onboarding(conn, ff_client, args, false).unwrap();
     wf

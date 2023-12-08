@@ -112,6 +112,7 @@ impl State {
     }
 
     #[allow(clippy::expect_used)]
+    #[tracing::instrument(skip_all)]
     pub async fn init_or_die(mut config: Config) -> Self {
         let feature_flag_client = LaunchDarklyFeatureFlagClient::new();
         let feature_flag_client = match feature_flag_client.init(&config.launch_darkly_sdk_key).await {
@@ -119,10 +120,8 @@ impl State {
                 tracing::info!("FeatureFlagClient successfully initialized");
                 client
             }
-            Err(err) => {
-                tracing::warn!( error=?err,
-                    "FeatureFlagClient failed to initialize"
-                );
+            Err(error) => {
+                tracing::warn!(?error, "FeatureFlagClient failed to initialize");
                 feature_flag_client
             }
         };

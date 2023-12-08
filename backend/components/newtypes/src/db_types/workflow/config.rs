@@ -1,3 +1,5 @@
+use crate::DocumentRequestKind;
+
 pub use super::*;
 use diesel::{AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
@@ -51,8 +53,19 @@ impl From<AlpacaKycConfig> for WorkflowConfig {
     }
 }
 
+fn default_doc_req_kind() -> DocumentRequestKind {
+    DocumentRequestKind::Identity
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
-pub struct DocumentConfig {}
+pub struct DocumentConfig {
+    // Legacy rows don't have this, so need serde default
+    #[serde(default)]
+    pub collect_selfie: bool,
+    // Legacy rows don't have this, so need serde default
+    #[serde(default = "default_doc_req_kind")]
+    pub kind: DocumentRequestKind,
+}
 
 impl From<DocumentConfig> for WorkflowConfig {
     fn from(value: DocumentConfig) -> Self {

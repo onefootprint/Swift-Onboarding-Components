@@ -150,3 +150,13 @@ impl<T> OptionalExtension<T, DbError> for Result<T, DbError> {
         }
     }
 }
+
+#[derive(Debug)]
+/// Shorthand to make it convenient to make an HTTP 400 validation error.
+pub(crate) struct ValidationError<'a>(pub &'a str);
+
+impl<'a> From<ValidationError<'a>> for DbError {
+    fn from(value: ValidationError<'a>) -> Self {
+        Self::ValidationError(value.0.to_string())
+    }
+}

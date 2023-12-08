@@ -17,26 +17,16 @@ use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_wire_types::TriggerRequest;
 use chrono::Duration;
-use db::models::document_request::DocumentRequest;
-use db::models::document_request::NewDocumentRequestArgs;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
-use db::models::workflow::NewWorkflowArgs;
 use db::models::workflow::Workflow;
 use db::models::workflow_request::WorkflowRequest;
-use db::TxnPgConn;
 use newtypes::ContactInfoKind;
 use newtypes::DbActor;
-use newtypes::DocumentConfig;
-use newtypes::DocumentRequestKind;
 use newtypes::PhoneNumber;
 use newtypes::PiiString;
-use newtypes::ScopedVaultId;
-use newtypes::TriggerInfo;
 use newtypes::TriggerKind;
 use newtypes::VaultKind;
-use newtypes::WorkflowKind;
-use newtypes::WorkflowSource;
 use newtypes::WorkflowTriggeredInfo;
 use paperclip::actix::{api_v2_operation, post, web};
 use std::collections::HashMap;
@@ -72,41 +62,25 @@ pub async fn post(
                 return Err(TenantError::IncorrectVaultKindForRedoKyc.into());
             }
 
-            let (event, auth_args) = match trigger {
-                TriggerInfo::RedoKyc => {
-                    let config = trigger.into();
-                    let (_, obc) = Workflow::latest_reonboardable_wf(conn, &sv.id)?
-                        .ok_or(UserError::NoCompleteOnboardings)?;
-                    let wr =
-                        WorkflowRequest::create(conn, sv.id.clone(), obc.id.clone(), actor.clone(), config)?;
-                    let args = UserSessionArgs {
-                        su_id: Some(sv.id.clone()),
-                        obc_id: Some(obc.id.clone()),
-                        wfr_id: Some(wr.id.clone()),
-                        is_from_api: true,
-                        ..Default::default()
-                    };
-                    let event = WorkflowTriggeredInfo {
-                        workflow_id: None,
-                        ob_config_id: Some(obc.id),
-                        workflow_request_id: Some(wr.id),
-                        actor,
-                    };
-                    (event, args)
-                }
-                // TODO deprecate this type of trigger - it's weird to not be associated with any
-                // playbook, and weird to have to create the wf inline here
-                TriggerInfo::IdDocument { collect_selfie } => handle_trigger_document(
-                    conn,
-                    &sv.id,
-                    DocumentRequestKind::Identity,
-                    collect_selfie,
-                    actor,
-                )?,
-                TriggerInfo::ProofOfSsn => {
-                    handle_trigger_document(conn, &sv.id, DocumentRequestKind::ProofOfSsn, false, actor)?
-                }
+            let (_, obc) =
+                Workflow::latest_reonboardable_wf(conn, &sv.id)?.ok_or(UserError::NoCompleteOnboardings)?;
+
+            let config = trigger.into();
+            let wr = WorkflowRequest::create(conn, sv.id.clone(), obc.id.clone(), actor.clone(), config)?;
+            let auth_args = UserSessionArgs {
+                su_id: Some(sv.id.clone()),
+                obc_id: Some(obc.id.clone()),
+                wfr_id: Some(wr.id.clone()),
+                is_from_api: true,
+                ..Default::default()
             };
+            let event = WorkflowTriggeredInfo {
+                workflow_id: None,
+                ob_config_id: Some(obc.id),
+                workflow_request_id: Some(wr.id),
+                actor,
+            };
+
             // No scopes or auth factors - require the user to re-auth when using this token
             let duration = Duration::days(1);
             let data = UserSession::make(sv.vault_id.clone(), auth_args, vec![], vec![])?;
@@ -233,56 +207,4 @@ impl<'a> From<TriggerMessage> for EmailMessage<'a> {
             template_data,
         }
     }
-}
-
-fn handle_trigger_document(
-    conn: &mut TxnPgConn,
-    sv_id: &ScopedVaultId,
-    document_request_kind: DocumentRequestKind,
-    collect_selfie: bool,
-    actor: DbActor,
-) -> ApiResult<(WorkflowTriggeredInfo, UserSessionArgs)> {
-    // Deactivate any redo KYC flows
-    WorkflowRequest::deactivate(conn, sv_id, None)?;
-
-    let last_alpaca_kyc_wf = Workflow::latest_by_kind(conn, sv_id, WorkflowKind::AlpacaKyc)?;
-    let last_kyc_wf = Workflow::latest_by_kind(conn, sv_id, WorkflowKind::Kyc)?;
-    let last_wf = last_alpaca_kyc_wf
-        .or(last_kyc_wf)
-        .ok_or(TenantError::CannotRedoKyc)?;
-    let args = NewWorkflowArgs {
-        scoped_vault_id: sv_id.clone(),
-        config: DocumentConfig {}.into(),
-        fixture_result: last_wf.fixture_result,
-        ob_configuration_id: last_wf.ob_configuration_id,
-        insight_event_id: None,
-        authorized: false,
-        // I'm going to get rid of this variant of the trigger API soon. Not worth
-        // differentiating and adding a new source for here
-        source: WorkflowSource::Unknown,
-        is_one_click: false,
-    };
-    let wf = Workflow::create(conn, args)?;
-    let args = NewDocumentRequestArgs {
-        scoped_vault_id: sv_id.clone(),
-        ref_id: None,
-        workflow_id: wf.id.clone(),
-        should_collect_selfie: collect_selfie,
-        kind: document_request_kind,
-    };
-    DocumentRequest::create(conn, args)?;
-
-    let args = UserSessionArgs {
-        su_id: Some(wf.scoped_vault_id),
-        wf_id: Some(wf.id.clone()),
-        obc_id: wf.ob_configuration_id,
-        ..Default::default()
-    };
-    let event = WorkflowTriggeredInfo {
-        workflow_id: Some(wf.id.clone()),
-        ob_config_id: None,
-        workflow_request_id: None,
-        actor,
-    };
-    Ok((event, args))
 }
