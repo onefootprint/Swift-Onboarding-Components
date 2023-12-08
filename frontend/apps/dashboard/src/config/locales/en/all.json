@@ -41,7 +41,8 @@
     "visa": "Visa",
     "permit": "Work permit / EAD card",
     "residence_document": "Residence card / Green card",
-    "voter_identification": "Voter identification"
+    "voter_identification": "Voter identification",
+    "ssn_card": "SSN Card"
   },
   "di": {
     "id": {
@@ -282,6 +283,13 @@
         "document_number": "Voter identification document number",
         "ref_number": "Voter identification reference number",
         "nationality": "Voter identification nationality"
+      },
+      "ssn_card": {
+        "front": {
+          "image": "SSN Card",
+          "latest_upload": "SSN Card",
+          "mime_type": "SSN Card MIME type"
+        }
       }
     },
     "business": {
@@ -814,6 +822,7 @@
             "permit.title": "Work permit / EAD card and selfie",
             "visa.title": "Visa and selfie",
             "voter_identification.title": "Voter identification",
+            "ssn_card.title": "SSN Card",
             "session-selector": {
               "title": "Session",
               "session": "Session"
@@ -865,7 +874,8 @@
                 "residence_document": "Residence card / Green card",
                 "permit": "Work permit / EAD card",
                 "visa": "Visa",
-                "voter_identification": "Voter identification"
+                "voter_identification": "Voter identification",
+                "ssn_card": "SSN Card"
               },
               "failure-reasons": {
                 "doc_type_mismatch": "Document type didn't match.",
@@ -1094,6 +1104,10 @@
               "title": "Re-upload ID photo",
               "description": "Data will be updated with this new information.",
               "collect-selfie": "Collect selfie"
+            },
+            "proof-of-ssn": {
+              "title": "Upload proof of SSN",
+              "description": "Request the user to upload proof of SSN"
             },
             "revise-kyc": {
               "title": "Re-onboard user",

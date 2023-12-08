@@ -14,6 +14,7 @@ import {
   IcoPassport24,
   IcoPhone24,
   IcoSelfie24,
+  IcoSsnCard24,
   IcoUserCircle24,
   IcoVisaPassport24,
   IcoVoter24,
@@ -52,6 +53,7 @@ const IconByIdDocType: Record<SupportedIdDocTypes, Icon> = {
   [SupportedIdDocTypes.residenceDocument]: IcoGreenCard24,
   [SupportedIdDocTypes.visa]: IcoVisaPassport24,
   [SupportedIdDocTypes.voterIdentification]: IcoVoter24,
+  [SupportedIdDocTypes.ssnCard]: IcoSsnCard24,
 };
 
 type KycFieldsProps = {
@@ -90,6 +92,7 @@ const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
     [SupportedIdDocTypes.voterIdentification]: t(
       'data-labels.voterIdentification',
     ),
+    [SupportedIdDocTypes.ssnCard]: t('data-labels.ssn_card'),
   };
 
   const fields: FieldProps[] = [];

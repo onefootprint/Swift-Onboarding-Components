@@ -13,11 +13,15 @@ export type Trigger =
       data: {
         collectSelfie: boolean;
       };
+    }
+  | {
+      kind: TriggerKind.ProofOfSsn;
     };
 
 export enum TriggerKind {
   RedoKyc = 'redo_kyc',
   IdDocument = 'id_document',
+  ProofOfSsn = 'proof_of_ssn',
 }
 
 export type TriggerResponse = {};

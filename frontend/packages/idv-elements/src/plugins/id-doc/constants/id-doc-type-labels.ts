@@ -8,6 +8,7 @@ const IdDocTypeToLabel: Record<SupportedIdDocTypes, string> = {
   [SupportedIdDocTypes.residenceDocument]: 'green card',
   [SupportedIdDocTypes.workPermit]: 'EAD card',
   [SupportedIdDocTypes.voterIdentification]: 'voter identification',
+  [SupportedIdDocTypes.ssnCard]: 'ssn card',
 };
 
 export default IdDocTypeToLabel;

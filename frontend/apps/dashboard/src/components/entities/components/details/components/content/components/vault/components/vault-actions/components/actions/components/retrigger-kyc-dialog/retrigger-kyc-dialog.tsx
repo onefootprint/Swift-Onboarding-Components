@@ -32,6 +32,8 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
       trigger = { kind, data: { collectSelfie } };
     } else if (kind === TriggerKind.RedoKyc) {
       trigger = { kind };
+    } else if (kind === TriggerKind.ProofOfSsn) {
+      trigger = { kind };
     } else {
       return;
     }

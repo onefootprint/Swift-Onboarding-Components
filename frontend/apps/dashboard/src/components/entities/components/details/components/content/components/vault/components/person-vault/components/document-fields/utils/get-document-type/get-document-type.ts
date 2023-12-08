@@ -25,6 +25,9 @@ const getDocumentType = (di: DocumentDI) => {
   if (di.includes(SupportedIdDocTypes.voterIdentification)) {
     return SupportedIdDocTypes.voterIdentification;
   }
+  if (di.includes(SupportedIdDocTypes.ssnCard)) {
+    return SupportedIdDocTypes.ssnCard;
+  }
   return undefined;
 };
 

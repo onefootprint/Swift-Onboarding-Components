@@ -4,6 +4,7 @@ import {
   IcoHome16,
   IcoIdCard16,
   IcoPassport16,
+  IcoSsnCard16,
   IcoVoter16,
   IcoWriting16,
 } from '@onefootprint/icons';
@@ -20,6 +21,7 @@ const IconByIdDocType: Record<SupportedIdDocTypes, JSX.Element> = {
   [SupportedIdDocTypes.residenceDocument]: <IcoHome16 />,
   [SupportedIdDocTypes.visa]: <IcoWriting16 />,
   [SupportedIdDocTypes.voterIdentification]: <IcoVoter16 />,
+  [SupportedIdDocTypes.ssnCard]: <IcoSsnCard16 />,
 };
 
 type IdDocUploadedEventIconProps = {

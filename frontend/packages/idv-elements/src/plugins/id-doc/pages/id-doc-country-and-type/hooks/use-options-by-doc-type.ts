@@ -4,6 +4,7 @@ import {
   IcoGreenCard24,
   IcoIdCard24,
   IcoPassport24,
+  IcoSsnCard24,
   IcoVisaPassport24,
   IcoVoter24,
   IcoWork24,
@@ -66,6 +67,13 @@ const useOptionsByDocType = (supportedDocumentTypes: SupportedIdDocTypes[]) => {
       title: t('form.type.voterIdentification.title'),
       IconComponent: IcoVoter24,
       value: SupportedIdDocTypes.voterIdentification,
+    };
+  }
+  if (supportedDocumentTypes?.includes(SupportedIdDocTypes.ssnCard)) {
+    optionsByDocType[SupportedIdDocTypes.ssnCard] = {
+      title: t('form.type.ssnCard.title'),
+      IconComponent: IcoSsnCard24,
+      value: SupportedIdDocTypes.ssnCard,
     };
   }
 

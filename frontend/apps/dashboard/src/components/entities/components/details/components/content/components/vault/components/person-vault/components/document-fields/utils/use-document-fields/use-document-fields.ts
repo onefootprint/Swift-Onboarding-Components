@@ -150,6 +150,11 @@ const useDocumentFields = () => {
         DocumentDI.voterIdentificationClassifiedDocumentType,
       ],
     },
+    {
+      main: DocumentDI.latestSsnCardFront,
+      label: t(DocumentDI.latestSsnCardFront),
+      dis: [DocumentDI.latestSsnCardFront],
+    },
   ];
 
   return fields;

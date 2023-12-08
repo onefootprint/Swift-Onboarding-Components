@@ -12,6 +12,7 @@ export enum SupportedIdDocTypes {
   workPermit = 'permit',
   residenceDocument = 'residence_document',
   voterIdentification = 'voter_identification',
+  ssnCard = 'ssn_card',
 }
 
 export enum IdDocRegionality {

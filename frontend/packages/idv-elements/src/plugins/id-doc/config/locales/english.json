@@ -257,6 +257,9 @@
           },
           "voterIdentification": {
             "title": "Voter identification"
+          },
+          "ssnCard": {
+            "title": "SSN Card"
           }
         },
         "not-supported": "Sorry, we don't support IDs for your country yet.",
@@ -272,7 +275,8 @@
           "visa": "Visa · PHOTO PAGE",
           "workPermit": "EAD card · FRONT",
           "residenceDocument": "Green card · FRONT",
-          "voterIdentification": "Voter identification · FRONT"
+          "voterIdentification": "Voter identification · FRONT",
+          "ssnCard": "SSN Card · FRONT"
         },
         "preview": {
           "driversLicense": "Driver's license",
@@ -281,7 +285,8 @@
           "visa": "Visa",
           "workPermit": "EAD card",
           "residenceDocument": "Green card",
-          "voterIdentification": "Voter identification"
+          "voterIdentification": "Voter identification",
+          "ssnCard": "SSN Card"
         }
       },
       "subtitle": {

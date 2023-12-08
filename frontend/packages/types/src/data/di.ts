@@ -55,6 +55,7 @@ export enum IdDI {
 export enum DocumentDI {
   finraComplianceLetter = 'document.finra_compliance_letter',
 
+  // TODO: we should migrate these away from `.latest_upload` to `.image`
   latestPassport = 'document.passport.front.latest_upload',
   latestPassportSelfie = 'document.passport.selfie.latest_upload',
   passportFullName = 'document.passport.full_name',
@@ -164,6 +165,8 @@ export enum DocumentDI {
   voterIdentificationRefNumber = 'document.voter_identification.ref_number',
   voterIdentificationNationality = 'document.voter_identification.nationality',
   voterIdentificationClassifiedDocumentType = 'document.voter_identification.classifed_document_type',
+
+  latestSsnCardFront = 'document.ssn_card.front.image',
 }
 
 export type VersionedDocumentDI<Version extends string = string> =
