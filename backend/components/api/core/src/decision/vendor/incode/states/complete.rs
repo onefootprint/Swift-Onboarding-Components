@@ -64,12 +64,15 @@ pub fn vault_complete_images(
     dk: IdDocKind,
     id_doc: &IdentityDocument,
 ) -> ApiResult<(Vec<DocumentData>, DataLifetimeSeqno)> {
+    // When we vault .latest_upload, we use the document_type that is provided by the user, not the eventual doc_type from incode which is the one
+    // we vault the complete images for
+    let doc_type_for_latest_upload = id_doc.document_type;
     let docs = id_doc
         .images(conn, true)?
         .into_iter()
         .map(|u| {
             let mime_type = vw
-                .get_mime_type(DocumentKind::LatestUpload(dk, u.side))
+                .get_mime_type(DocumentKind::LatestUpload(doc_type_for_latest_upload, u.side))
                 .unwrap_or("image/png");
             let file_extension = mime_type_to_extension(mime_type).unwrap_or("png");
             let kind = DocumentKind::from_id_doc_kind(dk, u.side).into();
