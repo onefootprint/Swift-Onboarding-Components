@@ -24,8 +24,8 @@ export type ButtonProps = {
   type?: 'button' | 'submit' | 'reset';
   variant?: ButtonVariant;
   prefixIcon?: Icon;
-  iconColor?: Color;
   sx?: SXStyleProps;
+  iconColor?: Color;
 };
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -44,23 +44,24 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       variant = 'primary',
       sx,
       prefixIcon: PrefixIcon,
-      iconColor = variant === 'primary' ? 'quinary' : 'primary',
+      iconColor,
     }: ButtonProps,
     ref,
   ) => {
     const sxStyles = useSX(sx);
 
     const getContent = () => (
-      <Stack
+      <InnerContainer
         as="span"
         justify="center"
         align="center"
         gap={3}
         visibility={loading ? 'hidden' : 'visible'}
+        variant={variant}
       >
         {PrefixIcon && <PrefixIcon color={iconColor} />}
         {children}
-      </Stack>
+      </InnerContainer>
     );
 
     return (
@@ -93,6 +94,19 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     );
   },
 );
+
+const InnerContainer = styled(Stack)<{ variant?: ButtonVariant }>`
+  ${({ theme, variant }) => css`
+    ${variant &&
+    css`
+      svg {
+        path {
+          fill: ${theme.components.button.variant[variant].color};
+        }
+      }
+    `}
+  `}
+`;
 
 const ButtonContainer = styled.button<{
   size: ButtonSize;

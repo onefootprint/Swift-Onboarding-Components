@@ -90,7 +90,6 @@ const Form = ({
         loading={isLoading}
         type="submit"
         prefixIcon={IcoSmartphone224}
-        iconColor="quinary"
       >
         {t('cta')}
       </Button>
