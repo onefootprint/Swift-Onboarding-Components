@@ -1,19 +1,19 @@
 import { IcoLink16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
-import kebabCase from 'lodash/kebabCase';
 import React from 'react';
+import getSectionMeta from 'src/utils/section';
 
 type H3Props = {
-  children: string;
+  children: string | string[];
 };
 
 const H3 = ({ children }: H3Props) => {
-  const id = kebabCase(children);
+  const { id, label } = getSectionMeta(children);
   return (
     <Anchor id={id} href={`#${id}`} rel="noopener noreferrer">
       <Typography as="h3" color="primary" variant="label-1">
-        {children}
+        {label}
         <IcoLink16 />
       </Typography>
     </Anchor>
