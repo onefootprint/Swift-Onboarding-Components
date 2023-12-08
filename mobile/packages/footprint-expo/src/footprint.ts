@@ -69,12 +69,13 @@ const open = async ({
   };
 
   try {
+    const redirect = redirectUrl ?? Linking.createURL('/');
     const url = createUrl({
       appearance,
-      redirectUrl: redirectUrl ?? Linking.createURL('/'),
+      redirectUrl: redirect,
       token,
     });
-    const result = await WebBrowser.openAuthSessionAsync(url);
+    const result = await WebBrowser.openAuthSessionAsync(url, redirect);
     if (!isUpdateHandled) {
       if (result.type !== 'success') {
         cancel();
