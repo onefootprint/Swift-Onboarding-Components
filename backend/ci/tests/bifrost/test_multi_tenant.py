@@ -72,7 +72,6 @@ def test_prefill_timeline_events(
     # Timeline events from sandbox_tenant's view belong to self
     body = get(f"/entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
     assert body
-    assert not any(i["is_from_other_org"] for i in body)
 
     # But from foo_sandbox_tenant's view, these events are portable and belong to another org
     body = get(

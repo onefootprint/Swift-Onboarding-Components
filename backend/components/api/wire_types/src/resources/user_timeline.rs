@@ -12,7 +12,6 @@ use crate::{
 pub struct UserTimeline {
     pub event: UserTimelineEvent,
     pub timestamp: DateTime<Utc>,
-    pub is_from_other_org: bool,
 }
 
 // TODO need Apiv2Schema to generate the oneOf type. Paperclip doesn't support this though...

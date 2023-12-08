@@ -73,11 +73,7 @@ pub enum SaturatedTimelineEvent {
 }
 
 pub type IsFromOtherTenant = bool;
-pub struct UserTimelineInfo(
-    pub UserTimeline,
-    pub IsFromOtherTenant,
-    pub SaturatedTimelineEvent,
-);
+pub struct UserTimelineInfo(pub UserTimeline, pub SaturatedTimelineEvent);
 
 impl UserTimeline {
     #[tracing::instrument("UserTimeline::create", skip_all)]
@@ -281,10 +277,7 @@ impl UserTimeline {
                         SaturatedTimelineEvent::WorkflowStarted((workflow, ob_config))
                     }
                 };
-                // This will actually display that events from different ob configs at the same
-                // tenant belong to a different tenant. Probably okay.
-                let is_from_other_tenant = ut.scoped_vault_id != su.id;
-                Ok(UserTimelineInfo(ut, is_from_other_tenant, saturated_event))
+                Ok(UserTimelineInfo(ut, saturated_event))
             })
             .collect::<DbResult<Vec<_>>>()?;
 
@@ -390,7 +383,7 @@ mod tests {
 
         assert_eq!(3, user_timeline_infos.len());
 
-        let ut1 = match &user_timeline_infos[0].2 {
+        let ut1 = match &user_timeline_infos[0].1 {
             SaturatedTimelineEvent::Annotation(a) => a,
             _ => unreachable!(),
         };
@@ -402,7 +395,7 @@ mod tests {
             _ => unreachable!(),
         };
 
-        let ut2 = match &user_timeline_infos[1].2 {
+        let ut2 = match &user_timeline_infos[1].1 {
             SaturatedTimelineEvent::Annotation(a) => a,
             _ => unreachable!(),
         };
@@ -414,7 +407,7 @@ mod tests {
             _ => unreachable!(),
         };
 
-        let ut3 = match &user_timeline_infos[2].2 {
+        let ut3 = match &user_timeline_infos[2].1 {
             SaturatedTimelineEvent::Annotation(a) => a,
             _ => unreachable!(),
         };
