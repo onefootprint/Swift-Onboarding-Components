@@ -23,6 +23,7 @@ use db::models::workflow::Workflow;
 use db::models::workflow_request::WorkflowRequest;
 use newtypes::ContactInfoKind;
 use newtypes::DbActor;
+use newtypes::OnboardingStatus;
 use newtypes::PhoneNumber;
 use newtypes::PiiString;
 use newtypes::TriggerKind;
@@ -57,6 +58,8 @@ pub async fn post(
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv.id)?;
+
+            validate(trigger_kind, &sv)?;
 
             if vw.vault.kind != VaultKind::Person {
                 return Err(TenantError::IncorrectVaultKindForRedoKyc.into());
@@ -124,6 +127,19 @@ pub async fn post(
     }
 
     ResponseData::ok(EmptyResponse {}).json()
+}
+
+fn validate(trigger_info: TriggerKind, scoped_vault: &ScopedVault) -> ApiResult<()> {
+    match trigger_info {
+        TriggerKind::RedoKyc => Ok(()),
+        TriggerKind::IdDocument => Ok(()),
+        TriggerKind::ProofOfSsn => match scoped_vault.status {
+            Some(OnboardingStatus::Pass) | Some(OnboardingStatus::Fail) => Ok(()),
+            None | Some(OnboardingStatus::Incomplete) | Some(OnboardingStatus::Pending) => {
+                Err(UserError::NoCompleteOnboardings.into())
+            }
+        },
+    }
 }
 
 #[derive(Clone)]

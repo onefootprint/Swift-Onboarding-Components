@@ -2,14 +2,18 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use db::models::identity_document::IdentityDocument;
-use db::models::manual_review::ManualReview;
 use db::models::ob_configuration::ObConfiguration;
+use db::models::onboarding_decision::NewDecisionArgs;
+use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
-use db::models::workflow::Workflow as DbWorkflow;
+use db::models::workflow::{Workflow as DbWorkflow, WorkflowUpdate as DbWorkflowUpdate};
 use db::TxnPgConn;
 
 use feature_flag::FeatureFlagClient;
-use newtypes::{DocKind, DocumentConfig, Locked, ReviewReason};
+use newtypes::{
+    DataLifetimeSeqno, DbActor, DecisionStatus, DocKind, DocumentConfig, Locked, OnboardingStatus,
+    ReviewReason,
+};
 use newtypes::{ScopedVaultId, TenantId, WorkflowId};
 
 use super::{DocumentState, MakeDecision};
@@ -19,6 +23,7 @@ use crate::decision::state::{
     common, WorkflowState,
 };
 use crate::decision::utils::should_execute_rules_for_document_only;
+use crate::errors::AssertionError;
 use crate::{
     decision::{
         self,
@@ -153,21 +158,24 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<DocumentState> {
         let (ff_client, vendor_results) = async_res;
-        let v = Vault::get(conn, &wf.scoped_vault_id)?;
-        let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
-        let fixture_decision =
-            decision::utils::get_fixture_data_decision(ff_client.clone(), &v, &wf, &self.t_id)?;
-        let execute_rules_for_real_document_decision_only = should_execute_rules_for_document_only(&v, &wf)?;
-        let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
-        let id_docs = IdentityDocument::list_by_wf_id(conn, &wf.id)?;
-        let is_proof_of_ssn = id_docs
-            .iter()
-            .any(|id| DocKind::from(id.document_type) == DocKind::ProofOfSsn);
 
-        if is_proof_of_ssn {
-            handle_proof_of_ssn(conn, &wf)?;
+        let id_docs = IdentityDocument::list_by_wf_id(conn, &wf.id)?;
+        let proof_of_ssn_seqno = id_docs
+            .iter()
+            .find(|id| DocKind::from(id.document_type) == DocKind::ProofOfSsn)
+            .map(|i| i.completed_seqno);
+
+        if let Some(proof_of_ssn) = proof_of_ssn_seqno {
+            handle_proof_of_ssn(conn, wf, proof_of_ssn)?;
         } else {
+            let v = Vault::get(conn, &wf.scoped_vault_id)?;
+            let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
             // Rerun decisioning, but with the latest doc risk signals
+            let fixture_decision =
+                decision::utils::get_fixture_data_decision(ff_client.clone(), &v, &wf, &self.t_id)?;
+            let execute_rules_for_real_document_decision_only =
+                should_execute_rules_for_document_only(&v, &wf)?;
+            let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
             // TODO: what's the review strategy for this case?
             let decision = common::get_decision(conn, ff_client, risk_signals, &wf, &v)?;
             let decision = if let Some(fixture_decision) = fixture_decision {
@@ -228,20 +236,42 @@ impl WorkflowState for DocumentComplete {
 }
 
 #[tracing::instrument(skip_all)]
-fn handle_proof_of_ssn(conn: &mut TxnPgConn, wf: &DbWorkflow) -> ApiResult<()> {
-    // Only create a review if there isn't already one, but still fire a webhook regardless
-    // This is a little weird
-    let existing_reviews = ManualReview::get_active_for_sv(conn, &wf.scoped_vault_id)?;
-    if existing_reviews.is_empty() {
-        ManualReview::create(
-            conn,
-            vec![ReviewReason::ProofOfSsnDocument],
-            wf.id.clone(),
-            wf.scoped_vault_id.clone(),
-        )?;
-    }
-
-    // TODO: figure out a strategy to push the fact that there's a MR for SSN Upload now
+fn handle_proof_of_ssn(
+    conn: &mut TxnPgConn,
+    wf: Locked<DbWorkflow>,
+    seqno: Option<DataLifetimeSeqno>,
+) -> ApiResult<()> {
+    let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?;
+    let decision = NewDecisionArgs {
+        vault_id: sv.vault_id.clone(),
+        logic_git_hash: crate::GIT_HASH.to_string(),
+        status: from_scoped_vault_status_for_proof_of_ssn_decision(&sv)?,
+        result_ids: vec![],
+        annotation_id: None,
+        actor: DbActor::Footprint,
+        seqno,
+        create_manual_review_reasons: Some(vec![ReviewReason::ProofOfSsnDocument]),
+    };
+    let update = DbWorkflowUpdate::set_decision(&wf, decision);
+    // TODO: figure out a strategy for users already in MR to push the fact that there's a MR for SSN Upload now
+    DbWorkflow::update(wf, conn, update)?;
 
     Ok(())
+}
+
+// in order to avoid updating sv status or triggering a status changed updated webhook,
+// we map the current sv.status to whatever the DecisionStatus should be to maintain that status
+fn from_scoped_vault_status_for_proof_of_ssn_decision(
+    scoped_vault: &ScopedVault,
+) -> ApiResult<DecisionStatus> {
+    let sv_status = scoped_vault.status.ok_or(AssertionError(
+        "cannot determine proof of ssn decision from sv.status",
+    ))?;
+    match sv_status {
+        OnboardingStatus::Pass => Ok(DecisionStatus::Pass),
+        OnboardingStatus::Fail => Ok(DecisionStatus::Fail),
+        OnboardingStatus::Incomplete | OnboardingStatus::Pending => {
+            Err(AssertionError("scoped vault status must be in pass or fail to collect proof of ssn").into())
+        }
+    }
 }
