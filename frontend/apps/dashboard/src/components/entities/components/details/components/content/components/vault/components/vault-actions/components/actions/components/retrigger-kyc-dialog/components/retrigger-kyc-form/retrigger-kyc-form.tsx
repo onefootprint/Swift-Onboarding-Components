@@ -11,7 +11,6 @@ import {
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import AnimatedContainer from 'src/components/animated-container';
-import useSession from 'src/hooks/use-session';
 
 import useEntity from '@/entity/hooks/use-entity';
 import useEntityId from '@/entity/hooks/use-entity-id';
@@ -46,10 +45,6 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
     });
   };
 
-  const {
-    data: { user },
-  } = useSession();
-
   return (
     <StyledForm id={formId} onSubmit={handleSubmit(handleBeforeSubmit)}>
       <Typography variant="label-3">{t('prompt')}</Typography>
@@ -71,16 +66,14 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
           />
         </AnimatedContainer>
       </div>
-      {user?.isFirmEmployee && (
-        <div>
-          <Radio
-            value={TriggerKind.ProofOfSsn}
-            label={t('form.proof-of-ssn.title')}
-            hint={t('form.proof-of-ssn.description')}
-            {...register('kind', { required: true })}
-          />
-        </div>
-      )}
+      <div>
+        <Radio
+          value={TriggerKind.ProofOfSsn}
+          label={t('form.proof-of-ssn.title')}
+          hint={t('form.proof-of-ssn.description')}
+          {...register('kind', { required: true })}
+        />
+      </div>
       <Radio
         value={TriggerKind.RedoKyc}
         label={t('form.revise-kyc.title')}
