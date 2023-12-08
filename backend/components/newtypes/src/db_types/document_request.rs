@@ -1,4 +1,5 @@
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum_macros::Display;
 
 use strum_macros::EnumString;
@@ -15,6 +16,8 @@ use strum_macros::EnumString;
     AsExpression,
     FromSqlRow,
     EnumString,
+    SerializeDisplay,
+    DeserializeFromStr,
     macros::SerdeAttr,
 )]
 #[strum(serialize_all = "snake_case")]

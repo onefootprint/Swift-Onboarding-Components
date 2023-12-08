@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct TriggerRequest {
     pub trigger: TriggerInfo,
@@ -8,7 +8,7 @@ pub struct TriggerRequest {
     pub note: Option<String>,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct TriggerKycRequest {
     pub onboarding_config_key: ObConfigurationKey,
@@ -16,7 +16,7 @@ pub struct TriggerKycRequest {
     pub fixture_result: Option<SimpleFixtureResult>,
 }
 
-#[derive(Debug, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[derive(Debug, Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct TriggerLinkResponse {
     pub link: PiiString,
@@ -40,7 +40,7 @@ impl From<SimpleFixtureResult> for WorkflowFixtureResult {
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct TriggerKybRequest {
     pub onboarding_config_key: ObConfigurationKey,

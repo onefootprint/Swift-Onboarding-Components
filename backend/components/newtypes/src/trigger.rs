@@ -21,6 +21,4 @@ pub enum TriggerInfo {
         collect_selfie: bool,
     },
     ProofOfSsn,
-    RedoKyb,
-    // TODO in the future, support BusinessOwnerLink, FinishKyc?, EditData?
 }

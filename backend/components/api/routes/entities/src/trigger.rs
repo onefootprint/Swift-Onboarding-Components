@@ -61,7 +61,7 @@ pub async fn post(
     let actor = DbActor::from(auth.actor());
 
     // Generate an auth token for the user and send to their phone number on file
-    let trigger_kind = trigger.into();
+    let trigger_kind = (&trigger).into();
     let (vw, auth_token) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -74,9 +74,11 @@ pub async fn post(
 
             let (event, auth_args) = match trigger {
                 TriggerInfo::RedoKyc => {
+                    let config = trigger.into();
                     let (_, obc) = Workflow::latest_reonboardable_wf(conn, &sv.id)?
                         .ok_or(UserError::NoCompleteOnboardings)?;
-                    let wr = WorkflowRequest::create(conn, sv.id.clone(), obc.id.clone(), actor.clone())?;
+                    let wr =
+                        WorkflowRequest::create(conn, sv.id.clone(), obc.id.clone(), actor.clone(), config)?;
                     let args = UserSessionArgs {
                         su_id: Some(sv.id.clone()),
                         obc_id: Some(obc.id.clone()),
@@ -104,7 +106,6 @@ pub async fn post(
                 TriggerInfo::ProofOfSsn => {
                     handle_trigger_document(conn, &sv.id, DocumentRequestKind::ProofOfSsn, false, actor)?
                 }
-                TriggerInfo::RedoKyb => return Err(TenantError::InvalidTriggerKind.into()), // not yet supported
             };
             // No scopes or auth factors - require the user to re-auth when using this token
             let duration = Duration::days(1);
@@ -173,15 +174,6 @@ impl TriggerMessage {
             )),
             TriggerKind::IdDocument => PiiString::from(format!(
                 "{}To verify your identity for {}, provide a photo of your ID here: {}",
-                self.note
-                    .as_ref()
-                    .map(|n| format!("{}\n\n", n))
-                    .unwrap_or_default(),
-                self.org_name,
-                self.link.leak()
-            )),
-            TriggerKind::RedoKyb => PiiString::from(format!(
-                "{}Re-verify your business for {} here: {}",
                 self.note
                     .as_ref()
                     .map(|n| format!("{}\n\n", n))

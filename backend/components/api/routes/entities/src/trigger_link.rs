@@ -31,7 +31,7 @@ pub async fn post(
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
-    let (fp_id, trigger_id) = path.into_inner();
+    let (fp_id, wfr_id) = path.into_inner();
     let session_key = state.session_sealing_key.clone();
 
     // Generate an auth token using the existing wfr.
@@ -40,7 +40,7 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let wfr = WorkflowRequest::get(conn, &trigger_id, &sv.id)?;
+            let wfr = WorkflowRequest::get(conn, &wfr_id, &sv.id)?;
             if wfr.deactivated_at.is_some() {
                 return Err(ValidationError("This trigger is no longer active").into());
             }

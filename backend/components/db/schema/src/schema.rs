@@ -1120,6 +1120,7 @@ table! {
         ob_configuration_id -> Text,
         created_by -> Jsonb,
         workflow_id -> Nullable<Text>,
+        config -> Jsonb,
     }
 }
 

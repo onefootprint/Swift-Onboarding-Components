@@ -11,6 +11,7 @@ use newtypes::DbActor;
 use newtypes::ObConfigurationId;
 use newtypes::ScopedVaultId;
 use newtypes::WorkflowId;
+use newtypes::WorkflowRequestConfig;
 use newtypes::WorkflowRequestId;
 
 #[derive(Debug, Clone, Queryable)]
@@ -26,6 +27,8 @@ pub struct WorkflowRequest {
     pub created_by: DbActor,
     /// The workflow_id created for this WorkflowRequest
     pub workflow_id: Option<WorkflowId>,
+    /// Information on what kind of Workflow to create from this request
+    pub config: WorkflowRequestConfig,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -35,6 +38,7 @@ struct NewWorkflowRequestRow {
     scoped_vault_id: ScopedVaultId,
     timestamp: DateTime<Utc>,
     created_by: DbActor,
+    config: WorkflowRequestConfig,
 }
 
 impl WorkflowRequest {
@@ -68,6 +72,7 @@ impl WorkflowRequest {
         sv_id: ScopedVaultId,
         obc_id: ObConfigurationId,
         created_by: DbActor,
+        config: WorkflowRequestConfig,
     ) -> DbResult<Self> {
         // Deactivate old WorkflowRequests when making a new one
         Self::deactivate(conn, &sv_id, None)?;
@@ -76,6 +81,7 @@ impl WorkflowRequest {
             ob_configuration_id: obc_id,
             timestamp: Utc::now(),
             created_by,
+            config,
         };
         let result = diesel::insert_into(workflow_request::table)
             .values(new_row)
