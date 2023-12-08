@@ -43,6 +43,14 @@ pub enum DocKind {
     Identity,
     ProofOfSsn,
 }
+impl DocKind {
+    pub fn should_initiate_requests(&self) -> bool {
+        match self {
+            DocKind::Identity => true,
+            DocKind::ProofOfSsn => false,
+        }
+    }
+}
 
 impl From<IdDocKind> for DocKind {
     fn from(value: IdDocKind) -> Self {

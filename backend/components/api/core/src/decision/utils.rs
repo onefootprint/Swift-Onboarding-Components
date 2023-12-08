@@ -20,15 +20,10 @@ use newtypes::{
 };
 
 use super::{
-    features::incode_docv::IncodeOcrComparisonDataFields,
     sandbox,
     vendor::{self},
 };
-use crate::{
-    errors::{onboarding::OnboardingError, ApiError, ApiErrorKind, ApiResult},
-    utils::vault_wrapper::{Person, VaultWrapper},
-    State,
-};
+use crate::errors::{onboarding::OnboardingError, ApiError, ApiErrorKind, ApiResult};
 use feature_flag::{BoolFlag, FeatureFlagClient};
 
 pub type CreateManualReview = bool;
@@ -95,39 +90,27 @@ type ShouldInitiateRealDocumentRequests = bool;
 
 /// Determines whether production identity document requests should be made, and if not, what the outcome should be
 pub async fn should_initiate_requests_for_document(
-    state: &State,
-    uvw: &VaultWrapper<Person>,
+    vault: &Vault,
     document_decision: Option<IdentityDocumentFixtureResult>,
-) -> ApiResult<(
-    ShouldInitiateRealDocumentRequests,
-    Option<IncodeOcrComparisonDataFields>,
-)> {
+) -> ApiResult<ShouldInitiateRealDocumentRequests> {
     // We allow identity documents to be tested in sandbox against incode demo environment, if a tenant is flagged in
     // We use a flag since not all tenants should have this enabled by default (they might need to sign incode terms and be advised that they can only do this for testing purposes)
-    if !uvw.vault.is_live {
+    if !vault.is_live {
         // TODO: ADD this assertion in main index.rs and remove fixture stuff from here
         // let d = document_decision
         //     // Ensure that each sandbox vault has a fixture result - we don't want to make real
         //     // requests for sandbox vaults
         //     .ok_or(OnboardingError::NoFixtureResultForSandboxUser)?;
-        let fixture_ocr_data = if document_decision
-            .map(|d| !matches!(d, IdentityDocumentFixtureResult::Real))
-            .unwrap_or(false)
-        {
-            let vault_data = IncodeOcrComparisonDataFields::compose(&state.enclave_client, uvw).await?;
-            Some(vault_data)
-        } else {
-            None
-        };
-
-        let should_initiate_sandbox = matches!(document_decision, Some(IdentityDocumentFixtureResult::Real));
-        return Ok((should_initiate_sandbox, fixture_ocr_data));
+        Ok(matches!(
+            document_decision,
+            Some(IdentityDocumentFixtureResult::Real)
+        ))
     // guard against prod vaults from providing document fixtures (we prevent this in the API route that starts the flow, but double checking never hurt nobody)
     } else if document_decision.is_some() {
-        return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
+        Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into())
+    } else {
+        Ok(true)
     }
-
-    Ok((true, None))
 }
 
 /// Helper to do some sanity checks when creating document verification requests

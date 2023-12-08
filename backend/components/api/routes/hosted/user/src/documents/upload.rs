@@ -135,8 +135,9 @@ pub async fn post(
     let wf_id2 = wf.id.clone();
     let is_sandbox = id_doc.fixture_result.is_some();
     // Check if we should be initiating requests (e.g. check if we are testing)
-    let (should_initiate_reqs, _) =
-        decision::utils::should_initiate_requests_for_document(&state, &uvw, id_doc.fixture_result).await?;
+    let should_initiate_reqs =
+        decision::utils::should_initiate_requests_for_document(&uvw.vault, id_doc.fixture_result).await?
+            && doc_kind.should_initiate_requests();
     let id_doc2 = id_doc.clone();
 
     let (missing_sides, created_reqs) = state

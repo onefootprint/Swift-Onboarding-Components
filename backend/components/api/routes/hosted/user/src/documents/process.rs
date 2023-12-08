@@ -69,8 +69,9 @@ pub async fn post(
     let is_sandbox = id_doc.fixture_result.is_some();
     let doc_kind: DocKind = id_doc.document_type.into();
     let upload_is_proof_of_ssn = doc_kind == DocKind::ProofOfSsn; // TODO: move this to being based on DR i think that's better and more source of truthy sicne we don't get from client
-    let (should_initiate_reqs, _) =
-        decision::utils::should_initiate_requests_for_document(&state, &uvw, id_doc.fixture_result).await?;
+    let should_initiate_reqs =
+        decision::utils::should_initiate_requests_for_document(&uvw.vault, id_doc.fixture_result).await?
+            && doc_kind.should_initiate_requests();
 
     let response = if should_initiate_reqs {
         // Not sandbox - make our request to vendors!
