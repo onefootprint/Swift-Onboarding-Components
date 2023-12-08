@@ -15,7 +15,6 @@ import DecryptForm from './components/decrypt-form';
 import DecryptProvider from './components/decrypt-machine';
 import EditForm from './components/edit-form';
 import EditProvider from './components/edit-machine';
-import editFormFieldName from './components/field/components/utils/edit-form-field-name';
 import PersonVault from './components/person-vault';
 import VaultActionControls, {
   useDecryptControls,
@@ -49,12 +48,7 @@ const Vault = ({ entity }: VaultProps) => {
       }
 
       const stayedEmpty = (!previousData || !previousData[di]) && !value;
-      let wasDeleted = previousData && previousData[di] && !value;
-      const formCountry = formData[editFormFieldName(IdDI.country)];
-      const isIntl = formCountry && formCountry !== 'US';
-      if (!stayedEmpty && di === IdDI.state && isIntl) {
-        wasDeleted = true;
-      }
+      const wasDeleted = previousData && previousData[di] && !value;
       let wasEdited =
         (previousData && previousData[di] !== value) ||
         ((!previousData || !previousData[di]) && value);

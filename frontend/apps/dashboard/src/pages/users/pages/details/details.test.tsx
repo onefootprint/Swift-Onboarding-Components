@@ -876,7 +876,7 @@ describe('<Details />', () => {
             withEdit(entityFixture.id, {
               [IdDI.country]: 'AD',
               [IdDI.zip]: 'AD300',
-              [IdDI.state]: undefined,
+              [IdDI.state]: 'Canillo',
             });
             await renderDetailsAndWaitData();
             await decryptFields([
@@ -921,21 +921,17 @@ describe('<Details />', () => {
               expect(zip).toHaveValue('AD300');
             });
 
-            const state = within(container).getByRole('combobox', {
-              name: 'state',
+            const state = getInputByRow({
+              name: 'State',
+              container,
             });
-            const emptyOption = within(state).getByRole('option', {
-              name: 'Select',
-            });
-            await userEvent.selectOptions(state, emptyOption);
+            await userEvent.clear(state);
             await waitFor(() => {
-              expect(
-                getSelectOptionByRow({
-                  rowName: 'State',
-                  optionName: 'Select',
-                  container,
-                }).selected,
-              ).toBe(true);
+              expect(state).toHaveValue('');
+            });
+            await userEvent.type(state, 'Canillo');
+            await waitFor(() => {
+              expect(state).toHaveValue('Canillo');
             });
 
             const saveButton = screen.getByRole('button', { name: 'Save' });
@@ -967,7 +963,7 @@ describe('<Details />', () => {
             await waitFor(() => {
               const newState = getTextByRow({
                 name: 'State',
-                value: '-',
+                value: 'Canillo',
                 container: screen.getByRole('group', {
                   name: 'Address data',
                 }),

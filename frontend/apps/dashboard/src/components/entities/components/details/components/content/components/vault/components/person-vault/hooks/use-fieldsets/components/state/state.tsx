@@ -12,11 +12,6 @@ export type StateType = {
   entity: Entity;
 };
 
-const checkStateCode = (value: VaultValue) =>
-  isVaultDataText(value) &&
-  isVaultDataDecrypted(value) &&
-  STATES.some(s => s.value === value);
-
 const getState = (state: VaultValue) => {
   const possibleState = STATES.find(s => s.value === state);
   return possibleState?.label || (state as string);
@@ -27,7 +22,7 @@ const State = ({ di, entity }: StateType) => (
     di={di}
     entity={entity}
     renderValue={value => {
-      if (value && checkStateCode(value)) {
+      if (value && isVaultDataText(value) && isVaultDataDecrypted(value)) {
         return (
           <Typography variant="body-3" color="primary">
             {getState(value)}
