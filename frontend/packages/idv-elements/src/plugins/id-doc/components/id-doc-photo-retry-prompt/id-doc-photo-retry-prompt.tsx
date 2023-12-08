@@ -4,7 +4,10 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { NavigationHeader } from '../../../../components';
-import type { IdDocImageErrorType } from '../../utils/state-machine';
+import type {
+  CaptureKind,
+  IdDocImageErrorType,
+} from '../../utils/state-machine';
 import Error from '../error';
 import FadeInContainer from '../fade-in-container';
 import IdDocPhotoButtons from '../id-doc-photo-buttons';
@@ -15,7 +18,11 @@ type IdDocPhotoRetryPromptProps = {
   countryName: string;
   imageType: IdDocImageTypes.front | IdDocImageTypes.back;
   errors: IdDocImageErrorType[];
-  onComplete: (imageFile: File, extraCompressed: boolean) => void;
+  onComplete: (
+    imageFile: File,
+    extraCompressed: boolean,
+    captureKind: CaptureKind,
+  ) => void;
 };
 
 const IdDocPhotoRetryPrompt = ({

@@ -32,7 +32,7 @@ type PhotoCaptureProps = {
   onComplete: (
     imageFile: File,
     extraCompressed: boolean,
-    captureKind?: CaptureKind,
+    captureKind: CaptureKind,
   ) => void;
   autocaptureKind: AutocaptureKind;
   deviceKind: DeviceKind;
@@ -93,6 +93,14 @@ const PhotoCapture = ({
     if (!image) {
       Logger.warn(
         'Captured image could not be confirmed and submitted - retaking the image',
+        'photo-capture',
+      );
+      return;
+    }
+
+    if (!captureKind) {
+      Logger.warn(
+        'Captured kind could not be determined - retaking the image',
         'photo-capture',
       );
       return;

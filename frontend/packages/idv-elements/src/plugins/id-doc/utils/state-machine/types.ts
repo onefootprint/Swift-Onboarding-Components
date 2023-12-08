@@ -15,7 +15,7 @@ export type IdDocImageErrorType = {
   errorInfo?: string;
 };
 
-export type CaptureKind = 'auto' | 'manual';
+export type CaptureKind = 'auto' | 'manual' | 'upload';
 
 export type MachineContext = {
   authToken: string;
@@ -23,7 +23,7 @@ export type MachineContext = {
   requirement: IdDocRequirement;
   image?: {
     imageFile: File;
-    captureKind?: CaptureKind;
+    captureKind: CaptureKind;
     extraCompressed?: boolean;
   };
   currSide?: IdDocImageTypes;
@@ -60,7 +60,7 @@ export type MachineEvents =
       type: 'receivedImage';
       payload: {
         imageFile: File;
-        captureKind?: CaptureKind;
+        captureKind: CaptureKind;
         extraCompressed?: boolean;
       };
     }

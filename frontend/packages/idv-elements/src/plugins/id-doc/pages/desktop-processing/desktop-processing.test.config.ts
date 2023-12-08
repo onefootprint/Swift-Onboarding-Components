@@ -59,6 +59,7 @@ export const initialContextDL: MachineContext = {
     imageFile: new File(['foo'], 'foo.txt', {
       type: 'text/plain',
     }),
+    captureKind: 'manual',
   },
 };
 

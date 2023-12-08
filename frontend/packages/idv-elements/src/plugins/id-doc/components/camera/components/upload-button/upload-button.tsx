@@ -53,6 +53,7 @@ const UploadButton = ({ onUpload, onComplete }: UploadButtonProps) => {
       payload: {
         imageFile: processResult.file,
         extraCompressed: processResult.extraCompressed,
+        captureKind: 'upload',
       },
     });
     onProcessingDone();

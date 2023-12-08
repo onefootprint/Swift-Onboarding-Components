@@ -157,7 +157,8 @@ const Processing = () => {
         side: currSide,
         id,
         meta: {
-          manual: captureKind ? captureKind === 'manual' : captureKind,
+          manual: captureKind === 'manual',
+          isUpload: captureKind === 'upload',
         },
       },
       {

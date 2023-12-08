@@ -110,12 +110,14 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
       ]);
       expect(state.value).toEqual('processingMobile');
       expect(state.context.image).toEqual({
         imageFile: testFile,
+        captureKind: 'manual',
       });
 
       state = machine.send({
@@ -131,12 +133,14 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
       ]);
       expect(state.value).toEqual('processingMobile');
       expect(state.context.image).toEqual({
         imageFile: testFile,
+        captureKind: 'manual',
       });
 
       state = machine.send({
@@ -152,12 +156,14 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
       ]);
       expect(state.value).toEqual('processingMobile');
       expect(state.context.image).toEqual({
         imageFile: testFile,
+        captureKind: 'manual',
       });
 
       state = machine.send({
@@ -211,12 +217,14 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
       ]);
       expect(state.value).toEqual('processingDesktop');
       expect(state.context.image).toEqual({
         imageFile: testFile,
+        captureKind: 'manual',
       });
 
       state = machine.send({
@@ -232,12 +240,14 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
       ]);
       expect(state.value).toEqual('processingDesktop');
       expect(state.context.image).toEqual({
         imageFile: testFile,
+        captureKind: 'manual',
       });
 
       state = machine.send({
@@ -253,12 +263,14 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
       ]);
       expect(state.value).toEqual('processingDesktop');
       expect(state.context.image).toEqual({
         imageFile: testFile,
+        captureKind: 'manual',
       });
 
       state = machine.send({
@@ -303,6 +315,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
         {
@@ -336,6 +349,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
         {
@@ -353,6 +367,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
         {
@@ -386,6 +401,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
         {
@@ -403,6 +419,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
         {
@@ -436,6 +453,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
         {
@@ -448,6 +466,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
         {
@@ -499,6 +518,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
         {
@@ -541,6 +561,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
         {
@@ -573,6 +594,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
         {
@@ -605,6 +627,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
         {
@@ -637,6 +660,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
         {
@@ -692,6 +716,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
         {
@@ -727,6 +752,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
         {
@@ -792,6 +818,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
         {
@@ -821,6 +848,7 @@ describe('Id Doc Machine Tests', () => {
           type: 'receivedImage',
           payload: {
             imageFile: testFile,
+            captureKind: 'manual',
           },
         },
         {

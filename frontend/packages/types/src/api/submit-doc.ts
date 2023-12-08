@@ -5,6 +5,7 @@ export type SubmitDocRequest = {
   side: string;
   id: string;
   meta: {
+    isUpload: boolean;
     manual?: boolean;
   };
 };

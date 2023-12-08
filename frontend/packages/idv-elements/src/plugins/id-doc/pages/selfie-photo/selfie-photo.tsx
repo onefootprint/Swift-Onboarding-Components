@@ -15,7 +15,7 @@ const SelfiePhoto = () => {
   const onComplete = (
     imageFile: File,
     extraCompressed: boolean,
-    captureKind?: CaptureKind,
+    captureKind: CaptureKind,
   ) =>
     send({
       type: 'receivedImage',

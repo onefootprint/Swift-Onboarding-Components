@@ -5,10 +5,15 @@ import React, { useRef, useState } from 'react';
 
 import Logger from '../../../../utils/logger';
 import useProcessImage from '../../hooks/use-process-image';
+import type { CaptureKind } from '../../utils/state-machine';
 import { useIdDocMachine } from '../machine-provider';
 
 type IdDocPhotoButtonsProp = {
-  onComplete: (imageFile: File, extraCompressed: boolean) => void;
+  onComplete: (
+    imageFile: File,
+    extraCompressed: boolean,
+    captureKind: CaptureKind,
+  ) => void;
 };
 
 const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
@@ -55,7 +60,7 @@ const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
       `IdDocPhotoButtons: size of the processed file to be sent in machine event type 'receivedImage' is ${file.size}, file type ${file.type}`,
     );
 
-    onComplete(file, extraCompressed);
+    onComplete(file, extraCompressed, 'upload');
     onProcessingDone();
   };
 

@@ -4,6 +4,7 @@ import React from 'react';
 import IdDocPhotoRetryPrompt from '../../components/id-doc-photo-retry-prompt';
 import { useIdDocMachine } from '../../components/machine-provider';
 import { getCountryFromCode } from '../../utils/get-country-from-code';
+import type { CaptureKind } from '../../utils/state-machine';
 
 const IdDocBackPhotoRetry = () => {
   const [state, send] = useIdDocMachine();
@@ -18,12 +19,17 @@ const IdDocBackPhotoRetry = () => {
 
   const countryName = getCountryFromCode(country)?.label;
 
-  const handleComplete = (imageFile: File, extraCompressed: boolean) => {
+  const handleComplete = (
+    imageFile: File,
+    extraCompressed: boolean,
+    captureKind: CaptureKind,
+  ) => {
     send({
       type: 'receivedImage',
       payload: {
         imageFile,
         extraCompressed,
+        captureKind,
       },
     });
   };

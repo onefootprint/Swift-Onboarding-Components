@@ -19,6 +19,7 @@ const submitDoc = async (payload: SubmitDocRequest) => {
       'x-fp-is-instant-app': false,
       'Content-Type': 'multipart/form-data',
       'x-fp-process-separately': true,
+      'x-fp-is-upload': meta.isUpload,
     },
     timeout: 180000,
   });
