@@ -65,8 +65,7 @@ pub async fn post(
                 return Err(TenantError::IncorrectVaultKindForRedoKyc.into());
             }
 
-            let (_, obc) =
-                Workflow::latest_reonboardable_wf(conn, &sv.id)?.ok_or(UserError::NoCompleteOnboardings)?;
+            let (_, obc) = Workflow::latest(conn, &sv.id, false)?.ok_or(UserError::NoCompleteOnboardings)?;
 
             let config = trigger.into();
             let wr = WorkflowRequest::create(conn, sv.id.clone(), obc.id.clone(), actor.clone(), config)?;

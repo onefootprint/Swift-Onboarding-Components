@@ -38,7 +38,6 @@ pub async fn post(
     let fp_id = fp_id.into_inner();
     let session_key = state.session_sealing_key.clone();
 
-    // Generate an auth token for the user and send to their phone number on file
     let (auth_token, session) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -50,8 +49,7 @@ pub async fn post(
                 return Err(TenantError::IncorrectVaultKindForRedoKyc.into());
             }
 
-            let (_, obc) =
-                Workflow::latest_reonboardable_wf(conn, &sv.id)?.ok_or(UserError::NoCompleteOnboardings)?;
+            let (_, obc) = Workflow::latest(conn, &sv.id, true)?.ok_or(UserError::NoCompleteOnboardings)?;
 
             let scopes = vec![];
             let duration = Duration::days(1);

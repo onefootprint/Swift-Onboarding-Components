@@ -394,19 +394,27 @@ impl Workflow {
     }
 
     /// Gets the latest workflow that the user completed that is "reonboard-able"
-    #[tracing::instrument("Workflow::list_by_completed_at", skip_all)]
-    pub fn latest_reonboardable_wf(
+    #[tracing::instrument("Workflow::latest", skip_all)]
+    pub fn latest(
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
+        only_completed: bool,
     ) -> DbResult<Option<(Self, ObConfiguration)>> {
-        let res = workflow::table
+        let mut query = workflow::table
             .inner_join(ob_configuration::table)
             .filter(workflow::scoped_vault_id.eq(sv_id))
-            .filter(not(workflow::completed_at.is_null()))
             .filter(not(ob_configuration::kind.eq(ObConfigurationKind::Auth)))
-            .order_by(workflow::completed_at.desc())
-            .first(conn)
-            .optional()?;
+            .into_boxed();
+
+        if only_completed {
+            query = query
+                .filter(not(workflow::completed_at.is_null()))
+                .order_by(workflow::completed_at.desc());
+        } else {
+            query = query.order_by(workflow::created_at.desc())
+        }
+
+        let res = query.first(conn).optional()?;
 
         Ok(res)
     }

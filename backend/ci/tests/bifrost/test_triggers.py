@@ -26,6 +26,22 @@ def extract_trigger_sms(twilio, phone_number, id):
     return try_until_success(inner, 60)
 
 
+def generate_trigger_link(fp_id, sandbox_tenant):
+    body = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
+    trigger_event = next(
+        i["event"] for i in body if i["event"]["kind"] == "workflow_triggered"
+    )
+    t_id = trigger_event["data"]["request"]["id"]
+    assert not trigger_event["data"]["request"]["is_deactivated"]
+    assert trigger_event["data"]["actor"]["kind"] == "organization"
+
+    # re-generate a link as is done from the dashboard instead of scouring for it via SMS
+    body = post(
+        f"entities/{fp_id}/triggers/{t_id}/link", None, *sandbox_tenant.db_auths
+    )
+    return FpAuth(body["link"].split("#")[1])
+
+
 @pytest.mark.parametrize("with_document", [True, False])
 def test_redo_kyc(sandbox_tenant, twilio, with_document, doc_first_obc):
     if with_document:
@@ -59,19 +75,7 @@ def test_redo_kyc(sandbox_tenant, twilio, with_document, doc_first_obc):
     body = get(f"entities/{fp_id}", None, *sandbox_tenant.db_auths)
     assert body["has_outstanding_workflow_request"]
 
-    body = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
-    trigger_event = next(
-        i["event"] for i in body if i["event"]["kind"] == "workflow_triggered"
-    )
-    t_id = trigger_event["data"]["request"]["id"]
-    assert not trigger_event["data"]["request"]["is_deactivated"]
-    assert trigger_event["data"]["actor"]["kind"] == "organization"
-
-    # re-generate a link as is done from the dashboard instead of scouring for it via SMS
-    body = post(
-        f"entities/{fp_id}/triggers/{t_id}/link", None, *sandbox_tenant.db_auths
-    )
-    initial_auth_token = FpAuth(body["link"].split("#")[1])
+    initial_auth_token = generate_trigger_link(fp_id, sandbox_tenant)
     auth_token = step_up_user(twilio, initial_auth_token, phone_number, False)
 
     # re-run Bifrost with the token from the link we sent to user
@@ -126,25 +130,12 @@ def test_recollect_document(sandbox_tenant, twilio):
 
     # Trigger recollect document
     def send_trigger():
-        data = dict(
-            trigger=dict(kind="id_document", data=dict(collect_selfie=False))
-        )
+        data = dict(trigger=dict(kind="id_document", data=dict(collect_selfie=False)))
         post(f"entities/{fp_id}/triggers", data, *sandbox_tenant.db_auths)
 
     try_until_success(send_trigger, 15, 3)
 
-    # Check the timeline event
-    body = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
-    trigger_event = next(
-        i["event"] for i in body if i["event"]["kind"] == "workflow_triggered"
-    )
-    t_id = trigger_event["data"]["request"]["id"]
-
-    # re-generate a link as is done from the dashboard instead of scouring for it via SMS
-    body = post(
-        f"entities/{fp_id}/triggers/{t_id}/link", None, *sandbox_tenant.db_auths
-    )
-    initial_auth_token = FpAuth(body["link"].split("#")[1])
+    initial_auth_token = generate_trigger_link(fp_id, sandbox_tenant)
     auth_token = step_up_user(twilio, initial_auth_token, phone_number, False)
 
     # re-run Bifrost with the token from the link we sent to user
@@ -175,6 +166,37 @@ def test_recollect_document(sandbox_tenant, twilio):
     assert all(map(lambda x: x["document_type"] == "drivers_license", users_docs))
 
 
+def test_trigger_incomplete(sandbox_tenant, twilio):
+    """
+    Ensure we can initiate a trigger for a user that has only an incomplete workflow.
+    """
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
+    sandbox_id = bifrost.sandbox_id
+    phone_number = bifrost.data["id.phone_number"]
+
+    # Don't finish onboarding. Grab fp_id from dashboard
+    body = get("/entities", None, *sandbox_tenant.db_auths)
+    user = next(u for u in body["data"] if u["sandbox_id"] == sandbox_id)
+    fp_id = user["id"]
+
+    # Trigger redo KYC
+    def send_trigger():
+        data = dict(trigger=dict(kind="redo_kyc"))
+        post(f"entities/{fp_id}/triggers", data, *sandbox_tenant.db_auths)
+
+    try_until_success(send_trigger, 15, 3)
+
+    # Check the timeline event
+    initial_auth_token = generate_trigger_link(fp_id, sandbox_tenant)
+    auth_token = step_up_user(twilio, initial_auth_token, phone_number, False)
+
+    # re-run Bifrost with the token from the link we sent to user
+    bifrost = BifrostClient.raw_auth(
+        sandbox_tenant.default_ob_config, auth_token, phone_number, sandbox_id
+    )
+    bifrost.run()
+
+
 def test_redo_kyc_with_sms_link(sandbox_tenant, twilio, live_phone_number):
     obc = sandbox_tenant.default_ob_config
     sandbox_id = _gen_random_sandbox_id()
@@ -198,7 +220,6 @@ def test_redo_kyc_with_sms_link(sandbox_tenant, twilio, live_phone_number):
     trigger_event = next(
         i["event"] for i in body if i["event"]["kind"] == "workflow_triggered"
     )
-    t_id = trigger_event["data"]["request"]["id"]
     assert not trigger_event["data"]["request"]["is_deactivated"]
     assert trigger_event["data"]["actor"]["kind"] == "organization"
 
