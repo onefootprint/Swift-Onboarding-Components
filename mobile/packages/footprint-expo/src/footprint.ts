@@ -26,44 +26,68 @@ const open = async ({
     return;
   }
 
-  const url = createUrl({
-    appearance,
-    redirectUrl,
-    token,
+  const cancel = () => {
+    try {
+      WebBrowser.dismissAuthSession();
+      WebBrowser.dismissBrowser();
+    } catch (error) {
+      /* noop */
+    }
+    onCanceled?.();
+  };
+
+  let isUpdateHandled = false; // Android and iOS handle results differently.
+  const subscription = Linking.addEventListener('url', ({ url: eventUrl }) => {
+    if (isUpdateHandled) {
+      return;
+    }
+    isUpdateHandled = true;
+    handleResultUrl(eventUrl);
   });
 
-  try {
-    const result = await WebBrowser.openAuthSessionAsync(url, redirectUrl);
-    if (result.type !== 'success') {
-      onCanceled?.();
-      return;
-    }
-    if (!result.url) {
-      console.warn(
-        `@onefootprint/footprint-expo: found invalid result url ${result.url}}`,
-      );
-      onCanceled?.();
+  const handleResultUrl = (resultUrl: string) => {
+    if (!resultUrl) {
+      console.warn('@onefootprint/footprint-expo: missing result url');
+      cancel();
       return;
     }
 
-    const { queryParams } = Linking.parse(result.url);
+    const { queryParams } = Linking.parse(resultUrl);
     const isCanceled = !queryParams || queryParams.canceled;
     if (isCanceled) {
-      onCanceled?.();
+      cancel();
       return;
     }
     const validationToken = queryParams.validation_token;
     if (!validationToken || typeof validationToken !== 'string') {
       console.warn('@onefootprint/footprint-expo: missing validation token');
-      onCanceled?.();
+      cancel();
       return;
     }
 
     onCompleted?.(validationToken);
+  };
+
+  try {
+    const url = createUrl({
+      appearance,
+      redirectUrl: redirectUrl ?? Linking.createURL('/'),
+      token,
+    });
+    const result = await WebBrowser.openAuthSessionAsync(url);
+    if (!isUpdateHandled) {
+      if (result.type !== 'success') {
+        cancel();
+      } else {
+        handleResultUrl(result.url);
+      }
+    }
   } catch (error) {
     console.error(`@onefootprint/footprint-expo: ${error}`);
-    onCanceled?.();
+    cancel();
   }
+
+  subscription.remove();
 };
 
 const close = () => {
