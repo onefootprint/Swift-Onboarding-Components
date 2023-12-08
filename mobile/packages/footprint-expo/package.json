@@ -2,7 +2,7 @@
   "name": "@onefootprint/footprint-expo",
   "private": false,
   "type": "module",
-  "version": "1.6.1",
+  "version": "1.6.1-beta",
   "main": "./dist/footprint-expo.cjs",
   "module": "./dist/footprint-expo.js",
   "unpkg": "./dist/footprint-expo.js",
@@ -34,8 +34,7 @@
   "dependencies": {
     "csstype": "^3.1.2",
     "expo-linking": "^5.0.2",
-    "expo-web-browser": "~12.3.2",
-    "query-string": "^8.1.0"
+    "expo-web-browser": "~12.3.2"
   },
   "peerDependencies": {
     "expo": "> 48",

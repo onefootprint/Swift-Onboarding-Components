@@ -64,7 +64,7 @@ const sendSdkArgsRecursive = async (
       }
       throw new Error(response.statusText);
     })
-    .catch(error => console.error(error.message));
+    .catch(error => console.error(`@onefootprint/footprint-expo: ${error}`));
 
 const sendSdkArgs = async ({
   publicKey,
@@ -84,13 +84,8 @@ const sendSdkArgs = async ({
     },
     NUM_RETRIES,
   );
-  if (!result) {
-    console.error(
-      'Footprint: Could not save sdk args, this could be due to connectivity problems.',
-    );
-    return undefined;
-  }
-  return result.token;
+
+  return result ? result.token : undefined;
 };
 
 export default sendSdkArgs;

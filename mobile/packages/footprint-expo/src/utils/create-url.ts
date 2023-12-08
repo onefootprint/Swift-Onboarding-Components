@@ -1,5 +1,10 @@
 import type { OpenFootprint } from '../footprint.types';
-import getAppearance from './get-appearance';
+
+const encode = (obj?: Record<string, unknown>): string => {
+  return obj && Object.keys(obj).length
+    ? encodeURIComponent(JSON.stringify(obj))
+    : '';
+};
 
 const createUrl = ({
   appearance,
@@ -7,26 +12,28 @@ const createUrl = ({
   token,
 }: {
   appearance?: OpenFootprint['appearance'];
-  redirectUrl?: string;
+  redirectUrl: string;
   token: string;
 }) => {
-  const url = 'http://id.onefootprint.com';
-  const { fontSrc, rules, variables } = getAppearance(appearance);
   const searchParams = new URLSearchParams();
-  if (variables) {
-    searchParams.append('variables', variables);
-  }
-  if (rules) {
-    searchParams.append('rules', rules);
-  }
-  if (fontSrc) {
-    searchParams.append('font_src', fontSrc);
-  }
-  if (redirectUrl) {
-    searchParams.append('redirect_url', redirectUrl);
+  searchParams.append('redirect_url', redirectUrl);
+
+  if (appearance) {
+    const variables = encode(appearance.variables);
+    const rules = encode(appearance.rules);
+
+    if (variables) {
+      searchParams.append('variables', variables);
+    }
+    if (rules) {
+      searchParams.append('rules', rules);
+    }
+    if (appearance.fontSrc) {
+      searchParams.append('font_src', appearance.fontSrc);
+    }
   }
 
-  return `${url}?${searchParams.toString()}#${token}`;
+  return `https://id.onefootprint.com?${searchParams.toString()}#${token}`;
 };
 
 export default createUrl;
