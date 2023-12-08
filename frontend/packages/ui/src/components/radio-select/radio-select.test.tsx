@@ -74,7 +74,7 @@ describe('<GroupedRadioSelect />', () => {
   }: Partial<RadioSelectProps>) => {
     const groupedOptions = [
       {
-        groupTitle: 'Group 1',
+        label: 'Group 1',
         options: [
           {
             title: 'Item 1',
@@ -91,7 +91,7 @@ describe('<GroupedRadioSelect />', () => {
         ],
       },
       {
-        groupTitle: 'Group 2',
+        label: 'Group 2',
         options: [
           {
             title: 'Item 3',

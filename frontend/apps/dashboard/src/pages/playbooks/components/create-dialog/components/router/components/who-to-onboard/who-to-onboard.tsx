@@ -50,28 +50,39 @@ const WhoToOnboard = ({ onSubmit, defaultKind }: WhoToOnboardProps) => {
             <RadioSelect
               options={[
                 {
-                  title: t('kyc.title'),
-                  description: t('kyc.description'),
-                  value: PlaybookKind.Kyc,
-                  IconComponent: IcoUsers24,
-                  disabled: org?.isLive && org?.isProdKycPlaybookRestricted,
-                  disabledHint: t('kyc.disabled-tooltip'),
+                  label: t('onboard-title'),
+                  options: [
+                    {
+                      title: t('kyc.title'),
+                      description: t('kyc.description'),
+                      value: PlaybookKind.Kyc,
+                      IconComponent: IcoUsers24,
+                      disabled: org?.isLive && org?.isProdKycPlaybookRestricted,
+                      disabledHint: t('kyc.disabled-tooltip'),
+                    },
+                    {
+                      title: t('kyb.title'),
+                      description: t('kyb.description'),
+                      value: PlaybookKind.Kyb,
+                      IconComponent: IcoStore24,
+                      disabled: org?.isLive && org?.isProdKybPlaybookRestricted,
+                      disabledHint: t('kyb.disabled-tooltip'),
+                    },
+                  ],
                 },
                 {
-                  title: t('kyb.title'),
-                  description: t('kyb.description'),
-                  value: PlaybookKind.Kyb,
-                  IconComponent: IcoStore24,
-                  disabled: org?.isLive && org?.isProdKybPlaybookRestricted,
-                  disabledHint: t('kyb.disabled-tooltip'),
-                },
-                {
-                  title: t('auth.title'),
-                  description: t('auth.description'),
-                  value: PlaybookKind.Auth,
-                  IconComponent: IcoShield24,
-                  disabled: org?.isLive && org?.isProdAuthPlaybookRestricted,
-                  disabledHint: t('auth.disabled-tooltip'),
+                  label: t('auth-title'),
+                  options: [
+                    {
+                      title: t('auth.title'),
+                      description: t('auth.description'),
+                      value: PlaybookKind.Auth,
+                      IconComponent: IcoShield24,
+                      disabled:
+                        org?.isLive && org?.isProdAuthPlaybookRestricted,
+                      disabledHint: t('auth.disabled-tooltip'),
+                    },
+                  ],
                 },
               ]}
               value={field.value}

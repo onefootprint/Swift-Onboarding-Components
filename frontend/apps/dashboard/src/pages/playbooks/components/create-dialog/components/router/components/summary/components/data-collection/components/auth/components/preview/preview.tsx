@@ -1,8 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheck16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Typography } from '@onefootprint/ui';
+import { createFontStyles, Typography } from '@onefootprint/ui';
 import React from 'react';
+
+import PopOver from '../pop-over';
 
 const Preview = () => {
   const { t } = useTranslation('pages.playbooks.dialog.summary.auth');
@@ -72,15 +74,35 @@ const Preview = () => {
             <Typography variant="body-4" color="primary">
               {t('passkeys')}
             </Typography>
-            <Typography variant="body-4" color="tertiary">
-              {t('passkeys-availability')} {t('passkeys-more')}
-            </Typography>
+            <Paragraph>
+              {t('passkeys-availability')}
+              <PopOver
+                videoSrc="/auth/passkeys.gif"
+                triggerVariants={{
+                  variant: 'body-4',
+                  color: 'tertiary',
+                }}
+                label={t('passkeys-more.title')}
+                content={t('passkeys-more.content')}
+              />
+            </Paragraph>
           </div>
         </Topic>
       </div>
     </Container>
   );
 };
+
+const Paragraph = styled.p`
+  ${({ theme }) => css`
+    ${createFontStyles('body-4')}
+    color: ${theme.color.tertiary};
+
+    button {
+      margin-left: ${theme.spacing[2]};
+    }
+  `}
+`;
 
 const Container = styled.div`
   ${({ theme }) => css`

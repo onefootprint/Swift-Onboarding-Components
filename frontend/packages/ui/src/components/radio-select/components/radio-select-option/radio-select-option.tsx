@@ -16,7 +16,7 @@ export type RadioSelectOptionFields = {
 };
 
 export type GroupedRadioSelectOptionFields = {
-  groupTitle: string;
+  label: string;
   options: RadioSelectOptionFields[];
 };
 

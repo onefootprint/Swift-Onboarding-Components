@@ -87,7 +87,7 @@ const compactOptions = [
 
 const groupedOptions = [
   {
-    groupTitle: 'Group 1',
+    label: 'Group 1',
     options: [
       {
         title: 'Item 1',
@@ -112,7 +112,7 @@ const groupedOptions = [
     ],
   },
   {
-    groupTitle: 'Group 2',
+    label: 'Group 2',
     options: [
       {
         title: 'Item 4',

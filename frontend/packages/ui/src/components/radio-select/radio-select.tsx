@@ -1,4 +1,4 @@
-import styled from '@onefootprint/styled';
+import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
 import Stack from '../stack';
@@ -26,17 +26,15 @@ const RadioSelect = ({
 }: RadioSelectProps) => (
   <OptionsContainer data-testid={testID} direction="column" gap={3}>
     {options.map(option => {
-      if ('groupTitle' in option) {
+      if ('label' in option) {
         return (
-          <Stack key={option.groupTitle} direction="column" gap={3}>
-            <Stack direction="row" gap={2} marginTop={3} marginBottom={1}>
-              <Typography
-                variant={size === 'compact' ? 'label-3' : 'label-2'}
-                color="primary"
-              >
-                {option.groupTitle}
-              </Typography>
-            </Stack>
+          <GroupContainer key={option.label} direction="column" gap={4}>
+            <Typography
+              variant={size === 'compact' ? 'label-3' : 'label-2'}
+              color="secondary"
+            >
+              {option.label}
+            </Typography>
             {option.options.map(subOption => (
               <RadioSelectOption
                 key={subOption.value}
@@ -53,7 +51,7 @@ const RadioSelect = ({
                 size={size}
               />
             ))}
-          </Stack>
+          </GroupContainer>
         );
       }
       return (
@@ -82,4 +80,11 @@ const OptionsContainer = styled(Stack)`
   }
 `;
 
+const GroupContainer = styled(Stack)`
+  ${({ theme }) => css`
+    &:not(:first-child) {
+      margin-top: ${theme.spacing[5]};
+    }
+  `};
+`;
 export default RadioSelect;
