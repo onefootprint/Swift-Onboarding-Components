@@ -17,6 +17,20 @@ type CardData = {
   country: string;
 };
 
+export const findMissingConfig = (): Error | undefined => {
+  if (!API_BASE_URL_DEV && !API_BASE_URL_PROD) {
+    return new Error('Empty values for API_BASE_URL_DEV and API_BASE_URL_PROD');
+  }
+
+  if (!API_SECRET_KEY_DEV && !API_SECRET_KEY_DEV) {
+    return new Error(
+      'Empty values for API_SECRET_KEY_DEV and API_SECRET_KEY_DEV',
+    );
+  }
+
+  return undefined;
+};
+
 export const waitForFormLoad = async ({
   page,
 }: {
