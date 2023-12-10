@@ -16,8 +16,9 @@ use db::{
 };
 use feature_flag::FeatureFlagClient;
 use newtypes::{
-    CollectedDataOption, DocumentConfig, DocumentRequestKind, EncryptedVaultPrivateKey, ObConfigurationKind,
-    Selfie, VaultKind, VaultPublicKey, WorkflowConfig, WorkflowId, WorkflowRequestId, WorkflowSource,
+    CipKind, CollectedDataOption, DocumentConfig, DocumentRequestKind, EncryptedVaultPrivateKey,
+    ObConfigurationKind, Selfie, VaultKind, VaultPublicKey, WorkflowConfig, WorkflowId, WorkflowRequestId,
+    WorkflowSource,
 };
 use std::sync::Arc;
 
@@ -171,10 +172,11 @@ fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObCon
                     CollectedDataOption::Document(doc_info) => Some(doc_info),
                     _ => None,
                 })
-                .next() else {
-                    // No doc request needed
-                    return Ok(());
-                };
+                .next()
+            else {
+                // No doc request needed
+                return Ok(());
+            };
             let should_collect_selfie = doc_info.selfie() == Selfie::RequireSelfie;
             (DocumentRequestKind::Identity, should_collect_selfie)
         }
@@ -185,13 +187,30 @@ fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObCon
         }
     };
 
-    let args = NewDocumentRequestArgs {
-        scoped_vault_id: wf.scoped_vault_id.clone(),
-        ref_id: None,
-        workflow_id: wf.id.clone(),
-        should_collect_selfie,
-        kind,
-    };
-    DocumentRequest::create(conn, args)?;
+    let doc_requests_to_create: Vec<NewDocumentRequestArgs> = vec![
+        Some(NewDocumentRequestArgs {
+            scoped_vault_id: wf.scoped_vault_id.clone(),
+            ref_id: None,
+            workflow_id: wf.id.clone(),
+            should_collect_selfie,
+            kind,
+        }),
+        // Hack to request ID doc and proof of ssn for alpaca
+        (kind == DocumentRequestKind::ProofOfSsn && obc.cip_kind == Some(CipKind::Alpaca)).then_some(
+            NewDocumentRequestArgs {
+                scoped_vault_id: wf.scoped_vault_id.clone(),
+                ref_id: None,
+                workflow_id: wf.id.clone(),
+                should_collect_selfie: true,
+                kind: DocumentRequestKind::Identity,
+            },
+        ),
+    ]
+    .into_iter()
+    .flatten()
+    .collect();
+
+    DocumentRequest::bulk_create(conn, doc_requests_to_create)?;
+
     Ok(())
 }

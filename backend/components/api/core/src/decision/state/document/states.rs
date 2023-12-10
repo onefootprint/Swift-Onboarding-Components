@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use db::models::identity_document::IdentityDocument;
+use db::models::data_lifetime::DataLifetime;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding_decision::NewDecisionArgs;
 use db::models::scoped_vault::ScopedVault;
@@ -11,8 +11,8 @@ use db::TxnPgConn;
 
 use feature_flag::FeatureFlagClient;
 use newtypes::{
-    DataLifetimeSeqno, DbActor, DecisionStatus, DocKind, DocumentConfig, Locked, OnboardingStatus,
-    ReviewReason,
+    DataLifetimeSeqno, DbActor, DecisionStatus, DocumentConfig, DocumentRequestKind, Locked,
+    OnboardingStatus, ReviewReason, WorkflowConfig,
 };
 use newtypes::{ScopedVaultId, TenantId, WorkflowId};
 
@@ -159,14 +159,14 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
     ) -> ApiResult<DocumentState> {
         let (ff_client, vendor_results) = async_res;
 
-        let id_docs = IdentityDocument::list_by_wf_id(conn, &wf.id)?;
-        let proof_of_ssn_seqno = id_docs
-            .iter()
-            .find(|id| DocKind::from(id.document_type) == DocKind::ProofOfSsn)
-            .map(|i| i.completed_seqno);
+        let is_proof_of_ssn_wf = match &wf.config {
+            WorkflowConfig::Document(c) => matches!(c.kind, DocumentRequestKind::ProofOfSsn),
+            _ => false,
+        };
+        let current_seqno = DataLifetime::get_current_seqno(conn)?;
 
-        if let Some(proof_of_ssn) = proof_of_ssn_seqno {
-            handle_proof_of_ssn(conn, wf, proof_of_ssn)?;
+        if is_proof_of_ssn_wf {
+            handle_proof_of_ssn(conn, wf, Some(current_seqno))?;
         } else {
             let v = Vault::get(conn, &wf.scoped_vault_id)?;
             let (obc, _) = ObConfiguration::get(conn, &wf.id)?;

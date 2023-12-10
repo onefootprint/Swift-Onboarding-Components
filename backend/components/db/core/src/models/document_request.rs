@@ -49,15 +49,43 @@ impl DocumentRequest {
         Ok(result)
     }
 
-    #[tracing::instrument("DocumentRequest::get_identity", skip_all)]
-    pub fn get_identity(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Option<Self>> {
-        let result = Self::get(conn, wf_id, DocumentRequestKind::Identity)?;
+    #[tracing::instrument("DocumentRequest::create", skip_all)]
+    pub fn bulk_create(conn: &mut PgConn, args: Vec<NewDocumentRequestArgs>) -> DbResult<Vec<Self>> {
+        let new_rows: Vec<NewDocumentRequestRow> = args
+            .into_iter()
+            .map(|a| {
+                let NewDocumentRequestArgs {
+                    scoped_vault_id,
+                    ref_id,
+                    workflow_id,
+                    should_collect_selfie,
+                    kind,
+                } = a;
+                NewDocumentRequestRow {
+                    scoped_vault_id,
+                    ref_id,
+                    created_at: Utc::now(),
+                    should_collect_selfie,
+                    workflow_id,
+                    kind,
+                }
+            })
+            .collect();
+        let result = diesel::insert_into(document_request::table)
+            .values(new_rows)
+            .get_results::<DocumentRequest>(conn)?;
         Ok(result)
     }
 
     #[tracing::instrument("DocumentRequest::get_proof_of_ssn", skip_all)]
     pub fn get_proof_of_ssn(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Option<Self>> {
         let result = Self::get(conn, wf_id, DocumentRequestKind::ProofOfSsn)?;
+        Ok(result)
+    }
+
+    #[tracing::instrument("DocumentRequest::get_identity", skip_all)]
+    pub fn get_identity(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Option<Self>> {
+        let result = Self::get(conn, wf_id, DocumentRequestKind::Identity)?;
         Ok(result)
     }
 
