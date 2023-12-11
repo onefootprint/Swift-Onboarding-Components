@@ -38,6 +38,7 @@ const createIcoComponent = async icoPath => {
         'aria-label': '{ariaLabel}',
         className: '{className}',
         role: 'img',
+        'data-colored': isColored,
       },
       plugins: [
         '@svgr/plugin-svgo',

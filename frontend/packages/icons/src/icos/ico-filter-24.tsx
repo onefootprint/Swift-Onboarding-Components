@@ -20,6 +20,7 @@ const IcoFilter24 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <path
         d="M19.25 4.75H4.75l4.562 5.702a2 2 0 0 1 .438 1.25v6.548a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-6.548a2 2 0 0 1 .438-1.25L19.25 4.75Z"

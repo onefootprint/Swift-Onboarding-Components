@@ -20,6 +20,7 @@ const IcoMinusSmall24 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <path
         d="M17 12H7"

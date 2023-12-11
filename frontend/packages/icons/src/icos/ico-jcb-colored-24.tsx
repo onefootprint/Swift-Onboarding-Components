@@ -16,6 +16,7 @@ const IcoJcb24 = ({
     aria-label={ariaLabel}
     className={className}
     role="img"
+    data-colored
   >
     <path
       d="M23 17.058a3.42 3.42 0 0 1-3.416 3.416H1V6.946A3.42 3.42 0 0 1 4.416 3.53H23v13.528Z"

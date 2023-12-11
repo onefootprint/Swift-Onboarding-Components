@@ -20,6 +20,7 @@ const IcoRepeat40 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <path
         d="m25 9.375 3.75 3.75-3.75 3.75m2.5-3.75H11.25A6.269 6.269 0 0 0 5 19.375v1.25m10 10-3.75-3.75 3.75-3.75m-2.5 3.75h16.25a6.269 6.269 0 0 0 6.25-6.25v-1.25"

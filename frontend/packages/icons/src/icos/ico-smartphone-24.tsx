@@ -20,9 +20,10 @@ const IcoSmartphone24 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <path
-        d="M4.65 6.75a2 2 0 0 1 2-2h6.5a2 2 0 0 1 2 2v10.5a2 2 0 0 1-2 2h-6.5a2 2 0 0 1-2-2V6.75ZM10.15 16.75h-.5M18.65 14.25s.5-.906.5-2.25c0-1.344-.5-2.25-.5-2.25"
+        d="M10.15 16.75h-.5m9-2.5s.5-.906.5-2.25c0-1.344-.5-2.25-.5-2.25m-12 9.5h6.5a2 2 0 0 0 2-2V6.75a2 2 0 0 0-2-2h-6.5a2 2 0 0 0-2 2v10.5a2 2 0 0 0 2 2Z"
         stroke={theme.color[color]}
         strokeWidth={1.5}
         strokeLinecap="round"

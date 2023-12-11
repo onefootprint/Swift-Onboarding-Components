@@ -20,6 +20,7 @@ const IcoSpinner40 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <path
         d="M20 4a16 16 0 0 1 16 16h-3.2A12.8 12.8 0 0 0 20 7.2V4Z"

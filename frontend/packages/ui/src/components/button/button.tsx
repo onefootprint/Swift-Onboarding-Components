@@ -51,7 +51,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const sxStyles = useSX(sx);
 
     const getContent = () => (
-      <InnerContainer
+      <IconContainer
         as="span"
         justify="center"
         align="center"
@@ -59,9 +59,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         visibility={loading ? 'hidden' : 'visible'}
         variant={variant}
       >
-        {PrefixIcon && <PrefixIcon color={iconColor} />}
+        {PrefixIcon && <PrefixIcon color={iconColor || undefined} />}
         {children}
-      </InnerContainer>
+      </IconContainer>
     );
 
     return (
@@ -95,17 +95,23 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   },
 );
 
-const InnerContainer = styled(Stack)<{ variant?: ButtonVariant }>`
-  ${({ theme, variant }) => css`
-    ${variant &&
-    css`
-      svg {
+const IconContainer = styled(Stack)<{
+  variant: ButtonVariant;
+}>`
+  ${({ theme, variant }) => {
+    const { button } = theme.components;
+
+    return css`
+      svg[data-colored='false'] {
         path {
-          fill: ${theme.components.button.variant[variant].color};
+          stroke: ${button.variant[variant].color};
+        }
+        rect {
+          stroke: ${button.variant[variant].color};
         }
       }
-    `}
-  `}
+    `;
+  }}
 `;
 
 const ButtonContainer = styled.button<{

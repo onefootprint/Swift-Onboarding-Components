@@ -20,6 +20,7 @@ const IcoMaximize16 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <path
         d="M1.958 10.292v3.75m0 0 4.584-4.584m-4.584 4.584h3.783M14.04 5.707v-3.75m0 0L9.457 6.54m4.583-4.583h-3.782"

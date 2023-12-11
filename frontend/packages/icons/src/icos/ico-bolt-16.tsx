@@ -20,6 +20,7 @@ const IcoBolt16 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <path
         d="M6.886 9.12H3.3L9.128 1.5v5.38h3.586L6.886 14.5V9.12Z"

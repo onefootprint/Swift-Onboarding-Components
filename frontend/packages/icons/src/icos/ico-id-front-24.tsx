@@ -20,6 +20,7 @@ const IcoIdFront24 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <circle cx={8.509} cy={8.509} fill={theme.color[color]} r={0.776} />
       <circle cx={11.224} cy={8.509} fill={theme.color[color]} r={0.776} />

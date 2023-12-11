@@ -20,6 +20,7 @@ const IcoFaceid40 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <path
         d="M16.273 15.31a1.172 1.172 0 1 1-2.344 0 1.172 1.172 0 0 1 2.344 0ZM25.653 15.31a1.172 1.172 0 1 1-2.345 0 1.172 1.172 0 0 1 2.345 0Z"

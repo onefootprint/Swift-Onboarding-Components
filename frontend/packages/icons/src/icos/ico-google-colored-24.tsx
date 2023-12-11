@@ -16,6 +16,7 @@ const IcoGoogle24 = ({
     aria-label={ariaLabel}
     className={className}
     role="img"
+    data-colored
   >
     <path
       d="M19.844 10.433H19.2V10.4H12v3.2h4.521A4.798 4.798 0 0 1 7.2 12 4.8 4.8 0 0 1 12 7.2c1.224 0 2.337.462 3.184 1.216l2.263-2.263A7.963 7.963 0 0 0 12 4a8 8 0 1 0 7.844 6.433Z"

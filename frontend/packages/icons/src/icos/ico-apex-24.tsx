@@ -20,6 +20,7 @@ const IcoApex24 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <circle cx={17.748} cy={17.511} r={1.838} fill={theme.color[color]} />
       <rect

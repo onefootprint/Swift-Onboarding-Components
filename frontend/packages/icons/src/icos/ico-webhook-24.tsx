@@ -20,6 +20,7 @@ const IcoWebhook24 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <mask
         id="prefix__a"

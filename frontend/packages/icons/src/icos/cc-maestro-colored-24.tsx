@@ -16,6 +16,7 @@ const CcMaestro24 = ({
     aria-label={ariaLabel}
     className={className}
     role="img"
+    data-colored
   >
     <g clipPath="url(#prefix__a)">
       <path

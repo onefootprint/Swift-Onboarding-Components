@@ -20,6 +20,7 @@ const IcoCheck24 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <path
         d="M17.274 7.41a.705.705 0 0 0-.484.214l-7.255 7.255-2.322-2.321a.704.704 0 1 0-.996.997l2.82 2.819a.705.705 0 0 0 .996 0l7.753-7.754a.705.705 0 0 0-.512-1.21Z"

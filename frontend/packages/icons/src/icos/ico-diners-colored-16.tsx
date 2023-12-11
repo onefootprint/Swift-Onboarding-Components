@@ -16,6 +16,7 @@ const IcoDiners16 = ({
     aria-label={ariaLabel}
     className={className}
     role="img"
+    data-colored
   >
     <path
       fillRule="evenodd"

@@ -20,6 +20,7 @@ const IcoIdFront16 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <g clipPath="url(#prefix__a)">
         <circle cx={4.85} cy={5.15} fill={theme.color[color]} r={0.85} />

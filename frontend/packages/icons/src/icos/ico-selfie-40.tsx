@@ -20,6 +20,7 @@ const IcoSelfie40 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <circle cx={16.5} cy={17} r={2} fill={theme.color[color]} />
       <circle cx={23.5} cy={17} r={2} fill={theme.color[color]} />

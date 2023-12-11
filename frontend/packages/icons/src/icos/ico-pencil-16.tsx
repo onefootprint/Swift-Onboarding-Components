@@ -20,6 +20,7 @@ const IcoPencil16 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <g clipPath="url(#prefix__a)">
         <path

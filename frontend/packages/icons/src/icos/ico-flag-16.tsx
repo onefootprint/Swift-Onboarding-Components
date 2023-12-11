@@ -20,6 +20,7 @@ const IcoFlag16 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <path
         d="M2.5 14.38V9.1m0 0V2.5S4.92.52 8 2.5s5.5 0 5.5 0v6.6s-2.42 1.98-5.5 0-5.5 0-5.5 0Z"

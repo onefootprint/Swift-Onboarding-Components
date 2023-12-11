@@ -20,6 +20,7 @@ const IcoMinusXSmall16 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <path
         d="M11 7.75H5"

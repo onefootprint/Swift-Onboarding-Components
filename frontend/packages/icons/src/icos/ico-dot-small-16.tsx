@@ -20,6 +20,7 @@ const IcoDotSmall16 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <circle cx={8} cy={8} r={3} fill={theme.color[color]} />
     </svg>

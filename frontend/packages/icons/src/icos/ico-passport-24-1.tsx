@@ -20,6 +20,7 @@ const IcoPassport241 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <path
         fillRule="evenodd"

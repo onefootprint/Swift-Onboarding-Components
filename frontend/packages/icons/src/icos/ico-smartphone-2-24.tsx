@@ -20,12 +20,14 @@ const IcoSmartphone224 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M8.75 4A2.75 2.75 0 0 0 6 6.75v10.5A2.75 2.75 0 0 0 8.75 20h6.5A2.75 2.75 0 0 0 18 17.25V6.75A2.75 2.75 0 0 0 15.25 4h-6.5ZM7.5 6.75c0-.69.56-1.25 1.25-1.25h6.5c.69 0 1.25.56 1.25 1.25v10.5c0 .69-.56 1.25-1.25 1.25h-6.5c-.69 0-1.25-.56-1.25-1.25V6.75ZM11.75 16a.75.75 0 0 0 0 1.5h.5a.75.75 0 0 0 0-1.5h-.5Z"
-        fill={theme.color[color]}
+        d="M12.25 16.75h-.5m-3 2.5h6.5a2 2 0 0 0 2-2V6.75a2 2 0 0 0-2-2h-6.5a2 2 0 0 0-2 2v10.5a2 2 0 0 0 2 2Z"
+        stroke={theme.color[color]}
+        strokeWidth={1.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

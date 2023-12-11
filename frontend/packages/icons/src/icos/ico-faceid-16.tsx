@@ -20,27 +20,31 @@ const IcoFaceid16 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <path
-        d="M5.63 1.75h-.432A3.448 3.448 0 0 0 1.75 5.198v.431M5.63 14.25h-.432a3.448 3.448 0 0 1-3.448-3.448v-.431M10.37 1.75h.432a3.448 3.448 0 0 1 3.448 3.448v.431M10.37 14.25h.432a3.448 3.448 0 0 0 3.448-3.448v-.431"
+        d="M5.63 1.75h-.432A3.448 3.448 0 0 0 1.75 5.198v.431m3.88 8.621h-.432a3.448 3.448 0 0 1-3.448-3.448v-.431m8.62-8.621h.432a3.448 3.448 0 0 1 3.448 3.448v.431m-3.88 8.621h.432a3.448 3.448 0 0 0 3.448-3.448v-.431M5.198 8.647S5.414 10.802 8 10.802s2.802-2.155 2.802-2.155"
         stroke={theme.color[color]}
         strokeWidth={1.4}
         strokeLinecap="round"
-        strokeLinejoin="round"
       />
-      <path
-        d="M6.707 6.276a.431.431 0 1 1-.862 0 .431.431 0 0 1 .862 0ZM10.155 6.276a.431.431 0 1 1-.862 0 .431.431 0 0 1 .862 0Z"
+      <rect
+        x={5.858}
+        y={5.902}
+        width={0.8}
+        height={0.8}
+        rx={0.4}
         stroke={theme.color[color]}
-        strokeWidth={0.9}
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        strokeWidth={0.8}
       />
-      <path
-        d="M5.198 8.647S5.414 10.802 8 10.802s2.802-2.155 2.802-2.155"
+      <rect
+        x={9.258}
+        y={5.902}
+        width={0.8}
+        height={0.8}
+        rx={0.4}
         stroke={theme.color[color]}
-        strokeWidth={1.4}
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        strokeWidth={0.8}
       />
     </svg>
   );

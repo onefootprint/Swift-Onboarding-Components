@@ -20,6 +20,7 @@ const IcoIdFront40 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <ellipse
         cx={13.454}

@@ -20,6 +20,7 @@ const IcoPin16 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <path
         d="M5.09 4.19 4.193 1.5h7.62l-.896 2.69v2.017c2.69.896 2.69 3.81 2.69 3.81H2.4s0-2.914 2.69-3.81V4.19ZM8.003 10.241V14.5"

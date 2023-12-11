@@ -20,6 +20,7 @@ const IcoActivity16 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <path
         d="M1.75 7.784h3.017L6.491 1.75l3.018 12.5 1.724-6.466h3.017"

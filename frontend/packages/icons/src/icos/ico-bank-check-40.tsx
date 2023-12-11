@@ -20,6 +20,7 @@ const IcoBankCheck40 = ({
       aria-label={ariaLabel}
       className={className}
       role="img"
+      data-colored={false}
     >
       <rect
         x={7}

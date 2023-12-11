@@ -16,6 +16,7 @@ const IcoMastercard24 = ({
     aria-label={ariaLabel}
     className={className}
     role="img"
+    data-colored
   >
     <g clipPath="url(#prefix__a)">
       <path d="M15.245 6.18h-6.49V17.84h6.49V6.18Z" fill="#FF5F00" />
