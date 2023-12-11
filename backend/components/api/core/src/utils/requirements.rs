@@ -197,7 +197,12 @@ fn is_cdo_met<Type>(
             let country = decrypted_values
                 .get(&IDK::Country.into())
                 .and_then(|a| a.parse_into::<Iso3166TwoDigitCountryCode>().ok());
-            if country.map(|c| c.is_us_including_territories()).unwrap_or(false) {
+            if country.map(|c| c.is_us_territory()).unwrap_or(false) {
+                // Territory addresses always require City and Zip
+                let addl_dis = [IDK::City.into(), IDK::Zip.into()];
+                required_dis.extend(addl_dis);
+            }
+            if country.map(|c| c.is_us()).unwrap_or(false) {
                 // US addresses always require City, State, and Zip
                 let addl_dis = [IDK::City.into(), IDK::State.into(), IDK::Zip.into()];
                 required_dis.extend(addl_dis);
