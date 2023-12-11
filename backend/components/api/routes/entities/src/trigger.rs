@@ -20,6 +20,7 @@ use chrono::Duration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
 use db::models::workflow::Workflow;
+use db::models::workflow_request::NewWorkflowRequestArgs;
 use db::models::workflow_request::WorkflowRequest;
 use newtypes::ContactInfoKind;
 use newtypes::DbActor;
@@ -53,7 +54,7 @@ pub async fn post(
 
     // Generate an auth token for the user and send to their phone number on file
     let trigger_kind = (&trigger).into();
-    let (vw, auth_token) = state
+    let (vw, auth_token, wfr) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
@@ -68,18 +69,25 @@ pub async fn post(
             let (_, obc) = Workflow::latest(conn, &sv.id, false)?.ok_or(UserError::NoCompleteOnboardings)?;
 
             let config = trigger.into();
-            let wr = WorkflowRequest::create(conn, sv.id.clone(), obc.id.clone(), actor.clone(), config)?;
+            let wfr_args = NewWorkflowRequestArgs {
+                scoped_vault_id: sv.id.clone(),
+                ob_configuration_id: obc.id.clone(),
+                created_by: actor.clone(),
+                config,
+                note,
+            };
+            let wfr = WorkflowRequest::create(conn, wfr_args)?;
             let auth_args = UserSessionArgs {
                 su_id: Some(sv.id.clone()),
                 obc_id: Some(obc.id.clone()),
-                wfr_id: Some(wr.id.clone()),
+                wfr_id: Some(wfr.id.clone()),
                 is_from_api: true,
                 ..Default::default()
             };
             let event = WorkflowTriggeredInfo {
                 workflow_id: None,
                 ob_config_id: Some(obc.id),
-                workflow_request_id: Some(wr.id),
+                workflow_request_id: Some(wfr.id.clone()),
                 actor,
             };
 
@@ -90,7 +98,7 @@ pub async fn post(
             // Create a timeline event logging that the workflow was triggered
             UserTimeline::create(conn, event, sv.vault_id.clone(), sv.id.clone())?;
             // Create an auth token for this workflow that we will send to the user
-            Ok((vw, auth_token))
+            Ok((vw, auth_token, wfr))
         })
         .await?;
 
@@ -101,7 +109,7 @@ pub async fn post(
     let org_name = auth.tenant().name.clone();
 
     let msg = TriggerMessage {
-        note,
+        note: wfr.note,
         org_name,
         trigger_kind,
         link,

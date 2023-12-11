@@ -48,6 +48,7 @@ pub struct WorkflowTriggered {
     pub workflow: TriggeredWorkflow,
     pub request: Option<WorkflowRequest>,
     pub actor: Actor,
+    pub note: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]

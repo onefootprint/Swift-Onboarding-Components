@@ -80,6 +80,7 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
             }),
             SaturatedTimelineEvent::WorkflowTriggered((workflow, actor, wfr)) => {
                 // Some weird logic for backcompat to determine the trigger type
+                let note = wfr.as_ref().and_then(|wfr| wfr.note.clone());
                 let (workflow, request) = if let Some(wfr) = wfr {
                     let kind = match wfr.config {
                         WorkflowRequestConfig::RedoKyc => TriggerKind::RedoKyc,
@@ -101,6 +102,7 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                     workflow,
                     request,
                     actor: api_wire_types::Actor::from_db(actor),
+                    note,
                 })
             }
             SaturatedTimelineEvent::WorkflowStarted((_, pb)) => {

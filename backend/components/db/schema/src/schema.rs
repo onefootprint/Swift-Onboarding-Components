@@ -1121,6 +1121,7 @@ table! {
         created_by -> Jsonb,
         workflow_id -> Nullable<Text>,
         config -> Jsonb,
+        note -> Nullable<Text>,
     }
 }
 

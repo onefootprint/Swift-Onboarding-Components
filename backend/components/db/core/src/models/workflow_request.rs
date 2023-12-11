@@ -29,6 +29,8 @@ pub struct WorkflowRequest {
     pub workflow_id: Option<WorkflowId>,
     /// Information on what kind of Workflow to create from this request
     pub config: WorkflowRequestConfig,
+    /// The note sent to the user via SMS when the trigger is created
+    pub note: Option<String>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -39,6 +41,15 @@ struct NewWorkflowRequestRow {
     timestamp: DateTime<Utc>,
     created_by: DbActor,
     config: WorkflowRequestConfig,
+    note: Option<String>,
+}
+
+pub struct NewWorkflowRequestArgs {
+    pub ob_configuration_id: ObConfigurationId,
+    pub scoped_vault_id: ScopedVaultId,
+    pub created_by: DbActor,
+    pub config: WorkflowRequestConfig,
+    pub note: Option<String>,
 }
 
 impl WorkflowRequest {
@@ -67,21 +78,23 @@ impl WorkflowRequest {
     }
 
     #[tracing::instrument("WorkflowRequest::create", skip_all)]
-    pub fn create(
-        conn: &mut TxnPgConn,
-        sv_id: ScopedVaultId,
-        obc_id: ObConfigurationId,
-        created_by: DbActor,
-        config: WorkflowRequestConfig,
-    ) -> DbResult<Self> {
+    pub fn create(conn: &mut TxnPgConn, args: NewWorkflowRequestArgs) -> DbResult<Self> {
+        let NewWorkflowRequestArgs {
+            scoped_vault_id,
+            ob_configuration_id,
+            created_by,
+            config,
+            note,
+        } = args;
         // Deactivate old WorkflowRequests when making a new one
-        Self::deactivate(conn, &sv_id, None)?;
+        Self::deactivate(conn, &scoped_vault_id, None)?;
         let new_row = NewWorkflowRequestRow {
-            scoped_vault_id: sv_id,
-            ob_configuration_id: obc_id,
+            scoped_vault_id,
+            ob_configuration_id,
             timestamp: Utc::now(),
             created_by,
             config,
+            note,
         };
         let result = diesel::insert_into(workflow_request::table)
             .values(new_row)
