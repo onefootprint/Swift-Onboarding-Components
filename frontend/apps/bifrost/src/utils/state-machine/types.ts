@@ -28,9 +28,6 @@ export type MachineEvents =
         publicKey?: string;
       };
     }
-  | {
-      type: 'configRequestFailed';
-    }
-  | {
-      type: 'reset';
-    };
+  | { type: 'configRequestFailed' }
+  | { type: 'initError' }
+  | { type: 'reset' };

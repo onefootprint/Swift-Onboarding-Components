@@ -88,31 +88,40 @@ const Init = () => {
     );
   };
 
-  useProps((props: FootprintVerifyDataProps) => {
-    if (isPropsSaved()) {
-      return;
-    }
+  useProps(
+    (props: FootprintVerifyDataProps) => {
+      if (isPropsSaved()) {
+        return;
+      }
 
-    const {
-      userData = {},
-      options = {},
-      l10n = {},
-      authToken = '',
-      publicKey = '',
-    } = props;
-    const { showCompletionPage = false, showLogo = false } = options || {};
-    send({
-      type: 'initContextUpdated',
-      payload: {
-        bootstrapData: userData as IdvBootstrapData,
-        showCompletionPage,
-        showLogo,
-        l10n,
-        authToken,
-        publicKey,
-      },
-    });
-  });
+      const {
+        userData = {},
+        options = {},
+        l10n = {},
+        authToken = '',
+        publicKey = '',
+      } = props;
+      const { showCompletionPage = false, showLogo = false } = options || {};
+      send({
+        type: 'initContextUpdated',
+        payload: {
+          bootstrapData: userData as IdvBootstrapData,
+          showCompletionPage,
+          showLogo,
+          l10n,
+          authToken,
+          publicKey,
+        },
+      });
+    },
+    (error: unknown) => {
+      Logger.error(
+        `Message: Failed to fetch initial properties ${getErrorMessage(error)}`,
+        'init-props',
+      );
+      send({ type: 'initError' });
+    },
+  );
 
   return <InitShimmer />;
 };

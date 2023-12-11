@@ -1,6 +1,11 @@
 import type { FootprintVerifyDataProps } from '@onefootprint/footprint-js';
 import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
-import { Logger, useFootprintProvider } from '@onefootprint/idv-elements';
+import {
+  getSdkArgsToken,
+  hasInvalidHashFragment,
+  Logger,
+  useFootprintProvider,
+} from '@onefootprint/idv-elements';
 import noop from 'lodash/noop';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
@@ -17,13 +22,16 @@ import getPublicKeyFromUrl from './utils/get-public-key-from-url';
 // TODO: delete when all customers migrate to v3.8.0+
 const POST_MESSAGE_TIMEOUT = 1000;
 
-const useProps = (onSuccess: (props: FootprintVerifyDataProps) => void) => {
+const useProps = (
+  onSuccess: (props: FootprintVerifyDataProps) => void,
+  onError?: (error: unknown) => void,
+) => {
   const router = useRouter();
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(false); // whether iframe adapter has loaded
   const onSuccessCalled = useRef(false); // Whether on success has been called with props
-  const authTokenFromUrl = router.asPath.split('#')[1] ?? '';
-  const sdkArgsQuery = useGetSdkArgs(authTokenFromUrl);
-  const isSdkArgsLoading = authTokenFromUrl && sdkArgsQuery.isLoading;
+  const sdkArgsToken = getSdkArgsToken(router.asPath.split('#')[1] ?? '');
+  const sdkArgsQuery = useGetSdkArgs(sdkArgsToken);
+  const isSdkArgsLoading = sdkArgsQuery.isLoading && sdkArgsQuery.isFetching; // `isLoading` is true right from the start; `isFetching` is controlled by `enabled` property
 
   const complete = (props: FootprintVerifyDataProps) => {
     // If already received props, ignore
@@ -49,6 +57,14 @@ const useProps = (onSuccess: (props: FootprintVerifyDataProps) => void) => {
   useEffect(() => {
     if (!isAdapterLoaded || !router.isReady || isSdkArgsLoading) {
       return noop;
+    }
+
+    if (onError) {
+      if (sdkArgsQuery.error) {
+        onError(sdkArgsQuery.error);
+      } else if (hasInvalidHashFragment(router.asPath)) {
+        onError(new TypeError('Invalid URL fragment'));
+      }
     }
 
     // See if we can retrieve the SDK args from the API (for >=3.8.0 footprint-js integrations only)

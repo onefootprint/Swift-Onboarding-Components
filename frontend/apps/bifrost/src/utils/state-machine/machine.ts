@@ -27,24 +27,20 @@ export const createBifrostMachine = () =>
       states: {
         init: {
           on: {
-            configRequestFailed: {
-              target: 'idv',
-            },
+            configRequestFailed: { target: 'idv' },
+            initError: { target: 'initError' },
             initContextUpdated: [
               {
+                cond: isContextReady,
                 target: 'idv',
                 actions: ['assignInitContext'],
-                cond: (context, event) => isContextReady(context, event),
               },
-              {
-                actions: ['assignInitContext'],
-              },
+              { actions: ['assignInitContext'] },
             ],
           },
         },
-        idv: {
-          type: 'final',
-        },
+        initError: { type: 'final' },
+        idv: { type: 'final' },
       },
     },
     {

@@ -19,6 +19,7 @@ import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { useEffectOnce } from 'usehooks-ts';
 
 import Init from '../init';
+import InitError from '../init-error';
 
 type RootProps = {
   variant?: FootprintVariant;
@@ -71,6 +72,7 @@ const Root = ({ variant }: RootProps) => {
     <Layout variant={variant}>
       <AppErrorBoundary onReset={() => send({ type: 'reset' })}>
         {state.matches('init') && <Init />}
+        {state.matches('initError') && <InitError />}
         {state.matches('idv') && (
           <Idv
             authToken={authToken}

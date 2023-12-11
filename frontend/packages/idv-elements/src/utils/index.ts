@@ -12,5 +12,10 @@ export { default as getScrubbedPhoneNumber } from './get-scrubbed-phone-number';
 export { default as Logger } from './logger';
 export { default } from './media';
 export { default as shouldChallengeEmail } from './should-challenge-email';
+export {
+  getSdkArgsToken,
+  hasInvalidHashFragment,
+  isValidTokenFormat,
+} from './url-fragment';
 export { default as validateBootstrapData } from './validate-bootstrap-data';
 export { default as withProvider } from './with-provider';

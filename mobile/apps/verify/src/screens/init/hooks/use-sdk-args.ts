@@ -5,6 +5,9 @@ import type {
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
+const isValidTokenFormat = (x: string): boolean =>
+  Boolean(x) && /^tok_/.test(x);
+
 const getSdkArgs = async ({ authToken }: GetSdkArgsRequest) => {
   const { data: response } = await request<GetSdkArgsResponse>({
     url: '/org/sdk_args',
@@ -24,7 +27,7 @@ const useSdkArgs = (
   },
 ) =>
   useQuery([authToken, 'get-sdk-args'], () => getSdkArgs({ authToken }), {
-    enabled: !!authToken,
+    enabled: isValidTokenFormat(authToken),
     onSuccess: options?.onSuccess,
     onError: options?.onError,
   });

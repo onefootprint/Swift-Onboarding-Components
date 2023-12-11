@@ -1,4 +1,8 @@
 import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
+import {
+  getSdkArgsToken,
+  hasInvalidHashFragment,
+} from '@onefootprint/idv-elements';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import noop from 'lodash/noop';
 import { useRouter } from 'next/router';
@@ -23,9 +27,9 @@ const useProps = <T extends Obj>(
   const router = useRouter();
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(false); // whether iframe adapter has loaded
   const onSuccessCalled = useRef(false); // Whether on success has been called with props
-  const authTokenFromUrl = router.asPath.split('#')[1] ?? '';
-  const sdkArgsQuery = useGetSdkArgs<T>(authTokenFromUrl, fpProvider);
-  const isSdkArgsLoading = authTokenFromUrl && sdkArgsQuery.isLoading;
+  const sdkArgsToken = getSdkArgsToken(router.asPath.split('#')[1] ?? '');
+  const sdkArgsQuery = useGetSdkArgs<T>(sdkArgsToken, fpProvider);
+  const isSdkArgsLoading = sdkArgsQuery.isLoading && sdkArgsQuery.isFetching; // `isLoading` is true right from the start; `isFetching` is controlled by `enabled` property
   const timerId = useRef<NodeJS.Timeout | undefined>();
 
   const complete = (props: T, config?: PublicOnboardingConfig) => {
@@ -48,8 +52,12 @@ const useProps = <T extends Obj>(
       return noop;
     }
 
-    if (onError && !isSdkArgsLoading && sdkArgsQuery.error) {
-      onError(sdkArgsQuery.error);
+    if (onError) {
+      if (sdkArgsQuery.error) {
+        onError(sdkArgsQuery.error);
+      } else if (hasInvalidHashFragment(router.asPath)) {
+        onError(new TypeError('Invalid URL fragment'));
+      }
     }
 
     // See if we can retrieve the SDK args from the API (for >=3.8.0 footprint-js integrations only)

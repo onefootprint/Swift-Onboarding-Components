@@ -19,6 +19,6 @@ export interface Typegen0 {
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates: 'idv' | 'init';
+  matchesStates: 'idv' | 'init' | 'initError';
   tags: never;
 }

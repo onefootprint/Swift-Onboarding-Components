@@ -80,6 +80,7 @@ const AuthContainer = ({
         });
       }
 
+      if (notification) return;
       if (!isAuth(authConfig?.kind)) {
         setNotification({
           title: t('notification.invalid-kind-title'),
