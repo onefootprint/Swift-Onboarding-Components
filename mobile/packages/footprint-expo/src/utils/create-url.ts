@@ -1,4 +1,4 @@
-import type { OpenFootprint } from '../footprint.types';
+import type { FootprintVerifyProps } from '../footprint.types';
 
 const encode = (obj?: Record<string, unknown>): string => {
   return obj && Object.keys(obj).length
@@ -11,7 +11,7 @@ const createUrl = ({
   redirectUrl,
   token,
 }: {
-  appearance?: OpenFootprint['appearance'];
+  appearance?: FootprintVerifyProps['appearance'];
   redirectUrl: string;
   token: string;
 }) => {

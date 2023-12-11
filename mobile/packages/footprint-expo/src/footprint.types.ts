@@ -1,11 +1,5 @@
 import type * as CSS from 'csstype';
 
-export type FootprintShowParams = {
-  publicKey: string;
-  onCompleted: (validationToken: string) => void;
-  onCanceled: () => void;
-};
-
 export type FootprintAppearanceVariables = Partial<{
   // globals
   borderRadius: CSS.Property.BorderRadius;
@@ -143,19 +137,28 @@ export type FootprintAppearance = {
   variables?: FootprintAppearanceVariables;
 };
 
-export type OpenFootprint = {
+type VerifyAuthToken = {
+  authToken: string;
+  publicKey?: never;
+};
+
+type VerifyPublicKey = {
+  publicKey: string;
+  authToken?: never;
+};
+
+export type FootprintVerifyProps = (VerifyAuthToken | VerifyPublicKey) & {
   redirectUrl?: string;
   appearance?: FootprintAppearance;
-  onCanceled?: () => void;
-  onCompleted?: (validationToken: string) => void;
-  publicKey?: string;
   userData?: FootprintUserData;
   options?: FootprintOptions;
-  l10n?: { locale?: 'en-US' | 'es-MX' };
+  l10n?: FootprintL10n;
+  onCanceled?: () => void;
+  onCompleted?: (validationToken: string) => void;
 };
 
 export type Footprint = {
-  open: (options: OpenFootprint) => Promise<void>;
+  open: (options: FootprintVerifyProps) => Promise<void>;
   close: () => Promise<void>;
 };
 
@@ -185,6 +188,9 @@ export type FootprintUserData = Partial<{
   'id.visa_kind': string;
   'id.visa_expiration_date': string;
 }>;
+
+export type FootprintSupportedLocale = 'en-US' | 'es-MX';
+export type FootprintL10n = { locale?: FootprintSupportedLocale };
 
 export type FootprintOptions = {
   showCompletionPage?: boolean;

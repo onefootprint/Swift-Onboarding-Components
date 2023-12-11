@@ -1,12 +1,15 @@
 import { version } from '../../package.json';
-import type { OpenFootprint } from '../footprint.types';
+import type { FootprintVerifyProps } from '../footprint.types';
 
 const API_BASE_URL = 'https://api.onefootprint.com';
 const NUM_RETRIES = 3;
 
 type SendSdkArgsRequest = {
   kind: 'verify_v1';
-  data: Pick<OpenFootprint, 'publicKey' | 'userData' | 'options' | 'l10n'>;
+  data: Pick<
+    FootprintVerifyProps,
+    'publicKey' | 'authToken' | 'userData' | 'options' | 'l10n'
+  >;
 };
 
 type SendSdkArgsResponse = {

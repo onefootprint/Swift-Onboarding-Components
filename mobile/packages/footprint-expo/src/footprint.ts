@@ -1,14 +1,14 @@
 import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 
-import type { OpenFootprint } from './footprint.types';
+import type { FootprintVerifyProps } from './footprint.types';
 import createUrl from './utils/create-url';
 import sendSdkArgs from './utils/send-sdk-args';
 
 const handleWebBrowserUrlChange = (
   url: string,
-  onComplete: OpenFootprint['onCompleted'],
-  onCancel: OpenFootprint['onCanceled'],
+  onComplete: FootprintVerifyProps['onCompleted'],
+  onCancel: FootprintVerifyProps['onCanceled'],
 ) => {
   if (!url) {
     console.warn('@onefootprint/footprint-expo: missing result url');
@@ -50,14 +50,16 @@ const open = async ({
   redirectUrl,
   appearance,
   publicKey,
+  authToken,
   userData,
   onCanceled,
   onCompleted,
   options,
   l10n,
-}: OpenFootprint) => {
+}: FootprintVerifyProps) => {
   const token = await sendSdkArgs({
     publicKey,
+    authToken,
     userData,
     options,
     l10n,

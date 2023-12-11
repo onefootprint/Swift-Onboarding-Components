@@ -2,7 +2,7 @@ import queryString from 'query-string';
 import { Platform } from 'react-native';
 import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 
-import type { OpenFootprint } from './footprint.types';
+import type { FootprintVerifyProps } from './footprint.types';
 import createUrl from './utils/create-url';
 import sendSdkArgs from './utils/send-sdk-args';
 
@@ -17,14 +17,16 @@ const getDeepLink = (baseScheme?: string) => {
 const open = async ({
   appearance,
   publicKey,
+  authToken,
   userData,
   onCanceled,
   onCompleted,
   options,
   l10n,
-}: OpenFootprint) => {
+}: FootprintVerifyProps) => {
   const token = await sendSdkArgs({
     publicKey,
+    authToken,
     userData,
     options,
     l10n,
