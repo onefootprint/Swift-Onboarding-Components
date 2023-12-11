@@ -16,7 +16,9 @@
         "invalid-config-title": "Integration incorrectly configured",
         "invalid-config-subtitle": "It seems like the Verify with Footprint integration is using an invalid integration key. Please contact the owner of this product.",
         "invalid-kind-title": "Invalid configuration",
-        "invalid-kind-description": "It looks like you're using a non-auth Playbook. Please review and rectify the settings."
+        "invalid-kind-description": "It looks like you're using a non-auth Playbook. Please review and rectify the settings.",
+        "invalid-domain-title": "Invalid domain",
+        "invalid-domain-description": "Sorry, you don't have permission to access this application. It seems that the domain associated with your account is not authorized. If you need assistance, feel free to contact technical support."
       },
       "sandbox": {
         "description": "You can log into a previously created sandbox user by using the Test ID from that corresponding session.",

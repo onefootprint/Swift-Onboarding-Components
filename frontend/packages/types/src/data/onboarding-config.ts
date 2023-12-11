@@ -32,6 +32,7 @@ export type PublicOnboardingConfig = {
   isKyb: boolean;
   allowInternationalResidents: boolean;
   supportedCountries?: CountryCode[];
+  allowedOrigins?: string[];
   canMakeRealDocScanCallsInSandbox?: boolean;
   isStepupEnabled?: boolean;
   kind?: 'auth' | 'kyb' | 'kyc';

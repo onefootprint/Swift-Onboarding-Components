@@ -12,7 +12,7 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query';
 import React from 'react';
-import type { FootprintClient } from 'src/components/footprint-provider';
+import type { ProviderReturn } from 'src/components/footprint-provider';
 import FootprintProvider from 'src/components/footprint-provider';
 
 import Loading from '../loading';
@@ -29,15 +29,12 @@ import {
 const useRouterSpy = createUseRouterSpy();
 
 describe('<Content />', () => {
-  const getMockClient = (): FootprintClient => ({
+  const getMockClient = () => ({
+    getAdapterResponse: () => null,
+    getLoadingStatus: () => false,
+    load: jest.fn(() => Promise.resolve()),
     on: jest.fn(() => jest.fn()),
     send: jest.fn(),
-    load: jest.fn(
-      () =>
-        new Promise(resolve => {
-          resolve(undefined);
-        }),
-    ),
   });
 
   const queryCache = new QueryCache();
@@ -67,7 +64,7 @@ describe('<Content />', () => {
     });
   });
 
-  const renderContent = (mockFootprint: FootprintClient) =>
+  const renderContent = (mockFootprint: ProviderReturn) =>
     render(
       <DesignSystemProvider theme={themes.light}>
         <QueryClientProvider client={queryClient}>
