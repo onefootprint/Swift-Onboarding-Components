@@ -30,7 +30,7 @@ const ManualReviewRequiredButton = ({
         </Button>
       </DropdownTrigger>
       <Dropdown.Portal>
-        <DropdownContent align="end">
+        <DropdownContent align="end" sideOffset={12}>
           <DropdownItem
             onClick={() => {
               onOpenDialog(ReviewStatus.pass);

@@ -1,8 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { EntityStatus } from '@onefootprint/types';
 import { Button, Portal, Stack, Tooltip } from '@onefootprint/ui';
 import { SplitButton } from '@onefootprint/ui/src/components';
 import React from 'react';
 import useEntityVaultWithTransforms from 'src/components/entities/hooks/use-entity-vault-with-transforms';
+import { useEffectOnce } from 'usehooks-ts';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import {
@@ -10,17 +12,21 @@ import {
   EDIT_VAULT_FORM_ID,
   HEADER_ACTIONS_SELECTOR,
 } from '@/entity/constants';
+import useCurrentEntity from '@/entity/hooks/use-current-entity';
 
 import Actions from './components/actions';
+import Cmdk from './components/cmdk';
 import ManualReview from './components/manual-review';
 import ReasonDialog from './components/reason-dialog';
 import useDecryptControls from './hooks/use-decrypt-controls';
 import useEditControls from './hooks/use-edit-controls';
 
-type VaultActionsControlsProps = WithEntityProps;
+export type VaultActionsControlsProps = WithEntityProps;
 
 const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
   const { allT, t } = useTranslation('pages.entity');
+  const { data: entityData } = useCurrentEntity();
+
   const decryptControls = useDecryptControls();
   const editControls = useEditControls();
   const canDecrypt = !!entity.decryptableAttributes.length;
@@ -36,11 +42,30 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
     });
   };
 
+  const handleKeyDown = (e: { key: string; preventDefault: () => void }) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      decryptControls.cancel();
+      editControls.cancel();
+    }
+  };
+
+  useEffectOnce(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  });
+
+  const shouldRenderManualReview =
+    entityData &&
+    entityData.status !== EntityStatus.none &&
+    entityData.status !== EntityStatus.incomplete;
+
   return (
     <Portal selector={HEADER_ACTIONS_SELECTOR}>
       {editControls.isIdle && decryptControls.isIdle && (
-        <Tooltip disabled={canDecrypt} text={t('decrypt.not-allowed')}>
-          <Stack gap={3} align="center">
+        <Stack gap={3} align="center">
+          <Tooltip disabled={canDecrypt} text={t('decrypt.not-allowed')}>
             <SplitButton
               disabled={!canDecrypt}
               variant="secondary"
@@ -60,10 +85,15 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
                 },
               ]}
             />
-            <ManualReview />
-            <Actions />
-          </Stack>
-        </Tooltip>
+          </Tooltip>
+          {shouldRenderManualReview && (
+            <ManualReview
+              requiresManualReview={entityData.requiresManualReview}
+              status={entityData.status}
+            />
+          )}
+          <Actions />
+        </Stack>
       )}
       {(decryptControls.inProgress || editControls.inProgress) && (
         <Stack gap={3}>
@@ -98,6 +128,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
         onSubmit={handleDecryptSubmit}
         open={decryptControls.isOpen}
       />
+      <Cmdk entity={entity} />
     </Portal>
   );
 };

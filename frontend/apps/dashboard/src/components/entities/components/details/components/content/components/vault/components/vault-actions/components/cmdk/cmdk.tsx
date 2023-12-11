@@ -1,0 +1,208 @@
+import { useTranslation } from '@onefootprint/hooks';
+import styled, { css } from '@onefootprint/styled';
+import { EntityKind, EntityStatus, ReviewStatus } from '@onefootprint/types';
+import { createFontStyles, Overlay } from '@onefootprint/ui';
+import { Command } from 'cmdk';
+import React, { useState } from 'react';
+import useCurrentEntity from 'src/components/entities/components/details/hooks/use-current-entity';
+import { useEffectOnce } from 'usehooks-ts';
+
+import { useEntityContext } from '@/entity/hooks/use-entity-context';
+
+import useDecryptControls from '../../hooks/use-decrypt-controls';
+import useEditControls from '../../hooks/use-edit-controls';
+import type { VaultActionsControlsProps } from '../../vault-actions';
+import { ActionType } from './cmdk.types';
+import ActionList from './components/main-dialog/action-list/action-list';
+import Footer from './components/main-dialog/footer/footer';
+import SearchInput from './components/main-dialog/search-input';
+import ManualReviewDialog from './components/manual-review-dialog';
+import RetriggerKYCDialog from './components/retrigger-kyc-dialog';
+
+const Cmd = ({ entity }: VaultActionsControlsProps) => {
+  const { t, allT } = useTranslation('components.cmd');
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const { data: entityData } = useCurrentEntity();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const decryptControls = useDecryptControls();
+  const [retrigerDialogOpen, setRetrigerDialogOpen] = useState(false);
+  const [reviewStatus, setReviewStatus] = useState<ReviewStatus | undefined>();
+  const editControls = useEditControls();
+  const { kind } = useEntityContext();
+  const canDecrypt = !!entity.decryptableAttributes.length;
+
+  const shouldRenderManualReview =
+    entityData &&
+    entityData.status !== EntityStatus.none &&
+    entityData.status !== EntityStatus.incomplete;
+
+  const resetSearch = () => {
+    setSearch('');
+  };
+
+  const handleKeyDown = (e: {
+    key: string;
+    metaKey: boolean;
+    ctrlKey: boolean;
+    preventDefault: () => void;
+  }) => {
+    if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      setOpen(currentOpen => !currentOpen);
+    }
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      setOpen(false);
+    }
+  };
+
+  useEffectOnce(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  });
+
+  const handleOpenDialog = (dialogStatus: ReviewStatus) => {
+    setReviewStatus(dialogStatus);
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setReviewStatus(undefined);
+  };
+
+  const handleRetrigerDialogClose = () => {
+    setRetrigerDialogOpen(false);
+  };
+
+  const handleRetrigerDialogOpen = () => {
+    setRetrigerDialogOpen(true);
+  };
+
+  const actions = [
+    {
+      title: allT(
+        `components.cmdk.review.${
+          kind === EntityKind.business ? 'title-business' : 'title-user'
+        }`,
+      ),
+      type: ActionType.REVIEW,
+      actions: [
+        {
+          label:
+            entityData && entityData.status === EntityStatus.failed
+              ? allT('components.cmdk.review.keep-as', {
+                  status: allT(`entity-statuses.${ReviewStatus.fail}`),
+                })
+              : allT('components.cmdk.review.mark-as', {
+                  status: allT(`entity-statuses.${ReviewStatus.fail}`),
+                }),
+          value: 'failed',
+          onSelect: () => handleOpenDialog(ReviewStatus.fail),
+          closeAfterSelect: true,
+        },
+        {
+          label:
+            entityData && entityData.status === EntityStatus.pass
+              ? allT('components.cmdk.review.keep-as', {
+                  status: allT(`entity-statuses.${ReviewStatus.pass}`),
+                })
+              : allT('components.cmdk.review.mark-as', {
+                  status: allT(`entity-statuses.${ReviewStatus.pass}`),
+                }),
+          value: 'verified',
+          onSelect: () => handleOpenDialog(ReviewStatus.pass),
+          closeAfterSelect: true,
+        },
+      ],
+    },
+    {
+      title: allT('components.cmdk.actions.title'),
+      type: ActionType.USER_ACTIONS,
+      actions: [
+        {
+          label: allT('components.cmdk.actions.edit'),
+          value: 'edit',
+          onSelect: editControls.start,
+          closeAfterSelect: true,
+        },
+        {
+          label: allT('components.cmdk.actions.request'),
+          value: 'request',
+          onSelect: handleRetrigerDialogOpen,
+          closeAfterSelect: true,
+        },
+      ],
+    },
+    {
+      title: allT('components.cmdk.decrypt.title'),
+      type: ActionType.DECRYPT,
+      actions: [
+        {
+          label: allT('components.cmdk.decrypt.decrypt-some'),
+          value: 'decrypt',
+          onSelect: decryptControls.start,
+          closeAfterSelect: true,
+          disabled: !canDecrypt,
+        },
+        {
+          label: allT('components.cmdk.decrypt.decrypt-all'),
+          value: 'decrypt-all',
+          onSelect: () =>
+            decryptControls.submitAllFields(entity.decryptableAttributes),
+          closeAfterSelect: true,
+          disabled: !canDecrypt,
+        },
+      ],
+    },
+  ];
+
+  return (
+    <>
+      <DialogContainer open={open} onOpenChange={setOpen} label={t('title')}>
+        <SearchInput
+          value={search}
+          onValueChange={setSearch}
+          onErase={resetSearch}
+        />
+        <ActionList
+          actionsArray={actions}
+          setOpen={setOpen}
+          hasReview={shouldRenderManualReview}
+        />
+        <Footer />
+      </DialogContainer>
+      <RetriggerKYCDialog
+        open={retrigerDialogOpen}
+        onClose={handleRetrigerDialogClose}
+      />
+      {dialogOpen && reviewStatus && (
+        <ManualReviewDialog
+          status={reviewStatus}
+          open={dialogOpen}
+          onClose={handleCloseDialog}
+        />
+      )}
+      <Overlay isVisible={open} />
+    </>
+  );
+};
+
+const DialogContainer = styled(Command.Dialog)`
+  ${({ theme }) => css`
+    ${createFontStyles('body-3')}
+    z-index: ${theme.zIndex.dialog};
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: ${theme.backgroundColor.primary};
+    box-shadow: ${theme.elevation[3]};
+    border-radius: ${theme.borderRadius.default};
+    width: 640px;
+    overflow: hidden;
+  `};
+`;
+
+export default Cmd;

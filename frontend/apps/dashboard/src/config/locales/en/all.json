@@ -397,6 +397,38 @@
     "native_device": "Native Device"
   },
   "components": {
+    "cmdk": {
+      "erase-search": "Erase search",
+      "no-results": "No results found",
+      "disabled": "Not enough permissions",
+      "decrypt": {
+        "title": "Decrypt",
+        "decrypt-some": "Decrypt some fields",
+        "decrypt-all": "Decrypt all fields"
+      },
+      "review": {
+        "title-user": "Review user",
+        "title-business": "Review business",
+        "mark-as-failed": "Mark as Failed",
+        "mark-as-verified": "Mark as Verified",
+        "mark-as": "Mark user as {{status}}",
+        "keep-as": "Keep user as {{status}}",
+        "status": {
+          "fail": "Failed",
+          "pass": "Verified"
+        }
+      },
+      "actions": {
+        "title": "User actions",
+        "edit": "Edit user information",
+        "request": "Request more information"
+      },
+      "footer": {
+        "navigate-up": "Navigate up",
+        "navigate-down": "Navigate down",
+        "trigger-action": "Trigger action"
+      }
+    },
     "timeline": {
       "empty": "No items"
     },
