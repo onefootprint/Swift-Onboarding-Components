@@ -1,0 +1,2 @@
+CREATE UNIQUE INDEX IF NOT EXISTS document_request_unique_scoped_vault_id ON document_request(scoped_vault_id) WHERE workflow_id IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS document_request_unique_workflow_id ON document_request(workflow_id) WHERE workflow_id IS NOT NULL;

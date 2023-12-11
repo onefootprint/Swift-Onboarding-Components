@@ -1,0 +1,2 @@
+DROP INDEX IF EXISTS document_request_unique_workflow_id;
+DROP INDEX IF EXISTS document_request_unique_scoped_vault_id;
