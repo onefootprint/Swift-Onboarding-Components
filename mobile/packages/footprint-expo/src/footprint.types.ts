@@ -144,7 +144,7 @@ export type FootprintAppearance = {
 };
 
 export type OpenFootprint = {
-  redirectUrl: string;
+  redirectUrl?: string;
   appearance?: FootprintAppearance;
   onCanceled?: () => void;
   onCompleted?: (validationToken: string) => void;

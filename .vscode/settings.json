@@ -140,9 +140,4 @@
     "--target-dir",
     "vscode-target"
   ],
-  "[javascript][typescript][typescriptreact]": {
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit"
-    }
-  },
 }

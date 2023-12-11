@@ -5,6 +5,47 @@ import type { OpenFootprint } from './footprint.types';
 import createUrl from './utils/create-url';
 import sendSdkArgs from './utils/send-sdk-args';
 
+const handleWebBrowserUrlChange = (
+  url: string,
+  onComplete: OpenFootprint['onCompleted'],
+  onCancel: OpenFootprint['onCanceled'],
+) => {
+  if (!url) {
+    console.warn('@onefootprint/footprint-expo: missing result url');
+    dismissBrowser();
+    onCancel?.();
+    return;
+  }
+
+  const { queryParams } = Linking.parse(url);
+  const isCanceled = !queryParams || queryParams.canceled;
+  if (isCanceled) {
+    dismissBrowser();
+    onCancel?.();
+    return;
+  }
+  const validationToken = queryParams.validation_token;
+  if (!validationToken || typeof validationToken !== 'string') {
+    console.warn('@onefootprint/footprint-expo: missing validation token');
+    dismissBrowser();
+    onCancel?.();
+    return;
+  }
+
+  onComplete?.(validationToken);
+};
+
+const dismissBrowser = () => {
+  // These methods may not be available depending on whether we are on iOS or Android.
+  // Will throw error if not available - safe to ignore.
+  try {
+    WebBrowser.dismissAuthSession();
+    WebBrowser.dismissBrowser();
+  } catch (error) {
+    /* noop */
+  }
+};
+
 const open = async ({
   redirectUrl,
   appearance,
@@ -26,78 +67,48 @@ const open = async ({
     return;
   }
 
-  const cancel = () => {
-    try {
-      WebBrowser.dismissAuthSession();
-      WebBrowser.dismissBrowser();
-    } catch (error) {
-      /* noop */
-    }
-    onCanceled?.();
-  };
-
-  let isUpdateHandled = false; // Android and iOS handle results differently.
+  // Only handle once either via listener or via openAuthSessionAsync result.
+  let isUpdateHandled = false;
   const subscription = Linking.addEventListener('url', ({ url: eventUrl }) => {
-    if (isUpdateHandled) {
-      return;
+    if (!isUpdateHandled) {
+      isUpdateHandled = true;
+      handleWebBrowserUrlChange(eventUrl, onCompleted, onCanceled);
     }
-    isUpdateHandled = true;
-    handleResultUrl(eventUrl);
   });
 
-  const handleResultUrl = (resultUrl: string) => {
-    if (!resultUrl) {
-      console.warn('@onefootprint/footprint-expo: missing result url');
-      cancel();
-      return;
-    }
-
-    const { queryParams } = Linking.parse(resultUrl);
-    const isCanceled = !queryParams || queryParams.canceled;
-    if (isCanceled) {
-      cancel();
-      return;
-    }
-    const validationToken = queryParams.validation_token;
-    if (!validationToken || typeof validationToken !== 'string') {
-      console.warn('@onefootprint/footprint-expo: missing validation token');
-      cancel();
-      return;
-    }
-
-    onCompleted?.(validationToken);
-  };
-
   try {
-    const redirect = redirectUrl ?? Linking.createURL('/');
+    // If redirectUrl is not provided, return to the root of the app when flow is done
+    const redirectUrlOrFallback = redirectUrl ?? Linking.createURL('/');
     const url = createUrl({
       appearance,
-      redirectUrl: redirect,
+      redirectUrl: redirectUrlOrFallback,
       token,
     });
-    const result = await WebBrowser.openAuthSessionAsync(url, redirect);
+    const result = await WebBrowser.openAuthSessionAsync(
+      url,
+      redirectUrlOrFallback,
+    );
     if (!isUpdateHandled) {
       if (result.type !== 'success') {
-        cancel();
+        // Triggered if user closes the web browser
+        dismissBrowser();
+        onCanceled?.();
       } else {
-        handleResultUrl(result.url);
+        handleWebBrowserUrlChange(result.url, onCompleted, onCanceled);
       }
     }
   } catch (error) {
     console.error(`@onefootprint/footprint-expo: ${error}`);
-    cancel();
+    dismissBrowser();
+    onCanceled?.();
   }
 
   subscription.remove();
 };
 
-const close = () => {
-  return WebBrowser.dismissBrowser();
-};
-
 const footprint = {
   open,
-  close,
+  close: dismissBrowser,
 };
 
 export default footprint;
