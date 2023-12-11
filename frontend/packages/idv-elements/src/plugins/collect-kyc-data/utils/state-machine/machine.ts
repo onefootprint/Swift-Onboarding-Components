@@ -9,9 +9,8 @@ import {
   isMissingUsLegalStatusAttribute,
   shouldConfirm,
 } from '../missing-attributes';
-import type { Typegen0 } from './machine.typegen';
 import type { MachineContext, MachineEvents } from './types';
-import isInDomesticFlow from './utils/is-country-us';
+import isCountryUsOrTerritories from './utils/is-country-us-or-territories';
 import mergeUpdatedData from './utils/merge-data';
 import mergeInitialData from './utils/merge-initial-data';
 
@@ -27,7 +26,8 @@ const createCollectKycDataMachine = (
         context: {} as MachineContext,
         events: {} as MachineEvents,
       },
-      tsTypes: {} as Typegen0,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      tsTypes: {} as import('./machine.typegen').Typegen0,
       initial: initState ?? 'init',
       context: { ...initialContext },
       states: {
@@ -75,7 +75,7 @@ const createCollectKycDataMachine = (
             {
               target: 'usLegalStatus',
               cond: context =>
-                isInDomesticFlow(context.data) &&
+                isCountryUsOrTerritories(context.data) &&
                 isMissingUsLegalStatusAttribute(
                   allAttributes(context.requirement),
                   context.data,
@@ -85,7 +85,7 @@ const createCollectKycDataMachine = (
             {
               target: 'ssn',
               cond: context =>
-                isInDomesticFlow(context.data) &&
+                isCountryUsOrTerritories(context.data) &&
                 isMissingSsnAttribute(
                   allAttributes(context.requirement),
                   context.data,
@@ -134,7 +134,7 @@ const createCollectKycDataMachine = (
                 cond: (context, event) => {
                   const allData = mergeUpdatedData(context.data, event.payload);
                   return (
-                    isInDomesticFlow(allData) &&
+                    isCountryUsOrTerritories(allData) &&
                     isMissingUsLegalStatusAttribute(
                       allAttributes(context.requirement),
                       allData,
@@ -149,7 +149,7 @@ const createCollectKycDataMachine = (
                 cond: (context, event) => {
                   const allData = mergeUpdatedData(context.data, event.payload);
                   return (
-                    isInDomesticFlow(allData) &&
+                    isCountryUsOrTerritories(allData) &&
                     isMissingSsnAttribute(
                       allAttributes(context.requirement),
                       allData,
@@ -186,7 +186,7 @@ const createCollectKycDataMachine = (
                 cond: (context, event) => {
                   const allData = mergeUpdatedData(context.data, event.payload);
                   return (
-                    isInDomesticFlow(allData) &&
+                    isCountryUsOrTerritories(allData) &&
                     isMissingUsLegalStatusAttribute(
                       allAttributes(context.requirement),
                       allData,
@@ -201,7 +201,7 @@ const createCollectKycDataMachine = (
                 cond: (context, event) => {
                   const allData = mergeUpdatedData(context.data, event.payload);
                   return (
-                    isInDomesticFlow(allData) &&
+                    isCountryUsOrTerritories(allData) &&
                     isMissingSsnAttribute(
                       allAttributes(context.requirement),
                       allData,
@@ -235,7 +235,7 @@ const createCollectKycDataMachine = (
                 cond: (context, event) => {
                   const allData = mergeUpdatedData(context.data, event.payload);
                   return (
-                    isInDomesticFlow(allData) &&
+                    isCountryUsOrTerritories(allData) &&
                     isMissingUsLegalStatusAttribute(
                       allAttributes(context.requirement),
                       allData,
@@ -250,7 +250,7 @@ const createCollectKycDataMachine = (
                 cond: (context, event) => {
                   const allData = mergeUpdatedData(context.data, event.payload);
                   return (
-                    isInDomesticFlow(allData) &&
+                    isCountryUsOrTerritories(allData) &&
                     isMissingSsnAttribute(
                       allAttributes(context.requirement),
                       allData,
@@ -295,7 +295,7 @@ const createCollectKycDataMachine = (
                 cond: (context, event) => {
                   const allData = mergeUpdatedData(context.data, event.payload);
                   return (
-                    isInDomesticFlow(allData) &&
+                    isCountryUsOrTerritories(allData) &&
                     isMissingSsnAttribute(
                       allAttributes(context.requirement),
                       allData,
@@ -403,7 +403,7 @@ const createCollectKycDataMachine = (
               {
                 target: 'ssn',
                 cond: context =>
-                  isInDomesticFlow(context.data) &&
+                  isCountryUsOrTerritories(context.data) &&
                   isMissingSsnAttribute(
                     allAttributes(context.requirement),
                     context.initialData,
@@ -413,7 +413,7 @@ const createCollectKycDataMachine = (
               {
                 target: 'usLegalStatus',
                 cond: context =>
-                  isInDomesticFlow(context.data) &&
+                  isCountryUsOrTerritories(context.data) &&
                   isMissingUsLegalStatusAttribute(
                     allAttributes(context.requirement),
                     context.initialData,

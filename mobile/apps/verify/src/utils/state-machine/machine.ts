@@ -6,7 +6,7 @@ import {
 import { assign, createMachine } from 'xstate';
 
 import allAttributes from '../all-attributes';
-import isInDomesticFlow from '../is-in-domestic-flow';
+import isCountryUsOrTerritories from '../is-country-us-or-territories';
 import mergeUpdatedData from '../merge-data/merge-data';
 import {
   isMissingResidentialAttribute,
@@ -136,7 +136,7 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
                     event.payload,
                   );
                   return (
-                    isInDomesticFlow(allData) &&
+                    isCountryUsOrTerritories(allData) &&
                     isMissingSsnAttribute(
                       allAttributes(context.kyc.requirement),
                       allData,
@@ -160,7 +160,7 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
                     event.payload,
                   );
                   return (
-                    isInDomesticFlow(allData) &&
+                    isCountryUsOrTerritories(allData) &&
                     isMissingSsnAttribute(
                       allAttributes(context.kyc.requirement),
                       allData,

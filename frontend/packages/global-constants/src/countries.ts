@@ -2302,3 +2302,5 @@ export const COUNTRIES_WITH_PROVINCES: CountryCode[] = [
   'ZM',
   'ZW',
 ];
+
+export const US_TERRITORY_COUNTRY_CODES = ['AS', 'GU', 'MP', 'PR', 'VI'];

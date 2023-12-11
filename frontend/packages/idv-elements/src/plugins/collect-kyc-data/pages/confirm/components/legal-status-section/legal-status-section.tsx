@@ -13,7 +13,7 @@ import {
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
-import isInDomesticFlow from '../../../../utils/state-machine/utils/is-country-us';
+import isCountryUsOrTerritories from '../../../../utils/state-machine/utils/is-country-us-or-territories';
 import LegalStatus from '../../../legal-status';
 import getCountrySelectOption from '../../../legal-status/utils/get-country-select-option';
 
@@ -22,13 +22,13 @@ const LegalStatusSection = () => {
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
   const [editing, setEditing] = useState(false);
-  const isCountryUs = isInDomesticFlow(data);
+  const isUsOrTerritories = isCountryUsOrTerritories(data);
 
   const legalStatus = [];
 
   const status = data[IdDI.usLegalStatus]?.value;
   // we check status so we don't show this section for old onboarding configs that include the nationality field but not legal status
-  if (!isCountryUs || !status) {
+  if (!isUsOrTerritories || !status) {
     return null;
   }
 
