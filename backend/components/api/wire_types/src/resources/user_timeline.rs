@@ -53,5 +53,15 @@ pub struct WorkflowTriggered {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct WorkflowStarted {
+    pub kind: WorkflowStartedEventKind,
     pub playbook: TimelinePlaybook,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum WorkflowStartedEventKind {
+    /// Onboarding onto an existing playbook
+    Playbook,
+    /// Collecting documents
+    Document,
 }

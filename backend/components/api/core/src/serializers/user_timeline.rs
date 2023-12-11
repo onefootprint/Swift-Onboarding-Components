@@ -1,8 +1,9 @@
+use api_wire_types::WorkflowStartedEventKind;
 use db::models::user_timeline::{
     SaturatedDataCollectedEvent, SaturatedTimelineEvent, UserTimeline, UserTimelineInfo,
 };
 use itertools::Itertools;
-use newtypes::{DocumentRequestKind, TriggerKind, WorkflowRequestConfig};
+use newtypes::{DocumentRequestKind, TriggerKind, WorkflowConfig, WorkflowRequestConfig};
 
 use crate::utils::db2api::DbToApi;
 
@@ -105,8 +106,16 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                     note,
                 })
             }
-            SaturatedTimelineEvent::WorkflowStarted((_, pb)) => {
+            SaturatedTimelineEvent::WorkflowStarted((wf, pb)) => {
+                let kind = match wf.config {
+                    WorkflowConfig::Kyc(_) | WorkflowConfig::Kyb(_) | WorkflowConfig::AlpacaKyc(_) => {
+                        WorkflowStartedEventKind::Playbook
+                    }
+                    WorkflowConfig::Document(_) => WorkflowStartedEventKind::Document,
+                };
                 Self::WorkflowStarted(api_wire_types::WorkflowStarted {
+                    kind,
+                    // Even though document workflows don't really use them, they are associated with playbooks
                     playbook: api_wire_types::TimelinePlaybook::from_db(pb),
                 })
             }
