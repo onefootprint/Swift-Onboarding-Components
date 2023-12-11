@@ -120,7 +120,14 @@ def test_redo_kyc(sandbox_tenant, twilio, with_document, doc_first_obc):
         assert users_docs[1]["created_at"] > users_docs[0]["created_at"]
 
 
-def test_recollect_document(sandbox_tenant, twilio):
+@pytest.mark.parametrize(
+    "trigger",
+    [
+        dict(kind="id_document", data=dict(collect_selfie=False)),
+        dict(kind="proof_of_ssn"),
+    ],
+)
+def test_recollect_document(trigger, sandbox_tenant, twilio):
     bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
     sandbox_user = bifrost.run()
 
@@ -130,7 +137,7 @@ def test_recollect_document(sandbox_tenant, twilio):
 
     # Trigger recollect document
     def send_trigger():
-        data = dict(trigger=dict(kind="id_document", data=dict(collect_selfie=False)))
+        data = dict(trigger=trigger)
         post(f"entities/{fp_id}/triggers", data, *sandbox_tenant.db_auths)
 
     try_until_success(send_trigger, 15, 3)
@@ -163,7 +170,6 @@ def test_recollect_document(sandbox_tenant, twilio):
 
     users_docs = get(f"users/{fp_id}/documents", None, sandbox_tenant.sk.key)
     assert len(users_docs) == 1
-    assert all(map(lambda x: x["document_type"] == "drivers_license", users_docs))
 
 
 def test_trigger_incomplete(sandbox_tenant, twilio):

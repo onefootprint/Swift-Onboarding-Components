@@ -271,16 +271,29 @@ class BifrostClient:
             consent_data = {"consent_language_text": "I consent"}
             post("hosted/user/consent", consent_data, self.auth_token)
 
+        doc_kind = None
+        sides = ["front"]
+        supported_doc_types = requirement["supported_country_and_doc_types"]["US"]
+        if "drivers_license" in supported_doc_types:
+            doc_kind = "drivers_license"
+            sides.append("back")
+        elif "ssn_card" in supported_doc_types:
+            # Kind of a hack - we won't actually upload an ssn card image
+            doc_kind = "ssn_card"
+        else:
+            assert (
+                False
+            ), f"""BifrostClient can't upload a supported document type: {",".join(supported_doc_types)}"""
+
+        if requirement["should_collect_selfie"]:
+            sides.append("selfie")
+
         data = {
-            "document_type": "drivers_license",
+            "document_type": doc_kind,
             "country_code": "US",
         }
         body = post("hosted/user/documents", data, self.auth_token)
         doc_id = body["id"]
-
-        sides = ["front", "back"]
-        if requirement["should_collect_selfie"]:
-            sides.append("selfie")
 
         # Upload the documents consecutively in separate requests
         for i, side in enumerate(sides):
