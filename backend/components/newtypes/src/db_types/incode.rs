@@ -128,6 +128,9 @@ impl IncodeFailureReason {
             Self::DocTypeMismatch => Some(FootprintReasonCode::DocumentTypeMismatch),
             Self::UnknownCountryCode => Some(FootprintReasonCode::DocumentUnknownCountryCode),
             Self::CountryCodeMismatch => Some(FootprintReasonCode::DocumentCountryCodeMismatch),
+            Self::SelfieTooDark | Self::SelfieLowConfidence => {
+                Some(FootprintReasonCode::DocumentSelfieBadQuality)
+            }
             Self::DriversLicensePermitNotAllowed => {
                 Some(FootprintReasonCode::DocumentIsPermitOrProvisionalLicense)
             }

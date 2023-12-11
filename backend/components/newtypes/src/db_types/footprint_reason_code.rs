@@ -815,6 +815,10 @@ footprint_reason_code_enum! {
         #[note = "Document image does not match selfie", severity = SignalSeverity::High,  description = "The image on the document does not match the captured selfie."]
         DocumentSelfieDoesNotMatch,
 
+        #[scope = SignalScope::Document, additional_scopes = vec![SignalScope::Selfie], match_level = None]
+        #[note = "Selfie image bad quality", severity = SignalSeverity::Medium,  description = "The selfie submitted was not good quality, which may impact verification checks."]
+        DocumentSelfieBadQuality,
+
         #[scope = SignalScope::Document, additional_scopes = vec![], match_level = None]
         #[note = "Unexpected document type provided", severity = SignalSeverity::High,  description = "The document uploaded was classified as a different type of document than was selected to be uploaded by the user."]
         DocumentTypeMismatch,
