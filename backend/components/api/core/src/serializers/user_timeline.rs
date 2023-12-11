@@ -2,7 +2,7 @@ use db::models::user_timeline::{
     SaturatedDataCollectedEvent, SaturatedTimelineEvent, UserTimeline, UserTimelineInfo,
 };
 use itertools::Itertools;
-use newtypes::TriggerKind;
+use newtypes::{DocumentRequestKind, TriggerKind, WorkflowRequestConfig};
 
 use crate::utils::db2api::DbToApi;
 
@@ -80,13 +80,23 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
             }),
             SaturatedTimelineEvent::WorkflowTriggered((workflow, actor, wfr)) => {
                 // Some weird logic for backcompat to determine the trigger type
-                let workflow = if let Some(wf) = workflow {
-                    api_wire_types::TriggeredWorkflow::from_db(wf)
+                let (workflow, request) = if let Some(wfr) = wfr {
+                    let kind = match wfr.config {
+                        WorkflowRequestConfig::RedoKyc => TriggerKind::RedoKyc,
+                        WorkflowRequestConfig::IdDocument { kind, .. } => match kind {
+                            DocumentRequestKind::ProofOfSsn => TriggerKind::ProofOfSsn,
+                            DocumentRequestKind::Identity => TriggerKind::IdDocument,
+                        },
+                    };
+                    let request = api_wire_types::WorkflowRequest::from_db(wfr);
+                    let wf = api_wire_types::TriggeredWorkflow { kind };
+                    (wf, Some(request))
+                } else if let Some(wf) = workflow {
+                    (api_wire_types::TriggeredWorkflow::from_db(wf), None)
                 } else {
                     let kind = TriggerKind::RedoKyc;
-                    api_wire_types::TriggeredWorkflow { kind }
+                    (api_wire_types::TriggeredWorkflow { kind }, None)
                 };
-                let request = wfr.map(api_wire_types::WorkflowRequest::from_db);
                 Self::WorkflowTriggered(api_wire_types::WorkflowTriggered {
                     workflow,
                     request,

@@ -1327,7 +1327,8 @@
             "requested-user-to": "requested user to {{action}}",
             "actions": {
               "id_document": "upload ID photo",
-              "redo_kyc": "revise KYC data"
+              "redo_kyc": "revise KYC data",
+              "proof_of_ssn": "provide proof of SSN"
             },
             "link-sent": "Link sent to user",
             "copy-link": "Copy link",
