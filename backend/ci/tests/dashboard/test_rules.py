@@ -61,7 +61,7 @@ def test_create(sandbox_tenant, data):
     assert res["name"] == data["name"]
     assert res["rule_expression"] == data["rule_expression"]
     assert res["action"] == data["action"]
-    assert res["is_shadow"] == True
+    assert res["is_shadow"] == False
 
 
 def test_list(sandbox_tenant, obc):
@@ -121,7 +121,7 @@ def test_patch(sandbox_tenant, obc):
     update2 = patch(
         f"/org/onboarding_configs/{obc.id}/rules/{rule['rule_id']}",
         dict(
-            is_shadow=False,
+            is_shadow=True,
             rule_expression=[
                 {"field": "document_selfie_glasses", "op": "eq", "value": True}
             ],
@@ -130,7 +130,7 @@ def test_patch(sandbox_tenant, obc):
     )
 
     assert update2["name"] == "New Name"
-    assert update2["is_shadow"] == False
+    assert update2["is_shadow"] == True
     assert update2["rule_expression"] == [
         {"field": "document_selfie_glasses", "op": "eq", "value": True}
     ]

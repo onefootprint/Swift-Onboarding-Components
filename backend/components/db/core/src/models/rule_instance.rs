@@ -33,7 +33,7 @@ pub struct RuleInstance {
     pub name: Option<String>,
     pub rule_expression: RuleExpression,
     pub action: RuleAction,
-    pub is_shadow: bool,
+    pub is_shadow: bool, // not yet used
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -112,7 +112,7 @@ impl RuleInstance {
             name,
             rule_expression,
             action,
-            is_shadow: true, // all rules start in shadow until explicitly promoted to livemode lets say
+            is_shadow: false, // we don't use this yet but in the near future may have new rules default to is_shadow=true
             deactivated_at: None,
             deactivated_seqno: None,
         };
