@@ -11,15 +11,14 @@ use api_core::utils::db2api::DbToApi;
 use api_core::utils::search_utils::parse_search;
 use api_wire_types::SearchUsersRequest;
 use db::scoped_vault::ScopedVaultListQueryParams;
+use newtypes::PiiString;
 use newtypes::ScopedVaultCursor;
 use newtypes::ScopedVaultCursorKind;
+use newtypes::TimestampCursor;
 use newtypes::VaultKind;
-use paperclip::actix::{api_v2_operation, get, web};
+use paperclip::actix::{api_v2_operation, get, post, web};
 
-#[api_v2_operation(
-    description = "Get a list of users, optionally searching by fingerprint",
-    tags(Users, Preview)
-)]
+#[api_v2_operation(description = "Get the list of users", tags(Users, Preview))]
 #[get("/users")]
 pub async fn get(
     state: web::Data<State>,
@@ -68,6 +67,59 @@ pub async fn get(
         .await??;
 
     let cursor = pagination.cursor_item(&state, &svs).map(|(sv, _)| sv.ordering_id);
+
+    let results = svs.into_iter().map(api_wire_types::LiteUser::from_db).collect();
+    CursorPaginatedResponseInner::ok(results, cursor, Some(count))
+}
+
+#[derive(serde::Deserialize, paperclip::actix::Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct SearchUsersRequestBody {
+    pub search: PiiString,
+    pub pagination: Option<CursorPaginationRequest<TimestampCursor>>,
+}
+
+#[api_v2_operation(description = "Search users by fingerprint", tags(Users, Preview))]
+#[post("/users/search")]
+pub async fn post_search(
+    state: web::Data<State>,
+    request: web::Json<SearchUsersRequestBody>,
+    auth: SecretTenantAuthContext,
+) -> CursorPaginatedResponse<Vec<api_wire_types::LiteUser>, TimestampCursor> {
+    let auth = auth.check_guard(TenantGuard::Read)?;
+    let tenant = auth.tenant();
+    let SearchUsersRequestBody { pagination, search } = request.into_inner();
+    let pagination = pagination.unwrap_or_default();
+
+    let (search, fp_id) = parse_search(&state, Some(search), &tenant.id).await?;
+    let params = ScopedVaultListQueryParams {
+        tenant_id: tenant.id.clone(),
+        is_live: auth.is_live()?,
+        search,
+        fp_id,
+        kind: Some(VaultKind::Person),
+        only_visible: true,
+        external_id: None,
+        ..ScopedVaultListQueryParams::default()
+    };
+    let cursor = pagination.cursor.as_ref().map(|c| c.into());
+    let page_size = pagination.page_size(&state);
+
+    let (svs, count) = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let page_size = (page_size + 1) as i64;
+            let order_by = ScopedVaultCursorKind::LastActivityAt;
+            let (svs, count) = db::scoped_vault::list_and_count_authorized_for_tenant(
+                conn, params, cursor, order_by, page_size,
+            )?;
+            Ok((svs, count))
+        })
+        .await??;
+
+    let cursor = pagination
+        .cursor_item(&state, &svs)
+        .map(|(sv, _)| TimestampCursor(sv.last_activity_at));
 
     let results = svs.into_iter().map(api_wire_types::LiteUser::from_db).collect();
     CursorPaginatedResponseInner::ok(results, cursor, Some(count))

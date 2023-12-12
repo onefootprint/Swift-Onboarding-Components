@@ -5,7 +5,7 @@ mod auth_events;
 mod decisions;
 mod detail;
 mod documents;
-mod get;
+mod list;
 mod liveness;
 mod match_signals;
 mod post;
@@ -15,7 +15,8 @@ mod risk_signals;
 pub fn routes(config: &mut web::ServiceConfig) {
     config
         .service(post::post)
-        .service(get::get)
+        .service(list::get)
+        .service(list::post_search)
         .service(documents::get)
         .service(risk_signals::get)
         .service(match_signals::get)

@@ -95,7 +95,7 @@
                     "Users",
                     "Preview"
                 ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGet a list of users, optionally searching by fingerprint",
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGet the list of users",
                 "parameters": [
                     {
                         "in": "query",
@@ -119,14 +119,6 @@
                         "in": "query",
                         "name": "external_id",
                         "description": "filter users by an external id",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "search",
                         "schema": {
                             "type": "string"
                         },
@@ -163,6 +155,72 @@
                                                     "description": "The cursor to be provided in the next request to fetch the next page\n The `cursor` parameter to provide in order to request the next page of results",
                                                     "type": "integer",
                                                     "format": "int64"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/search": {
+            "post": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nSearch users by fingerprint",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SearchUsersRequestBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "",
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/LiteUser"
+                                            }
+                                        },
+                                        "meta": {
+                                            "description": "Metadata required for a cursor-paginated response.",
+                                            "type": "object",
+                                            "properties": {
+                                                "count": {
+                                                    "example": 10000,
+                                                    "description": "The total number of results",
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "next": {
+                                                    "example": 1234,
+                                                    "description": "The cursor to be provided in the next request to fetch the next page\n The `cursor` parameter to provide in order to request the next page of results",
+                                                    "type": "integer"
                                                 }
                                             }
                                         }
@@ -7478,6 +7536,31 @@
                 "required": [
                     "expires_at",
                     "link"
+                ]
+            },
+            "SearchUsersRequestBody": {
+                "type": "object",
+                "properties": {
+                    "pagination": {
+                        "description": "Contains all of the fields that are passed in the querystring for a cursor-paginated request.\n Cursor pagination requests take in a cursor that identifies the start of the page (and is\n delivered by the last pagination request) using an ordered field.\n This is more performant, but doesn't give any insight into how far you have paginated through\n the results and requires the cursor field to have a _total_ ordering (partial does not work).\n But, results stay consistent as new results are added to earlier pages.\n Can be used alongside another actix web::Query extractor",
+                        "type": "object",
+                        "properties": {
+                            "cursor": {
+                                "example": 12345,
+                                "type": "integer"
+                            },
+                            "page_size": {
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        }
+                    },
+                    "search": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "search"
                 ]
             },
             "TriggerKybRequest": {

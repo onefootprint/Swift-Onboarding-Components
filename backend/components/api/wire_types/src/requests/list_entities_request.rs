@@ -20,9 +20,11 @@ pub struct ListEntitiesRequest {
     pub has_outstanding_workflow_request: Option<bool>,
 }
 
-#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
+#[derive(Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct SearchUsersRequest {
+    /// Deprecated
+    #[openapi(skip)]
     pub search: Option<PiiString>,
     /// filter users by an external id
     pub external_id: Option<ExternalId>,
