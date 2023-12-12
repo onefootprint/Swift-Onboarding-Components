@@ -27,7 +27,7 @@ def dual_onboarded_user(sandbox_user_real_phone, foo_sandbox_tenant, twilio):
 
     # Before the user finishes onboarding to foo_sandbox_tenant, the tenant shouldn't be able to
     # make a token that inherits auth
-    body = get("/entities", None, *foo_sandbox_tenant.db_auths)
+    body = post("entities/search", None, *foo_sandbox_tenant.db_auths)
     user = next(i for i in body["data"] if i["sandbox_id"] == sandbox_id)
     assert user["status"] == "in_progress"
     foo_fp_id = user["id"]
@@ -70,12 +70,12 @@ def test_prefill_timeline_events(
     foo_fp_id = dual_onboarded_user.foo_fp_id
 
     # Timeline events from sandbox_tenant's view belong to self
-    body = get(f"/entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
+    body = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
     assert body
 
     # But from foo_sandbox_tenant's view, these events are portable and belong to another org
     body = get(
-        f"/entities/{foo_fp_id}/timeline",
+        f"entities/{foo_fp_id}/timeline",
         None,
         *foo_sandbox_tenant.db_auths,
     )
@@ -91,17 +91,17 @@ def test_cant_see_fp_id(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user)
     fp_id = dual_onboarded_user.fp_id
     foo_fp_id = dual_onboarded_user.foo_fp_id
 
-    get(f"/entities/{foo_fp_id}", None, *sandbox_tenant.db_auths, status_code=404)
-    get(f"/entities/{fp_id}", None, *foo_sandbox_tenant.db_auths, status_code=404)
+    get(f"entities/{foo_fp_id}", None, *sandbox_tenant.db_auths, status_code=404)
+    get(f"entities/{fp_id}", None, *foo_sandbox_tenant.db_auths, status_code=404)
 
     get(
-        f"/entities/{foo_fp_id}/timeline",
+        f"entities/{foo_fp_id}/timeline",
         None,
         *sandbox_tenant.db_auths,
         status_code=404,
     )
     get(
-        f"/entities/{fp_id}/timeline",
+        f"entities/{fp_id}/timeline",
         None,
         *foo_sandbox_tenant.db_auths,
         status_code=404,
@@ -118,10 +118,10 @@ def test_search(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):
         data = dict(search=search_query)
         # Both tenants should be able to find the user based on the search query
 
-        body = get(f"/entities", data, *sandbox_tenant.db_auths)
+        body = post("entities/search", data, *sandbox_tenant.db_auths)
         assert any(i["id"] == dual_onboarded_user.fp_id for i in body["data"])
 
-        body = get(f"/entities", data, *foo_sandbox_tenant.db_auths)
+        body = post("entities/search", data, *foo_sandbox_tenant.db_auths)
         assert any(i["id"] == dual_onboarded_user.foo_fp_id for i in body["data"])
 
 
@@ -135,17 +135,17 @@ def test_cant_see_speculative_fingerprints(
         "id.first_name": "New",
         "id.last_name": "Name",
     }
-    patch(f"/entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
+    patch(f"entities/{fp_id}/vault", data, sandbox_tenant.sk.key)
 
     for search_query in ["new", "name"]:
         data = dict(search=search_query)
 
         # sandbox_tenant should be able to search for the user from its new name
-        body = get(f"/entities", data, *sandbox_tenant.db_auths)
+        body = post("entities/search", data, *sandbox_tenant.db_auths)
         assert any(i["id"] == dual_onboarded_user.fp_id for i in body["data"])
 
         # foo_sandbox_tenant should _not_ be able to find the user by its name at sandbox_tenant
-        body = get(f"/entities", data, *foo_sandbox_tenant.db_auths)
+        body = post("entities/search", data, *foo_sandbox_tenant.db_auths)
         assert not any(i["id"] == dual_onboarded_user.foo_fp_id for i in body["data"])
 
 

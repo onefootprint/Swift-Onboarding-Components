@@ -154,7 +154,7 @@ def test_trigger_incomplete(sandbox_tenant, twilio):
     phone_number = bifrost.data["id.phone_number"]
 
     # Don't finish onboarding. Grab fp_id from dashboard
-    body = get("/entities", None, *sandbox_tenant.db_auths)
+    body = post("entities/search", None, *sandbox_tenant.db_auths)
     user = next(u for u in body["data"] if u["sandbox_id"] == sandbox_id)
     fp_id = user["id"]
 

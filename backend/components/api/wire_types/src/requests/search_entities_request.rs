@@ -4,7 +4,7 @@ use crate::*;
 
 #[derive(Default, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
-pub struct ListEntitiesRequest {
+pub struct SearchEntitiesRequest {
     pub kind: Option<VaultKind>,
     #[serde(default)]
     #[serde(deserialize_with = "deserialize_stringified_list")]

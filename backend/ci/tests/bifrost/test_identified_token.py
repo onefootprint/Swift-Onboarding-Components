@@ -281,7 +281,7 @@ def test_portablize_api_vault(
         (sandbox_tenant, user.fp_id),
         (foo_sandbox_tenant, foo_user.fp_id),
     ]:
-        body = get("/entities", dict(search=live_phone_number), *t.db_auths)
+        body = post("entities/search", dict(search=live_phone_number), *t.db_auths)
         assert any(i["id"] == fp_id for i in body["data"])
 
 

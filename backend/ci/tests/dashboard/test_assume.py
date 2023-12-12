@@ -55,12 +55,15 @@ def assumed_token(tenant, sandbox_tenant_data):
         "org/members",
         "org/roles",
         "org/onboarding_configs",
-        "entities",
         "org/access_events",
     ],
 )
 def test_read_allowed(assumed_token, path):
     get(path, None, assumed_token)
+
+
+def test_read_allowed_post_entities_search(assumed_token):
+    post("entities/search", None, assumed_token)
 
 
 @pytest.mark.parametrize(

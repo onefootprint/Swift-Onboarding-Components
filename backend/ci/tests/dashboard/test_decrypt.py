@@ -124,7 +124,7 @@ def test_decrypt_optional(sandbox_tenant, twilio):
     bifrost = BifrostClient.new(obc, twilio)
     user = bifrost.run()
 
-    body = get(f"/entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
+    body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)
     phone_number = next(i for i in body["data"] if i["identifier"] == "id.phone_number")
     assert phone_number["is_decryptable"]
     email = next(i for i in body["data"] if i["identifier"] == "id.email")

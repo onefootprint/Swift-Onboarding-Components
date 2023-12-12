@@ -316,7 +316,7 @@ def test_get_annotations(sandbox_user):
     note1 = "this user is chill"
     # Actor = TenantApiKey
     annotation1 = post(
-        f"/entities/{sandbox_user.fp_id}/annotations",
+        f"entities/{sandbox_user.fp_id}/annotations",
         dict(
             note=note1,
             is_pinned=False,
@@ -325,7 +325,7 @@ def test_get_annotations(sandbox_user):
     )
 
     annotations = get(
-        f"/entities/{sandbox_user.fp_id}/annotations",
+        f"entities/{sandbox_user.fp_id}/annotations",
         None,
         *sandbox_user.tenant.db_auths,
     )
@@ -339,7 +339,7 @@ def test_get_annotations(sandbox_user):
     note2 = "ok mb they are a little sketch"
     # Actor = TenantUser
     annotation2 = post(
-        f"/entities/{sandbox_user.fp_id}/annotations",
+        f"entities/{sandbox_user.fp_id}/annotations",
         dict(
             note=note2,
             is_pinned=True,
@@ -348,7 +348,7 @@ def test_get_annotations(sandbox_user):
     )
 
     annotations = get(
-        f"/entities/{sandbox_user.fp_id}/annotations",
+        f"entities/{sandbox_user.fp_id}/annotations",
         None,
         *sandbox_user.tenant.db_auths,
     )
@@ -386,7 +386,7 @@ def test_update_data(sandbox_tenant):
 
 def test_entity_data(sandbox_user, sandbox_tenant):
     """
-    Check the data attribute in the GET /entities list and detail endpoints, including the data
+    Check the data attribute in the GET entities list and detail endpoints, including the data
     that is auto decrypted.
     """
     body = post("entities/search", None, *sandbox_tenant.db_auths)

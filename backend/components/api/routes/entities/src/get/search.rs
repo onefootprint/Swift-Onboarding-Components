@@ -21,7 +21,7 @@ use api_core::utils::vault_wrapper::DecryptAccessEventInfo;
 use api_core::utils::vault_wrapper::DecryptedData;
 use api_core::utils::vault_wrapper::EnclaveDecryptOperation;
 use api_core::utils::vault_wrapper::TenantVw;
-use api_wire_types::ListEntitiesRequest;
+use api_wire_types::SearchEntitiesRequest;
 use db::models::scoped_vault::ScopedVault;
 use db::scoped_vault::ScopedVaultListQueryParams;
 use itertools::Itertools;
@@ -34,30 +34,15 @@ use newtypes::IdentityDataKind as IDK;
 use newtypes::ScopedVaultCursorKind;
 use newtypes::ScopedVaultId;
 use newtypes::TimestampCursor;
-use paperclip::actix::{api_v2_operation, get, post, web};
+use paperclip::actix::{api_v2_operation, post, web};
 use std::collections::HashMap;
-
-#[api_v2_operation(
-    description = "View list of entities (business or user) that have started onboarding to the tenant.",
-    tags(Entities, Private)
-)]
-#[get("/entities")]
-pub async fn get(
-    state: web::Data<State>,
-    filters: web::Query<ListEntitiesRequest>,
-    pagination: web::Query<CursorPaginationRequest<TimestampCursor>>,
-    auth: TenantSessionAuth,
-) -> CursorPaginatedResponse<EntityListResponse, TimestampCursor> {
-    let result = inner(state, filters.into_inner(), pagination.into_inner(), auth).await?;
-    Ok(result)
-}
 
 #[derive(serde::Deserialize, paperclip::actix::Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct ListEntitiesSearchRequest {
     pub pagination: Option<CursorPaginationRequest<TimestampCursor>>,
     #[serde(flatten)]
-    pub filters: ListEntitiesRequest,
+    pub filters: SearchEntitiesRequest,
 }
 
 #[api_v2_operation(
@@ -67,32 +52,25 @@ pub struct ListEntitiesSearchRequest {
 #[post("/entities/search")]
 /// This doesn't actually have side effects despite being a POST. The request simply needs to be
 /// sent as an HTTP body since it contains PII, and many HTTP clients don't support GET with an HTTP body
-pub async fn post_search(
+pub async fn post(
     state: web::Data<State>,
     body: OptionalJson<ListEntitiesSearchRequest>,
-    auth: TenantSessionAuth,
-) -> CursorPaginatedResponse<EntityListResponse, TimestampCursor> {
-    let (pagination, filters) = if let Some(body) = body.into_inner() {
-        let ListEntitiesSearchRequest { pagination, filters } = body;
-        (pagination.unwrap_or_default(), filters)
-    } else {
-        (CursorPaginationRequest::default(), ListEntitiesRequest::default())
-    };
-    let result = inner(state, filters, pagination, auth).await?;
-    Ok(result)
-}
-
-async fn inner(
-    state: web::Data<State>,
-    filters: ListEntitiesRequest,
-    pagination: CursorPaginationRequest<TimestampCursor>,
     auth: TenantSessionAuth,
 ) -> CursorPaginatedResponse<EntityListResponse, TimestampCursor> {
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
 
+    let (pagination, filters) = if let Some(body) = body.into_inner() {
+        let ListEntitiesSearchRequest { pagination, filters } = body;
+        (pagination.unwrap_or_default(), filters)
+    } else {
+        (
+            CursorPaginationRequest::default(),
+            SearchEntitiesRequest::default(),
+        )
+    };
     let page_size = pagination.page_size(&state);
-    let ListEntitiesRequest {
+    let SearchEntitiesRequest {
         kind,
         statuses,
         requires_manual_review,

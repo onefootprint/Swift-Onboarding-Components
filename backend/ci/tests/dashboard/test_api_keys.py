@@ -207,8 +207,8 @@ def test_api_key_update(sandbox_tenant, secret_key):
     assert body["status"] == "disabled"
 
     # Verify we can't use the disabled API key for anything anymore
-    get(
-        f"entities",
+    post(
+        f"entities/search",
         None,
         secret_key.key,
         status_code=401,

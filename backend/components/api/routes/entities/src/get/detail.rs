@@ -2,7 +2,7 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
 use crate::errors::ApiError;
-use crate::get::list::decrypt_visible_attrs;
+use crate::get::search::decrypt_visible_attrs;
 use crate::get::EntityDetailResponse;
 use crate::types::JsonApiResponse;
 use crate::types::ResponseData;

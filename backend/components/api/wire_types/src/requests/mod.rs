@@ -1,5 +1,5 @@
-pub mod list_entities_request;
-pub use self::list_entities_request::*;
+pub mod search_entities_request;
+pub use self::search_entities_request::*;
 
 pub mod risk_signals;
 pub use self::risk_signals::*;
