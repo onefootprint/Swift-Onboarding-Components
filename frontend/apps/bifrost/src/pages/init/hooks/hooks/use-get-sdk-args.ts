@@ -11,6 +11,9 @@ type GetSdkArgsResponse = {
   obConfig?: PublicOnboardingConfig;
 };
 
+const extractCleanDomain = (s: string): string =>
+  s.replace(/(https?:\/\/)?(www\.)?/gi, '').split('/')[0];
+
 const getSdkArgs = async (authToken: string, fpProvider: ProviderReturn) => {
   let sdkUrl = '';
   let sdkVersion = '';
@@ -26,7 +29,8 @@ const getSdkArgs = async (authToken: string, fpProvider: ProviderReturn) => {
     url: '/org/sdk_args',
     headers: sdkVersion
       ? {
-          'x-fp-client-version': `footprint-js ${sdkVersion} ${sdkUrl}`.trim(),
+          'x-fp-client-version':
+            `footprint-js ${sdkVersion} ${extractCleanDomain(sdkUrl)}`.trim(),
           'x-fp-sdk-args-token': authToken,
         }
       : { 'x-fp-sdk-args-token': authToken },
