@@ -3,6 +3,7 @@ use crate::errors::ApiResult;
 use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
+use api_core::errors::ValidationError;
 use api_wire_types::UpdateRuleRequest;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::rule_instance::{RuleInstance, RuleInstanceUpdate};
@@ -29,6 +30,10 @@ pub async fn update_rule(
         rule_expression,
         is_shadow,
     } = request.into_inner();
+
+    if name.is_none() && rule_expression.is_none() && is_shadow.is_none() {
+        return Err(ValidationError("No field given to update").into());
+    }
 
     let rule = state
         .db_pool

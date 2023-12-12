@@ -144,6 +144,14 @@ def test_patch(sandbox_tenant, obc):
         {"field": "document_selfie_glasses", "op": "eq", "value": True}
     ]
 
+    # a patch that contains no field to update should error
+    patch(
+        f"/org/onboarding_configs/{obc.id}/rules/{rule['rule_id']}",
+        dict(),
+        *sandbox_tenant.db_auths,
+        status_code=400,
+    )
+
 
 def test_get_rule_set_result(
     sandbox_tenant, twilio, must_collect_data, live_phone_number
