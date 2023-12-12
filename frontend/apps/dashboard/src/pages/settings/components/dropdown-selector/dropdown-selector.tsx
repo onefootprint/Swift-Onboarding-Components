@@ -73,6 +73,7 @@ const Trigger = styled(Select.Trigger)`
 const ItemText = styled.div`
   ${({ theme }) => css`
     width: calc(100% - ${theme.spacing[7]});
+    white-space: pre-line;
   `}
 `;
 
