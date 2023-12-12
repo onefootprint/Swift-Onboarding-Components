@@ -1,10 +1,50 @@
 use idv::incode::doc::response::FetchOCRResponse;
 use itertools::Itertools;
-use newtypes::{PiiString, ScrubbedPiiString, IdentityDataKind, FootprintReasonCode};
+use newtypes::{PiiString, ScrubbedPiiString, IdentityDataKind, FootprintReasonCode, OcrDataKind as ODK};
 use regex::Regex;
 use levenshtein::levenshtein;
 
 use super::incode_docv::{IncodeOcrComparisonDataFields, IncodeOcrAddress};
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ParsedIncodeField {
+    pub odk: ODK, 
+    pub value: PiiString
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ParsedIncodeFields(pub Vec<ParsedIncodeField>);
+
+impl ParsedIncodeFields {
+    pub fn from_fetch_ocr_res(r: &FetchOCRResponse) -> ParsedIncodeFields {
+        // TODO: maybe we should incorporate the confidence scores in here and not vault a particular field at all if its confidence is too low?
+        
+        let pif = |odk: ODK, pii: Option<PiiString>| -> Option<ParsedIncodeField> {
+            pii.map(|value| ParsedIncodeField {
+                odk,
+                value
+            })
+        };
+
+        ParsedIncodeFields(vec![
+            pif(ODK::FullName, ParsedIncodeNames::from_fetch_ocr_res(r).full_name),
+            pif(ODK::FullAddress, ParsedIncodeAddress::from_fetch_ocr_res(r).full_address),
+            pif(ODK::Dob, r.dob().ok().map(|s| s.into())),
+            pif(ODK::ExpiresAt, r.expiration_date().ok().map(|s| s.into())),
+            pif(ODK::IssuedAt, r.issue_date().ok().map(|s| s.into())),
+            pif(ODK::IssuingCountry, r.issuing_country_two_digit().map(|s| s.into())),
+            pif(ODK::IssuingState, r.normalized_issuing_state().map(|s| s.into())),
+            pif(ODK::Gender, r.gender.clone().map(|s| s.into())),
+            pif(ODK::DocumentNumber, r.document_number.clone().map(|s| s.into())),
+            pif(ODK::RefNumber, r.ref_number.clone().map(|s| s.into())),
+            pif(ODK::Nationality, r.nationality_mrz.clone().or(r.nationality.clone()).map(|s| s.into())),
+            pif(ODK::Curp, r.curp.clone().map(|s| s.into())),
+            pif(
+                ODK::ClassifiedDocumentType, r.type_of_id.clone().map(|s| s.into())),
+        ].into_iter().flatten().collect())
+    }
+}
+
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ParsedIncodeNames {

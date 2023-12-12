@@ -2,6 +2,7 @@ use super::IncodeStateTransition;
 use super::VerificationSession;
 use crate::decision::features::incode_docv;
 use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
+use crate::decision::features::incode_utils::ParsedIncodeFields;
 use crate::decision::features::incode_utils::ParsedIncodeNames;
 use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::state::TransitionResult;
@@ -90,35 +91,16 @@ pub fn vault_complete_images(
 }
 
 fn ocr_data(r: FetchOCRResponse, dk: IdDocKind) -> Vec<(DataIdentifier, PiiString)> {
-    let di = |ocr_dk: ODK, pii: Option<ScrubbedPiiString>| -> Option<(DataIdentifier, PiiString)> {
-        pii.map(|x| (DataIdentifier::from(DocumentKind::OcrData(dk, ocr_dk)), x.into()))
-    };
-    let parsed_names = ParsedIncodeNames::from_fetch_ocr_res(&r);
-    vec![
-        di(ODK::Dob, r.dob().ok()),
-        di(ODK::ExpiresAt, r.expiration_date().ok()),
-        di(ODK::IssuedAt, r.issue_date().ok()),
-        di(ODK::IssuingCountry, r.issuing_country_two_digit()),
-        di(ODK::IssuingState, r.normalized_issuing_state()),
-        di(ODK::Gender, r.gender),
-        di(ODK::FullAddress, r.address),
-        di(ODK::DocumentNumber, r.document_number),
-        di(ODK::RefNumber, r.ref_number),
-        di(ODK::Nationality, r.nationality_mrz.or(r.nationality)),
-        di(
-            ODK::FullName,
-            // prefer MRZ decoded name to OCR, since OCR has a higher rate of whoopsies
-            parsed_names.full_name.map(ScrubbedPiiString::from),
-        ),
-        di(ODK::Curp, r.curp),
-        di(
-            ODK::ClassifiedDocumentType,
-            r.type_of_id.map(ScrubbedPiiString::from),
-        ),
-    ]
-    .into_iter()
-    .flatten()
-    .collect_vec()
+    ParsedIncodeFields::from_fetch_ocr_res(&r)
+        .0
+        .into_iter()
+        .map(|pif| {
+            (
+                DataIdentifier::from(DocumentKind::OcrData(dk, pif.odk)),
+                pif.value,
+            )
+        })
+        .collect_vec()
 }
 
 fn doc_first_id_data(r: &FetchOCRResponse, validate_args: ValidateArgs) -> Vec<(DataIdentifier, PiiString)> {
