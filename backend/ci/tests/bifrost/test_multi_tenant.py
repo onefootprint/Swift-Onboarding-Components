@@ -112,8 +112,9 @@ def test_search(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):
     """
     Make sure we can search by fields that were prefilled
     """
-    # TODO had a failure here
-    for search_query in ["piip", "penguin"]:
+    phone_number = dual_onboarded_user.user.client.data["id.phone_number"]
+    email = dual_onboarded_user.user.client.data["id.email"]
+    for search_query in [phone_number, email]:
         data = dict(search=search_query)
         # Both tenants should be able to find the user based on the search query
 
