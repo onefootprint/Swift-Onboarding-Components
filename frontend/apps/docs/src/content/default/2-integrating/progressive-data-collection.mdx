@@ -1,0 +1,119 @@
+---
+page: default
+slug: /integrate/progressive-data-collection
+category: Integrate
+title: Progressive data collection
+position: 5
+meta:
+  {
+    title: Progressive data collection,
+    description: How to progressively collect more information from your users,
+  }
+---
+
+On Footprint's admin dashboard, you are able to request additional information from a user who has already onboarded onto your service. For example, you may request an SSN card is uploaded or a driver's license is provided. By default, this will send a link to the user to allow them to complete the form.
+
+If you would prefer a more native experience to your application, you can instead embed the Footprint Verify component to complete any outstanding data requests.
+
+## Prerequisites
+
+Please read our [Server-side API Authentication guide](/integrate/api-auth).
+
+## Step 1: Check if the user has an outstanding request
+
+When the user logs into your application, check with Footprint from your backend if there's any outstanding info remaining to be collected from the user:
+
+### Example request
+
+```bash
+curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr \
+  -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
+```
+
+### Example response
+
+```json
+{
+  "id": "fp_id_K0q6Eh6Rr3WOOfFBLPiHsr",
+  "requires_manual_review": false,
+  "status": "pass",
+  "info_requested": {
+    "note": "Hi Christian, we can't wait for you to get started with your Acme Bank credit card! To finish verifying your identity, can you please submit a photo of your SSN card? Once received, we can approve your application and mail out your credit card."
+  }
+}
+```
+
+If the `info_requested` field is non-null, there is an outstanding request to collect information from this user. It will also include a human-readable note you provided in the dashboard to display to your user, which you may choose to render in your own application.
+
+If `info_requested` is null, there is no need to continue - all information has been collected from the user.
+
+You can find more info in the [API reference](/api-reference#get-users-fp-id).
+
+## Step 2: Generate an auth token for the user on your backend
+
+From your backend, using a secret API key, generate an `authToken` associated with the user's `fp_id`.
+
+### Example request
+
+```bash
+curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/token \
+  -X POST \
+  -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
+```
+
+### Example response
+
+```json
+{
+  "token": "tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0",
+  "expires_at": "2023-10-24T20:44:13.639341Z"
+}
+```
+
+You can find more info in the [API reference](/api-reference#post-users-fp-id-token).
+
+## Step 3: Pass auth token into Footprint Verify SDKs
+
+You can provide this auth token to the Footprint Verify SDK. This will ask the user to authenticate and then proceed with collecting any outstanding information. Check out the specific documentation for the SDK you're using.
+
+If you are using our React integration, you can pass the `authToken` as a prop into the `FootprintVerifyButton` component:
+
+```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import { FootprintVerifyButton } from '@onefootprint/footprint-react';
+
+const MyComponent = () => {
+  const handleComplete = (validationToken: string) => {
+    // TODO: Post to Footprint server to fetch user ID or verification status
+  };
+
+  return (
+    <FootprintVerifyButton
+      authToken='tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0'
+      onComplete={handleComplete}
+    />
+  );
+};
+
+export default MyComponent;
+```
+
+If you are using our Javascript integration, you can pass the `authToken` along with the other props into the `footprint.init` method:
+
+```javascript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import footprint from '@onefootprint/footprint-js';
+
+const handleClick = () => {
+  const component = footprint.init({
+    kind: 'verify',
+    authToken: 'tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0' // Auth token from Step 2
+    onComplete: (validationToken) => {
+      // TODO: Post to Footprint server to fetch user ID or verification status
+    }
+  });
+  component.render();
+};
+```
+
+Since you provided the playbook publishable key when creating the auth token, it cannot be provided to Footprint.js.
