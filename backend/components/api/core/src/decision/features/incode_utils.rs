@@ -6,41 +6,54 @@ use levenshtein::levenshtein;
 
 use super::incode_docv::{IncodeOcrComparisonDataFields, IncodeOcrAddress};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub struct ParsedIncodeField {
     pub odk: ODK, 
+    pub confidence: Option<f32>,
     pub value: PiiString
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub struct ParsedIncodeFields(pub Vec<ParsedIncodeField>);
 
 impl ParsedIncodeFields {
     pub fn from_fetch_ocr_res(r: &FetchOCRResponse) -> ParsedIncodeFields {
         // TODO: maybe we should incorporate the confidence scores in here and not vault a particular field at all if its confidence is too low?
         
-        let pif = |odk: ODK, pii: Option<PiiString>| -> Option<ParsedIncodeField> {
+        let pif = |odk: ODK, confidence: Option<f32>, pii: Option<PiiString>| -> Option<ParsedIncodeField> {
             pii.map(|value| ParsedIncodeField {
                 odk,
+                confidence,
                 value
             })
         };
 
+        let conf = r.ocr_data_confidence.clone();
+
+        let (nationality_conf, nationality_value) = if let Some(nationality) = r.nationality_mrz.clone() {
+            (conf.as_ref().and_then(|c| c.nationality_mrz_confidence), Some(PiiString::from(nationality)))
+        } else {
+            (conf.as_ref().and_then(|c| c.nationality_confidence), r.nationality.clone().map(PiiString::from))
+        };
+        
+
         ParsedIncodeFields(vec![
-            pif(ODK::FullName, ParsedIncodeNames::from_fetch_ocr_res(r).full_name),
-            pif(ODK::FullAddress, ParsedIncodeAddress::from_fetch_ocr_res(r).full_address),
-            pif(ODK::Dob, r.dob().ok().map(|s| s.into())),
-            pif(ODK::ExpiresAt, r.expiration_date().ok().map(|s| s.into())),
-            pif(ODK::IssuedAt, r.issue_date().ok().map(|s| s.into())),
-            pif(ODK::IssuingCountry, r.issuing_country_two_digit().map(|s| s.into())),
-            pif(ODK::IssuingState, r.normalized_issuing_state().map(|s| s.into())),
-            pif(ODK::Gender, r.gender.clone().map(|s| s.into())),
-            pif(ODK::DocumentNumber, r.document_number.clone().map(|s| s.into())),
-            pif(ODK::RefNumber, r.ref_number.clone().map(|s| s.into())),
-            pif(ODK::Nationality, r.nationality_mrz.clone().or(r.nationality.clone()).map(|s| s.into())),
-            pif(ODK::Curp, r.curp.clone().map(|s| s.into())),
+            pif(ODK::FullName, conf.as_ref().and_then(|c| c.name_confidence), ParsedIncodeNames::from_fetch_ocr_res(r).full_name),
+            pif(ODK::FullAddress, conf.as_ref().and_then(|c| c.address_confidence),ParsedIncodeAddress::from_fetch_ocr_res(r).full_address),
+            pif(ODK::Dob, conf.as_ref().and_then(|c| c.birth_date_confidence), r.dob().ok().map(|s| s.into())),
+            pif(ODK::ExpiresAt, conf.as_ref().and_then(|c| c.expire_at_confidence),r.expiration_date().ok().map(|s| s.into())),
+            pif(ODK::IssuedAt, conf.as_ref().and_then(|c| c.issued_at_confidence),r.issue_date().ok().map(|s| s.into())),
+            // TODO: seems like theres no confidence for these two..?
+            pif(ODK::IssuingCountry, None,r.issuing_country_two_digit().map(|s| s.into())),
+            pif(ODK::IssuingState, None, r.normalized_issuing_state().map(|s| s.into())),
+            pif(ODK::Gender, conf.as_ref().and_then(|c| c.gender_confidence),r.gender.clone().map(|s| s.into())),
+            pif(ODK::DocumentNumber, conf.as_ref().and_then(|c| c.document_number_confidence),r.document_number.clone().map(|s| s.into())),
+            pif(ODK::RefNumber, conf.as_ref().and_then(|c| c.ref_number_confidence),r.ref_number.clone().map(|s| s.into())),
+            // TODO: use nationality_mrz_confidence here too? also why would a MRZ field have confidence in the first place?
+            pif(ODK::Nationality, nationality_conf, nationality_value),
+            pif(ODK::Curp, conf.as_ref().and_then(|c| c.curp_confidence),r.curp.clone().map(|s| s.into())),
             pif(
-                ODK::ClassifiedDocumentType, r.type_of_id.clone().map(|s| s.into())),
+                ODK::ClassifiedDocumentType, None,r.type_of_id.clone().map(|s| s.into())),
         ].into_iter().flatten().collect())
     }
 }
