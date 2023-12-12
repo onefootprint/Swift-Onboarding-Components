@@ -115,6 +115,7 @@ pub struct Contact {
 
 impl Contact {
     pub fn try_from(d: IdvData, is_production: bool) -> Result<Contact, ConversionError> {
+        let state_and_country = d.state_and_country_for_vendors();
         let IdvData {
             first_name,
             middle_name: _,
@@ -122,9 +123,9 @@ impl Contact {
             address_line1,
             address_line2,
             city,
-            state,
+            state: _,
             zip,
-            country,
+            country: _,
             // TODO figure out how to send this? prob a doc type enum
             ssn4,
             // TODO: was getting invalid errors when testing this when optional, so figure out if required
@@ -177,8 +178,8 @@ impl Contact {
             street2: address_line2,
             post_town: normalized_city,
             postal: zip,
-            state_province_code: state,
-            country_code: country,
+            state_province_code: state_and_country.state,
+            country_code: state_and_country.country,
         };
 
         let emails = if is_production {

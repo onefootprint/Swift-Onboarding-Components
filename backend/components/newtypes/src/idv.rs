@@ -1,4 +1,9 @@
-use crate::{BusinessOwnerData, IdentityDataKind, PiiString, VerificationRequestId, DATE_FORMAT};
+use std::str::FromStr;
+
+use crate::{
+    BusinessOwnerData, IdentityDataKind, Iso3166TwoDigitCountryCode, PiiString, VerificationRequestId,
+    DATE_FORMAT,
+};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
@@ -75,6 +80,36 @@ impl IdvData {
     pub fn get_normalized(&self, idk: IdentityDataKind) -> Option<PiiString> {
         self.get(idk).map(|p| p.leak().trim().to_lowercase().into())
     }
+
+    pub fn state_and_country_for_vendors(&self) -> IdvDataStateAndCountry {
+        // For some vendors, they expect US territory country codes to be sent in the "state" field but US territory code is vaulted in `id.country`
+        if self
+            .country
+            .as_ref()
+            .and_then(|c| Iso3166TwoDigitCountryCode::from_str(c.leak()).ok())
+            .is_some_and(|code| code.is_us_territory())
+        {
+            if self.state.is_some() {
+                // error so we can check nothing changed on the FE<>BE impl since we don't expect this
+                tracing::error!(verification_request_id=?self.verification_request_id, "state provided for US territory");
+            }
+            IdvDataStateAndCountry {
+                state: self.country.clone(),
+                country: Some(Iso3166TwoDigitCountryCode::US.to_string().into()),
+            }
+        } else {
+            IdvDataStateAndCountry {
+                state: self.state.clone(),
+                country: self.country.clone(),
+            }
+        }
+    }
+}
+
+#[derive(PartialEq, Eq, Clone, Debug)]
+pub struct IdvDataStateAndCountry {
+    pub state: Option<PiiString>,
+    pub country: Option<PiiString>,
 }
 
 // KYB analogs of IdvData, still TBD and subject to change
@@ -105,5 +140,23 @@ impl From<BusinessOwnerData> for BoData {
             first_name: value.first_name,
             last_name: value.last_name,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test_case::test_case;
+
+    #[test_case("US" => IdvDataStateAndCountry {state: Some("NY".into()), country: Some("US".into())})]
+    #[test_case("PR" => IdvDataStateAndCountry {state: Some("PR".into()), country: Some("US".into())}; "sending PR country puts PR into state instead of country")]
+    fn test_state_and_country_for_vendors(country: &str) -> IdvDataStateAndCountry {
+        let idv_data = IdvData {
+            country: Some(country.into()),
+            state: Some("NY".into()),
+            ..Default::default()
+        };
+
+        idv_data.state_and_country_for_vendors()
     }
 }

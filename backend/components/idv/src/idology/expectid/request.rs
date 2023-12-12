@@ -30,6 +30,7 @@ pub(crate) struct RequestData {
 
 impl RequestData {
     pub fn try_from(d: IdvData, tenant_identifier: String) -> Result<Self, IdologyError::ConversionError> {
+        let state_and_country = d.state_and_country_for_vendors();
         let IdvData {
             first_name,
             middle_name: _, // Idology doesn't utilize middle name
@@ -37,7 +38,7 @@ impl RequestData {
             address_line1,
             address_line2, // TODO
             city,
-            state,
+            state: _,
             zip,
             country: _,
             ssn4,
@@ -53,6 +54,7 @@ impl RequestData {
             .ok_or(IdologyError::ConversionError::MissingLastName)?
             .map(crate::elongate_if_single_letter);
         let address = address_line1.ok_or(IdologyError::ConversionError::MissingAddress)?; // TODO
+                                                                                           // We need to send US territory in the state field
         let (dob_month, dob_year, dob_day) = if let Some(dob) = dob {
             let dob = NaiveDate::parse_from_str(dob.leak(), "%Y-%m-%d")
                 .map_err(|_| IdologyError::ConversionError::CantParseDob)?;
@@ -71,7 +73,7 @@ impl RequestData {
             address,
             address2: address_line2,
             city,
-            state,
+            state: state_and_country.state,
             zip,
             ssn_last4: ssn4,
             ssn: ssn9,
