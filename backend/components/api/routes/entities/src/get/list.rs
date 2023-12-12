@@ -11,6 +11,7 @@ use crate::State;
 use api_core::auth::tenant::TenantAuth;
 use api_core::errors::AssertionError;
 use api_core::types::CursorPaginatedResponseInner;
+use api_core::utils::actix::OptionalJson;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::search_utils::parse_search;
 use api_core::utils::vault_wrapper::bulk_decrypt;
@@ -68,10 +69,15 @@ pub struct ListEntitiesSearchRequest {
 /// sent as an HTTP body since it contains PII, and many HTTP clients don't support GET with an HTTP body
 pub async fn post_search(
     state: web::Data<State>,
-    body: web::Json<ListEntitiesSearchRequest>,
+    body: OptionalJson<ListEntitiesSearchRequest>,
     auth: TenantSessionAuth,
 ) -> CursorPaginatedResponse<EntityListResponse, TimestampCursor> {
-    let ListEntitiesSearchRequest { pagination, filters } = body.into_inner();
+    let (pagination, filters) = if let Some(body) = body.into_inner() {
+        let ListEntitiesSearchRequest { pagination, filters } = body;
+        (pagination, filters)
+    } else {
+        (CursorPaginationRequest::default(), ListEntitiesRequest::default())
+    };
     let result = inner(state, filters, pagination, auth).await?;
     Ok(result)
 }

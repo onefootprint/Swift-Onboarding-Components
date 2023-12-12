@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "ba9b01d5b218b95931fa3c2a170b838473f18420"
+        "version": "6a40fd12bdaa150ed8d72bbc2221aba5f72bfbbd"
     },
     "servers": [
         {
@@ -685,6 +685,73 @@
                 "security": [
                     {
                         "Client Token": []
+                    }
+                ]
+            }
+        },
+        "/entities/search": {
+            "post": {
+                "tags": [
+                    "Entities",
+                    "Private"
+                ],
+                "summary": "This doesn't actually have side effects despite being a POST. The request simply needs to be sent as an HTTP body since it contains PII, and many HTTP clients don't support GET with an HTTP body",
+                "description": "View list of entities (business or user) that have started onboarding to the tenant.",
+                "requestBody": {
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ListEntitiesSearchRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "",
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Entity"
+                                            }
+                                        },
+                                        "meta": {
+                                            "description": "Metadata required for a cursor-paginated response.",
+                                            "type": "object",
+                                            "properties": {
+                                                "count": {
+                                                    "example": 10000,
+                                                    "description": "The total number of results",
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "next": {
+                                                    "example": 1234,
+                                                    "description": "The cursor to be provided in the next request to fetch the next page\n The `cursor` parameter to provide in order to request the next page of results",
+                                                    "type": "integer"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
                     }
                 ]
             }
@@ -15053,6 +15120,76 @@
                 "required": [
                     "email_address",
                     "redirect_url"
+                ]
+            },
+            "ListEntitiesSearchRequest": {
+                "type": "object",
+                "properties": {
+                    "has_outstanding_workflow_request": {
+                        "type": "boolean"
+                    },
+                    "is_created_via_api": {
+                        "type": "boolean"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "person",
+                            "business"
+                        ]
+                    },
+                    "pagination": {
+                        "description": "Contains all of the fields that are passed in the querystring for a cursor-paginated request.\n Cursor pagination requests take in a cursor that identifies the start of the page (and is\n delivered by the last pagination request) using an ordered field.\n This is more performant, but doesn't give any insight into how far you have paginated through\n the results and requires the cursor field to have a _total_ ordering (partial does not work).\n But, results stay consistent as new results are added to earlier pages.\n Can be used alongside another actix web::Query extractor",
+                        "type": "object",
+                        "properties": {
+                            "cursor": {
+                                "example": 12345,
+                                "type": "integer"
+                            },
+                            "page_size": {
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        }
+                    },
+                    "requires_manual_review": {
+                        "type": "boolean"
+                    },
+                    "search": {
+                        "type": "string"
+                    },
+                    "show_all": {
+                        "description": "When true, shows hidden incomplete vaults that didn't complete a signup challenge",
+                        "type": "boolean"
+                    },
+                    "statuses": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "pass",
+                                "fail",
+                                "incomplete",
+                                "pending",
+                                "none"
+                            ]
+                        }
+                    },
+                    "timestamp_gte": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "timestamp_lte": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "watchlist_hit": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "pagination",
+                    "statuses"
                 ]
             },
             "LivenessEvent": {

@@ -2,7 +2,7 @@ use newtypes::input::deserialize_stringified_list;
 
 use crate::*;
 
-#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
+#[derive(Default, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct ListEntitiesRequest {
     pub kind: Option<VaultKind>,
