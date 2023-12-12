@@ -71,6 +71,7 @@ const sendSdkArgsRecursive = async (
 
 const sendSdkArgs = async ({
   publicKey,
+  authToken,
   userData,
   options,
   l10n,
@@ -80,6 +81,7 @@ const sendSdkArgs = async ({
       kind: 'verify_v1',
       data: convertKeysToSnakeCase({
         publicKey,
+        authToken,
         userData,
         options,
         l10n,
