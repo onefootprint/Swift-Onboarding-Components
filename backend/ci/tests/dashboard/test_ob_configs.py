@@ -306,10 +306,10 @@ def test_config_create(sandbox_tenant, twilio):
                 optional_data=[],
                 can_access_data=[],
                 allow_international_residents=True,
-                allow_us_territory_residents=True,
+                allow_us_territories=True,
                 allow_us_residents=True,
             ),
-            "Validation error: Specifying allow_us_territory_residents with allow_international_residents is redundant",
+            "Validation error: Specifying allow_us_territories with allow_international_residents is redundant",
         ),
     ],
 )

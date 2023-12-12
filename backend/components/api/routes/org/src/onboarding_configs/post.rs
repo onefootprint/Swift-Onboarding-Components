@@ -45,7 +45,7 @@ pub struct CreateOnboardingConfigurationRequest {
     // TODO: drop this option
     allow_us_residents: Option<bool>,
     // TODO: drop this option
-    allow_us_territory_residents: Option<bool>,
+    allow_us_territories: Option<bool>,
     kind: Option<ObConfigurationKind>,
     skip_confirm: Option<bool>,
 }
@@ -317,13 +317,12 @@ impl CreateOnboardingConfigurationRequest {
             }
         }
 
-        if self.allow_us_territory_residents == Some(true)
+        if self.allow_us_territories == Some(true)
             && self.international_country_restrictions.is_none()
             && self.allow_international_residents
         {
             return Err(TenantError::ValidationError(
-                "Specifying allow_us_territory_residents with allow_international_residents is redundant"
-                    .to_owned(),
+                "Specifying allow_us_territories with allow_international_residents is redundant".to_owned(),
             )
             .into());
         }
@@ -421,7 +420,7 @@ pub async fn post(
         doc_scan_for_optional_ssn,
         enhanced_aml,
         allow_us_residents,
-        allow_us_territory_residents,
+        allow_us_territories,
         kind,
         skip_confirm,
     } = request.clone();
@@ -487,7 +486,7 @@ pub async fn post(
                 enhanced_aml,
                 // TODO: remove these once frontend is merged
                 allow_us_residents.unwrap_or(true),
-                allow_us_territory_residents.unwrap_or(false),
+                allow_us_territories.unwrap_or(false),
                 kind,
                 skip_kyb,
                 skip_confirm.unwrap_or(false),
@@ -596,7 +595,7 @@ mod test {
             doc_scan_for_optional_ssn: None,
             enhanced_aml: Some(EnhancedAml::default()),
             allow_us_residents: Some(true),
-            allow_us_territory_residents: Some(false),
+            allow_us_territories: Some(false),
             kind: Some(ObConfigurationKind::Kyc),
             skip_confirm: None,
         };
@@ -626,7 +625,7 @@ mod test {
             doc_scan_for_optional_ssn: None,
             enhanced_aml: Some(EnhancedAml::default()),
             allow_us_residents: Some(true),
-            allow_us_territory_residents: Some(false),
+            allow_us_territories: Some(false),
             kind: Some(ObConfigurationKind::Kyc),
             skip_confirm: None,
         };
@@ -655,7 +654,7 @@ mod test {
             doc_scan_for_optional_ssn: None,
             enhanced_aml: Some(EnhancedAml::default()),
             allow_us_residents: Some(true),
-            allow_us_territory_residents: Some(false),
+            allow_us_territories: Some(false),
             kind: Some(ObConfigurationKind::Kyc),
             skip_confirm: None,
         };
@@ -680,7 +679,7 @@ mod test {
             doc_scan_for_optional_ssn: None,
             enhanced_aml: Some(EnhancedAml::default()),
             allow_us_residents: Some(true),
-            allow_us_territory_residents: Some(false),
+            allow_us_territories: Some(false),
             kind: Some(ObConfigurationKind::Kyc),
             skip_confirm: None,
         };
