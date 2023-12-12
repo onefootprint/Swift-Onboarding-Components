@@ -30,6 +30,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(client_token::get::get)
         .service(get::detail::get)
         .service(get::list::get)
+        .service(get::list::post_search)
         .service(annotations::get)
         .service(annotations::patch)
         .service(annotations::post)

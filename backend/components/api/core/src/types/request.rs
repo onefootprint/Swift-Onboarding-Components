@@ -21,6 +21,15 @@ pub struct CursorPaginationRequest<C> {
 
 const MAX_PAGE_SIZE: usize = 100;
 
+impl<C> Default for CursorPaginationRequest<C> {
+    fn default() -> Self {
+        Self {
+            cursor: None,
+            page_size: None,
+        }
+    }
+}
+
 impl<C> CursorPaginationRequest<C> {
     pub fn page_size(&self, state: &web::Data<State>) -> usize {
         if let Some(page_size) = self.page_size {

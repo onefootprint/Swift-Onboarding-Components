@@ -33,7 +33,7 @@ use newtypes::IdentityDataKind as IDK;
 use newtypes::ScopedVaultCursorKind;
 use newtypes::ScopedVaultId;
 use newtypes::TimestampCursor;
-use paperclip::actix::{api_v2_operation, get, web};
+use paperclip::actix::{api_v2_operation, get, post, web};
 use std::collections::HashMap;
 
 #[api_v2_operation(
@@ -45,6 +45,41 @@ pub async fn get(
     state: web::Data<State>,
     filters: web::Query<ListEntitiesRequest>,
     pagination: web::Query<CursorPaginationRequest<TimestampCursor>>,
+    auth: TenantSessionAuth,
+) -> CursorPaginatedResponse<EntityListResponse, TimestampCursor> {
+    let result = inner(state, filters.into_inner(), pagination.into_inner(), auth).await?;
+    Ok(result)
+}
+
+#[derive(serde::Deserialize, paperclip::actix::Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct ListEntitiesSearchRequest {
+    pub pagination: CursorPaginationRequest<TimestampCursor>,
+    #[serde(flatten)]
+    pub filters: ListEntitiesRequest,
+}
+
+#[api_v2_operation(
+    description = "View list of entities (business or user) that have started onboarding to the tenant.",
+    tags(Entities, Private)
+)]
+#[post("/entities/search")]
+/// This doesn't actually have side effects despite being a POST. The request simply needs to be
+/// sent as an HTTP body since it contains PII, and many HTTP clients don't support GET with an HTTP body
+pub async fn post_search(
+    state: web::Data<State>,
+    body: web::Json<ListEntitiesSearchRequest>,
+    auth: TenantSessionAuth,
+) -> CursorPaginatedResponse<EntityListResponse, TimestampCursor> {
+    let ListEntitiesSearchRequest { pagination, filters } = body.into_inner();
+    let result = inner(state, filters, pagination, auth).await?;
+    Ok(result)
+}
+
+async fn inner(
+    state: web::Data<State>,
+    filters: ListEntitiesRequest,
+    pagination: CursorPaginationRequest<TimestampCursor>,
     auth: TenantSessionAuth,
 ) -> CursorPaginatedResponse<EntityListResponse, TimestampCursor> {
     let auth = auth.check_guard(TenantGuard::Read)?;
@@ -62,7 +97,7 @@ pub async fn get(
         show_all,
         is_created_via_api,
         has_outstanding_workflow_request,
-    } = filters.into_inner();
+    } = filters;
     let cursor = pagination.cursor.as_ref().map(|c| c.into());
 
     let (search, fp_id) = parse_search(&state, search, &tenant.id).await?;
