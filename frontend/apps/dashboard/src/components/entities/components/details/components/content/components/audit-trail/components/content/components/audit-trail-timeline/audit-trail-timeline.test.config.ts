@@ -142,6 +142,7 @@ const TimelineFixture: Timeline = [
           kind: ActorKind.organization,
           member: 'Piip Penguin (piip@onefootprint.com)',
         },
+        note: 'Hello today, please upload your flerpderp',
       },
     },
     timestamp: '2022-11-08T20:21:53.771495Z',

@@ -102,6 +102,7 @@ export type WorkflowTriggeredEventData = {
     isDeactivated: boolean;
   };
   actor: Actor;
+  note?: string;
 };
 
 export type WorkflowTriggeredEvent = {

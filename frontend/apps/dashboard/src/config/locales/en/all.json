@@ -1325,12 +1325,13 @@
           },
           "workflow-triggered-event": {
             "requested-user-to": "requested user to {{action}}",
+            "with-note": " with a note",
             "actions": {
               "id_document": "upload ID photo",
               "redo_kyc": "revise KYC data",
               "proof_of_ssn": "provide proof of SSN"
             },
-            "link-sent": "Link sent to user",
+            "link-sent": "User received a link to complete this task",
             "copy-link": "Copy link",
             "tooltip": {
               "copied": "Copied!",

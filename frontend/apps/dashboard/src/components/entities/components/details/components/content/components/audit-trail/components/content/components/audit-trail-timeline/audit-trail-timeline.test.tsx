@@ -102,12 +102,19 @@ describe('<AuditTrailTimeline />', () => {
         screen.getByText('Piip Penguin (piip@onefootprint.com)'),
       ).toBeInTheDocument();
       expect(
-        screen.getByText('requested user to upload ID photo'),
+        screen.getByText('requested user to upload ID photo with a note'),
+      ).toBeInTheDocument();
+
+      const note = screen.getByTestId('workflow-triggered-event-body-note');
+      expect(
+        within(note).getByText('"Hello today, please upload your flerpderp"'),
       ).toBeInTheDocument();
 
       const body = screen.getByTestId('workflow-triggered-event-body');
       expect(body).toBeInTheDocument();
-      expect(within(body).getByText('Link sent to user')).toBeInTheDocument();
+      expect(
+        within(body).getByText('User received a link to complete this task'),
+      ).toBeInTheDocument();
       expect(within(body).queryByText('Copy link')).not.toBeInTheDocument();
     });
 
@@ -130,7 +137,9 @@ describe('<AuditTrailTimeline />', () => {
 
         const body = screen.getByTestId('workflow-triggered-event-body');
         expect(body).toBeInTheDocument();
-        expect(within(body).getByText('Link sent to user')).toBeInTheDocument();
+        expect(
+          within(body).getByText('User received a link to complete this task'),
+        ).toBeInTheDocument();
         const copyButton = within(body).getByText('Copy link');
         expect(copyButton).toBeInTheDocument();
 

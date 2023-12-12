@@ -56,7 +56,10 @@ import {
   WatchlistCheckEventHeader,
   WatchlistCheckEventIcon,
 } from './components/watchlist-check-event';
-import WorkflowTriggeredEventBody from './components/workflow-triggered-event';
+import {
+  WorkflowTriggeredEventBody,
+  WorkflowTriggeredEventHeader,
+} from './components/workflow-triggered-event';
 import type { AuditTrailTimelineEvent } from './utils/merge-audit-trail-timeline-events';
 import mergeAuditTrailTimelineEvents from './utils/merge-audit-trail-timeline-events';
 
@@ -163,24 +166,10 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       });
     } else if (kind === TimelineEventKind.workflowTriggered) {
       const eventData = data as WorkflowTriggeredEventData;
-      const workflowKind = eventData.workflow.kind;
-      const action = t(
-        `timeline.workflow-triggered-event.actions.${workflowKind}`,
-      );
       items.push({
         time,
         iconComponent: <IcoWriting16 />,
-        headerComponent: (
-          <>
-            <Actor actor={eventData.actor} />
-            &nbsp;
-            <Typography variant="body-3">
-              {t('timeline.workflow-triggered-event.requested-user-to', {
-                action,
-              })}
-            </Typography>
-          </>
-        ),
+        headerComponent: <WorkflowTriggeredEventHeader data={eventData} />,
         bodyComponent: (
           <WorkflowTriggeredEventBody data={eventData} entityId={entity.id} />
         ),

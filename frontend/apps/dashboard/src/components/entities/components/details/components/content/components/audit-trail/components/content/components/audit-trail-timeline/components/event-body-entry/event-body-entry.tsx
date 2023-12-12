@@ -8,7 +8,7 @@ import React from 'react';
 type EventBodyEntryProps = {
   content: string | JSX.Element;
   testID?: string;
-  iconComponent?: Icon;
+  iconComponent?: Icon | null;
   iconColor?: Color;
   lineHeight?: 'default' | 'large';
 };
@@ -21,9 +21,11 @@ const EventBodyEntry = ({
   lineHeight = 'large',
 }: EventBodyEntryProps) => (
   <Stack align="flex-start" justify="flex-start">
-    <IconBounds data-height={lineHeight}>
-      <IconComponent color={iconColor} />
-    </IconBounds>
+    {IconComponent && (
+      <IconBounds data-height={lineHeight}>
+        <IconComponent color={iconColor} />
+      </IconBounds>
+    )}
     <Content data-testid={testID} data-height={lineHeight}>
       {content}
     </Content>
@@ -32,7 +34,6 @@ const EventBodyEntry = ({
 
 const IconBounds = styled.div`
   ${({ theme }) => css`
-    margin-right: ${theme.spacing[3]};
     margin-left: ${theme.spacing[3]};
     display: flex;
     justify-content: center;
@@ -49,26 +50,29 @@ const IconBounds = styled.div`
 `;
 
 const Content = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-
-  & > * {
+  ${({ theme }) => css`
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
     align-items: center;
     justify-content: flex-start;
-  }
+    margin-left: ${theme.spacing[3]};
 
-  &[data-height='large'] {
-    min-height: 26px;
-  }
+    & > * {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start;
+    }
 
-  &[data-height='default'] {
-    min-height: 20px;
-  }
+    &[data-height='large'] {
+      min-height: 26px;
+    }
+
+    &[data-height='default'] {
+      min-height: 20px;
+    }
+  `}
 `;
 
 export default EventBodyEntry;

@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoInfo16 } from '@onefootprint/icons';
 import type { WorkflowTriggeredEventData } from '@onefootprint/types';
-import { LinkButton, Stack, Tooltip, Typography } from '@onefootprint/ui';
+import { Box, LinkButton, Stack, Tooltip, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import EventBodyEntry from '../event-body-entry';
@@ -70,42 +71,65 @@ const WorkflowTriggeredEventBody = ({
   };
 
   return (
-    <EventBodyEntry
-      content={
-        <Stack gap={2}>
-          <Typography variant="body-3" as="span" sx={{ marginRight: 1 }}>
-            {t('link-sent')}
-          </Typography>
-          {shouldShowCopyButton && (
-            <>
-              <Stack
-                align="center"
-                justify="center"
-                marginLeft={2}
-                marginRight={2}
-              >
-                ·
-              </Stack>
-              <Tooltip
-                position="right"
-                alignment="center"
-                text={confirmationTooltipMessage || ''}
-                open={!!confirmationTooltipMessage}
-              >
-                <LinkButton
-                  size="compact"
-                  onClick={generateLinkAndCopyToClipboard}
-                  disabled={generateTriggerLink.isLoading}
+    <Stack gap={3} direction="column">
+      {data.note && (
+        <EventBodyEntry
+          testID="workflow-triggered-event-body-note"
+          iconComponent={null}
+          content={
+            <Box
+              backgroundColor="secondary"
+              borderRadius="default"
+              paddingLeft={3}
+              paddingRight={3}
+              paddingTop={2}
+              paddingBottom={2}
+            >
+              <Typography variant="body-3" color="secondary">
+                {`"${data.note}"`}
+              </Typography>
+            </Box>
+          }
+        />
+      )}
+      <EventBodyEntry
+        iconComponent={IcoInfo16}
+        testID="workflow-triggered-event-body"
+        content={
+          <Stack gap={2}>
+            <Typography variant="body-3" as="span" sx={{ marginRight: 1 }}>
+              {t('link-sent')}
+            </Typography>
+            {shouldShowCopyButton && (
+              <>
+                <Stack
+                  align="center"
+                  justify="center"
+                  marginLeft={2}
+                  marginRight={2}
                 >
-                  {t('copy-link')}
-                </LinkButton>
-              </Tooltip>
-            </>
-          )}
-        </Stack>
-      }
-      testID="workflow-triggered-event-body"
-    />
+                  ·
+                </Stack>
+                <Tooltip
+                  position="right"
+                  alignment="center"
+                  text={confirmationTooltipMessage || ''}
+                  open={!!confirmationTooltipMessage}
+                >
+                  <LinkButton
+                    size="compact"
+                    onClick={generateLinkAndCopyToClipboard}
+                    disabled={generateTriggerLink.isLoading}
+                  >
+                    {t('copy-link')}
+                  </LinkButton>
+                </Tooltip>
+              </>
+            )}
+          </Stack>
+        }
+      />
+    </Stack>
   );
 };
 
