@@ -15,15 +15,18 @@ import useFilters from '../../../../hooks/use-filters';
 
 const getEntities = async (
   authHeaders: AuthHeaders,
-  params: GetEntitiesRequest,
+  req: GetEntitiesRequest,
 ) => {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const { cursor, page_size, ...filters } = req;
+  const data = { pagination: { cursor, page_size }, ...filters };
   const { data: response } = await request<
     PaginatedRequestResponse<GetEntitiesResponse>
   >({
-    method: 'GET',
-    url: '/entities',
+    method: 'POST',
+    url: '/entities/search',
     headers: authHeaders,
-    params,
+    data,
   });
 
   return response;

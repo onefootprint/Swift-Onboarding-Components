@@ -112,8 +112,8 @@ export const obConfigsFixture: GetOnboardingConfigsResponse = [
 
 export const withEntities = (response: Entity[] = entitiesFixture) =>
   mockRequest({
-    method: 'get',
-    path: '/entities',
+    method: 'post',
+    path: '/entities/search',
     response: {
       data: response,
       meta: {},
@@ -122,8 +122,8 @@ export const withEntities = (response: Entity[] = entitiesFixture) =>
 
 export const withEntitiesError = () =>
   mockRequest({
-    method: 'get',
-    path: '/entities',
+    method: 'post',
+    path: '/entities/search',
     statusCode: 400,
     response: {
       error: {
@@ -134,8 +134,8 @@ export const withEntitiesError = () =>
 
 export const withOnboardingConfigs = (response = obConfigsFixture) =>
   mockRequest({
-    method: 'get',
-    path: '/org/onboarding_configs',
+    method: 'post',
+    path: '/entities/search',
     response: {
       data: response,
       meta: {

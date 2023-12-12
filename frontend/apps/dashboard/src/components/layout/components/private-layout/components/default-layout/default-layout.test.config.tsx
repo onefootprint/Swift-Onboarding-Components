@@ -41,7 +41,7 @@ export const withOrgAuthRoles = () =>
 
 export const withEntities = () =>
   mockRequest({
-    method: 'get',
-    path: '/entities',
+    method: 'post',
+    path: '/entities/search',
     response: { data: [] },
   });

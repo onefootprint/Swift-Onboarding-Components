@@ -53,8 +53,8 @@ export const getOrgAuthRoleFixture: GetAuthRoleResponse = [
 
 export const withEntities = (response: Entity[] = entitiesFixture) =>
   mockRequest({
-    method: 'get',
-    path: '/entities',
+    method: 'post',
+    path: '/entities/search',
     response: {
       data: response,
       meta: {},

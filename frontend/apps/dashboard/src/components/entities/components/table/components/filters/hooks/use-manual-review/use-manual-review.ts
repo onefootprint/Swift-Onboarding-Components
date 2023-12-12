@@ -9,10 +9,10 @@ const getManualReview = async (authHeaders: AuthHeaders) => {
   const { data: response } = await request<
     PaginatedRequestResponse<GetEntitiesResponse>
   >({
-    method: 'GET',
-    url: '/entities',
+    method: 'POST',
+    url: '/entities/search',
     headers: authHeaders,
-    params: { requiresManualReview: true, kind: 'person' },
+    data: { requiresManualReview: true, kind: 'person' },
   });
 
   return response;

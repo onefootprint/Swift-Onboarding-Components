@@ -79,21 +79,26 @@ const useFilters = () => {
     verification: filters.query.verification,
     cursor: queryToArray(filters.query.cursor),
     dateRange: queryToArray(filters.query.date_range),
-    pageSize: filters.query.page_size || '15',
+    pageSize: filters.query.page_size
+      ? parseInt(filters.query.page_size, 10)
+      : 15,
     search: filters.query.search,
     watchlist_hit: filters.query.watchlist_hit,
     has_outstanding_workflow_request:
       filters.query.has_outstanding_workflow_request,
   };
   const { from, to } = getDateRange(values.dateRange);
+  const lastCursor = last(values.cursor);
   const requestParams = {
-    cursor: last(values.cursor),
+    cursor: lastCursor ? parseInt(lastCursor, 10) : undefined,
     search: values.search,
     page_size: values.pageSize,
     timestamp_gte: from,
     timestamp_lte: to,
-    watchlist_hit: values.watchlist_hit,
-    has_outstanding_workflow_request: values.has_outstanding_workflow_request,
+    watchlist_hit: parseBool(values.watchlist_hit),
+    has_outstanding_workflow_request: parseBool(
+      values.has_outstanding_workflow_request,
+    ),
     ...getStatusAndManualReviewParams(values.state, values.verification),
   };
   const searchParams = getSearchParams({
@@ -116,3 +121,6 @@ const useFilters = () => {
 };
 
 export default useFilters;
+
+const parseBool = (value: string | undefined) =>
+  value ? value === 'true' : undefined;
