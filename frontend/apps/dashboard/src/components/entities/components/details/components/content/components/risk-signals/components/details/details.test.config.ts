@@ -1,8 +1,85 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import type { AmlDetail, RiskSignal } from '@onefootprint/types';
-import { RiskSignalAttribute, RiskSignalSeverity } from '@onefootprint/types';
+import type { AmlDetail, Entity, RiskSignal } from '@onefootprint/types';
+import {
+  EntityKind,
+  EntityStatus,
+  IdDI,
+  RiskSignalAttribute,
+  RiskSignalSeverity,
+} from '@onefootprint/types';
 
 export const entityIdFixture = 'fp_id_yCZehsWNeywHnk5JqL20u';
+
+const attributesFixture = [
+  IdDI.email,
+  IdDI.firstName,
+  IdDI.lastName,
+  IdDI.country,
+  IdDI.addressLine1,
+  IdDI.dob,
+  IdDI.state,
+  IdDI.city,
+  IdDI.zip,
+];
+
+export const entityFixture: Entity = {
+  id: entityIdFixture,
+  isPortable: true,
+  kind: EntityKind.person,
+  requiresManualReview: false,
+  status: EntityStatus.pass,
+  attributes: attributesFixture,
+  data: attributesFixture.map(di => {
+    if (di === IdDI.lastName) {
+      return {
+        identifier: IdDI.lastName,
+        is_decryptable: true,
+        source: 'hosted',
+        transforms: { prefix_1: 'S' },
+        value: null,
+      };
+    }
+    if (di === IdDI.firstName) {
+      return {
+        identifier: IdDI.firstName,
+        is_decryptable: true,
+        source: 'hosted',
+        transforms: {},
+        value: 'John',
+      };
+    }
+    return {
+      identifier: di,
+      is_decryptable: true,
+      source: 'hosted',
+      transforms: {},
+      value: null,
+    };
+  }),
+  decryptableAttributes: attributesFixture,
+  startTimestamp: '2023-03-29T23:07:44.435194Z',
+  lastActivityAt: '2023-10-08T22:43:11.928846Z',
+  insightEvent: {
+    timestamp: '2023-03-29T23:07:46.850237Z',
+    ipAddress: '73.222.157.30',
+    city: 'San Francisco',
+    country: 'United States',
+    region: 'CA',
+    regionName: 'California',
+    latitude: 37.7595,
+    longitude: -122.4367,
+    metroCode: '807',
+    postalCode: '94114',
+    timeZone: 'America/Los_Angeles',
+    userAgent:
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
+  },
+  decryptedAttributes: {
+    // [BusinessDI.name]: 'Acme Inc.',
+  },
+  watchlistCheck: null,
+  hasOutstandingWorkflowRequest: false,
+};
 
 export const riskSignalDetailsFixture: RiskSignal = {
   id: 'sig_ryxauTlDX8hIm3wVRmm',
@@ -18,7 +95,7 @@ export const riskSignalDetailsFixture: RiskSignal = {
 };
 
 export const riskSignalDetailsWithAmlFixture: RiskSignal = {
-  id: 'sig_qaJe8ZAxXAfgVORoShZY5F',
+  id: 'sig_ryxauTlDX8hIm3wVRmm',
   onboardingDecisionId: '',
   note: 'Adverse media hit',
   description: 'A strong potential match with adverse media found',
@@ -86,9 +163,20 @@ export const withRiskSignalDetailsError = () =>
     },
   });
 
-export const withRiskSignalAmlHits = (aml: AmlDetail = amlDetailFixture) =>
+export const withDecryptRiskSignalAmlHits = (
+  aml: AmlDetail = amlDetailFixture,
+) =>
   mockRequest({
     method: 'post',
-    path: '/entities/fp_id_yCZehsWNeywHnk5JqL20u/decrypt_aml_hits/sig_qaJe8ZAxXAfgVORoShZY5F',
+    path: '/entities/fp_id_yCZehsWNeywHnk5JqL20u/decrypt_aml_hits/sig_ryxauTlDX8hIm3wVRmm',
     response: aml,
+  });
+
+export const withEntity = (entity = entityFixture) =>
+  mockRequest({
+    method: 'get',
+    path: `/entities/${entity.id}`,
+    response: {
+      ...entity,
+    },
   });

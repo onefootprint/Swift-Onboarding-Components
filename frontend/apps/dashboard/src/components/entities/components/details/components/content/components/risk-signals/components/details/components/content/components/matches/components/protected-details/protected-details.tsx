@@ -2,22 +2,35 @@ import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoShield40 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
+import { type Entity, IdDI } from '@onefootprint/types';
 import { Button, LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 type ProtectedDetailsProps = {
-  canDecrypt: boolean;
+  entity: Entity;
   onClick: () => void;
   isLoading: boolean;
 };
 
+const REQUIRED_DECRYPTABLE_ATTRS = [
+  IdDI.firstName,
+  IdDI.middleName,
+  IdDI.lastName,
+  IdDI.dob,
+];
+
 const ProtectedDetails = ({
-  canDecrypt,
+  entity,
   onClick,
   isLoading,
 }: ProtectedDetailsProps) => {
   const { t } = useTranslation(
     'pages.entity.risk-signals.details.matches.protected-details',
+  );
+  const canDecrypt = REQUIRED_DECRYPTABLE_ATTRS.every(
+    di =>
+      !entity.attributes.includes(di) ||
+      entity.decryptableAttributes.includes(di),
   );
 
   return (

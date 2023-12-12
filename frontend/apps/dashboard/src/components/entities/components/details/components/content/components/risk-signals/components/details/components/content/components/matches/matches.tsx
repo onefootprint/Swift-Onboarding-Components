@@ -2,7 +2,6 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoArrowRightSmall16, IcoCopy16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { AmlHit, AmlHitMedia } from '@onefootprint/types';
-import { RoleScopeKind } from '@onefootprint/types';
 import {
   CopyButton,
   createFontStyles,
@@ -12,7 +11,6 @@ import {
   useToast,
 } from '@onefootprint/ui';
 import React from 'react';
-import usePermissions from 'src/hooks/use-permissions';
 
 import HitItem from './components/hit-item';
 import HitsShimmer from './components/hits-shimmer';
@@ -30,7 +28,6 @@ const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
   const cachedAmlHit = useCachedRiskSignalAmlHint(riskSignalId);
   const decryptMutation = useRiskSignalAmlHits();
   const aml = decryptMutation.data || cachedAmlHit;
-  const { hasPermission } = usePermissions();
   const toast = useToast();
 
   const handleDecrypt = () => {
@@ -50,7 +47,6 @@ const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
       {!aml && (
         <>
           <ProtectedDetails
-            canDecrypt={hasPermission(RoleScopeKind.orgSettings)}
             onClick={handleDecrypt}
             isLoading={decryptMutation.isLoading}
           />

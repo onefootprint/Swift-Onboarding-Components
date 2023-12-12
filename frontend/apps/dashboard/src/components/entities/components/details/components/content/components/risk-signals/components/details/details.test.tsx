@@ -8,7 +8,6 @@ import {
   within,
 } from '@onefootprint/test-utils';
 import React from 'react';
-import { asAdminUser } from 'src/config/tests';
 
 import RiskSignalDetails from './details';
 import {
@@ -16,7 +15,8 @@ import {
   entityIdFixture,
   riskSignalDetailsFixture,
   riskSignalDetailsWithAmlFixture,
-  withRiskSignalAmlHits,
+  withDecryptRiskSignalAmlHits,
+  withEntity,
   withRiskSignalDetails,
   withRiskSignalDetailsError,
 } from './details.test.config';
@@ -40,6 +40,7 @@ describe('<Details />', () => {
 
   const renderRiskSignalDetailsAndWaitData = async () => {
     renderRiskSignalDetails();
+
     await waitForElementToBeRemoved(() =>
       screen.queryByRole('progressbar', {
         name: 'Loading details...',
@@ -107,30 +108,40 @@ describe('<Details />', () => {
 
     describe('when there are AML hits', () => {
       beforeEach(() => {
-        asAdminUser();
         withRiskSignalDetails(riskSignalDetailsWithAmlFixture);
+        withEntity();
       });
 
       it('should initially be encrypted', async () => {
         await renderRiskSignalDetailsAndWaitData();
 
-        const decryptTitle = screen.getByText('Protected details');
-        expect(decryptTitle).toBeInTheDocument();
-        const decryptButton = screen.getByRole('button', {
-          name: 'Decrypt',
+        await waitFor(() => {
+          const decryptTitle = screen.getByText('Protected details');
+          expect(decryptTitle).toBeInTheDocument();
         });
-        expect(decryptButton).toBeInTheDocument();
+        await waitFor(() => {
+          const decryptButton = screen.getByRole('button', {
+            name: 'Decrypt',
+          });
+          expect(decryptButton).toBeInTheDocument();
+        });
       });
 
       it('should show the aml hits data after decryption', async () => {
-        withRiskSignalAmlHits();
+        withDecryptRiskSignalAmlHits();
         await renderRiskSignalDetailsAndWaitData();
 
-        const decryptButton = screen.getByRole('button', {
-          name: 'Decrypt',
+        await waitFor(() => {
+          const decryptButton = screen.getByRole('button', {
+            name: 'Decrypt',
+          });
+          expect(decryptButton).toBeInTheDocument();
         });
-        expect(decryptButton).toBeInTheDocument();
-        await userEvent.click(decryptButton);
+        await userEvent.click(
+          screen.getByRole('button', {
+            name: 'Decrypt',
+          }),
+        );
 
         await waitFor(() => {
           const sourceUrlValue = screen.getByText(
@@ -183,14 +194,20 @@ describe('<Details />', () => {
       });
 
       it('should reveal all fields after clicking Show all', async () => {
-        withRiskSignalAmlHits();
+        withDecryptRiskSignalAmlHits();
         await renderRiskSignalDetailsAndWaitData();
 
-        const decryptButton = screen.getByRole('button', {
-          name: 'Decrypt',
+        await waitFor(() => {
+          const decryptButton = screen.getByRole('button', {
+            name: 'Decrypt',
+          });
+          expect(decryptButton).toBeInTheDocument();
         });
-        expect(decryptButton).toBeInTheDocument();
-        await userEvent.click(decryptButton);
+        await userEvent.click(
+          screen.getByRole('button', {
+            name: 'Decrypt',
+          }),
+        );
 
         await waitFor(() => {
           const showAllButton = screen.getByText('Show all');
@@ -216,14 +233,20 @@ describe('<Details />', () => {
       });
 
       it('should show aml media data after clicking See more', async () => {
-        withRiskSignalAmlHits();
+        withDecryptRiskSignalAmlHits();
         await renderRiskSignalDetailsAndWaitData();
 
-        const decryptButton = screen.getByRole('button', {
-          name: 'Decrypt',
+        await waitFor(() => {
+          const decryptButton = screen.getByRole('button', {
+            name: 'Decrypt',
+          });
+          expect(decryptButton).toBeInTheDocument();
         });
-        expect(decryptButton).toBeInTheDocument();
-        await userEvent.click(decryptButton);
+        await userEvent.click(
+          screen.getByRole('button', {
+            name: 'Decrypt',
+          }),
+        );
 
         await waitFor(() => {
           const seeMoreButton = screen.getByText('See more');
