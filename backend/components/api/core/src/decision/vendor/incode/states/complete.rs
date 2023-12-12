@@ -184,21 +184,25 @@ impl Complete {
             })
             .ok();
 
-        let score_reason_codes =
-            incode_docv::reason_codes_from_score_response(&score_response, expect_selfie)
-                .into_iter()
-                .map(|r| {
-                    (
-                        r,
-                        VendorAPI::IncodeFetchScores,
-                        score_verification_result_id.clone(),
-                    )
-                });
+        let score_reason_codes = incode_docv::reason_codes_from_score_response(
+            &score_response,
+            &fetch_ocr_response,
+            expect_selfie,
+            dk,
+        )
+        .into_iter()
+        .map(|r| {
+            (
+                r,
+                VendorAPI::IncodeFetchScores,
+                score_verification_result_id.clone(),
+            )
+        });
 
-        let ocr_reason_codes = if !obc.is_doc_first {
+        let pii_matching_ocr_reason_codes = if !obc.is_doc_first {
             // Only calculate OCR reason codes if we have already collected ID data
             let vault_data = vault_data.ok_or(AssertionError("Vault data not provided"))?;
-            incode_docv::reason_codes_from_ocr_response(&fetch_ocr_response, vault_data)
+            incode_docv::pii_matching_reason_codes_from_ocr_response(&fetch_ocr_response, vault_data)
                 .into_iter()
                 .map(|r| (r, VendorAPI::IncodeFetchOcr, ocr_verification_result_id.clone()))
                 .collect_vec()
@@ -240,7 +244,7 @@ impl Complete {
             conn,
             sv_id,
             score_reason_codes
-                .chain(ocr_reason_codes.into_iter())
+                .chain(pii_matching_ocr_reason_codes.into_iter())
                 .chain(additional_reason_codes)
                 .chain(ignored_error_reason_codes)
                 .collect(),

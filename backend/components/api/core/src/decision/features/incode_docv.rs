@@ -2,7 +2,7 @@ use chrono::{NaiveDateTime, Utc};
 use idv::incode::doc::response::{FetchScoresResponse, FetchOCRResponse, IncodeOcrFixtureResponseFields};
 use newtypes::{
     incode::{IncodeRCH, IncodeStatus, IncodeTest},
-    FootprintReasonCode, VendorAPI, PiiString, VerificationResultId, DataIdentifier, IdentityDataKind,
+    FootprintReasonCode, VendorAPI, PiiString, VerificationResultId, DataIdentifier, IdentityDataKind, IdDocKind,
 };
 use crate::{
     decision::{
@@ -96,20 +96,21 @@ pub fn footprint_reason_codes(
     scores: FetchScoresResponse,
     vault_data: IncodeOcrComparisonDataFields,
     // not all documents collect will have selfie
-    expect_selfie: bool
+    expect_selfie: bool,
+    dk: IdDocKind
 ) -> Result<Vec<FootprintReasonCode>, idv::Error> {
-    let score_reason_codes = reason_codes_from_score_response(&scores, expect_selfie);
-    let ocr_reason_codes = reason_codes_from_ocr_response(&ocr, vault_data);
+    let score_reason_codes = reason_codes_from_score_response(&scores, &ocr, expect_selfie, dk);
+    let ocr_reason_codes = pii_matching_reason_codes_from_ocr_response(&ocr, vault_data);
 
     Ok(score_reason_codes.into_iter().chain(ocr_reason_codes).collect())
 }
 
-pub fn reason_codes_from_score_response(res: &FetchScoresResponse, expect_selfie: bool) -> Vec<FootprintReasonCode> {
+pub fn reason_codes_from_score_response(scores_res: &FetchScoresResponse, ocr_res: &FetchOCRResponse, expect_selfie: bool, dk: IdDocKind) -> Vec<FootprintReasonCode> {
     // Overall score
     // 
     // We check for the existence of this at the vendor call layer, but our decisioning relies most heavily on the score (for now)
     // and we should not proceed if we don't have it
-    let document_score_code = match res
+    let document_score_code = match scores_res
         .document_score().1 {
             Some(s) => if s == IncodeStatus::Fail {
                 vec![FootprintReasonCode::DocumentNotVerified]
@@ -124,7 +125,7 @@ pub fn reason_codes_from_score_response(res: &FetchScoresResponse, expect_selfie
         };
 
     let liveness_score_code = if expect_selfie {
-        match res
+        match scores_res
         .liveness_score().1 {
             Some(s) => if s == IncodeStatus::Fail {
                 vec![FootprintReasonCode::DocumentSelfieNotLiveImage]
@@ -139,29 +140,10 @@ pub fn reason_codes_from_score_response(res: &FetchScoresResponse, expect_selfie
         }} else {
             vec![]
         };
-    
-
-    // OCR
-    // TODO: if this happens, would we not be able to retrieve OCR from incode?
-    //  should we just not vault it if OCR confidence isn't high?
-    //  would overall score always be failure then?
-    let ocr_code = match res
-        .id_ocr_confidence().1 {
-           Some(s) => if s == IncodeStatus::Fail {
-            vec![FootprintReasonCode::DocumentOcrNotSuccessful]
-        } else {
-            vec![FootprintReasonCode::DocumentOcrSuccessful]
-        },
-        None => {
-            tracing::warn!("missing incode ocr score");
-            vec![FootprintReasonCode::DocumentOcrNotSuccessful]
-        }
-    };
-   
-    
+        
     // only populate reason code if we collected a selfie
     let selfie_code = if expect_selfie {
-        match res.selfie_match().1 {
+        match scores_res.selfie_match().1 {
             Some(s) => if s == IncodeStatus::Fail {
                 vec![FootprintReasonCode::DocumentSelfieDoesNotMatch]
             } else {
@@ -176,8 +158,20 @@ pub fn reason_codes_from_score_response(res: &FetchScoresResponse, expect_selfie
         vec![]
     };
     
+    let doc_expired_code = if let Some(expired_frc) = doc_expired_reason_code(ocr_res) {
+        vec![expired_frc]
+    } else {
+        vec![]
+    };
+
+    let ocr_successful_code =  if ocr_was_successful(scores_res, ocr_res, dk) {
+        vec![FootprintReasonCode::DocumentOcrSuccessful]
+    } else {
+        vec![FootprintReasonCode::DocumentOcrNotSuccessful]
+    };
+
     // ID Tests => FRC
-    let (id_test_frcs, barcode_crosscheck_results): (Vec<FootprintReasonCode>, Vec<(bool, bool)>) = res
+    let (id_test_frcs, barcode_crosscheck_results): (Vec<FootprintReasonCode>, Vec<(bool, bool)>) = scores_res
         .get_id_tests()
         .iter()
         .filter_map(get_frc_from_test)
@@ -198,15 +192,16 @@ pub fn reason_codes_from_score_response(res: &FetchScoresResponse, expect_selfie
     };
 
     // Face tests => FRC
-    let (glasses_check, mask_check) = res.get_face_test_results();
+    let (glasses_check, mask_check) = scores_res.get_face_test_results();
     let face_codes: Vec<FootprintReasonCode> = [
         glasses_check.and_then(|has_glasses| has_glasses.then_some(FootprintReasonCode::DocumentSelfieGlasses)),
         mask_check.and_then(|has_glasses| has_glasses.then_some(FootprintReasonCode::DocumentSelfieMask))
     ].into_iter().flatten().collect();
 
     document_score_code.into_iter()
-        .chain(ocr_code)
         .chain(selfie_code)
+        .chain(doc_expired_code)
+        .chain(ocr_successful_code)
         .chain(id_test_frcs)
         .chain(face_codes)
         .chain(barcode_frc)
@@ -215,13 +210,13 @@ pub fn reason_codes_from_score_response(res: &FetchScoresResponse, expect_selfie
 }
 
     
-pub fn reason_codes_from_ocr_response(res: &FetchOCRResponse, vault_data: IncodeOcrComparisonDataFields) -> Vec<FootprintReasonCode> {
+pub fn pii_matching_reason_codes_from_ocr_response(res: &FetchOCRResponse, vault_data: IncodeOcrComparisonDataFields) -> Vec<FootprintReasonCode> {
     let parsed_names = ParsedIncodeNames::from_fetch_ocr_res(res);
     let parsed_address = ParsedIncodeAddress::from_fetch_ocr_res(res);
     
     let fn_matches = first_name_matches(&parsed_names, &vault_data);
     let ln_matches = last_name_matches(&parsed_names, &vault_data);
-    let mut reason_codes: Vec<FootprintReasonCode> = [
+    let reason_codes: Vec<FootprintReasonCode> = [
         reason_codes_from_match_field(IncodeMatchField::FirstName, fn_matches),
         reason_codes_from_match_field(IncodeMatchField::LastName, ln_matches),
         reason_codes_from_match_field(IncodeMatchField::Dob, dob_matches(res, &vault_data)),
@@ -230,10 +225,35 @@ pub fn reason_codes_from_ocr_response(res: &FetchOCRResponse, vault_data: Incode
 
     ].into_iter().flatten().collect();
 
-    if let Some(expired_frc) = doc_expired_reason_code(res) {
-        reason_codes.push(expired_frc);
-    }
     reason_codes
+}
+
+const OCR_CONFIDENCE_SCORE_THRESHOLD: f32 = 0.70;
+ 
+fn ocr_was_successful(scores_res: &FetchScoresResponse, ocr_res: &FetchOCRResponse, dk: IdDocKind) -> bool {
+    let parsed_odks: Vec<ParsedIncodeField> = ParsedIncodeFields::from_fetch_ocr_res(ocr_res).0;
+    let all_expected_fields_present_and_high_confidence = dk.expected_ciritical_ocr_data_kinds().into_iter().all(|odk| {
+        let pif = parsed_odks.iter().find(|p| p.odk == odk);
+        if let Some(pif) = pif {
+            // we don't have a lot of confidence (no pun intended) on Incode's consistency with producing these scores and for some fields its a little ambiguous which of several
+            // possible options should/could be used as the correct measure of confidence. So given this, if the confidence score is None, we treat this as passing OCR. (for now anyway)
+            pif.confidence.map(|c| c > OCR_CONFIDENCE_SCORE_THRESHOLD).unwrap_or(true)
+        } else {
+            // if the data was not parsed, then ocr was not successful
+            false 
+        }
+    });
+
+    let ocr_overall_confidence_passed = match scores_res.id_ocr_confidence().1 {
+       Some(s) => s != IncodeStatus::Fail,
+        None => {
+            tracing::error!("missing incode ocr score");
+            false
+        }
+    };
+
+    // call OCR unsuccessful if either the overall confidence check in the scores response is FAIL or if any critical fields are missing or low confidence in the OCR response
+    all_expected_fields_present_and_high_confidence && ocr_overall_confidence_passed
 }
 
 fn doc_expired_reason_code(res: &FetchOCRResponse) -> Option<FootprintReasonCode> {
@@ -260,9 +280,9 @@ fn get_frc_from_test(value: (&IncodeTest, &IncodeStatus)) -> Option<(FootprintRe
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
-    use newtypes::ScrubbedPiiString;
+    use newtypes::{ScrubbedPiiString, ScrubbedPiiLong, PiiLong};
     use db::test_helpers::assert_have_same_elements;
-    use idv::{incode::doc::response::FetchScoresResponse, test_fixtures::{DocTestOpts, OcrTestOpts, self}};
+    use idv::{incode::doc::response::{FetchScoresResponse, OCRName, OcrDataConfidence}, test_fixtures::{DocTestOpts, OcrTestOpts, self}};
     use newtypes::{
         incode::IncodeStatus::*,
         FootprintReasonCode::{self, *},
@@ -273,72 +293,72 @@ mod tests {
     #[test_case(
         ("Rob", "Roberto", "1990-01-01"), 
         (Some("Rob".into()),Some("Roberto".into()),Some("1990-01-01".into())),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]
     ; "name and dob match")]
     #[test_case(
         ("ROB", "    roBERTo", "1990-01-01"), 
         (Some("rob".into()), Some("roberto".into()), Some("       1990-01-01".into())),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]
     ; "whitespace/mixed case matches name")]
     #[test_case(
         ("Robby", "Roberto", "1990-01-01"), 
         (Some("Bob".into()),Some("Roberto".into()), Some("1980-01-01".into())),
-        vec![DocumentOcrNameDoesNotMatch, DocumentOcrFirstNameDoesNotMatch, DocumentOcrLastNameMatches, DocumentOcrDobDoesNotMatch, DocumentNotExpired, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "first name doesn't match and DOBs don't match"
+        vec![DocumentOcrNameDoesNotMatch, DocumentOcrFirstNameDoesNotMatch, DocumentOcrLastNameMatches, DocumentOcrDobDoesNotMatch, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "first name doesn't match and DOBs don't match"
     )]
     #[test_case(
         ("Bob", "Roberti", "1990-01-01"), 
         (Some("Bob".into()),Some("Roberto".into()),Some("  1980-01-01".into())),
-        vec![DocumentOcrNameDoesNotMatch, DocumentOcrFirstNameMatches, DocumentOcrLastNameDoesNotMatch, DocumentOcrDobDoesNotMatch, DocumentNotExpired, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "last name doesn't match and DOBs don't match"
+        vec![DocumentOcrNameDoesNotMatch, DocumentOcrFirstNameMatches, DocumentOcrLastNameDoesNotMatch, DocumentOcrDobDoesNotMatch, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "last name doesn't match and DOBs don't match"
     )]
     #[test_case(
         ("Bob", "Roberto", "1990-01-01"), 
         (Some("Crob".into()),Some("Croberto".into()),Some("1980-01-01".into())),
-        vec![DocumentOcrNameDoesNotMatch, DocumentOcrFirstNameDoesNotMatch, DocumentOcrLastNameDoesNotMatch, DocumentOcrDobDoesNotMatch, DocumentNotExpired, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "all doesn't match"
+        vec![DocumentOcrNameDoesNotMatch, DocumentOcrFirstNameDoesNotMatch, DocumentOcrLastNameDoesNotMatch, DocumentOcrDobDoesNotMatch, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "all doesn't match"
     )]
     #[test_case(
         ("Bob", "Roberto", "1990-01-01"), 
         (Some("Bob".into()),Some("Roberto".into()),None),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentNotExpired, DocumentOcrDobCouldNotMatch, DocumentOcrDobDoesNotMatch, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "dob missing"
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobCouldNotMatch, DocumentOcrDobDoesNotMatch, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "dob missing"
     )]
     #[test_case(
         ("Bob", "Roberto", "1990-01-01"), 
         (None, Some("Roberto".into()), Some("1990-01-01".into())),
-        vec![DocumentOcrNameCouldNotMatch, DocumentOcrNameDoesNotMatch, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "first name missing"
+        vec![DocumentOcrNameCouldNotMatch, DocumentOcrNameDoesNotMatch, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "first name missing"
     )]
     #[test_case(
         ("Rob", "Robèrto", "1990-01-01"), 
         (Some("Rob".into()),Some("Roberto".into()),Some("1990-01-01".into())),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "unicode"
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "unicode"
     )]
     #[test_case(
         ("RöbÀÑ", "RÓbèrtõ", "1990-01-01"), 
         (Some("Roban".into()),Some("ROBERTO".into()),Some("1990-01-01".into())),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "more unicode"
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "more unicode"
     )]
     #[test_case(
         ("B'ob", "Bo'berto", "1990-01-01"), 
         (Some("B'ob".into()),Some("Bo'berto".into()),Some("1990-01-01".into())),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "apostraphies in both names"
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "apostraphies in both names"
     )]
     #[test_case(
         ("B'ob", "Bo'berto", "1990-01-01"), 
         (Some("Bob".into()),Some("Boberto".into()),Some("1990-01-01".into())),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "apostraphies in OCR names"
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "apostraphies in OCR names"
     )]
     #[test_case(
         ("Bob", "Boberto", "1990-01-01"), 
         (Some("B'ob".into()),Some("Bo'berto".into()),Some("1990-01-01".into())),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "apostraphies in keyed in names"
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "apostraphies in keyed in names"
     )]
     #[test_case(
         ("Bob", "Bo'  berto", "1990-01-01"), 
         (Some("B' ob".into()),Some("Bo'berto".into()),Some("1990-01-01".into())),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "apostraphies and spaces"
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch]; "apostraphies and spaces"
     )]
     #[test_case(
         ("Bob", "Boberto-Jones", "1990-01-01"), 
         (Some("Bob".into()),Some("Boberto Jones".into()),Some("1990-01-01".into())),
-        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentNotExpired, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch,]; "hyphen"
+        vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch,]; "hyphen"
     )]
     fn test_reason_codes_from_ocr_response(raw_ocr: (&str, &str, &str), raw_vault_data: (Option<PiiString>, Option<PiiString>, Option<PiiString>), expected: Vec<FootprintReasonCode>) {
         let (first_ocr, last_ocr, dob_ocr) = raw_ocr;
@@ -360,7 +380,7 @@ mod tests {
         let raw = test_fixtures::incode_fetch_ocr_response(Some(ocr_opts));
         let parsed: FetchOCRResponse = serde_json::from_value(raw).unwrap();
 
-        assert_have_same_elements(reason_codes_from_ocr_response(&parsed, vault_data), expected)
+        assert_have_same_elements(pii_matching_reason_codes_from_ocr_response(&parsed, vault_data), expected)
     }
 
     #[test_case(
@@ -386,6 +406,7 @@ mod tests {
             DocumentExpirationCheckDigitMatches, 
             DocumentNumberCrosscheckMatches,
             DocumentBarcodeContentMatches,
+            DocumentNotExpired
         ], true; "everything passes")]
         #[test_case(
             DocTestOpts {
@@ -427,6 +448,7 @@ mod tests {
                 DocumentExpirationCheckDigitDoesNotMatch, 
                 DocumentSelfieNotLiveImage,
                 DocumentNumberCrosscheckDoesNotMatch, // barcode stuff is weird here
+                DocumentNotExpired
             ], true; "everything fails")]
         #[test_case(
             DocTestOpts {
@@ -465,6 +487,7 @@ mod tests {
                 DocumentSexCrosscheckMatches, 
                 DocumentExpirationCheckDigitMatches, 
                 DocumentNumberCrosscheckMatches,
+                DocumentNotExpired
             ], true; "mix of things")]
             #[test_case(
                 DocTestOpts::default(),
@@ -487,18 +510,24 @@ mod tests {
                     DocumentSexCrosscheckMatches, 
                     DocumentExpirationCheckDigitMatches, 
                     DocumentNumberCrosscheckMatches,
-                    DocumentBarcodeContentMatches
+                    DocumentBarcodeContentMatches,
+                    DocumentNotExpired
                     // no selfie code
                 ], false; "everything passes, but selfie isn't collected")]  
     fn test_reason_codes_from_score_response(doc_opts: DocTestOpts, expected: Vec<FootprintReasonCode>, expect_selfie: bool) {
         let raw_response = idv::test_fixtures::incode_fetch_scores_response(doc_opts);
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
 
-        assert_have_same_elements(super::reason_codes_from_score_response(&parsed, expect_selfie), expected)
+        let ocr_raw_response = idv::test_fixtures::incode_fetch_ocr_response(None);
+        let ocr_parsed: FetchOCRResponse = serde_json::from_value(ocr_raw_response).unwrap();
+
+        assert_have_same_elements(super::reason_codes_from_score_response(&parsed, &ocr_parsed, expect_selfie, IdDocKind::DriversLicense), expected)
     }
 
     #[test]
     fn test_summary_barcode_reason_code() {
+        let ocr_raw_response = idv::test_fixtures::incode_fetch_ocr_response(None);
+        let ocr_parsed: FetchOCRResponse = serde_json::from_value(ocr_raw_response).unwrap();
         // everything passes
         let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts::default());
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
@@ -506,26 +535,26 @@ mod tests {
         id_test_results.iter().for_each(|(test, status)| if test.is_crosscheck() {
             assert_eq!(status, &IncodeStatus::Ok)
         });
-        let frcs = super::reason_codes_from_score_response(&parsed, false);
+        let frcs = super::reason_codes_from_score_response(&parsed,&ocr_parsed, false, IdDocKind::DriversLicense);
         assert!(frcs.contains(&FootprintReasonCode::DocumentBarcodeContentMatches));
 
         // partial fail
         let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts {barcode_content: Fail, barcode: Ok, cross_checks: Ok, ..Default::default()});
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
-        let frcs = super::reason_codes_from_score_response(&parsed, false);
+        let frcs = super::reason_codes_from_score_response(&parsed,&ocr_parsed, false, IdDocKind::DriversLicense);
         assert!(!frcs.contains(&FootprintReasonCode::DocumentBarcodeContentMatches));
         assert!(!frcs.contains(&FootprintReasonCode::DocumentBarcodeContentDoesNotMatch));
 
         // read ok, but cross checks fail
         let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts {barcode_content: Ok, barcode: Ok, cross_checks: Fail, ..Default::default()});
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
-        let frcs = super::reason_codes_from_score_response(&parsed, false);
+        let frcs = super::reason_codes_from_score_response(&parsed,&ocr_parsed, false, IdDocKind::DriversLicense);
         assert!(frcs.contains(&FootprintReasonCode::DocumentBarcodeContentDoesNotMatch));
 
          // wasn't read
          let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts {barcode_content: Fail, barcode: Fail, cross_checks: Fail, ..Default::default()});
          let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
-         let frcs = super::reason_codes_from_score_response(&parsed, false);
+         let frcs = super::reason_codes_from_score_response(&parsed, &ocr_parsed,false, IdDocKind::DriversLicense);
          assert!(!frcs.contains(&FootprintReasonCode::DocumentBarcodeContentDoesNotMatch));
          assert!(!frcs.contains(&FootprintReasonCode::DocumentBarcodeContentMatches));
     }
@@ -543,5 +572,126 @@ mod tests {
     #[test_case(FetchOCRResponse { expire_at: Some(ScrubbedPiiString::from("2663459200000")), ..Default::default()} => Some(FootprintReasonCode::DocumentNotExpired))]
     fn test_doc_expired_reason_code(res: FetchOCRResponse) -> Option<FootprintReasonCode> {
         doc_expired_reason_code(&res) 
+    }
+
+    #[test_case(
+        IdDocKind::DriversLicense, 
+        DocTestOpts::default(), 
+        FetchOCRResponse {
+            name: Some(OCRName {
+                given_name: Some("bob".into()),
+                ..Default::default()
+            }),
+            address: Some("123 bob st".into()),
+            birth_date: Some(ScrubbedPiiLong::new(PiiLong::new(529873860000))),
+            document_number: Some("12354".into()),
+            expire_at: Some("423123251".into()),
+            issued_at: Some("3231234521".into()),         
+            ocr_data_confidence: Some(OcrDataConfidence{
+                name_confidence: Some(1.0),
+                address_confidence: Some(1.0),
+                birth_date_confidence: Some(1.0),
+                expire_at_confidence: Some(1.0),
+                document_number_confidence: Some(1.0),
+                ..Default::default()
+            }),
+            ..Default::default()
+        } 
+        => true)]
+    #[test_case(
+        IdDocKind::DriversLicense, 
+        DocTestOpts::default(), 
+        FetchOCRResponse {
+            name: Some(OCRName {
+                given_name: Some("bob".into()),
+                ..Default::default()
+            }),
+            address: Some("123 bob st".into()),
+            birth_date: Some(ScrubbedPiiLong::new(PiiLong::new(529873860000))),
+            document_number: Some("12354".into()),
+            expire_at: Some("423123251".into()),
+            issued_at: Some("3231234521".into()),         
+            ocr_data_confidence: Some(OcrDataConfidence{
+                name_confidence: Some(1.0),
+                address_confidence: Some(1.0),
+                birth_date_confidence: Some(1.0),
+                expire_at_confidence: Some(1.0),
+                document_number_confidence: Some(0.5),
+                ..Default::default()
+            }),
+            ..Default::default()
+        } 
+        => false)]
+    #[test_case(
+        IdDocKind::DriversLicense, 
+        DocTestOpts::default(), 
+        FetchOCRResponse {
+            name: Some(OCRName {
+                given_name: Some("bob".into()),
+                ..Default::default()
+            }),
+            address: Some("123 bob st".into()),
+            birth_date: Some(ScrubbedPiiLong::new(PiiLong::new(529873860000))),
+            document_number: Some("12354".into()),
+            expire_at: Some("423123251".into()),
+            issued_at: Some("3231234521".into()),
+            ..Default::default()
+        } 
+        => true)]
+    #[test_case(
+        IdDocKind::DriversLicense, 
+        DocTestOpts::default(), 
+        FetchOCRResponse {
+            name: Some(OCRName {
+                given_name: Some("bob".into()),
+                ..Default::default()
+            }),
+            address: Some("123 bob st".into()),
+            birth_date: Some(ScrubbedPiiLong::new(PiiLong::new(529873860000))),
+            document_number: Some("12354".into()),
+            expire_at: None,
+            issued_at: Some("3231234521".into()),
+            ..Default::default()
+        } 
+        => false)]
+    #[test_case(
+        IdDocKind::IdCard, 
+        DocTestOpts::default(), 
+        FetchOCRResponse {
+            name: Some(OCRName {
+                given_name: Some("bob".into()),
+                ..Default::default()
+            }),
+            ..Default::default()
+        } 
+        => true)]
+    #[test_case(
+        IdDocKind::Passport, 
+        DocTestOpts::default(), 
+        FetchOCRResponse {
+            name: Some(OCRName {
+                given_name: Some("bob".into()),
+                ..Default::default()
+            }),
+            ..Default::default()
+        } 
+        => false)]
+    #[test_case(
+        IdDocKind::IdCard, 
+        DocTestOpts {
+            ocr_confidence: Fail,
+           ..Default::default() 
+        }, 
+        FetchOCRResponse {
+            name: Some(OCRName {
+                given_name: Some("bob".into()),
+                ..Default::default()
+            }),
+            ..Default::default()
+        } 
+        => false)]
+    fn test_ocr_was_successful(dk: IdDocKind, score_opts: DocTestOpts, ocr_res: FetchOCRResponse) -> bool {
+        let scores_res: FetchScoresResponse = serde_json::from_value(idv::test_fixtures::incode_fetch_scores_response(score_opts)).unwrap();
+        ocr_was_successful(&scores_res, &ocr_res, dk)
     }
 }

@@ -340,10 +340,11 @@ pub async fn maybe_generate_ocr_reason_codes(
         .await??;
     let ocr_comparison_data = IncodeOcrComparisonDataFields::compose(&state.enclave_client, &vw).await?;
 
-    let ocr_reason_codes = incode_docv::reason_codes_from_ocr_response(fetch_ocr, ocr_comparison_data)
-        .into_iter()
-        .map(|r| (r, VendorAPI::IncodeFetchOcr, vres.verification_result_id.clone()))
-        .collect();
+    let ocr_reason_codes =
+        incode_docv::pii_matching_reason_codes_from_ocr_response(fetch_ocr, ocr_comparison_data)
+            .into_iter()
+            .map(|r| (r, VendorAPI::IncodeFetchOcr, vres.verification_result_id.clone()))
+            .collect();
 
     Ok(Some(ocr_reason_codes))
 }

@@ -5,7 +5,7 @@ use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::IntoEnumIterator;
 use strum_macros::{Display, EnumIter, EnumString};
 
-use crate::DocumentSide;
+use crate::{DocumentSide, OcrDataKind as ODK};
 
 #[derive(
     Debug,
@@ -93,6 +93,33 @@ impl IdDocKind {
         IdDocKind::iter()
             .filter(|id| DocKind::from(*id) == DocKind::Identity)
             .collect()
+    }
+
+    // Given the type of document, what are the expected/critical fields we expect to parse from that doc. If we don't parse (or have a very low confidence score)
+    // for one of these for a given doc, then we should produce the DocumentOcrNotSuccessful risk signal as a way to indicate to users/rules this
+    pub fn expected_ciritical_ocr_data_kinds(&self) -> Vec<ODK> {
+        match self {
+            IdDocKind::IdCard => vec![ODK::FullName],
+            IdDocKind::DriversLicense => vec![
+                ODK::FullName,
+                ODK::Dob,
+                ODK::FullAddress,
+                ODK::DocumentNumber,
+                ODK::ExpiresAt,
+            ], // TODO: should Gender, IssuedAt be here too? These seem less "critical" but are still present
+            IdDocKind::Passport => vec![ODK::FullName, ODK::DocumentNumber], // lots of different kinds of passports out there and stuff like DOB is def not ubiquitous
+            IdDocKind::Permit => vec![
+                ODK::FullName,
+                ODK::Dob,
+                ODK::FullAddress,
+                ODK::DocumentNumber,
+                ODK::ExpiresAt,
+            ],
+            IdDocKind::Visa => vec![ODK::FullName],
+            IdDocKind::ResidenceDocument => vec![ODK::FullName],
+            IdDocKind::VoterIdentification => vec![ODK::FullName],
+            IdDocKind::SsnCard => vec![ODK::FullName],
+        }
     }
 }
 
