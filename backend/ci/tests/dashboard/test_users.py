@@ -147,7 +147,7 @@ def test_get_users_list_pagination(sandbox_user, sandbox_user2):
     # Make sure the cursor is a nanosecond-encoded timestamp
     assert arrow.get(int(next_cursor) / 1000) > arrow.now().shift(days=-1)
     filters = dict(pagination=dict(cursor=next_cursor, page_size=1), statuses="pass")
-    body = get("entities", filters, *tenant.db_auths)
+    body = post("entities/search", filters, *tenant.db_auths)
     assert len(body["data"]) == 1
 
 

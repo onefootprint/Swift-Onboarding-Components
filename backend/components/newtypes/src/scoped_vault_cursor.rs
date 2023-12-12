@@ -22,7 +22,7 @@ pub enum ScopedVaultCursor {
     LastActivityAt(DateTime<Utc>),
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 /// Nanosecond-serialized timestamp to be used as a pagination cursor
 pub struct TimestampCursor(#[serde(with = "ts_nanoseconds")] pub DateTime<Utc>);
 

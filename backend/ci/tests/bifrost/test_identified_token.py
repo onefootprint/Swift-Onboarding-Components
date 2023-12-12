@@ -296,8 +296,8 @@ def test_no_implied_auth_for_stale(sandbox_tenant):
     """
     # Get an old user, who probably hasn't had any auths recently
     filters = dict(
-        timestamp_lte=arrow.now().shift(hours=-1, minutes=-5),
-        is_created_via_api="false",
+        timestamp_lte=arrow.now().shift(hours=-1, minutes=-5).isoformat(),
+        is_created_via_api=False,
         kind="person",
     )
     body = post("entities/search", filters, *sandbox_tenant.db_auths)
