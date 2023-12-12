@@ -55,7 +55,7 @@ pub async fn get(
 #[derive(serde::Deserialize, paperclip::actix::Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct ListEntitiesSearchRequest {
-    pub pagination: CursorPaginationRequest<TimestampCursor>,
+    pub pagination: Option<CursorPaginationRequest<TimestampCursor>>,
     #[serde(flatten)]
     pub filters: ListEntitiesRequest,
 }
@@ -74,7 +74,7 @@ pub async fn post_search(
 ) -> CursorPaginatedResponse<EntityListResponse, TimestampCursor> {
     let (pagination, filters) = if let Some(body) = body.into_inner() {
         let ListEntitiesSearchRequest { pagination, filters } = body;
-        (pagination, filters)
+        (pagination.unwrap_or_default(), filters)
     } else {
         (CursorPaginationRequest::default(), ListEntitiesRequest::default())
     };

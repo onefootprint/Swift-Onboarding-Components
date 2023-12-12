@@ -1,7 +1,6 @@
 import arrow
 import pytest
 from tests.utils import (
-    clean_up_user,
     post,
     create_ob_config,
     get,
@@ -301,7 +300,7 @@ def test_no_implied_auth_for_stale(sandbox_tenant):
         is_created_via_api="false",
         kind="person",
     )
-    body = get("entities", filters, *sandbox_tenant.db_auths)
+    body = post("entities/search", filters, *sandbox_tenant.db_auths)
     assert all([not i["is_created_via_api"] for i in body["data"]])
     if not body["data"]:
         assert (

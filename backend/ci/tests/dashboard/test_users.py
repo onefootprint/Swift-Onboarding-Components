@@ -22,7 +22,7 @@ def incomplete_user(sandbox_tenant, twilio):
 
     phone_number = bifrost.decrypted_data["id.phone_number"]
     # Get the user by searching by fingerprint in the admin API since we can't get the fp_id otherwise
-    body = get("entities", dict(search=phone_number), *sandbox_tenant.db_auths)
+    body = post("entities/search", dict(search=phone_number), *sandbox_tenant.db_auths)
     user = next(i for i in body["data"] if i["sandbox_id"] == bifrost.sandbox_id)
     return user["id"]
 
@@ -42,7 +42,9 @@ def test_get_org(sandbox_user):
 
 def test_get_users_list(incomplete_user, sandbox_user2, vault_user, sandbox_user):
     tenant = sandbox_user.tenant
-    body = get("entities", dict(page_size=400), *tenant.db_auths)
+    body = post(
+        "entities/search", dict(pagination=dict(page_size=100)), *tenant.db_auths
+    )
     scoped_users = body["data"]
     assert len(scoped_users)
 
@@ -62,7 +64,7 @@ def test_get_users_list(incomplete_user, sandbox_user2, vault_user, sandbox_user
 
 def test_get_users_by_fp_id_query(sandbox_user):
     tenant = sandbox_user.tenant
-    body = get("entities", {"search": sandbox_user.fp_id}, *tenant.db_auths)
+    body = post("entities/search", {"search": sandbox_user.fp_id}, *tenant.db_auths)
     scoped_users = body["data"]
     assert len(scoped_users) == 1
     assert scoped_users[0]["id"] == sandbox_user.fp_id
@@ -89,8 +91,8 @@ def test_get_users_filter(
     expected_user_idxs,
 ):
     tenant = sandbox_user.tenant
-    data = dict(page_size=100, **filters)
-    body = get("entities", data, *tenant.db_auths)
+    data = dict(pagination=dict(page_size=100), **filters)
+    body = post("entities/search", data, *tenant.db_auths)
     scoped_users = body["data"]
     all_fp_ids = [
         sandbox_user.fp_id,
@@ -105,23 +107,31 @@ def test_get_users_filter(
 def test_get_users_filter_workflow_request(sandbox_user2):
     tenant = sandbox_user2.tenant
 
-    filters = dict(page_size=100, has_outstanding_workflow_request="false")
-    body = get("entities", filters, *tenant.db_auths)
+    filters = dict(
+        pagination=dict(page_size=100), has_outstanding_workflow_request=False
+    )
+    body = post("entities/search", filters, *tenant.db_auths)
     assert any(i["id"] == sandbox_user2.fp_id for i in body["data"])
 
-    filters = dict(page_size=100, has_outstanding_workflow_request="true")
-    body = get("entities", filters, *tenant.db_auths)
+    filters = dict(
+        pagination=dict(page_size=100), has_outstanding_workflow_request=True
+    )
+    body = post("entities/search", filters, *tenant.db_auths)
     assert not any(i["id"] == sandbox_user2.fp_id for i in body["data"])
 
     data = dict(trigger=dict(kind="redo_kyc"), note="Flerp")
     body = post(f"entities/{sandbox_user2.fp_id}/triggers", data, *tenant.db_auths)
 
-    filters = dict(page_size=100, has_outstanding_workflow_request="true")
-    body = get("entities", filters, *tenant.db_auths)
+    filters = dict(
+        pagination=dict(page_size=100), has_outstanding_workflow_request=True
+    )
+    body = post("entities/search", filters, *tenant.db_auths)
     assert any(i["id"] == sandbox_user2.fp_id for i in body["data"])
 
-    filters = dict(page_size=100, has_outstanding_workflow_request="false")
-    body = get("entities", filters, *tenant.db_auths)
+    filters = dict(
+        pagination=dict(page_size=100), has_outstanding_workflow_request=False
+    )
+    body = post("entities/search", filters, *tenant.db_auths)
     assert not any(i["id"] == sandbox_user2.fp_id for i in body["data"])
 
 
@@ -129,18 +139,15 @@ def test_get_users_list_pagination(sandbox_user, sandbox_user2):
     sandbox_user2  # Not used, but need the fixture
     tenant = sandbox_user.tenant
     # Test paginated request with filters
-    pagination = dict(page_size=1, statuses="pass")
-    body = get("entities", pagination, *tenant.db_auths)
+    filters = dict(pagination=dict(page_size=1), statuses="pass")
+    body = post("entities/search", filters, *tenant.db_auths)
     assert len(body["data"]) == 1
     next_cursor = body["meta"]["next"]
     assert next_cursor  # Should be more than one page
     # Make sure the cursor is a nanosecond-encoded timestamp
     assert arrow.get(int(next_cursor) / 1000) > arrow.now().shift(days=-1)
-    body = get(
-        "entities",
-        dict(cursor=next_cursor, **pagination),
-        *tenant.db_auths,
-    )
+    filters = dict(pagination=dict(cursor=next_cursor, page_size=1), statuses="pass")
+    body = get("entities", filters, *tenant.db_auths)
     assert len(body["data"]) == 1
 
 
@@ -382,7 +389,7 @@ def test_entity_data(sandbox_user, sandbox_tenant):
     Check the data attribute in the GET /entities list and detail endpoints, including the data
     that is auto decrypted.
     """
-    body = get("entities", None, *sandbox_tenant.db_auths)
+    body = post("entities/search", None, *sandbox_tenant.db_auths)
     user_list = next(u for u in body["data"] if u["id"] == sandbox_user.fp_id)
     user_detail = get(f"entities/{sandbox_user.fp_id}", None, *sandbox_tenant.db_auths)
 
