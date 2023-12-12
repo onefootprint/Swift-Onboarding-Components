@@ -1,7 +1,7 @@
 import Logger from '../../../utils/logger';
-import type { FootprintClientGenerator } from '../types';
+import type { EmptyAdapterReturn } from '../types';
 
-const generateEmptyAdapter: FootprintClientGenerator = () => {
+const generateEmptyAdapter = (): EmptyAdapterReturn => {
   const load = (): Promise<void> => {
     Logger.info('Loading footprint from empty adapter');
     return Promise.resolve();

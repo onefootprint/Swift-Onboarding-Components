@@ -72,10 +72,7 @@ for (const { format, urlFragment, hasUserData } of SdkUrls) {
   test(`E2E.MobileSDKIntegration.${format} #ci`, async ({
     browserName,
     page,
-    isMobile,
   }) => {
-    // eslint-disable-next-line playwright/no-conditional-in-test
-    if (isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
     test.setTimeout(120000);
     const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
     await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());

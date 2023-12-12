@@ -1,7 +1,7 @@
 export { GenericTransition, IdAnimation } from './animations';
 export { default as AppErrorBoundary } from './app-error-boundary';
 export { default as DeviceSignals } from './device-signals';
-export type { CompletePayload, FootprintClient } from './footprint-provider';
+export type { CompletePayload, ProviderReturn } from './footprint-provider';
 export {
   default as FootprintProvider,
   useFootprintProvider,

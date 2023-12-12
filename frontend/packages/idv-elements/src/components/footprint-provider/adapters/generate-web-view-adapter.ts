@@ -1,7 +1,7 @@
 import Logger from '../../../utils/logger';
-import type { CompletePayload, FootprintClientGenerator } from '../types';
+import type { CompletePayload, WebViewAdapterReturn } from '../types';
 
-const generateWebViewAdapter: FootprintClientGenerator = () => {
+const generateWebViewAdapter = (): WebViewAdapterReturn => {
   const getRedirectUrl = () => {
     const params = new URLSearchParams(document.location.search);
     return params.get('redirect_url');

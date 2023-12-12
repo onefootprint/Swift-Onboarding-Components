@@ -9,4 +9,4 @@ const [Provider, useBareFootprintProvider] = constate(
 export const useFootprintProvider = () => useBareFootprintProvider();
 
 export default Provider;
-export type { CompletePayload, FootprintClient } from './types';
+export type { CompletePayload, ProviderReturn } from './types';

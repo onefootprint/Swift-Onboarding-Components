@@ -26,11 +26,14 @@ const useProps = (
   onSuccess: (props: FootprintVerifyDataProps) => void,
   onError?: (error: unknown) => void,
 ) => {
+  // For legacy web SDKs that only pass args via postMessage
+  // TODO: delete when all customers migrate to v3.8.0+
+  const fpProvider = useFootprintProvider();
   const router = useRouter();
   const [isAdapterLoaded, setIsAdapterLoaded] = useState(false); // whether iframe adapter has loaded
   const onSuccessCalled = useRef(false); // Whether on success has been called with props
   const sdkArgsToken = getSdkArgsToken(router.asPath.split('#')[1] ?? '');
-  const sdkArgsQuery = useGetSdkArgs(sdkArgsToken);
+  const sdkArgsQuery = useGetSdkArgs(sdkArgsToken, fpProvider);
   const isSdkArgsLoading = sdkArgsQuery.isLoading && sdkArgsQuery.isFetching; // `isLoading` is true right from the start; `isFetching` is controlled by `enabled` property
 
   const complete = (props: FootprintVerifyDataProps) => {
@@ -42,13 +45,10 @@ const useProps = (
     onSuccess(props);
   };
 
-  // For legacy web SDKs that only pass args via postMessage
-  // TODO: delete when all customers migrate to v3.8.0+
-  const footprintProvider = useFootprintProvider();
   const timerId = useRef<NodeJS.Timeout | undefined>();
 
   useEffectOnce(() => {
-    footprintProvider.load().then(() => {
+    fpProvider.load().then(() => {
       Logger.info('Footprint provider successfully loaded');
       setIsAdapterLoaded(true);
     });
@@ -103,7 +103,7 @@ const useProps = (
     }
 
     Logger.info('Subscribing to post messages for props');
-    const unsubscribe = footprintProvider.on(
+    const unsubscribe = fpProvider.on(
       FootprintPrivateEvent.propsReceived,
       (props: unknown) => {
         if (typeof props === 'object') {

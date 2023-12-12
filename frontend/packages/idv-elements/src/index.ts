@@ -1,6 +1,5 @@
 export type {
   CompletePayload,
-  FootprintClient,
   HeaderTitleProps,
   InfoBoxProps,
   NavigationHeaderBackButtonProps,
@@ -10,6 +9,7 @@ export type {
   NavigationHeaderProps,
   NavigationHeaderRightButtonProps,
   NavigationHeaderStaticContent,
+  ProviderReturn,
   SandboxBannerHandler,
   WhatsThisContentProps,
 } from './components';
