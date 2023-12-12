@@ -110,7 +110,13 @@ export type WorkflowTriggeredEvent = {
   data: WorkflowTriggeredEventData;
 };
 
+export enum WorkflowStartedEventKind {
+  playbook = 'playbook',
+  document = 'document',
+}
+
 export type WorkflowStartedEventData = {
+  kind: WorkflowStartedEventKind;
   playbook: TimelinePlaybook;
 };
 

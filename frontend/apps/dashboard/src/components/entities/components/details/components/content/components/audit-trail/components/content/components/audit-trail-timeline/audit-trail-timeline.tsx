@@ -50,12 +50,12 @@ import {
   OnboardingDecisionEventHeader,
   OnboardingDecisionEventIcon,
 } from './components/onboarding-decision-event';
-import PlaybookLink from './components/playbook-link';
 import {
   WatchlistCheckEventBody,
   WatchlistCheckEventHeader,
   WatchlistCheckEventIcon,
 } from './components/watchlist-check-event';
+import WorkflowStartedEventHeader from './components/workflow-started-event';
 import {
   WorkflowTriggeredEventBody,
   WorkflowTriggeredEventHeader,
@@ -179,14 +179,7 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       items.push({
         time,
         iconComponent: <IcoWriting16 />,
-        headerComponent: (
-          <>
-            <Typography variant="body-3">
-              {t('timeline.workflow-started-event.started-onboarding-onto')}
-            </Typography>
-            <PlaybookLink playbook={eventData.playbook} />
-          </>
-        ),
+        headerComponent: <WorkflowStartedEventHeader data={eventData} />,
       });
     }
   });

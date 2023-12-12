@@ -14,6 +14,7 @@ import { entityFixture } from 'src/components/entities/components/details/detail
 
 import AuditTrailTimeline from './audit-trail-timeline';
 import TimelineFixture, {
+  DocumentWorkflowStarted,
   WorkflowTriggeredWithLinkEvent,
 } from './audit-trail-timeline.test.config';
 
@@ -195,6 +196,13 @@ describe('<AuditTrailTimeline />', () => {
     it('should render workflow started event properly', () => {
       renderAuditTrailTimeline(TimelineFixture);
       expect(screen.getByText('Started onboarding onto')).toBeInTheDocument();
+    });
+
+    it('should render document workflow started event properly', () => {
+      renderAuditTrailTimeline([DocumentWorkflowStarted]);
+      expect(
+        screen.getByText('Started uploading document'),
+      ).toBeInTheDocument();
     });
 
     // TODO: implement this after the backend finalizes the data model for manual review fields

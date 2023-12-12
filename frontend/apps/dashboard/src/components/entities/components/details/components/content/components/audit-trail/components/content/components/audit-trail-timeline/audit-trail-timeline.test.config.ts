@@ -9,6 +9,7 @@ import {
   TriggerKind,
   Vendor,
 } from '@onefootprint/types';
+import { WorkflowStartedEventKind } from '@onefootprint/types/src/data/timeline';
 
 const TimelineFixture: Timeline = [
   {
@@ -156,6 +157,7 @@ const TimelineFixture: Timeline = [
           name: 'My Playbook',
           mustCollectData: [],
         },
+        kind: WorkflowStartedEventKind.playbook,
       },
     },
     timestamp: '2022-11-08T20:21:53.771495Z',
@@ -177,6 +179,21 @@ export const WorkflowTriggeredWithLinkEvent: TimelineEvent = {
         kind: ActorKind.organization,
         member: 'Piip Penguin (piip@onefootprint.com)',
       },
+    },
+  },
+  timestamp: '2022-11-08T20:21:53.771495Z',
+};
+
+export const DocumentWorkflowStarted: TimelineEvent = {
+  event: {
+    kind: TimelineEventKind.workflowStarted,
+    data: {
+      playbook: {
+        id: 'ob_config_id_3o5SdynZVGO1icDm8Z6llC',
+        name: 'My Playbook',
+        mustCollectData: [],
+      },
+      kind: WorkflowStartedEventKind.document,
     },
   },
   timestamp: '2022-11-08T20:21:53.771495Z',
