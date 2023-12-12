@@ -805,6 +805,8 @@
         "title-by-author": "From {{author}}",
         "note": "Note",
         "unpin-button-text": "Unpin note",
+        "sort-ascending": "Show newest first",
+        "sort-descending": "Show oldest first",
         "carousel-buttons": {
           "left-aria-label": "Previous note",
           "right-aria-label": "Next note"
