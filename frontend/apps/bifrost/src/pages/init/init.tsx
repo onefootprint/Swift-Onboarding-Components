@@ -16,13 +16,20 @@ import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
+import { useTimeout } from 'usehooks-ts';
 
 import useProps from './hooks/use-props';
+import { POST_MESSAGE_TIMEOUT } from './hooks/use-props/use-props';
+
+const STUCK_ON_SHIMMER_TIMEOUT = POST_MESSAGE_TIMEOUT * 3;
 
 const Init = () => {
   const [state, send] = useBifrostMachine();
-  const { authToken: authTokenContext, publicKey: publicKeyContext } =
-    state.context;
+  const {
+    authToken: authTokenContext,
+    publicKey: publicKeyContext,
+    config: configContext,
+  } = state.context;
   const observeCollector = useObserveCollector();
   const { DoNotRecordTenantOrgIdOnLogRocket } = useFlags();
   const orgIds = new Set<string>(DoNotRecordTenantOrgIdOnLogRocket);
@@ -47,6 +54,19 @@ const Init = () => {
       });
     }
   };
+
+  useTimeout(() => {
+    Logger.error(
+      `User is stuck on init shimmer screen for 3+ seconds. Known args: ${JSON.stringify(
+        {
+          publicKey: publicKeyContext,
+          config: configContext,
+          isPropsSaved: isPropsSaved(),
+        },
+      )}`,
+      'init-shimmer',
+    );
+  }, STUCK_ON_SHIMMER_TIMEOUT);
 
   // TODO: delete this when all customers migrate to footprint-js v 3.8+
   // When fetching the sdkArgs from API, we will also get back the onboarding config

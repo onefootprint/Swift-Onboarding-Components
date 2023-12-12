@@ -20,7 +20,7 @@ import getPublicKeyFromUrl from './utils/get-public-key-from-url';
 
 // For legacy web SDKs that only pass args via postMessage
 // TODO: delete when all customers migrate to v3.8.0+
-const POST_MESSAGE_TIMEOUT = 1000;
+export const POST_MESSAGE_TIMEOUT = 1000;
 
 const useProps = (
   onSuccess: (props: FootprintVerifyDataProps) => void,
