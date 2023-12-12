@@ -106,11 +106,11 @@ def _make_request(
     return response
 
 
-def get(path, params=None, *auths, status_code=200):
+def get(path, params=None, *auths, body=None, status_code=200):
     return _make_request(
         method=requests.get,
         path=path,
-        data=None,
+        data=body,
         params=params,
         status_code=status_code,
         auths=auths,

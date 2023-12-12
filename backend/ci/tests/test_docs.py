@@ -32,7 +32,7 @@ def test_standalone_vaults(tenant):
     data = {"id.email": "jane@acmebank.com", "custom.ach_account": "111122224444"}
     patch(f"/users/{fp_id}/vault", data, tenant.sk.key)
 
-    body = get("/users", dict(search="Jane"), tenant.sk.key)
+    body = get("/users", None, tenant.sk.key, body=dict(search="Jane"))
     assert any(i["id"] == fp_id for i in body["data"])
 
 
