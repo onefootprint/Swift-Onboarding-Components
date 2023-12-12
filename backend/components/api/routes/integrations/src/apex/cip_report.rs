@@ -5,7 +5,7 @@ use api_core::{
     State,
 };
 use api_wire_types::{
-    ApexCheckedKycData, ApexCipReportRequest, ApexCipSummaryResults, ApexSelfReportedData,
+    ApexCheckedKycData, ApexCipReportRequest, ApexCipSummaryResults, ApexSelfReportedData, ApexWatchlist,
     OldApexCipReportRequest,
 };
 use newtypes::PiiString;
@@ -126,6 +126,15 @@ pub async fn post_inner(
         date_of_birth_breakdown: cip.identity.date_of_birth_breakdown,
         tax_id: cip.identity.tax_id.into(),
         tax_id_breakdown: cip.identity.tax_id_breakdown,
+        watchlist: ApexWatchlist {
+            result: cip.watchlist.result.into(),
+            check_completed_at: cip.watchlist.created_at,
+            politically_exposed_person: cip.watchlist.politically_exposed_person.into(),
+            sanction: cip.watchlist.sanction.into(),
+            adverse_media: cip.watchlist.adverse_media.into(),
+            monitored_lists: cip.watchlist.monitored_lists.into(),
+            records: cip.watchlist.records,
+        },
     };
 
     ResponseData::ok(summary).json()

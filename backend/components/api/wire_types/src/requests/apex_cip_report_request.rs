@@ -75,4 +75,17 @@ pub struct ApexCipSummaryResults {
     pub date_of_birth_breakdown: Vec<Vendor>,
     pub tax_id: ApexCipResult,
     pub tax_id_breakdown: Vec<Vendor>,
+
+    pub watchlist: ApexWatchlist,
+}
+
+#[derive(Debug, Clone, Apiv2Schema, Serialize)]
+pub struct ApexWatchlist {
+    pub result: ApexCipResult,
+    pub check_completed_at: chrono::DateTime<Utc>,
+    pub politically_exposed_person: ApexCipResult,
+    pub sanction: ApexCipResult,
+    pub adverse_media: ApexCipResult,
+    pub monitored_lists: ApexCipResult,
+    pub records: Vec<PiiJsonValue>,
 }
