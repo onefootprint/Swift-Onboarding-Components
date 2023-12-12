@@ -6,13 +6,14 @@ pub struct EmptyRequest {}
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
-/// Contains all of the fields that are passed in the querystring for a cursor-paginated request.
-/// Cursor pagination requests take in a cursor that identifies the start of the page (and is
-/// delivered by the last pagination request) using an ordered field.
-/// This is more performant, but doesn't give any insight into how far you have paginated through
-/// the results and requires the cursor field to have a _total_ ordering (partial does not work).
-/// But, results stay consistent as new results are added to earlier pages.
-/// Can be used alongside another actix web::Query extractor
+// Don't want this to be a docstring or it will be visible in Apiv2Schema docs...
+// Contains all of the fields that are passed in the querystring for a cursor-paginated request.
+// Cursor pagination requests take in a cursor that identifies the start of the page (and is
+// delivered by the last pagination request) using an ordered field.
+// This is more performant, but doesn't give any insight into how far you have paginated through
+// the results and requires the cursor field to have a _total_ ordering (partial does not work).
+// But, results stay consistent as new results are added to earlier pages.
+// Can be used alongside another actix web::Query extractor
 pub struct CursorPaginationRequest<C> {
     #[openapi(example = "12345")]
     pub cursor: Option<C>,
@@ -50,13 +51,14 @@ impl<C> CursorPaginationRequest<C> {
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
-/// Contains all of the fields that are passed in the querystring for an offset-paginated request.
-/// Offset pagination requests take in a page number and page size and use postgres's OFFSET
-/// in order to fetch the requested page.
-/// This is less performant but simpler. Postgres iterates through all results matching a query and
-/// skips the results that appear on the first N pages. This allows rendering the total number of
-/// pages and jumping to a specific page. But, results on the Nth page are not stable.
-/// Can be used alongside another actix web::Query extractor
+// Don't want this to be a docstring or it will be visible in Apiv2Schema docs...
+// Contains all of the fields that are passed in the querystring for an offset-paginated request.
+// Offset pagination requests take in a page number and page size and use postgres's OFFSET
+// in order to fetch the requested page.
+// This is less performant but simpler. Postgres iterates through all results matching a query and
+// skips the results that appear on the first N pages. This allows rendering the total number of
+// pages and jumping to a specific page. But, results on the Nth page are not stable.
+// Can be used alongside another actix web::Query extractor
 pub struct OffsetPaginationRequest {
     pub page: Option<usize>,
     pub page_size: Option<usize>,

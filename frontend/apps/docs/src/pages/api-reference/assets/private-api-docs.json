@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "6a40fd12bdaa150ed8d72bbc2221aba5f72bfbbd"
+        "version": "e029273501736a01334f6ab5cf493115cfc6928a"
     },
     "servers": [
         {
@@ -478,179 +478,6 @@
                                     "items": {
                                         "$ref": "#/components/schemas/BusinessOwner"
                                     }
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    }
-                ]
-            }
-        },
-        "/entities": {
-            "get": {
-                "tags": [
-                    "Entities",
-                    "Private"
-                ],
-                "description": "View list of entities (business or user) that have started onboarding to the tenant.",
-                "parameters": [
-                    {
-                        "in": "query",
-                        "name": "has_outstanding_workflow_request",
-                        "schema": {
-                            "type": "boolean"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "is_created_via_api",
-                        "schema": {
-                            "type": "boolean"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "kind",
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "person",
-                                "business"
-                            ]
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "requires_manual_review",
-                        "schema": {
-                            "type": "boolean"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "search",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "show_all",
-                        "description": "When true, shows hidden incomplete vaults that didn't complete a signup challenge",
-                        "schema": {
-                            "type": "boolean"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "statuses",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "enum": [
-                                    "pass",
-                                    "fail",
-                                    "incomplete",
-                                    "pending",
-                                    "none"
-                                ]
-                            }
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "timestamp_gte",
-                        "schema": {
-                            "type": "string",
-                            "format": "date-time"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "timestamp_lte",
-                        "schema": {
-                            "type": "string",
-                            "format": "date-time"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "watchlist_hit",
-                        "schema": {
-                            "type": "boolean"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "cursor",
-                        "schema": {
-                            "type": "integer"
-                        },
-                        "style": "form"
-                    },
-                    {
-                        "in": "query",
-                        "name": "page_size",
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        },
-                        "style": "form"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "description": "",
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/Entity"
-                                            }
-                                        },
-                                        "meta": {
-                                            "description": "Metadata required for a cursor-paginated response.",
-                                            "type": "object",
-                                            "properties": {
-                                                "count": {
-                                                    "example": 10000,
-                                                    "description": "The total number of results",
-                                                    "type": "integer",
-                                                    "format": "int64"
-                                                },
-                                                "next": {
-                                                    "example": 1234,
-                                                    "description": "The cursor to be provided in the next request to fetch the next page\n The `cursor` parameter to provide in order to request the next page of results",
-                                                    "type": "integer"
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "required": [
-                                        "data",
-                                        "meta"
-                                    ]
                                 }
                             }
                         }
@@ -6286,7 +6113,7 @@
                     "allow_us_residents": {
                         "type": "boolean"
                     },
-                    "allow_us_territory_residents": {
+                    "allow_us_territories": {
                         "type": "boolean"
                     },
                     "can_access_data": {
@@ -15139,7 +14966,6 @@
                         ]
                     },
                     "pagination": {
-                        "description": "Contains all of the fields that are passed in the querystring for a cursor-paginated request.\n Cursor pagination requests take in a cursor that identifies the start of the page (and is\n delivered by the last pagination request) using an ordered field.\n This is more performant, but doesn't give any insight into how far you have paginated through\n the results and requires the cursor field to have a _total_ ordering (partial does not work).\n But, results stay consistent as new results are added to earlier pages.\n Can be used alongside another actix web::Query extractor",
                         "type": "object",
                         "properties": {
                             "cursor": {
@@ -15188,7 +15014,6 @@
                     }
                 },
                 "required": [
-                    "pagination",
                     "statuses"
                 ]
             },
