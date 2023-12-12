@@ -9,6 +9,8 @@ use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use db::models::manual_review::ManualReview;
 use db::models::scoped_vault::ScopedVault;
+use db::models::workflow_request::WorkflowRequest;
+use newtypes::PreviewApi;
 use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(
@@ -21,20 +23,28 @@ pub async fn detail(
     fp_id: FpIdPath,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<api_wire_types::User> {
+    // Low confidence in this being the right future-proof API, so let's gate it
+    let show_info_requested = auth.can_access_preview(&PreviewApi::UserDetailInfoRequested);
+
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
 
-    let (sv, mrs) = state
+    let (sv, mrs, wfr) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let mrs = ManualReview::get_active_for_sv(conn, &sv.id)?;
-            Ok((sv, mrs))
+            let wfr = if show_info_requested {
+                WorkflowRequest::get_active(conn, &sv.id)?
+            } else {
+                None
+            };
+            Ok((sv, mrs, wfr))
         })
         .await??;
 
-    let result = api_wire_types::User::from_db((sv, mrs));
+    let result = api_wire_types::User::from_db((sv, mrs, wfr));
     ResponseData::ok(result).json()
 }

@@ -62,6 +62,16 @@ impl WorkflowRequest {
         Ok(result)
     }
 
+    #[tracing::instrument("WorkflowRequest::get", skip_all)]
+    pub fn get_active(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Option<Self>> {
+        let result = workflow_request::table
+            .filter(workflow_request::scoped_vault_id.eq(sv_id))
+            .filter(workflow_request::deactivated_at.is_null())
+            .get_result(conn)
+            .optional()?;
+        Ok(result)
+    }
+
     #[tracing::instrument("Workflow::get_bulk", skip_all)]
     pub fn get_bulk(
         conn: &mut PgConn,

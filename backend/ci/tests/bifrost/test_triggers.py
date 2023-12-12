@@ -25,6 +25,13 @@ def send_trigger(fp_id, sandbox_tenant, trigger):
     assert not trigger_event["data"]["request"]["is_deactivated"]
     assert trigger_event["data"]["actor"]["kind"] == "organization"
 
+    # Enforce the user is marked as "info requested"
+    body = get(f"entities/{fp_id}", None, *sandbox_tenant.db_auths)
+    assert body["has_outstanding_workflow_request"]
+    # And that we serialize that the user has info requested
+    body = get(f"users/{fp_id}", None, sandbox_tenant.sk.key)
+    assert body["info_requested"]
+
     # Re-generate a link as is done from the dashboard
     body = post(
         f"entities/{fp_id}/triggers/{t_id}/link", None, *sandbox_tenant.db_auths
@@ -42,10 +49,6 @@ def complete_redo_flow(twilio, user, auth_token, pre_run=None):
     timeline = get(f"entities/{fp_id}/timeline", None, *tenant.db_auths)
     obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 1
-
-    # Enforce the user is marked as "info requested"
-    body = get(f"entities/{fp_id}", None, *tenant.db_auths)
-    assert body["has_outstanding_workflow_request"]
 
     # Re-run Bifrost with the token, optionally with any pre_run assertion checks
     auth_token = step_up_user(twilio, auth_token, phone_number, False)
