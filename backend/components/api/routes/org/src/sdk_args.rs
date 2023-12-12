@@ -36,7 +36,6 @@ async fn post(
 ) -> JsonApiResponse<CreateSdkArgsTokenResponse> {
     let session_key = state.session_sealing_key.clone();
     let data = request.0;
-    data.validate()?;
     let kind = SdkArgsKind::from(&data);
     root_span.record("meta", kind.to_string());
 
@@ -44,10 +43,13 @@ async fn post(
 
     let (token, session) = state
         .db_pool
+        // Don't make this a transaction since we return errors from here but still want to save
+        // the session in the database
         .db_query(move |conn| -> ApiResult<_> {
             let duration = Duration::minutes(15);
-            let obc = data.ob_config(conn)?;
-            if let Some((obc, _, _, _)) = obc {
+            let err = data.validate();
+            let obc = data.ob_config(conn);
+            if let Ok(Some((obc, _, _, _))) = &obc {
                 root_span.record("tenant_id", obc.tenant_id.to_string());
                 root_span.record("is_live", obc.is_live.to_string());
             }
@@ -57,9 +59,16 @@ async fn post(
                 e_private_key,
                 e_data,
             };
+            // Always save the session in the DB, even if some validation errors occurred.
+            // This allows us to look up the session by hash even if it had invalid args
             let (auth_token, session) = AuthSession::create_sync(conn, &session_key, data.into(), duration)?;
             root_span.record("auth_token_hash", auth_token.id().to_string());
-            Ok((auth_token, session))
+
+            if let Some(err) = err.err().or(obc.err()) {
+                Err(err)
+            } else {
+                Ok((auth_token, session))
+            }
         })
         .await??;
 

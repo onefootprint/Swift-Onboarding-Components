@@ -1,7 +1,10 @@
 use crate::{ProtectedAuth, State};
 use actix_web::{post, web, web::Json};
 use api_core::{
-    auth::session::AuthSessionData,
+    auth::session::{
+        sdk_args::{SdkArgs, SdkArgsData},
+        AuthSessionData,
+    },
     errors::ValidationError,
     types::{JsonApiResponse, ResponseData},
     ApiErrorKind,
@@ -59,8 +62,23 @@ pub async fn post(
     } else {
         // Then try decrypting the session and json deserializing
         let data = AuthSessionData::unseal(&state.session_sealing_key, SealedSessionBytes(session.data))?;
-        let serialized = serde_json::value::to_value(data)?;
-        (serialized, SessionKind::Sealed)
+
+        let data = if let AuthSessionData::SdkArgs(data) = data {
+            // SDK args are also encyrypted to another specific key, let's decrypt it
+            let SdkArgsData {
+                e_private_key,
+                e_data,
+            } = data;
+            let sdk_args_str = state
+                .enclave_client
+                .decrypt_to_piistring(&e_data, &e_private_key)
+                .await?;
+            let args: SdkArgs = serde_json::de::from_str(sdk_args_str.leak())?;
+            serde_json::value::to_value(args)?
+        } else {
+            serde_json::value::to_value(data)?
+        };
+        (data, SessionKind::Sealed)
     };
     let response = RevealResponse {
         data,
