@@ -12,7 +12,7 @@ type GetSdkArgsResponse = {
 };
 
 const extractCleanDomain = (s: string): string =>
-  s.replace(/(https?:\/\/)?(www\.)?/gi, '').split('/')[0];
+  s.replace(/(https?:\/\/)?(www\.)?/gi, '').split(/[/?#]/)[0];
 
 const getSdkArgs = async (authToken: string, fpProvider: ProviderReturn) => {
   let sdkUrl = '';
