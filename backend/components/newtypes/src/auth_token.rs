@@ -23,6 +23,12 @@ impl From<PiiString> for SessionAuthToken {
     }
 }
 
+impl<'a> From<&'a PiiString> for SessionAuthToken {
+    fn from(value: &'a PiiString) -> Self {
+        Self(value.leak_to_string())
+    }
+}
+
 impl SessionAuthToken {
     const PREFIX: &'static str = "tok_";
     const LEN_RANDOM_CHARS: usize = 34;

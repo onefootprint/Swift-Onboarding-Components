@@ -7,6 +7,7 @@ use db::{
 };
 use newtypes::{
     DataIdentifier, EncryptedVaultPrivateKey, ObConfigurationKey, PiiJsonValue, PiiString, SealedVaultBytes,
+    SessionAuthToken,
 };
 use paperclip::actix::Apiv2Schema;
 use std::collections::HashMap;
@@ -84,6 +85,17 @@ pub struct FormV1SdkArgs {
 
 impl VerifyV1SdkArgs {
     pub fn validate(&self) -> ApiResult<()> {
+        let auth_token_hash = self
+            .auth_token
+            .as_ref()
+            .map(|t| SessionAuthToken::from(t).id().to_string())
+            .unwrap_or("None".into());
+        let public_key = self
+            .public_key
+            .as_ref()
+            .map(|pk| pk.to_string())
+            .unwrap_or("None".into());
+        tracing::info!(%auth_token_hash, %public_key, "Verify args");
         if self.auth_token.is_none() && self.public_key.is_none() {
             return Err(ValidationError("Either auth token or public key must be provided").into());
         }
@@ -109,6 +121,12 @@ impl VerifyV1SdkArgs {
 
 impl AuthV1SdkArgs {
     pub fn validate(&self) -> ApiResult<()> {
+        let public_key = self
+            .public_key
+            .as_ref()
+            .map(|pk| pk.to_string())
+            .unwrap_or("None".into());
+        tracing::info!(%public_key, "Auth args");
         if self.public_key.is_none() {
             return Err(ValidationError("Public key must be provided").into());
         }
@@ -134,6 +152,12 @@ impl AuthV1SdkArgs {
 
 impl FormV1SdkArgs {
     pub fn validate(&self) -> ApiResult<()> {
+        let auth_token_hash = self
+            .auth_token
+            .as_ref()
+            .map(|t| SessionAuthToken::from(t).id().to_string())
+            .unwrap_or("None".into());
+        tracing::info!(%auth_token_hash, "Auth args");
         if self.auth_token.is_none() {
             return Err(ValidationError("Auth token must be provided").into());
         }
