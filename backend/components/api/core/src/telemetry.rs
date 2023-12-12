@@ -133,6 +133,9 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             ip_address,
             country,
             user_agent,
+            // This is already logged by the macro, but we want to overshadow it with a field that
+            // excludes the HTTP path
+            http.target = %request.uri().path(),
             "Root span"
         );
         span
