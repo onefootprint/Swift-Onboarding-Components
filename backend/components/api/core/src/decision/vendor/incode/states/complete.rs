@@ -170,7 +170,7 @@ impl Complete {
             .map(|odk| DocumentKind::OcrData(dk, odk).into())
             .collect();
         let seqno = DataLifetime::get_next_seqno(conn)?;
-        DataLifetime::bulk_deactivate_speculative(conn, sv_id, odks_to_clear, seqno)?;
+        DataLifetime::bulk_deactivate_kinds(conn, sv_id, odks_to_clear, seqno)?;
 
         // ////////////
         // Save Risk Signals

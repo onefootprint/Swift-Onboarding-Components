@@ -240,7 +240,7 @@ impl ValidatedDataRequest {
             .unique()
             .collect();
         let seqno = DataLifetime::get_next_seqno(conn)?;
-        DataLifetime::bulk_deactivate_speculative(conn, sv_id, kinds_to_deactivate, seqno)?;
+        DataLifetime::bulk_deactivate_kinds(conn, sv_id, kinds_to_deactivate, seqno)?;
 
         // Create the new VDs
         let actor = actor.map(|a| a.into());

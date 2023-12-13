@@ -252,10 +252,10 @@ impl DataLifetime {
         Ok(results)
     }
 
-    /// Deactivates the speculative DataLifetimes with the provided kinds associated with this (user, tenant).
-    /// This should only be used when replacing speculative, un-committed user data with new speculative user data
-    #[tracing::instrument("DataLifetime::bulk_deactivate_speculativbe", skip_all)]
-    pub fn bulk_deactivate_speculative(
+    /// Deactivates the old DataLifetimes with the provided kinds associated with this (user, tenant).
+    /// This should only be used when replacing old data with new
+    #[tracing::instrument("DataLifetime::bulk_deactivate_kinds", skip_all)]
+    pub fn bulk_deactivate_kinds(
         conn: &mut PgConn,
         scoped_vault_id: &ScopedVaultId,
         kinds: Vec<DataIdentifier>,
@@ -270,9 +270,6 @@ impl DataLifetime {
             .filter(data_lifetime::kind.eq_any(kinds))
             .filter(data_lifetime::scoped_vault_id.eq(scoped_vault_id))
             .filter(data_lifetime::deactivated_seqno.is_null())
-            // Specifically don't allow deactivating portable data here since we are replacing it
-            // with speculative data
-            .filter(data_lifetime::portablized_seqno.is_null())
             .set(update)
             .get_results(conn)?;
         Ok(results)

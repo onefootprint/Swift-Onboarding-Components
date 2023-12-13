@@ -229,7 +229,7 @@ impl WriteableVw<Person> {
 
         let seqno = DataLifetime::get_next_seqno(conn)?;
         let kinds = docs.iter().map(|d| d.kind.clone()).collect_vec();
-        DataLifetime::bulk_deactivate_speculative(conn, &su_id, kinds, seqno)?;
+        DataLifetime::bulk_deactivate_kinds(conn, &su_id, kinds, seqno)?;
 
         let actor = actor.map(|a| a.into());
         let docs = docs
