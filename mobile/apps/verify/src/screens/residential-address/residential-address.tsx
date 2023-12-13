@@ -10,8 +10,6 @@ import type { AddressPrediction, SelectRef } from '@onefootprint/ui';
 import {
   AddressInput,
   Box,
-  Button,
-  Container,
   CountrySelect,
   Select,
   TextInput,
@@ -22,6 +20,7 @@ import { type TextInput as RNTextInput } from 'react-native';
 import styled, { css } from 'styled-components/native';
 import * as z from 'zod';
 
+import DataCollectionActionButton from '@/components/data-collection-action-button';
 import Header from '@/components/header';
 import states from '@/constants/states';
 import type { SyncDataFieldErrors } from '@/hooks/use-sync-data';
@@ -41,6 +40,8 @@ export type ResidentialAddressProps = {
   config: PublicOnboardingConfig;
   kycData: KycData;
   onComplete: (data: KycData) => void;
+  onCancel?: () => void;
+  hideHeader?: boolean;
 };
 
 const fieldByDi: Partial<Record<IdDI, keyof FormData>> = {
@@ -58,6 +59,8 @@ const ResidentialAddress = ({
   config,
   kycData,
   onComplete,
+  onCancel,
+  hideHeader,
 }: ResidentialAddressProps) => {
   const { t } = useTranslation('pages.residential-address');
   const countryFromContext = kycData[IdDI.country]?.value;
@@ -206,8 +209,8 @@ const ResidentialAddress = ({
   };
 
   return (
-    <Container scroll>
-      <Header title={t('title')} subtitle={t('subtitle')} />
+    <Box>
+      {!hideHeader && <Header title={t('title')} subtitle={t('subtitle')} />}
       <Box gap={7}>
         <Controller
           control={control}
@@ -398,16 +401,13 @@ const ResidentialAddress = ({
           }}
           name="state"
         />
-
-        <Button
-          variant="primary"
-          onPress={handleSubmit(onSubmit)}
-          loading={isLoading}
-        >
-          {t('form.cta')}
-        </Button>
+        <DataCollectionActionButton
+          onComplete={handleSubmit(onSubmit)}
+          isLoading={isLoading}
+          onCancel={onCancel}
+        />
       </Box>
-    </Container>
+    </Box>
   );
 };
 

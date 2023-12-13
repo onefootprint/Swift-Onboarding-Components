@@ -126,7 +126,6 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
                   );
                 },
               },
-
               {
                 target: 'ssn',
                 actions: ['assignKycData'],
@@ -144,6 +143,10 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
                     )
                   );
                 },
+              },
+              {
+                target: 'confirm',
+                actions: ['assignKycData'],
               },
             ],
           },
@@ -169,18 +172,31 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
                   );
                 },
               },
+              {
+                target: 'confirm',
+                actions: ['assignKycData'],
+              },
             ],
           },
         },
         ssn: {
           on: {
             dataSubmitted: {
-              target: 'completed',
+              target: 'confirm',
               actions: ['assignKycData'],
             },
           },
         },
-
+        confirm: {
+          on: {
+            dataSubmitted: {
+              actions: ['assignKycData'],
+            },
+            done: {
+              target: 'completed',
+            },
+          },
+        },
         completed: {
           type: 'final',
         },

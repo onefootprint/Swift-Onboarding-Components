@@ -5,7 +5,7 @@ import {
   type SignupChallengeResponse,
   ChallengeKind,
 } from '@onefootprint/types';
-import { Container, PinInput, useToast } from '@onefootprint/ui';
+import { Box, PinInput, useToast } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components/native';
 import { useEffectOnce } from 'usehooks-ts';
@@ -181,7 +181,7 @@ const SmsChallenge = ({
   // TODO: Title can be "welcome back" or "enter code" depending on state
   // TODO: User can have option to choose a different method of verification
   return (
-    <Container>
+    <Box width="100%">
       <Header
         title={t('title')}
         subtitle={t('subtitle', { scrubbedPhoneNumber })}
@@ -207,7 +207,7 @@ const SmsChallenge = ({
           {isVerifying && <Verifying />}
         </>
       )}
-    </Container>
+    </Box>
   );
 };
 

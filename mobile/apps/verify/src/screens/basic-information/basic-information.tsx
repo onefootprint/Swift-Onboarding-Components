@@ -4,13 +4,14 @@ import {
   CollectedKycDataOption,
   IdDI,
 } from '@onefootprint/types';
-import { Box, Button, Container, TextInput } from '@onefootprint/ui';
+import { Box, TextInput } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import type { TextInput as RNTextInput } from 'react-native';
 import styled, { css } from 'styled-components/native';
 import * as z from 'zod';
 
+import DataCollectionActionButton from '@/components/data-collection-action-button';
 import Header from '@/components/header';
 import type { SyncDataFieldErrors } from '@/hooks/use-sync-data';
 import useSyncData from '@/hooks/use-sync-data';
@@ -33,6 +34,8 @@ export type BasicInformationProps = {
   data: KycData;
   authToken: string;
   onComplete: (data: KycData) => void;
+  onCancel?: () => void;
+  hideHeader?: boolean;
 };
 
 const fieldByDi: Partial<Record<IdDI, keyof FormData>> = {
@@ -47,6 +50,8 @@ const BasicInformation = ({
   requirement,
   authToken,
   data,
+  onCancel,
+  hideHeader,
 }: BasicInformationProps) => {
   const { t } = useTranslation('pages.basic-information');
   const { mutation, syncData } = useSyncData();
@@ -134,8 +139,8 @@ const BasicInformation = ({
 
   // TODO: add support to show country of birth
   return (
-    <Container scroll>
-      <Header title={t('title')} subtitle={t('subtitle')} />
+    <Box width="100%">
+      {!hideHeader && <Header title={t('title')} subtitle={t('subtitle')} />}
       <Box gap={7}>
         {requiresName && (
           <>
@@ -266,15 +271,13 @@ const BasicInformation = ({
             name="dob"
           />
         )}
-        <Button
-          variant="primary"
-          onPress={handleSubmit(onSubmit)}
-          loading={mutation.isLoading}
-        >
-          {t('form.cta')}
-        </Button>
+        <DataCollectionActionButton
+          isLoading={mutation.isLoading}
+          onComplete={handleSubmit(onSubmit)}
+          onCancel={onCancel}
+        />
       </Box>
-    </Container>
+    </Box>
   );
 };
 

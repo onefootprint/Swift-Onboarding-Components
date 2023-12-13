@@ -1,17 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ObConfigAuth } from '@onefootprint/types';
-import {
-  Box,
-  Button,
-  Container,
-  DismissKeyboard,
-  TextInput,
-  Typography,
-} from '@onefootprint/ui';
+import { Box, DismissKeyboard, TextInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+import DataCollectionActionButton from '@/components/data-collection-action-button';
 import useIdentify from '@/hooks/use-identify';
 import useRequestErrorToast from '@/hooks/use-request-error-toast';
 import useTranslation from '@/hooks/use-translation';
@@ -74,57 +68,52 @@ const EmailIdentification = ({
   };
 
   return (
-    <Container>
-      <DismissKeyboard>
-        <Box gap={3} marginBottom={7}>
-          <Typography color="primary" variant="heading-3" center>
-            {t('title')}
-          </Typography>
-          <Typography color="primary" variant="body-2" center>
-            {t('subtitle')}
-          </Typography>
-        </Box>
-        <Box marginBottom={7}>
-          <Controller
-            control={control}
-            render={({
-              field: { onChange, onBlur, value },
-              fieldState: { error },
-            }) => {
-              return (
-                <TextInput
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  autoCorrect={false}
-                  autoFocus
-                  blurOnSubmit
-                  enterKeyHint="send"
-                  hasError={!!error}
-                  hint={error?.message}
-                  inputMode="email"
-                  label={t('form.email.label')}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  onSubmitEditing={handleSubmit(onSubmit)}
-                  placeholder={t('form.email.placeholder')}
-                  private
-                  textContentType="emailAddress"
-                  value={value}
-                />
-              );
-            }}
-            name="email"
-          />
-        </Box>
-        <Button
-          variant="primary"
-          onPress={handleSubmit(onSubmit)}
-          loading={isLoading}
-        >
-          {t('form.cta')}
-        </Button>
-      </DismissKeyboard>
-    </Container>
+    <DismissKeyboard>
+      <Box gap={3} marginBottom={7}>
+        <Typography color="primary" variant="heading-3" center>
+          {t('title')}
+        </Typography>
+        <Typography color="primary" variant="body-2" center>
+          {t('subtitle')}
+        </Typography>
+      </Box>
+      <Box marginBottom={7}>
+        <Controller
+          control={control}
+          render={({
+            field: { onChange, onBlur, value },
+            fieldState: { error },
+          }) => {
+            return (
+              <TextInput
+                autoCapitalize="none"
+                autoComplete="email"
+                autoCorrect={false}
+                autoFocus
+                blurOnSubmit
+                enterKeyHint="send"
+                hasError={!!error}
+                hint={error?.message}
+                inputMode="email"
+                label={t('form.email.label')}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                onSubmitEditing={handleSubmit(onSubmit)}
+                placeholder={t('form.email.placeholder')}
+                private
+                textContentType="emailAddress"
+                value={value}
+              />
+            );
+          }}
+          name="email"
+        />
+      </Box>
+      <DataCollectionActionButton
+        onComplete={handleSubmit(onSubmit)}
+        isLoading={isLoading}
+      />
+    </DismissKeyboard>
   );
 };
 

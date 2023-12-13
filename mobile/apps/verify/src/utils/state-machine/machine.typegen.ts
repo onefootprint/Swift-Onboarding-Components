@@ -27,6 +27,7 @@ export interface Typegen0 {
   matchesStates:
     | 'basicInformation'
     | 'completed'
+    | 'confirm'
     | 'emailIdentification'
     | 'init'
     | 'initFailed'

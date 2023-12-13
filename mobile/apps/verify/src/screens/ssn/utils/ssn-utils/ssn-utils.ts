@@ -34,3 +34,18 @@ export const getSsnValue = (data: KycData, ssnKind?: 'last-4' | 'ssn-full') => {
   }
   return undefined;
 };
+
+export const ssnFormatter = (
+  ssnKind: 'ssn-full' | 'last-4',
+  ssn?: string,
+  scrubbed?: boolean,
+) => {
+  if (scrubbed) {
+    const len = ssnKind === 'ssn-full' ? 9 : 4;
+    return '•'.repeat(len);
+  }
+  if (!ssn) {
+    return '';
+  }
+  return ssn.replace(/^(\d{3})(\d{2})(\d{4})$/, '$1-$2-$3');
+};

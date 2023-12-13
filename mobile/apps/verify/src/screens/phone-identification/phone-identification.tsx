@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ObConfigAuth } from '@onefootprint/types';
-import { Box, Button, Container, TextInput } from '@onefootprint/ui';
+import { Box, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import isMobilePhone from 'validator/lib/isMobilePhone';
 import * as z from 'zod';
 
+import DataCollectionActionButton from '@/components/data-collection-action-button';
 import useIdentify from '@/hooks/use-identify';
 import useRequestErrorToast from '@/hooks/use-request-error-toast';
 import useTranslation from '@/hooks/use-translation';
@@ -78,7 +79,7 @@ const PhoneIdentification = ({
   };
 
   return (
-    <Container>
+    <Box width="100%">
       <Header title={t('title')} subtitle={t('subtitle')} />
       <EmailPreview email={email} onEdit={onEmailEdit} />
       <Box gap={7} marginBottom={7}>
@@ -113,16 +114,12 @@ const PhoneIdentification = ({
           }}
           name="phoneNumber"
         />
-
-        <Button
-          variant="primary"
-          onPress={handleSubmit(onSubmit)}
-          loading={isLoading}
-        >
-          {t('form.cta')}
-        </Button>
+        <DataCollectionActionButton
+          onComplete={handleSubmit(onSubmit)}
+          isLoading={isLoading}
+        />
       </Box>
-    </Container>
+    </Box>
   );
 };
 

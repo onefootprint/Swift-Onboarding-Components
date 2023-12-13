@@ -1,4 +1,5 @@
 import { type ChallengeData } from '@onefootprint/types';
+import { Container } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import React from 'react';
 
@@ -6,6 +7,7 @@ import createMachine from '@/utils/state-machine/machine';
 import type { IdentifyResultProps } from '@/utils/state-machine/types';
 
 import BasicInformation from '../basic-information';
+import Confirm from '../confirm';
 import EmailIdentification from '../email-identification';
 import Init from '../init';
 import InitFailed from '../init-failed';
@@ -68,34 +70,42 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
 
   if (state.matches('init')) {
     return (
-      <Init
-        authToken={sdkAuthToken}
-        onDone={({ error, data }) => {
-          if (data && data.obConfig) {
-            send({
-              type: 'sdkArgsReceived',
-              payload: { config: data.obConfig },
-            });
-          }
-          if (error) {
-            send({ type: 'failed' });
-          }
-        }}
-      />
+      <Container center>
+        <Init
+          authToken={sdkAuthToken}
+          onDone={({ error, data }) => {
+            if (data && data.obConfig) {
+              send({
+                type: 'sdkArgsReceived',
+                payload: { config: data.obConfig },
+              });
+            }
+            if (error) {
+              send({ type: 'failed' });
+            }
+          }}
+        />
+      </Container>
     );
   }
 
   if (state.matches('initFailed')) {
-    return <InitFailed />;
+    return (
+      <Container center>
+        <InitFailed />
+      </Container>
+    );
   }
 
   if (state.matches('emailIdentification')) {
     if (obConfigAuth) {
       return (
-        <EmailIdentification
-          obConfigAuth={obConfigAuth}
-          onComplete={handleIdentified}
-        />
+        <Container>
+          <EmailIdentification
+            obConfigAuth={obConfigAuth}
+            onComplete={handleIdentified}
+          />
+        </Container>
       );
     }
   }
@@ -103,12 +113,14 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
   if (state.matches('phoneIdentification')) {
     if (obConfigAuth && identify) {
       return (
-        <PhoneIdentification
-          obConfigAuth={obConfigAuth}
-          onComplete={handleIdentified}
-          email={identify.identifyResult?.email}
-          onEmailEdit={() => send({ type: 'identifyReset' })}
-        />
+        <Container>
+          <PhoneIdentification
+            obConfigAuth={obConfigAuth}
+            onComplete={handleIdentified}
+            email={identify.identifyResult?.email}
+            onEmailEdit={() => send({ type: 'identifyReset' })}
+          />
+        </Container>
       );
     }
   }
@@ -116,17 +128,19 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
   if (state.matches('smsChallenge')) {
     if (obConfigAuth) {
       return (
-        <SmsChallenge
-          identify={identify}
-          obConfigAuth={obConfigAuth}
-          onComplete={handleChallengeSucceed}
-          onChallengeReceived={(challengeData: ChallengeData) =>
-            send({
-              type: 'challengeReceived',
-              payload: challengeData,
-            })
-          }
-        />
+        <Container>
+          <SmsChallenge
+            identify={identify}
+            obConfigAuth={obConfigAuth}
+            onComplete={handleChallengeSucceed}
+            onChallengeReceived={(challengeData: ChallengeData) =>
+              send({
+                type: 'challengeReceived',
+                payload: challengeData,
+              })
+            }
+          />
+        </Container>
       );
     }
   }
@@ -134,17 +148,19 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
   if (state.matches('basicInformation')) {
     if (authToken && kycRequirement && kycData) {
       return (
-        <BasicInformation
-          requirement={kycRequirement}
-          data={kycData}
-          authToken={authToken}
-          onComplete={data => {
-            send({
-              type: 'dataSubmitted',
-              payload: data,
-            });
-          }}
-        />
+        <Container scroll>
+          <BasicInformation
+            requirement={kycRequirement}
+            data={kycData}
+            authToken={authToken}
+            onComplete={data => {
+              send({
+                type: 'dataSubmitted',
+                payload: data,
+              });
+            }}
+          />
+        </Container>
       );
     }
   }
@@ -152,18 +168,20 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
   if (state.matches('residentialAddress')) {
     if (config && kycData && authToken && kycRequirement) {
       return (
-        <ResidentialAddress
-          requirement={kycRequirement}
-          config={config}
-          kycData={kycData}
-          authToken={authToken}
-          onComplete={data => {
-            send({
-              type: 'dataSubmitted',
-              payload: data,
-            });
-          }}
-        />
+        <Container scroll>
+          <ResidentialAddress
+            requirement={kycRequirement}
+            config={config}
+            kycData={kycData}
+            authToken={authToken}
+            onComplete={data => {
+              send({
+                type: 'dataSubmitted',
+                payload: data,
+              });
+            }}
+          />
+        </Container>
       );
     }
   }
@@ -171,17 +189,41 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
   if (state.matches('ssn')) {
     if (authToken && kycRequirement && kycData) {
       return (
-        <Ssn
-          requirement={kycRequirement}
-          kycData={kycData}
-          authToken={authToken}
-          onComplete={data => {
-            send({
-              type: 'dataSubmitted',
-              payload: data,
-            });
-          }}
-        />
+        <Container scroll>
+          <Ssn
+            requirement={kycRequirement}
+            kycData={kycData}
+            authToken={authToken}
+            onComplete={data => {
+              send({
+                type: 'dataSubmitted',
+                payload: data,
+              });
+            }}
+          />
+        </Container>
+      );
+    }
+  }
+
+  if (state.matches('confirm')) {
+    if (kycRequirement && kycData && authToken && config) {
+      return (
+        <Container scroll>
+          <Confirm
+            requirement={kycRequirement}
+            data={kycData}
+            authToken={authToken}
+            config={config}
+            onComplete={() => console.log('clicked confirm')}
+            onConfirm={data => {
+              send({
+                type: 'dataSubmitted',
+                payload: data,
+              });
+            }}
+          />
+        </Container>
       );
     }
   }

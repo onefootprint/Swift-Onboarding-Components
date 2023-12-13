@@ -123,13 +123,14 @@ export const isMissingResidentialAttribute = (
   mustCollect: CollectedKycDataOption[],
   collectedData?: KycData,
   ignoreCollectedData?: boolean,
-) =>
-  isMissing(
+) => {
+  return isMissing(
     RESIDENTIAL_ATTRIBUTES,
     mustCollect,
     collectedData,
     ignoreCollectedData,
   );
+};
 
 export const isMissingSsnAttribute = (
   mustCollect: CollectedKycDataOption[],

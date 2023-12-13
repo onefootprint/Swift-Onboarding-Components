@@ -14,6 +14,7 @@ const signupChallenge = async (payload: SignupChallengeRequest) => {
   if (sandboxId) {
     headers[SANDBOX_ID_HEADER] = sandboxId;
   }
+  headers[SANDBOX_ID_HEADER] = 'sandbox1234567890';
   const response = await request<SignupChallengeResponse>({
     method: 'POST',
     url: '/hosted/identify/signup_challenge',

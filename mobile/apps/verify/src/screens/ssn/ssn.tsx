@@ -1,18 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IcoShield40 } from '@onefootprint/icons';
 import { type CollectKycDataRequirement, IdDI } from '@onefootprint/types';
-import {
-  Box,
-  Button,
-  Container,
-  TextInput,
-  Typography,
-} from '@onefootprint/ui';
+import { Box, TextInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components/native';
 import * as z from 'zod';
 
+import DataCollectionActionButton from '@/components/data-collection-action-button';
 import Header from '@/components/header';
 import type { SyncDataFieldErrors } from '@/hooks/use-sync-data';
 import useSyncData from '@/hooks/use-sync-data';
@@ -28,9 +23,18 @@ export type SsnProps = {
   requirement: CollectKycDataRequirement;
   authToken: string;
   onComplete: (data: KycData) => void;
+  onCancel?: () => void;
+  hideHeader?: boolean;
 };
 
-const Ssn = ({ kycData, requirement, authToken, onComplete }: SsnProps) => {
+const Ssn = ({
+  kycData,
+  requirement,
+  authToken,
+  onComplete,
+  onCancel,
+  hideHeader,
+}: SsnProps) => {
   const { t } = useTranslation('pages.ssn');
   const {
     mutation: { isLoading },
@@ -101,8 +105,8 @@ const Ssn = ({ kycData, requirement, authToken, onComplete }: SsnProps) => {
   };
 
   return (
-    <Container scroll>
-      <Header title={t('title')} subtitle={t('subtitle')} />
+    <Box width="100%">
+      {!hideHeader && <Header title={t('title')} subtitle={t('subtitle')} />}
       <Box gap={7}>
         {ssnKind === 'ssn-full' ? (
           <Controller
@@ -176,15 +180,13 @@ const Ssn = ({ kycData, requirement, authToken, onComplete }: SsnProps) => {
             </Box>
           </Disclaimer>
         )}
-        <Button
-          variant="primary"
-          onPress={handleSubmit(onSubmit)}
-          loading={isLoading}
-        >
-          {t('form.cta')}
-        </Button>
+        <DataCollectionActionButton
+          onComplete={handleSubmit(onSubmit)}
+          isLoading={isLoading}
+          onCancel={onCancel}
+        />
       </Box>
-    </Container>
+    </Box>
   );
 };
 

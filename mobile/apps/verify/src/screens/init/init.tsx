@@ -1,5 +1,5 @@
 import type { GetSdkArgsResponse } from '@onefootprint/types';
-import { Container, LoadingIndicator } from '@onefootprint/ui';
+import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
 
 import useSdkArgs from './hooks/use-sdk-args';
@@ -19,11 +19,7 @@ const Init = ({ authToken, onDone }: InitProps) => {
     },
   });
 
-  return (
-    <Container center>
-      <LoadingIndicator />
-    </Container>
-  );
+  return <LoadingIndicator />;
 };
 
 export default Init;

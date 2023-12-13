@@ -13,6 +13,11 @@
         "title": "An error occurred",
         "description": "An error occurred while saving data. Please fix the inputs and try again."
       }
+    },
+    "data-collection-action-button": {
+      "continue": "Continue",
+      "save": "Save",
+      "cancel": "Cancel"
     }
   },
   "pages": {
@@ -31,8 +36,7 @@
             "required": "Please enter an email",
             "invalid": "Please enter a valid email"
           }
-        },
-        "cta": "Continue"
+        }
       }
     },
     "phone-identification": {
@@ -49,8 +53,7 @@
             "required": "Please enter a phone number",
             "invalid": "Please enter a valid phone number"
           }
-        },
-        "cta": "Continue"
+        }
       }
     },
     "ssn": {
@@ -72,8 +75,7 @@
         "disclaimer": {
           "title": "Your data is safe",
           "description": "Your SSN is encrypted and protected by a state-of-the-art secure environment"
-        },
-        "cta": "Continue"
+        }
       }
     },
     "legal-status": {
@@ -109,8 +111,7 @@
           "tn1": "TN-1",
           "other": "Other"
         }
-      },
-      "cta": "Continue"
+      }
     },
     "residential-address": {
       "title": "What's your residential address?",
@@ -155,8 +156,7 @@
           "errors": {
             "required": "State cannot be empty"
           }
-        },
-        "cta": "Continue"
+        }
       }
     },
     "basic-information": {
@@ -192,8 +192,7 @@
             "future": "Please enter a date of birth in the past",
             "min-age": "You must be at least 18 years"
           }
-        },
-        "cta": "Continue"
+        }
       }
     },
     "sms-challenge": {
@@ -215,6 +214,83 @@
       "resend-button": {
         "cta": "Resend code",
         "disabled": "Please wait {{seconds}} seconds to resend it..."
+      }
+    },
+    "confirm": {
+      "summary": {
+        "title": "Confirm your personal data",
+        "subtitle": "Please make sure that your personal data is accurate and there are no typos before continuing.",
+        "edit": "Edit",
+        "reveal": "Reveal",
+        "hide": "Hide",
+        "cta": "Confirm & Continue"
+      },
+      "email": {
+        "title": "Email address",
+        "text": "Email"
+      },
+      "basic-info": {
+        "title": "Basic data",
+        "first-name": "First name",
+        "middle-name": "Middle name",
+        "last-name": "Last name",
+        "dob": "Date of birth",
+        "nationality": "Nationality"
+      },
+      "legal-status": {
+        "text": {
+          "title": "Legal status in the U.S.",
+          "status": "Legal status",
+          "nationality": "Country of birth",
+          "citizenship": "Citizenship",
+          "visa-kind": "Visa type",
+          "visa-expiration": "Visa expiration date"
+        },
+        "statuses": {
+          "citizen": "I'm a citizen",
+          "permanent_resident": "I have a Green Card/I'm a permanent resident",
+          "visa": "I have a Visa"
+        }
+      },
+      "address": {
+        "title": "Address"
+      },
+      "identity": {
+        "title": "Identity",
+        "ssn9": "SSN",
+        "ssn4": "SSN (last 4)",
+        "ssn-skipped-subtext": "You don't have a Social Security Number"
+      },
+      "di": {
+        "id": {
+          "email": "Email",
+          "first_name": "First name",
+          "middle_name": "Middle name",
+          "last_name": "Last name",
+          "ssn9": "SSN (Full)",
+          "ssn4": "SSN (Last 4)",
+          "nationality": "Nationality",
+          "dob": "Date of birth",
+          "address_line1": "Address line 1",
+          "address_line2": "Address line 2",
+          "city": "City",
+          "state": "State",
+          "zip": "Zip code",
+          "country": "Country",
+          "us_legal_status": "Legal status",
+          "country_of_birth": "Country of birth",
+          "citizenships": "Citizenship",
+          "visa_kind": "Visa type",
+          "visa_expiration_date": "Visa expiration date"
+        }
+      },
+      "errors": {
+        "invalid-inputs": {
+          "title": "An error occurred",
+          "description-with-message": "An error occurred while saving data. {{message}}.",
+          "description-with-fields": "An error occurred while saving data. Please fix these fields: {{fields}}.",
+          "description-generic": "An error occurred while saving data. Please fix the inputs and try again."
+        }
       }
     }
   }
