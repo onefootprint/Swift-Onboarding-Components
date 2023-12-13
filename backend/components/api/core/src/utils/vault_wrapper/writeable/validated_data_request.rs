@@ -39,12 +39,16 @@ impl<Type> VaultWrapper<Type> {
         data: &[NewVaultData],
         // None if adding data not for prefill, Some with the sv_id if adding data for prefill
         prefill_sv_id: Option<&ScopedVaultId>,
+        actor: Option<AuthActor>,
     ) -> ApiResult<HashSet<CollectedDataOption>> {
         // Don't allow replacing some pieces of info
         let mut validation_errors = HashMap::<DataIdentifier, newtypes::Error>::new();
         let dis = data.iter().map(|vd| &vd.kind).collect_vec();
 
-        let irreplaceable_ci = [IDK::PhoneNumber.into(), IDK::Email.into()];
+        let irreplaceable_ci = match actor {
+            Some(AuthActor::FirmEmployee(_)) => vec![],
+            _ => vec![IDK::PhoneNumber.into(), IDK::Email.into()],
+        };
         for di in irreplaceable_ci {
             let Some(d) = self.data(&di) else {
                 continue;
@@ -128,6 +132,7 @@ impl<Type> VaultWrapper<Type> {
         &self,
         conn: &mut PgConn,
         request: DataRequest<Fingerprints>,
+        actor: Option<AuthActor>,
     ) -> ApiResult<ValidatedDataRequest> {
         // Transform the request into a Vec<NewVaultData>
         let (data, json_fields, fingerprints) = request.decompose();
@@ -152,7 +157,7 @@ impl<Type> VaultWrapper<Type> {
             })
             .collect::<ApiResult<Vec<_>>>()?;
 
-        let new_cdos = self.validate_adding_dis(conn, &data, None)?;
+        let new_cdos = self.validate_adding_dis(conn, &data, None, actor)?;
 
         let req = ValidatedDataRequest {
             data,
@@ -179,7 +184,7 @@ impl<Type> WriteableVw<Type> {
             old_ci,
             ..
         } = prefill_data;
-        let new_cdos = self.validate_adding_dis(conn, &data, Some(&self.scoped_vault_id))?;
+        let new_cdos = self.validate_adding_dis(conn, &data, Some(&self.scoped_vault_id), None)?;
         let request = ValidatedDataRequest {
             data,
             old_ci,

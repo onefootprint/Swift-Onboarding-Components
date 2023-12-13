@@ -76,6 +76,7 @@ async fn post_inner(
 ) -> JsonApiResponse<EmptyResponse> {
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
+    let actor = auth.actor();
 
     let PatchDataRequest { updates, .. } =
         request.clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
@@ -86,7 +87,7 @@ async fn post_inner(
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
             updates.assert_allowable_identifiers(uvw.vault.kind)?;
-            uvw.validate_request(conn, updates)?;
+            uvw.validate_request(conn, updates, Some(actor))?;
             Ok(())
         })
         .await??;

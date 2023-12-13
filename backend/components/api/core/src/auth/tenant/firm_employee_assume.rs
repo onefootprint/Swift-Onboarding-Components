@@ -122,6 +122,7 @@ impl FirmEmployeeAssumeAuth {
             vec![
                 TenantScope::DecryptAll,
                 TenantScope::ManualReview,
+                TenantScope::WriteEntities,
                 TenantScope::OnboardingConfiguration,
                 TenantScope::ApiKeys,
                 TenantScope::ManageWebhooks,
@@ -190,6 +191,7 @@ mod test {
         TenantScope::Read,
         TenantScope::DecryptAll,
         TenantScope::ManualReview,
+                TenantScope::WriteEntities,
         TenantScope::OnboardingConfiguration,
         TenantScope::ApiKeys,
         TenantScope::ManageWebhooks,

@@ -52,7 +52,7 @@ impl<Type> WriteableVw<Type> {
     ) -> ApiResult<PatchDataResult> {
         let kyced_bos = request.get(&BDK::KycedBeneficialOwners.into()).cloned();
         request.assert_allowable_identifiers(self.vault.kind)?;
-        let request = self.validate_request(conn, request)?;
+        let request = self.validate_request(conn, request, actor.clone())?;
         let result = self.internal_save_data(conn, request, source, actor)?;
         self.create_bos_if_needed(conn, kyced_bos)?;
         Ok(result)
