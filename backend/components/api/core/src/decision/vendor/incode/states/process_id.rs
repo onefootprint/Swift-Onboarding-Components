@@ -62,11 +62,27 @@ async fn process_id_inner(
     let args = SaveVerificationResultArgs::from(&res, VendorAPI::IncodeProcessId, ctx);
     save_incode_verification_result(db_pool, args).await?;
 
-    // Now ensure we don't have an error
-    res.map_err(map_to_api_err)?
-        .result
-        .into_success()
-        .map_err(map_to_api_err)?;
+    let res = res.map_err(map_to_api_err)?.result;
+
+    // If we get the "Id already processed" error, then we ignore this an continue
+    // else we throw other kinds of errors as usual
+    if let idv::incode::IncodeAPIResult::ResponseError(e) = &res {
+        if e.message
+            .as_ref()
+            .map(|m| m.contains("Id already processed"))
+            .unwrap_or(false)
+        {
+            tracing::warn!(
+                ivs_id=%session.id,
+                sv_id=%ctx.sv_id,
+                "Received process_id response: Id already processed"
+            );
+        } else {
+            res.into_success().map_err(map_to_api_err)?;
+        }
+    } else {
+        res.into_success().map_err(map_to_api_err)?;
+    }
 
     Ok(())
 }
