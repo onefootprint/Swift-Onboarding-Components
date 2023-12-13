@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-import { clickOnCancel, clickOnYes } from '../utils/commands';
+import { clickOnCancel, clickOnYes } from '../verify/utils/commands';
 import {
   findMissingConfig,
   decryptData,

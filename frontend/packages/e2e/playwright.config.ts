@@ -27,7 +27,7 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL:
-      process.env.E2E_BASE_URL || 'https://demo.preview.onefootprint.com',
+      process.env.E2E_DEMOS_BASE_URL || 'https://demo.preview.onefootprint.com',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',

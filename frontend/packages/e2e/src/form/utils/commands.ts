@@ -1,6 +1,10 @@
 import { expect } from '@playwright/test';
 import type { APIRequestContext, FrameLocator, Page } from '@playwright/test';
-import { clickOn, clickOnContinue, clickOnSave } from '../../utils/commands';
+import {
+  clickOn,
+  clickOnContinue,
+  clickOnSave,
+} from '../../verify/utils/commands';
 import {
   API_BASE_URL_DEV,
   API_BASE_URL_PROD,

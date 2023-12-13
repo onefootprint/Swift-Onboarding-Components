@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { clickOn } from '../utils/commands';
+import { clickOn } from '../verify/utils/commands';
 import {
   decryptData,
   fillCardData,
