@@ -15,7 +15,8 @@ def test_super_admin_users(sandbox_user, tenant):
     assert org["id"] != sandbox_user.tenant.id
 
 
-def test_private_tenants(tenant, sandbox_tenant):
+def test_private_tenants(tenant, sandbox_tenant, foo_sandbox_tenant):
+    foo_sandbox_tenant  # Just need to use the fixture
     body = get("private/tenants", None, *tenant.db_auths)
 
     assert any(i["id"] == tenant.id for i in body["data"])

@@ -6,8 +6,9 @@ from twilio.rest import Client
 from tests.constants import (
     IT_TWILIO_ACCOUNT_SID,
     IT_TWILIO_SECRET_AUTH_TOKEN,
-    TENANT_ID2,
     TENANT_ID1,
+    TENANT_ID2,
+    TENANT_ID3,
     LIVE_PHONE_NUMBER,
     EMAIL,
 )
@@ -126,6 +127,24 @@ def tenant(must_collect_data, can_access_data):
 @pytest.fixture(scope="session")
 def sandbox_tenant(sandbox_tenant_data):
     return create_tenant(*sandbox_tenant_data)
+
+
+@pytest.fixture(scope="session")
+def foo_sandbox_tenant():
+    org_data = {
+        "id": TENANT_ID3,
+        "name": "Footprint Sandbox Integration Testing Foo",
+        "is_live": False,
+    }
+    # Specifically don't request nationality and ssn9
+    fields = ["name", "ssn4", "full_address", "email", "phone_number"]
+    ob_conf_data = {
+        "name": "Foo Credit Card",
+        "must_collect_data": fields,
+        "can_access_data": fields,
+    }
+
+    return create_tenant(org_data, ob_conf_data)
 
 
 @pytest.fixture(scope="session")
