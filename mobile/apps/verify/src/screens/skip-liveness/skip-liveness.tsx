@@ -16,7 +16,6 @@ const SkipLiveness = ({
   authToken,
 }: SkipLivenessProps) => {
   const skipLivenessMutation = useSkipLiveness();
-  console.log('in SkipLiveness');
 
   useEffectOnce(() => {
     if (!authToken) {

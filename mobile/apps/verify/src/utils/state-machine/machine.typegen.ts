@@ -20,6 +20,7 @@ export interface Typegen0 {
     assignKycData: 'dataSubmitted';
     assignKycDataCollected: 'dataConfirmed';
     assignObConfigAuth: 'sdkArgsReceived';
+    assignSandboxOutcome: 'sandboxOutcomeReceived';
     reset: 'identifyReset';
   };
   eventsCausingDelays: {};
@@ -39,6 +40,7 @@ export interface Typegen0 {
     | 'process'
     | 'requirements'
     | 'residentialAddress'
+    | 'sandboxOutcome'
     | 'smsChallenge'
     | 'ssn';
   tags: never;

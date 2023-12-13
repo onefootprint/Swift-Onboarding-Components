@@ -27,6 +27,7 @@ export type SmsChallengeProps = {
   obConfigAuth: ObConfigAuth;
   onComplete: (authToken: string) => void;
   onChallengeReceived: (challengeData: ChallengeData) => void;
+  sandboxId?: string;
 };
 
 // TODO: implement loginChallengeMutation for user-found case
@@ -35,6 +36,7 @@ const SmsChallenge = ({
   onComplete,
   obConfigAuth,
   onChallengeReceived,
+  sandboxId,
 }: SmsChallengeProps) => {
   const { t } = useTranslation('pages.sms-challenge');
   const toast = useToast();
@@ -131,6 +133,7 @@ const SmsChallenge = ({
         phoneNumber,
         email,
         obConfigAuth,
+        sandboxId,
       },
       {
         onSuccess: handleRequestChallengeSuccess,

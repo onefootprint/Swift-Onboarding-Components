@@ -304,6 +304,51 @@
     "complete": {
       "title": "Submission completed!",
       "subtitle": "Thanks for using Footprint to verify your identity."
+    },
+    "sandbox-outcome": {
+      "title": "Test outcomes",
+      "subtitle": "Select what result you want this user to have after they complete their onboarding",
+      "overall-outcome": {
+        "title": "General outcome",
+        "outcome": {
+          "options": {
+            "success": {
+              "title": "Success"
+            },
+            "manual-review": {
+              "title": "Manual review"
+            },
+            "fail": {
+              "title": "Fail"
+            },
+            "step-up": {
+              "title": "Step up",
+              "description": "Even if not required in playbook, users will upload ID photos."
+            },
+            "document-decision": {
+              "title": "ID Doc Decision"
+            }
+          }
+        }
+      },
+      "test-id": {
+        "label": "Test ID",
+        "description": "You can log into a previously created sandbox user by using the Test ID from that corresponding session.",
+        "placeholder": "Enter test ID",
+        "hint": "Do not use special characters or spaces.",
+        "errors": {
+          "required": "Test ID is required",
+          "invalid": "Test ID is invalid. Please remove spaces and special characters."
+        },
+        "button": {
+          "edit": "Edit",
+          "save": "Save",
+          "copy": "Copy",
+          "copy-confirmation": "Copied",
+          "reset": "Reset"
+        }
+      },
+      "cta": "Continue"
     }
   }
 }

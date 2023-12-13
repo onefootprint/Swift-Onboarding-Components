@@ -1,10 +1,11 @@
-import {
-  type OnboardingRequirement,
-  getRequirement,
-  OnboardingRequirementKind,
-} from '@onefootprint/types';
+import type { OnboardingRequirement } from '@onefootprint/types';
+import { getRequirement, OnboardingRequirementKind } from '@onefootprint/types';
 
-import type { MachineContext, RequirementsReceivedEvent } from './types';
+import type {
+  MachineContext,
+  RequirementsReceivedEvent,
+  SdkArgsReceivedEvent,
+} from './types';
 
 type MachineTarget = {
   target: string;
@@ -67,3 +68,10 @@ export const NextTargetsFromRequirement: MachineTarget[] = [
     target: 'incompatibleRequirements',
   },
 ];
+
+export const shouldShowSandbox = (
+  context: MachineContext,
+  event: SdkArgsReceivedEvent,
+): boolean => {
+  return !event.payload.config?.isLive && !context.identify.authToken;
+};

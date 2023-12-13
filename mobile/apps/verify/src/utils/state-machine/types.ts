@@ -5,6 +5,7 @@ import type {
   Identifier,
   ObConfigAuth,
   OnboardingRequirement,
+  OverallOutcome,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 
@@ -39,6 +40,17 @@ export type MachineContext = {
   kyc: KycDataCollectionProps;
   startedDataCollection?: boolean;
   collectedKycData?: boolean;
+  sandboxOutcome?: {
+    overallOutcome: OverallOutcome;
+    sandboxId: string;
+  };
+};
+
+export type SdkArgsReceivedEvent = {
+  type: 'sdkArgsReceived';
+  payload: {
+    config: PublicOnboardingConfig;
+  };
 };
 
 export type RequirementsReceivedEvent = {
@@ -49,12 +61,7 @@ export type RequirementsReceivedEvent = {
 export type MachineEvents =
   | { type: 'failed' }
   | { type: 'done' }
-  | {
-      type: 'sdkArgsReceived';
-      payload: {
-        config: PublicOnboardingConfig;
-      };
-    }
+  | SdkArgsReceivedEvent
   | {
       type: 'identified';
       payload: IdentifyResultProps;
@@ -86,5 +93,15 @@ export type MachineEvents =
     }
   | {
       type: 'skipLivenessError';
+    }
+  | {
+      type: 'requiresIdDoc';
+    }
+  | {
+      type: 'sandboxOutcomeReceived';
+      payload: {
+        overallOutcome: OverallOutcome;
+        sandboxId: string;
+      };
     }
   | RequirementsReceivedEvent;

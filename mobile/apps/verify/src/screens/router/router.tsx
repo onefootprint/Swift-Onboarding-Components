@@ -18,6 +18,7 @@ import InitFailed from '../init-failed';
 import PhoneIdentification from '../phone-identification';
 import Process from '../process';
 import ResidentialAddress from '../residential-address';
+import SandboxOutcome from '../sandbox-outcome';
 import SkipLiveness from '../skip-liveness';
 import SmsChallenge from '../sms-challenge';
 import Ssn from '../ssn';
@@ -39,6 +40,7 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
     kyc: { kycData, requirement: kycRequirement },
     startedDataCollection,
     collectedKycData,
+    sandboxOutcome,
   } = state.context;
   const { authToken } = identify;
 
@@ -105,6 +107,27 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
     );
   }
 
+  if (state.matches('sandboxOutcome')) {
+    return (
+      <Container scroll>
+        <SandboxOutcome
+          onSubmit={outcome =>
+            send({
+              type: 'sandboxOutcomeReceived',
+              payload: outcome,
+            })
+          }
+          config={config}
+          onIdDocRequirement={() =>
+            send({
+              type: 'requiresIdDoc',
+            })
+          }
+        />
+      </Container>
+    );
+  }
+
   if (state.matches('emailIdentification')) {
     if (obConfigAuth) {
       return (
@@ -141,6 +164,7 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
             identify={identify}
             obConfigAuth={obConfigAuth}
             onComplete={handleChallengeSucceed}
+            sandboxId={sandboxOutcome?.sandboxId}
             onChallengeReceived={(challengeData: ChallengeData) =>
               send({
                 type: 'challengeReceived',
@@ -257,7 +281,6 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
   }
 
   if (state.matches('liveness')) {
-    console.log('state matches liveness');
     if (authToken) {
       return (
         <Container center>
@@ -275,7 +298,11 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
     if (authToken) {
       return (
         <Container center>
-          <Process authToken={authToken} onDone={() => send('done')} />
+          <Process
+            authToken={authToken}
+            onDone={() => send('done')}
+            overallOutcome={sandboxOutcome?.overallOutcome}
+          />
         </Container>
       );
     }

@@ -8,7 +8,7 @@ import {
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
 } from '../missing-attributes';
-import { NextTargetsFromRequirement } from './machine.utils';
+import { NextTargetsFromRequirement, shouldShowSandbox } from './machine.utils';
 import type { MachineContext, MachineEvents } from './types';
 
 export const createPasskeysMachine = (sdkAuthToken: string) =>
@@ -26,16 +26,22 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
       context: {
         sdkAuthToken,
         identify: {},
-        // TODO: this is temporary; we will get this data from requirements machine when we implement it
         kyc: {},
       },
       states: {
         init: {
           on: {
-            sdkArgsReceived: {
-              target: 'emailIdentification',
-              actions: ['assignConfig', 'assignObConfigAuth'],
-            },
+            sdkArgsReceived: [
+              {
+                target: 'sandboxOutcome',
+                cond: (context, event) => shouldShowSandbox(context, event),
+                actions: ['assignConfig', 'assignObConfigAuth'],
+              },
+              {
+                target: 'emailIdentification',
+                actions: ['assignConfig', 'assignObConfigAuth'],
+              },
+            ],
             failed: {
               target: 'initFailed',
             },
@@ -43,6 +49,17 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
         },
         initFailed: {
           type: 'final',
+        },
+        sandboxOutcome: {
+          on: {
+            sandboxOutcomeReceived: {
+              target: 'emailIdentification',
+              actions: ['assignSandboxOutcome'],
+            },
+            requiresIdDoc: {
+              target: 'incompatibleRequirements',
+            },
+          },
         },
         emailIdentification: {
           on: {
@@ -285,6 +302,10 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
         }),
         assignKycDataCollected: assign(context => {
           context.collectedKycData = true;
+          return context;
+        }),
+        assignSandboxOutcome: assign((context, event) => {
+          context.sandboxOutcome = event.payload;
           return context;
         }),
       },
