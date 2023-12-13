@@ -21,7 +21,7 @@ use newtypes::PreviewApi;
 use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web};
 
-// TODO rm
+// TODO rm after findigs stops using it
 #[api_v2_operation(
     description = "Generate a link that can be sent to the user to ask them to reonboard to the last playbook they onboarded onto.",
     tags(Users, Deprecated)

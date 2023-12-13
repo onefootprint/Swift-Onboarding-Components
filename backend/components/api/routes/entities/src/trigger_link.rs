@@ -48,15 +48,15 @@ pub async fn post(
 
             let auth_args = UserSessionArgs {
                 su_id: Some(sv.id.clone()),
-                obc_id: Some(obc.id.clone()),
-                wfr_id: Some(wfr.id.clone()),
+                obc_id: Some(obc.id),
+                wfr_id: Some(wfr.id),
                 is_from_api: true,
                 ..Default::default()
             };
 
             // No scopes or auth factors - require the user to re-auth when using this token
             let duration = Duration::days(1);
-            let data = UserSession::make(sv.vault_id.clone(), auth_args, vec![], vec![])?;
+            let data = UserSession::make(sv.vault_id, auth_args, vec![], vec![])?;
             let (auth_token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             // Create an auth token for this workflow that we will send to the user
             Ok(auth_token)
