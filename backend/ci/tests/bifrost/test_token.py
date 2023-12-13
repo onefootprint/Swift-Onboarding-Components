@@ -25,13 +25,14 @@ def ob_config(sandbox_tenant, must_collect_data):
 def test_onboarded_vault(twilio, ob_config, sandbox_tenant):
     """
     Test creating a token for a user who has already onboarded onto a KYC playbook.
-    Run that token through bifrost.
+    Run that token through bifrost onboarding onto a different playbook.
     """
     bifrost = BifrostClient.new(ob_config, twilio)
     user = bifrost.run()
 
     # Go through onboarding with a token made from a user that already onboarded
-    data = dict(key=sandbox_tenant.default_ob_config.key.value)
+    obc = sandbox_tenant.default_ob_config
+    data = dict(kind="onboard", key=obc.key.value)
     body = post(f"entities/{user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
@@ -41,10 +42,7 @@ def test_onboarded_vault(twilio, ob_config, sandbox_tenant):
 
     # Run bifrost
     bifrost2 = BifrostClient.raw_auth(
-        sandbox_tenant.default_ob_config,
-        auth_token,
-        user.client.data["id.phone_number"],
-        user.client.sandbox_id,
+        obc, auth_token, user.client.data["id.phone_number"], user.client.sandbox_id
     )
     user2 = bifrost2.run()
     assert set(i["kind"] for i in bifrost2.already_met_requirements) == {
@@ -67,7 +65,7 @@ def test_api_vault(twilio, sandbox_tenant, ob_config):
     fp_id = body["id"]
     sandbox_id = body["sandbox_id"]
 
-    data = dict(key=ob_config.key.value)
+    data = dict(kind="onboard", key=ob_config.key.value)
     body = post(f"entities/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
@@ -116,7 +114,7 @@ def test_3p_auth(sandbox_tenant, ob_config):
     fp_id = body["id"]
     sandbox_id = body["sandbox_id"]
 
-    data = dict(key=ob_config.key.value, third_party_auth=True)
+    data = dict(kind="onboard", key=ob_config.key.value, third_party_auth=True)
     body = post(f"entities/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
@@ -146,15 +144,19 @@ def test_3p_auth(sandbox_tenant, ob_config):
     )
 
 
-def test_redo_onboard(twilio, ob_config, sandbox_tenant):
+@pytest.mark.parametrize("operation_kind", ["onboard", "reonboard"])
+def test_reonboard(twilio, ob_config, sandbox_tenant, operation_kind):
     """
-    Test creating a token to onboard a user onto the same KYC playbook they already onboarded onto
+    Test creating a token to onboard a user onto the same KYC playbook they already onboarded onto.
+    Once with the reonboard convenience operation alias and again with the onboard operation
     """
     bifrost1 = BifrostClient.new(ob_config, twilio)
     user = bifrost1.run()
 
     # Onboard this user onto the same ob config twice. This should make two workflows and two decisions
-    data = dict(key=sandbox_tenant.default_ob_config.key.value)
+    data = dict(kind=operation_kind)
+    if operation_kind == "onboard":
+        data["key"] = ob_config.key.value
     body = post(f"entities/{user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
@@ -163,10 +165,7 @@ def test_redo_onboard(twilio, ob_config, sandbox_tenant):
     assert set(body["scopes"]) >= {"sign_up"}
 
     bifrost2 = BifrostClient.raw_auth(
-        sandbox_tenant.default_ob_config,
-        auth_token,
-        FIXTURE_PHONE_NUMBER,
-        bifrost1.sandbox_id,
+        ob_config, auth_token, FIXTURE_PHONE_NUMBER, bifrost1.sandbox_id
     )
     user2 = bifrost2.run()
     assert user2.fp_id == user.fp_id
@@ -177,8 +176,11 @@ def test_redo_onboard(twilio, ob_config, sandbox_tenant):
     assert [i["kind"] for i in bifrost2.handled_requirements] == ["process"]
 
     timeline = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
-    obds = [i for i in timeline if i["event"]["kind"] == "onboarding_decision"]
+    obds = [i["event"] for i in timeline if i["event"]["kind"] == "onboarding_decision"]
     assert len(obds) == 2
+    assert all(
+        i["data"]["decision"]["ob_configuration"]["id"] == ob_config.id for i in obds
+    )
 
 
 def test_provide_publishable_key_on_client(twilio, sandbox_tenant, ob_config):
@@ -192,7 +194,8 @@ def test_provide_publishable_key_on_client(twilio, sandbox_tenant, ob_config):
     from tests.headers import BaseAuth
 
     # Create a token not linked to an OBC
-    body = post(f"entities/{user.fp_id}/token", dict(), sandbox_tenant.sk.key)
+    data = dict(kind="user")
+    body = post(f"entities/{user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
     # Should immediately have onboarding scopes because auth was implied
@@ -236,7 +239,7 @@ def test_portablize_api_vault(
     body = post("hosted/identify", identify_data, sandbox_id_h)
     assert not body["user_found"]
 
-    data = dict(key=ob_config.key.value)
+    data = dict(kind="onboard", key=ob_config.key.value)
     body = post(f"entities/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
@@ -309,7 +312,8 @@ def test_no_implied_auth_for_stale(sandbox_tenant):
 
     # Create a token and make sure it does not have implied auth
     fp_id = body["data"][0]["id"]
-    data = dict(key=sandbox_tenant.default_ob_config.key.value)
+    obc = sandbox_tenant.default_ob_config
+    data = dict(dict(kind="onboard", key=obc.key.value))
     body = post(f"entities/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
