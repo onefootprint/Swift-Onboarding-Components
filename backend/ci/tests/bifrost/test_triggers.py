@@ -30,7 +30,7 @@ def send_trigger(fp_id, sandbox_tenant, trigger):
     assert body["has_outstanding_workflow_request"]
     # And that we serialize that the user has info requested
     body = get(f"users/{fp_id}", None, sandbox_tenant.sk.key)
-    assert body["info_requested"]
+    assert body["requires_additional_info"]
 
     # Re-generate a link as is done from the dashboard
     body = post(

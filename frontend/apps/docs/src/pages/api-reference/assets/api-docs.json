@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Footprint API",
-        "version": "e029273501736a01334f6ab5cf493115cfc6928a"
+        "version": "8e28e9ddc3fe3709f90756a392a2cdf48ad3d220"
     },
     "servers": [
         {
@@ -3505,14 +3505,23 @@
                         "example": "fp_id_7p793EF07xKXHqAeg5VGPj",
                         "type": "string"
                     },
-                    "info_requested": {
-                        "description": "Information on data requested from the user via the Footprint dashboard.",
+                    "requires_additional_info": {
+                        "description": "When non-null, there is additional info pending collection from this user.\n When non-null, you may create a token for this user with the `inherited` operation. This\n token can be used to collect any outstanding information",
                         "type": "object",
                         "properties": {
                             "note": {
+                                "description": "The human-readable note you provided in the dashboard when requesting additional info. You may choose to render this message in your own application.",
                                 "type": "string"
+                            },
+                            "timestamp": {
+                                "description": "The timestamp at which the additional info was requested.",
+                                "type": "string",
+                                "format": "date-time"
                             }
-                        }
+                        },
+                        "required": [
+                            "timestamp"
+                        ]
                     },
                     "requires_manual_review": {
                         "type": "boolean"
