@@ -83,6 +83,20 @@ pub struct FormV1SdkArgs {
     pub l10n: Option<L10nV1>,
 }
 
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
+pub struct RenderV1SdkArgs {
+    pub id: DataIdentifier,
+    pub auth_token: PiiString,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub can_copy: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_hidden: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub show_hidden_toggle: Option<bool>,
+}
+
 impl VerifyV1SdkArgs {
     pub fn validate(&self) -> ApiResult<()> {
         let auth_token_hash = self
@@ -169,6 +183,16 @@ impl FormV1SdkArgs {
     }
 }
 
+impl RenderV1SdkArgs {
+    pub fn validate(&self) -> ApiResult<()> {
+        Ok(())
+    }
+
+    pub fn ob_config(&self, _: &mut PgConn) -> ApiResult<Option<ObConfigInfo>> {
+        Ok(None)
+    }
+}
+
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema, EnumDiscriminants)]
 #[strum_discriminants(name(SdkArgsKind))]
 #[strum_discriminants(derive(Display))]
@@ -184,6 +208,7 @@ pub enum SdkArgs {
     VerifyV1(VerifyV1SdkArgs),
     FormV1(FormV1SdkArgs),
     AuthV1(AuthV1SdkArgs),
+    RenderV1(RenderV1SdkArgs),
 }
 
 /// This structure is stored encrypted inside the session table
@@ -214,6 +239,7 @@ impl SdkArgs {
             Self::VerifyV1(args) => args.validate()?,
             Self::FormV1(args) => args.validate()?,
             Self::AuthV1(args) => args.validate()?,
+            Self::RenderV1(args) => args.validate()?,
         }
         Ok(())
     }
@@ -223,6 +249,7 @@ impl SdkArgs {
             Self::VerifyV1(args) => args.ob_config(conn),
             Self::FormV1(args) => args.ob_config(conn),
             Self::AuthV1(args) => args.ob_config(conn),
+            Self::RenderV1(args) => args.ob_config(conn),
         }
     }
 }
@@ -243,6 +270,11 @@ mod test {
     #[test_case(json!({"kind": "auth_v1", "data": {"public_key": "ob_1234", "user_data": {"id.first_name": "Hayes"}, "options": {"show_logo": false}}}))]
     #[test_case(json!({"kind": "auth_v1", "data": {"public_key": "ob_1234", "user_data": {"id.first_name": "Hayes"}}}))]
     #[test_case(json!({"kind": "auth_v1", "data": {"public_key": "ob_1234"}}))]
+    #[test_case(json!({"kind": "render_v1", "data": {"auth_token": "tok_1234", "id": "id.email"}}))]
+    #[test_case(json!({"kind": "render_v1", "data": {"auth_token": "tok_1234", "id": "id.phone_number", "label": "Phone"}}))]
+    #[test_case(json!({"kind": "render_v1", "data": {"auth_token": "tok_1234", "id": "id.phone_number", "label": "Phone 2", "can_copy": true}}))]
+    #[test_case(json!({"kind": "render_v1", "data": {"auth_token": "tok_1234", "id": "id.phone_number", "label": "Email", "can_copy": true, "default_hidden": true}}))]
+    #[test_case(json!({"kind": "render_v1", "data": {"auth_token": "tok_1234", "id": "id.phone_number", "label": "Email", "can_copy": true, "default_hidden": true, "show_hidden_toggle": true}}))]
     fn test_backcompat(value: serde_json::Value) {
         let args: SdkArgs = serde_json::value::from_value(value.clone()).unwrap();
         args.validate().unwrap();

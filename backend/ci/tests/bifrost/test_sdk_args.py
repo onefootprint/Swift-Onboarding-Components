@@ -26,6 +26,16 @@ def test_sdk_args_fail_validation():
         {"kind": "auth_v1", "data": {"public_key": "pb_test123455"}},
         status_code=404,
     )
+    post(
+        "/org/sdk_args",
+        {"kind": "render_v1", "data": {}},
+        status_code=400,
+    )
+    post(
+        "/org/sdk_args",
+        {"kind": "render_v1", "data": {"id": "invalid_di"}},
+        status_code=400,
+    )
 
 
 def test_sdk_args(sandbox_tenant):
@@ -99,6 +109,18 @@ def test_sdk_args(sandbox_tenant):
                     "show_logo": True,
                 },
                 "l10n": {"locale": "en-US"},
+            },
+        },
+        {
+            "kind": "render_v1",
+            "data": {"auth_token": "tok_12345", "id": "id.email"},
+        },
+        {
+            "kind": "render_v1",
+            "data": {
+                "auth_token": "tok_12345",
+                "id": "id.email",
+                "label": "Label",
             },
         },
     ]
