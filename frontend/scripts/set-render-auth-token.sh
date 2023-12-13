@@ -9,8 +9,7 @@ function getEnv {
   fi
 
   if [ "$env" != "dev" ] && [ "$env" != "prod" ]; then
-      echo "Invalid environment: $env, using dev instead"
-      return "dev"
+      env="dev"
   fi
 
   echo "$env"
@@ -84,8 +83,22 @@ response=$(curl -s "$BASE_URL/users/$USER_ID/client_token" \
     -X POST \
     -u "$API_KEY": \
     -d '{
-        "scopes": ["vault"],
-        "fields": ["card.'"$CARD_ALIAS"'.number", "card.'"$CARD_ALIAS"'.expiration", "card.'"$CARD_ALIAS"'.cvc", "card.'"$CARD_ALIAS"'.billing_address.zip", "card.'"$CARD_ALIAS"'.billing_address.country"],
+        "scopes": ["decrypt"],
+        "decrypt_reason": "Render component local dev (belce)",
+        "fields": [
+          "id.first_name", 
+          "id.last_name", 
+          "id.ssn4", 
+          "id.ssn9", 
+          "id.dob", 
+          "id.email", 
+          "id.phone_number", 
+          "card.'"$CARD_ALIAS"'.number", 
+          "card.'"$CARD_ALIAS"'.expiration", 
+          "card.'"$CARD_ALIAS"'.cvc", 
+          "card.'"$CARD_ALIAS"'.billing_address.zip", 
+          "card.'"$CARD_ALIAS"'.billing_address.country"
+        ],
         "reason": "Form Component Local Dev",
         "ttl": 86400
     }')
@@ -113,7 +126,7 @@ echo "Token: $token"
 # Update the .env file
 ENV_FILE="../apps/demos/.env"
 TMP_FILE="../apps/demos/.env.tmp"
-KEY="DEMO_FORM_AUTH_TOKEN"
+KEY="DEMO_RENDER_AUTH_TOKEN"
 
 if [ ! -f "$ENV_FILE" ]; then
   echo "$ENV_FILE does not exist"

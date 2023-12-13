@@ -2,7 +2,7 @@ import { FootprintForm } from '@onefootprint/footprint-react';
 import styled from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import { COMPONENTS_AUTH_TOKEN } from 'src/config/constants';
+import { DEMO_FORM_AUTH_TOKEN } from 'src/config/constants';
 
 const FormReactIntegration = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -22,7 +22,7 @@ const FormReactIntegration = () => {
         {isModalVisible && (
           <FootprintForm
             variant="modal"
-            authToken={COMPONENTS_AUTH_TOKEN ?? ''}
+            authToken={DEMO_FORM_AUTH_TOKEN ?? ''}
             onComplete={() => handleEvent('complete')}
             onCancel={() => handleEvent('cancel')}
             onClose={() => handleEvent('close')}
@@ -31,7 +31,7 @@ const FormReactIntegration = () => {
         {isDrawerVisible && (
           <FootprintForm
             variant="drawer"
-            authToken={COMPONENTS_AUTH_TOKEN ?? ''}
+            authToken={DEMO_FORM_AUTH_TOKEN ?? ''}
             onComplete={() => handleEvent('complete')}
             onCancel={() => handleEvent('cancel')}
             onClose={() => handleEvent('close')}

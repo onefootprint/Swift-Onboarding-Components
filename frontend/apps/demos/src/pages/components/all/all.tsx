@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import FormJsIntegration from './components/form-js';
 import FormReactIntegration from './components/form-react';
 import FormVanilla from './components/form-vanilla';
+import RenderJs from './components/render-js';
 import Title from './components/title';
 import VerifyButtonReactIntegration from './components/verify-button-react';
 import VerifyJs from './components/verify-js';
@@ -48,9 +49,7 @@ const AllComponents = () => {
         {/* {kind === FootprintComponentKind.VerifyButton && (
           <VerifyButtonJsIntegration />
         )} */}
-        {kind === FootprintComponentKind.Render && (
-          <Typography variant="label-1">Coming soon</Typography>
-        )}
+        {kind === FootprintComponentKind.Render && <RenderJs />}
       </Framework>
       <Title>Vanilla integrations</Title>
       <Framework>

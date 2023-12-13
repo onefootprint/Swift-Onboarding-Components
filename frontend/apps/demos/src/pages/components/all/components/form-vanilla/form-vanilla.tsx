@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { COMPONENTS_AUTH_TOKEN } from '../../../../../config/constants';
+import { DEMO_FORM_AUTH_TOKEN } from '../../../../../config/constants';
 
 const FormVanilla = () => {
   useEffectOnce(() => {
@@ -27,7 +27,7 @@ const FormVanilla = () => {
       data-footprint
       data-kind="form"
       data-variant="inline"
-      data-props={JSON.stringify({ authToken: COMPONENTS_AUTH_TOKEN ?? '' })}
+      data-props={JSON.stringify({ authToken: DEMO_FORM_AUTH_TOKEN ?? '' })}
     />
   );
 };

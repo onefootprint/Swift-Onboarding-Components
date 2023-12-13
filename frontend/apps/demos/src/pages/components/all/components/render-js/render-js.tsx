@@ -1,38 +1,32 @@
-import type { FootprintVariant } from '@onefootprint/footprint-js';
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import styled, { css } from '@onefootprint/styled';
-import { Button } from '@onefootprint/ui';
 import React from 'react';
-import { DEMO_FORM_AUTH_TOKEN } from 'src/config/constants';
+import { DEMO_RENDER_AUTH_TOKEN } from 'src/config/constants';
 import { useEffectOnce } from 'usehooks-ts';
 
-const FormJsIntegration = () => {
-  const launchForm = (variant: FootprintVariant, containerId?: string) => {
+const RenderJs = () => {
+  const launchRender = () => {
     const component = footprint.init({
-      kind: FootprintComponentKind.Form,
-      variant,
-      authToken: DEMO_FORM_AUTH_TOKEN ?? '',
-      containerId,
+      kind: FootprintComponentKind.Render,
+      id: 'id.email',
+      authToken: DEMO_RENDER_AUTH_TOKEN ?? '',
+      containerId: 'my-render',
+      variant: 'inline',
     });
+
     component.render();
     return component;
   };
 
   useEffectOnce(() => {
-    const component = launchForm('inline', 'my-form');
+    const component = launchRender();
 
     return () => {
       component.destroy();
     };
   });
 
-  return (
-    <>
-      <Button onClick={() => launchForm('modal')}>Modal</Button>
-      <Button onClick={() => launchForm('drawer')}>Drawer</Button>
-      <Container id="my-form" />
-    </>
-  );
+  return <Container id="my-render" />;
 };
 
 const Container = styled.div`
@@ -50,4 +44,4 @@ const Container = styled.div`
   `}
 `;
 
-export default FormJsIntegration;
+export default RenderJs;
