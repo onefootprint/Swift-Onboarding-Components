@@ -11,6 +11,7 @@ mod match_signals;
 mod post;
 mod reonboard;
 mod risk_signals;
+mod token;
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config
@@ -21,6 +22,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(risk_signals::get)
         .service(match_signals::get)
         .service(liveness::get)
+        .service(token::post)
         .service(auth_events::get)
         .service(reonboard::post)
         .service(decisions::post)

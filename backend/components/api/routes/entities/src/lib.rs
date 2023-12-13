@@ -14,7 +14,6 @@ mod match_signals;
 mod risk_signals;
 mod rule_set_result;
 mod timeline;
-mod token;
 mod trigger;
 mod trigger_link;
 mod vault;
@@ -23,9 +22,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
     vault::routes(config);
     client_token::post::configure_post_aliases(config);
     kyc::configure_post_aliases(config);
-    token::configure_post_aliases(config);
     config
-        .service(token::post)
         .service(client_token::post::post)
         .service(client_token::get::get)
         .service(get::detail::get)

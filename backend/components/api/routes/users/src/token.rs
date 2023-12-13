@@ -29,7 +29,6 @@ use db::models::vault::Vault;
 use db::models::workflow::Workflow;
 use db::models::workflow_request::WorkflowRequest;
 use feature_flag::BoolFlag;
-use macros::route_alias;
 use newtypes::AuthEventKind;
 use newtypes::IdentifyScope;
 use newtypes::ObConfigurationKind;
@@ -37,17 +36,11 @@ use newtypes::PreviewApi;
 use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web};
 
-#[route_alias(post(
-    "/users/{fp_id}/token",
-    tags(Users, Preview),
-    description = "Create an identified token for the provided fp_id. This token may be passed into Footprint.js to bootstrap a user's onboarding with known information. Re-auth will be required if the user hasn't logged into your tenant recently.",
-))]
-// TODO probably don't need the entities route
 #[api_v2_operation(
     description = "Create an identified token for the provided fp_id. This token may be passed into Footprint.js to bootstrap a user's onboarding with known information. Re-auth will be required if the user hasn't logged into your tenant recently.",
-    tags(Entities, Private)
+    tags(Users, Preview)
 )]
-#[post("/entities/{fp_id}/token")]
+#[post("/users/{fp_id}/token")]
 pub async fn post(
     state: web::Data<State>,
     fp_id: FpIdPath,
@@ -56,7 +49,6 @@ pub async fn post(
 ) -> JsonApiResponse<CreateTokenResponse> {
     auth.check_preview_guard(PreviewApi::CreateUserToken)?;
     let auth = auth.check_guard(TenantGuard::AuthToken)?;
-    // TODO add preview guard?
     let CreateTokenRequest {
         kind,
         key,
