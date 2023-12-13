@@ -51,12 +51,12 @@ curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/token \
 
 You are able to create auth tokens for the user that have different purposes.
 
-| Token kind     | Description                                                                                                                                             |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `onboard`      | Onboard the user onto a specific playbook, specified by the `key` (from the [Playbooks tab](https://dashboard.onefootprint.com/playbooks)).             |
-| `reonboard`    | Convenience method to reonboard the user onto the last playbook that they onboarded onto.                                                               |
-| `inherit`      | Inherit any operation previously requested via the dashboard, including reonboarding, ID document collection, and SSN card collection. More info below. |
-| `user`         | Simply create a token for the user. A playbook key may be provided directly to the Footprint Verify SDK to trigger onboarding.                          |
+| Token kind  | Description                                                                                                                                             |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `onboard`   | Onboard the user onto a specific playbook, specified by the `key` (from the [Playbooks tab](https://dashboard.onefootprint.com/playbooks)).             |
+| `reonboard` | Convenience method to reonboard the user onto the last playbook that they onboarded onto.                                                               |
+| `inherit`   | Inherit any operation previously requested via the dashboard, including reonboarding, ID document collection, and SSN card collection. More info below. |
+| `user`      | Simply create a token for the user. A playbook key may be provided directly to the Footprint Verify SDK to trigger onboarding.                          |
 
 You can find more info in the [API reference](/api-reference#post-users-fp-id-token).
 
