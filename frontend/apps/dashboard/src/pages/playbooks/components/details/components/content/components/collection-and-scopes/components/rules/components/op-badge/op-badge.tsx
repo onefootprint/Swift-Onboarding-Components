@@ -1,15 +1,40 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles } from '@onefootprint/ui';
-import React from 'react';
+import React, { useState } from 'react';
 
 export type OpBadgeProps = {
   isActive: boolean;
+  isEditable: boolean;
+  onClick: (isActive: boolean) => void;
 };
 
-const OpBadge = ({ isActive }: OpBadgeProps) => {
+const OpBadge = ({ isActive, isEditable, onClick }: OpBadgeProps) => {
   const { t } = useTranslation('pages.playbooks.details.rules.action-row');
-  return <Badge data-is-active={isActive}>{t('not')}</Badge>;
+  const [isSelected, setIsSelected] = useState(isActive);
+
+  const handleClick = () => {
+    const newIsSelected = !isSelected;
+    onClick(newIsSelected);
+    setIsSelected(newIsSelected);
+  };
+
+  if (isEditable) {
+    return (
+      <Badge
+        data-is-selected={isSelected}
+        data-is-editable={isEditable}
+        onClick={handleClick}
+      >
+        {t('not')}
+      </Badge>
+    );
+  }
+  return isSelected ? (
+    <Badge data-is-selected={isSelected} onClick={handleClick}>
+      {t('not')}
+    </Badge>
+  ) : null;
 };
 
 const Badge = styled.div`
@@ -25,10 +50,14 @@ const Badge = styled.div`
     justify-content: center;
     align-items: center;
 
-    &[data-is-active='true'] {
+    &[data-is-selected='true'] {
       background-color: ${theme.backgroundColor.error};
       border: 0;
       color: ${theme.color.error};
+    }
+
+    &[data-is-editable='true'] {
+      cursor: pointer;
     }
   `}
 `;

@@ -2175,14 +2175,21 @@
               "title": "Pass + Manual review",
               "subtitle": "User will be onboarded, but should be manually reviewed",
               "color": "success"
-            }
+            },
+            "add-rule": "Add rule"
           },
           "action-row": {
-            "if": "if",
-            "and": "and",
-            "not": "not"
-          },
-          "risk-signal-mapping": {}
+            "if": "if ",
+            "and": " and ",
+            "not": "not",
+            "add": "add",
+            "delete": "Delete rule",
+            "success-toast": {
+              "title": "Success!",
+              "edit-description": "Rule edited.",
+              "delete-description": "Rule deleted."
+            }
+          }
         }
       },
       "dialog": {

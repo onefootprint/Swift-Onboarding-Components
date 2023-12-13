@@ -19,8 +19,9 @@ const Rules = ({ playbookId, playbookKind }: RulesProps) => {
       {response && (
         <Content
           hasRules={response.hasRules}
-          actionRules={response.data}
           playbookKind={playbookKind}
+          playbookId={playbookId}
+          actionRules={response.data}
         />
       )}
       {isLoading && <Loading />}

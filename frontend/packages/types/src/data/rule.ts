@@ -17,10 +17,10 @@ export type RuleField = {
 };
 
 export type Rule = {
-  action: string;
+  action: RuleAction;
   createdAt: string;
   isShadow: boolean;
-  name: string;
+  name?: string;
   ruleExpression: RuleField[];
   ruleId: string;
 };

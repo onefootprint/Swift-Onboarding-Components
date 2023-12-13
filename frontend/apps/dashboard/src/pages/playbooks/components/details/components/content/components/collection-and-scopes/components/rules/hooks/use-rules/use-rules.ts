@@ -4,6 +4,12 @@ import { useQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
+export const GET_QUERY_KEY = (playbookId: string) => [
+  'onboarding_configs',
+  playbookId,
+  'rules',
+];
+
 const getRules = async (authHeaders: AuthHeaders, playbookId: string) => {
   const response = await request<GetRulesResponse>({
     method: 'GET',
@@ -17,7 +23,7 @@ const useRules = (playbookId: string = '') => {
   const { authHeaders } = useSession();
 
   const rulesQuery = useQuery(
-    ['onboarding_configs', playbookId, 'rules'],
+    GET_QUERY_KEY(playbookId),
     () => getRules(authHeaders, playbookId),
     {
       enabled: !!playbookId,
@@ -29,6 +35,12 @@ const useRules = (playbookId: string = '') => {
           } else {
             formattedRules[rule.action] = [rule];
           }
+        });
+        Object.keys(formattedRules).forEach(action => {
+          const rulesCopy = formattedRules[action].slice();
+          formattedRules[action] = rulesCopy.sort((a, b) =>
+            a.ruleExpression[0].field > b.ruleExpression[0].field ? 1 : -1,
+          );
         });
         return { hasRules: !!rules.length, data: formattedRules };
       },

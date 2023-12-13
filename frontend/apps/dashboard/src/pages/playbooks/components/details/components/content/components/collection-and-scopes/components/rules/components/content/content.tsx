@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import type { Rule } from '@onefootprint/types';
+import type { Rule, RuleAction } from '@onefootprint/types';
 import { OnboardingConfigKind } from '@onefootprint/types';
 import { InlineAlert, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
@@ -9,10 +9,16 @@ import ActionSection from '../action-section';
 export type RulesProps = {
   hasRules: boolean;
   playbookKind: OnboardingConfigKind;
+  playbookId: string;
   actionRules: Record<string, Rule[]>;
 };
 
-const Rules = ({ hasRules, playbookKind, actionRules }: RulesProps) => {
+const Rules = ({
+  hasRules,
+  playbookKind,
+  playbookId,
+  actionRules,
+}: RulesProps) => {
   const { t } = useTranslation('pages.playbooks.details.rules');
 
   return (
@@ -24,7 +30,8 @@ const Rules = ({ hasRules, playbookKind, actionRules }: RulesProps) => {
         Object.keys(actionRules).map(action => (
           <ActionSection
             key={action}
-            name={action}
+            playbookId={playbookId}
+            action={action as RuleAction}
             rules={actionRules[action]}
           />
         ))
