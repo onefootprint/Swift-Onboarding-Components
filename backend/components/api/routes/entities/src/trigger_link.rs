@@ -66,7 +66,7 @@ pub async fn post(
     let link = state
         .config
         .service_config
-        .generate_verify_link(auth_token, "user");
+        .generate_verify_link(&auth_token, "user");
 
     let response = TriggerLinkResponse { link };
     ResponseData::ok(response).json()

@@ -21,9 +21,10 @@ use newtypes::PreviewApi;
 use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web};
 
+// TODO rm
 #[api_v2_operation(
     description = "Generate a link that can be sent to the user to ask them to reonboard to the last playbook they onboarded onto.",
-    tags(Users, Preview)
+    tags(Users, Deprecated)
 )]
 #[post("/users/{fp_id}/reonboard")]
 pub async fn post(
@@ -68,7 +69,7 @@ pub async fn post(
     let link = state
         .config
         .service_config
-        .generate_verify_link(auth_token, "user");
+        .generate_verify_link(&auth_token, "user");
 
     let result = ReonboardResponse {
         link,

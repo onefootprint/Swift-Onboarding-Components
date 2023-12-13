@@ -650,43 +650,6 @@
                 ]
             }
         },
-        "/users/{fp_id}/reonboard": {
-            "post": {
-                "tags": [
-                    "Users",
-                    "Preview"
-                ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGenerate a link that can be sent to the user to ask them to reonboard to the last playbook they onboarded onto.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "fp_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ReonboardResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Secret API Key": []
-                    }
-                ]
-            }
-        },
         "/users/{fp_id}/risk_signals": {
             "get": {
                 "tags": [
@@ -1427,26 +1390,45 @@
                 "type": "object",
                 "properties": {
                     "key": {
-                        "description": "The publishable key of the playbook onto which you would like this user to onboard.\n The user will be asked to provide any missing information required by playbook.\n If you provide the key here, you can omit providing it in your frontend Footprint.js integration.",
+                        "description": "When the kind is `onboard`, the publishable key of the playbook onto which you would like\n this user to onboard. The user will be asked to provide any missing information required by\n playbook. If you provide the key here, you can omit providing it in the frontend\n Footprint.js SDK integration.",
                         "type": "string"
+                    },
+                    "kind": {
+                        "description": "The kind of token to create.\n `onboard` creates a token that onboards the user onto a specific playbook, specified by the `key`.\n `reonboard` creates a token that reonboards the user onto the last playbook that they onboarded onto.\n `inherit` creates a token that inherits any operation previously requested via the dashboard.\n `user` simply create a token for the user. A playbook key may be provided directly to the Footprint Verify SDK to trigger onboarding.",
+                        "type": "string",
+                        "enum": [
+                            "onboard",
+                            "reonboard",
+                            "inherit",
+                            "user"
+                        ]
                     }
-                }
+                },
+                "required": [
+                    "kind"
+                ]
             },
             "CreateTokenResponse": {
                 "type": "object",
                 "properties": {
                     "expires_at": {
-                        "description": "The time at which the token expires",
+                        "description": "The time at which the token (and link) expire",
                         "type": "string",
                         "format": "date-time"
                     },
+                    "link": {
+                        "example": "https://verify.onefootprint.com/?type=user#tok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt",
+                        "description": "A Footprint link embedding the `token` that can be sent to this user to allow them to complete the flow.",
+                        "type": "string"
+                    },
                     "token": {
-                        "description": "The short-lived token that gives temporary access to perform operations for this user",
+                        "description": "A short-lived token that can be passed into the Verify SDK to allow the user to complete the flow.",
                         "type": "string"
                     }
                 },
                 "required": [
                     "expires_at",
+                    "link",
                     "token"
                 ]
             },
@@ -7576,25 +7558,6 @@
                     "reason_code",
                     "scopes",
                     "severity"
-                ]
-            },
-            "ReonboardResponse": {
-                "type": "object",
-                "properties": {
-                    "expires_at": {
-                        "description": "The time at which the token expires",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "link": {
-                        "example": "https://verify.onefootprint.com/?type=user#tok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt",
-                        "description": "A Footprint link specific to this user that can be sent to reonboard the user",
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "expires_at",
-                    "link"
                 ]
             },
             "SearchUsersRequestBody": {

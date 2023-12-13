@@ -105,7 +105,7 @@ pub async fn post(
     let link = state
         .config
         .service_config
-        .generate_verify_link(auth_token, "user");
+        .generate_verify_link(&auth_token, "user");
     let org_name = auth.tenant().name.clone();
 
     let msg = TriggerMessage {
