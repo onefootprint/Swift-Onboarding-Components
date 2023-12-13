@@ -33,6 +33,7 @@ use macros::route_alias;
 use newtypes::AuthEventKind;
 use newtypes::IdentifyScope;
 use newtypes::ObConfigurationKind;
+use newtypes::PreviewApi;
 use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web};
 
@@ -53,6 +54,7 @@ pub async fn post(
     request: OptionalJson<CreateTokenRequest>,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<CreateTokenResponse> {
+    auth.check_preview_guard(PreviewApi::CreateUserToken)?;
     let auth = auth.check_guard(TenantGuard::AuthToken)?;
     // TODO add preview guard?
     let CreateTokenRequest {
