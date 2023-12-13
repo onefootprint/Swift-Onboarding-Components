@@ -36,7 +36,7 @@ def test_skip_confirm(twilio, sandbox_tenant, ob_config):
     sandbox_id = body["sandbox_id"]
 
     data = dict(key=ob_config.key.value)
-    body = post(f"entities/{fp_id}/token", data, sandbox_tenant.sk.key)
+    body = post(f"users/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
     # Should require step up because auth was not implied for API vault

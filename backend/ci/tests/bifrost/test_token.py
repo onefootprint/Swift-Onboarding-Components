@@ -33,7 +33,7 @@ def test_onboarded_vault(twilio, ob_config, sandbox_tenant):
     # Go through onboarding with a token made from a user that already onboarded
     obc = sandbox_tenant.default_ob_config
     data = dict(kind="onboard", key=obc.key.value)
-    body = post(f"entities/{user.fp_id}/token", data, sandbox_tenant.sk.key)
+    body = post(f"users/{user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
     # Should immediately have onboarding scopes because auth was implied
@@ -66,7 +66,7 @@ def test_api_vault(twilio, sandbox_tenant, ob_config):
     sandbox_id = body["sandbox_id"]
 
     data = dict(kind="onboard", key=ob_config.key.value)
-    body = post(f"entities/{fp_id}/token", data, sandbox_tenant.sk.key)
+    body = post(f"users/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
     # Don't allow email challenge to log in
@@ -115,7 +115,7 @@ def test_3p_auth(sandbox_tenant, ob_config):
     sandbox_id = body["sandbox_id"]
 
     data = dict(kind="onboard", key=ob_config.key.value, third_party_auth=True)
-    body = post(f"entities/{fp_id}/token", data, sandbox_tenant.sk.key)
+    body = post(f"users/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
     # Should immediately have onboarding scopes through 3p auth
@@ -157,7 +157,7 @@ def test_reonboard(twilio, ob_config, sandbox_tenant, operation_kind):
     data = dict(kind=operation_kind)
     if operation_kind == "onboard":
         data["key"] = ob_config.key.value
-    body = post(f"entities/{user.fp_id}/token", data, sandbox_tenant.sk.key)
+    body = post(f"users/{user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
     # Should immediately have onboarding scopes because auth was implied
@@ -193,7 +193,7 @@ def test_provide_publishable_key_on_client(twilio, sandbox_tenant, ob_config):
 
     # Create a token not linked to an OBC
     data = dict(kind="user")
-    body = post(f"entities/{user.fp_id}/token", data, sandbox_tenant.sk.key)
+    body = post(f"users/{user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
     # Should immediately have onboarding scopes because auth was implied
@@ -240,7 +240,7 @@ def test_portablize_api_vault(
     assert not body["user_found"]
 
     data = dict(kind="onboard", key=ob_config.key.value)
-    body = post(f"entities/{fp_id}/token", data, sandbox_tenant.sk.key)
+    body = post(f"users/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
     auth_token = step_up_user(twilio, auth_token, live_phone_number, True)
@@ -314,7 +314,7 @@ def test_no_implied_auth_for_stale(sandbox_tenant):
     fp_id = body["data"][0]["id"]
     obc = sandbox_tenant.default_ob_config
     data = dict(dict(kind="onboard", key=obc.key.value))
-    body = post(f"entities/{fp_id}/token", data, sandbox_tenant.sk.key)
+    body = post(f"users/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
     # Should immediately have onboarding scopes because auth was implied
@@ -330,7 +330,7 @@ def test_error_with_key(sandbox_tenant, sandbox_user, operation_kind):
     """
     data = dict(kind=operation_kind, key=sandbox_tenant.default_ob_config.key.value)
     body = post(
-        f"entities/{sandbox_user.fp_id}/token",
+        f"users/{sandbox_user.fp_id}/token",
         data,
         sandbox_tenant.sk.key,
         status_code=400,
@@ -348,7 +348,7 @@ def test_inherit_error_with_no_workflow_request(sandbox_tenant, sandbox_user):
     """
     data = dict(kind="inherit")
     body = post(
-        f"entities/{sandbox_user.fp_id}/token",
+        f"users/{sandbox_user.fp_id}/token",
         data,
         sandbox_tenant.sk.key,
         status_code=400,

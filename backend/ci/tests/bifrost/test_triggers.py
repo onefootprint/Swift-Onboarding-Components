@@ -251,6 +251,6 @@ def test_complete_trigger_w_user_specific_token(sandbox_tenant, twilio):
     # auth token. This auth token should automatically inherit the outstanding workflow request
     # because there was no obc provided
     data = dict(kind="inherit")
-    body = post(f"entities/{sandbox_user.fp_id}/token", data, sandbox_tenant.sk.key)
+    body = post(f"users/{sandbox_user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
     complete_redo_flow(twilio, sandbox_user, auth_token)
