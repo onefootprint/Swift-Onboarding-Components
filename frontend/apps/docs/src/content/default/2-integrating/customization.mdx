@@ -18,7 +18,7 @@ Footprint supports visual customization, allowing you to match the design of you
 <customization-preview></customization-preview>
 
 <br />
-Do you want to see a project example? Go [here](https://github.com/onefootprint/examples/tree/master/frontend-vite-vanilla).
+Do you want to see a project example? Go [here](https://github.com/onefootprint/examples/tree/master/idv/frontend-vite-vanilla).
 
 ## Themes
 
@@ -26,6 +26,7 @@ You'll need to pick one theme to extend it. We offer two themes: `light` and `da
 provide any themes, the `light` theme will be used by default.
 
 ```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
 import footprint from '@onefootprint/footprint-js';
 
 const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';
@@ -45,6 +46,7 @@ the resulting DOM using the DOM explorer in your browser. Scroll down to see the
 Properties can be set using the unit that you prefer: pixels, rem, hex, rgb, etc.
 
 ```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
 import footprint from '@onefootprint/footprint-js';
 
 const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';
@@ -297,6 +299,7 @@ Radio Select is used in two important areas within the Footprint interface. Firs
 If you want to add styles that are not supported by these variables, you can use `rules`. With `rules`, you can use CSS to arbitrarily style the elements.
 
 ```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
 import footprint from '@onefootprint/footprint-js';
 
 const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';
@@ -353,6 +356,7 @@ Footprint also lets you customize some other options that influence the UI flow.
 If you want to render a pre-built completion page at the end of the onboarding flow, you can pass an `options` object into your integration, as in below:
 
 ```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
 import footprint from '@onefootprint/footprint-js';
 
 const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';
@@ -378,6 +382,7 @@ If the `showCompletionPage` is not provided, the modal will automatically close 
 You can also add your company logo at the top of the modal by a passing boolean field `showLogo` in the `options` object.
 
 ```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
 import footprint from '@onefootprint/footprint-js';
 
 const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';
@@ -423,6 +428,7 @@ Footprint also supports localization settings, you can use the `l10n` (localizat
 For example, if your audience is in Mexico, you can set the locale to "es-MX" (Spanish - Mexico), Your locale helps Footprint format dates and numbers and adapt to cultural conventions.
 
 ```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
 import footprint from '@onefootprint/footprint-js';
 
 const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';

@@ -2,18 +2,20 @@
 page: default
 slug: /embedded-components/getting-started
 category: Guides
-title: Other Components
+title: Form Component
 position: 6
 meta:
   {
-    title: Other Components,
+    title: Form Component,
     description: PCI Compliant collection and rendering of sensitive data,
   }
 ---
 
-# FootprintForm
+# Footprint Secure Form
 
-Our embedded form component can help you collect sensitive PII data in your product in a PCI compliant way. Below is a guide that describes how to integrate our FootprintForm component to collect user data that automatically gets saved to the user's Footprint vault.
+Our embedded form component can help you collect sensitive PII data in your product in a PCI compliant way. Below is a guide that describes how to integrate our footprint form component to collect user data that automatically gets saved to the user's Footprint vault.
+
+<img alt="footprint form" height={250} src="/form/form.png" width={720} />
 
 ## Add Footprint.js to your app
 
@@ -63,7 +65,17 @@ A sample response can be found below:
 
 The token returned will need to be passed into the Footprint component on the frontend.
 
-6. Add the `footprint.js` script to your app.
+6. Add the `footprint.js` to your app.
+
+```bash
+# With NPM
+npm install @onefootprint/footprint-js
+
+# With yarn
+yarn add @onefootprint/footprint-js
+```
+
+or
 
 ```html
 <head>
@@ -81,81 +93,46 @@ The token returned will need to be passed into the Footprint component on the fr
 </body>
 ```
 
-or
-
-```bash
-# With NPM
-npm install @onefootprint/footprint-js
-
-# With yarn
-yarn add @onefootprint/footprint-js
-```
-
-7. Embed the FootprintForm component.
+7. Embed the Form component.
 
 Make sure to pass the auth token generated from Step 5.
 
-```html
-<div
-  data-footprint
-  data-kind="form"
-  data-variant="inline"
-  data-props='{"authToken":"tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit"}'
-></div>
-```
+```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import footprint from '@onefootprint/footprint-js';
 
-If you are rendering the secure form in an inline variant, it will take up all of the space provided by its parent container. The easiest way to customize the placement is to wrap the it in a div and apply styles to this div.
-
-You can also render it in `modal` or `drawer` variants:
-
-```html
-<style>
-  .container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-  }
-</style>
-
-<div class="container">
-  <div
-    data-footprint
-    data-kind="form"
-    data-variant="modal"
-    data-props='{"authToken":"tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit"}'
-  ></div>
-</div>
-```
-
-If you are rendering the secure form in a modal or drawer variant, it will take up the whole viewport when launched.
-
-8. Add callbacks for form events
-
-```javascript
-window.footprintCallbacks = {
-  onComplete: function () {
-    // TODO: Decrypt or proxy the saved data from your backend
-  },
-  onCancel: function () {
-    // TODO:
-  },
-  onClose: function () {
-    // TODO:
-  },
+const renderForm = () => {
+  const component = footprint.init({
+    kind: 'form',
+    variant: 'inline',
+    containerId: 'myContainerId', // unique ID for the div that the form should be rendered in
+    authToken: 'tok_joXzzB0kIVW0fMCB7RWPAHWt8itWdFWpit',
+    onComplete: () => {
+      // TODO:
+    },
+  });
+  component.render();
 };
 ```
+
+If you are rendering the secure form in an inline variant, it will take up all of the space provided by its parent container. The easiest way to customize the placement is to wrap the it in a div and apply styles to this div. You can also render it in `modal` or `drawer` variants. If you are rendering the secure form in a modal or drawer variant, it will take up the whole viewport when launched.
+
+You can find integration instructions for [React](https://docs.onefootprint.com/sdks/react#available-components-footprint-form-integration), [Vanilla HTML/JS](https://docs.onefootprint.com/sdks/html#available-components-form-component-integration), [Javascript/Typescript](https://docs.onefootprint.com/sdks/javascript#available-components-form-component-integration) in our docs as well.
 
 ## Decrypt or Proxy card data from the backend
 
 When the user has completed filling the secure collection form on your product, you can decrypt the data collected. More details can be found [here](https://docs.onefootprint.com/vault/apis#decrypt-data-from-a-users-vault)
 
-## Available FootprintForm Props
+## Available Form Props
 
-| Variable     | Description                                                                                                                                                      |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
-| `authToken`  | Required. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect                                        |
-| `title`      | Optional. A string that will be displayed at the top of the field                                                                                                |
-| `variant`    | Optional. One of `modal`, `drawer` or `inline`. Specifies whether the form will be rendered in-line or in a modal.                                               |
-| `appearance` | Optional. A stringified `FootprintAppearance` object that can be imported from to customize the look of your integration                                         |
-| `getRef`     | Optional. A callback that takes one argument `(ref) => {}`. The `ref` object contains a method `save()` that can be called to save the form data (`ref.save()`). |     |
+| Variable     | Description                                                                                                                                                                                                                                                           |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
+| `title`      | Optional. A form header.                                                                                                                                                                                                                                              |
+| `authToken`  | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect.                                                                                                                                            |
+| `onComplete` | Triggered after user completes the form and data is saved to the user vault.                                                                                                                                                                                          |
+| `onCancel`   | Triggered when the user abandons the flow. This can be triggered when the user clicks on close or cancel buttons inside our iframe                                                                                                                                    |
+| `onClose`    | Triggered when the user abandons the flow. This can be triggered when the user clicks on close or cancel buttons inside our iframe                                                                                                                                    |
+| `options`    | Optional. An options object that customizes the flow, can accept `hideButtons` and `hideFootprintLogo` boolean entries.                                                                                                                                               |
+| `appearance` | Optional. A stringified `FootprintAppearance` object that can be imported from the SDK to customize the look of your integration                                                                                                                                      |
+| `variant`    | Optional. One of `modal`, `inline` or `drawer`.                                                                                                                                                                                                                       |
+| `getRef`     | Optional. An async callback that takes one argument and returns a promise. The `ref` object contains a method `save()` that can be called to save the form data (`ref.save()`). Promise is resolved or rejected with a string error when saving to vault is complete. |     |
