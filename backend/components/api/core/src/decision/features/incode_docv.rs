@@ -247,7 +247,7 @@ fn ocr_was_successful(scores_res: &FetchScoresResponse, ocr_res: &FetchOCRRespon
     let ocr_overall_confidence_passed = match scores_res.id_ocr_confidence().1 {
        Some(s) => s != IncodeStatus::Fail,
         None => {
-            tracing::error!("missing incode ocr score");
+            tracing::warn!("missing incode ocr score");
             false
         }
     };
