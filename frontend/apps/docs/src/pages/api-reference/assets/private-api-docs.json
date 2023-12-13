@@ -1,8 +1,7 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "Footprint API",
-        "version": "8e28e9ddc3fe3709f90756a392a2cdf48ad3d220"
+        "title": "Footprint API"
     },
     "servers": [
         {
@@ -988,7 +987,7 @@
                 ]
             }
         },
-        "/entities/{fp_id}": {
+        "/entities/{fp_id:fp_[_A-Za-z0-9]*}": {
             "get": {
                 "tags": [
                     "Entities",
@@ -1001,7 +1000,8 @@
                         "name": "fp_id",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "pattern": "fp_[_A-Za-z0-9]*"
                         },
                         "style": "simple"
                     }

@@ -20,7 +20,7 @@ use paperclip::actix::{api_v2_operation, get, web};
     description = "View details of a specific entity (business or user)",
     tags(Entities, Private)
 )]
-#[get("/entities/{fp_id}")]
+#[get("/entities/{fp_id:fp_[_A-Za-z0-9]*}")]
 pub async fn get(
     state: web::Data<State>,
     fp_id: FpIdPath,

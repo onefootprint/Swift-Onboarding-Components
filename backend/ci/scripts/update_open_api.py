@@ -136,6 +136,9 @@ def get_apis(open_api_spec, tag):
         name: open_api_spec["components"]["securitySchemes"][name]
         for name in sorted(used_security_schemes)
     }
+    # Often creates merge conflicts
+    info = {**open_api_spec["info"]}
+    info.pop("version")
     return {
         **open_api_spec,
         "components": {
@@ -144,6 +147,7 @@ def get_apis(open_api_spec, tag):
             "schemas": used_schemas,
         },
         "paths": paths_dict,
+        "info": info,
     }
 
 
