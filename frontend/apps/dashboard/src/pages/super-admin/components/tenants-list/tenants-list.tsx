@@ -1,7 +1,11 @@
+import styled from '@onefootprint/styled';
 import type { Tenant } from '@onefootprint/types';
-import { Box, Pagination, Stack, Table, Typography } from '@onefootprint/ui';
+import { Pagination, Stack, Table, Typography } from '@onefootprint/ui';
+import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import useAssumeTenant from 'src/hooks/use-assume-tenant';
+import useSession from 'src/hooks/use-session';
 
 import Row from './components/row';
 import useFilters from './hooks/use-filters';
@@ -17,7 +21,6 @@ const TenantsList = () => {
     { text: t('table.header.live-users'), width: '12.5%' },
     { text: t('table.header.sandbox-users'), width: '12.5%' },
     { text: t('table.header.created-at'), width: '15%' },
-    { text: t('table.header.actions'), width: '15%' },
   ];
   const searchPlaceholder = t('table.search-placeholder') || '';
   const emptyState = errorMessage || t('table.empty-state') || '';
@@ -26,8 +29,24 @@ const TenantsList = () => {
     filters.push({ tenants_search: search });
   };
 
+  const useAssumeTenantMutation = useAssumeTenant();
+  const { refreshUserPermissions } = useSession();
+  const router = useRouter();
+
+  const handleAssumeTenant = (tenant: Tenant) => {
+    useAssumeTenantMutation.mutate(
+      { tenantId: tenant.id },
+      {
+        onSuccess: async () => {
+          await refreshUserPermissions();
+          router.push('/users');
+        },
+      },
+    );
+  };
+
   return (
-    <Box>
+    <Container>
       <Stack gap={2} marginBottom={7} direction="column">
         <Typography variant="heading-2">{t('title')}</Typography>
         <Typography variant="body-2" color="secondary">
@@ -44,6 +63,7 @@ const TenantsList = () => {
         items={response?.data}
         onChangeSearchText={handleSearchChange}
         renderTr={tenant => <Row tenant={tenant.item} />}
+        onRowClick={handleAssumeTenant}
         searchPlaceholder={searchPlaceholder}
       />
       {response && response.meta.count > 0 && (
@@ -57,8 +77,14 @@ const TenantsList = () => {
           totalNumResults={response.meta.count}
         />
       )}
-    </Box>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  max-width: 1600px;
+  margin-right: auto;
+  margin-left: auto;
+`;
 
 export default TenantsList;

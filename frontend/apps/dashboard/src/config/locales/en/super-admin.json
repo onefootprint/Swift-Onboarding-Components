@@ -1,7 +1,7 @@
 {
   "page-title": "Switch tenant",
   "title": "Tenants",
-  "subtitle": "Select a tenant to view as Super Admin ",
+  "subtitle": "Click a tenant to assume as a Super Admin ",
   "table": {
     "aria-label": "Tenants table",
     "search-placeholder": "Search by name...",
