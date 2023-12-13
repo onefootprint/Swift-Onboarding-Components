@@ -8,6 +8,7 @@ from tests.utils import (
     try_until_success,
     _gen_random_n_digit_number,
     step_up_user,
+    create_ob_config,
 )
 from tests.bifrost_client import BifrostClient
 
@@ -52,6 +53,7 @@ def complete_redo_flow(twilio, user, auth_token, pre_run=None):
 
     # Re-run Bifrost with the token, optionally with any pre_run assertion checks
     auth_token = step_up_user(twilio, auth_token, phone_number, False)
+    # Weird, the ob_config here isn't really used
     bifrost = BifrostClient.raw_auth(
         user.client.ob_config, auth_token, phone_number, sandbox_id
     )
@@ -232,3 +234,23 @@ def test_redo_kyc_with_sms_link(sandbox_tenant, twilio, live_phone_number):
 
     # And complete redo flow using this auth token
     complete_redo_flow(twilio, sandbox_user, initial_auth_token)
+
+
+def test_complete_trigger_w_user_specific_token(sandbox_tenant, twilio):
+    """
+    Use a user-specific token to finish the redo flow. This should inherit the outstanding
+    WorkflowRequest
+    """
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
+    sandbox_user = bifrost.run()
+
+    # Trigger redo KYC
+    send_trigger(sandbox_user.fp_id, sandbox_tenant, dict(kind="redo_kyc"))
+
+    # Generate an auth token for this user without a playbook key and complete redo flow using this
+    # auth token. This auth token should automatically inherit the outstanding workflow request
+    # because there was no obc provided
+    data = dict(kind="inherit")
+    body = post(f"entities/{sandbox_user.fp_id}/token", data, sandbox_tenant.sk.key)
+    auth_token = FpAuth(body["token"])
+    complete_redo_flow(twilio, sandbox_user, auth_token)

@@ -10,7 +10,7 @@ use api_core::config::Config;
 use api_core::errors::business::BusinessError;
 use api_core::errors::challenge::ChallengeError;
 use api_core::errors::user::UserError;
-use api_core::errors::{ApiError, ApiResult};
+use api_core::errors::{ApiError, ApiResult, ValidationError};
 use api_core::telemetry::RootSpan;
 use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
@@ -31,8 +31,8 @@ use db::models::vault::Vault;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::TxnPgConn;
 use newtypes::{
-    AuthEventKind, DataIdentifier, IdentifyScope, IdentityDataKind as IDK, ObConfigurationId,
-    ObConfigurationKind, ScopedVaultId, SessionAuthToken, VaultId, WebauthnCredentialId,
+    AuthEventKind, DataIdentifier, IdentifyScope, IdentityDataKind as IDK, ObConfigurationKind,
+    ScopedVaultId, SessionAuthToken, VaultId, WebauthnCredentialId,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -126,19 +126,33 @@ pub async fn post(
                     let bo = ob_pk_auth.as_ref().and_then(|a| a.business_owner());
                     let user_auth_obc = user_auth.as_ref().and_then(|a| a.ob_config());
                     let ob_pk_obc = ob_pk_auth.as_ref().map(|a| a.ob_config());
-                    let obc = user_auth_obc
-                        .or(ob_pk_obc)
-                        .ok_or(UserError::ObConfigRequiredForSignUp)?;
-                    if obc.kind == ObConfigurationKind::Auth {
-                        return Err(ChallengeError::IncorrectPlaybookKind(obc.kind, scope).into());
-                    }
+                    let obc = user_auth_obc.or(ob_pk_obc);
+                    let su_id = user_auth.as_ref().and_then(|ua| ua.scoped_user_id());
+                    let su = if let Some(su_id) = su_id {
+                        // We are stepping up an existing token already attached to a SU
+                        ScopedVault::get(conn, &su_id)?
+                    } else if let Some(obc) = obc {
+                        // We are making a new auth token or adding the SU to a token that doesn't have it
+                        if obc.kind == ObConfigurationKind::Auth {
+                            return Err(ChallengeError::IncorrectPlaybookKind(obc.kind, scope).into());
+                        }
+                        // Since only some codepaths above will create a SU, we need to always get_or_create a SU if
+                        // created with an ob config. This will create a SU when we are one-clicking onto this tenant
+                        let uv = Vault::lock(conn, &uv_id)?;
+                        ScopedVault::get_or_create(conn, &uv, obc.id.clone())?
+                    } else {
+                        return Err(ValidationError(
+                            "Must provide either a playbook key or an existing auth token",
+                        )
+                        .into());
+                    };
                     // TODO we should migrate the BO tokens to use these new un-authed, identified tokens
-                    let (su, sb_id) = onboarding_identifiers(conn, obc.id.clone(), bo, &uv_id)?;
+                    let sb_id = bo.map(|bo| get_scoped_business_id(conn, &su, bo)).transpose()?;
                     let duration = Duration::hours(1); // Onboarding is shorter
                     let args = UserSessionArgs {
                         su_id: Some(su.id.clone()),
                         sb_id,
-                        obc_id: Some(obc.id.clone()),
+                        obc_id: obc.map(|obc| obc.id.clone()),
                         // wf_id will be added later in POST /hosted/onboarding
                         ..Default::default()
                     };
@@ -190,38 +204,25 @@ pub async fn post(
     ResponseData::ok(VerifyResponse { auth_token }).json()
 }
 
-/// Determines the identifiers to add to the auth token to allow a user to complete onboarding
-fn onboarding_identifiers(
+fn get_scoped_business_id(
     conn: &mut TxnPgConn,
-    obc_id: ObConfigurationId,
-    bo: Option<&BusinessOwner>,
-    uv_id: &VaultId,
-) -> ApiResult<(ScopedVault, Option<ScopedVaultId>)> {
-    // Since only some codepaths above will create a SU, we need to always get_or_create a SU if
-    // created with an ob config. This will create a SU when we are one-clicking onto this tenant
-    let uv = Vault::lock(conn, uv_id)?;
-    let su = ScopedVault::get_or_create(conn, &uv, obc_id)?;
-
+    sv: &ScopedVault,
+    bo: &BusinessOwner,
+) -> ApiResult<ScopedVaultId> {
     // If we verified with a BoSessionAuth, update the corresponding BO
-    let sb_id = if let Some(bo) = bo {
-        let bo = BusinessOwner::lock(conn, &bo.id)?.into_inner();
-        let scoped_business = ScopedVault::get(conn, (&bo.business_vault_id, &su.tenant_id))?;
-        if let Some(existing_uv_id) = bo.user_vault_id.as_ref() {
-            // If uv on the BO, make sure it is the same UV that was located in identify flow
-            if existing_uv_id != &uv.id {
-                return Err(BusinessError::BoAlreadyHasVault.into());
-            }
-        } else {
-            // If no uv_id on the BO, add it
-            bo.add_user_vault_id(conn, &uv.id)?;
+    let bo = BusinessOwner::lock(conn, &bo.id)?.into_inner();
+    let scoped_business = ScopedVault::get(conn, (&bo.business_vault_id, &sv.tenant_id))?;
+    if let Some(existing_uv_id) = bo.user_vault_id.as_ref() {
+        // If uv on the BO, make sure it is the same UV that was located in identify flow
+        if existing_uv_id != &sv.vault_id {
+            return Err(BusinessError::BoAlreadyHasVault.into());
         }
-        // TODO this will give the secondary BO perms to update the business vault
-        Some(scoped_business.id)
     } else {
-        None
-    };
-
-    Ok((su, sb_id))
+        // If no uv_id on the BO, add it
+        bo.add_user_vault_id(conn, &sv.vault_id)?;
+    }
+    // TODO this will give the secondary BO perms to update the business vault
+    Ok(scoped_business.id)
 }
 
 fn validate_biometric_challenge(

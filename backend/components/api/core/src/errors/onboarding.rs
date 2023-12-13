@@ -29,7 +29,7 @@ pub enum OnboardingError {
     IdentityDocumentNotPending,
     #[error("Cannot create a document when no document request exists")]
     NoDocumentRequestFound,
-    #[error("No onboarding config provided for onboarding")]
+    #[error("No playbook key provided")]
     NoObConfig,
     #[error("Cannot edit completed onboarding")]
     AlreadyCompleted,

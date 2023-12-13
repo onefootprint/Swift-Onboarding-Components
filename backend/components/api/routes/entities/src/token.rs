@@ -27,6 +27,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::vault::Vault;
 use db::models::workflow::Workflow;
+use db::models::workflow_request::WorkflowRequest;
 use feature_flag::BoolFlag;
 use macros::route_alias;
 use newtypes::AuthEventKind;
@@ -147,14 +148,40 @@ pub async fn post(
             let duration = Duration::hours(1);
 
             // Determine arguments for the auth token based on the requested operation
-            let obc_id = match kind {
-                TokenOperationKind::User => None,
-                TokenOperationKind::Inherit => None, // TODO
+            let (obc_id, wfr_id) = match kind {
+                TokenOperationKind::User => {
+                    if key.is_some() {
+                        return Err(ValidationError(
+                            "Cannot provide playbook key for operation of kind user",
+                        )
+                        .into());
+                    }
+                    (None, None)
+                }
+                TokenOperationKind::Inherit => {
+                    if key.is_some() {
+                        return Err(ValidationError(
+                            "Cannot provide playbook key for operation of kind inherit",
+                        )
+                        .into());
+                    }
+                    // Inherit the WorkflowRequest
+                    let wfr = WorkflowRequest::get_active(conn, &sv.id)?
+                        .ok_or(ValidationError("No outstanding info is requested from this user"))?;
+                    // Do we want to replace the obc.id on the auth token?
+                    (Some(wfr.ob_configuration_id), Some(wfr.id))
+                }
                 TokenOperationKind::Reonboard => {
+                    if key.is_some() {
+                        return Err(ValidationError(
+                            "Cannot provide playbook key for operation of kind reonboard",
+                        )
+                        .into());
+                    }
                     let (_, obc) = Workflow::latest(conn, &sv.id, true)?.ok_or(ValidationError(
                         "Cannot reonboard user - user has no complete onboardings.",
                     ))?;
-                    Some(obc.id)
+                    (Some(obc.id), None)
                 }
                 TokenOperationKind::Onboard => {
                     let key = key.ok_or(ValidationError(
@@ -164,7 +191,7 @@ pub async fn post(
                     if obc.kind == ObConfigurationKind::Auth {
                         return Err(OnboardingError::CannotOnboardOntoAuthPlaybook.into());
                     }
-                    Some(obc.id)
+                    (Some(obc.id), None)
                 }
             };
 
@@ -173,6 +200,7 @@ pub async fn post(
                 obc_id,
                 is_from_api: true,
                 is_implied_auth: can_auto_authorize,
+                wfr_id,
                 ..Default::default()
             };
             let event_ids = inherited_auth_events.into_iter().map(|e| e.id).collect();

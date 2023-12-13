@@ -191,20 +191,20 @@ def test_provide_publishable_key_on_client(twilio, sandbox_tenant, ob_config):
     bifrost1 = BifrostClient.new(ob_config, twilio)
     user = bifrost1.run()
 
-    from tests.headers import BaseAuth
-
     # Create a token not linked to an OBC
     data = dict(kind="user")
     body = post(f"entities/{user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
     # Should immediately have onboarding scopes because auth was implied
+    # TODO we should probably update this test to not inherit auth and instead require going through
+    # the verify flow to make sure the logic there works
     body = get("hosted/user/token", None, auth_token)
     assert set(body["scopes"]) >= {"sign_up"}
 
     # Should require passing obc key
     body = post("hosted/onboarding", None, auth_token, status_code=400)
-    assert body["error"]["message"] == "No onboarding config provided for onboarding"
+    assert body["error"]["message"] == "No playbook key provided"
     body = post(
         "hosted/onboarding", None, auth_token, sandbox_tenant.default_ob_config.key
     )
@@ -320,6 +320,40 @@ def test_no_implied_auth_for_stale(sandbox_tenant):
     # Should immediately have onboarding scopes because auth was implied
     body = get("hosted/user/token", None, auth_token)
     assert not body["scopes"]
+
+
+@pytest.mark.parametrize("operation_kind", ["inherit", "user", "reonboard"])
+def test_error_with_key(sandbox_tenant, sandbox_user, operation_kind):
+    """
+    Ensure that we can't try to generate a token with operation including a playbook key AND
+    an operation kind other than onboard
+    """
+    data = dict(kind=operation_kind, key=sandbox_tenant.default_ob_config.key.value)
+    body = post(
+        f"entities/{sandbox_user.fp_id}/token",
+        data,
+        sandbox_tenant.sk.key,
+        status_code=400,
+    )
+    assert (
+        body["error"]["message"]
+        == f"Cannot provide playbook key for operation of kind {operation_kind}"
+    )
+
+
+def test_inherit_error_with_no_workflow_request(sandbox_tenant, sandbox_user):
+    """
+    Ensure that we return an HTTP 400 if you try to make a token `for_info_requested` and there is
+    no outstanding WorkflowRequest
+    """
+    data = dict(kind="inherit")
+    body = post(
+        f"entities/{sandbox_user.fp_id}/token",
+        data,
+        sandbox_tenant.sk.key,
+        status_code=400,
+    )
+    assert body["error"]["message"] == "No outstanding info is requested from this user"
 
 
 # TODO: test when we make a new vault via API that is already portable elsewhere...
