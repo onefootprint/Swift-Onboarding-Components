@@ -45,10 +45,7 @@ impl<Type> VaultWrapper<Type> {
         let mut validation_errors = HashMap::<DataIdentifier, newtypes::Error>::new();
         let dis = data.iter().map(|vd| &vd.kind).collect_vec();
 
-        let irreplaceable_ci = match actor {
-            Some(AuthActor::FirmEmployee(_)) => vec![],
-            _ => vec![IDK::PhoneNumber.into(), IDK::Email.into()],
-        };
+        let irreplaceable_ci = [IDK::PhoneNumber.into(), IDK::Email.into()];
         for di in irreplaceable_ci {
             let Some(d) = self.data(&di) else {
                 continue;
@@ -56,7 +53,11 @@ impl<Type> VaultWrapper<Type> {
             let ci = ContactInfo::get(conn, &d.lifetime.id)?;
             let update_has_di = dis.contains(&&di);
             if ci.is_otp_verified && update_has_di {
-                if prefill_sv_id.is_none() {
+                if matches!(actor, Some(AuthActor::FirmEmployee(_))) {
+                    // Don't error, allow firm employees (who already have write permissions) to
+                    // be able to replace CI
+                    tracing::error!("Firm employee is updating verified ContactInfo! Note that this won't entirely work properly - the new ContactInfo is marked as unverified, which causes weird bugs. Please repair the vault manually");
+                } else if prefill_sv_id.is_none() {
                     validation_errors.insert(di, ValidationError::CannotReplaceVerifiedContactInfo.into());
                 } else if prefill_sv_id.is_some_and(|sv_id| sv_id == &d.lifetime.scoped_vault_id) {
                     // With our current prefill logic that only prefills for the first WF for a SV,
