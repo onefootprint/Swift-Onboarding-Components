@@ -4,6 +4,7 @@ import { CodeInline, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 import Tags from 'src/components/entities/components/tags';
 import StatusBadge from 'src/components/status-badge';
+import useSession from 'src/hooks/use-session';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import { HEADER_ACTIONS_ID } from '@/entity/constants';
@@ -14,6 +15,9 @@ type HeaderProps = WithEntityProps;
 const Header = ({ entity }: HeaderProps) => {
   const { t } = useTranslation('pages.entity.header');
   const { kind } = useEntityContext();
+  const {
+    data: { user },
+  } = useSession();
 
   return (
     <HeaderContainer aria-label={t(`${kind}.title`)}>
@@ -33,6 +37,12 @@ const Header = ({ entity }: HeaderProps) => {
       <SubHeader>
         <Row>
           <CodeInline isPrivate>{entity.id}</CodeInline>
+          {user?.isFirmEmployee && entity.sandboxId && (
+            <>
+              <span>·</span>
+              <CodeInline isPrivate>{entity.sandboxId}</CodeInline>
+            </>
+          )}
         </Row>
         <Row>
           <div id={HEADER_ACTIONS_ID} />

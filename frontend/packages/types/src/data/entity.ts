@@ -65,6 +65,7 @@ export type Entity<TStatus = EntityStatus> = {
   requiresManualReview: boolean;
   insightEvent?: InsightEvent;
   hasOutstandingWorkflowRequest: boolean;
+  sandboxId?: string;
 };
 
 export const hasEntityUsLegalStatus = (entity: Entity) =>
