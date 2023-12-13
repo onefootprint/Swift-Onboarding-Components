@@ -69,8 +69,9 @@ const DobInput = ({ value }: DobInputProps) => {
         placeholder="YYYY-MM-DD"
         hasError={hasError}
         hint={getHint()}
-        defaultValue={value as string}
+        value={value as string}
         inputMode="numeric"
+        mask={{ date: true, delimiter: '-', datePattern: ['Y', 'm', 'd'] }}
         {...register(formField, options)}
       />
     </ValueContainer>
