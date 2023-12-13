@@ -191,7 +191,7 @@ mod test {
         TenantScope::Read,
         TenantScope::DecryptAll,
         TenantScope::ManualReview,
-                TenantScope::WriteEntities,
+        TenantScope::WriteEntities,
         TenantScope::OnboardingConfiguration,
         TenantScope::ApiKeys,
         TenantScope::ManageWebhooks,
