@@ -343,8 +343,8 @@ def test_error_with_key(sandbox_tenant, sandbox_user, operation_kind):
 
 def test_inherit_error_with_no_workflow_request(sandbox_tenant, sandbox_user):
     """
-    Ensure that we return an HTTP 400 if you try to make a token `for_info_requested` and there is
-    no outstanding WorkflowRequest
+    Ensure that we return an HTTP 400 if you try to make a token with operation inherit and there
+    is no outstanding WorkflowRequest
     """
     data = dict(kind="inherit")
     body = post(

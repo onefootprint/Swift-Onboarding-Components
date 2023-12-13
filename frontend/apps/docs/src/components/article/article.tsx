@@ -17,6 +17,8 @@ import Examples from './components/markdown-components/examples';
 import H1 from './components/markdown-components/h1';
 import H2 from './components/markdown-components/h2';
 import H3 from './components/markdown-components/h3';
+import H4 from './components/markdown-components/h4';
+import H5 from './components/markdown-components/h5';
 import Img from './components/markdown-components/img';
 import Strong from './components/markdown-components/strong';
 
@@ -39,6 +41,12 @@ const overrides: MarkdownToJSX.Overrides = {
   },
   h3: {
     component: H3,
+  },
+  h4: {
+    component: H4,
+  },
+  h5: {
+    component: H5,
   },
   img: {
     component: Img,
