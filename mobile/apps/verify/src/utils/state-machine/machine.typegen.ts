@@ -18,6 +18,7 @@ export interface Typegen0 {
     assignConfig: 'sdkArgsReceived';
     assignIdentifyResult: 'identified';
     assignKycData: 'dataSubmitted';
+    assignKycDataCollected: 'dataConfirmed';
     assignObConfigAuth: 'sdkArgsReceived';
     reset: 'identifyReset';
   };
@@ -29,9 +30,14 @@ export interface Typegen0 {
     | 'completed'
     | 'confirm'
     | 'emailIdentification'
+    | 'error'
+    | 'incompatibleRequirements'
     | 'init'
     | 'initFailed'
+    | 'liveness'
     | 'phoneIdentification'
+    | 'process'
+    | 'requirements'
     | 'residentialAddress'
     | 'smsChallenge'
     | 'ssn';

@@ -1,10 +1,12 @@
-export enum OverallOutcomes {
-  success = '',
-  manualReview = 'manualreview',
+export enum OverallOutcome {
+  success = 'pass',
+  manualReview = 'manual_review',
   fail = 'fail',
+  documentDecision = 'document_decision',
+  stepUp = 'step_up',
 }
 
-export enum IdDocOutcomes {
+export enum IdDocOutcome {
   success = 'pass',
   fail = 'fail',
   real = 'real',

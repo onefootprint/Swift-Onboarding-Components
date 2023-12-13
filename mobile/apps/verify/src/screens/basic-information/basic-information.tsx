@@ -31,7 +31,7 @@ import {
 
 export type BasicInformationProps = {
   requirement: CollectKycDataRequirement;
-  data: KycData;
+  data?: KycData;
   authToken: string;
   onComplete: (data: KycData) => void;
   onCancel?: () => void;
@@ -96,10 +96,10 @@ const BasicInformation = ({
   });
   const { control, handleSubmit, setError } = useForm<FormData>({
     defaultValues: {
-      firstName: data[IdDI.firstName]?.value,
-      middleName: data[IdDI.middleName]?.value,
-      lastName: data[IdDI.lastName]?.value,
-      dob: data[IdDI.dob]?.value,
+      firstName: data?.[IdDI.firstName]?.value,
+      middleName: data?.[IdDI.middleName]?.value,
+      lastName: data?.[IdDI.lastName]?.value,
+      dob: data?.[IdDI.dob]?.value,
     },
     resolver: zodResolver(schema),
   });

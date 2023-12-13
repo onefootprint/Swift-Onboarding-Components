@@ -1,8 +1,4 @@
-import {
-  CLIENT_PUBLIC_KEY_HEADER,
-  CollectedKycDataOption,
-  OnboardingRequirementKind,
-} from '@onefootprint/types';
+import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import allAttributes from '../all-attributes';
@@ -12,6 +8,7 @@ import {
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
 } from '../missing-attributes';
+import { NextTargetsFromRequirement } from './machine.utils';
 import type { MachineContext, MachineEvents } from './types';
 
 export const createPasskeysMachine = (sdkAuthToken: string) =>
@@ -30,24 +27,7 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
         sdkAuthToken,
         identify: {},
         // TODO: this is temporary; we will get this data from requirements machine when we implement it
-        kyc: {
-          requirement: {
-            isMet: false,
-            kind: OnboardingRequirementKind.collectKycData,
-            missingAttributes: [
-              CollectedKycDataOption.name,
-              CollectedKycDataOption.dob,
-              CollectedKycDataOption.fullAddress,
-              CollectedKycDataOption.ssn4,
-            ],
-            populatedAttributes: [
-              CollectedKycDataOption.email,
-              CollectedKycDataOption.phoneNumber,
-            ],
-            optionalAttributes: [],
-          },
-          kycData: {},
-        },
+        kyc: {},
       },
       states: {
         init: {
@@ -101,9 +81,14 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
               actions: ['assignChallengeData'],
             },
             challengeSucceeded: {
-              target: 'basicInformation',
+              target: 'requirements',
               actions: ['assignAuthToken'],
             },
+          },
+        },
+        requirements: {
+          on: {
+            requirementsReceived: NextTargetsFromRequirement,
           },
         },
         basicInformation: {
@@ -192,12 +177,34 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
             dataSubmitted: {
               actions: ['assignKycData'],
             },
-            done: {
-              target: 'completed',
+            dataConfirmed: {
+              target: 'requirements',
+              actions: ['assignKycDataCollected'],
             },
           },
         },
+        liveness: {
+          on: {
+            skipLiveness: {
+              target: 'requirements',
+            },
+            skipLivenessError: {
+              target: 'error',
+            },
+          },
+        },
+        process: {
+          on: {
+            done: {
+              target: 'requirements',
+            },
+          },
+        },
+        incompatibleRequirements: { type: 'final' },
         completed: {
+          type: 'final',
+        },
+        error: {
           type: 'final',
         },
       },
@@ -273,6 +280,11 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
             context.kyc.kycData ?? {},
             event.payload,
           );
+          context.startedDataCollection = true;
+          return context;
+        }),
+        assignKycDataCollected: assign(context => {
+          context.collectedKycData = true;
           return context;
         }),
       },

@@ -8,7 +8,7 @@ const InitFailed = () => {
 
   return (
     <Box width="100%">
-      <Typography variant="heading-3" marginBottom={3} marginTop={4}>
+      <Typography variant="heading-3" marginBottom={3} marginTop={4} center>
         {t('title')}
       </Typography>
       <Typography variant="body-3" marginBottom={9} center>

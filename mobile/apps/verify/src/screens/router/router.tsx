@@ -3,16 +3,22 @@ import { Container } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import React from 'react';
 
+import Error from '@/components/error';
 import createMachine from '@/utils/state-machine/machine';
 import type { IdentifyResultProps } from '@/utils/state-machine/types';
 
 import BasicInformation from '../basic-information';
+import CheckRequirements from '../check-requirements';
+import Complete from '../complete';
 import Confirm from '../confirm';
 import EmailIdentification from '../email-identification';
+import IncompatibleRequirementsError from '../incompatible-requirements-error';
 import Init from '../init';
 import InitFailed from '../init-failed';
 import PhoneIdentification from '../phone-identification';
+import Process from '../process';
 import ResidentialAddress from '../residential-address';
+import SkipLiveness from '../skip-liveness';
 import SmsChallenge from '../sms-challenge';
 import Ssn from '../ssn';
 import WithSdkArgs from './components/with-sdk-args';
@@ -31,6 +37,8 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
     config,
     identify,
     kyc: { kycData, requirement: kycRequirement },
+    startedDataCollection,
+    collectedKycData,
   } = state.context;
   const { authToken } = identify;
 
@@ -145,8 +153,28 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
     }
   }
 
+  if (state.matches('requirements')) {
+    if (authToken) {
+      return (
+        <Container center>
+          <CheckRequirements
+            authToken={authToken}
+            onComplete={payload =>
+              send({
+                type: 'requirementsReceived',
+                payload,
+              })
+            }
+            startedDataCollection={startedDataCollection}
+            collectedKycData={collectedKycData}
+          />
+        </Container>
+      );
+    }
+  }
+
   if (state.matches('basicInformation')) {
-    if (authToken && kycRequirement && kycData) {
+    if (authToken && kycRequirement) {
       return (
         <Container scroll>
           <BasicInformation
@@ -215,7 +243,7 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
             data={kycData}
             authToken={authToken}
             config={config}
-            onComplete={() => console.log('clicked confirm')}
+            onComplete={() => send('dataConfirmed')}
             onConfirm={data => {
               send({
                 type: 'dataSubmitted',
@@ -226,6 +254,55 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
         </Container>
       );
     }
+  }
+
+  if (state.matches('liveness')) {
+    console.log('state matches liveness');
+    if (authToken) {
+      return (
+        <Container center>
+          <SkipLiveness
+            authToken={authToken}
+            onComplete={() => send('skipLiveness')}
+            onError={() => send('skipLivenessError')}
+          />
+        </Container>
+      );
+    }
+  }
+
+  if (state.matches('process')) {
+    if (authToken) {
+      return (
+        <Container center>
+          <Process authToken={authToken} onDone={() => send('done')} />
+        </Container>
+      );
+    }
+  }
+
+  if (state.matches('incompatibleRequirements')) {
+    return (
+      <Container center>
+        <IncompatibleRequirementsError />
+      </Container>
+    );
+  }
+
+  if (state.matches('completed')) {
+    return (
+      <Container center>
+        <Complete />
+      </Container>
+    );
+  }
+
+  if (state.matches('error')) {
+    return (
+      <Container center>
+        <Error />
+      </Container>
+    );
   }
 
   return null;

@@ -4,6 +4,7 @@ import type {
   CollectKycDataRequirement,
   Identifier,
   ObConfigAuth,
+  OnboardingRequirement,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
 
@@ -20,7 +21,7 @@ export type IdentifyResultProps = {
 };
 
 export type KycDataCollectionProps = {
-  requirement: CollectKycDataRequirement;
+  requirement?: CollectKycDataRequirement;
   kycData?: KycData;
 };
 
@@ -36,6 +37,13 @@ export type MachineContext = {
   obConfigAuth?: ObConfigAuth;
   identify: IdentifyData;
   kyc: KycDataCollectionProps;
+  startedDataCollection?: boolean;
+  collectedKycData?: boolean;
+};
+
+export type RequirementsReceivedEvent = {
+  type: 'requirementsReceived';
+  payload: OnboardingRequirement[];
 };
 
 export type MachineEvents =
@@ -69,4 +77,14 @@ export type MachineEvents =
   | {
       type: 'dataSubmitted';
       payload: KycData;
-    };
+    }
+  | {
+      type: 'dataConfirmed';
+    }
+  | {
+      type: 'skipLiveness';
+    }
+  | {
+      type: 'skipLivenessError';
+    }
+  | RequirementsReceivedEvent;

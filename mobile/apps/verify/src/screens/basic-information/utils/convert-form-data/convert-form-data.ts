@@ -12,7 +12,7 @@ const convertFormData = ({
   formData,
 }: {
   requirement: CollectKycDataRequirement;
-  data: KycData;
+  data?: KycData;
   formData: FormData;
 }) => {
   const isNameDisabled =

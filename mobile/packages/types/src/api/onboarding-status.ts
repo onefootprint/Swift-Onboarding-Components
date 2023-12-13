@@ -1,3 +1,5 @@
+import type { PublicOnboardingConfig } from 'src/data';
+
 import type {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
@@ -12,6 +14,7 @@ export enum OnboardingRequirementKind {
   collectKybData = 'collect_business_data',
   investorProfile = 'collect_investor_profile',
   authorize = 'authorize',
+  process = 'process',
 }
 
 export type CollectKybDataRequirement = {
@@ -58,13 +61,19 @@ export type AuthorizeRequirement = {
   fieldsToAuthorize: AuthorizeFields;
 };
 
+export type ProcessRequirement = {
+  kind: OnboardingRequirementKind.process;
+  isMet: boolean;
+};
+
 export type OnboardingRequirement =
   | CollectKybDataRequirement
   | CollectKycDataRequirement
   | CollectInvestorProfileRequirement
   | IdDocRequirement
   | LivenessRequirement
-  | AuthorizeRequirement;
+  | AuthorizeRequirement
+  | ProcessRequirement;
 
 export type OnboardingStatusRequest = {
   authToken: string;
@@ -77,4 +86,29 @@ export type AuthorizeFields = {
 
 export type OnboardingStatusResponse = {
   allRequirements: OnboardingRequirement[];
+  obConfiguration: PublicOnboardingConfig;
+};
+
+export type RequirementForKind<K> = K extends OnboardingRequirementKind.liveness
+  ? LivenessRequirement
+  : K extends OnboardingRequirementKind.idDoc
+  ? IdDocRequirement
+  : K extends OnboardingRequirementKind.collectKycData
+  ? CollectKycDataRequirement
+  : K extends OnboardingRequirementKind.collectKybData
+  ? CollectKybDataRequirement
+  : K extends OnboardingRequirementKind.investorProfile
+  ? CollectInvestorProfileRequirement
+  : K extends OnboardingRequirementKind.authorize
+  ? AuthorizeRequirement
+  : K extends OnboardingRequirementKind.process
+  ? ProcessRequirement
+  : never;
+
+export const getRequirement = <K extends OnboardingRequirementKind>(
+  reqs: OnboardingRequirement[],
+  kind: K,
+) => {
+  const found = reqs.find(req => req.kind === kind);
+  return found as RequirementForKind<K> | undefined;
 };

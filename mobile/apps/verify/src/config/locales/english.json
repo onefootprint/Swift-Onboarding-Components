@@ -18,6 +18,10 @@
       "continue": "Continue",
       "save": "Save",
       "cancel": "Cancel"
+    },
+    "error": {
+      "title": "Uh-oh!",
+      "description": "There was an error while completing this request. Please refresh the page and try again."
     }
   },
   "pages": {
@@ -292,6 +296,14 @@
           "description-generic": "An error occurred while saving data. Please fix the inputs and try again."
         }
       }
+    },
+    "incompatible-requirements-error": {
+      "title": "Please continue on a browser",
+      "description": "We don't support this onboarding flow on this application yet. Please continue on a browser."
+    },
+    "complete": {
+      "title": "Submission completed!",
+      "subtitle": "Thanks for using Footprint to verify your identity."
     }
   }
 }

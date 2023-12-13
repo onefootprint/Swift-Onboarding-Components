@@ -37,6 +37,7 @@ export * from './identify-verify';
 export * from './login-challenge';
 export * from './onboarding';
 export * from './onboarding-authorize';
+export * from './onboarding-process';
 export * from './onboarding-status';
 export * from './onboarding-submit';
 export * from './org-api-key-reveal';
