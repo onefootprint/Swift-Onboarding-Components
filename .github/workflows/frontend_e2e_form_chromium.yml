@@ -34,7 +34,7 @@ jobs:
     # if: ${{ contains(github.event.pull_request.labels.*.name, 'e2e-on') }}
     strategy:
       matrix:
-        shard: [1/4, 2/4, 3/4, 4/4]
+        shard: [1/2, 2/2]
         node-version: [18.x]
         os: [ubuntu-latest]
     name: 'End-to-End test'

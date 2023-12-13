@@ -67,7 +67,7 @@ export const uploadImage = async (
   cta: RegExp,
   fileName: string,
 ) => {
-  const filePath = path.join(__dirname, `../upload/${fileName}`);
+  const filePath = path.join(__dirname, `../../upload/${fileName}`);
   const fileChooserPromise = page.waitForEvent('filechooser');
   if (isMobile) {
     await frame.locator('button[radius="56"]').first().click();
