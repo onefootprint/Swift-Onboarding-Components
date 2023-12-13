@@ -150,7 +150,7 @@ pub fn reason_codes_from_score_response(scores_res: &FetchScoresResponse, ocr_re
                 vec![FootprintReasonCode::DocumentSelfieMatches]
             },
             None => {
-                tracing::error!("missing incode selfie score");
+                tracing::warn!("missing incode selfie score");
                 vec![FootprintReasonCode::DocumentSelfieDoesNotMatch]
             }
         }    
