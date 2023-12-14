@@ -8,6 +8,7 @@ define_newtype_id!(
 
 define_newtype_id!(TenantId, String, "Identifier for a Org");
 define_newtype_id!(BillingProfileId, String, "Identifier for a billing profile");
+define_newtype_id!(BillingEventId, String, "Identifier for a billing event");
 define_newtype_id!(StripeCustomerId, String, "Identifier for stripe customer");
 define_newtype_id!(TenantRoleId, String, "Identifier for a Org role");
 define_newtype_id!(TenantRolebindingId, String, "Identifier for a Org rolebinding");

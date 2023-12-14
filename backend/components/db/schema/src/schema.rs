@@ -93,6 +93,21 @@ table! {
 table! {
     use diesel::sql_types::*;
 
+    billing_event (id) {
+        id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        timestamp -> Timestamptz,
+        kind -> Text,
+        scoped_vault_id -> Text,
+        ob_configuration_id -> Text,
+        existing_event_id -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+
     billing_profile (id) {
         id -> Text,
         _created_at -> Timestamptz,
@@ -107,6 +122,8 @@ table! {
         hot_proxy_vaults -> Nullable<Text>,
         vaults_with_non_pci -> Nullable<Text>,
         vaults_with_pci -> Nullable<Text>,
+        adverse_media_per_user -> Nullable<Text>,
+        continuous_monitoring_per_year -> Nullable<Text>,
     }
 }
 
@@ -1149,6 +1166,8 @@ joinable!(auth_event -> insight_event (insight_event_id));
 joinable!(auth_event -> scoped_vault (scoped_vault_id));
 joinable!(auth_event -> vault (vault_id));
 joinable!(auth_event -> webauthn_credential (webauthn_credential_id));
+joinable!(billing_event -> ob_configuration (ob_configuration_id));
+joinable!(billing_event -> scoped_vault (scoped_vault_id));
 joinable!(billing_profile -> tenant (tenant_id));
 joinable!(contact_info -> data_lifetime (lifetime_id));
 joinable!(data_lifetime -> scoped_vault (scoped_vault_id));
@@ -1242,6 +1261,7 @@ allow_tables_to_appear_in_same_query!(
     appearance,
     apple_device_attestation,
     auth_event,
+    billing_event,
     billing_profile,
     business_owner,
     contact_info,

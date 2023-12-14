@@ -34,6 +34,8 @@ pub enum Error {
     UnknownInvoiceItem(String),
     #[error("Quantity of line item doesn't match InvoiceItem: {0}")]
     InvalidLineItemQuantity(String),
+    #[error("{0}")]
+    ValidationError(String),
     #[error("Invoice is missing a line item. Has {0} line items, expected to have {1} line items")]
     InvoiceMissingItem(usize, usize),
     #[error("{0}")]

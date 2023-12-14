@@ -25,12 +25,17 @@ pub enum Product {
     VaultsWithNonPci,
     /// Number of vaults with card or custom data
     VaultsWithPci,
+    /// Number of completed workflows onto playbooks that include adverse media checks.
+    /// Adverse media checks are billing per onboarding even though we run them monthly???
+    AdverseMediaPerOnboarding,
+    /// Instead of watchlist_checks, billing for incode continuos monitoring. We bill on a per year
+    /// basis, but run the checks monthly
+    ContinuousMonitoringPerYear,
 }
 
 impl Product {
     /// The ProductId of the product in stripe's dashboard
     pub fn product_id(&self) -> &'static str {
-        // TODO this doesn't have dev products
         match self {
             Self::HotProxyVaults => "prod_OVScZrizPqwPn7",
             Self::HotVaults => "prod_OVSbMYqHKSm9VT",
@@ -41,6 +46,8 @@ impl Product {
             Self::Pii => "prod_NPMd4yoHoFrHw7",
             Self::VaultsWithNonPci => "prod_OXKFlTuCOGcCvW",
             Self::VaultsWithPci => "prod_OXKHHjVIuWL7OV",
+            Self::AdverseMediaPerOnboarding => "prod_P6nOzVVredzvo1",
+            Self::ContinuousMonitoringPerYear => "prod_P6nPpoj4yjL3tj",
         }
     }
 
@@ -58,6 +65,8 @@ impl Product {
             Self::HotProxyVaults => "price_1NkF3HGerPBo41Pt8FI5ii7q",
             Self::VaultsWithNonPci => "price_1NkFbHGerPBo41PtUNBe5Zlx",
             Self::VaultsWithPci => "price_1NkFcaGerPBo41Ptx8aKzHeS",
+            Self::AdverseMediaPerOnboarding => "price_1OIZnRGerPBo41Pt2hz8DkKf",
+            Self::ContinuousMonitoringPerYear => "price_1OIZoPGerPBo41PtautRHeYl",
         };
         let result = PriceId::from_str(price_id)?;
         Ok(result)

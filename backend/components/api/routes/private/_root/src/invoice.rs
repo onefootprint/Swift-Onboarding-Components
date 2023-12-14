@@ -7,13 +7,14 @@ use api_core::State;
 use billing::{BillingCounts, BillingInfo};
 use chrono::{Duration, NaiveDate, Utc};
 use db::models::access_event::AccessEvent;
+use db::models::billing_event::BillingEvent;
 use db::models::billing_profile::BillingProfile;
 use db::models::identity_document::IdentityDocument;
 use db::models::scoped_vault::{ScopedVault, ScopedVaultPiiFilters};
 use db::models::tenant::{Tenant, UpdateTenant};
 use db::models::watchlist_check::WatchlistCheck;
 use db::models::workflow::Workflow;
-use newtypes::{AccessEventPurpose, StripeCustomerId, TenantId, VaultKind};
+use newtypes::{AccessEventPurpose, BillingEventKind, StripeCustomerId, TenantId, VaultKind};
 use strum::IntoEnumIterator;
 
 #[derive(Debug, serde::Deserialize)]
@@ -146,6 +147,10 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
                 None
             };
 
+            // More modern-style BillingEvents - maybe we'll move some of these discrete events to
+            // the BillingEvent model so it becomes easier to count at read time
+            let billing_event_counts = BillingEvent::get_counts(conn, &t_id, i.start, i.end)?;
+
             let counts = BillingCounts {
                 pii,
                 kyc,
@@ -156,6 +161,15 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
                 hot_proxy_vaults,
                 vaults_with_non_pci,
                 vaults_with_pci,
+                // Could clean this up once all billing stuff is on BillingEvent
+                adverse_media_per_user: billing_event_counts
+                    .get(&BillingEventKind::AdverseMediaPerUser)
+                    .cloned()
+                    .unwrap_or_default(),
+                continuous_monitoring_per_year: billing_event_counts
+                    .get(&BillingEventKind::ContinuousMonitoringPerYear)
+                    .cloned()
+                    .unwrap_or_default(),
             };
             Ok((billing_profile, counts))
         })

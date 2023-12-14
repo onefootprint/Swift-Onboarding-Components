@@ -1,4 +1,4 @@
-use crate::{product::Product, profile::BillingProfile, BResult};
+use crate::{product::Product, profile::BillingProfile, BResult, Error};
 use stripe::PriceId;
 use strum::IntoEnumIterator;
 
@@ -22,6 +22,12 @@ pub struct BillingCounts {
     pub vaults_with_non_pci: Option<i64>,
     /// Number of vaults with card or custom data
     pub vaults_with_pci: Option<i64>,
+    /// Number of completed workflows onto playbooks that include adverse media checks.
+    /// Adverse media checks are billing per onboarding even though we run them monthly???
+    pub adverse_media_per_user: i64,
+    /// Instead of watchlist_checks, billing for incode continuos monitoring. We bill on a per year
+    /// basis, but run the checks monthly
+    pub continuous_monitoring_per_year: i64,
 }
 
 #[derive(Debug)]
@@ -45,6 +51,8 @@ impl BillingCounts {
             hot_proxy_vaults,
             vaults_with_non_pci,
             vaults_with_pci,
+            adverse_media_per_user,
+            continuous_monitoring_per_year,
         } = self;
         pii + kyc
             + kyb
@@ -54,6 +62,8 @@ impl BillingCounts {
             + hot_proxy_vaults.unwrap_or_default()
             + vaults_with_non_pci.unwrap_or_default()
             + vaults_with_pci.unwrap_or_default()
+            + adverse_media_per_user
+            + continuous_monitoring_per_year
             == 0
     }
 
@@ -64,21 +74,41 @@ impl BillingCounts {
             Product::Kyb => Some(self.kyb),
             Product::IdDocs => Some(self.id_docs),
             Product::WatchlistChecks => Some(self.watchlist_checks),
+            // These optional counts won't cause uncontracted price errors
             Product::HotVaults => self.hot_vaults,
             Product::HotProxyVaults => self.hot_proxy_vaults,
             Product::VaultsWithNonPci => self.vaults_with_non_pci,
             Product::VaultsWithPci => self.vaults_with_pci,
+            Product::AdverseMediaPerOnboarding => Some(self.adverse_media_per_user),
+            Product::ContinuousMonitoringPerYear => Some(self.continuous_monitoring_per_year),
         }
     }
 
     pub(crate) fn line_items(&self, prices: BillingProfile) -> BResult<Vec<LineItem>> {
+        let tenant_has_watchlist_product = prices.get(Product::WatchlistChecks).is_some();
+        let tenant_has_cm_product = prices.get(Product::ContinuousMonitoringPerYear).is_some();
+        if tenant_has_watchlist_product && tenant_has_cm_product {
+            return Err(Error::ValidationError(
+                "Tenant can't have both WatchlistChecks and ContinuousMonitoringPerYear".into(),
+            ));
+        }
+
         let results = Product::iter()
+            .filter(|p| match p {
+                // This is weird - there are two different products for effecitvely the same thing:
+                // watchlist checks billed per instance vs billed per user per year.
+                // If the tenant has pricing set up for one of those products, don't bill for the
+                // other. We assert that a tenant can't have both prices.
+                Product::WatchlistChecks => !tenant_has_cm_product,
+                Product::ContinuousMonitoringPerYear => !tenant_has_watchlist_product,
+                _ => true,
+            })
             .map(|product| (product, self.get_count(product)))
             .filter_map(|(p, count)| count.map(|c| (p, c)))
             .filter(|(_, count)| count > &0)
             .map(|(product, count)| -> BResult<_> {
                 let (price_id, is_uncontracted) = if let Some(price_id) = prices.get(product) {
-                    // If the BillingProfile for this tenant has a price set for the product, us it
+                    // If the BillingProfile for this tenant has a price set for the product, use it
                     (price_id, false)
                 } else {
                     // If there is no price set up for this tenant but they have used the product,
