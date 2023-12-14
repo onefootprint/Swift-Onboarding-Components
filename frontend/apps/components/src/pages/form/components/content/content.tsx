@@ -68,33 +68,31 @@ const Content = ({ fallback }: ContentProps) => {
     footprintProvider.send(FootprintPublicEvent.closed);
   };
 
-  const handleVaultDataError = (error: unknown, savedViaRef?: boolean) => {
-    if (!error) {
+  const handleVaultDataError = (err: unknown, savedViaRef?: boolean) => {
+    if (!err) {
       return;
     }
-    if (typeof error === 'string') {
+    if (typeof err === 'string') {
       if (savedViaRef) {
-        handleRefSaveError(error);
+        handleRefSaveError(err);
       }
-      Logger.info(`Setting form-wide error, ${error}`);
-      setFormErrorMessage(error);
+      Logger.info(`Setting form-wide error, ${err}`);
+      setFormErrorMessage(err);
       return;
     }
-    if (typeof error === 'object') {
+    if (typeof err === 'object') {
       if (savedViaRef) {
         handleRefSaveError(t('errors.invalid-data'));
       }
-      const processedFieldErrors = processFieldErrors(error);
+      const processedFieldErrors = processFieldErrors(err);
       setFieldErrors(processedFieldErrors);
-      Logger.info(`Setting field errors: ${JSON.stringify(error)}`);
+      Logger.info(`Setting field errors: ${JSON.stringify(err)}`);
       return;
     }
     if (savedViaRef) {
       handleRefSaveError(t('errors.unknown error'));
     }
-    Logger.error(
-      `Unknown error while vaulting data, ${getErrorMessage(error)}`,
-    );
+    Logger.error(`Unknown error while vaulting data, ${getErrorMessage(err)}`);
   };
 
   const handleComplete = () => {
@@ -149,11 +147,11 @@ const Content = ({ fallback }: ContentProps) => {
       authToken,
       data: convertedData,
       onSuccess: handleComplete,
-      onError: error => handleVaultDataError(error, savedViaRef),
+      onError: err => handleVaultDataError(err, savedViaRef),
     });
   };
 
-  const { data, isError, isLoading } = clientTokenFields;
+  const { data, isError, isLoading, error } = clientTokenFields;
   if (isLoading) {
     Logger.info('Fetching client token fields');
     return fallback; // Default to a loading state here
@@ -164,7 +162,11 @@ const Content = ({ fallback }: ContentProps) => {
   }
 
   if (isError) {
-    Logger.error(`Fetching client token fields failed.`);
+    Logger.error(
+      `Fetching client token fields failed with error: ${getErrorMessage(
+        error,
+      )}.`,
+    );
     return <Invalid onClose={handleClose} />;
   }
 

@@ -24,19 +24,22 @@ const arePropsValid = (
   if (!isIdValid)
     console.error('Id has to be a valid data identifier, received: ', id);
 
-  const isLabelValid = typeof label === 'string' || label === undefined;
+  const isLabelValid =
+    typeof label === 'string' || typeof label === 'undefined';
   if (!isLabelValid) console.error('Label must be a string or undefined.');
 
-  const isCanCopyValid = typeof canCopy === 'boolean' || canCopy === undefined;
+  const isCanCopyValid =
+    typeof canCopy === 'boolean' || typeof canCopy === 'undefined';
   if (!isCanCopyValid) console.error('canCopy must be a boolean or undefined.');
 
   const isDefaultHiddenValid =
-    typeof defaultHidden === 'boolean' || defaultHidden === undefined;
+    typeof defaultHidden === 'boolean' || typeof defaultHidden === 'undefined';
   if (!isDefaultHiddenValid)
     console.error('defaultHidden must be a boolean or undefined.');
 
   const isShowHiddenToggleValid =
-    typeof showHiddenToggle === 'boolean' || showHiddenToggle === undefined;
+    typeof showHiddenToggle === 'boolean' ||
+    typeof showHiddenToggle === 'undefined';
   if (!isShowHiddenToggleValid)
     console.error('showHiddenToggle must be a boolean or undefined.');
 

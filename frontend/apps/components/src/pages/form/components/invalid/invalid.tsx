@@ -11,7 +11,7 @@ type InvalidProps = {
 };
 
 const Invalid = ({ onClose }: InvalidProps) => {
-  const { t } = useTranslation('pages.secure-form.invalid');
+  const { t, allT } = useTranslation('pages.secure-form.invalid');
 
   return (
     <Container
@@ -19,7 +19,12 @@ const Invalid = ({ onClose }: InvalidProps) => {
       header={
         onClose && (
           <CloseButton>
-            <IconButton aria-label={t('close-aria-label')} onClick={onClose}>
+            <IconButton
+              aria-label={allT(
+                'pages.secure-form.form-dialog.header.close-aria-label',
+              )}
+              onClick={onClose}
+            >
               <IcoClose24 />
             </IconButton>
           </CloseButton>

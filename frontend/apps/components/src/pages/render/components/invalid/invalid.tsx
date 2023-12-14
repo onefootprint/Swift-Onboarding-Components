@@ -6,7 +6,7 @@ const Invalid = () => {
   const { t } = useTranslation('pages.secure-render.invalid');
 
   return (
-    <Typography color="primary" variant="body-2">
+    <Typography color="primary" variant="body-2" testID="invalid">
       {t('title')}
     </Typography>
   );

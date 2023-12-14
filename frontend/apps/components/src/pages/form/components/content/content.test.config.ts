@@ -31,10 +31,8 @@ export const withClientTokenFieldsExpiredAuthToken = () =>
     method: 'get',
     path: '/entities/client_token',
     response: {
-      data: {
-        vault_fields: [],
-        expires_at: new Date('01/01/2020'),
-      },
+      vault_fields: [],
+      expires_at: new Date('01/01/2020'),
     },
   });
 
@@ -43,14 +41,12 @@ export const withClientTokenFields = () =>
     method: 'get',
     path: '/entities/client_token',
     response: {
-      data: {
-        vault_fields: [
-          'card.primary.number',
-          'card.primary.cvc',
-          'card.primary.expiration',
-        ],
-        expires_at: new Date(),
-      },
+      vault_fields: [
+        'card.primary.number',
+        'card.primary.cvc',
+        'card.primary.expiration',
+      ],
+      expires_at: new Date(),
     },
   });
 

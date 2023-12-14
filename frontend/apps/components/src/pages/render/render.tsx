@@ -1,73 +1,18 @@
 import getCustomAppearance from '@onefootprint/appearance';
-import type { FootprintRenderDataProps } from '@onefootprint/footprint-js';
-import { useTranslation } from '@onefootprint/hooks';
-import type { DataIdentifier } from '@onefootprint/types';
-import { LoadingIndicator } from '@onefootprint/ui';
+import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import type { GetServerSideProps } from 'next';
-import React, { useState } from 'react';
-import { useEffectOnce } from 'usehooks-ts';
+import React, { Suspense } from 'react';
 
-import useProps from '../../components/footprint-provider/hooks/use-props';
-import Invalid from './components/invalid';
+import Content from './components/content';
 import Loading from './components/loading';
-import RenderBase from './components/render-base';
-import useEntitiesVaultDecrypt from './hooks/use-entities-vault-decrypt';
-import arePropsValid from './utils/are-props-valid';
-import getMaskForId from './utils/get-mask-for-id';
 
-const Render = () => {
-  const { t } = useTranslation('pages.secure-render');
-  const [props, setProps] = useState<FootprintRenderDataProps>();
-  useProps<FootprintRenderDataProps>(setProps);
-  const decryptMutation = useEntitiesVaultDecrypt();
-  const {
-    authToken = '',
-    id = '',
-    label,
-    canCopy,
-    showHiddenToggle,
-    defaultHidden,
-  } = props || {};
-  const field = id as DataIdentifier;
-
-  useEffectOnce(() => {
-    decryptMutation.mutate({ authToken, field });
-  });
-
-  const [isHidden, setIsHidden] = useState(defaultHidden);
-  if (!props) {
-    return <Loading />;
-  }
-
-  const isValid = arePropsValid(props);
-  if (!isValid) {
-    return <Invalid />;
-  }
-
-  const mask = getMaskForId(id);
-  const { data, isLoading: isMutationLoading } = decryptMutation;
-  const isLoading = !isHidden && isMutationLoading; // Only show loading indicator if the value is not hidden
-  const value = data?.[field] ?? '';
-
-  const handleToggleHidden = () => {
-    setIsHidden(!isHidden);
-  };
-
-  if (isLoading) {
-    return <LoadingIndicator />;
-  }
-
-  return (
-    <RenderBase
-      isHidden={isHidden}
-      onToggleHidden={showHiddenToggle ? handleToggleHidden : undefined}
-      label={label ?? t(`di.${id}`)}
-      value={value}
-      mask={mask}
-      canCopy={canCopy}
-    />
-  );
-};
+const Render = () => (
+  <ObserveCollectorProvider appName="render">
+    <Suspense fallback={<Loading />}>
+      <Content fallback={<Loading />} />
+    </Suspense>
+  </ObserveCollectorProvider>
+);
 
 export const getServerSideProps: GetServerSideProps = async ({
   res,
