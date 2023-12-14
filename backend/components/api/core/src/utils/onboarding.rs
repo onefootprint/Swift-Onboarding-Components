@@ -16,9 +16,8 @@ use db::{
 };
 use feature_flag::FeatureFlagClient;
 use newtypes::{
-    CipKind, CollectedDataOption, DocumentConfig, DocumentRequestKind, EncryptedVaultPrivateKey,
-    ObConfigurationKind, Selfie, VaultKind, VaultPublicKey, WorkflowConfig, WorkflowId, WorkflowRequestId,
-    WorkflowSource,
+    CollectedDataOption, DocumentConfig, DocumentRequestKind, EncryptedVaultPrivateKey, ObConfigurationKind,
+    Selfie, VaultKind, VaultPublicKey, WorkflowConfig, WorkflowId, WorkflowRequestId, WorkflowSource,
 };
 use std::sync::Arc;
 
@@ -195,16 +194,14 @@ fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObCon
             should_collect_selfie,
             kind,
         }),
-        // Hack to request ID doc and proof of ssn for alpaca
-        (kind == DocumentRequestKind::ProofOfSsn && obc.cip_kind == Some(CipKind::Alpaca)).then_some(
-            NewDocumentRequestArgs {
-                scoped_vault_id: wf.scoped_vault_id.clone(),
-                ref_id: None,
-                workflow_id: wf.id.clone(),
-                should_collect_selfie: true,
-                kind: DocumentRequestKind::Identity,
-            },
-        ),
+        // Hack to request ID doc and proof of ssn
+        (kind == DocumentRequestKind::ProofOfSsn).then_some(NewDocumentRequestArgs {
+            scoped_vault_id: wf.scoped_vault_id.clone(),
+            ref_id: None,
+            workflow_id: wf.id.clone(),
+            should_collect_selfie: true,
+            kind: DocumentRequestKind::Identity,
+        }),
     ]
     .into_iter()
     .flatten()

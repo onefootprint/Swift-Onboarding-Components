@@ -144,7 +144,9 @@ def test_recollect_document(trigger, sandbox_tenant, twilio):
     complete_redo_flow(twilio, sandbox_user, initial_auth_token, pre_run)
 
     users_docs = get(f"users/{fp_id}/documents", None, sandbox_tenant.sk.key)
-    assert len(users_docs) == 1
+    # currently we request iddoc + proof of ssn doc for proof_of_ssn triggers
+    expected_len = 2 if trigger['kind'] == "proof_of_ssn" else 1
+    assert len(users_docs) == expected_len
 
 
 def test_trigger_incomplete(sandbox_tenant, twilio):
