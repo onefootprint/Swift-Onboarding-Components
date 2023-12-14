@@ -13,7 +13,7 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    assignAuthToken: 'identifyCompleted';
+    assignAuthToken: 'authTokenChanged' | 'identifyCompleted';
     assignEmail: 'identifyCompleted';
     assignInitContext: 'initContextUpdated';
     assignPhoneNumber: 'identifyCompleted';

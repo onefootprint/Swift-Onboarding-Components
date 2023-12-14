@@ -65,4 +65,8 @@ export type MachineEvents =
     }
   | {
       type: 'expireSession';
+    }
+  | {
+      type: 'authTokenChanged';
+      payload: { authToken: string };
     };

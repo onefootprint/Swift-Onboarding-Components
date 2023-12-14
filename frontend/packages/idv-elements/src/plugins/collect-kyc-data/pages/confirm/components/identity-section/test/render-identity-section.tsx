@@ -2,10 +2,10 @@ import { customRender } from '@onefootprint/test-utils';
 import { ToastProvider } from '@onefootprint/ui';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
-import { Layout } from 'src/components';
 import { MachineProvider } from 'src/plugins/collect-kyc-data/components/machine-provider';
 import type { MachineContext } from 'src/plugins/collect-kyc-data/utils/state-machine';
 
+import { Layout } from '../../../../../../../components';
 import configureI18next from '../../../../../config/initializers/i18next';
 import IdentitySection from '../identity-section';
 

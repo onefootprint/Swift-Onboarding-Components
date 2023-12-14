@@ -1,16 +1,10 @@
 import request from '@onefootprint/request';
-import type { ChallengeKind } from '@onefootprint/types';
+import type { IdentifyResponse } from '@onefootprint/types';
 import { AUTH_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 export type IdentifyRequest = {
   authToken: string;
-};
-
-export type IdentifyResponse = {
-  userFound: boolean;
-  availableChallengeKinds?: ChallengeKind[];
-  hasSyncablePassKey?: boolean;
 };
 
 const identifyRequest = async (payload: IdentifyRequest) => {
@@ -23,10 +17,15 @@ const identifyRequest = async (payload: IdentifyRequest) => {
       [AUTH_HEADER]: authToken,
     },
   });
-  const { userFound, availableChallengeKinds, hasSyncablePassKey } =
-    response.data;
+  const {
+    userFound,
+    availableChallengeKinds,
+    hasSyncablePassKey,
+    isUnverified,
+  } = response.data;
 
   return {
+    isUnverified,
     userFound,
     availableChallengeKinds,
     hasSyncablePassKey,

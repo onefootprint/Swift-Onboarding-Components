@@ -1,4 +1,5 @@
 import { getErrorMessage } from '@onefootprint/request';
+import type { IdentifyResponse, UserTokenResponse } from '@onefootprint/types';
 import { ChallengeKind, UserTokenScope } from '@onefootprint/types';
 import { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
@@ -18,6 +19,26 @@ type UseStepUpArgs = {
   onSuccess?: (authToken: string) => void;
   onError?: (error: unknown) => void;
 };
+
+type StepUpScope = Pick<
+  IdentifyResponse,
+  'availableChallengeKinds' | 'hasSyncablePassKey'
+>;
+
+const isStepUpPossible = (
+  { type, hasSupportForWebauthn }: DeviceInfo,
+  { availableChallengeKinds, hasSyncablePassKey }: StepUpScope = {},
+): boolean => {
+  const serverSide = availableChallengeKinds?.includes(ChallengeKind.biometric);
+  const clientSide =
+    hasSupportForWebauthn && type === 'desktop' ? hasSyncablePassKey : true;
+
+  return Boolean(serverSide) && Boolean(clientSide);
+};
+
+const isStepUpNeeded = (data?: Pick<UserTokenResponse, 'scopes'>) =>
+  !data?.scopes.includes(UserTokenScope.sensitiveProfile);
+
 const useStepUp = ({
   authToken,
   device,
@@ -48,6 +69,9 @@ const useStepUp = ({
     loginChallengeMutation.isLoading ||
     identifyVerifyMutation.isLoading;
 
+  const needsStepUp = isStepUpNeeded(userTokenQuery.data);
+  const canStepUp = isStepUpPossible(device, identifyMutation.data);
+
   useEffectOnce(() => {
     identifyMutation.mutate(
       { authToken },
@@ -60,23 +84,6 @@ const useStepUp = ({
       },
     );
   });
-
-  const needsStepUp = !userTokenQuery.data?.scopes.includes(
-    UserTokenScope.sensitiveProfile,
-  );
-  const canRequestBiometric =
-    device.hasSupportForWebauthn &&
-    identifyMutation.data?.availableChallengeKinds?.includes(
-      ChallengeKind.biometric,
-    );
-
-  let hasDeviceSupport = device.hasSupportForWebauthn;
-  if (device.type === 'desktop') {
-    hasDeviceSupport =
-      hasDeviceSupport && !!identifyMutation.data?.hasSyncablePassKey;
-  }
-
-  const canStepUp = canRequestBiometric && hasDeviceSupport;
 
   const handleLoginChallengeSuccess = async (
     payload: LoginChallengeResponse,

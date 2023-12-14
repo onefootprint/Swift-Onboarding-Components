@@ -14,6 +14,7 @@ import {
   Section,
   SectionItem,
 } from '../../../../../../components/confirm-collected-data';
+import { FPCustomEvents, sendCustomEvent } from '../../../../../../utils';
 import Logger from '../../../../../../utils/logger';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import useDecryptUser from '../../../../hooks/use-decrypt-user';
@@ -33,6 +34,35 @@ export enum SsnValue {
   revealed,
 }
 
+type SSN = ReturnType<typeof getSsnValue>;
+
+const getSsnValueType = (ssn: SSN) => {
+  if (ssn?.value) {
+    return SsnValue.hidden;
+  }
+  return ssn?.scrubbed ? SsnValue.hidden : SsnValue.skipped;
+};
+
+const getIdentitiesSections = (
+  t: (key: string, options?: {}) => string,
+  ssnKind: 'ssn4' | 'ssn9' | undefined,
+  ssnValueType: SsnValue,
+  ssn: SSN,
+): SectionItemProps[] => {
+  if (!ssnKind) {
+    return [];
+  }
+
+  const ssnDisplayVal =
+    ssnValueType === SsnValue.skipped
+      ? t('identity.ssn-skipped-subtext')
+      : ssnFormatter(ssnKind, ssn?.value, ssnValueType === SsnValue.hidden);
+
+  const text = ssnKind === 'ssn9' ? t('identity.ssn9') : t('identity.ssn4');
+
+  return [{ text, subtext: ssnDisplayVal }];
+};
+
 const IdentitySection = () => {
   const { t, allT } = useTranslation('pages.confirm');
   const [editing, setEditing] = useState(false);
@@ -42,42 +72,18 @@ const IdentitySection = () => {
   const decryptUserMutation = useDecryptUser();
   const ssnKind = getSsnKind(requirement);
   const ssn = getSsnValue(data, ssnKind);
+  const [ssnValueType, setSsnValueType] = useState(() => getSsnValueType(ssn));
+  const identity = getIdentitiesSections(t, ssnKind, ssnValueType, ssn);
   const isUsOrTerritories = isCountryUsOrTerritories(data);
-
-  const getSsnValueType = () => {
-    if (ssn?.value) {
-      return SsnValue.hidden;
-    }
-    return ssn?.scrubbed ? SsnValue.hidden : SsnValue.skipped;
-  };
-  const [ssnValueType, setSsnValueType] = useState(getSsnValueType());
 
   useEffect(() => {
     if (ssn?.decrypted) {
       // If newly decrypted, want to reveal immediately
       setSsnValueType(SsnValue.revealed);
     } else {
-      setSsnValueType(getSsnValueType());
+      setSsnValueType(getSsnValueType(ssn));
     }
   }, [ssn]);
-
-  const identity: SectionItemProps[] = [];
-  if (ssnKind) {
-    let ssnDisplayVal: string | undefined;
-    if (ssnValueType === SsnValue.skipped) {
-      ssnDisplayVal = t('identity.ssn-skipped-subtext');
-    } else {
-      ssnDisplayVal = ssnFormatter(
-        ssnKind,
-        ssn?.value,
-        ssnValueType === SsnValue.hidden,
-      );
-    }
-    identity.push({
-      text: ssnKind === 'ssn9' ? t('identity.ssn9') : t('identity.ssn4'),
-      subtext: ssnDisplayVal,
-    });
-  }
 
   const stopEditing = () => {
     setEditing(false);
@@ -137,6 +143,9 @@ const IdentitySection = () => {
       payload: {
         authToken: stepUpAuthToken,
       },
+    });
+    sendCustomEvent(FPCustomEvents.stepUpCompleted, {
+      authToken: stepUpAuthToken,
     });
 
     // If the user has already decrypted their SSN, we don't need to do it again

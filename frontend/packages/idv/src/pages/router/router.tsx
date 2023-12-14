@@ -1,6 +1,7 @@
 import type { L10n } from '@onefootprint/footprint-js';
 import {
   AppErrorBoundary,
+  FPCustomEvents,
   getIdentifyBootstrapData,
   Identify,
   Logger,
@@ -14,6 +15,7 @@ import React, { useEffect } from 'react';
 
 import useIdvMachine from '../../hooks/use-idv-machine';
 import useValidateSession from '../../hooks/use-validate-session';
+import createAuthTokenChangedPayload from '../../utils/state-machine/utils/custom-listener';
 import Complete from '../complete';
 import ConfigInvalid from '../config-invalid';
 import Init from '../init';
@@ -84,6 +86,18 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
     onComplete?.(validationToken);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDone]);
+
+  useEffect(() => {
+    const listener = (e: Event) => {
+      const payload = createAuthTokenChangedPayload(e);
+      if (payload) send(payload);
+    };
+
+    document.addEventListener(FPCustomEvents.stepUpCompleted, listener);
+    return function cleanup() {
+      document.removeEventListener(FPCustomEvents.stepUpCompleted, listener);
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <AppErrorBoundary onReset={() => send({ type: 'reset' })}>

@@ -46,6 +46,9 @@ const createIdvMachine = (args: IdvMachineArgs) =>
           target: 'init',
           actions: ['resetContext'],
         },
+        authTokenChanged: {
+          actions: ['assignAuthToken'],
+        },
       },
       states: {
         init: {
