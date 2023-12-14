@@ -162,8 +162,13 @@ def test_get_members(
     expected_user1,
     expected_user2,
 ):
-    data = dict(page_size=200, **(filters or dict()))
+    data = dict(page_size=100, **(filters or dict()))
     body = get(f"org/members", data, *sandbox_tenant.db_auths)
+    # There are some flakes here, just print some debugging info
+    print([(u["id"], u["created_at"]) for u in body["data"]])
+    print(tenant_user["id"], tenant_user["created_at"])
+    print(tenant_user2["id"], tenant_user2["created_at"])
+    print(arrow.now())
     assert any(u["id"] == tenant_user["id"] for u in body["data"]) == expected_user1
     assert any(u["id"] == tenant_user2["id"] for u in body["data"]) == expected_user2
 
