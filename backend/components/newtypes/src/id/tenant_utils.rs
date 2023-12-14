@@ -16,4 +16,12 @@ impl TenantId {
     pub fn is_fractional(&self) -> bool {
         self.0 == *"org_PtnIJT4VR35BS9xy0wITgF"
     }
+
+    pub fn is_apiture(&self) -> bool {
+        self.0 == *"org_VWhEJ36DGxIgTSl8CFJOhR"
+    }
+
+    pub fn is_coast(&self) -> bool {
+        self.0 == *"org_vZfj1sekMjwGdURGCWisF"
+    }
 }

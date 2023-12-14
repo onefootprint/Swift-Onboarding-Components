@@ -12,6 +12,7 @@ pub struct CreateTokenRequest {
     /// `inherit` creates a token that inherits any operation previously requested via the dashboard.
     /// `user` simply create a token for the user. A playbook key may be provided directly to the Footprint Verify SDK to trigger onboarding.
     #[openapi(required)]
+    // TODO make this non-optional once apiture has upgraded
     pub kind: Option<TokenOperationKind>,
 
     /// When the kind is `onboard`, the publishable key of the playbook onto which you would like

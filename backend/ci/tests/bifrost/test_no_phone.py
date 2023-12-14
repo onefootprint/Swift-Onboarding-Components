@@ -155,7 +155,7 @@ def test_trigger(no_phone_user):
 
 
 def test_step_up(no_phone_user, sandbox_tenant):
-    data = dict(key=no_phone_user.client.ob_config.key.value)
+    data = dict(kind="onboard", key=no_phone_user.client.ob_config.key.value)
     body = post(f"users/{no_phone_user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 

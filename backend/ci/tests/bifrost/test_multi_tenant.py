@@ -33,7 +33,9 @@ def dual_onboarded_user(sandbox_user_real_phone, foo_sandbox_tenant, twilio):
     foo_fp_id = user["id"]
 
     def get_scopes():
-        body = post(f"users/{foo_fp_id}/token", None, foo_sandbox_tenant.sk.key)
+        body = post(
+            f"users/{foo_fp_id}/token", dict(kind="user"), foo_sandbox_tenant.sk.key
+        )
         auth_token = FpAuth(body["token"])
         body = get("hosted/user/token", None, auth_token)
         return body["scopes"]

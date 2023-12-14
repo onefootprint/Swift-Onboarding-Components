@@ -35,7 +35,7 @@ def test_skip_confirm(twilio, sandbox_tenant, ob_config):
     fp_id = body["id"]
     sandbox_id = body["sandbox_id"]
 
-    data = dict(key=ob_config.key.value)
+    data = dict(kind="onboard", key=ob_config.key.value)
     body = post(f"users/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 

@@ -55,12 +55,22 @@ pub async fn post(
         third_party_auth,
     } = request.0.unwrap_or_default();
     let third_party_auth = third_party_auth.unwrap_or(false);
-    // For backcompat
-    let kind = kind.unwrap_or(if key.is_some() {
-        TokenOperationKind::Onboard
+    let kind = if let Some(kind) = kind {
+        kind
+    } else if auth.tenant().id.is_apiture() || auth.tenant().id.is_coast() {
+        // Apiture is the only real tenant that has started using the old serialization that doesn't
+        // provide a kind. They were just in pilot, so don't want to make a bad impression by
+        // breaking their proof of concept app or asking them to update now.
+        // Will rm when they are contracted
+        tracing::error!("Apiture used legacy serialization in POST /users/<>/token");
+        if key.is_some() {
+            TokenOperationKind::Onboard
+        } else {
+            TokenOperationKind::User
+        }
     } else {
-        TokenOperationKind::User
-    });
+        return Err(ValidationError("Missing field kind").into());
+    };
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
