@@ -30,6 +30,7 @@ pub async fn get(
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant();
     let SearchUsersRequest { search, external_id } = request.into_inner();
+    let has_search = search.is_some();
 
     let (search, fp_id) = parse_search(&state, search, &tenant.id).await?;
     let params = ScopedVaultListQueryParams {
@@ -48,10 +49,14 @@ pub async fn get(
     // We're changing the kind of pagination we're using in `GET /entities`. But it's hard to
     // change for `GET /users` if anyone is using pagination since this API is tenant-facing.
     // Going to start logging to see if anyone is using it
-    match &cursor {
-        Some(_) => root_span.record("meta", "with_cursor"),
-        None => root_span.record("meta", "without_cursor"),
+    // Also changing whether we accept the search querystring, so jam that into the meta as well
+    let meta = match (&cursor, has_search) {
+        (Some(_), true) => "with_cursor,with_search",
+        (Some(_), false) => "with_cursor,without_search",
+        (None, true) => "without_cursor,with_search",
+        (None, false) => "without_cursor,without_search",
     };
+    root_span.record("meta", meta);
 
     let (svs, count) = state
         .db_pool
