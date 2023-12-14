@@ -106,6 +106,7 @@ pub enum Reason {
     PossibleTlsMitm,
     AzureDatacenterIp,
     PossibleTamperingDetected,
+    GcpDatacenterIp,
 }
 
 #[cfg(test)]
