@@ -3,7 +3,8 @@
 	"runArgs": [
 		"--cap-add=SYS_PTRACE",
 		"--security-opt",
-		"seccomp=unconfined"
+		"seccomp=unconfined",
+		"--device=/dev/net/tun"
 	],
 	"build": {
 		"dockerfile": "Dockerfile"
@@ -19,7 +20,8 @@
 	"features": {
 		"ghcr.io/devcontainers/features/sshd:1": {
 			"version": "latest"
-		}
+		},
+		"ghcr.io/tailscale/codespace/tailscale:1": {}
 	},
 	"postStartCommand": "./.devcontainer/startup.sh",
 	// Add the IDs of extensions you want installed when the container is created.
