@@ -716,7 +716,8 @@
                                 "$ref": "#/components/schemas/CreateTokenRequest"
                             }
                         }
-                    }
+                    },
+                    "required": true
                 },
                 "responses": {
                     "200": {

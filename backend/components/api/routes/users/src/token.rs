@@ -44,7 +44,7 @@ use paperclip::actix::{api_v2_operation, post, web};
 pub async fn post(
     state: web::Data<State>,
     fp_id: FpIdPath,
-    request: OptionalJson<CreateTokenRequest>,
+    request: OptionalJson<CreateTokenRequest, true>,
     auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<CreateTokenResponse> {
     auth.check_preview_guard(PreviewApi::CreateUserToken)?;

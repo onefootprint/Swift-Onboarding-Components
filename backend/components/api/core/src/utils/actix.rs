@@ -13,12 +13,14 @@ use paperclip::{
 use serde::de::DeserializeOwned;
 
 #[derive(Debug, Deref, DerefMut)]
-/// Optionally extracts json-serialized T from the request body.
+/// Optionally extracts json-serialized `T` from the request body.
 /// If there is no request body provided, extracts as None.
-/// If there is a request body provided, runs the extractor for T and passes along the Result.
-/// This is different from Option<Json<T>>, which will swallow errors by converting Err results
-/// into None
-pub struct OptionalJson<T>(pub Option<T>);
+/// If there is a request body provided, runs the extractor for `T` and passes along the Result.
+/// This is different from `Option<Json<T>>`, which will swallow errors by converting Err results
+/// into None.
+/// The const type parameter `REQUIRED` controls whether the open API spec for this Json should
+/// be marked as required, allowing the open API spec to drift from application behavior.
+pub struct OptionalJson<T, const REQUIRED: bool = false>(pub Option<T>);
 
 impl<T> OptionalJson<T> {
     /// Unwrap into inner `Option<T>` value.
@@ -27,7 +29,7 @@ impl<T> OptionalJson<T> {
     }
 }
 
-impl<T: DeserializeOwned + 'static> FromRequest for OptionalJson<T> {
+impl<T: DeserializeOwned + 'static, const REQUIRED: bool> FromRequest for OptionalJson<T, REQUIRED> {
     type Error = <Json<T> as FromRequest>::Error;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
@@ -52,7 +54,7 @@ impl<T: DeserializeOwned + 'static> FromRequest for OptionalJson<T> {
     }
 }
 
-impl<T> Apiv2Schema for OptionalJson<T>
+impl<T, const REQUIRED: bool> Apiv2Schema for OptionalJson<T, REQUIRED>
 where
     T: Apiv2Schema,
 {
@@ -65,7 +67,7 @@ where
     }
 
     fn required() -> bool {
-        false
+        REQUIRED
     }
 
     fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
@@ -86,7 +88,7 @@ where
     }
 }
 
-impl<T: Apiv2Schema> OperationModifier for OptionalJson<T> {
+impl<T: Apiv2Schema, const REQUIRED: bool> OperationModifier for OptionalJson<T, REQUIRED> {
     fn update_parameter(op: &mut DefaultOperationRaw) {
         // Mostly replicates <Json::<T> as OperationModifier>::update_parameter, but we override to
         // set required = false since the body is optional
@@ -95,7 +97,7 @@ impl<T: Apiv2Schema> OperationModifier for OptionalJson<T> {
             description: Some(T::description().to_owned()),
             in_: ParameterIn::Body,
             name: "body".into(),
-            required: false,
+            required: REQUIRED,
             schema: Some({
                 let mut def = Json::<T>::schema_with_ref();
                 def.retain_ref();
