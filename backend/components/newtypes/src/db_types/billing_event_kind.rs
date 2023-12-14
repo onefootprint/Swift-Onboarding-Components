@@ -1,4 +1,5 @@
 use crate::util::impl_enum_string_diesel;
+use chrono::Duration;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use strum_macros::{Display, EnumString};
 
@@ -9,6 +10,18 @@ pub enum BillingEventKind {
     /// TODO: charge again for events 1y after
     ContinuousMonitoringPerYear,
     AdverseMediaPerUser,
+}
+
+impl BillingEventKind {
+    /// Returns the Duration representing the billing frequency of this event.
+    /// We will only create a BillingEvent once per interval for the product.
+    /// None if the event is billed once per user.
+    pub fn billing_interval(&self) -> Option<Duration> {
+        match self {
+            Self::ContinuousMonitoringPerYear => Some(Duration::days(365)),
+            Self::AdverseMediaPerUser => None,
+        }
+    }
 }
 
 impl_enum_string_diesel!(BillingEventKind);

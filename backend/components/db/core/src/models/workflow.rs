@@ -28,6 +28,7 @@ use super::user_timeline::UserTimeline;
 use super::workflow_event::WorkflowEvent;
 use super::workflow_request::WorkflowRequest;
 use crate::errors::ValidationError;
+use crate::models::billing_event::BillingEvent;
 use crate::models::vault::Vault;
 use crate::{DbResult, PgConn, TxnPgConn};
 use db_schema::schema::{ob_configuration, workflow};
@@ -576,6 +577,23 @@ impl Workflow {
             };
             ScopedVault::update(conn, &wf.scoped_vault_id, update)?;
         }
+
+        if update.update.decision_made_at.is_some() {
+            // We are making the first decision for this workflow. Create the billing event(s)
+            if let Some(obc_id) = wf.ob_configuration_id.as_ref() {
+                use newtypes::EnhancedAmlOption;
+                let (obc, _) = ObConfiguration::get(conn, obc_id)?;
+                // I want if let chains...
+                if let EnhancedAmlOption::Yes { adverse_media, .. } = obc.enhanced_aml() {
+                    if adverse_media {
+                        use newtypes::BillingEventKind::AdverseMediaPerUser;
+                        let sv_id = wf.scoped_vault_id.clone();
+                        BillingEvent::create(conn, sv_id, obc.id, AdverseMediaPerUser)?;
+                    }
+                }
+            }
+        }
+
         let new_status = update.update.status;
         // TODO short circuit if nothing changed? like status is the same?
         let result = diesel::update(workflow::table)

@@ -1,4 +1,6 @@
+use db::models::billing_event::BillingEvent;
 use db::models::decision_intent::DecisionIntent;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::RequestAndMaybeResult;
 use db::models::{verification_request::VerificationRequest, verification_result::VerificationResult};
@@ -18,8 +20,9 @@ use newtypes::{
     ScopedVaultId, VendorAPI,
 };
 use newtypes::{
-    EncryptedVaultPrivateKey, IncodeEnvironment, IncodeWatchlistResultRef, ObConfigurationKey, PiiJsonValue,
-    VaultPublicKey, VerificationRequestId, VerificationResultId,
+    BillingEventKind::ContinuousMonitoringPerYear, EncryptedVaultPrivateKey, IncodeEnvironment,
+    IncodeWatchlistResultRef, ObConfigurationKey, PiiJsonValue, VaultPublicKey, VerificationRequestId,
+    VerificationResultId,
 };
 
 use super::vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results;
@@ -250,9 +253,10 @@ pub async fn run_watchlist_check(
 ) -> ApiResult<(VerificationResultId, WatchlistResultResponse)> {
     let svid = di.scoped_vault_id.clone();
     let diid = di.id.clone();
-    let (latest_results, tenant_id, vw) = state
+    let obc_key = obc_key.clone();
+    let (latest_results, tenant_id, vw, obc) = state
         .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
+        .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, &svid)?;
 
             let latest_results =
@@ -260,9 +264,14 @@ pub async fn run_watchlist_check(
 
             let vw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
 
-            Ok((latest_results, sv.tenant_id, vw))
+            let (obc, _) = ObConfiguration::get(conn, &obc_key)?;
+
+            // Create a BillingEvent once per year for this user
+            BillingEvent::create(conn, sv.id.clone(), obc.id.clone(), ContinuousMonitoringPerYear)?;
+
+            Ok((latest_results, sv.tenant_id, vw, obc))
         })
-        .await??;
+        .await?;
 
     // Check if a successful result already exists and idempotently return that if so
     let existing_res = existing_watchlist_check_response(
@@ -283,7 +292,7 @@ pub async fn run_watchlist_check(
     if state.config.service_config.is_production()
         || state
             .feature_flag_client
-            .flag(BoolFlag::EnableIncodeWatchlistCheckInNonProd(obc_key))
+            .flag(BoolFlag::EnableIncodeWatchlistCheckInNonProd(&obc.key))
     {
         make_watchlist_result_call(
             state,
