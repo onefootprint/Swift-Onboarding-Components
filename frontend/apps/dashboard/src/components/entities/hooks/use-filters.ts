@@ -19,6 +19,7 @@ export type EntitiesQueryParams = {
   requires_manual_review?: string;
   // this is a boolean but we need to pass as a string for URL; incompatible w/ index signature otherwise
   has_outstanding_workflow_request?: string;
+  show_unverified?: string;
 };
 
 const defaultQueryParams: EntitiesQueryParams = {
@@ -31,6 +32,7 @@ const defaultQueryParams: EntitiesQueryParams = {
   watchlist_hit: undefined,
   requires_manual_review: undefined,
   has_outstanding_workflow_request: undefined,
+  show_unverified: undefined,
 };
 
 const useFilters = () => {
@@ -86,9 +88,11 @@ const useFilters = () => {
     watchlist_hit: filters.query.watchlist_hit,
     has_outstanding_workflow_request:
       filters.query.has_outstanding_workflow_request,
+    show_unverified: filters.query.show_unverified,
   };
   const { from, to } = getDateRange(values.dateRange);
   const lastCursor = last(values.cursor);
+  // requestParams is the object actually sent to the backend
   const requestParams = {
     cursor: lastCursor ? parseInt(lastCursor, 10) : undefined,
     search: values.search,
@@ -99,6 +103,7 @@ const useFilters = () => {
     has_outstanding_workflow_request: parseBool(
       values.has_outstanding_workflow_request,
     ),
+    show_all: parseBool(values.show_unverified),
     ...getStatusAndManualReviewParams(values.state, values.verification),
   };
   const searchParams = getSearchParams({
@@ -111,6 +116,7 @@ const useFilters = () => {
     verification: filters.query.verification,
     has_outstanding_workflow_request:
       filters.query.has_outstanding_workflow_request,
+    show_unverified: filters.query.show_unverified,
   });
   return {
     ...filters,

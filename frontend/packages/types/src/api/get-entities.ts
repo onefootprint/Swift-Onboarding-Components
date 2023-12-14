@@ -11,6 +11,8 @@ export type GetEntitiesRequest = {
   requires_manual_review?: boolean;
   watchlist_hit?: boolean;
   has_outstanding_workflow_request?: boolean;
+  // When true, shows unverified vaults too
+  show_all?: boolean;
 };
 
 export type GetEntitiesResponse = Entity<ApiEntityStatus | undefined>[];
