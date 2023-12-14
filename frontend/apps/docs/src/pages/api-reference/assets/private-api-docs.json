@@ -5201,13 +5201,13 @@
                                                 "cip_integration",
                                                 "trigger_kyb",
                                                 "trigger_kyc",
-                                                "write_entities",
                                                 "auth_token",
                                                 "onboarding",
                                                 "decrypt_custom",
                                                 "decrypt_document",
                                                 "decrypt_document_and_selfie",
-                                                "decrypt_all"
+                                                "decrypt_all",
+                                                "write_entities"
                                             ]
                                         }
                                     }
@@ -5393,13 +5393,13 @@
                                 "cip_integration",
                                 "trigger_kyb",
                                 "trigger_kyc",
-                                "write_entities",
                                 "auth_token",
                                 "onboarding",
                                 "decrypt_custom",
                                 "decrypt_document",
                                 "decrypt_document_and_selfie",
-                                "decrypt_all"
+                                "decrypt_all",
+                                "write_entities"
                             ]
                         }
                     },
@@ -6904,13 +6904,13 @@
                                 "cip_integration",
                                 "trigger_kyb",
                                 "trigger_kyc",
-                                "write_entities",
                                 "auth_token",
                                 "onboarding",
                                 "decrypt_custom",
                                 "decrypt_document",
                                 "decrypt_document_and_selfie",
-                                "decrypt_all"
+                                "decrypt_all",
+                                "write_entities"
                             ]
                         }
                     }
@@ -15620,13 +15620,13 @@
                                                     "cip_integration",
                                                     "trigger_kyb",
                                                     "trigger_kyc",
-                                                    "write_entities",
                                                     "auth_token",
                                                     "onboarding",
                                                     "decrypt_custom",
                                                     "decrypt_document",
                                                     "decrypt_document_and_selfie",
-                                                    "decrypt_all"
+                                                    "decrypt_all",
+                                                    "write_entities"
                                                 ]
                                             }
                                         }
@@ -15741,13 +15741,13 @@
                                             "cip_integration",
                                             "trigger_kyb",
                                             "trigger_kyc",
-                                            "write_entities",
                                             "auth_token",
                                             "onboarding",
                                             "decrypt_custom",
                                             "decrypt_document",
                                             "decrypt_document_and_selfie",
-                                            "decrypt_all"
+                                            "decrypt_all",
+                                            "write_entities"
                                         ]
                                     }
                                 }
@@ -15868,13 +15868,13 @@
                                                     "cip_integration",
                                                     "trigger_kyb",
                                                     "trigger_kyc",
-                                                    "write_entities",
                                                     "auth_token",
                                                     "onboarding",
                                                     "decrypt_custom",
                                                     "decrypt_document",
                                                     "decrypt_document_and_selfie",
-                                                    "decrypt_all"
+                                                    "decrypt_all",
+                                                    "write_entities"
                                                 ]
                                             }
                                         }
@@ -16588,13 +16588,13 @@
                                                 "cip_integration",
                                                 "trigger_kyb",
                                                 "trigger_kyc",
-                                                "write_entities",
                                                 "auth_token",
                                                 "onboarding",
                                                 "decrypt_custom",
                                                 "decrypt_document",
                                                 "decrypt_document_and_selfie",
-                                                "decrypt_all"
+                                                "decrypt_all",
+                                                "write_entities"
                                             ]
                                         }
                                     }
@@ -16806,13 +16806,13 @@
                                         "cip_integration",
                                         "trigger_kyb",
                                         "trigger_kyc",
-                                        "write_entities",
                                         "auth_token",
                                         "onboarding",
                                         "decrypt_custom",
                                         "decrypt_document",
                                         "decrypt_document_and_selfie",
-                                        "decrypt_all"
+                                        "decrypt_all",
+                                        "write_entities"
                                     ]
                                 }
                             }
@@ -16894,13 +16894,13 @@
                                 "cip_integration",
                                 "trigger_kyb",
                                 "trigger_kyc",
-                                "write_entities",
                                 "auth_token",
                                 "onboarding",
                                 "decrypt_custom",
                                 "decrypt_document",
                                 "decrypt_document_and_selfie",
-                                "decrypt_all"
+                                "decrypt_all",
+                                "write_entities"
                             ]
                         }
                     }
@@ -18832,13 +18832,13 @@
                                         "cip_integration",
                                         "trigger_kyb",
                                         "trigger_kyc",
-                                        "write_entities",
                                         "auth_token",
                                         "onboarding",
                                         "decrypt_custom",
                                         "decrypt_document",
                                         "decrypt_document_and_selfie",
-                                        "decrypt_all"
+                                        "decrypt_all",
+                                        "write_entities"
                                     ]
                                 }
                             }
@@ -19044,13 +19044,13 @@
                                 "cip_integration",
                                 "trigger_kyb",
                                 "trigger_kyc",
-                                "write_entities",
                                 "auth_token",
                                 "onboarding",
                                 "decrypt_custom",
                                 "decrypt_document",
                                 "decrypt_document_and_selfie",
-                                "decrypt_all"
+                                "decrypt_all",
+                                "write_entities"
                             ]
                         }
                     }
