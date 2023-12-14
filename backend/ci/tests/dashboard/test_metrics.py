@@ -4,14 +4,14 @@ from tests.bifrost_client import BifrostClient
 
 
 def test_metrics(sandbox_tenant):
+    filters = dict(timestamp_gte=arrow.now().shift(days=-30).isoformat())
+    recently = get("/org/metrics", filters, *sandbox_tenant.db_auths)
     all_time = get("/org/metrics", None, *sandbox_tenant.db_auths)
     assert all_time["new_user_vaults"] >= all_time["total_user_onboardings"]
     assert all_time["total_user_onboardings"] >= all_time["successful_user_onboardings"]
     assert all_time["total_user_onboardings"] >= all_time["failed_user_onboardings"]
     assert all_time["total_user_onboardings"] >= all_time["incomplete_user_onboardings"]
 
-    filters = dict(timestamp_gte=arrow.now().shift(days=-30).isoformat())
-    recently = get("/org/metrics", filters, *sandbox_tenant.db_auths)
     for k in [
         "new_user_vaults",
         "total_user_onboardings",
