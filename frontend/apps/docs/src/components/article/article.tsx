@@ -20,6 +20,7 @@ import H3 from './components/markdown-components/h3';
 import H4 from './components/markdown-components/h4';
 import H5 from './components/markdown-components/h5';
 import Img from './components/markdown-components/img';
+import NavigationLink from './components/markdown-components/navigation-link';
 import Strong from './components/markdown-components/strong';
 
 type ArticleProps = {
@@ -68,6 +69,9 @@ const overrides: MarkdownToJSX.Overrides = {
   },
   banner: {
     component: Banner,
+  },
+  'navigation-link': {
+    component: NavigationLink,
   },
 };
 
