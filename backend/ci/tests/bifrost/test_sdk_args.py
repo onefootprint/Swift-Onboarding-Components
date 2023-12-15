@@ -157,3 +157,7 @@ def test_sdk_args_ob_config(sandbox_tenant):
         assert body["args"]["data"]["public_key"] == obc_key
         assert body["ob_config"]["name"] == sandbox_tenant.default_ob_config.name
         assert body["ob_config"]["key"] == obc_key
+
+
+def test_sdk_telemetry():
+    post("/org/sdk_telemetry", dict(log_message="my_test_event"))
