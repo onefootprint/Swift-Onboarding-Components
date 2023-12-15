@@ -66,7 +66,7 @@ pub struct ObConfiguration {
     pub skip_confirm: bool,
 }
 
-#[derive(derive_more::Deref)]
+#[derive(derive_more::Deref, PartialEq, Eq)]
 pub struct SupportedDocumentAndCountryMapping(pub HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>>);
 impl SupportedDocumentAndCountryMapping {
     pub fn supported_countries_for_doc_type(&self, doc_type: IdDocKind) -> Vec<Iso3166TwoDigitCountryCode> {
@@ -89,11 +89,23 @@ impl ObConfiguration {
                 CipKind::Alpaca => {
                     // In the general case, we need to accept a document that might have address
                     let alpaca_doc_types = vec![IdDocKind::DriversLicense, IdDocKind::IdCard];
+                    let residential_country_is_pr = residential_country
+                        .as_ref()
+                        .map(|c| *c == Iso3166TwoDigitCountryCode::PR)
+                        .unwrap_or(false);
+                    let alpaca_allowed_countries: Vec<Iso3166TwoDigitCountryCode> = vec![
+                        Some(Iso3166TwoDigitCountryCode::US),
+                        residential_country_is_pr.then_some(Iso3166TwoDigitCountryCode::PR),
+                    ]
+                    .into_iter()
+                    .flatten()
+                    .collect();
 
-                    return SupportedDocumentAndCountryMapping(HashMap::from_iter(vec![(
-                        Iso3166TwoDigitCountryCode::US,
-                        alpaca_doc_types,
-                    )]));
+                    return SupportedDocumentAndCountryMapping(HashMap::from_iter(
+                        alpaca_allowed_countries
+                            .into_iter()
+                            .map(|c| (c, alpaca_doc_types.clone())),
+                    ));
                 }
                 CipKind::Apex => todo!(),
             }
@@ -928,9 +940,15 @@ mod tests {
         obc.optional_ssn_restricted_id_doc_kinds()
     }
 
-    #[test_case(None)]
-    #[test_case(Some(CipKind::Alpaca))]
-    fn test_cip_kind_documents(cip: Option<CipKind>) {
+    #[test_case(None, None)]
+    #[test_case(None, Some(Iso3166TwoDigitCountryCode::US))]
+    #[test_case(Some(CipKind::Alpaca), Some(Iso3166TwoDigitCountryCode::US))]
+    #[test_case(Some(CipKind::Alpaca), Some(Iso3166TwoDigitCountryCode::PR))]
+    #[test_case(Some(CipKind::Alpaca), Some(Iso3166TwoDigitCountryCode::CA))]
+    fn test_cip_kind_documents(
+        cip: Option<CipKind>,
+        residential_country: Option<Iso3166TwoDigitCountryCode>,
+    ) {
         let obc = ObConfiguration {
             id: ObConfigurationId::from_str("1234").unwrap(),
             key: ObConfigurationKey::from_str("obk1").unwrap(),
@@ -962,16 +980,36 @@ mod tests {
             skip_confirm: false,
         };
 
-        let mapping = obc.supported_country_mapping_for_document(None).0;
+        let mapping = obc.supported_country_mapping_for_document(residential_country).0;
         if let Some(c) = cip {
             match c {
-                CipKind::Alpaca => {
-                    assert!(mapping.keys().len() == 1);
-                    assert_eq!(
-                        mapping.get(&Iso3166TwoDigitCountryCode::US).unwrap().clone(),
-                        vec![IdDocKind::DriversLicense, IdDocKind::IdCard,]
-                    );
-                }
+                CipKind::Alpaca => match residential_country {
+                    Some(Iso3166TwoDigitCountryCode::PR) => {
+                        assert!(mapping.keys().len() == 2);
+                        assert_eq!(
+                            mapping.get(&Iso3166TwoDigitCountryCode::US).unwrap().clone(),
+                            vec![IdDocKind::DriversLicense, IdDocKind::IdCard,]
+                        );
+                        assert_eq!(
+                            mapping.get(&Iso3166TwoDigitCountryCode::PR).unwrap().clone(),
+                            vec![IdDocKind::DriversLicense, IdDocKind::IdCard,]
+                        );
+                    }
+                    Some(_) => {
+                        assert!(mapping.keys().len() == 1);
+                        assert_eq!(
+                            mapping.get(&Iso3166TwoDigitCountryCode::US).unwrap().clone(),
+                            vec![IdDocKind::DriversLicense, IdDocKind::IdCard,]
+                        );
+                    }
+                    None => {
+                        assert!(mapping.keys().len() == 1);
+                        assert_eq!(
+                            mapping.get(&Iso3166TwoDigitCountryCode::US).unwrap().clone(),
+                            vec![IdDocKind::DriversLicense, IdDocKind::IdCard,]
+                        );
+                    }
+                },
                 CipKind::Apex => unimplemented!(),
             }
         } else {
