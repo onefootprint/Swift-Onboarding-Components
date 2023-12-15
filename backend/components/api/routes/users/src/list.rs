@@ -56,6 +56,8 @@ pub async fn get(
         (None, true) => "without_cursor,with_search",
         (None, false) => "without_cursor,without_search",
     };
+    // The root_span.record below doesn't seem to be working reliably... while investigating
+    tracing::info!(%meta, "GET /users meta");
     root_span.record("meta", meta);
 
     let (svs, count) = state
