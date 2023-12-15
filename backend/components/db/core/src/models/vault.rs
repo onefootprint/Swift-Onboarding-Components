@@ -44,6 +44,7 @@ pub struct Vault {
     pub is_created_via_api: bool,
     /// True if the vault has been OTP verified through the identify flow
     pub is_verified: Option<bool>,
+    pub created_at: Option<DateTime<Utc>>,
 }
 
 pub enum VaultIdentifier<'a> {
@@ -205,6 +206,7 @@ impl Vault {
             // All vaults start as is_verified = false, marked as verified after succesful identify
             // flow
             is_verified: false,
+            created_at: Utc::now(),
         };
 
         let vault = diesel::insert_into(vault::table)
@@ -326,6 +328,7 @@ struct NewVaultRow {
     sandbox_id: Option<SandboxId>,
     is_created_via_api: bool,
     is_verified: bool,
+    created_at: DateTime<Utc>,
 }
 
 pub struct NewVaultArgs {

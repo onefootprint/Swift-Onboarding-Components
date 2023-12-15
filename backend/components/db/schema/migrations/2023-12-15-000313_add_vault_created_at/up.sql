@@ -1,0 +1,1 @@
+ALTER TABLE vault ADD COLUMN created_at TIMESTAMPTZ;
