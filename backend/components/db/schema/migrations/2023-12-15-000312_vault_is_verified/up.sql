@@ -1,0 +1,1 @@
+ALTER TABLE vault ADD COLUMN is_verified BOOLEAN;

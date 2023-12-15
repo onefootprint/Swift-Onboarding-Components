@@ -42,6 +42,8 @@ pub struct Vault {
     pub sandbox_id: Option<SandboxId>, // is_none() IFF is_live
     /// True if the user was created via tenant-facing API rather than via bifrost
     pub is_created_via_api: bool,
+    /// True if the vault has been OTP verified through the identify flow
+    pub is_verified: Option<bool>,
 }
 
 pub enum VaultIdentifier<'a> {
@@ -146,6 +148,15 @@ impl Vault {
         Ok(uv)
     }
 
+    #[tracing::instrument("Vault::mark_verified", skip_all)]
+    pub fn mark_verified(conn: &mut TxnPgConn, id: &VaultId) -> DbResult<()> {
+        diesel::update(vault::table)
+            .filter(vault::id.eq(id))
+            .set(vault::is_verified.eq(true))
+            .execute(conn.conn())?;
+        Ok(())
+    }
+
     #[tracing::instrument("Vault::lock_by_idempotency_id", skip_all)]
     fn lock_by_idempotency_id(conn: &mut TxnPgConn, i_id: &IdempotencyId) -> DbResult<Option<Locked<Vault>>> {
         let vault = vault::table
@@ -191,6 +202,9 @@ impl Vault {
             is_created_via_api,
             // Vault isn't portable if it starts out created via API
             is_portable: !is_created_via_api,
+            // All vaults start as is_verified = false, marked as verified after succesful identify
+            // flow
+            is_verified: false,
         };
 
         let vault = diesel::insert_into(vault::table)
@@ -311,6 +325,7 @@ struct NewVaultRow {
     idempotency_id: Option<IdempotencyId>,
     sandbox_id: Option<SandboxId>,
     is_created_via_api: bool,
+    is_verified: bool,
 }
 
 pub struct NewVaultArgs {

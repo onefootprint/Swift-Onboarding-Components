@@ -995,6 +995,7 @@ table! {
         idempotency_id -> Nullable<Text>,
         sandbox_id -> Nullable<Text>,
         is_created_via_api -> Bool,
+        is_verified -> Nullable<Bool>,
     }
 }
 

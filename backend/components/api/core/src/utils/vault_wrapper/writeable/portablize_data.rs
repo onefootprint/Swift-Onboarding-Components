@@ -137,6 +137,7 @@ impl WriteableVw<Person> {
                 Fingerprint::mark_global_unique(conn, &ci.lifetime_id)?;
             }
         }
+        Vault::mark_verified(conn, &self.vault.id)?;
         let update = ScopedVaultUpdate {
             show_in_search: Some(true),
             ..ScopedVaultUpdate::default()
