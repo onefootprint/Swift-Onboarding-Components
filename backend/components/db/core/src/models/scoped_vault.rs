@@ -48,8 +48,8 @@ pub struct ScopedVault {
     /// Last time we logged a hosted API interacted with this scoped vault. Vaults touched recently
     /// are considered in progress if their KYC status is still incomplete
     pub last_heartbeat_at: DateTime<Utc>,
-    /// Temporary flag that will hide users without verified credentials from search
-    /// NOTE: replaced by vault.is_verified
+    /// Temporary flag that will hide users (made in bifrost) without verified credentials from
+    /// search. Users made via API will always show in search
     pub show_in_search: bool,
     /// The seqno at which the SV was created or refreshed.
     /// Data _before_ this seqno and tenat-scoped data _after_ this seqno are used to contruct the VW
