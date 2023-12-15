@@ -43,8 +43,8 @@ pub struct Vault {
     /// True if the user was created via tenant-facing API rather than via bifrost
     pub is_created_via_api: bool,
     /// True if the vault has been OTP verified through the identify flow
-    pub is_verified: Option<bool>,
-    pub created_at: Option<DateTime<Utc>>,
+    pub is_verified: bool,
+    pub created_at: DateTime<Utc>,
 }
 
 pub enum VaultIdentifier<'a> {
