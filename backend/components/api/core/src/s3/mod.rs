@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use aws_sdk_s3::operation::abort_multipart_upload::AbortMultipartUploadError;
 use aws_sdk_s3::operation::complete_multipart_upload::CompleteMultipartUploadError;
 use aws_sdk_s3::operation::create_multipart_upload::CreateMultipartUploadError;
@@ -7,9 +8,11 @@ use aws_sdk_s3::operation::list_buckets::ListBucketsError;
 use aws_sdk_s3::operation::put_object::PutObjectError;
 use aws_sdk_s3::operation::upload_part::UploadPartError;
 use aws_sdk_s3::primitives::ByteStream;
-use aws_sdk_s3::types::{CompletedMultipartUpload, CompletedPart, Delete, ObjectIdentifier};
+use aws_sdk_s3::types::{CompletedMultipartUpload, CompletedPart};
 use bytes::{Bytes, BytesMut};
 use futures::StreamExt;
+#[cfg(test)]
+use mockall::automock;
 use thiserror::Error;
 use url::{ParseError, Url};
 
@@ -17,13 +20,49 @@ use url::{ParseError, Url};
 const S3_PATH_PREFIX: &str = "s3://";
 
 #[derive(Clone)]
-pub struct S3Client {
+pub struct AwsS3Client {
     pub client: aws_sdk_s3::Client,
 }
 
-impl std::fmt::Debug for S3Client {
+#[cfg_attr(test, automock)]
+#[async_trait]
+pub trait S3Client: Send + Sync + std::fmt::Debug {
+    async fn put_bytes(
+        &self,
+        bucket: &str,
+        key: String,
+        bytes: Vec<u8>,
+        mime: Option<String>,
+    ) -> Result<String, S3Error>;
+
+    /// Get an object in S3 from the path specified by an s3 url
+    async fn get_object_from_s3_url(&self, url: &str) -> Result<actix_web::web::Bytes, S3Error>;
+    async fn get_object(&self, bucket: String, object: String) -> Result<actix_web::web::Bytes, S3Error>;
+}
+
+impl std::fmt::Debug for AwsS3Client {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("S3Client")
+    }
+}
+
+#[async_trait]
+impl S3Client for AwsS3Client {
+    async fn put_bytes(
+        &self,
+        bucket: &str,
+        key: String,
+        bytes: Vec<u8>,
+        mime: Option<String>,
+    ) -> Result<String, S3Error> {
+        self.put_object(bucket, key, bytes, mime.as_deref()).await
+    }
+
+    async fn get_object_from_s3_url(&self, url: &str) -> Result<actix_web::web::Bytes, S3Error> {
+        self.get_object_from_s3_url(url).await
+    }
+    async fn get_object(&self, bucket: String, object: String) -> Result<actix_web::web::Bytes, S3Error> {
+        self.get_object(bucket, object).await
     }
 }
 
@@ -37,28 +76,7 @@ impl std::fmt::Debug for S3Client {
 /// Resources:
 ///   - Overview of S3 architecture: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html
 ///   - Actions that can be performed in S3 https://docs.aws.amazon.com/AmazonS3/latest/API/API_Operations_Amazon_Simple_Storage_Service.html
-impl S3Client {
-    #[allow(unused)]
-    /// Delete a set of objects by keys in a particular S3 bucket
-    #[tracing::instrument(skip_all)]
-    pub async fn delete_objects(&self, bucket: &str, keys: Vec<String>) -> Result<(), S3Error> {
-        let delete_objects: Vec<ObjectIdentifier> = keys
-            .iter()
-            .map(|k| ObjectIdentifier::builder().set_key(Some(k.to_owned())).build())
-            .collect::<Result<Vec<_>, _>>()?;
-
-        let delete = Delete::builder().set_objects(Some(delete_objects)).build()?;
-
-        self.client
-            .delete_objects()
-            .bucket(bucket)
-            .delete(delete)
-            .send()
-            .await?;
-
-        Ok(())
-    }
-
+impl AwsS3Client {
     /// Put an object in S3 at the path specified by `s3://{bucket}/{key}`
     ///    - Note: S3 is a flat heirarchy, but key can use `/` in the name to mimic a directory structure
     #[tracing::instrument(skip(self, object))]
@@ -189,7 +207,6 @@ impl S3Client {
     }
 
     /// Get an object in S3 from the path specified by `s3://{bucket}/{key}`
-    #[allow(unused)]
     #[tracing::instrument(skip(self))]
     pub async fn get_object(&self, bucket: String, object: String) -> Result<actix_web::web::Bytes, S3Error> {
         let obj = self
@@ -207,18 +224,17 @@ impl S3Client {
 
         Ok(obj)
     }
-    #[allow(unused)]
     #[tracing::instrument(skip(self))]
     /// Get an object in S3 from the path specified by an s3 url
     pub async fn get_object_from_s3_url(&self, url: &str) -> Result<actix_web::web::Bytes, S3Error> {
-        let (bucket, object) = S3Client::parse_s3_url(url)?;
+        let (bucket, object) = AwsS3Client::parse_s3_url(url)?;
         let res = self.get_object(bucket, object).await?;
 
         Ok(res)
     }
 }
 
-impl S3Client {
+impl AwsS3Client {
     #[allow(dead_code)]
     fn parse_s3_url(url: &str) -> Result<(String, String), S3Error> {
         let s3_url = Url::parse(url)?;
@@ -286,14 +302,14 @@ mod tests {
     fn test_parse_s3_url() {
         // test_case would be nice here, but PartialEq/Eq were not defined for aws_sdk::s3 errors
         let good_url = "s3://bucket/object/is/here";
-        let (bucket, obj) = S3Client::parse_s3_url(good_url).expect("err");
+        let (bucket, obj) = AwsS3Client::parse_s3_url(good_url).expect("err");
         assert_eq!(bucket, "bucket".to_string());
         assert_eq!(obj, "object/is/here".to_string());
 
         // Failures
         let bad_url_wrong_scheme = "http://bucket/object/is/here";
         let fails_wrong_scheme = matches!(
-            S3Client::parse_s3_url(bad_url_wrong_scheme),
+            AwsS3Client::parse_s3_url(bad_url_wrong_scheme),
             Err(S3Error::InvalidS3Url)
         );
         assert!(fails_wrong_scheme);

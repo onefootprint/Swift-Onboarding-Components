@@ -6,7 +6,7 @@ use crate::{
     errors::ApiError,
     fingerprinter::AwsHmacClient,
     metrics::Metrics,
-    s3,
+    s3::{self, S3Client},
     utils::{
         email::SendgridClient,
         sms::{SmsClient, TwilioConfig},
@@ -70,7 +70,7 @@ pub struct State {
     pub challenge_sealing_key: ScopedSealingKey,
     pub session_sealing_key: ScopedSealingKey,
     pub idology_client: IdologyClient, // TOOD: remove, only used for now unused idology endpoints
-    pub s3_client: s3::S3Client,
+    pub s3_client: Arc<dyn S3Client>,
     pub feature_flag_client: Arc<dyn FeatureFlagClient>,
     pub feature_flag_client_raw: LaunchDarklyFeatureFlagClient, // hack for now cause JsonFlag isn't working on the trait
     pub webhook_client: Arc<dyn WebhookClient>,
@@ -86,6 +86,7 @@ impl State {
     #[cfg(test)]
     #[allow(clippy::expect_used)]
     pub async fn test_state() -> Self {
+        use crate::s3::MockS3Client;
         use crate::utils::mock_enclave::MockEnclave;
         use db::tests::MockFFClient;
         use webhooks::MockWebhookClient;
@@ -93,9 +94,12 @@ impl State {
 
         let mut s = Self::init_or_die(config).await;
         s.enclave_client.replace_proxy_client(Arc::new(MockEnclave));
+        s.enclave_client.replace_s3_client(Arc::new(MockS3Client::new()));
 
         // by default, the ff_client on a test state will just return the default
         s.set_ff_client(MockFFClient::new().into_mock());
+        // by default, any s3 calls will be stubbed out and a test will fail unless you mock or update this to use a client with local aws creds
+        s.set_s3_client(Arc::new(MockS3Client::new()));
 
         // by default, the webhook_client on a test state will expect anything
         let mut mock_webhook_client = MockWebhookClient::new();
@@ -131,7 +135,7 @@ impl State {
         let shared_config = aws_config::defaults(aws_config::BehaviorVersion::v2023_11_09())
             .load()
             .await;
-        let s3_client = s3::S3Client {
+        let s3_client = s3::AwsS3Client {
             client: aws_sdk_s3::Client::new(&shared_config),
         };
         let kms_client = aws_sdk_kms::Client::new(&shared_config);
@@ -258,7 +262,7 @@ impl State {
             challenge_sealing_key,
             session_sealing_key,
             idology_client,
-            s3_client,
+            s3_client: Arc::new(s3_client),
             feature_flag_client: Arc::new(feature_flag_client.clone()),
             feature_flag_client_raw: feature_flag_client,
             webhook_client: Arc::new(webhook_service_client),
@@ -279,6 +283,11 @@ impl State {
     #[cfg(test)]
     pub fn set_ff_client(&mut self, ff_client: Arc<dyn FeatureFlagClient>) {
         self.feature_flag_client = ff_client;
+    }
+
+    #[cfg(test)]
+    pub fn set_s3_client(&mut self, s3_client: Arc<dyn S3Client>) {
+        self.s3_client = s3_client;
     }
 
     #[cfg(test)]
@@ -561,6 +570,14 @@ mod test {
 
         state.set_socure_id_plus(Arc::new(mock_socure_api_call));
 
+        let mut mock_s3_client = s3::MockS3Client::new();
+        mock_s3_client
+            .expect_put_bytes()
+            .times(1)
+            .return_once(move |bucket, key, _, _| Ok(format!("s3://{}/{}", bucket, key)));
+
+        state.set_s3_client(Arc::new(mock_s3_client));
+
         // Test
         let flag_res = state.feature_flag_client.flag(BoolFlag::DisableAllSocure);
 
@@ -576,6 +593,7 @@ mod test {
             .unwrap();
 
         some_db_stuff(state).await;
+        assert_eq!("s3://bucket/object", &some_s3_jazz(state).await);
 
         println!("flag_res: {:?}", flag_res);
         println!("socure_res.parsed_response: {:?}", socure_res.parsed_response);
@@ -589,6 +607,14 @@ mod test {
             .unwrap()
             .unwrap();
         println!("some_db_stuff, tenants: {:?}", tenants);
+    }
+
+    pub async fn some_s3_jazz(state: &State) -> String {
+        state
+            .s3_client
+            .put_bytes("bucket", String::from("object"), vec![123], None)
+            .await
+            .unwrap()
     }
 
     #[test_state_case(false => false; "false false yo")]

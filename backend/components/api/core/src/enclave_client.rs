@@ -33,7 +33,7 @@ pub struct EnclaveClient {
     kms_creds: KmsCredentials,
     /// an s3 client is initialized soley for fetching and decrypting
     /// large objects that are stored in s3
-    s3_client: S3Client,
+    s3_client: Arc<dyn S3Client>,
 }
 
 #[async_trait]
@@ -79,8 +79,10 @@ impl EnclaveClient {
         )
         .expect("failed to build enclave http proxy client");
 
-        let shared_config = aws_config::defaults(aws_config::BehaviorVersion::v2023_11_09()).load().await;
-        let s3_client = crate::s3::S3Client {
+        let shared_config = aws_config::defaults(aws_config::BehaviorVersion::v2023_11_09())
+            .load()
+            .await;
+        let s3_client = crate::s3::AwsS3Client {
             client: aws_sdk_s3::Client::new(&shared_config),
         };
 
@@ -89,13 +91,18 @@ impl EnclaveClient {
             sealed_enc_ikek: SealedIkek::<Sealing>::new(sealed_enc_ikek),
             sealed_hmac_ikek: SealedIkek::<Signing>::new(sealed_hmac_ikek),
             kms_creds,
-            s3_client,
+            s3_client: Arc::new(s3_client),
         }
     }
 
     #[cfg(test)]
     pub fn replace_proxy_client(&mut self, client: Arc<dyn EnclaveClientProxy>) {
         self.client = client;
+    }
+
+    #[cfg(test)]
+    pub fn replace_s3_client(&mut self, client: Arc<dyn S3Client>) {
+        self.s3_client = client;
     }
 
     /// send the request to the enclave

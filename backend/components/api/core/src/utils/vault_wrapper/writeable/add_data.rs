@@ -282,7 +282,7 @@ pub async fn seal_file_and_upload_to_s3(
 
     let s3_path = state
         .s3_client
-        .put_object(bucket, key, sealed_bytes.0, Some(&file.mime_type))
+        .put_bytes(bucket, key, sealed_bytes.0, Some(file.mime_type.clone()))
         .await?;
 
     tracing::info!(s3_path = s3_path, scoped_vault_id=%scoped_vault_id, vault_id=%vault.id, filename=%file.filename, mime_type=%file.mime_type, "Uploaded Document to S3");

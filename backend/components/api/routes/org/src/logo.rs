@@ -59,11 +59,11 @@ pub async fn put(
     // stream upload
     state
         .s3_client
-        .put_object(
+        .put_bytes(
             &state.config.assets_s3_bucket,
             file_name,
             file.bytes.into_leak(),
-            Some(&file.mime_type),
+            Some(file.mime_type.clone()),
         )
         .await?;
 
