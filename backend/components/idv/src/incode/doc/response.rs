@@ -395,7 +395,7 @@ impl APIResponseToIncodeError for AddSelfieResponse {
             3010 => vec![IncodeFailureReason::SelfieBadImageCompression],
             500 => vec![IncodeFailureReason::UnexpectedErrorOccurred],
             6000 => {
-                tracing::error!("6000 selfie error from incode");
+                tracing::warn!("6000 selfie error from incode");
                 vec![IncodeFailureReason::UnexpectedErrorOccurred]
             }
             _ => vec![IncodeFailureReason::UnexpectedErrorOccurred],
