@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use crate::error::Error;
 use crate::response::message::Status;
 use newtypes::PiiString;
@@ -9,6 +7,7 @@ use reqwest_middleware::ClientWithMiddleware;
 use reqwest_middleware::RequestBuilder;
 use reqwest_tracing::TracingMiddleware;
 use response::{decode_response, lookup::LookupResponse, message::Message};
+use std::time::Duration;
 
 pub mod error;
 pub mod request;
