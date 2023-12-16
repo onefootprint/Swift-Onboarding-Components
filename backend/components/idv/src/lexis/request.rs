@@ -243,7 +243,7 @@ pub(crate) struct Dob {
 
 #[derive(Serialize_repr, Deserialize_repr, Clone, PartialEq, Eq, Debug)]
 #[repr(u8)]
-pub(crate) enum LBool {
+pub enum LBool {
     Zero = 0,
     One = 1,
 }

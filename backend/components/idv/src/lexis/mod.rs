@@ -3,7 +3,7 @@ mod request;
 pub mod response;
 use serde::de::DeserializeOwned;
 
-use self::response::FlexIDResponse;
+use self::response::FlexIdResponse;
 
 pub async fn decode_response<T: DeserializeOwned>(response: reqwest::Response) -> Result<T, Error> {
     if response.status().is_success() {
@@ -13,8 +13,8 @@ pub async fn decode_response<T: DeserializeOwned>(response: reqwest::Response) -
     }
 }
 
-pub fn parse_response(value: serde_json::Value) -> Result<FlexIDResponse, Error> {
-    let response: FlexIDResponse = serde_json::value::from_value(value)?;
+pub fn parse_response(value: serde_json::Value) -> Result<FlexIdResponse, Error> {
+    let response: FlexIdResponse = serde_json::value::from_value(value)?;
     Ok(response)
 }
 
