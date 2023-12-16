@@ -593,7 +593,7 @@ def _gen_random_n_digit_number(n):
 
 def _gen_random_sandbox_id():
     seed = _gen_random_n_digit_number(10)
-    return f"sandbox{seed}"
+    return f"footprint_it_{seed}"
 
 
 def _gen_random_ssn():

@@ -100,7 +100,6 @@ pub async fn patch(
     user_wf_auth: Option<UserWfAuthContext>,
 ) -> JsonApiResponse<EmptyResponse> {
     let (user, su_id, tenant, wf_info) = parse_auth(&state, user_auth, user_wf_auth).await?;
-    let is_fixture = user.is_fixture;
     let sv_id2 = su_id.clone();
     let PatchDataRequest { updates, .. } = request
         .into_inner()
@@ -115,9 +114,7 @@ pub async fn patch(
         .get(&IDK::Country.into())
         .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
 
-    let updates = updates
-        .build_global_fingerprints(state.as_ref(), is_fixture)
-        .await?;
+    let updates = updates.build_global_fingerprints(state.as_ref()).await?;
 
     let new_ci = state
         .db_pool

@@ -37,14 +37,14 @@ def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant, twilio):
         dict(email=bifrost.data["id.email"]),
     ]
     for identifier in identifiers:
-        print(identifier)
         data = dict(identifier=identifier)
-        # We're finding here. We make a global fingerprint earlier now? but it shouldn't be portablized
-        # Ahhhh, we shouldn't be making global fingerprint for fixture number vault!
+        # We can find via global fingerprints
         body = post("hosted/identify", data, sandbox_id_h)
-        assert not body["user_found"]
+        assert body["user_found"]
+        # And find from another tenant (via global fingerprints)
         body = post("hosted/identify", data, tenant.default_ob_config.key, sandbox_id_h)
-        assert not body["user_found"]
+        assert body["user_found"]
+        # And find at the current tenant
         body = post("hosted/identify", data, ob_config2.key, sandbox_id_h)
         assert body["user_found"]
 

@@ -235,18 +235,13 @@ impl<T> DataRequest<T> {
     pub async fn build_global_fingerprints<F: Fingerprinter>(
         self,
         fingerprinter: &F,
-        is_fixture: bool,
     ) -> Result<DataRequest<Fingerprints>, F::Error> {
-        let data_to_fingerprint = if !is_fixture {
-            GlobalFingerprintKind::iter()
-                .filter_map(|g| {
-                    let di = g.data_identifier();
-                    self.data.get(&di).map(|pii| (di, g, pii))
-                })
-                .collect::<Vec<_>>()
-        } else {
-            vec![]
-        };
+        let data_to_fingerprint = GlobalFingerprintKind::iter()
+            .filter_map(|g| {
+                let di = g.data_identifier();
+                self.data.get(&di).map(|pii| (di, g, pii))
+            })
+            .collect::<Vec<_>>();
 
         let global_fingerprints = fingerprinter.compute_fingerprints(data_to_fingerprint).await?;
 
