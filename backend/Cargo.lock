@@ -4442,6 +4442,7 @@ dependencies = [
  "selfie_doc",
  "serde",
  "serde_json",
+ "serde_repr",
  "serde_with",
  "strum",
  "strum_macros",

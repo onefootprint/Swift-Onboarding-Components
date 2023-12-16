@@ -113,7 +113,7 @@ mod tests {
         };
 
         let res = lexis_client.flex_id_request(idv_data).await.unwrap();
-        println!("res: {:?}", res);
+        println!("res: {}", serde_json::to_string_pretty(&res).unwrap());
         // let parsed_res = crate::lexis::parse_response(res).unwrap();
         // println!("parsed_res: {:?}", parsed_res);
     }
