@@ -6,7 +6,7 @@ import random
 import arrow
 import time
 import os
-from tests.headers import SandboxId
+from tests.headers import SandboxId, TenantSecretAuth
 from tests.types import ObConfiguration, SecretApiKey, Tenant
 from tests.headers import DashboardAuth, FpAuth, IsLive
 from tests.constants import (
@@ -498,21 +498,29 @@ def create_user(twilio, phone_number, email, token_kind, *headers) -> str:
 
 
 def create_tenant(org_data, ob_conf_data):
+    is_live = org_data.pop("is_live", False)
+    h_is_live = IsLive("true" if is_live else "false")
+
     def inner():
         body = post("private/test_tenant", org_data, CUSTODIAN_AUTH)
         print("\n======org info======")
         print(body)
-        sk = SecretApiKey.from_response(body["key"])
+
+        matching_sk = next(k for k in body["keys"] if k["is_live"] == is_live)
+        live_key = next(k for k in body["keys"] if k["is_live"])
+        sandbox_key = next(k for k in body["keys"] if not k["is_live"])
+        sk = SecretApiKey.from_response(matching_sk)
         auth_token = DashboardAuth(body["auth_token"])
         ro_auth_token = DashboardAuth(body["ro_auth_token"])
-        is_live = IsLive("true" if org_data.get("is_live", False) else "false")
         tenant = Tenant(
             id=body["org_id"],
             sk=sk,
+            l_sk=TenantSecretAuth(live_key["key"]),
+            s_sk=TenantSecretAuth(sandbox_key["key"]),
             name=org_data["name"],
-            db_auths=[auth_token, is_live],
+            db_auths=[auth_token, h_is_live],
             auth_token=auth_token,
-            ro_db_auths=[ro_auth_token, is_live],
+            ro_db_auths=[ro_auth_token, h_is_live],
             ro_auth_token=ro_auth_token,
             default_ob_config=None,  # Will populate this after making OB config
         )

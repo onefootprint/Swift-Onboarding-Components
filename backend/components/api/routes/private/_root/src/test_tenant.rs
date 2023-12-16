@@ -25,21 +25,19 @@ struct NewClientRequest {
     /// Otherwise, we make a new tenant with this ID.
     id: TenantId,
     name: String,
-    is_live: bool,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
 struct NewClientResponse {
     org_id: TenantId,
-    key: api_wire_types::SecretApiKey,
+    keys: Vec<api_wire_types::SecretApiKey>,
     auth_token: SessionAuthToken,
     ro_auth_token: SessionAuthToken,
 }
 
 struct Result {
     tenant: Tenant,
-    api_key: TenantApiKey,
-    api_key_role: TenantRole,
+    api_keys: Vec<(TenantApiKey, TenantRole)>,
     auth_token: SessionAuthToken,
     ro_auth_token: SessionAuthToken,
 }
@@ -50,7 +48,7 @@ async fn post(
     _custodian: CustodianAuthContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<NewClientResponse>>, ApiError> {
-    let NewClientRequest { id, name, is_live } = request.into_inner();
+    let NewClientRequest { id, name } = request.into_inner();
     if !id.is_integration_test_tenant() {
         // All integration testing tenant primary keys have a reserved prefix that signals that the
         // tenant is only to be used for integration tests.
@@ -63,13 +61,18 @@ async fn post(
     // This might not be used if we don't create a Tenant or TenantApiKey, but have to generate them
     // here because they're async
     let (ec_pk_uncompressed, e_priv_key) = state.enclave_client.generate_sealed_keypair().await?;
-    let secret_api_key = SecretApiKey::generate(is_live);
-    let sh_secret_api_key = secret_api_key.fingerprint(state.as_ref()).await?;
+    let live_api_key = SecretApiKey::generate(true);
+    let live_sh_api_key = live_api_key.fingerprint(state.as_ref()).await?;
+    let sandbox_api_key = SecretApiKey::generate(false);
+    let sandbox_sh_api_key = sandbox_api_key.fingerprint(state.as_ref()).await?;
+    let api_keys = vec![
+        (true, live_api_key, live_sh_api_key),
+        (false, sandbox_api_key, sandbox_sh_api_key),
+    ];
 
     let Result {
         tenant,
-        api_key,
-        api_key_role,
+        api_keys,
         auth_token,
         ro_auth_token,
     } = state
@@ -149,36 +152,40 @@ async fn post(
             )?;
 
             //
-            // Get or create the api key
+            // Get or create the api keys
             //
-            let rk = ImmutableRoleKind::Admin;
-            let admin_role =
-                TenantRole::get_immutable(conn, &tenant.id, rk, TenantRoleKind::ApiKey { is_live })?;
-            let tenant_api_key_name = "Integration test API key";
-            let (api_key, api_key_role) =
-                match TenantApiKey::get(conn, (tenant_api_key_name, &tenant.id, is_live)) {
-                    Ok(r) => r,
-                    Err(e) => {
-                        if !e.is_not_found() {
-                            return Err(e.into()); // Real error, return
+            let api_keys = api_keys
+                .into_iter()
+                .map(|(is_live, p_api_key, sh_api_key)| -> ApiResult<_> {
+                    let rk = ImmutableRoleKind::Admin;
+                    let admin_role =
+                        TenantRole::get_immutable(conn, &tenant.id, rk, TenantRoleKind::ApiKey { is_live })?;
+                    let tenant_api_key_name = "Integration test API key";
+                    let r = match TenantApiKey::get(conn, (tenant_api_key_name, &tenant.id, is_live)) {
+                        Ok(r) => r,
+                        Err(e) => {
+                            if !e.is_not_found() {
+                                return Err(e.into()); // Real error, return
+                            }
+                            let api_key = TenantApiKey::create(
+                                conn,
+                                // Always create it with the same name so we find it next time
+                                tenant_api_key_name.to_owned(),
+                                sh_api_key,
+                                p_api_key.seal_to(&tenant.public_key)?,
+                                tenant.id.clone(),
+                                is_live,
+                                admin_role.id.clone(),
+                            )?;
+                            (api_key, admin_role)
                         }
-                        let api_key = TenantApiKey::create(
-                            conn,
-                            // Always create it with the same name so we find it next time
-                            tenant_api_key_name.to_owned(),
-                            sh_secret_api_key,
-                            secret_api_key.seal_to(&tenant.public_key)?,
-                            tenant.id.clone(),
-                            is_live,
-                            admin_role.id.clone(),
-                        )?;
-                        (api_key, admin_role)
-                    }
-                };
+                    };
+                    Ok(r)
+                })
+                .collect::<ApiResult<_>>()?;
             let result = Result {
                 tenant,
-                api_key,
-                api_key_role,
+                api_keys,
                 auth_token,
                 ro_auth_token,
             };
@@ -186,16 +193,21 @@ async fn post(
         })
         .await?;
 
-    // Get the actual raw API key value
-    let decrypted_api_key = state
-        .enclave_client
-        .decrypt_to_piistring(&api_key.e_secret_api_key, &tenant.e_private_key)
-        .await?;
-    let decrypted_api_key = SecretApiKey::from(decrypted_api_key.leak().to_string());
+    let mut keys = vec![];
+    for (key, role) in api_keys {
+        let p_api_key = state
+            .enclave_client
+            .decrypt_to_piistring(&key.e_secret_api_key, &tenant.e_private_key)
+            .await?;
+        let p_api_key = SecretApiKey::from(p_api_key.leak().to_string());
+        let serialized = api_wire_types::SecretApiKey::from_db((key, role, Some(p_api_key)));
+        keys.push(serialized);
+    }
 
+    // Get the actual raw API key value
     let response = NewClientResponse {
         org_id: tenant.id,
-        key: api_wire_types::SecretApiKey::from_db((api_key, api_key_role, Some(decrypted_api_key))),
+        keys,
         auth_token,
         ro_auth_token,
     };

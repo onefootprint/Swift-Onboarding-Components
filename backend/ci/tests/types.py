@@ -44,6 +44,8 @@ class Tenant(NamedTuple):
     id: str
     default_ob_config: ObConfiguration
     sk: SecretApiKey
+    l_sk: TenantSecretAuth
+    s_sk: TenantSecretAuth
     name: str
     db_auths: list
     auth_token: DashboardAuth
