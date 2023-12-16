@@ -824,6 +824,89 @@ mod tests {
                 IdDocKind::DriversLicense,
                 IdDocKind::VoterIdentification,
             ],
+        );
+        // Second form of ID: Mexican Resident Card
+        let obc = obc_with_doc_cdo(
+            false,
+            None,
+            "document.residence_document.none.require_selfie",
+            Some("org_5lwSs95mU5v3gOU9xdSaml"),
+        );
+
+        let all_supported = obc.supported_country_mapping_for_document(None);
+        assert_eq!(all_supported.keys().len(), 1);
+        assert_have_same_elements(
+            all_supported
+                .get(&Iso3166TwoDigitCountryCode::MX)
+                .cloned()
+                .unwrap(),
+            vec![IdDocKind::ResidenceDocument],
+        );
+
+        let supported = obc.supported_country_mapping_for_document(Some(Iso3166TwoDigitCountryCode::MX));
+        assert_have_same_elements(
+            supported.get(&Iso3166TwoDigitCountryCode::MX).cloned().unwrap(),
+            vec![IdDocKind::ResidenceDocument],
+        );
+
+        // Second form of ID: Any additional document (voters ID, drivers license, etc)
+        let obc = obc_with_doc_cdo(
+            false,
+            None,
+            "document.drivers_license,voter_identification,visa,id_card,residence_document.none.require_selfie",
+            Some("org_5lwSs95mU5v3gOU9xdSaml"),
+        );
+
+        let all_supported = obc.supported_country_mapping_for_document(None);
+        assert_eq!(all_supported.keys().len(), 1);
+        assert_have_same_elements(
+            all_supported
+                .get(&Iso3166TwoDigitCountryCode::MX)
+                .cloned()
+                .unwrap(),
+            vec![
+                IdDocKind::ResidenceDocument,
+                IdDocKind::DriversLicense,
+                IdDocKind::Visa,
+                IdDocKind::VoterIdentification,
+                IdDocKind::IdCard,
+            ],
+        );
+
+        let supported = obc.supported_country_mapping_for_document(Some(Iso3166TwoDigitCountryCode::MX));
+        assert_have_same_elements(
+            supported.get(&Iso3166TwoDigitCountryCode::MX).cloned().unwrap(),
+            vec![
+                IdDocKind::ResidenceDocument,
+                IdDocKind::DriversLicense,
+                IdDocKind::Visa,
+                IdDocKind::VoterIdentification,
+                IdDocKind::IdCard,
+            ],
+        );
+
+        // Second form of ID: Driver's license
+        let obc = obc_with_doc_cdo(
+            false,
+            None,
+            "document.drivers_license.none.require_selfie",
+            Some("org_5lwSs95mU5v3gOU9xdSaml"),
+        );
+
+        let all_supported = obc.supported_country_mapping_for_document(None);
+        assert_eq!(all_supported.keys().len(), 1);
+        assert_have_same_elements(
+            all_supported
+                .get(&Iso3166TwoDigitCountryCode::MX)
+                .cloned()
+                .unwrap(),
+            vec![IdDocKind::DriversLicense],
+        );
+
+        let supported = obc.supported_country_mapping_for_document(Some(Iso3166TwoDigitCountryCode::MX));
+        assert_have_same_elements(
+            supported.get(&Iso3166TwoDigitCountryCode::MX).cloned().unwrap(),
+            vec![IdDocKind::DriversLicense],
         )
     }
 
