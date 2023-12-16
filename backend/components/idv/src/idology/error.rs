@@ -4,7 +4,7 @@ use newtypes::PiiJsonValue;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("socure type conversion error: {0}")]
+    #[error("idology type conversion error: {0}")]
     ConversionEror(#[from] ConversionError),
     #[error("internal reqwest error: {0}")]
     ReqwestError(#[from] ReqwestError),

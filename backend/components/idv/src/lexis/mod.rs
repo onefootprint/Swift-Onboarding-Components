@@ -28,6 +28,8 @@ pub enum Error {
     Api(String),
     #[error("Json error: {0}")]
     SerdeJson(#[from] serde_json::Error),
+    #[error("lexis type conversion error: {0}")]
+    ConversionEror(#[from] ConversionError),
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -38,6 +40,12 @@ pub enum ReqwestError {
     ReqwestSendError(String),
     #[error("error setting api headers: {0}")]
     InvalidHeader(#[from] reqwest::header::InvalidHeaderValue),
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum ConversionError {
+    #[error("Could not parse DOB")]
+    CantParseDob,
 }
 
 #[cfg(test)]

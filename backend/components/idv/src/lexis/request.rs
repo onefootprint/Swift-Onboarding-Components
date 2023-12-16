@@ -1,7 +1,10 @@
+use chrono::{Datelike, NaiveDate};
 use newtypes::*;
 use serde::{Deserialize, Serialize};
 use serde_repr::*;
 use std::fmt::Debug;
+
+use super::ConversionError;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
@@ -194,9 +197,17 @@ pub(crate) struct User {
 pub(crate) struct SearchBy {
     pub name: Name,
     pub address: Address,
+    pub dob: Option<Dob>,
+    /// Submit SSN or submit SSNLast4. The input SSN should not contain dashes.
     #[serde(rename = "SSN")]
     pub ssn: Option<PiiString>,
+    #[serde(rename = "SSNLast4")]
+    pub ssn_last_4: Option<PiiString>,
+    #[serde(rename = "IPAddress")]
+    pub ip_address: Option<PiiString>,
+    /// Ten-digit home phone number (for example, 925551234)
     pub home_phone: Option<PiiString>,
+    pub email: Option<PiiString>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -205,15 +216,29 @@ pub(crate) struct Name {
     pub first: Option<PiiString>,
     pub middle: Option<PiiString>,
     pub last: Option<PiiString>,
+    /// Generational suffix (for example, Jr or Sr)
+    pub suffix: Option<PiiString>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")]
 pub(crate) struct Address {
     pub street_address_1: Option<PiiString>,
+    pub street_address_2: Option<PiiString>,
     pub city: Option<PiiString>,
     pub state: Option<PiiString>,
     pub zip_5: Option<PiiString>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "PascalCase")]
+pub(crate) struct Dob {
+    /// Year (yyyy)
+    pub year: PiiString,
+    /// Month (MM)
+    pub month: PiiString,
+    /// Day (dd)
+    pub day: PiiString,
 }
 
 #[derive(Serialize_repr, Deserialize_repr, Clone, PartialEq, Eq, Debug)]
@@ -296,32 +321,54 @@ pub enum WatchlistKind {
 }
 
 impl LexisRequest {
-    pub fn new(idv_data: IdvData) -> Result<Self, crate::lexis::Error> {
+    pub fn new(idv_data: IdvData) -> Result<Self, ConversionError> {
         let IdvData {
             first_name,
             middle_name,
             last_name,
             address_line1,
-            address_line2: _,
+            address_line2,
             city,
             state,
             zip,
             country: _,
-            ssn4: _,
+            ssn4,
             ssn9,
-            dob: _,
-            email: _,
+            dob,
+            email,
             phone_number,
-            verification_request_id: _,
+            verification_request_id,
         } = idv_data;
+
+        let dob = if let Some(dob) = dob {
+            let parsed_dob = NaiveDate::parse_from_str(dob.leak(), "%Y-%m-%d")
+                .map_err(|_| ConversionError::CantParseDob)?;
+
+            Some(Dob {
+                year: parsed_dob.year().into(),
+                month: parsed_dob.month().into(),
+                day: parsed_dob.day().into(),
+            })
+        } else {
+            None
+        };
+
+        let (ssn, ssn_last_4) = match (ssn9, ssn4) {
+            (Some(ssn9), _) => (Some(ssn9), None),
+            (None, Some(ssn4)) => (None, Some(ssn4)),
+            (None, None) => (None, None),
+        };
 
         Ok(Self {
             flex_id_request: FlexIdRequest {
                 user: User {
                     reference_code: String::from("org_123"), // TODO: TenantID
-                    glb_purpose: String::from("1"),          // TODO
-                    dl_purpose: String::from("0"),
-                    query_id: String::from("vreq_123"), // TODO: vreq_id
+                    // TODO: check with Lexis if we should use 5 or mb 6 here for cases that are not stricly Bifrost
+                    glb_purpose: String::from("1"), // Transactions Authorized by Consumer—As necessary to effect, administer, or enforce a transaction requested or authorized by the consumer
+                    dl_purpose: String::from("3"), // Use in the Normal Course of Business—For use in the normal course of business but only to verify the accuracy of personal information submitted by the individual to the business; and if the submitted information is incorrect, to obtain the correct information, but only for the purposes of preventing fraud by, pursuing legal remedies against, or recovering on a debt or security interest against, the individual.
+                    query_id: verification_request_id
+                        .map(|v| v.to_string())
+                        .unwrap_or(Uuid::new_v4().to_string()),
                 },
                 options: Options {
                     watchlists: vec![Watchlist {
@@ -370,15 +417,21 @@ impl LexisRequest {
                         first: first_name,
                         middle: middle_name,
                         last: last_name,
+                        suffix: None, // maybe we'll collect/parse this later
                     },
                     address: Address {
                         street_address_1: address_line1,
+                        street_address_2: address_line2,
                         city,
                         state,
                         zip_5: zip,
                     },
-                    ssn: ssn9,
+                    ssn,
+                    ssn_last_4,
                     home_phone: phone_number,
+                    dob,
+                    ip_address: None, // maybe add this later
+                    email,
                 },
             },
         })
