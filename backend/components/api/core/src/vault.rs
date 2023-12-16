@@ -3,6 +3,7 @@ use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantGuard;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiResult;
+use crate::errors::ValidationError;
 use crate::telemetry::RootSpan;
 use crate::types::ResponseData;
 use crate::utils::actix::OptionalJson;
@@ -14,6 +15,7 @@ use crate::utils::vault_wrapper::Any;
 use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 
+use crate::utils::headers::SandboxId as SandboxIdHeader;
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_vault::ScopedVault;
@@ -35,6 +37,7 @@ pub async fn create_non_portable_vault(
     auth: SecretTenantAuthContext,
     insight: InsightHeaders,
     idempotency_id: IdempotencyId,
+    sandbox_id: SandboxIdHeader,
     external_id: ExternalId,
     vault_kind: VaultKind,
     root_span: RootSpan,
@@ -46,14 +49,24 @@ pub async fn create_non_portable_vault(
 
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
+
+    let sandbox_id = sandbox_id.0;
+    let sandbox_id = if is_live {
+        if sandbox_id.is_some() {
+            return Err(ValidationError("Cannot provide a sandbox ID outside of live mode").into());
+        }
+        None
+    } else {
+        Some(sandbox_id.unwrap_or_else(SandboxId::new))
+    };
+
     let new_user = NewVaultArgs {
         public_key,
         e_private_key,
         is_live,
         kind: vault_kind,
         is_fixture: false,
-        // TODO allow providing sandbox ID in a header
-        sandbox_id: (!is_live).then(SandboxId::new),
+        sandbox_id,
         is_created_via_api: true,
     };
 
