@@ -10,6 +10,7 @@ use newtypes::put_data_request::RawDataRequest;
 use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web};
 
+#[allow(clippy::too_many_arguments)]
 #[api_v2_operation(
     description = "Creates a new user, optionally initializing with the provided data",
     tags(Users, Vault, PublicApi)
