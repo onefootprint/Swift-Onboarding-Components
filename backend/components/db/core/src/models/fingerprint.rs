@@ -24,8 +24,10 @@ pub struct Fingerprint {
     /// Denormalized from the DataLifetime table in order to add uniqueness constraints on fingerprints
     pub kind: DataIdentifier,
     pub lifetime_id: DataLifetimeId,
-    /// For rows with is_unique, a db-level constraint enforces that no two rows have the same
-    /// fingerprint for the same kind
+    /// This is a misnomer now - it used to mean that the sh_data for this Fingerprint was unique,
+    /// but we no longer enforce uniqueness anymore.
+    /// But, we keep it around because there was some business logic that would branch based on
+    /// `is_unique`. Will remove in the future
     pub is_unique: bool,
     /// Version of the fingerprint schema
     pub version: FingerprintVersion,

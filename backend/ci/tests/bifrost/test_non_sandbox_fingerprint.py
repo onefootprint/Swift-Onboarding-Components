@@ -3,10 +3,10 @@ from tests.constants import EMAIL
 from tests.utils import post, try_until_success, identify_verify
 
 
-def test_concurrent_signup_unique_fingerprint(
+def test_concurrent_signup_same_phone_number(
     twilio, tenant, sandbox_tenant, live_phone_number
 ):
-    # Make a non-sandbox ob config for sandbox_tenant. Only live OBCs have unique fingerprints
+    # Make a non-sandbox ob config for sandbox_tenant
     data = dict(
         name="Live OBC",
         must_collect_data=["ssn4", "phone_number", "email", "name", "full_address"],
@@ -30,18 +30,15 @@ def test_concurrent_signup_unique_fingerprint(
     )
     challenge_token2 = try_until_success(lambda: initiate_challenge(ob_config_key), 20)
 
-    # Should be able to complete challenge at only one tenant
+    # Should be able to complete both challenges, effectively making two vaults with the same
+    # phone fingerprint
     identify_verify(
         twilio, live_phone_number, challenge_token2, "onboarding", ob_config_key
     )
-
-    # This isn't necessarily desired behavior, but useful to assert that this is the current
-    # behavior.
     identify_verify(
         twilio,
         live_phone_number,
         challenge_token1,
         "onboarding",
         tenant.default_ob_config.key,
-        expected_error="Operation not allowed: unique constraint violation",
     )

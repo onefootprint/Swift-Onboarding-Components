@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX fingerprint_kind_sh_data_idx ON fingerprint(kind, sh_data) WHERE is_unique;
