@@ -30,6 +30,7 @@ use newtypes::ValidateArgs;
 use newtypes::VaultKind;
 use paperclip::actix::web;
 
+#[allow(clippy::unwrap_or_default)]
 #[allow(clippy::too_many_arguments)]
 pub async fn create_non_portable_vault(
     state: web::Data<State>,
