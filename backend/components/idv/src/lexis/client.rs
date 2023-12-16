@@ -1,85 +1,65 @@
+use super::decode_response;
+use crate::footprint_http_client::FootprintVendorHttpClient;
 use crate::lexis::request::LexisRequest;
 use crate::lexis::ReqwestError;
+use newtypes::vendor_credentials::LexisCredentials;
 use newtypes::IdvData;
 use reqwest::header;
-
 use std::time::Duration;
-use tokio_retry::strategy::{jitter, ExponentialBackoff};
-use tokio_retry::Retry;
 
-use super::decode_response;
-
-#[derive(Clone)]
-pub struct LexisClient {
-    client: reqwest::Client,
-    url: String,
+pub struct LexisFlexIdRequest {
+    pub idv_data: IdvData,
+    pub credentials: LexisCredentials,
 }
 
-impl LexisClient {
-    pub fn new(user_id: String, password: String) -> Result<Self, crate::lexis::ReqwestError> {
-        let url = "https://wsonline.seisint.com/WsIdentity/FlexID?ver_=2.99";
-        let mut headers = header::HeaderMap::new();
+pub async fn flex_id(
+    fp_http_client: &FootprintVendorHttpClient,
+    req: LexisFlexIdRequest,
+) -> Result<serde_json::Value, crate::lexis::Error> {
+    let LexisFlexIdRequest {
+        idv_data,
+        credentials,
+    } = req;
 
-        let header_val = format!(
-            "Basic {}",
-            base64::encode(format!("{}:{}", user_id, password).as_bytes())
-        );
+    let url = "https://wsonline.seisint.com/WsIdentity/FlexID?ver_=3.12";
+    let mut headers = header::HeaderMap::new();
+    let header_val = format!(
+        "Basic {}",
+        base64::encode(format!("{}:{}", credentials.user_id.leak(), credentials.password.leak()).as_bytes())
+    );
+    headers.insert(
+        "Authorization",
+        header::HeaderValue::from_str(header_val.as_str())?,
+    );
 
-        headers.insert(
-            "Authorization",
-            header::HeaderValue::from_str(header_val.as_str())?,
-        );
+    let req = LexisRequest::new(idv_data)?;
+    tracing::info!(req = format!("{:?}", req), "flex_id req");
 
-        let client = reqwest::Client::builder().default_headers(headers).build()?;
-        Ok(Self {
-            client,
-            url: url.to_string(),
-        })
-    }
+    let response = fp_http_client
+        .client
+        .post(url.to_string())
+        .headers(headers)
+        .json(&req)
+        .timeout(Duration::from_secs(5))
+        .send()
+        .await
+        .map_err(|err| ReqwestError::ReqwestSendError(err.to_string()))?;
 
-    pub async fn flex_id_request(self, idv_data: IdvData) -> Result<serde_json::Value, crate::lexis::Error> {
-        // TODO: For now this just tries 1 time. We need to differentiate retriable errors from other errors
-        //  and match on that and then enable this to retry multiple times
-        let retry_strategy = ExponentialBackoff::from_millis(10).map(jitter).take(0);
-        let result = Retry::spawn(retry_strategy, || self.attempt_flex_id_request(idv_data.clone())).await?;
+    let json_response = decode_response::<serde_json::Value>(response).await;
 
-        Ok(result)
-    }
-
-    async fn attempt_flex_id_request(
-        &self,
-        idv_data: IdvData,
-    ) -> Result<serde_json::Value, crate::lexis::Error> {
-        let req = LexisRequest::new(idv_data)?;
-        tracing::info!(req = format!("{:?}", req), "LexisClient req");
-
-        let response = self
-            .client
-            .post(self.url.to_string())
-            .json(&req)
-            .timeout(Duration::from_secs(5))
-            .send()
-            .await
-            .map_err(|err| ReqwestError::ReqwestSendError(err.to_string()))?;
-
-        let json_response = decode_response::<serde_json::Value>(response).await;
-
-        match json_response {
-            Ok(_) => {
-                tracing::info!("LexisClient success");
-            }
-            Err(ref err) => {
-                tracing::error!(?err, "LexisClient error");
-                // TODO: write grafana/es alerts off of these
-            }
+    match json_response {
+        Ok(_) => {
+            tracing::info!("flex_id success");
         }
-        json_response
+        Err(ref err) => {
+            tracing::error!(?err, "flex_id error");
+        }
     }
+    json_response
 }
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
     use dotenv;
 
@@ -90,10 +70,11 @@ mod tests {
     #[traced_test]
     #[tokio::test]
     async fn test_client() {
-        let user_id = dotenv::var("LEXIS_TEST_USER_ID").unwrap();
-        let password = dotenv::var("LEXIS_TEST_PASSWORD").unwrap();
-
-        let lexis_client = LexisClient::new(user_id, password).unwrap();
+        let client = FootprintVendorHttpClient::new().unwrap();
+        let credentials = LexisCredentials {
+            user_id: dotenv::var("LEXIS_TEST_USER_ID").unwrap().into(),
+            password: dotenv::var("LEXIS_TEST_PASSWORD").unwrap().into(),
+        };
 
         let idv_data = IdvData {
             first_name: Some(PiiString::from("NICHOLAS")),
@@ -112,7 +93,15 @@ mod tests {
             ..Default::default()
         };
 
-        let res = lexis_client.flex_id_request(idv_data).await.unwrap();
+        let res = flex_id(
+            &client,
+            LexisFlexIdRequest {
+                idv_data,
+                credentials,
+            },
+        )
+        .await
+        .unwrap();
         println!("res: {}", serde_json::to_string_pretty(&res).unwrap());
         // let parsed_res = crate::lexis::parse_response(res).unwrap();
         // println!("parsed_res: {:?}", parsed_res);
