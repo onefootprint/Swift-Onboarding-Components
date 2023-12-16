@@ -1,6 +1,10 @@
 from typing import NamedTuple
 import pytest
-from tests.utils import get, patch, post
+from tests.utils import (
+    get,
+    patch,
+    post,
+)
 from tests.bifrost_client import BifrostClient
 from tests.headers import FpAuth
 
@@ -12,15 +16,16 @@ class DualOnboardedUser(NamedTuple):
 
 
 @pytest.fixture(scope="module")
-def dual_onboarded_user(sandbox_user_real_phone, foo_sandbox_tenant, twilio):
-    # Create a sandbox user, onboard them onto sandbox_tenant
-    fp_id = sandbox_user_real_phone.fp_id
+def dual_onboarded_user(sandbox_tenant, foo_sandbox_tenant, twilio):
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
+    sandbox_user = bifrost.run()
+    fp_id = sandbox_user.fp_id
 
     #
     # Then onboard them onto foo_sandbox_tenant
     #
-    phone_number = sandbox_user_real_phone.client.data["id.phone_number"]
-    sandbox_id = sandbox_user_real_phone.client.sandbox_id
+    phone_number = bifrost.data["id.phone_number"]
+    sandbox_id = bifrost.sandbox_id
     foo_bifrost = BifrostClient.inherit(
         foo_sandbox_tenant.default_ob_config, twilio, phone_number, sandbox_id
     )
@@ -55,7 +60,7 @@ def dual_onboarded_user(sandbox_user_real_phone, foo_sandbox_tenant, twilio):
     # foo_tenant's playbook collects less than sandbox_tenant's
     assert not get_scopes()
 
-    return DualOnboardedUser(fp_id, foo_fp_id, sandbox_user_real_phone)
+    return DualOnboardedUser(fp_id, foo_fp_id, sandbox_user)
 
 
 def test_fp_id(dual_onboarded_user):

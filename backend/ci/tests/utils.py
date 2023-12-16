@@ -404,6 +404,7 @@ def challenge_user(phone_number, challenge_kind, *headers):
     return try_until_success(challenge, 20)
 
 
+# TODO now that most tests do _not_ send SMSes, we can probably simplify these utils massively
 def identify_verify(
     twilio,
     phone_number,

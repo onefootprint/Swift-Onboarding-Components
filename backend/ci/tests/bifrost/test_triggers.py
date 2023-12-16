@@ -145,7 +145,7 @@ def test_recollect_document(trigger, sandbox_tenant, twilio):
 
     users_docs = get(f"users/{fp_id}/documents", None, sandbox_tenant.sk.key)
     # currently we request iddoc + proof of ssn doc for proof_of_ssn triggers
-    expected_len = 2 if trigger['kind'] == "proof_of_ssn" else 1
+    expected_len = 2 if trigger["kind"] == "proof_of_ssn" else 1
     assert len(users_docs) == expected_len
 
 
@@ -195,47 +195,6 @@ def test_cant_make_multiple_wfs(sandbox_tenant, twilio):
     post("hosted/onboarding", None, auth_token)
     body = get("hosted/onboarding/status", None, auth_token)
     assert not any(i["kind"] == "collect_data" for i in body["all_requirements"])
-
-
-def test_redo_kyc_with_sms_link(sandbox_tenant, twilio, live_phone_number):
-    bifrost = BifrostClient.create(
-        sandbox_tenant.default_ob_config,
-        twilio,
-        live_phone_number,  # Have to make with the live phone number in order to receive SMSes
-        _gen_random_sandbox_id(),
-    )
-    sandbox_user = bifrost.run()
-    fp_id = sandbox_user.fp_id
-    phone_number = sandbox_user.client.data["id.phone_number"]
-
-    # trigger RedoKYC
-    note = _gen_random_n_digit_number(10)
-
-    def send_trigger():
-        data = dict(trigger=dict(kind="redo_kyc"), note=note)
-        post(f"entities/{fp_id}/triggers", data, *sandbox_tenant.db_auths)
-
-    try_until_success(send_trigger, 15, 3)
-
-    body = get(f"entities/{fp_id}", None, *sandbox_tenant.db_auths)
-    assert body["has_outstanding_workflow_request"]
-
-    # find link we sent to user via Twilio
-    def inner():
-        messages = twilio.messages.list(to=phone_number, limit=25)
-        print(f"Searching for message with id {note} sent to {phone_number}")
-        message = next(
-            m for m in messages if f"{note}\n\nRe-verify your identity for" in m.body
-        )
-        token = message.body.split("#")[1].split("\n\nSent via Footprint")[0]
-        return token
-
-    time.sleep(2)
-    token = try_until_success(inner, 60)
-    initial_auth_token = FpAuth(token)
-
-    # And complete redo flow using this auth token
-    complete_redo_flow(twilio, sandbox_user, initial_auth_token)
 
 
 def test_complete_trigger_w_user_specific_token(sandbox_tenant, twilio):

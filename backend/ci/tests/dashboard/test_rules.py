@@ -153,9 +153,7 @@ def test_patch(sandbox_tenant, obc):
     )
 
 
-def test_get_rule_set_result(
-    sandbox_tenant, twilio, must_collect_data, live_phone_number
-):
+def test_get_rule_set_result(sandbox_tenant, twilio, must_collect_data):
     obc = create_ob_config(
         sandbox_tenant, "Rules yo", must_collect_data, must_collect_data
     )

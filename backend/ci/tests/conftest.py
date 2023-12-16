@@ -214,7 +214,7 @@ def sandbox_user(sandbox_tenant, twilio):
         "process",
     ]
 
-    # Assert we can't replace the verified email
+    # Assert we can't replace the verified phone
     data = {"id.phone_number": "+15555555555"}
     body = patch(
         f"entities/{user.fp_id}/vault", data, sandbox_tenant.sk.key, status_code=400
@@ -225,24 +225,6 @@ def sandbox_user(sandbox_tenant, twilio):
     )
 
     return user
-
-
-@pytest.fixture(scope="module")
-def sandbox_user_real_phone(
-    sandbox_tenant,
-    twilio,
-    live_phone_number,
-):
-    """
-    Create a user with registered data and webuathn creds and onboard them onto the sandbox_tenant.
-    """
-    from tests.bifrost_client import BifrostClient
-
-    sandbox_id = _gen_random_sandbox_id()
-    bifrost = BifrostClient.create(
-        sandbox_tenant.default_ob_config, twilio, live_phone_number, sandbox_id
-    )
-    return bifrost.run()
 
 
 @pytest.fixture(scope="module")
