@@ -22,7 +22,7 @@ config:
       assets: i.onefp.net
       base: api.onefootprint.com
       frontendBase: onefootprint.com
-      prefix: ''
+      prefix: ""
     elastic:
       apiKey:
         secure: v1:IuM1QjcgUc76uhEs:UzHJyEWwdT0iWEya1qfHfkIrYMESzQEZud0r70ygpwGW7V+9ptc=
@@ -99,6 +99,11 @@ config:
     launchDarkly:
       launchDarklySdkKey:
         secure: v1:DrKn4q/fyK2+S+sJ:V/huczZNR1v2VKctscz6cCDZhx3nl8DyDBw+njGsun69ftSiRh7Z08QDoYAKBCyG9ItmpSiL0YY=
+    lexis:
+      password:
+        secure: v1:M89G+jsg+97QAZ8o:NyS76wTAT+P+spvvgrNLpM43vxoBfZhTGzbY8w==
+      userId:
+        secure: v1:IgLfcPMF8meodCI3:W/FqpgAO8MkiZOCtwlBOjWi4LGtYjw==
     middesk:
       apiKey:
         secure: v1:WXNa8UEapgUz2KjX:hRZUhufEmcOhpzYggPFLHzCwK7oFnXjI+mWmTNZx0pWmhoIfO5HbSv0jJFp9AbVm
@@ -146,14 +151,14 @@ config:
         secure: v1:Md3FtwNwl+7bxKrr:ihwacs4t71LgGl8FlkIdS4XuCKbyvVEkaNmUku27OFcThcrr87SuH9GLz1RiTvezia4=
       apiKeySecret:
         secure: v1:6Sct1OQ1Y3A0QapO:dA7CqK0HR3NsmSDgJAR/kicJY7+i7k5KLfugEoCHIn1MqTsQ6BFOv0qKbqVWWT27
-      phoneNumber: '+14152129648'
+      phoneNumber: "+14152129648"
     twilioBackup:
       accountSid: AC675cd7f6557fb29b4fd3483fe49f6ff0
       apiKey:
         secure: v1:g/Buavshjo4oCE/9:iYXVkuHQxY8XO4HFDPvM69p/Xph/A6VZoYYtwgYJmN7Ofh9mwWxMUQAdl9cmckt25gM=
       apiKeySecret:
         secure: v1:WTH51OSrsdCEdap7:bIRwAeQZYkdPq0+VXdOeL2/A3eDYJ1/pruElC2LyDU/XMnZgQniODR9bWbfqGo44
-      phoneNumber: '+15105883668'
+      phoneNumber: "+15105883668"
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J

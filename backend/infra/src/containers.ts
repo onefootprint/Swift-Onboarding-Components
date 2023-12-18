@@ -159,6 +159,8 @@ export abstract class ServiceContainers {
         secretsStore.stytchSecret.arn,
         secretsStore.appleDeviceCheckPrivateKey.arn,
         secretsStore.googlePlayIntegrityDecryptionKey.arn,
+        secretsStore.lexisUserId.arn,
+        secretsStore.lexisPassword.arn,
       ])
       .apply(
         ([
@@ -210,6 +212,8 @@ export abstract class ServiceContainers {
           stytchSecret,
           appleDcPrivateKey,
           googleIntegrityDecryptionKey,
+          lexisUserId,
+          lexisPassword,
         ]) => {
           let def: aws.ecs.ContainerDefinition = {
             name,
@@ -395,6 +399,14 @@ export abstract class ServiceContainers {
               {
                 name: 'GOOGLE_PLAY_INTEGRITY_DECRYPTION_KEY',
                 valueFrom: googleIntegrityDecryptionKey,
+              },
+              {
+                name: 'LEXIS_USER_ID',
+                valueFrom: lexisUserId,
+              },
+              {
+                name: 'LEXIS_PASSWORD',
+                valueFrom: lexisPassword,
               },
             ],
             environment: [

@@ -65,6 +65,8 @@ export interface StaticSecrets {
   stytchSecret: aws.ssm.Parameter;
   appleDeviceCheckPrivateKey: aws.ssm.Parameter;
   googlePlayIntegrityDecryptionKey: aws.ssm.Parameter;
+  lexisUserId: aws.ssm.Parameter;
+  lexisPassword: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -88,6 +90,7 @@ interface SecretConstants {
   stytch: Stytch;
   apple: Apple;
   google: Google;
+  lexis: Lexis;
 }
 
 interface ElasticSecrets {
@@ -185,6 +188,11 @@ interface Apple {
 }
 interface Google {
   playIntegrityDecryptionKey: string;
+}
+
+interface Lexis {
+  userId: string;
+  password: string;
 }
 
 export async function LoadSecrets(
@@ -454,6 +462,14 @@ export async function LoadSecrets(
     googlePlayIntegrityDecryptionKey: createSecretParameter(
       `googleIntegrityDecryptionKey-${stack}`,
       secretConstants.google.playIntegrityDecryptionKey,
+    ),
+    lexisUserId: createSecretParameter(
+      `lexisUserId-${stack}`,
+      secretConstants.lexis.userId,
+    ),
+    lexisPassword: createSecretParameter(
+      `lexisPassword-${stack}`,
+      secretConstants.lexis.password,
     ),
   };
 }

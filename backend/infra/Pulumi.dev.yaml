@@ -101,6 +101,11 @@ config:
     launchDarkly:
       launchDarklySdkKey:
         secure: v1:UDxCGOYtRW7Wj7hH:hf5y2xIB89mGz6PiW8tkKL5tDvTC1CmUAtwNTMURbfK0BvcOJymessVR0TbfptH4Bp/97+bU6hE=
+    lexis:
+      password:
+        secure: v1:xFtWxpCbaCKCdWTm:Imsm4P+kt/c5LV0/3HRJvsufwnpOLxpImuAKWw==
+      userId:
+        secure: v1:+hcMwHOl3/HyiPEo:8/1F89myIlhyG5cndcAUnMaHmapYgg==
     middesk:
       apiKey:
         secure: v1:xtdaUeliAIgFqHjM:SoQBIALTVJdwz/fpovGd1nvNQLpJoz4Q85B+AS2LvmdqgKhAiiLUrAemlAfK0X/X
@@ -148,14 +153,14 @@ config:
         secure: v1:TddbkBlhZ7cYtOFN:ZsI5nrIil+wAJHlVffj8YcI8sn82QZuLxbb8E2ekbBg4TUAqffmXMvNoahef/hyzKnc=
       apiKeySecret:
         secure: v1:Mj1lvo0d2hHkitB4:bc7qwKQOSkoIe0WhqEJ3nRIqGK4Zht2klh96woc9EL3HNBp8R9GAcmxuE2TbVJYt
-      phoneNumber: '+15105883668'
+      phoneNumber: "+15105883668"
     twilioBackup:
       accountSid: AC675cd7f6557fb29b4fd3483fe49f6ff0
       apiKey:
         secure: v1:TddbkBlhZ7cYtOFN:ZsI5nrIil+wAJHlVffj8YcI8sn82QZuLxbb8E2ekbBg4TUAqffmXMvNoahef/hyzKnc=
       apiKeySecret:
         secure: v1:Mj1lvo0d2hHkitB4:bc7qwKQOSkoIe0WhqEJ3nRIqGK4Zht2klh96woc9EL3HNBp8R9GAcmxuE2TbVJYt
-      phoneNumber: '+15105883668'
+      phoneNumber: "+15105883668"
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J

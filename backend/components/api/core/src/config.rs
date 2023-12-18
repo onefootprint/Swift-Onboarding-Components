@@ -131,6 +131,9 @@ pub struct Config {
 
     #[envconfig(nested = true)]
     pub google_config: GooglePlayConfig,
+
+    #[envconfig(nested = true)]
+    pub lexis_config: LexisConfig,
 }
 
 fn load_from_env<T: Envconfig>() -> Result<T, Box<dyn std::error::Error>> {
@@ -378,4 +381,13 @@ pub struct GooglePlayConfig {
     pub play_integrity_verificiation_key: String,
     #[envconfig(from = "GOOGLE_PLAY_INTEGRITY_DECRYPTION_KEY")]
     pub play_integrity_decryptiong_key: String,
+}
+
+#[derive(Envconfig, Debug, Clone)]
+pub struct LexisConfig {
+    #[envconfig(from = "LEXIS_USER_ID")]
+    pub user_id: PiiString,
+
+    #[envconfig(from = "LEXIS_PASSWORD")]
+    pub password: PiiString,
 }
