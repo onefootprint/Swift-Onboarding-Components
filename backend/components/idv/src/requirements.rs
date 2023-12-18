@@ -159,7 +159,7 @@ fn vendor_api_eligible_for_onboarding_kyc(vendor_api: &VendorAPI) -> bool {
         VendorAPI::FootprintDeviceAttestation => false,
         VendorAPI::AwsRekognition => false,
         VendorAPI::AwsTextract => false,
-        VendorAPI::LexisFlexId => false, // off for now until we gain confidence in integration and shadow log for a period etc
+        VendorAPI::LexisFlexId => true,
     }
 }
 
@@ -181,7 +181,7 @@ mod tests {
         IdentityDataKind::State,
         IdentityDataKind::Country,
         IdentityDataKind::City,
-    ] => vec![VendorAPI::IdologyExpectId, VendorAPI::SocureIdPlus, VendorAPI::ExperianPreciseId])]
+    ] => vec![VendorAPI::IdologyExpectId, VendorAPI::SocureIdPlus, VendorAPI::ExperianPreciseId, VendorAPI::LexisFlexId])]
     fn test_available_vendor_apis(present_data_lifetime_kinds: &[IdentityDataKind]) -> Vec<VendorAPI> {
         available_vendor_apis(present_data_lifetime_kinds)
     }

@@ -19,6 +19,8 @@ pub enum BoolFlag<'a> {
     EnableMiddeskInNonProd(&'a ObConfigurationKey),
     #[strum(to_string = "EnableExperianIdvCallsInNonProdEnvironment")]
     EnableExperianInNonProd(&'a ObConfigurationKey),
+    #[strum(to_string = "EnableLexisInNonProd")]
+    EnableLexisInNonProd(&'a ObConfigurationKey),
     #[strum(to_string = "DisableAllScanOnboardingCalls")]
     DisableAllScanOnboarding,
     #[strum(to_string = "DisableAllSocureIdvCalls")]
@@ -94,6 +96,7 @@ impl<'a> BoolFlag<'a> {
             Self::EnableIdologyInNonProd(k) => Some(k.to_string()),
             Self::EnableMiddeskInNonProd(k) => Some(k.to_string()),
             Self::EnableExperianInNonProd(k) => Some(k.to_string()),
+            Self::EnableLexisInNonProd(k) => Some(k.to_string()),
             Self::EnableSocureInNonProd(k) => Some(k.to_string()),
             Self::DisableAllScanOnboarding => None,
             Self::DisableAllSocure => None,
@@ -137,6 +140,7 @@ impl<'a> BoolFlag<'a> {
             Self::EnableMiddeskInNonProd(_) => false,
             Self::EnableSocureInNonProd(_) => false,
             Self::EnableExperianInNonProd(_) => false,
+            Self::EnableLexisInNonProd(_) => false,
             Self::DisableAllScanOnboarding => false,
             Self::DisableAllSocure => false,
             Self::CanCleanUpPhoneNumber(_) => false,

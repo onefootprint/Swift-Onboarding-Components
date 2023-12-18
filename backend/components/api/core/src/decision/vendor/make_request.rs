@@ -20,6 +20,7 @@ use db::{
 use feature_flag::{BoolFlag, FeatureFlagClient};
 use idv::experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse};
 use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
+use idv::lexis::client::{LexisFlexIdRequest, LexisFlexIdResponse};
 use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
 use idv::{idology::expectid::response::ExpectIDResponse, ParsedResponse, VendorResponse};
@@ -151,6 +152,16 @@ pub async fn send_idv_request(
                 state.feature_flag_client.clone(),
             )
             .await
+        }
+        VendorAPI::LexisFlexId => {
+            let credentials = tvc.lexis_credentials();
+            send_lexis_flex_id_request(
+                LexisFlexIdRequest { idv_data, credentials },
+                is_production,
+                ob_configuration_key,
+                state.vendor_clients.lexis_flex_id.clone(),
+                state.feature_flag_client.clone(),
+            ).await
         }
         api => {
             let err = format!("send_idv_request not implemented for {}", api);
@@ -340,6 +351,41 @@ pub async fn send_experian_idv_request(
 
         Ok(VendorResponse {
             response: ParsedResponse::ExperianPreciseID(parsed_response),
+            raw_response: response.into(),
+        })
+    }
+}
+
+#[tracing::instrument(skip_all)]
+pub async fn send_lexis_flex_id_request(
+    request: LexisFlexIdRequest,
+    is_production: bool,
+    ob_configuration_key: ObConfigurationKey,
+    client: VendorClient<
+        LexisFlexIdRequest,
+        LexisFlexIdResponse,
+        idv::lexis::Error,
+    >,
+    ff_client: Arc<dyn FeatureFlagClient>,
+) -> Result<VendorResponse, idv::Error> {
+    if is_production || ff_client.flag(BoolFlag::EnableLexisInNonProd(&ob_configuration_key)) {
+        let res = client.make_request(request).await;
+
+        res.map(|r| {
+            let parsed_response = r.parsed_response();
+            let raw_response = r.raw_response();
+
+            VendorResponse {
+                response: parsed_response,
+                raw_response,
+            }
+        })
+        .map_err(|e| e.into())
+    } else {
+        let response = idv::test_fixtures::passing_lexis_flex_id_response();
+        let parsed_response = idv::lexis::parse_response(response.clone())?;
+        Ok(VendorResponse {
+            response: ParsedResponse::LexisFlexId(parsed_response),
             raw_response: response.into(),
         })
     }

@@ -25,6 +25,7 @@ use idv::{
         },
         IncodeResponse, IncodeStartOnboardingRequest,
     },
+    lexis::client::{LexisFlexIdRequest, LexisFlexIdResponse},
     middesk::{
         client::MiddeskClient, MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse,
         MiddeskGetBusinessRequest, MiddeskGetBusinessResponse,
@@ -189,6 +190,7 @@ pub struct VendorClients {
     pub twilio_lookup_v2: VendorClient<TwilioLookupV2Request, TwilioLookupV2APIResponse, idv::twilio::Error>,
     pub experian_cross_core:
         VendorClient<ExperianCrossCoreRequest, ExperianCrossCoreResponse, idv::experian::error::Error>,
+    pub lexis_flex_id: VendorClient<LexisFlexIdRequest, LexisFlexIdResponse, idv::lexis::Error>,
     pub middesk_create_business:
         VendorClient<MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse, idv::middesk::Error>,
     pub middesk_get_business:
@@ -215,6 +217,7 @@ impl VendorClients {
             socure_id_plus: Arc::new(socure_client),
             twilio_lookup_v2: Arc::new(twilio_client.twilio_client),
             experian_cross_core: footprint_client.clone(),
+            lexis_flex_id: footprint_client.clone(),
             middesk_create_business: middesk_client.clone(),
             middesk_get_business: middesk_client,
             idology_expect_id: footprint_client.clone(),
@@ -243,6 +246,11 @@ impl VendorClients {
                 ExperianCrossCoreRequest,
                 ExperianCrossCoreResponse,
                 idv::experian::error::Error,
+            >::new()),
+            lexis_flex_id: Arc::new(MockVendorAPICall::<
+                LexisFlexIdRequest,
+                LexisFlexIdResponse,
+                idv::lexis::Error,
             >::new()),
             middesk_create_business: Arc::new(MockVendorAPICall::<
                 MiddeskCreateBusinessRequest,

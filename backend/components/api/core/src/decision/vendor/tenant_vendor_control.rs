@@ -10,7 +10,7 @@ use idv::{
 use newtypes::{
     vendor_credentials::{
         ExperianCredentialBuilder, ExperianCredentials, IdologyCredentials, IncodeCredentials,
-        MiddeskCredentials,
+        LexisCredentials, MiddeskCredentials,
     },
     IdvData, IncodeEnvironment, PiiString, TenantId, Vendor, VendorAPI,
 };
@@ -21,6 +21,7 @@ pub struct TenantVendorControl {
     vendor_control: Option<DbTenantVendorControl>,
     idology_credentials: IdologyCredentials,
     experian_credentials: ExperianCredentials,
+    lexis_credentials: LexisCredentials,
     incode_credentials: IncodeCredentials,
     middesk_credentials: MiddeskCredentials,
     incode_sandbox_credentials: IncodeSandboxCredentials,
@@ -55,6 +56,10 @@ impl TenantVendorControl {
 
     pub fn experian_credentials(&self) -> ExperianCredentials {
         self.experian_credentials.clone()
+    }
+
+    pub fn lexis_credentials(&self) -> LexisCredentials {
+        self.lexis_credentials.clone()
     }
 
     pub fn incode_credentials(&self, incode_environment: IncodeEnvironment) -> IncodeCredentials {
@@ -118,6 +123,7 @@ impl TenantVendorControl {
         let experian_credentials =
             experian_credential_builder.build_with_subscriber_code(experian_subscriber_code);
 
+        let lexis_credentials = LexisCredentials::from(config);
         // As of 2023-04-25, we only have a single set of incode credentials
         let incode_credentials = IncodeCredentials::from(config);
         let incode_sandbox_credentials = IncodeSandboxCredentials::from(config);
@@ -144,6 +150,7 @@ impl TenantVendorControl {
             vendor_control,
             idology_credentials,
             experian_credentials,
+            lexis_credentials,
             enabled_vendor_apis,
             incode_credentials,
             middesk_credentials,
@@ -185,6 +192,10 @@ impl TenantVendorControl {
             if tvc.experian_enabled && tvc.experian_subscriber_code.is_some() {
                 apis.push(VendorAPI::ExperianPreciseId);
             }
+
+            if tvc.lexis_enabled {
+                apis.push(VendorAPI::LexisFlexId);
+            }
         } else {
             // If we do not, we enable Idology APIs by default
             all_idology_vendor_apis.into_iter().for_each(|a| apis.push(a));
@@ -225,6 +236,15 @@ impl From<&Config> for IncodeCredentials {
         IncodeCredentials {
             api_key: config.incode.api_key.clone(),
             base_url: config.incode.base_url.clone(),
+        }
+    }
+}
+
+impl From<&Config> for LexisCredentials {
+    fn from(config: &Config) -> Self {
+        LexisCredentials {
+            user_id: config.lexis_config.user_id.clone(),
+            password: config.lexis_config.password.clone(),
         }
     }
 }

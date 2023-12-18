@@ -4,6 +4,73 @@ use newtypes::{
     ExperianAddressAndNameMatchReasonCodes, ExperianSSNReasonCodes, ExperianWatchlistReasonCodes,
 };
 
+pub fn passing_lexis_flex_id_response() -> serde_json::Value {
+    serde_json::json!({
+        "FlexIDResponseEx": {
+          "@xmlns": "http://webservices.seisint.com/WsIdentity",
+          "response": {
+            "Header": {
+              "QueryId": "123456",
+              "Status": 0,
+              "TransactionId": "12345"
+            },
+            "Result": {
+              "BureauDeleted": false,
+              "ComprehensiveVerification": {
+                "ComprehensiveVerificationIndex": 50,
+                "RiskIndicators": {
+                  "RiskIndicator": []
+                }
+              },
+              "CustomComprehensiveVerification": {
+                "ComprehensiveVerificationIndex": 0
+              },
+              "EmergingId": false,
+              "ITINExpired": false,
+              "InputEcho": {
+                "Address": {
+                  "City": "San Francisco",
+                  "State": "CA",
+                  "StreetAddress1": "123 main street",
+                  "Zip5": "94114"
+                },
+                "Age": 0,
+                "HomePhone": "5555550100",
+                "Name": {
+                  "First": "Piip",
+                  "Last": "Pengiun"
+                },
+                "SSN": "123456789"
+              },
+              "InstantIDVersion": "1",
+              "IsPhoneCurrent": true,
+              "NameAddressPhone": {
+                "Summary": "12"
+              },
+              "NameAddressSSNSummary": 12,
+              "PhoneLineDescription": "W",
+              "UniqueId": "12345678",
+              "ValidElementSummary": {
+                "AddressCMRA": false,
+                "AddressPOBox": false,
+                "PassportValid": false,
+                "SSNDeceased": false,
+                "SSNFoundForLexID": true,
+                "SSNValid": true
+              },
+              "VerifiedElementSummary": {
+                "DOB": true,
+                "DOBMatchLevel": "8",
+                "Email": true
+              }
+            }
+          }
+        }
+      }
+
+    )
+}
+
 pub fn test_idology_expectid_response() -> serde_json::Value {
     serde_json::json!({
         "response": {
