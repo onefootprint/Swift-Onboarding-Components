@@ -11,6 +11,7 @@ use super::response::FlexIdResponse;
 pub struct LexisFlexIdRequest {
     pub idv_data: IdvData,
     pub credentials: LexisCredentials,
+    pub tenant_identifier: String,
 }
 
 #[derive(Clone)]
@@ -26,6 +27,7 @@ pub async fn flex_id(
     let LexisFlexIdRequest {
         idv_data,
         credentials,
+        tenant_identifier,
     } = req;
 
     let url = "https://wsonline.seisint.com/WsIdentity/FlexID?ver_=3.12";
@@ -39,7 +41,7 @@ pub async fn flex_id(
         header::HeaderValue::from_str(header_val.as_str())?,
     );
 
-    let req = LexisRequest::new(idv_data)?;
+    let req = LexisRequest::new(idv_data, tenant_identifier)?;
     tracing::info!(req = format!("{:?}", req), "flex_id req");
 
     let response = fp_http_client
@@ -89,7 +91,7 @@ mod tests {
             ssn9: Some(PiiString::from("486639975")),
             dob: Some(PiiString::from("1975-04-02")),
             email: None,
-            phone_number: Some(PiiString::from("333331085551212")),
+            phone_number: Some(PiiString::from("1085551212")),
             ..Default::default()
         };
 
@@ -98,6 +100,7 @@ mod tests {
             LexisFlexIdRequest {
                 idv_data,
                 credentials,
+                tenant_identifier: "test".to_owned(),
             },
         )
         .await

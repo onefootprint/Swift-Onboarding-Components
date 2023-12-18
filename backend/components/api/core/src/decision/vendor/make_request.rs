@@ -156,7 +156,7 @@ pub async fn send_idv_request(
         VendorAPI::LexisFlexId => {
             let credentials = tvc.lexis_credentials();
             send_lexis_flex_id_request(
-                LexisFlexIdRequest { idv_data, credentials },
+                LexisFlexIdRequest { idv_data, credentials, tenant_identifier: tvc.tenant_identifier() },
                 is_production,
                 ob_configuration_key,
                 state.vendor_clients.lexis_flex_id.clone(),

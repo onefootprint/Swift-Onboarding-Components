@@ -321,7 +321,7 @@ pub enum WatchlistKind {
 }
 
 impl LexisRequest {
-    pub fn new(idv_data: IdvData) -> Result<Self, ConversionError> {
+    pub fn new(idv_data: IdvData, tenant_identifier: String) -> Result<Self, ConversionError> {
         let IdvData {
             first_name,
             middle_name,
@@ -362,7 +362,7 @@ impl LexisRequest {
         Ok(Self {
             flex_id_request: FlexIdRequest {
                 user: User {
-                    reference_code: String::from("org_123"), // TODO: TenantID
+                    reference_code: tenant_identifier,
                     // TODO: check with Lexis if we should use 5 or mb 6 here for cases that are not stricly Bifrost
                     glb_purpose: String::from("1"), // Transactions Authorized by Consumer—As necessary to effect, administer, or enforce a transaction requested or authorized by the consumer
                     dl_purpose: String::from("3"), // Use in the Normal Course of Business—For use in the normal course of business but only to verify the accuracy of personal information submitted by the individual to the business; and if the submitted information is incorrect, to obtain the correct information, but only for the purposes of preventing fraud by, pursuing legal remedies against, or recovering on a debt or security interest against, the individual.
