@@ -179,15 +179,19 @@ const setupSentry = () => {
   configureSentry();
 };
 
-const info = (...args: unknown[]) => {
+const info = (message: string, location?: string) => {
+  if (IS_CONSOLE_ENABLED) {
+    console.info(message, location); // eslint-disable-line no-console
+  }
+
   if (IS_LOGGING_ENABLED) {
-    LogRocket.info(...args);
+    LogRocket.info(message, location);
   }
 };
 
 const warn = (message: string, location?: string) => {
   if (IS_CONSOLE_ENABLED) {
-    console.warn(message);
+    console.warn(message, location);
   }
 
   if (IS_LOGGING_ENABLED) {
@@ -197,7 +201,7 @@ const warn = (message: string, location?: string) => {
 
 const error = (message: string, location?: string) => {
   if (IS_CONSOLE_ENABLED) {
-    console.error(message);
+    console.error(message, location);
   }
 
   if (IS_LOGGING_ENABLED) {

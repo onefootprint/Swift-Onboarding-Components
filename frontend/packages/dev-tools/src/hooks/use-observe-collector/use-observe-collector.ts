@@ -69,6 +69,17 @@ const useObserveCollectorImpl = ({ appName }: ObserveCollectorProps) => {
         eventType: 'console',
       });
     };
+
+    const consoleInfo = window.console.info;
+    window.console.info = (...args: unknown[]) => {
+      consoleInfo(args);
+      const stringArgs = args.map((arg: unknown) => `${arg}`);
+      log('info', {
+        message: stringArgs.join(' '),
+        arguments: stringArgs,
+        eventType: 'console',
+      });
+    };
   }
 
   const addToQueue = (payload: Record<string, unknown>) => {

@@ -47,7 +47,7 @@ const CheckRequirements = () => {
   });
 
   const handleOnboardingStatus = (response: OnboardingStatusResponse) => {
-    Logger.info('checkRequirements', response);
+    Logger.info(`Onboarding requirements: ${JSON.stringify(response)}`);
 
     const payload = computeRequirementsToShow(
       !!isTransfer,
