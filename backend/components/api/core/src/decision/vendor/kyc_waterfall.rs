@@ -564,6 +564,7 @@ mod tests {
                         t.id,
                         idology_enabled.0,
                         experian_enabled.0,
+                        false,
                         experian_enabled.0.then(|| "abc123".to_owned()),
                         None,
                     )

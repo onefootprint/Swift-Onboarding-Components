@@ -19,5 +19,6 @@ pub fn create_in_memory(
         experian_enabled,
         experian_subscriber_code,
         middesk_api_key: None,
+        lexis_enabled: false,
     }
 }

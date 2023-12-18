@@ -21,6 +21,8 @@ pub struct TenantVendorControl {
     pub experian_subscriber_code: Option<String>,
 
     pub middesk_api_key: Option<SealedVaultBytes>,
+
+    pub lexis_enabled: bool,
 }
 
 #[derive(Debug, Clone, Queryable, Insertable)]
@@ -31,6 +33,7 @@ struct NewTenantVendorControl {
     experian_enabled: bool,
     experian_subscriber_code: Option<String>,
     middesk_api_key: Option<SealedVaultBytes>,
+    lexis_enabled: bool,
 }
 
 impl TenantVendorControl {
@@ -40,6 +43,7 @@ impl TenantVendorControl {
         tenant_id: TenantId,
         idology_enabled: bool,
         experian_enabled: bool,
+        lexis_enabled: bool,
         experian_subscriber_code: Option<String>,
         middesk_api_key: Option<SealedVaultBytes>,
     ) -> DbResult<Self> {
@@ -49,6 +53,7 @@ impl TenantVendorControl {
             experian_enabled,
             experian_subscriber_code,
             middesk_api_key,
+            lexis_enabled,
         };
         diesel::update(tenant_vendor_control::table)
             .filter(tenant_vendor_control::tenant_id.eq(&tenant_id))

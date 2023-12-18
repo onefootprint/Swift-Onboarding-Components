@@ -1,0 +1,1 @@
+ALTER TABLE tenant_vendor_control DROP COLUMN lexis_enabled;

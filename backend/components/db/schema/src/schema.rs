@@ -946,6 +946,7 @@ table! {
         experian_enabled -> Bool,
         experian_subscriber_code -> Nullable<Text>,
         middesk_api_key -> Nullable<Bytea>,
+        lexis_enabled -> Bool,
     }
 }
 

@@ -26,6 +26,7 @@ async fn create_db_vendor_control(
                 tenant.id.clone(),
                 idology_enabled,
                 experian_enabled,
+                false,
                 experian_subscriber_code,
                 None,
             )
