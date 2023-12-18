@@ -18,14 +18,14 @@ use db::{
 
 use macros::test_state_case;
 use newtypes::{
-    CollectedDataOption, CountryRestriction, DocTypeRestriction, DocumentCdoInfo, DocumentSide, IdDocKind,
-    IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus,
-    IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, PiiBytes, RiskSignalGroupKind, ScopedVaultId,
-    Selfie, TenantId, WorkflowFixtureResult,
+    CollectedDataOption, CountryRestriction, DocKind, DocTypeRestriction, DocumentCdoInfo,
+    DocumentRequestKind, DocumentSide, IdDocKind, IdentityDocumentFixtureResult, IdentityDocumentId,
+    IdentityDocumentStatus, IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, PiiBytes,
+    RiskSignalGroupKind, ScopedVaultId, Selfie, TenantId, WorkflowFixtureResult,
 };
 
 use super::document_test_utils::{
-    mock_enclave_s3_client, mock_ff_client, mock_incode_request, mock_s3_put_object,
+    mock_enclave_s3_client, mock_ff_client, mock_incode_request, mock_s3_put_object, save_document_request,
 };
 
 #[derive(Clone, Copy)]
@@ -33,15 +33,6 @@ pub enum UserKind {
     Live,
     Sandbox(IdentityDocumentFixtureResult),
     Demo,
-}
-impl UserKind {
-    pub fn user_is_live(&self) -> bool {
-        matches!(self, Self::Live)
-    }
-
-    pub fn make_incode_calls(&self) -> bool {
-        self.user_is_live() || matches!(self, Self::Sandbox(IdentityDocumentFixtureResult::Real))
-    }
 }
 #[derive(Clone)]
 pub struct TestCase {
@@ -59,7 +50,7 @@ impl TestCase {
     }
 
     pub fn requires_selfie(&self) -> bool {
-        matches!(self.require_selfie, Selfie::RequireSelfie)
+        matches!(self.require_selfie, Selfie::RequireSelfie) && !self.is_proof_of_ssn_flow()
     }
 
     pub fn identity_doc_fixture(&self) -> Option<IdentityDocumentFixtureResult> {
@@ -68,6 +59,27 @@ impl TestCase {
             UserKind::Sandbox(f) => Some(f),
             UserKind::Demo => todo!(),
         }
+    }
+
+    pub fn user_is_live(&self) -> bool {
+        matches!(self.user_kind, UserKind::Live)
+    }
+
+    pub fn make_incode_calls(&self) -> bool {
+        (self.user_is_live()
+            || matches!(
+                self.user_kind,
+                UserKind::Sandbox(IdentityDocumentFixtureResult::Real)
+            ))
+            && !self.is_proof_of_ssn_flow()
+    }
+
+    pub fn expect_risk_signals(&self) -> bool {
+        !self.is_proof_of_ssn_flow()
+    }
+
+    fn is_proof_of_ssn_flow(&self) -> bool {
+        matches!(self.document_type, IdDocKind::SsnCard)
     }
 }
 
@@ -110,6 +122,15 @@ async fn test_e2e_document_upload_for_all_identity_document_types(
     }
 }
 
+#[test_state_case(UserKind::Live)]
+#[test_state_case(UserKind::Sandbox(IdentityDocumentFixtureResult::Pass))]
+#[tokio::test]
+async fn test_proof_of_ssn(state: &mut State, user_kind: UserKind) {
+    let test_case = TestCase::new(user_kind, IdDocKind::SsnCard, Selfie::None);
+
+    e2e_inner(state, test_case).await;
+}
+
 async fn e2e_inner(state: &mut State, test_case: TestCase) {
     let obc_opts = ObConfigurationOpts {
         must_collect_data: vec![CollectedDataOption::Document(DocumentCdoInfo(
@@ -117,7 +138,7 @@ async fn e2e_inner(state: &mut State, test_case: TestCase) {
             CountryRestriction::None,
             test_case.require_selfie,
         ))],
-        is_live: test_case.user_kind.user_is_live(),
+        is_live: test_case.user_is_live(),
         ..Default::default()
     };
     let user_fixture_result = match test_case.user_kind {
@@ -127,6 +148,20 @@ async fn e2e_inner(state: &mut State, test_case: TestCase) {
     };
     let (t, wf, v, sv, _obc) =
         super::test_helpers::create_kyc_user_and_wf(state, obc_opts, user_fixture_result).await;
+
+    // Save proof of SSN doc req
+    let doc_kind: DocKind = test_case.document_type.into();
+    if matches!(doc_kind, DocKind::ProofOfSsn) {
+        save_document_request(
+            state,
+            DocumentRequestKind::ProofOfSsn,
+            wf.id.clone(),
+            sv.id.clone(),
+            false,
+        )
+        .await;
+    }
+
     let wf_id = wf.id.clone();
     let id_doc_req = CreateIdentityDocumentRequest {
         document_type: test_case.document_type,
@@ -189,7 +224,7 @@ async fn upload_and_process(
     document_id: IdentityDocumentId,
 ) -> DocumentResponse {
     // only make incode requests for live users
-    if test_case.user_kind.make_incode_calls() {
+    if test_case.make_incode_calls() {
         mock_incode_request(state, test_case.document_type, test_case.requires_selfie());
     }
 
@@ -254,14 +289,14 @@ async fn upload_and_process_inner(
     //
     // PROCESS (incode)
     //
-    if test_case.user_kind.make_incode_calls() {
+    if test_case.make_incode_calls() {
         // mock enclave decrypting images in s3 to send to incode
         mock_enclave_s3_client(state, document_id.clone(), &vault.e_private_key).await;
     }
 
     // Assert incode machine is in the right state, but we create the IVS inside handle_document_process on the first pass through,
     // so if we're handling front we won't have it yet
-    if side != DocumentSide::Front && test_case.user_kind.make_incode_calls() {
+    if side != DocumentSide::Front && test_case.make_incode_calls() {
         assert_ivs_in_state(state, document_id.clone(), side_to_ivs_state(side)).await;
     }
 
@@ -284,10 +319,14 @@ async fn assertions(
     document_id: IdentityDocumentId,
 ) {
     let rs = query_risk_signals(state, sv_id, RiskSignalGroupKind::Doc).await;
-    assert!(!rs.is_empty());
+    if test_case.is_proof_of_ssn_flow() {
+        assert!(rs.is_empty());
+    } else {
+        assert!(!rs.is_empty());
+    };
 
     // Only assert incode stuff if we're live
-    if test_case.user_kind.make_incode_calls() {
+    if test_case.make_incode_calls() {
         let ivs = assert_ivs_in_state(
             state,
             document_id.clone(),
