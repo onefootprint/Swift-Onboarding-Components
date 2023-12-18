@@ -1,4 +1,8 @@
 use crate::incode::{
+    doc::response::{
+        AddConsentResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse,
+        GetOnboardingStatusResponse, IncodeOcrFixtureResponseFields, ProcessFaceResponse, ProcessIdResponse,
+    },
     response::{self, OnboardingStartResponse},
     watchlist::response::{Content, Data, Doc, Hit, WatchlistResultResponse},
     IncodeAPIResult, IncodeResponse,
@@ -86,5 +90,119 @@ pub fn watchlist_result_error_response() -> IncodeResponse<WatchlistResultRespon
     IncodeResponse {
         result: IncodeAPIResult::ResponseError(res.clone()),
         raw_response: PiiJsonValue::from(serde_json::to_value(&res).unwrap()),
+    }
+}
+
+pub fn add_side_response() -> IncodeResponse<AddSideResponse> {
+    let raw_response = serde_json::json!({
+        "sharpness": 100,
+        "glare": 100,
+        "horizontalResolution": 0,
+        "classification": false,
+        "typeOfId": "DriversLicense",
+        "countryCode": "USA",
+        "issueYear": 2016,
+        "issueName": "USA DriversLicense DRIVERS_LICENSE",
+        "sessionStatus": "Alive",
+    });
+
+    let parsed: AddSideResponse = serde_json::from_value(raw_response.clone()).unwrap();
+    IncodeResponse {
+        result: IncodeAPIResult::Success(parsed),
+        raw_response: PiiJsonValue::from(serde_json::to_value(&raw_response).unwrap()),
+    }
+}
+
+pub fn add_selfie_response() -> IncodeResponse<AddSelfieResponse> {
+    let raw_response = serde_json::json!({
+      "age": 31,
+      "isBright": true,
+      "hasLenses": false,
+      "confidence": 0,
+      "hasFaceMask": false,
+      "sessionStatus": "Alive"
+    });
+
+    let parsed: AddSelfieResponse = serde_json::from_value(raw_response.clone()).unwrap();
+    IncodeResponse {
+        result: IncodeAPIResult::Success(parsed),
+        raw_response: PiiJsonValue::from(serde_json::to_value(&raw_response).unwrap()),
+    }
+}
+
+pub fn process_face_response() -> IncodeResponse<ProcessFaceResponse> {
+    let raw_response = serde_json::json!({
+      "confidence": 1,
+      "nameMatched": null,
+      "existingUser": false,
+      "existingExternalId": null,
+      "existingInterviewId": null
+    });
+
+    let parsed: ProcessFaceResponse = serde_json::from_value(raw_response.clone()).unwrap();
+    IncodeResponse {
+        result: IncodeAPIResult::Success(parsed),
+        raw_response: PiiJsonValue::from(serde_json::to_value(&raw_response).unwrap()),
+    }
+}
+
+pub fn process_id_response() -> IncodeResponse<ProcessIdResponse> {
+    let raw_response = serde_json::json!(
+        {
+            "success": true
+          }
+    );
+
+    let parsed: ProcessIdResponse = serde_json::from_value(raw_response.clone()).unwrap();
+    IncodeResponse {
+        result: IncodeAPIResult::Success(parsed),
+        raw_response: PiiJsonValue::from(serde_json::to_value(&raw_response).unwrap()),
+    }
+}
+
+pub fn add_consent_response() -> IncodeResponse<AddConsentResponse> {
+    let raw_response = serde_json::json!(
+        {
+            "success": true
+          }
+    );
+
+    let parsed: AddConsentResponse = serde_json::from_value(raw_response.clone()).unwrap();
+    IncodeResponse {
+        result: IncodeAPIResult::Success(parsed),
+        raw_response: PiiJsonValue::from(serde_json::to_value(&raw_response).unwrap()),
+    }
+}
+
+pub fn fetch_scores_response() -> IncodeResponse<FetchScoresResponse> {
+    // TODO parameterize
+    let parsed: FetchScoresResponse = FetchScoresResponse::fixture_response(None).unwrap();
+    IncodeResponse {
+        result: IncodeAPIResult::Success(parsed.clone()),
+        raw_response: PiiJsonValue::from(serde_json::to_value(&parsed).unwrap()),
+    }
+}
+
+pub fn fetch_ocr_response(
+    fixture: Option<IncodeOcrFixtureResponseFields>,
+) -> IncodeResponse<FetchOCRResponse> {
+    // TODO parameterize
+    let raw = FetchOCRResponse::fixture_response(fixture);
+    let parsed: FetchOCRResponse = serde_json::from_value(raw.clone()).unwrap();
+    IncodeResponse {
+        result: IncodeAPIResult::Success(parsed.clone()),
+        raw_response: PiiJsonValue::from(raw),
+    }
+}
+
+pub fn get_onboarding_status_response() -> IncodeResponse<GetOnboardingStatusResponse> {
+    let raw_response = serde_json::json!({
+      "onboardingStatus": "ID_VALIDATION_FINISHED"
+    });
+
+    let parsed: GetOnboardingStatusResponse = serde_json::from_value(raw_response.clone()).unwrap();
+    IncodeResponse {
+        result: IncodeAPIResult::Success(parsed),
+        raw_response: PiiJsonValue::from(serde_json::to_value(&raw_response).unwrap()),
     }
 }
