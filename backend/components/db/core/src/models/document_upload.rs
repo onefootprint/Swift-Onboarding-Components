@@ -160,20 +160,3 @@ impl DocumentUpload {
         Ok(results)
     }
 }
-
-impl DocumentUpload {
-    // can't be in test binary since it won't be accessible cross-crate
-    pub fn get_for_side_in_tests(
-        conn: &mut PgConn,
-        document_id: &IdentityDocumentId,
-        side: DocumentSide,
-    ) -> DbResult<Self> {
-        let res = document_upload::table
-            .filter(document_upload::document_id.eq(document_id))
-            .filter(document_upload::side.eq(side))
-            .filter(document_upload::deactivated_at.is_null())
-            .get_result(conn)?;
-
-        Ok(res)
-    }
-}

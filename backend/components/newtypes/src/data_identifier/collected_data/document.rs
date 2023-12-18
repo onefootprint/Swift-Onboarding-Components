@@ -44,7 +44,7 @@ pub enum CountryRestriction {
     None,
 }
 
-#[derive(Debug, Eq, PartialEq, Hash, Display, EnumString, Clone)]
+#[derive(Debug, Eq, PartialEq, Hash, Display, EnumString, Clone, Copy)]
 #[strum(serialize_all = "snake_case")]
 pub enum Selfie {
     RequireSelfie,
@@ -69,7 +69,7 @@ impl DocumentCdoInfo {
         self.1.clone()
     }
     pub fn selfie(&self) -> Selfie {
-        self.2.clone()
+        self.2
     }
 
     pub fn requires_selfie(&self) -> bool {

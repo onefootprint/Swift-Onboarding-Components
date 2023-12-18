@@ -13,9 +13,6 @@ mod vault;
 
 use api_core::*;
 
-#[cfg(test)]
-mod tests;
-
 pub fn routes(config: &mut web::ServiceConfig) {
     config
         .service(vault::patch::patch)

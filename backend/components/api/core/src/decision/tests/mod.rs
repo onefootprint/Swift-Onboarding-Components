@@ -21,3 +21,11 @@ mod tenant_vendor_control;
 #[allow(clippy::unwrap_used)]
 #[cfg(test)]
 pub mod test_helpers;
+
+#[allow(clippy::unwrap_used)]
+#[cfg(test)]
+pub mod document;
+
+#[allow(clippy::unwrap_used)]
+#[cfg(test)]
+pub mod document_test_utils;
