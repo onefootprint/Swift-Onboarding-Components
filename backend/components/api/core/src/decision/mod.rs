@@ -1,6 +1,7 @@
 use newtypes::{incode::IncodeDocumentType, ObConfigurationId, Vendor, VendorAPI, VerificationResultId};
 
 pub mod biz_risk;
+pub mod document;
 pub mod engine;
 pub mod features;
 pub mod field_validations;
