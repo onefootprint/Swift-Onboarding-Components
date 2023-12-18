@@ -264,6 +264,8 @@ impl IdentityDocument {
         use db_schema::schema::{incode_verification_session, scoped_vault};
         let count = identity_document::table
             .inner_join(document_request::table.inner_join(scoped_vault::table))
+            // This will have the effect of not charging for SSN cards since we don't verify them
+            // with incode
             .inner_join(incode_verification_session::table)
             // Basic filters
             .filter(scoped_vault::is_live.eq(true))
