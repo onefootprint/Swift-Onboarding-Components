@@ -14,6 +14,7 @@ use incode::doc::response::{
 };
 use incode::response::OnboardingStartResponse;
 use incode::watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse};
+use lexis::response::FlexIdResponse;
 use middesk::response::business::BusinessResponse;
 use middesk::response::webhook::{MiddeskBusinessUpdateWebhookResponse, MiddeskTinRetriedWebhookResponse};
 use newtypes::{PiiJsonValue, VendorAPI};
@@ -68,6 +69,7 @@ pub enum ParsedResponse {
     FootprintDeviceAttestation(footprint::FootprintDeviceAttestationData),
     AwsTextract(PiiJsonValue),
     AwsRekognition(PiiJsonValue),
+    LexisFlexId(FlexIdResponse),
 }
 
 impl ParsedResponse {
@@ -227,6 +229,11 @@ impl ParsedResponse {
         let parsed = crate::stytch::response::parse_response(raw_response).map_err(Error::from)?;
         Ok(Self::StytchLookup(parsed))
     }
+
+    pub fn from_lexis_flex_id(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
+        let parsed = crate::lexis::parse_response(raw_response).map_err(Error::from)?;
+        Ok(Self::LexisFlexId(parsed))
+    }
 }
 
 #[derive(Clone)]
@@ -266,6 +273,8 @@ pub enum Error {
     StytchError(#[from] stytch::error::Error),
     #[error("Aws Rekognition error: {0}")]
     AwsRekognitionError(#[from] selfie_doc::AwsSelfieDocError),
+    #[error("LexisError: {0}")]
+    LexisError(#[from] lexis::Error),
 }
 
 impl From<&ParsedResponse> for VendorAPI {
@@ -301,6 +310,7 @@ impl From<&ParsedResponse> for VendorAPI {
             ParsedResponse::FootprintDeviceAttestation(_) => VendorAPI::FootprintDeviceAttestation,
             ParsedResponse::AwsTextract(_) => VendorAPI::AwsTextract,
             ParsedResponse::AwsRekognition(_) => VendorAPI::AwsRekognition,
+            ParsedResponse::LexisFlexId(_) => VendorAPI::LexisFlexId,
         }
     }
 }

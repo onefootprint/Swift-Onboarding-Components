@@ -32,7 +32,7 @@ pub enum Vendor {
     Footprint,
     Idology,
     Socure,
-    LexisNexis,
+    Lexis,
     Experian,
     Twilio,
     Middesk,
@@ -92,6 +92,7 @@ pub enum VendorAPI {
     FootprintDeviceAttestation,
     AwsRekognition,
     AwsTextract,
+    LexisFlexId,
 }
 impl_enum_str_diesel!(VendorAPI);
 
@@ -127,6 +128,7 @@ impl From<VendorAPI> for Vendor {
             VendorAPI::FootprintDeviceAttestation => Self::Footprint,
             VendorAPI::AwsRekognition => Self::Footprint,
             VendorAPI::AwsTextract => Self::Footprint,
+            VendorAPI::LexisFlexId => Self::Lexis,
         }
     }
 }
@@ -142,7 +144,10 @@ impl VendorAPI {
     // temporary hack to allow us to filter to just vendor calls that are made in a batch of KYC vendor calls
     pub fn is_kyc_call(&self) -> bool {
         match self {
-            VendorAPI::IdologyExpectId | VendorAPI::TwilioLookupV2 | VendorAPI::ExperianPreciseId => true,
+            VendorAPI::IdologyExpectId
+            | VendorAPI::TwilioLookupV2
+            | VendorAPI::ExperianPreciseId
+            | VendorAPI::LexisFlexId => true,
             VendorAPI::IdologyScanVerifySubmission
             | VendorAPI::IdologyScanVerifyResults
             | VendorAPI::IdologyScanOnboarding
@@ -202,7 +207,8 @@ impl VendorAPI {
             | VendorAPI::StytchLookup
             | VendorAPI::FootprintDeviceAttestation
             | VendorAPI::AwsRekognition
-            | VendorAPI::AwsTextract => false,
+            | VendorAPI::AwsTextract
+            | VendorAPI::LexisFlexId => false,
         }
     }
 }

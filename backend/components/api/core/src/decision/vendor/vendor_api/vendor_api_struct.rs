@@ -39,6 +39,7 @@ pub enum WrappedVendorAPI {
     FootprintDeviceAttestation,
     AwsRekognition,
     AwsTextract,
+    LexisFlexId,
 }
 impl From<VendorAPI> for WrappedVendorAPI {
     fn from(value: VendorAPI) -> Self {
@@ -72,6 +73,7 @@ impl From<VendorAPI> for WrappedVendorAPI {
             VendorAPI::FootprintDeviceAttestation => Self::FootprintDeviceAttestation,
             VendorAPI::AwsRekognition => Self::AwsRekognition,
             VendorAPI::AwsTextract => Self::AwsTextract,
+            VendorAPI::LexisFlexId => Self::LexisFlexId,
         }
     }
 }
@@ -108,6 +110,7 @@ impl From<WrappedVendorAPI> for VendorAPI {
             WrappedVendorAPI::FootprintDeviceAttestation => VendorAPI::FootprintDeviceAttestation,
             WrappedVendorAPI::AwsRekognition => VendorAPI::AwsRekognition,
             WrappedVendorAPI::AwsTextract => VendorAPI::AwsTextract,
+            WrappedVendorAPI::LexisFlexId => VendorAPI::LexisFlexId,
         }
     }
 }

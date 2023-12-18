@@ -1,4 +1,5 @@
 use db::models::{verification_request::VerificationRequest, verification_result::VerificationResult};
+use idv::lexis::response::FlexIdResponse;
 use idv::stytch;
 use newtypes::{
     EncryptedVaultPrivateKey, PiiJsonValue, ScrubbedPiiJsonValue, SealedVaultBytes, VendorAPI,
@@ -120,6 +121,7 @@ pub fn scrub_raw_error_vendor_response(
         VendorAPI::FootprintDeviceAttestation => scrub_response::<FootprintDeviceAttestation>(raw_response),
         VendorAPI::AwsRekognition => scrub_response::<AwsRekognition>(raw_response),
         VendorAPI::AwsTextract => scrub_response::<AwsTextract>(raw_response),
+        VendorAPI::LexisFlexId => scrub_response::<LexisFlexId>(raw_response),
     }
 }
 
@@ -184,6 +186,7 @@ fn build_parsed_vendor_response_map_entry(
         }
         VendorAPI::AwsRekognition => insert_map_entry(map, AwsRekognition, raw_response)?,
         VendorAPI::AwsTextract => insert_map_entry(map, AwsTextract, raw_response)?,
+        VendorAPI::LexisFlexId => insert_map_entry(map, LexisFlexId, raw_response)?,
     };
 
     Ok(())
@@ -228,6 +231,7 @@ fn build_verification_identifier_map_entry(
         VendorAPI::FootprintDeviceAttestation => map.insert(FootprintDeviceAttestation, request_and_result),
         VendorAPI::AwsRekognition => map.insert(AwsRekognition, request_and_result),
         VendorAPI::AwsTextract => map.insert(AwsTextract, request_and_result),
+        VendorAPI::LexisFlexId => map.insert(LexisFlexId, request_and_result),
     };
 }
 
@@ -394,6 +398,9 @@ impl TypedMapKey<VendorAPIResponseMarker> for AwsRekognition {
 impl TypedMapKey<VendorAPIResponseMarker> for AwsTextract {
     type Value = serde_json::Value;
 }
+impl TypedMapKey<VendorAPIResponseMarker> for LexisFlexId {
+    type Value = FlexIdResponse;
+}
 
 /// Verification Request and Result map, used in conjunction with the above map for reason codes
 impl TypedMapKey<VendorAPIResponseIdsMarker> for IdologyExpectID {
@@ -481,6 +488,9 @@ impl TypedMapKey<VendorAPIResponseIdsMarker> for AwsRekognition {
     type Value = VerificationRequestAndResult;
 }
 impl TypedMapKey<VendorAPIResponseIdsMarker> for AwsTextract {
+    type Value = VerificationRequestAndResult;
+}
+impl TypedMapKey<VendorAPIResponseIdsMarker> for LexisFlexId {
     type Value = VerificationRequestAndResult;
 }
 

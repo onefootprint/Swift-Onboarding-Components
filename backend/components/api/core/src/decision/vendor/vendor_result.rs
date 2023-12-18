@@ -229,6 +229,7 @@ fn deserialize_from_vendor_api(
         // These json responses are subject to change, so for safety don't plan on ever using the deserialized version
         VendorAPI::AwsRekognition => ParsedResponse::AwsRekognition(raw_response.into()),
         VendorAPI::AwsTextract => ParsedResponse::AwsTextract(raw_response.into()),
+        VendorAPI::LexisFlexId => ParsedResponse::from_lexis_flex_id(raw_response)?,
     };
 
     Ok(res)

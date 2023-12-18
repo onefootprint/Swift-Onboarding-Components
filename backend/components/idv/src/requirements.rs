@@ -58,6 +58,18 @@ pub fn vendor_api_requirements_are_satisfied(
         ],
     };
 
+    let lexis_flex_id_requirements: MinimumIDVRequirements = MinimumIDVRequirements {
+        // technicaly Lexis doesn't seem to error if all of these are even missing but this is what they recommend and its in line with our other kyc reqs
+        required: vec![
+            IdentityDataKind::FirstName,
+            IdentityDataKind::LastName,
+            IdentityDataKind::AddressLine1,
+            IdentityDataKind::Zip,
+            IdentityDataKind::State,
+            IdentityDataKind::City,
+        ],
+    };
+
     let idology_pa_requirements: MinimumIDVRequirements = MinimumIDVRequirements {
         required: vec![
             IdentityDataKind::FirstName,
@@ -103,6 +115,7 @@ pub fn vendor_api_requirements_are_satisfied(
         VendorAPI::FootprintDeviceAttestation => false,
         VendorAPI::AwsRekognition => false,
         VendorAPI::AwsTextract => false,
+        VendorAPI::LexisFlexId => lexis_flex_id_requirements.are_satisfied(present_data_lifetime_kinds),
     }
 }
 
@@ -146,6 +159,7 @@ fn vendor_api_eligible_for_onboarding_kyc(vendor_api: &VendorAPI) -> bool {
         VendorAPI::FootprintDeviceAttestation => false,
         VendorAPI::AwsRekognition => false,
         VendorAPI::AwsTextract => false,
+        VendorAPI::LexisFlexId => false, // off for now until we gain confidence in integration and shadow log for a period etc
     }
 }
 
