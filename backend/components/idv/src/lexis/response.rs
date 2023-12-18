@@ -1,6 +1,9 @@
+use crate::lexis;
 use newtypes::*;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
+
+use super::ResponseError;
 
 #[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
 #[serde(rename_all = "PascalCase")]
@@ -8,6 +11,30 @@ use std::fmt::Debug;
 pub struct FlexIdResponse {
     #[serde(rename = "FlexIDResponseEx")]
     pub flex_id_response_ex: Option<FlexIdResponseEx>,
+    pub fault: Option<Fault>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
+// this ones not PascalCase lol
+#[allow(non_snake_case)]
+pub struct Fault {
+    pub detail: Option<FaultDetail>,
+    pub faultactor: Option<String>,
+    pub faultstring: Option<String>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
+#[serde(rename_all = "PascalCase")]
+#[allow(non_snake_case)]
+pub struct FaultDetail {
+    pub exceptions: Option<Exceptions>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
+#[serde(rename_all = "PascalCase")]
+#[allow(non_snake_case)]
+pub struct Exceptions {
+    pub exception: Option<Vec<Exception>>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
@@ -22,7 +49,7 @@ pub struct FlexIdResponseEx {
 #[allow(non_snake_case)]
 pub struct Response {
     pub header: Option<Header>,
-    pub result: Option<Result>,
+    pub result: Option<LResult>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
@@ -39,7 +66,7 @@ pub struct Header {
     pub query_id: Option<String>,
     /// Unique LexisNexis Risk Solutions transaction ID
     pub transaction_id: Option<String>,
-    pub exceptions: Option<Vec<Exception>>,
+    pub exceptions: Option<Exceptions>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
@@ -49,7 +76,7 @@ pub struct Exception {
     /// System component that reports the error
     pub source: Option<String>,
     /// HTML error code (see "HTTP Errors" on page 376)
-    pub code: Option<i32>,
+    pub code: Option<String>,
     /// Location of the error that occurred
     pub location: Option<String>,
     /// Description of the error that occurred
@@ -59,7 +86,7 @@ pub struct Exception {
 #[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
 #[serde(rename_all = "PascalCase")]
 #[allow(non_snake_case)]
-pub struct Result {
+pub struct LResult {
     pub input_echo: Option<InputEcho>,
     /// LexID number
     pub unique_id: Option<String>,
@@ -402,8 +429,54 @@ pub struct Dob {
     pub day: Option<ScrubbedPiiString>,
 }
 
+impl FlexIdResponse {
+    fn result(&self) -> Option<&LResult> {
+        self.flex_id_response_ex
+            .as_ref()
+            .and_then(|r| r.response.as_ref())
+            .and_then(|r: &Response| r.result.as_ref())
+    }
+
+    fn header(&self) -> Option<&Header> {
+        self.flex_id_response_ex
+            .as_ref()
+            .and_then(|r| r.response.as_ref())
+            .and_then(|r| r.header.as_ref())
+    }
+
+    fn error(&self) -> Option<ResponseError> {
+        let error_message = self.header().and_then(|r| r.message.clone());
+        let exceptions = self
+            .header()
+            .and_then(|h| h.exceptions.as_ref())
+            .and_then(|e| e.exception.clone())
+            .unwrap_or_default();
+        let fault = self.fault.clone();
+
+        // if any of these possible indications of an error are present, then treat this as a ErrorResponse
+        if error_message.is_some() || !exceptions.is_empty() || fault.is_some() {
+            Some(ResponseError::ErrorResponse(Box::new(self.clone())))
+        } else if self.result().is_none() {
+            // if we have an empty result body for whatever reason then also treat that as an error
+            Some(ResponseError::MissingResult(Box::new(self.clone())))
+        } else {
+            None
+        }
+    }
+
+    pub fn validate(&self) -> Result<(), lexis::Error> {
+        if let Some(err) = self.error() {
+            Err(err.into())
+        } else {
+            Ok(())
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use crate::lexis;
+
     use super::*;
     use serde_json::json;
 
@@ -482,10 +555,11 @@ mod tests {
           }
         });
 
-        let parsed: FlexIdResponse = serde_json::from_value(json).unwrap();
+        let parsed = lexis::parse_response(json).unwrap();
 
         assert_eq!(
             FlexIdResponse {
+                fault: None,
                 flex_id_response_ex: Some(FlexIdResponseEx {
                     response: Some(Response {
                         header: Some(Header {
@@ -496,7 +570,7 @@ mod tests {
                             transaction_id: Some("173737581S921904".to_owned()),
                             exceptions: None
                         }),
-                        result: Some(Result {
+                        result: Some(LResult {
                             input_echo: Some(InputEcho {
                                 name: Some(Name {
                                     full: None,
@@ -605,5 +679,58 @@ mod tests {
             },
             parsed
         );
+    }
+
+    #[test]
+    pub fn test_validate() {
+        let parsed = lexis::parse_response(serde_json::json!(  {
+          "Fault": {
+            "detail": {
+              "Exceptions": {
+                "Exception": [
+                  {
+                    "Code": "401",
+                    "Message": "[401: Insufficient privilege to run the function AllowFlexIDSSNVerification] "
+                  }
+                ]
+              }
+            },
+            "faultactor": "Esp",
+            "faultstring": "[401: Insufficient privilege to run the function AllowFlexIDSSNVerification] "
+          }
+        }))
+        .unwrap();
+        let lexis::Error::ResponseError(e) = parsed.validate().unwrap_err() else {
+            panic!();
+        };
+        assert!(matches!(e, ResponseError::ErrorResponse(_)));
+
+        let parsed = lexis::parse_response(serde_json::json!(  {
+          "Fault": {
+            "detail": {
+              "Exceptions": {
+                "Exception": [
+                  {
+                    "Code": "-1",
+                    "Message": "[ -1: Invalid value for type DOBMatchType: Exac] "
+                  }
+                ]
+              }
+            },
+            "faultactor": "Esp",
+            "faultstring": "[ -1: Invalid value for type DOBMatchType: Exac] "
+          }
+        }))
+        .unwrap();
+        let lexis::Error::ResponseError(e) = parsed.validate().unwrap_err() else {
+              panic!();
+          };
+        assert!(matches!(e, ResponseError::ErrorResponse(_)));
+
+        let parsed = lexis::parse_response(serde_json::json!({})).unwrap();
+        let lexis::Error::ResponseError(e) = parsed.validate().unwrap_err() else {
+                panic!();
+            };
+        assert!(matches!(e, ResponseError::MissingResult(_)));
     }
 }

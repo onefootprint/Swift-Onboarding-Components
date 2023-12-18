@@ -1,7 +1,6 @@
-use super::decode_response;
 use crate::footprint_http_client::FootprintVendorHttpClient;
 use crate::lexis::request::LexisRequest;
-use crate::lexis::ReqwestError;
+use crate::lexis::{self, ReqwestError};
 use newtypes::vendor_credentials::LexisCredentials;
 use newtypes::IdvData;
 use reqwest::header;
@@ -15,7 +14,7 @@ pub struct LexisFlexIdRequest {
 pub async fn flex_id(
     fp_http_client: &FootprintVendorHttpClient,
     req: LexisFlexIdRequest,
-) -> Result<serde_json::Value, crate::lexis::Error> {
+) -> Result<serde_json::Value, lexis::Error> {
     let LexisFlexIdRequest {
         idv_data,
         credentials,
@@ -44,18 +43,11 @@ pub async fn flex_id(
         .send()
         .await
         .map_err(|err| ReqwestError::ReqwestSendError(err.to_string()))?;
-
-    let json_response = decode_response::<serde_json::Value>(response).await;
-
-    match json_response {
-        Ok(_) => {
-            tracing::info!("flex_id success");
-        }
-        Err(ref err) => {
-            tracing::error!(?err, "flex_id error");
-        }
-    }
-    json_response
+    let response = response
+        .json::<serde_json::Value>()
+        .await
+        .map_err(lexis::Error::from)?;
+    Ok(response)
 }
 
 #[cfg(test)]
@@ -89,7 +81,7 @@ mod tests {
             ssn9: Some(PiiString::from("486639975")),
             dob: Some(PiiString::from("1975-04-02")),
             email: None,
-            phone_number: Some(PiiString::from("1085551212")),
+            phone_number: Some(PiiString::from("333331085551212")),
             ..Default::default()
         };
 
