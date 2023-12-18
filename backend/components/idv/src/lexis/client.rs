@@ -2,13 +2,21 @@ use crate::footprint_http_client::FootprintVendorHttpClient;
 use crate::lexis::request::LexisRequest;
 use crate::lexis::{self, ReqwestError};
 use newtypes::vendor_credentials::LexisCredentials;
-use newtypes::IdvData;
+use newtypes::{IdvData, PiiJsonValue};
 use reqwest::header;
 use std::time::Duration;
+
+use super::response::FlexIdResponse;
 
 pub struct LexisFlexIdRequest {
     pub idv_data: IdvData,
     pub credentials: LexisCredentials,
+}
+
+#[derive(Clone)]
+pub struct LexisFlexIdResponse {
+    pub raw_response: PiiJsonValue,
+    pub parsed_response: FlexIdResponse,
 }
 
 pub async fn flex_id(

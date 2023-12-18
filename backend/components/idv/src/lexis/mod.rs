@@ -1,6 +1,8 @@
 pub mod client;
 mod request;
 pub mod response;
+use newtypes::PiiJsonValue;
+
 use self::response::FlexIdResponse;
 
 pub fn parse_response(value: serde_json::Value) -> Result<FlexIdResponse, Error> {
@@ -24,6 +26,8 @@ pub enum Error {
     InvalidHeader(#[from] reqwest::header::InvalidHeaderValue),
     #[error("lexis response error: {0}")]
     ResponseError(#[from] ResponseError),
+    #[error("Parsable APIError {0}")]
+    ErrorWithResponse(Box<ErrorWithResponse>),
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -72,6 +76,36 @@ pub enum ResponseError {
         310 Incomplete address
         311 Highly-populated address
      */
+}
+
+impl Error {
+    pub fn into_error_with_response(self, response: serde_json::Value) -> Self {
+        Self::ErrorWithResponse(Box::new(ErrorWithResponse {
+            error: self,
+            response: response.into(),
+        }))
+    }
+}
+
+// TODO: we keep copy pasting this, should generify it and share
+pub struct ErrorWithResponse {
+    pub error: Error,
+    pub response: PiiJsonValue,
+}
+
+impl std::fmt::Display for ErrorWithResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.error)
+    }
+}
+
+impl std::fmt::Debug for ErrorWithResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ErrorWithResponse")
+            .field("error", &self.error)
+            .field("response", &"<omitted>")
+            .finish()
+    }
 }
 
 #[cfg(test)]

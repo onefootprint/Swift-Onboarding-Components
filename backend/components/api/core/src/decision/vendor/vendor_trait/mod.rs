@@ -1,6 +1,7 @@
 pub mod experian;
 pub mod idology;
 pub mod incode;
+pub mod lexis;
 pub mod middesk;
 pub mod socure;
 pub mod stytch;
