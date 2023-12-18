@@ -122,8 +122,8 @@ const DataCollection = ({
               title={t('non-us-residents.title')}
               options={{
                 internationalCountryRestrictions,
-                idDocKind: [SupportedIdDocTypes.passport],
-                selfie: true,
+                idDocKind: idDocKinds,
+                selfie,
               }}
             />
           ) : (
