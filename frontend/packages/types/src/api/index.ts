@@ -76,6 +76,7 @@ export type {
   GetOrgMetricsRequest,
   GetOrgMetricsResponse,
 } from './get-org-metrics';
+export type { GetOrgRiskSignalsResponse } from './get-org-risk-signals';
 export type {
   GetPinnedAnnotationsRequest,
   GetPinnedAnnotationsResponse,

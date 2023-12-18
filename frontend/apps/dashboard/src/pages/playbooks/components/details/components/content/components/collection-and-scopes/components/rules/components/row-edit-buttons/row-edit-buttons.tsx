@@ -10,15 +10,15 @@ import useEditRule from '../../hooks/use-edit-rule';
 export type RowEditButtonsProps = {
   playbookId: string;
   editedRule: Rule;
-  onCancelClick: () => void;
-  onSubmitClick: () => void;
+  onCancel: () => void;
+  onSubmit: () => void;
 };
 
 const RowEditButtons = ({
   playbookId,
   editedRule,
-  onCancelClick,
-  onSubmitClick,
+  onCancel: onCancelClick,
+  onSubmit: onSubmitClick,
 }: RowEditButtonsProps) => {
   const { t, allT } = useTranslation(
     'pages.playbooks.details.rules.action-row',
@@ -70,7 +70,7 @@ const RowEditButtons = ({
   };
 
   return (
-    <Stack direction="column" gap={7} marginTop={5}>
+    <Stack direction="column" gap={7}>
       <Stack align="center" justify="space-between">
         <Stack align="center" gap={3}>
           <Button size="small" onClick={handleSaveEdit}>

@@ -187,6 +187,7 @@ export {
   TriggerKind,
   UserTokenScope,
 } from './api';
+export type { GetOrgRiskSignalsResponse } from './api/get-org-risk-signals';
 export type {
   AccessEvent,
   AccessLog,

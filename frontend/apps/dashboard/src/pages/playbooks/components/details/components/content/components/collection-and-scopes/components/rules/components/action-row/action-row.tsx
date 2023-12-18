@@ -1,13 +1,14 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoPlusSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { type Rule, RuleOp } from '@onefootprint/types';
-import { Badge, LinkButton, Stack } from '@onefootprint/ui';
-import { createFontStyles } from '@onefootprint/ui/src/utils/mixins/mixins';
+import { type Rule, type RuleField, RuleOp } from '@onefootprint/types';
+import { Badge, createFontStyles, LinkButton, Stack } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import useSession from 'src/hooks/use-session';
 
 import OpBadge from '../op-badge';
 import RowEditButtons from '../row-edit-buttons';
+import RiskSignalSelect from './components/risk-signal-select';
 
 export type ActionRowProps = {
   playbookId: string;
@@ -21,6 +22,9 @@ const ActionRow = ({ playbookId, rule }: ActionRowProps) => {
   const isFirmEmployee = useSession().data.user?.isFirmEmployee;
   const [isEditing, setIsEditing] = useState(false);
   const [editedRule, setEditedRule] = useState<Rule>(rule);
+  const [expressions, setExpressions] = useState<RuleField[]>(
+    rule.ruleExpression,
+  );
 
   const handleStartEdit = () => {
     setIsEditing(true);
@@ -37,6 +41,27 @@ const ActionRow = ({ playbookId, rule }: ActionRowProps) => {
     setIsEditing(false);
   };
 
+  const handleAdd = () => {
+    const canAdd = !expressions.some(expression => expression.field === '');
+    if (!canAdd) return;
+
+    setExpressions(currentExpressions => [
+      ...currentExpressions,
+      { field: '', op: RuleOp.eq, value: true },
+    ]);
+  };
+
+  const handleChange = (expression: RuleField) => (nextValue: string) => {
+    setExpressions(currentExpressions =>
+      currentExpressions.map(currentExpression =>
+        currentExpression === expression
+          ? { ...currentExpression, field: nextValue }
+          : currentExpression,
+      ),
+    );
+    // TODO: Save in the DB
+  };
+
   const handleSubmitEdit = () => {
     setIsEditing(false);
   };
@@ -45,25 +70,43 @@ const ActionRow = ({ playbookId, rule }: ActionRowProps) => {
     <RulesListItem data-is-editing={isEditing}>
       <div>
         {t('if')}
-        {rule.ruleExpression.map(({ field: reasonCode, op }, index) => (
-          <React.Fragment key={reasonCode}>
+        {expressions.map((expression, index) => (
+          <React.Fragment key={expression.field}>
             {index > 0 && t('and')}
             <OpBadge
-              isActive={op === RuleOp.notEq}
+              isActive={expression.op === RuleOp.notEq}
               isEditable={isEditing}
               onClick={isNotEq => handleToggleOp(index, isNotEq)}
             />
-            <Badge variant="info">{reasonCode}</Badge>
+            {expression.field ? (
+              <Badge variant="info">{expression.field}</Badge>
+            ) : (
+              <RiskSignalSelect
+                value={expression.field}
+                onDelete={() => {}}
+                onChange={handleChange(expression)}
+              />
+            )}
           </React.Fragment>
         ))}
       </div>
       {isEditing ? (
-        <RowEditButtons
-          playbookId={playbookId}
-          editedRule={editedRule}
-          onCancelClick={handleCancelEdit}
-          onSubmitClick={handleSubmitEdit}
-        />
+        <Stack gap={7} direction="column" marginTop={3}>
+          <LinkButton
+            size="xTiny"
+            iconComponent={IcoPlusSmall16}
+            iconPosition="left"
+            onClick={handleAdd}
+          >
+            {t('add')}
+          </LinkButton>
+          <RowEditButtons
+            playbookId={playbookId}
+            editedRule={editedRule}
+            onCancel={handleCancelEdit}
+            onSubmit={handleSubmitEdit}
+          />
+        </Stack>
       ) : (
         isFirmEmployee && (
           <LinkButton size="tiny" onClick={handleStartEdit}>
@@ -89,6 +132,7 @@ const RulesListItem = styled(Stack)`
       align-items: center;
       justify-content: space-between;
     }
+
     &[data-is-editing='true'] {
       flex-direction: column;
     }

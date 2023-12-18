@@ -2195,6 +2195,12 @@
               "title": "Success!",
               "edit-description": "Rule edited.",
               "delete-description": "Rule deleted."
+            },
+            "risk-signals-select": {
+              "title": "Risk signals",
+              "aria-label": "Risk signals",
+              "placeholder": "Select...",
+              "delete": "Delete"
             }
           }
         }
