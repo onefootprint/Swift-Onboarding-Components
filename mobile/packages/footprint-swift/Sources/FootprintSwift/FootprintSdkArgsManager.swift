@@ -28,7 +28,7 @@ public class FootprintSdkArgsManager {
                     self.errorManager?.log(error: "Converting configuration object to JSON failed.")
                     return nil
                 }
-                let body = try! JSONSerialization.data(withJSONObject: [
+                let body = try JSONSerialization.data(withJSONObject: [
                     "kind": "verify_v1",
                     "data": configurationJSON
                 ])

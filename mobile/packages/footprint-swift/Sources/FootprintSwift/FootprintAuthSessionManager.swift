@@ -48,7 +48,7 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
             return
         }
 
-        let url = try! self.getURL(token: token)
+        let url = try self.getURL(token: token)
         self.authSession = ASWebAuthenticationSession(
             url: url,
             callbackURLScheme: self.configuration.scheme

@@ -46,13 +46,13 @@ struct ContentView: View {
                     l10n: FootprintL10n(locale: .esMX),
                     appearance: appearance,
                     onCancel: {
-                        print("cancel")
+                        print("User canceled")
                     },
                     onComplete: { validationToken in
-                        print("Validation Token: \(validationToken)")
+                        print("Validation token: \(validationToken)")
                     },
                     onError: { error in
-                        print("TENANT received error: \(error)")
+                        print("Tenant received error: \(error)")
                     }
                 )
                 
