@@ -13,17 +13,6 @@ from tests.bifrost_client import BifrostClient
 from tests.headers import SandboxId, FpAuth
 
 
-@pytest.fixture(scope="session")
-def auth_playbook(sandbox_tenant):
-    return create_ob_config(
-        sandbox_tenant,
-        "Auth playbook",
-        ["phone_number", "email"],
-        ["phone_number", "email"],
-        kind="auth",
-    )
-
-
 class User(typing.NamedTuple):
     fp_id: str
     sandbox_id: str

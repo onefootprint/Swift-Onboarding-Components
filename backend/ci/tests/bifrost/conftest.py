@@ -30,3 +30,14 @@ def skip_phone_obc(sandbox_tenant):
         optional_data=[],
         is_no_phone_flow=True,
     )
+
+
+@pytest.fixture(scope="session")
+def auth_playbook(sandbox_tenant):
+    return create_ob_config(
+        sandbox_tenant,
+        "Auth playbook",
+        ["phone_number", "email"],
+        ["phone_number", "email"],
+        kind="auth",
+    )
