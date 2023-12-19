@@ -3,6 +3,12 @@ import { fromUSDateToISO8601Format, strInputToUSDate } from './index';
 describe('strInputToUSDate', () => {
   it.each`
     locale     | str             | output
+    ${'en-US'} | ${''}           | ${''}
+    ${'en-US'} | ${null}         | ${''}
+    ${'en-US'} | ${undefined}    | ${''}
+    ${'en-US'} | ${' '}          | ${''}
+    ${'en-US'} | ${true}         | ${''}
+    ${'en-US'} | ${1}            | ${''}
     ${'en-US'} | ${'1/1/1997'}   | ${'01/01/1997'}
     ${'en-US'} | ${'1/2/1997'}   | ${'01/02/1997'}
     ${'en-US'} | ${'12/12/1997'} | ${'12/12/1997'}
@@ -19,6 +25,13 @@ describe('strInputToUSDate', () => {
 describe('fromUSDateToISO8601Format', () => {
   it.each`
     date            | output
+    ${''}           | ${undefined}
+    ${' '}          | ${undefined}
+    ${null}         | ${undefined}
+    ${undefined}    | ${undefined}
+    ${[]}           | ${undefined}
+    ${true}         | ${undefined}
+    ${1}            | ${undefined}
     ${'1/1/1997'}   | ${'1997-01-01'}
     ${'1/02/1997'}  | ${'1997-01-02'}
     ${'01/2/1997'}  | ${'1997-01-02'}
