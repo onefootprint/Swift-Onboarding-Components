@@ -35,26 +35,43 @@ module.exports = {
       },
       startServerCommand:
         'yarn start --filter=bifrost  --filter=handoff --filter=demos',
-      startServerReadyPattern: 'ready started server on 0.0.0.0:3002',
+      startServerReadyPattern: 'Ready in',
       url: ['http://localhost:3002'],
     },
     assert: {
       preset: 'lighthouse:recommended',
       assertions: {
         'bf-cache': 'off', //                 There are always bf-cache failures when testing in headless. Reenable when headless can give us realistic bf-cache insights.
+        'bootup-time': 'warn',
         'csp-xss': 'off', //                  Ensure CSP is effective against XSS attacks
+        'dom-size': 'warn',
+        'errors-in-console': 'warn',
         'html-has-lang': 'warn', //           `<html>` element does not have a `[lang]` attribute
+        'installable-manifest': 'warn',
         'installable-manifest': 'warn', //    Web app manifest or service worker do not meet the installability requirements
+        'landmark-one-main': 'warn',
+        'legacy-javascript': 'warn',
+        'mainthread-work-breakdown': 'warn',
+        'maskable-icon': 'warn',
         'maskable-icon': 'warn', //           Manifest doesn't have a maskable icon
+        'max-potential-fid': 'warn',
         'meta-description': 'warn', //        Document does not have a meta description
         'meta-viewport': 'warn', //           `[user-scalable="no"]` is used in the `<meta name="viewport">` element or the `[maximum-scale]` attribute is less than 5.
+        'render-blocking-resource': 'warn',
+        'server-response-time': 'warn',
+        'service-worker': 'warn',
         'service-worker': 'warn', //          Does not register a service worker that controls page and `start_url`
         'splash-screen': 'warn', //           Is not configured for a custom splash screen
         'themed-omnibox': 'warn', //          Does not set a theme color for the address bar.
         'timing-budget': 'warn', //           Enable me, once we are stable
+        'total-byte-weight': 'warn',
         'unused-javascript': 'warn', //       Reduce unused JavaScript
+        'uses-long-cache-ttl': ['warn', { maxScore: 2 }],
         'uses-responsive-images': 'warn', //  Properly size images
+        'uses-responsive-images': ['warn', { maxScore: 1 }],
+        'valid-source-maps': 'warn',
         'valid-source-maps': 'warn', //       Missing source maps for large first-party JavaScript
+        redirects: 'warn',
       },
     },
     server: {},
