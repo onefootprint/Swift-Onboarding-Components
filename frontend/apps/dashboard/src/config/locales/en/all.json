@@ -2072,7 +2072,8 @@
           "type": {
             "kyc": "KYC",
             "kyb": "KYB",
-            "auth": "Auth"
+            "auth": "Auth",
+            "document": "Document"
           },
           "status": {
             "enabled": "Enabled",
@@ -2098,7 +2099,8 @@
             "label": "Type",
             "kyc": "KYC",
             "kyb": "KYB",
-            "auth": "Auth"
+            "auth": "Auth",
+            "document": "Document"
           },
           "name": "Playbook name",
           "publishable-key": "Publishable key"
@@ -2478,8 +2480,8 @@
         "passport": "Passport",
         "visa": "Visa",
         "residence-document": "Residence card",
-        "permit": "Work permit",
         "voter-identification": "Voter identification",
+        "permit": "Work permit",
         "ssn": "SSN",
         "ssn4": "Last 4",
         "ssn9": "Full",

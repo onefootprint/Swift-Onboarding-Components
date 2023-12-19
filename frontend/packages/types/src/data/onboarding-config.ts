@@ -11,6 +11,7 @@ export enum OnboardingConfigKind {
   kyc = 'kyc',
   kyb = 'kyb',
   auth = 'auth',
+  document = 'document',
 }
 
 // Used in the IDV context

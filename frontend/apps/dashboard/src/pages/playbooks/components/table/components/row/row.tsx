@@ -47,6 +47,7 @@ const Row = ({ playbook }: RowProps) => {
         {playbook.kind === OnboardingConfigKind.kyc && t('type.kyc')}
         {playbook.kind === OnboardingConfigKind.kyb && t('type.kyb')}
         {playbook.kind === OnboardingConfigKind.auth && t('type.auth')}
+        {playbook.kind === OnboardingConfigKind.document && t('type.document')}
       </td>
       <td>
         <CodeInline truncate>{key}</CodeInline>
