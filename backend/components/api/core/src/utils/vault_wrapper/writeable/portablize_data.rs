@@ -6,7 +6,6 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use db::models::contact_info::ContactInfo;
 use db::models::contact_info::VerificationLevel;
 use db::models::data_lifetime::DataLifetime;
-use db::models::fingerprint::Fingerprint;
 use db::models::scoped_vault::ScopedVault;
 use db::models::scoped_vault::ScopedVaultUpdate;
 use db::models::vault::Vault;
@@ -129,14 +128,9 @@ impl WriteableVw<Person> {
             ContactInfo::mark_verified(conn, &ci.id, VerificationLevel::OtpVerified)?;
             let seqno = DataLifetime::get_next_seqno(conn)?;
             DataLifetime::portablize(conn, &ci.lifetime_id, seqno)?;
-
-            // Don't make sandbox fingerprints unique since one phone number can be used
-            // to make multiple sandbox vaults.
-            if self.vault.is_live && di.globally_unique() {
-                // Mark the global fingerprint as unique.
-                Fingerprint::mark_global_unique(conn, &ci.lifetime_id)?;
-            }
         }
+        // TODO if the vault is not portable, portablize it here? Probably only during an Auth
+        // playbook since if it's an onboarding playbook, we'll portablize later
         Vault::mark_verified(conn, &self.vault.id)?;
         let update = ScopedVaultUpdate {
             show_in_search: Some(true),

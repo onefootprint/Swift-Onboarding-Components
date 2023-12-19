@@ -86,7 +86,6 @@ impl<Type> TenantVw<Type> {
                 kind,
                 sh_data,
                 lifetime_id: lifetime_id.to_owned(),
-                is_unique: false,
                 scope,
                 version: FingerprintVersion::current(),
             })

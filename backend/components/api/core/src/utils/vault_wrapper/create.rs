@@ -144,7 +144,6 @@ impl VaultWrapper<Person> {
             .collect();
         let request = request.manual_fingerprints(fingerprints);
         let source = DataLifetimeSource::Hosted;
-        // Can we make the fingerprints as not is_unique and then when the CI is verified mark it as unique?
         let result = uvw.patch_data(conn, request, source, None)?;
 
         Ok((uv, su, result))

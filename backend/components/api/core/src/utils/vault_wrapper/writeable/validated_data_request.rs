@@ -266,9 +266,6 @@ impl ValidatedDataRequest {
                     kind: kind.clone(),
                     sh_data: fingerprint,
                     lifetime_id: vd.lifetime_id.clone(),
-                    // All fingerprints will start as not unique. Phone number fingerprints
-                    // will be marked as unique once the contact info is verified
-                    is_unique: false,
                     scope,
                     version: newtypes::FingerprintVersion::current(),
                 })

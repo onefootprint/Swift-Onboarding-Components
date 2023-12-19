@@ -1,0 +1,1 @@
+ALTER TABLE fingerprint ALTER COLUMN is_unique SET DEFAULT 'f';

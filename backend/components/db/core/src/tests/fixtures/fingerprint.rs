@@ -18,7 +18,6 @@ pub fn create(
         sh_data,
         kind,
         lifetime_id,
-        is_unique: false,
         scope,
         version: FingerprintVersion::current(),
     };

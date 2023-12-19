@@ -24,11 +24,6 @@ pub struct Fingerprint {
     /// Denormalized from the DataLifetime table in order to add uniqueness constraints on fingerprints
     pub kind: DataIdentifier,
     pub lifetime_id: DataLifetimeId,
-    /// This is a misnomer now - it used to mean that the sh_data for this Fingerprint was unique,
-    /// but we no longer enforce uniqueness anymore.
-    /// But, we keep it around because there was some business logic that would branch based on
-    /// `is_unique`. Will remove in the future
-    pub is_unique: bool,
     /// Version of the fingerprint schema
     pub version: FingerprintVersion,
     /// scope to which fingerprint was created for
@@ -41,7 +36,6 @@ pub struct NewFingerprint {
     pub sh_data: FingerprintData,
     pub kind: DataIdentifier,
     pub lifetime_id: DataLifetimeId,
-    pub is_unique: bool,
     pub version: FingerprintVersion,
     pub scope: FingerprintScopeKind,
 }
@@ -62,16 +56,6 @@ impl Fingerprint {
         }
         diesel::insert_into(fingerprint::table)
             .values(fingerprints)
-            .execute(conn.conn())?;
-        Ok(())
-    }
-
-    #[tracing::instrument("Fingerprint::create", skip_all)]
-    pub fn mark_global_unique(conn: &mut TxnPgConn, lifetime_id: &DataLifetimeId) -> DbResult<()> {
-        diesel::update(fingerprint::table)
-            .filter(fingerprint::lifetime_id.eq(lifetime_id))
-            .filter(fingerprint::scope.eq(FingerprintScopeKind::Global))
-            .set(fingerprint::is_unique.eq(true))
             .execute(conn.conn())?;
         Ok(())
     }

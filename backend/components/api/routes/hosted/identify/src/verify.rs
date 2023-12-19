@@ -272,7 +272,7 @@ fn validate(
         None
     };
     if let Some(existing_sv) = existing_sv {
-        // For bifrost logins that already have a SV (likely created in the signup challenge),
+        // For bifrost logins that already have a SV (created in the signup challenge or via API)
         // we can mark the contact info as OTP verified
         let vw = VaultWrapper::<Person>::lock_for_onboarding(conn, &existing_sv.id)?;
         vw.on_otp_verified(conn, di)?;
