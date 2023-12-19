@@ -289,7 +289,7 @@ impl Vault {
         use crate::models::scoped_vault::ScopedVault;
         use db_schema::schema::{data_lifetime, fingerprint};
 
-        // Look for vaults marked `is_portable` and `is_verified`
+        // Look for verified vaults marked `is_portable` and `is_verified`
         // that also have portable, active data matching the fingerprint
         // and a matching sandbox_id, if provided
         let mut query = vault::table
@@ -299,7 +299,7 @@ impl Vault {
             // When we allow replacing contact info, we might want to support finding the vault on
             // deactivated fingerprints in case the portable data is replaced by tenant-specific data
             .filter(data_lifetime::deactivated_seqno.is_null())
-            // Never allow identifying a user by fingerprint that hasn't completed an OTP challenge
+            // Don't identify users that haven't completed an OTP challenge
             .filter(vault::is_verified.eq(true))
             // Never allow identifying a user that is not marked as portable. API-only vaults start
             // as non-portable
@@ -307,17 +307,41 @@ impl Vault {
             .select(vault::all_columns)
             .into_boxed();
 
-        query = if let Some(sandbox_id) = sandbox_id {
+        query = if let Some(sandbox_id) = sandbox_id.as_ref() {
             query.filter(vault::sandbox_id.eq(sandbox_id))
         } else {
             query.filter(vault::sandbox_id.is_null())
         };
+        let mut vaults: Vec<_> = query.get_results::<Self>(conn)?;
+
+        // And, add in all of the unverified vaults owned by this tenant. This allows portablizing
+        // non-portable vaults
+        if let Some(tenant_id) = tenant_id {
+            let mut query = scoped_vault::table
+                .inner_join(data_lifetime::table.inner_join(fingerprint::table))
+                .inner_join(vault::table)
+                .filter(fingerprint::sh_data.eq_any(sh_data))
+                .filter(data_lifetime::portablized_seqno.is_null())
+                .filter(data_lifetime::deactivated_seqno.is_null())
+                // Un-verified vaults owned by this tenant
+                .filter(scoped_vault::tenant_id.eq(tenant_id))
+                .filter(vault::is_verified.eq(false))
+                .filter(vault::is_portable.eq(false))
+                .select(vault::all_columns)
+                .into_boxed();
+            query = if let Some(sandbox_id) = sandbox_id.as_ref() {
+                query.filter(vault::sandbox_id.eq(sandbox_id))
+            } else {
+                query.filter(vault::sandbox_id.is_null())
+            };
+            let unverified_vaults: Vec<_> = query.get_results::<Self>(conn)?;
+            vaults.extend(unverified_vaults)
+        }
 
         // All of the vaults here presumably are the same user (or same contact info) that has,
         // for one reason or another, been duplicated around the Footprint ecosystem.
         // Perhaps the user onboarded onto tenant A and then tenant B created an identical user via API.
         // Now, we have to figure out which of the duplicate vaults we want to log into.
-        let vaults: Vec<_> = query.get_results::<Self>(conn)?;
         let vaults = vaults.into_iter().unique_by(|v| v.id.clone()).collect_vec();
         let v_ids = vaults.iter().map(|v| &v.id).collect_vec();
 

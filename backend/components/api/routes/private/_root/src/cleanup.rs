@@ -43,6 +43,7 @@ async fn post(
             state
                 .find_vault(IdentifyId::PhoneNumber(phone_number), sandbox_id.0, None)
                 .await?
+                .map(|r| r.0)
         }
         Request::Email(email) => {
             // only allow footprint emails to be cleanable
@@ -50,7 +51,7 @@ async fn post(
                 return Err(AssertionError("Cannot clean up provided email").into());
             }
             let id = IdentifyId::Email(email);
-            let uv_id = state.find_vault(id, sandbox_id.0, None).await?;
+            let uv_id = state.find_vault(id, sandbox_id.0, None).await?.map(|r| r.0);
 
             // this check above is not sufficient because the email may not be verified
             // but attached to someone else's vault (rare -- but technically possible)

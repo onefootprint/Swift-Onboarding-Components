@@ -136,20 +136,6 @@ def vault4(sandbox_id, foo_sandbox_tenant, twilio):
     bifrost.run()
 
 
-@pytest.fixture(scope="function")
-def vault5(sandbox_id, tenant):
-    """
-    Tenant C - vault made via API, not portablized
-    """
-    sandbox_id_h = SandboxId(sandbox_id)
-    vault_data = {
-        "id.phone_number": FIXTURE_PHONE_NUMBER,
-        "id.email": FIXTURE_EMAIL,
-        "id.first_name": "From Tenant C",
-    }
-    post("users", vault_data, tenant.s_sk, sandbox_id_h)
-
-
 @pytest.fixture(scope="session")
 def tenant_sandbox_obc(tenant, must_collect_data):
     """
@@ -202,23 +188,31 @@ def test_identify_priority(
 
 
 def test_identify_with_non_portable_api_vault(
-    vault2, vault5, tenant, tenant_sandbox_obc, twilio, sandbox_id
+    vault2, tenant, tenant_sandbox_obc, twilio, sandbox_id
 ):
     """
-    Create two vaults: one portable one made via bifrost at tenant A, and then another made via
-    API at tenant B with almost no info.
-    TODO, eventually:
-    When identifying via tenant B, we should locate the user that was created via API at tenant B
-    instead of inheriting the vault from another tenant. Otherwise tenant B would have two fp_ids
+    Create two vaults: one portable made via bifrost at another tenant, and then another made via
+    API at tenant this tenant with almost no info.
+    When identifying, we should locate the user that was created via API at this tenant instead
+    of inheriting the vault from another tenant. Otherwise this tenant would have two fp_ids
     for the same underlying user.
     """
-    vault2, vault5
+
+    # Create the unverified user via API at this tenant
+    sandbox_id_h = SandboxId(sandbox_id)
+    vault_data = {
+        "id.phone_number": FIXTURE_PHONE_NUMBER,
+        "id.email": FIXTURE_EMAIL,
+        "id.first_name": "From Tenant C",
+        "id.last_name": "Penguin",
+    }
+    post("users", vault_data, tenant.s_sk, sandbox_id_h)
+
+    vault2
     bifrost = BifrostClient.inherit(
         tenant_sandbox_obc, twilio, FIXTURE_PHONE_NUMBER, sandbox_id
     )
     fp_id = bifrost.run().fp_id
     data = dict(fields=["id.first_name"], reason="flerp")
     body = post(f"users/{fp_id}/vault/decrypt", data, tenant.s_sk)
-    # TODO For now. Should be Tenant C after we start identifying vaults on tenant-scoped
-    # fingerprints, even if unverified
-    assert body["id.first_name"] == "From Tenant A"
+    assert body["id.first_name"] == "From Tenant C"

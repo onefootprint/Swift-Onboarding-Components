@@ -2,12 +2,15 @@ use api_wire_types::IdentifyId;
 use async_trait::async_trait;
 use aws_sdk_kms::primitives::Blob;
 use crypto::sha256;
-use db::models::vault::Vault;
+use db::{
+    errors::OptionalExtension,
+    models::{scoped_vault::ScopedVault, vault::Vault},
+};
 use itertools::Itertools;
 use newtypes::{
     fingerprinter::{FingerprintScopable, FingerprintScope, Fingerprinter, GlobalFingerprintKind},
     secret_api_key::ApiKeyFingerprinter,
-    DataIdentifier, Fingerprint, IdentityDataKind as IDK, PiiString, TenantId,
+    DataIdentifier, Fingerprint, IdentityDataKind as IDK, PiiString, ScopedVaultId, TenantId,
 };
 
 use crate::{
@@ -98,7 +101,7 @@ impl State {
         id: IdentifyId,
         sandbox_id: Option<SandboxId>,
         t_id: Option<&TenantId>,
-    ) -> ApiResult<Option<VaultId>> {
+    ) -> ApiResult<Option<(VaultId, Option<ScopedVaultId>)>> {
         // Search via fingerprint
         let (scopes, data) = match id {
             IdentifyId::PhoneNumber(phone_number) => (
@@ -129,11 +132,23 @@ impl State {
             .map(|(_, fp)| fp)
             .collect_vec();
         let t_id = t_id.cloned();
-        let existing = self
+        let result = self
             .db_pool
-            .db_query(move |conn| Vault::find_portable(conn, &sh_datas, sandbox_id, t_id.as_ref()))
+            .db_query(move |conn| -> ApiResult<_> {
+                let existing = Vault::find_portable(conn, &sh_datas, sandbox_id, t_id.as_ref())?;
+                let Some(vault) = existing else {
+                    return Ok(None);
+                };
+                let sv_id = t_id
+                    .as_ref()
+                    .map(|t_id| ScopedVault::get(conn, (&vault.id, t_id)).optional())
+                    .transpose()?
+                    .flatten()
+                    .map(|sv| sv.id);
+                Ok(Some((vault.id, sv_id)))
+            })
             .await??;
 
-        Ok(existing.map(|v| v.id))
+        Ok(result)
     }
 }
