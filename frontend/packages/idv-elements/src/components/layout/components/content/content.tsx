@@ -41,12 +41,14 @@ const Content = ({ children, isSandbox, config }: ContentProps) => {
       setBodyContentOverflowing(isOverflowing);
     };
 
+    const resizeObserver = new ResizeObserver(checkOverflow);
+
     const startResizeObserve = () => {
-      if (body) new ResizeObserver(checkOverflow).observe(body);
+      if (body) resizeObserver.observe(body);
     };
 
     const stopResizeObserve = () => {
-      if (body) new ResizeObserver(checkOverflow).unobserve(body);
+      if (body) resizeObserver.unobserve(body);
     };
 
     startResizeObserve();

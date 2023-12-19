@@ -1,6 +1,7 @@
 import styled, { css } from '@onefootprint/styled';
 import * as ScrollAreaRadix from '@radix-ui/react-scroll-area';
 import React, { useEffect, useRef, useState } from 'react';
+import { useEffectOnce } from 'usehooks-ts';
 
 import type { SXStyleProps, SXStyles } from '../../hooks';
 import { useSX } from '../../hooks';
@@ -58,26 +59,26 @@ const ScrollArea = ({
     }
   }, [noOverflow, scrolledToTop, hideTopLine]);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     const updateDimensions = () => {
       setScrollAreaHeight(scrollAreaRef.current?.clientHeight ?? 0);
       setViewportHeight(viewportRef.current?.clientHeight ?? 0);
     };
 
+    const resizeObserver = new ResizeObserver(updateDimensions);
+
     const startResizeObserve = () => {
-      if (viewportRef.current)
-        new ResizeObserver(updateDimensions).observe(viewportRef.current);
+      if (viewportRef.current) resizeObserver.observe(viewportRef.current);
     };
 
     const stopResizeObserve = () => {
-      if (viewportRef.current)
-        new ResizeObserver(updateDimensions).unobserve(viewportRef.current);
+      if (viewportRef.current) resizeObserver.unobserve(viewportRef.current);
     };
 
     startResizeObserve();
 
     return stopResizeObserve;
-  }, []);
+  });
 
   return (
     <StyledRoot

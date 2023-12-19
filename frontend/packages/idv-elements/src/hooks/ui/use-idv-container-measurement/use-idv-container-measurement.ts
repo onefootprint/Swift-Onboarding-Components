@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useEffectOnce } from 'usehooks-ts';
 
 import { LAYOUT_CONTAINER_ID } from '../../../components/layout/constants';
 
@@ -21,7 +22,7 @@ const useIdvContainerMeasurement = () => {
     right: 0,
   });
 
-  useEffect(() => {
+  useEffectOnce(() => {
     const container = document.querySelector(`#${LAYOUT_CONTAINER_ID}`);
     const boundingRect = container?.getBoundingClientRect();
     const updateDimensions = () => {
@@ -42,18 +43,24 @@ const useIdvContainerMeasurement = () => {
       });
     };
 
+    const resizeObserver = new ResizeObserver(updateDimensions);
+
     const startResizeObserve = () => {
-      if (container) new ResizeObserver(updateDimensions).observe(container);
+      if (container) {
+        resizeObserver.observe(container);
+      }
     };
 
     const stopResizeObserve = () => {
-      if (container) new ResizeObserver(updateDimensions).unobserve(container);
+      if (container) {
+        resizeObserver.unobserve(container);
+      }
     };
 
     startResizeObserve();
 
     return stopResizeObserve;
-  }, []);
+  });
 
   return measurement;
 };

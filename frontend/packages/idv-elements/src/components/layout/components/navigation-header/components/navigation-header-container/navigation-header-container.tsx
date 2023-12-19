@@ -40,14 +40,14 @@ const NavigationHeaderContainer = ({
       setHeaderTop(newHeaderTop);
     };
 
+    const resizeObserver = new ResizeObserver(updateDimensions);
+
     const startResizeObserve = () => {
-      if (layoutContainer)
-        new ResizeObserver(updateDimensions).observe(layoutContainer);
+      if (layoutContainer) resizeObserver.observe(layoutContainer);
     };
 
     const stopResizeObserve = () => {
-      if (layoutContainer)
-        new ResizeObserver(updateDimensions).unobserve(layoutContainer);
+      if (layoutContainer) resizeObserver.unobserve(layoutContainer);
     };
 
     startResizeObserve();
