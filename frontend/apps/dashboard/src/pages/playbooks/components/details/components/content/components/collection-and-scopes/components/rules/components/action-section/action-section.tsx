@@ -19,7 +19,12 @@ const ActionSection = ({ playbookId, action, rules }: ActionSectionProps) => {
   const kebabName = kebabCase(action);
 
   return (
-    <Stack direction="column" gap={2}>
+    <Stack
+      direction="column"
+      gap={2}
+      role="group"
+      aria-label={t(`${kebabName}.title`)}
+    >
       <Stack align="center" justify="space-between">
         <div>
           <Typography

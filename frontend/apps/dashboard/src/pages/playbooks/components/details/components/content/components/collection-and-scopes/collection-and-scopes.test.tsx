@@ -18,6 +18,10 @@ describe('<CollectionAndScopes />', () => {
     expect(
       screen.getByRole('tab', { name: 'Authorized scopes' }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole('tab', { name: 'AML monitoring' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Rules' })).toBeInTheDocument();
   });
 
   // it('should render document if document string included in mustCollectData', () => {

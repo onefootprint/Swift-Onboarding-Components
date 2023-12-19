@@ -67,7 +67,11 @@ const ActionRow = ({ playbookId, rule }: ActionRowProps) => {
   };
 
   return (
-    <RulesListItem data-is-editing={isEditing}>
+    <RulesListItem
+      data-is-editing={isEditing}
+      role="row"
+      aria-label={rule.ruleExpression[0].field}
+    >
       <div>
         {t('if')}
         {expressions.map((expression, index) => (
