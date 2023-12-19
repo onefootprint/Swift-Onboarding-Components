@@ -63,11 +63,11 @@ fn decide_data_to_portablize(data: CurrentData) -> HashSet<CollectedDataOption> 
 
 // Can only portablize identity data
 impl WriteableVw<Person> {
-    /// Marks all speculative identity data data as portable in order to make it portable after
-    /// it is verified by an approved onboarding.
-    /// Intentionally consumes the UVW to prevent using a stale reference
+    /// Marks all speculative identity data data as portable.
+    /// This makes the data available for prefill to future onboardings for this vault.
+    /// Intentionally consumes the UVW to prevent using a stale reference.
     /// NOTE: this DOES NOT portablize custom data or identity documents since we haven't figured out
-    /// the portability story for those types of data
+    /// the portability story for those types of data.
     #[tracing::instrument("WriteableVw::portablize_identity_data", skip_all)]
     pub fn portablize_identity_data(self, conn: &mut TxnPgConn) -> ApiResult<DataLifetimeSeqno> {
         // TODO only portablize data collected by the ob config rather than all data
@@ -78,9 +78,6 @@ impl WriteableVw<Person> {
         let seqno = DataLifetime::get_next_seqno(conn)?;
 
         if !uvw.vault.is_portable {
-            // If the vault wasn't initially portable, mark it as portable now
-            // TODO we might be able to remove is_portable as a flag since non-portable vaults
-            // won't even have global fingerprints
             Vault::mark_portable(conn, &uvw.vault.id)?;
         }
 
@@ -119,7 +116,8 @@ impl WriteableVw<Person> {
     }
 
     /// Mark the provided CI as verified.
-    pub fn on_otp_verified(self, conn: &mut TxnPgConn, di: DataIdentifier) -> ApiResult<()> {
+    /// Note: VW could be stale after this
+    pub fn on_otp_verified(&self, conn: &mut TxnPgConn, di: DataIdentifier) -> ApiResult<()> {
         let lifetime = self
             .get_lifetime(di.clone())
             .ok_or(AssertionError("No lifetime for CI"))?;
@@ -129,8 +127,6 @@ impl WriteableVw<Person> {
             let seqno = DataLifetime::get_next_seqno(conn)?;
             DataLifetime::portablize(conn, &ci.lifetime_id, seqno)?;
         }
-        // TODO if the vault is not portable, portablize it here? Probably only during an Auth
-        // playbook since if it's an onboarding playbook, we'll portablize later
         Vault::mark_verified(conn, &self.vault.id)?;
         let update = ScopedVaultUpdate {
             show_in_search: Some(true),

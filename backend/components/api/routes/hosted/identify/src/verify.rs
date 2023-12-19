@@ -276,6 +276,23 @@ fn validate(
         // we can mark the contact info as OTP verified
         let vw = VaultWrapper::<Person>::lock_for_onboarding(conn, &existing_sv.id)?;
         vw.on_otp_verified(conn, di)?;
+
+        let obc = user_auth
+            .and_then(|ua| ua.ob_config())
+            .or(ob_pk_auth.map(|ob| ob.ob_config()));
+        if obc.is_some_and(|obc| obc.kind == ObConfigurationKind::Auth) && !vw.vault.is_portable {
+            // If this is an auth playbook and the user was previously non-portable, we are
+            // currently portablizing an NYPID.
+            //
+            // This is a little bit different from our portablizing logic for onboarding playbooks:
+            // Normally, we only portablize after successful KYC. This is an arbitrary choice
+            // we made to increase the probability of the prefill data being accurate when the user
+            // later onboards.
+            // In some cases, when portablizing an NYPID backfilled into Footprint, the NYPID has
+            // already been onboarded onto our tenant, so there is also a good chance the prefill
+            // data is accurate.
+            vw.portablize_identity_data(conn)?;
+        }
     }
 
     Ok(vault_id)
