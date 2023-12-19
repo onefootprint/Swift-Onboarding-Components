@@ -1,0 +1,1 @@
+ALTER TABLE fingerprint DROP COLUMN is_unique;

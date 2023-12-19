@@ -1,0 +1,1 @@
+ALTER TABLE fingerprint ADD COLUMN is_unique BOOLEAN NOT NULL DEFAULT 'f';
