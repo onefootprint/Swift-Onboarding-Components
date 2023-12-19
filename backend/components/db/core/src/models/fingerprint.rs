@@ -51,6 +51,15 @@ pub type DuplicateExistingFingerprintsByDLK = HashMap<DataIdentifier, i64>;
 impl Fingerprint {
     #[tracing::instrument("Fingerprint::create", skip_all)]
     pub fn bulk_create(conn: &mut TxnPgConn, fingerprints: Vec<NewFingerprint>) -> DbResult<()> {
+        for fp in fingerprints.iter() {
+            // TODO turn these into hard errors after making sure they don't happen in prod
+            if !fp.kind.is_fingerprintable() {
+                tracing::error!(di=%fp.kind, "Fingerprinting DI that is not fingerprintable");
+            }
+            if fp.scope == FingerprintScopeKind::Global && !fp.kind.is_globally_fingerprintable() {
+                tracing::error!(di=%fp.kind, "Fingerprinting DI that is not globally fingerprintable");
+            }
+        }
         diesel::insert_into(fingerprint::table)
             .values(fingerprints)
             .execute(conn.conn())?;

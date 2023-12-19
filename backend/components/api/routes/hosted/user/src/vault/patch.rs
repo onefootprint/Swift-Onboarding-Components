@@ -114,7 +114,7 @@ pub async fn patch(
         .get(&IDK::Country.into())
         .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
 
-    let updates = updates.build_global_fingerprints(state.as_ref()).await?;
+    let updates = updates.build_fingerprints(state.as_ref(), &tenant.id).await?;
 
     let new_ci = state
         .db_pool

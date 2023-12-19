@@ -80,7 +80,8 @@ pub async fn patch(
 
     let PatchDataRequest { updates, .. } =
         request.clean_and_validate(ValidateArgs::for_bifrost(user_auth.scoped_user.is_live))?;
-    let updates = updates.build_global_fingerprints(state.as_ref()).await?;
+    let tenant_id = &user_auth.tenant().id;
+    let updates = updates.build_fingerprints(state.as_ref(), tenant_id).await?;
 
     state
         .db_pool

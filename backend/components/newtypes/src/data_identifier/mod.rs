@@ -33,8 +33,8 @@ pub use self::{
     investor_profile_kind::*, validation::Error as ValidationError, validation::*,
 };
 use crate::{
-    util::impl_enum_string_diesel, AliasId, EnumDotNotationError, KvDataKey, NtResult, PiiJsonValue,
-    PiiString, ValidateArgs, VaultKind,
+    fingerprinter::GlobalFingerprintKind, util::impl_enum_string_diesel, AliasId, EnumDotNotationError,
+    KvDataKey, NtResult, PiiJsonValue, PiiString, ValidateArgs, VaultKind,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use itertools::Itertools;
@@ -269,6 +269,11 @@ impl DataIdentifier {
     /// data with these types when added to the vault
     pub fn is_fingerprintable(&self) -> bool {
         Self::searchable().contains(self)
+    }
+
+    /// Returns true if the DI can be globally fingerprinted
+    pub fn is_globally_fingerprintable(&self) -> bool {
+        GlobalFingerprintKind::try_from(self).is_ok()
     }
 
     /// collect fingerprintable DIs

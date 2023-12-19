@@ -1,5 +1,5 @@
 use crate::data_identifier::ValidationError;
-use crate::fingerprinter::{Fingerprinter, GlobalFingerprintKind};
+use crate::fingerprinter::{FingerprintScope, Fingerprinter, GlobalFingerprintKind};
 use crate::{
     CollectedDataOption, DataIdentifier, Error, Fingerprint, FingerprintScopeKind, PiiJsonValue, PiiString,
     StorageType, TenantId, Validate, VaultKind,
@@ -9,7 +9,6 @@ use either::Either::{Left, Right};
 use itertools::Itertools;
 use std::clone::Clone;
 use std::collections::{HashMap, HashSet};
-use strum::IntoEnumIterator;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FingerprintRequest {
@@ -199,58 +198,39 @@ impl<T> DataRequest<T> {
     /// Given a DataRequest, computes fingerprints for all relevant, fingerprintable pieces of data
     /// and returns a new DataRequest with the Fingerprints populated.
     /// This gives us type safety that fingerprints are provided to the VW utils that add data to a vault
-    pub async fn build_tenant_fingerprints<F: Fingerprinter>(
+    pub async fn build_fingerprints<F: Fingerprinter>(
         self,
         fingerprinter: &F,
         tenant_id: &TenantId,
     ) -> Result<DataRequest<Fingerprints>, F::Error> {
-        let data: Vec<_> = self
+        let data_to_fingerprint: Vec<_> = self
             .data
             .iter()
-            .filter_map(|(di, pii)| {
-                di.is_fingerprintable()
-                    .then_some((di.clone(), (di, tenant_id), pii))
+            .flat_map(|(di, pii)| {
+                if !di.is_fingerprintable() {
+                    return vec![];
+                }
+                let tenant_scope = FingerprintScope::Tenant(di, tenant_id);
+                // Generate a tenant-scoped fingerprint and globally-scoped fingerprint (if possible)
+                let global_scope = GlobalFingerprintKind::try_from(di)
+                    .ok()
+                    .map(FingerprintScope::Global);
+                vec![global_scope, Some(tenant_scope)]
+                    .into_iter()
+                    .flatten()
+                    .map(|scope| ((di.clone(), scope.kind()), scope, pii))
+                    .collect_vec()
             })
             .collect();
 
-        let fingerprints = fingerprinter.compute_fingerprints(data).await?;
+        let fingerprints = fingerprinter.compute_fingerprints(data_to_fingerprint).await?;
 
         let fingerprints = fingerprints
             .into_iter()
-            .map(|(kind, fingerprint)| FingerprintRequest {
+            .map(|((kind, scope), fingerprint)| FingerprintRequest {
                 kind,
                 fingerprint,
-                scope: FingerprintScopeKind::Tenant,
-            })
-            .collect();
-
-        let request = DataRequest {
-            data: self.data,
-            json_fields: self.json_fields,
-            fingerprints,
-        };
-        Ok(request)
-    }
-
-    pub async fn build_global_fingerprints<F: Fingerprinter>(
-        self,
-        fingerprinter: &F,
-    ) -> Result<DataRequest<Fingerprints>, F::Error> {
-        let data_to_fingerprint = GlobalFingerprintKind::iter()
-            .filter_map(|g| {
-                let di = g.data_identifier();
-                self.data.get(&di).map(|pii| (di, g, pii))
-            })
-            .collect::<Vec<_>>();
-
-        let global_fingerprints = fingerprinter.compute_fingerprints(data_to_fingerprint).await?;
-
-        let fingerprints = global_fingerprints
-            .into_iter()
-            .map(|(kind, fingerprint)| FingerprintRequest {
-                fingerprint,
-                kind,
-                scope: FingerprintScopeKind::Global,
+                scope,
             })
             .collect();
 
