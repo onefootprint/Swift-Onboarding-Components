@@ -113,7 +113,9 @@ const Camera = ({
       return;
     }
     setIsVideoPlaying(true);
-    videoRef.current.play();
+    videoRef.current.play().catch(e => {
+      Logger.error(`Error playing video. Error: ${e}`);
+    });
   };
 
   const handleClick = (captureKind: CaptureKind) => {
