@@ -8,9 +8,6 @@ interface Comparator {
   (a?: unknown[], b?: unknown[]): boolean;
 }
 
-const isMissingKey = (obj: Record<string, unknown>, key: string): boolean =>
-  !Object.hasOwn(obj, key);
-
 export const isEqArray: Comparator = (a, b) => {
   if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) {
     return false;
@@ -33,7 +30,7 @@ const mergeInitialData = (
       const hasEqValue = Array.isArray(decryptedValue) ? isEqArray : isEqual;
 
       /** Don't allow replacing bootstrap data with decrypted data. The bootstrap data should take precedent */
-      if (isMissingKey(initData, k) || hasEqValue(initValue, decryptedValue)) {
+      if (!(k in initData) || hasEqValue(initValue, decryptedValue)) {
         /* @ts-ignore: key string vs enum comparison */
         obj[k] = val; // eslint-disable-line no-param-reassign
       }

@@ -6,16 +6,16 @@ const isEmailStep = (x: unknown) => x === 'emailIdentification';
 const isPhoneStep = (x: unknown) => x === 'phoneIdentification';
 const isSmsStep = (x: unknown) => x === 'smsChallenge';
 
-const hasOwn = (o: Obj, k: string) => o && Object.hasOwn(o, k) && Boolean(o[k]);
-const hasIdEmail = (obj: Obj) => hasOwn(obj, IdDI.email);
-const hasIdPhone = (obj: Obj) => hasOwn(obj, IdDI.phoneNumber);
+const hasEmail = (obj: Obj) => IdDI.email in obj && !!obj[IdDI.email];
+const hasPhone = (obj: Obj) =>
+  IdDI.phoneNumber in obj && !!obj[IdDI.phoneNumber];
 
 const sandboxIdEditRules =
   (obj: Obj) =>
   (step: string): boolean =>
-    (isEmailStep(step) && !hasIdEmail(obj) && !hasIdPhone(obj)) ||
-    (isEmailStep(step) && !hasIdEmail(obj) && hasIdPhone(obj)) ||
-    (isPhoneStep(step) && hasIdEmail(obj)) ||
-    (isSmsStep(step) && hasIdEmail(obj) && hasIdPhone(obj));
+    (isEmailStep(step) && !hasEmail(obj) && !hasPhone(obj)) ||
+    (isEmailStep(step) && !hasEmail(obj) && hasPhone(obj)) ||
+    (isPhoneStep(step) && hasEmail(obj)) ||
+    (isSmsStep(step) && hasEmail(obj) && hasPhone(obj));
 
 export default sandboxIdEditRules;

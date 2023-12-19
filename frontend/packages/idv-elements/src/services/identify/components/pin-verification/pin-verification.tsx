@@ -6,6 +6,7 @@ import type {
   Identifier,
   IdentifyVerifyResponse,
   LoginChallengeResponse,
+  PhoneIdentifier,
   SignupChallengeResponse,
 } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
@@ -19,7 +20,6 @@ import Logger from '../../../../utils/logger';
 import { useIdentifyMachine } from '../machine-provider';
 import Form from './components/form';
 
-type Obj = Record<string, unknown>;
 type PinVerificationProps = {
   title: string;
   onChallengeSucceed: (authToken: string) => void;
@@ -27,14 +27,14 @@ type PinVerificationProps = {
   identifier: Identifier;
 };
 
-const hasPhoneNumber = (o: Obj): o is { phoneNumber: string } =>
-  Object.hasOwn(o, 'phoneNumber') || Boolean(o.phoneNumber);
-
 const getPhoneNumber = (
   identifier: Identifier,
   phoneNumber?: string,
 ): string | undefined =>
-  hasPhoneNumber(identifier) ? identifier.phoneNumber : phoneNumber;
+  'phoneNumber' in identifier ||
+  !!(identifier as unknown as PhoneIdentifier).phoneNumber
+    ? (identifier as PhoneIdentifier).phoneNumber
+    : phoneNumber;
 
 const PinVerification = ({
   title,
@@ -68,7 +68,7 @@ const PinVerification = ({
     if (!identifyVerifyMutation.isSuccess) {
       return false;
     }
-    return userFound || 'email' in identifier || Boolean(email);
+    return userFound || 'email' in identifier || !!email;
   };
 
   const handlePinValidationSucceeded = ({

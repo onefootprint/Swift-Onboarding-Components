@@ -1,5 +1,10 @@
-export type EmailOrPhoneIdentifier =
-  | { email: string }
-  | { phoneNumber: string };
+export type PhoneIdentifier = { phoneNumber: string };
+export type EmailIdentifier = { email: string };
+export type AuthTokenIdentifier = { authToken: string };
 
-export type Identifier = EmailOrPhoneIdentifier | { authToken: string };
+export type EmailOrPhoneIdentifier = PhoneIdentifier | EmailIdentifier;
+
+export type Identifier =
+  | PhoneIdentifier
+  | EmailIdentifier
+  | AuthTokenIdentifier;

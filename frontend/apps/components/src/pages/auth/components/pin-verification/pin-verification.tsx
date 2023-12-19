@@ -59,7 +59,7 @@ const PinVerification = ({
 
   const isPinFormSuccess = (): boolean => {
     if (!identifyVerifyMutation.isSuccess) return false;
-    return userFound || Object.hasOwn(identifier, 'email') || Boolean(email);
+    return userFound || 'email' in identifier || !!email;
   };
 
   const handlePinValidationSucceeded = ({

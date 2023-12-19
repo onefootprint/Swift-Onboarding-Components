@@ -93,7 +93,13 @@ export {
   IdDocStatus,
   SupportedIdDocTypes,
 } from './id-doc-type';
-export type { EmailOrPhoneIdentifier, Identifier } from './identifier';
+export type {
+  AuthTokenIdentifier,
+  EmailIdentifier,
+  EmailOrPhoneIdentifier,
+  Identifier,
+  PhoneIdentifier,
+} from './identifier';
 export type { InsightEvent } from './insight-event';
 export {
   InvestorProfileAnnualIncome,

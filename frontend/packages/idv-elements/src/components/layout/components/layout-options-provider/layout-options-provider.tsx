@@ -32,7 +32,7 @@ const hasUpdatedProp = ({
   oldProps: Obj;
 }): boolean => {
   for (const key in newProps) {
-    if (Object.hasOwn(newProps, key) && Object.hasOwn(oldProps, key)) {
+    if (key in newProps && key in oldProps) {
       if (newProps[key] !== oldProps[key]) {
         return true;
       }
