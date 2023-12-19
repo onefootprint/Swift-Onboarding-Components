@@ -153,7 +153,7 @@ component.render();
 | `onClose`    | Triggered when the user closes the flow (either completed or canceled).                                                                                                                                 |
 | `userData`   | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/integrate/user-data).                    |
 | `options`    | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](https://docs.onefootprint.com/integrate/customization#available-options) |
-| `appearance` | Optional. A stringified `FootprintAppearance` object that can be imported from the SDK to customize the look of your integration                                                                        |
+| `appearance` | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                   |
 | `variant`    | Optional. One of `modal` or `drawer`. Specifies how the flow will be rendered.                                                                                                                          |
 | `l10n`       | Optional. Specifies the desired locale. More information [here](https://docs.onefootprint.com/integrate/customization#localization-configuration).                                                      |
 
@@ -253,7 +253,7 @@ component.render();
 | `onCancel`    | Triggered when the user abandons the flow. This can be triggered when the user clicks on close or cancel buttons inside our iframe                                                                                                                                    |
 | `onClose`     | Triggered when the user abandons the flow. This can be triggered when the user clicks on close or cancel buttons inside our iframe                                                                                                                                    |
 | `options`     | Optional. An options object that customizes the flow, can accept `hideButtons` and `hideFootprintLogo` boolean entries.                                                                                                                                               |
-| `appearance`  | Optional. A stringified `FootprintAppearance` object that can be imported from the SDK to customize the look of your integration                                                                                                                                      |
+| `appearance`  | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                                                                                 |
 | `variant`     | Optional. One of `modal`, `inline` or `drawer`. If `inline`, requires a `containerId`. Specifies how the form will be rendered.                                                                                                                                       |
 | `containerId` | Required if `variant` is `inline`. The ID for the HTML element that the form will be rendered in.                                                                                                                                                                     |
 | `getRef`      | Optional. An async callback that takes one argument and returns a promise. The `ref` object contains a method `save()` that can be called to save the form data (`ref.save()`). Promise is resolved or rejected with a string error when saving to vault is complete. |     |
@@ -369,7 +369,7 @@ component.render();
 | `onClose`    | Triggered when the user closes the flow (either completed or canceled).                                                                                                              |
 | `userData`   | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/integrate/user-data). |
 | `options`    | Optional. An options object that customizes the flow, can accept `showLogo`. More info [here](https://docs.onefootprint.com/integrate/customization#available-options)               |
-| `appearance` | Optional. A stringified `FootprintAppearance` object that can be imported from the SDK to customize the look of your integration                                                     |
+| `appearance` | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                |
 | `variant`    | Optional. One of `modal` or `drawer`. Specifies how the flow will be rendered.                                                                                                       |
 | `l10n`       | Optional. Specifies the desired locale. More information [here](https://docs.onefootprint.com/integrate/customization#localization-configuration).                                   |
 
