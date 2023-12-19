@@ -1,4 +1,5 @@
 use super::fixtures;
+use crate::models::vault::Priority;
 use crate::models::{data_lifetime::DataLifetime, vault::Vault};
 use crate::tests::prelude::*;
 use macros::db_test_case;
@@ -12,6 +13,7 @@ fn test_find_portable(conn: &mut TestPgConn, is_portablized: bool, is_deactivate
     let tenant = fixtures::tenant::create(conn);
     let ob_config = fixtures::ob_configuration::create(conn, &tenant.id, true);
     let uv = fixtures::vault::create_person(conn, true).into_inner();
+    Vault::mark_verified(conn, &uv.id).unwrap();
     let su = fixtures::scoped_vault::create(conn, &uv.id, &ob_config.id);
 
     let seqno = DataLifetime::get_next_seqno(conn).unwrap();
@@ -41,11 +43,39 @@ fn test_find_portable(conn: &mut TestPgConn, is_portablized: bool, is_deactivate
         Some(SandboxId::from("FLERP".to_owned()))
     };
     assert!(
-        Vault::find_portable(conn, &[fingerprint.clone()], inverse_sandbox_id)
+        Vault::find_portable(conn, &[fingerprint.clone()], inverse_sandbox_id, None)
             .unwrap()
             .is_none()
     );
 
-    let u = Vault::find_portable(conn, &[fingerprint], uv.sandbox_id).unwrap();
+    let u = Vault::find_portable(conn, &[fingerprint], uv.sandbox_id, None).unwrap();
     u.is_some()
+}
+
+#[test]
+fn test_priority_cmp() {
+    let p = |has_sv_at_tenant: Option<bool>,
+             num_svs: usize,
+             num_portable_dis: usize,
+             is_created_via_bifrost: bool,
+             neg_created_at: i64|
+     -> Priority {
+        Priority {
+            has_sv_at_tenant,
+            num_svs,
+            num_portable_dis,
+            is_created_via_bifrost,
+            neg_created_at,
+        }
+    };
+    assert!(vec![
+        p(Some(true), 10, 10, true, 0),
+        p(Some(true), 10, 0, true, 0),
+        p(Some(true), 0, 10, true, 0),
+        p(Some(true), 0, 0, true, 0),
+        p(Some(true), 0, 0, false, 0),
+        p(Some(false), 0, 0, false, 10),
+    ]
+    .windows(2)
+    .all(|w| w[0] > w[1]));
 }

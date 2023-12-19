@@ -10,8 +10,11 @@ use newtypes::{
     DataIdentifier, Fingerprint, IdentityDataKind as IDK, PiiString, TenantId,
 };
 
-use crate::{errors::kms::KmsSignError, ApiError, State};
-use newtypes::SandboxId;
+use crate::{
+    errors::{kms::KmsSignError, ApiResult},
+    ApiError, State,
+};
+use newtypes::{SandboxId, VaultId};
 
 /// Deprecated: old signed hash method using KMS directly
 /// replaced by hmac signing in the enclave
@@ -95,7 +98,7 @@ impl State {
         id: IdentifyId,
         sandbox_id: Option<SandboxId>,
         t_id: Option<&TenantId>,
-    ) -> Result<Option<Vault>, ApiError> {
+    ) -> ApiResult<Option<VaultId>> {
         // Search via fingerprint
         let (scopes, data) = match id {
             IdentifyId::PhoneNumber(phone_number) => (
@@ -113,8 +116,6 @@ impl State {
                 email.email,
             ),
         };
-        // For now, default to the sandbox id provided inline in the phone or email,
-        // otherwise, default to the one provided via a header
         let fps: Vec<_> = scopes
             .into_iter()
             .flatten()
@@ -127,11 +128,12 @@ impl State {
             .into_iter()
             .map(|(_, fp)| fp)
             .collect_vec();
-        let existing_user = self
+        let t_id = t_id.cloned();
+        let existing = self
             .db_pool
-            .db_query(move |conn| Vault::find_portable(conn, &sh_datas, sandbox_id))
+            .db_query(move |conn| Vault::find_portable(conn, &sh_datas, sandbox_id, t_id.as_ref()))
             .await??;
 
-        Ok(existing_user)
+        Ok(existing.map(|v| v.id))
     }
 }

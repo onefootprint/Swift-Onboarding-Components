@@ -137,18 +137,18 @@ async fn get_user_challenge_context(
 ) -> ApiResult<Option<UserChallengeContext>> {
     // Look up existing user vault by identifier
     let t_id = obc.as_ref().map(|obc| &obc.tenant().id);
-    let (existing_user, sv_id) = match identifier {
+    let (existing_user_id, sv_id) = match identifier {
         VaultIdentifier::IdentifyId(id, sandbox_id) => {
-            let Some(existing_user) = state.find_vault(id, sandbox_id, t_id).await? else {
+            let Some(existing_user_id) = state.find_vault(id, sandbox_id, t_id).await? else {
                 return Ok(None);
             };
-            (existing_user, None)
+            (existing_user_id, None)
         }
-        VaultIdentifier::AuthenticatedId(auth) => (auth.user.clone(), auth.scoped_user_id()),
+        VaultIdentifier::AuthenticatedId(auth) => (auth.user.clone().id, auth.scoped_user_id()),
     };
 
     // Record some properties on the root span
-    root_span.record("vault_id", existing_user.id.to_string());
+    root_span.record("vault_id", existing_user_id.to_string());
 
     let (uvw, creds, tenant) = state
         .db_pool
@@ -167,7 +167,7 @@ async fn get_user_challenge_context(
                 root_span.record("is_live", obc.ob_config().is_live);
                 let t_id = &obc.tenant().id;
                 // If there's already a SV for this (user, tenant) pair, log the fp_id
-                if let Some(sv) = ScopedVault::get(conn, (&existing_user.id, t_id)).optional()? {
+                if let Some(sv) = ScopedVault::get(conn, (&existing_user_id, t_id)).optional()? {
                     root_span.record("fp_id", sv.fp_id.to_string());
                 }
                 let tenant = Tenant::get(conn, t_id)?;
@@ -183,7 +183,7 @@ async fn get_user_challenge_context(
                 VwArgs::Tenant(sv_id)
             } else {
                 // Otherwise, create a UVW that only sees portable data
-                VwArgs::Vault(&existing_user.id)
+                VwArgs::Vault(&existing_user_id)
             };
             let uvw = VaultWrapper::build(conn, args)?;
 

@@ -38,13 +38,13 @@ def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant, twilio):
     ]
     for identifier in identifiers:
         data = dict(identifier=identifier)
-        # We can find via global fingerprints
+        # We can find via global fingerprints without specifying OBC
         body = post("hosted/identify", data, sandbox_id_h)
         assert body["user_found"]
         # And find from another tenant (via global fingerprints)
         body = post("hosted/identify", data, tenant.default_ob_config.key, sandbox_id_h)
         assert body["user_found"]
-        # And find at the current tenant
+        # And find at the current tenant when specifying OBC
         body = post("hosted/identify", data, ob_config2.key, sandbox_id_h)
         assert body["user_found"]
 

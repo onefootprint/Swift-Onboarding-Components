@@ -1,4 +1,3 @@
-use crate::models::fingerprint::Fingerprint as DbFingerprint;
 use crate::{DbError, PgConn};
 use crate::{DbResult, TxnPgConn};
 use chrono::{DateTime, Utc};
@@ -11,8 +10,8 @@ use diesel::upsert::on_constraint;
 use diesel::{Insertable, QueryDsl, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    EncryptedVaultPrivateKey, Fingerprint, FpId, IdempotencyId, Locked, SandboxId, ScopedVaultId, TenantId,
-    VaultId, VaultKind, VaultPublicKey,
+    DataIdentifier, EncryptedVaultPrivateKey, Fingerprint, FpId, IdempotencyId, Locked, SandboxId,
+    ScopedVaultId, TenantId, VaultId, VaultKind, VaultPublicKey,
 };
 
 use super::ob_configuration::IsLive;
@@ -233,7 +232,7 @@ impl Vault {
     }
 
     #[tracing::instrument("Vault::mark_portable", skip_all)]
-    /// Mark the provided vault is portable
+    /// Mark the provided vault as portable
     pub fn mark_portable(conn: &mut TxnPgConn, id: &VaultId) -> DbResult<()> {
         diesel::update(vault::table)
             .filter(vault::id.eq(id))
@@ -241,24 +240,71 @@ impl Vault {
             .execute(conn.conn())?;
         Ok(())
     }
+}
 
-    /// Look for the portable user vault with a matching fingerprint
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Clone, Copy)]
+/// When selecting which vault to log into of many vaults matching a Fingerprint, this struct
+/// represents the order-able Priority of each.
+pub(crate) struct Priority {
+    //
+    // These are the two most important ordering criteria.
+    //
+    /// Prefer logging into a vault that already has an fp_id at this tenant rather than making a
+    /// new fp_id for another vault.
+    /// For ex, tenant A has a vault made via API. Tenant B has a vault made via bifrost.
+    /// Tenant A should log into its vault, tenant B should log into its vault
+    /// DO NOT CHANGE THIS
+    pub(crate) has_sv_at_tenant: Option<bool>,
+    /// Prefer vaults that have been onboarded to more tenants. If there are duplicate vaults, this
+    /// ensures that one vault will become the winner as soon as a one-click occurs - future
+    /// onboardings will then continue to choose the same vault
+    /// DO NOT CHANGE THIS
+    pub(crate) num_svs: usize,
+
+    //
+    // The below are more heuristics to choose the best result amongst many. There's more
+    // flexibility in changing these
+    //
+    /// Prefer vaults that have more portable data.
+    /// For example, one vault maybe verified an OTP and has a portable phone, while another vault
+    /// finished onboarding and has a fully portable set of data
+    pub(crate) num_portable_dis: usize,
+    /// Prefer vaults created via Footprint's UI vs via tenant-facing API
+    pub(crate) is_created_via_bifrost: bool,
+    /// All else equal, just get the oldest vault
+    pub(crate) neg_created_at: i64,
+}
+
+impl Vault {
+    /// Given a fingerprint search parameter, find the Vault that we should log into.
+    /// When there are multiple vaults matching the search, we choose somewhat arbitrarily
+    /// (but consistenly) which vault to log into.
     #[tracing::instrument("Vault::find_portable", skip_all)]
     pub fn find_portable(
         conn: &mut PgConn,
         sh_data: &[Fingerprint],
         sandbox_id: Option<SandboxId>,
+        tenant_id: Option<&TenantId>,
     ) -> DbResult<Option<Vault>> {
+        use crate::models::scoped_vault::ScopedVault;
         use db_schema::schema::{data_lifetime, fingerprint};
 
+        // Look for vaults marked `is_portable` and `is_verified`
+        // that also have portable, active data matching the fingerprint
+        // and a matching sandbox_id, if provided
         let mut query = vault::table
             .inner_join(data_lifetime::table.inner_join(fingerprint::table))
             .filter(fingerprint::sh_data.eq_any(sh_data))
             .filter(not(data_lifetime::portablized_seqno.is_null()))
+            // When we allow replacing contact info, we might want to support finding the vault on
+            // deactivated fingerprints in case the portable data is replaced by tenant-specific data
             .filter(data_lifetime::deactivated_seqno.is_null())
+            // Never allow identifying a user by fingerprint that hasn't completed an OTP challenge
+            .filter(vault::is_verified.eq(true))
             // Never allow identifying a user that is not marked as portable. API-only vaults start
             // as non-portable
             .filter(vault::is_portable.eq(true))
+            .select(vault::all_columns)
             .into_boxed();
 
         query = if let Some(sandbox_id) = sandbox_id {
@@ -267,50 +313,58 @@ impl Vault {
             query.filter(vault::sandbox_id.is_null())
         };
 
-        let results: Vec<_> = query
-            .select((vault::all_columns, fingerprint::all_columns))
-            .get_results::<(Vault, DbFingerprint)>(conn)?;
+        // All of the vaults here presumably are the same user (or same contact info) that has,
+        // for one reason or another, been duplicated around the Footprint ecosystem.
+        // Perhaps the user onboarded onto tenant A and then tenant B created an identical user via API.
+        // Now, we have to figure out which of the duplicate vaults we want to log into.
+        let vaults: Vec<_> = query.get_results::<Self>(conn)?;
+        let vaults = vaults.into_iter().unique_by(|v| v.id.clone()).collect_vec();
+        let v_ids = vaults.iter().map(|v| &v.id).collect_vec();
 
-        tracing::info!("searched portable vaults, found: {}", results.len());
+        // Get the scoped vaults for each vault
+        let v_id_to_svs = scoped_vault::table
+            .filter(scoped_vault::vault_id.eq_any(v_ids.clone()))
+            .get_results::<ScopedVault>(conn)?
+            .into_iter()
+            .into_group_map_by(|sv| sv.vault_id.clone());
 
-        // we found more than 1 vault on this fingerprint
-        if results.len() > 1 {
-            // If multiple fingerprints match but it's just one UV, return that vault
-            let unique = results.iter().unique_by(|(uv, _)| uv.id.clone()).collect_vec();
-            if unique.len() == 1 {
-                return Ok(unique.into_iter().next().map(|(uv, _)| uv.clone()));
-            }
-            let vaults = results
-                .iter()
-                .map(|(uv, fp)| (uv.id.clone(), uv.is_created_via_api, uv._created_at, fp.is_unique))
-                .collect_vec();
-            tracing::warn!(vaults=?vaults, "found more than one vault for fingerprint");
+        // Get a mapping of vault_id -> Vec<DI> of all DIs that have been portablized at this vault
+        let v_id_to_portable_dis = data_lifetime::table
+            .filter(data_lifetime::vault_id.eq_any(v_ids))
+            .filter(not(data_lifetime::portablized_seqno.is_null()))
+            .select((data_lifetime::vault_id, data_lifetime::kind))
+            .get_results::<(VaultId, DataIdentifier)>(conn)?
+            .into_iter()
+            .unique()
+            .into_group_map();
 
-            // Otherwise, return the user with a unique fingerprint. We may hit this case if the
-            // user has a portable vault they made on bifrost and another tenant made a vault with
-            // the same phone number that became portable
-            if let Some(r) = results.iter().find(|(_, fp)| fp.is_unique) {
-                tracing::warn!("returning user with unique fp");
-                return Ok(Some(r.0.clone()));
-            }
+        // Find the vault with the highest priority. Some of these criteria are required for
+        // correctness, and others are heuristics to select the best of many duplicate vaults
+        let highest_priority = vaults
+            .into_iter()
+            .map(|vault| {
+                // True if the vault already has a scoped vault at the tenatn
+                let empty = vec![];
+                let svs = v_id_to_svs.get(&vault.id).unwrap_or(&empty);
+                let has_sv_at_tenant = tenant_id.map(|t_id| svs.iter().any(|sv| &sv.tenant_id == t_id));
+                // The number of DIs that have been marked as portable on this vault
+                let num_portable_dis = v_id_to_portable_dis
+                    .get(&vault.id)
+                    .map(|dis| dis.len())
+                    .unwrap_or_default();
+                let priority = Priority {
+                    has_sv_at_tenant,
+                    num_svs: svs.len(),
+                    num_portable_dis,
+                    is_created_via_bifrost: !vault.is_created_via_api,
+                    neg_created_at: -vault.created_at.timestamp_micros(),
+                };
+                (priority, vault)
+            })
+            .max_by_key(|(p, _)| *p)
+            .map(|(_, v)| v);
 
-            // NOTE: i have seen this happen with an email fingerprint
-            // in this case, more than 1 vault have non-verified claims for this email address
-            // so we cannot be sure which user vault we are trying to identify
-
-            // So, arbitrarily choose a user:
-            // - Choose created via bifrost over created via tenant API
-            // - Then choose earliest created
-            let user = results
-                .iter()
-                .sorted_by_key(|(uv, _)| (uv.is_created_via_api, uv._created_at))
-                .next()
-                .map(|(uv, _)| uv.clone());
-            tracing::info!(uv_id=?user.as_ref().map(|uv| &uv.id), "returning arbitrary uv");
-            return Ok(user);
-        }
-
-        Ok(results.into_iter().next().map(|v| v.0))
+        Ok(highest_priority)
     }
 }
 

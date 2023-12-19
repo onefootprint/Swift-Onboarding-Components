@@ -119,6 +119,7 @@ class BifrostClient:
         else:
             business_name = BUSINESS_DATA["business.name"]
 
+        ssn9 = _gen_random_ssn()
         self.data = {
             **ID_DATA,
             **BUSINESS_DATA,
@@ -135,7 +136,8 @@ class BifrostClient:
             "document.drivers_license.selfie.image": multipart_file(
                 "drivers_license.selfie.png", "image/png"
             ),
-            "id.ssn9": _gen_random_ssn(),
+            "id.ssn9": ssn9,
+            "id.ssn4": ssn9[-4:],
             "business.name": business_name,
             "id.phone_number": phone_number,
             "id.email": email,
@@ -366,10 +368,13 @@ class BifrostClient:
         return post("hosted/onboarding/validate", None, self.auth_token, **kwargs)
 
     def validate_token(self, validation_token):
-        # Use the SK of the tenant that owns the ob config
-        tenant_sk = self.ob_config.tenant.sk
+        # Use the SK of the tenant that owns the ob config, corresponding to the OBC's is_live
         data = dict(validation_token=validation_token)
-        body = post("onboarding/session/validate", data, tenant_sk.key)
+        if self.ob_config.is_live:
+            key = self.ob_config.tenant.l_sk
+        else:
+            key = self.ob_config.tenant.s_sk
+        body = post("onboarding/session/validate", data, key)
 
         # Check user
         assert body["user"]["fp_id"]
@@ -413,4 +418,4 @@ class User(NamedTuple):
 class RepeatRequirement(Exception):
     def __init__(self, requirement):
         self.requirement = requirement
-        super().__init__()
+        super().__init__(requirement)

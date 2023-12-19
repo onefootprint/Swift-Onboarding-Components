@@ -26,6 +26,7 @@ class ObConfiguration(NamedTuple):
     status: str
     must_collect_data: list
     can_access_data: list
+    is_live: bool
     tenant: Any  # Tenant
 
     def from_response(resp, tenant):
@@ -36,6 +37,7 @@ class ObConfiguration(NamedTuple):
             resp["status"],
             resp["must_collect_data"],
             resp["can_access_data"],
+            resp["is_live"],
             tenant,
         )
 
@@ -43,8 +45,11 @@ class ObConfiguration(NamedTuple):
 class Tenant(NamedTuple):
     id: str
     default_ob_config: ObConfiguration
+    # Just a convenience shorthand for the key created with the specified is_live.
     sk: SecretApiKey
+    # Live key
     l_sk: TenantSecretAuth
+    # Sandbox key
     s_sk: TenantSecretAuth
     name: str
     db_auths: list

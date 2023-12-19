@@ -35,7 +35,7 @@ async fn post(
     // When provided, identifies only sandbox users with the suffix
     sandbox_id: SandboxId,
 ) -> actix_web::Result<Json<ResponseData<CleanupResponse>>, ApiError> {
-    let uv = match request.into_inner() {
+    let uv_id = match request.into_inner() {
         Request::PhoneNumber(phone_number) => {
             ensure_phone_number_allowed(&state, &phone_number)?;
 
@@ -50,7 +50,7 @@ async fn post(
                 return Err(AssertionError("Cannot clean up provided email").into());
             }
             let id = IdentifyId::Email(email);
-            let uv = state.find_vault(id, sandbox_id.0, None).await?;
+            let uv_id = state.find_vault(id, sandbox_id.0, None).await?;
 
             // this check above is not sufficient because the email may not be verified
             // but attached to someone else's vault (rare -- but technically possible)
@@ -58,10 +58,10 @@ async fn post(
             // the phone number associated with the vault either:
             //  1) does not exist OR
             //  2) is one of our allowed-to-clean phone numbers.
-            if let Some(uv) = uv {
+            if let Some(uv_id) = uv_id {
                 let uvw = state
                     .db_pool
-                    .db_query(move |conn| VaultWrapper::<Any>::build_portable(conn, &uv.id))
+                    .db_query(move |conn| VaultWrapper::<Any>::build_portable(conn, &uv_id))
                     .await??;
                 let phone = uvw
                     .decrypt_contact_info(&state, newtypes::ContactInfoKind::Phone)
@@ -76,9 +76,9 @@ async fn post(
                     }
 
                     ensure_phone_number_allowed(&state, &PhoneNumber::parse(phone.0)?)?;
-                    Some(uvw.vault)
+                    Some(uvw.vault.id)
                 } else {
-                    Some(uvw.vault)
+                    Some(uvw.vault.id)
                 }
             } else {
                 None
@@ -86,9 +86,7 @@ async fn post(
         }
     };
 
-    let user_vault_id = if let Some(uv) = uv {
-        uv.id
-    } else {
+    let Some(uv_id) = uv_id else {
         return Ok(Json(ResponseData::ok(CleanupResponse { num_deleted_rows: 0 })));
     };
 
@@ -98,10 +96,10 @@ async fn post(
     let num_deleted_rows = state
         .db_pool
         .db_transaction(move |conn| -> Result<usize, ApiError> {
-            Vault::lock(conn, &user_vault_id)?;
+            Vault::lock(conn, &uv_id)?;
 
             if is_production {
-                let impacted_tenants: Vec<Tenant> = Tenant::list_by_user_vault_id(conn, &user_vault_id)?;
+                let impacted_tenants: Vec<Tenant> = Tenant::list_by_user_vault_id(conn, &uv_id)?;
 
                 let unallowed_affected_tenants: Vec<String> = impacted_tenants
                     .into_iter()
@@ -117,7 +115,7 @@ async fn post(
                 }
             }
 
-            let num_deleted_rows = db::private_cleanup_integration_tests(conn, user_vault_id)?;
+            let num_deleted_rows = db::private_cleanup_integration_tests(conn, uv_id)?;
             Ok(num_deleted_rows)
         })
         .await?;
