@@ -1,47 +1,25 @@
 import Foundation
 import AuthenticationServices
 
-func handleAuthError(error: Error, configuration: FootprintConfiguration, errorManager: FootprintErrorManager?) {
-    if let error = error as? ASWebAuthenticationSessionError {
-        switch error.code {
-            case .canceledLogin: // User dismissed the browser using the native UI
-                configuration.onCancel?()
-                return
-            case .presentationContextNotProvided:
-                errorManager?.log(error: "Presentation context not provided.", shouldCancel: true)
-                return
-            case .presentationContextInvalid:
-                errorManager?.log(error: "Invalid presentation context.", shouldCancel: true)
-                return
-            default:
-                errorManager?.log(error:"Authentication session failed: \(error.localizedDescription)", shouldCancel: true)
-                return
-        }
-    } else {
-        errorManager?.log(error: "An unexpected error occurred during auth: \(error.localizedDescription)", shouldCancel: true)
-    }
-}
-
 @available(iOS 13.0, *)
 class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationContextProviding {
-    private var authSession: ASWebAuthenticationSession?
+    public var authSession: ASWebAuthenticationSession?
     private var configuration: FootprintConfiguration
-    private var token: String
     private var errorManager: FootprintErrorManager?
     
-    init(configuration: FootprintConfiguration, token: String, errorManager: FootprintErrorManager?) {
+    init(configuration: FootprintConfiguration, errorManager: FootprintErrorManager?) {
         self.configuration = configuration
-        self.token = token
         self.errorManager = errorManager
+        self.authSession = nil
     }
     
-    private func getURL() throws -> URL {
+    private func getURL(token: String) throws -> URL {
         let bifrostBaseUrl = "https://id.onefootprint.com"
         var urlComponents = URLComponents(string: bifrostBaseUrl)!
         var queryItems: [URLQueryItem] = []
         queryItems.append(URLQueryItem(name: "redirect_url", value: self.getDeepLink()))
         
-        if let appearance = try! self.configuration.appearance?.toJSON() {
+        if let appearance = try self.configuration.appearance?.toJSON() {
             if let fontSrc = appearance["fontSrc"] {
                 queryItems.append(URLQueryItem(name: "fontSrc", value: fontSrc))
             }
@@ -57,7 +35,7 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
         }
         
         urlComponents.queryItems = queryItems
-        urlComponents.fragment = self.token
+        urlComponents.fragment = token
         return urlComponents.url!
     }
     
@@ -65,27 +43,43 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
         return "\(self.configuration.scheme)://"
     }
     
-    public func startSession() throws {
-        let url = try! self.getURL()
-        
+    public func startSession(token: String, onComplete: @escaping () -> Void) throws {
+        if self.authSession != nil {
+            return
+        }
+
+        let url = try! self.getURL(token: token)
         self.authSession = ASWebAuthenticationSession(
             url: url,
             callbackURLScheme: self.configuration.scheme
         ) { [weak self] callbackURL, error in
-            guard let weakSelf = self else {
-                // Handle the case where self is no longer in memory
-                print("@onefootprint/footprint-swift: Auth session has no self reference.")
-                return
-            }
-            weakSelf.authSession = nil
+            onComplete()
+            self?.authSession = nil
             
             if let error = error {
-                handleAuthError(error: error, configuration: weakSelf.configuration, errorManager: weakSelf.errorManager)
+                if let error = error as? ASWebAuthenticationSessionError {
+                    switch error.code {
+                    case .canceledLogin: // User dismissed the browser using the native UI
+                        self?.configuration.onCancel?()
+                        return
+                    case .presentationContextNotProvided:
+                        self?.errorManager?.log(error: "Presentation context not provided.", shouldCancel: true)
+                        return
+                    case .presentationContextInvalid:
+                        self?.errorManager?.log(error: "Invalid presentation context.", shouldCancel: true)
+                        return
+                    default:
+                        self?.errorManager?.log(error:"Authentication session failed: \(error.localizedDescription)", shouldCancel: true)
+                        return
+                    }
+                } else {
+                    self?.errorManager?.log(error: "An unexpected error occurred during auth: \(error.localizedDescription)", shouldCancel: true)
+                }
                 return
             }
             
             guard let callbackURL = callbackURL else {
-                weakSelf.errorManager?.log(error: "Missing callbackURL from auth session", shouldCancel: true)
+                self?.errorManager?.log(error: "Missing callbackURL from auth session", shouldCancel: true)
                 return
             }
             
@@ -95,17 +89,17 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
                 
                 if let canceledValue = queryItems!.first(where: { $0.name == "canceled" })?.value,
                    canceledValue == "true" {
-                    weakSelf.configuration.onCancel?()
+                    self?.configuration.onCancel?()
                 } else if let validationToken = queryItems!.first(where: { $0.name == "validation_token" })?.value {
-                    weakSelf.configuration.onComplete?(validationToken)
+                    self?.configuration.onComplete?(validationToken)
                 }
             } catch {
-                weakSelf.errorManager?.log(error: "Encountered error when redirecting after verification is complete.", shouldCancel: true)
+                self?.errorManager?.log(error: "Encountered error when redirecting after verification is complete.", shouldCancel: true)
             }
-            
         }
         
         self.authSession!.presentationContextProvider = self
+        self.authSession!.prefersEphemeralWebBrowserSession = true // Skips the confirmation popup before auth browser opens
         self.authSession!.start()
     }
     

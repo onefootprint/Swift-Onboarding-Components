@@ -8,20 +8,28 @@ public class Footprint: NSObject {
     private var sdkArgsManager: FootprintSdkArgsManager?
     private var authSessionManager: FootprintAuthSessionManager?
     private var errorManager: FootprintErrorManager?
+    private var hasActiveSession: Bool = false
     
     private override init() {}
     
     public static func initialize(with configuration: FootprintConfiguration) {
         Task {
             let errorManager = FootprintErrorManager(configuration: configuration)
+            let sdkArgsManager = FootprintSdkArgsManager(configuration: configuration, errorManager: errorManager)
+            let authSessionManager = FootprintAuthSessionManager(configuration: configuration, errorManager: errorManager)
+            
             if let existingInstance = instance {
                 existingInstance.configuration = configuration
                 existingInstance.errorManager = errorManager
+                existingInstance.sdkArgsManager = sdkArgsManager
+                existingInstance.authSessionManager = authSessionManager
                 await existingInstance.render()
             } else {
                 let footprint = Footprint()
                 footprint.configuration = configuration
                 footprint.errorManager = errorManager
+                footprint.sdkArgsManager = sdkArgsManager
+                footprint.authSessionManager = authSessionManager
                 await footprint.render()
                 instance = footprint
             }
@@ -34,21 +42,20 @@ public class Footprint: NSObject {
             return
         }
         
-        var token = ""
-        do {
-            self.sdkArgsManager = FootprintSdkArgsManager(configuration: configuration, errorManager: self.errorManager)
-            token = try! await self.sdkArgsManager!.sendArgs()
-        } catch {
-            self.errorManager?.log(error: "Could not generate an SDK args token.")
+        // Prevents launching multiple verification flows at the same time
+        if (self.hasActiveSession) {
             return
         }
         
         do {
-            self.authSessionManager = FootprintAuthSessionManager(configuration: configuration, token: token, errorManager: self.errorManager)
-            try! self.authSessionManager!.startSession()
+            self.hasActiveSession = true
+            let token = try await self.sdkArgsManager!.sendArgs()
+            try self.authSessionManager!.startSession(token: token, onComplete: {
+                self.hasActiveSession = false
+            })
         } catch {
+            self.hasActiveSession = false
             self.errorManager?.log(error: "Could not initialize auth session.")
-            return
         }
     }
     
