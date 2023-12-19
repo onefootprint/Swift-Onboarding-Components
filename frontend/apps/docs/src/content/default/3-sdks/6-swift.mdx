@@ -11,9 +11,9 @@ meta:
   }
 ---
 
-# FootprintSwift Package Overview
+# FootprintSwift package overview
 
-You can use our `FootprintSwift` package for adding Footprint powered onboarding flows to your application. Our verification flows run in a secure `ASWebAuthenticationSession` inside your app that doesn't share any cookies or data with other apps.
+You can use our `FootprintSwift` package for adding Footprint-powered onboarding flows to your application. Our verification flows run in a secure `ASWebAuthenticationSession` inside your app that doesn't share any cookies or data with other apps.
 
 ## Minimum version requirements
 
@@ -29,17 +29,15 @@ You can integrate with `FootprintSwift` by adding the following snippet to your 
 
 ```swift
 dependencies: [
-    .package(
-			url: "https://github.com/onefootprint/footprint-swift", from: "1.0.0"
-		)
+    .package(url: "https://github.com/onefootprint/footprint-swift", from: "1.0.0")
 ]
 ```
 
-You can also install `FootprintSwift` through the [Swift Package Index](https://swiftpackageindex.com/onefootprint/footprint-swift), which is a search engine for Swift packages. You can also install by clicking on “File > Add Package Dependencies…”, and searching for “Footprint”.
+You can also install `FootprintSwift` through the [Swift Package Index](https://swiftpackageindex.com/onefootprint/footprint-swift), which is a search engine for Swift packages. You can also install by clicking on “File > Add Package Dependencies…” and searching for “Footprint”.
 
 ## Integration
 
-1. Start by getting your Playbook Publishable Key, for instance, `pb_test_VMooXd04EUlnu3AvMYKjMW` from your [Footprint Dashboard](https://dashboard.onefootprint.com/playbooks).
+1. Start by getting your Playbook public key, for instance, `pb_test_VMooXd04EUlnu3AvMYKjMW` from your [Footprint Dashboard](https://dashboard.onefootprint.com/playbooks).
 
 2. Make sure to import `FootprintSwift` into your View class that will instantiate the flow.
 
@@ -80,7 +78,7 @@ Instead of a `publicKey`, you can also use an `authToken` that you generate for 
 
 For a complete example, click [here](https://github.com/onefootprint/examples/tree/master/idv/mobile-swift-ui).
 
-### Bootstrapping User Data
+### Bootstrapping user data
 
 Utilize the `userData` option to pre-fill any available data and bypass completed pages for your users. You can click [here](https://docs.onefootprint.com/integrate/user-data) to find out more about the formatting and validation requirements we have for these inputs.
 
@@ -177,7 +175,7 @@ struct ContentView: View {
 
                 let config = FootprintConfiguration(
                     publicKey: "pb_test_RcDHxZgJO9q3vY72d7ZLXu",
-                    scheme: "footprintapp-callback",
+                    scheme: "my-app",
                     appearance: appearance,
                     onComplete: { validationToken in
                         print("Validation token: \(validationToken)")
@@ -193,7 +191,7 @@ struct ContentView: View {
 
 ```
 
-### Showing Your Company Logo
+### Showing your company logo
 
 You can also add your company logo at the top of the modal by a passing boolean field `showLogo`.
 
@@ -212,7 +210,7 @@ struct ContentView: View {
 
                 let config = FootprintConfiguration(
                     publicKey: "pb_test_RcDHxZgJO9q3vY72d7ZLXu",
-                    scheme: "footprintapp-callback",
+                    scheme: "my-app",
                     options: options,
                     onComplete: { validationToken in
                         print("Validation token: \(validationToken)")
@@ -231,7 +229,7 @@ You can configure your logo from your [Footprint dashboard](https://dashboard.on
 If no logo is available, we will use a placeholder with your company name's initial
 letter.
 
-### Setting the Locale
+### Setting the locale
 
 Footprint also supports localization settings, you can use the `l10n` (localization) option and specify the desired locale.
 
@@ -263,7 +261,7 @@ struct ContentView: View {
 }
 ```
 
-## All Configuration Fields
+## All configuration fields
 
 | Variable     | Description                                                                                                                                                                                             |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
