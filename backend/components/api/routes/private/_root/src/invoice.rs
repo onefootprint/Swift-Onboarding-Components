@@ -115,9 +115,8 @@ async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: Nai
             // billing for them. We will error if any of these products have use when they haven't
             // been contracted
             let pii = ScopedVault::count_billable(conn, &t_id, i.end, ScopedVaultPiiFilters::None)?;
-            // TODO check if the workflow does KYC or not
-            let kyc = Workflow::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Person)?;
-            let kyb = Workflow::get_billable_count(conn, &t_id, i.start, i.end, VaultKind::Business)?;
+            let kyc = Workflow::get_kyc_kyb_billable_count(conn, &t_id, i.start, i.end, VaultKind::Person)?;
+            let kyb = Workflow::get_kyc_kyb_billable_count(conn, &t_id, i.start, i.end, VaultKind::Business)?;
             let id_docs = IdentityDocument::get_billable_count(conn, &t_id, i.start, i.end)?;
             let watchlist_checks = WatchlistCheck::get_billable_count(conn, &t_id, i.start, i.end)?;
 
