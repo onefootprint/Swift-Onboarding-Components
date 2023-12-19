@@ -31,7 +31,6 @@ use db::models::workflow_request::WorkflowRequest;
 use feature_flag::BoolFlag;
 use newtypes::AuthEventKind;
 use newtypes::IdentifyScope;
-use newtypes::ObConfigurationKind;
 use newtypes::PreviewApi;
 use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web};
@@ -192,8 +191,8 @@ pub async fn post(
                         "key must be provided for a token of kind onboard",
                     ))?;
                     let (obc, _) = ObConfiguration::get(conn, (&key, &tenant_id, is_live))?;
-                    if obc.kind == ObConfigurationKind::Auth {
-                        return Err(OnboardingError::CannotOnboardOntoAuthPlaybook.into());
+                    if !obc.kind.can_onboard() {
+                        return Err(OnboardingError::CannotOnboardOntoPlaybook(obc.kind).into());
                     }
                     (Some(obc.id), None)
                 }

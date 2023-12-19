@@ -49,6 +49,7 @@ impl_enum_str_diesel!(ApiKeyStatus);
     serde_with::SerializeDisplay,
     Apiv2Schema,
     macros::SerdeAttr,
+    EnumIter,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
@@ -57,9 +58,33 @@ pub enum ObConfigurationKind {
     Kyc,
     Kyb,
     Auth,
+    Document,
 }
 
 impl_enum_str_diesel!(ObConfigurationKind);
+
+impl ObConfigurationKind {
+    /// Returns the list of Playbook kinds that can be "re-onboarded" onto
+    pub fn reonboardable() -> Vec<Self> {
+        Self::iter()
+            .filter(|cdo| match cdo {
+                Self::Kyb | Self::Kyc => true,
+                // Technically, Document is "re-onboardable" because it has a Workflow. But
+                // behavior is probably not such that when requesting "Redo KYC" from the workflow
+                // that you want them to redo the Document playbook they onboarded onto
+                Self::Auth | Self::Document => false,
+            })
+            .collect()
+    }
+
+    /// Returns true if this playbook can be "onboarded" onto
+    pub fn can_onboard(&self) -> bool {
+        match self {
+            Self::Kyb | Self::Kyc | Self::Document => true,
+            Self::Auth => false,
+        }
+    }
+}
 
 #[derive(
     Eq,

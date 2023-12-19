@@ -1,5 +1,7 @@
 use newtypes::{output::Csv, CollectedDataOption};
-use newtypes::{IdDocKind, Iso3166TwoDigitCountryCode, OnboardingRequirementKind, WorkflowId};
+use newtypes::{
+    IdDocKind, Iso3166TwoDigitCountryCode, ObConfigurationKind, OnboardingRequirementKind, WorkflowId,
+};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -71,6 +73,6 @@ pub enum OnboardingError {
     Validation(String),
     #[error("Can only provide one image at a time")]
     OnlyOneImageAllowed,
-    #[error("Cannot onboard onto an auth playbook")]
-    CannotOnboardOntoAuthPlaybook,
+    #[error("Cannot onboard onto an {0} playbook")]
+    CannotOnboardOntoPlaybook(ObConfigurationKind),
 }

@@ -311,6 +311,39 @@ def test_config_create(sandbox_tenant, twilio):
             ),
             "Validation error: Specifying allow_us_territories with allow_international_residents is redundant",
         ),
+        (
+            dict(
+                must_collect_data=["name", "document.drivers_license.none.none"],
+                optional_data=[],
+                can_access_data=[],
+                kind="document",
+                skip_kyc=True,
+                skip_confirm=True,
+            ),
+            "Validation error: Playbooks of kind document cannot collect name",
+        ),
+        (
+            dict(
+                must_collect_data=["document.drivers_license.none.none"],
+                optional_data=[],
+                can_access_data=[],
+                kind="document",
+                skip_kyc=True,
+                skip_confirm=False,
+            ),
+            "Playbook of kind document must skip confirm",
+        ),
+        (
+            dict(
+                must_collect_data=["document.drivers_license.none.none"],
+                optional_data=[],
+                can_access_data=[],
+                kind="document",
+                skip_kyc=False,
+                skip_confirm=True,
+            ),
+            "Playbook of kind document must skip KYC",
+        ),
     ],
 )
 def test_config_create_validation(sandbox_tenant, config_data, expected_error):
@@ -333,9 +366,9 @@ def test_no_phone_obc(sandbox_tenant):
     collect_data = ["name", "full_address", "email"]
     data = dict(
         name="Let's skip the phone",
-        must_collect_data=["name", "full_address", "email"],
+        must_collect_data=collect_data,
         optional_data=[],
-        can_access_data=["name", "full_address", "email"],
+        can_access_data=collect_data,
         is_no_phone_flow=True,
     )
     res = post(
@@ -348,6 +381,24 @@ def test_no_phone_obc(sandbox_tenant):
     assert res["is_no_phone_flow"] == True
     assert res["must_collect_data"] == collect_data
     assert res["optional_data"] == []
+    assert res["can_access_data"] == collect_data
+
+
+def test_doc_only(sandbox_tenant):
+    collect_data = ["document.drivers_license,id_card.none.none"]
+    data = dict(
+        name="Doc only",
+        must_collect_data=collect_data,
+        optional_data=[],
+        can_access_data=collect_data,
+        kind="document",
+        skip_kyc=True,
+        skip_confirm=True,
+    )
+    res = post("org/onboarding_configs", data, *sandbox_tenant.db_auths)
+
+    assert res["kind"] == "document"
+    assert res["must_collect_data"] == collect_data
     assert res["can_access_data"] == collect_data
 
 

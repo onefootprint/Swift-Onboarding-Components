@@ -7,7 +7,8 @@ use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use api_core::decision::rule_engine;
-use api_core::errors::AssertionError;
+use api_core::errors::{AssertionError, ValidationError};
+use api_core::telemetry::RootSpan;
 use db::models::ob_configuration::ObConfiguration;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
@@ -16,7 +17,7 @@ use newtypes::{
     AdverseMediaListKind, CipKind, DataIdentifierDiscriminant, EnhancedAml, ObConfigurationKind, TenantId,
 };
 use newtypes::{CollectedData as CD, Iso3166TwoDigitCountryCode};
-use newtypes::{CollectedDataOption as CDO, EnhancedAmlOption};
+use newtypes::{CollectedDataOption as CDO, CollectedDataOptionKind as CDOK, EnhancedAmlOption};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use std::collections::HashMap;
@@ -229,44 +230,70 @@ impl CreateOnboardingConfigurationRequest {
 
     fn validate(&self, kind: ObConfigurationKind) -> ApiResult<()> {
         self.validate_inner()?;
+        self.validate_enhanced_aml()?;
+        self.validate_kind(kind)?;
+        Ok(())
+    }
 
+    fn validate_kind(&self, kind: ObConfigurationKind) -> ApiResult<()> {
+        // Check for required fields based on playbook kind
         let required_fields = match kind {
-            ObConfigurationKind::Auth => vec![CDO::Email, CDO::PhoneNumber],
-            ObConfigurationKind::Kyb => vec![CDO::BusinessName, CDO::BusinessAddress],
+            ObConfigurationKind::Auth => vec![CDOK::Email, CDOK::PhoneNumber],
+            ObConfigurationKind::Kyb => vec![CDOK::BusinessName, CDOK::BusinessAddress],
             ObConfigurationKind::Kyc => {
                 if self.is_no_phone_flow.unwrap_or(false) {
-                    vec![CDO::Name, CDO::FullAddress, CDO::Email]
+                    vec![CDOK::Name, CDOK::FullAddress, CDOK::Email]
                 } else {
-                    vec![CDO::Name, CDO::FullAddress, CDO::Email, CDO::PhoneNumber]
+                    vec![CDOK::Name, CDOK::FullAddress, CDOK::Email, CDOK::PhoneNumber]
                 }
             }
+            ObConfigurationKind::Document => vec![CDOK::Document],
         };
-
-        self.validate_enhanced_aml()?;
-
-        if kind == ObConfigurationKind::Auth
-            && self
-                .must_collect_data
-                .iter()
-                .any(|cdo| !matches!(cdo, CDO::Email | CDO::PhoneNumber))
-        {
-            return Err(TenantError::ValidationError(
-                "Auth playbooks can only collect phone and email for now".into(),
-            )
-            .into());
-        }
-
-        // Check for required fields
         let missing_required_fields: Vec<_> = required_fields
             .into_iter()
-            .filter(|x| !self.must_collect_data.contains(x))
+            .filter(|x| !self.must_collect_data.iter().map(CDOK::from).contains(x))
             .collect();
         if !missing_required_fields.is_empty() {
             return Err(TenantError::ValidationError(format!(
-                "Playbook must collect {}",
+                "Playbook of kind {} must collect {}",
+                kind,
                 Csv(missing_required_fields)
             ))
             .into());
+        }
+
+        // Check for disallowed fields based on playbook kind
+        let is_field_allowed = match kind {
+            ObConfigurationKind::Auth => |cdo: &CDO| -> bool { matches!(cdo, CDO::Email | CDO::PhoneNumber) },
+            ObConfigurationKind::Kyb => |_: &CDO| -> bool { true },
+            ObConfigurationKind::Kyc => |cdo: &CDO| -> bool {
+                cdo.parent().data_identifier_kind() != DataIdentifierDiscriminant::Business
+            },
+            ObConfigurationKind::Document => |cdo: &CDO| -> bool { matches!(cdo, CDO::Document(_)) },
+        };
+        let collected_disallowed_fields = self
+            .must_collect_data
+            .iter()
+            .filter(|&cdo| !is_field_allowed(cdo))
+            .cloned()
+            .collect_vec();
+        if !collected_disallowed_fields.is_empty() {
+            return Err(TenantError::ValidationError(format!(
+                "Playbooks of kind {} cannot collect {}",
+                kind,
+                Csv(collected_disallowed_fields),
+            ))
+            .into());
+        }
+
+        // Document playbooks must not run KYC
+        if kind == ObConfigurationKind::Document {
+            if !self.skip_kyc {
+                return Err(ValidationError("Playbook of kind document must skip KYC").into());
+            }
+            if !self.skip_confirm.unwrap_or(false) {
+                return Err(ValidationError("Playbook of kind document must skip confirm").into());
+            }
         }
 
         Ok(())
@@ -348,7 +375,7 @@ impl CreateOnboardingConfigurationRequest {
                     self.enhanced_aml.as_ref().is_some_and(|e| e.enhanced_aml),
                     "enhanced_aml",
                 ),
-                (self.skip_confirm == Some(true), "skip_confirm"),
+                (self.skip_confirm.unwrap_or(false), "skip_confirm"),
             ];
             if let Some((_, f)) = unallowed_flags.into_iter().find(|(v, _)| *v) {
                 return Err(
@@ -401,6 +428,7 @@ pub async fn post(
     state: web::Data<State>,
     auth: TenantSessionAuth,
     request: Json<CreateOnboardingConfigurationRequest>,
+    root_span: RootSpan,
 ) -> actix_web::Result<Json<ResponseData<api_wire_types::OnboardingConfiguration>>, ApiError> {
     let auth = auth.check_guard(TenantGuard::OnboardingConfiguration)?;
 
@@ -431,6 +459,10 @@ pub async fn post(
         .all(|d| d.parent().data_identifier_kind() != DataIdentifierDiscriminant::Business);
     // Newer auth playbooks will have the kind specified in API
     // TODO deprecate this when we start receiving the kind from all requests
+    match &kind {
+        None => root_span.record("meta", "without_kind"),
+        Some(_) => root_span.record("meta", "with_kind"),
+    };
     let kind = kind.unwrap_or(if is_kyc {
         ObConfigurationKind::Kyc
     } else {
@@ -439,6 +471,7 @@ pub async fn post(
 
     let restrictions = vec![
         (tenant.is_prod_ob_config_restricted, ObConfigurationKind::Kyc),
+        (tenant.is_prod_ob_config_restricted, ObConfigurationKind::Document), // Separate flag?
         (tenant.is_prod_kyb_playbook_restricted, ObConfigurationKind::Kyb),
         (tenant.is_prod_auth_playbook_restricted, ObConfigurationKind::Auth),
     ];

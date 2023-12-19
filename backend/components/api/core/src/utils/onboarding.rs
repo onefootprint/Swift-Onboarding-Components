@@ -16,8 +16,8 @@ use db::{
 };
 use feature_flag::FeatureFlagClient;
 use newtypes::{
-    CollectedDataOption, DocumentConfig, DocumentRequestKind, EncryptedVaultPrivateKey, ObConfigurationKind,
-    Selfie, VaultKind, VaultPublicKey, WorkflowConfig, WorkflowId, WorkflowRequestId, WorkflowSource,
+    CollectedDataOption, DocumentConfig, DocumentRequestKind, EncryptedVaultPrivateKey, Selfie, VaultKind,
+    VaultPublicKey, WorkflowConfig, WorkflowId, WorkflowRequestId, WorkflowSource,
 };
 use std::sync::Arc;
 
@@ -59,8 +59,8 @@ pub fn get_or_start_onboarding(
         maybe_prefill_data,
     } = args;
     let user_vault = Vault::lock(conn, &sv.vault_id)?;
-    if obc.kind == ObConfigurationKind::Auth {
-        return Err(OnboardingError::CannotOnboardOntoAuthPlaybook.into());
+    if !obc.kind.can_onboard() {
+        return Err(OnboardingError::CannotOnboardOntoPlaybook(obc.kind).into());
     }
 
     let wfr = wfr_id

@@ -404,7 +404,7 @@ impl Workflow {
         let mut query = workflow::table
             .inner_join(ob_configuration::table)
             .filter(workflow::scoped_vault_id.eq(sv_id))
-            .filter(not(ob_configuration::kind.eq(ObConfigurationKind::Auth)))
+            .filter(ob_configuration::kind.eq_any(ObConfigurationKind::reonboardable()))
             .into_boxed();
 
         if only_completed {
