@@ -154,7 +154,7 @@ Get or create a Secret API Key on your [developer dashboard](https://dashboard.o
 
 ### Validate the onboarding token (from Step 5 above)
 
-You should create an endpoint on your backend to handle signups. It should receive the validation token given in step 5 above from your frontend and pass it to Footprint’s backend in order to authenticate and verify the user:
+You should create an endpoint on your backend to handle signups. It should receive the validation token given in step 5 above from your frontend and pass it to Footprint’s backend in order to authenticate and verify the user using the <navigation-link fontFamily="code" href="/api-reference#post-onboarding-session-validate">POST /onboarding/session/validate</navigation-link> API:
 
 ```bash
 curl -X POST https://api.onefootprint.com/onboarding/session/validate \
@@ -174,8 +174,6 @@ Footprint will give you some information from this onboarding session. We’ll a
   ...
 }
 ```
-
-You can find more info on the validate API [here](/api-reference#post-onboarding-session-validate).
 
 <inline-alert variant="info">
   Save the `fp_id` in your database tied to the individual user. It is the

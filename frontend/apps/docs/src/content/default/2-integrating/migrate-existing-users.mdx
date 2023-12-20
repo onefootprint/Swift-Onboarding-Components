@@ -19,14 +19,14 @@ Please read our [API Authentication guide](/integrate/api-auth).
 
 ## Create a new user vault
 
-If your user doesn't yet have an `fp_id`, create a new user vault using the `POST /users` [API](/api-reference#post-users). You can provide a key-value map of data you've already collected from the user to initialize the Footprint vault.
+If your user doesn't yet have an `fp_id`, create a new user vault using <navigation-link fontFamily="code" href="/api-reference#post-users">POST /users</navigation-link>. You can provide a key-value map of data you've already collected from the user to initialize the Footprint vault.
 
 ### Example request
 
 ```bash
 curl https://api.onefootprint.com/users \
 	-X POST \
-    -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:\
+    -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
 	-d '{
         "id.first_name": "Jane",
         "id.middle_name": "Samantha",
@@ -61,7 +61,7 @@ Take special note of the `fp_id` value above - this is the only identifier you'l
 
 A successful response as above indicates the request data is properly formatted, the vault is created, and the data securely stored. Otherwise, an error will return with the data field that is improperly formatted, and the vault will not be created.
 
-Footprint's vault supports several types of structured data: identity data, debit and credit card data, documents (like drivers licenses and passports), arbitrary key-value records, and more. Footprint will apply validations to structured data when it is vaulted. Check out the [API reference](/api-reference#post-users) docs for details on how to use data identifiers and this API.
+Footprint's vault supports several types of structured data: identity data, debit and credit card data, documents (like drivers licenses and passports), arbitrary key-value records, and more. Footprint will apply validations to structured data when it is vaulted. Check out the API reference on <navigation-link fontFamily="code" href="/api-reference#post-users">POST /users</navigation-link> for details on how to use data identifiers and this API.
 
 ## Data integrity (optional)
 

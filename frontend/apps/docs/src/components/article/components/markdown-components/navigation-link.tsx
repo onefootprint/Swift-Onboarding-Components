@@ -1,7 +1,11 @@
-import type { Color, FontVariant } from '@onefootprint/design-tokens';
+import type {
+  Color,
+  FontFamily,
+  FontVariant,
+} from '@onefootprint/design-tokens';
 import { IcoArrowUpRight16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Stack, Typography } from '@onefootprint/ui';
+import { createFontStyles, Stack } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 
@@ -10,6 +14,7 @@ type NavigationLinkProps = {
   href: string;
   variant?: FontVariant;
   color?: Color;
+  fontFamily?: FontFamily;
 };
 
 const NavigationLink = ({
@@ -17,16 +22,39 @@ const NavigationLink = ({
   href,
   variant = 'body-3',
   color = 'primary',
+  fontFamily = 'default',
 }: NavigationLinkProps) => (
   <Container href={href} target="_blank">
-    <Typography variant={variant} color={color}>
+    <StyledTypography variant={variant} color={color} fontFamily={fontFamily}>
       {children}
-    </Typography>
+    </StyledTypography>
     <Stack marginTop={1}>
       <IcoArrowUpRight16 color={color} />
     </Stack>
   </Container>
 );
+
+const StyledTypography = styled.p<{
+  color: Color;
+  variant: FontVariant;
+  fontFamily: FontFamily;
+}>`
+  ${({ theme, color, variant, fontFamily }) => css`
+    ${createFontStyles(variant, fontFamily)}
+    color: ${theme.color[color]};
+
+    a {
+      color: ${theme.components.link.color};
+      text-decoration: none;
+
+      @media (hover: hover) {
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  `}
+`;
 
 const Container = styled(Link)`
   ${({ theme }) => css`

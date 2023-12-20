@@ -27,7 +27,7 @@ Data already in the user's Footprint vault won't need to be recollected from the
 
 ## Step 2: Generate an auth token for the user on your backend
 
-From your backend, using a secret API key, generate an auth token associated with the specific user using the [`POST /users/{fp_id}/token`](/api-reference#post-users-fp-id-token) API:
+From your backend, using a secret API key, generate an auth token associated with the specific user using the <navigation-link href="/api-reference#post-users-fp-id-token" fontFamily="code">POST /users/{fp_id}/token</navigation-link> API:
 
 ### Example request
 
@@ -58,7 +58,7 @@ You are able to create auth tokens for the user that have different purposes.
 | `inherit`   | Inherit any operation previously requested via the dashboard, including reonboarding, ID document collection, and SSN card collection. More info below. |
 | `user`      | Simply create a token for the user. A playbook key may be provided directly to the Footprint Verify SDK to trigger onboarding.                          |
 
-You can find more info in the [API reference](/api-reference#post-users-fp-id-token).
+You can find more info in the <navigation-link href="/api-reference#post-users-fp-id-token" fontFamily="code">POST /users/{fp_id}/token</navigation-link> API reference.
 
 ### The inherit token kind
 
@@ -66,7 +66,7 @@ The `inherit` token kind is powerful and deserves more explanation. On Footprint
 
 If you would prefer a more native experience to your application, you can instead embed the Footprint Verify component to complete any outstanding data requests.
 
-Before generating an `inherit` token and invoking the Footprint Verify SDK for the user, you can check via API if a user has an outstanding request to provide more info using the [`GET /users/{fp_id}`](/api-reference#get-users-fp-id) API:
+Before generating an `inherit` token and invoking the Footprint Verify SDK for the user, you can check via API if a user has an outstanding request to provide more info using the <navigation-link fontFamily="code" href="/api-reference#get-users-fp-id">GET /users/{fp_id}</navigation-link> API:
 
 #### Example request
 
