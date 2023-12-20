@@ -1,6 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import { IcoClose24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
+import styled, { css, keyframes } from '@onefootprint/styled';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import React, { useRef } from 'react';
 
@@ -9,7 +9,6 @@ import { media } from '../../utils';
 import IconButton from '../icon-button';
 import Overlay from '../overlay';
 import Typography from '../typography';
-import useOpenAnimation, { State } from './hooks/use-open-animation';
 
 export type DrawerProps = {
   children?: React.ReactNode;
@@ -35,10 +34,9 @@ const Drawer = ({
   sx,
 }: DrawerProps) => {
   const sxStyles = useSX(sx);
-  const state = useOpenAnimation(open);
   const DrawerRef = useRef<HTMLDivElement>(null);
 
-  return state === State.closed ? null : (
+  return (
     <DialogPrimitive.Root
       open={open}
       onOpenChange={newOpen => {
@@ -49,7 +47,6 @@ const Drawer = ({
       defaultOpen
     >
       <DrawerContainer
-        className={state}
         aria-label={title}
         role="dialog"
         ref={DrawerRef}
@@ -57,6 +54,7 @@ const Drawer = ({
         onClick={(event: React.MouseEvent<HTMLDivElement>) => {
           event.stopPropagation();
         }}
+        onEscapeKeyDown={onClose}
         sx={sxStyles}
       >
         <DrawerSurface>
@@ -76,10 +74,35 @@ const Drawer = ({
           <Body>{children}</Body>
         </DrawerSurface>
       </DrawerContainer>
-      <Overlay aria-modal isVisible={open} />
+      <DialogPrimitive.Overlay asChild>
+        <Overlay aria-modal isVisible={open} />
+      </DialogPrimitive.Overlay>
     </DialogPrimitive.Root>
   );
 };
+
+const slideIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+const slideOut = keyframes`
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+    
+  }
+`;
 
 const DrawerSurface = styled.div`
   ${({ theme }) => css`
@@ -108,13 +131,12 @@ const DrawerContainer = styled(DialogPrimitive.Content)<{ sx?: SXStyles }>`
       border-radius: 0;
     `}
 
-    &.open {
-      transform: translateX(0%);
+    &[data-state='open'] {
+      animation: ${slideIn} 0.2s ease-in;
     }
 
-    &.opening,
-    &.closing {
-      transform: translateX(100%);
+    &[data-state='closed'] {
+      animation: ${slideOut} 0.2s ease-out;
     }
 
     ${sx};
