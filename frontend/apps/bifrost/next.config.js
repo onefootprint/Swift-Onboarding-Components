@@ -117,7 +117,6 @@ const nextConfig = {
     '@onefootprint/request',
     '@onefootprint/types',
     '@onefootprint/appearance',
-    '@radix-ui/react-dialog',
   ],
   env: {
     CI: process.env.CI,

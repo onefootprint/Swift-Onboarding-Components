@@ -99,7 +99,6 @@ const nextConfig = {
     '@onefootprint/request',
     '@onefootprint/types',
     '@onefootprint/dev-tools',
-    '@radix-ui/react-dialog',
   ],
   eslint: {
     ignoreDuringBuilds: true,

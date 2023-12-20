@@ -1,23 +1,28 @@
 import type { Icon } from '@onefootprint/icons';
 import { IcoClose24 } from '@onefootprint/icons';
-import styled, { css, keyframes } from '@onefootprint/styled';
-import * as DialogPrimitive from '@radix-ui/react-dialog';
+import styled, { css } from '@onefootprint/styled';
+import FocusTrap from 'focus-trap-react';
 import React, { useRef } from 'react';
+import { useLockedBody } from 'usehooks-ts';
 
-import { type SXStyleProps, type SXStyles, useSX } from '../../hooks';
+import type { SXStyleProps, SXStyles } from '../../hooks';
+import { useEventListener, useOnClickOutside, useSX } from '../../hooks';
 import { media } from '../../utils';
 import IconButton from '../icon-button';
 import Overlay from '../overlay';
+import Portal from '../portal';
 import Typography from '../typography';
+import useOpenAnimation, { State } from './hooks/use-open-animation';
 
 export type DrawerProps = {
   children?: React.ReactNode;
   headerComponent?: React.ReactNode;
   closeAriaLabel?: string;
   closeIconComponent?: Icon;
-  onClickOutside?: () => void;
   onClose: () => void;
+  onClickOutside?: () => void;
   open?: boolean;
+  testID?: string;
   title: string;
   sx?: SXStyleProps;
 };
@@ -26,83 +31,61 @@ const Drawer = ({
   children,
   closeAriaLabel = 'Close',
   closeIconComponent: CloseIconComponent = IcoClose24,
-  onClickOutside,
   onClose,
+  onClickOutside,
   open,
+  testID,
   title,
   headerComponent,
   sx,
 }: DrawerProps) => {
   const sxStyles = useSX(sx);
+  const state = useOpenAnimation(open);
   const DrawerRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside(DrawerRef, onClickOutside ?? onClose);
+  useLockedBody(open);
+  useEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      onClose();
+    }
+  });
 
-  return (
-    <DialogPrimitive.Root
-      open={open}
-      onOpenChange={newOpen => {
-        if (!newOpen) {
-          onClose();
-        }
-      }}
-      defaultOpen
-    >
-      <DrawerContainer
-        aria-label={title}
-        role="dialog"
-        ref={DrawerRef}
-        onPointerDownOutside={onClickOutside}
-        onClick={(event: React.MouseEvent<HTMLDivElement>) => {
-          event.stopPropagation();
-        }}
-        onEscapeKeyDown={onClose}
-        sx={sxStyles}
-      >
-        <DrawerSurface>
-          <Header>
-            <CloseContainer>
-              <IconButton aria-label={closeAriaLabel} onClick={onClose}>
-                <CloseIconComponent />
-              </IconButton>
-            </CloseContainer>
-            <DialogPrimitive.Title asChild>
-              <Typography variant="label-2" as="h2">
-                {title}
-              </Typography>
-            </DialogPrimitive.Title>
-          </Header>
-          {headerComponent}
-          <Body>{children}</Body>
-        </DrawerSurface>
-      </DrawerContainer>
-      <DialogPrimitive.Overlay asChild>
-        <Overlay aria-modal isVisible={open} />
-      </DialogPrimitive.Overlay>
-    </DialogPrimitive.Root>
+  return state === State.closed ? null : (
+    <Portal selector="#footprint-portal">
+      <FocusTrap>
+        <span>
+          <Overlay aria-modal isVisible={open} />
+          <DrawerContainer
+            className={state}
+            aria-label={title}
+            data-testid={testID}
+            role="dialog"
+            ref={DrawerRef}
+            onClick={(event: React.MouseEvent<HTMLDivElement>) => {
+              event.stopPropagation();
+            }}
+            sx={sxStyles}
+          >
+            <DrawerSurface>
+              <Header>
+                <CloseContainer>
+                  <IconButton aria-label={closeAriaLabel} onClick={onClose}>
+                    <CloseIconComponent />
+                  </IconButton>
+                </CloseContainer>
+                <Typography variant="label-2" as="h2">
+                  {title}
+                </Typography>
+              </Header>
+              {headerComponent}
+              <Body>{children}</Body>
+            </DrawerSurface>
+          </DrawerContainer>
+        </span>
+      </FocusTrap>
+    </Portal>
   );
 };
-
-const slideIn = keyframes`
-  from {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-`;
-
-const slideOut = keyframes`
-  from {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateX(100%);
-    
-  }
-`;
 
 const DrawerSurface = styled.div`
   ${({ theme }) => css`
@@ -114,7 +97,7 @@ const DrawerSurface = styled.div`
   `}
 `;
 
-const DrawerContainer = styled(DialogPrimitive.Content)<{ sx?: SXStyles }>`
+const DrawerContainer = styled.div<{ sx?: SXStyles }>`
   ${({ theme, sx }) => css`
     height: 100vh;
     width: calc(500px + 2 * ${theme.spacing[3]});
@@ -131,12 +114,13 @@ const DrawerContainer = styled(DialogPrimitive.Content)<{ sx?: SXStyles }>`
       border-radius: 0;
     `}
 
-    &[data-state='open'] {
-      animation: ${slideIn} 0.2s ease-in;
+    &.open {
+      transform: translateX(0%);
     }
 
-    &[data-state='closed'] {
-      animation: ${slideOut} 0.2s ease-out;
+    &.opening,
+    &.closing {
+      transform: translateX(100%);
     }
 
     ${sx};

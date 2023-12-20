@@ -10,6 +10,7 @@ describe('<Drawer />', () => {
     closeAriaLabel = 'Close',
     title = 'Title',
     onClose = jest.fn(),
+    testID,
     open,
     children = 'content',
   }: Partial<DrawerProps>) =>
@@ -19,6 +20,7 @@ describe('<Drawer />', () => {
         closeIconComponent={closeIconComponent}
         onClose={onClose}
         open={open}
+        testID={testID}
         title={title}
       >
         {children}
@@ -33,6 +35,11 @@ describe('<Drawer />', () => {
   });
 
   describe('when the drawer is open', () => {
+    it('should assign a test id', () => {
+      renderDrawer({ open: true, testID: 'drawer-test-id' });
+      expect(screen.getByTestId('drawer-test-id')).toBeInTheDocument();
+    });
+
     it('should show the header text', () => {
       renderDrawer({ open: true, title: 'header' });
       expect(screen.getByText('header')).toBeInTheDocument();
