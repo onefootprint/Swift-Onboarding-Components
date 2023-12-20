@@ -35,6 +35,7 @@ fn reason_to_footprint_reason_code(value: &Reason) -> Option<FootprintReasonCode
         Reason::AzureDatacenterIp => Some(FootprintReasonCode::IpAlertDataCenter),
         Reason::PossibleTamperingDetected => Some(FootprintReasonCode::BrowserTampering),
         Reason::GcpDatacenterIp => Some(FootprintReasonCode::IpAlertDataCenter),
+        Reason::Arm8_32BitAndroidOld => None,
     }
 }
 

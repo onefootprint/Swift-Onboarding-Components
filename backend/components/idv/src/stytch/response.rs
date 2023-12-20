@@ -107,6 +107,7 @@ pub enum Reason {
     AzureDatacenterIp,
     PossibleTamperingDetected,
     GcpDatacenterIp,
+    Arm8_32BitAndroidOld,
 }
 
 #[cfg(test)]
@@ -209,5 +210,13 @@ mod tests {
                 }
             }
         )
+    }
+
+    #[test]
+    pub fn test_arm8_32_bit_android_old() {
+        assert_eq!(
+            Reason::Arm8_32BitAndroidOld,
+            Reason::try_from("ARM8_32BIT_ANDROID_OLD").unwrap()
+        );
     }
 }
