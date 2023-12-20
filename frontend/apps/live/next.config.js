@@ -72,5 +72,6 @@ module.exports = {
     '@onefootprint/hooks',
     '@onefootprint/request',
     '@onefootprint/types',
+    '@radix-ui/react-dialog',
   ],
 };

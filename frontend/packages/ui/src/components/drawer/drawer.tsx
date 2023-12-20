@@ -1,16 +1,13 @@
 import type { Icon } from '@onefootprint/icons';
 import { IcoClose24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import FocusTrap from 'focus-trap-react';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 import React, { useRef } from 'react';
-import { useLockedBody } from 'usehooks-ts';
 
-import type { SXStyleProps, SXStyles } from '../../hooks';
-import { useEventListener, useOnClickOutside, useSX } from '../../hooks';
+import { type SXStyleProps, type SXStyles, useSX } from '../../hooks';
 import { media } from '../../utils';
 import IconButton from '../icon-button';
 import Overlay from '../overlay';
-import Portal from '../portal';
 import Typography from '../typography';
 import useOpenAnimation, { State } from './hooks/use-open-animation';
 
@@ -19,10 +16,9 @@ export type DrawerProps = {
   headerComponent?: React.ReactNode;
   closeAriaLabel?: string;
   closeIconComponent?: Icon;
-  onClose: () => void;
   onClickOutside?: () => void;
+  onClose: () => void;
   open?: boolean;
-  testID?: string;
   title: string;
   sx?: SXStyleProps;
 };
@@ -31,10 +27,9 @@ const Drawer = ({
   children,
   closeAriaLabel = 'Close',
   closeIconComponent: CloseIconComponent = IcoClose24,
-  onClose,
   onClickOutside,
+  onClose,
   open,
-  testID,
   title,
   headerComponent,
   sx,
@@ -42,48 +37,47 @@ const Drawer = ({
   const sxStyles = useSX(sx);
   const state = useOpenAnimation(open);
   const DrawerRef = useRef<HTMLDivElement>(null);
-  useOnClickOutside(DrawerRef, onClickOutside ?? onClose);
-  useLockedBody(open);
-  useEventListener('keydown', event => {
-    if (event.key === 'Escape') {
-      onClose();
-    }
-  });
 
   return state === State.closed ? null : (
-    <Portal selector="#footprint-portal">
-      <FocusTrap>
-        <span>
-          <Overlay aria-modal isVisible={open} />
-          <DrawerContainer
-            className={state}
-            aria-label={title}
-            data-testid={testID}
-            role="dialog"
-            ref={DrawerRef}
-            onClick={(event: React.MouseEvent<HTMLDivElement>) => {
-              event.stopPropagation();
-            }}
-            sx={sxStyles}
-          >
-            <DrawerSurface>
-              <Header>
-                <CloseContainer>
-                  <IconButton aria-label={closeAriaLabel} onClick={onClose}>
-                    <CloseIconComponent />
-                  </IconButton>
-                </CloseContainer>
-                <Typography variant="label-2" as="h2">
-                  {title}
-                </Typography>
-              </Header>
-              {headerComponent}
-              <Body>{children}</Body>
-            </DrawerSurface>
-          </DrawerContainer>
-        </span>
-      </FocusTrap>
-    </Portal>
+    <DialogPrimitive.Root
+      open={open}
+      onOpenChange={newOpen => {
+        if (!newOpen) {
+          onClose();
+        }
+      }}
+      defaultOpen
+    >
+      <DrawerContainer
+        className={state}
+        aria-label={title}
+        role="dialog"
+        ref={DrawerRef}
+        onPointerDownOutside={onClickOutside}
+        onClick={(event: React.MouseEvent<HTMLDivElement>) => {
+          event.stopPropagation();
+        }}
+        sx={sxStyles}
+      >
+        <DrawerSurface>
+          <Header>
+            <CloseContainer>
+              <IconButton aria-label={closeAriaLabel} onClick={onClose}>
+                <CloseIconComponent />
+              </IconButton>
+            </CloseContainer>
+            <DialogPrimitive.Title asChild>
+              <Typography variant="label-2" as="h2">
+                {title}
+              </Typography>
+            </DialogPrimitive.Title>
+          </Header>
+          {headerComponent}
+          <Body>{children}</Body>
+        </DrawerSurface>
+      </DrawerContainer>
+      <Overlay aria-modal isVisible={open} />
+    </DialogPrimitive.Root>
   );
 };
 
@@ -97,7 +91,7 @@ const DrawerSurface = styled.div`
   `}
 `;
 
-const DrawerContainer = styled.div<{ sx?: SXStyles }>`
+const DrawerContainer = styled(DialogPrimitive.Content)<{ sx?: SXStyles }>`
   ${({ theme, sx }) => css`
     height: 100vh;
     width: calc(500px + 2 * ${theme.spacing[3]});
