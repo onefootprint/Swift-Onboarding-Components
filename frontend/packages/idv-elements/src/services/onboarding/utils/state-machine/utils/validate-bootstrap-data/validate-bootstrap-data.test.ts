@@ -126,12 +126,14 @@ describe('validateBootstrapData', () => {
           [IdDI.state]: 'MA',
           [IdDI.dob]: '05-12-1996',
           [IdDI.visaExpirationDate]: '25-12-2030',
+          [IdDI.ssn9]: '123-45-1234',
         },
         'en-US',
       ),
     ).toEqual({
       [IdDI.country]: 'US',
       [IdDI.state]: 'MA',
+      [IdDI.ssn9]: '123-45-1234',
     });
   });
 });
