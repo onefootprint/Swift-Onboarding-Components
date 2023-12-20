@@ -109,7 +109,7 @@ const Company = () => {
       name: 'Eli Wachs',
       avatarSrc: '/team/member-eli.png',
       role: 'Co-founder, CEO',
-      linkedin: 'https://www.linkedin.com/in/eli-wachs-15a609a6/',
+      linkedin: 'https://www.linkedin.com/in/eliwachs/',
       twitter: 'https://twitter.com/EliWachs',
     },
     {
