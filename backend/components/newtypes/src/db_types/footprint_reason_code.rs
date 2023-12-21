@@ -325,6 +325,10 @@ footprint_reason_code_enum! {
         #[note = "DOB month mismatch", severity = SignalSeverity::Low,  description = "Month of birth input does not match the month of birth located."]
         DobMobDoesNotMatch,
 
+        #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::Partial)]
+        #[note = "DOB day mismatch", severity = SignalSeverity::Low,  description = "Day of birth input does not match the day of birth located."]
+        DobDayDoesNotMatch,
+
         #[scope = SignalScope::Dob, additional_scopes = vec![], match_level = Some(MatchLevel::CouldNotMatch)]
         #[note = "DOB month unavailable", severity = SignalSeverity::Low,  description = "No month of birth located."]
         DobMobNotAvailable,

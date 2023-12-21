@@ -7,10 +7,12 @@ use std::convert::Into;
 fn footprint_reason_codes(res: FlexIdResponse) -> Vec<FootprintReasonCode> {
     let phone_codes = Into::<Vec<FootprintReasonCode>>::into(&res.name_address_phone_summary());
     let name_address_ssn_codes = Into::<Vec<FootprintReasonCode>>::into(&res.name_address_ssn_summary());
+    let dob_codes = Into::<Vec<FootprintReasonCode>>::into(&res.dob_match_level());
 
     phone_codes
         .into_iter()
         .chain(name_address_ssn_codes)
+        .chain(dob_codes)
         .unique()
         .collect()
 }
@@ -31,6 +33,7 @@ mod tests {
                 NameLastMatches,
                 AddressMatches,
                 SsnMatches,
+                DobMatches,
             ],
             super::footprint_reason_codes(res),
         );

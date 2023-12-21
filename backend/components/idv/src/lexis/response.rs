@@ -500,6 +500,20 @@ impl FlexIdResponse {
             )
             .unwrap_or(NameAddressSsnSummary::NothingFound) // TODO: in general when an expected field is missing or we fail to parse, do we want produce a conservative FRC (like this unwrap_or) or do we want to just not produce any FRC at all?
     }
+
+    pub fn dob_match_level(&self) -> DobMatchLevel {
+        self.result()
+            .and_then(|r| r.verified_element_summary.as_ref())
+            .and_then(|v| v.dob_match_level.as_ref())
+            .and_then(|d| match DobMatchLevel::try_from(d.as_str().trim()) {
+                Ok(dml) => Some(dml),
+                Err(_) => {
+                    tracing::error!(dob_match_level=%d, "Unknown Lexis DobMatchLevel");
+                    None
+                }
+            })
+            .unwrap_or(DobMatchLevel::NoDobFoundOrSubmitted) // TODO: in general when an expected field is missing or we fail to parse, do we want produce a conservative FRC (like this unwrap_or) or do we want to just not produce any FRC at all?
+    }
 }
 
 #[cfg(test)]
