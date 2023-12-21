@@ -16,6 +16,13 @@ impl<T> From<DbError> for DryRunError<T> {
     }
 }
 
+// Convenience to allow using ? for db operations
+impl<T> From<diesel::result::Error> for DryRunError<T> {
+    fn from(value: diesel::result::Error) -> Self {
+        Self::from(DbError::from(value))
+    }
+}
+
 impl<T> From<ApiError> for DryRunError<T> {
     fn from(value: ApiError) -> Self {
         Self::Err(value)

@@ -111,6 +111,8 @@ app-attest = { path = "../../app_attest" }
 deunicode = "1.3.3"
 selfie_doc = { path = "../../selfie_doc" }
 
+diesel = { workspace = true }
+
 
 [dev-dependencies]
 test-case = { workspace = true }

@@ -1161,6 +1161,8 @@ dependencies = [
  "aws-sdk-s3",
  "chrono",
  "db",
+ "diesel",
+ "itertools",
  "newtypes",
  "selfie_doc",
  "serde",

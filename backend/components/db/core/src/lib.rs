@@ -33,6 +33,8 @@ mod has_lifetime;
 pub mod scoped_vault;
 pub use has_lifetime::*;
 
+pub use db_schema::schema;
+
 mod cleanup;
 pub use cleanup::*;
 

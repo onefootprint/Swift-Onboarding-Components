@@ -9,6 +9,7 @@ use strum_macros::{AsRefStr, EnumString};
     Ord,
     PartialOrd,
     Display,
+    serde_with::SerializeDisplay,
     Hash,
     Clone,
     Copy,
