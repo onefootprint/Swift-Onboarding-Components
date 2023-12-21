@@ -24,16 +24,16 @@ const getScrubbedPhoneNumber = ({
     const countryCode = match[1] ? match[1] : '';
     const number = match[2];
     return (countryCode + number)
-      .replaceAll(' ', '\u00A0')
-      .replaceAll('-', '\u2011');
+      .replace(/ /g, '\u00A0')
+      .replace(/-/g, '\u2011');
   }
 
   const challengePhone = challengeData?.scrubbedPhoneNumber;
   if (challengePhone) {
     return challengePhone
-      .replaceAll('*', '•')
-      .replaceAll(' ', '\u00A0')
-      .replaceAll('-', '\u2011');
+      .replace(/\*/g, '•')
+      .replace(/ /g, '\u00A0')
+      .replace(/-/g, '\u2011');
   }
 
   return '';

@@ -19,14 +19,10 @@ const ImageConsent = forwardRef<ImageConsentHandler, {}>((props, ref) => {
     ref,
     () => ({
       getConsentInfo: () => {
-        const descriptionWithoutHyperlinks = t('description')
-          .replaceAll('<privacy>', '')
-          .replaceAll('</privacy>', '')
-          .replaceAll('<toc>', '')
-          .replaceAll('</toc>', '')
-          .replaceAll('<incode_privacy>', '')
-          .replaceAll('</incode_privacy>', '')
-          .replaceAll('<br/>', '');
+        const descriptionWithoutHyperlinks = String(t('description')).replace(
+          /<\/?privacy>|<\/?toc>|<\/?incode_privacy>|<br\/>/g,
+          '',
+        );
         const consentLanguages = [t('subtitle'), descriptionWithoutHyperlinks];
 
         if (isThirdPartyConsented) {
