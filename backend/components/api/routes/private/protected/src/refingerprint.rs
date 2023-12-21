@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::{ProtectedAuth, State};
 use actix_web::{post, web, web::Json};
 use api_core::{
-    errors::{ApiResult, DryRunResult, DryRunResultTrait, ValidationError},
+    errors::{ApiResult, AssertionError, DryRunResult, DryRunResultTrait, ValidationError},
     types::{JsonApiResponse, ResponseData},
     ApiError,
 };
@@ -162,12 +162,25 @@ fn get_dls_to_refingerprint(
 
     let data = data_lifetime::table
         .inner_join(vault_data::table)
-        .inner_join(scoped_vault::table)
-        .inner_join(vault::table)
         .filter(data_lifetime::vault_id.eq_any(&vault_ids))
-        .get_results::<(DataLifetime, VaultData, ScopedVault, Vault)>(conn)
+        .get_results::<(DataLifetime, VaultData)>(conn)
         .map_err(DbError::from)?;
-    let dl_ids = data.iter().map(|(dl, _, _, _)| &dl.id).collect_vec();
+    // Bulk fetch the SVs and Vaults
+    let sv_ids = data
+        .iter()
+        .map(|(dl, _)| &dl.scoped_vault_id)
+        .unique()
+        .collect_vec();
+    let svs: HashMap<_, _> = scoped_vault::table
+        .inner_join(vault::table)
+        .filter(scoped_vault::id.eq_any(sv_ids))
+        .get_results::<(ScopedVault, Vault)>(conn)
+        .map_err(DbError::from)?
+        .into_iter()
+        .map(|(sv, v)| (sv.id.clone(), (sv, v)))
+        .collect();
+
+    let dl_ids = data.iter().map(|(dl, _)| &dl.id).collect_vec();
     let mut fps = fingerprint::table
         .filter(fingerprint::lifetime_id.eq_any(dl_ids))
         .get_results::<Fingerprint>(conn)
@@ -177,10 +190,14 @@ fn get_dls_to_refingerprint(
 
     let dls_to_refingerprint = data
         .into_iter()
-        .flat_map(|(dl, vd, sv, vault)| {
+        .map(|(dl, vd)| -> ApiResult<_> {
             let fps = fps.remove(&dl.id).unwrap_or_default();
             // Check if this DL is missing a tenant-scoped or global fingerprint. If so, create it
             let di = &dl.kind;
+            let (sv, vault) = svs
+                .get(&dl.scoped_vault_id)
+                .ok_or(AssertionError("No SV found"))?
+                .clone();
             let missing_fps = vec![
                 (FingerprintScopeKind::Tenant, di.is_fingerprintable()),
                 (FingerprintScopeKind::Global, di.is_globally_fingerprintable()),
@@ -191,14 +208,18 @@ fn get_dls_to_refingerprint(
                 is_missing.then_some(scope)
             })
             .collect_vec();
-            (!missing_fps.is_empty()).then_some(ToRefingerprint {
+            let res = (!missing_fps.is_empty()).then_some(ToRefingerprint {
                 dl,
                 vd,
                 vault,
                 sv,
                 missing_fps,
-            })
+            });
+            Ok(res)
         })
+        .collect::<ApiResult<Vec<_>>>()?
+        .into_iter()
+        .flatten()
         .collect_vec();
 
     let next = vault_ids
