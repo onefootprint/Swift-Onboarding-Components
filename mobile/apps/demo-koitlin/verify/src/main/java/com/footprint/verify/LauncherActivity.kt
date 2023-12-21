@@ -4,11 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
-import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.constraintlayout.widget.ConstraintLayout
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.Call
@@ -23,132 +20,110 @@ import okio.IOException
 internal const val FootprintCanceledResultValue = "canceled"
 
 internal class LauncherActivity : AppCompatActivity() {
-    private var loadingIndicator: ProgressBar? = null
-    private var errorIndicator: ConstraintLayout? = null
-
     private val client = OkHttpClient()
     private val scheme = "com.footprint.verify.v1"
     private val host = "kyc"
-    private val sdkName = "footprint-android 1.0.0"
     private val customTabsIntent = CustomTabsIntent.Builder().build()
-    private var mCustomTabsOpened = false
+    private var isCustomTabOpen = false
 
-    private var destinationActivityName: String? = null
-    private var publicKey: String? = null
-    private var authToken: String? = null
-    private var userData: FootprintUserData? = null
-    private var options: FootprintOptions? = null
-    private var l10n: FootprintL10n? = null
-    private var onComplete: ((validationToken: String) -> Unit)? = null
-    private var onCancel: (() -> Unit)? = null
+    private var config: FootprintConfig? = null
     private val footprint = Footprint.instance
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launcher)
         footprint.setLauncherActivityActive(true)
-
-        loadingIndicator = findViewById(R.id.loadingIndicator)
-        errorIndicator = findViewById(R.id.errorIndicator)
-
-        destinationActivityName = footprint.getDestinationActivityName()
-        publicKey = footprint.getPublicKey()
-        authToken = footprint.getAuthToken()
-        userData = footprint.getUserData()
-        options = footprint.getOptions()
-        l10n = footprint.getL10n()
-        onComplete = footprint.getOnComplete()
-        onCancel = footprint.getOnCancel()
+        config = footprint.getConfig()
 
         val appIntent = intent;
         val resultUrl: Uri? = appIntent?.data
-        if(resultUrl == null){
-            if(publicKey != null && destinationActivityName != null) {
-                loadingIndicator?.visibility = View.VISIBLE
-                errorIndicator?.visibility = View.INVISIBLE
+        if(resultUrl == null) {
+            if(config?.publicKey != null && config?.destinationActivityName != null) {
                 launchVerification(this@LauncherActivity)
-            }else{
-                loadingIndicator?.visibility = View.INVISIBLE
-                errorIndicator?.visibility = View.VISIBLE
+            } else {
+                config?.onError?.invoke("Something went wrong") // TODO: better error message
             }
-        }else{
+        } else {
             val result = parseResultUrl(resultUrl.toString())
-            if(result == FootprintCanceledResultValue) onCancel?.invoke()
-            else onComplete?.invoke(result)
-            if(destinationActivityName != null) startDestinationActivity(destinationActivityName!!, result)
+            if(result == FootprintCanceledResultValue) {
+                config?.onCancel?.invoke()
+            } else {
+                config?.onComplete?.invoke(result)
+            }
+
+            if(config?.destinationActivityName != null) {
+                startDestinationActivity(config?.destinationActivityName!!, result)
+            }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        if (mCustomTabsOpened) {
-            // This means that the custom tabs have been closed by user clicking the close button on chrome (not our FE close button)
-            // In this case, we send the user to the destination activity with a "cancel" result
-            mCustomTabsOpened = false
-            onCancel?.invoke()
-            if(destinationActivityName != null) startDestinationActivity(destinationActivityName!!, FootprintCanceledResultValue)
+        if (isCustomTabOpen) {
+            // This means that the custom tabs have been closed by user clicking the close button
+            // on chrome (not our FE close button). In this case, we send the user to the destination
+            // activity and call the onCancel callback
+            isCustomTabOpen = false
+            config?.onCancel?.invoke()
+            if(config?.destinationActivityName != null) {
+                startDestinationActivity(
+                    config?.destinationActivityName!!,
+                    FootprintCanceledResultValue
+                )
+            }
         }
     }
 
-    private fun getUrl(sdkToken: String): String {
+    private fun getUrl(sdkToken: String): Uri {
         val baseUrl = "https://id.onefootprint.com"
         val redirectUrl = "${this.scheme}://${this.host}"
-        return "$baseUrl/?redirect_url=$redirectUrl#$sdkToken"
+        return Uri.parse("$baseUrl/?redirect_url=$redirectUrl#$sdkToken")
     }
-
-    private fun getSdkRequestBody(): String {
-        val requestData = Data(publicKey = publicKey,
-            authToken = authToken, userData = userData, options = options, l10n = l10n);
+    private fun getSdkRequest(): Request? {
+        val requestData = config?.toData()
+        if (requestData == null) {
+            return null // TODO: handle
+        }
         val requestBody = SdkRequestData(kind = "verify_v1", data = requestData)
-        val requestBodyString = Json.encodeToString(requestBody);
-        return requestBodyString
-    }
-
-    private fun getSdkRequest(sdkRequestBody: String): Request {
-        val endPoint = "https://api.onefootprint.com/org/sdk_args";
+        val endpoint = "https://api.onefootprint.com/org/sdk_args";
         return Request.Builder()
-            .url(endPoint)
-            .header("x-fp-client-version", this.sdkName)
+            .url(endpoint)
+            .header("x-fp-client-version", "footprint-android verify 1.0.0")
             .header("Content-Type", "application/json")
-            .post(sdkRequestBody.toRequestBody())
+            .post(Json.encodeToString(requestBody).toRequestBody())
             .build();
     }
 
     fun launchVerification(context: Context){
-        val sdkRequestBody = getSdkRequestBody()
-        val sdkRequest = getSdkRequest(sdkRequestBody = sdkRequestBody)
+        val sdkRequest = getSdkRequest()
+        if (sdkRequest == null) {
+            return // TODO: handle
+        }
 
         this.client.newCall(sdkRequest).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                runOnUiThread {
-                    loadingIndicator?.visibility = View.INVISIBLE
-                    errorIndicator?.visibility = View.VISIBLE
-                }
-                // TODO: Send error to backend
+                config?.onError?.invoke("Something went wrong 3") // TODO: better error message
             }
 
             override fun onResponse(call: Call, response: Response) {
                 response.use {
-                    if (!response.isSuccessful) {
-                        runOnUiThread {
-                            loadingIndicator?.visibility = View.INVISIBLE
-                            errorIndicator?.visibility = View.VISIBLE
-                        }
-                        // TODO: Send error to backend
+                    if (!it.isSuccessful) {
+                        config?.onError?.invoke("Something went wrong 2") // TODO: better error message
                         return
                     }
-                    val responseBody = response.body!!.string();
+                    val responseBody = it.body!!.string(); // TODO: handle error
                     val responseObject = Json.decodeFromString<SdkTokenResponse>(responseBody)
                     val sdkToken = responseObject.token
                     val url = getUrl(sdkToken = sdkToken)
-                    customTabsIntent.launchUrl(context, Uri.parse(url))
-                    mCustomTabsOpened = true
+                    customTabsIntent.launchUrl(context, url)
+                    isCustomTabOpen = true
                 }
             }
         })
     }
 
     private fun parseResultUrl(url: String): String {
+        // TODO: better URL parsing here
         // Risky operations because we are assuming the URL structure from our knowledge of how we defined them in the FE
         val params = url.split("?")[1]
         val key = params.split("=")[0]
@@ -171,7 +146,11 @@ internal class LauncherActivity : AppCompatActivity() {
             startActivity(intent)
             finish() // Important cause we don't want the user to be able to come back to our activity on backspace
         } catch (e: ClassNotFoundException) {
-            e.printStackTrace()
+            e.localizedMessage?.let {
+                config?.onError?.invoke(it)
+            } ?: run {
+                config?.onError?.invoke("Something went wrong") // TODO:
+            }
         }
     }
 

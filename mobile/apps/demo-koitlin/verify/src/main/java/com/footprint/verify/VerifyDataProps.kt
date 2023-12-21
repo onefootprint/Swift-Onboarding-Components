@@ -34,8 +34,14 @@ data class FootprintConfig(
     val options: FootprintOptions? = null,
     val l10n: FootprintL10n? = null,
     val onComplete: ((validationToken: String) -> Unit)? = null,
-    val onCancel: (() -> Unit)? = null
-)
+    val onCancel: (() -> Unit)? = null,
+    val onError: ((errorMessage: String) -> Unit)? = null
+) {
+    internal fun toData(): Data {
+        return Data(publicKey = publicKey,
+            authToken = authToken, userData = userData, options = options, l10n = l10n);
+    }
+}
 
 @Serializable
 data class FootprintOptions(
@@ -43,9 +49,9 @@ data class FootprintOptions(
     @SerialName("show_logo") val showLogo: Boolean? = null
 )
 
-enum class FootprintSupportedLocale(val value: String){
-    EN_US("en-US"),
-    ES_MX("es-MX")
+enum class FootprintSupportedLocale {
+    @SerialName("en-US") EN_US,
+    @SerialName("es-MX") ES_MX
 }
 
 @Serializable
