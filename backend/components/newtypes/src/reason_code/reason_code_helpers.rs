@@ -252,18 +252,18 @@ impl SsnTypes {
 /// Helper for constructing Address and Name reason codes for internal use only!
 ///
 /// Note: name is shortened to make constructing take up less line space
-pub(crate) struct ExpAddressRCH {
+pub(crate) struct AddressRCH {
     name: NameGrouping,
     address: AddressGrouping,
 }
-impl ExpAddressRCH {
+impl AddressRCH {
     pub fn new(name: NameGrouping, address: AddressGrouping) -> Self {
         Self { name, address }
     }
 }
 
-impl From<ExpAddressRCH> for Vec<FootprintReasonCode> {
-    fn from(erch: ExpAddressRCH) -> Self {
+impl From<AddressRCH> for Vec<FootprintReasonCode> {
+    fn from(erch: AddressRCH) -> Self {
         let name_codes = erch.name.codes().into_iter();
         let address_codes = erch.address.codes().into_iter();
 
@@ -271,19 +271,19 @@ impl From<ExpAddressRCH> for Vec<FootprintReasonCode> {
     }
 }
 
-pub(crate) struct ExpSsnRCH {
+pub(crate) struct SsnRCH {
     ssn: SsnTypes,
     name: NameGrouping,
     address: AddressGrouping,
 }
-impl ExpSsnRCH {
+impl SsnRCH {
     pub fn new(ssn: SsnTypes, name: NameGrouping, address: AddressGrouping) -> Self {
         Self { ssn, name, address }
     }
 }
 
-impl From<ExpSsnRCH> for Vec<FootprintReasonCode> {
-    fn from(erch: ExpSsnRCH) -> Self {
+impl From<SsnRCH> for Vec<FootprintReasonCode> {
+    fn from(erch: SsnRCH) -> Self {
         let ssn_codes = erch.ssn.codes().into_iter();
         let name_codes = erch.name.codes().into_iter();
         let address_codes = erch.address.codes().into_iter();
@@ -296,14 +296,14 @@ impl From<ExpSsnRCH> for Vec<FootprintReasonCode> {
     }
 }
 
-pub(crate) struct ExpPhRCH {
+pub(crate) struct PhRCH {
     pub phone_match_level: MatchLevel,
     #[allow(unused)]
     name: NameGrouping,
     #[allow(unused)]
     address: AddressGrouping,
 }
-impl ExpPhRCH {
+impl PhRCH {
     pub fn new(phone_match_level: MatchLevel, name: NameGrouping, address: AddressGrouping) -> Self {
         Self {
             phone_match_level,
@@ -313,8 +313,8 @@ impl ExpPhRCH {
     }
 }
 
-impl From<ExpPhRCH> for Vec<FootprintReasonCode> {
-    fn from(erch: ExpPhRCH) -> Self {
+impl From<PhRCH> for Vec<FootprintReasonCode> {
+    fn from(erch: PhRCH) -> Self {
         // TODO: we don't know exactly how this interplays with existing reason codes, so we
         // will just show the phone code only for now
         // let name_codes = erch.name.phone_codes().into_iter();

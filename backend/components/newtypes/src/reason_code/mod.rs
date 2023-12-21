@@ -1,9 +1,9 @@
 mod experian;
 mod experian_address_codes;
 mod experian_phone_codes;
-mod experian_reason_code_helpers;
 mod experian_ssn_codes;
 mod idology;
+mod reason_code_helpers;
 mod signal_attribute;
 mod socure;
 
@@ -17,6 +17,10 @@ pub use idology::*;
 pub use signal_attribute::*;
 pub use socure::*;
 
+// TODO: do these macros and our vendor enums need to be in newtypes? or could we move into decision or idv crate
+
+/// Used to define an enum representing some sort of set of reason codes from a vendor.
+/// This macro is for mapping 1 reason code to 0 or 1 FRC (see vendor_reason_code_enums for 1:N mapping)
 #[macro_export]
 macro_rules! vendor_reason_code_enum {
     (
@@ -50,7 +54,8 @@ macro_rules! vendor_reason_code_enum {
 }
 pub use vendor_reason_code_enum;
 
-macro_rules! experian_reason_code_enum {
+/// 1:N version of above that lets you map a vendor reason code into Vec<FRC>
+macro_rules! vendor_reason_codes_enum {
     (
         $(#[$macros:meta])*
         pub enum $name:ident {
@@ -73,7 +78,7 @@ macro_rules! experian_reason_code_enum {
 
     }
 }
-pub(crate) use experian_reason_code_enum;
+pub(crate) use vendor_reason_codes_enum;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 #[serde(try_from = "&str")]
