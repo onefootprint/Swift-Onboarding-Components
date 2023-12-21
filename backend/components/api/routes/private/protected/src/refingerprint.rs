@@ -158,11 +158,15 @@ fn get_dls_to_refingerprint(
         .limit(limit)
         .get_results::<Vault>(conn)
         .map_err(DbError::from)?;
-    let vault_ids = vaults.into_iter().map(|v| v.id).collect_vec();
+    let next = vault_ids
+        .into_iter()
+        .last()
+        .ok_or(ValidationError("Page is empty - no next page"))?;
 
     let data = data_lifetime::table
         .inner_join(vault_data::table)
-        .filter(data_lifetime::vault_id.eq_any(&vault_ids))
+        .filter(data_lifetime::vault_id.ge(cursor))
+        .filter(data_lifetime::vault_id.le(next))
         .get_results::<(DataLifetime, VaultData)>(conn)
         .map_err(DbError::from)?;
     // Bulk fetch the SVs and Vaults
@@ -221,12 +225,6 @@ fn get_dls_to_refingerprint(
         .into_iter()
         .flatten()
         .collect_vec();
-
-    let next = vault_ids
-        .last()
-        .ok_or(ValidationError("Page is empty - no next page"))
-        .map_err(ApiError::from)?
-        .clone();
 
     Ok((dls_to_refingerprint, next))
 }
