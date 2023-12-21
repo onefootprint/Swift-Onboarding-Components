@@ -1,6 +1,5 @@
-package com.example.foortpint_verification
+package com.example.footprint_verification
 
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -20,15 +19,15 @@ class MainActivity : AppCompatActivity() {
             Log.d("VerificationResult", "The flow has completed. The validation token is $token")
         }
         val onClose: () -> Unit = {
-            Log.d("VerificationResult", "The flow has been closed prematuredly")
+            Log.d("VerificationResult", "The flow was closed")
         }
         val onCancel: () -> Unit = {
-            Log.d("VerificationResult", "The flow has canceled")
+            Log.d("VerificationResult", "The flow was canceled")
         }
 
         val footprint = Footprint.getInstance()
         footprint.setParams(
-            "com.example.foortpint_verification.MainActivity",
+            "com.example.footprint_verification.MainActivity",
             publicKey = "pb_test_aSzwnZecnXS4faoyhxrocW",
             userData = userData,
             onComplete = onComplete,
@@ -38,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
         verificationButton = findViewById(R.id.verify_button)
         verificationButton.setOnClickListener {
-            footprint.startVerification(this@MainActivity);
+            footprint.startVerification(this@MainActivity)
         }
 
         val extras: Bundle? = intent.extras

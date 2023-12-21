@@ -1,0 +1,19 @@
+.gradle
+.DS_Store
+build/
+captures/
+.externalNativeBuild
+.cxx
+local.properties
+
+# Eclipse
+.settings/
+.classpath
+.project
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Maven
+target/

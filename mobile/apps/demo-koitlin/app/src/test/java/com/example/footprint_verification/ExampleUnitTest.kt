@@ -1,4 +1,4 @@
-package com.example.foortpint_verification
+package com.example.footprint_verification
 
 import org.junit.Test
 

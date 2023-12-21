@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "FoortpintVerification"
+rootProject.name = "FootprintVerification"
 include(":app")
 include(":verify")

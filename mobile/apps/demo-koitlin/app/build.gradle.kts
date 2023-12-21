@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.foortpint_verification"
+    namespace = "com.example.footprint_verification"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.foortpint_verification"
+        applicationId = "com.example.footprint_verification"
         minSdk = 21
         targetSdk = 33
         versionCode = 1
