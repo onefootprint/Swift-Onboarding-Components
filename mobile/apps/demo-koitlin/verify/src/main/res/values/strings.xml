@@ -1,0 +1,4 @@
+<resources>
+    <string name="loading">Launching verification</string>
+    <string name="error">There was an error launching verification. Please try again.</string>
+</resources>
