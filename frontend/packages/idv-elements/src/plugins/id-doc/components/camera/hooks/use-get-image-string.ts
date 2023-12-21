@@ -2,9 +2,9 @@ import { useOpenCv } from 'opencv-react-ts';
 import type { MutableRefObject } from 'react';
 
 import Logger from '../../../../../utils/logger';
+import type { AutocaptureKind } from '../types';
 import getSourceDimensions from '../utils/get-source-dimensions';
 import { sharpenImage } from '../utils/graphics-utils/graphics-processing-utils';
-import type { AutocaptureKind } from './use-auto-capture';
 
 type GetImageStringProps = {
   context: CanvasRenderingContext2D;
@@ -29,8 +29,8 @@ const useGetImageString = () => {
     desiredImageWidth,
     desiredImageHeight,
     autocaptureKind,
-    centerOffsetX,
-    centerOffsetY,
+    centerOffsetX = 0,
+    centerOffsetY = 0,
   }: GetImageStringProps) => {
     if (!videoRef.current || !canvasRef.current) return null;
 

@@ -20,64 +20,118 @@ import CountdownTimer from './components/countdown-timer';
 import Feedback from './components/feedback';
 import Overlay from './components/overlay';
 import UploadButton from './components/upload-button';
-import type { AutocaptureKind } from './hooks/use-auto-capture';
-import useAutoCapture from './hooks/use-auto-capture';
 import useGetImageString from './hooks/use-get-image-string';
 import useSize from './hooks/use-size';
 import useUserMedia from './hooks/use-user-media';
+import type {
+  AutocaptureKind,
+  CaptureStatus,
+  VideoRef,
+  VideoSize,
+} from './types';
 import type { CameraKind } from './utils/get-camera-options';
 import getOutlineDimensions from './utils/get-outline-dimensions';
 
 export type DeviceKind = 'mobile' | 'desktop';
+type ChildrenProps = {
+  canvasAutoCaptureRef: React.MutableRefObject<HTMLCanvasElement | undefined>;
+  feedbackPositionFromBottom: number;
+  mediaStream: MediaStream | null;
+  onDetectionComplete: () => void;
+  onDetectionReset: () => void;
+  outlineHeight: number;
+  outlineWidth: number;
+  videoRef: VideoRef;
+  videoSize: VideoSize | undefined;
+};
+type CameraProps = {
+  autocaptureKind: AutocaptureKind;
+  cameraKind: CameraKind;
+  children: (props: ChildrenProps) => JSX.Element | null;
+  deviceKind: DeviceKind;
+  docType?: SupportedIdDocTypes;
+  imageType: IdDocImageTypes;
+  onCapture: (image: string, captureKind: CaptureKind) => void;
+  onError?: () => void;
+  outlineHeightRatio: number; // with respect to the video width (not height since width is smaller)
+  outlineWidthRatio: number; // with respect to the video width
+  setIsCaptured: React.Dispatch<React.SetStateAction<boolean>>;
+  autocaptureFeedback?: CaptureStatus;
+};
+
 const AUTOCAPTURE_TIMER_START_VAL = 3;
 const FEEFBACK_POSITION_FROM_BOTTOM_MOBILE = 150;
 const FEEDBACK_POSITION_FROM_BOTTOM_DESKTOP = 50;
-
-type CameraProps = {
-  onCapture: (image: string, captureKind: CaptureKind) => void;
-  onError?: () => void;
-  cameraKind: CameraKind;
-  outlineWidthRatio: number; // with respect to the video width
-  outlineHeightRatio: number; // with respect to the video width (not height since width is smaller)
-  autocaptureKind: AutocaptureKind;
-  deviceKind: DeviceKind;
-  imageType: IdDocImageTypes;
-  docType?: SupportedIdDocTypes;
+const CountDownProps = {
+  countStart: AUTOCAPTURE_TIMER_START_VAL,
+  intervalMs: AUTOCAPTURE_TIMER_INTERVAL,
 };
 
+const isDesktop = (x: unknown) => x === 'desktop';
+const isDocument = (x: unknown) => x === 'document';
+const isMobile = (x: unknown) => x === 'mobile';
+const logError = (e: string) => Logger.error(e, 'camera');
+const logWarn = (e: string) => Logger.warn(e, 'camera');
+
+const clearCanvas = (
+  ref: React.MutableRefObject<HTMLCanvasElement | undefined>,
+) => {
+  if (!ref.current) {
+    logWarn('Canvas could not be cleared. Ref undefined');
+    return;
+  }
+
+  const context = ref.current.getContext('2d');
+  if (!context) {
+    logWarn('Canvas could not be cleared. Context undefined');
+    return;
+  }
+
+  context.clearRect(0, 0, ref.current.width, ref.current.height);
+};
+
+const getPositionFromBottom = (kind: DeviceKind): 150 | 50 =>
+  kind === 'mobile'
+    ? FEEFBACK_POSITION_FROM_BOTTOM_MOBILE
+    : FEEDBACK_POSITION_FROM_BOTTOM_DESKTOP;
+
+const getPositionFromTop = (kind: DeviceKind, size?: VideoSize): number =>
+  kind === 'mobile'
+    ? (size?.height ?? 0) - FEEFBACK_POSITION_FROM_BOTTOM_MOBILE
+    : (size?.height ?? 0) - FEEDBACK_POSITION_FROM_BOTTOM_DESKTOP;
+
 const Camera = ({
+  autocaptureFeedback,
+  autocaptureKind,
+  cameraKind,
+  children,
+  deviceKind,
+  docType,
+  imageType,
   onCapture,
   onError,
-  cameraKind,
-  outlineWidthRatio,
   outlineHeightRatio,
-  autocaptureKind,
-  deviceKind,
-  imageType,
-  docType,
+  outlineWidthRatio,
+  setIsCaptured,
 }: CameraProps) => {
   const { t } = useTranslation('components.camera');
-  const canvasRefAutoCapture = useRef<HTMLCanvasElement>();
-  const canvasRefImageCapture = useRef<HTMLCanvasElement>();
+  const canvasAutoCaptureRef = useRef<HTMLCanvasElement>();
+  const canvasImageCaptureRef = useRef<HTMLCanvasElement>();
   const videoRef = useRef<HTMLVideoElement>();
-  const videoSize = useSize(videoRef);
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const autocaptureRestartTimeoutRef = useRef<NodeJS.Timeout>();
+
+  const [isImageProcessing, setIsImageProcessing] = useState(false);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [shouldDetect, setShouldDetect] = useState(false); // auto-detect control
+
+  const videoSize = useSize(videoRef);
   const [
     autoCaptureTimerVal,
     { startCountdown, stopCountdown, resetCountdown },
-  ] = useCountdownCustom({
-    countStart: AUTOCAPTURE_TIMER_START_VAL,
-    intervalMs: AUTOCAPTURE_TIMER_INTERVAL,
-  });
-  const [autocaptureFeedback, setAutocaptureFeedback] = useState<
-    string | undefined
-  >('detecting');
-  const [isImageProcessing, setIsImageProcessing] = useState(false);
-  const [shouldDetect, setShouldDetect] = useState(false);
-  const [isCaptured, setIsCaptured] = useState(false);
+  ] = useCountdownCustom(CountDownProps);
+
   const getImageStringFromVideo = useGetImageString();
-  const autocaptureRestartTimeout = useRef<NodeJS.Timeout>();
 
   const mediaStream = useUserMedia(cameraKind, onError);
   const isCameraVisible = !!mediaStream && isVideoPlaying;
@@ -87,14 +141,9 @@ const Camera = ({
     outlineWidthRatio,
     deviceKind,
   });
-  const feedbackPositionFromBottom =
-    deviceKind === 'mobile'
-      ? FEEFBACK_POSITION_FROM_BOTTOM_MOBILE
-      : FEEDBACK_POSITION_FROM_BOTTOM_DESKTOP;
-  const feedbackTop =
-    deviceKind === 'mobile'
-      ? (videoSize?.height ?? 0) - FEEFBACK_POSITION_FROM_BOTTOM_MOBILE
-      : (videoSize?.height ?? 0) - FEEDBACK_POSITION_FROM_BOTTOM_DESKTOP;
+
+  const positionFromTop = getPositionFromTop(deviceKind, videoSize);
+  const positionFromBottom = getPositionFromBottom(deviceKind);
 
   if (mediaStream && videoRef.current && !videoRef.current.srcObject) {
     videoRef.current.srcObject = mediaStream;
@@ -119,28 +168,23 @@ const Camera = ({
   };
 
   const handleClick = (captureKind: CaptureKind) => {
-    if (!canvasRefImageCapture.current || !videoRef.current) {
-      Logger.error(
+    if (!canvasImageCaptureRef.current || !videoRef.current) {
+      logError(
         `Video ref or canvas not initialized for camera capture for capture kind: ${captureKind}`,
-        'camera',
       );
       return;
     }
 
-    const context = canvasRefImageCapture.current.getContext('2d');
+    const context = canvasImageCaptureRef.current.getContext('2d');
     if (!context) {
-      Logger.error(
+      logError(
         `Canvas context is undefined for camera capture for capture kind: ${captureKind}`,
-        'camera',
       );
       return;
     }
 
     if (!videoSize) {
-      Logger.error(
-        `Cannot capture - videoSize not initilized: ${captureKind}`,
-        'camera',
-      );
+      logError(`Cannot capture - videoSize not initilized: ${captureKind}`);
       return;
     }
 
@@ -149,84 +193,30 @@ const Camera = ({
 
     // For document capture, we keep the captured width/height spect ratio same as the outline aspect ratio
     // In case maintaining the aspect ratio overflows the height, we take the full height (Math.min)
-    if (autocaptureKind === 'document') {
+    if (isDocument(autocaptureKind)) {
       desiredImageHeight = Math.min(
-        videoSize.height - feedbackPositionFromBottom,
+        videoSize.height - positionFromBottom,
         videoSize.width * (outlineHeightRatio / outlineWidthRatio),
       );
     }
 
-    const yOffset =
-      autocaptureKind === 'document' ? -feedbackPositionFromBottom / 2 : 0;
-
     const imageString = getImageStringFromVideo({
-      context,
-      videoRef,
-      canvasRef: canvasRefImageCapture,
-      mediaStream,
-      desiredImageWidth,
-      desiredImageHeight,
       autocaptureKind,
-      centerOffsetY: yOffset,
+      canvasRef: canvasImageCaptureRef,
+      centerOffsetY: isDocument(autocaptureKind) ? -positionFromBottom / 2 : 0,
+      context,
+      desiredImageHeight,
+      desiredImageWidth,
+      mediaStream,
+      videoRef,
     });
 
     if (imageString) {
       setIsCaptured(true);
       onCapture(imageString, captureKind);
     }
-    clearCanvas();
+    clearCanvas(canvasImageCaptureRef);
   };
-
-  const clearCanvas = () => {
-    if (!canvasRefImageCapture.current) {
-      Logger.warn('Canvas could not be cleared. Ref undefined', 'camera');
-      return;
-    }
-    const context = canvasRefImageCapture.current.getContext('2d');
-    if (!context) {
-      Logger.warn('Canvas could not be cleared. Context undefined', 'camera');
-      return;
-    }
-    context.clearRect(
-      0,
-      0,
-      canvasRefImageCapture.current.width,
-      canvasRefImageCapture.current.height,
-    );
-  };
-
-  useEffect(() => {
-    if (autoCaptureTimerVal <= 0) {
-      stopCountdown();
-      handleClick('auto');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoCaptureTimerVal]);
-
-  const onAutoDetectionComplete = () => {
-    setIsTimerRunning(true);
-    startCountdown();
-  };
-
-  const resetTimer = () => {
-    resetCountdown();
-    setIsTimerRunning(false);
-  };
-
-  useAutoCapture({
-    videoRef,
-    canvasRef: canvasRefAutoCapture,
-    mediaStream,
-    outlineWidth,
-    outlineHeight,
-    onComplete: onAutoDetectionComplete,
-    onStatusChange: setAutocaptureFeedback,
-    autocaptureKind,
-    shouldDetect,
-    isCaptured,
-    onReset: resetTimer,
-    outlineOffsetY: -feedbackPositionFromBottom / 2, // Negative Y direction (upward)
-  });
 
   const onImageUpload = () => {
     setIsImageProcessing(true);
@@ -240,47 +230,77 @@ const Camera = ({
 
   const onMobileCaptureClick = () => {
     if (isTimerRunning) {
-      resetTimer();
+      handleResetDetectionTimer();
       setShouldDetect(false); // We can cancel the countdown
       const restartTimeout = setTimeout(
         () => setShouldDetect(true),
         AUTOCAPTURE_RESTART_DELAY,
       ); // We wait 1s before re-detecting and starting the countdown again
-      autocaptureRestartTimeout.current = restartTimeout;
+      autocaptureRestartTimeoutRef.current = restartTimeout;
     } else {
       handleClick('manual');
     }
   };
 
-  useEffect(() => () => clearTimeout(autocaptureRestartTimeout.current), []);
+  const handleResetDetectionTimer = () => {
+    resetCountdown();
+    setIsTimerRunning(false);
+  };
+
+  const handleDetectionComplete = () => {
+    setIsTimerRunning(true);
+    startCountdown();
+  };
+
+  useEffect(() => {
+    if (autoCaptureTimerVal <= 0) {
+      stopCountdown();
+      handleClick('auto');
+    }
+  }, [autoCaptureTimerVal]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => () => clearTimeout(autocaptureRestartTimeoutRef.current), []);
 
   return (
     <>
-      {!isCameraVisible && (
+      {!isCameraVisible ? (
         <LoadingContainer
           data-device-kind={deviceKind}
           desktopHeight={DESKTOP_INTERACTION_BOX_HEIGHT}
         >
           <LoadingIndicator />
         </LoadingContainer>
-      )}
+      ) : null}
       <Container data-visible={isCameraVisible}>
         <VideoContainer data-device-kind={deviceKind}>
           <Video
-            ref={videoRef as React.Ref<HTMLVideoElement>}
-            hidden={!isVideoPlaying}
-            onCanPlay={handleCanPlay}
+            autoPlay
             data-camera-kind={cameraKind}
             data-device-kind={deviceKind}
-            autoPlay
-            playsInline
+            hidden={!isVideoPlaying}
             muted
+            onCanPlay={handleCanPlay}
+            playsInline
+            ref={videoRef as React.Ref<HTMLVideoElement>}
           />
+          {isVideoPlaying && shouldDetect
+            ? children({
+                canvasAutoCaptureRef,
+                feedbackPositionFromBottom: positionFromBottom,
+                mediaStream,
+                onDetectionComplete: handleDetectionComplete,
+                onDetectionReset: handleResetDetectionTimer,
+                outlineHeight,
+                outlineWidth,
+                videoRef,
+                videoSize,
+              })
+            : null}
           {!isImageProcessing ? (
             <>
               <Overlay
                 width={videoSize?.width ?? 0}
-                height={feedbackTop}
+                height={positionFromTop}
                 videoHeight={videoSize?.height ?? 0}
                 captureKind={autocaptureKind}
                 outlineWidth={outlineWidth}
@@ -290,17 +310,17 @@ const Camera = ({
                 }
               />
               <Canvas
-                ref={canvasRefImageCapture as React.Ref<HTMLCanvasElement>}
+                ref={canvasImageCaptureRef as React.Ref<HTMLCanvasElement>}
                 width={videoSize?.width}
                 height={videoSize?.height}
               />
               <Canvas
-                ref={canvasRefAutoCapture as React.Ref<HTMLCanvasElement>}
+                ref={canvasAutoCaptureRef as React.Ref<HTMLCanvasElement>}
                 width={videoSize?.width}
                 height={videoSize?.height}
               />
-              {autocaptureFeedback && (
-                <Feedback deviceKind={deviceKind} top={feedbackTop}>
+              {autocaptureFeedback ? (
+                <Feedback deviceKind={deviceKind} top={positionFromTop}>
                   {t(
                     `autocapture.feedback.${autocaptureKind}.${autocaptureFeedback}`,
                     {
@@ -309,28 +329,28 @@ const Camera = ({
                     },
                   )}
                 </Feedback>
-              )}
-              {deviceKind === 'mobile' && (
+              ) : null}
+              {isMobile(deviceKind) && (
                 <CaptureButton
                   onClick={onMobileCaptureClick}
                   variant={isTimerRunning ? 'stop' : 'round'}
                   disabled={!isCameraVisible || !videoSize}
                 />
               )}
-              {autocaptureKind === 'document' && (
+              {isDocument(autocaptureKind) && (
                 <UploadButton
                   onUpload={onImageUpload}
                   onComplete={onUploadComplete}
                 />
               )}
-              {isTimerRunning && (
-                <TimerContainer height={feedbackTop}>
+              {isTimerRunning ? (
+                <TimerContainer height={positionFromTop}>
                   <CountdownTimer
                     current={autoCaptureTimerVal}
                     start={AUTOCAPTURE_TIMER_START_VAL}
                   />
                 </TimerContainer>
-              )}
+              ) : null}
             </>
           ) : (
             <ProcessingContainer>
@@ -338,7 +358,7 @@ const Camera = ({
             </ProcessingContainer>
           )}
         </VideoContainer>
-        {deviceKind === 'desktop' && (
+        {isDesktop(deviceKind) && (
           <StickyBottomBox>
             <CaptureButton
               onClick={() => handleClick('manual')}
@@ -473,4 +493,4 @@ const TimerContainer = styled.div<{ height: number }>`
   `}
 `;
 
-export default Camera;
+export default React.memo(Camera);

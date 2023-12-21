@@ -8,7 +8,7 @@ import {
 import { BottomSheet } from '@onefootprint/ui';
 import React from 'react';
 
-import type { AutocaptureKind } from '../../../camera/hooks/use-auto-capture';
+import type { AutocaptureKind } from '../../../camera/types';
 import InstructionItems from './components/instruction-item';
 
 type InstructionProps = {

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import React from 'react';
 
 import { AUTOCAPTURE_TIMER_INTERVAL } from '../../../../constants/transition-delay.constants';
-import type { AutocaptureKind } from '../../hooks/use-auto-capture';
+import type { AutocaptureKind } from '../../types';
 
 type OverlayProps = {
   width: number; // Fits the size of video

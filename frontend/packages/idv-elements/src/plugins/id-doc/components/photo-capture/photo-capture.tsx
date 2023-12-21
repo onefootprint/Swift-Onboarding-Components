@@ -1,8 +1,10 @@
 import { IcoInfo24 } from '@onefootprint/icons';
 import type { IdDocImageTypes } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
+import type { ComponentProps } from 'react';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 
+import type { NavigationHeaderLeftButtonProps } from '../../../../components';
 import {
   HeaderTitle,
   NavigationHeader,
@@ -13,63 +15,86 @@ import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import useProcessImage from '../../hooks/use-process-image';
 import type { CaptureKind } from '../../utils/state-machine';
 import Camera from '../camera';
+import AutoCaptureDoc from '../camera/auto-capture-doc';
+import AutoCaptureFace from '../camera/auto-capture-face';
 import type { DeviceKind } from '../camera/camera';
-import type { AutocaptureKind } from '../camera/hooks/use-auto-capture';
+import type { AutocaptureKind, CaptureStatus } from '../camera/types';
 import type { CameraKind } from '../camera/utils/get-camera-options';
 import Loading from '../loading';
 import Preview from '../preview';
 import Instructions from './components/instructions';
 
-type HeaderTextType = {
-  camera: string;
-  preview: string;
-};
+type HeaderTextType = { camera: string; preview: string };
+type OnComplete = (
+  imageFile: File,
+  extraCompressed: boolean,
+  captureKind: CaptureKind,
+) => void;
 
 type PhotoCaptureProps = {
-  outlineWidthRatio: number; // with respect to the video width
-  outlineHeightRatio: number; // with respect to the video width (not height)
-  cameraKind: CameraKind;
-  onComplete: (
-    imageFile: File,
-    extraCompressed: boolean,
-    captureKind: CaptureKind,
-  ) => void;
   autocaptureKind: AutocaptureKind;
+  cameraKind: CameraKind;
   deviceKind: DeviceKind;
-  onBack?: () => void;
-  title: HeaderTextType;
-  subtitle?: Partial<HeaderTextType>;
   imageType: IdDocImageTypes;
+  onBack?: () => void;
+  onComplete: OnComplete;
+  outlineHeightRatio: number; // with respect to the video width (not height)
+  outlineWidthRatio: number; // with respect to the video width
+  subtitle?: Partial<HeaderTextType>;
+  title: HeaderTextType;
 };
 
+const DesktopNavProps: NavigationHeaderLeftButtonProps = {
+  variant: 'close',
+  confirmClose: true,
+};
+
+const MobileBoxSX: ComponentProps<typeof Box>['sx'] = {
+  alignItems: 'center',
+  display: 'flex',
+  flexDirection: 'column',
+  height: '100%',
+  justifyContent: 'center',
+};
+
+const isDesktop = (x: unknown) => x === 'desktop';
+const isDocument = (x: unknown) => x === 'document';
+const isFace = (x: unknown) => x === 'face';
+const isMobile = (x: unknown) => x === 'mobile';
+const logWarn = (e: string) => Logger.warn(e, 'photo-capture');
+
 const PhotoCapture = ({
-  outlineWidthRatio,
-  outlineHeightRatio,
-  cameraKind,
-  onComplete,
   autocaptureKind,
+  cameraKind,
   deviceKind,
-  onBack,
-  title,
-  subtitle,
   imageType,
+  onBack,
+  onComplete,
+  outlineHeightRatio,
+  outlineWidthRatio,
+  subtitle,
+  title,
 }: PhotoCaptureProps) => {
   const [state, send] = useIdDocMachine();
   const {
     hasBadConnectivity,
     idDoc: { type: docType },
   } = state.context;
-  const [image, setImage] = useState<string | null>(null);
   const { processImageUrl } = useProcessImage();
+  const [image, setImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [captureKind, setCaptureKind] = useState<CaptureKind>();
   const [showInstructions, setShowInstructions] = useState(false);
+  const [isCaptured, setIsCaptured] = useState(false);
+  const [autocaptureFeedback, setAutocaptureFeedback] = useState<
+    CaptureStatus | undefined
+  >('detecting');
   const {
     footer: { set: updateFooter },
   } = useLayoutOptions();
 
   useLayoutEffect(() => {
-    if (deviceKind !== 'mobile') {
+    if (isMobile(deviceKind)) {
       return () => {};
     }
     // Only hide footer when we are in camera mode
@@ -87,22 +112,19 @@ const PhotoCapture = ({
 
   const handleRetake = () => {
     setImage(null);
+    setIsCaptured(false);
   };
 
   const handleConfirm = async () => {
     if (!image) {
-      Logger.warn(
+      logWarn(
         'Captured image could not be confirmed and submitted - retaking the image',
-        'photo-capture',
       );
       return;
     }
 
     if (!captureKind) {
-      Logger.warn(
-        'Captured kind could not be determined - retaking the image',
-        'photo-capture',
-      );
+      logWarn('Captured kind could not be determined - retaking the image');
       return;
     }
     Logger.info(`Photocapture: image URL length ${image.length}`);
@@ -113,10 +135,7 @@ const PhotoCapture = ({
       // An error occurred, directly prompt user to re-take the image
       setIsLoading(false);
       handleRetake();
-      Logger.warn(
-        'Captured image could not be processed - retaking the image',
-        'photo-capture',
-      );
+      logWarn('Captured image could not be processed - retaking the image');
       return;
     }
 
@@ -129,15 +148,12 @@ const PhotoCapture = ({
   };
 
   const handleError = () => {
-    send({
-      type: 'cameraErrored',
-    });
+    send({ type: 'cameraErrored' });
   };
 
   useEffect(() => {
-    if (image && deviceKind === 'mobile') handleConfirm();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [image]);
+    if (image && isMobile(deviceKind)) handleConfirm();
+  }, [image]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCapture = (newImage: string, newCaptureKind: CaptureKind) => {
     setImage(newImage);
@@ -146,12 +162,10 @@ const PhotoCapture = ({
 
   return image ? (
     <>
-      {deviceKind === 'desktop' && (
+      {isDesktop(deviceKind) && (
         <>
           <Box marginBottom={7}>
-            <NavigationHeader
-              leftButton={{ variant: 'close', confirmClose: true }}
-            />
+            <NavigationHeader leftButton={DesktopNavProps} />
             <HeaderTitle title={title.preview} />
           </Box>
           <Preview
@@ -164,54 +178,87 @@ const PhotoCapture = ({
           />
         </>
       )}
-      {deviceKind === 'mobile' && (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            height: '100%',
-            justifyContent: 'center',
-          }}
-        >
+      {isMobile(deviceKind) && (
+        <Box sx={MobileBoxSX}>
           <Loading step="process" imageType={imageType} />
         </Box>
       )}
     </>
   ) : (
     <>
-      {deviceKind === 'desktop' && (
+      {isDesktop(deviceKind) && (
         <Box marginBottom={7}>
-          <NavigationHeader
-            leftButton={{ variant: 'close', confirmClose: true }}
-          />
+          <NavigationHeader leftButton={DesktopNavProps} />
           <HeaderTitle title={title.camera} subtitle={subtitle?.camera} />
         </Box>
       )}
-      {deviceKind === 'mobile' && (
+      {isMobile(deviceKind) && (
         <NavigationHeader
           leftButton={{ variant: 'back', onBack }}
           rightButton={{
             icon: IcoInfo24,
             onClick: () => setShowInstructions(true),
           }}
-          content={{
-            kind: 'static',
-            title: title.camera,
-          }}
+          content={{ kind: 'static', title: title.camera }}
         />
       )}
       <Camera
-        onCapture={handleCapture}
-        onError={deviceKind === 'mobile' ? handleError : undefined} // We just show a toast in desktop since we don't have a prompt page
-        cameraKind={cameraKind}
-        outlineWidthRatio={outlineWidthRatio}
-        outlineHeightRatio={outlineHeightRatio}
+        autocaptureFeedback={autocaptureFeedback}
         autocaptureKind={autocaptureKind}
+        cameraKind={cameraKind}
         deviceKind={deviceKind}
-        imageType={imageType}
         docType={docType}
-      />
+        imageType={imageType}
+        onCapture={handleCapture}
+        onError={isMobile(deviceKind) ? handleError : undefined} // We just show a toast in desktop since we don't have a prompt page
+        outlineHeightRatio={outlineHeightRatio}
+        outlineWidthRatio={outlineWidthRatio}
+        setIsCaptured={setIsCaptured}
+      >
+        {({
+          canvasAutoCaptureRef,
+          feedbackPositionFromBottom,
+          mediaStream,
+          onDetectionComplete,
+          onDetectionReset,
+          outlineHeight,
+          outlineWidth,
+          videoRef,
+          videoSize,
+        }) => {
+          if (isDocument(autocaptureKind)) {
+            return (
+              <AutoCaptureDoc
+                canvasAutoCaptureRef={canvasAutoCaptureRef}
+                feedbackPositionFromBottom={feedbackPositionFromBottom}
+                isCaptured={isCaptured}
+                mediaStream={mediaStream}
+                onDetectionComplete={onDetectionComplete}
+                onDetectionReset={onDetectionReset}
+                outlineHeight={outlineHeight}
+                outlineWidth={outlineWidth}
+                setAutocaptureFeedback={setAutocaptureFeedback}
+                videoRef={videoRef}
+                videoSize={videoSize}
+              />
+            );
+          }
+
+          return isFace(autocaptureKind) ? (
+            <AutoCaptureFace
+              canvasAutoCaptureRef={canvasAutoCaptureRef}
+              feedbackPositionFromBottom={feedbackPositionFromBottom}
+              isCaptured={isCaptured}
+              onDetectionComplete={onDetectionComplete}
+              onDetectionReset={onDetectionReset}
+              outlineWidth={outlineWidth}
+              setAutocaptureFeedback={setAutocaptureFeedback}
+              videoRef={videoRef}
+              videoSize={videoSize}
+            />
+          ) : null;
+        }}
+      </Camera>
       <Instructions
         onClose={() => setShowInstructions(false)}
         isOpen={showInstructions}

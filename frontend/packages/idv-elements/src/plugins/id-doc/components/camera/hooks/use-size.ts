@@ -5,29 +5,23 @@ import useResizeObserver from 'use-resize-observer/polyfilled';
 // This size will be used to create a matching sized canvas to copy the
 // video image over when captured.
 const useSize = (target: React.RefObject<HTMLElement | undefined>) => {
-  const [size, setSize] = useState<{
-    width: number;
-    height: number;
-  }>();
+  const [size, setSize] = useState<{ width: number; height: number }>();
+
   useLayoutEffect(() => {
-    if (!target?.current) {
-      return;
+    if (!target?.current) return;
+
+    const { width, height } = target.current.getBoundingClientRect();
+    if (width && height) {
+      setSize({ width, height });
     }
-    const rect = target?.current.getBoundingClientRect();
-    setSize({
-      width: rect.width,
-      height: rect.height,
-    });
   }, [target]);
 
   useResizeObserver({
-    ref: target as React.RefObject<HTMLElement>,
-    onResize: newSize => {
-      const { width, height } = newSize;
-      if (!width || !height) {
-        return;
+    ref: target.current,
+    onResize: ({ width, height }) => {
+      if (width && height) {
+        setSize({ width, height });
       }
-      setSize({ width, height });
     },
   });
 

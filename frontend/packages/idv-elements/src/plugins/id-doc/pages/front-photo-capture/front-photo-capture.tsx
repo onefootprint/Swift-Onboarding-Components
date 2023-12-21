@@ -45,9 +45,7 @@ const FrontPhotoCapture = () => {
     });
 
   const handleClickBack = () => {
-    send({
-      type: 'navigatedToPrev',
-    });
+    send({ type: 'navigatedToPrev' });
   };
 
   return (

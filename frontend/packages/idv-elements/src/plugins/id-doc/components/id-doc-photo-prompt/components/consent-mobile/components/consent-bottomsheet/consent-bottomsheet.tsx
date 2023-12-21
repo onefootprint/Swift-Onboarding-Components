@@ -27,6 +27,11 @@ const OPEN_CLOSE_DELAY = 200;
 const DEFAULT_CONTENT_HEIGHT = 400;
 const SCROLL_OFFSET = 10; // We enable the button is the user scrolled with the 10px of the bottom of the content
 
+const getContentHeight = () =>
+  typeof window === 'undefined'
+    ? DEFAULT_CONTENT_HEIGHT
+    : Math.min(DEFAULT_CONTENT_HEIGHT, (window?.innerHeight ?? 0) * 0.6); // If the window height is smaller than 540px, we will use 80% of the window height
+
 const ConsentBottomSheet = ({
   open,
   onClose,
@@ -74,10 +79,7 @@ const ConsentBottomSheet = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const CONTENT_HEIGHT = Math.min(
-    DEFAULT_CONTENT_HEIGHT,
-    (window?.innerHeight ?? 0) * 0.6,
-  ); // If the window height is smaller than 540px, we will use 80% of the window height
+  const CONTENT_HEIGHT = getContentHeight();
 
   const handleClick = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
