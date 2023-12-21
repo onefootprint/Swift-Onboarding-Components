@@ -197,6 +197,7 @@ pub(crate) struct User {
 pub(crate) struct SearchBy {
     pub name: Name,
     pub address: Address,
+    #[serde(rename = "DOB")]
     pub dob: Option<Dob>,
     /// Submit SSN or submit SSNLast4. The input SSN should not contain dashes.
     #[serde(rename = "SSN")]
