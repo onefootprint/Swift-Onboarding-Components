@@ -3,6 +3,7 @@ mod experian_address_codes;
 mod experian_phone_codes;
 mod experian_ssn_codes;
 mod idology;
+mod lexis;
 mod reason_code_helpers;
 mod signal_attribute;
 mod socure;
@@ -14,6 +15,7 @@ pub use experian_address_codes::*;
 pub use experian_phone_codes::*;
 pub use experian_ssn_codes::*;
 pub use idology::*;
+pub use lexis::*;
 pub use signal_attribute::*;
 pub use socure::*;
 

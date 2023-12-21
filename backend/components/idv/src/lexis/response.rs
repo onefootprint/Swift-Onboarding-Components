@@ -471,6 +471,20 @@ impl FlexIdResponse {
             Ok(())
         }
     }
+
+    pub fn name_address_phone_summary(&self) -> NameAddressPhoneSummary {
+        self.result()
+            .and_then(|r| r.name_address_phone.as_ref())
+            .and_then(|nap| nap.summary.as_ref())
+            .and_then(|s| match NameAddressPhoneSummary::try_from(s.as_str().trim()) {
+                Ok(naps) => Some(naps),
+                Err(_) => {
+                    tracing::error!(name_address_phone_summary=%s, "Unknown Lexis NameAddressPhone summary");
+                    None
+                }
+            })
+            .unwrap_or(NameAddressPhoneSummary::NothingFound) // TODO: in general when an expected field is missing or we fail to parse, do we want produce a conservative FRC (like this unwrap_or) or do we want to just not produce any FRC at all?
+    }
 }
 
 #[cfg(test)]

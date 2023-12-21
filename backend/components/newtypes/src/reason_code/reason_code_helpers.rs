@@ -319,6 +319,10 @@ impl From<PhRCH> for Vec<FootprintReasonCode> {
         // will just show the phone code only for now
         // let name_codes = erch.name.phone_codes().into_iter();
         // let address_codes = erch.address.phone_codes().into_iter();
+
+        // TODO: this seems like it might be overly liberal, in that you can have just First name matching Phone (and not last name, address matching) and we call this PhoneLocatedMatches
+        // might make sense for us to only say phone matches if the name + address components match to a reasonable level as well?
+        // or use PhoneLocatedPartiallyMatches here (and have this have a dual meaning- either a digit is off in the phone itself or name/address don't match well)
         match erch.phone_match_level {
             MatchLevel::NoMatch => vec![FootprintReasonCode::PhoneLocatedDoesNotMatch],
             MatchLevel::Partial => vec![FootprintReasonCode::PhoneLocatedPartiallyMatches],
