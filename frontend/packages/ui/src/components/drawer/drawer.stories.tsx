@@ -76,7 +76,6 @@ const Template: Story<DrawerProps> = ({
   closeIconComponent: CloseIconComponent,
   onClose,
   open: initialOpen,
-  testID,
   title,
 }: DrawerProps) => {
   const [open, setOpen] = useState(initialOpen);
@@ -94,7 +93,6 @@ const Template: Story<DrawerProps> = ({
           onClose();
         }}
         open={open}
-        testID={testID}
         title={title}
       >
         <Typography variant="body-4">{children}</Typography>
@@ -118,6 +116,5 @@ Base.args = {
     console.log('clicked outside'); // eslint-disable-line no-console
   },
   open: false,
-  testID: 'drawer-test-id',
   title: 'Title',
 };

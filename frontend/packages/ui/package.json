@@ -29,6 +29,7 @@
     "@onefootprint/jest-presets": "*",
     "@onefootprint/styled": "*",
     "@popperjs/core": "^2.11.5",
+    "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-dropdown-menu": "1.0.0",
     "@radix-ui/react-scroll-area": "1.0.3",
     "@radix-ui/react-tabs": "1.0.2",
