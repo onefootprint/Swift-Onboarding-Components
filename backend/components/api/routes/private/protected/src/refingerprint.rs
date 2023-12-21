@@ -5,7 +5,6 @@ use actix_web::{post, web, web::Json};
 use api_core::{
     errors::{ApiResult, AssertionError, DryRunResult, DryRunResultTrait, ValidationError},
     types::{JsonApiResponse, ResponseData},
-    ApiError,
 };
 use db::{
     models::fingerprint::{Fingerprint, NewFingerprint},
@@ -153,20 +152,21 @@ fn get_dls_to_refingerprint(
     // Page through the vaults by ID, just because we have an index on it. We'll miss any vaults
     // newly created, but that's fine because they don't need to be backfilled
     let vaults = vault::table
-        .filter(vault::id.ge(cursor))
+        .filter(vault::id.ge(&cursor))
         .order_by(vault::id)
         .limit(limit)
         .get_results::<Vault>(conn)
         .map_err(DbError::from)?;
-    let next = vault_ids
+    let next = vaults
         .into_iter()
         .last()
-        .ok_or(ValidationError("Page is empty - no next page"))?;
+        .ok_or(ValidationError("Page is empty - no next page"))?
+        .id;
 
     let data = data_lifetime::table
         .inner_join(vault_data::table)
-        .filter(data_lifetime::vault_id.ge(cursor))
-        .filter(data_lifetime::vault_id.le(next))
+        .filter(data_lifetime::vault_id.ge(&cursor))
+        .filter(data_lifetime::vault_id.le(&next))
         .get_results::<(DataLifetime, VaultData)>(conn)
         .map_err(DbError::from)?;
     // Bulk fetch the SVs and Vaults
