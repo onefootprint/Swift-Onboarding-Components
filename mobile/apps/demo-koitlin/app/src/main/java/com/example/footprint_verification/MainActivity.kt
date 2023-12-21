@@ -5,6 +5,10 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import com.footprint.verify.Footprint
+import com.footprint.verify.FootprintConfig
+import com.footprint.verify.FootprintL10n
+import com.footprint.verify.FootprintOptions
+import com.footprint.verify.FootprintSupportedLocale
 import com.footprint.verify.FootprintUserData
 
 class MainActivity : AppCompatActivity() {
@@ -13,31 +17,25 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        val userData = FootprintUserData(email = "test@email.com", phoneNumber = ("+1 (555) 555-0100"))
-        val onComplete: (String) -> Unit = {token: String ->
-            Log.d("VerificationResult", "The flow has completed. The validation token is $token")
-        }
-        val onClose: () -> Unit = {
-            Log.d("VerificationResult", "The flow was closed")
-        }
-        val onCancel: () -> Unit = {
-            Log.d("VerificationResult", "The flow was canceled")
-        }
-
-        val footprint = Footprint.getInstance()
-        footprint.setParams(
-            "com.example.footprint_verification.MainActivity",
-            publicKey = "pb_test_aSzwnZecnXS4faoyhxrocW",
-            userData = userData,
-            onComplete = onComplete,
-            onCancel = onCancel,
-            onClose = onClose
-        )
-
         verificationButton = findViewById(R.id.verify_button)
         verificationButton.setOnClickListener {
-            footprint.startVerification(this@MainActivity)
+            val config = FootprintConfig(
+                destinationActivityName = "com.example.footprint_verification.MainActivity",
+                publicKey = "pb_test_aSzwnZecnXS4faoyhxrocW",
+                userData = FootprintUserData(email = "test@email.com", phoneNumber = ("+15555550100")),
+                options = FootprintOptions(showLogo = true),
+                l10n = FootprintL10n(locale = FootprintSupportedLocale.ES_MX),
+                onComplete = {token: String ->
+                    Log.d("VerificationResult", "The flow has completed. The validation token is $token")
+                },
+                onCancel = {
+                    Log.d("VerificationResult", "The flow was canceled")
+                }
+            )
+            Footprint.init(
+                this@MainActivity,
+                config = config
+            )
         }
 
         val extras: Bundle? = intent.extras

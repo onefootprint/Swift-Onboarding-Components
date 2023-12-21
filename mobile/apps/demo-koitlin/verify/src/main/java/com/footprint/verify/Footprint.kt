@@ -2,62 +2,34 @@ package com.footprint.verify
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
-import androidx.browser.customtabs.CustomTabsIntent
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
-import okio.IOException
 import java.lang.Exception
-import kotlin.concurrent.Volatile
 
 class Footprint private constructor() {
     private var destinationActivityName: String? = null
     private var publicKey: String? = null
+    private var authToken: String? = null
     private var userData: FootprintUserData? = null
     private var options: FootprintOptions? = null
+    private var l10n: FootprintL10n? = null
     private var launcherActivityActive = false
-    private var onCompleteCallback: ((validationToken: String) -> Unit)? = null
-    private var onCloseCallback: (() -> Unit)? = null
-    private var onCancelCallback: (() -> Unit)? = null
+    private var onComplete: ((validationToken: String) -> Unit)? = null
+    private var onCancel: (() -> Unit)? = null
 
     companion object {
-        @Volatile
-        private var instance: Footprint? = null
+        val instance: Footprint by lazy { Footprint() }
 
-        fun getInstance(): Footprint {
-            if (instance == null) {
-                synchronized(this) {
-                    if (instance == null) {
-                        instance = Footprint()
-                    }
-                }
-            }
-            return instance!!
+        fun init(context: Context, config: FootprintConfig) {
+            instance.apply {
+                destinationActivityName = config.destinationActivityName
+                publicKey = config.publicKey
+                authToken = config.authToken
+                userData = config.userData
+                options = config.options
+                l10n = config.l10n
+                onComplete = config.onComplete
+                onCancel = config.onCancel
+            }.startVerification(context)
         }
-    }
-
-    fun setParams(
-        destinationActivityName: String,
-        publicKey: String,
-        userData: FootprintUserData? = null,
-        options: FootprintOptions? = null,
-        onComplete: ((validationToken: String) -> Unit)? = null,
-        onClose: (() -> Unit)? = null,
-        onCancel: (() -> Unit)? = null
-    ){
-        this.destinationActivityName = destinationActivityName
-        this.publicKey = publicKey
-        this.userData = userData
-        this.options = options
-        this.onCompleteCallback = onComplete
-        this.onCloseCallback = onClose
-        this.onCancelCallback = onCancel
     }
 
     internal fun getDestinationActivityName(): String? {
@@ -68,6 +40,10 @@ class Footprint private constructor() {
         return this.publicKey
     }
 
+    internal fun getAuthToken(): String? {
+        return this.authToken
+    }
+
     internal fun getUserData(): FootprintUserData? {
         return this.userData
     }
@@ -76,16 +52,16 @@ class Footprint private constructor() {
         return this.options
     }
 
-    internal fun getOnCompleteCallback(): ((String) -> Unit)? {
-        return this.onCompleteCallback
+    internal fun getL10n(): FootprintL10n? {
+        return this.l10n
     }
 
-    internal fun getOnCloseCallback(): (() -> Unit)? {
-        return this.onCloseCallback
+    internal fun getOnComplete(): ((String) -> Unit)? {
+        return this.onComplete
     }
 
-    internal fun getOnCancelCallback(): (() -> Unit)? {
-        return this.onCancelCallback
+    internal fun getOnCancel(): (() -> Unit)? {
+        return this.onCancel
     }
 
     internal fun setLauncherActivityActive(isActive: Boolean) {
@@ -95,12 +71,14 @@ class Footprint private constructor() {
     fun startVerification(context: Context){
         if(launcherActivityActive) return // To avoid multiple clicks
         val hasPublicKey = publicKey != null && publicKey!!.isNotEmpty()
+        val hasAuthToken = authToken != null && authToken!!.isNotEmpty()
+        val isMissingParam = !hasPublicKey && !hasAuthToken
         val hasDestinationActivityName = destinationActivityName != null && destinationActivityName!!.isNotEmpty()
 
-        if(!hasPublicKey || !hasDestinationActivityName){
+        if(isMissingParam || !hasDestinationActivityName){
             throw Exception(
                 "Missing params:"+
-                        (if(hasPublicKey) "" else " publicKey") +
+                        (if(isMissingParam) "" else " (publicKey or auth token)") +
                         (if(hasDestinationActivityName) "" else " destinationActivityName")
             )
         }

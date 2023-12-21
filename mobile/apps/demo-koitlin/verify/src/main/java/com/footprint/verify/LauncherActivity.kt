@@ -20,10 +20,7 @@ import okhttp3.Response
 import okio.IOException
 
 
-internal enum class VerificationResult(val value: String){
-    CLOSED("closed"),
-    CANCELED("canceled")
-}
+internal const val FootprintCanceledResultValue = "canceled"
 
 internal class LauncherActivity : AppCompatActivity() {
     private var loadingIndicator: ProgressBar? = null
@@ -38,12 +35,14 @@ internal class LauncherActivity : AppCompatActivity() {
 
     private var destinationActivityName: String? = null
     private var publicKey: String? = null
+    private var authToken: String? = null
     private var userData: FootprintUserData? = null
     private var options: FootprintOptions? = null
-    private var onCompleteCallback: ((validationToken: String) -> Unit)? = null
-    private var onCloseCallback: (() -> Unit)? = null
-    private var onCancelCallback: (() -> Unit)? = null
-    private val footprint = Footprint.getInstance()
+    private var l10n: FootprintL10n? = null
+    private var onComplete: ((validationToken: String) -> Unit)? = null
+    private var onCancel: (() -> Unit)? = null
+    private val footprint = Footprint.instance
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launcher)
@@ -54,11 +53,12 @@ internal class LauncherActivity : AppCompatActivity() {
 
         destinationActivityName = footprint.getDestinationActivityName()
         publicKey = footprint.getPublicKey()
+        authToken = footprint.getAuthToken()
         userData = footprint.getUserData()
         options = footprint.getOptions()
-        onCompleteCallback = footprint.getOnCompleteCallback()
-        onCloseCallback = footprint.getOnCloseCallback()
-        onCancelCallback = footprint.getOnCancelCallback()
+        l10n = footprint.getL10n()
+        onComplete = footprint.getOnComplete()
+        onCancel = footprint.getOnCancel()
 
         val appIntent = intent;
         val resultUrl: Uri? = appIntent?.data
@@ -66,16 +66,15 @@ internal class LauncherActivity : AppCompatActivity() {
             if(publicKey != null && destinationActivityName != null) {
                 loadingIndicator?.visibility = View.VISIBLE
                 errorIndicator?.visibility = View.INVISIBLE
-                launchVerification(this@LauncherActivity, publicKey!!, userData, options)
+                launchVerification(this@LauncherActivity)
             }else{
                 loadingIndicator?.visibility = View.INVISIBLE
                 errorIndicator?.visibility = View.VISIBLE
             }
         }else{
             val result = parseResultUrl(resultUrl.toString())
-            if(result == VerificationResult.CLOSED.value) onCloseCallback?.invoke()
-            else if(result == VerificationResult.CANCELED.value) onCancelCallback?.invoke()
-            else onCompleteCallback?.invoke(result)
+            if(result == FootprintCanceledResultValue) onCancel?.invoke()
+            else onComplete?.invoke(result)
             if(destinationActivityName != null) startDestinationActivity(destinationActivityName!!, result)
         }
     }
@@ -84,11 +83,10 @@ internal class LauncherActivity : AppCompatActivity() {
         super.onResume()
         if (mCustomTabsOpened) {
             // This means that the custom tabs have been closed by user clicking the close button on chrome (not our FE close button)
-            // In this case, we send the user to the destination activity with a "close" result
-            // TODO: call onClose
+            // In this case, we send the user to the destination activity with a "cancel" result
             mCustomTabsOpened = false
-            onCloseCallback?.invoke()
-            if(destinationActivityName != null) startDestinationActivity(destinationActivityName!!, VerificationResult.CLOSED.value)
+            onCancel?.invoke()
+            if(destinationActivityName != null) startDestinationActivity(destinationActivityName!!, FootprintCanceledResultValue)
         }
     }
 
@@ -98,10 +96,10 @@ internal class LauncherActivity : AppCompatActivity() {
         return "$baseUrl/?redirect_url=$redirectUrl#$sdkToken"
     }
 
-    private fun getSdkRequestBody(publicKey: String, userData: FootprintUserData? = null, options: FootprintOptions? = null): String {
-        val kind = "verify_v1";
-        val requestData = Data(publicKey = publicKey, userData = userData, options = options);
-        val requestBody = SdkRequestData(kind =kind, data = requestData)
+    private fun getSdkRequestBody(): String {
+        val requestData = Data(publicKey = publicKey,
+            authToken = authToken, userData = userData, options = options, l10n = l10n);
+        val requestBody = SdkRequestData(kind = "verify_v1", data = requestData)
         val requestBodyString = Json.encodeToString(requestBody);
         return requestBodyString
     }
@@ -116,8 +114,8 @@ internal class LauncherActivity : AppCompatActivity() {
             .build();
     }
 
-    private fun launchVerification(context: Context, publicKey: String, userData: FootprintUserData? = null, options: FootprintOptions? = null){
-        val sdkRequestBody = getSdkRequestBody(publicKey = publicKey, userData = userData, options = options)
+    fun launchVerification(context: Context){
+        val sdkRequestBody = getSdkRequestBody()
         val sdkRequest = getSdkRequest(sdkRequestBody = sdkRequestBody)
 
         this.client.newCall(sdkRequest).enqueue(object : Callback {
@@ -155,7 +153,7 @@ internal class LauncherActivity : AppCompatActivity() {
         val params = url.split("?")[1]
         val key = params.split("=")[0]
         val value = params.split("=")[1]
-        if(key == VerificationResult.CANCELED.value || key == VerificationResult.CLOSED.value) {
+        if(key == FootprintCanceledResultValue) {
             return key
         }
         return value // The value is essentially the token here

@@ -4,12 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class FootprintOptions(
-    val showCompletionPage: Boolean? = null,
-    val showLogo: Boolean? = null
-)
-
-@Serializable
 data class FootprintUserData(
     @SerialName("id.email") val email: String? = null,
     @SerialName("id.phone_number") val phoneNumber: String? = null,
@@ -32,12 +26,45 @@ data class FootprintUserData(
     @SerialName("id.visa_expiration_date") val visaExpirationDate: String? = null
 )
 
+data class FootprintConfig(
+    val destinationActivityName: String? = null,
+    val publicKey: String? = null,
+    val authToken: String? = null,
+    val userData: FootprintUserData? = null,
+    val options: FootprintOptions? = null,
+    val l10n: FootprintL10n? = null,
+    val onComplete: ((validationToken: String) -> Unit)? = null,
+    val onCancel: (() -> Unit)? = null
+)
+
+@Serializable
+data class FootprintOptions(
+    @SerialName("show_completion_page") val showCompletionPage: Boolean? = null,
+    @SerialName("show_logo") val showLogo: Boolean? = null
+)
+
+enum class FootprintSupportedLocale(val value: String){
+    EN_US("en-US"),
+    ES_MX("es-MX")
+}
+
+@Serializable
+data class FootprintL10n(val locale: FootprintSupportedLocale? = null)
+
 @Serializable
 internal data class Data(
-    @SerialName("public_key") val publicKey: String,
+    @SerialName("public_key") val publicKey: String? = null,
+    @SerialName("auth_token") val authToken: String? = null,
     val options: FootprintOptions? = null,
-    @SerialName("user_data") val userData: FootprintUserData? = null,
-)
+    val l10n: FootprintL10n? = null,
+    @SerialName("user_data") val userData: FootprintUserData? = null
+) {
+    init {
+        require((publicKey != null).xor(authToken != null)) {
+            "Exactly one of publicKey or authToken must be provided"
+        }
+    }
+}
 
 @Serializable
 internal data class SdkRequestData(val kind: String, val data: Data)
