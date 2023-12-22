@@ -19,10 +19,30 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         verificationButton = findViewById(R.id.verify_button)
         verificationButton.setOnClickListener {
+            val userData = FootprintUserData(
+                email = "example@gmail.com",
+                phoneNumber = "+15555550100",
+                firstName = "Piip",
+                lastName = "Foot",
+                dob = "01/01/1996",
+                addressLine1 = "123 Main St",
+                addressLine2 = "Unit 123",
+                city = "Huntington Beach",
+                state = "CA",
+                country = "US",
+                zip = "12345",
+                ssn9 = "343434344",
+                ssn4 = "1234",
+                nationality = "US",
+                usLegalStatus = "citizen",
+                citizenships = listOf("US", "TR"),
+                visaKind = "f1",
+                visaExpirationDate = "05/12/2024"
+            )
             val config = FootprintConfig(
                 destinationActivityName = "com.example.footprint_verification.MainActivity",
                 publicKey = "pb_test_aSzwnZecnXS4faoyhxrocW",
-                userData = FootprintUserData(email = "test@email.com", phoneNumber = ("+15555550100")),
+                userData = userData,
                 options = FootprintOptions(showLogo = true),
                 l10n = FootprintL10n(locale = FootprintSupportedLocale.ES_MX),
                 onComplete = {token: String ->
@@ -37,8 +57,5 @@ class MainActivity : AppCompatActivity() {
                 config = config
             )
         }
-
-        val extras: Bundle? = intent.extras
-        Log.d("VerificationResult", "The bundle data: ${extras?.getString("verificationResult")}")
     }
 }

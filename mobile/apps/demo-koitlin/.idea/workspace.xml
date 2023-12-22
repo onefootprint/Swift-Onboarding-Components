@@ -4,23 +4,14 @@
     <shared>
       <config />
     </shared>
-    <layouts>
-      <layout url="file://$PROJECT_DIR$/verify/src/main/res/layout/activity_launcher.xml">
-        <config>
-          <theme>@android:style/Theme.Material.Light</theme>
-        </config>
-      </layout>
-    </layouts>
   </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2ff5c9b6-6d75-4d41-aae9-e81b90d520dd" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/verify/src/main/java/com/footprint/verify/Footprint.kt" beforeDir="false" afterPath="$PROJECT_DIR$/verify/src/main/java/com/footprint/verify/Footprint.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/verify/src/main/java/com/footprint/verify/FootprintSdkArgsManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/verify/src/main/java/com/footprint/verify/FootprintSdkArgsManager.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/verify/src/main/java/com/footprint/verify/LauncherActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/verify/src/main/java/com/footprint/verify/LauncherActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/verify/src/main/java/com/footprint/verify/VerifyDataProps.kt" beforeDir="false" afterPath="$PROJECT_DIR$/verify/src/main/java/com/footprint/verify/VerifyDataProps.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,34 +41,34 @@
             <expand>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="FoortpintVerification" type="f1a62948:ProjectNode" />
+                <item name="FootprintVerification" type="f1a62948:ProjectNode" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="FoortpintVerification" type="f1a62948:ProjectNode" />
+                <item name="FootprintVerification" type="f1a62948:ProjectNode" />
                 <item name="app" type="2d1252cf:ModuleNode" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="FoortpintVerification" type="f1a62948:ProjectNode" />
+                <item name="FootprintVerification" type="f1a62948:ProjectNode" />
                 <item name="app" type="2d1252cf:ModuleNode" />
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="FoortpintVerification" type="f1a62948:ProjectNode" />
+                <item name="FootprintVerification" type="f1a62948:ProjectNode" />
                 <item name="app" type="2d1252cf:ModuleNode" />
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
                 <item name="other" type="c8890929:TasksNode$1" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="FoortpintVerification" type="f1a62948:ProjectNode" />
+                <item name="FootprintVerification" type="f1a62948:ProjectNode" />
                 <item name="verify" type="2d1252cf:ModuleNode" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="FoortpintVerification" type="f1a62948:ProjectNode" />
+                <item name="FootprintVerification" type="f1a62948:ProjectNode" />
                 <item name="verify" type="2d1252cf:ModuleNode" />
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
               </path>

@@ -2,6 +2,7 @@ package com.footprint.verify
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 data class FootprintUserData(
@@ -26,29 +27,13 @@ data class FootprintUserData(
     @SerialName("id.visa_expiration_date") val visaExpirationDate: String? = null
 )
 
-data class FootprintConfig(
-    val destinationActivityName: String? = null,
-    val publicKey: String? = null,
-    val authToken: String? = null,
-    val userData: FootprintUserData? = null,
-    val options: FootprintOptions? = null,
-    val l10n: FootprintL10n? = null,
-    val onComplete: ((validationToken: String) -> Unit)? = null,
-    val onCancel: (() -> Unit)? = null,
-    val onError: ((errorMessage: String) -> Unit)? = null
-) {
-    internal fun toData(): Data {
-        return Data(publicKey = publicKey,
-            authToken = authToken, userData = userData, options = options, l10n = l10n);
-    }
-}
-
 @Serializable
 data class FootprintOptions(
     @SerialName("show_completion_page") val showCompletionPage: Boolean? = null,
     @SerialName("show_logo") val showLogo: Boolean? = null
 )
 
+@Serializable
 enum class FootprintSupportedLocale {
     @SerialName("en-US") EN_US,
     @SerialName("es-MX") ES_MX
@@ -58,12 +43,17 @@ enum class FootprintSupportedLocale {
 data class FootprintL10n(val locale: FootprintSupportedLocale? = null)
 
 @Serializable
-internal data class Data(
+data class FootprintConfig(
+    @Transient val destinationActivityName: String? = null,
     @SerialName("public_key") val publicKey: String? = null,
     @SerialName("auth_token") val authToken: String? = null,
+    @SerialName("user_data") val userData: FootprintUserData? = null,
     val options: FootprintOptions? = null,
     val l10n: FootprintL10n? = null,
-    @SerialName("user_data") val userData: FootprintUserData? = null
+    @Transient val appearance: FootprintAppearance? = null,
+    @Transient val onComplete: ((validationToken: String) -> Unit)? = null,
+    @Transient val onCancel: (() -> Unit)? = null,
+    @Transient val onError: ((errorMessage: String) -> Unit)? = null
 ) {
     init {
         require((publicKey != null).xor(authToken != null)) {
@@ -71,12 +61,3 @@ internal data class Data(
         }
     }
 }
-
-@Serializable
-internal data class SdkRequestData(val kind: String, val data: Data)
-
-@Serializable
-internal data class SdkTokenResponse(
-    val token: String,
-    @SerialName("expires_at") val expiresAt: String
-)
