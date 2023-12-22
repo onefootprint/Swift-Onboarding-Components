@@ -1,21 +1,26 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
+import { RuleOp } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export type OpBadgeProps = {
-  isActive: boolean;
+  defaultValue: RuleOp;
   isEditable: boolean;
-  onClick: (isActive: boolean) => void;
+  onClick: (newValue: RuleOp) => void;
 };
 
-const OpBadge = ({ isActive, isEditable, onClick }: OpBadgeProps) => {
+const OpBadge = ({ defaultValue, isEditable, onClick }: OpBadgeProps) => {
   const { t } = useTranslation('pages.playbooks.details.rules.action-row');
-  const [isSelected, setIsSelected] = useState(isActive);
+  const [isSelected, setIsSelected] = useState(defaultValue === RuleOp.notEq);
+
+  useEffect(() => {
+    setIsSelected(defaultValue === RuleOp.notEq);
+  }, [defaultValue]);
 
   const handleClick = () => {
     const newIsSelected = !isSelected;
-    onClick(newIsSelected);
+    onClick(newIsSelected ? RuleOp.notEq : RuleOp.eq);
     setIsSelected(newIsSelected);
   };
 
@@ -40,7 +45,6 @@ const OpBadge = ({ isActive, isEditable, onClick }: OpBadgeProps) => {
 const Badge = styled.div`
   ${({ theme }) => css`
     ${createFontStyles('caption-1')};
-    background-color: ${theme.backgroundColor.neutral};
     border-radius: ${theme.borderRadius.large};
     border: ${theme.borderWidth[1]} dashed ${theme.borderColor.tertiary};
     color: ${theme.color.quaternary};

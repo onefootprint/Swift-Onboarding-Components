@@ -2,6 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronDown16, IcoTrash16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
+  Badge,
   Box,
   createFontStyles,
   createOverlayBackground,
@@ -9,20 +10,20 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import * as SelectPrimitive from '@radix-ui/react-select';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import useRiskSignals from './hooks/use-risk-signals';
 
 type RiskSignalSelectProps = {
   value?: string;
+  onDelete?: () => void;
   onChange: (value: string) => void;
-  onDelete: () => void;
 };
 
 const RiskSignalSelect = ({
   value,
-  onChange,
   onDelete,
+  onChange,
 }: RiskSignalSelectProps) => {
   const { t } = useTranslation(
     'pages.playbooks.details.rules.action-row.risk-signals-select',
@@ -38,27 +39,31 @@ const RiskSignalSelect = ({
       })) || [],
     [riskSignalsQuery.data],
   );
+  const [selectedSignal, setSelectedSignal] = useState(value);
 
   return (
     <Box position="relative" display="inline-block">
       <SelectPrimitive.Root
-        value={value}
         defaultValue={value}
+        value={value}
         onValueChange={onChange}
       >
-        <Trigger aria-label={t('aria-label')} type="button">
-          <SelectPrimitive.Value placeholder={t('placeholder')} />
-          <IcoChevronDown16 color="info" />
+        <Trigger aria-label={t('aria-label')} type="button" asChild>
+          <Badge variant="info" sx={{ gap: 2 }}>
+            {selectedSignal || t('placeholder')}
+            <IcoChevronDown16 color="info" />
+          </Badge>
         </Trigger>
         <Content position="popper" sideOffset={4} align="end">
           <Header>
             <Typography variant="label-4">{t('title')}</Typography>
             <LinkButton
-              iconComponent={IcoTrash16}
-              iconPosition="left"
-              onClick={onDelete}
               size="tiny"
               variant="destructive"
+              iconComponent={IcoTrash16}
+              iconPosition="left"
+              disabled={!onDelete}
+              onClick={onDelete}
             >
               {t('delete')}
             </LinkButton>
@@ -66,11 +71,14 @@ const RiskSignalSelect = ({
           <Viewport>
             {options.map(option => (
               <Item
-                value={option.value}
                 key={option.value}
+                value={option.value}
                 textValue={option.label}
+                onClick={() => setSelectedSignal(option.label)}
               >
-                <Typography variant="body-4">{option.label}</Typography>
+                <Typography variant="body-4" sx={{ overflow: 'hidden' }}>
+                  {option.label}
+                </Typography>
                 <Typography variant="caption-4" color="tertiary">
                   {option.description}
                 </Typography>
@@ -83,18 +91,20 @@ const RiskSignalSelect = ({
   );
 };
 
+export default RiskSignalSelect;
+
 const Trigger = styled(SelectPrimitive.Trigger)`
   ${({ theme }) => css`
     ${createFontStyles('caption-1')};
+    display: inline-flex;
+    justify-content: center;
     align-items: center;
+    padding: ${theme.spacing[2]} ${theme.spacing[3]};
     background-color: ${theme.backgroundColor.info};
     border-radius: ${theme.borderRadius.large};
     border: 0;
     color: ${theme.color.info};
     cursor: pointer;
-    display: inline-flex;
-    justify-content: center;
-    padding: ${theme.spacing[2]} ${theme.spacing[3]};
   `}
 `;
 
@@ -118,13 +128,14 @@ const Content = styled(SelectPrimitive.Content)`
     box-shadow: ${theme.elevation[2]};
     height: 350px;
     overflow: auto;
-    width: 340px;
+    width: 360px;
     z-index: ${theme.zIndex.dropdown};
   `}
 `;
 
 const Viewport = styled(SelectPrimitive.Viewport)`
   ${({ theme }) => css`
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[3]};
@@ -148,5 +159,3 @@ const Item = styled(SelectPrimitive.Item)`
     }
   `}
 `;
-
-export default RiskSignalSelect;

@@ -1,5 +1,9 @@
 import request from '@onefootprint/request';
-import type { GetRulesResponse, Rule } from '@onefootprint/types';
+import {
+  type GetRulesResponse,
+  type Rule,
+  RuleAction,
+} from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
@@ -28,17 +32,16 @@ const useRules = (playbookId: string = '') => {
     {
       enabled: !!playbookId,
       select: rules => {
-        const formattedRules = {} as Record<string, Rule[]>;
+        const formattedRules = {} as Record<RuleAction, Rule[]>;
+        Object.values(RuleAction).forEach(action => {
+          formattedRules[action] = [];
+        });
         rules.forEach(rule => {
-          if (rule.action in formattedRules) {
-            formattedRules[rule.action].push(rule);
-          } else {
-            formattedRules[rule.action] = [rule];
-          }
+          formattedRules[rule.action].push(rule);
         });
         Object.keys(formattedRules).forEach(action => {
-          const rulesCopy = formattedRules[action].slice();
-          formattedRules[action] = rulesCopy.sort((a, b) =>
+          const rulesCopy = formattedRules[action as RuleAction].slice();
+          formattedRules[action as RuleAction] = rulesCopy.sort((a, b) =>
             a.ruleExpression[0].field > b.ruleExpression[0].field ? 1 : -1,
           );
         });

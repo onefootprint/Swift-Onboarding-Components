@@ -2,11 +2,13 @@ import type { Color } from '@onefootprint/design-tokens';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { Rule, RuleAction } from '@onefootprint/types';
-import { Stack, Typography } from '@onefootprint/ui';
+import { Button, Stack, Typography } from '@onefootprint/ui';
 import kebabCase from 'lodash/kebabCase';
-import React from 'react';
+import React, { useState } from 'react';
+import useSession from 'src/hooks/use-session';
 
 import ActionRow from '../action-row';
+import EmptyActionRow from '../empty-action-row';
 
 export type ActionSectionProps = {
   playbookId: string;
@@ -16,44 +18,98 @@ export type ActionSectionProps = {
 
 const ActionSection = ({ playbookId, action, rules }: ActionSectionProps) => {
   const { t } = useTranslation(`pages.playbooks.details.rules.action-section`);
-  const kebabName = kebabCase(action);
+  const isFirmEmployee = useSession().data.user?.isFirmEmployee;
+  const [isAddingRule, setIsAddingRule] = useState(false);
+  const actionName = kebabCase(action);
+
+  const handleStartAdd = () => {
+    setIsAddingRule(true);
+  };
+
+  const handleEndAdd = () => {
+    setIsAddingRule(false);
+  };
+
+  const getRuleList = () => {
+    const emptyRow = (
+      <EmptyActionRow
+        playbookId={playbookId}
+        action={action}
+        onClick={handleEndAdd}
+      />
+    );
+    if (rules.length) {
+      return (
+        <>
+          {rules.map(rule => (
+            <ActionRow
+              key={JSON.stringify(rule)}
+              playbookId={playbookId}
+              rule={rule}
+            />
+          ))}
+          {isAddingRule && emptyRow}
+        </>
+      );
+    }
+    return isAddingRule ? (
+      <EmptySection>{emptyRow}</EmptySection>
+    ) : (
+      <Typography variant="body-4" color="tertiary">
+        {t('empty-rules')}
+      </Typography>
+    );
+  };
 
   return (
     <Stack
       direction="column"
       gap={2}
       role="group"
-      aria-label={t(`${kebabName}.title`)}
+      aria-label={t(`${actionName}.title`)}
     >
       <Stack align="center" justify="space-between">
         <div>
           <Typography
             variant="label-3"
-            color={t(`${kebabName}.color`) as Color}
+            color={t(`${actionName}.color`) as Color}
           >
-            {t(`${kebabName}.title`)}
+            {t(`${actionName}.title`)}
           </Typography>
           <Typography variant="body-3" color="secondary">
-            {t(`${kebabName}.subtitle`)}
+            {t(`${actionName}.subtitle`)}
           </Typography>
         </div>
+        {isFirmEmployee && (
+          <Button
+            size="small"
+            variant="secondary"
+            sx={{ minWidth: 'fit-content' }}
+            disabled={isAddingRule}
+            onClick={handleStartAdd}
+          >
+            {t('add-rule')}
+          </Button>
+        )}
       </Stack>
-      <RulesList>
-        {rules.map(rule => (
-          <ActionRow
-            key={JSON.stringify(rule)}
-            playbookId={playbookId}
-            rule={rule}
-          />
-        ))}
-      </RulesList>
+      <RuleList data-is-empty={!rules.length}>{getRuleList()}</RuleList>
     </Stack>
   );
 };
 
-const RulesList = styled.div`
+const RuleList = styled.div`
   ${({ theme }) => css`
     margin: ${theme.spacing[4]} 0;
+
+    &[data-is-empty='false'] {
+      border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+      border-radius: ${theme.borderRadius.default};
+    }
+  `}
+`;
+
+const EmptySection = styled.div`
+  ${({ theme }) => css`
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     border-radius: ${theme.borderRadius.default};
   `}

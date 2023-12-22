@@ -17,8 +17,8 @@ export type RowEditButtonsProps = {
 const RowEditButtons = ({
   playbookId,
   editedRule,
-  onCancel: onCancelClick,
-  onSubmit: onSubmitClick,
+  onCancel,
+  onSubmit,
 }: RowEditButtonsProps) => {
   const { t, allT } = useTranslation(
     'pages.playbooks.details.rules.action-row',
@@ -27,25 +27,25 @@ const RowEditButtons = ({
   const deleteMutation = useDeleteRule();
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
+  const isLoading = editMutation.isLoading || deleteMutation.isLoading;
 
-  const handleSaveEdit = () => {
+  const handleEdit = () => {
     const fields = {
       rule_expression: editedRule.ruleExpression,
     };
+
     editMutation.mutate(
       { playbookId, ruleId: editedRule.ruleId, fields },
       {
         onSuccess: () => {
-          onSubmitClick();
+          onSubmit();
           toast.show({
             description: t('success-toast.edit-description'),
             title: t('success-toast.title'),
             variant: 'default',
           });
         },
-        onError: (error: unknown) => {
-          showRequestErrorToast(error);
-        },
+        onError: showRequestErrorToast,
       },
     );
   };
@@ -55,16 +55,14 @@ const RowEditButtons = ({
       { playbookId, ruleId: editedRule.ruleId },
       {
         onSuccess: () => {
-          onSubmitClick();
+          onSubmit();
           toast.show({
             description: t('success-toast.delete-description'),
             title: t('success-toast.title'),
             variant: 'default',
           });
         },
-        onError: (error: unknown) => {
-          showRequestErrorToast(error);
-        },
+        onError: showRequestErrorToast,
       },
     );
   };
@@ -73,10 +71,15 @@ const RowEditButtons = ({
     <Stack direction="column" gap={7}>
       <Stack align="center" justify="space-between">
         <Stack align="center" gap={3}>
-          <Button size="small" onClick={handleSaveEdit}>
+          <Button size="small" disabled={isLoading} onClick={handleEdit}>
             {allT('save')}
           </Button>
-          <Button size="small" variant="secondary" onClick={onCancelClick}>
+          <Button
+            size="small"
+            variant="secondary"
+            disabled={isLoading}
+            onClick={onCancel}
+          >
             {allT('cancel')}
           </Button>
         </Stack>
@@ -85,6 +88,7 @@ const RowEditButtons = ({
           variant="destructive"
           iconComponent={IcoTrash16}
           iconPosition="left"
+          disabled={isLoading}
           onClick={handleDelete}
         >
           {t('delete')}

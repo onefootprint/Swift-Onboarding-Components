@@ -2185,7 +2185,8 @@
               "subtitle": "User will be onboarded, but should be manually reviewed",
               "color": "success"
             },
-            "add-rule": "Add rule"
+            "add-rule": "Add rule",
+            "empty-rules": "There are no rules for this outcome."
           },
           "action-row": {
             "if": "if ",
@@ -2193,8 +2194,10 @@
             "not": "not",
             "add": "add",
             "delete": "Delete rule",
+            "empty-aria-label": "Empty rule",
             "success-toast": {
               "title": "Success!",
+              "add-description": "Rule added.",
               "edit-description": "Rule edited.",
               "delete-description": "Rule deleted."
             },

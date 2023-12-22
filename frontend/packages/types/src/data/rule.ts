@@ -4,10 +4,10 @@ export enum RuleOp {
 }
 
 export enum RuleAction {
-  passWithManualReview = 'passWithManualReview',
-  manualReview = 'manualReview',
-  stepUp = 'stepUp',
   fail = 'fail',
+  manualReview = 'manual_review',
+  stepUp = 'step_up',
+  passWithManualReview = 'pass_with_manual_review',
 }
 
 export type RuleField = {

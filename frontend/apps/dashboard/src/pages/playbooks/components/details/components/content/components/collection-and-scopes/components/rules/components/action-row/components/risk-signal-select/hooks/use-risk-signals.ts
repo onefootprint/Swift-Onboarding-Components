@@ -17,7 +17,10 @@ const getRiskSignals = async (authHeaders: AuthHeaders) => {
 const useRiskSignals = () => {
   const { authHeaders } = useSession();
 
-  return useQuery(['org', 'riskSignals'], () => getRiskSignals(authHeaders));
+  return useQuery(['org', 'riskSignals'], () => getRiskSignals(authHeaders), {
+    select: riskSignals =>
+      riskSignals.sort((a, b) => (a.reasonCode > b.reasonCode ? 1 : -1)),
+  });
 };
 
 export default useRiskSignals;

@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
-import type { Rule, RuleAction } from '@onefootprint/types';
-import { OnboardingConfigKind } from '@onefootprint/types';
+import type { Rule } from '@onefootprint/types';
+import { OnboardingConfigKind, RuleAction } from '@onefootprint/types';
 import { InlineAlert, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 
@@ -27,11 +27,11 @@ const Rules = ({
         <InlineAlert variant="info">{t('alerts.kyb-alert')}</InlineAlert>
       )}
       {hasRules ? (
-        Object.keys(actionRules).map(action => (
+        Object.values(RuleAction).map(action => (
           <ActionSection
             key={action}
             playbookId={playbookId}
-            action={action as RuleAction}
+            action={action}
             rules={actionRules[action]}
           />
         ))

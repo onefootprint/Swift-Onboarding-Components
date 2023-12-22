@@ -1,4 +1,6 @@
 export type {
+  AddRuleRequest,
+  AddRuleResponse,
   AuthorizeFields,
   AuthorizeRequirement,
   BiometricRegisterRequest,

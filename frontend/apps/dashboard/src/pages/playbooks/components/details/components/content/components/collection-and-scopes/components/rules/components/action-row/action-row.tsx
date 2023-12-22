@@ -21,7 +21,6 @@ const ActionRow = ({ playbookId, rule }: ActionRowProps) => {
   );
   const isFirmEmployee = useSession().data.user?.isFirmEmployee;
   const [isEditing, setIsEditing] = useState(false);
-  const [editedRule, setEditedRule] = useState<Rule>(rule);
   const [expressions, setExpressions] = useState<RuleField[]>(
     rule.ruleExpression,
   );
@@ -30,40 +29,45 @@ const ActionRow = ({ playbookId, rule }: ActionRowProps) => {
     setIsEditing(true);
   };
 
-  const handleToggleOp = (index: number, isNotEq: boolean) => {
-    const newRuleExp = JSON.parse(JSON.stringify(editedRule.ruleExpression));
-    newRuleExp[index].op = isNotEq ? RuleOp.notEq : RuleOp.eq;
-    setEditedRule({ ...editedRule, ruleExpression: newRuleExp });
-  };
-
-  const handleCancelEdit = () => {
-    setEditedRule(rule);
+  const handleEndEdit = () => {
     setIsEditing(false);
   };
 
-  const handleAdd = () => {
-    const canAdd = !expressions.some(expression => expression.field === '');
-    if (!canAdd) return;
+  // Using index instead of expression in case the rule has the same expression multiple times
+  const handleToggleOp = (index: number) => (newOp: RuleOp) => {
+    setExpressions(currentExpressions => {
+      const newExpressions = [...currentExpressions];
+      newExpressions[index] = { ...newExpressions[index], op: newOp };
+      return newExpressions;
+    });
+  };
 
+  const handleChangeField = (index: number) => (newField: string) => {
+    setExpressions(currentExpressions => {
+      const newExpressions = [...currentExpressions];
+      newExpressions[index] = { ...newExpressions[index], field: newField };
+      return newExpressions;
+    });
+  };
+
+  const handleDeleteField = (index: number) => {
+    setExpressions(currentExpressions =>
+      currentExpressions
+        .slice(0, index)
+        .concat(currentExpressions.slice(index + 1)),
+    );
+  };
+
+  const handleAddField = () => {
     setExpressions(currentExpressions => [
       ...currentExpressions,
       { field: '', op: RuleOp.eq, value: true },
     ]);
   };
 
-  const handleChange = (expression: RuleField) => (nextValue: string) => {
-    setExpressions(currentExpressions =>
-      currentExpressions.map(currentExpression =>
-        currentExpression === expression
-          ? { ...currentExpression, field: nextValue }
-          : currentExpression,
-      ),
-    );
-    // TODO: Save in the DB
-  };
-
-  const handleSubmitEdit = () => {
-    setIsEditing(false);
+  const handleCancelEdit = () => {
+    setExpressions(rule.ruleExpression);
+    handleEndEdit();
   };
 
   return (
@@ -75,45 +79,59 @@ const ActionRow = ({ playbookId, rule }: ActionRowProps) => {
       <div>
         {t('if')}
         {expressions.map((expression, index) => (
-          <React.Fragment key={expression.field}>
+          // eslint-disable-next-line react/no-array-index-key
+          <React.Fragment key={`${index} ${expression.field}`}>
             {index > 0 && t('and')}
             <OpBadge
-              isActive={expression.op === RuleOp.notEq}
+              defaultValue={expression.op}
               isEditable={isEditing}
-              onClick={isNotEq => handleToggleOp(index, isNotEq)}
+              onClick={handleToggleOp(index)}
             />
-            {expression.field ? (
-              <Badge variant="info">{expression.field}</Badge>
-            ) : (
+            {isEditing ? (
               <RiskSignalSelect
                 value={expression.field}
-                onDelete={() => {}}
-                onChange={handleChange(expression)}
+                onDelete={
+                  expressions.length > 1
+                    ? () => handleDeleteField(index)
+                    : undefined
+                }
+                onChange={handleChangeField(index)}
               />
+            ) : (
+              <Badge variant="info">{expression.field}</Badge>
             )}
           </React.Fragment>
         ))}
       </div>
       {isEditing ? (
-        <Stack gap={7} direction="column" marginTop={3}>
+        <Stack gap={7} direction="column">
           <LinkButton
             size="xTiny"
+            sx={{ width: 'fit-content' }}
             iconComponent={IcoPlusSmall16}
             iconPosition="left"
-            onClick={handleAdd}
+            disabled={expressions.some(expression => expression.field === '')}
+            onClick={handleAddField}
           >
             {t('add')}
           </LinkButton>
           <RowEditButtons
             playbookId={playbookId}
-            editedRule={editedRule}
+            editedRule={{
+              ...JSON.parse(JSON.stringify(rule)),
+              ruleExpression: expressions,
+            }}
             onCancel={handleCancelEdit}
-            onSubmit={handleSubmitEdit}
+            onSubmit={handleEndEdit}
           />
         </Stack>
       ) : (
         isFirmEmployee && (
-          <LinkButton size="tiny" onClick={handleStartEdit}>
+          <LinkButton
+            size="tiny"
+            sx={{ paddingTop: 5, paddingLeft: 3 }}
+            onClick={handleStartEdit}
+          >
             {allT('edit')}
           </LinkButton>
         )
@@ -133,11 +151,12 @@ const RulesListItem = styled(Stack)`
     }
 
     &[data-is-editing='false'] {
-      align-items: center;
+      gap: ${theme.spacing[8]};
       justify-content: space-between;
     }
 
     &[data-is-editing='true'] {
+      gap: ${theme.spacing[4]};
       flex-direction: column;
     }
   `}
