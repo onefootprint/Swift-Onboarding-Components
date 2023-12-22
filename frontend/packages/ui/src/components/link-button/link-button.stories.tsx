@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import {
   IcoArrowRightSmall24,
   IcoPlusSmall24,

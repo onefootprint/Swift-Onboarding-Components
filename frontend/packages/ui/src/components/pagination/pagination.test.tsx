@@ -57,28 +57,6 @@ describe('<Pagination />', () => {
     ).toBeInTheDocument();
   });
 
-  it.skip('Disables previous button when there is no previous page', () => {
-    renderPagination({
-      hasNextPage: true,
-      hasPrevPage: false,
-      pageIndex: 0,
-      pageSize: 10,
-      totalNumResults: 20,
-    });
-    expect(screen.getByText('Previous')).toBeDisabled();
-  });
-
-  it.skip('Disables next button when there is no next page', () => {
-    renderPagination({
-      hasNextPage: false,
-      hasPrevPage: true,
-      pageIndex: 1,
-      pageSize: 10,
-      totalNumResults: 20,
-    });
-    expect(screen.getByText('Next')).toBeDisabled();
-  });
-
   it('should call the onNextPage function when the next button is clicked', async () => {
     const onNextPage = jest.fn();
     renderPagination({

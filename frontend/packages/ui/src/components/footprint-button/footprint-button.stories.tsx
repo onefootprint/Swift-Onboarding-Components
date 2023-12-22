@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import type { Meta, Story } from '@storybook/react';
 import React from 'react';
 

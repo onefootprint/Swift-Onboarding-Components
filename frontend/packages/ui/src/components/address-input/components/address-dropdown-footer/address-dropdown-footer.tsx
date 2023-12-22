@@ -2,6 +2,7 @@ import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 
 const AddressDropdownFooter = () => (
+  /* eslint-disable @next/next/no-img-element */ // @onefootprint/ui has no next.js dependency
   <Container>
     <img
       alt="Powered by Google"
