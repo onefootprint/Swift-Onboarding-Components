@@ -13,7 +13,7 @@ class Footprint private constructor() {
         fun init(context: Context, config: FootprintConfig) {
             instance.apply {
                 this.config = config
-            }.startVerification(context)
+            }.start(context)
         }
     }
 
@@ -24,7 +24,7 @@ class Footprint private constructor() {
         this.launcherActivityActive = isActive
     }
 
-    fun startVerification(context: Context){
+    fun start(context: Context){
         if(launcherActivityActive) return // To avoid multiple clicks
         val hasPublicKey = config?.publicKey != null && config?.publicKey!!.isNotEmpty()
         val hasAuthToken = config?.authToken != null && config?.authToken!!.isNotEmpty()

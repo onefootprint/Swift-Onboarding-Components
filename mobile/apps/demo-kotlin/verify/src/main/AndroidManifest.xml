@@ -9,8 +9,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="com.footprint.verify.v1"
-                    android:host="kyc" />
+                <data android:scheme="com.footprint" />
             </intent-filter>
         </activity>
     </application>

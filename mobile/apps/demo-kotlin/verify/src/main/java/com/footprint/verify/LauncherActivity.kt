@@ -12,8 +12,6 @@ sealed class SessionResult {
 }
 
 internal class LauncherActivity : AppCompatActivity() {
-    private val scheme = "com.footprint.verify.v1"
-    private val host = "kyc"
     private val customTabsIntent = CustomTabsIntent.Builder().build()
     private var isCustomTabOpen = false
 
@@ -50,14 +48,22 @@ internal class LauncherActivity : AppCompatActivity() {
     }
 
     private fun launchVerificationIfReady() {
-        if (config?.publicKey != null && config?.destinationActivityName != null) {
-            val sdkArgsManager = FootprintSdkArgsManager(config!!)
-            sdkArgsManager.sendArgs { sdkToken ->
-                val url = getUrl(sdkToken)
-                customTabsIntent.launchUrl(this, url)
-                isCustomTabOpen = true
+        config?.let { outerConfig ->
+            outerConfig.destinationActivityName?.let {
+                val sdkArgsManager = FootprintSdkArgsManager(outerConfig)
+                sdkArgsManager.sendArgs { sdkToken ->
+                    val url = getUrl(outerConfig, sdkToken)
+                    url?.let {
+                        customTabsIntent.launchUrl(this, url)
+                        isCustomTabOpen = true
+                    } ?: run {
+                        config?.onError?.invoke("@onefootprint/footprint-kotlin: Encountered error while generating URL.")
+                    }
+                }
+            } ?: run {
+                config?.onError?.invoke("@onefootprint/footprint-kotlin: Required destinationActivityName missing.")
             }
-        } else {
+        } ?: run {
             config?.onError?.invoke("@onefootprint/footprint-kotlin: Required configuration missing.")
         }
     }
@@ -84,18 +90,28 @@ internal class LauncherActivity : AppCompatActivity() {
         // activity and call the onCancel callback
         isCustomTabOpen = false
         config?.onCancel?.invoke()
-        if(config?.destinationActivityName != null) {
+        config?.destinationActivityName?.let { destinationActivityName ->
             startDestinationActivity(
-                config?.destinationActivityName!!,
+                destinationActivityName,
                 SessionResult.Canceled
             )
         }
     }
 
-    private fun getUrl(sdkToken: String): Uri {
-        val baseUrl = "https://id.onefootprint.com"
-        val redirectUrl = "${this.scheme}://${this.host}"
-        return Uri.parse("$baseUrl/?redirect_url=$redirectUrl#$sdkToken")
+    private fun getUrl(config: FootprintConfig, token: String): Uri? {
+        val bifrostBaseUrl = "https://id.onefootprint.com"
+        val builder = Uri.parse(bifrostBaseUrl).buildUpon()
+        builder.appendQueryParameter("redirect_url", "com.footprint://")
+        val appearanceJson = config.appearance?.toJSON()
+        appearanceJson?.let {
+            it["fontSrc"]?.let { fontSrc -> builder.appendQueryParameter("fontSrc", fontSrc) }
+            it["variant"]?.let { variant -> builder.appendQueryParameter("variant", variant) }
+            it["variables"]?.let { variables -> builder.appendQueryParameter("variables", variables) }
+            it["rules"]?.let { rules -> builder.appendQueryParameter("rules", rules) }
+        }
+
+        builder.fragment(token)
+        return builder.build()
     }
 
     private fun startDestinationActivity(destinationActivityName: String, verificationResult: SessionResult){

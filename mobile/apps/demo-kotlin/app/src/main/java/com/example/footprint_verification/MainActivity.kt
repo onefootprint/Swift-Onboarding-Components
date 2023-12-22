@@ -5,6 +5,10 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import com.footprint.verify.Footprint
+import com.footprint.verify.FootprintAppearance
+import com.footprint.verify.FootprintAppearanceRules
+import com.footprint.verify.FootprintAppearanceTheme
+import com.footprint.verify.FootprintAppearanceVariables
 import com.footprint.verify.FootprintConfig
 import com.footprint.verify.FootprintL10n
 import com.footprint.verify.FootprintOptions
@@ -45,6 +49,11 @@ class MainActivity : AppCompatActivity() {
                 userData = userData,
                 options = FootprintOptions(showLogo = true),
                 l10n = FootprintL10n(locale = FootprintSupportedLocale.ES_MX),
+                appearance = FootprintAppearance(
+                    theme = FootprintAppearanceTheme.DARK,
+                    rules = FootprintAppearanceRules(button = mapOf("transition" to "all .2s linear")),
+                    variables = FootprintAppearanceVariables(borderRadius = "10px", buttonPrimaryBg = "#0C6948")
+                ),
                 onComplete = {token: String ->
                     Log.d("VerificationResult", "The flow has completed. The validation token is $token")
                 },
