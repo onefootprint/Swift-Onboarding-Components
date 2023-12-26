@@ -69,3 +69,9 @@ pub use apex_cip_report_request::*;
 
 mod rule;
 pub use rule::*;
+
+mod label_create_request;
+pub use label_create_request::*;
+
+mod tag_create_request;
+pub use tag_create_request::*;

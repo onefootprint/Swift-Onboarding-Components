@@ -26,6 +26,15 @@
                             "type": "string"
                         },
                         "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-sandbox-id",
+                        "description": "When provided, locates only sandbox users with the provided sandbox ID",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
                     }
                 ],
                 "requestBody": {
@@ -232,6 +241,15 @@
                         "in": "header",
                         "name": "x-idempotency-id",
                         "description": "To safely support retrying requests without accidentally performing the same operation multiple times, provide a client-generated `x-idempotency-id`. Requests made with the same `x-idempotency-id` value will no-op and return the same result. Note, if `x-idempotency-id` is provided, initial data may not be specified in the HTTP body.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "header",
+                        "name": "x-sandbox-id",
+                        "description": "When provided, locates only sandbox users with the provided sandbox ID",
                         "schema": {
                             "type": "string"
                         },

@@ -21,6 +21,7 @@ mod proxy_config;
 mod risk_signal;
 mod rule;
 mod secret_api_key;
+mod user_tag;
 mod user;
 mod user_timeline;
 mod validate;

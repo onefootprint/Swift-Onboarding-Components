@@ -573,6 +573,88 @@
                 ]
             }
         },
+        "/users/{fp_id}/label": {
+            "get": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nView a user's label",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserLabel"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nUpdate a user's label",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateLabelRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/users/{fp_id}/liveness": {
             "get": {
                 "tags": [
@@ -678,6 +760,137 @@
                                     "items": {
                                         "$ref": "#/components/schemas/PublicRiskSignal"
                                     }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/tags": {
+            "get": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nView a user's tags",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/UserTag"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nTag a user",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateTagRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
+        "/users/{fp_id}/tags/{tag_id}": {
+            "delete": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nUntag a user",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "tag_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
                                 }
                             }
                         }
@@ -1201,7 +1414,7 @@
                                 "footprint",
                                 "idology",
                                 "socure",
-                                "lexis_nexis",
+                                "lexis",
                                 "experian",
                                 "twilio",
                                 "middesk",
@@ -1232,7 +1445,7 @@
                                 "footprint",
                                 "idology",
                                 "socure",
-                                "lexis_nexis",
+                                "lexis",
                                 "experian",
                                 "twilio",
                                 "middesk",
@@ -1298,7 +1511,7 @@
                                 "footprint",
                                 "idology",
                                 "socure",
-                                "lexis_nexis",
+                                "lexis",
                                 "experian",
                                 "twilio",
                                 "middesk",
@@ -1385,6 +1598,36 @@
                     "tax_id_breakdown",
                     "user_id",
                     "watchlist"
+                ]
+            },
+            "CreateLabelRequest": {
+                "type": "object",
+                "properties": {
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "offboard_fraud",
+                            "offboard_other"
+                        ]
+                    }
+                },
+                "required": [
+                    "kind"
+                ]
+            },
+            "CreateTagRequest": {
+                "type": "object",
+                "properties": {
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "delinquent"
+                        ]
+                    }
+                },
+                "required": [
+                    "kind"
                 ]
             },
             "CreateTokenRequest": {
@@ -1577,6 +1820,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -1935,6 +2179,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -2293,6 +2538,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -2651,6 +2897,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -3009,6 +3256,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -3367,6 +3615,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -3725,6 +3974,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -4083,6 +4333,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -4441,6 +4692,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -4799,6 +5051,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -5157,6 +5410,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -5515,6 +5769,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -5873,6 +6128,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -6907,6 +7163,7 @@
                             "dob_yob_does_not_match",
                             "dob_yob_does_not_match_within1_year",
                             "dob_mob_does_not_match",
+                            "dob_day_does_not_match",
                             "dob_mob_not_available",
                             "dob_yob_not_available",
                             "dob_located_age_below_minimum",
@@ -7269,6 +7526,7 @@
                             "dob_yob_does_not_match",
                             "dob_yob_does_not_match_within1_year",
                             "dob_mob_does_not_match",
+                            "dob_day_does_not_match",
                             "dob_mob_not_available",
                             "dob_yob_not_available",
                             "dob_located_age_below_minimum",
@@ -7623,6 +7881,46 @@
                 },
                 "required": [
                     "onboarding_config_key"
+                ]
+            },
+            "UserLabel": {
+                "type": "object",
+                "properties": {
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "offboard_fraud",
+                            "offboard_other"
+                        ]
+                    }
+                }
+            },
+            "UserTag": {
+                "type": "object",
+                "properties": {
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "delinquent"
+                        ]
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "id",
+                    "kind"
                 ]
             }
         }

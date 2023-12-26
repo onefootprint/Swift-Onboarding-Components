@@ -5,12 +5,14 @@ mod auth_events;
 mod decisions;
 mod detail;
 mod documents;
+mod label;
 mod list;
 mod liveness;
 mod match_signals;
 mod post;
 mod reonboard;
 mod risk_signals;
+mod tags;
 mod token;
 
 pub fn routes(config: &mut web::ServiceConfig) {
@@ -26,5 +28,10 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(auth_events::get)
         .service(reonboard::post)
         .service(decisions::post)
-        .service(detail::detail);
+        .service(detail::detail)
+        .service(label::get)
+        .service(label::post)
+        .service(tags::get)
+        .service(tags::post)
+        .service(tags::delete);
 }

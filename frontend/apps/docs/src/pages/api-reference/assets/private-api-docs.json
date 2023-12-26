@@ -5207,7 +5207,8 @@
                                                 "decrypt_document",
                                                 "decrypt_document_and_selfie",
                                                 "decrypt_all",
-                                                "write_entities"
+                                                "write_entities",
+                                                "label_and_tag"
                                             ]
                                         }
                                     }
@@ -5399,7 +5400,8 @@
                                 "decrypt_document",
                                 "decrypt_document_and_selfie",
                                 "decrypt_all",
-                                "write_entities"
+                                "write_entities",
+                                "label_and_tag"
                             ]
                         }
                     },
@@ -6420,7 +6422,8 @@
                         "enum": [
                             "kyc",
                             "kyb",
-                            "auth"
+                            "auth",
+                            "document"
                         ]
                     },
                     "must_collect_data": {
@@ -6910,7 +6913,8 @@
                                 "decrypt_document",
                                 "decrypt_document_and_selfie",
                                 "decrypt_all",
-                                "write_entities"
+                                "write_entities",
+                                "label_and_tag"
                             ]
                         }
                     }
@@ -8942,6 +8946,7 @@
                                         "dob_yob_does_not_match",
                                         "dob_yob_does_not_match_within1_year",
                                         "dob_mob_does_not_match",
+                                        "dob_day_does_not_match",
                                         "dob_mob_not_available",
                                         "dob_yob_not_available",
                                         "dob_located_age_below_minimum",
@@ -9582,6 +9587,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -9940,6 +9946,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -10298,6 +10305,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -10656,6 +10664,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -11014,6 +11023,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -11372,6 +11382,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -11730,6 +11741,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -12088,6 +12100,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -12446,6 +12459,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -12804,6 +12818,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -13162,6 +13177,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -13520,6 +13536,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -13878,6 +13895,7 @@
                                                 "dob_yob_does_not_match",
                                                 "dob_yob_does_not_match_within1_year",
                                                 "dob_mob_does_not_match",
+                                                "dob_day_does_not_match",
                                                 "dob_mob_not_available",
                                                 "dob_yob_not_available",
                                                 "dob_located_age_below_minimum",
@@ -15422,7 +15440,8 @@
                                     "enum": [
                                         "kyc",
                                         "kyb",
-                                        "auth"
+                                        "auth",
+                                        "document"
                                     ]
                                 },
                                 "must_collect_data": {
@@ -15626,7 +15645,8 @@
                                                     "decrypt_document",
                                                     "decrypt_document_and_selfie",
                                                     "decrypt_all",
-                                                    "write_entities"
+                                                    "write_entities",
+                                                    "label_and_tag"
                                                 ]
                                             }
                                         }
@@ -15747,7 +15767,8 @@
                                             "decrypt_document",
                                             "decrypt_document_and_selfie",
                                             "decrypt_all",
-                                            "write_entities"
+                                            "write_entities",
+                                            "label_and_tag"
                                         ]
                                     }
                                 }
@@ -15874,7 +15895,8 @@
                                                     "decrypt_document",
                                                     "decrypt_document_and_selfie",
                                                     "decrypt_all",
-                                                    "write_entities"
+                                                    "write_entities",
+                                                    "label_and_tag"
                                                 ]
                                             }
                                         }
@@ -16309,7 +16331,8 @@
                         "enum": [
                             "kyc",
                             "kyb",
-                            "auth"
+                            "auth",
+                            "document"
                         ]
                     },
                     "must_collect_data": {
@@ -16594,7 +16617,8 @@
                                                 "decrypt_document",
                                                 "decrypt_document_and_selfie",
                                                 "decrypt_all",
-                                                "write_entities"
+                                                "write_entities",
+                                                "label_and_tag"
                                             ]
                                         }
                                     }
@@ -16812,7 +16836,8 @@
                                         "decrypt_document",
                                         "decrypt_document_and_selfie",
                                         "decrypt_all",
-                                        "write_entities"
+                                        "write_entities",
+                                        "label_and_tag"
                                     ]
                                 }
                             }
@@ -16900,7 +16925,8 @@
                                 "decrypt_document",
                                 "decrypt_document_and_selfie",
                                 "decrypt_all",
-                                "write_entities"
+                                "write_entities",
+                                "label_and_tag"
                             ]
                         }
                     }
@@ -17969,6 +17995,7 @@
                             "dob_yob_does_not_match",
                             "dob_yob_does_not_match_within1_year",
                             "dob_mob_does_not_match",
+                            "dob_day_does_not_match",
                             "dob_mob_not_available",
                             "dob_yob_not_available",
                             "dob_located_age_below_minimum",
@@ -18340,6 +18367,7 @@
                             "dob_yob_does_not_match",
                             "dob_yob_does_not_match_within1_year",
                             "dob_mob_does_not_match",
+                            "dob_day_does_not_match",
                             "dob_mob_not_available",
                             "dob_yob_not_available",
                             "dob_located_age_below_minimum",
@@ -18838,7 +18866,8 @@
                                         "decrypt_document",
                                         "decrypt_document_and_selfie",
                                         "decrypt_all",
-                                        "write_entities"
+                                        "write_entities",
+                                        "label_and_tag"
                                     ]
                                 }
                             }
@@ -19050,7 +19079,8 @@
                                 "decrypt_document",
                                 "decrypt_document_and_selfie",
                                 "decrypt_all",
-                                "write_entities"
+                                "write_entities",
+                                "label_and_tag"
                             ]
                         }
                     }

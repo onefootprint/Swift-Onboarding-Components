@@ -81,6 +81,9 @@ pub enum TenantScope {
     DecryptAll,
     /// Create new vaults and update existing vaults' information
     WriteEntities,
+
+    /// Create labels and tags
+    LabelAndTag,
 }
 
 impl TenantScope {
@@ -109,6 +112,8 @@ impl TenantScope {
             Self::TriggerKyc => vec![ApiKey],
             Self::AuthToken => vec![ApiKey],
             Self::Onboarding => vec![ApiKey],
+
+            Self::LabelAndTag => vec![ApiKey, DashboardUser],
         }
     }
 }

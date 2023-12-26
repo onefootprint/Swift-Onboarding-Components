@@ -33,6 +33,8 @@ pub mod rule_instance;
 pub mod rule_result;
 pub mod rule_set_result;
 pub mod scoped_vault;
+pub mod scoped_vault_label;
+pub mod scoped_vault_tag;
 pub mod session;
 pub mod socure_device_session;
 pub mod stytch_fingerprint_event;

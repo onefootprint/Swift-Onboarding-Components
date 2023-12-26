@@ -243,3 +243,6 @@ define_newtype_id!(
     String,
     "Identifier for a external vault ID referencing footprint ID"
 );
+
+define_newtype_id!(LabelId, String, "Identifier for a footprint id label");
+define_newtype_id!(TagId, String, "Identifier for a footprint id tag");

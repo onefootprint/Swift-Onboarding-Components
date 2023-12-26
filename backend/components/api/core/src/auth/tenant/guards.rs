@@ -26,6 +26,7 @@ pub enum TenantGuard {
     AuthToken,
     ManageWebhooks,
     Onboarding,
+    LabelAndTag,
 }
 
 impl TenantGuard {
@@ -46,6 +47,7 @@ impl TenantGuard {
             Self::AuthToken => TenantScope::AuthToken,
             Self::ManageWebhooks => TenantScope::ManageWebhooks,
             Self::Onboarding => TenantScope::Onboarding,
+            Self::LabelAndTag => TenantScope::LabelAndTag,
         }
     }
 }

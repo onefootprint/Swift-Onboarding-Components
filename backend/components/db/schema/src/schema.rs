@@ -746,6 +746,38 @@ table! {
 table! {
     use diesel::sql_types::*;
 
+    scoped_vault_label (id) {
+        id -> Text,
+        created_at -> Timestamptz,
+        deactivated_at -> Nullable<Timestamptz>,
+        created_seqno -> Int8,
+        deactivated_seqno -> Nullable<Int8>,
+        scoped_vault_id -> Text,
+        kind -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+
+    scoped_vault_tag (id) {
+        id -> Text,
+        created_at -> Timestamptz,
+        deactivated_at -> Nullable<Timestamptz>,
+        created_seqno -> Int8,
+        deactivated_seqno -> Nullable<Int8>,
+        scoped_vault_id -> Text,
+        kind -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+
     session (key) {
         key -> Varchar,
         _created_at -> Timestamptz,
@@ -1222,6 +1254,8 @@ joinable!(rule_set_result_risk_signal_junction -> risk_signal (risk_signal_id));
 joinable!(rule_set_result_risk_signal_junction -> rule_set_result (rule_set_result_id));
 joinable!(scoped_vault -> tenant (tenant_id));
 joinable!(scoped_vault -> vault (vault_id));
+joinable!(scoped_vault_label -> scoped_vault (scoped_vault_id));
+joinable!(scoped_vault_tag -> scoped_vault (scoped_vault_id));
 joinable!(socure_device_session -> workflow (workflow_id));
 joinable!(stytch_fingerprint_event -> scoped_vault (scoped_vault_id));
 joinable!(stytch_fingerprint_event -> vault (vault_id));
@@ -1300,6 +1334,8 @@ allow_tables_to_appear_in_same_query!(
     rule_set_result,
     rule_set_result_risk_signal_junction,
     scoped_vault,
+    scoped_vault_label,
+    scoped_vault_tag,
     session,
     socure_device_session,
     stytch_fingerprint_event,

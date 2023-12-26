@@ -1647,6 +1647,38 @@
                 },
                 "security": []
             }
+        },
+        "/org/sdk_telemetry": {
+            "post": {
+                "tags": [
+                    "SdkArgs",
+                    "Hosted"
+                ],
+                "description": "Log contents of the HTTP body. ",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LogBody"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
         }
     },
     "components": {
@@ -3232,7 +3264,8 @@
                                 "enum": [
                                     "kyc",
                                     "kyb",
-                                    "auth"
+                                    "auth",
+                                    "document"
                                 ]
                             },
                             "logo_url": {
@@ -3640,6 +3673,33 @@
                     "user_found"
                 ]
             },
+            "LogBody": {
+                "type": "object",
+                "properties": {
+                    "log_level": {
+                        "type": "string"
+                    },
+                    "log_message": {
+                        "type": "string"
+                    },
+                    "sdk_kind": {
+                        "description": "Really SdkArgsKind, but prefer for this telemetry API to be unopinionated on validation",
+                        "type": "string"
+                    },
+                    "sdk_name": {
+                        "type": "string"
+                    },
+                    "sdk_version": {
+                        "type": "string"
+                    },
+                    "session_id": {
+                        "type": "string"
+                    },
+                    "tenant_domain": {
+                        "type": "string"
+                    }
+                }
+            },
             "LoginChallengeResponse": {
                 "type": "object",
                 "properties": {
@@ -3739,7 +3799,8 @@
                                 "enum": [
                                     "kyc",
                                     "kyb",
-                                    "auth"
+                                    "auth",
+                                    "document"
                                 ]
                             },
                             "logo_url": {
@@ -4120,7 +4181,8 @@
                                 "enum": [
                                     "kyc",
                                     "kyb",
-                                    "auth"
+                                    "auth",
+                                    "document"
                                 ]
                             },
                             "logo_url": {
@@ -4500,7 +4562,8 @@
                         "enum": [
                             "kyc",
                             "kyb",
-                            "auth"
+                            "auth",
+                            "document"
                         ]
                     },
                     "logo_url": {
