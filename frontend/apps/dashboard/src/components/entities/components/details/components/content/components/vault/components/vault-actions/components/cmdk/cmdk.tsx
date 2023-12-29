@@ -33,9 +33,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
   const canDecrypt = !!entity.decryptableAttributes.length;
 
   const shouldRenderManualReview =
-    entityData &&
-    entityData.status !== EntityStatus.none &&
-    entityData.status !== EntityStatus.incomplete;
+    entityData && entityData.status !== EntityStatus.none;
 
   const resetSearch = () => {
     setSearch('');

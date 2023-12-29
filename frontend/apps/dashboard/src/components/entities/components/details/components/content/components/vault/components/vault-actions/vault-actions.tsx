@@ -57,9 +57,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
   });
 
   const shouldRenderManualReview =
-    entityData &&
-    entityData.status !== EntityStatus.none &&
-    entityData.status !== EntityStatus.incomplete;
+    entityData && entityData.status !== EntityStatus.none;
 
   return (
     <Portal selector={HEADER_ACTIONS_SELECTOR}>
@@ -87,10 +85,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
             />
           </Tooltip>
           {shouldRenderManualReview && (
-            <ManualReview
-              requiresManualReview={entityData.requiresManualReview}
-              status={entityData.status}
-            />
+            <ManualReview status={entityData.status} />
           )}
           <Actions />
         </Stack>
