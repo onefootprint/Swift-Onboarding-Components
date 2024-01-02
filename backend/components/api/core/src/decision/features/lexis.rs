@@ -1,18 +1,53 @@
-use idv::lexis::response::FlexIdResponse;
+use idv::lexis::response::{FlexIdResponse, ValidElementSummary};
 use itertools::Itertools;
-use newtypes::FootprintReasonCode;
+use newtypes::FootprintReasonCode as FRC;
 use std::convert::Into;
 
 #[allow(dead_code)]
-fn footprint_reason_codes(res: FlexIdResponse) -> Vec<FootprintReasonCode> {
-    let phone_codes = Into::<Vec<FootprintReasonCode>>::into(&res.name_address_phone_summary());
-    let name_address_ssn_codes = Into::<Vec<FootprintReasonCode>>::into(&res.name_address_ssn_summary());
-    let dob_codes = Into::<Vec<FootprintReasonCode>>::into(&res.dob_match_level());
+fn footprint_reason_codes(res: FlexIdResponse) -> Vec<FRC> {
+    let phone_codes = Into::<Vec<FRC>>::into(&res.name_address_phone_summary());
+    let name_address_ssn_codes = Into::<Vec<FRC>>::into(&res.name_address_ssn_summary());
+    let dob_codes = Into::<Vec<FRC>>::into(&res.dob_match_level());
+
+    let valid_element_summary_codes = if let Some(ves) = res.valid_element_summary() {
+        let mut codes = vec![];
+
+        let ValidElementSummary {
+            ssn_valid,
+            ssn_deceased,
+            // we dont send dl to lexis
+            dl_valid: _,
+            // we dont send passport to lexis
+            passport_valid: _,
+            address_po_box,
+            address_cmra,
+            // TODO: do we need to use this? Need to clarify with Lexis what exactly this means
+            // potentially we should produce SsnNotAvailable here?
+            ssn_found_for_lex_id: _,
+        } = ves;
+
+        if ssn_valid.map(|s| !s).unwrap_or(false) {
+            codes.push(FRC::SsnInputIsInvalid);
+        }
+        if ssn_deceased.unwrap_or(false) {
+            codes.push(FRC::SubjectDeceased);
+        }
+        if address_po_box.unwrap_or(false) || address_cmra.unwrap_or(false) {
+            // CRMA is technically different from a PO Box but I think it's fine to keep the same single risk signal here?
+            codes.push(FRC::AddressInputIsPoBox);
+            codes.push(FRC::AddressInputIsNonResidential);
+        }
+
+        codes
+    } else {
+        vec![]
+    };
 
     phone_codes
         .into_iter()
         .chain(name_address_ssn_codes)
         .chain(dob_codes)
+        .chain(valid_element_summary_codes)
         .unique()
         .collect()
 }

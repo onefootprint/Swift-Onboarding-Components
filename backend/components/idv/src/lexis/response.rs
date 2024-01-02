@@ -514,6 +514,10 @@ impl FlexIdResponse {
             })
             .unwrap_or(DobMatchLevel::NoDobFoundOrSubmitted) // TODO: in general when an expected field is missing or we fail to parse, do we want produce a conservative FRC (like this unwrap_or) or do we want to just not produce any FRC at all?
     }
+
+    pub fn valid_element_summary(&self) -> Option<ValidElementSummary> {
+        self.result().and_then(|r| r.valid_element_summary.clone())
+    }
 }
 
 #[cfg(test)]
