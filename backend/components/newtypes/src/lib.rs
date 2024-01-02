@@ -133,6 +133,7 @@ pub enum DataValidationError {
 pub enum ErrorMessage {
     String(String),
     Map(HashMap<String, String>),
+    Json(serde_json::Value),
 }
 
 impl serde::Serialize for ErrorMessage {
@@ -149,6 +150,7 @@ impl serde::Serialize for ErrorMessage {
                 }
                 ser.end()
             }
+            Self::Json(j) => j.serialize(serializer),
         }
     }
 }

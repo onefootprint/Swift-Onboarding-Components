@@ -22,3 +22,19 @@ impl<'a> From<ValidationError<'a>> for ApiError {
         ApiError::from(ApiErrorKind::ValidationError(value.0.to_string()))
     }
 }
+
+#[derive(Debug)]
+/// Shorthand to make it convenient to return an arbitrary JSON error
+pub struct JsonError<T>(pub T);
+
+impl<T> From<JsonError<T>> for ApiError
+where
+    T: serde::Serialize,
+{
+    fn from(value: JsonError<T>) -> Self {
+        match serde_json::value::to_value(value.0) {
+            Ok(v) => ApiError::from(ApiErrorKind::JsonError(v)),
+            Err(e) => ApiError::from(e),
+        }
+    }
+}

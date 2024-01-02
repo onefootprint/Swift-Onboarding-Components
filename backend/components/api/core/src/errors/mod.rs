@@ -196,6 +196,8 @@ pub enum ApiErrorKind {
     AwsSelfieDocError(#[from] selfie_doc::AwsSelfieDocError),
     #[error("Rolling back migration as a dry run")]
     MigrationDryRun,
+    #[error("Arbitrary json error - not used")]
+    JsonError(serde_json::Value),
 }
 
 impl From<std::convert::Infallible> for ApiError {
@@ -281,6 +283,7 @@ impl ApiError {
                     return err.json_message();
                 }
             }
+            JsonError(e) => return ErrorMessage::Json(e.clone()),
             Twilio(e) => return ErrorMessage::String(e.message()),
             Database(e) => return ErrorMessage::String(e.message()),
             _ => {}
@@ -377,6 +380,7 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::AttestError(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::AwsSelfieDocError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::MigrationDryRun => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorKind::JsonError(_) => StatusCode::BAD_REQUEST,
         }
     }
 
