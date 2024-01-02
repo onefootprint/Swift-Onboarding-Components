@@ -6,7 +6,7 @@ import React from 'react';
 import useEntity from '@/entity/hooks/use-entity';
 import useEntityId from '@/entity/hooks/use-entity-id';
 
-import useRetriggerKYC from '../main-dialog/hooks/use-retrigger-kyc';
+import useRetriggerKYC from '../actions/components/hooks/use-retrigger-kyc';
 import type { RetriggerKYCFormData } from './components/retrigger-kyc-form';
 import RetriggerKYCForm from './components/retrigger-kyc-form';
 
@@ -31,6 +31,8 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
     if (kind === TriggerKind.IdDocument) {
       trigger = { kind, data: { collectSelfie } };
     } else if (kind === TriggerKind.RedoKyc) {
+      trigger = { kind };
+    } else if (kind === TriggerKind.ProofOfSsn) {
       trigger = { kind };
     } else {
       return;

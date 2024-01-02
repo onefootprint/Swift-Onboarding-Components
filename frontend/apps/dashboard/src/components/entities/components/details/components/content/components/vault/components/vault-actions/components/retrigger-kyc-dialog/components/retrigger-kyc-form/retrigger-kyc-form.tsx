@@ -5,6 +5,7 @@ import {
   Checkbox,
   Divider,
   Radio,
+  Stack,
   TextArea,
   Typography,
 } from '@onefootprint/ui';
@@ -48,49 +49,48 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
   return (
     <StyledForm id={formId} onSubmit={handleSubmit(handleBeforeSubmit)}>
       <Typography variant="label-3">{t('prompt')}</Typography>
-      <div>
-        <Radio
-          value={TriggerKind.IdDocument}
-          label={t('form.id-photo.title')}
-          hint={t('form.id-photo.description')}
-          {...register('kind', { required: true })}
-        />
-        <AnimatedContainer
-          isExpanded={triggerKind === TriggerKind.IdDocument}
-          marginLeft={8}
-          marginTop={4}
-        >
-          <Checkbox
-            label={t('form.id-photo.collect-selfie')}
-            {...register('collectSelfie', { required: false })}
+      <Stack paddingBottom={2} direction="column" gap={4}>
+        <div>
+          <Radio
+            value={TriggerKind.IdDocument}
+            label={t('form.id-photo.title')}
+            hint={t('form.id-photo.description')}
+            {...register('kind', { required: true })}
           />
-        </AnimatedContainer>
-      </div>
-      <div>
+          <AnimatedContainer
+            isExpanded={triggerKind === TriggerKind.IdDocument}
+            marginLeft={8}
+            marginTop={4}
+          >
+            <Checkbox
+              label={t('form.id-photo.collect-selfie')}
+              {...register('collectSelfie', { required: false })}
+            />
+          </AnimatedContainer>
+        </div>
         <Radio
           value={TriggerKind.ProofOfSsn}
           label={t('form.proof-of-ssn.title')}
           hint={t('form.proof-of-ssn.description')}
           {...register('kind', { required: true })}
         />
-      </div>
-      <Radio
-        value={TriggerKind.RedoKyc}
-        label={t('form.revise-kyc.title')}
-        hint={t('form.revise-kyc.description')}
-        {...register('kind', { required: true })}
-      />
-      {errors.kind && (
-        <Typography variant="body-4" color="error">
-          {t('form.error')}
-        </Typography>
-      )}
+        <Radio
+          value={TriggerKind.RedoKyc}
+          label={t('form.revise-kyc.title')}
+          hint={t('form.revise-kyc.description')}
+          {...register('kind', { required: true })}
+        />
+        {errors.kind && (
+          <Typography variant="body-4" color="error">
+            {t('form.error')}
+          </Typography>
+        )}
+      </Stack>
       <TextArea
         label={t('form.note-for-user.label')}
         placeholder={t('form.note-for-user.placeholder')}
         {...register('note')}
       />
-
       <Divider />
       <Typography variant="body-3" color="tertiary">
         {userHasPhone

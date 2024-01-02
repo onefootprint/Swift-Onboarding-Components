@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 
 import type { WithEntityProps } from '../../../../../../../with-entity';
 import useEditControls from '../../hooks/use-edit-controls';
-import RetriggerKYCDialog from './components/retrigger-kyc-dialog';
+import RetriggerKYCDialog from '../retrigger-kyc-dialog';
 
 const Actions = ({ entity }: WithEntityProps) => {
   const { t } = useTranslation('pages.entity.actions');

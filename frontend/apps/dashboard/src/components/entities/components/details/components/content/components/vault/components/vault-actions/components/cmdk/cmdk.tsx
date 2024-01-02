@@ -12,12 +12,12 @@ import { useEntityContext } from '@/entity/hooks/use-entity-context';
 import useDecryptControls from '../../hooks/use-decrypt-controls';
 import useEditControls from '../../hooks/use-edit-controls';
 import type { VaultActionsControlsProps } from '../../vault-actions';
+import RetriggerKYCDialog from '../retrigger-kyc-dialog';
 import { ActionType } from './cmdk.types';
 import ActionList from './components/main-dialog/action-list/action-list';
 import Footer from './components/main-dialog/footer/footer';
 import SearchInput from './components/main-dialog/search-input';
 import ManualReviewDialog from './components/manual-review-dialog';
-import RetriggerKYCDialog from './components/retrigger-kyc-dialog';
 
 const Cmd = ({ entity }: VaultActionsControlsProps) => {
   const { t, allT } = useTranslation('components.cmd');
