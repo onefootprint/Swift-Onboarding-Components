@@ -24,23 +24,19 @@ class FootprintKotlin private constructor() {
         this.launcherActivityActive = isActive
     }
 
-    fun start(context: Context){
+    fun start(context: Context) {
         if(launcherActivityActive) return // To avoid multiple clicks
-        val hasPublicKey = config?.publicKey != null && config?.publicKey!!.isNotEmpty()
-        val hasAuthToken = config?.authToken != null && config?.authToken!!.isNotEmpty()
-        val isMissingParam = !hasPublicKey && !hasAuthToken
-        val hasDestinationActivityName = config?.destinationActivityName != null &&
-                config?.destinationActivityName!!.isNotEmpty()
-
-        if(isMissingParam || !hasDestinationActivityName){
-            throw Exception(
-                "Missing params:"+
+        config?.let { config ->
+            val isMissingParam = config.publicKey.isNullOrEmpty() && config.authToken.isNullOrEmpty()
+            val isMissingActivity = config.redirectActivityName.isNullOrEmpty()
+            if(isMissingParam || isMissingActivity) {
+                config.onError?.invoke("@onefootprint/footprint-kotlin: Missing params:"+
                         (if(isMissingParam) "" else " (publicKey or auth token)") +
-                        (if(hasDestinationActivityName) "" else " destinationActivityName")
-            )
-        }
+                        (if(isMissingActivity) "" else " redirectActivityName"))
+            }
 
-        val intent = Intent(context, LauncherActivity::class.java)
-        context.startActivity(intent)
+            val intent = Intent(context, LauncherActivity::class.java)
+            context.startActivity(intent)
+        }
     }
 }

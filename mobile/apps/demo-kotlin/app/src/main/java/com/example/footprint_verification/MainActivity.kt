@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
                 visaExpirationDate = "05/12/2024"
             )
             val config = FootprintConfig(
-                destinationActivityName = "com.example.footprint_verification.MainActivity",
+                redirectActivityName = "com.example.footprint_verification.MainActivity",
                 publicKey = "pb_test_aSzwnZecnXS4faoyhxrocW",
                 userData = userData,
                 options = FootprintOptions(showLogo = true),

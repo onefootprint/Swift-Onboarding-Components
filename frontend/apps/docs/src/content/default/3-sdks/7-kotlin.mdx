@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         verificationButton = findViewById(R.id.verify_button)
         verificationButton.setOnClickListener {
             val config = FootprintConfig(
-                destinationActivityName = "com.example.footprint_verification.MainActivity",
+                redirectActivityName = "com.example.footprint_verification.MainActivity",
                 publicKey = "pb_test_aSzwnZecnXS4faoyhxrocW",
                 onComplete = {token: String ->
                     Log.d("VerificationResult", "The flow has completed. The validation token is $token")
@@ -128,7 +128,7 @@ class MainActivity : AppCompatActivity() {
                 visaExpirationDate = "05/12/2024"
             )
             val config = FootprintConfig(
-                destinationActivityName = "com.example.footprint_verification.MainActivity",
+                redirectActivityName = "com.example.footprint_verification.MainActivity",
                 publicKey = "pb_test_aSzwnZecnXS4faoyhxrocW",
                 userData = userData,
                 onComplete = {token: String ->
@@ -172,7 +172,7 @@ class MainActivity : AppCompatActivity() {
         verificationButton = findViewById(R.id.verify_button)
         verificationButton.setOnClickListener {
             val config = FootprintConfig(
-                destinationActivityName = "com.example.footprint_verification.MainActivity",
+                redirectActivityName = "com.example.footprint_verification.MainActivity",
                 publicKey = "pb_test_aSzwnZecnXS4faoyhxrocW",
                 appearance = FootprintAppearance(
                     theme = FootprintAppearanceTheme.DARK,
@@ -217,7 +217,7 @@ class MainActivity : AppCompatActivity() {
         verificationButton = findViewById(R.id.verify_button)
         verificationButton.setOnClickListener {
             val config = FootprintConfig(
-                destinationActivityName = "com.example.footprint_verification.MainActivity",
+                redirectActivityName = "com.example.footprint_verification.MainActivity",
                 publicKey = "pb_test_aSzwnZecnXS4faoyhxrocW",
                 userData = userData,
                 options = FootprintOptions(showLogo = true),
@@ -265,7 +265,7 @@ class MainActivity : AppCompatActivity() {
         verificationButton = findViewById(R.id.verify_button)
         verificationButton.setOnClickListener {
             val config = FootprintConfig(
-                destinationActivityName = "com.example.footprint_verification.MainActivity",
+                redirectActivityName = "com.example.footprint_verification.MainActivity",
                 publicKey = "pb_test_aSzwnZecnXS4faoyhxrocW",
                 userData = userData,
                 l10n = FootprintL10n(locale = FootprintSupportedLocale.ES_MX),
@@ -286,7 +286,7 @@ class MainActivity : AppCompatActivity() {
 
 | Variable                  | Description                                                                                                                                                                                                                                                                                                                                          |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `destinationActivityName` | Required. The activity on your app that you want the app to be on after the verification flow has completed. The name must contain the package name as well. For example, if your activity’s class is named `MainActivity` and it is in the package `com.example.package` , the destination activity name will be `com.example.package.MainActivity` |
+| `redirectActivityName` | Required. The activity on your app that you want the app to be on after the verification flow has completed. The name must contain the package name as well. For example, if your activity’s class is named `MainActivity` and it is in the package `com.example.package` , the destination activity name will be `com.example.package.MainActivity` |
 | `publicKey`               | Optional. Onboarding configuration public key.                                                                                                                                                                                                                                                                                                       |
 | `authToken`               | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. One of publicKey or authToken must be provided.                                                                                                                                                                           |
 | `userData`                | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/integrate/user-data).                                                                                                                                                                 |

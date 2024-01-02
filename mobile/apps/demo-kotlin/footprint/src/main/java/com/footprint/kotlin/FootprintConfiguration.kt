@@ -44,7 +44,7 @@ data class FootprintL10n(val locale: FootprintSupportedLocale? = null)
 
 @Serializable
 data class FootprintConfig(
-    @Transient val destinationActivityName: String? = null,
+    @Transient val redirectActivityName: String? = null,
     @SerialName("public_key") val publicKey: String? = null,
     @SerialName("auth_token") val authToken: String? = null,
     @SerialName("user_data") val userData: FootprintUserData? = null,

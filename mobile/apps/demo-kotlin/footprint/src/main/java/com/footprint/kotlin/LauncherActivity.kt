@@ -26,7 +26,7 @@ internal class LauncherActivity : AppCompatActivity() {
             is SessionResult.Error -> config?.onError?.invoke("@onefootprint/footprint-kotlin: Error parsing redirect URL.")
         }
 
-        config?.destinationActivityName?.let { startDestinationActivity(it, result) }
+        config?.redirectActivityName?.let { startDestinationActivity(it, result) }
     }
 
     private fun parseResultFromUrl(url: String): SessionResult {
@@ -49,7 +49,7 @@ internal class LauncherActivity : AppCompatActivity() {
 
     private fun launchVerificationIfReady() {
         config?.let { outerConfig ->
-            outerConfig.destinationActivityName?.let {
+            outerConfig.redirectActivityName?.let {
                 val sdkArgsManager = FootprintSdkArgsManager(outerConfig)
                 sdkArgsManager.sendArgs { sdkToken ->
                     val url = getUrl(outerConfig, sdkToken)
@@ -61,7 +61,7 @@ internal class LauncherActivity : AppCompatActivity() {
                     }
                 }
             } ?: run {
-                config?.onError?.invoke("@onefootprint/footprint-kotlin: Required destinationActivityName missing.")
+                config?.onError?.invoke("@onefootprint/footprint-kotlin: Required redirectActivityName missing.")
             }
         } ?: run {
             config?.onError?.invoke("@onefootprint/footprint-kotlin: Required configuration missing.")
@@ -90,9 +90,9 @@ internal class LauncherActivity : AppCompatActivity() {
         // activity and call the onCancel callback
         isCustomTabOpen = false
         config?.onCancel?.invoke()
-        config?.destinationActivityName?.let { destinationActivityName ->
+        config?.redirectActivityName?.let { redirectActivityName ->
             startDestinationActivity(
-                destinationActivityName,
+                redirectActivityName,
                 SessionResult.Canceled
             )
         }
@@ -114,12 +114,12 @@ internal class LauncherActivity : AppCompatActivity() {
         return builder.build()
     }
 
-    private fun startDestinationActivity(destinationActivityName: String, verificationResult: SessionResult){
+    private fun startDestinationActivity(redirectActivityName: String, verificationResult: SessionResult){
         var intent: Intent? = null
         try {
             intent = Intent(
                 this,
-                Class.forName(destinationActivityName)
+                Class.forName(redirectActivityName)
             )
             footprint.setLauncherActivityActive(false)
             intent.putExtra("verificationResult", verificationResult.toString())
