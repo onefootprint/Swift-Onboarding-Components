@@ -8,7 +8,7 @@ class FootprintKotlin private constructor() {
     private var config: FootprintConfig? = null
     private var launcherActivityActive = false
     companion object {
-        val instance: FootprintKotlin by lazy { FootprintKotlin() }
+        internal val instance: FootprintKotlin by lazy { FootprintKotlin() }
 
         fun init(context: Context, config: FootprintConfig) {
             instance.apply {
