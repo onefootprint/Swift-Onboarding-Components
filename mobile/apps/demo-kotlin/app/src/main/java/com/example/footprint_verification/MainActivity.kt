@@ -4,16 +4,16 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import com.footprint.verify.Footprint
-import com.footprint.verify.FootprintAppearance
-import com.footprint.verify.FootprintAppearanceRules
-import com.footprint.verify.FootprintAppearanceTheme
-import com.footprint.verify.FootprintAppearanceVariables
-import com.footprint.verify.FootprintConfig
-import com.footprint.verify.FootprintL10n
-import com.footprint.verify.FootprintOptions
-import com.footprint.verify.FootprintSupportedLocale
-import com.footprint.verify.FootprintUserData
+import com.footprint.kotlin.FootprintKotlin
+import com.footprint.kotlin.FootprintAppearance
+import com.footprint.kotlin.FootprintAppearanceRules
+import com.footprint.kotlin.FootprintAppearanceTheme
+import com.footprint.kotlin.FootprintAppearanceVariables
+import com.footprint.kotlin.FootprintConfig
+import com.footprint.kotlin.FootprintL10n
+import com.footprint.kotlin.FootprintOptions
+import com.footprint.kotlin.FootprintSupportedLocale
+import com.footprint.kotlin.FootprintUserData
 
 class MainActivity : AppCompatActivity() {
     private lateinit var verificationButton: Button
@@ -59,9 +59,12 @@ class MainActivity : AppCompatActivity() {
                 },
                 onCancel = {
                     Log.d("VerificationResult", "The flow was canceled")
+                },
+                onError = {
+                    Log.d("Footprint error", it)
                 }
             )
-            Footprint.init(
+            FootprintKotlin.init(
                 this@MainActivity,
                 config = config
             )

@@ -1,4 +1,4 @@
-package com.footprint.verify
+package com.footprint.kotlin
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

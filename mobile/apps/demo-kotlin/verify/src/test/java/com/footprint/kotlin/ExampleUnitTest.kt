@@ -1,4 +1,4 @@
-package com.footprint.verify
+package com.footprint.kotlin
 
 import org.junit.Test
 

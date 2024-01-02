@@ -1,4 +1,4 @@
-package com.footprint.verify
+package com.footprint.kotlin
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

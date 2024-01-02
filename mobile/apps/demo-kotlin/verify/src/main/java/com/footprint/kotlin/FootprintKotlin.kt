@@ -1,14 +1,14 @@
-package com.footprint.verify
+package com.footprint.kotlin
 
 import android.content.Context
 import android.content.Intent
 import java.lang.Exception
 
-class Footprint private constructor() {
+class FootprintKotlin private constructor() {
     private var config: FootprintConfig? = null
     private var launcherActivityActive = false
     companion object {
-        val instance: Footprint by lazy { Footprint() }
+        val instance: FootprintKotlin by lazy { FootprintKotlin() }
 
         fun init(context: Context, config: FootprintConfig) {
             instance.apply {

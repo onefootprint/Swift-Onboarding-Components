@@ -1,6 +1,5 @@
-package com.footprint.verify
+package com.footprint.kotlin
 
-import android.content.Context
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json

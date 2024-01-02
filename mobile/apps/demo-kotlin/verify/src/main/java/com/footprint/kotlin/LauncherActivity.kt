@@ -1,4 +1,4 @@
-package com.footprint.verify
+package com.footprint.kotlin
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -16,7 +16,7 @@ internal class LauncherActivity : AppCompatActivity() {
     private var isCustomTabOpen = false
 
     private var config: FootprintConfig? = null
-    private val footprint = Footprint.instance
+    private val footprint = FootprintKotlin.instance
 
     private fun handleResultFromUrl(url: String) {
         val result = parseResultFromUrl(url)
