@@ -12,7 +12,7 @@ use api_core::telemetry::RootSpan;
 use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
 use api_core::utils::challenge::Challenge;
-use api_core::utils::headers::{SandboxId, TelemetryHeaders};
+use api_core::utils::headers::SandboxId;
 use api_core::utils::sms::rx_background_error;
 use api_core::utils::vault_wrapper::{InitialVaultData, VaultContext, VaultWrapper};
 use itertools::Itertools;
@@ -45,7 +45,6 @@ pub async fn post(
     ob_context: ObConfigAuth,
     // When provided, creates a sandbox user with the given suffix
     sandbox_id: SandboxId,
-    telemetry_headers: TelemetryHeaders,
     root_span: RootSpan,
 ) -> JsonApiResponse<SignupChallengeResponse> {
     let SignupChallengeRequest { phone_number, email } = request.into_inner();
@@ -77,10 +76,9 @@ pub async fn post(
             "Phone number required to initiate sign up challenge",
         ))?;
         let tenant = ob_context.tenant();
-        let s_id = telemetry_headers.session_id;
         let (rx, challenge_state_data, time_before_retry_s) = state
             .sms_client
-            .send_challenge_non_blocking(&state, Some(tenant), &phone_number, uv.id, sandbox_id, s_id)
+            .send_challenge_non_blocking(&state, Some(tenant), &phone_number, uv.id, sandbox_id)
             .await?;
 
         let challenge_state = ChallengeState {

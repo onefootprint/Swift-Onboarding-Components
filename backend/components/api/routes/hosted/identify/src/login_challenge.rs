@@ -16,7 +16,6 @@ use api_core::types::JsonApiResponse;
 use api_core::types::ResponseData;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::SandboxId;
-use api_core::utils::headers::TelemetryHeaders;
 use api_core::utils::liveness::WebauthnConfig;
 use api_core::utils::sms::rx_background_error;
 use api_wire_types::IdentifyId;
@@ -55,7 +54,6 @@ pub async fn post(
     // When provided, is used to identify the currently authed user. Will generate a challenge
     // for the authed user
     user_auth: Option<UserAuthContext>,
-    telemetry_headers: TelemetryHeaders,
     root_span: RootSpan,
 ) -> JsonApiResponse<LoginChallengeResponse> {
     let AuthChallengeRequest {
@@ -77,7 +75,9 @@ pub async fn post(
     let twilio_client = &state.sms_client;
 
     // Look up existing user vault by identifier
-    let Some(ctx) = crate::get_user_challenge_context(&state, identifier, ob_context, root_span.clone()).await? else {
+    let Some(ctx) =
+        crate::get_user_challenge_context(&state, identifier, ob_context, root_span.clone()).await?
+    else {
         // The user vault doesn't exist. Just return that the user wasn't found
         return Err(ChallengeError::LoginChallengeUserNotFound.into());
     };
@@ -117,10 +117,9 @@ pub async fn post(
             }
             ChallengeKind::Sms => {
                 let phone_number = vw.get_decrypted_verified_primary_phone(&state).await?;
-                let s_id = telemetry_headers.session_id;
                 let t = tenant.as_ref();
                 let (rx, challenge_state, time_before_retry_s) = twilio_client
-                    .send_challenge_non_blocking(&state, t, &phone_number, vault_id, sandbox_id, s_id)
+                    .send_challenge_non_blocking(&state, t, &phone_number, vault_id, sandbox_id)
                     .await?;
                 let challenge_data = ChallengeData::Sms(challenge_state);
                 (
