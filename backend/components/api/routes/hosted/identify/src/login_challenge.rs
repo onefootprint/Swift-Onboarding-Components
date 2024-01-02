@@ -95,11 +95,11 @@ pub async fn post(
 
     let challenge_kind = match preferred_challenge_kind {
         // Fall back to SMS if the user requested webauthn but doesn't have any creds
-        ChallengeKind::Biometric => {
+        ChallengeKind::Passkey => {
             if creds.is_empty() {
                 ChallengeKind::Sms
             } else {
-                ChallengeKind::Biometric
+                ChallengeKind::Passkey
             }
         }
         ck => ck,
@@ -110,8 +110,8 @@ pub async fn post(
 
     let (rx, challenge_state_data, time_before_retry_s, phone_number, biometric_challenge_json) =
         match challenge_kind {
-            ChallengeKind::Biometric => {
-                let challenge = initiate_biometric_challenge_for_user(&state, &vw.vault.id, creds).await?;
+            ChallengeKind::Passkey => {
+                let challenge = initiate_passkey_login_challenge(&state, &vw.vault.id, creds).await?;
                 let challenge_data = ChallengeData::Passkey(challenge.state);
                 (None, challenge_data, 0, None, Some(challenge.challenge_json))
             }
@@ -137,6 +137,7 @@ pub async fn post(
                 let challenge_data =
                     send_email_challenge_non_blocking(&state, &email, vault_id, &tenant, sandbox_id)?;
 
+                let challenge_data = ChallengeData::Email(challenge_data);
                 (
                     None,
                     challenge_data,
@@ -158,15 +159,10 @@ pub async fn post(
         None => root_span.record("meta", "no_error"),
     };
 
-    let challenge_state = ChallengeState {
+    let data = ChallengeState {
         data: challenge_state_data,
     };
-
-    let challenge_token = Challenge {
-        expires_at: challenge_state.expires_at(),
-        data: challenge_state,
-    }
-    .seal(&state.challenge_sealing_key)?;
+    let challenge_token = Challenge::new(data).seal(&state.challenge_sealing_key)?;
 
     let challenge_data = UserChallengeData {
         challenge_kind,
@@ -187,7 +183,7 @@ struct BiometricChallenge {
     challenge_json: String,
 }
 
-async fn initiate_biometric_challenge_for_user(
+async fn initiate_passkey_login_challenge(
     state: &web::Data<State>,
     user_id: &VaultId,
     creds: Vec<WebauthnCredential>,

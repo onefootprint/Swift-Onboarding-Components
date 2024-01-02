@@ -81,15 +81,9 @@ pub async fn post(
             .send_challenge_non_blocking(&state, Some(tenant), &phone_number, uv.id, sandbox_id)
             .await?;
 
-        let challenge_state = ChallengeState {
-            data: ChallengeData::Sms(challenge_state_data),
-        };
-
-        let challenge_token = Challenge {
-            expires_at: challenge_state.expires_at(),
-            data: challenge_state,
-        }
-        .seal(&state.challenge_sealing_key)?;
+        let challenge_data = ChallengeData::Sms(challenge_state_data);
+        let data = ChallengeState { data: challenge_data };
+        let challenge_token = Challenge::new(data).seal(&state.challenge_sealing_key)?;
         let data = UserChallengeData {
             challenge_kind: ChallengeKind::Sms,
             challenge_token,
@@ -113,14 +107,10 @@ pub async fn post(
         };
 
         let challenge_data = send_email_challenge_non_blocking(&state, &email, uv.id, tenant, sandbox_id)?;
+        let challenge_data = ChallengeData::Email(challenge_data);
 
-        let challenge_state = ChallengeState { data: challenge_data };
-
-        let challenge_token = Challenge {
-            expires_at: challenge_state.expires_at(),
-            data: challenge_state,
-        }
-        .seal(&state.challenge_sealing_key)?;
+        let data = ChallengeState { data: challenge_data };
+        let challenge_token = Challenge::new(data).seal(&state.challenge_sealing_key)?;
 
         let data = UserChallengeData {
             challenge_kind: ChallengeKind::Email,

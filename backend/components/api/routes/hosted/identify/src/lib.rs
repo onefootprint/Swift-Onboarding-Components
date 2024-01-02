@@ -10,7 +10,6 @@ use api_core::utils::sms::PhoneEmailChallengeState;
 use api_core::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use api_core::State;
 use api_wire_types::IdentifyId;
-use chrono::{DateTime, Duration, Utc};
 use db::errors::OptionalExtension;
 use db::models::contact_info::ContactInfo;
 use db::models::scoped_vault::ScopedVault;
@@ -48,7 +47,9 @@ pub(crate) enum CreateChallengeRequest {
 #[serde(rename_all = "snake_case")]
 pub(crate) enum ChallengeKind {
     Sms,
-    Biometric,
+    #[strum(serialize = "biometric")]
+    #[serde(rename = "biometric")]
+    Passkey,
     Email,
 }
 
@@ -88,6 +89,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(verify::post);
 }
 
+// TODO unnecessary wrapper
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ChallengeState {
     data: ChallengeData,
@@ -99,18 +101,6 @@ pub enum ChallengeData {
     #[serde(alias = "Biometric")] // TODO: drop this alias after challenges expire
     Passkey(BiometricChallengeState),
     Email(PhoneEmailChallengeState),
-}
-
-impl ChallengeState {
-    pub fn expires_at(&self) -> DateTime<Utc> {
-        let ttl = match &self.data {
-            ChallengeData::Sms(_) => Duration::minutes(5),
-            ChallengeData::Passkey(_) => Duration::minutes(5),
-            ChallengeData::Email(_) => Duration::minutes(5),
-        };
-
-        Utc::now() + ttl
-    }
 }
 
 #[allow(clippy::large_enum_variant)]
@@ -211,7 +201,7 @@ async fn get_user_challenge_context(
         .map(|(kind, _)| ChallengeKind::from(*kind))
         .collect_vec();
     if !creds.is_empty() {
-        kinds.push(ChallengeKind::Biometric);
+        kinds.push(ChallengeKind::Passkey);
     }
     let is_unverified = kinds.is_empty()
         && uvw.vault.is_created_via_api
@@ -240,7 +230,7 @@ pub fn send_email_challenge_non_blocking(
     vault_id: VaultId,
     tenant: &Tenant,
     sandbox_id: Option<SandboxId>, // pointless pass through for now, but may use later with a fixture email
-) -> ApiResult<ChallengeData> {
+) -> ApiResult<PhoneEmailChallengeState> {
     // Send non-blocking to prevent us from returning the challenge data to the frontend while
     // we wait for sendrid latency
     if email.is_fixture() && sandbox_id.is_none() {
@@ -266,8 +256,5 @@ pub fn send_email_challenge_non_blocking(
     };
     tokio::spawn(fut.in_current_span());
 
-    Ok(ChallengeData::Email(PhoneEmailChallengeState {
-        vault_id,
-        h_code,
-    }))
+    Ok(PhoneEmailChallengeState { vault_id, h_code })
 }
