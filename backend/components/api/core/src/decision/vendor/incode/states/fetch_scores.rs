@@ -1,6 +1,7 @@
 use super::{
-    map_to_api_err, save_incode_verification_result, Complete, IncodeStateTransition,
-    SaveVerificationResultArgs, VerificationSession,
+    compute_ocr_data, compute_risk_signals, map_to_api_err, save_incode_verification_result, Complete,
+    CompleteArgs, IncodeStateTransition, NewRiskSignal, PreCompleteArgs, SaveVerificationResultArgs,
+    VerificationSession,
 };
 use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use crate::decision::vendor::incode::state::IncodeState;
@@ -9,7 +10,7 @@ use crate::decision::vendor::verification_result::save_vreq_and_vres;
 use crate::decision::vendor::VendorAPIError;
 use crate::enclave_client::EnclaveClient;
 use crate::errors::{ApiResult, AssertionError};
-use crate::utils::vault_wrapper::{EnclaveDecryptOperation, Person, Pii, TenantVw, VaultWrapper};
+use crate::utils::vault_wrapper::{Any, EnclaveDecryptOperation, Person, Pii, VaultWrapper};
 use crate::vendor_clients::IncodeClients;
 use crate::ApiErrorKind;
 use async_trait::async_trait;
@@ -22,24 +23,22 @@ use feature_flag::BoolFlag;
 use http::StatusCode;
 use idv::footprint_http_client::FootprintVendorHttpClient;
 use idv::incode::client::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter};
-use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse};
+use idv::incode::doc::response::FetchScoresResponse;
 use idv::incode::doc::{IncodeFetchOCRRequest, IncodeFetchScoresRequest};
 use idv::{ParsedResponse, VendorResponse};
 use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    DataIdentifier, DecisionIntentKind, DocumentKind, DocumentSide, IdDocKind, IdentityDocumentId,
-    PiiJsonValue, ScopedVaultId, VendorAPI, VerificationResultId, WorkflowId,
+    DataIdentifier, DataRequest, DecisionIntentKind, DocumentKind, DocumentSide, Fingerprints, IdDocKind,
+    IdentityDocumentId, PiiJsonValue, ScopedVaultId, VendorAPI, WorkflowId,
 };
 use selfie_doc::{compare::CompareFacesResponse, AwsSelfieDocClient};
 use tracing::Instrument;
 
 pub struct FetchScores {
-    ocr_response: FetchOCRResponse,
     score_response: FetchScoresResponse,
-    vault_data: Option<IncodeOcrComparisonDataFields>,
-    score_verification_result_id: VerificationResultId,
-    ocr_verification_result_id: VerificationResultId,
+    ocr_data: DataRequest<Fingerprints>,
     document_kind: IdDocKind,
+    rs: Vec<NewRiskSignal>,
 }
 
 #[async_trait]
@@ -90,19 +89,23 @@ impl IncodeStateTransition for FetchScores {
             .map_err(map_to_api_err)?;
 
         let wf_id = ctx.wf_id.clone();
-        let (obc, _) = db_pool
-            .db_query(move |conn| ObConfiguration::get(conn, &wf_id))
+        let sv_id = ctx.sv_id.clone();
+        let id_doc_id = ctx.id_doc_id.clone();
+        let (obc, vw, id_doc) = db_pool
+            .db_query(move |conn| -> ApiResult<_> {
+                let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
+                let vw = VaultWrapper::<Person>::build_for_tenant(conn, &sv_id)?;
+                let (id_doc, _) = IdentityDocument::get(conn, &id_doc_id)?;
+                Ok((obc, vw, id_doc))
+            })
             .await??;
 
         // If the ID data already exists in the vault, extract it so we can use it to generate
         // OCR data risk signals
-        let vault_data = if !obc.is_doc_first {
-            let sv_id = ctx.sv_id.clone();
-            let uvw: TenantVw<Person> = db_pool
-                .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &sv_id))
-                .await??;
-            let vault_data = IncodeOcrComparisonDataFields::compose(&ctx.enclave_client, &uvw).await?;
-            Some(vault_data)
+        let ocr_comparison_fields = if !obc.is_doc_first {
+            let ocr_comparison_fields =
+                IncodeOcrComparisonDataFields::compose(&ctx.enclave_client, &vw).await?;
+            Some(ocr_comparison_fields)
         } else {
             None
         };
@@ -151,13 +154,29 @@ impl IncodeStateTransition for FetchScores {
             }
         }.in_current_span());
 
+        let args = PreCompleteArgs {
+            obc: &obc,
+            id_doc: &id_doc,
+            dk,
+            vw: &vw,
+            expect_selfie: session.kind.requires_selfie() && !ctx.disable_selfie,
+            fetch_ocr_response: &ocr_response,
+            score_response: &score_response,
+        };
+        let rs = compute_risk_signals(
+            args,
+            ocr_comparison_fields,
+            ocr_vres.id,
+            score_vres.id,
+            &session.ignored_failure_reasons,
+        )?;
+        let ocr_data = compute_ocr_data(&ctx.enclave_client, args, &rs).await?;
+
         Ok(Some(Self {
             score_response,
-            ocr_response,
-            vault_data,
-            score_verification_result_id: score_vres.id,
-            ocr_verification_result_id: ocr_vres.id,
+            ocr_data,
             document_kind: dk,
+            rs,
         }))
     }
 
@@ -165,23 +184,19 @@ impl IncodeStateTransition for FetchScores {
         self,
         conn: &mut TxnPgConn,
         ctx: &IncodeContext,
-        session: &VerificationSession,
+        _session: &VerificationSession,
     ) -> ApiResult<TransitionResult> {
         // TODO could represent enter inside the state transition
-        Complete::enter(
-            conn,
-            &ctx.vault,
-            &ctx.sv_id,
-            &ctx.id_doc_id,
-            self.document_kind,
-            session.ignored_failure_reasons.clone(),
-            self.ocr_response,
-            self.score_response,
-            self.vault_data,
-            session.kind.requires_selfie() && !ctx.disable_selfie,
-            self.ocr_verification_result_id,
-            self.score_verification_result_id,
-        )?;
+        let args = CompleteArgs {
+            vault: &ctx.vault,
+            sv_id: &ctx.sv_id,
+            id_doc_id: &ctx.id_doc_id,
+            dk: self.document_kind,
+            ocr_data: self.ocr_data,
+            score_response: self.score_response,
+            rs: self.rs,
+        };
+        Complete::enter(conn, args)?;
         Ok(Complete::new().into())
     }
 
@@ -218,8 +233,7 @@ async fn run_aws_inner(
     let (id_doc, vw) = db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let (id_doc, _) = IdentityDocument::get(conn, &id_doc_id)?;
-            let vw = VaultWrapper::<crate::utils::vault_wrapper::Any>::build_for_tenant(conn, &sv_id2)?;
-
+            let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv_id2)?;
             Ok((id_doc, vw))
         })
         .await??;

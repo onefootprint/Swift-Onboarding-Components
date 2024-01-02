@@ -251,7 +251,9 @@ impl<T> DataRequest<T> {
         }
     }
 
-    pub fn no_fingerprints(self) -> DataRequest<Fingerprints> {
+    /// Backdoor to not attach fingerprints to the DataRequest for cases where we're just using the
+    /// DataRequest for validation
+    pub fn no_fingerprints_for_validation(self) -> DataRequest<Fingerprints> {
         DataRequest {
             data: self.data,
             json_fields: self.json_fields,

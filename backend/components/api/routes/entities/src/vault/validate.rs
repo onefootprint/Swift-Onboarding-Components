@@ -80,7 +80,7 @@ async fn post_inner(
 
     let PatchDataRequest { updates, .. } =
         request.clean_and_validate(ValidateArgs::for_non_portable(is_live))?;
-    let updates = updates.no_fingerprints(); // No fingerprints to check speculatively
+    let updates = updates.no_fingerprints_for_validation(); // No fingerprints to check speculatively
     state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {

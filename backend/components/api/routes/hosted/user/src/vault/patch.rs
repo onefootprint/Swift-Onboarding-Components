@@ -75,7 +75,7 @@ pub async fn post_validate(
         is_live: user.is_live,
     };
     let PatchDataRequest { updates, .. } = request.into_inner().clean_and_validate(opts)?;
-    let updates = updates.no_fingerprints(); // No fingerprints to check speculatively
+    let updates = updates.no_fingerprints_for_validation(); // No fingerprints to check speculatively
     state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {

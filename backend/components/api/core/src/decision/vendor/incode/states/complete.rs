@@ -7,6 +7,7 @@ use crate::decision::features::incode_utils::ParsedIncodeNames;
 use crate::decision::vendor::incode::state::IncodeState;
 use crate::decision::vendor::incode::state::TransitionResult;
 use crate::decision::vendor::incode::state_machine::IncodeContext;
+use crate::enclave_client::EnclaveClient;
 use crate::errors::ApiErrorKind;
 use crate::errors::ApiResult;
 use crate::errors::AssertionError;
@@ -35,6 +36,7 @@ use newtypes::DataLifetimeSeqno;
 use newtypes::DataLifetimeSource;
 use newtypes::DataRequest;
 use newtypes::DocumentKind;
+use newtypes::Fingerprints;
 use newtypes::FootprintReasonCode;
 use newtypes::IdDocKind;
 use newtypes::IdentityDataKind as IDK;
@@ -58,49 +60,60 @@ use strum::IntoEnumIterator;
 // it yet so we do it in a custom way
 pub struct Complete {}
 
-/// Now that we have the correct type of the document, add the images to the vault under the correct type
-pub fn vault_complete_images(
-    conn: &mut TxnPgConn,
-    vw: &WriteableVw<Person>,
-    dk: IdDocKind,
-    id_doc: &IdentityDocument,
-) -> ApiResult<(Vec<DocumentData>, DataLifetimeSeqno)> {
-    // When we vault .latest_upload, we use the document_type that is provided by the user, not the eventual doc_type from incode which is the one
-    // we vault the complete images for
-    let doc_type_for_latest_upload = id_doc.document_type;
-    let docs = id_doc
-        .images(conn, true)?
-        .into_iter()
-        .map(|u| {
-            let mime_type = vw
-                .get_mime_type(DocumentKind::LatestUpload(doc_type_for_latest_upload, u.side))
-                .unwrap_or("image/png");
-            let file_extension = mime_type_to_extension(mime_type).unwrap_or("png");
-            let kind = DocumentKind::from_id_doc_kind(dk, u.side).into();
-            NewDocument {
-                mime_type: mime_type.to_owned(),
-                filename: format!("{}.{}", kind, file_extension),
-                kind,
-                e_data_key: u.e_data_key,
-                s3_url: u.s3_url,
-                source: DataLifetimeSource::Hosted,
-            }
-        })
-        .collect_vec();
-    vw.put_documents_unsafe(conn, docs, None)
+#[derive(Copy, Clone)]
+pub(super) struct PreCompleteArgs<'a> {
+    pub obc: &'a ObConfiguration,
+    pub id_doc: &'a IdentityDocument,
+    pub vw: &'a VaultWrapper<Person>,
+    pub dk: IdDocKind,
+    pub expect_selfie: bool,
+    pub fetch_ocr_response: &'a FetchOCRResponse,
+    pub score_response: &'a FetchScoresResponse,
 }
 
-fn ocr_data(r: FetchOCRResponse, dk: IdDocKind) -> Vec<(DataIdentifier, PiiString)> {
-    ParsedIncodeFields::from_fetch_ocr_res(&r)
+pub(super) async fn compute_ocr_data<'a>(
+    enclave_client: &EnclaveClient,
+    args: PreCompleteArgs<'a>,
+    rs: &'a [NewRiskSignal],
+) -> ApiResult<DataRequest<Fingerprints>> {
+    let PreCompleteArgs {
+        obc,
+        vw,
+        fetch_ocr_response: r,
+        dk,
+        ..
+    } = args;
+    let mut validate_args = ValidateArgs::for_bifrost(obc.is_live);
+    validate_args.allow_dangling_keys = true;
+
+    let barcode_read_successfully = rs
+        .iter()
+        .any(|r| r.0 == FootprintReasonCode::DocumentBarcodeCouldBeRead);
+
+    let data = ParsedIncodeFields::from_fetch_ocr_res(r)
         .0
         .into_iter()
-        .map(|pif| {
-            (
-                DataIdentifier::from(DocumentKind::OcrData(dk, pif.odk)),
-                pif.value,
-            )
-        })
-        .collect_vec()
+        .map(|pif| (DocumentKind::OcrData(dk, pif.odk).into(), pif.value))
+        .collect_vec();
+    // For doc-first onboardings, populate identity data
+    let id_data = if obc.is_doc_first {
+        if barcode_read_successfully {
+            doc_first_id_data(r, validate_args)
+                .into_iter()
+                // Don't add OCR data to the vault that already exists
+                .filter(|(k, _)| !vw.has_field(k.clone()))
+                .collect()
+        } else {
+            tracing::warn!("Skipping prefilling IDK data from doc because !barcode_read_successfully");
+            vec![]
+        }
+    } else {
+        vec![]
+    };
+    let data = HashMap::from_iter(data.into_iter().chain(id_data));
+    let data = DataRequest::clean_and_validate_str(data, validate_args)?;
+    let data = data.build_fingerprints(enclave_client, &obc.tenant_id).await?;
+    Ok(data)
 }
 
 fn doc_first_id_data(r: &FetchOCRResponse, validate_args: ValidateArgs) -> Vec<(DataIdentifier, PiiString)> {
@@ -134,26 +147,138 @@ fn doc_first_id_data(r: &FetchOCRResponse, validate_args: ValidateArgs) -> Vec<(
     .collect()
 }
 
+pub(super) type NewRiskSignal = (FootprintReasonCode, VendorAPI, VerificationResultId);
+
+pub(super) fn compute_risk_signals<'a>(
+    args: PreCompleteArgs<'a>,
+    vault_data: Option<IncodeOcrComparisonDataFields>,
+    ocr_vres_id: VerificationResultId,
+    score_vres_id: VerificationResultId,
+    ignored_failure_reasons: &'a [IncodeFailureReason],
+) -> ApiResult<Vec<NewRiskSignal>> {
+    let PreCompleteArgs {
+        obc,
+        id_doc,
+        dk,
+        expect_selfie,
+        fetch_ocr_response,
+        score_response,
+        ..
+    } = args;
+    if fetch_ocr_response.age().ok().is_some_and(|a| a < 18) {
+        tracing::error!("document submitted with age under 18");
+    }
+
+    let score_reason_codes =
+        incode_docv::reason_codes_from_score_response(score_response, fetch_ocr_response, expect_selfie, dk)
+            .into_iter()
+            .map(|r| (r, VendorAPI::IncodeFetchScores, score_vres_id.clone()));
+
+    let pii_matching_ocr_reason_codes = if !obc.is_doc_first {
+        // Only calculate OCR reason codes if we have already collected ID data
+        let vault_data = vault_data.ok_or(AssertionError("Vault data not provided"))?;
+        incode_docv::pii_matching_reason_codes_from_ocr_response(fetch_ocr_response, vault_data)
+            .into_iter()
+            .map(|r| (r, VendorAPI::IncodeFetchOcr, ocr_vres_id.clone()))
+            .collect_vec()
+    } else {
+        vec![]
+    };
+
+    let additional_reason_codes = vec![
+        id_doc.should_skip_selfie().then_some((
+            FootprintReasonCode::DocumentSelfieWasSkipped,
+            VendorAPI::IncodeFetchScores,
+            score_vres_id.clone(),
+        )),
+        id_doc.collected_on_desktop().then_some((
+            FootprintReasonCode::DocumentCollectedViaDesktop,
+            VendorAPI::IncodeFetchScores,
+            score_vres_id.clone(),
+        )),
+    ]
+    .into_iter()
+    .flatten();
+
+    // For all ignored errors from incode, generate a reason code.
+    // Some of these reason codes will trigger a rule that puts the user in manual review
+    let ignored_error_reason_codes = ignored_failure_reasons
+        .iter()
+        .filter_map(|r| r.reason_code())
+        .map(|rc| {
+            (
+                rc,
+                // Note: this is an incorrect vendor API
+                VendorAPI::IncodeFetchScores,
+                score_vres_id.clone(),
+            )
+        })
+        .unique();
+
+    let s = score_reason_codes
+        .chain(pii_matching_ocr_reason_codes)
+        .chain(additional_reason_codes)
+        .chain(ignored_error_reason_codes)
+        .collect();
+    Ok(s)
+}
+
+/// Now that we have the correct type of the document, add the images to the vault under the correct type
+pub fn vault_complete_images(
+    conn: &mut TxnPgConn,
+    vw: &WriteableVw<Person>,
+    dk: IdDocKind,
+    id_doc: &IdentityDocument,
+) -> ApiResult<(Vec<DocumentData>, DataLifetimeSeqno)> {
+    // When we vault .latest_upload, we use the document_type that is provided by the user, not the eventual doc_type from incode which is the one
+    // we vault the complete images for
+    let doc_type_for_latest_upload = id_doc.document_type;
+    let docs = id_doc
+        .images(conn, true)?
+        .into_iter()
+        .map(|u| {
+            let mime_type = vw
+                .get_mime_type(DocumentKind::LatestUpload(doc_type_for_latest_upload, u.side))
+                .unwrap_or("image/png");
+            let file_extension = mime_type_to_extension(mime_type).unwrap_or("png");
+            let kind = DocumentKind::from_id_doc_kind(dk, u.side).into();
+            NewDocument {
+                mime_type: mime_type.to_owned(),
+                filename: format!("{}.{}", kind, file_extension),
+                kind,
+                e_data_key: u.e_data_key,
+                s3_url: u.s3_url,
+                source: DataLifetimeSource::Hosted,
+            }
+        })
+        .collect_vec();
+    vw.put_documents_unsafe(conn, docs, None)
+}
+
+pub struct CompleteArgs<'a> {
+    pub vault: &'a Vault,
+    pub sv_id: &'a ScopedVaultId,
+    pub id_doc_id: &'a IdentityDocumentId,
+    pub dk: IdDocKind,
+    pub ocr_data: DataRequest<Fingerprints>,
+    pub score_response: FetchScoresResponse,
+    pub rs: Vec<NewRiskSignal>,
+}
+
 impl Complete {
-    #[allow(clippy::too_many_arguments)]
     /// Must call this before instantiating Complete
-    pub fn enter(
-        conn: &mut TxnPgConn,
-        vault: &Vault,
-        sv_id: &ScopedVaultId,
-        id_doc_id: &IdentityDocumentId,
-        dk: IdDocKind,
-        ignored_failure_reasons: Vec<IncodeFailureReason>,
-        fetch_ocr_response: FetchOCRResponse,
-        score_response: FetchScoresResponse,
-        vault_data: Option<IncodeOcrComparisonDataFields>,
-        expect_selfie: bool,
-        ocr_verification_result_id: VerificationResultId,
-        score_verification_result_id: VerificationResultId,
-    ) -> ApiResult<()> {
+    pub fn enter(conn: &mut TxnPgConn, args: CompleteArgs) -> ApiResult<()> {
+        let CompleteArgs {
+            vault,
+            sv_id,
+            id_doc_id,
+            dk,
+            ocr_data,
+            score_response,
+            rs,
+        } = args;
         let uvw = VaultWrapper::lock_for_onboarding(conn, sv_id)?;
-        let (id_doc, doc_request) = IdentityDocument::get(conn, id_doc_id)?;
-        let (obc, _) = ObConfiguration::get(conn, &doc_request.workflow_id)?;
+        let (id_doc, _) = IdentityDocument::get(conn, id_doc_id)?;
 
         // Create a timeline event
         let info = newtypes::IdentityDocumentUploadedInfo {
@@ -165,125 +290,19 @@ impl Complete {
         // Note that the dk here may be incorrect if we can't extract it from incode
         vault_complete_images(conn, &uvw, dk, &id_doc)?;
 
-        // Clear all OCR data for this document kind
+        // Clear all OCR data for this document kind, even if we're not replacing it
         let odks_to_clear = ODK::iter()
             .map(|odk| DocumentKind::OcrData(dk, odk).into())
             .collect();
         let seqno = DataLifetime::get_next_seqno(conn)?;
         DataLifetime::bulk_deactivate_kinds(conn, sv_id, odks_to_clear, seqno)?;
 
-        // ////////////
         // Save Risk Signals
-        // ////////////
-        fetch_ocr_response
-            .age()
-            .map(|a| {
-                if a < 18 {
-                    tracing::error!(scoped_vault_id=%sv_id, "document submitted with age under 18");
-                }
-            })
-            .ok();
-
-        let score_reason_codes = incode_docv::reason_codes_from_score_response(
-            &score_response,
-            &fetch_ocr_response,
-            expect_selfie,
-            dk,
-        )
-        .into_iter()
-        .map(|r| {
-            (
-                r,
-                VendorAPI::IncodeFetchScores,
-                score_verification_result_id.clone(),
-            )
-        });
-
-        let pii_matching_ocr_reason_codes = if !obc.is_doc_first {
-            // Only calculate OCR reason codes if we have already collected ID data
-            let vault_data = vault_data.ok_or(AssertionError("Vault data not provided"))?;
-            incode_docv::pii_matching_reason_codes_from_ocr_response(&fetch_ocr_response, vault_data)
-                .into_iter()
-                .map(|r| (r, VendorAPI::IncodeFetchOcr, ocr_verification_result_id.clone()))
-                .collect_vec()
-        } else {
-            vec![]
-        };
-
-        let additional_reason_codes = vec![
-            id_doc.should_skip_selfie().then_some((
-                FootprintReasonCode::DocumentSelfieWasSkipped,
-                VendorAPI::IncodeFetchScores,
-                score_verification_result_id.clone(),
-            )),
-            id_doc.collected_on_desktop().then_some((
-                FootprintReasonCode::DocumentCollectedViaDesktop,
-                VendorAPI::IncodeFetchScores,
-                score_verification_result_id.clone(),
-            )),
-        ]
-        .into_iter()
-        .flatten();
-
-        // For all ignored errors from incode, generate a reason code.
-        // Some of these reason codes will trigger a rule that puts the user in manual review
-        let ignored_error_reason_codes = ignored_failure_reasons
-            .into_iter()
-            .filter_map(|r| r.reason_code())
-            .map(|rc| {
-                (
-                    rc,
-                    // Note: this is an incorrect vendor API
-                    VendorAPI::IncodeFetchScores,
-                    score_verification_result_id.clone(),
-                )
-            })
-            .unique();
-
-        let rs = RiskSignal::bulk_create(
-            conn,
-            sv_id,
-            score_reason_codes
-                .chain(pii_matching_ocr_reason_codes.into_iter())
-                .chain(additional_reason_codes)
-                .chain(ignored_error_reason_codes)
-                .collect(),
-            newtypes::RiskSignalGroupKind::Doc,
-            false,
-        )?;
-        let barcode_read_successfully = rs
-            .iter()
-            .any(|r| r.reason_code == FootprintReasonCode::DocumentBarcodeCouldBeRead);
-
-        let mut validate_args = ValidateArgs::for_bifrost(vault.is_live);
-        validate_args.allow_dangling_keys = true;
-        // For doc-first onboardings, populate identity data
-        let id_data = if obc.is_doc_first {
-            if barcode_read_successfully {
-                doc_first_id_data(&fetch_ocr_response, validate_args)
-                        .into_iter()
-                        // Don't add OCR data to the vault that already exists
-                        .filter(|(k, _)| !uvw.has_field(k.clone()))
-                        .collect()
-            } else {
-                tracing::warn!(
-                    %sv_id,
-                    %id_doc_id,
-                    "Skipping prefilling IDK data from doc because !barcode_read_successfully"
-                );
-                vec![]
-            }
-        } else {
-            vec![]
-        };
+        RiskSignal::bulk_create(conn, sv_id, rs, newtypes::RiskSignalGroupKind::Doc, false)?;
 
         // Then add some extracted OCR data to the vault.
-        let ocr_data = ocr_data(fetch_ocr_response, dk);
-        let data = HashMap::from_iter(ocr_data.into_iter().chain(id_data));
-        let data = DataRequest::clean_and_validate_str(data, validate_args)?;
-        let data = data.no_fingerprints();
         let source = DataLifetimeSource::Ocr;
-        let seqno = uvw.patch_data(conn, data, source, None)?.seqno;
+        let seqno = uvw.patch_data(conn, ocr_data, source, None)?.seqno;
 
         let (document_score, _) = score_response.document_score();
         let (ocr_confidence_score, _) = score_response.id_ocr_confidence();

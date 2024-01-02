@@ -305,7 +305,7 @@ pub async fn handle_document_process(state: &State, sv_id: ScopedVaultId,wf_id: 
                     state,
                     &sv_id,
                     &wf_id2,
-                    obc.is_doc_first,
+                    obc,
                     id_doc,
                     should_collect_selfie,
                 )

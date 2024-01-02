@@ -6,6 +6,7 @@ use db::models::decision_intent::DecisionIntent;
 use db::models::document_upload::DocumentUpload;
 use db::models::identity_document::IdentityDocument;
 use db::models::incode_verification_session::IncodeVerificationSession;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::verification_request::VerificationRequest;
 
 mod start_onboarding;
@@ -51,7 +52,7 @@ use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use crate::decision::vendor;
 use crate::decision::vendor::verification_result::encrypt_verification_result_response;
 use crate::errors::{ApiResult, AssertionError};
-use crate::utils::vault_wrapper::{Person, TenantVw, VaultWrapper};
+use crate::utils::vault_wrapper::{Person, VaultWrapper};
 use crate::{ApiError, State};
 use db::models::verification_result::{NewVerificationResult, VerificationResult};
 use db::DbPool;
@@ -172,54 +173,51 @@ fn map_to_api_err(e: idv::incode::error::Error) -> ApiError {
 
 pub async fn save_incode_fixtures(
     state: &State,
-    scoped_vault_id: &ScopedVaultId,
+    su_id: &ScopedVaultId,
     wf_id: &WorkflowId,
-    is_doc_first: bool,
+    obc: ObConfiguration,
     id_doc: IdentityDocument,
     should_collect_selfie: bool,
 ) -> ApiResult<()> {
-    let suid = scoped_vault_id.clone();
-    let suid2 = scoped_vault_id.clone();
     let wf_id = wf_id.clone();
-    let (decision_intent, uvw) = state
+    let suid = su_id.clone();
+    let vw = state
+        .db_pool
+        .db_query(move |conn| VaultWrapper::<Person>::build_for_tenant(conn, &suid))
+        .await??;
+    let ocr_comparison_fields = if !obc.is_doc_first {
+        let ocr_comparison_fields =
+            IncodeOcrComparisonDataFields::compose(&state.enclave_client, &vw).await?;
+        Some(ocr_comparison_fields)
+    } else {
+        None
+    };
+    let uv_public_key = vw.vault.public_key.clone();
+
+    // Save OCR
+    let raw_ocr_response = FetchOCRResponse::fixture_response(ocr_comparison_fields.clone());
+    let ocr_response: FetchOCRResponse = serde_json::from_value(raw_ocr_response.clone())?;
+    let e_ocr_response = vendor::verification_result::encrypt_verification_result_response(
+        &raw_ocr_response.clone().into(),
+        &uv_public_key,
+    )?;
+
+    // save scores
+    let score_response =
+        FetchScoresResponse::fixture_response(id_doc.fixture_result).map_err(idv::Error::from)?;
+    let raw_score_response = serde_json::to_value(score_response.clone())?;
+    let e_score_response = vendor::verification_result::encrypt_verification_result_response(
+        &raw_score_response.clone().into(),
+        &uv_public_key,
+    )?;
+    let suid = su_id.clone();
+    let vres = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let vw: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &suid)?;
-            let decision_intent =
+            let di =
                 DecisionIntent::get_or_create_for_workflow(conn, &suid, &wf_id, DecisionIntentKind::DocScan)?;
-
-            Ok((decision_intent, vw))
-        })
-        .await?;
-    let ocr_data = IncodeOcrComparisonDataFields::compose(&state.enclave_client, &uvw).await?;
-    let uv_public_key = uvw.vault.public_key.clone();
-
-    state
-        .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
-            let requests = VerificationRequest::bulk_create(
-                conn,
-                suid2.clone(),
-                vec![VendorAPI::IncodeFetchOcr, VendorAPI::IncodeFetchScores],
-                &decision_intent.id,
-            )?;
-
-            // Save OCR
-            let raw_ocr_response = FetchOCRResponse::fixture_response(Some(ocr_data.clone()));
-            let e_ocr_response = vendor::verification_result::encrypt_verification_result_response(
-                &raw_ocr_response.clone().into(),
-                &uv_public_key,
-            )?;
-            let parsed_ocr_response: FetchOCRResponse = serde_json::from_value(raw_ocr_response.clone())?;
-
-            // save scores
-            let parsed_score_response =
-                FetchScoresResponse::fixture_response(id_doc.fixture_result).map_err(idv::Error::from)?;
-            let raw_score_response = serde_json::to_value(parsed_score_response.clone())?;
-            let e_score_response = vendor::verification_result::encrypt_verification_result_response(
-                &raw_score_response.clone().into(),
-                &uv_public_key,
-            )?;
+            let apis = vec![VendorAPI::IncodeFetchOcr, VendorAPI::IncodeFetchScores];
+            let requests = VerificationRequest::bulk_create(conn, suid, apis, &di.id)?;
 
             let new_vres = requests
                 .into_iter()
@@ -244,27 +242,42 @@ pub async fn save_incode_fixtures(
                 })
                 .collect();
 
-            let mut result = VerificationResult::bulk_create(conn, new_vres)?;
-            let vres = result
+            let mut vrs = VerificationResult::bulk_create(conn, new_vres)?;
+            let vres = vrs
                 .pop()
                 .ok_or(AssertionError("missing vres in incode fixture"))?;
-            let id_data = (!is_doc_first).then_some(ocr_data);
+            Ok(vres)
+        })
+        .await?;
 
+    let args = PreCompleteArgs {
+        obc: &obc,
+        id_doc: &id_doc,
+        dk: id_doc.document_type,
+        vw: &vw,
+        expect_selfie: should_collect_selfie,
+        fetch_ocr_response: &ocr_response,
+        score_response: &score_response,
+    };
+    // Use same VRes id because fixture
+    let rs = compute_risk_signals(args, ocr_comparison_fields, vres.id.clone(), vres.id, &[])?;
+    let ocr_data = compute_ocr_data(&state.enclave_client, args, &rs).await?;
+
+    let suid = su_id.clone();
+    state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
             // Enter the complete state to save risk signals
-            Complete::enter(
-                conn,
-                &uvw.vault,
-                &suid2,
-                &id_doc.id,
-                id_doc.document_type,
-                vec![],
-                parsed_ocr_response,
-                parsed_score_response,
-                id_data,
-                should_collect_selfie,
-                vres.id.clone(),
-                vres.id,
-            )?;
+            let args = CompleteArgs {
+                vault: &vw.vault,
+                sv_id: &suid,
+                id_doc_id: &id_doc.id,
+                dk: id_doc.document_type,
+                ocr_data,
+                score_response,
+                rs,
+            };
+            Complete::enter(conn, args)?;
 
             Ok(())
         })
