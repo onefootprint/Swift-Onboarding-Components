@@ -5,6 +5,18 @@ import type { Article } from './media.types';
 const getStaticProps: GetStaticProps = () => {
   const articles: Article[] = [
     {
+      id: '11',
+      url: 'https://whyyoushouldjoin.substack.com/p/inside-q1-24',
+      website: 'Why You Should Join: Inside Edition',
+      imageUrl: '/media/whyyoushouldjoin.png',
+      imageAlt: 'Inside Q1 24',
+      publishedAt: 'Jan 1, 2024',
+      title:
+        'Suggestions from Bogomil Balkansky (Sequoia), Shardul Shah (Index), Alex Kolicich (8VC), Ali Partovi and Suzanne Xie (Neo), and Arash Afrakhteh (Pear).',
+      excerpt:
+        '“Why You Should Join” is a monthly newsletter highlighting early-stage startups on track to becoming generational companies. Footprint was proudly featured in the January 2024 edition.',
+    },
+    {
       id: '10',
       url: 'https://www.primary.vc/firstedition/posts/focal-fintech-25-startups-to-watch',
       imageUrl: '/media/primary-vc.png',
