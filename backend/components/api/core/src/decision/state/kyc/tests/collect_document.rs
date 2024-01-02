@@ -77,12 +77,6 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
             .return_const(matches!(user_kind, UserKind::Demo));
     });
 
-    mock_ff_client.mock(|c| {
-        c.expect_flag()
-            .withf(move |f| matches!(f, BoolFlag::UseRulesEngineDecision(_)))
-            .return_const(true);
-    });
-
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
         UserKind::Demo | UserKind::Sandbox(_) => {
@@ -180,7 +174,12 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     let obd = obd.unwrap();
     assert!(obd.status == expected_status);
-    assert!(obd.seqno.is_some());
+
+    if matches!(user_kind, UserKind::Live) {
+        assert!(obd.seqno.is_some());
+    } else {
+        assert!(obd.seqno.is_none());
+    }
 
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert_eq!(doc_outcome.expected_onboarding_decision(), wf.status.unwrap());

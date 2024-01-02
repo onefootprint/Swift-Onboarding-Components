@@ -1,14 +1,11 @@
-use std::sync::Arc;
-
 use db::{
     models::{
         decision_intent::DecisionIntent, document_request::DocumentRequest,
         ob_configuration::ObConfiguration, risk_signal::NewRiskSignalInfo, scoped_vault::ScopedVault,
-        vault::Vault, workflow::Workflow,
+        workflow::Workflow,
     },
     DbPool, DbResult, TxnPgConn,
 };
-use feature_flag::{BoolFlag, FeatureFlagClient};
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
     CipKind, DecisionIntentKind, DecisionStatus, FootprintReasonCode, ReviewReason, RuleSetResultKind,
@@ -22,13 +19,9 @@ use crate::{
             incode_docv::{self, IncodeOcrComparisonDataFields},
             risk_signals::{risk_signal_group_struct::Aml, RiskSignalGroupStruct, RiskSignalsForDecision},
         },
-        onboarding::{
-            rules::{KycRuleExecutionConfig, KycRuleGroup},
-            Decision, OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput,
-        },
-        rule::rule_sets,
+        onboarding::{Decision, OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput},
         rule_engine,
-        utils::{should_execute_rules_for_document_only, FixtureDecision},
+        utils::FixtureDecision,
         vendor::{
             self,
             incode_watchlist::WatchlistCheckKind,
@@ -199,45 +192,14 @@ pub fn alpaca_kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> Ap
 #[tracing::instrument(skip_all)]
 pub fn get_decision(
     conn: &mut TxnPgConn,
-    ff_client: Arc<dyn FeatureFlagClient>,
     risk_signals: RiskSignalsForDecision,
     wf: &Workflow,
-    vault: &Vault,
+    is_fixture: bool,
 ) -> ApiResult<Decision> {
     let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
-    // later rules will come from Postgres itself
-    let rule_group = match obc.cip_kind {
-        Some(CipKind::Alpaca) => {
-            let mut aml_rules = rule_sets::common::aml_rules();
-            if ff_client.flag(BoolFlag::StepUpOnAmlHit(&obc.key)) {
-                aml_rules = aml_rules
-                    .into_iter()
-                    .chain(rule_sets::alpaca::stepup_on_watchlist_hit_rules().into_iter())
-                    .collect();
-            };
-            KycRuleGroup {
-                kyc_rules: rule_sets::alpaca::alpaca_rules(),
-                doc_rules: rule_sets::alpaca::doc_rules(),
-                aml_rules,
-            }
-        }
-        _ => KycRuleGroup::default(),
-    };
     let doc_collected = DocumentRequest::get_identity(conn, &wf.id)?.is_some();
-    let document_only = should_execute_rules_for_document_only(vault, wf)?;
 
-    let config = KycRuleExecutionConfig {
-        include_doc: doc_collected,
-        document_only,
-        skip_kyc: obc.skip_kyc,
-        allow_stepup: !doc_collected, // Soon we might just add is_stepup_enabled to OBC and then also use that here to determine if StepUp should be an allowed_action
-    };
-    let rules_output = rule_group.evaluate(risk_signals.clone(), config)?;
-    let decision = rules_output.final_kyc_decision()?;
-    engine::log_rule_evaluation(wf, &decision, decision::rule::CANONICAL_ONBOARDING_RULE_LINE);
-    let decision = decision.decision;
-
-    let decision = match rule_engine::engine::evaluate_workflow_decision(
+    rule_engine::engine::evaluate_workflow_decision(
         conn,
         &wf.scoped_vault_id,
         &obc.id,
@@ -245,22 +207,8 @@ pub fn get_decision(
         RuleSetResultKind::WorkflowDecision,
         risk_signals.risk_signals,
         doc_collected,
-    ) {
-        Ok(rules_engine_decision) => {
-            tracing::info!(?rules_engine_decision, ?decision, "rules_engine_decision");
-            if ff_client.flag(BoolFlag::UseRulesEngineDecision(&obc.key)) {
-                rules_engine_decision
-            } else {
-                decision
-            }
-        }
-        Err(err) => {
-            tracing::error!(?err, "Error evaluating Rules Engine");
-            decision
-        }
-    };
-
-    Ok(decision)
+        is_fixture,
+    )
 }
 
 #[tracing::instrument(skip(conn))]

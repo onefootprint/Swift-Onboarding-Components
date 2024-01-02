@@ -271,7 +271,8 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
             decision::utils::get_fixture_data_decision(ff_client.clone(), &v, &wf, &self.t_id)?;
         // TODO: reason_codes are produced in `MakeVendorCalls` on_commit, so untangle this from the util
         // TODO: load risk signals here, and use that to evaluate the rules
-        let decision = common::get_decision(conn, ff_client, self.risk_signals.clone(), &wf, &v)?;
+        let decision =
+            common::get_decision(conn, self.risk_signals.clone(), &wf, fixture_decision.is_some())?;
         let decision = if let Some(fixture_decision) = fixture_decision {
             common::alpaca_kyc_decision_from_fixture(fixture_decision)?
         } else {

@@ -21,6 +21,7 @@ use db::{
 use itertools::Itertools;
 use newtypes::{ObConfigurationId, RiskSignalGroupKind, RuleSetResultKind, ScopedVaultId, WorkflowId};
 
+#[allow(clippy::too_many_arguments)]
 #[tracing::instrument(skip_all)]
 pub fn evaluate_workflow_decision(
     conn: &mut TxnPgConn,
@@ -30,6 +31,7 @@ pub fn evaluate_workflow_decision(
     kind: RuleSetResultKind,
     risk_signals: HashMap<RiskSignalGroupKind, Vec<RiskSignal>>,
     doc_collected: bool, // could maybe query for DocReq in here and not need to pass this in
+    is_fixture: bool,
 ) -> ApiResult<Decision> {
     if doc_collected
         && !risk_signals
@@ -65,7 +67,7 @@ pub fn evaluate_workflow_decision(
 
     Ok(Decision {
         decision_status: rule_set_result.action_triggered.into(),
-        should_commit: should_commit_action.is_none(),
+        should_commit: !is_fixture && should_commit_action.is_none(),
         create_manual_review: rule_set_result
             .action_triggered
             .map(|ra| ra.should_create_review())

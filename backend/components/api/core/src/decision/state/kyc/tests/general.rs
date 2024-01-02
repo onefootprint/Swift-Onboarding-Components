@@ -177,12 +177,6 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
             .return_const(matches!(user_kind, UserKind::Demo));
     });
 
-    mock_ff_client.mock(|c| {
-        c.expect_flag()
-            .withf(move |f| matches!(f, BoolFlag::UseRulesEngineDecision(_)))
-            .return_const(true);
-    });
-
     match user_kind {
         // If Demo or Sandbox we expect no vendor calls to be attempted
         UserKind::Demo | UserKind::Sandbox(_) => {
@@ -401,12 +395,6 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
             .times(3)
             .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
             .return_const(matches!(user_kind, UserKind::Demo));
-    });
-
-    mock_ff_client.mock(|c| {
-        c.expect_flag()
-            .withf(move |f| matches!(f, BoolFlag::UseRulesEngineDecision(_)))
-            .return_const(true);
     });
 
     match user_kind {
@@ -643,12 +631,6 @@ async fn redo_and_pass(
             .times(3)
             .withf(move |f| *f == BoolFlag::IsDemoTenant(&tenant_id))
             .return_const(matches!(user_kind, UserKind::Demo));
-    });
-
-    mock_ff_client.mock(|c| {
-        c.expect_flag()
-            .withf(move |f| matches!(f, BoolFlag::UseRulesEngineDecision(_)))
-            .return_const(true);
     });
 
     match user_kind {

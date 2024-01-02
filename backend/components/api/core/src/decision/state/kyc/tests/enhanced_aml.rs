@@ -30,7 +30,7 @@ enum RS {
 
 #[test_state_case(EnhancedAmlOption::No, VR::Hits(vec![]), VR::NotExpected, (OnboardingStatus::Pass, RS::None))]
 #[test_state_case(EnhancedAmlOption::No, VR::Hits(vec![AmlKind::Ofac]), VR::NotExpected, (OnboardingStatus::Fail, RS::Some(IdologyExpectId, vec![AmlKind::Ofac])))]
-#[test_state_case(EnhancedAmlOption::No, VR::Hits(vec![AmlKind::Pep]), VR::NotExpected, (OnboardingStatus::Fail, RS::Some(IdologyExpectId, vec![AmlKind::Pep])))]
+#[test_state_case(EnhancedAmlOption::No, VR::Hits(vec![AmlKind::Pep]), VR::NotExpected, (OnboardingStatus::Pass, RS::Some(IdologyExpectId, vec![AmlKind::Pep])))]
 #[test_state_case(EnhancedAmlOption::Yes {ofac: true, pep: true, adverse_media:true, continuous_monitoring:true, adverse_media_lists: None}, VR::Hits(vec![]), VR::Hits(vec![]), (OnboardingStatus::Pass, RS::None))]
 #[test_state_case(EnhancedAmlOption::Yes {ofac: true, pep: true, adverse_media:true, continuous_monitoring:true, adverse_media_lists: None}, VR::Hits(vec![]), VR::Hits(vec![AmlKind::Ofac]), (OnboardingStatus::Fail, RS::Some(IncodeWatchlistCheck,vec![AmlKind::Ofac])))]
 #[test_state_case(EnhancedAmlOption::Yes {ofac: true, pep: true, adverse_media:true, continuous_monitoring:true, adverse_media_lists: None}, VR::Hits(vec![]), VR::Hits(vec![AmlKind::Ofac, AmlKind::Pep]), (OnboardingStatus::Fail, RS::Some(IncodeWatchlistCheck,vec![AmlKind::Ofac, AmlKind::Pep])))]
@@ -72,11 +72,6 @@ async fn test(
             BoolFlag::EnableIncodeWatchlistCheckInNonProd(_) => true,
             _ => f.default(),
         });
-    });
-    mock_ff_client.mock(|c| {
-        c.expect_flag()
-            .withf(move |f| matches!(f, BoolFlag::UseRulesEngineDecision(_)))
-            .return_const(true);
     });
 
     match kyc_call {
