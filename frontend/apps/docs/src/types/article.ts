@@ -28,5 +28,6 @@ export type Article = {
     sections: ArticleSection[];
     slug: string;
     title: string;
+    hidden?: boolean;
   };
 };

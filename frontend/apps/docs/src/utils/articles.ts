@@ -127,9 +127,9 @@ export const getNavigationByPage = async (page: string) => {
     return navigation.get(name);
   };
 
-  articles.forEach(({ data: { category, title, position, slug } }) => {
+  articles.forEach(({ data: { category, title, position, slug, hidden } }) => {
     const navigationCategory = findOrCreateCategory(category);
-    if (navigationCategory) {
+    if (navigationCategory && !hidden) {
       navigationCategory.items.push({
         title,
         position,
