@@ -1,4 +1,4 @@
-package com.footprint.kotlin
+package com.footprint.android
 
 import org.junit.Test
 

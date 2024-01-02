@@ -1,14 +1,13 @@
-package com.footprint.kotlin
+package com.footprint.android
 
 import android.content.Context
 import android.content.Intent
-import java.lang.Exception
 
-class FootprintKotlin private constructor() {
+class FootprintAndroid private constructor() {
     private var config: FootprintConfig? = null
     private var launcherActivityActive = false
     companion object {
-        internal val instance: FootprintKotlin by lazy { FootprintKotlin() }
+        internal val instance: FootprintAndroid by lazy { FootprintAndroid() }
 
         fun init(context: Context, config: FootprintConfig) {
             instance.apply {
@@ -30,9 +29,10 @@ class FootprintKotlin private constructor() {
             val isMissingParam = config.publicKey.isNullOrEmpty() && config.authToken.isNullOrEmpty()
             val isMissingActivity = config.redirectActivityName.isNullOrEmpty()
             if(isMissingParam || isMissingActivity) {
-                config.onError?.invoke("@onefootprint/footprint-kotlin: Missing params:"+
-                        (if(isMissingParam) "" else " (publicKey or auth token)") +
-                        (if(isMissingActivity) "" else " redirectActivityName"))
+                config.onError?.invoke("@onefootprint/footprint-android: Missing params: "+
+                        (if(isMissingParam) "(publicKey or auth token)" else "") +
+                        (if(isMissingParam && isMissingActivity) " and " else "") +
+                        (if(isMissingActivity) "redirectActivityName" else ""))
             }
 
             val intent = Intent(context, LauncherActivity::class.java)

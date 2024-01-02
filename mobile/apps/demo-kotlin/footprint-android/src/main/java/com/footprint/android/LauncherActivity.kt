@@ -1,4 +1,4 @@
-package com.footprint.kotlin
+package com.footprint.android
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -16,14 +16,14 @@ internal class LauncherActivity : AppCompatActivity() {
     private var isCustomTabOpen = false
 
     private var config: FootprintConfig? = null
-    private val footprint = FootprintKotlin.instance
+    private val footprint = FootprintAndroid.instance
 
     private fun handleResultFromUrl(url: String) {
         val result = parseResultFromUrl(url)
         when (result) {
             is SessionResult.Canceled -> config?.onCancel?.invoke()
             is SessionResult.Token -> config?.onComplete?.invoke(result.value)
-            is SessionResult.Error -> config?.onError?.invoke("@onefootprint/footprint-kotlin: Error parsing redirect URL.")
+            is SessionResult.Error -> config?.onError?.invoke("@onefootprint/footprint-android: Error parsing redirect URL.")
         }
 
         config?.redirectActivityName?.let { startDestinationActivity(it, result) }
@@ -57,14 +57,14 @@ internal class LauncherActivity : AppCompatActivity() {
                         customTabsIntent.launchUrl(this, url)
                         isCustomTabOpen = true
                     } ?: run {
-                        config?.onError?.invoke("@onefootprint/footprint-kotlin: Encountered error while generating URL.")
+                        config?.onError?.invoke("@onefootprint/footprint-android: Encountered error while generating URL.")
                     }
                 }
             } ?: run {
-                config?.onError?.invoke("@onefootprint/footprint-kotlin: Required redirectActivityName missing.")
+                config?.onError?.invoke("@onefootprint/footprint-android: Required redirectActivityName missing.")
             }
         } ?: run {
-            config?.onError?.invoke("@onefootprint/footprint-kotlin: Required configuration missing.")
+            config?.onError?.invoke("@onefootprint/footprint-android: Required configuration missing.")
         }
     }
 
@@ -127,9 +127,9 @@ internal class LauncherActivity : AppCompatActivity() {
             finish() // Important cause we don't want the user to be able to come back to our activity on backspace
         } catch (e: ClassNotFoundException) {
             e.localizedMessage?.let {
-                config?.onError?.invoke("@onefootprint/footprint-kotlin: $it")
+                config?.onError?.invoke("@onefootprint/footprint-android: $it")
             } ?: run {
-                config?.onError?.invoke("@onefootprint/footprint-kotlin: Unable to start intent.")
+                config?.onError?.invoke("@onefootprint/footprint-android: Unable to start intent.")
             }
         }
     }

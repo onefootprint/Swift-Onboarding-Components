@@ -4,16 +4,16 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import com.footprint.kotlin.FootprintKotlin
-import com.footprint.kotlin.FootprintAppearance
-import com.footprint.kotlin.FootprintAppearanceRules
-import com.footprint.kotlin.FootprintAppearanceTheme
-import com.footprint.kotlin.FootprintAppearanceVariables
-import com.footprint.kotlin.FootprintConfig
-import com.footprint.kotlin.FootprintL10n
-import com.footprint.kotlin.FootprintOptions
-import com.footprint.kotlin.FootprintSupportedLocale
-import com.footprint.kotlin.FootprintUserData
+import com.footprint.android.FootprintAndroid
+import com.footprint.android.FootprintAppearance
+import com.footprint.android.FootprintAppearanceRules
+import com.footprint.android.FootprintAppearanceTheme
+import com.footprint.android.FootprintAppearanceVariables
+import com.footprint.android.FootprintConfig
+import com.footprint.android.FootprintL10n
+import com.footprint.android.FootprintOptions
+import com.footprint.android.FootprintSupportedLocale
+import com.footprint.android.FootprintUserData
 
 class MainActivity : AppCompatActivity() {
     private lateinit var verificationButton: Button
@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d("Footprint error", it)
                 }
             )
-            FootprintKotlin.init(
+            FootprintAndroid.init(
                 this@MainActivity,
                 config = config
             )

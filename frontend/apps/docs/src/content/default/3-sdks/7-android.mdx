@@ -1,25 +1,25 @@
 ---
 page: default
-slug: /sdks/kotlin
+slug: /sdks/android
 category: SDKs
-title: Kotlin
+title: Android (Kotlin/Java)
 position: 7
 meta:
   {
-    title: 'Footprint Kotlin Integration',
-    description: 'Discover how to integrate Footprint with a Kotlin Codebase',
+    title: 'Footprint Android Integration (Kotlin/Java)',
+    description: 'Discover how to integrate Footprint with a Android (Kotlin/Java) Codebase',
   }
 ---
 
-# FootprintKotlin package overview
+# FootprintAndroid package overview
 
-You can use our `FootprintKotlin` package for adding Footprint-powered onboarding flows to your application. Our verification flows run in a secure Chrome Custom Tab inside your app. Chrome custom tabs is a part of the Chrome browser that integrates with the Android framework to allow apps to open websites in a lightweight process.
+You can use our `FootprintAndroid` package for adding Footprint-powered onboarding flows to your Kotlin or Java application. Our verification flows run in a secure Chrome Custom Tab inside your app. Chrome custom tabs is a part of the Chrome browser that integrates with the Android framework to allow apps to open websites in a lightweight process.
 
 ## Minimum version requirements
 
 Our onboarding flows require a `compileSdk` version of 34 or above in your app's gradle file.
 
-If you're using older versions, please consider upgrading to ensure compatibility with `FootprintKotlin`. Failure to meet these requirements could lead to unexpected issues or the package not working at all.
+If you're using older versions, please consider upgrading to ensure compatibility with `FootprintAndroid`. Failure to meet these requirements could lead to unexpected issues or the package not working at all.
 
 ## Installation
 
@@ -27,7 +27,7 @@ In order to use our SDK, you will need to add it as a dependency to your app gra
 
 ```kotlin
     dependencies {
-        implementation("https://github.com/onefootprint/footprint-kotlin")
+        implementation(<LINK>)
     }
 ```
 
@@ -35,9 +35,9 @@ In order to use our SDK, you will need to add it as a dependency to your app gra
 
 1. Start by getting your Playbook public key, for instance, `pb_test_VMooXd04EUlnu3AvMYKjMW` from your [Footprint Dashboard](https://dashboard.onefootprint.com/playbooks).
 
-2. Make sure to import `FootprintKotlin` from `import com.footprint.kotlin.FootprintKotlin` to instantiate the flow.
+2. Make sure to import `FootprintAndroid` from `import com.footprint.android.FootprintAndroid` to instantiate the flow.
 
-3. Next, call the `FootprintKotlin`'s `init` method to trigger the verification flow. You will need to pass a configuration into `init`. You should pass your public key and destination activity name, which is the activity on your app that you want the app to be on after the verification flow has completed. The name must contain the package name as well. For example, if your activity’s class is named `MainActivity` and it is in the package `com.example.package`, the destination activity name will be `com.example.package.MainActivity`. You can also add callback for when the onboarding flow is completed or canceled.
+3. Next, call the `FootprintAndroid`'s `init` method to trigger the verification flow. You will need to pass a configuration into `init`. You should pass your public key and destination activity name, which is the activity on your app that you want the app to be on after the verification flow has completed. The name must contain the package name as well. For example, if your activity’s class is named `MainActivity` and it is in the package `com.example.package`, the destination activity name will be `com.example.package.MainActivity`. You can also add callback for when the onboarding flow is completed or canceled.
 
 ```kotlin
 package com.example.footprint_verification
@@ -46,8 +46,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import com.footprint.kotlin.FootprintKotlin
-import com.footprint.kotlin.FootprintConfig
+import com.footprint.android.FootprintAndroid
+import com.footprint.android.FootprintConfig
 
 class MainActivity : AppCompatActivity() {
     private lateinit var verificationButton: Button
@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d("Footprint error", it)
                 }
             )
-            FootprintKotlin.init(
+            FootprintAndroid.init(
                 this@MainActivity,
                 config = config
             )
@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
 
 Instead of a `publicKey`, you can also use an `authToken` that you generate for a specific playbook and user. You can find more instructions on how to do this [here](https://docs.onefootprint.com/integrate/user-specific-onboarding).
 
-For a complete example, click [here](https://github.com/onefootprint/examples/tree/master/idv/mobile-kotlin-ui).
+For a complete example, click [here](https://github.com/onefootprint/examples/tree/master/idv/mobile-android-ui).
 
 ### Bootstrapping user data
 
@@ -95,9 +95,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import com.footprint.kotlin.FootprintKotlin
-import com.footprint.kotlin.FootprintConfig
-import com.footprint.kotlin.FootprintUserData
+import com.footprint.android.FootprintAndroid
+import com.footprint.android.FootprintConfig
+import com.footprint.android.FootprintUserData
 
 class MainActivity : AppCompatActivity() {
     private lateinit var verificationButton: Button
@@ -135,7 +135,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d("VerificationResult", "The flow has completed. The validation token is $token")
                 }
             )
-            FootprintKotlin.init(
+            FootprintAndroid.init(
                 this@MainActivity,
                 config = config
             )
@@ -156,12 +156,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import com.footprint.kotlin.FootprintKotlin
-import com.footprint.kotlin.FootprintAppearance
-import com.footprint.kotlin.FootprintAppearanceRules
-import com.footprint.kotlin.FootprintAppearanceTheme
-import com.footprint.kotlin.FootprintAppearanceVariables
-import com.footprint.kotlin.FootprintConfig
+import com.footprint.android.FootprintAndroid
+import com.footprint.android.FootprintAppearance
+import com.footprint.android.FootprintAppearanceRules
+import com.footprint.android.FootprintAppearanceTheme
+import com.footprint.android.FootprintAppearanceVariables
+import com.footprint.android.FootprintConfig
 
 class MainActivity : AppCompatActivity() {
     private lateinit var verificationButton: Button
@@ -183,7 +183,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d("VerificationResult", "The flow has completed. The validation token is $token")
                 }
             )
-            FootprintKotlin.init(
+            FootprintAndroid.init(
                 this@MainActivity,
                 config = config
             )
@@ -204,9 +204,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import com.footprint.kotlin.FootprintKotlin
-import com.footprint.kotlin.FootprintConfig
-import com.footprint.kotlin.FootprintOptions
+import com.footprint.android.FootprintAndroid
+import com.footprint.android.FootprintConfig
+import com.footprint.android.FootprintOptions
 
 class MainActivity : AppCompatActivity() {
     private lateinit var verificationButton: Button
@@ -225,7 +225,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d("VerificationResult", "The flow has completed. The validation token is $token")
                 }
             )
-            FootprintKotlin.init(
+            FootprintAndroid.init(
                 this@MainActivity,
                 config = config
             )
@@ -251,10 +251,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import com.footprint.kotlin.FootprintKotlin
-import com.footprint.kotlin.FootprintConfig
-import com.footprint.kotlin.FootprintL10n
-import com.footprint.kotlin.FootprintSupportedLocale
+import com.footprint.android.FootprintAndroid
+import com.footprint.android.FootprintConfig
+import com.footprint.android.FootprintL10n
+import com.footprint.android.FootprintSupportedLocale
 
 class MainActivity : AppCompatActivity() {
     private lateinit var verificationButton: Button
@@ -273,7 +273,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d("VerificationResult", "The flow has completed. The validation token is $token")
                 }
             )
-            FootprintKotlin.init(
+            FootprintAndroid.init(
                 this@MainActivity,
                 config = config
             )
@@ -284,15 +284,15 @@ class MainActivity : AppCompatActivity() {
 
 ## All configuration fields
 
-| Variable                  | Description                                                                                                                                                                                                                                                                                                                                          |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Variable               | Description                                                                                                                                                                                                                                                                                                                                          |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `redirectActivityName` | Required. The activity on your app that you want the app to be on after the verification flow has completed. The name must contain the package name as well. For example, if your activity’s class is named `MainActivity` and it is in the package `com.example.package` , the destination activity name will be `com.example.package.MainActivity` |
-| `publicKey`               | Optional. Onboarding configuration public key.                                                                                                                                                                                                                                                                                                       |
-| `authToken`               | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. One of publicKey or authToken must be provided.                                                                                                                                                                           |
-| `userData`                | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/integrate/user-data).                                                                                                                                                                 |
-| `options`                 | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](https://docs.onefootprint.com/integrate/customization#available-options)                                                                                                                                              |
-| `appearance`              | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                                                                                                                                                                |
-| `l10n`                    | Optional. Specifies the desired locale. More information [here](https://docs.onefootprint.com/integrate/customization#localization-configuration).                                                                                                                                                                                                   |
-| `onComplete`              | Optional. A function that is called when the onboarding flow is completed by the user.                                                                                                                                                                                                                                                               |
-| `onCancel`                | Optional. A function that is called when the onboarding flow is canceled by the user.                                                                                                                                                                                                                                                                |
-| `onError`                 | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                                                                                                                                                 |
+| `publicKey`            | Optional. Onboarding configuration public key.                                                                                                                                                                                                                                                                                                       |
+| `authToken`            | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. One of publicKey or authToken must be provided.                                                                                                                                                                           |
+| `userData`             | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/integrate/user-data).                                                                                                                                                                 |
+| `options`              | Optional. An options object that customizes the flow, can accept `showLogo` and `showCompletionPage` entries. More info [here](https://docs.onefootprint.com/integrate/customization#available-options)                                                                                                                                              |
+| `appearance`           | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                                                                                                                                                                                |
+| `l10n`                 | Optional. Specifies the desired locale. More information [here](https://docs.onefootprint.com/integrate/customization#localization-configuration).                                                                                                                                                                                                   |
+| `onComplete`           | Optional. A function that is called when the onboarding flow is completed by the user.                                                                                                                                                                                                                                                               |
+| `onCancel`             | Optional. A function that is called when the onboarding flow is canceled by the user.                                                                                                                                                                                                                                                                |
+| `onError`              | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                                                                                                                                                 |

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.footprint.kotlin"
+    namespace = "com.footprint.android"
     compileSdk = 33
 
     defaultConfig {

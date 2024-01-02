@@ -1,4 +1,4 @@
-package com.footprint.kotlin
+package com.footprint.android
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -32,13 +32,13 @@ class FootprintSdkArgsManager(private val config: FootprintConfig) {
         val sdkRequest = buildSdkRequest()
         client.newCall(sdkRequest).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                config.onError?.invoke("@onefootprint/footprint-kotlin: Saving SDK args request failed: ${e.localizedMessage}")
+                config.onError?.invoke("@onefootprint/footprint-android: Saving SDK args request failed: ${e.localizedMessage}")
             }
 
             override fun onResponse(call: Call, response: Response) {
                 response.use {
                     if (!it.isSuccessful) {
-                        config.onError?.invoke("@onefootprint/footprint-kotlin: SDK Args request failed with status code: ${it.code}")
+                        config.onError?.invoke("@onefootprint/footprint-android: SDK Args request failed with status code: ${it.code}")
                         return
                     }
                     val responseBody = it.body?.string() ?: ""
