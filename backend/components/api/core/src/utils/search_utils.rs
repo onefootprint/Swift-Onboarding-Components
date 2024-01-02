@@ -116,6 +116,7 @@ pub async fn parse_search(
         .flat_map(|(i, d)| d.into_iter().map(move |(scope, data)| (i, scope, data)))
         .collect_vec();
     let fingerprint_queries = state
+        .enclave_client
         .compute_fingerprints(data)
         .await?
         .into_iter()

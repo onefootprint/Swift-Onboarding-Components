@@ -167,7 +167,7 @@ async fn make_vault_context(
         .iter()
         .map(|(_, di, v)| -> ApiResult<_> { Ok((di.clone(), GlobalFingerprintKind::try_from(di)?, v)) })
         .collect::<ApiResult<Vec<_>>>()?;
-    let global_sh = state.compute_fingerprints(global_sh_data).await?;
+    let global_sh = state.enclave_client.compute_fingerprints(global_sh_data).await?;
 
     let tenant_sh = if let Some(ob_pk_auth) = ob_pk_auth.as_ref() {
         let tenant_sh_data = initial_data
@@ -175,7 +175,7 @@ async fn make_vault_context(
             .map(|(_, di, v)| (di.clone(), (di, &ob_pk_auth.tenant().id), v))
             .collect_vec();
         // If we are in identify for a specific tenant, also compute tenant-scoped FP
-        state.compute_fingerprints(tenant_sh_data).await?
+        state.enclave_client.compute_fingerprints(tenant_sh_data).await?
     } else {
         vec![]
     };

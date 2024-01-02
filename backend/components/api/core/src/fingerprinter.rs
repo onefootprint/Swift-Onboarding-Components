@@ -14,6 +14,7 @@ use newtypes::{
 };
 
 use crate::{
+    enclave_client::EnclaveClient,
     errors::{kms::KmsSignError, ApiResult},
     ApiError, State,
 };
@@ -77,7 +78,7 @@ impl ApiKeyFingerprinter for State {
 }
 
 #[async_trait]
-impl Fingerprinter for State {
+impl Fingerprinter for EnclaveClient {
     type Error = crate::ApiError;
 
     async fn compute_fingerprints<T: Send, S: FingerprintScopable + Send + Sync>(
@@ -86,7 +87,7 @@ impl Fingerprinter for State {
     ) -> Result<Vec<(T, Fingerprint)>, Self::Error> {
         let (identifiers, values_to_fp): (Vec<_>, Vec<_>) =
             data.into_iter().map(|(id, s, v)| (id, (s, v))).unzip();
-        let fps = self.enclave_client.batch_fingerprint(&values_to_fp).await?;
+        let fps = self.batch_fingerprint(&values_to_fp).await?;
         let results = identifiers.into_iter().zip(fps).collect();
         Ok(results)
     }
@@ -126,6 +127,7 @@ impl State {
             .map(|(s, v)| ((), s, v))
             .collect();
         let sh_datas = self
+            .enclave_client
             .compute_fingerprints(fps)
             .await?
             .into_iter()

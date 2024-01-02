@@ -131,7 +131,9 @@ async fn patch_inner(
     let mut args = ValidateArgs::for_non_portable(is_live);
     args.ignore_luhn_validation = ignore_luhn_validation;
     let PatchDataRequest { updates, deletions } = request.clean_and_validate(args)?;
-    let updates = updates.build_fingerprints(state, &tenant_id).await?;
+    let updates = updates
+        .build_fingerprints(&state.enclave_client, &tenant_id)
+        .await?;
 
     let source = auth.source();
     let actor = auth.actor();

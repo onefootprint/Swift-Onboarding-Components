@@ -116,20 +116,6 @@ pub trait Fingerprinter: std::marker::Sync {
         &self,
         data: Vec<(T, S, &PiiString)>,
     ) -> Result<Vec<(T, Fingerprint)>, Self::Error>;
-
-    async fn compute_fingerprint<S: FingerprintScopable + Send + Sync>(
-        &self,
-        id: S,
-        data: &PiiString,
-    ) -> Result<Fingerprint, Self::Error> {
-        Ok(self
-            .compute_fingerprints(vec![((), id, data)])
-            .await?
-            .into_iter()
-            .next()
-            .ok_or(crate::Error::Custom("missing fingerprints".into()))?
-            .1)
-    }
 }
 
 #[cfg(test)]
