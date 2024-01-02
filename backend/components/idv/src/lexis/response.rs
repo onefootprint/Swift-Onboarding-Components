@@ -526,6 +526,19 @@ impl FlexIdResponse {
     pub fn itin_expired(&self) -> Option<bool> {
         self.result().and_then(|r| r.itin_expired)
     }
+
+    pub fn phone_line_description(&self) -> PhoneLineDescription {
+        self.result()
+            .and_then(|r| r.phone_line_description.as_ref())
+            .and_then(|s| match PhoneLineDescription::try_from(s.as_str().trim()) {
+                Ok(pld) => Some(pld),
+                Err(_) => {
+                    tracing::error!(phone_line_description=%s, "Unknown Lexis PhoneLineDescription");
+                    None
+                }
+            })
+            .unwrap_or(PhoneLineDescription::Unknown)
+    }
 }
 
 #[cfg(test)]

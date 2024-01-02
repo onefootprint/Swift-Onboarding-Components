@@ -55,6 +55,10 @@ fn footprint_reason_codes(res: FlexIdResponse) -> Vec<FRC> {
         misc_codes.push(FRC::ItinIsExpired);
     }
 
+    if let Some(pl_frc) = Into::<Option<FRC>>::into(&res.phone_line_description()) {
+        misc_codes.push(pl_frc);
+    }
+
     phone_codes
         .into_iter()
         .chain(name_address_ssn_codes)
