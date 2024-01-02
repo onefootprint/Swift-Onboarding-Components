@@ -411,6 +411,12 @@ footprint_reason_code_enum! {
         #[note = "SSN not provided", severity = SignalSeverity::High,  description = "The user indicated they do not have an SSN."]
         SsnNotProvided,
 
+        // ~~~~~~~~~~~~ ITIN ~~~~~~~~~~~~
+        #[scope = SignalScope::Itin, additional_scopes = vec![], match_level = None]
+        #[note = "ITIN expired", severity = SignalSeverity::Medium,  description = "The input ITIN is potentially expired."]
+        ItinIsExpired,
+
+
         // ~~~~~~~~~~~~ Name ~~~~~~~~~~~~
 
         #[scope = SignalScope::Name, additional_scopes = vec![], match_level = Some(MatchLevel::NoMatch)]
@@ -603,6 +609,10 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = None]
         #[note = "Subject deceased", severity = SignalSeverity::High,  description = "Records indicate that the subject in question is deceased."]
         SubjectDeceased,
+
+        #[scope = SignalScope::Ssn, additional_scopes = vec![], match_level = None]
+        #[note = "Bureau deleted", severity = SignalSeverity::Medium,  description = "Indicates that the bureau deleted the found identity record, and SSN could not be verified."]
+        BureauDeletedRecord,
 
         #[scope = SignalScope::Ssn, additional_scopes = vec![SignalScope::Dob], match_level = None]
         #[note = "SSN issued before DOB", severity = SignalSeverity::High,  description = "The SSN number was issued before the individual’s DOB."]

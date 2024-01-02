@@ -518,6 +518,14 @@ impl FlexIdResponse {
     pub fn valid_element_summary(&self) -> Option<ValidElementSummary> {
         self.result().and_then(|r| r.valid_element_summary.clone())
     }
+
+    pub fn bureau_deleted(&self) -> Option<bool> {
+        self.result().and_then(|r| r.bureau_deleted)
+    }
+
+    pub fn itin_expired(&self) -> Option<bool> {
+        self.result().and_then(|r| r.itin_expired)
+    }
 }
 
 #[cfg(test)]

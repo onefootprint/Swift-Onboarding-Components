@@ -25,6 +25,7 @@ pub enum SignalScope {
     Name,
     Dob,
     Ssn,
+    Itin,
     Address,
     StreetAddress,
     City,
@@ -55,6 +56,7 @@ impl SignalScope {
             SignalScope::Name => true,
             SignalScope::Dob => true,
             SignalScope::Ssn => true,
+            SignalScope::Itin => true,
             SignalScope::Address => true,
             SignalScope::StreetAddress => true,
             SignalScope::City => true,
@@ -83,6 +85,7 @@ impl SignalScope {
             SignalScope::Name
             | SignalScope::Dob
             | SignalScope::Ssn
+            | SignalScope::Itin
             | SignalScope::Address
             | SignalScope::StreetAddress
             | SignalScope::City
@@ -111,6 +114,7 @@ impl SignalScope {
             SignalScope::Name
             | SignalScope::Dob
             | SignalScope::Ssn
+            | SignalScope::Itin
             | SignalScope::Address
             | SignalScope::StreetAddress
             | SignalScope::City

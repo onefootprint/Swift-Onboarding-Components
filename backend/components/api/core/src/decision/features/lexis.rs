@@ -43,11 +43,24 @@ fn footprint_reason_codes(res: FlexIdResponse) -> Vec<FRC> {
         vec![]
     };
 
+    let mut misc_codes = vec![];
+    // TODO: ask lexis what address_secondary_range_mismatch is and if we should use
+
+    if res.bureau_deleted().unwrap_or(false) {
+        // TODO: Ask Lexis to give more deets on what situations this would happens
+        misc_codes.push(FRC::BureauDeletedRecord);
+    }
+
+    if res.itin_expired().unwrap_or(false) {
+        misc_codes.push(FRC::ItinIsExpired);
+    }
+
     phone_codes
         .into_iter()
         .chain(name_address_ssn_codes)
         .chain(dob_codes)
         .chain(valid_element_summary_codes)
+        .chain(misc_codes)
         .unique()
         .collect()
 }
