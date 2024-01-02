@@ -1,4 +1,4 @@
-use api_core::errors::ApiResult;
+use api_core::{errors::ApiResult, utils::passkey::SavedAttestationData};
 use newtypes::WebauthnCredentialId;
 
 /// helper function to link a webauthn cred to an attestation
@@ -10,7 +10,7 @@ pub(super) fn link_webauthn_credential(
     webauthn_device_response_json: Option<String>,
 ) -> ApiResult<Option<WebauthnCredentialId>> {
     let Some(webauthn_device_response_json) = webauthn_device_response_json else {
-        return Ok(None)
+        return Ok(None);
     };
 
     let attested_registered_credential: webauthn_rs_proto::RegisterPublicKeyCredential =
@@ -20,8 +20,7 @@ pub(super) fn link_webauthn_credential(
     Ok(creds
         .into_iter()
         .filter_map(|cred| {
-            let attestation: crate::passkey::SavedAttestationData =
-                serde_cbor::from_slice(&cred.attestation_data).ok()?;
+            let attestation: SavedAttestationData = serde_cbor::from_slice(&cred.attestation_data).ok()?;
 
             // match by the raw attestation blob
             if attestation.raw_attestation_object

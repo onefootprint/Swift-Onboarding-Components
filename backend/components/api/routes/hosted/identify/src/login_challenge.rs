@@ -16,7 +16,7 @@ use api_core::types::JsonApiResponse;
 use api_core::types::ResponseData;
 use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::SandboxId;
-use api_core::utils::liveness::WebauthnConfig;
+use api_core::utils::passkey::WebauthnConfig;
 use api_core::utils::sms::rx_background_error;
 use api_wire_types::IdentifyId;
 use crypto::serde_cbor;

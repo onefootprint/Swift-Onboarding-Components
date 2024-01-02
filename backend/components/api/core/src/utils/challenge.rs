@@ -1,17 +1,22 @@
-use std::str::FromStr;
-
-use chrono::{DateTime, Utc};
+use crate::errors::{challenge::ChallengeError, ApiError};
+use chrono::{DateTime, Duration, Utc};
 use crypto::aead::{AeadSealedBytes, ScopedSealingKey};
 use newtypes::Base64Data;
 use paperclip::actix::Apiv2Schema;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
-
-use crate::errors::{challenge::ChallengeError, ApiError};
+use std::str::FromStr;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Challenge<C> {
     pub expires_at: DateTime<Utc>,
     pub data: C,
+}
+
+impl<C> Challenge<C> {
+    pub fn new(data: C) -> Self {
+        let expires_at = Utc::now() + Duration::minutes(5);
+        Self { data, expires_at }
+    }
 }
 
 #[doc = "Encrypted, base64-encoded challenge information"]

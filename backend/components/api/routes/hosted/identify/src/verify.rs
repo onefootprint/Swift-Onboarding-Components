@@ -16,7 +16,7 @@ use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
 use api_core::utils::challenge::{Challenge, ChallengeToken};
 use api_core::utils::headers::InsightHeaders;
-use api_core::utils::liveness::WebauthnConfig;
+use api_core::utils::passkey::WebauthnConfig;
 use api_core::utils::session::AuthSession;
 use api_core::utils::vault_wrapper::Person;
 use api_core::utils::vault_wrapper::VaultWrapper;

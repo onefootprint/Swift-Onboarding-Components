@@ -13,8 +13,8 @@ pub enum ChallengeError {
     EmailVerificationTokenInvalid,
     #[error("Please wait {0} more seconds")]
     RateLimited(i64),
-    #[error("Cannot add more than one biometric credential")]
-    BiometricCredentialAlreadyExists,
+    #[error("Cannot register passkey")]
+    CannotRegisterPasskey,
     #[error("Login challenge initiated for non-existent user vault")]
     LoginChallengeUserNotFound,
     #[error("Provide one user identifier to initiate a challenge")]
