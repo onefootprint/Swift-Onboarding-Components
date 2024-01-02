@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "FootprintVerification"
 include(":app")
-include(":verify")
+include(":footprint")
