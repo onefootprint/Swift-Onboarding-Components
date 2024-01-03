@@ -11,9 +11,7 @@ import ErrorBoundary from '../components/error-boundary';
 import Layout from '../components/layout';
 import configureReactI18next from '../config/initializers/react-i18next';
 import ReactQueryProvider from '../config/initializers/react-query-provider';
-import configureSentry from '../config/initializers/sentry';
 
-configureSentry();
 configureReactI18next();
 
 const App = ({ Component, pageProps }: AppProps) => {
