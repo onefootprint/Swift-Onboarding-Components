@@ -8,7 +8,7 @@ import {
   withCreateProxyConfigError,
 } from './create.test.config';
 
-describe.skip('<Create />', () => {
+describe('<Create />', () => {
   const renderCreate = () => customRender(<Create />);
 
   describe('when the request to create a proxy config succeeds', () => {
