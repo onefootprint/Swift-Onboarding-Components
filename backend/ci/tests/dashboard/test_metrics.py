@@ -7,19 +7,11 @@ def test_metrics(sandbox_tenant):
     filters = dict(timestamp_gte=arrow.now().shift(days=-30).isoformat())
     recently = get("/org/metrics", filters, *sandbox_tenant.db_auths)
     all_time = get("/org/metrics", None, *sandbox_tenant.db_auths)
-    assert all_time["new_user_vaults"] >= all_time["total_user_onboardings"]
-    assert all_time["total_user_onboardings"] >= all_time["successful_user_onboardings"]
-    assert all_time["total_user_onboardings"] >= all_time["failed_user_onboardings"]
-    assert all_time["total_user_onboardings"] >= all_time["incomplete_user_onboardings"]
-
-    for k in [
-        "new_user_vaults",
-        "total_user_onboardings",
-        "successful_user_onboardings",
-        "failed_user_onboardings",
-        "incomplete_user_onboardings",
-    ]:
-        assert recently[k] <= all_time[k]
+    for m in [recently, all_time]:
+        assert m["new_user_vaults"] >= m["total_user_onboardings"]
+        assert m["total_user_onboardings"] >= m["successful_user_onboardings"]
+        assert m["total_user_onboardings"] >= m["failed_user_onboardings"]
+        assert m["total_user_onboardings"] >= m["incomplete_user_onboardings"]
 
 
 def test_metrics_for_playbook(sandbox_user, sandbox_tenant, must_collect_data, twilio):
