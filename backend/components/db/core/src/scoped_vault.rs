@@ -282,7 +282,7 @@ fn vaults_matching_search(
     };
 
     let fingerprint_results = {
-        let all_fps = fingerprint_queries.iter().flat_map(|fps| &fps.0).collect_vec();
+        let all_fps = fingerprint_queries.iter().flat_map(|fps| &fps.0).unique().collect_vec();
         tracing::info!(sh_datas=%Csv::from(all_fps.iter().cloned().collect_vec()), "Searching for fingerprints");
 
         let results: HashMap<_, _> = fingerprint::table
