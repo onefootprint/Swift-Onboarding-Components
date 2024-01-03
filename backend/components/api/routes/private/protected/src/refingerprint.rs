@@ -15,7 +15,7 @@ use db::{
     models::{data_lifetime::DataLifetime, scoped_vault::ScopedVault, vault::Vault, vault_data::VaultData},
     TxnPgConn,
 };
-use diesel::prelude::*;
+use diesel::{dsl::not, prelude::*};
 use itertools::Itertools;
 use newtypes::{
     fingerprinter::{FingerprintScope, GlobalFingerprintKind},
@@ -178,6 +178,11 @@ fn get_dls_to_refingerprint(
     let svs: HashMap<_, _> = scoped_vault::table
         .inner_join(vault::table)
         .filter(scoped_vault::id.eq_any(sv_ids))
+        .filter(not(scoped_vault::tenant_id.eq_any([
+            "_private_it_org_1",
+            "_private_it_org_2",
+            "_private_it_org_3",
+        ])))
         .get_results::<(ScopedVault, Vault)>(conn)
         .map_err(DbError::from)?
         .into_iter()
