@@ -9,7 +9,7 @@ import com.footprint.android.FootprintAppearance
 import com.footprint.android.FootprintAppearanceRules
 import com.footprint.android.FootprintAppearanceTheme
 import com.footprint.android.FootprintAppearanceVariables
-import com.footprint.android.FootprintConfig
+import com.footprint.android.FootprintConfiguration
 import com.footprint.android.FootprintL10n
 import com.footprint.android.FootprintOptions
 import com.footprint.android.FootprintSupportedLocale
@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
                 visaKind = "f1",
                 visaExpirationDate = "05/12/2024"
             )
-            val config = FootprintConfig(
+            val config = FootprintConfiguration(
                 redirectActivityName = "com.example.footprint_verification.MainActivity",
                 publicKey = "pb_test_aSzwnZecnXS4faoyhxrocW",
                 userData = userData,
@@ -55,13 +55,13 @@ class MainActivity : AppCompatActivity() {
                     variables = FootprintAppearanceVariables(borderRadius = "10px", buttonPrimaryBg = "#0C6948")
                 ),
                 onComplete = {token: String ->
-                    Log.d("VerificationResult", "The flow has completed. The validation token is $token")
+                    Log.d("Footprint", "The flow has completed. The validation token is $token")
                 },
                 onCancel = {
-                    Log.d("VerificationResult", "The flow was canceled")
+                    Log.d("Footprint", "The flow was canceled")
                 },
                 onError = {
-                    Log.d("Footprint error", it)
+                    Log.d("Footprint", it)
                 }
             )
             FootprintAndroid.init(
