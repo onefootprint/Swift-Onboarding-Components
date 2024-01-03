@@ -1,7 +1,6 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
-import { getErrorMessage } from '@onefootprint/request';
 import type { ReviewStatus } from '@onefootprint/types';
-import { Dialog } from '@onefootprint/ui';
+import { Dialog, useToast } from '@onefootprint/ui';
 import React from 'react';
 
 import type { ManualNoteFormData } from '@/entities/components/details/components/content/components/manual-note-entry-form';
@@ -22,6 +21,7 @@ const ManualReviewDialog = ({
   status,
 }: ManualReviewDialogProps) => {
   const { t } = useTranslation('pages.entity.manual-review');
+  const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
   const submitReviewMutation = useSubmitReview();
   const entityId = useEntityId();
@@ -39,15 +39,13 @@ const ManualReviewDialog = ({
       },
       {
         onSuccess: () => {
+          toast.show({
+            title: t('feedback.success.title'),
+            description: t('feedback.success.description'),
+          });
           onClose();
         },
-        onError: (error: unknown) => {
-          console.error(
-            'Submitting manual review failed.',
-            getErrorMessage(error),
-          );
-          showRequestErrorToast(error);
-        },
+        onError: showRequestErrorToast,
       },
     );
   };

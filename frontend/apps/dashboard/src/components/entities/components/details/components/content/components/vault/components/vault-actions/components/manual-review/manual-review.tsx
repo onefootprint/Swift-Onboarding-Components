@@ -1,19 +1,24 @@
-import type { EntityStatus, ReviewStatus } from '@onefootprint/types';
+import type {
+  EntityKind,
+  EntityStatus,
+  ReviewStatus,
+} from '@onefootprint/types';
 import React, { useState } from 'react';
 
 import ManualReviewDialog from './components/manual-review-dialog';
-// import ManualReviewOptionalButton from './components/manual-review-optional-button';
-import ManualReviewRequiredButton from './components/manual-review-required-button';
+import ManualReviewTrigger from './components/manual-review-trigger';
 
-type ManualReviewProps = {
-  // requiresManualReview: boolean;
+export type ManualReviewProps = {
+  kind: EntityKind;
   status: EntityStatus;
 };
-const ManualReview = ({ status }: ManualReviewProps) => {
+
+const ManualReview = ({ kind, status }: ManualReviewProps) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [reviewStatus, setReviewStatus] = useState<ReviewStatus | undefined>();
+  const shouldShowDialog = dialogOpen && reviewStatus;
 
-  const handleOpenDialog = (dialogStatus: ReviewStatus) => {
+  const handleSelect = (dialogStatus: ReviewStatus) => {
     setReviewStatus(dialogStatus);
     setDialogOpen(true);
   };
@@ -25,11 +30,12 @@ const ManualReview = ({ status }: ManualReviewProps) => {
 
   return (
     <>
-      <ManualReviewRequiredButton
+      <ManualReviewTrigger
         status={status}
-        onOpenDialog={handleOpenDialog}
+        kind={kind}
+        onSelect={handleSelect}
       />
-      {dialogOpen && reviewStatus && (
+      {shouldShowDialog && (
         <ManualReviewDialog
           status={reviewStatus}
           open={dialogOpen}

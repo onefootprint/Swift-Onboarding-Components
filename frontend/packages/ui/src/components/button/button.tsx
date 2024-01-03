@@ -1,6 +1,8 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import type { Color } from '@onefootprint/design-tokens';
 import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
+import type { ButtonHTMLAttributes } from 'react';
 import React, { forwardRef } from 'react';
 
 import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
@@ -18,7 +20,6 @@ export type ButtonProps = {
   fullWidth?: boolean;
   loading?: boolean;
   loadingAriaLabel?: string;
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   size?: ButtonSize;
   testID?: string;
   type?: 'button' | 'submit' | 'reset';
@@ -26,7 +27,7 @@ export type ButtonProps = {
   prefixIcon?: Icon;
   sx?: SXStyleProps;
   iconColor?: Color;
-};
+} & ButtonHTMLAttributes<HTMLButtonElement>;
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
@@ -37,7 +38,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       fullWidth,
       loading,
       loadingAriaLabel,
-      onClick,
       size = 'default',
       testID,
       type = 'button',
@@ -45,6 +45,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       sx,
       prefixIcon: PrefixIcon,
       iconColor,
+      ...props
     }: ButtonProps,
     ref,
   ) => {
@@ -67,6 +68,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <ButtonContainer
         /** Do not change/remove these classes */
+        {...props}
         className="fp-button fp-custom-appearance"
         data-full-width={fullWidth}
         data-loading={loading}
@@ -75,7 +77,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         data-variant={variant}
         disabled={disabled}
         form={form}
-        onClick={onClick}
         ref={ref}
         size={size}
         sx={sxStyles}

@@ -4,25 +4,24 @@ import { EntityKind, EntityStatus, ReviewStatus } from '@onefootprint/types';
 import { Button, Dropdown } from '@onefootprint/ui';
 import React from 'react';
 
-import { useEntityContext } from '@/entity/hooks/use-entity-context';
-
-type ManualReviewRequiredButtonProps = {
+type ManualReviewTriggerProps = {
+  kind: EntityKind;
   status: EntityStatus;
-  onOpenDialog: (reviewStatus: ReviewStatus) => void;
+  onSelect: (reviewStatus: ReviewStatus) => void;
 };
 
-const ManualReviewRequiredButton = ({
+const ManualReviewTrigger = ({
+  kind,
   status,
-  onOpenDialog,
-}: ManualReviewRequiredButtonProps) => {
+  onSelect,
+}: ManualReviewTriggerProps) => {
   const { t } = useTranslation('pages.entity.manual-review');
-  const { kind } = useEntityContext();
   const pass = t(`status.${ReviewStatus.pass}`);
   const fail = t(`status.${ReviewStatus.fail}`);
 
   return (
     <Dropdown.Root>
-      <DropdownTrigger>
+      <DropdownTrigger asChild>
         <Button size="small">
           {kind === EntityKind.person
             ? t('button.review-person')
@@ -33,7 +32,7 @@ const ManualReviewRequiredButton = ({
         <DropdownContent align="end" sideOffset={12}>
           <DropdownItem
             onClick={() => {
-              onOpenDialog(ReviewStatus.pass);
+              onSelect(ReviewStatus.pass);
             }}
           >
             <div>
@@ -44,7 +43,7 @@ const ManualReviewRequiredButton = ({
           </DropdownItem>
           <DropdownItem
             onClick={() => {
-              onOpenDialog(ReviewStatus.fail);
+              onSelect(ReviewStatus.fail);
             }}
           >
             <div>
@@ -60,7 +59,7 @@ const ManualReviewRequiredButton = ({
 };
 
 const DropdownTrigger = styled(Dropdown.Trigger)`
-  width: unset;
+  all: unset;
 `;
 
 const DropdownContent = styled(Dropdown.Content)`
@@ -78,4 +77,4 @@ const DropdownItem = styled(Dropdown.Item)`
   `};
 `;
 
-export default ManualReviewRequiredButton;
+export default ManualReviewTrigger;

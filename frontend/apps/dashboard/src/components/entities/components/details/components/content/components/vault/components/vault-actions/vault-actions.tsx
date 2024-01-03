@@ -85,7 +85,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
             />
           </Tooltip>
           {shouldRenderManualReview && (
-            <ManualReview status={entityData.status} />
+            <ManualReview status={entityData.status} kind={entityData.kind} />
           )}
           <Actions />
         </Stack>

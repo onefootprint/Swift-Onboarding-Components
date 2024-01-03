@@ -1127,6 +1127,12 @@
             "prompt": "Why are you marking this user as {{status}}?",
             "placeholder": "Type here..."
           }
+        },
+        "feedback": {
+          "success": {
+            "title": "Success!",
+            "description": "Review submitted successfully"
+          }
         }
       },
       "actions": {
