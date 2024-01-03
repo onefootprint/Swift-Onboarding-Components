@@ -56,10 +56,17 @@ where
                         (
                             ApiErrorKind::AuthError(AuthError::MissingHeader(h1)),
                             ApiErrorKind::AuthError(AuthError::MissingHeader(h2)),
-                        ) => Err(ApiError::from(AuthError::MissingHeader(format!(
-                            "{} or {}",
-                            h1, h2
-                        )))),
+                        ) => {
+                            if h1 == h2 {
+                                // Both headers have the same name.
+                                Err(ApiError::from(AuthError::MissingHeader(h1)))
+                            } else {
+                                Err(ApiError::from(AuthError::MissingHeader(format!(
+                                    "{} or {}",
+                                    h1, h2
+                                ))))
+                            }
+                        }
 
                         // if there's a non missing header error on one side, pick that one
                         (ApiErrorKind::AuthError(AuthError::MissingHeader(_)), e)
