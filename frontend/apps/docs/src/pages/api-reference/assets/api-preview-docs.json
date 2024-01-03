@@ -240,6 +240,54 @@
                 ]
             }
         },
+        "/users/{fp_id:fp_[_A-Za-z0-9]*}/tags/{tag_id:tag_[_A-Za-z0-9]*}": {
+            "delete": {
+                "tags": [
+                    "Users",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nUntag a user",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "fp_[_A-Za-z0-9]*"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "in": "path",
+                        "name": "tag_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "tag_[_A-Za-z0-9]*"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/users/{fp_id}/auth_events": {
             "get": {
                 "tags": [
@@ -844,53 +892,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Secret API Key": []
-                    }
-                ]
-            }
-        },
-        "/users/{fp_id}/tags/{tag_id}": {
-            "delete": {
-                "tags": [
-                    "Users",
-                    "Preview"
-                ],
-                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nUntag a user",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "fp_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    },
-                    {
-                        "in": "path",
-                        "name": "tag_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
+                                    "$ref": "#/components/schemas/UserTag"
                                 }
                             }
                         }
@@ -1620,10 +1622,7 @@
                 "type": "object",
                 "properties": {
                     "kind": {
-                        "type": "string",
-                        "enum": [
-                            "delinquent"
-                        ]
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -1840,6 +1839,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
                                                 "name_matches",
@@ -1886,6 +1886,7 @@
                                                 "phone_not_provided",
                                                 "multiple_records_found",
                                                 "subject_deceased",
+                                                "bureau_deleted_record",
                                                 "ssn_issued_prior_to_dob",
                                                 "ssn_issue_date_cannot_be_verified",
                                                 "ssn_located_issue_date_cannot_be_verified",
@@ -2199,6 +2200,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
                                                 "name_matches",
@@ -2245,6 +2247,7 @@
                                                 "phone_not_provided",
                                                 "multiple_records_found",
                                                 "subject_deceased",
+                                                "bureau_deleted_record",
                                                 "ssn_issued_prior_to_dob",
                                                 "ssn_issue_date_cannot_be_verified",
                                                 "ssn_located_issue_date_cannot_be_verified",
@@ -2558,6 +2561,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
                                                 "name_matches",
@@ -2604,6 +2608,7 @@
                                                 "phone_not_provided",
                                                 "multiple_records_found",
                                                 "subject_deceased",
+                                                "bureau_deleted_record",
                                                 "ssn_issued_prior_to_dob",
                                                 "ssn_issue_date_cannot_be_verified",
                                                 "ssn_located_issue_date_cannot_be_verified",
@@ -2917,6 +2922,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
                                                 "name_matches",
@@ -2963,6 +2969,7 @@
                                                 "phone_not_provided",
                                                 "multiple_records_found",
                                                 "subject_deceased",
+                                                "bureau_deleted_record",
                                                 "ssn_issued_prior_to_dob",
                                                 "ssn_issue_date_cannot_be_verified",
                                                 "ssn_located_issue_date_cannot_be_verified",
@@ -3276,6 +3283,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
                                                 "name_matches",
@@ -3322,6 +3330,7 @@
                                                 "phone_not_provided",
                                                 "multiple_records_found",
                                                 "subject_deceased",
+                                                "bureau_deleted_record",
                                                 "ssn_issued_prior_to_dob",
                                                 "ssn_issue_date_cannot_be_verified",
                                                 "ssn_located_issue_date_cannot_be_verified",
@@ -3635,6 +3644,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
                                                 "name_matches",
@@ -3681,6 +3691,7 @@
                                                 "phone_not_provided",
                                                 "multiple_records_found",
                                                 "subject_deceased",
+                                                "bureau_deleted_record",
                                                 "ssn_issued_prior_to_dob",
                                                 "ssn_issue_date_cannot_be_verified",
                                                 "ssn_located_issue_date_cannot_be_verified",
@@ -3994,6 +4005,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
                                                 "name_matches",
@@ -4040,6 +4052,7 @@
                                                 "phone_not_provided",
                                                 "multiple_records_found",
                                                 "subject_deceased",
+                                                "bureau_deleted_record",
                                                 "ssn_issued_prior_to_dob",
                                                 "ssn_issue_date_cannot_be_verified",
                                                 "ssn_located_issue_date_cannot_be_verified",
@@ -4353,6 +4366,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
                                                 "name_matches",
@@ -4399,6 +4413,7 @@
                                                 "phone_not_provided",
                                                 "multiple_records_found",
                                                 "subject_deceased",
+                                                "bureau_deleted_record",
                                                 "ssn_issued_prior_to_dob",
                                                 "ssn_issue_date_cannot_be_verified",
                                                 "ssn_located_issue_date_cannot_be_verified",
@@ -4712,6 +4727,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
                                                 "name_matches",
@@ -4758,6 +4774,7 @@
                                                 "phone_not_provided",
                                                 "multiple_records_found",
                                                 "subject_deceased",
+                                                "bureau_deleted_record",
                                                 "ssn_issued_prior_to_dob",
                                                 "ssn_issue_date_cannot_be_verified",
                                                 "ssn_located_issue_date_cannot_be_verified",
@@ -5071,6 +5088,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
                                                 "name_matches",
@@ -5117,6 +5135,7 @@
                                                 "phone_not_provided",
                                                 "multiple_records_found",
                                                 "subject_deceased",
+                                                "bureau_deleted_record",
                                                 "ssn_issued_prior_to_dob",
                                                 "ssn_issue_date_cannot_be_verified",
                                                 "ssn_located_issue_date_cannot_be_verified",
@@ -5430,6 +5449,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
                                                 "name_matches",
@@ -5476,6 +5496,7 @@
                                                 "phone_not_provided",
                                                 "multiple_records_found",
                                                 "subject_deceased",
+                                                "bureau_deleted_record",
                                                 "ssn_issued_prior_to_dob",
                                                 "ssn_issue_date_cannot_be_verified",
                                                 "ssn_located_issue_date_cannot_be_verified",
@@ -5789,6 +5810,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
                                                 "name_matches",
@@ -5835,6 +5857,7 @@
                                                 "phone_not_provided",
                                                 "multiple_records_found",
                                                 "subject_deceased",
+                                                "bureau_deleted_record",
                                                 "ssn_issued_prior_to_dob",
                                                 "ssn_issue_date_cannot_be_verified",
                                                 "ssn_located_issue_date_cannot_be_verified",
@@ -6148,6 +6171,7 @@
                                                 "ssn_input_is_invalid",
                                                 "ssn_located_is_invalid",
                                                 "ssn_not_provided",
+                                                "itin_is_expired",
                                                 "name_last_does_not_match",
                                                 "name_last_partially_matches",
                                                 "name_matches",
@@ -6194,6 +6218,7 @@
                                                 "phone_not_provided",
                                                 "multiple_records_found",
                                                 "subject_deceased",
+                                                "bureau_deleted_record",
                                                 "ssn_issued_prior_to_dob",
                                                 "ssn_issue_date_cannot_be_verified",
                                                 "ssn_located_issue_date_cannot_be_verified",
@@ -7183,6 +7208,7 @@
                             "ssn_input_is_invalid",
                             "ssn_located_is_invalid",
                             "ssn_not_provided",
+                            "itin_is_expired",
                             "name_last_does_not_match",
                             "name_last_partially_matches",
                             "name_matches",
@@ -7229,6 +7255,7 @@
                             "phone_not_provided",
                             "multiple_records_found",
                             "subject_deceased",
+                            "bureau_deleted_record",
                             "ssn_issued_prior_to_dob",
                             "ssn_issue_date_cannot_be_verified",
                             "ssn_located_issue_date_cannot_be_verified",
@@ -7413,6 +7440,7 @@
                                 "name",
                                 "dob",
                                 "ssn",
+                                "itin",
                                 "address",
                                 "street_address",
                                 "city",
@@ -7546,6 +7574,7 @@
                             "ssn_input_is_invalid",
                             "ssn_located_is_invalid",
                             "ssn_not_provided",
+                            "itin_is_expired",
                             "name_last_does_not_match",
                             "name_last_partially_matches",
                             "name_matches",
@@ -7592,6 +7621,7 @@
                             "phone_not_provided",
                             "multiple_records_found",
                             "subject_deceased",
+                            "bureau_deleted_record",
                             "ssn_issued_prior_to_dob",
                             "ssn_issue_date_cannot_be_verified",
                             "ssn_located_issue_date_cannot_be_verified",
@@ -7777,6 +7807,7 @@
                                 "name",
                                 "dob",
                                 "ssn",
+                                "itin",
                                 "address",
                                 "street_address",
                                 "city",
@@ -7911,10 +7942,7 @@
                         "type": "string"
                     },
                     "kind": {
-                        "type": "string",
-                        "enum": [
-                            "delinquent"
-                        ]
+                        "type": "string"
                     }
                 },
                 "required": [
