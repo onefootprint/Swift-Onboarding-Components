@@ -5,6 +5,7 @@ import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 import type { FootprintVerifyProps } from './footprint.types';
 import createUrl from './utils/create-url';
 import sendSdkArgs from './utils/send-sdk-args';
+import logError from './utils/logger';
 
 const getDeepLink = (baseScheme?: string) => {
   let scheme = 'footprint';
@@ -14,24 +15,30 @@ const getDeepLink = (baseScheme?: string) => {
   return Platform.OS === 'android' ? `${scheme}://callback/` : `${scheme}://`;
 };
 
-const open = async ({
-  appearance,
-  publicKey,
-  authToken,
-  userData,
-  onCanceled,
-  onCompleted,
-  options,
-  l10n,
-}: FootprintVerifyProps) => {
-  const token = await sendSdkArgs({
+const open = async (props: FootprintVerifyProps) => {
+  const {
+    appearance,
+    publicKey,
+    authToken,
+    userData,
+    onCancel,
+    onComplete,
+    options,
+    l10n,
+  } = props;
+
+  const sdkArgsData = {
     publicKey,
     authToken,
     userData,
     options,
     l10n,
+  };
+  const token = await sendSdkArgs(sdkArgsData, (error: string) => {
+    logError(props, error);
   });
   if (!token) {
+    logError(props, 'Unable to get SDK args token.');
     return;
   }
 
@@ -47,12 +54,12 @@ const open = async ({
     if (result.type === 'success' && result.url) {
       const search = result.url.replace(deepLink, '');
       const urlParams = queryString.parse(search);
-      onCompleted?.(urlParams.validation_token as string);
+      onComplete?.(urlParams.validation_token as string);
     } else {
-      onCanceled?.();
+      onCancel?.();
     }
   } catch (error) {
-    console.error(error);
+    logError(props, error);
   }
 };
 
