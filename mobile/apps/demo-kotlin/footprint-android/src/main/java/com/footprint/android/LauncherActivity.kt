@@ -25,8 +25,7 @@ internal class LauncherActivity : AppCompatActivity() {
             is SessionResult.Token -> config?.onComplete?.invoke(result.value)
             is SessionResult.Error -> config?.onError?.invoke("@onefootprint/footprint-android: Error parsing redirect URL.")
         }
-
-        config?.redirectActivityName?.let { startDestinationActivity(it, result) }
+        startDestinationActivity(result)
     }
 
     private fun parseResultFromUrl(url: String): SessionResult {
@@ -47,24 +46,29 @@ internal class LauncherActivity : AppCompatActivity() {
         return SessionResult.Error
     }
 
-    private fun launchVerificationIfReady() {
+    private fun handleError(error: String, shouldRedirect: Boolean = false) {
+        config?.onError?.invoke("@onefootprint/footprint-android: $error")
+        if (shouldRedirect) startDestinationActivity(SessionResult.Error)
+    }
+
+    private fun handleSdkArgsToken(token: String) {
         config?.let { outerConfig ->
-            outerConfig.redirectActivityName?.let {
-                val sdkArgsManager = FootprintSdkArgsManager(outerConfig)
-                sdkArgsManager.sendArgs { sdkToken ->
-                    val url = getUrl(outerConfig, sdkToken)
-                    url?.let {
-                        customTabsIntent.launchUrl(this, url)
-                        isCustomTabOpen = true
-                    } ?: run {
-                        config?.onError?.invoke("@onefootprint/footprint-android: Encountered error while generating URL.")
-                    }
-                }
+            val url = getUrl(outerConfig, token)
+            url?.let {
+                customTabsIntent.launchUrl(this, url)
+                isCustomTabOpen = true
             } ?: run {
-                config?.onError?.invoke("@onefootprint/footprint-android: Required redirectActivityName missing.")
+                handleError("Encountered error while generating URL.", true)
             }
-        } ?: run {
-            config?.onError?.invoke("@onefootprint/footprint-android: Required configuration missing.")
+        }
+    }
+
+    private fun launchVerificationIfReady() {
+        config?.let { config ->
+            val sdkArgsManager = FootprintSdkArgsManager(config)
+            sdkArgsManager.sendArgs(::handleSdkArgsToken) { error ->
+                handleError(error, true)
+            }
         }
     }
 
@@ -90,18 +94,12 @@ internal class LauncherActivity : AppCompatActivity() {
         // activity and call the onCancel callback
         isCustomTabOpen = false
         config?.onCancel?.invoke()
-        config?.redirectActivityName?.let { redirectActivityName ->
-            startDestinationActivity(
-                redirectActivityName,
-                SessionResult.Canceled
-            )
-        }
+        startDestinationActivity(SessionResult.Canceled)
     }
 
     private fun getUrl(config: FootprintConfig, token: String): Uri? {
-        val bifrostBaseUrl = "https://id.onefootprint.com"
-        val builder = Uri.parse(bifrostBaseUrl).buildUpon()
-        builder.appendQueryParameter("redirect_url", "com.footprint://")
+        val builder = Uri.parse("https://id.onefootprint.com").buildUpon()
+        builder.appendQueryParameter("redirect_url", "com.footprint.android://")
         val appearanceJson = config.appearance?.toJSON()
         appearanceJson?.let {
             it["fontSrc"]?.let { fontSrc -> builder.appendQueryParameter("fontSrc", fontSrc) }
@@ -114,22 +112,24 @@ internal class LauncherActivity : AppCompatActivity() {
         return builder.build()
     }
 
-    private fun startDestinationActivity(redirectActivityName: String, verificationResult: SessionResult){
-        var intent: Intent? = null
-        try {
-            intent = Intent(
-                this,
-                Class.forName(redirectActivityName)
-            )
-            footprint.setLauncherActivityActive(false)
-            intent.putExtra("verificationResult", verificationResult.toString())
-            startActivity(intent)
-            finish() // Important cause we don't want the user to be able to come back to our activity on backspace
-        } catch (e: ClassNotFoundException) {
-            e.localizedMessage?.let {
-                config?.onError?.invoke("@onefootprint/footprint-android: $it")
-            } ?: run {
-                config?.onError?.invoke("@onefootprint/footprint-android: Unable to start intent.")
+    private fun startDestinationActivity(verificationResult: SessionResult) {
+        config?.redirectActivityName?.let { redirectActivityName ->
+            var intent: Intent? = null
+            try {
+                intent = Intent(
+                    this,
+                    Class.forName(redirectActivityName)
+                )
+                footprint.setLauncherActivityActive(false)
+                intent.putExtra("verificationResult", verificationResult.toString())
+                startActivity(intent)
+                finish() // Important cause we don't want the user to be able to come back to our activity on backspace
+            } catch (e: ClassNotFoundException) {
+                e.localizedMessage?.let {
+                    handleError(it)
+                } ?: run {
+                    handleError("Unable to start intent.")
+                }
             }
         }
     }

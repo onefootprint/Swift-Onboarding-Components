@@ -28,17 +28,17 @@ class FootprintSdkArgsManager(private val config: FootprintConfig) {
     private val client = OkHttpClient()
     private val endpoint = "https://api.onefootprint.com/org/sdk_args"
 
-    fun sendArgs(onSuccess: (String) -> Unit) {
+    fun sendArgs(onSuccess: (String) -> Unit, onError: (String) -> Unit) {
         val sdkRequest = buildSdkRequest()
         client.newCall(sdkRequest).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                config.onError?.invoke("@onefootprint/footprint-android: Saving SDK args request failed: ${e.localizedMessage}")
+                onError.invoke("Saving SDK args request failed: ${e.localizedMessage}")
             }
 
             override fun onResponse(call: Call, response: Response) {
                 response.use {
                     if (!it.isSuccessful) {
-                        config.onError?.invoke("@onefootprint/footprint-android: SDK Args request failed with status code: ${it.code}")
+                        onError.invoke("SDK Args request failed with status code: ${it.code}")
                         return
                     }
                     val responseBody = it.body?.string() ?: ""
