@@ -3,6 +3,18 @@ use itertools::Itertools;
 use newtypes::FootprintReasonCode as FRC;
 use std::convert::Into;
 
+// 0 Nothing verified
+// 10 Critical ID elements not verified, are associated with different
+//    person(s), or indications such as OFAC matches, deceased/invalid SSN,
+//    SSN issued prior to DOB, etc. exist
+// 20 Minimal verification, critical ID elements not verified or associated
+//    with different person(s)
+// 30 Several ID elements verified
+// 40 Last name, address and SSN or phone verified; first name, phone or SSN
+//    verification failures
+// 50 Full name, address, phone, SSN verified
+const COMPREHENSIVE_VERIFICATION_INDEX_THRESHOLD: i32 = 20;
+
 #[allow(dead_code)]
 fn footprint_reason_codes(res: FlexIdResponse) -> Vec<FRC> {
     let phone_codes = Into::<Vec<FRC>>::into(&res.name_address_phone_summary());
@@ -57,6 +69,14 @@ fn footprint_reason_codes(res: FlexIdResponse) -> Vec<FRC> {
 
     if let Some(pl_frc) = Into::<Option<FRC>>::into(&res.phone_line_description()) {
         misc_codes.push(pl_frc);
+    }
+
+    if res
+        .comprehensive_verification_index()
+        .map(|s| s <= COMPREHENSIVE_VERIFICATION_INDEX_THRESHOLD)
+        .unwrap_or(false)
+    {
+        misc_codes.push(FRC::IdFlagged);
     }
 
     phone_codes

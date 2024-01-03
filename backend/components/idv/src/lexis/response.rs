@@ -539,6 +539,12 @@ impl FlexIdResponse {
             })
             .unwrap_or(PhoneLineDescription::Unknown)
     }
+
+    pub fn comprehensive_verification_index(&self) -> Option<i32> {
+        self.result()
+            .and_then(|r| r.comprehensive_verification.as_ref())
+            .and_then(|c| c.comprehensive_verification_index)
+    }
 }
 
 #[cfg(test)]
