@@ -22,7 +22,7 @@ const ManualReviewRequiredButton = ({
 
   return (
     <Dropdown.Root>
-      <DropdownTrigger asChild>
+      <DropdownTrigger>
         <Button size="small">
           {kind === EntityKind.person
             ? t('button.review-person')
