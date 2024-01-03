@@ -150,6 +150,7 @@ pub async fn post(
 
 /// Decrypt all of the data for the VWs that is visible by default without an explicit request
 #[allow(clippy::borrowed_box)]
+#[tracing::instrument(skip_all)]
 pub async fn decrypt_visible_attrs(
     state: &State,
     auth: &Box<dyn TenantAuth>,
