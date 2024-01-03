@@ -1,5 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { getErrorMessage } from '@onefootprint/request';
 import { RoleKind } from '@onefootprint/types';
 import { Dialog as FPDialog } from '@onefootprint/ui';
 import React from 'react';
@@ -24,12 +23,6 @@ const Dialog = ({ onClose, open }: DialogProps) => {
   const handleSubmit = (invitations: Invitation[]) => {
     inviteMembersMutations.mutate(invitations, {
       onSuccess: onClose,
-      onError: (error: unknown) => {
-        console.error(
-          'Inviting members from team roles page failed',
-          getErrorMessage(error),
-        );
-      },
     });
   };
 

@@ -1,5 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { getErrorMessage } from '@onefootprint/request';
 import type { Member } from '@onefootprint/types';
 import { RoleKind } from '@onefootprint/types';
 import React, { useState } from 'react';
@@ -34,11 +33,7 @@ const EditRole = ({ member }: EditRoleProps) => {
       updateMemberMutation.mutate(
         { roleId },
         {
-          onError: (error: unknown) => {
-            console.error(
-              'Updating member role failed',
-              getErrorMessage(error),
-            );
+          onError: () => {
             setValue({
               id: member.role.id,
               name: member.role.name,

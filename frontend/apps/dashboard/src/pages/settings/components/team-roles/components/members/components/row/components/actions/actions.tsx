@@ -1,5 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import type { Member } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
@@ -44,12 +43,6 @@ const Actions = ({ member }: ActionsProps) => {
     removeMemberMutation.mutate(id, {
       onSuccess: () => {
         hideConfirmation();
-      },
-      onError: (error: unknown) => {
-        console.error(
-          'Removing members from team roles page failed',
-          getErrorMessage(error),
-        );
       },
     });
   };

@@ -15,15 +15,16 @@ import { asAdminUser, resetUser } from 'src/config/tests';
 
 import Roles from './roles';
 import {
-  RolesCreatedAtFixture,
-  RolesFixture,
-  RolesScopesFixture,
-  RoleToEdit,
-  RoleWithoutActiveUsers,
+  rolesCreatedAtFixture,
+  rolesFixture,
+  rolesScopesFixture,
+  roleToEdit,
+  roleWithoutActiveUsers,
   withCreateRole,
   withCreateRoleError,
   withDisableRole,
   withDisableRoleError,
+  withProxyConfigs,
   withRoles,
   withRolesError,
   withUpdateRole,
@@ -33,15 +34,16 @@ import {
 const useRouterSpy = createUseRouterSpy();
 const testDate = new Date('2023-01-19T14:10:20.503Z');
 
-describe.skip('<Roles />', () => {
+describe('<Roles />', () => {
   beforeEach(() => {
-    asAdminUser();
     useRouterSpy({
       pathname: '/settings',
       query: {
         tab: 'roles',
       },
     });
+    withProxyConfigs();
+    asAdminUser();
   });
 
   beforeAll(() => {
@@ -93,25 +95,23 @@ describe.skip('<Roles />', () => {
 
     it('should show role name, number of active users, number of active api keys, created at, and permissions', async () => {
       await renderRolesAndWaitData();
-      RolesFixture.forEach((role, index) => {
-        const name = screen.getByText(role.name);
+
+      rolesFixture.forEach((role, index) => {
+        const row = screen.getByRole('row', { name: role.id });
+
+        const name = within(row).getByText(role.name);
         expect(name).toBeInTheDocument();
 
-        // using getAll and indexing in the case that we have 0 active users and 0 active api keys
-        const numActiveUsers = screen.getAllByText(role.numActiveUsers);
-        expect(numActiveUsers[0]).toBeInTheDocument();
+        const numActiveApiKeys = within(row).getByText(role.numActiveApiKeys);
+        expect(numActiveApiKeys).toBeInTheDocument();
 
-        const numActiveApiKeys = screen.getAllByText(role.numActiveApiKeys);
-        expect(numActiveApiKeys[0]).toBeInTheDocument();
-
-        role.scopes.forEach((scope, scopeIndex) => {
-          const scopeText = RolesScopesFixture[scopeIndex];
-          const permission = screen.getByText(scopeText);
-          expect(permission).toBeInTheDocument();
+        rolesScopesFixture[index].forEach(scope => {
+          const tag = within(row).getByText(scope);
+          expect(tag).toBeInTheDocument();
         });
 
-        const formattedCreatedAt = RolesCreatedAtFixture[index];
-        const createdAt = screen.getByText(formattedCreatedAt);
+        const formattedCreatedAt = rolesCreatedAtFixture[index];
+        const createdAt = within(row).getByText(formattedCreatedAt);
         expect(createdAt).toBeInTheDocument();
       });
     });
@@ -181,7 +181,7 @@ describe.skip('<Roles />', () => {
 
         it('should create a role and show a confirmation message', async () => {
           withRoles([
-            ...RolesFixture,
+            ...rolesFixture,
             {
               id: 'Role_aExxJ6XgSBpvqIJ2VcHH6X',
               name: 'Customer Support',
@@ -293,15 +293,15 @@ describe.skip('<Roles />', () => {
 
     describe('when updating a role', () => {
       const updatedRole: Role = {
-        ...RoleToEdit,
+        ...roleToEdit,
         scopes: [
           { kind: RoleScopeKind.read },
           { kind: RoleScopeKind.apiKeys },
           { kind: RoleScopeKind.manualReview },
         ],
       };
-      const rolesWithoutUpdatedRole = RolesFixture.filter(
-        role => role.id !== RoleToEdit.id,
+      const rolesWithoutUpdatedRole = rolesFixture.filter(
+        role => role.id !== roleToEdit.id,
       );
 
       describe('when the request to update a role succeeds', () => {
@@ -314,7 +314,7 @@ describe.skip('<Roles />', () => {
           withRoles([...rolesWithoutUpdatedRole, updatedRole]);
 
           const actionButton = screen.getByRole('button', {
-            name: `Open actions for role ${RoleToEdit.name}`,
+            name: `Open actions for role ${roleToEdit.name}`,
           });
           await userEvent.click(actionButton);
 
@@ -339,15 +339,13 @@ describe.skip('<Roles />', () => {
           });
           await userEvent.click(submitButton);
 
-          await waitFor(() => {
-            const confirmationMessage = screen.getByText(
-              'Role Customer support was updated successfully.',
-            );
-            expect(confirmationMessage).toBeInTheDocument();
-          });
+          await waitForElementToBeRemoved(dialog);
 
           await waitFor(() => {
-            expect(dialog).not.toBeInTheDocument();
+            const confirmationMessage = screen.getByText(
+              `Role ${roleToEdit.name} was updated successfully.`,
+            );
+            expect(confirmationMessage).toBeInTheDocument();
           });
         });
       });
@@ -362,7 +360,7 @@ describe.skip('<Roles />', () => {
           withRoles([...rolesWithoutUpdatedRole, updatedRole]);
 
           const actionButton = screen.getByRole('button', {
-            name: `Open actions for role ${RoleToEdit.name}`,
+            name: `Open actions for role ${roleToEdit.name}`,
           });
           await userEvent.click(actionButton);
 
@@ -393,7 +391,7 @@ describe.skip('<Roles />', () => {
     });
 
     describe('when disabling a role with no active users', () => {
-      const roleToDisable = RoleWithoutActiveUsers;
+      const roleToDisable = roleWithoutActiveUsers;
 
       describe('when the request to disable a role succeeds', () => {
         beforeEach(() => {
@@ -402,7 +400,7 @@ describe.skip('<Roles />', () => {
 
         it('should disable a role and show a confirmation message', async () => {
           await renderRolesAndWaitData();
-          withRoles(RolesFixture.filter(role => role.id !== roleToDisable.id));
+          withRoles(rolesFixture.filter(role => role.id !== roleToDisable.id));
 
           const actionButton = screen.getByRole('button', {
             name: `Open actions for role ${roleToDisable.name}`,

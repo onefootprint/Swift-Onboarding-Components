@@ -1,53 +1,46 @@
 import { mockRequest } from '@onefootprint/test-utils';
-import type { Role } from '@onefootprint/types';
+import type { ProxyConfig, Role } from '@onefootprint/types';
 import { RoleKind, RoleScopeKind } from '@onefootprint/types';
 
-export const RolesFixture: Role[] = [
+export const rolesFixture: Role[] = [
   {
-    id: 'Role_aExxJ5gSBpvqIJ2VcHH6J',
-    name: 'Customer support',
-    scopes: [{ kind: RoleScopeKind.apiKeys }],
-    isImmutable: false,
     createdAt: '2022-11-18T00:04:11.368107Z',
-    numActiveUsers: 0,
+    id: 'orgrole_VFgjE8N8C4iG3GqlkBFoj',
+    isImmutable: false,
+    kind: RoleKind.dashboardUser,
+    name: 'Admin',
     numActiveApiKeys: 0,
-    kind: RoleKind.dashboardUser,
-  },
-  {
-    id: 'Role_aExxJ6XgSBpvqIJ2VcHH6J',
-    name: 'Super',
+    numActiveUsers: 0,
     scopes: [{ kind: RoleScopeKind.admin }],
-    isImmutable: true,
-    createdAt: '2023-01-25T21:47:22.679708Z',
-    numActiveUsers: 2,
-    numActiveApiKeys: 3,
-    kind: RoleKind.dashboardUser,
   },
   {
-    id: 'Role_erflKNWEF13143EWRWELJN',
-    name: 'Read only',
-    isImmutable: true,
-    scopes: [{ kind: RoleScopeKind.read }],
     createdAt: '2023-01-06T04:33:34.272399Z',
-    numActiveUsers: 4,
-    numActiveApiKeys: 5,
+    id: 'orgrole_tzXNHNYXyPWvyxRXlDjaFB',
+    isImmutable: true,
     kind: RoleKind.dashboardUser,
+    name: 'Member',
+    numActiveApiKeys: 10,
+    numActiveUsers: 10,
+    scopes: [{ kind: RoleScopeKind.read }],
   },
 ];
 
-export const RolesCreatedAtFixture = [
-  '11/18/22, 12:04 AM',
-  '1/25/23, 9:47 PM',
-  '1/6/23, 4:33 AM',
-];
+export const rolesCreatedAtFixture = ['11/18/22, 12:04 AM', '1/6/23, 4:33 AM'];
 
-export const RolesScopesFixture = ['Everything', 'Read', 'Manage Api Keys'];
+export const rolesScopesFixture = [['Everything'], ['Read-only']];
 
-export const RoleWithoutActiveUsers = RolesFixture[0];
+export const roleWithoutActiveUsers = rolesFixture[0];
 
-export const RoleToEdit = RolesFixture[0];
+export const roleToEdit = rolesFixture[0];
 
-export const withRoles = (roles: Role[] = RolesFixture) =>
+export const withProxyConfigs = (proxyConfigs: ProxyConfig[] = []) =>
+  mockRequest({
+    method: 'get',
+    path: '/org/proxy_configs',
+    response: proxyConfigs,
+  });
+
+export const withRoles = (roles: Role[] = rolesFixture) =>
   mockRequest({
     method: 'get',
     path: '/org/roles',
@@ -72,7 +65,7 @@ export const withRolesError = () =>
     },
   });
 
-export const withCreateRole = (role: Role = RolesFixture[0]) =>
+export const withCreateRole = (role: Role = rolesFixture[0]) =>
   mockRequest({
     method: 'post',
     path: '/org/roles',
