@@ -1,8 +1,8 @@
 import { customRender, screen, within } from '@onefootprint/test-utils';
 import React from 'react';
 
-import type { AmlMonitoringProps } from './aml-monitoring';
 import AmlMonitoring from './aml-monitoring';
+import onboardingConfigFixture from './aml-monitoring.test.config';
 
 describe('<AmlMonitoring />', () => {
   const renderAmlMonitoring = ({
@@ -10,13 +10,23 @@ describe('<AmlMonitoring />', () => {
     enhancedAml = false,
     ofac = false,
     pep = false,
-  }: Partial<AmlMonitoringProps>) =>
+  }: {
+    adverseMedia?: boolean;
+    enhancedAml?: boolean;
+    ofac?: boolean;
+    pep?: boolean;
+  }) =>
     customRender(
       <AmlMonitoring
-        adverseMedia={adverseMedia}
-        enhancedAml={enhancedAml}
-        ofac={ofac}
-        pep={pep}
+        playbook={{
+          ...onboardingConfigFixture,
+          enhancedAml: {
+            adverseMedia,
+            enhancedAml,
+            ofac,
+            pep,
+          },
+        }}
       />,
     );
 

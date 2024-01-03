@@ -1,28 +1,28 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { type CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
-import { InlineAlert, Stack, Typography } from '@onefootprint/ui';
+import {
+  type OnboardingConfig,
+  SupportedIdDocTypes,
+} from '@onefootprint/types';
+import { Box, Divider, InlineAlert, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import CollectedInformation from '@/playbooks/components/collected-information';
 
 export type DataCollectionProps = {
-  allowInternationalResidents: boolean;
-  allowUsResidents: boolean;
-  docScanForOptionalSsn?: string;
-  internationalCountryRestrictions: null | CountryCode[];
-  isDocFirstFlow: boolean;
-  mustCollectData: string[];
-  optionalData?: string[];
+  playbook: OnboardingConfig;
 };
 
 const DataCollection = ({
-  allowInternationalResidents,
-  allowUsResidents,
-  docScanForOptionalSsn,
-  internationalCountryRestrictions,
-  isDocFirstFlow,
-  mustCollectData,
-  optionalData = [],
+  playbook: {
+    allowInternationalResidents,
+    allowUsResidents,
+    allowUsTerritoryResidents,
+    docScanForOptionalSsn,
+    internationalCountryRestrictions,
+    isDocFirstFlow,
+    mustCollectData,
+    optionalData = [],
+  },
 }: DataCollectionProps) => {
   const { t } = useTranslation('pages.playbooks.details.data-collection');
   const requiresSSN =
@@ -46,13 +46,13 @@ const DataCollection = ({
   );
 
   return (
-    <Stack direction="column" gap={8}>
+    <Stack direction="column">
       {isKYB && (
         <Stack direction="column" gap={7}>
           <Typography variant="label-3" color="secondary">
             {t('kyb.business')}
           </Typography>
-          <Stack direction="column" gap={5}>
+          <Stack direction="column" gap={7}>
             <CollectedInformation
               title={t('kyb.basic_information')}
               options={{
@@ -85,7 +85,7 @@ const DataCollection = ({
             {t('kyb.business_beneficial_owners')}
           </Typography>
         )}
-        <Stack direction="column" gap={5}>
+        <Stack direction="column" gap={7}>
           <CollectedInformation
             title={t('basic-information')}
             options={{
@@ -143,6 +143,19 @@ const DataCollection = ({
       </Stack>
       {isDocFirstFlow && (
         <InlineAlert variant="info">{t('id-doc-first')}</InlineAlert>
+      )}
+      {allowUsTerritoryResidents && (
+        <footer>
+          <Box marginTop={5} marginBottom={5}>
+            <Divider variant="secondary" />
+          </Box>
+          <Typography variant="label-3" color="primary">
+            {t('us-territories.label')}{' '}
+            <Typography variant="label-3" color="tertiary" as="span">
+              {t('us-territories.content')}
+            </Typography>
+          </Typography>
+        </footer>
       )}
     </Stack>
   );

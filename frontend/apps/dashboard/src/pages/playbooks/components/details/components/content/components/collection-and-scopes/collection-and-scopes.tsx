@@ -16,30 +16,16 @@ export type CollectionAndScopesProps = {
   playbook: OnboardingConfig;
 };
 
-const CollectionAndScopes = ({
-  playbook: {
-    id,
-    allowInternationalResidents,
-    allowUsResidents,
-    canAccessData,
-    docScanForOptionalSsn,
-    enhancedAml,
-    internationalCountryRestrictions,
-    isDocFirstFlow,
-    mustCollectData,
-    optionalData,
-    kind,
-  },
-}: CollectionAndScopesProps) => {
+const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
   const { t } = useTranslation('pages.playbooks.details');
   const options = [
     { value: 'data', label: t('tabs.data-collection') },
     { value: 'authorized-scopes', label: t('tabs.authorized-scopes') },
     { value: 'aml-monitoring', label: t('tabs.aml-monitoring') },
+    ...(playbook.kind !== OnboardingConfigKind.auth
+      ? [{ value: 'rules', label: t('tabs.rules') }]
+      : []),
   ];
-  if (kind !== OnboardingConfigKind.auth) {
-    options.push({ value: 'rules', label: t('tabs.rules') });
-  }
   const [tab, setTab] = useState(options[0].value);
 
   const handleChange = (value: string) => {
@@ -59,34 +45,10 @@ const CollectionAndScopes = ({
           </Tab>
         ))}
       </Tabs>
-      {tab === 'data' && (
-        <DataCollection
-          allowInternationalResidents={allowInternationalResidents}
-          allowUsResidents={allowUsResidents}
-          docScanForOptionalSsn={docScanForOptionalSsn}
-          internationalCountryRestrictions={internationalCountryRestrictions}
-          isDocFirstFlow={isDocFirstFlow}
-          mustCollectData={mustCollectData}
-          optionalData={optionalData}
-        />
-      )}
-      {tab === 'authorized-scopes' && (
-        <AuthorizedScopes
-          allowInternationalResidents={allowInternationalResidents}
-          allowUsResidents={allowUsResidents}
-          canAccessData={canAccessData}
-          docScanForOptionalSsn={docScanForOptionalSsn}
-        />
-      )}
-      {tab === 'aml-monitoring' && (
-        <AmlMonitoring
-          adverseMedia={enhancedAml.adverseMedia}
-          enhancedAml={enhancedAml.enhancedAml}
-          ofac={enhancedAml.ofac}
-          pep={enhancedAml.pep}
-        />
-      )}
-      {tab === 'rules' && <Rules playbookId={id} playbookKind={kind} />}
+      {tab === 'data' && <DataCollection playbook={playbook} />}
+      {tab === 'authorized-scopes' && <AuthorizedScopes playbook={playbook} />}
+      {tab === 'aml-monitoring' && <AmlMonitoring playbook={playbook} />}
+      {tab === 'rules' && <Rules playbook={playbook} />}
     </Container>
   );
 };

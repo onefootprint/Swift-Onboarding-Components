@@ -2127,6 +2127,10 @@
             "title": "Non-U.S. residents",
             "empty": "Non-U.S. residents aren't allowed to be onboarded."
           },
+          "us-territories": {
+            "label": "Note:",
+            "content": "Residents from U.S. territories are allowed to be onboarded."
+          },
           "id-doc-first": "Document scan will be used to autofill basic identity data",
           "last4": "Last 4",
           "full": "Full",

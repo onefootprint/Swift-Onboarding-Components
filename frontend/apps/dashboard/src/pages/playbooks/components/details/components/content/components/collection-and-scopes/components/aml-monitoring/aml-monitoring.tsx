@@ -1,22 +1,19 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
+import { type OnboardingConfig } from '@onefootprint/types';
 import { Divider, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import CollectedInformation from '@/playbooks/components/collected-information';
 
 export type AmlMonitoringProps = {
-  adverseMedia: boolean;
-  enhancedAml: boolean;
-  ofac: boolean;
-  pep: boolean;
+  playbook: OnboardingConfig;
 };
 
 const AmlMonitoring = ({
-  enhancedAml,
-  ofac,
-  pep,
-  adverseMedia,
+  playbook: {
+    enhancedAml: { enhancedAml, ofac, pep, adverseMedia },
+  },
 }: AmlMonitoringProps) => {
   const { t } = useTranslation('pages.playbooks.details.aml-monitoring');
 

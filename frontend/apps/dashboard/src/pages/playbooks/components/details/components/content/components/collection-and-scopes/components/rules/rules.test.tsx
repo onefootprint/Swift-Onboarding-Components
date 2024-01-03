@@ -6,7 +6,7 @@ import {
   waitForElementToBeRemoved,
   within,
 } from '@onefootprint/test-utils';
-import { OnboardingConfigKind, RuleOp } from '@onefootprint/types';
+import { RuleOp } from '@onefootprint/types';
 import React from 'react';
 import { asAdminUserFirmEmployee } from 'src/config/tests';
 
@@ -14,7 +14,7 @@ import type { RulesProps } from './rules';
 import Rules from './rules';
 import {
   isPrecededByNotBadge,
-  kybPlaybookIdFixture,
+  kybPlaybookFixture,
   kycPlaybookFixture,
   passRuleFixture,
   rulesFixture,
@@ -27,17 +27,14 @@ import {
   withRulesError,
 } from './rules.test.config';
 
-const renderRules = (
-  { playbookId, playbookKind }: RulesProps = {
-    playbookId: kycPlaybookFixture.id,
-    playbookKind: OnboardingConfigKind.kyc,
-  },
-) => {
-  customRender(<Rules playbookId={playbookId} playbookKind={playbookKind} />);
+const renderRules = ({
+  playbook = kycPlaybookFixture,
+}: Partial<RulesProps>) => {
+  customRender(<Rules playbook={playbook} />);
 };
 
 const renderRulesAndWaitFinishLoading = async () => {
-  renderRules();
+  renderRules({});
 
   await waitFor(() => {
     const loader = screen.getByRole('progressbar', {
@@ -444,11 +441,9 @@ describe('<Rules />', () => {
 
   describe('when it is a KYB playbook', () => {
     it('should show an alert', async () => {
-      withRules(kybPlaybookIdFixture);
-      await renderRules({
-        playbookId: kybPlaybookIdFixture,
-        playbookKind: OnboardingConfigKind.kyb,
-      });
+      withRules(kybPlaybookFixture.id);
+      await renderRules({ playbook: kybPlaybookFixture });
+
       await waitFor(() => {
         const alert = screen.getByText(
           "These rules are only applied when verifying a Business Owner's identity.",
