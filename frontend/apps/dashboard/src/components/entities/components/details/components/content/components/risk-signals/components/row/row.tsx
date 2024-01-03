@@ -27,14 +27,18 @@ const Row = ({ riskSignal }: RowProps) => {
       </td>
       <td>{createCapitalStringList(scopesList)}</td>
       <td>
-        <RowData>
-          <Note>{riskSignal.note}</Note>
-          {shouldShowTooltip && (
-            <Tooltip text={riskSignal.description} alignment="start">
+        {shouldShowTooltip ? (
+          <Tooltip text={riskSignal.description} alignment="start">
+            <RowData>
+              <Note>{riskSignal.note}</Note>
               <IcoInfo16 />
-            </Tooltip>
-          )}
-        </RowData>
+            </RowData>
+          </Tooltip>
+        ) : (
+          <RowData>
+            <Note>{riskSignal.note}</Note>
+          </RowData>
+        )}
       </td>
     </>
   );
