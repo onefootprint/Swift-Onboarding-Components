@@ -73,7 +73,9 @@ const EmptyActionRow = ({
   const handleSaveAdd = () => {
     const fields = {
       action,
-      rule_expression: expressions,
+      rule_expression: expressions[expressions.length - 1].field
+        ? expressions
+        : expressions.slice(0, -1),
     };
 
     addMutation.mutate(
@@ -133,7 +135,11 @@ const EmptyActionRow = ({
         </LinkButton>
         <Stack align="center" justify="space-between">
           <Stack align="center" gap={3}>
-            <Button size="small" onClick={handleSaveAdd}>
+            <Button
+              size="small"
+              onClick={handleSaveAdd}
+              disabled={expressions.length === 1 && !expressions[0].field}
+            >
               {allT('save')}
             </Button>
             <Button size="small" variant="secondary" onClick={handleCancelAdd}>

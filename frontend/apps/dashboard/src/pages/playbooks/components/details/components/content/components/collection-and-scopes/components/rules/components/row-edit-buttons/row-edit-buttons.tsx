@@ -30,8 +30,11 @@ const RowEditButtons = ({
   const isLoading = editMutation.isLoading || deleteMutation.isLoading;
 
   const handleEdit = () => {
+    const { ruleExpression } = editedRule;
     const fields = {
-      rule_expression: editedRule.ruleExpression,
+      rule_expression: ruleExpression[ruleExpression.length - 1].field
+        ? ruleExpression
+        : ruleExpression.slice(0, -1),
     };
 
     editMutation.mutate(

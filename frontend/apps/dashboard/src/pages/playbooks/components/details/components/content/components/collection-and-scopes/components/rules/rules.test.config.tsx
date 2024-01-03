@@ -111,7 +111,7 @@ export const kybPlaybookFixture: OnboardingConfig = {
 export const multiFieldRuleFixture = {
   ruleId: 'rule_Zr3KN36uSLD9hTuiHbJHVz',
   action: RuleAction.fail,
-  createdAt: '2023-11-26T16:52:52.535896Z',
+  createdAt: '2021-11-26T16:52:52.535896Z',
   isShadow: false,
   ruleExpression: [
     { field: 'name_matches', op: RuleOp.notEq, value: true },
@@ -180,7 +180,7 @@ export const rulesFixture: Rule[] = [
   {
     ruleId: 'rule_sufY6KAthSHuaWS9bzo8xt',
     action: RuleAction.fail,
-    createdAt: '2023-12-05T23:37:22.943740Z',
+    createdAt: '2020-12-05T23:37:22.943740Z',
     ruleExpression: [
       {
         field: 'id_flagged',

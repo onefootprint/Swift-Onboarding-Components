@@ -42,7 +42,7 @@ const useRules = (playbookId: string = '') => {
         Object.keys(formattedRules).forEach(action => {
           const rulesCopy = formattedRules[action as RuleAction].slice();
           formattedRules[action as RuleAction] = rulesCopy.sort((a, b) =>
-            a.ruleExpression[0].field > b.ruleExpression[0].field ? 1 : -1,
+            a.createdAt > b.createdAt ? 1 : -1,
           );
         });
         return { hasRules: !!rules.length, data: formattedRules };

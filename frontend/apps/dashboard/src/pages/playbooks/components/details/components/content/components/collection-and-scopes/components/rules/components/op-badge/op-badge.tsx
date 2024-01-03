@@ -56,7 +56,7 @@ const Badge = styled.div`
 
     &[data-is-selected='true'] {
       background-color: ${theme.backgroundColor.error};
-      border: 0;
+      border: ${theme.borderWidth[1]} solid ${theme.backgroundColor.error};
       color: ${theme.color.error};
     }
 
