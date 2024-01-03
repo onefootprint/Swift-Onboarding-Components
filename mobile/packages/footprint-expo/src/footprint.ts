@@ -4,14 +4,16 @@ import * as WebBrowser from 'expo-web-browser';
 import type { FootprintVerifyProps } from './footprint.types';
 import createUrl from './utils/create-url';
 import sendSdkArgs from './utils/send-sdk-args';
+import { logError, logWarn } from './utils/logger';
 
 const handleWebBrowserUrlChange = (
+  props: FootprintVerifyProps,
   url: string,
-  onComplete: FootprintVerifyProps['onCompleted'],
-  onCancel: FootprintVerifyProps['onCanceled'],
+  onComplete: FootprintVerifyProps['onComplete'],
+  onCancel: FootprintVerifyProps['onCancel'],
 ) => {
   if (!url) {
-    console.warn('@onefootprint/footprint-expo: missing result url');
+    logWarn(props, 'Missing result URL.');
     dismissBrowser();
     onCancel?.();
     return;
@@ -26,7 +28,7 @@ const handleWebBrowserUrlChange = (
   }
   const validationToken = queryParams.validation_token;
   if (!validationToken || typeof validationToken !== 'string') {
-    console.warn('@onefootprint/footprint-expo: missing validation token');
+    logWarn(props, 'Missing validation token.');
     dismissBrowser();
     onCancel?.();
     return;
@@ -46,26 +48,31 @@ const dismissBrowser = () => {
   }
 };
 
-const open = async ({
-  redirectUrl,
-  appearance,
-  publicKey,
-  authToken,
-  userData,
-  onCanceled,
-  onCompleted,
-  options,
-  l10n,
-}: FootprintVerifyProps) => {
-  const token = await sendSdkArgs({
+const open = async (props: FootprintVerifyProps) => {
+  const {
+    redirectUrl,
+    appearance,
+    publicKey,
+    authToken,
+    userData,
+    onCancel,
+    onComplete,
+    options,
+    l10n,
+  } = props;
+
+  const sdkArgsData = {
     publicKey,
     authToken,
     userData,
     options,
     l10n,
+  };
+  const token = await sendSdkArgs(sdkArgsData, (error: string) => {
+    logError(props, error);
   });
   if (!token) {
-    console.error('@onefootprint/footprint-expo: Unable to get sdk args token');
+    logError(props, 'Unable to get SDK args token.');
     return;
   }
 
@@ -74,7 +81,7 @@ const open = async ({
   const subscription = Linking.addEventListener('url', ({ url: eventUrl }) => {
     if (!isUpdateHandled) {
       isUpdateHandled = true;
-      handleWebBrowserUrlChange(eventUrl, onCompleted, onCanceled);
+      handleWebBrowserUrlChange(props, eventUrl, onComplete, onCancel);
     }
   });
 
@@ -94,15 +101,15 @@ const open = async ({
       if (result.type !== 'success') {
         // Triggered if user closes the web browser
         dismissBrowser();
-        onCanceled?.();
+        onCancel?.();
       } else {
-        handleWebBrowserUrlChange(result.url, onCompleted, onCanceled);
+        handleWebBrowserUrlChange(props, result.url, onComplete, onCancel);
       }
     }
   } catch (error) {
-    console.error(`@onefootprint/footprint-expo: ${error}`);
+    logError(props, error);
     dismissBrowser();
-    onCanceled?.();
+    onCancel?.();
   }
 
   subscription.remove();

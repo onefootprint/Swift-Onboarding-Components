@@ -153,8 +153,9 @@ export type FootprintVerifyProps = (VerifyAuthToken | VerifyPublicKey) & {
   userData?: FootprintUserData;
   options?: FootprintOptions;
   l10n?: FootprintL10n;
-  onCanceled?: () => void;
-  onCompleted?: (validationToken: string) => void;
+  onCancel?: () => void;
+  onComplete?: (validationToken: string) => void;
+  onError?: (error: string) => void;
 };
 
 export type Footprint = {

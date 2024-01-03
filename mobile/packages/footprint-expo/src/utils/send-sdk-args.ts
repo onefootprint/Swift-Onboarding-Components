@@ -1,11 +1,11 @@
-import { version } from '../../package.json';
 import type { FootprintVerifyProps } from '../footprint.types';
+import { API_BASE_URL, SDK_NAME, SDK_VERSION } from './constants';
+import transformKeys from './transform-keys';
 
-const API_BASE_URL = 'https://api.onefootprint.com';
 const NUM_RETRIES = 3;
 
 type SendSdkArgsRequest = {
-  kind: 'verify_v1';
+  kind: string;
   data: Pick<
     FootprintVerifyProps,
     'publicKey' | 'authToken' | 'userData' | 'options' | 'l10n'
@@ -17,37 +17,11 @@ type SendSdkArgsResponse = {
   expires_at: string;
 };
 
-const camelToSnakeCase = (str: string) =>
-  str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-
-const fixKeys = (fn: Function) => (obj: unknown) => {
-  if (!obj || typeof obj !== 'object') {
-    return obj;
-  }
-  const entries: unknown[][] = Object.entries(obj).map(([k, v]) => {
-    let value;
-    if (Array.isArray(v)) {
-      value = v.map(fixKeys(fn));
-    } else if (Object(v) === v) {
-      value = fixKeys(fn)(v);
-    } else {
-      value = v;
-    }
-
-    const entry = [fn(k), value];
-    return entry;
-  });
-
-  return Object.fromEntries(entries);
-};
-
-const convertKeysToSnakeCase = fixKeys(camelToSnakeCase);
-
 const request = (args: unknown) =>
   fetch(`${API_BASE_URL}/org/sdk_args`, {
     method: 'POST',
     headers: {
-      'x-fp-client-version': `footprint-expo ${version}`,
+      'x-fp-client-version': `${SDK_NAME} ${SDK_VERSION}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(args),
@@ -56,6 +30,7 @@ const request = (args: unknown) =>
 const sendSdkArgsRecursive = async (
   payload: SendSdkArgsRequest,
   numRetries: number,
+  onError: (error: string) => void,
 ): Promise<SendSdkArgsResponse> =>
   request(payload)
     .then(response => {
@@ -63,23 +38,22 @@ const sendSdkArgsRecursive = async (
         return response.json();
       }
       if (numRetries > 0) {
-        return sendSdkArgsRecursive(payload, numRetries - 1);
+        return sendSdkArgsRecursive(payload, numRetries - 1, onError);
       }
       throw new Error(response.statusText);
     })
-    .catch(error => console.error(`@onefootprint/footprint-expo: ${error}`));
+    .catch(error => onError(error.message));
 
-const sendSdkArgs = async ({
-  publicKey,
-  authToken,
-  userData,
-  options,
-  l10n,
-}: SendSdkArgsRequest['data']) => {
+const sendSdkArgs = async (
+  data: SendSdkArgsRequest['data'],
+  onError: (error: string) => void,
+) => {
+  const { publicKey, authToken, userData, options, l10n } = data;
+
   const result = await sendSdkArgsRecursive(
     {
       kind: 'verify_v1',
-      data: convertKeysToSnakeCase({
+      data: transformKeys({
         publicKey,
         authToken,
         userData,
@@ -88,9 +62,16 @@ const sendSdkArgs = async ({
       }),
     },
     NUM_RETRIES,
+    onError,
   );
 
-  return result ? result.token : undefined;
+  if (!result) {
+    onError(
+      'Could not save SDK args, this could be due to connectivity problems.',
+    );
+    return undefined;
+  }
+  return result.token;
 };
 
 export default sendSdkArgs;
