@@ -139,7 +139,7 @@ const getNextConfig = () => {
         // https://github.com/getsentry/sentry-webpack-plugin#options
   
         // Suppresses source map uploading logs during build
-        silent: false,
+        silent: true,
         org: "onefootprint",
         project: "dashboard",
       },
