@@ -17,6 +17,7 @@ internal class LauncherActivity : AppCompatActivity() {
 
     private var config: FootprintConfig? = null
     private val footprint = FootprintAndroid.instance
+    private var appPaused = false
 
     private fun handleResultFromUrl(url: String) {
         val result = parseResultFromUrl(url)
@@ -51,43 +52,25 @@ internal class LauncherActivity : AppCompatActivity() {
         if (shouldRedirect) startDestinationActivity(SessionResult.Error)
     }
 
-    private fun handleSdkArgsToken(token: String) {
-        config?.let { outerConfig ->
-            val url = getUrl(outerConfig, token)
-            url?.let {
-                customTabsIntent.launchUrl(this, url)
-                isCustomTabOpen = true
-            } ?: run {
-                handleError("Encountered error while generating URL.", true)
-            }
-        }
-    }
-
-    private fun launchVerificationIfReady() {
-        config?.let { config ->
-            val sdkArgsManager = FootprintSdkArgsManager(config)
-            sdkArgsManager.sendArgs(::handleSdkArgsToken) { error ->
-                handleError(error, true)
-            }
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         footprint.setLauncherActivityActive(true)
         config = footprint.getConfig()
+        appPaused = false
+        val verificationFlowUrl = intent.getStringExtra("VERIFICATION_FLOW_URL")
 
         intent?.data?.let { resultUrl ->
             handleResultFromUrl(resultUrl.toString())
         } ?: run {
-            launchVerificationIfReady()
+            customTabsIntent.launchUrl(this, Uri.parse(verificationFlowUrl))
+            isCustomTabOpen = true
         }
     }
 
     override fun onResume() {
         super.onResume()
-        if (!isCustomTabOpen) {
-            return;
+        if (!isCustomTabOpen || !appPaused) {
+            return
         }
         // This means that the custom tabs have been closed by user clicking the close button
         // on chrome (not our FE close button). In this case, we send the user to the destination
@@ -97,19 +80,9 @@ internal class LauncherActivity : AppCompatActivity() {
         startDestinationActivity(SessionResult.Canceled)
     }
 
-    private fun getUrl(config: FootprintConfig, token: String): Uri? {
-        val builder = Uri.parse("https://id.onefootprint.com").buildUpon()
-        builder.appendQueryParameter("redirect_url", "com.footprint.android://")
-        val appearanceJson = config.appearance?.toJSON()
-        appearanceJson?.let {
-            it["fontSrc"]?.let { fontSrc -> builder.appendQueryParameter("fontSrc", fontSrc) }
-            it["variant"]?.let { variant -> builder.appendQueryParameter("variant", variant) }
-            it["variables"]?.let { variables -> builder.appendQueryParameter("variables", variables) }
-            it["rules"]?.let { rules -> builder.appendQueryParameter("rules", rules) }
-        }
-
-        builder.fragment(token)
-        return builder.build()
+    override fun onPause() {
+        super.onPause()
+        appPaused = true
     }
 
     private fun startDestinationActivity(verificationResult: SessionResult) {
@@ -128,7 +101,7 @@ internal class LauncherActivity : AppCompatActivity() {
                 e.localizedMessage?.let {
                     handleError(it)
                 } ?: run {
-                    handleError("Unable to start intent.")
+                    handleError("Unable to start the redirect activity - Class Not Found.")
                 }
             }
         }
