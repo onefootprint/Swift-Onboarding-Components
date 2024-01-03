@@ -34,6 +34,7 @@ export type PropsBase = {
   kind: ComponentKind;
   l10n?: L10n;
   variant?: Variant;
+  onError?: (error: string) => void;
 };
 
 export type Options = {

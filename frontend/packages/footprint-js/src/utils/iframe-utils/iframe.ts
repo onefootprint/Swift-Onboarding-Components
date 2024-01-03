@@ -13,8 +13,10 @@ import {
   removeLoader,
 } from '../dom-utils';
 import getUniqueId from '../get-unique-id';
+import { logError } from '../logger';
 import { getCallbackProps, sanitizeAndValidateProps } from '../prop-utils';
-import sendSdkArgs from '../send-sdk-args';
+import { SdkKindByComponentKind } from '../request-utils/constants';
+import sendSdkArgs from '../request-utils/send-sdk-args';
 import getURL, { getWindowUrl } from '../url-utils';
 import type { Iframe, OnDestroy, OnRenderSecondary } from './types';
 
@@ -30,11 +32,21 @@ const initIframe = (rawProps: Props): Iframe => {
   const hasOverlay = variant === 'modal' || variant === 'drawer';
   const id = getUniqueId();
 
+  const handleError = (error: string, shouldDestroy?: boolean) => {
+    const errorMessage = logError(SdkKindByComponentKind[props.kind], error);
+    props.onError?.(errorMessage);
+    if (isRendered && shouldDestroy) {
+      onDestroy();
+      isRendered = false;
+    }
+  };
+
   const registerCallbackProps = () => {
     if (!parentApi) {
-      throw new Error(
-        'Footprint should be initialized in order to listen events',
+      handleError(
+        'Footprint should be initialized in order to register callback props',
       );
+      return;
     }
 
     const callbackProps = getCallbackProps(props, onDestroy, onRenderSecondary);
@@ -43,20 +55,22 @@ const initIframe = (rawProps: Props): Iframe => {
     });
   };
 
-  const getOrCreateContainer = (): HTMLElement => {
+  const getOrCreateContainer = (): HTMLElement | undefined => {
     if (hasOverlay) {
       return createOverlayContainer(id);
     }
     if (!containerId) {
-      throw new Error('containerId is required when rendering inline');
+      handleError('containerId is required when rendering inline');
+      return undefined;
     }
 
     // If rendering inline, find the client parent div
     const clientParent = document.getElementById(containerId);
     if (!clientParent) {
-      throw new Error(
+      handleError(
         `Could not find container with id ${containerId} while rendering footprint`,
       );
+      return undefined;
     }
     return createInlineContainer(id, clientParent);
   };
@@ -79,9 +93,8 @@ const initIframe = (rawProps: Props): Iframe => {
 
   const setUpFormRefs = () => {
     if (!parentApi) {
-      throw new Error(
-        'Footprint should be initialized in order to set up refs',
-      );
+      handleError('Footprint should be initialized in order to set up refs');
+      return;
     }
     // For now we only support refs on the form component
     if (props.kind !== ComponentKind.Form || !props.getRef) {
@@ -91,9 +104,7 @@ const initIframe = (rawProps: Props): Iframe => {
     const formRef: FormRef = {
       save: () => {
         if (!parentApi) {
-          throw new Error(
-            'Footprint should be initialized to call ref methods',
-          );
+          handleError('Footprint should be initialized to call ref methods');
         }
         return new Promise((resolve, reject) => {
           // Make sure to first register the callbacks before triggering save
@@ -127,7 +138,7 @@ const initIframe = (rawProps: Props): Iframe => {
 
     const token = await sendSdkArgs(props);
     if (!token) {
-      onDestroy();
+      handleError('Unable to get SDK args token.', true);
       return;
     }
 
@@ -149,8 +160,7 @@ const initIframe = (rawProps: Props): Iframe => {
         },
       });
     } catch (e) {
-      console.error('Initializing Footprint iframe failed with error: ', e);
-      onDestroy();
+      handleError(`Initializing iframe failed with error ${e}`, true);
       return;
     }
 
