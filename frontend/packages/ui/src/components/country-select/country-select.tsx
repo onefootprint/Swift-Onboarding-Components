@@ -71,6 +71,7 @@ const CountrySelect = ({
           onClick={onClick}
           size={size}
           testID={triggerTestID}
+          hasIcon
         >
           {selectedOption?.value && (
             <StyledFlag code={selectedOption.value} disabled={disabled} />

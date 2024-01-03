@@ -36,6 +36,7 @@ export type BaseSelectProps<Option extends BaseSelectOption> = {
     selectedOption?: Option;
     size?: BaseSelectSize;
     testID?: string;
+    hasIcon?: boolean;
   }) => React.ReactNode;
   searchPlaceholder?: string;
   size?: BaseSelectSize;

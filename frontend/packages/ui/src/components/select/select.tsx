@@ -42,6 +42,7 @@ const Select = <Option extends SelectOption = SelectOption>({
     isOpen,
     selectedOption,
     testID: triggerTestID,
+    hasIcon,
   }) => (
     <BaseSelectTrigger
       disabled={disabled}
@@ -51,6 +52,7 @@ const Select = <Option extends SelectOption = SelectOption>({
       onClick={onClick}
       size={size}
       testID={triggerTestID}
+      hasIcon={hasIcon}
     >
       {selectedOption?.label || placeholder}
     </BaseSelectTrigger>

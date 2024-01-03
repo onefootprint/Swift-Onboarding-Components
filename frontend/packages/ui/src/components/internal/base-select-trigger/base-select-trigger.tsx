@@ -6,7 +6,7 @@ import { createTypography } from '../../../utils/mixins';
 import Stack from '../../stack';
 
 type BaseSelectTriggerProps = {
-  children: React.ReactNode;
+  children: React.ReactNode | string;
   disabled?: boolean;
   hasError?: boolean;
   hasFocus?: boolean;
@@ -14,6 +14,7 @@ type BaseSelectTriggerProps = {
   onClick?: () => void;
   size?: 'compact' | 'default';
   testID?: string;
+  hasIcon?: boolean;
 };
 
 const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
@@ -27,6 +28,7 @@ const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
       onClick,
       size,
       testID,
+      hasIcon,
     }: BaseSelectTriggerProps,
     ref,
   ) => (
@@ -44,7 +46,7 @@ const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
       className="fp-input fp-custom-appearance"
     >
       <Content data-private={isPrivate} data-testid={testID}>
-        {children}
+        {hasIcon ? children : <Text>{children}</Text>}
       </Content>
       <Stack align="center" justify="center" marginLeft={4}>
         <IcoChevronDown16 color={disabled ? 'tertiary' : 'primary'} />
@@ -52,6 +54,12 @@ const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
     </BaseSelectTriggerContainer>
   ),
 );
+
+const Text = styled.p`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
 
 const BaseSelectTriggerContainer = styled.button<BaseSelectTriggerProps>`
   ${({ theme }) => {
@@ -130,6 +138,7 @@ const Content = styled.span`
   display: flex;
   align-items: center;
   max-width: calc(100% - 28px); // Minus the width of the icon + margin
+  overflow: hidden;
 `;
 
 export default BaseSelectTrigger;
