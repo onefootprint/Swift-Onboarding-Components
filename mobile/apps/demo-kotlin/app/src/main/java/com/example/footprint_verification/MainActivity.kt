@@ -1,4 +1,4 @@
-package com.example.footprint_verification
+package com.example.footprint_android
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
                 visaExpirationDate = "05/12/2024"
             )
             val config = FootprintConfiguration(
-                redirectActivityName = "com.example.footprint_verification.MainActivity",
+                redirectActivityName = "com.example.footprint_android.MainActivity",
                 publicKey = "pb_test_aSzwnZecnXS4faoyhxrocW",
                 userData = userData,
                 options = FootprintOptions(showLogo = true),

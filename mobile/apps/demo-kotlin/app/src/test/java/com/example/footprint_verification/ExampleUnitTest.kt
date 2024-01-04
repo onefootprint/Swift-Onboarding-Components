@@ -1,4 +1,4 @@
-package com.example.footprint_verification
+package com.example.footprint_android
 
 import org.junit.Test
 

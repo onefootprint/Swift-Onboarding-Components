@@ -1,10 +1,12 @@
 .gradle
 .DS_Store
-build/
-captures/
+/build
+/footprint-android/build
+/captures
 .externalNativeBuild
 .cxx
 local.properties
+debug.log
 
 # Eclipse
 .settings/
@@ -12,7 +14,13 @@ local.properties
 .project
 
 # IntelliJ IDEA
-.idea/
+/.idea
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
 *.iml
 
 # Maven

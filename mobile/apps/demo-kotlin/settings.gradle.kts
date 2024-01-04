@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "FootprintVerification"
+rootProject.name = "FootprintAndroid"
 include(":app")
 include(":footprint-android")
