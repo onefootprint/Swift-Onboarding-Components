@@ -1,7 +1,7 @@
 use crate::errors::{challenge::ChallengeError, ApiError};
 use chrono::{DateTime, Duration, Utc};
 use crypto::aead::{AeadSealedBytes, ScopedSealingKey};
-use newtypes::Base64Data;
+use newtypes::{Base64Data, ContactInfoKind};
 use paperclip::actix::Apiv2Schema;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::str::FromStr;
@@ -16,6 +16,28 @@ impl<C> Challenge<C> {
     pub fn new(data: C) -> Self {
         let expires_at = Utc::now() + Duration::minutes(5);
         Self { data, expires_at }
+    }
+}
+
+#[derive(
+    Debug, Clone, Eq, PartialEq, Apiv2Schema, serde::Serialize, serde::Deserialize, strum_macros::Display,
+)]
+#[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+pub enum ChallengeKind {
+    Sms,
+    #[strum(serialize = "biometric")]
+    #[serde(rename = "biometric")]
+    Passkey,
+    Email,
+}
+
+impl From<ContactInfoKind> for ChallengeKind {
+    fn from(value: ContactInfoKind) -> Self {
+        match value {
+            ContactInfoKind::Email => Self::Email,
+            ContactInfoKind::Phone => Self::Sms,
+        }
     }
 }
 

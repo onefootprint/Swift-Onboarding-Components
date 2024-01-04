@@ -1,5 +1,4 @@
-use super::{ChallengeKind, UserChallengeData};
-use crate::send_email_challenge_non_blocking;
+use super::UserChallengeData;
 use crate::ChallengeData;
 use crate::ChallengeState;
 use crate::State;
@@ -12,6 +11,8 @@ use api_core::telemetry::RootSpan;
 use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
 use api_core::utils::challenge::Challenge;
+use api_core::utils::challenge::ChallengeKind;
+use api_core::utils::email::send_email_challenge_non_blocking;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::sms::rx_background_error;
 use api_core::utils::vault_wrapper::{InitialVaultData, VaultContext, VaultWrapper};

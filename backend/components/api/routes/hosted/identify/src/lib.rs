@@ -2,10 +2,9 @@
 
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::user::CheckedUserAuthContext;
-use api_core::errors::user::UserError;
 use api_core::errors::ApiResult;
 use api_core::telemetry::RootSpan;
-use api_core::utils::challenge::ChallengeToken;
+use api_core::utils::challenge::{ChallengeKind, ChallengeToken};
 use api_core::utils::sms::PhoneEmailChallengeState;
 use api_core::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use api_core::State;
@@ -16,7 +15,6 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::webauthn_credential::WebauthnCredential;
 use itertools::Itertools;
-use newtypes::email::Email;
 use newtypes::ContactInfoKind;
 use newtypes::IdentityDataKind as IDK;
 use newtypes::PiiString;
@@ -24,7 +22,6 @@ use newtypes::SandboxId;
 use newtypes::VaultId;
 use paperclip::actix::{web, Apiv2Schema};
 use strum::EnumDiscriminants;
-use tracing::Instrument;
 use webauthn_rs_core::proto::{AuthenticationState, Base64UrlSafeData};
 
 #[allow(clippy::module_inception)]
@@ -38,28 +35,6 @@ pub mod verify;
 pub(crate) enum CreateChallengeRequest {
     Email(String),
     PhoneNumber(String),
-}
-
-#[derive(
-    Debug, Clone, Eq, PartialEq, Apiv2Schema, serde::Serialize, serde::Deserialize, strum_macros::Display,
-)]
-#[strum(serialize_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
-pub(crate) enum ChallengeKind {
-    Sms,
-    #[strum(serialize = "biometric")]
-    #[serde(rename = "biometric")]
-    Passkey,
-    Email,
-}
-
-impl From<ContactInfoKind> for ChallengeKind {
-    fn from(value: ContactInfoKind) -> Self {
-        match value {
-            ContactInfoKind::Email => Self::Email,
-            ContactInfoKind::Phone => Self::Sms,
-        }
-    }
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -222,39 +197,4 @@ async fn get_user_challenge_context(
         tenant,
     };
     Ok(Some(ctx))
-}
-
-pub fn send_email_challenge_non_blocking(
-    state: &State,
-    email: &Email,
-    vault_id: VaultId,
-    tenant: &Tenant,
-    sandbox_id: Option<SandboxId>, // pointless pass through for now, but may use later with a fixture email
-) -> ApiResult<PhoneEmailChallengeState> {
-    // Send non-blocking to prevent us from returning the challenge data to the frontend while
-    // we wait for sendrid latency
-    if email.is_fixture() && sandbox_id.is_none() {
-        return Err(UserError::FixtureCIInLive.into());
-    }
-    let code = if email.is_fixture() {
-        "000000".to_owned()
-    } else {
-        crypto::random::gen_rand_n_digit_code(6)
-    };
-
-    let h_code = crypto::sha256(code.as_bytes()).to_vec();
-
-    let tenant_url = tenant.website_url.as_ref().unwrap_or(&tenant.name).to_owned(); // better to default name here than error probably?
-
-    let state = state.clone();
-    let email2 = email.email.clone();
-    let fut = async move {
-        let _ = state
-            .sendgrid_client
-            .send_email_otp_verify_email(email2, code, tenant_url)
-            .await;
-    };
-    tokio::spawn(fut.in_current_span());
-
-    Ok(PhoneEmailChallengeState { vault_id, h_code })
 }

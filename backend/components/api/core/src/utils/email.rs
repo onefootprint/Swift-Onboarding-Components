@@ -1,17 +1,21 @@
 use crate::auth::session::user::EmailVerifySession;
+use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiErrorKind};
 use crate::State;
 use crate::{auth::session::AuthSessionData, errors::ApiResult};
 use crypto::random::gen_random_alphanumeric_code;
+use db::models::tenant::Tenant;
 use feature_flag::BoolFlag;
 use newtypes::email::Email;
-use newtypes::{ContactInfoId, PiiString, TenantId};
+use newtypes::{ContactInfoId, PiiString, SandboxId, TenantId, VaultId};
 use paperclip::actix::web;
 use reqwest::StatusCode;
 use std::collections::HashMap;
 use std::str::FromStr;
+use tracing::Instrument;
 
 use super::session::AuthSession;
+use super::sms::PhoneEmailChallengeState;
 
 #[derive(Debug, Clone)]
 pub struct SendgridClient {
@@ -261,4 +265,39 @@ pub async fn send_email_challenge(
         .send_email_verify_email(email_address.clone(), confirm_link_str)
         .await?;
     Ok(())
+}
+
+pub fn send_email_challenge_non_blocking(
+    state: &State,
+    email: &Email,
+    vault_id: VaultId,
+    tenant: &Tenant,
+    sandbox_id: Option<SandboxId>, // pointless pass through for now, but may use later with a fixture email
+) -> ApiResult<PhoneEmailChallengeState> {
+    // Send non-blocking to prevent us from returning the challenge data to the frontend while
+    // we wait for sendrid latency
+    if email.is_fixture() && sandbox_id.is_none() {
+        return Err(UserError::FixtureCIInLive.into());
+    }
+    let code = if email.is_fixture() {
+        "000000".to_owned()
+    } else {
+        crypto::random::gen_rand_n_digit_code(6)
+    };
+
+    let h_code = crypto::sha256(code.as_bytes()).to_vec();
+
+    let tenant_url = tenant.website_url.as_ref().unwrap_or(&tenant.name).to_owned(); // better to default name here than error probably?
+
+    let state = state.clone();
+    let email2 = email.email.clone();
+    let fut = async move {
+        let _ = state
+            .sendgrid_client
+            .send_email_otp_verify_email(email2, code, tenant_url)
+            .await;
+    };
+    tokio::spawn(fut.in_current_span());
+
+    Ok(PhoneEmailChallengeState { vault_id, h_code })
 }

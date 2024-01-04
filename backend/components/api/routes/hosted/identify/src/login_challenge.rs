@@ -1,5 +1,4 @@
-use super::{BiometricChallengeState, ChallengeKind, UserChallengeData};
-use crate::send_email_challenge_non_blocking;
+use super::{BiometricChallengeState, UserChallengeData};
 use crate::ChallengeData;
 use crate::ChallengeState;
 use crate::State;
@@ -15,6 +14,8 @@ use api_core::telemetry::RootSpan;
 use api_core::types::JsonApiResponse;
 use api_core::types::ResponseData;
 use api_core::utils::challenge::Challenge;
+use api_core::utils::challenge::ChallengeKind;
+use api_core::utils::email::send_email_challenge_non_blocking;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::passkey::WebauthnConfig;
 use api_core::utils::sms::rx_background_error;

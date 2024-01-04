@@ -1,13 +1,11 @@
 use crate::{UserChallengeContext, VaultIdentifier};
 
-use super::ChallengeKind;
-
 use api_core::{
     auth::{ob_config::ObConfigAuth, user::UserAuthContext, Any},
     errors::challenge::ChallengeError,
     telemetry::RootSpan,
     types::{JsonApiResponse, ResponseData},
-    utils::headers::SandboxId,
+    utils::{challenge::ChallengeKind, headers::SandboxId},
     State,
 };
 use api_wire_types::IdentifyRequest;
@@ -54,7 +52,8 @@ pub async fn post(
     };
 
     // Look up existing user vault by identifier
-    let Some(ctx) = crate::get_user_challenge_context(&state, identifier, ob_context, root_span).await? else {
+    let Some(ctx) = crate::get_user_challenge_context(&state, identifier, ob_context, root_span).await?
+    else {
         // The user vault doesn't exist. Just return that the user wasn't found
         return Ok(Json(ResponseData {
             data: IdentifyResponse {
