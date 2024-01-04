@@ -397,6 +397,13 @@
     "native_device": "Native Device"
   },
   "components": {
+    "frequent-notes": {
+      "title": "Frequent notes",
+      "edit": "Edit",
+      "done": "Done",
+      "warning": "Note will be deleted for the entire organization",
+      "delete": "Delete"
+    },
     "cmdk": {
       "erase-search": "Erase search",
       "no-results": "No results found",

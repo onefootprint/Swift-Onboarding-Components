@@ -47,6 +47,16 @@ const ManualNoteEntryForm = ({
         hint={errors.note && t('note.errors.required')}
         {...register('note', { required: true })}
       />
+      {/* replace TextArea for this component once we have the backend for frequent notes ready */}
+      {/* <FrequentNotesTextArea
+        textAreaProps={{
+          label: t('note.label'),
+          placeholder,
+          hasError: !!errors.note,
+          hint: errors.note && t('note.errors.required'),
+          ...register('note', { required: true }),
+        }}
+      /> */}
       <Controller
         control={control}
         name="isPinned"
