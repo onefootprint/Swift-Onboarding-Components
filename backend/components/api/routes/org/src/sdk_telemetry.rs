@@ -28,6 +28,6 @@ async fn post(request: web::Json<LogBody>) -> JsonApiResponse<EmptyResponse> {
         log_message,
         session_id,
     } = request.into_inner();
-    tracing::info!(name=%fmt(session_id), tenant_domain=%fmt(tenant_domain), sdk_kind=%fmt(sdk_kind), sdk_name=%fmt(sdk_name), sdk_version=%fmt(sdk_version), log_level=%fmt(log_level), log_message=%fmt(log_message), "SDK telemetry");
+    tracing::info!(session_id=%fmt(session_id), tenant_domain=%fmt(tenant_domain), sdk_kind=%fmt(sdk_kind), sdk_name=%fmt(sdk_name), sdk_version=%fmt(sdk_version), log_level=%fmt(log_level), log_message=%fmt(log_message), "SDK telemetry");
     EmptyResponse::ok().json()
 }
