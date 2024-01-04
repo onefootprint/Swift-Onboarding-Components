@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { StepHeader } from '@onefootprint/idv-elements';
 import styled, { css } from '@onefootprint/styled';
 import { ChallengeKind } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
@@ -6,7 +7,6 @@ import React from 'react';
 
 import { useAuthMachine } from '../../state';
 import PinVerification from '../pin-verification';
-import StepHeader from '../step-header';
 
 const IS_TEST = typeof jest !== 'undefined';
 const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 100 : 1500;

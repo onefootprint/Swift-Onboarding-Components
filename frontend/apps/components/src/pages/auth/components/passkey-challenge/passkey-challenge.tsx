@@ -1,11 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoSmartphone24 } from '@onefootprint/icons';
+import { StepHeader } from '@onefootprint/idv-elements';
 import { Button, Stack } from '@onefootprint/ui';
 import React from 'react';
 
 import { useAuthMachine } from '../../state';
 import Biometric from '../biometric';
-import StepHeader from '../step-header';
 
 type StepPassKeyProps = { children?: JSX.Element | null };
 

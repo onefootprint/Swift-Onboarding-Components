@@ -1,11 +1,10 @@
-import type { NavigationHeaderLeftButtonProps } from '@onefootprint/idv-elements';
-import {
-  HeaderTitle,
-  Logo,
-  NavigationHeader,
-} from '@onefootprint/idv-elements';
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
+
+import HeaderTitle from '../layout/components/header-title';
+import NavigationHeader from '../layout/components/navigation-header';
+import type { NavigationHeaderLeftButtonProps } from '../layout/components/navigation-header/types';
+import Logo from '../logo';
 
 type HeaderProps = {
   leftButton: NavigationHeaderLeftButtonProps;

@@ -1,22 +1,21 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import { useRequestErrorToast } from '@onefootprint/hooks';
+import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { CountryCode, IdentifyResponse } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
 
+import { EmailPreview, PhoneForm, StepHeader } from '../../../../components';
+import { useL10nContext } from '../../../../components/l10n-provider';
 import useIdentify from '../../../../hooks/api/hosted/identify/use-identify';
 import checkIsPhoneValid from '../../../../utils/check-is-phone-valid';
 import { useIdentifyMachine } from '../../components/machine-provider';
 import SandboxOutcomeFooter from '../../components/sandbox-outcome-footer';
-import EmailPreview from './components/email-preview';
-import Form from './components/form';
-import Header from './components/header';
 
-type FormData = {
-  phoneNumber: string;
-};
+type FormData = { phoneNumber: string };
+
+const noop = () => undefined;
 
 const PhoneIdentification = () => {
   const [state, send] = useIdentifyMachine();
@@ -28,8 +27,9 @@ const PhoneIdentification = () => {
     config: { logoUrl, orgName, isLive },
   } = state.context;
   const identifyMutation = useIdentify();
-  const { isLoading } = identifyMutation;
   const showRequestErrorToast = useRequestErrorToast();
+  const { t } = useTranslation('pages.phone-identification');
+  const l10n = useL10nContext();
   const { IdvPhoneInputRestrictedCountries } = useFlags();
   const restrictedCountries = new Set<CountryCode>(
     IdvPhoneInputRestrictedCountries,
@@ -83,6 +83,10 @@ const PhoneIdentification = () => {
     );
   };
 
+  const handleHeaderBackClick = () => {
+    send({ type: 'navigatedToPrevPage' });
+  };
+
   const handleChangeEmail = () => {
     send({ type: 'identifyReset' });
   };
@@ -90,18 +94,32 @@ const PhoneIdentification = () => {
   return (
     <>
       <Stack direction="column" gap={8}>
-        <Header
+        <StepHeader
           showLogo={showLogo}
           orgName={orgName}
           logoUrl={logoUrl ?? undefined}
+          leftButton={{ variant: 'back', onBack: handleHeaderBackClick }}
+          subtitle={t('subtitle')}
+          title={t('title')}
         />
-        <EmailPreview email={email} onChange={handleChangeEmail} />
-        <Form
-          onSubmit={handleSubmit}
-          isLoading={isLoading}
+        <EmailPreview
+          email={email}
+          onChange={handleChangeEmail}
+          textCta={t('email-card.cta')}
+        />
+        <PhoneForm
+          onSubmit={identifyMutation.isLoading ? noop : handleSubmit}
+          isLoading={identifyMutation.isLoading}
           defaultPhone={phoneNumber}
           validator={validatePhone}
           options={options}
+          l10n={l10n}
+          texts={{
+            cta: t('form.cta'),
+            phoneInvalid: t('form.phone.errors.invalid'),
+            phoneLabel: t('form.phone.label'),
+            phoneRequired: t('form.phone.errors.required'),
+          }}
         />
       </Stack>
       <SandboxOutcomeFooter

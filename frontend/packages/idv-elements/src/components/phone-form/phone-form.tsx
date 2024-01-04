@@ -1,4 +1,6 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
+import { IcoSmartphone224 } from '@onefootprint/icons';
+import type { L10n } from '@onefootprint/types';
 import { Button, Grid, PhoneInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -7,6 +9,7 @@ type EmailFormData = { phoneNumber: string };
 type PhoneFormProps = {
   defaultPhone?: string;
   isLoading?: boolean;
+  l10n?: L10n;
   onSubmit: (formData: EmailFormData) => void;
   options?: CountryRecord[];
   validator?: (phone: string) => boolean;
@@ -21,6 +24,7 @@ type PhoneFormProps = {
 const PhoneForm = ({
   defaultPhone,
   isLoading,
+  l10n,
   onSubmit,
   options,
   texts,
@@ -73,6 +77,7 @@ const PhoneForm = ({
             hasError={!!error}
             hint={hint}
             label={texts.phoneLabel}
+            locale={l10n?.locale}
             name={name}
             onBlur={onBlur}
             onChange={onChange}
@@ -84,7 +89,12 @@ const PhoneForm = ({
           />
         )}
       />
-      <Button fullWidth loading={isLoading} type="submit">
+      <Button
+        fullWidth
+        loading={isLoading}
+        type="submit"
+        prefixIcon={IcoSmartphone224}
+      >
         {texts.cta}
       </Button>
     </Grid.Container>

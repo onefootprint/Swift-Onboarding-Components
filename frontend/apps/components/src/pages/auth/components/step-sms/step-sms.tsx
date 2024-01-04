@@ -1,5 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { getCanChallengeBiometrics } from '@onefootprint/idv-elements';
+import {
+  getCanChallengeBiometrics,
+  StepHeader,
+} from '@onefootprint/idv-elements';
 import styled, { css } from '@onefootprint/styled';
 import { ChallengeKind } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
@@ -7,7 +10,6 @@ import React from 'react';
 
 import { useAuthMachine } from '../../state';
 import PinVerification from '../pin-verification';
-import StepHeader from '../step-header';
 import { getFormTitle, getStepTitle } from './utils';
 
 type StepPhoneProps = { children?: JSX.Element | null };

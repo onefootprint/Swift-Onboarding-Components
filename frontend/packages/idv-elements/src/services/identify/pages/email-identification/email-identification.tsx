@@ -1,15 +1,13 @@
-import { useRequestErrorToast } from '@onefootprint/hooks';
+import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { IdentifyResponse } from '@onefootprint/types';
 import React from 'react';
 
+import { EmailForm, LegalFooter, StepHeader } from '../../../../components';
 import useIdentify from '../../../../hooks/api/hosted/identify/use-identify';
 import Logger from '../../../../utils/logger';
-import LegalFooter from '../../components/legal-footer';
 import { useIdentifyMachine } from '../../components/machine-provider';
 import SandboxOutcomeFooter from '../../components/sandbox-outcome-footer';
-import EmailIdentificationForm from './components/form';
-import EmailIdentificationHeader from './components/header';
 
 type FormData = {
   email: string;
@@ -17,6 +15,7 @@ type FormData = {
 
 const EmailIdentification = () => {
   const [state, send] = useIdentifyMachine();
+  const { t } = useTranslation('pages.email-identification');
   const {
     identify: { email, sandboxId },
     obConfigAuth,
@@ -74,17 +73,26 @@ const EmailIdentification = () => {
 
   return (
     <>
-      <EmailIdentificationHeader
+      <StepHeader
         showLogo={showLogo}
         orgName={orgName}
         logoUrl={logoUrl ?? undefined}
+        leftButton={{ variant: 'close' }}
+        subtitle={t('header.subtitle')}
+        title={t('header.title')}
       />
-      <EmailIdentificationForm
+      <EmailForm
         defaultEmail={email}
         onSubmit={handleSubmit}
         isLoading={isLoading}
+        texts={{
+          cta: t('form.cta'),
+          emailIsRequired: t('form.email.errors.required'),
+          emailLabel: t('form.email.label'),
+          emailPlaceholder: t('form.email.placeholder'),
+        }}
       />
-      <LegalFooter />
+      <LegalFooter descriptionKey="components.legal-footer.label" />
       <SandboxOutcomeFooter
         sandboxId={sandboxId}
         overallOutcome={overallOutcome}

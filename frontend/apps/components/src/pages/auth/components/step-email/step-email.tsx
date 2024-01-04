@@ -1,12 +1,10 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { EmailForm, LegalFooter, StepHeader } from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
 import React from 'react';
 
 import { useIdentify } from '../../hooks';
 import { useAuthMachine } from '../../state';
-import EmailForm from '../email-form';
-import LegalFooter from '../legal-footer';
-import StepHeader from '../step-header';
 
 type StepEmailProps = { children?: JSX.Element | null };
 

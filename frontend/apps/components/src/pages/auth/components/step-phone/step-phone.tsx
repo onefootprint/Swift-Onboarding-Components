@@ -1,15 +1,17 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
-import { checkIsPhoneValid } from '@onefootprint/idv-elements';
+import {
+  checkIsPhoneValid,
+  EmailPreview,
+  PhoneForm,
+  StepHeader,
+} from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';
 
 import { useIdentify } from '../../hooks';
 import { useAuthMachine } from '../../state';
-import EmailPreview from '../email-preview';
-import PhoneForm from '../phone-form';
-import StepHeader from '../step-header';
 
 type StepPhoneProps = { children?: JSX.Element | null };
 

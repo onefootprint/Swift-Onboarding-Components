@@ -1,6 +1,8 @@
 export { GenericTransition, IdAnimation } from './animations';
 export { default as AppErrorBoundary } from './app-error-boundary';
 export { default as DeviceSignals } from './device-signals';
+export { default as EmailForm } from './email-form';
+export { default as EmailPreview } from './email-preview';
 export type { CompletePayload, ProviderReturn } from './footprint-provider';
 export {
   default as FootprintProvider,
@@ -36,5 +38,8 @@ export {
 } from './layout';
 export type { WhatsThisContentProps } from './layout/components/whats-this-bottom-sheet/components/whats-this-content';
 export { default as WhatsThisContent } from './layout/components/whats-this-bottom-sheet/components/whats-this-content';
+export { default as LegalFooter } from './legal-footer';
 export { default as Logo } from './logo';
+export { default as PhoneForm } from './phone-form';
 export { default as SessionExpired } from './session-expired';
+export { default as StepHeader } from './step-header';
