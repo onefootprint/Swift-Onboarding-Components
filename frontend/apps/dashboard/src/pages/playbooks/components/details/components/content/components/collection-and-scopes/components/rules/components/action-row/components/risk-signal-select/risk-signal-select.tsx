@@ -1,3 +1,9 @@
+import {
+  Combobox,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxProvider,
+} from '@ariakit/react';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronDown16, IcoTrash16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
@@ -10,9 +16,19 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import * as SelectPrimitive from '@radix-ui/react-select';
-import React, { useMemo, useState } from 'react';
+import { matchSorter } from 'match-sorter';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import type { ListRowProps } from 'react-virtualized';
+import {
+  AutoSizer,
+  CellMeasurer,
+  CellMeasurerCache,
+  List,
+} from 'react-virtualized';
 
 import useRiskSignals from './hooks/use-risk-signals';
+
+const ITEM_HEIGHT = 64; // Adjust as needed for the height of each item
 
 type RiskSignalSelectProps = {
   value?: string;
@@ -29,6 +45,17 @@ const RiskSignalSelect = ({
     'pages.playbooks.details.rules.action-row.risk-signals-select',
   );
   const riskSignalsQuery = useRiskSignals();
+  const [open, setOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+  const [selectedSignal, setSelectedSignal] = useState(value);
+  const cache = useRef(
+    new CellMeasurerCache({
+      fixedWidth: true,
+      defaultHeight: ITEM_HEIGHT,
+    }),
+  );
+  const [listKey, setListKey] = useState(0); // Add a key state for the list
+
   const options = useMemo(
     () =>
       riskSignalsQuery.data?.map(riskSignal => ({
@@ -39,7 +66,58 @@ const RiskSignalSelect = ({
       })) || [],
     [riskSignalsQuery.data],
   );
-  const [selectedSignal, setSelectedSignal] = useState(value);
+
+  const matches = useMemo(() => {
+    if (!searchValue) return options;
+    const keys = ['label', 'description'];
+    return matchSorter(options, searchValue, { keys });
+  }, [searchValue, options]);
+
+  useEffect(() => {
+    cache.current.clearAll(); // Clear the cache
+    setListKey(prevKey => prevKey + 1); // Increment the key to force rerender
+  }, [matches]); // Dependency array includes matches
+
+  const renderRow: React.FC<ListRowProps> = ({ index, key, style, parent }) => {
+    const option = matches[index];
+    if (!option) return null;
+
+    return (
+      <CellMeasurer
+        key={key}
+        cache={cache.current}
+        parent={parent}
+        columnIndex={0}
+        rowIndex={index}
+      >
+        <div style={style}>
+          <Item
+            asChild
+            key={option.value}
+            value={option.value}
+            textValue={option.label}
+            onClick={() => setSelectedSignal(option.value)}
+          >
+            <ComboboxItem>
+              <Typography
+                variant="body-4"
+                sx={{
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {option.label}
+              </Typography>
+              <Typography variant="caption-4" color="tertiary">
+                {option.description}
+              </Typography>
+            </ComboboxItem>
+          </Item>
+        </div>
+      </CellMeasurer>
+    );
+  };
 
   return (
     <Box position="relative" display="inline-block">
@@ -47,68 +125,95 @@ const RiskSignalSelect = ({
         defaultValue={value}
         value={value}
         onValueChange={onChange}
+        open={open}
+        onOpenChange={setOpen}
       >
-        <Trigger aria-label={t('aria-label')} type="button" asChild>
-          <Badge variant="info" sx={{ gap: 2 }}>
-            {selectedSignal || t('placeholder')}
-            <IcoChevronDown16 color="info" />
-          </Badge>
-        </Trigger>
-        <Content position="popper" sideOffset={4} align="end">
-          <Header>
-            <Typography variant="label-4">{t('title')}</Typography>
-            <LinkButton
-              size="tiny"
-              variant="destructive"
-              iconComponent={IcoTrash16}
-              iconPosition="left"
-              disabled={!onDelete}
-              onClick={onDelete}
-            >
-              {t('delete')}
-            </LinkButton>
-          </Header>
-          <Viewport>
-            {options.map(option => (
-              <Item
-                key={option.value}
-                value={option.value}
-                textValue={option.label}
-                onClick={() => setSelectedSignal(option.label)}
-              >
-                <Typography variant="body-4" sx={{ overflow: 'hidden' }}>
-                  {option.label}
-                </Typography>
-                <Typography variant="caption-4" color="tertiary">
-                  {option.description}
-                </Typography>
-              </Item>
-            ))}
-          </Viewport>
-        </Content>
+        <ComboboxProvider
+          open={open}
+          setOpen={setOpen}
+          resetValueOnHide
+          includesBaseElement={false}
+          setValue={nextValue => {
+            setSearchValue(nextValue);
+          }}
+        >
+          <Trigger aria-label={t('aria-label')} type="button" asChild>
+            <Badge variant="info" sx={{ gap: 2 }}>
+              {selectedSignal || t('placeholder')}
+              <IcoChevronDown16 color="info" />
+            </Badge>
+          </Trigger>
+          <Content position="popper" sideOffset={4} align="end">
+            <Header>
+              <HeaderControls>
+                <Typography variant="label-4">{t('title')}</Typography>
+                <LinkButton
+                  size="tiny"
+                  variant="destructive"
+                  iconComponent={IcoTrash16}
+                  iconPosition="left"
+                  disabled={!onDelete}
+                  onClick={onDelete}
+                >
+                  {t('delete')}
+                </LinkButton>
+              </HeaderControls>
+              <Search
+                autoSelect
+                placeholder="Search by name or description"
+                onBlurCapture={event => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }}
+              />
+            </Header>
+            <ComboboxList className="listbox">
+              <AutoSizer>
+                {({ width }: { width: number }) => (
+                  <List
+                    key={listKey}
+                    width={width}
+                    height={350}
+                    deferredMeasurementCache={cache.current}
+                    rowCount={matches.length}
+                    rowHeight={cache.current.rowHeight}
+                    rowRenderer={renderRow}
+                    overscanRowCount={10}
+                  />
+                )}
+              </AutoSizer>
+            </ComboboxList>
+          </Content>
+        </ComboboxProvider>
       </SelectPrimitive.Root>
     </Box>
   );
 };
 
-export default RiskSignalSelect;
-
 const Trigger = styled(SelectPrimitive.Trigger)`
   ${({ theme }) => css`
     ${createFontStyles('caption-1')};
-    display: inline-flex;
-    justify-content: center;
     align-items: center;
-    padding: ${theme.spacing[2]} ${theme.spacing[3]};
     background-color: ${theme.backgroundColor.info};
     border-radius: ${theme.borderRadius.large};
     border: 0;
     color: ${theme.color.info};
     cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    padding: ${theme.spacing[2]} ${theme.spacing[3]};
   `}
 `;
 
 const Header = styled.header`
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1;
+`;
+
+const HeaderControls = styled.div`
   ${({ theme }) => css`
     align-items: center;
     background-color: ${theme.backgroundColor.secondary};
@@ -117,6 +222,23 @@ const Header = styled.header`
     height: 40px;
     justify-content: space-between;
     padding: 0 ${theme.spacing[5]};
+  `}
+`;
+
+const Search = styled(Combobox)`
+  ${({ theme }) => css`
+    ${createFontStyles('body-4')};
+    border: none;
+    border-bottom: 1px solid ${theme.borderColor.tertiary};
+    color: ${theme.color.primary};
+    height: 40px;
+    outline: none;
+    padding: ${theme.spacing[3]} ${theme.spacing[5]};
+    width: 100%;
+
+    ::placeholder {
+      color: ${theme.color.tertiary};
+    }
   `}
 `;
 
@@ -133,29 +255,23 @@ const Content = styled(SelectPrimitive.Content)`
   `}
 `;
 
-const Viewport = styled(SelectPrimitive.Viewport)`
-  ${({ theme }) => css`
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[3]};
-    padding: ${theme.spacing[3]} 0;
-  `}
-`;
-
 const Item = styled(SelectPrimitive.Item)`
   ${({ theme }) => css`
     padding: ${theme.spacing[2]} ${theme.spacing[5]};
     cursor: pointer;
     outline: none;
+    background: ${theme.backgroundColor.primary};
 
     @media (hover: hover) {
       :hover {
         ${createOverlayBackground('darken-1', 'primary')};
       }
     }
-    :focus {
+
+    &[data-active-item] {
       ${createOverlayBackground('darken-1', 'primary')};
     }
   `}
 `;
+
+export default RiskSignalSelect;
