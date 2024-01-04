@@ -21,6 +21,14 @@ Our onboarding flows require a `compileSdk` version of 34 or above in your app's
 
 If you're using older versions, please consider upgrading to ensure compatibility with `FootprintAndroid`. Failure to meet these requirements could lead to unexpected issues or the package not working at all.
 
+## Permissions
+
+In order to use the `FootprintAndroid` package your manifest must include `INTERNET` permission:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+```
+
 ## Installation
 
 In order to use our SDK, you will need to add it use Jitpack, which is a package repository for JVM and Android projects that builds Git projects on demand and provides you with ready-to-use artifacts (jar, aar).

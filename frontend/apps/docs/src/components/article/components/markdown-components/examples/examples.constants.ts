@@ -148,6 +148,24 @@ const mobile: Option = {
         width: 32,
       },
     },
+    {
+      name: 'Swift',
+      href: 'https://github.com/onefootprint/examples/tree/master/idv/mobile-swift-ui',
+      img: {
+        src: '/examples/swift.png',
+        height: 32,
+        width: 32,
+      },
+    },
+    {
+      name: 'Android + Kotlin',
+      href: 'https://github.com/onefootprint/examples/tree/master/idv/mobile-android-ui',
+      img: {
+        src: '/examples/kotlin.png',
+        height: 32,
+        width: 32,
+      },
+    },
   ],
 };
 
