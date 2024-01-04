@@ -1,8 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Box, media } from '@onefootprint/ui';
-import React from 'react';
+import React, { useRef } from 'react';
 import Seo from 'src/components/seo/seo';
+import { useHover } from 'usehooks-ts';
 
 import staticAPIData from './assets/api-docs.json';
 import staticPreviewAPIData from './assets/api-preview-docs.json';
@@ -15,6 +16,8 @@ const staticPreviewArticles = getArticles(staticPreviewAPIData);
 
 const ApiReference = () => {
   const { t } = useTranslation('pages.api-reference');
+  const navRef = useRef<HTMLElement>(null);
+  const isNavHovered = useHover(navRef);
 
   const sections = [
     {
@@ -32,16 +35,16 @@ const ApiReference = () => {
   return (
     <Box>
       <Seo title={t('html-title')} slug="/api-reference" />
-      <Layout>
-        <PageNav sections={sections} />
+      <Layout isNavHovered={isNavHovered}>
+        <PageNav sections={sections} ref={navRef} />
         <Articles sections={sections} />
       </Layout>
     </Box>
   );
 };
 
-const Layout = styled.div`
-  ${({ theme }) => css`
+const Layout = styled.div<{ isNavHovered: boolean }>`
+  ${({ theme, isNavHovered }) => css`
     background: ${theme.backgroundColor.primary};
     width: 100vw;
     height: 100vh;
@@ -49,8 +52,11 @@ const Layout = styled.div`
     ${media.greaterThan('md')`
       overflow: hidden;
       display: grid;
-      grid-template-columns: var(--page-aside-nav-api-reference-width) 1fr;
+      grid-template-columns: calc(var(--page-aside-nav-api-reference-width) + ${
+        isNavHovered ? '5%' : '0px'
+      }) 1fr;
       grid-template-areas: 'nav content';
+      transition: grid-template-columns 0.3s ease-in-out;
     `}
   `}
 `;

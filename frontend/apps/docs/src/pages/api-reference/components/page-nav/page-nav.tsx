@@ -8,7 +8,7 @@ import {
   ThemeToggle,
 } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
-import React, { useRef, useState } from 'react';
+import React, { forwardRef, useRef, useState } from 'react';
 import NavigationFooter from 'src/components/navigation-footer';
 import NavigationLogo from 'src/components/navigation-logo';
 import NavigationSectionTitle from 'src/components/navigation-section-title';
@@ -53,7 +53,7 @@ const groupBySection = (articles: Article[]) => {
   return sections;
 };
 
-const PageNav = ({ sections }: PageNavProps) => {
+const PageNav = forwardRef<HTMLElement, PageNavProps>(({ sections }, ref) => {
   const navInnerScrollRef = useRef<HTMLDivElement>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
@@ -70,7 +70,7 @@ const PageNav = ({ sections }: PageNavProps) => {
   };
 
   return (
-    <PageNavContainer>
+    <PageNavContainer ref={ref}>
       <Header isScrolled={isScrolled}>
         <NavigationLogo />
         <ThemeToggle onChange={handleToggleTheme} checked={theme === 'dark'} />
@@ -112,7 +112,7 @@ const PageNav = ({ sections }: PageNavProps) => {
       <NavigationFooter linkTo="docs" />
     </PageNavContainer>
   );
-};
+});
 
 const PathLabel = styled.span`
   text-transform: lowercase;
@@ -138,6 +138,7 @@ const PageNavContainer = styled.aside`
       top: 0;
       position: relative;
       grid-area: nav;
+      width: 100%;
     `};
   `}
 `;
