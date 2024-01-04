@@ -246,3 +246,8 @@ define_newtype_id!(
 
 define_newtype_id!(LabelId, String, "Identifier for a footprint id label");
 define_newtype_id!(TagId, String, "Identifier for a footprint id tag");
+define_newtype_id!(
+    TenantFrequentNoteId,
+    String,
+    "Identifier for a tenant frequent note"
+);

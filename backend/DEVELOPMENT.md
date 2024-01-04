@@ -190,14 +190,14 @@ First, install diesel CLI:
 Next, to generate a new migration:
 
 ```
-$ cd components/db/
-$ diesel migration <generate my_new_migration_name>
+$ cd components/db/schema
+$ diesel migration generate <my_new_migration_name>
 ```
 
-Finally, run `up` and `down` and `up` again to make sure your migration works!
-`$ diesel migration up`
-`$ diesel migration down`
-`$ diesel migration up`
+Finally, run `run` and `revert` and `run` again to make sure your migration works!
+`$ diesel migration run`
+`$ diesel migration revert`
+`$ diesel migration run`
 
 ## Accessing dev/dev-ephemeral DB
 

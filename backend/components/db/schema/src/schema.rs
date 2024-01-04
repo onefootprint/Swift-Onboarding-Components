@@ -918,6 +918,22 @@ table! {
 table! {
     use diesel::sql_types::*;
 
+    tenant_frequent_note (id) {
+        id -> Text,
+        created_at -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        tenant_id -> Text,
+        created_by_actor -> Jsonb,
+        kind -> Text,
+        content -> Text,
+        deactivated_at -> Nullable<Timestamptz>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+
     tenant_role (id) {
         id -> Text,
         tenant_id -> Text,
@@ -1264,6 +1280,7 @@ joinable!(task_execution -> task (task_id));
 joinable!(tenant_api_key -> tenant (tenant_id));
 joinable!(tenant_api_key -> tenant_role (role_id));
 joinable!(tenant_client_config -> tenant (tenant_id));
+joinable!(tenant_frequent_note -> tenant (tenant_id));
 joinable!(tenant_role -> tenant (tenant_id));
 joinable!(tenant_rolebinding -> tenant (tenant_id));
 joinable!(tenant_rolebinding -> tenant_role (tenant_role_id));
@@ -1344,6 +1361,7 @@ allow_tables_to_appear_in_same_query!(
     tenant,
     tenant_api_key,
     tenant_client_config,
+    tenant_frequent_note,
     tenant_role,
     tenant_rolebinding,
     tenant_user,

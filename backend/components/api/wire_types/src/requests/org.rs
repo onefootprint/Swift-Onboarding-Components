@@ -24,3 +24,14 @@ pub struct OrgRoleFilters {
     pub search: Option<String>,
     pub kind: Option<TenantRoleKindDiscriminant>,
 }
+
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
+pub struct GetOrgFrequentNotes {
+    pub kind: TenantFrequentNoteKind,
+}
+
+#[derive(Debug, Clone, Deserialize, Apiv2Schema)]
+pub struct CreateOrgFrequentNoteRequest {
+    pub kind: TenantFrequentNoteKind,
+    pub content: String,
+}

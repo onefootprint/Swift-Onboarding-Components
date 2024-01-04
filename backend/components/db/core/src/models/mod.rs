@@ -43,6 +43,7 @@ pub mod task_execution;
 pub mod tenant;
 pub mod tenant_api_key;
 pub mod tenant_client_config;
+pub mod tenant_frequent_note;
 pub mod tenant_role;
 pub mod tenant_rolebinding;
 pub mod tenant_user;

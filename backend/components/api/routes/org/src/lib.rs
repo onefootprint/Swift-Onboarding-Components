@@ -2,6 +2,7 @@ mod access_events;
 mod api_keys;
 mod authn;
 mod client_security_config;
+mod frequent_notes;
 mod index;
 mod logo;
 mod member;
@@ -46,7 +47,10 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(sdk_args::get)
         .service(sdk_telemetry::post)
         .service(client_security_config::get)
-        .service(client_security_config::patch);
+        .service(client_security_config::patch)
+        .service(frequent_notes::get)
+        .service(frequent_notes::post)
+        .service(frequent_notes::delete);
 
     onboarding_configs::routes(config);
     authn::routes(config);
