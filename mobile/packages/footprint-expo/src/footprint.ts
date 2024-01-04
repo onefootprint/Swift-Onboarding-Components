@@ -73,7 +73,7 @@ const footprint = () => {
         }
       }
     } catch (error) {
-      handleBrowserSessionEnd(props, { kind: 'error', error });
+      handleBrowserSessionEnd(props, { kind: 'error', error: `${error}` });
     }
 
     subscription.remove();
