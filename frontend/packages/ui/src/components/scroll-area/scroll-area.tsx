@@ -11,6 +11,8 @@ type ScrollAreaProps = {
   sx?: SXStyleProps;
   className?: string;
   maxHeight?: string;
+  hideBottomLine?: boolean;
+  hideTopLine?: boolean;
 };
 
 const ScrollArea = ({
@@ -19,31 +21,42 @@ const ScrollArea = ({
   asChild,
   className,
   maxHeight,
+  hideBottomLine,
+  hideTopLine,
 }: ScrollAreaProps) => {
+  const sxStyles = useSX(sx);
   const viewportRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [viewportHeight, setViewportHeight] = useState(0);
   const [scrollAreaHeight, setScrollAreaHeight] = useState(0);
   const [scrollTop, setScrollTop] = useState(0);
-  const [showLine, setShowLine] = useState(true);
+  const [showBottomLine, setShowBottomLine] = useState(true);
+  const [showTopLine, setShowTopLine] = useState(false);
 
   const noOverflow = viewportHeight <= scrollAreaHeight;
   const scrolledToBottom =
     scrollTop > 0 && scrollTop + scrollAreaHeight >= viewportHeight;
+  const scrolledToTop = scrollTop === 0;
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     setScrollTop(e.currentTarget.scrollTop);
   };
 
-  const sxStyles = useSX(sx);
+  useEffect(() => {
+    if (noOverflow || hideBottomLine) {
+      setShowBottomLine(false);
+    } else {
+      setShowBottomLine(!scrolledToBottom);
+    }
+  }, [noOverflow, scrolledToBottom, hideBottomLine]);
 
   useEffect(() => {
-    if (noOverflow) {
-      setShowLine(false);
+    if (noOverflow || hideTopLine) {
+      setShowTopLine(false);
     } else {
-      setShowLine(!scrolledToBottom);
+      setShowTopLine(!scrolledToTop);
     }
-  }, [noOverflow, scrolledToBottom]);
+  }, [noOverflow, scrolledToTop, hideTopLine]);
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -69,16 +82,17 @@ const ScrollArea = ({
   return (
     <StyledRoot
       ref={scrollAreaRef}
-      data-line={showLine}
+      data-line-bottom={showBottomLine}
+      data-line-top={showTopLine}
       onScroll={handleScroll}
       asChild={asChild}
+      style={{ maxHeight }}
     >
       <StyledViewport
         className={className}
         sx={sxStyles}
         asChild
         ref={viewportRef}
-        style={{ maxHeight }}
       >
         {children}
       </StyledViewport>
@@ -93,13 +107,21 @@ const StyledRoot = styled(ScrollAreaRadix.Root)`
   ${({ theme }) => css`
     overflow: auto;
 
-    &[data-line='false'] {
+    &[data-line-bottom='false'] {
       border-bottom: ${theme.borderWidth[1]} solid
         ${theme.borderColor.transparent};
     }
 
-    &[data-line='true'] {
+    &[data-line-bottom='true'] {
       border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    }
+
+    &[data-line-top='false'] {
+      border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.transparent};
+    }
+
+    &[data-line-top='true'] {
+      border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     }
   `}
 `;

@@ -63,7 +63,12 @@ const WhatsThisContent = ({ config }: WhatsThisContentProps) => (
     </Stack>
     <Stack direction="column" gap={5}>
       {localTranslations.cards.map(({ cardTitle, subtitle, icon }) => (
-        <FeatureCard title={cardTitle} subtitle={subtitle} icon={icon} />
+        <FeatureCard
+          title={cardTitle}
+          subtitle={subtitle}
+          icon={icon}
+          key={cardTitle}
+        />
       ))}
     </Stack>
   </Stack>

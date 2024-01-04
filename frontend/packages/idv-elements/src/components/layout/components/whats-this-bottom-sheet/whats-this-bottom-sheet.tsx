@@ -1,7 +1,8 @@
 import type { PublicOnboardingConfig } from '@onefootprint/types';
+import { BottomSheet } from '@onefootprint/ui';
 import React from 'react';
 
-import BifrostBottomSheet from './components/idv-bottom-sheet/idv-bottom-sheet';
+import { FOOTPRINT_FOOTER_ID } from '../../constants';
 import WhatsThisContent from './components/whats-this-content';
 
 export type WhatsThisBottomSheetProps = {
@@ -9,6 +10,7 @@ export type WhatsThisBottomSheetProps = {
   onClose: () => void;
   closeAriaLabel?: string;
   config?: PublicOnboardingConfig;
+  portalId?: string;
   containerId?: string;
 };
 
@@ -17,16 +19,18 @@ const WhatsThisBottomSheet = ({
   onClose,
   closeAriaLabel = 'Close',
   config,
+  portalId = FOOTPRINT_FOOTER_ID,
   containerId,
 }: WhatsThisBottomSheetProps) => (
-  <BifrostBottomSheet
+  <BottomSheet
     open={open}
     onClose={onClose}
     closeAriaLabel={closeAriaLabel}
+    portalId={portalId}
     containerId={containerId}
   >
     <WhatsThisContent config={config} />
-  </BifrostBottomSheet>
+  </BottomSheet>
 );
 
 export default WhatsThisBottomSheet;

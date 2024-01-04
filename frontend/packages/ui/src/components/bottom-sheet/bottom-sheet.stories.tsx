@@ -62,7 +62,6 @@ const Template: Story<BottomSheetProps> = ({
   children,
   onClose,
   open: initialOpen,
-  testID,
   title,
 }: BottomSheetProps) => {
   const [open, setOpen] = useState(initialOpen);
@@ -75,7 +74,6 @@ const Template: Story<BottomSheetProps> = ({
           onClose?.();
         }}
         open={open}
-        testID={testID}
         title={title}
       >
         <Typography variant="body-4">{children}</Typography>
@@ -95,7 +93,6 @@ Base.args = {
     console.log('close'); // eslint-disable-line no-console
   },
   open: false,
-  testID: 'bottom-sheet-test-id',
   title: 'Title',
 };
 
@@ -111,7 +108,6 @@ OnlyPrimary.args = {
 const LinkTemplate: Story<BottomSheetProps> = ({
   title,
   onClose,
-  testID,
   open: initialVisibility,
 }: BottomSheetProps) => {
   const [open, setOpen] = useState(initialVisibility);
@@ -124,7 +120,6 @@ const LinkTemplate: Story<BottomSheetProps> = ({
           setOpen(false);
           onClose?.();
         }}
-        testID={testID}
         open={open}
       >
         <Typography variant="body-4">Content</Typography>

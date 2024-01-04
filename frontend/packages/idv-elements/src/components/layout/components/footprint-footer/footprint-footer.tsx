@@ -4,6 +4,7 @@ import { media, Stack, Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import useResizeObserver from 'use-resize-observer';
 
+import { FOOTPRINT_FOOTER_ID } from '../../constants';
 import { useLayoutOptions } from '../layout-options-provider';
 import SecuredByFootprint from '../secured-by-footprint';
 import FooterActions from './components/footer-actions';
@@ -37,6 +38,7 @@ const FootprintFooter = ({
       isSticky={footerPosition === 'sticky'}
       isVisible={footerVisible}
       ref={ref}
+      id={FOOTPRINT_FOOTER_ID}
     >
       <SecuredByFootprint />
       <LinksContainer as="ul" align="center" justify="center" gap={3}>

@@ -12,18 +12,12 @@ import BottomSheet from './bottom-sheet';
 describe('<BottomSheet />', () => {
   const renderBottomSheet = ({
     open = true,
-    testID,
     onClose = () => {},
     title: headerTitle = 'title',
     children = 'content',
   }: Partial<BottomSheetProps>) =>
     customRender(
-      <BottomSheet
-        testID={testID}
-        open={open}
-        onClose={onClose}
-        title={headerTitle}
-      >
+      <BottomSheet open={open} onClose={onClose} title={headerTitle}>
         {children}
       </BottomSheet>,
     );
@@ -38,13 +32,6 @@ describe('<BottomSheet />', () => {
   });
 
   describe('when the bottom sheet is open', () => {
-    it('should assign a test id', async () => {
-      renderBottomSheet({ open: true, testID: 'bottom-sheet-test-id' });
-      await waitFor(() => {
-        expect(screen.getByTestId('bottom-sheet-test-id')).toBeInTheDocument();
-      });
-    });
-
     it('should show the title text', async () => {
       renderBottomSheet({ open: true, title: 'header' });
       await waitFor(() => {

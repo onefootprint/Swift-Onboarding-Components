@@ -1,121 +1,115 @@
-import { IcoClose24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import FocusTrap from 'focus-trap-react';
-import React, { useEffect, useRef, useState } from 'react';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import React, { useEffect, useRef } from 'react';
+import { keyframes } from 'styled-components';
 
-import { useOnClickOutside } from '../../hooks';
-import IconButton from '../icon-button';
+import { media } from '../../utils';
 import Overlay from '../overlay';
 import ScrollArea from '../scroll-area';
-import Stack from '../stack/stack';
-import Typography from '../typography';
+import Stack from '../stack';
+import Header, { HEADER_HEIGHT } from './header';
 
 export type BottomSheetProps = {
   open: boolean;
   onClose?: () => void;
   children: React.ReactNode;
   title?: string;
-  testID?: string;
   closeAriaLabel?: string;
+  containerId?: string;
+  portalId?: string;
 };
 
-enum State {
-  open = 'open',
-  opening = 'opening',
-  closed = 'closed',
-  closing = 'closing',
-}
-
-const OPEN_CLOSE_DELAY = 200;
-
 const BottomSheet = ({
-  open,
+  open = false,
   onClose,
   children,
   title,
   closeAriaLabel = 'Close',
-  testID,
+  containerId,
+  portalId = 'footprint-footer',
 }: BottomSheetProps) => {
-  const bottomSheetRef = useRef<HTMLDivElement>(null);
-  useOnClickOutside(bottomSheetRef, () => {
-    if (open) {
-      onClose?.();
-    }
-  });
+  const portalRef = useRef<HTMLElement | null>(null);
+  const containerRef = useRef<HTMLElement | null>(null);
 
-  const [visibleState, setVisibleState] = useState<State>(State.closed);
+  const PADDING_TOP = 40;
+  const containerHeight = containerRef.current?.clientHeight;
+  const componentMaxHeight = containerHeight
+    ? `${containerHeight - PADDING_TOP}px`
+    : undefined;
+  const scrollAreaMaxHeight = containerHeight
+    ? `${containerHeight - HEADER_HEIGHT - PADDING_TOP}px`
+    : undefined;
+
   useEffect(() => {
-    setVisibleState(open ? State.open : State.closed);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (portalId) {
+      portalRef.current = document.getElementById(portalId);
+    }
+  }, [portalId]);
 
-  // TODO: Move to react-transition-group
-  // https://linear.app/footprint/issue/FP-1516/add-react-transition-group
   useEffect(() => {
-    if (visibleState === State.opening || visibleState === State.closing) {
-      return;
+    if (containerId) {
+      containerRef.current = document.getElementById(containerId);
     }
+  }, [containerId]);
 
-    if (visibleState === State.open && !open) {
-      setVisibleState(State.closing);
-      setTimeout(() => {
-        setVisibleState(State.closed);
-      }, OPEN_CLOSE_DELAY);
-      return;
+  useEffect(() => {
+    if (open === true) {
+      document.body.style.pointerEvents = 'auto';
     }
-
-    if (visibleState === State.closed && open) {
-      setVisibleState(State.opening);
-      setTimeout(() => {
-        setVisibleState(State.open);
-      }, OPEN_CLOSE_DELAY);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
-    e.stopPropagation();
-  };
-
-  return visibleState === State.closed ? null : (
-    <FocusTrap active={open}>
-      <span>
-        <Sheet
-          onClick={handleClick}
-          className={visibleState}
-          role="dialog"
-          data-testid={testID}
-          ref={bottomSheetRef}
-          direction="column"
-        >
-          <Header hasBorder={!!title} flexGrow={0}>
-            <CloseContainer onClick={onClose}>
-              <IconButton aria-label={closeAriaLabel} onClick={onClose}>
-                <IcoClose24 />
-              </IconButton>
-            </CloseContainer>
-            {title && <Typography variant="label-2">{title}</Typography>}
-          </Header>
-          <Body>{children}</Body>
-        </Sheet>
-        <Overlay aria-modal isVisible={open} />
-      </span>
-    </FocusTrap>
+  return (
+    <DialogPrimitive.Root open={open} onOpenChange={onClose}>
+      <DialogPrimitive.Portal container={portalRef.current || undefined}>
+        <Content role="dialog" onPointerDownOutside={onClose}>
+          <Stack maxHeight={componentMaxHeight} direction="column">
+            <Header
+              closeAriaLabel={closeAriaLabel}
+              onClose={onClose}
+              title={title}
+            />
+            <ScrollArea
+              hideBottomLine
+              sx={{
+                padding: 5,
+              }}
+              maxHeight={scrollAreaMaxHeight}
+            >
+              {children}
+            </ScrollArea>
+          </Stack>
+        </Content>
+        <DialogPrimitive.Overlay asChild>
+          <Overlay isVisible={open} />
+        </DialogPrimitive.Overlay>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   );
 };
 
-const CloseContainer = styled.div`
-  ${({ theme }) => css`
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: ${theme.spacing[5]};
-  `}
+const slideIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 `;
 
-const Sheet = styled(Stack)<{
-  customBottom?: string;
-}>`
+const slideOut = keyframes`
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+`;
+
+const Content = styled(DialogPrimitive.Content)`
   ${({ theme }) => css`
     position: fixed;
     left: 0;
@@ -125,38 +119,18 @@ const Sheet = styled(Stack)<{
     border-radius: ${theme.borderRadius.large} ${theme.borderRadius.large} 0 0;
     z-index: ${theme.zIndex.bottomSheet};
     align-self: end;
-    transition: all 0.2s linear;
 
-    &.open {
-      translateY(0%);
+    &[data-state='open'] {
+      animation: ${slideIn} 0.3s ease-in-out;
     }
 
-    &.opening,
-    &.closing {
-      transform: translateY(100%);
+    &[data-state='closed'] {
+      animation: ${slideOut} 0.35s ease-in-out;
     }
-  `}
-`;
 
-const Header = styled(Stack)<{ hasBorder: boolean }>`
-  ${({ theme, hasBorder }) => css`
-    height: 52px;
-    padding: ${theme.spacing[5]};
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-
-    ${hasBorder &&
-    css`
-      border-bottom: 1px solid ${theme.borderColor.tertiary};
+    ${media.greaterThan('md')`
+      position: absolute;
     `}
-  `}
-`;
-
-const Body = styled(ScrollArea)`
-  ${({ theme }) => css`
-    padding: ${theme.spacing[5]};
   `}
 `;
 

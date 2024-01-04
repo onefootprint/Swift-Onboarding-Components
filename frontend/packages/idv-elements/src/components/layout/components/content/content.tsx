@@ -94,8 +94,8 @@ const Content = ({ children, isSandbox, config }: ContentProps) => {
       <WhatsThisBottomSheet
         open={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
-        containerId={LAYOUT_CONTAINER_ID}
         config={config}
+        containerId={LAYOUT_CONTAINER_ID}
       />
       <FootprintFooter
         hideOnDesktop={hideDesktopFooter}
