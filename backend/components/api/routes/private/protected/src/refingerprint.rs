@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::{ProtectedAuth, State};
 use actix_web::{post, web, web::Json};
 use api_core::{
-    errors::{ApiResult, AssertionError, DryRunResult, DryRunResultTrait, ValidationError},
+    errors::{ApiResult, DryRunResult, DryRunResultTrait, ValidationError},
     types::{JsonApiResponse, ResponseData},
 };
 use db::{
@@ -203,10 +203,9 @@ fn get_dls_to_refingerprint(
             let fps = fps.remove(&dl.id).unwrap_or_default();
             // Check if this DL is missing a tenant-scoped or global fingerprint. If so, create it
             let di = &dl.kind;
-            let (sv, vault) = svs
-                .get(&dl.scoped_vault_id)
-                .ok_or(AssertionError("No SV found"))?
-                .clone();
+            let Some((sv, vault)) = svs.get(&dl.scoped_vault_id).cloned() else {
+                return Ok(None);
+            };
             let missing_fps = vec![
                 (FingerprintScopeKind::Tenant, di.is_fingerprintable()),
                 (FingerprintScopeKind::Global, di.is_globally_fingerprintable()),
