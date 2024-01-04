@@ -1,6 +1,6 @@
 {
   "name": "views_getting_started",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "dependencies": {
     "@airplane/views": "2.1.13",
