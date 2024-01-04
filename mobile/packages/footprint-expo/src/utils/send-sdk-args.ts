@@ -17,61 +17,37 @@ type SendSdkArgsResponse = {
   expires_at: string;
 };
 
-const request = (args: unknown) =>
+const sendSdkArgsRecursive = async (
+  payload: SendSdkArgsRequest,
+  numRetries: number,
+): Promise<SendSdkArgsResponse> =>
   fetch(`${API_BASE_URL}/org/sdk_args`, {
     method: 'POST',
     headers: {
       'x-fp-client-version': `${SDK_NAME} ${SDK_VERSION}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(args),
+    body: JSON.stringify(payload),
+  }).then(response => {
+    if (response.ok) {
+      return response.json();
+    }
+    if (numRetries > 0) {
+      return sendSdkArgsRecursive(payload, numRetries - 1);
+    }
+    return undefined;
   });
 
-const sendSdkArgsRecursive = async (
-  payload: SendSdkArgsRequest,
-  numRetries: number,
-  onError: (error: string) => void,
-): Promise<SendSdkArgsResponse> =>
-  request(payload)
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      if (numRetries > 0) {
-        return sendSdkArgsRecursive(payload, numRetries - 1, onError);
-      }
-      throw new Error(response.statusText);
-    })
-    .catch(error => onError(error.message));
-
-const sendSdkArgs = async (
-  data: SendSdkArgsRequest['data'],
-  onError: (error: string) => void,
-) => {
-  const { publicKey, authToken, userData, options, l10n } = data;
-
+const sendSdkArgs = async (data: SendSdkArgsRequest['data']) => {
   const result = await sendSdkArgsRecursive(
     {
       kind: 'verify_v1',
-      data: transformKeys({
-        publicKey,
-        authToken,
-        userData,
-        options,
-        l10n,
-      }),
+      data: transformKeys(data),
     },
     NUM_RETRIES,
-    onError,
   );
 
-  if (!result) {
-    onError(
-      'Could not save SDK args, this could be due to connectivity problems.',
-    );
-    return undefined;
-  }
-  return result.token;
+  return result ? result.token : undefined;
 };
 
 export default sendSdkArgs;

@@ -1,8 +1,9 @@
-import { FootprintVerifyProps } from 'src/footprint.types';
-import sendSdkTelemetry from './send-sdk-telemetry';
 import * as Linking from 'expo-linking';
+import type { FootprintVerifyProps } from 'src/footprint.types';
 
-let debugMode = false; // Enable this for local development
+import sendSdkTelemetry from './send-sdk-telemetry';
+
+const debugMode = false; // Enable this for local development
 
 export const getStringMessage = (msg?: unknown | Error): string => {
   if (typeof msg === 'string') {
@@ -24,6 +25,7 @@ export const getStringMessage = (msg?: unknown | Error): string => {
 };
 
 const messagePrefix = '@onefootprint/footprint-js';
+
 export const logError = (props: FootprintVerifyProps, error: unknown) => {
   const errorMessage = getStringMessage(error);
   const errorMessageWithPrefix = `${messagePrefix}: ${errorMessage}`;
@@ -36,8 +38,7 @@ export const logError = (props: FootprintVerifyProps, error: unknown) => {
       props.redirectUrl ?? Linking.createURL('/'),
     );
   }
-
-  props.onError?.(errorMessage);
+  return errorMessageWithPrefix;
 };
 
 export const logWarn = (props: FootprintVerifyProps, error: unknown) => {
@@ -52,4 +53,5 @@ export const logWarn = (props: FootprintVerifyProps, error: unknown) => {
       props.redirectUrl ?? Linking.createURL('/'),
     );
   }
+  return warnMessageWithPrefix;
 };
