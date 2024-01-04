@@ -27,7 +27,10 @@ pub struct Vault {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub is_live: IsLive, // true IFF sandbox_id is null
-    /// True if the user can be found in /identify
+    /// TODO In the process of migrating this
+    /// True if the user is considered a PID.
+    /// This is used in airplane metrics to report how many PIDs we have. Be very careful when
+    /// changing the meaning of this.
     pub is_portable: bool,
     pub kind: VaultKind,
     /// A subset of the sandbox, non-is-live users are "fixture" users created specifically with
@@ -44,6 +47,9 @@ pub struct Vault {
     /// True if the vault has been OTP verified through the identify flow
     pub is_verified: bool,
     pub created_at: DateTime<Utc>,
+    /// True if the user can be found in /identify
+    /// TODO not reading this yet
+    pub is_identifiable: Option<bool>,
 }
 
 pub enum VaultIdentifier<'a> {
@@ -205,6 +211,8 @@ impl Vault {
             // All vaults start as is_verified = false, marked as verified after succesful identify
             // flow
             is_verified: false,
+            // Only identifiable if created via bifrost
+            is_identifiable: !is_created_via_api,
             created_at: Utc::now(),
         };
 
@@ -236,7 +244,13 @@ impl Vault {
     pub fn mark_portable(conn: &mut TxnPgConn, id: &VaultId) -> DbResult<()> {
         diesel::update(vault::table)
             .filter(vault::id.eq(id))
-            .set(vault::is_portable.eq(true))
+            .set((
+                vault::is_portable.eq(true),
+                // When a vault becomes portable, it also becomes identifiable.
+                // This has the effect of allowing vaults initially created via API to now be
+                // identifiable when they become a PID
+                vault::is_identifiable.eq(true),
+            ))
             .execute(conn.conn())?;
         Ok(())
     }
@@ -407,6 +421,7 @@ struct NewVaultRow {
     is_created_via_api: bool,
     is_verified: bool,
     created_at: DateTime<Utc>,
+    is_identifiable: bool,
 }
 
 pub struct NewVaultArgs {

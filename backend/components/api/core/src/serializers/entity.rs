@@ -89,6 +89,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
 
         let Vault {
             is_portable,
+            is_identifiable,
             kind,
             sandbox_id,
             is_created_via_api,
@@ -123,6 +124,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             id: fp_id,
             sandbox_id,
             is_portable,
+            is_identifiable: is_identifiable.unwrap_or_default(),
             kind,
             start_timestamp,
             last_activity_at,

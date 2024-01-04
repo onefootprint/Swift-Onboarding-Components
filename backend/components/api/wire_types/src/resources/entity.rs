@@ -19,6 +19,7 @@ pub struct Entity {
     pub id: FpId,
     pub sandbox_id: Option<SandboxId>,
     pub is_portable: bool,
+    pub is_identifiable: bool,
     /// The kind of entity: Person or Business
     pub kind: VaultKind,
     pub start_timestamp: DateTime<Utc>,

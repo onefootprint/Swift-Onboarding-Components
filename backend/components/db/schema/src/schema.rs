@@ -1045,6 +1045,7 @@ table! {
         is_created_via_api -> Bool,
         is_verified -> Bool,
         created_at -> Timestamptz,
+        is_identifiable -> Nullable<Bool>,
     }
 }
 
