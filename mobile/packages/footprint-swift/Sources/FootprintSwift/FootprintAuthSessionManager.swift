@@ -14,8 +14,7 @@ class FootprintAuthSessionManager: NSObject, ASWebAuthenticationPresentationCont
     }
     
     private func getURL(token: String) throws -> URL {
-        let bifrostBaseUrl = "https://id.onefootprint.com"
-        var urlComponents = URLComponents(string: bifrostBaseUrl)!
+        var urlComponents = URLComponents(string: FootprintSdkMetadata.bifrostBaseUrl)!
         var queryItems: [URLQueryItem] = []
         queryItems.append(URLQueryItem(name: "redirect_url", value: self.getDeepLink()))
         

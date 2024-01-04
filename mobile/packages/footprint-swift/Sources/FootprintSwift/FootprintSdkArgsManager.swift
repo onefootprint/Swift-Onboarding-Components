@@ -11,14 +11,11 @@ public class FootprintSdkArgsManager {
     }
     
     public func sendArgs() async throws -> String {
-        let SDK_VERSION = "1.0.0"
-        let apiUrl = "https://api.onefootprint.com/org/sdk_args"
-        
         let token = Task { () -> String? in
             do {
-                var request = URLRequest(url: URL(string: apiUrl)!)
+                var request = URLRequest(url: URL(string: "\(FootprintSdkMetadata.apiBaseUrl)/org/sdk_args")!)
                 request.httpMethod = "POST"
-                request.setValue("footprint-swift verify \(SDK_VERSION)", forHTTPHeaderField: "x-fp-client-version")
+                request.setValue("\(FootprintSdkMetadata.name) \(FootprintSdkMetadata.version)", forHTTPHeaderField: "x-fp-client-version")
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 
                 let encoder = JSONEncoder()

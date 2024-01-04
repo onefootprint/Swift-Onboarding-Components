@@ -58,7 +58,7 @@ class FootprintSdkArgsManager(private val config: FootprintConfiguration) {
         )
         return Request.Builder()
             .url("${FootprintSdkMetadata.apiBaseUrl}/org/sdk_args")
-            .header("x-fp-client-version", "${FootprintSdkMetadata.name} ${FootprintSdkMetadata.kind} ${FootprintSdkMetadata.version}")
+            .header("x-fp-client-version", "${FootprintSdkMetadata.name} ${FootprintSdkMetadata.version}")
             .header("Content-Type", "application/json")
             .post(Json.encodeToString(requestBody).toRequestBody())
             .build()
