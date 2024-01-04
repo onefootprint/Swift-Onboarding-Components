@@ -496,7 +496,7 @@ pub async fn post(
 
     let actor = auth.actor().into();
     let ff_client = state.feature_flag_client.clone();
-    let obc = state
+    let (obc, actor) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let skip_kyb = false;
@@ -530,13 +530,13 @@ pub async fn post(
                 Err(err) => tracing::error!(?err, "Error saving default rules for Playbook"),
             }
 
-            let obc = db::actor::saturate_actor_nullable(conn, obc)?;
-            Ok(obc)
+            let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
+            Ok((obc, actor))
         })
         .await?;
 
     Ok(Json(ResponseData::ok(
-        api_wire_types::OnboardingConfiguration::from_db(obc),
+        api_wire_types::OnboardingConfiguration::from_db((obc, actor, state.feature_flag_client.clone())),
     )))
 }
 

@@ -24,6 +24,7 @@ pub struct OnboardingConfiguration {
     pub enhanced_aml: EnhancedAml,
     pub doc_scan_for_optional_ssn: Option<CollectedDataOption>,
     pub kind: ObConfigurationKind,
+    pub is_rules_enabled: bool,
 }
 
 /// The public onboarding configuration

@@ -88,8 +88,20 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
     }
 }
 
-impl DbToApi<(ObConfiguration, Option<SaturatedActor>)> for api_wire_types::OnboardingConfiguration {
-    fn from_db((ob_config, author): (ObConfiguration, Option<SaturatedActor>)) -> Self {
+impl
+    DbToApi<(
+        ObConfiguration,
+        Option<SaturatedActor>,
+        Arc<dyn FeatureFlagClient>,
+    )> for api_wire_types::OnboardingConfiguration
+{
+    fn from_db(
+        (ob_config, author, ff_client): (
+            ObConfiguration,
+            Option<SaturatedActor>,
+            Arc<dyn FeatureFlagClient>,
+        ),
+    ) -> Self {
         let ObConfiguration {
             id,
             key,
@@ -110,8 +122,12 @@ impl DbToApi<(ObConfiguration, Option<SaturatedActor>)> for api_wire_types::Onbo
             allow_us_territory_residents,
             doc_scan_for_optional_ssn,
             kind,
+            tenant_id,
             ..
         } = ob_config;
+
+        let is_rules_enabled = ff_client.flag(BoolFlag::IsRulesProductEnabled(&tenant_id));
+
         Self {
             id,
             key,
@@ -133,6 +149,7 @@ impl DbToApi<(ObConfiguration, Option<SaturatedActor>)> for api_wire_types::Onbo
             allow_us_territory_residents,
             doc_scan_for_optional_ssn,
             kind,
+            is_rules_enabled,
         }
     }
 }

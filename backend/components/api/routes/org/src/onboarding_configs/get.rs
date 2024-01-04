@@ -50,7 +50,9 @@ async fn get_list(
 
     let results = results
         .into_iter()
-        .map(api_wire_types::OnboardingConfiguration::from_db)
+        .map(|(obc, actor)| {
+            api_wire_types::OnboardingConfiguration::from_db((obc, actor, state.feature_flag_client.clone()))
+        })
         .collect::<Vec<_>>();
     Ok(Json(OffsetPaginatedResponse::ok(results, next_page, count)))
 }
@@ -70,15 +72,16 @@ async fn get_detail(
     let is_live = auth.is_live()?;
     let ob_config_id = ob_config_id.into_inner();
 
-    let obc = state
+    let (obc, actor) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let (obc, _) = ObConfiguration::get(conn, (&ob_config_id, &tenant_id, is_live))?;
-            let obc = db::actor::saturate_actor_nullable(conn, obc)?;
-            Ok(obc)
+            let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
+            Ok((obc, actor))
         })
         .await??;
 
-    let result = api_wire_types::OnboardingConfiguration::from_db(obc);
+    let result =
+        api_wire_types::OnboardingConfiguration::from_db((obc, actor, state.feature_flag_client.clone()));
     ResponseData::ok(result).json()
 }

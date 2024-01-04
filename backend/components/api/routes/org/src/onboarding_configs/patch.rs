@@ -39,16 +39,16 @@ async fn patch(
     let UpdateObConfigPath { id } = path.into_inner();
     let UpdateObConfigRequest { name, status } = request.into_inner();
     let tenant_id = tenant.id.clone();
-    let result = state
+    let (obc, actor) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let obc = ObConfiguration::update(conn, &id, &tenant_id, is_live, name, status)?;
-            let obc = db::actor::saturate_actor_nullable(conn, obc)?;
-            Ok(obc)
+            let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
+            Ok((obc, actor))
         })
         .await?;
 
     Ok(Json(ResponseData::ok(
-        api_wire_types::OnboardingConfiguration::from_db(result),
+        api_wire_types::OnboardingConfiguration::from_db((obc, actor, state.feature_flag_client.clone())),
     )))
 }

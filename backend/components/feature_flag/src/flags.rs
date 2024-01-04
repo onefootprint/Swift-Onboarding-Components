@@ -76,6 +76,8 @@ pub enum BoolFlag<'a> {
     StepUpOnAmlHit(&'a ObConfigurationKey),
     #[strum(to_string = "UseBackupTwilioCredentials")]
     UseBackupTwilioCredentials(&'a str),
+    #[strum(to_string = "IsRulesProductEnabled")]
+    IsRulesProductEnabled(&'a TenantId),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -121,6 +123,7 @@ impl<'a> BoolFlag<'a> {
             Self::CreateKycWorkflowForAlpacaOnboardings(k) => Some(k.to_string()),
             Self::StepUpOnAmlHit(k) => Some(k.to_string()),
             Self::UseBackupTwilioCredentials(k) => Some(k.to_string()),
+            Self::IsRulesProductEnabled(k) => Some(k.to_string()),
         }
     }
 
@@ -162,6 +165,7 @@ impl<'a> BoolFlag<'a> {
             Self::CreateKycWorkflowForAlpacaOnboardings(_) => false,
             Self::StepUpOnAmlHit(_) => false,
             Self::UseBackupTwilioCredentials(_) => false,
+            Self::IsRulesProductEnabled(_) => false,
         }
     }
 }
