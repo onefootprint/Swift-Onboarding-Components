@@ -9,7 +9,6 @@ meta:
     title: 'Footprint Android Integration (Kotlin/Java)',
     description: 'Discover how to integrate Footprint with a Android (Kotlin/Java) Codebase',
   }
-hidden: true
 ---
 
 # FootprintAndroid package overview
@@ -24,13 +23,31 @@ If you're using older versions, please consider upgrading to ensure compatibilit
 
 ## Installation
 
-In order to use our SDK, you will need to add it as a dependency to your app gradle.
+In order to use our SDK, you will need to add it use Jitpack, which is a package repository for JVM and Android projects that builds Git projects on demand and provides you with ready-to-use artifacts (jar, aar).
+
+1. If you are using Gradle for your build system, add the following to your `build.gradle` file, at the end of the repositories:
 
 ```kotlin
-    dependencies {
-        implementation(<LINK>)
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
     }
+}
 ```
+
+2. Add the dependency like below:
+
+```kotlin
+dependencies {
+    implementation 'com.github.onefootprint:footprint-android:<VERSION>'
+}
+```
+
+You should replace `<VERSION>` with the version number, like `1.0.0`. We recommend always using the latest available version published.
+
+For instructions on how to install with different build systems (e.g. maven, sbt, leiningen), see [here](https://jitpack.io/#onefootprint/footprint-android)
 
 ## Integration
 
