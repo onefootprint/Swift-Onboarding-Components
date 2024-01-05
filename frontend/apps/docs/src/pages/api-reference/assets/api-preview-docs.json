@@ -7886,12 +7886,13 @@
                             "manual_review"
                         ]
                     },
-                    "onboarding_config_key": {
+                    "key": {
+                        "description": "The publishable key of the playbook onto which you would like this user to onboard.\n The playbook will specify required information and the rules by which to make a decision.",
                         "type": "string"
                     }
                 },
                 "required": [
-                    "onboarding_config_key"
+                    "key"
                 ]
             },
             "TriggerKycRequest": {
@@ -7906,12 +7907,13 @@
                             "manual_review"
                         ]
                     },
-                    "onboarding_config_key": {
+                    "key": {
+                        "description": "The publishable key of the playbook onto which you would like this user to onboard.\n The playbook will specify required information and the rules by which to make a decision.",
                         "type": "string"
                     }
                 },
                 "required": [
-                    "onboarding_config_key"
+                    "key"
                 ]
             },
             "UserLabel": {

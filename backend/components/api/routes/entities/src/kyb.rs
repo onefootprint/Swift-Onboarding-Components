@@ -7,7 +7,9 @@ use crate::State;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
+use api_core::errors::ValidationError;
 use api_core::task;
+use api_core::telemetry::RootSpan;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::requirements::GetRequirementsArgs;
@@ -23,6 +25,7 @@ use db::models::workflow::OnboardingWorkflowArgs;
 use db::models::workflow::Workflow;
 use db::DbError;
 use itertools::Itertools;
+use newtypes::ObConfigurationKind;
 use newtypes::OnboardingRequirement;
 use newtypes::VaultKind;
 use newtypes::WorkflowFixtureResult;
@@ -39,6 +42,7 @@ pub async fn post(
     fp_id: FpIdPath,
     request: web::Json<TriggerKybRequest>,
     auth: SecretTenantAuthContext,
+    root_span: RootSpan,
 ) -> JsonApiResponse<EntityValidateResponse> {
     let auth = auth.check_guard(TenantGuard::TriggerKyb)?;
     let tenant_id = auth.tenant().id.clone();
@@ -46,9 +50,18 @@ pub async fn post(
     let fp_id = fp_id.into_inner();
     let TriggerKybRequest {
         onboarding_config_key,
+        key,
         fixture_result,
     } = request.into_inner();
     let fixture_result = fixture_result.map(WorkflowFixtureResult::from);
+    // For backwards compatibility
+    match onboarding_config_key {
+        Some(_) => root_span.record("meta", "with_legacy_onboarding_key"),
+        None => root_span.record("meta", "with_modern_key"),
+    };
+    let key = key
+        .or(onboarding_config_key)
+        .ok_or(ValidationError("Missing required field key"))?;
 
     if fixture_result.is_some() && is_live {
         return Err(OnboardingError::CannotCreateFixtureResultForNonSandbox.into());
@@ -81,18 +94,10 @@ pub async fn post(
     let biz_wf = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let (obc, tenant) = ObConfiguration::get_enabled(conn, &onboarding_config_key)
-                .map_err(|_| DbError::ApiKeyNotFound)?;
-
-            if obc.is_live != is_live {
-                return Err(TenantError::UnsupportedObcForNpv(
-                    "Playbook and vault environment must match.".to_owned(),
-                )
-                .into());
-            }
-
-            if tenant.id != tenant_id {
-                Err(DbError::ApiKeyNotFound)?
+            let (obc, _) = ObConfiguration::get_enabled(conn, (&key, &tenant_id, is_live))
+                .map_err(|_| DbError::PlaybookNotFound)?;
+            if obc.kind != ObConfigurationKind::Kyb {
+                return Err(ValidationError("Must use playbook of kind KYB").into());
             }
 
             let unaccessable_cdos: Vec<_> = obc

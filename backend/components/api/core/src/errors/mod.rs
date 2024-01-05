@@ -250,7 +250,7 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::RelatedObjectNotFound => StatusCode::NOT_FOUND,
         DbError::CryptoError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::ApiKeyDisabled => StatusCode::UNAUTHORIZED,
-        DbError::ApiKeyNotFound => StatusCode::UNAUTHORIZED,
+        DbError::PlaybookNotFound => StatusCode::BAD_REQUEST,
         DbError::TenantUserDeactivated => StatusCode::UNAUTHORIZED,
         DbError::TenantRoleMismatch => StatusCode::UNAUTHORIZED,
         DbError::TenantRoleAlreadyExists => StatusCode::BAD_REQUEST,

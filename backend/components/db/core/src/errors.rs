@@ -39,8 +39,8 @@ pub enum DbError {
     ObjectNotFound,
     #[error("This API key is disabled")]
     ApiKeyDisabled,
-    #[error("Onboarding config not found with this key")]
-    ApiKeyNotFound,
+    #[error("Playbook not found with this key. Make sure your credentials are for the correct environment.")]
+    PlaybookNotFound,
     #[error("User is deactivated. Please contact your administor for assistance.")]
     TenantUserDeactivated,
     #[error("User with this email already exists.")]
