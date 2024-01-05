@@ -1405,53 +1405,6 @@
                 ]
             }
         },
-        "/entities/{fp_id}/kyc": {
-            "post": {
-                "tags": [
-                    "Entities",
-                    "Private"
-                ],
-                "description": "Trigger KYC on the provided user.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "fp_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/TriggerKycRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/EntityValidateResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Secret API Key": []
-                    }
-                ]
-            }
-        },
         "/entities/{fp_id}/liveness": {
             "get": {
                 "tags": [
@@ -9365,31 +9318,6 @@
                     "ordering_id",
                     "requires_manual_review",
                     "start_timestamp"
-                ]
-            },
-            "EntityValidateResponse": {
-                "type": "object",
-                "properties": {
-                    "fp_id": {
-                        "type": "string"
-                    },
-                    "requires_manual_review": {
-                        "type": "boolean"
-                    },
-                    "status": {
-                        "type": "string",
-                        "enum": [
-                            "pass",
-                            "fail",
-                            "incomplete",
-                            "pending"
-                        ]
-                    }
-                },
-                "required": [
-                    "fp_id",
-                    "requires_manual_review",
-                    "status"
                 ]
             },
             "GetClientTokenResponse": {
@@ -19107,27 +19035,6 @@
                     "name",
                     "role",
                     "status"
-                ]
-            },
-            "TriggerKycRequest": {
-                "type": "object",
-                "properties": {
-                    "fixture_result": {
-                        "description": "(only valid for sandbox users) choose the desired KYC outcome",
-                        "type": "string",
-                        "enum": [
-                            "fail",
-                            "pass",
-                            "manual_review"
-                        ]
-                    },
-                    "key": {
-                        "description": "The publishable key of the playbook onto which you would like this user to onboard.\n The playbook will specify required information and the rules by which to make a decision.",
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "key"
                 ]
             },
             "TriggerLinkResponse": {

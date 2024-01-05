@@ -21,7 +21,6 @@ mod vault;
 pub fn routes(config: &mut web::ServiceConfig) {
     vault::routes(config);
     client_token::post::configure_post_aliases(config);
-    kyc::configure_post_aliases(config);
     config
         .service(client_token::post::post)
         .service(client_token::get::get)

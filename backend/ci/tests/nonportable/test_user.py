@@ -108,7 +108,7 @@ def test_kyc(
 
     # run KYC
     body = post(
-        f"entities/{fp_id}/kyc",
+        f"users/{fp_id}/kyc",
         dict(onboarding_config_key=obc.key.value),
         sandbox_tenant.sk.key,
         status_code=200 if expected_error is None else 400,

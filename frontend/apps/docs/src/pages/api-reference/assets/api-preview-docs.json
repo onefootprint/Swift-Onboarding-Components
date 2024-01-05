@@ -7887,7 +7887,7 @@
                         ]
                     },
                     "key": {
-                        "description": "The publishable key of the playbook onto which you would like this user to onboard.\n The playbook will specify required information and the rules by which to make a decision.",
+                        "description": "The publishable key of the playbook onto which you would like this business to onboard.\n The playbook will specify required information and the rules by which to make a KYB decision.",
                         "type": "string"
                     }
                 },
@@ -7908,7 +7908,7 @@
                         ]
                     },
                     "key": {
-                        "description": "The publishable key of the playbook onto which you would like this user to onboard.\n The playbook will specify required information and the rules by which to make a decision.",
+                        "description": "The publishable key of the playbook onto which you would like this user to onboard.\n The playbook will specify required information and the rules by which to make a KYC decision.",
                         "type": "string"
                     }
                 },

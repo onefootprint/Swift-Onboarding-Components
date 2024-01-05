@@ -34,7 +34,6 @@ use db::models::workflow::Workflow;
 use db::models::workflow::WorkflowUpdate;
 use db::DbError;
 use itertools::Itertools;
-use macros::route_alias;
 use newtypes::DataIdentifierDiscriminant as DID;
 use newtypes::ObConfigurationKind;
 use newtypes::OnboardingRequirement;
@@ -42,14 +41,8 @@ use newtypes::VaultKind;
 use newtypes::WorkflowSource;
 use paperclip::actix::{api_v2_operation, post, web};
 
-#[route_alias(post(
-    "/users/{fp_id}/kyc",
-    tags(Users, Preview),
-    description = "Trigger KYC on the provided user.",
-))]
-// TODO remove entities path eventually when nobody is using it
-#[api_v2_operation(description = "Trigger KYC on the provided user.", tags(Entities, Private))]
-#[post("/entities/{fp_id}/kyc")]
+#[api_v2_operation(description = "Trigger KYC on the provided user.", tags(Users, Preview))]
+#[post("/users/{fp_id}/kyc")]
 pub async fn post(
     state: web::Data<State>,
     fp_id: FpIdPath,
