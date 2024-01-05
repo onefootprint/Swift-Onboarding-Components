@@ -563,7 +563,7 @@ impl FlexIdResponse {
                     })
                     .collect()
             })
-            .unwrap_or(vec![])
+            .unwrap_or_default()
     }
 }
 
@@ -817,14 +817,14 @@ mod tests {
         }))
         .unwrap();
         let lexis::Error::ResponseError(e) = parsed.validate().unwrap_err() else {
-              panic!();
-          };
+            panic!();
+        };
         assert!(matches!(e, ResponseError::ErrorResponse(_)));
 
         let parsed = lexis::parse_response(serde_json::json!({})).unwrap();
         let lexis::Error::ResponseError(e) = parsed.validate().unwrap_err() else {
-                panic!();
-            };
+            panic!();
+        };
         assert!(matches!(e, ResponseError::MissingResult(_)));
     }
 }
