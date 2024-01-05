@@ -2,10 +2,10 @@ import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 
 import type { FootprintVerifyProps } from './footprint.types';
+import type { SessionResult } from './types';
 import createUrl from './utils/create-url';
 import { logError, logWarn } from './utils/logger';
 import sendSdkArgs from './utils/send-sdk-args';
-import type { SessionResult } from './types';
 
 const footprint = () => {
   let isOpen = false;

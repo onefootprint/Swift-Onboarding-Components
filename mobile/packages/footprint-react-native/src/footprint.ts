@@ -3,10 +3,10 @@ import { Platform } from 'react-native';
 import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 
 import type { FootprintVerifyProps } from './footprint.types';
+import type { SessionResult } from './types';
 import createUrl from './utils/create-url';
 import { logError, logWarn } from './utils/logger';
 import sendSdkArgs from './utils/send-sdk-args';
-import type { SessionResult } from './types';
 
 const getDeepLink = () => {
   const scheme = 'footprint';
