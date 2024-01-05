@@ -24,7 +24,7 @@ export const getStringMessage = (msg?: unknown | Error): string => {
   return 'Something went wrong';
 };
 
-const messagePrefix = '@onefootprint/footprint-js';
+const messagePrefix = '@onefootprint/footprint-expo';
 
 export const logError = (props: FootprintVerifyProps, error: unknown) => {
   const errorMessage = getStringMessage(error);

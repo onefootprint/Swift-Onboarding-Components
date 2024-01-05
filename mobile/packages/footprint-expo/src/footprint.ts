@@ -5,28 +5,11 @@ import type { FootprintVerifyProps } from './footprint.types';
 import createUrl from './utils/create-url';
 import { logError, logWarn } from './utils/logger';
 import sendSdkArgs from './utils/send-sdk-args';
-
-type SessionCompleteResult = {
-  kind: 'complete';
-  validationToken: string;
-};
-
-type SessionCanceledResult = {
-  kind: 'cancel';
-};
-
-type SessionErroredResult = {
-  kind: 'error';
-  error: string;
-};
-
-type SessionResult =
-  | SessionCompleteResult
-  | SessionCanceledResult
-  | SessionErroredResult;
+import type { SessionResult } from './types';
 
 const footprint = () => {
   let isOpen = false;
+  WebBrowser.warmUpAsync(); // Async, can be called multiple times. Speeds up android implementation.
 
   const open = async (props: FootprintVerifyProps) => {
     if (isOpen) {
@@ -64,13 +47,16 @@ const footprint = () => {
 
     try {
       const result = await startBrowserSession(props, token);
-      if (!isUpdateHandled) {
-        if (result.type !== 'success') {
-          // Triggered if user closes the web browser
-          handleBrowserSessionEnd(props, { kind: 'cancel' });
-        } else {
-          handleBrowserUrlChange(props, result.url);
-        }
+      if (isUpdateHandled) {
+        subscription.remove();
+        return;
+      }
+
+      if (result.type !== 'success') {
+        // Triggered if user closes the web browser
+        handleBrowserSessionEnd(props, { kind: 'cancel' });
+      } else {
+        handleBrowserUrlChange(props, result.url);
       }
     } catch (error) {
       handleBrowserSessionEnd(props, { kind: 'error', error: `${error}` });

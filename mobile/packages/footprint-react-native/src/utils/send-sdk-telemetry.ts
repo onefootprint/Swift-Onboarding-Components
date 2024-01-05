@@ -12,13 +12,17 @@ type SdkTelemetryRequest = {
   sessionId?: string;
 };
 
-const sendSdkTelemetry = (message: string) => {
+const sendSdkTelemetry = (
+  message: string,
+  level: 'error' | 'warn',
+  domain?: string,
+) => {
   const body: SdkTelemetryRequest = {
-    tenantDomain: 'domain',
+    tenantDomain: domain,
     sdkKind: SDK_KIND,
     sdkName: SDK_NAME,
     sdkVersion: version,
-    logLevel: 'error',
+    logLevel: level,
     logMessage: message,
   };
   // Fire and forget. No need to await or handle the response.

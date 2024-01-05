@@ -1,5 +1,8 @@
-import { FootprintVerifyProps } from 'src/footprint.types';
+import { Linking } from 'react-native';
+
 import sendSdkTelemetry from './send-sdk-telemetry';
+
+const debugMode = false; // Enable this for local development
 
 export const getStringMessage = (msg?: unknown | Error): string => {
   if (typeof msg === 'string') {
@@ -20,18 +23,42 @@ export const getStringMessage = (msg?: unknown | Error): string => {
   return 'Something went wrong';
 };
 
-const logError = (props: FootprintVerifyProps, error: unknown) => {
-  let debugMode = false; // Enable this for local development
+const messagePrefix = '@onefootprint/footprint-react-native';
 
+export const logError = (error: unknown) => {
   const errorMessage = getStringMessage(error);
-  const errorMessageWithPrefix = `@onefootprint/footprint-js: ${errorMessage}`;
+  const errorMessageWithPrefix = `${messagePrefix}: ${errorMessage}`;
   if (debugMode) {
     console.error(errorMessageWithPrefix);
   } else {
-    sendSdkTelemetry(errorMessage);
+    Linking.getInitialURL()
+      .then(tenantDomain => {
+        sendSdkTelemetry(errorMessage, 'error', tenantDomain ?? '');
+      })
+      .catch(() => {
+        // Ignore any errors and send without tenant domain
+        sendSdkTelemetry(errorMessage, 'error');
+      });
   }
 
-  props.onError?.(errorMessage);
+  return errorMessageWithPrefix;
 };
 
-export default logError;
+export const logWarn = (error: unknown) => {
+  const warnMessage = getStringMessage(error);
+  const warnMessageWithPrefix = `${messagePrefix}: ${warnMessage}`;
+  if (debugMode) {
+    console.warn(warnMessageWithPrefix);
+  } else {
+    Linking.getInitialURL()
+      .then(tenantDomain => {
+        sendSdkTelemetry(warnMessage, 'warn', tenantDomain ?? '');
+      })
+      .catch(() => {
+        // Ignore any errors and send without tenant domain
+        sendSdkTelemetry(warnMessage, 'warn');
+      });
+  }
+
+  return warnMessageWithPrefix;
+};
