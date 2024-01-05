@@ -23,7 +23,7 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
         onboarding_decision_verification_result_junction, risk_signal, risk_signal_group, scoped_vault,
         socure_device_session, stytch_fingerprint_event, user_consent, user_timeline, vault, vault_data,
         verification_request, verification_result, watchlist_check, webauthn_credential, workflow,
-        workflow_event,
+        workflow_event, workflow_request,
     };
     let mut deleted_rows = 0;
 
@@ -163,20 +163,26 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
             .filter(decision_intent::scoped_vault_id.eq_any(su_ids.clone()))
             .execute(conn.conn())?;
 
-        // Rule results
-        let rule_set_result_ids = rule_set_result::table
-            .filter(rule_set_result::scoped_vault_id.eq_any(su_ids.clone()))
-            .select(rule_set_result::id);
+        deleted_rows += diesel::delete(workflow_request::table)
+            .filter(workflow_request::scoped_vault_id.eq_any(su_ids.clone()))
+            .execute(conn.conn())?;
 
-        deleted_rows += diesel::delete(rule_result::table)
-            .filter(rule_result::rule_set_result_id.eq_any(rule_set_result_ids.clone()))
-            .execute(conn.conn())?;
-        deleted_rows += diesel::delete(rule_set_result_risk_signal_junction::table)
-            .filter(rule_set_result_risk_signal_junction::rule_set_result_id.eq_any(rule_set_result_ids))
-            .execute(conn.conn())?;
-        deleted_rows += diesel::delete(rule_set_result::table)
-            .filter(rule_set_result::scoped_vault_id.eq_any(su_ids.clone()))
-            .execute(conn.conn())?;
+        // Rule results
+        {
+            let rule_set_result_ids = rule_set_result::table
+                .filter(rule_set_result::scoped_vault_id.eq_any(su_ids.clone()))
+                .select(rule_set_result::id);
+
+            deleted_rows += diesel::delete(rule_result::table)
+                .filter(rule_result::rule_set_result_id.eq_any(rule_set_result_ids.clone()))
+                .execute(conn.conn())?;
+            deleted_rows += diesel::delete(rule_set_result_risk_signal_junction::table)
+                .filter(rule_set_result_risk_signal_junction::rule_set_result_id.eq_any(rule_set_result_ids))
+                .execute(conn.conn())?;
+            deleted_rows += diesel::delete(rule_set_result::table)
+                .filter(rule_set_result::scoped_vault_id.eq_any(su_ids.clone()))
+                .execute(conn.conn())?;
+        }
 
         // Verification requests
         {
