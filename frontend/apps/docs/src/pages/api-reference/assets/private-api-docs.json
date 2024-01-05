@@ -3422,6 +3422,125 @@
                 ]
             }
         },
+        "/org/frequent_notes": {
+            "get": {
+                "tags": [
+                    "OrgSettings",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Returns a list of frequent notes for the organization.",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "kind",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "manual_review",
+                                "annotation",
+                                "trigger"
+                            ]
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/OrgFrequentNote"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "OrgSettings",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Creates a new frequent note for the organization.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateOrgFrequentNoteRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrgFrequentNote"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
+        "/org/frequent_notes/{frequent_note_id}": {
+            "delete": {
+                "tags": [
+                    "OrgSettings",
+                    "Organization",
+                    "Private"
+                ],
+                "description": "Delete a frequent note for the organization.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "frequent_note_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/org/logo": {
             "put": {
                 "tags": [
@@ -6502,6 +6621,26 @@
                     "skip_kyc"
                 ]
             },
+            "CreateOrgFrequentNoteRequest": {
+                "type": "object",
+                "properties": {
+                    "content": {
+                        "type": "string"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "manual_review",
+                            "annotation",
+                            "trigger"
+                        ]
+                    }
+                },
+                "required": [
+                    "content",
+                    "kind"
+                ]
+            },
             "CreateProxyConfigRequest": {
                 "description": "Create a new proxy configuration",
                 "type": "object",
@@ -8844,6 +8983,9 @@
                     "is_created_via_api": {
                         "type": "boolean"
                     },
+                    "is_identifiable": {
+                        "type": "boolean"
+                    },
                     "is_portable": {
                         "type": "boolean"
                     },
@@ -9216,6 +9358,7 @@
                     "has_outstanding_workflow_request",
                     "id",
                     "is_created_via_api",
+                    "is_identifiable",
                     "is_portable",
                     "kind",
                     "last_activity_at",
@@ -15461,6 +15604,9 @@
                                 "is_no_phone_flow": {
                                     "type": "boolean"
                                 },
+                                "is_rules_enabled": {
+                                    "type": "boolean"
+                                },
                                 "key": {
                                     "type": "string"
                                 },
@@ -15554,6 +15700,7 @@
                                 "is_doc_first_flow",
                                 "is_live",
                                 "is_no_phone_flow",
+                                "is_rules_enabled",
                                 "key",
                                 "kind",
                                 "must_collect_data",
@@ -16352,6 +16499,9 @@
                     "is_no_phone_flow": {
                         "type": "boolean"
                     },
+                    "is_rules_enabled": {
+                        "type": "boolean"
+                    },
                     "key": {
                         "type": "string"
                     },
@@ -16445,6 +16595,7 @@
                     "is_doc_first_flow",
                     "is_live",
                     "is_no_phone_flow",
+                    "is_rules_enabled",
                     "key",
                     "kind",
                     "must_collect_data",
@@ -16471,6 +16622,31 @@
                 "required": [
                     "allowed_origins",
                     "is_live"
+                ]
+            },
+            "OrgFrequentNote": {
+                "description": "Frequently used note for an Org",
+                "type": "object",
+                "properties": {
+                    "content": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "manual_review",
+                            "annotation",
+                            "trigger"
+                        ]
+                    }
+                },
+                "required": [
+                    "content",
+                    "id",
+                    "kind"
                 ]
             },
             "OrgLoginRequest": {
