@@ -26,8 +26,8 @@ pub struct Vault {
     pub public_key: VaultPublicKey,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub is_live: IsLive, // true IFF sandbox_id is null
-    /// TODO In the process of migrating this
+    /// True IFF sandbox_id is null
+    pub is_live: IsLive,
     /// True if the user is considered a PID.
     /// This is used in airplane metrics to report how many PIDs we have. Be very careful when
     /// changing the meaning of this.
@@ -205,8 +205,8 @@ impl Vault {
             idempotency_id: idempotency_id.clone(),
             sandbox_id,
             is_created_via_api,
-            // Vault isn't portable if it starts out created via API
-            is_portable: !is_created_via_api,
+            // Vaults start out as non-portable and are later marked as portable
+            is_portable: false,
             // All vaults start as is_verified = false, marked as verified after succesful identify
             // flow
             is_verified: false,
