@@ -1,47 +1,34 @@
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  getCanChallengeBiometrics,
-  StepHeader,
-} from '@onefootprint/idv-elements';
 import styled, { css } from '@onefootprint/styled';
 import { ChallengeKind } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
 import { useAuthMachine } from '../../state';
+import type { HeaderProps } from '../../types';
 import PinVerification from '../pin-verification';
 import { getFormTitle, getStepTitle } from './utils';
 
-type StepPhoneProps = { children?: JSX.Element | null };
+type StepPhoneProps = {
+  children?: JSX.Element | null;
+  Header: (props: HeaderProps) => JSX.Element;
+};
 
 const IS_TEST = typeof jest !== 'undefined';
 const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 100 : 1500;
 
-const StepSms = ({ children }: StepPhoneProps) => {
+const StepSms = ({ children, Header }: StepPhoneProps) => {
   const [state, send] = useAuthMachine();
   const {
-    bootstrapData,
-    config: { logoUrl, orgName },
-    challenge: { challengeData, hasSyncablePassKey, availableChallengeKinds },
-    device,
+    challenge: { challengeData },
     identify,
-    showLogo,
   } = state.context;
   const { phoneNumber = '', successfulIdentifier } = identify;
   const { t } = useTranslation('pages.auth');
   const toast = useToast();
 
-  const isBootstrap = !!(bootstrapData?.email || bootstrapData?.phoneNumber);
   const headerTitle = getStepTitle(t, identify);
   const formTitle = getFormTitle(t, challengeData, identify);
-
-  const shouldShowBack =
-    !isBootstrap ||
-    getCanChallengeBiometrics(
-      availableChallengeKinds,
-      hasSyncablePassKey,
-      device,
-    );
 
   const handleChallengeSucceed = (authToken: string) => {
     setTimeout(() => {
@@ -56,24 +43,9 @@ const StepSms = ({ children }: StepPhoneProps) => {
     });
   };
 
-  const handleBack = () => {
-    send({ type: 'navigatedToPrevPage' });
-  };
-
   return (
     <Container>
-      <StepHeader
-        data-private
-        leftButton={
-          shouldShowBack
-            ? { variant: 'back', onBack: handleBack }
-            : { variant: 'close' }
-        }
-        logoUrl={logoUrl ?? undefined}
-        orgName={orgName}
-        showLogo={showLogo}
-        title={headerTitle}
-      />
+      <Header data-private title={headerTitle} />
       <PinVerification
         identifier={successfulIdentifier ?? { phoneNumber }}
         onChallengeSucceed={handleChallengeSucceed}

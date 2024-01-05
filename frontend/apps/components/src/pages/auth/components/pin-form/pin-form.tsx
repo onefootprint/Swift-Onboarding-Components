@@ -72,7 +72,7 @@ const StyledForm = styled.form`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[8]};
+    gap: ${theme.spacing[7]};
     justify-content: center;
     align-items: center;
     text-align: center;

@@ -8,3 +8,5 @@ export const [AuthMachineProvider, useAuthMachine] = constate(
   ({ args }: { args: AuthMachineArgs }) =>
     useMachine(() => createAuthMachine(args)),
 );
+
+export type AuthMachineHook = ReturnType<typeof useAuthMachine>;

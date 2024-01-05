@@ -65,7 +65,7 @@ const ResendButton = ({
         disabled={resendClicked && countdown > 0}
         onClick={handleClick}
         size="compact"
-        sx={{ marginBottom: 2 }}
+        sx={{ marginBottom: 2, marginTop: 4 }}
       >
         {texts.resendCta}
       </LinkButton>

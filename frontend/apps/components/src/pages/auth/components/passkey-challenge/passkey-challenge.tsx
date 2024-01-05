@@ -1,26 +1,23 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoSmartphone24 } from '@onefootprint/icons';
-import { StepHeader } from '@onefootprint/idv-elements';
 import { Button, Stack } from '@onefootprint/ui';
 import React from 'react';
 
 import { useAuthMachine } from '../../state';
+import type { HeaderProps } from '../../types';
 import Biometric from '../biometric';
 
-type StepPassKeyProps = { children?: JSX.Element | null };
+type StepPassKeyProps = {
+  children?: JSX.Element | null;
+  Header: (props: HeaderProps) => JSX.Element;
+};
 
-const PasskeyChallenge = ({ children }: StepPassKeyProps) => {
+const PasskeyChallenge = ({ children, Header }: StepPassKeyProps) => {
   const { t } = useTranslation('pages.auth.passkey-challenge');
-  const [state, send] = useAuthMachine();
-  const { bootstrapData } = state.context;
-  const isBootstrap = !!(bootstrapData?.email || bootstrapData?.phoneNumber);
+  const [, send] = useAuthMachine();
 
   const handleChangeChallenge = () => {
     send({ type: 'changeChallengeToSms' });
-  };
-
-  const handleBack = () => {
-    send({ type: 'navigatedToPrevPage' });
   };
 
   return (
@@ -32,14 +29,7 @@ const PasskeyChallenge = ({ children }: StepPassKeyProps) => {
         justify="center"
         backgroundColor="primary"
       >
-        <StepHeader
-          title={t('title')}
-          leftButton={
-            !isBootstrap
-              ? { variant: 'back', onBack: handleBack }
-              : { variant: 'close' }
-          }
-        />
+        <Header title={t('title')} />
         <Stack
           align="center"
           direction="column"

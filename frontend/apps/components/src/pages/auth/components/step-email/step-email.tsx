@@ -1,22 +1,24 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
-import { EmailForm, LegalFooter, StepHeader } from '@onefootprint/idv-elements';
+import { EmailForm, LegalFooter } from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
 import React from 'react';
 
 import { useIdentify } from '../../hooks';
 import { useAuthMachine } from '../../state';
+import type { HeaderProps } from '../../types';
 
-type StepEmailProps = { children?: JSX.Element | null };
+type StepEmailProps = {
+  children?: JSX.Element | null;
+  Header: (props: HeaderProps) => JSX.Element;
+};
 
 const noop = () => undefined;
 
-const StepEmail = ({ children }: StepEmailProps) => {
+const StepEmail = ({ children, Header }: StepEmailProps) => {
   const [state, send] = useAuthMachine();
   const {
     identify: { email, sandboxId },
     obConfigAuth,
-    config: { logoUrl, orgName },
-    showLogo,
   } = state.context;
   const { t } = useTranslation('pages.auth');
   const identifyMutation = useIdentify();
@@ -58,11 +60,7 @@ const StepEmail = ({ children }: StepEmailProps) => {
 
   return (
     <>
-      <StepHeader
-        leftButton={{ variant: 'close' }}
-        logoUrl={logoUrl ?? undefined}
-        orgName={orgName}
-        showLogo={showLogo}
+      <Header
         subtitle={t('email-step.header.subtitle')}
         title={t('email-step.header.title')}
       />
@@ -71,7 +69,7 @@ const StepEmail = ({ children }: StepEmailProps) => {
         isLoading={identifyMutation.isLoading}
         onSubmit={identifyMutation.isLoading ? noop : handleSubmit}
         texts={{
-          cta: t('email-step.form.cta'),
+          cta: t('continue'),
           emailIsRequired: t('email-step.form.input-required'),
           emailLabel: t('email-step.form.input-label'),
           emailPlaceholder: t('email-step.form.input-placeholder'),

@@ -5,6 +5,7 @@ import React from 'react';
 import { createFontStyles } from '../../../../utils';
 import Stack from '../../../stack';
 
+type Size = 'compact' | 'default';
 type ContentProps = {
   title: string;
   description?: string;
@@ -12,7 +13,12 @@ type ContentProps = {
   selected: boolean;
   hovered: boolean;
   disabled?: boolean;
-  size?: 'compact' | 'default';
+  size?: Size;
+};
+
+const getIconColor = (disabled: boolean | undefined, selected: boolean) => {
+  if (disabled) return 'quaternary';
+  return selected ? 'quinary' : 'primary';
 };
 
 const Content = ({
@@ -23,57 +29,50 @@ const Content = ({
   IconComponent,
   title,
   description,
-}: ContentProps) => {
-  const getIconColor = () => {
-    if (disabled) {
-      return 'quaternary';
-    }
-    if (selected) {
-      return 'quinary';
-    }
-    return 'primary';
-  };
-
-  return (
-    <Container
-      direction="row"
-      gap={4}
-      align="center"
-      justify="left"
+}: ContentProps) => (
+  <Container
+    direction="row"
+    gap={4}
+    align="center"
+    justify="left"
+    hovered={hovered}
+    selected={selected}
+    disabled={disabled}
+    size={size}
+  >
+    <IconContainer
       hovered={hovered}
       selected={selected}
       disabled={disabled}
       size={size}
+      align="center"
+      justify="center"
     >
-      <IconContainer
+      <IconComponent color={getIconColor(disabled, selected)} />
+    </IconContainer>
+    <OptionLabel>
+      <Title
+        disabled={disabled}
         hovered={hovered}
         selected={selected}
-        disabled={disabled}
         size={size}
-        align="center"
-        justify="center"
       >
-        <IconComponent color={getIconColor()} />
-      </IconContainer>
-      <OptionLabel>
-        <Title selected={selected} hovered={hovered} disabled={disabled}>
-          {title}
-        </Title>
-        {size === 'default' && (
-          <Subtitle selected={selected} hovered={hovered} disabled={disabled}>
-            {description}
-          </Subtitle>
-        )}
-      </OptionLabel>
-    </Container>
-  );
-};
+        {title}
+      </Title>
+      {size === 'default' && (
+        <Subtitle selected={selected} hovered={hovered} disabled={disabled}>
+          {description}
+        </Subtitle>
+      )}
+    </OptionLabel>
+  </Container>
+);
 
 const Container = styled(Stack)<{
   selected?: boolean;
   hovered?: boolean;
   disabled?: boolean;
-  size?: 'compact' | 'default';
+  size?: Size;
 }>`
   ${({ theme, selected, hovered, disabled, size }) => {
     const {
@@ -118,14 +117,18 @@ const Title = styled.h2<{
   selected?: boolean;
   hovered?: boolean;
   disabled?: boolean;
+  size?: Size;
 }>`
-  ${({ theme, selected, hovered, disabled }) => {
+  ${({ theme, selected, hovered, disabled, size }) => {
     const {
       components: { radioSelect },
     } = theme;
 
     return css`
-      ${createFontStyles('label-2')}
+      ${size === 'compact'
+        ? createFontStyles('label-3')
+        : createFontStyles('label-2')};
+
       color: ${radioSelect.color};
 
       ${selected &&
@@ -184,9 +187,9 @@ const IconContainer = styled(Stack)<{
   selected?: boolean;
   hovered?: boolean;
   disabled?: boolean;
-  size?: 'compact' | 'default';
+  size?: Size;
 }>`
-  ${({ theme, selected, hovered, disabled }) => {
+  ${({ disabled, hovered, selected, size, theme }) => {
     const {
       components: { radioSelect },
     } = theme;
@@ -194,7 +197,7 @@ const IconContainer = styled(Stack)<{
       padding: ${theme.spacing[3]};
       border-radius: ${theme.borderRadius.full};
       transition: all 0.2s ease-out;
-      margin-top: ${theme.spacing[1]};
+      margin-top: ${size === 'compact' ? 0 : theme.spacing[1]};
       background-color: ${radioSelect.components.icon.bg};
 
       ${hovered &&

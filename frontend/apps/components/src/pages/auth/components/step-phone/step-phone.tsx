@@ -4,7 +4,6 @@ import {
   checkIsPhoneValid,
   EmailPreview,
   PhoneForm,
-  StepHeader,
 } from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
 import { Stack } from '@onefootprint/ui';
@@ -12,20 +11,23 @@ import React from 'react';
 
 import { useIdentify } from '../../hooks';
 import { useAuthMachine } from '../../state';
+import type { HeaderProps } from '../../types';
 
-type StepPhoneProps = { children?: JSX.Element | null };
+type StepPhoneProps = {
+  children?: JSX.Element | null;
+  Header: (props: HeaderProps) => JSX.Element;
+};
 
 const noop = () => undefined;
 
-const StepPhone = ({ children }: StepPhoneProps) => {
+const StepPhone = ({ children, Header }: StepPhoneProps) => {
   const [state, send] = useAuthMachine();
   const {
     identify: { phoneNumber, email, sandboxId },
     obConfigAuth,
-    showLogo,
-    config: { logoUrl, orgName, isLive },
+    config: { isLive },
   } = state.context;
-  const { t } = useTranslation('pages.auth.phone-step');
+  const { t } = useTranslation('pages.auth');
   const identifyMutation = useIdentify();
   const showRequestErrorToast = useRequestErrorToast();
 
@@ -36,10 +38,6 @@ const StepPhone = ({ children }: StepPhoneProps) => {
 
   const handleChangeEmail = () => {
     send({ type: 'identifyReset' });
-  };
-
-  const handleHeaderBackClick = () => {
-    send({ type: 'navigatedToPrevPage' });
   };
 
   const handleSubmit = (formData: { phoneNumber: string }) => {
@@ -80,18 +78,14 @@ const StepPhone = ({ children }: StepPhoneProps) => {
   return (
     <>
       <Stack direction="column" gap={8}>
-        <StepHeader
-          leftButton={{ variant: 'back', onBack: handleHeaderBackClick }}
-          logoUrl={logoUrl ?? undefined}
-          orgName={orgName}
-          showLogo={showLogo}
-          subtitle={t('subtitle')}
-          title={t('title')}
+        <Header
+          subtitle={t('phone-step.subtitle')}
+          title={t('phone-step.title')}
         />
         <EmailPreview
           email={email}
           onChange={handleChangeEmail}
-          textCta={t('change-cta')}
+          textCta={t('change')}
         />
         <PhoneForm
           defaultPhone={phoneNumber}
@@ -100,10 +94,10 @@ const StepPhone = ({ children }: StepPhoneProps) => {
           options={options}
           validator={handlePhoneValidation}
           texts={{
-            cta: t('form.cta'),
-            phoneInvalid: t('form.input-invalid'),
-            phoneLabel: t('form.input-label'),
-            phoneRequired: t('form.input-required'),
+            cta: t('continue'),
+            phoneInvalid: t('phone-step.form.input-invalid'),
+            phoneLabel: t('phone-step.form.input-label'),
+            phoneRequired: t('phone-step.form.input-required'),
           }}
         />
       </Stack>

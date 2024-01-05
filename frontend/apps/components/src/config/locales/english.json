@@ -5,12 +5,32 @@
   "components": {},
   "pages": {
     "auth": {
+      "add-device": "Add device",
+      "additional-verifications": "Additional verifications",
+      "change": "Change",
       "confirm-close-description": "Your changes may not be saved.",
       "confirm-close-title": "Are you sure?",
+      "continue": "Continue",
+      "device-added": "Device added",
+      "edit-details-in-account": "You can edit the details in your account.",
       "email-legal-footer": "By continuing, I agree to the <termsLink>Terms of Service</termsLink> and \n  acknowledge the <privacyPolicyLink>Privacy Policy</privacyPolicyLink>.",
+      "enhance-security-advice": "To enhance the security of your account, we advise verifying the following information.",
+      "enter-email": "Enter your email address",
+      "enter-phone": "Enter your new phone number",
       "invalid-kind-description": "It looks like you're using a non-auth Playbook. Please review and rectify the settings.",
       "invalid-kind-title": "Invalid configuration",
+      "log-in-to-modify-details": "Log in to modify your account details",
       "no": "No",
+      "passkey": "Passkey",
+      "revise-auth-details": "Revise your authentication details",
+      "save-changes": "Save changes",
+      "scan-code-to-log-in": "Scan the code to log in",
+      "send-code-to": "Send code to",
+      "skip-and-finish": "Skip and finish",
+      "use-camera-or-qr-reader": "Use your camera app or QR code reader on your mobile device and we’ll continue from there.",
+      "verified": "Verified",
+      "verify-identity": "Verify your identity",
+      "verify": "Verify",
       "yes": "Yes",
       "notification": {
         "invalid-config-title": "Integration incorrectly configured",
@@ -45,16 +65,13 @@
         "form": {
           "input-label": "Email",
           "input-placeholder": "jane.doe@acme.com",
-          "input-required": "Email is required",
-          "cta": "Continue"
+          "input-required": "Email is required"
         }
       },
       "phone-step": {
-        "change-cta": "Change",
         "subtitle": "Enter your phone number to proceed.",
         "title": "Hey there! 👋",
         "form": {
-          "cta": "Continue",
           "input-invalid": "Phone number is invalid",
           "input-label": "Phone number",
           "input-required": "Phone number cannot be empty"
@@ -91,7 +108,7 @@
         "label": "Email",
         "prompt-with-email": "Enter the 6-digit code sent to {{email}}.",
         "prompt-without-email": "Enter the 6-digit code sent to your email.",
-        "title": "Verify your email",
+        "title": "Verify your email address",
         "welcome-back-title": "Welcome back! 🎉"
       }
     },
