@@ -1,0 +1,1 @@
+ALTER TABLE vault ALTER COLUMN is_identifiable DROP NOT NULL;

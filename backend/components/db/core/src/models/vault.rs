@@ -48,8 +48,7 @@ pub struct Vault {
     pub is_verified: bool,
     pub created_at: DateTime<Utc>,
     /// True if the user can be found in /identify
-    /// TODO not reading this yet
-    pub is_identifiable: Option<bool>,
+    pub is_identifiable: bool,
 }
 
 pub enum VaultIdentifier<'a> {
@@ -315,9 +314,9 @@ impl Vault {
             .filter(data_lifetime::deactivated_seqno.is_null())
             // Don't identify users that haven't completed an OTP challenge
             .filter(vault::is_verified.eq(true))
-            // Never allow identifying a user that is not marked as portable. API-only vaults start
-            // as non-portable
-            .filter(vault::is_portable.eq(true))
+            // Never allow identifying a user that is not marked as identifiable.
+            // API-only vaults start as non-identifiable until they become PIDs
+            .filter(vault::is_identifiable.eq(true))
             .select(vault::all_columns)
             .into_boxed();
 
@@ -340,7 +339,7 @@ impl Vault {
                 // Un-verified vaults owned by this tenant
                 .filter(scoped_vault::tenant_id.eq(tenant_id))
                 .filter(vault::is_verified.eq(false))
-                .filter(vault::is_portable.eq(false))
+                .filter(vault::is_identifiable.eq(false))
                 .select(vault::all_columns)
                 .into_boxed();
             query = if let Some(sandbox_id) = sandbox_id.as_ref() {

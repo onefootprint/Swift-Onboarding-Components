@@ -124,7 +124,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             id: fp_id,
             sandbox_id,
             is_portable,
-            is_identifiable: is_identifiable.unwrap_or_default(),
+            is_identifiable,
             kind,
             start_timestamp,
             last_activity_at,
