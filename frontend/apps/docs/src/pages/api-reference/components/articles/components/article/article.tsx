@@ -23,6 +23,8 @@ type ArticleProps = {
   article: ApiReferenceArticle;
 };
 
+const CONTENT_WIDTH = 900;
+
 const Article = ({ article }: ArticleProps) => {
   const { t } = useTranslation('pages.api-reference');
   const {
@@ -40,40 +42,42 @@ const Article = ({ article }: ArticleProps) => {
   return (
     <ArticleContainer id={encodedId} name={encodedId}>
       <ContentColumn>
-        <TitleContainer direction="column" gap={3}>
-          {method && path && (
-            <Stack direction="row" gap={2}>
-              <TypeBadge type={method} />
-              <Stack direction="row" gap={1}>
-                <Typography variant="label-2" as="h3" color="tertiary">
-                  {API_BASE_URL}
-                </Typography>
-                <Typography variant="label-2" as="h3">
-                  {path}
-                </Typography>
+        <ContentWidth>
+          <TitleContainer direction="column" gap={3}>
+            {method && path && (
+              <Stack direction="row" gap={2}>
+                <TypeBadge type={method} />
+                <Stack direction="row" gap={1}>
+                  <Typography variant="label-2" as="h3" color="tertiary">
+                    {API_BASE_URL}
+                  </Typography>
+                  <Typography variant="label-2" as="h3">
+                    {path}
+                  </Typography>
+                </Stack>
               </Stack>
-            </Stack>
-          )}
-          {description && <Description>{description}</Description>}
-        </TitleContainer>
-        {security && (
-          <Requests>
-            <Typography variant="label-1" sx={{ marginTop: 3 }}>
-              {t('request')}
-            </Typography>
-            {security?.map((element: SecurityTypes) =>
-              Object.keys(element).map(type => (
-                <Security key={type} type={type as SecurityTypes} />
-              )),
             )}
-            <Box marginTop={2} marginBottom={2} />
-            <Schema>
-              {parameters && <Parameters parameters={parameters} />}
-              {requestBody && <RequestBody requestBody={requestBody} />}
-              {responses && <Responses responses={responses} />}
-            </Schema>
-          </Requests>
-        )}
+            {description && <Description>{description}</Description>}
+          </TitleContainer>
+          {security && (
+            <Requests>
+              <Typography variant="label-1" sx={{ marginTop: 3 }}>
+                {t('request')}
+              </Typography>
+              {security?.map((element: SecurityTypes) =>
+                Object.keys(element).map(type => (
+                  <Security key={type} type={type as SecurityTypes} />
+                )),
+              )}
+              <Box marginTop={2} marginBottom={2} />
+              <Schema>
+                {parameters && <Parameters parameters={parameters} />}
+                {requestBody && <RequestBody requestBody={requestBody} />}
+                {responses && <Responses responses={responses} />}
+              </Schema>
+            </Requests>
+          )}
+        </ContentWidth>
       </ContentColumn>
       <CodeColumn>
         {responses && (
@@ -94,10 +98,16 @@ const ArticleContainer = styled(Element)<{ name: string }>`
 
     ${media.greaterThan('md')`
       display: grid;
-      grid-template-columns: minmax(600px, 1.5fr) 1fr;
+      grid-template-columns: minmax(${CONTENT_WIDTH}px, 4fr) 480px;
       grid-template-areas: 'article code';
+      
     `}
   `}
+`;
+
+const ContentWidth = styled.div`
+  max-width: ${CONTENT_WIDTH}px;
+  margin: 0 auto;
 `;
 
 const TitleContainer = styled(Stack)`

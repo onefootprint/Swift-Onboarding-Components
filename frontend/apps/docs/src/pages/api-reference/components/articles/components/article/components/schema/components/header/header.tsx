@@ -51,7 +51,7 @@ const Header = ({ title, schema, isRequired, isInBrackets }: HeaderProps) => {
       <Column isInBrackets={isInBrackets}>
         <CodeInline disabled>{title}</CodeInline>
         <Separator>·</Separator>
-        <Typography variant="snippet-3" color="quaternary">
+        <Typography variant="snippet-2" color="quaternary">
           {typeLabel}
         </Typography>
       </Column>

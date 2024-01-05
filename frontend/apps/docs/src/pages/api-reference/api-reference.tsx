@@ -52,9 +52,11 @@ const Layout = styled.div<{ isNavHovered: boolean }>`
     ${media.greaterThan('md')`
       overflow: hidden;
       display: grid;
-      grid-template-columns: calc(var(--page-aside-nav-api-reference-width) + ${
-        isNavHovered ? '5%' : '0px'
-      }) 1fr;
+      grid-template-columns: ${
+        isNavHovered
+          ? `var(--page-aside-nav-api-reference-width)`
+          : `var(--page-aside-nav-api-reference-width-small)`
+      } 1fr;
       grid-template-areas: 'nav content';
       transition: grid-template-columns 0.3s ease-in-out;
     `}

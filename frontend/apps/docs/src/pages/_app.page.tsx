@@ -77,7 +77,8 @@ const GlobalStyle = createGlobalStyle`
     html {
       --header-height: 56px;
       --page-aside-nav-width: 270px;
-      --page-aside-nav-api-reference-width: 288px;
+      --page-aside-nav-api-reference-width: 420px;
+      --page-aside-nav-api-reference-width-small: 320px;
       --page-sections-width: 240px;
       --page-content-width: 720px;
 

@@ -158,10 +158,10 @@ export type BorderRadiuses = {
 export type BorderRadius = keyof BorderRadiuses;
 
 export type Breakpoints = {
+  xl: number;
   lg: number;
   md: number;
   sm: number;
-  xl: number;
   xs: number;
 };
 
