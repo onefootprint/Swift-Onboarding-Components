@@ -545,6 +545,26 @@ impl FlexIdResponse {
             .and_then(|r| r.comprehensive_verification.as_ref())
             .and_then(|c| c.comprehensive_verification_index)
     }
+
+    pub fn risk_indicator_codes(&self) -> Vec<RiskIndicatorCode> {
+        self.result()
+            .and_then(|r| r.comprehensive_verification.as_ref())
+            .and_then(|c| c.risk_indicators.as_ref())
+            .and_then(|r| r.risk_indicator.as_ref())
+            .map(|r| {
+                r.iter()
+                    .filter_map(|ri| ri.risk_code.as_ref())
+                    .filter_map(|c| match RiskIndicatorCode::try_from(c.as_str().trim()) {
+                        Ok(ric) => Some(ric),
+                        Err(_) => {
+                            tracing::error!(risk_indicator=%c, "Unknown Lexis RiskIndicator");
+                            None
+                        }
+                    })
+                    .collect()
+            })
+            .unwrap_or(vec![])
+    }
 }
 
 #[cfg(test)]

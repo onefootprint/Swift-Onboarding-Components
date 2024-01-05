@@ -79,12 +79,19 @@ fn footprint_reason_codes(res: FlexIdResponse) -> Vec<FRC> {
         misc_codes.push(FRC::IdFlagged);
     }
 
+    let risk_indicator_codes = res
+        .risk_indicator_codes()
+        .into_iter()
+        .filter_map(|ric| Into::<Option<FRC>>::into(&ric))
+        .collect_vec();
+
     phone_codes
         .into_iter()
         .chain(name_address_ssn_codes)
         .chain(dob_codes)
         .chain(valid_element_summary_codes)
         .chain(misc_codes)
+        .chain(risk_indicator_codes)
         .unique()
         .collect()
 }
