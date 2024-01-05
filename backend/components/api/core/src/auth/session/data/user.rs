@@ -30,15 +30,52 @@ pub struct UserSession {
     pub wfr_id: Option<WorkflowRequestId>,
     /// Permissions that this auth token is given
     pub scopes: Vec<UserAuthScope>,
-    /// The auths that give this token its permissions
+    /// DEPRECATED
+    #[serde(default)]
     pub auth_event_ids: Vec<AuthEventId>,
-    /// When true, the auth token was initially issued as an unauthed, identified token
+    /// The auth events that give this token its permissions
+    #[serde(default)]
+    pub auth_events: Vec<AssociatedAuthEvent>,
+    /// When true, the auth token was initially issued as an unauthed, identified token.
+    /// Also true for tokens created via step up of tokens made via API
     pub is_from_api: bool,
     /// When true, the auth events that occurred at this tenant were inherited to form this token,
     /// rather than proof of auth being exchanged physically
     #[serde(default)]
     #[allow(unused)]
     pub is_implied_auth: bool,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub struct AssociatedAuthEvent {
+    pub id: AuthEventId,
+    pub kind: AssociatedAuthEventKind,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[serde(rename_all = "snake_case")]
+pub enum AssociatedAuthEventKind {
+    /// The auth event was created explicitly by the user using this auth session.
+    Explicit,
+    /// The auth event was implicitly inherited when creating a token via tenant-facing API.
+    /// Implicit auths have fewer permissions that explicit auths
+    Implicit,
+}
+
+impl AssociatedAuthEvent {
+    pub fn implicit(id: AuthEventId) -> Self {
+        Self {
+            id,
+            kind: AssociatedAuthEventKind::Implicit,
+        }
+    }
+
+    pub fn explicit(id: AuthEventId) -> Self {
+        Self {
+            id,
+            kind: AssociatedAuthEventKind::Explicit,
+        }
+    }
 }
 
 #[derive(Default)]
@@ -57,7 +94,9 @@ impl UserSession {
         user_vault_id: VaultId,
         args: UserSessionArgs,
         scopes: Vec<UserAuthScope>,
+        // TODO rm
         auth_event_ids: Vec<AuthEventId>,
+        auth_events: Vec<AssociatedAuthEvent>,
     ) -> ApiResult<AuthSessionData> {
         if scopes.iter().any(|s| matches!(s, UserAuthScope::SignUp)) && args.su_id.is_none() {
             return Err(UserError::InvalidAuthSession(
@@ -84,6 +123,7 @@ impl UserSession {
             scopes,
             is_from_api,
             auth_event_ids,
+            auth_events,
             is_implied_auth,
         });
         Ok(session)

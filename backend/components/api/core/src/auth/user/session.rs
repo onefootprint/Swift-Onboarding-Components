@@ -18,7 +18,7 @@ use super::UserAuthScope;
 use crate::{
     auth::{
         session::{
-            user::{UserSession, UserSessionArgs},
+            user::{AssociatedAuthEvent, UserSession, UserSessionArgs},
             AllowSessionUpdate, AuthSessionData, ExtractableAuthSession, RequestInfo,
         },
         user::UserAuth,
@@ -40,6 +40,7 @@ pub struct UserSessionContext {
     pub wfr_id: Option<WorkflowRequestId>,
     pub(super) is_implied_auth: bool,
     pub auth_event_ids: Vec<AuthEventId>,
+    pub auth_events: Vec<AssociatedAuthEvent>,
     /// When true, the auth token was initially issued as an unauthed, identified token
     pub is_from_api: bool,
 }
@@ -70,7 +71,7 @@ impl UserSessionContext {
         self,
         new_args: UserSessionArgs,
         new_scopes: Vec<UserAuthScope>,
-        new_auth_event_id: Option<AuthEventId>,
+        new_auth_event: Option<AssociatedAuthEvent>,
     ) -> ApiResult<AuthSessionData> {
         // Merge args, scopes, and auth factors and create a new session with these merged fields
         let new_scopes = self.scopes.into_iter().chain(new_scopes).unique().collect();
@@ -84,8 +85,13 @@ impl UserSessionContext {
             is_from_api: new_args.is_from_api || self.is_from_api,
             is_implied_auth: new_args.is_implied_auth || self.is_implied_auth,
         };
-        let ae_ids = self.auth_event_ids.into_iter().chain(new_auth_event_id).collect();
-        UserSession::make(self.user.id, args, new_scopes, ae_ids)
+        let ae_ids = self
+            .auth_event_ids
+            .into_iter()
+            .chain(new_auth_event.as_ref().map(|e| e.id.clone()))
+            .collect();
+        let aes = self.auth_events.into_iter().chain(new_auth_event).collect();
+        UserSession::make(self.user.id, args, new_scopes, ae_ids, aes)
     }
 
     pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {
@@ -151,6 +157,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     scopes,
                     is_from_api,
                     auth_event_ids,
+                    auth_events,
                     is_implied_auth,
                 } = data;
                 let vault = Vault::get(conn, &user_vault_id)?;
@@ -190,6 +197,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     scopes,
                     is_from_api,
                     auth_event_ids,
+                    auth_events,
                     is_implied_auth,
                 };
                 Ok(ParsedUserSessionContext(data))

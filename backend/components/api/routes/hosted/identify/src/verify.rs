@@ -2,7 +2,7 @@ use super::{BiometricChallengeState, PhoneEmailChallengeState};
 use crate::State;
 use crate::{ChallengeData, ChallengeState};
 use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::session::user::{UserSession, UserSessionArgs};
+use api_core::auth::session::user::{AssociatedAuthEvent, UserSession, UserSessionArgs};
 use api_core::auth::user::allowed_user_scopes;
 use api_core::auth::user::{CheckedUserAuthContext, UserAuthContext};
 use api_core::auth::Any;
@@ -188,12 +188,13 @@ pub async fn post(
 
             let scopes = allowed_user_scopes(vec![event.kind], scope, false);
 
+            let ae = AssociatedAuthEvent::explicit(event.id.clone());
             let data = if let Some(user_auth) = user_auth {
                 // Add the new scopes and args to the existing scopes and args on the auth token
-                user_auth.data.clone().update(args, scopes, Some(event.id))?
+                user_auth.data.clone().update(args, scopes, Some(ae))?
             } else {
                 // Otherwise, create a new token with these scopes / args
-                UserSession::make(uv_id.clone(), args, scopes, vec![event.id])?
+                UserSession::make(uv_id.clone(), args, scopes, vec![event.id], vec![ae])?
             };
             let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
 

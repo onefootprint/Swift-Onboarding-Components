@@ -2,6 +2,7 @@ use crate::auth::tenant::CheckTenantGuard;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
+use api_core::auth::session::user::AssociatedAuthEvent;
 use api_core::auth::session::user::UserSession;
 use api_core::auth::session::user::UserSessionArgs;
 use api_core::auth::tenant::SecretTenantAuthContext;
@@ -29,6 +30,7 @@ use db::models::vault::Vault;
 use db::models::workflow::Workflow;
 use db::models::workflow_request::WorkflowRequest;
 use feature_flag::BoolFlag;
+use itertools::Itertools;
 use newtypes::AuthEventKind;
 use newtypes::IdentifyScope;
 use newtypes::PreviewApi;
@@ -206,8 +208,13 @@ pub async fn post(
                 wfr_id,
                 ..Default::default()
             };
-            let event_ids = inherited_auth_events.into_iter().map(|e| e.id).collect();
-            let data = UserSession::make(sv.vault_id, args, scopes, event_ids)?;
+            // All auth events associated with the token made here are implicit
+            let events = inherited_auth_events
+                .into_iter()
+                .map(|e| AssociatedAuthEvent::implicit(e.id))
+                .collect_vec();
+            let event_ids = events.iter().map(|e| e.id.clone()).collect();
+            let data = UserSession::make(sv.vault_id, args, scopes, event_ids, events)?;
             let (auth_token, session) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             Ok((auth_token, session))
         })
