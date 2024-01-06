@@ -12,7 +12,7 @@ import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-co
 export const entitiesFixture: Entity[] = [
   {
     id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
-    isPortable: true,
+    isIdentifiable: true,
     kind: EntityKind.business,
     attributes: [
       BusinessDI.city,

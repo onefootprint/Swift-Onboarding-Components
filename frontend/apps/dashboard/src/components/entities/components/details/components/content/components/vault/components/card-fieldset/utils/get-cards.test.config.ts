@@ -3,7 +3,7 @@ import { EntityKind, EntityStatus } from '@onefootprint/types';
 
 const entityFixture: Entity = {
   id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
-  isPortable: true,
+  isIdentifiable: true,
   kind: EntityKind.business,
   data: [],
   attributes: [],

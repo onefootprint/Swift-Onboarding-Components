@@ -8,7 +8,7 @@ import {
 
 export const entityPassedFixture: Entity = {
   id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
-  isPortable: true,
+  isIdentifiable: true,
   kind: EntityKind.person,
   data: [],
   attributes: [],

@@ -5,7 +5,7 @@ import { EntityKind, EntityStatus, IdDI } from '@onefootprint/types';
 export const entityId = 'fp_id_yCZehsWNeywHnk5JqL20u';
 export const entityWithPhoneFixture: Entity = {
   id: entityId,
-  isPortable: true,
+  isIdentifiable: true,
   kind: EntityKind.person,
   data: [],
   attributes: [IdDI.phoneNumber],
@@ -21,7 +21,7 @@ export const entityWithPhoneFixture: Entity = {
 
 export const entityWithoutPhoneFixture: Entity = {
   id: entityId,
-  isPortable: true,
+  isIdentifiable: true,
   kind: EntityKind.person,
   data: [],
   attributes: [],

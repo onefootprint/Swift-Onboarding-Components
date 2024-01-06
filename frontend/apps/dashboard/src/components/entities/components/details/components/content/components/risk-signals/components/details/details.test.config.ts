@@ -24,7 +24,7 @@ const attributesFixture = [
 
 export const entityFixture: Entity = {
   id: entityIdFixture,
-  isPortable: true,
+  isIdentifiable: true,
   kind: EntityKind.person,
   requiresManualReview: false,
   status: EntityStatus.pass,

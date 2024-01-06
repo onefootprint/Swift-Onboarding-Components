@@ -5,7 +5,7 @@ import { EntityKind, EntityStatus } from '@onefootprint/types';
 export const entitiesFixture: Entity[] = [
   {
     id: 'fp_id_wL6XIWe26cRinucZrRK1yn',
-    isPortable: true,
+    isIdentifiable: true,
     kind: EntityKind.person,
     requiresManualReview: false,
     status: EntityStatus.pass,

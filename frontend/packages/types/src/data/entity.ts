@@ -54,7 +54,7 @@ export type Entity<TStatus = EntityStatus> = {
   attributes: DataIdentifier[];
   decryptableAttributes: DataIdentifier[];
   id: string;
-  isPortable: boolean;
+  isIdentifiable: boolean;
   kind: EntityKind;
   data: Attribute[];
   startTimestamp: string;

@@ -12,7 +12,7 @@ import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-co
 export const entitiesFixture: Entity[] = [
   {
     id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
-    isPortable: true,
+    isIdentifiable: true,
     kind: EntityKind.person,
     data: [],
     attributes: [IdDI.firstName, IdDI.lastName, IdDI.email],
@@ -42,7 +42,7 @@ export const entitiesFixture: Entity[] = [
   },
   {
     id: 'fp_id_tvfUNdGqmk2kJyyka9gX22',
-    isPortable: true,
+    isIdentifiable: true,
     kind: EntityKind.person,
     data: [],
     attributes: [IdDI.firstName, IdDI.lastName, IdDI.email],

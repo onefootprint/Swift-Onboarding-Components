@@ -26,7 +26,7 @@ import {
 
 export const entityFixture: Entity = {
   id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
-  isPortable: true,
+  isIdentifiable: true,
   kind: EntityKind.business,
   attributes: [
     BusinessDI.addressLine1,

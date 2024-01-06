@@ -22,7 +22,7 @@ export enum EntityStatus {
 export type Entity = {
   attributes: DataIdentifier[];
   id: string;
-  isPortable: boolean;
+  isIdentifiable: boolean;
   kind: EntityKind;
   onboarding?: Onboarding;
   requiresManualReview: boolean;
@@ -59,7 +59,7 @@ export const augmentEntityWithOnboardingInfo = (entity: Entity) => ({
 });
 
 const getEntityStatus = (entity: Entity): EntityStatus => {
-  if (!entity.isPortable) {
+  if (!entity.isIdentifiable) {
     return EntityStatus.vaultOnly;
   }
   return (entity.onboarding?.status ||

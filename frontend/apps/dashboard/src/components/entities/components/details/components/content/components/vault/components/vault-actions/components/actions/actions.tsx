@@ -14,7 +14,7 @@ const Actions = ({ entity }: WithEntityProps) => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const shouldShowActionsDropdown = entity.kind === EntityKind.person;
-  const shouldShowRetriggerKyc = entity?.isPortable;
+  const shouldShowRetriggerKyc = entity?.isIdentifiable;
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
