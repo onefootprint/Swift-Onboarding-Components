@@ -9,6 +9,7 @@ use diesel::prelude::*;
 use diesel::upsert::on_constraint;
 use diesel::{Insertable, QueryDsl, Queryable};
 use itertools::Itertools;
+use newtypes::output::Csv;
 use newtypes::{
     DataIdentifier, EncryptedVaultPrivateKey, Fingerprint, FpId, IdempotencyId, Locked, SandboxId,
     ScopedVaultId, TenantId, VaultId, VaultKind, VaultPublicKey,
@@ -301,6 +302,8 @@ impl Vault {
     ) -> DbResult<Option<Vault>> {
         use crate::models::scoped_vault::ScopedVault;
         use db_schema::schema::{data_lifetime, fingerprint};
+
+        tracing::info!(sh_datas=%Csv::from(sh_data.iter().cloned().collect_vec()), "Searching for fingerprints");
 
         // Look for verified vaults marked `is_portable` and `is_verified`
         // that also have portable, active data matching the fingerprint
