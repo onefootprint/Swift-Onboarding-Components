@@ -8,7 +8,7 @@ type CtaButtonProps = {
 };
 
 const CtaButton = ({ label, isLoading }: CtaButtonProps) => {
-  const { t } = useTranslation('pages.cta');
+  const { t } = useTranslation('pages.kyc.cta');
 
   return (
     <Button type="submit" fullWidth loading={isLoading}>

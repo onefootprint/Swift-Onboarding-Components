@@ -11,7 +11,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import type { FormData } from '../../types';
 
 const StateField = () => {
-  const { t } = useTranslation('pages.residential-address.form.state');
+  const { t } = useTranslation('pages.kyc.residential-address.form.state');
   const {
     control,
     register,

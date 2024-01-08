@@ -13,7 +13,7 @@ const ZipField = () => {
     watch,
     getValues,
   } = useFormContext<FormData>();
-  const { t } = useTranslation('pages.residential-address.form.zipCode');
+  const { t } = useTranslation('pages.kyc.residential-address.form.zipCode');
   const country = watch('country');
   const { zipcode } = useInputValidations(country.value);
   const isCountryUs = country.value === 'US';

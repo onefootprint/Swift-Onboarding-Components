@@ -13,7 +13,7 @@ type SSN9Props = {
 
 const SSN9 = ({ hideDisclaimer, disabled }: SSN9Props) => {
   const inputMasks = useInputMask('en-US');
-  const { t } = useTranslation('pages.ssn.full');
+  const { t } = useTranslation('pages.kyc.ssn.full');
   const {
     register,
     getValues,

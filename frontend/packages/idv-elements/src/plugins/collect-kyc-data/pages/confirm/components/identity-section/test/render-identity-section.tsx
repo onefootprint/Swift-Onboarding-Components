@@ -6,7 +6,7 @@ import { MachineProvider } from 'src/plugins/collect-kyc-data/components/machine
 import type { MachineContext } from 'src/plugins/collect-kyc-data/utils/state-machine';
 
 import { Layout } from '../../../../../../../components';
-import configureI18next from '../../../../../config/initializers/i18next';
+import configureI18next from '../../../../../../../config/initializers/i18next';
 import IdentitySection from '../identity-section';
 
 type WrapperProps = {

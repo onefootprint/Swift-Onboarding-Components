@@ -33,7 +33,7 @@ const EmailCollect = ({
 }: EmailCollectProps) => {
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
-  const { t } = useTranslation('pages.email');
+  const { t } = useTranslation('pages.kyc.email');
   const { mutation, syncEmail } = useSyncEmail();
   const {
     register,

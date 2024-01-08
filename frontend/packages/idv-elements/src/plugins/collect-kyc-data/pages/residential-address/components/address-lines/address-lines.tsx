@@ -16,7 +16,7 @@ const AddressLines = () => {
     watch,
   } = useFormContext<FormData>();
   const country = watch('country');
-  const { t } = useTranslation('pages.residential-address.form');
+  const { t } = useTranslation('pages.kyc.residential-address.form');
   const isCountryUs = country.value === 'US';
 
   const handleAddressSelect = async (

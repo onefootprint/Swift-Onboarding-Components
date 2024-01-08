@@ -19,7 +19,7 @@ import IdentitySection from './components/identity-section';
 import LegalStatusSection from './components/legal-status-section';
 
 const Confirm = () => {
-  const { t } = useTranslation('pages.confirm');
+  const { t } = useTranslation('pages.kyc.confirm');
   const showRequestErrorToast = useRequestErrorToast();
   const [state, send] = useCollectKycDataMachine();
   const { authToken, data, requirement, initialData } = state.context;

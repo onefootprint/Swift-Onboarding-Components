@@ -15,7 +15,7 @@ import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-mac
 import Email from '../../../email';
 
 const EmailSection = () => {
-  const { t, allT } = useTranslation('pages.confirm');
+  const { t, allT } = useTranslation('pages.kyc.confirm');
   const [state] = useCollectKycDataMachine();
   const {
     data,
@@ -65,7 +65,7 @@ const EmailSection = () => {
       <Email
         onComplete={stopEditing}
         onCancel={stopEditing}
-        ctaLabel={allT('pages.cta.continue')}
+        ctaLabel={allT('pages.kyc.cta.continue')}
         hideHeader
       />
     );
@@ -74,7 +74,7 @@ const EmailSection = () => {
   const actions: SectionAction[] = [];
   if (!editing) {
     actions.push({
-      label: allT('pages.confirm.summary.edit'),
+      label: allT('pages.kyc.confirm.summary.edit'),
       onClick: () => setEditing(true),
     });
   }

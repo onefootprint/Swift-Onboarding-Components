@@ -21,7 +21,7 @@ import getInitialCountry from '../../../../utils/get-initial-country';
 import BasicInformation from '../../../basic-information';
 
 const BasicInfoSection = () => {
-  const { t, allT } = useTranslation('pages.confirm');
+  const { t, allT } = useTranslation('pages.kyc.confirm');
   const [state] = useCollectKycDataMachine();
   const { data, requirement } = state.context;
   const [editing, setEditing] = useState(false);
@@ -105,7 +105,7 @@ const BasicInfoSection = () => {
   const actions: SectionAction[] = [];
   if (!editing) {
     actions.push({
-      label: allT('pages.confirm.summary.edit'),
+      label: allT('pages.kyc.confirm.summary.edit'),
       onClick: () => setEditing(true),
     });
   }

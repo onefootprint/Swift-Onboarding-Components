@@ -108,7 +108,7 @@ const LegalStatusSection = () => {
   const actions: SectionAction[] = [];
   if (!editing) {
     actions.push({
-      label: allT('pages.confirm.summary.edit'),
+      label: allT('pages.kyc.confirm.summary.edit'),
       onClick: () => setEditing(true),
     });
   }

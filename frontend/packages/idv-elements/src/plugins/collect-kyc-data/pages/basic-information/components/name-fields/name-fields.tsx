@@ -11,7 +11,7 @@ type NameFieldsProps = {
 };
 
 const NameFields = ({ disabled }: NameFieldsProps) => {
-  const { t } = useTranslation('pages.basic-information.form');
+  const { t } = useTranslation('pages.kyc.basic-information.form');
   const {
     register,
     getValues,

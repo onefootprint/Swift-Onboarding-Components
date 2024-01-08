@@ -64,7 +64,7 @@ const getIdentitiesSections = (
 };
 
 const IdentitySection = () => {
-  const { t, allT } = useTranslation('pages.confirm');
+  const { t, allT } = useTranslation('pages.kyc.confirm');
   const [editing, setEditing] = useState(false);
   const [state, send] = useCollectKycDataMachine();
   const { authToken, device, data, requirement } = state.context;
@@ -212,7 +212,7 @@ const IdentitySection = () => {
   const actions: SectionAction[] = [];
   if (!editing) {
     actions.push({
-      label: allT('pages.confirm.summary.edit'),
+      label: allT('pages.kyc.confirm.summary.edit'),
       onClick: () => setEditing(true),
       actionTestID: 'identity-edit-button',
     });
@@ -221,13 +221,13 @@ const IdentitySection = () => {
     if (canReveal) {
       if (ssnValueType === SsnValue.revealed) {
         actions.unshift({
-          label: allT('pages.confirm.summary.hide'),
+          label: allT('pages.kyc.confirm.summary.hide'),
           onClick: () => setSsnValueType(SsnValue.hidden),
           actionTestID: 'identity-hide-button',
         });
       } else {
         actions.unshift({
-          label: allT('pages.confirm.summary.reveal'),
+          label: allT('pages.kyc.confirm.summary.reveal'),
           onClick: handleReveal,
           isLoading: isStepUpLoading,
           actionTestID: 'identity-reveal-button',

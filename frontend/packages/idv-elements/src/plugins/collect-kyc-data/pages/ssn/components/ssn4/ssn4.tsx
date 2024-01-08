@@ -9,7 +9,7 @@ type SSN4Props = {
 
 const SSN4 = ({ disabled }: SSN4Props) => {
   const inputMasks = useInputMask('en-US');
-  const { t } = useTranslation('pages.ssn.last-four');
+  const { t } = useTranslation('pages.kyc.ssn.last-four');
   const {
     register,
     getValues,

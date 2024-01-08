@@ -12,7 +12,7 @@ import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
 import CitizenshipField from './citizenship-field';
 
 const CitizenshipFields = () => {
-  const { t } = useTranslation('pages.legal-status.form');
+  const { t } = useTranslation('pages.kyc.legal-status.form');
   const { control } = useFormContext();
   const { append, fields, remove } = useFieldArray({
     name: 'citizenships',

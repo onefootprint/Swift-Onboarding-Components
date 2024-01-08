@@ -3,6 +3,27 @@
     "errors": {}
   },
   "components": {
+    "cta": {
+      "continue": "Continue",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "kyc": {
+      "sync-data-error": {
+        "empty-auth-token": {
+          "title": "Your session is invalid",
+          "description": "Please refresh this page to try onboarding again."
+        },
+        "request-data": {
+          "title": "There are missing fields",
+          "description": "Please return to previous steps to ensure all data is filled out"
+        },
+        "invalid-inputs": {
+          "title": "An error occurred",
+          "description": "An error occurred while saving data. Please fix the inputs and try again."
+        }
+      }
+    },
     "id-doc": {
       "media-errors": {
         "not-found": "We couldn't find a camera on your device. Please use another device.",
@@ -224,6 +245,271 @@
     }
   },
   "pages": {
+    "kyc": {
+      "email": {
+        "title": "Email address",
+        "subtitle": "We are required to collect your email address.",
+        "email": {
+          "label": "Email",
+          "placeholder": "jane.doe@acme.com",
+          "hint": "Add ”#string” (e.g., #test1) at the end of your email address.",
+          "errors": {
+            "required": "Email is required",
+            "pattern": "Add ”#string” (e.g., #test1) at the end of your email address."
+          }
+        }
+      },
+      "basic-information": {
+        "title": "Basic Data",
+        "subtitle": "Spell your full legal first, middle and last names exactly as shown on your government-issued ID.",
+        "form": {
+          "first-name": {
+            "label": "First name",
+            "placeholder": "Jane",
+            "error": {
+              "empty": "First name cannot be empty",
+              "special-chars": "First name contains invalid characters."
+            }
+          },
+          "middle-name": {
+            "label": "Middle name (optional)",
+            "placeholder": "Sue",
+            "error": {
+              "special-chars": "Middle name contains invalid characters."
+            }
+          },
+          "last-name": {
+            "label": "Last name",
+            "placeholder": "Doe",
+            "error": {
+              "empty": "Last name cannot be empty",
+              "special-chars": "First name contains invalid characters."
+            }
+          },
+          "dob": {
+            "label": "Date of Birth",
+            "error": {
+              "invalid": "Date of birth cannot be empty or is invalid",
+              "future-date": "Date of birth cannot be in the future",
+              "too-young": "Must be at least 18 years old",
+              "too-old": "Date of birth cannot be before than 1900"
+            }
+          },
+          "nationality": {
+            "label": "Nationality",
+            "placeholder": "Select nationality"
+          }
+        }
+      },
+      "residential-address": {
+        "form": {
+          "address-line-1": {
+            "label": "Address line 1",
+            "international-label": "Address",
+            "placeholder": "Street and house number",
+            "error": "Address cannot be empty and must be a residential address (e.g. cannot be a P.O. Box)"
+          },
+          "address-line-2": {
+            "international-label": "Apartment/neighborhood (optional)",
+            "label": "Address line 2 (optional)",
+            "international-placeholder": "Neighborhood name, suite no, etc.",
+            "placeholder": "Apartment, suite, etc."
+          },
+          "city": {
+            "label": "City",
+            "placeholder": "City",
+            "error": "City cannot be empty"
+          },
+          "state": {
+            "label": "State",
+            "international-label": "State/province",
+            "placeholder": "State",
+            "international-placeholder": "State/province",
+            "error": "State cannot be empty"
+          },
+          "country": {
+            "label": "Country",
+            "placeholder": "Select",
+            "error": "Country cannot be empty",
+            "disabled-hint": "Only addresses in {{countryName}} are accepted"
+          },
+          "zipCode": {
+            "label": "Zip code",
+            "placeholder": "11206",
+            "error": "Zip code cannot be empty or is invalid"
+          }
+        },
+        "title": "What's your residential address?",
+        "subtitle": "Make sure to provide your updated residential address (no P.O. Boxes)."
+      },
+      "legal-status": {
+        "title": "What's your legal status in the U.S.?",
+        "subtitle": "We need to collect this information to complete your profile.",
+        "statuses": {
+          "citizen": "I'm a citizen",
+          "permanent-resident": "I have a Green Card/I'm a permanent resident",
+          "visa": "I have a Visa",
+          "other": "Other"
+        },
+        "form": {
+          "nationality": {
+            "label": "Country of birth",
+            "placeholder": "Select",
+            "error": "Country of birth cannot be empty"
+          },
+          "citizenship": {
+            "label": "Citizenship",
+            "placeholder": "Select",
+            "empty-error": "Citizenship cannot be empty",
+            "us-citizen-error": "If you are a US citizen, please select the \"I'm a citizen\" option above",
+            "delete-aria": "Remove citizenship",
+            "add-text": "Add Citizenship"
+          },
+          "visa-kind": {
+            "label": "Visa type",
+            "placeholder": "Select",
+            "error": "Visa type cannot be empty",
+            "mapping": {
+              "e1": "E-1",
+              "e2": "E-2",
+              "e3": "E-3",
+              "f1": "F-1",
+              "g4": "G-4",
+              "h1b": "H-1B",
+              "l1": "L-1",
+              "o1": "O-1",
+              "tn1": "TN-1",
+              "other": "Other"
+            }
+          },
+          "visa-expiration": {
+            "label": "Visa expiration date",
+            "error": {
+              "required": "Visa expiration date cannot be empty",
+              "invalid": "Visa expiration date is invalid",
+              "invalidTimeframe": "Visa expiration date is invalid"
+            }
+          }
+        }
+      },
+      "ssn": {
+        "full": {
+          "title": "What's your Social Security Number?",
+          "subtitle": "We need to collect this information to verify your identity.",
+          "disclaimer": {
+            "security": {
+              "title": "Your data is safe",
+              "description": "Your SSN is encrypted and protected by a state-of-the-art secure environment."
+            }
+          },
+          "form": {
+            "label": "SSN",
+            "placeholder": "XXX-XX-XXXX",
+            "error": "SSN cannot be empty or is invalid"
+          }
+        },
+        "last-four": {
+          "title": "What are the last 4 digits of your Social Security Number?",
+          "subtitle": "We need to collect this information to verify your identity.",
+          "form": {
+            "label": "SSN (last 4)",
+            "placeholder": "XXXX",
+            "error": "SSN cannot be empty or is invalid"
+          }
+        },
+        "skip": {
+          "cta": "I don't have a Social Security Number",
+          "confirmation": {
+            "title": "No SSN?",
+            "with-stepup-description": "Please confirm that you don’t have an SSN.",
+            "without-stepup-description": "Please confirm that you don’t have an SSN. It may take a bit longer to verify your identity.",
+            "yes": "Confirm",
+            "no": "Cancel"
+          }
+        }
+      },
+      "confirm": {
+        "summary": {
+          "title": "Confirm your personal data",
+          "subtitle": "Please make sure that your personal data is accurate and there are no typos before continuing.",
+          "edit": "Edit",
+          "reveal": "Reveal",
+          "hide": "Hide",
+          "cta": "Confirm & Continue",
+          "reveal-error": {
+            "title": "Something went wrong",
+            "description": "We were not able to reveal your SSN. Please edit your SSN to save it again."
+          }
+        },
+        "email": {
+          "title": "Email address",
+          "text": "Email"
+        },
+        "basic-info": {
+          "title": "Basic data",
+          "first-name": "First name",
+          "middle-name": "Middle name",
+          "last-name": "Last name",
+          "dob": "Date of birth",
+          "nationality": "Nationality"
+        },
+        "legal-status": {
+          "text": {
+            "title": "Legal status in the U.S.",
+            "status": "Legal status",
+            "nationality": "Country of birth",
+            "citizenship": "Citizenship",
+            "visa-kind": "Visa type",
+            "visa-expiration": "Visa expiration date"
+          },
+          "statuses": {
+            "citizen": "I'm a citizen",
+            "permanent_resident": "I have a Green Card/I'm a permanent resident",
+            "visa": "I have a Visa"
+          }
+        },
+        "address": {
+          "title": "Address"
+        },
+        "identity": {
+          "title": "Identity",
+          "ssn9": "SSN",
+          "ssn4": "SSN (last 4)",
+          "ssn-skipped-subtext": "You don't have a Social Security Number"
+        },
+        "di": {
+          "id": {
+            "email": "Email",
+            "first_name": "First name",
+            "middle_name": "Middle name",
+            "last_name": "Last name",
+            "ssn9": "SSN (Full)",
+            "ssn4": "SSN (Last 4)",
+            "nationality": "Nationality",
+            "dob": "Date of birth",
+            "address_line1": "Address line 1",
+            "address_line2": "Address line 2",
+            "city": "City",
+            "state": "State",
+            "zip": "Zip code",
+            "country": "Country",
+            "us_legal_status": "Legal status",
+            "country_of_birth": "Country of birth",
+            "citizenships": "Citizenship",
+            "visa_kind": "Visa type",
+            "visa_expiration_date": "Visa expiration date"
+          }
+        },
+        "errors": {
+          "invalid-inputs": {
+            "title": "An error occurred",
+            "description-with-message": "An error occurred while saving data. {{message}}.",
+            "description-with-fields": "An error occurred while saving data. Please fix these fields: {{fields}}.",
+            "description-generic": "An error occurred while saving data. Please fix the inputs and try again."
+          }
+        }
+      }
+    },
     "id-doc": {
       "desktop-consent": {
         "submit-button": {

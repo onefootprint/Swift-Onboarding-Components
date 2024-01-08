@@ -9,7 +9,7 @@ import { useL10nContext } from '../../../../../../components/l10n-provider';
 import type { FormData } from '../../types';
 
 const VisaFields = () => {
-  const { t } = useTranslation('pages.legal-status.form');
+  const { t } = useTranslation('pages.kyc.legal-status.form');
   const {
     control,
     formState: { errors },

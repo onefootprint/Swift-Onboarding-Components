@@ -20,7 +20,7 @@ const EditableFormButtonContainer = ({
   skipLabel,
   submitButtonTestID,
 }: EditableFormButtonContainerProps) => {
-  const { t } = useTranslation('pages');
+  const { t } = useTranslation('components');
 
   if (onCancel) {
     return (

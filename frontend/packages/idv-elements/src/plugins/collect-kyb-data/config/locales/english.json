@@ -1,5 +1,10 @@
 {
   "components": {
+    "cta": {
+      "continue": "Continue",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
     "sync-data-error": {
       "empty-auth-token": {
         "title": "Your session is invalid",

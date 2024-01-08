@@ -1,1 +1,1 @@
-export { default } from './EditableFormButtonContainer';
+export { default } from './editable-form-button-container';
