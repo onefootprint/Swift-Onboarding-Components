@@ -34,7 +34,7 @@ use crate::{
         review::save_review_decision,
         state::{
             actions::{MakeDecision, WorkflowActions},
-            common::{self, get_vres_id_for_fixture},
+            common::{self},
             Authorize, DocCollected, MakeVendorCalls, MakeWatchlistCheckCall, OnAction, ReviewCompleted,
             WorkflowState,
         },
@@ -132,7 +132,7 @@ impl AlpacaKycVendorCalls {
 impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
     type AsyncRes = (
         Option<Vec<NewRiskSignalInfo>>,
-        Vec<VendorResult>,
+        VendorResult,
         Arc<dyn FeatureFlagClient>,
     );
 
@@ -145,15 +145,11 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
         _action: MakeVendorCalls,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        let vendor_results = common::run_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?;
+        let vendor_result = common::run_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?;
         let ocr_reason_codes =
             common::maybe_generate_ocr_reason_codes(state, &self.wf_id, &self.sv_id).await?;
 
-        Ok((
-            ocr_reason_codes,
-            vendor_results,
-            state.feature_flag_client.clone(),
-        ))
+        Ok((ocr_reason_codes, vendor_result, state.feature_flag_client.clone()))
     }
 
     #[tracing::instrument("OnAction<MakeVendorCalls, AlpacaKycState>::on_commit", skip_all)]
@@ -163,7 +159,7 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<AlpacaKycState> {
-        let (ocr_reason_codes, vendor_results, ff_client) = async_res;
+        let (ocr_reason_codes, vendor_result, ff_client) = async_res;
         let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, &self.wf_id)?;
 
         // Save OCR risk signals for doc-first OBC if necessary
@@ -179,7 +175,7 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
         let risk_signals: RiskSignalGroupStruct<risk_signal_group_struct::Kyc> =
             if let Some(fd) = fixture_decision {
                 let reason_codes = decision::sandbox::get_fixture_reason_codes_alpaca(fd, &vw, &obc);
-                let vres_id = get_vres_id_for_fixture(&vendor_results)?;
+                let vres_id = vendor_result.verification_result_id.clone();
 
                 RiskSignalGroupStruct {
                     footprint_reason_codes: reason_codes
@@ -189,7 +185,9 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
                     group: risk_signal_group_struct::Kyc,
                 }
             } else {
-                let (results_map, ids_map) = build_vendor_response_map_from_vendor_results(&vendor_results)?;
+                let (results_map, ids_map) =
+                    build_vendor_response_map_from_vendor_results(&vec![vendor_result.clone()])?;
+                // TODO: later just have this take in a singular VR
                 create_risk_signals_from_vendor_results((&results_map, &ids_map), vw, obc)?
             };
 
@@ -202,7 +200,7 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
             wf_id: self.wf_id,
             sv_id: self.sv_id,
             t_id: self.t_id,
-            vendor_results,
+            vendor_results: vec![vendor_result],
             risk_signals,
         }))
     }

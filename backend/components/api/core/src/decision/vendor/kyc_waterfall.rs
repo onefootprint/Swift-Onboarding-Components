@@ -71,7 +71,7 @@ pub async fn run_kyc_waterfall(
     state: &State,
     di: &DecisionIntent,
     wf_id: &WorkflowId,
-) -> ApiResult<Vec<VendorResult>> {
+) -> ApiResult<VendorResult> {
     let svid = di.scoped_vault_id.clone();
     let diid = di.id.clone();
     let wf_id = wf_id.clone();
@@ -164,7 +164,7 @@ async fn waterfall_loop<F, Fut>(
     mut waterfall_vec: Vec<(VendorAPI, Option<RequestAndMaybeHydratedResult>)>,
     make_vendor_call: F,
     rule_config: WaterfallRuleConfig,
-) -> ApiResult<Vec<VendorResult>>
+) -> ApiResult<VendorResult>
 // TODO: refactor to just return a singular VendorResult
 where
     F: Fn(VendorAPI) -> Fut,
@@ -180,13 +180,13 @@ where
     // for now, this would most likely just 1 response since our current waterfall strategy is to only waterfall on hard errors and stop when we get 1 success
     // If this case is hit, that really means that we complted the waterfall successfully but then crashed before completing `on_commit` and advancing the workflow
     let success_responses = get_successful_vendor_responses(waterfall_vec.clone());
-    if !success_responses.is_empty() {
+    if let Some(success_vr) = success_responses.last() {
         // TODO: now that we are potentially waterfalling on rule failure, if we crash midway and then restart and the lastest call was a non-error but rule failing response, then we'll just return here instead of waterfalling like we might be needing to do.
         tracing::info!(
             success_responses_len = success_responses.len(),
             "[waterfall_loop] success_response already exists, returning"
         );
-        return Ok(success_responses.as_slice()[success_responses.len() - 1..].to_vec());
+        return Ok(success_vr.clone());
     }
 
     let mut i = 0;
@@ -203,14 +203,14 @@ where
             // ugh this sucks but kinda painted myself in a corner here, TODO: refactor/rewrite waterfall_loop so its cleaner now that we've added in rule failure waterfalling
             // we've exhausted vendors to try but the latest (or some) vendor we did try may have had a successful (but rule failing) response and so we want to return that and have the user fail rather than throw an error
             let final_vendor_responses = get_successful_vendor_responses(waterfall_vec);
-            if final_vendor_responses.is_empty() {
-                tracing::info!("[waterfall_loop] exhausted vendors and no non-error vendor response was received, erroring");
-                return Err(ApiErrorKind::VendorRequestsFailed.into());
-            } else {
+            if let Some(vr) = final_vendor_responses.last() {
                 tracing::info!(
                     "[waterfall_loop] exhausted vendors but returning latest non-error vendor response"
                 );
-                return Ok(final_vendor_responses.as_slice()[final_vendor_responses.len() - 1..].to_vec());
+                return Ok(vr.clone());
+            } else {
+                tracing::info!("[waterfall_loop] exhausted vendors and no non-error vendor response was received, erroring");
+                return Err(ApiErrorKind::VendorRequestsFailed.into());
             }
         };
         match next_action(&req_res, have_attempted_call, rule_config.clone()) {
@@ -240,10 +240,13 @@ where
             }
         }
     }
-    // return all successful VendorResponse's (although atm this is probably just 1)
     let final_vendor_responses = get_successful_vendor_responses(waterfall_vec);
     tracing::info!(final_vendor_responses_len=?final_vendor_responses.len(), "[waterfall_loop] loop finished, returning successful vendor response");
-    Ok(final_vendor_responses.as_slice()[final_vendor_responses.len() - 1..].to_vec())
+    if let Some(vr) = final_vendor_responses.last() {
+        Ok(vr.clone())
+    } else {
+        Err(ApiErrorKind::VendorRequestsFailed.into())
+    }
 }
 
 #[tracing::instrument(skip_all)]
@@ -643,13 +646,11 @@ mod tests {
     async fn assert_expected_result(
         state: &mut State,
         expected_result: ExpectedResult,
-        res: ApiResult<Vec<VendorResult>>,
+        res: ApiResult<VendorResult>,
     ) {
         match expected_result {
             ExpectedResult::SingularSuccessVendorResult(vendor) => {
-                let mut res = res.unwrap();
-                assert_eq!(1, res.len());
-                assert_vendor_result(state, vendor, res.pop().unwrap()).await;
+                assert_vendor_result(state, vendor, res.unwrap()).await;
             }
             ExpectedResult::ErrVendorRequestsFailed => {
                 let err = res.err().unwrap();

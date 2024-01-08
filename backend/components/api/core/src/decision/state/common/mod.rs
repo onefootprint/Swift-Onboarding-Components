@@ -27,7 +27,7 @@ use crate::{
             incode_watchlist::WatchlistCheckKind,
             vendor_api::{
                 vendor_api_response::build_vendor_response_map_from_vendor_results,
-                vendor_api_struct::{ExperianPreciseID, IdologyExpectID, IncodeFetchOCR},
+                vendor_api_struct::IncodeFetchOCR,
             },
             vendor_result::VendorResult,
         },
@@ -63,7 +63,7 @@ pub async fn run_kyc_vendor_calls(
     state: &State,
     wf_id: &WorkflowId,
     t_id: &TenantId,
-) -> ApiResult<Vec<VendorResult>> {
+) -> ApiResult<VendorResult> {
     let wfid = wf_id.clone();
     let (wf, v, di) = state
         .db_pool
@@ -82,9 +82,7 @@ pub async fn run_kyc_vendor_calls(
     let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, t_id)?;
 
     if fixture_decision.is_some() {
-        Ok(vec![
-            decision::sandbox::save_fixture_vendor_result(&state.db_pool, &di, &wf).await?,
-        ])
+        Ok(decision::sandbox::save_fixture_vendor_result(&state.db_pool, &di, &wf).await?)
     } else {
         vendor::kyc_waterfall::run_kyc_waterfall(state, &di, &wf.id).await
     }
@@ -147,21 +145,6 @@ pub type KycDecision = (
     WaterfallOnboardingRulesDecisionOutput,
     Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
 );
-
-// TODO: this is an awful temporary hack but should go away when we refactor things so we pass reason codes directly into rule execution
-// In sandbox/demo, we still make Vres's based on the Tenant's TVC. We should probably just have some dummy TestVendor or something or
-// always simulate just Idology, but for now we just robustly take the first of either Idology or Experian that exists
-#[tracing::instrument(skip_all)]
-pub fn get_vres_id_for_fixture(vendor_results: &[VendorResult]) -> ApiResult<VerificationResultId> {
-    let (_, vendor_ids_map) = build_vendor_response_map_from_vendor_results(vendor_results)?;
-    let idology = vendor_ids_map
-        .get(&IdologyExpectID)
-        .map(|r| r.verification_result_id.clone());
-    let experian = vendor_ids_map
-        .get(&ExperianPreciseID)
-        .map(|r| r.verification_result_id.clone());
-    Ok(idology.or(experian).ok_or(decision::Error::FixtureVresNotFound)?)
-}
 
 pub fn kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> ApiResult<Decision> {
     let rules_output = OnboardingRulesDecisionOutput::from(fixture_decision);
@@ -319,9 +302,9 @@ pub fn get_aml_risk_signals_from_aml_call(
 pub fn get_aml_risk_signals_from_kyc_call(
     obc: ObConfiguration,
     vw: VaultWrapper,
-    kyc_vendor_results: &[VendorResult],
+    kyc_vendor_result: VendorResult,
 ) -> ApiResult<RiskSignalGroupStruct<Aml>> {
-    let (results_map, ids_map) = build_vendor_response_map_from_vendor_results(kyc_vendor_results)?;
+    let (results_map, ids_map) = build_vendor_response_map_from_vendor_results(&vec![kyc_vendor_result])?;
     decision::features::risk_signals::create_risk_signals_from_vendor_results(
         (&results_map, &ids_map),
         vw,

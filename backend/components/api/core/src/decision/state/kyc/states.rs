@@ -29,7 +29,7 @@ use crate::decision::{
     },
     state::{
         actions::{Authorize, WorkflowActions},
-        common::{self, get_vres_id_for_fixture},
+        common::{self},
         DocCollected, WorkflowState,
     },
     utils::should_execute_rules_for_document_only,
@@ -118,7 +118,7 @@ impl KycVendorCalls {
 impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
     type AsyncRes = (
         Option<Vec<NewRiskSignalInfo>>,
-        Option<Vec<VendorResult>>,
+        Option<VendorResult>,
         Option<(VerificationResultId, WatchlistResultResponse)>,
         Arc<dyn FeatureFlagClient>,
     );
@@ -140,7 +140,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             .0;
 
         // TODO: we should also skip if the UVW is non-US, but then we probably need to assert that doc was collected. Also need to clairfy tenant's understanding of this
-        let kyc_vendor_results = if !obc.skip_kyc {
+        let kyc_vendor_result = if !obc.skip_kyc {
             Some(common::run_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?)
         } else {
             None
@@ -158,7 +158,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
 
         Ok((
             ocr_reason_codes,
-            kyc_vendor_results,
+            kyc_vendor_result,
             aml_vendor_result,
             state.feature_flag_client.clone(),
         ))
@@ -171,7 +171,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<KycState> {
-        let (ocr_reason_codes, kyc_vendor_results, aml_vendor_result, ff_client) = async_res;
+        let (ocr_reason_codes, kyc_vendor_result, aml_vendor_result, ff_client) = async_res;
         let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, &self.wf_id)?;
 
         // Save OCR risk signals for doc-first OBC if necessary
@@ -185,10 +185,10 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         let fixture_decision =
             decision::utils::get_fixture_data_decision(ff_client, &vw.vault, &wf, &self.t_id)?;
         // Save KYC risk signals, if we made KYC calls
-        if let Some(kyc_vendor_results) = &kyc_vendor_results {
+        if let Some(kyc_vendor_result) = &kyc_vendor_result {
             let kyc_risk_signals = if let Some(fd) = fixture_decision {
                 let reason_codes = decision::sandbox::get_fixture_kyc_reason_codes(fd, &vw, &obc);
-                let vres_id = get_vres_id_for_fixture(kyc_vendor_results)?;
+                let vres_id = kyc_vendor_result.verification_result_id.clone();
 
                 RiskSignalGroupStruct {
                     footprint_reason_codes: reason_codes
@@ -201,7 +201,8 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 // TODO: make kyc_vendor_results a singular kyc_vendor_result and probably can skip this map stuff? could optimize that later
                 // and consolidate this into one method for VendorResult -> risk signals
                 let (results_map, ids_map) =
-                    build_vendor_response_map_from_vendor_results(kyc_vendor_results)?;
+                    build_vendor_response_map_from_vendor_results(&[kyc_vendor_result.clone()])?;
+                // TODO: change this to take in a single VR
                 create_risk_signals_from_vendor_results((&results_map, &ids_map), vw.clone(), obc.clone())?
             };
             save_risk_signals(conn, &self.sv_id, &kyc_risk_signals, false)?;
@@ -227,8 +228,8 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 )
             };
             save_risk_signals(conn, &self.sv_id, &aml_risk_signals, false)?;
-        } else if let Some(kyc_vendor_results) = kyc_vendor_results {
-            let aml_risk_signals = common::get_aml_risk_signals_from_kyc_call(obc, vw, &kyc_vendor_results)?;
+        } else if let Some(kyc_vendor_result) = kyc_vendor_result {
+            let aml_risk_signals = common::get_aml_risk_signals_from_kyc_call(obc, vw, kyc_vendor_result)?;
             save_risk_signals(conn, &self.sv_id, &aml_risk_signals, false)?;
         };
 
