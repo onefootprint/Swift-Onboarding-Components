@@ -3,6 +3,7 @@ import pytest
 from tests.bifrost_client import BifrostClient
 from tests.headers import FpAuth
 from tests.utils import (
+    HttpError,
     post,
     override_webauthn_challenge,
     override_webauthn_attestation,
@@ -95,11 +96,14 @@ def test_replace_ci(sandbox_tenant, challenge, di, user_with_token):
     )
 
 
-def test_add_passkey(sandbox_tenant, user_with_token):
+@pytest.mark.parametrize("action_kind", ["add", "replace"])
+def test_passkey(sandbox_tenant, user_with_token, action_kind):
     user, auth_token = user_with_token
 
     # Add a passkey
-    data = dict(kind="passkey", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="add")
+    data = dict(
+        kind="passkey", phone_number=FIXTURE_PHONE_NUMBER2, action_kind=action_kind
+    )
     body = post("hosted/user/challenge", data, auth_token)
 
     challenge_token = body["challenge_token"]
@@ -113,9 +117,25 @@ def test_add_passkey(sandbox_tenant, user_with_token):
     body = post("hosted/user/challenge/verify", data, auth_token)
 
     # Kind of hacky, replace the webauthn cred stored on bifrost client with the one we just registered
+    old_webauthn_device = user.client.webauthn_device
     user.client.webauthn_device = webauthn_device
 
     # Make sure we can log in using the new passkey
     auth_token = inherit_user_biometric(
         user, "onboarding", sandbox_tenant.default_ob_config.key
     )
+
+    if action_kind == "replace":
+        # Make sure we can't log in using the old passkey
+        user.client.webauthn_device = old_webauthn_device
+        try:
+            inherit_user_biometric(
+                user, "onboarding", sandbox_tenant.default_ob_config.key
+            )
+            assert False, "Expected error"
+        except HttpError as e:
+            assert e.status_code == 400
+            assert (
+                json.loads(e.content)["error"]["message"]
+                == "The credential requested could not be found"
+            )

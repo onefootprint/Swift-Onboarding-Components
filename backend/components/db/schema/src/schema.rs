@@ -1132,6 +1132,7 @@ table! {
         attestation_type -> Text,
         insight_event_id -> Text,
         backup_state -> Bool,
+        deactivated_at -> Nullable<Timestamptz>,
     }
 }
 

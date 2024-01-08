@@ -26,6 +26,7 @@ use crypto::sha256;
 use db::models::auth_event::AuthEvent;
 use db::models::auth_event::NewAuthEvent;
 use db::models::insight_event::CreateInsightEvent;
+use db::models::webauthn_credential::WebauthnCredential;
 use db::TxnPgConn;
 use newtypes::AuthEventKind;
 use newtypes::ContactInfoKind;
@@ -179,9 +180,11 @@ impl Action {
                 (kind, None)
             }
             Self::RegisterWebauthnCred(res) => {
-                if action_kind != ActionKind::Add {
-                    // We should build support for this in the future
-                    return ValidationError("Can only add passkey for now").into();
+                match action_kind {
+                    ActionKind::Replace => {
+                        WebauthnCredential::deactivate(conn, user_auth.user_vault_id())?;
+                    }
+                    ActionKind::Add => {}
                 }
                 let cred = res.save_credential(conn, user_auth, ie_id)?;
                 (AuthEventKind::Passkey, Some(cred.id))

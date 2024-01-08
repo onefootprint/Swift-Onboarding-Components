@@ -1,0 +1,1 @@
+ALTER TABLE webauthn_credential ADD COLUMN deactivated_at TIMESTAMPTZ;

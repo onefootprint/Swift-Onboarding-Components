@@ -6,8 +6,6 @@ use db_schema::schema::{self, webauthn_credential};
 use diesel::{Insertable, QueryDsl, Queryable, RunQueryDsl};
 use newtypes::{AttestationType, InsightEventId, VaultId, WebauthnCredentialId};
 
-use super::insight_event::InsightEvent;
-
 // TODO handle when a user tries to add a second webauthn credential
 #[derive(Debug, Clone, Queryable, Identifiable)]
 #[diesel(table_name = webauthn_credential)]
@@ -27,6 +25,7 @@ pub struct WebauthnCredential {
     pub attestation_type: AttestationType,
     pub insight_event_id: InsightEventId,
     pub backup_state: bool,
+    pub deactivated_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, AsChangeset)]
@@ -40,22 +39,10 @@ impl WebauthnCredential {
     pub fn list(conn: &mut PgConn, vault_id: &VaultId) -> DbResult<Vec<Self>> {
         let creds = schema::webauthn_credential::table
             .filter(schema::webauthn_credential::vault_id.eq(vault_id))
+            .filter(schema::webauthn_credential::deactivated_at.is_null())
             .get_results(conn)?;
 
         Ok(creds)
-    }
-
-    #[tracing::instrument("WebauthnCredential::get_bulk", skip_all)]
-    pub fn get_bulk(
-        conn: &mut PgConn,
-        ids: Vec<&WebauthnCredentialId>,
-    ) -> DbResult<Vec<(Self, InsightEvent)>> {
-        let results = webauthn_credential::table
-            .inner_join(schema::insight_event::table)
-            .filter(webauthn_credential::id.eq_any(ids))
-            .get_results::<(WebauthnCredential, InsightEvent)>(conn)?;
-
-        Ok(results)
     }
 
     #[tracing::instrument("WebauthnCredential::update_backup_state", skip_all)]
@@ -69,10 +56,22 @@ impl WebauthnCredential {
 
     #[tracing::instrument("WebauthnCredential::get_by_credential_id", skip_all)]
     pub fn get_by_credential_id(conn: &mut PgConn, vault_id: &VaultId, cred_id: &[u8]) -> DbResult<Self> {
-        Ok(webauthn_credential::table
+        let result = webauthn_credential::table
             .filter(webauthn_credential::vault_id.eq(vault_id))
             .filter(webauthn_credential::credential_id.eq(cred_id))
-            .get_result(conn)?)
+            .filter(schema::webauthn_credential::deactivated_at.is_null())
+            .get_result(conn)?;
+        Ok(result)
+    }
+
+    #[tracing::instrument("WebauthnCredential::deactivate", skip_all)]
+    /// Deactivate any webauthn credentials for the provided vault
+    pub fn deactivate(conn: &mut PgConn, vault_id: &VaultId) -> DbResult<()> {
+        diesel::update(webauthn_credential::table)
+            .filter(webauthn_credential::vault_id.eq(vault_id))
+            .set(webauthn_credential::deactivated_at.eq(Utc::now()))
+            .execute(conn)?;
+        Ok(())
     }
 }
 
