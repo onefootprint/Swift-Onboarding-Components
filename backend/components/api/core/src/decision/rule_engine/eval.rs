@@ -9,6 +9,7 @@ pub trait HasRule {
     fn action(&self) -> RuleAction;
 }
 
+#[derive(Debug)]
 pub struct Rule {
     pub expression: RuleExpression,
     pub action: RuleAction,

@@ -1,12 +1,7 @@
 use std::collections::HashMap;
 
 use crate::{
-    decision::{
-        self,
-        features::risk_signals::RiskSignalsForDecision,
-        onboarding::rules::{KycRuleExecutionConfig, KycRuleGroup},
-        rule::rule_sets,
-    },
+    decision::{self, rule_engine::eval::Rule},
     errors::ApiResult,
     utils::vault_wrapper::{Any, VaultWrapper, VwArgs},
     ApiErrorKind, State,
@@ -18,7 +13,7 @@ use db::models::{
 use feature_flag::BoolFlag;
 use idv::VendorResponse;
 use itertools::Itertools;
-use newtypes::{RuleName, VendorAPI, WorkflowId};
+use newtypes::{RuleAction, VendorAPI, WorkflowId};
 use std::future::Future;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
@@ -120,23 +115,7 @@ pub async fn run_kyc_waterfall(
         .feature_flag_client
         .flag(BoolFlag::IsKycWaterfallOnRuleFailureEnabled(&tenant_id))
     {
-        // If a user does not provide SSN, we don't necessarily need to waterfall if that's the only failing rule
-        let mut rules = rule_sets::kyc::kyc_rules();
-        rules.retain(|r| r.name != RuleName::SsnNotProvided); // a little sketch to use name here
-
-        WaterfallRuleConfig::Enabled {
-            // TODO: rework HasRuleGroup and instead get rules based on OBC and use that here instead of hardcoding to rule_sets::kyc::kyc_rules(). And split kyc vs aml vs doc rules so we can get just the configured kyc rules here.
-            // or mb we have separate rules for waterfall determination
-            rule_group: KycRuleGroup {
-                kyc_rules: rules,
-                doc_rules: vec![],
-                aml_rules: vec![],
-            },
-
-            rule_config: KycRuleExecutionConfig::for_kyc_only(),
-            vw,
-            obc,
-        }
+        WaterfallRuleConfig::Enabled { vw, obc }
     } else {
         WaterfallRuleConfig::Disabled
     };
@@ -296,14 +275,9 @@ fn next_action(
 
                     match rule_config {
                         WaterfallRuleConfig::Disabled => Action::Done,
-                        WaterfallRuleConfig::Enabled {
-                            rule_group,
-                            rule_config,
-                            vw,
-                            obc,
-                        } => {
+                        WaterfallRuleConfig::Enabled { vw, obc } => {
                             // mb unnecessary and could `?` here but for now to be a bit safer, just log error and default to `Done` if there is an error in rule eval
-                            match eval_rules(vr, rule_group, rule_config, vw, obc) {
+                            match eval_rules(vr, vw, obc) {
                                 Ok(action) => action,
                                 Err(_) => Action::Done,
                             }
@@ -320,38 +294,44 @@ fn next_action(
 }
 
 #[tracing::instrument(skip_all)]
-fn eval_rules(
-    res: VendorResult,
-    rule_group: KycRuleGroup,
-    rule_config: KycRuleExecutionConfig,
-    vw: VaultWrapper,
-    obc: ObConfiguration,
-) -> ApiResult<Action> {
+fn eval_rules(res: VendorResult, vw: VaultWrapper, obc: ObConfiguration) -> ApiResult<Action> {
     // this does a lot of unnecessary stuff and has a lot of layers of unnecessary indirection but unfortunately this is the safest way to produce risk signals here without diverging too much from how other code paths do this
-    let rsg = decision::features::risk_signals::parse_reason_codes_from_vendor_result(res, vw, obc)?.kyc;
-    let rsfd = RiskSignalsForDecision {
-        kyc: Some(rsg.clone()),
-        doc: None,
-        kyb: None,
-        aml: None,
-        risk_signals: HashMap::new(), // TODO: when we use the new Rules Engine here, we'll need to write hidden risk signals for each vendor
-    };
+    let reason_codes = decision::features::risk_signals::parse_reason_codes_from_vendor_result(res, vw, obc)?
+        .kyc
+        .footprint_reason_codes
+        .into_iter()
+        .map(|(frc, _, _)| frc)
+        .collect_vec();
 
-    let decision_output = rule_group.evaluate(rsfd, rule_config)?.final_kyc_decision()?;
+    let rules: Vec<_> = [
+        decision::rule_engine::default_rules::base_kyc_rules(),
+        decision::rule_engine::default_rules::ssn_rules(),
+    ]
+    .concat()
+    .into_iter()
+    .map(|(re, ra)| Rule {
+        expression: re,
+        action: ra,
+    })
+    .collect();
+    let (rule_results, action_triggered) =
+        decision::rule_engine::eval::evaluate_rule_set(rules, &reason_codes, true);
+
     tracing::info!(
-       rules_triggered=%decision::rule::rules_to_string(&decision_output.rules_triggered),
-       rules_not_triggered=%decision::rule::rules_to_string(&decision_output.rules_not_triggered),
-       create_manual_review=%decision_output.decision.create_manual_review,
-       decision=%decision_output.decision.decision_status,
-       reason_codes=%rsg.footprint_reason_codes.iter().map(|r| r.0.to_string()).join(","),
-       footprint_reason_codes=?rsg.footprint_reason_codes,
-       "kyc_waterfall rule evaluation"
+        ?rule_results,
+        ?action_triggered,
+        ?reason_codes,
+        "kyc_waterfall rule evaluation"
     );
 
-    match decision_output.decision.decision_status {
-        newtypes::DecisionStatus::Fail | newtypes::DecisionStatus::StepUp => Ok(Action::TryNextVendor),
-        newtypes::DecisionStatus::Pass => Ok(Action::Done),
-    }
+    let action = match action_triggered {
+        None => Action::Done,
+        Some(ra) => match ra {
+            RuleAction::PassWithManualReview => Action::Done,
+            RuleAction::ManualReview | RuleAction::StepUp | RuleAction::Fail => Action::TryNextVendor,
+        },
+    };
+    Ok(action)
 }
 
 #[derive(Clone)]
@@ -359,8 +339,6 @@ fn eval_rules(
 enum WaterfallRuleConfig {
     Disabled,
     Enabled {
-        rule_group: KycRuleGroup,
-        rule_config: KycRuleExecutionConfig,
         vw: VaultWrapper,     // needed for risk signal generation
         obc: ObConfiguration, // needed for risk signal generation
     },
