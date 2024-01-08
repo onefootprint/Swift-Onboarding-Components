@@ -2,21 +2,49 @@ import {
   Stack,
   Table,
   Title,
-  useComponentState,
-  CodeInput,
   Card,
   Text,
-  TextInput,
-  Code,
   Button,
   useTaskQuery,
-  useTaskMutation,
   Loader,
   Chart,
 } from '@airplane/views';
 
 import { useState } from 'react';
 import airplane from 'airplane';
+
+// Add your own select clause to this query
+const NYPID_QUERY = `
+FROM vault 
+INNER JOIN scoped_vault on scoped_vault.vault_id = vault.id
+INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
+WHERE
+  vault.is_portable = 'f' AND
+  vault.is_live = 't' AND
+  vault.is_created_via_api = 't' AND
+  -- This is technically needed for correctness since only id data is portablizable. But this slows
+  -- down the query a lot, and doesn't make a huge difference on numbers
+  -- vault.id IN (
+  --    SELECT vault_id
+  --    FROM data_lifetime
+  --    WHERE kind ilike 'id.%'
+  -- ) AND
+  tenant.sandbox_restricted = false AND
+  tenant.is_demo_tenant='f'
+`;
+
+// Add your own select clause to this query
+const PID_QUERY = `
+FROM vault
+INNER JOIN scoped_vault on scoped_vault.vault_id = vault.id
+INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
+WHERE
+  vault.is_portable = 't' AND
+  vault.is_live = 't' AND
+  tenant.id NOT LIKE '_private_it_org_%' AND
+  tenant.sandbox_restricted = false AND
+  scoped_vault.is_live = true
+`;
 
 // Views documentation: https://docs.airplane.dev/views/getting-started
 const Stats = () => {
@@ -34,12 +62,8 @@ const Stats = () => {
         <OverviewCard
           title={'Portable IDs'}
           query={`
-          SELECT count(distinct scoped_vault.id) FROM onboarding_decision
-          INNER JOIN workflow on onboarding_decision.workflow_id = workflow.id
-          INNER JOIN scoped_vault on scoped_vault.id = workflow.scoped_vault_id
-          INNER JOIN vault on vault.id = scoped_vault.vault_id
-          INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
-          WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND onboarding_decision.status = 'pass' AND vault.is_portable = 't';
+          SELECT count(distinct vault.id)
+          ${PID_QUERY};
           `}
         ></OverviewCard>
         <OverviewCard
@@ -49,16 +73,19 @@ const Stats = () => {
           INNER JOIN workflow on onboarding_decision.workflow_id = workflow.id
           INNER JOIN scoped_vault on scoped_vault.id = workflow.scoped_vault_id
           INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
-          WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.is_demo_tenant='f' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND onboarding_decision.status = 'pass';
+          WHERE
+            tenant.is_demo_tenant='f' AND
+            tenant.sandbox_restricted = false AND
+            scoped_vault.is_live = true AND
+            onboarding_decision.status = 'pass' AND
+            onboarding_decision.actor ->> 'kind' = 'footprint';
           `}
         ></OverviewCard>
         <OverviewCard
           title={'Not (yet) Portable IDs'}
           query={`
-          SELECT count(*) FROM scoped_vault 
-          INNER JOIN vault on scoped_vault.vault_id = vault.id
-          INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
-          WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.sandbox_restricted = false AND tenant.is_demo_tenant='f' AND scoped_vault.is_live = true AND vault.is_portable = 'f'
+          SELECT count(distinct vault.id)
+          ${NYPID_QUERY};
           `}
         ></OverviewCard>
       </Stack>
@@ -68,12 +95,15 @@ const Stats = () => {
           transform={null}
           colors={null}
           query={`
-          SELECT "day", "new vaults" from (SELECT to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day", count(*) as "new vaults" FROM scoped_vault
-          INNER JOIN vault on scoped_vault.vault_id = vault.id
-          INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
-          WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.is_demo_tenant='f' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND vault.is_portable = 't'
-          GROUP BY "day"
-          ORDER BY "day" DESC LIMIT 30) r 
+          SELECT "day", "new vaults"
+          FROM (
+            SELECT
+              to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day",
+              count(distinct vault.id) as "new vaults"
+            ${PID_QUERY}
+            GROUP BY "day"
+            ORDER BY "day" DESC LIMIT 30
+          ) r 
           ORDER BY "day" ASC;
         `}
         ></GraphCard>
@@ -119,15 +149,13 @@ const Stats = () => {
             return out;
           }}
           query={`
-            WITH live_tenants AS (
-              SELECT tenant.id FROM tenant
-              WHERE tenant.sandbox_restricted = false AND tenant.id NOT LIKE '_private_it_org_%' AND tenant.is_demo_tenant='f'
-            ), vault_counts_per_day AS (
-                SELECT to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day", tenant.name as "tenant", count(*) as "new_vaults"
-                FROM scoped_vault
-                INNER JOIN vault on scoped_vault.vault_id = vault.id
-                INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
-                WHERE tenant.id IN (SELECT id FROM live_tenants) AND scoped_vault.is_live = true AND vault.is_portable = 't' AND start_timestamp > current_timestamp - '7 days'::interval  
+            WITH vault_counts_per_day AS (
+                SELECT
+                  to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day",
+                  tenant.name as "tenant",
+                  count(distinct vault.id) as "new_vaults"
+                ${PID_QUERY}
+                  AND start_timestamp > current_timestamp - '7 days'::interval  
                 GROUP BY 1, 2
                 ORDER BY 1, 2
               )          
@@ -135,19 +163,19 @@ const Stats = () => {
         `}
         ></GraphCard>
 
+        {/* TODO same here as well */}
         <GraphCard
           title={'Not (yet) Portable IDs last 30 days'}
           transform={null}
           colors={null}
           query={`
-          SELECT "day", "new vaults" from (SELECT to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day", count(*) as "new vaults" FROM scoped_vault
-          INNER JOIN vault on scoped_vault.vault_id = vault.id
-          INNER JOIN tenant on tenant.id = scoped_vault.tenant_id
-          WHERE tenant.id NOT LIKE '_private_it_org_%' AND tenant.is_demo_tenant='f' AND tenant.sandbox_restricted = false AND scoped_vault.is_live = true AND vault.is_portable = 'f'
+          SELECT
+            "day", "new vaults" from (SELECT to_char(scoped_vault.start_timestamp at time zone '${timezone}', 'YYYY-MM-DD') AS "day",
+            count(distinct vault.id) as "new vaults"
+          ${NYPID_QUERY}
           GROUP BY "day"
           ORDER BY "day" DESC LIMIT 30) r 
           ORDER BY "day" ASC;
-
         `}
         ></GraphCard>
 
@@ -179,20 +207,20 @@ const Stats = () => {
             params: {
               query: `
               select 
-              t.id, 
-              t.name,
-              sum(cast(sv.status != 'incomplete' as int)) as completed,
-              ROUND(sum(cast(sv.status = 'pass' as int)) * 1.00 / sum(cast(sv.status != 'incomplete' as int)), 2) as pass_rate,
-              sum(cast(sv.status = 'pass' as int)) as passes,
-              sum(cast(sv.status = 'fail' as int)) as fails,
-              sum(cast(sv.status = 'incomplete' as int)) as incompletes
-            from scoped_vault sv
-            join tenant t on t.id = sv.tenant_id
-            where sv._created_at > '2023-09-24'
-              and t.is_demo_tenant='f'
-              and sv.is_live
-            group by 1,2
-          `,
+                t.id, 
+                t.name,
+                sum(cast(sv.status != 'incomplete' as int)) as completed,
+                ROUND(sum(cast(sv.status = 'pass' as int)) * 1.00 / sum(cast(sv.status != 'incomplete' as int)), 2) as pass_rate,
+                sum(cast(sv.status = 'pass' as int)) as passes,
+                sum(cast(sv.status = 'fail' as int)) as fails,
+                sum(cast(sv.status = 'incomplete' as int)) as incompletes
+              from scoped_vault sv
+              join tenant t on t.id = sv.tenant_id
+              where sv._created_at > '2023-09-24'
+                and t.is_demo_tenant='f'
+                and sv.is_live
+              group by 1,2
+            `,
             },
           }}
         ></Table>
