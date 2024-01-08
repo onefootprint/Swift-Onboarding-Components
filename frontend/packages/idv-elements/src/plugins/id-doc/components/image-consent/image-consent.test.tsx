@@ -3,7 +3,7 @@ import { Button } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 import { I18nextProvider } from 'react-i18next';
 
-import configureI18next from '../../config/initializers/i18next';
+import configureI18next from '../../../../config/initializers/i18next';
 import type { ImageConsentHandler } from '.';
 import ImageConsent from '.';
 

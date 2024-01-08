@@ -13,7 +13,7 @@ import { SupportedIdDocTypes } from '@onefootprint/types';
 import type { RadioSelectOptionFields } from '@onefootprint/ui';
 
 const useOptionsByDocType = (supportedDocumentTypes: SupportedIdDocTypes[]) => {
-  const { t } = useTranslation('pages.country-and-type-selection');
+  const { t } = useTranslation('pages.id-doc.country-and-type-selection');
 
   const optionsByDocType: {
     [key in SupportedIdDocTypes]?: RadioSelectOptionFields;

@@ -145,7 +145,7 @@ const Camera = ({
   outlineWidthRatio,
   setIsCaptured,
 }: CameraProps) => {
-  const { t } = useTranslation('components.camera');
+  const { t } = useTranslation('components.id-doc.camera');
   const canvasAutoCaptureRef = useRef<HTMLCanvasElement>();
   const canvasImageCaptureRef = useRef<HTMLCanvasElement>();
   const videoRef: VideoRef = useRef<HTMLVideoElement>(null);

@@ -40,7 +40,7 @@ const DesktopPhotoPrompt = ({
   isRetry,
   errors,
 }: DesktopPhotoPromptProps) => {
-  const { t } = useTranslation('components.desktop-photo-prompt');
+  const { t } = useTranslation('components.id-doc.desktop-photo-prompt');
   const [state, send] = useIdDocMachine();
   const { hasBadConnectivity } = state.context;
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();

@@ -11,7 +11,7 @@ import { getCountryFromCode } from '../../utils/get-country-from-code';
 
 const SelfieRetryPrompt = () => {
   const [state, send] = useIdDocMachine();
-  const { t } = useTranslation('pages.selfie-retry-prompt');
+  const { t } = useTranslation('pages.id-doc.selfie-retry-prompt');
 
   const {
     idDoc: { type, country },

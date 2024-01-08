@@ -5,11 +5,11 @@ import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 
 import { useL10nContext } from '../../components/l10n-provider';
+import configureI18next from '../../config/initializers/i18next';
+import queryClient from '../../config/initializers/react-query';
 import { ImgProcessorsContextProvider } from './components/image-processors';
 import { MachineProvider } from './components/machine-provider';
 import { MissingPermissionsSheetProvider } from './components/missing-permissions-sheet';
-import configureI18next from './config/initializers/i18next';
-import queryClient from './config/initializers/react-query';
 import { FaceModelProvider } from './hooks/use-face-model-loader';
 import Router from './pages/router';
 import type { IdDocProps } from './types';

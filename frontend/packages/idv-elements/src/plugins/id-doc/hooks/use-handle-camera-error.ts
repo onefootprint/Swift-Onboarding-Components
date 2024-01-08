@@ -6,7 +6,7 @@ import { useMissingPermissionsSheet } from '../components/missing-permissions-sh
 
 const useHandleCameraError = () => {
   const toast = useToast();
-  const { t } = useTranslation('components.media-errors');
+  const { t } = useTranslation('components.id-doc.media-errors');
   const missingPermissionsSheet = useMissingPermissionsSheet();
 
   const showErrorToast = (description: string) => {

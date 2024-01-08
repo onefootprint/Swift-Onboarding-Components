@@ -14,7 +14,7 @@ const MissingPermissionsSheet = ({
   open,
   onClose,
 }: MissingPermissionsSheetProps) => {
-  const { t } = useTranslation('components.missing-permissions');
+  const { t } = useTranslation('components.id-doc.missing-permissions');
 
   return (
     <BottomSheet open={open} onClose={onClose}>

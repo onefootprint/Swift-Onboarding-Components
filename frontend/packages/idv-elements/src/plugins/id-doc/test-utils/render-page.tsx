@@ -2,11 +2,11 @@ import { render, Wrapper } from '@onefootprint/test-utils';
 import type { ReactNode } from 'react';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
-import { Layout } from 'src/components';
 
+import { Layout } from '../../../components';
+import configureI18next from '../../../config/initializers/i18next';
 import { MachineProvider } from '../components/machine-provider';
 import { MissingPermissionsSheetProvider } from '../components/missing-permissions-sheet';
-import configureI18next from '../config/initializers/i18next';
 import type { MachineContext } from '../utils/state-machine';
 
 const renderPage = (

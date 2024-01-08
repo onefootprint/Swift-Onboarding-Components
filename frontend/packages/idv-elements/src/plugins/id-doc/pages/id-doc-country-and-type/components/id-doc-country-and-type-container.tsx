@@ -59,7 +59,7 @@ const IdDocCountryAndTypeContainer = ({
   onSubmitDocTypeSuccess,
   onConsentSubmit,
 }: IdDocCountryAndTypeContainerProps) => {
-  const { t } = useTranslation('pages.country-and-type-selection');
+  const { t } = useTranslation('pages.id-doc.country-and-type-selection');
   const [state] = useIdDocMachine();
   const submitDocTypeMutation = useSubmitDocType();
   const { isLoading: isDocTypeSubmissionLoading } = submitDocTypeMutation;

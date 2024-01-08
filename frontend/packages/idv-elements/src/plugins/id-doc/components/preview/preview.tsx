@@ -24,7 +24,7 @@ const Preview = ({
   cameraKind,
   deviceKind,
 }: PreviewProps) => {
-  const { t } = useTranslation('components.preview');
+  const { t } = useTranslation('components.id-doc.preview');
 
   return (
     <Container>

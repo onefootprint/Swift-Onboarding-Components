@@ -15,7 +15,7 @@ import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import { getCountryFromCode } from '../../utils/get-country-from-code';
 
 const DesktopSelfieRetry = () => {
-  const { t } = useTranslation('pages.desktop-selfie-retry');
+  const { t } = useTranslation('pages.id-doc.desktop-selfie-retry');
   const [state, send] = useIdDocMachine();
   const {
     idDoc: { type, country },

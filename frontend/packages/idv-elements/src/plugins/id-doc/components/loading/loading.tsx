@@ -17,7 +17,7 @@ const Loading = ({
   step,
   showSlowConnectionMessage,
 }: LoadingProps) => {
-  const { t } = useTranslation('components.loading');
+  const { t } = useTranslation('components.id-doc.loading');
 
   return (
     <Container>

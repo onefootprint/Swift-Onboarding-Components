@@ -15,7 +15,7 @@ type DesktopHeaderProps = {
 };
 
 const DesktopHeader = ({ type, imageType, country }: DesktopHeaderProps) => {
-  const { t } = useTranslation('components.desktop-header');
+  const { t } = useTranslation('components.id-doc.desktop-header');
 
   const side = getImageSideLabel(imageType, type);
 

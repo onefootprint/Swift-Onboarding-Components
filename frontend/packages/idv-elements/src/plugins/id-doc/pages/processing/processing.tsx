@@ -21,7 +21,7 @@ import useProcessDoc from '../../hooks/use-process-doc';
 import useSubmitDoc from '../../hooks/use-submit-doc';
 
 const Processing = () => {
-  const { t } = useTranslation('pages.processing');
+  const { t } = useTranslation('pages.id-doc.processing');
   const [state, send] = useIdDocMachine();
   const submitDocMutation = useSubmitDoc();
   const processDocMutation = useProcessDoc();
