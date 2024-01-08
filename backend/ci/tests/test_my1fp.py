@@ -18,7 +18,7 @@ def auth_token(sandbox_user, twilio):
     # Specifically inherit the user through the identify flow without providing any ob public key auth
     auth_token = inherit_user(twilio, phone_number, "my1fp", SandboxId(sandbox_id))
     body = get("/hosted/user/token", None, auth_token)
-    assert body["scopes"] == ["basic_profile"]
+    assert set(body["scopes"]) == {"basic_profile", "explicit_auth"}
     return auth_token
 
 
@@ -66,7 +66,7 @@ def test_decrypt_sensitive(sandbox_user, auth_token):
     # First, step up with the existing auth token
     auth_token = step_up_user_biometric(auth_token, sandbox_user, "my1fp")
     body = get("/hosted/user/token", None, auth_token)
-    assert "sensitive_profile" in [i for i in body["scopes"]]
+    assert "sensitive_profile" in body["scopes"]
 
     # Now, we should be able to decrypt sensitive data
     fields = BASIC_FIELDS + SENSITIVE_FIELDS

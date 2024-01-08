@@ -148,7 +148,7 @@ pub async fn post(
             let kinds = inherited_auth_events.iter().map(|e| e.kind).collect();
             // Request Onboarding scopes, but if the user hasn't authed to the tenant recently, we
             // will be granted no scopes and the user will be required to re-auth
-            let scopes = allowed_user_scopes(kinds, IdentifyScope::Onboarding, true);
+            let scopes = allowed_user_scopes(kinds, IdentifyScope::Onboarding, false);
             let duration = Duration::hours(1);
 
             // Determine arguments for the auth token based on the requested operation

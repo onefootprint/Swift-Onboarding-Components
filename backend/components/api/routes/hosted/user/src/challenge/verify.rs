@@ -6,6 +6,7 @@ use api_core::auth::user::CheckedUserAuthContext;
 use api_core::auth::user::UserAuth;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::user::UserAuthGuard;
+use api_core::auth::IsGuardMet;
 use api_core::errors::challenge::ChallengeError;
 use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
@@ -60,12 +61,9 @@ pub async fn post(
     user_auth: UserAuthContext,
     insights: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(UserAuthGuard::Auth)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::ExplicitAuth.and(UserAuthGuard::Auth))?;
     if !user_auth.data.is_from_api {
         return ValidationError("Can only update auth methods using auth issued via API").into();
-    }
-    if user_auth.data.is_implied_auth {
-        return ValidationError("Cannot replace auth method using implied auth").into();
     }
     let tenant = user_auth
         .tenant()

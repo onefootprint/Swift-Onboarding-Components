@@ -191,7 +191,7 @@ pub async fn post(
             }
             .create(conn.conn())?;
 
-            let scopes = allowed_user_scopes(vec![event.kind], scope, false);
+            let scopes = allowed_user_scopes(vec![event.kind], scope, true);
 
             let ae = AssociatedAuthEvent::explicit(event.id.clone());
             let data = if let Some(user_auth) = user_auth {

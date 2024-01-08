@@ -33,7 +33,9 @@ def user_with_token(sandbox_tenant, twilio, auth_playbook):
 
     # Make sure we can't use the onboarding token (not created via API) to update auth
     assert_cant_use_token(
-        bifrost.auth_token, 401, "Not allowed: required permission is missing: auth"
+        bifrost.auth_token,
+        401,
+        "Not allowed: required permission is missing: And<explicit_auth,auth>",
     )
 
     # Also test that a playbook with the auth scopes can't be used
@@ -47,9 +49,13 @@ def user_with_token(sandbox_tenant, twilio, auth_playbook):
     body = post(f"users/{user.fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
-    # Make sure we have to explicitly auth (and not use implied auth) to initiate a challenge
+    # Make sure we have to explicitly auth (and not use implied auth) to initiate a challenge AND
+    # we need the `auth` token scope
+    # It would be nice if we could test these two separately, but there isn't a codepath to do so
     assert_cant_use_token(
-        auth_token, 401, "Not allowed: required permission is missing: auth"
+        auth_token,
+        401,
+        "Not allowed: required permission is missing: And<explicit_auth,auth>",
     )
 
     # Finally, step up the token so it can be used to initiate a challenge

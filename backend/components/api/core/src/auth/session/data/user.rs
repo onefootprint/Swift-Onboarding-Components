@@ -41,6 +41,7 @@ pub struct UserSession {
     pub is_from_api: bool,
     /// When true, the auth events that occurred at this tenant were inherited to form this token,
     /// rather than proof of auth being exchanged physically
+    /// rm?
     #[serde(default)]
     #[allow(unused)]
     pub is_implied_auth: bool,

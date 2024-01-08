@@ -14,6 +14,13 @@ pub trait IsGuardMet<ScopeT>: Display {
     {
         Or(self, other)
     }
+
+    fn and<T: IsGuardMet<ScopeT>>(self, other: T) -> And<Self, T>
+    where
+        Self: Sized,
+    {
+        And(self, other)
+    }
 }
 
 /// Represents a guard that is always met, no matter the scopes of the auth token
@@ -51,6 +58,29 @@ where
 {
     fn is_met(self, token_scopes: &[ScopeT]) -> bool {
         self.0.is_met(token_scopes) || self.1.is_met(token_scopes)
+    }
+}
+
+/// Represents a permission that is met if both its Left and Right permission are met
+pub struct And<Left, Right>(pub(crate) Left, pub(crate) Right);
+
+impl<Left, Right> Display for And<Left, Right>
+where
+    Left: Display,
+    Right: Display,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "And<{},{}>", self.0, self.1)
+    }
+}
+
+impl<ScopeT, Left, Right> IsGuardMet<ScopeT> for And<Left, Right>
+where
+    Left: IsGuardMet<ScopeT>,
+    Right: IsGuardMet<ScopeT>,
+{
+    fn is_met(self, token_scopes: &[ScopeT]) -> bool {
+        self.0.is_met(token_scopes) && self.1.is_met(token_scopes)
     }
 }
 

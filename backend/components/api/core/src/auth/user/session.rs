@@ -39,7 +39,7 @@ pub struct UserSessionContext {
     pub(super) obc_id: Option<ObConfigurationId>,
     pub(super) wf_id: Option<WorkflowId>,
     pub wfr_id: Option<WorkflowRequestId>,
-    pub is_implied_auth: bool,
+    pub(super) is_implied_auth: bool,
     pub auth_event_ids: Vec<AuthEventId>,
     pub auth_events: Vec<AssociatedAuthEvent>,
     /// When true, the auth token was initially issued as an unauthed, identified token
