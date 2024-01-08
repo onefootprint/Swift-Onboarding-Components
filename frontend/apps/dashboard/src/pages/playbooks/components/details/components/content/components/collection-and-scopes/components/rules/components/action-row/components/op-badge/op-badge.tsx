@@ -24,19 +24,12 @@ const OpBadge = ({ defaultValue, isEditable, onClick }: OpBadgeProps) => {
     setIsSelected(newIsSelected);
   };
 
-  if (isEditable) {
-    return (
-      <Badge
-        data-is-selected={isSelected}
-        data-is-editable={isEditable}
-        onClick={handleClick}
-      >
-        {t('not')}
-      </Badge>
-    );
-  }
-  return isSelected ? (
-    <Badge data-is-selected={isSelected} onClick={handleClick}>
+  return isEditable || isSelected ? (
+    <Badge
+      data-is-selected={isSelected}
+      data-is-editable={isEditable}
+      onClick={isEditable ? handleClick : undefined}
+    >
       {t('not')}
     </Badge>
   ) : null;

@@ -80,10 +80,10 @@ describe('<RiskSignals />', () => {
       const scopes = within(tr).getByText('Phone number');
       expect(scopes).toBeInTheDocument();
 
-      const note = within(tr).getByText('VOIP phone number');
-      expect(note).toBeInTheDocument();
+      const reasonCode = within(tr).getByText('phone_number_located_is_voip');
+      expect(reasonCode).toBeInTheDocument();
 
-      await userEvent.hover(note);
+      await userEvent.hover(reasonCode);
       await waitFor(() => {
         const tooltip = screen.getByRole('tooltip', {
           name: "The consumer's phone number could be tied to an answering service, page, or VoIP.",

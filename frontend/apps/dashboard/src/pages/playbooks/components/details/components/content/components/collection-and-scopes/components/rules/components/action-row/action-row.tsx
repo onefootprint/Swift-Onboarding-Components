@@ -4,22 +4,25 @@ import styled, { css } from '@onefootprint/styled';
 import { type Rule, type RuleField, RuleOp } from '@onefootprint/types';
 import { Badge, createFontStyles, LinkButton, Stack } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import useSession from 'src/hooks/use-session';
 
-import OpBadge from '../op-badge';
 import RowEditButtons from '../row-edit-buttons';
+import OpBadge from './components/op-badge';
 import RiskSignalSelect from './components/risk-signal-select';
 
 export type ActionRowProps = {
+  shouldAllowEditing: boolean;
   playbookId: string;
   rule: Rule;
 };
 
-const ActionRow = ({ playbookId, rule }: ActionRowProps) => {
+const ActionRow = ({
+  shouldAllowEditing,
+  playbookId,
+  rule,
+}: ActionRowProps) => {
   const { t, allT } = useTranslation(
     'pages.playbooks.details.rules.action-row',
   );
-  const isFirmEmployee = useSession().data.user?.isFirmEmployee;
   const [isEditing, setIsEditing] = useState(false);
   const [expressions, setExpressions] = useState<RuleField[]>(
     rule.ruleExpression,
@@ -126,7 +129,7 @@ const ActionRow = ({ playbookId, rule }: ActionRowProps) => {
           />
         </Stack>
       ) : (
-        isFirmEmployee && (
+        shouldAllowEditing && (
           <LinkButton
             size="tiny"
             sx={{ paddingTop: 5, paddingLeft: 3 }}

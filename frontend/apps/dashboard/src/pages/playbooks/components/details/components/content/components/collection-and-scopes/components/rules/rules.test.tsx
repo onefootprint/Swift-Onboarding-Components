@@ -176,7 +176,7 @@ describe('<Rules />', () => {
 
         // Add adverse_media_hit field
         const addFieldButton = within(firstRuleRow).getByRole('button', {
-          name: 'add',
+          name: 'and',
         });
         await userEvent.click(addFieldButton);
         await waitFor(() => {

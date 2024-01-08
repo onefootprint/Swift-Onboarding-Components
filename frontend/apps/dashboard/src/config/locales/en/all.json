@@ -1381,7 +1381,7 @@
           "header": {
             "severity": "Severity",
             "scopes": "Scopes",
-            "note": "Note"
+            "reason-code": "Reason code"
           }
         },
         "filters": {
@@ -2213,7 +2213,7 @@
             "if": "if ",
             "and": " and ",
             "not": "not",
-            "add": "add",
+            "add": "and",
             "delete": "Delete rule",
             "empty-aria-label": "Empty rule",
             "success-toast": {

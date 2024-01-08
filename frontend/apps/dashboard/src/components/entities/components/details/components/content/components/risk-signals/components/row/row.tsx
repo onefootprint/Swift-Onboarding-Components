@@ -18,7 +18,6 @@ const Row = ({ riskSignal }: RowProps) => {
   const scopesList = uniqueScopes.map(scope =>
     allT(`signal-attributes.${scope}`),
   );
-  const shouldShowTooltip = riskSignal.description !== riskSignal.note;
 
   return (
     <>
@@ -27,18 +26,12 @@ const Row = ({ riskSignal }: RowProps) => {
       </td>
       <td>{createCapitalStringList(scopesList)}</td>
       <td>
-        {shouldShowTooltip ? (
-          <Tooltip text={riskSignal.description} alignment="start">
-            <RowData>
-              <Note>{riskSignal.note}</Note>
-              <IcoInfo16 />
-            </RowData>
-          </Tooltip>
-        ) : (
+        <Tooltip text={riskSignal.description} alignment="start">
           <RowData>
-            <Note>{riskSignal.note}</Note>
+            <ReasonCode>{riskSignal.reasonCode}</ReasonCode>
+            <IcoInfo16 />
           </RowData>
-        )}
+        </Tooltip>
       </td>
     </>
   );
@@ -46,15 +39,17 @@ const Row = ({ riskSignal }: RowProps) => {
 
 const RowData = styled.div`
   ${({ theme }) => css`
-    gap: ${theme.spacing[2]};
+    width: 100%;
     display: flex;
+    gap: ${theme.spacing[2]};
+    justify-content: flex-start;
     align-items: center;
   `}
 `;
 
-const Note = styled.div`
-  display: block
-  overflow: hidden;
+const ReasonCode = styled.div`
+  width: 100%;
+  display: block;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;

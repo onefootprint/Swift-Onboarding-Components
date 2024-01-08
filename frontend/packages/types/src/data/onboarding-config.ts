@@ -71,4 +71,5 @@ export type OnboardingConfig = {
     kind: string;
     member: string;
   };
+  isRulesEnabled?: boolean;
 };

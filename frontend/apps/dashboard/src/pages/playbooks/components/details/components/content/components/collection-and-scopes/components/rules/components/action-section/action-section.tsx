@@ -5,20 +5,24 @@ import type { Rule, RuleAction } from '@onefootprint/types';
 import { Button, Stack, Typography } from '@onefootprint/ui';
 import kebabCase from 'lodash/kebabCase';
 import React, { useState } from 'react';
-import useSession from 'src/hooks/use-session';
 
 import ActionRow from '../action-row';
 import EmptyActionRow from '../empty-action-row';
 
 export type ActionSectionProps = {
+  shouldAllowEditing: boolean;
   playbookId: string;
   action: RuleAction;
   rules: Rule[];
 };
 
-const ActionSection = ({ playbookId, action, rules }: ActionSectionProps) => {
+const ActionSection = ({
+  shouldAllowEditing,
+  playbookId,
+  action,
+  rules,
+}: ActionSectionProps) => {
   const { t } = useTranslation(`pages.playbooks.details.rules.action-section`);
-  const isFirmEmployee = useSession().data.user?.isFirmEmployee;
   const [isAddingRule, setIsAddingRule] = useState(false);
   const actionName = kebabCase(action);
 
@@ -44,6 +48,7 @@ const ActionSection = ({ playbookId, action, rules }: ActionSectionProps) => {
           {rules.map(rule => (
             <ActionRow
               key={JSON.stringify(rule)}
+              shouldAllowEditing={shouldAllowEditing}
               playbookId={playbookId}
               rule={rule}
             />
@@ -80,7 +85,7 @@ const ActionSection = ({ playbookId, action, rules }: ActionSectionProps) => {
             {t(`${actionName}.subtitle`)}
           </Typography>
         </div>
-        {isFirmEmployee && (
+        {shouldAllowEditing && (
           <Button
             size="small"
             variant="secondary"

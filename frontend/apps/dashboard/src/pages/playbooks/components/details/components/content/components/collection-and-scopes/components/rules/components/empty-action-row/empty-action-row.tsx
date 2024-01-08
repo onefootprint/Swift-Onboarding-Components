@@ -8,8 +8,8 @@ import { createFontStyles } from '@onefootprint/ui/src/utils/mixins/mixins';
 import React, { useState } from 'react';
 
 import useAddRule from '../../hooks/use-add-rule';
+import OpBadge from '../action-row/components/op-badge';
 import RiskSignalSelect from '../action-row/components/risk-signal-select';
-import OpBadge from '../op-badge';
 
 export type EmptyActionRowProps = {
   playbookId: string;

@@ -10,6 +10,7 @@ export type RulesProps = {
   hasRules: boolean;
   playbookKind: OnboardingConfigKind;
   playbookId: string;
+  shouldAllowEditing: boolean;
   actionRules: Record<string, Rule[]>;
 };
 
@@ -17,6 +18,7 @@ const Rules = ({
   hasRules,
   playbookKind,
   playbookId,
+  shouldAllowEditing,
   actionRules,
 }: RulesProps) => {
   const { t } = useTranslation('pages.playbooks.details.rules');
@@ -30,6 +32,7 @@ const Rules = ({
         Object.values(RuleAction).map(action => (
           <ActionSection
             key={action}
+            shouldAllowEditing={shouldAllowEditing}
             playbookId={playbookId}
             action={action}
             rules={actionRules[action]}
