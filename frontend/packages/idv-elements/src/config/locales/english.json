@@ -42,6 +42,11 @@
         "destination": "A few more investing-specific questions!"
       }
     },
+    "liveness": {
+      "liveness-success": {
+        "label": "Verified!"
+      }
+    },
     "id-doc": {
       "media-errors": {
         "not-found": "We couldn't find a camera on your device. Please use another device.",
@@ -641,6 +646,27 @@
           "disclaimer": "In accordance with applicable FINRA rules, you will need to obtain a letter written and signed by a compliance officer on company letterhead explicitly granting permission to carry the account and explicitly stating whether or not the firm requires access to duplicate account statements and/or trade confirmations. If the firm would like access to your duplicate account statements and/or trade confirmations, the letter must include the applicant's full name and a statement that the account holder is responsible for sharing statements with the firm.",
           "required": "A compliance letter is required"
         }
+      }
+    },
+    "liveness": {
+      "register": {
+        "title": "Liveness check",
+        "subtitle": "We need to verify that you're a real person.",
+        "cta": "Launch Verification"
+      },
+      "retry": {
+        "title": "Biometrics not recognized",
+        "subtitle": "You can try biometrics again or you can do this next time you use Footprint.",
+        "cta": "Try biometrics again",
+        "skip": "Do it later"
+      },
+      "unavailable": {
+        "title": "Biometric authentication unavailable",
+        "subtitle": "Unfortunately your device doesn't support biometric authentication."
+      },
+      "success": {
+        "title": "Biometric authentication successful!",
+        "subtitle": "We were able to verify your liveness."
       }
     },
     "id-doc": {
