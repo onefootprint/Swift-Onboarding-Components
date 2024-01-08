@@ -3,12 +3,12 @@ import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
+import configureI18next from '../../config/initializers/i18next';
+import queryClient from '../../config/initializers/react-query';
 import {
   MachineProvider,
   useInvestorProfileMachine,
 } from './components/machine-provider';
-import configureI18next from './config/initializers/react-i18next';
-import queryClient from './config/initializers/react-query';
 import type { InvestorProfileProps } from './investor-profile.types';
 import Router from './pages/router';
 

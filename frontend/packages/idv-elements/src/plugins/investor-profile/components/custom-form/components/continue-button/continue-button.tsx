@@ -8,7 +8,7 @@ type ContinueButtonProps = {
 };
 
 const ContinueButton = ({ label, isLoading }: ContinueButtonProps) => {
-  const { t } = useTranslation('components.continue-button');
+  const { t } = useTranslation('components.investor-profile.continue-button');
 
   return (
     <Button

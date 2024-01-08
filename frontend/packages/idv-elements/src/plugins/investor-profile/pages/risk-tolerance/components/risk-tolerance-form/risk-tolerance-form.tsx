@@ -26,7 +26,7 @@ const RiskToleranceForm = ({
   defaultValues,
   onSubmit,
 }: RiskToleranceFormProps) => {
-  const { t } = useTranslation('pages.risk-tolerance');
+  const { t } = useTranslation('pages.investor-profile.risk-tolerance');
   const { handleSubmit, register } = useForm<FormData>({
     defaultValues: {
       riskTolerance:

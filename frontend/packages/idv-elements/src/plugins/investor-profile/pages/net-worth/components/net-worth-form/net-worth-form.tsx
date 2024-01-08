@@ -26,7 +26,7 @@ const NetWorthForm = ({
   defaultValues,
   onSubmit,
 }: NetWorthFormProps) => {
-  const { t } = useTranslation('pages.net-worth');
+  const { t } = useTranslation('pages.investor-profile.net-worth');
   const { handleSubmit, register } = useForm<FormData>({
     defaultValues: {
       netWorth:

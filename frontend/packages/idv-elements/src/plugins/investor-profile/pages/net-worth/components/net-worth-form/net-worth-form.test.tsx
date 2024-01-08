@@ -5,12 +5,11 @@ import {
 import React from 'react';
 
 import {
-  renderInvestorProfile,
+  renderComponent,
   screen,
   userEvent,
   waitFor,
-} from '@/investor-profile/config/tests';
-
+} from '../../../../../../config/tests/render';
 import type { NetWorthFormProps } from './net-worth-form';
 import NetWorthForm from './net-worth-form';
 
@@ -20,7 +19,7 @@ describe('<NetWorthForm />', () => {
     isLoading,
     onSubmit = () => {},
   }: Partial<NetWorthFormProps>) => {
-    renderInvestorProfile(
+    renderComponent(
       <NetWorthForm
         defaultValues={defaultValues}
         isLoading={isLoading}

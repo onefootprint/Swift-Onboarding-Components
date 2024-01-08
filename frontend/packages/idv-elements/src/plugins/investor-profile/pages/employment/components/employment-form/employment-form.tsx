@@ -25,7 +25,7 @@ const EmploymentForm = ({
   isLoading,
   onSubmit,
 }: EmploymentFormProps) => {
-  const { t } = useTranslation('pages.employment');
+  const { t } = useTranslation('pages.investor-profile.employment');
   const options: SelectOption[] = [
     {
       label: t('employment-status.employed'),

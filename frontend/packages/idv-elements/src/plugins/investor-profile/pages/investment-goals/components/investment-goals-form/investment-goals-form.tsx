@@ -24,7 +24,7 @@ const InvestmentGoalsForm = ({
   isLoading,
   onSubmit,
 }: InvestmentGoalsFormProps) => {
-  const { t } = useTranslation('pages.investment-goals');
+  const { t } = useTranslation('pages.investor-profile.investment-goals');
   const defaultEntries = (
     defaultValues?.[InvestorProfileDI.investmentGoals] ?? []
   ).map(goal => [goal, true]);

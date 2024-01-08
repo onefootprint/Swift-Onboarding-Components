@@ -5,12 +5,11 @@ import {
 import React from 'react';
 
 import {
-  renderInvestorProfile,
+  renderComponent,
   screen,
   userEvent,
   waitFor,
-} from '@/investor-profile/config/tests';
-
+} from '../../../../../../config/tests/render';
 import type { RiskToleranceFormProps } from './risk-tolerance-form';
 import RiskToleranceForm from './risk-tolerance-form';
 
@@ -20,7 +19,7 @@ describe('<RiskToleranceForm />', () => {
     isLoading,
     onSubmit = () => {},
   }: Partial<RiskToleranceFormProps>) => {
-    renderInvestorProfile(
+    renderComponent(
       <RiskToleranceForm
         defaultValues={defaultValues}
         isLoading={isLoading}

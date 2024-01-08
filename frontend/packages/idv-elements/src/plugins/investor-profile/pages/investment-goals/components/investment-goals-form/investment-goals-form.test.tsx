@@ -5,12 +5,11 @@ import {
 import React from 'react';
 
 import {
-  renderInvestorProfile,
+  renderComponent,
   screen,
   userEvent,
   waitFor,
-} from '@/investor-profile/config/tests/render';
-
+} from '../../../../../../config/tests/render';
 import type { InvestmentGoalsFormProps } from './investment-goals-form';
 import InvestmentGoalsForm from './investment-goals-form';
 
@@ -20,7 +19,7 @@ describe('<InvestmentGoalsForm />', () => {
     isLoading,
     onSubmit = () => {},
   }: Partial<InvestmentGoalsFormProps>) => {
-    renderInvestorProfile(
+    renderComponent(
       <InvestmentGoalsForm
         defaultValues={defaultValues}
         isLoading={isLoading}

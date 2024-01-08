@@ -5,12 +5,11 @@ import {
 import React from 'react';
 
 import {
-  renderInvestorProfile,
+  renderComponent,
   screen,
   userEvent,
   waitFor,
-} from '@/investor-profile/config/tests';
-
+} from '../../../../../../config/tests/render';
 import type { IncomeFormProps } from './income-form';
 import IncomeForm from './income-form';
 
@@ -20,7 +19,7 @@ describe('<IncomeForm />', () => {
     isLoading,
     onSubmit = () => {},
   }: Partial<IncomeFormProps>) => {
-    renderInvestorProfile(
+    renderComponent(
       <IncomeForm
         defaultValues={defaultValues}
         isLoading={isLoading}
