@@ -42,13 +42,11 @@ const RowData = styled.div`
     width: 100%;
     display: flex;
     gap: ${theme.spacing[2]};
-    justify-content: flex-start;
     align-items: center;
   `}
 `;
 
 const ReasonCode = styled.div`
-  width: 100%;
   display: block;
   text-overflow: ellipsis;
   white-space: nowrap;
