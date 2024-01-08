@@ -85,6 +85,7 @@ fn footprint_reason_codes(res: FlexIdResponse) -> Vec<FRC> {
         .filter_map(|ric| Into::<Option<FRC>>::into(&ric))
         .collect_vec();
 
+    // TODO: Don't produce SSN reason codes if SSN not submitted!
     phone_codes
         .into_iter()
         .chain(name_address_ssn_codes)
@@ -99,22 +100,353 @@ fn footprint_reason_codes(res: FlexIdResponse) -> Vec<FRC> {
 #[cfg(test)]
 mod tests {
     use db::test_helpers::assert_have_same_elements;
-    use newtypes::FootprintReasonCode::*;
+    use newtypes::FootprintReasonCode::{self, *};
+    use test_case::test_case;
 
-    #[test]
-    fn test_reason_codes() {
-        let res = idv::lexis::parse_response(idv::test_fixtures::passing_lexis_flex_id_response()).unwrap();
-        assert_have_same_elements(
-            vec![
-                PhoneLocatedMatches,
-                NameMatches,
-                NameFirstMatches,
-                NameLastMatches,
-                AddressMatches,
-                SsnMatches,
-                DobMatches,
-            ],
-            super::footprint_reason_codes(res),
-        );
+    #[test_case(
+        idv::test_fixtures::passing_lexis_flex_id_response(),
+        vec![
+            PhoneLocatedMatches,
+            NameMatches,
+            NameFirstMatches,
+            NameLastMatches,
+            AddressMatches,
+            SsnMatches,
+            DobMatches,
+        ])
+    ]
+    #[test_case(
+        example1(),
+        vec![
+            PhoneLocatedDoesNotMatch,
+            NameFirstMatches,
+            NameLastMatches,
+            NameMatches,
+            AddressMatches,
+            SsnDoesNotMatch,
+            DobPartialMatch,
+            DobYobDoesNotMatch,
+            SsnInputIsInvalid,
+            IdFlagged,
+            PhoneNumberInputInvalid
+        ])
+    ]
+    #[test_case(
+        example2(),
+        vec![
+            PhoneLocatedDoesNotMatch,
+            NameFirstDoesNotMatch,
+            NameLastDoesNotMatch,
+            NameDoesNotMatch,
+            AddressDoesNotMatch,
+            SsnDoesNotMatch,
+            DobCouldNotMatch,
+            SsnInputIsInvalid,
+            IdFlagged,
+            PhoneNumberInputInvalid
+        ])
+    ]
+    #[test_case(
+        example3(),
+        vec![
+            NameFirstMatches, 
+            NameLastMatches, 
+            NameMatches, 
+            AddressMatches, 
+            DobMatches, 
+            SsnMatches,
+            PhoneLocatedMatches
+        ])
+    ]
+    fn test_reason_codes(json: serde_json::Value, expected_frc: Vec<FootprintReasonCode>) {
+        let res = idv::lexis::parse_response(json).unwrap();
+        assert_have_same_elements(expected_frc, super::footprint_reason_codes(res));
+    }
+
+    fn example1() -> serde_json::Value {
+        serde_json::json!({
+          "FlexIDResponseEx": {
+            "@xmlns": "http://webservices.seisint.com/WsIdentity",
+            "response": {
+              "Header": {
+                "QueryId": "30682eec-3740-4711-9437-3ede48f5fc45",
+                "Status": 0,
+                "TransactionId": "173740661R566943"
+              },
+              "Result": {
+                "BureauDeleted": false,
+                "ComprehensiveVerification": {
+                  "ComprehensiveVerificationIndex": 20,
+                  "RiskIndicators": {
+                    "RiskIndicator": [
+                      {
+                        "Description": "Unable to verify phone number",
+                        "RiskCode": "27",
+                        "Sequence": 1
+                      },
+                      {
+                        "Description": "The input SSN/TIN was missing or incomplete",
+                        "RiskCode": "79",
+                        "Sequence": 2
+                      },
+                      {
+                        "Description": "Address mismatch on secondary address range",
+                        "RiskCode": "SR",
+                        "Sequence": 3
+                      },
+                      {
+                        "Description": "Unable to verify date-of-birth",
+                        "RiskCode": "28",
+                        "Sequence": 4
+                      },
+                      {
+                        "Description": "The input phone number is potentially invalid",
+                        "RiskCode": "08",
+                        "Sequence": 5
+                      },
+                      {
+                        "Description": "The input name and address return a different phone number",
+                        "RiskCode": "82",
+                        "Sequence": 6
+                      }
+                    ]
+                  }
+                },
+                "CustomComprehensiveVerification": {
+                  "ComprehensiveVerificationIndex": 0
+                },
+                "EmergingId": false,
+                "ITINExpired": false,
+                "InputEcho": {
+                  "Address": {
+                    "City": "San Francisco",
+                    "State": "CA",
+                    "StreetAddress1": "123 Market St",
+                    "Zip5": "94114"
+                  },
+                  "Age": 0,
+                  "DOB": {
+                    "Day": 1,
+                    "Month": 1,
+                    "Year": 1988
+                  },
+                  "HomePhone": "1085551212",
+                  "Name": {
+                    "First": "Bob",
+                    "Last": "Boberto"
+                  }
+                },
+                "InstantIDVersion": "1",
+                "IsPhoneCurrent": true,
+                "NameAddressPhone": {
+                  "Summary": "2",
+                  "Type": "S"
+                },
+                "NameAddressSSNSummary": 8,
+                "PhoneLineDescription": "U",
+                "UniqueId": "190433587765",
+                "ValidElementSummary": {
+                  "AddressCMRA": false,
+                  "AddressPOBox": false,
+                  "PassportValid": false,
+                  "SSNDeceased": false,
+                  "SSNFoundForLexID": true,
+                  "SSNValid": false
+                },
+                "VerifiedElementSummary": {
+                  "DOB": false,
+                  "DOBMatchLevel": "4",
+                  "Email": false
+                }
+              }
+            }
+          }
+        })
+    }
+
+    fn example2() -> serde_json::Value {
+        serde_json::json!({
+          "FlexIDResponseEx": {
+            "@xmlns": "http://webservices.seisint.com/WsIdentity",
+            "response": {
+              "Header": {
+                "QueryId": "464663c3-8b53-459e-8cc6-47db5fe47a29",
+                "Status": 0,
+                "TransactionId": "173740741R554729"
+              },
+              "Result": {
+                "BureauDeleted": false,
+                "ComprehensiveVerification": {
+                  "ComprehensiveVerificationIndex": 0,
+                  "RiskIndicators": {
+                    "RiskIndicator": [
+                      {
+                        "Description": "Unable to verify name, address, SSN/TIN and phone",
+                        "RiskCode": "19",
+                        "Sequence": 1
+                      },
+                      {
+                        "Description": "The input SSN/TIN was missing or incomplete",
+                        "RiskCode": "79",
+                        "Sequence": 2
+                      },
+                      {
+                        "Description": "Address mismatch between city/state and zip code",
+                        "RiskCode": "CZ",
+                        "Sequence": 3
+                      },
+                      {
+                        "Description": "Unable to verify date-of-birth",
+                        "RiskCode": "28",
+                        "Sequence": 4
+                      },
+                      {
+                        "Description": "No date-of-birth reported for the input identity",
+                        "RiskCode": "NB",
+                        "Sequence": 5
+                      },
+                      {
+                        "Description": "The input phone number is potentially invalid",
+                        "RiskCode": "08",
+                        "Sequence": 6
+                      },
+                      {
+                        "Description": "The input name and address return a different phone number",
+                        "RiskCode": "82",
+                        "Sequence": 7
+                      },
+                      {
+                        "Description": "The input address returns a different phone number",
+                        "RiskCode": "64",
+                        "Sequence": 8
+                      }
+                    ]
+                  }
+                },
+                "CustomComprehensiveVerification": {
+                  "ComprehensiveVerificationIndex": 0
+                },
+                "EmergingId": false,
+                "ITINExpired": false,
+                "InputEcho": {
+                  "Address": {
+                    "City": "Anytown",
+                    "State": "CA",
+                    "StreetAddress1": "123 Main St",
+                    "Zip5": "94114"
+                  },
+                  "Age": 0,
+                  "DOB": {
+                    "Day": 1,
+                    "Month": 1,
+                    "Year": 1975
+                  },
+                  "HomePhone": "1085551212",
+                  "Name": {
+                    "First": "Bob",
+                    "Last": "Boberto"
+                  }
+                },
+                "InstantIDVersion": "1",
+                "IsPhoneCurrent": true,
+                "NameAddressPhone": {
+                  "Summary": "0"
+                },
+                "NameAddressSSNSummary": 0,
+                "PhoneLineDescription": "U",
+                "UniqueId": "0",
+                "ValidElementSummary": {
+                  "AddressCMRA": false,
+                  "AddressPOBox": false,
+                  "PassportValid": false,
+                  "SSNDeceased": false,
+                  "SSNFoundForLexID": false,
+                  "SSNValid": false
+                },
+                "VerifiedElementSummary": {
+                  "DOB": false,
+                  "DOBMatchLevel": "0",
+                  "Email": false
+                }
+              }
+            }
+          }
+        })
+    }
+
+    fn example3() -> serde_json::Value {
+        serde_json::json!({
+          "FlexIDResponseEx": {
+            "@xmlns": "http://webservices.seisint.com/WsIdentity",
+            "response": {
+              "Header": {
+                "QueryId": "041ddab8-0f48-4558-8283-364908669f3f",
+                "Status": 0,
+                "TransactionId": "173740681R563168"
+              },
+              "Result": {
+                "BureauDeleted": false,
+                "ComprehensiveVerification": {
+                  "ComprehensiveVerificationIndex": 40,
+                  "RiskIndicators": {
+                    "RiskIndicator": [
+                      {
+                        "Description": "Address mismatch on secondary address range",
+                        "RiskCode": "SR",
+                        "Sequence": 1
+                      },
+                    ]
+                  }
+                },
+                "CustomComprehensiveVerification": {
+                  "ComprehensiveVerificationIndex": 0
+                },
+                "EmergingId": false,
+                "ITINExpired": false,
+                "InputEcho": {
+                  "Address": {
+                    "City": "San Francisco",
+                    "State": "CA",
+                    "StreetAddress1": "123 Market St",
+                    "Zip5": "94114"
+                  },
+                  "Age": 0,
+                  "DOB": {
+                    "Day": 1,
+                    "Month": 1,
+                    "Year": 1988
+                  },
+                  "HomePhone": "1085551212",
+                  "Name": {
+                    "First": "Bob",
+                    "Last": "Boberto"
+                  }
+                },
+                "InstantIDVersion": "1",
+                "IsPhoneCurrent": true,
+                "NameAddressPhone": {
+                  "Summary": "12",
+                  "Type": "S"
+                },
+                "NameAddressSSNSummary": 12,
+                "PhoneLineDescription": "U",
+                "UniqueId": "190433587765",
+                "ValidElementSummary": {
+                  "AddressCMRA": false,
+                  "AddressPOBox": false,
+                  "PassportValid": false,
+                  "SSNDeceased": false,
+                  "SSNFoundForLexID": true,
+                  "SSNValid": true
+                },
+                "VerifiedElementSummary": {
+                  "DOB": true,
+                  "DOBMatchLevel": "8",
+                  "Email": false
+                }
+              }
+            }
+          }
+        })
     }
 }
