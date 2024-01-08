@@ -26,7 +26,6 @@ use strum_macros::EnumIter;
 use super::{
     get_vendor_apis_for_verification_requests, make_request,
     tenant_vendor_control::TenantVendorControl,
-    vendor_api,
     vendor_result::{HydratedVerificationResult, RequestAndMaybeHydratedResult, VendorResult},
     VendorAPIError,
 };
@@ -329,14 +328,7 @@ fn eval_rules(
     obc: ObConfiguration,
 ) -> ApiResult<Action> {
     // this does a lot of unnecessary stuff and has a lot of layers of unnecessary indirection but unfortunately this is the safest way to produce risk signals here without diverging too much from how other code paths do this
-    let (results_map, ids_map) =
-        vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results(&vec![res])?;
-    let rsg = decision::features::risk_signals::create_risk_signals_from_vendor_results(
-        (&results_map, &ids_map),
-        vw,
-        obc,
-    )?
-    .kyc;
+    let rsg = decision::features::risk_signals::parse_reason_codes_from_vendor_result(res, vw, obc)?.kyc;
     let rsfd = RiskSignalsForDecision {
         kyc: Some(rsg.clone()),
         doc: None,

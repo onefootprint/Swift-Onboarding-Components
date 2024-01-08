@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use super::{
-    features::risk_signals::{create_risk_signals_from_vendor_results, RiskSignalsForDecision},
+    features::risk_signals::{parse_reason_codes_from_vendor_result, RiskSignalsForDecision},
     onboarding::{
         rules::{KycRuleExecutionConfig, KycRuleGroup},
         Decision, OnboardingRulesDecisionOutput,
@@ -9,7 +9,6 @@ use super::{
     vendor::{
         make_request::{VerificationRequestWithVendorError, VerificationRequestWithVendorResponse},
         tenant_vendor_control::TenantVendorControl,
-        vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results,
         vendor_result::VendorResult,
         verification_result, VendorAPIError,
     },
@@ -240,16 +239,16 @@ pub async fn make_vendor_requests(
     Ok(partition_vendor_errors(results))
 }
 
-/// Separate creating decision from saving decision. Used to "dry run" a decision before applying
+/// Legacy codepath only used by private/protected endpoints. To be replaced to use new rules engine soon
+/// Just computes the KYC decision based on a singular kyc vendor result
 pub fn calculate_decision(
-    vendor_results: Vec<VendorResult>,
+    vendor_result: VendorResult,
     vw: VaultWrapper,
     obc: ObConfiguration,
     rule_group: KycRuleGroup,
 ) -> ApiResult<OnboardingRulesDecisionOutput> {
-    let (response_map, ids_map) = build_vendor_response_map_from_vendor_results(&vendor_results)?;
     let risk_signals = RiskSignalsForDecision {
-        kyc: Some(create_risk_signals_from_vendor_results((&response_map, &ids_map), vw, obc)?.kyc),
+        kyc: Some(parse_reason_codes_from_vendor_result(vendor_result, vw, obc)?.kyc),
         ..Default::default()
     };
     let decision = rule_group.evaluate(

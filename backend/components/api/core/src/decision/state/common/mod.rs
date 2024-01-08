@@ -304,13 +304,8 @@ pub fn get_aml_risk_signals_from_kyc_call(
     vw: VaultWrapper,
     kyc_vendor_result: VendorResult,
 ) -> ApiResult<RiskSignalGroupStruct<Aml>> {
-    let (results_map, ids_map) = build_vendor_response_map_from_vendor_results(&vec![kyc_vendor_result])?;
-    decision::features::risk_signals::create_risk_signals_from_vendor_results(
-        (&results_map, &ids_map),
-        vw,
-        obc,
-    )
-    .map(|r| r.aml)
+    decision::features::risk_signals::parse_reason_codes_from_vendor_result(kyc_vendor_result, vw, obc)
+        .map(|r| r.aml)
 }
 
 pub fn get_review_reasons(

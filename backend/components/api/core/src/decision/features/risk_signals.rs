@@ -4,6 +4,7 @@ use db::models::{
     ob_configuration::ObConfiguration,
     risk_signal::{IncludeHidden, RiskSignal},
 };
+use idv::ParsedResponse;
 use itertools::Itertools;
 use newtypes::{
     CollectedData, FootprintReasonCode, IdentityDataKind, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
@@ -16,7 +17,10 @@ use super::{
 use crate::{
     decision::{
         onboarding::FeatureSet,
-        vendor::vendor_api::vendor_api_response::{VendorAPIResponseIdentifiersMap, VendorAPIResponseMap},
+        vendor::{
+            vendor_api::vendor_api_response::{VendorAPIResponseIdentifiersMap, VendorAPIResponseMap},
+            vendor_result::VendorResult,
+        },
     },
     errors::ApiResult,
     utils::vault_wrapper::VaultWrapper,
@@ -100,19 +104,67 @@ pub struct ParsedFootprintReasonCodes {
     pub aml: RiskSignalGroupStruct<Aml>,
 }
 
-pub fn create_risk_signals_from_vendor_results<'a>(
-    vendor_result_maps: (&'a VendorAPIResponseMap, &'a VendorAPIResponseIdentifiersMap),
+pub fn parse_reason_codes_from_vendor_result(
+    vendor_result: VendorResult,
     vw: VaultWrapper,
     obc: ObConfiguration,
 ) -> ApiResult<ParsedFootprintReasonCodes> {
-    let kyc = RiskSignalGroupStruct::<Kyc>::from(VendorResultsAndVault::new(
-        vendor_result_maps,
-        vw.clone(),
-        obc.clone(),
-    ));
-    let aml = RiskSignalGroupStruct::<Aml>::from(VendorResultsAndVault::new(vendor_result_maps, vw, obc));
+    let vendor_api: VendorAPI = (&vendor_result.response.response).into();
+    let vres_id = vendor_result.verification_result_id.clone();
+
+    let (aml_frcs, kyc_frcs): (Vec<_>, Vec<_>) = parse_reason_codes(vendor_result.clone(), vw, obc)
+        .into_iter()
+        .partition(|frc| frc.is_aml());
+
+    let kyc = RiskSignalGroupStruct {
+        footprint_reason_codes: kyc_frcs
+            .into_iter()
+            .map(|frc| (frc, vendor_api, vres_id.clone()))
+            .collect(),
+        group: Kyc,
+    };
+
+    let aml = RiskSignalGroupStruct {
+        footprint_reason_codes: aml_frcs
+            .into_iter()
+            .map(|frc| (frc, vendor_api, vres_id.clone()))
+            .collect(),
+        group: Aml,
+    };
+
     let res = ParsedFootprintReasonCodes { kyc, aml };
     Ok(res)
+}
+
+fn parse_reason_codes(
+    vendor_result: VendorResult,
+    vw: VaultWrapper,
+    obc: ObConfiguration,
+) -> Vec<FootprintReasonCode> {
+    // Risk Signals that should be created for every *KYC* vendor, based purely on data in vault + obc
+    let user_input_risk_signals = user_input_based_risk_signals(&vw, &obc);
+
+    match vendor_result.response.response {
+        ParsedResponse::IDologyExpectID(r) => {
+            IDologyFeatures::from(
+                r,
+                vendor_result.verification_result_id, // TODO remove this param later
+                vw,
+            )
+            .footprint_reason_codes()
+            .into_iter()
+            .chain(user_input_risk_signals)
+            .collect()
+        }
+        ParsedResponse::ExperianPreciseID(r) => {
+            ExperianFeatures::from(r, vendor_result.verification_result_id)
+                .footprint_reason_codes()
+                .into_iter()
+                .chain(user_input_risk_signals)
+                .collect()
+        }
+        _ => vec![],
+    }
 }
 
 pub fn save_risk_signals<T>(

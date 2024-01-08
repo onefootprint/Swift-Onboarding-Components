@@ -40,7 +40,7 @@ impl FeatureSet for IDologyFeatures {
 impl IDologyFeatures {
     pub fn from(
         resp: ExpectIDResponse,
-        verification_result_id: VerificationResultId,
+        verification_result_id: VerificationResultId, // TODO: rm or just rm IDologyFeatures in general
         vw: VaultWrapper,
     ) -> Self {
         let dob_submitted = vw.has_field(IdentityDataKind::AddressLine1);
@@ -75,10 +75,7 @@ impl IDologyFeatures {
             .map(|r| PaWatchlistHit::to_footprint_reason_codes(r.watchlists()))
             .unwrap_or_default();
 
-        reason_codes = reason_codes
-            .into_iter()
-            .chain(restriction_reason_codes)
-            .collect();
+        reason_codes = reason_codes.into_iter().chain(restriction_reason_codes).collect();
         //
         // Construct final set of codes
         //

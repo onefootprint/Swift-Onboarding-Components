@@ -4,14 +4,13 @@ use actix_web::web::{self, Json};
 use api_core::decision::engine;
 use api_core::decision::features::risk_signals::risk_signal_group_struct::Kyc;
 use api_core::decision::features::risk_signals::{
-    create_risk_signals_from_vendor_results, fetch_latest_risk_signals_map, save_risk_signals,
+    fetch_latest_risk_signals_map, parse_reason_codes_from_vendor_result, save_risk_signals,
     RiskSignalGroupStruct,
 };
 use api_core::decision::onboarding::rules::KycRuleExecutionConfig;
 use api_core::decision::onboarding::{rules::KycRuleGroup, Decision, OnboardingRulesDecisionOutput};
 use api_core::decision::vendor;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
-use api_core::decision::vendor::vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results;
 use api_core::decision::vendor::vendor_result::VendorResult;
 use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::AssertionError;
@@ -120,25 +119,22 @@ async fn make_vendor_calls(
         return Err(ApiErrorKind::VendorRequestsFailed)?;
     }
 
-    let vendor_results = decision::engine::save_vendor_responses(
+    let vendor_result = decision::engine::save_vendor_responses(
         &state.db_pool,
         &vendor_results.successful,
         vendor_results.all_errors_with_parsable_requests(),
         &wf.id,
     )
-    .await?;
+    .await?
+    .pop()
+    .ok_or(ApiError::from(ApiErrorKind::VendorRequestsFailed))?;
     let rule_group = KycRuleGroup::default();
     let rules_output =
-        api_core::decision::engine::calculate_decision(vendor_results.clone(), vw, obc, rule_group)?;
-
-    let (request_ids, response_ids): (Vec<VerificationRequestId>, Vec<VerificationResultId>) = vendor_results
-        .into_iter()
-        .map(|r| (r.verification_request_id, r.verification_result_id))
-        .unzip();
+        api_core::decision::engine::calculate_decision(vendor_result.clone(), vw, obc, rule_group)?;
 
     Ok(Json(ResponseData::ok(MakeVendorCallsResponse {
-        new_vendor_request_ids: request_ids,
-        new_vendor_result_ids: response_ids,
+        new_vendor_request_ids: vec![vendor_result.verification_request_id],
+        new_vendor_result_ids: vec![vendor_result.verification_result_id],
         decision_output: rules_output.into(),
     })))
 }
@@ -194,15 +190,14 @@ async fn make_decision(
         return Err(AssertionError("No completed vendor requests found").into());
     }
 
-    let vendor_results: Vec<VendorResult> = vendor_requests.completed_requests;
-    let (results_map, ids_map) = build_vendor_response_map_from_vendor_results(&vendor_results)?;
-    let verification_result_ids: Vec<VerificationResultId> = vendor_results
-        .iter()
-        .map(|vr| vr.verification_result_id.clone())
-        .collect();
-    let vendor_result_ids = verification_result_ids.clone();
+    let vendor_result = vendor_requests
+        .completed_requests
+        .last()
+        .cloned()
+        .ok_or(ApiError::from(ApiErrorKind::VendorRequestsFailed))?;
+    let vres_id = vendor_result.verification_result_id.clone();
     let risk_signals: RiskSignalGroupStruct<Kyc> =
-        create_risk_signals_from_vendor_results((&results_map, &ids_map), vw, obc)?.kyc;
+        parse_reason_codes_from_vendor_result(vendor_result.clone(), vw, obc)?.kyc;
 
     state
         .db_pool
@@ -222,7 +217,7 @@ async fn make_decision(
                 conn,
                 &wf,
                 rules_output.final_kyc_decision()?.decision,
-                verification_result_ids,
+                vec![vres_id.clone()],
                 vec![],
             )?;
 
@@ -232,7 +227,9 @@ async fn make_decision(
 
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 
-    Ok(Json(ResponseData::ok(MakeDecisionResponse { vendor_result_ids })))
+    Ok(Json(ResponseData::ok(MakeDecisionResponse {
+        vendor_result_ids: vec![vendor_result.verification_result_id],
+    })))
 }
 
 #[derive(Debug, Clone, serde::Deserialize)]
@@ -305,7 +302,7 @@ async fn shadow_run(
     // calculate_decision currently requires Vec<VendorResult> which we normally get from saving VerificationResult's to PG
     // since we want to keep things in-memory-only, we manually create VendorResult's here with dummy VerificationResultId's
     #[allow(clippy::unwrap_used)]
-    let vendor_results = vendor_results
+    let vendor_result = vendor_results
         .successful
         .into_iter()
         .map(|(req, res)| VendorResult {
@@ -314,9 +311,10 @@ async fn shadow_run(
                 .unwrap(),
             verification_request_id: req.id,
         })
-        .collect();
+        .last()
+        .ok_or(ApiError::from(ApiErrorKind::VendorRequestsFailed))?;
     let rule_group = KycRuleGroup::default();
-    let rules_output = decision::engine::calculate_decision(vendor_results, vw, obc, rule_group)?;
+    let rules_output = decision::engine::calculate_decision(vendor_result, vw, obc, rule_group)?;
 
     Ok(Json(ResponseData::ok(ShadowRunResult {
         decision_status: rules_output.decision.decision_status,

@@ -23,7 +23,7 @@ use super::{
 };
 use crate::decision::{
     features::risk_signals::{
-        create_risk_signals_from_vendor_results, fetch_latest_risk_signals_map,
+        fetch_latest_risk_signals_map, parse_reason_codes_from_vendor_result,
         risk_signal_group_struct::{Aml, Kyc},
         save_risk_signals, RiskSignalGroupStruct,
     },
@@ -33,7 +33,6 @@ use crate::decision::{
         DocCollected, WorkflowState,
     },
     utils::should_execute_rules_for_document_only,
-    vendor::vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results,
 };
 use crate::{
     decision::{self, state::OnAction, vendor::vendor_result::VendorResult},
@@ -198,13 +197,8 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                     group: Kyc,
                 }
             } else {
-                // TODO: make kyc_vendor_results a singular kyc_vendor_result and probably can skip this map stuff? could optimize that later
-                // and consolidate this into one method for VendorResult -> risk signals
-                let (results_map, ids_map) =
-                    build_vendor_response_map_from_vendor_results(&[kyc_vendor_result.clone()])?;
-                // TODO: change this to take in a single VR
-                create_risk_signals_from_vendor_results((&results_map, &ids_map), vw.clone(), obc.clone())?
-                    .kyc // TODO: only call this once and re-use for aml portion below
+                parse_reason_codes_from_vendor_result(kyc_vendor_result.clone(), vw.clone(), obc.clone())?.kyc
+                // TODO: only call this once and re-use for aml portion below
             };
             save_risk_signals(conn, &self.sv_id, &kyc_risk_signals, false)?;
         }

@@ -26,7 +26,7 @@ use crate::{
     decision::{
         self,
         features::risk_signals::{
-            create_risk_signals_from_vendor_results, fetch_latest_kyc_risk_signals,
+            fetch_latest_kyc_risk_signals, parse_reason_codes_from_vendor_result,
             risk_signal_group_struct::{self},
             save_risk_signals, RiskSignalGroupStruct,
         },
@@ -41,7 +41,6 @@ use crate::{
         utils::FixtureDecision,
         vendor::{
             self, incode_watchlist::WatchlistCheckKind, tenant_vendor_control::TenantVendorControl,
-            vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results,
             vendor_result::VendorResult,
         },
     },
@@ -185,10 +184,7 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
                     group: risk_signal_group_struct::Kyc,
                 }
             } else {
-                let (results_map, ids_map) =
-                    build_vendor_response_map_from_vendor_results(&vec![vendor_result.clone()])?;
-                // TODO: later just have this take in a singular VR
-                create_risk_signals_from_vendor_results((&results_map, &ids_map), vw, obc)?.kyc
+                parse_reason_codes_from_vendor_result(vendor_result.clone(), vw, obc)?.kyc
             };
 
         save_risk_signals(conn, &self.sv_id, &risk_signals, false)?;
