@@ -1,4 +1,10 @@
-import { mockRequest, within } from '@onefootprint/test-utils';
+import {
+  mockRequest,
+  screen,
+  userEvent,
+  waitFor,
+  within,
+} from '@onefootprint/test-utils';
 import {
   type OnboardingConfig,
   OnboardingConfigKind,
@@ -194,6 +200,34 @@ export const rulesFixture: Rule[] = [
   passRuleFixture,
 ];
 
+export const startEditing = async (title: string) => {
+  const failSection = screen.getByRole('group', {
+    name: title,
+  });
+  const [firstRuleRow] = within(failSection).queryAllByRole('row');
+
+  const editButton = within(firstRuleRow).getByText('Edit');
+  await userEvent.click(editButton);
+  await waitFor(() => {
+    expect(editButton).not.toBeInTheDocument();
+  });
+  return firstRuleRow;
+};
+
+export const startAdding = async (title: string) => {
+  const section = screen.getByRole('group', {
+    name: title,
+  });
+  const addRuleButton = within(section).getByRole('button', {
+    name: 'Add rule',
+  });
+  await userEvent.click(addRuleButton);
+  await waitFor(() => {
+    expect(addRuleButton).toBeDisabled();
+  });
+  return section;
+};
+
 export const isPrecededByNotBadge = ({
   row,
   text,
@@ -267,6 +301,7 @@ export const withRiskSignals = () => {
     path: `/org/risk_signals`,
     response: [
       {
+        id: '1',
         description:
           'The individual has lived at their current address for a short time.',
         note: 'Address longevity alert',
@@ -275,6 +310,7 @@ export const withRiskSignals = () => {
         severity: 'low',
       },
       {
+        id: '2',
         reason_code: 'adverse_media_hit',
         note: 'Adverse media hit',
         description: 'A strong potential match with adverse media found',
@@ -282,6 +318,7 @@ export const withRiskSignals = () => {
         scopes: ['name', 'dob'],
       },
       {
+        id: '3',
         description: 'DOB located does not match input',
         note: 'Dob does not match',
         reasonCode: 'dob_does_not_match',
@@ -289,6 +326,7 @@ export const withRiskSignals = () => {
         severity: 'high',
       },
       {
+        id: '4',
         description:
           'Either the located identity was flagged for elevated risk, or a confident match for the identity could not be found',
         note: 'Identity flagged for elevated risk',
@@ -297,6 +335,7 @@ export const withRiskSignals = () => {
         severity: 'high',
       },
       {
+        id: '5',
         description:
           'Identity could not be located with the information provided',
         note: 'Identity not located',
@@ -305,6 +344,7 @@ export const withRiskSignals = () => {
         severity: 'high',
       },
       {
+        id: '6',
         description: 'The located name matches the input name.',
         note: 'Name matches',
         reasonCode: 'name_matches',
@@ -312,6 +352,7 @@ export const withRiskSignals = () => {
         severity: 'info',
       },
       {
+        id: '7',
         description:
           'Records indicate that the subject in question is deceased.',
         note: 'Subject deceased',
@@ -320,6 +361,7 @@ export const withRiskSignals = () => {
         severity: 'high',
       },
       {
+        id: '8',
         description:
           'A strong potential match on a governmental OFAC watchlist',
         note: 'OFAC watchlist hit',
@@ -328,6 +370,7 @@ export const withRiskSignals = () => {
         severity: 'high',
       },
       {
+        id: '9',
         description:
           "The document provided was a provisional license or learner's permit",
         note: "Document is a learner's permit or provisional driver's license",

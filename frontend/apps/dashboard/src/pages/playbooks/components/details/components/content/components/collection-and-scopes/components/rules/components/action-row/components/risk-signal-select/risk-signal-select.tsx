@@ -8,7 +8,6 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronDown16, IcoTrash16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
-  Badge,
   Box,
   createFontStyles,
   createOverlayBackground,
@@ -74,9 +73,9 @@ const RiskSignalSelect = ({
   }, [searchValue, options]);
 
   useEffect(() => {
-    cache.current.clearAll(); // Clear the cache
-    setListKey(prevKey => prevKey + 1); // Increment the key to force rerender
-  }, [matches]); // Dependency array includes matches
+    cache.current.clearAll();
+    setListKey(prevKey => prevKey + 1);
+  }, [matches]);
 
   const renderRow: React.FC<ListRowProps> = ({ index, key, style, parent }) => {
     const option = matches[index];
@@ -90,31 +89,32 @@ const RiskSignalSelect = ({
         columnIndex={0}
         rowIndex={index}
       >
-        <div style={style}>
-          <Item
-            asChild
-            key={option.value}
-            value={option.value}
-            textValue={option.label}
-            onClick={() => setSelectedSignal(option.value)}
-          >
-            <ComboboxItem>
-              <Typography
-                variant="body-4"
-                sx={{
-                  textOverflow: 'ellipsis',
-                  overflow: 'hidden',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {option.label}
-              </Typography>
-              <Typography variant="caption-4" color="tertiary">
-                {option.description}
-              </Typography>
-            </ComboboxItem>
-          </Item>
-        </div>
+        <Item
+          asChild
+          key={option.value}
+          value={option.value}
+          textValue={option.label}
+          onClick={() => setSelectedSignal(option.value)}
+          role="option"
+          aria-label={option.label}
+          style={style}
+        >
+          <ComboboxItem>
+            <Typography
+              variant="body-4"
+              sx={{
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {option.label}
+            </Typography>
+            <Typography variant="caption-4" color="tertiary">
+              {option.description}
+            </Typography>
+          </ComboboxItem>
+        </Item>
       </CellMeasurer>
     );
   };
@@ -137,11 +137,11 @@ const RiskSignalSelect = ({
             setSearchValue(nextValue);
           }}
         >
-          <Trigger aria-label={t('aria-label')} type="button" asChild>
-            <Badge variant="info" sx={{ gap: 2 }}>
+          <Trigger role="button" aria-label={t('aria-label')} type="button">
+            <>
               {selectedSignal || t('placeholder')}
               <IcoChevronDown16 color="info" />
-            </Badge>
+            </>
           </Trigger>
           <Content position="popper" sideOffset={4} align="end">
             <Header>
@@ -167,22 +167,24 @@ const RiskSignalSelect = ({
                 }}
               />
             </Header>
-            <ComboboxList className="listbox">
-              <AutoSizer>
-                {({ width }: { width: number }) => (
-                  <List
-                    key={listKey}
-                    width={width}
-                    height={350}
-                    deferredMeasurementCache={cache.current}
-                    rowCount={matches.length}
-                    rowHeight={cache.current.rowHeight}
-                    rowRenderer={renderRow}
-                    overscanRowCount={10}
-                  />
-                )}
-              </AutoSizer>
-            </ComboboxList>
+            {matches.length > 0 ? (
+              <ComboboxList role="listbox" aria-label="Risk signals">
+                <AutoSizer>
+                  {({ width }) => (
+                    <List
+                      key={listKey}
+                      width={width}
+                      height={350}
+                      deferredMeasurementCache={cache.current}
+                      rowCount={matches.length}
+                      rowHeight={cache.current.rowHeight}
+                      rowRenderer={renderRow}
+                      overscanRowCount={10}
+                    />
+                  )}
+                </AutoSizer>
+              </ComboboxList>
+            ) : null}
           </Content>
         </ComboboxProvider>
       </SelectPrimitive.Root>
@@ -197,6 +199,7 @@ const Trigger = styled(SelectPrimitive.Trigger)`
     background-color: ${theme.backgroundColor.info};
     border-radius: ${theme.borderRadius.large};
     border: 0;
+    gap: ${theme.spacing[2]};
     color: ${theme.color.info};
     cursor: pointer;
     display: inline-flex;

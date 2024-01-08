@@ -1,5 +1,6 @@
 import './utils/mock-resize-observer';
 import './utils/mock-pointer-events';
+import './utils/mock-react-virtualized';
 
 export {
   createClipboardSpy,

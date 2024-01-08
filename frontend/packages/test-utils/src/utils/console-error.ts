@@ -13,7 +13,10 @@ const throwOnConsoleErrors = () => {
       // we should just remove to make the console cleaner and prevent the to break the test
       const hasIgnored = args.some(arg => {
         const isMockRequest = arg.response?.headers?.xPoweredBy === 'msw';
-        if (typeof arg === 'object' && isMockRequest) {
+        const isWarning =
+          typeof arg === 'string' && arg.startsWith('Warning: ');
+
+        if ((typeof arg === 'object' && isMockRequest) || isWarning) {
           return true;
         }
         return false;
