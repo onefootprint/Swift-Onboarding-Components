@@ -10,7 +10,7 @@ const ContentSecurityPolicy = `
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';
   frame-ancestors 'self';
-  frame-src 'self' *.onefootprint.com http://localhost:3000 http://localhost:3010 vercel.live;
+  frame-src 'self' *.onefootprint.com http://localhost:3000 http://localhost:3010 http://localhost:3011 vercel.live;
   img-src 'self' data: assets.vercel.com vercel.live footprint-blog.ghost.io vercel.com cdn.jsdelivr.net;
   media-src 'self' https;
   script-src 'self' 'unsafe-inline' 'unsafe-eval' *.usefathom.com vercel.live vitals.vercel-insights.com https://cdn.jsdelivr.net;

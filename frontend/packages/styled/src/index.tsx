@@ -1,4 +1,4 @@
-import { Theme } from '@onefootprint/design-tokens';
+import type { Theme } from '@onefootprint/design-tokens';
 import * as styledComponents from 'styled-components';
 
 const {

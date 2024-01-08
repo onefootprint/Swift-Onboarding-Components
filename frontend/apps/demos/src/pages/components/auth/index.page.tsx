@@ -53,7 +53,10 @@ const AuthDemo = () => {
         <title>Footprint Auth Demo</title>
       </Head>
       <Container>
-        <FootprintButton text="Sign in with Footprint" onClick={handleClick} />
+        <FootprintButton
+          onClick={handleClick}
+          text="Authenticate with Footprint"
+        />
       </Container>
     </>
   );
