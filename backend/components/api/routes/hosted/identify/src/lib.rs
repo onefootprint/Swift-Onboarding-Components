@@ -15,11 +15,10 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::webauthn_credential::WebauthnCredential;
 use itertools::Itertools;
-use newtypes::ContactInfoKind;
-use newtypes::IdentityDataKind as IDK;
 use newtypes::PiiString;
 use newtypes::SandboxId;
 use newtypes::VaultId;
+use newtypes::{ContactInfoKind, DataIdentifier as DI};
 use paperclip::actix::{web, Apiv2Schema};
 use strum::EnumDiscriminants;
 use webauthn_rs_core::proto::{AuthenticationState, Base64UrlSafeData};
@@ -159,7 +158,7 @@ async fn get_user_challenge_context(
 
     let ci = vec![ContactInfoKind::Phone, ContactInfoKind::Email]
         .into_iter()
-        .filter_map(|ci| uvw.get(IDK::from(ci)).map(|d| (ci, d.lifetime_id().clone())))
+        .filter_map(|ci| uvw.get(DI::from(ci)).map(|d| (ci, d.lifetime_id().clone())))
         .collect_vec();
     let cis = state
         .db_pool

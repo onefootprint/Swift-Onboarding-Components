@@ -32,13 +32,14 @@ use feature_flag::FeatureFlagClient;
 pub struct UserSessionContext {
     pub user: Vault,
     pub scopes: Vec<UserAuthScope>,
-    pub(super) obc: Option<(ObConfiguration, Tenant)>,
+    pub(super) obc: Option<ObConfiguration>,
+    pub(super) tenant: Option<Tenant>,
     pub(super) scoped_user: Option<ScopedVault>,
     pub(super) sb_id: Option<ScopedVaultId>,
     pub(super) obc_id: Option<ObConfigurationId>,
     pub(super) wf_id: Option<WorkflowId>,
     pub wfr_id: Option<WorkflowRequestId>,
-    pub(super) is_implied_auth: bool,
+    pub is_implied_auth: bool,
     pub auth_event_ids: Vec<AuthEventId>,
     pub auth_events: Vec<AssociatedAuthEvent>,
     /// When true, the auth token was initially issued as an unauthed, identified token
@@ -111,11 +112,11 @@ impl UserSessionContext {
     }
 
     pub fn ob_config(&self) -> Option<&ObConfiguration> {
-        self.obc.as_ref().map(|(obc, _)| obc)
+        self.obc.as_ref()
     }
 
     pub fn tenant(&self) -> Option<&Tenant> {
-        self.obc.as_ref().map(|(_, t)| t)
+        self.tenant.as_ref()
     }
 }
 
@@ -169,9 +170,14 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     // Conservatively confirm that the onboarding in the auth token belongs to the user
                     .map(|id| ScopedVault::get(conn, (id, &vault.id)))
                     .transpose()?;
-                let obc = obc_id
+                let (obc, _) = obc_id
                     .as_ref()
                     .map(|id| ObConfiguration::get(conn, id))
+                    .transpose()?
+                    .unzip();
+                let tenant = scoped_user
+                    .as_ref()
+                    .map(|sv| Tenant::get(conn, &sv.tenant_id))
                     .transpose()?;
 
                 if let Some(su) = scoped_user.as_ref() {
@@ -193,6 +199,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     wfr_id,
                     scoped_user,
                     obc,
+                    tenant,
                     obc_id,
                     scopes,
                     is_from_api,

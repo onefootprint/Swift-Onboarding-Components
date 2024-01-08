@@ -1,5 +1,7 @@
 use crate::{ApiError, ApiErrorKind};
 
+use super::ApiResult;
+
 #[derive(Debug)]
 /// Shorthand to make it convenient to make an HTTP 500 assertion error.
 /// Use this when an application-level invariant isn't met. This should only be returned when
@@ -20,6 +22,12 @@ pub struct ValidationError<'a>(pub &'a str);
 impl<'a> From<ValidationError<'a>> for ApiError {
     fn from(value: ValidationError<'a>) -> Self {
         ApiError::from(ApiErrorKind::ValidationError(value.0.to_string()))
+    }
+}
+
+impl<'a, T> From<ValidationError<'a>> for ApiResult<T> {
+    fn from(value: ValidationError<'a>) -> Self {
+        Err(ApiError::from(value))
     }
 }
 

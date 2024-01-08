@@ -87,7 +87,7 @@ async fn post_inner(
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
             updates.assert_allowable_identifiers(uvw.vault.kind)?;
-            uvw.validate_request(conn, updates, Some(actor))?;
+            uvw.validate_request(conn, updates, Some(actor), false)?;
             Ok(())
         })
         .await??;

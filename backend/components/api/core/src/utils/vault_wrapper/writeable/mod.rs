@@ -8,6 +8,7 @@ mod build;
 mod delete;
 mod portablize_data;
 mod prefill;
+mod replace_verified_ci;
 mod validated_data_request;
 
 #[cfg(test)]

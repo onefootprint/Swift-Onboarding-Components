@@ -3,6 +3,7 @@ use paperclip::actix::web;
 mod access_events;
 mod attest_device;
 mod authorized_orgs;
+mod challenge;
 mod consent;
 pub mod documents;
 mod email;
@@ -29,6 +30,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(email::verify::post)
         .service(consent::post)
         .service(upload::post)
+        .service(challenge::index::post)
+        .service(challenge::verify::post)
         .service(attest_device::post_challenge)
         .service(attest_device::post_attestation);
 

@@ -112,7 +112,7 @@ pub async fn post(
                 .create(conn)?;
             }
 
-            let (inherited_auth_events, can_auto_authorize) = {
+            let inherited_auth_events = {
                 // Don't allow inheriting auth if the user token has more permissions than the tenant.
                 // This notably makes the experience worse for users who are one-clicking onto a tenant
                 // who uses us for both auth and verify.
@@ -139,12 +139,11 @@ pub async fn post(
                 let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
                 let can_auto_authorize = vw.can_auto_authorize(has_prefill_data);
 
-                let inherited_auth_events = if can_auto_authorize {
+                if can_auto_authorize {
                     AuthEvent::list_recent(conn, &sv.id)?
                 } else {
                     vec![]
-                };
-                (inherited_auth_events, can_auto_authorize)
+                }
             };
             let kinds = inherited_auth_events.iter().map(|e| e.kind).collect();
             // Request Onboarding scopes, but if the user hasn't authed to the tenant recently, we
@@ -204,7 +203,7 @@ pub async fn post(
                 su_id: Some(sv.id),
                 obc_id,
                 is_from_api: true,
-                is_implied_auth: can_auto_authorize,
+                is_implied_auth: !inherited_auth_events.is_empty(),
                 wfr_id,
                 ..Default::default()
             };

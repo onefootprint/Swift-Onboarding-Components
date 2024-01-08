@@ -13,6 +13,8 @@ use db::TxnPgConn;
 use newtypes::CollectedDataOption;
 use newtypes::DataIdentifier;
 use newtypes::DataLifetimeSeqno;
+use newtypes::ScopedVaultId;
+use newtypes::VaultId;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
@@ -122,19 +124,29 @@ impl WriteableVw<Person> {
             .get_lifetime(di.clone())
             .ok_or(AssertionError("No lifetime for CI"))?;
         let ci = ContactInfo::get(conn, &lifetime.id)?;
-        if !ci.is_otp_verified {
-            ContactInfo::mark_verified(conn, &ci.id, VerificationLevel::OtpVerified)?;
-            let seqno = DataLifetime::get_next_seqno(conn)?;
-            DataLifetime::portablize(conn, &ci.lifetime_id, seqno)?;
-        }
-        Vault::mark_verified(conn, &self.vault.id)?;
-        let update = ScopedVaultUpdate {
-            show_in_search: Some(true),
-            ..ScopedVaultUpdate::default()
-        };
-        ScopedVault::update(conn, &self.scoped_vault_id, update)?;
+        on_otp_verified(conn, ci, &self.scoped_vault_id, &self.vault.id)?;
         Ok(())
     }
+}
+
+pub(super) fn on_otp_verified(
+    conn: &mut TxnPgConn,
+    ci: ContactInfo,
+    sv_id: &ScopedVaultId,
+    v_id: &VaultId,
+) -> ApiResult<()> {
+    if !ci.is_otp_verified {
+        ContactInfo::mark_verified(conn, &ci.id, VerificationLevel::OtpVerified)?;
+        let seqno = DataLifetime::get_next_seqno(conn)?;
+        DataLifetime::portablize(conn, &ci.lifetime_id, seqno)?;
+    }
+    Vault::mark_verified(conn, v_id)?;
+    let update = ScopedVaultUpdate {
+        show_in_search: Some(true),
+        ..ScopedVaultUpdate::default()
+    };
+    ScopedVault::update(conn, sv_id, update)?;
+    Ok(())
 }
 
 #[cfg(test)]

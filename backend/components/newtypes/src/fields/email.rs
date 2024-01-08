@@ -13,6 +13,7 @@ string_api_data_type_alias!(Email);
 
 impl Email {
     const FIXTURE_EMAIL: &'static str = "sandbox@onefootprint.com";
+    const FIXTURE_EMAIL2: &'static str = "sandbox2@onefootprint.com";
 
     pub fn leak(&self) -> &str {
         self.email.leak()
@@ -30,7 +31,7 @@ impl Email {
     }
 
     pub fn is_fixture(&self) -> bool {
-        self.email.leak() == Self::FIXTURE_EMAIL
+        self.email.leak() == Self::FIXTURE_EMAIL || self.email.leak() == Self::FIXTURE_EMAIL2
     }
 }
 

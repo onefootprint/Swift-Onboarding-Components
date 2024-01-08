@@ -28,6 +28,7 @@ pub enum ChallengeKind {
     Sms,
     #[strum(serialize = "biometric")]
     #[serde(rename = "biometric")]
+    #[serde(alias = "passkey")]
     Passkey,
     Email,
 }

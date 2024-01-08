@@ -40,12 +40,17 @@ impl<Type> VaultWrapper<Type> {
         // None if adding data not for prefill, Some with the sv_id if adding data for prefill
         prefill_sv_id: Option<&ScopedVaultId>,
         actor: Option<AuthActor>,
+        for_replacing_ci: bool,
     ) -> ApiResult<HashSet<CollectedDataOption>> {
         // Don't allow replacing some pieces of info
         let mut validation_errors = HashMap::<DataIdentifier, newtypes::Error>::new();
         let dis = data.iter().map(|vd| &vd.kind).collect_vec();
 
-        let irreplaceable_ci = [IDK::PhoneNumber.into(), IDK::Email.into()];
+        let irreplaceable_ci = if !for_replacing_ci {
+            vec![IDK::PhoneNumber.into(), IDK::Email.into()]
+        } else {
+            vec![]
+        };
         for di in irreplaceable_ci {
             let Some(d) = self.data(&di) else {
                 continue;
@@ -83,7 +88,7 @@ impl<Type> VaultWrapper<Type> {
         let new_cdos = CollectedDataOption::list_from(dis.iter().map(|x| (*x).clone()).collect());
         for speculative_cdo in &new_cdos {
             let Some(full_cdo) = speculative_cdo.full_variant() else {
-                continue
+                continue;
             };
 
             // Some clunky logic to allow partial updates, which may need to happen while the
@@ -134,6 +139,7 @@ impl<Type> VaultWrapper<Type> {
         conn: &mut PgConn,
         request: DataRequest<Fingerprints>,
         actor: Option<AuthActor>,
+        for_replacing_ci: bool,
     ) -> ApiResult<ValidatedDataRequest> {
         // Transform the request into a Vec<NewVaultData>
         let (data, json_fields, fingerprints) = request.decompose();
@@ -158,7 +164,7 @@ impl<Type> VaultWrapper<Type> {
             })
             .collect::<ApiResult<Vec<_>>>()?;
 
-        let new_cdos = self.validate_adding_dis(conn, &data, None, actor)?;
+        let new_cdos = self.validate_adding_dis(conn, &data, None, actor, for_replacing_ci)?;
 
         let req = ValidatedDataRequest {
             data,
@@ -185,7 +191,7 @@ impl<Type> WriteableVw<Type> {
             old_ci,
             ..
         } = prefill_data;
-        let new_cdos = self.validate_adding_dis(conn, &data, Some(&self.scoped_vault_id), None)?;
+        let new_cdos = self.validate_adding_dis(conn, &data, Some(&self.scoped_vault_id), None, false)?;
         let request = ValidatedDataRequest {
             data,
             old_ci,

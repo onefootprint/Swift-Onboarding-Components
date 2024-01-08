@@ -9,8 +9,9 @@ use db::models::contact_info::ContactInfo;
 use db::{DbError, DbPool};
 use newtypes::email::Email;
 use newtypes::{
-    BusinessDataKind as BDK, BusinessOwnerData, BusinessOwnerKind, ContactInfoKind, IdentityDataKind as IDK,
-    Iso3166TwoDigitCountryCode, KycedBusinessOwnerData, PhoneNumber, PiiString, TenantId,
+    BusinessDataKind as BDK, BusinessOwnerData, BusinessOwnerKind, ContactInfoKind, DataIdentifier,
+    IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, KycedBusinessOwnerData, PhoneNumber, PiiString,
+    TenantId,
 };
 use std::str::FromStr;
 
@@ -20,7 +21,7 @@ impl<Type> VaultWrapper<Type> {
         state: &State,
         kind: ContactInfoKind,
     ) -> ApiResult<Option<(PiiString, ContactInfo)>> {
-        if let Some(di_id) = self.get(IDK::from(kind)) {
+        if let Some(di_id) = self.get(DataIdentifier::from(kind)) {
             let di_id = di_id.lifetime_id().clone();
             let ci = state
                 .db_pool
@@ -28,7 +29,7 @@ impl<Type> VaultWrapper<Type> {
                 .await??;
 
             let data = self
-                .decrypt_unchecked_single(&state.enclave_client, IDK::from(kind).into())
+                .decrypt_unchecked_single(&state.enclave_client, kind.into())
                 .await?
                 .ok_or(ApiError::from(DbError::ObjectNotFound))?;
             Ok(Some((data, ci)))

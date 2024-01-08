@@ -50,7 +50,7 @@ pub async fn post_validate(
         .db_query(move |conn| -> ApiResult<_> {
             let bvw: TenantVw<Business> = VaultWrapper::build_for_tenant(conn, &sb_id)?;
             updates.assert_allowable_identifiers(bvw.vault.kind)?;
-            bvw.validate_request(conn, updates, None)?;
+            bvw.validate_request(conn, updates, None, false)?;
             Ok(())
         })
         .await??;

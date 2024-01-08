@@ -28,6 +28,7 @@ impl Debug for PhoneNumber {
 
 impl PhoneNumber {
     const FIXTURE_PHONE_NUMBER: &'static str = "+15555550100";
+    const FIXTURE_PHONE_NUMBER2: &'static str = "+15555550111";
 
     pub fn parse(number: PiiString) -> NtResult<Self> {
         let number = phonenumber::parse(None, number.leak()).map_err(Error::from)?;
@@ -37,7 +38,7 @@ impl PhoneNumber {
 
     /// Returns true for the SINGLE fake, fixture phone number we provide
     pub fn is_fixture_phone_number(&self) -> bool {
-        self.e164().leak() == Self::FIXTURE_PHONE_NUMBER
+        self.e164().leak() == Self::FIXTURE_PHONE_NUMBER || self.e164().leak() == Self::FIXTURE_PHONE_NUMBER2
     }
 
     // Maybe make two versions of e164: one with sandbox and one without

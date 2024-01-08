@@ -947,6 +947,78 @@
                 ]
             }
         },
+        "/hosted/user/challenge": {
+            "post": {
+                "tags": [
+                    "Challenge",
+                    "Hosted"
+                ],
+                "description": "Sends a challenge of the requested kind",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ChallengeRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ChallengeResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "User Token": []
+                    }
+                ]
+            }
+        },
+        "/hosted/user/challenge/verify": {
+            "post": {
+                "tags": [
+                    "Challenge",
+                    "Hosted"
+                ],
+                "description": "Verify the previously sent challenge and attach the new form of contact info to the vault",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ChallengeVerifyRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmptyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "User Token": []
+                    }
+                ]
+            }
+        },
         "/hosted/user/consent": {
             "post": {
                 "tags": [
@@ -2096,6 +2168,79 @@
                 "required": [
                     "can_access_data",
                     "org_name"
+                ]
+            },
+            "ChallengeRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "description": "If the challenge kind is email, the email address to send the challenge to",
+                        "type": "string"
+                    },
+                    "kind": {
+                        "description": "The kind of challenge to initiate",
+                        "type": "string",
+                        "enum": [
+                            "sms",
+                            "biometric",
+                            "email"
+                        ]
+                    },
+                    "phone_number": {
+                        "description": "If the challenge kind is SMS, the phone number to send the challenge to",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "kind"
+                ]
+            },
+            "ChallengeResponse": {
+                "type": "object",
+                "properties": {
+                    "biometric_challenge_json": {
+                        "description": "If the challenge kind is biometric, the challenge JSON for the browser",
+                        "type": "string"
+                    },
+                    "challenge_token": {
+                        "description": "Information saved client side and sent back with the challenge response",
+                        "type": "string"
+                    },
+                    "time_before_retry_s": {
+                        "description": "The timeout until you're allowed to initiate another challenge",
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "required": [
+                    "challenge_token",
+                    "time_before_retry_s"
+                ]
+            },
+            "ChallengeVerifyRequest": {
+                "type": "object",
+                "properties": {
+                    "action_kind": {
+                        "description": "Specifies whether to add the new auth method alongside existing auth methods or replace\n the existing method.",
+                        "type": "string",
+                        "enum": [
+                            "replace",
+                            "add"
+                        ]
+                    },
+                    "challenge_response": {
+                        "description": "The response to the challenge. Either SMS/email PIN code or passkey response",
+                        "type": "string"
+                    },
+                    "challenge_token": {
+                        "description": "The token given from initiating the challenge",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "action_kind",
+                    "challenge_response",
+                    "challenge_token"
                 ]
             },
             "CheckSessionResponse": {
