@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import useDesktopMachine from '../../../../../hooks/desktop/use-desktop-machine';
 
 const ContinueOnDesktop = () => {
-  const { t } = useTranslation('pages.desktop.qr-register');
+  const { t } = useTranslation('pages.transfer.desktop.qr-register');
   const [state, send] = useDesktopMachine();
   const {
     missingRequirements: { idDoc },

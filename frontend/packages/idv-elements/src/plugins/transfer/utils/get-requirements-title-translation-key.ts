@@ -14,7 +14,7 @@ const getRequirementsTitleTranslationKey = (
     key = 'id-doc';
   }
 
-  return `components.requirements-title.${key}`;
+  return `components.transfer.requirements-title.${key}`;
 };
 
 export default getRequirementsTitleTranslationKey;

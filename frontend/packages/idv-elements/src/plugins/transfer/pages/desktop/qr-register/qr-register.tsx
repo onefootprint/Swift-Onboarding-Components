@@ -18,7 +18,7 @@ import ContinueOnDesktop from './components/continue-on-desktop';
 const QR_CODE_SIZE = 130;
 
 const QRRegister = () => {
-  const { t, allT } = useTranslation('pages.desktop.qr-register');
+  const { t, allT } = useTranslation('pages.transfer.desktop.qr-register');
   const [state, send] = useDesktopMachine();
   const {
     authToken,

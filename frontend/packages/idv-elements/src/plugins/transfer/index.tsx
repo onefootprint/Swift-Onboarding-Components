@@ -2,11 +2,11 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 
+import configureI18next from '../../config/initializers/i18next';
+import queryClient from '../../config/initializers/react-query';
 import checkIsSocialMediaBrowser from '../../utils/check-is-social-media-browser';
 import { DesktopMachineProvider } from './components/desktop-machine-provider';
 import { MobileMachineProvider } from './components/mobile-machine-provider';
-import configureI18next from './config/initializers/i18next';
-import queryClient from './config/initializers/react-query';
 import DesktopRouter from './pages/desktop/router';
 import MobileRouter from './pages/mobile/router';
 import type { TransferProps } from './types';

@@ -25,11 +25,11 @@ const Router = ({ onDone }: RouterProps) => {
     <>
       {state.matches('newTabRequest') && <NewTabRequest />}
       {state.matches('newTabProcessing') && (
-        <MobileProcessing translationKey="pages.mobile.new-tab-processing" />
+        <MobileProcessing translationKey="pages.transfer.mobile.new-tab-processing" />
       )}
       {state.matches('sms') && <Sms />}
       {state.matches('smsProcessing') && (
-        <MobileProcessing translationKey="pages.mobile.sms-processing" />
+        <MobileProcessing translationKey="pages.transfer.mobile.sms-processing" />
       )}
     </>
   );

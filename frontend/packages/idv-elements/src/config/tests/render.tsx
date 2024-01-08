@@ -1,4 +1,5 @@
 import { customRender } from '@onefootprint/test-utils';
+import { ToastProvider } from '@onefootprint/ui';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 
@@ -15,6 +16,10 @@ export const WithTranslation = ({ children }: WrapperProps) => (
 );
 
 export const renderComponent = (Component?: React.ReactNode) =>
-  customRender(<WithTranslation>{Component}</WithTranslation>);
+  customRender(
+    <WithTranslation>
+      <ToastProvider>{Component}</ToastProvider>
+    </WithTranslation>,
+  );
 
 export * from '@onefootprint/test-utils';

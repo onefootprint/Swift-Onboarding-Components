@@ -8,7 +8,9 @@ import useDesktopMachine from '../../../hooks/desktop/use-desktop-machine';
 
 const ConfirmContinueOnDesktop = () => {
   const [, send] = useDesktopMachine();
-  const { t } = useTranslation('pages.desktop.confirm-continue-on-desktop');
+  const { t } = useTranslation(
+    'pages.transfer.desktop.confirm-continue-on-desktop',
+  );
 
   const handleDesktop = () => {
     send({
