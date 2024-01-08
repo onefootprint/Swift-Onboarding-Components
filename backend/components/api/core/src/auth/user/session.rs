@@ -99,6 +99,10 @@ impl UserSessionContext {
         self.scoped_user.as_ref().map(|su| su.id.clone())
     }
 
+    pub fn scoped_user(&self) -> Option<&ScopedVault> {
+        self.scoped_user.as_ref()
+    }
+
     pub fn ob_configuration_id(&self) -> Option<ObConfigurationId> {
         self.obc_id.clone()
     }

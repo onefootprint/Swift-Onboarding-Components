@@ -5,7 +5,7 @@ use crate::State;
 use api_core::auth::user::CheckedUserAuthContext;
 use api_core::auth::user::UserAuth;
 use api_core::auth::user::UserAuthContext;
-use api_core::auth::Any;
+use api_core::auth::user::UserAuthGuard;
 use api_core::errors::challenge::ChallengeError;
 use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
@@ -18,6 +18,7 @@ use api_core::utils::challenge::ChallengeToken;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::passkey::VerifyChallengeResult;
 use api_core::utils::passkey::WebauthnConfig;
+use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use chrono::Utc;
 use crypto::sha256;
@@ -59,7 +60,10 @@ pub async fn post(
     user_auth: UserAuthContext,
     insights: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_guard(Any)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::Auth)?;
+    if !user_auth.data.is_from_api {
+        return ValidationError("Can only update auth methods using auth issued via API").into();
+    }
     if user_auth.data.is_implied_auth {
         return ValidationError("Cannot replace auth method using implied auth").into();
     }

@@ -3,7 +3,7 @@ use super::RegisterChallengeData;
 use crate::challenge::RegisterChallenge;
 use crate::State;
 use api_core::auth::user::UserAuthContext;
-use api_core::auth::Any;
+use api_core::auth::user::UserAuthGuard;
 use api_core::errors::AssertionError;
 use api_core::errors::JsonError;
 use api_core::errors::ValidationError;
@@ -57,9 +57,12 @@ pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<ChallengeResponse> {
-    let user_auth = user_auth.check_guard(Any)?;
+    let user_auth = user_auth.check_guard(UserAuthGuard::Auth)?;
+    if !user_auth.data.is_from_api {
+        return ValidationError("Can only update auth methods using auth issued via API").into();
+    }
     if user_auth.data.is_implied_auth {
-        return ValidationError("Cannot replace auth method using implied auth").into();
+        return ValidationError("Cannot update auth method using implied auth").into();
     }
     let ChallengeRequest {
         phone_number,

@@ -212,7 +212,9 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
         raise last_exception
 
 
-def step_up_user(twilio, token, recipient_phone_number, expect_unverified):
+def step_up_user(
+    twilio, token, recipient_phone_number, expect_unverified, token_scope="onboarding"
+):
     """
     Step up a token from unauthed, "identified" to authed with onboarding scope
     """
@@ -230,17 +232,24 @@ def step_up_user(twilio, token, recipient_phone_number, expect_unverified):
         twilio,
         recipient_phone_number,
         challenge_data["challenge_token"],
-        "onboarding",
+        token_scope,
         token,
     )
 
     # Now, token should have scopes
+    if token_scope == "onboarding":
+        expected_scope = "sign_up"
+    elif token_scope == "auth":
+        expected_scope = "auth"
     body = get("hosted/user/token", None, new_token)
-    assert set(body["scopes"]) >= {"sign_up"}
+    assert set(body["scopes"]) >= {expected_scope}
     assert (
         new_token.value != token.value
     ), "Verify should give us a new token with permissions"
-    # TODO eventually, enforce that the old token's scopes did not increase
+
+    # And scopes of old token shouldn't have changed
+    body = get("hosted/user/token", None, token)
+    assert not body["scopes"]
 
     return new_token
 

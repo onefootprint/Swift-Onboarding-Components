@@ -238,3 +238,14 @@ def live_phone_number():
     # Cleanup the non-sandbox user that is used across all integration test runs
     clean_up_user(LIVE_PHONE_NUMBER, EMAIL)
     return LIVE_PHONE_NUMBER
+
+
+@pytest.fixture(scope="session")
+def auth_playbook(sandbox_tenant):
+    return create_ob_config(
+        sandbox_tenant,
+        "Auth playbook",
+        ["phone_number", "email"],
+        ["phone_number", "email"],
+        kind="auth",
+    )

@@ -1,17 +1,63 @@
 import json
 import pytest
 from tests.bifrost_client import BifrostClient
+from tests.headers import FpAuth
 from tests.utils import (
     post,
     override_webauthn_challenge,
     override_webauthn_attestation,
     inherit_user_biometric,
+    step_up_user,
 )
-from tests.constants import TEST_URL
+from tests.constants import TEST_URL, FIXTURE_PHONE_NUMBER
 from tests.webauthn_simulator import SoftWebauthnDevice
 
 FIXTURE_PHONE_NUMBER2 = "+15555550111"
 FIXTURE_EMAIL2 = f"sandbox2@onefootprint.com"
+
+
+@pytest.fixture(scope="function")
+def user_with_token(sandbox_tenant, twilio, auth_playbook):
+    """
+    An existing user and an auth token for it that can be used to update the user's auth methods
+    """
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
+    user = bifrost.run()
+
+    def assert_cant_use_token(token, status_code, error_message):
+        data = dict(
+            kind="sms", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="replace"
+        )
+        body = post("hosted/user/challenge", data, token, status_code=status_code)
+        assert body["error"]["message"] == error_message
+
+    # Make sure we can't use the onboarding token (not created via API) to update auth
+    assert_cant_use_token(
+        bifrost.auth_token, 401, "Not allowed: required permission is missing: auth"
+    )
+
+    # Also test that a playbook with the auth scopes can't be used
+    token_for_auth = inherit_user_biometric(user, "auth", auth_playbook.key)
+    assert_cant_use_token(
+        token_for_auth, 400, "Can only update auth methods using auth issued via API"
+    )
+
+    # Create a new auth token via API that _can_ initiate a challenge, after step up
+    data = dict(kind="user")
+    body = post(f"users/{user.fp_id}/token", data, sandbox_tenant.sk.key)
+    auth_token = FpAuth(body["token"])
+
+    # Make sure we have to explicitly auth (and not use implied auth) to initiate a challenge
+    assert_cant_use_token(
+        auth_token, 401, "Not allowed: required permission is missing: auth"
+    )
+
+    # Finally, step up the token so it can be used to initiate a challenge
+    auth_token = step_up_user(
+        twilio, auth_token, FIXTURE_PHONE_NUMBER, False, token_scope="auth"
+    )
+
+    return (user, auth_token)
 
 
 @pytest.mark.parametrize(
@@ -24,10 +70,8 @@ FIXTURE_EMAIL2 = f"sandbox2@onefootprint.com"
         (dict(kind="email", email=FIXTURE_EMAIL2), "id.email"),
     ],
 )
-def test_replace_ci(sandbox_tenant, twilio, challenge, di):
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
-    user = bifrost.run()
-    auth_token = bifrost.auth_token
+def test_replace_ci(sandbox_tenant, challenge, di, user_with_token):
+    user, auth_token = user_with_token
 
     # Replace the contact info with a challenge
     data = dict(**challenge, action_kind="replace")
@@ -45,10 +89,8 @@ def test_replace_ci(sandbox_tenant, twilio, challenge, di):
     )
 
 
-def test_add_passkey(sandbox_tenant, twilio):
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
-    user = bifrost.run()
-    auth_token = bifrost.auth_token
+def test_add_passkey(sandbox_tenant, user_with_token):
+    user, auth_token = user_with_token
 
     # Add a passkey
     data = dict(kind="passkey", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="add")

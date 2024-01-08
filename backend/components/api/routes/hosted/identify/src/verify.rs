@@ -104,20 +104,25 @@ pub async fn post(
             // Determine which scopes to issue on the auth token
             let (args, duration, su) = match scope {
                 IdentifyScope::Auth => {
-                    let obc = ob_pk_auth
-                        .as_ref()
-                        .map(|a| a.ob_config())
-                        .ok_or(UserError::PlaybookMissingForAuth)?;
-                    if obc.kind != ObConfigurationKind::Auth {
-                        return Err(ChallengeError::IncorrectPlaybookKind(obc.kind, scope).into());
-                    }
-                    let uv = Vault::lock(conn, &uv_id)?;
-                    let su = ScopedVault::get_or_create(conn, &uv, obc.id.clone())?;
+                    let obc = ob_pk_auth.as_ref().map(|a| a.ob_config());
+                    let su = if let Some(obc) = obc {
+                        if obc.kind != ObConfigurationKind::Auth {
+                            return Err(ChallengeError::IncorrectPlaybookKind(obc.kind, scope).into());
+                        }
+                        let uv = Vault::lock(conn, &uv_id)?;
+                        ScopedVault::get_or_create(conn, &uv, obc.id.clone())?
+                    } else {
+                        let Some(su_from_token) = user_auth.as_ref().and_then(|ua| ua.scoped_user()) else {
+                            // A playbook MUST be provided if we're not stepping up
+                            return Err(UserError::PlaybookMissingForAuth.into());
+                        };
+                        su_from_token.clone()
+                    };
 
                     let duration = Duration::hours(1);
                     let args = UserSessionArgs {
                         su_id: Some(su.id.clone()),
-                        obc_id: Some(obc.id.clone()),
+                        obc_id: obc.map(|obc| obc.id.clone()),
                         ..Default::default()
                     };
                     (args, duration, Some(su))
