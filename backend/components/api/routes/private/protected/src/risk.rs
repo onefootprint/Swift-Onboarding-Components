@@ -202,7 +202,7 @@ async fn make_decision(
         .collect();
     let vendor_result_ids = verification_result_ids.clone();
     let risk_signals: RiskSignalGroupStruct<Kyc> =
-        create_risk_signals_from_vendor_results((&results_map, &ids_map), vw, obc)?;
+        create_risk_signals_from_vendor_results((&results_map, &ids_map), vw, obc)?.kyc;
 
     state
         .db_pool

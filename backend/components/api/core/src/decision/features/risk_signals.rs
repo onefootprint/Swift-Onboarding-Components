@@ -18,6 +18,7 @@ use crate::{
         onboarding::FeatureSet,
         vendor::vendor_api::vendor_api_response::{VendorAPIResponseIdentifiersMap, VendorAPIResponseMap},
     },
+    errors::ApiResult,
     utils::vault_wrapper::VaultWrapper,
     ApiError,
 };
@@ -93,17 +94,24 @@ impl<'a> VendorResultsAndVault<'a> {
 //
 // WRITE
 //
-pub fn create_risk_signals_from_vendor_results<'a, T>(
+
+pub struct ParsedFootprintReasonCodes {
+    pub kyc: RiskSignalGroupStruct<Kyc>, // TODO: just have these be Vec<FRC>
+    pub aml: RiskSignalGroupStruct<Aml>,
+}
+
+pub fn create_risk_signals_from_vendor_results<'a>(
     vendor_result_maps: (&'a VendorAPIResponseMap, &'a VendorAPIResponseIdentifiersMap),
     vw: VaultWrapper,
     obc: ObConfiguration,
-) -> Result<RiskSignalGroupStruct<T>, ApiError>
-where
-    T: Into<WrappedRiskSignalGroupKind> + Clone,
-    RiskSignalGroupStruct<T>: From<VendorResultsAndVault<'a>>,
-{
-    let res = RiskSignalGroupStruct::<T>::from(VendorResultsAndVault::new(vendor_result_maps, vw, obc));
-
+) -> ApiResult<ParsedFootprintReasonCodes> {
+    let kyc = RiskSignalGroupStruct::<Kyc>::from(VendorResultsAndVault::new(
+        vendor_result_maps,
+        vw.clone(),
+        obc.clone(),
+    ));
+    let aml = RiskSignalGroupStruct::<Aml>::from(VendorResultsAndVault::new(vendor_result_maps, vw, obc));
+    let res = ParsedFootprintReasonCodes { kyc, aml };
     Ok(res)
 }
 

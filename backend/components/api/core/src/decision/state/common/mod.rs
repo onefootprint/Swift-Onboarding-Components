@@ -310,6 +310,7 @@ pub fn get_aml_risk_signals_from_kyc_call(
         vw,
         obc,
     )
+    .map(|r| r.aml)
 }
 
 pub fn get_review_reasons(

@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::{
     decision::{
         self,
-        features::risk_signals::{risk_signal_group_struct::Kyc, RiskSignalsForDecision},
+        features::risk_signals::RiskSignalsForDecision,
         onboarding::rules::{KycRuleExecutionConfig, KycRuleGroup},
         rule::rule_sets,
     },
@@ -331,11 +331,12 @@ fn eval_rules(
     // this does a lot of unnecessary stuff and has a lot of layers of unnecessary indirection but unfortunately this is the safest way to produce risk signals here without diverging too much from how other code paths do this
     let (results_map, ids_map) =
         vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results(&vec![res])?;
-    let rsg = decision::features::risk_signals::create_risk_signals_from_vendor_results::<Kyc>(
+    let rsg = decision::features::risk_signals::create_risk_signals_from_vendor_results(
         (&results_map, &ids_map),
         vw,
         obc,
-    )?;
+    )?
+    .kyc;
     let rsfd = RiskSignalsForDecision {
         kyc: Some(rsg.clone()),
         doc: None,

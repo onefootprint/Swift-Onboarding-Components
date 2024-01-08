@@ -188,7 +188,7 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
                 let (results_map, ids_map) =
                     build_vendor_response_map_from_vendor_results(&vec![vendor_result.clone()])?;
                 // TODO: later just have this take in a singular VR
-                create_risk_signals_from_vendor_results((&results_map, &ids_map), vw, obc)?
+                create_risk_signals_from_vendor_results((&results_map, &ids_map), vw, obc)?.kyc
             };
 
         save_risk_signals(conn, &self.sv_id, &risk_signals, false)?;

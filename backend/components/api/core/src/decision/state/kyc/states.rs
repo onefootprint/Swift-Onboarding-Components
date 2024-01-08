@@ -204,6 +204,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                     build_vendor_response_map_from_vendor_results(&[kyc_vendor_result.clone()])?;
                 // TODO: change this to take in a single VR
                 create_risk_signals_from_vendor_results((&results_map, &ids_map), vw.clone(), obc.clone())?
+                    .kyc // TODO: only call this once and re-use for aml portion below
             };
             save_risk_signals(conn, &self.sv_id, &kyc_risk_signals, false)?;
         }
