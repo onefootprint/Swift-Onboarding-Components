@@ -9,7 +9,9 @@ type HeaderProps = {
 };
 
 const Header = ({ shouldShowRemove, onRemove }: HeaderProps) => {
-  const { t } = useTranslation('pages.beneficial-owners.form.fields-header');
+  const { t } = useTranslation(
+    'pages.kyb.beneficial-owners.form.fields-header',
+  );
 
   return shouldShowRemove ? (
     <HeaderContainer>

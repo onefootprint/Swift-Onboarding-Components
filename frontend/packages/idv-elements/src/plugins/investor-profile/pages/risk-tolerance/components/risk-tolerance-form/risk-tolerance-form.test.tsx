@@ -1,15 +1,15 @@
 import {
+  customRender,
+  screen,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
+import {
   InvestorProfileDI,
   InvestorProfileRiskTolerance,
 } from '@onefootprint/types';
 import React from 'react';
 
-import {
-  renderComponent,
-  screen,
-  userEvent,
-  waitFor,
-} from '../../../../../../config/tests/render';
 import type { RiskToleranceFormProps } from './risk-tolerance-form';
 import RiskToleranceForm from './risk-tolerance-form';
 
@@ -19,7 +19,7 @@ describe('<RiskToleranceForm />', () => {
     isLoading,
     onSubmit = () => {},
   }: Partial<RiskToleranceFormProps>) => {
-    renderComponent(
+    customRender(
       <RiskToleranceForm
         defaultValues={defaultValues}
         isLoading={isLoading}

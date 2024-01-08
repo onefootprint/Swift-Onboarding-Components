@@ -19,7 +19,7 @@ export type FieldsProps = {
 };
 
 const Fields = ({ index, onRemove, config, l10n }: FieldsProps) => {
-  const { t } = useTranslation('pages.beneficial-owners.form.fields');
+  const { t } = useTranslation('pages.kyb.beneficial-owners.form.fields');
 
   const handleRemove = () => {
     onRemove(index);

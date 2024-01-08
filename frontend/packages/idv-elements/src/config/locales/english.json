@@ -24,6 +24,18 @@
         }
       }
     },
+    "kyb": {
+      "sync-data-error": {
+        "empty-auth-token": {
+          "title": "Your session is invalid",
+          "description": "Please refresh this page to try onboarding again."
+        },
+        "invalid-inputs": {
+          "title": "An error occurred",
+          "description": "An error occurred while saving data. Please fix the inputs and try again."
+        }
+      }
+    },
     "investor-profile": {
       "empty-auth-token": {
         "title": "Your session is invalid",
@@ -551,6 +563,220 @@
             "description-generic": "An error occurred while saving data. Please fix the inputs and try again."
           }
         }
+      }
+    },
+    "kyb": {
+      "introduction": {
+        "title": "Let's get to know your business! 😊",
+        "subtitle": "Before we get started, there are a couple of things you should know.",
+        "guidelines": {
+          "beneficial-owner": {
+            "title": "You need to be a beneficial owner to verify your business.",
+            "description": "A beneficial owner is anyone who has substantial control of or owns at least 25% of the business."
+          },
+          "bo-kyc": {
+            "title": "We need to verify your identity, as a beneficial owner.",
+            "description": "Otherwise we can't successfully verify your business."
+          }
+        }
+      },
+      "basic-data": {
+        "title": "Basic data",
+        "subtitle": "We need some information about your business.",
+        "form": {
+          "business-name": {
+            "label": "Business name",
+            "placeholder": "Acme Bank Inc.",
+            "error": "Business name cannot be empty or is invalid"
+          },
+          "doing-business-as": {
+            "label": "Doing Business As (optional)",
+            "placeholder": "Acme Bank"
+          },
+          "tin": {
+            "label": "Taxpayer Identification Number (TIN)",
+            "placeholder": "12-3456789",
+            "errors": {
+              "required": "TIN cannot be empty or is invalid",
+              "pattern": "TIN has to be in the format 12-3456789"
+            }
+          },
+          "corporation-type": {
+            "label": "Legal entity type",
+            "mapping": {
+              "agent": "Agent",
+              "c_corporation": "C Corporation",
+              "s_corporation": "S Corporation",
+              "b_corporation": "B Corporation",
+              "llc": "LLC",
+              "llp": "LLP",
+              "non_profit": "Non-profit",
+              "partnership": "Partnership",
+              "sole_proprietorship": "Sole proprietorship",
+              "trust": "Trust",
+              "unknown": "Unknown"
+            },
+            "error": "Legal entity type cannot be empty or is invalid"
+          },
+          "website": {
+            "label": "Website",
+            "placeholder": "https://www.acmebank.com",
+            "errors": {
+              "required": "Website cannot be empty or is invalid"
+            }
+          },
+          "phone-number": {
+            "label": "Phone number",
+            "placeholder": "(123) 456-7890",
+            "errors": {
+              "required": "Phone number cannot be empty",
+              "pattern": "Phone number is invalid"
+            }
+          }
+        }
+      },
+      "business-address": {
+        "title": "What's your registered business address?",
+        "subtitle": "For verification purposes, we only need the registered business address.",
+        "form": {
+          "address-line-1": {
+            "label": "Address line 1",
+            "placeholder": "Street and house number",
+            "error": "Address cannot be empty"
+          },
+          "address-line-2": {
+            "label": "Address line 2 (optional)",
+            "placeholder": "Apartment, suite, etc."
+          },
+          "city": {
+            "label": "City",
+            "placeholder": "New York",
+            "error": "City cannot be empty"
+          },
+          "state": {
+            "label": "State",
+            "placeholder": "Select",
+            "error": "State cannot be empty"
+          },
+          "country": {
+            "label": "Country",
+            "placeholder": "Select",
+            "error": "Country cannot be empty",
+            "us-only-hint": "Only US businesses are supported at the moment."
+          },
+          "zip": {
+            "label": "Zip code",
+            "placeholder": "11206",
+            "error": "Zip code cannot be empty"
+          }
+        }
+      },
+      "beneficial-owners": {
+        "title": "Who are the beneficial owners?",
+        "subtitle": "List all individuals who own at least 25% of the business or have substantial control over the business.",
+        "form": {
+          "fields-header": {
+            "beneficial-owner-you": "Beneficial owner (You)",
+            "beneficial-owner-other": "Beneficial owner (Other)",
+            "remove": "Remove"
+          },
+          "fields": {
+            "primary-bo-name-hint": "Spell your first, middle and last names exactly as shown on your government-issued ID",
+            "first-name": {
+              "label": "First name",
+              "placeholder": "Jane",
+              "error": "First name cannot be empty or is invalid"
+            },
+            "middle-name": {
+              "label": "Middle name (optional)",
+              "placeholder": "Sue"
+            },
+            "last-name": {
+              "label": "Last name",
+              "placeholder": "Doe",
+              "error": "Last name cannot be empty or is invalid"
+            },
+            "email": {
+              "label": "Email",
+              "placeholder": "jane.doe@acme.com",
+              "hint": "Add ”#string” (e.g., #test1) at the end of your email address.",
+              "errors": {
+                "required": "Email is required",
+                "pattern": "Add ”#string” (e.g., #test1) at the end of your email address."
+              }
+            },
+            "phone": {
+              "label": "Phone number",
+              "placeholder": "(123) 456-7890",
+              "errors": {
+                "required": "Phone number is required",
+                "pattern": "Phone number is invalid"
+              }
+            },
+            "ownership-stake": {
+              "label": "Approximate ownership stake (%)",
+              "placeholder": "25",
+              "errors": {
+                "required": "Ownership stake is empty or invalid",
+                "min": "Ownership stake cannot be smaller than 1%",
+                "max": "Ownership stake cannot be larger than 100%"
+              }
+            }
+          },
+          "multi-kyc": "We need to verify all other beneficial owners’ identities. We'll email them a link after you finish filling out your business verification.",
+          "add-more": "Add more",
+          "errors": {
+            "invalid": "Please complete the fields above.",
+            "ownership-stake-total": {
+              "title": "Ownership stake total exceeds 100%",
+              "description": "Please verify each beneficial owner's ownership stake. The sum can't exceed 100%."
+            },
+            "duplicate-email": {
+              "title": "Duplicate email",
+              "description": "Please make sure that each beneficial owner has a unique email address."
+            },
+            "duplicate-phone-number": {
+              "title": "Duplicate phone number",
+              "description": "Please make sure that each beneficial owner has a unique phone number."
+            }
+          }
+        }
+      },
+      "confirm": {
+        "summary": {
+          "title": "Confirm your business data",
+          "subtitle": "Please make sure that your business data is accurate and there are no typos before continuing.",
+          "edit": "Edit",
+          "save": "Save",
+          "cta": "Confirm & Continue"
+        },
+        "basic-data": {
+          "title": "Basic data",
+          "business-name": "Business name",
+          "doing-business-as": "Doing Business As (optional)",
+          "tin": "Taxpayer Identification Number (TIN)",
+          "corporation-type": "Legal entity type",
+          "website": "Website",
+          "phone-number": "Phone number"
+        },
+        "business-address": {
+          "title": "Registered business address"
+        },
+        "beneficial-owners": {
+          "title": "Beneficial owners",
+          "beneficial-owner-you": "Beneficial owner (You)",
+          "beneficial-owner-other": "Beneficial owner (Other)",
+          "first-name": "First name",
+          "middle-name": "Middle name",
+          "last-name": "Last name",
+          "email": "Email",
+          "ownership-stake": "Ownership stake"
+        }
+      },
+      "cta": {
+        "continue": "Continue",
+        "save": "Save",
+        "cancel": "Cancel"
       }
     },
     "investor-profile": {

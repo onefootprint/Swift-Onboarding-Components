@@ -18,7 +18,7 @@ type PhoneProps = {
 const PhoneFieldName = BeneficialOwnerDataAttribute.phoneNumber;
 
 const Phone = ({ index, config, locale }: PhoneProps) => {
-  const { t } = useTranslation('pages.beneficial-owners.form.fields.phone');
+  const { t } = useTranslation('pages.kyb.beneficial-owners.form.fields.phone');
   const {
     control,
     formState: { errors },

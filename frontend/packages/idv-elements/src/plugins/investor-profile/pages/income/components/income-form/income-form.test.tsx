@@ -1,15 +1,15 @@
 import {
+  customRender,
+  screen,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
+import {
   InvestorProfileAnnualIncome,
   InvestorProfileDI,
 } from '@onefootprint/types';
 import React from 'react';
 
-import {
-  renderComponent,
-  screen,
-  userEvent,
-  waitFor,
-} from '../../../../../../config/tests/render';
 import type { IncomeFormProps } from './income-form';
 import IncomeForm from './income-form';
 
@@ -19,7 +19,7 @@ describe('<IncomeForm />', () => {
     isLoading,
     onSubmit = () => {},
   }: Partial<IncomeFormProps>) => {
-    renderComponent(
+    customRender(
       <IncomeForm
         defaultValues={defaultValues}
         isLoading={isLoading}

@@ -11,7 +11,7 @@ type CountryFieldProps = {
 
 const CountryField = ({ onChange }: CountryFieldProps) => {
   const { control } = useFormContext();
-  const { t } = useTranslation('pages.business-address.form.country');
+  const { t } = useTranslation('pages.kyb.business-address.form.country');
   const l10n = useL10nContext();
 
   return (

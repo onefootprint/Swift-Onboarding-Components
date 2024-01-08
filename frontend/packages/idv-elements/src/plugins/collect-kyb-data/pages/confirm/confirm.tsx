@@ -10,7 +10,7 @@ import BeneficialOwnersSection from './components/beneficial-owners-section';
 import BusinessAddressSection from './components/business-address-section';
 
 const Confirm = () => {
-  const { t } = useTranslation('pages.confirm.summary');
+  const { t } = useTranslation('pages.kyb.confirm.summary');
   const [state, send] = useCollectKybDataMachine();
   const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();

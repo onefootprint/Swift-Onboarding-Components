@@ -8,7 +8,7 @@ type AddButtonProps = {
 };
 
 const AddButton = ({ onClick }: AddButtonProps) => {
-  const { t } = useTranslation('pages.beneficial-owners.form');
+  const { t } = useTranslation('pages.kyb.beneficial-owners.form');
 
   return (
     <LinkButton

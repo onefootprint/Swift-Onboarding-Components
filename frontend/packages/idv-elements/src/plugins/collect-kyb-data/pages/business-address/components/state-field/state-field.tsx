@@ -15,7 +15,7 @@ const StateField = ({ countryCode }: StateFieldProps) => {
     formState: { errors },
     control,
   } = useFormContext();
-  const { t } = useTranslation('pages.business-address.form.state');
+  const { t } = useTranslation('pages.kyb.business-address.form.state');
 
   return countryCode === 'US' ? (
     <Controller

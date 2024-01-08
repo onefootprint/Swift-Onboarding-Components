@@ -12,7 +12,7 @@ type OwnershipStakeProps = {
 
 const OwnershipStake = ({ index }: OwnershipStakeProps) => {
   const { t } = useTranslation(
-    'pages.beneficial-owners.form.fields.ownership-stake',
+    'pages.kyb.beneficial-owners.form.fields.ownership-stake',
   );
   const {
     register,

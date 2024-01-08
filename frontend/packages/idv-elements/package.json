@@ -89,7 +89,7 @@
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web",
     "setupFiles": [
-      "<rootDir>/src/plugins/collect-kyb-data/config/initializers/react-i18next-test.ts"
+      "<rootDir>/src/config/initializers/i18next-test.ts"
     ],
     "moduleNameMapper": {
       "@/investor-profile/(.*)": "<rootDir>/src/plugins/investor-profile/$1"

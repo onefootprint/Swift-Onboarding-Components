@@ -15,7 +15,7 @@ type SyncDataArgs = {
 
 const useSyncData = () => {
   const businessDataMutation = useBusinessData();
-  const { t } = useTranslation('components.sync-data-error');
+  const { t } = useTranslation('components.kyb.sync-data-error');
   const toast = useToast();
 
   const syncData = ({

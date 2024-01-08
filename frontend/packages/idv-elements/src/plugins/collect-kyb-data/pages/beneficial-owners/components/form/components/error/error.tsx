@@ -5,7 +5,7 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
 const Error = () => {
-  const { t } = useTranslation('pages.beneficial-owners.form.errors');
+  const { t } = useTranslation('pages.kyb.beneficial-owners.form.errors');
 
   return (
     <Container>

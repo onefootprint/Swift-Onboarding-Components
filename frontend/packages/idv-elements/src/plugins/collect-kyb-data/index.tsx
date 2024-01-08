@@ -2,10 +2,10 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 
+import configureI18next from '../../config/initializers/i18next';
+import queryClient from '../../config/initializers/react-query';
 import type { CollectKybDataProps } from './collect-kyb-data.types';
 import { MachineProvider } from './components/machine-provider';
-import configureI18next from './config/initializers/react-i18next';
-import queryClient from './config/initializers/react-query';
 import Router from './pages/router';
 import type { MachineContext } from './utils/state-machine';
 

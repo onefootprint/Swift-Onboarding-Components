@@ -22,7 +22,7 @@ const createAddressLine = (address: Array<string | undefined | null>) =>
     .join(', ');
 
 const BusinessAddressSection = () => {
-  const { allT, t } = useTranslation('pages.confirm.business-address');
+  const { allT, t } = useTranslation('pages.kyb.confirm.business-address');
   const [state] = useCollectKybDataMachine();
   const { data } = state.context;
 
@@ -76,7 +76,7 @@ const BusinessAddressSection = () => {
 
     return (
       <BusinessAddress
-        ctaLabel={allT('pages.confirm.summary.save')}
+        ctaLabel={allT('pages.kyb.confirm.summary.save')}
         onComplete={stopEditing}
         onCancel={stopEditing}
         hideHeader
@@ -87,7 +87,7 @@ const BusinessAddressSection = () => {
   const actions: SectionAction[] = [];
   if (!editing) {
     actions.push({
-      label: allT('pages.confirm.summary.edit'),
+      label: allT('pages.kyb.confirm.summary.edit'),
       onClick: () => setEditing(true),
     });
   }

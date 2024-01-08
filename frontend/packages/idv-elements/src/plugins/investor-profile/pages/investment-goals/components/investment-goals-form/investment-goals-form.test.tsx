@@ -1,15 +1,15 @@
 import {
+  customRender,
+  screen,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
+import {
   InvestorProfileDI,
   InvestorProfileInvestmentGoal,
 } from '@onefootprint/types';
 import React from 'react';
 
-import {
-  renderComponent,
-  screen,
-  userEvent,
-  waitFor,
-} from '../../../../../../config/tests/render';
 import type { InvestmentGoalsFormProps } from './investment-goals-form';
 import InvestmentGoalsForm from './investment-goals-form';
 
@@ -19,7 +19,7 @@ describe('<InvestmentGoalsForm />', () => {
     isLoading,
     onSubmit = () => {},
   }: Partial<InvestmentGoalsFormProps>) => {
-    renderComponent(
+    customRender(
       <InvestmentGoalsForm
         defaultValues={defaultValues}
         isLoading={isLoading}

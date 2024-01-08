@@ -1,15 +1,15 @@
 import {
+  customRender,
+  screen,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
+import {
   InvestorProfileDeclaration,
   InvestorProfileDI,
 } from '@onefootprint/types';
 import React from 'react';
 
-import {
-  renderComponent,
-  screen,
-  userEvent,
-  waitFor,
-} from '../../../../../../config/tests/render';
 import type { DeclarationsFormProps } from './declarations-form';
 import DeclarationsForm from './declarations-form';
 
@@ -19,7 +19,7 @@ describe('<DeclarationsForm />', () => {
     isLoading,
     onSubmit = () => {},
   }: Partial<DeclarationsFormProps>) => {
-    renderComponent(
+    customRender(
       <DeclarationsForm
         defaultValues={defaultValues}
         isLoading={isLoading}

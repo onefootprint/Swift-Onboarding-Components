@@ -77,7 +77,7 @@ const BasicDataForm = ({
   ctaLabel,
   config,
 }: BasicDataFormProps) => {
-  const { t } = useTranslation('pages.basic-data.form');
+  const { t } = useTranslation('pages.kyb.basic-data.form');
   const l10n = useL10nContext();
   const inputMasks = useInputMask(l10n?.locale);
   const {

@@ -24,7 +24,7 @@ const BusinessAddress = ({
   onCancel,
   hideHeader,
 }: BusinessAddressProps) => {
-  const { t } = useTranslation('pages.business-address');
+  const { t } = useTranslation('pages.kyb.business-address');
   const [state, send] = useCollectKybDataMachine();
   const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();

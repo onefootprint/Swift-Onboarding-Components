@@ -12,7 +12,7 @@ type NameProps = {
 };
 
 const Name = ({ index }: NameProps) => {
-  const { t } = useTranslation('pages.beneficial-owners.form.fields');
+  const { t } = useTranslation('pages.kyb.beneficial-owners.form.fields');
   const {
     register,
     formState: { errors },

@@ -11,7 +11,7 @@ type EmailProps = {
 };
 
 const Email = ({ index }: EmailProps) => {
-  const { t } = useTranslation('pages.beneficial-owners.form.fields.email');
+  const { t } = useTranslation('pages.kyb.beneficial-owners.form.fields.email');
   const {
     register,
     formState: { errors },

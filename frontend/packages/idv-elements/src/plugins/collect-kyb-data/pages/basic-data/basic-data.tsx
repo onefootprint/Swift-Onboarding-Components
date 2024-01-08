@@ -32,7 +32,7 @@ const BasicData = ({
   const { authToken, config, data, kybRequirement } = state.context;
   const { missingAttributes } = kybRequirement || {};
   const { mutation, syncData } = useSyncData();
-  const { t, allT } = useTranslation('pages.basic-data');
+  const { t, allT } = useTranslation('pages.kyb.basic-data');
 
   const handleSubmit = (basicData: BasicDataFields) => {
     const handleSuccess = () => {

@@ -5,7 +5,7 @@ import { useToast } from '@onefootprint/ui';
 
 const useCheckDuplicateContacts = () => {
   const toast = useToast();
-  const { t } = useTranslation('pages.beneficial-owners.form.errors');
+  const { t } = useTranslation('pages.kyb.beneficial-owners.form.errors');
 
   return (beneficialOwners: BeneficialOwner[]) => {
     const emails = beneficialOwners.map(

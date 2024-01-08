@@ -20,7 +20,7 @@ import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-mac
 import BeneficialOwners from '../../../beneficial-owners/beneficial-owners';
 
 const BeneficialOwnersSection = () => {
-  const { t, allT } = useTranslation('pages.confirm.beneficial-owners');
+  const { t, allT } = useTranslation('pages.kyb.confirm.beneficial-owners');
   const [state] = useCollectKybDataMachine();
   const {
     data,
@@ -96,7 +96,7 @@ const BeneficialOwnersSection = () => {
       content={
         <BeneficialOwners
           hideHeader
-          ctaLabel={allT('pages.confirm.summary.save')}
+          ctaLabel={allT('pages.kyb.confirm.summary.save')}
           onComplete={stopEditing}
           onCancel={stopEditing}
         />
@@ -106,7 +106,7 @@ const BeneficialOwnersSection = () => {
   ) : (
     <MultiSection
       title={t('title')}
-      editLabel={allT('pages.confirm.summary.edit')}
+      editLabel={allT('pages.kyb.confirm.summary.edit')}
       onEdit={startEditing}
       IconComponent={IcoUserCircle24}
       sections={sections}

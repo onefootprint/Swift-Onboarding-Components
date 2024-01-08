@@ -1,15 +1,15 @@
 import {
+  customRender,
+  screen,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
+import {
   InvestorProfileDI,
   InvestorProfileNetWorth,
 } from '@onefootprint/types';
 import React from 'react';
 
-import {
-  renderComponent,
-  screen,
-  userEvent,
-  waitFor,
-} from '../../../../../../config/tests/render';
 import type { NetWorthFormProps } from './net-worth-form';
 import NetWorthForm from './net-worth-form';
 
@@ -19,7 +19,7 @@ describe('<NetWorthForm />', () => {
     isLoading,
     onSubmit = () => {},
   }: Partial<NetWorthFormProps>) => {
-    renderComponent(
+    customRender(
       <NetWorthForm
         defaultValues={defaultValues}
         isLoading={isLoading}

@@ -1,13 +1,13 @@
-import { InvestorProfileDI } from '@onefootprint/types';
-import React from 'react';
-
 import {
-  renderComponent,
+  customRender,
   screen,
   selectEvents,
   userEvent,
   waitFor,
-} from '../../../../../../config/tests/render';
+} from '@onefootprint/test-utils';
+import { InvestorProfileDI } from '@onefootprint/types';
+import React from 'react';
+
 import type { EmploymentFormProps } from './employment-form';
 import EmploymentForm from './employment-form';
 
@@ -17,7 +17,7 @@ describe('<EmploymentForm />', () => {
     isLoading,
     onSubmit = () => {},
   }: Partial<EmploymentFormProps>) => {
-    renderComponent(
+    customRender(
       <EmploymentForm
         defaultValues={defaultValues}
         isLoading={isLoading}

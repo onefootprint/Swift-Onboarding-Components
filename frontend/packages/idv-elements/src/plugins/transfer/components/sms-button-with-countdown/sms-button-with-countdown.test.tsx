@@ -1,7 +1,6 @@
-import { screen, waitFor } from '@onefootprint/test-utils';
+import { customRender, screen, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 
-import { renderComponent } from '../../../../config/tests/render';
 import type { SmsButtonWithCountdownProps } from './sms-button-with-countdown';
 import SmsButtonWithCountdown from './sms-button-with-countdown';
 import withD2PSms from './sms-button-with-countdown.test.config';
@@ -11,7 +10,7 @@ describe('<SmsButtonWithCountdown />', () => {
     url,
     authToken,
   }: Partial<SmsButtonWithCountdownProps> = {}) =>
-    renderComponent(<SmsButtonWithCountdown url={url} authToken={authToken} />);
+    customRender(<SmsButtonWithCountdown url={url} authToken={authToken} />);
 
   describe('when sending sms succeeds', () => {
     beforeEach(() => {
