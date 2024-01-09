@@ -14,7 +14,7 @@ pub mod build_request;
 pub mod fp_device_attestation;
 pub mod incode;
 pub mod incode_watchlist;
-pub mod kyc_waterfall;
+pub mod kyc;
 pub mod make_request;
 pub mod middesk;
 pub mod tenant_vendor_control;

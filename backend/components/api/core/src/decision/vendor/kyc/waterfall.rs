@@ -1,5 +1,11 @@
 use std::collections::HashMap;
 
+use crate::decision::vendor::{
+    get_vendor_apis_for_verification_requests, make_request,
+    tenant_vendor_control::TenantVendorControl,
+    vendor_result::{HydratedVerificationResult, RequestAndMaybeHydratedResult, VendorResult},
+    VendorAPIError,
+};
 use crate::{
     decision::{self, rule_engine::eval::Rule},
     errors::ApiResult,
@@ -17,13 +23,6 @@ use newtypes::{RuleAction, VendorAPI, WorkflowId};
 use std::future::Future;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
-
-use super::{
-    get_vendor_apis_for_verification_requests, make_request,
-    tenant_vendor_control::TenantVendorControl,
-    vendor_result::{HydratedVerificationResult, RequestAndMaybeHydratedResult, VendorResult},
-    VendorAPIError,
-};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, EnumIter)]
 // For now, we just have 1 singular KYC waterfall ordering for all vendors. We start with Experian and then waterfall to Idology if needed.
