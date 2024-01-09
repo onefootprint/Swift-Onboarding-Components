@@ -23,13 +23,18 @@ use chrono::Duration;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
 use macros::route_alias;
+use newtypes::AliasId;
+use newtypes::CardDataKind;
+use newtypes::CardInfo;
 use paperclip::actix::{api_v2_operation, post, web};
+use strum::IntoEnumIterator;
 
 #[route_alias(post(
     "/users/{fp_id}/client_token",
     tags(Users, Client, PublicApi),
     description = "Create a short-lived token safe to pass to your client for operations to vault or decrypt data for this user.",
 ))]
+// TODO remove entities path
 #[api_v2_operation(
     description = "Create a short-lived token safe to pass to your client for operations to vault or decrypt data for this user.",
     tags(Entities, Client, Private)
@@ -50,6 +55,27 @@ pub async fn post(
         scope,
         decrypt_reason,
     } = request.into_inner();
+    let fields = if scope
+        .as_ref()
+        .is_some_and(|s| *s == ModernClientTokenScopeKind::VaultCard)
+    {
+        // For VaultCard scope, generate a random card alias to use.
+        // This token will have permissions to write to all non-derived CDKs with this alias
+        let alias = AliasId::random();
+        CardDataKind::iter()
+            .filter(|cdk| !cdk.is_derived())
+            .map(|kind| {
+                CardInfo {
+                    alias: alias.clone(),
+                    kind,
+                }
+                .into()
+            })
+            .collect_vec()
+    } else {
+        fields.into_iter().collect_vec()
+    };
+
     if !scopes.is_empty() {
         root_span.record("meta", "has_old_scopes");
     } else {
@@ -70,13 +96,13 @@ pub async fn post(
             ModernClientTokenScopeKind::DecryptDownload => {
                 vec![DEPRECATEDClientTokenScopeKind::DecryptDownload]
             }
+            ModernClientTokenScopeKind::VaultCard => vec![DEPRECATEDClientTokenScopeKind::Vault],
         },
         (None, v) if v.is_empty() => {
             return ValidationError("Missing required field scope").into();
         }
         (None, v) => v,
     };
-    let fields = fields.into_iter().collect_vec();
     if fields.is_empty() {
         return Err(TenantError::MustProvideFields.into());
     }
@@ -172,5 +198,10 @@ pub async fn post(
         .await??;
 
     let expires_at = session.expires_at;
-    ResponseData::ok(CreateClientTokenResponse { token, expires_at }).json()
+    ResponseData::ok(CreateClientTokenResponse {
+        token,
+        expires_at,
+        fields,
+    })
+    .json()
 }

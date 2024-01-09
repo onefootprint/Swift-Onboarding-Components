@@ -99,6 +99,12 @@ impl FromStr for AliasId {
     }
 }
 
+impl AliasId {
+    pub fn random() -> Self {
+        Self(crypto::random::gen_random_alphanumeric_code(10))
+    }
+}
+
 impl paperclip::v2::schema::TypedData for AliasId {
     fn data_type() -> paperclip::v2::models::DataType {
         paperclip::v2::models::DataType::String
@@ -111,6 +117,8 @@ impl paperclip::v2::schema::TypedData for AliasId {
 
 #[cfg(test)]
 mod test {
+    use std::str::FromStr;
+
     use test_case::test_case;
 
     use crate::{AliasId, KvDataKey};
@@ -133,5 +141,12 @@ mod test {
         // Test serde deserialize, which should use the FromStr implementation
         let result = serde_json::from_str::<KvDataKey>("\"hayes.valley\"");
         assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_random_alias() {
+        let alias = AliasId::random();
+        let parsed = AliasId::from_str(&alias.to_string()).unwrap();
+        assert_eq!(alias, parsed);
     }
 }

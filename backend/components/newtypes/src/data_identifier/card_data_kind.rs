@@ -25,6 +25,20 @@ pub enum CardDataKind {
     Issuer,
 }
 
+impl CardDataKind {
+    pub fn is_derived(&self) -> bool {
+        match self {
+            Self::ExpMonth | Self::ExpYear | Self::Last4 | Self::Issuer => true,
+            Self::Number
+            | Self::Expiration
+            | Self::Cvc
+            | Self::Name
+            | Self::BillingZip
+            | Self::BillingCountry => false,
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CardInfo {
     pub alias: AliasId,

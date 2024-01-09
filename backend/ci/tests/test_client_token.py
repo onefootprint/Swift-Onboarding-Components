@@ -7,7 +7,7 @@ from tests.headers import ClientTokenAuth
 
 def client_token_with_scopes(user, **kwargs):
     body = post(f"entities/{user.fp_id}/client_token", kwargs, user.tenant.sk.key)
-    return ClientTokenAuth(body["token"])
+    return ClientTokenAuth(body["token"]), body
 
 
 def test_generate(sandbox_user):
@@ -29,7 +29,7 @@ def test_generate(sandbox_user):
 def test_decrypt(sandbox_user, attrs_to_decrypt):
     tenant = sandbox_user.tenant
     # Generate the token that can only be used to decrypt this info
-    auth_token = client_token_with_scopes(
+    auth_token, _ = client_token_with_scopes(
         sandbox_user, fields=attrs_to_decrypt, scopes=["decrypt"]
     )
 
@@ -48,7 +48,7 @@ def test_decrypt(sandbox_user, attrs_to_decrypt):
 
 def test_decrypt_reason(sandbox_user):
     tenant = sandbox_user.tenant
-    auth_token = client_token_with_scopes(
+    auth_token, _ = client_token_with_scopes(
         sandbox_user, fields=["id.first_name"], scopes=["decrypt"]
     )
     # Shouldn't be able to decrypt without a reason
@@ -56,7 +56,7 @@ def test_decrypt_reason(sandbox_user):
     post(f"entities/vault/decrypt", data, auth_token, status_code=400)
 
     # Should work with reason specified on auth token
-    auth_token = client_token_with_scopes(
+    auth_token, _ = client_token_with_scopes(
         sandbox_user,
         fields=["id.first_name"],
         scopes=["decrypt"],
@@ -77,9 +77,10 @@ def test_decrypt_reason(sandbox_user):
 
 
 def test_vault(sandbox_user, sandbox_tenant):
-    auth_token = client_token_with_scopes(
+    auth_token, _ = client_token_with_scopes(
         sandbox_user,
         fields=["id.first_name", "id.last_name"],
+        # TODO update other tests to only use scope
         scopes=["decrypt", "vault"],
     )
 
@@ -103,14 +104,51 @@ def test_vault(sandbox_user, sandbox_tenant):
     assert body["id.last_name"] == "Valley"
 
 
+def test_vault_card(sandbox_user, sandbox_tenant):
+    auth_token, body = client_token_with_scopes(
+        sandbox_user,
+        scope="vault_card",
+    )
+    fields = body["fields"]
+    assert all(f.startswith("card.") for f in fields)
+    assert set(f.split(".")[-1] for f in fields) == {
+        "number",
+        "expiration",
+        "cvc",
+        "name",
+        "zip",
+        "country",
+    }
+    card_alias = fields[0].split(".")[1]
+
+    body = get(f"entities/client_token", None, auth_token)
+    assert set(body["vault_fields"]) == set(fields)
+
+    vault_data = {
+        f"card.{card_alias}.number": "4428680502681658",
+        f"card.{card_alias}.cvc": "101",
+    }
+    post(f"entities/vault/validate", vault_data, auth_token)
+    patch(f"entities/vault", vault_data, auth_token)
+
+    data = dict(
+        fields=[f"card.{card_alias}.number", f"card.{card_alias}.cvc"],
+        reason="Hayes valley",
+    )
+    body = post(
+        f"entities/{sandbox_user.fp_id}/vault/decrypt", data, sandbox_tenant.sk.key
+    )
+    assert all(body[k] == vault_data[k] for k in vault_data.keys())
+
+
 def test_insufficient_permissions(sandbox_user):
     auth_tokens = [
         # Token with incorrect decrypt perms
         client_token_with_scopes(
             sandbox_user, fields=["id.first_name"], scopes=["decrypt"]
-        ),
+        )[0],
         # Token with vault perms
-        client_token_with_scopes(sandbox_user, fields=["id.ssn9"], scopes=["vault"]),
+        client_token_with_scopes(sandbox_user, fields=["id.ssn9"], scopes=["vault"])[0],
     ]
 
     # Try to use the token to decrypt ssn - but we have insufficient permissions
@@ -125,9 +163,11 @@ def test_insufficient_permissions(sandbox_user):
         # Token with incorrect vault perms
         client_token_with_scopes(
             sandbox_user, fields=["id.first_name"], scopes=["vault"]
-        ),
+        )[0],
         # Token with decrypt perms
-        client_token_with_scopes(sandbox_user, fields=["id.ssn9"], scopes=["decrypt"]),
+        client_token_with_scopes(sandbox_user, fields=["id.ssn9"], scopes=["decrypt"])[
+            0
+        ],
     ]
     for auth_token in auth_tokens:
         data = {
@@ -138,7 +178,7 @@ def test_insufficient_permissions(sandbox_user):
 
 
 def test_large_objects(sandbox_user):
-    auth_token = client_token_with_scopes(
+    auth_token, _ = client_token_with_scopes(
         sandbox_user, fields=["custom.large_id"], scopes=["decrypt", "vault"]
     )
 
@@ -162,7 +202,7 @@ def test_large_objects(sandbox_user):
     assert json.loads(obj_out)["some_key"] == obj["some_key"]
 
     # Test decrypt downloading
-    token = client_token_with_scopes(
+    token, _ = client_token_with_scopes(
         sandbox_user,
         fields=["custom.large_id"],
         scopes=["decrypt_download"],
