@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.8.2
+
+### Patch Changes
+
+- 48c47f244: Add hideCancelButton to form component options prop
+
 ## 3.8.1
 
 ### Patch Changes
