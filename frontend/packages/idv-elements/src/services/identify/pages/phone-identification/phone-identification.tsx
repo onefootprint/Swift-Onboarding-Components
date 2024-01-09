@@ -28,7 +28,7 @@ const PhoneIdentification = () => {
   } = state.context;
   const identifyMutation = useIdentify();
   const showRequestErrorToast = useRequestErrorToast();
-  const { t } = useTranslation('pages.phone-identification');
+  const { t } = useTranslation('identify.pages.phone-identification');
   const l10n = useL10nContext();
   const { IdvPhoneInputRestrictedCountries } = useFlags();
   const restrictedCountries = new Set<CountryCode>(

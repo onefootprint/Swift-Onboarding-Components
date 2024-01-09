@@ -13,7 +13,7 @@ import Logger from '../../../../../../utils/logger';
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 
 const Biometric = () => {
-  const { t } = useTranslation('pages.biometric-challenge');
+  const { t } = useTranslation('identify.pages.biometric-challenge');
   const [state, send] = useIdentifyMachine();
   const {
     identify: { successfulIdentifier, sandboxId },

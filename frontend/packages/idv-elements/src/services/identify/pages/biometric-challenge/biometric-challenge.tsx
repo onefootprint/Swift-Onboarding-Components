@@ -10,7 +10,7 @@ import useIdentifyMachine from '../../hooks/use-identify-machine';
 import Biometric from './components/biometric';
 
 const BiometricChallenge = () => {
-  const { t } = useTranslation('pages.biometric-challenge');
+  const { t } = useTranslation('identify.pages.biometric-challenge');
   const [state, send] = useIdentifyMachine();
   const { initialAuthToken, bootstrapData, config } = state.context;
   const isBootstrap = !!(bootstrapData?.email || bootstrapData?.phoneNumber);

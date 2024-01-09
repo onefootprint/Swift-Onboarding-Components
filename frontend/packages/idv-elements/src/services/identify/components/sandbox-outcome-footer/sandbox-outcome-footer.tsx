@@ -13,7 +13,7 @@ const SandboxOutcomeFooter = ({
   sandboxId,
   overallOutcome,
 }: SandboxOutcomeFooterProps) => {
-  const { t } = useTranslation('components.sandbox-outcome-footer');
+  const { t } = useTranslation('identify.components.sandbox-outcome-footer');
   const outcomeLabels: Record<OverallOutcome, string> = {
     [OverallOutcome.success]: t('outcome.options.success'),
     [OverallOutcome.manualReview]: t('outcome.options.manual-review'),

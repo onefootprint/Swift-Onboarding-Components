@@ -4,7 +4,7 @@ import { LoadingIndicator, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 const Verifying = () => {
-  const { t } = useTranslation('components.pin-verification');
+  const { t } = useTranslation('identify.components.pin-verification');
 
   return (
     <Container>

@@ -42,7 +42,7 @@ const PinVerification = ({
   preferredChallengeKind,
   identifier,
 }: PinVerificationProps) => {
-  const { t } = useTranslation('components.pin-verification');
+  const { t } = useTranslation('identify.components.pin-verification');
   const [state, send] = useIdentifyMachine();
   const {
     identify: { email, sandboxId, userFound },

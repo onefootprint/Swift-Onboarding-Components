@@ -15,7 +15,7 @@ type FormData = {
 
 const EmailIdentification = () => {
   const [state, send] = useIdentifyMachine();
-  const { t } = useTranslation('pages.email-identification');
+  const { t } = useTranslation('identify.pages.email-identification');
   const {
     identify: { email, sandboxId },
     obConfigAuth,

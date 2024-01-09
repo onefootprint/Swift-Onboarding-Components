@@ -5,7 +5,7 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
 const Success = () => {
-  const { t } = useTranslation('components.pin-verification');
+  const { t } = useTranslation('identify.components.pin-verification');
 
   return (
     <Container>

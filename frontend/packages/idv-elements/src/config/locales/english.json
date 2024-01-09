@@ -26,6 +26,111 @@
     },
     "pages": {}
   },
+  "identify": {
+    "components": {
+      "sandbox-outcome-footer": {
+        "outcome": {
+          "label": "Test outcome:",
+          "options": {
+            "success": "Success",
+            "fail": "Failure",
+            "manual-review": "Manual Review",
+            "document-decision": "ID Doc Decision",
+            "step-up": "ID Doc Decision"
+          }
+        },
+        "testID": "Test ID:"
+      },
+      "legal-footer": {
+        "label": "By continuing, I agree to the <termsLink>Terms of Service</termsLink> and \n  acknowledge the <privacyPolicyLink>Privacy Policy</privacyPolicyLink>."
+      },
+      "pin-verification": {
+        "error": "Incorrect code",
+        "verifying": "Verifying...",
+        "success": "Success!",
+        "resend-button": {
+          "cta": "Resend code",
+          "disabled": "Please wait {{seconds}} seconds to resend it..."
+        },
+        "toast": {
+          "success": {
+            "title": "Success",
+            "description": "We sent you a new code."
+          }
+        }
+      },
+      "log-in-different-account": {
+        "label": "Login with a different account",
+        "or": "or"
+      }
+    },
+    "pages": {
+      "auth-token-invalid": {
+        "title": "The link you opened is invalid",
+        "subtitle": "Please contact the business that sent you this link."
+      },
+      "email-identification": {
+        "header": {
+          "title": "Hey there! 👋",
+          "subtitle": "Enter your email to get started."
+        },
+        "form": {
+          "email": {
+            "label": "Email",
+            "placeholder": "jane.doe@acme.com",
+            "errors": {
+              "required": "Email is required"
+            }
+          },
+          "cta": "Continue"
+        }
+      },
+      "phone-identification": {
+        "title": "Hey there! 👋",
+        "subtitle": "Enter your phone number to proceed.",
+        "email-card": {
+          "cta": "Change"
+        },
+        "form": {
+          "phone": {
+            "label": "Phone number",
+            "placeholder": "(123) 123-1234",
+            "errors": {
+              "required": "Phone number cannot be empty",
+              "invalid": "Phone number is invalid"
+            }
+          },
+          "cta": "Verify with SMS"
+        }
+      },
+      "sms-challenge": {
+        "label": "SMS",
+        "title": "Verify your phone number",
+        "welcome-back-title": "Welcome back! 🎉",
+        "prompt-with-phone": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}.",
+        "prompt-without-phone": "Enter the 6-digit code sent to your phone."
+      },
+      "email-challenge": {
+        "label": "Email",
+        "title": "Verify your email",
+        "welcome-back-title": "Welcome back! 🎉",
+        "prompt-with-email": "Enter the 6-digit code sent to {{email}}.",
+        "prompt-without-email": "Enter the 6-digit code sent to your email."
+      },
+      "biometric-challenge": {
+        "label": "Passkey",
+        "loading": "Waiting...",
+        "success": "Success!",
+        "cta": "Login with passkey",
+        "title": "Welcome back! 🎉",
+        "login-with-sms": "Login with SMS",
+        "passkey-error": {
+          "title": "Something went wrong",
+          "description": "This might be because of your device permissions. Please try logging in with SMS instead."
+        }
+      }
+    }
+  },
   "kyc": {
     "components": {
       "sync-data-error": {

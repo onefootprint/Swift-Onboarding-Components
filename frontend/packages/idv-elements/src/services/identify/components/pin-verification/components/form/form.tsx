@@ -28,7 +28,7 @@ const Form = ({
   onResend,
   isResendLoading,
 }: FormProps) => {
-  const { t } = useTranslation('components.pin-verification');
+  const { t } = useTranslation('identify.components.pin-verification');
 
   if (isSuccess) {
     return <Success />;

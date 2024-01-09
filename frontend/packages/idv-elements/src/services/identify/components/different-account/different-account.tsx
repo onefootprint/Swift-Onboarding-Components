@@ -10,7 +10,7 @@ type DifferentAccountProps = {
 };
 
 const DifferentAccount = ({ onClick }: DifferentAccountProps) => {
-  const { t } = useTranslation('components.log-in-different-account');
+  const { t } = useTranslation('identify.components.log-in-different-account');
   return (
     <>
       <DividerContainer justify="center" align="center">

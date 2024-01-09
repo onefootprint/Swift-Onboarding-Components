@@ -15,7 +15,7 @@ const IS_TEST = typeof jest !== 'undefined';
 const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 100 : 1500;
 
 const SmsChallenge = () => {
-  const { t } = useTranslation('pages.sms-challenge');
+  const { t } = useTranslation('identify.pages.sms-challenge');
   const [state, send] = useIdentifyMachine();
   const {
     initialAuthToken,

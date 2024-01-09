@@ -1,7 +1,12 @@
-import { MockDate, screen, userEvent, waitFor } from '@onefootprint/test-utils';
+import {
+  customRender,
+  MockDate,
+  screen,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
 import React from 'react';
 
-import { renderIdentify } from '../../../../config/tests/render';
 import type { FormProps } from './form';
 import Form from './form';
 
@@ -27,7 +32,7 @@ describe('<Form />', () => {
     onResend = () => {},
     isResendLoading,
   }: Partial<FormProps>) =>
-    renderIdentify(
+    customRender(
       <Form
         title={title}
         isVerifying={isVerifying}
