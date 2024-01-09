@@ -1,6 +1,6 @@
 import json
 import os
-from .headers import CustodianAuth
+from .headers import CustodianAuth, ProtectedCustodianAuth
 from dotenv import load_dotenv
 import random
 
@@ -58,8 +58,10 @@ FIXTURE_EMAIL = f"sandbox@onefootprint.com"
 live_phone_number_hash = hash(LIVE_PHONE_NUMBER)
 EMAIL = f"footprint.user.dev+{live_phone_number_hash}@gmail.com"
 CUSTODIAN_KEY = get_secret("CUSTODIAN_KEY") or "onefootprint"
+PROTECTED_CUSTODIAN_KEY = get_secret("PROTECTED_CUSTODIAN_KEY")
 
 CUSTODIAN_AUTH = CustodianAuth(CUSTODIAN_KEY)
+PROTECTED_CUSTODIAN_AUTH = ProtectedCustodianAuth(PROTECTED_CUSTODIAN_KEY)
 SVIX_AUTH_TOKEN = get_secret("SVIX_AUTH_TOKEN")
 
 FIXTURE_EMAIL_OTP_PIN = "000000"

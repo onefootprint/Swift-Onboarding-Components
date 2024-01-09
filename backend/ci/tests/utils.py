@@ -1,4 +1,5 @@
 import re
+import string
 import requests
 import base64
 import json
@@ -616,6 +617,10 @@ def _gen_random_sandbox_id():
 
 def _gen_random_ssn():
     return _gen_random_n_digit_number(9)
+
+
+def _gen_random_str(length):
+    return "".join(random.choice(string.ascii_letters) for _ in range(length))
 
 
 def _b64_decode(v):

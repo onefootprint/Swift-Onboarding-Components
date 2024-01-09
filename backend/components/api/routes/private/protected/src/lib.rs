@@ -2,6 +2,7 @@ mod aws_selfie_doc;
 mod decrypt;
 mod default_rules;
 mod incode;
+mod org;
 mod refingerprint;
 mod risk;
 mod task;
@@ -28,7 +29,9 @@ pub fn configure(config: &mut web::ServiceConfig) {
         .service(decrypt::post)
         .service(aws_selfie_doc::post)
         .service(refingerprint::post)
-        .service(default_rules::add_default_rules);
+        .service(default_rules::add_default_rules)
+        .service(org::update_business_info)
+        .service(org::get_business_info);
 }
 
 #[actix_web::get("/private/protected/check")]

@@ -34,6 +34,10 @@ class CustodianAuth(BaseAuth):
     HEADER_NAME = "x-footprint-custodian-key"
 
 
+class ProtectedCustodianAuth(BaseAuth):
+    HEADER_NAME = "X-Fp-Protected-Custodian-Key"
+
+
 class DashboardAuth(BaseAuth):
     HEADER_NAME = "x-fp-dashboard-authorization"
 
