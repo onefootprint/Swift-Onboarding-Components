@@ -251,3 +251,8 @@ define_newtype_id!(
     String,
     "Identifier for a tenant frequent note"
 );
+define_newtype_id!(
+    TenantBusinessInfoId,
+    String,
+    "Identifier for a a tenant_business_info"
+);

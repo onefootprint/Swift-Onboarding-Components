@@ -906,6 +906,27 @@ table! {
 table! {
     use diesel::sql_types::*;
 
+    tenant_business_info (id) {
+        id -> Text,
+        created_at -> Timestamptz,
+        created_seqno -> Int8,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        deactivated_at -> Nullable<Timestamptz>,
+        deactivated_seqno -> Nullable<Int8>,
+        tenant_id -> Text,
+        company_name -> Bytea,
+        address_line1 -> Bytea,
+        city -> Bytea,
+        state -> Bytea,
+        zip -> Bytea,
+        phone -> Bytea,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+
     tenant_client_config (id) {
         id -> Text,
         tenant_id -> Text,
@@ -1281,6 +1302,7 @@ joinable!(stytch_fingerprint_event -> verification_result (verification_result_i
 joinable!(task_execution -> task (task_id));
 joinable!(tenant_api_key -> tenant (tenant_id));
 joinable!(tenant_api_key -> tenant_role (role_id));
+joinable!(tenant_business_info -> tenant (tenant_id));
 joinable!(tenant_client_config -> tenant (tenant_id));
 joinable!(tenant_frequent_note -> tenant (tenant_id));
 joinable!(tenant_role -> tenant (tenant_id));
@@ -1362,6 +1384,7 @@ allow_tables_to_appear_in_same_query!(
     task_execution,
     tenant,
     tenant_api_key,
+    tenant_business_info,
     tenant_client_config,
     tenant_frequent_note,
     tenant_role,
