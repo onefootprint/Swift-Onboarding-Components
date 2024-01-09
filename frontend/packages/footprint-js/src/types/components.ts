@@ -108,6 +108,7 @@ export type RenderDataProps = Pick<
 
 export type FormOptions = {
   hideButtons?: boolean;
+  hideCancelButton?: boolean;
   hideFootprintLogo?: boolean;
 };
 

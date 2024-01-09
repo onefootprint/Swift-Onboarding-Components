@@ -68,6 +68,8 @@ pub struct FormV1Options {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hide_buttons: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub hide_cancel_button: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub hide_footprint_logo: Option<bool>,
 }
 
@@ -265,6 +267,7 @@ mod test {
     #[test_case(json!({"kind": "verify_v1", "data": {"auth_token": "tok_1234"}}))]
     #[test_case(json!({"kind": "verify_v1", "data": {"public_key": "ob_1234", "user_data": {"id.first_name": "Hayes"}, "options": {"show_logo": false}}}))]
     #[test_case(json!({"kind": "form_v1", "data": {"auth_token": "tok_1234", "title": "My Form", "options": {"hide_buttons": true, "hide_footprint_logo": true}, "l10n": {"locale": "en-US"}}}))]
+    #[test_case(json!({"kind": "form_v1", "data": {"auth_token": "tok_1234", "title": "My Form", "options": {"hide_cancel_button": true, "hide_footprint_logo": true}, "l10n": {"locale": "en-US"}}}))]
     #[test_case(json!({"kind": "form_v1", "data": {"auth_token": "tok_1234"}}))]
     #[test_case(json!({"kind": "auth_v1", "data": {"public_key": "ob_1234", "options": {"show_logo": false}}}))]
     #[test_case(json!({"kind": "auth_v1", "data": {"public_key": "ob_1234", "user_data": {"id.first_name": "Hayes"}, "options": {"show_logo": false}}}))]

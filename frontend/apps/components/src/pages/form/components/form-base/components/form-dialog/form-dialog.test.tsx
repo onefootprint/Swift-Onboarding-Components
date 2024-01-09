@@ -91,7 +91,7 @@ describe('<FormDialog />', () => {
   });
 
   it('should hide buttons when hideButtons is true', async () => {
-    renderFormDialog({ hideButtons: true });
+    renderFormDialog({ hideSaveButton: true, hideCancelButton: true });
     await waitFor(() => {
       expect(
         screen.queryByRole('button', { name: 'Primary' }) &&
@@ -101,7 +101,11 @@ describe('<FormDialog />', () => {
   });
 
   it('should hide the footer when hideButtons and hideFootprintLogo are true', async () => {
-    renderFormDialog({ hideButtons: true, hideFootprintLogo: true });
+    renderFormDialog({
+      hideSaveButton: true,
+      hideCancelButton: true,
+      hideFootprintLogo: true,
+    });
     await waitFor(() => {
       expect(screen.queryByRole('footer')).not.toBeInTheDocument();
     });

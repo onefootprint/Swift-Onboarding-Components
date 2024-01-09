@@ -10,53 +10,61 @@ type FooterProps = {
   primaryButton: FormDialogButton;
   secondaryButton?: FormDialogButton;
   hideFootprintLogo?: boolean;
-  hideButtons?: boolean;
+  hideSaveButton?: boolean;
+  hideCancelButton?: boolean;
 };
 
 const Footer = ({
   primaryButton,
   secondaryButton,
   hideFootprintLogo,
-  hideButtons,
+  hideSaveButton,
+  hideCancelButton,
 }: FooterProps) => {
   const { t } = useTranslation('pages.secure-form.form-dialog');
+
+  if (hideSaveButton && hideCancelButton) {
+    return (
+      <Container hideFootprintLogo={hideFootprintLogo}>
+        {!hideFootprintLogo && <SecuredByFootprint />}
+      </Container>
+    );
+  }
 
   return (
     <Container hideFootprintLogo={hideFootprintLogo}>
       {!hideFootprintLogo && <SecuredByFootprint />}
-      {!hideButtons && (
-        <ButtonsContainer>
-          {secondaryButton && (
-            <Button
-              disabled={secondaryButton.disabled}
-              form={secondaryButton.form}
-              loading={secondaryButton.loading}
-              loadingAriaLabel={t('loading-aria-label')}
-              onClick={secondaryButton.onClick}
-              size="compact"
-              type={secondaryButton.type}
-              variant="secondary"
-            >
-              {secondaryButton.label}
-            </Button>
-          )}
-          {primaryButton && (
-            <Button
-              testID="primary-button"
-              disabled={primaryButton.disabled}
-              form={primaryButton.form}
-              loading={primaryButton.loading}
-              loadingAriaLabel={t('loading-aria-label')}
-              onClick={primaryButton.onClick}
-              size="compact"
-              type={primaryButton.type}
-              variant="primary"
-            >
-              {primaryButton.label}
-            </Button>
-          )}
-        </ButtonsContainer>
-      )}
+      <ButtonsContainer>
+        {!hideCancelButton && secondaryButton && (
+          <Button
+            disabled={secondaryButton.disabled}
+            form={secondaryButton.form}
+            loading={secondaryButton.loading}
+            loadingAriaLabel={t('loading-aria-label')}
+            onClick={secondaryButton.onClick}
+            size="compact"
+            type={secondaryButton.type}
+            variant="secondary"
+          >
+            {secondaryButton.label}
+          </Button>
+        )}
+        {!hideSaveButton && (
+          <Button
+            testID="primary-button"
+            disabled={primaryButton.disabled}
+            form={primaryButton.form}
+            loading={primaryButton.loading}
+            loadingAriaLabel={t('loading-aria-label')}
+            onClick={primaryButton.onClick}
+            size="compact"
+            type={primaryButton.type}
+            variant="primary"
+          >
+            {primaryButton.label}
+          </Button>
+        )}
+      </ButtonsContainer>
     </Container>
   );
 };

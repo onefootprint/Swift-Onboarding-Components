@@ -44,9 +44,14 @@ export default {
       description: 'If true, the footprint logo is hidden',
       required: false,
     },
-    hideButtons: {
+    hideSaveButton: {
       control: 'boolean',
-      description: 'If true, the buttons are hidden',
+      description: 'If true, the save button is hidden',
+      required: false,
+    },
+    hideCancelButton: {
+      control: 'boolean',
+      description: 'If true, the cancel button is hidden',
       required: false,
     },
   },
@@ -59,7 +64,8 @@ const Template: Story<FormBaseProps> = ({
   onClose,
   onCancel,
   hideFootprintLogo,
-  hideButtons,
+  hideSaveButton,
+  hideCancelButton,
 }: FormBaseProps) => (
   <FormBase
     title={title}
@@ -69,7 +75,8 @@ const Template: Story<FormBaseProps> = ({
     onCancel={onCancel}
     onClose={onClose}
     hideFootprintLogo={hideFootprintLogo}
-    hideButtons={hideButtons}
+    hideSaveButton={hideSaveButton}
+    hideCancelButton={hideCancelButton}
   />
 );
 

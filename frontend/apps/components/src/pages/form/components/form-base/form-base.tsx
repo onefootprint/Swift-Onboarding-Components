@@ -39,7 +39,8 @@ export type FormBaseProps = {
   onCancel?: () => void;
   onClose?: () => void;
   hideFootprintLogo?: boolean;
-  hideButtons?: boolean;
+  hideSaveButton?: boolean;
+  hideCancelButton?: boolean;
   formErrorMessage?: string;
   fieldErrors?: Partial<Record<keyof FormData, string>>;
 };
@@ -56,7 +57,8 @@ const FormBase = ({
   onCancel,
   onClose,
   hideFootprintLogo,
-  hideButtons,
+  hideSaveButton,
+  hideCancelButton,
   formErrorMessage,
   fieldErrors = {},
 }: FormBaseProps) => {
@@ -187,17 +189,16 @@ const FormBase = ({
         type: 'submit',
         loading: isLoading,
       }}
-      secondaryButton={
-        onCancel && {
-          label: t('buttons.cancel'),
-          type: 'reset',
-          onClick: () => confirmClose(onCancel),
-          disabled: isLoading,
-        }
-      }
+      secondaryButton={{
+        label: t('buttons.cancel'),
+        type: 'reset',
+        onClick: () => confirmClose(onCancel),
+        disabled: isLoading,
+      }}
       onClose={() => confirmClose(onClose)}
       hideFootprintLogo={hideFootprintLogo}
-      hideButtons={hideButtons}
+      hideSaveButton={hideSaveButton}
+      hideCancelButton={hideCancelButton}
     >
       <FormProvider {...methods}>
         <StyledForm id={FORM_ID} onSubmit={handleSubmit(handleBeforeSubmit)}>

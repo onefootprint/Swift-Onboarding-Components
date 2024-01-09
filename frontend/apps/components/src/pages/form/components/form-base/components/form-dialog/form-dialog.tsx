@@ -14,7 +14,8 @@ export type FormDialogProps = {
   testID?: string;
   variant?: FootprintVariant;
   hideFootprintLogo?: boolean;
-  hideButtons?: boolean;
+  hideSaveButton?: boolean;
+  hideCancelButton?: boolean;
 } & (AllButtons | OnlyPrimaryButton);
 
 const FormDialog = ({
@@ -26,9 +27,11 @@ const FormDialog = ({
   onClose,
   variant = 'modal',
   hideFootprintLogo,
-  hideButtons,
+  hideSaveButton,
+  hideCancelButton,
 }: FormDialogProps) => {
-  const shouldHideFooter = hideButtons && hideFootprintLogo;
+  const shouldHideFooter =
+    hideSaveButton && hideCancelButton && hideFootprintLogo;
   const showHeader = variant === 'modal' || variant === 'drawer' || title;
 
   return (
@@ -46,7 +49,8 @@ const FormDialog = ({
             primaryButton={primaryButton}
             secondaryButton={secondaryButton}
             hideFootprintLogo={hideFootprintLogo}
-            hideButtons={hideButtons}
+            hideSaveButton={hideSaveButton}
+            hideCancelButton={hideCancelButton}
           />
         )
       }

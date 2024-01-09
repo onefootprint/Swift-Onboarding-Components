@@ -20,7 +20,8 @@ describe('<FormBase />', () => {
     variant,
     isLoading,
     hideFootprintLogo,
-    hideButtons,
+    hideSaveButton,
+    hideCancelButton,
     onSave,
     onCancel,
     onClose,
@@ -42,7 +43,8 @@ describe('<FormBase />', () => {
             variant={variant}
             isLoading={isLoading}
             hideFootprintLogo={hideFootprintLogo}
-            hideButtons={hideButtons}
+            hideSaveButton={hideSaveButton}
+            hideCancelButton={hideCancelButton}
             onSave={onSave}
             onCancel={onCancel}
             onClose={onClose}
@@ -72,8 +74,8 @@ describe('<FormBase />', () => {
       ).toBeInTheDocument();
     });
 
-    it('should hide buttons', () => {
-      renderFormBase({ hideButtons: true });
+    it('should hide both buttons', () => {
+      renderFormBase({ hideSaveButton: true, hideCancelButton: true });
       expect(
         screen.queryByRole('button', { name: 'Save' }),
       ).not.toBeInTheDocument();
@@ -82,6 +84,13 @@ describe('<FormBase />', () => {
       ).not.toBeInTheDocument();
     });
 
+    it('should hide cancel button', () => {
+      renderFormBase({ hideCancelButton: true });
+      expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Cancel' }),
+      ).not.toBeInTheDocument();
+    });
     it('should hide footprint logo', () => {
       renderFormBase({ hideFootprintLogo: true });
       expect(

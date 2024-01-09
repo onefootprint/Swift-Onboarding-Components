@@ -82,6 +82,18 @@ def test_sdk_args(sandbox_tenant):
             },
         },
         {
+            "kind": "form_v1",
+            "data": {
+                "auth_token": "tok_12345",
+                "title": "Form Title",
+                "options": {
+                    "hide_cancel_button": True,
+                    "hide_footprint_logo": True,
+                },
+                "l10n": {"locale": "en-US"},
+            },
+        },
+        {
             "kind": "auth_v1",
             "data": {
                 "public_key": obc_key,

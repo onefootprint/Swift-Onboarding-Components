@@ -45,16 +45,16 @@ const Content = ({ fallback }: ContentProps) => {
   >();
 
   const { authToken = '', title, options = {} } = props || {};
-  const { hideFootprintLogo, hideButtons } = options;
+  const { hideFootprintLogo, hideCancelButton, hideButtons } = options;
   useEffect(() => {
     Logger.info(
       `Received form props: title=${title}, hideFootprintLogo=${
         hideFootprintLogo ? 'true' : 'false'
-      }, hideButtons=${hideButtons ? 'true' : 'false'}. ${
-        authToken ? 'Has' : 'No'
-      } auth token.`,
+      }, hideCancelButton=${hideCancelButton ? 'true' : 'false'}, hideButtons=${
+        hideButtons ? 'true' : 'false'
+      }. ${authToken ? 'Has' : 'No'} auth token.`,
     );
-  }, [authToken, title, hideFootprintLogo, hideButtons]);
+  }, [authToken, title, hideFootprintLogo, hideButtons, hideCancelButton]);
   const { vaultData, usersVaultMutation } = useVaultData();
   const clientTokenFields = useClientTokenFields(authToken);
 
@@ -200,8 +200,8 @@ const Content = ({ fallback }: ContentProps) => {
       sections={sections}
       variant={variant}
       isLoading={usersVaultMutation.isLoading}
-      hideFootprintLogo={hideFootprintLogo}
-      hideButtons={hideButtons}
+      hideSaveButton={hideButtons}
+      hideCancelButton={hideCancelButton || hideButtons}
       formErrorMessage={formErrorMessage}
       fieldErrors={fieldErrors}
       onSave={handleSave}
