@@ -5,22 +5,11 @@ use api_core::{
     errors::challenge::ChallengeError,
     telemetry::RootSpan,
     types::{JsonApiResponse, ResponseData},
-    utils::{challenge::ChallengeKind, headers::SandboxId},
+    utils::headers::SandboxId,
     State,
 };
-use api_wire_types::IdentifyRequest;
-use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
-#[serde(rename_all = "snake_case")]
-pub struct IdentifyResponse {
-    user_found: bool,
-    available_challenge_kinds: Option<Vec<ChallengeKind>>,
-    /// signals that one or more biometric credentials
-    /// support syncing and may be available to use on desktop/other devices
-    has_syncable_pass_key: bool,
-    is_unverified: bool,
-}
+use api_wire_types::{IdentifyRequest, IdentifyResponse};
+use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
     tags(Identify, Hosted),

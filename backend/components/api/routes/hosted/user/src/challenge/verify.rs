@@ -15,12 +15,13 @@ use api_core::types::response::ResponseData;
 use api_core::types::EmptyResponse;
 use api_core::types::JsonApiResponse;
 use api_core::utils::challenge::Challenge;
-use api_core::utils::challenge::ChallengeToken;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::passkey::VerifyChallengeResult;
 use api_core::utils::passkey::WebauthnConfig;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
+use api_wire_types::ActionKind;
+use api_wire_types::UserChallengeVerifyRequest;
 use chrono::Utc;
 use crypto::sha256;
 use db::models::auth_event::AuthEvent;
@@ -38,18 +39,9 @@ use newtypes::PiiString;
 use newtypes::TenantId;
 use newtypes::ValidateArgs;
 use newtypes::WebauthnCredentialId;
-use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
+use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
-use super::ActionKind;
 use super::RegisterChallengeData;
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
-pub struct ChallengeVerifyRequest {
-    /// The token given from initiating the challenge
-    challenge_token: ChallengeToken,
-    /// The response to the challenge. Either SMS/email PIN code or passkey response
-    challenge_response: String,
-}
 
 #[api_v2_operation(
     tags(Challenge, Hosted),
@@ -57,7 +49,7 @@ pub struct ChallengeVerifyRequest {
 )]
 #[actix::post("/hosted/user/challenge/verify")]
 pub async fn post(
-    request: Json<ChallengeVerifyRequest>,
+    request: Json<UserChallengeVerifyRequest>,
     state: web::Data<State>,
     user_auth: UserAuthContext,
     insights: InsightHeaders,
@@ -69,7 +61,7 @@ pub async fn post(
     let tenant = user_auth
         .tenant()
         .ok_or(ValidationError("Need tenant ID to verify challenge"))?;
-    let ChallengeVerifyRequest {
+    let UserChallengeVerifyRequest {
         challenge_token,
         challenge_response: c_response,
     } = request.into_inner();
@@ -168,7 +160,7 @@ impl Action {
     ) -> ApiResult<(AuthEventKind, Option<WebauthnCredentialId>)> {
         let sv_id = user_auth
             .scoped_user_id()
-            .ok_or(ValidationError("Cannot update contact info without "))?;
+            .ok_or(ValidationError("Cannot update contact info without scoped vault"))?;
         let vw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv_id)?;
         let (event_kind, passkey_cred_id) = match self {
             Self::ReplaceContactInfo { kind, data } => {

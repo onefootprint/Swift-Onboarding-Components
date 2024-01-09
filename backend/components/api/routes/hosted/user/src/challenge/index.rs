@@ -1,4 +1,3 @@
-use super::ActionKind;
 use super::RegisterChallengeData;
 use crate::challenge::RegisterChallenge;
 use crate::State;
@@ -11,42 +10,14 @@ use api_core::errors::ValidationError;
 use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
 use api_core::utils::challenge::Challenge;
-use api_core::utils::challenge::ChallengeKind;
-use api_core::utils::challenge::ChallengeToken;
 use api_core::utils::email::send_email_challenge_non_blocking;
 use api_core::utils::passkey::WebauthnConfig;
 use api_core::utils::sms::rx_background_error;
-use newtypes::email::Email;
-use newtypes::PhoneNumber;
-use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
-
-#[derive(Apiv2Schema, serde::Deserialize)]
-pub struct ChallengeRequest {
-    /// If the challenge kind is SMS, the phone number to send the challenge to
-    phone_number: Option<PhoneNumber>,
-    /// If the challenge kind is email, the email address to send the challenge to
-    email: Option<Email>,
-    /// The kind of challenge to initiate
-    kind: ChallengeKind,
-    /// Specifies whether to add the new auth method alongside existing auth methods or replace
-    /// the existing method.
-    action_kind: ActionKind,
-}
-
-#[derive(Apiv2Schema, serde::Serialize)]
-pub struct ChallengeResponse {
-    /// If the challenge kind is biometric, the challenge JSON for the browser
-    biometric_challenge_json: Option<String>,
-    /// Information saved client side and sent back with the challenge response
-    challenge_token: ChallengeToken,
-    /// The timeout until you're allowed to initiate another challenge
-    time_before_retry_s: i64,
-}
-
-#[derive(serde::Serialize)]
-pub struct ErrorChallengeResponse {
-    error: String,
-}
+use api_wire_types::ErrorChallengeResponse;
+use api_wire_types::UserChallengeRequest;
+use api_wire_types::UserChallengeResponse;
+use newtypes::ChallengeKind;
+use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
     tags(Challenge, Hosted),
@@ -54,15 +25,15 @@ pub struct ErrorChallengeResponse {
 )]
 #[actix::post("/hosted/user/challenge")]
 pub async fn post(
-    request: Json<ChallengeRequest>,
+    request: Json<UserChallengeRequest>,
     state: web::Data<State>,
     user_auth: UserAuthContext,
-) -> JsonApiResponse<ChallengeResponse> {
+) -> JsonApiResponse<UserChallengeResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::ExplicitAuth.and(UserAuthGuard::Auth))?;
     if !user_auth.data.is_from_api {
         return ValidationError("Can only update auth methods using auth issued via API").into();
     }
-    let ChallengeRequest {
+    let UserChallengeRequest {
         phone_number,
         email,
         kind,
@@ -130,7 +101,7 @@ pub async fn post(
     let time_before_retry_s = time_before_retry
         .map(|d| d.num_seconds())
         .unwrap_or(state.config.time_s_between_sms_challenges);
-    let response = ChallengeResponse {
+    let response = UserChallengeResponse {
         biometric_challenge_json,
         challenge_token,
         time_before_retry_s,

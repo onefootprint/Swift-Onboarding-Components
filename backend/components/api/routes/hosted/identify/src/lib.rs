@@ -4,7 +4,6 @@ use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::user::CheckedUserAuthContext;
 use api_core::errors::ApiResult;
 use api_core::telemetry::RootSpan;
-use api_core::utils::challenge::{ChallengeKind, ChallengeToken};
 use api_core::utils::sms::PhoneEmailChallengeState;
 use api_core::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
 use api_core::State;
@@ -15,7 +14,7 @@ use db::models::scoped_vault::ScopedVault;
 use db::models::tenant::Tenant;
 use db::models::webauthn_credential::WebauthnCredential;
 use itertools::Itertools;
-use newtypes::PiiString;
+use newtypes::ChallengeKind;
 use newtypes::SandboxId;
 use newtypes::VaultId;
 use newtypes::{ContactInfoKind, DataIdentifier as DI};
@@ -34,17 +33,6 @@ pub mod verify;
 pub(crate) enum CreateChallengeRequest {
     Email(String),
     PhoneNumber(String),
-}
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
-#[serde(rename_all = "snake_case")]
-pub struct UserChallengeData {
-    challenge_kind: ChallengeKind,
-    challenge_token: ChallengeToken,
-    /// For login challenges, provide some context on where the challenge was sent
-    scrubbed_phone_number: Option<PiiString>,
-    biometric_challenge_json: Option<String>,
-    time_before_retry_s: i64,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

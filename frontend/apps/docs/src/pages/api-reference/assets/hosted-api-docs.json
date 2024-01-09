@@ -212,7 +212,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/AuthChallengeRequest"
+                                "$ref": "#/components/schemas/LoginChallengeRequest"
                             }
                         }
                     },
@@ -310,7 +310,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/VerifyRequest"
+                                "$ref": "#/components/schemas/IdentifyVerifyRequest"
                             }
                         }
                     },
@@ -322,7 +322,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/VerifyResponse"
+                                    "$ref": "#/components/schemas/IdentifyVerifyResponse"
                                 }
                             }
                         }
@@ -958,7 +958,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ChallengeRequest"
+                                "$ref": "#/components/schemas/UserChallengeRequest"
                             }
                         }
                     },
@@ -970,7 +970,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ChallengeResponse"
+                                    "$ref": "#/components/schemas/UserChallengeResponse"
                                 }
                             }
                         }
@@ -994,7 +994,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/ChallengeVerifyRequest"
+                                "$ref": "#/components/schemas/UserChallengeVerifyRequest"
                             }
                         }
                     },
@@ -2108,25 +2108,6 @@
                     "timestamp"
                 ]
             },
-            "AuthChallengeRequest": {
-                "type": "object",
-                "properties": {
-                    "identifier": {
-                        "type": "string"
-                    },
-                    "preferred_challenge_kind": {
-                        "type": "string",
-                        "enum": [
-                            "sms",
-                            "biometric",
-                            "email"
-                        ]
-                    }
-                },
-                "required": [
-                    "preferred_challenge_kind"
-                ]
-            },
             "AuthorizedOrg": {
                 "type": "object",
                 "properties": {
@@ -2168,79 +2149,6 @@
                 "required": [
                     "can_access_data",
                     "org_name"
-                ]
-            },
-            "ChallengeRequest": {
-                "type": "object",
-                "properties": {
-                    "action_kind": {
-                        "description": "Specifies whether to add the new auth method alongside existing auth methods or replace\n the existing method.",
-                        "type": "string",
-                        "enum": [
-                            "replace",
-                            "add"
-                        ]
-                    },
-                    "email": {
-                        "description": "If the challenge kind is email, the email address to send the challenge to",
-                        "type": "string"
-                    },
-                    "kind": {
-                        "description": "The kind of challenge to initiate",
-                        "type": "string",
-                        "enum": [
-                            "sms",
-                            "biometric",
-                            "email"
-                        ]
-                    },
-                    "phone_number": {
-                        "description": "If the challenge kind is SMS, the phone number to send the challenge to",
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "action_kind",
-                    "kind"
-                ]
-            },
-            "ChallengeResponse": {
-                "type": "object",
-                "properties": {
-                    "biometric_challenge_json": {
-                        "description": "If the challenge kind is biometric, the challenge JSON for the browser",
-                        "type": "string"
-                    },
-                    "challenge_token": {
-                        "description": "Information saved client side and sent back with the challenge response",
-                        "type": "string"
-                    },
-                    "time_before_retry_s": {
-                        "description": "The timeout until you're allowed to initiate another challenge",
-                        "type": "integer",
-                        "format": "int64"
-                    }
-                },
-                "required": [
-                    "challenge_token",
-                    "time_before_retry_s"
-                ]
-            },
-            "ChallengeVerifyRequest": {
-                "type": "object",
-                "properties": {
-                    "challenge_response": {
-                        "description": "The response to the challenge. Either SMS/email PIN code or passkey response",
-                        "type": "string"
-                    },
-                    "challenge_token": {
-                        "description": "The token given from initiating the challenge",
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "challenge_response",
-                    "challenge_token"
                 ]
             },
             "CheckSessionResponse": {
@@ -3818,6 +3726,44 @@
                     "user_found"
                 ]
             },
+            "IdentifyVerifyRequest": {
+                "type": "object",
+                "properties": {
+                    "challenge_response": {
+                        "type": "string"
+                    },
+                    "challenge_token": {
+                        "description": "Opaque challenge state token",
+                        "type": "string"
+                    },
+                    "scope": {
+                        "description": "Determines which scopes the issued auth token will have. Request the correct scopes for\n your use case in order to get the least permissions required",
+                        "type": "string",
+                        "enum": [
+                            "my1fp",
+                            "onboarding",
+                            "auth"
+                        ]
+                    }
+                },
+                "required": [
+                    "challenge_response",
+                    "challenge_token",
+                    "scope"
+                ]
+            },
+            "IdentifyVerifyResponse": {
+                "type": "object",
+                "properties": {
+                    "auth_token": {
+                        "description": "An cryptographically generated auth token to authenticate a session",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "auth_token"
+                ]
+            },
             "LogBody": {
                 "type": "object",
                 "properties": {
@@ -3844,6 +3790,25 @@
                         "type": "string"
                     }
                 }
+            },
+            "LoginChallengeRequest": {
+                "type": "object",
+                "properties": {
+                    "identifier": {
+                        "type": "string"
+                    },
+                    "preferred_challenge_kind": {
+                        "type": "string",
+                        "enum": [
+                            "sms",
+                            "biometric",
+                            "email"
+                        ]
+                    }
+                },
+                "required": [
+                    "preferred_challenge_kind"
+                ]
             },
             "LoginChallengeResponse": {
                 "type": "object",
@@ -5356,42 +5321,77 @@
                     "scopes"
                 ]
             },
-            "VerifyRequest": {
+            "UserChallengeRequest": {
                 "type": "object",
                 "properties": {
-                    "challenge_response": {
+                    "action_kind": {
+                        "description": "Specifies whether to add the new auth method alongside existing auth methods or replace\n the existing method.",
+                        "type": "string",
+                        "enum": [
+                            "replace",
+                            "add"
+                        ]
+                    },
+                    "email": {
+                        "description": "If the challenge kind is email, the email address to send the challenge to",
+                        "type": "string"
+                    },
+                    "kind": {
+                        "description": "The kind of challenge to initiate",
+                        "type": "string",
+                        "enum": [
+                            "sms",
+                            "biometric",
+                            "email"
+                        ]
+                    },
+                    "phone_number": {
+                        "description": "If the challenge kind is SMS, the phone number to send the challenge to",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "action_kind",
+                    "kind"
+                ]
+            },
+            "UserChallengeResponse": {
+                "type": "object",
+                "properties": {
+                    "biometric_challenge_json": {
+                        "description": "If the challenge kind is biometric, the challenge JSON for the browser",
                         "type": "string"
                     },
                     "challenge_token": {
-                        "description": "Opaque challenge state token",
+                        "description": "Information saved client side and sent back with the challenge response",
                         "type": "string"
                     },
-                    "scope": {
-                        "description": "Determines which scopes the issued auth token will have. Request the correct scopes for\n your use case in order to get the least permissions required",
-                        "type": "string",
-                        "enum": [
-                            "my1fp",
-                            "onboarding",
-                            "auth"
-                        ]
+                    "time_before_retry_s": {
+                        "description": "The timeout until you're allowed to initiate another challenge",
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "required": [
+                    "challenge_token",
+                    "time_before_retry_s"
+                ]
+            },
+            "UserChallengeVerifyRequest": {
+                "type": "object",
+                "properties": {
+                    "challenge_response": {
+                        "description": "The response to the challenge. Either SMS/email PIN code or passkey response",
+                        "type": "string"
+                    },
+                    "challenge_token": {
+                        "description": "The token given from initiating the challenge",
+                        "type": "string"
                     }
                 },
                 "required": [
                     "challenge_response",
-                    "challenge_token",
-                    "scope"
-                ]
-            },
-            "VerifyResponse": {
-                "type": "object",
-                "properties": {
-                    "auth_token": {
-                        "description": "An cryptographically generated auth token to authenticate a session",
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "auth_token"
+                    "challenge_token"
                 ]
             },
             "WebAuthnInitResponse": {

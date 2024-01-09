@@ -1,4 +1,4 @@
-use super::{BiometricChallengeState, UserChallengeData};
+use super::BiometricChallengeState;
 use crate::ChallengeData;
 use crate::ChallengeState;
 use crate::State;
@@ -14,30 +14,20 @@ use api_core::telemetry::RootSpan;
 use api_core::types::JsonApiResponse;
 use api_core::types::ResponseData;
 use api_core::utils::challenge::Challenge;
-use api_core::utils::challenge::ChallengeKind;
 use api_core::utils::email::send_email_challenge_non_blocking;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::passkey::WebauthnConfig;
 use api_core::utils::sms::rx_background_error;
-use api_wire_types::IdentifyId;
+use api_wire_types::LoginChallengeRequest;
+use api_wire_types::LoginChallengeResponse;
+use api_wire_types::UserChallengeData;
 use crypto::serde_cbor;
 use db::models::webauthn_credential::WebauthnCredential;
+use newtypes::ChallengeKind;
 use newtypes::VaultId;
-use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
+use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use webauthn_rs_core::proto::{Base64UrlSafeData, Credential, ParsedAttestation, ParsedAttestationData};
 use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
-pub struct AuthChallengeRequest {
-    identifier: Option<IdentifyId>,
-    preferred_challenge_kind: ChallengeKind,
-}
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
-pub struct LoginChallengeResponse {
-    challenge_data: UserChallengeData,
-    error: Option<String>,
-}
 
 #[api_v2_operation(
     tags(Identify, Hosted),
@@ -47,7 +37,7 @@ pub struct LoginChallengeResponse {
 )]
 #[actix::post("/hosted/identify/login_challenge")]
 pub async fn post(
-    request: Json<AuthChallengeRequest>,
+    request: Json<LoginChallengeRequest>,
     state: web::Data<State>,
     ob_context: Option<ObConfigAuth>,
     // When provided, identifies only sandbox users with the suffix
@@ -57,7 +47,7 @@ pub async fn post(
     user_auth: Option<UserAuthContext>,
     root_span: RootSpan,
 ) -> JsonApiResponse<LoginChallengeResponse> {
-    let AuthChallengeRequest {
+    let LoginChallengeRequest {
         identifier,
         preferred_challenge_kind,
     } = request.into_inner();

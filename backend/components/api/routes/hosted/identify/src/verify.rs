@@ -14,12 +14,13 @@ use api_core::errors::{ApiError, ApiResult, ValidationError};
 use api_core::telemetry::RootSpan;
 use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
-use api_core::utils::challenge::{Challenge, ChallengeToken};
+use api_core::utils::challenge::Challenge;
 use api_core::utils::headers::InsightHeaders;
 use api_core::utils::passkey::WebauthnConfig;
 use api_core::utils::session::AuthSession;
 use api_core::utils::vault_wrapper::Person;
 use api_core::utils::vault_wrapper::VaultWrapper;
+use api_wire_types::{IdentifyVerifyRequest, IdentifyVerifyResponse};
 use chrono::{Duration, Utc};
 use crypto::sha256;
 use db::errors::OptionalExtension;
@@ -32,24 +33,9 @@ use db::models::webauthn_credential::WebauthnCredential;
 use db::TxnPgConn;
 use newtypes::{
     AuthEventKind, DataIdentifier, IdentifyScope, IdentityDataKind as IDK, ObConfigurationKind,
-    ScopedVaultId, SessionAuthToken, VaultId, WebauthnCredentialId,
+    ScopedVaultId, VaultId, WebauthnCredentialId,
 };
-use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
-pub struct VerifyRequest {
-    /// Opaque challenge state token
-    challenge_token: ChallengeToken,
-    challenge_response: String,
-    /// Determines which scopes the issued auth token will have. Request the correct scopes for
-    /// your use case in order to get the least permissions required
-    scope: IdentifyScope,
-}
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
-pub struct VerifyResponse {
-    auth_token: SessionAuthToken,
-}
+use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
     tags(Identify, Hosted),
@@ -61,15 +47,15 @@ pub struct VerifyResponse {
 #[actix::post("/hosted/identify/verify")]
 pub async fn post(
     state: web::Data<State>,
-    request: Json<VerifyRequest>,
+    request: Json<IdentifyVerifyRequest>,
     ob_pk_auth: Option<ObConfigAuth>,
     // When provided, augments the existing user_auth token with the scopes gained from the challenge
     user_auth: Option<UserAuthContext>,
     insight_headers: InsightHeaders,
     root_span: RootSpan,
-) -> JsonApiResponse<VerifyResponse> {
+) -> JsonApiResponse<IdentifyVerifyResponse> {
     // Note: Challenge::unseal checks for challenge token expiry as well
-    let VerifyRequest {
+    let IdentifyVerifyRequest {
         challenge_token,
         challenge_response: c_response,
         scope,
@@ -207,7 +193,7 @@ pub async fn post(
         })
         .await?;
 
-    ResponseData::ok(VerifyResponse { auth_token }).json()
+    ResponseData::ok(IdentifyVerifyResponse { auth_token }).json()
 }
 
 fn get_scoped_business_id(

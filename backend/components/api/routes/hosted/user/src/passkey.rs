@@ -2,10 +2,7 @@ use crate::{
     auth::user::{UserAuth, UserAuthContext},
     errors::{challenge::ChallengeError, ApiError},
     types::{response::ResponseData, EmptyResponse},
-    utils::{
-        challenge::{Challenge, ChallengeToken},
-        headers::InsightHeaders,
-    },
+    utils::{challenge::Challenge, headers::InsightHeaders},
     State,
 };
 use api_core::{
@@ -20,7 +17,7 @@ use db::models::{
 };
 use db::models::{vault::Vault, webauthn_credential::WebauthnCredential};
 use macros::route_alias;
-use newtypes::AuthEventKind;
+use newtypes::{AuthEventKind, ChallengeToken};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
 

@@ -1,4 +1,3 @@
-use super::UserChallengeData;
 use crate::ChallengeData;
 use crate::ChallengeState;
 use crate::State;
@@ -11,28 +10,18 @@ use api_core::telemetry::RootSpan;
 use api_core::types::response::ResponseData;
 use api_core::types::JsonApiResponse;
 use api_core::utils::challenge::Challenge;
-use api_core::utils::challenge::ChallengeKind;
 use api_core::utils::email::send_email_challenge_non_blocking;
 use api_core::utils::headers::SandboxId;
 use api_core::utils::sms::rx_background_error;
 use api_core::utils::vault_wrapper::{InitialVaultData, VaultContext, VaultWrapper};
+use api_wire_types::SignupChallengeRequest;
+use api_wire_types::SignupChallengeResponse;
+use api_wire_types::UserChallengeData;
 use itertools::Itertools;
-use newtypes::email::Email;
 use newtypes::fingerprinter::GlobalFingerprintKind;
-use newtypes::{DataIdentifier, Fingerprinter, IdentityDataKind as IDK, PhoneNumber, PiiString};
-use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
-pub struct SignupChallengeRequest {
-    phone_number: Option<PhoneNumber>,
-    email: Option<Email>,
-}
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
-pub struct SignupChallengeResponse {
-    challenge_data: UserChallengeData,
-    error: Option<String>,
-}
+use newtypes::ChallengeKind;
+use newtypes::{DataIdentifier, Fingerprinter, IdentityDataKind as IDK, PiiString};
+use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
     tags(Identify, Hosted),

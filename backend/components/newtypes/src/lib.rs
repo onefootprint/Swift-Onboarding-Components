@@ -20,6 +20,9 @@ pub use decision::*;
 pub mod scoped_vault_cursor;
 pub use scoped_vault_cursor::*;
 
+mod challenge_kind;
+pub use challenge_kind::*;
+
 pub mod country_codes;
 pub use country_codes::*;
 

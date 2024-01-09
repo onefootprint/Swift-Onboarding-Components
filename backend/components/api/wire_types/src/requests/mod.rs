@@ -75,3 +75,6 @@ pub use label_create_request::*;
 
 mod tag_create_request;
 pub use tag_create_request::*;
+
+mod user_challenge;
+pub use user_challenge::*;
