@@ -9,6 +9,9 @@ pub mod verify;
 pub struct RegisterChallenge {
     pub data: RegisterChallengeData,
     pub action_kind: ActionKind,
+    /// Additional field just to prevent accidentally deserializing another struct with similar
+    /// serialization
+    pub is_register_challenge: bool,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

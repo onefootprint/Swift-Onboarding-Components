@@ -66,8 +66,14 @@ pub async fn post(
         challenge_response: c_response,
     } = request.into_inner();
     let webauthn = WebauthnConfig::new(&state.config);
-    let RegisterChallenge { data, action_kind } =
-        Challenge::unseal(&state.challenge_sealing_key, &challenge_token)?.data;
+    let RegisterChallenge {
+        data,
+        action_kind,
+        is_register_challenge,
+    } = Challenge::unseal(&state.challenge_sealing_key, &challenge_token)?.data;
+    if !is_register_challenge {
+        return ValidationError("Invalid challenge token").into();
+    }
 
     // Verify the challenge response and determine which action to perform
     let action = match data {

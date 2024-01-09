@@ -82,7 +82,11 @@ pub async fn post(
             (None, challenge_data, None, Some(challenge_json))
         }
     };
-    let challenge = RegisterChallenge { data, action_kind };
+    let challenge = RegisterChallenge {
+        data,
+        action_kind,
+        is_register_challenge: true,
+    };
     let challenge_token = Challenge::new(challenge).seal(&state.challenge_sealing_key)?;
 
     let err = if let Some(rx) = rx {
