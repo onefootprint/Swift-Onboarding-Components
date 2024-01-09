@@ -64,7 +64,10 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
         emailIdentification: {
           on: {
             identified: [
-              // TODO: biometric and email challenge
+              {
+                target: 'incompatibleRequirements',
+                cond: (context, event) => !!event.payload.userFound, // TODO: handle userFound cases later
+              },
               {
                 target: 'phoneIdentification',
                 actions: ['assignIdentifyResult'],
@@ -82,10 +85,16 @@ export const createPasskeysMachine = (sdkAuthToken: string) =>
         },
         phoneIdentification: {
           on: {
-            identified: {
-              target: 'smsChallenge',
-              actions: ['assignIdentifyResult'],
-            },
+            identified: [
+              {
+                target: 'incompatibleRequirements',
+                cond: (context, event) => !!event.payload.userFound, // TODO: handle userFound cases later
+              },
+              {
+                target: 'smsChallenge',
+                actions: ['assignIdentifyResult'],
+              },
+            ],
             identifyReset: {
               target: 'emailIdentification',
               actions: ['reset'],

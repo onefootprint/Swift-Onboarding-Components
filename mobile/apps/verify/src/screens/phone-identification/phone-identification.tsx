@@ -20,6 +20,7 @@ export type PhoneIdentificationProps = {
   onEmailEdit: () => void;
   onComplete: (result: IdentifyResultProps) => void;
   obConfigAuth: ObConfigAuth;
+  sandboxId?: string;
 };
 
 type FormData = {
@@ -31,6 +32,7 @@ const PhoneIdentification = ({
   onComplete,
   obConfigAuth,
   onEmailEdit,
+  sandboxId,
 }: PhoneIdentificationProps) => {
   const { t } = useTranslation('pages.phone-identification');
   const schema = z.object({
@@ -51,10 +53,15 @@ const PhoneIdentification = ({
 
   const onSubmit = (data: FormData) => {
     const { phoneNumber } = data;
+    if (isLoading) {
+      return;
+    }
+
     identifyMutation.mutate(
       {
         identifier: { phoneNumber },
         obConfigAuth,
+        sandboxId,
       },
       {
         onSuccess: response => {

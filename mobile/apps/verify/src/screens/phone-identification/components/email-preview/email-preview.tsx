@@ -1,4 +1,4 @@
-import { IcoFaceid24 } from '@onefootprint/icons'; // TODO: Use IcoEmail24 that is not available in mobile icon library yet
+import { IcoEmail24 } from '@onefootprint/icons'; // TODO: Use IcoEmail24 that is not available in mobile icon library yet
 import { Box, LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 
@@ -31,7 +31,7 @@ const EmailPreview = ({ email, onEdit }: EmailPreviewProps) => {
         gap={3}
         maxWidth="60%"
       >
-        <IcoFaceid24 />
+        <IcoEmail24 />
         <Typography variant="label-3" color="primary">
           {email}
         </Typography>

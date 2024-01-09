@@ -61,6 +61,7 @@ export const SandboxOutcome = ({
     getValues,
   } = formMethods;
 
+  // TODO: Remove this when we start supporting id-doc
   if (requiresIdDoc) {
     onIdDocRequirement();
     return null;

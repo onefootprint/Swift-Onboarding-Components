@@ -1,6 +1,6 @@
 import request from '@onefootprint/request';
 import type { IdentifyRequest, IdentifyResponse } from '@onefootprint/types';
-import { SANDBOX_ID_HEADER } from '@onefootprint/types';
+import { AUTH_HEADER, SANDBOX_ID_HEADER } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 const identifyRequest = async (payload: IdentifyRequest) => {
@@ -10,7 +10,11 @@ const identifyRequest = async (payload: IdentifyRequest) => {
     headers[SANDBOX_ID_HEADER] = sandboxId;
   }
   const data: Record<string, unknown> = {};
-  // TODO: Auth token based identification
+  if ('authToken' in identifier) {
+    headers[AUTH_HEADER] = identifier.authToken;
+  } else {
+    data.identifier = identifier;
+  }
   data.identifier = identifier;
 
   const response = await request<IdentifyResponse>({

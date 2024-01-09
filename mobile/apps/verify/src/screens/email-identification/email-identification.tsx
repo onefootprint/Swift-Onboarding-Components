@@ -14,6 +14,7 @@ import type { IdentifyResultProps } from '@/utils/state-machine/types';
 export type EmailIdentificationProps = {
   onComplete: (result: IdentifyResultProps) => void;
   obConfigAuth: ObConfigAuth;
+  sandboxId?: string;
 };
 
 type FormData = {
@@ -23,6 +24,7 @@ type FormData = {
 const EmailIdentification = ({
   onComplete,
   obConfigAuth,
+  sandboxId,
 }: EmailIdentificationProps) => {
   const { t } = useTranslation('pages.email-identification');
   const schema = z.object({
@@ -40,10 +42,14 @@ const EmailIdentification = ({
 
   const onSubmit = (data: FormData) => {
     const { email } = data;
+    if (isLoading) {
+      return;
+    }
     mutate(
       {
         identifier: { email },
         obConfigAuth,
+        sandboxId,
       },
       {
         onSuccess: response => {

@@ -1,4 +1,4 @@
-import { Color } from '@onefootprint/design-tokens';
+import type { Color } from '@onefootprint/design-tokens';
 
 export type IconProps = {
   color?: Color;

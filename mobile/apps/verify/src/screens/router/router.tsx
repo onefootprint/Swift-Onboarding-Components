@@ -135,6 +135,7 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
           <EmailIdentification
             obConfigAuth={obConfigAuth}
             onComplete={handleIdentified}
+            sandboxId={sandboxOutcome?.sandboxId}
           />
         </Container>
       );
@@ -150,6 +151,7 @@ const Router = ({ sdkAuthToken }: RouterProps) => {
             onComplete={handleIdentified}
             email={identify.identifyResult?.email}
             onEmailEdit={() => send({ type: 'identifyReset' })}
+            sandboxId={sandboxOutcome?.sandboxId}
           />
         </Container>
       );

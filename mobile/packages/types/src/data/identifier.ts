@@ -6,4 +6,5 @@ export type Identifier =
   | {
       phoneNumber: string;
       email?: never;
-    };
+    }
+  | { authToken: string };

@@ -13,6 +13,7 @@ export { default as IcoChevronRight24 } from './ico-chevron-right-24';
 export { default as IcoClose24 } from './ico-close-24';
 export { default as IcoClose32 } from './ico-close-32';
 export { default as IcoCloseSmall24 } from './ico-close-small-24';
+export { default as IcoEmail24 } from './ico-email-24';
 export { default as IcoEmojiHappy24 } from './ico-emoji-happy-24';
 export { default as IcoFaceid24 } from './ico-faceid-24';
 export { default as IcoFaceid40 } from './ico-faceid-40';
