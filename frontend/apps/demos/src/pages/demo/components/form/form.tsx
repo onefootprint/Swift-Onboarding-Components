@@ -209,6 +209,10 @@ const InputsContainer = styled.div`
 
     > * {
       width: 100%;
+      /* patch to fix a bug happening to the phone input positioning absolutely without apparent reason */
+      && {
+        position: relative;
+      }
     }
   `}
 `;
