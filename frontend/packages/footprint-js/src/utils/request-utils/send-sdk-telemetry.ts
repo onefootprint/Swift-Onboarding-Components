@@ -26,14 +26,18 @@ const sendSdkTelemetry = (
     logLevel: level,
     logMessage: message,
   };
-  // Fire and forget. No need to await or handle the response.
-  fetch(`${API_BASE_URL}/org/sdk_telemetry`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(transformKeys(body)),
-  });
+  try {
+    // Fire and forget. No need to await or handle the response.
+    fetch(`${API_BASE_URL}/org/sdk_telemetry`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(transformKeys(body)),
+    });
+  } catch (e) {
+    // Do nothing
+  }
 };
 
 export default sendSdkTelemetry;
