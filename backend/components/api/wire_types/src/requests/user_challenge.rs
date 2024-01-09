@@ -22,12 +22,13 @@ pub struct UserChallengeRequest {
     pub action_kind: ActionKind,
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Apiv2Schema, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum ActionKind {
-    /// Replace the existing auth method
+    /// Replace the existing auth method.
     Replace,
-    /// Add the provided auth method
+    /// Add the provided auth method, where an auth method of this kind doesn't already exist.
+    /// Adding a secondary credential will be a different operation kind.
     Add,
 }
 

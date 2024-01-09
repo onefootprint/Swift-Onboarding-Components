@@ -182,7 +182,13 @@ impl Action {
                     ActionKind::Replace => {
                         WebauthnCredential::deactivate(conn, user_auth.user_vault_id())?;
                     }
-                    ActionKind::Add => {}
+                    ActionKind::Add => {
+                        let existing = WebauthnCredential::list(conn, user_auth.user_vault_id())?;
+                        if !existing.is_empty() {
+                            return ValidationError("Cannot add webauthn cred when one already exists.")
+                                .into();
+                        }
+                    }
                 }
                 let cred = res.save_credential(conn, user_auth, ie_id)?;
                 (AuthEventKind::Passkey, Some(cred.id))
