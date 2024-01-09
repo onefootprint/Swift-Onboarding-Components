@@ -110,7 +110,9 @@ def test_fail_to_add_passkey(user_with_token):
     _, auth_token = user_with_token
 
     # Try to add a passkey
-    data = dict(kind="passkey", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="add")
+    data = dict(
+        kind="passkey", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="add_primary"
+    )
     body = post("hosted/user/challenge", data, auth_token)
 
     challenge_token = body["challenge_token"]
@@ -123,7 +125,8 @@ def test_fail_to_add_passkey(user_with_token):
     )
     body = post("hosted/user/challenge/verify", data, auth_token, status_code=400)
     assert (
-        body["error"]["message"] == "Cannot add webauthn cred when one already exists."
+        body["error"]["message"]
+        == "Cannot add primary passkey when one already exists."
     )
 
 
@@ -174,7 +177,9 @@ def test_add_passkey(sandbox_tenant, twilio, auth_playbook):
     user, auth_token = get_auth_token_for_ci_update(user, twilio, auth_playbook)
 
     # Add a passkey
-    data = dict(kind="passkey", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="add")
+    data = dict(
+        kind="passkey", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="add_primary"
+    )
     body = post("hosted/user/challenge", data, auth_token)
 
     challenge_token = body["challenge_token"]

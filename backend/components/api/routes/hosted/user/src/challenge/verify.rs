@@ -182,10 +182,10 @@ impl Action {
                     ActionKind::Replace => {
                         WebauthnCredential::deactivate(conn, user_auth.user_vault_id())?;
                     }
-                    ActionKind::Add => {
+                    ActionKind::AddPrimary => {
                         let existing = WebauthnCredential::list(conn, user_auth.user_vault_id())?;
                         if !existing.is_empty() {
-                            return ValidationError("Cannot add webauthn cred when one already exists.")
+                            return ValidationError("Cannot add primary passkey when one already exists.")
                                 .into();
                         }
                     }

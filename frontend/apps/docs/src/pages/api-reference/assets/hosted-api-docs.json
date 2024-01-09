@@ -5329,7 +5329,7 @@
                         "type": "string",
                         "enum": [
                             "replace",
-                            "add"
+                            "add_primary"
                         ]
                     },
                     "email": {

@@ -29,7 +29,7 @@ pub enum ActionKind {
     Replace,
     /// Add the provided auth method, where an auth method of this kind doesn't already exist.
     /// Adding a secondary credential will be a different operation kind.
-    Add,
+    AddPrimary,
 }
 
 #[derive(Apiv2Schema, serde::Serialize)]
