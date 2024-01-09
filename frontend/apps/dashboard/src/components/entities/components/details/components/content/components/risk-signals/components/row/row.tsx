@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoInfo16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { RiskSignal } from '@onefootprint/types';
-import { Tooltip } from '@onefootprint/ui';
+import { Badge, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import { createCapitalStringList } from 'src/utils/create-string-list';
 
@@ -28,7 +28,9 @@ const Row = ({ riskSignal }: RowProps) => {
       <td>
         <Tooltip text={riskSignal.description} alignment="start">
           <RowData>
-            <ReasonCode>{riskSignal.reasonCode}</ReasonCode>
+            <Badge variant="info" sx={{ maxWidth: '95%' }}>
+              <ReasonCode>{riskSignal.reasonCode}</ReasonCode>
+            </Badge>
             <IcoInfo16 />
           </RowData>
         </Tooltip>

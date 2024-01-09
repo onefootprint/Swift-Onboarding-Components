@@ -5,7 +5,8 @@ import type { RuleAction, RuleField } from '@onefootprint/types';
 import { RuleOp } from '@onefootprint/types';
 import { Button, LinkButton, Stack, useToast } from '@onefootprint/ui';
 import { createFontStyles } from '@onefootprint/ui/src/utils/mixins/mixins';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { useEffectOnce } from 'usehooks-ts';
 
 import useAddRule from '../../hooks/use-add-rule';
 import OpBadge from '../action-row/components/op-badge';
@@ -34,6 +35,11 @@ const EmptyActionRow = ({
     } as RuleField,
   ];
   const [expressions, setExpressions] = useState(emptyExpressions);
+
+  const ref = useRef<HTMLDivElement>(null);
+  useEffectOnce(() => {
+    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 
   const handleToggleOp = (index: number) => (newOp: RuleOp) => {
     setExpressions(currentExpressions => {
@@ -96,6 +102,7 @@ const EmptyActionRow = ({
 
   return (
     <RulesListEmptyItem
+      ref={ref}
       role="row"
       aria-label={t('action-row.empty-aria-label')}
     >
