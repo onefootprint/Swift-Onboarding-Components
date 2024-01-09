@@ -197,7 +197,7 @@ async fn make_decision(
         .ok_or(ApiError::from(ApiErrorKind::VendorRequestsFailed))?;
     let vres_id = vendor_result.verification_result_id.clone();
     let risk_signals: RiskSignalGroupStruct<Kyc> =
-        parse_reason_codes_from_vendor_result(vendor_result.clone(), vw, obc)?.kyc;
+        parse_reason_codes_from_vendor_result(vendor_result.clone(), &vw, &obc)?.kyc;
 
     state
         .db_pool

@@ -248,7 +248,7 @@ pub fn calculate_decision(
     rule_group: KycRuleGroup,
 ) -> ApiResult<OnboardingRulesDecisionOutput> {
     let risk_signals = RiskSignalsForDecision {
-        kyc: Some(parse_reason_codes_from_vendor_result(vendor_result, vw, obc)?.kyc),
+        kyc: Some(parse_reason_codes_from_vendor_result(vendor_result, &vw, &obc)?.kyc),
         ..Default::default()
     };
     let decision = rule_group.evaluate(

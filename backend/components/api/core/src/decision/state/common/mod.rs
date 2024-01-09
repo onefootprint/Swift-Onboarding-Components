@@ -300,8 +300,8 @@ pub fn get_aml_risk_signals_from_aml_call(
 }
 
 pub fn get_aml_risk_signals_from_kyc_call(
-    obc: ObConfiguration,
-    vw: VaultWrapper,
+    obc: &ObConfiguration,
+    vw: &VaultWrapper,
     kyc_vendor_result: VendorResult,
 ) -> ApiResult<RiskSignalGroupStruct<Aml>> {
     decision::features::risk_signals::parse_reason_codes_from_vendor_result(kyc_vendor_result, vw, obc)

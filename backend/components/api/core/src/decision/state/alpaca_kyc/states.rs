@@ -184,7 +184,7 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
                     group: risk_signal_group_struct::Kyc,
                 }
             } else {
-                parse_reason_codes_from_vendor_result(vendor_result.clone(), vw, obc)?.kyc
+                parse_reason_codes_from_vendor_result(vendor_result.clone(), &vw, &obc)?.kyc
             };
 
         save_risk_signals(conn, &self.sv_id, &risk_signals, false)?;

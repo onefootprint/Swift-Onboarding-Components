@@ -78,6 +78,8 @@ pub enum BoolFlag<'a> {
     UseBackupTwilioCredentials(&'a str),
     #[strum(to_string = "IsRulesProductEnabled")]
     IsRulesProductEnabled(&'a TenantId),
+    #[strum(to_string = "MakeLexisCall")]
+    MakeLexisCall(&'a TenantId),
 }
 
 impl<'a> BoolFlag<'a> {
@@ -124,6 +126,7 @@ impl<'a> BoolFlag<'a> {
             Self::StepUpOnAmlHit(k) => Some(k.to_string()),
             Self::UseBackupTwilioCredentials(k) => Some(k.to_string()),
             Self::IsRulesProductEnabled(k) => Some(k.to_string()),
+            Self::MakeLexisCall(k) => Some(k.to_string()),
         }
     }
 
@@ -166,6 +169,7 @@ impl<'a> BoolFlag<'a> {
             Self::StepUpOnAmlHit(_) => false,
             Self::UseBackupTwilioCredentials(_) => false,
             Self::IsRulesProductEnabled(_) => false,
+            Self::MakeLexisCall(_) => false,
         }
     }
 }

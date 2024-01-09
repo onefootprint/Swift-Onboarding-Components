@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::decision::vendor::{
-    get_vendor_apis_for_verification_requests, make_request,
+    get_vendor_apis_for_verification_requests, kyc, make_request,
     tenant_vendor_control::TenantVendorControl,
     vendor_result::{HydratedVerificationResult, RequestAndMaybeHydratedResult, VendorResult},
     VendorAPIError,
@@ -114,9 +114,20 @@ pub async fn run_kyc_waterfall(
         .feature_flag_client
         .flag(BoolFlag::IsKycWaterfallOnRuleFailureEnabled(&tenant_id))
     {
-        WaterfallRuleConfig::Enabled { vw, obc }
+        WaterfallRuleConfig::Enabled {
+            vw: vw.clone(),
+            obc: obc.clone(),
+        }
     } else {
         WaterfallRuleConfig::Disabled
+    };
+
+    // best effort call Lexis but don't use results for anything
+    match kyc::lexis::maybe_shadow_call_lexis(state, &tvc, &sv_id, &di_id, &obc, &vw).await {
+        Ok(_) => {}
+        Err(err) => {
+            tracing::error!(?err, "Error shadow calling Lexis");
+        }
     };
 
     waterfall_loop(
@@ -236,7 +247,7 @@ fn get_successful_vendor_responses(
         .collect()
 }
 
-enum Action {
+pub(super) enum Action {
     Done,
     MakeCall,
     TryNextVendor,
@@ -276,7 +287,7 @@ fn next_action(
                         WaterfallRuleConfig::Disabled => Action::Done,
                         WaterfallRuleConfig::Enabled { vw, obc } => {
                             // mb unnecessary and could `?` here but for now to be a bit safer, just log error and default to `Done` if there is an error in rule eval
-                            match eval_rules(vr, vw, obc) {
+                            match eval_rules(vr, &vw, &obc) {
                                 Ok(action) => action,
                                 Err(_) => Action::Done,
                             }
@@ -293,7 +304,9 @@ fn next_action(
 }
 
 #[tracing::instrument(skip_all)]
-fn eval_rules(res: VendorResult, vw: VaultWrapper, obc: ObConfiguration) -> ApiResult<Action> {
+pub(super) fn eval_rules(res: VendorResult, vw: &VaultWrapper, obc: &ObConfiguration) -> ApiResult<Action> {
+    let vendor_api = res.vendor_api();
+    let vault_id = vw.vault.id.clone();
     // this does a lot of unnecessary stuff and has a lot of layers of unnecessary indirection but unfortunately this is the safest way to produce risk signals here without diverging too much from how other code paths do this
     let reason_codes = decision::features::risk_signals::parse_reason_codes_from_vendor_result(res, vw, obc)?
         .kyc
@@ -317,6 +330,11 @@ fn eval_rules(res: VendorResult, vw: VaultWrapper, obc: ObConfiguration) -> ApiR
         decision::rule_engine::eval::evaluate_rule_set(rules, &reason_codes, true);
 
     tracing::info!(
+        %vendor_api,
+        %vault_id,
+        tenant_id=%obc.tenant_id,
+        obc_id=%obc.id,
+        obc_key=%obc.key,
         ?rule_results,
         ?action_triggered,
         ?reason_codes,

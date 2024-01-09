@@ -197,7 +197,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                     group: Kyc,
                 }
             } else {
-                parse_reason_codes_from_vendor_result(kyc_vendor_result.clone(), vw.clone(), obc.clone())?.kyc
+                parse_reason_codes_from_vendor_result(kyc_vendor_result.clone(), &vw, &obc)?.kyc
                 // TODO: only call this once and re-use for aml portion below
             };
             save_risk_signals(conn, &self.sv_id, &kyc_risk_signals, false)?;
@@ -224,7 +224,7 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             };
             save_risk_signals(conn, &self.sv_id, &aml_risk_signals, false)?;
         } else if let Some(kyc_vendor_result) = kyc_vendor_result {
-            let aml_risk_signals = common::get_aml_risk_signals_from_kyc_call(obc, vw, kyc_vendor_result)?;
+            let aml_risk_signals = common::get_aml_risk_signals_from_kyc_call(&obc, &vw, kyc_vendor_result)?;
             save_risk_signals(conn, &self.sv_id, &aml_risk_signals, false)?;
         };
 

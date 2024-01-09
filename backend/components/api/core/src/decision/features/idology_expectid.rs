@@ -41,7 +41,7 @@ impl IDologyFeatures {
     pub fn from(
         resp: ExpectIDResponse,
         verification_result_id: VerificationResultId, // TODO: rm or just rm IDologyFeatures in general
-        vw: VaultWrapper,
+        vw: &VaultWrapper,
     ) -> Self {
         let dob_submitted = vw.has_field(IdentityDataKind::AddressLine1);
         let ssn_submitted = vw.has_field(IdentityDataKind::Ssn4) || vw.has_field(IdentityDataKind::Ssn9);
@@ -226,7 +226,7 @@ impl
         Ok(IDologyFeatures::from(
             f.clone(),
             ids.verification_result_id.clone(),
-            vw,
+            &vw,
         ))
     }
 }

@@ -50,6 +50,10 @@ impl TenantVendorControl {
     }
 
     // Accessors
+    pub fn tenant_id(&self) -> TenantId {
+        self.tenant_id.clone()
+    }
+
     pub fn idology_credentials(&self) -> IdologyCredentials {
         self.idology_credentials.clone()
     }

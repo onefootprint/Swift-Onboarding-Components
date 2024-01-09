@@ -105,9 +105,9 @@ pub struct ParsedFootprintReasonCodes {
 }
 
 pub fn parse_reason_codes_from_vendor_result(
-    vendor_result: VendorResult,
-    vw: VaultWrapper,
-    obc: ObConfiguration,
+    vendor_result: VendorResult, // TODO: this could be VendorResponse later when vres_id is removed from here
+    vw: &VaultWrapper,
+    obc: &ObConfiguration,
 ) -> ApiResult<ParsedFootprintReasonCodes> {
     let vendor_api: VendorAPI = (&vendor_result.response.response).into();
     let vres_id = vendor_result.verification_result_id.clone();
@@ -138,11 +138,11 @@ pub fn parse_reason_codes_from_vendor_result(
 
 fn parse_reason_codes(
     vendor_result: VendorResult,
-    vw: VaultWrapper,
-    obc: ObConfiguration,
+    vw: &VaultWrapper,
+    obc: &ObConfiguration,
 ) -> Vec<FootprintReasonCode> {
     // Risk Signals that should be created for every *KYC* vendor, based purely on data in vault + obc
-    let user_input_risk_signals = user_input_based_risk_signals(&vw, &obc);
+    let user_input_risk_signals = user_input_based_risk_signals(vw, obc);
 
     match vendor_result.response.response {
         ParsedResponse::IDologyExpectID(r) => {
