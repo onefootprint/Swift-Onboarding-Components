@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { OnboardingConfig } from '@onefootprint/types';
-import { RoleScopeKind } from '@onefootprint/types';
+import { OnboardingConfigKind, RoleScopeKind } from '@onefootprint/types';
 import { Dropdown, Stack } from '@onefootprint/ui';
 import React, { useRef } from 'react';
 import PermissionGate from 'src/components/permission-gate';
@@ -18,11 +18,13 @@ type ActionsProps = {
 };
 
 const Actions = ({ playbook }: ActionsProps) => {
-  const { name, status } = playbook;
+  const { name, status, kind } = playbook;
   const { t } = useTranslation('pages.playbooks.table.actions');
   const statusRef = useRef<StatusHandler>(null);
   const editNameRef = useRef<EditNameHandler>(null);
   const copyLinkRef = useRef<CopyLinkHandler>(null);
+  const canShowLink =
+    kind === OnboardingConfigKind.kyc || kind === OnboardingConfigKind.kyb;
 
   const handleToggleStatus = () => {
     statusRef.current?.toggle();
@@ -48,12 +50,14 @@ const Actions = ({ playbook }: ActionsProps) => {
           </Dropdown.Trigger>
         </PermissionGate>
         <Dropdown.Content align="end">
-          <Dropdown.Item
-            onSelect={copyLinkToClipboard}
-            onClick={event => event.stopPropagation()}
-          >
-            {t('get-link.cta')}
-          </Dropdown.Item>
+          {canShowLink && (
+            <Dropdown.Item
+              onSelect={copyLinkToClipboard}
+              onClick={event => event.stopPropagation()}
+            >
+              {t('get-link.cta')}
+            </Dropdown.Item>
+          )}
           <Dropdown.Item
             onSelect={launchEditName}
             onClick={event => event.stopPropagation()}

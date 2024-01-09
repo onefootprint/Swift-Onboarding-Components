@@ -17,15 +17,17 @@ export type RowProps = {
 const Row = ({ playbook }: RowProps) => {
   const { t } = useTranslation('pages.playbooks.table.row');
   const { formatDateWithTime } = useIntl();
-  const { name, key, status, createdAt } = playbook;
+  const { name, key, status, createdAt, kind } = playbook;
   const { sandbox } = useOrgSession();
+  const canShowLink =
+    kind === OnboardingConfigKind.kyc || kind === OnboardingConfigKind.kyb;
 
   return (
     <>
       <td>
         {sandbox.isSandbox ? (
           <IndicatorContainer>
-            {status === 'enabled' ? (
+            {status === 'enabled' && canShowLink ? (
               <LinkButton
                 href={`${DEMO_BASE_URL}/preview?ob_key=${key}`}
                 iconComponent={IcoArrowTopRight24}
