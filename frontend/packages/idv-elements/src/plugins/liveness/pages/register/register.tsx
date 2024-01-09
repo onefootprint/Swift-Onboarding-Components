@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
+import styled from '@onefootprint/styled';
 import { Box, Button } from '@onefootprint/ui';
 import React from 'react';
 
@@ -43,24 +44,35 @@ const Register = () => {
   };
 
   return (
-    <Box>
-      <NavigationHeader />
-      <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-      {biometricInitMutation.isSuccess ? (
-        <LivenessSuccess />
-      ) : (
-        <Button
-          loading={biometricInitMutation.isLoading}
-          disabled={biometricInitMutation.isLoading}
-          onClick={handleClick}
-          fullWidth
-          sx={{ marginTop: 8 }}
-        >
-          {t('cta')}
-        </Button>
-      )}
-    </Box>
+    <Container>
+      <Box>
+        <NavigationHeader />
+        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+        {biometricInitMutation.isSuccess ? (
+          <LivenessSuccess />
+        ) : (
+          <Button
+            loading={biometricInitMutation.isLoading}
+            disabled={biometricInitMutation.isLoading}
+            onClick={handleClick}
+            fullWidth
+            sx={{ marginTop: 8 }}
+          >
+            {t('cta')}
+          </Button>
+        )}
+      </Box>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+  text-align: center;
+`;
 
 export default Register;

@@ -1,5 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { HeaderTitle, NavigationHeader } from '@onefootprint/idv-elements';
+import styled from '@onefootprint/styled';
+import { Box } from '@onefootprint/ui';
 import React from 'react';
 
 import useHandoffMachine from '../../hooks/use-handoff-machine';
@@ -10,16 +12,27 @@ const Canceled = () => {
   const { t } = useTranslation('pages.canceled');
 
   return (
-    <>
-      <NavigationHeader />
-      <HeaderTitle
-        title={t('title')}
-        subtitle={
-          opener === 'mobile' ? t('subtitle.mobile') : t('subtitle.desktop')
-        }
-      />
-    </>
+    <Container>
+      <Box>
+        <NavigationHeader />
+        <HeaderTitle
+          title={t('title')}
+          subtitle={
+            opener === 'mobile' ? t('subtitle.mobile') : t('subtitle.desktop')
+          }
+        />
+      </Box>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+  text-align: center;
+`;
 
 export default Canceled;

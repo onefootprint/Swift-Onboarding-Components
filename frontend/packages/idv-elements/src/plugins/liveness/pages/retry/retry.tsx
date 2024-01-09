@@ -1,5 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
+import styled from '@onefootprint/styled';
 import { Button, Grid } from '@onefootprint/ui';
 import React from 'react';
 
@@ -68,38 +69,51 @@ const Retry = () => {
   };
 
   return (
-    <Grid.Container as="form" gap={8}>
-      <NavigationHeader />
-      <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-      {biometricInitMutation.isSuccess ? (
-        <LivenessSuccess />
-      ) : (
-        <Grid.Container gap={4}>
-          <Button
-            onClick={handleRetry}
-            loading={biometricInitMutation.isLoading}
-            disabled={
-              biometricInitMutation.isLoading || skipLivenessMutation.isLoading
-            }
-            fullWidth
-          >
-            {t('cta')}
-          </Button>
-          <Button
-            loading={skipLivenessMutation.isLoading}
-            disabled={
-              biometricInitMutation.isLoading || skipLivenessMutation.isLoading
-            }
-            onClick={handleSkip}
-            fullWidth
-            variant="secondary"
-          >
-            {t('skip')}
-          </Button>
-        </Grid.Container>
-      )}
-    </Grid.Container>
+    <Container>
+      <Grid.Container as="form" gap={8}>
+        <NavigationHeader />
+        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+        {biometricInitMutation.isSuccess ? (
+          <LivenessSuccess />
+        ) : (
+          <Grid.Container gap={4}>
+            <Button
+              onClick={handleRetry}
+              loading={biometricInitMutation.isLoading}
+              disabled={
+                biometricInitMutation.isLoading ||
+                skipLivenessMutation.isLoading
+              }
+              fullWidth
+            >
+              {t('cta')}
+            </Button>
+            <Button
+              loading={skipLivenessMutation.isLoading}
+              disabled={
+                biometricInitMutation.isLoading ||
+                skipLivenessMutation.isLoading
+              }
+              onClick={handleSkip}
+              fullWidth
+              variant="secondary"
+            >
+              {t('skip')}
+            </Button>
+          </Grid.Container>
+        )}
+      </Grid.Container>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+  text-align: center;
+`;
 
 export default Retry;
