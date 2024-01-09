@@ -153,7 +153,7 @@ const Form = ({ html, onSuccess }: FormProps) => {
           Continue
         </Button>
         <OrDivider>
-          <StyledDivider />
+          <Divider />
           <Typography variant="body-3" color="tertiary">
             or
           </Typography>
@@ -209,10 +209,6 @@ const InputsContainer = styled.div`
 
     > * {
       width: 100%;
-      /* patch to fix a bug happening to the phone input positioning absolutely without apparent reason */
-      && {
-        position: relative;
-      }
     }
   `}
 `;
@@ -235,12 +231,6 @@ const OrDivider = styled.div`
       line-height: 1;
     }
   `}
-`;
-
-const StyledDivider = styled(Divider)`
-  position: absolute;
-  top: 50%;
-  width: 100%;
 `;
 
 export default Form;
