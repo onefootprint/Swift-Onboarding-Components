@@ -7,7 +7,7 @@ import {
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
 import { useTranslation } from '@onefootprint/hooks';
-import { Logger } from '@onefootprint/idv-elements';
+import { Logger } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';

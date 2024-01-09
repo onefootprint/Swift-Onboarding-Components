@@ -1,5 +1,5 @@
 import type { FootprintVariant } from '@onefootprint/footprint-js';
-import { Layout as AppLayout } from '@onefootprint/idv-elements';
+import { Layout as AppLayout } from '@onefootprint/idv';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import React from 'react';
 

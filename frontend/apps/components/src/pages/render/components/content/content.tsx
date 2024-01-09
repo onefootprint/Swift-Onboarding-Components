@@ -1,6 +1,6 @@
 import type { FootprintRenderDataProps } from '@onefootprint/footprint-js';
 import { useTranslation } from '@onefootprint/hooks';
-import { Logger } from '@onefootprint/idv-elements';
+import { Logger } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import type { DataIdentifier } from '@onefootprint/types';
 import React, { useEffect, useState } from 'react';

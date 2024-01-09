@@ -1,9 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { HeaderTitle, NavigationHeader } from '@onefootprint/idv-elements';
 import React from 'react';
 
+import { HeaderTitle, NavigationHeader } from '../../components';
+
 const ConfigInvalid = () => {
-  const { t } = useTranslation('pages.config-invalid');
+  const { t } = useTranslation('global.pages.config-invalid');
 
   return (
     <>

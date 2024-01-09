@@ -1,4 +1,4 @@
-import { validateBootstrapData } from '@onefootprint/idv-elements';
+import { validateBootstrapData } from '@onefootprint/idv';
 import partial from 'lodash/fp/partial';
 import React, { useMemo } from 'react';
 import { useEffectOnce } from 'usehooks-ts';

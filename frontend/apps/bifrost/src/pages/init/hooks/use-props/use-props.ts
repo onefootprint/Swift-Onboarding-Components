@@ -5,7 +5,7 @@ import {
   hasInvalidHashFragment,
   Logger,
   useFootprintProvider,
-} from '@onefootprint/idv-elements';
+} from '@onefootprint/idv';
 import noop from 'lodash/noop';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';

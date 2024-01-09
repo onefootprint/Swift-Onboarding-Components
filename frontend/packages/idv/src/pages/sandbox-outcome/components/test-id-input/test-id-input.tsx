@@ -22,7 +22,7 @@ import InlineButton from '../inline-button';
 import InlineButtonsLayout from '../inline-buttons-layout';
 
 const TestIdInput = () => {
-  const { t } = useTranslation('pages.sandbox-outcome');
+  const { t } = useTranslation('global.pages.sandbox-outcome');
   const [idInputLocked, setIdInputLocked] = useState(true);
   const {
     register,

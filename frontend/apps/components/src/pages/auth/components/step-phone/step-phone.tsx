@@ -1,10 +1,6 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
-import {
-  checkIsPhoneValid,
-  EmailPreview,
-  PhoneForm,
-} from '@onefootprint/idv-elements';
+import { checkIsPhoneValid, EmailPreview, PhoneForm } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';

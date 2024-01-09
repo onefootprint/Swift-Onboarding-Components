@@ -1,4 +1,4 @@
-import type { DeviceInfo } from '@onefootprint/idv-elements';
+import type { DeviceInfo } from '@onefootprint/idv';
 import type {
   ChallengeData,
   ChallengeKind,

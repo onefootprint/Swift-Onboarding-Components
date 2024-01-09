@@ -13,7 +13,7 @@ type RealOutcomeProps = {
 };
 
 const RealOutcome = ({ onSelect, isSelected }: RealOutcomeProps) => {
-  const { t } = useTranslation('pages.sandbox-outcome.id-doc-outcome');
+  const { t } = useTranslation('global.pages.sandbox-outcome.id-doc-outcome');
   const {
     idDocOutcomeOptions: { idDocOutcomeReal },
   } = useSandboxOutcomeOptions();

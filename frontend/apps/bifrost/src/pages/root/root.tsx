@@ -2,13 +2,12 @@ import getCustomAppearance from '@onefootprint/appearance';
 import { useObserveCollector } from '@onefootprint/dev-tools';
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import { LAUNCH_DARKLY_CLIENT_SIDE_ID } from '@onefootprint/global-constants';
-import Idv from '@onefootprint/idv';
-import {
+import Idv, {
   AppErrorBoundary,
   Logger,
   useFootprintProvider,
   useLogStateMachine,
-} from '@onefootprint/idv-elements';
+} from '@onefootprint/idv';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import { withLDProvider } from 'launchdarkly-react-client-sdk';
 import * as LogRocket from 'logrocket';

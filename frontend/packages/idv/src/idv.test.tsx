@@ -1,7 +1,6 @@
 /* eslint-disable jest/expect-expect */
 import themes from '@onefootprint/design-tokens';
 import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
-import { Layout } from '@onefootprint/idv-elements';
 import {
   createUseRouterSpy,
   render,
@@ -25,6 +24,7 @@ import {
 } from '@tanstack/react-query';
 import React from 'react';
 
+import { Layout } from './components';
 import Idv from './idv';
 import {
   authorizeData,

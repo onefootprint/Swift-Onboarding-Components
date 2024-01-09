@@ -1,6 +1,6 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IcoFaceid24 } from '@onefootprint/icons';
-import { getBiometricChallengeResponse } from '@onefootprint/idv-elements';
+import { getBiometricChallengeResponse } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import type { LoginChallengeResponse } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';

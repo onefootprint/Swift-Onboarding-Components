@@ -1,6 +1,5 @@
-import { useGetOnboardingConfig } from '@onefootprint/idv-elements';
-
-import useIdvMachine from '../../../hooks/use-idv-machine';
+import { useGetOnboardingConfig } from '../../../hooks';
+import useIdvMachine from '../../../hooks/ui/use-idv-machine';
 
 const useIsKyb = () => {
   const [state] = useIdvMachine();

@@ -3,7 +3,7 @@ import {
   ObserveCollectorProvider,
   useObserveCollector,
 } from '@onefootprint/dev-tools';
-import { Logger } from '@onefootprint/idv-elements';
+import { Logger } from '@onefootprint/idv';
 import * as LogRocket from 'logrocket';
 import type { GetServerSideProps } from 'next';
 import React, { Suspense } from 'react';

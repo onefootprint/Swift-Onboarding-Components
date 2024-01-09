@@ -1,5 +1,5 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
-import { EmailForm, LegalFooter } from '@onefootprint/idv-elements';
+import { EmailForm, LegalFooter } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import React from 'react';
 

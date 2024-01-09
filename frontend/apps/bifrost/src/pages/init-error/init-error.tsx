@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { HeaderTitle, NavigationHeader } from '@onefootprint/idv-elements';
+import { HeaderTitle, NavigationHeader } from '@onefootprint/idv';
 import React from 'react';
 
 const InitError = () => {

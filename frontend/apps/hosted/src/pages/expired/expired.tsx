@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { HeaderTitle } from '@onefootprint/idv-elements';
+import { HeaderTitle } from '@onefootprint/idv';
 import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React from 'react';

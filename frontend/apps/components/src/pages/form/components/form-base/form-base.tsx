@@ -3,7 +3,7 @@ import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
 import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoBuilding24, IcoCreditcard24 } from '@onefootprint/icons';
-import { Logger } from '@onefootprint/idv-elements';
+import { Logger } from '@onefootprint/idv';
 import styled, { css } from '@onefootprint/styled';
 import { Divider, useConfirmationDialog } from '@onefootprint/ui';
 import React, { useEffect } from 'react';

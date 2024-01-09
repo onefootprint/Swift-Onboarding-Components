@@ -1,5 +1,5 @@
 import type { FootprintVariant } from '@onefootprint/footprint-js';
-import { Layout as AppLayout } from '@onefootprint/idv-elements';
+import { Layout as AppLayout } from '@onefootprint/idv';
 import styled from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import React from 'react';

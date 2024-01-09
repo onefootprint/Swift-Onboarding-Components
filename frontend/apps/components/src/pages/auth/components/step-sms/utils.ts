@@ -1,5 +1,5 @@
 import type { T } from '@onefootprint/hooks';
-import { getScrubbedPhoneNumber } from '@onefootprint/idv-elements';
+import { getScrubbedPhoneNumber } from '@onefootprint/idv';
 import type {
   ChallengeData,
   Identifier as IdvIdentifier,

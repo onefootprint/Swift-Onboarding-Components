@@ -4,7 +4,7 @@ import {
   useObserveCollector,
 } from '@onefootprint/dev-tools';
 import type { FootprintVariant } from '@onefootprint/footprint-js';
-import { Logger } from '@onefootprint/idv-elements';
+import { Logger } from '@onefootprint/idv';
 import type { FootprintAppearance } from '@onefootprint/types';
 import * as LogRocket from 'logrocket';
 import type { GetServerSideProps } from 'next';

@@ -3,13 +3,13 @@ import {
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
 import { useTranslation } from '@onefootprint/hooks';
-import type { DeviceInfo } from '@onefootprint/idv-elements';
+import type { DeviceInfo } from '@onefootprint/idv';
 import {
   getIdentifyBootstrapData,
   getRandomID,
   Logger,
   useDeviceInfo,
-} from '@onefootprint/idv-elements';
+} from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';

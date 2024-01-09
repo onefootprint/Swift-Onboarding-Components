@@ -1,5 +1,5 @@
 import { IcoClose16 } from '@onefootprint/icons';
-import { WhatsThisContent } from '@onefootprint/idv-elements';
+import { WhatsThisContent } from '@onefootprint/idv';
 import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { createFontStyles, IconButton, Stack } from '@onefootprint/ui';

@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IdDocOutcome, OverallOutcome } from '@onefootprint/types';
 
 const useSandboxOutcomeOptions = () => {
-  const { t } = useTranslation('pages.sandbox-outcome');
+  const { t } = useTranslation('global.pages.sandbox-outcome');
 
   const overallOutcomeSuccess = {
     label: t('overall-outcome.outcome.options.success.title'),

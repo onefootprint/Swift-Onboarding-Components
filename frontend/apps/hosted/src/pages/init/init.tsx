@@ -1,6 +1,6 @@
 import { useObserveCollector } from '@onefootprint/dev-tools';
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { Logger, useGetOnboardingConfig } from '@onefootprint/idv-elements';
+import { Logger, useGetOnboardingConfig } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import type { BusinessResponse, ObConfigAuth } from '@onefootprint/types';

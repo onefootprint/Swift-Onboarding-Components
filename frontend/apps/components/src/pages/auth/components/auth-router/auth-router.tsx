@@ -1,5 +1,5 @@
-import type { NavigationHeaderLeftButtonProps } from '@onefootprint/idv-elements';
-import { StepHeader } from '@onefootprint/idv-elements';
+import type { NavigationHeaderLeftButtonProps } from '@onefootprint/idv';
+import { StepHeader } from '@onefootprint/idv';
 import React, { useEffect } from 'react';
 
 import type { AuthMachineHook, MachineContext } from '../../state';

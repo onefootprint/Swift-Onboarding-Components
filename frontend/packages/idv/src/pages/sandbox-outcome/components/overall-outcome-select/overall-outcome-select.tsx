@@ -13,7 +13,7 @@ type OverallOutcomeSelectProps = {
 };
 
 const OverallOutcomeSelect = ({ config }: OverallOutcomeSelectProps) => {
-  const { t } = useTranslation('pages.sandbox-outcome.overall-outcome');
+  const { t } = useTranslation('global.pages.sandbox-outcome.overall-outcome');
   const {
     overallOutcomeOptions: {
       overallOutcomeSuccess,

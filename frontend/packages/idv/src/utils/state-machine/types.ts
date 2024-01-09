@@ -1,4 +1,3 @@
-import type { DeviceInfo } from '@onefootprint/idv-elements';
 import type {
   IdDocOutcome,
   IdvBootstrapData,
@@ -6,6 +5,8 @@ import type {
   OverallOutcome,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
+
+import type { DeviceInfo } from '../../hooks';
 
 export type MachineContext = {
   // Inputs

@@ -1,8 +1,8 @@
-import type { DeviceInfo } from '@onefootprint/idv-elements';
+import type { DeviceInfo } from '@onefootprint/idv';
 import {
   getCanChallengeBiometrics,
   shouldChallengeEmail,
-} from '@onefootprint/idv-elements';
+} from '@onefootprint/idv';
 import type { ObConfigAuth, PublicOnboardingConfig } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 

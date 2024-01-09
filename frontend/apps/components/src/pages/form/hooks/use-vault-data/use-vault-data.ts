@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { Logger } from '@onefootprint/idv-elements';
+import { Logger } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import type { DataIdentifier, UsersVaultRequest } from '@onefootprint/types';
 import type { AxiosError } from 'axios';

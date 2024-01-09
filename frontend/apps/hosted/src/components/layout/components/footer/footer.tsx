@@ -1,6 +1,6 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { SecuredByFootprint } from '@onefootprint/idv-elements';
+import { SecuredByFootprint } from '@onefootprint/idv';
 import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { media, Typography } from '@onefootprint/ui';

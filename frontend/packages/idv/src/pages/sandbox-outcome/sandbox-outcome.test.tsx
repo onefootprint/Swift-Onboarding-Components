@@ -1,4 +1,3 @@
-import { Layout } from '@onefootprint/idv-elements';
 import {
   customRender,
   fireEvent,
@@ -17,7 +16,8 @@ import {
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 
-import configureI18next from '../../config/initializers/react-i18next';
+import { Layout } from '../../components';
+import configureI18next from '../../config/initializers/i18next';
 import SandboxOutcomeContainer from './components/sandbox-outcome-container';
 import type { SandboxOutcomeFormData } from './types';
 

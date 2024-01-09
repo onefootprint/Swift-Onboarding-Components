@@ -1,5 +1,5 @@
 import type { FootprintVerifyDataProps } from '@onefootprint/footprint-js';
-import { Logger } from '@onefootprint/idv-elements';
+import { Logger } from '@onefootprint/idv';
 
 const FRAGMENT_DIVIDER = '__';
 

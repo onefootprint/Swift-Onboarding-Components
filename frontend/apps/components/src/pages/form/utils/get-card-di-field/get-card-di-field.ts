@@ -1,4 +1,4 @@
-import { Logger } from '@onefootprint/idv-elements';
+import { Logger } from '@onefootprint/idv';
 import type { CardDIField } from '@onefootprint/types';
 
 const getCardDIField = (di: string): CardDIField | null => {

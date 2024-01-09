@@ -1,6 +1,6 @@
 import type { FootprintVerifyDataProps } from '@onefootprint/footprint-js';
-import type { ProviderReturn } from '@onefootprint/idv-elements';
-import { isValidTokenFormat } from '@onefootprint/idv-elements';
+import type { ProviderReturn } from '@onefootprint/idv';
+import { isValidTokenFormat } from '@onefootprint/idv';
 import type { RequestError } from '@onefootprint/request';
 import request from '@onefootprint/request';
 import type { PublicOnboardingConfig } from '@onefootprint/types';

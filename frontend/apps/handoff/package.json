@@ -24,7 +24,6 @@
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",
     "@onefootprint/idv": "*",
-    "@onefootprint/idv-elements": "*",
     "@onefootprint/request": "*",
     "@onefootprint/styled": "*",
     "@onefootprint/types": "*",

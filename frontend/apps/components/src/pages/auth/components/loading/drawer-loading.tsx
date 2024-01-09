@@ -1,4 +1,4 @@
-import { FullHeightContainer } from '@onefootprint/idv-elements';
+import { FullHeightContainer } from '@onefootprint/idv';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
 

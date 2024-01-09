@@ -1,4 +1,4 @@
-import { Logger } from '@onefootprint/idv-elements';
+import { Logger } from '@onefootprint/idv';
 
 const checkIsExpired = (expiresAt?: Date) => {
   if (!expiresAt) {

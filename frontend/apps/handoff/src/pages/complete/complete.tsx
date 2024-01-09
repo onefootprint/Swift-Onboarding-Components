@@ -3,7 +3,7 @@ import {
   HeaderTitle,
   NavigationHeader,
   useUpdateD2PStatus,
-} from '@onefootprint/idv-elements';
+} from '@onefootprint/idv';
 import styled from '@onefootprint/styled';
 import { D2PStatusUpdate } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';

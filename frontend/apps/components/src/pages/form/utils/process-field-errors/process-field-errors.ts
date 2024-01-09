@@ -1,4 +1,4 @@
-import { Logger } from '@onefootprint/idv-elements';
+import { Logger } from '@onefootprint/idv';
 import type { DataIdentifier } from '@onefootprint/types';
 import { CardDIField } from '@onefootprint/types';
 

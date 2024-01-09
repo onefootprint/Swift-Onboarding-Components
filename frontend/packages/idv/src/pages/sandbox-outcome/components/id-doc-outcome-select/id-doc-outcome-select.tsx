@@ -11,7 +11,7 @@ type IdDocOutcomeSelectProps = {
 };
 
 const IdDocOutcomeSelect = ({ allowRealOutcome }: IdDocOutcomeSelectProps) => {
-  const { t } = useTranslation('pages.sandbox-outcome.id-doc-outcome');
+  const { t } = useTranslation('global.pages.sandbox-outcome.id-doc-outcome');
   const [isSimulated, setIsSimulated] = useState(true);
 
   const outcomeTypeChange = () => {

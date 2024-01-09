@@ -1,4 +1,4 @@
-import { FPCustomEvents, isCustomEvent } from '@onefootprint/idv-elements';
+import { FPCustomEvents, isCustomEvent } from '../../../custom-event';
 
 type Payload = {
   type: 'authTokenChanged';

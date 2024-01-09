@@ -1,8 +1,5 @@
 import type { FootprintVariant } from '@onefootprint/footprint-js';
-import {
-  Layout as AppLayout,
-  useFootprintProvider,
-} from '@onefootprint/idv-elements';
+import { Layout as AppLayout, useFootprintProvider } from '@onefootprint/idv';
 import React from 'react';
 
 import { useBifrostMachine } from '../bifrost-machine-provider';

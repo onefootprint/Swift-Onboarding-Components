@@ -4,7 +4,7 @@ import {
   configureFootprint,
   FootprintProvider,
   Logger,
-} from '@onefootprint/idv-elements';
+} from '@onefootprint/idv';
 import { createGlobalStyle } from '@onefootprint/styled';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';

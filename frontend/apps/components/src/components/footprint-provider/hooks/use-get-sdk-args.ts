@@ -1,4 +1,4 @@
-import { isValidTokenFormat } from '@onefootprint/idv-elements';
+import { isValidTokenFormat } from '@onefootprint/idv';
 import request from '@onefootprint/request';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';

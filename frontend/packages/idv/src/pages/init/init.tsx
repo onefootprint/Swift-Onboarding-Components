@@ -1,16 +1,13 @@
 import { useObserveCollector } from '@onefootprint/dev-tools';
-import type { DeviceInfo } from '@onefootprint/idv-elements';
-import {
-  InitShimmer,
-  Logger,
-  useDeviceInfo,
-  useGetOnboardingConfig,
-} from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import React from 'react';
 
-import useIdvMachine from '../../hooks/use-idv-machine';
+import { InitShimmer } from '../../components';
+import type { DeviceInfo } from '../../hooks';
+import { useDeviceInfo, useGetOnboardingConfig } from '../../hooks';
+import useIdvMachine from '../../hooks/ui/use-idv-machine';
+import { Logger } from '../../utils';
 
 const Init = () => {
   const [state, send] = useIdvMachine();

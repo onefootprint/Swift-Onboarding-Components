@@ -1,8 +1,5 @@
 import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
-import {
-  getSdkArgsToken,
-  hasInvalidHashFragment,
-} from '@onefootprint/idv-elements';
+import { getSdkArgsToken, hasInvalidHashFragment } from '@onefootprint/idv';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import noop from 'lodash/noop';
 import { useRouter } from 'next/router';

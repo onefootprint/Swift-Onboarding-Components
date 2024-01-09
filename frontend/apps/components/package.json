@@ -24,7 +24,7 @@
     "@onefootprint/global-constants": "*",
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",
-    "@onefootprint/idv-elements": "*",
+    "@onefootprint/idv": "*",
     "@onefootprint/postmate": "2.1.0",
     "@onefootprint/request": "*",
     "@onefootprint/styled": "*",

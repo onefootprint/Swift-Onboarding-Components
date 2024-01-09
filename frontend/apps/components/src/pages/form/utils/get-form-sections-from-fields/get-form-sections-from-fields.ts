@@ -1,4 +1,4 @@
-import { Logger } from '@onefootprint/idv-elements';
+import { Logger } from '@onefootprint/idv';
 import { CardDIField } from '@onefootprint/types';
 
 import type { FormSection } from '../../components/form-base';

@@ -1,6 +1,6 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
-import { checkIsPhoneValid, PhoneForm } from '@onefootprint/idv-elements';
+import { checkIsPhoneValid, PhoneForm } from '@onefootprint/idv';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';
 

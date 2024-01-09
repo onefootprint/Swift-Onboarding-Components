@@ -1,24 +1,18 @@
 import type { L10n } from '@onefootprint/footprint-js';
-import {
-  AppErrorBoundary,
-  FPCustomEvents,
-  getIdentifyBootstrapData,
-  Identify,
-  Logger,
-  Onboarding,
-  SessionExpired,
-  useLogStateMachine,
-} from '@onefootprint/idv-elements';
 import { getErrorMessage } from '@onefootprint/request';
 import { SessionStatus } from '@onefootprint/types';
 import React, { useEffect } from 'react';
 
-import useIdvMachine from '../../hooks/use-idv-machine';
-import useValidateSession from '../../hooks/use-validate-session';
+import { AppErrorBoundary, SessionExpired } from '../../components';
+import { useIdvMachine, useLogStateMachine } from '../../hooks';
+import useValidateSession from '../../hooks/ui/use-validate-session';
+import { FPCustomEvents, getIdentifyBootstrapData, Logger } from '../../utils';
 import createAuthTokenChangedPayload from '../../utils/state-machine/utils/custom-listener';
 import Complete from '../complete';
 import ConfigInvalid from '../config-invalid';
+import Identify from '../identify';
 import Init from '../init';
+import Onboarding from '../onboarding';
 import SandboxOutcome from '../sandbox-outcome';
 
 const AUTO_CLOSE_DELAY = 6000;
@@ -114,7 +108,6 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
           bootstrapData={getIdentifyBootstrapData(bootstrapData)}
           showLogo={showLogo}
           onDone={payload => send({ type: 'identifyCompleted', payload })}
-          l10n={l10n}
         />
       )}
       {state.matches('onboarding') && authToken && config && device && (

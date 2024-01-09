@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { EmailForm } from '@onefootprint/idv-elements';
+import { EmailForm } from '@onefootprint/idv';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';
 

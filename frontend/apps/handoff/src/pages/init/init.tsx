@@ -6,7 +6,7 @@ import {
   useGetOnboardingStatus,
   useParseHandoffUrl,
   useUpdateD2PStatus,
-} from '@onefootprint/idv-elements';
+} from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import type {
   GetD2PResponse,

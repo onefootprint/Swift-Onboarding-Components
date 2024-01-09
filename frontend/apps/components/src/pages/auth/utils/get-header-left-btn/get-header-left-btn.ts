@@ -1,5 +1,5 @@
-import type { NavigationHeaderLeftButtonProps } from '@onefootprint/idv-elements';
-import { getCanChallengeBiometrics } from '@onefootprint/idv-elements';
+import type { NavigationHeaderLeftButtonProps } from '@onefootprint/idv';
+import { getCanChallengeBiometrics } from '@onefootprint/idv';
 
 import type { AuthMachineHook } from '../../state';
 
