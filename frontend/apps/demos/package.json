@@ -25,7 +25,7 @@
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
     "@sentry/nextjs": "^7.91.0",
-    "@tryghost/content-api": "^1.11.5",
+    "@tryghost/content-api": "^1.11.20",
     "google-libphonenumber": "^3.2.32",
     "isemail": "^3.2.0",
     "lodash": "^4.17.21",

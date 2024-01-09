@@ -15,20 +15,19 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
-    "@onefootprint/types": "*",
     "@onefootprint/design-tokens": "*",
     "@onefootprint/dev-tools": "*",
     "@onefootprint/jest-presets": "*",
-    "@types/axios": "^0.14.0",
-    "axios-case-converter": "^0.9.0",
-    "axios": "^1.2.1",
+    "@onefootprint/types": "*",
+    "axios": "^1.6.5",
+    "axios-case-converter": "^1.1.0",
     "eslint-config-footprint": "*",
     "tsconfig": "*",
     "typescript": "4.9.5"
   },
   "peerDependencies": {
-    "axios": "^1.2.1",
-    "axios-case-converter": "^0.9.0"
+    "axios": "^1.6.5",
+    "axios-case-converter": "^1.1.0"
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web"
