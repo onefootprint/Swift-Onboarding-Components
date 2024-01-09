@@ -52,7 +52,16 @@ const useHandleCameraError = () => {
       // other errors
       showErrorToast(t('other-error'));
     }
-    Logger.error(`Camera error: ${err}`, 'camera');
+
+    // Do not log permission errors since they create too much noise
+    if (
+      error.name === 'NotAllowedError' ||
+      error.name === 'PermissionDeniedError'
+    ) {
+      Logger.warn(`Camera error: ${err}`, 'camera');
+    } else {
+      Logger.error(`Camera error: ${err}`, 'camera');
+    }
   };
 };
 

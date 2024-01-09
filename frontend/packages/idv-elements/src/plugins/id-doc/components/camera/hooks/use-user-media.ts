@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import Logger from '../../../../../utils/logger';
 import useHandleCameraError from '../../../hooks/use-handle-camera-error';
 import type { CameraKind } from '../utils/get-camera-options';
 import getCameraOptions from '../utils/get-camera-options';
 
 const isUndefined = (x: unknown): x is 'undefined' => typeof x === 'undefined';
-const logError = (e: string) => Logger.error(e, 'camera');
 
 const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
   const onCameraError = useHandleCameraError();
@@ -21,7 +19,6 @@ const useUserMedia = (cameraKind: CameraKind, onError?: () => void) => {
         const stream = await navigator.mediaDevices.getUserMedia(cameraOptions);
         setMediaStream(stream);
       } catch (err) {
-        logError(`Could not initialize media stream. Error: ${err}`);
         onCameraError(err);
         onError?.();
       }
