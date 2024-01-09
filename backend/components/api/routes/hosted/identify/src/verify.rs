@@ -179,13 +179,13 @@ pub async fn post(
 
             let scopes = allowed_user_scopes(vec![event.kind], scope, true);
 
-            let ae = AssociatedAuthEvent::explicit(event.id.clone());
+            let ae = AssociatedAuthEvent::explicit(event.id);
             let data = if let Some(user_auth) = user_auth {
                 // Add the new scopes and args to the existing scopes and args on the auth token
                 user_auth.data.clone().update(args, scopes, Some(ae))?
             } else {
                 // Otherwise, create a new token with these scopes / args
-                UserSession::make(uv_id.clone(), args, scopes, vec![event.id], vec![ae])?
+                UserSession::make(uv_id.clone(), args, scopes, vec![ae])?
             };
             let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
 

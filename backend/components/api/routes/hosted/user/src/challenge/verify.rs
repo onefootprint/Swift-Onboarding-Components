@@ -106,11 +106,11 @@ pub async fn post(
             let (event_kind, passkey_cred_id) =
                 action.register(conn, action_kind, &user_auth, ie.id.clone())?;
 
-            let auth_event_id = user_auth
-                .auth_event_ids
+            let auth_event = user_auth
+                .auth_events
                 .first()
                 .ok_or(AssertionError("No auth events found for user"))?;
-            let existing_auth_event = AuthEvent::get(conn, auth_event_id)?;
+            let existing_auth_event = AuthEvent::get(conn, &auth_event.id)?;
             NewAuthEvent {
                 vault_id: user_auth.user_vault_id().clone(),
                 scoped_vault_id: user_auth.scoped_user_id(),

@@ -9,8 +9,7 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    AuthEventId, AuthEventKind, ObConfigurationId, ScopedVaultId, VaultId, VaultKind, WorkflowId,
-    WorkflowRequestId,
+    AuthEventKind, ObConfigurationId, ScopedVaultId, VaultId, VaultKind, WorkflowId, WorkflowRequestId,
 };
 use paperclip::actix::Apiv2Security;
 
@@ -40,7 +39,6 @@ pub struct UserSessionContext {
     pub(super) wf_id: Option<WorkflowId>,
     pub wfr_id: Option<WorkflowRequestId>,
     pub(super) is_implied_auth: bool,
-    pub auth_event_ids: Vec<AuthEventId>,
     pub auth_events: Vec<AssociatedAuthEvent>,
     /// When true, the auth token was initially issued as an unauthed, identified token
     pub is_from_api: bool,
@@ -53,7 +51,8 @@ impl UserSessionContext {
     }
 
     pub fn auth_events(&self, conn: &mut PgConn) -> ApiResult<Vec<AuthEvent>> {
-        let aes = AuthEvent::get_bulk(conn, &self.auth_event_ids)?;
+        let ids = self.auth_events.iter().map(|e| e.id.clone()).collect_vec();
+        let aes = AuthEvent::get_bulk(conn, &ids)?;
         Ok(aes)
     }
 }
@@ -86,13 +85,8 @@ impl UserSessionContext {
             is_from_api: new_args.is_from_api || self.is_from_api,
             is_implied_auth: new_args.is_implied_auth || self.is_implied_auth,
         };
-        let ae_ids = self
-            .auth_event_ids
-            .into_iter()
-            .chain(new_auth_event.as_ref().map(|e| e.id.clone()))
-            .collect();
         let aes = self.auth_events.into_iter().chain(new_auth_event).collect();
-        UserSession::make(self.user.id, args, new_scopes, ae_ids, aes)
+        UserSession::make(self.user.id, args, new_scopes, aes)
     }
 
     pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {
@@ -161,7 +155,6 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     obc_id,
                     scopes,
                     is_from_api,
-                    auth_event_ids,
                     auth_events,
                     is_implied_auth,
                 } = data;
@@ -207,7 +200,6 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     obc_id,
                     scopes,
                     is_from_api,
-                    auth_event_ids,
                     auth_events,
                     is_implied_auth,
                 };

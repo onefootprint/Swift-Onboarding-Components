@@ -212,8 +212,7 @@ pub async fn post(
                 .into_iter()
                 .map(|e| AssociatedAuthEvent::implicit(e.id))
                 .collect_vec();
-            let event_ids = events.iter().map(|e| e.id.clone()).collect();
-            let data = UserSession::make(sv.vault_id, args, scopes, event_ids, events)?;
+            let data = UserSession::make(sv.vault_id, args, scopes, events)?;
             let (auth_token, session) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             Ok((auth_token, session))
         })

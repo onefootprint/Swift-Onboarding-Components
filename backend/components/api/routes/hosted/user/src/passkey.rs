@@ -128,11 +128,11 @@ pub async fn complete_post(
             let ie = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
             let credential = result.save_credential(conn, &user_auth, ie.id)?;
 
-            let auth_event_id = user_auth
-                .auth_event_ids
+            let auth_event = user_auth
+                .auth_events
                 .first()
                 .ok_or(AssertionError("No auth events found for user"))?;
-            let existing_auth_event = AuthEvent::get(conn, auth_event_id)?;
+            let existing_auth_event = AuthEvent::get(conn, &auth_event.id)?;
 
             // record our registration of a passkey as an auth event
             // this is done here for (a) consistency with SMS first-time registration/auth

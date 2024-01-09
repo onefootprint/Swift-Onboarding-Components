@@ -82,13 +82,14 @@ pub async fn post(
     let validation_token = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
-            if user_auth.auth_event_ids.is_empty() {
+            if user_auth.auth_events.is_empty() {
                 return Err(AssertionError("No auth events found for user").into());
             }
             // Validate as much as possible in this API instead of in the tenant-facing API.
             // If this fails, the user may be able to retry and get a new validation token.
             // But once the tenant has the validation token, they cannot do anything if it fails
-            let auth_events = AuthEvent::get_bulk(conn, &user_auth.auth_event_ids)?;
+            let ae_ids = user_auth.auth_events.iter().map(|e| e.id.clone()).collect_vec();
+            let auth_events = AuthEvent::get_bulk(conn, &ae_ids)?;
             if !auth_events.iter().any(|ae| ae.scoped_vault_id.is_some()) {
                 return Err(AssertionError("Auth event must have scoped vault").into());
             }
@@ -104,7 +105,7 @@ pub async fn post(
             }
             let data = AuthSessionData::ValidateUserToken(ValidateUserToken {
                 sv_id,
-                auth_event_ids: user_auth.auth_event_ids,
+                auth_event_ids: ae_ids,
                 wf_id: wf.map(|wf| wf.id),
             });
             let (validation_token, _) =

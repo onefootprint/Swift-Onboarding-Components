@@ -30,9 +30,6 @@ pub struct UserSession {
     pub wfr_id: Option<WorkflowRequestId>,
     /// Permissions that this auth token is given
     pub scopes: Vec<UserAuthScope>,
-    /// DEPRECATED
-    #[serde(default)]
-    pub auth_event_ids: Vec<AuthEventId>,
     /// The auth events that give this token its permissions
     #[serde(default)]
     pub auth_events: Vec<AssociatedAuthEvent>,
@@ -95,8 +92,6 @@ impl UserSession {
         user_vault_id: VaultId,
         args: UserSessionArgs,
         scopes: Vec<UserAuthScope>,
-        // TODO rm
-        auth_event_ids: Vec<AuthEventId>,
         auth_events: Vec<AssociatedAuthEvent>,
     ) -> ApiResult<AuthSessionData> {
         if scopes.iter().any(|s| matches!(s, UserAuthScope::SignUp)) && args.su_id.is_none() {
@@ -123,7 +118,6 @@ impl UserSession {
             wfr_id,
             scopes,
             is_from_api,
-            auth_event_ids,
             auth_events,
             is_implied_auth,
         });
