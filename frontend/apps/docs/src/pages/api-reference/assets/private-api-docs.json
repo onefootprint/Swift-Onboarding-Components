@@ -6090,17 +6090,15 @@
                             ]
                         }
                     },
-                    "scopes": {
+                    "scope": {
                         "description": "Specify whether this token should be allowed to vault, decrypt, or both",
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "enum": [
-                                "vault",
-                                "decrypt",
-                                "decrypt_download"
-                            ]
-                        }
+                        "type": "string",
+                        "enum": [
+                            "vault",
+                            "decrypt",
+                            "vault_and_decrypt",
+                            "decrypt_download"
+                        ]
                     },
                     "ttl": {
                         "example": 300,
@@ -6111,7 +6109,7 @@
                 },
                 "required": [
                     "fields",
-                    "scopes"
+                    "scope"
                 ]
             },
             "CreateClientTokenResponse": {

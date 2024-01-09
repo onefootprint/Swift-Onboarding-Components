@@ -4,9 +4,22 @@ use crate::*;
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
-pub enum ClientTokenScopeKind {
+pub enum DEPRECATEDClientTokenScopeKind {
     Vault,
     Decrypt,
+    DecryptDownload,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub enum ModernClientTokenScopeKind {
+    /// Allow vaulting the provided fields
+    Vault,
+    /// Allow decrypting the provided fields
+    Decrypt,
+    /// Provide both vault and decrypt permissions
+    VaultAndDecrypt,
+    /// Provides the ability to download the contents of a single DI as a file
     DecryptDownload,
 }
 
@@ -18,8 +31,13 @@ pub struct CreateClientTokenRequest {
     /// Time to live until this token expires, provided in seconds. Defaults to 30 minutes. Must be at least 60 seconds, at most 1 day
     #[openapi(example = "300")]
     pub ttl: Option<u32>,
+    #[openapi(skip)]
+    #[serde(default)]
+    /// DEPRECATED
+    pub scopes: Vec<DEPRECATEDClientTokenScopeKind>,
+    #[openapi(required)]
     /// Specify whether this token should be allowed to vault, decrypt, or both
-    pub scopes: Vec<ClientTokenScopeKind>,
+    pub scope: Option<ModernClientTokenScopeKind>,
     /// If the token is allowed to decrypt, provide a default decryption reason
     pub decrypt_reason: Option<String>,
 }

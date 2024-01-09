@@ -11,11 +11,14 @@ use api_core::auth::CanDecrypt;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::ApiResult;
 use api_core::errors::AssertionError;
+use api_core::errors::ValidationError;
+use api_core::telemetry::RootSpan;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::session::AuthSession;
-use api_wire_types::ClientTokenScopeKind;
 use api_wire_types::CreateClientTokenRequest;
 use api_wire_types::CreateClientTokenResponse;
+use api_wire_types::DEPRECATEDClientTokenScopeKind;
+use api_wire_types::ModernClientTokenScopeKind;
 use chrono::Duration;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
@@ -38,13 +41,41 @@ pub async fn post(
     request: web::Json<CreateClientTokenRequest>,
     // For now, only accept tenant API key
     auth: SecretTenantAuthContext,
+    root_span: RootSpan,
 ) -> JsonApiResponse<CreateClientTokenResponse> {
     let CreateClientTokenRequest {
         fields,
         ttl,
         scopes,
+        scope,
         decrypt_reason,
     } = request.into_inner();
+    if !scopes.is_empty() {
+        root_span.record("meta", "has_old_scopes");
+    } else {
+        root_span.record("meta", "has_modern_scope");
+    }
+    // `scopes` is an old, deprecated representation. Keep this logic to parse `scopes` until old
+    // clients have updated
+    let scopes = match (scope, scopes) {
+        (Some(scope), _) => match scope {
+            ModernClientTokenScopeKind::Vault => vec![DEPRECATEDClientTokenScopeKind::Vault],
+            ModernClientTokenScopeKind::Decrypt => vec![DEPRECATEDClientTokenScopeKind::Decrypt],
+            ModernClientTokenScopeKind::VaultAndDecrypt => {
+                vec![
+                    DEPRECATEDClientTokenScopeKind::Vault,
+                    DEPRECATEDClientTokenScopeKind::Decrypt,
+                ]
+            }
+            ModernClientTokenScopeKind::DecryptDownload => {
+                vec![DEPRECATEDClientTokenScopeKind::DecryptDownload]
+            }
+        },
+        (None, v) if v.is_empty() => {
+            return ValidationError("Missing required field scope").into();
+        }
+        (None, v) => v,
+    };
     let fields = fields.into_iter().collect_vec();
     if fields.is_empty() {
         return Err(TenantError::MustProvideFields.into());
@@ -56,10 +87,10 @@ pub async fn post(
     // this token
     for s in scopes.iter() {
         match s {
-            ClientTokenScopeKind::Decrypt | ClientTokenScopeKind::DecryptDownload => {
+            DEPRECATEDClientTokenScopeKind::Decrypt | DEPRECATEDClientTokenScopeKind::DecryptDownload => {
                 auth.check_one_guard(CanDecrypt::new(fields.clone()))?
             }
-            ClientTokenScopeKind::Vault => auth.check_one_guard(TenantGuard::WriteEntities)?,
+            DEPRECATEDClientTokenScopeKind::Vault => auth.check_one_guard(TenantGuard::WriteEntities)?,
         }
     }
     // Can use Any guard here since we've already checked permissions above
@@ -77,9 +108,9 @@ pub async fn post(
         .into_iter()
         .map(|s| -> ApiResult<_> {
             let result = match s {
-                ClientTokenScopeKind::Decrypt => ClientTenantScope::Decrypt(fields.clone()),
-                ClientTokenScopeKind::Vault => ClientTenantScope::Vault(fields.clone()),
-                ClientTokenScopeKind::DecryptDownload => {
+                DEPRECATEDClientTokenScopeKind::Decrypt => ClientTenantScope::Decrypt(fields.clone()),
+                DEPRECATEDClientTokenScopeKind::Vault => ClientTenantScope::Vault(fields.clone()),
+                DEPRECATEDClientTokenScopeKind::DecryptDownload => {
                     // DecryptDownload scopes have a few other requirements
                     if fields.len() > 1 {
                         return Err(TenantError::OneDecryptDownloadField.into());
