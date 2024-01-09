@@ -294,7 +294,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let execute_rules_for_real_document_decision_only = should_execute_rules_for_document_only(&v, &wf)?;
         let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
 
-        let doc_collected = DocumentRequest::get_identity(conn, &wf.id)?.is_some();
+        let doc_collected = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?.is_some();
         let review_reasons = common::get_review_reasons(&risk_signals, doc_collected, &obc);
         let vres_ids = risk_signals.verification_result_ids();
 
@@ -305,7 +305,8 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
             if execute_rules_for_real_document_decision_only || obc.skip_kyc {
                 decision
             } else {
-                let doc_collected = DocumentRequest::get_identity(conn, &wf.id)?.is_some();
+                let doc_collected =
+                    DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?.is_some();
                 // we'll hopefully support fixturing the post-stepup decision but for now we just always fail with review if we stepped up
                 let fixture_decision =
                     if matches!(fixture_decision.0, DecisionStatus::StepUp) && doc_collected {

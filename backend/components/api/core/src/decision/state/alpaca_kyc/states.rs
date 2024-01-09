@@ -471,7 +471,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
         let is_sandbox = watchlist_res.is_right();
 
         // If we collected a doc, we go to review and fail OBD even if no hits
-        let doc_req = DocumentRequest::get_identity(conn, &self.wf_id)?;
+        let doc_req = DocumentRequest::get(conn, &self.wf_id, DocumentRequestKind::Identity)?;
 
         // TODO: in future could express this as a Rule or at least an engine decision
         let final_decision = if wc_reason_codes.is_empty() && doc_req.is_none() {

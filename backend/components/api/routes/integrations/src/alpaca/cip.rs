@@ -36,9 +36,9 @@ use db::{
 use idv::ParsedResponse;
 use itertools::Itertools;
 use newtypes::{
-    format_pii, pii, DataIdentifier, DecisionStatus, DocumentKind, FootprintReasonCode, FpId, IdDocKind,
-    IdentityDataKind, MatchLevel, OcrDataKind, PiiJsonValue, PiiString, ReviewReason, SignalScope, TenantId,
-    Vendor, VendorAPI,
+    format_pii, pii, DataIdentifier, DecisionStatus, DocumentKind, DocumentRequestKind, FootprintReasonCode,
+    FpId, IdDocKind, IdentityDataKind, MatchLevel, OcrDataKind, PiiJsonValue, PiiString, ReviewReason,
+    SignalScope, TenantId, Vendor, VendorAPI,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use std::collections::HashSet;
@@ -185,8 +185,8 @@ pub(crate) async fn create_cip_request(
                 }
             };
 
-            let collected_document =
-                DocumentRequest::get_identity(conn, &wf.id)?.map(|d| d.should_collect_selfie);
+            let collected_document = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?
+                .map(|d| d.should_collect_selfie);
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             let insight = InsightEvent::get(conn, &wf.id)?;
 

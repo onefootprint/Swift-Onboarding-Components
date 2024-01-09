@@ -25,9 +25,9 @@ use macros::test_state_case;
 use newtypes::{
     incode::{IncodeStatus, IncodeTest},
     CollectedDataOption, CountryRestriction, DecisionIntentKind, DocTypeRestriction, DocVData,
-    DocumentCdoInfo, DocumentSide, IdDocKind, IdentityDocumentStatus, IncodeFailureReason,
-    IncodeVerificationSessionState, PiiString, RiskSignalGroupKind, S3Url, SealedVaultDataKey, Selfie,
-    VendorAPI,
+    DocumentCdoInfo, DocumentRequestKind, DocumentSide, IdDocKind, IdentityDocumentStatus,
+    IncodeFailureReason, IncodeVerificationSessionState, PiiString, RiskSignalGroupKind, S3Url,
+    SealedVaultDataKey, Selfie, VendorAPI,
 };
 
 use super::IncodeContext;
@@ -82,7 +82,8 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
                     .unwrap();
 
             let ie = InsightEvent::get(conn, &wf_id)?.unwrap();
-            let doc_request = DocumentRequest::get_identity(conn.conn(), &wf_id)?.unwrap();
+            let doc_request =
+                DocumentRequest::get(conn.conn(), &wf.id, DocumentRequestKind::Identity)?.unwrap();
 
             let note = "I, Bob Boberto, consent to NOTHING".into();
             UserConsent::create(conn, Utc::now(), ie.id, note, false, wf_id)?;
@@ -327,7 +328,7 @@ async fn test_fail(state: &State, is_selfie: bool) {
                     .unwrap();
             let ie = InsightEvent::get(conn, &wf_id)?.unwrap();
 
-            let doc_request = DocumentRequest::get_identity(conn.conn(), &wf_id)?.unwrap();
+            let doc_request = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?.unwrap();
 
             let note = "I, Bob Boberto, consent to NOTHING".into();
             UserConsent::create(conn, Utc::now(), ie.id, note, false, wf_id)?;

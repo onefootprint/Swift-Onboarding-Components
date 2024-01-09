@@ -475,7 +475,11 @@ pub async fn mock_incode_doc_collection(
         .db_transaction(move |conn| -> ApiResult<_> {
             let vault = Vault::get(conn.conn(), &scoped_vault_id).unwrap();
 
-            if create_doc_request && DocumentRequest::get_identity(conn, &wf_id).unwrap().is_none() {
+            if create_doc_request
+                && DocumentRequest::get(conn, &wf_id, DocumentRequestKind::Identity)
+                    .unwrap()
+                    .is_none()
+            {
                 // we need a doc request in order to indicate to the decision engine that we should include document rules in decisioning
                 let args = NewDocumentRequestArgs {
                     scoped_vault_id: scoped_vault_id.clone(),

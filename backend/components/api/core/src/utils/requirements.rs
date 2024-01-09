@@ -16,9 +16,9 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    AlpacaKycState, AuthorizeFields, DocumentCdoInfo, IdentityDocumentStatus, Iso3166TwoDigitCountryCode,
-    KycState, LivenessSource, OnboardingRequirement, OnboardingRequirementKind, Selfie, UsLegalStatus,
-    VaultId, WorkflowState,
+    AlpacaKycState, AuthorizeFields, DocumentCdoInfo, DocumentRequestKind, IdentityDocumentStatus,
+    Iso3166TwoDigitCountryCode, KycState, LivenessSource, OnboardingRequirement, OnboardingRequirementKind,
+    Selfie, UsLegalStatus, VaultId, WorkflowState,
 };
 use newtypes::{
     CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind,
@@ -404,7 +404,7 @@ fn get_requirement_inner(
             }
         }
         OnboardingRequirementKind::CollectDocument => {
-            let dr = DocumentRequest::get_identity(conn, &wf.id)?;
+            let dr = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?;
             if let Some(dr) = dr {
                 let user_consent = UserConsent::get_for_workflow(conn, &wf.id)?;
                 let id_doc = IdentityDocument::list_by_request_id(conn, &dr.id)?;
@@ -431,7 +431,7 @@ fn get_requirement_inner(
             }
         }
         OnboardingRequirementKind::CollectProofOfSsn => {
-            let dr = DocumentRequest::get_proof_of_ssn(conn, &wf.id)?;
+            let dr = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::ProofOfSsn)?;
             if let Some(dr) = dr {
                 let id_doc = IdentityDocument::list_by_request_id(conn, &dr.id)?;
                 // Show a CollectDocument requirement if there's no id_document or the existing

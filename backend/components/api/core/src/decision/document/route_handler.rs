@@ -1,4 +1,4 @@
-use newtypes::{TenantId, WorkflowId, ScopedVaultId, DocKind, IdDocKind, Iso3166TwoDigitCountryCode, DocumentScanDeviceType, IdentityDocumentId, IdentityDocumentFixtureResult, IdentityDocumentStatus, DocumentSide, DataIdentifier, DocumentKind, DecisionIntentKind, S3Url, SealedVaultDataKey, DataLifetimeSource};
+use newtypes::{TenantId, WorkflowId, ScopedVaultId, DocKind, IdDocKind, Iso3166TwoDigitCountryCode, DocumentScanDeviceType, IdentityDocumentId, IdentityDocumentFixtureResult, IdentityDocumentStatus, DocumentSide, DataIdentifier, DocumentKind, DecisionIntentKind, S3Url, SealedVaultDataKey, DataLifetimeSource, DocumentRequestKind};
 
 use crate::{decision, errors::ApiResult, State};
 use crate::errors::onboarding::OnboardingError;
@@ -64,7 +64,7 @@ pub async fn handle_document_create(state: &State, create_identity_document_requ
         .db_transaction(move |conn| -> ApiResult<_> {
             // If there's no doc requests, nothing to do here
             let doc_request =
-                DbDocumentRequest::get_identity(conn, &wf_id)?.ok_or(OnboardingError::NoDocumentRequestFound)?;
+                DbDocumentRequest::get(conn, &wf_id, DocumentRequestKind::Identity)?.ok_or(OnboardingError::NoDocumentRequestFound)?;
 
             let (obc, _) = ObConfiguration::get(conn, &wf_id)?;         
             crate::decision::vendor::incode::validate_doc_type_is_allowed(
@@ -364,7 +364,7 @@ async fn handle_proof_of_ssn(state: &State, workflow_id: WorkflowId, document_ty
     .db_transaction(move |conn| -> ApiResult<_> {
         // If there's no doc requests for proof of ssn, nothing to do here
         let doc_request =
-            DbDocumentRequest::get_proof_of_ssn(conn, &workflow_id)?.ok_or(OnboardingError::NoDocumentRequestFound)?;
+            DbDocumentRequest::get(conn, &workflow_id, DocumentRequestKind::ProofOfSsn)?.ok_or(OnboardingError::NoDocumentRequestFound)?;
 
 
             let args = NewIdentityDocumentArgs {

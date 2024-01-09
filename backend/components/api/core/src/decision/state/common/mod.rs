@@ -8,8 +8,8 @@ use db::{
 };
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
-    CipKind, DecisionIntentKind, DecisionStatus, FootprintReasonCode, ReviewReason, RuleSetResultKind,
-    ScopedVaultId, TenantId, VendorAPI, VerificationResultId, WorkflowId,
+    CipKind, DecisionIntentKind, DecisionStatus, DocumentRequestKind, FootprintReasonCode, ReviewReason,
+    RuleSetResultKind, ScopedVaultId, TenantId, VendorAPI, VerificationResultId, WorkflowId,
 };
 
 use crate::{
@@ -180,7 +180,7 @@ pub fn get_decision(
     is_fixture: bool,
 ) -> ApiResult<Decision> {
     let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
-    let doc_collected = DocumentRequest::get_identity(conn, &wf.id)?.is_some();
+    let doc_collected = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?.is_some();
 
     rule_engine::engine::evaluate_workflow_decision(
         conn,
