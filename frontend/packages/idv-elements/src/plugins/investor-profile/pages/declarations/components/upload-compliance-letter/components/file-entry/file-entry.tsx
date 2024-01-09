@@ -9,7 +9,9 @@ type FileEntryProps = {
 };
 
 const FileEntry = ({ file, onRemove }: FileEntryProps) => {
-  const { t } = useTranslation('pages.declarations.doc-upload');
+  const { t } = useTranslation(
+    'investor-profile.pages.declarations.doc-upload',
+  );
 
   return (
     <Stack align="center" justify="space-between" minHeight="32px">

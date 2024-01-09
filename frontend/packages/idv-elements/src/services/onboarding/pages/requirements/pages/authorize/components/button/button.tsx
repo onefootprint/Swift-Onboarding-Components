@@ -13,7 +13,7 @@ type ButtonProps = {
 };
 
 const Button = ({ isLoading, onClick }: ButtonProps) => {
-  const { t } = useTranslation('pages.authorize');
+  const { t } = useTranslation('onboarding.pages.authorize');
   const [state] = useOnboardingRequirementsMachine();
   const {
     onboardingContext: {
@@ -36,7 +36,7 @@ const Button = ({ isLoading, onClick }: ButtonProps) => {
           sx={{ textAlign: 'center' }}
         >
           <Trans
-            i18nKey="pages.authorize.footer"
+            i18nKey="onboarding.pages.authorize.footer"
             values={{ tenantName }}
             components={{
               a: (

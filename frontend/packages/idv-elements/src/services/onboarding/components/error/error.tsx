@@ -7,7 +7,7 @@ import React from 'react';
 import { NavigationHeader } from '../../../../components/layout';
 
 const Error = () => {
-  const { t } = useTranslation('components.error');
+  const { t } = useTranslation('onboarding.components.error');
 
   return (
     <Container>

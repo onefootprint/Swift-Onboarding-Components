@@ -92,7 +92,7 @@ const EmailIdentification = () => {
           emailPlaceholder: t('form.email.placeholder'),
         }}
       />
-      <LegalFooter descriptionKey="components.legal-footer.label" />
+      <LegalFooter descriptionKey="identify.components.legal-footer.label" />
       <SandboxOutcomeFooter
         sandboxId={sandboxId}
         overallOutcome={overallOutcome}

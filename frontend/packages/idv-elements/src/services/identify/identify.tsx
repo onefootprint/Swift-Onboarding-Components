@@ -3,9 +3,9 @@ import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 
 import { L10nContextProvider } from '../../components/l10n-provider';
+import configureI18next from '../../config/initializers/i18next';
+import queryClient from '../../config/initializers/react-query';
 import { IdentifyMachineProvider } from './components/machine-provider';
-import configureI18next from './config/initializers/react-i18next';
-import queryClient from './config/initializers/react-query';
 import Router from './pages/router';
 import type { IdentifyProps } from './types';
 

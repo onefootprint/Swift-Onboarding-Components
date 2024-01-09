@@ -33,7 +33,7 @@ export type AuthorizeProps = {
 };
 
 const Authorize = ({ onDone }: AuthorizeProps) => {
-  const { t } = useTranslation('pages.authorize');
+  const { t } = useTranslation('onboarding.pages.authorize');
   const [state] = useOnboardingRequirementsMachine();
   const {
     onboardingContext: { authToken, config, overallOutcome },

@@ -7,7 +7,7 @@ import { Trans } from 'react-i18next';
 const LegalFooter = () => (
   <StyledTypography>
     <Trans
-      i18nKey="components.legal-footer.label"
+      i18nKey="identify.components.legal-footer.label"
       components={{
         termsLink: (
           <Link

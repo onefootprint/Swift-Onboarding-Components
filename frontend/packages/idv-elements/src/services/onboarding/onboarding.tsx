@@ -4,9 +4,9 @@ import { I18nextProvider } from 'react-i18next';
 
 import DeviceSignals from '../../components/device-signals';
 import { L10nContextProvider } from '../../components/l10n-provider';
+import configureI18next from '../../config/initializers/i18next';
+import queryClient from '../../config/initializers/react-query';
 import OnboardingMachineProvider from './components/machine-provider';
-import configureI18next from './config/initializers/react-i18next';
-import queryClient from './config/initializers/react-query';
 import Router from './pages/router';
 import type { OnboardingProps } from './types';
 

@@ -16,7 +16,7 @@ const Employment = () => {
   const [state, send] = useInvestorProfileMachine();
   const { authToken, showTransition, data } = state.context;
   const { mutation, syncData } = useSyncData();
-  const { allT } = useTranslation('pages.employment');
+  const { t } = useTranslation('investor-profile.pages.employment');
   // Only show the animation if this is the first time we are rendering this page
   // If user saved data, and navigated prev to this page, don't animate again
   const hasCollectedData = Object.keys(data).length > 0;
@@ -51,10 +51,8 @@ const Employment = () => {
       <GenericTransition
         firstIcon={IcoUser40}
         secondIcon={IcoDollar40}
-        firstText={allT(
-          'investor-profile.components.transition-animation.source',
-        )}
-        secondText={allT(
+        firstText={t('investor-profile.components.transition-animation.source')}
+        secondText={t(
           'investor-profile.components.transition-animation.destination',
         )}
         timeout={4000}

@@ -53,7 +53,7 @@ const ImageConsent = forwardRef<ImageConsentHandler, {}>((props, ref) => {
         sx={{ marginBottom: 5, marginTop: 7 }}
       >
         <Trans
-          i18nKey="components.image-consent.description"
+          i18nKey="id-doc.components.image-consent.description"
           components={{
             privacy: (
               <Link
