@@ -27,7 +27,7 @@ const PinInput = ({
   onComplete,
   ...props
 }: PinInputProps) => {
-  const { autoFocus, ...inputProps } = props;
+  const { autoFocus, disabled, ...inputProps } = props;
   const [enteredPin, setEnteredPin] = useState<string[]>([]);
   const pinInputs = usePinInputRefs(INPUT_FIELDS_COUNT);
 
@@ -48,7 +48,7 @@ const PinInput = ({
     } else {
       const nextInput = pinInputs.next(index);
       if (nextInput) {
-        nextInput.focus();
+        setTimeout(() => nextInput.focus(), 50); // For some reason, you cannot focus on non-editable text input. You fist have to wait for it to be editable, and then focus. A little hacky approach
       }
     }
   };
@@ -94,7 +94,7 @@ const PinInput = ({
       <Box gap={3} flexDirection="row" center>
         {pins.map((pinPosition, pinIndex) => {
           const key = pinIndex;
-          const isDisabled = pinIndex > enteredPin.length;
+          const isDisabled = disabled || pinIndex > enteredPin.length;
           return (
             <TextInput
               {...inputProps}

@@ -90,6 +90,7 @@ const TextInput = forwardRef<RNTextInput, TextInputProps>(
             hasFocus={isFocused}
             onBlur={handleBlur}
             onFocus={handleFocus}
+            editable={!disabled}
             placeholderTextColor={input.global.placeholderColor}
             // @ts-ignore
             ref={mergeRefs([ref, localRef])}
