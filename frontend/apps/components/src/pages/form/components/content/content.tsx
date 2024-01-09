@@ -200,6 +200,7 @@ const Content = ({ fallback }: ContentProps) => {
       sections={sections}
       variant={variant}
       isLoading={usersVaultMutation.isLoading}
+      hideFootprintLogo={hideFootprintLogo}
       hideSaveButton={hideButtons}
       hideCancelButton={hideCancelButton || hideButtons}
       formErrorMessage={formErrorMessage}
