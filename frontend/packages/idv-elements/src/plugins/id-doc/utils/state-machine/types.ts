@@ -22,7 +22,7 @@ export type MachineContext = {
   device: DeviceInfo;
   requirement: IdDocRequirement;
   image?: {
-    imageFile: File;
+    imageFile: File | Blob;
     captureKind: CaptureKind;
     extraCompressed?: boolean;
   };
@@ -59,7 +59,7 @@ export type MachineEvents =
   | {
       type: 'receivedImage';
       payload: {
-        imageFile: File;
+        imageFile: File | Blob;
         captureKind: CaptureKind;
         extraCompressed?: boolean;
       };

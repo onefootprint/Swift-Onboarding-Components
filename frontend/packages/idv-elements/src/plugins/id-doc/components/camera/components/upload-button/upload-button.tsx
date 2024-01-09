@@ -9,27 +9,42 @@ import { useIdDocMachine } from '../../../machine-provider';
 const BUTTON_RADIUS = 56;
 
 type UploadButtonProps = {
-  onUpload: () => void;
-  onComplete: () => void;
+  onUploadBtnClick: () => void;
+  onUploadChangeDone: () => void;
 };
 
-const UploadButton = ({ onUpload, onComplete }: UploadButtonProps) => {
+const logWarn = (e: string) => Logger.warn(e, 'upload-button');
+const logProcessedFile = (res: {
+  file: File | Blob;
+  extraCompressed: boolean;
+}) => {
+  Logger.info(
+    `UploadButton: size of the processed file to be sent in machine event type 'receivedImage' is ${res.file.size}, file type ${res.file.type}`,
+  );
+};
+
+const UploadButton = ({
+  onUploadBtnClick,
+  onUploadChangeDone,
+}: UploadButtonProps) => {
   const [state, send] = useIdDocMachine();
   const { hasBadConnectivity } = state.context;
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
-  const { processImageFile, acceptedFileFormats } = useProcessImage();
-
   const [isLoading, setIsLoading] = useState(false);
+  const { processImageFile, acceptedFileFormats } = useProcessImage();
 
   const onProcessingDone = () => {
     setIsLoading(false);
-    onComplete();
+    onUploadChangeDone();
   };
 
-  const handleImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setIsLoading(true);
-    onUpload();
+    onUploadBtnClick();
     const { files } = event.target;
+
     if (!files?.length) {
       onProcessingDone();
       return;
@@ -37,17 +52,12 @@ const UploadButton = ({ onUpload, onComplete }: UploadButtonProps) => {
 
     const processResult = await processImageFile(files[0], hasBadConnectivity);
     if (!processResult) {
-      Logger.warn(
-        'Captured image could not be processed - retaking the image',
-        'upload-button',
-      );
+      logWarn('Captured image could not be processed - retaking the image');
       onProcessingDone();
       return;
     }
 
-    Logger.info(
-      `UploadButton: size of the processed file to be sent in machine event type 'receivedImage' is ${processResult.file.size}, file type ${processResult.file.type}`,
-    );
+    logProcessedFile(processResult);
     send({
       type: 'receivedImage',
       payload: {
@@ -59,14 +69,12 @@ const UploadButton = ({ onUpload, onComplete }: UploadButtonProps) => {
     onProcessingDone();
   };
 
-  const handleUpload = () => {
-    uploadPhotoRef.current?.click();
-  };
+  const handleUploadClick = () => uploadPhotoRef.current?.click();
 
   return (
     <>
       <RoundButton
-        onClick={handleUpload}
+        onClick={handleUploadClick}
         radius={BUTTON_RADIUS}
         disabled={isLoading}
       >
@@ -76,7 +84,7 @@ const UploadButton = ({ onUpload, onComplete }: UploadButtonProps) => {
         ref={uploadPhotoRef as React.RefObject<HTMLInputElement>}
         type="file"
         accept={acceptedFileFormats}
-        onChange={handleImage}
+        onChange={handleImageChange}
       />
     </>
   );

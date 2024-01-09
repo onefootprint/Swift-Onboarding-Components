@@ -24,7 +24,7 @@ const computeSrcDimensions = (
   outlineWidth: number,
   outlineHeight: number,
   outlineOffsetY: number | undefined,
-  videoRef: MutableRefObject<HTMLVideoElement | undefined>,
+  videoRef: VideoRef,
   mediaStream: MediaStream | null,
   outlineOffsetX: number | undefined,
 ) => {

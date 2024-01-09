@@ -19,7 +19,7 @@ type IdDocPhotoRetryPromptProps = {
   imageType: IdDocImageTypes.front | IdDocImageTypes.back;
   errors: IdDocImageErrorType[];
   onComplete: (
-    imageFile: File,
+    imageFile: File | Blob,
     extraCompressed: boolean,
     captureKind: CaptureKind,
   ) => void;

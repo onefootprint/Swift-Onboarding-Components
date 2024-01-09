@@ -2,7 +2,7 @@ import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
-import type { DeviceKind } from '../../camera';
+import type { DeviceKind } from '../../types';
 
 type FeedbackProps = {
   children: string;

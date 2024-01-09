@@ -1,5 +1,7 @@
 import FileResizer from 'react-image-file-resizer';
 
+import { isFileOrBlob, isString } from '../../../utils/capture';
+
 /*
   From idology:
   - Ensure that the image has a minimum of 2048x1536 pixel resolution but is no larger than 4288x3216.
@@ -15,7 +17,7 @@ const OUTPUT_FORMAT = 'file';
 const FORMAT = 'JPEG';
 
 // Input: Non-HEIC Image File. Resized JPEG Image File.
-const resizeImage = async (imageFile: File): Promise<File | undefined> =>
+const resizeImage = async (imageFile: Blob): Promise<File | Blob | undefined> =>
   new Promise(resolve => {
     FileResizer.imageFileResizer(
       imageFile,
@@ -24,8 +26,15 @@ const resizeImage = async (imageFile: File): Promise<File | undefined> =>
       FORMAT,
       QUALITY,
       ROTATION,
-      uri => {
-        resolve(uri as File);
+      (uri: string | Blob | File | ProgressEvent<FileReader>) => {
+        if (isFileOrBlob(uri)) {
+          resolve(uri);
+        } else if (isString(uri)) {
+          const file = new File([uri], 'resized-image', { type: 'image/jpeg' });
+          resolve(file);
+        } else {
+          resolve(undefined);
+        }
       },
       OUTPUT_FORMAT,
       MIN_WIDTH,

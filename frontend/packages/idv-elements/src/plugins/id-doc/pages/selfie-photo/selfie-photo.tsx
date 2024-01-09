@@ -13,7 +13,7 @@ const SelfiePhoto = () => {
   const [, send] = useIdDocMachine();
 
   const onComplete = (
-    imageFile: File,
+    imageFile: File | Blob,
     extraCompressed: boolean,
     captureKind: CaptureKind,
   ) =>

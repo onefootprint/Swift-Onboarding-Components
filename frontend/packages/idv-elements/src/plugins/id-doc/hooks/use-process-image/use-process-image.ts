@@ -4,13 +4,18 @@ import partial from 'lodash/fp/partial';
 
 import Logger from '../../../../utils/logger';
 import { useImgProcessorsContext } from '../../components/image-processors';
+import {
+  hasFileReaderSupport,
+  isFileOrBlob,
+  isString,
+} from '../../utils/capture';
 import compressImage, {
   COMPRESS_EXTRA_MAX_SIZE_MB,
 } from './utils/compress-image';
 import imageFileToStrippedBase64 from './utils/image-file-to-stripped-base64';
 import resizeImage from './utils/resize-image';
 
-type ProcessedImageFile = { file: File; extraCompressed: boolean };
+type ProcessedImageFile = { file: File | Blob; extraCompressed: boolean };
 type Toast = ReturnType<typeof useToast>;
 type HandleError = (step: ImageProcessingStepError, error?: unknown) => void;
 type ImageProcessors = ReturnType<typeof useImgProcessorsContext>;
@@ -21,15 +26,27 @@ enum ImageProcessingStepError {
   other = 'Unknown Error',
 }
 
+const isError = (x: unknown): x is Error => x instanceof Error;
 const isHeicType = (x: unknown) => x === 'image/heic';
+const logError = (e: string) => Logger.error(e, 'use-process-image');
+const logInfo = (e: string) => Logger.info(e, 'use-process-image');
+const logWarn = (e: string) => Logger.warn(e, 'use-process-image');
 
-const stringify = (x: unknown) =>
-  typeof x === 'string' ? x : JSON.stringify(x);
+const stringify = (x: unknown): string => {
+  try {
+    return isString(x) ? x : JSON.stringify(x);
+  } catch (e: unknown) {
+    if (isError(e)) {
+      logWarn(`Error during JSON.stringify: ${e?.message}`);
+    }
+    return '';
+  }
+};
 
 const errorHandler =
   (toast: Toast) => (step: ImageProcessingStepError, error?: unknown) => {
     if (error) {
-      Logger.error(stringify(error), 'use-process-image');
+      logError(stringify(error));
     }
     toast.show({
       title: 'Uh-oh',
@@ -37,93 +54,144 @@ const errorHandler =
     });
   };
 
-const runProcessFileScript = async (
-  onError: HandleError,
-  imageProcessors: ImageProcessors | undefined,
-  file: File,
-  extraCompress?: boolean,
-): Promise<ProcessedImageFile | undefined> => {
-  let converted: File | undefined;
-  try {
-    if (!isHeicType(file.type)) {
-      converted = file;
-    } else if (imageProcessors?.heic && !imageProcessors.heicLoading) {
-      converted = await imageProcessors
-        .heic({ blob: file, toType: 'image/jpeg' })
-        .then(res => {
-          const blob = Array.isArray(res) ? res : [res];
-          return new File(blob, file.name, {
-            type: 'image/jpeg',
-            lastModified: file.lastModified,
-          });
-        });
-    }
-  } catch (e) {
-    onError(ImageProcessingStepError.heic, e);
-    return undefined;
-  }
-  if (!converted) {
-    onError(ImageProcessingStepError.heic);
-    return undefined;
-  }
-  Logger.info(
-    `Converted image size (before resizing): ${converted.size} bytes`,
-  );
-
-  let resized;
-  try {
-    resized = await resizeImage(converted);
-  } catch (e) {
-    onError(ImageProcessingStepError.resize, e);
-    return undefined;
-  }
-  if (!resized) {
-    onError(ImageProcessingStepError.resize);
-    return undefined;
-  }
-  Logger.info(
-    `Image size after resizing before compression: ${resized.size} bytes`,
-  );
-
-  let compressed;
-  try {
-    compressed = await compressImage(resized, extraCompress);
-  } catch (e) {
-    onError(ImageProcessingStepError.compress, e);
-    Logger.warn("Moving on with the image that wasn't compressed");
-    compressed = resized;
-  }
-  if (!compressed) {
-    onError(ImageProcessingStepError.compress);
-    Logger.warn("Moving on with the image that wasn't compressed");
-    compressed = resized;
-  }
-  const extraCompressed =
-    resized.size > compressed.size &&
-    !!extraCompress &&
-    compressed.size <= COMPRESS_EXTRA_MAX_SIZE_MB;
-  Logger.info(
-    `Image size after compression: ${compressed.size} bytes, extraCompressed: ${extraCompressed}`,
-  );
-
-  return {
-    file: compressed,
-    extraCompressed,
-  };
-};
-
 const convertImageFileToStrippedBase64 = async (
   onError: HandleError,
   file: File,
 ): Promise<string | undefined> => {
-  let imageString;
   try {
-    imageString = await imageFileToStrippedBase64(file);
+    return await imageFileToStrippedBase64(file);
   } catch (error) {
     onError(ImageProcessingStepError.other, error);
+    return undefined;
+  }
+};
+
+const stepHeicConversion = async (
+  onError: HandleError,
+  imageProcessors: ImageProcessors | undefined,
+  file: File,
+): Promise<File | Error> => {
+  try {
+    if (imageProcessors?.heic && !imageProcessors.heicLoading) {
+      const res = await imageProcessors.heic({
+        blob: file,
+        toType: 'image/jpeg',
+      });
+      const blob = Array.isArray(res) ? res : [res];
+      return new File(blob, file.name, {
+        type: 'image/jpeg',
+        lastModified: file.lastModified,
+      });
+    }
+
+    logWarn('HEIC image processor not available');
+    return new Error('HEIC image processor not available');
+  } catch (e: unknown) {
+    onError(ImageProcessingStepError.heic, e);
+    return isError(e) ? e : new Error('HEIC processing failed');
+  }
+};
+
+const stepImageResize = async (
+  onError: HandleError,
+  file: File,
+): Promise<File | Blob | Error> => {
+  try {
+    const resized = await resizeImage(file);
+    return resized || new Error('resize processing failed');
+  } catch (e) {
+    onError(ImageProcessingStepError.resize, e);
+    return isError(e) ? e : new Error('resize processing failed');
+  }
+};
+
+const stepImageCompression = async (
+  onError: HandleError,
+  file: File | Blob,
+  extraCompress: boolean = false,
+): Promise<File | Error> => {
+  try {
+    const compressed = await compressImage(file, extraCompress);
+    return compressed || new Error('compress processing failed');
+  } catch (e) {
+    onError(ImageProcessingStepError.compress, e);
+    return isError(e) ? e : new Error('compress processing failed');
+  }
+};
+
+/**
+ * Processes a file by performing HEIC conversion, image resizing, and compression.
+ *
+ * @param {HandleError} onError - Function to handle errors.
+ * @param {ImageProcessors | undefined} imageProcessors - Image processors configuration.
+ * @param {File} file - The input file to be processed.
+ * @param {boolean} [extraCompressFlag] - Optional flag for extra compression.
+ * @returns {Promise<ProcessedImageFile | undefined>} A Promise that resolves to the processed file
+ * or undefined if an error occurs during processing.
+ *
+ * @typedef {Object} ProcessedImageFile - Object containing the processed file and extra compression flag.
+ * @property {File} file - The processed file.
+ * @property {boolean} extraCompressed - Indicates if extra compression was applied.
+ */
+const runProcessFileScript = async (
+  onError: HandleError,
+  imageProcessors: ImageProcessors | undefined,
+  file: File,
+  extraCompressFlag?: boolean,
+): Promise<ProcessedImageFile | undefined> => {
+  logInfo(`Original file type | size: ${file.type} | ${file.size}`);
+
+  const heicOutput = isHeicType(file.type)
+    ? await stepHeicConversion(onError, imageProcessors, file)
+    : file;
+
+  if (!isError(heicOutput)) {
+    logInfo(`HEIC conversion size: ${heicOutput.size} bytes`);
   }
 
-  return imageString;
+  const resizeInput = isFileOrBlob(heicOutput) ? heicOutput : file;
+  let resizeOutput;
+  if (isHeicType(resizeInput.type)) {
+    resizeOutput = resizeInput;
+  } else {
+    resizeOutput = hasFileReaderSupport()
+      ? await stepImageResize(onError, resizeInput)
+      : new Error('Unsupported FileReader in this browser');
+  }
+
+  if (isError(resizeOutput)) {
+    logWarn(`Proceeding with not resized image: ${stringify(resizeOutput)}`);
+  } else {
+    logInfo(`Resized image size: ${resizeOutput.size} bytes`);
+  }
+
+  const prevFile = [resizeOutput, heicOutput].find(isFileOrBlob);
+  const compressionInput = prevFile && !isError(prevFile) ? prevFile : file;
+  const compressOutput = await stepImageCompression(
+    onError,
+    compressionInput,
+    extraCompressFlag,
+  );
+
+  if (isError(compressOutput)) {
+    logWarn(`Proceeding with uncompressed image: ${stringify(compressOutput)}`);
+  } else {
+    logInfo(`Compressed image size: ${compressOutput.size} bytes`);
+  }
+
+  const extraCompressed =
+    !isError(resizeOutput) &&
+    !isError(compressOutput) &&
+    resizeOutput.size > compressOutput.size &&
+    Boolean(extraCompressFlag) &&
+    compressOutput.size <= COMPRESS_EXTRA_MAX_SIZE_MB;
+
+  logInfo(`extraCompressed: ${extraCompressed}`);
+
+  const final = [compressOutput, resizeOutput, heicOutput].find(isFileOrBlob);
+  return final && !isError(final)
+    ? { file: final, extraCompressed }
+    : undefined;
 };
 
 const processImageUrl = async (
@@ -138,11 +206,10 @@ const processImageUrl = async (
     onError(ImageProcessingStepError.other, error);
   }
   if (!file) {
-    const str = 'Image files undefined after image compression';
-    Logger.error(str, 'use-process-image');
+    logError('Image files undefined after image compression');
     return undefined;
   }
-  Logger.info(
+  logInfo(
     `Image file size read from url (getFilefromDataUrl): ${file.size} bytes`,
   );
 

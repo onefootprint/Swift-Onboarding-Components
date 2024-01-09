@@ -31,7 +31,7 @@ const BackPhotoCapture = () => {
   if (!docType) return null;
 
   const onComplete = (
-    imageFile: File,
+    imageFile: File | Blob,
     extraCompressed: boolean,
     captureKind: CaptureKind,
   ) =>

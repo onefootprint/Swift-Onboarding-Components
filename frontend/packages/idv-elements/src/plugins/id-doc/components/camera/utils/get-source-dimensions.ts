@@ -1,7 +1,7 @@
-import type { MutableRefObject } from 'react';
+import type { VideoRef } from '../types';
 
 type GetSourceDImensionsProps = {
-  videoRef: MutableRefObject<HTMLVideoElement | undefined>;
+  videoRef: VideoRef;
   mediaStream: MediaStream | null;
   desiredImageWidth: number;
   desiredImageHeight: number;

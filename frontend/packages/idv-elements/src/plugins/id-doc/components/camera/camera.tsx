@@ -2,6 +2,7 @@ import { useCountdownCustom, useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 import { LoadingIndicator, media } from '@onefootprint/ui';
+import noop from 'lodash/noop';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTimeout } from 'usehooks-ts';
 
@@ -14,6 +15,16 @@ import {
   AUTOCAPTURE_START_DELAY,
   AUTOCAPTURE_TIMER_INTERVAL,
 } from '../../constants/transition-delay.constants';
+import {
+  clearCanvas,
+  getHtmlVideoElement,
+  isDesktop,
+  isDocument,
+  isFunction,
+  isMobile,
+  isNonPlayingVideoEvent,
+  VideoEvents,
+} from '../../utils/capture';
 import type { CaptureKind } from '../../utils/state-machine';
 import CaptureButton from './components/capture-button';
 import CountdownTimer from './components/countdown-timer';
@@ -26,13 +37,13 @@ import useUserMedia from './hooks/use-user-media';
 import type {
   AutocaptureKind,
   CaptureStatus,
+  DeviceKind,
   VideoRef,
   VideoSize,
 } from './types';
 import type { CameraKind } from './utils/get-camera-options';
 import getOutlineDimensions from './utils/get-outline-dimensions';
 
-export type DeviceKind = 'mobile' | 'desktop';
 type ChildrenProps = {
   canvasAutoCaptureRef: React.MutableRefObject<HTMLCanvasElement | undefined>;
   feedbackPositionFromBottom: number;
@@ -44,7 +55,9 @@ type ChildrenProps = {
   videoRef: VideoRef;
   videoSize: VideoSize | undefined;
 };
+
 type CameraProps = {
+  autocaptureFeedback?: CaptureStatus;
   autocaptureKind: AutocaptureKind;
   cameraKind: CameraKind;
   children: (props: ChildrenProps) => JSX.Element | null;
@@ -56,7 +69,6 @@ type CameraProps = {
   outlineHeightRatio: number; // with respect to the video width (not height since width is smaller)
   outlineWidthRatio: number; // with respect to the video width
   setIsCaptured: React.Dispatch<React.SetStateAction<boolean>>;
-  autocaptureFeedback?: CaptureStatus;
 };
 
 const AUTOCAPTURE_TIMER_START_VAL = 3;
@@ -67,28 +79,25 @@ const CountDownProps = {
   intervalMs: AUTOCAPTURE_TIMER_INTERVAL,
 };
 
-const isDesktop = (x: unknown) => x === 'desktop';
-const isDocument = (x: unknown) => x === 'document';
-const isMobile = (x: unknown) => x === 'mobile';
 const logError = (e: string) => Logger.error(e, 'camera');
 const logWarn = (e: string) => Logger.warn(e, 'camera');
 
-const clearCanvas = (
-  ref: React.MutableRefObject<HTMLCanvasElement | undefined>,
-) => {
-  if (!ref.current) {
-    logWarn('Canvas could not be cleared. Ref undefined');
-    return;
-  }
-
-  const context = ref.current.getContext('2d');
-  if (!context) {
-    logWarn('Canvas could not be cleared. Context undefined');
-    return;
-  }
-
-  context.clearRect(0, 0, ref.current.width, ref.current.height);
-};
+const videoElementStateListener =
+  (setPlayingState: (state: boolean) => void, videoElement: HTMLVideoElement) =>
+  (event: Event) => {
+    if (!videoElement) return;
+    logWarn(`Video element status: ${event.type}`);
+    if (isFunction(videoElement?.play) && isNonPlayingVideoEvent(event)) {
+      setPlayingState(false);
+      videoElement
+        .play()
+        .then(() => {
+          logWarn('Video element status: playing');
+          setPlayingState(true);
+        })
+        .catch(e => logError(`Error playing video element: ${e}`));
+    }
+  };
 
 const getPositionFromBottom = (kind: DeviceKind): 150 | 50 =>
   kind === 'mobile'
@@ -99,6 +108,28 @@ const getPositionFromTop = (kind: DeviceKind, size?: VideoSize): number =>
   kind === 'mobile'
     ? (size?.height ?? 0) - FEEFBACK_POSITION_FROM_BOTTOM_MOBILE
     : (size?.height ?? 0) - FEEDBACK_POSITION_FROM_BOTTOM_DESKTOP;
+
+const getDesiredSize = (
+  videoSize: VideoSize,
+  autocaptureKind: AutocaptureKind,
+  positionFromBottom: number,
+  outlineHeightRatio: number,
+  outlineWidthRatio: number,
+) => {
+  // For document capture, we keep the captured width/height spect ratio same as the outline aspect ratio
+  // In case maintaining the aspect ratio overflows the height, we take the full height (Math.min)
+  if (isDocument(autocaptureKind)) {
+    return {
+      width: videoSize.width,
+      height: Math.min(
+        videoSize.height - positionFromBottom,
+        videoSize.width * (outlineHeightRatio / outlineWidthRatio),
+      ),
+    };
+  }
+
+  return videoSize; // We capture the full height for selfie
+};
 
 const Camera = ({
   autocaptureFeedback,
@@ -117,7 +148,7 @@ const Camera = ({
   const { t } = useTranslation('components.camera');
   const canvasAutoCaptureRef = useRef<HTMLCanvasElement>();
   const canvasImageCaptureRef = useRef<HTMLCanvasElement>();
-  const videoRef = useRef<HTMLVideoElement>();
+  const videoRef: VideoRef = useRef<HTMLVideoElement>(null);
   const autocaptureRestartTimeoutRef = useRef<NodeJS.Timeout>();
 
   const [isImageProcessing, setIsImageProcessing] = useState(false);
@@ -134,7 +165,7 @@ const Camera = ({
   const getImageStringFromVideo = useGetImageString();
 
   const mediaStream = useUserMedia(cameraKind, onError);
-  const isCameraVisible = !!mediaStream && isVideoPlaying;
+  const isCameraVisible = Boolean(mediaStream?.active) && isVideoPlaying;
   const { outlineWidth, outlineHeight } = getOutlineDimensions({
     videoSize,
     outlineHeightRatio,
@@ -149,22 +180,15 @@ const Camera = ({
     videoRef.current.srcObject = mediaStream;
   }
 
-  // We don't detect for 3 seconds so the camera has time to focus
-  useTimeout(
-    () => {
-      setShouldDetect(true);
-    },
-    isCameraVisible ? AUTOCAPTURE_START_DELAY : null,
-  );
-
   const handleCanPlay = () => {
-    if (!videoRef.current) {
-      return;
-    }
-    setIsVideoPlaying(true);
-    videoRef.current.play().catch(e => {
-      Logger.error(`Error playing video. Error: ${e}`);
-    });
+    if (!videoRef.current) return;
+    videoRef.current
+      .play()
+      .then(() => {
+        logWarn('Video element status: started playing');
+        setIsVideoPlaying(true);
+      })
+      .catch(e => logError(`Error starting playing video: ${e}`));
   };
 
   const handleClick = (captureKind: CaptureKind) => {
@@ -188,25 +212,21 @@ const Camera = ({
       return;
     }
 
-    const desiredImageWidth = videoSize.width; // We capture the full width
-    let desiredImageHeight = videoSize.height; // We capture the full height for selfie
-
-    // For document capture, we keep the captured width/height spect ratio same as the outline aspect ratio
-    // In case maintaining the aspect ratio overflows the height, we take the full height (Math.min)
-    if (isDocument(autocaptureKind)) {
-      desiredImageHeight = Math.min(
-        videoSize.height - positionFromBottom,
-        videoSize.width * (outlineHeightRatio / outlineWidthRatio),
-      );
-    }
+    const desiredSize = getDesiredSize(
+      videoSize,
+      autocaptureKind,
+      positionFromBottom,
+      outlineHeightRatio,
+      outlineWidthRatio,
+    );
 
     const imageString = getImageStringFromVideo({
       autocaptureKind,
       canvasRef: canvasImageCaptureRef,
       centerOffsetY: isDocument(autocaptureKind) ? -positionFromBottom / 2 : 0,
       context,
-      desiredImageHeight,
-      desiredImageWidth,
+      desiredImageHeight: desiredSize.height,
+      desiredImageWidth: desiredSize.width,
       mediaStream,
       videoRef,
     });
@@ -215,7 +235,7 @@ const Camera = ({
       setIsCaptured(true);
       onCapture(imageString, captureKind);
     }
-    clearCanvas(canvasImageCaptureRef);
+    clearCanvas(logWarn, canvasImageCaptureRef);
   };
 
   const onImageUpload = () => {
@@ -252,12 +272,34 @@ const Camera = ({
     startCountdown();
   };
 
+  // We don't detect for 3 seconds so the camera has time to focus
+  useTimeout(
+    () => setShouldDetect(true),
+    isCameraVisible ? AUTOCAPTURE_START_DELAY : null,
+  );
+
   useEffect(() => {
     if (autoCaptureTimerVal <= 0) {
       stopCountdown();
       handleClick('auto');
     }
   }, [autoCaptureTimerVal]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const vidRef = getHtmlVideoElement(videoRef);
+    if (!vidRef) return noop;
+
+    const listener = videoElementStateListener(setIsVideoPlaying, vidRef);
+    VideoEvents.forEach(e => vidRef.addEventListener(e, listener));
+
+    if (vidRef.paused) {
+      vidRef.play().catch(noop);
+    }
+
+    return () => {
+      VideoEvents.forEach(e => vidRef.removeEventListener(e, listener));
+    };
+  }, [videoRef]);
 
   useEffect(() => () => clearTimeout(autocaptureRestartTimeoutRef.current), []);
 
@@ -274,6 +316,7 @@ const Camera = ({
       <Container data-visible={isCameraVisible}>
         <VideoContainer data-device-kind={deviceKind}>
           <Video
+            key={mediaStream?.id}
             autoPlay
             data-camera-kind={cameraKind}
             data-device-kind={deviceKind}
@@ -281,7 +324,7 @@ const Camera = ({
             muted
             onCanPlay={handleCanPlay}
             playsInline
-            ref={videoRef as React.Ref<HTMLVideoElement>}
+            ref={videoRef}
           />
           {isVideoPlaying && shouldDetect
             ? children({
@@ -339,8 +382,8 @@ const Camera = ({
               )}
               {isDocument(autocaptureKind) && (
                 <UploadButton
-                  onUpload={onImageUpload}
-                  onComplete={onUploadComplete}
+                  onUploadBtnClick={onImageUpload}
+                  onUploadChangeDone={onUploadComplete}
                 />
               )}
               {isTimerRunning ? (

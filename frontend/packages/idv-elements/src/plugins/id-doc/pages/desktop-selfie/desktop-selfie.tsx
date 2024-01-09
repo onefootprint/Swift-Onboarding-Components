@@ -16,7 +16,7 @@ const DesktopSelfie = () => {
   const permissionState = useCameraPermission();
 
   const onComplete = (
-    imageFile: File,
+    imageFile: File | Blob,
     extraCompressed: boolean,
     captureKind: CaptureKind,
   ) =>

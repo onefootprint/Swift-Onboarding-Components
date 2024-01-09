@@ -20,7 +20,7 @@ const IdDocFrontPhotoRetry = () => {
   const countryName = getCountryFromCode(country)?.label;
 
   const handleComplete = (
-    imageFile: File,
+    imageFile: File | Blob,
     extraCompressed: boolean,
     captureKind: CaptureKind,
   ) => {

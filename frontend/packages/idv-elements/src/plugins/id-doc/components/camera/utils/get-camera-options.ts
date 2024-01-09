@@ -1,6 +1,6 @@
 export type CameraKind = 'front' | 'back';
 
-const getCameraOptions = async (cameraKind: CameraKind) => {
+const getCameraOptions = (cameraKind: CameraKind) => {
   if (cameraKind === 'front') {
     return {
       audio: false,

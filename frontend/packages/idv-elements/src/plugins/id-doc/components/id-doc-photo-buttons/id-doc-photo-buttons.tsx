@@ -10,7 +10,7 @@ import { useIdDocMachine } from '../machine-provider';
 
 type IdDocPhotoButtonsProp = {
   onComplete: (
-    imageFile: File,
+    imageFile: File | Blob,
     extraCompressed: boolean,
     captureKind: CaptureKind,
   ) => void;

@@ -4,7 +4,7 @@ import useResizeObserver from 'use-resize-observer/polyfilled';
 // Used to track video element size as it gets mounted and/or resized.
 // This size will be used to create a matching sized canvas to copy the
 // video image over when captured.
-const useSize = (target: React.RefObject<HTMLElement | undefined>) => {
+const useSize = (target: React.RefObject<HTMLVideoElement | undefined>) => {
   const [size, setSize] = useState<{ width: number; height: number }>();
 
   useLayoutEffect(() => {

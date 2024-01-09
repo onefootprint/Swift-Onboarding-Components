@@ -4,7 +4,7 @@ import { Button, media } from '@onefootprint/ui';
 import React from 'react';
 
 import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
-import type { DeviceKind } from '../camera/camera';
+import type { DeviceKind } from '../camera/types';
 import type { CameraKind } from '../camera/utils/get-camera-options';
 
 type PreviewProps = {

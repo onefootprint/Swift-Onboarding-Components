@@ -1,7 +1,7 @@
 export type SubmitDocRequest = {
   authToken: string;
   extraCompress?: boolean;
-  image: File;
+  image: File | Blob;
   side: string;
   id: string;
   meta: {

@@ -13,12 +13,16 @@ import {
 import Logger from '../../../../utils/logger';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import useProcessImage from '../../hooks/use-process-image';
+import { isDesktop, isDocument, isFace, isMobile } from '../../utils/capture';
 import type { CaptureKind } from '../../utils/state-machine';
 import Camera from '../camera';
 import AutoCaptureDoc from '../camera/auto-capture-doc';
 import AutoCaptureFace from '../camera/auto-capture-face';
-import type { DeviceKind } from '../camera/camera';
-import type { AutocaptureKind, CaptureStatus } from '../camera/types';
+import type {
+  AutocaptureKind,
+  CaptureStatus,
+  DeviceKind,
+} from '../camera/types';
 import type { CameraKind } from '../camera/utils/get-camera-options';
 import Loading from '../loading';
 import Preview from '../preview';
@@ -26,7 +30,7 @@ import Instructions from './components/instructions';
 
 type HeaderTextType = { camera: string; preview: string };
 type OnComplete = (
-  imageFile: File,
+  imageFile: File | Blob,
   extraCompressed: boolean,
   captureKind: CaptureKind,
 ) => void;
@@ -57,10 +61,6 @@ const MobileBoxSX: ComponentProps<typeof Box>['sx'] = {
   justifyContent: 'center',
 };
 
-const isDesktop = (x: unknown) => x === 'desktop';
-const isDocument = (x: unknown) => x === 'document';
-const isFace = (x: unknown) => x === 'face';
-const isMobile = (x: unknown) => x === 'mobile';
 const logWarn = (e: string) => Logger.warn(e, 'photo-capture');
 
 const PhotoCapture = ({

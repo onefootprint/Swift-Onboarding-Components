@@ -2,13 +2,13 @@ import { useOpenCv } from 'opencv-react-ts';
 import type { MutableRefObject } from 'react';
 
 import Logger from '../../../../../utils/logger';
-import type { AutocaptureKind } from '../types';
+import type { AutocaptureKind, VideoRef } from '../types';
 import getSourceDimensions from '../utils/get-source-dimensions';
 import { sharpenImage } from '../utils/graphics-utils/graphics-processing-utils';
 
 type GetImageStringProps = {
   context: CanvasRenderingContext2D;
-  videoRef: MutableRefObject<HTMLVideoElement | undefined>;
+  videoRef: VideoRef;
   canvasRef: MutableRefObject<HTMLCanvasElement | undefined>;
   mediaStream: MediaStream | null;
   desiredImageWidth: number;
