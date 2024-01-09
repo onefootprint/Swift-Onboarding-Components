@@ -60,7 +60,7 @@
       },
       "retry": {
         "title": "Please try again",
-        "subtitle": "Face/Touch id verification failed. Try again or you can do this next time.",
+        "subtitle": "Face/Touch ID verification failed. Try again or complete later.",
         "cta": "Launch verification",
         "skip": "Do it later"
       },
