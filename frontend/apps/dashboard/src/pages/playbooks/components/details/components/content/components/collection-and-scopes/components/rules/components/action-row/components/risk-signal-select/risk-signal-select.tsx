@@ -27,7 +27,7 @@ import {
 
 import useRiskSignals from './hooks/use-risk-signals';
 
-const ITEM_HEIGHT = 64; // Adjust as needed for the height of each item
+const ITEM_HEIGHT = 64;
 
 type RiskSignalSelectProps = {
   value?: string;
@@ -53,7 +53,7 @@ const RiskSignalSelect = ({
       defaultHeight: ITEM_HEIGHT,
     }),
   );
-  const [listKey, setListKey] = useState(0); // Add a key state for the list
+  const [listKey, setListKey] = useState(0);
 
   const options = useMemo(
     () =>
@@ -160,7 +160,7 @@ const RiskSignalSelect = ({
               </HeaderControls>
               <Search
                 autoSelect
-                placeholder="Search by name or description"
+                placeholder={t('search')}
                 onBlurCapture={event => {
                   event.preventDefault();
                   event.stopPropagation();
@@ -168,7 +168,7 @@ const RiskSignalSelect = ({
               />
             </Header>
             {matches.length > 0 ? (
-              <ComboboxList role="listbox" aria-label="Risk signals">
+              <ComboboxList role="listbox" aria-label={t('title')}>
                 <AutoSizer>
                   {({ width }) => (
                     <List

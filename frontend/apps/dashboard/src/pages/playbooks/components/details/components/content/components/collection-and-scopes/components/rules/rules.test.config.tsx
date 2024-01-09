@@ -1,4 +1,5 @@
 import {
+  fireEvent,
   mockRequest,
   screen,
   userEvent,
@@ -200,18 +201,25 @@ export const rulesFixture: Rule[] = [
   passRuleFixture,
 ];
 
+export const selectOption = async (label: string) => {
+  const newOption = screen.getByRole('option', {
+    name: label,
+  });
+  await fireEvent.keyDown(newOption, { key: 'Enter' });
+};
+
 export const startEditing = async (title: string) => {
-  const failSection = screen.getByRole('group', {
+  const section = screen.getByRole('group', {
     name: title,
   });
-  const [firstRuleRow] = within(failSection).queryAllByRole('row');
+  const [row] = within(section).queryAllByRole('row');
 
-  const editButton = within(firstRuleRow).getByText('Edit');
+  const editButton = within(row).getByText('Edit');
   await userEvent.click(editButton);
   await waitFor(() => {
     expect(editButton).not.toBeInTheDocument();
   });
-  return firstRuleRow;
+  return { section, row };
 };
 
 export const startAdding = async (title: string) => {
@@ -225,7 +233,7 @@ export const startAdding = async (title: string) => {
   await waitFor(() => {
     expect(addRuleButton).toBeDisabled();
   });
-  return section;
+  return { section };
 };
 
 export const isPrecededByNotBadge = ({

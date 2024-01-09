@@ -46,7 +46,6 @@ const ActionRow = ({
   };
 
   const handleChangeField = (index: number) => (newField: string) => {
-    console.log('CHANGED');
     setExpressions(currentExpressions => {
       const newExpressions = [...currentExpressions];
       newExpressions[index] = { ...newExpressions[index], field: newField };

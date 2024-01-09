@@ -2224,9 +2224,10 @@
             },
             "risk-signals-select": {
               "title": "Risk signals",
-              "aria-label": "Risk signals",
+              "aria-label": "Open risk signals select",
               "placeholder": "Select...",
-              "delete": "Delete"
+              "delete": "Delete",
+              "search": "Search by name or description"
             }
           }
         }

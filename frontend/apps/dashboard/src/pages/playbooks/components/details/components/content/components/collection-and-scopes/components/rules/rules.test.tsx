@@ -18,6 +18,7 @@ import {
   kycPlaybookFixture,
   passRuleFixture,
   rulesFixture,
+  selectOption,
   startAdding,
   startEditing,
   stepUpRuleFixture,
@@ -136,9 +137,9 @@ describe('<Rules />', () => {
           ],
         });
         await renderRulesAndWaitFinishLoading();
-        const firstRuleRow = await startEditing('Fail');
+        const { row } = await startEditing('Fail');
 
-        const notBadge = within(firstRuleRow).getByText('not');
+        const notBadge = within(row).getByText('not');
         await userEvent.click(notBadge);
         await waitFor(() => {
           expect(notBadge).toHaveAttribute('data-is-selected', 'true');
@@ -162,118 +163,87 @@ describe('<Rules />', () => {
           ],
         });
         await renderRulesAndWaitFinishLoading();
-        const firstRuleRow = await startEditing('Fail');
+        const { row } = await startEditing('Fail');
 
-        const selectTrigger = within(firstRuleRow).getByText('id_flagged');
+        const selectTrigger = within(row).getByText('id_flagged');
         await userEvent.click(selectTrigger);
 
-        await waitFor(() => {
-          const selectList = within(firstRuleRow).getByRole('listbox', {
-            name: 'Risk signals',
-          });
-          expect(selectList).toBeInTheDocument();
+        await screen.findByRole('listbox', {
+          name: 'Risk signals',
         });
-
-        const newOption = screen.getByText('address_alert_longevity');
-        await userEvent.click(newOption);
+        await selectOption('address_alert_longevity');
 
         await waitFor(() => {
-          const selectList = within(firstRuleRow).queryByRole('listbox', {
+          const selectList = within(row).queryByRole('listbox', {
             name: 'Risk signals',
           });
           expect(selectList).not.toBeInTheDocument();
         });
       });
 
-      it.skip('should cancel editing the not toggle correctly', async () => {
+      it('should cancel editing the not toggle correctly', async () => {
         await renderRulesAndWaitFinishLoading();
+        const { section, row } = await startEditing('Fail + Manual review');
 
-        const manualRevSection = screen.getByRole('group', {
-          name: 'Fail + Manual review',
-        });
-        const ruleRow = within(manualRevSection).getByRole('row');
-
-        const editButton = within(ruleRow).getByText('Edit');
-        await userEvent.click(editButton);
-        await waitFor(() => {
-          expect(editButton).not.toBeInTheDocument();
-        });
-
-        const cancelButton = within(ruleRow).getByRole('button', {
+        const cancelButton = within(row).getByRole('button', {
           name: 'Cancel',
         });
         await userEvent.click(cancelButton);
-        await waitForElementToBeRemoved(cancelButton);
         await waitFor(() => {
           expect(cancelButton).not.toBeInTheDocument();
         });
 
-        const nots = within(manualRevSection).queryAllByText('not');
+        const nots = within(section).queryAllByText('not');
         expect(nots).toHaveLength(0);
       });
 
-      it.skip('should cancel editing the risk signal code correctly', async () => {
+      it('should cancel editing the risk signal code correctly', async () => {
         await renderRulesAndWaitFinishLoading();
+        const { row } = await startEditing('Fail + Manual review');
 
-        const manualRevSection = screen.getByRole('group', {
-          name: 'Fail + Manual review',
+        const selectTrigger = within(row).getByText('watchlist_hit_ofac');
+        await userEvent.click(selectTrigger);
+
+        await screen.findByRole('listbox', {
+          name: 'Risk signals',
         });
-        const ruleRow = within(manualRevSection).getByRole('row');
-
-        const editButton = within(ruleRow).getByText('Edit');
-        await userEvent.click(editButton);
+        await selectOption('subject_deceased');
         await waitFor(() => {
-          expect(editButton).not.toBeInTheDocument();
+          const selectList = within(row).queryByRole('listbox', {
+            name: 'Risk signals',
+          });
+          expect(selectList).not.toBeInTheDocument();
         });
 
-        const fieldDropdown = within(ruleRow).getByText('watchlist_hit_ofac');
-        await userEvent.click(fieldDropdown);
-        await waitFor(() => {
-          expect(
-            within(ruleRow).getByText('address_alert_longevity'),
-          ).toBeInTheDocument();
-        });
-        await userEvent.click(within(ruleRow).getByText('subject_deceased'));
-        await waitFor(() => {
-          expect(
-            within(ruleRow).queryByText('Risk signals'),
-          ).not.toBeInTheDocument();
-        });
-
-        const cancelButton = within(ruleRow).getByRole('button', {
+        const cancelButton = within(row).getByRole('button', {
           name: 'Cancel',
         });
         await userEvent.click(cancelButton);
         await waitFor(() => {
           expect(cancelButton).not.toBeInTheDocument();
         });
-
-        expect(
-          within(ruleRow).queryByText('subject_deceased'),
-        ).not.toBeInTheDocument();
       });
 
-      it.skip('should delete a rule correctly', async () => {
+      it('should delete a rule correctly', async () => {
         withDeleteRule(passRuleFixture.ruleId);
         await renderRulesAndWaitFinishLoading();
+        const { row } = await startEditing('Pass + Manual review');
 
-        const row = await startEditing('Pass + Manual review');
         const deleteButton = within(row).getByText('Delete rule');
         await userEvent.click(deleteButton);
+        await waitForElementToBeRemoved(deleteButton);
+
         await waitFor(() => {
-          expect(
-            within(row).queryByText('Delete rule'),
-          ).not.toBeInTheDocument();
+          const confirmationTitle = screen.getByText('Success!');
+          expect(confirmationTitle).toBeInTheDocument();
         });
         await waitFor(() => {
-          expect(screen.getByText('Success!')).toBeInTheDocument();
-        });
-        await waitFor(() => {
-          expect(screen.getByText('Rule deleted.')).toBeInTheDocument();
+          const confirmationMessage = screen.getByText('Rule deleted.');
+          expect(confirmationMessage).toBeInTheDocument();
         });
       });
 
-      it.skip('should add a rule to an empty section correctly', async () => {
+      it('should add a rule to an empty section correctly', async () => {
         withAddRule(stepUpRuleFixture);
         await renderRulesAndWaitFinishLoading();
         await startAdding('Step-up');
@@ -301,21 +271,11 @@ describe('<Rules />', () => {
 
         const selectTrigger = within(newRuleRow).getByText('Select...');
         await userEvent.click(selectTrigger);
-
-        await waitFor(() => {
-          const select = screen.getByRole('listbox', {
-            name: 'Risk signals',
-          });
-          expect(select).toBeInTheDocument();
-        });
-
-        const select = screen.getByRole('listbox', {
+        await screen.findByRole('listbox', {
           name: 'Risk signals',
         });
-        const newOption = within(select).getByRole('option', {
-          name: 'dob_does_not_match',
-        });
-        await userEvent.click(newOption);
+
+        await selectOption('dob_does_not_match');
 
         await waitFor(() => {
           expect(
@@ -328,54 +288,48 @@ describe('<Rules />', () => {
         const saveButton = within(newRuleRow).getByRole('button', {
           name: 'Save',
         });
-        // await userEvent.click(saveButton);
-        // await waitFor(() => {
-        //   expect(saveButton).not.toBeInTheDocument();
-        // });
+        await userEvent.click(saveButton);
+        await waitFor(() => {
+          expect(saveButton).not.toBeInTheDocument();
+        });
 
-        // await waitFor(() => {
-        //   expect(screen.getByText('Success!')).toBeInTheDocument();
-        // });
-        // await waitFor(() => {
-        //   expect(screen.getByText('Rule added.')).toBeInTheDocument();
-        // });
+        await waitFor(() => {
+          const confirmationTitle = screen.getByText('Success!');
+          expect(confirmationTitle).toBeInTheDocument();
+        });
+        await waitFor(() => {
+          const confirmationMessage = screen.getByText('Rule added.');
+          expect(confirmationMessage).toBeInTheDocument();
+        });
       });
 
-      it.skip('should cancel an added rule correctly', async () => {
+      it('should cancel an added rule correctly', async () => {
         await renderRulesAndWaitFinishLoading();
 
-        const passSection = screen.getByRole('group', {
-          name: 'Pass + Manual review',
-        });
-        const addRuleButton = within(passSection).getByRole('button', {
-          name: 'Add rule',
-        });
-        await userEvent.click(addRuleButton);
-        await waitFor(() => {
-          expect(addRuleButton).toBeDisabled();
-        });
+        const { section } = await startAdding('Pass + Manual review');
+        const row = within(section).queryAllByRole('row')[1];
 
-        const newRuleRow = within(passSection).queryAllByRole('row')[1];
-        const notBadge = within(newRuleRow).getByText('not');
+        const notBadge = within(row).getByText('not');
         await userEvent.click(notBadge);
         await waitFor(() => {
           expect(notBadge).toHaveAttribute('data-is-selected', 'true');
         });
-        const fieldDropdown = within(newRuleRow).getByText('Select...');
-        await userEvent.click(fieldDropdown);
-        await waitFor(() => {
-          expect(
-            within(newRuleRow).getByText('address_alert_longevity'),
-          ).toBeInTheDocument();
-        });
-        await userEvent.click(within(newRuleRow).getByText('name_matches'));
-        await waitFor(() => {
-          expect(
-            within(newRuleRow).queryByText('Risk signals'),
-          ).not.toBeInTheDocument();
+
+        const selectTrigger = within(row).getByText('Select...');
+        await userEvent.click(selectTrigger);
+        await screen.findByRole('listbox', {
+          name: 'Risk signals',
         });
 
-        const cancelButton = within(newRuleRow).getByRole('button', {
+        await selectOption('name_matches');
+        await waitFor(() => {
+          const selectList = within(row).queryByRole('listbox', {
+            name: 'Risk signals',
+          });
+          expect(selectList).not.toBeInTheDocument();
+        });
+
+        const cancelButton = within(row).getByRole('button', {
           name: 'Cancel',
         });
         await userEvent.click(cancelButton);
@@ -383,11 +337,8 @@ describe('<Rules />', () => {
           expect(cancelButton).not.toBeInTheDocument();
         });
 
-        const nots = within(passSection).queryAllByText('not');
+        const nots = within(section).queryAllByText('not');
         expect(nots).toHaveLength(0);
-        expect(
-          within(passSection).queryByText('name_matches'),
-        ).not.toBeInTheDocument();
       });
     });
   });
