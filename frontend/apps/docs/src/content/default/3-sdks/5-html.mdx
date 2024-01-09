@@ -131,12 +131,13 @@ Footprint provides some events based on some actions performed by the user. To l
 </script>
 ```
 
-| Name         | Description                                                                                                                     |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| `onComplete` | Triggered after completing the onboarding flow. You'll receive a `validationToken`, and from there you can post to your backend |
-| `onCancel`   | Triggered when the user abandons the flow. This can be triggered when the user clicks on the close button inside our iframe     |
-| `onClose`    | Triggered when the user closes the flow (either completed or canceled).                                                         |
-| `onClick`    | Triggered when the verify button is clicked.                                                                                    |
+| Name         | Description                                                                                                                                                          |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `onComplete` | Triggered after completing the onboarding flow. You'll receive a `validationToken`, and from there you can post to your backend                                      |
+| `onError`    | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details. |
+| `onCancel`   | Triggered when the user abandons the flow. This can be triggered when the user clicks on the close button inside our iframe                                          |
+| `onClose`    | Triggered when the user closes the flow (either completed or canceled).                                                                                              |
+| `onClick`    | Triggered when the verify button is clicked.                                                                                                                         |
 
 ## Form Component Integration
 
@@ -227,11 +228,12 @@ Our Form component provides some events based on actions performed by the user. 
 </script>
 ```
 
-| Name         | Description                                                                                                                        |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `onComplete` | Triggered after user completes the form and data is saved to the user vault.                                                       |
-| `onCancel`   | Triggered when the user abandons the flow. This can be triggered when the user clicks on close or cancel buttons inside our iframe |
-| `onClose`    | Triggered when the user abandons the flow. This can be triggered when the user clicks on close or cancel buttons inside our iframe |
+| Name         | Description                                                                                                                                                          |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `onComplete` | Triggered after user completes the form and data is saved to the user vault.                                                                                         |
+| `onError`    | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details. |
+| `onCancel`   | Triggered when the user abandons the flow. This can be triggered when the user clicks on close or cancel buttons inside our iframe                                   |
+| `onClose`    | Triggered when the user abandons the flow. This can be triggered when the user clicks on close or cancel buttons inside our iframe                                   |
 
 ## Auth Component Integration
 
@@ -324,5 +326,6 @@ Footprint provides some events based on some actions performed by the user. To l
 | Name         | Description                                                                                                                                                                                                                      |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `onComplete` | Triggered after completing the authentication flow. You'll receive a `validationToken`, You must verify this validation token on your backend and exchange it for the exact fp_id (unique identifier) of the authenticated user. |
+| `onError`    | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                                                             |
 | `onCancel`   | Triggered when the user abandons the flow. This can be triggered when the user clicks on the close button inside our iframe                                                                                                      |
 | `onClose`    | Triggered when the user closes the flow (either completed or canceled).                                                                                                                                                          |
