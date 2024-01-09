@@ -110,6 +110,7 @@ const PinInput = ({
               required
               type="tel"
               value={enteredPin[pinIndex] || ''}
+              width="40px"
             />
           );
         })}
@@ -132,7 +133,6 @@ const Pin = styled(Input)<{ isDisabled: boolean }>`
     padding: 0;
     pointer-events: ${isDisabled ? 'none' : undefined};
     text-align: center;
-    width: 40px;
   `}
 `;
 
