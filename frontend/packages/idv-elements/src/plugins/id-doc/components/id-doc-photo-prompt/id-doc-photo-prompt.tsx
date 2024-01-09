@@ -38,7 +38,7 @@ const IdDocPhotoPrompt = ({
   country,
   promptConsent,
 }: IdDocPhotoPromptProps) => {
-  const { t } = useTranslation('components.id-doc.id-doc-photo-prompt');
+  const { t } = useTranslation('id-doc.components.id-doc-photo-prompt');
   const [state, send] = useIdDocMachine();
   const { shouldCollectConsent: consentRequired } = state.context.requirement;
   const [consentVisible, setConsentVisible] = useState(false);

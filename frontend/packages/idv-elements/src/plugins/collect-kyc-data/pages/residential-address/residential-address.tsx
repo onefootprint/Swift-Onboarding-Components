@@ -36,7 +36,7 @@ const ResidentialAddress = ({
   hideHeader,
   disableCountry,
 }: ResidentialAddressProps) => {
-  const { t } = useTranslation('pages.kyc.residential-address');
+  const { t } = useTranslation('kyc.pages.residential-address');
   const [state, send] = useCollectKycDataMachine();
   const { data, config } = state.context;
   const countryFromContext = data[IdDI.country]?.value;

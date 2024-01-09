@@ -11,7 +11,7 @@ import getRequirementsTitleTranslationKey from '../../../utils/get-requirements-
 const Processing = () => {
   const [state, send] = useDesktopMachine();
   const { scopedAuthToken, missingRequirements } = state.context;
-  const { t, allT } = useTranslation('pages.desktop.processing');
+  const { t, allT } = useTranslation('transfer.pages.desktop.processing');
   const allTKey = getRequirementsTitleTranslationKey(missingRequirements);
   const cancelD2P = useCancelD2P({
     authToken: scopedAuthToken,

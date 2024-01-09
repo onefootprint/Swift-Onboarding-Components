@@ -14,7 +14,7 @@ import useConsent from '../../hooks/use-consent';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 
 const DesktopConsent = () => {
-  const { t } = useTranslation('pages.id-doc.desktop-consent');
+  const { t } = useTranslation('id-doc.pages.desktop-consent');
   const [state, send] = useIdDocMachine();
   const { authToken } = state.context;
   const consentMutation = useConsent();

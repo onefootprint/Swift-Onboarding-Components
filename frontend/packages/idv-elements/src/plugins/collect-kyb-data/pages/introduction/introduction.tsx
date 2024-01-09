@@ -11,7 +11,7 @@ import useCollectKybDataMachine from '../../hooks/use-collect-kyb-data-machine';
 
 const Introduction = () => {
   const [, send] = useCollectKybDataMachine();
-  const { allT, t } = useTranslation('pages.kyb.introduction');
+  const { allT, t } = useTranslation('kyb.pages.introduction');
 
   const handleClick = () => {
     send({
@@ -39,7 +39,7 @@ const Introduction = () => {
         variant="default"
       />
       <Button fullWidth onClick={handleClick}>
-        {allT('pages.kyb.cta.continue')}
+        {allT('kyb.pages.cta.continue')}
       </Button>
     </Container>
   );

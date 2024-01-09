@@ -10,7 +10,7 @@ type NationalityFieldProps = {
 };
 
 const NationalityField = ({ disabled }: NationalityFieldProps) => {
-  const { t } = useTranslation('pages.kyc.basic-information.form.nationality');
+  const { t } = useTranslation('kyc.pages.basic-information.form.nationality');
   const { control } = useFormContext();
   const l10n = useL10nContext();
 

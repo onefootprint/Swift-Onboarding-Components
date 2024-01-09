@@ -32,7 +32,7 @@ const BasicData = ({
   const { authToken, config, data, kybRequirement } = state.context;
   const { missingAttributes } = kybRequirement || {};
   const { mutation, syncData } = useSyncData();
-  const { t, allT } = useTranslation('pages.kyb.basic-data');
+  const { t, allT } = useTranslation('kyb.components.basic-data');
 
   const handleSubmit = (basicData: BasicDataFields) => {
     const handleSuccess = () => {
@@ -73,7 +73,7 @@ const BasicData = ({
       ? {
           value: corpTypeValue,
           label: allT(
-            `pages.basic-data.form.corporation-type.mapping.${corpTypeValue}`,
+            `kyb.pages.basic-data.form.corporation-type.mapping.${corpTypeValue}`,
           ),
         }
       : undefined,

@@ -40,7 +40,7 @@ const BeneficialOwners = ({
   } = state.context;
   const { mutation, syncData } = useSyncData();
   const checkDuplicateContacts = useCheckDuplicateContacts();
-  const { t } = useTranslation('pages.kyb.beneficial-owners');
+  const { t } = useTranslation('kyb.pages.beneficial-owners');
   const requireMultiKyc = missingAttributes.includes(
     CollectedKybDataOption.kycedBeneficialOwners,
   );

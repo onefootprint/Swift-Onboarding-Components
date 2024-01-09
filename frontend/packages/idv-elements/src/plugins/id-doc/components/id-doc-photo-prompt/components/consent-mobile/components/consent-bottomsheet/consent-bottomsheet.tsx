@@ -42,7 +42,7 @@ const ConsentBottomSheet = ({
   testID,
 }: ConsentBottomSheetProps) => {
   const { t } = useTranslation(
-    'components.id-doc-photo-prompt.consent-mobile.consent-bottomsheet',
+    'id-doc.components.id-doc-photo-prompt.consent-mobile.consent-bottomsheet',
   );
   const bottomSheetRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(bottomSheetRef, () => {

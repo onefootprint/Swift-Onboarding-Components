@@ -13,7 +13,7 @@ import useMobileMachine from '../../../hooks/mobile/use-mobile-machine';
 import useGenerateScopedAuthToken from '../../../hooks/use-generate-scoped-auth-token';
 
 const Sms = () => {
-  const { t } = useTranslation('pages.transfer.mobile.sms');
+  const { t } = useTranslation('transfer.pages.mobile.sms');
   useHandleD2PStatusUpdate();
   const [state, send] = useMobileMachine();
   const { config, scopedAuthToken, authToken, device, idDocOutcome } =

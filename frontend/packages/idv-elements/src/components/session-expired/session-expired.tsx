@@ -9,7 +9,7 @@ type SessionExpiredProps = {
 };
 
 const SessionExpired = ({ onRestart }: SessionExpiredProps) => {
-  const { t } = useTranslation('components.session-expired');
+  const { t } = useTranslation('global.components.session-expired');
 
   return (
     <>

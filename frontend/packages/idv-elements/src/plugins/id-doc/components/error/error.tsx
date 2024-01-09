@@ -22,7 +22,7 @@ type ErrorProps = {
 };
 
 const Error = ({ errors, imageType, docType, countryName }: ErrorProps) => {
-  const { t } = useTranslation('components.id-doc.error');
+  const { t } = useTranslation('id-doc.components.error');
 
   const side = getImageSideLabel(imageType, docType);
 

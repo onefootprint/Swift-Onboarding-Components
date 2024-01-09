@@ -8,7 +8,7 @@ const CityField = () => {
     register,
     formState: { errors },
   } = useFormContext();
-  const { t } = useTranslation('pages.kyb.business-address.form.city');
+  const { t } = useTranslation('kyb.pages.business-address.form.city');
 
   return (
     <TextInput

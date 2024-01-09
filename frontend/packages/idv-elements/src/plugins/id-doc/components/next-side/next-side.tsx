@@ -13,7 +13,7 @@ type NextSideProps = {
 };
 
 const NextSide = ({ nextSideImageType, onComplete }: NextSideProps) => {
-  const { t } = useTranslation('components.id-doc.next-side');
+  const { t } = useTranslation('id-doc.components.next-side');
   const Icon = imageIcons[nextSideImageType];
 
   useTimeout(() => {

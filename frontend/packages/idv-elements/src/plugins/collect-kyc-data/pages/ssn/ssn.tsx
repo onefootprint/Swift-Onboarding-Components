@@ -36,7 +36,7 @@ const SSN = ({
   onComplete,
   onCancel,
 }: SSNProps) => {
-  const { t } = useTranslation('pages.kyc.ssn');
+  const { t } = useTranslation('kyc.pages.ssn');
   const confirmationDialog = useConfirmationDialog();
   const [state, send] = useCollectKycDataMachine();
   const { data, requirement, config } = state.context;

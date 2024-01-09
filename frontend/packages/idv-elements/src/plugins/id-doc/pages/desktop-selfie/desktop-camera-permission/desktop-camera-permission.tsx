@@ -15,7 +15,7 @@ const DesktopCameraPermission = ({
   permissionState,
 }: DesktopCameraPermissionProps) => {
   const { t } = useTranslation(
-    'pages.desktop-selfie.desktop-camera-permission',
+    'id-doc.pages.desktop-selfie.desktop-camera-permission',
   );
 
   return (

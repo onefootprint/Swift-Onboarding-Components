@@ -12,7 +12,7 @@ import useMobileMachine from '../../../hooks/mobile/use-mobile-machine';
 import useGenerateScopedAuthToken from '../../../hooks/use-generate-scoped-auth-token';
 
 const NewTabRequest = () => {
-  const { t } = useTranslation('pages.mobile.new-tab-requested');
+  const { t } = useTranslation('transfer.pages.mobile.new-tab-requested');
   const [state, send] = useMobileMachine();
   const { authToken, device, config, scopedAuthToken, idDocOutcome } =
     state.context;

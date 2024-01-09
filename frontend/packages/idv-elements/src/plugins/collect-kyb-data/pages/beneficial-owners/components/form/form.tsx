@@ -36,7 +36,7 @@ const Form = ({
   config,
 }: FormProps) => {
   const [animate] = useAutoAnimate<HTMLFormElement>();
-  const { t } = useTranslation('pages.kyb.beneficial-owners.form');
+  const { t } = useTranslation('kyb.pages.beneficial-owners.form');
   const toast = useToast();
   const l10n = useL10nContext();
   const defaultBeneficialOwnersData = defaultValues ?? [

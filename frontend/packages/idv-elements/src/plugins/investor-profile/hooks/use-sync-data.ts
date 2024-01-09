@@ -18,7 +18,7 @@ type SyncDataArgs = {
 
 const useSyncData = () => {
   const investorProfileDataMutation = useUserData();
-  const { t } = useTranslation('components.investor-profile.sync-data-error');
+  const { t } = useTranslation('investor-profile.components.sync-data-error');
   const toast = useToast();
 
   const syncData = ({

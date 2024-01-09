@@ -12,7 +12,7 @@ export type ImageConsentHandler = {
 };
 
 const ImageConsent = forwardRef<ImageConsentHandler, {}>((props, ref) => {
-  const { t } = useTranslation('components.id-doc.image-consent');
+  const { t } = useTranslation('id-doc.components.image-consent');
   const [isThirdPartyConsented, setIsThirdPartyConsented] = useState(false);
 
   useImperativeHandle(

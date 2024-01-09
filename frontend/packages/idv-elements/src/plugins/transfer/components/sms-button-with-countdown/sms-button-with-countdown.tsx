@@ -18,7 +18,7 @@ const SmsButtonWithCountdown = ({
   url,
   authToken,
 }: SmsButtonWithCountdownProps) => {
-  const { t } = useTranslation('components.transfer.sms-button-with-countdown');
+  const { t } = useTranslation('transfer.components.sms-button-with-countdown');
   const { countdown, setSeconds } = useCountdown({
     onCompleted: () => setIsDisabled(false),
   });

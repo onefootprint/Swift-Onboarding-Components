@@ -24,7 +24,7 @@ const CitizenshipField = ({
   hasError,
   hint,
 }: CitizenshipFieldProps) => {
-  const { t } = useTranslation('pages.kyc.legal-status.form');
+  const { t } = useTranslation('kyc.pages.legal-status.form');
   const l10n = useL10nContext();
 
   const citizenshipSelect = (

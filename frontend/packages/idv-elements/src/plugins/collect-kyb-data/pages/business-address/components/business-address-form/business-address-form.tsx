@@ -50,7 +50,7 @@ const BusinessAddressForm = ({
   onSubmit,
   onCancel,
 }: BusinessAddressFormProps) => {
-  const { t } = useTranslation('pages.kyb.business-address.form');
+  const { t } = useTranslation('kyb.pages.business-address.form');
 
   const methods = useForm<FormData>({
     defaultValues: {

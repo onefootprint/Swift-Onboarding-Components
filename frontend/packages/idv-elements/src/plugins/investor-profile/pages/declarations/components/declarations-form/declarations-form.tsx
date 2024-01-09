@@ -39,7 +39,7 @@ const DeclarationsForm = ({
   isLoading,
   onSubmit,
 }: DeclarationsFormProps) => {
-  const { t } = useTranslation('pages.investor-profile.declarations');
+  const { t } = useTranslation('investor-profile.pages.declarations');
   const defaultEntries = (
     defaultValues?.[InvestorProfileDI.declarations] ?? []
   ).map(goal => [goal, true]);

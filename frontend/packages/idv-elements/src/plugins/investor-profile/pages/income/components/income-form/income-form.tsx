@@ -26,7 +26,7 @@ const IncomeForm = ({
   isLoading,
   onSubmit,
 }: IncomeFormProps) => {
-  const { t } = useTranslation('pages.investor-profile.income');
+  const { t } = useTranslation('investor-profile.pages.income');
   const { handleSubmit, register } = useForm<FormData>({
     defaultValues: {
       income:

@@ -20,7 +20,7 @@ const CountryField = ({ onChange, disabled }: CountryFieldProps) => {
   } = state;
   const { control, watch } = useFormContext<FormData>();
   const country = watch('country');
-  const { t } = useTranslation('pages.kyc.residential-address.form.country');
+  const { t } = useTranslation('kyc.pages.residential-address.form.country');
   const l10n = useL10nContext();
   const allowedCountries = new Set(config.supportedCountries);
   const shouldDisable = disabled || allowedCountries.size === 1;

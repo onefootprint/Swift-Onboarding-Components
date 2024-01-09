@@ -13,7 +13,7 @@ type UploadFilesProps = {
 // this component supports multiple files
 const UploadFiles = ({ onChange }: UploadFilesProps) => {
   const { t } = useTranslation(
-    'pages.investor-profile.declarations.doc-upload',
+    'investor-profile.pages.declarations.doc-upload',
   );
   const inputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<File[]>([]);

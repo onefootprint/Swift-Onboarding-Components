@@ -13,7 +13,7 @@ import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-mac
 import BasicData from '../../../basic-data';
 
 const BasicDataSection = () => {
-  const { allT, t } = useTranslation('pages.kyb.confirm.basic-data');
+  const { allT, t } = useTranslation('kyb.pages.confirm.basic-data');
   const [state] = useCollectKybDataMachine();
   const { data } = state.context;
   const [editing, setEditing] = useState(false);
@@ -49,7 +49,7 @@ const BasicDataSection = () => {
     basicInfo.push({
       text: t('corporation-type'),
       subtext: allT(
-        `pages.basic-data.form.corporation-type.mapping.${corporationType}`,
+        `kyb.pages.basic-data.form.corporation-type.mapping.${corporationType}`,
       ),
     });
   }
@@ -96,7 +96,7 @@ const BasicDataSection = () => {
     return (
       <BasicData
         hideHeader
-        ctaLabel={allT('pages.kyb.confirm.summary.save')}
+        ctaLabel={allT('kyb.pages.confirm.summary.save')}
         onComplete={stopEditing}
         onCancel={stopEditing}
       />
@@ -106,7 +106,7 @@ const BasicDataSection = () => {
   const actions: SectionAction[] = [];
   if (!editing) {
     actions.push({
-      label: allT('pages.kyb.confirm.summary.edit'),
+      label: allT('kyb.pages.confirm.summary.edit'),
       onClick: () => setEditing(true),
     });
   }

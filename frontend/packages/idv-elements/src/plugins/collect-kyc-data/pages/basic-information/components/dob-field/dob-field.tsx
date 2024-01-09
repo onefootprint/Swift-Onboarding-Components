@@ -9,7 +9,7 @@ import validateDob, { DobValidationError } from './utils/validate-dob';
 type DobFieldProps = { disabled?: boolean };
 
 const DobField = ({ disabled }: DobFieldProps) => {
-  const { t } = useTranslation('pages.kyc.basic-information.form.dob');
+  const { t } = useTranslation('kyc.pages.basic-information.form.dob');
   const {
     register,
     getValues,

@@ -40,7 +40,7 @@ const LegalStatus = ({
   const [state, send] = useCollectKycDataMachine();
   const { data } = state.context;
   const { mutation, syncData } = useSyncData();
-  const { t } = useTranslation('pages.kyc.legal-status');
+  const { t } = useTranslation('kyc.pages.legal-status');
   const convertFormData = useConvertFormData();
 
   const usCountryRecord = COUNTRIES.find(country => country.value === 'US');

@@ -5,7 +5,7 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
 const LivenessSuccess = () => {
-  const { t } = useTranslation('components.liveness-success');
+  const { t } = useTranslation('liveness.components.liveness-success');
 
   return (
     <IconContainer>

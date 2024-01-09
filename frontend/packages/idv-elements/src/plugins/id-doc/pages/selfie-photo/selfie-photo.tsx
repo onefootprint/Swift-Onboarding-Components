@@ -9,7 +9,7 @@ import type { CaptureKind } from '../../utils/state-machine';
 const FACE_OUTLINE_TO_WIDTH_RATIO = 0.7;
 
 const SelfiePhoto = () => {
-  const { t } = useTranslation('pages.id-doc.selfie-photo');
+  const { t } = useTranslation('id-doc.pages.selfie-photo');
   const [, send] = useIdDocMachine();
 
   const onComplete = (

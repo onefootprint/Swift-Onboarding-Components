@@ -18,7 +18,7 @@ import LegalStatus from '../../../legal-status';
 import getCountrySelectOption from '../../../legal-status/utils/get-country-select-option';
 
 const LegalStatusSection = () => {
-  const { t, allT } = useTranslation('pages');
+  const { t, allT } = useTranslation('kyc.pages');
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
   const [editing, setEditing] = useState(false);
@@ -108,7 +108,7 @@ const LegalStatusSection = () => {
   const actions: SectionAction[] = [];
   if (!editing) {
     actions.push({
-      label: allT('pages.kyc.confirm.summary.edit'),
+      label: allT('kyc.pages.confirm.summary.edit'),
       onClick: () => setEditing(true),
     });
   }

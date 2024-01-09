@@ -22,7 +22,7 @@ type SyncDataArgs = {
 };
 
 const useSyncData = () => {
-  const { t } = useTranslation('components.kyc.sync-data-error');
+  const { t } = useTranslation('kyc.components.sync-data-error');
   const [state] = useCollectKycDataMachine();
   const showRequestErrorToast = useRequestErrorToast();
   const { authToken, requirement } = state.context;

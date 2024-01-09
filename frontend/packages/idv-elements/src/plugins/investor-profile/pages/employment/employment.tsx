@@ -51,8 +51,12 @@ const Employment = () => {
       <GenericTransition
         firstIcon={IcoUser40}
         secondIcon={IcoDollar40}
-        firstText={allT('components.transition-animation.source')}
-        secondText={allT('components.transition-animation.destination')}
+        firstText={allT(
+          'investor-profile.components.transition-animation.source',
+        )}
+        secondText={allT(
+          'investor-profile.components.transition-animation.destination',
+        )}
         timeout={4000}
         onAnimationEnd={() => setShowAnimation(false)}
         showFeedbackIcon

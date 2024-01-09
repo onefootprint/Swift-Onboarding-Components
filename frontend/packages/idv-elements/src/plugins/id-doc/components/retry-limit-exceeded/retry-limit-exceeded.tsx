@@ -12,7 +12,7 @@ import FeedbackIcon from '../feedback-icon';
 import { useIdDocMachine } from '../machine-provider';
 
 const RetryLimitExceeded = () => {
-  const { t } = useTranslation('components.id-doc.retry-limit-exceeded');
+  const { t } = useTranslation('id-doc.components.retry-limit-exceeded');
 
   const [, send] = useIdDocMachine();
 

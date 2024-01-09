@@ -21,7 +21,7 @@ const translationIndex: { [key in SupportedIdDocTypes]: string } = {
 };
 
 const BackPhotoCapture = () => {
-  const { t } = useTranslation('pages.id-doc.back-photo-capture');
+  const { t } = useTranslation('id-doc.pages.back-photo-capture');
   const [state, send] = useIdDocMachine();
 
   const {

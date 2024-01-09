@@ -20,7 +20,7 @@ const EditableFormButtonContainer = ({
   skipLabel,
   submitButtonTestID,
 }: EditableFormButtonContainerProps) => {
-  const { t } = useTranslation('components');
+  const { t } = useTranslation('global.components.cta');
 
   if (onCancel) {
     return (
@@ -32,7 +32,7 @@ const EditableFormButtonContainer = ({
           onClick={onCancel}
           disabled={isLoading}
         >
-          {t('cta.cancel')}
+          {t('cancel')}
         </Button>
         <Button
           size="small"
@@ -40,7 +40,7 @@ const EditableFormButtonContainer = ({
           loading={isLoading}
           testID={submitButtonTestID}
         >
-          {t('cta.save')}
+          {t('save')}
         </Button>
       </EndJustifiedButtons>
     );
@@ -55,7 +55,7 @@ const EditableFormButtonContainer = ({
           loading={isLoading}
           testID={submitButtonTestID}
         >
-          {ctaLabel ?? t('cta.continue')}
+          {ctaLabel ?? t('continue')}
         </Button>
         <LinkButton onClick={onSkip}>{skipLabel}</LinkButton>
       </VerticalButtons>
@@ -69,7 +69,7 @@ const EditableFormButtonContainer = ({
       loading={isLoading}
       testID={submitButtonTestID}
     >
-      {ctaLabel ?? t('cta.continue')}
+      {ctaLabel ?? t('continue')}
     </Button>
   );
 };

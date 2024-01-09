@@ -10,7 +10,7 @@ type StatusFieldsProps = {
 };
 
 const StatusFields = ({ handleStatusChange }: StatusFieldsProps) => {
-  const { t } = useTranslation('pages.kyc.legal-status.statuses');
+  const { t } = useTranslation('kyc.pages.legal-status.statuses');
   const { register } = useFormContext();
 
   return (

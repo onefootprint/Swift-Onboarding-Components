@@ -17,7 +17,7 @@ type IdDocPhotoButtonsProp = {
 };
 
 const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
-  const { t } = useTranslation('components.id-doc.id-doc-photo-upload-buttons');
+  const { t } = useTranslation('id-doc.components.id-doc-photo-upload-buttons');
   const [state, send] = useIdDocMachine();
   const { hasBadConnectivity } = state.context;
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();

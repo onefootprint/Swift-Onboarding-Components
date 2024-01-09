@@ -7,7 +7,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { useL10nContext } from '../../../../../../components/l10n-provider';
 
 const CountryOfBirthField = () => {
-  const { t } = useTranslation('pages.kyc.legal-status.form.nationality');
+  const { t } = useTranslation('kyc.pages.legal-status.form.nationality');
   const { control } = useFormContext();
   const l10n = useL10nContext();
 

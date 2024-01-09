@@ -16,7 +16,7 @@ const UploadComplianceLetter = ({
   onChange,
 }: UploadComplianceLetterProps) => {
   const { t } = useTranslation(
-    'pages.investor-profile.declarations.doc-upload',
+    'investor-profile.pages.declarations.doc-upload',
   );
 
   return (

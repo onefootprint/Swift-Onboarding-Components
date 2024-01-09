@@ -22,7 +22,7 @@ const Instructions = ({
   isOpen,
   autocaptureKind,
 }: InstructionProps) => {
-  const { t } = useTranslation('components.id-doc.photo-capture.instructions');
+  const { t } = useTranslation('id-doc.components.photo-capture.instructions');
   const instructionItems = [
     {
       title: t(`position-${autocaptureKind}.title`),

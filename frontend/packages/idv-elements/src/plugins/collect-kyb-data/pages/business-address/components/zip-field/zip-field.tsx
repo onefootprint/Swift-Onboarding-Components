@@ -16,7 +16,7 @@ const ZipField = ({ countryCode }: ZipFieldProps) => {
     formState: { errors },
     getValues,
   } = useFormContext();
-  const { t } = useTranslation('pages.kyb.business-address.form.zip');
+  const { t } = useTranslation('kyb.pages.business-address.form.zip');
   const { zip } = useInputValidations(countryCode);
 
   return (

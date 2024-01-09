@@ -14,7 +14,7 @@ import useBiometricInit from '../../hooks/use-register-biometric';
 const SUCCESS_TRANSITION_DELAY_MS = 1500;
 
 const Register = () => {
-  const { t } = useTranslation('pages.register');
+  const { t } = useTranslation('liveness.pages.register');
   const [state, send] = useLivenessMachine();
   const { authToken } = state.context;
   const biometricInitMutation = useBiometricInit();

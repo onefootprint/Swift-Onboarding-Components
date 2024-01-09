@@ -11,7 +11,7 @@ type SuccessProps = {
 };
 
 const Success = ({ onComplete }: SuccessProps) => {
-  const { t } = useTranslation('components.id-doc.success');
+  const { t } = useTranslation('id-doc.components.success');
 
   useEffect(() => {
     // This conditional should satisfy only when we are done with the flow

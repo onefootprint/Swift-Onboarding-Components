@@ -11,7 +11,7 @@ import useCameraPermission from './hooks/use-camera-permission';
 const FACE_OUTLINE_TO_WIDTH_RATIO = 0.7;
 
 const DesktopSelfie = () => {
-  const { t } = useTranslation('pages.id-doc.desktop-selfie');
+  const { t } = useTranslation('id-doc.pages.desktop-selfie');
   const [, send] = useIdDocMachine();
   const permissionState = useCameraPermission();
 
