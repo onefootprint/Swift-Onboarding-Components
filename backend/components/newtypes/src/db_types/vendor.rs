@@ -64,9 +64,6 @@ impl_enum_str_diesel!(Vendor);
 /// Represents the API for the request we'll make
 pub enum VendorAPI {
     IdologyExpectId,
-    IdologyScanVerifySubmission,
-    IdologyScanVerifyResults,
-    IdologyScanOnboarding,
     IdologyPa,
     TwilioLookupV2,
     SocureIdPlus,
@@ -100,9 +97,6 @@ impl From<VendorAPI> for Vendor {
     fn from(api: VendorAPI) -> Self {
         match api {
             VendorAPI::IdologyExpectId => Self::Idology,
-            VendorAPI::IdologyScanVerifySubmission => Self::Idology,
-            VendorAPI::IdologyScanVerifyResults => Self::Idology,
-            VendorAPI::IdologyScanOnboarding => Self::Idology,
             VendorAPI::TwilioLookupV2 => Self::Twilio,
             VendorAPI::SocureIdPlus => Self::Socure,
             VendorAPI::IdologyPa => Self::Idology,
@@ -148,10 +142,7 @@ impl VendorAPI {
             | VendorAPI::TwilioLookupV2
             | VendorAPI::ExperianPreciseId
             | VendorAPI::LexisFlexId => true,
-            VendorAPI::IdologyScanVerifySubmission
-            | VendorAPI::IdologyScanVerifyResults
-            | VendorAPI::IdologyScanOnboarding
-            | VendorAPI::IdologyPa
+            VendorAPI::IdologyPa
             | VendorAPI::MiddeskCreateBusiness
             | VendorAPI::MiddeskGetBusiness
             | VendorAPI::MiddeskBusinessUpdateWebhook
@@ -192,9 +183,6 @@ impl VendorAPI {
             VendorAPI::IncodeWatchlistCheck
             | VendorAPI::IncodeUpdatedWatchlistResult
             | VendorAPI::IncodeStartOnboarding
-            | VendorAPI::IdologyScanVerifySubmission
-            | VendorAPI::IdologyScanVerifyResults
-            | VendorAPI::IdologyScanOnboarding
             | VendorAPI::IdologyPa
             | VendorAPI::MiddeskCreateBusiness
             | VendorAPI::MiddeskGetBusiness

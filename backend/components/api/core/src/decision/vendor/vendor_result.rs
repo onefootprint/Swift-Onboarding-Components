@@ -186,15 +186,8 @@ fn deserialize_from_vendor_api(
 ) -> Result<ParsedResponse, ApiError> {
     let res = match vendor_api {
         VendorAPI::IdologyExpectId => ParsedResponse::from_idology_expectid_response(raw_response)?,
-        VendorAPI::IdologyScanVerifySubmission => {
-            ParsedResponse::from_idology_scan_verify_submission(raw_response)?
-        }
-        VendorAPI::IdologyScanVerifyResults => {
-            ParsedResponse::from_idology_scan_verify_results(raw_response)?
-        }
         VendorAPI::TwilioLookupV2 => ParsedResponse::from_twilio_lookupv2_response(raw_response)?,
         VendorAPI::SocureIdPlus => ParsedResponse::from_socure_idplus_response(raw_response)?,
-        VendorAPI::IdologyScanOnboarding => ParsedResponse::from_idology_scan_onboarding(raw_response)?,
         VendorAPI::IdologyPa => ParsedResponse::from_idology_pa(raw_response)?,
         VendorAPI::ExperianPreciseId => ParsedResponse::from_experian_cross_core(raw_response)?,
         VendorAPI::MiddeskCreateBusiness => ParsedResponse::from_middesk_create_business(raw_response)?,

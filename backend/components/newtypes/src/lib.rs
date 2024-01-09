@@ -59,9 +59,6 @@ pub use reason_code::*;
 pub mod locked;
 pub use locked::*;
 
-pub mod status_code;
-pub use status_code::*;
-
 pub mod vendor;
 pub use vendor::*;
 

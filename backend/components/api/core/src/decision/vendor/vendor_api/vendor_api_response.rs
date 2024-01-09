@@ -30,9 +30,6 @@ use serde::de::DeserializeOwned;
 use twilio::response::lookup::LookupV2Response;
 use typedmap::{TypedMap, TypedMapKey};
 
-use idv::idology::scan_onboarding::response::ScanOnboardingAPIResponse;
-use idv::idology::scan_verify::response::{ScanVerifyAPIResponse, ScanVerifySubmissionAPIResponse};
-
 use crate::decision::vendor::{
     vendor_result::VendorResult, verification_result::decrypt_verification_result_response,
 };
@@ -89,9 +86,6 @@ pub fn scrub_raw_error_vendor_response(
 ) -> Result<ScrubbedPiiJsonValue, serde_json::Error> {
     match vendor_api {
         VendorAPI::IdologyExpectId => scrub_response::<IdologyExpectID>(raw_response),
-        VendorAPI::IdologyScanVerifySubmission => scrub_response::<IdologyScanVerifySubmission>(raw_response),
-        VendorAPI::IdologyScanVerifyResults => scrub_response::<IdologyScanVerifyResults>(raw_response),
-        VendorAPI::IdologyScanOnboarding => scrub_response::<IdologyScanOnboarding>(raw_response),
         VendorAPI::IdologyPa => scrub_response::<IdologyPa>(raw_response),
         VendorAPI::TwilioLookupV2 => scrub_response::<TwilioLookupV2>(raw_response),
         VendorAPI::SocureIdPlus => scrub_response::<SocureIDPlus>(raw_response),
@@ -148,11 +142,6 @@ fn build_parsed_vendor_response_map_entry(
 ) -> Result<(), serde_json::Error> {
     match vendor_api {
         VendorAPI::IdologyExpectId => insert_map_entry(map, IdologyExpectID, raw_response)?,
-        VendorAPI::IdologyScanVerifySubmission => {
-            insert_map_entry(map, IdologyScanVerifySubmission, raw_response)?
-        }
-        VendorAPI::IdologyScanVerifyResults => insert_map_entry(map, IdologyScanVerifyResults, raw_response)?,
-        VendorAPI::IdologyScanOnboarding => insert_map_entry(map, IdologyScanOnboarding, raw_response)?,
         VendorAPI::IdologyPa => insert_map_entry(map, IdologyPa, raw_response)?,
         VendorAPI::TwilioLookupV2 => insert_map_entry(map, TwilioLookupV2, raw_response)?,
         VendorAPI::SocureIdPlus => insert_map_entry(map, SocureIDPlus, raw_response)?,
@@ -199,9 +188,6 @@ fn build_verification_identifier_map_entry(
 ) {
     match vendor_api {
         VendorAPI::IdologyExpectId => map.insert(IdologyExpectID, request_and_result),
-        VendorAPI::IdologyScanVerifySubmission => map.insert(IdologyScanVerifySubmission, request_and_result),
-        VendorAPI::IdologyScanVerifyResults => map.insert(IdologyScanVerifyResults, request_and_result),
-        VendorAPI::IdologyScanOnboarding => map.insert(IdologyScanOnboarding, request_and_result),
         VendorAPI::IdologyPa => map.insert(IdologyPa, request_and_result),
         VendorAPI::TwilioLookupV2 => map.insert(TwilioLookupV2, request_and_result),
         VendorAPI::SocureIdPlus => map.insert(SocureIDPlus, request_and_result),
@@ -314,15 +300,6 @@ pub async fn build_parsed_vendor_response_map(
 impl TypedMapKey<VendorAPIResponseMarker> for IdologyExpectID {
     type Value = ExpectIDResponse;
 }
-impl TypedMapKey<VendorAPIResponseMarker> for IdologyScanVerifySubmission {
-    type Value = ScanVerifyAPIResponse;
-}
-impl TypedMapKey<VendorAPIResponseMarker> for IdologyScanVerifyResults {
-    type Value = ScanVerifySubmissionAPIResponse;
-}
-impl TypedMapKey<VendorAPIResponseMarker> for IdologyScanOnboarding {
-    type Value = ScanOnboardingAPIResponse;
-}
 impl TypedMapKey<VendorAPIResponseMarker> for IdologyPa {
     type Value = PaResponse;
 }
@@ -404,15 +381,6 @@ impl TypedMapKey<VendorAPIResponseMarker> for LexisFlexId {
 
 /// Verification Request and Result map, used in conjunction with the above map for reason codes
 impl TypedMapKey<VendorAPIResponseIdsMarker> for IdologyExpectID {
-    type Value = VerificationRequestAndResult;
-}
-impl TypedMapKey<VendorAPIResponseIdsMarker> for IdologyScanVerifySubmission {
-    type Value = VerificationRequestAndResult;
-}
-impl TypedMapKey<VendorAPIResponseIdsMarker> for IdologyScanVerifyResults {
-    type Value = VerificationRequestAndResult;
-}
-impl TypedMapKey<VendorAPIResponseIdsMarker> for IdologyScanOnboarding {
     type Value = VerificationRequestAndResult;
 }
 impl TypedMapKey<VendorAPIResponseIdsMarker> for IdologyPa {
@@ -501,7 +469,7 @@ mod tests {
     use typedmap::TypedMap;
 
     use crate::decision::vendor::vendor_api::vendor_api_struct::{
-        ExperianPreciseID, IdologyExpectID, IdologyScanOnboarding,
+        ExperianPreciseID, IdologyExpectID, IncodeFetchScores,
     };
 
     #[test]
@@ -526,6 +494,6 @@ mod tests {
         assert_eq!(2, map.len());
         assert!(map.get(&IdologyExpectID).is_some());
         assert!(map.get(&ExperianPreciseID).is_some());
-        assert!(map.get(&IdologyScanOnboarding).is_none())
+        assert!(map.get(&IncodeFetchScores).is_none())
     }
 }

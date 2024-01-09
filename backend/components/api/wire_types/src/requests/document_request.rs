@@ -1,7 +1,6 @@
 use newtypes::{
-    idology::IdologyImageCaptureErrors, DocumentScanDeviceType, DocumentSide, IdDocKind,
-    IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus, IncodeFailureReason,
-    Iso3166TwoDigitCountryCode,
+    DocumentScanDeviceType, DocumentSide, IdDocKind, IdentityDocumentFixtureResult, IdentityDocumentId,
+    IdentityDocumentStatus, IncodeFailureReason, Iso3166TwoDigitCountryCode,
 };
 use paperclip::actix::Apiv2Schema;
 
@@ -100,22 +99,6 @@ pub enum DocumentImageError {
     UnknownError,
     DocumentGlare,
     DocumentSharpness,
-}
-
-impl From<IdologyImageCaptureErrors> for DocumentImageError {
-    fn from(err: IdologyImageCaptureErrors) -> Self {
-        match err {
-            IdologyImageCaptureErrors::ImageTooSmall => Self::ImageTooSmall,
-            IdologyImageCaptureErrors::DocumentMissingFourCorners => Self::DocumentMissingFourCorners,
-            IdologyImageCaptureErrors::DocumentTooSmall => Self::DocumentTooSmall,
-            IdologyImageCaptureErrors::DocumentBorderTooSmall => Self::DocumentBorderTooSmall,
-            IdologyImageCaptureErrors::FaceImageNotDetected => Self::FaceImageNotDetected,
-            IdologyImageCaptureErrors::BarcodeNotDetected => Self::BarcodeNotDetected,
-            IdologyImageCaptureErrors::ImageError => Self::ImageError,
-            IdologyImageCaptureErrors::InvalidJpeg => Self::InvalidJpeg,
-            IdologyImageCaptureErrors::DocumentIsSkewed => Self::DocumentIsSkewed,
-        }
-    }
 }
 
 impl From<IncodeFailureReason> for DocumentImageError {

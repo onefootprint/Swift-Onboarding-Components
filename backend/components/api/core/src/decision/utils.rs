@@ -12,18 +12,18 @@ use db::{
         workflow::{Workflow, WorkflowUpdate},
         zip_code::ZipCode,
     },
-    PgConn, TxnPgConn,
+    TxnPgConn,
 };
 use newtypes::{
-    DecisionIntentId, DecisionStatus, IdentityDocumentFixtureResult, IdentityDocumentId, OnboardingStatus,
-    RiskSignalGroupKind, ScopedVaultId, TenantId, VendorAPI, WorkflowFixtureResult, WorkflowId,
+    DecisionStatus, IdentityDocumentFixtureResult, OnboardingStatus, RiskSignalGroupKind, TenantId,
+    VendorAPI, WorkflowFixtureResult, WorkflowId,
 };
 
 use super::{
     sandbox,
     vendor::{self},
 };
-use crate::errors::{onboarding::OnboardingError, ApiError, ApiErrorKind, ApiResult};
+use crate::errors::{onboarding::OnboardingError, ApiResult};
 use feature_flag::{BoolFlag, FeatureFlagClient};
 
 pub type CreateManualReview = bool;
@@ -111,30 +111,6 @@ pub async fn should_initiate_requests_for_document(
     } else {
         Ok(true)
     }
-}
-
-/// Helper to do some sanity checks when creating document verification requests
-pub fn create_document_verification_request(
-    conn: &mut PgConn,
-    vendor_api: VendorAPI,
-    scoped_user_id: ScopedVaultId,
-    identity_document_id: IdentityDocumentId,
-    decision_intent_id: &DecisionIntentId,
-) -> Result<VerificationRequest, ApiError> {
-    // As of now, we only support 1 vendor for sending documents too
-    if vendor_api != VendorAPI::IdologyScanOnboarding {
-        let msg = format!("cannot send document request to {}", vendor_api);
-        Err(ApiErrorKind::AssertionError(msg))?;
-    }
-
-    VerificationRequest::create_document_verification_request(
-        conn,
-        vendor_api,
-        scoped_user_id,
-        identity_document_id,
-        decision_intent_id,
-    )
-    .map_err(ApiError::from)
 }
 
 // If socure fails, we shouldn't fail the DE run

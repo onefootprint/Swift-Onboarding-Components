@@ -11,9 +11,6 @@ use strum_macros::{EnumIter, EnumString};
 #[evt(derive(Clone, Hash, PartialEq, Eq))]
 pub enum WrappedVendorAPI {
     IdologyExpectID,
-    IdologyScanVerifySubmission,
-    IdologyScanVerifyResults,
-    IdologyScanOnboarding,
     IdologyPa,
     TwilioLookupV2,
     SocureIDPlus,
@@ -45,9 +42,6 @@ impl From<VendorAPI> for WrappedVendorAPI {
     fn from(value: VendorAPI) -> Self {
         match value {
             VendorAPI::IdologyExpectId => Self::IdologyExpectID,
-            VendorAPI::IdologyScanVerifySubmission => Self::IdologyScanVerifySubmission,
-            VendorAPI::IdologyScanVerifyResults => Self::IdologyScanVerifyResults,
-            VendorAPI::IdologyScanOnboarding => Self::IdologyScanOnboarding,
             VendorAPI::IdologyPa => Self::IdologyPa,
             VendorAPI::TwilioLookupV2 => Self::TwilioLookupV2,
             VendorAPI::SocureIdPlus => Self::SocureIDPlus,
@@ -82,9 +76,6 @@ impl From<WrappedVendorAPI> for VendorAPI {
     fn from(value: WrappedVendorAPI) -> Self {
         match value {
             WrappedVendorAPI::IdologyExpectID => VendorAPI::IdologyExpectId,
-            WrappedVendorAPI::IdologyScanVerifySubmission => VendorAPI::IdologyScanVerifySubmission,
-            WrappedVendorAPI::IdologyScanVerifyResults => VendorAPI::IdologyScanVerifyResults,
-            WrappedVendorAPI::IdologyScanOnboarding => VendorAPI::IdologyScanOnboarding,
             WrappedVendorAPI::IdologyPa => VendorAPI::IdologyPa,
             WrappedVendorAPI::TwilioLookupV2 => VendorAPI::TwilioLookupV2,
             WrappedVendorAPI::SocureIDPlus => VendorAPI::SocureIdPlus,

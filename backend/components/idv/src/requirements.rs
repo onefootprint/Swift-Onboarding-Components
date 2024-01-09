@@ -84,10 +84,6 @@ pub fn vendor_api_requirements_are_satisfied(
 
     match vendor_api {
         VendorAPI::IdologyExpectId => expectid_requirements.are_satisfied(present_data_lifetime_kinds),
-        // These document related vendors are a no op, since they are handled separately from KYC requests
-        VendorAPI::IdologyScanVerifyResults => false,
-        VendorAPI::IdologyScanVerifySubmission => false,
-        VendorAPI::IdologyScanOnboarding => false,
         VendorAPI::TwilioLookupV2 => twilio_requirements.are_satisfied(present_data_lifetime_kinds),
         VendorAPI::SocureIdPlus => meets_requirements_for_idplus_request(present_data_lifetime_kinds),
         VendorAPI::IdologyPa => idology_pa_requirements.are_satisfied(present_data_lifetime_kinds),
@@ -131,9 +127,6 @@ pub fn available_vendor_apis(present_data_lifetime_kinds: &[IdentityDataKind]) -
 fn vendor_api_eligible_for_onboarding_kyc(vendor_api: &VendorAPI) -> bool {
     match vendor_api {
         VendorAPI::IdologyExpectId => true,
-        VendorAPI::IdologyScanVerifySubmission => false,
-        VendorAPI::IdologyScanVerifyResults => false,
-        VendorAPI::IdologyScanOnboarding => false,
         VendorAPI::IdologyPa => false,
         VendorAPI::TwilioLookupV2 => true,
         VendorAPI::SocureIdPlus => true,

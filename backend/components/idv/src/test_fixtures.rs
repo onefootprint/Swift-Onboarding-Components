@@ -1,7 +1,7 @@
 use chrono::NaiveDate;
 use newtypes::{
-    idology::IdologyScanOnboardingCaptureResult, incode::IncodeStatus,
-    ExperianAddressAndNameMatchReasonCodes, ExperianSSNReasonCodes, ExperianWatchlistReasonCodes,
+    incode::IncodeStatus, ExperianAddressAndNameMatchReasonCodes, ExperianSSNReasonCodes,
+    ExperianWatchlistReasonCodes,
 };
 
 pub fn passing_lexis_flex_id_response() -> serde_json::Value {
@@ -221,62 +221,6 @@ pub fn socure_idplus_fake_passing_response() -> serde_json::Value {
           "score":0.01
        }
     })
-}
-
-pub fn scan_onboarding_fake_response(
-    capture_result_key: IdologyScanOnboardingCaptureResult,
-    image_errors: Option<Vec<&str>>,
-) -> serde_json::Value {
-    let capture_result = capture_result_key.to_string();
-    if image_errors.is_none() {
-        serde_json::json!({
-            "response": {
-                "query-id": 3010453,
-                "capture-result": {
-                    "key": capture_result.as_str(),
-                    "message": "Completed"
-                },
-                "capture-decision": {
-                    "key": "result.scan.capture.id.approved",
-                    "message": "ID Approved"
-                },
-                "qualifiers": null,
-                "capture-data": {
-                    "first-name": "JOHN",
-                    "middle-name": "A",
-                    "last-name": "SMITH",
-                    "last-name2": null,
-                    "last-name3": null,
-                    "street-address": "222333 PEACHTREE STREET",
-                    "street-address2": null,
-                    "street-address3": null,
-                    "street-address4": null,
-                    "street-address5": null,
-                    "street-address6": null,
-                    "city": "ATLANTA",
-                    "state": "GA",
-                    "zip": 303181234,
-                    "country": "USA",
-                    "month-of-birth": "02",
-                    "day-of-birth": 28,
-                    "year-of-birth": 1975,
-                    "expiration-date": "02-28-2025",
-                    "issuance-date": "02-01-2015",
-                    "document-number": 123456789,
-                    "document-type": "DL",
-                    "template-type": "DL",
-                    "capture-confidence-score": 100,
-                    "capture-facial-match-score": null
-                }
-            }
-        })
-    } else {
-        serde_json::json!({
-          "response": {
-            "error": image_errors
-          }
-        })
-    }
 }
 
 pub fn fingerprint_server_api_fake_event() -> serde_json::Value {

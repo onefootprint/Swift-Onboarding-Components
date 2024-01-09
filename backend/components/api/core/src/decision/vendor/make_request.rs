@@ -5,7 +5,6 @@ use super::tenant_vendor_control::TenantVendorControl;
 
 use super::vendor_trait::VendorAPIResponse;
 use super::*;
-use crate::errors::ApiErrorKind;
 use crate::vendor_clients::VendorClient;
 use crate::{errors::ApiError, State};
 use db::models::vault::Vault;
@@ -24,8 +23,7 @@ use idv::lexis::client::{LexisFlexIdRequest, LexisFlexIdResponse};
 use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
 use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
 use idv::{idology::expectid::response::ExpectIDResponse, ParsedResponse, VendorResponse};
-use newtypes::idology::IdologyScanOnboardingCaptureResult;
-use newtypes::{DocVData, IdvData, ObConfigurationKey, PiiString, VendorAPI, WorkflowId};
+use newtypes::{IdvData, ObConfigurationKey, PiiString, VendorAPI, WorkflowId};
 
 
 
@@ -174,45 +172,6 @@ pub async fn send_idv_request(
     })
 }
 
-/// Send a request to vendors for document verification
-/// TODO this isn't used, can i rm?
-#[tracing::instrument(skip_all)]
-pub async fn send_docv_request(
-    state: &State,
-    request: VerificationRequest,
-    workflow_id: &WorkflowId,
-    data: DocVData,
-) -> Result<VendorResponse, ApiError> {
-    tracing::info!(
-        msg = "Sending verification request",
-        request_id = request.id.clone().to_string(),
-        vendor_api = request.vendor_api.clone().to_string(),
-        scoped_user_id = %request.scoped_vault_id,
-        workflow_id = %workflow_id,
-    );
-    // Make the request to the DocV vendor
-    // TODO implement mocking for these once we use scan verify
-    let result = match request.vendor_api {
-        VendorAPI::IdologyScanVerifySubmission => {
-            idv::idology::send_scan_verify_request(&state.idology_client, data).await?
-        }
-        VendorAPI::IdologyScanVerifyResults => {
-            let Some(ref_id) = data.reference_id else {
-                return Err(idv::Error::from(idv::idology::error::Error::MissingReferenceId).into())
-            };
-            idv::idology::poll_scan_verify_results_request(&state.idology_client, ref_id).await?
-        }
-        VendorAPI::IdologyScanOnboarding => {
-            send_scan_onboarding_docv_request(state, workflow_id, data).await?
-        }
-        api => {
-            let err = format!("send_docv_request not implemented for {}", api);
-            return Err(ApiErrorKind::AssertionError(err))?;
-        }
-    };
-
-    Ok(result)
-}
 
 #[tracing::instrument(skip_all)]
 pub async fn send_twilio_lookupv2_request(
@@ -386,44 +345,6 @@ pub async fn send_lexis_flex_id_request(
         let parsed_response = idv::lexis::parse_response(response.clone())?;
         Ok(VendorResponse {
             response: ParsedResponse::LexisFlexId(parsed_response),
-            raw_response: response.into(),
-        })
-    }
-}
-
-#[tracing::instrument(skip_all)]
-pub async fn send_scan_onboarding_docv_request(
-    state: &State,
-    workflow_id: &WorkflowId,
-    data: DocVData,
-) -> Result<VendorResponse, ApiError> {
-    let ff_client = state.feature_flag_client.clone();
-
-    let wfid = workflow_id.clone();
-    let obc_key = state
-        .db_pool
-        .db_query(move |conn| ObConfiguration::get(conn, &wfid))
-        .await??.0.key;
-
-    if ff_client.flag(BoolFlag::DisableAllScanOnboarding) {
-        Err(ApiError::from(idv::Error::VendorCallsDisabledError))
-    } else if state.config.service_config.is_production()
-        || ff_client.flag(BoolFlag::EnableScanOnboardingInNonProd(&obc_key))
-    {
-        idv::idology::send_scan_onboarding_request(&state.idology_client, data)
-            .await
-            .map_err(ApiError::from)
-    } else {
-        let response = idv::test_fixtures::scan_onboarding_fake_response(
-            IdologyScanOnboardingCaptureResult::Completed,
-            None,
-        );
-
-        let parsed_response = idv::idology::scan_onboarding::response::parse_response(response.clone())
-            .map_err(|e| ApiError::from(idv::Error::from(e)))?;
-
-        Ok(VendorResponse {
-            response: ParsedResponse::IDologyScanOnboarding(parsed_response),
             raw_response: response.into(),
         })
     }

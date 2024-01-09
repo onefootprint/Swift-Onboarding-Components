@@ -6,8 +6,6 @@ use ::twilio::response::lookup::LookupV2Response;
 use experian::cross_core::response::CrossCoreAPIResponse;
 use idology::expectid::response::ExpectIDResponse;
 use idology::pa::response::PaResponse;
-use idology::scan_onboarding::response::ScanOnboardingAPIResponse;
-use idology::scan_verify::response::{ScanVerifyAPIResponse, ScanVerifySubmissionAPIResponse};
 use incode::doc::response::{
     AddConsentResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse,
     GetOnboardingStatusResponse, ProcessFaceResponse, ProcessIdResponse,
@@ -40,9 +38,6 @@ pub mod twilio;
 #[serde(untagged)]
 pub enum ParsedResponse {
     IDologyExpectID(ExpectIDResponse),
-    IDologyScanVerifyResult(ScanVerifyAPIResponse),
-    IDologyScanVerifySubmission(ScanVerifySubmissionAPIResponse),
-    IDologyScanOnboarding(ScanOnboardingAPIResponse),
     IDologyPa(PaResponse),
     TwilioLookupV2(LookupV2Response),
     SocureIDPlus(SocureIDPlusResponse),
@@ -89,29 +84,6 @@ impl ParsedResponse {
         let parsed = crate::socure::parse_response(raw_response).map_err(Error::from)?;
 
         Ok(Self::SocureIDPlus(parsed))
-    }
-
-    pub fn from_idology_scan_verify_results(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
-        let parsed =
-            crate::idology::scan_verify::response::parse_response(raw_response).map_err(Error::from)?;
-
-        Ok(Self::IDologyScanVerifyResult(parsed))
-    }
-
-    pub fn from_idology_scan_verify_submission(
-        raw_response: serde_json::Value,
-    ) -> Result<Self, crate::Error> {
-        let parsed = crate::idology::scan_verify::response::parse_submission_response(raw_response)
-            .map_err(Error::from)?;
-
-        Ok(Self::IDologyScanVerifySubmission(parsed))
-    }
-
-    pub fn from_idology_scan_onboarding(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
-        let parsed =
-            crate::idology::scan_onboarding::response::parse_response(raw_response).map_err(Error::from)?;
-
-        Ok(Self::IDologyScanOnboarding(parsed))
     }
 
     pub fn from_idology_pa(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
@@ -281,9 +253,6 @@ impl From<&ParsedResponse> for VendorAPI {
     fn from(value: &ParsedResponse) -> Self {
         match value {
             ParsedResponse::IDologyExpectID(_) => VendorAPI::IdologyExpectId,
-            ParsedResponse::IDologyScanVerifyResult(_) => VendorAPI::IdologyScanVerifyResults,
-            ParsedResponse::IDologyScanVerifySubmission(_) => VendorAPI::IdologyScanVerifySubmission,
-            ParsedResponse::IDologyScanOnboarding(_) => VendorAPI::IdologyScanOnboarding,
             ParsedResponse::IDologyPa(_) => VendorAPI::IdologyPa,
             ParsedResponse::TwilioLookupV2(_) => VendorAPI::TwilioLookupV2,
             ParsedResponse::SocureIDPlus(_) => VendorAPI::SocureIdPlus,
