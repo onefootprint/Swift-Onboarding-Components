@@ -15,7 +15,7 @@ type AppProps = IdvProps & { l10n?: L10n };
 
 const App = ({ l10n, ...props }: AppProps) => (
   <>
-    <I18nextProvider i18n={configureI18next()}>
+    <I18nextProvider i18n={configureI18next(l10n?.language)}>
       <L10nContextProvider l10n={l10n}>
         <MachineProvider args={props}>
           <GlobalStyle />

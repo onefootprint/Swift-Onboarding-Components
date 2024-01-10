@@ -11,7 +11,8 @@ export type Component = {
 };
 
 export type SupportedLocale = 'en-US' | 'es-MX';
-export type L10n = { locale?: SupportedLocale };
+export type SupportedLanguage = 'en' | 'es';
+export type L10n = { locale?: SupportedLocale; language?: SupportedLanguage };
 export type Variant = 'modal' | 'drawer' | 'inline';
 export type Props =
   | AuthProps

@@ -1,14 +1,17 @@
 import i18next from 'i18next';
 
 import en from '../locales/english.json';
+import es from '../locales/spanish.json';
 
-const configureI18next = () => {
+const configureI18next = (initialLanguage = 'en') => {
   const i18nextInstance = i18next.createInstance(
     {
       resources: {
         en: { translation: en },
+        es: { translation: es },
       },
-      lng: 'en',
+      lng: initialLanguage,
+      fallbackLng: 'en',
       interpolation: {
         escapeValue: false,
       },
