@@ -1,14 +1,14 @@
 import time
 import pytest
 from tests.headers import BusinessOwnerAuth, SandboxId
+from tests.identify_client import IdentifyClient
 from tests.utils import (
     get,
+    post,
     create_ob_config,
-    inherit_user,
     challenge_user,
     identify_verify,
     try_until_success,
-    identify_user,
 )
 from tests.bifrost_client import BifrostClient
 
@@ -97,21 +97,36 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
     # Should be able to use the BO token in identify flow for same user
     phone_number = secondary_bo.client.data["id.phone_number"]
     sandbox_id = secondary_bo.client.sandbox_id
-    inherit_user("onboarding", secondary_bo_token, SandboxId(sandbox_id))
+    IdentifyClient(secondary_bo_token, sandbox_id).inherit()
 
     # But not for a different user
     phone_number = primary_bo.client.data["id.phone_number"]
     sandbox_id_h = SandboxId(primary_bo.client.sandbox_id)
-    identify_user(
-        dict(phone_number=phone_number), kyb_sandbox_ob_config.key, sandbox_id_h
+
+    identifier = dict(phone_number=phone_number)
+    data = dict(identifier=identifier)
+    body = post("hosted/identify", data, kyb_sandbox_ob_config.key, sandbox_id_h)
+    assert body["user_found"]
+
+    data = dict(identifier=identifier, preferred_challenge_kind="sms")
+    body = post(
+        "hosted/identify/login_challenge", data, kyb_sandbox_ob_config.key, sandbox_id_h
     )
-    challenge_data = challenge_user("sms", kyb_sandbox_ob_config.key, sandbox_id_h)
-    identify_verify(
-        challenge_data["challenge_token"],
-        "onboarding",
-        expected_error="This business owner has already started KYC",
-        *[secondary_bo_token, sandbox_id_h],
+    challenge_data = body["challenge_data"]
+
+    data = {
+        "challenge_response": "000000",
+        "challenge_token": challenge_data["challenge_token"],
+        "scope": "onboarding",
+    }
+    body = post(
+        "hosted/identify/verify",
+        data,
+        secondary_bo_token,
+        sandbox_id_h,
+        status_code=400,
     )
+    assert body["error"]["message"] == "This business owner has already started KYC"
 
 
 @pytest.fixture(scope="session")

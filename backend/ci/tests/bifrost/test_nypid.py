@@ -1,4 +1,5 @@
-from tests.utils import get, post, inherit_user, _gen_random_sandbox_id
+from tests.utils import get, post, _gen_random_sandbox_id
+from tests.identify_client import IdentifyClient
 from tests.constants import FIXTURE_PHONE_NUMBER, FIXTURE_EMAIL
 from tests.headers import SandboxId
 from tests.bifrost_client import BifrostClient
@@ -26,7 +27,7 @@ def test_portablize_nypid_via_auth(sandbox_tenant, foo_sandbox_tenant, auth_play
     post("users", initial_data, sandbox_tenant.s_sk, sandbox_id_h)
 
     # Log into the user with an auth playbook, which will portablize it
-    inherit_user("auth", auth_playbook.key, sandbox_id_h)
+    IdentifyClient(auth_playbook.key, sandbox_id).inherit(scope="auth")
 
     # Now, when one-click onboarding onto another tenant, we should prefill this data instead of
     # using the data that is filled in by the Bifrost client

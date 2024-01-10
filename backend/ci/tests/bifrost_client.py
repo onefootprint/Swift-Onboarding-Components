@@ -12,11 +12,11 @@ from tests.constants import (
     FIXTURE_EMAIL,
 )
 from tests.webauthn_simulator import SoftWebauthnDevice
+from tests.identify_client import IdentifyClient
 from tests.utils import (
     _gen_random_sandbox_id,
     multipart_file,
     _gen_random_ssn,
-    inherit_user,
     get,
     create_user,
     post,
@@ -52,8 +52,7 @@ class BifrostClient:
         Create an instance of BifrostClient that inherits the user with the provided phone number.
         """
         ob_config_auth = override_ob_config_auth or ob_config.key
-        sandbox_id_h = SandboxId(sandbox_id)
-        auth = inherit_user("onboarding", ob_config_auth, sandbox_id_h)
+        auth = IdentifyClient(ob_config_auth, sandbox_id).inherit()
         return BifrostClient(ob_config, auth, sandbox_id)
 
     def create(

@@ -1,6 +1,6 @@
 import pytest
+from tests.identify_client import IdentifyClient
 from tests.utils import (
-    inherit_user,
     get,
     post,
     step_up_user_biometric,
@@ -13,9 +13,11 @@ def auth_token(sandbox_user):
     """
     My1fp-specific auth token
     """
-    sandbox_id = sandbox_user.client.sandbox_id
-    # Specifically inherit the user through the identify flow without providing any ob public key auth
-    auth_token = inherit_user("my1fp", SandboxId(sandbox_id))
+    auth_token = IdentifyClient.from_user(
+        sandbox_user,
+        # Specifically don't provide any ob public key auth
+        playbook_key=None,
+    ).inherit(scope="my1fp")
     body = get("/hosted/user/token", None, auth_token)
     assert set(body["scopes"]) == {"basic_profile", "explicit_auth"}
     return auth_token

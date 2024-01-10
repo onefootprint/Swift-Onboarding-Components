@@ -1,14 +1,12 @@
 import pytest
 import typing
+from tests.identify_client import IdentifyClient
 from tests.utils import (
-    create_ob_config,
     post,
     get,
     create_user,
     _gen_random_sandbox_id,
-    inherit_user_biometric,
 )
-from tests.constants import FIXTURE_PHONE_NUMBER, EMAIL
 from tests.bifrost_client import BifrostClient
 from tests.headers import SandboxId, FpAuth
 
@@ -89,7 +87,10 @@ def test_auth_onto_onboarded_user(sandbox_user, auth_playbook, sandbox_tenant):
     Test running a user through an auth playbook after they onboard to a KYC playbook.
     Use a passkey to log in
     """
-    auth_token = inherit_user_biometric(sandbox_user, "auth", auth_playbook.key)
+    auth_token = IdentifyClient.from_user(
+        sandbox_user,
+        playbook_key=auth_playbook.key,
+    ).inherit(kind="biometric", scope="auth")
     # Grab a validation token
     body = post("/hosted/onboarding/validate", None, auth_token)
 

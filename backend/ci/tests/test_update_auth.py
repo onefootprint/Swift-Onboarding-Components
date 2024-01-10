@@ -2,14 +2,13 @@ import json
 import pytest
 from tests.bifrost_client import BifrostClient
 from tests.headers import FpAuth, SandboxId
+from tests.identify_client import IdentifyClient
 from tests.utils import (
     HttpError,
     _gen_random_sandbox_id,
     post,
     override_webauthn_challenge,
     override_webauthn_attestation,
-    inherit_user,
-    inherit_user_biometric,
     step_up_user,
     step_up_user_biometric,
     step_up_user_email,
@@ -53,8 +52,10 @@ def get_auth_token_for_ci_update(user, auth_playbook):
     )
 
     # Also test that a playbook with the auth scopes can't be used
-    sandbox_id_h = SandboxId(user.client.sandbox_id)
-    token_for_auth = inherit_user("auth", auth_playbook.key, sandbox_id_h)
+    token_for_auth = IdentifyClient.from_user(
+        user,
+        playbook_key=auth_playbook.key,
+    ).inherit(scope="auth")
 
     assert_cant_use_token(
         token_for_auth, 400, "Can only update auth methods using auth issued via API"
@@ -227,17 +228,15 @@ def test_replace_passkey(user_with_token):
         challenge_token=challenge_token, challenge_response=json.dumps(attestation)
     )
     body = post("hosted/user/challenge/verify", data, auth_token)
-    # Kind of hacky, replace the webauthn cred stored on bifrost client with the one we just registered
-    old_webauthn_device = user.client.webauthn_device
-    user.client.webauthn_device = webauthn_device
 
     # Make sure we can log in using the new passkey
-    auth_token = inherit_user_biometric(user, "onboarding", user.client.ob_config.key)
+    auth_token = IdentifyClient.from_user(user, webauthn=webauthn_device).inherit(
+        kind="biometric"
+    )
 
     # Make sure we can't log in using the old passkey
-    user.client.webauthn_device = old_webauthn_device
     try:
-        inherit_user_biometric(user, "onboarding", user.client.ob_config.key)
+        auth_token = IdentifyClient.from_user(user).inherit(kind="biometric")
         assert False, "Expected error"
     except HttpError as e:
         assert e.status_code == 400
@@ -271,9 +270,5 @@ def test_add_passkey(sandbox_tenant, auth_playbook):
     )
     body = post("hosted/user/challenge/verify", data, auth_token)
 
-    # Kind of hacky, replace the webauthn cred stored on bifrost client with the one we just registered
-    user.client.webauthn_device = webauthn_device
     # Make sure we can log in using the new passkey
-    auth_token = inherit_user_biometric(
-        user, "onboarding", sandbox_tenant.default_ob_config.key
-    )
+    IdentifyClient.from_user(user, webauthn=webauthn_device).inherit(kind="biometric")

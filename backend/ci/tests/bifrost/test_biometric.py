@@ -2,12 +2,12 @@ import json
 from tests.constants import TEST_URL
 from tests.headers import FpAuth, SandboxId
 from tests.bifrost_client import BifrostClient
+from tests.identify_client import IdentifyClient
 from tests.utils import (
     override_webauthn_attestation,
     override_webauthn_challenge,
     get,
     post,
-    inherit_user_biometric,
 )
 
 from tests.webauthn_simulator import SoftWebauthnDevice
@@ -122,7 +122,7 @@ def test_identify_login_repeat_customer_biometric(sandbox_user):
     assert set(body["available_challenge_kinds"]) == {"sms", "biometric"}
 
     # Inherit the user via biometric
-    auth_token = inherit_user_biometric(sandbox_user, "onboarding")
+    auth_token = IdentifyClient.from_user(sandbox_user).inherit(kind="biometric")
 
     # Should be able to use the auth token
     post("hosted/onboarding", None, auth_token)

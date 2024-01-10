@@ -1,14 +1,13 @@
 import pytest
-from tests.utils import inherit_user_email
 from tests.headers import SandboxId
 from tests.headers import FpAuth
-from tests.constants import FIXTURE_PHONE_NUMBER, FIXTURE_EMAIL_OTP_PIN
+from tests.constants import FIXTURE_EMAIL_OTP_PIN, FIXTURE_EMAIL
 from tests.utils import _gen_random_sandbox_id
-from tests.constants import FIXTURE_EMAIL
 from tests.utils import post, patch
 from tests.utils import get_requirement_from_requirements
 from tests.bifrost_client import BifrostClient
-from tests.utils import create_ob_config, challenge_user
+from tests.identify_client import IdentifyClient
+from tests.utils import challenge_user
 
 
 @pytest.fixture(scope="session")
@@ -100,16 +99,7 @@ def test_new_user(skip_phone_obc):
 
 
 def test_inherit_from_email(no_phone_user):
-    body = post(
-        "hosted/identify",
-        dict(identifier={"email": no_phone_user.client.data["id.email"]}),
-        no_phone_user.client.ob_config.key,
-        SandboxId(no_phone_user.client.sandbox_id),
-    )
-    assert body["user_found"]
-    assert set(body["available_challenge_kinds"]) == {"email"}
-
-    auth_token = inherit_user_email(no_phone_user)
+    auth_token = IdentifyClient.from_user(no_phone_user).inherit(kind="email")
     # auth_token is valid and can be used to start onboarding
     post("hosted/onboarding", None, auth_token)
 

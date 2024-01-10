@@ -250,78 +250,6 @@ def step_up_user(token, expect_unverified, token_scope="onboarding"):
     return new_token
 
 
-# TODO we're probably pretty close to needing an IdentifyClient like bifrost client to orchestrate
-# all of this logic :P
-def inherit_user(scope, *headers):
-    body = identify_user(dict(phone_number=FIXTURE_PHONE_NUMBER), *headers)
-    assert "sms" in body["available_challenge_kinds"]
-    challenge_data = challenge_user("sms", *headers)
-
-    # Log in as the user
-    return identify_verify(
-        challenge_data["challenge_token"],
-        scope,
-        *headers,
-    )
-
-
-def inherit_user_biometric(user, token_kind, *headers):
-    phone_number = user.client.data["id.phone_number"]
-    sandbox_id = user.client.sandbox_id
-    sandbox_id_h = [SandboxId(sandbox_id)] if sandbox_id else []
-
-    body = identify_user(
-        dict(phone_number=phone_number),
-        user.client.ob_config.key,
-        *sandbox_id_h,
-        *headers,
-    )
-    assert "biometric" in body["available_challenge_kinds"]
-    challenge_data = challenge_user(
-        "biometric", user.client.ob_config.key, *sandbox_id_h, *headers
-    )
-    body = biometric_challenge_response(
-        challenge_data,
-        user,
-        token_kind,
-        user.client.ob_config.key,
-        *sandbox_id_h,
-        *headers,
-    )
-    return FpAuth(body["auth_token"])
-
-
-def inherit_user_email(user):
-    email = user.client.data["id.email"]
-    sandbox_id = user.client.sandbox_id
-    sandbox_id_h = [SandboxId(sandbox_id)] if sandbox_id else []
-
-    body = identify_user(dict(email=email), user.client.ob_config.key, *sandbox_id_h)
-    assert "email" in body["available_challenge_kinds"]
-    body = post(
-        "hosted/identify/login_challenge",
-        dict(
-            identifier=dict(email=email),
-            preferred_challenge_kind="email",
-        ),
-        user.client.ob_config.key,
-        *sandbox_id_h,
-    )
-
-    verify_res = post(
-        "hosted/identify/verify",
-        dict(
-            challenge_response=FIXTURE_EMAIL_OTP_PIN,
-            challenge_token=body["challenge_data"]["challenge_token"],
-            scope="onboarding",
-        ),
-        user.client.ob_config.key,
-        *sandbox_id_h,
-    )
-
-    return FpAuth(verify_res["auth_token"])
-
-
 def step_up_user_biometric(auth_token, user, scope):
     # Don't technically need to pass in the phone number to step up, but the util takes it in
     sandbox_id = user.client.sandbox_id
@@ -331,18 +259,6 @@ def step_up_user_biometric(auth_token, user, scope):
         challenge_data, user, scope, auth_token, *sandbox_id_h
     )
     assert body["auth_token"] != auth_token.value
-    return FpAuth(body["auth_token"])
-
-
-def step_up_user_email(auth_token, scope):
-    challenge_data = challenge_user("email", auth_token)
-    data = {
-        "challenge_response": "000000",
-        "challenge_kind": "email",
-        "challenge_token": challenge_data["challenge_token"],
-        "scope": scope,
-    }
-    body = post("hosted/identify/verify", data, auth_token)
     return FpAuth(body["auth_token"])
 
 
@@ -376,6 +292,18 @@ def biometric_challenge_response(challenge_data, user, scope, *headers):
     }
     body = post("hosted/identify/verify", data, *headers)
     return body
+
+
+def step_up_user_email(auth_token, scope):
+    challenge_data = challenge_user("email", auth_token)
+    data = {
+        "challenge_response": "000000",
+        "challenge_kind": "email",
+        "challenge_token": challenge_data["challenge_token"],
+        "scope": scope,
+    }
+    body = post("hosted/identify/verify", data, auth_token)
+    return FpAuth(body["auth_token"])
 
 
 def identify_user(identifier, *headers):
