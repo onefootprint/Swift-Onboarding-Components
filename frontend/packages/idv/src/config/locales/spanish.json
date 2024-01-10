@@ -670,12 +670,12 @@
         }
       },
       "beneficial-owners": {
-        "title": "¿Quiénes son los propietarios beneficiosos?",
-        "subtitle": "Enumera a todas las personas que poseen al menos el 25% del negocio o tienen control sustancial sobre él.",
+        "title": "¿Quiénes son los propietarios?",
+        "subtitle": "Enumera a todas las personas que poseen al menos el 25% del negocio o tienen un control sustancial sobre él.",
         "form": {
           "fields-header": {
-            "beneficial-owner-you": "Propietario beneficioso (Tú)",
-            "beneficial-owner-other": "Propietario beneficioso (Otro)",
+            "beneficial-owner-you": "Propietario (Tú)",
+            "beneficial-owner-other": "Propietario (Otro)",
             "remove": "Eliminar"
           },
           "fields": {
@@ -683,7 +683,7 @@
             "first-name": {
               "label": "Nombre",
               "placeholder": "Jane",
-              "error": "El nombre no puede estar vacío o es inválido"
+              "error": "El nombre no puede quedar vacío o ser inválido"
             },
             "middle-name": {
               "label": "Segundo nombre (opcional)",
@@ -692,22 +692,22 @@
             "last-name": {
               "label": "Apellido",
               "placeholder": "Doe",
-              "error": "El apellido no puede estar vacío o es inválido"
+              "error": "El apellido no puede quedar vacío o es inválido"
             },
             "email": {
               "label": "Correo electrónico",
               "placeholder": "jane.doe@acme.com",
-              "hint": "Agrega “#cadena” (p. ej., #test1) al final de tu dirección de correo electrónico.",
+              "hint": "Agrega “#palabra” (p. ej., #test1) al final de tu dirección de correo electrónico.",
               "errors": {
                 "required": "Se requiere correo electrónico",
-                "pattern": "Agrega “#cadena” (p. ej., #test1) al final de tu dirección de correo electrónico."
+                "pattern": "Agrega “#palabra” (p. ej., #test1) al final de tu dirección de correo electrónico."
               }
             },
             "phone": {
               "label": "Número de teléfono",
               "placeholder": "(123) 456-7890",
               "errors": {
-                "required": "Se requiere número de teléfono",
+                "required": "El campo 'Número de teléfono' es obligatorio",
                 "pattern": "El número de teléfono es inválido"
               }
             },
@@ -715,27 +715,27 @@
               "label": "Porcentaje aproximado de propiedad (%)",
               "placeholder": "25",
               "errors": {
-                "required": "El porcentaje de propiedad está vacío o es inválido",
+                "required": "El porcentaje de propiedad de la compañía está vacío o es inválido",
                 "min": "El porcentaje de propiedad no puede ser menor del 1%",
                 "max": "El porcentaje de propiedad no puede ser mayor del 100%"
               }
             }
           },
-          "multi-kyc": "Necesitamos verificar las identidades de todos los demás propietarios beneficiosos. Les enviaremos un enlace por correo electrónico después de que termines de completar la verificación de tu empresa.",
+          "multi-kyc": "Necesitamos verificar las identidades de todos los demás propietarios. Les enviaremos un enlace por correo electrónico después de que termines de completar la verificación de tu empresa.",
           "add-more": "Agregar más",
           "errors": {
             "invalid": "Por favor, completa los campos anteriores.",
             "ownership-stake-total": {
               "title": "El porcentaje total de propiedad supera el 100%",
-              "description": "Por favor, verifica el porcentaje de propiedad de cada propietario beneficioso. La suma no puede superar el 100%."
+              "description": "Por favor, verifica el porcentaje de propiedad de cada propietario. La suma no puede superar el 100%."
             },
             "duplicate-email": {
               "title": "Correo electrónico duplicado",
-              "description": "Asegúrate de que cada propietario beneficioso tenga una dirección de correo electrónico única."
+              "description": "Asegúrate de que cada propietario tenga una dirección de correo electrónico única."
             },
             "duplicate-phone-number": {
               "title": "Número de teléfono duplicado",
-              "description": "Asegúrate de que cada propietario beneficioso tenga un número de teléfono único."
+              "description": "Asegúrate de que cada propietario tenga un número de teléfono único."
             }
           }
         }
@@ -743,7 +743,7 @@
       "confirm": {
         "summary": {
           "title": "Confirma los datos de tu empresa",
-          "subtitle": "Por favor, asegúrate de que los datos de tu empresa sean precisos y no haya errores tipográficos antes de continuar.",
+          "subtitle": "Por favor, asegúrate de que los datos de tu empresa sean correctos y no haya errores tipográficos antes de continuar.",
           "edit": "Editar",
           "save": "Guardar",
           "cta": "Confirmar y continuar"
@@ -762,8 +762,8 @@
         },
         "beneficial-owners": {
           "title": "Propietarios beneficiosos",
-          "beneficial-owner-you": "Propietario beneficioso (Tú)",
-          "beneficial-owner-other": "Propietario beneficioso (Otro)",
+          "beneficial-owner-you": "Propietario (Tú)",
+          "beneficial-owner-other": "Propietario (Otro)",
           "first-name": "Nombre",
           "middle-name": "Segundo nombre",
           "last-name": "Apellido",
@@ -781,12 +781,12 @@
   "investor-profile": {
     "components": {
       "empty-auth-token": {
-        "title": "Tu sesión no es válida",
-        "description": "Por favor, actualiza esta página para intentar el proceso de incorporación de nuevo."
+        "title": "Sesión inválida",
+        "description": "Por favor, actualiza esta página y reinicia el proceso de aplicación."
       },
       "invalid-inputs": {
         "title": "Ocurrió un error",
-        "description": "Hubo un error al guardar los datos. Por favor, corrige los datos e inténtalo de nuevo."
+        "description": "Hubo un error al procesar los datos. Por favor, revisa que los datos sean correctos e inténtalo de nuevo."
       },
       "continue-button": {
         "label": "Continuar",
@@ -794,36 +794,36 @@
       },
       "transition-animation": {
         "source": "Casi listo...",
-        "destination": "¡Unas pocas preguntas más específicas sobre inversión!"
+        "destination": "Sólo quedan unas pocas preguntas sobre tu perfil de inversor."
       }
     },
     "pages": {
       "employment": {
         "title": "¿Cuál es tu estado de empleo y ocupación?",
-        "subtitle": "Estamos legalmente obligados a recopilar esta información.",
+        "subtitle": "Estamos legalmente obligados a requerir esta información.",
         "employment-status": {
           "employed": "Empleado",
           "unemployed": "Desempleado",
           "retired": "Jubilado",
           "student": "Estudiante",
-          "label": "Estado de empleo",
-          "placeholder": "Selecciona tu estado de empleo",
-          "error": "Se requiere estado de empleo"
+          "label": "Situación laboral",
+          "placeholder": "Selecciona tu situación laboral",
+          "error": "Situación laboral es un campo requerido"
         },
         "occupation": {
           "label": "Ocupación",
           "placeholder": "Ingeniero de Software",
-          "error": "Se requiere ocupación"
+          "error": "Ocupación es un campo requerido"
         },
         "employer": {
           "label": "Empleador",
           "placeholder": "Acme Bank",
-          "error": "Se requiere empleador"
+          "error": "Empleador es un campo requerido"
         }
       },
       "income": {
         "title": "¿Cuál es tu ingreso anual?",
-        "subtitle": "Estamos legalmente obligados a recopilar esta información.",
+        "subtitle": "Estamos legalmente obligados a requerir esta información. Los montos están en dólares americanos.",
         "le25k": "Menos de $25,000",
         "gt25k_le50k": "$25,001 - $50,000",
         "gt50k_le100k": "$50,001 - $100,000",
@@ -835,7 +835,7 @@
       },
       "net-worth": {
         "title": "¿Cuál es tu patrimonio neto?",
-        "subtitle": "Estamos legalmente obligados a recopilar esta información.",
+        "subtitle": "Estamos legalmente obligados a requerir esta información. Los montos están en dólares americanos.",
         "le50k": "Menos de $50,000",
         "gt50k_le100k": "$50,001 - $100,000",
         "gt100k_le200k": "$100,001 - $200,000",
@@ -846,7 +846,7 @@
       },
       "investment-goals": {
         "title": "¿Cuáles son tus objetivos de inversión?",
-        "subtitle": "Estamos legalmente obligados a recopilar esta información.",
+        "subtitle": "Estamos legalmente obligados a requerir esta información.",
         "growth": "Crecimiento",
         "income": "Ingresos",
         "preserve_capital": "Preservar capital",
@@ -857,7 +857,7 @@
       },
       "risk-tolerance": {
         "title": "¿Cómo describirías tu tolerancia al riesgo?",
-        "subtitle": "Estamos legalmente obligados a recopilar esta información.",
+        "subtitle": "Estamos legalmente obligados a requerir esta información.",
         "conservative": {
           "label": "Conservador",
           "description": "Prefiere rendimientos menores pero consistentes"
@@ -884,19 +884,19 @@
         "brokerage-firm-employer": {
           "label": "Nombre de la empresa",
           "placeholder": "Nombre de la empresa",
-          "error": "Se requiere el nombre de la empresa"
+          "error": "El nombre de la empresa es un campo requerido"
         },
         "company-symbols": {
           "label": "Símbolos de la empresa",
           "placeholder": "ABNB, META, GOOG",
           "hint": "Usa comas para separar los símbolos de las empresas",
-          "error": "Se requieren los símbolos de la empresa y deben estar separados por comas"
+          "error": "Los símbolos de las empresas son un campo requerido y deben estar separados por comas"
         },
         "family-members": {
           "label": "Nombres de los familiares inmediatos",
           "placeholder": "Josh Smith, Brooke Newman",
           "hint": "Esto incluye ex cónyuges. Usa comas para separar los nombres",
-          "error": "Se requieren los nombres de los familiares y deben estar separados por comas"
+          "error": ":os nombres de los familiares son un campo requerido y deben estar separados por comas"
         },
         "political-organization": {
           "label": "Organización política",
@@ -908,7 +908,7 @@
           "cta": "Elegir archivo para subir",
           "cta-multiple": "Subir otro archivo",
           "disclaimer": "De acuerdo con las reglas aplicables de FINRA, necesitarás obtener una carta escrita y firmada por un oficial de cumplimiento en papel membretado que otorgue explícitamente permiso para llevar la cuenta y que indique explícitamente si la empresa requiere acceso a estados de cuenta duplicados y/o confirmaciones de operaciones. Si la empresa desea acceder a tus estados de cuenta duplicados y/o confirmaciones de operaciones, la carta debe incluir el nombre completo del titular de la cuenta y una declaración de que el titular de la cuenta es responsable de compartir los estados de cuenta con la empresa.",
-          "required": "Se requiere una carta de cumplimiento"
+          "required": "Se requiere una carta de cumplimiento para continuar"
         }
       }
     }
@@ -920,8 +920,8 @@
         "subtitleWithCount_one": "Por favor, espera {{count}} segundo...",
         "subtitleWithCount_other": "Por favor, espera {{count}} segundos...",
         "error": {
-          "title": "Lo siento, algo salió mal.",
-          "description": "Por favor, intenta reenviar el enlace a tu número de teléfono."
+          "title": "Algo salió mal.",
+          "description": "Por favor, intenta nuevamente, reenviando el enlace a tu número de teléfono."
         },
         "resend-success": {
           "title": "Éxito",
@@ -930,8 +930,8 @@
       },
       "requirements-title": {
         "liveness": "Verificación de autenticidad",
-        "id-doc": "Escanear o subir tu identificación",
-        "liveness-with-id-doc": "Verificación de autenticidad y documento de identificación"
+        "id-doc": "Escanea o sube una imagen de tu identificación",
+        "liveness-with-id-doc": "Prueva de vida y de documento de identificación"
       }
     },
     "pages": {
@@ -941,12 +941,12 @@
           "subtitle": "Te hemos enviado un enlace a tu número de teléfono. Por favor, ábrelo y sigue las instrucciones."
         },
         "sms-processing": {
-          "subtitle": "Enlace enviado al teléfono. Por favor, continúa desde allí.",
+          "subtitle": "Enviamos un enlace a tu teléfono. Por favor, continúa desde allí.",
           "cancel": "Cancelar"
         },
         "new-tab-requested": {
           "title": "Nueva ventana del navegador",
-          "subtitle": "Para continuar, necesitamos abrir una nueva ventana del navegador. Por favor, pulsa el botón de abajo.",
+          "subtitle": "Para continuar, necesitamos abrir una nueva ventana del navegador.",
           "cta": "Abrir nueva pestaña del navegador"
         },
         "new-tab-processing": {
@@ -972,7 +972,7 @@
         "confirm-continue-on-desktop": {
           "title": "¿Estás seguro de que quieres continuar en el escritorio?",
           "subtitle": "En caso de que no tengas un smartphone, puedes subir manualmente los documentos que necesitamos desde tu computadora por ahora y completar el resto de las validaciones más tarde.",
-          "warning": "Te recomendamos encarecidamente que continúes desde tu teléfono, si es posible, ya que acelerará significativamente el proceso de verificación de identidad.",
+          "warning": "Igualmente, si fuera posible, te recomendamos que continúes desde tu teléfono, ya que de esa forma aceleraremos significativamente el proceso de verificación de identidad.",
           "cta": {
             "mobile": "No, continuar en mi smartphone",
             "desktop": "Sí, continuar en el escritorio"
@@ -989,13 +989,13 @@
     },
     "pages": {
       "register": {
-        "title": "Verificación de autenticidad",
+        "title": "Prueba de vida",
         "subtitle": "Necesitamos verificar que eres una persona real.",
         "cta": "Iniciar verificación"
       },
       "retry": {
-        "title": "Biometría no reconocida",
-        "subtitle": "Puedes intentar la biometría de nuevo o hacerlo la próxima vez que uses Footprint.",
+        "title": "No pudimos verificar tus datos de biometría",
+        "subtitle": "Puedes intentarlo de nuevo o hacerlo la próxima vez que uses Footprint.",
         "cta": "Intentar biometría de nuevo",
         "skip": "Hacerlo más tarde"
       },
@@ -1005,26 +1005,26 @@
       },
       "success": {
         "title": "¡Autenticación biométrica exitosa!",
-        "subtitle": "Hemos podido verificar tu autenticidad."
+        "subtitle": "Hemos podido verificar tus datos de biometría."
       }
     }
   },
   "id-doc": {
     "components": {
       "media-errors": {
-        "not-found": "No pudimos encontrar una cámara en tu dispositivo. Por favor, usa otro dispositivo.",
+        "not-found": "No pudimos encontrar una cámara en tu dispositivo. Por favor, usa uno que tenga cámara para continuar la verificación.",
         "already-in-use": "Otra aplicación está usando tu cámara, cierra la otra aplicación e inténtalo de nuevo.",
-        "constraint": "No pudimos encontrar una cámara que se pudiera usar para tomar fotos. Por favor, usa otro dispositivo.",
-        "undefined-navigator": "Parece que tu navegador no puede abrir la cámara. Por favor, intenta usar un navegador o dispositivo diferente.",
+        "constraint": "No pudimos encontrar una cámaraen este dispositivo. Por favor, usa otro que tenga una cámara con la que puedas tomar fotos de tu documentación.",
+        "undefined-navigator": "Parece que tu navegador no puede abrir la cámara de tu dispositivo. Por favor, intenta usar un navegador o dispositivo diferente.",
         "other-error": "Hubo un error al acceder a tu cámara. Por favor, inténtalo de nuevo."
       },
       "retry-limit-exceeded": {
         "title": "Demasiados intentos",
-        "description": "Lo sentimos, no podemos continuar con la incorporación ya que has intentado enviar tus imágenes de documento demasiadas veces. Nos pondremos en contacto si necesitamos más información."
+        "description": "Lo sentimos, no podemos continuar con la incorporación ya que has intentado enviar tus imágenes de documento demasiadas veces. Nos pondremos en contacto con usted en caso de necesitar más información."
       },
       "missing-permissions": {
-        "title": "Permite el acceso a tu cámara",
-        "subtitle": "Necesitaremos que tomes fotos de tu documento para verificar tu identidad correctamente.",
+        "title": "Solicitud de acceso a la cámara del dispositivo",
+        "subtitle": "Necesitaremos que tomes fotos de tu documento para verificar tu identidad correctamente, y para ellos, necesitamos que le permitas el uso de tu cámara de fotos en este dispositivo.",
         "cta": "Abrir ajustes para dar permisos a la cámara"
       },
       "id-doc-photo-prompt": {
@@ -1036,11 +1036,11 @@
             "title": "Mantén tu dispositivo estable"
           },
           "position-document": {
-            "title": "Alinea tu {{document}} con el contorno del marco",
+            "title": "Alinea tu {{document}} con el marco",
             "description": "Asegúrate de que es el {{side}}."
           },
           "background": {
-            "title": "Encuentra un fondo con buen contraste",
+            "title": "Encuentra un fondo con mejor contraste",
             "description": "Lo más diferente posible al color de la tarjeta de identificación."
           },
           "autocapture": {
@@ -1078,7 +1078,7 @@
       "image-consent": {
         "title": "Consentimiento para usar tus imágenes",
         "subtitle": "Consentimiento y liberación escrita para la recopilación, uso, divulgación y almacenamiento de datos personales (incluida la información y los identificadores biométricos)",
-        "description": "Al hacer clic en Aceptar y continuar y proporcionar a One Footprint, Inc. (en adelante, \"la Empresa\") tus datos personales, incluida tu información biométrica e información de identificación gubernamental, das tu consentimiento para que la Empresa y Incode Technologies, Inc. (en adelante, \"Incode\") recolecten, almacenen, retengan, usen y divulguen dicha información para proporcionar los servicios de verificación de identidad, de acuerdo con el <privacy>Aviso de privacidad</privacy> y los <toc>Términos de uso</toc> de la Empresa. Aunque des tu consentimiento, puedes retirarlo en cualquier momento.<br/><br/>Para verificar que eres la persona representada en tu identificación emitida por el gobierno (\"Servicios\"), la Empresa utiliza tecnología de terceros de Incode para recopilar datos personales de ti o sobre ti, incluida la información biométrica y los identificadores biométricos, como tu huella facial (\"Información Biométrica\"), una selfie y la identificación emitida por el gobierno, incluida la información obtenida, por ejemplo y cuando sea aplicable, al escanear el código de barras (colectivamente con la Información Biométrica, \"Datos Personales\"). Específicamente, se te pedirá que tomes una selfie a través de la plataforma de Incode. Incode luego escaneará y mapeará tus rasgos faciales en comparación con la imagen en tu identificación emitida por el gobierno para permitirte crear y/o acceder a tu cuenta con la Empresa. Ten en cuenta que el procesamiento de tus Datos Personales, a saber, de tu Información Biométrica por Incode, incluirá una comparación de la imagen en tu documento de identificación con tu selfie (1:1) que luego se comparará con la base de datos de la Empresa para prevenir el fraude (1:N). Para los Servicios, Incode también recopilará otra información que está en el anverso y reverso de tu documentación de identificación, incluida donde exista y esté permitido por la ley, escaneando el código de barras y recopilando información derivada de él (por ejemplo, nombre, fecha de nacimiento, altura). Incode usa esta información para verificar tu identidad y prevenir el fraude. Incode también puede, con tu consentimiento, usar esta información para mejorar sus productos y servicios. La Empresa o Incode en nombre de la Empresa, también pueden compartir tus Datos Personales con proveedores de servicios de terceros o entidades gubernamentales que nos permitan proporcionar nuestros Servicios (por ejemplo, proveedores de alojamiento en la nube, base de datos de defraudadores o el Departamento de Vehículos Motorizados si proporcionas una tarjeta de identificación de EE. UU.) y otros terceros cuando lo requiera la ley. Uso de tus Datos Personales: Tus Datos Personales, incluida la Información Biométrica, pueden usarse para los siguientes propósitos (según corresponda según tu consentimiento), en cada caso como se describe más detalladamente en la <privacy>Política de privacidad</privacy> de la Empresa y/o la <incode_privacy>Política de privacidad de Incode</incode_privacy>:<br/> • Para proporcionar los servicios para los que se solicitó los Datos Personales;<br/> • Para mejorar o modificar los productos y servicios de Incode; y<br/> • Para cumplir con las obligaciones de la Empresa o de Incode bajo la ley aplicable.<br/>Puedes solicitar la eliminación de tus Datos Personales y ejercer cualquier otro derecho bajo las leyes de protección de datos aplicables en cualquier momento enviando un correo electrónico a la Empresa a support@onefootprint.com o a Incode a dataprotection@incode.com. Si solicitas la eliminación de tus Datos Personales, no podremos recuperarlos en un momento posterior. La Empresa o Incode, según corresponda, eliminarán permanentemente la Información Biométrica procesada (si la hay) para sus propios fines antes de: (i) el momento en que se haya cumplido el propósito para el cual se recopiló; o (ii) tres años desde el momento en que das tu consentimiento. Incode hará lo mismo con la Información Biométrica que procesa en nombre de, y según las instrucciones de, la Empresa.",
+        "description": "Al hacer click en 'Aceptar y continuar', le permites a One Footprint, Inc. (en adelante, \"la Empresa\") tus datos personales, incluida tu información biométrica e información de identificación gubernamental, estás dando tu consentimiento para que la Empresa e Incode Technologies, Inc. (en adelante, \"Incode\") recolecten, almacenen, retengan, usen y divulguen dicha información para proporcionar los servicios de verificación de identidad, de acuerdo con el <privacy>Aviso de privacidad</privacy> y los <toc>Términos de uso</toc> de la Empresa. Aunque des tu consentimiento, puedes retirarlo en cualquier momento.<br/><br/>Para verificar que eres la persona representada en tu identificación emitida por el gobierno (\"Servicios\"), la Empresa utiliza tecnología de terceros de Incode para recopilar datos personales de ti o sobre ti, incluida la información biométrica y los identificadores biométricos, como tu huella facial (\"Información Biométrica\"), una selfie y la identificación emitida por el gobierno, incluida la información obtenida, por ejemplo y cuando sea aplicable, al escanear el código de barras (colectivamente con la Información Biométrica, \"Datos Personales\"). Específicamente, se te pedirá que tomes una selfie a través de la plataforma de Incode. Incode luego escaneará y mapeará tus rasgos faciales en comparación con la imagen en tu identificación emitida por el gobierno para permitirte crear y/o acceder a tu cuenta con la Empresa. Ten en cuenta que el procesamiento de tus Datos Personales, a saber, de tu Información Biométrica por Incode, incluirá una comparación de la imagen en tu documento de identificación con tu selfie (1:1) que luego se comparará con la base de datos de la Empresa para prevenir el fraude (1:N). Para los Servicios, Incode también recopilará otra información que está en el anverso y reverso de tu documentación de identificación, incluida donde exista y esté permitido por la ley, escaneando el código de barras y recopilando información derivada de él (por ejemplo, nombre, fecha de nacimiento, altura). Incode usa esta información para verificar tu identidad y prevenir el fraude. Incode también puede, con tu consentimiento, usar esta información para mejorar sus productos y servicios. La Empresa o Incode en nombre de la Empresa, también pueden compartir tus Datos Personales con proveedores de servicios de terceros o entidades gubernamentales que nos permitan proporcionar nuestros Servicios (por ejemplo, proveedores de alojamiento en la nube, base de datos de defraudadores o el Departamento de Vehículos Motorizados si proporcionas una tarjeta de identificación de EE. UU.) y otros terceros cuando lo requiera la ley. Uso de tus Datos Personales: Tus Datos Personales, incluida la Información Biométrica, pueden usarse para los siguientes propósitos (según corresponda según tu consentimiento), en cada caso como se describe más detalladamente en la <privacy>Política de privacidad</privacy> de la Empresa y/o la <incode_privacy>Política de privacidad de Incode</incode_privacy>:<br/> • Para proporcionar los servicios para los que se solicitó los Datos Personales;<br/> • Para mejorar o modificar los productos y servicios de Incode; y<br/> • Para cumplir con las obligaciones de la Empresa o de Incode bajo la ley aplicable.<br/>Puedes solicitar la eliminación de tus Datos Personales y ejercer cualquier otro derecho bajo las leyes de protección de datos aplicables en cualquier momento enviando un correo electrónico a la Empresa a support@onefootprint.com o a Incode a dataprotection@incode.com. Si solicitas la eliminación de tus Datos Personales, no podremos recuperarlos en un momento posterior. La Empresa o Incode, según corresponda, eliminarán permanentemente la Información Biométrica procesada (si la hay) para sus propios fines antes de: (i) el momento en que se haya cumplido el propósito para el cual se recopiló; o (ii) tres años desde el momento en que das tu consentimiento. Incode hará lo mismo con la Información Biométrica que procesa en nombre de, y según las instrucciones de, la Empresa.",
         "cta": "Aceptar",
         "continue": "Continuar",
         "third-party-consent": "Opcional: Al marcar esta casilla y proporcionar a Incode tus Datos Personales, incluida tu Información Biométrica e información de identificación gubernamental, das tu consentimiento y proporcionas una liberación escrita a Incode para la recopilación, almacenamiento, retención, uso y divulgación de dicha información para mejorar, modificar o actualizar los productos o servicios de Incode (incluido su algoritmo), de acuerdo con su Aviso de privacidad. Puedes ejercer tus derechos bajo las leyes de privacidad aplicables, incluida la retirada del consentimiento, contactando a dataprotection@incode.com. IMPORTANTE: Tu consentimiento es voluntario, incluso si no das tu consentimiento, aún podrás acceder a los servicios de la Empresa."
@@ -1095,7 +1095,7 @@
           "analyze-back": "Analizando imagen...",
           "analyze-selfie": "Analizando selfie..."
         },
-        "subtitle": "¡Un momento! Pronto estará listo.",
+        "subtitle": "Aguarda unos instantes. Estamos procesando tu imagen.",
         "slow-connection": "Tu conexión a Internet parece inestable. Esto podría tardar más de lo habitual."
       },
       "error": {
@@ -1108,7 +1108,7 @@
           "unsupported_document_type": "Lamentablemente, el tipo de documento subido no es compatible. Por favor, sube tu {{documentType}} de {{countryName}}.",
           "wrong_document_side": "Parece que subiste el lado incorrecto de tu documento. Por favor, voltea tu identificación y sube el {{side}} de tu {{documentType}} de {{countryName}}.",
           "wrong_one_sided_document": "Se detectó un tipo de documento incorrecto. Por favor, sube tu {{documentType}} de {{countryName}}.",
-          "document_not_readable": "No se pudo leer tu documento. Por favor, inténtalo de nuevo.",
+          "document_not_readable": "No se pudo procesar tu documento. Por favor, inténtalo de nuevo.",
           "document_glare": "La foto de tu documento tenía demasiado brillo. Por favor, ajusta la iluminación e inténtalo de nuevo.",
           "document_sharpness": "La imagen del documento estaba borrosa. Por favor, sube o captura una imagen más nítida.",
           "id_type_not_acceptable": "Se detectó un tipo de documento inválido. Por favor, sube tu {{documentType}} de {{countryName}}.",
@@ -1156,15 +1156,15 @@
           "title": "Instrucciones",
           "background": {
             "title": "Busca un fondo con buen contraste",
-            "description": "Un alto contraste ayuda con la detección del documento, evitando errores."
+            "description": "Un buen contraste ayuda con la detección del documento y evita errores."
           },
           "position-document": {
             "title": "Posiciona el documento en el marco",
-            "description": "Asegúrate de que todo el documento esté posicionado, como se indica, en el marco."
+            "description": "Asegúrate de que todo el documento esté posicionado en el marco indicado en la pantalla."
           },
           "position-face": {
             "title": "Posiciona tu rostro en el marco",
-            "description": "Asegúrate de que todo tu rostro esté posicionado, como se indica, en el marco."
+            "description": "Asegúrate de que todo tu rostro esté posicionado en el marco indicado en la pantalla."
           },
           "steady": {
             "title": "Mantén firme",
@@ -1249,7 +1249,7 @@
               "title": "Pasaporte"
             },
             "idCard": {
-              "title": "Tarjeta de identidad"
+              "title": "Documento de identidad"
             },
             "driversLicense": {
               "title": "Licencia de conducir"
@@ -1261,7 +1261,7 @@
               "title": "Permiso de trabajo / Tarjeta EAD"
             },
             "residenceDocument": {
-              "title": "Tarjeta de residencia / Tarjeta verde"
+              "title": "Tarjeta de residencia permanente / Green Card"
             },
             "voterIdentification": {
               "title": "Identificación de votante"
@@ -1270,7 +1270,7 @@
               "title": "Tarjeta de SSN"
             }
           },
-          "not-supported": "Lo sentimos, aún no admitimos identificaciones de tu país.",
+          "not-supported": "Lo sentimos, por el momento no admitimos identificaciones de tu país.",
           "cta": "Continuar"
         }
       },
@@ -1278,21 +1278,21 @@
         "title": {
           "camera": {
             "driversLicense": "Licencia de conducir · FRENTE",
-            "idCard": "Tarjeta de identidad · FRENTE",
+            "idCard": "Documento de identidad · FRENTE",
             "passport": "Pasaporte · PÁGINA DE FOTO",
             "visa": "Visa · PÁGINA DE FOTO",
             "workPermit": "Tarjeta EAD · FRENTE",
-            "residenceDocument": "Tarjeta verde · FRENTE",
+            "residenceDocument": "Green Card · FRENTE",
             "voterIdentification": "Identificación de votante · FRENTE",
             "ssnCard": "Tarjeta de SSN · FRENTE"
           },
           "preview": {
             "driversLicense": "Licencia de conducir",
-            "idCard": "Tarjeta de identidad",
+            "idCard": "Documento de identidad",
             "passport": "Pasaporte",
             "visa": "Visa",
             "workPermit": "Tarjeta EAD",
-            "residenceDocument": "Tarjeta verde",
+            "residenceDocument": "Green Card",
             "voterIdentification": "Identificación de votante",
             "ssnCard": "Tarjeta de SSN"
           }
@@ -1305,20 +1305,20 @@
         "title": {
           "camera": {
             "driversLicense": "Licencia de conducir · ATRÁS",
-            "idCard": "Tarjeta de identidad · ATRÁS",
+            "idCard": "Documento de identidad · ATRÁS",
             "passport": "Pasaporte · PÁGINA DE FOTO",
             "visa": "Visa · PÁGINA DE FOTO",
             "workPermit": "Tarjeta EAD · ATRÁS",
-            "residenceDocument": "Tarjeta verde · ATRÁS",
+            "residenceDocument": "Green Card · ATRÁS",
             "voterIdentification": "Identificación de votante · ATRÁS"
           },
           "preview": {
             "driversLicense": "Licencia de conducir",
-            "idCard": "Tarjeta de identidad",
+            "idCard": "Documento de identidad",
             "passport": "Pasaporte",
             "visa": "Visa",
             "workPermit": "Tarjeta EAD",
-            "residenceDocument": "Tarjeta verde",
+            "residenceDocument": "Green Card",
             "voterIdentification": "Identificación de votante"
           }
         },
@@ -1342,7 +1342,7 @@
         },
         "guidelines": {
           "whole-face": {
-            "title": "Posiciona tu rostro dentro del marco",
+            "title": "Posiciona tu rostro dentro del marco indicado en la pantalla",
             "description": "Mantén tu cabeza recta apuntando a la cámara"
           },
           "check-lighting": {
@@ -1374,11 +1374,11 @@
             "other-error": "Algo salió mal"
           },
           "subtitle": {
-            "not-allowed": "Por favor, da permiso a este sitio web para que podamos usar tu cámara para tomar tu selfie.",
+            "not-allowed": "Por favor, acepta la solicitud de permiso en el navegador para que podamos usar tu cámara para tomar tu selfie.",
             "device-not-found": "No pudimos encontrar una cámara en tu dispositivo. Por favor, asegúrate de que la cámara esté funcionando correctamente y no esté siendo utilizada por otra aplicación.",
             "device-busy": "Parece que la cámara está siendo utilizada por otra aplicación. Por favor, asegúrate de que la cámara no esté siendo utilizada por otra aplicación.",
             "no-video-option": "No pudimos encontrar una cámara que pudiera ser utilizada para tomar fotos. Por favor, usa otro dispositivo.",
-            "undefined-navigator": "Parece que tu navegador no puede abrir la cámara. Por favor, intenta usar un navegador o dispositivo diferente.",
+            "undefined-navigator": "Tu navegador no puede abrir la cámara. Por favor, intenta usar un navegador o dispositivo diferente.",
             "other-error": "Hubo un error al acceder a tu cámara. Por favor, inténtalo de nuevo."
           },
           "take-selfie": "Tomar una selfie"
@@ -1397,14 +1397,14 @@
         "take-selfie-again": "Tomar selfie de nuevo"
       },
       "processing": {
-        "missing-requirement-error": "Lo sentimos, algo salió mal. Por favor, reinicia el proceso de incorporación."
+        "missing-requirement-error": "Lo sentimos, algo salió mal. Por favor, inicia el proceso de verificación nuevamente"
       },
       "desktop-processing": {
         "continue": "Continuar",
-        "missing-requirement-error": "Lo sentimos, algo salió mal. Por favor, reinicia el proceso de incorporación."
+        "missing-requirement-error": "Lo sentimos, algo salió mal. Por favor, inicia el proceso de verificación nuevamente."
       },
       "device-warning": {
-        "warning": "Esta acción solo se puede realizar en un teléfono móvil. Por favor, regresa a la pantalla/pestaña anterior y haz clic en el botón \"Cancelar\" para generar un nuevo código QR con un nuevo enlace URL. Abre el nuevo enlace en tu teléfono."
+        "warning": "Esta acción solo se puede realizar en un teléfono móvil. Por favor, regresa a la pantalla/pestaña anterior y haz clic en el botón \"Cancelar\" para generar un nuevo código QR. Escanea el código y abre el nuevo enlace en tu teléfono."
       }
     }
   }
