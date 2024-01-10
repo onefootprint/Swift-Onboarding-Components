@@ -64,6 +64,20 @@ def test_sdk_args(sandbox_tenant):
             "data": {"public_key": obc_key, "l10n": {"locale": "en-US"}},
         },
         {
+            "kind": "verify_v1",
+            "data": {
+                "public_key": obc_key,
+                "l10n": {"locale": "en-US", "language": "es"},
+            },
+        },
+        {
+            "kind": "verify_v1",
+            "data": {
+                "public_key": obc_key,
+                "l10n": {"language": "en"},
+            },
+        },
+        {
             "kind": "form_v1",
             "data": {
                 "auth_token": "tok_12345",

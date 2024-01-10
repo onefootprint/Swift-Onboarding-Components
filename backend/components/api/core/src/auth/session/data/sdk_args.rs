@@ -21,6 +21,8 @@ pub type UserDataV1 = HashMap<DataIdentifier, PiiJsonValue>;
 pub struct L10nV1 {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub locale: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub language: Option<String>,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
@@ -267,6 +269,8 @@ mod test {
     #[test_case(json!({"kind": "verify_v1", "data": {"auth_token": "tok_1234"}}))]
     #[test_case(json!({"kind": "verify_v1", "data": {"public_key": "ob_1234", "user_data": {"id.first_name": "Hayes"}, "options": {"show_logo": false}}}))]
     #[test_case(json!({"kind": "form_v1", "data": {"auth_token": "tok_1234", "title": "My Form", "options": {"hide_buttons": true, "hide_footprint_logo": true}, "l10n": {"locale": "en-US"}}}))]
+    #[test_case(json!({"kind": "form_v1", "data": {"auth_token": "tok_1234", "title": "My Form", "options": {"hide_buttons": true, "hide_footprint_logo": true}, "l10n": {"locale": "en-US", "language": "en"}}}))]
+    #[test_case(json!({"kind": "form_v1", "data": {"auth_token": "tok_1234", "title": "My Form", "options": {"hide_buttons": true, "hide_footprint_logo": true}, "l10n": {"language": "es"}}}))]
     #[test_case(json!({"kind": "form_v1", "data": {"auth_token": "tok_1234", "title": "My Form", "options": {"hide_cancel_button": true, "hide_footprint_logo": true}, "l10n": {"locale": "en-US"}}}))]
     #[test_case(json!({"kind": "form_v1", "data": {"auth_token": "tok_1234"}}))]
     #[test_case(json!({"kind": "auth_v1", "data": {"public_key": "ob_1234", "options": {"show_logo": false}}}))]
