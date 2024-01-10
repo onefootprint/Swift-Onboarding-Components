@@ -189,6 +189,27 @@ pub(crate) struct User {
     pub glb_purpose: String,
     #[serde(rename = "DLPurpose")]
     pub dl_purpose: String,
+    pub end_user: EndUser,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "PascalCase")]
+#[allow(non_snake_case)]
+pub(crate) struct EndUser {
+    /// Entity on whose behalf the report is generated
+    pub company_name: PiiString,
+    /// Unparsed street address (for example, 123 N. Main St)
+    #[serde(rename = "StreetAddress1")]
+    pub street_address_1: PiiString,
+    /// City
+    pub city: PiiString,
+    /// Two-letter state abbreviation (for example, MT or FL)
+    pub state: PiiString,
+    /// Five-digit ZIP Code
+    #[serde(rename = "Zip5")]
+    pub zip5: PiiString,
+    ///Ten-digit phone number
+    pub phone: PiiString,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -322,7 +343,11 @@ pub enum WatchlistKind {
 }
 
 impl LexisRequest {
-    pub fn new(idv_data: IdvData, tenant_identifier: String) -> Result<Self, ConversionError> {
+    pub fn new(
+        idv_data: IdvData,
+        tenant_identifier: String,
+        tbi: TenantBusinessInfo,
+    ) -> Result<Self, ConversionError> {
         let IdvData {
             first_name,
             middle_name,
@@ -370,6 +395,14 @@ impl LexisRequest {
                     query_id: verification_request_id
                         .map(|v| v.to_string())
                         .unwrap_or(Uuid::new_v4().to_string()),
+                    end_user: EndUser {
+                        company_name: tbi.company_name,
+                        street_address_1: tbi.address_line1,
+                        city: tbi.city,
+                        state: tbi.state,
+                        zip5: tbi.zip,
+                        phone: tbi.phone,
+                    },
                 },
                 options: Options {
                     watchlists: vec![Watchlist {

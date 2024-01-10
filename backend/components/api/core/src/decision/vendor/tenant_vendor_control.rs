@@ -1,6 +1,9 @@
-use crate::{config::Config, enclave_client::EnclaveClient, errors::ApiResult};
+use crate::{config::Config, enclave_client::EnclaveClient, errors::ApiResult, utils};
 use db::{
-    models::{tenant::Tenant, tenant_vendor::TenantVendorControl as DbTenantVendorControl},
+    models::{
+        tenant::Tenant, tenant_business_info::TenantBusinessInfo,
+        tenant_vendor::TenantVendorControl as DbTenantVendorControl,
+    },
     DbPool, DbResult,
 };
 use idv::{
@@ -15,10 +18,11 @@ use newtypes::{
     IdvData, IncodeEnvironment, PiiString, TenantId, Vendor, VendorAPI,
 };
 
-#[derive(Clone, PartialEq, Eq, Debug, Default)]
+#[derive(Clone, Debug, Default)]
 /// A struct for adapting db::models::TenantVendorControl for use in the api crate
 pub struct TenantVendorControl {
-    vendor_control: Option<DbTenantVendorControl>,
+    #[allow(dead_code)]
+    vendor_control: Option<DbTenantVendorControl>, // TODO: not needed here?
     idology_credentials: IdologyCredentials,
     experian_credentials: ExperianCredentials,
     lexis_credentials: LexisCredentials,
@@ -28,6 +32,7 @@ pub struct TenantVendorControl {
     enabled_vendor_apis: Vec<VendorAPI>,
     tenant_id: TenantId,
     tenant_name: String,
+    tbi: Option<newtypes::TenantBusinessInfo>,
 }
 
 impl TenantVendorControl {
@@ -37,16 +42,17 @@ impl TenantVendorControl {
         config: &Config,
         enclave_client: &EnclaveClient,
     ) -> ApiResult<TenantVendorControl> {
-        let (tenant, vendor_control) = db_pool
+        let (tenant, vendor_control, tbi) = db_pool
             .db_query(move |conn| -> DbResult<_> {
                 let t = Tenant::get(conn, &tenant_id)?;
                 let tvc = DbTenantVendorControl::get(conn, t.id.clone())?;
+                let tbi = TenantBusinessInfo::get(conn, &t.id)?;
 
-                Ok((t, tvc))
+                Ok((t, tvc, tbi))
             })
             .await??;
 
-        Self::new_internal(vendor_control, config, enclave_client, tenant).await
+        Self::new_internal(vendor_control, config, enclave_client, tenant, tbi).await
     }
 
     // Accessors
@@ -81,6 +87,10 @@ impl TenantVendorControl {
         self.enabled_vendor_apis.clone()
     }
 
+    pub fn tenant_business_info(&self) -> Option<newtypes::TenantBusinessInfo> {
+        self.tbi.clone()
+    }
+
     // Requests
     pub fn build_idology_request(&self, idv_data: IdvData) -> IdologyExpectIDRequest {
         IdologyExpectIDRequest {
@@ -111,6 +121,7 @@ impl TenantVendorControl {
         config: &Config,
         enclave_client: &EnclaveClient,
         tenant: Tenant,
+        tbi: Option<TenantBusinessInfo>,
     ) -> ApiResult<Self> {
         // As of 2023-06-28 we just use our default idology credentials for all tenants
         let idology_credentials = IdologyCredentials::from(config);
@@ -146,8 +157,17 @@ impl TenantVendorControl {
             MiddeskCredentials::from(config)
         };
 
+        let tbi = if let Some(tbi) = &tbi {
+            Some(
+                utils::tenant_business_info::decrypt_tenant_business_info(enclave_client, &tenant, tbi)
+                    .await?,
+            )
+        } else {
+            None
+        };
+
         // stash the enabled APIs on TVC
-        let enabled_vendor_apis = Self::get_enabled_vendor_apis(&vendor_control);
+        let enabled_vendor_apis = Self::get_enabled_vendor_apis(&vendor_control, tbi.as_ref());
 
         // eventually we'll want to do some validations here, like checking the db is configured for at least 1 KYC vendor, but for now let's not validate in constructor
         let control = Self {
@@ -161,6 +181,7 @@ impl TenantVendorControl {
             incode_sandbox_credentials,
             tenant_name: tenant.name,
             tenant_id: tenant.id,
+            tbi,
         };
 
         Ok(control)
@@ -182,7 +203,10 @@ impl TenantVendorControl {
     }
 
     // Parse the db row and return which APIs are configured for the tenant
-    fn get_enabled_vendor_apis(vendor_control: &Option<DbTenantVendorControl>) -> Vec<VendorAPI> {
+    fn get_enabled_vendor_apis(
+        vendor_control: &Option<DbTenantVendorControl>,
+        tbi: Option<&newtypes::TenantBusinessInfo>,
+    ) -> Vec<VendorAPI> {
         let all_idology_vendor_apis = newtypes::vendor_apis_from_vendor(Vendor::Idology);
         // default vendors enabled for tenants
         let mut apis = vec![VendorAPI::MiddeskCreateBusiness];
@@ -197,8 +221,11 @@ impl TenantVendorControl {
                 apis.push(VendorAPI::ExperianPreciseId);
             }
 
-            if tvc.lexis_enabled {
+            // only consider Lexis enabled if we have a populated tenant_business_info for the tenant
+            if tvc.lexis_enabled && tbi.is_some() {
                 apis.push(VendorAPI::LexisFlexId);
+            } else if tvc.lexis_enabled {
+                tracing::error!("tvc.lexis_enabled = true but tenant is missing tenant_business_info");
             }
         } else {
             // If we do not, we enable Idology APIs by default
@@ -221,7 +248,7 @@ impl TenantVendorControl {
         vendor_control: Option<DbTenantVendorControl>,
         tenant: Tenant,
     ) -> ApiResult<Self> {
-        Self::new_internal(vendor_control, config, enclave_client, tenant).await
+        Self::new_internal(vendor_control, config, enclave_client, tenant, None).await
     }
 }
 

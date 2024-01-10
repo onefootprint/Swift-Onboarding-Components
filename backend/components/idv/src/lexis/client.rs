@@ -2,7 +2,7 @@ use crate::footprint_http_client::FootprintVendorHttpClient;
 use crate::lexis::request::LexisRequest;
 use crate::lexis::{self, ReqwestError};
 use newtypes::vendor_credentials::LexisCredentials;
-use newtypes::{IdvData, PiiJsonValue};
+use newtypes::{IdvData, PiiJsonValue, TenantBusinessInfo};
 use reqwest::header;
 use std::time::Duration;
 
@@ -12,6 +12,7 @@ pub struct LexisFlexIdRequest {
     pub idv_data: IdvData,
     pub credentials: LexisCredentials,
     pub tenant_identifier: String,
+    pub tbi: TenantBusinessInfo,
 }
 
 #[derive(Clone)]
@@ -28,6 +29,7 @@ pub async fn flex_id(
         idv_data,
         credentials,
         tenant_identifier,
+        tbi,
     } = req;
 
     let url = "https://wsonline.seisint.com/WsIdentity/FlexID?ver_=3.12";
@@ -41,7 +43,7 @@ pub async fn flex_id(
         header::HeaderValue::from_str(header_val.as_str())?,
     );
 
-    let req = LexisRequest::new(idv_data, tenant_identifier)?;
+    let req = LexisRequest::new(idv_data, tenant_identifier, tbi)?;
     tracing::info!(req = format!("{:?}", req), "flex_id req");
 
     let response = fp_http_client
@@ -78,6 +80,16 @@ mod tests {
             password: dotenv::var("LEXIS_TEST_PASSWORD").unwrap().into(),
         };
 
+        let tbi = TenantBusinessInfo {
+            // TODO: put these in .env? seems better than plaintexting it here even though its not super duper sensitive
+            company_name: PiiString::from(""),
+            address_line1: PiiString::from(""),
+            city: PiiString::from(""),
+            state: PiiString::from(""),
+            zip: PiiString::from(""),
+            phone: PiiString::from(""),
+        };
+
         let idv_data = IdvData {
             first_name: Some(PiiString::from("NICHOLAS")),
             last_name: Some(PiiString::from("BOGGAN")),
@@ -101,6 +113,7 @@ mod tests {
                 idv_data,
                 credentials,
                 tenant_identifier: "test".to_owned(),
+                tbi,
             },
         )
         .await

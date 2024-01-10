@@ -153,13 +153,17 @@ pub async fn send_idv_request(
         }
         VendorAPI::LexisFlexId => {
             let credentials = tvc.lexis_credentials();
-            send_lexis_flex_id_request(
-                LexisFlexIdRequest { idv_data, credentials, tenant_identifier: tvc.tenant_identifier() },
-                is_production,
-                ob_configuration_key,
-                state.vendor_clients.lexis_flex_id.clone(),
-                state.feature_flag_client.clone(),
-            ).await
+            if let Some(tbi) = tvc.tenant_business_info() {
+                send_lexis_flex_id_request(
+                    LexisFlexIdRequest { idv_data, credentials, tenant_identifier: tvc.tenant_identifier(), tbi },
+                    is_production,
+                    ob_configuration_key,
+                    state.vendor_clients.lexis_flex_id.clone(),
+                    state.feature_flag_client.clone(),
+                ).await
+            } else { // shouldn't be possible since we check tvc.enabled_vendor_apis before attempting this function and that takes the presence of TBI into account
+                Err(idv::Error::AssertionError("Missing tenant_business_info".to_owned()))
+            }
         }
         api => {
             let err = format!("send_idv_request not implemented for {}", api);

@@ -1,7 +1,7 @@
 use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::tenant_business_info;
-use diesel::{ExpressionMethods, Insertable, QueryDsl, Queryable, RunQueryDsl};
+use diesel::{ExpressionMethods, Insertable, OptionalExtension, QueryDsl, Queryable, RunQueryDsl};
 use newtypes::{DataLifetimeSeqno, SealedVaultBytes, TenantBusinessInfoId, TenantId};
 
 use super::data_lifetime::DataLifetime;
@@ -94,11 +94,12 @@ impl TenantBusinessInfo {
     }
 
     #[tracing::instrument("TenantBusinessInfo::get", skip_all)]
-    pub fn get(conn: &mut PgConn, tenant_id: &TenantId) -> DbResult<Self> {
+    pub fn get(conn: &mut PgConn, tenant_id: &TenantId) -> DbResult<Option<Self>> {
         let res = tenant_business_info::table
             .filter(tenant_business_info::tenant_id.eq(tenant_id))
             .filter(tenant_business_info::deactivated_at.is_null())
-            .get_result(conn)?;
+            .get_result(conn)
+            .optional()?;
 
         Ok(res)
     }
@@ -128,7 +129,7 @@ mod tests {
         )
         .unwrap();
 
-        let tbi = TenantBusinessInfo::get(conn, &t.id).unwrap();
+        let tbi = TenantBusinessInfo::get(conn, &t.id).unwrap().unwrap();
         assert_eq!(new_tbi.id, tbi.id);
         assert_eq!(SealedVaultBytes(vec![1]), tbi.company_name);
 
@@ -146,7 +147,7 @@ mod tests {
         )
         .unwrap();
 
-        let tbi = TenantBusinessInfo::get(conn, &t.id).unwrap();
+        let tbi = TenantBusinessInfo::get(conn, &t.id).unwrap().unwrap();
         assert_eq!(new_tbi2.id, tbi.id);
         assert_eq!(SealedVaultBytes(vec![2]), tbi.company_name);
     }
