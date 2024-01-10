@@ -184,7 +184,7 @@ const AuthContainer = ({
           config,
           device,
           obConfigAuth,
-          sandboxId,
+          sandboxId: isSandbox ? sandboxId : undefined,
           showLogo: options.showLogo,
         }}
       >
