@@ -12,7 +12,7 @@ use newtypes::{
 };
 
 use super::{
-    experian::ExperianFeatures, idology_expectid::IDologyFeatures, incode_docv::IncodeDocumentFeatures,
+    experian::ExperianFeatures, idology_expectid::IDologyFeatures, incode_docv::IncodeDocumentFeatures, lexis,
 };
 use crate::{
     decision::{
@@ -163,6 +163,10 @@ fn parse_reason_codes(
                 .chain(user_input_risk_signals)
                 .collect()
         }
+        ParsedResponse::LexisFlexId(r) => lexis::footprint_reason_codes(r)
+            .into_iter()
+            .chain(user_input_risk_signals)
+            .collect(),
         _ => vec![],
     }
 }

@@ -13,10 +13,9 @@ use std::convert::Into;
 // 40 Last name, address and SSN or phone verified; first name, phone or SSN
 //    verification failures
 // 50 Full name, address, phone, SSN verified
-const COMPREHENSIVE_VERIFICATION_INDEX_THRESHOLD: i32 = 20;
+const COMPREHENSIVE_VERIFICATION_INDEX_THRESHOLD: i32 = 30;
 
-#[allow(dead_code)]
-fn footprint_reason_codes(res: FlexIdResponse) -> Vec<FRC> {
+pub fn footprint_reason_codes(res: FlexIdResponse) -> Vec<FRC> {
     let phone_codes = Into::<Vec<FRC>>::into(&res.name_address_phone_summary());
     let name_address_ssn_codes = Into::<Vec<FRC>>::into(&res.name_address_ssn_summary());
     let dob_codes = Into::<Vec<FRC>>::into(&res.dob_match_level());
