@@ -1,0 +1,1411 @@
+{
+  "global": {
+    "errors": {
+      "uncaught-error": {
+        "title": "¡Ups! Ocurrió un error.",
+        "description": "Lo sentimos. Por favor, reinicie el proceso.",
+        "cta": "Reiniciar"
+      }
+    },
+    "components": {
+      "cta": {
+        "continue": "Continuar",
+        "save": "Guardar",
+        "cancel": "Cancelar"
+      },
+      "navigation-header": {
+        "back-button": {
+          "aria-label": "Volver atrás"
+        }
+      },
+      "session-expired": {
+        "title": "Sesión expirada",
+        "description": "Tu sesión ha expirado. Por favor, reiníciala.",
+        "cta": "Reiniciar"
+      }
+    },
+    "pages": {
+      "config-invalid": {
+        "title": "Integración configurada incorrectamente",
+        "subtitle": "Parece que la integración 'Verificar con Footprint' está utilizando una clave de integración inválida. Por favor, contacte al propietario de este producto."
+      },
+      "sandbox-outcome": {
+        "title": "Resultados de prueba",
+        "subtitle": "Selecciona qué resultado deseas que tenga este usuario después de completar su proceso de incorporación",
+        "overall-outcome": {
+          "title": "Resultado general",
+          "outcome": {
+            "options": {
+              "success": {
+                "title": "Éxito"
+              },
+              "manual-review": {
+                "title": "Revisión manual"
+              },
+              "fail": {
+                "title": "Fallo"
+              },
+              "step-up": {
+                "title": "Incrementar",
+                "description": "Aunque no sea requerido en el manual, los usuarios subirán fotos de su identificación."
+              },
+              "document-decision": {
+                "title": "Decisión sobre el documento de identificación"
+              }
+            }
+          }
+        },
+        "id-doc-outcome": {
+          "title": "Imágenes del documento de identidad",
+          "simulated-outcome": {
+            "title": "Resultado simulado",
+            "description": "Resultado ficticio independiente de la imagen cargada",
+            "options": {
+              "success": {
+                "title": "Éxito"
+              },
+              "fail": {
+                "title": "Fallo",
+                "description": "El resultado general fallará si la imagen del documento de identidad falla."
+              }
+            }
+          },
+          "real-outcome": {
+            "title": "Resultado real",
+            "description": "Procesaremos las imágenes subidas utilizando el mismo sistema que en producción y los resultados reflejarán la respuesta real."
+          }
+        },
+        "test-id": {
+          "label": "ID de prueba",
+          "description": "Puede iniciar sesión en un usuario de sandbox previamente creado utilizando el ID de prueba de esa sesión correspondiente.",
+          "placeholder": "Ingrese ID de prueba",
+          "hint": "No use caracteres especiales ni espacios.",
+          "errors": {
+            "required": "Se requiere ID de prueba",
+            "invalid": "ID de prueba inválido. Por favor, elimine los espacios y caracteres especiales."
+          },
+          "button": {
+            "edit": "Editar",
+            "save": "Guardar",
+            "copy": "Copiar",
+            "copy-confirmation": "Copiado",
+            "reset": "Reiniciar"
+          }
+        },
+        "cta": "Continuar"
+      },
+      "complete": {
+        "title": "Envío completado!",
+        "subtitle-with-kyb": "Gracias por usar Footprint para verificar su negocio y su identidad.",
+        "subtitle": "Gracias por usar Footprint para verificar su identidad.",
+        "cta": "Regresar al sitio"
+      }
+    }
+  },
+  "identify": {
+    "components": {
+      "sandbox-outcome-footer": {
+        "outcome": {
+          "label": "Resultado de la prueba:",
+          "options": {
+            "success": "Éxito",
+            "fail": "Fracaso",
+            "manual-review": "Revisión manual",
+            "document-decision": "Decisión de documento de identificación",
+            "step-up": "Decisión de documento de identificación"
+          }
+        },
+        "testID": "ID de prueba:"
+      },
+      "legal-footer": {
+        "label": "Al continuar, acepto los <termsLink>Términos de servicio</termsLink> y reconozco la <privacyPolicyLink>Política de privacidad</privacyPolicyLink>."
+      },
+      "pin-verification": {
+        "error": "Código incorrecto",
+        "verifying": "Verificando...",
+        "success": "¡Éxito!",
+        "resend-button": {
+          "cta": "Reenviar código",
+          "disabled": "Espere {{seconds}} segundos para reenviarlo..."
+        },
+        "toast": {
+          "success": {
+            "title": "Éxito",
+            "description": "Te hemos enviado un nuevo código."
+          }
+        }
+      },
+      "log-in-different-account": {
+        "label": "Iniciar sesión con una cuenta diferente",
+        "or": "o"
+      }
+    },
+    "pages": {
+      "auth-token-invalid": {
+        "title": "El enlace que abriste es inválido",
+        "subtitle": "Por favor, contacta a la empresa que te envió este enlace."
+      },
+      "email-identification": {
+        "header": {
+          "title": "¡Hola! 👋",
+          "subtitle": "Introduce tu correo electrónico para empezar."
+        },
+        "form": {
+          "email": {
+            "label": "Correo electrónico",
+            "placeholder": "jane.doe@acme.com",
+            "errors": {
+              "required": "Se requiere correo electrónico"
+            }
+          },
+          "cta": "Continuar"
+        }
+      },
+      "phone-identification": {
+        "title": "¡Hola! 👋",
+        "subtitle": "Introduce tu número de teléfono para continuar.",
+        "email-card": {
+          "cta": "Cambiar"
+        },
+        "form": {
+          "phone": {
+            "label": "Número de teléfono",
+            "placeholder": "(123) 123-1234",
+            "errors": {
+              "required": "No se puede dejar el número de teléfono en blanco",
+              "invalid": "Número de teléfono inválido"
+            }
+          },
+          "cta": "Verificar con SMS"
+        }
+      },
+      "sms-challenge": {
+        "label": "SMS",
+        "title": "Verifica tu número de teléfono",
+        "welcome-back-title": "¡Bienvenido de nuevo! 🎉",
+        "prompt-with-phone": "Introduce el código de 6 dígitos enviado a {{scrubbedPhoneNumber}}.",
+        "prompt-without-phone": "Introduce el código de 6 dígitos enviado a tu teléfono."
+      },
+      "email-challenge": {
+        "label": "Correo electrónico",
+        "title": "Verifica tu correo electrónico",
+        "welcome-back-title": "¡Bienvenido de nuevo! 🎉",
+        "prompt-with-email": "Introduce el código de 6 dígitos enviado a {{email}}.",
+        "prompt-without-email": "Introduce el código de 6 dígitos enviado a tu correo electrónico."
+      },
+      "biometric-challenge": {
+        "label": "Llave de acceso",
+        "loading": "Esperando...",
+        "success": "¡Éxito!",
+        "cta": "Iniciar sesión con llave de acceso",
+        "title": "¡Bienvenido de nuevo! 🎉",
+        "login-with-sms": "Iniciar sesión con SMS",
+        "passkey-error": {
+          "title": "Algo salió mal",
+          "description": "Esto puede deberse a los permisos de tu dispositivo. Por favor, intenta iniciar sesión con SMS."
+        }
+      }
+    }
+  },
+  "onboarding": {
+    "components": {
+      "error": {
+        "title": "¡Vaya!",
+        "description": "Hubo un error al completar esta solicitud. Por favor, actualiza la página e inténtalo de nuevo."
+      }
+    },
+    "pages": {
+      "authorize": {
+        "title": "Autorizar acceso",
+        "subtitle": "{{tenantName}} podrá ver de forma segura los siguientes datos:",
+        "cta": "Autorizar",
+        "footer": "Al hacer clic en \"Autorizar\", reconoces la <a>política de privacidad</a> de {{tenantName}}.",
+        "onboarding-complete-error": {
+          "title": "Ocurrió un error",
+          "description": "Hubo un error al completar el proceso de incorporación. Por favor, inténtalo de nuevo."
+        },
+        "kyc": {
+          "title": "Tus datos personales"
+        },
+        "kyb": {
+          "title": "Los datos de tu empresa"
+        },
+        "data-labels": {
+          "name": "Nombre",
+          "email": "Correo electrónico",
+          "phone": "Número de teléfono",
+          "ssn4": "SSN (últimos 4)",
+          "ssn9": "SSN",
+          "dob": "Fecha de nacimiento",
+          "address-full": "Dirección",
+          "address-partial": "País y código postal",
+          "nationality": "Nacionalidad",
+          "us-legal-status": "Estado legal en EE.UU.",
+          "id-card": "Tarjeta de identificación",
+          "passport": "Pasaporte",
+          "driversLicense": "Licencia de conducir",
+          "residence-document": "Tarjeta de residencia",
+          "work-permit": "Permiso de trabajo",
+          "visa": "Visa",
+          "voterIdentification": "Identificación de votante",
+          "ssnCard": "Tarjeta de SSN",
+          "selfie": "Selfie",
+          "business-name": "Nombre de la empresa",
+          "business-tin": "TIN",
+          "business-address": "Dirección registrada",
+          "business-beneficial-owners": "Propietarios beneficiosos",
+          "kyced-business-beneficial-owners": "Propietarios beneficiosos",
+          "business-website": "Sitio web",
+          "business-corporation-type": "Tipo de corporación",
+          "business-phone-number": "Número de teléfono",
+          "investor-profile": "Perfil del inversor"
+        },
+        "error": {
+          "title": "¡Vaya!",
+          "description": "Hubo un error al completar esta solicitud. Por favor, inténtalo de nuevo."
+        }
+      }
+    }
+  },
+  "kyc": {
+    "components": {
+      "sync-data-error": {
+        "empty-auth-token": {
+          "title": "Tu sesión no es válida",
+          "description": "Por favor, actualiza esta página para intentar el proceso de incorporación de nuevo."
+        },
+        "request-data": {
+          "title": "Hay campos faltantes",
+          "description": "Por favor, regresa a los pasos anteriores para asegurarte de que todos los datos están completos"
+        },
+        "invalid-inputs": {
+          "title": "Ocurrió un error",
+          "description": "Hubo un error al guardar los datos. Por favor, corrige los datos e inténtalo de nuevo."
+        }
+      }
+    },
+    "pages": {
+      "email": {
+        "title": "Dirección de correo electrónico",
+        "subtitle": "Estamos obligados a recopilar tu dirección de correo electrónico.",
+        "email": {
+          "label": "Correo electrónico",
+          "placeholder": "jane.doe@acme.com",
+          "hint": "Agrega “#cadena” (p. ej., #test1) al final de tu dirección de correo electrónico.",
+          "errors": {
+            "required": "Se requiere correo electrónico",
+            "pattern": "Agrega “#cadena” (p. ej., #test1) al final de tu dirección de correo electrónico."
+          }
+        }
+      },
+      "basic-information": {
+        "title": "Datos básicos",
+        "subtitle": "Escribe tus nombres y apellidos legales completos tal como aparecen en tu identificación emitida por el gobierno.",
+        "form": {
+          "first-name": {
+            "label": "Nombre",
+            "placeholder": "Jane",
+            "error": {
+              "empty": "El nombre no puede estar vacío",
+              "special-chars": "El nombre contiene caracteres inválidos."
+            }
+          },
+          "middle-name": {
+            "label": "Segundo nombre (opcional)",
+            "placeholder": "Sue",
+            "error": {
+              "special-chars": "El segundo nombre contiene caracteres inválidos."
+            }
+          },
+          "last-name": {
+            "label": "Apellido",
+            "placeholder": "Doe",
+            "error": {
+              "empty": "El apellido no puede estar vacío",
+              "special-chars": "El apellido contiene caracteres inválidos."
+            }
+          },
+          "dob": {
+            "label": "Fecha de nacimiento",
+            "error": {
+              "invalid": "La fecha de nacimiento no puede estar vacía o es inválida",
+              "future-date": "La fecha de nacimiento no puede ser en el futuro",
+              "too-young": "Debe tener al menos 18 años de edad",
+              "too-old": "La fecha de nacimiento no puede ser anterior a 1900"
+            }
+          },
+          "nationality": {
+            "label": "Nacionalidad",
+            "placeholder": "Selecciona la nacionalidad"
+          }
+        }
+      },
+      "residential-address": {
+        "form": {
+          "address-line-1": {
+            "label": "Línea de dirección 1",
+            "international-label": "Dirección",
+            "placeholder": "Calle y número de casa",
+            "error": "La dirección no puede estar vacía y debe ser una dirección residencial (p. ej., no puede ser un apartado postal)"
+          },
+          "address-line-2": {
+            "international-label": "Apartamento/barrio (opcional)",
+            "label": "Línea de dirección 2 (opcional)",
+            "international-placeholder": "Nombre del barrio, número de suite, etc.",
+            "placeholder": "Apartamento, suite, etc."
+          },
+          "city": {
+            "label": "Ciudad",
+            "placeholder": "Ciudad",
+            "error": "La ciudad no puede estar vacía"
+          },
+          "state": {
+            "label": "Estado",
+            "international-label": "Estado/provincia",
+            "placeholder": "Estado",
+            "international-placeholder": "Estado/provincia",
+            "error": "El estado no puede estar vacío"
+          },
+          "country": {
+            "label": "País",
+            "placeholder": "Seleccionar",
+            "error": "El país no puede estar vacío",
+            "disabled-hint": "Solo se aceptan direcciones en {{countryName}}"
+          },
+          "zipCode": {
+            "label": "Código postal",
+            "placeholder": "11206",
+            "error": "El código postal no puede estar vacío o es inválido"
+          }
+        },
+        "title": "¿Cuál es tu dirección residencial?",
+        "subtitle": "Asegúrate de proporcionar tu dirección residencial actualizada (no apartados postales)."
+      },
+      "legal-status": {
+        "title": "¿Cuál es tu estatus legal en EE.UU.?",
+        "subtitle": "Necesitamos recopilar esta información para completar tu perfil.",
+        "statuses": {
+          "citizen": "Soy ciudadano",
+          "permanent-resident": "Tengo una Tarjeta Verde/Soy residente permanente",
+          "visa": "Tengo una Visa",
+          "other": "Otro"
+        },
+        "form": {
+          "nationality": {
+            "label": "País de nacimiento",
+            "placeholder": "Seleccionar",
+            "error": "El país de nacimiento no puede estar vacío"
+          },
+          "citizenship": {
+            "label": "Ciudadanía",
+            "placeholder": "Seleccionar",
+            "empty-error": "La ciudadanía no puede estar vacía",
+            "us-citizen-error": "Si eres ciudadano de EE.UU., selecciona la opción \"Soy ciudadano\" arriba",
+            "delete-aria": "Eliminar ciudadanía",
+            "add-text": "Agregar ciudadanía"
+          },
+          "visa-kind": {
+            "label": "Tipo de Visa",
+            "placeholder": "Seleccionar",
+            "error": "El tipo de Visa no puede estar vacío",
+            "mapping": {
+              "e1": "E-1",
+              "e2": "E-2",
+              "e3": "E-3",
+              "f1": "F-1",
+              "g4": "G-4",
+              "h1b": "H-1B",
+              "l1": "L-1",
+              "o1": "O-1",
+              "tn1": "TN-1",
+              "other": "Otro"
+            }
+          },
+          "visa-expiration": {
+            "label": "Fecha de expiración de la Visa",
+            "error": {
+              "required": "La fecha de expiración de la Visa no puede estar vacía",
+              "invalid": "La fecha de expiración de la Visa es inválida",
+              "invalidTimeframe": "La fecha de expiración de la Visa es inválida"
+            }
+          }
+        }
+      },
+      "ssn": {
+        "full": {
+          "title": "¿Cuál es tu Número de Seguridad Social?",
+          "subtitle": "Necesitamos recopilar esta información para verificar tu identidad.",
+          "disclaimer": {
+            "security": {
+              "title": "Tus datos están seguros",
+              "description": "Tu SSN está encriptado y protegido por un entorno seguro de última generación."
+            }
+          },
+          "form": {
+            "label": "SSN",
+            "placeholder": "XXX-XX-XXXX",
+            "error": "El SSN no puede estar vacío o es inválido"
+          }
+        },
+        "last-four": {
+          "title": "¿Cuáles son los últimos 4 dígitos de tu Número de Seguridad Social?",
+          "subtitle": "Necesitamos recopilar esta información para verificar tu identidad.",
+          "form": {
+            "label": "SSN (últimos 4)",
+            "placeholder": "XXXX",
+            "error": "El SSN no puede estar vacío o es inválido"
+          }
+        },
+        "skip": {
+          "cta": "No tengo un Número de Seguridad Social",
+          "confirmation": {
+            "title": "¿No tienes SSN?",
+            "with-stepup-description": "Por favor, confirma que no tienes un SSN.",
+            "without-stepup-description": "Por favor, confirma que no tienes un SSN. Esto puede tardar más tiempo en verificar tu identidad.",
+            "yes": "Confirmar",
+            "no": "Cancelar"
+          }
+        }
+      },
+      "confirm": {
+        "summary": {
+          "title": "Confirma tus datos personales",
+          "subtitle": "Por favor, asegúrate de que tus datos personales son precisos y no hay errores tipográficos antes de continuar.",
+          "edit": "Editar",
+          "reveal": "Revelar",
+          "hide": "Ocultar",
+          "cta": "Confirmar y continuar",
+          "reveal-error": {
+            "title": "Algo salió mal",
+            "description": "No pudimos revelar tu SSN. Por favor, edita tu SSN para guardarlo de nuevo."
+          }
+        },
+        "email": {
+          "title": "Dirección de correo electrónico",
+          "text": "Correo electrónico"
+        },
+        "basic-info": {
+          "title": "Datos básicos",
+          "first-name": "Nombre",
+          "middle-name": "Segundo nombre",
+          "last-name": "Apellido",
+          "dob": "Fecha de nacimiento",
+          "nationality": "Nacionalidad"
+        },
+        "legal-status": {
+          "text": {
+            "title": "Estatus legal en EE.UU.",
+            "status": "Estatus legal",
+            "nationality": "País de nacimiento",
+            "citizenship": "Ciudadanía",
+            "visa-kind": "Tipo de Visa",
+            "visa-expiration": "Fecha de expiración de la Visa"
+          },
+          "statuses": {
+            "citizen": "Soy ciudadano",
+            "permanent_resident": "Tengo una Tarjeta Verde/Soy residente permanente",
+            "visa": "Tengo una Visa"
+          }
+        },
+        "address": {
+          "title": "Dirección"
+        },
+        "identity": {
+          "title": "Identidad",
+          "ssn9": "SSN",
+          "ssn4": "SSN (últimos 4)",
+          "ssn-skipped-subtext": "No tienes un Número de Seguridad Social"
+        },
+        "di": {
+          "id": {
+            "email": "Correo electrónico",
+            "first_name": "Nombre",
+            "middle_name": "Segundo nombre",
+            "last_name": "Apellido",
+            "ssn9": "SSN (Completo)",
+            "ssn4": "SSN (Últimos 4)",
+            "nationality": "Nacionalidad",
+            "dob": "Fecha de nacimiento",
+            "address_line1": "Línea de dirección 1",
+            "address_line2": "Línea de dirección 2",
+            "city": "Ciudad",
+            "state": "Estado",
+            "zip": "Código postal",
+            "country": "País",
+            "us_legal_status": "Estatus legal",
+            "country_of_birth": "País de nacimiento",
+            "citizenships": "Ciudadanía",
+            "visa_kind": "Tipo de Visa",
+            "visa_expiration_date": "Fecha de expiración de la Visa"
+          }
+        },
+        "errors": {
+          "invalid-inputs": {
+            "title": "Ocurrió un error",
+            "description-with-message": "Hubo un error al guardar los datos. {{message}}.",
+            "description-with-fields": "Hubo un error al guardar los datos. Por favor, corrige estos campos: {{fields}}.",
+            "description-generic": "Hubo un error al guardar los datos. Por favor, corrige los datos e inténtalo de nuevo."
+          }
+        }
+      }
+    }
+  },
+  "kyb": {
+    "components": {
+      "sync-data-error": {
+        "empty-auth-token": {
+          "title": "Tu sesión no es válida",
+          "description": "Por favor, actualiza esta página para intentar el proceso de incorporación de nuevo."
+        },
+        "invalid-inputs": {
+          "title": "Ocurrió un error",
+          "description": "Hubo un error al guardar los datos. Por favor, corrige los datos e inténtalo de nuevo."
+        }
+      }
+    },
+    "pages": {
+      "introduction": {
+        "title": "¡Conozcamos a tu empresa! 😊",
+        "subtitle": "Antes de comenzar, hay un par de cosas que debes saber.",
+        "guidelines": {
+          "beneficial-owner": {
+            "title": "Necesitas ser un propietario beneficioso para verificar tu negocio.",
+            "description": "Un propietario beneficioso es cualquier persona que tenga control sustancial o posea al menos el 25% del negocio."
+          },
+          "bo-kyc": {
+            "title": "Necesitamos verificar tu identidad, como propietario beneficioso.",
+            "description": "De lo contrario, no podemos verificar exitosamente tu negocio."
+          }
+        }
+      },
+      "basic-data": {
+        "title": "Datos básicos",
+        "subtitle": "Necesitamos información sobre tu empresa.",
+        "form": {
+          "business-name": {
+            "label": "Nombre de la empresa",
+            "placeholder": "Acme Bank Inc.",
+            "error": "El nombre de la empresa no puede estar vacío o es inválido"
+          },
+          "doing-business-as": {
+            "label": "Nombre comercial (opcional)",
+            "placeholder": "Acme Bank"
+          },
+          "tin": {
+            "label": "Número de Identificación del Contribuyente (TIN)",
+            "placeholder": "12-3456789",
+            "errors": {
+              "required": "El TIN no puede estar vacío o es inválido",
+              "pattern": "El TIN debe tener el formato 12-3456789"
+            }
+          },
+          "corporation-type": {
+            "label": "Tipo de entidad legal",
+            "mapping": {
+              "agent": "Agente",
+              "c_corporation": "Corporación C",
+              "s_corporation": "Corporación S",
+              "b_corporation": "Corporación B",
+              "llc": "LLC",
+              "llp": "LLP",
+              "non_profit": "Sin fines de lucro",
+              "partnership": "Sociedad",
+              "sole_proprietorship": "Propietario único",
+              "trust": "Fideicomiso",
+              "unknown": "Desconocido"
+            },
+            "error": "El tipo de entidad legal no puede estar vacío o es inválido"
+          },
+          "website": {
+            "label": "Sitio web",
+            "placeholder": "https://www.acmebank.com",
+            "errors": {
+              "required": "El sitio web no puede estar vacío o es inválido"
+            }
+          },
+          "phone-number": {
+            "label": "Número de teléfono",
+            "placeholder": "(123) 456-7890",
+            "errors": {
+              "required": "El número de teléfono no puede estar vacío",
+              "pattern": "El número de teléfono es inválido"
+            }
+          }
+        }
+      },
+      "business-address": {
+        "title": "¿Cuál es la dirección registrada de tu empresa?",
+        "subtitle": "Para fines de verificación, solo necesitamos la dirección registrada del negocio.",
+        "form": {
+          "address-line-1": {
+            "label": "Línea de dirección 1",
+            "placeholder": "Calle y número de casa",
+            "error": "La dirección no puede estar vacía"
+          },
+          "address-line-2": {
+            "label": "Línea de dirección 2 (opcional)",
+            "placeholder": "Apartamento, suite, etc."
+          },
+          "city": {
+            "label": "Ciudad",
+            "placeholder": "Nueva York",
+            "error": "La ciudad no puede estar vacía"
+          },
+          "state": {
+            "label": "Estado",
+            "placeholder": "Seleccionar",
+            "error": "El estado no puede estar vacío"
+          },
+          "country": {
+            "label": "País",
+            "placeholder": "Seleccionar",
+            "error": "El país no puede estar vacío",
+            "us-only-hint": "Actualmente solo se admiten negocios de EE. UU."
+          },
+          "zip": {
+            "label": "Código postal",
+            "placeholder": "11206",
+            "error": "El código postal no puede estar vacío"
+          }
+        }
+      },
+      "beneficial-owners": {
+        "title": "¿Quiénes son los propietarios beneficiosos?",
+        "subtitle": "Enumera a todas las personas que poseen al menos el 25% del negocio o tienen control sustancial sobre él.",
+        "form": {
+          "fields-header": {
+            "beneficial-owner-you": "Propietario beneficioso (Tú)",
+            "beneficial-owner-other": "Propietario beneficioso (Otro)",
+            "remove": "Eliminar"
+          },
+          "fields": {
+            "primary-bo-name-hint": "Escribe tus nombres y apellidos tal como aparecen en tu identificación emitida por el gobierno",
+            "first-name": {
+              "label": "Nombre",
+              "placeholder": "Jane",
+              "error": "El nombre no puede estar vacío o es inválido"
+            },
+            "middle-name": {
+              "label": "Segundo nombre (opcional)",
+              "placeholder": "Sue"
+            },
+            "last-name": {
+              "label": "Apellido",
+              "placeholder": "Doe",
+              "error": "El apellido no puede estar vacío o es inválido"
+            },
+            "email": {
+              "label": "Correo electrónico",
+              "placeholder": "jane.doe@acme.com",
+              "hint": "Agrega “#cadena” (p. ej., #test1) al final de tu dirección de correo electrónico.",
+              "errors": {
+                "required": "Se requiere correo electrónico",
+                "pattern": "Agrega “#cadena” (p. ej., #test1) al final de tu dirección de correo electrónico."
+              }
+            },
+            "phone": {
+              "label": "Número de teléfono",
+              "placeholder": "(123) 456-7890",
+              "errors": {
+                "required": "Se requiere número de teléfono",
+                "pattern": "El número de teléfono es inválido"
+              }
+            },
+            "ownership-stake": {
+              "label": "Porcentaje aproximado de propiedad (%)",
+              "placeholder": "25",
+              "errors": {
+                "required": "El porcentaje de propiedad está vacío o es inválido",
+                "min": "El porcentaje de propiedad no puede ser menor del 1%",
+                "max": "El porcentaje de propiedad no puede ser mayor del 100%"
+              }
+            }
+          },
+          "multi-kyc": "Necesitamos verificar las identidades de todos los demás propietarios beneficiosos. Les enviaremos un enlace por correo electrónico después de que termines de completar la verificación de tu empresa.",
+          "add-more": "Agregar más",
+          "errors": {
+            "invalid": "Por favor, completa los campos anteriores.",
+            "ownership-stake-total": {
+              "title": "El porcentaje total de propiedad supera el 100%",
+              "description": "Por favor, verifica el porcentaje de propiedad de cada propietario beneficioso. La suma no puede superar el 100%."
+            },
+            "duplicate-email": {
+              "title": "Correo electrónico duplicado",
+              "description": "Asegúrate de que cada propietario beneficioso tenga una dirección de correo electrónico única."
+            },
+            "duplicate-phone-number": {
+              "title": "Número de teléfono duplicado",
+              "description": "Asegúrate de que cada propietario beneficioso tenga un número de teléfono único."
+            }
+          }
+        }
+      },
+      "confirm": {
+        "summary": {
+          "title": "Confirma los datos de tu empresa",
+          "subtitle": "Por favor, asegúrate de que los datos de tu empresa sean precisos y no haya errores tipográficos antes de continuar.",
+          "edit": "Editar",
+          "save": "Guardar",
+          "cta": "Confirmar y continuar"
+        },
+        "basic-data": {
+          "title": "Datos básicos",
+          "business-name": "Nombre de la empresa",
+          "doing-business-as": "Nombre comercial (opcional)",
+          "tin": "Número de Identificación del Contribuyente (TIN)",
+          "corporation-type": "Tipo de entidad legal",
+          "website": "Sitio web",
+          "phone-number": "Número de teléfono"
+        },
+        "business-address": {
+          "title": "Dirección registrada de la empresa"
+        },
+        "beneficial-owners": {
+          "title": "Propietarios beneficiosos",
+          "beneficial-owner-you": "Propietario beneficioso (Tú)",
+          "beneficial-owner-other": "Propietario beneficioso (Otro)",
+          "first-name": "Nombre",
+          "middle-name": "Segundo nombre",
+          "last-name": "Apellido",
+          "email": "Correo electrónico",
+          "ownership-stake": "Porcentaje de propiedad"
+        }
+      },
+      "cta": {
+        "continue": "Continuar",
+        "save": "Guardar",
+        "cancel": "Cancelar"
+      }
+    }
+  },
+  "investor-profile": {
+    "components": {
+      "empty-auth-token": {
+        "title": "Tu sesión no es válida",
+        "description": "Por favor, actualiza esta página para intentar el proceso de incorporación de nuevo."
+      },
+      "invalid-inputs": {
+        "title": "Ocurrió un error",
+        "description": "Hubo un error al guardar los datos. Por favor, corrige los datos e inténtalo de nuevo."
+      },
+      "continue-button": {
+        "label": "Continuar",
+        "loading-aria-label": "Cargando..."
+      },
+      "transition-animation": {
+        "source": "Casi listo...",
+        "destination": "¡Unas pocas preguntas más específicas sobre inversión!"
+      }
+    },
+    "pages": {
+      "employment": {
+        "title": "¿Cuál es tu estado de empleo y ocupación?",
+        "subtitle": "Estamos legalmente obligados a recopilar esta información.",
+        "employment-status": {
+          "employed": "Empleado",
+          "unemployed": "Desempleado",
+          "retired": "Jubilado",
+          "student": "Estudiante",
+          "label": "Estado de empleo",
+          "placeholder": "Selecciona tu estado de empleo",
+          "error": "Se requiere estado de empleo"
+        },
+        "occupation": {
+          "label": "Ocupación",
+          "placeholder": "Ingeniero de Software",
+          "error": "Se requiere ocupación"
+        },
+        "employer": {
+          "label": "Empleador",
+          "placeholder": "Acme Bank",
+          "error": "Se requiere empleador"
+        }
+      },
+      "income": {
+        "title": "¿Cuál es tu ingreso anual?",
+        "subtitle": "Estamos legalmente obligados a recopilar esta información.",
+        "le25k": "Menos de $25,000",
+        "gt25k_le50k": "$25,001 - $50,000",
+        "gt50k_le100k": "$50,001 - $100,000",
+        "gt100k_le200k": "$100,001 - $200,000",
+        "gt200k_le300k": "$200,001 - $300,000",
+        "gt300k_le500k": "$300,001 - $500,000",
+        "gt500k_le1200k": "$500,001 - $1,200,000",
+        "gt1200k": "Más de $1,200,001"
+      },
+      "net-worth": {
+        "title": "¿Cuál es tu patrimonio neto?",
+        "subtitle": "Estamos legalmente obligados a recopilar esta información.",
+        "le50k": "Menos de $50,000",
+        "gt50k_le100k": "$50,001 - $100,000",
+        "gt100k_le200k": "$100,001 - $200,000",
+        "gt200k_le500k": "$200,001 - $500,000",
+        "gt500k_le1m": "$500,000 - $1,000,000",
+        "gt1m_le5m": "$1,000,001 - $5,000,000",
+        "gt5m": "Más de $5,000,000"
+      },
+      "investment-goals": {
+        "title": "¿Cuáles son tus objetivos de inversión?",
+        "subtitle": "Estamos legalmente obligados a recopilar esta información.",
+        "growth": "Crecimiento",
+        "income": "Ingresos",
+        "preserve_capital": "Preservar capital",
+        "speculation": "Especulación",
+        "diversification": "Diversificación",
+        "other": "Otro",
+        "empty-selection": "Por favor, selecciona al menos un objetivo"
+      },
+      "risk-tolerance": {
+        "title": "¿Cómo describirías tu tolerancia al riesgo?",
+        "subtitle": "Estamos legalmente obligados a recopilar esta información.",
+        "conservative": {
+          "label": "Conservador",
+          "description": "Prefiere rendimientos menores pero consistentes"
+        },
+        "moderate": {
+          "label": "Moderado",
+          "description": "Busca un portafolio equilibrado"
+        },
+        "aggressive": {
+          "label": "Agresivo",
+          "description": "Prefiere el potencial de crecimiento agresivo"
+        }
+      },
+      "declarations": {
+        "title": "¿Alguno de los siguientes se aplica a ti o a un miembro de tu familia inmediata?",
+        "subtitle": "Estas declaraciones no aplicarán a la mayoría de los usuarios.",
+        "options": {
+          "none": "Ninguno",
+          "affiliated_with_us_broker": "Afiliado o trabaja con un corredor de bolsa registrado en EE. UU. o FINRA",
+          "senior_executive": "Ejecutivo senior o accionista de más del 10% de una empresa que cotiza en bolsa",
+          "senior_political_figure": "Soy una figura política importante"
+        },
+        "cta-none": "Ninguno de estos me aplica",
+        "brokerage-firm-employer": {
+          "label": "Nombre de la empresa",
+          "placeholder": "Nombre de la empresa",
+          "error": "Se requiere el nombre de la empresa"
+        },
+        "company-symbols": {
+          "label": "Símbolos de la empresa",
+          "placeholder": "ABNB, META, GOOG",
+          "hint": "Usa comas para separar los símbolos de las empresas",
+          "error": "Se requieren los símbolos de la empresa y deben estar separados por comas"
+        },
+        "family-members": {
+          "label": "Nombres de los familiares inmediatos",
+          "placeholder": "Josh Smith, Brooke Newman",
+          "hint": "Esto incluye ex cónyuges. Usa comas para separar los nombres",
+          "error": "Se requieren los nombres de los familiares y deben estar separados por comas"
+        },
+        "political-organization": {
+          "label": "Organización política",
+          "placeholder": "Organización política",
+          "error": "Se requiere organización política"
+        },
+        "doc-upload": {
+          "label": "Subir una carta de cumplimiento (PDF)",
+          "cta": "Elegir archivo para subir",
+          "cta-multiple": "Subir otro archivo",
+          "disclaimer": "De acuerdo con las reglas aplicables de FINRA, necesitarás obtener una carta escrita y firmada por un oficial de cumplimiento en papel membretado que otorgue explícitamente permiso para llevar la cuenta y que indique explícitamente si la empresa requiere acceso a estados de cuenta duplicados y/o confirmaciones de operaciones. Si la empresa desea acceder a tus estados de cuenta duplicados y/o confirmaciones de operaciones, la carta debe incluir el nombre completo del titular de la cuenta y una declaración de que el titular de la cuenta es responsable de compartir los estados de cuenta con la empresa.",
+          "required": "Se requiere una carta de cumplimiento"
+        }
+      }
+    }
+  },
+  "transfer": {
+    "components": {
+      "sms-button-with-countdown": {
+        "cta": "Reenviar enlace",
+        "subtitleWithCount_one": "Por favor, espera {{count}} segundo...",
+        "subtitleWithCount_other": "Por favor, espera {{count}} segundos...",
+        "error": {
+          "title": "Lo siento, algo salió mal.",
+          "description": "Por favor, intenta reenviar el enlace a tu número de teléfono."
+        },
+        "resend-success": {
+          "title": "Éxito",
+          "description": "Te hemos enviado un nuevo código."
+        }
+      },
+      "requirements-title": {
+        "liveness": "Verificación de autenticidad",
+        "id-doc": "Escanear o subir tu identificación",
+        "liveness-with-id-doc": "Verificación de autenticidad y documento de identificación"
+      }
+    },
+    "pages": {
+      "mobile": {
+        "sms": {
+          "title": "Revisa tus mensajes",
+          "subtitle": "Te hemos enviado un enlace a tu número de teléfono. Por favor, ábrelo y sigue las instrucciones."
+        },
+        "sms-processing": {
+          "subtitle": "Enlace enviado al teléfono. Por favor, continúa desde allí.",
+          "cancel": "Cancelar"
+        },
+        "new-tab-requested": {
+          "title": "Nueva ventana del navegador",
+          "subtitle": "Para continuar, necesitamos abrir una nueva ventana del navegador. Por favor, pulsa el botón de abajo.",
+          "cta": "Abrir nueva pestaña del navegador"
+        },
+        "new-tab-processing": {
+          "subtitle": "Hemos abierto una nueva pestaña en este dispositivo. Por favor, completa tu verificación de autenticidad allí.",
+          "cancel": "Cancelar"
+        }
+      },
+      "desktop": {
+        "qr-register": {
+          "subtitle": "Te hemos enviado un enlace a tu número de teléfono. Por favor, ábrelo y sigue las instrucciones.",
+          "qr-code": {
+            "instructions": "Alternativamente, también puedes escanear este código QR con tu teléfono para continuar."
+          },
+          "continue-on-desktop": {
+            "title": "¿No tienes un smartphone?",
+            "cta": "Continuar en el escritorio"
+          }
+        },
+        "processing": {
+          "subtitle": "Sesión móvil iniciada. Por favor, continúa allí.",
+          "cancel": "Cancelar"
+        },
+        "confirm-continue-on-desktop": {
+          "title": "¿Estás seguro de que quieres continuar en el escritorio?",
+          "subtitle": "En caso de que no tengas un smartphone, puedes subir manualmente los documentos que necesitamos desde tu computadora por ahora y completar el resto de las validaciones más tarde.",
+          "warning": "Te recomendamos encarecidamente que continúes desde tu teléfono, si es posible, ya que acelerará significativamente el proceso de verificación de identidad.",
+          "cta": {
+            "mobile": "No, continuar en mi smartphone",
+            "desktop": "Sí, continuar en el escritorio"
+          }
+        }
+      }
+    }
+  },
+  "liveness": {
+    "components": {
+      "liveness-success": {
+        "label": "¡Verificado!"
+      }
+    },
+    "pages": {
+      "register": {
+        "title": "Verificación de autenticidad",
+        "subtitle": "Necesitamos verificar que eres una persona real.",
+        "cta": "Iniciar verificación"
+      },
+      "retry": {
+        "title": "Biometría no reconocida",
+        "subtitle": "Puedes intentar la biometría de nuevo o hacerlo la próxima vez que uses Footprint.",
+        "cta": "Intentar biometría de nuevo",
+        "skip": "Hacerlo más tarde"
+      },
+      "unavailable": {
+        "title": "Autenticación biométrica no disponible",
+        "subtitle": "Lamentablemente tu dispositivo no admite autenticación biométrica."
+      },
+      "success": {
+        "title": "¡Autenticación biométrica exitosa!",
+        "subtitle": "Hemos podido verificar tu autenticidad."
+      }
+    }
+  },
+  "id-doc": {
+    "components": {
+      "media-errors": {
+        "not-found": "No pudimos encontrar una cámara en tu dispositivo. Por favor, usa otro dispositivo.",
+        "already-in-use": "Otra aplicación está usando tu cámara, cierra la otra aplicación e inténtalo de nuevo.",
+        "constraint": "No pudimos encontrar una cámara que se pudiera usar para tomar fotos. Por favor, usa otro dispositivo.",
+        "undefined-navigator": "Parece que tu navegador no puede abrir la cámara. Por favor, intenta usar un navegador o dispositivo diferente.",
+        "other-error": "Hubo un error al acceder a tu cámara. Por favor, inténtalo de nuevo."
+      },
+      "retry-limit-exceeded": {
+        "title": "Demasiados intentos",
+        "description": "Lo sentimos, no podemos continuar con la incorporación ya que has intentado enviar tus imágenes de documento demasiadas veces. Nos pondremos en contacto si necesitamos más información."
+      },
+      "missing-permissions": {
+        "title": "Permite el acceso a tu cámara",
+        "subtitle": "Necesitaremos que tomes fotos de tu documento para verificar tu identidad correctamente.",
+        "cta": "Abrir ajustes para dar permisos a la cámara"
+      },
+      "id-doc-photo-prompt": {
+        "title": "Escanear o subir {{side}} de tu {{type}} ({{country}})",
+        "camera-permission-name": "cámara",
+        "photo-lib-permission-name": "biblioteca de fotos",
+        "guidelines": {
+          "device-steady": {
+            "title": "Mantén tu dispositivo estable"
+          },
+          "position-document": {
+            "title": "Alinea tu {{document}} con el contorno del marco",
+            "description": "Asegúrate de que es el {{side}}."
+          },
+          "background": {
+            "title": "Encuentra un fondo con buen contraste",
+            "description": "Lo más diferente posible al color de la tarjeta de identificación."
+          },
+          "autocapture": {
+            "title": "La imagen se capturará automáticamente"
+          }
+        },
+        "consent-mobile": {
+          "consent-bottomsheet": {
+            "submit-button": {
+              "disabled-title": "Desplázate para aceptar",
+              "enabled-title": "Aceptar y continuar"
+            }
+          }
+        },
+        "continue": "Continuar"
+      },
+      "desktop-header": {
+        "title": {
+          "id-doc": "{{type, capitalize}} · {{side, capitalize}}",
+          "selfie": "Selfie"
+        },
+        "subtitle": "Emitido en {{country}}"
+      },
+      "desktop-photo-prompt": {
+        "upload-link-button": {
+          "title": "Elegir archivo para subir"
+        },
+        "drag-drop-text": {
+          "line-1": "o arrastra y suelta",
+          "line-2": "Solo se permiten imágenes (JPG, PNG, etc)"
+        },
+        "continue": "Continuar",
+        "choose-different-file": "Elegir un archivo diferente"
+      },
+      "image-consent": {
+        "title": "Consentimiento para usar tus imágenes",
+        "subtitle": "Consentimiento y liberación escrita para la recopilación, uso, divulgación y almacenamiento de datos personales (incluida la información y los identificadores biométricos)",
+        "description": "Al hacer clic en Aceptar y continuar y proporcionar a One Footprint, Inc. (en adelante, \"la Empresa\") tus datos personales, incluida tu información biométrica e información de identificación gubernamental, das tu consentimiento para que la Empresa y Incode Technologies, Inc. (en adelante, \"Incode\") recolecten, almacenen, retengan, usen y divulguen dicha información para proporcionar los servicios de verificación de identidad, de acuerdo con el <privacy>Aviso de privacidad</privacy> y los <toc>Términos de uso</toc> de la Empresa. Aunque des tu consentimiento, puedes retirarlo en cualquier momento.<br/><br/>Para verificar que eres la persona representada en tu identificación emitida por el gobierno (\"Servicios\"), la Empresa utiliza tecnología de terceros de Incode para recopilar datos personales de ti o sobre ti, incluida la información biométrica y los identificadores biométricos, como tu huella facial (\"Información Biométrica\"), una selfie y la identificación emitida por el gobierno, incluida la información obtenida, por ejemplo y cuando sea aplicable, al escanear el código de barras (colectivamente con la Información Biométrica, \"Datos Personales\"). Específicamente, se te pedirá que tomes una selfie a través de la plataforma de Incode. Incode luego escaneará y mapeará tus rasgos faciales en comparación con la imagen en tu identificación emitida por el gobierno para permitirte crear y/o acceder a tu cuenta con la Empresa. Ten en cuenta que el procesamiento de tus Datos Personales, a saber, de tu Información Biométrica por Incode, incluirá una comparación de la imagen en tu documento de identificación con tu selfie (1:1) que luego se comparará con la base de datos de la Empresa para prevenir el fraude (1:N). Para los Servicios, Incode también recopilará otra información que está en el anverso y reverso de tu documentación de identificación, incluida donde exista y esté permitido por la ley, escaneando el código de barras y recopilando información derivada de él (por ejemplo, nombre, fecha de nacimiento, altura). Incode usa esta información para verificar tu identidad y prevenir el fraude. Incode también puede, con tu consentimiento, usar esta información para mejorar sus productos y servicios. La Empresa o Incode en nombre de la Empresa, también pueden compartir tus Datos Personales con proveedores de servicios de terceros o entidades gubernamentales que nos permitan proporcionar nuestros Servicios (por ejemplo, proveedores de alojamiento en la nube, base de datos de defraudadores o el Departamento de Vehículos Motorizados si proporcionas una tarjeta de identificación de EE. UU.) y otros terceros cuando lo requiera la ley. Uso de tus Datos Personales: Tus Datos Personales, incluida la Información Biométrica, pueden usarse para los siguientes propósitos (según corresponda según tu consentimiento), en cada caso como se describe más detalladamente en la <privacy>Política de privacidad</privacy> de la Empresa y/o la <incode_privacy>Política de privacidad de Incode</incode_privacy>:<br/> • Para proporcionar los servicios para los que se solicitó los Datos Personales;<br/> • Para mejorar o modificar los productos y servicios de Incode; y<br/> • Para cumplir con las obligaciones de la Empresa o de Incode bajo la ley aplicable.<br/>Puedes solicitar la eliminación de tus Datos Personales y ejercer cualquier otro derecho bajo las leyes de protección de datos aplicables en cualquier momento enviando un correo electrónico a la Empresa a support@onefootprint.com o a Incode a dataprotection@incode.com. Si solicitas la eliminación de tus Datos Personales, no podremos recuperarlos en un momento posterior. La Empresa o Incode, según corresponda, eliminarán permanentemente la Información Biométrica procesada (si la hay) para sus propios fines antes de: (i) el momento en que se haya cumplido el propósito para el cual se recopiló; o (ii) tres años desde el momento en que das tu consentimiento. Incode hará lo mismo con la Información Biométrica que procesa en nombre de, y según las instrucciones de, la Empresa.",
+        "cta": "Aceptar",
+        "continue": "Continuar",
+        "third-party-consent": "Opcional: Al marcar esta casilla y proporcionar a Incode tus Datos Personales, incluida tu Información Biométrica e información de identificación gubernamental, das tu consentimiento y proporcionas una liberación escrita a Incode para la recopilación, almacenamiento, retención, uso y divulgación de dicha información para mejorar, modificar o actualizar los productos o servicios de Incode (incluido su algoritmo), de acuerdo con su Aviso de privacidad. Puedes ejercer tus derechos bajo las leyes de privacidad aplicables, incluida la retirada del consentimiento, contactando a dataprotection@incode.com. IMPORTANTE: Tu consentimiento es voluntario, incluso si no das tu consentimiento, aún podrás acceder a los servicios de la Empresa."
+      },
+      "loading": {
+        "title": {
+          "process-front": "Procesando imagen...",
+          "process-back": "Procesando imagen...",
+          "process-selfie": "Procesando selfie...",
+          "upload-front": "Subiendo imagen...",
+          "upload-back": "Subiendo imagen...",
+          "upload-selfie": "Subiendo selfie...",
+          "analyze-front": "Analizando imagen...",
+          "analyze-back": "Analizando imagen...",
+          "analyze-selfie": "Analizando selfie..."
+        },
+        "subtitle": "¡Un momento! Pronto estará listo.",
+        "slow-connection": "Tu conexión a Internet parece inestable. Esto podría tardar más de lo habitual."
+      },
+      "error": {
+        "title-front": "No pudimos procesar tu imagen",
+        "title-back": "No pudimos procesar tu imagen",
+        "title-selfie": "No pudimos procesar tu selfie",
+        "description": {
+          "doc_type_mismatch": "El tipo de documento no coincide. Por favor, sube tu {{documentType}} de {{countryName}}.",
+          "unknown_document_type": "No pudimos clasificar este documento. Por favor, sube tu {{documentType}} de {{countryName}}.",
+          "unsupported_document_type": "Lamentablemente, el tipo de documento subido no es compatible. Por favor, sube tu {{documentType}} de {{countryName}}.",
+          "wrong_document_side": "Parece que subiste el lado incorrecto de tu documento. Por favor, voltea tu identificación y sube el {{side}} de tu {{documentType}} de {{countryName}}.",
+          "wrong_one_sided_document": "Se detectó un tipo de documento incorrecto. Por favor, sube tu {{documentType}} de {{countryName}}.",
+          "document_not_readable": "No se pudo leer tu documento. Por favor, inténtalo de nuevo.",
+          "document_glare": "La foto de tu documento tenía demasiado brillo. Por favor, ajusta la iluminación e inténtalo de nuevo.",
+          "document_sharpness": "La imagen del documento estaba borrosa. Por favor, sube o captura una imagen más nítida.",
+          "id_type_not_acceptable": "Se detectó un tipo de documento inválido. Por favor, sube tu {{documentType}} de {{countryName}}.",
+          "unable_to_align_document": "Una o más esquinas del documento no están dentro de los bordes de la imagen. Por favor, centra el documento en el marco e inténtalo de nuevo.",
+          "unknown_country_code": "No pudimos detectar el país emisor de tu documento. Por favor, sube tu {{documentType}} de {{countryName}}.",
+          "country_code_mismatch": "El país emisor del {{documentType}} no coincide. Por favor, sube tu {{documentType}} de {{countryName}}.",
+          "selfie_face_not_found": "No pudimos detectar un rostro en la selfie. Por favor, inténtalo de nuevo y asegúrate de que tu rostro esté en el marco.",
+          "selfie_low_confidence": "No pudimos verificar tu selfie. Por favor, inténtalo de nuevo.",
+          "selfie_too_dark": "Tu imagen estaba demasiado oscura. Por favor, ajusta la iluminación e inténtalo de nuevo.",
+          "selfie_glare": "Tu selfie tenía demasiado brillo. Por favor, ajusta la iluminación e inténtalo de nuevo.",
+          "selfie_has_lenses": "Detectamos gafas en tu selfie. Por favor, quítate las gafas e inténtalo de nuevo.",
+          "selfie_has_face_mask": "Detectamos una mascarilla en tu selfie. Por favor, quítate cualquier cobertura facial e inténtalo de nuevo.",
+          "unknown_upload_error": "La subida del archivo falló. Por favor, inténtalo de nuevo.",
+          "multiple_files_error": "Detectamos más de un archivo. Por favor, sube solo un archivo de imagen.",
+          "file_type_not_allowed": "El tipo de archivo subido no es compatible. Por favor, sube solo archivos de imagen.",
+          "selfie_blurry": "Tu selfie estaba demasiado borrosa. Por favor, inténtalo de nuevo.",
+          "selfie_image_size_unsupported": "La imagen de tu selfie era demasiado pequeña. Por favor, inténtalo de nuevo con una imagen de mayor resolución.",
+          "selfie_image_orientation_incorrect": "La orientación de tu imagen de selfie es incorrecta. Por favor, asegúrate de que la imagen presentada esté en formato vertical e inténtalo de nuevo.",
+          "selfie_bad_image_compression": "La compresión de tu imagen de selfie es incorrecta. Por favor, inténtalo de nuevo.",
+          "drivers_license_permit_not_allowed": "No se permiten permisos de licencia de conducir, por favor reintenta con una licencia de conducir completa o contacta a la empresa para obtener apoyo.",
+          "unknown_error": "Ocurrió un error. Por favor, inténtalo de nuevo.",
+          "network_error": "{{errorInfo}}. Por favor, inténtalo de nuevo.",
+          "face_not_found": "No pudimos detectar un rostro en el documento proporcionado. Por favor, inténtalo de nuevo y asegúrate de que estás capturando una imagen clara."
+        }
+      },
+      "success": {
+        "title": "¡Éxito!"
+      },
+      "id-doc-photo-upload-buttons": {
+        "take-photo": {
+          "title": "Tomar foto",
+          "take": "Tomar foto"
+        },
+        "upload-photo": {
+          "title": "Subir foto"
+        }
+      },
+      "next-side": {
+        "front": "Ahora el lado frontal",
+        "back": "Ahora el lado posterior",
+        "selfie": "Ahora necesitamos una selfie"
+      },
+      "photo-capture": {
+        "instructions": {
+          "title": "Instrucciones",
+          "background": {
+            "title": "Busca un fondo con buen contraste",
+            "description": "Un alto contraste ayuda con la detección del documento, evitando errores."
+          },
+          "position-document": {
+            "title": "Posiciona el documento en el marco",
+            "description": "Asegúrate de que todo el documento esté posicionado, como se indica, en el marco."
+          },
+          "position-face": {
+            "title": "Posiciona tu rostro en el marco",
+            "description": "Asegúrate de que todo tu rostro esté posicionado, como se indica, en el marco."
+          },
+          "steady": {
+            "title": "Mantén firme",
+            "description": "Mantén tu cámara firme para evitar cualquier desenfoque o brillo."
+          },
+          "autocapture-document": {
+            "title": "La imagen se capturará automáticamente",
+            "description": "Mostraremos una cuenta regresiva de 3 segundos antes de capturarla."
+          },
+          "autocapture-face": {
+            "title": "La selfie se capturará automáticamente",
+            "description": "Mostraremos una cuenta regresiva de 3 segundos antes de capturarla."
+          }
+        }
+      },
+      "camera": {
+        "take": "Tomar foto",
+        "autocapture": {
+          "feedback": {
+            "face": {
+              "ok": "Mantén firme...",
+              "detecting": "Posiciona tu rostro en el marco",
+              "face-too-far": "El rostro está demasiado lejos de la cámara",
+              "face-outside-the-frame": "El rostro está fuera del contorno del marco",
+              "head-not-straight": "El rostro está inclinado o mirando hacia otro lado",
+              "blurry": "La imagen está borrosa, busca mejor iluminación o mueve tu cámara"
+            },
+            "document": {
+              "ok": "Mantén firme...",
+              "detecting": " Escanea el {{side, allCaps}} de tu {{documentType}}",
+              "blurry": "La imagen está borrosa, busca mejor iluminación o mueve tu cámara"
+            }
+          }
+        },
+        "guidelines": {
+          "position-document": {
+            "title": "Alinea tu identificación con el contorno del marco"
+          },
+          "background": {
+            "title": "Busca un fondo con buen contraste"
+          },
+          "whole-face": {
+            "title": "Posiciona tu rostro dentro del marco"
+          },
+          "check-lighting": {
+            "title": "Revisa tu iluminación"
+          },
+          "device-steady": {
+            "title": "Mantén tu dispositivo firme"
+          },
+          "autocapture": {
+            "title": "La imagen se capturará automáticamente"
+          }
+        },
+        "manual-enabled-toast": {
+          "title": "Captura manual habilitada",
+          "description": "Notamos que te está tomando tiempo activar la captura automática, así que ahora puedes tomar la foto manualmente."
+        }
+      },
+      "preview": {
+        "retake": "Reintentar",
+        "confirm": "Confirmar"
+      }
+    },
+    "pages": {
+      "desktop-consent": {
+        "submit-button": {
+          "disabled-title": "Desplázate para aceptar",
+          "enabled-title": "Aceptar y continuar"
+        }
+      },
+      "country-and-type-selection": {
+        "title": "Escanear o subir tu identificación",
+        "subtitle": "Necesitamos más información sobre tu identidad.",
+        "form": {
+          "country": "País",
+          "hint": {
+            "label": "Solo se aceptan documentos emitidos por {{country}}"
+          },
+          "type": {
+            "passport": {
+              "title": "Pasaporte"
+            },
+            "idCard": {
+              "title": "Tarjeta de identidad"
+            },
+            "driversLicense": {
+              "title": "Licencia de conducir"
+            },
+            "visa": {
+              "title": "Visa emitida por el gobierno"
+            },
+            "workPermit": {
+              "title": "Permiso de trabajo / Tarjeta EAD"
+            },
+            "residenceDocument": {
+              "title": "Tarjeta de residencia / Tarjeta verde"
+            },
+            "voterIdentification": {
+              "title": "Identificación de votante"
+            },
+            "ssnCard": {
+              "title": "Tarjeta de SSN"
+            }
+          },
+          "not-supported": "Lo sentimos, aún no admitimos identificaciones de tu país.",
+          "cta": "Continuar"
+        }
+      },
+      "front-photo-capture": {
+        "title": {
+          "camera": {
+            "driversLicense": "Licencia de conducir · FRENTE",
+            "idCard": "Tarjeta de identidad · FRENTE",
+            "passport": "Pasaporte · PÁGINA DE FOTO",
+            "visa": "Visa · PÁGINA DE FOTO",
+            "workPermit": "Tarjeta EAD · FRENTE",
+            "residenceDocument": "Tarjeta verde · FRENTE",
+            "voterIdentification": "Identificación de votante · FRENTE",
+            "ssnCard": "Tarjeta de SSN · FRENTE"
+          },
+          "preview": {
+            "driversLicense": "Licencia de conducir",
+            "idCard": "Tarjeta de identidad",
+            "passport": "Pasaporte",
+            "visa": "Visa",
+            "workPermit": "Tarjeta EAD",
+            "residenceDocument": "Tarjeta verde",
+            "voterIdentification": "Identificación de votante",
+            "ssnCard": "Tarjeta de SSN"
+          }
+        },
+        "subtitle": {
+          "preview": "Lado frontal"
+        }
+      },
+      "back-photo-capture": {
+        "title": {
+          "camera": {
+            "driversLicense": "Licencia de conducir · ATRÁS",
+            "idCard": "Tarjeta de identidad · ATRÁS",
+            "passport": "Pasaporte · PÁGINA DE FOTO",
+            "visa": "Visa · PÁGINA DE FOTO",
+            "workPermit": "Tarjeta EAD · ATRÁS",
+            "residenceDocument": "Tarjeta verde · ATRÁS",
+            "voterIdentification": "Identificación de votante · ATRÁS"
+          },
+          "preview": {
+            "driversLicense": "Licencia de conducir",
+            "idCard": "Tarjeta de identidad",
+            "passport": "Pasaporte",
+            "visa": "Visa",
+            "workPermit": "Tarjeta EAD",
+            "residenceDocument": "Tarjeta verde",
+            "voterIdentification": "Identificación de votante"
+          }
+        },
+        "subtitle": {
+          "preview": "Lado posterior"
+        }
+      },
+      "selfie-photo-prompt": {
+        "title": "Toma una selfie",
+        "subtitle": "Esto nos permitirá validar el documento de identificación que subiste en el paso anterior.",
+        "camera-permission-name": "cámara",
+        "photo-lib-permission-name": "biblioteca de fotos",
+        "cta": "Tomar foto",
+        "animation-selfie": {
+          "first-text": "Imagen posterior capturada",
+          "second-text": "Ahora necesitamos una selfie"
+        },
+        "animation-selfie-from-passport": {
+          "first-text": "Imagen del documento capturada",
+          "second-text": "Ahora necesitamos una selfie"
+        },
+        "guidelines": {
+          "whole-face": {
+            "title": "Posiciona tu rostro dentro del marco",
+            "description": "Mantén tu cabeza recta apuntando a la cámara"
+          },
+          "check-lighting": {
+            "title": "Revisa tu iluminación",
+            "description": "No puede ser demasiado brillante ni demasiado oscuro."
+          },
+          "device-steady": {
+            "title": "Mantén tu dispositivo estable"
+          },
+          "autocapture": {
+            "title": "La imagen se capturará automáticamente"
+          }
+        }
+      },
+      "selfie-retry-prompt": {
+        "cta": "Tomar foto"
+      },
+      "selfie-photo": {
+        "title": "Foto de selfie"
+      },
+      "desktop-selfie": {
+        "desktop-camera-permission": {
+          "title": {
+            "not-allowed": "Permitir acceso a tu cámara",
+            "undefined-navigator": "No se puede abrir la cámara",
+            "device-not-found": "Cámara no encontrada",
+            "device-busy": "Cámara ocupada",
+            "no-video-option": "La cámara no puede tomar fotos",
+            "other-error": "Algo salió mal"
+          },
+          "subtitle": {
+            "not-allowed": "Por favor, da permiso a este sitio web para que podamos usar tu cámara para tomar tu selfie.",
+            "device-not-found": "No pudimos encontrar una cámara en tu dispositivo. Por favor, asegúrate de que la cámara esté funcionando correctamente y no esté siendo utilizada por otra aplicación.",
+            "device-busy": "Parece que la cámara está siendo utilizada por otra aplicación. Por favor, asegúrate de que la cámara no esté siendo utilizada por otra aplicación.",
+            "no-video-option": "No pudimos encontrar una cámara que pudiera ser utilizada para tomar fotos. Por favor, usa otro dispositivo.",
+            "undefined-navigator": "Parece que tu navegador no puede abrir la cámara. Por favor, intenta usar un navegador o dispositivo diferente.",
+            "other-error": "Hubo un error al acceder a tu cámara. Por favor, inténtalo de nuevo."
+          },
+          "take-selfie": "Tomar una selfie"
+        },
+        "header": {
+          "title": {
+            "camera": "Tomar una selfie",
+            "preview": "Confirmar selfie"
+          },
+          "subtitle": {
+            "camera": "Coloca tu rostro dentro del marco"
+          }
+        }
+      },
+      "desktop-selfie-retry": {
+        "take-selfie-again": "Tomar selfie de nuevo"
+      },
+      "processing": {
+        "missing-requirement-error": "Lo sentimos, algo salió mal. Por favor, reinicia el proceso de incorporación."
+      },
+      "desktop-processing": {
+        "continue": "Continuar",
+        "missing-requirement-error": "Lo sentimos, algo salió mal. Por favor, reinicia el proceso de incorporación."
+      },
+      "device-warning": {
+        "warning": "Esta acción solo se puede realizar en un teléfono móvil. Por favor, regresa a la pantalla/pestaña anterior y haz clic en el botón \"Cancelar\" para generar un nuevo código QR con un nuevo enlace URL. Abre el nuevo enlace en tu teléfono."
+      }
+    }
+  }
+}
