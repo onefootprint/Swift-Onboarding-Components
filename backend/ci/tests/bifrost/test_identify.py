@@ -1,7 +1,7 @@
 import pytest
 from tests.bifrost_client import BifrostClient
 from tests.constants import FIXTURE_PHONE_NUMBER, FIXTURE_EMAIL
-from tests.utils import _gen_random_sandbox_id, create_ob_config, post, identify_verify
+from tests.utils import _gen_random_sandbox_id, create_ob_config, post
 from tests.identify_client import IdentifyClient
 from tests.headers import SandboxId, FpAuth, IsLive
 
@@ -44,10 +44,19 @@ def test_concurrent_signup_same_phone_number(sandbox_tenant):
     body = post("hosted/identify/signup_challenge", data, obc.key, sandbox_id_h)
     challenge_token2 = body["challenge_data"]["challenge_token"]
 
+    def verify(challenge_token):
+        data = {
+            "challenge_response": "000000",
+            "challenge_kind": "sms",
+            "challenge_token": challenge_token,
+            "scope": "onboarding",
+        }
+        post("hosted/identify/verify", data, obc.key)
+
     # Should be able to complete both challenges without conflict, effectively making two vaults
     # with the same phone fingerprint and same sandbox ID.
-    identify_verify(challenge_token2, "onboarding", obc.key)
-    identify_verify(challenge_token1, "onboarding", obc.key)
+    verify(challenge_token2)
+    verify(challenge_token1)
 
 
 @pytest.fixture(scope="function")

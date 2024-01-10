@@ -55,33 +55,31 @@ class IdentifyClient:
         if auth_token:
             self.headers.append(auth_token)
 
-    def identify(self, identifier):
-        # TODO when do we use this? maybe in login challenge and signup challenge respectively
-        data = dict(identifier=identifier)
-        body = post("hosted/identify", data, *self.headers)
-        assert body["user_found"]
-        assert body["available_challenge_kinds"]
-        return body
-
-    def signup_challenge(self, kind="sms"):
+    def _signup_challenge(self, kind="sms"):
         if kind == "sms":
             data = dict(phone_number=self.phone_number, email=self.email)
         elif kind == "email":
             data = dict(email=self.email)
+
         body = post("hosted/identify/signup_challenge", data, *self.headers)
         self.challenge_kind = kind
         self.challenge_data = body["challenge_data"]
 
-    def login_challenge(self, kind="sms"):
+    def _login_challenge(self, kind="sms"):
         identifier = None
         if not self.auth_token:
             if kind == "email":
                 identifier = dict(email=self.email)
             else:
                 identifier = dict(phone_number=self.phone_number)
-        body = self.identify(identifier)
+
+        # Check that the user is found in identify
+        data = dict(identifier=identifier)
+        body = post("hosted/identify", data, *self.headers)
+        assert body["user_found"]
         assert kind in body["available_challenge_kinds"]
 
+        # Issue the login challenge
         data = dict(
             identifier=identifier,
             preferred_challenge_kind=kind,
@@ -97,7 +95,7 @@ class IdentifyClient:
         self.challenge_kind = kind
         self.challenge_data = body["challenge_data"]
 
-    def verify(self, scope):
+    def _verify(self, scope):
         assert self.challenge_data, "Must initiate a signup or login challenge first"
 
         if self.challenge_kind == "sms":
@@ -124,12 +122,12 @@ class IdentifyClient:
         return auth_token
 
     def create_user(self, scope="onboarding"):
-        self.signup_challenge()
-        return self.verify(scope)
+        self._signup_challenge()
+        return self._verify(scope)
 
     def inherit(self, kind="sms", scope="onboarding"):
-        self.login_challenge(kind)
-        return self.verify(scope)
+        self._login_challenge(kind)
+        return self._verify(scope)
 
     def step_up(self, kind="sms", scope="onboarding", assert_had_no_scopes=False):
         """
@@ -146,9 +144,10 @@ class IdentifyClient:
                 "scopes"
             ], "Token expected to be only identified and have no scopes"
 
+        # Perform the step up
         new_token = self.inherit(kind=kind, scope=scope)
 
-        # Now, token should have scopes
+        # Now, new token should have scopes
         if scope == "onboarding":
             expected_scope = "sign_up"
         elif scope == "auth":
@@ -161,15 +160,15 @@ class IdentifyClient:
         assert (
             new_token.value != self.auth_token.value
         ), "Verify should give us a new token with permissions"
+        assert set(new_scopes) > set(
+            original_scopes
+        ), "Stepped up token should have additional scopes"
 
         # And scopes of old token shouldn't have changed
         body = get("hosted/user/token", None, self.auth_token)
         assert set(body["scopes"]) == set(
             original_scopes
         ), "Original token scopes shouldn't have changed"
-        assert set(new_scopes) > set(
-            body["scopes"]
-        ), "Stepped up token should have additional scopes"
 
         return new_token
 

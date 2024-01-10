@@ -7,7 +7,6 @@ from tests.utils import post, patch
 from tests.utils import get_requirement_from_requirements
 from tests.bifrost_client import BifrostClient
 from tests.identify_client import IdentifyClient
-from tests.utils import challenge_user
 
 
 @pytest.fixture(scope="session")
@@ -146,14 +145,7 @@ def test_step_up(no_phone_user, sandbox_tenant):
     auth_token = FpAuth(body["token"])
 
     # Step up the auth token using an email challenge
-    challenge_data = challenge_user("email", auth_token)
-    data = dict(
-        challenge_response=FIXTURE_EMAIL_OTP_PIN,
-        challenge_token=challenge_data["challenge_token"],
-        scope="onboarding",
-    )
-    body = post("hosted/identify/verify", data, auth_token)
-    auth_token = FpAuth(body["auth_token"])
+    auth_token = IdentifyClient.from_token(auth_token).step_up(kind="email")
 
     # And use the auth token to onboard
     bifrost2 = BifrostClient.raw_auth(

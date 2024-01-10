@@ -6,8 +6,6 @@ from tests.utils import (
     get,
     post,
     create_ob_config,
-    challenge_user,
-    identify_verify,
     try_until_success,
 )
 from tests.bifrost_client import BifrostClient

@@ -212,65 +212,6 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
         raise last_exception
 
 
-def challenge_user(challenge_kind, *headers):
-    # Some challenges may be invoked via token instead of phone_number
-    identifier = dict(phone_number=FIXTURE_PHONE_NUMBER)
-
-    def challenge():
-        data = dict(
-            identifier=identifier,
-            preferred_challenge_kind=challenge_kind,
-        )
-
-        if any(isinstance(h, FpAuth) for h in headers):
-            # Hacky - if we are challenging for step up, don't provide an identifier
-            data.pop("identifier")
-
-        body = post("hosted/identify/login_challenge", data, *headers)
-        if challenge_kind == "sms":
-            last_two = FIXTURE_PHONE_NUMBER[-2:]
-            assert (
-                body["challenge_data"]["scrubbed_phone_number"]
-                == f"+1 (***) ***-**{last_two}"
-            )
-        assert body["challenge_data"]["challenge_kind"] == challenge_kind
-        return body["challenge_data"]
-
-    return try_until_success(challenge, 20)
-
-
-def identify_verify(
-    challenge_token,
-    scope,
-    *headers,
-    expected_error=None,
-):
-    def verify(code):
-        data = {
-            "challenge_response": code,
-            "challenge_kind": "sms",
-            "challenge_token": challenge_token,
-            "scope": scope,
-        }
-        body = post("hosted/identify/verify", data, *headers)
-        return FpAuth(body["auth_token"])
-
-    result = None
-    # The code for the fixture number in sandbox is fixed
-    try:
-        result = verify("000000")
-    except HttpError as e:
-        if expected_error and expected_error in str(e):
-            # The specific error we expected to see was returned from verify - we can exit
-            return
-        raise e
-    if result and expected_error:
-        raise NotRetryableException(
-            "Expected error in identify verify but got result:", result
-        )
-    return result
-
-
 def create_tenant(org_data, ob_conf_data):
     is_live = org_data.pop("is_live", False)
     h_is_live = IsLive("true" if is_live else "false")
