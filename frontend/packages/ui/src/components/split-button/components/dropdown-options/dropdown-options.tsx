@@ -55,7 +55,7 @@ const DropdownContainer = styled(DropdownPrimitive.Content)`
     return css`
       background-color: ${dropdown.bg};
       box-shadow: ${dropdown.elevation};
-      padding: ${theme.spacing[3]} 0;
+      padding: ${theme.spacing[2]} ${theme.spacing[2]};
       border-radius: ${dropdown.borderRadius};
       border-color: ${dropdown.borderColor};
       border-style: solid;
@@ -86,7 +86,17 @@ const Item = styled(DropdownPrimitive.Item)`
       ${createFontStyles('body-3')}
       background-color: ${dropdown.bg};
       cursor: pointer;
-      padding: ${theme.spacing[1]} ${theme.spacing[5]};
+      padding: ${theme.spacing[2]} ${theme.spacing[5]};
+      border-radius: ${theme.borderRadius.compact};
+
+      &:hover {
+        border: none;
+        background-color: ${dropdown.hover.bg};
+      }
+
+      &:focus {
+        border: none;
+      }
     `;
   }}
 `;
