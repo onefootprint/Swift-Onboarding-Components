@@ -61,6 +61,10 @@ export type {
   GetEntityRiskSignalsRequest,
   GetEntityRiskSignalsResponse,
 } from './get-entity-risk-signals';
+export type {
+  GetEntityRuleSetResultRequest,
+  GetEntityRuleSetResultResponse,
+} from './get-entity-rule-set-result';
 export type { GetLivenessRequest, GetLivenessResponse } from './get-liveness';
 export type { GetMembersRequest, GetMembersResponse } from './get-members';
 export type {

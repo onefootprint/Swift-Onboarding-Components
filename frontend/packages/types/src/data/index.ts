@@ -165,7 +165,7 @@ export type {
 } from './role';
 export { RoleKind, RoleScopeKind, supportedRoleKinds } from './role';
 export type { Rolebinding } from './rolebinding';
-export type { Rule, RuleField } from './rule';
+export type { Rule, RuleField, RuleResult } from './rule';
 export { RuleAction, RuleOp } from './rule';
 export { IdDocOutcome, OverallOutcome } from './sandbox-outcomes-type';
 export { default as SessionStatus } from './session-status';

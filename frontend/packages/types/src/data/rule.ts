@@ -24,3 +24,8 @@ export type Rule = {
   ruleExpression: RuleField[];
   ruleId: string;
 };
+
+export type RuleResult = {
+  result: boolean;
+  rule: Rule;
+};
