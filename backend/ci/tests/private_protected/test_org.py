@@ -1,4 +1,3 @@
-from tests.constants import PROTECTED_CUSTODIAN_AUTH
 from tests.utils import _gen_random_n_digit_number, _gen_random_str, patch, get
 
 
