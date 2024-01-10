@@ -1,6 +1,6 @@
 import json
 import os
-from .headers import CustodianAuth, ProtectedCustodianAuth
+from .headers import CustodianAuth
 from dotenv import load_dotenv
 import random
 
