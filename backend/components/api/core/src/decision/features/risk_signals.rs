@@ -144,12 +144,15 @@ fn parse_reason_codes(
     // Risk Signals that should be created for every *KYC* vendor, based purely on data in vault + obc
     let user_input_risk_signals = user_input_based_risk_signals(vw, obc);
 
+    let dob_submitted = vw.has_field(IdentityDataKind::Dob);
+    let ssn_submitted = vw.has_field(IdentityDataKind::Ssn4) || vw.has_field(IdentityDataKind::Ssn9);
     match vendor_result.response.response {
         ParsedResponse::IDologyExpectID(r) => {
             IDologyFeatures::from(
                 r,
                 vendor_result.verification_result_id, // TODO remove this param later
-                vw,
+                dob_submitted,
+                ssn_submitted,
             )
             .footprint_reason_codes()
             .into_iter()
@@ -163,7 +166,7 @@ fn parse_reason_codes(
                 .chain(user_input_risk_signals)
                 .collect()
         }
-        ParsedResponse::LexisFlexId(r) => lexis::footprint_reason_codes(r)
+        ParsedResponse::LexisFlexId(r) => lexis::footprint_reason_codes(r, ssn_submitted)
             .into_iter()
             .chain(user_input_risk_signals)
             .collect(),

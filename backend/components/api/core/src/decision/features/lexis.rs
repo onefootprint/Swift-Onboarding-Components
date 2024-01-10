@@ -1,6 +1,6 @@
 use idv::lexis::response::{FlexIdResponse, ValidElementSummary};
 use itertools::Itertools;
-use newtypes::FootprintReasonCode as FRC;
+use newtypes::{FootprintReasonCode as FRC, SignalScope};
 use std::convert::Into;
 
 // 0 Nothing verified
@@ -15,9 +15,9 @@ use std::convert::Into;
 // 50 Full name, address, phone, SSN verified
 const COMPREHENSIVE_VERIFICATION_INDEX_THRESHOLD: i32 = 30;
 
-pub fn footprint_reason_codes(res: FlexIdResponse) -> Vec<FRC> {
+pub fn footprint_reason_codes(res: FlexIdResponse, ssn_submitted: bool) -> Vec<FRC> {
     let phone_codes = Into::<Vec<FRC>>::into(&res.name_address_phone_summary());
-    let name_address_ssn_codes = Into::<Vec<FRC>>::into(&res.name_address_ssn_summary());
+    let name_address_ssn_codes = Into::<Vec<FRC>>::into(&res.name_address_ssn_summary()).into_iter().filter(|frc| ssn_submitted || !matches!(frc.scope(), Some(SignalScope::Ssn))); // could possibly just generally apply this logic for all vendors but need to be careful with what we have tagged as scope=ssn (for eg stuff like id_not_located/id_flagged shouldn't get filtered out if ssn not submitted)
     let dob_codes = Into::<Vec<FRC>>::into(&res.dob_match_level());
 
     let valid_element_summary_codes = if let Some(ves) = res.valid_element_summary() {
@@ -37,7 +37,7 @@ pub fn footprint_reason_codes(res: FlexIdResponse) -> Vec<FRC> {
             ssn_found_for_lex_id: _,
         } = ves;
 
-        if ssn_valid.map(|s| !s).unwrap_or(false) {
+        if ssn_submitted && ssn_valid.map(|s| !s).unwrap_or(false) {
             codes.push(FRC::SsnInputIsInvalid);
         }
         if ssn_deceased.unwrap_or(false) {
@@ -104,6 +104,7 @@ mod tests {
 
     #[test_case(
         idv::test_fixtures::passing_lexis_flex_id_response(),
+        true,
         vec![
             PhoneLocatedMatches,
             NameMatches,
@@ -116,6 +117,7 @@ mod tests {
     ]
     #[test_case(
         example1(),
+        true,
         vec![
             PhoneLocatedDoesNotMatch,
             NameFirstMatches,
@@ -131,7 +133,23 @@ mod tests {
         ])
     ]
     #[test_case(
+      example1(),
+      false,
+      vec![
+          PhoneLocatedDoesNotMatch,
+          NameFirstMatches,
+          NameLastMatches,
+          NameMatches,
+          AddressMatches,
+          DobPartialMatch,
+          DobYobDoesNotMatch,
+          IdFlagged,
+          PhoneNumberInputInvalid
+      ])
+  ]
+    #[test_case(
         example2(),
+        true,
         vec![
             PhoneLocatedDoesNotMatch,
             NameFirstDoesNotMatch,
@@ -147,6 +165,7 @@ mod tests {
     ]
     #[test_case(
         example3(),
+        true,
         vec![
             NameFirstMatches, 
             NameLastMatches, 
@@ -157,9 +176,9 @@ mod tests {
             PhoneLocatedMatches
         ])
     ]
-    fn test_reason_codes(json: serde_json::Value, expected_frc: Vec<FootprintReasonCode>) {
+    fn test_reason_codes(json: serde_json::Value, ssn_submitted: bool, expected_frc: Vec<FootprintReasonCode>) {
         let res = idv::lexis::parse_response(json).unwrap();
-        assert_have_same_elements(expected_frc, super::footprint_reason_codes(res));
+        assert_have_same_elements(expected_frc, super::footprint_reason_codes(res, ssn_submitted));
     }
 
     fn example1() -> serde_json::Value {

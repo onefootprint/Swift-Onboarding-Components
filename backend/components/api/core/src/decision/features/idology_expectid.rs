@@ -41,10 +41,9 @@ impl IDologyFeatures {
     pub fn from(
         resp: ExpectIDResponse,
         verification_result_id: VerificationResultId, // TODO: rm or just rm IDologyFeatures in general
-        vw: &VaultWrapper,
+        dob_submitted: bool,
+        ssn_submitted: bool,
     ) -> Self {
-        let dob_submitted = vw.has_field(IdentityDataKind::AddressLine1);
-        let ssn_submitted = vw.has_field(IdentityDataKind::Ssn4) || vw.has_field(IdentityDataKind::Ssn9);
         let footprint_reason_codes: Vec<FootprintReasonCode> =
             Self::footprint_reason_codes(resp, dob_submitted, ssn_submitted);
 
@@ -223,10 +222,14 @@ impl
                 VendorAPI::from(WrappedVendorAPI::from(v)),
             ))?;
 
+        let dob_submitted = vw.has_field(IdentityDataKind::Dob);
+        let ssn_submitted = vw.has_field(IdentityDataKind::Ssn4) || vw.has_field(IdentityDataKind::Ssn9);
+
         Ok(IDologyFeatures::from(
             f.clone(),
             ids.verification_result_id.clone(),
-            &vw,
+            dob_submitted,
+            ssn_submitted,
         ))
     }
 }
