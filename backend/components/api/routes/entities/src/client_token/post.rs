@@ -22,24 +22,17 @@ use api_wire_types::ModernClientTokenScopeKind;
 use chrono::Duration;
 use db::models::scoped_vault::ScopedVault;
 use itertools::Itertools;
-use macros::route_alias;
 use newtypes::AliasId;
 use newtypes::CardDataKind;
 use newtypes::CardInfo;
 use paperclip::actix::{api_v2_operation, post, web};
 use strum::IntoEnumIterator;
 
-#[route_alias(post(
-    "/users/{fp_id}/client_token",
-    tags(Users, Client, PublicApi),
-    description = "Create a short-lived token safe to pass to your client for operations to vault or decrypt data for this user.",
-))]
-// TODO remove entities path
 #[api_v2_operation(
     description = "Create a short-lived token safe to pass to your client for operations to vault or decrypt data for this user.",
-    tags(Entities, Client, Private)
+    tags(Users, Client, PublicApi)
 )]
-#[post("/entities/{fp_id}/client_token")]
+#[post("/users/{fp_id}/client_token")]
 pub async fn post(
     state: web::Data<State>,
     fp_id: FpIdPath,

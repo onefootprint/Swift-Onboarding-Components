@@ -6,19 +6,19 @@ from tests.headers import ClientTokenAuth
 
 
 def client_token_with_scope(user, **kwargs):
-    body = post(f"entities/{user.fp_id}/client_token", kwargs, user.tenant.sk.key)
+    body = post(f"users/{user.fp_id}/client_token", kwargs, user.tenant.sk.key)
     return ClientTokenAuth(body["token"]), body
 
 
 def test_generate(sandbox_user):
     data = dict(fields=["id.ssn9"], ttl=60 * 60, scope="decrypt")
     tenant = sandbox_user.tenant
-    body = post(f"entities/{sandbox_user.fp_id}/client_token", data, tenant.sk.key)
+    body = post(f"users/{sandbox_user.fp_id}/client_token", data, tenant.sk.key)
     assert body["expires_at"]
 
     # Can't generate with dashboard auth
     post(
-        f"entities/{sandbox_user.fp_id}/client_token",
+        f"users/{sandbox_user.fp_id}/client_token",
         data,
         *tenant.db_auths,
         status_code=401,
