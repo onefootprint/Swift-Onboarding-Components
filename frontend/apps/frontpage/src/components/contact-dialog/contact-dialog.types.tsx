@@ -3,6 +3,7 @@ export type ContactDialogData = {
   [FormField.email]: string;
   [FormField.message]: string;
   [FormField.company]: string;
+  meta?: string;
 };
 
 export enum FormField {

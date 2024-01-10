@@ -648,95 +648,69 @@
     "pricing": {
       "html-title": "Footprint - Pricing",
       "cta": "Get started",
+      "contact-us": "Contact us for pricing",
+      "soon": "Soon",
+      "units": {
+        "per-month": "per month",
+        "per-year": "per year",
+        "monthly": "monthly",
+        "yearly": "annually"
+      },
       "hero": {
         "title": "Secure onboarding at lightning speed and minimum cost",
         "subtitle": "Next-gen encryption infrastructure to offload compliance, risk, and cost."
       },
-      "identify": {
-        "title": "Identify users",
-        "subtitle": "Charged per onboard",
-        "items": {
-          "kyc": {
-            "title": "Standard KYC (Know Your Customer)",
-            "subtitle": "When an existing Footprint user creates a new account with you with only one click."
-          },
-          "id-verification": {
-            "title": "Document Verification (IDV)",
-            "subtitle": "Drivers license or passport"
-          },
-          "one-click": {
-            "title": "One-click KYC"
-          },
-          "kyb": {
-            "title": "KYB (Know Your Business)",
-            "subtitle": "Middesk also available for KYB"
-          },
-          "hosted": {
-            "title": "Hosted onboarding without KYC/KYB"
-          },
-          "app-clip": {
-            "title": "App Clip / Instant App risk signals"
-          },
-          "behavioral": {
-            "title": "Behavioral signals"
-          },
-          "email": {
-            "title": "Email age"
-          }
-        }
-      },
-      "secure": {
-        "title": "Secure users’ data",
-        "subtitle": "Priced per active user per month",
-        "items": {
-          "pii": {
-            "title": "Secure PII Storage"
-          },
-          "custom": {
-            "title": "Custom data vaulting",
-            "subtitle": "Unlimited tokens and decryptions"
-          },
-          "vault-proxy": {
-            "title": "Vault Proxy",
-            "subtitle": "Process transactions without handling sensitive card data"
-          }
-        }
-      },
-      "aml": {
-        "title": "AML monitoring",
-        "subtitle": "Priced annually per user",
-        "items": {
-          "ofac": {
-            "title": "Continuous OFAC monitoring",
-            "subtitle": "Unlimited calls per year"
-          },
-          "media": {
-            "title": "Adverse media",
-            "subtitle": "Requires continuous OFAC monitoring"
-          },
-          "email": {
-            "title": "Email age"
-          }
-        }
-      },
-      "auth": {
-        "title": "Auth",
-        "subtitle": "Priced per active user per month",
-        "items": {
-          "passkeys": {
-            "title": "Auth with Passkeys"
-          },
-          "sms": {
-            "title": "SMS and Email verification"
-          },
-          "social": {
-            "title": "Social log in"
-          }
+      "plans": {
+        "startup": {
+          "title": "Startup",
+          "kyc": "Standard KYC (Know Your Customer)",
+          "id-doc": "Document Verification + Selfie",
+          "manual-review": "Manual Review",
+          "passkeys": "Access Passkey Auth",
+          "sms-otp": "SMS OTP - Phone verification",
+          "aml-monitoring": "Continuous AML Monitoring",
+          "pii": "PII Vaulting in managed Nitro Enclaves",
+          "compute-environment": "Isolated compute environments for processing PII",
+          "encryption": "Encryption and tokenization APIs",
+          "cta": "Get Startup plan"
+        },
+        "growth": {
+          "title": "Growth",
+          "behavioral-risks": "Access to behavioral risk signals",
+          "audit-logs": "Automatically generated audit logs",
+          "step-up": "Ability to automatically waterfall to one vendor for step-up",
+          "kyb": "Access to KYB at additional cost",
+          "rules-engine": "Customizable rules engine",
+          "international": "International support",
+          "pci-compliant": "PCI compliant vaulting",
+          "manual-review": "Advanced case management for manual review",
+          "custom-data-vaulting": "Custom data vaulting",
+          "itin-verification": "ITIN verification",
+          "eCBSV": "eCBSV verification",
+          "cta": "Get Growth plan"
+        },
+        "enterprise": {
+          "title": "Enterprise",
+          "rbac-iam": "RBAC/IAM",
+          "app-clip": "App Clip fraud signals",
+          "device-attestation": "Device attestation",
+          "Localization": "Localization",
+          "complete-auth": "Complete Auth",
+          "compliance-view": "Compliance view",
+          "customization": "Complete customization features",
+          "white-glove-support": "White glove support",
+          "custom-alerts": "Custom alerts for dashboard insights or any unexpected behavior in onboarding",
+          "kyc": "KYC + Fraud rules engine",
+          "waterfall": "Full waterfall until match priced at 50% KYC list for each vendor hit",
+          "saml-sso": "Custom SAML SSO integration",
+          "sna": "SNA",
+          "SFTP": "SFTP proxy",
+          "cta": "Get Enterprise plan"
         }
       },
       "banner": {
-        "title": "Bundle and save",
-        "subtitle": "If you use 2 or more services (eg: Onboarding and Security) you'll enjoy great discounts. Reach out to us to know more.",
+        "title": "Not sure what plan you need?",
+        "subtitle": "Reach out to us and we'll be happy to guide you through the available options.",
         "schedule-call": "Schedule a call",
         "get-started": "Sign up for free"
       }
