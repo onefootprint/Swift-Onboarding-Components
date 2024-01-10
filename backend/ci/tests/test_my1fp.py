@@ -1,11 +1,6 @@
 import pytest
 from tests.identify_client import IdentifyClient
-from tests.utils import (
-    get,
-    post,
-    step_up_user_biometric,
-)
-from tests.headers import SandboxId
+from tests.utils import get, post
 
 
 @pytest.fixture(scope="module")
@@ -65,7 +60,9 @@ def test_decrypt_basic(sandbox_user, auth_token):
 
 def test_decrypt_sensitive(sandbox_user, auth_token):
     # First, step up with the existing auth token
-    auth_token = step_up_user_biometric(auth_token, sandbox_user, "my1fp")
+    auth_token = IdentifyClient.from_token(
+        auth_token, webauthn=sandbox_user.client.webauthn_device
+    ).step_up(kind="biometric", scope="my1fp")
     body = get("/hosted/user/token", None, auth_token)
     assert "sensitive_profile" in body["scopes"]
 

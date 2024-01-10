@@ -2,9 +2,8 @@ import pytest
 from tests.utils import (
     post,
     create_ob_config,
-    step_up_user,
-    patch,
 )
+from tests.identify_client import IdentifyClient
 from tests.bifrost_client import BifrostClient
 from tests.headers import FpAuth
 from tests.constants import FIXTURE_PHONE_NUMBER, ID_DATA, FIXTURE_EMAIL
@@ -39,8 +38,15 @@ def test_skip_confirm(sandbox_tenant, ob_config):
     body = post(f"users/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
+    # Token should be unverified because this vault was made via API
+    body = post("/hosted/identify", dict(identifier=None), auth_token)
+    assert body["user_found"]
+    assert body["is_unverified"]
+
     # Should require step up because auth was not implied for API vault
-    auth_token = step_up_user(auth_token, True)
+    auth_token = IdentifyClient.from_token(auth_token).step_up(
+        assert_had_no_scopes=True
+    )
 
     # Run bifrost
     bifrost = BifrostClient.raw_auth(ob_config, auth_token, sandbox_id)

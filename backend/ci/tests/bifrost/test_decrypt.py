@@ -1,5 +1,6 @@
 import pytest
-from tests.utils import post, step_up_user_biometric
+from tests.utils import post
+from tests.identify_client import IdentifyClient
 
 
 @pytest.fixture(scope="module")
@@ -7,9 +8,9 @@ def biometric_sandbox_user_auth(sandbox_user):
     """
     auth token for sandbox_user from logging in via biometric credential
     """
-    return step_up_user_biometric(
-        sandbox_user.client.auth_token, sandbox_user, "onboarding"
-    )
+    return IdentifyClient.from_token(
+        sandbox_user.client.auth_token, webauthn=sandbox_user.client.webauthn_device
+    ).step_up(kind="biometric", scope="onboarding")
 
 
 @pytest.mark.parametrize(

@@ -212,111 +212,6 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
         raise last_exception
 
 
-def step_up_user(token, expect_unverified, token_scope="onboarding"):
-    """
-    Step up a token from unauthed, "identified" to authed with onboarding scope
-    """
-    # Token should start with no scopes
-    body = get("hosted/user/token", None, token)
-    assert not body["scopes"]
-
-    body = identify_user(None, token)
-    assert "sms" in body["available_challenge_kinds"]
-    assert body["is_unverified"] == expect_unverified
-    challenge_data = challenge_user("sms", token)
-
-    # Log in as the user
-    new_token = identify_verify(
-        challenge_data["challenge_token"],
-        token_scope,
-        token,
-    )
-
-    # Now, token should have scopes
-    if token_scope == "onboarding":
-        expected_scope = "sign_up"
-    elif token_scope == "auth":
-        expected_scope = "auth"
-    body = get("hosted/user/token", None, new_token)
-    assert set(body["scopes"]) >= {expected_scope}
-    assert (
-        new_token.value != token.value
-    ), "Verify should give us a new token with permissions"
-
-    # And scopes of old token shouldn't have changed
-    body = get("hosted/user/token", None, token)
-    assert not body["scopes"]
-
-    return new_token
-
-
-def step_up_user_biometric(auth_token, user, scope):
-    # Don't technically need to pass in the phone number to step up, but the util takes it in
-    sandbox_id = user.client.sandbox_id
-    sandbox_id_h = [SandboxId(sandbox_id)] if sandbox_id else []
-    challenge_data = challenge_user("biometric", auth_token, *sandbox_id_h)
-    body = biometric_challenge_response(
-        challenge_data, user, scope, auth_token, *sandbox_id_h
-    )
-    assert body["auth_token"] != auth_token.value
-    return FpAuth(body["auth_token"])
-
-
-def biometric_challenge_response(challenge_data, user, scope, *headers):
-    # do webauthn
-    chal = json.loads(challenge_data["biometric_challenge_json"])
-    chal["publicKey"]["challenge"] = _b64_decode(chal["publicKey"]["challenge"])
-
-    attestation = user.client.webauthn_device.get(chal, TEST_URL)
-    attestation["rawId"] = _b64_encode(attestation["rawId"])
-    attestation["id"] = _b64_encode(attestation["id"])
-    attestation["response"]["authenticatorData"] = _b64_encode(
-        attestation["response"]["authenticatorData"]
-    )
-    attestation["response"]["signature"] = _b64_encode(
-        attestation["response"]["signature"]
-    )
-    attestation["response"]["userHandle"] = _b64_encode(
-        attestation["response"]["userHandle"]
-    )
-    attestation["response"]["clientDataJSON"] = _b64_encode(
-        attestation["response"]["clientDataJSON"]
-    )
-
-    # Log in as the user
-    data = {
-        "challenge_response": json.dumps(attestation),
-        "challenge_kind": "biometric",
-        "challenge_token": challenge_data["challenge_token"],
-        "scope": scope,
-    }
-    body = post("hosted/identify/verify", data, *headers)
-    return body
-
-
-def step_up_user_email(auth_token, scope):
-    challenge_data = challenge_user("email", auth_token)
-    data = {
-        "challenge_response": "000000",
-        "challenge_kind": "email",
-        "challenge_token": challenge_data["challenge_token"],
-        "scope": scope,
-    }
-    body = post("hosted/identify/verify", data, auth_token)
-    return FpAuth(body["auth_token"])
-
-
-def identify_user(identifier, *headers):
-    def identify():
-        data = dict(identifier=identifier)
-        body = post("hosted/identify", data, *headers)
-        assert body["user_found"]
-        assert body["available_challenge_kinds"]
-        return body
-
-    return try_until_success(identify, 5)
-
-
 def challenge_user(challenge_kind, *headers):
     # Some challenges may be invoked via token instead of phone_number
     identifier = dict(phone_number=FIXTURE_PHONE_NUMBER)
@@ -376,6 +271,7 @@ def identify_verify(
     return result
 
 
+# TODO move to identify machine
 def create_user(token_kind, *headers) -> str:
     # Initiate the challenge to a sandbox phone number
     def initiate_challenge():

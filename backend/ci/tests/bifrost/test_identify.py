@@ -6,9 +6,9 @@ from tests.utils import (
     create_ob_config,
     post,
     create_user,
-    step_up_user,
     identify_verify,
 )
+from tests.identify_client import IdentifyClient
 from tests.headers import SandboxId, FpAuth, IsLive
 
 
@@ -118,7 +118,15 @@ def vault4(sandbox_id, foo_sandbox_tenant):
     data = dict(kind="onboard", key=foo_sandbox_tenant.default_ob_config.key.value)
     body = post(f"users/{fp_id}/token", data, foo_sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
-    auth_token = step_up_user(auth_token, True)
+
+    # Token should be unverified because this vault was made via API
+    body = post("/hosted/identify", dict(identifier=None), auth_token)
+    assert body["user_found"]
+    assert body["is_unverified"]
+
+    auth_token = IdentifyClient.from_token(auth_token).step_up(
+        assert_had_no_scopes=True
+    )
     bifrost = BifrostClient.raw_auth(
         foo_sandbox_tenant.default_ob_config, auth_token, sandbox_id
     )
@@ -149,7 +157,6 @@ def test_identify_priority(
     foo_sandbox_tenant,
     tenant_sandbox_obc,
     tenant,
-    twilio,
     sandbox_id,
 ):
     """

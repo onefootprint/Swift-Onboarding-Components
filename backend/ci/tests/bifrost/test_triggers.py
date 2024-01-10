@@ -1,15 +1,8 @@
 import pytest
-import time
 from tests.headers import FpAuth
-from tests.utils import _gen_random_sandbox_id, post
-from tests.utils import (
-    get,
-    patch,
-    try_until_success,
-    _gen_random_n_digit_number,
-    step_up_user,
-    create_ob_config,
-)
+from tests.utils import post
+from tests.utils import get, patch
+from tests.identify_client import IdentifyClient
 from tests.bifrost_client import BifrostClient
 
 
@@ -51,7 +44,9 @@ def complete_redo_flow(user, auth_token, pre_run=None):
     assert len(obds) == 1
 
     # Re-run Bifrost with the token, optionally with any pre_run assertion checks
-    auth_token = step_up_user(auth_token, False)
+    auth_token = IdentifyClient.from_token(auth_token).step_up(
+        assert_had_no_scopes=True
+    )
     # Weird, the ob_config here isn't really used
     bifrost = BifrostClient.raw_auth(user.client.ob_config, auth_token, sandbox_id)
     if pre_run:
@@ -161,7 +156,9 @@ def test_trigger_incomplete(sandbox_tenant):
 
     # Trigger redo KYC
     initial_auth_token = send_trigger(fp_id, sandbox_tenant, dict(kind="redo_kyc"))
-    auth_token = step_up_user(initial_auth_token, False)
+    auth_token = IdentifyClient.from_token(initial_auth_token).step_up(
+        assert_had_no_scopes=True
+    )
 
     # re-run Bifrost with the token from the link we sent to user
     bifrost = BifrostClient.raw_auth(
@@ -187,8 +184,9 @@ def test_cant_make_multiple_wfs(sandbox_tenant):
 
     # Make sure the token can't be used to make another Workflow by re-logging in with the same token.
     # Shouldn't include a met collect_data requirement because we inherited the completed Workflow.
-    phone_number = bifrost.data["id.phone_number"]
-    auth_token = step_up_user(initial_auth_token, False)
+    auth_token = IdentifyClient.from_token(initial_auth_token).step_up(
+        assert_had_no_scopes=True
+    )
     post("hosted/onboarding", None, auth_token)
     body = get("hosted/onboarding/status", None, auth_token)
     assert not any(i["kind"] == "collect_data" for i in body["all_requirements"])

@@ -9,9 +9,6 @@ from tests.utils import (
     post,
     override_webauthn_challenge,
     override_webauthn_attestation,
-    step_up_user,
-    step_up_user_biometric,
-    step_up_user_email,
 )
 from tests.constants import (
     TEST_URL,
@@ -76,7 +73,9 @@ def get_auth_token_for_ci_update(user, auth_playbook):
     )
 
     # Finally, step up the token so it can be used to initiate a challenge
-    auth_token = step_up_user(auth_token, False, token_scope="auth")
+    auth_token = IdentifyClient.from_token(auth_token).step_up(
+        kind="sms", scope="auth", assert_had_no_scopes=True
+    )
 
     return (user, auth_token)
 
@@ -140,7 +139,9 @@ def test_add_phone(sandbox_tenant, skip_phone_obc):
     body = post(f"users/{user.fp_id}/token", data, user.client.ob_config.tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
-    auth_token = step_up_user_email(auth_token, "auth")
+    auth_token = IdentifyClient.from_token(auth_token).step_up(
+        kind="email", scope="auth"
+    )
 
     # Replace the contact info with a challenge
     data = dict(
@@ -214,7 +215,9 @@ def test_replace_passkey(user_with_token):
     assert body["error"]["message"] == "Cannot initiate challenge of kind biometric"
 
     # Step up the token using a passkey
-    auth_token = step_up_user_biometric(auth_token, user, scope="auth")
+    auth_token = IdentifyClient.from_token(
+        auth_token, webauthn=user.client.webauthn_device
+    ).inherit(kind="biometric", scope="auth")
 
     # Then can initiate replacing the paasskey
     body = post("hosted/user/challenge", data, auth_token)

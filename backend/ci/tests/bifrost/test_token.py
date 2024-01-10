@@ -1,12 +1,7 @@
 import arrow
 import pytest
-from tests.utils import (
-    post,
-    create_ob_config,
-    get,
-    step_up_user,
-    patch,
-)
+from tests.utils import post, create_ob_config, get, patch
+from tests.identify_client import IdentifyClient
 from tests.bifrost_client import BifrostClient
 from tests.headers import FpAuth, SandboxId
 from tests.constants import FIXTURE_PHONE_NUMBER, EMAIL, ENVIRONMENT
@@ -72,8 +67,15 @@ def test_api_vault(sandbox_tenant, ob_config):
     body = post("hosted/identify/login_challenge", data, auth_token, status_code=400)
     assert body["error"]["message"] == "Cannot initiate a challenge of kind email"
 
+    # Token should be unverified because this vault was made via API
+    body = post("/hosted/identify", dict(identifier=None), auth_token)
+    assert body["user_found"]
+    assert body["is_unverified"]
+
     # Should require step up because auth was not implied for API vault
-    auth_token = step_up_user(auth_token, True)
+    auth_token = IdentifyClient.from_token(auth_token).step_up(
+        assert_had_no_scopes=True
+    )
     # Ensure we can't edit the phone number once it's been verified
     body = patch(
         f"entities/{fp_id}/vault", initial_data, sandbox_tenant.sk.key, status_code=400
@@ -222,7 +224,14 @@ def test_portablize_api_vault(sandbox_tenant, foo_sandbox_tenant, ob_config):
     body = post(f"users/{fp_id}/token", data, sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
-    auth_token = step_up_user(auth_token, True)
+    # Token should be unverified because this vault was made via API
+    body = post("/hosted/identify", dict(identifier=None), auth_token)
+    assert body["user_found"]
+    assert body["is_unverified"]
+
+    auth_token = IdentifyClient.from_token(auth_token).step_up(
+        assert_had_no_scopes=True
+    )
 
     # re-run Bifrost with the token from the link we sent to user
     bifrost = BifrostClient.raw_auth(ob_config, auth_token, sandbox_id)

@@ -1,4 +1,4 @@
-from tests.utils import post
+from tests.utils import post, get
 from tests.constants import (
     FIXTURE_PHONE_NUMBER,
     FIXTURE_EMAIL,
@@ -25,6 +25,11 @@ class IdentifyClient:
             **kwargs,
         )
 
+    def from_token(auth_token, **kwargs):
+        return IdentifyClient(
+            playbook_key=None, sandbox_id=None, auth_token=auth_token, **kwargs
+        )
+
     def __init__(
         self,
         playbook_key,
@@ -42,7 +47,9 @@ class IdentifyClient:
         self.email = email
         self.auth_token = auth_token
 
-        self.headers = [SandboxId(sandbox_id)]
+        self.headers = []
+        if sandbox_id:
+            self.headers.append(SandboxId(sandbox_id))
         if playbook_key:
             self.headers.append(playbook_key)
         if auth_token:
@@ -119,6 +126,48 @@ class IdentifyClient:
     def inherit(self, kind="sms", scope="onboarding"):
         self.login_challenge(kind)
         return self.verify(scope)
+
+    def step_up(self, kind="sms", scope="onboarding", assert_had_no_scopes=False):
+        """
+        Just a wrapper around inherit, including some assertions that the new token has additional
+        scopes
+        """
+        assert self.auth_token, "Can only step up if had existing token"
+
+        # Token should start with no scopes
+        body = get("hosted/user/token", None, self.auth_token)
+        original_scopes = body["scopes"]
+        if assert_had_no_scopes:
+            assert not body[
+                "scopes"
+            ], "Token expected to be only identified and have no scopes"
+
+        new_token = self.inherit(kind=kind, scope=scope)
+
+        # Now, token should have scopes
+        if scope == "onboarding":
+            expected_scope = "sign_up"
+        elif scope == "auth":
+            expected_scope = "auth"
+        elif scope == "my1fp":
+            expected_scope = "basic_profile"
+        body = get("hosted/user/token", None, new_token)
+        new_scopes = body["scopes"]
+        assert set(new_scopes) >= {expected_scope}
+        assert (
+            new_token.value != self.auth_token.value
+        ), "Verify should give us a new token with permissions"
+
+        # And scopes of old token shouldn't have changed
+        body = get("hosted/user/token", None, self.auth_token)
+        assert set(body["scopes"]) == set(
+            original_scopes
+        ), "Original token scopes shouldn't have changed"
+        assert set(new_scopes) > set(
+            body["scopes"]
+        ), "Stepped up token should have additional scopes"
+
+        return new_token
 
 
 def biometric_challenge_response(challenge_data, webauthn):
