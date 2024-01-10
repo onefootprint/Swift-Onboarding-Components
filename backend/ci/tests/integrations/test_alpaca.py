@@ -106,7 +106,7 @@ def test_alpaca_cip(
     )
     bifrost = BifrostClient.create(
         obc,
-        sandbox_id,
+        override_sandbox_id=sandbox_id,
         override_email=email,
     )
     bifrost.vault_barcode_with_doc = False  # hack cause /vault barfs when trying to vault barcode during stepup because stepup workflow state only gives the AddDocument guard, not the AddData guard

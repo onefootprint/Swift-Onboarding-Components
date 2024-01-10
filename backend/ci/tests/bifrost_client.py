@@ -52,13 +52,13 @@ class BifrostClient:
         Create an instance of BifrostClient that inherits the user with the provided phone number.
         """
         ob_config_auth = override_ob_config_auth or ob_config.key
-        sandbox_id_header = [SandboxId(sandbox_id)] if sandbox_id else []
-        auth = inherit_user("onboarding", ob_config_auth, *sandbox_id_header)
+        sandbox_id_h = SandboxId(sandbox_id)
+        auth = inherit_user("onboarding", ob_config_auth, sandbox_id_h)
         return BifrostClient(ob_config, auth, sandbox_id)
 
     def create(
         ob_config,
-        sandbox_id,
+        override_sandbox_id=None,
         override_ob_config_auth=None,
         override_email=None,
     ):
@@ -66,12 +66,9 @@ class BifrostClient:
         Create an instance of BifrostClient that creates a new user with the provided phone number.
         """
         ob_config_auth = override_ob_config_auth or ob_config.key
-        sandbox_id_header = [SandboxId(sandbox_id)] if sandbox_id else []
-        auth_token = create_user(
-            "onboarding",
-            ob_config_auth,
-            *sandbox_id_header,
-        )
+        sandbox_id = override_sandbox_id or _gen_random_sandbox_id()
+        sandbox_id_h = SandboxId(sandbox_id)
+        auth_token = create_user("onboarding", ob_config_auth, sandbox_id_h)
         return BifrostClient(ob_config, auth_token, sandbox_id, override_email)
 
     def new(ob_config, override_ob_config_auth=None):

@@ -81,7 +81,9 @@ def vault2(sandbox_id, sandbox_tenant):
     """
     Tenant A - vault made via bifrost and fully onboarded/portablized
     """
-    bifrost = BifrostClient.create(sandbox_tenant.default_ob_config, sandbox_id)
+    bifrost = BifrostClient.create(
+        sandbox_tenant.default_ob_config, override_sandbox_id=sandbox_id
+    )
     bifrost.data["id.first_name"] = "From Tenant A"
     bifrost.run()
 
