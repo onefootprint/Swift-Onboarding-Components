@@ -554,13 +554,13 @@
                                             "properties": {
                                                 "count": {
                                                     "example": 10000,
-                                                    "description": "The total number of results",
+                                                    "description": "The total number of results.",
                                                     "type": "integer",
                                                     "format": "int64"
                                                 },
                                                 "next": {
                                                     "example": 1234,
-                                                    "description": "The cursor to be provided in the next request to fetch the next page\n The `cursor` parameter to provide in order to request the next page of results",
+                                                    "description": "The `cursor` parameter to provide in order to request the next page of results.",
                                                     "type": "integer"
                                                 }
                                             }
@@ -2814,13 +2814,13 @@
                                             "properties": {
                                                 "count": {
                                                     "example": 10000,
-                                                    "description": "The total number of results",
+                                                    "description": "The total number of results.",
                                                     "type": "integer",
                                                     "format": "int64"
                                                 },
                                                 "next": {
                                                     "example": 1234,
-                                                    "description": "The cursor to be provided in the next request to fetch the next page\n The `cursor` parameter to provide in order to request the next page of results",
+                                                    "description": "The `cursor` parameter to provide in order to request the next page of results.",
                                                     "type": "integer",
                                                     "format": "int64"
                                                 }

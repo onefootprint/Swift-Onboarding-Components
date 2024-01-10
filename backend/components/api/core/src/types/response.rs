@@ -79,14 +79,13 @@ where
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 /// Metadata required for a cursor-paginated response.
 pub struct CursorPaginatedResponseMeta<C> {
-    /// The cursor to be provided in the next request to fetch the next page
     // TODO need a reasonable openapi example. This doesn't work for every C
     #[openapi(example = "1234")]
-    /// The `cursor` parameter to provide in order to request the next page of results
+    /// The `cursor` parameter to provide in order to request the next page of results.
     pub next: Option<C>,
     #[openapi(example = "10000")]
     // TODO why is this optional
-    /// The total number of results
+    /// The total number of results.
     pub count: Option<i64>,
 }
 
