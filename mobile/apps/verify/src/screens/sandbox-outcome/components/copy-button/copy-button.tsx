@@ -4,7 +4,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import React from 'react';
 import styled, { css } from 'styled-components/native';
 
-type CopyButtonProps = {
+export type CopyButtonProps = {
   text: string;
 };
 

@@ -1,6 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-import type { SupportedLocale } from '@onefootprint/footprint-js';
-
 /**
  * Function that returns a USA-date-string representation
  * @param {string} locale en-US, es-MX
@@ -10,10 +7,7 @@ import type { SupportedLocale } from '@onefootprint/footprint-js';
  *     strInputToUSDate('en-US', '12/25/1997') -> '12/25/1997'
  *     strInputToUSDate('es-MX', '25/12/1997') -> '12/25/1997'
  */
-export const strInputToUSDate = (
-  locale: SupportedLocale,
-  str: string,
-): string => {
+export const strInputToUSDate = (locale: string, str: string): string => {
   const now = new Date();
   const part = str.split('/');
   const strFormat = new Intl.DateTimeFormat(locale)

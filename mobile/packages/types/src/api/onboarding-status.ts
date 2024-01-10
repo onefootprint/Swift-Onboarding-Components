@@ -1,11 +1,10 @@
-import type { PublicOnboardingConfig } from 'src/data';
-
 import type {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from '../data/collected-data-option';
 import type { SupportedIdDocTypes } from '../data/id-doc-type';
+import type { PublicOnboardingConfig } from '../data/onboarding-config';
 
 export enum OnboardingRequirementKind {
   liveness = 'liveness',

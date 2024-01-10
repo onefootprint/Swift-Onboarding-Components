@@ -1,7 +1,7 @@
 import type {
   CountryCode,
   CountryCode3,
-  IdDocOutcomes,
+  IdDocOutcome,
   SupportedIdDocTypes,
 } from '../data';
 
@@ -9,7 +9,7 @@ export type SubmitDocTypeRequest = {
   authToken: string;
   countryCode: CountryCode | CountryCode3;
   documentType: SupportedIdDocTypes;
-  fixtureResult?: IdDocOutcomes;
+  fixtureResult?: IdDocOutcome;
 };
 
 export type SubmitDocTypeResponse = {

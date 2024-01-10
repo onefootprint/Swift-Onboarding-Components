@@ -1,8 +1,8 @@
-import type { IdDocOutcomes } from '@onefootprint/types';
+import type { IdDocOutcome } from '@onefootprint/types';
 import { createContext } from 'react';
 
 const AppContext = createContext<{
-  sandboxIdDocOutcome: IdDocOutcomes | null;
+  sandboxIdDocOutcome: IdDocOutcome | null;
 }>({
   sandboxIdDocOutcome: null,
 });
