@@ -99,6 +99,7 @@ const ResidentialAddress = ({
           as="form"
           gap={7}
           onSubmit={handleSubmit(onSubmitFormData)}
+          width="100%"
         >
           {!hideHeader && (
             <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
