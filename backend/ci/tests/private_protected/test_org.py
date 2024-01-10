@@ -1,6 +1,10 @@
+import pytest
 from tests.utils import _gen_random_n_digit_number, _gen_random_str, patch, get
 
 
+@pytest.mark.skip(
+    reason="don't have access to PROTECTED_CUSTODIAN_KEY in CI and are scared to give test tenant users risk ops status"
+)
 def test_business_info(sandbox_tenant):
     for _ in range(2):
         nonce = _gen_random_str(5)
