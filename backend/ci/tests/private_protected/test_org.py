@@ -16,12 +16,12 @@ def test_business_info(sandbox_tenant):
         patch(
             f"/private/protected/org/{sandbox_tenant.id}/business_info",
             biz_info,
-            PROTECTED_CUSTODIAN_AUTH,
+            *sandbox_tenant.db_auths,
         )
         body = get(
             f"/private/protected/org/{sandbox_tenant.id}/business_info",
             None,
-            PROTECTED_CUSTODIAN_AUTH,
+            *sandbox_tenant.db_auths,
         )
         assert body["company_name"] == biz_info["company_name"]
         assert body["address_line1"] == biz_info["address_line1"]
