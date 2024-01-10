@@ -131,7 +131,7 @@ const FloatingBox = ({
                     </Typography>
                     <AboutAppClipAndInstantApp kind="app-clip" />
                   </Stack>
-                  <Stack direction="row" align="center" gap={3}>
+                  <Stack direction="row" align="center" gap={2} justify="end">
                     <IcoAppclip16 />
                     <Typography variant="body-3" isPrivate>
                       {t('app-clip.yes')}
