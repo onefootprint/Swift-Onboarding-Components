@@ -1,13 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
-import styled from '@onefootprint/styled';
 import { Drawer, LinkButton, Stack } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
-import ValidationItems from './components/validation-items';
+import FieldValidations from './components/field-validations';
 
-const FieldValidationDetails = () => {
+const NotVerifiedDetails = () => {
   const { t } = useTranslation(
-    'pages.entity.audit-trail.timeline.onboarding-decision-event.field-validation',
+    'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details',
   );
   const [isDrawerOpen, setDrawerOpen] = useState(false);
 
@@ -33,16 +32,10 @@ const FieldValidationDetails = () => {
           setDrawerOpen(false);
         }}
       >
-        <ValidationItemsContainer>
-          <ValidationItems />
-        </ValidationItemsContainer>
+        <FieldValidations />
       </Drawer>
     </>
   );
 };
 
-const ValidationItemsContainer = styled.div`
-  margin-left: -150px;
-`;
-
-export default FieldValidationDetails;
+export default NotVerifiedDetails;

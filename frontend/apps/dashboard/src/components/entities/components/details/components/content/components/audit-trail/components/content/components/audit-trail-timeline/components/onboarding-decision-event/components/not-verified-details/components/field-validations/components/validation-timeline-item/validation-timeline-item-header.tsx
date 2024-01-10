@@ -28,7 +28,7 @@ const ValidationTimelineItemHeader = ({
   matchLevel,
 }: ValidationTimelineItemHeaderProps) => {
   const { t } = useTranslation(
-    'pages.entity.audit-trail.timeline.onboarding-decision-event.field-validation',
+    'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.field-validations',
   );
 
   return (

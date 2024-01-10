@@ -3,7 +3,7 @@ import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, Typography } from '@onefootprint/ui';
 import React from 'react';
 
-import type { SignalShortInfoType } from '../../hooks/use-entity-match-signals/utils/transform-response';
+import type { SignalShortInfoType } from '../../../../hooks/use-entity-match-signals/utils/transform-response';
 
 type ValidationTimelineItemBodyProps = {
   signals: SignalShortInfoType[];
@@ -13,7 +13,7 @@ const ValidationTimelineItemBody = ({
   signals,
 }: ValidationTimelineItemBodyProps) => {
   const { t } = useTranslation(
-    'pages.entity.audit-trail.timeline.onboarding-decision-event.field-validation',
+    'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.field-validations',
   );
 
   return (

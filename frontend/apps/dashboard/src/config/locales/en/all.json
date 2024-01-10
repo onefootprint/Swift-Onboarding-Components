@@ -1286,34 +1286,40 @@
                 "pin-note": "Pin note to the top of the page"
               }
             },
-            "field-validation": {
+            "not-verified-details": {
               "drawer": {
-                "title": "Field validations",
+                "title": "Details",
                 "no-data": "Match data not available",
-                "error": "There was an error loading the data. Try again later."
+                "error": "There was an error loading the data. Try again later.",
+                "tabs": {
+                  "rules": "Rules",
+                  "field-validations": "Field validations"
+                }
               },
               "view-details": "View details",
-              "attributes": {
-                "phone": "Phone number",
-                "name": "Name",
-                "address": "Address",
-                "dob": "Date of birth",
-                "email": "Email",
-                "ssn": "SSN",
-                "document": "Document",
-                "businessName": "Business name",
-                "businessTin": "Business TIN",
-                "businessAddress": "Business address",
-                "businessBeneficialOwners": "Business beneficial owners",
-                "businessPhoneNumber": "Business phone number"
-              },
-              "match-level": {
-                "exact": "Matched",
-                "no_match": "Did not match",
-                "could_not_match": "Could not match",
-                "partial": "Partial match",
-                "verified": "Verified",
-                "not_verified": "Not verified"
+              "field-validations": {
+                "attributes": {
+                  "phone": "Phone number",
+                  "name": "Name",
+                  "address": "Address",
+                  "dob": "Date of birth",
+                  "email": "Email",
+                  "ssn": "SSN",
+                  "document": "Document",
+                  "businessName": "Business name",
+                  "businessTin": "Business TIN",
+                  "businessAddress": "Business address",
+                  "businessBeneficialOwners": "Business beneficial owners",
+                  "businessPhoneNumber": "Business phone number"
+                },
+                "match-level": {
+                  "exact": "Matched",
+                  "no_match": "Did not match",
+                  "could_not_match": "Could not match",
+                  "partial": "Partial match",
+                  "verified": "Verified",
+                  "not_verified": "Not verified"
+                }
               }
             }
           },

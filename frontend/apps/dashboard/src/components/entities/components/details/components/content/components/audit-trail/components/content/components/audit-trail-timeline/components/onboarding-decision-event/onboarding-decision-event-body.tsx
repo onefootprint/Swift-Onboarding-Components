@@ -13,7 +13,7 @@ import CdoTagList from 'src/components/cdo-tag-list';
 import AnnotationNote from '../annotation-note';
 import EventBodyEntry from '../event-body-entry';
 import PlaybookLink from '../playbook-link';
-import FieldValidationDetails from './components/field-validation-details';
+import FieldValidationDetails from './components/not-verified-details';
 
 type OnboardingDecisionEventBodyProps = {
   data: OnboardingDecisionEventData;
