@@ -271,21 +271,6 @@ def identify_verify(
     return result
 
 
-# TODO move to identify machine
-def create_user(token_kind, *headers) -> str:
-    # Initiate the challenge to a sandbox phone number
-    def initiate_challenge():
-        data = dict(phone_number=FIXTURE_PHONE_NUMBER, email=FIXTURE_EMAIL)
-        body = post("hosted/identify/signup_challenge", data, *headers)
-        return body["challenge_data"]["challenge_token"]
-
-    # Rate limiting may take a while
-    challenge_token = try_until_success(initiate_challenge, 20)
-
-    # Respond to the challenge and create the user
-    return identify_verify(challenge_token, token_kind, *headers)
-
-
 def create_tenant(org_data, ob_conf_data):
     is_live = org_data.pop("is_live", False)
     h_is_live = IsLive("true" if is_live else "false")

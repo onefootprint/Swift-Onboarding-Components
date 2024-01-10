@@ -1,12 +1,7 @@
 import pytest
 import typing
 from tests.identify_client import IdentifyClient
-from tests.utils import (
-    post,
-    get,
-    create_user,
-    _gen_random_sandbox_id,
-)
+from tests.utils import post, get, _gen_random_sandbox_id
 from tests.bifrost_client import BifrostClient
 from tests.headers import SandboxId, FpAuth
 
@@ -20,12 +15,7 @@ class User(typing.NamedTuple):
 @pytest.fixture(scope="session")
 def authed_user(auth_playbook, sandbox_tenant):
     sandbox_id = _gen_random_sandbox_id()
-    sandbox_id_header = SandboxId(sandbox_id)
-    auth_token = create_user(
-        "auth",
-        auth_playbook.key,
-        sandbox_id_header,
-    )
+    auth_token = IdentifyClient(auth_playbook.key, sandbox_id).create_user(scope="auth")
 
     # Enforce we can't start an onboarding with this auth token
     body = post("/hosted/onboarding", None, auth_token, status_code=401)

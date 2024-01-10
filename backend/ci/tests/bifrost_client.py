@@ -18,7 +18,6 @@ from tests.utils import (
     multipart_file,
     _gen_random_ssn,
     get,
-    create_user,
     post,
     patch,
     override_webauthn_challenge,
@@ -66,8 +65,7 @@ class BifrostClient:
         """
         ob_config_auth = override_ob_config_auth or ob_config.key
         sandbox_id = override_sandbox_id or _gen_random_sandbox_id()
-        sandbox_id_h = SandboxId(sandbox_id)
-        auth_token = create_user("onboarding", ob_config_auth, sandbox_id_h)
+        auth_token = IdentifyClient(ob_config_auth, sandbox_id).create_user()
         return BifrostClient(ob_config, auth_token, sandbox_id, override_email)
 
     def new(ob_config, override_ob_config_auth=None):
@@ -76,11 +74,7 @@ class BifrostClient:
         """
         ob_config_auth = override_ob_config_auth or ob_config.key
         sandbox_id = _gen_random_sandbox_id()
-        auth_token = create_user(
-            "onboarding",
-            ob_config_auth,
-            SandboxId(sandbox_id),
-        )
+        auth_token = IdentifyClient(ob_config_auth, sandbox_id).create_user()
         return BifrostClient(ob_config, auth_token, sandbox_id)
 
     def __init__(

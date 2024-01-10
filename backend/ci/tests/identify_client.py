@@ -123,6 +123,10 @@ class IdentifyClient:
 
         return auth_token
 
+    def create_user(self, scope="onboarding"):
+        self.signup_challenge()
+        return self.verify(scope)
+
     def inherit(self, kind="sms", scope="onboarding"):
         self.login_challenge(kind)
         return self.verify(scope)

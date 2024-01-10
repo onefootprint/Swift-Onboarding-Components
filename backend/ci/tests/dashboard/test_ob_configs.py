@@ -3,15 +3,13 @@ from tests.utils import (
     get,
     post,
     patch,
-    create_user,
     create_ob_config,
     _gen_random_sandbox_id,
 )
-from tests.constants import FIXTURE_PHONE_NUMBER, FIXTURE_EMAIL
 from tests.headers import (
     PublishableOnboardingKey,
-    SandboxId,
 )
+from tests.identify_client import IdentifyClient
 
 
 @pytest.fixture(scope="session")
@@ -107,7 +105,7 @@ def test_config_create(sandbox_tenant):
     ob_config_key = PublishableOnboardingKey(ob_config["key"])
 
     sandbox_id = _gen_random_sandbox_id()
-    auth_token = create_user("onboarding", ob_config_key, SandboxId(sandbox_id))
+    auth_token = IdentifyClient(ob_config_key, sandbox_id).create_user()
     post("hosted/onboarding", None, ob_config_key, auth_token)
 
 

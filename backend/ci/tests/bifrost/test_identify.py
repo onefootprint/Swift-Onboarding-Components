@@ -1,13 +1,7 @@
 import pytest
 from tests.bifrost_client import BifrostClient
 from tests.constants import FIXTURE_PHONE_NUMBER, FIXTURE_EMAIL
-from tests.utils import (
-    _gen_random_sandbox_id,
-    create_ob_config,
-    post,
-    create_user,
-    identify_verify,
-)
+from tests.utils import _gen_random_sandbox_id, create_ob_config, post, identify_verify
 from tests.identify_client import IdentifyClient
 from tests.headers import SandboxId, FpAuth, IsLive
 
@@ -94,12 +88,7 @@ def vault3(sandbox_id, sandbox_tenant):
     Tenant A - vault made via bifrost and OTP verified with no other info
     Should never be identified.
     """
-    sandbox_id_h = SandboxId(sandbox_id)
-    create_user(
-        "onboarding",
-        sandbox_tenant.default_ob_config.key,
-        sandbox_id_h,
-    )
+    IdentifyClient(sandbox_tenant.default_ob_config.key, sandbox_id).create_user()
 
 
 @pytest.fixture(scope="function")
