@@ -5,7 +5,7 @@ impl DbToApi<ScopedVaultTag> for api_wire_types::UserTag {
     fn from_db(tag: ScopedVaultTag) -> Self {
         api_wire_types::UserTag {
             id: tag.id,
-            kind: tag.kind,
+            tag: tag.kind,
             created_at: tag.created_at,
         }
     }

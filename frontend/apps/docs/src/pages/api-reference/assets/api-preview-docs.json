@@ -1621,12 +1621,13 @@
             "CreateTagRequest": {
                 "type": "object",
                 "properties": {
-                    "kind": {
+                    "tag": {
+                        "description": "any string to tag a user with",
                         "type": "string"
                     }
                 },
                 "required": [
-                    "kind"
+                    "tag"
                 ]
             },
             "CreateTokenRequest": {

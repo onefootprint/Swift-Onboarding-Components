@@ -210,7 +210,7 @@ pub async fn decrypt(client: Client, ciphertext: Vec<u8>) -> Result<Vec<u8>, Err
         let mut plaintext_buf: ffi::aws_byte_buf = unsafe { std::mem::zeroed() };
         let rc = unsafe {
             ffi::aws_kms_decrypt_blocking(
-                *client.kms_client,
+                *client.kms_client, 
                 std::ptr::null_mut(),
                 std::ptr::null_mut(),
                 &ciphertext_buf,

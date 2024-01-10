@@ -32,7 +32,7 @@ pub async fn post(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
-    let tag_kind = request.into_inner().kind;
+    let tag_kind = request.into_inner().tag;
 
     let tag = state
         .db_pool

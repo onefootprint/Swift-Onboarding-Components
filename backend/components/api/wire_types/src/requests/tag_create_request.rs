@@ -2,5 +2,6 @@ use crate::*;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct CreateTagRequest {
-    pub kind: String,
+    /// any string to tag a user with
+    pub tag: String,
 }

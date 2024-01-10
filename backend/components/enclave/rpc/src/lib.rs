@@ -68,7 +68,7 @@ impl WireMessage {
     }
 
     pub fn to_bytes(self) -> Result<Vec<u8>, Error> {
-        let mut len_bytes = vec![];
+        let mut len_bytes: Vec<u8> = vec![];
         len_bytes.write_u64::<BigEndian>(self.length as u64)?;
         Ok([len_bytes, self.data].concat())
     }
