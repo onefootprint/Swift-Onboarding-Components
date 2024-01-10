@@ -11,12 +11,12 @@ from tests.utils import compare_contents, compare_b64_contents, multipart_file
 
 
 @pytest.fixture(scope="session")
-def user_with_documents(doc_request_sandbox_ob_config, twilio):
+def user_with_documents(doc_request_sandbox_ob_config):
     """
     Create a user with registered data and webuathn creds and onboard them onto the document_requesting_tenant_session_scoped
     with document info as well
     """
-    bifrost = BifrostClient.new(doc_request_sandbox_ob_config, twilio)
+    bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
     user = bifrost.run()
     doc_requirement = next(
         r for r in bifrost.handled_requirements if r["kind"] == "collect_document"

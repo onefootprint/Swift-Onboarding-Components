@@ -21,7 +21,7 @@ def ob_config(sandbox_tenant):
     return create_ob_config(sandbox_tenant, **ob_conf_data)
 
 
-def test_skip_confirm(twilio, sandbox_tenant, ob_config):
+def test_skip_confirm(sandbox_tenant, ob_config):
     """
     Test that we omit the confirm requirement when all data is already provided for a user.
     We will create the user via API with all identity data pre-populated.
@@ -40,15 +40,10 @@ def test_skip_confirm(twilio, sandbox_tenant, ob_config):
     auth_token = FpAuth(body["token"])
 
     # Should require step up because auth was not implied for API vault
-    auth_token = step_up_user(twilio, auth_token, FIXTURE_PHONE_NUMBER, True)
+    auth_token = step_up_user(auth_token, True)
 
     # Run bifrost
-    bifrost = BifrostClient.raw_auth(
-        ob_config,
-        auth_token,
-        FIXTURE_PHONE_NUMBER,
-        sandbox_id,
-    )
+    bifrost = BifrostClient.raw_auth(ob_config, auth_token, sandbox_id)
     user = bifrost.run()
     # collect_data requirement should be missing entirely
     assert [i["kind"] for i in bifrost.already_met_requirements] == ["authorize"]

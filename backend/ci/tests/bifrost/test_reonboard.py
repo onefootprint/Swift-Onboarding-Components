@@ -3,13 +3,11 @@ from tests.bifrost_client import BifrostClient
 from tests.utils import create_ob_config
 
 
-def test_reonboard(sandbox_tenant, twilio, sandbox_user):
+def test_reonboard(sandbox_tenant, sandbox_user):
     # User one-clicks onto same ob config
     phone_number = sandbox_user.client.data["id.phone_number"]
     sandbox_id = sandbox_user.client.sandbox_id
-    bifrost = BifrostClient.inherit(
-        sandbox_tenant.default_ob_config, twilio, phone_number, sandbox_id
-    )
+    bifrost = BifrostClient.inherit(sandbox_tenant.default_ob_config, sandbox_id)
     bifrost.run()
     body = patch("hosted/user/vault", dict(), bifrost.auth_token, status_code=401)
     assert body["error"]["message"] == "Workflow state does not allow add_data"
@@ -25,7 +23,7 @@ def test_reonboard(sandbox_tenant, twilio, sandbox_user):
     assert len(obds) == 1
 
 
-def test_abort_then_reonboard(sandbox_tenant, twilio, must_collect_data):
+def test_abort_then_reonboard(sandbox_tenant, must_collect_data):
     obc1 = create_ob_config(
         sandbox_tenant,
         "Reonboard OBC 1",
@@ -40,10 +38,10 @@ def test_abort_then_reonboard(sandbox_tenant, twilio, must_collect_data):
     )
 
     # Start onboarding onto obc1, then deactivate it by onboarding onto obc2
-    bifrost1 = BifrostClient.new(obc1, twilio)
+    bifrost1 = BifrostClient.new(obc1)
     phone_number = bifrost1.data["id.phone_number"]
     sandbox_id = bifrost1.sandbox_id
-    bifrost2 = BifrostClient.inherit(obc2, twilio, phone_number, sandbox_id)
+    bifrost2 = BifrostClient.inherit(obc2, sandbox_id)
 
     # Shouldn't be able to do anything with bifrost1's workflow/auth token
     body = patch("hosted/user/vault", dict(), bifrost1.auth_token, status_code=401)
@@ -55,5 +53,5 @@ def test_abort_then_reonboard(sandbox_tenant, twilio, must_collect_data):
     patch("hosted/user/vault", dict(), bifrost2.auth_token)
 
     # And, can re-start onboarding onto obc1 and run to completion
-    bifrost1 = BifrostClient.inherit(obc1, twilio, phone_number, sandbox_id)
+    bifrost1 = BifrostClient.inherit(obc1, sandbox_id)
     bifrost1.run()

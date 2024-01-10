@@ -32,8 +32,8 @@ def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data):
 
 
 @pytest.fixture(scope="session")
-def primary_bo(kyb_sandbox_ob_config, twilio):
-    bifrost = BifrostClient.new(kyb_sandbox_ob_config, twilio)
+def primary_bo(kyb_sandbox_ob_config):
+    bifrost = BifrostClient.new(kyb_sandbox_ob_config)
     user = bifrost.run()
     assert bifrost.validate_response["user"]["status"] == "pass"
     assert bifrost.validate_response["business"]["status"] == "incomplete"
@@ -66,7 +66,7 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
 
     # Send the secondary BO through KYC
     bifrost = BifrostClient.new(
-        kyb_sandbox_ob_config, twilio, override_ob_config_auth=secondary_bo_token
+        kyb_sandbox_ob_config, override_ob_config_auth=secondary_bo_token
     )
     secondary_bo = bifrost.run()
     assert bifrost.validate_response["user"]["status"] == "pass"
@@ -97,9 +97,7 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
     # Should be able to use the BO token in identify flow for same user
     phone_number = secondary_bo.client.data["id.phone_number"]
     sandbox_id = secondary_bo.client.sandbox_id
-    inherit_user(
-        twilio, phone_number, "onboarding", secondary_bo_token, SandboxId(sandbox_id)
-    )
+    inherit_user("onboarding", secondary_bo_token, SandboxId(sandbox_id))
 
     # But not for a different user
     phone_number = primary_bo.client.data["id.phone_number"]
@@ -107,12 +105,8 @@ def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
     identify_user(
         dict(phone_number=phone_number), kyb_sandbox_ob_config.key, sandbox_id_h
     )
-    challenge_data = challenge_user(
-        phone_number, "sms", kyb_sandbox_ob_config.key, sandbox_id_h
-    )
+    challenge_data = challenge_user("sms", kyb_sandbox_ob_config.key, sandbox_id_h)
     identify_verify(
-        twilio,
-        phone_number,
         challenge_data["challenge_token"],
         "onboarding",
         expected_error="This business owner has already started KYC",
@@ -132,24 +126,21 @@ def ob_config2(sandbox_tenant, must_collect_data):
     return create_ob_config(sandbox_tenant, **ob_conf_data)
 
 
-def test_one_click_bos(sandbox_tenant, ob_config2, kyb_sandbox_ob_config, twilio):
+def test_one_click_bos(ob_config2, kyb_sandbox_ob_config, twilio):
     # Create two users onboarded onto the default OB config
-    bifrost = BifrostClient.new(ob_config2, twilio)
+    bifrost = BifrostClient.new(ob_config2)
     primary_bo = bifrost.run()
     assert primary_bo.fp_id
     assert not primary_bo.fp_bid
 
-    bifrost = BifrostClient.new(ob_config2, twilio)
+    bifrost = BifrostClient.new(ob_config2)
     secondary_bo = bifrost.run()
     assert secondary_bo.fp_id
     assert not secondary_bo.fp_bid
 
     # Onboard the primary_bo onto the KYB sandbox config
-    phone_number = primary_bo.client.data["id.phone_number"]
     sandbox_id = primary_bo.client.sandbox_id
-    bifrost = BifrostClient.inherit(
-        kyb_sandbox_ob_config, twilio, phone_number, sandbox_id
-    )
+    bifrost = BifrostClient.inherit(kyb_sandbox_ob_config, sandbox_id)
     # Kind of hacky - sometimes, we run this test too closely after the previous and we get rate
     # limited for sending an SMS to the same number (the secondary BO). Let's retry this until it
     # succeeds
@@ -186,8 +177,6 @@ def test_one_click_bos(sandbox_tenant, ob_config2, kyb_sandbox_ob_config, twilio
     sandbox_id = secondary_bo.client.sandbox_id
     bifrost = BifrostClient.inherit(
         kyb_sandbox_ob_config,
-        twilio,
-        phone_number,
         sandbox_id,
         override_ob_config_auth=secondary_bo_token,
     )

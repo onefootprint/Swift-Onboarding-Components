@@ -10,7 +10,7 @@ from tests.utils import create_ob_config
     "submit_ssn,step_up_to_doc",
     [(True, False), (False, False), (False, True), (True, True)],
 )
-def test_requirements(sandbox_tenant, twilio, submit_ssn, step_up_to_doc):
+def test_requirements(sandbox_tenant, submit_ssn, step_up_to_doc):
     must_collect_data = ["full_address", "name", "email", "phone_number"]
     optional_data = ["ssn9"]
     can_access_data = must_collect_data + optional_data
@@ -24,7 +24,7 @@ def test_requirements(sandbox_tenant, twilio, submit_ssn, step_up_to_doc):
         if step_up_to_doc
         else None,
     )
-    bifrost = BifrostClient.new(obc, twilio, override_ob_config_auth=None)
+    bifrost = BifrostClient.new(obc, override_ob_config_auth=None)
 
     collect_data_req = get_requirement_from_requirements(
         "collect_data", bifrost.get_status()["all_requirements"], is_met=False
@@ -101,7 +101,7 @@ def test_requirements(sandbox_tenant, twilio, submit_ssn, step_up_to_doc):
 
 @pytest.mark.parametrize("middle_name", [None, "Billy"])
 @pytest.mark.parametrize("can_access_name", [True, False])
-def test_middle_name(sandbox_tenant, twilio, middle_name, can_access_name):
+def test_middle_name(sandbox_tenant, middle_name, can_access_name):
     base_data = ["full_address", "email", "phone_number"]
     obc = create_ob_config(
         sandbox_tenant,
@@ -111,7 +111,7 @@ def test_middle_name(sandbox_tenant, twilio, middle_name, can_access_name):
     )
 
     di = "id.middle_name"
-    bifrost = BifrostClient.new(obc, twilio)
+    bifrost = BifrostClient.new(obc)
 
     if middle_name:
         bifrost.data[di] = middle_name

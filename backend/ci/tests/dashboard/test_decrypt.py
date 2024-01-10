@@ -70,10 +70,9 @@ def test_tenant_document_decrypt_no_permissions(sandbox_user):
 
 def test_tenant_image_decrypt(
     sandbox_tenant,
-    twilio,
     doc_request_sandbox_ob_config,
 ):
-    bifrost = BifrostClient.new(doc_request_sandbox_ob_config, twilio)
+    bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
     user = bifrost.run()
 
     data = {
@@ -110,7 +109,7 @@ def test_tenant_image_decrypt(
     }
 
 
-def test_decrypt_optional(sandbox_tenant, twilio):
+def test_decrypt_optional(sandbox_tenant):
     """
     Test that we can't decrypt fields that aren't in can_access
     """
@@ -121,7 +120,7 @@ def test_decrypt_optional(sandbox_tenant, twilio):
         ["phone_number"],
         optional_data=["ssn9"],
     )
-    bifrost = BifrostClient.new(obc, twilio)
+    bifrost = BifrostClient.new(obc)
     user = bifrost.run()
 
     body = get(f"entities/{user.fp_id}", None, *sandbox_tenant.db_auths)

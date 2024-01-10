@@ -14,11 +14,11 @@ import base64
 
 
 @pytest.fixture(scope="function")
-def incomplete_client(investor_profile_ob_config, twilio):
+def incomplete_client(investor_profile_ob_config):
     """
     Sandbox user partially onboarded onto an ob config requiring investor profile
     """
-    bifrost = BifrostClient.new(investor_profile_ob_config, twilio)
+    bifrost = BifrostClient.new(investor_profile_ob_config)
     requirements = bifrost.get_status()["all_requirements"]
     ip_requirements = get_requirement_from_requirements(
         "collect_investor_profile", requirements
@@ -125,8 +125,8 @@ def test_valid_doc_upload(incomplete_client, sandbox_tenant):
 
 
 # Case where user re-uploads the same doc (ie uploaded the wrong doc and uploads a new corrected version)
-def test_doc_reupload(sandbox_tenant, investor_profile_ob_config, twilio):
-    bifrost = BifrostClient.new(investor_profile_ob_config, twilio)
+def test_doc_reupload(sandbox_tenant, investor_profile_ob_config):
+    bifrost = BifrostClient.new(investor_profile_ob_config)
     # First upload one document
     bifrost.handle_ip_doc()
     # Then change the document and run again

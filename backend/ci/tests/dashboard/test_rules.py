@@ -153,7 +153,7 @@ def test_patch(sandbox_tenant, obc):
     )
 
 
-def test_get_rule_set_result(sandbox_tenant, twilio, must_collect_data):
+def test_get_rule_set_result(sandbox_tenant, must_collect_data):
     obc = create_ob_config(
         sandbox_tenant, "Rules yo", must_collect_data, must_collect_data
     )
@@ -179,7 +179,7 @@ def test_get_rule_set_result(sandbox_tenant, twilio, must_collect_data):
         *sandbox_tenant.db_auths,
     )
 
-    bifrost = BifrostClient.new(obc, twilio)
+    bifrost = BifrostClient.new(obc)
     user = bifrost.run()
 
     rule_set_result = get(

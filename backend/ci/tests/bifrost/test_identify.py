@@ -32,7 +32,7 @@ def test_entity_created_after_signup_challenge(sandbox_tenant):
     assert entity["status"] == "in_progress"
 
 
-def test_concurrent_signup_same_phone_number(twilio, sandbox_tenant):
+def test_concurrent_signup_same_phone_number(sandbox_tenant):
     """
     Test a race condition where the user tries to sign up with the same phone number at the same
     time.
@@ -52,12 +52,8 @@ def test_concurrent_signup_same_phone_number(twilio, sandbox_tenant):
 
     # Should be able to complete both challenges without conflict, effectively making two vaults
     # with the same phone fingerprint and same sandbox ID.
-    identify_verify(
-        twilio, FIXTURE_PHONE_NUMBER, challenge_token2, "onboarding", obc.key
-    )
-    identify_verify(
-        twilio, FIXTURE_PHONE_NUMBER, challenge_token1, "onboarding", obc.key
-    )
+    identify_verify(challenge_token2, "onboarding", obc.key)
+    identify_verify(challenge_token1, "onboarding", obc.key)
 
 
 @pytest.fixture(scope="function")
@@ -81,28 +77,23 @@ def vault1(sandbox_id, sandbox_tenant):
 
 
 @pytest.fixture(scope="function")
-def vault2(sandbox_id, sandbox_tenant, twilio):
+def vault2(sandbox_id, sandbox_tenant):
     """
     Tenant A - vault made via bifrost and fully onboarded/portablized
     """
-    bifrost = BifrostClient.create(
-        sandbox_tenant.default_ob_config, twilio, FIXTURE_PHONE_NUMBER, sandbox_id
-    )
+    bifrost = BifrostClient.create(sandbox_tenant.default_ob_config, sandbox_id)
     bifrost.data["id.first_name"] = "From Tenant A"
     bifrost.run()
 
 
 @pytest.fixture(scope="function")
-def vault3(sandbox_id, sandbox_tenant, twilio):
+def vault3(sandbox_id, sandbox_tenant):
     """
     Tenant A - vault made via bifrost and OTP verified with no other info
     Should never be identified.
     """
     sandbox_id_h = SandboxId(sandbox_id)
     create_user(
-        twilio,
-        FIXTURE_PHONE_NUMBER,
-        FIXTURE_EMAIL,
         "onboarding",
         sandbox_tenant.default_ob_config.key,
         sandbox_id_h,
@@ -110,7 +101,7 @@ def vault3(sandbox_id, sandbox_tenant, twilio):
 
 
 @pytest.fixture(scope="function")
-def vault4(sandbox_id, foo_sandbox_tenant, twilio):
+def vault4(sandbox_id, foo_sandbox_tenant):
     """
     Tenant B - vault made via API, portablized
     """
@@ -125,12 +116,9 @@ def vault4(sandbox_id, foo_sandbox_tenant, twilio):
     data = dict(kind="onboard", key=foo_sandbox_tenant.default_ob_config.key.value)
     body = post(f"users/{fp_id}/token", data, foo_sandbox_tenant.sk.key)
     auth_token = FpAuth(body["token"])
-    auth_token = step_up_user(twilio, auth_token, FIXTURE_PHONE_NUMBER, True)
+    auth_token = step_up_user(auth_token, True)
     bifrost = BifrostClient.raw_auth(
-        foo_sandbox_tenant.default_ob_config,
-        auth_token,
-        FIXTURE_PHONE_NUMBER,
-        sandbox_id,
+        foo_sandbox_tenant.default_ob_config, auth_token, sandbox_id
     )
     bifrost.data["id.first_name"] = "From Tenant B"
     bifrost.run()
@@ -180,7 +168,7 @@ def test_identify_priority(
         # by identify is to onboard it and check the PII
         # Maybe it would be nice to expose via API to integration tests the underlying vault ID
         # TODO test identifying on email
-        bifrost = BifrostClient.inherit(obc, twilio, FIXTURE_PHONE_NUMBER, sandbox_id)
+        bifrost = BifrostClient.inherit(obc, sandbox_id)
         fp_id = bifrost.run().fp_id
         data = dict(fields=["id.first_name"], reason="flerp")
         body = post(f"users/{fp_id}/vault/decrypt", data, tenant.s_sk)
@@ -188,7 +176,7 @@ def test_identify_priority(
 
 
 def test_identify_with_non_portable_api_vault(
-    vault2, tenant, tenant_sandbox_obc, twilio, sandbox_id
+    vault2, tenant, tenant_sandbox_obc, sandbox_id
 ):
     """
     Create two vaults: one portable made via bifrost at another tenant, and then another made via
@@ -209,9 +197,7 @@ def test_identify_with_non_portable_api_vault(
     post("users", vault_data, tenant.s_sk, sandbox_id_h)
 
     vault2
-    bifrost = BifrostClient.inherit(
-        tenant_sandbox_obc, twilio, FIXTURE_PHONE_NUMBER, sandbox_id
-    )
+    bifrost = BifrostClient.inherit(tenant_sandbox_obc, sandbox_id)
     fp_id = bifrost.run().fp_id
     data = dict(fields=["id.first_name"], reason="flerp")
     body = post(f"users/{fp_id}/vault/decrypt", data, tenant.s_sk)

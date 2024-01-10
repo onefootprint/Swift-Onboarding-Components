@@ -2,7 +2,7 @@ from tests.utils import create_ob_config, get
 from tests.bifrost_client import BifrostClient
 
 
-def test_onboard_onto_multiple_obcs(sandbox_tenant, twilio):
+def test_onboard_onto_multiple_obcs(sandbox_tenant):
     # Will onboard onto this ob config
     REQUIRED_ATTRS = ["phone_number", "email", "full_address", "name"]
     data = {
@@ -28,10 +28,9 @@ def test_onboard_onto_multiple_obcs(sandbox_tenant, twilio):
     ob_config3 = create_ob_config(sandbox_tenant, **data)
 
     # Onboard onto the first ob config
-    bifrost = BifrostClient.new(ob_config1, twilio)
+    bifrost = BifrostClient.new(ob_config1)
     user1 = bifrost.run()
     fp_id = user1.fp_id
-    phone_number = bifrost.data["id.phone_number"]
     sandbox_id = bifrost.sandbox_id
     body = get(f"entities/{fp_id}", None, *sandbox_tenant.db_auths)
     assert set(body["attributes"]) >= {
@@ -43,7 +42,7 @@ def test_onboard_onto_multiple_obcs(sandbox_tenant, twilio):
     assert set(body["decryptable_attributes"]) >= {"id.phone_number", "id.email"}
 
     # Decryption perms don't change after onboarding onto ob config 2, but we can see ssn9
-    bifrost = BifrostClient.inherit(ob_config2, twilio, phone_number, sandbox_id)
+    bifrost = BifrostClient.inherit(ob_config2, sandbox_id)
     bifrost.handle_requirements(kind="collect_data")
     body = get(f"entities/{fp_id}", None, *sandbox_tenant.db_auths)
     assert set(body["attributes"]) >= {
@@ -61,7 +60,7 @@ def test_onboard_onto_multiple_obcs(sandbox_tenant, twilio):
     }
 
     # After onboarding onto ob config 3, we get more decrypt permissions. But, still can't decrypt ssn9
-    bifrost = BifrostClient.inherit(ob_config3, twilio, phone_number, sandbox_id)
+    bifrost = BifrostClient.inherit(ob_config3, sandbox_id)
     user3 = bifrost.run()
     assert user3.fp_id == fp_id
     body = get(f"entities/{fp_id}", None, *sandbox_tenant.db_auths)

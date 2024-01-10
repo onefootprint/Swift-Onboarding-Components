@@ -1,16 +1,109 @@
-import pytest
+import time
+import arrow
+import re
 
 from tests.bifrost_client import BifrostClient
-from tests.utils import get, post, patch, get_requirement_from_requirements
+from tests.headers import FpAuth
+from tests.utils import (
+    get,
+    post,
+    patch,
+    get_requirement_from_requirements,
+    try_until_success,
+    HttpError,
+    NotRetryableException,
+)
+from tests.constants import EMAIL
+
+
+def identify_verify_real_sms(
+    twilio,
+    phone_number,
+    challenge_token,
+    scope,
+    *headers,
+    expected_error=None,
+):
+    def verify(code):
+        data = {
+            "challenge_response": code,
+            "challenge_kind": "sms",
+            "challenge_token": challenge_token,
+            "scope": scope,
+        }
+        body = post("hosted/identify/verify", data, *headers)
+        return FpAuth(body["auth_token"])
+
+    def inner():
+        print(
+            f"At {arrow.now().isoformat()}, looking for 2fac code sent to {phone_number}"
+        )
+        messages = twilio.messages.list(to=phone_number, limit=10)
+        first_error = None
+        for message in messages:
+            code = re.search("\\d{6}", message.body).group(0)
+            if not code:
+                print("No code in message", message.body)
+                # No code in this message, move on
+                continue
+
+            result = None
+            try:
+                print(f"Trying {code}")
+                result = verify(code)
+            except HttpError as e:
+                print("  Got error:", e)
+                if expected_error and expected_error in str(e):
+                    # The specific error we expected to see was returned from verify - we can exit
+                    return
+                if not first_error:
+                    first_error = e
+
+            if result and expected_error:
+                raise NotRetryableException(
+                    "Expected error in identify verify but got result:", result
+                )
+            if result:
+                return result
+
+        if first_error:
+            raise first_error
+        else:
+            ts = arrow.now().isoformat()
+            raise Exception(
+                f"SMS 2fac code is not present to {phone_number}. Failed at: {ts}"
+            )
+
+    time.sleep(2)
+    return try_until_success(inner, 30)
 
 
 def test_onboarding_init(twilio, tenant, live_phone_number, sandbox_tenant):
-    bifrost = BifrostClient.create(
-        # Have to use live phone number in non-sandbox mode
-        tenant.default_ob_config,
+    # Create a user with the live phone number, fetching the OTP from the actual SMS
+    def initiate_challenge():
+        data = dict(phone_number=live_phone_number, email=EMAIL)
+        body = post(
+            "hosted/identify/signup_challenge", data, tenant.default_ob_config.key
+        )
+        return body["challenge_data"]["challenge_token"]
+
+    # Rate limiting may take a while
+    challenge_token = try_until_success(initiate_challenge, 20)
+
+    auth_token = identify_verify_real_sms(
         twilio,
         live_phone_number,
+        challenge_token,
+        "onboarding",
+        tenant.default_ob_config.key,
+    )
+
+    bifrost = BifrostClient.raw_auth(
+        tenant.default_ob_config,
+        auth_token,
         None,
+        override_phone=live_phone_number,
+        override_email=EMAIL,
     )
 
     # Already initialized in bifrost client, but try again to make sure this endpoint is

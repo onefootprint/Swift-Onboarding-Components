@@ -16,18 +16,17 @@ class DualOnboardedUser(NamedTuple):
 
 
 @pytest.fixture(scope="module")
-def dual_onboarded_user(sandbox_tenant, foo_sandbox_tenant, twilio):
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
+def dual_onboarded_user(sandbox_tenant, foo_sandbox_tenant):
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
     sandbox_user = bifrost.run()
     fp_id = sandbox_user.fp_id
 
     #
     # Then onboard them onto foo_sandbox_tenant
     #
-    phone_number = bifrost.data["id.phone_number"]
     sandbox_id = bifrost.sandbox_id
     foo_bifrost = BifrostClient.inherit(
-        foo_sandbox_tenant.default_ob_config, twilio, phone_number, sandbox_id
+        foo_sandbox_tenant.default_ob_config, sandbox_id
     )
 
     # Before the user finishes onboarding to foo_sandbox_tenant, the tenant shouldn't be able to

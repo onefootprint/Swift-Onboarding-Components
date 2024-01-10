@@ -46,8 +46,8 @@ def legal_status_obc(sandbox_tenant):
         },
     ],
 )
-def test_us_legal_status(legal_status_obc, twilio, data):
-    bifrost = BifrostClient.new(legal_status_obc, twilio)
+def test_us_legal_status(legal_status_obc, data):
+    bifrost = BifrostClient.new(legal_status_obc)
     bifrost.data = {
         **bifrost.data,
         **data,
@@ -87,8 +87,8 @@ def test_us_legal_status(legal_status_obc, twilio, data):
         },
     ],
 )
-def test_invalid_us_legal_status(legal_status_obc, twilio, data):
-    bifrost = BifrostClient.new(legal_status_obc, twilio)
+def test_invalid_us_legal_status(legal_status_obc, data):
+    bifrost = BifrostClient.new(legal_status_obc)
     bifrost.data = {
         **bifrost.data,
         **data,

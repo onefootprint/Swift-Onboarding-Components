@@ -32,11 +32,7 @@ def no_phone_user(skip_phone_obc):
     )
 
     bifrost = BifrostClient.raw_auth(
-        skip_phone_obc,
-        FpAuth(res["auth_token"]),
-        FIXTURE_PHONE_NUMBER,
-        sandbox_id,
-        override_email=FIXTURE_EMAIL,
+        skip_phone_obc, FpAuth(res["auth_token"]), sandbox_id
     )
     user = bifrost.run()
 
@@ -84,7 +80,7 @@ def test_new_user(skip_phone_obc):
     auth_token = FpAuth(res["auth_token"])
 
     bifrost = BifrostClient.raw_auth(
-        skip_phone_obc, auth_token, FIXTURE_PHONE_NUMBER, _gen_random_sandbox_id()
+        skip_phone_obc, auth_token, _gen_random_sandbox_id()
     )
 
     reqs = bifrost.get_status()["all_requirements"]
@@ -160,7 +156,7 @@ def test_step_up(no_phone_user, sandbox_tenant):
     auth_token = FpAuth(body["token"])
 
     # Step up the auth token using an email challenge
-    challenge_data = challenge_user(None, "email", auth_token)
+    challenge_data = challenge_user("email", auth_token)
     data = dict(
         challenge_response=FIXTURE_EMAIL_OTP_PIN,
         challenge_token=challenge_data["challenge_token"],
@@ -171,10 +167,7 @@ def test_step_up(no_phone_user, sandbox_tenant):
 
     # And use the auth token to onboard
     bifrost2 = BifrostClient.raw_auth(
-        sandbox_tenant.default_ob_config,
-        auth_token,
-        FIXTURE_PHONE_NUMBER,
-        no_phone_user.client.sandbox_id,
+        sandbox_tenant.default_ob_config, auth_token, no_phone_user.client.sandbox_id
     )
     user2 = bifrost2.run()
     assert user2.fp_id == no_phone_user.fp_id

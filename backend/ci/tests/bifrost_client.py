@@ -8,8 +8,8 @@ from tests.constants import (
     BUSINESS_DATA,
     IP_DATA,
     CDO_TO_DIS,
-    EMAIL,
     FIXTURE_PHONE_NUMBER,
+    FIXTURE_EMAIL,
 )
 from tests.webauthn_simulator import SoftWebauthnDevice
 from tests.utils import (
@@ -29,39 +29,35 @@ from tests.utils import (
 class BifrostClient:
     """
     BifrostClient simulates Footprint hosted frontend's requests to the backend APIs.
+    By default, the BifrostClient is created with a user that has the FIXTURE_PHONE_NUMBER and
+    FIXTURE_EMAIl
     """
 
     def raw_auth(
         ob_config,
         auth_token,
-        phone_number,
         sandbox_id,
+        override_phone=None,
         override_email=None,
     ):
         """
         Create an instance of BifrostClient that uses the provided auth token.
         """
         return BifrostClient(
-            ob_config, auth_token, phone_number, sandbox_id, override_email
+            ob_config, auth_token, sandbox_id, override_phone, override_email
         )
 
-    def inherit(
-        ob_config, twilio, phone_number, sandbox_id, override_ob_config_auth=None
-    ):
+    def inherit(ob_config, sandbox_id, override_ob_config_auth=None):
         """
         Create an instance of BifrostClient that inherits the user with the provided phone number.
         """
         ob_config_auth = override_ob_config_auth or ob_config.key
         sandbox_id_header = [SandboxId(sandbox_id)] if sandbox_id else []
-        auth = inherit_user(
-            twilio, phone_number, "onboarding", ob_config_auth, *sandbox_id_header
-        )
-        return BifrostClient(ob_config, auth, phone_number, sandbox_id)
+        auth = inherit_user("onboarding", ob_config_auth, *sandbox_id_header)
+        return BifrostClient(ob_config, auth, sandbox_id)
 
     def create(
         ob_config,
-        twilio,
-        phone_number,
         sandbox_id,
         override_ob_config_auth=None,
         override_email=None,
@@ -71,48 +67,40 @@ class BifrostClient:
         """
         ob_config_auth = override_ob_config_auth or ob_config.key
         sandbox_id_header = [SandboxId(sandbox_id)] if sandbox_id else []
-        email = override_email or EMAIL
         auth_token = create_user(
-            twilio,
-            phone_number,
-            email,
             "onboarding",
             ob_config_auth,
             *sandbox_id_header,
         )
-        return BifrostClient(
-            ob_config, auth_token, phone_number, sandbox_id, override_email
-        )
+        return BifrostClient(ob_config, auth_token, sandbox_id, override_email)
 
-    def new(ob_config, twilio, override_ob_config_auth=None):
+    def new(ob_config, override_ob_config_auth=None):
         """
         Create an instance of BifrostClient that creates a new sandbox user with the fixture phone number
         """
         ob_config_auth = override_ob_config_auth or ob_config.key
         sandbox_id = _gen_random_sandbox_id()
         auth_token = create_user(
-            twilio,
-            FIXTURE_PHONE_NUMBER,
-            EMAIL,
             "onboarding",
             ob_config_auth,
             SandboxId(sandbox_id),
         )
-        return BifrostClient(ob_config, auth_token, FIXTURE_PHONE_NUMBER, sandbox_id)
+        return BifrostClient(ob_config, auth_token, sandbox_id)
 
     def __init__(
         self,
         ob_config,
         auth_token,
-        phone_number,
         sandbox_id,
+        override_phone=None,
         override_email=None,
     ):
         self.ob_config = ob_config
         self.auth_token = auth_token
         self.sandbox_id = sandbox_id
 
-        email = override_email or EMAIL
+        phone_number = override_phone or FIXTURE_PHONE_NUMBER
+        email = override_email or FIXTURE_EMAIL
         if sandbox_id:
             # Edit the business name to have the same suffix as the phone number for more visibility
             business_name = f'{BUSINESS_DATA["business.name"]} {sandbox_id}'

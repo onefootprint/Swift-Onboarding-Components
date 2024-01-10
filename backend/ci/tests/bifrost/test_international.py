@@ -2,7 +2,7 @@ from tests.bifrost_client import BifrostClient
 from tests.utils import get_requirement_from_requirements, create_ob_config, patch
 
 
-def test_international_address_req(sandbox_tenant, must_collect_data, twilio):
+def test_international_address_req(sandbox_tenant, must_collect_data):
     obc = create_ob_config(
         sandbox_tenant,
         "International config",
@@ -10,7 +10,7 @@ def test_international_address_req(sandbox_tenant, must_collect_data, twilio):
         must_collect_data,
         allow_international_residents=True,
     )
-    bifrost = BifrostClient.new(obc, twilio)
+    bifrost = BifrostClient.new(obc)
 
     # Add address line 1 and country, which is sufficient ONLY if the country is non-US
     data = {"id.address_line1": "730 Hayes St", "id.country": "US"}
@@ -38,7 +38,7 @@ def test_international_address_req(sandbox_tenant, must_collect_data, twilio):
 
 
 def test_user_without_documents_international(
-    sandbox_tenant, must_collect_data, can_access_data, twilio
+    sandbox_tenant, must_collect_data, can_access_data
 ):
     obc = create_ob_config(
         sandbox_tenant,
@@ -47,7 +47,7 @@ def test_user_without_documents_international(
         can_access_data,
         allow_international_residents=True,
     )
-    bifrost = BifrostClient.new(obc, twilio)
+    bifrost = BifrostClient.new(obc)
     status = bifrost.get_status()
     doc_requirement_before = get_requirement_from_requirements(
         "collect_document", status["all_requirements"]
@@ -79,7 +79,7 @@ def test_user_without_documents_international(
 
 
 def test_with_documents_handles_international_address(
-    sandbox_tenant, must_collect_data, can_access_data, twilio
+    sandbox_tenant, must_collect_data, can_access_data
 ):
     obc = create_ob_config(
         sandbox_tenant,
@@ -88,7 +88,7 @@ def test_with_documents_handles_international_address(
         can_access_data + ["document_and_selfie"],
         allow_international_residents=True,
     )
-    bifrost = BifrostClient.new(obc, twilio)
+    bifrost = BifrostClient.new(obc)
     bifrost.data["id.country"] = "MX"
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
@@ -115,7 +115,7 @@ def test_with_documents_handles_international_address(
 
 
 def test_with_documents_handles_international_address_restricted_documents(
-    sandbox_tenant, must_collect_data, can_access_data, twilio
+    sandbox_tenant, must_collect_data, can_access_data
 ):
     obc = create_ob_config(
         sandbox_tenant,
@@ -125,7 +125,7 @@ def test_with_documents_handles_international_address_restricted_documents(
         allow_international_residents=True,
         international_country_restrictions=["MX", "NO"],
     )
-    bifrost = BifrostClient.new(obc, twilio)
+    bifrost = BifrostClient.new(obc)
     bifrost.data["id.country"] = "MX"
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
@@ -147,7 +147,7 @@ def test_with_documents_handles_international_address_restricted_documents(
 
 
 def test_with_documents_handles_international_address_restricted_documents_with_dl(
-    sandbox_tenant, must_collect_data, can_access_data, twilio
+    sandbox_tenant, must_collect_data, can_access_data
 ):
     # in this test we expect to see the following behavior:
     #
@@ -162,7 +162,7 @@ def test_with_documents_handles_international_address_restricted_documents_with_
         allow_international_residents=True,
         international_country_restrictions=["US", "MX", "NO"],
     )
-    bifrost = BifrostClient.new(obc, twilio)
+    bifrost = BifrostClient.new(obc)
     status_before_address = bifrost.get_status()
     doc_requirement_before_address = get_requirement_from_requirements(
         "collect_document", status_before_address["all_requirements"]
@@ -197,7 +197,7 @@ def test_with_documents_handles_international_address_restricted_documents_with_
         assert doc == ["passport"]
 
 
-def test_us_legal_status(sandbox_tenant, twilio):
+def test_us_legal_status(sandbox_tenant):
     obc = create_ob_config(
         sandbox_tenant,
         "KYC with legal status",
@@ -218,7 +218,7 @@ def test_us_legal_status(sandbox_tenant, twilio):
         optional_data=[],
         allow_international_residents=True,
     )
-    bifrost = BifrostClient.new(obc, twilio)
+    bifrost = BifrostClient.new(obc)
 
     status_before_address = bifrost.get_status()
     collect_data_requirement_before_address = get_requirement_from_requirements(

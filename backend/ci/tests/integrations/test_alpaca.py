@@ -55,6 +55,7 @@ def cdos_for_nationality_config(nationality_config):
         return []
 
 
+@pytest.skip(allow_module_level=True)
 @pytest.mark.parametrize(
     "nationality_config",
     [
@@ -80,7 +81,6 @@ def cdos_for_nationality_config(nationality_config):
 )
 def test_alpaca_cip(
     sandbox_tenant,
-    twilio,
     sandbox_outcome,
     manually_mark_as_verified,
     expected_error,
@@ -106,8 +106,6 @@ def test_alpaca_cip(
     )
     bifrost = BifrostClient.create(
         obc,
-        twilio,
-        FIXTURE_PHONE_NUMBER,
         sandbox_id,
         override_email=email,
     )

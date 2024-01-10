@@ -9,14 +9,13 @@ from tests.headers import SandboxId
 
 
 @pytest.fixture(scope="module")
-def auth_token(sandbox_user, twilio):
+def auth_token(sandbox_user):
     """
     My1fp-specific auth token
     """
-    phone_number = sandbox_user.client.data["id.phone_number"]
     sandbox_id = sandbox_user.client.sandbox_id
     # Specifically inherit the user through the identify flow without providing any ob public key auth
-    auth_token = inherit_user(twilio, phone_number, "my1fp", SandboxId(sandbox_id))
+    auth_token = inherit_user("my1fp", SandboxId(sandbox_id))
     body = get("/hosted/user/token", None, auth_token)
     assert set(body["scopes"]) == {"basic_profile", "explicit_auth"}
     return auth_token

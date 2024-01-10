@@ -51,13 +51,11 @@ def test_basic_auth(sandbox_tenant):
     ],
 )
 def test_get_user(
-    twilio, sandbox_tenant, sandbox_id, expected_status, expected_requires_manual_review
+    sandbox_tenant, sandbox_id, expected_status, expected_requires_manual_review
 ):
     seed = _gen_random_n_digit_number(10)
     sandbox_id = f"{sandbox_id}{seed}"
-    bifrost = BifrostClient.create(
-        sandbox_tenant.default_ob_config, twilio, FIXTURE_PHONE_NUMBER, sandbox_id
-    )
+    bifrost = BifrostClient.create(sandbox_tenant.default_ob_config, sandbox_id)
     user = bifrost.run()
 
     body = get(f"/users/{user.fp_id}", None, sandbox_tenant.sk.key)
@@ -66,13 +64,11 @@ def test_get_user(
     assert body["status"] == expected_status
 
 
-def test_check_session(sandbox_tenant, twilio):
+def test_check_session(sandbox_tenant):
     seed = _gen_random_n_digit_number(10)
     sandbox_id = f"session_check_{seed}"
 
-    bifrost = BifrostClient.create(
-        sandbox_tenant.default_ob_config, twilio, FIXTURE_PHONE_NUMBER, sandbox_id
-    )
+    bifrost = BifrostClient.create(sandbox_tenant.default_ob_config, sandbox_id)
     bifrost.run()
     body = get(f"hosted/check_session", None, bifrost.auth_token)
     assert body == "active"

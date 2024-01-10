@@ -1,4 +1,3 @@
-import re
 import string
 import requests
 import base64
@@ -15,10 +14,10 @@ from tests.constants import (
     TEST_URL,
     FIXTURE_PHONE_NUMBER,
     FIXTURE_EMAIL_OTP_PIN,
+    FIXTURE_EMAIL,
 )
 
 url = lambda path: "{}/{}".format(TEST_URL, path.strip("/"))
-from datetime import datetime, timedelta
 
 
 SERVER_VERSION_HEADER = "x-footprint-server-version"
@@ -213,9 +212,7 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
         raise last_exception
 
 
-def step_up_user(
-    twilio, token, recipient_phone_number, expect_unverified, token_scope="onboarding"
-):
+def step_up_user(token, expect_unverified, token_scope="onboarding"):
     """
     Step up a token from unauthed, "identified" to authed with onboarding scope
     """
@@ -226,12 +223,10 @@ def step_up_user(
     body = identify_user(None, token)
     assert "sms" in body["available_challenge_kinds"]
     assert body["is_unverified"] == expect_unverified
-    challenge_data = challenge_user(recipient_phone_number, "sms", token)
+    challenge_data = challenge_user("sms", token)
 
     # Log in as the user
     new_token = identify_verify(
-        twilio,
-        recipient_phone_number,
         challenge_data["challenge_token"],
         token_scope,
         token,
@@ -257,15 +252,13 @@ def step_up_user(
 
 # TODO we're probably pretty close to needing an IdentifyClient like bifrost client to orchestrate
 # all of this logic :P
-def inherit_user(twilio, phone_number, scope, *headers):
-    body = identify_user(dict(phone_number=phone_number), *headers)
+def inherit_user(scope, *headers):
+    body = identify_user(dict(phone_number=FIXTURE_PHONE_NUMBER), *headers)
     assert "sms" in body["available_challenge_kinds"]
-    challenge_data = challenge_user(phone_number, "sms", *headers)
+    challenge_data = challenge_user("sms", *headers)
 
     # Log in as the user
     return identify_verify(
-        twilio,
-        phone_number,
         challenge_data["challenge_token"],
         scope,
         *headers,
@@ -285,7 +278,7 @@ def inherit_user_biometric(user, token_kind, *headers):
     )
     assert "biometric" in body["available_challenge_kinds"]
     challenge_data = challenge_user(
-        phone_number, "biometric", user.client.ob_config.key, *sandbox_id_h, *headers
+        "biometric", user.client.ob_config.key, *sandbox_id_h, *headers
     )
     body = biometric_challenge_response(
         challenge_data,
@@ -331,12 +324,9 @@ def inherit_user_email(user):
 
 def step_up_user_biometric(auth_token, user, scope):
     # Don't technically need to pass in the phone number to step up, but the util takes it in
-    phone_number = user.client.data["id.phone_number"]
     sandbox_id = user.client.sandbox_id
     sandbox_id_h = [SandboxId(sandbox_id)] if sandbox_id else []
-    challenge_data = challenge_user(
-        phone_number, "biometric", auth_token, *sandbox_id_h
-    )
+    challenge_data = challenge_user("biometric", auth_token, *sandbox_id_h)
     body = biometric_challenge_response(
         challenge_data, user, scope, auth_token, *sandbox_id_h
     )
@@ -387,9 +377,9 @@ def identify_user(identifier, *headers):
     return try_until_success(identify, 5)
 
 
-def challenge_user(phone_number, challenge_kind, *headers):
+def challenge_user(challenge_kind, *headers):
     # Some challenges may be invoked via token instead of phone_number
-    identifier = dict(phone_number=phone_number) if phone_number else None
+    identifier = dict(phone_number=FIXTURE_PHONE_NUMBER)
 
     def challenge():
         data = dict(
@@ -403,7 +393,7 @@ def challenge_user(phone_number, challenge_kind, *headers):
 
         body = post("hosted/identify/login_challenge", data, *headers)
         if challenge_kind == "sms":
-            last_two = phone_number[-2:]
+            last_two = FIXTURE_PHONE_NUMBER[-2:]
             assert (
                 body["challenge_data"]["scrubbed_phone_number"]
                 == f"+1 (***) ***-**{last_two}"
@@ -414,10 +404,7 @@ def challenge_user(phone_number, challenge_kind, *headers):
     return try_until_success(challenge, 20)
 
 
-# TODO now that most tests do _not_ send SMSes, we can probably simplify these utils massively
 def identify_verify(
-    twilio,
-    phone_number,
     challenge_token,
     scope,
     *headers,
@@ -434,69 +421,25 @@ def identify_verify(
         return FpAuth(body["auth_token"])
 
     result = None
-    if phone_number == FIXTURE_PHONE_NUMBER:
-        # The code for the fixture number in sandbox is fixed
-        try:
-            result = verify("000000")
-        except HttpError as e:
-            if expected_error and expected_error in str(e):
-                # The specific error we expected to see was returned from verify - we can exit
-                return
-            raise e
-        if result and expected_error:
-            raise NotRetryableException(
-                "Expected error in identify verify but got result:", result
-            )
-        return result
-
-    def inner():
-        print(
-            f"At {arrow.now().isoformat()}, looking for 2fac code sent to {phone_number}"
+    # The code for the fixture number in sandbox is fixed
+    try:
+        result = verify("000000")
+    except HttpError as e:
+        if expected_error and expected_error in str(e):
+            # The specific error we expected to see was returned from verify - we can exit
+            return
+        raise e
+    if result and expected_error:
+        raise NotRetryableException(
+            "Expected error in identify verify but got result:", result
         )
-        messages = twilio.messages.list(to=phone_number, limit=10)
-        first_error = None
-        for message in messages:
-            code = re.search("\\d{6}", message.body).group(0)
-            if not code:
-                print("No code in message", message.body)
-                # No code in this message, move on
-                continue
-
-            result = None
-            try:
-                print(f"Trying {code}")
-                result = verify(code)
-            except HttpError as e:
-                print("  Got error:", e)
-                if expected_error and expected_error in str(e):
-                    # The specific error we expected to see was returned from verify - we can exit
-                    return
-                if not first_error:
-                    first_error = e
-
-            if result and expected_error:
-                raise NotRetryableException(
-                    "Expected error in identify verify but got result:", result
-                )
-            if result:
-                return result
-
-        if first_error:
-            raise first_error
-        else:
-            ts = arrow.now().isoformat()
-            raise Exception(
-                f"SMS 2fac code is not present to {phone_number}. Failed at: {ts}"
-            )
-
-    time.sleep(2)
-    return try_until_success(inner, 30)
+    return result
 
 
-def create_user(twilio, phone_number, email, token_kind, *headers) -> str:
+def create_user(token_kind, *headers) -> str:
     # Initiate the challenge to a sandbox phone number
     def initiate_challenge():
-        data = dict(phone_number=phone_number, email=email)
+        data = dict(phone_number=FIXTURE_PHONE_NUMBER, email=FIXTURE_EMAIL)
         body = post("hosted/identify/signup_challenge", data, *headers)
         return body["challenge_data"]["challenge_token"]
 
@@ -504,7 +447,7 @@ def create_user(twilio, phone_number, email, token_kind, *headers) -> str:
     challenge_token = try_until_success(initiate_challenge, 20)
 
     # Respond to the challenge and create the user
-    return identify_verify(twilio, phone_number, challenge_token, token_kind, *headers)
+    return identify_verify(challenge_token, token_kind, *headers)
 
 
 def create_tenant(org_data, ob_conf_data):

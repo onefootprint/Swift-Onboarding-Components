@@ -7,7 +7,7 @@ from tests.utils import (
     create_ob_config,
     _gen_random_sandbox_id,
 )
-from tests.constants import FIXTURE_PHONE_NUMBER, EMAIL
+from tests.constants import FIXTURE_PHONE_NUMBER, FIXTURE_EMAIL
 from tests.headers import (
     PublishableOnboardingKey,
     SandboxId,
@@ -96,7 +96,7 @@ def test_config_detail(sandbox_tenant, ob_configuration):
     assert config["created_at"]
 
 
-def test_config_create(sandbox_tenant, twilio):
+def test_config_create(sandbox_tenant):
     data = dict(
         name="Acme Bank Loan",
         must_collect_data=["ssn4", "phone_number", "email", "name", "full_address"],
@@ -107,14 +107,7 @@ def test_config_create(sandbox_tenant, twilio):
     ob_config_key = PublishableOnboardingKey(ob_config["key"])
 
     sandbox_id = _gen_random_sandbox_id()
-    auth_token = create_user(
-        twilio,
-        FIXTURE_PHONE_NUMBER,
-        EMAIL,
-        "onboarding",
-        ob_config_key,
-        SandboxId(sandbox_id),
-    )
+    auth_token = create_user("onboarding", ob_config_key, SandboxId(sandbox_id))
     post("hosted/onboarding", None, ob_config_key, auth_token)
 
 

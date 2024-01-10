@@ -15,7 +15,7 @@ def ob_config2(sandbox_tenant, must_collect_data):
     return create_ob_config(sandbox_tenant, **ob_conf_data)
 
 
-def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant, twilio):
+def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant):
     sandbox_id = _gen_random_sandbox_id()
     sandbox_id_h = SandboxId(sandbox_id)
 
@@ -23,7 +23,7 @@ def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant, twilio):
     body = post("hosted/identify", identify_data, ob_config2.key, sandbox_id_h)
     assert not body["user_found"]
 
-    bifrost = BifrostClient.create(ob_config2, twilio, FIXTURE_PHONE_NUMBER, sandbox_id)
+    bifrost = BifrostClient.create(ob_config2, sandbox_id)
     bifrost.run()
     assert [i["kind"] for i in bifrost.handled_requirements] == [
         "collect_data",
@@ -48,9 +48,7 @@ def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant, twilio):
         body = post("hosted/identify", data, ob_config2.key, sandbox_id_h)
         assert body["user_found"]
 
-    bifrost2 = BifrostClient.inherit(
-        sandbox_tenant.default_ob_config, twilio, FIXTURE_PHONE_NUMBER, sandbox_id
-    )
+    bifrost2 = BifrostClient.inherit(sandbox_tenant.default_ob_config, sandbox_id)
     bifrost2.run()
     assert [i["kind"] for i in bifrost2.handled_requirements] == [
         "process",
@@ -61,23 +59,19 @@ def test_one_click_same_tenant(sandbox_tenant, ob_config2, tenant, twilio):
     }
 
 
-def test_one_click_same_tenant_no_decryption_bleeding(
-    sandbox_tenant, ob_config2, twilio
-):
+def test_one_click_same_tenant_no_decryption_bleeding(sandbox_tenant, ob_config2):
     # If we onboard onto sandbox_tenant.default_ob_config first, the second onboarding _must_ require authorizing
     # default_ob_config doesn't have full decryption permissions - so if we automatically authorized
     # the second workflow, it would instantly grant decryption permissions to the second workflow
     # that the user didn't already have
     sandbox_id = _gen_random_sandbox_id()
     ob_config = sandbox_tenant.default_ob_config
-    bifrost = BifrostClient.create(ob_config, twilio, FIXTURE_PHONE_NUMBER, sandbox_id)
+    bifrost = BifrostClient.create(ob_config, sandbox_id)
     bifrost.run()
 
     # Now onboard onto second ob config. This ob config needs access to more data than is already
     # granted by the first ob config, so it cannot be automatically authorized
-    bifrost2 = BifrostClient.inherit(
-        ob_config2, twilio, FIXTURE_PHONE_NUMBER, sandbox_id
-    )
+    bifrost2 = BifrostClient.inherit(ob_config2, sandbox_id)
     bifrost2.run()
     assert [i["kind"] for i in bifrost2.handled_requirements] == [
         "authorize",

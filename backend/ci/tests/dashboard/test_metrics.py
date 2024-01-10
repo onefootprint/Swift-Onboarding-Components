@@ -14,7 +14,7 @@ def test_metrics(sandbox_tenant):
         assert m["total_user_onboardings"] >= m["incomplete_user_onboardings"]
 
 
-def test_metrics_for_playbook(sandbox_user, sandbox_tenant, must_collect_data, twilio):
+def test_metrics_for_playbook(sandbox_user, sandbox_tenant, must_collect_data):
     sandbox_user  # Not used, just need this fixture to be used
 
     # Metrics exist when not filtering by anything
@@ -32,7 +32,7 @@ def test_metrics_for_playbook(sandbox_user, sandbox_tenant, must_collect_data, t
     assert body["total_user_onboardings"] == 0
 
     # Onboard a user onto the playbook and show that the metrics increment
-    bifrost = BifrostClient.new(pb, twilio)
+    bifrost = BifrostClient.new(pb)
     bifrost.run()
     body = get("/org/metrics", dict(playbook_id=pb.id), *sandbox_tenant.db_auths)
     assert body["total_user_onboardings"] == 1

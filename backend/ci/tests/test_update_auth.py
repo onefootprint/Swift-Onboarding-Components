@@ -19,17 +19,17 @@ FIXTURE_EMAIL2 = f"sandbox2@onefootprint.com"
 
 
 @pytest.fixture(scope="function")
-def user_with_token(sandbox_tenant, twilio, auth_playbook):
+def user_with_token(sandbox_tenant, auth_playbook):
     """
     An existing user and an auth token for it that can be used to update the user's auth methods
     """
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
     user = bifrost.run()
 
-    return get_auth_token_for_ci_update(user, twilio, auth_playbook)
+    return get_auth_token_for_ci_update(user, auth_playbook)
 
 
-def get_auth_token_for_ci_update(user, twilio, auth_playbook):
+def get_auth_token_for_ci_update(user, auth_playbook):
     def assert_cant_use_token(token, status_code, error_message):
         data = dict(
             kind="sms", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="replace"
@@ -45,11 +45,8 @@ def get_auth_token_for_ci_update(user, twilio, auth_playbook):
     )
 
     # Also test that a playbook with the auth scopes can't be used
-    phone_number = user.client.data["id.phone_number"]
     sandbox_id_h = SandboxId(user.client.sandbox_id)
-    token_for_auth = inherit_user(
-        twilio, phone_number, "auth", auth_playbook.key, sandbox_id_h
-    )
+    token_for_auth = inherit_user("auth", auth_playbook.key, sandbox_id_h)
 
     assert_cant_use_token(
         token_for_auth, 400, "Can only update auth methods using auth issued via API"
@@ -70,9 +67,7 @@ def get_auth_token_for_ci_update(user, twilio, auth_playbook):
     )
 
     # Finally, step up the token so it can be used to initiate a challenge
-    auth_token = step_up_user(
-        twilio, auth_token, FIXTURE_PHONE_NUMBER, False, token_scope="auth"
-    )
+    auth_token = step_up_user(auth_token, False, token_scope="auth")
 
     return (user, auth_token)
 
@@ -168,13 +163,13 @@ def test_replace_passkey(user_with_token):
         )
 
 
-def test_add_passkey(sandbox_tenant, twilio, auth_playbook):
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
+def test_add_passkey(sandbox_tenant, auth_playbook):
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
     # Skip registering a passkey during onboarding so we can add it later
     post("hosted/onboarding/skip_passkey_register", None, bifrost.auth_token)
     user = bifrost.run()
 
-    user, auth_token = get_auth_token_for_ci_update(user, twilio, auth_playbook)
+    user, auth_token = get_auth_token_for_ci_update(user, auth_playbook)
 
     # Add a passkey
     data = dict(

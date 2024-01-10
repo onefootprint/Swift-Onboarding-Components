@@ -22,7 +22,7 @@ def check_webhook(hooky_url, webhook_fpids):
         webhook_fpids.append(fp_id)
 
 
-def test_webhook_e2e(sandbox_tenant, twilio, run_id):
+def test_webhook_e2e(sandbox_tenant, run_id):
     # 1. get the svix app id
     body = get("org/webhook_portal", None, *sandbox_tenant.db_auths)
     assert body["url"]
@@ -63,7 +63,7 @@ def test_webhook_e2e(sandbox_tenant, twilio, run_id):
     p.start()
 
     # 3. fire off a codepath that triggers the webhook (i.e. an onboarding)
-    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config, twilio)
+    bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
     user = bifrost.run()
 
     # 4. Retrieve the webhook message and make sure it's correct

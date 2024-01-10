@@ -20,13 +20,10 @@ class User(typing.NamedTuple):
 
 
 @pytest.fixture(scope="session")
-def authed_user(auth_playbook, sandbox_tenant, twilio):
+def authed_user(auth_playbook, sandbox_tenant):
     sandbox_id = _gen_random_sandbox_id()
     sandbox_id_header = SandboxId(sandbox_id)
     auth_token = create_user(
-        twilio,
-        FIXTURE_PHONE_NUMBER,
-        EMAIL,
         "auth",
         auth_playbook.key,
         sandbox_id_header,
@@ -76,10 +73,7 @@ def test_onboarding_authed_user(authed_user, sandbox_tenant):
     post("hosted/onboarding", None, auth_token, sandbox_tenant.default_ob_config.key)
 
     bifrost = BifrostClient.raw_auth(
-        sandbox_tenant.default_ob_config,
-        auth_token,
-        FIXTURE_PHONE_NUMBER,
-        authed_user.sandbox_id,
+        sandbox_tenant.default_ob_config, auth_token, authed_user.sandbox_id
     )
     user = bifrost.run()
     assert user.fp_id == authed_user.fp_id

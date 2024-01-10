@@ -28,8 +28,8 @@ def restricted_doc_ob_config_only_international(
     )
 
 
-def test_upload_documents(doc_request_sandbox_ob_config, twilio):
-    bifrost = BifrostClient.new(doc_request_sandbox_ob_config, twilio)
+def test_upload_documents(doc_request_sandbox_ob_config):
+    bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
 
     # First, make a few upload sessions that are aborted
     data = {
@@ -72,9 +72,9 @@ def test_upload_documents(doc_request_sandbox_ob_config, twilio):
 
 
 def test_upload_documents_with_ob_config_restriction_legacy_version(
-    restricted_doc_ob_config, twilio
+    restricted_doc_ob_config,
 ):
-    bifrost = BifrostClient.new(restricted_doc_ob_config, twilio)
+    bifrost = BifrostClient.new(restricted_doc_ob_config)
 
     # Manually handle the document requirement with some invalid data
     consent_data = {"consent_language_text": "I consent"}
@@ -113,9 +113,9 @@ def test_upload_documents_with_ob_config_restriction_legacy_version(
 
 
 def test_upload_documents_with_ob_config_restriction(
-    restricted_doc_ob_config_only_international, twilio
+    restricted_doc_ob_config_only_international,
 ):
-    bifrost = BifrostClient.new(restricted_doc_ob_config_only_international, twilio)
+    bifrost = BifrostClient.new(restricted_doc_ob_config_only_international)
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
     # make sure we've collected country
@@ -163,8 +163,8 @@ def test_upload_documents_with_ob_config_restriction(
     assert document_types_to_authorize == ["drivers_license"]
 
 
-def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
-    bifrost = BifrostClient.new(doc_request_sandbox_ob_config, twilio)
+def test_user_skipping_selfie(doc_request_sandbox_ob_config):
+    bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
     bifrost.handle_requirements(kind="collect_data")
     bifrost.handle_requirements(kind="liveness")
     status = bifrost.get_status()
@@ -214,8 +214,8 @@ def test_user_skipping_selfie(doc_request_sandbox_ob_config, twilio):
     bifrost.run()
 
 
-def test_upload_apis(doc_request_sandbox_ob_config, twilio):
-    bifrost = BifrostClient.new(doc_request_sandbox_ob_config, twilio)
+def test_upload_apis(doc_request_sandbox_ob_config):
+    bifrost = BifrostClient.new(doc_request_sandbox_ob_config)
     # consent
     consent_data = {"consent_language_text": "I consent"}
     post("hosted/user/consent", consent_data, bifrost.auth_token)
