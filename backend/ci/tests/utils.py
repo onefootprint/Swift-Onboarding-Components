@@ -334,6 +334,18 @@ def step_up_user_biometric(auth_token, user, scope):
     return FpAuth(body["auth_token"])
 
 
+def step_up_user_email(auth_token, scope):
+    challenge_data = challenge_user("email", auth_token)
+    data = {
+        "challenge_response": "000000",
+        "challenge_kind": "email",
+        "challenge_token": challenge_data["challenge_token"],
+        "scope": scope,
+    }
+    body = post("hosted/identify/verify", data, auth_token)
+    return FpAuth(body["auth_token"])
+
+
 def biometric_challenge_response(challenge_data, user, scope, *headers):
     # do webauthn
     chal = json.loads(challenge_data["biometric_challenge_json"])

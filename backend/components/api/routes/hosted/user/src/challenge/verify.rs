@@ -26,9 +26,11 @@ use chrono::Utc;
 use crypto::sha256;
 use db::models::auth_event::AuthEvent;
 use db::models::auth_event::NewAuthEvent;
+use db::models::contact_info::ContactInfo;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::TxnPgConn;
+use itertools::Itertools;
 use newtypes::AuthEventKind;
 use newtypes::ContactInfoKind;
 use newtypes::DataLifetimeSource;
@@ -168,11 +170,23 @@ impl Action {
             .scoped_user_id()
             .ok_or(ValidationError("Cannot update contact info without scoped vault"))?;
         let vw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv_id)?;
+        let vault_id = user_auth.user_vault_id();
         let (event_kind, passkey_cred_id) = match self {
             Self::ReplaceContactInfo { kind, data } => {
-                if action_kind != ActionKind::Replace {
-                    // We should build support for this in the future
-                    return ValidationError("Can only replace email and phone number for now").into();
+                match action_kind {
+                    ActionKind::Replace => {} // Existing data will be deactivated below
+                    ActionKind::AddPrimary => {
+                        // Make sure there isn't already a verified CI at any tenant.
+                        // This will have a weird side effect where if the current tenant can't see
+                        // a phone number that was added by another tenant, there will be no way
+                        // to add a phone number to the current tenant
+                        let dis = data.keys().cloned().collect_vec();
+                        let existing_ci = ContactInfo::list(conn, vault_id, dis)?;
+                        if existing_ci.iter().any(|ci| ci.is_otp_verified) {
+                            return ValidationError("Cannot add primary contact info when it already exists")
+                                .into();
+                        }
+                    }
                 }
                 vw.replace_verified_ci(conn, data, DataLifetimeSource::Hosted)?;
                 (kind, None)
@@ -180,10 +194,10 @@ impl Action {
             Self::RegisterWebauthnCred(res) => {
                 match action_kind {
                     ActionKind::Replace => {
-                        WebauthnCredential::deactivate(conn, user_auth.user_vault_id())?;
+                        WebauthnCredential::deactivate(conn, vault_id)?;
                     }
                     ActionKind::AddPrimary => {
-                        let existing = WebauthnCredential::list(conn, user_auth.user_vault_id())?;
+                        let existing = WebauthnCredential::list(conn, vault_id)?;
                         if !existing.is_empty() {
                             return ValidationError("Cannot add primary passkey when one already exists.")
                                 .into();

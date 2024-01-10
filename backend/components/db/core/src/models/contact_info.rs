@@ -5,6 +5,8 @@ use db_schema::schema::contact_info;
 use diesel::prelude::*;
 use diesel::Queryable;
 use newtypes::ContactInfoPriority;
+use newtypes::DataIdentifier;
+use newtypes::VaultId;
 use newtypes::{ContactInfoId, DataLifetimeId};
 
 #[derive(Debug, Clone, Queryable)]
@@ -76,6 +78,18 @@ impl ContactInfo {
         let result = contact_info::table
             .filter(contact_info::lifetime_id.eq(lifetime_id))
             .get_result(conn)?;
+        Ok(result)
+    }
+
+    #[tracing::instrument("ContactInfo::list", skip_all)]
+    pub fn list(conn: &mut PgConn, vault_id: &VaultId, kinds: Vec<DataIdentifier>) -> DbResult<Vec<Self>> {
+        use db_schema::schema::data_lifetime;
+        let result = contact_info::table
+            .inner_join(data_lifetime::table)
+            .filter(data_lifetime::vault_id.eq(vault_id))
+            .filter(data_lifetime::kind.eq_any(kinds))
+            .select(contact_info::all_columns)
+            .get_results::<Self>(conn)?;
         Ok(result)
     }
 }

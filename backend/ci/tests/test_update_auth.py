@@ -4,6 +4,7 @@ from tests.bifrost_client import BifrostClient
 from tests.headers import FpAuth, SandboxId
 from tests.utils import (
     HttpError,
+    _gen_random_sandbox_id,
     post,
     override_webauthn_challenge,
     override_webauthn_attestation,
@@ -11,8 +12,14 @@ from tests.utils import (
     inherit_user_biometric,
     step_up_user,
     step_up_user_biometric,
+    step_up_user_email,
 )
-from tests.constants import TEST_URL, FIXTURE_PHONE_NUMBER
+from tests.constants import (
+    TEST_URL,
+    FIXTURE_PHONE_NUMBER,
+    FIXTURE_EMAIL,
+    FIXTURE_EMAIL_OTP_PIN,
+)
 from tests.webauthn_simulator import SoftWebauthnDevice
 
 FIXTURE_PHONE_NUMBER2 = "+15555550111"
@@ -102,28 +109,97 @@ def test_replace_ci(sandbox_tenant, challenge, di, user_with_token):
     )
 
 
-def test_fail_to_add_passkey(user_with_token):
+def test_add_phone(sandbox_tenant, skip_phone_obc):
+    sandbox_id = _gen_random_sandbox_id()
+    headers = [skip_phone_obc.key, SandboxId(sandbox_id)]
+
+    # Create a user on a skip_phone OBC so they don't have a phone
+    data = dict(email=FIXTURE_EMAIL)
+    res = post("hosted/identify/signup_challenge", data, *headers)
+    challenge_token = res["challenge_data"]["challenge_token"]
+
+    data = dict(
+        challenge_response=FIXTURE_EMAIL_OTP_PIN,
+        challenge_token=challenge_token,
+        scope="onboarding",
+    )
+    body = post("hosted/identify/verify", data, *headers)
+
+    bifrost = BifrostClient.raw_auth(
+        skip_phone_obc,
+        FpAuth(body["auth_token"]),
+        FIXTURE_PHONE_NUMBER,
+        sandbox_id,
+        override_email=FIXTURE_EMAIL,
+    )
+    user = bifrost.run()
+
+    # Create an auth token with permissions to update contact info
+    data = dict(kind="user")
+    body = post(f"users/{user.fp_id}/token", data, user.client.ob_config.tenant.sk.key)
+    auth_token = FpAuth(body["token"])
+
+    auth_token = step_up_user_email(auth_token, "auth")
+
+    # Replace the contact info with a challenge
+    data = dict(
+        kind="sms", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="add_primary"
+    )
+    body = post("hosted/user/challenge", data, auth_token)
+    challenge_token = body["challenge_token"]
+    data = dict(challenge_token=challenge_token, challenge_response="000000")
+    body = post("hosted/user/challenge/verify", data, auth_token)
+
+    # Make sure the contact info has been updated
+    data = dict(fields=["id.phone_number"], reason="Blah")
+    body = post(f"entities/{user.fp_id}/vault/decrypt", data, *sandbox_tenant.db_auths)
+    assert body["id.phone_number"] == FIXTURE_PHONE_NUMBER2
+
+
+def test_add_email(user_with_token, sandbox_tenant):
+    user, auth_token = user_with_token
+
+    # Replace the contact info with a challenge
+    data = dict(kind="email", email=FIXTURE_EMAIL2, action_kind="add_primary")
+    body = post("hosted/user/challenge", data, auth_token)
+    challenge_token = body["challenge_token"]
+    data = dict(challenge_token=challenge_token, challenge_response="000000")
+    body = post("hosted/user/challenge/verify", data, auth_token)
+
+    # Make sure the contact info has been updated
+    data = dict(fields=["id.email"], reason="Blah")
+    body = post(f"entities/{user.fp_id}/vault/decrypt", data, *sandbox_tenant.db_auths)
+    assert body["id.email"] == FIXTURE_EMAIL2
+
+
+@pytest.mark.parametrize(
+    "kind,expected_error",
+    [
+        ("sms", "Cannot add primary contact info when it already exists"),
+        ("passkey", "Cannot add primary passkey when one already exists."),
+    ],
+)
+def test_fail_to_add_primary(user_with_token, kind, expected_error):
     _, auth_token = user_with_token
 
     # Try to add a passkey
     data = dict(
-        kind="passkey", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="add_primary"
+        kind=kind, phone_number=FIXTURE_PHONE_NUMBER2, action_kind="add_primary"
     )
     body = post("hosted/user/challenge", data, auth_token)
 
     challenge_token = body["challenge_token"]
-    chal = override_webauthn_challenge(json.loads(body["biometric_challenge_json"]))
-    webauthn_device = SoftWebauthnDevice()
-    attestation = webauthn_device.create(chal, TEST_URL)
-    attestation = override_webauthn_attestation(attestation)
-    data = dict(
-        challenge_token=challenge_token, challenge_response=json.dumps(attestation)
-    )
+    if kind == "passkey":
+        chal = override_webauthn_challenge(json.loads(body["biometric_challenge_json"]))
+        webauthn_device = SoftWebauthnDevice()
+        attestation = webauthn_device.create(chal, TEST_URL)
+        attestation = override_webauthn_attestation(attestation)
+        challenge_response = json.dumps(attestation)
+    else:
+        challenge_response = "000000"
+    data = dict(challenge_token=challenge_token, challenge_response=challenge_response)
     body = post("hosted/user/challenge/verify", data, auth_token, status_code=400)
-    assert (
-        body["error"]["message"]
-        == "Cannot add primary passkey when one already exists."
-    )
+    assert body["error"]["message"] == expected_error
 
 
 def test_replace_passkey(user_with_token):

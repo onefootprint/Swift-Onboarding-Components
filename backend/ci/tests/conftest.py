@@ -160,6 +160,18 @@ def doc_request_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_
 
 
 @pytest.fixture(scope="session")
+def skip_phone_obc(sandbox_tenant):
+    return create_ob_config(
+        sandbox_tenant,
+        "skip phone",
+        must_collect_data=["full_address", "name", "email"],
+        can_access_data=["full_address", "name", "email"],
+        optional_data=[],
+        is_no_phone_flow=True,
+    )
+
+
+@pytest.fixture(scope="session")
 def kyb_cdos():
     return [
         "business_name",

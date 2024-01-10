@@ -18,15 +18,3 @@ def doc_first_obc(sandbox_tenant):
         can_access_data=["phone_number", "full_address", "name", "email"],
         is_doc_first_flow=True,
     )
-
-
-@pytest.fixture(scope="session")
-def skip_phone_obc(sandbox_tenant):
-    return create_ob_config(
-        sandbox_tenant,
-        "skip phone",
-        must_collect_data=["full_address", "name", "email"],
-        can_access_data=["full_address", "name", "email"],
-        optional_data=[],
-        is_no_phone_flow=True,
-    )
