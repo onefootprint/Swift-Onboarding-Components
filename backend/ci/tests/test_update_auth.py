@@ -10,6 +10,7 @@ from tests.utils import (
     inherit_user,
     inherit_user_biometric,
     step_up_user,
+    step_up_user_biometric,
 )
 from tests.constants import TEST_URL, FIXTURE_PHONE_NUMBER
 from tests.webauthn_simulator import SoftWebauthnDevice
@@ -128,10 +129,17 @@ def test_fail_to_add_passkey(user_with_token):
 def test_replace_passkey(user_with_token):
     user, auth_token = user_with_token
 
-    # Replace the passkey
+    # Can't replace the passkey with this auth token since it only has an SMS auth event
     data = dict(
         kind="passkey", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="replace"
     )
+    body = post("hosted/user/challenge", data, auth_token, status_code=400)
+    assert body["error"]["message"] == "Cannot initiate challenge of kind biometric"
+
+    # Step up the token using a passkey
+    auth_token = step_up_user_biometric(auth_token, user, scope="auth")
+
+    # Then can initiate replacing the paasskey
     body = post("hosted/user/challenge", data, auth_token)
 
     challenge_token = body["challenge_token"]

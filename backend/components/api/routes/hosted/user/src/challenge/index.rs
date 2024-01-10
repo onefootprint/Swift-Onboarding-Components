@@ -1,6 +1,8 @@
 use super::RegisterChallengeData;
 use crate::challenge::RegisterChallenge;
 use crate::State;
+use api_core::auth::session::user::AssociatedAuthEventKind;
+use api_core::auth::user::load_auth_events;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::user::UserAuthGuard;
 use api_core::auth::IsGuardMet;
@@ -13,9 +15,12 @@ use api_core::utils::challenge::Challenge;
 use api_core::utils::email::send_email_challenge_non_blocking;
 use api_core::utils::passkey::WebauthnConfig;
 use api_core::utils::sms::rx_background_error;
+use api_wire_types::ActionKind;
 use api_wire_types::ErrorChallengeResponse;
 use api_wire_types::UserChallengeRequest;
 use api_wire_types::UserChallengeResponse;
+use itertools::Itertools;
+use newtypes::AuthEventKind;
 use newtypes::ChallengeKind;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -39,6 +44,20 @@ pub async fn post(
         kind,
         action_kind,
     } = request.into_inner();
+
+    let auth_events = user_auth.auth_events.clone();
+    let auth_events = state
+        .db_pool
+        .db_query(move |conn| load_auth_events(conn, &auth_events))
+        .await??;
+    let allowed_challenge_kinds = auth_events
+        .iter()
+        .flat_map(|(ae, kind)| allowed_challenge_kinds(action_kind, ae.kind, *kind))
+        .unique()
+        .collect_vec();
+    if !allowed_challenge_kinds.contains(&kind) {
+        return ValidationError(&format!("Cannot initiate challenge of kind {}", kind,)).into();
+    }
 
     let tenant = user_auth.tenant();
     let uv = user_auth.user.clone();
@@ -111,4 +130,59 @@ pub async fn post(
         time_before_retry_s,
     };
     ResponseData::ok(response).json()
+}
+
+/// Given the requested action_kind and the kind of the explicit AuthEvents associated with this
+/// token, returns what kind of ChallengeKinds are allowed to be initiated
+fn allowed_challenge_kinds(
+    action_kind: ActionKind,
+    auth_factor: AuthEventKind,
+    ae_kind: AssociatedAuthEventKind,
+) -> Vec<ChallengeKind> {
+    if ae_kind != AssociatedAuthEventKind::Explicit {
+        // Only Explicit AuthEvents allow updating/replacing auth methods
+        return vec![];
+    }
+    if auth_factor == AuthEventKind::ThirdParty {
+        // Third-party auth (attested by the tenant) should not allow editing contact info.
+        // Third-party auth is also always implicit, so we'll hit the case above. But just being extra safe.
+        return vec![];
+    }
+    match (action_kind, auth_factor) {
+        // If this is the first time this auth method is added, it's allowed
+        // TODO this would also allow adding a passkey with a SIM-swapped phone if there's no passkey yet
+        (ActionKind::AddPrimary, _) => vec![ChallengeKind::Email, ChallengeKind::Sms, ChallengeKind::Passkey],
+        (ActionKind::Replace, AuthEventKind::Email | AuthEventKind::Sms) => {
+            vec![ChallengeKind::Email, ChallengeKind::Sms]
+        }
+        (ActionKind::Replace, AuthEventKind::Passkey) => {
+            // Authing with a passkey allows editing any form of contact info
+            vec![ChallengeKind::Email, ChallengeKind::Sms, ChallengeKind::Passkey]
+        }
+        (_, AuthEventKind::ThirdParty) => vec![],
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::challenge::ActionKind;
+    use api_core::auth::session::user::AssociatedAuthEventKind;
+    use newtypes::{AuthEventKind, ChallengeKind};
+    use test_case::test_case;
+
+    use super::allowed_challenge_kinds;
+
+    #[test_case(ActionKind::AddPrimary, AuthEventKind::Passkey, AssociatedAuthEventKind::Implicit => Vec::<ChallengeKind>::new(); "no-challenges-allowed-for-implicit")]
+    #[test_case(ActionKind::Replace, AuthEventKind::ThirdParty, AssociatedAuthEventKind::Explicit => Vec::<ChallengeKind>::new(); "no-challenges-allowed-for-3p")] // This isn't realistic since 3p auth is only ever implicit, but just testing in case
+    #[test_case(ActionKind::AddPrimary, AuthEventKind::Email, AssociatedAuthEventKind::Explicit => vec![ChallengeKind::Email, ChallengeKind::Sms, ChallengeKind::Passkey]; "any-auth-factor-allows-adding-first")]
+    #[test_case(ActionKind::Replace, AuthEventKind::Email, AssociatedAuthEventKind::Explicit => vec![ChallengeKind::Email, ChallengeKind::Sms]; "email-only-allows-replacing-phone-email")]
+    #[test_case(ActionKind::Replace, AuthEventKind::Sms, AssociatedAuthEventKind::Explicit => vec![ChallengeKind::Email, ChallengeKind::Sms]; "sms-only-allows-replacing-phone-email")]
+    #[test_case(ActionKind::Replace, AuthEventKind::Passkey, AssociatedAuthEventKind::Explicit => vec![ChallengeKind::Email, ChallengeKind::Sms, ChallengeKind::Passkey]; "passkey-allows-replacing-all")]
+    fn test_allowed_challenge_kinds(
+        action_kind: ActionKind,
+        auth_factor: AuthEventKind,
+        ae_kind: AssociatedAuthEventKind,
+    ) -> Vec<ChallengeKind> {
+        allowed_challenge_kinds(action_kind, auth_factor, ae_kind)
+    }
 }

@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use db::{
     models::{
@@ -17,7 +17,7 @@ use super::UserAuthScope;
 use crate::{
     auth::{
         session::{
-            user::{AssociatedAuthEvent, UserSession, UserSessionArgs},
+            user::{AssociatedAuthEvent, AssociatedAuthEventKind, UserSession, UserSessionArgs},
             AllowSessionUpdate, AuthSessionData, ExtractableAuthSession, RequestInfo,
         },
         user::UserAuth,
@@ -46,15 +46,23 @@ pub struct UserSessionContext {
 
 impl UserSessionContext {
     pub fn did_use_passkey(&self, conn: &mut PgConn) -> ApiResult<bool> {
-        let aes = self.auth_events(conn)?;
-        Ok(aes.iter().any(|ae| ae.kind == AuthEventKind::Passkey))
+        let aes = load_auth_events(conn, &self.auth_events)?;
+        Ok(aes.iter().any(|(ae, _)| ae.kind == AuthEventKind::Passkey))
     }
+}
 
-    pub fn auth_events(&self, conn: &mut PgConn) -> ApiResult<Vec<AuthEvent>> {
-        let ids = self.auth_events.iter().map(|e| e.id.clone()).collect_vec();
-        let aes = AuthEvent::get_bulk(conn, &ids)?;
-        Ok(aes)
-    }
+pub fn load_auth_events(
+    conn: &mut PgConn,
+    auth_events: &[AssociatedAuthEvent],
+) -> ApiResult<Vec<(AuthEvent, AssociatedAuthEventKind)>> {
+    let id_to_kind: HashMap<_, _> = auth_events.iter().map(|e| (e.id.clone(), e.kind)).collect();
+    let ids = id_to_kind.keys().cloned().collect_vec();
+    let aes = AuthEvent::get_bulk(conn, &ids)?;
+    let aes = aes
+        .into_iter()
+        .filter_map(|ae| id_to_kind.get(&ae.id).map(|k| (ae, *k)))
+        .collect();
+    Ok(aes)
 }
 
 impl UserAuth for UserSessionContext {

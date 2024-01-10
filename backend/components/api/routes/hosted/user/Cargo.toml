@@ -70,3 +70,6 @@ jsonpath_lib = "0.3.0"
 urlencoding = "2.1.2"
 actix-multipart = { workspace = true }
 rand = { workspace = true }
+
+[dev-dependencies]
+test-case = { workspace = true }

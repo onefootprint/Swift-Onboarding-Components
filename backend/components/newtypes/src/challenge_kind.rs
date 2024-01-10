@@ -4,7 +4,15 @@ use serde::{Deserialize, Serialize};
 use crate::ContactInfoKind;
 
 #[derive(
-    Debug, Clone, Eq, PartialEq, Apiv2Schema, serde::Serialize, serde::Deserialize, strum_macros::Display,
+    Debug,
+    Clone,
+    Eq,
+    PartialEq,
+    Hash,
+    Apiv2Schema,
+    serde::Serialize,
+    serde::Deserialize,
+    strum_macros::Display,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]

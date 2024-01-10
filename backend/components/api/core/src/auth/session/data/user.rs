@@ -50,7 +50,7 @@ pub struct AssociatedAuthEvent {
     pub kind: AssociatedAuthEventKind,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum AssociatedAuthEventKind {
     /// The auth event was created explicitly by the user using this auth session.
