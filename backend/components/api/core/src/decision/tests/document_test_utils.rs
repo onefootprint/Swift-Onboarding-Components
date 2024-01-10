@@ -23,8 +23,66 @@ use idv::incode::{
 };
 use newtypes::{
     DocumentRequestKind, DocumentSide, EncryptedVaultPrivateKey, IdDocKind, IdentityDocumentFixtureResult,
-    IdentityDocumentId, S3Url, ScopedVaultId, SealedVaultBytes, TenantId, WorkflowId,
+    IdentityDocumentId, S3Url, ScopedVaultId, SealedVaultBytes, Selfie, TenantId, WorkflowId,
 };
+
+#[derive(Clone, Copy)]
+pub enum UserKind {
+    Live,
+    Sandbox(IdentityDocumentFixtureResult),
+    Demo,
+}
+
+impl UserKind {
+    pub fn identity_doc_fixture(&self) -> Option<IdentityDocumentFixtureResult> {
+        match self {
+            UserKind::Live => None,
+            UserKind::Sandbox(f) => Some(*f),
+            UserKind::Demo => todo!(),
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct DocumentUploadTestCase {
+    pub user_kind: UserKind,
+    pub document_type: IdDocKind,
+    pub require_selfie: Selfie,
+}
+impl DocumentUploadTestCase {
+    pub fn new(user_kind: UserKind, document_type: IdDocKind, include_selfie: Selfie) -> Self {
+        DocumentUploadTestCase {
+            user_kind,
+            document_type,
+            require_selfie: include_selfie,
+        }
+    }
+
+    pub fn requires_selfie(&self) -> bool {
+        matches!(self.require_selfie, Selfie::RequireSelfie) && !self.is_proof_of_ssn_flow()
+    }
+
+    pub fn identity_doc_fixture(&self) -> Option<IdentityDocumentFixtureResult> {
+        self.user_kind.identity_doc_fixture()
+    }
+
+    pub fn user_is_live(&self) -> bool {
+        matches!(self.user_kind, UserKind::Live)
+    }
+
+    pub fn make_incode_calls(&self) -> bool {
+        (self.user_is_live()
+            || matches!(
+                self.user_kind,
+                UserKind::Sandbox(IdentityDocumentFixtureResult::Real)
+            ))
+            && !self.is_proof_of_ssn_flow()
+    }
+
+    fn is_proof_of_ssn_flow(&self) -> bool {
+        matches!(self.document_type, IdDocKind::SsnCard)
+    }
+}
 
 // Mock incode returning various responses to use
 // TODO: a lot of these will be parameterized in future
