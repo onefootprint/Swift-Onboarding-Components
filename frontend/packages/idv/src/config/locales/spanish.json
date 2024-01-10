@@ -2,8 +2,8 @@
   "global": {
     "errors": {
       "uncaught-error": {
-        "title": "¡Ups! Ocurrió un error.",
-        "description": "Lo sentimos. Por favor, reinicie el proceso.",
+        "title": "¡Ups! Ha ocurrido un error.",
+        "description": "Lo sentimos. Por favor, vuelva a intentarlo.",
         "cta": "Reiniciar"
       }
     },
@@ -15,23 +15,23 @@
       },
       "navigation-header": {
         "back-button": {
-          "aria-label": "Volver atrás"
+          "aria-label": "Atrás"
         }
       },
       "session-expired": {
         "title": "Sesión expirada",
-        "description": "Tu sesión ha expirado. Por favor, reiníciala.",
-        "cta": "Reiniciar"
+        "description": "Tu sesión ha expirado. Por favor, indentifícate nuevamente.",
+        "cta": "Reiniciar sesión"
       }
     },
     "pages": {
       "config-invalid": {
-        "title": "Integración configurada incorrectamente",
-        "subtitle": "Parece que la integración 'Verificar con Footprint' está utilizando una clave de integración inválida. Por favor, contacte al propietario de este producto."
+        "title": "La integración no está configurada correctamente",
+        "subtitle": "Parece que la integración 'Verificar con Footprint' está utilizando una clave de integración inválida. Por favor, contacte al administrador de este producto y solicítele una clave nueva."
       },
       "sandbox-outcome": {
-        "title": "Resultados de prueba",
-        "subtitle": "Selecciona qué resultado deseas que tenga este usuario después de completar su proceso de incorporación",
+        "title": "Modo prueba",
+        "subtitle": "Selecciona qué resultado deseas que tenga este usuario después de completar su verificación.",
         "overall-outcome": {
           "title": "Resultado general",
           "outcome": {
@@ -46,11 +46,11 @@
                 "title": "Fallo"
               },
               "step-up": {
-                "title": "Incrementar",
-                "description": "Aunque no sea requerido en el manual, los usuarios subirán fotos de su identificación."
+                "title": "Verificación incremental",
+                "description": "En ciertos casos en los que aún queden dudas sobre la identidad de un usuario, podemos solicitarle que proporcione imágenes de su documentación."
               },
               "document-decision": {
-                "title": "Decisión sobre el documento de identificación"
+                "title": "Decisión sobre la documentación presentada"
               }
             }
           }
@@ -59,7 +59,7 @@
           "title": "Imágenes del documento de identidad",
           "simulated-outcome": {
             "title": "Resultado simulado",
-            "description": "Resultado ficticio independiente de la imagen cargada",
+            "description": "Resultado ficticio, independiente de la imagen cargada",
             "options": {
               "success": {
                 "title": "Éxito"
@@ -72,16 +72,16 @@
           },
           "real-outcome": {
             "title": "Resultado real",
-            "description": "Procesaremos las imágenes subidas utilizando el mismo sistema que en producción y los resultados reflejarán la respuesta real."
+            "description": "Procesaremos las imágenes subidas utilizando el mismo sistema y proveedor con el que lo haríamos en producción."
           }
         },
         "test-id": {
           "label": "ID de prueba",
-          "description": "Puede iniciar sesión en un usuario de sandbox previamente creado utilizando el ID de prueba de esa sesión correspondiente.",
+          "description": "Puede iniciar sesión con un usuario de sandbox previamente creado utilizando el mismo ID que usó en esa sesión.",
           "placeholder": "Ingrese ID de prueba",
           "hint": "No use caracteres especiales ni espacios.",
           "errors": {
-            "required": "Se requiere ID de prueba",
+            "required": "ID de prueba es un campo requerido",
             "invalid": "ID de prueba inválido. Por favor, elimine los espacios y caracteres especiales."
           },
           "button": {
@@ -95,7 +95,7 @@
         "cta": "Continuar"
       },
       "complete": {
-        "title": "Envío completado!",
+        "title": "Datos enviados!",
         "subtitle-with-kyb": "Gracias por usar Footprint para verificar su negocio y su identidad.",
         "subtitle": "Gracias por usar Footprint para verificar su identidad.",
         "cta": "Regresar al sitio"
@@ -111,8 +111,8 @@
             "success": "Éxito",
             "fail": "Fracaso",
             "manual-review": "Revisión manual",
-            "document-decision": "Decisión de documento de identificación",
-            "step-up": "Decisión de documento de identificación"
+            "document-decision": "Decisión sobre el documento de identificación",
+            "step-up": "Decisión sobre el documento de identificación"
           }
         },
         "testID": "ID de prueba:"
@@ -126,7 +126,7 @@
         "success": "¡Éxito!",
         "resend-button": {
           "cta": "Reenviar código",
-          "disabled": "Espere {{seconds}} segundos para reenviarlo..."
+          "disabled": "Espere {{seconds}} segundos para reenviar el código..."
         },
         "toast": {
           "success": {
@@ -136,14 +136,14 @@
         }
       },
       "log-in-different-account": {
-        "label": "Iniciar sesión con una cuenta diferente",
+        "label": "Iniciar sesión con otra cuenta",
         "or": "o"
       }
     },
     "pages": {
       "auth-token-invalid": {
-        "title": "El enlace que abriste es inválido",
-        "subtitle": "Por favor, contacta a la empresa que te envió este enlace."
+        "title": "El enlace es inválido",
+        "subtitle": "Por favor, contacta a la empresa que te lo envió para solicitarle uno nuevo."
       },
       "email-identification": {
         "header": {
@@ -155,7 +155,7 @@
             "label": "Correo electrónico",
             "placeholder": "jane.doe@acme.com",
             "errors": {
-              "required": "Se requiere correo electrónico"
+              "required": "Correo electrónico es un campo requerido"
             }
           },
           "cta": "Continuar"
@@ -176,33 +176,33 @@
               "invalid": "Número de teléfono inválido"
             }
           },
-          "cta": "Verificar con SMS"
+          "cta": "Verificar enviando un SMS"
         }
       },
       "sms-challenge": {
         "label": "SMS",
         "title": "Verifica tu número de teléfono",
         "welcome-back-title": "¡Bienvenido de nuevo! 🎉",
-        "prompt-with-phone": "Introduce el código de 6 dígitos enviado a {{scrubbedPhoneNumber}}.",
-        "prompt-without-phone": "Introduce el código de 6 dígitos enviado a tu teléfono."
+        "prompt-with-phone": "Introduce el código de 6 dígitos que enviamos a {{scrubbedPhoneNumber}}.",
+        "prompt-without-phone": "Introduce el código de 6 dígitos que enviamos a tu teléfono."
       },
       "email-challenge": {
         "label": "Correo electrónico",
         "title": "Verifica tu correo electrónico",
         "welcome-back-title": "¡Bienvenido de nuevo! 🎉",
-        "prompt-with-email": "Introduce el código de 6 dígitos enviado a {{email}}.",
-        "prompt-without-email": "Introduce el código de 6 dígitos enviado a tu correo electrónico."
+        "prompt-with-email": "Introduce el código de 6 dígitos que enviamos a {{email}}.",
+        "prompt-without-email": "Introduce el código de 6 dígitos que enviamos a tu correo electrónico."
       },
       "biometric-challenge": {
-        "label": "Llave de acceso",
-        "loading": "Esperando...",
+        "label": "Passkey",
+        "loading": "Procesando...",
         "success": "¡Éxito!",
-        "cta": "Iniciar sesión con llave de acceso",
+        "cta": "Iniciar sesión con Passkey",
         "title": "¡Bienvenido de nuevo! 🎉",
         "login-with-sms": "Iniciar sesión con SMS",
         "passkey-error": {
           "title": "Algo salió mal",
-          "description": "Esto puede deberse a los permisos de tu dispositivo. Por favor, intenta iniciar sesión con SMS."
+          "description": "Esto puede deberse a que no tiene los permisos necesarios en tu dispositivo. Por favor, intenta iniciar sesión con SMS."
         }
       }
     }
@@ -222,7 +222,7 @@
         "footer": "Al hacer clic en \"Autorizar\", reconoces la <a>política de privacidad</a> de {{tenantName}}.",
         "onboarding-complete-error": {
           "title": "Ocurrió un error",
-          "description": "Hubo un error al completar el proceso de incorporación. Por favor, inténtalo de nuevo."
+          "description": "Hubo un error al completar la verificación. Por favor, inténtalo de nuevo."
         },
         "kyc": {
           "title": "Tus datos personales"
@@ -240,11 +240,11 @@
           "address-full": "Dirección",
           "address-partial": "País y código postal",
           "nationality": "Nacionalidad",
-          "us-legal-status": "Estado legal en EE.UU.",
-          "id-card": "Tarjeta de identificación",
+          "us-legal-status": "Situación legal en EE.UU.",
+          "id-card": "Documento de identificación",
           "passport": "Pasaporte",
           "driversLicense": "Licencia de conducir",
-          "residence-document": "Tarjeta de residencia",
+          "residence-document": "Documentación de residencia",
           "work-permit": "Permiso de trabajo",
           "visa": "Visa",
           "voterIdentification": "Identificación de votante",
@@ -253,12 +253,12 @@
           "business-name": "Nombre de la empresa",
           "business-tin": "TIN",
           "business-address": "Dirección registrada",
-          "business-beneficial-owners": "Propietarios beneficiosos",
-          "kyced-business-beneficial-owners": "Propietarios beneficiosos",
+          "business-beneficial-owners": "Propietarios de la empresa",
+          "kyced-business-beneficial-owners": "Propietarios de la empresa",
           "business-website": "Sitio web",
-          "business-corporation-type": "Tipo de corporación",
+          "business-corporation-type": "Tipo de empresa",
           "business-phone-number": "Número de teléfono",
-          "investor-profile": "Perfil del inversor"
+          "investor-profile": "Perfil de inversor"
         },
         "error": {
           "title": "¡Vaya!",
@@ -272,41 +272,41 @@
       "sync-data-error": {
         "empty-auth-token": {
           "title": "Tu sesión no es válida",
-          "description": "Por favor, actualiza esta página para intentar el proceso de incorporación de nuevo."
+          "description": "Por favor, actualice esta página y comience el proceso de incorporación de nuevo."
         },
         "request-data": {
-          "title": "Hay campos faltantes",
-          "description": "Por favor, regresa a los pasos anteriores para asegurarte de que todos los datos están completos"
+          "title": "Ha olviado completar algunos campos requeridos",
+          "description": "Por favor, asegúrese de que todos los datos están completos"
         },
         "invalid-inputs": {
           "title": "Ocurrió un error",
-          "description": "Hubo un error al guardar los datos. Por favor, corrige los datos e inténtalo de nuevo."
+          "description": "Hubo un error al guardar sus datos. Por favor, corrija los campos con error e inténtelo de nuevo."
         }
       }
     },
     "pages": {
       "email": {
         "title": "Dirección de correo electrónico",
-        "subtitle": "Estamos obligados a recopilar tu dirección de correo electrónico.",
+        "subtitle": "Necesitamos recopilar tu dirección de correo electrónico.",
         "email": {
           "label": "Correo electrónico",
           "placeholder": "jane.doe@acme.com",
-          "hint": "Agrega “#cadena” (p. ej., #test1) al final de tu dirección de correo electrónico.",
+          "hint": "Agregue “#palabra” (p. ej., #test1) al final de tu dirección de correo electrónico.",
           "errors": {
-            "required": "Se requiere correo electrónico",
-            "pattern": "Agrega “#cadena” (p. ej., #test1) al final de tu dirección de correo electrónico."
+            "required": "Correo electrónico es un campo requerido",
+            "pattern": "Agregue “#palabra”” (p. ej., #test1) al final de tu dirección de correo electrónico."
           }
         }
       },
       "basic-information": {
         "title": "Datos básicos",
-        "subtitle": "Escribe tus nombres y apellidos legales completos tal como aparecen en tu identificación emitida por el gobierno.",
+        "subtitle": "Escribe tus nombres y apellidos tal como aparecen en tu identificación emitida por el gobierno.",
         "form": {
           "first-name": {
             "label": "Nombre",
             "placeholder": "Jane",
             "error": {
-              "empty": "El nombre no puede estar vacío",
+              "empty": "El campo 'Nombre' no puede quedar vacío",
               "special-chars": "El nombre contiene caracteres inválidos."
             }
           },
@@ -321,15 +321,15 @@
             "label": "Apellido",
             "placeholder": "Doe",
             "error": {
-              "empty": "El apellido no puede estar vacío",
-              "special-chars": "El apellido contiene caracteres inválidos."
+              "empty": "El apellido no puede quedar vacío",
+              "special-chars": "El apellido contiene caracteres inválidos. "
             }
           },
           "dob": {
             "label": "Fecha de nacimiento",
             "error": {
-              "invalid": "La fecha de nacimiento no puede estar vacía o es inválida",
-              "future-date": "La fecha de nacimiento no puede ser en el futuro",
+              "invalid": "La fecha de nacimiento no puede quedar vacía o ser inválida",
+              "future-date": "La fecha de nacimiento no puede estar en el futuro",
               "too-young": "Debe tener al menos 18 años de edad",
               "too-old": "La fecha de nacimiento no puede ser anterior a 1900"
             }
@@ -343,50 +343,50 @@
       "residential-address": {
         "form": {
           "address-line-1": {
-            "label": "Línea de dirección 1",
+            "label": "Dirección - Calle y número",
             "international-label": "Dirección",
             "placeholder": "Calle y número de casa",
-            "error": "La dirección no puede estar vacía y debe ser una dirección residencial (p. ej., no puede ser un apartado postal)"
+            "error": "La dirección no puede quedar vacía y debe ser una dirección residencial (p. ej., no puede ser un PO Box)"
           },
           "address-line-2": {
-            "international-label": "Apartamento/barrio (opcional)",
-            "label": "Línea de dirección 2 (opcional)",
+            "international-label": "Apartamento, barrio (opcional)",
+            "label": "Detalles adicionales (opcional)",
             "international-placeholder": "Nombre del barrio, número de suite, etc.",
             "placeholder": "Apartamento, suite, etc."
           },
           "city": {
             "label": "Ciudad",
             "placeholder": "Ciudad",
-            "error": "La ciudad no puede estar vacía"
+            "error": "El campo 'Ciudad' no puede quedar vacío"
           },
           "state": {
             "label": "Estado",
-            "international-label": "Estado/provincia",
+            "international-label": "Estado o Provincia",
             "placeholder": "Estado",
-            "international-placeholder": "Estado/provincia",
-            "error": "El estado no puede estar vacío"
+            "international-placeholder": "Estado o Provincia",
+            "error": "El campo 'Estado o Provincia' no puede estar vacío"
           },
           "country": {
             "label": "País",
             "placeholder": "Seleccionar",
-            "error": "El país no puede estar vacío",
-            "disabled-hint": "Solo se aceptan direcciones en {{countryName}}"
+            "error": "El campo 'País' no puede quedar vacío",
+            "disabled-hint": "Sólo las direcciones de {{countryName}} son compatibles en este momento"
           },
           "zipCode": {
             "label": "Código postal",
             "placeholder": "11206",
-            "error": "El código postal no puede estar vacío o es inválido"
+            "error": "El código postal no puede quedar vacío o ser inválido"
           }
         },
-        "title": "¿Cuál es tu dirección residencial?",
+        "title": "¿Cuál es tu dirección?",
         "subtitle": "Asegúrate de proporcionar tu dirección residencial actualizada (no apartados postales)."
       },
       "legal-status": {
-        "title": "¿Cuál es tu estatus legal en EE.UU.?",
+        "title": "¿Cuál es tu situación legal en EE.UU.?",
         "subtitle": "Necesitamos recopilar esta información para completar tu perfil.",
         "statuses": {
           "citizen": "Soy ciudadano",
-          "permanent-resident": "Tengo una Tarjeta Verde/Soy residente permanente",
+          "permanent-resident": "Tengo una Green Card/Soy residente permanente",
           "visa": "Tengo una Visa",
           "other": "Otro"
         },
@@ -394,12 +394,12 @@
           "nationality": {
             "label": "País de nacimiento",
             "placeholder": "Seleccionar",
-            "error": "El país de nacimiento no puede estar vacío"
+            "error": "El campo 'País de nacimiento' no puede quedar vacío"
           },
           "citizenship": {
             "label": "Ciudadanía",
             "placeholder": "Seleccionar",
-            "empty-error": "La ciudadanía no puede estar vacía",
+            "empty-error": "El campo 'Ciudadanía' no puede quedar vacío",
             "us-citizen-error": "Si eres ciudadano de EE.UU., selecciona la opción \"Soy ciudadano\" arriba",
             "delete-aria": "Eliminar ciudadanía",
             "add-text": "Agregar ciudadanía"
@@ -407,7 +407,7 @@
           "visa-kind": {
             "label": "Tipo de Visa",
             "placeholder": "Seleccionar",
-            "error": "El tipo de Visa no puede estar vacío",
+            "error": "El campo 'Tipo de Visa' no puede quedar vacío",
             "mapping": {
               "e1": "E-1",
               "e2": "E-2",
@@ -422,33 +422,33 @@
             }
           },
           "visa-expiration": {
-            "label": "Fecha de expiración de la Visa",
+            "label": "Fecha de expiración de su Visa",
             "error": {
-              "required": "La fecha de expiración de la Visa no puede estar vacía",
-              "invalid": "La fecha de expiración de la Visa es inválida",
-              "invalidTimeframe": "La fecha de expiración de la Visa es inválida"
+              "required": "El campo 'Fecha de expiración de su Visa' no puede quedar vacío",
+              "invalid": "La fecha de expiración de su Visa es inválida",
+              "invalidTimeframe": "La fecha de expiración de su Visa es inválida"
             }
           }
         }
       },
       "ssn": {
         "full": {
-          "title": "¿Cuál es tu Número de Seguridad Social?",
+          "title": "¿Cuál es tu Número de Seguridad Social (SSN)?",
           "subtitle": "Necesitamos recopilar esta información para verificar tu identidad.",
           "disclaimer": {
             "security": {
               "title": "Tus datos están seguros",
-              "description": "Tu SSN está encriptado y protegido por un entorno seguro de última generación."
+              "description": "Tu SSN está encriptado y protegido por un sistema informático seguro de última generación."
             }
           },
           "form": {
             "label": "SSN",
             "placeholder": "XXX-XX-XXXX",
-            "error": "El SSN no puede estar vacío o es inválido"
+            "error": "El campo 'SSN' no puede quedar vacío o ser inválido"
           }
         },
         "last-four": {
-          "title": "¿Cuáles son los últimos 4 dígitos de tu Número de Seguridad Social?",
+          "title": "¿Cuáles son los últimos 4 dígitos de tu Número de Seguridad Social (SSN)?",
           "subtitle": "Necesitamos recopilar esta información para verificar tu identidad.",
           "form": {
             "label": "SSN (últimos 4)",
@@ -457,11 +457,11 @@
           }
         },
         "skip": {
-          "cta": "No tengo un Número de Seguridad Social",
+          "cta": "No tengo un Número de Seguridad Social (SSN)",
           "confirmation": {
             "title": "¿No tienes SSN?",
             "with-stepup-description": "Por favor, confirma que no tienes un SSN.",
-            "without-stepup-description": "Por favor, confirma que no tienes un SSN. Esto puede tardar más tiempo en verificar tu identidad.",
+            "without-stepup-description": "Por favor, confirma que no tienes un SSN, porque esto puede hacer que demore bastante más su verificación.",
             "yes": "Confirmar",
             "no": "Cancelar"
           }
@@ -469,15 +469,15 @@
       },
       "confirm": {
         "summary": {
-          "title": "Confirma tus datos personales",
-          "subtitle": "Por favor, asegúrate de que tus datos personales son precisos y no hay errores tipográficos antes de continuar.",
+          "title": "Confirme sus datos personales",
+          "subtitle": "Por favor, asegúrate de que tus datos personales sean precisos y no haya errores tipográficos antes de continuar.",
           "edit": "Editar",
           "reveal": "Revelar",
           "hide": "Ocultar",
           "cta": "Confirmar y continuar",
           "reveal-error": {
             "title": "Algo salió mal",
-            "description": "No pudimos revelar tu SSN. Por favor, edita tu SSN para guardarlo de nuevo."
+            "description": "No pudimos confirmar tu SSN. Por favor, revisa que el dato sea correcto e inténtalo nuevamente."
           }
         },
         "email": {
@@ -494,8 +494,8 @@
         },
         "legal-status": {
           "text": {
-            "title": "Estatus legal en EE.UU.",
-            "status": "Estatus legal",
+            "title": "Situación legal en EE.UU.",
+            "status": "Situación legal",
             "nationality": "País de nacimiento",
             "citizenship": "Ciudadanía",
             "visa-kind": "Tipo de Visa",
@@ -503,7 +503,7 @@
           },
           "statuses": {
             "citizen": "Soy ciudadano",
-            "permanent_resident": "Tengo una Tarjeta Verde/Soy residente permanente",
+            "permanent_resident": "Tengo una Green Card / Soy residente permanente",
             "visa": "Tengo una Visa"
           }
         },
@@ -514,7 +514,7 @@
           "title": "Identidad",
           "ssn9": "SSN",
           "ssn4": "SSN (últimos 4)",
-          "ssn-skipped-subtext": "No tienes un Número de Seguridad Social"
+          "ssn-skipped-subtext": "No tengo un Número de Seguridad Social (SSN)"
         },
         "di": {
           "id": {
@@ -526,8 +526,8 @@
             "ssn4": "SSN (Últimos 4)",
             "nationality": "Nacionalidad",
             "dob": "Fecha de nacimiento",
-            "address_line1": "Línea de dirección 1",
-            "address_line2": "Línea de dirección 2",
+            "address_line1": "Dirección",
+            "address_line2": "Detalles adicionales",
             "city": "Ciudad",
             "state": "Estado",
             "zip": "Código postal",
@@ -542,9 +542,9 @@
         "errors": {
           "invalid-inputs": {
             "title": "Ocurrió un error",
-            "description-with-message": "Hubo un error al guardar los datos. {{message}}.",
-            "description-with-fields": "Hubo un error al guardar los datos. Por favor, corrige estos campos: {{fields}}.",
-            "description-generic": "Hubo un error al guardar los datos. Por favor, corrige los datos e inténtalo de nuevo."
+            "description-with-message": "Hubo un error al procesar los datos. {{message}}.",
+            "description-with-fields": "Hubo un error al procesar los datos. Por favor, corrige estos campos: {{fields}}.",
+            "description-generic": "Hubo un error al procesar los datos. Por favor, revisa la información e inténtalo de nuevo."
           }
         }
       }
@@ -554,26 +554,26 @@
     "components": {
       "sync-data-error": {
         "empty-auth-token": {
-          "title": "Tu sesión no es válida",
-          "description": "Por favor, actualiza esta página para intentar el proceso de incorporación de nuevo."
+          "title": "Sesión inválida",
+          "description": "Por favor, actualiza esta página y reinicia el proceso de aplicación."
         },
         "invalid-inputs": {
           "title": "Ocurrió un error",
-          "description": "Hubo un error al guardar los datos. Por favor, corrige los datos e inténtalo de nuevo."
+          "description": "Hubo un error al procesar los datos. Por favor, revisa que los datos sean correctos e inténtalo de nuevo."
         }
       }
     },
     "pages": {
       "introduction": {
-        "title": "¡Conozcamos a tu empresa! 😊",
+        "title": "¡Empecemos a conocer tu empresa! 😊",
         "subtitle": "Antes de comenzar, hay un par de cosas que debes saber.",
         "guidelines": {
           "beneficial-owner": {
-            "title": "Necesitas ser un propietario beneficioso para verificar tu negocio.",
-            "description": "Un propietario beneficioso es cualquier persona que tenga control sustancial o posea al menos el 25% del negocio."
+            "title": "Necesitas ser un propietario de la empresa para verificarla.",
+            "description": "Un propietario se define como cualquier persona que tenga posea al menos el 25% de ella."
           },
           "bo-kyc": {
-            "title": "Necesitamos verificar tu identidad, como propietario beneficioso.",
+            "title": "Por ser propietario, necesitamos verificar tu identidad.",
             "description": "De lo contrario, no podemos verificar exitosamente tu negocio."
           }
         }
@@ -585,7 +585,7 @@
           "business-name": {
             "label": "Nombre de la empresa",
             "placeholder": "Acme Bank Inc.",
-            "error": "El nombre de la empresa no puede estar vacío o es inválido"
+            "error": "El nombre de la empresa no puede quedar vacío o ser inválido"
           },
           "doing-business-as": {
             "label": "Nombre comercial (opcional)",
@@ -595,12 +595,12 @@
             "label": "Número de Identificación del Contribuyente (TIN)",
             "placeholder": "12-3456789",
             "errors": {
-              "required": "El TIN no puede estar vacío o es inválido",
-              "pattern": "El TIN debe tener el formato 12-3456789"
+              "required": "El TIN no puede quedar vacío o ser inválido",
+              "pattern": "El TIN debe tener el formato '12-3456789'"
             }
           },
           "corporation-type": {
-            "label": "Tipo de entidad legal",
+            "label": "Entidad legal",
             "mapping": {
               "agent": "Agente",
               "c_corporation": "Corporación C",
@@ -614,58 +614,58 @@
               "trust": "Fideicomiso",
               "unknown": "Desconocido"
             },
-            "error": "El tipo de entidad legal no puede estar vacío o es inválido"
+            "error": "La entidad legal no puede quedar vacía o ser inválida"
           },
           "website": {
             "label": "Sitio web",
             "placeholder": "https://www.acmebank.com",
             "errors": {
-              "required": "El sitio web no puede estar vacío o es inválido"
+              "required": "El sitio web no puede quedar vacío o ser inválido"
             }
           },
           "phone-number": {
             "label": "Número de teléfono",
             "placeholder": "(123) 456-7890",
             "errors": {
-              "required": "El número de teléfono no puede estar vacío",
+              "required": "El número de teléfono no puede quedar vacío",
               "pattern": "El número de teléfono es inválido"
             }
           }
         }
       },
       "business-address": {
-        "title": "¿Cuál es la dirección registrada de tu empresa?",
+        "title": "¿Cuál es la dirección en la que tu empresa está registrada?",
         "subtitle": "Para fines de verificación, solo necesitamos la dirección registrada del negocio.",
         "form": {
           "address-line-1": {
             "label": "Línea de dirección 1",
             "placeholder": "Calle y número de casa",
-            "error": "La dirección no puede estar vacía"
+            "error": "La dirección no puede quedar vacía"
           },
           "address-line-2": {
-            "label": "Línea de dirección 2 (opcional)",
+            "label": "Detalles adicionales",
             "placeholder": "Apartamento, suite, etc."
           },
           "city": {
             "label": "Ciudad",
             "placeholder": "Nueva York",
-            "error": "La ciudad no puede estar vacía"
+            "error": "La ciudad no puede quedar vacía"
           },
           "state": {
             "label": "Estado",
             "placeholder": "Seleccionar",
-            "error": "El estado no puede estar vacío"
+            "error": "El estado no puede quedar vacío"
           },
           "country": {
             "label": "País",
             "placeholder": "Seleccionar",
-            "error": "El país no puede estar vacío",
+            "error": "El país no puede quedar vacío",
             "us-only-hint": "Actualmente solo se admiten negocios de EE. UU."
           },
           "zip": {
             "label": "Código postal",
             "placeholder": "11206",
-            "error": "El código postal no puede estar vacío"
+            "error": "El código postal no puede quedar vacío"
           }
         }
       },
