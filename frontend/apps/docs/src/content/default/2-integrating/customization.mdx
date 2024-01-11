@@ -421,11 +421,11 @@ letter, as in below:
 
 ## Localization configuration
 
-### Setting the locale
+### Setting the language & locale
 
-Footprint also supports localization settings, you can use the `l10n` (localization) option and specify the desired locale.
+Footprint also supports localization settings, you can use the `l10n` (localization) option and specify the desired locale and language.
 
-For example, if your audience is in Mexico, you can set the locale to "es-MX" (Spanish - Mexico), Your locale helps Footprint format dates and numbers and adapt to cultural conventions.
+For example, if you have Spanish speaking users, you can set the language to "es", and it will show the onboarding flow in Spanish.
 
 ```typescript
 import '@onefootprint/footprint-js/dist/footprint-js.css';
@@ -433,6 +433,22 @@ import footprint from '@onefootprint/footprint-js';
 
 const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';
 const l10n = {
+  language: 'es',
+};
+
+const component = footprint.init({ kind: 'verify', publicKey, l10n });
+component.render();
+```
+
+Similarly, if your audience is in Mexico, you can set the locale to "es-MX" (Spanish - Mexico). This locale configuration helps Footprint format dates and numbers and adapt to cultural conventions.
+
+```typescript
+import '@onefootprint/footprint-js/dist/footprint-js.css';
+import footprint from '@onefootprint/footprint-js';
+
+const publicKey = 'pb_test_VMooXd04EUlnu3AvMYKjMW';
+const l10n = {
+  language: 'es',
   locale: 'es-MX',
 };
 
@@ -445,3 +461,4 @@ component.render();
 | Option field | Type             |
 | ------------ | ---------------- |
 | `locale`     | `en-US`, `es-MX` |
+| `language`   | `en`, `es`       |
