@@ -10,9 +10,11 @@ use crate::decision::state::WorkflowActions;
 use crate::decision::state::WorkflowWrapper;
 use crate::decision::state::{DocCollected, MakeDecision};
 
+use crate::errors::ApiResult;
 use crate::State;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::risk_signal::RiskSignal;
+use db::models::rule_instance::RuleInstance;
 use db::models::workflow::{NewWorkflowArgs, Workflow};
 use db::test_helpers::assert_have_same_elements;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
@@ -21,9 +23,10 @@ use feature_flag::BoolFlag;
 use itertools::Itertools;
 use macros::test_state_case;
 use newtypes::{
-    CollectedDataOption as CDO, CountryRestriction, DbActor, DecisionStatus, DocTypeRestriction,
-    DocumentCdoInfo, DocumentConfig, DocumentRequestKind, FootprintReasonCode, RiskSignalGroupKind, Selfie,
-    TenantId, VendorAPI, WorkflowSource,
+    BooleanOperator, CollectedDataOption as CDO, CountryRestriction, DbActor, DecisionStatus,
+    DocTypeRestriction, DocumentCdoInfo, DocumentConfig, DocumentRequestKind, FootprintReasonCode,
+    RiskSignalGroupKind, RuleAction, RuleExpression, RuleExpressionCondition, Selfie, TenantId, VendorAPI,
+    WorkflowSource,
 };
 use newtypes::{KycState, WorkflowState};
 use newtypes::{OnboardingStatus, WorkflowFixtureResult};
@@ -56,11 +59,35 @@ async fn document_fails(state: &mut State, user_kind: UserKind, doc_outcome: Doc
     let wfid = wf.id.clone();
     let svid = wf.scoped_vault_id.clone();
     let svid2 = wf.scoped_vault_id.clone();
+    let obc_id2 = obc.id.clone();
 
     let ww = WorkflowWrapper::init(state, wf).await.unwrap();
     let doc_upload_failed = doc_outcome == DocUploadFailed;
     let doc_passed_with_review = doc_outcome == PassWithManualReview;
     let expected_status = if doc_passed_with_review {
+        // This is not a default rule, but we're testing it here
+        state
+            .db_pool
+            .db_transaction(move |conn| -> ApiResult<_> {
+                RuleInstance::create(
+                    conn,
+                    obc_id2,
+                    DbActor::Footprint,
+                    None,
+                    RuleExpression(vec![RuleExpressionCondition::RiskSignal {
+                        field: FootprintReasonCode::DocumentIsPermitOrProvisionalLicense,
+                        op: BooleanOperator::Equals,
+                        value: true,
+                    }]),
+                    RuleAction::PassWithManualReview,
+                )
+                .unwrap();
+
+                Ok(())
+            })
+            .await
+            .unwrap();
+
         DecisionStatus::Pass
     } else {
         DecisionStatus::Fail

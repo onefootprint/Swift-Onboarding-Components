@@ -52,10 +52,6 @@ pub fn base_doc_rules(always_review: bool) -> Vec<(RuleExpression, RuleAction)> 
         (if_risk_signal(FRC::DocumentTypeMismatch), RA::ManualReview),
         (if_risk_signal(FRC::DocumentUnknownCountryCode), RA::ManualReview),
         (if_risk_signal(FRC::DocumentCountryCodeMismatch), RA::ManualReview),
-        (
-            if_risk_signal(FRC::DocumentIsPermitOrProvisionalLicense),
-            RA::PassWithManualReview,
-        ),
     ]
 }
 

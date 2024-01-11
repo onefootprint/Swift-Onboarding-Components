@@ -185,6 +185,12 @@ pub(super) fn compute_risk_signals<'a>(
         vec![]
     };
 
+    let drivers_license_features =
+        incode_docv::drivers_license_features_from_ocr_response(fetch_ocr_response)
+            .into_iter()
+            .map(|r| (r, VendorAPI::IncodeFetchOcr, ocr_vres_id.clone()))
+            .collect_vec();
+
     let additional_reason_codes = vec![
         id_doc.should_skip_selfie().then_some((
             FootprintReasonCode::DocumentSelfieWasSkipped,
@@ -219,6 +225,7 @@ pub(super) fn compute_risk_signals<'a>(
         .chain(pii_matching_ocr_reason_codes)
         .chain(additional_reason_codes)
         .chain(ignored_error_reason_codes)
+        .chain(drivers_license_features)
         .unique()
         .collect();
     Ok(s)
