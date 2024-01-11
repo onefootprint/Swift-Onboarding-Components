@@ -2,6 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoDownload16,
   IcoFileText16,
+  IcoLock16,
   IcoWarning16,
   IcoWriting16,
 } from '@onefootprint/icons';
@@ -20,7 +21,10 @@ import type {
   WorkflowTriggeredEventData,
 } from '@onefootprint/types';
 import { EntityStatus, TimelineEventKind } from '@onefootprint/types';
-import type { WorkflowStartedEventData } from '@onefootprint/types/src/data/timeline';
+import type {
+  AuthMethodUpdatedData,
+  WorkflowStartedEventData,
+} from '@onefootprint/types/src/data/timeline';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import type { TimelineItem } from 'src/components/timeline';
@@ -180,6 +184,19 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
         time,
         iconComponent: <IcoWriting16 />,
         headerComponent: <WorkflowStartedEventHeader data={eventData} />,
+      });
+    } else if (kind === TimelineEventKind.authMethodUpdated) {
+      const eventData = data as AuthMethodUpdatedData;
+      items.push({
+        time,
+        iconComponent: <IcoLock16 />,
+        headerComponent: (
+          <Typography variant="body-3">
+            {t(`timeline.auth-method-updated.${eventData.action}`, {
+              kind: t(`timeline.auth-method-updated.method.${eventData.kind}`),
+            })}
+          </Typography>
+        ),
       });
     }
   });

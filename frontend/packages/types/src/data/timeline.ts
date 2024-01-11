@@ -25,6 +25,7 @@ export enum TimelineEventKind {
   vaultCreated = 'vault_created',
   workflowTriggered = 'workflow_triggered',
   workflowStarted = 'workflow_started',
+  authMethodUpdated = 'auth_method_updated',
 }
 
 export type CollectedDataEvent = {
@@ -125,6 +126,27 @@ export type WorkflowStartedEvent = {
   data: WorkflowStartedEventData;
 };
 
+export type AuthMethodUpdatedData = {
+  kind: AuthMethodKind;
+  action: AuthMethodAction;
+};
+
+export type AuthMethodUpdatedEvent = {
+  kind: TimelineEventKind.authMethodUpdated;
+  data: AuthMethodUpdatedData;
+};
+
+export enum AuthMethodKind {
+  phone = 'phone',
+  email = 'email',
+  passkey = 'passkey',
+}
+
+export enum AuthMethodAction {
+  add_primary = 'add_primary',
+  replace = 'replace',
+}
+
 export enum WatchlistCheckReasonCode {
   watchlistHitOfac = 'watchlist_hit_ofac',
   watchlistHitPep = 'watchlist_hit_pep',
@@ -165,7 +187,8 @@ export type TimelineEvent = {
     | CombinedWatchlistChecksEvent
     | VaultCreatedEvent
     | WorkflowTriggeredEvent
-    | WorkflowStartedEvent;
+    | WorkflowStartedEvent
+    | AuthMethodUpdatedEvent;
   timestamp: string;
 };
 
