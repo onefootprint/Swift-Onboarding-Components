@@ -32,10 +32,6 @@ const PlansDetails = [
         soon: false,
       },
       {
-        translation: 'sms-otp',
-        soon: false,
-      },
-      {
         translation: 'aml-monitoring',
         soon: false,
       },
@@ -62,10 +58,6 @@ const PlansDetails = [
     features: [
       {
         translation: 'behavioral-risks',
-        soon: false,
-      },
-      {
-        translation: 'audit-logs',
         soon: false,
       },
       {

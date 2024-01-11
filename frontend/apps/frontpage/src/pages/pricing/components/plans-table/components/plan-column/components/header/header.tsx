@@ -46,7 +46,11 @@ const Header = ({ title, price, period = Periods.yearly }: HeaderProps) => {
                   ? USDollar.format(price.monthly || 0)
                   : USDollar.format(price.yearly || 0)}
               </Typography>
-              <Typography variant="label-3">{period}</Typography>
+              <Typography variant="label-3">
+                {period === 'monthly'
+                  ? t('units.per-month')
+                  : t('units.per-year')}
+              </Typography>
             </Stack>
             <Stack direction="row" justify="start" align="center" gap={2}>
               <Typography
