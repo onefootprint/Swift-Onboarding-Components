@@ -63,14 +63,14 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Restore yarn dependencies
+      - name: Cache turbo build setup
         uses: actions/cache@v3
-        id: cache-dependencies
         with:
-          path: mobile/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-turbo-
+
       - name: Lint
         working-directory: ./mobile
         run: yarn lint:ci
@@ -84,18 +84,20 @@ jobs:
     needs: install-dependencies
     steps:
       - uses: actions/checkout@v3
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Restore yarn dependencies
+
+      - name: Cache turbo build setup
         uses: actions/cache@v3
-        id: cache-dependencies
         with:
-          path: mobile/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-turbo-
+
       - name: Prettier
         working-directory: ./mobile
         run: yarn format:ci
@@ -109,18 +111,20 @@ jobs:
     needs: install-dependencies
     steps:
       - uses: actions/checkout@v3
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Restore yarn dependencies
+
+      - name: Cache turbo build setup
         uses: actions/cache@v3
-        id: cache-dependencies
         with:
-          path: mobile/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-turbo-
+
       - name: Tests
         working-directory: ./mobile
         run: yarn test:ci
@@ -134,18 +138,20 @@ jobs:
     needs: install-dependencies
     steps:
       - uses: actions/checkout@v3
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Restore yarn dependencies
+
+      - name: Cache turbo build setup
         uses: actions/cache@v3
-        id: cache-dependencies
         with:
-          path: mobile/node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-turbo-
+
       - name: Tests
         working-directory: ./mobile
-        run: yarn typecheck
+        run: yarn typecheck:ci
