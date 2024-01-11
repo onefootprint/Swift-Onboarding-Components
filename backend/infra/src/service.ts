@@ -281,7 +281,7 @@ async function createCdnFrontedLoadBalancer(
         timeout: 10,
         unhealthyThreshold: 5,
       },
-      deregistrationDelay: 10,
+      deregistrationDelay: 30,
     },
     { provider },
   );

@@ -89,11 +89,11 @@ async fn run_server(config: Config) -> std::io::Result<()> {
 
 
         let  spec = DefaultApiRaw {
-            swagger: paperclip::v2::models::Version::V2,            
+            swagger: paperclip::v2::models::Version::V2,
             host: Some("api.onefootprint.com".to_string()),
             info: Info {
                 version: crate::GIT_HASH.to_string(),
-                title: "Footprint API".into(),            
+                title: "Footprint API".into(),
                 ..Default::default()
             },
             tags: vec![
@@ -142,7 +142,7 @@ async fn run_server(config: Config) -> std::io::Result<()> {
     // time out while the loadbalancer is waiting for a response, increase the keep alive timeout
     // https://linear.app/footprint/issue/FP-3633/diagnose-502s
     .keep_alive(KeepAlive::Timeout(Duration::from_secs(120)))
-    .shutdown_timeout(5)
+    .shutdown_timeout(30)
     .bind(("0.0.0.0", config.port))?
     .run()
     .await
