@@ -21,7 +21,7 @@ use api_wire_types::UserChallengeRequest;
 use api_wire_types::UserChallengeResponse;
 use itertools::Itertools;
 use newtypes::AuthEventKind;
-use newtypes::ChallengeKind;
+use newtypes::AuthMethodKind;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
@@ -63,7 +63,7 @@ pub async fn post(
     let uv = user_auth.user.clone();
 
     let (rx, data, time_before_retry, biometric_challenge_json) = match kind {
-        ChallengeKind::Sms => {
+        AuthMethodKind::Phone => {
             // Expect a phone number and initiate an SMS challenge
             let phone_number = phone_number.ok_or(ValidationError(
                 "Phone number required to initiate sign up challenge",
@@ -79,7 +79,7 @@ pub async fn post(
             };
             (Some(rx), challenge_data, Some(time_before_retry), None)
         }
-        ChallengeKind::Email => {
+        AuthMethodKind::Email => {
             let email = email.ok_or(ValidationError(
                 "Email must be provided for no-phone signup challenges",
             ))?;
@@ -93,7 +93,7 @@ pub async fn post(
             };
             (None, challenge_data, None, None)
         }
-        ChallengeKind::Passkey => {
+        AuthMethodKind::Passkey => {
             let webauthn = WebauthnConfig::new(&state.config);
             let (challenge, reg_state) = webauthn.initiate_challenge(uv.id)?;
             let challenge_json = serde_json::to_string(&challenge)?;
@@ -138,7 +138,7 @@ fn allowed_challenge_kinds(
     action_kind: ActionKind,
     auth_factor: AuthEventKind,
     ae_kind: AssociatedAuthEventKind,
-) -> Vec<ChallengeKind> {
+) -> Vec<AuthMethodKind> {
     if ae_kind != AssociatedAuthEventKind::Explicit {
         // Only Explicit AuthEvents allow updating/replacing auth methods
         return vec![];
@@ -151,13 +151,21 @@ fn allowed_challenge_kinds(
     match (action_kind, auth_factor) {
         // If this is the first time this auth method is added, it's allowed
         // TODO this would also allow adding a passkey with a SIM-swapped phone if there's no passkey yet
-        (ActionKind::AddPrimary, _) => vec![ChallengeKind::Email, ChallengeKind::Sms, ChallengeKind::Passkey],
+        (ActionKind::AddPrimary, _) => vec![
+            AuthMethodKind::Email,
+            AuthMethodKind::Phone,
+            AuthMethodKind::Passkey,
+        ],
         (ActionKind::Replace, AuthEventKind::Email | AuthEventKind::Sms) => {
-            vec![ChallengeKind::Email, ChallengeKind::Sms]
+            vec![AuthMethodKind::Email, AuthMethodKind::Phone]
         }
         (ActionKind::Replace, AuthEventKind::Passkey) => {
             // Authing with a passkey allows editing any form of contact info
-            vec![ChallengeKind::Email, ChallengeKind::Sms, ChallengeKind::Passkey]
+            vec![
+                AuthMethodKind::Email,
+                AuthMethodKind::Phone,
+                AuthMethodKind::Passkey,
+            ]
         }
         (_, AuthEventKind::ThirdParty) => vec![],
     }
@@ -167,22 +175,22 @@ fn allowed_challenge_kinds(
 mod test {
     use crate::challenge::ActionKind;
     use api_core::auth::session::user::AssociatedAuthEventKind;
-    use newtypes::{AuthEventKind, ChallengeKind};
+    use newtypes::{AuthEventKind, AuthMethodKind};
     use test_case::test_case;
 
     use super::allowed_challenge_kinds;
 
-    #[test_case(ActionKind::AddPrimary, AuthEventKind::Passkey, AssociatedAuthEventKind::Implicit => Vec::<ChallengeKind>::new(); "no-challenges-allowed-for-implicit")]
-    #[test_case(ActionKind::Replace, AuthEventKind::ThirdParty, AssociatedAuthEventKind::Explicit => Vec::<ChallengeKind>::new(); "no-challenges-allowed-for-3p")] // This isn't realistic since 3p auth is only ever implicit, but just testing in case
-    #[test_case(ActionKind::AddPrimary, AuthEventKind::Email, AssociatedAuthEventKind::Explicit => vec![ChallengeKind::Email, ChallengeKind::Sms, ChallengeKind::Passkey]; "any-auth-factor-allows-adding-first")]
-    #[test_case(ActionKind::Replace, AuthEventKind::Email, AssociatedAuthEventKind::Explicit => vec![ChallengeKind::Email, ChallengeKind::Sms]; "email-only-allows-replacing-phone-email")]
-    #[test_case(ActionKind::Replace, AuthEventKind::Sms, AssociatedAuthEventKind::Explicit => vec![ChallengeKind::Email, ChallengeKind::Sms]; "sms-only-allows-replacing-phone-email")]
-    #[test_case(ActionKind::Replace, AuthEventKind::Passkey, AssociatedAuthEventKind::Explicit => vec![ChallengeKind::Email, ChallengeKind::Sms, ChallengeKind::Passkey]; "passkey-allows-replacing-all")]
+    #[test_case(ActionKind::AddPrimary, AuthEventKind::Passkey, AssociatedAuthEventKind::Implicit => Vec::<AuthMethodKind>::new(); "no-challenges-allowed-for-implicit")]
+    #[test_case(ActionKind::Replace, AuthEventKind::ThirdParty, AssociatedAuthEventKind::Explicit => Vec::<AuthMethodKind>::new(); "no-challenges-allowed-for-3p")] // This isn't realistic since 3p auth is only ever implicit, but just testing in case
+    #[test_case(ActionKind::AddPrimary, AuthEventKind::Email, AssociatedAuthEventKind::Explicit => vec![AuthMethodKind::Email, AuthMethodKind::Phone, AuthMethodKind::Passkey]; "any-auth-factor-allows-adding-first")]
+    #[test_case(ActionKind::Replace, AuthEventKind::Email, AssociatedAuthEventKind::Explicit => vec![AuthMethodKind::Email, AuthMethodKind::Phone]; "email-only-allows-replacing-phone-email")]
+    #[test_case(ActionKind::Replace, AuthEventKind::Sms, AssociatedAuthEventKind::Explicit => vec![AuthMethodKind::Email, AuthMethodKind::Phone]; "sms-only-allows-replacing-phone-email")]
+    #[test_case(ActionKind::Replace, AuthEventKind::Passkey, AssociatedAuthEventKind::Explicit => vec![AuthMethodKind::Email, AuthMethodKind::Phone, AuthMethodKind::Passkey]; "passkey-allows-replacing-all")]
     fn test_allowed_challenge_kinds(
         action_kind: ActionKind,
         auth_factor: AuthEventKind,
         ae_kind: AssociatedAuthEventKind,
-    ) -> Vec<ChallengeKind> {
+    ) -> Vec<AuthMethodKind> {
         allowed_challenge_kinds(action_kind, auth_factor, ae_kind)
     }
 }

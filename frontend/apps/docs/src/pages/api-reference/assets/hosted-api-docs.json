@@ -2523,6 +2523,9 @@
                             "l10n": {
                                 "type": "object",
                                 "properties": {
+                                    "language": {
+                                        "type": "string"
+                                    },
                                     "locale": {
                                         "type": "string"
                                     }
@@ -2592,6 +2595,9 @@
                             "l10n": {
                                 "type": "object",
                                 "properties": {
+                                    "language": {
+                                        "type": "string"
+                                    },
                                     "locale": {
                                         "type": "string"
                                     }
@@ -5337,11 +5343,11 @@
                         "type": "string"
                     },
                     "kind": {
-                        "description": "The kind of challenge to initiate",
+                        "description": "The kind of auth method for which to initiate a challenge",
                         "type": "string",
                         "enum": [
-                            "sms",
-                            "biometric",
+                            "phone",
+                            "passkey",
                             "email"
                         ]
                     },

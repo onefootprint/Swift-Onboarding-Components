@@ -36,7 +36,7 @@ def user_with_token(sandbox_tenant, auth_playbook):
 def get_auth_token_for_ci_update(user, auth_playbook):
     def assert_cant_use_token(token, status_code, error_message):
         data = dict(
-            kind="sms", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="replace"
+            kind="phone", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="replace"
         )
         body = post("hosted/user/challenge", data, token, status_code=status_code)
         assert body["error"]["message"] == error_message
@@ -84,7 +84,7 @@ def get_auth_token_for_ci_update(user, auth_playbook):
     "challenge,di",
     [
         (
-            dict(kind="sms", phone_number=FIXTURE_PHONE_NUMBER2),
+            dict(kind="phone", phone_number=FIXTURE_PHONE_NUMBER2),
             "id.phone_number",
         ),
         (dict(kind="email", email=FIXTURE_EMAIL2), "id.email"),
@@ -145,7 +145,7 @@ def test_add_phone(sandbox_tenant, skip_phone_obc):
 
     # Replace the contact info with a challenge
     data = dict(
-        kind="sms", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="add_primary"
+        kind="phone", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="add_primary"
     )
     body = post("hosted/user/challenge", data, auth_token)
     challenge_token = body["challenge_token"]
@@ -177,7 +177,7 @@ def test_add_email(user_with_token, sandbox_tenant):
 @pytest.mark.parametrize(
     "kind,expected_error",
     [
-        ("sms", "Cannot add primary contact info when it already exists"),
+        ("phone", "Cannot add primary contact info when it already exists"),
         ("passkey", "Cannot add primary passkey when one already exists."),
     ],
 )
@@ -207,12 +207,12 @@ def test_fail_to_add_primary(user_with_token, kind, expected_error):
 def test_replace_passkey(user_with_token):
     user, auth_token = user_with_token
 
-    # Can't replace the passkey with this auth token since it only has an SMS auth event
+    # Can't replace the passkey with this auth token since it only has an sms auth event
     data = dict(
         kind="passkey", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="replace"
     )
     body = post("hosted/user/challenge", data, auth_token, status_code=400)
-    assert body["error"]["message"] == "Cannot initiate challenge of kind biometric"
+    assert body["error"]["message"] == "Cannot initiate challenge of kind passkey"
 
     # Step up the token using a passkey
     auth_token = IdentifyClient.from_token(

@@ -1671,7 +1671,8 @@
                                     "WatchlistCheck",
                                     "VaultCreated",
                                     "WorkflowTriggered",
-                                    "WorkflowStarted"
+                                    "WorkflowStarted",
+                                    "AuthMethodUpdated"
                                 ]
                             }
                         },

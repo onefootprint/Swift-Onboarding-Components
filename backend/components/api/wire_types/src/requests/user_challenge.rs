@@ -1,4 +1,4 @@
-use newtypes::{email::Email, ChallengeKind, ChallengeToken, PhoneNumber};
+use newtypes::{email::Email, AuthMethodKind, ChallengeToken, PhoneNumber};
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -15,8 +15,8 @@ pub struct UserChallengeRequest {
     pub phone_number: Option<PhoneNumber>,
     /// If the challenge kind is email, the email address to send the challenge to
     pub email: Option<Email>,
-    /// The kind of challenge to initiate
-    pub kind: ChallengeKind,
+    /// The kind of auth method for which to initiate a challenge
+    pub kind: AuthMethodKind,
     /// Specifies whether to add the new auth method alongside existing auth methods or replace
     /// the existing method.
     pub action_kind: ActionKind,

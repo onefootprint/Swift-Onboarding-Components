@@ -2,6 +2,27 @@ use strum_macros::Display;
 
 use crate::{AuthEventKind, DataIdentifier, IdentityDataKind};
 
+#[derive(
+    Debug,
+    Clone,
+    Eq,
+    PartialEq,
+    Hash,
+    paperclip::actix::Apiv2Schema,
+    serde_with::SerializeDisplay,
+    serde_with::DeserializeFromStr,
+    strum_macros::Display,
+    strum_macros::EnumString,
+    macros::SerdeAttr,
+)]
+#[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+pub enum AuthMethodKind {
+    Phone,
+    Passkey,
+    Email,
+}
+
 #[derive(Debug, Display, Clone, Copy, Eq, PartialEq)]
 pub enum ContactInfoKind {
     Phone,

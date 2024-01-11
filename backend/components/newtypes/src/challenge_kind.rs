@@ -28,8 +28,8 @@ pub enum ChallengeKind {
 impl From<ContactInfoKind> for ChallengeKind {
     fn from(value: ContactInfoKind) -> Self {
         match value {
-            ContactInfoKind::Email => Self::Email,
-            ContactInfoKind::Phone => Self::Sms,
+            ContactInfoKind::Email => ChallengeKind::Email,
+            ContactInfoKind::Phone => ChallengeKind::Sms,
         }
     }
 }
