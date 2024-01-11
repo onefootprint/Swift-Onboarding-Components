@@ -60,4 +60,13 @@ enum class FootprintSupportedLocale {
 }
 
 @Serializable
-data class FootprintL10n(val locale: FootprintSupportedLocale? = null)
+enum class FootprintSupportedLanguage {
+    @SerialName("en") ENGLISH,
+    @SerialName("es") SPANISH
+}
+
+@Serializable
+data class FootprintL10n(
+    val locale: FootprintSupportedLocale? = null,
+    val language: FootprintSupportedLanguage? = null
+)

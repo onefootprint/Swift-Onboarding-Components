@@ -190,7 +190,11 @@ export type FootprintUserData = Partial<{
 }>;
 
 export type FootprintSupportedLocale = 'en-US' | 'es-MX';
-export type FootprintL10n = { locale?: FootprintSupportedLocale };
+export type FootprintSupportedLanguage = 'en' | 'es';
+export type FootprintL10n = {
+  locale?: FootprintSupportedLocale;
+  language?: FootprintSupportedLanguage;
+};
 
 export type FootprintOptions = {
   showCompletionPage?: boolean;
