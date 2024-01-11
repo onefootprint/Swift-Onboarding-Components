@@ -2,8 +2,8 @@
   "global": {
     "errors": {
       "uncaught-error": {
-        "title": "¡Ups! Ocurrió un error.",
-        "description": "Lo sentimos. Por favor, reinicia el proceso.",
+        "title": "¡Ups! Ha ocurrido un error.",
+        "description": "Lo sentimos. Por favor, comienza la verificación nuevamente.",
         "cta": "Reiniciar"
       }
     }
@@ -11,7 +11,7 @@
   "components": {
     "layout": {
       "sandbox-banner": {
-        "title": "Modo Sandbox"
+        "title": "Modo de prueba"
       },
       "footer": {
         "links": {
@@ -27,15 +27,15 @@
       "header": {
         "bo-kyc": {
           "title": "{{tenantName}} quiere verificar tu empresa",
-          "subtitle": "{{otherBoName}} está verificando {{businessName}}, y fuiste identificado como un propietario beneficioso. Para verificar tu empresa con éxito, primero necesitamos verificar tu identidad."
+          "subtitle": "{{otherBoName}} está verificando {{businessName}}, y fuiste identificado como un propietario. Por ello, necesitamos verificar tu identidad primero."
         },
         "kyb": {
           "title": "{{tenantName}} quiere verificar tu empresa",
-          "subtitle": "{{tenantName}} necesita recopilar información empresarial y personal para confirmar tu identidad."
+          "subtitle": "{{tenantName}} necesita recopilar información de la empresa y de las personas que la integran para continuar."
         },
         "kyc": {
           "title": "{{tenantName}} quiere verificar tu identidad",
-          "subtitle": "{{tenantName}} necesita recopilar información personal para confirmar tu identidad."
+          "subtitle": "{{tenantName}} necesita recopilar su información personal para verificar los datos de su empresa."
         }
       },
       "cta": {
@@ -44,18 +44,18 @@
       }
     },
     "invalid-url": {
-      "title": "El enlace que abriste no es válido",
-      "subtitle": "Por favor, contacta a la empresa que te envió este enlace."
+      "title": "El enlace no es válido",
+      "subtitle": "Por favor, contacta a la empresa que te lo envió e inténtalo de nuevo."
     },
     "complete": {
-      "title": "¡Envío completado!",
+      "title": "¡Verificación terminada con éxito!",
       "subtitle-with-kyb": "Gracias por usar Footprint para verificar tu empresa y tu identidad.",
       "subtitle": "Gracias por usar Footprint para verificar tu identidad.",
       "cta": "Volver al sitio"
     },
     "expired": {
       "title": "Sesión expirada",
-      "subtitle": "Por razones de seguridad, esta sesión ha caducado en el flujo o actualiza la página.",
+      "subtitle": "Por razones de seguridad, esta sesión ha caducado, actualiza la página y vuelve a ingresar.",
       "cta": "Reiniciar"
     }
   }

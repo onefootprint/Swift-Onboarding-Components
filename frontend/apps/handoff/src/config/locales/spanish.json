@@ -2,8 +2,8 @@
   "global": {
     "errors": {
       "uncaught-error": {
-        "title": "¡Vaya! Ocurrió un error.",
-        "description": "Lo sentimos. Por favor, reinicia el proceso.",
+        "title": "Ha ocurrido un error.",
+        "description": "Lo sentimos. Por favor, vuelve a ingresar.",
         "cta": "Reiniciar"
       }
     }
@@ -13,22 +13,22 @@
       "title": "Completado",
       "subtitle": {
         "with-countdown": "Esta página se cerrará en {{seconds}} segundos...",
-        "without-countdown": "Por favor, continúa en tu computadora."
+        "without-countdown": "Por favor, continúa en tu computadora de escritorio."
       }
     },
     "expired": {
       "title": "Sesión expirada",
       "subtitle": {
-        "mobile": "Por razones de seguridad, esta sesión ha caducado. Por favor, regresa a la página anterior.",
-        "desktop": "Por razones de seguridad, este enlace ha caducado. Por favor, vuelve a tu computadora para generar un nuevo enlace."
+        "mobile": "Por razones de seguridad, esta sesión ha caducado. Por favor, vuelve a ingresar.",
+        "desktop": "Por razones de seguridad, este enlace ha caducado. Por favor, genere un nuevo enlace y vuelva a intentarlo."
       },
       "cta": "Regresar"
     },
     "canceled": {
       "title": "Sesión cancelada",
       "subtitle": {
-        "mobile": "Por favor, regresa a la página anterior.",
-        "desktop": "Por favor, regresa a tu computadora."
+        "mobile": "Por favor, regrese a la página anterior.",
+        "desktop": "Por favor, regrese a su computadora de escritorio."
       }
     }
   }
