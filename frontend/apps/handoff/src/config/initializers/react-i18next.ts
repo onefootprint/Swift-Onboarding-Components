@@ -2,15 +2,16 @@ import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import en from '../locales/english.json';
+import es from '../locales/spanish.json';
 
-const configureReactI18next = () => {
-  const resources = {
-    en: { translation: en },
-  };
-
+const configureReactI18next = (initialLanguage = 'en') => {
   const I18NOptions = {
-    resources,
-    lng: 'en',
+    resources: {
+      en: { translation: en },
+      es: { translation: es },
+    },
+    lng: initialLanguage,
+    fallbackLng: 'en',
     interpolation: {
       escapeValue: false,
     },

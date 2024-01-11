@@ -8,7 +8,6 @@
       }
     }
   },
-  "components": {},
   "pages": {
     "init-error": {
       "invalid-config-title": "Integration incorrectly configured",

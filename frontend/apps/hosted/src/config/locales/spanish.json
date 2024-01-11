@@ -1,0 +1,62 @@
+{
+  "global": {
+    "errors": {
+      "uncaught-error": {
+        "title": "¡Ups! Ocurrió un error.",
+        "description": "Lo sentimos. Por favor, reinicia el proceso.",
+        "cta": "Reiniciar"
+      }
+    }
+  },
+  "components": {
+    "layout": {
+      "sandbox-banner": {
+        "title": "Modo Sandbox"
+      },
+      "footer": {
+        "links": {
+          "terms": "Términos de Servicio",
+          "privacy": "Política de Privacidad",
+          "what-is-this": "¿Qué es esto?"
+        }
+      }
+    }
+  },
+  "pages": {
+    "intro": {
+      "header": {
+        "bo-kyc": {
+          "title": "{{tenantName}} quiere verificar tu empresa",
+          "subtitle": "{{otherBoName}} está verificando {{businessName}}, y fuiste identificado como un propietario beneficioso. Para verificar tu empresa con éxito, primero necesitamos verificar tu identidad."
+        },
+        "kyb": {
+          "title": "{{tenantName}} quiere verificar tu empresa",
+          "subtitle": "{{tenantName}} necesita recopilar información empresarial y personal para confirmar tu identidad."
+        },
+        "kyc": {
+          "title": "{{tenantName}} quiere verificar tu identidad",
+          "subtitle": "{{tenantName}} necesita recopilar información personal para confirmar tu identidad."
+        }
+      },
+      "cta": {
+        "kyb": "Verificar tu empresa",
+        "kyc": "Verificar tu identidad"
+      }
+    },
+    "invalid-url": {
+      "title": "El enlace que abriste no es válido",
+      "subtitle": "Por favor, contacta a la empresa que te envió este enlace."
+    },
+    "complete": {
+      "title": "¡Envío completado!",
+      "subtitle-with-kyb": "Gracias por usar Footprint para verificar tu empresa y tu identidad.",
+      "subtitle": "Gracias por usar Footprint para verificar tu identidad.",
+      "cta": "Volver al sitio"
+    },
+    "expired": {
+      "title": "Sesión expirada",
+      "subtitle": "Por razones de seguridad, esta sesión ha caducado en el flujo o actualiza la página.",
+      "cta": "Reiniciar"
+    }
+  }
+}
