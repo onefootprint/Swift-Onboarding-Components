@@ -9,5 +9,6 @@
       "@/wallet/*": ["./src/domains/wallet/*"],
       "@/scan/*": ["src/components/id-doc/*"],
     },
+    "types": ["node"]
   }
 }
