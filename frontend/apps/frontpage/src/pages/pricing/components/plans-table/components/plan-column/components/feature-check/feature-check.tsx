@@ -1,20 +1,28 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheck16 } from '@onefootprint/icons';
-import { Stack, Typography } from '@onefootprint/ui';
+import { Badge, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 type FeatureCheckProps = {
   children: string;
+  soon?: boolean;
 };
 
-const FeatureCheck = ({ children }: FeatureCheckProps) => (
-  <Stack direction="row" gap={2} align="start" marginTop={2}>
-    <Stack flexGrow={0} marginTop={2}>
-      <IcoCheck16 />
+const FeatureCheck = ({ children, soon }: FeatureCheckProps) => {
+  const { t } = useTranslation('pages.pricing');
+  return (
+    <Stack direction="row" marginTop={2} justify="space-between">
+      <Stack direction="row" gap={2} align="start">
+        <Stack flexGrow={0} marginTop={2}>
+          <IcoCheck16 />
+        </Stack>
+        <Stack flexGrow={1}>
+          <Typography variant="label-3">{children}</Typography>
+        </Stack>
+      </Stack>
+      {soon && <Badge variant="info">{t('soon')}</Badge>}
     </Stack>
-    <Stack flexGrow={1}>
-      <Typography variant="label-3">{children}</Typography>
-    </Stack>
-  </Stack>
-);
+  );
+};
 
 export default FeatureCheck;

@@ -7,6 +7,11 @@ import type { Period, Plans } from '../../plans-table-types';
 import FeatureCheck from './components/feature-check';
 import Header from './components/header';
 
+type FeatureProps = {
+  translation: string;
+  soon: boolean;
+};
+
 type PlanColumnProps = {
   title: Plans;
   price?: {
@@ -14,7 +19,7 @@ type PlanColumnProps = {
     yearly?: number;
   };
   period: Period;
-  features: string[];
+  features: FeatureProps[];
   buttonVariant: ButtonProps['variant'];
   buttonLabel: string;
   onButtonClick: () => void;
@@ -42,8 +47,8 @@ const PlanColumn = ({
       <Header title={t(`plans.${title}.title`)} price={price} period={period} />
       <Stack direction="column" flexGrow={1} gap={3} padding={5}>
         {features.map(feature => (
-          <FeatureCheck key={feature}>
-            {t(`plans.${title}.${feature}`)}
+          <FeatureCheck key={feature.translation} soon={feature.soon}>
+            {t(`plans.${title}.${feature.translation}`)}
           </FeatureCheck>
         ))}
       </Stack>
