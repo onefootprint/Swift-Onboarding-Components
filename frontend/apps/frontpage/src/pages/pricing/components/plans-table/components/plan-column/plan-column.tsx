@@ -3,7 +3,8 @@ import type { ButtonProps } from '@onefootprint/ui';
 import { Button, Stack } from '@onefootprint/ui';
 import React from 'react';
 
-import type { Period, Plans } from '../../plans-table-types';
+import { Plans } from '../../plans-table-types';
+import EverythingAndBanner from './components/everything-and-banner';
 import FeatureCheck from './components/feature-check';
 import Header from './components/header';
 
@@ -18,7 +19,6 @@ type PlanColumnProps = {
     monthly?: number;
     yearly?: number;
   };
-  period: Period;
   features: FeatureProps[];
   buttonVariant: ButtonProps['variant'];
   buttonLabel: string;
@@ -28,7 +28,6 @@ type PlanColumnProps = {
 const PlanColumn = ({
   price,
   title,
-  period,
   features,
   buttonLabel,
   buttonVariant,
@@ -44,8 +43,9 @@ const PlanColumn = ({
       minWidth="410px"
       maxWidth="410px"
     >
-      <Header title={t(`plans.${title}.title`)} price={price} period={period} />
+      <Header title={t(`plans.${title}.title`)} price={price} />
       <Stack direction="column" flexGrow={1} gap={3} padding={5}>
+        {title !== Plans.startup && <EverythingAndBanner plan={title} />}
         {features.map(feature => (
           <FeatureCheck key={feature.translation} soon={feature.soon}>
             {t(`plans.${title}.${feature.translation}`)}

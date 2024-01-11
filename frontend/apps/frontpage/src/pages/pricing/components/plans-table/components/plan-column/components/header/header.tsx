@@ -3,21 +3,11 @@ import styled, { css } from '@onefootprint/styled';
 import { Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 
-import { type HeaderProps, Periods } from '../../../../plans-table-types';
+import { type HeaderProps } from '../../../../plans-table-types';
 
-const Header = ({ title, price, period = Periods.yearly }: HeaderProps) => {
+const Header = ({ title, price }: HeaderProps) => {
   const { t } = useTranslation('pages.pricing');
   const hasPrice = price && price.monthly && price.yearly;
-  const deltaPricePercent =
-    !!price?.monthly &&
-    !!price?.yearly &&
-    Math.round(
-      ((price.monthly - price.yearly / 12) / (price.yearly / 12)) * 100,
-    );
-  const sign =
-    deltaPricePercent && deltaPricePercent > 0 && period === Periods.yearly
-      ? '-'
-      : '+';
 
   const USDollar = new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -33,7 +23,6 @@ const Header = ({ title, price, period = Periods.yearly }: HeaderProps) => {
       paddingLeft={7}
       paddingRight={7}
       gap={2}
-      minHeight="110px"
       justify="center"
     >
       <Stack direction="column" gap={2}>
@@ -42,28 +31,9 @@ const Header = ({ title, price, period = Periods.yearly }: HeaderProps) => {
           <Stack direction="column">
             <Stack direction="row" gap={2}>
               <Typography variant="label-3">
-                {period === 'monthly'
-                  ? USDollar.format(price.monthly || 0)
-                  : USDollar.format(price.yearly || 0)}
+                {t('units.from')} {USDollar.format(price.monthly || 0)}
               </Typography>
-              <Typography variant="label-3">
-                {period === 'monthly'
-                  ? t('units.per-month')
-                  : t('units.per-year')}
-              </Typography>
-            </Stack>
-            <Stack direction="row" justify="start" align="center" gap={2}>
-              <Typography
-                variant="label-3"
-                color={sign === '+' ? 'warning' : 'success'}
-              >
-                {sign}
-                {deltaPricePercent}%
-              </Typography>
-              <Typography variant="body-3" color="tertiary">
-                vs.{' '}
-                {period === 'monthly' ? t('units.yearly') : t('units.monthly')}
-              </Typography>
+              <Typography variant="label-3">{t('units.per-month')}</Typography>
             </Stack>
           </Stack>
         ) : (

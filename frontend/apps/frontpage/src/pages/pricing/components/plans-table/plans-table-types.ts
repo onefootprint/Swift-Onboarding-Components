@@ -2,7 +2,6 @@ export type Period = Periods.monthly | Periods.yearly;
 
 export type HeaderProps = {
   title: string;
-  period: Period;
   price?: {
     monthly?: number;
     yearly?: number;

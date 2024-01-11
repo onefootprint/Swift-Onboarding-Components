@@ -28,6 +28,10 @@ const PlansDetails = [
         soon: false,
       },
       {
+        translation: 'audit-logs',
+        soon: false,
+      },
+      {
         translation: 'sms-otp',
         soon: false,
       },
@@ -61,15 +65,15 @@ const PlansDetails = [
         soon: false,
       },
       {
-        translation: 'audit-logs',
-        soon: false,
-      },
-      {
         translation: 'step-up',
         soon: false,
       },
       {
         translation: 'kyb',
+        soon: false,
+      },
+      {
+        translation: 'customization',
         soon: false,
       },
       {
@@ -122,7 +126,7 @@ const PlansDetails = [
         soon: false,
       },
       {
-        translation: 'Localization',
+        translation: 'localization',
         soon: false,
       },
       {
@@ -131,10 +135,6 @@ const PlansDetails = [
       },
       {
         translation: 'compliance-view',
-        soon: false,
-      },
-      {
-        translation: 'customization',
         soon: false,
       },
       {

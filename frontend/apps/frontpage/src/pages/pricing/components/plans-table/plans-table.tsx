@@ -4,15 +4,13 @@ import React, { useState } from 'react';
 
 import ContactDialog from '../../../../components/contact-dialog';
 import PlanColumn from './components/plan-column';
-import Toggle from './components/toggle';
 import PlansDetails from './plans-table-data';
-import { type Period, Periods, Plans } from './plans-table-types';
+import { Plans } from './plans-table-types';
 
 const GET_FORM_URL =
   'https://getform.io/f/9f26eb67-51b3-4685-8dc4-8cf458e698e1';
 
 const PlansTable = () => {
-  const [period, setPeriod] = useState<Period>(Periods.yearly);
   const [showDialog, setShowDialog] = useState(false);
 
   const getOnClick = (planId: string) => () => {
@@ -29,16 +27,8 @@ const PlansTable = () => {
     setShowDialog(false);
   };
 
-  const handleValueChange = (value: Period) => {
-    if (value) setPeriod(value);
-  };
-
   return (
     <Stack direction="column" align="center" justify="center" gap={7}>
-      <Toggle
-        onValueChange={(newValue: Period) => handleValueChange(newValue)}
-        value={period}
-      />
       <PlansContainer direction="row" flexWrap="wrap">
         {PlansDetails.map(plan => (
           <PlanColumn
@@ -52,7 +42,6 @@ const PlansTable = () => {
             buttonLabel={plan.buttonLabel}
             buttonVariant={plan.buttonVariant}
             onButtonClick={getOnClick(plan.id)}
-            period={period}
           />
         ))}
       </PlansContainer>
