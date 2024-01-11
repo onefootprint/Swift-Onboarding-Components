@@ -68,7 +68,7 @@ fn test_priority_cmp() {
             neg_created_at,
         }
     };
-    assert!(vec![
+    assert!([
         p(Some(true), 10, 10, true, 0),
         p(Some(true), 10, 0, true, 0),
         p(Some(true), 0, 10, true, 0),

@@ -456,10 +456,17 @@ pub struct FetchOCRResponse {
     pub nationality: Option<ScrubbedPiiString>,
     // PiiString. Person's nationality as it appears in MRZ (if present).
     pub nationality_mrz: Option<ScrubbedPiiString>,
+    // String. Optional. Person's driver licence classes.
+    pub classes: Option<PiiString>,
+    // String. Optional. Person's driver licence mentions.
+    pub mentions: Option<PiiString>,
+    // String. Optional. Person's driver licence conditions.
+    pub cond: Option<PiiString>,
     // Array. Optional. List of driver's license details elements:
+    // Note: We don't seem to ever get this
     pub dl_class_details: Option<serde_json::Value>,
-    pub ocr_data_confidence: Option<OcrDataConfidence>,
     pub restrictions: Option<ScrubbedPiiString>,
+    pub ocr_data_confidence: Option<OcrDataConfidence>,
     // MX specific
     pub curp: Option<ScrubbedPiiString>,
     pub cic: Option<ScrubbedPiiString>,
