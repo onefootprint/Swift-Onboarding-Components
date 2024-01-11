@@ -30,6 +30,7 @@ import CaptureButton from './components/capture-button';
 import CountdownTimer from './components/countdown-timer';
 import Feedback from './components/feedback';
 import Overlay from './components/overlay';
+import PlayPermissionDialog from './components/play-permission-dialog';
 import UploadButton from './components/upload-button';
 import useGetImageString from './hooks/use-get-image-string';
 import useSize from './hooks/use-size';
@@ -83,11 +84,22 @@ const logError = (e: string) => Logger.error(e, 'camera');
 const logWarn = (e: string) => Logger.warn(e, 'camera');
 
 const videoElementStateListener =
-  (setPlayingState: (state: boolean) => void, videoElement: HTMLVideoElement) =>
+  (
+    setPlayingState: (state: boolean) => void,
+    isPlaying: boolean,
+    onPlayNotAllowed: () => void,
+    videoElement: HTMLVideoElement,
+  ) =>
   (event: Event) => {
     if (!videoElement) return;
     logWarn(`Video element status: ${event.type}`);
-    if (isFunction(videoElement?.play) && isNonPlayingVideoEvent(event)) {
+    if (
+      isFunction(videoElement?.play) &&
+      (isNonPlayingVideoEvent(event) ||
+        (!isPlaying &&
+          (event.type === 'canplay' || event.type === 'canplaythrough'))) &&
+      videoElement.readyState >= 2
+    ) {
       setPlayingState(false);
       videoElement
         .play()
@@ -95,7 +107,16 @@ const videoElementStateListener =
           logWarn('Video element status: playing');
           setPlayingState(true);
         })
-        .catch(e => logError(`Error playing video element: ${e}`));
+        .catch(error => {
+          if ((error as DOMException).name === 'NotAllowedError') {
+            onPlayNotAllowed();
+            logWarn(
+              'Video element status: play not allowed - prompting user interaction',
+            );
+          } else {
+            logError(`Error starting playing video: ${error}`);
+          }
+        });
     }
   };
 
@@ -155,6 +176,7 @@ const Camera = ({
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [shouldDetect, setShouldDetect] = useState(false); // auto-detect control
+  const [showPlayAllowDialog, setShowPlayAllowDialog] = useState(false);
 
   const videoSize = useSize(videoRef);
   const [
@@ -180,15 +202,32 @@ const Camera = ({
     videoRef.current.srcObject = mediaStream;
   }
 
+  const handlePlayError = (err: unknown) => {
+    const error = err as DOMException;
+    if (error.name === 'NotAllowedError') {
+      setShowPlayAllowDialog(true);
+      logWarn(
+        'Video element status: play not allowed - prompting user interaction',
+      );
+    } else {
+      logError(`Error starting playing video: ${err}`);
+    }
+  };
+
   const handleCanPlay = () => {
-    if (!videoRef.current) return;
+    if (!videoRef.current || isVideoPlaying) return;
     videoRef.current
       .play()
       .then(() => {
         logWarn('Video element status: started playing');
         setIsVideoPlaying(true);
       })
-      .catch(e => logError(`Error starting playing video: ${e}`));
+      .catch(handlePlayError);
+  };
+
+  const handlePlayAllow = () => {
+    setShowPlayAllowDialog(false);
+    handleCanPlay();
   };
 
   const handleClick = (captureKind: CaptureKind) => {
@@ -208,7 +247,7 @@ const Camera = ({
     }
 
     if (!videoSize) {
-      logError(`Cannot capture - videoSize not initilized: ${captureKind}`);
+      logError(`Cannot capture - videoSize not initialized: ${captureKind}`);
       return;
     }
 
@@ -289,12 +328,13 @@ const Camera = ({
     const vidRef = getHtmlVideoElement(videoRef);
     if (!vidRef) return noop;
 
-    const listener = videoElementStateListener(setIsVideoPlaying, vidRef);
+    const listener = videoElementStateListener(
+      setIsVideoPlaying,
+      isVideoPlaying,
+      () => setShowPlayAllowDialog(true),
+      vidRef,
+    );
     VideoEvents.forEach(e => vidRef.addEventListener(e, listener));
-
-    if (vidRef.paused) {
-      vidRef.play().catch(noop);
-    }
 
     return () => {
       VideoEvents.forEach(e => vidRef.removeEventListener(e, listener));
@@ -410,6 +450,11 @@ const Camera = ({
             />
           </StickyBottomBox>
         )}
+        <PlayPermissionDialog
+          open={showPlayAllowDialog}
+          hide={() => setShowPlayAllowDialog(false)}
+          onAllow={handlePlayAllow}
+        />
       </Container>
     </>
   );

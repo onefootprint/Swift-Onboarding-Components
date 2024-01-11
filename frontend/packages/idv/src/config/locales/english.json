@@ -1222,6 +1222,11 @@
         "manual-enabled-toast": {
           "title": "Manual capture enabled",
           "description": "We noticed it's taking you a while to trigger the automatic capture, so you can now take the picture manually."
+        },
+        "play-permission-dialog": {
+          "title": "Permission required",
+          "description": "For optimal camera functionality in your browser, we need your permission to enable video autoplay.",
+          "cta": "Allow"
         }
       },
       "preview": {
