@@ -4097,6 +4097,85 @@ pub fn incode_fetch_ocr_response(opts: Option<OcrTestOpts>) -> serde_json::Value
       }
     })
 }
+
+pub fn incode_fetch_ocr_response_for_drivers_license(
+    class: &str,
+    issuing_state: &str,
+    type_of_id: &str,
+) -> serde_json::Value {
+    serde_json::json!({
+        "name": {
+            "fullName": "ROBERT BOB BOBERTO",
+            "machineReadableFullName": "ROBERT BOB BOBERTO",
+            "firstName": "ROBERT",
+            "middleName": "BOB",
+            "givenName": "BOBERTO",
+            "paternalLastName": "BOBERTO"},
+        "address": "1 MAIN ST HAYES VALLEY GA 30088-2794 USA",
+        "addressFields": {
+            "street": "1 MAIN ST",
+            "postalCode": "300882794",
+            "city": "HAYES VALLEY",
+            "state": "GA"
+        },
+        "checkedAddress": "1 Main St, Hayes Valley, GA 30088, United States",
+        "checkedAddressBean": {
+            "street": "1 Main St",
+            "postalCode": "30088",
+            "city": "Hayes Valley",
+            "state": "GA",
+            "label": "1 Main St",
+            "latitude": 2.75955,
+            "longitude": -1.18541,
+            "zipColonyOptions": []},
+        "typeOfId": type_of_id,
+        "documentFrontSubtype": "DRIVERS_LICENSE",
+        "documentBackSubtype": "DRIVERS_LICENSE",
+        "birthDate": 775958,
+        "gender": "F",
+        "documentNumber": "12345",
+        "refNumber": "12345",
+        "issuedAt": "1686614400000",
+        "expireAt": "1754265600000",
+        "expirationDate": 2025,
+        "issueDate": 2023,
+        "issuingCountry": "USA",
+        "issuingState": issuing_state,
+        "height": "067 IN",
+        "weight": "126",
+        "eyeColor": "BRO",
+        "classes": class,
+        "mentions": "NONE",
+        "restrictions": "A",
+        "ocrDataConfidence": {"birthDateConfidence": 1.0,
+            "nameConfidence": 1.0,
+            "givenNameConfidence": 1.0,
+            "firstNameConfidence": 1.0,
+            "middleNameConfidence": 1.0,
+            "fathersSurnameConfidence": 1.0,
+            "fullNameMrzConfidence": 1.0,
+            "addressConfidence": 1.0,
+            "streetConfidence": 1.0,
+            "postalCodeConfidence": 1.0,
+            "cityConfidence": 1.0,
+            "stateConfidence": 1.0,
+            "countryCodeConfidence": 1.0,
+            "genderConfidence": 1.0,
+            "issueDateConfidence": 1.0,
+            "expirationDateConfidence": 1.0,
+            "issuedAtConfidence": 1.0,
+            "expireAtConfidence": 1.0,
+            "documentNumberConfidence": 1.0,
+            "heightConfidence": 1.0,
+            "eyeColorConfidence": 1.0,
+            "classesConfidence": 1.0,
+            "mentionsConfidence": 1.0,
+            "refNumberConfidence": 1.0,
+            "weightConfidence": 1.0,
+            "restrictionsConfidence": 1.0}
+        }
+    )
+}
 pub fn incode_watchlist_result_response_large() -> serde_json::Value {
     let s = r#"
     {

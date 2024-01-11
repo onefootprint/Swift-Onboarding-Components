@@ -219,6 +219,7 @@ pub(super) fn compute_risk_signals<'a>(
         .chain(pii_matching_ocr_reason_codes)
         .chain(additional_reason_codes)
         .chain(ignored_error_reason_codes)
+        .unique()
         .collect();
     Ok(s)
 }

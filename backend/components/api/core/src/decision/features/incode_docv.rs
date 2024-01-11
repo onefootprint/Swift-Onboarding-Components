@@ -228,6 +228,16 @@ pub fn pii_matching_reason_codes_from_ocr_response(res: &FetchOCRResponse, vault
     reason_codes
 }
 
+// TODO: rm ff for this in the other place in follow up PR since we have rules now
+pub fn drivers_license_features_from_ocr_response(res: &FetchOCRResponse) -> Vec<FootprintReasonCode> {
+    let mut frc = vec![];
+    if res.is_permit_or_provisional_license().unwrap_or(false) {
+      frc.push(FootprintReasonCode::DocumentIsPermitOrProvisionalLicense)
+    } 
+
+    frc
+}
+
 const OCR_CONFIDENCE_SCORE_THRESHOLD: f32 = 0.70;
  
 fn ocr_was_successful(scores_res: &FetchScoresResponse, ocr_res: &FetchOCRResponse, dk: IdDocKind) -> bool {
@@ -694,4 +704,19 @@ mod tests {
         let scores_res: FetchScoresResponse = serde_json::from_value(idv::test_fixtures::incode_fetch_scores_response(score_opts)).unwrap();
         ocr_was_successful(&scores_res, &ocr_res, dk)
     }
+
+    #[test_case("CP", "GEORGIA", "DriversLicense", vec![FootprintReasonCode::DocumentIsPermitOrProvisionalLicense])]
+    #[test_case("EP", "GEORGIA", "DriversLicense", vec![FootprintReasonCode::DocumentIsPermitOrProvisionalLicense])]
+    #[test_case("cp   ", "GEorgIA", "DriversLicense", vec![FootprintReasonCode::DocumentIsPermitOrProvisionalLicense]; "with normalization")]
+    #[test_case("CP", "GEORGIA", "IdentificationCard", vec![]; "not a DL")]
+    #[test_case("C", "GEORGIA", "DriversLicense", vec![]; "full driver class passes")]
+    #[test_case("A", "GEORGIA", "DriversLicense", vec![]; "full commercial driver class passes")]
+    #[test_case("D", "NEW YORK", "DriversLicense", vec![])]
+    fn test_drivers_license_features(class: &str, issuing_state: &str, type_of_id: &str, expected: Vec<FootprintReasonCode>) {
+        let raw = test_fixtures::incode_fetch_ocr_response_for_drivers_license(class, issuing_state, type_of_id);
+        let parsed: FetchOCRResponse = serde_json::from_value(raw).unwrap();
+
+        assert_have_same_elements(super::drivers_license_features_from_ocr_response(&parsed), expected)
+    }
+
 }
