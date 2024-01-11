@@ -12,6 +12,7 @@ use chrono::{DateTime, Utc};
 use db_schema::schema::user_timeline;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use newtypes::AuthMethodUpdatedInfo;
 use newtypes::CollectedDataOption;
 use newtypes::DataIdentifier;
 use newtypes::DbUserTimelineEventKind;
@@ -70,6 +71,7 @@ pub enum SaturatedTimelineEvent {
     VaultCreated(SaturatedActor),
     WorkflowTriggered((Option<Workflow>, SaturatedActor, Option<WorkflowRequest>)),
     WorkflowStarted((Workflow, ObConfiguration)),
+    AuthMethodUpdated(AuthMethodUpdatedInfo),
 }
 
 pub type IsFromOtherTenant = bool;
@@ -275,6 +277,9 @@ impl UserTimeline {
                             .ok_or(DbError::RelatedObjectNotFound)?
                             .clone();
                         SaturatedTimelineEvent::WorkflowStarted((workflow, ob_config))
+                    }
+                    DbUserTimelineEvent::AuthMethodUpdated(ref e) => {
+                        SaturatedTimelineEvent::AuthMethodUpdated(e.clone())
                     }
                 };
                 Ok(UserTimelineInfo(ut, saturated_event))

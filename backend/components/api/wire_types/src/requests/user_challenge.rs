@@ -1,4 +1,4 @@
-use newtypes::{email::Email, AuthMethodKind, ChallengeToken, PhoneNumber};
+use newtypes::{email::Email, ActionKind, AuthMethodKind, ChallengeToken, PhoneNumber};
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -20,16 +20,6 @@ pub struct UserChallengeRequest {
     /// Specifies whether to add the new auth method alongside existing auth methods or replace
     /// the existing method.
     pub action_kind: ActionKind,
-}
-
-#[derive(Debug, Clone, Copy, Apiv2Schema, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
-#[serde(rename_all = "snake_case")]
-pub enum ActionKind {
-    /// Replace the existing auth method.
-    Replace,
-    /// Add the provided auth method, where an auth method of this kind doesn't already exist.
-    /// Adding a secondary credential will be a different operation kind.
-    AddPrimary,
 }
 
 #[derive(Apiv2Schema, serde::Serialize)]

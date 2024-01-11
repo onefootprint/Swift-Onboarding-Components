@@ -1,3 +1,4 @@
+use paperclip::actix::Apiv2Schema;
 use strum_macros::Display;
 
 use crate::{AuthEventKind, DataIdentifier, IdentityDataKind};
@@ -8,7 +9,7 @@ use crate::{AuthEventKind, DataIdentifier, IdentityDataKind};
     Eq,
     PartialEq,
     Hash,
-    paperclip::actix::Apiv2Schema,
+    Apiv2Schema,
     serde_with::SerializeDisplay,
     serde_with::DeserializeFromStr,
     strum_macros::Display,
@@ -21,6 +22,16 @@ pub enum AuthMethodKind {
     Phone,
     Passkey,
     Email,
+}
+
+#[derive(Debug, Clone, Copy, Apiv2Schema, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum ActionKind {
+    /// Replace the existing auth method.
+    Replace,
+    /// Add the provided auth method, where an auth method of this kind doesn't already exist.
+    /// Adding a secondary credential will be a different operation kind.
+    AddPrimary,
 }
 
 #[derive(Debug, Display, Clone, Copy, Eq, PartialEq)]

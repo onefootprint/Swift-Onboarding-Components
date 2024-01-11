@@ -2,7 +2,9 @@ use crate::{
     util::impl_enum_string_diesel, AnnotationId, CollectedDataOption, IdentityDocumentId, LivenessEventId,
     OnboardingDecisionId, WatchlistCheckId, WebauthnCredentialId, WorkflowRequestId,
 };
-use crate::{DataIdentifier, DbActor, ObConfigurationId, WorkflowId};
+use crate::{
+    ActionKind, AuthEventId, AuthMethodKind, DataIdentifier, DbActor, ObConfigurationId, WorkflowId,
+};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
@@ -37,6 +39,7 @@ pub enum DbUserTimelineEvent {
     VaultCreated(VaultCreatedInfo),
     WorkflowTriggered(WorkflowTriggeredInfo),
     WorkflowStarted(WorkflowStartedInfo),
+    AuthMethodUpdated(AuthMethodUpdatedInfo),
 }
 
 impl_enum_string_diesel!(DbUserTimelineEventKind);
@@ -92,6 +95,12 @@ impl From<WorkflowTriggeredInfo> for DbUserTimelineEvent {
 impl From<WorkflowStartedInfo> for DbUserTimelineEvent {
     fn from(s: WorkflowStartedInfo) -> Self {
         Self::WorkflowStarted(s)
+    }
+}
+
+impl From<AuthMethodUpdatedInfo> for DbUserTimelineEvent {
+    fn from(s: AuthMethodUpdatedInfo) -> Self {
+        Self::AuthMethodUpdated(s)
     }
 }
 
@@ -160,4 +169,11 @@ pub struct WorkflowTriggeredInfo {
 pub struct WorkflowStartedInfo {
     pub workflow_id: WorkflowId,
     pub pb_id: ObConfigurationId,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AuthMethodUpdatedInfo {
+    pub kind: AuthMethodKind,
+    pub action: ActionKind,
+    pub auth_event_id: AuthEventId,
 }

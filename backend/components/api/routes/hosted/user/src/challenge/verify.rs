@@ -20,7 +20,6 @@ use api_core::utils::passkey::VerifyChallengeResult;
 use api_core::utils::passkey::WebauthnConfig;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
-use api_wire_types::ActionKind;
 use api_wire_types::UserChallengeVerifyRequest;
 use chrono::Utc;
 use crypto::sha256;
@@ -28,16 +27,21 @@ use db::models::auth_event::AuthEvent;
 use db::models::auth_event::NewAuthEvent;
 use db::models::contact_info::ContactInfo;
 use db::models::insight_event::CreateInsightEvent;
+use db::models::user_timeline::UserTimeline;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::TxnPgConn;
 use itertools::Itertools;
+use newtypes::ActionKind;
 use newtypes::AuthEventKind;
+use newtypes::AuthMethodKind;
+use newtypes::AuthMethodUpdatedInfo;
 use newtypes::ContactInfoKind;
 use newtypes::DataLifetimeSource;
 use newtypes::DataRequest;
 use newtypes::Fingerprints;
 use newtypes::InsightEventId;
 use newtypes::PiiString;
+use newtypes::ScopedVaultId;
 use newtypes::TenantId;
 use newtypes::ValidateArgs;
 use newtypes::WebauthnCredentialId;
@@ -60,6 +64,9 @@ pub async fn post(
     if !user_auth.data.is_from_api {
         return ValidationError("Can only update auth methods using auth issued via API").into();
     }
+    let sv_id = user_auth
+        .scoped_user_id()
+        .ok_or(ValidationError("Cannot update contact info without scoped vault"))?;
     let tenant = user_auth
         .tenant()
         .ok_or(ValidationError("Need tenant ID to verify challenge"))?;
@@ -78,6 +85,7 @@ pub async fn post(
     }
 
     // Verify the challenge response and determine which action to perform
+    let kind = AuthMethodKind::from(&data);
     let action = match data {
         RegisterChallengeData::Sms {
             h_code,
@@ -106,16 +114,17 @@ pub async fn post(
         .db_transaction(move |conn| -> ApiResult<_> {
             let ie = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
             let (event_kind, passkey_cred_id) =
-                action.register(conn, action_kind, &user_auth, ie.id.clone())?;
+                action.register(conn, &sv_id, action_kind, &user_auth, ie.id.clone())?;
 
             let auth_event = user_auth
                 .auth_events
                 .first()
                 .ok_or(AssertionError("No auth events found for user"))?;
             let existing_auth_event = AuthEvent::get(conn, &auth_event.id)?;
-            NewAuthEvent {
-                vault_id: user_auth.user_vault_id().clone(),
-                scoped_vault_id: user_auth.scoped_user_id(),
+            let vault_id = user_auth.user_vault_id().clone();
+            let ae = NewAuthEvent {
+                vault_id: vault_id.clone(),
+                scoped_vault_id: Some(sv_id.clone()),
                 insight_event_id: Some(ie.id),
                 kind: event_kind,
                 webauthn_credential_id: passkey_cred_id,
@@ -124,6 +133,12 @@ pub async fn post(
                 scope: existing_auth_event.scope,
             }
             .create(conn.conn())?;
+            let info = AuthMethodUpdatedInfo {
+                kind,
+                action: action_kind,
+                auth_event_id: ae.id,
+            };
+            UserTimeline::create(conn, info, vault_id, sv_id)?;
 
             Ok(())
         })
@@ -162,14 +177,12 @@ impl Action {
     fn register(
         self,
         conn: &mut TxnPgConn,
+        sv_id: &ScopedVaultId,
         action_kind: ActionKind,
         user_auth: &CheckedUserAuthContext,
         ie_id: InsightEventId,
     ) -> ApiResult<(AuthEventKind, Option<WebauthnCredentialId>)> {
-        let sv_id = user_auth
-            .scoped_user_id()
-            .ok_or(ValidationError("Cannot update contact info without scoped vault"))?;
-        let vw = VaultWrapper::<Any>::lock_for_onboarding(conn, &sv_id)?;
+        let vw = VaultWrapper::<Any>::lock_for_onboarding(conn, sv_id)?;
         let vault_id = user_auth.user_vault_id();
         let (event_kind, passkey_cred_id) = match self {
             Self::ReplaceContactInfo { kind, data } => {

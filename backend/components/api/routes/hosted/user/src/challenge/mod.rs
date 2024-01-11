@@ -1,5 +1,5 @@
-use api_wire_types::ActionKind;
-use newtypes::PiiString;
+use newtypes::ActionKind;
+use newtypes::{AuthMethodKind, PiiString};
 use webauthn_rs_core::proto::RegistrationState;
 
 pub mod index;
@@ -27,4 +27,14 @@ pub enum RegisterChallengeData {
     Passkey {
         reg_state: RegistrationState,
     },
+}
+
+impl<'a> From<&'a RegisterChallengeData> for AuthMethodKind {
+    fn from(value: &'a RegisterChallengeData) -> Self {
+        match value {
+            RegisterChallengeData::Sms { .. } => Self::Phone,
+            RegisterChallengeData::Email { .. } => Self::Email,
+            RegisterChallengeData::Passkey { .. } => Self::Passkey,
+        }
+    }
 }

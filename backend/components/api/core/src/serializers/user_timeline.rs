@@ -3,7 +3,9 @@ use db::models::user_timeline::{
     SaturatedDataCollectedEvent, SaturatedTimelineEvent, UserTimeline, UserTimelineInfo,
 };
 use itertools::Itertools;
-use newtypes::{DocumentRequestKind, TriggerKind, WorkflowConfig, WorkflowRequestConfig};
+use newtypes::{
+    AuthMethodUpdatedInfo, DocumentRequestKind, TriggerKind, WorkflowConfig, WorkflowRequestConfig,
+};
 
 use crate::utils::db2api::DbToApi;
 
@@ -118,6 +120,14 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                     // Even though document workflows don't really use them, they are associated with playbooks
                     playbook: api_wire_types::TimelinePlaybook::from_db(pb),
                 })
+            }
+            SaturatedTimelineEvent::AuthMethodUpdated(e) => {
+                let AuthMethodUpdatedInfo {
+                    kind,
+                    action,
+                    auth_event_id: _,
+                } = e;
+                Self::AuthMethodUpdated(api_wire_types::AuthMethodUpdated { kind, action })
             }
         }
     }

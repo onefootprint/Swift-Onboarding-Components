@@ -1,4 +1,4 @@
-use newtypes::CollectedDataOption;
+use newtypes::{ActionKind, AuthMethodKind, CollectedDataOption};
 
 use crate::{
     Actor, Annotation, Apiv2Schema, DateTime, IdentityDocumentTimelineEvent, LivenessEvent,
@@ -32,6 +32,7 @@ pub enum UserTimelineEvent {
     VaultCreated(VaultCreated),
     WorkflowTriggered(WorkflowTriggered),
     WorkflowStarted(WorkflowStarted),
+    AuthMethodUpdated(AuthMethodUpdated),
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -55,6 +56,12 @@ pub struct WorkflowTriggered {
 pub struct WorkflowStarted {
     pub kind: WorkflowStartedEventKind,
     pub playbook: TimelinePlaybook,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct AuthMethodUpdated {
+    pub kind: AuthMethodKind,
+    pub action: ActionKind,
 }
 
 #[derive(Debug, Clone, Serialize)]
