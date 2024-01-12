@@ -1,15 +1,19 @@
 import {
   createUseRouterSpy,
   customRender,
+  mockRequest,
   screen,
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
+import { RoleScopeKind } from '@onefootprint/types';
 import React from 'react';
 import {
+  asAdminUserFirmEmployee,
   asAdminUserInLive,
   asAdminUserInSandbox,
   asAdminUserInSandboxAndRestricted,
+  asAssumedUser,
 } from 'src/config/tests';
 
 import DefaultLayout from './default-layout';
@@ -31,6 +35,14 @@ describe('<DefaultLayout />', () => {
       pathname: '/users',
       query: {},
     });
+    mockRequest({
+      method: 'get',
+      path: '/org/member',
+      statusCode: 200,
+      response: {
+        scopes: [RoleScopeKind.read],
+      },
+    });
     withEntities();
     withOrgAuthRoles();
   });
@@ -46,7 +58,7 @@ describe('<DefaultLayout />', () => {
   });
 
   describe('when in sandbox mode', () => {
-    it('should go from the sandbox to the live mode', async () => {
+    it('should go from the sandbox to live mode', async () => {
       asAdminUserInSandbox();
       renderDefaultLayout();
 
@@ -165,6 +177,53 @@ describe('<DefaultLayout />', () => {
       });
       await waitFor(() => {
         expect(screen.getByText(SANDBOX_MODE_TEXT)).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('<AssumeBanner />', () => {
+    describe('when not assuming', () => {
+      it('should not show banner', async () => {
+        asAdminUserFirmEmployee();
+        renderDefaultLayout();
+
+        expect(
+          screen.queryByText("You're logged into Acme in view-only mode"),
+        ).not.toBeInTheDocument();
+      });
+    });
+
+    describe('when assuming', () => {
+      it('should show banner', async () => {
+        asAssumedUser();
+        renderDefaultLayout();
+
+        expect(
+          screen.getByText("You're logged into Acme in view-only mode"),
+        ).toBeInTheDocument();
+        expect(screen.getByText('Enable edit mode')).toBeDisabled();
+      });
+    });
+
+    describe('when user has write permissions while impersonating', () => {
+      it('allow enabling edit mode', async () => {
+        mockRequest({
+          method: 'get',
+          path: '/org/member',
+          statusCode: 200,
+          response: {
+            scopes: [RoleScopeKind.admin],
+          },
+        });
+        asAssumedUser();
+        renderDefaultLayout();
+
+        expect(
+          screen.getByText("You're logged into Acme in view-only mode"),
+        ).toBeInTheDocument();
+        await waitFor(() => {
+          expect(screen.getByText('Enable edit mode')).toBeEnabled();
+        });
       });
     });
   });

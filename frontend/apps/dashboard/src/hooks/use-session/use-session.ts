@@ -1,6 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import request, { getErrorMessage } from '@onefootprint/request';
-import type { OrgMemberResponse } from '@onefootprint/types';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -9,6 +8,7 @@ import {
   DASHBOARD_AUTHORIZATION_HEADER,
   DASHBOARD_IS_LIVE_HEADER,
 } from '../../config/constants';
+import { getOrgMemberRequest } from '../use-get-org-member/use-get-org-member';
 import type {
   AuthHeaders,
   MetaSession,
@@ -18,19 +18,6 @@ import type {
   UserSessionState,
 } from './user-session.types';
 import { defaultSession } from './user-session.types';
-
-const getUser = async (auth: string, isAssumedSessionEditMode: boolean) => {
-  const response = await request<OrgMemberResponse>({
-    headers: {
-      [DASHBOARD_AUTHORIZATION_HEADER]: auth,
-      [DASHBOARD_ALLOW_ASSUMED_WRITES]: isAssumedSessionEditMode,
-    },
-    method: 'GET',
-    url: '/org/member',
-  });
-
-  return response.data;
-};
 
 const logoutUser = (auth: string) =>
   request({
@@ -109,7 +96,10 @@ const useSession = () => {
     newIsAssumedSessionEditMode?: boolean;
   }) => {
     try {
-      const user = await getUser(authToken, !!newIsAssumedSessionEditMode);
+      const user = await getOrgMemberRequest({
+        auth: authToken,
+        isAssumedSessionEditMode: !!newIsAssumedSessionEditMode,
+      });
       update({
         user: {
           ...user,
@@ -170,6 +160,8 @@ const useSession = () => {
 
   const setAssumedSessionEditMode = async (newEditMode: boolean) => {
     if (!data?.auth) return;
+    // Fetch the permissions from the backend with the newEditMode - the backend will properly
+    // render and apply permissions as requested
     await refreshPermissions({
       authToken: data.auth,
       newIsAssumedSessionEditMode: newEditMode,
