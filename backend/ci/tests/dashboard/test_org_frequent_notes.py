@@ -42,7 +42,8 @@ def test_org_frequent_notes(sandbox_tenant):
         want_ids = [fn_id for fn_id, fn in zip(fn_ids, fixtures) if fn[0] == kind]
 
         # Don't compare creation time ordering as that may be flaky.
-        assert set(got_ids) == set(want_ids)
+        # Don't compare set equality either since other concurrent tests may create frequent notes.
+        assert set(want_ids).issubset(set(got_ids))
 
     # Attempting to delete fails for read-only creds.
     for fn_id in fn_ids:
@@ -59,7 +60,8 @@ def test_org_frequent_notes(sandbox_tenant):
         want_ids = [fn_id for fn_id, fn in zip(fn_ids[i+1:], fixtures[i+1:]) if fn[0] == kind]
 
         # Don't compare creation time ordering as that may be flaky.
-        assert set(got_ids) == set(want_ids)
+        # Don't compare set equality either since other concurrent tests may create frequent notes.
+        assert set(want_ids).issubset(set(got_ids))
 
     # Re-deletion throws errors.
     for fn_id in fn_ids:
