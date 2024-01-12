@@ -62,7 +62,7 @@
     },
     "ssn": {
       "title": "What's your Social Security Number?",
-      "subtitle": "We're legally required to collect this information.",
+      "subtitle": "We need to collect this information to verify your identity.",
       "form": {
         "full": {
           "label": "SSN (Full)",

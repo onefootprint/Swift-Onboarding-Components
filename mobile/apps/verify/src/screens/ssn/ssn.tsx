@@ -104,6 +104,20 @@ const Ssn = ({
     });
   };
 
+  const formatSsn = (val: string, kind: 'last-4' | 'ssn-full') => {
+    const numericVal = val.replace(/[^0-9]/g, '');
+    if (kind === 'last-4') {
+      return numericVal;
+    }
+    const firstThree = numericVal.slice(0, Math.min(3, numericVal.length));
+    const secondTwo = numericVal.slice(3, Math.min(5, numericVal.length));
+    const lastFour = numericVal.slice(5, Math.min(9, numericVal.length));
+    const fullSsn = `${firstThree}${secondTwo ? '-' : ''}${secondTwo}${
+      lastFour ? '-' : ''
+    }${lastFour}`;
+    return fullSsn;
+  };
+
   return (
     <Box width="100%">
       {!hideHeader && <Header title={t('title')} subtitle={t('subtitle')} />}
@@ -127,11 +141,15 @@ const Ssn = ({
                   inputMode="text"
                   label={t('form.full.label')}
                   onBlur={onBlur}
-                  onChangeText={onChange}
+                  onChangeText={val => {
+                    const formattedVal = formatSsn(val, 'ssn-full');
+                    onChange(formattedVal);
+                  }}
                   onSubmitEditing={handleSubmit(onSubmit)}
                   placeholder={t('form.full.placeholder')}
                   private
                   value={value}
+                  maxLength={11}
                 />
               );
             }}
@@ -156,11 +174,15 @@ const Ssn = ({
                   inputMode="text"
                   label={t('form.last-4.label')}
                   onBlur={onBlur}
-                  onChangeText={onChange}
+                  onChangeText={val => {
+                    const formattedVal = formatSsn(val, 'ssn-full');
+                    onChange(formattedVal);
+                  }}
                   onSubmitEditing={handleSubmit(onSubmit)}
                   placeholder={t('form.last-4.placeholder')}
                   private
                   value={value}
+                  maxLength={4}
                 />
               );
             }}
