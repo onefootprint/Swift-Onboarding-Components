@@ -235,57 +235,28 @@ describe('<SideNav />', () => {
           expect(screen.getByText('Show all')).toBeInTheDocument();
         });
       });
+    });
+  });
 
-      describe('when it is not a firm employee', () => {
-        it('should not show the super admin mode button', async () => {
-          renderSideNav();
+  describe('when it is not a firm employee', () => {
+    it('should not show the super admin mode button', async () => {
+      renderSideNav();
 
-          const navDropdownButton = screen.getByTestId('nav-dropdown-button');
-          await userEvent.click(navDropdownButton);
+      const tenants = screen.queryByText('Tenants');
+      expect(tenants).not.toBeInTheDocument();
+    });
+  });
 
-          await waitFor(() => {
-            const superAdmin = screen.queryByText('Log in as Super Admin');
-            expect(superAdmin).not.toBeInTheDocument();
-          });
-        });
-      });
+  describe('when it is a firm employee', () => {
+    beforeEach(() => {
+      asAdminUserFirmEmployee();
+    });
 
-      describe('when it is a firm employee', () => {
-        beforeEach(() => {
-          asAdminUserFirmEmployee();
-        });
+    it('should show the super admin mode button', async () => {
+      renderSideNav();
 
-        it('should show the super admin mode button', async () => {
-          renderSideNav();
-
-          const navDropdownButton = screen.getByTestId('nav-dropdown-button');
-          await userEvent.click(navDropdownButton);
-
-          await waitFor(() => {
-            const superAdmin = screen.getByText('Log in as Super Admin');
-            expect(superAdmin).toBeInTheDocument();
-          });
-        });
-
-        describe('when clicking on the button', () => {
-          it('should show the super admin mode button', async () => {
-            const push = jest.fn();
-            useRouterSpy({
-              pathname: '/',
-              push,
-            });
-            renderSideNav();
-
-            const navDropdownButton = screen.getByTestId('nav-dropdown-button');
-            await userEvent.click(navDropdownButton);
-
-            const superAdmin = screen.getByText('Log in as Super Admin');
-            await userEvent.click(superAdmin);
-
-            expect(push).toHaveBeenCalledWith('/super-admin');
-          });
-        });
-      });
+      const tenants = screen.queryByText('Tenants');
+      expect(tenants).toBeInTheDocument();
     });
   });
 });
