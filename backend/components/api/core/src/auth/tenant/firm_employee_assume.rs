@@ -7,6 +7,7 @@ use crate::{
         AuthError, SessionContext,
     },
     errors::ApiResult,
+    utils::headers::get_bool_header,
 };
 use db::{
     models::{
@@ -29,6 +30,10 @@ pub struct FirmEmployeeAssumeAuth {
     role: TenantRole,
     is_risk_ops: bool,
     is_live: bool,
+    /// True if the request from the client includes a header to allow write operations.
+    /// This forces clients to explicitly acknowledge they're performing write actions on behalf of
+    /// a tenant.
+    requested_allow_writes: bool,
     pub(super) auth_method: WorkosAuthMethod,
 }
 
@@ -81,6 +86,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAssumeAuth {
 
         let is_risk_ops = ff_client.flag(BoolFlag::IsRiskOps(&tenant_user.email));
         let is_live = get_is_live(&req).unwrap_or(!tenant.sandbox_restricted);
+        let allow_writes = get_bool_header("x-allow-assumed-writes", &req.headers).unwrap_or(false);
 
         tracing::info!(tenant_id=%tenant.id, tenant_user_id=%tenant_user.id, "Authenticated as firm employee in assume session");
         Ok(Self(FirmEmployeeAssumeAuth {
@@ -90,6 +96,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAssumeAuth {
             is_risk_ops,
             is_live,
             auth_method: data.auth_method,
+            requested_allow_writes: allow_writes,
         }))
     }
 
@@ -118,7 +125,7 @@ impl AllowSessionUpdate for ParsedFirmEmployeeAssumeAuth {}
 impl FirmEmployeeAssumeAuth {
     fn token_scopes(&self) -> Vec<TenantScope> {
         // TODO check if there's a header that approves write access
-        let extra_permissions_for_user = if self.is_risk_ops {
+        let extra_permissions_for_user = if self.is_risk_ops && self.requested_allow_writes {
             vec![
                 TenantScope::DecryptAll,
                 TenantScope::ManualReview,
@@ -186,8 +193,10 @@ mod test {
     use macros::db_test_case;
     use newtypes::{TenantRoleKind, TenantScope, WorkosAuthMethod};
 
-    #[db_test_case(false => vec![TenantScope::Read])]
-    #[db_test_case(true => vec![
+    #[db_test_case(false, false => vec![TenantScope::Read])]
+    #[db_test_case(false, true => vec![TenantScope::Read])]
+    #[db_test_case(true, false => vec![TenantScope::Read])]
+    #[db_test_case(true, true => vec![
         TenantScope::Read,
         TenantScope::DecryptAll,
         TenantScope::ManualReview,
@@ -196,7 +205,11 @@ mod test {
         TenantScope::ApiKeys,
         TenantScope::ManageWebhooks,
     ])]
-    fn test_roles(conn: &mut TestPgConn, is_risk_ops: bool) -> Vec<TenantScope> {
+    fn test_roles(
+        conn: &mut TestPgConn,
+        requested_allow_writes: bool,
+        is_risk_ops: bool,
+    ) -> Vec<TenantScope> {
         let tenant = db::tests::fixtures::tenant::create(conn);
         let role_kind = TenantRoleKind::DashboardUser;
         let role =
@@ -214,6 +227,7 @@ mod test {
             is_risk_ops,
             is_live: true,
             auth_method: WorkosAuthMethod::GoogleOauth,
+            requested_allow_writes,
         };
         let data = ParsedFirmEmployeeAssumeAuth(data);
         let auth = SessionContext::create_fixture(data, session_data);

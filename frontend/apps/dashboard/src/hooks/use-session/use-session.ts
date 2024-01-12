@@ -5,6 +5,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 import {
+  DASHBOARD_ALLOW_ASSUMED_WRITES,
   DASHBOARD_AUTHORIZATION_HEADER,
   DASHBOARD_IS_LIVE_HEADER,
 } from '../../config/constants';
@@ -18,10 +19,11 @@ import type {
 } from './user-session.types';
 import { defaultSession } from './user-session.types';
 
-const getUser = async (auth: string) => {
+const getUser = async (auth: string, isAssumedSessionEditMode: boolean) => {
   const response = await request<OrgMemberResponse>({
     headers: {
       [DASHBOARD_AUTHORIZATION_HEADER]: auth,
+      [DASHBOARD_ALLOW_ASSUMED_WRITES]: isAssumedSessionEditMode,
     },
     method: 'GET',
     url: '/org/member',
@@ -83,6 +85,9 @@ const useSession = () => {
     [DASHBOARD_AUTHORIZATION_HEADER]: data?.auth as string,
     [DASHBOARD_IS_LIVE_HEADER]: JSON.stringify(isLive),
   } as AuthHeaders;
+  if (isAssumedSessionEditMode) {
+    authHeaders[DASHBOARD_ALLOW_ASSUMED_WRITES] = JSON.stringify(true);
+  }
 
   const logIn = async (session: { auth: string; meta?: MetaSession }) => {
     // Update local storage with the auth and meta ASAP
@@ -91,20 +96,25 @@ const useSession = () => {
       update({ meta: session.meta });
     }
     // Then asynchronously fetch user and tenant info from the backend for the new auth
-    await refreshPermissions(session.auth);
+    await refreshPermissions({ authToken: session.auth });
   };
 
-  const refreshPermissions = async (
-    authToken: string,
-    org?: Partial<OrgSession>,
-  ) => {
+  const refreshPermissions = async ({
+    authToken,
+    org,
+    newIsAssumedSessionEditMode,
+  }: {
+    authToken: string;
+    org?: Partial<OrgSession>;
+    newIsAssumedSessionEditMode?: boolean;
+  }) => {
     try {
-      const user = await getUser(authToken);
+      const user = await getUser(authToken, !!newIsAssumedSessionEditMode);
       update({
         user: {
           ...user,
           isAssumedSession: !!user.isAssumedSession,
-          isAssumedSessionEditMode: false,
+          isAssumedSessionEditMode: newIsAssumedSessionEditMode,
         },
         org: {
           ...user.tenant,
@@ -125,7 +135,7 @@ const useSession = () => {
 
   const refreshUserPermissions = async (org?: Partial<OrgSession>) => {
     if (!data.auth) return;
-    await refreshPermissions(data.auth, org);
+    await refreshPermissions({ authToken: data.auth, org });
   };
 
   const logOut = () => {
@@ -158,10 +168,11 @@ const useSession = () => {
     });
   };
 
-  const setAssumedSessionEditMode = (newEditMode: boolean) => {
-    if (!data.user) return;
-    update({
-      user: { ...data.user, isAssumedSessionEditMode: newEditMode },
+  const setAssumedSessionEditMode = async (newEditMode: boolean) => {
+    if (!data?.auth) return;
+    await refreshPermissions({
+      authToken: data.auth,
+      newIsAssumedSessionEditMode: newEditMode,
     });
   };
 

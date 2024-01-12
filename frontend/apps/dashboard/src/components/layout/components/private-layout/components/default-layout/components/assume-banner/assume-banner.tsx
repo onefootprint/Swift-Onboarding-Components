@@ -1,7 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoInfo16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { RoleScopeKind } from '@onefootprint/types';
 import { Banner, Stack, Tooltip } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -12,9 +11,6 @@ const AssumeBanner = () => {
   const { data, isAssumedSessionEditMode, setAssumedSessionEditMode } =
     useSession();
   const router = useRouter();
-  const canUserAccessEditMode = data.user?.scopes.some(
-    s => s.kind !== RoleScopeKind.read,
-  );
 
   const handleChangeEdit = () => {
     setAssumedSessionEditMode(!isAssumedSessionEditMode);
@@ -40,16 +36,10 @@ const AssumeBanner = () => {
             </Tooltip>
           )}
           <span>·</span>
-          {canUserAccessEditMode && (
-            <>
-              <button type="button" onClick={handleChangeEdit}>
-                {isAssumedSessionEditMode
-                  ? t('disable-edit')
-                  : t('enable-edit')}
-              </button>
-              ·
-            </>
-          )}
+          <button type="button" onClick={handleChangeEdit}>
+            {isAssumedSessionEditMode ? t('disable-edit') : t('enable-edit')}
+          </button>
+          ·
           <button type="button" onClick={handleLogout}>
             {t('log-out')}
           </button>
