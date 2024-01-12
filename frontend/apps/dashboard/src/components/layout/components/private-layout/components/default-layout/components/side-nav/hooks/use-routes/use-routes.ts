@@ -44,11 +44,6 @@ const useRoutes = (): Route[] => {
           Icon: IcoFileText16,
           text: t('security-logs'),
         },
-        {
-          href: '/settings',
-          Icon: IcoSettings16,
-          text: t('settings'),
-        },
       ],
     },
     {
@@ -73,6 +68,11 @@ const useRoutes = (): Route[] => {
           href: '/webhooks',
           Icon: IcoWebhook16,
           text: t('webhooks'),
+        },
+        {
+          href: '/settings',
+          Icon: IcoSettings16,
+          text: t('settings'),
         },
       ],
     },
