@@ -27,6 +27,11 @@ impl OrgMemberEmail {
     /// DO NOT CHANGE THIS UNLESS YOU KNOW WHAT YOU ARE DOING.
     pub const INTEGRATION_TEST_USER_EMAIL: &'static str = "integrationtests@onefootprint.com";
     pub const INTEGRATION_TEST_RO_USER_EMAIL: &'static str = "integrationtests_ro@onefootprint.com";
+
+    pub fn is_integration_test_email(&self) -> bool {
+        self.0.to_lowercase() == Self::INTEGRATION_TEST_USER_EMAIL.to_lowercase()
+            || self.0.to_lowercase() == Self::INTEGRATION_TEST_RO_USER_EMAIL.to_lowercase()
+    }
 }
 
 impl FromStr for OrgMemberEmail {

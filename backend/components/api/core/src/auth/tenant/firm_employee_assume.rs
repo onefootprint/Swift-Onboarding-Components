@@ -73,6 +73,9 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAssumeAuth {
             }
         };
         let tenant_user = TenantUser::get_firm_employee(conn, &data.tenant_user_id)?;
+        if tenant_user.email.is_integration_test_email() && !data.tenant_id.is_integration_test_tenant() {
+            return Err(AuthError::NotAllowedForIntegrationTestUser.into());
+        }
         if !tenant_user.is_firm_employee {
             // Double-checking for safety
             return Err(AuthError::NotFirmEmployee.into());

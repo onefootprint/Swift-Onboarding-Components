@@ -85,7 +85,7 @@ impl ExtractableAuthSession for ParsedFirmEmployeeAuth {
 }
 
 pub enum FirmEmployeeGuard {
-    /// Don't require any special permissions
+    /// Don't require any special permissions.
     Any,
     /// Require the authed firm employee is in the "risk ops" group
     RiskOps,

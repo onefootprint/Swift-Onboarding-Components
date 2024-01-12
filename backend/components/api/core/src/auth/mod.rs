@@ -65,6 +65,8 @@ pub enum AuthError {
     CannotCreateMultipleHandoffTokens,
     #[error("Not allowed: user is not a firm employee")]
     NotFirmEmployee,
+    #[error("Not allowed: integration testing user cannot perform this action")]
+    NotAllowedForIntegrationTestUser,
     #[error("Not allowed: user is not a risk ops firm employee")]
     NotRiskOpsFirmEmployee,
     #[error("Not allowed: ob config doesn't require collecting business")]
