@@ -87,6 +87,7 @@ export async function CreateDB(
   stackMetadata: StackMetadata,
 ): Promise<DatabaseOutput> {
   const user = 'footprint';
+  const roUser = 'footprint_ro';
   // We'll use a different user to log into interactive sessions from the jumpbox - this lets us
   // set more reasonable defaults for interactive sessions and allows us to track which queries
   // came from an interactive session
@@ -150,7 +151,7 @@ export async function CreateDB(
     allowMajorVersionUpgrade: false,
     engine: EngineType.AuroraPostgresql,
     engineMode: 'provisioned',
-    masterPassword: secretsStore.dbPassword,
+    masterPassword: secretsStore.dbWritePassword,
     masterUsername: user,
     applyImmediately: true,
     snapshotIdentifier: await getSnapshotIdIfNeeded(clusterIdentifier),
@@ -218,21 +219,22 @@ export async function CreateDB(
   });
 
   const {
-    rw: databaseUrl,
-    jb: jbDatabaseUrl,
+    rw: rwDatabaseUrl,
     ro: readOnlyDatabaseUrl,
+    jbRw: jbRwDatabaseUrl,
   } = pulumi
     .all([
       db.endpoint,
       db.readerEndpoint,
-      secretsStore.dbPassword,
-      secretsStore.jbDbPassword,
+      secretsStore.dbWritePassword,
+      secretsStore.dbReadOnlyPassword,
+      secretsStore.jbDbWritePassword,
     ])
-    .apply(([host, roHost, password, jbPassword]) => {
-      const rw = `postgresql://${user}:${password}@${host}`;
-      const jb = `postgresql://${jbUser}:${jbPassword}@${host}/${databaseName}`;
-      const ro = `postgresql://${user}:${password}@${roHost}`;
-      return { rw, jb, ro };
+    .apply(([host, roHost, rwPassword, roPassword, jbRwPassword]) => {
+      const rw = `postgresql://${user}:${rwPassword}@${host}`;
+      const ro = `postgresql://${roUser}:${roPassword}@${roHost}`;
+      const jbRw = `postgresql://${jbUser}:${jbRwPassword}@${host}/${databaseName}`;
+      return { rw, ro, jbRw };
     });
 
   const dbSecretName = `/db/url-${clusterIdentifier}`;
@@ -240,7 +242,7 @@ export async function CreateDB(
     `ssm-param-database-conn-${clusterIdentifier}`,
     {
       type: 'SecureString',
-      value: databaseUrl,
+      value: rwDatabaseUrl,
       name: dbSecretName,
     },
   );
@@ -250,7 +252,7 @@ export async function CreateDB(
     `ssm-param-database-conn-jumpbox-${clusterIdentifier}`,
     {
       type: 'SecureString',
-      value: jbDatabaseUrl,
+      value: jbRwDatabaseUrl,
       name: dbJbSecretName,
     },
   );
@@ -285,7 +287,7 @@ export async function CreateDB(
   );
 
   return {
-    databaseUrl,
+    databaseUrl: rwDatabaseUrl,
     readOnlyDatabaseUrl,
     db,
     databaseUrlSecretParam,

@@ -19,8 +19,9 @@ export interface StaticSecrets {
   enclaveUserSecretKey: aws.ssm.Parameter;
   enclaveSealedEncIkek: aws.ssm.Parameter;
   enclaveSealedHmacIkek: aws.ssm.Parameter;
-  dbPassword: pulumi.Output<string>;
-  jbDbPassword: pulumi.Output<string>;
+  dbWritePassword: pulumi.Output<string>;
+  dbReadOnlyPassword: pulumi.Output<string>;
+  jbDbWritePassword: pulumi.Output<string>;
   cookieSessionKey: aws.ssm.Parameter;
   workosSecretKey: aws.ssm.Parameter;
   twilioApiKey: aws.ssm.Parameter;
@@ -232,7 +233,13 @@ export async function LoadSecrets(
     length: 44,
     special: false,
   });
-
+  // These db passwords are put here to be tracked by pulumi, but they still must be manually
+  // configured in the DB. Terraform/pulumi only allows configuring the master DB password, which
+  // is auroraDbPassword above
+  const auroraDbRoPassword = new random.RandomPassword('db_ro_password', {
+    length: 44,
+    special: false,
+  });
   const jumpboxAuroraDbPassword = new random.RandomPassword('db__jb_password', {
     length: 44,
     special: false,
@@ -279,8 +286,9 @@ export async function LoadSecrets(
       value: fs.readFileSync('./config/otel.yml', 'utf8'),
       name: `/static_secrets/trace-otelconfig-${stack}`,
     }),
-    dbPassword: pulumi.secret(auroraDbPassword.result),
-    jbDbPassword: pulumi.secret(jumpboxAuroraDbPassword.result),
+    dbWritePassword: pulumi.secret(auroraDbPassword.result),
+    dbReadOnlyPassword: pulumi.secret(auroraDbRoPassword.result),
+    jbDbWritePassword: pulumi.secret(jumpboxAuroraDbPassword.result),
     cookieSessionKey: new aws.ssm.Parameter(
       `ssm-param-api-cookie-session-key`,
       {
