@@ -20,6 +20,7 @@ export type RequestParams = {
   fullPath?: boolean;
   method?: RequestMethod;
   path: string;
+  queryParams?: URLSearchParams;
   statusCode?: number;
   response: any;
   once?: boolean;
@@ -31,12 +32,28 @@ const requestHelper = ({
   fullPath = false,
   method = 'get',
   path,
+  queryParams,
   response,
   once,
 }: RequestParams) => {
   const caller = rest[method];
   const URL = fullPath ? path : combineURL(API_BASE_URL ?? '', path);
-  return caller(URL, (_req, res, ctx) => {
+  return caller(URL, (req, res, ctx) => {
+    if (queryParams) {
+      let gotParams = new URLSearchParams(req.url.searchParams);
+      let wantParams = new URLSearchParams(queryParams);
+      gotParams.sort();
+      wantParams.sort();
+      if (gotParams.toString() !== wantParams.toString()) {
+        console.warn('request query string matcher passing through', {
+          url: URL,
+          got: gotParams.toString(),
+          want: wantParams.toString(),
+        });
+        return req.passthrough();
+      }
+    }
+
     const args = [ctx.status(statusCode), ctx.delay(delay), ctx.json(response)];
     return once ? res.once(...args) : res(...args);
   });

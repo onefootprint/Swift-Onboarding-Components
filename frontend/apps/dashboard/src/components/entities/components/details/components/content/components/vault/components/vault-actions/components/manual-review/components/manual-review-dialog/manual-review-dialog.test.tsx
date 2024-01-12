@@ -5,8 +5,9 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import { ReviewStatus } from '@onefootprint/types';
+import { OrgFrequentNoteKind, ReviewStatus } from '@onefootprint/types';
 import React from 'react';
+import { withFrequentNotes } from 'src/components/frequent-notes-text-area/frequent-notes-text-area.test.config';
 
 import type { ManualReviewDialogProps } from './manual-review-dialog';
 import ManualReviewDialog from './manual-review-dialog';
@@ -15,6 +16,7 @@ const useRouterSpy = createUseRouterSpy();
 
 describe('<ManualReviewDialog />', () => {
   beforeEach(() => {
+    withFrequentNotes(OrgFrequentNoteKind.ManualReview, []);
     useRouterSpy({
       pathname: '/users/detail',
       query: {

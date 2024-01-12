@@ -27,10 +27,11 @@ const Option = ({
   isEdit,
 }: OptionProps) => {
   const { t } = useTranslation('components.frequent-notes');
-  const hoverRef = useRef<HTMLButtonElement>(null);
+  const hoverRef = useRef<HTMLDivElement>(null);
   const isHovered = useHover(hoverRef);
   const [isCopied, setIsCopied] = useState<boolean>(false);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+  const [hideCheckTimeout, setHideCheckTimeout] = useState<NodeJS.Timeout>();
 
   const handleOnClick = () => {
     if (isEdit) {
@@ -38,9 +39,15 @@ const Option = ({
     } else if (onClick) {
       onClick(children, value);
       setIsCopied(true);
-      setTimeout(() => {
+
+      // The icon will flash to a check mark after it is copied, and then hide shortly after
+      if (hideCheckTimeout) {
+        clearTimeout(hideCheckTimeout);
+      }
+      const timeout = setTimeout(() => {
         setIsCopied(false);
       }, 1000);
+      setHideCheckTimeout(timeout);
     }
   };
 
@@ -66,9 +73,8 @@ const Option = ({
   return (
     <Container
       ref={hoverRef}
-      isHovered={isHovered}
-      isCopied={isCopied}
-      value={value}
+      $isHovered={isHovered}
+      $isCopied={isCopied}
       onClick={handleOnClick}
       transition={{ duration: 0.2 }}
       layout
@@ -117,11 +123,11 @@ const Option = ({
   );
 };
 
-const Container = styled(motion.button)<{
-  isHovered?: boolean;
-  isCopied?: boolean;
+const Container = styled(motion.div)<{
+  $isHovered?: boolean;
+  $isCopied?: boolean;
 }>`
-  ${({ theme, isHovered, isCopied }) => css`
+  ${({ theme, $isHovered: isHovered, $isCopied: isCopied }) => css`
     all: unset;
     ${createFontStyles('body-3')}
     cursor: pointer;

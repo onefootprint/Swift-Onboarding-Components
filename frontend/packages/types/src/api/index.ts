@@ -166,6 +166,11 @@ export type {
   OrgCreateApiKeyRequest,
   OrgCreateApiKeysResponse,
 } from './org-create-api-key';
+export type {
+  CreateOrgFrequentNoteRequest,
+  CreateOrgFrequentNoteResponse,
+  GetOrgFrequentNotesResponse,
+} from './org-frequent-note';
 export type { OrgMemberResponse } from './org-member-response';
 export type {
   OrgOnboardingConfigCreateRequest,

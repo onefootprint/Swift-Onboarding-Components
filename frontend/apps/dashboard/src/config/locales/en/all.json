@@ -398,11 +398,23 @@
   },
   "components": {
     "frequent-notes": {
-      "title": "Frequent notes",
+      "title": "Macros",
       "edit": "Edit",
       "done": "Done",
-      "warning": "Note will be deleted for the entire organization",
-      "delete": "Delete"
+      "warning": "Macro will be deleted for the entire organization.",
+      "delete": "Delete",
+      "save": "Save as macro",
+      "created-toast": {
+        "title" : "Success",
+        "description": "Macro saved for organization."
+      },
+      "deleted-toast": {
+        "title" : "Success",
+        "description": "Macro deleted for organization."
+      },
+      "errors": {
+        "required": "A note is required"
+      }
     },
     "cmdk": {
       "erase-search": "Erase search",
@@ -1191,10 +1203,7 @@
       "manual-note-entry-form": {
         "note": {
           "label": "Note",
-          "placeholder": "Type here...",
-          "errors": {
-            "required": "A note is required"
-          }
+          "placeholder": "Type here..."
         },
         "toggle": {
           "label": "Pin note to the top of the page"

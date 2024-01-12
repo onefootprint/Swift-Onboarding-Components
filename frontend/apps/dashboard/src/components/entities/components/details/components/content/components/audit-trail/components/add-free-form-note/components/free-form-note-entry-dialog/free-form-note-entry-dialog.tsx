@@ -1,5 +1,6 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
+import { OrgFrequentNoteKind } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
 import React from 'react';
 
@@ -66,6 +67,7 @@ const FreeFormNoteEntryDialog = ({
         formId="free-form-note-form"
         placeholder={t('dialog.form.placeholder')}
         onSubmit={handleSubmit}
+        frequentNoteKind={OrgFrequentNoteKind.Annotation}
       />
     </Dialog>
   );

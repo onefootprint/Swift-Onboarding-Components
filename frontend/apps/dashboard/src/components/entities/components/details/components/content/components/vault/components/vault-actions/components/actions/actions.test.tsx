@@ -6,7 +6,9 @@ import {
   waitFor,
   waitForElementToBeRemoved,
 } from '@onefootprint/test-utils';
+import { OrgFrequentNoteKind } from '@onefootprint/types';
 import React from 'react';
+import { withFrequentNotes } from 'src/components/frequent-notes-text-area/frequent-notes-text-area.test.config';
 
 import TestWrapper from '../../../utils/test-wrapper';
 import Actions from './actions';
@@ -32,6 +34,7 @@ const renderActions = async (isNoPhone?: boolean) =>
 
 describe('<Actions />', () => {
   beforeEach(() => {
+    withFrequentNotes(OrgFrequentNoteKind.Trigger, []);
     useRouterSpy({
       asPath: `/entities/${entityId}&mode=sandbox`,
       pathname: '/users/[id]',

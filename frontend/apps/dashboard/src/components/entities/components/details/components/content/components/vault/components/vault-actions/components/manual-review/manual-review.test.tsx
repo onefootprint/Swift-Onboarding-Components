@@ -6,8 +6,13 @@ import {
   waitFor,
   waitForElementToBeRemoved,
 } from '@onefootprint/test-utils';
-import { EntityKind, EntityStatus } from '@onefootprint/types';
+import {
+  EntityKind,
+  EntityStatus,
+  OrgFrequentNoteKind,
+} from '@onefootprint/types';
 import React from 'react';
+import { withFrequentNotes } from 'src/components/frequent-notes-text-area/frequent-notes-text-area.test.config';
 
 import type { ManualReviewProps } from './manual-review';
 import ManualReview from './manual-review';
@@ -23,6 +28,7 @@ const useRouterSpy = createUseRouterSpy();
 describe('<ManualReview />', () => {
   beforeEach(() => {
     withEntity(entityFixture.id);
+    withFrequentNotes(OrgFrequentNoteKind.ManualReview, []);
     useRouterSpy({
       pathname: `/entities/${entityFixture.id}`,
       query: {
@@ -86,7 +92,7 @@ describe('<ManualReview />', () => {
             expect(dialog).toBeInTheDocument();
           });
 
-          const note = screen.getByRole('textbox', { name: 'Note' });
+          const note = screen.getByLabelText('Note');
           await userEvent.type(note, 'This is a note');
 
           const submit = screen.getByRole('button', { name: 'Complete' });

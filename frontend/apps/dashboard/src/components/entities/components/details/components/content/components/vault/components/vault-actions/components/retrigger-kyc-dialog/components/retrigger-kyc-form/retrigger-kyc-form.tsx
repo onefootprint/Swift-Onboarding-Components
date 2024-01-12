@@ -1,17 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { IdDI, TriggerKind } from '@onefootprint/types';
-import {
-  Checkbox,
-  Divider,
-  Radio,
-  Stack,
-  TextArea,
-  Typography,
-} from '@onefootprint/ui';
+import { IdDI, OrgFrequentNoteKind, TriggerKind } from '@onefootprint/types';
+import { Checkbox, Divider, Radio, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import AnimatedContainer from 'src/components/animated-container';
+import FrequentNotesTextArea from 'src/components/frequent-notes-text-area';
 
 import useEntity from '@/entity/hooks/use-entity';
 import useEntityId from '@/entity/hooks/use-entity-id';
@@ -32,12 +26,13 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
   const entityId = useEntityId();
   const entity = useEntity(entityId);
   const userHasPhone = entity.data?.attributes?.includes(IdDI.phoneNumber);
+  const methods = useForm<RetriggerKYCFormData>();
   const {
     register,
     handleSubmit,
     formState: { errors },
     watch,
-  } = useForm<RetriggerKYCFormData>();
+  } = methods;
   const triggerKind = watch('kind');
 
   const handleBeforeSubmit = (data: RetriggerKYCFormData) => {
@@ -47,57 +42,60 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
   };
 
   return (
-    <StyledForm id={formId} onSubmit={handleSubmit(handleBeforeSubmit)}>
-      <Typography variant="label-3">{t('prompt')}</Typography>
-      <Stack paddingBottom={2} direction="column" gap={4}>
-        <div>
+    <FormProvider {...methods}>
+      <StyledForm id={formId} onSubmit={handleSubmit(handleBeforeSubmit)}>
+        <Typography variant="label-3">{t('prompt')}</Typography>
+        <Stack paddingBottom={2} direction="column" gap={4}>
+          <div>
+            <Radio
+              value={TriggerKind.IdDocument}
+              label={t('form.id-photo.title')}
+              hint={t('form.id-photo.description')}
+              {...register('kind', { required: true })}
+            />
+            <AnimatedContainer
+              isExpanded={triggerKind === TriggerKind.IdDocument}
+              marginLeft={8}
+              marginTop={4}
+            >
+              <Checkbox
+                label={t('form.id-photo.collect-selfie')}
+                {...register('collectSelfie', { required: false })}
+              />
+            </AnimatedContainer>
+          </div>
           <Radio
-            value={TriggerKind.IdDocument}
-            label={t('form.id-photo.title')}
-            hint={t('form.id-photo.description')}
+            value={TriggerKind.ProofOfSsn}
+            label={t('form.proof-of-ssn.title')}
+            hint={t('form.proof-of-ssn.description')}
             {...register('kind', { required: true })}
           />
-          <AnimatedContainer
-            isExpanded={triggerKind === TriggerKind.IdDocument}
-            marginLeft={8}
-            marginTop={4}
-          >
-            <Checkbox
-              label={t('form.id-photo.collect-selfie')}
-              {...register('collectSelfie', { required: false })}
-            />
-          </AnimatedContainer>
-        </div>
-        <Radio
-          value={TriggerKind.ProofOfSsn}
-          label={t('form.proof-of-ssn.title')}
-          hint={t('form.proof-of-ssn.description')}
-          {...register('kind', { required: true })}
+          <Radio
+            value={TriggerKind.RedoKyc}
+            label={t('form.revise-kyc.title')}
+            hint={t('form.revise-kyc.description')}
+            {...register('kind', { required: true })}
+          />
+          {errors.kind && (
+            <Typography variant="body-4" color="error">
+              {t('form.error')}
+            </Typography>
+          )}
+        </Stack>
+        <FrequentNotesTextArea
+          kind={OrgFrequentNoteKind.Trigger}
+          formField="note"
+          label={t('form.note-for-user.label')}
+          placeholder={t('form.note-for-user.placeholder')}
         />
-        <Radio
-          value={TriggerKind.RedoKyc}
-          label={t('form.revise-kyc.title')}
-          hint={t('form.revise-kyc.description')}
-          {...register('kind', { required: true })}
-        />
-        {errors.kind && (
-          <Typography variant="body-4" color="error">
-            {t('form.error')}
-          </Typography>
-        )}
-      </Stack>
-      <TextArea
-        label={t('form.note-for-user.label')}
-        placeholder={t('form.note-for-user.placeholder')}
-        {...register('note')}
-      />
-      <Divider />
-      <Typography variant="body-3" color="tertiary">
-        {userHasPhone
-          ? t('form.description-phone')
-          : t('form.description-email')}
-      </Typography>
-    </StyledForm>
+        <Divider />
+        <Typography variant="body-3" color="tertiary">
+          {userHasPhone
+            ? t('form.description-phone')
+            : t('form.description-email')}
+        </Typography>
+      </StyledForm>
+    </FormProvider>
   );
 };
 

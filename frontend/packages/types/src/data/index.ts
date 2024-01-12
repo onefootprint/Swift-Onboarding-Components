@@ -137,6 +137,8 @@ export {
 } from './onboarding-config';
 export type { OnboardingDecision } from './onboarding-decision';
 export { default as OnboardingStatus } from './onboarding-status';
+export type { OrgFrequentNote } from './org-frequent-note';
+export { OrgFrequentNoteKind } from './org-frequent-note';
 export type { Member } from './org-member';
 export type { OrgMetrics } from './org-metrics';
 export type { Organization } from './organization';

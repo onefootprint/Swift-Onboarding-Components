@@ -1,6 +1,6 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
-import type { ReviewStatus } from '@onefootprint/types';
+import { OrgFrequentNoteKind, type ReviewStatus } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
 import React from 'react';
 
@@ -75,6 +75,7 @@ const ManualReviewDialog = ({
         prompt={t('dialog.form.prompt', { status: t(`status.${status}`) })}
         placeholder={t('dialog.form.placeholder')}
         onSubmit={handleSubmit}
+        frequentNoteKind={OrgFrequentNoteKind.ManualReview}
       />
     </Dialog>
   );
