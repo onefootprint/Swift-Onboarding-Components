@@ -200,7 +200,13 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 parse_reason_codes_from_vendor_result(kyc_vendor_result.clone(), &vw, &obc)?.kyc
                 // TODO: only call this once and re-use for aml portion below
             };
-            save_risk_signals(conn, &self.sv_id, &kyc_risk_signals, false)?;
+            save_risk_signals(
+                conn,
+                &self.sv_id,
+                kyc_risk_signals.footprint_reason_codes,
+                RiskSignalGroupKind::Kyc,
+                false,
+            )?;
         }
 
         // Save AML risk signals from Aml call or Kyc call (or save nothing if neither called)
@@ -222,10 +228,22 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                     &watchlist_result_response,
                 )
             };
-            save_risk_signals(conn, &self.sv_id, &aml_risk_signals, false)?;
+            save_risk_signals(
+                conn,
+                &self.sv_id,
+                aml_risk_signals.footprint_reason_codes,
+                RiskSignalGroupKind::Aml,
+                false,
+            )?;
         } else if let Some(kyc_vendor_result) = kyc_vendor_result {
             let aml_risk_signals = common::get_aml_risk_signals_from_kyc_call(&obc, &vw, kyc_vendor_result)?;
-            save_risk_signals(conn, &self.sv_id, &aml_risk_signals, false)?;
+            save_risk_signals(
+                conn,
+                &self.sv_id,
+                aml_risk_signals.footprint_reason_codes,
+                RiskSignalGroupKind::Aml,
+                false,
+            )?;
         };
 
         Ok(KycState::from(KycDecisioning {

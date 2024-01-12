@@ -187,7 +187,13 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
                 parse_reason_codes_from_vendor_result(vendor_result.clone(), &vw, &obc)?.kyc
             };
 
-        save_risk_signals(conn, &self.sv_id, &risk_signals, false)?;
+        save_risk_signals(
+            conn,
+            &self.sv_id,
+            risk_signals.footprint_reason_codes,
+            RiskSignalGroupKind::Kyc,
+            false,
+        )?;
 
         // we might need doc signals here too, so we reload
         let risk_signals = fetch_latest_kyc_risk_signals(conn, &self.sv_id)?;

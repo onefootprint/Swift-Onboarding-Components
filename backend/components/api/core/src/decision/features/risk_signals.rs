@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use db::models::{
     ob_configuration::ObConfiguration,
-    risk_signal::{IncludeHidden, RiskSignal},
+    risk_signal::{IncludeHidden, NewRiskSignalInfo, RiskSignal},
 };
 use idv::ParsedResponse;
 use itertools::Itertools;
@@ -174,20 +174,18 @@ fn parse_reason_codes(
     }
 }
 
-pub fn save_risk_signals<T>(
+pub fn save_risk_signals(
     conn: &mut db::TxnPgConn,
     scoped_vault_id: &ScopedVaultId,
-    risk_signals: &RiskSignalGroupStruct<T>,
+    new_risk_signals: Vec<NewRiskSignalInfo>,
+    risk_signal_group_kind: RiskSignalGroupKind,
     hidden: bool,
-) -> Result<(), ApiError>
-where
-    T: Into<WrappedRiskSignalGroupKind> + Clone,
-{
+) -> Result<(), ApiError> {
     RiskSignal::bulk_create(
         conn,
         scoped_vault_id,
-        risk_signals.footprint_reason_codes.clone(),
-        risk_signals.group.clone().into().into(),
+        new_risk_signals,
+        risk_signal_group_kind,
         // default to hiding for things using this code path
         hidden,
     )?;

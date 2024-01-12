@@ -513,7 +513,14 @@ pub async fn mock_incode_doc_collection(
                 group: Doc,
             };
             // incode state machine defaults this to not hidden
-            save_risk_signals(conn, &scoped_vault_id, &rsg, false).unwrap();
+            save_risk_signals(
+                conn,
+                &scoped_vault_id,
+                rsg.footprint_reason_codes,
+                RiskSignalGroupKind::Doc,
+                false,
+            )
+            .unwrap();
 
             Ok(())
         })
