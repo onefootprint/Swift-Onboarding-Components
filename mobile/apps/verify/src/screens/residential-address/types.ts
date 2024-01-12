@@ -5,6 +5,6 @@ export type FormData = {
   addressLine2?: string;
   city: string;
   country: CountrySelectOption;
-  state: SelectOption<{ value: string; label: string }>;
+  state: string | SelectOption<{ value: string; label: string }>;
   zip: string;
 };

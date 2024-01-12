@@ -15,7 +15,7 @@ const WithSdkArgs = ({ children }: WithSdkArgsProps) => {
 
   useEffect(() => {
     sdkArgsMutation.mutate({
-      data: { publicKey: 'pb_test_xO8gnDYcqKmNJU4MyaW03U' },
+      data: { publicKey: 'pb_test_LibqMUbHu920QbOH250jTE' },
       kind: 'verify_v1',
     });
   }, []);

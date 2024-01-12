@@ -119,7 +119,7 @@
     },
     "residential-address": {
       "title": "What's your residential address?",
-      "subtitle": "We're legally required to collect this information.",
+      "subtitle": "Make sure to provide your updated residential address (no P.O. Boxes).",
       "form": {
         "country": {
           "label": "Country",
@@ -131,13 +131,16 @@
         },
         "address-line1": {
           "label": "Address line 1",
+          "international-label": "Address",
           "placeholder": "Street and house number",
           "errors": {
             "required": "Address cannot be empty and must be a residential address (e.g. cannot be a P.O. Box)"
           }
         },
         "address-line2": {
-          "label": "Address line 2",
+          "international-label": "Apartment/neighborhood (optional)",
+          "label": "Address line 2 (optional)",
+          "international-placeholder": "Neighborhood name, suite no, etc.",
           "placeholder": "Apartment, suite, etc."
         },
         "city": {
@@ -156,7 +159,9 @@
         },
         "state": {
           "label": "State",
-          "placeholder": "Search for a state",
+          "international-label": "State/province",
+          "placeholder": "State",
+          "international-placeholder": "State/province",
           "errors": {
             "required": "State cannot be empty"
           }

@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { COUNTRIES } from '@onefootprint/global-constants';
 import type {
   CollectKycDataRequirement,
   CountryCode,
@@ -7,15 +6,9 @@ import type {
 } from '@onefootprint/types';
 import { IdDI, isCountryCode } from '@onefootprint/types';
 import type { AddressPrediction, SelectRef } from '@onefootprint/ui';
-import {
-  AddressInput,
-  Box,
-  CountrySelect,
-  Select,
-  TextInput,
-} from '@onefootprint/ui';
+import { Box } from '@onefootprint/ui';
 import React, { useRef } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { type TextInput as RNTextInput } from 'react-native';
 import styled, { css } from 'styled-components/native';
 import * as z from 'zod';
@@ -30,6 +23,11 @@ import type { KycData } from '@/types';
 import getInitialCountry from '@/utils/get-initial-country';
 import getInitialState from '@/utils/get-initial-state';
 
+import AddressLinesInput from './components/address-lines-input';
+import CityInput from './components/city-input';
+import CountryInput from './components/country-input';
+import StateInput from './components/state-input';
+import ZipInput from './components/zip-input/zip-input';
 import type { FormData } from './types';
 import convertFormData from './utils/convert-form-data';
 import getAddressComponent from './utils/get-address-components';
@@ -80,13 +78,6 @@ const ResidentialAddress = ({
     [defaultCountry] = config.supportedCountries;
   }
 
-  const allowedCountries = new Set(config.supportedCountries);
-  const shouldDisableCountry = allowedCountries.size === 1;
-  const countryOptions = COUNTRIES.filter(entry =>
-    allowedCountries.has(entry.value),
-  );
-  // TODO: We need to update l10n using locale on country change
-
   const schema = z.object({
     country: z.object({
       label: z.string().min(1, { message: t('form.country.errors.required') }),
@@ -95,7 +86,7 @@ const ResidentialAddress = ({
     addressLine1: z
       .string()
       .min(1, { message: t('form.address-line1.errors.required') }),
-    addressLine2: z.string(),
+    addressLine2: z.optional(z.string()),
     city: z.string().min(1, { message: t('form.city.errors.required') }),
     // TODO:
     // Add validation if country is US
@@ -104,10 +95,12 @@ const ResidentialAddress = ({
     // TODO:
     // If not US, we should display a text input instead
     // https://linear.app/footprint/issue/FP-6739/if-country-is-not-us-state-should-be-a-text-input-field-instead
-    state: z.object({
-      label: z.string().min(1, { message: t('form.state.errors.required') }),
-      value: z.string().min(1, { message: t('form.state.errors.required') }),
-    }),
+    state: z
+      .object({
+        label: z.string().min(1, { message: t('form.state.errors.required') }),
+        value: z.string().min(1, { message: t('form.state.errors.required') }),
+      })
+      .or(z.string().min(1, { message: t('form.state.errors.required') })),
   });
   const {
     control,
@@ -133,7 +126,7 @@ const ResidentialAddress = ({
   const addressLine2Ref = useRef<RNTextInput>(null);
   const cityRef = useRef<RNTextInput>(null);
   const zipRef = useRef<RNTextInput>(null);
-  const stateRef = useRef<SelectRef>(null);
+  const stateRef = useRef<SelectRef | RNTextInput>(null);
 
   const handleCountryChange = () => {
     resetField('addressLine1');
@@ -212,195 +205,30 @@ const ResidentialAddress = ({
     <Box>
       {!hideHeader && <Header title={t('title')} subtitle={t('subtitle')} />}
       <Box gap={7}>
-        <Controller
+        <CountryInput
           control={control}
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => {
-            return (
-              <CountrySelect
-                hasError={!!error}
-                hint={
-                  shouldDisableCountry && value
-                    ? t('form.country.disabled-hint', {
-                        countryName: value.label,
-                      })
-                    : error?.message
-                }
-                label={t('form.country.label')}
-                onBlur={onBlur}
-                value={value}
-                options={countryOptions}
-                onChange={newValue => {
-                  onChange(newValue);
-                  handleCountryChange();
-                }}
-                searchInputProps={{
-                  placeholder: t('form.country.placeholder'),
-                  enterKeyHint: 'next',
-                  autoComplete: 'country',
-                  textContentType: 'countryName',
-                }}
-                disabled={shouldDisableCountry}
-              />
-            );
-          }}
-          name="country"
+          supportedCountries={config.supportedCountries}
+          onCountryChange={handleCountryChange}
         />
-        <Controller
+        <AddressLinesInput
           control={control}
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => {
-            return (
-              <AddressInput
-                country={country.value}
-                hasError={!!error}
-                hint={error?.message}
-                label={t('form.address-line1.label')}
-                onBlur={onBlur}
-                onChange={handleAddressSelect}
-                onChangeText={onChange}
-                placeholder={t('form.address-line1.placeholder')}
-                searchInputProps={{
-                  autoComplete: 'address-line1',
-                  enterKeyHint: 'next',
-                  placeholder: t('form.address-line1.placeholder'),
-                  textContentType: 'streetAddressLine1',
-                  blurOnSubmit: false,
-                  onSubmitEditing: () => {
-                    addressLine2Ref.current?.focus();
-                  },
-                }}
-                value={value}
-              />
-            );
-          }}
-          name="addressLine1"
-        />
-        <Controller
-          control={control}
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => {
-            return (
-              <TextInput
-                autoComplete="address-line2"
-                blurOnSubmit={false}
-                enterKeyHint="next"
-                hasError={!!error}
-                hint={error?.message}
-                inputMode="text"
-                label={t('form.address-line2.label')}
-                onBlur={onBlur}
-                onChangeText={onChange}
-                onSubmitEditing={() => addressLine2Ref.current?.focus()}
-                placeholder={t('form.address-line2.placeholder')}
-                private
-                ref={addressLine2Ref}
-                textContentType="streetAddressLine2"
-                value={value}
-              />
-            );
-          }}
-          name="addressLine2"
+          country={country}
+          onAddressSelect={handleAddressSelect}
+          addressLine2Ref={addressLine2Ref}
         />
         <Row>
-          <Box flex={1}>
-            <Controller
-              control={control}
-              render={({
-                field: { onChange, onBlur, value },
-                fieldState: { error },
-              }) => {
-                return (
-                  <TextInput
-                    autoComplete="address-line1"
-                    blurOnSubmit={false}
-                    enterKeyHint="next"
-                    hasError={!!error}
-                    hint={error?.message}
-                    inputMode="text"
-                    label={t('form.city.label')}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    onSubmitEditing={() => zipRef.current?.focus()}
-                    placeholder={t('form.city.placeholder')}
-                    private
-                    ref={cityRef}
-                    textContentType="addressCity"
-                    value={value}
-                  />
-                );
-              }}
-              name="city"
-            />
-          </Box>
-          <Box flex={1}>
-            <Controller
-              control={control}
-              render={({
-                field: { onChange, onBlur, value },
-                fieldState: { error },
-              }) => {
-                return (
-                  <TextInput
-                    autoComplete="postal-code"
-                    blurOnSubmit
-                    enterKeyHint="next"
-                    hasError={!!error}
-                    hint={error?.message}
-                    inputMode="text"
-                    label={t('form.zip.label')}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    onSubmitEditing={() => {
-                      stateRef.current?.focus();
-                    }}
-                    placeholder={t('form.zip.placeholder')}
-                    private
-                    ref={zipRef}
-                    textContentType="postalCode"
-                    value={value}
-                  />
-                );
-              }}
-              name="zip"
-            />
-          </Box>
+          <CityInput
+            control={control}
+            currInputRef={cityRef}
+            nextInputRef={zipRef}
+          />
+          <ZipInput
+            control={control}
+            currInputRef={zipRef}
+            nextInputRef={stateRef}
+          />
         </Row>
-        <Controller
-          control={control}
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => {
-            return (
-              <Select
-                hasError={!!error}
-                hint={error?.message}
-                label={t('form.state.label')}
-                onBlur={onBlur}
-                onChange={newValue => {
-                  onChange(newValue);
-                }}
-                options={states}
-                ref={stateRef}
-                value={value}
-                searchInputProps={{
-                  autoComplete: 'postal-address-locality',
-                  enterKeyHint: 'next',
-                  placeholder: t('form.state.placeholder'),
-                  textContentType: 'addressState',
-                }}
-              />
-            );
-          }}
-          name="state"
-        />
+        <StateInput control={control} stateRef={stateRef} country={country} />
         <DataCollectionActionButton
           onComplete={handleSubmit(onSubmit)}
           isLoading={isLoading}

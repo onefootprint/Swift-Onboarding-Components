@@ -1,4 +1,4 @@
-import { type ChallengeData } from '@onefootprint/types';
+import type { ChallengeData } from '@onefootprint/types';
 import { Container } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import React from 'react';

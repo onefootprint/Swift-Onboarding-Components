@@ -1012,3 +1012,56 @@ export const getCountryFromCode = (countryCode?: CountryCode) => {
   );
   return match;
 };
+
+export const COUNTRIES_WITH_STATES: CountryCode[] = [
+  'US',
+  'AU',
+  'AT',
+  'BR',
+  'DE',
+  'IN',
+  'MY',
+  'MX',
+  'FM',
+  'MM',
+  'NZ',
+  'NG',
+  'PW',
+  'SS',
+];
+
+export const COUNTRIES_WITH_PROVINCES: CountryCode[] = [
+  'AF',
+  'DZ',
+  'AO',
+  'AM',
+  'AR',
+  'TR',
+  'BG',
+  'BI',
+  'CA',
+  'KH',
+  'CN',
+  'CR',
+  'CG',
+  'CU',
+  'DO',
+  'EC',
+  'GQ',
+  'GA',
+  'ID',
+  'LA',
+  'NP',
+  'PK',
+  'SL',
+  'ZA',
+  'SB',
+  'LK',
+  'TO',
+  'VU',
+  'VN',
+  'ZM',
+  'ZW',
+];
+
+export const US_TERRITORY_COUNTRY_CODES = ['AS', 'GU', 'MP', 'PR', 'VI'];
