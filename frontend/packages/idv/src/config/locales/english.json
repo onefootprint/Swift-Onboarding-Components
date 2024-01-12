@@ -8,6 +8,12 @@
       }
     },
     "components": {
+      "layout": {
+        "secured-by-footprint": "Secured by Footprint",
+        "sandbox-banner": "Sandbox Mode",
+        "privacy": "Privacy",
+        "whats-this": "What's this?"
+      },
       "cta": {
         "continue": "Continue",
         "save": "Save",

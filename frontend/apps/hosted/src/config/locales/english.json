@@ -10,10 +10,11 @@
   },
   "components": {
     "layout": {
-      "sandbox-banner": {
-        "title": "Sandbox Mode"
-      },
-      "footer": {
+      "secured-by-footprint": "Secured by Footprint",
+      "sandbox-banner": "Sandbox Mode",
+      "privacy": "Privacy",
+      "whats-this": "What's this?",
+      "app-footer": {
         "links": {
           "terms": "Terms of Service",
           "privacy": "Privacy Policy",

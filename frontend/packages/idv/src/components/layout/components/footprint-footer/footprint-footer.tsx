@@ -1,4 +1,5 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
+import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { media, Stack, Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
@@ -18,6 +19,7 @@ const FootprintFooter = ({
   hideOnDesktop,
   onWhatsThisClick,
 }: FootprintFooterProps) => {
+  const { t } = useTranslation('components.layout');
   const {
     footer: { options, set: updateFooterOptions },
   } = useLayoutOptions();
@@ -45,7 +47,7 @@ const FootprintFooter = ({
         <li>
           <WhatsThisButton onClick={onWhatsThisClick}>
             <Typography variant="caption-1" color="secondary" as="span">
-              What&apos;s this?
+              {t('whats-this')}
             </Typography>
           </WhatsThisButton>
         </li>
@@ -56,7 +58,7 @@ const FootprintFooter = ({
             rel="noreferrer"
           >
             <Typography variant="caption-1" color="secondary" as="span">
-              Privacy
+              {t('privacy')}
             </Typography>
           </a>
         </li>

@@ -10,10 +10,11 @@
   },
   "components": {
     "layout": {
-      "sandbox-banner": {
-        "title": "Modo de prueba"
-      },
-      "footer": {
+      "secured-by-footprint": "Asegurado por Footprint",
+      "sandbox-banner": "Modo Sandbox",
+      "privacy": "Privacidad",
+      "whats-this": "¿Qué es esto?",
+      "app-footer": {
         "links": {
           "terms": "Términos de Servicio",
           "privacy": "Política de Privacidad",

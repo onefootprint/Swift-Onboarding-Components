@@ -11,6 +11,6 @@ describe('<SandboxBanner />', () => {
   it('should render a banner', () => {
     renderSandboxBanner();
     expect(screen.getByRole('alert')).toBeInTheDocument();
-    expect(screen.getByText('Sandbox Mode')).toBeInTheDocument();
+    expect(screen.getByTestId('sandbox-banner')).toBeInTheDocument();
   });
 });

@@ -16,7 +16,7 @@ type FootprintFooterProps = {
 };
 
 const Footer = ({ config }: FootprintFooterProps) => {
-  const { t } = useTranslation('components.layout.footer');
+  const { t } = useTranslation('components.layout.app-footer');
 
   const links: Link[] = [
     {

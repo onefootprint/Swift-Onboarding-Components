@@ -8,6 +8,14 @@
       }
     }
   },
+  "components": {
+    "layout": {
+      "secured-by-footprint": "Asegurado por Footprint",
+      "sandbox-banner": "Modo Sandbox",
+      "privacy": "Privacidad",
+      "whats-this": "¿Qué es esto?"
+    }
+  },
   "pages": {
     "init-error": {
       "invalid-config-title": "Integración configurada incorrectamente",

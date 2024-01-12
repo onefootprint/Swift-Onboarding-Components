@@ -2,7 +2,14 @@
   "global": {
     "errors": {}
   },
-  "components": {},
+  "components": {
+    "layout": {
+      "secured-by-footprint": "Secured by Footprint",
+      "sandbox-banner": "Sandbox Mode",
+      "privacy": "Privacy",
+      "whats-this": "What's this?"
+    }
+  },
   "pages": {
     "auth": {
       "add-device": "Add device",

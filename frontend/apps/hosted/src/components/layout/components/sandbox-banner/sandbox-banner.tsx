@@ -5,14 +5,14 @@ import React from 'react';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 
 const SandboxBanner = () => {
-  const { t } = useTranslation('components.layout.sandbox-banner');
+  const { t } = useTranslation('components.layout');
   const [state] = useHostedMachine();
   const { onboardingConfig } = state.context;
   const isSandbox = onboardingConfig?.isLive === false;
 
   return (
     <SandboxBannerContainer>
-      {isSandbox && <Banner variant="warning">{t('title')}</Banner>}
+      {isSandbox && <Banner variant="warning">{t('sandbox-banner')}</Banner>}
     </SandboxBannerContainer>
   );
 };
