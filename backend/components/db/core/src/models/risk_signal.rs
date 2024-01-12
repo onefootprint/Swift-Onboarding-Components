@@ -254,6 +254,17 @@ impl RiskSignal {
         Ok(results)
     }
 
+    #[tracing::instrument("RiskSignal::list_by_verification_result_id", skip_all)]
+    pub fn list_by_verification_result_id(
+        conn: &mut PgConn,
+        vres_id: &VerificationResultId,
+    ) -> DbResult<Vec<Self>> {
+        let results = risk_signal::table
+            .filter(risk_signal::verification_result_id.eq(vres_id))
+            .get_results(conn)?;
+        Ok(results)
+    }
+
     #[cfg(test)]
     fn _bulk_create_for_test(conn: &mut PgConn, new: NewRiskSignals) -> DbResult<Vec<Self>> {
         let new_risk_signals: Vec<NewRiskSignal> = match new {

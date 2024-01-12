@@ -20,6 +20,7 @@ pub fn configure(config: &mut web::ServiceConfig) {
         .service(risk::make_vendor_calls)
         .service(risk::make_decision)
         .service(risk::shadow_run)
+        .service(risk::save_risk_signals_for_vres)
         .service(task::execute_tasks)
         .service(task::create_task)
         .service(task::create_overdue_watchlist_check_tasks)

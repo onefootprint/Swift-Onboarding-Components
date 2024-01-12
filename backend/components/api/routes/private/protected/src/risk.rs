@@ -23,12 +23,14 @@ use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::DocumentRequest;
+use db::models::risk_signal::RiskSignal;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VerificationRequest;
+use db::models::verification_result::VerificationResult;
 use db::models::workflow::Workflow;
 use newtypes::{
-    DecisionIntentId, DecisionStatus, DocumentRequestKind, FpId, RiskSignalGroupKind, TenantId, Vendor,
-    VendorAPI, VerificationRequestId, VerificationResultId, WorkflowId,
+    DecisionIntentId, DecisionStatus, DocumentRequestKind, FpId, RiskSignalGroupKind, RiskSignalId, TenantId,
+    Vendor, VendorAPI, VerificationRequestId, VerificationResultId, WorkflowId,
 };
 use std::str::FromStr;
 
@@ -313,5 +315,76 @@ async fn shadow_run(
 
     Ok(Json(ResponseData::ok(ShadowRunResult {
         decision_status: rules_output.decision.decision_status,
+    })))
+}
+
+#[derive(Debug, Clone, serde::Deserialize)]
+pub struct SaveVresRiskSignalsRequest {
+    pub vres_id: VerificationResultId,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct SaveVresRiskSignalsResult {
+    created_risk_signals: Vec<RiskSignalId>,
+}
+
+// If the given vres_id does not have risk signals
+// This was used circa 2024-01-12 to fix some missing risk signals on old Fractional vaults and should probably not be used again: https://onefootprint.slack.com/archives/C05U1CAD6FQ/p1705084067751509
+#[post("/private/protected/risk/save_risk_signals_for_vres")]
+async fn save_risk_signals_for_vres(
+    state: web::Data<State>,
+    _: ProtectedAuth,
+    request: Json<SaveVresRiskSignalsRequest>,
+) -> actix_web::Result<Json<ResponseData<SaveVresRiskSignalsResult>>, ApiError> {
+    let SaveVresRiskSignalsRequest { vres_id } = request.into_inner();
+
+    let (vreq_vres, vw) = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let vreq_vres = VerificationResult::get(conn, &vres_id)?;
+            let existing_rs = RiskSignal::list_by_verification_result_id(conn, &vres_id)?;
+            if !existing_rs.is_empty() {
+                return Err(AssertionError("RiskSignal's already exist for vres").into());
+            }
+
+            let vw = VaultWrapper::<_>::build(
+                conn,
+                VwArgs::Historical(&vreq_vres.0.scoped_vault_id, vreq_vres.0.uvw_snapshot_seqno),
+            )?;
+            Ok((vreq_vres, vw))
+        })
+        .await??;
+
+    let svid = vreq_vres.0.scoped_vault_id.clone();
+    let vendor_result =
+        VendorResult::hydrate_vendor_result(vreq_vres, &state.enclave_client, &vw.vault.e_private_key)
+            .await?
+            .into_vendor_result()
+            .ok_or(AssertionError("Error hydrating vres"))?;
+    let risk_signals = parse_reason_codes_from_vendor_result(vendor_result, &vw)?;
+
+    let rs: Vec<_> = state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let kyc_rs = RiskSignal::bulk_create(
+                conn,
+                &svid,
+                risk_signals.kyc.footprint_reason_codes,
+                RiskSignalGroupKind::Kyc,
+                false,
+            )?;
+            let aml_rs = RiskSignal::bulk_create(
+                conn,
+                &svid,
+                risk_signals.aml.footprint_reason_codes,
+                RiskSignalGroupKind::Aml,
+                false,
+            )?;
+            Ok(kyc_rs.into_iter().chain(aml_rs).collect())
+        })
+        .await?;
+
+    Ok(Json(ResponseData::ok(SaveVresRiskSignalsResult {
+        created_risk_signals: rs.into_iter().map(|rs| rs.id).collect(),
     })))
 }
