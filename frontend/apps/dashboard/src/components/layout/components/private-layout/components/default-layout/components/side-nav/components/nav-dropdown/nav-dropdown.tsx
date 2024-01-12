@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoLogOut24, IcoShield24 } from '@onefootprint/icons';
+import { IcoLogOut24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { GetAuthRolesOrg } from '@onefootprint/types';
 import { Dropdown, Typography } from '@onefootprint/ui';
@@ -26,10 +26,6 @@ const NavDropdown = ({
   const { t } = useTranslation('components.private-layout.nav');
   const router = useRouter();
 
-  const handleAdminMode = () => {
-    router.push('/super-admin');
-  };
-
   const handleLogout = () => {
     router.push('/logout');
   };
@@ -48,15 +44,6 @@ const NavDropdown = ({
                 {user.email}
               </Typography>
             </UserDropdownItem>
-            {user.isFirmEmployee && (
-              <>
-                <Dropdown.Divider />
-                <SuperAdminDropdownItem onSelect={handleAdminMode}>
-                  <IcoShield24 />
-                  {t('admin-mode')}
-                </SuperAdminDropdownItem>
-              </>
-            )}
             {tenants?.length && (
               <>
                 <Dropdown.Divider />
@@ -101,14 +88,6 @@ const UserDropdownItem = styled(Dropdown.Item)`
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-  `};
-`;
-
-const SuperAdminDropdownItem = styled(Dropdown.Item)`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: row;
-    gap: ${theme.spacing[3]};
   `};
 `;
 

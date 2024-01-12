@@ -14,6 +14,7 @@ import {
 
 type Route = {
   title?: string;
+  employeesOnly: boolean;
   items: { href: string; Icon: Icon; text: string; badgeCount?: number }[];
 };
 
@@ -22,6 +23,7 @@ const useRoutes = (): Route[] => {
   const routes = [
     {
       title: '',
+      employeesOnly: false,
       items: [
         {
           href: '/home',
@@ -48,6 +50,7 @@ const useRoutes = (): Route[] => {
     },
     {
       title: t('configure'),
+      employeesOnly: false,
       items: [
         {
           href: '/playbooks',
@@ -73,6 +76,17 @@ const useRoutes = (): Route[] => {
           href: '/settings',
           Icon: IcoSettings16,
           text: t('settings'),
+        },
+      ],
+    },
+    {
+      title: t('internal'),
+      employeesOnly: true,
+      items: [
+        {
+          href: '/super-admin',
+          Icon: IcoStore16,
+          text: t('tenants.title'),
         },
       ],
     },

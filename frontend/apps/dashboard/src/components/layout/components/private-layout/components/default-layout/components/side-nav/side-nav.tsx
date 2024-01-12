@@ -16,7 +16,11 @@ import moveTenantToFront from './utils/move-tenant-to-front';
 
 const Nav = () => {
   const router = useRouter();
-  const { dangerouslyCastedData, logIn } = useSession();
+  const {
+    dangerouslyCastedData,
+    logIn,
+    data: { user },
+  } = useSession();
   const assumeRoleMutation = useAssumeAuthRole();
   const showErrorToast = useRequestErrorToast();
   const routes = useRoutes();
@@ -42,22 +46,26 @@ const Nav = () => {
   return (
     <NavContainer>
       <Links direction="column">
-        {routes.map(({ title, items }) => (
-          <TabGroup key={title}>
-            {title && <Title>{title}</Title>}
-            {items.map(({ text, href, Icon, badgeCount }) => (
-              <Element key={text} asChild>
-                <NavLink
-                  badgeCount={badgeCount}
-                  href={href}
-                  icon={Icon}
-                  selected={router.pathname.startsWith(href)}
-                  text={text}
-                />
-              </Element>
-            ))}
-          </TabGroup>
-        ))}
+        {routes
+          .filter(
+            ({ employeesOnly }) => !employeesOnly || !!user?.isFirmEmployee,
+          )
+          .map(({ title, items }) => (
+            <TabGroup key={title}>
+              {title && <Title>{title}</Title>}
+              {items.map(({ text, href, Icon, badgeCount }) => (
+                <Element key={text} asChild>
+                  <NavLink
+                    badgeCount={badgeCount}
+                    href={href}
+                    icon={Icon}
+                    selected={router.pathname.startsWith(href)}
+                    text={text}
+                  />
+                </Element>
+              ))}
+            </TabGroup>
+          ))}
       </Links>
       <Divider />
       <Stack

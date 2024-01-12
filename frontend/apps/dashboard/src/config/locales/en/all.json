@@ -405,11 +405,11 @@
       "delete": "Delete",
       "save": "Save as frequent note",
       "created-toast": {
-        "title" : "Success",
+        "title": "Success",
         "description": "Saved frequent note for organization."
       },
       "deleted-toast": {
-        "title" : "Success",
+        "title": "Success",
         "description": "Deleted frequent note for organization."
       },
       "errors": {
@@ -465,6 +465,7 @@
         "proxy-configs": "Vault proxy",
         "webhooks": "Webhooks",
         "configure": "Configure",
+        "internal": "Internal",
         "sandbox-mode": {
           "label": "Sandbox mode",
           "tooltip-info": {
