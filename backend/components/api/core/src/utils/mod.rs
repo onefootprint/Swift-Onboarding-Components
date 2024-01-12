@@ -1,6 +1,7 @@
 pub mod actix;
 pub mod body_bytes;
 pub mod challenge;
+pub mod challenge_rate_limit;
 pub mod db2api;
 pub mod email;
 pub mod email_domain;

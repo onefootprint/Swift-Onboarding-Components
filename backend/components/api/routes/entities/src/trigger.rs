@@ -10,6 +10,7 @@ use api_core::errors::tenant::TenantError;
 use api_core::errors::user::UserError;
 use api_core::errors::ApiResult;
 use api_core::types::EmptyResponse;
+use api_core::utils::challenge_rate_limit::RateLimit;
 use api_core::utils::email::SendgridClient;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::session::AuthSession;
@@ -205,7 +206,7 @@ impl<'a> From<TriggerMessage> for SmsMessage<'a> {
     fn from(value: TriggerMessage) -> Self {
         SmsMessage {
             message_body: value.message_body(),
-            rate_limit_scope: api_core::utils::sms::rate_limit::DASHBOARD_TRIGGER,
+            rate_limit_scope: RateLimit::DASHBOARD_TRIGGER,
         }
     }
 }

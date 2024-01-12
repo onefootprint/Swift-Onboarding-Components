@@ -4,11 +4,11 @@ use tokio::sync::oneshot::{self, Receiver, Sender};
 use tracing::Instrument;
 
 use crate::{
-    errors::{challenge::ChallengeError, user::UserError, ApiError, ApiResult, AssertionError},
+    errors::{user::UserError, ApiError, ApiResult, AssertionError},
     State,
 };
 use async_trait::async_trait;
-use chrono::{Duration, Utc};
+use chrono::Duration;
 use crypto::sha256;
 use db::models::tenant::Tenant;
 use feature_flag::{BoolFlag, FeatureFlagClient, LaunchDarklyFeatureFlagClient};
@@ -16,9 +16,7 @@ use itertools::Itertools;
 use newtypes::SandboxId;
 use newtypes::{Base64Data, PhoneNumber, PiiString, VaultId};
 
-use self::rate_limit::RateLimit;
-
-use super::session::{JsonSession, RateLimitRecord};
+use super::challenge_rate_limit::RateLimit;
 
 pub type SecondsBeforeRetry = Duration;
 
@@ -193,12 +191,11 @@ impl SmsClient {
             return Ok(());
         }
         RateLimit {
-            state,
-            phone_number: destination,
+            key: &destination.e164(),
             period: self.duration_between_challenges,
             scope: rate_limit_scope,
         }
-        .enforce_and_update()
+        .enforce_and_update(state)
         .await?;
         let message_body = PiiString::from(format!("{}\n\nSent via Footprint", message_body.leak()));
         self._send_message(message_body, destination.e164(), None).await?;
@@ -219,12 +216,11 @@ impl SmsClient {
             return Ok(());
         }
         RateLimit {
-            state,
-            phone_number: destination,
+            key: &destination.e164(),
             period: self.duration_between_challenges,
             scope: rate_limit_scope,
         }
-        .enforce_and_update()
+        .enforce_and_update(state)
         .await?;
         let message_body = PiiString::from(format!("{}\n\nSent via Footprint", message_body.leak()));
         let e164 = destination.e164();
@@ -340,7 +336,7 @@ impl SmsClient {
         // Oneshot channel to send an error back from async message sending
         let (tx, rx) = oneshot::channel();
 
-        self.send_message_non_blocking(state, message_body, destination, rate_limit::SMS_CHALLENGE, tx)
+        self.send_message_non_blocking(state, message_body, destination, RateLimit::SMS_CHALLENGE, tx)
             .await?;
 
         let state = PhoneEmailChallengeState {
@@ -362,7 +358,7 @@ impl SmsClient {
             url
         ));
 
-        self.send_message(state, message_body, destination, rate_limit::D2P_LINK)
+        self.send_message(state, message_body, destination, RateLimit::D2P_LINK)
             .await?;
 
         Ok(self.duration_between_challenges)
@@ -378,7 +374,7 @@ impl SmsClient {
             info.url.leak()
         ));
 
-        self.send_message(state, message_body, info.destination, rate_limit::BO_SESSION)
+        self.send_message(state, message_body, info.destination, RateLimit::BO_SESSION)
             .await?;
 
         Ok(())
@@ -393,63 +389,6 @@ pub struct BoSessionSmsInfo<'a> {
     /// The tenant name
     pub org_name: &'a str,
     pub url: PiiString,
-}
-
-pub mod rate_limit {
-    use super::*;
-
-    // TODO: probably just enum these dudes
-    pub const BO_SESSION: &str = "bo_session";
-    pub const DASHBOARD_TRIGGER: &str = "dashboard_trigger";
-    pub const D2P_LINK: &str = "d2p_session";
-    pub const SMS_CHALLENGE: &str = "sms_challenge";
-
-    fn key(phone_number: &PhoneNumber, scope: &str) -> String {
-        // Check SMS rate limits not including sandbox suffix to prevent spamming someone
-        format!("{}:{}", phone_number.e164().leak(), scope)
-    }
-
-    pub(super) struct RateLimit<'a> {
-        pub(super) state: &'a State,
-        pub(super) period: Duration,
-        pub(super) phone_number: &'a PhoneNumber,
-        pub(super) scope: &'a str,
-    }
-
-    impl<'a> RateLimit<'a> {
-        pub(super) async fn enforce_and_update(&self) -> Result<(), ApiError> {
-            let RateLimit {
-                state,
-                period,
-                phone_number,
-                scope,
-            } = *self;
-
-            let rate_limit_key = key(phone_number, scope);
-            let now = Utc::now();
-
-            state
-                .db_pool
-                .db_query(move |conn| -> Result<_, ApiError> {
-                    if let Some(session) = JsonSession::<RateLimitRecord>::get(conn, &rate_limit_key)? {
-                        let time_since_last_sent = now - session.data.sent_at;
-                        if time_since_last_sent < period {
-                            // num_seconds() only returns count of whole seconds, so we add one to avoid returning 0 seconds as time remaining
-                            let time_remaining = (period - time_since_last_sent).num_seconds() + 1;
-                            return Err(ChallengeError::RateLimited(time_remaining).into());
-                        }
-                    }
-
-                    let record = RateLimitRecord { sent_at: now };
-                    JsonSession::update_or_create(conn, &rate_limit_key, &record, now + period)?;
-
-                    Ok(())
-                })
-                .await??;
-
-            Ok(())
-        }
-    }
 }
 
 #[tracing::instrument(skip_all)]
