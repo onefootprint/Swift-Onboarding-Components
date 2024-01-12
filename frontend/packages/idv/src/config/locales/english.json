@@ -974,8 +974,8 @@
           "subtitle": "In case you don't have a smartphone, you can manually upload the documents we need from your computer for now and finish the rest of the validations later.",
           "warning": "We highly recommend you to continue from your phone, if possible, since it will significantly expedite the identity verification process.",
           "cta": {
-            "mobile": "No, continue on my smartphone",
-            "desktop": "Yes, continue on desktop"
+            "mobile": "Continue on my smartphone",
+            "desktop": "Continue on desktop"
           }
         }
       }
