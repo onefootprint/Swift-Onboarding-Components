@@ -23,7 +23,6 @@ use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::DocumentRequest;
-use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VerificationRequest;
 use db::models::workflow::Workflow;
@@ -91,8 +90,7 @@ async fn make_vendor_calls(
     let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config, &state.enclave_client).await?;
     let tvc2 = tvc.clone();
 
-    let wfid = wf.id.clone();
-    let (requests, vw, obc) = state
+    let (requests, vw) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&sv.id))?;
@@ -107,9 +105,7 @@ async fn make_vendor_calls(
                 vec![vendor_api],
             )?;
 
-            let (obc, _) = ObConfiguration::get(conn, &wfid)?;
-
-            Ok((requests, uvw, obc))
+            Ok((requests, uvw))
         })
         .await?;
 
@@ -129,8 +125,7 @@ async fn make_vendor_calls(
     .pop()
     .ok_or(ApiError::from(ApiErrorKind::VendorRequestsFailed))?;
     let rule_group = KycRuleGroup::default();
-    let rules_output =
-        api_core::decision::engine::calculate_decision(vendor_result.clone(), vw, obc, rule_group)?;
+    let rules_output = api_core::decision::engine::calculate_decision(vendor_result.clone(), vw, rule_group)?;
 
     Ok(Json(ResponseData::ok(MakeVendorCallsResponse {
         new_vendor_request_ids: vec![vendor_result.verification_request_id],
@@ -161,17 +156,14 @@ async fn make_decision(
 ) -> actix_web::Result<Json<ResponseData<MakeDecisionResponse>>, ApiError> {
     let MakeDecisionRequest { tenant_id, fp_id } = request.into_inner();
 
-    let (wf, vw, obc) = state
+    let (wf, vw) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
             let wf = Workflow::get_active(conn, &scoped_user.id)?.ok_or(OnboardingError::NoWorkflow)?;
-
-            let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
-
             let vw = VaultWrapper::<_>::build(conn, VwArgs::Tenant(&wf.scoped_vault_id))?;
 
-            Ok((wf, vw, obc))
+            Ok((wf, vw))
         })
         .await?;
 
@@ -197,7 +189,7 @@ async fn make_decision(
         .ok_or(ApiError::from(ApiErrorKind::VendorRequestsFailed))?;
     let vres_id = vendor_result.verification_result_id.clone();
     let risk_signals: RiskSignalGroupStruct<Kyc> =
-        parse_reason_codes_from_vendor_result(vendor_result.clone(), &vw, &obc)?.kyc;
+        parse_reason_codes_from_vendor_result(vendor_result.clone(), &vw)?.kyc;
 
     state
         .db_pool
@@ -264,8 +256,7 @@ async fn shadow_run(
     let tid = sv.tenant_id.clone();
     let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config, &state.enclave_client).await?;
 
-    let wfid = wf.id.clone();
-    let (requests, vw, obc) = state
+    let (requests, vw) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&sv.id))?;
@@ -289,9 +280,7 @@ async fn shadow_run(
                 })
                 .collect();
 
-            let (obc, _) = ObConfiguration::get(conn, &wfid)?;
-
-            Ok((memory_only_requests, uvw, obc))
+            Ok((memory_only_requests, uvw))
         })
         .await?;
 
@@ -320,7 +309,7 @@ async fn shadow_run(
         .last()
         .ok_or(ApiError::from(ApiErrorKind::VendorRequestsFailed))?;
     let rule_group = KycRuleGroup::default();
-    let rules_output = decision::engine::calculate_decision(vendor_result, vw, obc, rule_group)?;
+    let rules_output = decision::engine::calculate_decision(vendor_result, vw, rule_group)?;
 
     Ok(Json(ResponseData::ok(ShadowRunResult {
         decision_status: rules_output.decision.decision_status,

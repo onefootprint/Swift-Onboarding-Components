@@ -308,7 +308,7 @@ pub(super) fn eval_rules(res: VendorResult, vw: &VaultWrapper, obc: &ObConfigura
     let vendor_api = res.vendor_api();
     let vault_id = vw.vault.id.clone();
     // this does a lot of unnecessary stuff and has a lot of layers of unnecessary indirection but unfortunately this is the safest way to produce risk signals here without diverging too much from how other code paths do this
-    let reason_codes = decision::features::risk_signals::parse_reason_codes_from_vendor_result(res, vw, obc)?
+    let reason_codes = decision::features::risk_signals::parse_reason_codes_from_vendor_result(res, vw)?
         .kyc
         .footprint_reason_codes
         .into_iter()

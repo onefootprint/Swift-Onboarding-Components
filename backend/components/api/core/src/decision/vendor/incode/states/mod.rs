@@ -52,7 +52,7 @@ use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
 use crate::decision::vendor;
 use crate::decision::vendor::verification_result::encrypt_verification_result_response;
 use crate::errors::{ApiResult, AssertionError};
-use crate::utils::vault_wrapper::{Person, VaultWrapper};
+use crate::utils::vault_wrapper::VaultWrapper;
 use crate::{ApiError, State};
 use db::models::verification_result::{NewVerificationResult, VerificationResult};
 use db::DbPool;
@@ -183,7 +183,7 @@ pub async fn save_incode_fixtures(
     let suid = su_id.clone();
     let vw = state
         .db_pool
-        .db_query(move |conn| VaultWrapper::<Person>::build_for_tenant(conn, &suid))
+        .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &suid))
         .await??;
     let ocr_comparison_fields = if !obc.is_doc_first {
         let ocr_comparison_fields =

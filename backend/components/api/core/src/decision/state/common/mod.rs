@@ -35,7 +35,7 @@ use crate::{
     },
     enclave_client::EnclaveClient,
     errors::{onboarding::OnboardingError, ApiResult},
-    utils::vault_wrapper::{Any, Person, TenantVw, VaultWrapper, VwArgs},
+    utils::vault_wrapper::{Any, TenantVw, VaultWrapper, VwArgs},
     State,
 };
 
@@ -242,7 +242,7 @@ pub async fn maybe_generate_ocr_reason_codes(
     state: &State,
     wf_id: &WorkflowId,
     sv_id: &ScopedVaultId,
-    vw: &VaultWrapper<Person>,
+    vw: &VaultWrapper,
 ) -> ApiResult<Option<Vec<NewRiskSignalInfo>>> {
     let wf_id = wf_id.clone();
     let (obc, _) = state
@@ -278,34 +278,33 @@ pub async fn maybe_generate_ocr_reason_codes(
     Ok(Some(ocr_reason_codes))
 }
 
-// TODO: compute the `user_input_risk_signals` we compute in parse_reason_codes_from_vendor_result here instead
 // Note: vendor_api/vres_id passed in here is a complete hack because currently RiskSignal's require these and we are doing something hacky here by writing non-vendor
 // reason codes as RiskSignal's. The vendor_api/vres_id for the KYC call made should be what is passed in here and these risk signals will just be attached to that vendor call
 pub async fn generate_user_input_risk_signals(
     enclave_client: &EnclaveClient,
-    vw: &VaultWrapper<Person>,
+    vw: &VaultWrapper,
+    obc: &ObConfiguration,
     vendor_api: VendorAPI,
     vres_id: &VerificationResultId,
-) -> ApiResult<Option<Vec<NewRiskSignalInfo>>> {
+) -> ApiResult<Vec<NewRiskSignalInfo>> {
+    let mut reason_codes = decision::features::risk_signals::user_input_based_risk_signals(vw, obc);
+
     let declarations = vw
         .decrypt_unchecked_single(enclave_client, InvestorProfileKind::Declarations.into())
         .await?;
 
-    let ipk_risk_signals = if let Some(declarations) = declarations {
+    if let Some(declarations) = declarations {
         let declarations: Vec<Declaration> = declarations.deserialize()?;
         if declarations.contains(&Declaration::AffiliatedWithUsBroker) {
-            Some(vec![(
-                FootprintReasonCode::AffiliatedWithBrokerOrFinra,
-                vendor_api,
-                vres_id.clone(),
-            )])
-        } else {
-            None
+            reason_codes.push(FootprintReasonCode::AffiliatedWithBrokerOrFinra)
         }
-    } else {
-        None
-    };
-    Ok(ipk_risk_signals)
+    }
+
+    let risk_signals = reason_codes
+        .into_iter()
+        .map(|frc| (frc, vendor_api, vres_id.clone()))
+        .collect();
+    Ok(risk_signals)
 }
 
 pub fn get_aml_risk_signals_from_aml_call(
@@ -328,11 +327,10 @@ pub fn get_aml_risk_signals_from_aml_call(
 }
 
 pub fn get_aml_risk_signals_from_kyc_call(
-    obc: &ObConfiguration,
     vw: &VaultWrapper,
     kyc_vendor_result: VendorResult,
 ) -> ApiResult<RiskSignalGroupStruct<Aml>> {
-    decision::features::risk_signals::parse_reason_codes_from_vendor_result(kyc_vendor_result, vw, obc)
+    decision::features::risk_signals::parse_reason_codes_from_vendor_result(kyc_vendor_result, vw)
         .map(|r| r.aml)
 }
 

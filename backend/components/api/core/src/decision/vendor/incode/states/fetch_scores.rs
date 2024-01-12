@@ -10,7 +10,7 @@ use crate::decision::vendor::verification_result::save_vreq_and_vres;
 use crate::decision::vendor::VendorAPIError;
 use crate::enclave_client::EnclaveClient;
 use crate::errors::{ApiResult, AssertionError};
-use crate::utils::vault_wrapper::{Any, EnclaveDecryptOperation, Person, Pii, VaultWrapper};
+use crate::utils::vault_wrapper::{Any, EnclaveDecryptOperation, Pii, VaultWrapper};
 use crate::vendor_clients::IncodeClients;
 use crate::ApiErrorKind;
 use async_trait::async_trait;
@@ -94,7 +94,7 @@ impl IncodeStateTransition for FetchScores {
         let (obc, vw, id_doc) = db_pool
             .db_query(move |conn| -> ApiResult<_> {
                 let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
-                let vw = VaultWrapper::<Person>::build_for_tenant(conn, &sv_id)?;
+                let vw = VaultWrapper::build_for_tenant(conn, &sv_id)?;
                 let (id_doc, _) = IdentityDocument::get(conn, &id_doc_id)?;
                 Ok((obc, vw, id_doc))
             })

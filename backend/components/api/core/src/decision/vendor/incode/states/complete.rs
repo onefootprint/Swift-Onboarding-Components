@@ -64,7 +64,7 @@ pub struct Complete {}
 pub(super) struct PreCompleteArgs<'a> {
     pub obc: &'a ObConfiguration,
     pub id_doc: &'a IdentityDocument,
-    pub vw: &'a VaultWrapper<Person>,
+    pub vw: &'a VaultWrapper,
     pub dk: IdDocKind,
     pub expect_selfie: bool,
     pub fetch_ocr_response: &'a FetchOCRResponse,

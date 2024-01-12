@@ -22,7 +22,6 @@ use crate::{
 };
 use db::{
     models::{
-        ob_configuration::ObConfiguration,
         vault::Vault,
         verification_request::{RequestAndMaybeResult, VerificationRequest},
         verification_result::VerificationResult,
@@ -244,11 +243,10 @@ pub async fn make_vendor_requests(
 pub fn calculate_decision(
     vendor_result: VendorResult,
     vw: VaultWrapper,
-    obc: ObConfiguration,
     rule_group: KycRuleGroup,
 ) -> ApiResult<OnboardingRulesDecisionOutput> {
     let risk_signals = RiskSignalsForDecision {
-        kyc: Some(parse_reason_codes_from_vendor_result(vendor_result, &vw, &obc)?.kyc),
+        kyc: Some(parse_reason_codes_from_vendor_result(vendor_result, &vw)?.kyc),
         ..Default::default()
     };
     let decision = rule_group.evaluate(

@@ -10,7 +10,7 @@ use crate::{
         features::incode_utils::*
     }, 
     enclave_client::EnclaveClient, 
-    utils::vault_wrapper::{VaultWrapper, Person, DecryptUncheckedResult}, 
+    utils::vault_wrapper::{VaultWrapper, DecryptUncheckedResult}, 
     errors::ApiResult
 };
 
@@ -39,7 +39,7 @@ impl From<IncodeOcrComparisonDataFields> for IncodeOcrFixtureResponseFields {
 }
 
 impl IncodeOcrComparisonDataFields {
-    pub async fn compose(enclave_client: &EnclaveClient, vw: &VaultWrapper<Person>) -> ApiResult<Self> {
+    pub async fn compose(enclave_client: &EnclaveClient, vw: &VaultWrapper) -> ApiResult<Self> {
         let fields = &[
             DataIdentifier::Id(IdentityDataKind::FirstName),
             DataIdentifier::Id(IdentityDataKind::LastName),

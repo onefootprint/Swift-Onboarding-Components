@@ -1048,7 +1048,7 @@ footprint_reason_code_enum! {
 
         // ~~~~~~~~~ "User Input" ~~~~~~~~~~
         #[scope = SignalScope::Name, additional_scopes = vec![], match_level = None]
-        #[note = "User associated with US Broker or FINRA", severity = SignalSeverity::Medium,  description = "The user reported that they are affiliated with a US Broker or FINRA."]
+        #[note = "User associated with US Broker or FINRA", severity = SignalSeverity::High,  description = "The user reported that they are affiliated with a US Broker or FINRA."]
         AffiliatedWithBrokerOrFinra,
         //
         //

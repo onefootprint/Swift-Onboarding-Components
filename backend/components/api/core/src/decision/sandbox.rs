@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{errors::ApiResult, utils::vault_wrapper::VaultWrapper};
+use crate::errors::ApiResult;
 use db::{
     models::{
         decision_intent::DecisionIntent, ob_configuration::ObConfiguration, vault::Vault,
@@ -19,7 +19,6 @@ use rand::Rng;
 use strum::IntoEnumIterator;
 
 use super::{
-    features,
     onboarding::{Decision, OnboardingRulesDecisionOutput},
     utils::FixtureDecision,
     vendor::{self, vendor_result::VendorResult},
@@ -102,22 +101,18 @@ pub fn get_fixture_kyb_reason_codes(
 
 pub fn get_fixture_kyc_reason_codes(
     fixture_decision: FixtureDecision,
-    vw: &VaultWrapper,
     obc: &ObConfiguration,
 ) -> Vec<(FootprintReasonCode, VendorAPI)> {
     match obc.cip_kind {
         // We produce specific fixtures for Alpaca to better simulate the 3 canonical use cases that Alpaca always asks for
-        Some(CipKind::Alpaca) => get_fixture_reason_codes_alpaca(fixture_decision, vw, obc),
+        Some(CipKind::Alpaca) => get_fixture_reason_codes_alpaca(fixture_decision),
         // For non-alpaca cases, we just produce an assortment of reasonable random risk signals
         Some(CipKind::Apex) | None => {
             let reason_codes =
                 make_random_kyc_reason_codes_for_fixture_decision(fixture_decision, VaultKind::Person);
-            // Still create the expected user input based risk signals to make the Sandbox experience as fun and lifelike as possible for the eager Tenant-to-be
-            let user_input_risk_signals = features::risk_signals::user_input_based_risk_signals(vw, obc);
 
             reason_codes
                 .into_iter()
-                .chain(user_input_risk_signals)
                 .map(|r| (r, VendorAPI::IdologyExpectId))
                 .collect()
         }
@@ -153,8 +148,6 @@ pub fn make_random_kyc_reason_codes_for_fixture_decision(
 // #fail => KYC hard fails (KYC reason_code should be SSN does not match or something else catastrophic)
 pub fn get_fixture_reason_codes_alpaca(
     fixture_decision: FixtureDecision,
-    vw: &VaultWrapper,
-    obc: &ObConfiguration,
 ) -> Vec<(FootprintReasonCode, VendorAPI)> {
     let (decision_status, create_manual_review) = fixture_decision;
     let reason_codes: Vec<FootprintReasonCode> = match (decision_status, create_manual_review) {
@@ -187,11 +180,8 @@ pub fn get_fixture_reason_codes_alpaca(
         (DecisionStatus::Fail, false) => vec![FootprintReasonCode::SsnDoesNotMatch],
     };
 
-    let user_input_risk_signals = features::risk_signals::user_input_based_risk_signals(vw, obc);
-
     reason_codes
         .into_iter()
-        .chain(user_input_risk_signals)
         .map(|r| (r, VendorAPI::IdologyExpectId))
         .collect()
 }

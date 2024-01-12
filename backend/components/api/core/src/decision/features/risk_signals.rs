@@ -107,12 +107,11 @@ pub struct ParsedFootprintReasonCodes {
 pub fn parse_reason_codes_from_vendor_result(
     vendor_result: VendorResult, // TODO: this could be VendorResponse later when vres_id is removed from here
     vw: &VaultWrapper,
-    obc: &ObConfiguration,
 ) -> ApiResult<ParsedFootprintReasonCodes> {
     let vendor_api: VendorAPI = (&vendor_result.response.response).into();
     let vres_id = vendor_result.verification_result_id.clone();
 
-    let (aml_frcs, kyc_frcs): (Vec<_>, Vec<_>) = parse_reason_codes(vendor_result.clone(), vw, obc)
+    let (aml_frcs, kyc_frcs): (Vec<_>, Vec<_>) = parse_reason_codes(vendor_result.clone(), vw)
         .into_iter()
         .partition(|frc| frc.is_aml());
 
@@ -136,14 +135,7 @@ pub fn parse_reason_codes_from_vendor_result(
     Ok(res)
 }
 
-fn parse_reason_codes(
-    vendor_result: VendorResult,
-    vw: &VaultWrapper,
-    obc: &ObConfiguration,
-) -> Vec<FootprintReasonCode> {
-    // Risk Signals that should be created for every *KYC* vendor, based purely on data in vault + obc
-    let user_input_risk_signals = user_input_based_risk_signals(vw, obc);
-
+fn parse_reason_codes(vendor_result: VendorResult, vw: &VaultWrapper) -> Vec<FootprintReasonCode> {
     let dob_submitted = vw.has_field(IdentityDataKind::Dob);
     let ssn_submitted = vw.has_field(IdentityDataKind::Ssn4) || vw.has_field(IdentityDataKind::Ssn9);
     match vendor_result.response.response {
@@ -156,19 +148,16 @@ fn parse_reason_codes(
             )
             .footprint_reason_codes()
             .into_iter()
-            .chain(user_input_risk_signals)
             .collect()
         }
         ParsedResponse::ExperianPreciseID(r) => {
             ExperianFeatures::from(r, vendor_result.verification_result_id)
                 .footprint_reason_codes()
                 .into_iter()
-                .chain(user_input_risk_signals)
                 .collect()
         }
         ParsedResponse::LexisFlexId(r) => lexis::footprint_reason_codes(r, ssn_submitted)
             .into_iter()
-            .chain(user_input_risk_signals)
             .collect(),
         _ => vec![],
     }
