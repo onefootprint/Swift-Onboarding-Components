@@ -121,13 +121,17 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                     playbook: api_wire_types::TimelinePlaybook::from_db(pb),
                 })
             }
-            SaturatedTimelineEvent::AuthMethodUpdated(e) => {
+            SaturatedTimelineEvent::AuthMethodUpdated((e, _, insight_event)) => {
                 let AuthMethodUpdatedInfo {
                     kind,
                     action,
                     auth_event_id: _,
                 } = e;
-                Self::AuthMethodUpdated(api_wire_types::AuthMethodUpdated { kind, action })
+                Self::AuthMethodUpdated(api_wire_types::AuthMethodUpdated {
+                    kind,
+                    action,
+                    insight_event: api_wire_types::InsightEvent::from_db(insight_event),
+                })
             }
         }
     }

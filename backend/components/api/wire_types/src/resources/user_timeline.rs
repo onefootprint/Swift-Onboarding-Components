@@ -1,7 +1,7 @@
 use newtypes::{ActionKind, AuthMethodKind, CollectedDataOption};
 
 use crate::{
-    Actor, Annotation, Apiv2Schema, DateTime, IdentityDocumentTimelineEvent, LivenessEvent,
+    Actor, Annotation, Apiv2Schema, DateTime, IdentityDocumentTimelineEvent, InsightEvent, LivenessEvent,
     OnboardingDecision, Serialize, TimelinePlaybook, TriggeredWorkflow, Utc, VaultCreated, WatchlistCheck,
     WorkflowRequest,
 };
@@ -62,6 +62,7 @@ pub struct WorkflowStarted {
 pub struct AuthMethodUpdated {
     pub kind: AuthMethodKind,
     pub action: ActionKind,
+    pub insight_event: InsightEvent,
 }
 
 #[derive(Debug, Clone, Serialize)]

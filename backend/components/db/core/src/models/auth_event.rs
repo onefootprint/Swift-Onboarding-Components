@@ -23,6 +23,8 @@ use super::apple_device_attest::AppleDeviceAttestation;
 use super::google_device_attest::GoogleDeviceAttestation;
 use super::insight_event::InsightEvent;
 
+use std::collections::HashMap;
+
 #[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = auth_event)]
 pub struct AuthEvent {
@@ -110,6 +112,23 @@ impl AuthEvent {
         let results = auth_event::table
             .filter(auth_event::id.eq_any(ids))
             .get_results(conn)?;
+        Ok(results)
+    }
+
+    #[tracing::instrument("AuthEvent::get_bulk_for_timeline", skip_all)]
+    pub fn get_bulk_for_timeline(
+        conn: &mut PgConn,
+        ids: Vec<AuthEventId>,
+    ) -> DbResult<HashMap<AuthEventId, (Self, InsightEvent)>> {
+        use db_schema::schema::insight_event;
+        let results = auth_event::table
+            // Not all have an insight event, but all the ones we care about do
+            .inner_join(insight_event::table)
+            .filter(auth_event::id.eq_any(ids))
+            .get_results::<(Self, InsightEvent)>(conn)?
+            .into_iter()
+            .map(|e| (e.0.id.clone(), e))
+            .collect();
         Ok(results)
     }
 

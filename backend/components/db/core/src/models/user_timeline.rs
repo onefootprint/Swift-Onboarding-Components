@@ -19,6 +19,7 @@ use newtypes::DbUserTimelineEventKind;
 use newtypes::{DbUserTimelineEvent, ScopedVaultId, UserTimelineId, VaultId};
 
 use super::annotation::AnnotationInfo;
+use super::auth_event::AuthEvent;
 use super::document_request::DocumentRequest;
 use super::identity_document::IdentityDocument;
 use super::insight_event::InsightEvent;
@@ -71,7 +72,7 @@ pub enum SaturatedTimelineEvent {
     VaultCreated(SaturatedActor),
     WorkflowTriggered((Option<Workflow>, SaturatedActor, Option<WorkflowRequest>)),
     WorkflowStarted((Workflow, ObConfiguration)),
-    AuthMethodUpdated(AuthMethodUpdatedInfo),
+    AuthMethodUpdated((AuthMethodUpdatedInfo, AuthEvent, InsightEvent)),
 }
 
 pub type IsFromOtherTenant = bool;
@@ -164,7 +165,10 @@ impl UserTimeline {
             DbUserTimelineEvent::WorkflowStarted(ref e) => Some(e.workflow_id.clone()),
             _ => None,
         });
-
+        let auth_event_ids = results.iter().flat_map(|ut| match ut.event {
+            DbUserTimelineEvent::AuthMethodUpdated(ref e) => Some(e.auth_event_id.clone()),
+            _ => None,
+        });
         let wfr_ids = results.iter().flat_map(|ut| match ut.event {
             DbUserTimelineEvent::WorkflowTriggered(ref e) => e.workflow_request_id.clone(),
             _ => None,
@@ -180,6 +184,7 @@ impl UserTimeline {
         let ob_configs = ObConfiguration::get_bulk(conn, ob_config_ids.collect())?;
         let workflows = Workflow::get_bulk(conn, workflow_ids.collect())?;
         let wfrs = WorkflowRequest::get_bulk(conn, wfr_ids.collect())?;
+        let auth_events = AuthEvent::get_bulk_for_timeline(conn, auth_event_ids.collect())?;
 
         // Join the UserTimeline events with the saturated info we fetched from different tables
         let results = results
@@ -279,7 +284,11 @@ impl UserTimeline {
                         SaturatedTimelineEvent::WorkflowStarted((workflow, ob_config))
                     }
                     DbUserTimelineEvent::AuthMethodUpdated(ref e) => {
-                        SaturatedTimelineEvent::AuthMethodUpdated(e.clone())
+                        let (auth_event, insight_event) = auth_events
+                            .get(&e.auth_event_id)
+                            .ok_or(DbError::RelatedObjectNotFound)?
+                            .clone();
+                        SaturatedTimelineEvent::AuthMethodUpdated((e.clone(), auth_event, insight_event))
                     }
                 };
                 Ok(UserTimelineInfo(ut, saturated_event))
