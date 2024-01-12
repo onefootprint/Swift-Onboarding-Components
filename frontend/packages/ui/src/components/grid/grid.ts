@@ -29,44 +29,42 @@ const createRows = (rows?: string | string[]) => {
   return undefined;
 };
 
-const Container = styled('div').attrs<{ as: GridTag }>(({ as, ...props }) => ({
+const Container = styled('div').attrs<{ as: GridTag }>(({ as }) => ({
   as,
-  ...props,
 }))<GridContainerProps>`
-  ${({ theme, sx, ...props }) => css`
-    {...props}
-    sx=${sx};
+  ${({ theme, ...props }) => css`
     display: grid;
     width: ${props.width};
     grid-template-columns: ${createColumns(props.columns)};
     grid-template-rows: ${createRows(props.rows)};
     grid-gap: ${props.gap ? theme.spacing[props.gap] : undefined};
-    grid-column-gap: ${
-      props.columnGap ? theme.spacing[props.columnGap] : undefined
-    };
+    grid-column-gap: ${props.columnGap
+      ? theme.spacing[props.columnGap]
+      : undefined};
     grid-row-gap: ${props.rowGap ? theme.spacing[props.rowGap] : undefined};
     align-items: ${props.alignItems};
     justify-content: ${props.justifyContent};
-    grid-template-areas: ${
-      props.templateAreas ? `"${props.templateAreas.join('"\n"')}"` : undefined
-    };
+    grid-template-areas: ${props.templateAreas
+      ? `"${props.templateAreas.join('"\n"')}"`
+      : undefined};
 
     /* Box */
     ${getBorders(props, theme)};
     padding: ${getPadding(props, theme)};
     margin: ${getMargin(props, theme)};
     ${props.fontStyle && createFontStyles(props.fontStyle)};
-    box-shadow: ${props.elevation ? theme.elevation[props.elevation] : 'none'};
-    background-color: ${
-      (props.backgroundColor && theme.backgroundColor[props.backgroundColor]) ||
-      (props.surfaceColor && theme.surfaceColor[props.surfaceColor])
-    };
+    box-shadow: ${props.elevation
+      ? theme.elevation[props.elevation]
+      : undefined};
+    background-color: ${(props.backgroundColor &&
+      theme.backgroundColor[props.backgroundColor]) ||
+    (props.surfaceColor && theme.surfaceColor[props.surfaceColor])};
     position: ${props.position || 'relative'};
     display: ${props.display};
     text-align: ${props.textAlign};
-    border-radius: ${
-      theme.borderRadius[props.borderRadius ? props.borderRadius : 'none']
-    };
+    border-radius: ${props.borderRadius
+      ? theme.borderRadius[props.borderRadius]
+      : undefined};
     width: ${props.width};
     height: ${props.height};
     overflow: ${props.overflow};
