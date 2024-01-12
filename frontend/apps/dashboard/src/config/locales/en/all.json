@@ -493,8 +493,8 @@
         "tooltip": "To access live data you have to activate your account first. Please contact us to do so."
       },
       "assume-banner": {
-        "title": "You're logged into {{orgName}} in view-only mode.",
-        "edit-mode-title": "You're in edit mode for {{orgName}}.",
+        "title": "You're logged into {{orgName}} in view-only mode",
+        "edit-mode-title": "You're in edit mode for {{orgName}}",
         "enable-edit": "Enable edit mode",
         "disable-edit": "Exit edit mode",
         "edit-mode-info": "Proceed with caution. You are performing write actions on behalf of {{orgName}}.",

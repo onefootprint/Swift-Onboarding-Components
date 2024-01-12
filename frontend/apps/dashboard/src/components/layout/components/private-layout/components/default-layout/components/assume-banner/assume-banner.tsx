@@ -39,6 +39,7 @@ const AssumeBanner = () => {
               <IcoInfo16 color="error" />
             </Tooltip>
           )}
+          <span>·</span>
           {canUserAccessEditMode && (
             <>
               <button type="button" onClick={handleChangeEdit}>
