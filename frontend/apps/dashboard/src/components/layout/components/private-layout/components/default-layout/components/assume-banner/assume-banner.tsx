@@ -36,7 +36,7 @@ const AssumeBanner = () => {
           })}
           {isAssumedSessionEditMode && (
             <Tooltip text={t('edit-mode-info', { orgName: data.org?.name })}>
-              <IcoInfo16 />
+              <IcoInfo16 color="error" />
             </Tooltip>
           )}
           {canUserAccessEditMode && (
