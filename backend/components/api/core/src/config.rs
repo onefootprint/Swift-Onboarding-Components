@@ -50,7 +50,7 @@ pub struct Config {
     pub rp_id: String,
 
     #[envconfig(from = "TIME_S_BETWEEN_SMS_CHALLENGES", default = "8")]
-    pub time_s_between_sms_challenges: i64,
+    pub time_s_between_challenges: i64,
 
     #[envconfig(from = "TWILIO_API_KEY")]
     pub twilio_api_key: String,

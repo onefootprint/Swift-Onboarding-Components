@@ -162,7 +162,7 @@ impl State {
         let twilio_client = SmsClient::new(
             twilio,
             twilio_backup,
-            config.time_s_between_sms_challenges,
+            config.time_s_between_challenges,
             feature_flag_client.clone(),
         )
         .expect("failed to build SMS client");

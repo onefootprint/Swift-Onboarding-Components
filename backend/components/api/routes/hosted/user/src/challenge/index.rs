@@ -62,7 +62,7 @@ pub async fn post(
     let tenant = user_auth.tenant();
     let uv = user_auth.user.clone();
 
-    let (rx, data, time_before_retry, biometric_challenge_json) = match kind {
+    let (rx, data, time_before_retry_s, biometric_challenge_json) = match kind {
         AuthMethodKind::Phone => {
             // Expect a phone number and initiate an SMS challenge
             let phone_number = phone_number.ok_or(ValidationError(
@@ -77,7 +77,7 @@ pub async fn post(
                 h_code: challenge_data.h_code,
                 phone_number: phone_number.e164(),
             };
-            (Some(rx), challenge_data, Some(time_before_retry), None)
+            (Some(rx), challenge_data, time_before_retry.num_seconds(), None)
         }
         AuthMethodKind::Email => {
             let email = email.ok_or(ValidationError(
@@ -91,14 +91,14 @@ pub async fn post(
                 h_code: challenge_data.h_code,
                 email: email.email,
             };
-            (None, challenge_data, None, None)
+            (None, challenge_data, state.config.time_s_between_challenges, None)
         }
         AuthMethodKind::Passkey => {
             let webauthn = WebauthnConfig::new(&state.config);
             let (challenge, reg_state) = webauthn.initiate_challenge(uv.id)?;
             let challenge_json = serde_json::to_string(&challenge)?;
             let challenge_data = RegisterChallengeData::Passkey { reg_state };
-            (None, challenge_data, None, Some(challenge_json))
+            (None, challenge_data, 0, Some(challenge_json))
         }
     };
     let challenge = RegisterChallenge {
@@ -120,10 +120,6 @@ pub async fn post(
         return Err(JsonError(e).into());
     }
 
-    // TODO make sure we actually enforce this?
-    let time_before_retry_s = time_before_retry
-        .map(|d| d.num_seconds())
-        .unwrap_or(state.config.time_s_between_sms_challenges);
     let response = UserChallengeResponse {
         biometric_challenge_json,
         challenge_token,

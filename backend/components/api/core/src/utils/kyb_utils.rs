@@ -128,7 +128,7 @@ pub async fn send_secondary_bo_links(
 
     let futs = bo_sms_info.into_iter().flat_map(|(sms, email)| {
         let sms = state.sms_client.send_bo_session(state, sms);
-        let email = state.sendgrid_client.send_business_owner_invite(email);
+        let email = state.sendgrid_client.send_business_owner_invite(state, email);
         let v: Vec<Pin<Box<dyn futures::Future<Output = ApiResult<()>>>>> =
             vec![Box::pin(sms), Box::pin(email)];
         v

@@ -128,7 +128,7 @@ pub async fn post(
         let msg = EmailMessage::from(msg);
         state
             .sendgrid_client
-            .send_template(email.0, msg.template_id, msg.template_data)
+            .send_template(&state, email.0, msg.template_id, msg.template_data)
             .await?;
     } else {
         return Err(UserError::NoContactInfoForUser.into());

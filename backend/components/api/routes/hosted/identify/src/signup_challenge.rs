@@ -107,7 +107,7 @@ pub async fn post(
             challenge_token,
             scrubbed_phone_number: None,
             biometric_challenge_json: None,
-            time_before_retry_s: state.config.time_s_between_sms_challenges,
+            time_before_retry_s: state.config.time_s_between_challenges,
         };
         (None, data)
     };

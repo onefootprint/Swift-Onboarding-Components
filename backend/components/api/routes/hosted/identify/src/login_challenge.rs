@@ -132,7 +132,7 @@ pub async fn post(
                 (
                     None,
                     challenge_data,
-                    state.config.time_s_between_sms_challenges,
+                    state.config.time_s_between_challenges,
                     None,
                     None,
                 )

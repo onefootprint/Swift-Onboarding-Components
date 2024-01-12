@@ -125,7 +125,7 @@ async fn post(
     let inviter = inviter.first_name.unwrap_or(inviter.email.0);
     state
         .sendgrid_client
-        .send_dashboard_invite_email(email.0, inviter, tenant.name.clone(), link)
+        .send_dashboard_invite_email(&state, email.0, inviter, tenant.name.clone(), link)
         .await?;
 
     let result = api_wire_types::OrganizationMember::from_db((user, rb, role));

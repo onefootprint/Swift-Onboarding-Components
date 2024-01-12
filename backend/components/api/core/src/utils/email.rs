@@ -3,6 +3,7 @@ use crate::errors::user::UserError;
 use crate::errors::{ApiError, ApiErrorKind};
 use crate::State;
 use crate::{auth::session::AuthSessionData, errors::ApiResult};
+use chrono::Duration;
 use crypto::random::gen_random_alphanumeric_code;
 use db::models::tenant::Tenant;
 use feature_flag::BoolFlag;
@@ -14,6 +15,7 @@ use std::collections::HashMap;
 use std::str::FromStr;
 use tracing::Instrument;
 
+use super::challenge_rate_limit::RateLimit;
 use super::session::AuthSession;
 use super::sms::PhoneEmailChallengeState;
 
@@ -95,9 +97,15 @@ impl SendgridClient {
         Self { api_key, client }
     }
 
-    pub async fn send_magic_link_email(&self, to_email: String, url: PiiString) -> ApiResult<()> {
+    pub async fn send_magic_link_email(
+        &self,
+        state: &State,
+        to_email: String,
+        url: PiiString,
+    ) -> ApiResult<()> {
         let template_data = HashMap::from([("curl_request".to_string(), url)]);
         self.send_template(
+            state,
             PiiString::from(to_email),
             Self::MAGIC_LINK_TEMPLATE_ID,
             template_data,
@@ -107,6 +115,7 @@ impl SendgridClient {
 
     pub async fn send_dashboard_invite_email(
         &self,
+        state: &State,
         to_email: String,
         inviter: String,
         org_name: String,
@@ -119,17 +128,26 @@ impl SendgridClient {
             ("org_name".to_string(), PiiString::from(org_name)),
             ("accept_url".to_string(), accept_url),
         ]);
-        self.send_template(to_email, Self::DASHBOARD_INVITE_TEMPLATE_ID, template_data)
+        self.send_template(state, to_email, Self::DASHBOARD_INVITE_TEMPLATE_ID, template_data)
             .await
     }
 
-    pub async fn send_email_verify_email(&self, to_email: PiiString, curl_url: PiiString) -> ApiResult<()> {
+    pub async fn send_email_verify_email(
+        &self,
+        state: &State,
+        to_email: PiiString,
+        curl_url: PiiString,
+    ) -> ApiResult<()> {
         let template_data = HashMap::from([("curl_request".to_string(), curl_url)]);
-        self.send_template(to_email, Self::EMAIL_VERIFY_TEMPLATE_ID, template_data)
+        self.send_template(state, to_email, Self::EMAIL_VERIFY_TEMPLATE_ID, template_data)
             .await
     }
 
-    pub async fn send_business_owner_invite<'a>(&self, info: BoInviteEmailInfo<'a>) -> ApiResult<()> {
+    pub async fn send_business_owner_invite<'a>(
+        &self,
+        state: &State,
+        info: BoInviteEmailInfo<'a>,
+    ) -> ApiResult<()> {
         let BoInviteEmailInfo {
             to_email,
             inviter,
@@ -162,13 +180,14 @@ impl SendgridClient {
             .into_iter()
             .flatten(),
         );
-        self.send_template(to_email, Self::KYC_BUSINESS_OWNER_TEMPLATE_ID, d)
+        self.send_template(state, to_email, Self::KYC_BUSINESS_OWNER_TEMPLATE_ID, d)
             .await
     }
 
     #[tracing::instrument(skip_all, err)]
     pub async fn send_email_otp_verify_email(
         &self,
+        state: &State,
         to_email: PiiString,
         code: String,
         tenant_url: String,
@@ -177,13 +196,14 @@ impl SendgridClient {
             ("code".to_string(), code.into()),
             ("tenant_url".to_string(), tenant_url.into()),
         ]);
-        self.send_template(to_email, Self::OTP_VERIFY_TEMPLATE_ID, template_data)
+        self.send_template(state, to_email, Self::OTP_VERIFY_TEMPLATE_ID, template_data)
             .await
     }
 
     #[tracing::instrument(skip_all)]
     pub async fn send_template(
         &self,
+        state: &State,
         to_email: PiiString,
         template_id: &str,
         template_data: HashMap<String, PiiString>,
@@ -192,8 +212,21 @@ impl SendgridClient {
             .ok()
             .is_some_and(|e| e.is_fixture())
         {
-            // Don't rate limit send emails to the fixture email number
+            // Don't rate limit or send emails to the fixture email
             return Ok(());
+        }
+        let res = RateLimit {
+            key: &to_email,
+            period: Duration::seconds(state.config.time_s_between_challenges),
+            scope: template_id,
+        }
+        .enforce_and_update(state)
+        .await;
+        if let Err(err) = res {
+            // For now, going to soft roll out the rate limit to make sure we don't have any
+            // codepaths in prod that are sneakily disobeying the rate limit
+            // TODO hard error when rate limit is exceeded
+            tracing::error!(?err, "Error in applying email rate limit");
         }
         let template_data = template_data
             .into_iter()
@@ -262,7 +295,7 @@ pub async fn send_email_challenge(
     let confirm_link_str = PiiString::from(format!("{}/?v={}#{}", base_url, unique_param, token));
     state
         .sendgrid_client
-        .send_email_verify_email(email_address.clone(), confirm_link_str)
+        .send_email_verify_email(state, email_address.clone(), confirm_link_str)
         .await?;
     Ok(())
 }
@@ -294,7 +327,7 @@ pub fn send_email_challenge_non_blocking(
     let fut = async move {
         let _ = state
             .sendgrid_client
-            .send_email_otp_verify_email(email2, code, tenant_url)
+            .send_email_otp_verify_email(&state, email2, code, tenant_url)
             .await;
     };
     tokio::spawn(fut.in_current_span());

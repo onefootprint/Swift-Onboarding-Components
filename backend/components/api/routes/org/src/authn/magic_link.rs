@@ -29,7 +29,7 @@ fn handler(
     let link = create_magic_link(&state, &email_address, &redirect_url, false).await?;
     state
         .sendgrid_client
-        .send_magic_link_email(email_address, link)
+        .send_magic_link_email(&state, email_address, link)
         .await?;
 
     Ok(Json(EmptyResponse::ok()))
