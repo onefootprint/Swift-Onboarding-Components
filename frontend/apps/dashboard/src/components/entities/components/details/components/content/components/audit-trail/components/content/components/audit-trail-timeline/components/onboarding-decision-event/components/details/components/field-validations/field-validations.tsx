@@ -4,8 +4,6 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import Timeline from 'src/components/timeline';
 
-import useEntityId from '@/entity/hooks/use-entity-id';
-
 import useEntityMatchSignals from '../../hooks/use-entity-match-signals';
 import Error from './components/error';
 import Loading from './components/loading';
@@ -15,13 +13,16 @@ import {
   ValidationTimelineItemIcon,
 } from './components/validation-timeline-item';
 
-const FieldValidations = () => {
+export type FieldValidationsProps = {
+  entityId: string;
+};
+
+const FieldValidations = ({ entityId }: FieldValidationsProps) => {
   const { t } = useTranslation(
     'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.drawer',
   );
-  const id = useEntityId();
   const { data, isError, error, isLoading } = useEntityMatchSignals({
-    id,
+    id: entityId,
   });
 
   const getContent = () => {

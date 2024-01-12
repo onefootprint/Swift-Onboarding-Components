@@ -1291,7 +1291,8 @@
             },
             "not-verified-details": {
               "drawer": {
-                "title": "Details",
+                "details-title": "Details",
+                "field-title": "Field validations",
                 "no-data": "Match data not available",
                 "error": "There was an error loading the data. Try again later.",
                 "tabs": {
@@ -1300,6 +1301,28 @@
                 }
               },
               "view-details": "View details",
+              "rules": {
+                "description": "See below which rules have been triggered, and not triggered, for this onboarding.",
+                "triggered": "Rules triggered",
+                "not-triggered": "Rules not triggered",
+                "fail": {
+                  "title": "Fail",
+                  "color": "error"
+                },
+                "manual-review": {
+                  "title": "Fail + Manual review",
+                  "color": "warning"
+                },
+                "step-up": {
+                  "title": "Step-up",
+                  "color": "info"
+                },
+                "pass-with-manual-review": {
+                  "title": "Pass + Manual review",
+                  "color": "success"
+                },
+                "no-rules": "None"
+              },
               "field-validations": {
                 "attributes": {
                   "phone": "Phone number",

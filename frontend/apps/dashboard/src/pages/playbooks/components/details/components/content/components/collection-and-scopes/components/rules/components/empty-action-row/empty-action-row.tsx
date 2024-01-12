@@ -6,11 +6,11 @@ import { RuleOp } from '@onefootprint/types';
 import { Button, LinkButton, Stack, useToast } from '@onefootprint/ui';
 import { createFontStyles } from '@onefootprint/ui/src/utils/mixins/mixins';
 import React, { useRef, useState } from 'react';
+import OpBadge from 'src/components/rules-action-row/components/op-badge';
+import RiskSignalSelect from 'src/components/rules-action-row/components/risk-signal-select';
 import { useEffectOnce } from 'usehooks-ts';
 
 import useAddRule from '../../hooks/use-add-rule';
-import OpBadge from '../action-row/components/op-badge';
-import RiskSignalSelect from '../action-row/components/risk-signal-select';
 
 export type EmptyActionRowProps = {
   playbookId: string;

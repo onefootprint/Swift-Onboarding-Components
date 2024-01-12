@@ -4,8 +4,8 @@ import { type Rule } from '@onefootprint/types';
 import { Button, LinkButton, Stack, useToast } from '@onefootprint/ui';
 import React from 'react';
 
-import useDeleteRule from '../../hooks/use-delete-rule';
-import useEditRule from '../../hooks/use-edit-rule';
+import useDeleteRule from './hooks/use-delete-rule';
+import useEditRule from './hooks/use-edit-rule';
 
 export type RowEditButtonsProps = {
   playbookId: string;

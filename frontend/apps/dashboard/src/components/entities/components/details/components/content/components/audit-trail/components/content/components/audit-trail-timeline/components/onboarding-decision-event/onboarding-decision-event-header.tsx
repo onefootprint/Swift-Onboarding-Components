@@ -5,7 +5,7 @@ import { Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import Actor from '../actor';
-import NotVerifiedDetails from './components/not-verified-details';
+import Details from './components/details';
 
 type OnboardingDecisionEventHeaderProps = {
   data: OnboardingDecisionEventData;
@@ -35,8 +35,7 @@ const OnboardingDecisionEventHeader = ({
     text = t('org-overwrite.title', { decision });
   }
 
-  const showNotVerifiedDetails =
-    !isVerified && source.kind === ActorKind.footprint;
+  const showDetails = !isVerified && source.kind === ActorKind.footprint;
 
   return (
     <Stack direction="row" gap={2}>
@@ -49,7 +48,7 @@ const OnboardingDecisionEventHeader = ({
         &nbsp;
         <Actor actor={source} />
       </Typography>
-      {showNotVerifiedDetails && <NotVerifiedDetails />}
+      {showDetails && <Details />}
     </Stack>
   );
 };

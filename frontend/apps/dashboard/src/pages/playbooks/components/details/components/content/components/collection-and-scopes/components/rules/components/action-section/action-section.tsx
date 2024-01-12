@@ -5,8 +5,8 @@ import type { Rule, RuleAction } from '@onefootprint/types';
 import { Button, Stack, Typography } from '@onefootprint/ui';
 import kebabCase from 'lodash/kebabCase';
 import React, { useState } from 'react';
+import RulesActionRow from 'src/components/rules-action-row';
 
-import ActionRow from '../action-row';
 import EmptyActionRow from '../empty-action-row';
 
 export type ActionSectionProps = {
@@ -46,7 +46,7 @@ const ActionSection = ({
       return (
         <>
           {rules.map(rule => (
-            <ActionRow
+            <RulesActionRow
               key={JSON.stringify(rule)}
               shouldAllowEditing={shouldAllowEditing}
               playbookId={playbookId}

@@ -1,4 +1,4 @@
-import request from '@onefootprint/request';
+import request, { getErrorMessage } from '@onefootprint/request';
 import type {
   GetEntityRuleSetResultRequest,
   GetEntityRuleSetResultResponse,
@@ -33,12 +33,20 @@ const useEntityRuleSetResult = ({ id }: UseEntityRuleSetResultProps) => {
     () => getRuleSetResult({ id }, authHeaders),
     {
       select: response => {
-        const formattedRules = {} as Record<
+        if (!response) {
+          return {
+            hasRuleResults: false,
+            obConfigurationId: null,
+            ruleResults: null,
+          };
+        }
+
+        const formattedRuleResults = {} as Record<
           RuleAction,
           Record<string, Rule[] | boolean>
         >;
         Object.values(RuleAction).forEach(action => {
-          formattedRules[action] = {
+          formattedRuleResults[action] = {
             isOutcome: response.actionTriggered === action,
             triggered: [],
             notTriggered: [],
@@ -50,24 +58,26 @@ const useEntityRuleSetResult = ({ id }: UseEntityRuleSetResultProps) => {
         );
         sortedRuleResults.forEach(({ result, rule }) => {
           if (result) {
-            (formattedRules[rule.action].triggered as Rule[]).push(rule);
+            (formattedRuleResults[rule.action].triggered as Rule[]).push(rule);
           } else {
-            (formattedRules[rule.action].notTriggered as Rule[]).push(rule);
+            (formattedRuleResults[rule.action].notTriggered as Rule[]).push(
+              rule,
+            );
           }
         });
         return {
+          hasRuleResults: true,
           obConfigurationId: response.obConfigurationId,
-          data: formattedRules,
+          ruleResults: formattedRuleResults,
         };
       },
     },
   );
-  const { data, error } = ruleSetResultQuery;
+  const { error } = ruleSetResultQuery;
 
   return {
     ...ruleSetResultQuery,
-    error: error ?? undefined,
-    response: data,
+    errorMessage: error ? getErrorMessage(error) : undefined,
   };
 };
 

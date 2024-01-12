@@ -13,7 +13,7 @@ import CdoTagList from 'src/components/cdo-tag-list';
 import AnnotationNote from '../annotation-note';
 import EventBodyEntry from '../event-body-entry';
 import PlaybookLink from '../playbook-link';
-import FieldValidationDetails from './components/not-verified-details';
+import Details from './components/details';
 
 type OnboardingDecisionEventBodyProps = {
   data: OnboardingDecisionEventData;
@@ -48,7 +48,7 @@ const OnboardingDecisionEventBody = ({
           {statusStr}
         </Typography>
         <CdoTagList cdos={collectedDataOptions} singleDocument />
-        <FieldValidationDetails />
+        <Details />
       </Container>
     );
 

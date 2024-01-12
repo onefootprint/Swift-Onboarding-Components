@@ -5,21 +5,21 @@ import { type Rule, type RuleField, RuleOp } from '@onefootprint/types';
 import { Badge, createFontStyles, LinkButton, Stack } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
-import RowEditButtons from '../row-edit-buttons';
 import OpBadge from './components/op-badge';
 import RiskSignalSelect from './components/risk-signal-select';
+import RowEditButtons from './components/row-edit-buttons';
 
-export type ActionRowProps = {
+export type RulesActionRowProps = {
   shouldAllowEditing: boolean;
   playbookId: string;
   rule: Rule;
 };
 
-const ActionRow = ({
+const RulesActionRow = ({
   shouldAllowEditing,
   playbookId,
   rule,
-}: ActionRowProps) => {
+}: RulesActionRowProps) => {
   const { t, allT } = useTranslation(
     'pages.playbooks.details.rules.action-row',
   );
@@ -165,4 +165,4 @@ const RulesListItem = styled(Stack)`
   `}
 `;
 
-export default ActionRow;
+export default RulesActionRow;

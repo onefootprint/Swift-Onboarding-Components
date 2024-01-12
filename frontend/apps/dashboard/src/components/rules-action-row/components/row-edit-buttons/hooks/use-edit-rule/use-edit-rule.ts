@@ -1,33 +1,35 @@
 import { requestWithoutCaseConverter } from '@onefootprint/request';
-import type {
-  DeleteRuleRequest,
-  DeleteRuleResponse,
+import {
+  type EditRuleRequest,
+  type EditRuleResponse,
 } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
+import { GET_QUERY_KEY } from 'src/pages/playbooks/components/details/components/content/components/collection-and-scopes/components/rules/hooks/use-rules/use-rules';
 
-import { GET_QUERY_KEY } from '../use-rules/use-rules';
-
-const deleteRule = async (
-  { playbookId, ruleId }: DeleteRuleRequest,
+const editRule = async (
+  { playbookId, ruleId, fields }: EditRuleRequest,
   authHeaders: AuthHeaders,
 ) => {
-  const response = await requestWithoutCaseConverter<DeleteRuleResponse>({
-    method: 'DELETE',
+  const response = await requestWithoutCaseConverter<EditRuleResponse>({
+    method: 'PATCH',
     url: `/org/onboarding_configs/${playbookId}/rules/${ruleId}`,
+    data: {
+      ...fields,
+    },
     headers: authHeaders,
   });
-  return { playbookId, data: response };
+  return { data: response.data, playbookId };
 };
 
-const useDeleteRule = () => {
+const useEditRule = () => {
   const { authHeaders } = useSession();
   const queryClient = useQueryClient();
 
   return useMutation(
-    ({ playbookId, ruleId }: DeleteRuleRequest) =>
-      deleteRule({ playbookId, ruleId }, authHeaders),
+    ({ playbookId, ruleId, fields }: EditRuleRequest) =>
+      editRule({ playbookId, ruleId, fields }, authHeaders),
     {
       onSuccess: ({ playbookId }) => {
         queryClient.invalidateQueries(GET_QUERY_KEY(playbookId));
@@ -36,4 +38,4 @@ const useDeleteRule = () => {
   );
 };
 
-export default useDeleteRule;
+export default useEditRule;

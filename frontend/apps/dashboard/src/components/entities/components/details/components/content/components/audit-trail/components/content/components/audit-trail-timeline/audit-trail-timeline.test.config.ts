@@ -1,17 +1,28 @@
-import type { Timeline, TimelineEvent } from '@onefootprint/types';
+import { mockRequest } from '@onefootprint/test-utils';
+import type {
+  GetEntityRuleSetResultResponse,
+  RuleResult,
+  Timeline,
+  TimelineEvent,
+} from '@onefootprint/types';
 import {
   ActorKind,
   CollectedKycDataOption,
   DecisionStatus,
   LivenessIssuer,
   LivenessSource,
+  RuleAction,
+  RuleOp,
   TimelineEventKind,
   TriggerKind,
   Vendor,
 } from '@onefootprint/types';
 import { WorkflowStartedEventKind } from '@onefootprint/types/src/data/timeline';
 
-const TimelineFixture: Timeline = [
+export const entityIdFixure = 'fp_id_cDsFPmDwz784hdwovghMqt';
+export const obcIdFixure = 'ob_config_id_LZuy8k6ch31LcTEZvyk7YX';
+
+export const TimelineFixture: Timeline = [
   {
     event: {
       kind: TimelineEventKind.dataCollected,
@@ -199,4 +210,99 @@ export const DocumentWorkflowStarted: TimelineEvent = {
   timestamp: '2022-11-08T20:21:53.771495Z',
 };
 
-export default TimelineFixture;
+export const ruleResultsFixture: RuleResult[] = [
+  {
+    result: true,
+    rule: {
+      ruleId: 'rule_MsUPlKcWagUEbpB4SIIzlp',
+      action: RuleAction.fail,
+      createdAt: '2023-12-05T23:37:22.943739Z',
+      ruleExpression: [
+        {
+          field: 'subject_deceased',
+          op: RuleOp.eq,
+          value: true,
+        },
+      ],
+      isShadow: false,
+    },
+  },
+  {
+    result: true,
+    rule: {
+      ruleId: 'rule_Zr3KN36uSLD9hTuiHbJHVz',
+      action: RuleAction.fail,
+      createdAt: '2021-11-26T16:52:52.535896Z',
+      isShadow: false,
+      ruleExpression: [
+        { field: 'name_matches', op: RuleOp.notEq, value: true },
+        { field: 'id_not_located', op: RuleOp.eq, value: true },
+        { field: 'watchlist_hit_ofac', op: RuleOp.eq, value: true },
+      ],
+    },
+  },
+  {
+    result: false,
+    rule: {
+      ruleId: 'rule_sufY6KAthSHuaWS9bzo8xt',
+      action: RuleAction.fail,
+      createdAt: '2020-12-05T23:37:22.943740Z',
+      ruleExpression: [
+        {
+          field: 'id_flagged',
+          op: RuleOp.eq,
+          value: true,
+        },
+      ],
+      isShadow: false,
+    },
+  },
+  {
+    result: false,
+    rule: {
+      ruleId: 'rule_y0szjzoMrHRhevmzeTvHSV',
+      action: RuleAction.manualReview,
+      createdAt: '2023-11-27T23:36:30.695149Z',
+      ruleExpression: [
+        {
+          field: 'watchlist_hit_ofac',
+          op: RuleOp.eq,
+          value: true,
+        },
+      ],
+      isShadow: false,
+    },
+  },
+  {
+    result: false,
+    rule: {
+      ruleId: 'rule_QCzXqumr8OLk71ABBk9yEN',
+      action: RuleAction.passWithManualReview,
+      createdAt: '2023-12-05T23:37:22.943740Z',
+      ruleExpression: [
+        {
+          field: 'document_is_permit_or_provisional_license',
+          op: RuleOp.eq,
+          value: true,
+        },
+      ],
+      isShadow: false,
+    },
+  },
+];
+
+export const ruleResultFixture: GetEntityRuleSetResultResponse = {
+  actionTriggered: RuleAction.fail,
+  createdAt: '2024-01-05T23:37:22.943740Z',
+  obConfigurationId: obcIdFixure,
+  ruleResults: ruleResultsFixture,
+};
+
+export const withRuleSetResult = (
+  response: GetEntityRuleSetResultResponse = ruleResultFixture,
+) =>
+  mockRequest({
+    method: 'get',
+    path: `/entities/${entityIdFixure}/rule_set_result`,
+    response,
+  });

@@ -13,8 +13,11 @@ import React from 'react';
 import { entityFixture } from 'src/components/entities/components/details/details.test.config';
 
 import AuditTrailTimeline from './audit-trail-timeline';
-import TimelineFixture, {
+import {
   DocumentWorkflowStarted,
+  entityIdFixure,
+  TimelineFixture,
+  withRuleSetResult,
   WorkflowTriggeredWithLinkEvent,
 } from './audit-trail-timeline.test.config';
 
@@ -23,8 +26,12 @@ const useRouterSpy = createUseRouterSpy();
 describe('<AuditTrailTimeline />', () => {
   beforeEach(() => {
     useRouterSpy({
-      pathname: '/users/fp_id_cDsFPmDwz784hdwovghMqt',
+      pathname: `/entities/${entityIdFixure}`,
+      query: {
+        id: entityIdFixure,
+      },
     });
+    withRuleSetResult();
   });
 
   const renderAuditTrailTimeline = (timeline: TimelineEvent[]) =>
