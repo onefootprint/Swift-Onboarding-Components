@@ -124,7 +124,6 @@ impl AllowSessionUpdate for ParsedFirmEmployeeAssumeAuth {}
 
 impl FirmEmployeeAssumeAuth {
     fn token_scopes(&self) -> Vec<TenantScope> {
-        // TODO check if there's a header that approves write access
         let extra_permissions_for_user = if self.is_risk_ops && self.requested_allow_writes {
             vec![
                 TenantScope::DecryptAll,
