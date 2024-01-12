@@ -398,19 +398,19 @@
   },
   "components": {
     "frequent-notes": {
-      "title": "Macros",
+      "title": "Frequent Notes",
       "edit": "Edit",
       "done": "Done",
-      "warning": "Macro will be deleted for the entire organization.",
+      "warning": "This note will be deleted for the entire organization.",
       "delete": "Delete",
-      "save": "Save as macro",
+      "save": "Save as frequent note",
       "created-toast": {
         "title" : "Success",
-        "description": "Macro saved for organization."
+        "description": "Saved frequent note for organization."
       },
       "deleted-toast": {
         "title" : "Success",
-        "description": "Macro deleted for organization."
+        "description": "Deleted frequent note for organization."
       },
       "errors": {
         "required": "A note is required"

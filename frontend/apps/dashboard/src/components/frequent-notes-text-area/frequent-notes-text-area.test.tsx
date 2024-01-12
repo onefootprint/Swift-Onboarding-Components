@@ -105,7 +105,9 @@ describe('<FrequentNotesTextArea />', () => {
 
       const firstInput = screen.getByLabelText('Note');
       await userEvent.type(firstInput, 'this is the third note');
-      const saveButton = screen.getByRole('button', { name: 'Save as macro' });
+      const saveButton = screen.getByRole('button', {
+        name: 'Save as frequent note',
+      });
       await userEvent.click(saveButton);
 
       await waitFor(() => {
