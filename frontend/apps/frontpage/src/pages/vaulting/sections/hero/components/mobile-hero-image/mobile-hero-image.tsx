@@ -1,20 +1,7 @@
 import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
-import Image from 'next/image';
-import React from 'react';
 
-const DesktopHeroImage = () => (
-  <ImageContainer>
-    <Image
-      src="/vaulting/hero/dashboard-dark.png"
-      alt="Vaulting Dashboard"
-      width={988}
-      height={733}
-    />
-  </ImageContainer>
-);
-
-const ImageContainer = styled.div`
+const DesktopHeroImage = styled.div`
   ${({ theme }) => css`
     display: block;
     position: relative;
@@ -23,16 +10,24 @@ const ImageContainer = styled.div`
     margin: auto;
     mask-mode: alpha;
     mask: radial-gradient(
-      100% 100% at 50% 0%,
+      100% 100% at 0% 0%,
       black 0%,
-      black 50%,
+      black 25%,
       transparent 100%
     );
 
-    img {
+    &:before {
+      content: '';
       position: absolute;
-      top: ${theme.spacing[4]};
-      left: ${theme.spacing[4]};
+      top: 0;
+      left: 0;
+      width: 200%;
+      height: 400px;
+      background: url('/vaulting/hero/dashboard-dark.png') no-repeat;
+      background-size: cover;
+      background-position: top left;
+      border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+      border-radius: ${theme.borderRadius.default};
     }
 
     ${media.greaterThan('md')`

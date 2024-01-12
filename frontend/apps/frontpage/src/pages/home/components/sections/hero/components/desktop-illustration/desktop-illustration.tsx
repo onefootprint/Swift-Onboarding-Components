@@ -1,18 +1,18 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import { motion, useAnimation, useInView } from 'framer-motion';
-import Image from 'next/image';
 import React, { useEffect, useRef } from 'react';
 
 import Background from '../background';
 
 const DesktopIllustration = () => {
-  const { t } = useTranslation('pages.home.hero');
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
   const mockupControls = useAnimation();
   const containerControls = useAnimation();
+
+  const MOCKUP_WIDTH = 1240;
+  const MOCKUP_HEIGHT = 800;
 
   const mockupVariants = {
     hidden: {
@@ -58,15 +58,12 @@ const DesktopIllustration = () => {
   return (
     <IllustrationContainer ref={ref}>
       <StyledBackground />
-      <MockupContainer animate={containerControls}>
-        <ImageContainer animate={mockupControls}>
-          <Image
-            src="/home/hero/hero.png"
-            height={682}
-            width={1024}
-            alt={t('desktop-img-alt')}
-          />
-        </ImageContainer>
+      <MockupContainer
+        animate={containerControls}
+        width={MOCKUP_WIDTH}
+        height={MOCKUP_HEIGHT}
+      >
+        <ImageContainer animate={mockupControls} />
       </MockupContainer>
     </IllustrationContainer>
   );
@@ -82,74 +79,58 @@ const IllustrationContainer = styled.div`
       display: flex;
       overflow: hidden;
       border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
-
-      &::before {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 20%;
-        z-index: 2;
-        background: linear-gradient(
-          180deg,
-          transparent 0%,
-          rgba(250, 250, 250, 0.6) 100%
-        );
-      }
     `};
   `}
 `;
 
 const ImageContainer = styled(motion.div)`
+  position: relative;
   z-index: 2;
   max-width: 100%;
   opacity: 0;
-
-  img {
-    width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-  }
+  background-image: url('/home/hero/hero.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 12px 12px 0 0;
 
   ${media.greaterThan('md')`
-    height: 682px;
-    width: 1024px;
+    height: 100%;
+    width: 100%;
   `}
 `;
 
-const MockupContainer = styled(motion(Container))`
-  ${({ theme }) => css`
-    && {
-      max-width: 1024px;
-    }
+const MockupContainer = styled(motion(Container))<{
+  width: number;
+  height: number;
+}>`
+  ${({ theme, width, height }) => css`
+    width: ${width}px;
+    height: ${height}px;
     position: relative;
     padding: ${theme.spacing[2]};
     padding-bottom: ${theme.spacing[1]}};
-    background-color: ${theme.backgroundColor.senary};
-    height: fit-content;
-    bottom: 16px;
-    border-radius: 6px;
+    border-radius: ${theme.borderRadius.default};
     isolation: isolate;
     overflow: hidden;
     opacity: 0;
 
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 6px;
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: calc(100% + ${theme.spacing[2]});
+      height: calc(100% + ${theme.spacing[2]});
+      background: ${theme.backgroundColor.senary};
+      z-index: 1;
     }
 
     ${media.greaterThan('md')`
-      bottom: -20px;
+      bottom: -${theme.spacing[9]};
       border-radius: 22px 22px 0 0;
       padding: ${theme.spacing[3]};
-
-      img {
-        border-radius: ${theme.borderRadius.large} ${theme.borderRadius.large} 0 0;
-      }
-    `};
+    `}
   `}
 `;
 

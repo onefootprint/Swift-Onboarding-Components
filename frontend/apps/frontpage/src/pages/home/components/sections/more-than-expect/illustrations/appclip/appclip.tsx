@@ -7,8 +7,8 @@ const AppClip = () => (
   <StyledBaseIllustration>
     <Image
       src="/home/more-than-expect/app-clip.png"
-      width={165}
-      height={184}
+      width={166 * 1.1}
+      height={185 * 1.1}
       alt="App Clip"
     />
   </StyledBaseIllustration>
@@ -16,12 +16,14 @@ const AppClip = () => (
 
 const StyledBaseIllustration = styled(BaseIllustration)`
   ${({ theme }) => css`
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: relative;
     height: 256px;
 
     img {
+      position: absolute;
+      top: 40px;
+      left: 50%;
+      transform: translateX(-50%);
       box-shadow: ${theme.elevation[3]};
       border-radius: ${theme.borderRadius.large};
       overflow: hidden;
