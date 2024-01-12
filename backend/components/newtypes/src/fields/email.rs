@@ -1,6 +1,19 @@
 use serde_with::DeserializeFromStr;
 
 use crate::{api_schema_helper::string_api_data_type_alias, PiiString};
+use lazy_static::lazy_static;
+use regex::Regex;
+
+/// Findigs wants some of their own emails to always produce a fixture PIN code for their own
+/// internal QA testing
+fn findigs_fixture_email_re() -> Regex {
+    #[allow(clippy::unwrap_used)]
+    Regex::new(r"^qauserfootprint\+[A-Za-z0-9]+@findigs\.com$").unwrap()
+}
+
+lazy_static! {
+    pub static ref FINDIGS_FIXTURE_EMAIL_RE: Regex = findigs_fixture_email_re();
+}
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, DeserializeFromStr, Default)]
 /// Email address. Will be checked against a basic regex for validity and
@@ -31,7 +44,9 @@ impl Email {
     }
 
     pub fn is_fixture(&self) -> bool {
-        self.email.leak() == Self::FIXTURE_EMAIL || self.email.leak() == Self::FIXTURE_EMAIL2
+        self.email.leak() == Self::FIXTURE_EMAIL
+            || self.email.leak() == Self::FIXTURE_EMAIL2
+            || FINDIGS_FIXTURE_EMAIL_RE.is_match(self.email.leak())
     }
 }
 
@@ -117,5 +132,17 @@ mod tests {
         for v in bad_deserialized {
             assert!(v.is_err());
         }
+    }
+
+    #[test_case("sandbox@onefootprint.com" => true)]
+    #[test_case("sandbox2@onefootprint.com" => true)]
+    #[test_case("sandbox3@onefootprint.com" => false)]
+    #[test_case("hayesvalley@gmail.com" => false)]
+    #[test_case("qauserfootprint+123@findigs.com" => true)]
+    #[test_case("qauserfootprint+ABcd098@findigs.com" => true)]
+    #[test_case("qauserfootprint+123@findigs.co" => false)]
+    #[test_case("xxxqauserfootprint+123@findigs.com" => false)]
+    fn test_is_fixture(input: &str) -> bool {
+        Email::from_str(input).unwrap().is_fixture()
     }
 }
