@@ -8,8 +8,9 @@ use db::{
 };
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
-    CipKind, DecisionIntentKind, DecisionStatus, DocumentRequestKind, FootprintReasonCode, ReviewReason,
-    RuleSetResultKind, ScopedVaultId, TenantId, VendorAPI, VerificationResultId, WorkflowId,
+    CipKind, DecisionIntentKind, DecisionStatus, Declaration, DocumentRequestKind, FootprintReasonCode,
+    InvestorProfileKind, ReviewReason, RuleSetResultKind, ScopedVaultId, TenantId, VendorAPI,
+    VerificationResultId, WorkflowId,
 };
 
 use crate::{
@@ -32,8 +33,9 @@ use crate::{
             vendor_result::VendorResult,
         },
     },
+    enclave_client::EnclaveClient,
     errors::{onboarding::OnboardingError, ApiResult},
-    utils::vault_wrapper::{Any, TenantVw, VaultWrapper, VwArgs},
+    utils::vault_wrapper::{Any, Person, TenantVw, VaultWrapper, VwArgs},
     State,
 };
 
@@ -240,6 +242,7 @@ pub async fn maybe_generate_ocr_reason_codes(
     state: &State,
     wf_id: &WorkflowId,
     sv_id: &ScopedVaultId,
+    vw: &VaultWrapper<Person>,
 ) -> ApiResult<Option<Vec<NewRiskSignalInfo>>> {
     let wf_id = wf_id.clone();
     let (obc, _) = state
@@ -264,12 +267,7 @@ pub async fn maybe_generate_ocr_reason_codes(
         return Ok(None);
     };
 
-    let sv_id = sv_id.clone();
-    let vw = state
-        .db_pool
-        .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &sv_id))
-        .await??;
-    let ocr_comparison_data = IncodeOcrComparisonDataFields::compose(&state.enclave_client, &vw).await?;
+    let ocr_comparison_data = IncodeOcrComparisonDataFields::compose(&state.enclave_client, vw).await?;
 
     let ocr_reason_codes =
         incode_docv::pii_matching_reason_codes_from_ocr_response(fetch_ocr, ocr_comparison_data)
@@ -278,6 +276,36 @@ pub async fn maybe_generate_ocr_reason_codes(
             .collect();
 
     Ok(Some(ocr_reason_codes))
+}
+
+// TODO: compute the `user_input_risk_signals` we compute in parse_reason_codes_from_vendor_result here instead
+// Note: vendor_api/vres_id passed in here is a complete hack because currently RiskSignal's require these and we are doing something hacky here by writing non-vendor
+// reason codes as RiskSignal's. The vendor_api/vres_id for the KYC call made should be what is passed in here and these risk signals will just be attached to that vendor call
+pub async fn generate_user_input_risk_signals(
+    enclave_client: &EnclaveClient,
+    vw: &VaultWrapper<Person>,
+    vendor_api: VendorAPI,
+    vres_id: &VerificationResultId,
+) -> ApiResult<Option<Vec<NewRiskSignalInfo>>> {
+    let declarations = vw
+        .decrypt_unchecked_single(enclave_client, InvestorProfileKind::Declarations.into())
+        .await?;
+
+    let ipk_risk_signals = if let Some(declarations) = declarations {
+        let declarations: Vec<Declaration> = declarations.deserialize()?;
+        if declarations.contains(&Declaration::AffiliatedWithUsBroker) {
+            Some(vec![(
+                FootprintReasonCode::AffiliatedWithBrokerOrFinra,
+                vendor_api,
+                vres_id.clone(),
+            )])
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+    Ok(ipk_risk_signals)
 }
 
 pub fn get_aml_risk_signals_from_aml_call(

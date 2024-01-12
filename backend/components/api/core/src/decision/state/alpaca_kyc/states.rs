@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use crate::utils::vault_wrapper::{Person, VaultWrapper};
 use api_wire_types::DecisionRequest;
 use async_trait::async_trait;
 use db::models::{
@@ -131,6 +132,7 @@ impl AlpacaKycVendorCalls {
 impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
     type AsyncRes = (
         Option<Vec<NewRiskSignalInfo>>,
+        Option<Vec<NewRiskSignalInfo>>,
         VendorResult,
         Arc<dyn FeatureFlagClient>,
     );
@@ -144,11 +146,28 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
         _action: MakeVendorCalls,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
+        let svid = self.sv_id.clone();
+        let vw = state
+            .db_pool
+            .db_query(move |conn| VaultWrapper::<Person>::build_for_tenant(conn, &svid))
+            .await??;
         let vendor_result = common::run_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?;
+        let user_input_reason_codes = common::generate_user_input_risk_signals(
+            &state.enclave_client,
+            &vw,
+            vendor_result.vendor_api(),
+            &vendor_result.verification_result_id,
+        )
+        .await?;
         let ocr_reason_codes =
-            common::maybe_generate_ocr_reason_codes(state, &self.wf_id, &self.sv_id).await?;
+            common::maybe_generate_ocr_reason_codes(state, &self.wf_id, &self.sv_id, &vw).await?;
 
-        Ok((ocr_reason_codes, vendor_result, state.feature_flag_client.clone()))
+        Ok((
+            ocr_reason_codes,
+            user_input_reason_codes,
+            vendor_result,
+            state.feature_flag_client.clone(),
+        ))
     }
 
     #[tracing::instrument("OnAction<MakeVendorCalls, AlpacaKycState>::on_commit", skip_all)]
@@ -158,7 +177,7 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<AlpacaKycState> {
-        let (ocr_reason_codes, vendor_result, ff_client) = async_res;
+        let (ocr_reason_codes, user_input_reason_codes, vendor_result, ff_client) = async_res;
         let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, &self.wf_id)?;
 
         // Save OCR risk signals for doc-first OBC if necessary
@@ -190,7 +209,11 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
         save_risk_signals(
             conn,
             &self.sv_id,
-            risk_signals.footprint_reason_codes,
+            risk_signals
+                .footprint_reason_codes
+                .into_iter()
+                .chain(user_input_reason_codes.unwrap_or_default())
+                .collect(),
             RiskSignalGroupKind::Kyc,
             false,
         )?;

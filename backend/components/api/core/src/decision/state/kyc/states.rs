@@ -21,23 +21,27 @@ use super::{
     KycComplete, KycDataCollection, KycDecisioning, KycDocCollection, KycState, KycVendorCalls, MakeDecision,
     MakeVendorCalls,
 };
-use crate::decision::{
-    features::risk_signals::{
-        fetch_latest_risk_signals_map, parse_reason_codes_from_vendor_result,
-        risk_signal_group_struct::{Aml, Kyc},
-        save_risk_signals, RiskSignalGroupStruct,
-    },
-    state::{
-        actions::{Authorize, WorkflowActions},
-        common::{self},
-        DocCollected, WorkflowState,
-    },
-    utils::should_execute_rules_for_document_only,
-};
 use crate::{
     decision::{self, state::OnAction, vendor::vendor_result::VendorResult},
     errors::ApiResult,
+    utils::vault_wrapper::Person,
     State,
+};
+use crate::{
+    decision::{
+        features::risk_signals::{
+            fetch_latest_risk_signals_map, parse_reason_codes_from_vendor_result,
+            risk_signal_group_struct::{Aml, Kyc},
+            save_risk_signals, RiskSignalGroupStruct,
+        },
+        state::{
+            actions::{Authorize, WorkflowActions},
+            common::{self},
+            DocCollected, WorkflowState,
+        },
+        utils::should_execute_rules_for_document_only,
+    },
+    utils::vault_wrapper::VaultWrapper,
 };
 
 // TODO: how do we want to model sandbox here 🤔? Could (1) do entirely seperatly from workflow, (2) special case it within workflow, (3) model it as an immediate transition from DataCollection -> Complete
@@ -117,6 +121,7 @@ impl KycVendorCalls {
 impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
     type AsyncRes = (
         Option<Vec<NewRiskSignalInfo>>,
+        Option<Vec<NewRiskSignalInfo>>,
         Option<VendorResult>,
         Option<(VerificationResultId, WatchlistResultResponse)>,
         Arc<dyn FeatureFlagClient>,
@@ -138,11 +143,25 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
             .await??
             .0;
 
+        let svid = self.sv_id.clone();
+        let vw = state
+            .db_pool
+            .db_query(move |conn| VaultWrapper::<Person>::build_for_tenant(conn, &svid))
+            .await??;
+
         // TODO: we should also skip if the UVW is non-US, but then we probably need to assert that doc was collected. Also need to clairfy tenant's understanding of this
-        let kyc_vendor_result = if !obc.skip_kyc {
-            Some(common::run_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?)
+        let (kyc_vendor_result, user_input_reason_codes) = if !obc.skip_kyc {
+            let kyc_vendor_result = common::run_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?;
+            let user_input_reason_codes = common::generate_user_input_risk_signals(
+                &state.enclave_client,
+                &vw,
+                kyc_vendor_result.vendor_api(),
+                &kyc_vendor_result.verification_result_id,
+            )
+            .await?;
+            (Some(kyc_vendor_result), user_input_reason_codes)
         } else {
-            None
+            (None, None)
         };
 
         let aml_vendor_result = match obc.enhanced_aml {
@@ -153,10 +172,11 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         };
 
         let ocr_reason_codes =
-            common::maybe_generate_ocr_reason_codes(state, &self.wf_id, &self.sv_id).await?;
+            common::maybe_generate_ocr_reason_codes(state, &self.wf_id, &self.sv_id, &vw).await?; // TODO: pass in uvw here
 
         Ok((
             ocr_reason_codes,
+            user_input_reason_codes,
             kyc_vendor_result,
             aml_vendor_result,
             state.feature_flag_client.clone(),
@@ -170,7 +190,8 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<KycState> {
-        let (ocr_reason_codes, kyc_vendor_result, aml_vendor_result, ff_client) = async_res;
+        let (ocr_reason_codes, user_input_risk_signals, kyc_vendor_result, aml_vendor_result, ff_client) =
+            async_res;
         let (vw, obc) = common::get_vw_and_obc(conn, &self.sv_id, &self.wf_id)?;
 
         // Save OCR risk signals for doc-first OBC if necessary
@@ -200,10 +221,16 @@ impl OnAction<MakeVendorCalls, KycState> for KycVendorCalls {
                 parse_reason_codes_from_vendor_result(kyc_vendor_result.clone(), &vw, &obc)?.kyc
                 // TODO: only call this once and re-use for aml portion below
             };
+
+            let kyc_risk_signals = kyc_risk_signals
+                .footprint_reason_codes
+                .into_iter()
+                .chain(user_input_risk_signals.unwrap_or_default())
+                .collect();
             save_risk_signals(
                 conn,
                 &self.sv_id,
-                kyc_risk_signals.footprint_reason_codes,
+                kyc_risk_signals,
                 RiskSignalGroupKind::Kyc,
                 false,
             )?;

@@ -1046,6 +1046,10 @@ footprint_reason_code_enum! {
         #[note = "Area code matches located state", severity = SignalSeverity::Info,  description = "The area code for the phone number input matches any address in the located address history for the identity."]
         InputPhoneNumberMatchesLocatedStateHistory,
 
+        // ~~~~~~~~~ "User Input" ~~~~~~~~~~
+        #[scope = SignalScope::Name, additional_scopes = vec![], match_level = None]
+        #[note = "User associated with US Broker or FINRA", severity = SignalSeverity::Medium,  description = "The user reported that they are affiliated with a US Broker or FINRA."]
+        AffiliatedWithBrokerOrFinra,
         //
         //
         // ~~~~~~~~~ KYB ~~~~~~~~~~~
