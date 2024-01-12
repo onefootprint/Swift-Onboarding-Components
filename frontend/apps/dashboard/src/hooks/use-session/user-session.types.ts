@@ -12,6 +12,7 @@ export type UserSession = {
   lastName: string | null;
   scopes: RoleScope[];
   isAssumedSession: boolean;
+  isAssumedSessionEditMode?: boolean;
   isFirmEmployee?: boolean;
 };
 

@@ -77,6 +77,7 @@ const useSession = () => {
   };
   const isLoggedIn = !!data.user;
   const isLive = !!data.org?.isLive;
+  const isAssumedSessionEditMode = !!data.user?.isAssumedSessionEditMode;
 
   const authHeaders = {
     [DASHBOARD_AUTHORIZATION_HEADER]: data?.auth as string,
@@ -103,6 +104,7 @@ const useSession = () => {
         user: {
           ...user,
           isAssumedSession: !!user.isAssumedSession,
+          isAssumedSessionEditMode: false,
         },
         org: {
           ...user.tenant,
@@ -156,6 +158,13 @@ const useSession = () => {
     });
   };
 
+  const setAssumedSessionEditMode = (newEditMode: boolean) => {
+    if (!data.user) return;
+    update({
+      user: { ...data.user, isAssumedSessionEditMode: newEditMode },
+    });
+  };
+
   const setIsLive = (newIsLive: boolean) => {
     if (!data.org) return;
     update({
@@ -181,6 +190,8 @@ const useSession = () => {
     updateUserName,
     isLive,
     setIsLive,
+    isAssumedSessionEditMode,
+    setAssumedSessionEditMode,
     completeOnboarding,
   };
 };

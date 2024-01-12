@@ -4,7 +4,13 @@ import useSession from '../use-session';
 
 const usePermissions = () => {
   const session = useSession();
-  const scopes = session.data.user?.scopes || [];
+  let scopes = session.data.user?.scopes || [];
+  if (
+    session.data.user?.isAssumedSession &&
+    !session.data.user?.isAssumedSessionEditMode
+  ) {
+    scopes = scopes.filter(s => s.kind === RoleScopeKind.read);
+  }
   const isAdmin = scopes.some(s => s.kind === RoleScopeKind.admin);
 
   const hasPermission = (scopeKind: RoleScopeKind) =>

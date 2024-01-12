@@ -1,17 +1,23 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoInfo16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Banner } from '@onefootprint/ui';
+import { RoleScopeKind } from '@onefootprint/types';
+import { Banner, Stack, Tooltip } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
 import useSession from 'src/hooks/use-session';
 
 const AssumeBanner = () => {
   const { t } = useTranslation('components.private-layout.assume-banner');
-  const { data } = useSession();
+  const { data, isAssumedSessionEditMode, setAssumedSessionEditMode } =
+    useSession();
   const router = useRouter();
+  const canUserAccessEditMode = data.user?.scopes.some(
+    s => s.kind !== RoleScopeKind.read,
+  );
 
-  const handleSwitch = () => {
-    router.push('/super-admin');
+  const handleChangeEdit = () => {
+    setAssumedSessionEditMode(!isAssumedSessionEditMode);
   };
 
   const handleLogout = () => {
@@ -23,19 +29,44 @@ const AssumeBanner = () => {
 
   return data.user?.isAssumedSession ? (
     <AssumeBannerContainer>
-      <Banner variant="info">
-        {t('title', { orgName: data.org?.name })}
-        <button type="button" onClick={handleSwitch}>
-          {t('switch')}
-        </button>{' '}
-        ·
-        <button type="button" onClick={handleLogout}>
-          {t('log-out')}
-        </button>
-      </Banner>
+      <StyledBanner variant={isAssumedSessionEditMode ? 'error' : 'info'}>
+        <Stack direction="row" gap={2}>
+          {t(isAssumedSessionEditMode ? 'edit-mode-title' : 'title', {
+            orgName: data.org?.name,
+          })}
+          {isAssumedSessionEditMode && (
+            <Tooltip text={t('edit-mode-info', { orgName: data.org?.name })}>
+              <IcoInfo16 />
+            </Tooltip>
+          )}
+          {canUserAccessEditMode && (
+            <>
+              <button type="button" onClick={handleChangeEdit}>
+                {isAssumedSessionEditMode
+                  ? t('disable-edit')
+                  : t('enable-edit')}
+              </button>
+              ·
+            </>
+          )}
+          <button type="button" onClick={handleLogout}>
+            {t('log-out')}
+          </button>
+        </Stack>
+      </StyledBanner>
     </AssumeBannerContainer>
   ) : null;
 };
+
+const StyledBanner = styled(Banner)`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: ${theme.spacing[1]};
+  `};
+`;
 
 const AssumeBannerContainer = styled.div`
   ${({ theme }) => css`
