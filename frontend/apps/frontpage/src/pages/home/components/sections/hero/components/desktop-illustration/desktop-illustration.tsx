@@ -84,19 +84,33 @@ const IllustrationContainer = styled.div`
 `;
 
 const ImageContainer = styled(motion.div)`
-  position: relative;
-  z-index: 2;
-  max-width: 100%;
-  opacity: 0;
-  background-image: url('/home/hero/hero.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  border-radius: 12px 12px 0 0;
+  ${({ theme }) => css`
+    position: relative;
+    z-index: 2;
+    max-width: 100%;
+    opacity: 0;
+    background-color: ${theme.backgroundColor.primary};
+    border-radius: 15px 15px 0 0;
+    overflow: hidden;
 
-  ${media.greaterThan('md')`
-    height: 100%;
-    width: 100%;
+    &::after {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-image: url('/home/hero/hero.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: 3;
+    }
+
+    ${media.greaterThan('md')`
+      height: 100%;
+      width: 100%;
+    `}
   `}
 `;
 
