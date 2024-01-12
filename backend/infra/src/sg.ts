@@ -17,6 +17,7 @@ export type CoreSecurityGroups = {
   fpcServiceLoadBalancer: awsx.ec2.SecurityGroup;
   fpcService: awsx.ec2.SecurityGroup;
   jumpbox: awsx.ec2.SecurityGroup;
+  jumpboxReadOnly: awsx.ec2.SecurityGroup;
   airplane: awsx.ec2.SecurityGroup;
 };
 
@@ -72,6 +73,32 @@ export function CreateCoreSecurityGroups(
     { provider },
   );
 
+  const jumpboxReadOnly = new awsx.ec2.SecurityGroup(
+    `db-jumpbox-readonly-sg-${stackMetadata.shortStackName}`,
+    {
+      vpc: vpc.vpc,
+      ingress: [
+        {
+          protocol: 'tcp',
+          fromPort: 22,
+          toPort: 22,
+          cidrBlocks: [
+            // retool
+            '35.90.103.132/30',
+            '44.208.168.68/30',
+            // metabase
+            '18.207.81.126/32',
+            '3.211.20.157/32',
+            '50.17.234.169/32',
+          ],
+          description: 'Inbound connections to the JBRO',
+        },
+      ],
+      egress: [EGRESS_ALL],
+    },
+    { provider },
+  );
+
   const airplane = new awsx.ec2.SecurityGroup(
     `airplane-sg-${stackMetadata.shortStackName}`,
     {
@@ -86,6 +113,7 @@ export function CreateCoreSecurityGroups(
     fpcServiceLoadBalancer,
     fpcService,
     jumpbox,
+    jumpboxReadOnly,
     airplane,
   };
 }

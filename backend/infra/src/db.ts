@@ -117,6 +117,14 @@ export async function CreateDB(
           protocol: '-1',
           fromPort: 5432,
           toPort: 5432,
+          sourceSecurityGroupId: coreSecurityGroups.jumpboxReadOnly.id,
+          description:
+            'Allows inbound DB connections from the jumpbox (readonly)',
+        },
+        {
+          protocol: '-1',
+          fromPort: 5432,
+          toPort: 5432,
           sourceSecurityGroupId: coreSecurityGroups.airplane.id,
           description: 'Allows inbound DB connections from the airplane-agent',
         },
@@ -281,6 +289,15 @@ export async function CreateDB(
     jumpboxRwSecretName,
     dbReadOnlySecretName,
     coreSecurityGroups.jumpbox,
+    vpc,
+    provider,
+    stackMetadata,
+  );
+
+  const jumpRo = await createReadOnlyDbJumpBox(
+    clusterIdentifier,
+    dbReadOnlySecretName,
+    coreSecurityGroups.jumpboxReadOnly,
     vpc,
     provider,
     stackMetadata,
@@ -469,7 +486,7 @@ async function createDbJumpBox(
     },
   );
 
-  let jumpHostname = `jumpbox-${stack.shortStackName}`;
+  let jumpHostname = `jumpbox-write-${stack.shortStackName}`;
 
   const userData = pulumi.interpolate`
 #!/bin/bash
@@ -588,7 +605,7 @@ chmod +x connect_db.sh`;
   });
 
   const jumpbox = new aws.ec2.Instance(
-    `jumpbox-${clusterId}`,
+    `jumpbox-write-${clusterId}`,
     {
       instanceType: size,
       subnetId: vpc.privateSubnetIds[0],
@@ -614,5 +631,228 @@ chmod +x connect_db.sh`;
 }
 
 /**
- *
+ *  Create Read-only DB Jump box
  */
+async function createReadOnlyDbJumpBox(
+  clusterId: string,
+  dbReadOnlyUrlSecretName: string,
+  securityGroup: awsx.ec2.SecurityGroup,
+  vpc: FootprintVpc,
+  provider: aws.Provider,
+  stack: StackMetadata,
+): Promise<aws.ec2.Instance> {
+  const size = 't2.micro';
+
+  // generate a tailscale key accessing the jumpbox
+  let tag = '';
+  if (stack.environment === StackEnvironment.DevEphemeral) {
+    tag = `tag:jumpbox-dev`;
+  } else {
+    tag = `tag:jumpbox-${stack.shortStackName}`;
+  }
+
+  const tailscaleAuthKey = new tailscale.TailnetKey(
+    `jump-tskey-ro-${stack.shortStackName}`,
+    {
+      ephemeral: true,
+      preauthorized: true,
+      reusable: true,
+      tags: [tag],
+    },
+  );
+
+  // store the TS-key in SSM
+  const tsKeySecretName = `/db/ts-ro-key-${clusterId}`;
+  new aws.ssm.Parameter(`ssm-param-ts-key-ro-jumpbox-${clusterId}`, {
+    type: 'SecureString',
+    value: tailscaleAuthKey.key,
+    name: tsKeySecretName,
+  });
+
+  const instanceRole = new aws.iam.Role(`jump-role-ro-${clusterId}`, {
+    assumeRolePolicy: {
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Sid: '',
+          Effect: 'Allow',
+          Principal: {
+            Service: 'ec2.amazonaws.com',
+          },
+          Action: 'sts:AssumeRole',
+        },
+      ],
+    },
+    inlinePolicies: [
+      {
+        name: 'jumpbox_policies_ro',
+        policy: JSON.stringify({
+          Version: '2012-10-17',
+          Statement: [
+            {
+              Action: ['ssm:GetParameter'],
+              Effect: 'Allow',
+              Resource: `arn:aws:ssm:*:*:parameter${dbReadOnlyUrlSecretName}`,
+            },
+            {
+              Action: ['ssm:GetParameter'],
+              Effect: 'Allow',
+              Resource: `arn:aws:ssm:*:*:parameter${tsKeySecretName}`,
+            },
+          ],
+        }),
+      },
+      {
+        name: 'cloudwatch_logging',
+        policy: JSON.stringify({
+          Version: '2012-10-17',
+          Statement: [
+            {
+              Action: [
+                'logs:CreateLogGroup',
+                'logs:PutLogEvents',
+                'logs:DescribeLogStreams',
+                'logs:CreateLogStream',
+                'logs:PutLogEvents',
+              ],
+              Effect: 'Allow',
+              Resource: '*',
+            },
+          ],
+        }),
+      },
+    ],
+  });
+
+  const iamInstanceProfile = new aws.iam.InstanceProfile(
+    `jump_ro_profile-${clusterId}`,
+    {
+      role: instanceRole.name,
+    },
+  );
+
+  let jumpHostname = `jumpbox-read-${stack.shortStackName}`;
+
+  const userData = pulumi.interpolate`
+#!/bin/bash
+
+sudo yum update -y
+sudo yum install amazon-linux-extras -y
+sudo amazon-linux-extras enable postgresql14 -y
+sudo yum install postgresql jq yum-utils -y
+
+### AWS LOGS ###
+
+# install log agent on ec2 instance
+sudo yum install -y awslogs
+sudo mkdir -p /var/lib/awslogs/state/
+
+# Define our log conf files
+# see https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AgentReference.html
+cat <<'EOF' > /etc/awslogs/awslogs.conf
+[general]
+state_file=/var/lib/awslogs/state/agent-state
+
+[/var/log/awslogs]
+log_group_name=/ec2/${jumpHostname}-logs
+log_stream_name={instance_id}
+time_zone=UTC
+file=/var/log/awslogs*
+initial_position=start_of_file
+
+[/var/log/boot]
+log_group_name=/ec2/${jumpHostname}-boot
+log_stream_name={instance_id}
+time_zone=UTC
+file=/var/log/boot*
+initial_position=start_of_file
+
+[/var/log/cloud-init]
+log_group_name=/ec2/${jumpHostname}-cloud-init
+log_stream_name={instance_id}
+time_zone=UTC
+file=/var/log/cloud-init*.log
+initial_position=start_of_file
+EOF
+
+# start logging daemon
+sudo systemctl start awslogsd
+
+### END AWS LOGS ###
+
+### BEGIN SETUP TAILSCALE ###
+echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.conf
+echo 'net.ipv6.conf.all.forwarding = 1' | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p /etc/sysctl.conf
+
+sudo yum-config-manager --add-repo https://pkgs.tailscale.com/stable/centos/7/tailscale.repo
+sudo yum install tailscale nc -y
+sudo systemctl enable --now tailscaled
+
+cat <<'EOF' > tailscale_connect.sh
+#!/bin/sh
+export TS_KEY="$(aws --region us-east-1 ssm get-parameter --name '${tsKeySecretName}' --with-decryption | jq -r '.Parameter.Value')"
+sudo tailscale up --authkey "$TS_KEY" --ssh --hostname "${jumpHostname}"
+EOF
+
+chmod +x tailscale_connect.sh
+
+cat <<'EOF' > tailscale_connect.service
+[Unit]
+Description=tailscale_connect
+
+[Service]
+User=root
+WorkingDirectory=/
+ExecStart="/tailscale_connect.sh"
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo cp tailscale_connect.service /etc/systemd/system/tailscale_connect.service
+sudo systemctl start tailscale_connect.service && sudo systemctl enable tailscale_connect.service
+
+### END SETUP TAILSCALE ###
+
+### BEGIN setup db access helper ###
+# setup db connect script
+cat <<'EOF' > connect_db.sh
+#!/bin/sh
+psql $(aws --region us-east-1 ssm get-parameter --name "${dbReadOnlyUrlSecretName}" --with-decryption | jq -r ".Parameter.Value")
+EOF
+
+chmod +x connect_db.sh`;
+
+  const ebsKmsKey = await aws.kms.getKey({ keyId: 'alias/aws/ebs' });
+
+  const userDataBase64 = userData.apply(ud => {
+    return Buffer.from(ud).toString('base64');
+  });
+
+  const jumpbox = new aws.ec2.Instance(
+    `jumpbox-readonly-${clusterId}`,
+    {
+      instanceType: size,
+      subnetId: vpc.publicSubnetIds[0],
+      vpcSecurityGroupIds: [securityGroup.id],
+      ami: 'ami-0f9fc25dd2506cf6d',
+      userData: userDataBase64,
+      iamInstanceProfile,
+      associatePublicIpAddress: true,
+      tags: {
+        Name: jumpHostname,
+      },
+      rootBlockDevice: {
+        deleteOnTermination: true,
+        encrypted: true,
+        volumeSize: 100,
+        kmsKeyId: ebsKmsKey.arn,
+      },
+    },
+    { provider },
+  );
+
+  return jumpbox;
+}
