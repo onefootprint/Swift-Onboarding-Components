@@ -90,8 +90,8 @@ def get_auth_token_for_ci_update(user, auth_playbook):
         (dict(kind="email", email=FIXTURE_EMAIL2), "id.email"),
     ],
 )
-def test_replace_ci(sandbox_tenant, challenge, di, user_with_token):
-    user, auth_token = user_with_token
+def test_replace_ci(challenge, di, user_with_token):
+    _, auth_token = user_with_token
 
     # Replace the contact info with a challenge
     data = dict(**challenge, action_kind="replace")
@@ -102,14 +102,14 @@ def test_replace_ci(sandbox_tenant, challenge, di, user_with_token):
     body = post("hosted/user/challenge/verify", data, auth_token)
 
     # Make sure the contact info has been updated
-    data = dict(fields=[di], reason="Blah")
-    body = post(f"entities/{user.fp_id}/vault/decrypt", data, *sandbox_tenant.db_auths)
+    data = dict(fields=[di])
+    body = post(f"hosted/user/vault/decrypt", data, auth_token)
     assert body[di] == challenge.get("phone_number", None) or challenge.get(
         "email", None
     )
 
 
-def test_add_phone(sandbox_tenant, skip_phone_obc):
+def test_add_phone(skip_phone_obc):
     sandbox_id = _gen_random_sandbox_id()
     headers = [skip_phone_obc.key, SandboxId(sandbox_id)]
 
@@ -153,12 +153,12 @@ def test_add_phone(sandbox_tenant, skip_phone_obc):
     body = post("hosted/user/challenge/verify", data, auth_token)
 
     # Make sure the contact info has been updated
-    data = dict(fields=["id.phone_number"], reason="Blah")
-    body = post(f"entities/{user.fp_id}/vault/decrypt", data, *sandbox_tenant.db_auths)
+    data = dict(fields=["id.phone_number"])
+    body = post(f"hosted/user/vault/decrypt", data, auth_token)
     assert body["id.phone_number"] == FIXTURE_PHONE_NUMBER2
 
 
-def test_add_email(user_with_token, sandbox_tenant):
+def test_add_email(user_with_token):
     user, auth_token = user_with_token
 
     # Replace the contact info with a challenge
@@ -169,8 +169,8 @@ def test_add_email(user_with_token, sandbox_tenant):
     body = post("hosted/user/challenge/verify", data, auth_token)
 
     # Make sure the contact info has been updated
-    data = dict(fields=["id.email"], reason="Blah")
-    body = post(f"entities/{user.fp_id}/vault/decrypt", data, *sandbox_tenant.db_auths)
+    data = dict(fields=["id.email"])
+    body = post(f"hosted/user/vault/decrypt", data, auth_token)
     assert body["id.email"] == FIXTURE_EMAIL2
 
 

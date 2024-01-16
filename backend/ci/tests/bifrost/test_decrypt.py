@@ -18,7 +18,7 @@ def biometric_sandbox_user_auth(sandbox_user):
     [
         (["id.first_name", "id.last_name"], True),
         (["id.dob"], True),
-        (["id.phone_number"], False),
+        (["id.phone_number", "id.email"], True),
         (["id.ssn9"], False),
         (["business.address_line1"], False),
         (["custom.flerp"], False),
@@ -41,9 +41,9 @@ def test_decrypt_basic(sandbox_user, fields_to_decrypt, expected_success):
 @pytest.mark.parametrize(
     "fields_to_decrypt,expected_success",
     [
-        (["id.first_name", "id.last_name"], True),
-        # Now, we can decrypt ssn9, phone, and email because we authed via webauthn!
-        (["id.phone_number", "id.ssn9", "id.email", "id.dob"], True),
+        (["id.first_name", "id.last_name", "id.phone_number", "id.email"], True),
+        # Now, we can decrypt ssn9 because we authed via webauthn!
+        (["id.ssn9", "id.dob"], True),
         (["business.address_line1"], False),
         (["custom.flerp"], False),
     ],

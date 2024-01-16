@@ -38,10 +38,10 @@ BASIC_FIELDS = [
     "id.first_name",
     "id.last_name",
     "id.dob",
-]
-SENSITIVE_FIELDS = [
     "id.phone_number",
     "id.email",
+]
+SENSITIVE_FIELDS = [
     "id.ssn4",
     "id.ssn9",
 ]
