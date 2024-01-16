@@ -17,9 +17,10 @@
   },
   "devDependencies": {
     "@onefootprint/jest-presets": "*",
-    "@onefootprint/test-utils": "*",
     "@onefootprint/styled": "*",
+    "@onefootprint/test-utils": "*",
     "@types/react-dom": "^18.0.10",
+    "@types/ua-parser-js": "^0.7.39",
     "@types/uuid": "^9.0.0",
     "eslint-config-footprint": "*",
     "tsconfig": "*",
