@@ -129,7 +129,6 @@ export type WorkflowStartedEvent = {
 export type AuthMethodUpdatedData = {
   kind: AuthMethodKind;
   action: AuthMethodAction;
-  insightEvent: InsightEvent;
 };
 
 export type AuthMethodUpdatedEvent = {
