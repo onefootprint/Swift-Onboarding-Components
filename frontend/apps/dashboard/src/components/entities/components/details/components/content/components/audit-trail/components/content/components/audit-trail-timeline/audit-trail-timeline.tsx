@@ -27,6 +27,7 @@ import type {
 } from '@onefootprint/types/src/data/timeline';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import InsightEventPopover from 'src/components/insight-event-popover/insight-event-popover';
 import type { TimelineItem } from 'src/components/timeline';
 import Timeline from 'src/components/timeline';
 
@@ -191,11 +192,18 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
         time,
         iconComponent: <IcoLock16 />,
         headerComponent: (
-          <Typography variant="body-3">
-            {t(`timeline.auth-method-updated.${eventData.action}`, {
-              kind: t(`timeline.auth-method-updated.method.${eventData.kind}`),
-            })}
-          </Typography>
+          <>
+            <InsightEventPopover insightEvent={eventData.insightEvent}>
+              {t('timeline.auth-method-updated.user')}
+            </InsightEventPopover>
+            <Typography variant="body-3">
+              {t(`timeline.auth-method-updated.${eventData.action}`, {
+                kind: t(
+                  `timeline.auth-method-updated.method.${eventData.kind}`,
+                ),
+              })}
+            </Typography>
+          </>
         ),
       });
     }
