@@ -112,7 +112,8 @@ const sendSdkArgsRecursive = async (
   fetch(`${API_BASE_URL}/org/sdk_args`, {
     method: 'POST',
     headers: {
-      'x-fp-client-version': `${SDK_NAME} ${SDK_VERSION}`,
+      'x-fp-client-version':
+        `${SDK_NAME} ${SDK_VERSION} ${payload.kind}`.trim(),
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(payload),

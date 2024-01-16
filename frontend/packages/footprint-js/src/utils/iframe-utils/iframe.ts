@@ -27,10 +27,11 @@ const initIframe = (rawProps: Props): Iframe => {
   let isRendered = false;
   let onDestroy: OnDestroy;
   let onRenderSecondary: OnRenderSecondary;
+  const { formSaveComplete, formSaved, formSaveFailed, started } = PrivateEvent;
   const props = sanitizeAndValidateProps(rawProps);
   const { variant, containerId } = props;
   const hasOverlay = variant === 'modal' || variant === 'drawer';
-  const id = getUniqueId();
+  const initId = getUniqueId();
 
   const handleError = (error: string, shouldDestroy?: boolean) => {
     const errorMessage = logError(SdkKindByComponentKind[props.kind], error);
@@ -52,12 +53,13 @@ const initIframe = (rawProps: Props): Iframe => {
     const callbackProps = getCallbackProps(props, onDestroy, onRenderSecondary);
     Object.entries(callbackProps).forEach(([event, callback]) => {
       parentApi?.on(event, callback);
+      parentApi?.on(`${initId}:${event}`, callback);
     });
   };
 
   const getOrCreateContainer = (): HTMLElement | undefined => {
     if (hasOverlay) {
-      return createOverlayContainer(id);
+      return createOverlayContainer(initId);
     }
     if (!containerId) {
       handleError('containerId is required when rendering inline');
@@ -72,22 +74,22 @@ const initIframe = (rawProps: Props): Iframe => {
       );
       return undefined;
     }
-    return createInlineContainer(id, clientParent);
+    return createInlineContainer(initId, clientParent);
   };
 
   const setLoading = (container: HTMLElement, isLoading: boolean) => {
     if (!isLoading) {
-      removeLoader(id);
+      removeLoader(initId);
       parentApi?.frame.classList.remove(`footprint-${variant}-loading`);
       parentApi?.frame.classList.add(`footprint-${variant}-loaded`);
       return;
     }
 
     if (hasOverlay) {
-      const overlay = createOverlay(container, id);
-      createLoader(overlay, id);
+      const overlay = createOverlay(container, initId);
+      createLoader(overlay, initId);
     } else {
-      createLoader(container, id);
+      createLoader(container, initId);
     }
   };
 
@@ -108,13 +110,17 @@ const initIframe = (rawProps: Props): Iframe => {
         }
         return new Promise((resolve, reject) => {
           // Make sure to first register the callbacks before triggering save
-          parentApi?.on(PrivateEvent.formSaveComplete, () => {
+          parentApi?.on(formSaveComplete, () => {
             resolve();
           });
-          parentApi?.on(PrivateEvent.formSaveFailed, (error: string) => {
+          parentApi?.on(formSaveFailed, (error: string) => {
             reject(error);
           });
-          parentApi?.call(PrivateEvent.formSaved);
+
+          parentApi?.on(`${initId}:${formSaveComplete}`, resolve);
+          parentApi?.on(`${initId}:${formSaveFailed}`, reject);
+
+          parentApi?.call(formSaved);
         });
       },
     };
@@ -150,11 +156,12 @@ const initIframe = (rawProps: Props): Iframe => {
           `footprint-${variant}-loading`,
         ],
         container,
-        name: `footprint-iframe-${id}`,
+        name: `footprint-iframe-${initId}`,
         url,
         allow:
           'otp-credentials; publickey-credentials-get *; camera *; clipboard-write;',
         model: {
+          initId,
           sdkVersion: version || '',
           sdkUrl: getWindowUrl(),
         },
@@ -166,9 +173,8 @@ const initIframe = (rawProps: Props): Iframe => {
 
     setLoading(container, false);
     registerCallbackProps();
-    parentApi?.on(PrivateEvent.started, () => {
-      setUpFormRefs();
-    });
+    parentApi?.on(started, () => setUpFormRefs());
+    parentApi?.on(`${initId}:${started}`, setUpFormRefs);
   };
 
   // Only called from parent iframe manager, never to be called inside this iframe.ts file
@@ -177,7 +183,7 @@ const initIframe = (rawProps: Props): Iframe => {
       return;
     }
     isRendered = false;
-    await removeDOMElements(id);
+    await removeDOMElements(initId);
     if (parentApi) {
       parentApi.destroy();
       parentApi = null;
