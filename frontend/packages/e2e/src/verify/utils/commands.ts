@@ -391,5 +391,5 @@ export const skipTransferOnDesktop = async ({
   frame: FrameLocator;
 }) => {
   await clickOn(/continue on desktop/i, { frame });
-  await clickOn(/yes, continue on desktop/i, { frame });
+  await clickOn(/continue on desktop/i, { frame });
 };
