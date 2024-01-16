@@ -1,4 +1,4 @@
-import { IcoFileText216 } from '@onefootprint/icons';
+import { IcoFileText24 } from '@onefootprint/icons';
 import type { CollectKycDataRequirement } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
 import React, { useState } from 'react';
@@ -110,7 +110,7 @@ const BasicInfoSection = ({
     <Section
       title={t('basic-info.title')}
       actions={actions}
-      IconComponent={IcoFileText216}
+      IconComponent={IcoFileText24}
       content={getSectionContent(basicInfo)}
       testID="basic-info-section"
     />

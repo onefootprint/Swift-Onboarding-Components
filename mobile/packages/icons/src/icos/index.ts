@@ -18,6 +18,7 @@ export { default as IcoEmojiHappy24 } from './ico-emoji-happy-24';
 export { default as IcoFaceid24 } from './ico-faceid-24';
 export { default as IcoFaceid40 } from './ico-faceid-40';
 export { default as IcoFileText216 } from './ico-file-text-2-16';
+export { default as IcoFileText24 } from './ico-file-text-24';
 export { default as IcoFootprint24 } from './ico-footprint-24';
 export { default as IcoForbid40 } from './ico-forbid-40';
 export { default as IcoGreenCard24 } from './ico-green-card-24';
