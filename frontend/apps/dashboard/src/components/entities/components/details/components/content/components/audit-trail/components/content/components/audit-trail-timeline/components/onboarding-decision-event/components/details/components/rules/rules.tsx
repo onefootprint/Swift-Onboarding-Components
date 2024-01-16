@@ -8,7 +8,7 @@ import Error from './components/error';
 import Loading from './components/loading';
 
 export type RulesProps = {
-  data: Record<
+  data?: Record<
     string,
     | boolean
     | string

@@ -24,10 +24,17 @@ const ActionResultSection = ({
   const actionName = kebabCase(action);
 
   const getResultSection = (name: string) => {
+    const triggeredName = t(kebabCase(name));
     const rules = data[name] as Rule[];
+
     return (
-      <Stack direction="column" gap={rules.length ? 5 : 3}>
-        <Typography variant="label-3">{t(kebabCase(name))}</Typography>
+      <Stack
+        direction="column"
+        gap={rules.length ? 5 : 3}
+        role="group"
+        aria-label={triggeredName}
+      >
+        <Typography variant="label-3">{triggeredName}</Typography>
         {rules.length ? (
           <RuleList>
             {rules.map(rule => (
