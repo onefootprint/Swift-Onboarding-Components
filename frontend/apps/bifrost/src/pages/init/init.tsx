@@ -1,5 +1,6 @@
 import { useObserveCollector } from '@onefootprint/dev-tools';
 import type { FootprintVerifyDataProps } from '@onefootprint/footprint-js';
+import type { ProviderReturn } from '@onefootprint/idv';
 import {
   checkIsInIframe,
   checkIsSocialMediaBrowser,
@@ -18,12 +19,15 @@ import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { useTimeout } from 'usehooks-ts';
 
+import getSdkContext from '../../utils/sdk-context';
 import useProps from './hooks/use-props';
 import { POST_MESSAGE_TIMEOUT } from './hooks/use-props/use-props';
 
+type InitProps = { fpProvider: ProviderReturn };
+
 const STUCK_ON_SHIMMER_TIMEOUT = POST_MESSAGE_TIMEOUT * 3;
 
-const Init = () => {
+const Init = ({ fpProvider }: InitProps) => {
   const [state, send] = useBifrostMachine();
   const {
     authToken: authTokenContext,
@@ -37,15 +41,16 @@ const Init = () => {
     ? { [CLIENT_PUBLIC_KEY_HEADER]: publicKeyContext }
     : undefined;
 
-  const setupLogger = (config: PublicOnboardingConfig) => {
+  const setupLogger = async (config: PublicOnboardingConfig) => {
     const isInIframe = checkIsInIframe();
-    observeCollector.setAppContext({
-      config,
-    });
+    observeCollector.setAppContext({ config });
     const { orgName, orgId, key, isLive } = config;
+    const sdkContextModel = await getSdkContext(fpProvider);
+
     if (isLive && !orgIds.has(orgId)) {
       Logger.setupLogRocket('bifrost');
       Logger.identify({
+        ...sdkContextModel,
         orgName,
         orgId,
         publicKey: key,

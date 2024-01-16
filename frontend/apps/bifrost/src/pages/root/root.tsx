@@ -25,7 +25,7 @@ type RootProps = {
 };
 
 const Root = ({ variant }: RootProps) => {
-  const footprint = useFootprintProvider();
+  const fpProvider = useFootprintProvider();
   const [state, send] = useBifrostMachine();
   const {
     bootstrapData,
@@ -54,7 +54,7 @@ const Root = ({ variant }: RootProps) => {
       'IDV flow is complete, sending validation token back to the tenant',
     );
     if (validationToken) {
-      footprint.complete({
+      fpProvider.complete({
         validationToken,
         closeDelay: delay,
       });
@@ -63,14 +63,14 @@ const Root = ({ variant }: RootProps) => {
 
   const handleClose = () => {
     Logger.info('IDV flow is closed by the user');
-    footprint.cancel();
-    footprint.close();
+    fpProvider.cancel();
+    fpProvider.close();
   };
 
   return (
     <Layout variant={variant}>
       <AppErrorBoundary onReset={() => send({ type: 'reset' })}>
-        {state.matches('init') && <Init />}
+        {state.matches('init') && <Init fpProvider={fpProvider} />}
         {state.matches('initError') && <InitError />}
         {state.matches('idv') && (
           <Idv

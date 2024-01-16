@@ -2,10 +2,14 @@ import type { ProviderReturn } from '../types';
 
 type UseFootprintProvider = { client: ProviderReturn };
 
-const useFootprintProvider = ({ client }: UseFootprintProvider) => ({
+const useFootprintProvider = ({
+  client,
+}: UseFootprintProvider): ProviderReturn => ({
   cancel: client.cancel,
   close: client.close,
   complete: client.complete,
+  getAdapterResponse: client.getAdapterResponse,
+  getLoadingStatus: client.getLoadingStatus,
   load: client.load,
   on: client.on,
 });

@@ -3,6 +3,7 @@ export type CustomChildAPI = Postmate.ChildAPI & {
   parent?: Record<string, unknown>; // Window type
   parentOrigin?: string;
   model?: {
+    initId?: string;
     sdkUrl?: string;
     sdkVersion?: string;
   };
@@ -25,9 +26,13 @@ export type IframeAdapterReturn = {
 };
 
 export type ProviderReturn = {
-  getAdapterResponse: (() => CustomChildAPI | null) | (() => null);
-  getLoadingStatus: () => boolean;
-  load: (() => Promise<CustomChildAPI | null>) | (() => Promise<void>);
-  on: ((event: string, callback: Function) => () => void) | (() => () => void);
-  send: ((event: string, data?: unknown) => void) | ((event: string) => void);
+  getAdapterResponse:
+    | IframeAdapterReturn['getAdapterResponse']
+    | WebViewAdapterReturn['getAdapterResponse'];
+  getLoadingStatus:
+    | IframeAdapterReturn['getLoadingStatus']
+    | WebViewAdapterReturn['getLoadingStatus'];
+  load: WebViewAdapterReturn['load'] | IframeAdapterReturn['load'];
+  on: WebViewAdapterReturn['on'] | IframeAdapterReturn['on'];
+  send: WebViewAdapterReturn['send'] | IframeAdapterReturn['send'];
 };

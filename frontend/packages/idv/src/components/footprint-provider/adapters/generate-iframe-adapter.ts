@@ -16,14 +16,23 @@ import generateEventEmitter from '../utils/generate-event-emitter';
 const { closed, canceled, completed } = FootprintPublicEvent;
 const { propsReceived, started } = FootprintPrivateEvent;
 
+const getSpecificEvent = (
+  event: string,
+  childRef: CustomChildAPI | null,
+): string => {
+  const sdkInitId = childRef?.model?.initId;
+  return sdkInitId?.length ? `${sdkInitId}:${event}` : event;
+};
+
 const generateIframeAdapter = (): IframeAdapterReturn => {
   let isAdapterLoaded: boolean = false;
   let postmateChildApiRef: CustomChildAPI | null = null;
   const eventEmitter = generateEventEmitter();
 
   const sendEvent = (event: string, data?: unknown): void => {
+    const specificEvent = getSpecificEvent(event, postmateChildApiRef);
     if (postmateChildApiRef) {
-      postmateChildApiRef.emit(event, data);
+      postmateChildApiRef.emit(specificEvent, data);
     } else {
       Logger.warn(
         `Footprint.js must be initialized in order to dispatch the event "${event}"`,
@@ -32,12 +41,12 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
     }
   };
 
-  const close = () => {
+  const close = (): void => {
     Logger.info('Closing footprint from iframe adapter');
     sendEvent(closed);
   };
 
-  const cancel = () => {
+  const cancel = (): void => {
     Logger.info('Canceling footprint from iframe adapter');
     sendEvent(canceled);
   };
@@ -81,13 +90,13 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
   };
 
   return {
-    load,
     cancel,
     close,
     complete,
-    on: eventEmitter.on,
     getAdapterResponse: () => postmateChildApiRef,
     getLoadingStatus: () => isAdapterLoaded,
+    load,
+    on: eventEmitter.on,
   };
 };
 

@@ -10,10 +10,8 @@ const configureFootprint = () => {
   if (IS_SSR) {
     return generateEmptyAdapter();
   }
-  if (isInIframe) {
-    return generateIframeAdapter();
-  }
-  return generateWebViewAdapter();
+
+  return isInIframe ? generateIframeAdapter() : generateWebViewAdapter();
 };
 
 export default configureFootprint;

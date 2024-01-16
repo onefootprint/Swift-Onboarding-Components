@@ -6,31 +6,22 @@ import request from '@onefootprint/request';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
+import getSdkContext from '../../../../utils/sdk-context';
+
 type GetSdkArgsResponse = {
   args: { kind: string; data: FootprintVerifyDataProps };
   obConfig?: PublicOnboardingConfig;
 };
 
-const extractCleanDomain = (s: string): string =>
-  s.replace(/(https?:\/\/)?(www\.)?/gi, '').split(/[/?#]/)[0];
-
 const getSdkArgs = async (authToken: string, fpProvider: ProviderReturn) => {
-  let sdkUrl = '';
-  let sdkVersion = '';
-  try {
-    const childApiRef = await fpProvider.load();
-    sdkUrl = childApiRef?.model?.sdkUrl || '';
-    sdkVersion = childApiRef?.model?.sdkVersion || '';
-  } catch {
-    /* empty */
-  }
+  const sdkContextModel = await getSdkContext(fpProvider);
   const { data: response } = await request<GetSdkArgsResponse>({
     method: 'GET',
     url: '/org/sdk_args',
-    headers: sdkVersion
+    headers: sdkContextModel
       ? {
           'x-fp-client-version':
-            `footprint-js ${sdkVersion} ${extractCleanDomain(sdkUrl)}`.trim(),
+            `footprint-js ${sdkContextModel.sdkVersion} ${sdkContextModel.sdkUrl}`.trim(),
           'x-fp-sdk-args-token': authToken,
         }
       : { 'x-fp-sdk-args-token': authToken },
