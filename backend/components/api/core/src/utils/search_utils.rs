@@ -32,6 +32,7 @@ pub async fn parse_search(
     }
 
     let search_str = search.clean_for_fingerprint();
+    tracing::info!(search_len=%search_str.leak().len(), "Parsing search string");
     // See if the search string is a phone number and format it properly for fingerprinting
     let mut data = vec![];
 
