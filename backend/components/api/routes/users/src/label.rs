@@ -8,10 +8,7 @@ use api_core::types::JsonApiResponse;
 use api_core::types::ResponseData;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::CreateLabelRequest;
-use chrono::Utc;
-use db::models::data_lifetime::DataLifetime;
 use db::models::scoped_vault::ScopedVault;
-use db::models::scoped_vault_label::NewScopedVaultLabel;
 use db::models::scoped_vault_label::ScopedVaultLabel;
 use newtypes::PreviewApi;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
@@ -35,15 +32,7 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let seqno = DataLifetime::get_current_seqno(conn)?;
-
-            NewScopedVaultLabel {
-                created_at: Utc::now(),
-                created_seqno: seqno,
-                scoped_vault_id: sv.id,
-                kind: label_kind,
-            }
-            .insert(conn)?;
+            ScopedVaultLabel::create(conn, sv, label_kind)?;
             Ok(())
         })
         .await?;

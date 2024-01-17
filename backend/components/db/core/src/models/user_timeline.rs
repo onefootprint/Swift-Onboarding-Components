@@ -8,6 +8,7 @@ use crate::models::scoped_vault::ScopedVault;
 use crate::DbError;
 use crate::DbResult;
 use crate::PgConn;
+use crate::TxnPgConn;
 use chrono::{DateTime, Utc};
 use db_schema::schema::user_timeline;
 use diesel::prelude::*;
@@ -26,6 +27,7 @@ use super::insight_event::InsightEvent;
 use super::ob_configuration::ObConfiguration;
 use super::onboarding_decision::{OnboardingDecision, SaturatedOnboardingDecisionInfo};
 use super::scoped_vault::ScopedVaultIdentifier;
+use super::scoped_vault_label::ScopedVaultLabel;
 use super::watchlist_check::WatchlistCheck;
 use super::workflow::Workflow;
 use super::workflow_request::WorkflowRequest;
@@ -73,6 +75,7 @@ pub enum SaturatedTimelineEvent {
     WorkflowTriggered((Option<Workflow>, SaturatedActor, Option<WorkflowRequest>)),
     WorkflowStarted((Workflow, ObConfiguration)),
     AuthMethodUpdated((AuthMethodUpdatedInfo, AuthEvent, InsightEvent)),
+    LabelAdded(ScopedVaultLabel),
 }
 
 pub type IsFromOtherTenant = bool;
@@ -81,7 +84,7 @@ pub struct UserTimelineInfo(pub UserTimeline, pub SaturatedTimelineEvent);
 impl UserTimeline {
     #[tracing::instrument("UserTimeline::create", skip_all)]
     pub fn create<T>(
-        conn: &mut PgConn,
+        conn: &mut TxnPgConn,
         event: T,
         vault_id: VaultId,
         scoped_vault_id: ScopedVaultId,
@@ -100,7 +103,7 @@ impl UserTimeline {
         };
         diesel::insert_into(user_timeline::table)
             .values(new)
-            .execute(conn)?;
+            .execute(conn.conn())?;
         Ok(())
     }
 
@@ -173,6 +176,10 @@ impl UserTimeline {
             DbUserTimelineEvent::WorkflowTriggered(ref e) => e.workflow_request_id.clone(),
             _ => None,
         });
+        let label_ids = results.iter().flat_map(|ut| match ut.event {
+            DbUserTimelineEvent::LabelAdded(ref e) => Some(e.id.clone()),
+            _ => None,
+        });
 
         let decisions = OnboardingDecision::get_bulk(conn, decision_ids.collect())?;
         let annotations = Annotation::get_bulk(conn, annotation_ids.collect())?;
@@ -185,6 +192,7 @@ impl UserTimeline {
         let workflows = Workflow::get_bulk(conn, workflow_ids.collect())?;
         let wfrs = WorkflowRequest::get_bulk(conn, wfr_ids.collect())?;
         let auth_events = AuthEvent::get_bulk_for_timeline(conn, auth_event_ids.collect())?;
+        let labels = ScopedVaultLabel::get_bulk(conn, label_ids.collect())?;
 
         // Join the UserTimeline events with the saturated info we fetched from different tables
         let results = results
@@ -289,6 +297,10 @@ impl UserTimeline {
                             .ok_or(DbError::RelatedObjectNotFound)?
                             .clone();
                         SaturatedTimelineEvent::AuthMethodUpdated((e.clone(), auth_event, insight_event))
+                    }
+                    DbUserTimelineEvent::LabelAdded(ref e) => {
+                        let label = labels.get(&e.id).ok_or(DbError::RelatedObjectNotFound)?.clone();
+                        SaturatedTimelineEvent::LabelAdded(label)
                     }
                 };
                 Ok(UserTimelineInfo(ut, saturated_event))

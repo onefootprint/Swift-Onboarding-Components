@@ -3,7 +3,7 @@ use crate::{
     OnboardingDecisionId, WatchlistCheckId, WebauthnCredentialId, WorkflowRequestId,
 };
 use crate::{
-    ActionKind, AuthEventId, AuthMethodKind, DataIdentifier, DbActor, ObConfigurationId, WorkflowId,
+    ActionKind, AuthEventId, AuthMethodKind, DataIdentifier, DbActor, LabelId, ObConfigurationId, WorkflowId,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
@@ -40,6 +40,7 @@ pub enum DbUserTimelineEvent {
     WorkflowTriggered(WorkflowTriggeredInfo),
     WorkflowStarted(WorkflowStartedInfo),
     AuthMethodUpdated(AuthMethodUpdatedInfo),
+    LabelAdded(LabelAddedInfo),
 }
 
 impl_enum_string_diesel!(DbUserTimelineEventKind);
@@ -101,6 +102,12 @@ impl From<WorkflowStartedInfo> for DbUserTimelineEvent {
 impl From<AuthMethodUpdatedInfo> for DbUserTimelineEvent {
     fn from(s: AuthMethodUpdatedInfo) -> Self {
         Self::AuthMethodUpdated(s)
+    }
+}
+
+impl From<LabelAddedInfo> for DbUserTimelineEvent {
+    fn from(s: LabelAddedInfo) -> Self {
+        Self::LabelAdded(s)
     }
 }
 
@@ -176,4 +183,9 @@ pub struct AuthMethodUpdatedInfo {
     pub kind: AuthMethodKind,
     pub action: ActionKind,
     pub auth_event_id: AuthEventId,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LabelAddedInfo {
+    pub id: LabelId,
 }

@@ -1,6 +1,7 @@
 use api_wire_types::WorkflowStartedEventKind;
-use db::models::user_timeline::{
-    SaturatedDataCollectedEvent, SaturatedTimelineEvent, UserTimeline, UserTimelineInfo,
+use db::models::{
+    scoped_vault_label::ScopedVaultLabel,
+    user_timeline::{SaturatedDataCollectedEvent, SaturatedTimelineEvent, UserTimeline, UserTimelineInfo},
 };
 use itertools::Itertools;
 use newtypes::{
@@ -132,6 +133,10 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                     action,
                     insight_event: api_wire_types::InsightEvent::from_db(insight_event),
                 })
+            }
+            SaturatedTimelineEvent::LabelAdded(label) => {
+                let ScopedVaultLabel { kind, .. } = label;
+                Self::LabelAdded(api_wire_types::LabelAdded { kind })
             }
         }
     }

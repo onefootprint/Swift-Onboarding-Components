@@ -1,4 +1,4 @@
-use newtypes::{ActionKind, AuthMethodKind, CollectedDataOption};
+use newtypes::{ActionKind, AuthMethodKind, CollectedDataOption, LabelKind};
 
 use crate::{
     Actor, Annotation, Apiv2Schema, DateTime, IdentityDocumentTimelineEvent, InsightEvent, LivenessEvent,
@@ -33,6 +33,7 @@ pub enum UserTimelineEvent {
     WorkflowTriggered(WorkflowTriggered),
     WorkflowStarted(WorkflowStarted),
     AuthMethodUpdated(AuthMethodUpdated),
+    LabelAdded(LabelAdded),
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -72,4 +73,9 @@ pub enum WorkflowStartedEventKind {
     Playbook,
     /// Collecting documents
     Document,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct LabelAdded {
+    pub kind: LabelKind,
 }

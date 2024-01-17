@@ -27,6 +27,15 @@ def test_create_label(sandbox_user, sandbox_tenant):
     body = post(f"/entities/search", dict(label="active"), *sandbox_tenant.db_auths)
     assert not any(i["id"] == sandbox_user.fp_id for i in body["data"])
 
+    # Make sure we have a timeline event for updating the labels
+    body = get(
+        f"entities/{sandbox_user.fp_id}/timeline", None, *sandbox_tenant.db_auths
+    )
+    label_events = [
+        i["event"]["data"]["kind"] for i in body if i["event"]["kind"] == "label_added"
+    ]
+    assert label_events == ["offboard_fraud", "active"]
+
 
 def test_create_tag(sandbox_user, sandbox_tenant):
     data = {"tag": "delinquent"}
