@@ -8635,6 +8635,14 @@
                             "business"
                         ]
                     },
+                    "label": {
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "offboard_fraud",
+                            "offboard_other"
+                        ]
+                    },
                     "last_activity_at": {
                         "type": "string",
                         "format": "date-time"

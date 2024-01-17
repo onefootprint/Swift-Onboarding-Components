@@ -15,6 +15,9 @@ def test_create_label(sandbox_user, sandbox_tenant):
     body = get(f"/users/{sandbox_user.fp_id}/label", None, sandbox_tenant.sk.key)
     assert body["kind"] == "offboard_fraud"
 
+    body = get(f"/entities/{sandbox_user.fp_id}", data, *sandbox_tenant.db_auths)
+    assert body["label"] == "offboard_fraud"
+
 
 def test_create_tag(sandbox_user, sandbox_tenant):
     data = {"tag": "delinquent"}

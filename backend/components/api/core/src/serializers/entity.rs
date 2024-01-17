@@ -24,7 +24,7 @@ pub type EntityDetail<'a> = (
 
 impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
     fn from_db((entity, vw, auth, decrypted_attrs): EntityDetail) -> Self {
-        let (sv, watchlist_check, wr, mrs, wfs) = entity;
+        let (sv, watchlist_check, wr, label, mrs, wfs) = entity;
 
         // Don't require any permissions to decrypt plaintext attributes - always show them
         let plaintext_attrs = vw
@@ -138,6 +138,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             // Annoying: for now, document-only workflows are a really custom codepath. So we have
             // to check in another way if there are any outstanding doc-only workflows
             has_outstanding_workflow_request: has_outstanding_doc_wf || wr.is_some(),
+            label: label.map(|l| l.kind),
 
             // TODO deprecate all of these
             attributes,

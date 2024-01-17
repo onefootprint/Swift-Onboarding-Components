@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use super::insight_event::InsightEvent;
 use super::manual_review::ManualReview;
 use super::ob_configuration::{IsLive, ObConfiguration};
+use super::scoped_vault_label::ScopedVaultLabel;
 use super::tenant::Tenant;
 use super::user_timeline::UserTimeline;
 use super::vault::NewVaultArgs;
@@ -151,6 +152,7 @@ pub type SerializableEntity = (
     ScopedVault,
     Option<WatchlistCheck>,
     Option<WorkflowRequest>,
+    Option<ScopedVaultLabel>,
     Vec<ManualReview>,
     Vec<SerializableWorkflow>,
 );
@@ -322,22 +324,34 @@ impl ScopedVault {
         conn: &mut PgConn,
         ids: Vec<ScopedVaultId>,
     ) -> DbResult<HashMap<ScopedVaultId, SerializableEntity>> {
-        use db_schema::schema::{insight_event, manual_review, watchlist_check, workflow, workflow_request};
-        let results: Vec<(ScopedVault, Option<WatchlistCheck>, Option<WorkflowRequest>)> =
-            scoped_vault::table
-                .left_join(
-                    watchlist_check::table.on(watchlist_check::scoped_vault_id
-                        .eq(scoped_vault::id)
-                        .and(watchlist_check::deactivated_at.is_null())
-                        .and(not(watchlist_check::completed_at.is_null()))),
-                )
-                .left_join(
-                    workflow_request::table.on(workflow_request::scoped_vault_id
-                        .eq(scoped_vault::id)
-                        .and(workflow_request::deactivated_at.is_null())),
-                )
-                .filter(scoped_vault::id.eq_any(&ids))
-                .load(conn)?;
+        use db_schema::schema::{
+            insight_event, manual_review, scoped_vault_label, watchlist_check, workflow, workflow_request,
+        };
+        type ScopedVaultInfo = (
+            ScopedVault,
+            Option<WatchlistCheck>,
+            Option<WorkflowRequest>,
+            Option<ScopedVaultLabel>,
+        );
+        let results: Vec<ScopedVaultInfo> = scoped_vault::table
+            .left_join(
+                watchlist_check::table.on(watchlist_check::scoped_vault_id
+                    .eq(scoped_vault::id)
+                    .and(watchlist_check::deactivated_at.is_null())
+                    .and(not(watchlist_check::completed_at.is_null()))),
+            )
+            .left_join(
+                workflow_request::table.on(workflow_request::scoped_vault_id
+                    .eq(scoped_vault::id)
+                    .and(workflow_request::deactivated_at.is_null())),
+            )
+            .left_join(
+                scoped_vault_label::table.on(scoped_vault_label::scoped_vault_id
+                    .eq(scoped_vault::id)
+                    .and(scoped_vault_label::deactivated_at.is_null())),
+            )
+            .filter(scoped_vault::id.eq_any(&ids))
+            .load(conn)?;
 
         // Fetch manual reviews separately since there may be multiple for one scoped vault
         let mut manual_reviews = manual_review::table
@@ -364,7 +378,7 @@ impl ScopedVault {
                 let sv_id = i.0.id.clone();
                 let manual_reviews = manual_reviews.remove(&sv_id).unwrap_or_default();
                 let workflows = workflows.remove(&sv_id).unwrap_or_default();
-                let entity = (i.0, i.1, i.2, manual_reviews, workflows);
+                let entity = (i.0, i.1, i.2, i.3, manual_reviews, workflows);
                 (sv_id, entity)
             })
             .collect();

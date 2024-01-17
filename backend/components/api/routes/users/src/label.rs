@@ -31,19 +31,20 @@ pub async fn post(
     let fp_id = fp_id.into_inner();
     let label_kind = request.kind;
 
-    let _ = state
+    state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let seqno = DataLifetime::get_current_seqno(conn)?;
 
-            Ok(NewScopedVaultLabel {
+            NewScopedVaultLabel {
                 created_at: Utc::now(),
                 created_seqno: seqno,
                 scoped_vault_id: sv.id,
                 kind: label_kind,
             }
-            .insert(conn)?)
+            .insert(conn)?;
+            Ok(())
         })
         .await?;
 
