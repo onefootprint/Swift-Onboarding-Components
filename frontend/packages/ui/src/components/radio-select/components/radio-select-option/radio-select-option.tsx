@@ -82,7 +82,13 @@ const RadioSelectOption = ({
 const Option = styled.button`
   all: unset;
   cursor: pointer;
+  pointer-events: auto;
   transition: all 0.2s ease-out;
+
+  :disabled {
+    cursor: default;
+    pointer-events: none;
+  }
 `;
 
 export default RadioSelectOption;

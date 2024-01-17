@@ -1,4 +1,5 @@
 import styled, { css } from '@onefootprint/styled';
+import noop from 'lodash/noop';
 import React from 'react';
 
 import Stack from '../stack';
@@ -44,9 +45,9 @@ const RadioSelect = ({
                 IconComponent={subOption.IconComponent}
                 disabled={subOption.disabled}
                 disabledHint={subOption.disabledHint}
-                onClick={() => {
-                  onChange?.(subOption.value);
-                }}
+                onClick={
+                  subOption.disabled ? noop : () => onChange?.(subOption.value)
+                }
                 selected={subOption.value === value}
                 size={size}
               />
@@ -63,9 +64,7 @@ const RadioSelect = ({
           IconComponent={option.IconComponent}
           disabled={option.disabled}
           disabledHint={option.disabledHint}
-          onClick={() => {
-            onChange?.(option.value);
-          }}
+          onClick={option.disabled ? noop : () => onChange?.(option.value)}
           selected={option.value === value}
           size={size}
         />

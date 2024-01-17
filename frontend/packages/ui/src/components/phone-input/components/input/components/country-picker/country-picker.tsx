@@ -47,6 +47,7 @@ const Button = styled.button`
       height: 100%;
       justify-content: center;
       user-select: none;
+      padding: 0 calc(${theme.spacing[2]} + ${theme.spacing[1]});
 
       &:enabled {
         cursor: pointer;
