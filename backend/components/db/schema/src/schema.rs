@@ -76,7 +76,7 @@ table! {
 table! {
     use diesel::sql_types::*;
 
-    audit_log (id) {
+    audit_event (id) {
         id -> Text,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
@@ -1257,14 +1257,14 @@ joinable!(annotation -> scoped_vault (scoped_vault_id));
 joinable!(appearance -> tenant (tenant_id));
 joinable!(apple_device_attestation -> vault (vault_id));
 joinable!(apple_device_attestation -> webauthn_credential (webauthn_credential_id));
-joinable!(audit_log -> document_data (document_data_id));
-joinable!(audit_log -> insight_event (insight_event_id));
-joinable!(audit_log -> ob_configuration (ob_configuration_id));
-joinable!(audit_log -> scoped_vault (scoped_vault_id));
-joinable!(audit_log -> tenant (tenant_id));
-joinable!(audit_log -> tenant_api_key (tenant_api_key_id));
-joinable!(audit_log -> tenant_role (tenant_role_id));
-joinable!(audit_log -> tenant_user (tenant_user_id));
+joinable!(audit_event -> document_data (document_data_id));
+joinable!(audit_event -> insight_event (insight_event_id));
+joinable!(audit_event -> ob_configuration (ob_configuration_id));
+joinable!(audit_event -> scoped_vault (scoped_vault_id));
+joinable!(audit_event -> tenant (tenant_id));
+joinable!(audit_event -> tenant_api_key (tenant_api_key_id));
+joinable!(audit_event -> tenant_role (tenant_role_id));
+joinable!(audit_event -> tenant_user (tenant_user_id));
 joinable!(auth_event -> insight_event (insight_event_id));
 joinable!(auth_event -> scoped_vault (scoped_vault_id));
 joinable!(auth_event -> vault (vault_id));
@@ -1367,7 +1367,7 @@ allow_tables_to_appear_in_same_query!(
     annotation,
     appearance,
     apple_device_attestation,
-    audit_log,
+    audit_event,
     auth_event,
     billing_event,
     billing_profile,
