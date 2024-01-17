@@ -1,4 +1,4 @@
-import { IcoCheck24, IcoClose24, IcoPhone24 } from '@onefootprint/icons';
+import { IcoCheck24, IcoClose24, IcoPencil24 } from '@onefootprint/icons';
 import { Box, Hint, TextInput, Typography } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -60,6 +60,7 @@ const TestIdInput = () => {
                   hasError={!!errors.testID}
                   placeholder={t('test-id.placeholder')}
                   disabled={idInputLocked}
+                  autoCapitalize="none"
                 />
               );
             }}
@@ -73,7 +74,7 @@ const TestIdInput = () => {
               <InlineButton
                 ariaLabel={t('test-id.button.edit')}
                 onClick={handleSaveOrEdit}
-                icon={IcoPhone24}
+                icon={IcoPencil24}
               />
             </InlineButtonsLayout>
           ) : (

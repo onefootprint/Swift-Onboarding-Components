@@ -1,4 +1,4 @@
-import { IcoBolt24 } from '@onefootprint/icons';
+import { IcoCopy24 } from '@onefootprint/icons';
 import { IconButton } from '@onefootprint/ui';
 import Clipboard from '@react-native-clipboard/clipboard';
 import React from 'react';
@@ -16,7 +16,7 @@ const CopyButton = ({ text }: CopyButtonProps) => {
   return (
     <CopyButtonContainer>
       <IconButton aria-label="copy" onPress={handleClick}>
-        <IcoBolt24 />
+        <IcoCopy24 />
       </IconButton>
     </CopyButtonContainer>
   );
