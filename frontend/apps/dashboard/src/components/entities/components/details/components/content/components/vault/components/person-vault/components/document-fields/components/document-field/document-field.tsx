@@ -32,7 +32,7 @@ const DocumentField = ({
   const { t } = useTranslation('pages.entity.fieldset.document');
   const [isDrawerOpen, show, hide] = useToggle(false);
   const [activeDocumentVersion, setActiveDocumentVersion] = useState(
-    getDocumentVersion(documents[0], documents),
+    getDocumentVersion(documents[documents.length - 1], documents),
   );
   const { inProgress: showEditView } = useEditControls();
   const documentStatus = getDocumentStatus({ documents, documentType });

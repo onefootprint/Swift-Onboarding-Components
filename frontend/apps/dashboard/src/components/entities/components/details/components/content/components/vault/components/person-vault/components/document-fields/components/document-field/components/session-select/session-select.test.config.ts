@@ -42,7 +42,7 @@ export const driversLicenseDoc3: Document = {
 };
 
 export const driversLicenseDoc4: Document = {
-  completedVersion: 3,
+  completedVersion: 4,
   kind: SupportedIdDocTypes.driversLicense,
   startedAt: '2023-07-26T00:00:00.000Z',
   status: IdDocStatus.pending,
