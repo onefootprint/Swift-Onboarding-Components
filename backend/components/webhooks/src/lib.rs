@@ -65,6 +65,8 @@ impl WebhookServiceClient {
             format!("{}_sandbox", tenant.id)
         };
 
+        // TODO we should save these app URLs in the tenant table - this can take 300ms
+        // https://ui.honeycomb.io/footprint-2e/environments/prod/datasets/fpc-api/result/2vcWaR8FYLY/trace/HHAjiu2kirp?fields[]=s_name&fields[]=s_serviceName&span=8af9744106e2f8a2
         let app = client
             .application()
             .get_or_create(
@@ -107,6 +109,7 @@ impl WebhookClient for WebhookServiceClient {
     }
 
     /// Send a webhook event to tenant if it's been configured
+    #[tracing::instrument(skip_all)]
     async fn send_event_to_tenant(
         &self,
         tenant: WebhookApp,
