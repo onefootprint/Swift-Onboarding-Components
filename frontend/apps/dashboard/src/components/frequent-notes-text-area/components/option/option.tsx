@@ -7,7 +7,7 @@ import {
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Button, createFontStyles, Stack, Typography } from '@onefootprint/ui';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import React, { useRef, useState } from 'react';
 import { useHover } from 'usehooks-ts';
 
@@ -40,7 +40,6 @@ const Option = ({
       onClick(children, value);
       setIsCopied(true);
 
-      // The icon will flash to a check mark after it is copied, and then hide shortly after
       if (hideCheckTimeout) {
         clearTimeout(hideCheckTimeout);
       }
@@ -76,8 +75,6 @@ const Option = ({
       $isHovered={isHovered}
       $isCopied={isCopied}
       onClick={handleOnClick}
-      transition={{ duration: 0.2 }}
-      layout
     >
       <Stack direction="row" gap={3} padding={4} align="start">
         <IconContainer
@@ -100,25 +97,23 @@ const Option = ({
           <p>{children}</p>
         </TextContainer>
       </Stack>
-      <AnimatePresence>
-        {showConfirmation && (
-          <motion.span
-            initial={{ opacity: 0, transform: 'translateY(-30%)' }}
-            animate={{ opacity: 1, transform: 'translateY(0%)' }}
-            exit={{ opacity: 0, transform: 'translateY(-10%)' }}
-            transition={{ duration: 0.1 }}
-          >
-            <ConfirmationFooter>
-              <Typography variant="body-4" color="secondary">
-                {t('warning')}
-              </Typography>
-              <Button size="small" onClick={handleDelete}>
-                {t('delete')}
-              </Button>
-            </ConfirmationFooter>
-          </motion.span>
-        )}
-      </AnimatePresence>
+      {showConfirmation && (
+        <motion.span
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.1 }}
+        >
+          <ConfirmationFooter>
+            <Typography variant="body-4" color="tertiary">
+              {t('warning')}
+            </Typography>
+            <Button size="small" onClick={handleDelete}>
+              {t('delete')}
+            </Button>
+          </ConfirmationFooter>
+        </motion.span>
+      )}
     </Container>
   );
 };
@@ -136,12 +131,13 @@ const Container = styled(motion.div)<{
     background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default};
     transition: all 0.2s ease-in-out;
-    box-shadow: ${theme.elevation[1]};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    max-width: 100%;
 
     ${isHovered &&
     !isCopied &&
     css`
-      box-shadow: ${theme.elevation[2]};
+      border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
     `}
   `};
 `;
@@ -185,6 +181,7 @@ const IconContainer = styled(Stack)<{
 const TextContainer = styled(Stack)`
   ${({ theme }) => css`
     max-height: ${theme.spacing[11]};
+    max-width: 100%;
 
     p {
       display: -webkit-box;

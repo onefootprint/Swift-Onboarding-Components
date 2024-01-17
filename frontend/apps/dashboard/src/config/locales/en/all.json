@@ -404,7 +404,7 @@
       "done": "Done",
       "warning": "This note will be deleted for the entire organization.",
       "delete": "Delete",
-      "save": "Save as frequent note",
+      "save": "Add to frequent notes",
       "created-toast": {
         "title": "Success",
         "description": "Saved frequent note for organization."
@@ -1126,7 +1126,7 @@
               }
             }
           },
-          "disclaimer": "Please note that all data attribute access are logged for security reasons."
+          "disclaimer": "All data attribute access are logged for security reasons."
         }
       },
       "manual-review": {
@@ -1211,7 +1211,7 @@
         "toggle": {
           "label": "Pin note to the top of the page"
         },
-        "disclaimer": "Please note that this action will be logged for security reasons."
+        "disclaimer": "This action will be logged for security reasons."
       },
       "risks": {
         "cta": "See details",

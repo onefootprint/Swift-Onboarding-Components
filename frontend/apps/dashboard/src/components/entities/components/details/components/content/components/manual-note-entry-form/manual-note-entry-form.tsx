@@ -48,6 +48,7 @@ const ManualNoteEntryForm = ({
           placeholder={placeholder}
           required
         />
+        <Divider variant="secondary" />
         <Controller
           control={control}
           name="isPinned"
@@ -64,10 +65,6 @@ const ManualNoteEntryForm = ({
             </ToggleContainer>
           )}
         />
-        <Divider />
-        <Typography variant="body-3" color="tertiary">
-          {t('disclaimer')}
-        </Typography>
       </StyledForm>
     </FormProvider>
   );

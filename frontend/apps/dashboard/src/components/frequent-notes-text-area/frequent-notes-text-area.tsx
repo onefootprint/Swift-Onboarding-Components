@@ -3,12 +3,14 @@ import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import { type OrgFrequentNoteKind, RoleScopeKind } from '@onefootprint/types';
 import {
+  Box,
+  createTypography,
   LinkButton,
   Stack,
   TextArea as UnstyledTextArea,
-  Typography,
   useToast,
 } from '@onefootprint/ui';
+import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import usePermissions from 'src/hooks/use-permissions';
@@ -72,7 +74,7 @@ const FrequentNotesTextArea = ({
   const isLoading =
     getQuery.isLoading || createMutation.isLoading || deleteMutation.isLoading;
   const hasEditPermissions = hasPermission(RoleScopeKind.orgSettings);
-  const showSave = !(notes && notes.find(n => n.content === value));
+  const showSave = !(notes && notes.find(n => n.content === value)) && value;
 
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const handleOptionClick = (body: string) => {
@@ -114,64 +116,119 @@ const FrequentNotesTextArea = ({
     });
   };
 
+  const appearHorizontal = {
+    initial: { opacity: 0, x: -20 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -20 },
+  };
+
+  const appearCenter = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
+  };
+
   return (
-    <Stack direction="column" gap={5}>
-      <TextArea
-        label={label}
-        placeholder={placeholder}
-        hasError={!!errors.note}
-        hint={errors.note && t('errors.required')}
-        value={value}
-        disabled={createMutation.isLoading}
-        onChangeText={handleChangeText}
-        ref={e => {
-          // https://www.react-hook-form.com/faqs/#Howtosharerefusage
-          ref(e);
-          textAreaRef.current = e;
-        }}
-        {...restOfFormReg}
-      />
-      {hasEditPermissions && (
-        <LinkButton
-          disabled={isLoading || !showSave || !value}
-          onClick={handleSave}
-        >
-          {t('save')}
-        </LinkButton>
-      )}
-      {(error || !!notes?.length) && (
-        <Stack direction="column" gap={3}>
-          <Stack direction="row" justify="space-between" align="center">
-            <Typography variant="label-3">{t('title')}</Typography>
-            {hasEditPermissions && (
-              <LinkButton
-                disabled={isLoading}
-                onClick={() => setIsEdit(!isEdit)}
-                size="compact"
-              >
-                {t(`${isEdit ? 'done' : 'edit'}`)}
-              </LinkButton>
-            )}
+    <Stack direction="column">
+      <Stack direction="column">
+        <TextArea
+          label={label}
+          placeholder={placeholder}
+          hasError={!!errors.note}
+          hint={errors.note && t('errors.required')}
+          value={value}
+          disabled={createMutation.isLoading}
+          onChangeText={handleChangeText}
+          ref={e => {
+            // https://www.react-hook-form.com/faqs/#Howtosharerefusage
+            ref(e);
+            textAreaRef.current = e;
+          }}
+          {...restOfFormReg}
+        />
+        <Box marginBottom={4} />
+
+        {hasEditPermissions && (
+          <Stack marginBottom={5}>
+            <LinkButton
+              disabled={isLoading || !showSave}
+              onClick={handleSave}
+              size="compact"
+            >
+              {t('save')}
+            </LinkButton>
           </Stack>
-          {error && <Error message={getErrorMessage(error)} />}
-          {notes &&
-            notes.map(note => (
-              <Option
-                key={note.id}
-                value={note.id}
-                onClick={handleOptionClick}
-                isEdit={isEdit}
-                onDelete={() => {
-                  deleteFrequentNote(note.id);
-                }}
+        )}
+      </Stack>
+      <AnimatePresence initial={false}>
+        {(error || !!notes?.length) && (
+          <motion.span
+            variants={appearCenter}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ duration: 0.1 }}
+          >
+            <Stack direction="column" gap={3}>
+              <Stack
+                direction="row"
+                justify="space-between"
+                align="center"
+                marginRight={2}
+                marginTop={3}
               >
-                {note.content}
-              </Option>
-            ))}
-        </Stack>
-      )}
+                <Title>{t('title')}</Title>
+                {hasEditPermissions && (
+                  <LinkButton
+                    disabled={isLoading}
+                    onClick={() => setIsEdit(!isEdit)}
+                    size="compact"
+                  >
+                    {t(`${isEdit ? 'done' : 'edit'}`)}
+                  </LinkButton>
+                )}
+              </Stack>
+              {error && <Error message={getErrorMessage(error)} />}
+              <AnimatePresence initial={false}>
+                {notes &&
+                  notes.map(note => (
+                    <motion.span
+                      variants={appearHorizontal}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                      transition={{ duration: 0.15 }}
+                      key={note.id}
+                    >
+                      <Option
+                        value={note.id}
+                        onClick={handleOptionClick}
+                        isEdit={isEdit}
+                        onDelete={() => {
+                          deleteFrequentNote(note.id);
+                        }}
+                      >
+                        {note.content}
+                      </Option>
+                    </motion.span>
+                  ))}
+              </AnimatePresence>
+            </Stack>
+          </motion.span>
+        )}
+      </AnimatePresence>
     </Stack>
   );
 };
+
+const Title = styled.div`
+  ${({ theme }) => {
+    const { label } = theme.components;
+    return css`
+      ${createTypography(label.size.default.typography)}
+      color: ${label.states.default.color};
+    `;
+  }}
+`;
 
 export default FrequentNotesTextArea;
