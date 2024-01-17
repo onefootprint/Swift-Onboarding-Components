@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { media, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import validateName, { NameValidationError } from './validate-name';
@@ -11,7 +11,9 @@ type NameFieldsProps = {
 };
 
 const NameFields = ({ disabled }: NameFieldsProps) => {
-  const { t } = useTranslation('kyc.pages.basic-information.form');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyc.pages.basic-information.form',
+  });
   const {
     register,
     getValues,

@@ -1,4 +1,4 @@
-import { useInputMask, useTranslation } from '@onefootprint/hooks';
+import { useInputMask } from '@onefootprint/hooks';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { BusinessDI, CorporationType } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
@@ -6,6 +6,7 @@ import { Grid, PhoneInput, Select, Stack, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import type { UseFormSetError } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
 import { useL10nContext } from '../../../../../../components/l10n-provider';
@@ -77,7 +78,9 @@ const BasicDataForm = ({
   ctaLabel,
   config,
 }: BasicDataFormProps) => {
-  const { t } = useTranslation('kyb.pages.basic-data.form');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyb.pages.basic-data.form',
+  });
   const l10n = useL10nContext();
   const inputMasks = useInputMask(l10n?.locale);
   const {

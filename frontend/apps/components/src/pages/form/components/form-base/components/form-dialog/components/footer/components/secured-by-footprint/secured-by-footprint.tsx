@@ -1,13 +1,13 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoFootprint16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { media, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const SecuredByFootprint = () => {
-  const { t } = useTranslation(
-    'pages.secure-form.form-dialog.secured-by-footprint',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.secure-form.form-dialog.secured-by-footprint',
+  });
 
   return (
     <Container data-testid="secured-by-footprint">

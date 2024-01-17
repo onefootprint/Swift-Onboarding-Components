@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { EmailForm } from '@onefootprint/idv';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { HeaderProps } from '../../types';
 
@@ -13,7 +13,9 @@ type ManagePhoneProps = {
 const noop = () => undefined;
 
 const ManageEmail = ({ children, Header }: ManagePhoneProps) => {
-  const { t } = useTranslation('pages.auth');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.auth',
+  });
 
   return (
     <>

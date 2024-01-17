@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { InvestorProfileData } from '@onefootprint/types';
 import {
   InvestorProfileAnnualIncome,
@@ -7,6 +6,7 @@ import {
 import { Radio } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import FormWithOptions from '../../../../components/custom-form';
 import type { IncomeData } from '../../../../utils/state-machine/types';
@@ -26,7 +26,9 @@ const IncomeForm = ({
   isLoading,
   onSubmit,
 }: IncomeFormProps) => {
-  const { t } = useTranslation('investor-profile.pages.income');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'investor-profile.pages.income',
+  });
   const { handleSubmit, register } = useForm<FormData>({
     defaultValues: {
       income:

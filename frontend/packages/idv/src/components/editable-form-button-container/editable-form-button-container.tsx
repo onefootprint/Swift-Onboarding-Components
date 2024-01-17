@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Button, LinkButton } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type EditableFormButtonContainerProps = {
   onCancel?: () => void;
@@ -20,7 +20,7 @@ const EditableFormButtonContainer = ({
   skipLabel,
   submitButtonTestID,
 }: EditableFormButtonContainerProps) => {
-  const { t } = useTranslation('global.components.cta');
+  const { t } = useTranslation('idv', { keyPrefix: 'global.components.cta' });
 
   if (onCancel) {
     return (

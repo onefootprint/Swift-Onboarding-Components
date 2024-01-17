@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Logger } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import type { DataIdentifier, UsersVaultRequest } from '@onefootprint/types';
 import type { AxiosError } from 'axios';
+import { useTranslation } from 'react-i18next';
 
 import useUsersVault from './hooks/use-users-vault';
 
@@ -19,7 +19,9 @@ export type UsersVaultArgs = UsersVaultRequest & {
 };
 
 const useVaultData = () => {
-  const { t } = useTranslation('pages.secure-form.errors');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.secure-form.errors',
+  });
   const usersVaultMutation = useUsersVault();
 
   const vaultData = ({

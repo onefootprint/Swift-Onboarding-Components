@@ -1,5 +1,5 @@
-import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ConfirmCollectedData } from '../../../../components/confirm-collected-data';
 import Logger from '../../../../utils/logger';
@@ -10,7 +10,9 @@ import BeneficialOwnersSection from './components/beneficial-owners-section';
 import BusinessAddressSection from './components/business-address-section';
 
 const Confirm = () => {
-  const { t } = useTranslation('kyb.pages.confirm.summary');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyb.pages.confirm.summary',
+  });
   const [state, send] = useCollectKybDataMachine();
   const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();

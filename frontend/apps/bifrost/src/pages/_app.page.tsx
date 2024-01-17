@@ -10,7 +10,8 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import Script from 'next/script';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { BifrostMachineProvider } from '../components/bifrost-machine-provider';
 import { GOOGLE_MAPS_KEY } from '../config/constants';
@@ -23,6 +24,12 @@ configureReactI18next();
 
 const App = ({ Component, pageProps }: AppProps) => {
   const { appearance, theme, rules } = pageProps;
+  const { ready: i18nReady } = useTranslation();
+  // Prevent hydration errors from html rendering before translation is loaded
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), [i18nReady]);
+  if (!ready) return null;
+
   return (
     <>
       <Head>
@@ -32,16 +39,20 @@ const App = ({ Component, pageProps }: AppProps) => {
         />
       </Head>
       <ObserveCollectorProvider appName="bifrost">
-        <AppearanceProvider appearance={appearance} theme={theme} rules={rules}>
-          <QueryClientProvider client={queryClient}>
+        <QueryClientProvider client={queryClient}>
+          <AppearanceProvider
+            appearance={appearance}
+            theme={theme}
+            rules={rules}
+          >
             <BifrostMachineProvider>
               <GlobalStyle />
               <FootprintProvider client={footprint}>
                 <Component {...pageProps} />
               </FootprintProvider>
             </BifrostMachineProvider>
-          </QueryClientProvider>
-        </AppearanceProvider>
+          </AppearanceProvider>
+        </QueryClientProvider>
       </ObserveCollectorProvider>
       <Script
         src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places&callback=Function.prototype`}

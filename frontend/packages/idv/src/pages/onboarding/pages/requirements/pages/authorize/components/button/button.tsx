@@ -1,9 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { FootprintButton, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
-import { Trans } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 import useOnboardingRequirementsMachine from '../../../../hooks/use-onboarding-requirements-machine';
 
@@ -13,7 +12,9 @@ type ButtonProps = {
 };
 
 const Button = ({ isLoading, onClick }: ButtonProps) => {
-  const { t } = useTranslation('onboarding.pages.authorize');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'onboarding.pages.authorize',
+  });
   const [state] = useOnboardingRequirementsMachine();
   const {
     onboardingContext: {
@@ -36,6 +37,7 @@ const Button = ({ isLoading, onClick }: ButtonProps) => {
           sx={{ textAlign: 'center' }}
         >
           <Trans
+            ns="idv"
             i18nKey="onboarding.pages.authorize.footer"
             values={{ tenantName }}
             components={{

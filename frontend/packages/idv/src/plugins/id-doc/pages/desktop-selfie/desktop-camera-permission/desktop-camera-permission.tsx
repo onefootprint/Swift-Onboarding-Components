@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Box, LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { HeaderTitle, NavigationHeader } from '../../../../../components';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../../constants/desktop-interaction-box.constants';
@@ -14,9 +14,9 @@ type DesktopCameraPermissionProps = {
 const DesktopCameraPermission = ({
   permissionState,
 }: DesktopCameraPermissionProps) => {
-  const { t } = useTranslation(
-    'id-doc.pages.desktop-selfie.desktop-camera-permission',
-  );
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.pages.desktop-selfie.desktop-camera-permission',
+  });
 
   return (
     <Container>

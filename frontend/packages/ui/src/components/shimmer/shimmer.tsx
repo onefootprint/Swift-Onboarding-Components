@@ -1,5 +1,6 @@
 import styled, { css, keyframes } from '@onefootprint/styled';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import useSX from '../../hooks/use-sx';
@@ -18,13 +19,17 @@ const Shimmer = ({
   'aria-valuetext': ariaValueText = 'Loading...',
 }: ShimmerProps) => {
   const sxStyles = useSX(sx);
+  const { t } = useTranslation('ui');
+
   return (
     <ShimmerContainer
       aria-hidden={ariaHidden}
       aria-busy="true"
       aria-valuemax={100}
       aria-valuemin={0}
-      aria-valuetext={ariaValueText}
+      aria-valuetext={
+        ariaValueText ?? t('components.shimmer.aria-valuetext-default')
+      }
       data-testid={testID}
       role="progressbar"
       sx={sxStyles}

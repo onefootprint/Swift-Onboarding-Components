@@ -1,7 +1,8 @@
-import { useInputMask, useTranslation } from '@onefootprint/hooks';
+import { useInputMask } from '@onefootprint/hooks';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import { useL10nContext } from '../../../../../../components/l10n-provider';
 import validateDob, { DobValidationError } from './utils/validate-dob';
@@ -9,7 +10,9 @@ import validateDob, { DobValidationError } from './utils/validate-dob';
 type DobFieldProps = { disabled?: boolean };
 
 const DobField = ({ disabled }: DobFieldProps) => {
-  const { t } = useTranslation('kyc.pages.basic-information.form.dob');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyc.pages.basic-information.form.dob',
+  });
   const {
     register,
     getValues,

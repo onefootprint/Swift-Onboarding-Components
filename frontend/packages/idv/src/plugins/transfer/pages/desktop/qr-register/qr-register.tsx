@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoSmartphone224 } from '@onefootprint/icons';
 import type { D2PGenerateResponse } from '@onefootprint/types';
 import { Divider, Grid, Shimmer, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import QRCode from 'react-qr-code';
 
 import { HeaderTitle, NavigationHeader } from '../../../../../components';
@@ -18,7 +18,10 @@ import ContinueOnDesktop from './components/continue-on-desktop';
 const QR_CODE_SIZE = 130;
 
 const QRRegister = () => {
-  const { t, allT } = useTranslation('transfer.pages.desktop.qr-register');
+  const {
+    t,
+    i18n: { language },
+  } = useTranslation('idv');
   const [state, send] = useDesktopMachine();
   const {
     authToken,
@@ -33,6 +36,7 @@ const QRRegister = () => {
   const url = useCreateHandoffUrl({
     authToken: scopedAuthToken,
     onboardingConfig: config,
+    language,
   });
 
   const { mutation, generateScopedAuthToken } = useGenerateScopedAuthToken({
@@ -70,15 +74,15 @@ const QRRegister = () => {
       <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
       <Grid.Container gap={7} textAlign="center">
         <HeaderTitle
-          title={allT(allTKey)}
-          subtitle={t('subtitle')}
+          title={t(allTKey)}
+          subtitle={t('transfer.pages.desktop.qr-register.subtitle')}
           icon={IcoSmartphone224}
         />
         <SmsButtonWithCountdown authToken={scopedAuthToken} url={url} />
         <Divider variant="secondary" />
         <Stack direction="column" align="center" gap={5}>
           <Typography variant="body-2" color="secondary">
-            {t('qr-code.instructions')}
+            {t('transfer.pages.desktop.qr-register.qr-code.instructions')}
           </Typography>
           {isLoading ? (
             <Shimmer

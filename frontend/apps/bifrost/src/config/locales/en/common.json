@@ -1,0 +1,8 @@
+{
+  "pages": {
+    "init-error": {
+      "invalid-config-title": "Integration incorrectly configured",
+      "invalid-config-description": "It seems like the Verify with Footprint integration is using an invalid or expired integration key. Please contact the owner of this product."
+    }
+  }
+}

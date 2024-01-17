@@ -1,9 +1,9 @@
 import type { FootprintVariant } from '@onefootprint/footprint-js';
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoClose24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { IconButton } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type HeaderProps = {
   title?: string;
@@ -12,7 +12,9 @@ type HeaderProps = {
 };
 
 const Header = ({ title, variant, onClose }: HeaderProps) => {
-  const { t } = useTranslation('pages.secure-form.form-dialog.header');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.secure-form.form-dialog.header',
+  });
   const canClose = variant === 'modal' || variant === 'drawer';
   if (!title && !canClose) {
     return null;

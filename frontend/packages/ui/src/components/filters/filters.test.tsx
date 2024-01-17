@@ -1,3 +1,5 @@
+import '../../config/initializers/i18next-test';
+
 import {
   customRender,
   screen,
@@ -372,7 +374,7 @@ describe('<Filters />', () => {
         const popover = screen.getByRole('dialog');
         expect(popover).toBeInTheDocument();
 
-        const allTime = screen.getByRole('radio', { name: 'All-time' });
+        const allTime = screen.getByRole('radio', { name: 'All time' });
         expect(allTime).toBeInTheDocument();
 
         const today = screen.getByRole('radio', { name: 'Today' });

@@ -2,6 +2,7 @@ import { IcoCloseSmall16, IcoInfo16 } from '@onefootprint/icons';
 import styled, { css, keyframes } from '@onefootprint/styled';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
+import { useTranslation } from 'react-i18next';
 
 import LinkButton from '../link-button';
 import Stack from '../stack';
@@ -12,7 +13,7 @@ const DESKTOP_WIDTH = '380px';
 const MOBILE_WIDTH = '90vw';
 
 const Toast = ({
-  closeAriaLabel = 'Close',
+  closeAriaLabel,
   cta,
   description,
   leaving = false,
@@ -20,60 +21,66 @@ const Toast = ({
   testID,
   title,
   variant = 'default',
-}: ToastProps) => (
-  <ToastContainer
-    role="alert"
-    data-leaving={leaving}
-    data-testid={testID}
-    gap={3}
-    align="start"
-    width={isMobile ? MOBILE_WIDTH : DESKTOP_WIDTH}
-  >
-    <Stack align="center" justify="center" marginTop={1}>
-      <StyledIcoInfo16 color={variant === 'error' ? 'error' : undefined} />
-    </Stack>
-    <Stack
-      flexGrow={1}
+}: ToastProps) => {
+  const { t } = useTranslation('ui');
+
+  return (
+    <ToastContainer
+      role="alert"
+      data-leaving={leaving}
+      data-testid={testID}
+      gap={3}
       align="start"
-      justify="flex-start"
-      height="fit-content"
-      direction="column"
-      gap={4}
+      width={isMobile ? MOBILE_WIDTH : DESKTOP_WIDTH}
     >
-      <Stack direction="column">
-        <Typography
-          color={variant === 'error' ? 'error' : 'primary'}
-          variant="label-3"
-          sx={{ marginBottom: 2 }}
-        >
-          {title}
-        </Typography>
-        <Typography color="tertiary" variant="body-3">
-          {description}
-        </Typography>
+      <Stack align="center" justify="center" marginTop={1}>
+        <StyledIcoInfo16 color={variant === 'error' ? 'error' : undefined} />
       </Stack>
-      {cta && (
-        <LinkButton
-          onClick={() => {
-            onClose?.();
-            cta.onClick?.();
-          }}
-          size="compact"
-        >
-          {cta.label}
-        </LinkButton>
-      )}
-    </Stack>
-    <button
-      aria-label={closeAriaLabel}
-      onClick={onClose}
-      tabIndex={0}
-      type="button"
-    >
-      <IcoCloseSmall16 />
-    </button>
-  </ToastContainer>
-);
+      <Stack
+        flexGrow={1}
+        align="start"
+        justify="flex-start"
+        height="fit-content"
+        direction="column"
+        gap={4}
+      >
+        <Stack direction="column">
+          <Typography
+            color={variant === 'error' ? 'error' : 'primary'}
+            variant="label-3"
+            sx={{ marginBottom: 2 }}
+          >
+            {title}
+          </Typography>
+          <Typography color="tertiary" variant="body-3">
+            {description}
+          </Typography>
+        </Stack>
+        {cta && (
+          <LinkButton
+            onClick={() => {
+              onClose?.();
+              cta.onClick?.();
+            }}
+            size="compact"
+          >
+            {cta.label}
+          </LinkButton>
+        )}
+      </Stack>
+      <button
+        aria-label={
+          closeAriaLabel ?? t('components.toast.close-aria-label-default')
+        }
+        onClick={onClose}
+        tabIndex={0}
+        type="button"
+      >
+        <IcoCloseSmall16 />
+      </button>
+    </ToastContainer>
+  );
+};
 
 const slideIn = keyframes`
   to {

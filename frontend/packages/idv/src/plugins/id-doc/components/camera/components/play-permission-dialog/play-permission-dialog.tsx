@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Dialog, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type PlayPermissionDialogProps = {
   open?: boolean;
@@ -13,9 +13,9 @@ const PlayPermissionDialog = ({
   hide,
   onAllow,
 }: PlayPermissionDialogProps) => {
-  const { t } = useTranslation(
-    'id-doc.components.camera.play-permission-dialog',
-  );
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.components.camera.play-permission-dialog',
+  });
 
   return (
     <Dialog

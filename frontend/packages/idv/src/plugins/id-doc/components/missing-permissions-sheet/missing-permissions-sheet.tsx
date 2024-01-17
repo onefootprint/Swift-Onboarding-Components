@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { BottomSheet, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
 
@@ -14,7 +14,9 @@ const MissingPermissionsSheet = ({
   open,
   onClose,
 }: MissingPermissionsSheetProps) => {
-  const { t } = useTranslation('id-doc.components.missing-permissions');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.components.missing-permissions',
+  });
 
   return (
     <BottomSheet open={open} onClose={onClose}>

@@ -1,11 +1,13 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoWarning16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Error = () => {
-  const { t } = useTranslation('kyb.pages.beneficial-owners.form.errors');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyb.pages.beneficial-owners.form.errors',
+  });
 
   return (
     <Container>

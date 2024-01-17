@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { OverallOutcome } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type SandboxOutcomeFooterProps = {
   sandboxId?: string;
@@ -13,7 +13,9 @@ const SandboxOutcomeFooter = ({
   sandboxId,
   overallOutcome,
 }: SandboxOutcomeFooterProps) => {
-  const { t } = useTranslation('identify.components.sandbox-outcome-footer');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'identify.components.sandbox-outcome-footer',
+  });
   const outcomeLabels: Record<OverallOutcome, string> = {
     [OverallOutcome.success]: t('outcome.options.success'),
     [OverallOutcome.manualReview]: t('outcome.options.manual-review'),

@@ -1,6 +1,7 @@
 import styled, { css } from '@onefootprint/styled';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import React, { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { keyframes } from 'styled-components';
 
 import { media } from '../../utils';
@@ -24,10 +25,11 @@ const BottomSheet = ({
   onClose,
   children,
   title,
-  closeAriaLabel = 'Close',
+  closeAriaLabel,
   containerId,
   portalId = 'footprint-footer',
 }: BottomSheetProps) => {
+  const { t } = useTranslation('ui');
   const portalRef = useRef<HTMLElement | null>(null);
   const containerRef = useRef<HTMLElement | null>(null);
 
@@ -64,7 +66,10 @@ const BottomSheet = ({
         <Content role="dialog" onPointerDownOutside={onClose}>
           <Stack maxHeight={componentMaxHeight} direction="column">
             <Header
-              closeAriaLabel={closeAriaLabel}
+              closeAriaLabel={
+                closeAriaLabel ??
+                t('components.bottom-sheet.close-aria-label-default')
+              }
               onClose={onClose}
               title={title}
             />

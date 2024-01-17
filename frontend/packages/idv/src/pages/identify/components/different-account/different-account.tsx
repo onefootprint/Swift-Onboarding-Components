@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, Divider, LinkButton, Stack } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import LegalFooter from '../legal-footer';
 
@@ -10,7 +10,9 @@ type DifferentAccountProps = {
 };
 
 const DifferentAccount = ({ onClick }: DifferentAccountProps) => {
-  const { t } = useTranslation('identify.components.log-in-different-account');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'identify.components.log-in-different-account',
+  });
   return (
     <>
       <DividerContainer justify="center" align="center">

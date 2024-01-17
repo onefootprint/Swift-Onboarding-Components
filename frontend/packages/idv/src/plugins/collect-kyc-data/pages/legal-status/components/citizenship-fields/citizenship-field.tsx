@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoTrash24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { CountrySelect, IconButton } from '@onefootprint/ui';
 import React from 'react';
 import type { ControllerRenderProps, FieldValues } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import { useL10nContext } from '../../../../../../components/l10n-provider';
 
@@ -24,7 +24,9 @@ const CitizenshipField = ({
   hasError,
   hint,
 }: CitizenshipFieldProps) => {
-  const { t } = useTranslation('kyc.pages.legal-status.form');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyc.pages.legal-status.form',
+  });
   const l10n = useL10nContext();
 
   const citizenshipSelect = (

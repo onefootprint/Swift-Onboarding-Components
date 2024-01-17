@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
 import { media, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import type { FormData } from '../../../../types';
@@ -12,7 +12,9 @@ type NameProps = {
 };
 
 const Name = ({ index }: NameProps) => {
-  const { t } = useTranslation('kyb.pages.beneficial-owners.form.fields');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyb.pages.beneficial-owners.form.fields',
+  });
   const {
     register,
     formState: { errors },

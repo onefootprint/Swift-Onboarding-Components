@@ -1,6 +1,6 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
 import { COUNTRIES, DEFAULT_COUNTRY } from '@onefootprint/global-constants';
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import type { CountryCode, SubmitDocTypeResponse } from '@onefootprint/types';
@@ -17,6 +17,7 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useL10nContext } from '../../../../../components/l10n-provider';
 import HeaderTitle from '../../../../../components/layout/components/header-title';
@@ -59,7 +60,9 @@ const IdDocCountryAndTypeContainer = ({
   onSubmitDocTypeSuccess,
   onConsentSubmit,
 }: IdDocCountryAndTypeContainerProps) => {
-  const { t } = useTranslation('id-doc.pages.country-and-type-selection');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.pages.country-and-type-selection',
+  });
   const [state] = useIdDocMachine();
   const submitDocTypeMutation = useSubmitDocType();
   const { isLoading: isDocTypeSubmissionLoading } = submitDocTypeMutation;

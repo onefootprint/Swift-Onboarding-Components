@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import useInputValidations from '../../hooks/use-input-validations';
 import type { FormData } from '../../types';
@@ -13,7 +13,9 @@ const ZipField = () => {
     watch,
     getValues,
   } = useFormContext<FormData>();
-  const { t } = useTranslation('kyc.pages.residential-address.form.zipCode');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyc.pages.residential-address.form.zipCode',
+  });
   const country = watch('country');
   const { zipcode } = useInputValidations(country.value);
   const isCountryUs = country.value === 'US';

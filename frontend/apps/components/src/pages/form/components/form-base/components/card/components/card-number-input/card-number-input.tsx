@@ -1,9 +1,9 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { useTranslation } from '@onefootprint/hooks';
 import type { InputProps } from '@onefootprint/ui';
 import { InternalInput } from '@onefootprint/ui';
 import creditcardutils from 'creditcardutils';
 import React, { forwardRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import CardIcon from './components/card-icon';
 
@@ -27,7 +27,9 @@ const CardNumberInput = forwardRef<HTMLInputElement, CardNumberInputProps>(
     { hasError, hint, onChange, label, value, ...props }: CardNumberInputProps,
     ref,
   ) => {
-    const { t } = useTranslation('pages.secure-form.card.form.number');
+    const { t } = useTranslation('common', {
+      keyPrefix: 'pages.secure-form.card.form.number',
+    });
     const [brand, setBrand] = useState('');
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

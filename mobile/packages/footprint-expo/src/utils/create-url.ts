@@ -8,10 +8,12 @@ const encode = (obj?: Record<string, unknown>): string => {
 
 const createUrl = ({
   appearance,
+  l10n,
   redirectUrl,
   token,
 }: {
   appearance?: FootprintVerifyProps['appearance'];
+  l10n?: FootprintVerifyProps['l10n'];
   redirectUrl: string;
   token: string;
 }) => {
@@ -30,6 +32,9 @@ const createUrl = ({
     }
     if (appearance.fontSrc) {
       searchParams.append('font_src', appearance.fontSrc);
+    }
+    if (l10n?.language) {
+      searchParams.append('lng', l10n.language);
     }
   }
 

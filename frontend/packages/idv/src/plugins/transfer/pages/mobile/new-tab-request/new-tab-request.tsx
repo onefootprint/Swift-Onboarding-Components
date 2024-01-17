@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { D2PGenerateResponse } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useL10nContext } from '../../../../../components/l10n-provider';
 import HeaderTitle from '../../../../../components/layout/components/header-title';
@@ -12,7 +12,12 @@ import useMobileMachine from '../../../hooks/mobile/use-mobile-machine';
 import useGenerateScopedAuthToken from '../../../hooks/use-generate-scoped-auth-token';
 
 const NewTabRequest = () => {
-  const { t } = useTranslation('transfer.pages.mobile.new-tab-requested');
+  const {
+    t,
+    i18n: { language },
+  } = useTranslation('idv', {
+    keyPrefix: 'transfer.pages.mobile.new-tab-requested',
+  });
   const [state, send] = useMobileMachine();
   const { authToken, device, config, scopedAuthToken, idDocOutcome } =
     state.context;
@@ -20,6 +25,7 @@ const NewTabRequest = () => {
   const url = useCreateHandoffUrl({
     authToken: scopedAuthToken,
     onboardingConfig: config,
+    language,
   });
   const { mutation } = useGenerateScopedAuthToken({
     authToken,

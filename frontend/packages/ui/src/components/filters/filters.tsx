@@ -1,6 +1,7 @@
 import styled, { css } from '@onefootprint/styled';
 import noop from 'lodash/noop';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import LinkButton from '../link-button';
 import Control from './components/control';
@@ -20,6 +21,7 @@ const Filters = ({
   onChange = noop,
   onClear = noop,
 }: FiltersProps) => {
+  const { t } = useTranslation('ui');
   const hasSelectedOptions = controls.some(
     control => control.selectedOptions && control.selectedOptions.length > 0,
   );
@@ -39,7 +41,7 @@ const Filters = ({
       {hasSelectedOptions && (
         <ClearFiltersContainer>
           <LinkButton onClick={onClear} size="compact">
-            Clear filters
+            {t('components.filters.clear-filters')}
           </LinkButton>
         </ClearFiltersContainer>
       )}

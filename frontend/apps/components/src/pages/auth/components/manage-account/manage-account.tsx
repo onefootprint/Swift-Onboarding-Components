@@ -1,7 +1,7 @@
 import type { T } from '@onefootprint/hooks';
-import { useTranslation } from '@onefootprint/hooks';
 import type { ComponentProps } from 'react';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ManageAccountComponent from './component';
 
@@ -38,7 +38,9 @@ const getEditFlowTexts = (t: T): Texts => ({
 });
 
 const ManageAccount = ({ children, Header }: ManageAccountProps) => {
-  const { t } = useTranslation('pages.auth');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.auth',
+  });
 
   return (
     <ManageAccountComponent

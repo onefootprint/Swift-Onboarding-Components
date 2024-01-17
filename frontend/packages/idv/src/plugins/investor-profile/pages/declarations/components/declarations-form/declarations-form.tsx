@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   InvestorProfileDeclaration,
   InvestorProfileDI,
@@ -6,6 +5,7 @@ import {
 import { Checkbox, TextInput } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import CustomForm from '../../../../components/custom-form';
 import type { DeclarationData } from '../../../../utils/state-machine/types';
@@ -39,7 +39,9 @@ const DeclarationsForm = ({
   isLoading,
   onSubmit,
 }: DeclarationsFormProps) => {
-  const { t } = useTranslation('investor-profile.pages.declarations');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'investor-profile.pages.declarations',
+  });
   const defaultEntries = (
     defaultValues?.[InvestorProfileDI.declarations] ?? []
   ).map(goal => [goal, true]);

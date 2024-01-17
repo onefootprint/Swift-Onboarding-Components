@@ -2,6 +2,7 @@ import type { Color } from '@onefootprint/design-tokens';
 import { IcoSpinner16, IcoSpinner24 } from '@onefootprint/icons';
 import styled, { keyframes } from '@onefootprint/styled';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type LoadingIndicatorProps = {
   'aria-label'?: string;
@@ -11,19 +12,29 @@ export type LoadingIndicatorProps = {
 };
 
 const LoadingIndicator = ({
-  'aria-label': ariaLabel = 'Loading...',
+  'aria-label': ariaLabel,
   color = 'primary',
   size = 'default',
   testID,
-}: LoadingIndicatorProps) => (
-  <Container data-testid={testID} aria-label={ariaLabel} role="progressbar">
-    {size === 'default' ? (
-      <IcoSpinner24 color={color} />
-    ) : (
-      <IcoSpinner16 color={color} />
-    )}
-  </Container>
-);
+}: LoadingIndicatorProps) => {
+  const { t } = useTranslation('ui');
+
+  return (
+    <Container
+      data-testid={testID}
+      aria-label={
+        ariaLabel ?? t('components.loading-indicator.aria-label-default')
+      }
+      role="progressbar"
+    >
+      {size === 'default' ? (
+        <IcoSpinner24 color={color} />
+      ) : (
+        <IcoSpinner16 color={color} />
+      )}
+    </Container>
+  );
+};
 
 const rotate = keyframes`
   from {

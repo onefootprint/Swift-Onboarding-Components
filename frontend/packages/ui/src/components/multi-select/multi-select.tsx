@@ -1,5 +1,6 @@
 import { useTheme } from '@onefootprint/styled';
 import React, { useId } from 'react';
+import { useTranslation } from 'react-i18next';
 import type {
   ActionMeta,
   GroupBase,
@@ -59,7 +60,7 @@ const MultiSelect = <
   autoFocus,
   defaultValue,
   disabled,
-  emptyStateText = 'No results found',
+  emptyStateText,
   id: baseId,
   label,
   name,
@@ -68,7 +69,7 @@ const MultiSelect = <
   onFocus,
   onInputChange,
   options: initialOptions = [],
-  placeholder = 'Search...',
+  placeholder,
   required,
   hasError = false,
   hint,
@@ -76,6 +77,7 @@ const MultiSelect = <
   value,
   allOption,
 }: MultiSelectProps<Option, Group>) => {
+  const { t } = useTranslation('ui');
   const internalId = useId();
   const id = baseId || internalId;
   const theme = useTheme();
@@ -120,6 +122,9 @@ const MultiSelect = <
     }
   };
 
+  const getNoOptionsMessage = () =>
+    emptyStateText ?? t('components.multi-select.empty-state-text-default');
+
   return (
     <Box>
       {label && (
@@ -147,14 +152,16 @@ const MultiSelect = <
         isMulti
         menuPlacement="auto"
         name={name}
-        noOptionsMessage={() => emptyStateText}
+        noOptionsMessage={getNoOptionsMessage}
         onBlur={onBlur}
         onChange={handleChange}
         onFocus={onFocus}
         onInputChange={onInputChange}
         openMenuOnFocus
         options={options}
-        placeholder={placeholder}
+        placeholder={
+          placeholder ?? t('components.multi-select.placeholder-default')
+        }
         required={required}
         value={value}
         styles={{

@@ -3,7 +3,7 @@ import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 
-import options from '../../../../config/locales/english.json';
+import options from '../../../../config/locales/en/common.json';
 
 const tableOptions = options.pages.compare.table;
 

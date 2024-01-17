@@ -17,7 +17,7 @@ const getURL = (props: Props, token: string) => {
 };
 
 const getBifrostURL = (props: VerifyProps, token: string): string => {
-  const { appearance, variant, kind } = props;
+  const { appearance, variant, kind, l10n } = props;
   const { fontSrc, rules, variables } = getEncodedAppearance(appearance);
   const url = process.env.BIFROST_URL;
   const searchParams = new URLSearchParams();
@@ -31,6 +31,9 @@ const getBifrostURL = (props: VerifyProps, token: string): string => {
   if (fontSrc) {
     searchParams.append('font_src', fontSrc);
   }
+  if (l10n?.language) {
+    searchParams.append('lng', l10n.language);
+  }
   searchParams.append('variant', variant ?? getDefaultVariantForKind(kind));
 
   const searchParamsStr = searchParams.toString();
@@ -38,7 +41,7 @@ const getBifrostURL = (props: VerifyProps, token: string): string => {
 };
 
 const getComponentsURL = (props: Props, token: string): string => {
-  const { appearance, kind, variant } = props;
+  const { appearance, kind, variant, l10n } = props;
   const { fontSrc, rules, variables } = getEncodedAppearance(appearance);
   const url = process.env.COMPONENTS_URL;
   const searchParams = new URLSearchParams();
@@ -51,6 +54,9 @@ const getComponentsURL = (props: Props, token: string): string => {
   }
   if (fontSrc) {
     searchParams.append('font_src', fontSrc);
+  }
+  if (l10n?.language) {
+    searchParams.append('lng', l10n.language);
   }
   searchParams.append('variant', variant ?? getDefaultVariantForKind(kind));
 

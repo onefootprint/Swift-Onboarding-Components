@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { InvestorProfileData } from '@onefootprint/types';
 import {
   InvestorProfileDI,
@@ -7,6 +6,7 @@ import {
 import { Radio } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import CustomForm from '../../../../components/custom-form';
 import type { NetWorthData } from '../../../../utils/state-machine/types';
@@ -26,7 +26,9 @@ const NetWorthForm = ({
   defaultValues,
   onSubmit,
 }: NetWorthFormProps) => {
-  const { t } = useTranslation('investor-profile.pages.net-worth');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'investor-profile.pages.net-worth',
+  });
   const { handleSubmit, register } = useForm<FormData>({
     defaultValues: {
       netWorth:

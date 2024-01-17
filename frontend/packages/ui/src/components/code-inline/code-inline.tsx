@@ -1,5 +1,6 @@
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { createFontStyles } from '../../utils/mixins';
 import CopyButton from '../copy-button';
@@ -16,15 +17,17 @@ export type CodeInlineProps = {
 };
 
 const CodeInline = ({
-  ariaLabel = 'Copy to clipboard',
+  ariaLabel,
   children,
   disabled,
-  tooltipText = 'Copy to clipboard',
-  tooltipTextConfirmation = 'Copied!',
+  tooltipText,
+  tooltipTextConfirmation,
   truncate,
   isPrivate,
   size = 'default',
 }: CodeInlineProps) => {
+  const { t } = useTranslation('ui');
+
   if (disabled) {
     return (
       <CodeContent
@@ -39,10 +42,15 @@ const CodeInline = ({
 
   return (
     <CopyButton
-      ariaLabel={ariaLabel}
       contentToCopy={children}
-      tooltipText={tooltipText}
-      tooltipTextConfirmation={tooltipTextConfirmation}
+      ariaLabel={ariaLabel ?? t('components.code-inline.aria-label-default')}
+      tooltipText={
+        tooltipText ?? t('components.code-inline.tooltip-text-default')
+      }
+      tooltipTextConfirmation={
+        tooltipTextConfirmation ??
+        t('components.code-inline.tooltip-text-confirmation-default')
+      }
     >
       <CodeContent
         data-truncate={truncate}

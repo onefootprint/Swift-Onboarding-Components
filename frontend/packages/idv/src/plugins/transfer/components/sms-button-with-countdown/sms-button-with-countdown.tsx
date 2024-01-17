@@ -1,7 +1,8 @@
-import { useCountdown, useTranslation } from '@onefootprint/hooks';
+import { useCountdown } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { Button, Stack, Typography, useToast } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { useD2PSms } from '../../../../hooks/api';
@@ -18,7 +19,9 @@ const SmsButtonWithCountdown = ({
   url,
   authToken,
 }: SmsButtonWithCountdownProps) => {
-  const { t } = useTranslation('transfer.components.sms-button-with-countdown');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'transfer.components.sms-button-with-countdown',
+  });
   const { countdown, setSeconds } = useCountdown({
     onCompleted: () => setIsDisabled(false),
   });

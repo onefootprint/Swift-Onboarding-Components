@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDocOutcome, OverallOutcome } from '@onefootprint/types';
 import { Box, Select, Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import useSandboxOutcomeOptions from '../../hooks/use-sandbox-outcome-options';
 
@@ -13,7 +13,9 @@ type OverallOutcomeSelectProps = {
 };
 
 const OverallOutcomeSelect = ({ config }: OverallOutcomeSelectProps) => {
-  const { t } = useTranslation('global.pages.sandbox-outcome.overall-outcome');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'global.pages.sandbox-outcome.overall-outcome',
+  });
   const {
     overallOutcomeOptions: {
       overallOutcomeSuccess,

@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { ChallengeKind } from '@onefootprint/types';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import getCanChallengeBiometrics from '../../../../utils/get-can-challenge-biometrics';
 import getScrubbedPhoneNumber from '../../../../utils/get-scrubbed-phone-number';
@@ -15,7 +15,9 @@ const IS_TEST = typeof jest !== 'undefined';
 const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 100 : 1500;
 
 const SmsChallenge = () => {
-  const { t } = useTranslation('identify.pages.sms-challenge');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'identify.pages.sms-challenge',
+  });
   const [state, send] = useIdentifyMachine();
   const {
     initialAuthToken,

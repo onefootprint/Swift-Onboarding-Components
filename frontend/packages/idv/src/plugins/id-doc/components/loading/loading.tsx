@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { IdDocImageTypes } from '@onefootprint/types';
 import { LoadingIndicator, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type Step = 'process' | 'upload' | 'analyze';
 
@@ -17,7 +17,9 @@ const Loading = ({
   step,
   showSlowConnectionMessage,
 }: LoadingProps) => {
-  const { t } = useTranslation('id-doc.components.loading');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.components.loading',
+  });
 
   return (
     <Container>

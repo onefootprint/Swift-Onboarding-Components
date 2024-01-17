@@ -1,19 +1,7 @@
 {
-  "global": {
-    "errors": {
-      "uncaught-error": {
-        "title": "¡Ups! Ha ocurrido un error.",
-        "description": "Lo sentimos. Por favor, comienza la verificación nuevamente.",
-        "cta": "Reiniciar"
-      }
-    }
-  },
   "components": {
     "layout": {
-      "secured-by-footprint": "Asegurado por Footprint",
-      "sandbox-banner": "Modo Sandbox",
-      "privacy": "Privacidad",
-      "whats-this": "¿Qué es esto?",
+      "sandbox-banner": "Modo de prueba",
       "app-footer": {
         "links": {
           "terms": "Términos de Servicio",
@@ -28,7 +16,7 @@
       "header": {
         "bo-kyc": {
           "title": "{{tenantName}} quiere verificar tu empresa",
-          "subtitle": "{{otherBoName}} está verificando {{businessName}}, y fuiste identificado como un propietario. Por ello, necesitamos verificar tu identidad primero."
+          "subtitle": "{{otherBoName}} está verificando su empresa {{businessName}}. Ha sido usted identificado como propietario y por ello necesitamos verificar su identidad."
         },
         "kyb": {
           "title": "{{tenantName}} quiere verificar tu empresa",
@@ -36,7 +24,7 @@
         },
         "kyc": {
           "title": "{{tenantName}} quiere verificar tu identidad",
-          "subtitle": "{{tenantName}} necesita recopilar su información personal para verificar los datos de su empresa."
+          "subtitle": "{{tenantName}} necesita recopilar su información personal y así poder verificar los datos de su empresa."
         }
       },
       "cta": {
@@ -49,9 +37,9 @@
       "subtitle": "Por favor, contacta a la empresa que te lo envió e inténtalo de nuevo."
     },
     "complete": {
-      "title": "¡Verificación terminada con éxito!",
-      "subtitle-with-kyb": "Gracias por usar Footprint para verificar tu empresa y tu identidad.",
-      "subtitle": "Gracias por usar Footprint para verificar tu identidad.",
+      "title": "¡Verificación finalizada!",
+      "subtitle-with-kyb": "Gracias por usar Footprint.",
+      "subtitle": "Gracias por usar Footprint.",
       "cta": "Volver al sitio"
     },
     "expired": {

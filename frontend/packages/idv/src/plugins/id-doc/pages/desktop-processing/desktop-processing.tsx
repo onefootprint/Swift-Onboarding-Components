@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import type { IdDocImageTypes, ProcessDocResponse } from '@onefootprint/types';
 import { IdDocImageProcessingError } from '@onefootprint/types';
 import { Button, media, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEffectOnce, useTimeout } from 'usehooks-ts';
 
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
@@ -25,7 +25,9 @@ import useProcessDoc from '../../hooks/use-process-doc';
 import useSubmitDoc from '../../hooks/use-submit-doc';
 
 const DeskTopProcessing = () => {
-  const { t } = useTranslation('id-doc.pages.desktop-processing');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.pages.desktop-processing',
+  });
   const [state, send] = useIdDocMachine();
   const submitDocMutation = useSubmitDoc();
   const processDocMutation = useProcessDoc();

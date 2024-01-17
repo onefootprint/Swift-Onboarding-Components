@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoUserCircle24 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
 import type { DecryptUserResponse } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type {
   SectionAction,
@@ -55,16 +55,19 @@ const getIdentitiesSections = (
 
   const ssnDisplayVal =
     ssnValueType === SsnValue.skipped
-      ? t('identity.ssn-skipped-subtext')
+      ? t('confirm.identity.ssn-skipped-subtext')
       : ssnFormatter(ssnKind, ssn?.value, ssnValueType === SsnValue.hidden);
 
-  const text = ssnKind === 'ssn9' ? t('identity.ssn9') : t('identity.ssn4');
+  const text =
+    ssnKind === 'ssn9'
+      ? t('confirm.identity.ssn9')
+      : t('confirm.identity.ssn4');
 
   return [{ text, subtext: ssnDisplayVal }];
 };
 
 const IdentitySection = () => {
-  const { t, allT } = useTranslation('kyc.pages.confirm');
+  const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages' });
   const [editing, setEditing] = useState(false);
   const [state, send] = useCollectKycDataMachine();
   const { authToken, device, data, requirement } = state.context;
@@ -131,8 +134,8 @@ const IdentitySection = () => {
 
   const showErrorToast = () => {
     toast.show({
-      title: t('summary.reveal-error.title'),
-      description: t('summary.reveal-error.description'),
+      title: t('confirm.summary.reveal-error.title'),
+      description: t('confirm.summary.reveal-error.description'),
       variant: 'error',
     });
   };
@@ -212,7 +215,7 @@ const IdentitySection = () => {
   const actions: SectionAction[] = [];
   if (!editing) {
     actions.push({
-      label: allT('kyc.pages.confirm.summary.edit'),
+      label: t('confirm.summary.edit'),
       onClick: () => setEditing(true),
       actionTestID: 'identity-edit-button',
     });
@@ -221,13 +224,13 @@ const IdentitySection = () => {
     if (canReveal) {
       if (ssnValueType === SsnValue.revealed) {
         actions.unshift({
-          label: allT('kyc.pages.confirm.summary.hide'),
+          label: t('confirm.summary.hide'),
           onClick: () => setSsnValueType(SsnValue.hidden),
           actionTestID: 'identity-hide-button',
         });
       } else {
         actions.unshift({
-          label: allT('kyc.pages.confirm.summary.reveal'),
+          label: t('confirm.summary.reveal'),
           onClick: handleReveal,
           isLoading: isStepUpLoading,
           actionTestID: 'identity-reveal-button',
@@ -242,7 +245,7 @@ const IdentitySection = () => {
 
   return (
     <Section
-      title={t('identity.title')}
+      title={t('confirm.identity.title')}
       actions={actions}
       IconComponent={IcoUserCircle24}
       content={getSectionContent()}

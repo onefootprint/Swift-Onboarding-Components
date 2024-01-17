@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { IdDocImageTypes } from '@onefootprint/types';
 import { Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTimeout } from 'usehooks-ts';
 
 import { imageIcons } from '../../constants/image-types';
@@ -13,7 +13,9 @@ type NextSideProps = {
 };
 
 const NextSide = ({ nextSideImageType, onComplete }: NextSideProps) => {
-  const { t } = useTranslation('id-doc.components.next-side');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.components.next-side',
+  });
   const Icon = imageIcons[nextSideImageType];
 
   useTimeout(() => {

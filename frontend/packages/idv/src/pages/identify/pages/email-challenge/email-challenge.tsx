@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { ChallengeKind } from '@onefootprint/types';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ChallengeHeader from '../../components/challenge-header';
 import DifferentAccount from '../../components/different-account';
@@ -13,7 +13,9 @@ const IS_TEST = typeof jest !== 'undefined';
 const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 100 : 1500;
 
 const EmailChallenge = () => {
-  const { t } = useTranslation('identify.pages.email-challenge');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'identify.pages.email-challenge',
+  });
   const [state, send] = useIdentifyMachine();
   const {
     bootstrapData,

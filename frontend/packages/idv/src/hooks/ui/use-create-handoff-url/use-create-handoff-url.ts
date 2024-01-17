@@ -6,10 +6,12 @@ const useCreateHandoffUrl = ({
   authToken,
   onboardingConfig,
   baseUrl = HANDOFF_BASE_URL,
+  language = 'en',
 }: {
   authToken?: string;
   onboardingConfig?: PublicOnboardingConfig;
   baseUrl?: string;
+  language?: string;
 }) =>
   useMemo(() => {
     if (!authToken || !onboardingConfig) {
@@ -30,10 +32,13 @@ const useCreateHandoffUrl = ({
     const params = new URLSearchParams();
     const randomSeed = Math.floor(Math.random() * 1000).toString();
     params.append('r', randomSeed);
+    if (language !== 'en') {
+      params.append('lng', language);
+    }
     newUrl.search = params.toString();
-
     newUrl.hash = encodeURI(authToken);
+
     return newUrl.toString();
-  }, [authToken, onboardingConfig, baseUrl]);
+  }, [authToken, onboardingConfig, baseUrl, language]);
 
 export default useCreateHandoffUrl;

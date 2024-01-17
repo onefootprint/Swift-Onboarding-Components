@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import {
   IdDocImageProcessingError,
@@ -6,6 +5,7 @@ import {
 } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { NavigationHeader } from '../../../../components';
 import DesktopHeader from '../../components/desktop-header';
@@ -15,7 +15,9 @@ import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import { getCountryFromCode } from '../../utils/get-country-from-code';
 
 const DesktopSelfieRetry = () => {
-  const { t } = useTranslation('id-doc.pages.desktop-selfie-retry');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.pages.desktop-selfie-retry',
+  });
   const [state, send] = useIdDocMachine();
   const {
     idDoc: { type, country },

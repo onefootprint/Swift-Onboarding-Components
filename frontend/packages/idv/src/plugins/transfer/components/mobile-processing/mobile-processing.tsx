@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { D2PStatus } from '@onefootprint/types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useGetD2PStatus } from '../../../../hooks';
 import useHandleD2PStatusUpdate from '../../hooks/mobile/use-handle-d2p-status-update';
@@ -16,7 +16,7 @@ type MobileProcessingProps = {
 const MobileProcessing = ({ translationKey }: MobileProcessingProps) => {
   const [state, send] = useMobileMachine();
   const { scopedAuthToken, missingRequirements, tab } = state.context;
-  const { t, allT } = useTranslation(translationKey);
+  const { t } = useTranslation(translationKey);
   const allTKey = getRequirementsTitleTranslationKey(missingRequirements);
 
   const { handleSuccess, handleError } = useHandleD2PStatusUpdate();
@@ -53,7 +53,7 @@ const MobileProcessing = ({ translationKey }: MobileProcessingProps) => {
 
   return (
     <Processing
-      title={allT(allTKey)}
+      title={t(allTKey)}
       subtitle={t('subtitle')}
       cta={t('cancel')}
       onCancel={cancelD2P}

@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type {
   InvestorProfileData,
   UserDataResponse,
 } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
+import { useTranslation } from 'react-i18next';
 
 import { useUserData } from '../../../hooks';
 
@@ -18,7 +18,9 @@ type SyncDataArgs = {
 
 const useSyncData = () => {
   const investorProfileDataMutation = useUserData();
-  const { t } = useTranslation('investor-profile.components.sync-data-error');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'investor-profile.components.sync-data-error',
+  });
   const toast = useToast();
 
   const syncData = ({

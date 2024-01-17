@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { BeneficialOwner } from '@onefootprint/types';
 import {
   BeneficialOwnerDataAttribute,
@@ -8,6 +7,7 @@ import {
 } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import Logger from '../../../../utils/logger';
@@ -40,7 +40,9 @@ const BeneficialOwners = ({
   } = state.context;
   const { mutation, syncData } = useSyncData();
   const checkDuplicateContacts = useCheckDuplicateContacts();
-  const { t } = useTranslation('kyb.pages.beneficial-owners');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyb.pages.beneficial-owners',
+  });
   const requireMultiKyc = missingAttributes.includes(
     CollectedKybDataOption.kycedBeneficialOwners,
   );

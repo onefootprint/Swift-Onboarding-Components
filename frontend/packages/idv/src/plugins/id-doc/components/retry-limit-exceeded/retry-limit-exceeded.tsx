@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoRepeat40, IcoWarning16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTimeout } from 'usehooks-ts';
 
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
@@ -12,7 +12,9 @@ import FeedbackIcon from '../feedback-icon';
 import { useIdDocMachine } from '../machine-provider';
 
 const RetryLimitExceeded = () => {
-  const { t } = useTranslation('id-doc.components.retry-limit-exceeded');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.components.retry-limit-exceeded',
+  });
 
   const [, send] = useIdDocMachine();
 

@@ -1,6 +1,7 @@
 import styled, { css } from '@onefootprint/styled';
 import FocusTrap from 'focus-trap-react';
 import React, { useId, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLockedBody } from 'usehooks-ts';
 
 import { useEventListener, useOnClickOutside } from '../../../../../../hooks';
@@ -16,6 +17,7 @@ export type PopoverProps = {
 };
 
 const Popover = ({ children, id, onClose, title }: PopoverProps) => {
+  const { t } = useTranslation('ui');
   const headerId = useId();
   const bodyId = useId();
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -45,7 +47,7 @@ const Popover = ({ children, id, onClose, title }: PopoverProps) => {
         </Body>
         <Footer>
           <Button onClick={onClose} size="small" variant="secondary">
-            Cancel
+            {t('components.filters.popover.cancel')}
           </Button>
           <Button
             form="filter-form"
@@ -53,7 +55,7 @@ const Popover = ({ children, id, onClose, title }: PopoverProps) => {
             type="submit"
             variant="primary"
           >
-            Apply
+            {t('components.filters.popover.apply')}
           </Button>
         </Footer>
       </PopoverContainer>

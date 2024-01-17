@@ -1,10 +1,11 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoFaceid24 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
 import type { Identifier, LoginChallengeResponse } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
 import { Button, Typography, useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useIdentifyVerify from '../../../../../../hooks/api/hosted/identify/use-identify-verify';
 import useLoginChallenge from '../../../../../../hooks/api/hosted/identify/use-login-challenge';
@@ -13,7 +14,9 @@ import Logger from '../../../../../../utils/logger';
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 
 const Biometric = () => {
-  const { t } = useTranslation('identify.pages.biometric-challenge');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'identify.pages.biometric-challenge',
+  });
   const [state, send] = useIdentifyMachine();
   const {
     identify: { successfulIdentifier, sandboxId },

@@ -1,4 +1,4 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoFaceid24 } from '@onefootprint/icons';
 import { getBiometricChallengeResponse } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
@@ -6,6 +6,7 @@ import type { LoginChallengeResponse } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
 import { Button, Typography, useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useIdentifyVerify, useLoginChallenge } from '../../hooks';
 import { useAuthMachine } from '../../state';
@@ -16,7 +17,9 @@ const Biometric = () => {
     identify: { successfulIdentifier, sandboxId },
     obConfigAuth,
   } = state.context;
-  const { t } = useTranslation('pages.auth.passkey-challenge');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.auth.passkey-challenge',
+  });
   const showRequestErrorToast = useRequestErrorToast();
   const toast = useToast();
   const loginChallengeMutation = useLoginChallenge();

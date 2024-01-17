@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { PinInput, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { ResendButtonProps } from './components/resend-button';
 import ResendButton from './components/resend-button';
@@ -28,7 +28,9 @@ const Form = ({
   onResend,
   isResendLoading,
 }: FormProps) => {
-  const { t } = useTranslation('identify.components.pin-verification');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'identify.components.pin-verification',
+  });
 
   if (isSuccess) {
     return <Success />;

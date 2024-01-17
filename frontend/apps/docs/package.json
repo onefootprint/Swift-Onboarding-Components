@@ -3,16 +3,17 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3009",
-    "build": "next build",
+    "i18n-build": "copy-and-watch --clean ../../packages/ui/src/config/locales/en/ui.json ./src/config/locales/en/*.json ./public/locales/en/",
+    "i18n-watch": "copy-and-watch --clean --watch ../../packages/ui/src/config/locales/en/ui.json ./src/config/locales/en/*.json ./public/locales/en/",
+    "dev": "yarn i18n-watch & next dev -p 3009",
+    "build": "yarn i18n-build && next build",
     "build:analyze": "ANALYZE=true yarn build",
     "start": "next start -p 3009",
-    "lint": "eslint src --fix",
-    "lint:ci": "eslint src",
-    "format": "prettier --check \"**/*.{ts,tsx,md,mdx}\"",
-    "format:fix": "prettier --write \"**/*.{ts,tsx,md,mdx}\"",
-    "typecheck": "yarn tsc --noEmit",
-    "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
+    "lint": "yarn i18n-build && eslint src --fix",
+    "lint:ci": "yarn i18n-build && eslint src",
+    "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "typecheck": "yarn i18n-build && yarn tsc --noEmit",
+    "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules && rm -rf ./public/locales/",
     "set:dot-env": "sh ../../scripts/set-dot-env.sh"
   },
   "dependencies": {
@@ -53,6 +54,7 @@
     "i18next": "^23.7.16",
     "react-i18next": "^14.0.0",
     "tsconfig": "*",
+    "copy-and-watch": "^0.1.6",
     "typescript": "4.9.5"
   },
   "jest": {

@@ -1,15 +1,17 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { HeaderTitle, NavigationHeader } from '@onefootprint/idv';
 import styled from '@onefootprint/styled';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHandoffMachine from '../../hooks/use-handoff-machine';
 
 const Canceled = () => {
   const [state] = useHandoffMachine();
   const { opener } = state.context;
-  const { t } = useTranslation('pages.canceled');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.canceled.subtitle',
+  });
 
   return (
     <Container>
@@ -17,9 +19,7 @@ const Canceled = () => {
         <NavigationHeader />
         <HeaderTitle
           title={t('title')}
-          subtitle={
-            opener === 'mobile' ? t('subtitle.mobile') : t('subtitle.desktop')
-          }
+          subtitle={opener === 'mobile' ? t('mobile') : t('desktop')}
         />
       </Box>
     </Container>

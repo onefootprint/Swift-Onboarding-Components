@@ -1,15 +1,15 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckCircle40 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
 import { Box, LinkButton, LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { HeaderTitle, NavigationHeader } from '../../components';
 import useIdvMachine from '../../hooks/ui/use-idv-machine';
 import useIsKyb from './hooks/use-is-kyb';
 
 const Complete = () => {
-  const { t } = useTranslation('global.pages.complete');
+  const { t } = useTranslation('idv', { keyPrefix: 'global.pages.complete' });
   const [state] = useIdvMachine();
   const { isLoading, isKyb } = useIsKyb();
   const { onClose } = state.context;

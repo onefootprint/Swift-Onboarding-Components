@@ -1,5 +1,4 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
-import { useTranslation } from '@onefootprint/hooks';
 import type {
   BeneficialOwner,
   PublicOnboardingConfig,
@@ -8,6 +7,7 @@ import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
 import { Divider, Grid, Typography, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
 import { useL10nContext } from '../../../../../../components/l10n-provider';
@@ -36,7 +36,9 @@ const Form = ({
   config,
 }: FormProps) => {
   const [animate] = useAutoAnimate<HTMLFormElement>();
-  const { t } = useTranslation('kyb.pages.beneficial-owners.form');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyb.pages.beneficial-owners.form',
+  });
   const toast = useToast();
   const l10n = useL10nContext();
   const defaultBeneficialOwnersData = defaultValues ?? [

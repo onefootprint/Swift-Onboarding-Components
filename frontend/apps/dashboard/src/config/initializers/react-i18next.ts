@@ -1,3 +1,4 @@
+import { enUiJson as ui } from '@onefootprint/ui';
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
@@ -8,27 +9,32 @@ import internal from '../locales/en/internal.json';
 import users from '../locales/en/users.json';
 
 const configureReactI18next = () => {
-  const resources = {
-    en: {
-      default: en,
-      users,
-      businesses,
-      'domain-restrictions': domainRestrictions,
-      internal,
+  i18next.use(initReactI18next).init({
+    resources: {
+      en: {
+        default: en,
+        businesses,
+        internal,
+        users,
+        'domain-restrictions': domainRestrictions,
+        ui,
+      },
     },
-  };
-  const I18NOptions = {
-    resources,
     lng: 'en',
     defaultNS: 'default',
-    ns: ['default', 'businesses', 'internal', 'users', 'domain-restrictions'],
+    ns: [
+      'default',
+      'businesses',
+      'internal',
+      'users',
+      'domain-restrictions',
+      'ui',
+    ],
     returnNull: false,
     interpolation: {
       escapeValue: false,
     },
-  };
-
-  i18next.use(initReactI18next).init(I18NOptions);
+  });
   return i18next;
 };
 

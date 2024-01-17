@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText24 } from '@onefootprint/icons';
 import { BusinessDI } from '@onefootprint/types';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { SectionAction } from '../../../../../../components/confirm-collected-data';
 import {
@@ -13,7 +13,7 @@ import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-mac
 import BasicData from '../../../basic-data';
 
 const BasicDataSection = () => {
-  const { allT, t } = useTranslation('kyb.pages.confirm.basic-data');
+  const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.confirm' });
   const [state] = useCollectKybDataMachine();
   const { data } = state.context;
   const [editing, setEditing] = useState(false);
@@ -23,7 +23,7 @@ const BasicDataSection = () => {
   const name = data[BusinessDI.name];
   if (name) {
     basicInfo.push({
-      text: t('business-name'),
+      text: t('basic-data.business-name'),
       subtext: name,
     });
   }
@@ -31,7 +31,7 @@ const BasicDataSection = () => {
   const doingBusinessAs = data[BusinessDI.doingBusinessAs];
   if (doingBusinessAs) {
     basicInfo.push({
-      text: t('doing-business-as'),
+      text: t('basic-data.doing-business-as'),
       subtext: doingBusinessAs,
     });
   }
@@ -39,7 +39,7 @@ const BasicDataSection = () => {
   const tin = data[BusinessDI.tin];
   if (tin) {
     basicInfo.push({
-      text: t('tin'),
+      text: t('basic-data.tin'),
       subtext: tin,
     });
   }
@@ -47,8 +47,8 @@ const BasicDataSection = () => {
   const corporationType = data[BusinessDI.corporationType];
   if (corporationType) {
     basicInfo.push({
-      text: t('corporation-type'),
-      subtext: allT(
+      text: t('basic-data.corporation-type'),
+      subtext: t(
         `kyb.pages.basic-data.form.corporation-type.mapping.${corporationType}`,
       ),
     });
@@ -57,7 +57,7 @@ const BasicDataSection = () => {
   const website = data[BusinessDI.website];
   if (website) {
     basicInfo.push({
-      text: t('website'),
+      text: t('basic-data.website'),
       subtext: website,
     });
   }
@@ -65,7 +65,7 @@ const BasicDataSection = () => {
   const phone = data[BusinessDI.phoneNumber];
   if (phone) {
     basicInfo.push({
-      text: t('phone-number'),
+      text: t('basic-data.phone-number'),
       subtext: phone,
     });
   }
@@ -96,7 +96,7 @@ const BasicDataSection = () => {
     return (
       <BasicData
         hideHeader
-        ctaLabel={allT('kyb.pages.confirm.summary.save')}
+        ctaLabel={t('summary.save')}
         onComplete={stopEditing}
         onCancel={stopEditing}
       />
@@ -106,7 +106,7 @@ const BasicDataSection = () => {
   const actions: SectionAction[] = [];
   if (!editing) {
     actions.push({
-      label: allT('kyb.pages.confirm.summary.edit'),
+      label: t('summary.edit'),
       onClick: () => setEditing(true),
     });
   }
@@ -114,7 +114,7 @@ const BasicDataSection = () => {
   return (
     <Section
       testID="basic-data"
-      title={t('title')}
+      title={t('basic-data.title')}
       actions={actions}
       IconComponent={IcoFileText24}
       content={getSectionContent()}

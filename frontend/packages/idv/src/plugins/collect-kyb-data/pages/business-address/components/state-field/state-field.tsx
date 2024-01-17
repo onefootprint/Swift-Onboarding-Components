@@ -1,9 +1,9 @@
 import { STATES } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import type { CountryCode } from '@onefootprint/types';
 import { Select, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 type StateFieldProps = {
   countryCode: CountryCode;
@@ -15,7 +15,9 @@ const StateField = ({ countryCode }: StateFieldProps) => {
     formState: { errors },
     control,
   } = useFormContext();
-  const { t } = useTranslation('kyb.pages.business-address.form.state');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyb.pages.business-address.form.state',
+  });
 
   return countryCode === 'US' ? (
     <Controller

@@ -6,11 +6,11 @@ import {
   FootprintPrivateEvent,
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
-import { useTranslation } from '@onefootprint/hooks';
 import { Logger } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useFootprintProvider } from '../../../../components/footprint-provider';
 import useProps from '../../../../components/footprint-provider/hooks/use-props';
@@ -32,7 +32,9 @@ type ContentProps = {
 
 const Content = ({ fallback }: ContentProps) => {
   const footprintProvider = useFootprintProvider();
-  const { t } = useTranslation('pages.secure-form.card.form');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.secure-form.card.form',
+  });
   const [props, setProps] = useState<FootprintFormDataProps>();
   useProps<FootprintFormDataProps>(setProps);
   const router = useRouter();

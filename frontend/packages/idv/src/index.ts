@@ -1,3 +1,5 @@
+import './config/initializers/i18next';
+
 export type {
   NavigationHeaderLeftButtonProps,
   ProviderReturn,
@@ -23,6 +25,7 @@ export {
   WhatsThisContent,
 } from './components';
 export { FullHeightContainer } from './components/layout';
+export { default as enIdvJson } from './config/locales/en/idv.json';
 export type { DeviceInfo } from './hooks';
 export {
   useDeviceInfo,

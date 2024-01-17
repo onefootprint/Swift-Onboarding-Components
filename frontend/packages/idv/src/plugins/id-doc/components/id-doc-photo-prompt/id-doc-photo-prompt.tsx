@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoLayer0124,
   IcoSmartphone224,
@@ -13,6 +12,7 @@ import type {
 } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { HeaderTitle } from '../../../../components';
 import InfoBox from '../../../../components/info-box';
@@ -38,7 +38,9 @@ const IdDocPhotoPrompt = ({
   country,
   promptConsent,
 }: IdDocPhotoPromptProps) => {
-  const { t } = useTranslation('id-doc.components.id-doc-photo-prompt');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.components.id-doc-photo-prompt',
+  });
   const [state, send] = useIdDocMachine();
   const { shouldCollectConsent: consentRequired } = state.context.requirement;
   const [consentVisible, setConsentVisible] = useState(false);

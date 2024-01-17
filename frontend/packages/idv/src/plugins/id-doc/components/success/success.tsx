@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheck24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { TRANSITION_DELAY_DEFAULT } from '../../constants/transition-delay.constants';
 
@@ -11,7 +11,9 @@ type SuccessProps = {
 };
 
 const Success = ({ onComplete }: SuccessProps) => {
-  const { t } = useTranslation('id-doc.components.success');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.components.success',
+  });
 
   useEffect(() => {
     // This conditional should satisfy only when we are done with the flow

@@ -1,11 +1,11 @@
 import { STATES } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import type { CountryCode } from '@onefootprint/types';
 import { BusinessDI } from '@onefootprint/types';
 import type { CountrySelectOption, SelectOption } from '@onefootprint/ui';
 import { AddressInput, Grid, Stack, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
 import type { BusinessAddressData } from '../../../../utils/state-machine/types';
@@ -50,7 +50,9 @@ const BusinessAddressForm = ({
   onSubmit,
   onCancel,
 }: BusinessAddressFormProps) => {
-  const { t } = useTranslation('kyb.pages.business-address.form');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyb.pages.business-address.form',
+  });
 
   const methods = useForm<FormData>({
     defaultValues: {

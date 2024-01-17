@@ -1,8 +1,9 @@
-import { useInputMask, useTranslation } from '@onefootprint/hooks';
+import { useInputMask } from '@onefootprint/hooks';
 import { IcoShield24 } from '@onefootprint/icons';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import InfoBox from '../../../../../../components/info-box';
 
@@ -13,7 +14,7 @@ type SSN9Props = {
 
 const SSN9 = ({ hideDisclaimer, disabled }: SSN9Props) => {
   const inputMasks = useInputMask('en-US');
-  const { t } = useTranslation('kyc.pages.ssn.full');
+  const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages.ssn.full' });
   const {
     register,
     getValues,

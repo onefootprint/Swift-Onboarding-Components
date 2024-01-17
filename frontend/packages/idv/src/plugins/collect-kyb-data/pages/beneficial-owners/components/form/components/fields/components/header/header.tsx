@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import { LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type HeaderProps = {
   shouldShowRemove?: boolean;
@@ -9,9 +9,9 @@ type HeaderProps = {
 };
 
 const Header = ({ shouldShowRemove, onRemove }: HeaderProps) => {
-  const { t } = useTranslation(
-    'kyb.pages.beneficial-owners.form.fields-header',
-  );
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyb.pages.beneficial-owners.form.fields-header',
+  });
 
   return shouldShowRemove ? (
     <HeaderContainer>

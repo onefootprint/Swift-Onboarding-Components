@@ -1,3 +1,5 @@
+import '../../../../../../config/initializers/i18next-test';
+
 import {
   customRender,
   screen,

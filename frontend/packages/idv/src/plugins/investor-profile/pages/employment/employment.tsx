@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoDollar40, IcoUser40 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
 import { InvestorProfileDI } from '@onefootprint/types';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import GenericTransition from '../../../../components/animations/generic-transition';
 import Logger from '../../../../utils/logger';
@@ -16,7 +16,7 @@ const Employment = () => {
   const [state, send] = useInvestorProfileMachine();
   const { authToken, showTransition, data } = state.context;
   const { mutation, syncData } = useSyncData();
-  const { allT } = useTranslation();
+  const { t } = useTranslation('idv');
   // Only show the animation if this is the first time we are rendering this page
   // If user saved data, and navigated prev to this page, don't animate again
   const hasCollectedData = Object.keys(data).length > 0;
@@ -51,10 +51,8 @@ const Employment = () => {
       <GenericTransition
         firstIcon={IcoUser40}
         secondIcon={IcoDollar40}
-        firstText={allT(
-          'investor-profile.components.transition-animation.source',
-        )}
-        secondText={allT(
+        firstText={t('investor-profile.components.transition-animation.source')}
+        secondText={t(
           'investor-profile.components.transition-animation.destination',
         )}
         timeout={4000}

@@ -2,6 +2,7 @@ import { COUNTRIES } from '@onefootprint/global-constants';
 import styled, { css } from '@onefootprint/styled';
 import type { CountryCode, SupportedLocale } from '@onefootprint/types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { getCountryCodeFromLocale } from '../../utils';
 import Flag from '../flag';
@@ -35,14 +36,31 @@ const CountrySelect = ({
   onBlur,
   onChange,
   options = COUNTRIES,
-  placeholder = 'Select',
+  placeholder,
   size = 'default',
   testID,
   value,
 }: CountrySelectProps) => {
+  const { t } = useTranslation('ui');
   const localeCountry = getCountryCodeFromLocale(locale);
+
+  const getCountriesWithLocalizedLabels = () =>
+    options.map(option => ({
+      ...option,
+      label: t(`global.countries.${option.value}`),
+    }));
+
+  const localizedOptions = getCountriesWithLocalizedLabels();
+
   const currentValue =
-    !value && locale ? options.find(o => o.value === localeCountry) : value;
+    !value && locale
+      ? localizedOptions.find(o => o.value === localeCountry)
+      : value;
+  const placeholderText =
+    placeholder ?? t('components.country-select.placeholder-default');
+
+  const getLocalizedOption = (countryCode?: CountryCode) =>
+    countryCode ? localizedOptions.find(o => o.value === countryCode) : null;
 
   return (
     <BaseSelect<BaseSelectOption<CountryCode>>
@@ -56,31 +74,35 @@ const CountrySelect = ({
       onBlur={onBlur}
       onChange={onChange}
       OptionComponent={Option}
-      options={options}
+      options={localizedOptions}
       renderTrigger={({
         isOpen,
         onClick,
         selectedOption,
         testID: triggerTestID,
-      }) => (
-        <BaseSelectTrigger
-          disabled={disabled}
-          hasError={hasError}
-          hasFocus={isOpen}
-          isPrivate
-          onClick={onClick}
-          size={size}
-          testID={triggerTestID}
-          hasIcon
-        >
-          {selectedOption?.value && (
-            <StyledFlag code={selectedOption.value} disabled={disabled} />
-          )}
-          <LabelContainer>
-            {selectedOption?.label || placeholder}
-          </LabelContainer>
-        </BaseSelectTrigger>
-      )}
+      }) => {
+        const localizedOption = getLocalizedOption(selectedOption?.value);
+
+        return (
+          <BaseSelectTrigger
+            disabled={disabled}
+            hasError={hasError}
+            hasFocus={isOpen}
+            isPrivate
+            onClick={onClick}
+            size={size}
+            testID={triggerTestID}
+            hasIcon
+          >
+            {localizedOption?.value && (
+              <StyledFlag code={localizedOption.value} disabled={disabled} />
+            )}
+            <LabelContainer>
+              {localizedOption?.label ?? placeholderText}
+            </LabelContainer>
+          </BaseSelectTrigger>
+        );
+      }}
       size={size}
       testID={testID}
       value={currentValue}

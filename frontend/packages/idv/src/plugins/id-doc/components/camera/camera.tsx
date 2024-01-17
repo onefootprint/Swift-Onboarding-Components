@@ -1,9 +1,10 @@
-import { useCountdownCustom, useTranslation } from '@onefootprint/hooks';
+import { useCountdownCustom } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 import { LoadingIndicator, media } from '@onefootprint/ui';
 import noop from 'lodash/noop';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTimeout } from 'usehooks-ts';
 
 import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
@@ -164,7 +165,9 @@ const Camera = ({
   outlineWidthRatio,
   setIsCaptured,
 }: CameraProps) => {
-  const { t } = useTranslation('id-doc.components.camera');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.components.camera',
+  });
   const canvasAutoCaptureRef = useRef<HTMLCanvasElement>();
   const canvasImageCaptureRef = useRef<HTMLCanvasElement>();
   const videoRef: VideoRef = useRef<HTMLVideoElement>(null);

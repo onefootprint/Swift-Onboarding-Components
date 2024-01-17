@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoLayer0124,
   IcoSmartphone224,
@@ -7,6 +6,7 @@ import {
 } from '@onefootprint/icons';
 import { BottomSheet } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { AutocaptureKind } from '../../../camera/types';
 import InstructionItems from './components/instruction-item';
@@ -22,7 +22,9 @@ const Instructions = ({
   isOpen,
   autocaptureKind,
 }: InstructionProps) => {
-  const { t } = useTranslation('id-doc.components.photo-capture.instructions');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.components.photo-capture.instructions',
+  });
   const instructionItems = [
     {
       title: t(`position-${autocaptureKind}.title`),

@@ -1,3 +1,5 @@
+import '../../config/initializers/i18next-test';
+
 import { IcoArrowRightSmall24 } from '@onefootprint/icons';
 import {
   customRender,

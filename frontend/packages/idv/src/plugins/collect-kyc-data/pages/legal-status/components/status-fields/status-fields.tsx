@@ -1,16 +1,18 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { UsLegalStatus } from '@onefootprint/types';
 import { Grid, media, Radio } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 type StatusFieldsProps = {
   handleStatusChange: (newStatus: UsLegalStatus) => void;
 };
 
 const StatusFields = ({ handleStatusChange }: StatusFieldsProps) => {
-  const { t } = useTranslation('kyc.pages.legal-status.statuses');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyc.pages.legal-status.statuses',
+  });
   const { register } = useFormContext();
 
   return (

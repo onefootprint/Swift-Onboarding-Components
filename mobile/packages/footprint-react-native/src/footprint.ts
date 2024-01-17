@@ -127,6 +127,7 @@ const footprint = () => {
     const deepLink = getDeepLink();
     const url = createUrl({
       appearance: props.appearance,
+      l10n: props.l10n,
       redirectUrl: deepLink,
       token,
     });

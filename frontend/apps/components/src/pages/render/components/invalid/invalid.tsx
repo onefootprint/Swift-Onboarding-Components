@@ -1,9 +1,11 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Invalid = () => {
-  const { t } = useTranslation('pages.secure-render.invalid');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.secure-render.invalid',
+  });
 
   return (
     <Typography color="primary" variant="body-2" testID="invalid">

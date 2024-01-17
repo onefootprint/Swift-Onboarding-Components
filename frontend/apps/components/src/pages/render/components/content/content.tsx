@@ -1,9 +1,9 @@
 import type { FootprintRenderDataProps } from '@onefootprint/footprint-js';
-import { useTranslation } from '@onefootprint/hooks';
 import { Logger } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import type { DataIdentifier } from '@onefootprint/types';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useProps from 'src/components/footprint-provider/hooks/use-props';
 
 import useEntitiesVaultDecrypt from '../../hooks/use-entities-vault-decrypt';
@@ -17,7 +17,9 @@ type ContentProps = {
 };
 
 const Content = ({ fallback }: ContentProps) => {
-  const { t } = useTranslation('pages.secure-render');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.secure-render',
+  });
   const [props, setProps] = useState<FootprintRenderDataProps>();
   useProps<FootprintRenderDataProps>(setProps);
   const decryptMutation = useEntitiesVaultDecrypt();

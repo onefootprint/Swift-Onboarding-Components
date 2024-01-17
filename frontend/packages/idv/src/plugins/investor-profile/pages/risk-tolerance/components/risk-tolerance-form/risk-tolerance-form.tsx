@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { InvestorProfileData } from '@onefootprint/types';
 import {
   InvestorProfileDI,
@@ -7,6 +6,7 @@ import {
 import { Grid, Radio } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import CustomForm from '../../../../components/custom-form';
 import type { RiskToleranceData } from '../../../../utils/state-machine/types';
@@ -26,7 +26,9 @@ const RiskToleranceForm = ({
   defaultValues,
   onSubmit,
 }: RiskToleranceFormProps) => {
-  const { t } = useTranslation('investor-profile.pages.risk-tolerance');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'investor-profile.pages.risk-tolerance',
+  });
   const { handleSubmit, register } = useForm<FormData>({
     defaultValues: {
       riskTolerance:

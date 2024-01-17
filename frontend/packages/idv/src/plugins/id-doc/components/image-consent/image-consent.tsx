@@ -1,9 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Checkbox, Divider, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import { Trans } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
 
@@ -12,7 +11,9 @@ export type ImageConsentHandler = {
 };
 
 const ImageConsent = forwardRef<ImageConsentHandler, {}>((props, ref) => {
-  const { t } = useTranslation('id-doc.components.image-consent');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.components.image-consent',
+  });
   const [isThirdPartyConsented, setIsThirdPartyConsented] = useState(false);
 
   useImperativeHandle(
@@ -53,6 +54,7 @@ const ImageConsent = forwardRef<ImageConsentHandler, {}>((props, ref) => {
         sx={{ marginBottom: 5, marginTop: 7 }}
       >
         <Trans
+          ns="idv"
           i18nKey="id-doc.components.image-consent.description"
           components={{
             privacy: (

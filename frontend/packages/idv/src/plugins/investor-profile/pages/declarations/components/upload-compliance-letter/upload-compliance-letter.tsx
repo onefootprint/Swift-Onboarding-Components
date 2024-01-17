@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText24, IcoWarning16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Divider, Grid, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import UploadFiles from './components/upload-files';
 
@@ -15,9 +15,9 @@ const UploadComplianceLetter = ({
   hasError,
   onChange,
 }: UploadComplianceLetterProps) => {
-  const { t } = useTranslation(
-    'investor-profile.pages.declarations.doc-upload',
-  );
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'investor-profile.pages.declarations.doc-upload',
+  });
 
   return (
     <>

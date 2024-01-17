@@ -1,18 +1,22 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Banner, media } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 
 const SandboxBanner = () => {
-  const { t } = useTranslation('components.layout');
+  const { t } = useTranslation('common');
   const [state] = useHostedMachine();
   const { onboardingConfig } = state.context;
   const isSandbox = onboardingConfig?.isLive === false;
 
   return (
     <SandboxBannerContainer>
-      {isSandbox && <Banner variant="warning">{t('sandbox-banner')}</Banner>}
+      {isSandbox && (
+        <Banner variant="warning">
+          {t('components.layout.sandbox-banner')}
+        </Banner>
+      )}
     </SandboxBannerContainer>
   );
 };

@@ -1,4 +1,5 @@
 import React, { forwardRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { InputProps } from '../internal/input';
 import Input from '../internal/input';
@@ -28,17 +29,18 @@ export type SearchInputProps = BaseProps & {
 const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
   (
     {
-      clearButtonAriaLabel = 'Reset',
+      clearButtonAriaLabel,
       onChange,
       onChangeText,
       onReset,
-      placeholder = 'Search...',
+      placeholder,
       sx,
       value,
       ...remainingProps
     }: SearchInputProps,
     ref,
   ) => {
+    const { t } = useTranslation('ui');
     const handleClearInput = () => {
       onChangeText?.('');
       onReset?.();
@@ -47,7 +49,10 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
     const renderSuffix = () =>
       value ? (
         <ClearButton
-          aria-label={clearButtonAriaLabel}
+          aria-label={
+            clearButtonAriaLabel ??
+            t('components.search-input.clear-button.aria-label-default')
+          }
           onClick={handleClearInput}
         />
       ) : null;
@@ -57,7 +62,9 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         {...remainingProps}
         onChange={onChange}
         onChangeText={onChangeText}
-        placeholder={placeholder}
+        placeholder={
+          placeholder ?? t('components.search-input.placeholder-default')
+        }
         prefixComponent={<SearchIcon />}
         sx={{
           paddingLeft: 8,

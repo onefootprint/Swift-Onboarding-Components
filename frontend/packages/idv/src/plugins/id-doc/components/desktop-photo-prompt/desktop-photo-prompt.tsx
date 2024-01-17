@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type {
   CountryCode,
@@ -11,6 +10,7 @@ import {
 } from '@onefootprint/types';
 import { Box, Button, media, Stack, Typography } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
 import Logger from '../../../../utils/logger';
@@ -40,7 +40,9 @@ const DesktopPhotoPrompt = ({
   isRetry,
   errors,
 }: DesktopPhotoPromptProps) => {
-  const { t } = useTranslation('id-doc.components.desktop-photo-prompt');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.components.desktop-photo-prompt',
+  });
   const [state, send] = useIdDocMachine();
   const { hasBadConnectivity } = state.context;
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();

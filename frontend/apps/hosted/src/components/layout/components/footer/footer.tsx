@@ -1,11 +1,11 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import { SecuredByFootprint } from '@onefootprint/idv';
 import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import WhatsThisPopover from '../whats-this-popover';
 
@@ -16,7 +16,9 @@ type FootprintFooterProps = {
 };
 
 const Footer = ({ config }: FootprintFooterProps) => {
-  const { t } = useTranslation('components.layout.app-footer');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.layout.app-footer',
+  });
 
   const links: Link[] = [
     {

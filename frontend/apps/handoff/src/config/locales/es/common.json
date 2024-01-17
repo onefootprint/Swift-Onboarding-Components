@@ -1,0 +1,26 @@
+{
+  "pages": {
+    "complete": {
+      "title": "Completado",
+      "subtitle": {
+        "with-countdown": "Esta página se cerrará en {{seconds}} segundos...",
+        "without-countdown": "Por favor, continúa en tu computadora."
+      }
+    },
+    "expired": {
+      "title": "Sesión expirada",
+      "subtitle": {
+        "mobile": "Por razones de seguridad, esta sesión ha caducado. Por favor, vuelve a ingresar.",
+        "desktop": "Por razones de seguridad, este enlace ha caducado. Por favor, genere uno nuevo y vuelva a intentarlo."
+      },
+      "cta": "Regresar"
+    },
+    "canceled": {
+      "title": "Sesión cancelada",
+      "subtitle": {
+        "mobile": "Por favor, vuelva a intentarlo.",
+        "desktop": "Por favor, inténtelo nuevamente desde su computadora."
+      }
+    }
+  }
+}

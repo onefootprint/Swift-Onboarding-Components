@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { Icon } from '@onefootprint/icons';
 import {
   IcoBuilding24,
@@ -28,6 +27,7 @@ import {
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { isKycCdo } from '../../../../../../utils/cdo-utils';
 import type { FieldProps } from '../field';
@@ -67,7 +67,9 @@ type KycFieldsProps = {
 };
 
 const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
-  const { t } = useTranslation('onboarding.pages.authorize');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'onboarding.pages.authorize',
+  });
 
   const collectedKycDataOptionLabels: Record<CollectedKycDataOption, string> = {
     [CollectedKycDataOption.name]: t('data-labels.name'),

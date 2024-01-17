@@ -1,6 +1,7 @@
 import { IcoGoogle24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { ButtonProps } from '../button';
 import Button from '../button';
@@ -13,7 +14,7 @@ export type GoogleButtonProps = Omit<ButtonProps, 'variant'> &
   OverrideButtonProps;
 
 const GoogleButton = ({
-  children = 'Continue with Google',
+  children,
   disabled,
   fullWidth,
   loading,
@@ -22,22 +23,26 @@ const GoogleButton = ({
   size,
   testID,
   type,
-}: GoogleButtonProps) => (
-  <Button
-    disabled={disabled}
-    fullWidth={fullWidth}
-    loading={loading}
-    loadingAriaLabel={loadingAriaLabel}
-    onClick={onClick}
-    size={size}
-    testID={testID}
-    type={type}
-    variant="secondary"
-  >
-    <StyledIcon />
-    {children}
-  </Button>
-);
+}: GoogleButtonProps) => {
+  const { t } = useTranslation('ui');
+
+  return (
+    <Button
+      disabled={disabled}
+      fullWidth={fullWidth}
+      loading={loading}
+      loadingAriaLabel={loadingAriaLabel}
+      onClick={onClick}
+      size={size}
+      testID={testID}
+      type={type}
+      variant="secondary"
+    >
+      <StyledIcon />
+      {children ?? t('components.google-button.text-default')}
+    </Button>
+  );
+};
 
 const StyledIcon = styled(IcoGoogle24)`
   ${({ theme }) => css`

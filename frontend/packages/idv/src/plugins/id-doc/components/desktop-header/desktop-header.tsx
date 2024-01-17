@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
 import { IdDocImageTypes } from '@onefootprint/types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { HeaderTitle } from '../../../../components';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
@@ -15,7 +15,9 @@ type DesktopHeaderProps = {
 };
 
 const DesktopHeader = ({ type, imageType, country }: DesktopHeaderProps) => {
-  const { t } = useTranslation('id-doc.components.desktop-header');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.components.desktop-header',
+  });
 
   const side = getImageSideLabel(imageType, type);
 

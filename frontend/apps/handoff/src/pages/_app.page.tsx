@@ -30,8 +30,8 @@ const App = ({ Component, pageProps }: AppProps) => {
           />
         </Head>
       ) : null}
-      <QueryClientProvider client={queryClient}>
-        <ObserveCollectorProvider appName="handoff">
+      <ObserveCollectorProvider appName="handoff">
+        <QueryClientProvider client={queryClient}>
           <MachineProvider>
             <AppearanceProvider
               options={{
@@ -42,8 +42,8 @@ const App = ({ Component, pageProps }: AppProps) => {
               <Component {...pageProps} />
             </AppearanceProvider>
           </MachineProvider>
-        </ObserveCollectorProvider>
-      </QueryClientProvider>
+        </QueryClientProvider>
+      </ObserveCollectorProvider>
     </>
   );
 };

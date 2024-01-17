@@ -1,8 +1,9 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
@@ -14,7 +15,9 @@ import useConsent from '../../hooks/use-consent';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 
 const DesktopConsent = () => {
-  const { t } = useTranslation('id-doc.pages.desktop-consent');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.pages.desktop-consent',
+  });
   const [state, send] = useIdDocMachine();
   const { authToken } = state.context;
   const consentMutation = useConsent();

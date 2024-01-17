@@ -1,3 +1,5 @@
+import '../../config/initializers/i18next-test';
+
 import {
   customRender,
   fireEvent,
@@ -14,10 +16,8 @@ import {
   OverallOutcome,
 } from '@onefootprint/types';
 import React from 'react';
-import { I18nextProvider } from 'react-i18next';
 
 import { Layout } from '../../components';
-import configureI18next from '../../config/initializers/i18next';
 import SandboxOutcomeContainer from './components/sandbox-outcome-container';
 import type { SandboxOutcomeFormData } from './types';
 
@@ -80,14 +80,12 @@ const renderSandbox = ({
   allowRealDocOutcome?: boolean;
 }) => {
   customRender(
-    <I18nextProvider i18n={configureI18next()}>
-      <Layout onClose={() => {}}>
-        <SandboxOutcomeWrapper
-          requiresIdDoc={requiresIdDoc}
-          allowRealDocOutcome={allowRealDocOutcome}
-        />
-      </Layout>
-    </I18nextProvider>,
+    <Layout onClose={() => {}}>
+      <SandboxOutcomeWrapper
+        requiresIdDoc={requiresIdDoc}
+        allowRealDocOutcome={allowRealDocOutcome}
+      />
+    </Layout>,
   );
 };
 

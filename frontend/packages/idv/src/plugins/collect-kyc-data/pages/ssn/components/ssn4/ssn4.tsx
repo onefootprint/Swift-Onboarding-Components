@@ -1,7 +1,8 @@
-import { useInputMask, useTranslation } from '@onefootprint/hooks';
+import { useInputMask } from '@onefootprint/hooks';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 type SSN4Props = {
   disabled?: boolean;
@@ -9,7 +10,7 @@ type SSN4Props = {
 
 const SSN4 = ({ disabled }: SSN4Props) => {
   const inputMasks = useInputMask('en-US');
-  const { t } = useTranslation('kyc.pages.ssn.last-four');
+  const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages.ssn.last-four' });
   const {
     register,
     getValues,

@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
@@ -8,6 +7,7 @@ import {
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Logger from '../../../../utils/logger';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
@@ -22,7 +22,7 @@ type ErrorProps = {
 };
 
 const Error = ({ errors, imageType, docType, countryName }: ErrorProps) => {
-  const { t } = useTranslation('id-doc.components.error');
+  const { t } = useTranslation('idv', { keyPrefix: 'id-doc.components.error' });
 
   const side = getImageSideLabel(imageType, docType);
 

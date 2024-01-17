@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoEye16, IcoEyeCrossed16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { CopyButton, IconButton, Typography } from '@onefootprint/ui';
 import { formatCardExpiry, formatCardNumber } from 'creditcardutils';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type RenderMask = 'creditCard' | 'cvc' | 'date';
 
@@ -24,7 +24,9 @@ const RenderBase = ({
   value,
   canCopy,
 }: RenderBaseProps) => {
-  const { t } = useTranslation('pages.secure-render');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.secure-render',
+  });
   const [values, setValues] = useState({
     showValue: '',
     hiddenValue: '',

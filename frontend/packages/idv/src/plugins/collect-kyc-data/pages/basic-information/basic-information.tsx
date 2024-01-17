@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   CollectedKycDataOption,
   IdDI,
@@ -7,6 +6,7 @@ import {
 import { Grid, Stack } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import EditableFormButtonContainer from '../../../../components/editable-form-button-container';
 import HeaderTitle from '../../../../components/layout/components/header-title';
@@ -45,7 +45,9 @@ const BasicInformation = ({
   const [state, send] = useCollectKycDataMachine();
   const { data, requirement } = state.context;
   const { mutation, syncData } = useSyncData();
-  const { t } = useTranslation('kyc.pages.basic-information');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyc.pages.basic-information',
+  });
   const attributes = allAttributes(requirement);
   const requiresName = attributes.includes(CollectedKycDataOption.name);
   const requiresDob = attributes.includes(CollectedKycDataOption.dob);

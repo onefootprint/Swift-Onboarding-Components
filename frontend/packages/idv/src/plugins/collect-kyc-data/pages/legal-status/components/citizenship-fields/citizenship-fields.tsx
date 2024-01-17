@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoPlusSmall16 } from '@onefootprint/icons';
 import { LinkButton } from '@onefootprint/ui';
 import React from 'react';
@@ -8,11 +7,14 @@ import type {
   FieldValues,
 } from 'react-hook-form';
 import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import CitizenshipField from './citizenship-field';
 
 const CitizenshipFields = () => {
-  const { t } = useTranslation('kyc.pages.legal-status.form');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyc.pages.legal-status.form',
+  });
   const { control } = useFormContext();
   const { append, fields, remove } = useFieldArray({
     name: 'citizenships',

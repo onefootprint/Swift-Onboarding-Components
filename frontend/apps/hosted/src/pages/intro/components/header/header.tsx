@@ -1,13 +1,13 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { HeaderTitle } from '@onefootprint/idv';
 import styled, { css } from '@onefootprint/styled';
 import { Avatar } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 import useIsKyb from 'src/pages/intro/utils/is-kyb';
 
 const Header = () => {
-  const { t } = useTranslation('pages.intro.header');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.intro.header' });
   const [state] = useHostedMachine();
   const { businessBoKycData, onboardingConfig } = state.context;
   const isKyb = useIsKyb();

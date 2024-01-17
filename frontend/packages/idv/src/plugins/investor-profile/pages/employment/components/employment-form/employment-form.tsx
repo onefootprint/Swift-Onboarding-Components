@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { InvestorProfileDI } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
 import { Select, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import CustomForm from '../../../../components/custom-form';
 import type { EmploymentData } from '../../../../utils/state-machine/types';
@@ -25,7 +25,9 @@ const EmploymentForm = ({
   isLoading,
   onSubmit,
 }: EmploymentFormProps) => {
-  const { t } = useTranslation('investor-profile.pages.employment');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'investor-profile.pages.employment',
+  });
   const options: SelectOption[] = [
     {
       label: t('employment-status.employed'),

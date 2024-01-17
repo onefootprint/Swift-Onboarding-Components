@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { D2PGenerateResponse } from '@onefootprint/types';
 import { Grid } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useL10nContext } from '../../../../../components/l10n-provider';
 import HeaderTitle from '../../../../../components/layout/components/header-title';
@@ -13,7 +13,12 @@ import useMobileMachine from '../../../hooks/mobile/use-mobile-machine';
 import useGenerateScopedAuthToken from '../../../hooks/use-generate-scoped-auth-token';
 
 const Sms = () => {
-  const { t } = useTranslation('transfer.pages.mobile.sms');
+  const {
+    t,
+    i18n: { language },
+  } = useTranslation('idv', {
+    keyPrefix: 'transfer.pages.mobile.sms',
+  });
   useHandleD2PStatusUpdate();
   const [state, send] = useMobileMachine();
   const { config, scopedAuthToken, authToken, device, idDocOutcome } =
@@ -22,6 +27,7 @@ const Sms = () => {
   const url = useCreateHandoffUrl({
     authToken: scopedAuthToken,
     onboardingConfig: config,
+    language,
   });
 
   const { generateScopedAuthToken } = useGenerateScopedAuthToken({

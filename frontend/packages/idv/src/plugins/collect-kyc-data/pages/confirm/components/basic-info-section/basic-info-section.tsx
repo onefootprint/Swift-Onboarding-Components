@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText24 } from '@onefootprint/icons';
 import {
   CollectedKycDataOption,
@@ -6,6 +5,7 @@ import {
   isCountryCode,
 } from '@onefootprint/types';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type {
   SectionAction,
@@ -21,7 +21,7 @@ import getInitialCountry from '../../../../utils/get-initial-country';
 import BasicInformation from '../../../basic-information';
 
 const BasicInfoSection = () => {
-  const { t, allT } = useTranslation('kyc.pages.confirm');
+  const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages' });
   const [state] = useCollectKycDataMachine();
   const { data, requirement } = state.context;
   const [editing, setEditing] = useState(false);
@@ -32,7 +32,7 @@ const BasicInfoSection = () => {
   const firstName = data[IdDI.firstName]?.value;
   if (firstName) {
     basicInfo.push({
-      text: t('basic-info.first-name'),
+      text: t('confirm.basic-info.first-name'),
       subtext: firstName,
     });
   }
@@ -40,7 +40,7 @@ const BasicInfoSection = () => {
   const middleName = data[IdDI.middleName]?.value;
   if (middleName) {
     basicInfo.push({
-      text: t('basic-info.middle-name'),
+      text: t('confirm.basic-info.middle-name'),
       subtext: middleName,
     });
   }
@@ -48,7 +48,7 @@ const BasicInfoSection = () => {
   const lastName = data[IdDI.lastName]?.value;
   if (lastName) {
     basicInfo.push({
-      text: t('basic-info.last-name'),
+      text: t('confirm.basic-info.last-name'),
       subtext: lastName,
     });
   }
@@ -56,7 +56,7 @@ const BasicInfoSection = () => {
   const dob = data[IdDI.dob]?.value;
   if (dob) {
     basicInfo.push({
-      text: t('basic-info.dob'),
+      text: t('confirm.basic-info.dob'),
       subtext: dob,
     });
   }
@@ -71,7 +71,7 @@ const BasicInfoSection = () => {
   // we only want to display nationality / the default country if we collected it and if there is no legal status data
   if (!requiresUsLegalStatus && countryVal && nationality) {
     basicInfo.push({
-      text: t('basic-info.nationality'),
+      text: t('confirm.basic-info.nationality'),
       subtext: nationality,
     });
   }
@@ -105,14 +105,14 @@ const BasicInfoSection = () => {
   const actions: SectionAction[] = [];
   if (!editing) {
     actions.push({
-      label: allT('kyc.pages.confirm.summary.edit'),
+      label: t('confirm.summary.edit'),
       onClick: () => setEditing(true),
     });
   }
 
   return (
     <Section
-      title={t('basic-info.title')}
+      title={t('confirm.basic-info.title')}
       actions={actions}
       IconComponent={IcoFileText24}
       content={getSectionContent(basicInfo)}

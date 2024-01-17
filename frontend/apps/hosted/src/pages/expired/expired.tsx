@@ -1,12 +1,12 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { HeaderTitle } from '@onefootprint/idv';
 import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 
 const Expired = () => {
-  const { t } = useTranslation('pages.expired');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.expired' });
   const [, send] = useHostedMachine();
 
   const handleClick = () => {

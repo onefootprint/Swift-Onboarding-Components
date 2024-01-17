@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import type {
@@ -10,6 +9,7 @@ import type {
 import { getRequirement, OnboardingRequirementKind } from '@onefootprint/types';
 import { Divider, useToast } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../../components/layout/components/navigation-header';
@@ -33,7 +33,9 @@ export type AuthorizeProps = {
 };
 
 const Authorize = ({ onDone }: AuthorizeProps) => {
-  const { t } = useTranslation('onboarding.pages.authorize');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'onboarding.pages.authorize',
+  });
   const [state] = useOnboardingRequirementsMachine();
   const {
     onboardingContext: { authToken, config, overallOutcome },

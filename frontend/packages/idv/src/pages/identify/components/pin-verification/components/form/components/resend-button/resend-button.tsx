@@ -1,7 +1,8 @@
-import { useCountdown, useTranslation } from '@onefootprint/hooks';
+import { useCountdown } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import { LinkButton, LoadingIndicator, Typography } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type ResendButtonProps = {
   isResendLoading?: boolean;
@@ -14,9 +15,9 @@ const ResendButton = ({
   resendDisabledUntil,
   onResend,
 }: ResendButtonProps) => {
-  const { t } = useTranslation(
-    'identify.components.pin-verification.resend-button',
-  );
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'identify.components.pin-verification.resend-button',
+  });
   const { setDate, countdown } = useCountdown();
   const [resendClicked, setResendClicked] = useState(false);
   const [internalDate, setInternalDate] = useState<Date | undefined>();

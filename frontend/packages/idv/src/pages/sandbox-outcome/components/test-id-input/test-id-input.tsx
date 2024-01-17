@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoCheck24,
   IcoClose24,
@@ -17,12 +16,15 @@ import {
 import Hint from '@onefootprint/ui/src/components/internal/hint';
 import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import InlineButton from '../inline-button';
 import InlineButtonsLayout from '../inline-buttons-layout';
 
 const TestIdInput = () => {
-  const { t } = useTranslation('global.pages.sandbox-outcome');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'global.pages.sandbox-outcome',
+  });
   const [idInputLocked, setIdInputLocked] = useState(true);
   const {
     register,

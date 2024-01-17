@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Logger from '../../../../utils/logger';
 import useProcessImage from '../../hooks/use-process-image';
@@ -17,7 +17,9 @@ type IdDocPhotoButtonsProp = {
 };
 
 const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
-  const { t } = useTranslation('id-doc.components.id-doc-photo-upload-buttons');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.components.id-doc-photo-upload-buttons',
+  });
   const [state, send] = useIdDocMachine();
   const { hasBadConnectivity } = state.context;
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();

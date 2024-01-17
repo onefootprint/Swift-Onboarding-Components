@@ -1,18 +1,32 @@
-import i18next from 'i18next';
+import { enUiJson as ui } from '@onefootprint/ui';
+import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-import en from '../locales/english.json';
+import idv from '../locales/en/idv.json';
 
-const resources = {
-  en: { translation: en },
-};
+const IS_DEV = process.env.NODE_ENV === 'development';
 
-const I18NOptions = {
-  resources,
-  lng: 'en',
-  interpolation: {
-    escapeValue: false,
+i18n.use(initReactI18next).init({
+  debug: IS_DEV,
+  fallbackLng: 'en',
+  defaultNS: 'idv',
+  ns: ['idv', 'ui'],
+  interpolation: { escapeValue: false }, // not needed for react as it escapes by default
+  react: { useSuspense: false },
+  supportedLngs: ['en'],
+  resources: {
+    en: {
+      idv,
+      ui,
+    },
   },
-};
+});
 
-i18next.use(initReactI18next).init(I18NOptions);
+i18n.services.formatter?.add(
+  'capitalize',
+  value => `${value.charAt(0).toUpperCase()}${value.slice(1)}`,
+);
+
+i18n.services.formatter?.add('allCaps', value => value.toUpperCase());
+
+export default i18n;

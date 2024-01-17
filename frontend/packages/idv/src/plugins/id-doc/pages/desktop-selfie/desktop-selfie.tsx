@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IdDocImageTypes } from '@onefootprint/types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import PhotoCapture from '../../components/photo-capture/photo-capture';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
@@ -11,7 +11,9 @@ import useCameraPermission from './hooks/use-camera-permission';
 const FACE_OUTLINE_TO_WIDTH_RATIO = 0.7;
 
 const DesktopSelfie = () => {
-  const { t } = useTranslation('id-doc.pages.desktop-selfie');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.pages.desktop-selfie',
+  });
   const [, send] = useIdDocMachine();
   const permissionState = useCameraPermission();
 

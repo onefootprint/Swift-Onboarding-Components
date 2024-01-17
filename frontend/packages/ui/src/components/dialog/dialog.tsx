@@ -2,6 +2,7 @@ import { IcoClose24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import FocusTrap from 'focus-trap-react';
 import React, { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useElementSize, useLockedBody } from 'usehooks-ts';
 
 import { useEventListener, useOnClickOutside } from '../../hooks';
@@ -49,11 +50,10 @@ const Dialog = ({
   headerIcon: {
     component: HeaderIconComponent = IcoClose24,
     onClick: onHeaderIconClick = onClose,
-    ariaLabel: headerIconAriaLabel = 'Close',
+    ariaLabel: headerIconAriaLabel,
   } = {
     component: IcoClose24,
     onClick: onClose,
-    ariaLabel: 'Close',
   },
   linkButton = undefined,
   open,
@@ -65,6 +65,7 @@ const Dialog = ({
   disableResponsiveness = false,
   isConfirmation = false,
 }: DialogProps) => {
+  const { t } = useTranslation('ui');
   const dialogRef = useRef<HTMLDivElement>(null);
   useLockedBody(open);
   useOnClickOutside(dialogRef, onClose);
@@ -97,7 +98,10 @@ const Dialog = ({
           <Header>
             <CloseContainer>
               <IconButton
-                aria-label={headerIconAriaLabel}
+                aria-label={
+                  headerIconAriaLabel ??
+                  t('components.dialog.header-icon.aria-label-default')
+                }
                 onClick={onHeaderIconClick}
               >
                 <HeaderIconComponent />

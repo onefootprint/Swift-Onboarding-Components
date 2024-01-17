@@ -1,10 +1,12 @@
-import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { HeaderTitle, NavigationHeader } from '../../components';
 
 const ConfigInvalid = () => {
-  const { t } = useTranslation('global.pages.config-invalid');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'global.pages.config-invalid',
+  });
 
   return (
     <>

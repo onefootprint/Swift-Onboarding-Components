@@ -1,4 +1,4 @@
-import { useCountdown, useTranslation } from '@onefootprint/hooks';
+import { useCountdown } from '@onefootprint/hooks';
 import {
   HeaderTitle,
   NavigationHeader,
@@ -8,6 +8,7 @@ import styled from '@onefootprint/styled';
 import { D2PStatusUpdate } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
 import useHandoffMachine from '../../hooks/use-handoff-machine';
@@ -15,7 +16,7 @@ import useHandoffMachine from '../../hooks/use-handoff-machine';
 const SUCCESS_COUNTER_SECONDS = 3;
 
 const Complete = () => {
-  const { t } = useTranslation('pages.complete');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.complete' });
   const updateD2PStatusMutation = useUpdateD2PStatus();
   const [state] = useHandoffMachine();
   const { authToken, opener } = state.context;

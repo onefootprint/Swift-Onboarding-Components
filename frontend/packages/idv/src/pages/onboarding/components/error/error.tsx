@@ -1,13 +1,15 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { NavigationHeader } from '../../../../components/layout';
 
 const Error = () => {
-  const { t } = useTranslation('onboarding.components.error');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'onboarding.components.error',
+  });
 
   return (
     <Container>

@@ -1,10 +1,11 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { CountryCode, IdentifyResponse } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { EmailPreview, PhoneForm, StepHeader } from '../../../../components';
 import { useL10nContext } from '../../../../components/l10n-provider';
@@ -28,7 +29,9 @@ const PhoneIdentification = () => {
   } = state.context;
   const identifyMutation = useIdentify();
   const showRequestErrorToast = useRequestErrorToast();
-  const { t } = useTranslation('identify.pages.phone-identification');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'identify.pages.phone-identification',
+  });
   const l10n = useL10nContext();
   const { IdvPhoneInputRestrictedCountries } = useFlags();
   const restrictedCountries = new Set<CountryCode>(

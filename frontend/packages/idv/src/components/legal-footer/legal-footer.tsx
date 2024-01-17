@@ -9,6 +9,7 @@ type LegalFooterProps = { descriptionKey: string };
 const LegalFooter = ({ descriptionKey }: LegalFooterProps) => (
   <StyledTypography>
     <Trans
+      ns="idv"
       i18nKey={descriptionKey}
       components={{
         termsLink: (

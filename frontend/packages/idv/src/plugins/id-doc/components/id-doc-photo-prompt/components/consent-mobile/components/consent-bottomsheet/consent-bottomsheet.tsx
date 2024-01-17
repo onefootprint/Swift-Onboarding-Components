@@ -1,9 +1,10 @@
-import { useOnClickOutside, useTranslation } from '@onefootprint/hooks';
+import { useOnClickOutside } from '@onefootprint/hooks';
 import { IcoClose24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Button, Divider, IconButton, Overlay } from '@onefootprint/ui';
 import FocusTrap from 'focus-trap-react';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
 export type ConsentBottomSheetProps = {
@@ -41,9 +42,10 @@ const ConsentBottomSheet = ({
   closeAriaLabel = 'Close',
   testID,
 }: ConsentBottomSheetProps) => {
-  const { t } = useTranslation(
-    'id-doc.components.id-doc-photo-prompt.consent-mobile.consent-bottomsheet',
-  );
+  const { t } = useTranslation('idv', {
+    keyPrefix:
+      'id-doc.components.id-doc-photo-prompt.consent-mobile.consent-bottomsheet',
+  });
   const bottomSheetRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(bottomSheetRef, () => {
     if (open) {

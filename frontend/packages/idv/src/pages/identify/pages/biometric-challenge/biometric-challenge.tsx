@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoSmartphone24 } from '@onefootprint/icons';
 import { Button, Stack } from '@onefootprint/ui';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ChallengeHeader from '../../components/challenge-header';
 import DifferentAccount from '../../components/different-account';
@@ -10,7 +10,9 @@ import useIdentifyMachine from '../../hooks/use-identify-machine';
 import Biometric from './components/biometric';
 
 const BiometricChallenge = () => {
-  const { t } = useTranslation('identify.pages.biometric-challenge');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'identify.pages.biometric-challenge',
+  });
   const [state, send] = useIdentifyMachine();
   const { initialAuthToken, bootstrapData, config } = state.context;
   const isBootstrap = !!(bootstrapData?.email || bootstrapData?.phoneNumber);

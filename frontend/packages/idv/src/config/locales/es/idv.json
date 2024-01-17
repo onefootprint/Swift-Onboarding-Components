@@ -9,10 +9,28 @@
     },
     "components": {
       "layout": {
-        "secured-by-footprint": "Asegurado por Footprint",
-        "sandbox-banner": "Modo Sandbox",
+        "secured-by-footprint": "Sesión resgardada por Footprint",
+        "sandbox-banner": "Modo de prueba",
         "privacy": "Privacidad",
-        "whats-this": "¿Qué es esto?"
+        "whats-this": "¿Qué es esto?",
+        "whats-this-drawer": {
+          "label": "¿Qué es esto?",
+          "title": "Tus datos personales y tu privacidad son muy importantes para nosotros",
+          "subtitle": "Es por eso que {{tenant}} se ha asociado con Footprint para alcanzar los más altos estándares de seguridad y que tu información personal esté siempre bien protegida.",
+          "footprint-url-label": "Más sobre Footprint",
+          "tenant-url-label": "Más sobre {{tenant}}",
+          "this-company": "esta empresa",
+          "cards": {
+            "trust": {
+              "title": "Total invisibilidad de tus datos para 'malos' actores",
+              "subtitle": "Nuestra API asegura que solo las partes correctas puedan acceder a los datos que tienen permiso de ver."
+            },
+            "secure": {
+              "title": "Respaldado por Nitro Enclaves",
+              "subtitle": "Nuestras bóvedas avanzadas de datos personales utilizan criptografía avanzada, y están construidas sobre una tecnología llamada Nitro Enclaves, que las hace ser las más seguras del mercado."
+            }
+          }
+        }
       },
       "cta": {
         "continue": "Continuar",

@@ -1,9 +1,9 @@
 import { STATES } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import type { CountryCode } from '@onefootprint/types';
 import { AddressInput, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import getAddressComponent from './utils/get-address-components';
 
@@ -18,7 +18,9 @@ const AddressLines = ({ countryCode }: AddressLinesProps) => {
     setValue,
     resetField,
   } = useFormContext();
-  const { t } = useTranslation('pages.secure-form.address.form');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.secure-form.address.form',
+  });
 
   const handleAddressSelect = async (
     prediction?: google.maps.places.AutocompletePrediction | null,

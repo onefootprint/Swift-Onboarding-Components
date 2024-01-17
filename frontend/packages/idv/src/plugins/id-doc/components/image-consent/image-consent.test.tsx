@@ -1,9 +1,9 @@
+import '../../../../config/initializers/i18next-test';
+
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import { Button } from '@onefootprint/ui';
 import React, { useRef } from 'react';
-import { I18nextProvider } from 'react-i18next';
 
-import configureI18next from '../../../../config/initializers/i18next';
 import type { ImageConsentHandler } from '.';
 import ImageConsent from '.';
 
@@ -34,11 +34,7 @@ const ImageConsentWrapper = ({ onSubmit }: ImageConsentWrapperProps) => {
 };
 
 const renderImageConsent = (onSubmit: (consentInfo: ConsentInfoType) => void) =>
-  customRender(
-    <I18nextProvider i18n={configureI18next()}>
-      <ImageConsentWrapper onSubmit={onSubmit} />
-    </I18nextProvider>,
-  );
+  customRender(<ImageConsentWrapper onSubmit={onSubmit} />);
 
 describe('<ImageConsent/>', () => {
   it('Shows the ml consent true when optional checked', async () => {

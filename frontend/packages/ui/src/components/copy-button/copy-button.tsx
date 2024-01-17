@@ -2,6 +2,7 @@ import { IcoCopy24 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import { useTranslation } from 'react-i18next';
 
 import type { TooltipProps } from '../tooltip';
 import Tooltip from '../tooltip';
@@ -21,14 +22,15 @@ const HIDE_TIMEOUT = 600;
 let confirmationTimeout: null | NodeJS.Timeout = null;
 
 const CopyButton = ({
-  ariaLabel = 'Copy to clipboard',
+  ariaLabel,
   tooltipPosition = 'right',
-  tooltipText = 'Copy to clipboard',
-  tooltipTextConfirmation = 'Copied!',
+  tooltipText,
+  tooltipTextConfirmation,
   children,
   disable,
   contentToCopy,
 }: CopyButtonProps) => {
+  const { t } = useTranslation('ui');
   const [shouldShowConfirmation, setShowConfirmation] = useState(false);
   const [isTooltipVisible, setTooltipVisible] = useState(false);
 
@@ -60,10 +62,15 @@ const CopyButton = ({
   };
 
   const handleText = () => {
+    const tooltip =
+      tooltipText ?? t('components.copy-button.tooltip-text-default');
+    const confirmation =
+      tooltipTextConfirmation ??
+      t('components.copy-button.tooltip-text-confirmation-default');
     if (isMobile) {
-      return tooltipTextConfirmation;
+      return confirmation;
     }
-    return shouldShowConfirmation ? tooltipTextConfirmation : tooltipText;
+    return shouldShowConfirmation ? confirmation : tooltip;
   };
 
   useEffect(() => {
@@ -80,7 +87,7 @@ const CopyButton = ({
       onOpenChange={setTooltipVisible}
     >
       <Button
-        aria-label={ariaLabel}
+        aria-label={ariaLabel ?? t('components.copy-button.aria-label-default')}
         type="button"
         disabled={disable}
         onClick={handleClick}

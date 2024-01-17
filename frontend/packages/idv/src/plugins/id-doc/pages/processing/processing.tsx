@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { IdDocImageTypes, ProcessDocResponse } from '@onefootprint/types';
 import { IdDocImageProcessingError } from '@onefootprint/types';
 import { Box, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEffectOnce, useTimeout } from 'usehooks-ts';
 
 import Logger from '../../../../utils/logger';
@@ -21,7 +21,7 @@ import useProcessDoc from '../../hooks/use-process-doc';
 import useSubmitDoc from '../../hooks/use-submit-doc';
 
 const Processing = () => {
-  const { t } = useTranslation('id-doc.pages.processing');
+  const { t } = useTranslation('idv', { keyPrefix: 'id-doc.pages.processing' });
   const [state, send] = useIdDocMachine();
   const submitDocMutation = useSubmitDoc();
   const processDocMutation = useProcessDoc();

@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
 import { Grid, Stack, useConfirmationDialog } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import EditableFormButtonContainer from '../../../../components/editable-form-button-container';
 import HeaderTitle from '../../../../components/layout/components/header-title';
@@ -36,7 +36,7 @@ const SSN = ({
   onComplete,
   onCancel,
 }: SSNProps) => {
-  const { t } = useTranslation('kyc.pages.ssn');
+  const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages.ssn' });
   const confirmationDialog = useConfirmationDialog();
   const [state, send] = useCollectKycDataMachine();
   const { data, requirement, config } = state.context;

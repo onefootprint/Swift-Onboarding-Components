@@ -1,8 +1,8 @@
 import { STATES } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import { Select, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 type StateFieldProps = {
   inputKind: 'dropdown' | 'text';
@@ -14,7 +14,9 @@ const StateField = ({ inputKind }: StateFieldProps) => {
     register,
     formState: { errors },
   } = useFormContext();
-  const { t } = useTranslation('pages.secure-form.address.form.state');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.secure-form.address.form.state',
+  });
 
   return inputKind === 'dropdown' ? (
     <Controller

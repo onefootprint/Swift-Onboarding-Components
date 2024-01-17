@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { BusinessDataResponse, BusinessDIData } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
+import { useTranslation } from 'react-i18next';
 
 import { useBusinessData } from '../../../hooks';
 
@@ -15,7 +15,9 @@ type SyncDataArgs = {
 
 const useSyncData = () => {
   const businessDataMutation = useBusinessData();
-  const { t } = useTranslation('kyb.components.sync-data-error');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyb.components.sync-data-error',
+  });
   const toast = useToast();
 
   const syncData = ({

@@ -1,4 +1,4 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type {
   ChallengeData,
@@ -8,6 +8,7 @@ import type {
   SignupChallengeResponse,
 } from '@onefootprint/types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
 import {
@@ -40,7 +41,9 @@ const PinVerification = ({
     challenge: { challengeData: data },
     obConfigAuth,
   } = state.context;
-  const { t } = useTranslation('pages.auth.pin-verification');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.auth.pin-verification',
+  });
   const showRequestErrorToast = useRequestErrorToast();
   const loginChallengeMutation = useLoginChallenge();
   const signupChallengeMutation = useSignupChallenge();

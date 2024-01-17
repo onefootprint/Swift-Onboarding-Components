@@ -43,6 +43,23 @@ describe('useCreateHandoffUrl', () => {
       const parsedUrl = new URL(url as string);
       expect(parsedUrl.origin).toBe(customBaseUrl);
     });
+
+    it('should include foreign language', () => {
+      const customBaseUrl = 'https://custom.base.url';
+      const { result } = customRenderHook(() =>
+        useCreateHandoffUrl({
+          authToken: 'tok_mKgpGYfPAkkl3AaLrtsQsfNxK2xbWF88LN',
+          baseUrl: customBaseUrl,
+          onboardingConfig,
+          language: 'es',
+        }),
+      );
+
+      const url = result.current;
+      const parsedUrl = new URL(url as string);
+      expect(parsedUrl.origin).toBe(customBaseUrl);
+      expect(parsedUrl.searchParams.get('lng')).toBe('es');
+    });
   });
 
   describe('when appclip and instant app are not enabled', () => {
@@ -59,6 +76,24 @@ describe('useCreateHandoffUrl', () => {
       const parsedUrl = new URL(url as string);
       expect(parsedUrl.hash).toBe('#tok_mKgpGYfPAkkl3AaLrtsQsfNxK2xbWF88LN');
       expect(parsedUrl.searchParams.get('r')).toMatch(/^\d{1,3}$/);
+      expect(parsedUrl.origin).toBe('https://handoff.onefootprint.com');
+    });
+
+    it('should include foreign language', () => {
+      const { result } = customRenderHook(() =>
+        useCreateHandoffUrl({
+          authToken: 'tok_mKgpGYfPAkkl3AaLrtsQsfNxK2xbWF88LN',
+          baseUrl: 'https://handoff.onefootprint.com',
+          onboardingConfig,
+          language: 'es',
+        }),
+      );
+
+      const url = result.current;
+      const parsedUrl = new URL(url as string);
+      expect(parsedUrl.hash).toBe('#tok_mKgpGYfPAkkl3AaLrtsQsfNxK2xbWF88LN');
+      expect(parsedUrl.searchParams.get('r')).toMatch(/^\d{1,3}$/);
+      expect(parsedUrl.searchParams.get('lng')).toBe('es');
       expect(parsedUrl.origin).toBe('https://handoff.onefootprint.com');
     });
   });
@@ -81,6 +116,26 @@ describe('useCreateHandoffUrl', () => {
         '/appclip/app_exp_9KlTyouGLSNKMgJmpUdBAF',
       );
     });
+
+    it('should include foreign language', () => {
+      const { result } = customRenderHook(() =>
+        useCreateHandoffUrl({
+          authToken: 'tok_mKgpGYfPAkkl3AaLrtsQsfNxK2xbWF88LN',
+          onboardingConfig: {
+            ...onboardingConfig,
+            isAppClipEnabled: true,
+          },
+          language: 'es',
+        }),
+      );
+
+      const url = result.current;
+      const parsedUrl = new URL(url as string);
+      expect(parsedUrl.pathname).toBe(
+        '/appclip/app_exp_9KlTyouGLSNKMgJmpUdBAF',
+      );
+      expect(parsedUrl.searchParams.get('lng')).toBe('es');
+    });
   });
 
   describe('when instant-app is enabled', () => {
@@ -98,6 +153,24 @@ describe('useCreateHandoffUrl', () => {
       const url = result.current;
       const parsedUrl = new URL(url as string);
       expect(parsedUrl.pathname).toBe('/instant-app');
+    });
+
+    it('should include foreign language', () => {
+      const { result } = customRenderHook(() =>
+        useCreateHandoffUrl({
+          authToken: 'tok_mKgpGYfPAkkl3AaLrtsQsfNxK2xbWF88LN',
+          onboardingConfig: {
+            ...onboardingConfig,
+            isInstantAppEnabled: true,
+          },
+          language: 'es',
+        }),
+      );
+
+      const url = result.current;
+      const parsedUrl = new URL(url as string);
+      expect(parsedUrl.pathname).toBe('/instant-app');
+      expect(parsedUrl.searchParams.get('lng')).toBe('es');
     });
   });
 
@@ -119,6 +192,27 @@ describe('useCreateHandoffUrl', () => {
       expect(parsedUrl.pathname).toBe(
         '/appclip-instant/app_exp_9KlTyouGLSNKMgJmpUdBAF',
       );
+    });
+
+    it('should include foreign language', () => {
+      const { result } = customRenderHook(() =>
+        useCreateHandoffUrl({
+          authToken: 'tok_mKgpGYfPAkkl3AaLrtsQsfNxK2xbWF88LN',
+          onboardingConfig: {
+            ...onboardingConfig,
+            isAppClipEnabled: true,
+            isInstantAppEnabled: true,
+          },
+          language: 'es',
+        }),
+      );
+
+      const url = result.current;
+      const parsedUrl = new URL(url as string);
+      expect(parsedUrl.pathname).toBe(
+        '/appclip-instant/app_exp_9KlTyouGLSNKMgJmpUdBAF',
+      );
+      expect(parsedUrl.searchParams.get('lng')).toBe('es');
     });
   });
 });

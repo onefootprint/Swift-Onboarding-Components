@@ -3,6 +3,7 @@ import { IcoClose24 } from '@onefootprint/icons';
 import styled, { css, keyframes } from '@onefootprint/styled';
 import * as DrawerPrimitive from '@radix-ui/react-dialog';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { SXStyles } from '../../hooks';
 import { media } from '../../utils';
@@ -23,7 +24,7 @@ export type DrawerProps = {
 
 const Drawer = ({
   children,
-  closeAriaLabel = 'Close',
+  closeAriaLabel,
   open,
   title,
   headerComponent,
@@ -31,6 +32,7 @@ const Drawer = ({
   onClickOutside,
   onClose,
 }: DrawerProps) => {
+  const { t } = useTranslation('ui');
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
       onClose();
@@ -47,7 +49,10 @@ const Drawer = ({
         >
           <DrawerSurface>
             <Header
-              closeAriaLabel={closeAriaLabel}
+              closeAriaLabel={
+                closeAriaLabel ??
+                t('components.drawer.close-aria-label-default')
+              }
               closeIconComponent={CloseIconComponent}
               onClose={onClose}
             >

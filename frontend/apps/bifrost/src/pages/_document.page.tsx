@@ -34,10 +34,10 @@ export default class MyDocument extends Document {
   }
 
   render() {
-    const { variant, fontSrc } = this.getPageProps();
+    const { variant, fontSrc, language } = this.getPageProps();
 
     return (
-      <Html lang="en">
+      <Html lang={language ?? 'en'}>
         <Head>
           <meta name="app-commit-sha" content={COMMIT_SHA} />
           <meta name="app-deployment-url" content={DEPLOYMENT_URL} />

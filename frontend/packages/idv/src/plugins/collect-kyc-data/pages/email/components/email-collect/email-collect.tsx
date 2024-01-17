@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { IdDI } from '@onefootprint/types';
 import { Box, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import EditableFormButtonContainer from '../../../../../../components/editable-form-button-container';
 import HeaderTitle from '../../../../../../components/layout/components/header-title';
@@ -33,7 +33,7 @@ const EmailCollect = ({
 }: EmailCollectProps) => {
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
-  const { t } = useTranslation('kyc.pages.email');
+  const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages.email' });
   const { mutation, syncEmail } = useSyncEmail();
   const {
     register,

@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { FormDialogButton } from '../../types';
 import SecuredByFootprint from './components/secured-by-footprint';
@@ -21,7 +21,9 @@ const Footer = ({
   hideSaveButton,
   hideCancelButton,
 }: FooterProps) => {
-  const { t } = useTranslation('pages.secure-form.form-dialog');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.secure-form.form-dialog',
+  });
 
   if (hideSaveButton && hideCancelButton) {
     return (

@@ -1,3 +1,5 @@
+import './config/initializers/i18next';
+
 export type {
   AddressInputProps,
   AvatarProps,
@@ -142,6 +144,7 @@ export {
   Typography,
   useToast,
 } from './components';
+export { default as enUiJson } from './config/locales/en/ui.json';
 export type {
   BaseStyleProps,
   CustomStyleProps,

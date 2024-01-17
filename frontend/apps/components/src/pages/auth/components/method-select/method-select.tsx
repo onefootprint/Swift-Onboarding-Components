@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoEmail16, IcoFaceid16, IcoSmartphone16 } from '@onefootprint/icons';
 import type { ComponentProps } from 'react';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import MethodSelectComponent from './component';
 
@@ -12,7 +12,9 @@ type MethodSelectProps = Pick<
 >;
 
 const MethodSelect = ({ children, Header }: MethodSelectProps) => {
-  const { t } = useTranslation('pages.auth');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.auth',
+  });
 
   return (
     <MethodSelectComponent

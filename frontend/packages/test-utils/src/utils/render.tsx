@@ -36,15 +36,17 @@ type WrapperProps = {
   children: React.ReactNode;
 };
 
-export const Wrapper = ({ children }: WrapperProps) => (
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <DesignSystemProvider theme={themes.light}>
-        {children}
-      </DesignSystemProvider>
-    </QueryClientProvider>
-  </React.StrictMode>
-);
+export const Wrapper = ({ children }: WrapperProps) => {
+  return (
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <DesignSystemProvider theme={themes.light}>
+          {children}
+        </DesignSystemProvider>
+      </QueryClientProvider>
+    </React.StrictMode>
+  );
+};
 
 export const customRender = (Component?: React.ReactNode) => {
   throwOnConsoleErrors();

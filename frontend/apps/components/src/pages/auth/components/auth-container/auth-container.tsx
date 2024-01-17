@@ -2,7 +2,6 @@ import {
   FootprintComponentKind,
   FootprintPublicEvent,
 } from '@onefootprint/footprint-js';
-import { useTranslation } from '@onefootprint/hooks';
 import type { DeviceInfo } from '@onefootprint/idv';
 import {
   getIdentifyBootstrapData,
@@ -15,6 +14,7 @@ import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import { useConfirmationDialog } from '@onefootprint/ui';
 import React, { useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useFootprintProvider } from '../../../../components/footprint-provider';
 import useProps from '../../../../components/footprint-provider/hooks/use-props';
@@ -106,7 +106,7 @@ const AuthContainer = ({
   const { options = voidObj, publicKey, userData, variant } = props || voidObj;
   const fpProvider = useFootprintProvider();
 
-  const { t } = useTranslation('pages.auth');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.auth' });
   const confirmationDialog = useConfirmationDialog();
   const onboardingValidateMutation = useOnboardingValidate();
   const obConfigAuth = getOnboardConfigurationKey(publicKey);

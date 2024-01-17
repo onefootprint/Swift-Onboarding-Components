@@ -1,7 +1,8 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { IdentifyResponse } from '@onefootprint/types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { EmailForm, LegalFooter, StepHeader } from '../../../../components';
 import useIdentify from '../../../../hooks/api/hosted/identify/use-identify';
@@ -15,7 +16,9 @@ type FormData = {
 
 const EmailIdentification = () => {
   const [state, send] = useIdentifyMachine();
-  const { t } = useTranslation('identify.pages.email-identification');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'identify.pages.email-identification',
+  });
   const {
     identify: { email, sandboxId },
     obConfigAuth,

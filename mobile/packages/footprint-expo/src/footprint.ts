@@ -136,6 +136,7 @@ const footprint = () => {
     const redirectUrlOrFallback = props.redirectUrl ?? Linking.createURL('/');
     const url = createUrl({
       appearance: props.appearance,
+      l10n: props.l10n,
       redirectUrl: redirectUrlOrFallback,
       token,
     });

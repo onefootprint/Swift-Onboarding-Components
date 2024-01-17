@@ -1,5 +1,6 @@
 import styled, { useTheme } from '@onefootprint/styled';
 import React, { useCallback, useId, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { usePopper } from 'react-popper';
 import type { OptionProps } from 'react-select';
 import ReactSelect from 'react-select';
@@ -48,7 +49,7 @@ export type BaseSelectProps<Option extends BaseSelectOption> = {
 
 const BaseSelect = <Option extends BaseSelectOption>({
   disabled,
-  emptyStateText = 'No results found',
+  emptyStateText,
   hasError,
   hint,
   id: baseId,
@@ -60,11 +61,12 @@ const BaseSelect = <Option extends BaseSelectOption>({
   OptionComponent = Option,
   options,
   renderTrigger,
-  searchPlaceholder = 'Search',
+  searchPlaceholder,
   size = 'default',
   testID,
   value,
 }: BaseSelectProps<Option>) => {
+  const { t } = useTranslation('ui');
   const internalId = useId();
   const id = baseId || internalId;
   const [isOpen, setOpen] = useState(false);
@@ -97,9 +99,12 @@ const BaseSelect = <Option extends BaseSelectOption>({
     closeDropdown();
   };
 
+  const localizedEmptyStateText =
+    emptyStateText ??
+    t('components.internal.base-select.empty-state-text-default');
   const renderEmptyState = useCallback(
-    () => <EmptyState>{emptyStateText}</EmptyState>,
-    [emptyStateText],
+    () => <EmptyState>{localizedEmptyStateText}</EmptyState>,
+    [localizedEmptyStateText],
   );
 
   return (
@@ -182,7 +187,10 @@ const BaseSelect = <Option extends BaseSelectOption>({
             onChange={handleChange}
             onMenuClose={closeDropdown}
             options={options}
-            placeholder={searchPlaceholder}
+            placeholder={
+              searchPlaceholder ??
+              t('components.internal.base-select.search-placeholder-default')
+            }
             value={value}
           />
         </div>

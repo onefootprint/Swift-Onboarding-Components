@@ -1,14 +1,16 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoPlusSmall16 } from '@onefootprint/icons';
 import { LinkButton } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type AddButtonProps = {
   onClick: () => void;
 };
 
 const AddButton = ({ onClick }: AddButtonProps) => {
-  const { t } = useTranslation('kyb.pages.beneficial-owners.form');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyb.pages.beneficial-owners.form',
+  });
 
   return (
     <LinkButton

@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoGlobe24 } from '@onefootprint/icons';
 import { IdDI } from '@onefootprint/types';
 import type { CountrySelectOption } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type {
   SectionAction,
@@ -18,7 +18,7 @@ import LegalStatus from '../../../legal-status';
 import getCountrySelectOption from '../../../legal-status/utils/get-country-select-option';
 
 const LegalStatusSection = () => {
-  const { t, allT } = useTranslation('kyc.pages');
+  const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages' });
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
   const [editing, setEditing] = useState(false);
@@ -108,7 +108,7 @@ const LegalStatusSection = () => {
   const actions: SectionAction[] = [];
   if (!editing) {
     actions.push({
-      label: allT('kyc.pages.confirm.summary.edit'),
+      label: t('confirm.summary.edit'),
       onClick: () => setEditing(true),
     });
   }

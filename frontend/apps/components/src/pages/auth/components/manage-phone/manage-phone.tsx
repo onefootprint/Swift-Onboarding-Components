@@ -1,8 +1,8 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import { checkIsPhoneValid, PhoneForm } from '@onefootprint/idv';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { HeaderProps } from '../../types';
 
@@ -16,7 +16,9 @@ const handlePhoneValidation = (s: string) => checkIsPhoneValid(s, !isLive);
 const noop = () => undefined;
 
 const ManagePhone = ({ children, Header }: ManagePhoneProps) => {
-  const { t } = useTranslation('pages.auth');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.auth',
+  });
 
   return (
     <>

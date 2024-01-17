@@ -1,12 +1,14 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { LinkButton, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import useDesktopMachine from '../../../../../hooks/desktop/use-desktop-machine';
 
 const ContinueOnDesktop = () => {
-  const { t } = useTranslation('transfer.pages.desktop.qr-register');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'transfer.pages.desktop.qr-register',
+  });
   const [state, send] = useDesktopMachine();
   const {
     missingRequirements: { idDoc },

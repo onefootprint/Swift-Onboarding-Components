@@ -1,3 +1,5 @@
+import '../../config/initializers/i18next-test';
+
 import { COUNTRIES as options } from '@onefootprint/global-constants';
 import { customRender, screen, selectEvents } from '@onefootprint/test-utils';
 import take from 'lodash/take';

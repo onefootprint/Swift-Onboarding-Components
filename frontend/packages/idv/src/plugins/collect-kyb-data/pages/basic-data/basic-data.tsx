@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   BusinessDI,
   CollectedKybDataOption,
@@ -6,6 +5,7 @@ import {
 } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import Logger from '../../../../utils/logger';
@@ -32,7 +32,7 @@ const BasicData = ({
   const { authToken, config, data, kybRequirement } = state.context;
   const { missingAttributes } = kybRequirement || {};
   const { mutation, syncData } = useSyncData();
-  const { t, allT } = useTranslation('kyb.pages.basic-data');
+  const { t } = useTranslation('idv');
 
   const handleSubmit = (basicData: BasicDataFields) => {
     const handleSuccess = () => {
@@ -72,7 +72,7 @@ const BasicData = ({
     corporationType: corpTypeValue
       ? {
           value: corpTypeValue,
-          label: allT(
+          label: t(
             `kyb.pages.basic-data.form.corporation-type.mapping.${corpTypeValue}`,
           ),
         }
@@ -101,8 +101,8 @@ const BasicData = ({
         <>
           <CollectKybDataNavigationHeader />
           <HeaderTitle
-            title={t('title')}
-            subtitle={t('subtitle')}
+            title={t('kyb.pages.basic-data.title')}
+            subtitle={t('kyb.pages.basic-data.subtitle')}
             sx={{ marginBottom: 7 }}
           />
         </>

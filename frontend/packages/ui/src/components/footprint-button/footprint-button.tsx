@@ -1,6 +1,7 @@
 import { IcoFootprint24 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
 import React, { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { ButtonProps } from '../button';
 import Button from '../button';
@@ -23,10 +24,11 @@ const FootprintButton = ({
   size = 'default',
   testID,
   type = 'button',
-  text = 'Verify with Footprint',
+  text,
   loading,
   loadingAriaLabel,
 }: FootprintButtonProps) => {
+  const { t } = useTranslation('ui');
   const buttonRef = useRef<HTMLButtonElement>(null);
   const className = buttonRef.current?.className;
   const isCustomAppearance = className?.includes('fp-custom-appearance');
@@ -55,7 +57,7 @@ const FootprintButton = ({
         color="quinary"
         variant={footprintButtonFontVariantBySize[size]}
       >
-        {text}
+        {text ?? t('components.footprint-button.text-default')}
       </Typography>
     </Button>
   );

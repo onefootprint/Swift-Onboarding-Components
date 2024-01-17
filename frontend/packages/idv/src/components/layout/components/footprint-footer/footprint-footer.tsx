@@ -1,8 +1,8 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { media, Stack, Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import useResizeObserver from 'use-resize-observer';
 
 import { FOOTPRINT_FOOTER_ID } from '../../constants';
@@ -19,7 +19,9 @@ const FootprintFooter = ({
   hideOnDesktop,
   onWhatsThisClick,
 }: FootprintFooterProps) => {
-  const { t } = useTranslation('components.layout');
+  const { t /* i18n */ } = useTranslation('idv', {
+    keyPrefix: 'global.components.layout',
+  });
   const {
     footer: { options, set: updateFooterOptions },
   } = useLayoutOptions();
@@ -34,6 +36,13 @@ const FootprintFooter = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [height]);
 
+  // const handleChangeLanguage = () => {
+  //   const changeTo = i18n.language === 'en' ? 'es' : 'en';
+  //   // const allLanguages = i18n.languages; // TODO: uncomment to get all languages
+  //   i18n.changeLanguage(changeTo);
+  //   document.documentElement.setAttribute('lang', changeTo);
+  // };
+
   return (
     <FootprintFooterContainer
       hideOnDesktop={hideOnDesktop}
@@ -44,6 +53,11 @@ const FootprintFooter = ({
     >
       <SecuredByFootprint />
       <LinksContainer as="ul" align="center" justify="center" gap={3}>
+        {/* <li>
+          <Button size="compact" onClick={handleChangeLanguage}>
+            Lang
+          </Button>
+        </li> */}
         <li>
           <WhatsThisButton onClick={onWhatsThisClick}>
             <Typography variant="caption-1" color="secondary" as="span">

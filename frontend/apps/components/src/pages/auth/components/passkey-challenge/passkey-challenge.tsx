@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoSmartphone24 } from '@onefootprint/icons';
 import { Button, Stack } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useAuthMachine } from '../../state';
 import type { HeaderProps } from '../../types';
@@ -13,7 +13,9 @@ type StepPassKeyProps = {
 };
 
 const PasskeyChallenge = ({ children, Header }: StepPassKeyProps) => {
-  const { t } = useTranslation('pages.auth.passkey-challenge');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.auth.passkey-challenge',
+  });
   const [, send] = useAuthMachine();
 
   const handleChangeChallenge = () => {

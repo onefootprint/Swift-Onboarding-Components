@@ -1,21 +1,4 @@
 {
-  "global": {
-    "errors": {
-      "uncaught-error": {
-        "title": "Oops! An error occurred.",
-        "description": "We're sorry. Please restart the flow.",
-        "cta": "Restart"
-      }
-    }
-  },
-  "components": {
-    "layout": {
-      "secured-by-footprint": "Secured by Footprint",
-      "sandbox-banner": "Sandbox Mode",
-      "privacy": "Privacy",
-      "whats-this": "What's this?"
-    }
-  },
   "pages": {
     "complete": {
       "title": "Completed",

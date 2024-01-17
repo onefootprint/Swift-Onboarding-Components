@@ -3,6 +3,7 @@ import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import type { CaptionProps } from 'react-day-picker';
 import { useNavigation } from 'react-day-picker';
+import { useTranslation } from 'react-i18next';
 
 import IconButton from '../../../icon-button';
 import Typograhy from '../../../typography';
@@ -11,11 +12,15 @@ const shortMonthDateFormatter = (date: Date) =>
   date.toLocaleDateString(undefined, { year: 'numeric', month: 'short' });
 
 const CustomCaption = ({ displayMonth }: CaptionProps) => {
+  const { t } = useTranslation('ui');
   const { goToMonth, nextMonth, previousMonth } = useNavigation();
+
   return (
     <CaptionContainer>
       <IconButton
-        aria-label="Previous"
+        aria-label={t(
+          'components.internal.date-picker.custom-caption.previous',
+        )}
         disabled={!previousMonth}
         onClick={() => previousMonth && goToMonth(previousMonth)}
       >
@@ -25,7 +30,7 @@ const CustomCaption = ({ displayMonth }: CaptionProps) => {
         {shortMonthDateFormatter(displayMonth)}
       </Typograhy>
       <IconButton
-        aria-label="Next"
+        aria-label={t('components.internal.date-picker.custom-caption.next')}
         disabled={!nextMonth}
         onClick={() => nextMonth && goToMonth(nextMonth)}
       >

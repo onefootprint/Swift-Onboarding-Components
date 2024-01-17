@@ -1,5 +1,6 @@
 import styled, { css, useTheme } from '@onefootprint/styled';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 
 import { createFontStyles } from '../../utils/mixins';
@@ -19,21 +20,26 @@ const CodeBlock = ({
   title,
   language,
   children,
-  tooltipText = 'Copy to clipboard',
-  tooltipTextConfirmation = 'Copied!',
-  ariaLabel = 'Copy to clipboard',
+  tooltipText,
+  tooltipTextConfirmation,
+  ariaLabel,
 }: CodeBlockProps) => {
   const theme = useTheme();
-
+  const { t } = useTranslation('ui');
   return (
     <Container>
       <Header>
         <Typography variant="label-3">{title || language}</Typography>
         <CopyButton
           contentToCopy={children}
-          tooltipText={tooltipText}
-          tooltipTextConfirmation={tooltipTextConfirmation}
-          ariaLabel={ariaLabel}
+          tooltipText={
+            tooltipText ?? t('components.code-block.tooltip-text-default')
+          }
+          tooltipTextConfirmation={
+            tooltipTextConfirmation ??
+            t('components.code-inline.tooltip-text-confirmation-default')
+          }
+          ariaLabel={ariaLabel ?? t('components.code-block.aria-label-default')}
         />
       </Header>
       <Content>

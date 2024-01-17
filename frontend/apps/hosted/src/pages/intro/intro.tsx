@@ -1,14 +1,14 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
 
 import Header from './components/header';
 import useIsKyb from './utils/is-kyb';
 
 const Intro = () => {
-  const { t } = useTranslation('pages.intro');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.intro.cta' });
   const [, send] = useHostedMachine();
   const isKyb = useIsKyb();
 
@@ -22,7 +22,7 @@ const Intro = () => {
     <Container>
       <Header />
       <Button fullWidth onClick={handleClick}>
-        {isKyb ? t('cta.kyb') : t('cta.kyc')}
+        {isKyb ? t('kyb') : t('kyc')}
       </Button>
     </Container>
   );

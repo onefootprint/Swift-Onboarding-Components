@@ -1,5 +1,5 @@
-import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useGetD2PStatus from '../../../../../hooks/api/hosted/onboarding/d2p/use-get-d2p-status';
 import { useDesktopMachine } from '../../../components/desktop-machine-provider';
@@ -11,7 +11,7 @@ import getRequirementsTitleTranslationKey from '../../../utils/get-requirements-
 const Processing = () => {
   const [state, send] = useDesktopMachine();
   const { scopedAuthToken, missingRequirements } = state.context;
-  const { t, allT } = useTranslation('transfer.pages.desktop.processing');
+  const { t } = useTranslation('idv');
   const allTKey = getRequirementsTitleTranslationKey(missingRequirements);
   const cancelD2P = useCancelD2P({
     authToken: scopedAuthToken,
@@ -35,9 +35,9 @@ const Processing = () => {
 
   return (
     <ProcessingBase
-      title={allT(allTKey)}
-      subtitle={t('subtitle')}
-      cta={t('cancel')}
+      title={t(allTKey)}
+      subtitle={t('transfer.pages.desktop.processing.subtitle')}
+      cta={t('transfer.pages.desktop.processing.cancel')}
       onCancel={cancelD2P}
     />
   );

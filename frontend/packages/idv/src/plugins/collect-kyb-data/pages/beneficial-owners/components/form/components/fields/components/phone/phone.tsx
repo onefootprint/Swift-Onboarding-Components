@@ -1,10 +1,10 @@
 import type { SupportedLocale } from '@onefootprint/footprint-js';
-import { useTranslation } from '@onefootprint/hooks';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
 import { PhoneInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import checkIsPhoneValid from '../../../../../../../../../../utils/check-is-phone-valid/check-is-phone-valid';
 import type { FormData } from '../../../../types';
@@ -18,7 +18,9 @@ type PhoneProps = {
 const PhoneFieldName = BeneficialOwnerDataAttribute.phoneNumber;
 
 const Phone = ({ index, config, locale }: PhoneProps) => {
-  const { t } = useTranslation('kyb.pages.beneficial-owners.form.fields.phone');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyb.pages.beneficial-owners.form.fields.phone',
+  });
   const {
     control,
     formState: { errors },

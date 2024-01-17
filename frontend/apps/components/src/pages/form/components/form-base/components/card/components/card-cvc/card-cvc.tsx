@@ -1,8 +1,8 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { useTranslation } from '@onefootprint/hooks';
 import type { InputProps } from '@onefootprint/ui';
 import { InternalInput } from '@onefootprint/ui';
 import React, { forwardRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export enum CvcLength {
   three = 3,
@@ -40,7 +40,9 @@ const CardCvc = forwardRef<HTMLInputElement, CardCvcProps>(
     }: CardCvcProps,
     ref,
   ) => {
-    const { t } = useTranslation('pages.secure-form.card.form.cvc');
+    const { t } = useTranslation('common', {
+      keyPrefix: 'pages.secure-form.card.form.cvc',
+    });
 
     return (
       <InternalInput

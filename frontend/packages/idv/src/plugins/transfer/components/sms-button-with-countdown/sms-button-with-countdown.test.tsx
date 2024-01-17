@@ -1,3 +1,5 @@
+import '../../../../config/initializers/i18next-test';
+
 import { customRender, screen, waitFor } from '@onefootprint/test-utils';
 import React from 'react';
 

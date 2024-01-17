@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Button, Grid, InlineAlert, Stack } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import HeaderTitle from '../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
@@ -8,9 +8,9 @@ import useDesktopMachine from '../../../hooks/desktop/use-desktop-machine';
 
 const ConfirmContinueOnDesktop = () => {
   const [, send] = useDesktopMachine();
-  const { t } = useTranslation(
-    'transfer.pages.desktop.confirm-continue-on-desktop',
-  );
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'transfer.pages.desktop.confirm-continue-on-desktop',
+  });
 
   const handleDesktop = () => {
     send({

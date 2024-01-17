@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import RealOutcome from './components/real-outcome';
 import SimulatedOutcomes from './components/simulated-outcomes';
@@ -11,7 +11,9 @@ type IdDocOutcomeSelectProps = {
 };
 
 const IdDocOutcomeSelect = ({ allowRealOutcome }: IdDocOutcomeSelectProps) => {
-  const { t } = useTranslation('global.pages.sandbox-outcome.id-doc-outcome');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'global.pages.sandbox-outcome.id-doc-outcome',
+  });
   const [isSimulated, setIsSimulated] = useState(true);
 
   const outcomeTypeChange = () => {

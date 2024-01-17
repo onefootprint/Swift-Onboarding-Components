@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import { Box, Button, Divider, Grid } from '@onefootprint/ui';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import FileEntry from '../file-entry';
 
@@ -12,9 +12,9 @@ type UploadFilesProps = {
 // TODO: For now, we are restricted by API to upload only one file even though
 // this component supports multiple files
 const UploadFiles = ({ onChange }: UploadFilesProps) => {
-  const { t } = useTranslation(
-    'investor-profile.pages.declarations.doc-upload',
-  );
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'investor-profile.pages.declarations.doc-upload',
+  });
   const inputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<File[]>([]);
 

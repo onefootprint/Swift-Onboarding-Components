@@ -1,4 +1,6 @@
 /* eslint-disable jest/expect-expect */
+import './config/initializers/i18next-test';
+
 import themes from '@onefootprint/design-tokens';
 import { ObserveCollectorProvider } from '@onefootprint/dev-tools';
 import {

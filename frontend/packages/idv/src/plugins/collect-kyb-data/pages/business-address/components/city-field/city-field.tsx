@@ -1,14 +1,16 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 const CityField = () => {
   const {
     register,
     formState: { errors },
   } = useFormContext();
-  const { t } = useTranslation('kyb.pages.business-address.form.city');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyb.pages.business-address.form.city',
+  });
 
   return (
     <TextInput

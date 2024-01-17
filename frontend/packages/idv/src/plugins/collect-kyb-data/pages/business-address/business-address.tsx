@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { BusinessDI } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import Logger from '../../../../utils/logger';
@@ -24,7 +24,9 @@ const BusinessAddress = ({
   onCancel,
   hideHeader,
 }: BusinessAddressProps) => {
-  const { t } = useTranslation('kyb.pages.business-address');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyb.pages.business-address',
+  });
   const [state, send] = useCollectKybDataMachine();
   const { authToken, data } = state.context;
   const { mutation, syncData } = useSyncData();

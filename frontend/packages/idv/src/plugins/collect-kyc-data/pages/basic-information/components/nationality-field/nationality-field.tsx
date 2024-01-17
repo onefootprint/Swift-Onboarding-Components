@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { CountrySelect } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import { useL10nContext } from '../../../../../../components/l10n-provider';
 
@@ -10,7 +10,9 @@ type NationalityFieldProps = {
 };
 
 const NationalityField = ({ disabled }: NationalityFieldProps) => {
-  const { t } = useTranslation('kyc.pages.basic-information.form.nationality');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyc.pages.basic-information.form.nationality',
+  });
   const { control } = useFormContext();
   const l10n = useL10nContext();
 

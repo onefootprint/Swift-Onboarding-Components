@@ -3,15 +3,17 @@ import {
   COUNTRIES_WITH_STATES,
   STATES,
 } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import { Select, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import type { FormData } from '../../types';
 
 const StateField = () => {
-  const { t } = useTranslation('kyc.pages.residential-address.form.state');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyc.pages.residential-address.form.state',
+  });
   const {
     control,
     register,

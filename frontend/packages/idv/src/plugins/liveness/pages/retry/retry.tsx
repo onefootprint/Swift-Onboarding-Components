@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import { Button, Grid } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
@@ -15,7 +15,7 @@ import useBiometricInit from '../../hooks/use-register-biometric';
 const SUCCESS_TRANSITION_DELAY_MS = 1500;
 
 const Retry = () => {
-  const { t } = useTranslation('liveness.pages.retry');
+  const { t } = useTranslation('idv', { keyPrefix: 'liveness.pages.retry' });
   const [state, send] = useLivenessMachine();
   const { authToken } = state.context;
   const biometricInitMutation = useBiometricInit();

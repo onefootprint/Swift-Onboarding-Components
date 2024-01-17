@@ -1,9 +1,9 @@
 import type { L10n } from '@onefootprint/footprint-js';
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { Grid, InlineAlert, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Email from './components/email';
 import Header from './components/header';
@@ -19,7 +19,9 @@ export type FieldsProps = {
 };
 
 const Fields = ({ index, onRemove, config, l10n }: FieldsProps) => {
-  const { t } = useTranslation('kyb.pages.beneficial-owners.form.fields');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyb.pages.beneficial-owners.form.fields',
+  });
 
   const handleRemove = () => {
     onRemove(index);

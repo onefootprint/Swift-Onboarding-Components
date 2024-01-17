@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoUserCircle24 } from '@onefootprint/icons';
 import {
   BeneficialOwnerDataAttribute,
@@ -6,6 +5,7 @@ import {
   CollectedKybDataOption,
 } from '@onefootprint/types';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type {
   SectionItemProps,
@@ -20,7 +20,7 @@ import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-mac
 import BeneficialOwners from '../../../beneficial-owners/beneficial-owners';
 
 const BeneficialOwnersSection = () => {
-  const { t, allT } = useTranslation('kyb.pages.confirm.beneficial-owners');
+  const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.confirm' });
   const [state] = useCollectKybDataMachine();
   const {
     data,
@@ -43,11 +43,11 @@ const BeneficialOwnersSection = () => {
   beneficialOwners.forEach((beneficialOwner, index) => {
     const items = [
       {
-        text: t('first-name'),
+        text: t('beneficial-owners.first-name'),
         subtext: beneficialOwner[BeneficialOwnerDataAttribute.firstName],
       },
       {
-        text: t('last-name'),
+        text: t('beneficial-owners.last-name'),
         subtext: beneficialOwner[BeneficialOwnerDataAttribute.lastName],
       },
     ];
@@ -55,13 +55,13 @@ const BeneficialOwnersSection = () => {
     const email = beneficialOwner[BeneficialOwnerDataAttribute.email];
     if (index > 0 && email) {
       items.push({
-        text: t('email'),
+        text: t('beneficial-owners.email'),
         subtext: email,
       });
     }
 
     items.push({
-      text: t('ownership-stake'),
+      text: t('beneficial-owners.ownership-stake'),
       subtext: `${
         beneficialOwner[BeneficialOwnerDataAttribute.ownershipStake]
       }%`,
@@ -69,7 +69,9 @@ const BeneficialOwnersSection = () => {
 
     sections.push({
       title:
-        index === 0 ? t('beneficial-owner-you') : t('beneficial-owner-other'),
+        index === 0
+          ? t('beneficial-owners.beneficial-owner-you')
+          : t('beneficial-owners.beneficial-owner-other'),
       content: items.map(({ text, subtext, textColor }: SectionItemProps) => (
         <SectionItem
           key={text}
@@ -91,12 +93,12 @@ const BeneficialOwnersSection = () => {
 
   return editing ? (
     <Section
-      title={t('title')}
+      title={t('beneficial-owners.title')}
       IconComponent={IcoUserCircle24}
       content={
         <BeneficialOwners
           hideHeader
-          ctaLabel={allT('kyb.pages.confirm.summary.save')}
+          ctaLabel={t('summary.save')}
           onComplete={stopEditing}
           onCancel={stopEditing}
         />
@@ -105,8 +107,8 @@ const BeneficialOwnersSection = () => {
     />
   ) : (
     <MultiSection
-      title={t('title')}
-      editLabel={allT('kyb.pages.confirm.summary.edit')}
+      title={t('beneficial-owners.title')}
+      editLabel={t('summary.edit')}
       onEdit={startEditing}
       IconComponent={IcoUserCircle24}
       sections={sections}

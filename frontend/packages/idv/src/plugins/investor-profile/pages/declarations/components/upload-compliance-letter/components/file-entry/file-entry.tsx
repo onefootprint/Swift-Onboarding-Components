@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoTrash16 } from '@onefootprint/icons';
 import { Box, IconButton, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type FileEntryProps = {
   file: File;
@@ -9,9 +9,9 @@ type FileEntryProps = {
 };
 
 const FileEntry = ({ file, onRemove }: FileEntryProps) => {
-  const { t } = useTranslation(
-    'investor-profile.pages.declarations.doc-upload',
-  );
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'investor-profile.pages.declarations.doc-upload',
+  });
 
   return (
     <Stack align="center" justify="space-between" minHeight="32px">

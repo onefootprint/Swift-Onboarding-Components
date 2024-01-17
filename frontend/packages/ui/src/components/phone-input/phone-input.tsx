@@ -1,6 +1,7 @@
 import { COUNTRIES, REGION_CODES } from '@onefootprint/global-constants';
 import type { CountryCode } from '@onefootprint/types';
 import React, { forwardRef, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import mergeRefs from 'react-merge-refs';
 import { useUpdateEffect } from 'usehooks-ts';
 
@@ -22,11 +23,12 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
       selectEmptyStateText,
       value,
       locale,
-      options,
+      options = COUNTRIES,
       ...props
     }: PhoneInputProps,
     ref,
   ) => {
+    const { t } = useTranslation('ui');
     const localRef = useRef<HTMLInputElement>(null);
     const [selectedCountry, setCountry] = useState<PhoneSelectOption>(() =>
       getCountryFromPhoneNumber(value, getCountryCodeFromLocale(locale)),
@@ -42,6 +44,14 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
       localRef.current?.focus();
     }, [countryCode]);
 
+    const getCountriesWithLocalizedLabels = () =>
+      options.map(option => ({
+        ...option,
+        label: t(`global.countries.${option.value}`),
+      }));
+
+    const localizedOptions = getCountriesWithLocalizedLabels();
+
     return (
       <BaseSelect<BaseSelectOption<CountryCode>>
         emptyStateText={selectEmptyStateText}
@@ -49,7 +59,7 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
         hint={hint}
         onChange={handleCountryChange}
         OptionComponent={Option}
-        options={options ?? COUNTRIES}
+        options={localizedOptions}
         renderTrigger={trigger => (
           <Input
             {...props}

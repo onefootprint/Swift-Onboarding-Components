@@ -1,10 +1,10 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import { IdDI, UsLegalStatus } from '@onefootprint/types';
 import type { CountrySelectOption } from '@onefootprint/ui';
 import { Divider, Grid } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import EditableFormButtonContainer from '../../../../components/editable-form-button-container';
 import HeaderTitle from '../../../../components/layout/components/header-title';
@@ -40,7 +40,7 @@ const LegalStatus = ({
   const [state, send] = useCollectKycDataMachine();
   const { data } = state.context;
   const { mutation, syncData } = useSyncData();
-  const { t } = useTranslation('kyc.pages.legal-status');
+  const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages.legal-status' });
   const convertFormData = useConvertFormData();
 
   const usCountryRecord = COUNTRIES.find(country => country.value === 'US');

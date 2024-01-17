@@ -14,8 +14,8 @@ Logger.setupSentry();
 configureReactI18next();
 
 const App = ({ Component, pageProps }: AppProps) => (
-  <QueryClientProvider client={queryClient}>
-    <ObserveCollectorProvider appName="hosted">
+  <ObserveCollectorProvider appName="hosted">
+    <QueryClientProvider client={queryClient}>
       <HostedMachineProvider>
         <AppearanceProvider
           options={{
@@ -26,8 +26,8 @@ const App = ({ Component, pageProps }: AppProps) => (
           <Component {...pageProps} />
         </AppearanceProvider>
       </HostedMachineProvider>
-    </ObserveCollectorProvider>
-  </QueryClientProvider>
+    </QueryClientProvider>
+  </ObserveCollectorProvider>
 );
 
 const GlobalStyle = createGlobalStyle`

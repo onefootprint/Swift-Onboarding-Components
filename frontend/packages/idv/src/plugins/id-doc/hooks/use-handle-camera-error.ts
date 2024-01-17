@@ -1,12 +1,14 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { useToast } from '@onefootprint/ui';
+import { useTranslation } from 'react-i18next';
 
 import Logger from '../../../utils/logger';
 import { useMissingPermissionsSheet } from '../components/missing-permissions-sheet';
 
 const useHandleCameraError = () => {
   const toast = useToast();
-  const { t } = useTranslation('id-doc.components.media-errors');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.components.media-errors',
+  });
   const missingPermissionsSheet = useMissingPermissionsSheet();
 
   const showErrorToast = (description: string) => {

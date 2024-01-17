@@ -1,8 +1,8 @@
 import type { Color } from '@onefootprint/design-tokens';
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoBuilding24 } from '@onefootprint/icons';
 import { IdDI } from '@onefootprint/types';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type {
   SectionAction,
@@ -17,7 +17,7 @@ import Address from '../../../residential-address';
 import createAddressLine from './utils/create-address-line';
 
 const AddressSection = () => {
-  const { t, allT } = useTranslation('kyc.pages.confirm');
+  const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages' });
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
 
@@ -79,14 +79,14 @@ const AddressSection = () => {
   const actions: SectionAction[] = [];
   if (!editing) {
     actions.push({
-      label: allT('kyc.pages.confirm.summary.edit'),
+      label: t('confirm.summary.edit'),
       onClick: () => setEditing(true),
     });
   }
 
   return (
     <Section
-      title={t('address.title')}
+      title={t('confirm.address.title')}
       actions={actions}
       IconComponent={IcoBuilding24}
       content={getSectionContent()}

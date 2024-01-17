@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoEmail24 } from '@onefootprint/icons';
 import { CollectedKycDataOption, IdDI } from '@onefootprint/types';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type {
   SectionAction,
@@ -15,7 +15,7 @@ import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-mac
 import Email from '../../../email';
 
 const EmailSection = () => {
-  const { t, allT } = useTranslation('kyc.pages.confirm');
+  const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages' });
   const [state] = useCollectKycDataMachine();
   const {
     data,
@@ -37,7 +37,7 @@ const EmailSection = () => {
 
   const emailElement = [
     {
-      text: t('email.text'),
+      text: t('confirm.email.text'),
       subtext: email,
     },
   ];
@@ -65,7 +65,7 @@ const EmailSection = () => {
       <Email
         onComplete={stopEditing}
         onCancel={stopEditing}
-        ctaLabel={allT('kyc.pages.cta.continue')}
+        ctaLabel={t('cta.continue')}
         hideHeader
       />
     );
@@ -74,7 +74,7 @@ const EmailSection = () => {
   const actions: SectionAction[] = [];
   if (!editing) {
     actions.push({
-      label: allT('kyc.pages.confirm.summary.edit'),
+      label: t('confirm.summary.edit'),
       onClick: () => setEditing(true),
     });
   }
@@ -82,7 +82,7 @@ const EmailSection = () => {
   return (
     <Section
       testID="email-section"
-      title={t('email.title')}
+      title={t('confirm.email.title')}
       actions={actions}
       IconComponent={IcoEmail24}
       content={getSectionContent()}

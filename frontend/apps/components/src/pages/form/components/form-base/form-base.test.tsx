@@ -1,3 +1,5 @@
+import '../../../../config/initializers/react-i18next-test';
+
 import {
   createGoogleMapsSpy,
   getPlacePredictions,

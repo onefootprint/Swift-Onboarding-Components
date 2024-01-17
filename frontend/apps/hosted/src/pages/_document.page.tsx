@@ -6,6 +6,8 @@ import React from 'react';
 
 import { COMMIT_SHA, DEPLOYMENT_URL } from '../config/constants';
 
+const nextData = '__NEXT_DATA__';
+
 export default class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {
     const sheet = new ServerStyleSheet();
@@ -27,9 +29,15 @@ export default class MyDocument extends Document {
     }
   }
 
+  getPageProps() {
+    return this.props[nextData].props.pageProps;
+  }
+
   render() {
+    const { language } = this.getPageProps();
+
     return (
-      <Html lang="en">
+      <Html lang={language ?? 'en'}>
         <Head>
           <LoadFonts />
           <meta name="app-commit-sha" content={COMMIT_SHA} />

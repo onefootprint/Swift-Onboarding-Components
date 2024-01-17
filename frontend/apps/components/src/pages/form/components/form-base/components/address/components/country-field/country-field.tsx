@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { CountrySelect } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 type CountryFieldProps = {
   onChange: () => void;
@@ -9,7 +9,9 @@ type CountryFieldProps = {
 
 const CountryField = ({ onChange }: CountryFieldProps) => {
   const { control } = useFormContext();
-  const { t } = useTranslation('pages.secure-form.address.form.country');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.secure-form.address.form.country',
+  });
 
   return (
     <Controller

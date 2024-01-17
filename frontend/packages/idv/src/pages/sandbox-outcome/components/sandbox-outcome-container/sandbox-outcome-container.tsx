@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { IdDocOutcome } from '@onefootprint/types';
 import { Button, Grid, InlineAlert, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import { HeaderTitle, NavigationHeader } from '../../../../components';
 import { getRandomID } from '../../../../utils';
@@ -21,7 +21,9 @@ export const SandboxOutcomeContainer = ({
   onSubmit: (formData: SandboxOutcomeFormData) => void;
   config?: PublicOnboardingConfig;
 }) => {
-  const { t } = useTranslation('global.pages.sandbox-outcome');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'global.pages.sandbox-outcome',
+  });
   const {
     overallOutcomeOptions: { overallOutcomeSuccess },
   } = useSandboxOutcomeOptions();

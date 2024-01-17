@@ -1,10 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import { Grid } from '@onefootprint/ui';
 import creditcardutils from 'creditcardutils';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import CardCvc, { CvcLength } from './components/card-cvc';
 import CardExpDateInput from './components/card-exp-date-input';
@@ -25,7 +25,9 @@ const DEFAULT_CVC_NUM_DIGITS = CvcLength.three;
 const AMEX_CVC_NUM_DIGITS = CvcLength.four;
 
 const Card = () => {
-  const { t } = useTranslation('pages.secure-form.card.form');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.secure-form.card.form',
+  });
   const { register, watch, formState } = useFormContext<CardData>();
   const { errors } = formState;
 

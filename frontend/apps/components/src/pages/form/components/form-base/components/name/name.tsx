@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 export type NameData = {
   name: string;
@@ -12,7 +12,9 @@ export type NameProps = {
 };
 
 const Name = ({ label }: NameProps) => {
-  const { t } = useTranslation('pages.secure-form.name.form');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.secure-form.name.form',
+  });
   const {
     register,
     formState: { errors },

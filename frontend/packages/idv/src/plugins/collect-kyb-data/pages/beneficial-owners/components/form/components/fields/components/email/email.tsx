@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import type { FormData } from '../../../../types';
 
@@ -11,7 +11,9 @@ type EmailProps = {
 };
 
 const Email = ({ index }: EmailProps) => {
-  const { t } = useTranslation('kyb.pages.beneficial-owners.form.fields.email');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyb.pages.beneficial-owners.form.fields.email',
+  });
   const {
     register,
     formState: { errors },

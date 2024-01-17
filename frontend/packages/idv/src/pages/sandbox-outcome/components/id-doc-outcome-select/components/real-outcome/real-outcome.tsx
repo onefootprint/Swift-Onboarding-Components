@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoInfo16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Radio, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import useSandboxOutcomeOptions from '../../../../hooks/use-sandbox-outcome-options';
 
@@ -13,7 +13,9 @@ type RealOutcomeProps = {
 };
 
 const RealOutcome = ({ onSelect, isSelected }: RealOutcomeProps) => {
-  const { t } = useTranslation('global.pages.sandbox-outcome.id-doc-outcome');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'global.pages.sandbox-outcome.id-doc-outcome',
+  });
   const {
     idDocOutcomeOptions: { idDocOutcomeReal },
   } = useSandboxOutcomeOptions();

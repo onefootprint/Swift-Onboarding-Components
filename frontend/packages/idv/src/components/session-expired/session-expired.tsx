@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { EmptyState } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { NavigationHeader } from '../layout';
 
@@ -9,7 +9,9 @@ type SessionExpiredProps = {
 };
 
 const SessionExpired = ({ onRestart }: SessionExpiredProps) => {
-  const { t } = useTranslation('global.components.session-expired');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'global.components.session-expired',
+  });
 
   return (
     <>

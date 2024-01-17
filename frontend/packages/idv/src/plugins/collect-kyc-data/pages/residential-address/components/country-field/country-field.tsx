@@ -1,8 +1,8 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import { CountrySelect } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import { useL10nContext } from '../../../../../../components/l10n-provider';
 import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
@@ -20,7 +20,9 @@ const CountryField = ({ onChange, disabled }: CountryFieldProps) => {
   } = state;
   const { control, watch } = useFormContext<FormData>();
   const country = watch('country');
-  const { t } = useTranslation('kyc.pages.residential-address.form.country');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyc.pages.residential-address.form.country',
+  });
   const l10n = useL10nContext();
   const allowedCountries = new Set(config.supportedCountries);
   const shouldDisable = disabled || allowedCountries.size === 1;

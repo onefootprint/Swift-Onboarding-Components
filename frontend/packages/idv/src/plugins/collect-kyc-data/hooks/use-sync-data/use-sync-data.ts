@@ -1,9 +1,10 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { UserDataError } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import type { AxiosError } from 'axios';
+import { useTranslation } from 'react-i18next';
 
 import { useL10nContext } from '../../../../components/l10n-provider';
 import useUserData from '../../../../hooks/api/hosted/user/vault/use-user-data';
@@ -22,7 +23,9 @@ type SyncDataArgs = {
 };
 
 const useSyncData = () => {
-  const { t } = useTranslation('kyc.components.sync-data-error');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyc.components.sync-data-error',
+  });
   const [state] = useCollectKycDataMachine();
   const showRequestErrorToast = useRequestErrorToast();
   const { authToken, requirement } = state.context;

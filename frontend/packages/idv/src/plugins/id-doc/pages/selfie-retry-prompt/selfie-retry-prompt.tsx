@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { IdDocImageTypes } from '@onefootprint/types';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Error from '../../components/error/error';
 import FadeInContainer from '../../components/fade-in-container';
@@ -11,7 +11,9 @@ import { getCountryFromCode } from '../../utils/get-country-from-code';
 
 const SelfieRetryPrompt = () => {
   const [state, send] = useIdDocMachine();
-  const { t } = useTranslation('id-doc.pages.selfie-retry-prompt');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.pages.selfie-retry-prompt',
+  });
 
   const {
     idDoc: { type, country },

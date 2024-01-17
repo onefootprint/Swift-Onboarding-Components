@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoCar24,
   IcoGreenCard24,
@@ -11,9 +10,12 @@ import {
 } from '@onefootprint/icons';
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import type { RadioSelectOptionFields } from '@onefootprint/ui';
+import { useTranslation } from 'react-i18next';
 
 const useOptionsByDocType = (supportedDocumentTypes: SupportedIdDocTypes[]) => {
-  const { t } = useTranslation('id-doc.pages.country-and-type-selection');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'id-doc.pages.country-and-type-selection',
+  });
 
   const optionsByDocType: {
     [key in SupportedIdDocTypes]?: RadioSelectOptionFields;

@@ -1,8 +1,8 @@
 import type { Color } from '@onefootprint/design-tokens';
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24 } from '@onefootprint/icons';
 import { IconButton } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type NavigationBackButtonProps = {
   onBack?: () => void;
@@ -10,9 +10,9 @@ export type NavigationBackButtonProps = {
 };
 
 const NavigationBackButton = ({ onBack, color }: NavigationBackButtonProps) => {
-  const { t } = useTranslation(
-    'global.components.layout.navigation-header.back-button',
-  );
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'global.components.layout.navigation-header.back-button',
+  });
 
   return (
     <IconButton

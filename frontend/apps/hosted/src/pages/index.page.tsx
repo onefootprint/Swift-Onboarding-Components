@@ -5,6 +5,7 @@ import Idv, { AppErrorBoundary } from '@onefootprint/idv';
 import { IdDI } from '@onefootprint/types';
 import { withLDProvider } from 'launchdarkly-react-client-sdk';
 import * as LogRocket from 'logrocket';
+import type { GetServerSideProps } from 'next';
 import React from 'react';
 import Layout from 'src/components/layout';
 import useHostedMachine from 'src/hooks/use-hosted-machine';
@@ -60,6 +61,18 @@ const Root = ({ variant }: RootProps) => {
       </AppErrorBoundary>
     </Layout>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async ({
+  query,
+  res,
+}) => {
+  res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=30, stale-while-revalidate=3600',
+  );
+
+  return { props: { language: query.lng ?? 'en' } };
 };
 
 export default withLDProvider({

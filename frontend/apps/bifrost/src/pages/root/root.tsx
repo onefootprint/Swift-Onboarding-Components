@@ -99,6 +99,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   );
 
   const obConfig = query.public_key as string | undefined;
+  const language = query.lng as string | undefined;
   const params = query as Record<string, string>;
   const response = await getCustomAppearance({
     strategy: ['queryParameters', 'obConfig'],
@@ -106,7 +107,13 @@ export const getServerSideProps: GetServerSideProps = async ({
     params,
     variant: params.variant,
   });
-  return { props: response };
+
+  return {
+    props: {
+      ...response,
+      language: language ?? 'en',
+    },
+  };
 };
 
 export default withLDProvider({

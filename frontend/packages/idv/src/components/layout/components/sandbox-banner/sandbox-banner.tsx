@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Banner, media } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type SandboxBannerHandler = {
   getHeight: () => number;
@@ -15,7 +15,9 @@ const SandboxBanner = forwardRef<SandboxBannerHandler, SandboxBannerProps>(
   ({ hideOnDesktop }, ref) => {
     const containerRef = useRef<HTMLDivElement | null>(null);
     const getHeight = () => containerRef.current?.clientHeight ?? 0;
-    const { t } = useTranslation('components.layout');
+    const { t } = useTranslation('idv', {
+      keyPrefix: 'global.components.layout',
+    });
 
     useImperativeHandle(
       ref,

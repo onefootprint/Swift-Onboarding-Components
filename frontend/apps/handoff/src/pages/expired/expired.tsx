@@ -1,13 +1,13 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { HeaderTitle, NavigationHeader } from '@onefootprint/idv';
 import styled from '@onefootprint/styled';
 import { Box, Button, Grid } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHandoffMachine from '../../hooks/use-handoff-machine';
 
 const Expired = () => {
-  const { t } = useTranslation('pages.expired');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.expired' });
   const [state] = useHandoffMachine();
   const { opener } = state.context;
 

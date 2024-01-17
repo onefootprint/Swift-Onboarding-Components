@@ -1,11 +1,13 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { BeneficialOwner } from '@onefootprint/types';
 import { BeneficialOwnerDataAttribute } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
+import { useTranslation } from 'react-i18next';
 
 const useCheckDuplicateContacts = () => {
   const toast = useToast();
-  const { t } = useTranslation('kyb.pages.beneficial-owners.form.errors');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'kyb.pages.beneficial-owners.form.errors',
+  });
 
   return (beneficialOwners: BeneficialOwner[]) => {
     const emails = beneficialOwners.map(

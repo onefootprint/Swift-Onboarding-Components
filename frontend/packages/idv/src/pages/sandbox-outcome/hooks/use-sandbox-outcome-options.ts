@@ -1,8 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IdDocOutcome, OverallOutcome } from '@onefootprint/types';
+import { useTranslation } from 'react-i18next';
 
 const useSandboxOutcomeOptions = () => {
-  const { t } = useTranslation('global.pages.sandbox-outcome');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'global.pages.sandbox-outcome',
+  });
 
   const overallOutcomeSuccess = {
     label: t('overall-outcome.outcome.options.success.title'),

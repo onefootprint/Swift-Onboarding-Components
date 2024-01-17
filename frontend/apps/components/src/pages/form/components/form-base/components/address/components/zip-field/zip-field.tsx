@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { CountryCode } from '@onefootprint/types';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import useInputValidations from './hooks/use-input-validations';
 
@@ -16,7 +16,9 @@ const ZipField = ({ countryCode }: ZipFieldProps) => {
     formState: { errors },
     getValues,
   } = useFormContext();
-  const { t } = useTranslation('pages.secure-form.address.form.zip');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.secure-form.address.form.zip',
+  });
   const { zipcode } = useInputValidations(countryCode);
   const isCountryUS = countryCode === 'US';
 

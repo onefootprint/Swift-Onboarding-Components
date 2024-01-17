@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Button } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type ContinueButtonProps = {
   isLoading?: boolean;
@@ -8,7 +8,9 @@ type ContinueButtonProps = {
 };
 
 const ContinueButton = ({ label, isLoading }: ContinueButtonProps) => {
-  const { t } = useTranslation('investor-profile.components.continue-button');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'investor-profile.components.continue-button',
+  });
 
   return (
     <Button

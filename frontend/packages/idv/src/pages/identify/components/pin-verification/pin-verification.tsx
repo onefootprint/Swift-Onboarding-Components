@@ -1,4 +1,4 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type {
   ChallengeData,
@@ -11,6 +11,7 @@ import type {
 } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
 import useIdentifyVerify from '../../../../hooks/api/hosted/identify/use-identify-verify';
@@ -42,7 +43,9 @@ const PinVerification = ({
   preferredChallengeKind,
   identifier,
 }: PinVerificationProps) => {
-  const { t } = useTranslation('identify.components.pin-verification');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'identify.components.pin-verification',
+  });
   const [state, send] = useIdentifyMachine();
   const {
     identify: { email, sandboxId, userFound },

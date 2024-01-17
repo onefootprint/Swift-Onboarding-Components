@@ -1,8 +1,8 @@
 import type { Color } from '@onefootprint/design-tokens';
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoBuilding24 } from '@onefootprint/icons';
 import { BusinessDI } from '@onefootprint/types';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type {
   SectionAction,
@@ -22,7 +22,7 @@ const createAddressLine = (address: Array<string | undefined | null>) =>
     .join(', ');
 
 const BusinessAddressSection = () => {
-  const { allT, t } = useTranslation('kyb.pages.confirm.business-address');
+  const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages' });
   const [state] = useCollectKybDataMachine();
   const { data } = state.context;
 
@@ -76,7 +76,7 @@ const BusinessAddressSection = () => {
 
     return (
       <BusinessAddress
-        ctaLabel={allT('kyb.pages.confirm.summary.save')}
+        ctaLabel={t('confirm.summary.save')}
         onComplete={stopEditing}
         onCancel={stopEditing}
         hideHeader
@@ -87,14 +87,14 @@ const BusinessAddressSection = () => {
   const actions: SectionAction[] = [];
   if (!editing) {
     actions.push({
-      label: allT('kyb.pages.confirm.summary.edit'),
+      label: t('confirm.summary.edit'),
       onClick: () => setEditing(true),
     });
   }
 
   return (
     <Section
-      title={t('title')}
+      title={t('confirm.business-address.title')}
       actions={actions}
       IconComponent={IcoBuilding24}
       content={getSectionContent()}

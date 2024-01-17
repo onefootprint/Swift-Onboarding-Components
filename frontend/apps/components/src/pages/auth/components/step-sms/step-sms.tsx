@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { ChallengeKind } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useAuthMachine } from '../../state';
 import type { HeaderProps } from '../../types';
@@ -24,7 +24,9 @@ const StepSms = ({ children, Header }: StepPhoneProps) => {
     identify,
   } = state.context;
   const { phoneNumber = '', successfulIdentifier } = identify;
-  const { t } = useTranslation('pages.auth');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.auth',
+  });
   const toast = useToast();
 
   const headerTitle = getStepTitle(t, identify);

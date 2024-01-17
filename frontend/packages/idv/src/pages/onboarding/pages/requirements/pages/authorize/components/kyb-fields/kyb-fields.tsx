@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { Icon } from '@onefootprint/icons';
 import {
   IcoBuilding24,
@@ -9,6 +8,7 @@ import {
 import { CollectedKybDataOption } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { FieldProps } from '../field';
 import FieldsList from '../fields-list';
@@ -30,7 +30,9 @@ type KybFieldsProps = {
 };
 
 const KybFields = ({ data, showTitle }: KybFieldsProps) => {
-  const { t } = useTranslation('onboarding.pages.authorize');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'onboarding.pages.authorize',
+  });
 
   const collectedKybDataOptionLabels: Record<CollectedKybDataOption, string> = {
     [CollectedKybDataOption.name]: t('data-labels.business-name'),
