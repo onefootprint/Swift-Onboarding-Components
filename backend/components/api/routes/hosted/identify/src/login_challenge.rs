@@ -158,7 +158,7 @@ pub async fn post(
     let challenge_data = UserChallengeData {
         challenge_kind,
         challenge_token,
-        scrubbed_phone_number: phone_number.map(|p| p.last_two()),
+        scrubbed_phone_number: phone_number.map(|p| p.scrubbed()),
         biometric_challenge_json,
         time_before_retry_s,
     };

@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::{UserChallengeContext, VaultIdentifier};
 
 use api_core::{
@@ -9,6 +11,7 @@ use api_core::{
     State,
 };
 use api_wire_types::{IdentifyRequest, IdentifyResponse};
+use newtypes::{email::Email, DataIdentifier, IdentityDataKind as IDK, PhoneNumber};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
@@ -29,6 +32,7 @@ pub async fn post(
     root_span: RootSpan,
 ) -> JsonApiResponse<IdentifyResponse> {
     let IdentifyRequest { identifier } = request.into_inner();
+    let is_token_provided = user_auth.is_some();
 
     // Require one of user_auth or identifier
     let identifier = match (user_auth, identifier) {
@@ -44,14 +48,27 @@ pub async fn post(
     let Some(ctx) = crate::get_user_challenge_context(&state, identifier, ob_context, root_span).await?
     else {
         // The user vault doesn't exist. Just return that the user wasn't found
-        return Ok(Json(ResponseData {
-            data: IdentifyResponse {
-                user_found: false,
-                is_unverified: false,
-                available_challenge_kinds: None,
-                has_syncable_pass_key: false,
-            },
-        }));
+        return ResponseData::ok(IdentifyResponse::default()).json();
+    };
+
+    let (scrubbed_phone, scrubbed_email) = if is_token_provided {
+        // When we are identifying a user via auth token, provide the scrubbed phone and email
+        let dis = vec![
+            DataIdentifier::Id(IDK::PhoneNumber),
+            DataIdentifier::Id(IDK::Email),
+        ];
+        let values = ctx.vw.decrypt_unchecked(&state.enclave_client, &dis).await?;
+        let phone = values.get_di(IDK::PhoneNumber).ok();
+        let scrubbed_phone = phone
+            .and_then(|p| PhoneNumber::parse(p).ok())
+            .map(|p| p.scrubbed());
+        let email = values.get_di(IDK::Email).ok();
+        let scrubbed_email = email
+            .and_then(|p| Email::from_str(p.leak()).ok())
+            .map(|email| email.scrubbed());
+        (scrubbed_phone, scrubbed_email)
+    } else {
+        (None, None)
     };
 
     let UserChallengeContext {
@@ -67,6 +84,8 @@ pub async fn post(
         user_found: true,
         available_challenge_kinds: Some(challenge_kinds),
         has_syncable_pass_key,
+        scrubbed_phone,
+        scrubbed_email,
     };
     ResponseData::ok(response).json()
 }

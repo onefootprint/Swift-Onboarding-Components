@@ -16,7 +16,7 @@ pub struct IdentifyRequest {
     pub identifier: Option<IdentifyId>,
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub struct IdentifyResponse {
     pub user_found: bool,
@@ -25,6 +25,10 @@ pub struct IdentifyResponse {
     /// support syncing and may be available to use on desktop/other devices
     pub has_syncable_pass_key: bool,
     pub is_unverified: bool,
+    /// Populated only when identifying a user via auth token
+    pub scrubbed_phone: Option<PiiString>,
+    /// Populated only when identifying a user via auth token
+    pub scrubbed_email: Option<PiiString>,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]

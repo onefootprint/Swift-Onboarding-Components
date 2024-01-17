@@ -77,7 +77,7 @@ pub async fn post(
         let data = UserChallengeData {
             challenge_kind: ChallengeKind::Sms,
             challenge_token,
-            scrubbed_phone_number: Some(phone_number.last_two()),
+            scrubbed_phone_number: Some(phone_number.scrubbed()),
             biometric_challenge_json: None,
             time_before_retry_s: time_before_retry_s.num_seconds(),
         };

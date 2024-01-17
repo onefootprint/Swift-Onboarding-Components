@@ -48,6 +48,38 @@ impl Email {
             || self.email.leak() == Self::FIXTURE_EMAIL2
             || FINDIGS_FIXTURE_EMAIL_RE.is_match(self.email.leak())
     }
+
+    /// Formats the Email with most scrubbed - just first letter of email and first letter of domain
+    pub fn scrubbed(&self) -> PiiString {
+        let domain_idx = self.email.leak().rfind('@');
+        let last_dot_idx = self.email.leak().rfind('.');
+        let last_dot_idx = if domain_idx.zip(last_dot_idx).is_some_and(|(x, y)| y < x) {
+            // If the last dot isn't part of the domain, don't show anything after the dot
+            None
+        } else {
+            last_dot_idx
+        };
+        let value: String = self
+            .email
+            .leak()
+            .chars()
+            .enumerate()
+            .map(|(i, c)| {
+                // Take the first character of the email
+                let is_first_char = i == 0;
+                // Take the first character of the domain
+                let is_first_domain_char = domain_idx.is_some_and(|idx| i == idx || i == idx + 1);
+                // Take the entire last subdomain (like .com)
+                let is_after_last_dot = last_dot_idx.is_some_and(|idx| i >= idx);
+                if is_first_char || is_first_domain_char || is_after_last_dot {
+                    c
+                } else {
+                    '*'
+                }
+            })
+            .collect();
+        PiiString::new(value)
+    }
 }
 
 impl serde::Serialize for Email {
@@ -144,5 +176,13 @@ mod tests {
     #[test_case("xxxqauserfootprint+123@findigs.com" => false)]
     fn test_is_fixture(input: &str) -> bool {
         Email::from_str(input).unwrap().is_fixture()
+    }
+
+    #[test_case("sandbox@onefootprint.com" => "s******@o***********.com")]
+    #[test_case("sandbox+12@onefootprint.com" => "s*********@o***********.com")]
+    #[test_case("sandbox.hi@mydomain" => "s*********@m*******")]
+    #[test_case("sandbox.hi@mydomain.com" => "s*********@m*******.com")]
+    fn test_scrub(input: &str) -> String {
+        Email::from_str(input).unwrap().scrubbed().leak_to_string()
     }
 }

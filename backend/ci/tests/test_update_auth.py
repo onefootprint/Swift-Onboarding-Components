@@ -80,6 +80,16 @@ def get_auth_token_for_ci_update(user, auth_playbook):
     return (user, auth_token)
 
 
+def test_scrubbed_phone_email(sandbox_user, sandbox_tenant):
+    data = dict(kind="user")
+    body = post(f"users/{sandbox_user.fp_id}/token", data, sandbox_tenant.sk.key)
+    auth_token = FpAuth(body["token"])
+
+    body = post("hosted/identify", dict(identifier=None), auth_token)
+    assert body["scrubbed_phone"] == "+1 (***) ***-**00"
+    assert body["scrubbed_email"] == "s******@o***********.com"
+
+
 @pytest.mark.parametrize(
     "challenge,di",
     [

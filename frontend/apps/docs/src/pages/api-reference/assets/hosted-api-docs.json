@@ -3471,6 +3471,14 @@
                     "is_unverified": {
                         "type": "boolean"
                     },
+                    "scrubbed_email": {
+                        "description": "Populated only when identifying a user via auth token",
+                        "type": "string"
+                    },
+                    "scrubbed_phone": {
+                        "description": "Populated only when identifying a user via auth token",
+                        "type": "string"
+                    },
                     "user_found": {
                         "type": "boolean"
                     }
