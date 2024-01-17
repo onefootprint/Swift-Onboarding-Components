@@ -28,6 +28,7 @@ const OverallOutcomeSelect = ({ config }: OverallOutcomeSelectProps) => {
       simulatedOutcomeOptions: { idDocOutcomeSuccess },
     },
   } = useSandboxOutcomeOptions();
+
   const { control, watch, setValue } = useFormContext();
   const watchIdDocOutcome = watch('outcomes.idDocOutcome');
   const watchOverallOutcome = watch('outcomes.overallOutcome');
@@ -73,8 +74,8 @@ const OverallOutcomeSelect = ({ config }: OverallOutcomeSelectProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setValue, watchIdDocOutcome, watchOverallOutcome]);
 
-  const hasValueInOptions = (value: OverallOutcome) =>
-    options.some(option => option.value === value);
+  const getOption = (value: OverallOutcome) =>
+    options.find(option => option.value === value);
 
   const isDisabled =
     watchIdDocOutcome?.value === IdDocOutcome.fail ||
@@ -90,7 +91,7 @@ const OverallOutcomeSelect = ({ config }: OverallOutcomeSelectProps) => {
           <Box>
             <Select
               options={options}
-              value={hasValueInOptions(field.value.value) ? field.value : null}
+              value={getOption(field.value.value)}
               onChange={field.onChange}
               testID="overallOutcomeOption"
               disabled={isDisabled}
