@@ -17,7 +17,7 @@ import type { Article } from '../../api-reference.types';
 import TypeBadge from '../type-badge';
 import NavigationScrollLink from './components/navigation-scroll-link';
 
-type PageNavProps = {
+export type PageNavProps = {
   sections: PageNavSection[];
 };
 

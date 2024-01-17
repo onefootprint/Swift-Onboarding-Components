@@ -37,6 +37,7 @@ const StyledBadge = styled(Badge)<{ skinny: boolean }>`
       : `${theme.spacing[2]} ${theme.spacing[3]}`};
     border-radius: ${theme.borderRadius.default};
     text-transform: uppercase;
+    width: fit-content;
   `}
 `;
 

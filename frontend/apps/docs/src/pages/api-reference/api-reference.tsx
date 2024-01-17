@@ -8,6 +8,7 @@ import { useHover } from 'usehooks-ts';
 import staticAPIData from './assets/api-docs.json';
 import staticPreviewAPIData from './assets/api-preview-docs.json';
 import Articles from './components/articles/articles';
+import Cmd from './components/cmd';
 import PageNav from './components/page-nav';
 import getArticles from './utils/get-articles';
 
@@ -39,6 +40,7 @@ const ApiReference = () => {
         <PageNav sections={sections} ref={navRef} />
         <Articles sections={sections} />
       </Layout>
+      <Cmd sections={sections} />
     </Box>
   );
 };

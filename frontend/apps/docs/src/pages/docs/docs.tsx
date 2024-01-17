@@ -1,7 +1,7 @@
 import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import React from 'react';
-import Cmd from 'src/components/cmd/cmd';
+import Cmd from 'src/pages/docs/components/cmd/cmd';
 import type { Article } from 'src/types/article';
 import type { PageNavigation } from 'src/types/page';
 
