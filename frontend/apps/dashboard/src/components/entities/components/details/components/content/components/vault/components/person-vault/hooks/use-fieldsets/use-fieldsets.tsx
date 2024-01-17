@@ -130,6 +130,7 @@ const useFieldsets = (excludeNationality?: boolean): Fieldset => {
       fields: [
         { di: InvestorProfileDI.employmentStatus },
         { di: InvestorProfileDI.occupation },
+        { di: InvestorProfileDI.employer },
         { di: InvestorProfileDI.annualIncome },
         { di: InvestorProfileDI.netWorth },
         { di: InvestorProfileDI.investmentGoals },

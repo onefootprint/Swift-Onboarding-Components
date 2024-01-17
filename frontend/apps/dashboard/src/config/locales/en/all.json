@@ -71,6 +71,7 @@
     "investor_profile": {
       "employment_status": "Employment status",
       "occupation": "Occupation",
+      "employer": "Employer",
       "annual_income": "Annual income",
       "net_worth": "Net worth",
       "investment_goals": "Investment goals",
