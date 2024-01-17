@@ -28,7 +28,7 @@ const getDocumentStatus = ({
     return new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime();
   })[0];
   return (
-    mostRecentDocument.status && DocStatusToUIState[mostRecentDocument.status]
+    mostRecentDocument?.status && DocStatusToUIState[mostRecentDocument.status]
   );
 };
 
