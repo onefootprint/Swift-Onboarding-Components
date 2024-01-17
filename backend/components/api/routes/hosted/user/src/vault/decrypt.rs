@@ -12,7 +12,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use std::collections::{HashMap, HashSet};
 
 #[derive(serde::Deserialize, Apiv2Schema)]
-pub struct DecryptRequest {
+pub struct UserDecryptRequest {
     /// List of data identifiers to decrypt. For example, `id.first_name`, `id.ssn4`, `business.name`
     fields: HashSet<DataIdentifier>,
 }
@@ -24,7 +24,7 @@ pub struct DecryptRequest {
 #[actix::post("/hosted/user/vault/decrypt")]
 pub async fn post(
     state: web::Data<State>,
-    request: Json<DecryptRequest>,
+    request: Json<UserDecryptRequest>,
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<DecryptResponse> {
     let fields = request.into_inner().fields.into_iter().collect_vec();
