@@ -68,7 +68,7 @@ export const idCardSuccess: Document = {
 export const idCardFail: Document = {
   completedVersion: 3,
   kind: SupportedIdDocTypes.idCard,
-  startedAt: '2023-07-26T00:00:00.000Z',
+  startedAt: '2023-07-27T00:00:00.000Z',
   status: IdDocStatus.failed,
   uploads: [],
   documentScore: null,

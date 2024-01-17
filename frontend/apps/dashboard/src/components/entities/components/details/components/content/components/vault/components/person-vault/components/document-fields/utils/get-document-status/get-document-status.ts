@@ -23,22 +23,13 @@ const getDocumentStatus = ({
     return undefined;
   }
   const relevantDocuments = filterDocumentsByKind(documents, documentType);
-  if (
-    relevantDocuments.some(document => document.status === IdDocStatus.complete)
-  ) {
-    return DocStatusToUIState[IdDocStatus.complete];
-  }
-  if (
-    relevantDocuments.some(document => document.status === IdDocStatus.pending)
-  ) {
-    return DocStatusToUIState[IdDocStatus.pending];
-  }
-  if (
-    relevantDocuments.some(document => document.status === IdDocStatus.failed)
-  ) {
-    return DocStatusToUIState[IdDocStatus.failed];
-  }
-  return undefined;
+  const mostRecentDocument = relevantDocuments.sort((a, b) => {
+    if (!a.startedAt || !b.startedAt) return 0;
+    return new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime();
+  })[0];
+  return (
+    mostRecentDocument.status && DocStatusToUIState[mostRecentDocument.status]
+  );
 };
 
 export default getDocumentStatus;

@@ -11,7 +11,7 @@ import {
 } from './get-document-status.test.config';
 
 describe('getDocumentStatus', () => {
-  it('should return success if there is a successful document', () => {
+  it('should return pending if pending is the most recent', () => {
     const documents = [
       driversLicenseSuccess,
       driversLicenseFailed,
@@ -24,10 +24,10 @@ describe('getDocumentStatus', () => {
         documents,
         documentType: SupportedIdDocTypes.driversLicense,
       }),
-    ).toEqual('success');
+    ).toEqual('warning');
   });
 
-  it('should return fail if there is a successful document of another kind', () => {
+  it('should ignore document of another kind', () => {
     const documents = [driversLicenseFailed, idCardSuccess, idCardFail];
     expect(
       getDocumentStatus({
@@ -35,21 +35,6 @@ describe('getDocumentStatus', () => {
         documentType: SupportedIdDocTypes.driversLicense,
       }),
     ).toEqual('error');
-  });
-
-  it('should return pending/warning if there is a failed document but no success for that type', () => {
-    const documents = [
-      driversLicenseFailed,
-      driversLicensePending,
-      idCardSuccess,
-      idCardFail,
-    ];
-    expect(
-      getDocumentStatus({
-        documents,
-        documentType: SupportedIdDocTypes.driversLicense,
-      }),
-    ).toEqual('warning');
   });
 
   it('should return undefined if there are no documents', () => {
