@@ -1701,6 +1701,53 @@
                 ]
             }
         },
+        "/entities/{fp_id}/token": {
+            "post": {
+                "tags": [
+                    "Users",
+                    "Private"
+                ],
+                "description": "Create an identified token for the provided fp_id. This token may be passed into Footprint.js to bootstrap a user's onboarding with known information. Re-auth will be required if the user hasn't logged into your tenant recently.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "fp_id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateEntityTokenRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateTokenResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Dashboard Token": []
+                    }
+                ]
+            }
+        },
         "/entities/{fp_id}/triggers": {
             "post": {
                 "tags": [
@@ -5817,6 +5864,26 @@
                     "role_id"
                 ]
             },
+            "CreateEntityTokenRequest": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "onboard",
+                            "reonboard",
+                            "inherit",
+                            "user"
+                        ]
+                    }
+                },
+                "required": [
+                    "kind"
+                ]
+            },
             "CreateOnboardingConfigurationRequest": {
                 "type": "object",
                 "properties": {
@@ -6726,6 +6793,30 @@
                     "email",
                     "redirect_url",
                     "role_id"
+                ]
+            },
+            "CreateTokenResponse": {
+                "type": "object",
+                "properties": {
+                    "expires_at": {
+                        "description": "The time at which the token (and link) expire",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "link": {
+                        "example": "https://verify.onefootprint.com/?type=user#tok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt",
+                        "description": "A Footprint link embedding the `token` that can be sent to this user to allow them to complete the flow.",
+                        "type": "string"
+                    },
+                    "token": {
+                        "description": "A short-lived token that can be passed into the Verify SDK to allow the user to complete the flow.",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "expires_at",
+                    "link",
+                    "token"
                 ]
             },
             "DecisionRequest": {

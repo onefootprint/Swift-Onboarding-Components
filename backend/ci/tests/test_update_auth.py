@@ -60,7 +60,9 @@ def get_auth_token_for_ci_update(user, auth_playbook):
 
     # Create a new auth token via API that _can_ initiate a challenge, after step up
     data = dict(kind="user")
-    body = post(f"users/{user.fp_id}/token", data, user.client.ob_config.tenant.sk.key)
+    body = post(
+        f"entities/{user.fp_id}/token", data, *user.client.ob_config.tenant.db_auths
+    )
     auth_token = FpAuth(body["token"])
 
     # Make sure we have to explicitly auth (and not use implied auth) to initiate a challenge AND
@@ -146,7 +148,9 @@ def test_add_phone(skip_phone_obc):
 
     # Create an auth token with permissions to update contact info
     data = dict(kind="user")
-    body = post(f"users/{user.fp_id}/token", data, user.client.ob_config.tenant.sk.key)
+    body = post(
+        f"entities/{user.fp_id}/token", data, *user.client.ob_config.tenant.db_auths
+    )
     auth_token = FpAuth(body["token"])
 
     auth_token = IdentifyClient.from_token(auth_token).step_up(

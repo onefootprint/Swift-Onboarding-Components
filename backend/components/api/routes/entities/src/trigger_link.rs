@@ -18,6 +18,7 @@ use db::models::workflow_request::WorkflowRequest;
 use newtypes::WorkflowRequestId;
 use paperclip::actix::{api_v2_operation, post, web};
 
+// TODO deprecate this in favor of POST /entities/<>/token
 #[api_v2_operation(
     description = "Trigger a workflow for the provided user.",
     tags(EntityDetails, Entities, Private)

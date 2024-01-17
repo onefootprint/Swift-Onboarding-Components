@@ -3,38 +3,30 @@ use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::auth::session::user::AssociatedAuthEvent;
-use api_core::auth::session::user::UserSession;
-use api_core::auth::session::user::UserSessionArgs;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::user::allowed_user_scopes;
-use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
 use api_core::utils::actix::OptionalJson;
 use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::session::AuthSession;
+use api_core::utils::token::create_token;
+use api_core::utils::token::CreateTokenArgs;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_wire_types::CreateTokenRequest;
 use api_wire_types::CreateTokenResponse;
 use api_wire_types::TokenOperationKind;
-use chrono::Duration;
 use chrono::Utc;
 use db::models::auth_event::AuthEvent;
 use db::models::auth_event::NewAuthEvent;
-use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
-use db::models::vault::Vault;
-use db::models::workflow::Workflow;
-use db::models::workflow_request::WorkflowRequest;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
 use newtypes::AuthEventKind;
 use newtypes::IdentifyScope;
 use newtypes::PreviewApi;
-use newtypes::VaultKind;
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(
@@ -90,10 +82,6 @@ pub async fn post(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let vault = Vault::get(conn, &sv.vault_id)?;
-            if vault.kind != VaultKind::Person {
-                return Err(ValidationError("Cannot create a token for a non-person vault").into());
-            }
 
             if third_party_auth {
                 // Trust that the tenant has authenticated this user already. Only certain tenants
@@ -112,7 +100,20 @@ pub async fn post(
                 .create(conn)?;
             }
 
-            let inherited_auth_events = {
+            let implied_auth_events = {
+                // As customers start to use us for auth, there will be situations in which:
+                // - The user logs into/creates an account at, say, Grid using the Footprint auth component.
+                // - The user then signs up for a credit card with Grid, which requires KYC through
+                //   the Footprint verify component. When this happens, we want to avoid the user
+                //   needing to re-log in inside the Footprint verify component with an SMS OTP
+                //   since they just did that a few minutes ago.
+                // We could achieve this behavior by having the tenant physically pass us some
+                // proof that the user already logged into Grid.
+                // But for a better ergonomic experience, we inherit "implied" auth events -
+                // if Grid generates a token to launch the user into the Footprint verify component,
+                // we already have server-side state that says that the user already authenticated
+                // with Grid in the last hour, so there's no need for physical token exchange.
+
                 // Don't allow inheriting auth if the user token has more permissions than the tenant.
                 // This notably makes the experience worse for users who are one-clicking onto a tenant
                 // who uses us for both auth and verify.
@@ -145,75 +146,27 @@ pub async fn post(
                     vec![]
                 }
             };
-            let kinds = inherited_auth_events.iter().map(|e| e.kind).collect();
-            // Request Onboarding scopes, but if the user hasn't authed to the tenant recently, we
-            // will be granted no scopes and the user will be required to re-auth
-            let scopes = allowed_user_scopes(kinds, IdentifyScope::Onboarding, false);
-            let duration = Duration::hours(1);
-
-            // Determine arguments for the auth token based on the requested operation
-            let (obc_id, wfr_id) = match kind {
-                TokenOperationKind::User => {
-                    if key.is_some() {
-                        return Err(ValidationError(
-                            "Cannot provide playbook key for operation of kind user",
-                        )
-                        .into());
-                    }
-                    (None, None)
-                }
-                TokenOperationKind::Inherit => {
-                    if key.is_some() {
-                        return Err(ValidationError(
-                            "Cannot provide playbook key for operation of kind inherit",
-                        )
-                        .into());
-                    }
-                    // Inherit the WorkflowRequest
-                    let wfr = WorkflowRequest::get_active(conn, &sv.id)?
-                        .ok_or(ValidationError("No outstanding info is requested from this user"))?;
-                    // Do we want to replace the obc.id on the auth token?
-                    (Some(wfr.ob_configuration_id), Some(wfr.id))
-                }
-                TokenOperationKind::Reonboard => {
-                    if key.is_some() {
-                        return Err(ValidationError(
-                            "Cannot provide playbook key for operation of kind reonboard",
-                        )
-                        .into());
-                    }
-                    let (_, obc) = Workflow::latest(conn, &sv.id, true)?.ok_or(ValidationError(
-                        "Cannot reonboard user - user has no complete onboardings.",
-                    ))?;
-                    (Some(obc.id), None)
-                }
-                TokenOperationKind::Onboard => {
-                    let key = key.ok_or(ValidationError(
-                        "key must be provided for a token of kind onboard",
-                    ))?;
-                    let (obc, _) = ObConfiguration::get(conn, (&key, &tenant_id, is_live))?;
-                    if !obc.kind.can_onboard() {
-                        return Err(OnboardingError::CannotOnboardOntoPlaybook(obc.kind).into());
-                    }
-                    (Some(obc.id), None)
-                }
-            };
-
-            let args = UserSessionArgs {
-                su_id: Some(sv.id),
-                obc_id,
-                is_from_api: true,
-                is_implied_auth: !inherited_auth_events.is_empty(),
-                wfr_id,
-                ..Default::default()
-            };
+            let is_implied_auth = !implied_auth_events.is_empty();
+            let kinds = implied_auth_events.iter().map(|e| e.kind).collect();
             // All auth events associated with the token made here are implicit
-            let events = inherited_auth_events
+            let auth_events = implied_auth_events
                 .into_iter()
                 .map(|e| AssociatedAuthEvent::implicit(e.id))
                 .collect_vec();
-            let data = UserSession::make(sv.vault_id, args, scopes, events)?;
-            let (auth_token, session) = AuthSession::create_sync(conn, &session_key, data, duration)?;
+
+            // Request Onboarding scopes, but if the user hasn't authed to the tenant recently, we
+            // will be granted no scopes and the user will be required to re-auth
+            let scopes = allowed_user_scopes(kinds, IdentifyScope::Onboarding, false);
+
+            let args = CreateTokenArgs {
+                sv,
+                kind,
+                key,
+                scopes,
+                auth_events,
+                is_implied_auth,
+            };
+            let (auth_token, session) = create_token(conn, &session_key, args)?;
             Ok((auth_token, session))
         })
         .await?;

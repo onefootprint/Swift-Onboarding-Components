@@ -25,6 +25,13 @@ pub struct CreateTokenRequest {
     pub third_party_auth: Option<bool>,
 }
 
+#[derive(Deserialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct CreateEntityTokenRequest {
+    pub kind: TokenOperationKind,
+    pub key: Option<ObConfigurationKey>,
+}
+
 #[derive(Display, EnumString, DeserializeFromStr, SerializeDisplay, Apiv2Schema, ::macros::SerdeAttr)]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]

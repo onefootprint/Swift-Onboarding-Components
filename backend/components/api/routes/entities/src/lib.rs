@@ -14,6 +14,7 @@ mod match_signals;
 mod risk_signals;
 mod rule_set_result;
 mod timeline;
+mod token;
 mod trigger;
 mod trigger_link;
 mod vault;
@@ -31,6 +32,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(decisions::post)
         .service(documents::get)
         .service(liveness::get)
+        .service(token::post)
         .service(timeline::get)
         .service(risk_signals::get)
         .service(match_signals::get)
