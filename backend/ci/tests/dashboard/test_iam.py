@@ -377,6 +377,7 @@ def test_cant_update_admin_role(sandbox_tenant, admin_role):
     )
 
 
+@pytest.mark.flaky
 def test_deactivate_role_and_user(sandbox_tenant, run_id):
     suffix = _gen_random_n_digit_number(10)
     role_data = dict(

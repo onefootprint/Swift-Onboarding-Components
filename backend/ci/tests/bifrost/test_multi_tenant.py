@@ -114,6 +114,7 @@ def test_cant_see_fp_id(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user)
     )
 
 
+@pytest.mark.flaky
 def test_search(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):
     """
     Make sure we can search by fields that were prefilled

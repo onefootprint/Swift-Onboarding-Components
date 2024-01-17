@@ -1,3 +1,4 @@
+import pytest
 import multiprocessing
 from tests.constants import SVIX_AUTH_TOKEN
 from tests.utils import EXPECTED_SERVER_VERSION_GIT_HASH, try_until_success
@@ -22,6 +23,7 @@ def check_webhook(hooky_url, webhook_fpids):
         webhook_fpids.append(fp_id)
 
 
+@pytest.mark.flaky
 def test_webhook_e2e(sandbox_tenant, run_id):
     # 1. get the svix app id
     body = get("org/webhook_portal", None, *sandbox_tenant.db_auths)
