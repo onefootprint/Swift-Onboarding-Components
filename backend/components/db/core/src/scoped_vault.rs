@@ -9,6 +9,7 @@ use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::output::Csv;
 use newtypes::ExternalId;
+use newtypes::LabelKind;
 use newtypes::ObConfigurationId;
 use newtypes::OnboardingStatus;
 use newtypes::OnboardingStatusFilter;
@@ -40,6 +41,7 @@ pub struct ScopedVaultListQueryParams<TSearch = SearchQuery> {
     pub playbook_id: Option<ObConfigurationId>,
     pub has_outstanding_workflow_request: Option<bool>,
     pub external_id: Option<ExternalId>,
+    pub label: Option<LabelKind>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -73,6 +75,7 @@ impl ScopedVaultListQueryParams {
             playbook_id,
             has_outstanding_workflow_request,
             external_id,
+            label,
         } = self;
 
         let matching_vaults = if let Some(search) = search {
@@ -98,6 +101,7 @@ impl ScopedVaultListQueryParams {
             playbook_id,
             has_outstanding_workflow_request,
             external_id,
+            label,
         };
         Ok(result)
     }
@@ -112,7 +116,8 @@ macro_rules! list_query {
         // not be visible in the dashboard since the tenant doesn't have permissions to view anything
         // about the user
         use db_schema::schema::{
-            manual_review, scoped_vault, vault, watchlist_check, workflow, workflow_request,
+            manual_review, scoped_vault, scoped_vault_label, vault, watchlist_check, workflow,
+            workflow_request,
         };
         let mut query = scoped_vault::table
             .inner_join(vault::table)
@@ -243,6 +248,15 @@ macro_rules! list_query {
             query = query.filter(scoped_vault::external_id.eq(external_id))
         }
 
+        if let Some(label) = $params.label.as_ref() {
+            let matching_ids = scoped_vault_label::table
+                .filter(scoped_vault_label::deactivated_at.is_null())
+                .filter(scoped_vault_label::kind.eq(label))
+                .select(scoped_vault_label::scoped_vault_id)
+                .distinct();
+            query = query.filter(scoped_vault::id.eq_any(matching_ids))
+        }
+
         query
     }};
 }
@@ -282,7 +296,11 @@ fn vaults_matching_search(
     };
 
     let fingerprint_results = {
-        let all_fps = fingerprint_queries.iter().flat_map(|fps| &fps.0).unique().collect_vec();
+        let all_fps = fingerprint_queries
+            .iter()
+            .flat_map(|fps| &fps.0)
+            .unique()
+            .collect_vec();
         tracing::info!(sh_datas=%Csv::from(all_fps.iter().cloned().collect_vec()), "Searching for fingerprints");
 
         let results: HashMap<_, _> = fingerprint::table

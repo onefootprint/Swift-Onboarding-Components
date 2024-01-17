@@ -15,8 +15,17 @@ def test_create_label(sandbox_user, sandbox_tenant):
     body = get(f"/users/{sandbox_user.fp_id}/label", None, sandbox_tenant.sk.key)
     assert body["kind"] == "offboard_fraud"
 
+    # Make sure the label is included in the entity serialization
     body = get(f"/entities/{sandbox_user.fp_id}", data, *sandbox_tenant.db_auths)
     assert body["label"] == "offboard_fraud"
+
+    # Test searching on label
+    body = post(
+        f"/entities/search", dict(label="offboard_fraud"), *sandbox_tenant.db_auths
+    )
+    assert any(i["id"] == sandbox_user.fp_id for i in body["data"])
+    body = post(f"/entities/search", dict(label="active"), *sandbox_tenant.db_auths)
+    assert not any(i["id"] == sandbox_user.fp_id for i in body["data"])
 
 
 def test_create_tag(sandbox_user, sandbox_tenant):
