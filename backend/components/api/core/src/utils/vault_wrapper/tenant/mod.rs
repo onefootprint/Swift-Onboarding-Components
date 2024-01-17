@@ -10,7 +10,6 @@ pub use bulk_decrypt::*;
 use super::{Any, VaultWrapper};
 
 use derive_more::Deref;
-pub mod fingerprint;
 
 /// Constructed for a specific tenant's view of the world. A tenant is able to see its own speculative
 /// data on the user vault.

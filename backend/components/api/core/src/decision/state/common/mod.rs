@@ -34,8 +34,8 @@ use crate::{
         },
     },
     enclave_client::EnclaveClient,
-    errors::{onboarding::OnboardingError, ApiResult},
-    utils::vault_wrapper::{Any, TenantVw, VaultWrapper, VwArgs},
+    errors::ApiResult,
+    utils::vault_wrapper::{VaultWrapper, VwArgs},
     State,
 };
 
@@ -214,28 +214,6 @@ pub fn save_kyc_decision(
         review_reasons,
     )?;
     Ok(())
-}
-
-#[tracing::instrument(skip(state))]
-/// Write new fingerprints as needed
-/// - Tenant-scoped fingerprints for data visible to the tenant
-/// - Globally-scoped fingerprints for newly portablized data
-pub async fn write_authorized_fingerprints(state: &State, wf_id: &WorkflowId) -> ApiResult<()> {
-    let wf_id = wf_id.clone();
-    let (obc, vw) = state
-        .db_pool
-        .db_query(move |conn| -> ApiResult<_> {
-            let wf = Workflow::get(conn, &wf_id)?;
-            let uvw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &wf.scoped_vault_id)?;
-            let obc_id = wf
-                .ob_configuration_id
-                .as_ref()
-                .ok_or(OnboardingError::NoObcForWorkflow)?;
-            let (obc, _) = ObConfiguration::get(conn, obc_id)?;
-            Ok((obc, uvw))
-        })
-        .await??;
-    vw.create_authorized_fingerprints(state, obc).await
 }
 
 pub async fn maybe_generate_ocr_reason_codes(

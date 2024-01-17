@@ -2,13 +2,11 @@ use std::collections::HashMap;
 
 use crate::PgConn;
 use chrono::{DateTime, Utc};
-use db_schema::schema::data_lifetime;
 use db_schema::schema::fingerprint;
 use diesel::prelude::*;
 use diesel::Queryable;
 use newtypes::FingerprintScopeKind;
 use newtypes::FingerprintVersion;
-use newtypes::ScopedVaultId;
 use newtypes::{DataIdentifier, DataLifetimeId, Fingerprint as FingerprintData, FingerprintId};
 
 use crate::{DbResult, TxnPgConn};
@@ -46,7 +44,6 @@ impl Fingerprint {
     #[tracing::instrument("Fingerprint::create", skip_all)]
     pub fn bulk_create(conn: &mut TxnPgConn, fingerprints: Vec<NewFingerprint>) -> DbResult<()> {
         for fp in fingerprints.iter() {
-            // TODO turn these into hard errors after making sure they don't happen in prod
             if !fp.kind.is_fingerprintable() {
                 tracing::error!(di=%fp.kind, "Fingerprinting DI that is not fingerprintable");
             }
@@ -64,17 +61,6 @@ impl Fingerprint {
     pub fn bulk_get(conn: &mut PgConn, lifetime_ids: Vec<DataLifetimeId>) -> DbResult<Vec<Self>> {
         let results = fingerprint::table
             .filter(fingerprint::lifetime_id.eq_any(lifetime_ids))
-            .get_results(conn)?;
-        Ok(results)
-    }
-
-    // for tests
-    #[tracing::instrument("Fingerprint::_list_for_scoped_vault", skip_all)]
-    pub fn _list_for_scoped_vault(conn: &mut PgConn, sv_id: &ScopedVaultId) -> DbResult<Vec<Self>> {
-        let results = fingerprint::table
-            .inner_join(data_lifetime::table)
-            .filter(data_lifetime::scoped_vault_id.eq(sv_id))
-            .select(fingerprint::all_columns)
             .get_results(conn)?;
         Ok(results)
     }

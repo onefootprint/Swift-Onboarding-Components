@@ -94,7 +94,7 @@ async fn test(
         .await
         .unwrap();
 
-    let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mr, obd, rs) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     // TODO: This assertion will fail if enhanced_aml = Yes because we are not yet properly incorporating Incode Aml risk signals into rules decisioning!!!!!!!!!!
     assert_eq!(expected_status, wf.status.unwrap());

@@ -174,14 +174,13 @@ async fn pass(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
+    let (wf, _, _, _, _) = query_data(state, &svid, &wfid).await;
     assert!(wf.authorized_at.is_some());
 
     match wf_kind {
         WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state),
         WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::VendorCalls), wf.state),
     }
-    assert!(!fps.is_empty()); //fingerprints were written
 
     // MakeVendorCalls
     let (ww, _) = ww
@@ -215,7 +214,7 @@ async fn pass(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
         WFKind::Kyc => {} // KYC Workflow will have gone from MakeDecision -> Complete
         WFKind::Alpaca => {
             // For Alpaca, we need to run the MakeWatchlistCheckCall action next, then it will proceed to Complete
-            let (_, _, mr, obd, _, _) = query_data(state, &svid, &wfid).await;
+            let (_, _, mr, obd, _) = query_data(state, &svid, &wfid).await;
             // Assert no OBD is created yet and ob status is pending
             assert!(obd.is_none());
             assert_eq!(OnboardingStatus::Pending, wf.status.unwrap());
@@ -231,7 +230,7 @@ async fn pass(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
         }
     }
 
-    let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mr, obd, rs) = query_data(state, &svid, &wfid).await;
     match wf_kind {
         WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state),
         WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state),
@@ -373,13 +372,12 @@ async fn pass_then_watchlist_hit(
         .await
         .unwrap();
 
-    let (wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
+    let (wf, _, _, _, _) = query_data(state, &svid, &wfid).await;
     assert!(wf.authorized_at.is_some());
     match wf_kind {
         WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state),
         WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::VendorCalls), wf.state),
     }
-    assert!(!fps.is_empty()); //fingerprints were written
 
     // MakeVendorCalls
     let (ww, _) = ww
@@ -415,7 +413,7 @@ async fn pass_then_watchlist_hit(
         WFKind::Alpaca => {
             // For Alpaca, we need to run the MakeWatchlistCheckCall action next, then it will proceed to Complete
 
-            let (_, _, mr, obd, _, _) = query_data(state, &svid, &wfid).await;
+            let (_, _, mr, obd, _) = query_data(state, &svid, &wfid).await;
             // Assert no OBD is created yet and ob status is pending
 
             assert_eq!(OnboardingStatus::Pending, wf.status.unwrap());
@@ -438,7 +436,7 @@ async fn pass_then_watchlist_hit(
         }
     };
 
-    let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mr, obd, rs) = query_data(state, &svid, &wfid).await;
     match wf_kind {
         WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state),
         WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state),
@@ -525,7 +523,7 @@ async fn pass_then_watchlist_hit(
         }
     }
 
-    let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mr, obd, rs) = query_data(state, &svid, &wfid).await;
     match wf_kind {
         WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state),
         WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state),
@@ -699,7 +697,7 @@ async fn step_up(
         .await
         .unwrap();
 
-    let (wf, _, mr, obd, _, fps) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mr, obd, _) = query_data(state, &svid, &wfid).await;
     match wf_kind {
         WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::DocCollection), wf.state),
         WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::DocCollection), wf.state),
@@ -709,7 +707,6 @@ async fn step_up(
     assert!(obd.is_none());
     assert_eq!(OnboardingStatus::Incomplete, wf.status.unwrap());
     assert!(mr.is_none());
-    assert!(!fps.is_empty()); //fingerprints were written
 
     // Expect Webhooks
     mock_webhooks(
@@ -733,7 +730,7 @@ async fn step_up(
         .await
         .unwrap();
 
-    let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mr, obd, rs) = query_data(state, &svid, &wfid).await;
     match wf_kind {
         WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state),
         WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::PendingReview), wf.state),
@@ -861,7 +858,7 @@ async fn step_up(
         }
     }
 
-    let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mr, obd, rs) = query_data(state, &svid, &wfid).await;
     match wf_kind {
         WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state),
         WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state),
@@ -959,13 +956,12 @@ async fn fail(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (wf, _, _, _, _, fps) = query_data(state, &svid, &wfid).await;
+    let (wf, _, _, _, _) = query_data(state, &svid, &wfid).await;
     assert!(wf.authorized_at.is_some());
     match wf_kind {
         WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::VendorCalls), wf.state),
         WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::VendorCalls), wf.state),
     }
-    assert!(!fps.is_empty()); //fingerprints were written
 
     // MakeVendorCalls
     let (ww, _) = ww
@@ -995,7 +991,7 @@ async fn fail(state: &mut State, wf_kind: WFKind, user_kind: UserKind) {
         .await
         .unwrap();
 
-    let (wf, _, mr, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, mr, obd, rs) = query_data(state, &svid, &wfid).await;
     match wf_kind {
         WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state),
         WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state),
@@ -1133,7 +1129,7 @@ async fn redo_and_pass(
         .await
         .unwrap();
 
-    let (wf, _, _, obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, _, obd, rs) = query_data(state, &svid, &wfid).await;
     match wf_kind {
         WFKind::Alpaca => assert_eq!(WorkflowState::AlpacaKyc(AlpacaKycState::Complete), wf.state),
         WFKind::Kyc => assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state),

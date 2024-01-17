@@ -57,10 +57,8 @@ impl OnAction<Authorize, KybState> for KybDataCollection {
     async fn execute_async_idempotent_actions(
         &self,
         _action: Authorize,
-        state: &State,
+        _state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        common::write_authorized_fingerprints(state, &self.wf_id).await?;
-
         Ok(())
     }
 

@@ -9,7 +9,6 @@ use crate::ApiError;
 use crate::{decision::tests::test_helpers, State};
 use db::models::decision_intent::DecisionIntent;
 use db::models::document_request::{DocumentRequest, NewDocumentRequestArgs};
-use db::models::fingerprint::Fingerprint;
 use db::models::manual_review::ManualReview;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::risk_signal::{IncludeHidden, RiskSignal};
@@ -166,7 +165,6 @@ pub async fn query_data(
     Option<ManualReview>,
     Option<OnboardingDecision>,
     Vec<RiskSignal>,
-    Vec<Fingerprint>,
 ) {
     let svid = sv_id.clone();
     let wfid = wf_id.clone();
@@ -184,9 +182,7 @@ pub async fn query_data(
             let mr = ManualReview::get_active(conn, &wfid).unwrap();
             let wfe = WorkflowEvent::list_for_workflow(conn, &wfid).unwrap();
 
-            let fps = Fingerprint::_list_for_scoped_vault(conn, &svid).unwrap();
-
-            (wf, wfe, mr, obd, rs, fps)
+            (wf, wfe, mr, obd, rs)
         })
         .await
         .unwrap()

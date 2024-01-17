@@ -104,7 +104,7 @@ async fn collect_doc_skip_kyc(
         .await
         .unwrap();
 
-    let (wf, _, _mr, _obd, rs, _) = query_data(state, &svid, &wfid).await;
+    let (wf, _, _mr, _obd, rs) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     assert_eq!(expected_status, wf.status.unwrap());
 
