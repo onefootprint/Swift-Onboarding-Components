@@ -16,6 +16,7 @@ export const entityFixture: Entity = {
   decryptedAttributes: {},
   watchlistCheck: null,
   hasOutstandingWorkflowRequest: false,
+  label: null,
 };
 
 export const withEntity = (entityId: string) =>

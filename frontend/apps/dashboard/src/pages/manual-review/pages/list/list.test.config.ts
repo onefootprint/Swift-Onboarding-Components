@@ -61,6 +61,7 @@ export const entitiesFixture: Entity[] = [
     },
     watchlistCheck: null,
     hasOutstandingWorkflowRequest: false,
+    label: null,
   },
 ];
 

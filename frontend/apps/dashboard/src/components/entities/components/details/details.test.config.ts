@@ -81,6 +81,7 @@ export const entityFixture: Entity = {
   },
   watchlistCheck: null,
   hasOutstandingWorkflowRequest: false,
+  label: null,
 };
 
 export const timelineFixture: Timeline = [

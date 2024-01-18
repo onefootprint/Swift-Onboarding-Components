@@ -39,6 +39,7 @@ export const entitiesFixture: Entity[] = [
     decryptedAttributes: {},
     watchlistCheck: null,
     hasOutstandingWorkflowRequest: false,
+    label: null,
   },
   {
     id: 'fp_id_tvfUNdGqmk2kJyyka9gX22',
@@ -69,6 +70,7 @@ export const entitiesFixture: Entity[] = [
     decryptedAttributes: {},
     watchlistCheck: null,
     hasOutstandingWorkflowRequest: false,
+    label: null,
   },
 ];
 

@@ -17,6 +17,7 @@ export const entitiesFixture: Entity[] = [
     decryptedAttributes: {},
     watchlistCheck: null,
     hasOutstandingWorkflowRequest: false,
+    label: null,
   },
 ];
 

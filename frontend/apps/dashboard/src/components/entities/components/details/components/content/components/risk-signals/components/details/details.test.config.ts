@@ -74,11 +74,10 @@ export const entityFixture: Entity = {
     userAgent:
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
   },
-  decryptedAttributes: {
-    // [BusinessDI.name]: 'Acme Inc.',
-  },
+  decryptedAttributes: {},
   watchlistCheck: null,
   hasOutstandingWorkflowRequest: false,
+  label: null,
 };
 
 export const riskSignalDetailsFixture: RiskSignal = {

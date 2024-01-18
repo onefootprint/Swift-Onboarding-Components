@@ -17,6 +17,7 @@ export const entityWithPhoneFixture: Entity = {
   decryptedAttributes: {},
   watchlistCheck: null,
   hasOutstandingWorkflowRequest: false,
+  label: null,
 };
 
 export const entityWithoutPhoneFixture: Entity = {
@@ -33,6 +34,7 @@ export const entityWithoutPhoneFixture: Entity = {
   decryptedAttributes: {},
   watchlistCheck: null,
   hasOutstandingWorkflowRequest: false,
+  label: null,
 };
 
 export const withEntity = (entityFixture: Entity) =>

@@ -24,6 +24,7 @@ describe('getGridTemplateAreas', () => {
     decryptedAttributes: {},
     watchlistCheck: null,
     hasOutstandingWorkflowRequest: false,
+    label: null,
   });
 
   it('should generate grid template areas for basic, address and identity', () => {
