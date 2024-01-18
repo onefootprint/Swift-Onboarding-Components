@@ -296,6 +296,47 @@ impl From<SsnRCH> for Vec<FootprintReasonCode> {
     }
 }
 
+pub struct LexisNAS {
+    // Lexis match designations are just yes or no boolean's
+    pub ssn_match: bool,
+    pub first_name_match: bool,
+    pub last_name_match: bool,
+    pub address_match: bool,
+}
+impl LexisNAS {
+    pub fn new(ssn_match: bool, first_name_match: bool, last_name_match: bool, address_match: bool) -> Self {
+        Self {
+            ssn_match,
+            first_name_match,
+            last_name_match,
+            address_match,
+        }
+    }
+}
+
+pub struct LexisNAP {
+    // Lexis match designations are just yes or no boolean's
+    pub phone_match: bool,
+    pub first_name_match: bool,
+    pub last_name_match: bool,
+    pub address_match: bool,
+}
+impl LexisNAP {
+    pub fn new(
+        phone_match: bool,
+        first_name_match: bool,
+        last_name_match: bool,
+        address_match: bool,
+    ) -> Self {
+        Self {
+            phone_match,
+            first_name_match,
+            last_name_match,
+            address_match,
+        }
+    }
+}
+
 pub(crate) struct PhRCH {
     pub phone_match_level: MatchLevel,
     #[allow(unused)]

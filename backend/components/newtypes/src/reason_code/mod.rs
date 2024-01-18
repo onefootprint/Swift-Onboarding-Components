@@ -16,6 +16,7 @@ pub use experian_phone_codes::*;
 pub use experian_ssn_codes::*;
 pub use idology::*;
 pub use lexis::*;
+pub use reason_code_helpers::*;
 pub use signal_attribute::*;
 pub use socure::*;
 
@@ -81,6 +82,52 @@ macro_rules! vendor_reason_codes_enum {
     }
 }
 pub(crate) use vendor_reason_codes_enum;
+
+macro_rules! lexis_name_address_ssn_enum {
+    (
+        $(#[$macros:meta])*
+        pub enum $name:ident {
+            $(#[ser = $ser:literal] #[nas = $nas:expr] $item:ident),*
+        }
+    ) => {
+        $(#[$macros])*
+        pub enum $name {
+            $(#[strum(to_string = $ser)] $item,)*
+        }
+
+        impl $name {
+            pub fn name_address_ssn_matches(&self) -> LexisNAS {
+                match self {
+                    $(Self::$item => $nas),*
+                }
+            }
+        }
+    }
+}
+pub(crate) use lexis_name_address_ssn_enum;
+
+macro_rules! lexis_name_address_phone_enum {
+    (
+        $(#[$macros:meta])*
+        pub enum $name:ident {
+            $(#[ser = $ser:literal] #[nap = $nap:expr] $item:ident),*
+        }
+    ) => {
+        $(#[$macros])*
+        pub enum $name {
+            $(#[strum(to_string = $ser)] $item,)*
+        }
+
+        impl $name {
+            pub fn name_address_phone_matches(&self) -> LexisNAP {
+                match self {
+                    $(Self::$item => $nap),*
+                }
+            }
+        }
+    }
+}
+pub(crate) use lexis_name_address_phone_enum;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 #[serde(try_from = "&str")]
