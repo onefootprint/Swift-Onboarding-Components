@@ -114,7 +114,7 @@ pub(crate) struct DobMatch {
 #[allow(clippy::upper_case_acronyms)]
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum DobMatchType {
-    FuzzyCCYYMMDD,
+    FuzzyCCYYMMDD, // default, uses "mis key" fuzzy logic and considers Day as well (unlike the below option)
     FuzzyCCYYMM,
     RadiusCCYY,
     ExactCCYYMMDD,
@@ -420,22 +420,20 @@ impl LexisRequest {
                     include_ms_override: LBool::Zero, // for now, don't let multiple SSN's impact the CVI score. We'll just parse that reason code separately and not let it impact the score
                     po_box_compliance: LBool::Zero, // for now, don't let this impact CVI score and we'll just parse that reason code separately
                     require_exact_match: RequireExactMatch {
-                        // for now, we require exact name/address matching because we can't disambiguate partial vs exact matches
-                        last_name: LBool::One,
-                        first_name: LBool::One,
+                        last_name: LBool::Zero,
+                        first_name: LBool::Zero,
                         first_name_allow_nickname: LBool::Zero,
-                        address: LBool::One,
+                        address: LBool::Zero,
                         home_phone: LBool::Zero,
-                        ssn: LBool::One,
+                        ssn: LBool::Zero,
                         driver_license: LBool::Zero, // noop for us
                     },
                     include_all_risk_indicators: LBool::One,
                     include_verified_element_summary: LBool::Zero, // Don't have privelages for this :(
                     include_dl_verification: LBool::Zero,          // noops for us
                     dob_match: DobMatch {
-                        // for now, we require exact dob matching because we can't disambiguate partial vs exact matches
-                        match_type: DobMatchType::ExactCCYYMMDD,
-                        match_year_radius: 0, // should be noop since we chose Exact above
+                        match_type: DobMatchType::FuzzyCCYYMMDD,
+                        match_year_radius: 0, // should be noop since we arent using RadiusCCYY
                     },
                     include_models: IncludeModels {
                         fraud_point_model: FraudPointModel {
@@ -447,10 +445,16 @@ impl LexisRequest {
                     last_seen_threshold: 365, // Lexis's default but we can tweak later if we want
                     include_mi_override: LBool::Zero, // probably? don't let this influence score for now and give us more flexbility to just use as a risk signal
                     include_ssn_verification: LBool::Zero, // Don't have privelages for this :(
-                    cvi_calculation_options: None, // TODO: ask Lexis what the defaults are for these and why/if we would want to change them
-                    instant_id_version: None,      // TODO: ask Lexis if any reason we'd set this
+                    cvi_calculation_options: Some(CviCalculationOptions {
+                        include_dob: LBool::One,
+                        include_driver_license: LBool::Zero,
+                        disable_customer_network_option: LBool::Zero, // TODO: might need to fiddle with this and see how it impacts scores
+                        include_itin: LBool::One,
+                        include_compliance_cap: LBool::Zero,
+                    }),
+                    instant_id_version: None,
                     name_input_order: NameInputOrder::Unknown, // Lexis's default and seems fair
-                    include_email_verification: LBool::One, // TODO: confirm with Lexis that this won't impact the CVI or anything else
+                    include_email_verification: LBool::One,
                     disable_non_government_dl_data: LBool::Zero,
                 },
                 search_by: SearchBy {
