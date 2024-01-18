@@ -258,11 +258,11 @@ impl ServiceEnvironmentConfig {
             }
             LinkKind::UpdateAuth => {
                 if self.is_production() {
-                    "https://auth.onefootprint.com/update"
+                    "https://auth.onefootprint.com/user"
                 } else if self.is_local() {
-                    "http://localhost:3011/update"
+                    "http://localhost:3011/user"
                 } else {
-                    "https://auth.preview.onefootprint.com/update"
+                    "https://auth.preview.onefootprint.com/user"
                 }
             }
         };
