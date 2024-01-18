@@ -84,9 +84,9 @@ const useRoutes = (): Route[] => {
       employeesOnly: true,
       items: [
         {
-          href: '/super-admin',
+          href: '/internal/tenants',
           Icon: IcoStore16,
-          text: t('tenants.title'),
+          text: t('tenants'),
         },
       ],
     },

@@ -7,17 +7,18 @@ import {
 import React from 'react';
 import { asAdminUserFirmEmployee, resetUser } from 'src/config/tests';
 
-import TenantsList from './tenants-list';
+import Tenants from './tenants';
 import {
   tenantsFixture,
   withTenants,
   withTenantsError,
-} from './tenants-list.test.config';
+} from './tenants.test.config';
 
 const useRouterSpy = createUseRouterSpy();
-const renderTenantsList = () => customRender(<TenantsList />);
 
-describe('<TenantsList />', () => {
+const renderTenants = () => customRender(<Tenants />);
+
+describe('<Tenants />', () => {
   beforeAll(() => {
     useRouterSpy({
       pathname: '/',
@@ -38,7 +39,7 @@ describe('<TenantsList />', () => {
     });
 
     it('should show an error messsage', async () => {
-      renderTenantsList();
+      renderTenants();
 
       await waitFor(() => {
         const errorMessage = screen.getByText('Something went wrong');
@@ -53,7 +54,7 @@ describe('<TenantsList />', () => {
     });
 
     it('should render tenant name, id', async () => {
-      renderTenantsList();
+      renderTenants();
 
       await waitFor(() => {
         tenantsFixture.data.forEach(tenant => {
@@ -64,7 +65,7 @@ describe('<TenantsList />', () => {
     });
 
     it('should render tenant id', async () => {
-      renderTenantsList();
+      renderTenants();
 
       await waitFor(() => {
         tenantsFixture.data.forEach(tenant => {
@@ -75,7 +76,7 @@ describe('<TenantsList />', () => {
     });
 
     it('should render the total of live users', async () => {
-      renderTenantsList();
+      renderTenants();
 
       await waitFor(() => {
         tenantsFixture.data.forEach(tenant => {
@@ -86,7 +87,7 @@ describe('<TenantsList />', () => {
     });
 
     it('should render the total of sandbox users', async () => {
-      renderTenantsList();
+      renderTenants();
 
       await waitFor(() => {
         tenantsFixture.data.forEach(tenant => {

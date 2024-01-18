@@ -51,7 +51,11 @@ const TenantsList = ({ tenants, currTenantId, onClick }: TenantsListProps) => {
             size="compact"
             sx={{ paddingLeft: 5, paddingBottom: 3 }}
           >
-            {t(shouldShowAllTenants ? 'tenants.show-less' : 'tenants.show-all')}
+            {t(
+              shouldShowAllTenants
+                ? 'tenants-list.show-less'
+                : 'tenants-list.show-all',
+            )}
           </LinkButton>
         </LinkButtonContainer>
       )}

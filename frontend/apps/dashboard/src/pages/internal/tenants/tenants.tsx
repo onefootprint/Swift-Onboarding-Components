@@ -1,6 +1,7 @@
 import styled from '@onefootprint/styled';
 import type { Tenant } from '@onefootprint/types';
 import { Pagination, Stack, Table, Typography } from '@onefootprint/ui';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,8 +12,8 @@ import Row from './components/row';
 import useFilters from './hooks/use-filters';
 import useTenants from './hooks/use-tenants';
 
-const TenantsList = () => {
-  const { t } = useTranslation('super-admin');
+const Tenants = () => {
+  const { t } = useTranslation('internal');
   const filters = useFilters();
   const { data: response, isLoading, errorMessage, pagination } = useTenants();
   const columns = [
@@ -46,38 +47,43 @@ const TenantsList = () => {
   };
 
   return (
-    <Container>
-      <Stack gap={2} marginBottom={7} direction="column">
-        <Typography variant="heading-2">{t('title')}</Typography>
-        <Typography variant="body-2" color="secondary">
-          {t('subtitle')}
-        </Typography>
-      </Stack>
-      <Table<Tenant>
-        aria-label={t('table.aria-label')}
-        columns={columns}
-        emptyStateText={emptyState}
-        getKeyForRow={(tenant: Tenant) => tenant.id}
-        initialSearch=""
-        isLoading={isLoading}
-        items={response?.data}
-        onChangeSearchText={handleSearchChange}
-        renderTr={tenant => <Row tenant={tenant.item} />}
-        onRowClick={handleAssumeTenant}
-        searchPlaceholder={searchPlaceholder}
-      />
-      {response && response.meta.count > 0 && (
-        <Pagination
-          hasNextPage={pagination.hasNextPage}
-          hasPrevPage={pagination.hasPrevPage}
-          onNextPage={pagination.loadNextPage}
-          onPrevPage={pagination.loadPrevPage}
-          pageIndex={pagination.pageIndex}
-          pageSize={pagination.pageSize}
-          totalNumResults={response.meta.count}
+    <>
+      <Head>
+        <title>{t('page-title')}</title>
+      </Head>
+      <Container>
+        <Stack gap={2} marginBottom={7} direction="column">
+          <Typography variant="heading-2">{t('title')}</Typography>
+          <Typography variant="body-2" color="secondary">
+            {t('subtitle')}
+          </Typography>
+        </Stack>
+        <Table<Tenant>
+          aria-label={t('table.aria-label')}
+          columns={columns}
+          emptyStateText={emptyState}
+          getKeyForRow={(tenant: Tenant) => tenant.id}
+          initialSearch=""
+          isLoading={isLoading}
+          items={response?.data}
+          onChangeSearchText={handleSearchChange}
+          renderTr={tenant => <Row tenant={tenant.item} />}
+          onRowClick={handleAssumeTenant}
+          searchPlaceholder={searchPlaceholder}
         />
-      )}
-    </Container>
+        {response && response.meta.count > 0 && (
+          <Pagination
+            hasNextPage={pagination.hasNextPage}
+            hasPrevPage={pagination.hasPrevPage}
+            onNextPage={pagination.loadNextPage}
+            onPrevPage={pagination.loadPrevPage}
+            pageIndex={pagination.pageIndex}
+            pageSize={pagination.pageSize}
+            totalNumResults={response.meta.count}
+          />
+        )}
+      </Container>
+    </>
   );
 };
 
@@ -87,4 +93,4 @@ const Container = styled.div`
   margin-left: auto;
 `;
 
-export default TenantsList;
+export default Tenants;

@@ -467,15 +467,8 @@
         "webhooks": "Webhooks",
         "configure": "Configure",
         "internal": "Internal",
-        "sandbox-mode": {
-          "label": "Sandbox mode",
-          "tooltip-info": {
-            "sandbox": "By turning this off, you’ll see live data and will be redirected to a different page",
-            "live": "By turning this on, you’ll see test data and will be redirected to a different page"
-          },
-          "tooltip-disabled": "To access live data you have to activate your account first. Please contact us to do so."
-        },
-        "tenants": {
+        "tenants": "Tenants",
+        "tenants-list": {
           "title": "Tenants",
           "show-all": "Show all",
           "show-less": "Show less",
@@ -487,6 +480,14 @@
           "errors": {
             "auth-method-not-supported": "{{tenantName}} has disabled the ability to log in using this auth method. Please retry using another method."
           }
+        },
+        "sandbox-mode": {
+          "label": "Sandbox mode",
+          "tooltip-info": {
+            "sandbox": "By turning this off, you’ll see live data and will be redirected to a different page",
+            "live": "By turning this on, you’ll see test data and will be redirected to a different page"
+          },
+          "tooltip-disabled": "To access live data you have to activate your account first. Please contact us to do so."
         },
         "admin-mode": "Log in as Super Admin",
         "log-out": "Log out"

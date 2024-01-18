@@ -52,7 +52,7 @@ const NavDropdown = ({
                   color="tertiary"
                   sx={{ paddingLeft: 5, paddingTop: 3 }}
                 >
-                  {t('tenants.title')}
+                  {t('tenants-list.title')}
                 </Typography>
                 <TenantsList
                   tenants={tenants}

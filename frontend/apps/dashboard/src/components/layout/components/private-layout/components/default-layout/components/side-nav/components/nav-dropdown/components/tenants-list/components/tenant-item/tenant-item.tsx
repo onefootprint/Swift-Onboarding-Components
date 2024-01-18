@@ -12,7 +12,7 @@ type TenantItemProps = {
 };
 
 const TenantItem = ({ tenant, onClick, isSelected }: TenantItemProps) => {
-  const { t } = useTranslation('components.private-layout.nav.tenants');
+  const { t } = useTranslation('components.private-layout.nav.tenants-list');
 
   return (
     <ItemContainer data-testid="tenant-item">
