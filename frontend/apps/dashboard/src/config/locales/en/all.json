@@ -784,29 +784,28 @@
           "none": "None",
           "manual-review": "Manual review"
         },
-        "created": {
-          "label": "Created"
-        },
-        "on-watchlist": {
-          "label": "On a watchlist",
-          "options": {
-            "yes": "Yes",
-            "no": "No"
-          }
-        },
-        "has-outstanding-workflow-request": {
-          "label": "Info requested",
-          "options": {
-            "yes": "Yes",
-            "no": "No"
-          }
-        },
-        "show-unverified": {
-          "label": "Show unverified users",
-          "options": {
-            "yes": "Yes",
-            "no": "No"
-          }
+        "drawer": {
+          "trigger": "Filters",
+          "title": "Apply filters",
+          "labels": {
+            "label": "Labels",
+            "options": {
+              "active": "Active",
+              "fraud": "Offboard (Fraud)",
+              "other": "Offboard (Other)"
+            }
+          },
+          "created": {
+            "label": "Created"
+          },
+          "other": {
+            "label": "Other filters",
+            "on-watchlist": "On a watchlist",
+            "has-outstanding-workflow-request": "Info requested",
+            "show-unverified": "Show unverified users"
+          },
+          "reset": "Clear filters",
+          "cta": "Apply"
         },
         "info": {
           "cta": "Don't show again",

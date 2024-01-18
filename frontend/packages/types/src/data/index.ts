@@ -72,6 +72,7 @@ export {
   ApiEntityStatus,
   augmentEntityWithOnboardingInfo,
   EntityKind,
+  EntityLabel,
   EntityStatus,
   hasEntityCards,
   hasEntityCustomData,

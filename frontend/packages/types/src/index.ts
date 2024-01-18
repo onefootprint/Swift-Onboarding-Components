@@ -346,6 +346,7 @@ export {
   documentCdoFor,
   DocumentDI,
   EntityKind,
+  EntityLabel,
   EntityStatus,
   hasEntityCards,
   hasEntityCustomData,

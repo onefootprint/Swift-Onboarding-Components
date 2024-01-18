@@ -47,6 +47,11 @@ export const queryToArray = (value?: string | string[]) => {
   return value;
 };
 
+export const queryToBoolean = (value?: string) => {
+  if (!value) return undefined;
+  return value === 'true';
+};
+
 export const queryToString = (value: string[]) => {
   if (value.length === 0) {
     return undefined;
