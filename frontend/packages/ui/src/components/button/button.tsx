@@ -27,6 +27,7 @@ export type ButtonProps = {
   prefixIcon?: Icon;
   sx?: SXStyleProps;
   iconColor?: Color;
+  className?: string;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
