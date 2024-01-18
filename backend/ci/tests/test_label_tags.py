@@ -21,10 +21,10 @@ def test_create_label(sandbox_user, sandbox_tenant):
 
     # Test searching on label
     body = post(
-        f"/entities/search", dict(label="offboard_fraud"), *sandbox_tenant.db_auths
+        f"/entities/search", dict(labels=["offboard_fraud"]), *sandbox_tenant.db_auths
     )
     assert any(i["id"] == sandbox_user.fp_id for i in body["data"])
-    body = post(f"/entities/search", dict(label="active"), *sandbox_tenant.db_auths)
+    body = post(f"/entities/search", dict(labels=["active"]), *sandbox_tenant.db_auths)
     assert not any(i["id"] == sandbox_user.fp_id for i in body["data"])
 
     # Make sure we have a timeline event for updating the labels

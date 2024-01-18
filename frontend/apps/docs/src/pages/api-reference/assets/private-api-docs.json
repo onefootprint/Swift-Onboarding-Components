@@ -14806,13 +14806,16 @@
                             "business"
                         ]
                     },
-                    "label": {
-                        "type": "string",
-                        "enum": [
-                            "active",
-                            "offboard_fraud",
-                            "offboard_other"
-                        ]
+                    "labels": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "offboard_fraud",
+                                "offboard_other"
+                            ]
+                        }
                     },
                     "pagination": {
                         "type": "object",
@@ -14863,6 +14866,7 @@
                     }
                 },
                 "required": [
+                    "labels",
                     "statuses"
                 ]
             },

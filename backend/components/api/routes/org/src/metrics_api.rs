@@ -50,7 +50,7 @@ async fn get(
             playbook_id: playbook_id.clone(),
             has_outstanding_workflow_request: None,
             external_id: None,
-            label: None,
+            labels: vec![],
         }
     };
 

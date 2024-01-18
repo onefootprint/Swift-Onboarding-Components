@@ -41,7 +41,7 @@ pub struct ScopedVaultListQueryParams<TSearch = SearchQuery> {
     pub playbook_id: Option<ObConfigurationId>,
     pub has_outstanding_workflow_request: Option<bool>,
     pub external_id: Option<ExternalId>,
-    pub label: Option<LabelKind>,
+    pub labels: Vec<LabelKind>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -75,7 +75,7 @@ impl ScopedVaultListQueryParams {
             playbook_id,
             has_outstanding_workflow_request,
             external_id,
-            label,
+            labels,
         } = self;
 
         let matching_vaults = if let Some(search) = search {
@@ -101,7 +101,7 @@ impl ScopedVaultListQueryParams {
             playbook_id,
             has_outstanding_workflow_request,
             external_id,
-            label,
+            labels,
         };
         Ok(result)
     }
@@ -248,10 +248,10 @@ macro_rules! list_query {
             query = query.filter(scoped_vault::external_id.eq(external_id))
         }
 
-        if let Some(label) = $params.label.as_ref() {
+        if !$params.labels.is_empty() {
             let matching_ids = scoped_vault_label::table
                 .filter(scoped_vault_label::deactivated_at.is_null())
-                .filter(scoped_vault_label::kind.eq(label))
+                .filter(scoped_vault_label::kind.eq_any(&$params.labels))
                 .select(scoped_vault_label::scoped_vault_id)
                 .distinct();
             query = query.filter(scoped_vault::id.eq_any(matching_ids))

@@ -46,7 +46,7 @@ pub async fn get(
         playbook_id: None,
         has_outstanding_workflow_request: None,
         external_id: None,
-        label: None,
+        labels: vec![],
     };
     let (entity, vw) = state
         .db_pool
