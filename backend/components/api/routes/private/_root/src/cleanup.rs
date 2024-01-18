@@ -1,5 +1,7 @@
 use actix_web::{post, web, web::Json};
 use api_core::auth::custodian::CustodianAuthContext;
+use api_core::auth::protected_auth::ProtectedAuth;
+use api_core::auth::Either;
 use api_core::errors::ApiError;
 use api_core::errors::{ApiResult, AssertionError};
 use api_core::types::response::ResponseData;
@@ -26,11 +28,11 @@ pub struct CleanupResponse {
     num_deleted_rows: usize,
 }
 
-#[tracing::instrument(skip(state, _custodian))]
+#[tracing::instrument(skip(state, _auth))]
 #[post("/private/cleanup")]
 async fn post(
     state: web::Data<State>,
-    _custodian: CustodianAuthContext,
+    _auth: Either<CustodianAuthContext, ProtectedAuth>,
     request: web::Json<Request>,
     // When provided, identifies only sandbox users with the suffix
     sandbox_id: SandboxId,
