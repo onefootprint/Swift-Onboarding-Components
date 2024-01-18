@@ -103,11 +103,12 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
             {t('update-email')}
           </Typography>
         </StyledLi>
-        <StyledLi>
+        {/* TODO show this copy when passkey editing is fixed */}
+        {/* <StyledLi>
           <Typography variant="body-3" as="span">
             {t('update-passkey')}
           </Typography>
-        </StyledLi>
+        </StyledLi> */}
         <LinkContainer direction="row" gap={3} marginTop={2}>
           {generateTokenMutation.isLoading ? (
             <Shimmer sx={{ width: '100%' }} />
