@@ -1,5 +1,6 @@
 import { IcoImages24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
+import { useToast } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 
 import Logger from '../../../../../../utils/logger';
@@ -32,6 +33,7 @@ const UploadButton = ({
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
   const [isLoading, setIsLoading] = useState(false);
   const { processImageFile, acceptedFileFormats } = useProcessImage();
+  const toast = useToast();
 
   const onProcessingDone = () => {
     setIsLoading(false);
@@ -46,6 +48,16 @@ const UploadButton = ({
     const { files } = event.target;
 
     if (!files?.length) {
+      onProcessingDone();
+      return;
+    }
+
+    if (!files[0].type.startsWith('image')) {
+      logWarn('Uploaded file is not an image');
+      toast.show({
+        title: 'Uh-oh',
+        description: `Only image files are supported. Please try again.`,
+      });
       onProcessingDone();
       return;
     }
