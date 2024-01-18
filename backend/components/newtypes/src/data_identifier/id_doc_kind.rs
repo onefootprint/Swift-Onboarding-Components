@@ -35,19 +35,26 @@ pub enum IdDocKind {
     Visa,
     ResidenceDocument,
     VoterIdentification,
+    // Proof of ssn
     SsnCard,
+    // Proof of address
+    Lease,
+    UtilityBill,
+    BankStatement,
 }
 
 #[derive(Debug, Display, Clone, Copy, Eq, PartialEq)]
 pub enum DocKind {
     Identity,
     ProofOfSsn,
+    ProofOfAddress,
 }
 impl DocKind {
-    pub fn should_initiate_requests(&self) -> bool {
+    pub fn should_initiate_incode_requests(&self) -> bool {
         match self {
             DocKind::Identity => true,
             DocKind::ProofOfSsn => false,
+            DocKind::ProofOfAddress => false,
         }
     }
 }
@@ -63,6 +70,9 @@ impl From<IdDocKind> for DocKind {
             IdDocKind::ResidenceDocument => Self::Identity,
             IdDocKind::VoterIdentification => Self::Identity,
             IdDocKind::SsnCard => Self::ProofOfSsn,
+            IdDocKind::Lease => Self::ProofOfAddress,
+            IdDocKind::UtilityBill => Self::ProofOfAddress,
+            IdDocKind::BankStatement => Self::ProofOfAddress,
         }
     }
 }
@@ -82,6 +92,9 @@ impl IdDocKind {
             Self::ResidenceDocument => vec![DocumentSide::Front, DocumentSide::Back],
             Self::VoterIdentification => vec![DocumentSide::Front, DocumentSide::Back],
             Self::SsnCard => vec![DocumentSide::Front],
+            Self::Lease => vec![DocumentSide::Front],
+            Self::UtilityBill => vec![DocumentSide::Front],
+            Self::BankStatement => vec![DocumentSide::Front],
         }
     }
 
@@ -118,7 +131,11 @@ impl IdDocKind {
             IdDocKind::Visa => vec![ODK::FullName],
             IdDocKind::ResidenceDocument => vec![ODK::FullName],
             IdDocKind::VoterIdentification => vec![ODK::FullName],
-            IdDocKind::SsnCard => vec![ODK::FullName],
+            // In actuality, We don't parse anything from these.
+            IdDocKind::SsnCard => vec![],
+            IdDocKind::Lease => vec![],
+            IdDocKind::UtilityBill => vec![],
+            IdDocKind::BankStatement => vec![],
         }
     }
 }
@@ -130,6 +147,7 @@ pub enum AlpacaDocumentType {
     NationalId,
     Passport,
     Visa,
+    ProofOfAddress,
 }
 
 impl TryFrom<IdDocKind> for AlpacaDocumentType {
@@ -146,6 +164,9 @@ impl TryFrom<IdDocKind> for AlpacaDocumentType {
             IdDocKind::ResidenceDocument => Err(crate::Error::Custom(msg.into())),
             IdDocKind::VoterIdentification => Err(crate::Error::Custom(msg.into())),
             IdDocKind::SsnCard => Err(crate::Error::Custom(msg.into())),
+            IdDocKind::Lease => Ok(AlpacaDocumentType::ProofOfAddress),
+            IdDocKind::UtilityBill => Ok(AlpacaDocumentType::ProofOfAddress),
+            IdDocKind::BankStatement => Ok(AlpacaDocumentType::ProofOfAddress),
         }
     }
 }

@@ -173,7 +173,7 @@ pub async fn handle_document_upload(
     // Check if we should be initiating requests (e.g. check if we are testing)
     let should_initiate_reqs =
         crate::decision::utils::should_initiate_requests_for_document(&uvw.vault, id_doc.fixture_result).await?
-            && doc_kind.should_initiate_requests();
+            && doc_kind.should_initiate_incode_requests();
 
     let missing_sides = state
         .db_pool
@@ -270,7 +270,7 @@ pub async fn handle_document_process(state: &State, sv_id: ScopedVaultId,wf_id: 
     let upload_is_proof_of_ssn = doc_kind == DocKind::ProofOfSsn; // TODO: move this to being based on DR i think that's better and more source of truthy sicne we don't get from client
     let should_initiate_reqs =
         crate::decision::utils::should_initiate_requests_for_document(&uvw.vault, id_doc.fixture_result).await?
-            && doc_kind.should_initiate_requests();
+            && doc_kind.should_initiate_incode_requests();
 
     let response = if should_initiate_reqs {
         // Not sandbox - make our request to vendors!
