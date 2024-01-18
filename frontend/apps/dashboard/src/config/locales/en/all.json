@@ -468,6 +468,7 @@
         "configure": "Configure",
         "internal": "Internal",
         "tenants": "Tenants",
+        "toolbox": "Toolbox",
         "tenants-list": {
           "title": "Tenants",
           "show-all": "Show all",
@@ -2942,6 +2943,12 @@
       },
       "cta": "Test playbook'",
       "cancel": "Cancel"
+    },
+    "toolbox": {
+      "page-title": "Toolbox",
+      "title": "Toolbox",
+      "subtitle": "Employee-only tools",
+      "submit": "Submit"
     }
   }
 }

@@ -2,6 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import type { Icon } from '@onefootprint/icons';
 import {
   IcoBook16,
+  IcoConstruct16,
   IcoFileText16,
   IcoHome16,
   IcoKey16,
@@ -87,6 +88,11 @@ const useRoutes = (): Route[] => {
           href: '/internal/tenants',
           Icon: IcoStore16,
           text: t('tenants'),
+        },
+        {
+          href: '/internal/toolbox',
+          Icon: IcoConstruct16,
+          text: t('toolbox'),
         },
       ],
     },
