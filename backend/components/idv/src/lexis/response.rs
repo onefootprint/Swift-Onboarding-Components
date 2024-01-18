@@ -128,7 +128,7 @@ pub struct LResult {
     /// • 1 (Wireless)
     /// • 2 (VoIP (Voice over Internet Protocol))
     /// • 3 (Unknown)
-    pub phone_line_type: Option<i32>,
+    pub phone_line_type: Option<String>,
     /// Description of the phone line
     /// • L (Landline)
     /// • W (Wireless)
