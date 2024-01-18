@@ -7,13 +7,16 @@ export type TagsProps = {
   entity: Entity;
 };
 
-const Tags = ({ entity }: TagsProps) => {
-  const { t } = useTranslation('users');
-  const {
+const Tags = ({
+  entity: {
     watchlistCheck,
     requiresManualReview,
     hasOutstandingWorkflowRequest,
-  } = entity;
+    label,
+  },
+}: TagsProps) => {
+  const { t } = useTranslation('users');
+
   const onWatchlist = watchlistCheck?.status === 'fail';
 
   return (
@@ -23,6 +26,7 @@ const Tags = ({ entity }: TagsProps) => {
       )}
       {onWatchlist && <Tag>{t('table.row.status.on-watchlist')}</Tag>}
       {requiresManualReview && <Tag>{t('table.row.status.on-review')}</Tag>}
+      {label && <Tag>{t(`table.row.status.label.${label}`)}</Tag>}
     </Stack>
   );
 };

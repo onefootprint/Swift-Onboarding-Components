@@ -19,7 +19,12 @@
       "status": {
         "on-watchlist": "Watchlist",
         "on-review": "Manual review",
-        "outstanding-workflow-request": "Info requested"
+        "outstanding-workflow-request": "Info requested",
+        "label": {
+          "active": "Active",
+          "offboard_fraud": "Offboarded (fraud)",
+          "offboard_other": "Offboarded (other)"
+        }
       }
     }
   }
