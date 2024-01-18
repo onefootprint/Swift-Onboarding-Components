@@ -6,6 +6,7 @@ import type {
   CollectedKybDataOption,
   CollectedKycDataOption,
 } from './collected-data-option';
+import type { EntityLabel } from './entity';
 import type { IdDocStatus, SupportedIdDocTypes } from './id-doc-type';
 import type { InsightEvent } from './insight-event';
 import type { LivenessAttribute, LivenessSource } from './liveness';
@@ -15,6 +16,7 @@ import type {
 } from './onboarding-decision';
 
 export enum TimelineEventKind {
+  labelAdded = 'label_added',
   dataCollected = 'data_collected',
   onboardingDecision = 'onboarding_decision',
   liveness = 'liveness',
@@ -27,6 +29,15 @@ export enum TimelineEventKind {
   workflowStarted = 'workflow_started',
   authMethodUpdated = 'auth_method_updated',
 }
+
+export type LabelAddedEvent = {
+  kind: TimelineEventKind.labelAdded;
+  data: LabelAddedEventData;
+};
+
+export type LabelAddedEventData = {
+  kind: EntityLabel;
+};
 
 export type CollectedDataEvent = {
   kind: TimelineEventKind.dataCollected;
@@ -178,6 +189,7 @@ export type PreviousWatchlistChecksEventData = {
 
 export type TimelineEvent = {
   event:
+    | LabelAddedEvent
     | CollectedDataEvent
     | LivenessEvent
     | IdDocUploadedEvent

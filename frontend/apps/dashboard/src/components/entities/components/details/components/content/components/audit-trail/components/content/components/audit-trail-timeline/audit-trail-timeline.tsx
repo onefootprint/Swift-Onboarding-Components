@@ -2,6 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoDownload16,
   IcoFileText16,
+  IcoInfo16,
   IcoLock16,
   IcoWarning16,
   IcoWriting16,
@@ -23,6 +24,7 @@ import type {
 import { EntityStatus, TimelineEventKind } from '@onefootprint/types';
 import type {
   AuthMethodUpdatedData,
+  LabelAddedEventData,
   WorkflowStartedEventData,
 } from '@onefootprint/types/src/data/timeline';
 import { Typography } from '@onefootprint/ui';
@@ -44,6 +46,7 @@ import {
   IdDocUploadedEventHeader,
   IdDocUploadedEventIcon,
 } from './components/id-doc-uploaded-event';
+import LabelAddedEventHeader from './components/label-added-event';
 import {
   LivenessEventBody,
   LivenessEventHeader,
@@ -98,6 +101,13 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
         iconComponent: <LivenessEventIcon data={eventData} />,
         headerComponent: <LivenessEventHeader data={eventData} />,
         bodyComponent: <LivenessEventBody data={eventData} />,
+      });
+    } else if (kind === TimelineEventKind.labelAdded) {
+      const eventData = data as LabelAddedEventData;
+      items.push({
+        time,
+        iconComponent: <IcoInfo16 />,
+        headerComponent: <LabelAddedEventHeader data={eventData} />,
       });
     } else if (kind === TimelineEventKind.dataCollected) {
       const eventData = data as CollectedDataEventData;

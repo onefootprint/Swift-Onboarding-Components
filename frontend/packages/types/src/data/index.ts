@@ -180,6 +180,8 @@ export type {
   FreeFormNoteEvent,
   IdDocUploadedEvent,
   IdDocUploadedEventData,
+  LabelAddedEvent,
+  LabelAddedEventData,
   LivenessEvent,
   LivenessEventData,
   OnboardingDecisionEvent,

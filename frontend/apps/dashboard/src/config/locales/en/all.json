@@ -1285,6 +1285,14 @@
               "failed": "Unable to collect "
             }
           },
+          "label-added-event": {
+            "as": "Labeled as",
+            "labels": {
+              "active": "Active",
+              "offboard_fraud": "Offboard (Fraud)",
+              "offboard_other": "Offboard (Other)"
+            }
+          },
           "data-collected-event": {
             "title": "Collected",
             "title-prefill": "Prefilled",

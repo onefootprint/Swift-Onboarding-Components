@@ -9,6 +9,7 @@ import {
   ActorKind,
   CollectedKycDataOption,
   DecisionStatus,
+  EntityLabel,
   LivenessIssuer,
   LivenessSource,
   RuleAction,
@@ -23,6 +24,15 @@ export const entityIdFixure = 'fp_id_cDsFPmDwz784hdwovghMqt';
 export const obcIdFixure = 'ob_config_id_LZuy8k6ch31LcTEZvyk7YX';
 
 export const TimelineFixture: Timeline = [
+  {
+    event: {
+      kind: TimelineEventKind.labelAdded,
+      data: {
+        kind: EntityLabel.active,
+      },
+    },
+    timestamp: '2022-11-08T10:21:33.931738Z',
+  },
   {
     event: {
       kind: TimelineEventKind.dataCollected,

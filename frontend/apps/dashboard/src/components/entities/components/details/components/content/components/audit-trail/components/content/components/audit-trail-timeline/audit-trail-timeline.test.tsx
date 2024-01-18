@@ -40,6 +40,14 @@ describe('<AuditTrailTimeline />', () => {
     );
 
   describe('when timeline data is loaded', () => {
+    it('should render label added event correctly', () => {
+      renderAuditTrailTimeline(TimelineFixture);
+      const header = screen.getByTestId('label-added-event-header');
+      expect(header).toBeInTheDocument();
+      expect(within(header).getByText('Labeled as')).toBeInTheDocument();
+      expect(within(header).getByText('Active')).toBeInTheDocument();
+    });
+
     it('should render kyc data collection event correctly', () => {
       renderAuditTrailTimeline(TimelineFixture);
       const header = screen.getByTestId('data-collected-event-header');

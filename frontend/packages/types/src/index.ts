@@ -258,6 +258,8 @@ export type {
   InvokeVaultProxyScopeData,
   KycBootstrapData,
   L10n,
+  LabelAddedEvent,
+  LabelAddedEventData,
   Liveness,
   LivenessAttestation,
   LivenessAttestationDeviceType,
