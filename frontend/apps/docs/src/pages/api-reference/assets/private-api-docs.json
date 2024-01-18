@@ -4598,33 +4598,6 @@
                 ]
             }
         },
-        "/org/settings": {
-            "get": {
-                "tags": [
-                    "OrgSettings",
-                    "Organization",
-                    "Private"
-                ],
-                "description": "Returns tenant settings.",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/GetTenantResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    }
-                ]
-            }
-        },
         "/org/webhook_portal": {
             "get": {
                 "tags": [
@@ -14059,26 +14032,6 @@
                         ]
                     }
                 }
-            },
-            "GetTenantResponse": {
-                "type": "object",
-                "properties": {
-                    "email_domains": {
-                        "description": "set of email domains",
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "name": {
-                        "description": "tenant name",
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "email_domains",
-                    "name"
-                ]
             },
             "GetVaultResponse": {
                 "example": {

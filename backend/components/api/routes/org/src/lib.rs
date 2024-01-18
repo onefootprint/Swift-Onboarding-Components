@@ -16,7 +16,6 @@ mod roles;
 mod rules;
 mod sdk_args;
 mod sdk_telemetry;
-mod settings;
 mod webhook_portal;
 
 // Temporary glob imports until api core is disbanded.
@@ -37,7 +36,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(roles::post)
         .service(roles::patch)
         .service(roles::deactivate)
-        .service(settings::get)
         .service(risk_signals::get)
         .service(access_events::get)
         .service(logo::put)
