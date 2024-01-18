@@ -34,7 +34,7 @@ describe('<DeclarationsForm />', () => {
       renderForm({ onSubmit });
 
       const broker = screen.getByLabelText(
-        'Affiliated or work with the US registered broker-dealer or FINRA',
+        'Affiliated or work with a US registered broker-dealer or FINRA',
       );
       await userEvent.click(broker);
 
@@ -173,7 +173,7 @@ describe('<DeclarationsForm />', () => {
       });
 
       const affiliation = screen.getByLabelText(
-        'Affiliated or work with the US registered broker-dealer or FINRA',
+        'Affiliated or work with a US registered broker-dealer or FINRA',
       ) as HTMLInputElement;
       expect(affiliation.checked).toBe(false);
 

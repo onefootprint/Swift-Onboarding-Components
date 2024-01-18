@@ -2527,7 +2527,7 @@ describe.skip('<Details />', () => {
               const declarations = getTextByRow({
                 name: 'Declaration(s)',
                 value:
-                  'Affiliated or work with the us registered broker-dealer or finra',
+                  'Affiliated or work with a us registered broker-dealer or finra',
                 container,
               });
               expect(declarations).toBeInTheDocument();
