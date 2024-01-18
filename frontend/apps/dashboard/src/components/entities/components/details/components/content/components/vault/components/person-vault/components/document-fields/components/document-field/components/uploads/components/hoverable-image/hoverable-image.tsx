@@ -18,6 +18,7 @@ type HoverableImageProps = {
 const HoverableImage = ({ src, isSuccess }: HoverableImageProps) => {
   const { t } = useTranslation('pages.entity.fieldset.document.drawer.uploads');
   const [isExpanded, setExpanded] = useState(false);
+  const isPDF = src.startsWith('data:application/pdf;base64');
 
   const handleToggleExpanded = () => {
     setExpanded(!isExpanded);
@@ -29,7 +30,13 @@ const HoverableImage = ({ src, isSuccess }: HoverableImageProps) => {
       transition={{ duration: 0.2, ease: 'easeInOut' }}
       initial={{ width: '50%' }}
     >
-      <StyledImage src={src} width={0} height={0} alt={t('image-alt')} />
+      {isPDF ? (
+        <IframeEmbedContainer>
+          <Embed src={src} width="100%" height="100%" type="application/pdf" />
+        </IframeEmbedContainer>
+      ) : (
+        <StyledImage src={src} width={0} height={0} alt={t('image-alt')} />
+      )}
       <ToggleContainer onClick={handleToggleExpanded} className="toggle">
         {isExpanded ? (
           <IcoMinimize24 color="primary" />
@@ -59,6 +66,20 @@ const ImageContainer = styled(motion.div)`
       opacity: 1;
     }
   }
+`;
+
+const IframeEmbedContainer = styled.div`
+  ${({ theme }) => css`
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: ${theme.borderRadius.default};
+    border: none;
+  `};
+`;
+
+const Embed = styled.embed`
+  border: none;
 `;
 
 const StyledImage = styled(Image)`

@@ -1,11 +1,13 @@
-const { withSentryConfig } = require("@sentry/nextjs");
+const { withSentryConfig } = require('@sentry/nextjs');
 const bundlerAnalyzer = require('@next/bundle-analyzer');
 
 const IS_DEV = process.env.NODE_ENV === 'development';
 const COMMIT_SHA = process.env.VERCEL_GIT_COMMIT_SHA;
 
-const SHOULD_SHOW_ANALYZE = IS_DEV && process.env.ANALYZE === 'true'
-const SHOULD_UPLOAD_SOURCE_MAPS = process.env.VERCEL_ENV === 'production' || process.env.VERCEL_ENV === 'preview';
+const SHOULD_SHOW_ANALYZE = IS_DEV && process.env.ANALYZE === 'true';
+const SHOULD_UPLOAD_SOURCE_MAPS =
+  process.env.VERCEL_ENV === 'production' ||
+  process.env.VERCEL_ENV === 'preview';
 
 const getNextConfig = () => {
   const SENTRY_CONNECT_SRC = ['*.sentry.io', '*.ingest.sentry.io'].join(' ');
@@ -18,13 +20,13 @@ const getNextConfig = () => {
   const DevContentSecurityPolicy = `
     child-src onefootprint.com;
     connect-src 'self' http://localhost:8000 *.onefootprint.com unpkg.com *.googleapis.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live ${SENTRY_CONNECT_SRC} getform.io ${OBSERVE_CONNECT_SRC}; 
-    default-src 'self' vitals.vercel-insights.com;
+    default-src 'self' vitals.vercel-insights.com data:;
     font-src 'self' fonts.googleapis.com fonts.gstatic.com;
     form-action 'self';
     frame-ancestors 'self';
-    frame-src 'self' vercel.live https://app.svix.com calendly.com cdn.jsdelivr.net;
+    frame-src 'self' vercel.live https://app.svix.com calendly.com cdn.jsdelivr.net data:;
     img-src 'self' blob: data: assets.vercel.com vercel.live vercel.com *.googleapis.com maps.gstatic.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net assets.calendly.com;
-    media-src 'self' https;
+    media-src 'self' https data:;
     script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.usefathom.com vercel.live vitals.vercel-insights.com cdn.vercel-insights.com ${SENTRY_SCRIPT_SRC};
     style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;
     worker-src 'self' blob:;
@@ -33,13 +35,13 @@ const getNextConfig = () => {
   const ProdContentSecurityPolicy = `
     child-src onefootprint.com;
     connect-src 'self' *.onefootprint.com unpkg.com *.googleapis.com vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live ${SENTRY_CONNECT_SRC} ${OBSERVE_CONNECT_SRC}; 
-    default-src 'self' vitals.vercel-insights.com;
+    default-src 'self' vitals.vercel-insights.com data:;
     font-src 'self' fonts.googleapis.com fonts.gstatic.com;
     form-action 'self';
     frame-ancestors 'self';
-    frame-src 'self' vercel.live https://app.svix.com calendly.com;
+    frame-src 'self' vercel.live https://app.svix.com calendly.com data:;
     img-src 'self' blob: data: assets.vercel.com vercel.live vercel.com *.googleapis.com maps.gstatic.com i.onefp.net i-dev.onefp.net *.i-dev.onefp.net assets.calendly.com;
-    media-src 'self' https;
+    media-src 'self' https data:;
     script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.usefathom.com vercel.live vitals.vercel-insights.com cdn.vercel-insights.com ${SENTRY_SCRIPT_SRC};
     style-src 'self' 'unsafe-inline' fonts.googleapis.com cdn.jsdelivr.net;
     worker-src 'self' blob:;
@@ -137,11 +139,11 @@ const getNextConfig = () => {
       {
         // For all available options, see:
         // https://github.com/getsentry/sentry-webpack-plugin#options
-  
+
         // Suppresses source map uploading logs during build
         silent: true,
-        org: "onefootprint",
-        project: "dashboard",
+        org: 'onefootprint',
+        project: 'dashboard',
       },
       {
         // For all available options, see:
@@ -149,14 +151,14 @@ const getNextConfig = () => {
         release: COMMIT_SHA,
         widenClientFileUpload: true,
         transpileClientSDK: false,
-        tunnelRoute: "/monitoring",
+        tunnelRoute: '/monitoring',
         hideSourceMaps: true,
         disableLogger: true,
-      }
+      },
     );
   }
 
   return defaultNextConfig;
-}
+};
 
 module.exports = getNextConfig();

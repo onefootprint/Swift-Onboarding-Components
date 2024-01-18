@@ -12,6 +12,7 @@ import { createFontStyles, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 
 import HoverableImage from './components/hoverable-image';
+import getMimeType from './utils/get-mime-type';
 
 export type UploadsProps = {
   vault: EntityVault;
@@ -28,7 +29,10 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
     const hasVaultValue = vaultIndex in vault;
     if (hasVaultValue) {
       const vaultValue = vault[vaultIndex];
-      return `data:image/jpg;base64,${vaultValue}`;
+      if (typeof vaultValue === 'string') {
+        const mime = getMimeType(vaultValue);
+        return `data:${mime};base64,${vaultValue}`;
+      }
     }
     return '';
   };
