@@ -17,6 +17,7 @@ const AssumeBanner = () => {
   // mode
   const { data: user } = useGetOrgMember({
     auth: data.auth as string,
+    isLive: !!data.org?.isLive,
     isAssumedSessionEditMode: true,
   });
   const userCanEnableEditMode =

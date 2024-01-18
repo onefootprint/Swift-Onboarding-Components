@@ -110,8 +110,8 @@ describe('useSession', () => {
       await act(async () => {
         await result.current.logIn(loginPayload);
       });
-      act(() => {
-        result.current.setIsLive(true);
+      act(async () => {
+        await result.current.setIsLive(true);
       });
       expect(result.current.data.org?.isLive).toBeTruthy();
     });

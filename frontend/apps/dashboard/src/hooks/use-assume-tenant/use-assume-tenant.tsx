@@ -34,7 +34,7 @@ const useAssumeTenant = () => {
       postAssumeTenantReadOnly(authHeaders, data.tenantId),
     {
       onSuccess: () => {
-        session.refreshUserPermissions();
+        session.refreshUserPermissions({});
       },
       onError: (error: unknown) => {
         console.error(`Assuming tenant failed`, getErrorMessage(error));

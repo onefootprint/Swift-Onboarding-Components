@@ -18,7 +18,7 @@ const TopMenuBar = () => {
     ? t('sandbox-mode.tooltip-info.sandbox')
     : t('sandbox-mode.tooltip-info.live');
 
-  const toggleSandboxMode = () => {
+  const toggleSandboxMode = async () => {
     if (router.pathname.startsWith('/users')) {
       router.push({
         pathname: '/users',
@@ -30,7 +30,7 @@ const TopMenuBar = () => {
         query: omit(router.query, ['id', 'cursor']),
       });
     }
-    sandbox.toggle();
+    await sandbox.toggle();
   };
   const router = useRouter();
 

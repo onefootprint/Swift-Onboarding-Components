@@ -12,29 +12,30 @@ const ModeSwitcher = ({ children }: ModeSwitcherProps) => {
   const { sandbox } = useOrgSession();
   const toast = useToast();
 
-  const toggleMode = () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const mode = urlParams.get('mode');
-    const isSameMode =
-      (mode === 'sandbox' && sandbox.isSandbox) ||
-      (mode === 'live' && !sandbox.isSandbox);
-    if (!mode || isSameMode || !sandbox.canToggle) return;
+  useEffect(() => {
+    const toggleMode = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const mode = urlParams.get('mode');
+      const isSameMode =
+        (mode === 'sandbox' && sandbox.isSandbox) ||
+        (mode === 'live' && !sandbox.isSandbox);
+      if (!mode || isSameMode || !sandbox.canToggle) return;
 
-    sandbox.toggle();
-    if (mode === 'sandbox') {
-      toast.show({
-        title: t('live-to-sandbox.title'),
-        description: t('live-to-sandbox.description'),
-      });
-    } else {
-      toast.show({
-        title: t('sandbox-to-live.title'),
-        description: t('sandbox-to-live.description'),
-      });
-    }
-  };
-
-  useEffect(toggleMode, []);
+      await sandbox.toggle();
+      if (mode === 'sandbox') {
+        toast.show({
+          title: t('live-to-sandbox.title'),
+          description: t('live-to-sandbox.description'),
+        });
+      } else {
+        toast.show({
+          title: t('sandbox-to-live.title'),
+          description: t('sandbox-to-live.description'),
+        });
+      }
+    };
+    toggleMode();
+  }, []);
 
   return <Box>{children}</Box>;
 };
