@@ -3,7 +3,6 @@ import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { EntityKind } from '@onefootprint/types';
 import { Dropdown } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import useSession from 'src/hooks/use-session';
 
 import type { WithEntityProps } from '../../../../../../../with-entity';
 import useEditControls from '../../hooks/use-edit-controls';
@@ -18,9 +17,6 @@ enum ActionDialog {
 const Actions = ({ entity }: WithEntityProps) => {
   const { t } = useTranslation('pages.entity.actions');
   const editControls = useEditControls();
-  const {
-    data: { user },
-  } = useSession();
   const [openDialog, setOpenDialog] = useState<ActionDialog | null>(null);
 
   const shouldShowActionsDropdown = entity.kind === EntityKind.person;
@@ -51,11 +47,9 @@ const Actions = ({ entity }: WithEntityProps) => {
               {t('retrigger-kyc.label')}
             </Dropdown.Item>
           )}
-          {user?.isFirmEmployee && (
-            <Dropdown.Item onSelect={handleOpenAuthMethodsDialog}>
-              {t('update-auth-methods.label')}
-            </Dropdown.Item>
-          )}
+          <Dropdown.Item onSelect={handleOpenAuthMethodsDialog}>
+            {t('update-auth-methods.label')}
+          </Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Root>
       <RetriggerKYCDialog
