@@ -95,9 +95,7 @@ const videoElementStateListener =
     logWarn(`Video element status: ${event.type}`);
     if (
       isFunction(videoElement?.play) &&
-      (isNonPlayingVideoEvent(event) ||
-        (!isPlaying &&
-          (event.type === 'canplay' || event.type === 'canplaythrough'))) &&
+      isNonPlayingVideoEvent(event) &&
       videoElement.readyState >= 2
     ) {
       setPlayingState(false);
@@ -326,7 +324,7 @@ const Camera = ({
 
   useEffect(() => {
     const vidRef = getHtmlVideoElement(videoRef);
-    if (!vidRef) return noop;
+    if (!vidRef || !isVideoPlaying) return noop;
 
     const listener = videoElementStateListener(
       setIsVideoPlaying,
@@ -339,7 +337,7 @@ const Camera = ({
     return () => {
       VideoEvents.forEach(e => vidRef.removeEventListener(e, listener));
     };
-  }, [videoRef]);
+  }, [isVideoPlaying, videoRef]);
 
   useEffect(() => () => clearTimeout(autocaptureRestartTimeoutRef.current), []);
 
@@ -356,7 +354,6 @@ const Camera = ({
       <Container data-visible={isCameraVisible}>
         <VideoContainer data-device-kind={deviceKind}>
           <Video
-            key={mediaStream?.id}
             autoPlay
             data-camera-kind={cameraKind}
             data-device-kind={deviceKind}
