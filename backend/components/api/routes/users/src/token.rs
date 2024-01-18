@@ -6,6 +6,7 @@ use api_core::auth::session::user::AssociatedAuthEvent;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::user::allowed_user_scopes;
+use api_core::config::LinkKind;
 use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
 use api_core::utils::actix::OptionalJson;
@@ -172,7 +173,10 @@ pub async fn post(
         .await?;
 
     let expires_at = session.expires_at;
-    let link = state.config.service_config.generate_verify_link(&token, "user");
+    let link = state
+        .config
+        .service_config
+        .generate_link(LinkKind::VerifyUser, &token);
     let response = CreateTokenResponse {
         token,
         link,

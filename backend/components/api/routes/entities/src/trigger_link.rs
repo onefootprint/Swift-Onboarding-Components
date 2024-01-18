@@ -6,6 +6,7 @@ use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::auth::session::user::UserSession;
 use api_core::auth::session::user::UserSessionArgs;
+use api_core::config::LinkKind;
 use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
 use api_core::utils::fp_id_path::FpIdPathPlus;
@@ -67,7 +68,7 @@ pub async fn post(
     let link = state
         .config
         .service_config
-        .generate_verify_link(&auth_token, "user");
+        .generate_link(LinkKind::VerifyUser, &auth_token);
 
     let response = TriggerLinkResponse { link };
     ResponseData::ok(response).json()

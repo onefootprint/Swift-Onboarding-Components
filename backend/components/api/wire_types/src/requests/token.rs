@@ -25,13 +25,6 @@ pub struct CreateTokenRequest {
     pub third_party_auth: Option<bool>,
 }
 
-#[derive(Deserialize, Apiv2Schema)]
-#[serde(rename_all = "snake_case")]
-pub struct CreateEntityTokenRequest {
-    pub kind: TokenOperationKind,
-    pub key: Option<ObConfigurationKey>,
-}
-
 #[derive(Display, EnumString, DeserializeFromStr, SerializeDisplay, Apiv2Schema, ::macros::SerdeAttr)]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
@@ -45,6 +38,26 @@ pub enum TokenOperationKind {
     Inherit,
     /// Simply create a token for the user. A playbook key may be provided directly to the Footprint Verify SDK to trigger onboarding.
     User,
+}
+
+#[derive(Deserialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct CreateEntityTokenRequest {
+    pub kind: EntityTokenOperationKind,
+    pub key: Option<ObConfigurationKey>,
+}
+
+#[derive(Display, EnumString, DeserializeFromStr, SerializeDisplay, Apiv2Schema, ::macros::SerdeAttr)]
+#[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+/// Our dashboard-facing version of the token API creates a disjoint set of tokens to the
+/// tenant-facing version.
+/// These are the dashboard-facing token kinds
+pub enum EntityTokenOperationKind {
+    /// Same as TokenOperationKind
+    Inherit,
+    /// Generate a token and link that allows the user to update their contact info
+    UpdateAuthMethods,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]

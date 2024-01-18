@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::pin::Pin;
 
 use crate::auth::session::ob_config::BoSession;
+use crate::config::LinkKind;
 use crate::decision::state::{Authorize, BoKycCompleted, WorkflowActions, WorkflowWrapper};
 use crate::errors::business::BusinessError;
 use crate::errors::onboarding::OnboardingError;
@@ -106,7 +107,10 @@ pub async fn send_secondary_bo_links(
             let bo_data = secondary_bos_from_vault
                 .get(&l_id)
                 .ok_or(BusinessError::BoNotFound)?;
-            let url = state.config.service_config.generate_verify_link(&token, "bo");
+            let url = state
+                .config
+                .service_config
+                .generate_link(LinkKind::VerifyBusinessOwner, &token);
             let sms = BoSessionSmsInfo {
                 destination: &bo_data.phone_number,
                 inviter: &inviter,

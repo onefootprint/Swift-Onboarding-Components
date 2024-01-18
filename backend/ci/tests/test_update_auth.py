@@ -59,7 +59,7 @@ def get_auth_token_for_ci_update(user, auth_playbook):
     )
 
     # Create a new auth token via API that _can_ initiate a challenge, after step up
-    data = dict(kind="user")
+    data = dict(kind="update_auth_methods")
     body = post(
         f"entities/{user.fp_id}/token", data, *user.client.ob_config.tenant.db_auths
     )
@@ -83,8 +83,8 @@ def get_auth_token_for_ci_update(user, auth_playbook):
 
 
 def test_scrubbed_phone_email(sandbox_user, sandbox_tenant):
-    data = dict(kind="user")
-    body = post(f"users/{sandbox_user.fp_id}/token", data, sandbox_tenant.sk.key)
+    data = dict(kind="update_auth_methods")
+    body = post(f"entities/{sandbox_user.fp_id}/token", data, *sandbox_tenant.db_auths)
     auth_token = FpAuth(body["token"])
 
     body = post("hosted/identify", dict(identifier=None), auth_token)
@@ -147,7 +147,7 @@ def test_add_phone(skip_phone_obc):
     user = bifrost.run()
 
     # Create an auth token with permissions to update contact info
-    data = dict(kind="user")
+    data = dict(kind="update_auth_methods")
     body = post(
         f"entities/{user.fp_id}/token", data, *user.client.ob_config.tenant.db_auths
     )

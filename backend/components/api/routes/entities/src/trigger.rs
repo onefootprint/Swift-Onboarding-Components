@@ -6,6 +6,7 @@ use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::auth::session::user::UserSession;
 use api_core::auth::session::user::UserSessionArgs;
+use api_core::config::LinkKind;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::user::UserError;
 use api_core::errors::ApiResult;
@@ -106,7 +107,7 @@ pub async fn post(
     let link = state
         .config
         .service_config
-        .generate_verify_link(&auth_token, "user");
+        .generate_link(LinkKind::VerifyUser, &auth_token);
     let org_name = auth.tenant().name.clone();
 
     let msg = TriggerMessage {

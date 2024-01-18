@@ -1672,7 +1672,8 @@
                                     "VaultCreated",
                                     "WorkflowTriggered",
                                     "WorkflowStarted",
-                                    "AuthMethodUpdated"
+                                    "AuthMethodUpdated",
+                                    "LabelAdded"
                                 ]
                             }
                         },
@@ -1707,7 +1708,7 @@
                     "Users",
                     "Private"
                 ],
-                "description": "Create an identified token for the provided fp_id. This token may be passed into Footprint.js to bootstrap a user's onboarding with known information. Re-auth will be required if the user hasn't logged into your tenant recently.",
+                "description": "Create an identified token for the provided fp_id and a link to the hosted flow that allows the user to complete the requested flow.",
                 "parameters": [
                     {
                         "in": "path",
@@ -5873,10 +5874,8 @@
                     "kind": {
                         "type": "string",
                         "enum": [
-                            "onboard",
-                            "reonboard",
                             "inherit",
-                            "user"
+                            "update_auth_methods"
                         ]
                     }
                 },

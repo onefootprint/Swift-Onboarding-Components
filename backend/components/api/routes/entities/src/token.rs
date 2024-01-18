@@ -4,12 +4,15 @@ use crate::types::JsonApiResponse;
 use crate::State;
 use api_core::auth::tenant::TenantGuard;
 use api_core::auth::tenant::TenantSessionAuth;
+use api_core::config::LinkKind;
 use api_core::errors::ApiResult;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::token::create_token;
 use api_core::utils::token::CreateTokenArgs;
 use api_wire_types::CreateEntityTokenRequest;
 use api_wire_types::CreateTokenResponse;
+use api_wire_types::EntityTokenOperationKind;
+use api_wire_types::TokenOperationKind;
 use db::models::scoped_vault::ScopedVault;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
@@ -31,6 +34,15 @@ pub async fn post(
     let fp_id = fp_id.into_inner();
     let session_key = state.session_sealing_key.clone();
 
+    let token_kind = match kind {
+        EntityTokenOperationKind::Inherit => TokenOperationKind::Inherit,
+        EntityTokenOperationKind::UpdateAuthMethods => TokenOperationKind::User,
+    };
+    let link_kind = match kind {
+        EntityTokenOperationKind::Inherit => LinkKind::VerifyUser,
+        EntityTokenOperationKind::UpdateAuthMethods => LinkKind::UpdateAuth,
+    };
+
     let (token, session) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -38,7 +50,7 @@ pub async fn post(
 
             let args = CreateTokenArgs {
                 sv,
-                kind,
+                kind: token_kind,
                 key,
                 scopes: vec![],
                 auth_events: vec![],
@@ -51,7 +63,7 @@ pub async fn post(
         .await?;
 
     let expires_at = session.expires_at;
-    let link = state.config.service_config.generate_verify_link(&token, "user");
+    let link = state.config.service_config.generate_link(link_kind, &token);
     let response = CreateTokenResponse {
         token,
         link,

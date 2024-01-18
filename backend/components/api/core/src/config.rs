@@ -218,6 +218,15 @@ lazy_static::lazy_static! {
     };
 }
 
+pub enum LinkKind {
+    /// Hosted bifrost verify component with a user-specific link
+    VerifyUser,
+    /// Hosted bifrost verify component with a business-owner link
+    VerifyBusinessOwner,
+    /// Hosted auth to update login methods
+    UpdateAuth,
+}
+
 impl ServiceEnvironmentConfig {
     pub fn load_from_env() -> Result<Self, Box<dyn std::error::Error>> {
         load_from_env()
@@ -232,23 +241,42 @@ impl ServiceEnvironmentConfig {
     }
 
     /// Generate a link to hosted bifrost based on the environment in which we are running
-    pub fn generate_verify_link(&self, token: &SessionAuthToken, kind: &str) -> PiiString {
-        // TODO right now, for simplicity, we determine the verify link from the environment running
+    pub fn generate_link(&self, kind: LinkKind, token: &SessionAuthToken) -> PiiString {
+        // TODO right now, for simplicity, we determine the base_url from the environment running
         // in the backend. Ideally, if you are testing a local frontend, we should send you a link
         // to your local frontend. In the future, migrate to have the client provide info on the
         // environment
-        let base_url = if self.is_production() {
-            "https://verify.onefootprint.com"
-        } else if self.is_local() {
-            "http://localhost:3004"
-        } else {
-            "https://verify.preview.onefootprint.com"
+        let base_url = match kind {
+            LinkKind::VerifyUser | LinkKind::VerifyBusinessOwner => {
+                if self.is_production() {
+                    "https://verify.onefootprint.com"
+                } else if self.is_local() {
+                    "http://localhost:3004"
+                } else {
+                    "https://verify.preview.onefootprint.com"
+                }
+            }
+            LinkKind::UpdateAuth => {
+                if self.is_production() {
+                    "https://auth.onefootprint.com/update"
+                } else if self.is_local() {
+                    "http://localhost:3011/update"
+                } else {
+                    "https://auth.preview.onefootprint.com/update"
+                }
+            }
         };
-        // Generate a random querystring so different links open in different tabs
+        // Randomize the querystring so different links open in different tabs
         let r = rand::thread_rng().gen_range(0..1000);
+
+        let querystring = match kind {
+            LinkKind::VerifyUser => format!("type=user&r={}", r),
+            LinkKind::VerifyBusinessOwner => format!("type=bo&r={}", r),
+            LinkKind::UpdateAuth => format!("r={}", r),
+        };
         // Send the auth token in the url fragment #, which isn't logged by default.
         // The auth token is a secret
-        PiiString::new(format!("{}?type={}&r={}#{}", base_url, kind, r, token))
+        PiiString::new(format!("{}?{}#{}", base_url, querystring, token))
     }
 }
 
