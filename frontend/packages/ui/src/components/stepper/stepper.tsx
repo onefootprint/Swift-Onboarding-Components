@@ -1,6 +1,6 @@
 import { IcoCheckSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import React, { Fragment } from 'react';
+import React from 'react';
 
 import { createFontStyles } from '../../utils';
 
@@ -47,7 +47,7 @@ const Stepper = ({
           const showSubOptions = isSelected && subOptions.length > 0;
 
           return (
-            <Fragment key={option.value}>
+            <React.Fragment key={option.value}>
               <Item
                 data-completed={isCompleted}
                 data-next={isNext}
@@ -105,7 +105,7 @@ const Stepper = ({
                   )}
                 </>
               )}
-            </Fragment>
+            </React.Fragment>
           );
         })}
       </ul>

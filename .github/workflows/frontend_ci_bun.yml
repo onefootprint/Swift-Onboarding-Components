@@ -1,0 +1,36 @@
+name: Frontend CI Bun
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'frontend/**'
+  pull_request:
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend_ci_bun'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+jobs:
+  unit-tests:
+    name: 'Unit tests'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: 1.0.23 # or "latest", "canary", 1.0.23 ,<sha>
+          
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Bun install
+        working-directory: ./frontend
+        run: bun install
+
+      - name: Bun tests
+        working-directory: ./frontend
+        run: bun run test:ci:bun

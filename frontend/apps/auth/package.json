@@ -1,0 +1,55 @@
+{
+  "name": "auth",
+  "version": "1.0.0",
+  "private": true,
+  "sideEffects": false,
+  "scripts": {
+    "build:analyze": "ANALYZE=true yarn build",
+    "build": "next build",
+    "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
+    "dev": "next dev -p 3011",
+    "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "lint": "next lint",
+    "start": "next start -p 3011",
+    "test:ci:bun": "bun test",
+    "typecheck": "yarn tsc --noEmit",
+    "set:dot-env": "sh ../../scripts/set-dot-env.sh"
+  },
+  "dependencies": {
+    "@onefootprint/design-tokens": "*",
+    "@onefootprint/global-constants": "*",
+    "@onefootprint/hooks": "*",
+    "@onefootprint/icons": "*",
+    "@onefootprint/idv": "*",
+    "@onefootprint/postmate": "2.1.0",
+    "@onefootprint/request": "*",
+    "@onefootprint/styled": "*",
+    "@onefootprint/ui": "*",
+    "@tanstack/react-query": "4.35.7",
+    "@xstate/react": "^3.2.1",
+    "constate": "^3.3.2",
+    "i18next": "^23.7.16",
+    "lodash": "^4.17.21",
+    "logrocket": "^5.0.1",
+    "react-dom": "18.2.0",
+    "react-i18next": "^14.0.0",
+    "react": "18.2.0",
+    "xstate": "^4.37.1"
+  },
+  "devDependencies": {
+    "@next/bundle-analyzer": "^12.3.4",
+    "@onefootprint/footprint-js": "*",
+    "@onefootprint/types": "*",
+    "@types/lodash": "^4.14.194",
+    "@types/node": "^17.0.31",
+    "@types/react": "^18.0.10",
+    "@types/react-dom": "^18.0.10",
+    "eslint-config-footprint": "*",
+    "next": "13.5.3",
+    "tsconfig": "*",
+    "typescript": "4.9.5"
+  },
+  "browser": {
+    "fs": false
+  }
+}

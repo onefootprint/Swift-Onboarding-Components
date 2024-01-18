@@ -1,0 +1,32 @@
+import type { WebViewAdapterReturn } from '../types';
+
+const generateWebViewAdapter = (): WebViewAdapterReturn => {
+  let isAdapterLoaded: boolean = false;
+  const getRedirectUrl = () => {
+    const params = new URLSearchParams(document.location.search);
+    return params.get('redirect_url');
+  };
+
+  const setLocation = (data: Record<string, string | boolean> = {}) => {
+    const params = new URLSearchParams();
+    Object.entries(data).forEach(([key, value]) => {
+      params.set(key, value as string);
+    });
+    window.location.href = `${getRedirectUrl()}?${params.toString()}`;
+  };
+
+  return {
+    getAdapterResponse: () => null,
+    getLoadingStatus: () => isAdapterLoaded,
+    load: () =>
+      Promise.resolve().then(() => {
+        isAdapterLoaded = true;
+      }),
+    on: () => () => {},
+    send: (event: string) => {
+      setLocation({ [event]: true });
+    },
+  };
+};
+
+export default generateWebViewAdapter;

@@ -69,6 +69,11 @@
         "^build"
       ]
     },
+    "test:ci:bun": {
+      "dependsOn": [
+        "^build"
+      ]
+    },
     "test:e2e:ci": {
       "cache": false
     },

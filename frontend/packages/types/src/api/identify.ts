@@ -24,6 +24,8 @@ export type IdentifyResponse = {
   // Email included only if no-phone user, otherwise phone is included by default.
   // Passkey included only if registered by user
   availableChallengeKinds?: ChallengeKind[];
+  scrubbedEmail?: string;
+  scrubbedPhone?: string;
 };
 
 /*

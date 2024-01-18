@@ -18,6 +18,7 @@
     "lint:ci": "turbo run lint:ci",
     "test": "turbo run test",
     "test:ci": "turbo run test:ci",
+    "test:ci:bun": "turbo run test:ci:bun",
     "test:e2e:ci": "turbo run test:e2e:ci",
     "test:stress:ci": "turbo run test:stress:ci",
     "test:watch": "turbo run test:watch",
