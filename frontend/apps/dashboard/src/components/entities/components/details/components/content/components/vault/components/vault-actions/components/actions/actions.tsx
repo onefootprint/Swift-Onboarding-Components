@@ -3,25 +3,37 @@ import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { EntityKind } from '@onefootprint/types';
 import { Dropdown } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import useSession from 'src/hooks/use-session';
 
 import type { WithEntityProps } from '../../../../../../../with-entity';
 import useEditControls from '../../hooks/use-edit-controls';
 import RetriggerKYCDialog from '../retrigger-kyc-dialog';
+import UpdateAuthDialog from '../update-auth-dialog';
+
+enum ActionDialog {
+  auth,
+  retrigger,
+}
 
 const Actions = ({ entity }: WithEntityProps) => {
   const { t } = useTranslation('pages.entity.actions');
   const editControls = useEditControls();
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const {
+    data: { user },
+  } = useSession();
+  const [openDialog, setOpenDialog] = useState<ActionDialog | null>(null);
 
   const shouldShowActionsDropdown = entity.kind === EntityKind.person;
   const shouldShowRetriggerKyc = entity?.isIdentifiable;
 
   const handleCloseDialog = () => {
-    setDialogOpen(false);
+    setOpenDialog(null);
   };
-
-  const handleOpenDialog = () => {
-    setDialogOpen(true);
+  const handleOpenRetriggerKycDialog = () => {
+    setOpenDialog(ActionDialog.retrigger);
+  };
+  const handleOpenAuthMethodsDialog = () => {
+    setOpenDialog(ActionDialog.auth);
   };
 
   return shouldShowActionsDropdown ? (
@@ -35,13 +47,25 @@ const Actions = ({ entity }: WithEntityProps) => {
             {t('edit-user.label')}
           </Dropdown.Item>
           {shouldShowRetriggerKyc && (
-            <Dropdown.Item onSelect={handleOpenDialog}>
+            <Dropdown.Item onSelect={handleOpenRetriggerKycDialog}>
               {t('retrigger-kyc.label')}
+            </Dropdown.Item>
+          )}
+          {user?.isFirmEmployee && (
+            <Dropdown.Item onSelect={handleOpenAuthMethodsDialog}>
+              {t('update-auth-methods.label')}
             </Dropdown.Item>
           )}
         </Dropdown.Content>
       </Dropdown.Root>
-      <RetriggerKYCDialog open={dialogOpen} onClose={handleCloseDialog} />
+      <RetriggerKYCDialog
+        open={openDialog === ActionDialog.retrigger}
+        onClose={handleCloseDialog}
+      />
+      <UpdateAuthDialog
+        open={openDialog === ActionDialog.auth}
+        onClose={handleCloseDialog}
+      />
     </>
   ) : null;
 };

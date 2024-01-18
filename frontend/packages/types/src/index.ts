@@ -22,6 +22,8 @@ export type {
   CreateProxyConfigResponse,
   CreateRoleRequest,
   CreateRoleResponse,
+  CreateTokenRequest,
+  CreateTokenResponse,
   D2PGenerateRequest,
   D2PGenerateResponse,
   D2PSmsRequest,

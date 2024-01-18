@@ -1199,6 +1199,21 @@
             "title": "Request sent"
           }
         },
+        "update-auth-methods": {
+          "label": "Allow updating login methods",
+          "title": "Allowing updating login methods",
+          "header": "Allow user to update authentication methods",
+          "share-this-link": "Share this link with the user. They will be asked to log in using one of their current auth methods and then will be able to:",
+          "update-phone": "Update their phone number",
+          "update-email": "Update their email address",
+          "update-passkey": "Update their passkey",
+          "copied": {
+            "header": "Success!",
+            "description": "Link copied to clipboard"
+          },
+          "done": "Done",
+          "send-via-sms": "Send via SMS"
+        },
         "share": {
           "label": "Share"
         }

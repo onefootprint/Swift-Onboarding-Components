@@ -31,7 +31,7 @@ describe('<RetriggerKYCDialog />', () => {
     withEntity(entityFixture.id);
     withFrequentNotes(OrgFrequentNoteKind.Trigger, []);
     useRouterSpy({
-      pathname: `/entities/${entityFixture.id}/trigger`,
+      pathname: `/entities/${entityFixture.id}`,
       query: {
         id: entityFixture.id,
       },
