@@ -46,13 +46,27 @@ impl PhoneNumber {
         self.number.format().mode(phonenumber::Mode::E164).into()
     }
 
+    pub fn subscriber_number(&self) -> PiiString {
+        self.national()
+            .leak()
+            .chars()
+            .filter(|c| c.is_numeric())
+            .collect::<String>()
+            .into()
+    }
+
+    fn national(&self) -> PiiString {
+        self.number.format().mode(phonenumber::Mode::National).into()
+    }
+
     /// Formats the PhoneNumber with all digits except the country code and last two scrubbed
     pub fn scrubbed(&self) -> PiiString {
         // Use the phonenumber library to format the number as a national number.
         // This includes nice formatting, aside from the country code
-        let national = format!("{}", self.number.format().mode(phonenumber::Mode::National));
+        let national = self.national();
         let len = national.len();
         let national: String = national
+            .leak_to_string()
             .chars()
             .enumerate()
             .map(|(i, c)| {
@@ -114,6 +128,15 @@ mod tests {
         let phone_number = PhoneNumber::parse(number.into()).unwrap();
         assert!(!phone_number.is_fixture_phone_number());
         phone_number.scrubbed().leak_to_string()
+    }
+
+
+    #[test_case("+1-415-123-1234" => "4151231234".to_owned(); "US")]
+    #[test_case("+55 (12) 12345-1234" => "12123451234".to_owned(); "brazil")]
+    #[test_case("+47 913 12 123" => "91312123".to_owned(); "norway")]
+    fn test_subscriber_number(number: &str) -> String {
+        let phone_number = PhoneNumber::parse(number.into()).unwrap();
+        phone_number.subscriber_number().leak_to_string()
     }
 
     #[test]

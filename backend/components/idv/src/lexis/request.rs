@@ -379,6 +379,13 @@ impl LexisRequest {
             None
         };
 
+        // Only send phone if we have a valid 10 digit phone number and send it as such (without the country code)
+        // TODO: should we just not send phone at all if its a non-US phone? Need to answer this empiracally from performance we see with lexis on intl nums
+        let phone_number = phone_number
+            .and_then(|pn| PhoneNumber::parse(pn).ok())
+            .map(|pn| pn.subscriber_number())
+            .filter(|pn| pn.len() == 10);
+
         let (ssn, ssn_last_4) = match (ssn9, ssn4) {
             (Some(ssn9), _) => (Some(ssn9), None),
             (None, Some(ssn4)) => (None, Some(ssn4)),

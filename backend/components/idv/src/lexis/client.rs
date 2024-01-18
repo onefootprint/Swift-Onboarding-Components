@@ -103,7 +103,7 @@ mod tests {
             ssn9: Some(PiiString::from("486639975")),
             dob: Some(PiiString::from("1975-04-02")),
             email: None,
-            phone_number: Some(PiiString::from("1085551212")),
+            phone_number: Some(PiiString::from("+15085551212")),
             ..Default::default()
         };
 
