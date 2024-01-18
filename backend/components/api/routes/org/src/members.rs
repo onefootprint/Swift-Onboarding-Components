@@ -116,7 +116,7 @@ async fn post(
         .db_transaction(move |conn| -> ApiResult<_> {
             let inviter = TenantUser::get(conn, &user_id)?;
             let user = TenantUser::get_and_update_or_create(conn, email2, first_name, last_name)?;
-            let (rb, role) = TenantRolebinding::create(conn, user.id.clone(), role_id, tenant_id)?;
+            let (rb, role) = TenantRolebinding::get_or_create(conn, user.id.clone(), role_id, tenant_id)?;
             Ok((inviter, user, rb, role))
         })
         .await?;

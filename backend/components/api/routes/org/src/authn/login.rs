@@ -14,14 +14,10 @@ use api_wire_types::{OrgLoginRequest, OrgLoginResponse};
 use api_wire_types::{Organization, OrganizationMember};
 use chrono::Duration;
 use db::models::tenant::{NewTenant, Tenant};
-use db::models::tenant_role::{ImmutableRoleKind, TenantRole};
-use db::models::tenant_rolebinding::{TenantRolebinding, TenantRolebindingFilters};
+use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
-use db::OffsetPagination;
 use itertools::Itertools;
-use newtypes::{
-    OrgMemberEmail, TenantRoleKind, TenantRolebindingId, TenantScope, TenantUserId, WorkosAuthMethod,
-};
+use newtypes::{OrgMemberEmail, TenantScope, WorkosAuthMethod};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use workos::sso::{
     AuthorizationCode, ClientId, ConnectionType, GetProfileAndToken, GetProfileAndTokenParams,
@@ -88,8 +84,12 @@ async fn handler(
         // If there are no rolebindings for this user, make one.
         // The new user will be associated with the tenant that owns the email address's domain OR
         // with a brand new tenant named after the user's email
-        let rb_id = create_tenant_rolebinding(&state, user.id.clone(), tenant).await?;
-        (vec![rb_id], created_new_tenant)
+        let user_id = user.id.clone();
+        let rb = state
+            .db_pool
+            .db_transaction(move |conn| TenantRolebinding::get_or_create_login(conn, user_id, tenant.id))
+            .await?;
+        (vec![rb.id], created_new_tenant)
     };
 
     let (session, requires_onboarding, user, tenant, is_first_login) = if matching_rolebindings.len() == 1 {
@@ -136,40 +136,6 @@ async fn handler(
     ResponseData { data }.json()
 }
 
-async fn create_tenant_rolebinding(
-    state: &State,
-    user_id: TenantUserId,
-    tenant: Tenant,
-) -> ApiResult<TenantRolebindingId> {
-    let tenant_id = tenant.id.clone();
-    let rb = state
-        .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
-            // Get the default admin and read-only role for this tenant
-            let kind = TenantRoleKind::DashboardUser;
-            let admin_role = TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::Admin, kind)?;
-            let ro_role = TenantRole::get_immutable(conn, &tenant.id, ImmutableRoleKind::ReadOnly, kind)?;
-            // If the tenant was just created and has no users, give the user admin perms.
-            // Otherwise, read-only perms
-            let filters = TenantRolebindingFilters {
-                tenant_id: &tenant_id,
-                only_active: false,
-                role_ids: None,
-                search: None,
-                is_invite_pending: None,
-            };
-            let pagination = OffsetPagination::new(None, 1);
-            let (users, _) = TenantRolebinding::list(conn, &filters, pagination)?;
-            let are_no_users = users.is_empty();
-            let role_id = if are_no_users { admin_role.id } else { ro_role.id };
-            let (rb, _) = TenantRolebinding::create(conn, user_id, role_id, tenant_id)?;
-            Ok(rb)
-        })
-        .await?;
-    // Just give the ID - the caller will log into the rolebinding (and update last_login_at)
-    Ok(rb.id)
-}
-
 type IsNewTenant = bool;
 async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tenant, IsNewTenant), ApiError> {
     // process domain
@@ -190,23 +156,12 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tena
     // create new tenant in the case of public email tenant user or existing private tenant with allow_domain_access = false
     tracing::info!("Creating new tenant with domain {:?}", domain);
     let tenant_name = domain.clone().unwrap_or_else(|| profile.email.to_string());
-    let tenant = create_tenant(state, tenant_name, None, domain).await?;
-    Ok((tenant, true))
-}
-
-async fn create_tenant(
-    state: &State,
-    tenant_name: String,
-    workos_org_id: Option<String>,
-    domain: Option<String>,
-) -> Result<Tenant, ApiError> {
     let (ec_pk_uncompressed, e_priv_key) = state.enclave_client.generate_sealed_keypair().await?;
-
     let new_tenant = NewTenant {
         name: tenant_name,
         e_private_key: e_priv_key,
         public_key: ec_pk_uncompressed,
-        workos_id: workos_org_id,
+        workos_id: None,
         logo_url: None,
         sandbox_restricted: true,
         is_prod_ob_config_restricted: true,
@@ -215,10 +170,9 @@ async fn create_tenant(
         domains: domain.into_iter().collect(),
         allow_domain_access: false, // false by default on creation, has to become true manually with PATCH /org
     };
-    let result = state
+    let tenant = state
         .db_pool
         .db_transaction(move |conn| Tenant::create(conn, new_tenant))
         .await?;
-
-    Ok(result)
+    Ok((tenant, true))
 }

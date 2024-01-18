@@ -1,5 +1,5 @@
 use super::tenant::Tenant;
-use super::tenant_role::TenantRole;
+use super::tenant_role::{ImmutableRoleKind, TenantRole};
 use super::tenant_user::TenantUser;
 use crate::PgConn;
 use crate::{DbError, NextPage, OffsetPagination};
@@ -9,7 +9,9 @@ use db_schema::schema::{tenant_role, tenant_rolebinding, tenant_user};
 use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::Queryable;
-use newtypes::{TenantId, TenantRoleId, TenantRoleKindDiscriminant, TenantRolebindingId, TenantUserId};
+use newtypes::{
+    TenantId, TenantRoleId, TenantRoleKind, TenantRoleKindDiscriminant, TenantRolebindingId, TenantUserId,
+};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = tenant_rolebinding)]
@@ -85,8 +87,8 @@ macro_rules! list_query {
 impl TenantRolebinding {
     /// Gets or creates the TenantUser with the provided email, and creates a rolebinding to
     /// associate the TenantUser with the provided role
-    #[tracing::instrument("TenantRolebinding::create", skip_all)]
-    pub fn create(
+    #[tracing::instrument("TenantRolebinding::get_or_create", skip_all)]
+    pub fn get_or_create(
         conn: &mut TxnPgConn,
         tenant_user_id: TenantUserId,
         tenant_role_id: TenantRoleId,
@@ -122,6 +124,33 @@ impl TenantRolebinding {
                 }
             })?;
         Ok((rb, tenant_role.into_inner()))
+    }
+
+    #[tracing::instrument("TenantRolebinding::create_for_login", skip_all)]
+    pub fn get_or_create_login(
+        conn: &mut TxnPgConn,
+        user_id: TenantUserId,
+        tenant_id: TenantId,
+    ) -> DbResult<Self> {
+        // Get the default admin and read-only role for this tenant
+        let kind = TenantRoleKind::DashboardUser;
+        let admin_role = TenantRole::get_immutable(conn, &tenant_id, ImmutableRoleKind::Admin, kind)?;
+        let ro_role = TenantRole::get_immutable(conn, &tenant_id, ImmutableRoleKind::ReadOnly, kind)?;
+        // If the tenant was just created and has no users, give the user admin perms.
+        // Otherwise, read-only perms
+        let filters = TenantRolebindingFilters {
+            tenant_id: &tenant_id,
+            only_active: false,
+            role_ids: None,
+            search: None,
+            is_invite_pending: None,
+        };
+        let pagination = OffsetPagination::new(None, 1);
+        let (users, _) = TenantRolebinding::list(conn, &filters, pagination)?;
+        let are_no_users = users.is_empty();
+        let role_id = if are_no_users { admin_role.id } else { ro_role.id };
+        let (rb, _) = TenantRolebinding::get_or_create(conn, user_id, role_id, tenant_id)?;
+        Ok(rb)
     }
 
     /// Get the list of active TenantRolebindingIds for the provided user.
