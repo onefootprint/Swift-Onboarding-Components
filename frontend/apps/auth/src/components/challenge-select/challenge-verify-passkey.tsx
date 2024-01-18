@@ -39,7 +39,7 @@ const ChallengeVerifyPasskey = ({
   const { t } = useTranslation('auth.passkey-challenge');
   const toast = useToast();
   const mutLoginChallenge = useLoginChallenge({});
-  const mutIdentifyVerify = useIdentifyVerify({});
+  const mutIdentifyVerify = useIdentifyVerify({ authToken });
   const [isRunningWebauthn, setIsRunningWebauthn] = useState(false);
   const isAuthenticating = isRunningWebauthn || mutIdentifyVerify.isLoading;
 
