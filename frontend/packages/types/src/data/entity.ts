@@ -24,6 +24,12 @@ export enum ApiEntityStatus {
   inProgress = 'in_progress',
 }
 
+export enum EntityLabel {
+  active = 'active',
+  offboard_fraud = 'offboard_fraud',
+  offboard_other = 'offboard_other',
+}
+
 /// This type doesn't actually exist on the backend - it is a frontend-only representation of the
 /// status of an entity.
 /// Realistically, all but the `none` status exist on the backend as EntityStatuses
@@ -52,20 +58,21 @@ export type Attribute = {
 
 export type Entity<TStatus = EntityStatus> = {
   attributes: DataIdentifier[];
+  data: Attribute[];
   decryptableAttributes: DataIdentifier[];
+  decryptedAttributes: EntityVault;
+  hasOutstandingWorkflowRequest: boolean;
   id: string;
+  insightEvent?: InsightEvent;
   isIdentifiable: boolean;
   kind: EntityKind;
-  data: Attribute[];
-  startTimestamp: string;
+  label: EntityLabel | null;
   lastActivityAt: string;
-  decryptedAttributes: EntityVault;
-  watchlistCheck: WatchlistCheckEventData | null;
-  status: TStatus;
   requiresManualReview: boolean;
-  insightEvent?: InsightEvent;
-  hasOutstandingWorkflowRequest: boolean;
   sandboxId?: string;
+  startTimestamp: string;
+  status: TStatus;
+  watchlistCheck: WatchlistCheckEventData | null;
 };
 
 export const hasEntityUsLegalStatus = (entity: Entity) =>
