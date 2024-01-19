@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
+import styled, { css, useTheme } from '@onefootprint/styled';
 import { CodeInline, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
 import Tags from 'src/components/entities/components/tags';
@@ -18,10 +18,11 @@ const Header = ({ entity }: HeaderProps) => {
   const {
     data: { user },
   } = useSession();
+  const theme = useTheme();
 
   return (
     <HeaderContainer aria-label={t(`${kind}.title`)}>
-      <Row>
+      <Stack align="center" gap={3}>
         <Typography variant="label-1">{t(`${kind}.title`)}</Typography>
         <Stack gap={2}>
           <StatusBadge
@@ -33,21 +34,32 @@ const Header = ({ entity }: HeaderProps) => {
           />
           <Tags entity={entity} />
         </Stack>
-      </Row>
-      <SubHeader>
-        <Row>
-          <CodeInline isPrivate>{entity.id}</CodeInline>
+      </Stack>
+      <Stack
+        align="center"
+        flexWrap="wrap"
+        justify="space-between"
+        gap={3}
+        width="100%"
+        minHeight={theme.spacing[8]}
+      >
+        <Stack align="center" justify="center" gap={3}>
+          <CodeInline truncate isPrivate>
+            {entity.id}
+          </CodeInline>
           {user?.isFirmEmployee && entity.sandboxId && (
             <>
               <span>·</span>
-              <CodeInline isPrivate>{entity.sandboxId}</CodeInline>
+              <CodeInline truncate isPrivate>
+                {entity.sandboxId}
+              </CodeInline>
             </>
           )}
-        </Row>
-        <Row>
+        </Stack>
+        <Stack align="center" gap={3} width="fit-content">
           <div id={HEADER_ACTIONS_ID} />
-        </Row>
-      </SubHeader>
+        </Stack>
+      </Stack>
     </HeaderContainer>
   );
 };
@@ -57,24 +69,6 @@ const HeaderContainer = styled.header`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[2]};
-  `};
-`;
-
-const Row = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: ${theme.spacing[3]};
-  `};
-`;
-
-const SubHeader = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column wrap;
-    justify-content: space-between;
-    height: ${theme.spacing[8]};
   `};
 `;
 

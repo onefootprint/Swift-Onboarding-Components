@@ -62,7 +62,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         variant={variant}
       >
         {PrefixIcon && <PrefixIcon color={iconColor || undefined} />}
-        {children}
+        <LabelContainer>{children}</LabelContainer>
       </IconContainer>
     );
 
@@ -183,6 +183,12 @@ const ButtonContainer = styled.button<{
       }
     `;
   }}
+`;
+
+const LabelContainer = styled.span`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 export default Button;
