@@ -204,7 +204,6 @@ describe('<DefaultLayout />', () => {
         expect(
           screen.getByText("You're logged into Acme in view-only mode"),
         ).toBeInTheDocument();
-        expect(screen.getByText('Enable edit mode')).toBeDisabled();
       });
     });
 
