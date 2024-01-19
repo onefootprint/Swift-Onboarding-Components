@@ -18,10 +18,10 @@ use db::{
 
 use macros::test_state_case;
 use newtypes::{
-    CollectedDataOption, CountryRestriction, DocKind, DocTypeRestriction, DocumentCdoInfo,
-    DocumentRequestKind, DocumentSide, IdDocKind, IdentityDocumentFixtureResult, IdentityDocumentId,
-    IdentityDocumentStatus, IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, PiiBytes,
-    RiskSignalGroupKind, ScopedVaultId, Selfie, TenantId, WorkflowFixtureResult,
+    CollectedDataOption, CountryRestriction, DocKind, DocTypeRestriction, DocumentCdoInfo, DocumentSide,
+    IdDocKind, IdentityDocumentFixtureResult, IdentityDocumentId, IdentityDocumentStatus,
+    IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, PiiBytes, RiskSignalGroupKind, ScopedVaultId,
+    Selfie, TenantId, WorkflowFixtureResult,
 };
 
 use super::document_test_utils::{
@@ -74,6 +74,17 @@ async fn test_proof_of_ssn(state: &mut State, user_kind: UserKind) {
     e2e_inner(state, test_case).await;
 }
 
+#[test_state_case(UserKind::Live)]
+#[test_state_case(UserKind::Sandbox(IdentityDocumentFixtureResult::Pass))]
+#[tokio::test]
+async fn test_proof_of_address(state: &mut State, user_kind: UserKind) {
+    for doc_type in IdDocKind::proof_of_address_docs() {
+        let test_case = DocumentUploadTestCase::new(user_kind, doc_type, Selfie::None);
+
+        e2e_inner(state, test_case).await;
+    }
+}
+
 async fn e2e_inner(state: &mut State, test_case: DocumentUploadTestCase) {
     let obc_opts = ObConfigurationOpts {
         must_collect_data: vec![CollectedDataOption::Document(DocumentCdoInfo(
@@ -94,15 +105,8 @@ async fn e2e_inner(state: &mut State, test_case: DocumentUploadTestCase) {
 
     // Save proof of SSN doc req
     let doc_kind: DocKind = test_case.document_type.into();
-    if matches!(doc_kind, DocKind::ProofOfSsn) {
-        save_document_request(
-            state,
-            DocumentRequestKind::ProofOfSsn,
-            wf.id.clone(),
-            sv.id.clone(),
-            false,
-        )
-        .await;
+    if !doc_kind.is_identity() {
+        save_document_request(state, doc_kind.into(), wf.id.clone(), sv.id.clone(), false).await;
     }
 
     let wf_id = wf.id.clone();
@@ -262,7 +266,7 @@ async fn assertions(
     document_id: IdentityDocumentId,
 ) {
     let rs = query_risk_signals(state, sv_id, RiskSignalGroupKind::Doc).await;
-    if matches!(test_case.document_type, IdDocKind::SsnCard) {
+    if test_case.is_non_identity_document_flow() {
         assert!(rs.is_empty());
     } else {
         assert!(!rs.is_empty());

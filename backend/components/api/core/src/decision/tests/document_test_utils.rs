@@ -22,8 +22,9 @@ use idv::incode::{
     IncodeResponse, IncodeStartOnboardingRequest,
 };
 use newtypes::{
-    DocumentRequestKind, DocumentSide, EncryptedVaultPrivateKey, IdDocKind, IdentityDocumentFixtureResult,
-    IdentityDocumentId, S3Url, ScopedVaultId, SealedVaultBytes, Selfie, TenantId, WorkflowId,
+    DocKind, DocumentRequestKind, DocumentSide, EncryptedVaultPrivateKey, IdDocKind,
+    IdentityDocumentFixtureResult, IdentityDocumentId, S3Url, ScopedVaultId, SealedVaultBytes, Selfie,
+    TenantId, WorkflowId,
 };
 
 #[derive(Clone, Copy)]
@@ -59,7 +60,7 @@ impl DocumentUploadTestCase {
     }
 
     pub fn requires_selfie(&self) -> bool {
-        matches!(self.require_selfie, Selfie::RequireSelfie) && !self.is_proof_of_ssn_flow()
+        matches!(self.require_selfie, Selfie::RequireSelfie) && !self.is_non_identity_document_flow()
     }
 
     pub fn identity_doc_fixture(&self) -> Option<IdentityDocumentFixtureResult> {
@@ -76,11 +77,11 @@ impl DocumentUploadTestCase {
                 self.user_kind,
                 UserKind::Sandbox(IdentityDocumentFixtureResult::Real)
             ))
-            && !self.is_proof_of_ssn_flow()
+            && !self.is_non_identity_document_flow()
     }
 
-    fn is_proof_of_ssn_flow(&self) -> bool {
-        matches!(self.document_type, IdDocKind::SsnCard)
+    pub fn is_non_identity_document_flow(&self) -> bool {
+        !matches!(self.document_type.into(), DocKind::Identity)
     }
 }
 

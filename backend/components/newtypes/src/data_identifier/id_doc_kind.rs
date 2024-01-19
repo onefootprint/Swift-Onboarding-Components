@@ -51,11 +51,11 @@ pub enum DocKind {
 }
 impl DocKind {
     pub fn should_initiate_incode_requests(&self) -> bool {
-        match self {
-            DocKind::Identity => true,
-            DocKind::ProofOfSsn => false,
-            DocKind::ProofOfAddress => false,
-        }
+        self.is_identity()
+    }
+
+    pub fn is_identity(&self) -> bool {
+        matches!(self, Self::Identity)
     }
 }
 
@@ -105,6 +105,12 @@ impl IdDocKind {
     pub fn identity_docs() -> Vec<IdDocKind> {
         IdDocKind::iter()
             .filter(|id| DocKind::from(*id) == DocKind::Identity)
+            .collect()
+    }
+
+    pub fn proof_of_address_docs() -> Vec<IdDocKind> {
+        IdDocKind::iter()
+            .filter(|id| DocKind::from(*id) == DocKind::ProofOfAddress)
             .collect()
     }
 

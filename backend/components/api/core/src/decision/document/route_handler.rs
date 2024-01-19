@@ -44,8 +44,8 @@ pub async fn handle_document_create(state: &State, create_identity_document_requ
     let ff_client = state.feature_flag_client.clone();
 
     // Handle proof of SSN, which doesn't involve a lot of other checks (at this time)
-    if doc_kind == DocKind::ProofOfSsn {
-        let id_doc_id = handle_proof_of_ssn(state, wf_id, document_type, country_code, device_type).await?;
+    if !doc_kind.is_identity() {
+        let id_doc_id = handle_non_identity_document(state, wf_id, document_type, country_code, device_type, doc_kind).await?;
         return Ok(id_doc_id)
     }
 
@@ -267,7 +267,7 @@ pub async fn handle_document_process(state: &State, sv_id: ScopedVaultId,wf_id: 
 
     let is_sandbox = id_doc.fixture_result.is_some();
     let doc_kind: DocKind = id_doc.document_type.into();
-    let upload_is_proof_of_ssn = doc_kind == DocKind::ProofOfSsn; // TODO: move this to being based on DR i think that's better and more source of truthy sicne we don't get from client
+    let is_non_identity_document = !doc_kind.is_identity();
     let should_initiate_reqs =
         crate::decision::utils::should_initiate_requests_for_document(&uvw.vault, id_doc.fixture_result).await?
             && doc_kind.should_initiate_incode_requests();
@@ -298,8 +298,8 @@ pub async fn handle_document_process(state: &State, sv_id: ScopedVaultId,wf_id: 
         let next_side_to_collect = missing_sides.next_side_to_collect();
         if next_side_to_collect.is_none() {
             let sv_id = sv_id.clone();
-            if upload_is_proof_of_ssn {
-                complete_proof_of_ssn(state, id_doc, sv_id).await?;
+            if is_non_identity_document {
+                complete_non_identity_document(state, id_doc, sv_id).await?;
             } else {
                 decision::vendor::incode::states::save_incode_fixtures(
                     state,
@@ -321,7 +321,7 @@ pub async fn handle_document_process(state: &State, sv_id: ScopedVaultId,wf_id: 
     Ok(response)
 }
 
-pub async fn complete_proof_of_ssn(
+pub async fn complete_non_identity_document(
     state: &State,
     id_doc: IdentityDocument,
     sv_id: ScopedVaultId,
@@ -358,13 +358,13 @@ pub async fn complete_proof_of_ssn(
     Ok(())
 }
 
-async fn handle_proof_of_ssn(state: &State, workflow_id: WorkflowId, document_type: IdDocKind, country_code: Iso3166TwoDigitCountryCode, device_type: Option<DocumentScanDeviceType>) -> ApiResult<IdentityDocumentId> {
+async fn handle_non_identity_document(state: &State, workflow_id: WorkflowId, document_type: IdDocKind, country_code: Iso3166TwoDigitCountryCode, device_type: Option<DocumentScanDeviceType>, doc_kind: DocKind) -> ApiResult<IdentityDocumentId> {
     state
     .db_pool
     .db_transaction(move |conn| -> ApiResult<_> {
-        // If there's no doc requests for proof of ssn, nothing to do here
+        // If there's no doc request, nothing to do here
         let doc_request =
-            DbDocumentRequest::get(conn, &workflow_id, DocumentRequestKind::ProofOfSsn)?.ok_or(OnboardingError::NoDocumentRequestFound)?;
+            DbDocumentRequest::get(conn, &workflow_id, doc_kind.into())?.ok_or(OnboardingError::NoDocumentRequestFound)?;
 
 
             let args = NewIdentityDocumentArgs {
@@ -422,7 +422,7 @@ fn create_latest_doc_upload(
 }
 
 fn check_consent(user_consent: Option<UserConsent>, doc_kind: DocKind) -> ApiResult<()> {
-    if user_consent.is_none() && doc_kind == DocKind::Identity {
+    if user_consent.is_none() && doc_kind.is_identity() {
         Err(OnboardingError::UserConsentNotFound.into())
     } else {
         Ok(())

@@ -4,6 +4,8 @@ use strum_macros::Display;
 
 use strum_macros::EnumString;
 
+use crate::DocKind;
+
 #[derive(
     Debug,
     Display,
@@ -26,6 +28,17 @@ use strum_macros::EnumString;
 pub enum DocumentRequestKind {
     Identity,
     ProofOfSsn,
+    ProofOfAddress,
+}
+
+impl From<DocKind> for DocumentRequestKind {
+    fn from(value: DocKind) -> Self {
+        match value {
+            DocKind::Identity => Self::Identity,
+            DocKind::ProofOfSsn => Self::ProofOfSsn,
+            DocKind::ProofOfAddress => Self::ProofOfAddress,
+        }
+    }
 }
 
 crate::util::impl_enum_string_diesel!(DocumentRequestKind);
