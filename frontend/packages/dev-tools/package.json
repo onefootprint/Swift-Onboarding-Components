@@ -10,13 +10,12 @@
     "lint": "eslint src --fix",
     "lint:ci": "eslint src",
     "typecheck": "yarn tsc --noEmit",
-    "test": "jest",
-    "test:ci": "jest --ci --bail --runInBand",
-    "test:watch": "jest --watch",
+    "test": "bun test",
+    "test:ci:bun": "bun test",
+    "test:watch": "bun test --watch",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
-    "@onefootprint/jest-presets": "*",
     "@onefootprint/styled": "*",
     "@onefootprint/test-utils": "*",
     "@types/react-dom": "^18.0.10",
@@ -40,8 +39,5 @@
     "usehooks-ts": "^2.9.1",
     "uuid": "^9.0.0",
     "xstate": "^4.35.2"
-  },
-  "jest": {
-    "preset": "@onefootprint/jest-presets/jest/web"
   }
 }

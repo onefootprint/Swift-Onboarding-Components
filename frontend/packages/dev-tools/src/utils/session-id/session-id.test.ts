@@ -3,7 +3,7 @@ import getSessionId from './session-id';
 describe('getSessionId', () => {
   describe('when sessionStorage is available', () => {
     beforeEach(() => {
-      Object.defineProperty(window, 'sessionStorage', {
+      Object.defineProperty(global, 'sessionStorage', {
         value: {
           getItem: jest.fn(() => null),
           setItem: jest.fn(),
@@ -15,7 +15,7 @@ describe('getSessionId', () => {
 
     it('should store session id in sessionStorage', () => {
       const sessionId = getSessionId();
-      expect(window.sessionStorage.setItem).toHaveBeenCalledWith(
+      expect(global.sessionStorage.setItem).toHaveBeenCalledWith(
         'fp-session-id',
         sessionId,
       );
@@ -24,7 +24,7 @@ describe('getSessionId', () => {
     it('should retrieve session id from sessionStorage', () => {
       const sessionId = getSessionId();
       // @ts-ignore
-      window.sessionStorage.getItem.mockReturnValueOnce(sessionId);
+      global.sessionStorage.getItem.mockReturnValueOnce(sessionId);
       const sessionId2 = getSessionId();
       expect(sessionId).toEqual(sessionId2);
     });
@@ -32,7 +32,7 @@ describe('getSessionId', () => {
 
   describe('when sessionStorage is not available', () => {
     beforeEach(() => {
-      Object.defineProperty(window, 'sessionStorage', {
+      Object.defineProperty(global, 'sessionStorage', {
         value: undefined,
         writable: true,
       });
