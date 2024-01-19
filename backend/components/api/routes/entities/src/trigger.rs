@@ -26,7 +26,6 @@ use db::models::workflow_request::NewWorkflowRequestArgs;
 use db::models::workflow_request::WorkflowRequest;
 use newtypes::ContactInfoKind;
 use newtypes::DbActor;
-use newtypes::OnboardingStatus;
 use newtypes::PhoneNumber;
 use newtypes::PiiString;
 use newtypes::TriggerKind;
@@ -61,7 +60,6 @@ pub async fn post(
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv.id)?;
-
             validate(trigger_kind, &sv)?;
 
             if vw.vault.kind != VaultKind::Person {
@@ -141,13 +139,15 @@ pub async fn post(
 fn validate(trigger_info: TriggerKind, scoped_vault: &ScopedVault) -> ApiResult<()> {
     match trigger_info {
         TriggerKind::RedoKyc => Ok(()),
-        TriggerKind::IdDocument => Ok(()),
-        TriggerKind::ProofOfSsn => match scoped_vault.status {
-            Some(OnboardingStatus::Pass) | Some(OnboardingStatus::Fail) => Ok(()),
-            None | Some(OnboardingStatus::Incomplete) | Some(OnboardingStatus::Pending) => {
+        TriggerKind::IdDocument | TriggerKind::ProofOfSsn => {
+            // if doc only or we have a decision
+            // theoretically we should be checking risk signals here too
+            if scoped_vault.status.map(|d| d.has_decision()).unwrap_or(false) {
+                Ok(())
+            } else {
                 Err(UserError::NoCompleteOnboardings.into())
             }
-        },
+        }
     }
 }
 

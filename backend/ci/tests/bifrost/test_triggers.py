@@ -6,9 +6,14 @@ from tests.identify_client import IdentifyClient
 from tests.bifrost_client import BifrostClient
 
 
-def send_trigger(fp_id, sandbox_tenant, trigger):
+def send_trigger(fp_id, sandbox_tenant, trigger, expected_error=None):
+    status_code = 200 if expected_error is None else 400
     data = dict(trigger=trigger)
-    post(f"entities/{fp_id}/triggers", data, *sandbox_tenant.db_auths)
+    res = post(f"entities/{fp_id}/triggers", data, *sandbox_tenant.db_auths, status_code=status_code)
+
+    if expected_error:
+         assert res["error"]["message"] == expected_error
+         return
 
     # Grab the trigger ID from the timeline
     body = get(f"entities/{fp_id}/timeline", None, *sandbox_tenant.db_auths)
@@ -141,9 +146,17 @@ def test_recollect_document(trigger, sandbox_tenant):
     assert len(users_docs) == expected_len
 
 
-def test_trigger_incomplete(sandbox_tenant):
+@pytest.mark.parametrize(
+    "trigger",
+    [
+        dict(kind="id_document", data=dict(collect_selfie=False)),
+        dict(kind="proof_of_ssn"),
+        dict(kind='redo_kyc')
+    ],
+)
+def test_trigger_incomplete(sandbox_tenant, trigger):
     """
-    Ensure we can initiate a trigger for a user that has only an incomplete workflow.
+    Ensure we can initiate a trigger for a user that has only an incomplete workflow. We should error if an id doc is requested
     """
     bifrost = BifrostClient.new(sandbox_tenant.default_ob_config)
     sandbox_id = bifrost.sandbox_id
@@ -154,8 +167,11 @@ def test_trigger_incomplete(sandbox_tenant):
     user = next(u for u in body["data"] if u["sandbox_id"] == sandbox_id)
     fp_id = user["id"]
 
-    # Trigger redo KYC
-    initial_auth_token = send_trigger(fp_id, sandbox_tenant, dict(kind="redo_kyc"))
+    # Trigger
+    expected_error = "Cannot reonboard user - user has no complete onboardings." if trigger['kind'] in ['proof_of_ssn', 'id_document'] else None
+    initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger, expected_error)
+    if expected_error:
+        return
     auth_token = IdentifyClient.from_token(initial_auth_token).step_up(
         assert_had_no_scopes=True
     )
