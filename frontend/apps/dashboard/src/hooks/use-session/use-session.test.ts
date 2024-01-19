@@ -69,7 +69,7 @@ describe('useSession', () => {
         RoleScopeKind.admin,
       );
       expect(result.current.data.org).toEqual({
-        isLive: true,
+        isLive: false,
         isSandboxRestricted: false,
         logoUrl: null,
         name: 'Acme',
@@ -110,8 +110,9 @@ describe('useSession', () => {
       await act(async () => {
         await result.current.logIn(loginPayload);
       });
-      act(() => {
-        result.current.setIsLive(true);
+      expect(result.current.data.org?.isLive).toBeFalsy();
+      await act(async () => {
+        await result.current.setIsLive(true);
       });
       expect(result.current.data.org?.isLive).toBeTruthy();
     });
@@ -125,7 +126,7 @@ describe('useSession', () => {
       });
 
       expect(result.current.dangerouslyCastedData.org).toEqual({
-        isLive: true,
+        isLive: false,
         isSandboxRestricted: false,
         logoUrl: null,
         name: 'Acme',
@@ -135,7 +136,7 @@ describe('useSession', () => {
         result.current.setOrg({ name: 'Lorem' });
       });
       expect(result.current.dangerouslyCastedData.org).toEqual({
-        isLive: true,
+        isLive: false,
         isSandboxRestricted: false,
         logoUrl: null,
         name: 'Lorem',

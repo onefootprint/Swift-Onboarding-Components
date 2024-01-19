@@ -1,5 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import request, { getErrorMessage } from '@onefootprint/request';
+import { useToast } from '@onefootprint/ui';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -54,6 +55,7 @@ export const useStore = create<UserSessionState>()(
 );
 
 const useSession = () => {
+  const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
   const { data, reset, update } = useStore(state => state);
   // Dangerously cast fields that are nullable when the user is logged out into non-nullable fields
@@ -83,33 +85,50 @@ const useSession = () => {
       update({ meta: session.meta });
     }
     // Then asynchronously fetch user and tenant info from the backend for the new auth
-    await refreshPermissions({ authToken: session.auth });
+    await refreshPermissions({ newAuthToken: session.auth, newIsLive: isLive });
   };
 
   const refreshPermissions = async ({
-    authToken,
-    org,
+    newAuthToken,
+    newIsLive,
     newIsAssumedSessionEditMode,
   }: {
-    authToken: string;
-    org?: Partial<OrgSession>;
+    newAuthToken: string;
+    newIsLive: boolean;
     newIsAssumedSessionEditMode?: boolean;
   }) => {
     try {
+      // Fetch the new permissions from the backend
       const user = await getOrgMemberRequest({
-        auth: authToken,
+        auth: newAuthToken,
+        isLive: newIsLive,
         isAssumedSessionEditMode: !!newIsAssumedSessionEditMode,
       });
+
+      if (user.tenant.isSandboxRestricted && newIsLive) {
+        // If we requested to login in live mode but the tenant is sandbox restricted, re-login
+        // in sandbox mode
+        toast.show({
+          title: 'Switched to sandbox mode',
+          description: "This organization doesn't have live mode enabled.",
+        });
+        await refreshPermissions({
+          newAuthToken,
+          newIsLive: false,
+          newIsAssumedSessionEditMode,
+        });
+        return;
+      }
+
       update({
         user: {
           ...user,
           isAssumedSession: !!user.isAssumedSession,
-          isAssumedSessionEditMode: newIsAssumedSessionEditMode,
+          isAssumedSessionEditMode: !!newIsAssumedSessionEditMode,
         },
         org: {
           ...user.tenant,
-          isLive: !user.tenant.isSandboxRestricted,
-          ...org,
+          isLive: newIsLive,
         },
       });
     } catch (error: unknown) {
@@ -123,9 +142,16 @@ const useSession = () => {
     }
   };
 
-  const refreshUserPermissions = async (org?: Partial<OrgSession>) => {
+  const refreshUserPermissions = async ({
+    newIsLive,
+  }: {
+    newIsLive?: boolean;
+  }) => {
     if (!data.auth) return;
-    await refreshPermissions({ authToken: data.auth, org });
+    await refreshPermissions({
+      newAuthToken: data.auth,
+      newIsLive: newIsLive !== undefined ? newIsLive : isLive,
+    });
   };
 
   const logOut = () => {
@@ -163,15 +189,17 @@ const useSession = () => {
     // Fetch the permissions from the backend with the newEditMode - the backend will properly
     // render and apply permissions as requested
     await refreshPermissions({
-      authToken: data.auth,
+      newAuthToken: data.auth,
+      newIsLive: isLive,
       newIsAssumedSessionEditMode: newEditMode,
     });
   };
 
-  const setIsLive = (newIsLive: boolean) => {
-    if (!data.org) return;
-    update({
-      org: { ...data.org, isLive: newIsLive },
+  const setIsLive = async (newIsLive: boolean) => {
+    if (!data.auth) return;
+    await refreshPermissions({
+      newAuthToken: data.auth,
+      newIsLive,
     });
   };
 

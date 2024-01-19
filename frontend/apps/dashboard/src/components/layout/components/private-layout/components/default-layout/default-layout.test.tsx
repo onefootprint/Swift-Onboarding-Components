@@ -41,6 +41,9 @@ describe('<DefaultLayout />', () => {
       statusCode: 200,
       response: {
         scopes: [RoleScopeKind.read],
+        tenant: {
+          isSandboxRestricted: false,
+        },
       },
     });
     withEntities();

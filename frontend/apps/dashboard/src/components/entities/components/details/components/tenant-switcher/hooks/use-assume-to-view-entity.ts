@@ -6,7 +6,6 @@ import type {
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import useAssumeTenant from 'src/hooks/use-assume-tenant';
-import useOrgSession from 'src/hooks/use-org-session';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
@@ -35,43 +34,42 @@ const useAssumeToViewEntity = (options: {
     data: { org },
     setIsLive,
   } = useSession();
-  const { sandbox } = useOrgSession();
   const useAssumeTenantMutation = useAssumeTenant();
   const queryClient = useQueryClient();
 
-  const switchTenant = (id: string) => (response: GetPrivateEntityResponse) => {
-    const isSameTenant = response.tenantId === org?.id;
-    const isDifferentMode = response.isLive !== org?.isLive;
+  const switchTenant =
+    (id: string) => async (response: GetPrivateEntityResponse) => {
+      const isSameTenant = response.tenantId === org?.id;
+      const isDifferentMode = response.isLive !== org?.isLive;
 
-    const changeRouteIfNeeded = () => {
-      // If a scoped user ID was provided instead of an fp_id, replace the id with the fpid
-      const isDifferentFpId = response.id !== id;
-      if (isDifferentFpId) {
-        const newRoute = router.pathname.replace(/[^/]*$/, response.id);
-        router.replace(newRoute);
-      }
-    };
+      const changeRouteIfNeeded = () => {
+        // If a scoped user ID was provided instead of an fp_id, replace the id with the fpid
+        const isDifferentFpId = response.id !== id;
+        if (isDifferentFpId) {
+          const newRoute = router.pathname.replace(/[^/]*$/, response.id);
+          router.replace(newRoute);
+        }
+      };
 
-    if (isSameTenant) {
-      if (isDifferentMode) {
-        sandbox.toggle();
-        setIsLive(response.isLive);
-        queryClient.invalidateQueries();
-      }
-      changeRouteIfNeeded();
-      return;
-    }
-    useAssumeTenantMutation.mutate(
-      { tenantId: response.tenantId },
-      {
-        onSuccess: async () => {
-          await refreshUserPermissions({ isLive: response.isLive });
+      if (isSameTenant) {
+        if (isDifferentMode) {
+          await setIsLive(response.isLive);
           queryClient.invalidateQueries();
-          changeRouteIfNeeded();
+        }
+        changeRouteIfNeeded();
+        return;
+      }
+      useAssumeTenantMutation.mutate(
+        { tenantId: response.tenantId },
+        {
+          onSuccess: async () => {
+            await refreshUserPermissions({ newIsLive: response.isLive });
+            queryClient.invalidateQueries();
+            changeRouteIfNeeded();
+          },
         },
-      },
-    );
-  };
+      );
+    };
 
   return useQuery(
     ['assume', 'entity', options.entityId],

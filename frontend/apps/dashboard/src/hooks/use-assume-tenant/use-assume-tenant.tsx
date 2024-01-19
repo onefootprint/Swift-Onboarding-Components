@@ -26,16 +26,12 @@ const postAssumeTenantReadOnly = async (
 
 const useAssumeTenant = () => {
   const { authHeaders } = useSession();
-  const session = useSession();
   const showErrorToast = useRequestErrorToast();
 
   return useMutation(
     (data: PostAssumeRequest) =>
       postAssumeTenantReadOnly(authHeaders, data.tenantId),
     {
-      onSuccess: () => {
-        session.refreshUserPermissions();
-      },
       onError: (error: unknown) => {
         console.error(`Assuming tenant failed`, getErrorMessage(error));
         showErrorToast(error);
