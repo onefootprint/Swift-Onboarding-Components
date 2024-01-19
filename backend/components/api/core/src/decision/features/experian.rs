@@ -1,14 +1,7 @@
+use crate::decision::onboarding::FeatureSet;
 use idv::experian::{cross_core::response::CrossCoreAPIResponse, precise_id::response::PreciseIDParsedScore};
 use itertools::Itertools;
 use newtypes::{FootprintReasonCode, VendorAPI, VerificationResultId};
-
-use crate::decision::{
-    onboarding::FeatureSet,
-    vendor::vendor_api::{
-        vendor_api_response::{VendorAPIResponseIdentifiersMap, VendorAPIResponseMap},
-        vendor_api_struct::{ExperianPreciseID, WrappedVendorAPI},
-    },
-};
 
 const SCORE_THRESHOLD: i32 = 500;
 
@@ -133,32 +126,6 @@ fn footprint_reason_codes(resp: CrossCoreAPIResponse) -> Vec<FootprintReasonCode
         .chain(score_code)
         .unique()
         .collect()
-}
-
-impl TryFrom<(&VendorAPIResponseMap, &VendorAPIResponseIdentifiersMap)> for ExperianFeatures {
-    type Error = crate::decision::Error;
-
-    fn try_from(
-        maps: (&VendorAPIResponseMap, &VendorAPIResponseIdentifiersMap),
-    ) -> Result<Self, Self::Error> {
-        let (response_map, ids_map) = maps;
-        let v = ExperianPreciseID;
-        let f = response_map
-            .get(&v)
-            .ok_or(crate::decision::Error::FeatureVectorConversionError(
-                VendorAPI::from(WrappedVendorAPI::from(v.clone())),
-            ))?;
-        let ids = ids_map
-            .get(&v)
-            .ok_or(crate::decision::Error::FeatureVectorConversionError(
-                VendorAPI::from(WrappedVendorAPI::from(v)),
-            ))?;
-
-        Ok(ExperianFeatures::from(
-            f.clone(),
-            ids.verification_result_id.clone(),
-        ))
-    }
 }
 
 #[cfg(test)]

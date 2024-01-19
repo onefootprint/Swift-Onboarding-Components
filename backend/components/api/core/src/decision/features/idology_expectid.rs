@@ -1,24 +1,13 @@
 use std::str::FromStr;
 
+use crate::decision::onboarding::FeatureSet;
 use idv::idology::{
     common::response::{IDologyQualifiers, WarmAddressType},
     expectid::response::{ExpectIDResponse, PaWatchlistHit},
 };
 use itertools::Itertools;
 use newtypes::{
-    idology_match_codes, FootprintReasonCode, IDologyReasonCode, IdentityDataKind, VendorAPI,
-    VerificationResultId,
-};
-
-use crate::{
-    decision::{
-        onboarding::FeatureSet,
-        vendor::vendor_api::{
-            vendor_api_response::{VendorAPIResponseIdentifiersMap, VendorAPIResponseMap},
-            vendor_api_struct::{IdologyExpectID, WrappedVendorAPI},
-        },
-    },
-    utils::vault_wrapper::VaultWrapper,
+    idology_match_codes, FootprintReasonCode, IDologyReasonCode, VendorAPI, VerificationResultId,
 };
 
 /// Struct to represent the elements (derived or pass through) that we use from IDology to make a decision
@@ -191,46 +180,6 @@ impl IDologyFeatures {
         } else {
             vec![]
         }
-    }
-}
-
-impl
-    TryFrom<(
-        (&VendorAPIResponseMap, &VendorAPIResponseIdentifiersMap),
-        VaultWrapper,
-    )> for IDologyFeatures
-{
-    type Error = crate::decision::Error;
-
-    fn try_from(
-        value: (
-            (&VendorAPIResponseMap, &VendorAPIResponseIdentifiersMap),
-            VaultWrapper,
-        ),
-    ) -> Result<Self, Self::Error> {
-        let (maps, vw) = value;
-        let (response_map, ids_map) = maps;
-        let v = IdologyExpectID;
-        let f = response_map
-            .get(&v)
-            .ok_or(crate::decision::Error::FeatureVectorConversionError(
-                VendorAPI::from(WrappedVendorAPI::from(v.clone())),
-            ))?;
-        let ids = ids_map
-            .get(&v)
-            .ok_or(crate::decision::Error::FeatureVectorConversionError(
-                VendorAPI::from(WrappedVendorAPI::from(v)),
-            ))?;
-
-        let dob_submitted = vw.has_field(IdentityDataKind::Dob);
-        let ssn_submitted = vw.has_field(IdentityDataKind::Ssn4) || vw.has_field(IdentityDataKind::Ssn9);
-
-        Ok(IDologyFeatures::from(
-            f.clone(),
-            ids.verification_result_id.clone(),
-            dob_submitted,
-            ssn_submitted,
-        ))
     }
 }
 

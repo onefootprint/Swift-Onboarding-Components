@@ -1,9 +1,6 @@
 use std::collections::HashMap;
 
-use db::models::{
-    ob_configuration::ObConfiguration,
-    risk_signal::{IncludeHidden, NewRiskSignalInfo, RiskSignal},
-};
+use db::models::risk_signal::{IncludeHidden, NewRiskSignalInfo, RiskSignal};
 use idv::ParsedResponse;
 use itertools::Itertools;
 use newtypes::{
@@ -12,17 +9,10 @@ use newtypes::{
 };
 
 use super::{
-    experian::ExperianFeatures, idology_expectid::IDologyFeatures, incode_docv::IncodeDocumentFeatures,
-    lexis, user_input,
+    experian::ExperianFeatures, idology_expectid::IDologyFeatures, incode_docv::IncodeDocumentFeatures, lexis,
 };
 use crate::{
-    decision::{
-        onboarding::FeatureSet,
-        vendor::{
-            vendor_api::vendor_api_response::{VendorAPIResponseIdentifiersMap, VendorAPIResponseMap},
-            vendor_result::VendorResult,
-        },
-    },
+    decision::{onboarding::FeatureSet, vendor::vendor_result::VendorResult},
     errors::ApiResult,
     utils::vault_wrapper::VaultWrapper,
     ApiError,
@@ -69,29 +59,6 @@ where
         Self {
             footprint_reason_codes: vec![],
             group: T::default(),
-        }
-    }
-}
-
-#[allow(dead_code)]
-pub struct VendorResultsAndVault<'a> {
-    response_map: &'a VendorAPIResponseMap,
-    ids_map: &'a VendorAPIResponseIdentifiersMap,
-    vw: VaultWrapper, // TODO: use these bad boys
-    obc: ObConfiguration,
-}
-
-impl<'a> VendorResultsAndVault<'a> {
-    pub fn new(
-        maps: (&'a VendorAPIResponseMap, &'a VendorAPIResponseIdentifiersMap),
-        vw: VaultWrapper,
-        obc: ObConfiguration,
-    ) -> Self {
-        Self {
-            response_map: maps.0,
-            ids_map: maps.1,
-            vw,
-            obc,
         }
     }
 }
@@ -181,94 +148,6 @@ pub fn save_risk_signals(
     )?;
 
     Ok(())
-}
-
-impl From<VendorResultsAndVault<'_>> for RiskSignalGroupStruct<Kyc> {
-    fn from(results: VendorResultsAndVault) -> Self {
-        let VendorResultsAndVault {
-            response_map,
-            ids_map,
-            vw,
-            obc,
-        } = results;
-
-        // Risk Signals that should be created for every vendor, based purely on data in vault + obc
-        let user_input_risk_signals = user_input::user_input_based_risk_signals(&vw, &obc);
-
-        let idology_features = IDologyFeatures::try_from(((response_map, ids_map), vw))
-            .ok()
-            .map(|f| {
-                let vres = f.verification_result_id.clone();
-
-                f.footprint_reason_codes
-                    .into_iter()
-                    .chain(user_input_risk_signals.clone())
-                    .filter(|r| !r.is_aml()) // Filter out AML reason codes!
-                    .map(|r| (r, VendorAPI::IdologyExpectId, vres.to_owned()))
-                    .collect()
-            })
-            .unwrap_or(vec![]);
-        let experian_features = ExperianFeatures::try_from((response_map, ids_map))
-            .ok()
-            .map(|f| {
-                let vres = f.verification_result_id.clone();
-
-                f.footprint_reason_codes
-                    .into_iter()
-                    .chain(user_input_risk_signals.clone())
-                    .filter(|r| !r.is_aml()) // Filter out AML reason codes!
-                    .map(|r| (r, VendorAPI::ExperianPreciseId, vres.to_owned()))
-                    .collect()
-            })
-            .unwrap_or(vec![]);
-        // TODO: incode here? it's done a bit out of band in the incode state machine so may just need this on the read side
-
-        RiskSignalGroupStruct {
-            footprint_reason_codes: idology_features.into_iter().chain(experian_features).collect(),
-            group: Kyc,
-        }
-    }
-}
-
-impl From<VendorResultsAndVault<'_>> for RiskSignalGroupStruct<Aml> {
-    fn from(results: VendorResultsAndVault) -> Self {
-        let VendorResultsAndVault {
-            response_map,
-            ids_map,
-            vw,
-            obc: _,
-        } = results;
-
-        let idology_features = IDologyFeatures::try_from(((response_map, ids_map), vw))
-            .ok()
-            .map(|f| {
-                let vres = f.verification_result_id.clone();
-
-                f.footprint_reason_codes
-                    .into_iter()
-                    .filter(|r| r.is_aml())  // Filter to only AML risk signals!
-                    .map(|r| (r, VendorAPI::IdologyExpectId, vres.to_owned()))
-                    .collect()
-            })
-            .unwrap_or(vec![]);
-        let experian_features = ExperianFeatures::try_from((response_map, ids_map))
-            .ok()
-            .map(|f| {
-                let vres = f.verification_result_id.clone();
-
-                f.footprint_reason_codes
-                    .into_iter()
-                    .filter(|r| r.is_aml()) // Filter to only AML risk signals!
-                    .map(|r| (r, VendorAPI::ExperianPreciseId, vres.to_owned()))
-                    .collect()
-            })
-            .unwrap_or(vec![]);
-
-        RiskSignalGroupStruct {
-            footprint_reason_codes: idology_features.into_iter().chain(experian_features).collect(),
-            group: Aml,
-        }
-    }
 }
 
 //
