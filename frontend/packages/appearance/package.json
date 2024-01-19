@@ -8,9 +8,9 @@
   "scripts": {
     "lint:fix": "eslint --fix \"**/*.{ts,tsx,md}\"",
     "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "test": "jest",
-    "test:ci": "jest --ci --bail --runInBand",
-    "test:watch": "jest --watch",
+    "test": "bun test",
+    "test:ci:bun": "bun test",
+    "test:watch": "bun test --watch",
     "lint": "eslint src --fix",
     "lint:ci": "eslint src",
     "typecheck": "yarn tsc --noEmit",
@@ -24,8 +24,6 @@
     "@onefootprint/ui": "*"
   },
   "devDependencies": {
-    "@onefootprint/jest-presets": "*",
-    "@onefootprint/test-utils": "*",
     "@types/lodash": "^4.14.199",
     "eslint-config-footprint": "*",
     "react-dom": "18.2.0",
@@ -36,9 +34,6 @@
   "peerDependencies": {
     "react": "18.x",
     "react-dom": "18.x"
-  },
-  "jest": {
-    "preset": "@onefootprint/jest-presets/jest/web"
   },
   "browser": {
     "fs": false
