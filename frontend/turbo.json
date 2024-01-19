@@ -14,6 +14,7 @@
       "env": [
         "API_BASE_URL",
         "BIFROST_URL",
+        "AUTH_URL",
         "COMPONENTS_URL",
         "DEMO_RENDER_AUTH_TOKEN",
         "DEMO_FORM_AUTH_TOKEN",

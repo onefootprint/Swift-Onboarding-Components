@@ -15,11 +15,8 @@ const getBranchAsSlug = (branchName?: string) => {
   return branchName.replaceAll('/', '-');
 };
 
-const getBifrostUrl = (isLocal: boolean) => {
-  if (isE2E) {
-    return 'http://localhost:3000';
-  }
-  if (isLocal) {
+const getBifrostUrl = (isLocal: boolean): string => {
+  if (isE2E || isLocal) {
     return 'http://localhost:3000';
   }
   if (isDevelopment) {
@@ -30,6 +27,20 @@ const getBifrostUrl = (isLocal: boolean) => {
     return `https://bifrost-git-${branchAsSlug}.preview.onefootprint.com`;
   }
   return 'https://id.onefootprint.com';
+};
+
+const getAuthUrl = (isLocal: boolean): string => {
+  if (isE2E || isLocal) {
+    return 'http://localhost:3011';
+  }
+  if (isDevelopment) {
+    return 'https://auth.preview.onefootprint.com';
+  }
+  if (isPreview) {
+    const branchAsSlug = getBranchAsSlug(currentBranch);
+    return `https://auth-git-${branchAsSlug}.preview.onefootprint.com`;
+  }
+  return 'https://auth.onefootprint.com';
 };
 
 const getComponentsUrl = (isLocal: boolean) => {
@@ -46,23 +57,13 @@ const getComponentsUrl = (isLocal: boolean) => {
   return 'https://components.onefootprint.com';
 };
 
-const getApiUrl = (isLocal: boolean) => {
-  if (isE2E) {
-    return 'https://api.dev.onefootprint.com';
-  }
-  if (isLocal) {
-    return 'https://api.dev.onefootprint.com';
-  }
-  if (isDevelopment || isPreview) {
-    return 'https://api.dev.onefootprint.com';
-  }
-  return 'https://api.onefootprint.com';
-};
+const getApiUrl = (isLocal: boolean): string =>
+  isE2E || isLocal || isDevelopment || isPreview
+    ? 'https://api.dev.onefootprint.com'
+    : 'https://api.onefootprint.com';
 
 export default defineConfig(options => ({
-  entryPoints: {
-    'footprint-js': 'src/index.ts',
-  },
+  entryPoints: { 'footprint-js': 'src/index.ts' },
   clean: true,
   treeshake: true,
   dts: true,
@@ -72,6 +73,7 @@ export default defineConfig(options => ({
   env: {
     API_BASE_URL: getApiUrl(!!options.watch || forceFootprintToUseLocal),
     BIFROST_URL: getBifrostUrl(!!options.watch || forceFootprintToUseLocal),
+    AUTH_URL: getAuthUrl(!!options.watch || forceFootprintToUseLocal),
     COMPONENTS_URL: getComponentsUrl(
       !!options.watch || forceFootprintToUseLocal,
     ),
