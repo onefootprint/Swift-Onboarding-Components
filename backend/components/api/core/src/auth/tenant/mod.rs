@@ -27,9 +27,9 @@ use super::Either;
 use super::IsGuardMet;
 use super::Or;
 use super::SessionContext;
-use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
 use crate::errors::ApiResult;
+use crate::errors::ValidationError;
 use crate::State;
 use newtypes::{DbActor, TenantApiKeyId, TenantScope, TenantUserId};
 
@@ -47,10 +47,7 @@ impl AnyTenantSessionAuth {
             // For any other session token, validate it has Any permission and then extract the user actor
             Either::Right(r) => {
                 let r = r.check_guard(Any)?;
-                match r.actor() {
-                    AuthActor::TenantUser(tu_id) | AuthActor::FirmEmployee(tu_id) => tu_id,
-                    _ => return Err(TenantError::ValidationError("Non-user principal".to_owned()).into()),
-                }
+                r.actor().tenant_user_id()?.clone()
             }
         };
         Ok(tu_id)
@@ -101,6 +98,15 @@ pub enum AuthActor {
     TenantUser(TenantUserId),
     TenantApiKey(TenantApiKeyId),
     FirmEmployee(TenantUserId),
+}
+
+impl AuthActor {
+    pub fn tenant_user_id(&self) -> ApiResult<&TenantUserId> {
+        match self {
+            AuthActor::TenantUser(tu_id) | AuthActor::FirmEmployee(tu_id) => Ok(tu_id),
+            _ => ValidationError("Non-user principal").into(),
+        }
+    }
 }
 
 impl From<TenantUserId> for AuthActor {

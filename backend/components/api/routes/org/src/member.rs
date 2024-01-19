@@ -33,11 +33,7 @@ async fn get(
     let scopes = auth.token_scopes();
     let auth = auth.check_guard(TenantGuard::Read)?;
     let tenant = auth.tenant().clone();
-    let user_id = match auth.actor() {
-        AuthActor::TenantUser(tenant_user_id) => tenant_user_id,
-        AuthActor::FirmEmployee(tenant_user_id) => tenant_user_id,
-        _ => return Err(TenantError::ValidationError("Non-user principal".to_owned()).into()),
-    };
+    let user_id = auth.actor().tenant_user_id()?.clone();
     let user = state
         .db_pool
         .db_query(move |conn| TenantUser::get(conn, &user_id))
