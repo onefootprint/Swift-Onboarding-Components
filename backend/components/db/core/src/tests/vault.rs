@@ -1,7 +1,10 @@
+use std::time::Duration;
+
 use super::fixtures;
 use crate::models::vault::Priority;
 use crate::models::{data_lifetime::DataLifetime, vault::Vault};
 use crate::tests::prelude::*;
+use chrono::{DateTime, Utc};
 use macros::db_test_case;
 use newtypes::{Fingerprint, FingerprintScopeKind, IdentityDataKind as IDK, SandboxId};
 
@@ -58,23 +61,26 @@ fn test_priority_cmp() {
              num_svs: usize,
              num_portable_dis: usize,
              is_created_via_bifrost: bool,
-             neg_created_at: i64|
+             created_at: DateTime<Utc>|
      -> Priority {
         Priority {
             has_sv_at_tenant,
             num_svs,
             num_portable_dis,
             is_created_via_bifrost,
-            neg_created_at,
+            created_at,
         }
     };
+    let t0 = Utc::now();
+    let t1 = t0 + Duration::from_secs(10);
     assert!([
-        p(Some(true), 10, 10, true, 0),
-        p(Some(true), 10, 0, true, 0),
-        p(Some(true), 0, 10, true, 0),
-        p(Some(true), 0, 0, true, 0),
-        p(Some(true), 0, 0, false, 0),
-        p(Some(false), 0, 0, false, 10),
+        p(Some(true), 10, 10, true, t0),
+        p(Some(true), 10, 0, true, t0),
+        p(Some(true), 0, 10, true, t0),
+        p(Some(true), 0, 0, true, t0),
+        p(Some(true), 0, 0, false, t0),
+        p(Some(false), 0, 0, false, t1),
+        p(Some(false), 0, 0, false, t0),
     ]
     .windows(2)
     .all(|w| w[0] > w[1]));

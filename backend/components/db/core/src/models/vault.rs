@@ -285,8 +285,8 @@ pub(crate) struct Priority {
     pub(crate) num_portable_dis: usize,
     /// Prefer vaults created via Footprint's UI vs via tenant-facing API
     pub(crate) is_created_via_bifrost: bool,
-    /// All else equal, just get the oldest vault
-    pub(crate) neg_created_at: i64,
+    /// All else equal, just get the most recently created vault
+    pub(crate) created_at: DateTime<Utc>,
 }
 
 impl Vault {
@@ -397,7 +397,7 @@ impl Vault {
                     num_svs: svs.len(),
                     num_portable_dis,
                     is_created_via_bifrost: !vault.is_created_via_api,
-                    neg_created_at: -vault.created_at.timestamp_micros(),
+                    created_at: vault.created_at,
                 };
                 (priority, vault)
             })
