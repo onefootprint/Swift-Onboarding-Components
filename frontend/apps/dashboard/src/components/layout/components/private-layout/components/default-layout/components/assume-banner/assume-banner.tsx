@@ -1,11 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoInfo16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { RoleScopeKind } from '@onefootprint/types';
 import { Banner, Stack, Tooltip } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { useGetOrgMember } from 'src/hooks/use-get-org-member';
 import useSession from 'src/hooks/use-session';
 
 const AssumeBanner = () => {
@@ -13,15 +11,6 @@ const AssumeBanner = () => {
   const { data, isAssumedSessionEditMode, setAssumedSessionEditMode } =
     useSession();
   const router = useRouter();
-  // Fetch the user as if we were in edit mode to check if the user has the ability to enable edit
-  // mode
-  const { data: user } = useGetOrgMember({
-    auth: data.auth as string,
-    isLive: !!data.org?.isLive,
-    isAssumedSessionEditMode: true,
-  });
-  const userCanEnableEditMode =
-    user?.scopes.some(s => s.kind !== RoleScopeKind.read) || false;
 
   const handleChangeEdit = () => {
     setAssumedSessionEditMode(!isAssumedSessionEditMode);
@@ -49,18 +38,9 @@ const AssumeBanner = () => {
             </Tooltip>
           )}
           <span>·</span>
-          <Tooltip
-            text={t('no-permission-to-enable-edit')}
-            disabled={userCanEnableEditMode}
-          >
-            <button
-              type="button"
-              onClick={handleChangeEdit}
-              disabled={!userCanEnableEditMode}
-            >
-              {isAssumedSessionEditMode ? t('disable-edit') : t('enable-edit')}
-            </button>
-          </Tooltip>
+          <button type="button" onClick={handleChangeEdit}>
+            {isAssumedSessionEditMode ? t('disable-edit') : t('enable-edit')}
+          </button>
           ·
           <button type="button" onClick={handleLogout}>
             {t('log-out')}

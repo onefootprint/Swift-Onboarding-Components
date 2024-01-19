@@ -127,15 +127,25 @@ impl AllowSessionUpdate for ParsedFirmEmployeeAssumeAuth {}
 
 impl FirmEmployeeAssumeAuth {
     fn token_scopes(&self) -> Vec<TenantScope> {
-        let extra_permissions_for_user = if self.is_risk_ops && self.requested_allow_writes {
-            vec![
-                TenantScope::DecryptAll,
-                TenantScope::ManualReview,
-                TenantScope::WriteEntities,
-                TenantScope::OnboardingConfiguration,
-                TenantScope::ApiKeys,
-                TenantScope::ManageWebhooks,
-            ]
+        let extra_permissions_for_user = if self.requested_allow_writes {
+            if !self.is_live {
+                // In sandbox mode, all firm employees are allowed to have write access
+                vec![TenantScope::Admin]
+            } else if self.is_risk_ops {
+                // Outside of sandbox, "risk ops" employees have some extended permissions
+                vec![
+                    TenantScope::OrgSettings,
+                    TenantScope::DecryptAll,
+                    TenantScope::ManualReview,
+                    TenantScope::WriteEntities,
+                    TenantScope::OnboardingConfiguration,
+                    TenantScope::ApiKeys,
+                    TenantScope::ManageWebhooks,
+                ]
+            } else {
+                // But, firm employees are always allowed to edit org settings
+                vec![TenantScope::OrgSettings]
+            }
         } else {
             vec![]
         };
@@ -195,22 +205,29 @@ mod test {
     use macros::db_test_case;
     use newtypes::{TenantRoleKind, TenantScope, WorkosAuthMethod};
 
-    #[db_test_case(false, false => vec![TenantScope::Read])]
-    #[db_test_case(false, true => vec![TenantScope::Read])]
-    #[db_test_case(true, false => vec![TenantScope::Read])]
-    #[db_test_case(true, true => vec![
+    #[db_test_case(false, false, false => vec![TenantScope::Read])]
+    #[db_test_case(false, true, false => vec![TenantScope::Read])]
+    #[db_test_case(true, false, false => vec![TenantScope::Read])]
+    #[db_test_case(true, true, false => vec![TenantScope::Read])]
+    #[db_test_case(false, false, true => vec![TenantScope::Read, TenantScope::Admin]; "always have admin in sandbox")]
+    #[db_test_case(false, true, true => vec![TenantScope::Read, TenantScope::Admin]; "always have admin in sandbox, even risk ops")]
+    #[db_test_case(true, false, true => vec![TenantScope::Read, TenantScope::OrgSettings]; "always have org settings in live mode")]
+    #[db_test_case(true, true, true => vec![
         TenantScope::Read,
+        TenantScope::OrgSettings,
         TenantScope::DecryptAll,
         TenantScope::ManualReview,
         TenantScope::WriteEntities,
         TenantScope::OnboardingConfiguration,
         TenantScope::ApiKeys,
         TenantScope::ManageWebhooks,
-    ])]
+    ]; "risk ops has lots of permissions in live mode")]
     fn test_roles(
         conn: &mut TestPgConn,
-        requested_allow_writes: bool,
+        is_live: bool,
         is_risk_ops: bool,
+        // If requested_allow_writes is ever false, we shouldn't have any permissions beyond Read
+        requested_allow_writes: bool,
     ) -> Vec<TenantScope> {
         let tenant = db::tests::fixtures::tenant::create(conn);
         let role_kind = TenantRoleKind::DashboardUser;
@@ -227,7 +244,7 @@ mod test {
             tenant_user,
             role,
             is_risk_ops,
-            is_live: true,
+            is_live,
             auth_method: WorkosAuthMethod::GoogleOauth,
             requested_allow_writes,
         };

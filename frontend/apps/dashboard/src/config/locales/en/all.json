@@ -514,7 +514,6 @@
         "enable-edit": "Enable edit mode",
         "disable-edit": "Exit edit mode",
         "edit-mode-info": "Proceed with caution. You are performing write actions on behalf of {{orgName}}. Note, you may not have all write permissions for this tenant.",
-        "no-permission-to-enable-edit": "You don't have permission to enable edit mode.",
         "log-out": "Log out"
       }
     },
