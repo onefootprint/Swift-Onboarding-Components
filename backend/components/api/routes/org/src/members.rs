@@ -81,6 +81,9 @@ struct CreateTenantUserRequest {
     redirect_url: String, // The URL to the dashboard where the invite login link should be sent
     first_name: Option<String>,
     last_name: Option<String>,
+    #[serde(default)]
+    /// A feature only used by employees to allow inviting users to a tenant without sending them an email
+    omit_email_invite: bool,
 }
 
 #[api_v2_operation(
@@ -96,11 +99,7 @@ async fn post(
     let auth = auth.check_guard(TenantGuard::OrgSettings)?;
     let tenant = auth.tenant();
 
-    let user_id = match auth.actor() {
-        AuthActor::TenantUser(tenant_user_id) => tenant_user_id,
-        _ => return Err(TenantError::ValidationError("Non-user principal".to_owned()).into()),
-    };
-
+    let user_id = auth.actor().tenant_user_id()?.clone();
     let tenant_id = tenant.id.clone();
     let CreateTenantUserRequest {
         email,
@@ -108,7 +107,9 @@ async fn post(
         redirect_url,
         first_name,
         last_name,
+        omit_email_invite,
     } = request.into_inner();
+
     let email = OrgMemberEmail::try_from(email)?;
     let email2 = email.clone();
     let (inviter, user, rb, role) = state
@@ -121,12 +122,14 @@ async fn post(
         })
         .await?;
 
-    let link = create_magic_link(&state, &email.0, &redirect_url, false).await?;
-    let inviter = inviter.first_name.unwrap_or(inviter.email.0);
-    state
-        .sendgrid_client
-        .send_dashboard_invite_email(&state, email.0, inviter, tenant.name.clone(), link)
-        .await?;
+    if !omit_email_invite {
+        let link = create_magic_link(&state, &email.0, &redirect_url, false).await?;
+        let inviter = inviter.first_name.unwrap_or(inviter.email.0);
+        state
+            .sendgrid_client
+            .send_dashboard_invite_email(&state, email.0, inviter, tenant.name.clone(), link)
+            .await?;
+    }
 
     let result = api_wire_types::OrganizationMember::from_db((user, rb, role));
     ResponseData::ok(result).json()
