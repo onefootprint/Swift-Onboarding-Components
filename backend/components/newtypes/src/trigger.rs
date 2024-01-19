@@ -21,4 +21,5 @@ pub enum TriggerInfo {
         collect_selfie: bool,
     },
     ProofOfSsn,
+    ProofOfAddress,
 }

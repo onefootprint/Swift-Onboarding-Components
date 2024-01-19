@@ -186,26 +186,38 @@ fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObCon
         }
     };
 
-    let doc_requests_to_create: Vec<NewDocumentRequestArgs> = vec![
-        Some(NewDocumentRequestArgs {
+    let doc_requests_to_create = match kind {
+        DocumentRequestKind::Identity => vec![NewDocumentRequestArgs {
             scoped_vault_id: wf.scoped_vault_id.clone(),
             ref_id: None,
             workflow_id: wf.id.clone(),
             should_collect_selfie,
-            kind,
-        }),
-        // Hack to request ID doc and proof of ssn
-        (kind == DocumentRequestKind::ProofOfSsn).then_some(NewDocumentRequestArgs {
+            kind: DocumentRequestKind::Identity,
+        }],
+        DocumentRequestKind::ProofOfSsn => vec![
+            NewDocumentRequestArgs {
+                scoped_vault_id: wf.scoped_vault_id.clone(),
+                ref_id: None,
+                workflow_id: wf.id.clone(),
+                should_collect_selfie: false,
+                kind: DocumentRequestKind::ProofOfSsn,
+            },
+            NewDocumentRequestArgs {
+                scoped_vault_id: wf.scoped_vault_id.clone(),
+                ref_id: None,
+                workflow_id: wf.id.clone(),
+                should_collect_selfie: true,
+                kind: DocumentRequestKind::Identity,
+            },
+        ],
+        DocumentRequestKind::ProofOfAddress => vec![NewDocumentRequestArgs {
             scoped_vault_id: wf.scoped_vault_id.clone(),
             ref_id: None,
             workflow_id: wf.id.clone(),
-            should_collect_selfie: true,
-            kind: DocumentRequestKind::Identity,
-        }),
-    ]
-    .into_iter()
-    .flatten()
-    .collect();
+            should_collect_selfie: false,
+            kind: DocumentRequestKind::ProofOfAddress,
+        }],
+    };
 
     DocumentRequest::bulk_create(conn, doc_requests_to_create)?;
 

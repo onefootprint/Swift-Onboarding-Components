@@ -120,6 +120,7 @@ def test_redo_kyc(sandbox_tenant, with_document, doc_first_obc):
     [
         dict(kind="id_document", data=dict(collect_selfie=False)),
         dict(kind="proof_of_ssn"),
+        dict(kind="proof_of_address"),
     ],
 )
 def test_recollect_document(trigger, sandbox_tenant):
@@ -151,6 +152,7 @@ def test_recollect_document(trigger, sandbox_tenant):
     [
         dict(kind="id_document", data=dict(collect_selfie=False)),
         dict(kind="proof_of_ssn"),
+        dict(kind="proof_of_address"),
         dict(kind='redo_kyc')
     ],
 )
@@ -168,7 +170,7 @@ def test_trigger_incomplete(sandbox_tenant, trigger):
     fp_id = user["id"]
 
     # Trigger
-    expected_error = "Cannot reonboard user - user has no complete onboardings." if trigger['kind'] in ['proof_of_ssn', 'id_document'] else None
+    expected_error = "Cannot reonboard user - user has no complete onboardings." if trigger['kind'] in ['proof_of_ssn', 'id_document', 'proof_of_address'] else None
     initial_auth_token = send_trigger(fp_id, sandbox_tenant, trigger, expected_error)
     if expected_error:
         return

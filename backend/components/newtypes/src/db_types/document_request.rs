@@ -30,6 +30,11 @@ pub enum DocumentRequestKind {
     ProofOfSsn,
     ProofOfAddress,
 }
+impl DocumentRequestKind {
+    pub fn is_identity(&self) -> bool {
+        matches!(self, DocumentRequestKind::Identity)
+    }
+}
 
 impl From<DocKind> for DocumentRequestKind {
     fn from(value: DocKind) -> Self {

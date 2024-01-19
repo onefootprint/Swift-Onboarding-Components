@@ -139,9 +139,9 @@ pub async fn post(
 fn validate(trigger_info: TriggerKind, scoped_vault: &ScopedVault) -> ApiResult<()> {
     match trigger_info {
         TriggerKind::RedoKyc => Ok(()),
-        TriggerKind::IdDocument | TriggerKind::ProofOfSsn => {
-            // if doc only or we have a decision
-            // theoretically we should be checking risk signals here too
+        TriggerKind::IdDocument | TriggerKind::ProofOfSsn | TriggerKind::ProofOfAddress => {
+            // if docs only or we have a decision
+            // TODO: theoretically we should be checking risk signals here too or that there's an FP decision, but maybe not
             if scoped_vault.status.map(|d| d.has_decision()).unwrap_or(false) {
                 Ok(())
             } else {
@@ -182,6 +182,15 @@ impl TriggerMessage {
             )),
             TriggerKind::ProofOfSsn => PiiString::from(format!(
                 "{}To verify your SSN for {}, provide a photo proof of SSN here: {}", // TODO: sketch
+                self.note
+                    .as_ref()
+                    .map(|n| format!("{}\n\n", n))
+                    .unwrap_or_default(),
+                self.org_name,
+                self.link.leak()
+            )),
+            TriggerKind::ProofOfAddress => PiiString::from(format!(
+                "{}To verify your address for {}, provide a photo proof of address here: {}",
                 self.note
                     .as_ref()
                     .map(|n| format!("{}\n\n", n))

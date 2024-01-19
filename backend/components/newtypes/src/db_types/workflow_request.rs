@@ -30,6 +30,10 @@ impl From<TriggerInfo> for WorkflowRequestConfig {
                 kind: DocumentRequestKind::ProofOfSsn,
                 collect_selfie: false,
             },
+            TriggerInfo::ProofOfAddress => Self::IdDocument {
+                kind: DocumentRequestKind::ProofOfAddress,
+                collect_selfie: false,
+            },
         }
     }
 }

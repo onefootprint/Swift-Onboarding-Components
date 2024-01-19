@@ -43,6 +43,8 @@ pub enum OnboardingRequirement {
     },
     /// Uses the same struct as CollectDocument in practice
     CollectProofOfSsn,
+    /// Uses the same struct as CollectDocument in practice
+    CollectProofOfAddress,
     /// The client needs to display the authorization consent page and confirm the user authorizes access
     Authorize {
         fields_to_authorize: AuthorizeFields,
@@ -62,8 +64,9 @@ impl OnboardingRequirementKind {
                 Self::RegisterPasskey => 3,
                 Self::CollectDocument => 4,
                 Self::CollectProofOfSsn => 5,
-                Self::Authorize => 6,
-                Self::Process => 7,
+                Self::CollectProofOfAddress => 6,
+                Self::Authorize => 7,
+                Self::Process => 8,
             }
         } else {
             // For a doc-first config, we show passkey and doc collection first
@@ -71,11 +74,12 @@ impl OnboardingRequirementKind {
                 Self::RegisterPasskey => 0,
                 Self::CollectDocument => 1,
                 Self::CollectProofOfSsn => 2,
-                Self::CollectBusinessData => 3,
-                Self::CollectData => 4,
-                Self::CollectInvestorProfile => 5,
-                Self::Authorize => 6,
-                Self::Process => 7,
+                Self::CollectProofOfAddress => 3,
+                Self::CollectBusinessData => 4,
+                Self::CollectData => 5,
+                Self::CollectInvestorProfile => 6,
+                Self::Authorize => 7,
+                Self::Process => 8,
             }
         }
     }
@@ -111,6 +115,7 @@ impl OnboardingRequirement {
                 supported_country_and_doc_types: _,
             } => false,
             Self::CollectProofOfSsn => false,
+            Self::CollectProofOfAddress => false,
             Self::Process => false,
         }
     }

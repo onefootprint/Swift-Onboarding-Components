@@ -159,14 +159,20 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
     ) -> ApiResult<DocumentState> {
         let (ff_client, vendor_results) = async_res;
 
-        let is_proof_of_ssn_wf = match &wf.config {
-            WorkflowConfig::Document(c) => matches!(c.kind, DocumentRequestKind::ProofOfSsn),
-            _ => false,
+        let non_identity_document_request = match &wf.config {
+            WorkflowConfig::Document(c) => {
+                if !c.kind.is_identity() {
+                    Some(c.kind)
+                } else {
+                    None
+                }
+            }
+            _ => None,
         };
         let current_seqno = DataLifetime::get_current_seqno(conn)?;
 
-        if is_proof_of_ssn_wf {
-            handle_proof_of_ssn(conn, wf, Some(current_seqno))?;
+        if let Some(doc_req) = non_identity_document_request {
+            handle_non_identity_document(conn, wf, Some(current_seqno), doc_req)?;
         } else {
             let v = Vault::get(conn, &wf.scoped_vault_id)?;
             let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
@@ -236,21 +242,27 @@ impl WorkflowState for DocumentComplete {
 }
 
 #[tracing::instrument(skip_all)]
-fn handle_proof_of_ssn(
+fn handle_non_identity_document(
     conn: &mut TxnPgConn,
     wf: Locked<DbWorkflow>,
     seqno: Option<DataLifetimeSeqno>,
+    doc_request_kind: DocumentRequestKind,
 ) -> ApiResult<()> {
     let sv = ScopedVault::lock(conn, &wf.scoped_vault_id)?;
+    let review_reasons = match doc_request_kind {
+        DocumentRequestKind::Identity => None,
+        DocumentRequestKind::ProofOfSsn => Some(vec![ReviewReason::ProofOfSsnDocument]),
+        DocumentRequestKind::ProofOfAddress => Some(vec![ReviewReason::ProofOfAddressDocument]),
+    };
     let decision = NewDecisionArgs {
         vault_id: sv.vault_id.clone(),
         logic_git_hash: crate::GIT_HASH.to_string(),
-        status: from_scoped_vault_status_for_proof_of_ssn_decision(&sv)?,
+        status: from_scoped_vault_status_for_non_identity_document_decision(&sv)?,
         result_ids: vec![],
         annotation_id: None,
         actor: DbActor::Footprint,
         seqno,
-        create_manual_review_reasons: Some(vec![ReviewReason::ProofOfSsnDocument]),
+        create_manual_review_reasons: review_reasons,
     };
     let update = DbWorkflowUpdate::set_decision(&wf, decision);
     // TODO: figure out a strategy for users already in MR to push the fact that there's a MR for SSN Upload now
@@ -261,7 +273,7 @@ fn handle_proof_of_ssn(
 
 // in order to avoid updating sv status or triggering a status changed updated webhook,
 // we map the current sv.status to whatever the DecisionStatus should be to maintain that status
-fn from_scoped_vault_status_for_proof_of_ssn_decision(
+fn from_scoped_vault_status_for_non_identity_document_decision(
     scoped_vault: &ScopedVault,
 ) -> ApiResult<DecisionStatus> {
     let sv_status = scoped_vault.status.ok_or(AssertionError(

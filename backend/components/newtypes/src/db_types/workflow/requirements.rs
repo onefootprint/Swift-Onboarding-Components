@@ -17,6 +17,7 @@ impl WorkflowState {
             Self::Document(_) => vec![
                 OnboardingRequirementKind::CollectDocument,
                 OnboardingRequirementKind::CollectProofOfSsn,
+                OnboardingRequirementKind::CollectProofOfAddress,
                 OnboardingRequirementKind::Process,
             ],
         }

@@ -91,7 +91,7 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                         WorkflowRequestConfig::IdDocument { kind, .. } => match kind {
                             DocumentRequestKind::ProofOfSsn => TriggerKind::ProofOfSsn,
                             DocumentRequestKind::Identity => TriggerKind::IdDocument,
-                            DocumentRequestKind::ProofOfAddress => unimplemented!(), // TODO
+                            DocumentRequestKind::ProofOfAddress => TriggerKind::ProofOfAddress,
                         },
                     };
                     let request = api_wire_types::WorkflowRequest::from_db(wfr);
