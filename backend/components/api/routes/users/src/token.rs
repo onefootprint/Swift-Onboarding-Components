@@ -19,6 +19,7 @@ use api_core::utils::vault_wrapper::VaultWrapper;
 use api_wire_types::CreateTokenRequest;
 use api_wire_types::CreateTokenResponse;
 use api_wire_types::TokenOperationKind;
+use chrono::Duration;
 use chrono::Utc;
 use db::models::auth_event::AuthEvent;
 use db::models::auth_event::NewAuthEvent;
@@ -167,7 +168,7 @@ pub async fn post(
                 auth_events,
                 is_implied_auth,
             };
-            let (auth_token, session) = create_token(conn, &session_key, args)?;
+            let (auth_token, session) = create_token(conn, &session_key, args, Duration::hours(1))?;
             Ok((auth_token, session))
         })
         .await?;

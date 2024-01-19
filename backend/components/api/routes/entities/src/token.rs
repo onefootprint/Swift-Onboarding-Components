@@ -13,6 +13,7 @@ use api_wire_types::CreateEntityTokenRequest;
 use api_wire_types::CreateTokenResponse;
 use api_wire_types::EntityTokenOperationKind;
 use api_wire_types::TokenOperationKind;
+use chrono::Duration;
 use db::models::scoped_vault::ScopedVault;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
@@ -56,7 +57,7 @@ pub async fn post(
                 auth_events: vec![],
                 is_implied_auth: false,
             };
-            let (auth_token, session) = create_token(conn, &session_key, args)?;
+            let (auth_token, session) = create_token(conn, &session_key, args, Duration::days(3))?;
 
             Ok((auth_token, session))
         })

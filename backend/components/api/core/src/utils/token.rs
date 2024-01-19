@@ -31,6 +31,7 @@ pub fn create_token(
     conn: &mut TxnPgConn,
     session_key: &ScopedSealingKey,
     args: CreateTokenArgs,
+    duration: Duration,
 ) -> ApiResult<(SessionAuthToken, Session)> {
     let CreateTokenArgs {
         sv,
@@ -98,7 +99,6 @@ pub fn create_token(
         ..Default::default()
     };
     let data = UserSession::make(sv.vault_id, args, scopes, auth_events)?;
-    let duration = Duration::hours(1);
     let (auth_token, session) = AuthSession::create_sync(conn, session_key, data, duration)?;
     Ok((auth_token, session))
 }
