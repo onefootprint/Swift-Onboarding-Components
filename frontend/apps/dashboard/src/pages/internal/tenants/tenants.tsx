@@ -39,7 +39,7 @@ const Tenants = () => {
       { tenantId: tenant.id },
       {
         onSuccess: async () => {
-          await refreshUserPermissions({});
+          await refreshUserPermissions();
           router.push('/users');
         },
       },

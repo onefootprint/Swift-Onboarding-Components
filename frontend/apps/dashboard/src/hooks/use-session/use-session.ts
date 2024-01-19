@@ -83,22 +83,21 @@ const useSession = () => {
       update({ meta: session.meta });
     }
     // Then asynchronously fetch user and tenant info from the backend for the new auth
-    await refreshPermissions({ newAuthToken: session.auth, newIsLive: isLive });
+    await refreshPermissions({ authToken: session.auth });
   };
 
   const refreshPermissions = async ({
-    newAuthToken,
-    newIsLive,
+    authToken,
+    org,
     newIsAssumedSessionEditMode,
   }: {
-    newAuthToken: string;
-    newIsLive: boolean;
+    authToken: string;
+    org?: Partial<OrgSession>;
     newIsAssumedSessionEditMode?: boolean;
   }) => {
     try {
       const user = await getOrgMemberRequest({
-        auth: newAuthToken,
-        isLive: newIsLive,
+        auth: authToken,
         isAssumedSessionEditMode: !!newIsAssumedSessionEditMode,
       });
       update({
@@ -109,7 +108,8 @@ const useSession = () => {
         },
         org: {
           ...user.tenant,
-          isLive: newIsLive,
+          isLive: !user.tenant.isSandboxRestricted,
+          ...org,
         },
       });
     } catch (error: unknown) {
@@ -123,16 +123,9 @@ const useSession = () => {
     }
   };
 
-  const refreshUserPermissions = async ({
-    newIsLive,
-  }: {
-    newIsLive?: boolean;
-  }) => {
+  const refreshUserPermissions = async (org?: Partial<OrgSession>) => {
     if (!data.auth) return;
-    await refreshPermissions({
-      newAuthToken: data.auth,
-      newIsLive: newIsLive !== undefined ? newIsLive : isLive,
-    });
+    await refreshPermissions({ authToken: data.auth, org });
   };
 
   const logOut = () => {
@@ -170,17 +163,15 @@ const useSession = () => {
     // Fetch the permissions from the backend with the newEditMode - the backend will properly
     // render and apply permissions as requested
     await refreshPermissions({
-      newAuthToken: data.auth,
-      newIsLive: isLive,
+      authToken: data.auth,
       newIsAssumedSessionEditMode: newEditMode,
     });
   };
 
-  const setIsLive = async (newIsLive: boolean) => {
-    if (!data.auth) return;
-    await refreshPermissions({
-      newAuthToken: data.auth,
-      newIsLive,
+  const setIsLive = (newIsLive: boolean) => {
+    if (!data.org) return;
+    update({
+      org: { ...data.org, isLive: newIsLive },
     });
   };
 

@@ -15,8 +15,8 @@ const useOrgSession = () => {
   const data = sessionData.org;
   const canToggle = sessionData.org?.isSandboxRestricted === false;
 
-  const toggle = async () => {
-    await setIsLive(!isLive);
+  const toggle = () => {
+    setIsLive(!isLive);
     queryClient.invalidateQueries();
   };
 

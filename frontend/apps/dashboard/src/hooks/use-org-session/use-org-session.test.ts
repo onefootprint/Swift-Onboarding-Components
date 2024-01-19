@@ -36,8 +36,8 @@ describe('useOrgSession', () => {
   it('should toggle sandbox mode', async () => {
     const { result } = customRenderHook(() => useOrgSession());
     expect(result.current.sandbox.isSandbox).toBeTruthy();
-    act(async () => {
-      await result.current.sandbox.toggle();
+    act(() => {
+      result.current.sandbox.toggle();
     });
 
     expect(result.current.sandbox.isSandbox).toBeFalsy();
