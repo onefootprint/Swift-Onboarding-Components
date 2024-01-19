@@ -7,12 +7,13 @@ use db::models::{
 use idv::ParsedResponse;
 use itertools::Itertools;
 use newtypes::{
-    CollectedData, FootprintReasonCode, IdentityDataKind, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
+    FootprintReasonCode, IdentityDataKind, RiskSignalGroupKind, ScopedVaultId, VendorAPI,
     VerificationResultId,
 };
 
 use super::{
-    experian::ExperianFeatures, idology_expectid::IDologyFeatures, incode_docv::IncodeDocumentFeatures, lexis,
+    experian::ExperianFeatures, idology_expectid::IDologyFeatures, incode_docv::IncodeDocumentFeatures,
+    lexis, user_input,
 };
 use crate::{
     decision::{
@@ -182,32 +183,6 @@ pub fn save_risk_signals(
     Ok(())
 }
 
-pub fn ssn_optional_and_missing<T>(vw: &VaultWrapper<T>, obc: &ObConfiguration) -> bool {
-    let cd = CollectedData::Ssn;
-    let cdos = cd.options();
-    cdos.iter().any(|cdo| {
-        !cdo.required_data_identifiers()
-            .into_iter()
-            .all(|di| vw.has_field(di))
-            && obc.optional_data.contains(cdo)
-    })
-}
-
-pub fn user_input_based_risk_signals(vw: &VaultWrapper, obc: &ObConfiguration) -> Vec<FootprintReasonCode> {
-    let mut frcs = Vec::<FootprintReasonCode>::new();
-
-    let ssn_optional_and_missing_and_no_doc_stepup =
-        ssn_optional_and_missing(vw, obc) && !obc.should_stepup_to_do_for_optional_ssn();
-    if ssn_optional_and_missing_and_no_doc_stepup {
-        frcs.push(FootprintReasonCode::SsnNotProvided);
-    }
-
-    if !vw.has_field(IdentityDataKind::PhoneNumber) {
-        frcs.push(FootprintReasonCode::PhoneNotProvided);
-    }
-    frcs
-}
-
 impl From<VendorResultsAndVault<'_>> for RiskSignalGroupStruct<Kyc> {
     fn from(results: VendorResultsAndVault) -> Self {
         let VendorResultsAndVault {
@@ -218,7 +193,7 @@ impl From<VendorResultsAndVault<'_>> for RiskSignalGroupStruct<Kyc> {
         } = results;
 
         // Risk Signals that should be created for every vendor, based purely on data in vault + obc
-        let user_input_risk_signals = user_input_based_risk_signals(&vw, &obc);
+        let user_input_risk_signals = user_input::user_input_based_risk_signals(&vw, &obc);
 
         let idology_features = IDologyFeatures::try_from(((response_map, ids_map), vw))
             .ok()

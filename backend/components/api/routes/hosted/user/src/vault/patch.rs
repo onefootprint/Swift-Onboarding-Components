@@ -6,7 +6,6 @@ use crate::utils::vault_wrapper::VaultWrapper;
 use crate::State;
 use api_core::auth::user::{UserAuthContext, UserAuthGuard, UserWfAuthContext};
 use api_core::auth::AuthError;
-use api_core::decision::features::risk_signals::ssn_optional_and_missing;
 use api_core::utils::vault_wrapper::{Any, Person, VwArgs};
 use db::models::document_request::{DocumentRequest, NewDocumentRequestArgs};
 use db::models::ob_configuration::ObConfiguration;
@@ -189,7 +188,7 @@ async fn handle_ssn_skipped(
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let vw = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&sv_id))?;
-            let ssn_optional_and_missing = ssn_optional_and_missing(&vw, &obc);
+            let ssn_optional_and_missing = api_core::decision::features::user_input::ssn_optional_and_missing(&vw, &obc);
 
             if ssn_optional_and_missing {
                 let doc_req_args = default_stepup_doc_args(&sv_id, doc_info.requires_selfie(), &workflow_id);

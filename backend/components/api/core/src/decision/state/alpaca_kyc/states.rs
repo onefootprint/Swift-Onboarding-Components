@@ -24,10 +24,13 @@ use crate::{
     auth::tenant::AuthActor,
     decision::{
         self,
-        features::risk_signals::{
-            fetch_latest_kyc_risk_signals, parse_reason_codes_from_vendor_result,
-            risk_signal_group_struct::{self},
-            save_risk_signals, RiskSignalGroupStruct,
+        features::{
+            self,
+            risk_signals::{
+                fetch_latest_kyc_risk_signals, parse_reason_codes_from_vendor_result,
+                risk_signal_group_struct::{self},
+                save_risk_signals, RiskSignalGroupStruct,
+            },
         },
         onboarding::Decision,
         review::save_review_decision,
@@ -148,7 +151,7 @@ impl OnAction<MakeVendorCalls, AlpacaKycState> for AlpacaKycVendorCalls {
             .db_transaction(move |conn| common::get_vw_and_obc(conn, &svid, &wfid))
             .await?;
         let vendor_result = common::run_kyc_vendor_calls(state, &self.wf_id, &self.t_id).await?;
-        let user_input_reason_codes = common::generate_user_input_risk_signals(
+        let user_input_reason_codes = features::user_input::generate_user_input_risk_signals(
             &state.enclave_client,
             &vw,
             &obc,

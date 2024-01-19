@@ -11,3 +11,4 @@ pub mod middesk;
 pub mod risk_signals;
 pub mod socure_idplus;
 pub mod stytch;
+pub mod user_input;
