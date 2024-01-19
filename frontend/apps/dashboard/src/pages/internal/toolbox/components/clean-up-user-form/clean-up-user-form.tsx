@@ -12,7 +12,7 @@ enum IdentifierType {
 
 type CleanUpUserFormData = {
   identifier: string;
-  type: IdentifierType;
+  type: { label: string; value: IdentifierType };
 };
 
 const makeOption = (value: string) => ({
@@ -30,7 +30,10 @@ const CleanUpUserForm = ({ formId, onClose }: RetriggerKYCFormProps) => {
   const toast = useToast();
   const methods = useForm<CleanUpUserFormData>({
     defaultValues: {
-      type: IdentifierType.phoneNumber,
+      type: {
+        label: IdentifierType.phoneNumber,
+        value: IdentifierType.phoneNumber,
+      },
     },
   });
   const {
@@ -42,9 +45,9 @@ const CleanUpUserForm = ({ formId, onClose }: RetriggerKYCFormProps) => {
 
   const handleBeforeSubmit = async (data: CleanUpUserFormData) => {
     let requestData = {};
-    if (data.type === IdentifierType.phoneNumber) {
+    if (data.type.value === IdentifierType.phoneNumber) {
       requestData = { phoneNumber: data.identifier };
-    } else if (data.type === IdentifierType.email) {
+    } else if (data.type.value === IdentifierType.email) {
       requestData = { email: data.identifier };
     }
     cleanUpMutation.mutate(requestData, {
@@ -86,7 +89,7 @@ const CleanUpUserForm = ({ formId, onClose }: RetriggerKYCFormProps) => {
               onChange={field.onChange}
               hint={error && 'Invalid'}
               hasError={!!error}
-              value={makeOption(field.value)}
+              value={field.value}
             />
           )}
         />
