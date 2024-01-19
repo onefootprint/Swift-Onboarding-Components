@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Select, TextInput, Typography, useToast } from '@onefootprint/ui';
 import React from 'react';
