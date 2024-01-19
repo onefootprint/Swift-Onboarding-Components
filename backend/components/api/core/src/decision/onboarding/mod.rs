@@ -2,6 +2,7 @@ use std::cmp::Ordering;
 
 use enum_dispatch::enum_dispatch;
 use newtypes::{DecisionStatus, FootprintReasonCode, RuleName, VendorAPI};
+use serde::Serialize;
 
 use crate::errors::ApiResult;
 
@@ -128,7 +129,7 @@ impl FinalAndAdditionalDecisions for KybOnboardingRulesDecisionOutput {
 
 // handle ONLY doc or ONLY kyc
 
-#[derive(PartialEq, Eq, Debug, Clone)]
+#[derive(PartialEq, Eq, Debug, Clone, Serialize)]
 pub struct Decision {
     pub decision_status: DecisionStatus,
     pub should_commit: bool,

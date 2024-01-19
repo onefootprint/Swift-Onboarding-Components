@@ -173,11 +173,12 @@ pub fn alpaca_kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> Ap
 }
 
 #[tracing::instrument(skip_all)]
-pub fn get_decision(
+pub fn evaluate_rules(
     conn: &mut TxnPgConn,
     risk_signals: RiskSignalsForDecision,
     wf: &Workflow,
     is_fixture: bool,
+    rule_result_kind: RuleSetResultKind,
 ) -> ApiResult<Decision> {
     let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
     let doc_collected = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?.is_some();
@@ -187,7 +188,7 @@ pub fn get_decision(
         &wf.scoped_vault_id,
         &obc.id,
         Some(&wf.id),
-        RuleSetResultKind::WorkflowDecision,
+        rule_result_kind,
         risk_signals.risk_signals,
         doc_collected,
         is_fixture,

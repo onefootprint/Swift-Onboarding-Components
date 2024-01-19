@@ -14,7 +14,7 @@ use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
     DecisionStatus, DocumentRequestKind, EnhancedAmlOption, KycConfig, Locked, OnboardingStatus,
-    RiskSignalGroupKind, VerificationResultId,
+    RiskSignalGroupKind, RuleSetResultKind, VerificationResultId,
 };
 
 use super::{
@@ -335,7 +335,13 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let vres_ids = risk_signals.verification_result_ids();
 
         // Always execute real Rules, even in sandbox. But below we just use the sandbox fixture decision instead of the decision from these real Rules
-        let decision = common::get_decision(conn, risk_signals, &wf, fixture_decision.is_some())?;
+        let decision = common::evaluate_rules(
+            conn,
+            risk_signals,
+            &wf,
+            fixture_decision.is_some(),
+            RuleSetResultKind::WorkflowDecision,
+        )?;
         // If Sandbox and not doing real decisioning using doc, then replace decision with the fixture decision
         let decision = if let Some(fixture_decision) = fixture_decision {
             if execute_rules_for_real_document_decision_only || obc.skip_kyc {

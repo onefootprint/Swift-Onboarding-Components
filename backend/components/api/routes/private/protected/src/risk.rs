@@ -2,13 +2,10 @@ use crate::ProtectedAuth;
 use actix_web::post;
 use actix_web::web::{self, Json};
 use api_core::decision::engine;
-use api_core::decision::features::risk_signals::risk_signal_group_struct::Kyc;
 use api_core::decision::features::risk_signals::{
-    fetch_latest_risk_signals_map, parse_reason_codes_from_vendor_result, save_risk_signals,
-    RiskSignalGroupStruct,
+    fetch_latest_risk_signals_map, parse_reason_codes_from_vendor_result,
 };
-use api_core::decision::onboarding::rules::KycRuleExecutionConfig;
-use api_core::decision::onboarding::{rules::KycRuleGroup, Decision, OnboardingRulesDecisionOutput};
+use api_core::decision::onboarding::{Decision, OnboardingRulesDecisionOutput};
 use api_core::decision::vendor;
 use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
 use api_core::decision::vendor::vendor_result::VendorResult;
@@ -16,21 +13,24 @@ use api_core::errors::onboarding::OnboardingError;
 use api_core::errors::AssertionError;
 use api_core::errors::{ApiError, ApiResult};
 use api_core::types::response::ResponseData;
+use api_core::utils::db2api::DbToApi;
 use api_core::utils::vault_wrapper::{VaultWrapper, VwArgs};
 use api_core::{decision, State};
 use api_core::{task, ApiErrorKind};
 use chrono::Utc;
 use db::models::data_lifetime::DataLifetime;
 use db::models::decision_intent::DecisionIntent;
-use db::models::document_request::DocumentRequest;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::risk_signal::RiskSignal;
+use db::models::rule_instance::RuleInstance;
 use db::models::scoped_vault::ScopedVault;
 use db::models::verification_request::VerificationRequest;
 use db::models::verification_result::VerificationResult;
 use db::models::workflow::Workflow;
+use itertools::Itertools;
 use newtypes::{
-    DecisionIntentId, DecisionStatus, DocumentRequestKind, FpId, RiskSignalGroupKind, RiskSignalId, TenantId,
-    Vendor, VendorAPI, VerificationRequestId, VerificationResultId, WorkflowId,
+    DecisionIntentId, DecisionStatus, FpId, RiskSignalGroupKind, RiskSignalId, RuleAction, RuleSetResultKind,
+    TenantId, Vendor, VendorAPI, VerificationRequestId, VerificationResultId, WorkflowId,
 };
 use std::str::FromStr;
 
@@ -44,7 +44,8 @@ pub struct MakeVendorCallsRequest {
 pub struct MakeVendorCallsResponse {
     new_vendor_request_ids: Vec<VerificationRequestId>,
     new_vendor_result_ids: Vec<VerificationResultId>,
-    decision_output: DecisionOutput,
+    rule_results: Vec<(api_wire_types::Rule, bool)>,
+    action_triggered: Option<RuleAction>,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -92,7 +93,8 @@ async fn make_vendor_calls(
     let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config, &state.enclave_client).await?;
     let tvc2 = tvc.clone();
 
-    let (requests, vw) = state
+    let wf_id = wf.id.clone();
+    let (requests, vw, rules) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&sv.id))?;
@@ -107,7 +109,9 @@ async fn make_vendor_calls(
                 vec![vendor_api],
             )?;
 
-            Ok((requests, uvw))
+            let (obc, _) = ObConfiguration::get(conn, &wf_id)?;
+            let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id)?;
+            Ok((requests, uvw, rules))
         })
         .await?;
 
@@ -126,13 +130,25 @@ async fn make_vendor_calls(
     .await?
     .pop()
     .ok_or(ApiError::from(ApiErrorKind::VendorRequestsFailed))?;
-    let rule_group = KycRuleGroup::default();
-    let rules_output = api_core::decision::engine::calculate_decision(vendor_result.clone(), vw, rule_group)?;
+
+    let reason_codes =
+        decision::features::risk_signals::parse_reason_codes_from_vendor_result(vendor_result.clone(), &vw)?
+            .kyc
+            .footprint_reason_codes
+            .into_iter()
+            .map(|(frc, _, _)| frc)
+            .collect_vec();
+    let (rule_results, action_triggered) =
+        decision::rule_engine::eval::evaluate_rule_set(rules, &reason_codes, true);
 
     Ok(Json(ResponseData::ok(MakeVendorCallsResponse {
         new_vendor_request_ids: vec![vendor_result.verification_request_id],
         new_vendor_result_ids: vec![vendor_result.verification_result_id],
-        decision_output: rules_output.into(),
+        rule_results: rule_results
+            .into_iter()
+            .map(|(ri, b)| (api_wire_types::Rule::from_db(ri), b))
+            .collect_vec(),
+        action_triggered,
     })))
 }
 
@@ -144,12 +160,11 @@ pub struct MakeDecisionRequest {
 
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct MakeDecisionResponse {
-    // ID's of the VerificationResult's used for the decision engine run
-    vendor_result_ids: Vec<VerificationResultId>,
-    // TODO: add OnboardingRulesDecisionOutput here
+    decision: Decision,
 }
 
-// TODO: rework these to use Workflows
+/// Fetches latest risk signals, executes rules against those, and writes a new onboarding decision from the result
+/// For now errors if the decision is StepUp
 #[post("/private/protected/risk/make_decision")]
 async fn make_decision(
     state: web::Data<State>,
@@ -158,78 +173,35 @@ async fn make_decision(
 ) -> actix_web::Result<Json<ResponseData<MakeDecisionResponse>>, ApiError> {
     let MakeDecisionRequest { tenant_id, fp_id } = request.into_inner();
 
-    let (wf, vw) = state
+    let decision = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
-            let wf = Workflow::get_active(conn, &scoped_user.id)?.ok_or(OnboardingError::NoWorkflow)?;
-            let vw = VaultWrapper::<_>::build(conn, VwArgs::Tenant(&wf.scoped_vault_id))?;
+            let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, true))?;
+            let wf = Workflow::get_active(conn, &sv.id)?.ok_or(OnboardingError::NoWorkflow)?;
 
-            Ok((wf, vw))
-        })
-        .await?;
-
-    let vendor_requests = decision::engine::get_latest_verification_requests_and_results(
-        &wf.scoped_vault_id,
-        &state.db_pool,
-        &state.enclave_client,
-    )
-    .await?;
-
-    if !vendor_requests.outstanding_requests.is_empty() {
-        return Err(AssertionError("Outstanding vendor requests found").into());
-    }
-    if vendor_requests.completed_requests.is_empty() {
-        // Don't think this should ever be possible, but worth asserting
-        return Err(AssertionError("No completed vendor requests found").into());
-    }
-
-    let vendor_result = vendor_requests
-        .completed_requests
-        .last()
-        .cloned()
-        .ok_or(ApiError::from(ApiErrorKind::VendorRequestsFailed))?;
-    let vres_id = vendor_result.verification_result_id.clone();
-    let risk_signals: RiskSignalGroupStruct<Kyc> =
-        parse_reason_codes_from_vendor_result(vendor_result.clone(), &vw)?.kyc;
-
-    state
-        .db_pool
-        .db_transaction(move |conn| -> ApiResult<_> {
-            save_risk_signals(
+            let risk_signals = fetch_latest_risk_signals_map(conn, &sv.id)?;
+            let vres_ids = risk_signals.verification_result_ids();
+            let decision = decision::state::common::evaluate_rules(
                 conn,
-                &wf.scoped_vault_id,
-                risk_signals.footprint_reason_codes,
-                RiskSignalGroupKind::Kyc,
-                false,
-            )?;
-            let rule_group = KycRuleGroup::default();
-            let risk_signals = fetch_latest_risk_signals_map(conn, &wf.scoped_vault_id)?;
-            let include_doc = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?.is_some();
-            let config = KycRuleExecutionConfig {
-                include_doc,
-                document_only: false,
-                skip_kyc: false,
-                allow_stepup: true,
-            };
-            let rules_output = rule_group.evaluate(risk_signals, config)?;
-            engine::save_onboarding_decision(
-                conn,
+                risk_signals,
                 &wf,
-                rules_output.final_kyc_decision()?.decision,
-                vec![vres_id.clone()],
-                vec![],
+                false,
+                RuleSetResultKind::Adhoc,
             )?;
-
-            Ok(())
+            if !matches!(
+                decision.decision_status,
+                DecisionStatus::Pass | DecisionStatus::Fail
+            ) {
+                return Err(AssertionError("decision was StepUp, erroring").into());
+            }
+            engine::save_onboarding_decision(conn, &wf, decision.clone(), vres_ids, vec![])?;
+            Ok(decision)
         })
         .await?;
 
     task::execute_webhook_tasks((*state.clone().into_inner()).clone());
 
-    Ok(Json(ResponseData::ok(MakeDecisionResponse {
-        vendor_result_ids: vec![vendor_result.verification_result_id],
-    })))
+    Ok(Json(ResponseData::ok(MakeDecisionResponse { decision })))
 }
 
 #[derive(Debug, Clone, serde::Deserialize)]
@@ -240,7 +212,7 @@ pub struct ShadowRunRequest {
 
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct ShadowRunResult {
-    decision_status: DecisionStatus, // TODO: add DecisionOutput when merged in
+    decision_status: DecisionStatus,
 }
 
 #[post("/private/protected/risk/shadow_run_vendor_calls_and_decisioning")]
@@ -257,8 +229,8 @@ async fn shadow_run(
         .await??;
     let tid = sv.tenant_id.clone();
     let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config, &state.enclave_client).await?;
-
-    let (requests, vw) = state
+    let wfid = wf.id.clone();
+    let (requests, vw, rules) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let uvw = VaultWrapper::build(conn, VwArgs::Tenant(&sv.id))?;
@@ -282,7 +254,10 @@ async fn shadow_run(
                 })
                 .collect();
 
-            Ok((memory_only_requests, uvw))
+            let (obc, _) = ObConfiguration::get(conn, &wfid)?;
+            let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, &obc.id)?;
+
+            Ok((memory_only_requests, uvw, rules))
         })
         .await?;
 
@@ -310,11 +285,18 @@ async fn shadow_run(
         })
         .last()
         .ok_or(ApiError::from(ApiErrorKind::VendorRequestsFailed))?;
-    let rule_group = KycRuleGroup::default();
-    let rules_output = decision::engine::calculate_decision(vendor_result, vw, rule_group)?;
+
+    let reason_codes =
+        decision::features::risk_signals::parse_reason_codes_from_vendor_result(vendor_result.clone(), &vw)?
+            .kyc
+            .footprint_reason_codes
+            .into_iter()
+            .map(|(frc, _, _)| frc)
+            .collect_vec();
+    let (_, action_triggered) = decision::rule_engine::eval::evaluate_rule_set(rules, &reason_codes, true);
 
     Ok(Json(ResponseData::ok(ShadowRunResult {
-        decision_status: rules_output.decision.decision_status,
+        decision_status: action_triggered.into(),
     })))
 }
 

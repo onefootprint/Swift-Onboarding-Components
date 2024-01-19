@@ -12,7 +12,7 @@ use db::TxnPgConn;
 use feature_flag::FeatureFlagClient;
 use newtypes::{
     DataLifetimeSeqno, DbActor, DecisionStatus, DocumentConfig, DocumentRequestKind, Locked,
-    OnboardingStatus, ReviewReason, WorkflowConfig,
+    OnboardingStatus, ReviewReason, RuleSetResultKind, WorkflowConfig,
 };
 use newtypes::{ScopedVaultId, TenantId, WorkflowId};
 
@@ -183,7 +183,13 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
                 should_execute_rules_for_document_only(&v, &wf)?;
             let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
             // TODO: what's the review strategy for this case?
-            let decision = common::get_decision(conn, risk_signals, &wf, fixture_decision.is_some())?;
+            let decision = common::evaluate_rules(
+                conn,
+                risk_signals,
+                &wf,
+                fixture_decision.is_some(),
+                RuleSetResultKind::WorkflowDecision,
+            )?;
             let decision = if let Some(fixture_decision) = fixture_decision {
                 if execute_rules_for_real_document_decision_only || obc.skip_kyc {
                     decision
