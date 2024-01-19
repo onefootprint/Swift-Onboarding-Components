@@ -1,6 +1,6 @@
 use actix_web::{post, web, web::Json};
 use api_core::auth::custodian::CustodianAuthContext;
-use api_core::auth::protected_auth::ProtectedAuth;
+use api_core::auth::tenant::FirmEmployeeAuthContext;
 use api_core::auth::Either;
 use api_core::errors::ApiError;
 use api_core::errors::{ApiResult, AssertionError};
@@ -32,7 +32,7 @@ pub struct CleanupResponse {
 #[post("/private/cleanup")]
 async fn post(
     state: web::Data<State>,
-    _auth: Either<CustodianAuthContext, ProtectedAuth>,
+    _auth: Either<CustodianAuthContext, FirmEmployeeAuthContext>,
     request: web::Json<Request>,
     // When provided, identifies only sandbox users with the suffix
     sandbox_id: SandboxId,
