@@ -1,5 +1,4 @@
 import { IcoGoogle24 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -37,17 +36,11 @@ const GoogleButton = ({
       testID={testID}
       type={type}
       variant="secondary"
+      prefixIcon={IcoGoogle24}
     >
-      <StyledIcon />
       {children ?? t('components.google-button.text-default')}
     </Button>
   );
 };
-
-const StyledIcon = styled(IcoGoogle24)`
-  ${({ theme }) => css`
-    margin-right: ${theme.spacing[3]};
-  `}
-`;
 
 export default GoogleButton;
