@@ -4,34 +4,9 @@ use super::{
     rule_set::{Rule, RuleEvaluationSummary, RuleSet, RuleSetResult},
     *,
 };
-use crate::decision::{
-    onboarding::{rules::KycRuleExecutionConfig, FeatureSet},
-    rule::RULE_LOG_LINE,
-};
+use crate::decision::{onboarding::FeatureSet, rule::RULE_LOG_LINE};
 use itertools::Itertools;
 use strum::IntoEnumIterator;
-
-pub fn evaluate_onboarding_rule_set<T>(
-    ruleset: RuleSet<T>,
-    rule_input: &T,
-    rule_config: KycRuleExecutionConfig,
-) -> OnboardingEvaluationResult
-where
-    T: FeatureSet + Clone,
-{
-    let evaluated_ruleset = ruleset.evaluate(rule_input, rule_config.allow_stepup);
-    let triggered_action = evaluated_ruleset.action;
-
-    // Log evaluation of a single rule set
-    log_ruleset_evaluation(&evaluated_ruleset, rule_input.vendor_apis());
-
-    OnboardingEvaluationResult {
-        rules_triggered: evaluated_ruleset.triggered_rule_names(),
-        rules_not_triggered: evaluated_ruleset.not_triggered_rule_names(),
-        triggered_action,
-        vendor_apis: rule_input.vendor_apis(),
-    }
-}
 
 pub fn evaluate_reason_code_rules(
     rules: Vec<Rule<Vec<FootprintReasonCode>>>,

@@ -1,11 +1,7 @@
 use std::collections::HashMap;
 
 use super::{
-    features::risk_signals::{parse_reason_codes_from_vendor_result, RiskSignalsForDecision},
-    onboarding::{
-        rules::{KycRuleExecutionConfig, KycRuleGroup},
-        Decision, OnboardingRulesDecisionOutput,
-    },
+    onboarding::{Decision, OnboardingRulesDecisionOutput},
     vendor::{
         make_request::{VerificationRequestWithVendorError, VerificationRequestWithVendorResponse},
         tenant_vendor_control::TenantVendorControl,
@@ -17,7 +13,6 @@ use super::{
 use crate::{
     enclave_client::EnclaveClient,
     errors::{ApiError, ApiErrorKind, ApiResult},
-    utils::vault_wrapper::VaultWrapper,
     State,
 };
 use db::{
@@ -236,30 +231,6 @@ pub async fn make_vendor_requests(
     let results = vendor::make_request::make_vendor_requests(state, tvc, requests, wf_id).await?;
 
     Ok(partition_vendor_errors(results))
-}
-
-/// Legacy codepath only used by private/protected endpoints. To be replaced to use new rules engine soon
-/// Just computes the KYC decision based on a singular kyc vendor result
-pub fn calculate_decision(
-    vendor_result: VendorResult,
-    vw: VaultWrapper,
-    rule_group: KycRuleGroup,
-) -> ApiResult<OnboardingRulesDecisionOutput> {
-    let risk_signals = RiskSignalsForDecision {
-        kyc: Some(parse_reason_codes_from_vendor_result(vendor_result, &vw)?.kyc),
-        ..Default::default()
-    };
-    let decision = rule_group.evaluate(
-        risk_signals,
-        KycRuleExecutionConfig {
-            include_doc: false,
-            document_only: false,
-            skip_kyc: false,
-            allow_stepup: true,
-        },
-    )?;
-
-    decision.final_kyc_decision()
 }
 
 /// Create and save an onboarding decision
