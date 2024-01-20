@@ -19,6 +19,7 @@
     "demos",
     "emails",
     "docs",
+    "auth",
     "@onefootprint/global-constants",
     "@onefootprint/ui",
     "@onefootprint/styled",
