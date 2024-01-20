@@ -8,6 +8,7 @@ import { DEFAULT_PRIVATE_ROUTE } from 'src/config/constants';
 import useSession from 'src/hooks/use-session';
 
 import CleanUpUserForm from './components/clean-up-user-form';
+import CreateSandboxTenantForm from './components/create-sandbox-tenant-form';
 
 type Tool = {
   title: string;
@@ -53,6 +54,16 @@ const Tenants = () => {
       subtitle: 'Delete a vault belonging to an employee and all its data',
       dialogComponent: (
         <CleanUpUserForm formId="tool-form" onClose={handleDialogClose} />
+      ),
+    },
+    {
+      title: 'Create sandbox tenant',
+      subtitle: `Before a sales demo, pre-create a tenant for the target customer's company`,
+      dialogComponent: (
+        <CreateSandboxTenantForm
+          formId="tool-form"
+          onClose={handleDialogClose}
+        />
       ),
     },
   ];
