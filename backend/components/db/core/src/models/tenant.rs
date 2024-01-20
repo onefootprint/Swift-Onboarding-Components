@@ -100,6 +100,7 @@ pub struct NewTenant {
     pub name: String,
     pub public_key: VaultPublicKey,
     pub e_private_key: EncryptedVaultPrivateKey,
+    /// DEPRECATED
     pub workos_id: Option<String>,
     pub logo_url: Option<String>,
     pub sandbox_restricted: bool,

@@ -5,6 +5,7 @@ mod incode;
 mod org;
 mod refingerprint;
 mod risk;
+mod sandbox_tenant;
 mod task;
 mod token_reveal;
 mod workflow;
@@ -31,6 +32,7 @@ pub fn configure(config: &mut web::ServiceConfig) {
         .service(aws_selfie_doc::post)
         .service(refingerprint::post)
         .service(default_rules::add_default_rules)
+        .service(sandbox_tenant::post)
         .service(org::update_business_info)
         .service(org::get_business_info);
 }

@@ -128,6 +128,8 @@ impl AllowSessionUpdate for ParsedFirmEmployeeAssumeAuth {}
 impl FirmEmployeeAssumeAuth {
     fn token_scopes(&self) -> Vec<TenantScope> {
         let extra_permissions_for_user = if self.requested_allow_writes {
+            // To receive an extra permissions, the dashboard must send an explicit header that
+            // shows the user has enabled write mode on the dashboard
             if !self.is_live {
                 // In sandbox mode, all firm employees are allowed to have write access
                 vec![TenantScope::Admin]
