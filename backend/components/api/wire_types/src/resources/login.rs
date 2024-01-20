@@ -3,6 +3,9 @@ use crate::*;
 #[derive(serde::Deserialize, Apiv2Schema)]
 pub struct OrgLoginRequest {
     pub code: String,
+    /// Optionally request to log into the provided tenant, if the user has a rolebinding at this
+    /// tenant.
+    pub request_org_id: Option<TenantId>,
 }
 
 #[derive(serde::Serialize, Apiv2Schema)]

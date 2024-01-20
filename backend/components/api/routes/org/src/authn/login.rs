@@ -16,7 +16,6 @@ use chrono::Duration;
 use db::models::tenant::{NewTenant, Tenant};
 use db::models::tenant_rolebinding::TenantRolebinding;
 use db::models::tenant_user::TenantUser;
-use itertools::Itertools;
 use newtypes::{OrgMemberEmail, TenantScope, WorkosAuthMethod};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use workos::sso::{
@@ -47,7 +46,7 @@ async fn handler(
     state: web::Data<State>,
     request: web::Json<OrgLoginRequest>,
 ) -> actix_web::Result<Json<ResponseData<OrgLoginResponse>>, ApiError> {
-    let code = request.into_inner().code;
+    let OrgLoginRequest { code, request_org_id } = request.into_inner();
 
     let GetProfileAndTokenResponse { profile, .. } = &state
         .workos_client
@@ -62,7 +61,11 @@ async fn handler(
 
     let profile2 = profile.clone();
     let auth_method = get_auth_method(&profile.connection_type)?;
-    // Get all matching tenant rolebindings.
+
+    //
+    // Get all tenant rolebindings associated with this user
+    //
+
     let (user, matching_rolebindings) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -74,12 +77,15 @@ async fn handler(
             Ok((user, matching_rolebindings))
         })
         .await?;
-    let matching_rolebindings = matching_rolebindings.into_iter().map(|(id, _)| id).collect_vec();
+
+    //
+    // Create a new tenant if there are no rolebindings
+    //
 
     let (matching_rolebindings, created_new_tenant) = if !matching_rolebindings.is_empty() {
-        (matching_rolebindings, false)
-    } else {
-        // Find or create the tenant
+        let rbs = matching_rolebindings.into_iter().map(|(rb, _)| rb).collect();
+        (rbs, false)
+    } else if request_org_id.is_none() {
         let (tenant, created_new_tenant) = find_or_create_tenant(&state, profile).await?;
         // If there are no rolebindings for this user, make one.
         // The new user will be associated with the tenant that owns the email address's domain OR
@@ -89,49 +95,68 @@ async fn handler(
             .db_pool
             .db_transaction(move |conn| TenantRolebinding::get_or_create_login(conn, user_id, tenant.id))
             .await?;
-        (vec![rb.id], created_new_tenant)
+        (vec![(rb)], created_new_tenant)
+    } else {
+        (vec![], false)
     };
 
-    let (session, requires_onboarding, user, tenant, is_first_login) = if matching_rolebindings.len() == 1 {
-        // If one rolebinding, log into it and create a TenantUser session
-        let rolebinding_id = matching_rolebindings
-            .into_iter()
-            .next()
-            .ok_or(TenantError::TenantUserDoesNotExist)?;
+    //
+    // Determine if there's only one rolebinding to log into
+    //
 
-        // Log into the user, updating the last_login_at and name (if new)
+    let single_rb = if let Some(org_id) = request_org_id {
+        // If a specific tenant ID was requested, only log into that tenant
+        matching_rolebindings
+            .into_iter()
+            .find(|rb| rb.tenant_id == org_id)
+    } else {
+        // If there's only one rolebinding for this user, log into it
+        (matching_rolebindings.len() == 1)
+            .then_some(matching_rolebindings.into_iter().next())
+            .flatten()
+    };
+
+    //
+    // Compose the with a token that has either logged into the single rolebinding OR with a token
+    // that allows selecting amongst a list of available rolebindings
+    //
+
+    let data = if let Some(rb) = single_rb {
+        // Log into the single user, updating the last_login_at and name (if new)
         let ((tenant_user, rb, tenant_role, tenant), is_first_login) = state
             .db_pool
-            .db_transaction(move |conn| TenantRolebinding::login(conn, &rolebinding_id))
+            .db_transaction(move |conn| TenantRolebinding::login(conn, &rb.id))
             .await?;
 
-        let session_data = TenantRbSession::create(&tenant, rb.id.clone(), auth_method)?.into();
-
+        let session = TenantRbSession::create(&tenant, rb.id.clone(), auth_method)?.into();
+        let auth_token = AuthSession::create(&state, session, Duration::days(5)).await?;
         let requires_onboarding = tenant_role.scopes.contains(&TenantScope::Admin)
             && (tenant.website_url.is_none() || tenant.company_size.is_none());
-        let user = Some(OrganizationMember::from_db((tenant_user, rb, tenant_role)));
-        let tenant = Some(Organization::from_db(tenant));
-        (session_data, requires_onboarding, user, tenant, is_first_login)
+        OrgLoginResponse {
+            auth_token,
+            created_new_tenant,
+            is_first_login,
+            requires_onboarding,
+            user: Some(OrganizationMember::from_db((tenant_user, rb, tenant_role))),
+            tenant: Some(Organization::from_db(tenant)),
+        }
     } else {
-        // If multiple users, create a WorkOsSession that just shows the email that was proven to be owned.
-        // This token lets the user choose which tenant they'd like to auth as. Only give them 10
-        // mins to do so.
-        // TODO one day support footprint firm employees
-        let session_data = AuthSessionData::WorkOs(WorkOsSession {
+        // If not exactly one rolebinding, create a WorkOsSession that just shows the email that
+        // was proven to be owned. This lets the user choose which tenant they'd like to log into
+        let session = AuthSessionData::WorkOs(WorkOsSession {
             tenant_user_id: user.id,
             auth_method,
         });
-        (session_data, false, None, None, false)
-    };
-    // Save tenant login in session data into the DB
-    let auth_token = AuthSession::create(&state, session, Duration::days(5)).await?;
-    let data = OrgLoginResponse {
-        auth_token,
-        created_new_tenant,
-        is_first_login,
-        requires_onboarding,
-        user,
-        tenant,
+        let auth_token = AuthSession::create(&state, session, Duration::days(5)).await?;
+        // Save tenant login in session data into the DB
+        OrgLoginResponse {
+            auth_token,
+            created_new_tenant,
+            is_first_login: false,
+            requires_onboarding: false,
+            user: None,
+            tenant: None,
+        }
     };
     ResponseData { data }.json()
 }

@@ -156,16 +156,13 @@ impl TenantRolebinding {
     /// Get the list of active TenantRolebindingIds for the provided user.
     /// Could be multiple if a user has been invited to multiple tenants.
     #[tracing::instrument("TenantRolebinding::list_by_user", skip_all)]
-    pub fn list_by_user(
-        conn: &mut PgConn,
-        user_id: &TenantUserId,
-    ) -> DbResult<Vec<(TenantRolebindingId, Tenant)>> {
+    pub fn list_by_user(conn: &mut PgConn, user_id: &TenantUserId) -> DbResult<Vec<(Self, Tenant)>> {
         use db_schema::schema::tenant;
         let results = tenant_rolebinding::table
             .inner_join(tenant::table)
             .filter(tenant_rolebinding::tenant_user_id.eq(user_id))
             .filter(tenant_rolebinding::deactivated_at.is_null())
-            .select((tenant_rolebinding::id, tenant::all_columns))
+            .select((tenant_rolebinding::all_columns, tenant::all_columns))
             .get_results(conn)?;
         Ok(results)
     }
