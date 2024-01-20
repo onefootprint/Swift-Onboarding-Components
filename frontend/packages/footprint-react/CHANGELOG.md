@@ -1,5 +1,13 @@
 # @onefootprint/footprint-react
 
+## 6.1.1
+
+### Patch Changes
+
+- a14729deb: Add foreign language support and bug fixes
+- Updated dependencies [a14729deb]
+  - @onefootprint/footprint-js@3.8.3
+
 ## 6.1.0
 
 ### Minor Changes
