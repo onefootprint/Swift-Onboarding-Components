@@ -63,6 +63,7 @@ impl AuthSession {
         Ok(auth_token)
     }
 
+    #[tracing::instrument(skip_all)]
     pub fn create_sync(
         conn: &mut PgConn,
         session_sealing_key: &ScopedSealingKey,
@@ -70,6 +71,8 @@ impl AuthSession {
         expires_in: Duration,
     ) -> DbResult<(SessionAuthToken, Session)> {
         let token = SessionAuthToken::generate();
+        let auth_token_hash = token.id();
+        tracing::info!(%auth_token_hash, "Token created");
         let expires_at = Utc::now() + expires_in;
         let kind = data.session_kind();
         let sealed_data = data.seal(session_sealing_key)?;
