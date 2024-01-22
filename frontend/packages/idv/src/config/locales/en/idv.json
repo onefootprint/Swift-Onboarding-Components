@@ -32,6 +32,10 @@
           }
         }
       },
+      "footer": {
+        "whats-this": "What's this?",
+        "privacy": "Privacy"
+      },
       "cta": {
         "continue": "Continue",
         "save": "Save",

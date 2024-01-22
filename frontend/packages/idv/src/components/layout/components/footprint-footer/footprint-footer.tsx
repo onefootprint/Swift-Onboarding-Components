@@ -1,7 +1,8 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import styled, { css } from '@onefootprint/styled';
 import { media, Stack, Typography } from '@onefootprint/ui';
-import React, { useEffect } from 'react';
+import i18n from 'i18next';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useResizeObserver from 'use-resize-observer';
 
@@ -9,6 +10,12 @@ import { FOOTPRINT_FOOTER_ID } from '../../constants';
 import { useLayoutOptions } from '../layout-options-provider';
 import SecuredByFootprint from '../secured-by-footprint';
 import FooterActions from './components/footer-actions';
+import type { Language } from './components/language-select';
+import LanguageSelect from './components/language-select';
+import {
+  languageBaseList,
+  LanguageCodes,
+} from './components/language-select/language-select-types';
 
 type FootprintFooterProps = {
   hideOnDesktop?: boolean;
@@ -30,18 +37,23 @@ const FootprintFooter = ({
     box: 'border-box',
   });
 
+  const [activeLanguage, setActiveLanguage] = useState<Language>(
+    languageBaseList[0],
+  );
+
   useEffect(() => {
     if (!footerVisible) updateFooterOptions({ height: 0 });
     else updateFooterOptions({ height: height ?? 0 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [height]);
 
-  // const handleChangeLanguage = () => {
-  //   const changeTo = i18n.language === 'en' ? 'es' : 'en';
-  //   // const allLanguages = i18n.languages; // TODO: uncomment to get all languages
-  //   i18n.changeLanguage(changeTo);
-  //   document.documentElement.setAttribute('lang', changeTo);
-  // };
+  const handleChangeLanguage = () => {
+    const changeTo =
+      i18n.language === LanguageCodes.EN ? LanguageCodes.ES : LanguageCodes.EN;
+    i18n.changeLanguage(changeTo);
+    document.documentElement.setAttribute('lang', changeTo);
+    setActiveLanguage(languageBaseList.find(lang => lang.code === changeTo)!);
+  };
 
   return (
     <FootprintFooterContainer
@@ -53,11 +65,12 @@ const FootprintFooter = ({
     >
       <SecuredByFootprint />
       <LinksContainer as="ul" align="center" justify="center" gap={3}>
-        {/* <li>
-          <Button size="compact" onClick={handleChangeLanguage}>
-            Lang
-          </Button>
-        </li> */}
+        <li>
+          <LanguageSelect
+            onLanguageChange={handleChangeLanguage}
+            activeLanguage={activeLanguage}
+          />
+        </li>
         <li>
           <WhatsThisButton onClick={onWhatsThisClick}>
             <Typography variant="caption-1" color="secondary" as="span">
@@ -78,7 +91,11 @@ const FootprintFooter = ({
         </li>
       </LinksContainer>
       <ActionsWrapper>
-        <FooterActions onWhatsThisClick={onWhatsThisClick} />
+        <FooterActions
+          onWhatsThisClick={onWhatsThisClick}
+          onLanguageChange={handleChangeLanguage}
+          activeLanguage={activeLanguage}
+        />
       </ActionsWrapper>
     </FootprintFooterContainer>
   );

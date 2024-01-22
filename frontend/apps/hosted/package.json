@@ -37,6 +37,7 @@
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
     "@radix-ui/react-popover": "^1.0.7",
+    "@radix-ui/react-select": "^2.0.0",
     "@tanstack/react-query": "^4.35.7",
     "launchdarkly-react-client-sdk": "^3.0.9",
     "logrocket": "^5.0.1",

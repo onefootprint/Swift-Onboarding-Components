@@ -190,6 +190,8 @@ export { default as IcoJcb16 } from './ico-jcb-colored-16';
 export { default as IcoJcb24 } from './ico-jcb-colored-24';
 export { default as IcoKey16 } from './ico-key-16';
 export { default as IcoKey24 } from './ico-key-24';
+export { default as IcoLang16 } from './ico-lang-16';
+export { default as IcoLang24 } from './ico-lang-24';
 export { default as IcoLaptop16 } from './ico-laptop-16';
 export { default as IcoLaptop24 } from './ico-laptop-24';
 export { default as IcoLaptop40 } from './ico-laptop-40';

@@ -9,7 +9,7 @@
     },
     "components": {
       "layout": {
-        "secured-by-footprint": "Sesión resgardada por Footprint",
+        "secured-by-footprint": "Resguardado por Footprint",
         "sandbox-banner": "Modo de prueba",
         "privacy": "Privacidad",
         "whats-this": "¿Qué es esto?",
@@ -31,6 +31,10 @@
             }
           }
         }
+      },
+      "footer": {
+        "whats-this": "¿Qué es esto?",
+        "privacy": "Privacidad"
       },
       "cta": {
         "continue": "Continuar",
