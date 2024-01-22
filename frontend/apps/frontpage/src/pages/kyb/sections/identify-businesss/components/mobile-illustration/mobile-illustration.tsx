@@ -1,12 +1,18 @@
-import styled, { css } from '@onefootprint/styled';
-import { media } from '@onefootprint/ui';
+import styled from '@onefootprint/styled';
+import { Grid, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 
 const MobileIllustration = () => (
   <Container>
-    <Grid>
-      <ImageContainer data-grid-area="hey-there">
+    <Grid.Container
+      columns={['1fr']}
+      rows={['auto']}
+      templateAreas={['hey-there', 'basic-data', 'bos', 'business-address']}
+      gap={5}
+      maxWidth="100%"
+    >
+      <ImageContainer gridArea="hey-there">
         <Image
           src="/kyb/verify-businesses/hey-there.png"
           alt="Basic Data"
@@ -14,7 +20,7 @@ const MobileIllustration = () => (
           height={265}
         />
       </ImageContainer>
-      <ImageContainer data-grid-area="basic-data">
+      <ImageContainer gridArea="basic-data">
         <Image
           src="/kyb/verify-businesses/basic-data.png"
           alt="Basic Data"
@@ -22,7 +28,7 @@ const MobileIllustration = () => (
           height={358.75}
         />
       </ImageContainer>
-      <ImageContainer data-grid-area="bos">
+      <ImageContainer gridArea="bos">
         <Image
           src="/kyb/verify-businesses/bos.png"
           alt="Residential Address"
@@ -30,16 +36,15 @@ const MobileIllustration = () => (
           height={391}
         />
       </ImageContainer>
-      <ImageContainer data-grid-area="business-address">
+      <ImageContainer gridArea="business-address">
         <Image
           src="/kyb/verify-businesses/business-address.png"
           alt="App Clip"
           width={336.8}
           height={497.7}
-          data-grid-area="business-address"
         />
       </ImageContainer>
-    </Grid>
+    </Grid.Container>
   </Container>
 );
 
@@ -62,20 +67,12 @@ const Container = styled.div`
   `}
 `;
 
-const Grid = styled.div``;
-
-const ImageContainer = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacing[5]};
-
-    img {
-      object-fit: contain;
-      width: 100%;
-      height: 100%;
-    }
-  `}
+const ImageContainer = styled(Grid.Item)`
+  img {
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 export default MobileIllustration;

@@ -11,13 +11,13 @@ import MobileIllustration from './components/mobile-illustration';
 const IdentifyBusinesses = () => {
   const { t } = useTranslation('pages.kyb.identify-businesses');
   return (
-    <TimelineLayout icon={IcoStore24}>
-      <Content>
+    <Content>
+      <TimelineLayout icon={IcoStore24}>
         <TimelineTitle title={t('title')} subtitle={t('subtitle')} />
         <DesktopIllustration />
         <MobileIllustration />
-      </Content>
-    </TimelineLayout>
+      </TimelineLayout>
+    </Content>
   );
 };
 
@@ -27,6 +27,8 @@ const Content = styled.div`
     flex-direction: column;
     gap: ${theme.spacing[10]};
     margin-bottom: ${theme.spacing[10]};
+    width: 100%;
+    overflow: hidden;
   `}
 `;
 export default IdentifyBusinesses;

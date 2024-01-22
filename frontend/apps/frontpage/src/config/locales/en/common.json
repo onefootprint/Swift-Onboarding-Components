@@ -3,6 +3,16 @@
     "errors": {}
   },
   "components": {
+    "developer-experience": {
+      "title": "Developer experience like no other",
+      "subtitle": "Just five lines of code, Footprint is quick and easy to integrate into your product",
+      "see-documentation": "See documentation",
+      "tabs": {
+        "configuration": "Configuration",
+        "customization": "Customization",
+        "documentation": "Documentation"
+      }
+    },
     "penguin-banner": {
       "home": {
         "title": "Onboard more customers and enjoy peace of mind. Today.",
@@ -517,17 +527,6 @@
           "no-download": "No download required."
         }
       },
-      "developer-experience": {
-        "title": "Developer experience like no other",
-        "subtitle": "Just five lines of code, Footprint is quick and easy to integrate into your product",
-        "see-documentation": "See documentation",
-        "sections": {
-          "aria-label": "Types of experiences selector",
-          "configuration": "Configuration",
-          "customization": "Customization",
-          "documentation": "Documentation"
-        }
-      },
       "storage": {
         "title": "Securely store customer data",
         "subtitle": "Footprint automatically vaults PII during onboarding, meaning you never touch sensitive data.",
@@ -566,16 +565,6 @@
         "title": "Securely store their data",
         "subtitle": "We securely vault identity data, payment card data, and custom key-value data.",
         "linke": "Learn more"
-      },
-      "developer-experience": {
-        "title": "Developer experience like no other",
-        "subtitle": "Just five lines of code, Footprint is quick and easy to integrate into your product",
-        "see-documentation": "See documentation",
-        "tabs": {
-          "configuration": "Configuration",
-          "customization": "Customization",
-          "documentation": "Documentation"
-        }
       },
       "banner": {
         "title": "Onboard more customers and enjoy peace of mind. Today.",

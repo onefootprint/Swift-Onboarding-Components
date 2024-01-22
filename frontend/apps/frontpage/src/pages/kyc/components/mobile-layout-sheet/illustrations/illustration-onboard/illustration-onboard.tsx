@@ -1,6 +1,5 @@
 import { IcoBolt24, IcoUser24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 import React from 'react';
 
@@ -12,7 +11,7 @@ const IllustrationOnboard = () => {
     <Container>
       <PhoneContainer width={PHONE_WIDTH} height={PHONE_HEIGHT}>
         <PhoneFrameImage
-          src="/kyc/sticky-rail/iphone.png"
+          src="/iphone.png"
           alt=""
           width={PHONE_WIDTH}
           height={PHONE_HEIGHT}
@@ -92,7 +91,7 @@ const PhoneFrameImage = styled(Image)`
   z-index: 2;
 `;
 
-const Circle = styled(motion.div)<{ diameter: number }>`
+const Circle = styled.div<{ diameter: number }>`
   ${({ diameter, theme }) => css`
     width: ${diameter}px;
     height: ${diameter}px;
@@ -105,7 +104,7 @@ const Circle = styled(motion.div)<{ diameter: number }>`
   `}
 `;
 
-const IconContainer = styled(motion.div)`
+const IconContainer = styled.div`
   ${({ theme }) => css`
     position: absolute;
     width: ${theme.spacing[8]};

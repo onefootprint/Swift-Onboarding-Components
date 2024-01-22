@@ -1,7 +1,7 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
-import { Button, Container, createFontStyles } from '@onefootprint/ui';
+import { Button, Container, createFontStyles, media } from '@onefootprint/ui';
 import Link from 'next/link';
 import React, { useState } from 'react';
 /* eslint-disable import/no-extraneous-dependencies */
@@ -51,7 +51,11 @@ const SectionContainer = styled.div`
     align-items: center;
     justify-content: center;
     gap: ${theme.spacing[8]};
-    padding: ${theme.spacing[14]} 0 ${theme.spacing[12]} 0;
+    padding: ${theme.spacing[10]} 0 ${theme.spacing[12]} 0;
+
+    ${media.greaterThan('md')`
+      padding: ${theme.spacing[11]} 0 ${theme.spacing[13]} 0;
+    `}
   `}
 `;
 

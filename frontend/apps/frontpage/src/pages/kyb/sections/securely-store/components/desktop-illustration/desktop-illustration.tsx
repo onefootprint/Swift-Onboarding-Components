@@ -9,7 +9,7 @@ const DesktopIllustration = () => {
   return (
     <ImageContainer>
       <Image
-        src="/kyb/securely-store/business-tab.png"
+        src="/kyb/securely-store/kyb.png"
         width={1037}
         height={739}
         alt={t('title')}

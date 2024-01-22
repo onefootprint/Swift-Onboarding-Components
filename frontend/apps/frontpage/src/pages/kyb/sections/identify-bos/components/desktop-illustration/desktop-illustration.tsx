@@ -41,10 +41,9 @@ const Grid = styled.div`
       padding-right: ${theme.spacing[9]};
       grid-template-rows: 1fr;
       gap: ${theme.spacing[6]};
-      mask: linear-gradient(180deg, black 0%, black 60%, transparent 90%);
+      mask: linear-gradient(180deg, black 0%, black 75%, transparent 100%);
       mask-mode: alpha;
-      height: 650px;
-      overflow: hidden;
+      height: 660px;
       align-items: center;
       justify-content: center;
       grid-template-columns: 1fr 1fr 1fr;

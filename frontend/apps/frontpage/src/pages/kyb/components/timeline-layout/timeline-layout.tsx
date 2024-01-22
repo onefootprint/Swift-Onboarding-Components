@@ -1,6 +1,6 @@
 import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Container } from '@onefootprint/ui';
+import { Container, Grid } from '@onefootprint/ui';
 import React from 'react';
 import SectionIcon from 'src/components/section-icon';
 
@@ -10,30 +10,25 @@ type TimelineLayoutProps = {
 };
 
 const TimelineLayout = ({ icon, children }: TimelineLayoutProps) => (
-  <StyledContainer>
-    <Line>
-      <SectionIcon icon={icon} />
-    </Line>
-    <Content>{children}</Content>
-  </StyledContainer>
+  <Container>
+    <Grid.Container
+      columns={['40px', '1fr']}
+      gap={7}
+      paddingBottom={7}
+      templateAreas={['line content']}
+    >
+      <Line gridArea="line" align="flex-start" justify="center">
+        <SectionIcon icon={icon} />
+      </Line>
+      <Grid.Item gridArea="content" direction="column" gap={7} maxWidth="100%">
+        {children}
+      </Grid.Item>
+    </Grid.Container>
+  </Container>
 );
 
-const StyledContainer = styled(Container)`
+const Line = styled(Grid.Item)`
   ${({ theme }) => css`
-    display: grid;
-    grid-template-columns: ${theme.spacing[9]} 1fr;
-    grid-column-gap: ${theme.spacing[7]};
-    padding-bottom: ${theme.spacing[7]};
-    grid-template-areas: 'line content';
-  `}
-`;
-
-const Line = styled.div`
-  ${({ theme }) => css`
-    grid-area: line;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
     position: relative;
 
     &::after {
@@ -51,11 +46,6 @@ const Line = styled.div`
       );
     }
   `}
-`;
-
-const Content = styled.div`
-  grid-area: content;
-  padding-top: 6px;
 `;
 
 export default TimelineLayout;

@@ -5,16 +5,13 @@ import {
   Container,
   LinkButton,
   media,
+  Stack,
   Tab,
   Tabs,
   Typography,
 } from '@onefootprint/ui';
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
-
-import settingsImage from './images/settings.png';
-import userDetailsImage from './images/user-details.png';
-import usersImage from './images/users.png';
+import React, { useState } from 'react';
 
 const StoreData = () => {
   const { t } = useTranslation('pages.kyc.storage');
@@ -22,32 +19,24 @@ const StoreData = () => {
     {
       label: t('sections.users'),
       value: 'users',
-      image: usersImage,
     },
     {
       label: t('sections.user-details'),
       value: 'user-details',
-      image: userDetailsImage,
     },
     {
       label: t('sections.settings'),
       value: 'settings',
-      image: settingsImage,
     },
   ];
 
   const [segment, setSegment] = useState(options[0].value);
-  const [image, setImage] = useState(options[0].image);
+  const [imageSrc, setImageSrc] = useState(`/kyc/store-data/${segment}.png`);
 
   const handleChange = (value: string) => {
     setSegment(value);
+    setImageSrc(`/kyc/store-data/${value}.png`);
   };
-
-  useEffect(() => {
-    const foundOption = options.find(option => option.value === segment);
-    setImage(foundOption ? foundOption.image : options[0].image);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [segment]);
 
   return (
     <SectionContainer>
@@ -80,12 +69,11 @@ const StoreData = () => {
       </Tabs>
       <ImageContainer>
         <Image
-          src={image}
+          src={imageSrc}
           alt={segment}
           height={838}
           width={1280}
           priority
-          placeholder="blur"
         />
       </ImageContainer>
     </SectionContainer>
@@ -121,18 +109,37 @@ const SectionContainer = styled(Container)`
   `}
 `;
 
-const ImageContainer = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  img {
+const ImageContainer = styled(Stack)`
+  ${({ theme }) => css`
+    position: relative;
+    overflow: hidden;
     width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-`;
+    height: 360px;
+    background-color: ${theme.backgroundColor.secondary};
+    border-radius: ${theme.borderRadius.default};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
 
+    img {
+      position: absolute;
+      top: ${theme.spacing[5]};
+      left: ${theme.spacing[5]};
+      transform: scale(0.5);
+      transform-origin: top left;
+    }
+
+    ${media.greaterThan('md')`
+      height: auto;
+      background-color: transparent;  
+      border: none;
+
+      img {
+        position: relative;
+        transform: scale(1);
+        width: 100%;  
+        top: 0;
+        left: 0;  
+      }
+    `}
+  `}
+`;
 export default StoreData;
