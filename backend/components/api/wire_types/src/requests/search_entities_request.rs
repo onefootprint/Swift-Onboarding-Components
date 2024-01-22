@@ -28,6 +28,13 @@ pub struct SearchUsersRequest {
     /// Deprecated
     #[openapi(skip)]
     pub search: Option<PiiString>,
-    /// filter users by an external id
+    /// Filter users by an external id
+    pub external_id: Option<ExternalId>,
+}
+
+#[derive(Deserialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct ModernSearchRequest {
+    /// Filter users by an external id
     pub external_id: Option<ExternalId>,
 }

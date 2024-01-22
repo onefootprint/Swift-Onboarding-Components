@@ -9,6 +9,92 @@
         }
     ],
     "paths": {
+        "/businesses": {
+            "get": {
+                "tags": [
+                    "Businesses",
+                    "Preview"
+                ],
+                "description": "This is a preview API and may actively change. We will give notice before making backwards-incompatible changes.\nGet the list of businesses",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "cursor",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page_size",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "style": "form"
+                    },
+                    {
+                        "in": "query",
+                        "name": "external_id",
+                        "description": "Filter users by an external id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "form"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "",
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/LiteUser"
+                                            }
+                                        },
+                                        "meta": {
+                                            "description": "Metadata required for a cursor-paginated response.",
+                                            "type": "object",
+                                            "properties": {
+                                                "count": {
+                                                    "example": 10000,
+                                                    "description": "The total number of results.",
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                },
+                                                "next": {
+                                                    "example": 1234,
+                                                    "description": "The `cursor` parameter to provide in order to request the next page of results.",
+                                                    "type": "integer",
+                                                    "format": "int64"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Secret API Key": []
+                    }
+                ]
+            }
+        },
         "/businesses/{fp_id}/kyb": {
             "post": {
                 "tags": [
@@ -117,7 +203,7 @@
                     {
                         "in": "query",
                         "name": "external_id",
-                        "description": "filter users by an external id",
+                        "description": "Filter users by an external id",
                         "schema": {
                             "type": "string"
                         },

@@ -23,6 +23,7 @@ pub async fn post(
     insight: InsightHeaders,
     idempotency_id: IdempotencyId,
     sandbox_id: SandboxId,
+    external_id: ExternalId,
     root_span: RootSpan,
 ) -> ApiResult<ResponseData<api_wire_types::LiteUser>> {
     let result = create_non_portable_vault(
@@ -32,7 +33,7 @@ pub async fn post(
         insight,
         idempotency_id,
         sandbox_id,
-        ExternalId(None), // for now businesss don't support external ids
+        external_id,
         VaultKind::Business,
         root_span,
     )

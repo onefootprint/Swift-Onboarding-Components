@@ -1,5 +1,6 @@
 import pytest
-from tests.utils import post, patch
+from tests.utils import _gen_random_sandbox_id, post, patch, get
+from tests.headers import ExternalId
 
 
 @pytest.mark.parametrize(
@@ -53,3 +54,38 @@ def test_data_validation(tenant, key, value, expected_error):
     assert body["error"]["message"][key] == expected_error
     # Validate endpoint should also fail
     post(f"entities/{fp_id}/vault/validate", data, tenant.sk.key, status_code=400)
+
+
+def test_external_id(tenant, sandbox_tenant):
+    external_id = f"my_cus_id_{_gen_random_sandbox_id()}"
+    body = post("businesses/", None, tenant.sk.key, ExternalId(external_id))
+    fp_id = body["id"]
+    assert body["external_id"] == external_id
+
+    # test fetching the user by the external id
+    body = get(f"businesses/?external_id={external_id}", None, tenant.sk.key)
+    print(body)
+    assert body["data"][0]["id"] == fp_id
+    assert body["data"][0]["external_id"] == external_id
+
+    # test no failure creating the same user
+    body = post("businesses/", None, tenant.sk.key, ExternalId(external_id))
+    assert body["id"] == fp_id
+    assert body["external_id"] == external_id
+
+    # Cannot provide data alongisde external ID since result would be undefined
+    data = {"id.dob": "1998-12-25"}
+    post("businesses/", data, tenant.sk.key, ExternalId(external_id), status_code=400)
+
+    # Can use the same external ID at another tenant to get a different vault
+    body = post("businesses/", None, sandbox_tenant.sk.key, ExternalId(external_id))
+    assert body["id"] != fp_id
+
+    invalid_id_too_short = ExternalId("1234")
+    post(
+        "businesses/",
+        None,
+        sandbox_tenant.sk.key,
+        invalid_id_too_short,
+        status_code=400,
+    )
