@@ -88,12 +88,7 @@ const VaultProxyIllustration = () => (
 );
 
 const StyledContainer = styled(Container)`
-  mask: radial-gradient(
-    100% 50% at 50% 50%,
-    #fff 0%,
-    transparent 80%,
-    transparent 100%
-  );
+  mask: radial-gradient(50% 50% at 50% 50%, black 0%, transparent 100%);
   mask-mode: alpha;
   position: relative;
 `;

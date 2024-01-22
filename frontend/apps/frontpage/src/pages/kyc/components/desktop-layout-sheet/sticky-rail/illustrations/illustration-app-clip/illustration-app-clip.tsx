@@ -70,12 +70,7 @@ const IllustrationAppClip = ({ scroll }: IllustrationAppClipProps) => {
   return (
     <Container style={{ opacity }}>
       <PhoneContainer>
-        <PhoneFrame
-          src="/kyc/sticky-rail/iphone.png"
-          alt=""
-          width={375}
-          height={812}
-        />
+        <PhoneFrame src="/iphone.png" alt="" width={375} height={812} />
         <BackgroundPhone
           src="/kyc/sticky-rail/background.png"
           alt=""

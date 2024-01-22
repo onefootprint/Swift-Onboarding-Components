@@ -98,12 +98,7 @@ const MobileTimeline = styled.div`
   height: 320px;
   width: 100%;
   position: relative;
-  mask: radial-gradient(
-    60% 100% at 50% 0%,
-    black 0%,
-    black 90%,
-    transparent 100%
-  );
+  mask: radial-gradient(100% 100% at 0% 0%, black 0%, transparent 100%);
   mask-mode: alpha;
 
   img {

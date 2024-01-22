@@ -19,17 +19,10 @@ const DesktopMap = () => (
     <PlacemarkContainer>
       <Placemark zIndex={2} />
       <Wave
-        initialDiameter={20}
+        initialDiameter={80}
         finalDiameter={240}
-        duration={10}
+        duration={6}
         delay={0}
-        zIndex={1}
-      />
-      <Wave
-        initialDiameter={20}
-        finalDiameter={240}
-        duration={10}
-        delay={2}
         zIndex={0}
       />
     </PlacemarkContainer>

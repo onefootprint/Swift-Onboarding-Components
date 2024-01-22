@@ -32,7 +32,7 @@ const ToggleButton = ({
   >
     <Sparkles color="white">
       <StyledButton>
-        <SectionTitle variant="display-1">{children}</SectionTitle>
+        <SectionTitle variant="display-2">{children}</SectionTitle>
       </StyledButton>
     </Sparkles>
     <Border />
