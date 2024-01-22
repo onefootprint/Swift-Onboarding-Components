@@ -25,6 +25,7 @@ const useCountdown = (
 
   const clearCounter = () => {
     if (interval) {
+      // @ts-ignore-error: Argument of type 'Timer' is not assignable to parameter of type 'number'.
       clearInterval(interval);
       interval = null;
     }

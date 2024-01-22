@@ -119,8 +119,8 @@ const UserRouter = ({ onDone }: UserRouterProps): JSX.Element | null => {
   if (state.matches('notFoundUser')) {
     return (
       <Notification
-        title={t('notification.404-token-title')}
-        subtitle={t('notification.404-token-description')}
+        title={t('notification.404-user-title')}
+        subtitle={t('notification.404-user-description')}
       />
     );
   }

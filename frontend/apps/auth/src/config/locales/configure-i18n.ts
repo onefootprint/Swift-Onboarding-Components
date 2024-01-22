@@ -1,16 +1,50 @@
 import i18next from 'i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
+import HttpBackend from 'i18next-http-backend';
 import { initReactI18next } from 'react-i18next';
 
-import en from './english.json';
+const IS_BROWSER = typeof window !== 'undefined';
 
 const configureI18n = () => {
-  const i18nOptions = {
-    lng: 'en',
-    interpolation: { escapeValue: false },
-    resources: { en: { translation: en } },
-  };
+  i18next
+    .use(HttpBackend)
+    .use(LanguageDetector)
+    .use(initReactI18next)
+    .init({
+      debug: process.env.NODE_ENV === 'development',
+      defaultNS: 'auth',
+      ns: ['auth'],
+      interpolation: { escapeValue: false },
+      fallbackLng: 'en',
+      supportedLngs: ['en', 'es'],
+      backend: IS_BROWSER
+        ? {
+            loadPath: '/locales/{{lng}}/{{ns}}.json',
+            requestOptions: {
+              cache: 'default',
+              credentials: 'same-origin',
+              mode: 'no-cors',
+            },
+          }
+        : undefined,
+      detection: {
+        lookupQuerystring: 'lng',
+        order: ['querystring', 'navigator'],
+      },
+      react: {
+        bindI18n: 'languageChanged',
+        bindI18nStore: '',
+        useSuspense: false,
+      },
+    });
 
-  i18next.use(initReactI18next).init(i18nOptions);
+  i18next.services.formatter?.add(
+    'capitalize',
+    value => `${value.charAt(0).toUpperCase()}${value.slice(1)}`,
+  );
+
+  i18next.services.formatter?.add('allCaps', value => value.toUpperCase());
+
   return i18next;
 };
 
