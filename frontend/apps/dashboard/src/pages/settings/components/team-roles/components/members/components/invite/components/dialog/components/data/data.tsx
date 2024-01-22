@@ -2,9 +2,10 @@ import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { SelectOption } from '@onefootprint/ui';
-import { Box } from '@onefootprint/ui';
+import { Box, Checkbox } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
+import useSession from 'src/hooks/use-session';
 
 import type { Invitation } from '../../dialog.types';
 import AddButton from './components/add-button';
@@ -19,17 +20,22 @@ export type DataProps = {
 
 type FormData = {
   invitations: { email: string; role: SelectOption }[];
+  omitEmailInvite: boolean;
 };
 
 const Data = ({ roles, defaultRole, onSubmit }: DataProps) => {
   const { t } = useTranslation('pages.onboarding.invite');
   const [animate] = useAutoAnimate<HTMLFormElement>();
+  const {
+    data: { user },
+  } = useSession();
   const methods = useForm({
     defaultValues: {
       invitations: [{ email: '', role: defaultRole }],
+      omitEmailInvite: !!user?.isFirmEmployee,
     },
   });
-  const { handleSubmit, control, formState } = methods;
+  const { handleSubmit, control, formState, register } = methods;
   const { fields, append } = useFieldArray({
     control,
     name: 'invitations',
@@ -49,6 +55,7 @@ const Data = ({ roles, defaultRole, onSubmit }: DataProps) => {
         email: invite.email,
         roleId: invite.role.value,
         redirectUrl: `${window.location.origin}/auth`,
+        omitEmailInvite: formData.omitEmailInvite,
       }));
     onSubmit(invitations);
   };
@@ -65,8 +72,16 @@ const Data = ({ roles, defaultRole, onSubmit }: DataProps) => {
             <InviteFields index={index} key={field.id} roles={roles} />
           ))}
         </Form>
+        <AddButton onClick={handleAddMore} />
+        {user?.isFirmEmployee && (
+          <Box marginTop={5}>
+            <Checkbox
+              label="Omit sending email invite"
+              {...register(`omitEmailInvite`, {})}
+            />
+          </Box>
+        )}
       </FormProvider>
-      <AddButton onClick={handleAddMore} />
       {shouldShowError && <Error>{t('form.errors.invalid')}</Error>}
     </Box>
   );

@@ -47,6 +47,7 @@ describe('<Data />', () => {
         email: 'johnny@acme.com',
         redirectUrl: 'http://localhost/auth',
         roleId: 'org_role_abc1234',
+        omitEmailInvite: false,
       },
     ]);
   });

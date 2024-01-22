@@ -61,6 +61,7 @@ const Content = ({
           email: invite.email,
           roleId: invite.role.value,
           redirectUrl: `${window.location.origin}/auth`,
+          omitEmailInvite: false,
         }));
 
       inviteMembersMutations.mutate(invitations, {
