@@ -22,7 +22,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
     ),
     actix::post(
         "/businesses/{fp_bid}/vault/validate",
-        tags(Businesses, Vault, Private),
+        tags(Businesses, Vault, PublicApi),
         description = "Checks if provided data is valid before adding it to the vault."
     )
 )]

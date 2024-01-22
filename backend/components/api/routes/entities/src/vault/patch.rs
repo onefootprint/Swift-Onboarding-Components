@@ -29,7 +29,7 @@ use paperclip::actix::{self, api_v2_operation, web, web::Json};
     actix::patch(
         "/businesses/{fp_bid}/vault",
         description = "Updates data in a business vault.",
-        tags(Businesses, Vault, Private)
+        tags(Businesses, Vault, PublicApi)
     )
 )]
 #[api_v2_operation(
