@@ -89,7 +89,6 @@ async fn get_user_challenge_context(
 ) -> ApiResult<Option<UserChallengeContext>> {
     // Look up existing user vault by identifier
     let t_id = obc.as_ref().map(|obc| &obc.tenant().id);
-    let identified_via_token = matches!(identifier, VaultIdentifier::AuthenticatedId(_));
     let (existing_user_id, sv_id) = match identifier {
         VaultIdentifier::IdentifyId(id, sandbox_id) => {
             let Some(existing) = state.find_vault(id, sandbox_id, t_id).await? else {
@@ -145,55 +144,42 @@ async fn get_user_challenge_context(
         })
         .await??;
 
-    // Now that we've identified the user, determine what kinds of challenges are available to
-    // log into this user
-
     let ci = vec![ContactInfoKind::Phone, ContactInfoKind::Email]
         .into_iter()
-        .filter_map(|ci| uvw.get_lifetime(DI::from(ci)).map(|d| (ci, d.clone())))
+        .filter_map(|ci| uvw.get(DI::from(ci)).map(|d| (ci, d.lifetime_id().clone())))
         .collect_vec();
     let cis = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             ci.into_iter()
-                .map(|(ci, dl)| -> ApiResult<_> { Ok((ci, ContactInfo::get(conn, &dl.id)?, dl)) })
+                .map(|(ci, id)| -> ApiResult<_> { Ok((ci, ContactInfo::get(conn, &id)?)) })
                 .collect::<ApiResult<Vec<_>>>()
         })
         .await??;
 
-    let is_all_ci_unverified = cis.iter().all(|(_, ci, _)| !ci.is_otp_verified);
-    let is_unverified = is_all_ci_unverified && uvw.vault.is_created_via_api;
-    let challenge_kinds = if is_unverified {
+    let mut kinds = cis
+        .iter()
+        .filter(|(_, ci)| ci.is_otp_verified)
+        .map(|(kind, _)| ChallengeKind::from(*kind))
+        .collect_vec();
+    if !creds.is_empty() {
+        kinds.push(ChallengeKind::Passkey);
+    }
+    let is_unverified = kinds.is_empty()
+        && uvw.vault.is_created_via_api
+        && cis.iter().any(|(k, _)| *k == ContactInfoKind::Phone);
+    let kinds = if is_unverified {
         // If this is a non-portable vault with a phone, allow initiating a challenge to the phone
-        // even though it is unverified.
-        // In theory, we could allow them to sign up with an email, but we'd prefer for them to
-        // verify their phone number now
-        let includes_phone = cis.iter().any(|(k, _, _)| *k == ContactInfoKind::Phone);
-        includes_phone
-            .then_some(ContactInfoKind::Phone.into())
-            .into_iter()
-            .collect()
+        // even though it is unverified
+        vec![ContactInfoKind::Phone.into()]
     } else {
-        let mut kinds = cis
-            .iter()
-            .filter(|(_, ci, dl)| {
-                // Allow logging in with any auth method that is OTP verified
-                // OR, during the update auth method flow, allow logging in with any auth method
-                // that was added by the user via bifrost, regardless of whether it was OTP verified
-                ci.is_otp_verified || (identified_via_token && dl.source.is_added_by_user())
-            })
-            .map(|(kind, _, _)| ChallengeKind::from(*kind))
-            .collect_vec();
-        if !creds.is_empty() {
-            kinds.push(ChallengeKind::Passkey);
-        }
         kinds
     };
 
     let ctx = UserChallengeContext {
         vw: uvw,
         webauthn_creds: creds,
-        challenge_kinds,
+        challenge_kinds: kinds,
         is_unverified,
         tenant,
     };

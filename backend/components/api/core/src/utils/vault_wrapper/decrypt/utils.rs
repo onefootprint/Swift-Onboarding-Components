@@ -6,7 +6,6 @@ use crate::errors::ApiResult;
 use crate::{ApiError, ApiErrorKind, State};
 use db::models::business_owner::{BusinessOwner, UserData};
 use db::models::contact_info::ContactInfo;
-use db::models::data_lifetime::DataLifetime;
 use db::{DbError, DbPool};
 use newtypes::email::Email;
 use newtypes::{
@@ -21,19 +20,19 @@ impl<Type> VaultWrapper<Type> {
         &self,
         state: &State,
         kind: ContactInfoKind,
-    ) -> ApiResult<Option<(PiiString, ContactInfo, DataLifetime)>> {
-        if let Some(dl) = self.get_lifetime(DataIdentifier::from(kind)) {
-            let dl_id = dl.id.clone();
+    ) -> ApiResult<Option<(PiiString, ContactInfo)>> {
+        if let Some(di_id) = self.get(DataIdentifier::from(kind)) {
+            let di_id = di_id.lifetime_id().clone();
             let ci = state
                 .db_pool
-                .db_query(move |conn| ContactInfo::get(conn, &dl_id))
+                .db_query(move |conn| ContactInfo::get(conn, &di_id))
                 .await??;
 
             let data = self
                 .decrypt_unchecked_single(&state.enclave_client, kind.into())
                 .await?
                 .ok_or(ApiError::from(DbError::ObjectNotFound))?;
-            Ok(Some((data, ci, dl.clone())))
+            Ok(Some((data, ci)))
         } else {
             Ok(None)
         }
@@ -45,15 +44,14 @@ impl<Type> VaultWrapper<Type> {
         state: &State,
         kind: ContactInfoKind,
     ) -> ApiResult<PiiString> {
-        let (data, _, dl) = self
+        let (data, ci) = self
             .decrypt_contact_info(state, kind)
             .await?
             .ok_or(ApiErrorKind::ContactInfoKindNotInVault(kind))?;
 
         // TODO we're moving away from needing to send things to verified contact info. Can we get
-        // rid of this check for vaults made via bifrost too?
-        let vault_made_via_bifrost = !self.vault.is_created_via_api;
-        if vault_made_via_bifrost && !dl.source.is_added_by_user() {
+        // rid of this check for portable vaults too?
+        if !self.vault.is_created_via_api && !ci.is_otp_verified {
             // Many of the communications we send out give either OTPs or links that allow authing
             // as the user. So, we want to make sure a tenant can't update the user's phone number/email
             // and then send themselves OTPs. First, check that the phone number/email is verified to

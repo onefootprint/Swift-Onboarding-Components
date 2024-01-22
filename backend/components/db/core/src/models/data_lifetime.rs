@@ -70,7 +70,7 @@ pub struct DataLifetime {
     pub portablized_seqno: Option<DataLifetimeSeqno>,
     pub deactivated_seqno: Option<DataLifetimeSeqno>,
     pub kind: DataIdentifier,
-    /// Information on how the piece of data was added to the vault
+    /// Inforamation on how the piece of data was added to the vault
     pub source: DataLifetimeSource,
     /// The actor that added this piece of data to the vault, if not performed by the user
     pub actor: Option<DbActor>,
@@ -194,14 +194,7 @@ impl DataLifetime {
     }
 
     #[tracing::instrument("DataLifetime::portablize", skip_all)]
-    pub fn portablize(conn: &mut TxnPgConn, id: &DataLifetimeId, seqno: DataLifetimeSeqno) -> DbResult<Self> {
-        let dl = data_lifetime::table
-            .filter(data_lifetime::id.eq(id))
-            .get_result::<Self>(conn.conn())?;
-        if dl.portablized_seqno.is_some() {
-            // No-op if already portablized
-            return Ok(dl);
-        }
+    pub fn portablize(conn: &mut PgConn, id: &DataLifetimeId, seqno: DataLifetimeSeqno) -> DbResult<Self> {
         let update = DataLifetimeUpdate {
             portablized_at: Some(Some(Utc::now())),
             portablized_seqno: Some(Some(seqno)),
@@ -209,9 +202,8 @@ impl DataLifetime {
         };
         let result = diesel::update(data_lifetime::table)
             .filter(data_lifetime::id.eq(id))
-            .filter(data_lifetime::portablized_seqno.is_null())
             .set(update)
-            .get_result(conn.conn())?;
+            .get_result(conn)?;
         Ok(result)
     }
 
