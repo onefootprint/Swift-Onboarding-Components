@@ -6,9 +6,9 @@
   "types": "./src/index.ts",
   "license": "MIT",
   "scripts": {
-    "test": "jest",
-    "test:ci": "jest --ci --bail --runInBand",
-    "test:watch": "jest --watch",
+    "test": "bun test",
+    "test:ci:bun": "bun test --bail",
+    "test:watch": "bun test --watch",
     "lint": "eslint src --fix",
     "lint:ci": "eslint src",
     "typecheck": "yarn tsc --noEmit",
@@ -17,7 +17,6 @@
   "devDependencies": {
     "@onefootprint/design-tokens": "*",
     "@onefootprint/dev-tools": "*",
-    "@onefootprint/jest-presets": "*",
     "@onefootprint/types": "*",
     "axios": "^1.6.5",
     "axios-case-converter": "^1.1.0",
@@ -28,8 +27,5 @@
   "peerDependencies": {
     "axios": "^1.6.5",
     "axios-case-converter": "^1.1.0"
-  },
-  "jest": {
-    "preset": "@onefootprint/jest-presets/jest/web"
   }
 }
