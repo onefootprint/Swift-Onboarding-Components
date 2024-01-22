@@ -126,6 +126,7 @@ const ItemBox = styled.div`
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     border-radius: ${theme.borderRadius.default};
     cursor: pointer;
+    width: 100%;
 
     :hover {
       background-color: ${theme.backgroundColor.secondary};
