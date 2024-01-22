@@ -41,7 +41,7 @@ const UserContainer = ({ variant }: AuthContainerProps): JSX.Element | null => {
         secondaryButton: { label: t('no') },
         primaryButton: {
           label: t('yes'),
-          onClick: () => router.push('?done'),
+          onClick: () => router.push('/user/closed'),
         },
       });
     },
@@ -63,7 +63,7 @@ const UserContainer = ({ variant }: AuthContainerProps): JSX.Element | null => {
         />
       ) : (
         <UserMachineProvider args={{ authToken }}>
-          <UserRouter onDone={() => router.push('?done')} />
+          <UserRouter onDone={() => router.push('/user/done')} />
         </UserMachineProvider>
       )}
     </Layout>

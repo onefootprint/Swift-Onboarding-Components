@@ -6,7 +6,7 @@ import { getCustomAppearanceFork } from '@/src/package-appearance';
 import Loading from './loading';
 import UserProviders from './user-providers';
 
-type AppPageProps = {
+type UserPageProps = {
   params: Record<string, string>;
   searchParams: Record<string, string>;
 };
@@ -17,7 +17,7 @@ const UserContainer = dynamic(() => import('@/src/components/user-container'), {
   loading: () => <Loading />,
 });
 
-const UserPage = async (props: AppPageProps) => {
+const UserPage = async (props: UserPageProps) => {
   const { searchParams } = props;
   const loadedStyle = await getCustomAppearanceFork({
     strategy: ['queryParameters', 'obConfig'],
