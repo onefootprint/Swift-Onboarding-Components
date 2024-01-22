@@ -45,7 +45,10 @@ fi
 # Yarn
 npm install -g yarn
 npm install -g vercel
-corepack enable
+corepack 
+
+# Bun
+curl -fsSL https://bun.sh/install | bash
 
 # Developer tools
 if [[ $(command -v xcode-select) == "" ]]; then
