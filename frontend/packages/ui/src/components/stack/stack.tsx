@@ -1,13 +1,10 @@
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
-import type { StackProps, StackTag } from './stack.types';
+import type { StackProps } from './stack.types';
 import { getBorders, getMargin, getPadding } from './stack.utils';
 
-const Stack = styled('div').attrs<{ as: StackTag }>(({ as, ...props }) => ({
-  as,
-  ...props,
-}))<StackProps>`
+const Stack = styled.div<StackProps>`
   ${({ theme, ...props }) => css`
     display: ${props.inline ? 'inline-flex' : 'flex'};
     flex-direction: ${props.direction};

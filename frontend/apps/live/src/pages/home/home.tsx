@@ -3,6 +3,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { LogoFpDefault } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Grid, media, Stack, Typography } from '@onefootprint/ui';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -50,6 +51,7 @@ const Live = () => {
           justify="center"
           width="100%"
           height="100%"
+          as={motion.div}
         >
           <Stack
             position="absolute"

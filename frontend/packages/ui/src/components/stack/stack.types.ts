@@ -1,37 +1,11 @@
 import type { Spacing, Theme } from '@onefootprint/design-tokens';
 import type * as CSS from 'csstype';
+import type { HTMLMotionProps } from 'framer-motion';
 import type { AriaRole } from 'react';
 
-export type StackTag =
-  | 'div'
-  | 'section'
-  | 'article'
-  | 'aside'
-  | 'span'
-  | 'main'
-  | 'form'
-  | 'ul'
-  | 'li'
-  | 'ol'
-  | 'nav'
-  | 'header'
-  | 'footer'
-  | 'button'
-  | 'input'
-  | 'select'
-  | 'textarea'
-  | 'label'
-  | 'fieldset'
-  | 'legend'
-  | 'table'
-  | 'caption'
-  | 'tbody'
-  | 'thead'
-  | 'tfoot'
-  | 'tr'
-  | 'td'
-  | 'th'
-  | 'img';
+export type AsTagProps = {
+  as?: string | HTMLMotionProps<'div'>;
+};
 
 export type StackStylesProps = {
   backgroundColor?: keyof Theme['backgroundColor'];
@@ -83,7 +57,7 @@ export type StackStylesProps = {
 export type StackProps = StackStylesProps & {
   'aria-busy'?: boolean;
   ariaLabel?: string;
-  as?: StackTag;
+  as?: AsTagProps;
   children?: React.ReactNode;
   id?: string;
   role?: AriaRole;
