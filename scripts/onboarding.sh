@@ -35,8 +35,8 @@ source ~/.zshrc
 curl -sSL https://get.rvm.io | bash -s stable --ruby
 source ~/.zshrc
 source ~/.bash_profile
-rvm install 2.7.5
-rvm use 2.7.5 --default
+rvm install 3.0.0
+rvm use 3.0.0 --default
 
 if [[ $(command -v code) == "" ]]; then
  brew install visual-studio-code
