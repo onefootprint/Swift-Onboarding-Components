@@ -97,6 +97,7 @@ impl IDologyFeatures {
         let address_partially_matches = idology_match_codes::ADDRESS_PARTIALLY_MATCHES_CODES
             .iter()
             .any(|r| footprint_reason_codes.contains(r));
+
         let yob_does_not_match = idology_match_codes::DOB_YOB_CODES
             .iter()
             .any(|r| footprint_reason_codes.contains(r));
@@ -105,6 +106,8 @@ impl IDologyFeatures {
             .any(|r| footprint_reason_codes.contains(r));
         let dob_does_not_match = yob_does_not_match && mob_does_not_match;
         let dob_partially_matches = (yob_does_not_match || mob_does_not_match) && !dob_does_not_match;
+        let dob_could_not_match = footprint_reason_codes.contains(&FootprintReasonCode::DobCouldNotMatch);
+
         let ssn_does_not_match = idology_match_codes::SSN_DOES_NOT_MATCH_CODES
             .iter()
             .any(|r| footprint_reason_codes.contains(r));
@@ -130,13 +133,15 @@ impl IDologyFeatures {
             footprint_reason_codes.push(FootprintReasonCode::AddressMatches);
         };
 
-        if dob_does_not_match {
-            footprint_reason_codes.push(FootprintReasonCode::DobDoesNotMatch);
-        } else if dob_partially_matches {
-            footprint_reason_codes.push(FootprintReasonCode::DobPartialMatch);
-        } else if dob_submitted {
-            footprint_reason_codes.push(FootprintReasonCode::DobMatches);
-        };
+        if !dob_could_not_match {
+            if dob_does_not_match {
+                footprint_reason_codes.push(FootprintReasonCode::DobDoesNotMatch);
+            } else if dob_partially_matches {
+                footprint_reason_codes.push(FootprintReasonCode::DobPartialMatch);
+            } else if dob_submitted {
+                footprint_reason_codes.push(FootprintReasonCode::DobMatches);
+            };
+        }
 
         if ssn_does_not_match {
             footprint_reason_codes.push(FootprintReasonCode::SsnDoesNotMatch);

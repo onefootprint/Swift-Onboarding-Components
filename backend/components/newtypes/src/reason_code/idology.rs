@@ -14,9 +14,8 @@ pub mod idology_match_codes {
         FootprintReasonCode::AddressStreetNumberDoesNotMatch,
         FootprintReasonCode::AddressStateDoesNotMatch,
     ];
-    pub const DOB_YOB_CODES: [FootprintReasonCode; 3] = [
+    pub const DOB_YOB_CODES: [FootprintReasonCode; 2] = [
         FootprintReasonCode::DobYobDoesNotMatch,
-        FootprintReasonCode::DobYobNotAvailable,
         FootprintReasonCode::DobYobDoesNotMatchWithin1Year,
     ];
     pub const DOB_MOB_CODES: [FootprintReasonCode; 2] = [
@@ -135,8 +134,8 @@ vendor_reason_code_enum! {
         AlternateAddressAlert,
 
         #[ser = "resultcode.no.dob.available", description = "The individual was identified, but DOB information was not available in the records located. This does not mean the search failed. Numerous public-record data sources do not include DOB information in their records."]
-        #[footprint_reason_code = Some(FootprintReasonCode::DobYobNotAvailable)]
-        DobyobNotAvailable,
+        #[footprint_reason_code = Some(FootprintReasonCode::DobCouldNotMatch)]
+        NoDobAvailable,
 
         #[ser = "resultcode.ssn.not.available", description = "The individual was identified, but SSN information was not available. This does not mean the search failed. Numerous public-record data sources do not include SSN information in their records."]
         #[footprint_reason_code = Some(FootprintReasonCode::SsnNotAvailable)]
