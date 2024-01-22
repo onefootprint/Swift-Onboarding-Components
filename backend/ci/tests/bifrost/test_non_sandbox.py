@@ -1,3 +1,4 @@
+import pytest
 import time
 import arrow
 import re
@@ -78,6 +79,7 @@ def identify_verify_real_sms(
     return try_until_success(inner, 30)
 
 
+@pytest.mark.flaky
 def test_onboarding_init(twilio, tenant, live_phone_number, sandbox_tenant):
     # Create a user with the live phone number, fetching the OTP from the actual SMS
     def initiate_challenge():

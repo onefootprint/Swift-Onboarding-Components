@@ -40,6 +40,7 @@ def primary_bo(kyb_sandbox_ob_config):
     return user
 
 
+@pytest.mark.flaky
 def test_onboard_secondary_bo(primary_bo, kyb_sandbox_ob_config, twilio):
     # Extract the link sent to the secondary BO's phone number and verify it contains references to
     # the business and the BO that invited them
@@ -139,6 +140,7 @@ def ob_config2(sandbox_tenant, must_collect_data):
     return create_ob_config(sandbox_tenant, **ob_conf_data)
 
 
+@pytest.mark.flaky
 def test_one_click_bos(ob_config2, kyb_sandbox_ob_config, twilio):
     # Create two users onboarded onto the default OB config
     bifrost = BifrostClient.new(ob_config2)
