@@ -26,6 +26,13 @@ def test_portablize_nypid_via_auth(sandbox_tenant, foo_sandbox_tenant, auth_play
     }
     post("users", initial_data, sandbox_tenant.s_sk, sandbox_id_h)
 
+    # Assert only an SMS challenge is available to portablize the NYPID since we want them to
+    # verify their phone number over their email
+    data = dict(identifier=dict(phone_number=FIXTURE_PHONE_NUMBER))
+    body = post("hosted/identify", data, sandbox_id_h, auth_playbook.key)
+    assert body["user_found"]
+    assert body["available_challenge_kinds"] == ["sms"]
+
     # Log into the user with an auth playbook, which will portablize it
     IdentifyClient(auth_playbook.key, sandbox_id).inherit(scope="auth")
 

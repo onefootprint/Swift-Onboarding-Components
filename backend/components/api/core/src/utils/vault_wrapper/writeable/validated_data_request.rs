@@ -53,10 +53,12 @@ impl<Type> VaultWrapper<Type> {
         };
         for di in irreplaceable_ci {
             let Some(d) = self.data(&di) else {
+                // If the DI doesn't exist yet, we're just adding the data, which is safe.
                 continue;
             };
             let ci = ContactInfo::get(conn, &d.lifetime.id)?;
             let update_has_di = dis.contains(&&di);
+            // TODO should we disallow updating the email for any vault that is_verified?
             if ci.is_otp_verified && update_has_di {
                 if matches!(actor, Some(AuthActor::FirmEmployee(_))) {
                     // Don't error, allow firm employees (who already have write permissions) to

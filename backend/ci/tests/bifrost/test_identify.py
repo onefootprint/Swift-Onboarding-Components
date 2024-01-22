@@ -209,3 +209,26 @@ def test_identify_with_non_portable_api_vault(
     data = dict(fields=["id.first_name"], reason="flerp")
     body = post(f"users/{fp_id}/vault/decrypt", data, tenant.s_sk)
     assert body["id.first_name"] == "From Tenant C"
+
+
+def test_login_with_unverified_email(sandbox_user, sandbox_tenant):
+    # Shouldn't be able to log in using the unverified email in a normal bifrost onboarding
+    data = dict(identifier=dict(email=sandbox_user.client.data["id.email"]))
+    sandbox_id_h = SandboxId(sandbox_user.client.sandbox_id)
+    body = post("hosted/identify", data, sandbox_id_h)
+    assert body["user_found"]
+    assert "email" not in body["available_challenge_kinds"]
+
+    # And then should be able to log in with email using a token generated for the update auth
+    # method flow
+    data = dict(kind="update_auth_methods")
+    body = post(f"entities/{sandbox_user.fp_id}/token", data, *sandbox_tenant.db_auths)
+    auth_token = FpAuth(body["token"])
+    IdentifyClient.from_token(auth_token).inherit(kind="email")
+
+    # The email should also now be OTP-verified, so it should be available for future logins
+    data = dict(identifier=dict(email=sandbox_user.client.data["id.email"]))
+    sandbox_id_h = SandboxId(sandbox_user.client.sandbox_id)
+    body = post("hosted/identify", data, sandbox_id_h)
+    assert body["user_found"]
+    assert "email" in body["available_challenge_kinds"]
