@@ -55,6 +55,10 @@ if [[ $(command -v xcode-select) == "" ]]; then
  xcode-select --install
 fi
 
+sudo sh -c 'xcode-select -s /Applications/Xcode.app/Contents/Developer && xcodebuild -runFirstLaunch'
+xcodebuild -downloadPlatform iOS
+sudo xcodebuild -license
+
 # Install frontend deps
 cd frontend
 yarn install
