@@ -1050,6 +1050,13 @@ footprint_reason_code_enum! {
         #[scope = SignalScope::Name, additional_scopes = vec![], match_level = None]
         #[note = "User associated with US Broker or FINRA", severity = SignalSeverity::High,  description = "The user reported that they are affiliated with a US Broker or FINRA."]
         AffiliatedWithBrokerOrFinra,
+
+        #[scope = SignalScope::Name, additional_scopes = vec![], match_level = None]
+        #[note = "Visa type is Other", severity = SignalSeverity::High,  description = "The user reported that they have a US Visa of type 'Other'"]
+        VisaIsOther,
+        #[scope = SignalScope::Name, additional_scopes = vec![], match_level = None]
+        #[note = "Visa is expiring soon or has expired", severity = SignalSeverity::High,  description = "The user's visa expires within 90 days or has already expired"]
+        VisaExpiredOrExpiringSoon,
         //
         //
         // ~~~~~~~~~ KYB ~~~~~~~~~~~
