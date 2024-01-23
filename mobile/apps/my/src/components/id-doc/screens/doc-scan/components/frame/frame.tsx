@@ -63,9 +63,9 @@ const StyledFrame = styled(Reanimated.View)<{
   ${({ theme, frameWidth, frameHeight }) => {
     return css`
       align-items: center;
-      border-color: #FFF;
+      border-color: #fff;
       border-radius: ${theme.borderRadius.large};
-      border: ${theme.borderWidth[2]} solid #FFF  
+      border: ${theme.borderWidth[2]} solid #fff;
       gap: ${theme.spacing[2]};
       height: ${frameHeight}px;
       justify-content: center;

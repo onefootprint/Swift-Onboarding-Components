@@ -9,6 +9,7 @@ import SplashScreen from 'react-native-splash-screen';
 
 import IdDoc from '@/components/id-doc';
 import { PREVIEW_AUTH_TOKEN } from '@/config/constants';
+import configureReactI18next from '@/config/initializers/react-i18next';
 
 import Banner from './components/banner';
 import Completed from './screens/completed';
@@ -19,6 +20,8 @@ type PreviewProps = {
   isDemo: boolean;
   isDebug: boolean;
 };
+
+configureReactI18next();
 
 const Preview = ({ isDemo, isDebug }: PreviewProps) => {
   const [showPasskey, setShowPasskey] = useState(true);

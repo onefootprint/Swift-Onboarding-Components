@@ -1,3 +1,4 @@
+import type { L10n } from './l10n';
 import type { IdDocOutcome } from './sandbox-outcomes-type';
 
 export type D2PMeta = {
@@ -6,4 +7,5 @@ export type D2PMeta = {
   styleParams?: string; // FootprintAppearance style params stringified
   sandboxIdDocOutcome?: IdDocOutcome; // Sandbox outcome for id doc
   redirectUrl?: string; // Redirect url for the d2p session, useful especially for app clip
+  l10n?: L10n; // localization from bifrost
 };

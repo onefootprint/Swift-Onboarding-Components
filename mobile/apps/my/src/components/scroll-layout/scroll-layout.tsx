@@ -3,7 +3,12 @@ import React from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styled, { css } from 'styled-components/native';
 
-const ScrollLayout = ({ children, Footer }) => {
+type ScrollLayoutProps = {
+  children: React.ReactNode;
+  Footer: React.ReactNode;
+};
+
+const ScrollLayout = ({ children, Footer }: ScrollLayoutProps) => {
   const { bottom } = useSafeAreaInsets();
 
   return (
@@ -23,7 +28,7 @@ const StyledContainer = styled(Container)`
 
 const StickyFooter = styled.View<{ bottom: number }>`
   ${({ theme, bottom }) => css`
-    background-color: ${theme.backgroundColor.primary}};
+    background-color: ${theme.backgroundColor.primary};
     border-color: ${theme.borderColor.primary};
     border-top-width: ${theme.borderWidth[1]};
     bottom: 0;
@@ -34,5 +39,4 @@ const StickyFooter = styled.View<{ bottom: number }>`
     width: 100%;
   `}
 `;
-
 export default ScrollLayout;
