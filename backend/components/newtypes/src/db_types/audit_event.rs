@@ -43,15 +43,12 @@ use strum_macros::{Display, EnumDiscriminants, EnumString};
 )]
 pub enum AuditEventMetadata {
     CreateUser {
-        is_live: bool,
         fields: Vec<DataIdentifier>,
     },
     UpdateUserData {
-        is_live: bool,
         fields: Vec<DataIdentifier>,
     },
     DecryptUserData {
-        is_live: bool,
         reason: String,
         fields: Vec<DataIdentifier>,
     },
@@ -88,7 +85,6 @@ mod tests {
         let json_str = r#"{
             "kind": "decrypt_user_data",
             "data": {
-                "is_live": true,
                 "reason": "an example reason",
                 "fields": ["id.phone_number", "id.last_name"]
             }
@@ -98,7 +94,6 @@ mod tests {
         assert_eq!(
             meta,
             AuditEventMetadata::DecryptUserData {
-                is_live: true,
                 reason: "an example reason".to_owned(),
                 fields: vec![
                     DataIdentifier::Id(IdentityDataKind::PhoneNumber),

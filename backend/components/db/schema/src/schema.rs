@@ -92,6 +92,7 @@ table! {
         tenant_api_key_id -> Nullable<Text>,
         tenant_user_id -> Nullable<Text>,
         tenant_role_id -> Nullable<Text>,
+        is_live -> Nullable<Bool>,
     }
 }
 
