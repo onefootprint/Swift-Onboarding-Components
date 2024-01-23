@@ -1,16 +1,17 @@
 import { FootprintVerifyButton } from '@onefootprint/footprint-react';
 import { useTranslation } from '@onefootprint/hooks';
 import { LogoFpDefault } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
-import { Grid, media, Stack, Typography } from '@onefootprint/ui';
-import { motion } from 'framer-motion';
-import Image from 'next/image';
+import styled, { css, useTheme } from '@onefootprint/styled';
+import { media, Stack, Typography } from '@onefootprint/ui';
+import { easeIn, motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
+import Balancer from 'react-wrap-balancer';
 
 import SEO from '../../components/seo';
-import Footer from './components/footer';
+import FooterLinks from './components/footer-links';
+import Illustration from './components/illustration';
 
 const kycPublicKey = process.env.NEXT_PUBLIC_KYC_TENANT_KEY ?? '';
 const kybPublicKey = process.env.NEXT_PUBLIC_KYB_TENANT_KEY ?? '';
@@ -34,71 +35,85 @@ const Live = () => {
 
   const publicKey = getPublicKey();
   const translationsKey = type === 'kyb' ? 'kyb' : 'kyc';
+  const theme = useTheme();
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        duration: 0.5,
+      },
+      delay: 0.05,
+    },
+  };
+  const childrenVariants = {
+    hidden: { opacity: 0, x: -5, filter: 'blur(5px)', transform: 'scale(1.1)' },
+    visible: {
+      opacity: 1,
+      transform: 'scale(1)',
+      x: 0,
+      filter: 'blur(0px)',
+      transition: { ease: easeIn, duration: 0.5 },
+    },
+  };
+  const illustrationVariants = {
+    hidden: { filter: 'blur(10px)', opacity: 0, transform: 'scale(1.1)' },
+    visible: {
+      filter: 'blur(0px)',
+      transform: 'scale(1)',
+      opacity: 1,
+      transition: { delay: 0.1, duration: 0.5 },
+    },
+  };
 
   return (
     <>
       <SEO title={t(`${translationsKey}.html-title`)} />
-      <BlurredBackground
-        align="center"
-        justify="center"
-        width="100vw"
-        minHeight="100vh"
-        overflow="hidden"
-      >
+      <FullContainer direction="column">
         <Stack
-          direction="column"
+          height={theme.spacing[10]}
+          width="100%"
           align="center"
           justify="center"
-          width="100%"
-          height="100%"
-          as={motion.div}
         >
-          <Stack
-            position="absolute"
-            width="100%"
-            height="100px"
-            top={0}
-            left={0}
-            direction="row"
-            justify="center"
-            align="center"
+          <Link
+            href="https://onefootprint.com/"
+            target="_blank"
+            rel="nonreferrer"
           >
-            <Link
-              href="https://onefootprint.com/"
-              target="_blank"
-              rel="nonreferrer"
-            >
-              <LogoFpDefault />
-            </Link>
-          </Stack>
-          <HeroContainer
-            maxWidth="90%"
-            paddingTop={11}
-            paddingBottom={3}
-            gap={4}
-            columns={['1fr 1fr']}
-            rows={['0.3fr 1fr']}
-            templateAreas={['image image', 'content content']}
-          >
+            <LogoFpDefault />
+          </Link>
+        </Stack>
+        <InnerContent
+          direction="row"
+          flexWrap="wrap-reverse"
+          flexGrow={2}
+          align="center"
+          justify="center"
+          gap={10}
+        >
+          <Balancer>
             <TextContainer
-              gridArea="content"
+              align="start"
               direction="column"
               gap={5}
-              textAlign="center"
-              justify="center"
+              as={motion.span}
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
             >
-              <Typography as="h1" variant="display-2">
-                {t(`${translationsKey}.title`)}
-              </Typography>
-              <Typography as="h1" variant="display-4">
-                {t(`${translationsKey}.subtitle`)}
-              </Typography>
-              <ActionsContainer
-                direction="column"
-                justify="center"
-                gap={6}
-                marginTop={6}
-              >
+              <Stack as={motion.span} variants={childrenVariants}>
+                <Typography as="h1" variant="display-2">
+                  {t(`${translationsKey}.title`)}
+                </Typography>
+              </Stack>
+              <Stack as={motion.span} variants={childrenVariants}>
+                <Typography as="h1" variant="display-4">
+                  {t(`${translationsKey}.subtitle`)}
+                </Typography>
+              </Stack>
+              <Stack as={motion.span} variants={childrenVariants}>
                 <FootprintVerifyButton
                   publicKey={publicKey}
                   label={t(`${translationsKey}.cta`)}
@@ -106,108 +121,107 @@ const Live = () => {
                     router.push('/ending');
                   }}
                 />
-                <Typography as="p" variant="body-2" color="secondary">
+              </Stack>
+              <Stack as={motion.span} variants={childrenVariants}>
+                <Typography
+                  as="p"
+                  variant="body-2"
+                  color="tertiary"
+                  sx={{
+                    maxWidth: '520px',
+                  }}
+                >
                   {t(`${translationsKey}.disclaimer`)}
                 </Typography>
-              </ActionsContainer>
+              </Stack>
             </TextContainer>
-            <Grid.Item
-              align="center"
-              gridArea="image"
-              justify="center"
-              position="relative"
-            >
-              <ImageOffset>
-                <Image
-                  src="/live/fl-devices.png"
-                  fill
-                  alt="footprint wallet"
-                  priority
-                />
-              </ImageOffset>
-            </Grid.Item>
-          </HeroContainer>
-          <Footer />
+          </Balancer>
+          <IllustrationContainer
+            align="center"
+            justify="center"
+            padding={7}
+            as={motion.span}
+            variants={illustrationVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <Illustration />
+          </IllustrationContainer>
+        </InnerContent>
+        <Stack
+          direction="row"
+          justify="center"
+          gap={5}
+          height={theme.spacing[9]}
+        >
+          <FooterLinks />
         </Stack>
-      </BlurredBackground>
+      </FullContainer>
     </>
   );
 };
 
-const HeroContainer = styled(Grid.Container)`
-  z-index: 1;
-  grid-template-areas:
-    'image image'
-    'content content';
-
-  ${media.greaterThan('md')`
-      margin: 0;
-      grid-template-areas: 
-      'content image'
-      'content image';
-    `};
-
-  ${media.greaterThan('lg')`
-      max-width: 1256px;
-    `}
-`;
-
-const BlurredBackground = styled(Stack)`
-  background: linear-gradient(
-      180deg,
-      rgba(176, 255, 191, 0.4) 0%,
-      rgba(176, 255, 191, 0) 100%
-    ),
-    radial-gradient(at 50% 15%, #e5f6c1 2%, rgba(255, 255, 255, 0) 50%),
-    radial-gradient(at 0% 60%, #cbc1f6 0%, rgba(255, 255, 255, 0) 80%),
-    radial-gradient(at 0% 0%, #c1c2f6 0%, rgba(255, 255, 255, 0) 48%),
-    radial-gradient(at 100% 0%, #c8e4ff 0%, rgba(200, 228, 255, 0) 40%),
-    linear-gradient(180deg, #b0ffbf 0%, rgba(176, 255, 191, 0) 100%);
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-`;
-
-const TextContainer = styled(Grid.Item)`
+const FullContainer = styled(Stack)`
   ${({ theme }) => css`
-    ${media.greaterThan('md')`
-      max-width: 720px;
-      text-align: left; 
-      padding-right: ${theme.spacing[10]};
-    `}
+    min-height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(
+      180deg,
+      ${theme.backgroundColor.primary} 0%,
+      ${theme.backgroundColor.secondary} 100%
+    );
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('/noise.svg');
+      background-size: 300px 300px;
+      background-repeat: repeat;
+      mix-blend-mode: multiply;
+      opacity: 0.2;
+      mask: linear-gradient(180deg, transparent 0%, black 100%);
+      mask-mode: alpha;
+    }
   `}
 `;
 
-const ActionsContainer = styled(Stack)`
+const IllustrationContainer = styled(Stack)`
+  height: 720px;
+  width: 100%;
+
   ${media.greaterThan('md')`
-      max-width: 90%;
-      
-      & > * {
-        width: fit-content;
-      }
-    `}
+    height: 800px;
+    width: 600px;
+  `}
 `;
 
-const ImageOffset = styled.div`
-  position: relative;
-  width: 100%;
-  height: 340px;
+const TextContainer = styled(Stack)`
+  max-width: 600px;
+  text-align: center;
+  align-items: center;
 
-  img {
-    object-fit: contain;
+  button {
+    width: 100%;
   }
 
   ${media.greaterThan('md')`
-      align-self: center;
-      position: absolute;
-      left: 0;
-      width: 800px;
-      height: 720px;
-  `};
+    text-align: left;
+    align-items: flex-start;
+  `}
 `;
 
+const InnerContent = styled(Stack)`
+  ${({ theme }) => css`
+    padding: ${theme.spacing[3]};
+    margin-bottom: ${theme.spacing[7]};
+
+    ${media.greaterThan('md')`
+      padding: ${theme.spacing[7]}
+    `};
+  `}
+`;
 export default Live;

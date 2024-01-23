@@ -1,14 +1,14 @@
 import { useTranslation } from '@onefootprint/hooks';
-import styled, { css } from '@onefootprint/styled';
-import { media, Typography } from '@onefootprint/ui';
+import styled from '@onefootprint/styled';
+import { Stack, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 
-const Footer = () => {
+const FooterLinks = () => {
   const { t } = useTranslation('home.legal-documents');
 
   return (
-    <FooterContainer>
+    <Container direction="row" gap={5}>
       <Link
         href="https://www.onefootprint.com/privacy-policy"
         target="_blank"
@@ -27,33 +27,14 @@ const Footer = () => {
           {t('terms-of-service.title')}
         </Typography>
       </Link>
-    </FooterContainer>
+    </Container>
   );
 };
 
-const FooterContainer = styled.footer`
-  ${({ theme }) => css`
-    width: 100%;
-    position: relative;
-    bottom: 0;
-    left: 0;
-    padding: ${theme.spacing[4]};
-    display: flex;
-    justify-content: center;
-    gap: ${theme.spacing[7]};
-    margin-top: ${theme.spacing[4]};
-
-    a {
-      text-decoration: none;
-    }
-  `}
-
-  ${media.greaterThan('md')`
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    justify-content: flex-end;
-  `}
+const Container = styled(Stack)`
+  a {
+    text-decoration: none;
+  }
 `;
 
-export default Footer;
+export default FooterLinks;
