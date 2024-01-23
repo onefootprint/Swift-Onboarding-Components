@@ -45,7 +45,8 @@ pub async fn post(
     };
 
     // Look up existing user vault by identifier
-    let Some(ctx) = crate::get_user_challenge_context(&state, identifier, ob_context, root_span).await?
+    let Some((ctx, _)) =
+        crate::get_identify_challenge_context(&state, identifier, ob_context, root_span).await?
     else {
         // The user vault doesn't exist. Just return that the user wasn't found
         return ResponseData::ok(IdentifyResponse::default()).json();
@@ -73,16 +74,16 @@ pub async fn post(
 
     let UserChallengeContext {
         webauthn_creds,
-        challenge_kinds,
-        is_unverified,
+        available_challenge_kinds,
+        is_vault_unverified,
         ..
     } = ctx;
 
     let has_syncable_pass_key = webauthn_creds.iter().any(|cred| cred.backup_state);
     let response = IdentifyResponse {
-        is_unverified,
+        is_unverified: is_vault_unverified,
         user_found: true,
-        available_challenge_kinds: Some(challenge_kinds),
+        available_challenge_kinds: Some(available_challenge_kinds),
         has_syncable_pass_key,
         scrubbed_phone,
         scrubbed_email,

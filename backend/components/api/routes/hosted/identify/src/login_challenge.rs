@@ -66,8 +66,8 @@ pub async fn post(
     let twilio_client = &state.sms_client;
 
     // Look up existing user vault by identifier
-    let Some(ctx) =
-        crate::get_user_challenge_context(&state, identifier, ob_context, root_span.clone()).await?
+    let Some((ctx, tenant)) =
+        crate::get_identify_challenge_context(&state, identifier, ob_context, root_span.clone()).await?
     else {
         // The user vault doesn't exist. Just return that the user wasn't found
         return Err(ChallengeError::LoginChallengeUserNotFound.into());
@@ -75,8 +75,7 @@ pub async fn post(
     let UserChallengeContext {
         vw,
         webauthn_creds: creds,
-        tenant,
-        challenge_kinds,
+        available_challenge_kinds,
         ..
     } = ctx;
 
@@ -95,7 +94,7 @@ pub async fn post(
         }
         ck => ck,
     };
-    if !challenge_kinds.contains(&challenge_kind) {
+    if !available_challenge_kinds.contains(&challenge_kind) {
         return Err(OnboardingError::UnsupportedChallengeKind(challenge_kind.to_string()).into());
     }
 
