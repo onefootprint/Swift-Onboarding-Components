@@ -24,12 +24,15 @@ use db::models::user_timeline::UserTimeline;
 use db::models::workflow::Workflow;
 use db::models::workflow_request::NewWorkflowRequestArgs;
 use db::models::workflow_request::WorkflowRequest;
+use itertools::Itertools;
 use newtypes::ContactInfoKind;
 use newtypes::DbActor;
+use newtypes::DocumentRequestKind;
 use newtypes::PhoneNumber;
 use newtypes::PiiString;
 use newtypes::TriggerKind;
 use newtypes::VaultKind;
+use newtypes::WorkflowRequestConfig;
 use newtypes::WorkflowTriggeredInfo;
 use paperclip::actix::{api_v2_operation, post, web};
 use std::collections::HashMap;
@@ -108,12 +111,7 @@ pub async fn post(
         .generate_link(LinkKind::VerifyUser, &auth_token);
     let org_name = auth.tenant().name.clone();
 
-    let msg = TriggerMessage {
-        note: wfr.note,
-        org_name,
-        trigger_kind,
-        link,
-    };
+    let msg = TriggerMessage::compose(wfr, org_name, link);
 
     if let Some(phone) = vw.decrypt_contact_info(&state, ContactInfoKind::Phone).await? {
         let msg = SmsMessage::from(msg);
@@ -155,50 +153,61 @@ fn validate(trigger_info: TriggerKind, scoped_vault: &ScopedVault) -> ApiResult<
 struct TriggerMessage {
     note: Option<String>,
     org_name: String,
-    trigger_kind: TriggerKind,
+    context_message: String,
     link: PiiString,
 }
 
 impl TriggerMessage {
-    fn message_body(&self) -> PiiString {
-        match self.trigger_kind {
-            TriggerKind::RedoKyc => PiiString::from(format!(
-                "{}Re-verify your identity for {} here: {}",
-                self.note
-                    .as_ref()
-                    .map(|n| format!("{}\n\n", n))
-                    .unwrap_or_default(),
-                self.org_name,
-                self.link.leak()
-            )),
-            TriggerKind::IdDocument => PiiString::from(format!(
-                "{}To verify your identity for {}, provide a photo of your ID here: {}",
-                self.note
-                    .as_ref()
-                    .map(|n| format!("{}\n\n", n))
-                    .unwrap_or_default(),
-                self.org_name,
-                self.link.leak()
-            )),
-            TriggerKind::ProofOfSsn => PiiString::from(format!(
-                "{}To verify your SSN for {}, provide a photo proof of SSN here: {}", // TODO: sketch
-                self.note
-                    .as_ref()
-                    .map(|n| format!("{}\n\n", n))
-                    .unwrap_or_default(),
-                self.org_name,
-                self.link.leak()
-            )),
-            TriggerKind::ProofOfAddress => PiiString::from(format!(
-                "{}To verify your address for {}, provide a photo proof of address here: {}",
-                self.note
-                    .as_ref()
-                    .map(|n| format!("{}\n\n", n))
-                    .unwrap_or_default(),
-                self.org_name,
-                self.link.leak()
-            )),
+    fn compose(wfr: WorkflowRequest, org_name: String, link: PiiString) -> Self {
+        let WorkflowRequest { note, config, .. } = wfr;
+        let context_message = match config {
+            WorkflowRequestConfig::RedoKyc => {
+                format!("{} has requested you to reverify your identity.", org_name)
+            }
+            WorkflowRequestConfig::IdDocument {
+                kind,
+                collect_selfie: _,
+            } => {
+                match kind {
+                    DocumentRequestKind::Identity => {
+                        format!("In order to verify your identity, {} has requested you provide a photo of your ID.", org_name)
+                    }
+                    DocumentRequestKind::ProofOfAddress => {
+                        format!(
+                            "In order to verify your address, {} has requested you provide proof of address.",
+                            org_name
+                        )
+                    }
+                    DocumentRequestKind::ProofOfSsn => {
+                        format!(
+                            "In order to verify your identity, {} has requested you provide proof of SSN.",
+                            org_name
+                        )
+                    }
+                }
+            }
+        };
+        Self {
+            note,
+            org_name,
+            context_message,
+            link,
         }
+    }
+}
+
+impl TriggerMessage {
+    fn message_body(&self) -> PiiString {
+        PiiString::from(
+            vec![
+                self.note.as_ref(),
+                Some(&self.context_message),
+                Some(&format!("Continue here: {}", self.link.leak())),
+            ]
+            .into_iter()
+            .flatten()
+            .join("\n\n"),
+        )
     }
 }
 
