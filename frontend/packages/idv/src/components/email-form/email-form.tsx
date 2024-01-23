@@ -32,7 +32,7 @@ const EmailForm = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Box marginBottom={7}>
+      <Box marginBottom={7} marginTop={5}>
         <TextInput
           autoFocus
           data-private
