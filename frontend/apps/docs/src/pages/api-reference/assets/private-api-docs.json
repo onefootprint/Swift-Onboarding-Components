@@ -1705,7 +1705,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/CreateTokenResponse"
+                                    "$ref": "#/components/schemas/CreateEntityTokenResponse"
                                 }
                             }
                         }
@@ -1753,7 +1753,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/CreateTokenResponse"
+                                    "$ref": "#/components/schemas/CreateEntityTokenResponse"
                                 }
                             }
                         }
@@ -6057,6 +6057,35 @@
                     "send_link"
                 ]
             },
+            "CreateEntityTokenResponse": {
+                "type": "object",
+                "properties": {
+                    "delivery_method": {
+                        "description": "When a link was requested to be sent, the method by which the link was sent",
+                        "type": "string",
+                        "enum": [
+                            "phone",
+                            "email"
+                        ]
+                    },
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "link": {
+                        "type": "string"
+                    },
+                    "token": {
+                        "description": "An cryptographically generated auth token to authenticate a session",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "expires_at",
+                    "link",
+                    "token"
+                ]
+            },
             "CreateOnboardingConfigurationRequest": {
                 "type": "object",
                 "properties": {
@@ -7028,30 +7057,6 @@
                     "omit_email_invite",
                     "redirect_url",
                     "role_id"
-                ]
-            },
-            "CreateTokenResponse": {
-                "type": "object",
-                "properties": {
-                    "expires_at": {
-                        "description": "The time at which the token (and link) expire",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "link": {
-                        "example": "https://verify.onefootprint.com/?type=user#tok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt",
-                        "description": "A Footprint link embedding the `token` that can be sent to this user to allow them to complete the flow.",
-                        "type": "string"
-                    },
-                    "token": {
-                        "description": "A short-lived token that can be passed into the Verify SDK to allow the user to complete the flow.",
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "expires_at",
-                    "link",
-                    "token"
                 ]
             },
             "DecisionRequest": {

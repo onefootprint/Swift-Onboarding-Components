@@ -15,7 +15,7 @@ use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::session::AuthSession;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::VaultWrapper;
-use api_wire_types::CreateTokenResponse;
+use api_wire_types::CreateEntityTokenResponse;
 use api_wire_types::TriggerRequest;
 use chrono::Duration;
 use db::models::scoped_vault::ScopedVault;
@@ -39,7 +39,7 @@ pub async fn post(
     fp_id: FpIdPath,
     request: web::Json<TriggerRequest>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<CreateTokenResponse> {
+) -> JsonApiResponse<CreateEntityTokenResponse> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
     let TriggerRequest {
         trigger,
@@ -106,16 +106,19 @@ pub async fn post(
         .service_config
         .generate_link(LinkKind::VerifyUser, &token);
 
-    if send_link {
+    let delivery_method = if send_link {
         let org_name = auth.tenant().name.clone();
-        send_communication(&state, vw, Some(wfr), org_name, link.clone()).await?;
-    }
+        send_communication(&state, vw, Some(wfr), org_name, link.clone()).await?
+    } else {
+        None
+    };
 
     let expires_at = session.expires_at;
-    let response = CreateTokenResponse {
+    let response = CreateEntityTokenResponse {
         token,
         link,
         expires_at,
+        delivery_method,
     };
     ResponseData::ok(response).json()
 }

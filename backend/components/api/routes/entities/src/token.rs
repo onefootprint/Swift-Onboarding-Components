@@ -19,7 +19,7 @@ use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_wire_types::CreateEntityTokenRequest;
-use api_wire_types::CreateTokenResponse;
+use api_wire_types::CreateEntityTokenResponse;
 use api_wire_types::EntityTokenOperationKind;
 use api_wire_types::TokenOperationKind;
 use chrono::Duration;
@@ -43,7 +43,7 @@ pub async fn post(
     fp_id: FpIdPath,
     request: Json<CreateEntityTokenRequest>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<CreateTokenResponse> {
+) -> JsonApiResponse<CreateEntityTokenResponse> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
     let CreateEntityTokenRequest { kind, key, send_link } = request.into_inner();
     let tenant_id = auth.tenant().id.clone();
@@ -82,16 +82,19 @@ pub async fn post(
     let CreateTokenResult { token, session, wfr } = res;
     let link = state.config.service_config.generate_link(link_kind, &token);
 
-    if send_link {
+    let delivery_method = if send_link {
         let org_name = auth.tenant().name.clone();
-        send_communication(&state, vw, wfr, org_name, link.clone()).await?;
-    }
+        send_communication(&state, vw, wfr, org_name, link.clone()).await?
+    } else {
+        None
+    };
 
     let expires_at = session.expires_at;
-    let response = CreateTokenResponse {
+    let response = CreateEntityTokenResponse {
         token,
         link,
         expires_at,
+        delivery_method,
     };
     ResponseData::ok(response).json()
 }
@@ -102,14 +105,14 @@ pub(super) async fn send_communication(
     wfr: Option<WorkflowRequest>,
     org_name: String,
     link: PiiString,
-) -> ApiResult<()> {
+) -> ApiResult<Option<ContactInfoKind>> {
     let msg = if let Some(wfr) = wfr {
         TriggerMessage::for_wfr(wfr, org_name, link)
     } else {
         TriggerMessage::for_auth(org_name, link)
     };
 
-    if let Some(phone) = vw.decrypt_contact_info(state, ContactInfoKind::Phone).await? {
+    let method = if let Some(phone) = vw.decrypt_contact_info(state, ContactInfoKind::Phone).await? {
         let msg = SmsMessage::from(msg);
         let scope = msg.rate_limit_scope;
         let phone = PhoneNumber::parse(phone.0)?;
@@ -117,16 +120,18 @@ pub(super) async fn send_communication(
             .sms_client
             .send_message(state, msg.message_body, &phone, scope)
             .await?;
+        Some(ContactInfoKind::Phone)
     } else if let Some(email) = vw.decrypt_contact_info(state, ContactInfoKind::Email).await? {
         let msg = EmailMessage::from(msg);
         state
             .sendgrid_client
             .send_template(state, email.0, msg.template_id, msg.template_data)
             .await?;
+        Some(ContactInfoKind::Email)
     } else {
         return Err(UserError::NoContactInfoForUser.into());
-    }
-    Ok(())
+    };
+    Ok(method)
 }
 
 #[derive(Clone)]
@@ -155,7 +160,7 @@ impl TriggerMessage {
         let WorkflowRequest { note, config, .. } = wfr;
         let context_message = match config {
             WorkflowRequestConfig::RedoKyc => {
-                format!("{} has requested you to reverify your identity.", org_name)
+                format!("{} has requested you to re-verify your identity.", org_name)
             }
             WorkflowRequestConfig::IdDocument {
                 kind,

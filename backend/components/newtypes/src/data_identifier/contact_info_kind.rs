@@ -35,7 +35,8 @@ pub enum ActionKind {
     AddPrimary,
 }
 
-#[derive(Debug, Display, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Display, Clone, Copy, Eq, PartialEq, serde::Serialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
 pub enum ContactInfoKind {
     Phone,
     Email,

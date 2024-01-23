@@ -73,3 +73,13 @@ pub struct CreateTokenResponse {
     /// The time at which the token (and link) expire
     pub expires_at: DateTime<Utc>,
 }
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct CreateEntityTokenResponse {
+    pub token: SessionAuthToken,
+    pub link: PiiString,
+    pub expires_at: DateTime<Utc>,
+    /// When a link was requested to be sent, the method by which the link was sent
+    pub delivery_method: Option<ContactInfoKind>,
+}
