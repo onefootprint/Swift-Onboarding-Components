@@ -114,7 +114,6 @@ def test_cant_see_fp_id(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user)
     )
 
 
-@pytest.mark.flaky
 def test_search(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):
     """
     Make sure we can search by fields that were prefilled
@@ -122,7 +121,7 @@ def test_search(sandbox_tenant, foo_sandbox_tenant, dual_onboarded_user):
     phone_number = dual_onboarded_user.user.client.data["id.phone_number"]
     email = dual_onboarded_user.user.client.data["id.email"]
     for search_query in [phone_number, email]:
-        data = dict(search=search_query)
+        data = dict(search=search_query, pagination=dict(page_size=100))
         # Both tenants should be able to find the user based on the search query
 
         body = post("entities/search", data, *sandbox_tenant.db_auths)
