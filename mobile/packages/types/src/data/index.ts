@@ -38,6 +38,7 @@ export * from './identifier';
 export * from './insight-event';
 export * from './investor-data-attribute';
 export * from './investor-profile-data';
+export * from './l10n';
 export * from './liveness';
 export * from './liveness-check-info';
 export * from './match-signal';

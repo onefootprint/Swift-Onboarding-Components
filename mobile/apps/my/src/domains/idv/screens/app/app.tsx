@@ -1,7 +1,7 @@
 import themes from '@onefootprint/design-tokens';
-import styled, { css } from 'styled-components/native';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import React, { useMemo } from 'react';
+import styled, { css } from 'styled-components/native';
 
 import createTheme from '@/utils/create-theme';
 
