@@ -45,7 +45,7 @@ impl<Type> VaultWrapper<Type> {
         state: &State,
         kind: ContactInfoKind,
     ) -> ApiResult<PiiString> {
-        let (data, _, dl) = self
+        let (data, ci, _) = self
             .decrypt_contact_info(state, kind)
             .await?
             .ok_or(ApiErrorKind::ContactInfoKindNotInVault(kind))?;
@@ -53,7 +53,7 @@ impl<Type> VaultWrapper<Type> {
         // TODO we're moving away from needing to send things to verified contact info. Can we rm
         // this check for vaults made via bifrost too?
         let vault_made_via_bifrost = !self.vault.is_created_via_api;
-        if vault_made_via_bifrost && !dl.source.is_added_by_user() {
+        if vault_made_via_bifrost && !ci.is_otp_verified {
             // Many of the communications we send out give either OTPs or links that allow authing
             // as the user. So, we want to make sure a tenant can't update the user's phone number/email
             // and then send themselves OTPs. First, check that the phone number/email is verified to

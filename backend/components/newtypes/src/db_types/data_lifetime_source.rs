@@ -41,15 +41,3 @@ pub enum DataLifetimeSource {
 }
 
 crate::util::impl_enum_string_diesel!(DataLifetimeSource);
-
-impl DataLifetimeSource {
-    /// True if this DataLifetimeSource implies that the end user themselves added the piece of data
-    pub fn is_added_by_user(&self) -> bool {
-        match self {
-            Self::Hosted | Self::Prefill => true,
-            // ClientTenant is impersonatable by the tenant, so it is not considered to be added
-            // by the user
-            Self::ClientTenant | Self::Tenant | Self::Ocr | Self::Unknown => false,
-        }
-    }
-}
