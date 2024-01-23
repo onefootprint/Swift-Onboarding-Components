@@ -1,0 +1,329 @@
+{
+  "side": {
+    "front": "frente",
+    "back": "atrás"
+  },
+  "di": {
+    "id.name": "Nombre",
+    "id.phone_number": "Número de teléfono",
+    "id.email": "Correo electrónico",
+    "id.first_name": "Nombre",
+    "id.last_name": "Apellido",
+    "id.ssn9": "SSN (Completo)",
+    "id.ssn4": "SSN (Últimos 4)",
+    "id.dob": "Fecha de nacimiento",
+    "id.address_line1": "Línea de dirección 1",
+    "id.address_line2": "Línea de dirección 2",
+    "id.city": "Ciudad",
+    "id.country": "País",
+    "id.state": "Estado",
+    "id.zip": "Código postal"
+  },
+  "id-doc": {
+    "drivers_license": "Licencia de conducir",
+    "id_card": "Tarjeta de identificación",
+    "passport": "Pasaporte",
+    "visa": "Visa",
+    "permit": "Permiso de trabajo / Tarjeta EAD",
+    "residence_document": "Tarjeta de residencia / Tarjeta verde"
+  },
+  "cdo": {
+    "name": "Nombre completo",
+    "dob": "Fecha de nacimiento",
+    "ssn9": "SSN (Completo)",
+    "ssn4": "SSN (Últimos 4)",
+    "full_address": "Dirección",
+    "email": "Correo electrónico",
+    "phone_number": "Número de teléfono",
+    "nationality": "Nacionalidad",
+    "selfie": "Selfie",
+    "document": "Documento de identidad",
+    "document_and_selfie": "Documento de identidad y Selfie",
+    "investor_profile": "Perfil de inversor"
+  },
+  "components": {
+    "back-button": {
+      "cta": "Volver atrás"
+    },
+    "passkeys": {
+      "register": {
+        "title": "Verificación de vida",
+        "subtitle": "Con una verificación de rostro o huella dactilar, aseguramos que tu cuenta siempre se acceda de manera segura por ti, manteniendo tus detalles personales privados y protegidos.",
+        "cta": "Iniciar verificación",
+        "skip": "Hacerlo más tarde",
+        "about": {
+          "cta": "Más sobre las contraseñas de acceso",
+          "title": "Acerca de las contraseñas de acceso",
+          "content": "Las contraseñas de acceso son nuestra forma de eliminar las contraseñas complicadas. Son una clave simple y segura para acceder a la aplicación, ¡y son únicas para ti! Di adiós a recordar y escribir contraseñas, tu contraseña de acceso lo hace todo con un toque.",
+          "close": "Cerrar"
+        }
+      },
+      "retry": {
+        "title": "Por favor, inténtalo de nuevo",
+        "subtitle": "La verificación de rostro/huella dactilar falló. Inténtalo de nuevo o completa más tarde.",
+        "cta": "Iniciar verificación",
+        "skip": "Hacerlo más tarde"
+      },
+      "success": {
+        "title": "¡Autenticación biométrica exitosa!"
+      }
+    }
+  },
+  "scan": {
+    "doc-selection": {
+      "title": "Necesitamos una foto de tu identificación",
+      "subtitle": "Selecciona la opción que mejor te funcione",
+      "country-select": {
+        "hint": "Solo se aceptan documentos emitidos por {{country}}"
+      },
+      "options": {
+        "dl": "Licencia de conducir",
+        "id": "Tarjeta de identificación",
+        "passport": "Pasaporte",
+        "residence-document": "Tarjeta de residencia / Tarjeta verde",
+        "voter-identification": "Identificación de votante",
+        "permit": "Permiso de trabajo / Tarjeta EAD",
+        "visa": "Visa"
+      },
+      "permissions-dialog": {
+        "title": "Permitir acceso a tu cámara",
+        "description": "Necesitaremos que tomes fotos de tu documento para verificar adecuadamente tu identidad.",
+        "continue": "Continuar",
+        "open-settings": "Abrir ajustes",
+        "cta": "Continuar"
+      },
+      "cta": "Continuar"
+    },
+    "instructions": {
+      "title": "Instrucciones",
+      "bg": {
+        "title": "Encuentra un fondo con buen contraste",
+        "description": "Un alto contraste ayuda en la detección del documento, evitando errores."
+      },
+      "frame": {
+        "title": "Coloca el documento en el marco",
+        "description": "Asegúrate de que todo el documento esté posicionado según se indica en el marco."
+      },
+      "hold": {
+        "title": "Mantén la cámara estable",
+        "description": "Mantén la cámara estable para evitar desenfoques o reflejos."
+      },
+      "auto": {
+        "title": "La imagen se capturará automáticamente",
+        "description": "Mostraremos una cuenta regresiva de 3 segundos antes de que se capture."
+      }
+    },
+    "upload": {
+      "errors": {
+        "title": "No pudimos procesar tu imagen",
+        "cta": "Volver a tomar",
+        "doc_type_mismatch": "El tipo de documento no coincide. Por favor, sube tu {{documentType}} de {{countryName}}.",
+        "unknown_document_type": "No pudimos clasificar este documento. Por favor, sube tu {{documentType}} de {{countryName}}.",
+        "unsupported_document_type": "Lamentablemente, el tipo de documento subido no es compatible. Por favor, sube tu {{documentType}} de {{countryName}}.",
+        "wrong_document_side": "Parece que subiste el lado incorrecto de tu documento. Voltea tu identificación y sube el {{side}} de tu {{documentType}} de {{countryName}}.",
+        "wrong_one_sided_document": "Se detectó un tipo de documento incorrecto. Por favor, sube tu {{documentType}} de {{countryName}}.",
+        "document_not_readable": "No se pudo leer tu documento. Por favor, inténtalo de nuevo.",
+        "document_glare": "La imagen de tu documento tenía demasiado resplandor. Ajusta la iluminación e inténtalo de nuevo.",
+        "document_sharpness": "La imagen del documento estaba borrosa. Por favor, sube o captura una imagen más nítida.",
+        "id_type_not_acceptable": "Se detectó un tipo de documento inválido. Por favor, sube tu {{documentType}} de {{countryName}}.",
+        "unable_to_align_document": "Uno o más bordes del documento no están dentro de los límites de la imagen. Coloca el documento en el centro del marco e inténtalo de nuevo.",
+        "unknown_country_code": "No pudimos detectar el país emisor de tu documento. Por favor, sube tu {{documentType}} de {{countryName}}.",
+        "country_code_mismatch": "El país emisor de {{documentType}} no coincidió. Por favor, sube tu {{documentType}} de {{countryName}}.",
+        "selfie_face_not_found": "No pudimos detectar un rostro en la selfie. Por favor, inténtalo de nuevo y asegúrate de que tu rostro esté en el encuadre.",
+        "selfie_low_confidence": "No pudimos verificar tu selfie. Por favor, inténtalo de nuevo.",
+        "selfie_too_dark": "Tu imagen estaba demasiado oscura. Ajusta la iluminación e inténtalo de nuevo.",
+        "selfie_glare": "Tu selfie tenía demasiado resplandor. Ajusta la iluminación e inténtalo de nuevo.",
+        "selfie_has_lenses": "Detectamos gafas en tu selfie. Por favor, retira tus gafas e inténtalo de nuevo.",
+        "selfie_has_face_mask": "Detectamos una mascarilla facial en tu selfie. Por favor, quítate todas las cubiertas faciales y inténtalo de nuevo.",
+        "selfie_blurry": "Tu selfie estaba demasiado borrosa. Por favor, inténtalo de nuevo.",
+        "selfie_image_size_unsupported": "La imagen de tu selfie era demasiado pequeña. Por favor, inténtalo de nuevo con una imagen de mayor resolución.",
+        "selfie_image_orientation_incorrect": "La imagen de tu selfie tiene la orientación incorrecta. Asegúrate de que la imagen enviada esté en formato vertical y inténtalo de nuevo.",
+        "selfie_bad_image_compression": "La imagen de tu selfie tiene una compresión incorrecta. Por favor, inténtalo de nuevo.",
+        "drivers_license_permit_not_allowed": "Los permisos de licencia de conducir no están permitidos. Por favor, inténtalo con una licencia de conducir completa o ponte en contacto con el negocio para obtener soporte.",
+        "unknown_error": "Se produjo un error. Por favor, inténtalo de nuevo.",
+        "face_not_found": "No pudimos detectar un rostro en el documento proporcionado. Por favor, inténtalo de nuevo y asegúrate de que estás capturando una imagen clara."
+      },
+      "loading": {
+        "title": "Procesando imagen",
+        "description": "¡Espera un momento! Estará listo pronto."
+      },
+      "success": {
+        "title": "¡Éxito!"
+      },
+      "too-many-attempts": {
+        "title": "Demasiados intentos",
+        "description": "Lo sentimos, no podemos continuar con el proceso de incorporación ya que has intentado enviar las imágenes de tu documento demasiadas veces. Nos pondremos en contacto si necesitamos más información."
+      }
+    },
+    "consent": {
+      "title": "Consentimiento para el uso de tus imágenes",
+      "subtitle": "Consentimiento y autorización por escrito para la recopilación, uso, divulgación y almacenamiento de datos personales (incluyendo información biométrica e identificadores)",
+      "description": "Al hacer clic en Aceptar y continuar y proporcionar a One Footprint, Inc. (en adelante referida como \"Empresa\") tus Datos Personales, incluyendo tu Información Biométrica e información de identificación gubernamental, consientes a la recopilación, almacenamiento, retención, uso y divulgación de dicha información por parte de la Empresa y Incode Technologies, Inc. (en adelante \"Incode\") para proporcionar los servicios de verificación de identidad, de acuerdo con el Aviso de Privacidad de la Empresa y los Términos de Uso que puedes encontrar en https://www.onefootprint.com/privacy-policy y https://www.onefootprint.com/terms-of-service. Incluso si consientes, puedes retirar tu consentimiento en cualquier momento.\n\nPara verificar que eres la persona representada en tu identificación emitida por el gobierno (\"Servicios\"), la Empresa utiliza tecnología de terceros de Incode para recopilar datos personales tuyos, incluyendo información biométrica e identificadores biométricos como tu huella facial (\"Información Biométrica\"), una selfie y tu identificación emitida por el gobierno, incluyendo información obtenida, por ejemplo y cuando corresponda, escaneando el código de barras (colectivamente con la Información Biométrica, \"Datos Personales\"). Específicamente, se te pedirá que tomes una selfie a través de la plataforma de Incode. Luego, Incode escaneará y mapeará tus rasgos faciales en comparación con la imagen en tu identificación emitida por el gobierno para permitirte crear y/o acceder a tu cuenta con la Empresa. Ten en cuenta que el procesamiento de tus Datos Personales, en particular de tu Información Biométrica por parte de Incode, incluirá una comparación de la imagen en tu documento de identificación con tu selfie (1:1), que luego se comparará con la base de datos de la Empresa con fines de prevención de fraudes (1:N). Para los Servicios, Incode también recopilará otra información que se encuentra en el frente y dorso de tu documentación de identificación, incluyendo donde exista y lo permita la ley, escaneando el código de barras y recopilando información derivada de él (por ejemplo, nombre, fecha de nacimiento, estatura). Incode utiliza esta información para verificar tu identidad y prevenir fraudes. Incode también puede, con tu consentimiento, utilizar esta información para mejorar sus productos y servicios. La Empresa o Incode en nombre de la Empresa, pueden compartir tus Datos Personales con proveedores de servicios de terceros o entidades gubernamentales que nos permitan proporcionar nuestros Servicios (por ejemplo, proveedores de alojamiento en la nube, base de datos de estafadores o el Departamento de Vehículos Motorizados si proporcionas una tarjeta de identificación de EE. UU.) y otros terceros cuando lo requiera la ley.\n\nUso de tus Datos Personales: Tus Datos Personales, incluyendo la Información Biométrica, pueden utilizarse para los siguientes fines (según corresponda según tu consentimiento), en cada caso como se describe con mayor detalle en la Política de Privacidad de la Empresa y/o la Política de Privacidad de Incode:\n\n• Para proporcionar los servicios para los cuales se solicitaron los Datos Personales;\n • Para mejorar o modificar los productos y servicios de Incode; y\n• Para cumplir con las obligaciones de la Empresa o Incode bajo la ley aplicable.\n\nPuedes solicitar la eliminación de tus Datos Personales y ejercer cualquier otro derecho bajo las leyes de protección de datos aplicables en cualquier momento enviando un correo electrónico a la Empresa a support@onefootprint.com o a Incode a dataprotection@incode.com. Si solicitas la eliminación de tus Datos Personales, no podremos recuperarlos en un momento posterior. La Empresa o Incode, según corresponda, eliminará permanentemente la Información Biométrica procesada (si la hubiera) para sus propios fines en el momento anterior de: (i) el momento en que se haya satisfecho el propósito para el cual se recopiló; o (ii) tres años desde el momento en que proporcionaste tu consentimiento. Incode hará lo mismo con la Información Biométrica que procesa en nombre de la Empresa y según las instrucciones de la misma.\n",
+      "scroll-to-agree": "Desplázate para aceptar",
+      "agree-and-continue": "Aceptar y continuar",
+      "continue": "Continuar",
+      "third-party": "Opcional: Al marcar esta casilla y proporcionar a Incode tus Datos Personales, incluyendo tu Información Biométrica y tu información de identificación gubernamental, otorgas tu consentimiento y proporcionas una autorización por escrito a Incode para la recopilación, almacenamiento, retención, uso y divulgación de dicha información con el fin de mejorar, modificar o actualizar los productos o servicios de Incode (incluyendo su algoritmo), de acuerdo con su Aviso de Privacidad. Puedes ejercer tus derechos conforme a las leyes de privacidad aplicables, incluyendo la revocación de tu consentimiento, contactando a dataprotection@incode.com. IMPORTANTE: Tu consentimiento es voluntario, incluso si no das tu consentimiento, aún podrás acceder a los servicios de la Compañía.",
+      "consent-bottomsheet": {
+        "submit-button": {
+          "disabled-title": "Desplázate para aceptar",
+          "enabled-title": "Aceptar y continuar"
+        }
+      }
+    },
+    "drivers-license": {
+      "name": "licencia de conducir",
+      "title-front": "Licencia de conducir - Frente",
+      "title-back": "Licencia de conducir - Dorso",
+      "instructions": {
+        "title-front": "Coloca el frente de tu licencia de conducir aquí",
+        "title-back": "Coloca el dorso de tu licencia de conducir aquí",
+        "description": "La escanearemos automáticamente"
+      }
+    },
+    "passport": {
+      "name": "pasaporte",
+      "title": "Pasaporte",
+      "instructions": {
+        "title": "Coloca el pasaporte aquí",
+        "description": "Lo escanearemos automáticamente"
+      }
+    },
+    "id-card": {
+      "name": "Tarjeta de identificación",
+      "title-front": "Tarjeta de identificación - Frente",
+      "title-back": "Tarjeta de identificación - Dorso",
+      "instructions": {
+        "title-front": "Coloca el frente de tu tarjeta de identificación aquí",
+        "title-back": "Coloca el dorso de tu tarjeta de identificación aquí",
+        "description": "La escanearemos automáticamente"
+      }
+    },
+    "voter-identification": {
+      "name": "identificación de votante",
+      "title-front": "Identificación de votante - Frente",
+      "title-back": "Identificación de votante - Dorso",
+      "instructions": {
+        "title-front": "Coloca el frente de tu identificación de votante aquí",
+        "title-back": "Coloca el dorso de tu identificación de votante aquí",
+        "description": "La escanearemos automáticamente"
+      }
+    },
+    "residence-document": {
+      "name": "tarjeta de residencia",
+      "title-front": "Tarjeta de residencia - Frente",
+      "title-back": "Tarjeta de residencia - Dorso",
+      "instructions": {
+        "title-front": "Coloca el frente de tu tarjeta de residencia aquí",
+        "title-back": "Coloca el dorso de tu tarjeta de residencia aquí",
+        "description": "La escanearemos automáticamente"
+      }
+    },
+    "permit": {
+      "name": "tarjeta EAD",
+      "title-front": "Tarjeta EAD - Frente",
+      "title-back": "Tarjeta EAD - Dorso",
+      "instructions": {
+        "title-front": "Coloca el frente de tu tarjeta EAD aquí",
+        "title-back": "Coloca el dorso de tu tarjeta EAD aquí",
+        "description": "La escanearemos automáticamente"
+      }
+    },
+    "visa": {
+      "name": "visa",
+      "title-front": "Visa - Frente",
+      "title-back": "Visa - Dorso",
+      "instructions": {
+        "title-front": "Coloca el frente de tu visa aquí",
+        "title-back": "Coloca el dorso de tu visa aquí",
+        "description": "La escanearemos automáticamente"
+      }
+    },
+    "selfie": {
+      "title": "Selfie",
+      "instructions": {
+        "title": "Coloca tu rostro aquí",
+        "description": "La escanearemos automáticamente"
+      }
+    }
+  },
+  "screens": {
+    "preview": {
+      "banner": "Modo demo",
+      "about": {
+        "title": "Modo demo",
+        "content": "Para mantener las cosas seguras, esta experiencia utiliza datos ficticios para que puedas probar el flujo sin comprometer tu privacidad.",
+        "cta": "Continuar"
+      }
+    },
+    "email-identification": {
+      "title": "¡Hola! 👋",
+      "subtitle": "Ingresa tu correo electrónico para empezar.",
+      "form": {
+        "email": {
+          "label": "Correo electrónico",
+          "placeholder": "jane.doe@acme.com",
+          "errors": {
+            "required": "Por favor, ingresa un correo electrónico"
+          }
+        },
+        "cta": "Continuar"
+      },
+      "user-not-found": {
+        "title": "Usuario no encontrado",
+        "description": "Lo siento, no pudimos encontrar una cuenta asociada a este correo electrónico.",
+        "cta": "Cerrar"
+      }
+    },
+    "login": {
+      "title": "¡Bienvenido de nuevo! 🎉",
+      "tab": {
+        "aria-label": "Método de identificación"
+      },
+      "sms": {
+        "title": "SMS",
+        "instructions": "Ingresa el código de 6 dígitos enviado a",
+        "cta": "Reenviar código",
+        "verifying": "Verificando...",
+        "success": "¡Éxito!",
+        "resend-button": {
+          "cta": "Reenviar código",
+          "disabled": "Por favor, espera {{seconds}} segundos para volver a enviarlo..."
+        },
+        "error": {
+          "title": "No pudimos autenticar mediante SMS"
+        }
+      },
+      "passkey": {
+        "title": "Clave de acceso",
+        "cta": "Iniciar clave de acceso",
+        "cta-retry": "Reintentar clave de acceso",
+        "notifications": {
+          "error": {
+            "title": "No pudimos autenticar mediante la clave de acceso"
+          }
+        }
+      }
+    },
+    "canceled": {
+      "title": "Sesión cancelada",
+      "subtitle": "Por favor, regresa a la página anterior"
+    },
+    "completed": {
+      "title": "¡Éxito!",
+      "subtitle": "Ahora puedes continuar desde donde lo dejaste en la computadora de escritorio"
+    },
+    "completed-preview": {
+      "title": "¡Éxito!",
+      "subtitle": "Has completado con éxito nuestra demostración.",
+      "cta": "Reiniciar demo"
+    },
+    "error": {
+      "title": "La sesión no es válida",
+      "subtitle": "Por favor, regresa a la página anterior."
+    },
+    "expired": {
+      "title": "Sesión expirada",
+      "subtitle": "Por razones de seguridad, esta sesión ha expirado. Por favor, regresa a la página anterior."
+    }
+  }
+}
