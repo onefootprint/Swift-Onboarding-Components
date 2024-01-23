@@ -97,7 +97,7 @@ const EmailIdentification = ({
                 autoCorrect={false}
                 autoFocus
                 blurOnSubmit
-                enterKeyHint="send"
+                returnKeyType="send"
                 hasError={!!error}
                 hint={error?.message}
                 inputMode="email"

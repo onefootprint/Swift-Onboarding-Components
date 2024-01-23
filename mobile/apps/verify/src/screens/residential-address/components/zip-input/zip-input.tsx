@@ -29,7 +29,7 @@ const ZipInput = ({ control, currInputRef, nextInputRef }: ZipInputProps) => {
             <TextInput
               autoComplete="postal-code"
               blurOnSubmit
-              enterKeyHint="next"
+              returnKeyType="next"
               hasError={!!error}
               hint={error?.message}
               inputMode="text"

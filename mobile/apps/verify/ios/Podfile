@@ -1,11 +1,6 @@
-platform :ios, '14.0'
-
-# Resolve react_native_pods.rb with node to allow for hoisting
-require Pod::Executable.execute_command('node', ['-p',
-  'require.resolve(
-    "react-native/scripts/react_native_pods.rb",
-    {paths: [process.argv[1]]},
-  )', __dir__]).strip
+require_relative '../../../node_modules/react-native/scripts/react_native_pods'
+require_relative '../../../node_modules/@react-native-community/cli-platform-ios/native_modules'
+platform :ios, min_ios_version_supported
 
 prepare_react_native_project!
 
@@ -31,7 +26,11 @@ target 'verify' do
 
   use_react_native!(
     :path => config[:reactNativePath],
+    # Hermes is now enabled by default. Disable by setting this flag to false.
     :hermes_enabled => false,
+    :fabric_enabled => false,
+    # :hermes_enabled => flags[:hermes_enabled],
+    # :fabric_enabled => flags[:fabric_enabled], 
     # Enables Flipper.
     #
     # Note that if you have use_frameworks! enabled, Flipper will not work and
@@ -51,6 +50,7 @@ post_install do |installer|
     config[:reactNativePath],
     :mac_catalyst_enabled => false
   )
+  __apply_Xcode_12_5_M1_post_install_workaround(installer)
 
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
@@ -68,4 +68,3 @@ post_install do |installer|
     end
   end
 end
-

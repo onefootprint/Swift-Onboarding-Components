@@ -135,7 +135,7 @@ const Ssn = ({
                   autoCorrect={false}
                   autoFocus
                   blurOnSubmit
-                  enterKeyHint="send"
+                  returnKeyType="send"
                   hasError={!!error}
                   hint={error?.message}
                   inputMode="text"
@@ -168,7 +168,7 @@ const Ssn = ({
                   autoCorrect={false}
                   autoFocus
                   blurOnSubmit
-                  enterKeyHint="send"
+                  returnKeyType="send"
                   hasError={!!error}
                   hint={error?.message}
                   inputMode="text"

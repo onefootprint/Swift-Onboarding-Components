@@ -52,7 +52,7 @@ const StateInput = ({ control, country, stateRef }: StateInputProps) => {
             value={typeof value === 'object' ? value : undefined}
             searchInputProps={{
               autoComplete: 'postal-address-locality',
-              enterKeyHint: 'next',
+              returnKeyType: 'next',
               placeholder: t('form.state.placeholder'),
               textContentType: 'addressState',
             }}
@@ -60,7 +60,7 @@ const StateInput = ({ control, country, stateRef }: StateInputProps) => {
         ) : (
           <TextInput
             blurOnSubmit={false}
-            enterKeyHint="next"
+            returnKeyType="next"
             hasError={!!error}
             hint={error?.message}
             inputMode="text"

@@ -28,7 +28,7 @@ const CityInput = ({ control, currInputRef, nextInputRef }: CityInputProps) => {
             <TextInput
               autoComplete="address-line1"
               blurOnSubmit={false}
-              enterKeyHint="next"
+              returnKeyType="next"
               hasError={!!error}
               hint={error?.message}
               inputMode="text"

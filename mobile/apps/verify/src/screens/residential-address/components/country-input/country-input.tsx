@@ -54,7 +54,7 @@ const CountryInput = ({
             }}
             searchInputProps={{
               placeholder: t('form.country.placeholder'),
-              enterKeyHint: 'next',
+              returnKeyType: 'next',
               autoComplete: 'country',
               textContentType: 'countryName',
             }}

@@ -49,7 +49,7 @@ const AddressLinesInput = ({
               placeholder={t('form.address-line1.placeholder')}
               searchInputProps={{
                 autoComplete: 'address-line1',
-                enterKeyHint: 'next',
+                returnKeyType: 'next',
                 placeholder: t('form.address-line1.placeholder'),
                 textContentType: 'streetAddressLine1',
                 blurOnSubmit: false,
@@ -73,7 +73,7 @@ const AddressLinesInput = ({
             <TextInput
               autoComplete="address-line2"
               blurOnSubmit={false}
-              enterKeyHint="next"
+              returnKeyType="next"
               hasError={!!error}
               hint={error?.message}
               inputMode="text"

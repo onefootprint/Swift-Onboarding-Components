@@ -103,7 +103,7 @@ const PhoneIdentification = ({
                 autoComplete="tel"
                 autoCorrect={false}
                 blurOnSubmit
-                enterKeyHint="send"
+                returnKeyType="send"
                 hasError={!!error}
                 hint={error?.message}
                 inputMode="tel"
