@@ -18,6 +18,7 @@ import {
   IcoVisaPassport24,
   IcoVoter24,
   IcoWork24,
+  IcoWriting24,
 } from '@onefootprint/icons';
 import {
   CollectedDocumentDataOption,
@@ -54,6 +55,10 @@ const IconByIdDocType: Record<SupportedIdDocTypes, Icon> = {
   [SupportedIdDocTypes.visa]: IcoVisaPassport24,
   [SupportedIdDocTypes.voterIdentification]: IcoVoter24,
   [SupportedIdDocTypes.ssnCard]: IcoSsnCard24,
+  [SupportedIdDocTypes.lease]: IcoWriting24,
+  [SupportedIdDocTypes.bankStatement]: IcoWriting24,
+  [SupportedIdDocTypes.utilityBill]: IcoWriting24,
+
 };
 
 type KycFieldsProps = {
@@ -95,6 +100,9 @@ const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
       'data-labels.voterIdentification',
     ),
     [SupportedIdDocTypes.ssnCard]: t('data-labels.ssn_card'),
+    [SupportedIdDocTypes.lease]: t('data-labels.lease'),
+    [SupportedIdDocTypes.bankStatement]: t('data-labels.bank_statement'),
+    [SupportedIdDocTypes.utilityBill]: t('data-labels.utility_bill'),
   };
 
   const fields: FieldProps[] = [];

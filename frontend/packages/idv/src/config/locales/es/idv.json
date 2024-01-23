@@ -1296,6 +1296,15 @@
             },
             "ssnCard": {
               "title": "Tarjeta de SSN"
+            },
+            "lease": {
+              "title": "Arrendamiento (actual)"
+            },
+            "bankStatement": {
+              "title": "Extracto de Cuenta (desde los últimos 30 días)"
+            },
+            "utilityBill": {
+              "title": "Factura de servicios (desde los últimos 30 días)"
             }
           },
           "not-supported": "Lo sentimos, por el momento no admitimos identificaciones de tu país.",

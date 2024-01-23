@@ -167,6 +167,9 @@ export enum DocumentDI {
   voterIdentificationClassifiedDocumentType = 'document.voter_identification.classifed_document_type',
 
   latestSsnCardFront = 'document.ssn_card.front.image',
+  latestLeaseFront = 'document.lease.front.image',
+  latestBankStatementFront = 'document.bank_statement.front.image',
+  latestUtilityBillFront = 'document.utility_bill.front.image',
 }
 
 export type VersionedDocumentDI<Version extends string = string> =

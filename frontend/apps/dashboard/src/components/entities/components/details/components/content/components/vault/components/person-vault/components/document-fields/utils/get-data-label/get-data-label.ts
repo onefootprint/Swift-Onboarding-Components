@@ -16,6 +16,9 @@ const getDataLabel = (
     .replace(`document.${SupportedIdDocTypes.residenceDocument}.`, '')
     .replace(`document.${SupportedIdDocTypes.voterIdentification}.`, '')
     .replace(`document.${SupportedIdDocTypes.ssnCard}.`, '')
+    .replace(`document.${SupportedIdDocTypes.lease}.`, '')
+    .replace(`document.${SupportedIdDocTypes.bankStatement}.`, '')
+    .replace(`document.${SupportedIdDocTypes.utilityBill}.`, '')
     .replace(`:${activeDocumentVersion}`, '');
 
 export default getDataLabel;

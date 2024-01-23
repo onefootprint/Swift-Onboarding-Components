@@ -28,6 +28,15 @@ const getDocumentType = (di: DocumentDI) => {
   if (di.includes(SupportedIdDocTypes.ssnCard)) {
     return SupportedIdDocTypes.ssnCard;
   }
+  if (di.includes(SupportedIdDocTypes.lease)) {
+    return SupportedIdDocTypes.lease;
+  }
+  if (di.includes(SupportedIdDocTypes.bankStatement)) {
+    return SupportedIdDocTypes.bankStatement;
+  }
+  if (di.includes(SupportedIdDocTypes.utilityBill)) {
+    return SupportedIdDocTypes.utilityBill;
+  }
   return undefined;
 };
 

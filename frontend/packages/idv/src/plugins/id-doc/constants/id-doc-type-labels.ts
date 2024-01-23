@@ -9,6 +9,9 @@ const IdDocTypeToLabel: Record<SupportedIdDocTypes, string> = {
   [SupportedIdDocTypes.workPermit]: 'EAD card',
   [SupportedIdDocTypes.voterIdentification]: 'voter identification',
   [SupportedIdDocTypes.ssnCard]: 'ssn card',
+  [SupportedIdDocTypes.lease]: 'lease',
+  [SupportedIdDocTypes.bankStatement]: 'bank statement',
+  [SupportedIdDocTypes.utilityBill]: 'utility bill',
 };
 
 export default IdDocTypeToLabel;

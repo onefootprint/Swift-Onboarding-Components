@@ -1301,6 +1301,15 @@
             },
             "ssnCard": {
               "title": "SSN Card"
+            },
+            "lease": {
+              "title": "Lease (Current)"
+            },
+            "bankStatement": {
+              "title": "Bank Statement (from last 30d)"
+            },
+            "utilityBill": {
+              "title": "Utility Bill (from last 30d)"
             }
           },
           "not-supported": "Sorry, we don't support IDs for your country yet.",

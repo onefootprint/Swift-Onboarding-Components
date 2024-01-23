@@ -34,6 +34,8 @@ const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
       trigger = { kind };
     } else if (kind === TriggerKind.ProofOfSsn) {
       trigger = { kind };
+    } else if (kind === TriggerKind.ProofOfAddress) {
+      trigger = { kind };
     } else {
       return;
     }

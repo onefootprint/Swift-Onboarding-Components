@@ -13,6 +13,10 @@ export enum SupportedIdDocTypes {
   residenceDocument = 'residence_document',
   voterIdentification = 'voter_identification',
   ssnCard = 'ssn_card',
+  lease = 'lease',
+  bankStatement = 'bank_statement',
+  utilityBill = 'utility_bill'
+
 }
 
 export enum IdDocRegionality {

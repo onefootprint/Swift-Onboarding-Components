@@ -42,7 +42,10 @@
     "permit": "Work permit / EAD card",
     "residence_document": "Residence card / Green card",
     "voter_identification": "Voter identification",
-    "ssn_card": "SSN Card"
+    "ssn_card": "SSN Card",
+    "lease": "Lease",
+    "utility_bill": "Utility Bill",
+    "bank_statement": "Bank Statement"
   },
   "di": {
     "id": {
@@ -290,6 +293,27 @@
           "image": "SSN Card",
           "latest_upload": "SSN Card",
           "mime_type": "SSN Card MIME type"
+        }
+      },
+      "lease": {
+        "front": {
+          "image": "Lease",
+          "latest_upload": "Lease",
+          "mime_type": "Lease MIME type"
+        }
+      },
+      "bank_statement": {
+        "front": {
+          "image": "Bank Statement",
+          "latest_upload": "Bank Statement",
+          "mime_type": "Bank Statement MIME type"
+        }
+      },
+      "utility_bill": {
+        "front": {
+          "image": "Utility Bill",
+          "latest_upload": "Utility Bill",
+          "mime_type": "Utility Bill MIME type"
         }
       }
     },
@@ -941,7 +965,10 @@
                 "permit": "Work permit / EAD card",
                 "visa": "Visa",
                 "voter_identification": "Voter identification",
-                "ssn_card": "SSN Card"
+                "ssn_card": "SSN Card",
+                "lease": "Lease",
+                "bank_statement": "Bank Statement",
+                "utility_bill": "Utility Bill"
               },
               "failure-reasons": {
                 "doc_type_mismatch": "Document type didn't match.",
@@ -1180,6 +1207,10 @@
             "proof-of-ssn": {
               "title": "Upload proof of SSN",
               "description": "Request the user to upload proof of SSN"
+            },
+            "proof-of-address": {
+              "title": "Upload proof of address",
+              "description": "Request the user to upload proof of address"
             },
             "revise-kyc": {
               "title": "Re-onboard user",
@@ -1427,7 +1458,8 @@
             "actions": {
               "id_document": "upload ID photo",
               "redo_kyc": "revise KYC data",
-              "proof_of_ssn": "provide proof of SSN"
+              "proof_of_ssn": "provide proof of SSN",
+              "proof_of_address": "provide proof of address"
             },
             "link-sent": "User received a link to complete this task",
             "copy-link": "Copy link",

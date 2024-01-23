@@ -22,6 +22,9 @@ const IconByIdDocType: Record<SupportedIdDocTypes, JSX.Element> = {
   [SupportedIdDocTypes.visa]: <IcoWriting16 />,
   [SupportedIdDocTypes.voterIdentification]: <IcoVoter16 />,
   [SupportedIdDocTypes.ssnCard]: <IcoSsnCard16 />,
+  [SupportedIdDocTypes.lease]: <IcoWriting16 />,
+  [SupportedIdDocTypes.bankStatement]: <IcoWriting16 />,
+  [SupportedIdDocTypes.utilityBill]: <IcoWriting16 />,
 };
 
 type IdDocUploadedEventIconProps = {

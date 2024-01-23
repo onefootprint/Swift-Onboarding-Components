@@ -255,6 +255,9 @@
           "visa": "Visa",
           "voterIdentification": "Voter identification",
           "ssnCard": "SSN Card",
+          "lease": "Lease",
+          "utilityBill": "Utility Bill",
+          "bankStatement": "Bank Statement",
           "selfie": "Selfie",
           "business-name": "Business name",
           "business-tin": "TIN",
@@ -1279,6 +1282,15 @@
             },
             "ssnCard": {
               "title": "SSN Card"
+            },
+            "lease": {
+              "title": "Lease (Current)"
+            },
+            "bankStatement": {
+              "title": "Bank Statement (from last 30d)"
+            },
+            "utilityBill": {
+              "title": "Utility Bill (from last 30d)"
             }
           },
           "not-supported": "Sorry, we don't support IDs for your country yet.",
@@ -1295,7 +1307,10 @@
             "workPermit": "EAD card · FRONT",
             "residenceDocument": "Green card · FRONT",
             "voterIdentification": "Voter identification · FRONT",
-            "ssnCard": "SSN Card · FRONT"
+            "ssnCard": "SSN Card · FRONT",
+            "lease": "Lease · FRONT",
+            "utilityBill": "Utility Bill · FRONT",
+            "bankStatement": "Bank Statement · FRONT"
           },
           "preview": {
             "driversLicense": "Driver's license",
@@ -1305,7 +1320,10 @@
             "workPermit": "EAD card",
             "residenceDocument": "Green card",
             "voterIdentification": "Voter identification",
-            "ssnCard": "SSN Card"
+            "ssnCard": "SSN Card",
+            "lease": "Lease",
+            "utilityBill": "Utility Bill",
+            "bankStatement": "Bank Statement"
           }
         },
         "subtitle": {

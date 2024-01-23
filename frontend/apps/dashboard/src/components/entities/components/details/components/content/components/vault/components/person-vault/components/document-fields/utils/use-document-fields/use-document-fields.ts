@@ -155,6 +155,21 @@ const useDocumentFields = () => {
       label: t(DocumentDI.latestSsnCardFront),
       dis: [DocumentDI.latestSsnCardFront],
     },
+    {
+      main: DocumentDI.latestLeaseFront,
+      label: t(DocumentDI.latestLeaseFront),
+      dis: [DocumentDI.latestLeaseFront],
+    },
+    {
+      main: DocumentDI.latestBankStatementFront,
+      label: t(DocumentDI.latestBankStatementFront),
+      dis: [DocumentDI.latestBankStatementFront],
+    },
+    {
+      main: DocumentDI.latestUtilityBillFront,
+      label: t(DocumentDI.latestUtilityBillFront),
+      dis: [DocumentDI.latestUtilityBillFront],
+    },
   ];
 
   return fields;

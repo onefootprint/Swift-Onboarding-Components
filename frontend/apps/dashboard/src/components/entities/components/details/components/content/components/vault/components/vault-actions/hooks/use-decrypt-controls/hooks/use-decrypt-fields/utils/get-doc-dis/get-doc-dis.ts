@@ -18,6 +18,10 @@ const mainDIs: Partial<Record<DocumentDI, SupportedIdDocTypes>> = {
   [DocumentDI.latestVoterIdentificationFront]:
     SupportedIdDocTypes.voterIdentification,
   [DocumentDI.latestSsnCardFront]: SupportedIdDocTypes.ssnCard,
+  [DocumentDI.latestLeaseFront]: SupportedIdDocTypes.lease,
+  [DocumentDI.latestBankStatementFront]: SupportedIdDocTypes.bankStatement,
+  [DocumentDI.latestUtilityBillFront]: SupportedIdDocTypes.utilityBill,
+
 };
 
 const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {

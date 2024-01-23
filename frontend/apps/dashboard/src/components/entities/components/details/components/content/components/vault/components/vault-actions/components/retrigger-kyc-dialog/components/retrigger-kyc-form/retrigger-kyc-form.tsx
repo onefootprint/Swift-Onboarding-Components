@@ -6,6 +6,7 @@ import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import AnimatedContainer from 'src/components/animated-container';
 import FrequentNotesTextArea from 'src/components/frequent-notes-text-area';
+import useSession from 'src/hooks/use-session';
 
 import useEntity from '@/entity/hooks/use-entity';
 import useEntityId from '@/entity/hooks/use-entity-id';
@@ -34,6 +35,10 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
     watch,
   } = methods;
   const triggerKind = watch('kind');
+
+  const {
+    data: { user },
+  } = useSession();
 
   const handleBeforeSubmit = (data: RetriggerKYCFormData) => {
     onSubmit({
@@ -70,6 +75,16 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
             hint={t('form.proof-of-ssn.description')}
             {...register('kind', { required: true })}
           />
+          {user?.isFirmEmployee && (
+          <div>
+            <Radio
+              value={TriggerKind.ProofOfAddress}
+              label={t('form.proof-of-address.title')}
+              hint={t('form.proof-of-address.description')}
+              {...register('kind', { required: true })}
+            />
+          </div>
+        )}
           <Radio
             value={TriggerKind.RedoKyc}
             label={t('form.revise-kyc.title')}
