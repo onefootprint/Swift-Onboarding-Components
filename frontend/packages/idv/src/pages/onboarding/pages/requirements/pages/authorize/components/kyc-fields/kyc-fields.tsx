@@ -58,7 +58,6 @@ const IconByIdDocType: Record<SupportedIdDocTypes, Icon> = {
   [SupportedIdDocTypes.lease]: IcoWriting24,
   [SupportedIdDocTypes.bankStatement]: IcoWriting24,
   [SupportedIdDocTypes.utilityBill]: IcoWriting24,
-
 };
 
 type KycFieldsProps = {

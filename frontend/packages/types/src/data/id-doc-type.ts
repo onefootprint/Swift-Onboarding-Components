@@ -15,8 +15,7 @@ export enum SupportedIdDocTypes {
   ssnCard = 'ssn_card',
   lease = 'lease',
   bankStatement = 'bank_statement',
-  utilityBill = 'utility_bill'
-
+  utilityBill = 'utility_bill',
 }
 
 export enum IdDocRegionality {
