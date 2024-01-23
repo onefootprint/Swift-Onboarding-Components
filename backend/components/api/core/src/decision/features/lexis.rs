@@ -13,7 +13,7 @@ use std::convert::Into;
 // 40 Last name, address and SSN or phone verified; first name, phone or SSN
 //    verification failures
 // 50 Full name, address, phone, SSN verified
-const COMPREHENSIVE_VERIFICATION_INDEX_THRESHOLD: i32 = 30;
+const COMPREHENSIVE_VERIFICATION_INDEX_THRESHOLD: i32 = 20;
 
 pub fn footprint_reason_codes(res: FlexIdResponse, ssn_submitted: bool) -> Vec<FRC> {
     let risk_indicator_codes = res.risk_indicator_codes();
