@@ -96,11 +96,10 @@ const ArticleContainer = styled(Element)<{ name: string }>`
     display: flex;
     flex-direction: column;
 
-    ${media.greaterThan('md')`
+    ${media.greaterThan('lg')`
       display: grid;
-      grid-template-columns: minmax(${CONTENT_WIDTH}px, 4fr) 480px;
+      grid-template-columns: minmax(600px, 1fr) minmax(var(--page-aside-nav-api-reference-width-small), 0.5fr);
       grid-template-areas: 'article code';
-      
     `}
   `}
 `;

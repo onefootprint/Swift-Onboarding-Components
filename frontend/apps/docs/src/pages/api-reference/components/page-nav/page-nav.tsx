@@ -6,6 +6,7 @@ import {
   media,
   Stack,
   ThemeToggle,
+  Tooltip,
 } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
 import React, { forwardRef, useRef, useState } from 'react';
@@ -31,6 +32,8 @@ type Section = {
   title: string;
   subsections: Article[];
 };
+
+const CHARACTER_LIMIT_FOR_TOOLTIP = 35;
 
 /// A stable operation that groups _adjacent_ articles that have the same section name.
 /// This preserves the order of the input articles so they are displayed in navigation in the same
@@ -69,6 +72,15 @@ const PageNav = forwardRef<HTMLElement, PageNavProps>(({ sections }, ref) => {
     }
   };
 
+  const overflowRef = useRef<HTMLSpanElement>(null);
+
+  const analyzeLength = (path: string) => {
+    if (path.length > CHARACTER_LIMIT_FOR_TOOLTIP) {
+      return false;
+    }
+    return true;
+  };
+
   return (
     <PageNavContainer ref={ref}>
       <Header isScrolled={isScrolled}>
@@ -92,17 +104,25 @@ const PageNav = forwardRef<HTMLElement, PageNavProps>(({ sections }, ref) => {
                 {s.title}
               </SectionTitle>
               {groupBySection(s.articles).map(({ title, subsections }) => (
-                <div key={title}>
+                <Group key={title}>
                   <NavigationSectionTitle>{title}</NavigationSectionTitle>
                   {subsections.map(({ method, path, id }) => (
-                    <NavigationScrollLink key={id} id={id}>
-                      <Stack justify="center">
-                        <TypeBadge skinny type={method} />
-                      </Stack>
-                      <PathLabel>{path}</PathLabel>
-                    </NavigationScrollLink>
+                    <Tooltip
+                      key={id}
+                      text={path}
+                      alignment="center"
+                      position="top"
+                      disabled={analyzeLength(path)}
+                    >
+                      <NavigationScrollLink id={id}>
+                        <Stack justify="center">
+                          <TypeBadge skinny type={method} />
+                        </Stack>
+                        <PathLabel ref={overflowRef}>{path}</PathLabel>
+                      </NavigationScrollLink>
+                    </Tooltip>
                   ))}
-                </div>
+                </Group>
               ))}
               {i !== sections.length - 1 && <Divider />}
             </React.Fragment>
@@ -121,6 +141,7 @@ const PathLabel = styled.span`
   width: 100%;
   display: block;
   overflow: hidden;
+  max-width: 100%;
 `;
 
 const PageNavContainer = styled.aside`
@@ -141,6 +162,12 @@ const PageNavContainer = styled.aside`
       width: 100%;
     `};
   `}
+`;
+
+const Group = styled.div`
+  & > span {
+    width: 100%;
+  }
 `;
 
 const SectionTitle = styled.h3`

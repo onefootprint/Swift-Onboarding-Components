@@ -9,25 +9,28 @@ type NavigationScrollLinkProps = {
 };
 
 const NavigationScrollLink = ({ id, children }: NavigationScrollLinkProps) => (
-  <ScrollLink
+  <StyledLink
     activeClass="active"
     containerId="articles-container"
     hashSpy
     spy
     data-id={id}
     to={encodeURIComponent(id)}
+    smooth
   >
     {children}
-  </ScrollLink>
+  </StyledLink>
 );
 
-const ScrollLink = styled(Link)`
+const StyledLink = styled(Link)`
   ${({ theme }) => css`
     ${createFontStyles('body-4')};
-    border-radius: ${theme.borderRadius.default};
-    display: grid;
-    grid-template-columns: 48px auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
     gap: ${theme.spacing[3]};
+    border-radius: ${theme.borderRadius.default};
     margin-bottom: ${theme.spacing[2]};
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
     text-decoration: none;
