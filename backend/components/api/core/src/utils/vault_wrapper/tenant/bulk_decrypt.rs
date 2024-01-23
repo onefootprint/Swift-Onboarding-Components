@@ -1,3 +1,4 @@
+use db::models::audit_event::{AuditEvent, NewAuditEvent};
 use std::collections::HashMap;
 
 use db::models::{
@@ -5,7 +6,9 @@ use db::models::{
     insight_event::CreateInsightEvent,
 };
 use itertools::Itertools;
-use newtypes::{AccessEventKind, AccessEventPurpose, DbActor, PiiJsonValue};
+use newtypes::{
+    AccessEventKind, AccessEventPurpose, AuditEventDetail, DataIdentifier, DbActor, PiiJsonValue,
+};
 
 use crate::{
     errors::{ApiResult, AssertionError},
@@ -24,7 +27,7 @@ pub struct BulkDecryptReq<'a, T = Any> {
     pub targets: Vec<EnclaveDecryptOperation>,
 }
 
-const MAX_ACCESS_EVENTS: usize = 5000;
+const EVENT_CREATE_BATCH_SIZE: usize = 5000;
 
 /// Represents all the info needed to make an access event during decryption
 #[allow(clippy::large_enum_variant)]
@@ -112,34 +115,54 @@ where
             .db_pool
             .db_query(move |conn| -> ApiResult<_> {
                 let insight = insight.insert_with_conn(conn)?;
-                let access_events = access_events
+
+                let access_and_audit_events = access_events
                     .into_iter()
                     .map(|(fp_id, targets)| -> ApiResult<_> {
                         let sv = fp_id_to_sv
                             .remove(&fp_id)
                             .ok_or(AssertionError("No ScopedVault for key"))?;
                         // Combine decrypts for one fp_id into a single access event
-                        let targets = targets.into_iter().flatten().unique().collect();
+                        let targets: Vec<DataIdentifier> = targets.into_iter().flatten().unique().collect();
                         // NOTE: If we add any more fields to the access event, we might have to lower
                         // the chunk size below or we'll hit a max size for an insert statement.
                         let access_event = NewAccessEventRow {
-                            scoped_vault_id: sv.id,
-                            tenant_id: sv.tenant_id,
+                            scoped_vault_id: sv.id.clone(),
+                            tenant_id: sv.tenant_id.clone(),
                             is_live: sv.is_live,
                             // TODO: also store the transforms!
-                            targets,
+                            targets: targets.clone(),
                             insight_event_id: insight.id.clone(),
                             reason: Some(reason.clone()),
                             principal: principal.clone(),
                             kind: AccessEventKind::Decrypt,
                             purpose,
                         };
-                        Ok(access_event)
+
+                        let audit_event = NewAuditEvent {
+                            tenant_id: sv.tenant_id,
+                            principal_actor: Some(principal.clone()),
+                            insight_event_id: insight.id.clone(),
+                            detail: AuditEventDetail::DecryptUserData {
+                                is_live: sv.is_live,
+                                scoped_vault_id: sv.id,
+                                reason: reason.clone(),
+                                decrypted_fields: targets,
+                            },
+                        };
+
+                        Ok((access_event, audit_event))
                     })
                     .collect::<ApiResult<Vec<_>>>()?;
 
-                for access_events in access_events.into_iter().chunks(MAX_ACCESS_EVENTS).into_iter() {
-                    AccessEvent::bulk_create(conn, access_events.into_iter().collect())?;
+                for chunk in access_and_audit_events
+                    .into_iter()
+                    .chunks(EVENT_CREATE_BATCH_SIZE)
+                    .into_iter()
+                {
+                    let (access_events, audit_events) = chunk.into_iter().unzip();
+                    AccessEvent::bulk_create(conn, access_events)?;
+                    AuditEvent::bulk_create(conn, audit_events)?;
                 }
                 Ok(())
             })
