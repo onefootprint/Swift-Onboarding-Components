@@ -6430,10 +6430,10 @@ human-signals@^2.1.0:
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-2.1.0.tgz#dc91fcba42e4d06e4abaed33b3e7a3c02f514ea0"
   integrity sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==
 
-i18next@^23.5.1:
-  version "23.7.16"
-  resolved "https://registry.yarnpkg.com/i18next/-/i18next-23.7.16.tgz#7026d18b7a3ac9e2ecfeb78da5e4da5ca33312ef"
-  integrity sha512-SrqFkMn9W6Wb43ZJ9qrO6U2U4S80RsFMA7VYFSqp7oc7RllQOYDCdRfsse6A7Cq/V8MnpxKvJCYgM8++27n4Fw==
+i18next@^23.7.18:
+  version "23.7.18"
+  resolved "https://registry.yarnpkg.com/i18next/-/i18next-23.7.18.tgz#4f219e3702b08342c5519bc2cda7d09c67edebb9"
+  integrity sha512-b9N2KjRCYQNlUvE1Kc83g8knyUkL5NiZQOp9BsTR/v/LXk6Fzz+doOzTg2/826XK28mCgBkYLNAtixjE58qpCw==
   dependencies:
     "@babel/runtime" "^7.23.2"
 
@@ -9665,10 +9665,10 @@ react-hook-form@^7.46.2:
   resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.49.3.tgz#576a4567f8a774830812f4855e89f5da5830435c"
   integrity sha512-foD6r3juidAT1cOZzpmD/gOKt7fRsDhXXZ0y28+Al1CHgX+AY1qIN9VSIIItXRq1dN68QrRwl1ORFlwjBaAqeQ==
 
-react-i18next@^13.2.2:
-  version "13.5.0"
-  resolved "https://registry.yarnpkg.com/react-i18next/-/react-i18next-13.5.0.tgz#44198f747628267a115c565f0c736a50a76b1ab0"
-  integrity sha512-CFJ5NDGJ2MUyBohEHxljOq/39NQ972rh1ajnadG9BjTk+UXbHLq4z5DKEbEQBDoIhUmmbuS/fIMJKo6VOax1HA==
+react-i18next@^14.0.1:
+  version "14.0.1"
+  resolved "https://registry.yarnpkg.com/react-i18next/-/react-i18next-14.0.1.tgz#75351b25be076ad7391360b5a111b59ca87e0b63"
+  integrity sha512-TMV8hFismBmpMdIehoFHin/okfvgjFhp723RYgIqB4XyhDobVMyukyM3Z8wtTRmajyFMZrBl/OaaXF2P6WjUAw==
   dependencies:
     "@babel/runtime" "^7.22.5"
     html-parse-stringify "^3.0.1"
