@@ -82,7 +82,7 @@ table! {
         _updated_at -> Timestamptz,
         timestamp -> Timestamptz,
         tenant_id -> Text,
-        event_name -> Text,
+        name -> Text,
         principal_actor -> Nullable<Jsonb>,
         insight_event_id -> Text,
         metadata -> Jsonb,
