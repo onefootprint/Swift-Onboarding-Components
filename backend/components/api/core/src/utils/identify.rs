@@ -4,7 +4,7 @@ use crate::State;
 use db::models::contact_info::ContactInfo;
 use db::models::webauthn_credential::WebauthnCredential;
 use itertools::Itertools;
-use newtypes::VaultId;
+use newtypes::{AuthMethodKind, VaultId};
 use newtypes::{ChallengeKind, ScopedVaultId};
 use newtypes::{ContactInfoKind, DataIdentifier as DI};
 
@@ -13,8 +13,14 @@ use super::vault_wrapper::Person;
 pub struct UserChallengeContext {
     pub vw: VaultWrapper<Person>,
     pub webauthn_creds: Vec<WebauthnCredential>,
+    pub auth_methods: Vec<AuthMethod>,
     pub available_challenge_kinds: Vec<ChallengeKind>,
     pub is_vault_unverified: bool,
+}
+
+pub struct AuthMethod {
+    pub kind: AuthMethodKind,
+    pub is_verified: bool,
 }
 
 /// Determine what challenge kinds are available for the given user
@@ -53,33 +59,46 @@ pub async fn get_user_challenge_context(
         })
         .await??;
 
+    let mut auth_methods = cis
+        .iter()
+        .map(|(cik, ci, _)| AuthMethod {
+            kind: (*cik).into(),
+            is_verified: ci.is_otp_verified,
+        })
+        .collect_vec();
+    if !creds.is_empty() {
+        auth_methods.push(AuthMethod {
+            kind: AuthMethodKind::Passkey,
+            is_verified: true,
+        });
+    }
+
     let is_all_ci_unverified = cis.iter().all(|(_, ci, _)| !ci.is_otp_verified);
     let is_vault_unverified = is_all_ci_unverified && uvw.vault.is_created_via_api;
-    let available_challenge_kinds = if is_vault_unverified {
+    let auth_methods = if is_vault_unverified {
         // If this is a non-portable vault with a phone, allow initiating a challenge to the phone
         // even though it is unverified.
         // In theory, we could allow them to sign up with an email, but we'd prefer for them to
         // verify their phone number now
-        let includes_phone = cis.iter().any(|(k, _, _)| *k == ContactInfoKind::Phone);
-        includes_phone
-            .then_some(ContactInfoKind::Phone.into())
+        auth_methods
             .into_iter()
-            .collect()
+            .filter(|m| m.kind == AuthMethodKind::Phone)
+            .collect_vec()
     } else {
-        let mut kinds = cis
-            .iter()
-            .filter(|(_, ci, _)| ci.is_otp_verified)
-            .map(|(kind, _, _)| ChallengeKind::from(*kind))
-            .collect_vec();
-        if !creds.is_empty() {
-            kinds.push(ChallengeKind::Passkey);
-        }
-        kinds
+        auth_methods
     };
+    let available_challenge_kinds = auth_methods
+        .iter()
+        // If the whole vault is unverified and made via API, allow logging in with unverified
+        // auth methods
+        .filter(|m| m.is_verified || is_vault_unverified)
+        .map(|m| m.kind.into())
+        .collect_vec();
 
     let ctx = UserChallengeContext {
         vw: uvw,
         webauthn_creds: creds,
+        auth_methods,
         available_challenge_kinds,
         is_vault_unverified,
     };

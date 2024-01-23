@@ -1,11 +1,12 @@
 use paperclip::actix::Apiv2Schema;
 use strum_macros::Display;
 
-use crate::{AuthEventKind, DataIdentifier, IdentityDataKind};
+use crate::{AuthEventKind, ChallengeKind, DataIdentifier, IdentityDataKind};
 
 #[derive(
     Debug,
     Clone,
+    Copy,
     Eq,
     PartialEq,
     Hash,
@@ -38,6 +39,25 @@ pub enum ActionKind {
 pub enum ContactInfoKind {
     Phone,
     Email,
+}
+
+impl From<AuthMethodKind> for ChallengeKind {
+    fn from(value: AuthMethodKind) -> Self {
+        match value {
+            AuthMethodKind::Email => Self::Email,
+            AuthMethodKind::Phone => Self::Sms,
+            AuthMethodKind::Passkey => Self::Passkey,
+        }
+    }
+}
+
+impl From<ContactInfoKind> for AuthMethodKind {
+    fn from(value: ContactInfoKind) -> Self {
+        match value {
+            ContactInfoKind::Email => AuthMethodKind::Email,
+            ContactInfoKind::Phone => AuthMethodKind::Phone,
+        }
+    }
 }
 
 impl From<ContactInfoKind> for DataIdentifier {

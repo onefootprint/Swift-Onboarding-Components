@@ -5,6 +5,7 @@ from tests.headers import FpAuth, SandboxId
 from tests.identify_client import IdentifyClient
 from tests.utils import (
     HttpError,
+    get,
     _gen_random_sandbox_id,
     post,
     override_webauthn_challenge,
@@ -92,6 +93,14 @@ def test_scrubbed_phone_email(sandbox_user, sandbox_tenant):
     assert body["scrubbed_email"] == "s******@o***********.com"
 
 
+def test_auth_methods(user_with_token):
+    _, auth_token = user_with_token
+    body = get("hosted/user/auth_methods", None, auth_token)
+    assert next(i["is_verified"] for i in body if i["kind"] == "phone")
+    assert not next(i["is_verified"] for i in body if i["kind"] == "email")
+    assert next(i["is_verified"] for i in body if i["kind"] == "phone")
+
+
 @pytest.mark.parametrize(
     "challenge,di",
     [
@@ -173,7 +182,7 @@ def test_add_phone(skip_phone_obc):
 
 
 def test_add_email(user_with_token):
-    user, auth_token = user_with_token
+    _, auth_token = user_with_token
 
     # Replace the contact info with a challenge
     data = dict(kind="email", email=FIXTURE_EMAIL2, action_kind="add_primary")
@@ -186,6 +195,12 @@ def test_add_email(user_with_token):
     data = dict(fields=["id.email"])
     body = post(f"hosted/user/vault/decrypt", data, auth_token)
     assert body["id.email"] == FIXTURE_EMAIL2
+
+    # Make sure email is marked as verified
+    body = get("hosted/user/auth_methods", None, auth_token)
+    assert next(i["is_verified"] for i in body if i["kind"] == "phone")
+    assert next(i["is_verified"] for i in body if i["kind"] == "email")
+    assert next(i["is_verified"] for i in body if i["kind"] == "phone")
 
 
 @pytest.mark.parametrize(

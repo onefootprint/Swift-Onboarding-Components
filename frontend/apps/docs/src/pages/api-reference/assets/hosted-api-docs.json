@@ -918,6 +918,35 @@
                 ]
             }
         },
+        "/hosted/user/auth_methods": {
+            "get": {
+                "tags": [
+                    "User",
+                    "Hosted"
+                ],
+                "description": "Returns information about the auth methods this user has registered.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/AuthMethod"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "User Token": []
+                    }
+                ]
+            }
+        },
         "/hosted/user/authorized_orgs": {
             "get": {
                 "tags": [
@@ -2220,6 +2249,26 @@
                     "targets",
                     "tenant_id",
                     "timestamp"
+                ]
+            },
+            "AuthMethod": {
+                "type": "object",
+                "properties": {
+                    "is_verified": {
+                        "type": "boolean"
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "phone",
+                            "passkey",
+                            "email"
+                        ]
+                    }
+                },
+                "required": [
+                    "is_verified",
+                    "kind"
                 ]
             },
             "AuthorizedOrg": {

@@ -1,8 +1,6 @@
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
-use crate::ContactInfoKind;
-
 #[derive(
     Debug,
     Clone,
@@ -23,15 +21,6 @@ pub enum ChallengeKind {
     #[serde(alias = "passkey")]
     Passkey,
     Email,
-}
-
-impl From<ContactInfoKind> for ChallengeKind {
-    fn from(value: ContactInfoKind) -> Self {
-        match value {
-            ContactInfoKind::Email => ChallengeKind::Email,
-            ContactInfoKind::Phone => ChallengeKind::Sms,
-        }
-    }
 }
 
 #[doc = "Encrypted, base64-encoded challenge information"]

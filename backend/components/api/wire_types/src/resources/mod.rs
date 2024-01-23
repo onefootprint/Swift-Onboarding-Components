@@ -117,3 +117,6 @@ pub use user_label::*;
 
 mod user_tag;
 pub use user_tag::*;
+
+mod auth_method;
+pub use auth_method::*;
