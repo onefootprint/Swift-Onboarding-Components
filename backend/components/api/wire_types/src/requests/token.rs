@@ -45,6 +45,8 @@ pub enum TokenOperationKind {
 pub struct CreateEntityTokenRequest {
     pub kind: EntityTokenOperationKind,
     pub key: Option<ObConfigurationKey>,
+    #[serde(default)]
+    pub send_link: bool,
 }
 
 #[derive(Display, EnumString, DeserializeFromStr, SerializeDisplay, Apiv2Schema, ::macros::SerdeAttr)]

@@ -27,12 +27,19 @@ pub struct CreateTokenArgs {
     pub is_implied_auth: bool,
 }
 
+pub struct CreateTokenResult {
+    pub token: SessionAuthToken,
+    pub session: Session,
+    /// For Inherit tokens, the WorkflowRequest being inherited
+    pub wfr: Option<WorkflowRequest>,
+}
+
 pub fn create_token(
     conn: &mut TxnPgConn,
     session_key: &ScopedSealingKey,
     args: CreateTokenArgs,
     duration: Duration,
-) -> ApiResult<(SessionAuthToken, Session)> {
+) -> ApiResult<CreateTokenResult> {
     let CreateTokenArgs {
         sv,
         kind,
@@ -48,7 +55,7 @@ pub fn create_token(
     }
 
     // Determine arguments for the auth token based on the requested operation
-    let (obc_id, wfr_id) = match kind {
+    let (obc_id, wfr) = match kind {
         TokenOperationKind::User => {
             if key.is_some() {
                 return Err(ValidationError("Cannot provide playbook key for operation of kind user").into());
@@ -65,7 +72,7 @@ pub fn create_token(
             let wfr = WorkflowRequest::get_active(conn, &sv.id)?
                 .ok_or(ValidationError("No outstanding info is requested from this user"))?;
             // Do we want to replace the obc.id on the auth token?
-            (Some(wfr.ob_configuration_id), Some(wfr.id))
+            (Some(wfr.ob_configuration_id.clone()), Some(wfr))
         }
         TokenOperationKind::Reonboard => {
             if key.is_some() {
@@ -95,10 +102,11 @@ pub fn create_token(
         obc_id,
         is_from_api: true,
         is_implied_auth,
-        wfr_id,
+        wfr_id: wfr.as_ref().map(|wfr| wfr.id.clone()),
         ..Default::default()
     };
     let data = UserSession::make(sv.vault_id, args, scopes, auth_events)?;
-    let (auth_token, session) = AuthSession::create_sync(conn, session_key, data, duration)?;
-    Ok((auth_token, session))
+    let (token, session) = AuthSession::create_sync(conn, session_key, data, duration)?;
+    let result = CreateTokenResult { token, session, wfr };
+    Ok(result)
 }

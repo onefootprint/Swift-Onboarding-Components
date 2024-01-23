@@ -1753,7 +1753,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EmptyResponse"
+                                    "$ref": "#/components/schemas/CreateTokenResponse"
                                 }
                             }
                         }
@@ -6047,10 +6047,14 @@
                             "inherit",
                             "update_auth_methods"
                         ]
+                    },
+                    "send_link": {
+                        "type": "boolean"
                     }
                 },
                 "required": [
-                    "kind"
+                    "kind",
+                    "send_link"
                 ]
             },
             "CreateOnboardingConfigurationRequest": {
@@ -19883,6 +19887,10 @@
                         "description": "Optional note with more context on what we're asking the user to do",
                         "type": "string"
                     },
+                    "send_link": {
+                        "description": "TODO: remove this when the client starts using POST /token to send the link",
+                        "type": "boolean"
+                    },
                     "trigger": {
                         "type": "string",
                         "enum": [
@@ -19893,6 +19901,7 @@
                     }
                 },
                 "required": [
+                    "send_link",
                     "trigger"
                 ]
             },

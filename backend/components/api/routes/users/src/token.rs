@@ -13,6 +13,7 @@ use api_core::utils::actix::OptionalJson;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::token::create_token;
 use api_core::utils::token::CreateTokenArgs;
+use api_core::utils::token::CreateTokenResult;
 use api_core::utils::vault_wrapper::Any;
 use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
@@ -168,8 +169,12 @@ pub async fn post(
                 auth_events,
                 is_implied_auth,
             };
-            let (auth_token, session) = create_token(conn, &session_key, args, Duration::hours(1))?;
-            Ok((auth_token, session))
+            let CreateTokenResult {
+                token,
+                session,
+                wfr: _,
+            } = create_token(conn, &session_key, args, Duration::hours(1))?;
+            Ok((token, session))
         })
         .await?;
 
