@@ -256,3 +256,4 @@ define_newtype_id!(
     String,
     "Identifier for a a tenant_business_info"
 );
+define_newtype_id!(AuditEventId, String, "Identifier for an audit event");
