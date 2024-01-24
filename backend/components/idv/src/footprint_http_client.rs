@@ -12,7 +12,7 @@ impl FootprintVendorHttpClient {
         let retry_policy = ExponentialBackoff::builder()
             .retry_bounds(Duration::from_secs(1), Duration::from_secs(3))
             .base(1)
-            .build_with_max_retries(3);
+            .build_with_max_retries(2);
         let client = ClientBuilder::new(reqwest::Client::new())
             // Will only retry if:
             // * The status was 5XX (server error)
