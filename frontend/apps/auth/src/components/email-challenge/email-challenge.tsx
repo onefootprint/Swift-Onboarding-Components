@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { ChallengeKind } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useAuthMachine } from '@/src/state';
 import type { HeaderProps } from '@/src/types';
@@ -18,7 +18,7 @@ type EmailChallengeProps = {
 };
 
 const EmailChallenge = ({ children, Header }: EmailChallengeProps) => {
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation('common', { keyPrefix: 'auth' });
   const [state, send] = useAuthMachine();
   const toast = useToast();
   const {

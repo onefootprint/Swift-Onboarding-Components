@@ -1,7 +1,6 @@
 'use client';
 
 import { FootprintPublicEvent } from '@onefootprint/footprint-js';
-import { useTranslation } from '@onefootprint/hooks';
 import type { DeviceInfo } from '@onefootprint/idv';
 import {
   getIdentifyBootstrapData,
@@ -14,6 +13,7 @@ import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { CLIENT_PUBLIC_KEY_HEADER } from '@onefootprint/types';
 import { useConfirmationDialog } from '@onefootprint/ui';
 import React, { useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useOnboardingValidate } from '@/src/queries';
 import { AuthMachineProvider } from '@/src/state';
@@ -105,7 +105,7 @@ const AuthContainer = ({
   } = props || voidObj;
   const fpProvider = useFootprintProvider();
 
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation('common', { keyPrefix: 'auth' });
   const confirmationDialog = useConfirmationDialog();
   const mutOnboardingValidate = useOnboardingValidate();
   const obConfigAuth = getOnboardConfigurationKey(publicKey);

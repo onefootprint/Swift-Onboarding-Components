@@ -1,12 +1,14 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { RoleKind, RoleScopeKind } from '@onefootprint/types';
 import { Box, Button } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import CreateDialog from 'src/components/roles/create-dialog';
 
 const Create = () => {
-  const { t } = useTranslation('pages.settings.roles.create');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.roles.create',
+  });
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => {

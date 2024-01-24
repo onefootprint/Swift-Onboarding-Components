@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { HeaderTitle, NavigationHeader } from '@onefootprint/idv';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const InitError = () => {
-  const { t } = useTranslation('pages.init-error');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.init-error' });
 
   return (
     <>

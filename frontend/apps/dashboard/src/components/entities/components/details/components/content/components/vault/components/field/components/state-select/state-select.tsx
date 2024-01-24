@@ -1,11 +1,11 @@
 import { STATES } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { IdDI, type VaultValue } from '@onefootprint/types';
 import { NativeSelect, TextInput } from '@onefootprint/ui';
 import Hint from '@onefootprint/ui/src/components/internal/hint';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import EMPTY_SELECT_VALUE from '../../../../constants';
 import editFormFieldName from '../utils/edit-form-field-name';
@@ -15,7 +15,7 @@ export type StateSelectProps = {
 };
 
 const StateSelect = ({ value }: StateSelectProps) => {
-  const { t } = useTranslation('pages.entity.edit');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.edit' });
   const {
     register,
     watch,

@@ -1,17 +1,19 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronRight24, IcoInfo16 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
 import type { RiskSignal } from '@onefootprint/types';
 import { RiskSignalSeverity } from '@onefootprint/types';
 import { Badge, Stack, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type RowProps = {
   riskSignal: RiskSignal;
 };
 
 const Row = ({ riskSignal }: RowProps) => {
-  const { t } = useTranslation('pages.entity.risk-signals.severity');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.risk-signals.severity',
+  });
 
   return (
     <>

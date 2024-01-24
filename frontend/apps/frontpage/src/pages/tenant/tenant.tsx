@@ -1,5 +1,4 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoCheckCircle24,
   IcoDatabase24,
@@ -11,6 +10,7 @@ import styled, { css } from '@onefootprint/styled';
 import { Grid, media, Stack, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import FeatureCard from './components/feature-card';
 import PartnersLogos from './components/partners-logos';
@@ -23,7 +23,7 @@ type TenantPageProps = {
 };
 
 const TenantPage = ({ tenant }: TenantPageProps) => {
-  const { t } = useTranslation('pages.tenant');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.tenant' });
 
   return (
     <>

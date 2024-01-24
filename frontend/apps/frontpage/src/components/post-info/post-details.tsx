@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Box, createFontStyles, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type PostInfoProps = {
   authors: {
@@ -23,7 +23,7 @@ const PostInfo = ({
   readingTime,
   tag,
 }: PostInfoProps) => {
-  const { t } = useTranslation('pages.blog');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.blog' });
 
   return (
     <Container>

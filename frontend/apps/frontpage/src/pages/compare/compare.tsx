@@ -1,8 +1,8 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Box, Container, media, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import LinkButton from 'src/components/linking-button';
 
 import SEO from '../../components/seo';
@@ -18,7 +18,7 @@ import Shield from './components/illustrations/shield';
 import VerticalCard from './components/vertical-card';
 
 const Compare = () => {
-  const { t } = useTranslation('pages.compare');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.compare' });
 
   return (
     <>

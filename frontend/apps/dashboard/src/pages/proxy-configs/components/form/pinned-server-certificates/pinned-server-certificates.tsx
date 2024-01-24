@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText224, IcoPlusSmall16 } from '@onefootprint/icons';
 import { LinkButton, TextArea, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import type {
   FormData,
   StepProps,
@@ -14,9 +14,9 @@ import UploadFile from '../upload-file';
 const defaultValue = { certificate: '' };
 
 const PinnedServerCertificates = ({ id, onSubmit, values }: StepProps) => {
-  const { t } = useTranslation(
-    'pages.proxy-configs.create.form.pinned-server-certificates',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.proxy-configs.create.form.pinned-server-certificates',
+  });
   const { control, handleSubmit, register, setValue } = useForm<FormData>({
     defaultValues: {
       pinnedServerCertificates: values.pinnedServerCertificates,

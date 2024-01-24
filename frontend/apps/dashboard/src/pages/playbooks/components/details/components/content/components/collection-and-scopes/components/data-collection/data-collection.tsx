@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   type OnboardingConfig,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 import { Box, Divider, InlineAlert, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import CollectedInformation from '@/playbooks/components/collected-information';
 
@@ -24,7 +24,9 @@ const DataCollection = ({
     optionalData = [],
   },
 }: DataCollectionProps) => {
-  const { t } = useTranslation('pages.playbooks.details.data-collection');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.details.data-collection',
+  });
   const requiresSSN =
     mustCollectData.includes('ssn9') || mustCollectData.includes('ssn4');
   const optionalSSN =

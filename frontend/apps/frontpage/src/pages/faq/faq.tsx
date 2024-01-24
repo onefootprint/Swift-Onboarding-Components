@@ -1,13 +1,13 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Button, Grid, media, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Accordion from 'src/components/accordion';
 
 import SEO from '../../components/seo';
 
 const Faq = () => {
-  const { t } = useTranslation('pages.faq');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.faq' });
   const items = [
     {
       id: 'what-is-kyc',
@@ -22,7 +22,10 @@ const Faq = () => {
     {
       id: 'too-good',
       title: t('questions.too-good.title'),
-      content: t('questions.too-good.content'),
+      content: [
+        t('questions.too-good.content-first'),
+        t('questions.too-good.content-second'),
+      ],
     },
     {
       id: 'customize-kyc',
@@ -37,7 +40,11 @@ const Faq = () => {
     {
       id: 'why-vaulting',
       title: t('questions.why-vaulting.title'),
-      content: t('questions.why-vaulting.content'),
+      content: [
+        t('questions.why-vaulting.content-first'),
+        t('questions.why-vaulting.content-second'),
+        t('questions.why-vaulting.content-third'),
+      ],
     },
     {
       id: 'promises-one-click',

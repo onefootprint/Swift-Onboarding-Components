@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoDatabase24,
   IcoGridMasonry24,
@@ -10,6 +9,7 @@ import {
 import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import React, { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useHover } from 'usehooks-ts';
 
 // import AuthIllustration from './illustrations/auth-illustration';

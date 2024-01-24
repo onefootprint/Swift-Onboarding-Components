@@ -53,6 +53,14 @@ const FrontPhotoCapture = () => {
     send({ type: 'navigatedToPrev' });
   };
 
+  const translationKey = translationIndex[docType];
+  const camera = t(
+    `title.camera.${translationKey}` as unknown as TemplateStringsArray,
+  ) as unknown as string;
+  const preview = t(
+    `title.preview.${translationKey}` as unknown as TemplateStringsArray,
+  ) as unknown as string;
+
   return (
     <PhotoCapture
       outlineHeightRatio={ID_OUTLINE_HEIGHT_RATIO}
@@ -62,8 +70,8 @@ const FrontPhotoCapture = () => {
       autocaptureKind="document"
       deviceKind="mobile"
       title={{
-        camera: t(`title.camera.${translationIndex[docType]}`),
-        preview: t(`title.preview.${translationIndex[docType]}`),
+        camera,
+        preview,
       }}
       subtitle={{ preview: t(`subtitle.preview`) }}
       onBack={handleClickBack}

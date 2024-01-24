@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import PenguinBanner from 'src/components/penguin-banner';
 
 import DeveloperExperience from '../../components/developer-experience';
@@ -11,7 +11,7 @@ import IdentifyBusinesses from './sections/identify-businesss';
 import SecurelyStore from './sections/securely-store';
 
 const KYB = () => {
-  const { t } = useTranslation('pages.kyb');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.kyb' });
 
   return (
     <>

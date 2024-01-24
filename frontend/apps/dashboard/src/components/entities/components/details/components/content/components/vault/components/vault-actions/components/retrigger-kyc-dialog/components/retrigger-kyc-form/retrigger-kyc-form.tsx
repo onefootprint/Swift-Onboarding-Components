@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { IdDI, OrgFrequentNoteKind, TriggerKind } from '@onefootprint/types';
 import {
@@ -11,6 +10,7 @@ import {
 } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import AnimatedContainer from 'src/components/animated-container';
 import FrequentNotesTextArea from 'src/components/frequent-notes-text-area';
 import useSession from 'src/hooks/use-session';
@@ -30,7 +30,9 @@ type RetriggerKYCFormProps = {
 };
 
 const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
-  const { t } = useTranslation('pages.entity.actions.retrigger-kyc');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.actions.retrigger-kyc',
+  });
   const entityId = useEntityId();
   const entity = useEntity(entityId);
   const userHasPhone = entity.data?.attributes?.includes(IdDI.phoneNumber);

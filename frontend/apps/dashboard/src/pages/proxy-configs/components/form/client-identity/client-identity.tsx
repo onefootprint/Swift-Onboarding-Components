@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText224, IcoKey24 } from '@onefootprint/icons';
 import { Box, Divider, TextArea, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import type {
   FormData,
   StepProps,
@@ -11,9 +11,9 @@ import type {
 import UploadFile from '../upload-file';
 
 const ClientIdentity = ({ id, onSubmit, values }: StepProps) => {
-  const { t } = useTranslation(
-    'pages.proxy-configs.create.form.client-identity',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.proxy-configs.create.form.client-identity',
+  });
   const { handleSubmit, register, setValue } = useForm<FormData>({
     defaultValues: {
       clientIdentity: values.clientIdentity,

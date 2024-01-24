@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import { IdDI } from '@onefootprint/types';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import editFormFieldName from '../utils/edit-form-field-name';
 import validateCitizenships, {
@@ -15,7 +15,9 @@ export type CitizenshipsInputProps = {
 };
 
 const CitizenshipsInput = ({ citizenships }: CitizenshipsInputProps) => {
-  const { t } = useTranslation('pages.entity.edit.errors.citizenships');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.edit.errors.citizenships',
+  });
   const {
     register,
     getValues,

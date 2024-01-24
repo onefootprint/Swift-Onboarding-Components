@@ -2,6 +2,7 @@
 import styled from '@onefootprint/styled';
 import { Grid } from '@onefootprint/ui';
 import creditcardutils from 'creditcardutils';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -45,7 +46,7 @@ const Card = () => {
       return message;
     }
     if (error) {
-      return t(`${field}.errors.${type}`);
+      return t(`${field}.errors.${type}` as ParseKeys<'common'>);
     }
     return undefined;
   };

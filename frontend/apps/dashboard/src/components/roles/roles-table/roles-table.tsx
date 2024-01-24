@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { Role } from '@onefootprint/types';
 import { RoleKind } from '@onefootprint/types';
 import { Table } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useRolesFilters from '../hooks/use-roles-filters';
 import Row from './components/row';
@@ -20,7 +20,7 @@ const RolesTable = ({
   isLoading,
   kind,
 }: RolesTableProps) => {
-  const { t } = useTranslation('pages.settings.roles');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.settings.roles' });
   const filters = useRolesFilters();
   const columns = [
     { id: 'role', text: t('table.header.role'), width: '19%' },

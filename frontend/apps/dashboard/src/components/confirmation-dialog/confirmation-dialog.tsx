@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Dialog, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type ConfirmationDialogProps = {
   children: React.ReactNode;

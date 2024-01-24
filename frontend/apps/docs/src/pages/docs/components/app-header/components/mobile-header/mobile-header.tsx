@@ -1,5 +1,4 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoClose24,
   IcoMenu24,
@@ -9,6 +8,7 @@ import styled, { css } from '@onefootprint/styled';
 import { createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type MobileNavProps = {
   onClick: () => void;
@@ -16,7 +16,7 @@ type MobileNavProps = {
 };
 
 const MobileNav = ({ onClick, isExpanded }: MobileNavProps) => {
-  const { t } = useTranslation('components.header');
+  const { t } = useTranslation('common', { keyPrefix: 'components.header' });
   return (
     <Header>
       <NavTriggerContainer>

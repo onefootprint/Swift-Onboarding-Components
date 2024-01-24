@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { RiskSignal } from '@onefootprint/types';
 import type { TableRow } from '@onefootprint/ui';
 import { Box, Dialog, Table, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Row from './components/row';
 import useRiskSignalsOverviewFilters from './hooks/use-risk-signals-overview-filters';
@@ -16,7 +16,9 @@ export type ListDialogProps = {
 
 const ListDialog = ({ riskSignals, renderCta }: ListDialogProps) => {
   const filters = useRiskSignalsOverviewFilters();
-  const { t } = useTranslation('pages.entity.risks.list-dialog');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity',
+  });
 
   const [open, setOpen] = useState(false);
   const columns = [
@@ -41,16 +43,16 @@ const ListDialog = ({ riskSignals, renderCta }: ListDialogProps) => {
   return (
     <Box>
       <Dialog
-        title={t('title')}
+        title={t('risks.list-dialog.title')}
         size="compact"
         onClose={handleClose}
         open={open}
       >
         <Typography variant="body-3" sx={{ marginBottom: 6 }}>
-          {t('description')}
+          {t('risks.list-dialog.description')}
         </Typography>
         <Table<RiskSignal>
-          aria-label={t('table.aria-label')}
+          aria-label={t('risk-signals.table.aria-label')}
           columns={columns}
           getKeyForRow={(signal: RiskSignal) => signal.id}
           hideThead

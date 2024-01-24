@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Button, Pagination, Stack, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 import WaveAnimation from 'src/components/wave-animation';
 
@@ -14,7 +14,7 @@ import useFilters from './hooks/use-filters';
 import usePlaybooks from './hooks/use-playbooks';
 
 const Playbooks = () => {
-  const { t } = useTranslation('pages.playbooks');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks' });
   const [dialogOpen, setDialogOpen] = useState(false);
   const [hasHadPlaybook, setHasHadPlaybook] = useState(false);
   const {

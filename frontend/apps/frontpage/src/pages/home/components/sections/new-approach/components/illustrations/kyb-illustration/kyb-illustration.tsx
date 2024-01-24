@@ -1,13 +1,15 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import { motion, useAnimation, useInView } from 'framer-motion';
 import Image from 'next/image';
 import React, { useEffect, useRef } from 'react';
 import { isMobile, isTablet } from 'react-device-detect';
+import { useTranslation } from 'react-i18next';
 import BaseIllustration from 'src/pages/home/components/base-illustration';
 
 const KybIllustration = () => {
-  const { t } = useTranslation('home.new-approach.kyb');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.home.new-approach.kyb',
+  });
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
   const phoneControls = useAnimation();

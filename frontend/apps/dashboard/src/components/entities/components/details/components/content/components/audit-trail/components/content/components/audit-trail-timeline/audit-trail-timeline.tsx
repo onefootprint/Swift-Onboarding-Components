@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoDownload16,
   IcoFileText16,
@@ -28,7 +27,9 @@ import type {
   WorkflowStartedEventData,
 } from '@onefootprint/types/src/data/timeline';
 import { Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { TimelineItem } from 'src/components/timeline';
 import Timeline from 'src/components/timeline';
 
@@ -76,7 +77,9 @@ export type AuditTrailTimelineProps = {
 };
 
 const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
-  const { t } = useTranslation('pages.entity.audit-trail');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.audit-trail',
+  });
   const mergedTimeline = mergeAuditTrailTimelineEvents(timeline);
 
   const items: TimelineItem[] = [];
@@ -203,7 +206,9 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
         headerComponent: (
           <Typography variant="body-3">
             {t(`timeline.auth-method-updated.${eventData.action}`, {
-              kind: t(`timeline.auth-method-updated.method.${eventData.kind}`),
+              kind: t(
+                `timeline.auth-method-updated.method.${eventData.kind}` as ParseKeys<'common'>,
+              ) as string,
             })}
           </Typography>
         ),

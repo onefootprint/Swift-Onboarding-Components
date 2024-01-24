@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { ProxyConfigDetails } from '@onefootprint/types';
 import { CodeInline, Typography } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Field } from 'src/components';
 
 type IngressVaultingProps = {
@@ -9,7 +9,9 @@ type IngressVaultingProps = {
 };
 
 const IngressVaulting = ({ proxyConfig }: IngressVaultingProps) => {
-  const { t } = useTranslation('pages.proxy-configs.details.ingress-vaulting');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.proxy-configs.details.ingress-vaulting',
+  });
   if (!proxyConfig.ingressContentType) {
     return (
       <Typography variant="body-3" as="div" color="tertiary">

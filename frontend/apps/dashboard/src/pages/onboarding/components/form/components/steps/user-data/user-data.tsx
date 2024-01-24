@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Box, Button, Grid, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import useUserSession from 'src/hooks/use-user-session';
 
 import Header from '../header';
@@ -19,7 +19,10 @@ type FormData = {
 
 const UserData = ({ onBack, onComplete }: UserDataProps) => {
   const { data, dangerouslyCastedData, mutation } = useUserSession();
-  const { t, allT } = useTranslation('pages.onboarding.user-data');
+  const { t: allT } = useTranslation('common');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.onboarding.user-data',
+  });
   const {
     register,
     handleSubmit: handleFormSubmit,

@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoSmartphone24 } from '@onefootprint/icons';
 import { Button, Stack } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { HeaderProps } from '@/src/types';
 
@@ -18,7 +18,9 @@ const PasskeyChallenge = ({
   Header,
   onSmsButtonClick,
 }: StepPassKeyProps) => {
-  const { t } = useTranslation('auth.passkey-challenge');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'auth.passkey-challenge',
+  });
 
   return (
     <>

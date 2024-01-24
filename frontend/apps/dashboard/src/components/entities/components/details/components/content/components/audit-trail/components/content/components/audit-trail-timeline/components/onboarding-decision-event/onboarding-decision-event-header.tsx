@@ -1,8 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { OnboardingDecisionEventData } from '@onefootprint/types';
 import { ActorKind, DecisionStatus } from '@onefootprint/types';
 import { Stack, Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Actor from '../actor';
 import Details from './components/details';
@@ -14,9 +15,9 @@ type OnboardingDecisionEventHeaderProps = {
 const OnboardingDecisionEventHeader = ({
   data,
 }: OnboardingDecisionEventHeaderProps) => {
-  const { t } = useTranslation(
-    'pages.entity.audit-trail.timeline.onboarding-decision-event',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.audit-trail.timeline.onboarding-decision-event',
+  });
   const {
     decision: { source, status },
   } = data;
@@ -31,7 +32,7 @@ const OnboardingDecisionEventHeader = ({
   if (isFootprintActor) {
     text = isVerified ? t('verified-by') : t('could-not-be-verified-by');
   } else {
-    const decision = t(`decision-status.${status}`);
+    const decision = t(`decision-status.${status}` as ParseKeys<'common'>);
     text = t('org-overwrite.title', { decision });
   }
 

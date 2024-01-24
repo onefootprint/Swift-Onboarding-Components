@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoInfo16, IcoPencil16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import { Checkbox, LinkButton, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import CollectedInformation from '@/playbooks/components/collected-information';
 import type { Personal, SummaryMeta } from '@/playbooks/utils/machine/types';
@@ -18,7 +18,9 @@ type PreviewProps = {
 };
 
 const Preview = ({ onStartEditing, meta }: PreviewProps) => {
-  const { t } = useTranslation('pages.playbooks.dialog.summary.person');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.dialog.summary.person',
+  });
   const { getValues, register } = useFormContext();
   const values: Personal = getValues('personal');
   const isIdDocFirstFlowEnabled = useIdDocFirstFlowEnabled(

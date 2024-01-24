@@ -1,5 +1,4 @@
 import { primitives } from '@onefootprint/design-tokens';
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoCheckSmall16,
   IcoPlusSmall16,
@@ -9,6 +8,7 @@ import styled, { css } from '@onefootprint/styled';
 import { Button, createFontStyles, Stack, Typography } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React, { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useHover } from 'usehooks-ts';
 
 type OptionProps = {
@@ -26,7 +26,9 @@ const Option = ({
   onDelete,
   isEdit,
 }: OptionProps) => {
-  const { t } = useTranslation('components.frequent-notes');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.frequent-notes',
+  });
   const hoverRef = useRef<HTMLDivElement>(null);
   const isHovered = useHover(hoverRef);
   const [isCopied, setIsCopied] = useState<boolean>(false);

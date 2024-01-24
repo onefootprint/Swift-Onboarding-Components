@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Button, media, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import WelcomeIllustration from './componens/welcome-illustration';
 
@@ -10,7 +10,10 @@ export type WelcomeProps = {
 };
 
 const Welcome = ({ onComplete }: WelcomeProps) => {
-  const { t, allT } = useTranslation('pages.onboarding.welcome');
+  const { t: allT } = useTranslation('common');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.onboarding.welcome',
+  });
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

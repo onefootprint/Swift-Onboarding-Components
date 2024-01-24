@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoLogOut24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { GetAuthRolesOrg } from '@onefootprint/types';
 import { Dropdown, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import OverflowButton from 'src/components/overflow-button';
 import type { UserSession } from 'src/hooks/use-session';
 
@@ -23,7 +23,9 @@ const NavDropdown = ({
   onAssumeTenant,
   user,
 }: NavDropdownProps) => {
-  const { t } = useTranslation('components.private-layout.nav');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.private-layout.nav',
+  });
   const router = useRouter();
 
   const handleLogout = () => {

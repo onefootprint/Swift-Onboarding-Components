@@ -1,9 +1,10 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheck24, IcoCloseSmall24 } from '@onefootprint/icons';
 import type { SupportedIdDocTypes } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import IdDocDisplay from '@/playbooks/components/id-doc-display';
 import ListValue from '@/playbooks/components/list-value';
@@ -16,7 +17,9 @@ type DisplayValueProps<K extends keyof Option = keyof Option> = {
 };
 
 const DisplayValue = ({ name, value }: DisplayValueProps) => {
-  const { t } = useTranslation('pages.playbooks.collected-data');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.collected-data',
+  });
 
   if (typeof value === 'boolean') {
     return value ? (
@@ -37,7 +40,8 @@ const DisplayValue = ({ name, value }: DisplayValueProps) => {
     if (ssnValue.active) {
       return (
         <Typography variant="body-3">
-          {t(`${ssnValue.kind}`)} {ssnValue.optional ? t('optional') : ''}
+          {t(`${ssnValue.kind}` as ParseKeys<'common'>)}{' '}
+          {ssnValue.optional ? t('optional') : ''}
         </Typography>
       );
     }

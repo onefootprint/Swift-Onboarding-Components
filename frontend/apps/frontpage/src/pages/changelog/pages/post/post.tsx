@@ -1,4 +1,4 @@
-import { useIntl, useTranslation } from '@onefootprint/hooks';
+import { useIntl } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
@@ -12,6 +12,7 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import SEO from '../../../../components/seo';
 import type { PostDetails } from '../../../../utils/ghost/types';
@@ -24,7 +25,7 @@ export type PostProps = {
 };
 
 const PostPage = ({ post }: PostProps) => {
-  const { t } = useTranslation('pages.changelog');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.changelog' });
   const { formatDateWithLongMonth } = useIntl();
   const formattedDate = formatDateWithLongMonth(new Date(post.published_at));
 

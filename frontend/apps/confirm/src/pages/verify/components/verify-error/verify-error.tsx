@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const VerifyError = () => {
-  const { t } = useTranslation('pages.verify.error');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.verify.error' });
 
   return (
     <>

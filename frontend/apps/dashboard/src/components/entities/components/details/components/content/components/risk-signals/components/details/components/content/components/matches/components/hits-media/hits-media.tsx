@@ -1,4 +1,4 @@
-import { useIntl, useTranslation } from '@onefootprint/hooks';
+import { useIntl } from '@onefootprint/hooks';
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { AmlHitMedia } from '@onefootprint/types';
@@ -10,6 +10,7 @@ import {
 } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
 import TruncatedText from '@/entities/components/details/components/truncated-text';
@@ -19,9 +20,9 @@ type HitsMediaProps = {
 };
 
 const HitsMedia = ({ mediaList }: HitsMediaProps) => {
-  const { t } = useTranslation(
-    'pages.entity.risk-signals.details.matches.hits-media',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.risk-signals.details.matches.hits-media',
+  });
   const { formatDateWithShortMonth } = useIntl();
 
   const firstMediaRef = useRef<HTMLDivElement>(null);

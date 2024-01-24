@@ -1,11 +1,11 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoDownload16, ThemedLogoFpCompact } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Dropdown, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import type { MouseEvent } from 'react';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const assetsToCopy = [
   {
@@ -23,7 +23,9 @@ type LogoCopyAssetsProps = {
 };
 
 const LogoCopyAssets = ({ href = FRONTPAGE_BASE_URL }: LogoCopyAssetsProps) => {
-  const { t } = useTranslation('components.save-assets');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.save-assets',
+  });
   const router = useRouter();
   const [showOptions, setShowOptions] = useState(false);
 

@@ -98,10 +98,10 @@ const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
     [SupportedIdDocTypes.voterIdentification]: t(
       'data-labels.voterIdentification',
     ),
-    [SupportedIdDocTypes.ssnCard]: t('data-labels.ssn_card'),
+    [SupportedIdDocTypes.ssnCard]: t('data-labels.ssnCard'),
     [SupportedIdDocTypes.lease]: t('data-labels.lease'),
-    [SupportedIdDocTypes.bankStatement]: t('data-labels.bank_statement'),
-    [SupportedIdDocTypes.utilityBill]: t('data-labels.utility_bill'),
+    [SupportedIdDocTypes.bankStatement]: t('data-labels.bankStatement'),
+    [SupportedIdDocTypes.utilityBill]: t('data-labels.utilityBill'),
   };
 
   const fields: FieldProps[] = [];

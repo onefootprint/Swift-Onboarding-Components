@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoChartUp40,
   IcoCheckCircle40,
@@ -10,6 +9,7 @@ import {
 import styled, { css } from '@onefootprint/styled';
 import { Divider, media, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import SEO from '../../components/seo';
 import CompanyPhotos from './components/company-photos';
@@ -18,7 +18,7 @@ import Team from './components/team';
 import Values from './components/values';
 
 const Company = () => {
-  const { t } = useTranslation('pages.company');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.company' });
   const values = [
     {
       id: 'intellectually-curious',

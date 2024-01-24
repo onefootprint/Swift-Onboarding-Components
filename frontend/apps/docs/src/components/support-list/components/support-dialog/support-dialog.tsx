@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   Dialog,
   Grid,
@@ -9,6 +8,7 @@ import {
 } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import useSupportForm from '../../hooks/use-support-form';
 import type { SupportFormData } from '../../support-list.types';
@@ -29,7 +29,9 @@ const SupportDialog = ({
   open,
   onClose,
 }: SupportDialogProps) => {
-  const { t } = useTranslation('components.support-dialog');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.support-dialog',
+  });
   const submitFormMutation = useSupportForm();
   const toast = useToast();
   const {

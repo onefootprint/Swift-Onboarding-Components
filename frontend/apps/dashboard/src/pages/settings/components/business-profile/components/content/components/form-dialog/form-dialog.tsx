@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Dialog } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type FormDialogProps = {
   children: React.ReactNode;

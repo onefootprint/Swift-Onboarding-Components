@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoCheck24,
   IcoEye24,
@@ -11,7 +10,9 @@ import {
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Container, Grid, media, Stack } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import FeatureCard from '../../components/feature-card';
 import SectionSubtitle from '../../components/section-subtitle';
@@ -54,7 +55,9 @@ const featureCards = [
 ];
 
 const AllFeatures = () => {
-  const { t } = useTranslation('pages.vaulting.all-features');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.vaulting.all-features',
+  });
   return (
     <StyledContainer>
       <Title>
@@ -83,8 +86,8 @@ const AllFeatures = () => {
         {featureCards.map(card => (
           <FeatureCard
             key={card.id}
-            title={t(`bullets.${card.id}.title`)}
-            subtitle={t(`bullets.${card.id}.subtitle`)}
+            title={t(`bullets.${card.id}.title` as ParseKeys<'common'>)}
+            subtitle={t(`bullets.${card.id}.subtitle` as ParseKeys<'common'>)}
             icon={card.icon}
             gridArea={card.id}
           />

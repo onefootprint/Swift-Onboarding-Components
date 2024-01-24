@@ -33,7 +33,7 @@ type ContentProps = {
 const Content = ({ fallback }: ContentProps) => {
   const footprintProvider = useFootprintProvider();
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.secure-form.card.form',
+    keyPrefix: 'pages.secure-form',
   });
   const [props, setProps] = useState<FootprintFormDataProps>();
   useProps<FootprintFormDataProps>(setProps);
@@ -92,7 +92,7 @@ const Content = ({ fallback }: ContentProps) => {
       return;
     }
     if (savedViaRef) {
-      handleRefSaveError(t('errors.unknown error'));
+      handleRefSaveError(t('errors.unknown-error'));
     }
     Logger.error(`Unknown error while vaulting data, ${getErrorMessage(err)}`);
   };

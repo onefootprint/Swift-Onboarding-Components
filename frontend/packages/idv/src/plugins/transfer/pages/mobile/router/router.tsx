@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useLogStateMachine from '../../../../../hooks/ui/use-log-state-machine';
 import MobileProcessing from '../../../components/mobile-processing';
 import useMobileMachine from '../../../hooks/mobile/use-mobile-machine';
+import getRequirementsTitleTranslationKey from '../../../utils/get-requirements-title-translation-key';
 import NewTabRequest from '../new-tab-request';
 import Sms from '../sms';
 
@@ -12,8 +14,11 @@ type RouterProps = {
 
 const Router = ({ onDone }: RouterProps) => {
   const [state] = useMobileMachine();
+  const { missingRequirements } = state.context;
   const isDone = state.matches('complete');
   useLogStateMachine('transfer-mobile', state);
+  const { t } = useTranslation('idv');
+  const title = getRequirementsTitleTranslationKey(missingRequirements);
 
   useEffect(() => {
     if (isDone) {
@@ -25,11 +30,19 @@ const Router = ({ onDone }: RouterProps) => {
     <>
       {state.matches('newTabRequest') && <NewTabRequest />}
       {state.matches('newTabProcessing') && (
-        <MobileProcessing translationKey="transfer.pages.mobile.new-tab-processing" />
+        <MobileProcessing
+          title={title}
+          subtitle={t('transfer.pages.mobile.new-tab-processing.subtitle')}
+          cta={t('transfer.pages.mobile.new-tab-processing.cancel')}
+        />
       )}
       {state.matches('sms') && <Sms />}
       {state.matches('smsProcessing') && (
-        <MobileProcessing translationKey="transfer.pages.mobile.sms-processing" />
+        <MobileProcessing
+          title={title}
+          subtitle={t('transfer.pages.mobile.sms-processing.subtitle')}
+          cta={t('transfer.pages.mobile.sms-processing.cancel')}
+        />
       )}
     </>
   );

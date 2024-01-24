@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   Box,
   FormControl,
@@ -9,15 +8,16 @@ import {
 } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import type {
   FormData,
   StepProps,
 } from 'src/pages/proxy-configs/proxy-configs.types';
 
 const BasicConfiguration = ({ id, onSubmit, values }: StepProps) => {
-  const { t } = useTranslation(
-    'pages.proxy-configs.create.form.basic-configuration',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.proxy-configs.create.form.basic-configuration',
+  });
   const { handleSubmit, register, formState } = useForm<FormData>({
     defaultValues: {
       name: values.name,

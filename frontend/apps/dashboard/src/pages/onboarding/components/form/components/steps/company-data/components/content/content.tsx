@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { Organization, OrganizationSize } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
 import { Button, Select, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import useUpdateOrg from 'src/hooks/use-update-org';
 
 import SIZE_OPTIONS from './content.constants';
@@ -22,7 +22,7 @@ export type ContentProps = {
 };
 
 const Content = ({ onBack, onComplete, organization }: ContentProps) => {
-  const { t, allT } = useTranslation('pages.onboarding.company-data');
+  const { t } = useTranslation('common');
   const mutation = useUpdateOrg();
   const {
     control,
@@ -58,25 +58,39 @@ const Content = ({ onBack, onComplete, organization }: ContentProps) => {
         <TextInput
           autoFocus
           hasError={!!errors.name}
-          hint={errors.name ? t('form.name.errors.required') : undefined}
-          label={t('form.name.label')}
-          placeholder={t('form.name.placeholder')}
+          hint={
+            errors.name
+              ? t('pages.onboarding.company-data.form.name.errors.required')
+              : undefined
+          }
+          label={t('pages.onboarding.company-data.form.name.label')}
+          placeholder={t('pages.onboarding.company-data.form.name.placeholder')}
           {...register('name', {
             required: {
               value: true,
-              message: t('form.name.errors.required'),
+              message: t(
+                'pages.onboarding.company-data.form.name.errors.required',
+              ),
             },
           })}
         />
         <TextInput
-          label={t('form.website.label')}
+          label={t('pages.onboarding.company-data.form.website.label')}
           hasError={!!errors.website}
-          hint={errors.website ? t('form.website.errors.required') : undefined}
-          placeholder={t('form.website.placeholder')}
+          hint={
+            errors.website
+              ? t('pages.onboarding.company-data.form.website.errors.required')
+              : undefined
+          }
+          placeholder={t(
+            'pages.onboarding.company-data.form.website.placeholder',
+          )}
           {...register('website', {
             required: {
               value: true,
-              message: t('form.website.errors.required'),
+              message: t(
+                'pages.onboarding.company-data.form.website.errors.required',
+              ),
             },
           })}
         />
@@ -87,8 +101,11 @@ const Content = ({ onBack, onComplete, organization }: ContentProps) => {
           render={({ field, fieldState }) => (
             <Select
               hasError={!!fieldState.error}
-              hint={fieldState.error && t('form.size.errors.required')}
-              label={t('form.size.label')}
+              hint={
+                fieldState.error &&
+                t('pages.onboarding.company-data.form.size.errors.required')
+              }
+              label={t('pages.onboarding.company-data.form.size.label')}
               onBlur={field.onBlur}
               onChange={field.onChange}
               options={SIZE_OPTIONS}
@@ -103,10 +120,10 @@ const Content = ({ onBack, onComplete, organization }: ContentProps) => {
             size="compact"
             variant="secondary"
           >
-            {allT('back')}
+            {t('back')}
           </Button>
           <Button loading={mutation.isLoading} size="compact" type="submit">
-            {allT('next')}
+            {t('next')}
           </Button>
         </ButtonContainer>
       </form>

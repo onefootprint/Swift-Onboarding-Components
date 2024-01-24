@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { RiskSignal } from '@onefootprint/types';
 import type { TableRow } from '@onefootprint/ui';
 import { Table } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useCurrentEntityRiskSignals from '@/entity/hooks/use-current-entity-risk-signals';
 import useRiskSignalsFilters from '@/entity/hooks/use-risk-signals-filters';
@@ -14,7 +14,9 @@ import Filters from './components/filters';
 import Row from './components/row';
 
 const RiskSignals = () => {
-  const { t } = useTranslation('pages.entity.risk-signals');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.risk-signals',
+  });
   const { isLoading, error, data } = useCurrentEntityRiskSignals();
   const filters = useRiskSignalsFilters();
   const columns = [

@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
+import { useTranslation } from 'react-i18next';
 
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
 
 const useOptions = () => {
-  const { t } = useTranslation('pages.playbooks');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks' });
 
   const defaultOptions = [
     { value: 'whoToOnboard', label: t('dialog.who-to-onboard.nav') },

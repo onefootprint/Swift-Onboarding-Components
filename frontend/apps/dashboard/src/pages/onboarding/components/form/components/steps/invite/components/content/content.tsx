@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { Organization } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
 import { Box, Button } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import DomainAccess from 'src/components/domain-access';
 import useUpdateOrg from 'src/hooks/use-update-org';
 
@@ -32,7 +32,10 @@ const Content = ({
   org,
   roles,
 }: ContentProps) => {
-  const { t, allT } = useTranslation('pages.onboarding.invite');
+  const { t: allT } = useTranslation('common');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.onboarding.invite',
+  });
   const inviteMembersMutations = useInviteMembers();
   const updateOrgMutation = useUpdateOrg();
   const methods = useForm({

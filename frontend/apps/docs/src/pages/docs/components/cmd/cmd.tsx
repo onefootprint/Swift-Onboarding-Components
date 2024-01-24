@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoClose16, IcoSearch24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, IconButton, Overlay } from '@onefootprint/ui';
 import { Command } from 'cmdk';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { PageNavigation } from 'src/types/page';
 
 import Footer from './components/footer/footer';
@@ -15,7 +15,7 @@ type CmdProps = {
 };
 
 const Cmd = ({ navigation }: CmdProps) => {
-  const { t } = useTranslation('components.cmd');
+  const { t } = useTranslation('common', { keyPrefix: 'components.cmd' });
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const router = useRouter();

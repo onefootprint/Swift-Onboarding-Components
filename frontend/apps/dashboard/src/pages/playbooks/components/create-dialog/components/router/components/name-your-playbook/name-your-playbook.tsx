@@ -1,8 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Button, TextInput, Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React, { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
 
 import type { NameFormData } from '@/playbooks/utils/machine/types';
@@ -23,9 +24,10 @@ const NameYourPlaybook = ({
   onBack,
   defaultValues,
 }: NameYourPlaybookProps) => {
-  const { t, allT } = useTranslation(
-    'pages.playbooks.dialog.name-your-playbook',
-  );
+  const { t: allT } = useTranslation('common');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.dialog.name-your-playbook',
+  });
   const formMethods = useForm<NameFormData>({
     defaultValues,
   });
@@ -42,7 +44,9 @@ const NameYourPlaybook = ({
     setValue('kind', kind);
   }, [setValue, kind]);
 
-  const kindString = t(kind);
+  const kindString = t(
+    kind as unknown as ParseKeys<'common'>,
+  ) as unknown as string;
   const placeholder = getPlaceholder({
     tenantName: org?.name || '',
     kindString,

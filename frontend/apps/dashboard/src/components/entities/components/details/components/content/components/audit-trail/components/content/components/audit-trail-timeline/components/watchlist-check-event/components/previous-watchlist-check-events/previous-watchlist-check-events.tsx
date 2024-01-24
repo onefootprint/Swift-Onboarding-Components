@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import type { PreviousWatchlistChecksEventData } from '@onefootprint/types';
 import { Drawer, LinkButton, Stack, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import WatchlistCheckEventsDrawerContent from './components/watchlist-check-events-drawer-content';
 
@@ -13,9 +13,9 @@ type PreviousWatchlistCheckEventsProps = {
 const PreviousWatchlistCheckEvents = ({
   data,
 }: PreviousWatchlistCheckEventsProps) => {
-  const { t } = useTranslation(
-    'pages.entity.audit-trail.timeline.watchlist-check-event',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.audit-trail.timeline.watchlist-check-event',
+  });
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const hasPreviousWatchlistChecks = data.length > 0;
   return hasPreviousWatchlistChecks ? (

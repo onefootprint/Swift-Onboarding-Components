@@ -1,8 +1,10 @@
+import type { ParseKeys } from 'i18next';
+
 import type { TransferRequirements } from '../types';
 
 const getRequirementsTitleTranslationKey = (
   missingRequirements: TransferRequirements,
-): string => {
+): ParseKeys<'idv', {}> => {
   const { liveness, idDoc } = missingRequirements;
 
   let key = '';
@@ -14,7 +16,10 @@ const getRequirementsTitleTranslationKey = (
     key = 'id-doc';
   }
 
-  return `transfer.components.requirements-title.${key}`;
+  return `transfer.components.requirements-title.${key}` as ParseKeys<
+    'idv',
+    {}
+  >;
 };
 
 export default getRequirementsTitleTranslationKey;

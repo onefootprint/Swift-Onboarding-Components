@@ -1,8 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoSmartphone224 } from '@onefootprint/icons';
 import { Container, Stack } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
+import { useTranslation } from 'react-i18next';
 
 import Title from '../../title';
 import OsProtected from './components/illustrations/os-protected';
@@ -19,7 +20,7 @@ const sections = [
 ];
 
 const Secure = () => {
-  const { t } = useTranslation('pages.auth.sections');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.auth.sections' });
   return (
     <Container
       sx={{
@@ -34,8 +35,8 @@ const Secure = () => {
       <Stack direction="column" gap={isMobile ? 4 : 12} paddingTop={11}>
         {sections.map(({ translations, illustration }, index) => (
           <Section
-            title={t(`${translations}.title`)}
-            subtitle={t(`${translations}.subtitle`)}
+            title={t(`${translations}.title` as ParseKeys<'common'>)}
+            subtitle={t(`${translations}.subtitle` as ParseKeys<'common'>)}
             image={illustration}
             inverted={!isMobile ? index % 2 !== 0 : false}
             key={translations}

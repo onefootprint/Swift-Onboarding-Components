@@ -11,7 +11,9 @@ type InvalidProps = {
 };
 
 const Invalid = ({ onClose }: InvalidProps) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.secure-form',
+  });
 
   return (
     <Container
@@ -20,9 +22,7 @@ const Invalid = ({ onClose }: InvalidProps) => {
         onClose && (
           <CloseButton>
             <IconButton
-              aria-label={t(
-                'pages.secure-form.form-dialog.header.close-aria-label',
-              )}
+              aria-label={t('form-dialog.header.close-aria-label')}
               onClick={onClose}
             >
               <IcoClose24 />
@@ -37,7 +37,7 @@ const Invalid = ({ onClose }: InvalidProps) => {
         variant="heading-3"
         sx={{ textAlign: 'center' }}
       >
-        {t('title')}
+        {t('invalid.title')}
       </Typography>
       <Typography
         variant="body-2"
@@ -45,7 +45,7 @@ const Invalid = ({ onClose }: InvalidProps) => {
         as="h3"
         sx={{ marginTop: 3, marginBottom: 7, textAlign: 'center' }}
       >
-        {t('pages.secure-form.invalid.subtitle')}
+        {t('invalid.subtitle')}
       </Typography>
     </Container>
   );

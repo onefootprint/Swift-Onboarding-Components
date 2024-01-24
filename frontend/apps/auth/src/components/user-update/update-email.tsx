@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { EmailForm } from '@onefootprint/idv';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { HeaderProps } from '@/src/types';
 
@@ -12,7 +12,7 @@ type ManagePhoneProps = {
 };
 
 const UpdateEmail = ({ children, Header, onSubmit }: ManagePhoneProps) => {
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation('common', { keyPrefix: 'auth' });
 
   const handleFormSubmit = (formData: { email: string }) => {
     onSubmit(formData.email);

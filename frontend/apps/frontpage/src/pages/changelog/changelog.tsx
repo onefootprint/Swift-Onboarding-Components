@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoArrowRightSmall24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
@@ -10,6 +9,7 @@ import {
 } from '@onefootprint/ui';
 import Link from 'next/link';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getInitialPosts, PostType } from 'src/utils/ghost';
 import type { PostDetails } from 'src/utils/ghost/types';
 
@@ -37,7 +37,7 @@ const BLUR_COLORS = [
 ];
 
 const Changelog = ({ posts }: ChangelogProps) => {
-  const { t } = useTranslation('pages.changelog');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.changelog' });
   const [postNumber, setPostNumber] = useState(POSTS_NUMBER);
   const handleLoadMore = async () => {
     setPostNumber(prevPostNumber => prevPostNumber + POSTS_NUMBER);

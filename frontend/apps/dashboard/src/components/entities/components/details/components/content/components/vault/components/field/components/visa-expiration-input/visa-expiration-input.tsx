@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import { IdDI, type VaultValue } from '@onefootprint/types';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import editFormFieldName from '../utils/edit-form-field-name';
 import validateVisaExpiration, {
@@ -15,7 +15,9 @@ export type VisaExpirationInputProps = {
 };
 
 const VisaExpirationInput = ({ value }: VisaExpirationInputProps) => {
-  const { t } = useTranslation('pages.entity.edit.errors.visa-expiration');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.edit.errors.visa-expiration',
+  });
   const {
     register,
     watch,

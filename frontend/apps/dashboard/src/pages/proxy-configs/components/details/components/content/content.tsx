@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { ProxyConfigDetails } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Fieldset } from 'src/components';
 
 import {
@@ -17,7 +17,9 @@ type ContentProps = {
 };
 
 const Content = ({ proxyConfig }: ContentProps) => {
-  const { t } = useTranslation('pages.proxy-configs.details');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.proxy-configs.details',
+  });
 
   const sections = [
     {

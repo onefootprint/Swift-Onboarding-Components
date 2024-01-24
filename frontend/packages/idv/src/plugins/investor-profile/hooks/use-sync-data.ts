@@ -19,7 +19,7 @@ type SyncDataArgs = {
 const useSyncData = () => {
   const investorProfileDataMutation = useUserData();
   const { t } = useTranslation('idv', {
-    keyPrefix: 'investor-profile.components.sync-data-error',
+    keyPrefix: 'investor-profile.components',
   });
   const toast = useToast();
 
@@ -32,8 +32,8 @@ const useSyncData = () => {
   }: SyncDataArgs) => {
     if (!authToken) {
       toast.show({
-        title: t('empty-auth-token.title'),
-        description: t('empty-auth-token.description'),
+        title: t('sync-data-error.empty-auth-token.title'),
+        description: t('sync-data-error.empty-auth-token.description'),
         variant: 'error',
       });
       onError?.(

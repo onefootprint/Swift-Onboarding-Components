@@ -1,17 +1,17 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoHelp24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Button, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ContactDialog from 'src/components/contact-dialog';
 
 const GET_FORM_URL =
   'https://getform.io/f/9f26eb67-51b3-4685-8dc4-8cf458e698e1';
 
 const Banner = () => {
-  const { t } = useTranslation('pages.home.banner');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.home.banner' });
   const [showDialog, setShowDialog] = useState(false);
 
   const handleClickTrigger = () => {

@@ -1,16 +1,16 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import { Container } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
 
 import Form from './components/form';
 import Header from './components/header';
 
 const Onboarding = () => {
-  const { t } = useTranslation('pages.onboarding');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.onboarding' });
   const router = useRouter();
   const session = useSession();
 

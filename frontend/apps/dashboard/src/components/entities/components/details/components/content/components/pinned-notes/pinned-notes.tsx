@@ -1,9 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoArrowDown16, IcoPin24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { ActorKind } from '@onefootprint/types';
 import { createFontStyles, Divider, Stack, Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React, { Fragment, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useHover } from 'usehooks-ts';
 
 import useCurrentEntityAnnotations from '@/entity/hooks/use-current-entity-annotations';
@@ -17,7 +18,9 @@ enum SortOrder {
 
 const PinnedNotes = () => {
   const { data } = useCurrentEntityAnnotations();
-  const { t } = useTranslation('pages.entity.pinned-notes');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.pinned-notes',
+  });
   const [sortedData, setSortedData] = useState(data);
   const [sortDirection, setSortDirection] = useState(SortOrder.descending);
   const sortButtonRef = useRef<HTMLButtonElement>(null);
@@ -88,7 +91,9 @@ const PinnedNotes = () => {
               author={
                 source.kind === ActorKind.organization
                   ? source.member
-                  : t(`note-added-by-source.${source.kind}`)
+                  : t(
+                      `note-added-by-source.${source.kind}` as ParseKeys<'common'>,
+                    )
               }
               key={id}
               note={note}

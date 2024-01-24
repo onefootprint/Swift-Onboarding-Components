@@ -1,13 +1,15 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoSmartphone224 } from '@onefootprint/icons';
 import { Container } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Title from '../../title';
 import CardGrid from './components/card-grid';
 
 const EndlessBenefits = () => {
-  const { t } = useTranslation('pages.auth.endless-benefits');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.auth.endless-benefits',
+  });
   return (
     <>
       <Container

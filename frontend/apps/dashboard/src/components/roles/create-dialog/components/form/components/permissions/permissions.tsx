@@ -1,5 +1,4 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { RoleKind } from '@onefootprint/types';
 import { RoleScopeKind, supportedRoleKinds } from '@onefootprint/types';
@@ -12,6 +11,7 @@ import {
 } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { useDecryptOptions, useVaultProxyOptions } from 'src/components/roles';
 
 export type PermissionsProps = {
@@ -21,7 +21,7 @@ export type PermissionsProps = {
 const Permissions = ({ kind }: PermissionsProps) => {
   const [animateDecryptSelect] = useAutoAnimate<HTMLDivElement>();
   const [animateProxyConfigSelect] = useAutoAnimate<HTMLDivElement>();
-  const { t } = useTranslation('pages.settings.roles');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.settings.roles' });
   const { register, watch, control, setValue, formState } = useFormContext();
   const { errors } = formState;
   const { options: decryptOptions, allOption: decryptAllOption } =

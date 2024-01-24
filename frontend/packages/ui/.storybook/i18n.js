@@ -1,8 +1,8 @@
 import { initReactI18next } from 'react-i18next';
 import i18n from 'i18next';
 
-import en from '../public/locales/en/ui.json';
-import es from '../public/locales/es/ui.json';
+import en from '../src/config/locales/en/ui.json';
+import es from '../src/config/locales/es/ui.json';
 
 i18n.use(initReactI18next).init({
   debug: true,

@@ -1,7 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { EntityStatus } from '@onefootprint/types';
 import { InlineAlert, LinkButton } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
 import { AUDIT_TRAILS_ID } from '@/entity/constants';
@@ -9,7 +10,7 @@ import { AUDIT_TRAILS_ID } from '@/entity/constants';
 type BannerProps = WithEntityProps;
 
 const Banner = ({ entity }: BannerProps) => {
-  const { t } = useTranslation('pages.entity.banner');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.banner' });
 
   const handleClick = () => {
     const auditTrail = document.getElementById(AUDIT_TRAILS_ID);
@@ -34,7 +35,7 @@ const Banner = ({ entity }: BannerProps) => {
   if (entity.status === EntityStatus.incomplete) {
     return (
       <InlineAlert variant="warning">
-        {t(`incomplete.header.${entity.kind}`)}
+        {t(`incomplete.header.${entity.kind}` as ParseKeys<'common'>)}
         <LinkButton onClick={handleClick} sx={{ marginLeft: 2 }}>
           {t('cta')}
         </LinkButton>

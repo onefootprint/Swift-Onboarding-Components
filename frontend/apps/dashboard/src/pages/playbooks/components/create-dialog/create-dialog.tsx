@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Dialog } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Router from './components/router';
 
@@ -11,7 +11,9 @@ export type CreateDialogProps = {
 };
 
 const CreateDialog = ({ open, onClose, onCreate }: CreateDialogProps) => {
-  const { t } = useTranslation('pages.playbooks.dialog');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.dialog',
+  });
 
   return (
     <Dialog size="full-screen" onClose={onClose} open={open} title={t('title')}>

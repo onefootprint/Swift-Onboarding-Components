@@ -1,4 +1,4 @@
-import { useIntl, useTranslation } from '@onefootprint/hooks';
+import { useIntl } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24 } from '@onefootprint/icons';
 import {
   Box,
@@ -9,6 +9,7 @@ import {
 } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import PostContent from 'src/components/post-content';
 import SEO from 'src/components/seo';
 import WritingLayout from 'src/components/writing-layout';
@@ -22,7 +23,7 @@ export type PostProps = {
 };
 
 const Post = ({ post }: PostProps) => {
-  const { t } = useTranslation('pages.library');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.library' });
   const { formatDateWithLongMonth } = useIntl();
 
   return (

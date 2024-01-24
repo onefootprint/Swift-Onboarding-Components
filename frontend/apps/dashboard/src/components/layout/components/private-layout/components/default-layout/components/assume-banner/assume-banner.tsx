@@ -1,13 +1,15 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoInfo16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Banner, Stack, Tooltip } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
 
 const AssumeBanner = () => {
-  const { t } = useTranslation('components.private-layout.assume-banner');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.private-layout.assume-banner',
+  });
   const { data, isAssumedSessionEditMode, setAssumedSessionEditMode } =
     useSession();
   const router = useRouter();

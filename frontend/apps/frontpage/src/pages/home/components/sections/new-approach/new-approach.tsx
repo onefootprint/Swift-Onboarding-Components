@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoChartUp16,
   IcoCode16,
@@ -9,6 +8,7 @@ import {
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import FeatureCard from '../../../../../components/feature-card/feature-card';
 import MicroFeatureCard from '../../micro-feature-card/micro-feature-card';
@@ -17,7 +17,9 @@ import KybIllustration from './components/illustrations/kyb-illustration';
 import KycIllustration from './components/illustrations/kyc-illustration';
 
 const NewApproach = () => {
-  const { t } = useTranslation('pages.home.new-approach');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.home.new-approach',
+  });
   return (
     <>
       <SectionTitle

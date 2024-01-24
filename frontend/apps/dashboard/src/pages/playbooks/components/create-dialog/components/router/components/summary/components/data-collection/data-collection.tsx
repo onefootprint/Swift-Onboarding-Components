@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { InlineAlert } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { isAuth, isKyb, isKyc } from 'src/pages/playbooks/utils/kind';
 
 import type { SummaryMeta } from '@/playbooks/utils/machine/types';
@@ -16,9 +16,9 @@ type DataCollectionProps = {
 };
 
 const DataCollection = ({ meta }: DataCollectionProps) => {
-  const { t } = useTranslation(
-    'pages.playbooks.dialog.summary.data-collection',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.dialog.summary.data-collection',
+  });
 
   return (
     <Container>

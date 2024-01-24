@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { Box, Stack, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Content from './components/content';
 import Error from './components/error';
@@ -11,7 +11,7 @@ import useFakeSpinnerTimeout from './hooks/use-fake-spinner-timeout';
 import useWebhookPortal from './hooks/use-webhooks-portal';
 
 const Webhooks = () => {
-  const { t } = useTranslation('pages.webhooks');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.webhooks' });
   const { data, error, isLoading } = useWebhookPortal();
   const showSpinner = useFakeSpinnerTimeout();
 

@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Box, Dialog, InlineAlert, useToast } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Form from './components/form';
 import type { ContactDialogData } from './contact-dialog.types';
@@ -13,7 +13,9 @@ type ContactDialogProps = {
 };
 
 const ContactDialog = ({ url, open, onClose }: ContactDialogProps) => {
-  const { t } = useTranslation('components.contact-us-dialog');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.contact-us-dialog',
+  });
   const submitFormMutation = useContactForm();
   const formId = 'support-dialog-id';
   const toast = useToast();

@@ -1,5 +1,5 @@
-import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import useOrg from 'src/hooks/use-org';
 
 import Header from '../header';
@@ -14,7 +14,9 @@ export type CompanyDataProps = {
 
 const CompanyData = ({ onBack, onComplete }: CompanyDataProps) => {
   const orgQuery = useOrg();
-  const { t } = useTranslation('pages.onboarding.company-data');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.onboarding.company-data',
+  });
 
   return (
     <>

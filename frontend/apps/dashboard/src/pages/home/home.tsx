@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Select, Stack, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Content from './components/content';
 import Error from './components/error';
@@ -14,7 +14,7 @@ import useOrgMetrics from './hooks/use-org-metrics';
 import usePlaybookOptions from './hooks/use-playbook-options';
 
 const Home = () => {
-  const { t } = useTranslation('pages.home');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.home' });
   const filters = useFilters();
   const metrics = useOrgMetrics();
   const { data: playbooksData } = usePlaybookOptions();

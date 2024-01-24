@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import {
   CollectedKycDataOption,
   type OnboardingConfig,
 } from '@onefootprint/types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   basicInformationFields,
   usResidentDisplayScopes,
@@ -24,7 +24,9 @@ const AuthorizedScopes = ({
     docScanForOptionalSsn,
   },
 }: AuthorizedScopesProps) => {
-  const { t } = useTranslation('pages.playbooks.details.authorized-scopes');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.details.authorized-scopes',
+  });
   const ssn =
     canAccessData.includes(CollectedKycDataOption.ssn9) ||
     canAccessData.includes(CollectedKycDataOption.ssn4);

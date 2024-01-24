@@ -1,8 +1,9 @@
-import { useToggle, useTranslation } from '@onefootprint/hooks';
+import { useToggle } from '@onefootprint/hooks';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Box, Button, Stack, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 
 import CreateDialog from './components/create-dialog';
@@ -10,7 +11,7 @@ import Roles from './components/roles';
 import Table from './components/table';
 
 const ApiKeys = () => {
-  const { t } = useTranslation('pages.api-keys');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.api-keys' });
   const [isCreateDialogOpen, openCreateDialog, closeCreateDialog] =
     useToggle(false);
 

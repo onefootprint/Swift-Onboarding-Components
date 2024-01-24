@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Dialog } from '@onefootprint/ui';
 import noop from 'lodash/noop';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useDecryptControls from '../../hooks/use-decrypt-controls';
 import ReasonForm from './components/reason-form';
@@ -19,7 +19,7 @@ const ReasonDialog = ({
   onClose,
   onSubmit,
 }: ReasonDialogProps) => {
-  const { t, allT } = useTranslation('pages.entity.decrypt');
+  const { t } = useTranslation('common');
   const decryptControls = useDecryptControls();
 
   const handleSubmit = (reason: string) => {
@@ -30,15 +30,15 @@ const ReasonDialog = ({
   return (
     <Dialog
       size="compact"
-      title={t('start')}
+      title={t('pages.entity.decrypt.start')}
       primaryButton={{
         form: 'decrypt-reason-form',
-        label: t('decrypt'),
+        label: t('pages.entity.decrypt.decrypt'),
         loading,
         type: 'submit',
       }}
       secondaryButton={{
-        label: allT('cancel'),
+        label: t('cancel'),
         onClick: onClose,
         disabled: loading,
       }}

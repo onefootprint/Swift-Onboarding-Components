@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { NavigationHeaderLeftButtonProps } from '@onefootprint/idv';
 import { StepHeader } from '@onefootprint/idv';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { UserMachineContext } from '@/src/state';
 import { useUserMachine } from '@/src/state';
@@ -39,7 +39,7 @@ const getHeader = (
 
 const UserRouter = ({ onDone }: UserRouterProps): JSX.Element | null => {
   const [state, send] = useUserMachine();
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation('common', { keyPrefix: 'auth' });
   const isDone = state.matches('success');
   const Header = getHeader(state.context, getUserLeftNavButton(state, send));
 

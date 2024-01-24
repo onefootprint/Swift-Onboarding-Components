@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { ChallengeKind } from '@onefootprint/types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useUserMachine } from '@/src/state';
 import type { HeaderProps } from '@/src/types';
@@ -21,7 +21,7 @@ const ChallengeVerifyPhone = ({
 }: ChallengeVerifyPhoneProps) => {
   const [state, send] = useUserMachine();
   const { phoneChallenge } = state.context;
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation('common', { keyPrefix: 'auth' });
   const scrubbedPhoneNumber = phoneChallenge?.scrubbedPhoneNumber;
   const headerTitle = scrubbedPhoneNumber
     ? t('sms-step.prompt-with-phone', { scrubbedPhoneNumber })

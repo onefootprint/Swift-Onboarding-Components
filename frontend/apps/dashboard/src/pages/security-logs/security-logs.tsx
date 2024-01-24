@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { AccessEvent } from '@onefootprint/types';
 import { SearchInput, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import Timeline from 'src/components/timeline';
 
 import Dot from './components/dot';
@@ -14,7 +14,7 @@ import useGetAccessEvents from './hooks/use-get-access-events';
 import useSecurityLogsFilters from './hooks/use-security-logs-filters';
 
 const SecurityLogs = () => {
-  const { t } = useTranslation('pages.security-logs');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.security-logs' });
   const filters = useSecurityLogsFilters();
   const getAccessEvents = useGetAccessEvents();
   const accessEvents =

@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { ChallengeKind } from '@onefootprint/types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useUserMachine } from '@/src/state';
 import type { HeaderProps } from '@/src/types';
@@ -21,7 +21,7 @@ const ChallengeVerifyEmail = ({
 }: ChallengeVerifyEmailProps) => {
   const [state, send] = useUserMachine();
   const { email, emailChallenge } = state.context;
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation('common', { keyPrefix: 'auth' });
 
   const headerTitle = email
     ? t('email-challenge.prompt-with-email', { email })

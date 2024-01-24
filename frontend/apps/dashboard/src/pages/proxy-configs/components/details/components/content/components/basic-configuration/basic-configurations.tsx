@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { ProxyConfigDetails } from '@onefootprint/types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Field } from 'src/components';
 
 type BasicConfigurationProps = {
@@ -8,9 +8,9 @@ type BasicConfigurationProps = {
 };
 
 const BasicConfiguration = ({ proxyConfig }: BasicConfigurationProps) => {
-  const { t } = useTranslation(
-    'pages.proxy-configs.details.basic-configuration',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.proxy-configs.details.basic-configuration',
+  });
 
   return (
     <>

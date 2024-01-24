@@ -43,29 +43,6 @@ const getSsnValueType = (ssn: SSN) => {
   return ssn?.scrubbed ? SsnValue.hidden : SsnValue.skipped;
 };
 
-const getIdentitiesSections = (
-  t: (key: string, options?: {}) => string,
-  ssnKind: 'ssn4' | 'ssn9' | undefined,
-  ssnValueType: SsnValue,
-  ssn: SSN,
-): SectionItemProps[] => {
-  if (!ssnKind) {
-    return [];
-  }
-
-  const ssnDisplayVal =
-    ssnValueType === SsnValue.skipped
-      ? t('confirm.identity.ssn-skipped-subtext')
-      : ssnFormatter(ssnKind, ssn?.value, ssnValueType === SsnValue.hidden);
-
-  const text =
-    ssnKind === 'ssn9'
-      ? t('confirm.identity.ssn9')
-      : t('confirm.identity.ssn4');
-
-  return [{ text, subtext: ssnDisplayVal }];
-};
-
 const IdentitySection = () => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages' });
   const [editing, setEditing] = useState(false);
@@ -76,8 +53,27 @@ const IdentitySection = () => {
   const ssnKind = getSsnKind(requirement);
   const ssn = getSsnValue(data, ssnKind);
   const [ssnValueType, setSsnValueType] = useState(() => getSsnValueType(ssn));
-  const identity = getIdentitiesSections(t, ssnKind, ssnValueType, ssn);
   const isUsOrTerritories = isCountryUsOrTerritories(data);
+
+  const getIdentitiesSections = (): SectionItemProps[] => {
+    if (!ssnKind) {
+      return [];
+    }
+
+    const ssnDisplayVal =
+      ssnValueType === SsnValue.skipped
+        ? t('confirm.identity.ssn-skipped-subtext')
+        : ssnFormatter(ssnKind, ssn?.value, ssnValueType === SsnValue.hidden);
+
+    const text =
+      ssnKind === 'ssn9'
+        ? t('confirm.identity.ssn9')
+        : t('confirm.identity.ssn4');
+
+    return [{ text, subtext: ssnDisplayVal }];
+  };
+
+  const identity = getIdentitiesSections();
 
   useEffect(() => {
     if (ssn?.decrypted) {

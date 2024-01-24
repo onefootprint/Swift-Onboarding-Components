@@ -71,7 +71,9 @@ const Confirm = () => {
           });
           return;
         }
-        const fieldNames = fields.map(di => t(`di.${di}`)).join(', ');
+        const fieldNames = fields
+          .map(di => t(`di.${di}` as unknown as TemplateStringsArray))
+          .join(', ');
         toast.show({
           title: t('errors.invalid-inputs.title'),
           description: t('errors.invalid-inputs.description-with-fields', {

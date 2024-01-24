@@ -1,3 +1,4 @@
+import type { IconProps } from '@onefootprint/icons';
 import {
   IcoLayer0124,
   IcoSmartphone224,
@@ -25,7 +26,11 @@ const Instructions = ({
   const { t } = useTranslation('idv', {
     keyPrefix: 'id-doc.components.photo-capture.instructions',
   });
-  const instructionItems = [
+  const instructionItems: {
+    title: string;
+    description: string;
+    Icon: (props: IconProps) => JSX.Element;
+  }[] = [
     {
       title: t(`position-${autocaptureKind}.title`),
       description: t(`position-${autocaptureKind}.description`),

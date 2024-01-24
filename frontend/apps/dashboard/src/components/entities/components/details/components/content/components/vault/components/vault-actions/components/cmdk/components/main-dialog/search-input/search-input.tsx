@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoClose16, IcoSearch24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, IconButton } from '@onefootprint/ui';
 import { Command } from 'cmdk';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type SearchInputProps = {
   value: string;
@@ -12,7 +12,7 @@ type SearchInputProps = {
 };
 
 const SearchInput = ({ value, onValueChange, onErase }: SearchInputProps) => {
-  const { t } = useTranslation('components.cmd');
+  const { t } = useTranslation('common', { keyPrefix: 'components.cmdk' });
   return (
     <InputContainer>
       <IcoSearch24 color="tertiary" />

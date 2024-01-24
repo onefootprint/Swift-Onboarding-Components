@@ -4,10 +4,8 @@ import { initReactI18next } from 'react-i18next';
 
 import idv from '../locales/en/idv.json';
 
-const IS_DEV = process.env.NODE_ENV === 'development';
-
 i18n.use(initReactI18next).init({
-  debug: IS_DEV,
+  debug: false,
   fallbackLng: 'en',
   defaultNS: 'idv',
   ns: ['idv', 'ui'],

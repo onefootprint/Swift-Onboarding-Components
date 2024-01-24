@@ -42,7 +42,9 @@ const KybFields = ({ data, showTitle }: KybFieldsProps) => {
       'data-labels.business-phone-number',
     ),
     [CollectedKybDataOption.website]: t('data-labels.business-website'),
-    [CollectedKybDataOption.corporationType]: t('data-labels.corporation-type'),
+    [CollectedKybDataOption.corporationType]: t(
+      'data-labels.business-corporation-type',
+    ),
     [CollectedKybDataOption.beneficialOwners]: t(
       'data-labels.business-beneficial-owners',
     ),

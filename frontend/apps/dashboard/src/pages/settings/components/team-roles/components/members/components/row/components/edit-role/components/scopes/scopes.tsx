@@ -1,6 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { RoleScope } from '@onefootprint/types';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import DecryptOptions from 'src/components/roles/roles-table/components/row/components/decrypt-options';
 import VaultProxyOptions from 'src/components/roles/roles-table/components/row/components/vault-proxy-options';
 import groupScopes from 'src/components/roles/utils/group-scopes';
@@ -10,7 +11,7 @@ export type ScopesListProps = {
 };
 
 const ScopesList = ({ scopes }: ScopesListProps) => {
-  const { t } = useTranslation('pages.settings.roles');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.settings.roles' });
   const { isAdmin, decryptOptions, basicScopes, vaultProxyOptions } =
     groupScopes(scopes);
 
@@ -19,7 +20,13 @@ const ScopesList = ({ scopes }: ScopesListProps) => {
   ) : (
     <>
       {basicScopes.map(scope => (
-        <span key={scope.kind}>{t(`scopes.${scope.kind}`)}</span>
+        <span key={scope.kind}>
+          {
+            t(
+              `scopes.${scope.kind}` as unknown as ParseKeys<'common'>,
+            ) as unknown as string
+          }
+        </span>
       ))}
       <DecryptOptions options={decryptOptions} />
       <VaultProxyOptions options={vaultProxyOptions} />

@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { EntityStatus, RoleScopeKind } from '@onefootprint/types';
 import { Button, Portal, Stack, Tooltip } from '@onefootprint/ui';
 import { SplitButton } from '@onefootprint/ui/src/components';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import useEntityVaultWithTransforms from 'src/components/entities/hooks/use-entity-vault-with-transforms';
 import PermissionGate from 'src/components/permission-gate';
 import { useEffectOnce } from 'usehooks-ts';
@@ -25,7 +25,7 @@ import useEditControls from './hooks/use-edit-controls';
 export type VaultActionsControlsProps = WithEntityProps;
 
 const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
-  const { allT, t } = useTranslation('pages.entity');
+  const { t } = useTranslation('common');
   const { data: entityData } = useCurrentEntity();
 
   const decryptControls = useDecryptControls();
@@ -64,18 +64,21 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
     <Portal selector={HEADER_ACTIONS_SELECTOR}>
       {editControls.isIdle && decryptControls.isIdle && (
         <Stack gap={3} align="center">
-          <Tooltip disabled={canDecrypt} text={t('decrypt.not-allowed')}>
+          <Tooltip
+            disabled={canDecrypt}
+            text={t('pages.entity.decrypt.not-allowed')}
+          >
             <SplitButton
               disabled={!canDecrypt}
               variant="secondary"
               options={[
                 {
-                  label: t('decrypt.start'),
+                  label: t('pages.entity.decrypt.start'),
                   value: 'start',
                   onSelect: decryptControls.start,
                 },
                 {
-                  label: t('decrypt.start-all'),
+                  label: t('pages.entity.decrypt.start-all'),
                   value: 'start-all',
                   onSelect: () =>
                     decryptControls.submitAllFields(
@@ -88,7 +91,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
           {shouldRenderManualReview && (
             <PermissionGate
               scopeKind={RoleScopeKind.manualReview}
-              fallbackText={t('manual-review-not-allowed')}
+              fallbackText={t('pages.entity.manual-review-not-allowed')}
             >
               <ManualReview status={entityData.status} kind={entityData.kind} />
             </PermissionGate>
@@ -107,7 +110,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
                 : editControls.cancel
             }
           >
-            {allT('cancel')}
+            {t('cancel')}
           </Button>
           <Button
             form={
@@ -119,7 +122,7 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
             type="submit"
             loading={!!editControls.isLoading}
           >
-            {decryptControls.inProgress ? allT('next') : allT('save')}
+            {decryptControls.inProgress ? t('next') : t('save')}
           </Button>
         </Stack>
       )}

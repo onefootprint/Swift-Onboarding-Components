@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronDown16, IcoShield16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { CodeInline, createFontStyles, Divider } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { SecurityProps } from '@/api-reference/api-reference.types';
 import staticData from '@/api-reference/assets/api-docs.json';
@@ -10,7 +10,7 @@ import staticData from '@/api-reference/assets/api-docs.json';
 const securityComponentContent = staticData?.components?.securitySchemes;
 
 const Security = ({ type }: SecurityProps) => {
-  const { t } = useTranslation('pages.api-reference');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
   const [isExpanded, setIsExpanded] = useState(false);
   return (
     <Container>

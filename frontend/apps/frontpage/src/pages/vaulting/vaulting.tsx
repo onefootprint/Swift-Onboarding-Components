@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import PenguinBanner from 'src/components/penguin-banner';
 
 import SEO from '../../components/seo';
@@ -12,7 +12,7 @@ import Hero from './sections/hero';
 import VaultProxy from './sections/vault-proxy';
 
 const Vaulting = () => {
-  const { t } = useTranslation('pages.vaulting');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.vaulting' });
 
   return (
     <Container>

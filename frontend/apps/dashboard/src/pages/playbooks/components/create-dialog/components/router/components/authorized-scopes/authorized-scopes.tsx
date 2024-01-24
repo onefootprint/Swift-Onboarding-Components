@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Button, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import type {
   AuthorizedScopesFormData,
@@ -30,9 +30,10 @@ const AuthorizedScopes = ({
   onSubmit,
   playbook,
 }: AuthorizedScopesProps) => {
-  const { t, allT } = useTranslation(
-    'pages.playbooks.dialog.authorized-scopes',
-  );
+  const { t: allT } = useTranslation('common');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.dialog.authorized-scopes',
+  });
   const formMethods = useForm<AuthorizedScopesFormData>({
     defaultValues: { ...defaultAuthorizedScopesValues },
   });

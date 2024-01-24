@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronRight16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
@@ -8,6 +7,7 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { evaluateSchemaRef } from 'src/pages/api-reference/utils/get-schemas';
 
 import type { ContentSchema } from '@/api-reference/api-reference.types';
@@ -33,7 +33,7 @@ const ObjectProperties = ({
   level = 0,
   isArray = false,
 }: PropertyProps) => {
-  const { t } = useTranslation('pages.api-reference');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
   const [expanded, setExpanded] = useState(false);
 
   const handleToggle = () => {

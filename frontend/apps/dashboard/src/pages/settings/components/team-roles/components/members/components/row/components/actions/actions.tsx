@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import type { Member } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
@@ -11,7 +10,7 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import { Trans } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import OverflowButton from 'src/components/overflow-button';
 import PermissionGate from 'src/components/permission-gate';
 
@@ -22,7 +21,10 @@ export type ActionsProps = {
 };
 
 const Actions = ({ member }: ActionsProps) => {
-  const { t, allT } = useTranslation('pages.settings.members.table.actions');
+  const { t: allT } = useTranslation('common');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.members.table.actions',
+  });
   const { email, firstName, lastName, id } = member;
   const [open, setOpen] = useState(false);
   const removeMemberMutation = useRemoveMember(email);

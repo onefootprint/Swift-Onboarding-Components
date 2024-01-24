@@ -1,11 +1,12 @@
 import { DEMO_BASE_URL } from '@onefootprint/global-constants';
-import { useIntl, useTranslation } from '@onefootprint/hooks';
+import { useIntl } from '@onefootprint/hooks';
 import { IcoArrowTopRight24 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { OnboardingConfigKind } from '@onefootprint/types/src/data/onboarding-config';
 import { Badge, CodeInline, LinkButton } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import useOrgSession from 'src/hooks/use-org-session';
 
 import Actions from './components/actions';
@@ -15,7 +16,9 @@ export type RowProps = {
 };
 
 const Row = ({ playbook }: RowProps) => {
-  const { t } = useTranslation('pages.playbooks.table.row');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.table.row',
+  });
   const { formatDateWithTime } = useIntl();
   const { name, key, status, createdAt, kind } = playbook;
   const { sandbox } = useOrgSession();

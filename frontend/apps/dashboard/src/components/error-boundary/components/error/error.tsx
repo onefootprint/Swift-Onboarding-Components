@@ -1,16 +1,16 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import { Container, EmptyState } from '@onefootprint/ui';
 import Head from 'next/head';
 import Image from 'next/image';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type ErrorProps = {
   resetErrorBoundary: () => void;
 };
 
 const Error = ({ resetErrorBoundary }: ErrorProps) => {
-  const { t } = useTranslation('error');
+  const { t } = useTranslation('common', { keyPrefix: 'error' });
 
   return (
     <>

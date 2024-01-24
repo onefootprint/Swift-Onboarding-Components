@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Box, EmptyState } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Page404 = () => {
-  const { t } = useTranslation('pages.404');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.404' });
 
   return (
     <Box marginTop={12}>

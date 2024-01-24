@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import {
   Container,
@@ -10,10 +9,13 @@ import {
 } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import ContactButtons from 'src/components/contact-buttons/contact-buttons';
 
 const PenguinBannerAuth = () => {
-  const { t } = useTranslation('pages.auth.stronger-auth');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.auth.stronger-auth',
+  });
 
   return (
     <Container

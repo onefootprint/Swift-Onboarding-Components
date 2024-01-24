@@ -1,5 +1,4 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckSmall16, IcoInfo16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
@@ -11,11 +10,14 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import SEO from '../../components/seo';
 
 const SupportedIdDocuments = () => {
-  const { t } = useTranslation('pages.supported-id-documents');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.supported-id-documents',
+  });
 
   const handleClick = () => {
     window.open('mailto:hello@onefootprint.com');

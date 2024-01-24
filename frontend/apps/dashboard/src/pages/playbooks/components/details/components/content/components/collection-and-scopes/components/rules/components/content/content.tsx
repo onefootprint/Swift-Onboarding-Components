@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { Rule } from '@onefootprint/types';
 import { OnboardingConfigKind, RuleAction } from '@onefootprint/types';
 import { InlineAlert, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ActionSection from '../action-section';
 
@@ -21,7 +21,9 @@ const Rules = ({
   shouldAllowEditing,
   actionRules,
 }: RulesProps) => {
-  const { t } = useTranslation('pages.playbooks.details.rules');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.details.rules',
+  });
 
   return (
     <Stack direction="column" gap={7}>

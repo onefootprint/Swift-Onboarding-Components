@@ -1,15 +1,15 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoBuilding24, IcoFileText224, IcoUsers24 } from '@onefootprint/icons';
 import type { DataIdentifier, Entity } from '@onefootprint/types';
 import { BusinessDI } from '@onefootprint/types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Fieldset } from '../../../../vault.types';
 import BusinessOwners from './components/business-owners';
 import CorporationType from './components/corporation-type';
 
 const useFieldsets = (): Fieldset => {
-  const { t } = useTranslation('pages.business.vault');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.business.vault' });
   return {
     basic: {
       title: t('basic.title'),

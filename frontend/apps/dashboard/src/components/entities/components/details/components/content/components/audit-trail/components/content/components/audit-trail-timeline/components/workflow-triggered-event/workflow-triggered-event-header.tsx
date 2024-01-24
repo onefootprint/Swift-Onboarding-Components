@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { type WorkflowTriggeredEventData } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Actor from '../actor/actor';
 
@@ -12,9 +12,9 @@ type WorkflowTriggeredEventHeaderProps = {
 const WorkflowTriggeredEventHeader = ({
   data,
 }: WorkflowTriggeredEventHeaderProps) => {
-  const { t } = useTranslation(
-    'pages.entity.audit-trail.timeline.workflow-triggered-event',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.audit-trail.timeline.workflow-triggered-event',
+  });
   const workflowKind = data.workflow.kind;
   const action = t(`actions.${workflowKind}`);
 

@@ -1,13 +1,13 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import { Container, EmptyState } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import SEO from '../../components/seo';
 
 const Page404 = () => {
-  const { t } = useTranslation('pages.404');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.404' });
   return (
     <>
       <SEO title={t('title')} slug="/" />

@@ -1,15 +1,16 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoPlusSmall16, IcoTrash16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { CollectedInvestorProfileDataOption } from '@onefootprint/types';
 import { LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 const InvestorProfile = () => {
-  const { t } = useTranslation(
-    'pages.playbooks.dialog.summary.data-collection.investor-profile',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix:
+      'pages.playbooks.dialog.summary.data-collection.investor-profile',
+  });
   const { register, setValue, watch } = useFormContext();
 
   const added = watch(CollectedInvestorProfileDataOption.investorProfile);

@@ -10,6 +10,7 @@ const LegalFooter = ({ descriptionKey }: LegalFooterProps) => (
   <StyledTypography>
     <Trans
       ns="idv"
+      // @ts-ignore:next-line
       i18nKey={descriptionKey}
       components={{
         termsLink: (

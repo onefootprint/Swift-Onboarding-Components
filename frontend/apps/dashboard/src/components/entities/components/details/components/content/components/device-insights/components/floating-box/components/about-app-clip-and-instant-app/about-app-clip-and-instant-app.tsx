@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Box, Dialog, LinkButton, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import QRCode from 'react-qr-code';
 
 type AboutAppClipAndInstantAppProps = {
@@ -11,7 +11,9 @@ type AboutAppClipAndInstantAppProps = {
 const AboutAppClipAndInstantApp = ({
   kind,
 }: AboutAppClipAndInstantAppProps) => {
-  const { t } = useTranslation(`pages.entity.device-insights.${kind}`);
+  const { t } = useTranslation('common', {
+    keyPrefix: `pages.entity.device-insights.${kind}`,
+  });
   const [isOpen, setIsOpen] = useState(false);
 
   const handleClose = () => {

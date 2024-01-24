@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { Table as UITable } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useFilters from '../../hooks/use-filters';
 import Row from './components/row';
@@ -13,7 +13,7 @@ type TableProps = {
 };
 
 const Table = ({ data, isLoading, errorMessage }: TableProps) => {
-  const { t } = useTranslation('pages.playbooks');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.playbooks' });
   const filters = useFilters();
   const columns = [
     { id: 'name', text: t('table.header.name'), width: '25%' },

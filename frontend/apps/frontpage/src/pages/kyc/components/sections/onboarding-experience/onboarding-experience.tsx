@@ -1,16 +1,21 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoPencil24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import SectionCore from '../../section-text';
 
 const bulletPointKets = ['fonts', 'variables', 'style', 'specify', 'sec'];
 
 const OnboardingExperience = () => {
-  const { t } = useTranslation('pages.kyc.onboarding-experience');
-  const bulletPointContent = bulletPointKets.map(key => t(`bullets.${key}`));
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.kyc.onboarding-experience',
+  });
+  const bulletPointContent = bulletPointKets.map(key =>
+    t(`bullets.${key}` as ParseKeys<'common'>),
+  );
   return (
     <Section>
       <SectionCore

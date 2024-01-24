@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Dialog, Grid, Stack, Typography, useToast } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DEFAULT_PRIVATE_ROUTE } from 'src/config/constants';
 import useSession from 'src/hooks/use-session';
 
@@ -20,7 +20,7 @@ type Tool = {
 };
 
 const Tenants = () => {
-  const { t } = useTranslation('pages.toolbox');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.toolbox' });
   const {
     data: { auth, user },
   } = useSession();

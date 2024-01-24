@@ -1,4 +1,4 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type {
   ChallengeData,
@@ -8,6 +8,7 @@ import type {
   SignupChallengeResponse,
 } from '@onefootprint/types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useEffectOnceStrict } from '@/src/hooks';
 import {
@@ -47,7 +48,9 @@ const PinVerification = ({
     obConfigAuth,
     sandboxId,
   };
-  const { t } = useTranslation('auth.pin-verification');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'auth.pin-verification',
+  });
   const showRequestErrorToast = useRequestErrorToast();
   const mutLoginChallenge = useLoginChallenge(commonMutationProps);
   const mutSignupChallenge = useSignupChallenge(commonMutationProps);

@@ -26,7 +26,7 @@ const Domain = ({ domain, onRemove }: DomainProps) => {
       <Dropdown.Root>
         <PermissionGate
           scopeKind={RoleScopeKind.onboardingConfiguration}
-          fallbackText={t('not-allowed')}
+          fallbackText={t('list.not-allowed')}
         >
           <Dropdown.Trigger
             aria-label={t('list.actions', { domain }) as string}

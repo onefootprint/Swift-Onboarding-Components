@@ -277,6 +277,9 @@
           "visa": "Visa",
           "voterIdentification": "Voter identification",
           "ssnCard": "SSN Card",
+          "lease": "Lease",
+          "utilityBill": "Utility Bill",
+          "bankStatement": "Bank Statement",
           "selfie": "Selfie",
           "business-name": "Business name",
           "business-tin": "TIN",
@@ -575,6 +578,11 @@
             "description-generic": "An error occurred while saving data. Please fix the inputs and try again."
           }
         }
+      },
+      "cta": {
+        "continue": "Continue",
+        "save": "Save",
+        "cancel": "Cancel"
       }
     }
   },
@@ -808,6 +816,12 @@
   },
   "investor-profile": {
     "components": {
+      "sync-data-error": {
+        "empty-auth-token": {
+          "title": "Your session is invalid",
+          "description": "Please refresh this page to try onboarding again."
+        }
+      },
       "empty-auth-token": {
         "title": "Your session is invalid",
         "description": "Please refresh this page to try onboarding again."
@@ -933,6 +947,7 @@
         },
         "doc-upload": {
           "label": "Upload a compliance letter (PDF)",
+          "remove-aria-label": "Remove",
           "cta": "Choose file to upload",
           "cta-multiple": "Upload another file",
           "disclaimer": "In accordance with applicable FINRA rules, you will need to obtain a letter written and signed by a compliance officer on company letterhead explicitly granting permission to carry the account and explicitly stating whether or not the firm requires access to duplicate account statements and/or trade confirmations. If the firm would like access to your duplicate account statements and/or trade confirmations, the letter must include the applicant's full name and a statement that the account holder is responsible for sharing statements with the firm.",

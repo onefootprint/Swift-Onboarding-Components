@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { BusinessOwner, Entity } from '@onefootprint/types';
 import {
@@ -7,8 +6,10 @@ import {
   isVaultDataEncrypted,
 } from '@onefootprint/types';
 import { Box, Grid, Stack, Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import Link from 'next/link';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { FieldOrPlaceholder } from 'src/components';
 import StatusBadge from 'src/components/status-badge';
 import getFullName from 'src/utils/get-full-name';
@@ -23,7 +24,9 @@ export type ContentProps = {
 };
 
 const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
-  const { t } = useTranslation('pages.business.vault.bos');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.business.vault.bos',
+  });
   const field = useField(entity);
   let di = BusinessDI.beneficialOwners;
   if (entity.attributes.includes(BusinessDI.kycedBeneficialOwners)) {
@@ -76,13 +79,15 @@ const BusinessOwnersField = ({ businessOwners, entity }: ContentProps) => {
     </Stack>
   );
 
-  const boHintText = (businessOwner: BusinessOwner) => {
+  const boHintText = (businessOwner: BusinessOwner): string => {
     if (businessOwner.ownershipStake) {
       return t(`hint.${businessOwner.kind}`, {
         stake: businessOwner.ownershipStake,
-      });
+      }) as string;
     }
-    return businessOwner.kind === 'primary' ? t(`hint.primary_no_stake`) : '';
+    return businessOwner.kind === 'primary'
+      ? (t(`hint.primary_no_stake` as ParseKeys<'common'>) as string)
+      : '';
   };
 
   return (

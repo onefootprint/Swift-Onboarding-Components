@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import IllustrationContainer from '../../components/illustration-section-title/container';
 import Rectangle from '../../components/illustration-section-title/rectangle/rectangle';
@@ -10,7 +10,9 @@ import SectionSubtitle from '../../components/section-subtitle';
 import SectionTitle from '../../components/section-title';
 
 const AuditTrail = () => {
-  const { t } = useTranslation('pages.vaulting.audit-trail');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.vaulting.audit-trail',
+  });
   return (
     <StyledContainer>
       <Title>

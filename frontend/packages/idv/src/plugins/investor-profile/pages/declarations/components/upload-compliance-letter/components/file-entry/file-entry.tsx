@@ -19,7 +19,7 @@ const FileEntry = ({ file, onRemove }: FileEntryProps) => {
         <Typography variant="body-3">{file.name}</Typography>
       </Box>
       <Box minWidth="32px">
-        <IconButton aria-label={t('remove')} onClick={onRemove}>
+        <IconButton aria-label={t('remove-aria-label')} onClick={onRemove}>
           <IcoTrash16 color="error" />
         </IconButton>
       </Box>

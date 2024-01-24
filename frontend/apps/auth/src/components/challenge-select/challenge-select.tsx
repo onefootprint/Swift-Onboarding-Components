@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoEmail16, IcoFaceid16, IcoSmartphone16 } from '@onefootprint/icons';
 import { ChallengeKind } from '@onefootprint/types';
 import type { ComponentProps, FormEvent } from 'react';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useUserMachine } from '@/src/state';
 
@@ -32,7 +32,7 @@ const getPhonePasskeyEntry = (title: string) => ({
 });
 
 const ChallengeSelect = ({ children, Header }: ChallengeSelectProps) => {
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation('common', { keyPrefix: 'auth' });
   const [state, send] = useUserMachine();
   const { kindToChallenge, userFound } = state.context;
   const availableOptions = userFound?.availableChallengeKinds || [];

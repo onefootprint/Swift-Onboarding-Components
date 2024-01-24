@@ -1,11 +1,11 @@
 'use client';
 
-import { useTranslation } from '@onefootprint/hooks';
 import { getSdkArgsToken } from '@onefootprint/idv';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { useConfirmationDialog } from '@onefootprint/ui';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { UserMachineProvider } from '@/src/state';
 import type { Variant } from '@/src/types';
@@ -24,7 +24,7 @@ const UserContainer = ({ variant }: AuthContainerProps): JSX.Element | null => {
   const searchParams = useSearchParams();
   const windowUrl = getWindowUrl();
   const authToken = getSdkArgsToken(windowUrl.split('#')[1]) ?? '';
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation('common', { keyPrefix: 'auth' });
   const confirmationDialog = useConfirmationDialog();
   const notification = !authToken
     ? {

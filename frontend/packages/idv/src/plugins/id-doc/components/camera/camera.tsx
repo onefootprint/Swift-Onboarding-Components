@@ -343,6 +343,13 @@ const Camera = ({
   }, [isVideoPlaying, videoRef]);
 
   useEffect(() => () => clearTimeout(autocaptureRestartTimeoutRef.current), []);
+  const feedbackText = t(
+    `autocapture.feedback.${autocaptureKind}.${autocaptureFeedback}` as unknown as TemplateStringsArray,
+    {
+      side: imageType,
+      documentType: docType ? IdDocTypeToLabel[docType] : '',
+    },
+  ) as unknown as string;
 
   return (
     <>
@@ -404,13 +411,7 @@ const Camera = ({
               />
               {autocaptureFeedback ? (
                 <Feedback deviceKind={deviceKind} top={positionFromTop}>
-                  {t(
-                    `autocapture.feedback.${autocaptureKind}.${autocaptureFeedback}`,
-                    {
-                      side: imageType,
-                      documentType: docType ? IdDocTypeToLabel[docType] : '',
-                    },
-                  )}
+                  {feedbackText}
                 </Feedback>
               ) : null}
               {isMobile(deviceKind) && (

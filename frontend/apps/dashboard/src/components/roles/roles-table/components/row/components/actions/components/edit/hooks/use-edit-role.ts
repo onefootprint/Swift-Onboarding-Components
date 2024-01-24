@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import request, { getErrorMessage } from '@onefootprint/request';
 import type {
   UpdateRoleRequest,
@@ -6,6 +5,7 @@ import type {
 } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
@@ -25,7 +25,9 @@ const updateRoleRequest = async (
 };
 
 const useEditRole = (id: string) => {
-  const { t } = useTranslation('pages.settings.roles.edit.notifications');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.roles.edit.notifications',
+  });
   const toast = useToast();
   const session = useSession();
   const queryClient = useQueryClient();

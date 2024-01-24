@@ -1,10 +1,10 @@
 import { primitives } from '@onefootprint/design-tokens';
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group';
 import { motion } from 'framer-motion';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Period } from '../../plans-table-types';
 import { Periods } from '../../plans-table-types';
@@ -20,7 +20,7 @@ const options = [
 ];
 
 const Toggle = ({ onValueChange, value }: ToggleProps) => {
-  const { t } = useTranslation('pages.pricing.units');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.pricing.units' });
   return (
     <Container
       onValueChange={onValueChange}

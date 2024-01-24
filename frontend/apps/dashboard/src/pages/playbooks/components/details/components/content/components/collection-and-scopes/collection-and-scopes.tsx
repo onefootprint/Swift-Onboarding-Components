@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import {
   type OnboardingConfig,
@@ -6,6 +5,7 @@ import {
 } from '@onefootprint/types';
 import { Tab, Tabs } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import AmlMonitoring from './components/aml-monitoring';
 import AuthorizedScopes from './components/authorized-scopes';
@@ -17,7 +17,9 @@ export type CollectionAndScopesProps = {
 };
 
 const CollectionAndScopes = ({ playbook }: CollectionAndScopesProps) => {
-  const { t } = useTranslation('pages.playbooks.details');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.details',
+  });
   const options = [
     { value: 'data', label: t('tabs.data-collection') },
     { value: 'authorized-scopes', label: t('tabs.authorized-scopes') },

@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { ApiKey } from '@onefootprint/types';
 import type { TableRow } from '@onefootprint/ui';
 import { Table } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Row from './components/row';
 import useApiKeys from './hooks/use-api-keys';
@@ -12,7 +12,7 @@ const renderTr = ({ item }: TableRow<ApiKey>) => <Row apiKey={item} />;
 
 const ApiKeysTable = () => {
   const { isLoading, error, data } = useApiKeys();
-  const { t } = useTranslation('pages.api-keys');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.api-keys' });
   const columns = [
     { text: t('table.header.name'), width: '15%' },
     { text: t('table.header.secret-key'), width: '25%' },

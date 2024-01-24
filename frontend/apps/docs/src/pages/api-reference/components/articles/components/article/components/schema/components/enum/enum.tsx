@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronDown16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
@@ -8,6 +7,7 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type EnumProps = {
   enums: string[];
@@ -16,7 +16,7 @@ export type EnumProps = {
 const THRESHOLD = 40;
 
 const Enum = ({ enums }: EnumProps) => {
-  const { t } = useTranslation('pages.api-reference');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
   const [expanded, setExpanded] = useState(() => enums.length < THRESHOLD);
   const shouldShowAllButton = enums.length > THRESHOLD;
   const items = expanded ? enums : enums.slice(0, THRESHOLD);

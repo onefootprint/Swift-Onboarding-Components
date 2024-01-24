@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Grid, media, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import SEO from '../../components/seo';
 import ArticleItem from './components/article-item';
@@ -12,7 +12,7 @@ type MediaProps = {
 };
 
 const Media = ({ articles }: MediaProps) => {
-  const { t } = useTranslation('pages.media');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.media' });
 
   return (
     <>

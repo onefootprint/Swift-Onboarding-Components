@@ -41,7 +41,7 @@ const BeneficialOwnersSection = () => {
 
   const sections: SectionProps[] = [];
   beneficialOwners.forEach((beneficialOwner, index) => {
-    const items = [
+    const items: { text: string; subtext: string }[] = [
       {
         text: t('beneficial-owners.first-name'),
         subtext: beneficialOwner[BeneficialOwnerDataAttribute.firstName],

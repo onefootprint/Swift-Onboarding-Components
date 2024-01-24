@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Badge, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type DocumentStatus = 'success' | 'warning' | 'error';
 
@@ -9,7 +9,9 @@ type DocumentBadgeStatusProps = {
 };
 
 const DocumentStatusBadge = ({ status }: DocumentBadgeStatusProps) => {
-  const { t } = useTranslation('pages.entity.decrypt.status');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.decrypt.status',
+  });
 
   return status ? (
     <Badge variant={status}>

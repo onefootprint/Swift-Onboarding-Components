@@ -35,7 +35,7 @@ const OverallOutcomeSelect = ({ config }: OverallOutcomeSelectProps) => {
   const requiresIdDoc = !!config?.requiresIdDoc;
   const shouldShowStepUp = !!config?.isStepupEnabled;
 
-  const options = [
+  const options: { label: string; value: string; description?: string }[] = [
     overallOutcomeSuccess,
     overallOutcomeFail,
     overallOutcomeManualReview,

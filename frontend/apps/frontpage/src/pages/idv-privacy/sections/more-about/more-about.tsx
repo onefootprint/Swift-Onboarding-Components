@@ -1,12 +1,13 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Container, media, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
-import { Trans } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 const MoreAbout = () => {
-  const { t } = useTranslation('pages.idv-privacy.more-about');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.idv-privacy.more-about',
+  });
   return (
     <StyledContainer>
       <Content>

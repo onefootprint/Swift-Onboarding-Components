@@ -1,12 +1,12 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { RiskSignalAttribute } from '@onefootprint/types';
 import { Filters } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useRiskSignalsFilters from '@/entity/hooks/use-risk-signals-filters';
 
 const RiskSignalsFilters = () => {
-  const { t, allT } = useTranslation('pages.entity.risk-signals');
+  const { t } = useTranslation('common');
   const filters = useRiskSignalsFilters();
 
   return (
@@ -14,23 +14,23 @@ const RiskSignalsFilters = () => {
       controls={[
         {
           query: 'risk_signal_severity',
-          label: t('filters.severity.label'),
+          label: t('pages.entity.risk-signals.filters.severity.label'),
           kind: 'multi-select',
           options: [
             {
-              label: t('severity.high'),
+              label: t('pages.entity.risk-signals.severity.high'),
               value: 'high',
             },
             {
-              label: t('severity.medium'),
+              label: t('pages.entity.risk-signals.severity.medium'),
               value: 'medium',
             },
             {
-              label: t('severity.low'),
+              label: t('pages.entity.risk-signals.severity.low'),
               value: 'low',
             },
             {
-              label: t('severity.info'),
+              label: t('pages.entity.risk-signals.severity.info'),
               value: 'info',
             },
           ],
@@ -38,63 +38,63 @@ const RiskSignalsFilters = () => {
         },
         {
           query: 'risk_signal_scope',
-          label: t('filters.scope.label'),
+          label: t('pages.entity.risk-signals.filters.scope.label'),
           kind: 'multi-select',
           options: [
             {
-              label: allT('signal-attributes.name'),
+              label: t('signal-attributes.name'),
               value: RiskSignalAttribute.name,
             },
             {
-              label: allT('signal-attributes.email'),
+              label: t('signal-attributes.email'),
               value: RiskSignalAttribute.email,
             },
             {
-              label: allT('signal-attributes.phone_number'),
+              label: t('signal-attributes.phone_number'),
               value: RiskSignalAttribute.phoneNumber,
             },
             {
-              label: allT('signal-attributes.dob'),
+              label: t('signal-attributes.dob'),
               value: RiskSignalAttribute.dob,
             },
             {
-              label: allT('signal-attributes.ssn'),
+              label: t('signal-attributes.ssn'),
               value: RiskSignalAttribute.ssn,
             },
             {
-              label: allT('signal-attributes.document'),
+              label: t('signal-attributes.document'),
               value: RiskSignalAttribute.document,
             },
             {
-              label: allT('signal-attributes.address'),
+              label: t('signal-attributes.address'),
               value: RiskSignalAttribute.address,
             },
             {
-              label: allT('signal-attributes.street_address'),
+              label: t('signal-attributes.street_address'),
               value: RiskSignalAttribute.streetAddress,
             },
             {
-              label: allT('signal-attributes.city'),
+              label: t('signal-attributes.city'),
               value: RiskSignalAttribute.city,
             },
             {
-              label: allT('signal-attributes.state'),
+              label: t('signal-attributes.state'),
               value: RiskSignalAttribute.state,
             },
             {
-              label: allT('signal-attributes.zip'),
+              label: t('signal-attributes.zip'),
               value: RiskSignalAttribute.zip,
             },
             {
-              label: allT('signal-attributes.ip_address'),
+              label: t('signal-attributes.ip_address'),
               value: RiskSignalAttribute.ipAddress,
             },
             {
-              label: allT('signal-attributes.device'),
+              label: t('signal-attributes.device'),
               value: RiskSignalAttribute.device,
             },
             {
-              label: allT('signal-attributes.native_device'),
+              label: t('signal-attributes.native_device'),
               value: RiskSignalAttribute.native_device,
             },
           ],

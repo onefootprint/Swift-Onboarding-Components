@@ -1,4 +1,4 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoCopy16 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
 import { TokenKind } from '@onefootprint/types/src/api/create-token';
@@ -12,6 +12,7 @@ import {
   useToast,
 } from '@onefootprint/ui';
 import React, { useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 
@@ -23,7 +24,9 @@ export type UpdateAuthDialogProps = {
 };
 
 const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
-  const { t } = useTranslation('pages.entity.actions.update-auth-methods');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.actions.update-auth-methods',
+  });
   const generateTokenMutation = useGenerateTokenRequest();
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();

@@ -11,7 +11,7 @@ export type NavigationBackButtonProps = {
 
 const NavigationBackButton = ({ onBack, color }: NavigationBackButtonProps) => {
   const { t } = useTranslation('idv', {
-    keyPrefix: 'global.components.layout.navigation-header.back-button',
+    keyPrefix: 'global.components.navigation-header.back-button',
   });
 
   return (

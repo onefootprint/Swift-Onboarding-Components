@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { CodeBlock, media } from '@onefootprint/ui';
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type {
   Content,
@@ -18,7 +18,7 @@ export type DemoCodeProps = {
 };
 
 const DemoCode = ({ requestBody, responses }: DemoCodeProps) => {
-  const { t } = useTranslation('pages.api-reference');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
   const requestSchema = getSchemaFromComponent(requestBody);
   return (
     <Container>

@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoFaceid24, IcoSmartphone24 } from '@onefootprint/icons';
 import { getBiometricChallengeResponseV2 } from '@onefootprint/idv';
 import type {
@@ -10,6 +9,7 @@ import type { SXStyleProps } from '@onefootprint/ui';
 import { Button, Stack, Typography, useToast } from '@onefootprint/ui';
 import { noop } from 'lodash/fp';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useIdentifyVerify, useLoginChallenge } from '@/src/queries';
 import { useUserMachine } from '@/src/state';
@@ -36,7 +36,9 @@ const ChallengeVerifyPasskey = ({
 }: ChallengeVerifyPasskeyProps) => {
   const [state] = useUserMachine();
   const { authToken } = state.context;
-  const { t } = useTranslation('auth.passkey-challenge');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'auth.passkey-challenge',
+  });
   const toast = useToast();
   const mutLoginChallenge = useLoginChallenge({});
   const mutIdentifyVerify = useIdentifyVerify({ authToken });

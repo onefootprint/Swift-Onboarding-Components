@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import { Box, Checkbox, Divider, Grid, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 type IdDocPickerProps = {
   unselectedIDDoc: boolean;
@@ -10,7 +10,9 @@ type IdDocPickerProps = {
 
 const IdDocPicker = ({ unselectedIDDoc }: IdDocPickerProps) => {
   const { register, watch } = useFormContext();
-  const { t } = useTranslation('pages.playbooks.dialog.summary.person');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.dialog.summary.person',
+  });
   const idDocKind = watch('personal.idDocKind');
 
   return (

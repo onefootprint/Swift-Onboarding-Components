@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
@@ -9,6 +8,7 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import useEntityVaultWithTransforms from 'src/components/entities/hooks/use-entity-vault-with-transforms';
 import { getCustomDIs } from 'src/components/entities/utils/get-dis';
 
@@ -30,7 +30,9 @@ const CustomDataFields = ({
   iconComponent: IconComponent,
   title,
 }: CustomDataFieldsProps) => {
-  const { t } = useTranslation('pages.entity.fieldset');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.fieldset',
+  });
   const decrypt = useDecryptControls();
   const decryptForm = useDecryptForm();
   const getFieldProps = useField(entity);

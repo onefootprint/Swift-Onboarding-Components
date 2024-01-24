@@ -1,8 +1,8 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import { checkIsPhoneValid, PhoneForm } from '@onefootprint/idv';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { HeaderProps } from '@/src/types';
 
@@ -19,7 +19,7 @@ const isSandbox = isTest || !isProd;
 const handlePhoneValidation = (s: string) => checkIsPhoneValid(s, isSandbox);
 
 const UpdatePhone = ({ children, Header, onSubmit }: UpdatePhoneProps) => {
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation('common', { keyPrefix: 'auth' });
   const handleFormSubmit = (formData: FormData) => {
     onSubmit(formData.phoneNumber);
   };

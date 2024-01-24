@@ -37,7 +37,9 @@ const VisaFields = () => {
         return t('visa-kind.error');
       }
       if (field === 'expirationDate' && errors.visa.expirationDate) {
-        return t(`visa-expiration.error.${errors.visa.expirationDate.type}`);
+        return t(
+          `visa-expiration.error.${errors.visa.expirationDate.type}` as unknown as TemplateStringsArray,
+        ) as unknown as string;
       }
     }
     return undefined;

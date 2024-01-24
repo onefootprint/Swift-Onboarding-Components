@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoArrowRightSmall16, IcoCopy16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { AmlHit, AmlHitMedia } from '@onefootprint/types';
@@ -11,6 +10,7 @@ import {
   useToast,
 } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import HitItem from './components/hit-item';
 import HitsShimmer from './components/hits-shimmer';
@@ -24,7 +24,9 @@ type MatchesProps = {
 };
 
 const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
-  const { t } = useTranslation('pages.entity.risk-signals.details.matches');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.risk-signals.details.matches',
+  });
   const cachedAmlHit = useCachedRiskSignalAmlHint(riskSignalId);
   const decryptMutation = useRiskSignalAmlHits();
   const aml = decryptMutation.data || cachedAmlHit;
@@ -34,8 +36,8 @@ const Matches = ({ riskSignalId, handleShowAmlMedia }: MatchesProps) => {
     decryptMutation.mutate(riskSignalId, {
       onError: () => {
         toast.show({
-          title: t('errors.title'),
-          description: t('errors.description'),
+          title: t('protected-details.error.title'),
+          description: t('protected-details.error.description'),
           variant: 'error',
         });
       },

@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { ParameterProps } from '@/api-reference/api-reference.types';
 
@@ -9,7 +9,7 @@ import Schema from '../schema';
 import useParametersGroupBySections from './hooks/use-parameters-grouped-by-section';
 
 const Parameters = ({ parameters }: { parameters: ParameterProps[] }) => {
-  const { t } = useTranslation('pages.api-reference');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
   const sections = useParametersGroupBySections(parameters);
 
   return (

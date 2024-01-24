@@ -1,7 +1,8 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { OrgFrequentNoteKind, type ReviewStatus } from '@onefootprint/types';
 import { Dialog, useToast } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { ManualNoteFormData } from '@/entities/components/details/components/content/components/manual-note-entry-form';
 import ManualNoteEntryForm from '@/entities/components/details/components/content/components/manual-note-entry-form';
@@ -20,7 +21,9 @@ const ManualReviewDialog = ({
   onClose,
   status,
 }: ManualReviewDialogProps) => {
-  const { t } = useTranslation('pages.entity.manual-review');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.manual-review',
+  });
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
   const submitReviewMutation = useSubmitReview();

@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { ReviewStatus } from '@onefootprint/types';
 import { Divider, TextArea, Toggle, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 export type ManualReviewFormData = {
   note: string;
@@ -21,7 +21,9 @@ type ManualReviewFormProps = {
 };
 
 const ManualReviewForm = ({ status, onSubmit }: ManualReviewFormProps) => {
-  const { t } = useTranslation('pages.entity.manual-review');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.manual-review',
+  });
   const {
     register,
     handleSubmit,

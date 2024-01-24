@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { CollectedKycDataOption } from '@onefootprint/types';
 import {
@@ -12,6 +11,7 @@ import {
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
 
 import type { Personal, SummaryMeta } from '@/playbooks/utils/machine/types';
@@ -26,7 +26,10 @@ type EditingProps = {
 
 const Editing = ({ onStopEditing, meta }: EditingProps) => {
   const { control, register, watch, setValue, getValues } = useFormContext();
-  const { t, allT } = useTranslation('pages.playbooks.dialog.summary.person');
+  const { t: allT } = useTranslation('common');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.dialog.summary.person',
+  });
   const { kind } = meta;
   const {
     data: { user, org },

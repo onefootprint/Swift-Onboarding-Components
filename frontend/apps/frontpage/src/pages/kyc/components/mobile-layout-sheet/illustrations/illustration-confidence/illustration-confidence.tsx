@@ -1,8 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { motion, useAnimationControls, useInView } from 'framer-motion';
+import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
 import React, { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Tag from './components/tag';
 import { tagKeys } from './constants';
@@ -12,7 +13,9 @@ const IllustrationConfidence = () => {
   const isInView = useInView(ref, { once: true, amount: 'all' });
   const controlsTags = useAnimationControls();
   const controlsLights = useAnimationControls();
-  const { t } = useTranslation('pages.kyc.confidence.tags');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.kyc.confidence.tags',
+  });
 
   useEffect(() => {
     if (isInView) {
@@ -53,7 +56,7 @@ const IllustrationConfidence = () => {
             key={key}
           >
             <Tag key={key} icon={Icon}>
-              {t(key)}
+              {t(key as ParseKeys<'common'>)}
             </Tag>
           </motion.span>
         ))}

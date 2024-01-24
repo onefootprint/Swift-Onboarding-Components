@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { GetAuthRolesOrg } from '@onefootprint/types';
 import { LinkButton } from '@onefootprint/ui';
 import { createFontStyles } from '@onefootprint/ui/src/utils/mixins/mixins';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import TenantItem from './components/tenant-item';
 
@@ -16,7 +16,9 @@ type TenantsListProps = {
 const NUM_TENANTS_IN_DROPDOWN = 5;
 
 const TenantsList = ({ tenants, currTenantId, onClick }: TenantsListProps) => {
-  const { t } = useTranslation('components.private-layout.nav');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.private-layout.nav',
+  });
   const [shouldShowAllTenants, setShouldShowAllTenants] = useState(false);
   const [selectedTenant, setSelectedTenant] = useState(currTenantId);
   const displayList = shouldShowAllTenants

@@ -1,5 +1,4 @@
 import { primitives } from '@onefootprint/design-tokens';
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoDollar16,
   IcoEye16,
@@ -10,6 +9,7 @@ import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import dynamic from 'next/dynamic';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import MicroFeatureCard from '../../micro-feature-card/micro-feature-card';
 import SectionTitle from '../../section-title/section-title';
@@ -27,7 +27,9 @@ const DynamicMobileIllustration = dynamic(
 );
 
 const VaultProxy = () => {
-  const { t } = useTranslation('pages.home.vault-proxy');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.home.vault-proxy',
+  });
 
   return (
     <Background id="vault-proxy">

@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { DataIdentifier, VaultValue } from '@onefootprint/types';
 import {
   IdDI,
@@ -8,6 +7,7 @@ import {
 import type { Transforms } from '@onefootprint/types/src/data/entity';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { FieldOrPlaceholder } from 'src/components';
 
 import AddressCountrySelect from '../address-country-select';
@@ -43,7 +43,7 @@ export type FieldValueProps = {
 };
 
 const FieldValue = ({ field, renderValue }: FieldValueProps) => {
-  const { t } = useTranslation('pages.entity.edit');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.edit' });
   const {
     value,
     showEditView,

@@ -1,6 +1,7 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
 import styled, { css } from '@onefootprint/styled';
 import type { CountryCode, SupportedLocale } from '@onefootprint/types';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -47,7 +48,7 @@ const CountrySelect = ({
   const getCountriesWithLocalizedLabels = () =>
     options.map(option => ({
       ...option,
-      label: t(`global.countries.${option.value}`),
+      label: t(`global.countries.${option.value}` as ParseKeys<'ui'>),
     }));
 
   const localizedOptions = getCountriesWithLocalizedLabels();

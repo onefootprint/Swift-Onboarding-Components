@@ -1,10 +1,11 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoPencil16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
 import { CodeInline, LinkButton, Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 
 import EditName from './components/edit-name';
@@ -14,7 +15,9 @@ export type BasicsProps = {
 };
 
 const Basics = ({ playbook }: BasicsProps) => {
-  const { t } = useTranslation('pages.playbooks.details.basics');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.details.basics',
+  });
   const [showForm, setShowForm] = useState(false);
 
   const handleShowForm = () => {
@@ -57,7 +60,7 @@ const Basics = ({ playbook }: BasicsProps) => {
               {t('type.label')}
             </Typography>
             <Typography variant="body-3">
-              {t(`type.${playbook.kind}`)}
+              {t(`type.${playbook.kind}` as ParseKeys<'common'>)}
             </Typography>
           </Item>
           <Item>

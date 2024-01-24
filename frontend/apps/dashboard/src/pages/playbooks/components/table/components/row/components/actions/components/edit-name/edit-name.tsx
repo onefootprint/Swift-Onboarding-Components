@@ -1,9 +1,10 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { Dialog, TextInput, useToast } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import useUpdatePlaybook from '@/playbooks/hooks/use-update-playbook';
 
@@ -19,7 +20,9 @@ type FormData = { name: string };
 
 const EditName = forwardRef<EditNameHandler, EditNameProps>(
   ({ playbook }, ref) => {
-    const { t } = useTranslation('pages.playbooks.table.actions.edit-name');
+    const { t } = useTranslation('common', {
+      keyPrefix: 'pages.playbooks.table.actions.edit-name',
+    });
     const [open, setOpen] = useState(false);
     const mutation = useUpdatePlaybook();
     const toast = useToast();

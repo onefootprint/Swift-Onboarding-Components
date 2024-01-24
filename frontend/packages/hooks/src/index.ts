@@ -7,5 +7,3 @@ export { default as useOnClickOutside } from './use-on-click-outside';
 export { default as useQueryState } from './use-querystate';
 export { default as useRequestErrorToast } from './use-request-error-toast';
 export { default as useToggle } from './use-toggle';
-export type { T } from './use-translation';
-export { default as useTranslation } from './use-translation';

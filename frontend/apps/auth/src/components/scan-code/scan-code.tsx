@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { LoadingIndicator, Stack } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { HeaderProps } from '@/src/types';
 
@@ -11,7 +11,7 @@ type ScanCodeProps = {
 };
 
 const ScanCode = ({ children, Header }: ScanCodeProps) => {
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation('common', { keyPrefix: 'auth' });
 
   return (
     <>

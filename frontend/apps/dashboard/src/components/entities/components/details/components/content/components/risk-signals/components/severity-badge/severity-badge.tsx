@@ -1,14 +1,16 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { RiskSignalSeverity } from '@onefootprint/types';
 import { Badge } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type SeverityBadgeProps = {
   severity: RiskSignalSeverity;
 };
 
 const SeverityBadge = ({ severity }: SeverityBadgeProps) => {
-  const { t } = useTranslation('pages.entity.risk-signals.severity');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.risk-signals.severity',
+  });
 
   return (
     <>

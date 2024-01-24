@@ -1,8 +1,9 @@
-import { useOnClickOutside, useTranslation } from '@onefootprint/hooks';
+import { useOnClickOutside } from '@onefootprint/hooks';
 import { IcoClose16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { media, Overlay, Typography } from '@onefootprint/ui';
 import React, { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import ReactPlayer from 'react-player';
 import { useLockedBody } from 'usehooks-ts';
 
@@ -21,7 +22,7 @@ const VIDEO_MOBILE_HEIGHT = 215;
 
 const DemoVideo = ({ open, link, onClose }: DemoVideoProps) => {
   useLockedBody(open);
-  const { t } = useTranslation('pages.home.hero');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.home.hero' });
   const videoRef = useRef(null);
 
   const handleClickOutside = () => {

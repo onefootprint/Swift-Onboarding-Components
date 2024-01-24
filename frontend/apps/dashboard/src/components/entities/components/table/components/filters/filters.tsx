@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { EntityStatus } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useFilters from '../../../../hooks/use-filters';
 import DrawerFilter from './components/drawer-filter';
@@ -30,7 +30,9 @@ export enum RequiresManualReviewStatus {
 }
 
 const Filters = () => {
-  const { t } = useTranslation('pages.entities.filters');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entities.filters',
+  });
   const filters = useFilters();
   const manualReviewQuery = useManualReview();
   const isAll = !filters.values.state && !filters.values.verification;

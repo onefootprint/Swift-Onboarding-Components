@@ -1,5 +1,4 @@
 import { FootprintVerifyButton } from '@onefootprint/footprint-react';
-import { useTranslation } from '@onefootprint/hooks';
 import { LogoFpDefault } from '@onefootprint/icons';
 import styled, { css, useTheme } from '@onefootprint/styled';
 import { media, Stack, Typography } from '@onefootprint/ui';
@@ -7,6 +6,7 @@ import { easeIn, motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Balancer from 'react-wrap-balancer';
 
 import SEO from '../../components/seo';
@@ -18,7 +18,7 @@ const kybPublicKey = process.env.NEXT_PUBLIC_KYB_TENANT_KEY ?? '';
 const kycIdDocPublicKey = process.env.NEXT_PUBLIC_KYC_ID_DOC_TENANT_KEY ?? '';
 
 const Live = () => {
-  const { t } = useTranslation('home');
+  const { t } = useTranslation('common', { keyPrefix: 'home' });
   const router = useRouter();
   const type = router?.query.type;
 

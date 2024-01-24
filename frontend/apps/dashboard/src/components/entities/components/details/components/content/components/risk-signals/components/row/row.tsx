@@ -1,9 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoInfo16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { RiskSignal } from '@onefootprint/types';
 import { Badge, Tooltip } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { createCapitalStringList } from 'src/utils/create-string-list';
 
 import SeverityBadge from '../severity-badge';
@@ -13,10 +14,10 @@ type RowProps = {
 };
 
 const Row = ({ riskSignal }: RowProps) => {
-  const { allT } = useTranslation('pages.entity.risk-signals.severity');
+  const { t } = useTranslation('common');
   const uniqueScopes = Array.from(new Set(riskSignal.scopes));
   const scopesList = uniqueScopes.map(scope =>
-    allT(`signal-attributes.${scope}`),
+    t(`signal-attributes.${scope}` as ParseKeys<'common'>),
   );
 
   return (

@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { Member } from '@onefootprint/types';
 import { Table } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useMembersFilters from '../../hooks/use-members-filters';
 import Row from '../row';
@@ -14,7 +14,9 @@ type MembersTableProps = {
 };
 
 const MembersTable = ({ data, isLoading, errorMessage }: MembersTableProps) => {
-  const { t } = useTranslation('pages.settings.members');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.members',
+  });
   const filters = useMembersFilters();
   const columns = [
     { id: 'email', text: t('table.header.email'), width: '25%' },

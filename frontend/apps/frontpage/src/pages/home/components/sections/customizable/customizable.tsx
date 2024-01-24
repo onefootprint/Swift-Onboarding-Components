@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoCode216,
   IcoFileText16,
@@ -9,6 +8,7 @@ import {
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import SectionTitle from '../../section-title/section-title';
 import Card from './components/card';
@@ -42,7 +42,9 @@ const HoverableWorldClassIllustration = ({
 }: HoverableIllustrationProps) => <WorldClassIllustration isHover={isHover} />;
 
 const Customizable = () => {
-  const { t } = useTranslation('pages.home.customizable');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.home.customizable',
+  });
 
   return (
     <>

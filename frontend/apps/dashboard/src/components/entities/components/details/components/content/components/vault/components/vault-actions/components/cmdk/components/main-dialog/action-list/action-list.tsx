@@ -1,13 +1,13 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles } from '@onefootprint/ui';
 import { Command } from 'cmdk';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { type ActionListProps, ActionType } from '../../../cmdk.types';
 
 const ActionList = ({ actionsArray, setOpen, hasReview }: ActionListProps) => {
-  const { t } = useTranslation('components.cmdk');
+  const { t } = useTranslation('common', { keyPrefix: 'components.cmdk' });
 
   const handleOnSelect =
     (onSelect: { (): void; (): void }, closeAfterSelect: boolean | undefined) =>

@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import {
   Box,
@@ -8,6 +7,7 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { TimelineItemTimeData } from './components/timeline-item-time';
 import TimelineItemTime from './components/timeline-item-time';
@@ -37,7 +37,7 @@ export const getKeyForItemTime = (time?: TimelineItemTimeData) => {
 };
 
 const Timeline = ({ items, isLoading }: TimelineProps) => {
-  const { t } = useTranslation('components.timeline');
+  const { t } = useTranslation('common', { keyPrefix: 'components.timeline' });
   if (!isLoading && !items.length) {
     return <Typography variant="body-4">{t('empty')}</Typography>;
   }

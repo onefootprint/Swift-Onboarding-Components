@@ -277,6 +277,9 @@
           "visa": "Visa",
           "voterIdentification": "Identificación de votante",
           "ssnCard": "Tarjeta de SSN",
+          "lease": "Arrendamiento",
+          "utilityBill": "Factura de servicios",
+          "bankStatement": "Extracto de Cuenta",
           "selfie": "Selfie",
           "business-name": "Nombre de la empresa",
           "business-tin": "TIN",
@@ -575,6 +578,11 @@
             "description-generic": "Hubo un error al procesar los datos. Por favor, revisa la información e inténtalo de nuevo."
           }
         }
+      },
+      "cta": {
+        "continue": "Continuar",
+        "save": "Guardar",
+        "cancel": "Cancelar"
       }
     }
   },
@@ -808,6 +816,12 @@
   },
   "investor-profile": {
     "components": {
+      "sync-data-error": {
+        "empty-auth-token": {
+          "title": "Sesión inválida",
+          "description": "Por favor, actualiza esta página y reinicia el proceso de aplicación."
+        }
+      },
       "empty-auth-token": {
         "title": "Sesión inválida",
         "description": "Por favor, actualiza esta página y reinicia el proceso de aplicación."
@@ -933,6 +947,7 @@
         },
         "doc-upload": {
           "label": "Subir una carta de cumplimiento (PDF)",
+          "remove-aria-label": "Eliminar",
           "cta": "Elegir archivo para subir",
           "cta-multiple": "Subir otro archivo",
           "disclaimer": "De acuerdo con las reglas aplicables de FINRA, necesitarás obtener una carta escrita y firmada por un oficial de cumplimiento en papel membretado que otorgue explícitamente permiso para llevar la cuenta y que indique explícitamente si la empresa requiere acceso a estados de cuenta duplicados y/o confirmaciones de operaciones. Si la empresa desea acceder a tus estados de cuenta duplicados y/o confirmaciones de operaciones, la carta debe incluir el nombre completo del titular de la cuenta y una declaración de que el titular de la cuenta es responsable de compartir los estados de cuenta con la empresa.",
@@ -946,6 +961,7 @@
       "sms-button-with-countdown": {
         "cta": "Reenviar enlace",
         "subtitleWithCount_one": "Por favor, espera {{count}} segundo...",
+        "subtitleWithCount_many": "Please wait {{count}} seconds...",
         "subtitleWithCount_other": "Por favor, espera {{count}} segundos...",
         "error": {
           "title": "Algo salió mal.",
@@ -1250,6 +1266,11 @@
         "manual-enabled-toast": {
           "title": "Captura manual habilitada",
           "description": "Notamos que te está tomando tiempo activar la captura automática, así que ahora puedes tomar la foto manualmente."
+        },
+        "play-permission-dialog": {
+          "title": "Permission required",
+          "description": "For optimal camera functionality in your browser, we need your permission to enable video autoplay.",
+          "cta": "Allow"
         }
       },
       "preview": {

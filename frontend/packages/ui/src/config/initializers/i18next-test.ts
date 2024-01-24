@@ -3,10 +3,8 @@ import { initReactI18next } from 'react-i18next';
 
 import en from '../locales/en/ui.json';
 
-const IS_DEV = process.env.NODE_ENV === 'development';
-
 i18n.use(initReactI18next).init({
-  debug: IS_DEV,
+  debug: false,
   fallbackLng: 'en',
   defaultNS: 'ui',
   ns: ['ui'],

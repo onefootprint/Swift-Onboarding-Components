@@ -1,8 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { RiskSignal } from '@onefootprint/types';
 import { Grid, Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React, { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createCapitalStringList } from 'src/utils/create-string-list';
 import { useEffectOnce } from 'usehooks-ts';
 
@@ -16,12 +17,10 @@ type OverviewProps = {
 };
 
 const Overview = ({ description, scopes, severity }: OverviewProps) => {
-  const { t, allT } = useTranslation(
-    'pages.entity.risk-signals.details.overview',
-  );
+  const { t } = useTranslation('common');
   const uniqueScopes = Array.from(new Set(scopes));
   const scopesList = uniqueScopes.map(scope =>
-    allT(`signal-attributes.${scope}`),
+    t(`signal-attributes.${scope}` as ParseKeys<'common'>),
   );
 
   const overviewRef = useRef<HTMLDivElement>(null);
@@ -32,18 +31,26 @@ const Overview = ({ description, scopes, severity }: OverviewProps) => {
   return (
     <OverviewSection ref={overviewRef}>
       <Header>
-        <Typography variant="label-2">{t('title')}</Typography>
+        <Typography variant="label-2">
+          {t('pages.entity.risk-signals.details.overview.title')}
+        </Typography>
       </Header>
       <Fieldset>
         <Grid.Container columns={['1fr', '1fr']} gap={5}>
-          <Field label={t('severity')}>
+          <Field
+            label={t('pages.entity.risk-signals.details.overview.severity')}
+          >
             <SeverityBadge severity={severity} />
           </Field>
-          <Field label={t('scopes')}>
+          <Field label={t('pages.entity.risk-signals.details.overview.scopes')}>
             {createCapitalStringList(scopesList)}
           </Field>
         </Grid.Container>
-        <Field label={t('description')}>{description}</Field>
+        <Field
+          label={t('pages.entity.risk-signals.details.overview.description')}
+        >
+          {description}
+        </Field>
       </Fieldset>
     </OverviewSection>
   );

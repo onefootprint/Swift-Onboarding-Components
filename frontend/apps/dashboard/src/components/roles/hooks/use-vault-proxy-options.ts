@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { InvokeVaultProxyRoleScope, RoleScope } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
+import { useTranslation } from 'react-i18next';
 
 import useProxyConfigs from './use-proxy-configs';
 
@@ -49,7 +49,9 @@ type Option = {
 };
 
 const useVaultProxyOptions = () => {
-  const { t } = useTranslation('pages.settings.roles.scopes');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.roles.scopes',
+  });
   const { data } = useProxyConfigs({
     status: 'enabled',
   });

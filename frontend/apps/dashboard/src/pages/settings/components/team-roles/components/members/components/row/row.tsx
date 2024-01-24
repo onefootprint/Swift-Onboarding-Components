@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import type { Member } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Badge, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import usePermissions from 'src/hooks/use-permissions';
 import useUserSession from 'src/hooks/use-user-session';
 
@@ -15,7 +15,9 @@ export type RowProps = {
 };
 
 const Row = ({ member }: RowProps) => {
-  const { t } = useTranslation('pages.settings.members.table');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.members.table',
+  });
   const session = useUserSession();
   const { hasPermission } = usePermissions();
   const { id, email, firstName, lastName } = member;

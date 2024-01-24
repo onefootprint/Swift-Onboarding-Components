@@ -1,4 +1,4 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoPlusSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { RuleAction, RuleField } from '@onefootprint/types';
@@ -6,6 +6,7 @@ import { RuleOp } from '@onefootprint/types';
 import { Button, LinkButton, Stack, useToast } from '@onefootprint/ui';
 import { createFontStyles } from '@onefootprint/ui/src/utils/mixins/mixins';
 import React, { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import OpBadge from 'src/components/rules-action-row/components/op-badge';
 import RiskSignalSelect from 'src/components/rules-action-row/components/risk-signal-select';
 import { useEffectOnce } from 'usehooks-ts';
@@ -23,7 +24,7 @@ const EmptyActionRow = ({
   action,
   onClick,
 }: EmptyActionRowProps) => {
-  const { t, allT } = useTranslation('pages.playbooks.details.rules');
+  const { t } = useTranslation('common');
   const addMutation = useAddRule();
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
@@ -89,8 +90,12 @@ const EmptyActionRow = ({
       {
         onSuccess: () => {
           toast.show({
-            description: t('action-row.success-toast.add-description'),
-            title: t('action-row.success-toast.title'),
+            description: t(
+              'pages.playbooks.details.rules.action-row.success-toast.add-description',
+            ),
+            title: t(
+              'pages.playbooks.details.rules.action-row.success-toast.title',
+            ),
             variant: 'default',
           });
           onClick();
@@ -104,14 +109,16 @@ const EmptyActionRow = ({
     <RulesListEmptyItem
       ref={ref}
       role="row"
-      aria-label={t('action-row.empty-aria-label')}
+      aria-label={t(
+        'pages.playbooks.details.rules.action-row.empty-aria-label',
+      )}
     >
       <div>
-        {t('action-row.if')}
+        {t('pages.playbooks.details.rules.action-row.if')}
         {expressions.map(({ field, op }, index) => (
           // eslint-disable-next-line react/no-array-index-key
           <React.Fragment key={`${index} ${field}`}>
-            {index > 0 && t('action-row.and')}
+            {index > 0 && t('pages.playbooks.details.rules.action-row.and')}
             <OpBadge
               defaultValue={op}
               isEditable
@@ -138,7 +145,7 @@ const EmptyActionRow = ({
           disabled={expressions.some(expression => expression.field === '')}
           onClick={handleAddField}
         >
-          {t('action-row.add')}
+          {t('pages.playbooks.details.rules.action-row.add')}
         </LinkButton>
         <Stack align="center" justify="space-between">
           <Stack align="center" gap={3}>
@@ -147,10 +154,10 @@ const EmptyActionRow = ({
               onClick={handleSaveAdd}
               disabled={expressions.length === 1 && !expressions[0].field}
             >
-              {allT('save')}
+              {t('save')}
             </Button>
             <Button size="small" variant="secondary" onClick={handleCancelAdd}>
-              {allT('cancel')}
+              {t('cancel')}
             </Button>
           </Stack>
         </Stack>

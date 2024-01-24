@@ -1,4 +1,4 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import { type OrgFrequentNoteKind, RoleScopeKind } from '@onefootprint/types';
@@ -11,8 +11,10 @@ import {
   useToast,
 } from '@onefootprint/ui';
 import { AnimatePresence, motion } from 'framer-motion';
+import type { ParseKeys } from 'i18next';
 import React, { useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import usePermissions from 'src/hooks/use-permissions';
 
 import Error from './components/error';
@@ -42,7 +44,9 @@ const FrequentNotesTextArea = ({
   placeholder,
   required,
 }: FrequentNotesTextAreaProps) => {
-  const { t } = useTranslation('components.frequent-notes');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.frequent-notes',
+  });
   const { hasPermission } = usePermissions();
 
   const [isEdit, setIsEdit] = useState<boolean>(false);
@@ -184,7 +188,7 @@ const FrequentNotesTextArea = ({
                     onClick={() => setIsEdit(!isEdit)}
                     size="compact"
                   >
-                    {t(`${isEdit ? 'done' : 'edit'}`)}
+                    {t(`${isEdit ? 'done' : 'edit'}` as ParseKeys<'common'>)}
                   </LinkButton>
                 )}
               </Stack>

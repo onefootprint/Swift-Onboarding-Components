@@ -1,8 +1,9 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { OrgFrequentNoteKind } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { ManualNoteFormData } from '@/entities/components/details/components/content/components/manual-note-entry-form';
 import ManualNoteEntryForm from '@/entities/components/details/components/content/components/manual-note-entry-form';
@@ -19,7 +20,9 @@ const FreeFormNoteEntryDialog = ({
   open,
   onClose,
 }: FreeFormNoteEntryDialogProps) => {
-  const { t } = useTranslation('pages.entity.audit-trail.free-form-note');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.audit-trail.free-form-note',
+  });
   const showRequestErrorToast = useRequestErrorToast();
   const submitFreeFormMutation = useSubmitFreeFormNote();
   const entityId = useEntityId();

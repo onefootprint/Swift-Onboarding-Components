@@ -3,10 +3,8 @@ import i18n from 'i18next';
 import en from '../locales/en/idv.json';
 import es from '../locales/es/idv.json';
 
-const IS_DEV = process.env.NODE_ENV === 'development';
-
 i18n.createInstance({
-  debug: IS_DEV,
+  debug: false,
   fallbackLng: 'en',
   defaultNS: 'idv',
   ns: ['idv', 'ui'],

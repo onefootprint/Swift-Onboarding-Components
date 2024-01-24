@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { ChallengeKind } from '@onefootprint/types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useUserMachine } from '@/src/state';
 import type { HeaderProps } from '@/src/types';
@@ -16,7 +16,7 @@ type UpdateVerifyEmailProps = {
 const { logWarn, logError } = getLogger('update-verify-email');
 
 const UpdateVerifyEmail = ({ children, Header }: UpdateVerifyEmailProps) => {
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation('common', { keyPrefix: 'auth' });
   const [state, send] = useUserMachine();
   const { email, emailReplaceChallenge, verifyToken } = state.context;
   const headerTitle = email

@@ -1,10 +1,11 @@
 import type { Color } from '@onefootprint/design-tokens';
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { Rule, RuleAction } from '@onefootprint/types';
 import { Button, Stack, Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import kebabCase from 'lodash/kebabCase';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import RulesActionRow from 'src/components/rules-action-row';
 
 import EmptyActionRow from '../empty-action-row';
@@ -22,7 +23,9 @@ const ActionSection = ({
   action,
   rules,
 }: ActionSectionProps) => {
-  const { t } = useTranslation(`pages.playbooks.details.rules.action-section`);
+  const { t } = useTranslation('common', {
+    keyPrefix: `pages.playbooks.details.rules.action-section`,
+  });
   const [isAddingRule, setIsAddingRule] = useState(false);
   const actionName = kebabCase(action);
 
@@ -71,18 +74,18 @@ const ActionSection = ({
       direction="column"
       gap={2}
       role="group"
-      aria-label={t(`${actionName}.title`)}
+      aria-label={t(`${actionName}.title` as ParseKeys<'common'>)}
     >
       <Stack align="center" justify="space-between">
         <div>
           <Typography
             variant="label-3"
-            color={t(`${actionName}.color`) as Color}
+            color={t(`${actionName}.color` as ParseKeys<'common'>) as Color}
           >
-            {t(`${actionName}.title`)}
+            {t(`${actionName}.title` as ParseKeys<'common'>)}
           </Typography>
           <Typography variant="body-3" color="secondary">
-            {t(`${actionName}.subtitle`)}
+            {t(`${actionName}.subtitle` as ParseKeys<'common'>)}
           </Typography>
         </div>
         {shouldAllowEditing && (

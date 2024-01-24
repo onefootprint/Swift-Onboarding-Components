@@ -1,8 +1,9 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoTrash16 } from '@onefootprint/icons';
 import { type Rule } from '@onefootprint/types';
 import { Button, LinkButton, Stack, useToast } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useDeleteRule from './hooks/use-delete-rule';
 import useEditRule from './hooks/use-edit-rule';
@@ -20,9 +21,10 @@ const RowEditButtons = ({
   onCancel,
   onSubmit,
 }: RowEditButtonsProps) => {
-  const { t, allT } = useTranslation(
-    'pages.playbooks.details.rules.action-row',
-  );
+  const { t: allT } = useTranslation('common');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.details.rules.action-row',
+  });
   const editMutation = useEditRule();
   const deleteMutation = useDeleteRule();
   const toast = useToast();

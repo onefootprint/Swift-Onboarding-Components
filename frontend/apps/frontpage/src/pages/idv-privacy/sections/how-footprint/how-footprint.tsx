@@ -1,8 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Container, createFontStyles, media } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import Link from 'next/link';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import FeatureCard from '../../components/feature-card';
 
@@ -31,7 +32,9 @@ const keys = [
 ];
 
 const HowFootprint = () => {
-  const { t } = useTranslation('pages.idv-privacy.how');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.idv-privacy.how',
+  });
   return (
     <StyledContainer>
       <LeftRail>
@@ -41,8 +44,8 @@ const HowFootprint = () => {
         {keys.map(key => (
           <FeatureCard
             key={key.id}
-            title={t(`${key.id}.title`)}
-            description={t(`${key.id}.description`)}
+            title={t(`${key.id}.title` as ParseKeys<'common'>)}
+            description={t(`${key.id}.description` as ParseKeys<'common'>)}
             trans={key.trans}
           />
         ))}

@@ -7,11 +7,11 @@ import type { AppProps } from 'next/app';
 import React from 'react';
 import { HostedMachineProvider } from 'src/components/hosted-machine-provider';
 
-import configureReactI18next from '../config/initializers/react-i18next';
+import configureI18n from '../config/initializers/i18next';
 import queryClient from '../config/initializers/react-query';
 
 Logger.setupSentry();
-configureReactI18next();
+configureI18n();
 
 const App = ({ Component, pageProps }: AppProps) => (
   <ObserveCollectorProvider appName="hosted">

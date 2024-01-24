@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoDownload16 } from '@onefootprint/icons';
 import type { ProxyConfigDetails } from '@onefootprint/types';
 import { LinkButton, Typography } from '@onefootprint/ui';
 import { saveAs } from 'file-saver';
 import kebabCase from 'lodash/kebabCase';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Field } from 'src/components';
 
 export type ClientCertificateProps = {
@@ -12,9 +12,9 @@ export type ClientCertificateProps = {
 };
 
 const ClientCertificate = ({ proxyConfig }: ClientCertificateProps) => {
-  const { t } = useTranslation(
-    'pages.proxy-configs.details.client-certificate',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.proxy-configs.details.client-certificate',
+  });
 
   const handleClick = (content: string) => () => {
     const blob = new Blob([content], {

@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheck24, IcoCloseSmall24 } from '@onefootprint/icons';
 import {
   CollectedKycDataOption,
@@ -6,6 +5,7 @@ import {
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import IdDocDisplay from 'src/pages/playbooks/components/id-doc-display';
 
 export type DisplayValueProps = {
@@ -19,7 +19,9 @@ const DisplayValue = ({
   mustCollectData,
   optionalData = [],
 }: DisplayValueProps) => {
-  const { t } = useTranslation('pages.playbooks.details.data-collection');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.details.data-collection',
+  });
 
   if (field === 'document') {
     const documentString = mustCollectData.find(a => a.match('document'));

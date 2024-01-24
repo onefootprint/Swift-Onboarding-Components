@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 export type NameProps = {
   id: string;
@@ -14,7 +14,9 @@ type FormData = {
 };
 
 const Form = ({ id, value, onSubmit }: NameProps) => {
-  const { t } = useTranslation('pages.settings.business-profile.name');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.business-profile.name',
+  });
   const { register, handleSubmit, formState } = useForm<FormData>({
     defaultValues: {
       name: value,

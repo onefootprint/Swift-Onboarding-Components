@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoLogOut16, LogoFpCompact } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
@@ -9,6 +8,7 @@ import {
   media,
 } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type HeaderProps = {
   userEmail: string;
@@ -16,7 +16,9 @@ export type HeaderProps = {
 };
 
 const Header = ({ userEmail, onLogout }: HeaderProps) => {
-  const { t } = useTranslation('pages.onboarding.header');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.onboarding.header',
+  });
 
   return (
     <>

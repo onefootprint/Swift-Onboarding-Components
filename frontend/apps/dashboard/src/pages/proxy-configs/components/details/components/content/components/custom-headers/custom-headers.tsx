@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { ProxyConfigDetails } from '@onefootprint/types';
 import { Badge, CodeInline, Typography } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Field } from 'src/components';
 
 export type CustomHeadersProps = {
@@ -9,7 +9,9 @@ export type CustomHeadersProps = {
 };
 
 const CustomHeaders = ({ proxyConfig }: CustomHeadersProps) => {
-  const { t } = useTranslation('pages.proxy-configs.details.custom-headers');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.proxy-configs.details.custom-headers',
+  });
   const shouldShow =
     proxyConfig.headers.length > 0 || proxyConfig.secretHeaders.length > 0;
 

@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type {
@@ -8,7 +7,9 @@ import type {
 } from '@onefootprint/types';
 import { isVaultDataText } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { getDataLabel, getRelevantKeys } from '../../../../utils';
 
@@ -23,7 +24,9 @@ const ExtractedDocumentData = ({
   documentType,
   activeDocumentVersion,
 }: ExtractedDocumentDataProps) => {
-  const { t } = useTranslation('pages.entity.fieldset.document');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.fieldset.document',
+  });
   const relevantKeys = getRelevantKeys({
     vault,
     documentType,
@@ -43,7 +46,7 @@ const ExtractedDocumentData = ({
       <LabelContainer>
         <IcoFileText24 />
         <Typography variant="label-2">
-          {t(`drawer.document-data.title`)}
+          {t(`drawer.document-data.title` as ParseKeys<'common'>)}
         </Typography>
       </LabelContainer>
       <DocumentDataFieldContainer>
@@ -54,7 +57,7 @@ const ExtractedDocumentData = ({
                 `drawer.document-data.labels.${getDataLabel(
                   key,
                   activeDocumentVersion,
-                )}`,
+                )}` as ParseKeys<'common'>,
               )}
             </Typography>
             <Typography

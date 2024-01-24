@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoArrowUpRight16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { LinkButton, media, ThemeToggle } from '@onefootprint/ui';
 import { useTheme } from 'next-themes';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { API_REFERENCE_PATH } from 'src/config/constants';
 
 import SupportList from '../support-list';
@@ -13,7 +13,9 @@ type NavigationFooterProps = {
 };
 
 const NavigationFooter = ({ linkTo }: NavigationFooterProps) => {
-  const { t } = useTranslation('components.navigation-footer');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.navigation-footer',
+  });
   const { theme, setTheme } = useTheme();
   const handleToggleTheme = () => {
     const nextTheme = theme === 'light' ? 'dark' : 'light';

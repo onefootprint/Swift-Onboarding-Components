@@ -1,9 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { EntityCard, VaultValue } from '@onefootprint/types';
 import { Box, LinkButton, Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import FieldOrPlaceholder from 'src/components/field-or-placeholder';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
@@ -27,7 +28,7 @@ const Fieldset = ({
   title,
   iconComponent: IconComponent,
 }: FieldsetProps) => {
-  const { t, allT } = useTranslation('pages.entity.fieldset');
+  const { t } = useTranslation('common');
   const decrypt = useDecryptControls();
   const decryptForm = useDecryptForm();
 
@@ -42,7 +43,7 @@ const Fieldset = ({
   const shouldShowSelectAll = decrypt.inProgress && selectableFields.length > 0;
 
   const getCardTitle = (count: number) =>
-    `${title} ${t('cards.title', { count })}`;
+    `${title} ${t('pages.entity.fieldset.cards.title', { count })}`;
 
   const handleSelectAll = () => {
     decryptForm.set(selectableFields, true);
@@ -53,7 +54,9 @@ const Fieldset = ({
   };
 
   const renderCardIssuer = (value: VaultValue) => {
-    const changedValue = t(`cards.card-brands.${value}`);
+    const changedValue = t(
+      `cards.card-brands.${value}` as ParseKeys<'common'>,
+    ) as string;
     return <FieldOrPlaceholder data={changedValue} />;
   };
 
@@ -68,7 +71,7 @@ const Fieldset = ({
           key={di}
           di={di}
           entity={entity}
-          renderLabel={() => allT(tKeyWithoutAlias)}
+          renderLabel={() => t(tKeyWithoutAlias as ParseKeys<'common'>)}
         />
       );
     }
@@ -77,7 +80,7 @@ const Fieldset = ({
         key={di}
         di={di}
         entity={entity}
-        renderLabel={() => allT(tKeyWithoutAlias)}
+        renderLabel={() => t(tKeyWithoutAlias as ParseKeys<'common'>)}
       />
     );
   };
@@ -104,7 +107,9 @@ const Fieldset = ({
               onClick={allSelected ? handleDeselectAll : handleSelectAll}
               size="compact"
             >
-              {allSelected ? t('deselect-all') : t('select-all')}
+              {allSelected
+                ? t('pages.entity.fieldset.deselect-all')
+                : t('pages.entity.fieldset.select-all')}
             </LinkButton>
           )}
         </Header>

@@ -1,17 +1,20 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Breadcrumb as UIBreadcrumb, BreadcrumbItem } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import Link from 'next/link';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useFilters from '@/entities/hooks/use-filters';
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
 
 const Breadcrumb = () => {
-  const { t } = useTranslation('pages.entity.breadcrumb');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.breadcrumb',
+  });
   const { kind, listPath } = useEntityContext();
   const { searchParams } = useFilters();
-  const label = t(`${kind}.label`);
-  const title = t(`${kind}.title`);
+  const label = t(`${kind}.label` as ParseKeys<'common'>);
+  const title = t(`${kind}.title` as ParseKeys<'common'>);
   const params = searchParams ? `?${searchParams}` : '';
 
   return (

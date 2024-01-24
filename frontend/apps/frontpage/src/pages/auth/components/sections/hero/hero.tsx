@@ -1,10 +1,10 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Button, Container, media, Typography } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 /* eslint-disable import/no-extraneous-dependencies */
 import ContactDialog from 'src/components/contact-dialog';
 
@@ -14,7 +14,7 @@ const GET_FORM_URL =
   'https://getform.io/f/9f26eb67-51b3-4685-8dc4-8cf458e698e1';
 
 const Hero = () => {
-  const { t } = useTranslation('pages.auth.hero');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.auth.hero' });
   const [showDialog, setShowDialog] = useState(false);
   const handleClickTrigger = () => {
     setShowDialog(true);

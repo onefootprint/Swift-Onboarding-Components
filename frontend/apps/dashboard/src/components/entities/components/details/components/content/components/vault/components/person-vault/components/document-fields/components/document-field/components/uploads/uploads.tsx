@@ -1,4 +1,4 @@
-import { useIntl, useTranslation } from '@onefootprint/hooks';
+import { useIntl } from '@onefootprint/hooks';
 import { IcoIdFront16, IcoInfo16, IcoUpload24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type {
@@ -9,7 +9,9 @@ import type {
 } from '@onefootprint/types';
 import { IdDocImageTypes } from '@onefootprint/types';
 import { createFontStyles, Tooltip, Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import HoverableImage from './components/hoverable-image';
 import getMimeType from './utils/get-mime-type';
@@ -20,7 +22,9 @@ export type UploadsProps = {
 };
 
 const Uploads = ({ vault, currentDocument }: UploadsProps) => {
-  const { t } = useTranslation('pages.entity.fieldset.document.drawer.uploads');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.fieldset.document.drawer.uploads',
+  });
   const { formatTime } = useIntl();
 
   const getSrc = (side: IdDocImageTypes, version: string) => {
@@ -50,9 +54,9 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
       )}`;
     }
     // "Front ID successfully uploaded"
-    return `${t(`${relevantUpload.side}`)} ${t(`document-types.${kind}`)} ${t(
-      relevantUpload.failureReasons.length ? 'failed' : 'success',
-    )}`;
+    return `${t(`${relevantUpload.side}`)} ${t(
+      `document-types.${kind}` as ParseKeys<'common'>,
+    )} ${t(relevantUpload.failureReasons.length ? 'failed' : 'success')}`;
   };
 
   const { uploadSource } = currentDocument;
@@ -63,7 +67,7 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
 
   const getFailureReasons = (relevantUpload: DocumentUpload) => {
     const reasons = relevantUpload.failureReasons.map(reason =>
-      t(`failure-reasons.${reason}`),
+      t(`failure-reasons.${reason}` as ParseKeys<'common'>),
     );
     const reasonsWithBullets = reasons.map(reason => `- ${reason}`).join('\n');
     return reasons.length > 1 ? reasonsWithBullets : reasons[0];
@@ -74,7 +78,7 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
       <Header>
         <LabelContainer>
           <IcoUpload24 />
-          <Typography variant="label-2">{t(`title`)}</Typography>
+          <Typography variant="label-2">{t('title')}</Typography>
         </LabelContainer>
         {!!uploadsSortedByDate.length && (
           <DocumentUploadContainer>
@@ -84,7 +88,9 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
               variant="body-4"
               sx={{ whiteSpace: 'nowrap' }}
             >
-              {`${t('uploaded-from')} ${t(`upload-source.${uploadSource}`)}`}
+              {`${t('uploaded-from')} ${t(
+                `upload-source.${uploadSource}` as ParseKeys<'common'>,
+              )}`}
             </Typography>
           </DocumentUploadContainer>
         )}

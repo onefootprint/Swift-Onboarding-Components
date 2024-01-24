@@ -8,12 +8,12 @@ export type TagsProps = {
 };
 
 const Tags = ({ onWatchlist, onManualReview }: TagsProps) => {
-  const { t } = useTranslation('users');
+  const { t } = useTranslation('users', { keyPrefix: 'table.row.status' });
 
   return (
     <Stack gap={2}>
-      {onWatchlist && <Tag>{t('table.row.status.on-watchlist')}</Tag>}
-      {onManualReview && <Tag>{t('table.row.status.on-review')}</Tag>}
+      {onWatchlist && <Tag>{t('on-watchlist')}</Tag>}
+      {onManualReview && <Tag>{t('on-review')}</Tag>}
     </Stack>
   );
 };

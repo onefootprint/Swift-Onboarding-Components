@@ -1,9 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import kebabCase from 'lodash/kebabCase';
 import type { ComponentProps } from 'react';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Option } from './collected-information.types';
 import DisplayValue from './components/display-value';
@@ -19,7 +20,9 @@ const CollectedInformation = ({
   subtitle,
   options,
 }: CollectedInformationProps) => {
-  const { t } = useTranslation('pages.playbooks.collected-data');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.collected-data',
+  });
 
   return (
     <Container>
@@ -31,9 +34,13 @@ const CollectedInformation = ({
           {Object.entries(options).map(([name, value]) => {
             if (value == null || value === undefined) return null;
             return (
-              <OptionItem key={name} role="row" aria-label={t(kebabCase(name))}>
+              <OptionItem
+                key={name}
+                role="row"
+                aria-label={t(kebabCase(name) as ParseKeys<'common'>)}
+              >
                 <Label variant="body-3" color="tertiary">
-                  {t(kebabCase(name))}
+                  {t(kebabCase(name) as ParseKeys<'common'>)}
                 </Label>
                 <DisplayValue
                   name={name as DisplayValueProps['name']}

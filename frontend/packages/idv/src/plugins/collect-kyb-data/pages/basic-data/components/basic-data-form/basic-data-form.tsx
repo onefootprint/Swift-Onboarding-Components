@@ -4,7 +4,6 @@ import { BusinessDI, CorporationType } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
 import { Grid, PhoneInput, Select, Stack, TextInput } from '@onefootprint/ui';
 import React from 'react';
-import type { UseFormSetError } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -25,7 +24,6 @@ type FormData = {
 type FormHints = Partial<{ [K in keyof FormData]: string }>;
 type FormProps = (keyof FormData)[];
 type FormErrors = Partial<{ [K in keyof FormData]: { message?: string } }>;
-type T = ReturnType<typeof useTranslation>['t'];
 
 export type BasicDataFormProps = {
   defaultValues?: Partial<FormData>;
@@ -49,23 +47,6 @@ const getFormHints = (list: FormProps, errors: FormErrors): FormHints =>
     }
     return hints;
   }, Object.create(null));
-
-const getFormPhoneState = (
-  t: T,
-  setError: UseFormSetError<FormData>,
-  config?: PublicOnboardingConfig,
-  value?: string,
-): boolean => {
-  if (value && !checkIsPhoneValid(value, !config?.isLive)) {
-    setError(
-      'phoneNumber',
-      { message: t('phone-number.errors.pattern') },
-      { shouldFocus: true },
-    );
-    return false;
-  }
-  return true;
-};
 
 const FormHintsList: FormProps = ['phoneNumber', 'tin', 'website'];
 
@@ -99,6 +80,18 @@ const BasicDataForm = ({
     website: websiteHint = undefined,
   } = getFormHints(FormHintsList, errors);
 
+  const getFormPhoneState = (value?: string): boolean => {
+    if (value && !checkIsPhoneValid(value, !config?.isLive)) {
+      setError(
+        'phoneNumber',
+        { message: t('phone-number.errors.pattern') },
+        { shouldFocus: true },
+      );
+      return false;
+    }
+    return true;
+  };
+
   const onSubmitFormData = (formData: FormData) => {
     const basicData = {
       [BusinessDI.name]: formData.name,
@@ -110,12 +103,7 @@ const BasicDataForm = ({
       [BusinessDI.phoneNumber]: formData.phoneNumber,
       [BusinessDI.website]: formData.website,
     };
-    const isPhoneValid = getFormPhoneState(
-      t,
-      setError,
-      config,
-      formData.phoneNumber,
-    );
+    const isPhoneValid = getFormPhoneState(formData.phoneNumber);
     if (!isPhoneValid) return;
 
     onSubmit(basicData);

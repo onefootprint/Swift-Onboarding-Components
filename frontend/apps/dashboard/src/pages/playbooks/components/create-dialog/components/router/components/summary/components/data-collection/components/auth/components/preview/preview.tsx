@@ -1,13 +1,15 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheck16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import PopOver from '../pop-over';
 
 const Preview = () => {
-  const { t } = useTranslation('pages.playbooks.dialog.summary.auth');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.dialog.summary.auth',
+  });
 
   return (
     <Container>

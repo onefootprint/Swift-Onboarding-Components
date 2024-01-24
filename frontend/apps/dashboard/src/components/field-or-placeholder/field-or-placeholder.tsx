@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { VaultValue } from '@onefootprint/types';
 import {
   isVaultDataDocument,
@@ -10,6 +9,7 @@ import type { Transforms } from '@onefootprint/types/src/data/entity';
 import { LinkButton, Typography } from '@onefootprint/ui';
 import { saveAs } from 'file-saver';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import EncryptedCell from '../encrypted-cell';
 

@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import { EntityKind, RoleScopeKind } from '@onefootprint/types';
 import { Dropdown } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 
 import type { WithEntityProps } from '../../../../../../../with-entity';
@@ -16,7 +16,7 @@ enum ActionDialog {
 }
 
 const Actions = ({ entity }: WithEntityProps) => {
-  const { t } = useTranslation('pages.entity.actions');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.actions' });
   const editControls = useEditControls();
   const [openDialog, setOpenDialog] = useState<ActionDialog | null>(null);
 

@@ -1,8 +1,8 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import { Container, Stack } from '@onefootprint/ui';
 import router from 'next/router';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ContactDialog from '../../components/contact-dialog';
 import SEO from '../../components/seo';
@@ -14,7 +14,7 @@ const GET_FORM_URL =
   'https://getform.io/f/9f26eb67-51b3-4685-8dc4-8cf458e698e1';
 
 const Pricing = () => {
-  const { t } = useTranslation('pages.pricing');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.pricing' });
   const [showDialog, setShowDialog] = useState(false);
   const handleClickTrigger = () => {
     setShowDialog(true);

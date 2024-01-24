@@ -1,5 +1,5 @@
-import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Error } from 'src/components';
 
 import { AUDIT_TRAILS_ID } from '@/entity/constants';
@@ -10,7 +10,9 @@ import AddFreeFormNote from './components/add-free-form-note';
 import Content from './components/content';
 
 const AuditTrail = () => {
-  const { t } = useTranslation('pages.entity.audit-trail');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.audit-trail',
+  });
   const { data, error } = useCurrentEntityTimeline();
 
   return (

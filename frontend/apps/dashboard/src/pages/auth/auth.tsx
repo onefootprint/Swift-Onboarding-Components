@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { OrgAuthLoginResponse } from '@onefootprint/types';
 import { Box, useToast } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { DEFAULT_PUBLIC_ROUTE } from 'src/config/constants';
 import useSession from 'src/hooks/use-session';
 
@@ -13,7 +13,7 @@ import useTrackAnimationDuration from './hooks/use-track-animation-duration';
 import useWorkosParams from './hooks/use-workos-params';
 
 const Auth = () => {
-  const { t } = useTranslation('pages.auth');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.auth' });
   const router = useRouter();
   const toast = useToast();
   const loginMutation = useLogin();
@@ -99,7 +99,7 @@ const Auth = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Box aria-label={t('aria-label')} aria-busy>
+      <Box aria-label={t('loading-aria-label')} aria-busy>
         <Loading />
       </Box>
     </>

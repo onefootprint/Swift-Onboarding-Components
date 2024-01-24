@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { ApiKey } from '@onefootprint/types';
 import { RoleKind } from '@onefootprint/types';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useRoles from 'src/hooks/use-roles';
 import RoleDropdownSelector from 'src/pages/settings/components/role-dropdown-selector';
 
@@ -12,7 +12,9 @@ export type EditRoleProps = {
 };
 
 const EditRole = ({ apiKey }: EditRoleProps) => {
-  const { t } = useTranslation('pages.api-keys.table.edit-role');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.api-keys.table.edit-role',
+  });
   const rolesQuery = useRoles(RoleKind.apiKey);
   const updateApiKeyMutation = useUpdateRoleId();
   const [value, setValue] = useState({

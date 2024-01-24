@@ -1,4 +1,6 @@
+import { getScrubbedPhoneNumber } from '@onefootprint/idv';
 import styled, { css } from '@onefootprint/styled';
+import type { Identifier } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
@@ -7,7 +9,6 @@ import { useTranslation } from 'react-i18next';
 import { useAuthMachine } from '../../state';
 import type { HeaderProps } from '../../types';
 import PinVerification from '../pin-verification';
-import { getFormTitle, getStepTitle } from './utils';
 
 type StepPhoneProps = {
   children?: JSX.Element | null;
@@ -29,8 +30,27 @@ const StepSms = ({ children, Header }: StepPhoneProps) => {
   });
   const toast = useToast();
 
-  const headerTitle = getStepTitle(t, identify);
-  const formTitle = getFormTitle(t, challengeData, identify);
+  const getStepTitle = (): string => {
+    const shouldShowWelcomeBack = identify.userFound && !identify.isUnverified;
+    return shouldShowWelcomeBack
+      ? t('sms-step.welcome-back-title')
+      : t('sms-step.title');
+  };
+
+  const getFormTitle = (): string => {
+    const scrubbedPhoneNumber = getScrubbedPhoneNumber({
+      challengeData,
+      phoneNumber: identify.phoneNumber,
+      successfulIdentifier: identify.successfulIdentifier as Identifier,
+    });
+
+    return scrubbedPhoneNumber
+      ? t('sms-step.prompt-with-phone', { scrubbedPhoneNumber })
+      : t('sms-step.prompt-without-phone');
+  };
+
+  const headerTitle = getStepTitle();
+  const formTitle = getFormTitle();
 
   const handleChallengeSucceed = (authToken: string) => {
     setTimeout(() => {

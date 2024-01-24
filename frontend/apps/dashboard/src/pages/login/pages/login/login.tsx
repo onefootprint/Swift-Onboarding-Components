@@ -1,13 +1,13 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { ThemedLogoFpDefault } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Button, GoogleButton, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Login = () => {
-  const { t } = useTranslation('pages.login');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.login' });
   const router = useRouter();
 
   const handleGoggleButtonClick = () => {

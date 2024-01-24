@@ -1,15 +1,15 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
 import { EmptyState } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type ErrorProps = {
   error: unknown;
 };
 
 const Error = ({ error }: ErrorProps) => {
-  const { t } = useTranslation('notifications');
+  const { t } = useTranslation('common', { keyPrefix: 'notifications' });
 
   return (
     <EmptyState

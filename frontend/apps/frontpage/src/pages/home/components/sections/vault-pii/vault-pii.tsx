@@ -1,5 +1,4 @@
 import { primitives } from '@onefootprint/design-tokens';
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoCreditcard16,
   IcoDatabase24,
@@ -9,6 +8,7 @@ import {
 import styled, { css } from '@onefootprint/styled';
 import { Container, Grid, media } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import SectionTitle from '../../section-title/section-title';
 import CircularBeam from './components/circular-beam/circular-beam';
@@ -19,7 +19,7 @@ import PaymentCardData from './components/illustrations/payment-card-data/paymen
 import VerticalCard from './components/vertical-card';
 
 const VaultPii = () => {
-  const { t } = useTranslation('pages.home.vault-pii');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.home.vault-pii' });
 
   return (
     <Section id="vault">

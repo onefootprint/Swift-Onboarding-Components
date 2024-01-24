@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheck16 } from '@onefootprint/icons';
 import { Badge, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type FeatureCheckProps = {
   children: string;
@@ -9,7 +9,7 @@ type FeatureCheckProps = {
 };
 
 const FeatureCheck = ({ children, soon }: FeatureCheckProps) => {
-  const { t } = useTranslation('pages.pricing');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.pricing' });
   return (
     <Stack direction="row" marginTop={2} justify="space-between">
       <Stack direction="row" gap={2} align="start">

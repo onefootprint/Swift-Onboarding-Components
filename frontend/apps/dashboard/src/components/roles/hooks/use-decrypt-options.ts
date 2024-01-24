@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { RoleScope } from '@onefootprint/types';
 import {
   CollectedInvestorProfileDataOption,
   CollectedKycDataOption,
   RoleScopeKind,
 } from '@onefootprint/types';
+import { useTranslation } from 'react-i18next';
 
 // These aren't sent to the API - just used to represent all the options of decryptable things in
 // the MultiSelect. We need this since different decrypt options have special serializations in the API
@@ -111,7 +111,9 @@ type Group = {
 };
 
 const useDecryptOptions = () => {
-  const { t } = useTranslation('pages.settings.roles.scopes');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.roles.scopes',
+  });
 
   const options: Group[] = [
     {

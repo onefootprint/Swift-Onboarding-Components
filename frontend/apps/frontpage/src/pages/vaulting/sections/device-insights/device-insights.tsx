@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import SectionSubtitle from '../../components/section-subtitle';
 import SectionTitle from '../../components/section-title';
@@ -10,7 +10,9 @@ import DesktopMap from './components/desktop-map';
 import MobileMap from './components/mobile-map/mobile-map';
 
 const DeviceInsights = () => {
-  const { t } = useTranslation('pages.vaulting.device-insights');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.vaulting.device-insights',
+  });
   return (
     <StyledContainer>
       <Title>

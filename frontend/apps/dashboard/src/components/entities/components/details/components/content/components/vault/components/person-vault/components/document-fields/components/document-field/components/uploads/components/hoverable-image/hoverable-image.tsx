@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoCheckSmall16,
   IcoCloseSmall16,
@@ -9,6 +8,7 @@ import styled, { css } from '@onefootprint/styled';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type HoverableImageProps = {
   src: string;
@@ -16,7 +16,9 @@ type HoverableImageProps = {
 };
 
 const HoverableImage = ({ src, isSuccess }: HoverableImageProps) => {
-  const { t } = useTranslation('pages.entity.fieldset.document.drawer.uploads');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.fieldset.document.drawer.uploads',
+  });
   const [isExpanded, setExpanded] = useState(false);
   const isPDF = src.startsWith('data:application/pdf;base64');
 

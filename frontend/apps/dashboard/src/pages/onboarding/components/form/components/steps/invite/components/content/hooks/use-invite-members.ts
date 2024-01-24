@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import request, { getErrorMessage } from '@onefootprint/request';
 import type {
   CreateMembersRequest,
@@ -6,6 +5,7 @@ import type {
 } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useIsMutating, useMutation } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
@@ -25,7 +25,9 @@ const inviteMember = async (
 
 const useInviteMembers = () => {
   const isMutating = useIsMutating(['inviteMember']);
-  const { t } = useTranslation('pages.onboarding.invite');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.onboarding.invite',
+  });
   const toast = useToast();
   const session = useSession();
   const { mutateAsync } = useMutation({

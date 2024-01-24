@@ -51,7 +51,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         <ClearButton
           aria-label={
             clearButtonAriaLabel ??
-            t('components.search-input.clear-button.aria-label-default')
+            t('components.search-input.clear-button-aria-label-default')
           }
           onClick={handleClearInput}
         />

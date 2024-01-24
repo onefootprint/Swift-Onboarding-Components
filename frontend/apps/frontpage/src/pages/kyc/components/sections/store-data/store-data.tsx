@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
@@ -12,9 +11,10 @@ import {
 } from '@onefootprint/ui';
 import Image from 'next/image';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const StoreData = () => {
-  const { t } = useTranslation('pages.kyc.storage');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.kyc.storage' });
   const options = [
     {
       label: t('sections.users'),

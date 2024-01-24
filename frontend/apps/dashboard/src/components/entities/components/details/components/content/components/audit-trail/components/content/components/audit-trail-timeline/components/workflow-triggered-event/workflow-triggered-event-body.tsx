@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoInfo16 } from '@onefootprint/icons';
 import type { WorkflowTriggeredEventData } from '@onefootprint/types';
 import { Box, LinkButton, Stack, Tooltip, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import EventBodyEntry from '../event-body-entry';
 import useGenerateTriggerLink from './hooks/use-generate-trigger-link';
@@ -24,9 +24,9 @@ const WorkflowTriggeredEventBody = ({
   const [confirmationTooltipMessage, setConfirmationTooltipMessage] = useState<
     string | null
   >(null);
-  const { t } = useTranslation(
-    'pages.entity.audit-trail.timeline.workflow-triggered-event',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.audit-trail.timeline.workflow-triggered-event',
+  });
   const shouldShowCopyButton = data.request?.isDeactivated === false;
 
   const clearTooltipTimeout = () => {

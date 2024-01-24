@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { CollectedKybDataOption } from '@onefootprint/types';
 import { Button, Toggle, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import type { BusinessInformation } from '@/playbooks/utils/machine/types';
 
@@ -13,9 +13,9 @@ type EditingProps = {
 
 const Editing = ({ onStopEditing }: EditingProps) => {
   const { control, setValue, getValues } = useFormContext();
-  const { t } = useTranslation(
-    'pages.playbooks.dialog.summary.business-information.editing',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.dialog.summary.business-information.editing',
+  });
 
   const [initialValues] = useState<BusinessInformation>({
     ...getValues('businessInformation'),

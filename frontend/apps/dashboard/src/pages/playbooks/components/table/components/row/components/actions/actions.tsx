@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { OnboardingConfigKind, RoleScopeKind } from '@onefootprint/types';
 import { Dropdown, Stack } from '@onefootprint/ui';
 import React, { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 
 import type { CopyLinkHandler } from './components/copy-link';
@@ -19,7 +19,9 @@ type ActionsProps = {
 
 const Actions = ({ playbook }: ActionsProps) => {
   const { name, status, kind } = playbook;
-  const { t } = useTranslation('pages.playbooks.table.actions');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.table.actions',
+  });
   const statusRef = useRef<StatusHandler>(null);
   const editNameRef = useRef<EditNameHandler>(null);
   const copyLinkRef = useRef<CopyLinkHandler>(null);
@@ -71,7 +73,7 @@ const Actions = ({ playbook }: ActionsProps) => {
           >
             {playbook.status === 'enabled'
               ? t('status.disable.cta')
-              : t('status.enable')}
+              : t('status.enable.cta')}
           </Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Root>

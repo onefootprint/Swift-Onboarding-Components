@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { Member } from '@onefootprint/types';
 import { RoleKind } from '@onefootprint/types';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useRoles from 'src/hooks/use-roles';
 
 import RoleDropdownSelector from '../../../../../../../role-dropdown-selector';
@@ -12,7 +12,9 @@ export type EditRoleProps = {
 };
 
 const EditRole = ({ member }: EditRoleProps) => {
-  const { t } = useTranslation('pages.settings.members.edit-role');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.members.edit-role',
+  });
   const [value, setValue] = useState({
     id: member.role.id,
     name: member.role.name,

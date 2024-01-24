@@ -1,5 +1,4 @@
 import type { FontVariant } from '@onefootprint/design-tokens';
-import { useTranslation } from '@onefootprint/hooks';
 import type {
   LinkButtonSize,
   LinkButtonVariant,
@@ -7,6 +6,7 @@ import type {
 } from '@onefootprint/ui';
 import { LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useTruncatedtext, { ShownTextState } from './hooks/use-truncated-text';
 
@@ -33,7 +33,9 @@ const TruncatedText = ({
     currShownText,
     showMoreOrLessText,
   } = useTruncatedtext(text, maxTextViewHeight);
-  const { t } = useTranslation('pages.entity.truncated-text');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.truncated-text',
+  });
 
   return (
     <Typography

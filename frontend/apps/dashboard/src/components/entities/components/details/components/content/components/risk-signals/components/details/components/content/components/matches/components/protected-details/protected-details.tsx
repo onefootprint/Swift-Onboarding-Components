@@ -1,10 +1,10 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoShield40 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { type Entity, IdDI } from '@onefootprint/types';
 import { Button, LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type ProtectedDetailsProps = {
   entity: Entity;
@@ -24,9 +24,9 @@ const ProtectedDetails = ({
   onClick,
   isLoading,
 }: ProtectedDetailsProps) => {
-  const { t } = useTranslation(
-    'pages.entity.risk-signals.details.matches.protected-details',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.risk-signals.details.matches.protected-details',
+  });
   const canDecrypt = REQUIRED_DECRYPTABLE_ATTRS.every(
     di =>
       !entity.attributes.includes(di) ||

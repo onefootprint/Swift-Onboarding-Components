@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Keycaps = () => {
-  const { t } = useTranslation('components.cmd');
+  const { t } = useTranslation('common', { keyPrefix: 'components.cmd' });
   return (
     <Container>
       <KeyCaps>

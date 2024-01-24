@@ -1,11 +1,11 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled from '@onefootprint/styled';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { OnboardingConfigStatus } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import { Trans } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import ConfirmationDialog from 'src/components/confirmation-dialog';
 
 import useUpdatePlaybook from '@/playbooks/hooks/use-update-playbook';
@@ -19,7 +19,9 @@ export type StatusProps = {
 };
 
 const Status = forwardRef<StatusHandler, StatusProps>(({ playbook }, ref) => {
-  const { t } = useTranslation('pages.playbooks.table.actions.status');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.table.actions.status',
+  });
   const [open, setOpen] = useState(false);
   const mutation = useUpdatePlaybook();
   const showErrorToast = useRequestErrorToast();

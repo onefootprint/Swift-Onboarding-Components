@@ -1,9 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import type { ProxyConfig } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import { Trans } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import ConfirmationDialog from 'src/components/confirmation-dialog';
 import useUpdateProxyConfigs from 'src/pages/proxy-configs/hooks/use-update-proxy-configs';
 
@@ -17,7 +16,9 @@ export type StatusProps = {
 
 const Status = forwardRef<StatusHandler, StatusProps>(
   ({ proxyConfig }, ref) => {
-    const { t } = useTranslation('pages.proxy-configs.actions.status');
+    const { t } = useTranslation('common', {
+      keyPrefix: 'pages.proxy-configs.actions.status',
+    });
     const [open, setOpen] = useState(false);
     const mutation = useUpdateProxyConfigs();
 

@@ -1,9 +1,10 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import type { GetAuthRolesOrg } from '@onefootprint/types';
 import { Tooltip, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DEFAULT_PUBLIC_ROUTE } from 'src/config/constants';
 import useAssumeAuthRole from 'src/hooks/use-assume-auth-role';
 import useSession from 'src/hooks/use-session';
@@ -16,7 +17,7 @@ type DataProps = {
 };
 
 const Data = ({ authToken, organizations }: DataProps) => {
-  const { t } = useTranslation('pages.organizations');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.organizations' });
   const { logIn } = useSession();
   const router = useRouter();
   const assumeRoleMutation = useAssumeAuthRole();

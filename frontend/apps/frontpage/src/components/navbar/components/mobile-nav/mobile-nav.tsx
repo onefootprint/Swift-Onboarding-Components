@@ -1,5 +1,4 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoClose24,
   IcoMenu24,
@@ -11,6 +10,7 @@ import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import LinkButton from 'src/components/linking-button';
 import { useLockedBody } from 'usehooks-ts';
 
@@ -32,7 +32,7 @@ const MobileNav = ({
   entries,
   isOnDarkSection,
 }: MobileNavProps) => {
-  const { t } = useTranslation('components.navbar');
+  const { t } = useTranslation('common', { keyPrefix: 'components.navbar' });
   const breakpoint = useMediaQuery({ minWidth: 'lg', maxWidth: 'xl' });
   const [isOpen, setOpen] = useState(false);
   useLockedBody(isOpen);

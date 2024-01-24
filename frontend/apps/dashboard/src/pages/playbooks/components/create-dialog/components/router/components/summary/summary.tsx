@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Button, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import { isAuth } from '@/playbooks/utils/kind';
 import type {
@@ -12,7 +12,6 @@ import type {
 
 import DataCollection from './components/data-collection';
 
-type TFunction = ReturnType<typeof useTranslation>['t'];
 type SummaryProps = {
   defaultValues: SummaryFormData;
   meta: SummaryMeta;
@@ -20,36 +19,38 @@ type SummaryProps = {
   onSubmit: (data: SummaryFormData) => void;
 };
 
-const getTitle = (t: TFunction, meta: SummaryMeta): string =>
-  isAuth(meta.kind) ? t('auth.title') : t('title');
-
-const getSubtitle = (t: TFunction, meta: SummaryMeta): string => {
-  if (isAuth(meta.kind)) return t('auth.subtitle');
-
-  const internationalOnly =
-    meta.residency?.allowInternationalResidents &&
-    !meta.residency.allowUsResidents;
-
-  return internationalOnly
-    ? t('subtitle-international-only')
-    : t('subtitle-default');
-};
-
 const Summary = ({ meta, onSubmit, onBack, defaultValues }: SummaryProps) => {
-  const { t, allT } = useTranslation('pages.playbooks.dialog.summary');
+  const { t: allT } = useTranslation('common');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.dialog.summary',
+  });
+
+  const getTitle = (): string =>
+    isAuth(meta.kind) ? t('auth.title') : t('title');
+
+  const getSubtitle = (): string => {
+    if (isAuth(meta.kind)) return t('auth.subtitle');
+
+    const internationalOnly =
+      meta.residency?.allowInternationalResidents &&
+      !meta.residency.allowUsResidents;
+
+    return internationalOnly
+      ? t('subtitle-international-only')
+      : t('subtitle-default');
+  };
+
   const formMethods = useForm<SummaryFormData>({ defaultValues });
   const { handleSubmit } = formMethods;
-  const title = getTitle(t, meta);
-  const subtitle = getSubtitle(t, meta);
 
   return (
     <Container>
       <Header>
         <Typography variant="label-1" color="secondary">
-          {title}
+          {getTitle()}
         </Typography>
         <Typography variant="body-2" color="secondary">
-          {subtitle}
+          {getSubtitle()}
         </Typography>
       </Header>
       <FormProvider {...formMethods}>

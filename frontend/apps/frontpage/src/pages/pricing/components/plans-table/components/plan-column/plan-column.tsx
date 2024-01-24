@@ -1,7 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { ButtonProps } from '@onefootprint/ui';
 import { Button, Stack } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Plans } from '../../plans-table-types';
 import EverythingAndBanner from './components/everything-and-banner';
@@ -33,7 +34,7 @@ const PlanColumn = ({
   buttonVariant,
   onButtonClick,
 }: PlanColumnProps) => {
-  const { t } = useTranslation('pages.pricing');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.pricing' });
 
   return (
     <Stack
@@ -43,12 +44,15 @@ const PlanColumn = ({
       minWidth="410px"
       maxWidth="410px"
     >
-      <Header title={t(`plans.${title}.title`)} price={price} />
+      <Header
+        title={t(`plans.${title}.title` as ParseKeys<'common'>)}
+        price={price}
+      />
       <Stack direction="column" flexGrow={1} gap={3} padding={5}>
         {title !== Plans.startup && <EverythingAndBanner plan={title} />}
         {features.map(feature => (
           <FeatureCheck key={feature.translation} soon={feature.soon}>
-            {t(`plans.${title}.${feature.translation}`)}
+            {t(`plans.${title}.${feature.translation}` as ParseKeys<'common'>)}
           </FeatureCheck>
         ))}
       </Stack>
@@ -59,7 +63,7 @@ const PlanColumn = ({
           size="compact"
           fullWidth
         >
-          {t(`plans.${title}.${buttonLabel}`)}
+          {t(`plans.${title}.${buttonLabel}` as ParseKeys<'common'>)}
         </Button>
       </Stack>
     </Stack>

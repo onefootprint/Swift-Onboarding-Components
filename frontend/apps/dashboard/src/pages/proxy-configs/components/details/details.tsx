@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { Drawer } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useFilters from '../../hooks/use-filters';
 import Content from './components/content';

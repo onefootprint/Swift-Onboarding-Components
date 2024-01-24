@@ -1,7 +1,8 @@
-import { useIntl, useTranslation } from '@onefootprint/hooks';
+import { useIntl } from '@onefootprint/hooks';
 import type { ProxyConfig } from '@onefootprint/types';
 import { Badge, CodeInline } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Actions from './components/actions';
 
@@ -10,7 +11,7 @@ export type RowProps = {
 };
 
 const Row = ({ proxyConfig }: RowProps) => {
-  const { t } = useTranslation('pages.proxy-configs');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.proxy-configs' });
   const { formatDateWithTime } = useIntl();
   const { name, url, method, status, createdAt } = proxyConfig;
 

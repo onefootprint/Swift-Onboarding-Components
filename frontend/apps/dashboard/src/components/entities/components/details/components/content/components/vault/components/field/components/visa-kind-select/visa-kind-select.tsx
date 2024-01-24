@@ -1,10 +1,11 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { IdDI, type VaultValue, VisaKind } from '@onefootprint/types';
 import { NativeSelect } from '@onefootprint/ui';
 import Hint from '@onefootprint/ui/src/components/internal/hint';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import EMPTY_SELECT_VALUE from '../../../../constants';
 import editFormFieldName from '../utils/edit-form-field-name';
@@ -17,7 +18,7 @@ export type VisaKindSelectProps = {
 };
 
 const VisaKindSelect = ({ value }: VisaKindSelectProps) => {
-  const { t } = useTranslation('pages.entity.edit');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.edit' });
   const {
     register,
     getValues,
@@ -68,7 +69,7 @@ const VisaKindSelect = ({ value }: VisaKindSelectProps) => {
         </option>
         {Object.values(VisaKind).map(kind => (
           <option key={kind} value={kind}>
-            {t(`legal-status.visa-kind-mapping.${kind}`)}
+            {t(`legal-status.visa-kind-mapping.${kind}` as ParseKeys<'common'>)}
           </option>
         ))}
       </NativeSelect>

@@ -24,7 +24,7 @@ const DesktopHeader = ({ type, imageType, country }: DesktopHeaderProps) => {
   const typeLabel = type ? IdDocTypeToLabel[type] : '';
   const countryName = getCountryFromCode(country)?.label;
 
-  let title = t('title.id-doc', {
+  let title: string = t('title.id-doc', {
     type: typeLabel,
     side,
   });

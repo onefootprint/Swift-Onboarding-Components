@@ -1,4 +1,4 @@
-import { useToggle, useTranslation } from '@onefootprint/hooks';
+import { useToggle } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type {
   Document,
@@ -6,7 +6,9 @@ import type {
   SupportedIdDocTypes,
 } from '@onefootprint/types';
 import { Drawer, LinkButton, Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useEditControls } from '../../../../../vault-actions';
 import { getDocumentStatus, getDocumentVersion } from '../../utils';
@@ -29,7 +31,9 @@ const DocumentField = ({
   vault,
   documents,
 }: DocumentFieldProps) => {
-  const { t } = useTranslation('pages.entity.fieldset.document');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.fieldset.document',
+  });
   const [isDrawerOpen, show, hide] = useToggle(false);
   const [activeDocumentVersion, setActiveDocumentVersion] = useState(
     getDocumentVersion(documents[documents.length - 1], documents),
@@ -71,7 +75,9 @@ const DocumentField = ({
       <Drawer
         closeAriaLabel={t('close-aria-label')}
         open={isDrawerOpen}
-        title={t(`drawer.${documentType}.title`)}
+        title={
+          t(`drawer.${documentType}.title` as ParseKeys<'common'>) as string
+        }
         onClose={hide}
         headerComponent={
           <SessionSelect

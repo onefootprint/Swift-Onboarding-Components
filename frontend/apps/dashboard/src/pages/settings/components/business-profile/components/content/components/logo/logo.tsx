@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { Organization } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Avatar, createFontStyles } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 
 import useUpdateOrgLogo from './hooks/use-update-org-logo';
@@ -13,7 +13,9 @@ type LogoProps = {
 };
 
 const Logo = ({ organization }: LogoProps) => {
-  const { t } = useTranslation('pages.settings.business-profile.logo');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.business-profile.logo',
+  });
   const updateOrgLogoMutation = useUpdateOrgLogo();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

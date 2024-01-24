@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import type {
   PreviousWatchlistChecksEventData,
@@ -6,6 +5,7 @@ import type {
 } from '@onefootprint/types';
 import { Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Timeline from 'src/components/timeline';
 
 import WatchlistCheckEventBody from '../../../../watchlist-check-event-body';
@@ -18,9 +18,9 @@ type WatchlistCheckEventsDrawerContentProp = {
 const WatchlistCheckEventsDrawerContent = ({
   data,
 }: WatchlistCheckEventsDrawerContentProp) => {
-  const { t } = useTranslation(
-    'pages.entity.audit-trail.timeline.watchlist-check-event',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.audit-trail.timeline.watchlist-check-event',
+  });
   const timelineItems = data.map(event => {
     const { watchlistEvent, timestamp } = event;
     const eventData = watchlistEvent.data as WatchlistCheckEventData;

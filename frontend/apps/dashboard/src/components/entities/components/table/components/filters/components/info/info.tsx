@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { EntityStatus } from '@onefootprint/types';
 import { InlineAlert } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useEntitiesContext } from '@/entities/components/list/hooks/use-entities-context';
 import useFilters from '@/entities/hooks/use-filters';
@@ -9,7 +9,9 @@ import useFilters from '@/entities/hooks/use-filters';
 import useShouldShow from './hooks/use-should-show';
 
 const Info = () => {
-  const { t } = useTranslation('pages.entities.filters');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entities.filters',
+  });
   const { shouldShow, dismiss } = useShouldShow();
   const {
     values: { state, verification },

@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import type { DataIdentifier, VaultValue } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
 import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import editFormFieldName from '../utils/edit-form-field-name';
 import validateName, { NameValidationError } from '../utils/validate-name';
@@ -15,7 +15,9 @@ export type NameInputProps = {
 };
 
 const NameInput = ({ fieldName, fieldValue }: NameInputProps) => {
-  const { t } = useTranslation('pages.entity.edit.errors.name');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.edit.errors.name',
+  });
   const {
     register,
     getValues,

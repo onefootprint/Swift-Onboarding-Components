@@ -1,15 +1,15 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Container, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import SEO from '../../components/seo';
-import Consent from './sections/consent/consent';
-import HowFootprint from './sections/how-footprint/how-footprint';
-import MoreAbout from './sections/more-about/more-about';
+import Consent from './sections/consent';
+import HowFootprint from './sections/how-footprint';
+import MoreAbout from './sections/more-about';
 
 const IdvPrivacy = () => {
-  const { t } = useTranslation('pages.idv-privacy');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.idv-privacy' });
 
   return (
     <>

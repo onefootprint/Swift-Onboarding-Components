@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoQuoteLeft16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { Annotation } from '@onefootprint/types';
 import { Stack, Toggle } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import TruncatedText from '@/entities/components/details/components/truncated-text';
 import useCurrentEntityUpdateAnnotation from '@/entity/hooks/use-current-entity-update-annotation';
@@ -15,9 +15,9 @@ type AnnotationNoteProps = {
 const DEFAULT_TEXT_VIEW_HEIGHT = 60;
 
 const AnnotationNote = ({ annotation }: AnnotationNoteProps) => {
-  const { t } = useTranslation(
-    'pages.entity.audit-trail.timeline.onboarding-decision-event',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.audit-trail.timeline.onboarding-decision-event',
+  });
   const [isNotePinned, setIsNotePinned] = useState(!!annotation?.isPinned);
   const updateMutation = useCurrentEntityUpdateAnnotation();
 

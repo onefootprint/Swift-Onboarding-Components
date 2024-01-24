@@ -1,6 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Tag } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { getDI } from 'src/components/entities/utils/get-dis';
 
 export type FieldTagListProps = {
@@ -8,10 +9,10 @@ export type FieldTagListProps = {
 };
 
 const FieldTagList = ({ targets }: FieldTagListProps) => {
-  const { t } = useTranslation('');
+  const { t } = useTranslation('common');
 
   const tags = targets
-    .map((target: string) => t(getDI(target)))
+    .map((target: string) => t(getDI(target) as ParseKeys<'common'>))
     .filter(tag => tag.length > 0);
 
   return (

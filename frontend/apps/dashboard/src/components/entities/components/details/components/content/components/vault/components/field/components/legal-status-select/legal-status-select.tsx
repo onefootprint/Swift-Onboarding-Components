@@ -1,9 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { IdDI, UsLegalStatus, type VaultValue } from '@onefootprint/types';
 import { NativeSelect } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import EMPTY_SELECT_VALUE from '../../../../constants';
 import editFormFieldName from '../utils/edit-form-field-name';
@@ -13,7 +14,9 @@ export type LegalStatusSelectProps = {
 };
 
 const LegalStatusSelect = ({ value }: LegalStatusSelectProps) => {
-  const { t } = useTranslation('pages.entity.edit.legal-status');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.edit.legal-status',
+  });
   const { register, clearErrors } = useFormContext();
   const formField = editFormFieldName(IdDI.usLegalStatus);
 
@@ -39,7 +42,7 @@ const LegalStatusSelect = ({ value }: LegalStatusSelectProps) => {
         </option>
         {Object.values(UsLegalStatus).map(status => (
           <option key={status} value={status}>
-            {t(`legal-status-mapping.${status}`)}
+            {t(`legal-status-mapping.${status}` as ParseKeys<'common'>)}
           </option>
         ))}
       </NativeSelect>

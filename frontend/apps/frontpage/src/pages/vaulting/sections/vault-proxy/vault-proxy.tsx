@@ -1,9 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoDollar16, IcoEye16, IcoShield16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Container, Grid, media } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import MicroFeatureCard from 'src/pages/home/components/micro-feature-card/micro-feature-card';
 
 import SectionSubtitle from '../../components/section-subtitle';
@@ -14,7 +15,9 @@ const translations = ['enhanced-security', 'reduced-liability', 'less-money'];
 const icons = [IcoShield16, IcoEye16, IcoDollar16];
 
 const VaultProxy = () => {
-  const { t } = useTranslation('pages.vaulting.vault-proxy');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.vaulting.vault-proxy',
+  });
   return (
     <StyledContainer>
       <VaultProxyImage>
@@ -34,8 +37,10 @@ const VaultProxy = () => {
         {translations.map((translation, index) => (
           <MicroFeatureCard
             key={translation}
-            title={t(`bullets.${translation}.title`)}
-            subtitle={t(`bullets.${translation}.subtitle`)}
+            title={t(`bullets.${translation}.title` as ParseKeys<'common'>)}
+            subtitle={t(
+              `bullets.${translation}.subtitle` as ParseKeys<'common'>,
+            )}
             icon={icons[index]}
           />
         ))}

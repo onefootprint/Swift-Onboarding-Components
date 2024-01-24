@@ -1,5 +1,4 @@
 import { DASHBOARD_BASE_URL } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoCirclePlay24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
@@ -11,6 +10,7 @@ import {
 } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 /* eslint-disable import/no-extraneous-dependencies */
 import ContactDialog from 'src/components/contact-dialog';
 import LinkingButton from 'src/components/linking-button';
@@ -25,7 +25,7 @@ const GET_FORM_URL =
   'https://getform.io/f/9f26eb67-51b3-4685-8dc4-8cf458e698e1';
 
 const Hero = () => {
-  const { t } = useTranslation('pages.home.hero');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.home.hero' });
   const [isDemoVisible, setDemoVisible] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
 

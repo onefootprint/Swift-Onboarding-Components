@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { CountryCode, DataIdentifier, Entity } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { EncryptedCell } from 'src/components';
 
 import Field from '../../../../../field';
@@ -14,7 +14,7 @@ export type CountryOfBirthType = {
 };
 
 const CountryOfBirth = ({ di, entity }: CountryOfBirthType) => {
-  const { t } = useTranslation('di');
+  const { t } = useTranslation('common', { keyPrefix: 'di' });
 
   return (
     <Field

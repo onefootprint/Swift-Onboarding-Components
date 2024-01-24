@@ -1,7 +1,8 @@
-import { useIntl, useTranslation } from '@onefootprint/hooks';
+import { useIntl } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Container, Divider, media } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';
 import SubscribeToNewsletter from 'src/components/writing-layout/components/subscribe-to-newsletter';
 import { getInitialPosts, PostType } from 'src/utils/ghost';
@@ -20,7 +21,7 @@ export type BlogProps = {
 };
 
 const Blog = ({ posts }: BlogProps) => {
-  const { t } = useTranslation('pages.blog');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.blog' });
   const { formatDateWithLongMonth } = useIntl();
   const [featuredPost, ...allPosts] = posts;
 

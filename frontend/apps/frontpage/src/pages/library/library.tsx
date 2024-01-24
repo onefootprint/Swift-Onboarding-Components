@@ -1,7 +1,8 @@
-import { useIntl, useTranslation } from '@onefootprint/hooks';
+import { useIntl } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Container, Divider, Grid, media } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';
 import WritingLayout from 'src/components/writing-layout';
 import { getInitialPosts, PostType } from 'src/utils/ghost';
@@ -20,7 +21,7 @@ export type InvestorUpdatesProps = {
 };
 
 const Library = ({ posts }: InvestorUpdatesProps) => {
-  const { t } = useTranslation('pages.library');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.library' });
   const { formatDateWithLongMonth } = useIntl();
   return (
     <>

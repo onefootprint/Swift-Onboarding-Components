@@ -1,10 +1,10 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { SelectOption } from '@onefootprint/ui';
 import { Box, Checkbox } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
 
 import type { Invitation } from '../../dialog.types';
@@ -24,7 +24,9 @@ type FormData = {
 };
 
 const Data = ({ roles, defaultRole, onSubmit }: DataProps) => {
-  const { t } = useTranslation('pages.onboarding.invite');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.onboarding.invite',
+  });
   const [animate] = useAutoAnimate<HTMLFormElement>();
   const {
     data: { user },

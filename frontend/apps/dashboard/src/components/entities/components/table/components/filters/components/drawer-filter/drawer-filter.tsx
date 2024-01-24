@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoFilter16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { EntityLabel } from '@onefootprint/types';
@@ -14,6 +13,7 @@ import {
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
 
 import useFilters from '../../../../../../hooks/use-filters';
@@ -23,7 +23,9 @@ import useInitialFilters from './hooks/use-initial-filters';
 import transformFormDataToQuery from './utils/transform-form-to-query';
 
 const DrawerFilter = () => {
-  const { t } = useTranslation('pages.entities.filters.drawer');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entities.filters.drawer',
+  });
   const {
     data: { user },
   } = useSession();

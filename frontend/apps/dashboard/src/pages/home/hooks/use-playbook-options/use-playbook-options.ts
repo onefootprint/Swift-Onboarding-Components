@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { PaginatedRequestResponse } from '@onefootprint/request';
 import request from '@onefootprint/request';
 import type { GetOnboardingConfigsResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
@@ -27,7 +27,9 @@ const getPlaybooks = async (authHeaders: AuthHeaders) => {
 const usePlaybookOptions = () => {
   const { authHeaders, isLive } = useSession();
   const { isReady } = useFilters();
-  const { t } = useTranslation('pages.home.onboarding-metrics.filters');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.home.onboarding-metrics.filters',
+  });
 
   return useQuery(
     ['insights', 'playbooks', isLive],

@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoPlusSmall16 } from '@onefootprint/icons';
 import {
   Box,
@@ -12,6 +11,7 @@ import {
 } from '@onefootprint/ui';
 import React from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import type {
   FormData,
   StepProps,
@@ -22,9 +22,9 @@ import FormGrid from '../form-grid';
 const defaultRule = { token: '', target: '' };
 
 const IngressVaulting = ({ id, onSubmit, values }: StepProps) => {
-  const { t } = useTranslation(
-    'pages.proxy-configs.create.form.ingress-vaulting',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.proxy-configs.create.form.ingress-vaulting',
+  });
   const { handleSubmit, control, register, watch } = useForm<FormData>({
     defaultValues: {
       ingressSettings: {

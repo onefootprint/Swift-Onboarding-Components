@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoStore24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import TimelineLayout from '../../components/timeline-layout';
 import TimelineTitle from '../../components/timeline-title';
@@ -9,7 +9,9 @@ import DesktopIllustration from './components/desktop-illustration';
 import MobileIllustration from './components/mobile-illustration';
 
 const IdentifyBusinesses = () => {
-  const { t } = useTranslation('pages.kyb.identify-businesses');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.kyb.identify-businesses',
+  });
   return (
     <Content>
       <TimelineLayout icon={IcoStore24}>

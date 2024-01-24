@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import {
   CollectedDocumentDataOption,
@@ -8,6 +7,7 @@ import {
 import { Box, Checkbox, Grid, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import type {
   SummaryFormData,
@@ -21,9 +21,10 @@ type PersonProps = {
 };
 
 const Person = ({ playbook, meta }: PersonProps) => {
-  const { allT, t } = useTranslation(
-    'pages.playbooks.dialog.authorized-scopes',
-  );
+  const { t: allT } = useTranslation('common');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.dialog.authorized-scopes',
+  });
   const { register } = useFormContext();
   const { personal } = playbook;
   const { selfie, idDocKind, ssn, ssnKind } = personal;

@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { EntityKind, EntityStatus, ReviewStatus } from '@onefootprint/types';
 import { createFontStyles, Overlay } from '@onefootprint/ui';
 import { Command } from 'cmdk';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useCurrentEntity from 'src/components/entities/components/details/hooks/use-current-entity';
 import { useEffectOnce } from 'usehooks-ts';
 
@@ -20,7 +20,7 @@ import SearchInput from './components/main-dialog/search-input';
 import ManualReviewDialog from './components/manual-review-dialog';
 
 const Cmd = ({ entity }: VaultActionsControlsProps) => {
-  const { t, allT } = useTranslation('components.cmd');
+  const { t } = useTranslation('common');
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const { data: entityData } = useCurrentEntity();
@@ -80,7 +80,7 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
 
   const actions = [
     {
-      title: allT(
+      title: t(
         `components.cmdk.review.${
           kind === EntityKind.business ? 'title-business' : 'title-user'
         }`,
@@ -90,11 +90,11 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
         {
           label:
             entityData && entityData.status === EntityStatus.failed
-              ? allT('components.cmdk.review.keep-as', {
-                  status: allT(`entity-statuses.${ReviewStatus.fail}`),
+              ? t('components.cmdk.review.keep-as', {
+                  status: t(`entity-statuses.${ReviewStatus.fail}`),
                 })
-              : allT('components.cmdk.review.mark-as', {
-                  status: allT(`entity-statuses.${ReviewStatus.fail}`),
+              : t('components.cmdk.review.mark-as', {
+                  status: t(`entity-statuses.${ReviewStatus.fail}`),
                 }),
           value: 'failed',
           onSelect: () => handleOpenDialog(ReviewStatus.fail),
@@ -103,11 +103,11 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
         {
           label:
             entityData && entityData.status === EntityStatus.pass
-              ? allT('components.cmdk.review.keep-as', {
-                  status: allT(`entity-statuses.${ReviewStatus.pass}`),
+              ? t('components.cmdk.review.keep-as', {
+                  status: t(`entity-statuses.${ReviewStatus.pass}`),
                 })
-              : allT('components.cmdk.review.mark-as', {
-                  status: allT(`entity-statuses.${ReviewStatus.pass}`),
+              : t('components.cmdk.review.mark-as', {
+                  status: t(`entity-statuses.${ReviewStatus.pass}`),
                 }),
           value: 'verified',
           onSelect: () => handleOpenDialog(ReviewStatus.pass),
@@ -116,17 +116,17 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
       ],
     },
     {
-      title: allT('components.cmdk.actions.title'),
+      title: t('components.cmdk.actions.title'),
       type: ActionType.USER_ACTIONS,
       actions: [
         {
-          label: allT('components.cmdk.actions.edit'),
+          label: t('components.cmdk.actions.edit'),
           value: 'edit',
           onSelect: editControls.start,
           closeAfterSelect: true,
         },
         {
-          label: allT('components.cmdk.actions.request'),
+          label: t('components.cmdk.actions.request'),
           value: 'request',
           onSelect: handleRetrigerDialogOpen,
           closeAfterSelect: true,
@@ -134,18 +134,18 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
       ],
     },
     {
-      title: allT('components.cmdk.decrypt.title'),
+      title: t('components.cmdk.decrypt.title'),
       type: ActionType.DECRYPT,
       actions: [
         {
-          label: allT('components.cmdk.decrypt.decrypt-some'),
+          label: t('components.cmdk.decrypt.decrypt-some'),
           value: 'decrypt',
           onSelect: decryptControls.start,
           closeAfterSelect: true,
           disabled: !canDecrypt,
         },
         {
-          label: allT('components.cmdk.decrypt.decrypt-all'),
+          label: t('components.cmdk.decrypt.decrypt-all'),
           value: 'decrypt-all',
           onSelect: () =>
             decryptControls.submitAllFields(entity.decryptableAttributes),
@@ -158,7 +158,11 @@ const Cmd = ({ entity }: VaultActionsControlsProps) => {
 
   return (
     <>
-      <DialogContainer open={open} onOpenChange={setOpen} label={t('title')}>
+      <DialogContainer
+        open={open}
+        onOpenChange={setOpen}
+        label={t('components.cmdk.decrypt.title')}
+      >
         <SearchInput
           value={search}
           onValueChange={setSearch}

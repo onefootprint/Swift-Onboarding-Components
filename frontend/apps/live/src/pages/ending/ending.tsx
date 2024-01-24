@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoCheckCircle24,
   IcoDatabase24,
@@ -17,6 +16,7 @@ import {
 } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import SEO from '../../components/seo';
 import FeatureCard from './components/feature-card';
@@ -25,7 +25,7 @@ import Illustration from './components/illustration';
 import Navigation from './components/navigation';
 
 const Ending = () => {
-  const { t } = useTranslation('ending');
+  const { t } = useTranslation('common', { keyPrefix: 'ending' });
 
   return (
     <>

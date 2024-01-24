@@ -1,5 +1,4 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckSmall16, IcoDotsHorizontal24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
@@ -9,6 +8,7 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Language } from '../language-select';
 import { languageBaseList } from '../language-select/language-select-types';
@@ -26,7 +26,9 @@ const FooterActions = ({
   languageList = languageBaseList,
   activeLanguage,
 }: FooterActionsProps) => {
-  const { t } = useTranslation('idv');
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'global.components.layout',
+  });
   return (
     <Dropdown.Root>
       <DropdownTrigger>

@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { UpdateOrgRequest } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
 import React, { useId, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useUpdateOrg from 'src/hooks/use-update-org';
 
 import FormDialog from '../form-dialog';
@@ -18,7 +18,9 @@ export type FieldsetProps = {
 };
 
 const Fieldset = ({ children, label, value }: FieldsetProps) => {
-  const { t } = useTranslation('pages.settings.business-profile');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.business-profile',
+  });
   const id = useId();
   const [open, setOpen] = useState(false);
   const updateOrgMutation = useUpdateOrg();

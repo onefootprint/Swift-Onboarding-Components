@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Badge, createFontStyles, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Content } from '@/api-reference/api-reference.types';
 import { getSchemaFromComponent } from '@/api-reference/utils/get-schemas';
@@ -13,7 +13,7 @@ export type ResponsesProps = {
 };
 
 const Responses = ({ responses }: ResponsesProps) => {
-  const { t } = useTranslation('pages.api-reference');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
 
   return Object.keys(responses).length === 0 ? null : (
     <Container>

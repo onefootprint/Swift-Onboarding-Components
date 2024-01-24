@@ -1,9 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import type { Role } from '@onefootprint/types';
 import { createFontStyles, useToast } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import { Trans } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 import ConfirmationDialog from './components/confirmation-dialog';
 import useRemoveRole from './hooks/use-remove-role';
@@ -18,7 +17,9 @@ export type RemoveProps = {
 
 const Remove = forwardRef<RemoveHandler, RemoveProps>(({ role }, ref) => {
   const { id, numActiveUsers, name, numActiveApiKeys } = role;
-  const { t } = useTranslation('pages.settings.roles.remove');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.roles.remove',
+  });
   const [open, setOpen] = useState(false);
   const removeRoleMutation = useRemoveRole(name);
   const toast = useToast();

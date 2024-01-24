@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoShield24, IcoStore24, IcoUsers24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Button, RadioSelect, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
 
 import { PlaybookKind } from '@/playbooks/utils/machine/types';
@@ -18,7 +18,10 @@ type FormData = {
 };
 
 const WhoToOnboard = ({ onSubmit, defaultKind }: WhoToOnboardProps) => {
-  const { t, allT } = useTranslation('pages.playbooks.dialog.who-to-onboard');
+  const { t: allT } = useTranslation('common');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.dialog.who-to-onboard',
+  });
   const {
     data: { org },
   } = useSession();

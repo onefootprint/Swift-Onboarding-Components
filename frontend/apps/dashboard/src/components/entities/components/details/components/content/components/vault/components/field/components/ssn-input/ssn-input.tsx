@@ -1,10 +1,11 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import type { DataIdentifier, VaultValue } from '@onefootprint/types';
 import { IdDI } from '@onefootprint/types';
 import { TextInput } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import editFormFieldName from '../utils/edit-form-field-name';
 
@@ -14,7 +15,9 @@ export type SsnInputProps = {
 };
 
 const SsnInput = ({ fieldName, fieldValue }: SsnInputProps) => {
-  const { t } = useTranslation('pages.entity.edit.errors.ssn');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.edit.errors.ssn',
+  });
   const {
     register,
     getValues,
@@ -36,7 +39,7 @@ const SsnInput = ({ fieldName, fieldValue }: SsnInputProps) => {
       return message;
     }
     if (errors[formField]?.type) {
-      return t(`${errors[formField]?.type}`);
+      return t(`${errors[formField]?.type}` as ParseKeys<'common'>);
     }
     return undefined;
   };

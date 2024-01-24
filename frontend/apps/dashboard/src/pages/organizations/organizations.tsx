@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { ThemedLogoFpDefault } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
@@ -6,6 +5,7 @@ import { Box } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import useAuthRoles from 'src/hooks/use-auth-roles';
 
 import Data from './components/data';
@@ -13,7 +13,7 @@ import Error from './components/error';
 import Loading from './components/loading';
 
 const Organizations = () => {
-  const { t } = useTranslation('pages.organizations');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.organizations' });
   const { query, isReady } = useRouter();
   const authToken = isReady ? (query.token as string) : '';
   const hasToken = isReady && authToken;

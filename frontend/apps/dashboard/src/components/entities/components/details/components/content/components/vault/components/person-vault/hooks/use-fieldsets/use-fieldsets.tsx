@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoBuilding24,
   IcoCreditcard24,
@@ -11,6 +10,7 @@ import {
 import type { DataIdentifier, Entity } from '@onefootprint/types';
 import { DocumentDI, IdDI, InvestorProfileDI } from '@onefootprint/types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Fieldset } from '../../../../vault.types';
 import Citizenships from './components/citizenships';
@@ -22,7 +22,7 @@ import UsLegalStatus from './components/us-legal-status';
 import VisaKind from './components/visa-kind';
 
 const useFieldsets = (excludeNationality?: boolean): Fieldset => {
-  const { t } = useTranslation('pages.user.vault');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.user.vault' });
 
   const fieldsets = {
     basic: {

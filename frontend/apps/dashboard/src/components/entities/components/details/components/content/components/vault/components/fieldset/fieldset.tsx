@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Box, LinkButton, Typography } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
 
@@ -28,7 +28,9 @@ const Fieldset = ({
   iconComponent: IconComponent,
   title,
 }: FieldsetProps) => {
-  const { t } = useTranslation('pages.entity.fieldset');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.fieldset',
+  });
   const decrypt = useDecryptControls();
   const decryptForm = useDecryptForm();
   const dis = fields.map(field => field.di);

@@ -7,7 +7,10 @@
   "error": {
     "title": "Oops! An error occurred.",
     "description": "Our penguins were notified and are working on it.",
-    "cta": "Restart"
+    "cta": "Restart",
+    "image": {
+      "alt": "An image of a penguin using a smartphone"
+    }
   },
   "edit": "Edit",
   "save": "Save",
@@ -644,6 +647,7 @@
       "cta": "Back home"
     },
     "auth": {
+      "loading-aria-label": "Loading",
       "page-title": "Footprint Login | Logging in to the Footprint Dashboard",
       "workos-error": {
         "title": "Please try again",
@@ -1178,7 +1182,18 @@
           "cancel": "Cancel",
           "form": {
             "prompt": "Why are you marking this user as {{status}}?",
-            "placeholder": "Type here..."
+            "placeholder": "Type here...",
+            "disclaimer": "",
+            "note": {
+              "label": "Manual review note",
+              "placeholder": "Your note",
+              "errors": {
+                "required": "A note is required"
+              }
+            },
+            "toggle": {
+              "label": "Toggle"
+            }
           }
         },
         "feedback": {
@@ -2147,7 +2162,13 @@
           "not-allowed": "You're not allowed to manage Playbooks",
           "status": {
             "label": "Status",
-            "enable": "Enable",
+            "enable": {
+              "cta": "Enable",
+              "confirmation": {
+                "title": "Enable Playbook?",
+                "description": "Are you sure you want to enable this Playbook?"
+              }
+            },
             "disable": {
               "cta": "Disable",
               "confirmation": {
@@ -2903,17 +2924,24 @@
           "ingress-vaulting": {
             "title": "Ingress vaulting",
             "content-type": {
+              "placeholder": "Your content type",
               "label": "Content type"
             },
             "vaulting-rules": {
               "title": "Vaulting rules",
               "token": {
                 "label": "Vault token",
-                "placeholder": "custom.bank_account_number"
+                "placeholder": "custom.bank_account_number",
+                "errors": {
+                  "required": "A vault token is required"
+                }
               },
               "target": {
                 "label": "Source",
-                "placeholder": "bank.account_number"
+                "placeholder": "bank.account_number",
+                "errors": {
+                  "required": "A source is required"
+                }
               }
             },
             "add-more": "Add another"

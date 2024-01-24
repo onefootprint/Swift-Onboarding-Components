@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoWarning16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
@@ -11,6 +10,7 @@ import {
 } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import type { AMLFormData } from '@/playbooks/utils/machine/types';
 
@@ -22,7 +22,10 @@ export type AMLProps = {
 };
 
 const AML = ({ defaultValues, isLoading, onBack, onSubmit }: AMLProps) => {
-  const { t, allT } = useTranslation('pages.playbooks.dialog.aml');
+  const { t: allT } = useTranslation('common');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.dialog.aml',
+  });
   const [showError, setShowError] = useState(false);
   const { handleSubmit, register, watch } = useForm<AMLFormData>({
     defaultValues,

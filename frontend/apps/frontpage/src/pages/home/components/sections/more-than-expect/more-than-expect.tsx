@@ -1,9 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoHeart24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
+import { useTranslation } from 'react-i18next';
 
 import FeatureCard from '../../../../../components/feature-card';
 import SectionTitle from '../../section-title';
@@ -54,7 +55,9 @@ const cards = [
 ];
 
 const MoreThanExpect = () => {
-  const { t } = useTranslation('pages.home.more-than-expect');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.home.more-than-expect',
+  });
   return (
     <>
       <SectionTitle
@@ -66,8 +69,8 @@ const MoreThanExpect = () => {
         {cards.map(({ translations, illustration, id, invertedGradient }) => (
           <FeatureCard
             size="compact"
-            title={t(`${translations}.title`)}
-            subtitle={t(`${translations}.subtitle`)}
+            title={t(`${translations}.title` as ParseKeys<'common'>)}
+            subtitle={t(`${translations}.subtitle` as ParseKeys<'common'>)}
             gridArea={translations}
             key={id}
             invertedGradient={isMobile ? id % 2 === 0 : invertedGradient}

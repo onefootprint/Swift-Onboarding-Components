@@ -1,5 +1,5 @@
-import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Fieldset from '../fieldset';
 
@@ -8,7 +8,7 @@ export type ErrorProps = {
 };
 
 const Error = ({ message }: ErrorProps) => {
-  const { t } = useTranslation('notifications');
+  const { t } = useTranslation('common', { keyPrefix: 'notifications' });
   return <Fieldset label={t('error')} value={message} />;
 };
 

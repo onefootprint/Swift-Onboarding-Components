@@ -1,7 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css, useTheme } from '@onefootprint/styled';
 import { CodeInline, Stack, Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Tags from 'src/components/entities/components/tags';
 import StatusBadge from 'src/components/status-badge';
 import useSession from 'src/hooks/use-session';
@@ -13,7 +14,7 @@ import { useEntityContext } from '@/entity/hooks/use-entity-context';
 type HeaderProps = WithEntityProps;
 
 const Header = ({ entity }: HeaderProps) => {
-  const { t } = useTranslation('pages.entity.header');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.header' });
   const { kind } = useEntityContext();
   const {
     data: { user },
@@ -21,16 +22,20 @@ const Header = ({ entity }: HeaderProps) => {
   const theme = useTheme();
 
   return (
-    <HeaderContainer aria-label={t(`${kind}.title`)}>
+    <HeaderContainer aria-label={t(`${kind}.title` as ParseKeys<'common'>)}>
       <Stack align="center" gap={3}>
-        <Typography variant="label-1">{t(`${kind}.title`)}</Typography>
+        <Typography variant="label-1">
+          {t(`${kind}.title` as ParseKeys<'common'>)}
+        </Typography>
         <Stack gap={2}>
           <StatusBadge
             status={entity.status}
             requiresManualReview={entity.requiresManualReview}
             isOnWatchlist={entity.watchlistCheck?.status === 'fail'}
             shouldShowWatchlistLabel
-            watchlistLabel={t(`watchlist.on-watchlist-${kind}`)}
+            watchlistLabel={t(
+              `watchlist.on-watchlist-${kind}` as ParseKeys<'common'>,
+            )}
           />
           <Tags entity={entity} />
         </Stack>

@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { DocumentDI } from '@onefootprint/types';
+import { useTranslation } from 'react-i18next';
 
 const useDocumentFields = () => {
-  const { t } = useTranslation('di');
+  const { t } = useTranslation('common', { keyPrefix: 'di' });
 
   const fields = [
     {

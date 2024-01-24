@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { RoleScopeKind } from '@onefootprint/types';
 import { LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 
 export type ValueProps = {
@@ -13,7 +13,9 @@ export type ValueProps = {
 };
 
 const Value = ({ children, cta }: ValueProps) => {
-  const { t } = useTranslation('pages.settings.business-profile');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.business-profile',
+  });
 
   return children ? (
     <Typography variant="body-3">{children}</Typography>

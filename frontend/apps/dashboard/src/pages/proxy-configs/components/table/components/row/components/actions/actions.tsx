@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { ProxyConfig } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Dropdown, Stack } from '@onefootprint/ui';
 import React, { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 
 import type { RemoveHandler } from './components/remove';
@@ -17,7 +17,9 @@ export type ActionsProps = {
 
 const Actions = ({ proxyConfig }: ActionsProps) => {
   const { name } = proxyConfig;
-  const { t } = useTranslation('pages.proxy-configs.actions');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.proxy-configs.actions',
+  });
   const statusRef = useRef<StatusHandler>(null);
   const removeRef = useRef<RemoveHandler>(null);
 

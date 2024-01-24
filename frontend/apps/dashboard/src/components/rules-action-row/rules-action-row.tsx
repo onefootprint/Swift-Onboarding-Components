@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoPlusSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { type Rule, type RuleField, RuleOp } from '@onefootprint/types';
 import { Badge, createFontStyles, LinkButton, Stack } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import OpBadge from './components/op-badge';
 import RiskSignalSelect from './components/risk-signal-select';
@@ -20,9 +20,7 @@ const RulesActionRow = ({
   playbookId,
   rule,
 }: RulesActionRowProps) => {
-  const { t, allT } = useTranslation(
-    'pages.playbooks.details.rules.action-row',
-  );
+  const { t } = useTranslation('common');
   const [isEditing, setIsEditing] = useState(false);
   const [expressions, setExpressions] = useState<RuleField[]>(
     rule.ruleExpression,
@@ -80,11 +78,11 @@ const RulesActionRow = ({
       aria-label={rule.ruleExpression[0].field}
     >
       <div>
-        {t('if')}
+        {t('pages.playbooks.details.rules.action-row.if')}
         {expressions.map((expression, index) => (
           // eslint-disable-next-line react/no-array-index-key
           <React.Fragment key={`${index} ${expression.field}`}>
-            {index > 0 && t('and')}
+            {index > 0 && t('pages.playbooks.details.rules.action-row.and')}
             <OpBadge
               defaultValue={expression.op}
               isEditable={isEditing}
@@ -116,7 +114,7 @@ const RulesActionRow = ({
             disabled={expressions.some(expression => expression.field === '')}
             onClick={handleAddField}
           >
-            {t('add')}
+            {t('pages.playbooks.details.rules.action-row.add')}
           </LinkButton>
           <RowEditButtons
             playbookId={playbookId}
@@ -135,7 +133,7 @@ const RulesActionRow = ({
             sx={{ paddingTop: 5, paddingLeft: 3 }}
             onClick={handleStartEdit}
           >
-            {allT('edit')}
+            {t('edit')}
           </LinkButton>
         )
       )}

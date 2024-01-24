@@ -1,9 +1,10 @@
 import type { Color } from '@onefootprint/design-tokens';
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import { MatchLevel } from '@onefootprint/types/src/data/match-signal';
 import { Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type ValidationTimelineItemHeaderProps = {
   attribute: string;
@@ -27,15 +28,18 @@ const ValidationTimelineItemHeader = ({
   attribute,
   matchLevel,
 }: ValidationTimelineItemHeaderProps) => {
-  const { t } = useTranslation(
-    'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.field-validations',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix:
+      'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.field-validations',
+  });
 
   return (
     <HeaderContainer>
-      <Typography variant="label-3">{t(`attributes.${attribute}`)}</Typography>
+      <Typography variant="label-3">
+        {t(`attributes.${attribute}` as ParseKeys<'common'>)}
+      </Typography>
       <Typography variant="body-4" color={matchColors[matchLevel]}>
-        {t(`match-level.${matchLevel}`)}
+        {t(`match-level.${matchLevel}` as ParseKeys<'common'>)}
       </Typography>
     </HeaderContainer>
   );

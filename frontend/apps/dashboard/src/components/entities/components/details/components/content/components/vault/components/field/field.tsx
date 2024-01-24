@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import {
   type DataIdentifier,
@@ -8,6 +7,7 @@ import {
 import { Box, Checkbox, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import useField from '../../hooks/use-field';
 import { useDecryptControls } from '../vault-actions';
@@ -33,7 +33,7 @@ const Field = ({
   renderLabel,
   status,
 }: FieldProps) => {
-  const { t } = useTranslation('pages.entity.decrypt');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.decrypt' });
   const { register } = useFormContext();
   const field = useField(entity)(di);
   const decrypt = useDecryptControls();

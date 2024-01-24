@@ -73,8 +73,8 @@ const BasicData = ({
       ? {
           value: corpTypeValue,
           label: t(
-            `kyb.pages.basic-data.form.corporation-type.mapping.${corpTypeValue}`,
-          ),
+            `kyb.pages.basic-data.form.corporation-type.mapping.${corpTypeValue}` as unknown as TemplateStringsArray,
+          ) as unknown as string,
         }
       : undefined,
     phoneNumber: data?.[BusinessDI.phoneNumber],

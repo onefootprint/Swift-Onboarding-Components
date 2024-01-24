@@ -1,5 +1,4 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import {
   Button,
@@ -11,6 +10,7 @@ import {
 } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import {
   CountryRestriction,
@@ -24,7 +24,10 @@ export type ResidencyProps = {
 };
 
 const Residency = ({ defaultValues, onBack, onSubmit }: ResidencyProps) => {
-  const { t, allT } = useTranslation('pages.playbooks.dialog.residency');
+  const { t: allT } = useTranslation('common');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.dialog.residency',
+  });
   const { handleSubmit, register, watch, control } = useForm<ResidencyFormData>(
     {
       defaultValues,

@@ -4,7 +4,6 @@ import {
   ComboboxList,
   ComboboxProvider,
 } from '@ariakit/react';
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronDown16, IcoTrash16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
@@ -17,6 +16,7 @@ import {
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { matchSorter } from 'match-sorter';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ListRowProps } from 'react-virtualized';
 import {
   AutoSizer,
@@ -40,9 +40,9 @@ const RiskSignalSelect = ({
   onDelete,
   onChange,
 }: RiskSignalSelectProps) => {
-  const { t } = useTranslation(
-    'pages.playbooks.details.rules.action-row.risk-signals-select',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.details.rules.action-row.risk-signals-select',
+  });
   const riskSignalsQuery = useRiskSignals();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');

@@ -1,14 +1,14 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import { motion, useAnimation, useInView } from 'framer-motion';
 import Image from 'next/image';
 import React, { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Background from '../background';
 
 const TabletIllustration = () => {
-  const { t } = useTranslation('pages.home.hero');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.home.hero' });
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
   const mockupControls = useAnimation();

@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoDatabase24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import TimelineLayout from '../../components/timeline-layout';
 import TimelineTitle from '../../components/timeline-title';
@@ -10,7 +10,9 @@ import DesktopIllustration from './components/desktop-illustration';
 import MobileIllustration from './components/mobile-illustration';
 
 const SecurelyStore = () => {
-  const { t } = useTranslation('pages.kyb.securely-store');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.kyb.securely-store',
+  });
   return (
     <TimelineLayout icon={IcoDatabase24}>
       <Content>

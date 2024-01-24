@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import request, { getErrorMessage } from '@onefootprint/request';
 import { useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
@@ -18,7 +18,9 @@ const removeMemberRequest = async (authHeaders: AuthHeaders, id: string) => {
 };
 
 const useRemoveMember = (email: string) => {
-  const { t } = useTranslation('pages.settings.members.table.actions.remove');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.members.table.actions.remove',
+  });
   const toast = useToast();
   const session = useSession();
   const queryClient = useQueryClient();

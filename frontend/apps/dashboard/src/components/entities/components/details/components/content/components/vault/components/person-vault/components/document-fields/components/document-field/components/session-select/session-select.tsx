@@ -1,8 +1,9 @@
-import { useIntl, useTranslation } from '@onefootprint/hooks';
+import { useIntl } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { Document } from '@onefootprint/types';
 import { Box, Select, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { getDocumentVersion } from '../../../../utils';
 
@@ -18,9 +19,9 @@ const SessionSelect = ({
   onActiveDocumentVersionChange,
 }: SessionSelectProps) => {
   const { formatDateWithTime } = useIntl();
-  const { t } = useTranslation(
-    'pages.entity.fieldset.document.drawer.session-selector',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.fieldset.document.drawer.session-selector',
+  });
   // Hide the whole session selector if any of the sessions don't have a start date.
   // These aren't real sessions, just a series of images uploaded via API rather than via bifrost.
   const sessionsToRender = documents.filter(d => !!d.startedAt);

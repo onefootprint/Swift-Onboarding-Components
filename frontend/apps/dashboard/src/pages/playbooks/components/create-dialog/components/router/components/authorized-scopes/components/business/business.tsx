@@ -1,12 +1,14 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Checkbox, Divider, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 const Business = () => {
   const { register } = useFormContext();
-  const { t } = useTranslation('pages.playbooks.dialog.authorized-scopes');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.dialog.authorized-scopes',
+  });
 
   return (
     <Container>

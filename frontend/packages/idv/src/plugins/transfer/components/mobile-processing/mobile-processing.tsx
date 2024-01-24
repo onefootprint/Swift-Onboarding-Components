@@ -1,23 +1,21 @@
 import { D2PStatus } from '@onefootprint/types';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { useGetD2PStatus } from '../../../../hooks';
 import useHandleD2PStatusUpdate from '../../hooks/mobile/use-handle-d2p-status-update';
 import useCancelD2P from '../../hooks/use-cancel-d2p';
-import getRequirementsTitleTranslationKey from '../../utils/get-requirements-title-translation-key';
 import { useMobileMachine } from '../mobile-machine-provider';
 import Processing from '../processing';
 
 type MobileProcessingProps = {
-  translationKey: string;
+  title: string;
+  subtitle: string;
+  cta: string;
 };
 
-const MobileProcessing = ({ translationKey }: MobileProcessingProps) => {
+const MobileProcessing = ({ title, subtitle, cta }: MobileProcessingProps) => {
   const [state, send] = useMobileMachine();
-  const { scopedAuthToken, missingRequirements, tab } = state.context;
-  const { t } = useTranslation(translationKey);
-  const allTKey = getRequirementsTitleTranslationKey(missingRequirements);
+  const { scopedAuthToken, tab } = state.context;
 
   const { handleSuccess, handleError } = useHandleD2PStatusUpdate();
   useGetD2PStatus({
@@ -53,9 +51,9 @@ const MobileProcessing = ({ translationKey }: MobileProcessingProps) => {
 
   return (
     <Processing
-      title={t(allTKey)}
-      subtitle={t('subtitle')}
-      cta={t('cancel')}
+      title={title}
+      subtitle={subtitle}
+      cta={cta}
       onCancel={cancelD2P}
     />
   );

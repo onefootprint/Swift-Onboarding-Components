@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { CollectedDataEventData } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import CdoTagList from 'src/components/cdo-tag-list';
 
 import Actor from '../actor';
@@ -12,9 +12,9 @@ type DataCollectedEventHeaderProps = {
 };
 
 const DataCollectedEventHeader = ({ data }: DataCollectedEventHeaderProps) => {
-  const { t } = useTranslation(
-    'pages.entity.audit-trail.timeline.data-collected-event',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.audit-trail.timeline.data-collected-event',
+  });
   const { attributes } = data;
 
   let title = <>{t('title')}</>;

@@ -1,11 +1,12 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import {
   DocumentDI,
   InvestorProfileDI,
   isVaultDataEmpty,
 } from '@onefootprint/types';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { FieldOrPlaceholder } from 'src/components';
 import useEntityVaultWithTransforms from 'src/components/entities/hooks/use-entity-vault-with-transforms';
 import createStringList, {
@@ -20,7 +21,9 @@ import FieldSection from './components/field-section';
 type InvestorProfileFieldsProps = WithEntityProps;
 
 const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
-  const { t } = useTranslation('pages.user.vault.investor-profile');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.user.vault.investor-profile',
+  });
   const { data } = useEntityVaultWithTransforms(entity.id, entity);
   const vaultData = data?.vault;
 
@@ -36,7 +39,9 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
                 <FieldOrPlaceholder data={value} />
               ) : (
                 <FieldOrPlaceholder
-                  data={t(`employment-status.options.${value}`)}
+                  data={t(
+                    `employment-status.options.${value}` as ParseKeys<'common'>,
+                  )}
                 />
               )
             }
@@ -55,7 +60,9 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
                 <FieldOrPlaceholder data={value} />
               ) : (
                 <FieldOrPlaceholder
-                  data={t(`annual-income.options.${value}`)}
+                  data={t(
+                    `annual-income.options.${value}` as ParseKeys<'common'>,
+                  )}
                 />
               )
             }
@@ -69,7 +76,9 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
               !isValueDecrypted ? (
                 <FieldOrPlaceholder data={value} />
               ) : (
-                <FieldOrPlaceholder data={t(`net-worth.options.${value}`)} />
+                <FieldOrPlaceholder
+                  data={t(`net-worth.options.${value}` as ParseKeys<'common'>)}
+                />
               )
             }
           />
@@ -87,7 +96,9 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
                   <FieldOrPlaceholder
                     data={createCapitalStringList(
                       value.map(option =>
-                        t(`investment-goals.options.${option}`),
+                        t(
+                          `investment-goals.options.${option}` as ParseKeys<'common'>,
+                        ),
                       ),
                     )}
                   />
@@ -106,7 +117,9 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
                 <FieldOrPlaceholder data={value} />
               ) : (
                 <FieldOrPlaceholder
-                  data={t(`risk-tolerance.options.${value}`)}
+                  data={t(
+                    `risk-tolerance.options.${value}` as ParseKeys<'common'>,
+                  )}
                 />
               )
             }
@@ -126,7 +139,11 @@ const InvestorProfileFields = ({ entity }: InvestorProfileFieldsProps) => {
                 return (
                   <FieldOrPlaceholder
                     data={createCapitalStringList(
-                      value.map(option => t(`declarations.options.${option}`)),
+                      value.map(option =>
+                        t(
+                          `declarations.options.${option}` as ParseKeys<'common'>,
+                        ),
+                      ),
                     )}
                   />
                 );

@@ -1,5 +1,5 @@
 import { primitives } from '@onefootprint/design-tokens';
-import { useHasScroll, useToggle, useTranslation } from '@onefootprint/hooks';
+import { useHasScroll, useToggle } from '@onefootprint/hooks';
 import {
   IcoFileText24,
   IcoKey24,
@@ -12,13 +12,14 @@ import {
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import DesktopNav from './components/desktop-nav';
 import MobileNav from './components/mobile-nav';
 import type { NavEntry } from './types';
 
 const Navbar = () => {
-  const { t } = useTranslation('components.navbar');
+  const { t } = useTranslation('common', { keyPrefix: 'components.navbar' });
   const [isFloatingEnabled, enableFloating, disableFloating] = useToggle(true);
   const [isOnDarkSection, setIsOnDarkSection] = useState(false);
   const hasScroll = useHasScroll();

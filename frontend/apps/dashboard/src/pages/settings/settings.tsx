@@ -1,15 +1,15 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Box, ThemeToggle, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useTheme } from 'next-themes';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import BusinessProfile from './components/business-profile';
 import TeamRoles from './components/team-roles';
 
 const Settings = () => {
-  const { t } = useTranslation('pages.settings');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.settings' });
   const { theme, setTheme } = useTheme();
 
   const handleToggleTheme = () => {

@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
@@ -12,9 +11,12 @@ import {
 } from '@onefootprint/ui';
 import Image from 'next/image';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const DeveloperExperience = () => {
-  const { t } = useTranslation('components.developer-experience');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.developer-experience',
+  });
   const options = [
     {
       label: t('tabs.configuration'),

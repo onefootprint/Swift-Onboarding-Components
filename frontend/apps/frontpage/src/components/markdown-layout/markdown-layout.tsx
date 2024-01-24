@@ -1,7 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Container, media, Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import SEO from '../seo';
 
@@ -16,10 +17,13 @@ type MarkdownLayoutProps = {
 };
 
 const MarkdownLayout = ({ children, meta }: MarkdownLayoutProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
   return (
     <>
-      <SEO title={t(meta.htmlTitleKey)} slug={meta.slug} />
+      <SEO
+        title={t(meta.htmlTitleKey as ParseKeys<'common'>)}
+        slug={meta.slug}
+      />
       <Container>
         <Inner>
           <Header>
@@ -28,7 +32,7 @@ const MarkdownLayout = ({ children, meta }: MarkdownLayoutProps) => {
               color="primary"
               sx={{ marginBottom: 5 }}
             >
-              {t(meta.titleKey)}
+              {t(meta.titleKey as ParseKeys<'common'>)}
             </Typography>
           </Header>
           <Article>{children}</Article>

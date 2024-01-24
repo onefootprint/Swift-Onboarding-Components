@@ -1,8 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { EntityKind, EntityStatus, ReviewStatus } from '@onefootprint/types';
 import { Button, Dropdown } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type ManualReviewTriggerProps = {
   kind: EntityKind;
@@ -17,9 +18,11 @@ const ManualReviewTrigger = ({
   onSelect,
   disabled,
 }: ManualReviewTriggerProps) => {
-  const { t } = useTranslation('pages.entity.manual-review');
-  const pass = t(`status.${ReviewStatus.pass}`);
-  const fail = t(`status.${ReviewStatus.fail}`);
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.manual-review',
+  });
+  const pass = t(`status.${ReviewStatus.pass}` as ParseKeys<'common'>);
+  const fail = t(`status.${ReviewStatus.fail}` as ParseKeys<'common'>);
 
   return (
     <Dropdown.Root>

@@ -1,12 +1,12 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { type HeaderProps } from '../../../../plans-table-types';
 
 const Header = ({ title, price }: HeaderProps) => {
-  const { t } = useTranslation('pages.pricing');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.pricing' });
   const hasPrice = price && price.monthly && price.yearly;
 
   const USDollar = new Intl.NumberFormat('en-US', {

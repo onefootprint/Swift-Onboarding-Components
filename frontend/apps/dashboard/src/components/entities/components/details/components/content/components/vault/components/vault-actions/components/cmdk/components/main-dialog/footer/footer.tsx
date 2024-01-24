@@ -1,11 +1,13 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoFootprint16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Footer = () => {
-  const { t } = useTranslation('components.cmdk.footer');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.cmdk.footer',
+  });
   return (
     <Container>
       <IcoFootprint16 />

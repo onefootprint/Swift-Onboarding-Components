@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Drawer, LinkButton, Stack, Tab, Tabs } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useSession from 'src/hooks/use-session';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
@@ -10,9 +10,10 @@ import Rules from './components/rules';
 import useEntityRuleSetResult from './hooks/use-entity-rule-set-result';
 
 const Details = () => {
-  const { t } = useTranslation(
-    'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix:
+      'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details',
+  });
   const { isLive } = useSession();
   const id = useEntityId();
   const [isDrawerOpen, setDrawerOpen] = useState(false);

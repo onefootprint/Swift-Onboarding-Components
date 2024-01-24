@@ -1,16 +1,16 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import type { Actor as TActor } from '@onefootprint/types';
 import { ActorKind } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type ActorProps = {
   actor: TActor;
 };
 
 const Actor = ({ actor }: ActorProps) => {
-  const { t } = useTranslation('pages.entity.actor');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.actor' });
 
   return (
     <Container>

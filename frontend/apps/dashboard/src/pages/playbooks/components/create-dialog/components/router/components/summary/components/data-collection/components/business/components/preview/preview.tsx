@@ -1,9 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoPencil16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { LinkButton, Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import type { BusinessInformation } from '@/playbooks/utils/machine/types';
 
@@ -14,9 +15,9 @@ type PreviewProps = {
 };
 
 const Preview = ({ onStartEditing }: PreviewProps) => {
-  const { t } = useTranslation(
-    'pages.playbooks.dialog.summary.business-information.preview',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.dialog.summary.business-information.preview',
+  });
   const { getValues } = useFormContext();
   const businessInformation: BusinessInformation = getValues(
     'businessInformation',
@@ -44,7 +45,7 @@ const Preview = ({ onStartEditing }: PreviewProps) => {
               color="tertiary"
               sx={{ whiteSpace: 'nowrap', textAlign: 'right' }}
             >
-              {t(field)}
+              {t(field as ParseKeys<'common'>)}
             </Typography>
             <ValueContainer>
               <DisplayValue

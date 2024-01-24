@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { LinkButton, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type InvestorUpdatePreviewProps = {
   index: number;
@@ -23,7 +23,9 @@ const InvestorUpdatePreview = ({
   title,
   image,
 }: InvestorUpdatePreviewProps) => {
-  const { t } = useTranslation('pages.investor-updates');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.investor-updates',
+  });
 
   return (
     <Link href={href} passHref legacyBehavior>

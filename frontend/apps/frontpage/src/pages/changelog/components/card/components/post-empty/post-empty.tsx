@@ -1,11 +1,11 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const PostEmpty = () => {
-  const { t } = useTranslation('pages.changelog');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.changelog' });
   return (
     <Container>
       <Image

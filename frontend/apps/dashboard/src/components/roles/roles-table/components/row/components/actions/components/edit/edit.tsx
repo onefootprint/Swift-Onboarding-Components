@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { Role, UpdateRoleRequest } from '@onefootprint/types';
 import { Dialog } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Form from 'src/components/roles/create-dialog/components/form';
 import type { VaultProxySelectOption } from 'src/components/roles/create-dialog/components/form/form.types';
 import { useVaultProxyOptions } from 'src/components/roles/hooks';
@@ -18,8 +18,13 @@ export type EditProps = {
 };
 
 const Edit = forwardRef<EditHandler, EditProps>(({ role }, ref) => {
-  const { t, allT } = useTranslation('pages.settings.roles.edit');
-  const { t: scopesT } = useTranslation('pages.settings.roles.scopes');
+  const { t: allT } = useTranslation('common');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.roles.edit',
+  });
+  const { t: scopesT } = useTranslation('common', {
+    keyPrefix: 'pages.settings.roles.scopes',
+  });
   const [open, setOpen] = useState(false);
   const editRoleMutation = useEditRole(role.id);
   const { allOptions: allVaultProxyOptions } = useVaultProxyOptions();

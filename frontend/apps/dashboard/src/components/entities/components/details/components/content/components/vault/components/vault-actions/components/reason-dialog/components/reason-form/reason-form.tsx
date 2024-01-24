@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   Box,
   Divider,
@@ -10,6 +9,7 @@ import Hint from '@onefootprint/ui/src/components/internal/hint';
 import Label from '@onefootprint/ui/src/components/label';
 import React, { useId, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 type FormData = {
   reason?: string;
@@ -22,7 +22,9 @@ type ReasonFormProps = {
 
 const ReasonForm = ({ onSubmit }: ReasonFormProps) => {
   const [showCustomReason, setShowCustomReason] = useState(false);
-  const { t } = useTranslation('pages.entity.decrypt.reason-dialog');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.decrypt.reason-dialog',
+  });
   const {
     register,
     handleSubmit,

@@ -1,15 +1,17 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { API_REFERENCE_PATH } from 'src/config/constants';
 
 import LogoCopyAssets from './components/logo-copy-assets';
 
 const NavigationLogo = () => {
-  const { t } = useTranslation('components.header.nav');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.header.nav',
+  });
   const router = useRouter();
 
   const section = router.asPath.includes('/api-reference')

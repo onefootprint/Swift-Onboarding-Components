@@ -1,5 +1,5 @@
-import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useUserMachine } from '@/src/state';
 import type { HeaderProps } from '@/src/types';
@@ -15,7 +15,7 @@ type UpdateVerifyPhoneProps = {
 const { logWarn, logError } = getLogger('update-verify-phone');
 
 const UpdateVerifyPhone = ({ children, Header }: UpdateVerifyPhoneProps) => {
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation('common', { keyPrefix: 'auth' });
   const [state, send] = useUserMachine();
   const { phoneNumber, phoneReplaceChallenge, verifyToken } = state.context;
   const headerTitle = phoneNumber

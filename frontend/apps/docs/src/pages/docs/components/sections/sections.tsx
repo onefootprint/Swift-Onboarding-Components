@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Box, createFontStyles, media, Stack } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ArticleSection } from 'src/types/article';
 
 type SectionsProps = {
@@ -10,7 +10,9 @@ type SectionsProps = {
 };
 
 const Sections = ({ sections }: SectionsProps) => {
-  const { t } = useTranslation('components.article-sections');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.article-sections',
+  });
   const [activeSectionID, setActiveSectionID] = useState(sections[0].id);
 
   const scrollToArticle = (id: string) => () => {

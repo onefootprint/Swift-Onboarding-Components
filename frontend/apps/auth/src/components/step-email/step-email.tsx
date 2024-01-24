@@ -1,7 +1,8 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { EmailForm, LegalFooter } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useIdentify } from '@/src/queries';
 import { useAuthMachine } from '@/src/state';
@@ -20,7 +21,7 @@ const StepEmail = ({ children, Header }: StepEmailProps) => {
     identify: { email, sandboxId },
     obConfigAuth,
   } = state.context;
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation('common', { keyPrefix: 'auth' });
   const mutIdentify = useIdentify({ obConfigAuth, sandboxId });
   const showRequestErrorToast = useRequestErrorToast();
 

@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { Icon } from '@onefootprint/icons';
 import {
   IcoBook16,
@@ -12,6 +11,7 @@ import {
   IcoUsers16,
   IcoWebhook16,
 } from '@onefootprint/icons';
+import { useTranslation } from 'react-i18next';
 
 type Route = {
   title?: string;
@@ -20,7 +20,9 @@ type Route = {
 };
 
 const useRoutes = (): Route[] => {
-  const { t } = useTranslation('components.private-layout.nav');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.private-layout.nav',
+  });
   const routes = [
     {
       title: '',

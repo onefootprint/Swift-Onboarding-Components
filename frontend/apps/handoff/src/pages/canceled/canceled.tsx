@@ -10,7 +10,7 @@ const Canceled = () => {
   const [state] = useHandoffMachine();
   const { opener } = state.context;
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.canceled.subtitle',
+    keyPrefix: 'pages.canceled',
   });
 
   return (
@@ -19,7 +19,9 @@ const Canceled = () => {
         <NavigationHeader />
         <HeaderTitle
           title={t('title')}
-          subtitle={opener === 'mobile' ? t('mobile') : t('desktop')}
+          subtitle={
+            opener === 'mobile' ? t('subtitle.mobile') : t('subtitle.desktop')
+          }
         />
       </Box>
     </Container>

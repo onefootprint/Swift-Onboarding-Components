@@ -1,18 +1,21 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Box, useToast } from '@onefootprint/ui';
-import React, { useEffect } from 'react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import useOrgSession from 'src/hooks/use-org-session';
+import { useEffectOnce } from 'usehooks-ts';
 
 export type ModeSwitcherProps = {
   children: React.ReactNode;
 };
 
 const ModeSwitcher = ({ children }: ModeSwitcherProps) => {
-  const { t } = useTranslation('components.private-layout.mode-switcher');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.private-layout.mode-switcher',
+  });
   const { sandbox } = useOrgSession();
   const toast = useToast();
 
-  useEffect(() => {
+  useEffectOnce(() => {
     const toggleMode = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const mode = urlParams.get('mode');
@@ -35,7 +38,7 @@ const ModeSwitcher = ({ children }: ModeSwitcherProps) => {
       }
     };
     toggleMode();
-  }, []);
+  });
 
   return <Box>{children}</Box>;
 };

@@ -1,10 +1,11 @@
 import type { Color } from '@onefootprint/design-tokens';
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { Rule, RuleAction } from '@onefootprint/types';
 import { Stack, Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import { kebabCase } from 'lodash';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import RulesActionRow from 'src/components/rules-action-row';
 
 export type ActionResultSectionProps = {
@@ -18,13 +19,14 @@ const ActionResultSection = ({
   action,
   data,
 }: ActionResultSectionProps) => {
-  const { t } = useTranslation(
-    'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.rules',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix:
+      'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.rules',
+  });
   const actionName = kebabCase(action);
 
   const getResultSection = (name: string) => {
-    const triggeredName = t(kebabCase(name));
+    const triggeredName = t(kebabCase(name) as ParseKeys<'common'>);
     const rules = data[name] as Rule[];
 
     return (
@@ -60,10 +62,13 @@ const ActionResultSection = ({
       direction="column"
       gap={5}
       role="group"
-      aria-label={t(`${actionName}.title`)}
+      aria-label={t(`${actionName}.title` as ParseKeys<'common'>)}
     >
-      <Typography variant="label-2" color={t(`${actionName}.color`) as Color}>
-        {t(`${actionName}.title`)}
+      <Typography
+        variant="label-2"
+        color={t(`${actionName}.color` as ParseKeys<'common'>) as Color}
+      >
+        {t(`${actionName}.title` as ParseKeys<'common'>)}
       </Typography>
       {getResultSection('triggered')}
       {getResultSection('notTriggered')}

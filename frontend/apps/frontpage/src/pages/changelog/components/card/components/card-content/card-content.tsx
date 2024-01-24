@@ -1,9 +1,10 @@
-import { useIntl, useTranslation } from '@onefootprint/hooks';
+import { useIntl } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { CopyButton, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { PostDetails } from 'src/utils/ghost/types';
 
 import HtmlContent from '../../../html-content';
@@ -16,7 +17,7 @@ type CardContentProps = {
 };
 
 const CardContent = ({ post }: CardContentProps) => {
-  const { t } = useTranslation('components.copy-link');
+  const { t } = useTranslation('common', { keyPrefix: 'components.copy-link' });
   const { formatDateWithLongMonth } = useIntl();
   const formattedDate = formatDateWithLongMonth(new Date(post.published_at));
 

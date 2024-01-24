@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { RoleKind } from '@onefootprint/types';
 import { Dialog, Grid, Select, TextInput, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import useRoles from 'src/hooks/use-roles/use-roles';
 
 import Loading from './components/loading';
@@ -17,7 +17,9 @@ type FormData = { name: string; role: { label: string; value: string } };
 
 const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
   const createApiKeyMutation = useCreateApiKey();
-  const { t } = useTranslation('pages.api-keys.create');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.api-keys.create',
+  });
   const toast = useToast();
   const {
     reset,

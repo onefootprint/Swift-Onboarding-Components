@@ -1,5 +1,4 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoEyeCrossed24,
   IcoFaceid24,
@@ -8,8 +7,10 @@ import {
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Container } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import Link from 'next/link';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import IconFeatureCard from '../../components/icon-feature-card';
 import Title from './components/title';
@@ -94,7 +95,9 @@ const improveVendorCards = [
 ];
 
 const Consent = () => {
-  const { t } = useTranslation('pages.idv-privacy.consent');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.idv-privacy.consent',
+  });
   return (
     <StyledContainer>
       <Title title={t('title')} subtitle={t('subtitle')} variant="primary" />
@@ -106,8 +109,10 @@ const Consent = () => {
             <IconFeatureCard
               key={card.key}
               icon={card.icon}
-              title={t(`verify.cards.${card.key}.title`)}
-              description={t(`verify.cards.${card.key}.description`)}
+              title={t(`verify.cards.${card.key}.title` as ParseKeys<'common'>)}
+              description={t(
+                `verify.cards.${card.key}.description` as ParseKeys<'common'>,
+              )}
               trans={card.trans}
             />
           ))}
@@ -121,8 +126,12 @@ const Consent = () => {
             <IconFeatureCard
               key={card.key}
               icon={card.icon}
-              title={t(`optional.cards.${card.key}.title`)}
-              description={t(`optional.cards.${card.key}.description`)}
+              title={t(
+                `optional.cards.${card.key}.title` as ParseKeys<'common'>,
+              )}
+              description={t(
+                `optional.cards.${card.key}.description` as ParseKeys<'common'>,
+              )}
               trans={card.trans}
             />
           ))}

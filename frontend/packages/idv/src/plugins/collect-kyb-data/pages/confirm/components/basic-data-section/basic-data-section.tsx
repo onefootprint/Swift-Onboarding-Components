@@ -49,7 +49,7 @@ const BasicDataSection = () => {
     basicInfo.push({
       text: t('basic-data.corporation-type'),
       subtext: t(
-        `kyb.pages.basic-data.form.corporation-type.mapping.${corporationType}`,
+        `kyb.pages.basic-data.form.corporation-type.mapping.${corporationType}` as unknown as TemplateStringsArray,
       ),
     });
   }
@@ -79,6 +79,7 @@ const BasicDataSection = () => {
   };
 
   const basicInfoDetails = basicInfo.map(
+    // @ts-ignore:next-line
     ({ text, subtext, textColor }: SectionItemProps) => (
       <SectionItem
         key={text}

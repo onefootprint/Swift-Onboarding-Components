@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Grid, TextArea, TextInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import type { ContactDialogData } from '../../contact-dialog.types';
 import { FormField } from '../../contact-dialog.types';
@@ -11,7 +11,9 @@ type FormProps = {
 };
 
 const Form = ({ onSubmit }: FormProps) => {
-  const { t } = useTranslation('components.contact-us-dialog');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.contact-us-dialog',
+  });
   const {
     register,
     handleSubmit,

@@ -1,8 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Grid, media } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
+import { useTranslation } from 'react-i18next';
 import FeatureCard from 'src/components/feature-card';
 
 import ChargebackDisputes from './illustrations/chargeback-disputes';
@@ -52,14 +53,16 @@ const cards = [
 ];
 
 const CardGrid = () => {
-  const { t } = useTranslation('pages.auth.endless-benefits.elements');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.auth.endless-benefits.elements',
+  });
   return (
     <Layout>
       {cards.map(({ translations, illustration, id, invertedGradient }) => (
         <FeatureCard
           size="compact"
-          title={t(`${translations}.title`)}
-          subtitle={t(`${translations}.subtitle`)}
+          title={t(`${translations}.title` as ParseKeys<'common'>)}
+          subtitle={t(`${translations}.subtitle` as ParseKeys<'common'>)}
           gridArea={translations}
           key={id}
           invertedGradient={!isMobile ? invertedGradient : id % 2 === 0}

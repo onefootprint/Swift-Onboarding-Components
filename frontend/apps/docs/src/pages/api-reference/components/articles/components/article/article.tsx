@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Box, media, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Element } from 'react-scroll';
 
 import type {
@@ -26,7 +26,7 @@ type ArticleProps = {
 const CONTENT_WIDTH = 900;
 
 const Article = ({ article }: ArticleProps) => {
-  const { t } = useTranslation('pages.api-reference');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
   const {
     id,
     parameters,

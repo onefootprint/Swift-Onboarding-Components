@@ -32,9 +32,9 @@ const ManagePhone = ({ children, Header }: ManagePhoneProps) => {
           validator={handlePhoneValidation}
           texts={{
             cta: t('continue'),
-            phoneInvalid: t('email-step.form.input-invalid'),
-            phoneLabel: t('email-step.form.input-label'),
-            phoneRequired: t('email-step.form.input-required'),
+            phoneInvalid: t('phone-step.form.input-invalid'),
+            phoneLabel: t('phone-step.form.input-label'),
+            phoneRequired: t('phone-step.form.input-required'),
           }}
         />
       </Stack>

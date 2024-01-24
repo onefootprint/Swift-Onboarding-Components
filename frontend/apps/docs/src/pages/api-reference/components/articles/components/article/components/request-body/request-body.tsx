@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Box, createFontStyles, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Content } from '@/api-reference/api-reference.types';
 import { getSchemaFromComponent } from '@/api-reference/utils/get-schemas';
@@ -13,7 +13,7 @@ type RequestBodyProps = {
 };
 
 const RequestBody = ({ requestBody }: RequestBodyProps) => {
-  const { t } = useTranslation('pages.api-reference');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
   const schema = getSchemaFromComponent(requestBody);
   const isOptional = !requestBody?.required;
 

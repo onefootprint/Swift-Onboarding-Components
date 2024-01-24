@@ -1,5 +1,5 @@
-import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import DeveloperExperience from '../../components/developer-experience';
 import PenguinBanner from '../../components/penguin-banner';
@@ -10,7 +10,7 @@ import Hero from './components/sections/hero';
 import StoreData from './components/sections/store-data';
 
 const KYC = () => {
-  const { t } = useTranslation('pages.kyc');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.kyc' });
 
   return (
     <>

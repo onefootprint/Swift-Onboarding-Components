@@ -3,18 +3,17 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpBackend from 'i18next-http-backend';
 import { initReactI18next } from 'react-i18next';
 
-const IS_DEV = process.env.NODE_ENV === 'development';
 const IS_BROWSER = typeof window !== 'undefined';
 
-const configureReactI18next = () => {
+const configureI18n = () => {
   i18next
     .use(HttpBackend)
     .use(LanguageDetector)
     .use(initReactI18next)
     .init({
-      debug: IS_DEV,
+      debug: false,
       defaultNS: 'common',
-      ns: ['common', 'idv', 'ui'],
+      ns: ['common', 'ui', 'idv'],
       interpolation: {
         escapeValue: false,
       },
@@ -51,4 +50,4 @@ const configureReactI18next = () => {
   return i18next;
 };
 
-export default configureReactI18next;
+export default configureI18n;

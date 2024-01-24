@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Box, media } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Seo from 'src/components/seo/seo';
 
 import staticAPIData from './assets/api-docs.json';
@@ -15,7 +15,7 @@ const staticArticles = getArticles(staticAPIData);
 const staticPreviewArticles = getArticles(staticPreviewAPIData);
 
 const ApiReference = () => {
-  const { t } = useTranslation('pages.api-reference');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.api-reference' });
 
   const sections = [
     {

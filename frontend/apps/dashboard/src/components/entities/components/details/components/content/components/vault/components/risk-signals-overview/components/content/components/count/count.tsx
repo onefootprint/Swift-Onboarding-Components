@@ -1,9 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { RiskSignal } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
-import { Trans } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 export type CountProps = {
   high?: RiskSignal[];
@@ -12,7 +11,7 @@ export type CountProps = {
 };
 
 const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
-  const { t } = useTranslation('pages.entity.risks');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.risks' });
   const hasHighRisks = high.length > 0;
   const hasMediumRisks = medium.length > 0;
   const hasLowRisks = low.length > 0;

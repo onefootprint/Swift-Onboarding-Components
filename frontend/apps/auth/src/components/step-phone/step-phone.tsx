@@ -1,9 +1,10 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { checkIsPhoneValid, EmailPreview, PhoneForm } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import { Stack } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useIdentify } from '@/src/queries';
 import { useAuthMachine } from '@/src/state';
@@ -23,7 +24,7 @@ const StepPhone = ({ children, Header }: StepPhoneProps) => {
     obConfigAuth,
     config: { isLive },
   } = state.context;
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation('common', { keyPrefix: 'auth' });
   const mutIdentify = useIdentify({ obConfigAuth, sandboxId });
   const showRequestErrorToast = useRequestErrorToast();
 

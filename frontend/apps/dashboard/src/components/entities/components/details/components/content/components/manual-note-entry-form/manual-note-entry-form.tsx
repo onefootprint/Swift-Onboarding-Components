@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { OrgFrequentNoteKind } from '@onefootprint/types';
 import { Divider, Toggle, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import FrequentNotesTextArea from 'src/components/frequent-notes-text-area';
 
 export type ManualNoteFormData = {
@@ -26,7 +26,9 @@ const ManualNoteEntryForm = ({
   onSubmit,
   frequentNoteKind,
 }: ManualNoteEntryFormProps) => {
-  const { t } = useTranslation('pages.entity.manual-note-entry-form');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.manual-note-entry-form',
+  });
   const methods = useForm<ManualNoteFormData>({
     defaultValues: { note: '', isPinned: false },
   });

@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Drawer } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useFilters from '@/playbooks/hooks/use-filters';
 import usePlaybook from '@/playbooks/hooks/use-playbook';
@@ -10,7 +10,7 @@ import Error from './components/error';
 import Loading from './components/loading';
 
 const Details = () => {
-  const { t, allT } = useTranslation('pages.playbooks.details');
+  const { t } = useTranslation('common');
   const { query, push } = useFilters();
   const isOpen = !!query.onboarding_config_id;
   const { data, isLoading, errorMessage } = usePlaybook(
@@ -19,11 +19,9 @@ const Details = () => {
 
   const getDrawerTitle = () => {
     if (data) {
-      return t('title');
+      return t('pages.playbooks.details.title');
     }
-    return isLoading
-      ? allT('notifications.loading')
-      : allT('notifications.error');
+    return isLoading ? t('notifications.loading') : t('notifications.error');
   };
 
   const handleClose = () => {

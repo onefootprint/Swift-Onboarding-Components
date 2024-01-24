@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { PreviousWatchlistChecksEventData } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import PreviousWatchlistCheckEvents from './components/previous-watchlist-check-events';
 
@@ -12,9 +12,9 @@ type WatchlistCheckEventHeaderProps = {
 const WatchlistCheckEventHeader = ({
   data,
 }: WatchlistCheckEventHeaderProps) => {
-  const { t } = useTranslation(
-    'pages.entity.audit-trail.timeline.watchlist-check-event',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.audit-trail.timeline.watchlist-check-event',
+  });
 
   return (
     <>

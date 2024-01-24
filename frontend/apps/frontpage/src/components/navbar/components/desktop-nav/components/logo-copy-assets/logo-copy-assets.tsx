@@ -1,12 +1,13 @@
 import { primitives } from '@onefootprint/design-tokens';
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoDownload16, ThemedLogoFpCompact } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Dropdown, Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import { useRouter } from 'next/router';
 import type { MouseEvent } from 'react';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const assetsToCopy = [
   {
@@ -28,7 +29,9 @@ const LogoCopyAssets = ({
   href = FRONTPAGE_BASE_URL,
   isOnDarkSection,
 }: LogoCopyAssetsProps) => {
-  const { t } = useTranslation('components.navbar.save-assets');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.navbar.save-assets',
+  });
   const router = useRouter();
   const [showOptions, setShowOptions] = useState(false);
 
@@ -83,7 +86,10 @@ const LogoCopyAssets = ({
         {assetsToCopy.map(asset => (
           <StyledItem key={asset.label} onClick={handleSave(asset.label)}>
             <IcoDownload16 color="tertiary" />
-            <Typography variant="body-2"> {t(asset.label)} </Typography>
+            <Typography variant="body-2">
+              {' '}
+              {t(asset.label as ParseKeys<'common'>)}{' '}
+            </Typography>
           </StyledItem>
         ))}
       </Dropdown.Content>

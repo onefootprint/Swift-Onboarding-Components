@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24, IcoClose24 } from '@onefootprint/icons';
 import type { CreateProxyConfigRequest } from '@onefootprint/types';
 import { Dialog as FPDialog, useConfirmationDialog } from '@onefootprint/ui';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { FormData } from 'src/pages/proxy-configs/proxy-configs.types';
 
 import FormWizard from './components/form-wizard';
@@ -16,7 +16,10 @@ type DialogProps = {
 };
 
 const Dialog = ({ onClose, open, defaultValues }: DialogProps) => {
-  const { t, allT } = useTranslation('pages.proxy-configs.create.form');
+  const { t: allT } = useTranslation('common');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.proxy-configs.create.form',
+  });
   const mutation = useCreateProxyConfig();
   const confirmationDialog = useConfirmationDialog();
   const [stepIndex, setStepIndex] = useState(0);
@@ -45,14 +48,14 @@ const Dialog = ({ onClose, open, defaultValues }: DialogProps) => {
 
   const confirmBeforeClosing = () => {
     confirmationDialog.open({
-      title: allT('confirm.title'),
-      description: allT('confirm.description'),
+      title: t('confirm.title'),
+      description: t('confirm.description'),
       primaryButton: {
-        label: allT('confirm.cta'),
+        label: t('confirm.cta'),
         onClick: onClose,
       },
       secondaryButton: {
-        label: allT('confirm.cancel'),
+        label: t('confirm.cancel'),
       },
     });
   };

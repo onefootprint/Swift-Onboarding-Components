@@ -1,7 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Stack } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import IllustrationContainer from '../illustration-container';
 import Event from './components/event';
@@ -9,15 +10,18 @@ import Event from './components/event';
 const translations = ['ios', 'mac', 'collected'];
 
 const SecurityLogs = () => {
-  const { t } = useTranslation(
-    'pages.auth.endless-benefits.elements.security-logs',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.auth.endless-benefits.elements.security-logs',
+  });
   return (
     <StyledIllustrationContainer>
       <Background />
       <Events direction="column" gap={9}>
         {translations.map(translation => (
-          <Event text={t(`logs.${translation}`)} key={translation} />
+          <Event
+            text={t(`logs.${translation}` as ParseKeys<'common'>)}
+            key={translation}
+          />
         ))}
       </Events>
     </StyledIllustrationContainer>

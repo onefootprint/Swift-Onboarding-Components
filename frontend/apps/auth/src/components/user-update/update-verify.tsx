@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { useToast } from '@onefootprint/ui';
 import noop from 'lodash/fp/noop';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useEffectOnceStrict } from '@/src/hooks';
 import type { UserChallengeBody, UserChallengeResponse } from '@/src/queries';
@@ -40,7 +40,7 @@ const UpdateVerify = ({
   onChallengeVerificationSuccess,
 }: UpdateVerifyProps) => {
   const { authToken } = challengePayload;
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation('common', { keyPrefix: 'auth' });
   const toast = useToast();
   const mutUserChallenge = useUserChallenge({});
   const mutUserChallengeVerify = useUserChallengeVerify({});

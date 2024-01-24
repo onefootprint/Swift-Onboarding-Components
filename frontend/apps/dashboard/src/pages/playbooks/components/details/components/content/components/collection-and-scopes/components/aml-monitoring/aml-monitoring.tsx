@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { type OnboardingConfig } from '@onefootprint/types';
 import { Divider, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import CollectedInformation from '@/playbooks/components/collected-information';
 
@@ -15,7 +15,9 @@ const AmlMonitoring = ({
     enhancedAml: { enhancedAml, ofac, pep, adverseMedia },
   },
 }: AmlMonitoringProps) => {
-  const { t } = useTranslation('pages.playbooks.details.aml-monitoring');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.details.aml-monitoring',
+  });
 
   return (
     <Container>

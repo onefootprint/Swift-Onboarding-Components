@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { RequestError } from '@onefootprint/request';
 import request, { getErrorMessage } from '@onefootprint/request';
 import type { OrgAuthLoginResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'react-i18next';
 
 const login = async (code: string) => {
   const response = await request<OrgAuthLoginResponse>({
@@ -17,7 +17,7 @@ const login = async (code: string) => {
 };
 
 const useLogin = () => {
-  const { t } = useTranslation('pages.auth');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.auth' });
   const router = useRouter();
   const toast = useToast();
 

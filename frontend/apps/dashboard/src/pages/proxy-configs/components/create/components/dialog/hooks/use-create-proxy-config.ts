@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import request, { getErrorMessage } from '@onefootprint/request';
 import type {
   CreateProxyConfigRequest,
@@ -6,6 +5,7 @@ import type {
 } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
@@ -24,7 +24,9 @@ const createProxyConfig = async (
 };
 
 const useCreateProxyConfig = () => {
-  const { t } = useTranslation('pages.proxy-configs.notifications.create');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.proxy-configs.notifications.create',
+  });
   const toast = useToast();
   const session = useSession();
   const queryClient = useQueryClient();

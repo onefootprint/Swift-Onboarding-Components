@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { Role } from '@onefootprint/types';
 import { RoleScopeKind } from '@onefootprint/types';
 import { Dropdown, Stack } from '@onefootprint/ui';
 import React, { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import PermissionGate from 'src/components/permission-gate';
 
 import type { EditHandler } from './components/edit';
@@ -17,7 +17,9 @@ export type ActionsProps = {
 
 const Actions = ({ role }: ActionsProps) => {
   const { name } = role;
-  const { t } = useTranslation('pages.settings.roles.table.actions');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.roles.table.actions',
+  });
   const removeRef = useRef<RemoveHandler>(null);
   const editRef = useRef<EditHandler>(null);
 

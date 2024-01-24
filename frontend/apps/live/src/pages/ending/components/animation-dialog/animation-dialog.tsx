@@ -1,10 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheck24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import Rive from '@rive-app/react-canvas';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTimeout } from 'usehooks-ts';
 
 import Sparkles from '../sparkles';
@@ -44,7 +44,7 @@ type AnimationDialogContentProps = {
 };
 
 const AnimationDialog = ({ onClose }: AnimationDialogContentProps) => {
-  const { t } = useTranslation('ending');
+  const { t } = useTranslation('common', { keyPrefix: 'ending' });
   const [showIdAnimation, setShowIdAnimation] = useState(true);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showEndMessage, setShowEndMessage] = useState(false);

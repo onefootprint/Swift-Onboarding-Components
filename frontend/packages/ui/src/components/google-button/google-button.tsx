@@ -38,7 +38,7 @@ const GoogleButton = ({
       variant="secondary"
       prefixIcon={IcoGoogle24}
     >
-      {children ?? t('components.google-button.text-default')}
+      {children ?? t('components.google-button.children-default')}
     </Button>
   );
 };

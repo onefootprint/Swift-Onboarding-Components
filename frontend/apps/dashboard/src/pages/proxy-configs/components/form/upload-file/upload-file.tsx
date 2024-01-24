@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { Icon } from '@onefootprint/icons';
 import { IcoTrash16 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
@@ -13,6 +12,7 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type UploadFileProps = {
   accept: string;
@@ -35,7 +35,9 @@ const UploadFile = ({
   onChange,
   onRemove,
 }: UploadFileProps) => {
-  const { t } = useTranslation('pages.proxy-configs.create.form.upload-file');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.proxy-configs.create.form.upload-file',
+  });
   const [fileName, setFileName] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 

@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import { Box, Divider } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import SectionHeader from 'src/components/section-header';
 import useOrg from 'src/hooks/use-org';
 
@@ -11,7 +11,9 @@ import Error from './components/error';
 import Loading from './components/loading';
 
 const BusinessProfile = () => {
-  const { t } = useTranslation('pages.settings.business-profile');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.business-profile',
+  });
   const { isLoading, error, data } = useOrg();
 
   return (

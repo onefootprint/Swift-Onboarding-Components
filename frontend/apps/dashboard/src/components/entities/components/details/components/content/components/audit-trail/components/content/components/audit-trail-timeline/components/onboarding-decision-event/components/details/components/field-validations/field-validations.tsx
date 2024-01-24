@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Timeline from 'src/components/timeline';
 
 import useEntityMatchSignals from '../../hooks/use-entity-match-signals';
@@ -18,9 +18,10 @@ export type FieldValidationsProps = {
 };
 
 const FieldValidations = ({ entityId }: FieldValidationsProps) => {
-  const { t } = useTranslation(
-    'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.drawer',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix:
+      'pages.entity.audit-trail.timeline.onboarding-decision-event.not-verified-details.drawer',
+  });
   const { data, isError, error, isLoading } = useEntityMatchSignals({
     id: entityId,
   });

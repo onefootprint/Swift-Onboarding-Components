@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoAppclip16,
   IcoBolt16,
@@ -10,6 +9,7 @@ import styled, { css } from '@onefootprint/styled';
 import { EntityKind } from '@onefootprint/types';
 import { Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { displayForUserAgent, icoForUserAgent } from 'src/utils/user-agent';
 
 import { useEntityContext } from '@/entity/hooks/use-entity-context';
@@ -38,7 +38,9 @@ const FloatingBox = ({
   region,
   userAgent,
 }: FloatingBoxProps) => {
-  const { t } = useTranslation('pages.entity.device-insights');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.device-insights',
+  });
   const context = useEntityContext();
   const userAgentText = userAgent || '';
   const fullRegion = getRegion(city, region);

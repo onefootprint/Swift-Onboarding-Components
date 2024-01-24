@@ -1,7 +1,8 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IdDI, TriggerKind } from '@onefootprint/types';
 import { Dialog, useToast } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useEntity from '@/entity/hooks/use-entity';
 import useEntityId from '@/entity/hooks/use-entity-id';
@@ -16,7 +17,9 @@ export type RetriggerKYCDialogProps = {
 };
 
 const RetriggerKYCDialog = ({ open, onClose }: RetriggerKYCDialogProps) => {
-  const { t } = useTranslation('pages.entity.actions.retrigger-kyc');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.actions.retrigger-kyc',
+  });
   const submitRetriggerKYCMutation = useRetriggerKYC();
   const showRequestErrorToast = useRequestErrorToast();
   const toast = useToast();

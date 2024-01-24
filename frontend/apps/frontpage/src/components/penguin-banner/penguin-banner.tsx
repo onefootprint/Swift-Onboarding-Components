@@ -1,8 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { Container, createFontStyles, media, Stack } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ContactButtons from '../contact-buttons';
 
@@ -17,7 +18,9 @@ const PenguinBanner = ({
   section = 'home',
   isDarkTheme,
 }: PenguinBannerProps) => {
-  const { t } = useTranslation('components.penguin-banner');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.penguin-banner',
+  });
 
   return (
     <StyledContainer>
@@ -26,7 +29,7 @@ const PenguinBanner = ({
           src={imgSrc}
           height={600}
           width={900}
-          alt={t(`${section}.alt-img`)}
+          alt={t(`${section}.alt-img` as ParseKeys<'common'>)}
         />
         <Stack
           direction="column"
@@ -36,10 +39,12 @@ const PenguinBanner = ({
           justify="center"
           maxWidth="960px"
         >
-          <Title isDarkTheme={isDarkTheme}>{t(`${section}.title`)}</Title>
+          <Title isDarkTheme={isDarkTheme}>
+            {t(`${section}.title` as ParseKeys<'common'>)}
+          </Title>
           <ContactButtons
-            bookADemoButton={t(`${section}.secondary`)}
-            signUpButton={t(`${section}.primary`)}
+            bookADemoButton={t(`${section}.secondary` as ParseKeys<'common'>)}
+            signUpButton={t(`${section}.primary` as ParseKeys<'common'>)}
             justify="center"
           />
         </Stack>

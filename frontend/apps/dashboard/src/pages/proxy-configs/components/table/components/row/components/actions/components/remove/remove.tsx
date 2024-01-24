@@ -1,9 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import type { ProxyConfig } from '@onefootprint/types';
 import { createFontStyles } from '@onefootprint/ui';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import { Trans } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import ConfirmationDialog from 'src/components/confirmation-dialog';
 
 import useRemoveProxyConfig from './hooks/use-remove-proxy-config';
@@ -18,7 +17,9 @@ export type RemoveProps = {
 
 const Remove = forwardRef<RemoveHandler, RemoveProps>(
   ({ proxyConfig }, ref) => {
-    const { t } = useTranslation('pages.proxy-configs.actions.remove');
+    const { t } = useTranslation('common', {
+      keyPrefix: 'pages.proxy-configs.actions.remove',
+    });
     const [open, setOpen] = useState(false);
     const mutation = useRemoveProxyConfig(proxyConfig);
 

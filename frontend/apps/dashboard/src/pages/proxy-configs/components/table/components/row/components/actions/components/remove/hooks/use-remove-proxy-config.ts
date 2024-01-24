@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import request, { getErrorMessage } from '@onefootprint/request';
 import type { ProxyConfig } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import type { AuthHeaders } from 'src/hooks/use-session';
 import useSession from 'src/hooks/use-session';
 
@@ -17,7 +17,9 @@ const removeProxyConfig = async (authHeaders: AuthHeaders, id: string) => {
 };
 
 const useRemoveProxyConfig = (proxyConfig: ProxyConfig) => {
-  const { t } = useTranslation('pages.proxy-configs.notifications.remove');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.proxy-configs.notifications.remove',
+  });
   const toast = useToast();
   const session = useSession();
   const queryClient = useQueryClient();

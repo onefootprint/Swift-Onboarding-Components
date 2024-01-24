@@ -1,10 +1,11 @@
-import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import type { OnboardingConfigKind } from '@onefootprint/types';
 import { Stepper, useToast } from '@onefootprint/ui';
 import { useMachine } from '@xstate/react';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { getAuthFixedPayload, isAuth } from '@/playbooks/utils/kind';
 import playbookMachine from '@/playbooks/utils/machine';
@@ -32,7 +33,9 @@ export type RouterProps = {
 const Router = ({ onCreate }: RouterProps) => {
   const [state, send] = useMachine(playbookMachine);
   const { kind } = state.context;
-  const { t } = useTranslation('pages.playbooks.dialog');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.dialog',
+  });
   const toast = useToast();
   const showRequestError = useRequestErrorToast();
   const mutation = useCreatePlaybook();

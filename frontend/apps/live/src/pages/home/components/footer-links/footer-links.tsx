@@ -1,11 +1,11 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
 import { Stack, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const FooterLinks = () => {
-  const { t } = useTranslation('home.legal-documents');
+  const { t } = useTranslation('common', { keyPrefix: 'home.legal-documents' });
 
   return (
     <Container direction="row" gap={5}>

@@ -1,5 +1,5 @@
-import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Fieldset from '../fieldset';
 import Form from './components/form';
@@ -9,7 +9,9 @@ export type NameProps = {
 };
 
 const Name = ({ value }: NameProps) => {
-  const { t } = useTranslation('pages.settings.business-profile.name');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.business-profile.name',
+  });
 
   return (
     <Fieldset label={t('label')} value={value}>

@@ -1,9 +1,10 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { SupportedIdDocTypes } from '@onefootprint/types';
 import { Tag, Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import kebabCase from 'lodash/kebabCase';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type SectionProps = {
   displayScopes: string[];
@@ -18,7 +19,9 @@ const Section = ({
   displayScopes,
   docScanForOptionalSsn,
 }: SectionProps) => {
-  const { t } = useTranslation('pages.playbooks.collected-data');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.playbooks.collected-data',
+  });
 
   const dataToDisplay = canAccessData.filter(
     scope =>
@@ -48,7 +51,7 @@ const Section = ({
       </Typography>
       <TagContainer>
         {dataToDisplay.map(field => (
-          <Tag key={field}>{t(kebabCase(field))}</Tag>
+          <Tag key={field}>{t(kebabCase(field) as ParseKeys<'common'>)}</Tag>
         ))}
       </TagContainer>
     </Container>

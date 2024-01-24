@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type { LivenessEventData } from '@onefootprint/types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import createStringList from 'src/utils/create-string-list';
 
 import EventBodyEntry from '../event-body-entry';
@@ -10,9 +10,9 @@ type LivenessEventBodyProps = {
 };
 
 const LivenessEventBody = ({ data }: LivenessEventBodyProps) => {
-  const { t } = useTranslation(
-    'pages.entity.audit-trail.timeline.liveness-event',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.audit-trail.timeline.liveness-event',
+  });
   const {
     insightEvent: { ipAddress },
     attributes,

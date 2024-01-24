@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { EntityKind } from '@onefootprint/types';
 import { Box, Dialog, Typography } from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTimeout } from 'usehooks-ts';
 
 import useEntities from '../../hooks/use-entities/use-entities';
@@ -13,7 +13,7 @@ const TIME_TO_SHOW_DIALOG = 1000;
 
 const IntroDialog = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { t } = useTranslation('pages.entities.intro');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.entities.intro' });
   const { data: onboardings } = useOnboardingConfigs();
   const { data: entities } = useEntities(EntityKind.person);
   const router = useRouter();

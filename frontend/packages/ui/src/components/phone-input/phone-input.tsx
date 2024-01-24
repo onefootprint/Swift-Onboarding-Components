@@ -1,5 +1,6 @@
 import { COUNTRIES, REGION_CODES } from '@onefootprint/global-constants';
 import type { CountryCode } from '@onefootprint/types';
+import type { ParseKeys } from 'i18next';
 import React, { forwardRef, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import mergeRefs from 'react-merge-refs';
@@ -47,7 +48,7 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
     const getCountriesWithLocalizedLabels = () =>
       options.map(option => ({
         ...option,
-        label: t(`global.countries.${option.value}`),
+        label: t(`global.countries.${option.value}` as ParseKeys<'ui'>),
       }));
 
     const localizedOptions = getCountriesWithLocalizedLabels();

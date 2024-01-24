@@ -1,7 +1,7 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { Box, Stack, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Create from './components/create';
 import Details from './components/details';
@@ -9,7 +9,7 @@ import Table from './components/table';
 import useProxyConfigs from './hooks/use-proxy-configs';
 
 const ProxyConfigs = () => {
-  const { t } = useTranslation('pages.proxy-configs');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.proxy-configs' });
   const { data, errorMessage, isLoading } = useProxyConfigs();
 
   return (

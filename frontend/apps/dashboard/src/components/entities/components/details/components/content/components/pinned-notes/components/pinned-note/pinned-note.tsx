@@ -1,8 +1,8 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoQuoteLeft16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Box, LinkButton, Stack, Typography } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import TruncatedText from '@/entities/components/details/components/truncated-text';
 import useCurrentEntityUpdateAnnotation from '@/entity/hooks/use-current-entity-update-annotation';
@@ -17,7 +17,9 @@ export type PinnedNoteProps = {
 const DEFAULT_TEXT_VIEW_HEIGHT = 60;
 
 const PinnedNote = ({ note, author, timestamp, noteId }: PinnedNoteProps) => {
-  const { t } = useTranslation('pages.entity.pinned-notes');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.pinned-notes',
+  });
   const updateMutation = useCurrentEntityUpdateAnnotation();
 
   const handleUnpinNote = (annotationId: string) => {

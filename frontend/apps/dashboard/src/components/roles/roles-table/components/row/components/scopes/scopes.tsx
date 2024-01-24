@@ -1,8 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { RoleScope } from '@onefootprint/types';
 import { Tag } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import groupScopes from 'src/components/roles/utils/group-scopes';
 
 import DecryptOptions from '../decrypt-options';
@@ -13,7 +14,7 @@ export type ScopesProps = {
 };
 
 const Scopes = ({ scopes }: ScopesProps) => {
-  const { t } = useTranslation('pages.settings.roles');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.settings.roles' });
   const { isAdmin, decryptOptions, basicScopes, vaultProxyOptions } =
     groupScopes(scopes);
 
@@ -23,9 +24,13 @@ const Scopes = ({ scopes }: ScopesProps) => {
 
   return (
     <Tags>
-      {basicScopes.map(scope => (
-        <Tag key={scope.kind}>{t(`scopes.${scope.kind}`)}</Tag>
-      ))}
+      {basicScopes.map(scope => {
+        const label = t(
+          `scopes.${scope.kind}` as ParseKeys<'common'>,
+        ) as unknown as string;
+
+        return <Tag key={scope.kind}>{label}</Tag>;
+      })}
       <DecryptOptions options={decryptOptions} as={Tag} />
       <VaultProxyOptions options={vaultProxyOptions} as={Tag} />
     </Tags>

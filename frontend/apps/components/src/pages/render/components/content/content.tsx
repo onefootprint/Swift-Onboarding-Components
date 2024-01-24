@@ -2,6 +2,7 @@ import type { FootprintRenderDataProps } from '@onefootprint/footprint-js';
 import { Logger } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import type { DataIdentifier } from '@onefootprint/types';
+import type { ParseKeys } from 'i18next';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useProps from 'src/components/footprint-provider/hooks/use-props';
@@ -103,7 +104,7 @@ const Content = ({ fallback }: ContentProps) => {
     <RenderBase
       isHidden={isHidden}
       onToggleHidden={showHiddenToggle ? handleToggleHidden : undefined}
-      label={label ?? t(`di.${id}`)}
+      label={label ?? t(`di.${id}` as ParseKeys<'common'>)}
       value={value}
       mask={mask}
       canCopy={canCopy}

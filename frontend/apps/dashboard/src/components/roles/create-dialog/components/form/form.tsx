@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import type {
   CreateRoleRequest,
   RoleKind,
@@ -9,6 +8,7 @@ import { RoleScopeKind } from '@onefootprint/types';
 import { Box, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import { DecryptOptionToRoleScope } from '../../../hooks/use-decrypt-options';
 import { scopeFromVaultProxyOption } from '../../../hooks/use-vault-proxy-options';
@@ -33,7 +33,9 @@ const Form = ({
   },
   kind,
 }: FormProps) => {
-  const { t } = useTranslation('pages.settings.roles.form');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.roles.form',
+  });
   const formMethods = useForm<FormData>({ defaultValues });
   const {
     register,

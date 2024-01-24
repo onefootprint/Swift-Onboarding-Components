@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoMessage16 } from '@onefootprint/icons';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import SupportDialog from '../support-dialog';
 import SupportListItem from '../support-list-item';
@@ -9,7 +9,9 @@ const GET_FORM_URL =
   'https://getform.io/f/037045de-1c04-421c-a274-429812dacb45';
 
 const SendFeedback = () => {
-  const { t } = useTranslation('components.navigation-footer.send-feedback');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.navigation-footer.send-feedback',
+  });
   const [showDialog, setShowDialog] = useState(false);
 
   const handleClickTrigger = () => {

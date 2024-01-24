@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoLinkedin24,
   IcoTwitter24,
@@ -6,9 +5,11 @@ import {
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Container, Divider, media, Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import FooterLink from './components/footer-link';
 
@@ -30,7 +31,7 @@ const resourcesLinks = [
 const developerLinks = ['docs', 'status'];
 
 const Footer = () => {
-  const { t } = useTranslation('components.footer');
+  const { t } = useTranslation('common', { keyPrefix: 'components.footer' });
   return (
     <>
       <Divider />
@@ -87,8 +88,8 @@ const Footer = () => {
               {productLinks.map(link => (
                 <FooterLink
                   key={link}
-                  text={t(`links.product.${link}.text`)}
-                  href={t(`links.product.${link}.href`)}
+                  text={t(`links.product.${link}.text` as ParseKeys<'common'>)}
+                  href={t(`links.product.${link}.href` as ParseKeys<'common'>)}
                 />
               ))}
             </SectionColumn>
@@ -99,8 +100,8 @@ const Footer = () => {
               {companyLinks.map(link => (
                 <FooterLink
                   key={link}
-                  text={t(`links.company.${link}.text`)}
-                  href={t(`links.company.${link}.href`)}
+                  text={t(`links.company.${link}.text` as ParseKeys<'common'>)}
+                  href={t(`links.company.${link}.href` as ParseKeys<'common'>)}
                 />
               ))}
             </SectionColumn>
@@ -111,8 +112,12 @@ const Footer = () => {
               {developerLinks.map(link => (
                 <FooterLink
                   key={link}
-                  text={t(`links.developers.${link}.text`)}
-                  href={t(`links.developers.${link}.href`)}
+                  text={t(
+                    `links.developers.${link}.text` as ParseKeys<'common'>,
+                  )}
+                  href={t(
+                    `links.developers.${link}.href` as ParseKeys<'common'>,
+                  )}
                 />
               ))}
             </SectionColumn>
@@ -123,8 +128,12 @@ const Footer = () => {
               {resourcesLinks.map(link => (
                 <FooterLink
                   key={link}
-                  text={t(`links.resources.${link}.text`)}
-                  href={t(`links.resources.${link}.href`)}
+                  text={t(
+                    `links.resources.${link}.text` as ParseKeys<'common'>,
+                  )}
+                  href={t(
+                    `links.resources.${link}.href` as ParseKeys<'common'>,
+                  )}
                 />
               ))}
             </SectionColumn>

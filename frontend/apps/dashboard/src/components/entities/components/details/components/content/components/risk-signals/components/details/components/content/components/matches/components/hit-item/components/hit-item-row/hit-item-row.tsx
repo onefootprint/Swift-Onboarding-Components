@@ -1,4 +1,3 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoCopy16 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
 import type { AmlHitMedia } from '@onefootprint/types';
@@ -11,6 +10,7 @@ import {
   Typography,
 } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import toReadableString from './utils/to-readable-string';
 
@@ -27,9 +27,9 @@ const HitItemRow = ({
   handleShowAllFields,
   handleShowAmlMedia,
 }: HitItemRowProps) => {
-  const { t } = useTranslation(
-    'pages.entity.risk-signals.details.matches.hits',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.risk-signals.details.matches.hits',
+  });
 
   const renderMatchTypes = (matchTypes: string[]) =>
     matchTypes.map((str: string) => toReadableString(str)).join(', ');
@@ -88,7 +88,7 @@ const HitItemRow = ({
 
   const labelText =
     fieldName === 'showAll'
-      ? t('show-all.label', { count: fieldValue })
+      ? t('show-all.label', { count: fieldValue as number })
       : toReadableString(fieldName);
   return (
     <Box

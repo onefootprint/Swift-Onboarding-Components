@@ -1,5 +1,4 @@
 import type { Color } from '@onefootprint/design-tokens';
-import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoCheck16,
   IcoClose16,
@@ -10,7 +9,9 @@ import styled, { css } from '@onefootprint/styled';
 import type { WatchlistCheckEventData } from '@onefootprint/types';
 import { WatchlistCheckStatus } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import EventBodyEntry from '../event-body-entry';
 
@@ -41,17 +42,19 @@ const WatchlistCheckEventBody = ({
   data,
   lineHeight = 'large',
 }: WatchlistCheckEventBodyProps) => {
-  const { t } = useTranslation(
-    'pages.entity.audit-trail.timeline.watchlist-check-event',
-  );
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.audit-trail.timeline.watchlist-check-event',
+  });
   const { status, reasonCodes } = data;
   const isPass = status === WatchlistCheckStatus.pass;
   const color = textColors[status];
   const iconComponent = statusIcons[status];
-  let statusStr = t(`status.${status}`);
+  let statusStr = t(`status.${status}` as ParseKeys<'common'>) as string;
   if (!isPass && reasonCodes) {
     // Show some message specific to the reason codes
-    statusStr = t(`reason-codes.${reasonCodes[0]}`);
+    statusStr = t(
+      `reason-codes.${reasonCodes[0]}` as ParseKeys<'common'>,
+    ) as string;
   }
 
   return (

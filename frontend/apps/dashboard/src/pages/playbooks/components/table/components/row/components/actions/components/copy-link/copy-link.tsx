@@ -1,8 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import type { OnboardingConfig } from '@onefootprint/types';
 import { Box, Button, Dialog, TextInput, Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import getPermanentLink from '../../utils/get-permanent-link';
 
@@ -20,7 +21,9 @@ const CopyLink = forwardRef<CopyLinkHandler, CopyLinkProps>(
     const permanentLink = getPermanentLink(playbook);
     const [showSuccess, setShowSuccess] = useState(false);
 
-    const { t } = useTranslation('pages.playbooks.table.actions.copy-link');
+    const { t } = useTranslation('common', {
+      keyPrefix: 'pages.playbooks.table.actions.copy-link',
+    });
     useImperativeHandle(
       ref,
       () => ({
@@ -53,13 +56,13 @@ const CopyLink = forwardRef<CopyLinkHandler, CopyLinkProps>(
     return (
       <Dialog
         size="compact"
-        title={t(`${playbook.kind}.title`)}
+        title={t(`${playbook.kind}.title` as ParseKeys<'common'>)}
         open={open}
         onClose={handleClose}
       >
         <Content>
           <Typography variant="body-2">
-            {t(`${playbook.kind}.description`)}
+            {t(`${playbook.kind}.description` as ParseKeys<'common'>)}
           </Typography>
           <InputContainer>
             <TextInput

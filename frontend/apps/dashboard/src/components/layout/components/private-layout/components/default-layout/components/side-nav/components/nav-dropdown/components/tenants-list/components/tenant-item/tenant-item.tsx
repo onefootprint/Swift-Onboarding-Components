@@ -1,9 +1,9 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import type { GetAuthRolesOrg } from '@onefootprint/types';
 import { Dropdown, Tooltip } from '@onefootprint/ui';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type TenantItemProps = {
   tenant: GetAuthRolesOrg;
@@ -12,7 +12,9 @@ type TenantItemProps = {
 };
 
 const TenantItem = ({ tenant, onClick, isSelected }: TenantItemProps) => {
-  const { t } = useTranslation('components.private-layout.nav.tenants-list');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'components.private-layout.nav.tenants-list',
+  });
 
   return (
     <ItemContainer data-testid="tenant-item">

@@ -1,6 +1,6 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { useToast } from '@onefootprint/ui';
+import { useTranslation } from 'react-i18next';
 import type { VaultType } from 'src/components/entities/hooks/use-entity-vault-with-transforms';
 
 import type { EditSubmitData } from '../../../../vault.types';
@@ -8,7 +8,7 @@ import { Event, State, useEditMachine } from '../../../edit-machine';
 import useEditFields from './hooks/use-edit-fields';
 
 const useEditControls = () => {
-  const { t } = useTranslation('pages.entity.edit');
+  const { t } = useTranslation('common', { keyPrefix: 'pages.entity.edit' });
   const [state, send] = useEditMachine();
   const { context } = state;
   const editFields = useEditFields();
