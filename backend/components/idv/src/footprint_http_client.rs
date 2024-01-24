@@ -10,9 +10,9 @@ pub struct FootprintVendorHttpClient {
 impl FootprintVendorHttpClient {
     pub fn new() -> Result<Self, reqwest::Error> {
         let retry_policy = ExponentialBackoff::builder()
-            .retry_bounds(Duration::from_secs(1), Duration::from_secs(3))
+            .retry_bounds(Duration::from_millis(200), Duration::from_secs(3))
             .base(1)
-            .build_with_max_retries(2);
+            .build_with_max_retries(1);
         let client = ClientBuilder::new(reqwest::Client::new())
             // Will only retry if:
             // * The status was 5XX (server error)
