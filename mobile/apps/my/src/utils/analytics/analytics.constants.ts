@@ -14,6 +14,9 @@ export enum Events {
   PasskeyRegistrationSkipped = 'Passkeys registration skipped',
   PasskeyRegistrationNotSupported = 'Passkeys registration not supported',
 
+  // Attestation
+  AttestationFailed = 'Attestation failed',
+
   // Documents
   DocSelectionSubmitted = 'Doc type and country submitted',
   DocSelectionSubmittedFailed = 'Doc type and country submitted failed',

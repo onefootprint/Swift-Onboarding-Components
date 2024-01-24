@@ -8,6 +8,7 @@ import { useMutation } from '@tanstack/react-query';
 import { NativeModules, Platform } from 'react-native';
 
 import { AUTH_HEADER } from '@/config/constants';
+import { Events, useAnalytics } from '@/utils/analytics';
 
 const { DeviceAttestation } = NativeModules;
 
@@ -20,7 +21,11 @@ const getSignalsAsync = async (
       if (error) {
         reject(error);
       } else {
-        resolve(result.attestation);
+        if (!result.attestation) {
+          throw new Error('Attestation is empty');
+        } else {
+          resolve(result.attestation);
+        }
       }
     });
   });
@@ -76,6 +81,7 @@ const getAttestation = async ({
     deviceResponseJson,
     attestationChallenge,
   );
+  if (!attestation) return null;
   await createDeviceAttestation(authToken, {
     attestation,
     state,
@@ -83,6 +89,8 @@ const getAttestation = async ({
 };
 
 const useAttestDevice = () => {
+  const analytics = useAnalytics();
+
   return useMutation(
     ({
       authToken,
@@ -91,6 +99,11 @@ const useAttestDevice = () => {
       authToken: string;
       deviceResponseJson: string | null;
     }) => getAttestation({ authToken, deviceResponseJson }),
+    {
+      onError: error => {
+        analytics.track(Events.AttestationFailed, { error });
+      },
+    },
   );
 };
 
