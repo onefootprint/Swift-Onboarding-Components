@@ -1,3 +1,4 @@
+export { default as useDecryptUser } from './use-decrypt-user';
 export { default as useGetSdkArgs } from './use-get-sdk-args';
 export { default as useIdentify } from './use-identify';
 export { default as useIdentifyVerify } from './use-identify-verify';

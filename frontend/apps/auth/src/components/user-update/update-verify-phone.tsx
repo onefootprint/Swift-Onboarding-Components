@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useUserMachine } from '@/src/state';
 import type { HeaderProps } from '@/src/types';
-import { getLogger } from '@/src/utils';
+import { getLogger, isString } from '@/src/utils';
 
 import UpdateVerify from './update-verify';
 
@@ -12,7 +12,6 @@ type UpdateVerifyPhoneProps = {
   Header: (props: HeaderProps) => JSX.Element;
 };
 
-const isString = (x: unknown): x is string => typeof x === 'string';
 const { logWarn, logError } = getLogger('update-verify-phone');
 
 const UpdateVerifyPhone = ({ children, Header }: UpdateVerifyPhoneProps) => {

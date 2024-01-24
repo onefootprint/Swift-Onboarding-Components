@@ -1,6 +1,7 @@
 import { ChallengeKind } from '@onefootprint/types';
 
 import {
+  assignDecryptedData,
   assignEmail,
   assignEmailChallenge,
   assignEmailReplaceChallenge,
@@ -18,7 +19,7 @@ import type { UserMachineContext } from './types';
 const anyDate = new Date();
 
 describe('should pass the entire payload', () => {
-  test('assignEmail', () => {
+  it('assignEmail', () => {
     type Meta = Parameters<typeof assignEmail>['2'];
     const ctx = {} as UserMachineContext;
     const meta = {} as Meta;
@@ -33,7 +34,7 @@ describe('should pass the entire payload', () => {
     expect(result.email).toEqual(ctx.email);
   });
 
-  test('assignPhoneNumber', () => {
+  it('assignPhoneNumber', () => {
     type Meta = Parameters<typeof assignPhoneNumber>['2'];
     const ctx = {} as UserMachineContext;
     const meta = {} as Meta;
@@ -48,7 +49,7 @@ describe('should pass the entire payload', () => {
     expect(result.phoneNumber).toEqual(ctx.phoneNumber);
   });
 
-  test('assignPhoneReplaceChallenge', () => {
+  it('assignPhoneReplaceChallenge', () => {
     type Meta = Parameters<typeof assignPhoneReplaceChallenge>['2'];
     const ctx = {} as UserMachineContext;
     const data = {
@@ -77,7 +78,7 @@ describe('should pass the entire payload', () => {
     expect(phoneReplaceChallenge).toEqual(ctx.phoneReplaceChallenge);
   });
 
-  test('assignEmailChallenge', () => {
+  it('assignEmailChallenge', () => {
     type Meta = Parameters<typeof assignEmailChallenge>['2'];
     const ctx = {} as UserMachineContext;
     const data = {
@@ -108,7 +109,7 @@ describe('should pass the entire payload', () => {
     expect(result.emailChallenge).toEqual(ctx.emailChallenge);
   });
 
-  test('assignEmailReplaceChallenge', () => {
+  it('assignEmailReplaceChallenge', () => {
     type Meta = Parameters<typeof assignEmailReplaceChallenge>['2'];
     const ctx = {} as UserMachineContext;
     const data = {
@@ -137,7 +138,7 @@ describe('should pass the entire payload', () => {
     expect(emailReplaceChallenge).toEqual(ctx.emailReplaceChallenge);
   });
 
-  test('assignKindToChallenge', () => {
+  it('assignKindToChallenge', () => {
     type Meta = Parameters<typeof assignKindToChallenge>['2'];
     const ctx = {} as UserMachineContext;
     const meta = {} as Meta;
@@ -152,7 +153,7 @@ describe('should pass the entire payload', () => {
     expect(result.kindToChallenge).toEqual(ctx.kindToChallenge);
   });
 
-  test('assignPasskeyChallenge', () => {
+  it('assignPasskeyChallenge', () => {
     type Meta = Parameters<typeof assignPasskeyChallenge>['2'];
     const ctx = {} as UserMachineContext;
     const data = {
@@ -176,7 +177,7 @@ describe('should pass the entire payload', () => {
 });
 
 describe('machine assigners', () => {
-  test('should assign payload and replace asterisks to bullet: assignPhoneChallenge', () => {
+  it('should assign payload and replace asterisks to bullet: assignPhoneChallenge', () => {
     type Meta = Parameters<typeof assignPhoneChallenge>['2'];
     const ctx = {
       userDashboard: {
@@ -213,7 +214,7 @@ describe('machine assigners', () => {
     expect(result.userDashboard?.phone?.label).toEqual('1•••');
   });
 
-  test('should assign verified token and dashboard status: assignVerifyToken', () => {
+  it('should assign verified token and dashboard status: assignVerifyToken', () => {
     type Meta = Parameters<typeof assignVerifyToken>['2'];
     const ctx = {
       userDashboard: {
@@ -241,7 +242,7 @@ describe('machine assigners', () => {
     });
   });
 
-  test('should update dashboard entry: assignUserDashboard', () => {
+  it('should update dashboard entry: assignUserDashboard', () => {
     type Meta = Parameters<typeof assignUserDashboard>['2'];
     const ctx = {
       userDashboard: {
@@ -268,8 +269,38 @@ describe('machine assigners', () => {
     });
   });
 
+  it('should assign decrypted data to user dashboard: assignDecryptedData', () => {
+    type Meta = Parameters<typeof assignDecryptedData>['2'];
+    const ctx = {
+      userDashboard: {
+        email: { status: 'empty' },
+        phone: { status: 'empty' },
+        passkey: { status: 'empty' },
+      },
+    } as UserMachineContext;
+    const meta = {} as Meta;
+
+    const result = assignDecryptedData(
+      ctx,
+      {
+        type: 'decryptUserDone',
+        payload: {
+          'id.email': 'sandbox@onefootprint.com',
+          'id.phone_number': '+15555550100',
+        },
+      },
+      meta,
+    );
+
+    expect(result.userDashboard).toEqual({
+      email: { label: 'sandbox@onefootprint.com', status: 'set' },
+      passkey: { status: 'empty' },
+      phone: { label: '+15555550100', status: 'set' },
+    });
+  });
+
   describe('assignUserFound', () => {
-    test('should set values for kind, user dashboard and user found', () => {
+    it('should set values for kind, user dashboard and user found', () => {
       type Meta = Parameters<typeof assignUserFound>['2'];
       const ctx = {
         userDashboard: {
@@ -321,7 +352,7 @@ describe('machine assigners', () => {
       expect(result.userFound).toEqual(ctx.userFound);
     });
 
-    test('should not assign phone when challenge is not available', () => {
+    it('should not assign phone when challenge is not available', () => {
       type Meta = Parameters<typeof assignUserFound>['2'];
 
       const ctx = {

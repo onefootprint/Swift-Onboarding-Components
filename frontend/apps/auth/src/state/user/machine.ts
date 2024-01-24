@@ -1,9 +1,11 @@
-import type { IdentifyResponse } from '@onefootprint/types';
-import { ChallengeKind } from '@onefootprint/types';
+import type { ChallengeKind, IdentifyResponse } from '@onefootprint/types';
 import compose from 'lodash/fp/compose';
 import { assign, createMachine } from 'xstate';
 
+import { isEmail, isNotEmptyArray, isPasskey, isSms } from '@/src/utils';
+
 import {
+  assignDecryptedData,
   assignEmail,
   assignEmailChallenge,
   assignEmailReplaceChallenge,
@@ -24,19 +26,12 @@ type IdentifyPayload = { payload: IdentifyResponse };
 
 export type UserMachineArgs = { authToken: string };
 
-const { sms, email, biometric } = ChallengeKind;
-const isSms = (x: unknown): x is ChallengeKind.sms => x === sms;
-const isEmail = (x: unknown): x is ChallengeKind.email => x === email;
-const isPasskey = (x: unknown): x is ChallengeKind.biometric => x === biometric;
 const hasVerifyToken = (ctx: UserMachineContext) => Boolean(ctx.verifyToken);
 
 const getKindPayload = (_: Ignore, { payload }: KindPayload) => payload;
 const isPayloadEmail = compose(isEmail, getKindPayload);
 const isPayloadSms = compose(isSms, getKindPayload);
 const isPayloadPasskey = compose(isPasskey, getKindPayload);
-
-const isNotEmptyArray = (x: unknown): boolean =>
-  Array.isArray(x) && x.length > 0;
 
 const userOrChallengesNotFound = (_: Ignore, { payload }: IdentifyPayload) =>
   !payload.userFound || !isNotEmptyArray(payload.availableChallengeKinds);
@@ -72,6 +67,19 @@ const createUserMachine = (args: UserMachineArgs) =>
         userFound: undefined,
         verifyToken: undefined,
       },
+      on: {
+        decryptUserDone: {
+          actions: ['assignDecryptedData'],
+        },
+        setVerifyToken: {
+          target: 'dashboard',
+          actions: ['assignVerifyToken'],
+        },
+        updateUserDashboard: {
+          target: 'dashboard',
+          actions: ['assignUserDashboard'],
+        },
+      },
       states: {
         init: {
           always: [
@@ -102,20 +110,12 @@ const createUserMachine = (args: UserMachineArgs) =>
           on: {
             goToBack: { target: 'userFound' },
             setEmailChallenge: { actions: ['assignEmailChallenge'] },
-            setVerifyToken: {
-              target: 'dashboard',
-              actions: ['assignVerifyToken'],
-            },
           },
         },
         phoneChallenge: {
           on: {
             goToBack: { target: 'userFound' },
             setPhoneChallenge: { actions: ['assignPhoneChallenge'] },
-            setVerifyToken: {
-              target: 'dashboard',
-              actions: ['assignVerifyToken'],
-            },
           },
         },
         passkeyChallenge: {
@@ -127,10 +127,6 @@ const createUserMachine = (args: UserMachineArgs) =>
               actions: ['assignKindToChallenge'],
             },
             setPasskeyChallenge: { actions: ['assignPasskeyChallenge'] },
-            setVerifyToken: {
-              target: 'dashboard',
-              actions: ['assignVerifyToken'],
-            },
           },
         },
         dashboard: {
@@ -152,10 +148,6 @@ const createUserMachine = (args: UserMachineArgs) =>
         updateEmailVerify: {
           on: {
             goToBack: { target: 'dashboard' },
-            updateUserDashboard: {
-              target: 'dashboard',
-              actions: ['assignUserDashboard'],
-            },
             setEmailReplaceChallenge: {
               actions: ['assignEmailReplaceChallenge'],
             },
@@ -173,10 +165,6 @@ const createUserMachine = (args: UserMachineArgs) =>
         updatePhoneVerify: {
           on: {
             goToBack: { target: 'dashboard' },
-            updateUserDashboard: {
-              target: 'dashboard',
-              actions: ['assignUserDashboard'],
-            },
             setSmsReplaceChallenge: {
               actions: ['assignPhoneReplaceChallenge'],
             },
@@ -194,21 +182,22 @@ const createUserMachine = (args: UserMachineArgs) =>
     },
     {
       actions: {
+        assignDecryptedData: assign(assignDecryptedData),
         assignEmail: assign(assignEmail),
         assignEmailChallenge: assign(assignEmailChallenge),
         assignEmailReplaceChallenge: assign(assignEmailReplaceChallenge),
         assignKindToChallenge: assign(assignKindToChallenge),
         assignPasskeyChallenge: assign(assignPasskeyChallenge),
+        assignPhoneChallenge: assign(assignPhoneChallenge),
+        assignPhoneNumber: assign(assignPhoneNumber),
+        assignPhoneReplaceChallenge: assign(assignPhoneReplaceChallenge),
+        assignUserDashboard: assign(assignUserDashboard),
+        assignUserFound: assign(assignUserFound),
+        assignVerifyToken: assign(assignVerifyToken),
         // assignPasskeyReplaceChallenge: assign((ctx, { payload }) => {
         //   ctx.passkeyReplaceChallenge = payload;
         //   return ctx;
         // }),
-        assignPhoneChallenge: assign(assignPhoneChallenge),
-        assignPhoneNumber: assign(assignPhoneNumber),
-        assignPhoneReplaceChallenge: assign(assignPhoneReplaceChallenge),
-        assignUserFound: assign(assignUserFound),
-        assignVerifyToken: assign(assignVerifyToken),
-        assignUserDashboard: assign(assignUserDashboard),
       },
     },
   );

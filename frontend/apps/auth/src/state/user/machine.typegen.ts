@@ -13,6 +13,7 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
+    assignDecryptedData: 'decryptUserDone';
     assignEmail: 'setEmail';
     assignEmailChallenge: 'setEmailChallenge';
     assignEmailReplaceChallenge: 'setEmailReplaceChallenge';

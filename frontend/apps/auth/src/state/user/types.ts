@@ -1,6 +1,7 @@
 import type {
   ChallengeData,
   ChallengeKind,
+  DecryptUserResponse,
   IdentifyResponse,
 } from '@onefootprint/types';
 
@@ -32,6 +33,7 @@ export type UserMachineContext = {
 };
 
 export type UserMachineEvents =
+  | { type: 'decryptUserDone'; payload: DecryptUserResponse }
   | { type: 'goToBack' }
   | { type: 'goToChallenge'; payload: ChallengeKind }
   | { type: 'goToSmsChallenge' }

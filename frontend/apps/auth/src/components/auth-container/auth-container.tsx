@@ -1,9 +1,6 @@
 'use client';
 
-import {
-  FootprintComponentKind,
-  FootprintPublicEvent,
-} from '@onefootprint/footprint-js';
+import { FootprintPublicEvent } from '@onefootprint/footprint-js';
 import { useTranslation } from '@onefootprint/hooks';
 import type { DeviceInfo } from '@onefootprint/idv';
 import {
@@ -26,7 +23,7 @@ import type {
   ObKeyHeader,
   Variant,
 } from '@/src/types';
-import { isSdkUrlAllowed, sandboxIdEditRules } from '@/src/utils';
+import { isAuth, isSdkUrlAllowed, sandboxIdEditRules } from '@/src/utils';
 
 import { useFootprintProvider } from '../../provider-footprint';
 import useProps from '../../provider-footprint/hooks/use-props';
@@ -46,7 +43,6 @@ const initialDevice = { hasSupportForWebauthn: false, type: 'unknown' };
 const { canceled, closed, completed } = FootprintPublicEvent;
 
 const RenderNull = (): null => null;
-const isAuth = (x: unknown) => x === FootprintComponentKind.Auth;
 
 const getOnboardConfigurationKey = (key?: string): ObKeyHeader | undefined =>
   key ? { [CLIENT_PUBLIC_KEY_HEADER]: key } : undefined;

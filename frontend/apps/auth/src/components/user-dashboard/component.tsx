@@ -1,7 +1,7 @@
 import type { Spacings } from '@onefootprint/design-tokens';
 import { IcoEmail24, IcoFaceid16, IcoSmartphone24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Button, Stack, Typography } from '@onefootprint/ui';
+import { Button, Shimmer, Stack, Typography } from '@onefootprint/ui';
 import anyPass from 'lodash/fp/anyPass';
 import type { ComponentProps } from 'react';
 import React from 'react';
@@ -19,9 +19,10 @@ type ComponentTexts = {
 };
 
 type Entry = {
+  isLoading: boolean;
   label: string;
-  onClick: React.MouseEventHandler<HTMLButtonElement>;
   status: 'empty' | 'set' | 'verified';
+  onClick: React.MouseEventHandler<HTMLButtonElement>;
 };
 
 type ManageAccountComponentProps = {
@@ -42,6 +43,7 @@ const isSet = (x: unknown): x is 'set' => x === 'set';
 const isEmpty = (x: unknown): x is 'empty' => x === 'empty';
 const isVerified = (x: unknown): x is 'verified' => x === 'verified';
 const isEditable = anyPass([isVerified, isSet]);
+const ButtonLoading = () => <Shimmer sx={{ width: 'auto', height: '48px' }} />;
 
 const ManageAccountComponent = ({
   children,
@@ -57,7 +59,8 @@ const ManageAccountComponent = ({
       <Header subtitle={texts.headerSubtitle} title={texts.headerTitle} />
     </Stack>
     <Stack direction="column" gap={5} marginBottom={7}>
-      {entryEmail ? (
+      {entryEmail && entryEmail.isLoading ? <ButtonLoading /> : null}
+      {entryEmail && !entryEmail.isLoading ? (
         <ButtonTile type="button" onClick={entryEmail.onClick}>
           <FlexRow gap={3}>
             <IcoEmail24 />
@@ -74,7 +77,8 @@ const ManageAccountComponent = ({
         </ButtonTile>
       ) : null}
 
-      {entryPhone ? (
+      {entryPhone && entryPhone.isLoading ? <ButtonLoading /> : null}
+      {entryPhone && !entryPhone.isLoading ? (
         <ButtonTile type="button" onClick={entryPhone.onClick}>
           <FlexRow gap={3}>
             <IcoSmartphone24 />
