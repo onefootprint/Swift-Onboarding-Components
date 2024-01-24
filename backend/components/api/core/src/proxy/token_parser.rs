@@ -20,90 +20,72 @@ pub struct ProxyTokenParser<'a> {
     /// maps proxy tokens to their original string matches
     /// there may be multiple incantantions
     pub matches: HashMap<ProxyToken, Vec<String>>,
+    global_fp_id: Option<FpId>,
 }
 
-impl<'a> ProxyTokenParser<'a> {
-    const DELIMITER_START: [char; 2] = ['{', '{'];
-    const DELIMITER_END: [char; 2] = ['}', '}'];
+const DELIMITER_START: [char; 2] = ['{', '{'];
+const DELIMITER_END: [char; 2] = ['}', '}'];
 
+impl<'a> ProxyTokenParser<'a> {
     /// produces the find-and-replaceable text match of the token string
     fn text_match(token: &str) -> String {
         format!(
             "{}{}{}{}{}",
-            Self::DELIMITER_START[0],
-            Self::DELIMITER_START[1],
-            token,
-            Self::DELIMITER_END[0],
-            Self::DELIMITER_END[1],
+            DELIMITER_START[0], DELIMITER_START[1], token, DELIMITER_END[0], DELIMITER_END[1],
         )
-    }
-
-    fn is_delimiter_char(c: &char) -> bool {
-        Self::DELIMITER_START.contains(c) || Self::DELIMITER_END.contains(c)
     }
 
     /// parses a string into a map of Proxy Tokens
     #[tracing::instrument("ProxyTokenParser::parse", skip_all)]
-    pub fn parse(raw: &'a str, global_fp_id: Option<FpId>) -> ApiResult<ProxyTokenParser> {
-        let mut parsed: Vec<(String, ProxyToken)> = vec![];
-        let mut chars = raw.chars().peekable();
-        let mut current_token: Option<String> = None;
+    pub fn parse(body: &'a str, global_fp_id: Option<FpId>) -> ApiResult<ProxyTokenParser> {
+        let mut parsed: Vec<_> = vec![];
 
-        let mut current_char = chars.next();
-        let mut next_char = chars.peek();
+        process_tokens(body, |token| -> ApiResult<Option<&PiiString>> {
+            // Every time a token is encountered, parse it and add it
+            let text_match = Self::text_match(token);
+            parsed.push((
+                ProxyToken::parse_global(token, global_fp_id.as_ref())?,
+                text_match,
+            ));
+            Ok(None)
+        })?;
 
-        while let (Some(c1), Some(c2)) = (current_char, next_char) {
-            match &mut current_token {
-                // if we found the start of a token, reset our state
-                _ if [c1, *c2] == Self::DELIMITER_START => {
-                    current_char = chars.next();
-                    next_char = chars.peek();
-
-                    // before changing state, make sure the next character is not a delimiter
-                    if next_char.map(Self::is_delimiter_char) != Some(false) {
-                        continue;
-                    }
-
-                    current_token = Some(String::new());
-                }
-                // if we reached the end of the token
-                Some(current) if [c1, *c2] == Self::DELIMITER_END => {
-                    let text_match = Self::text_match(current.as_ref());
-
-                    // parse and add the token
-                    parsed.push((
-                        text_match,
-                        ProxyToken::parse_global(current, global_fp_id.clone())?,
-                    ));
-
-                    // reset state
-                    current_token = None;
-                }
-                // we're in a token, so build up our token contents
-                Some(current) => {
-                    current.push(c1);
-                }
-                // we're not in a match
-                None => {}
-            }
-            current_char = chars.next();
-            next_char = chars.peek();
-        }
-
-        let mut matches: HashMap<ProxyToken, Vec<String>> = HashMap::new();
-        for (tok_key, tok) in parsed {
-            if let Some(existing) = matches.get_mut(&tok) {
-                existing.push(tok_key.clone());
-            } else {
-                matches.insert(tok, vec![tok_key]);
-            }
-        }
-        Ok(Self { body: raw, matches })
+        let matches = parsed.into_iter().into_group_map();
+        Ok(Self {
+            body,
+            matches,
+            global_fp_id,
+        })
     }
 
-    /// replace proxy tokens with their detokenized counterparts
-    #[tracing::instrument("ProxyTokenParser::detokenize_body", skip_all)]
-    pub fn detokenize_body(self, detokens: HashMap<ProxyToken, PiiString>) -> ApiResult<PiiString> {
+    #[tracing::instrument("ProxyTokenParser::detokenize_body_new", skip_all)]
+    pub fn detokenize_body_new(&self, detokens: &HashMap<ProxyToken, PiiString>) -> ApiResult<PiiString> {
+        // Approximate the capacity of the new string we're going to build
+        let mut not_found = vec![];
+
+        let detokenized_body = process_tokens(self.body, |token_str| -> ApiResult<Option<&PiiString>> {
+            // Every time a token is encountered, parse it and add it
+            let token = ProxyToken::parse_global(token_str, self.global_fp_id.as_ref())?;
+            let Some(detoken) = detokens.get(&token) else {
+                tracing::warn!(token=%token, "did not find detoken for token");
+                not_found.push(token);
+                return Ok(None);
+            };
+            Ok(Some(detoken))
+        })?;
+
+        // Hard error if we were not able to decrypt some of the tokens
+        if !not_found.is_empty() {
+            let failed = not_found.into_iter().map(|tok| tok.to_string()).join(", ");
+
+            return Err(VaultProxyError::DataIdentifiersNotFound(failed))?;
+        }
+
+        Ok(detokenized_body)
+    }
+
+    #[tracing::instrument("ProxyTokenParser::detokenize_body_old", skip_all)]
+    pub fn detokenize_body_old(self, detokens: HashMap<ProxyToken, PiiString>) -> ApiResult<PiiString> {
         let mut detokenized_body = self.body.to_string();
 
         let mut not_found = vec![];
@@ -115,8 +97,6 @@ impl<'a> ProxyTokenParser<'a> {
                 continue;
             };
 
-            // TODO this is taking multiple seconds for large bodies. Should do some more efficient
-            // string processing
             for to_replace in matches {
                 detokenized_body = detokenized_body.replace(&to_replace, detoken.leak());
             }
@@ -131,6 +111,96 @@ impl<'a> ProxyTokenParser<'a> {
 
         Ok(PiiString::from(detokenized_body))
     }
+
+    /// replace proxy tokens with their detokenized counterparts
+    #[tracing::instrument("ProxyTokenParser::detokenize_body", skip_all)]
+    pub fn detokenize_body(self, detokens: HashMap<ProxyToken, PiiString>) -> ApiResult<PiiString> {
+        let new = self.detokenize_body_new(&detokens)?;
+        let old = self.detokenize_body_old(detokens)?;
+        if new.leak() != old.leak() {
+            tracing::error!(new_len=%new.len(), old_len=old.len(), "Mismatch in new detokenize");
+        } else {
+            tracing::info!("Old and new detokenize implementations match");
+        }
+        Ok(old)
+    }
+}
+
+/// A util to iterate through the raw body in linear time. The callback is called with each token
+/// and allows replacing the token with a detokenized value.
+/// This returns the raw body with tokens replaced with the return value of the callback.
+/// - `detokenize` is called for each complete token in the body that is extracted. Its return
+///   value is used to replace the token in the return value.
+fn process_tokens<'a, F>(raw: &str, mut detokenize: F) -> ApiResult<PiiString>
+where
+    F: FnMut(&str) -> ApiResult<Option<&'a PiiString>>,
+{
+    // Approximate the capacity of the new string we're going to build
+    let mut detokenized_body = String::with_capacity(raw.len());
+
+    let mut chars = raw.chars().peekable();
+    let mut current_token: Option<String> = None;
+
+    let mut current_char = chars.next();
+    let mut next_char = chars.peek();
+
+    while let (Some(c1), Some(c2)) = (current_char, next_char) {
+        match &mut current_token {
+            // If we found the start of a token, reset our state
+            _ if [c1, *c2] == DELIMITER_START => {
+                // Proceed to the next character since the delimiter is 2 characters
+                chars.next();
+                next_char = chars.peek();
+
+                // Two checks that preserve the invariant that we take tokens of the minimal length
+
+                if let Some(current_token) = current_token {
+                    // We've encountered another DELIMITER_START while already inside a token.
+                    // So the current_token contents aren't actually a token, they're part of the
+                    // detokenized_body.
+                    detokenized_body.push_str(&DELIMITER_START.iter().collect::<String>());
+                    detokenized_body.push_str(&current_token);
+                }
+
+                if next_char.is_some_and(|c| c == &DELIMITER_START[1]) {
+                    // We've encountered a `{{{`. Treat the first of the three `{` as not part of
+                    // the token.
+                    detokenized_body.push(DELIMITER_START[0]);
+                    // Proceed to the next character
+                    chars.next();
+                }
+
+                current_token = Some(String::new());
+            }
+            // If we reached the end of the token
+            Some(current) if [c1, *c2] == DELIMITER_END => {
+                // Proceed to the next character since the delimiter is 2 characters
+                chars.next();
+
+                let detokenized = detokenize(current)?;
+                if let Some(detokenized) = detokenized {
+                    detokenized_body.push_str(detokenized.leak());
+                }
+
+                // reset state
+                current_token = None;
+            }
+            // We're in a token, so build up our token contents
+            Some(current) => {
+                current.push(c1);
+            }
+            // We're not in a token
+            None => {
+                detokenized_body.push(c1);
+            }
+        }
+        current_char = chars.next();
+        next_char = chars.peek();
+    }
+    if let Some(current_char) = current_char {
+        detokenized_body.push(current_char)
+    }
+    Ok(PiiString::new(detokenized_body))
 }
 
 #[allow(clippy::expect_used)]
@@ -176,6 +246,37 @@ mod tests {
             identifier: identifier.into(),
             filter_functions,
         }
+    }
+
+    #[test]
+    fn test_process_tokens() {
+        // This tests the innards of the process_tokens method because it could be very dangerous
+        // for this logic to change.
+        // The main constraint is that process_tokens should be extracting only the minimal set of
+        // tokens.
+        let mut tokens = vec![];
+        let raw = 
+            "{{token1}} This is a nice string. }} It has {{ with-spaces     }} some tokens inside of it. And {{{ extra-opening-brace  }} another token. And also {{ extra-closing-brace  }}} some {{ text-before-an-extra-opening-brace {{{ double-opening-braces-is-minimal }} more tokens.{{ {{ end-of-string-is-token }}";
+        let expected_non_token_str = 
+            "*** This is a nice string. }} It has *** some tokens inside of it. And {*** another token. And also ***} some {{ text-before-an-extra-opening-brace {*** more tokens.{{ ***";
+        let token_replacement = PiiString::new("***".into());
+        let non_token_str = process_tokens(
+            raw,
+            |token| -> ApiResult<Option<&PiiString>> {
+                tokens.push(token.to_string());
+                Ok(Some(&token_replacement))
+            },
+        ).unwrap();
+        assert_eq!(tokens, vec![
+            "token1",
+            " with-spaces     ",
+            " extra-opening-brace  ",
+            " extra-closing-brace  ",
+            " double-opening-braces-is-minimal ",
+            " end-of-string-is-token ",
+        ]);
+        // And all the remaining characters are left
+        assert_eq!(non_token_str.leak(), expected_non_token_str);
     }
 
     const VALID_JSON_BODY: &str = r#"{
@@ -297,20 +398,24 @@ mod tests {
         };
         let global = global.map(|s| FpId::from(s.to_string()));
 
-        let Ok(token) = ProxyToken::parse_global(raw, global) else {
-            return false
+        let Ok(token) = ProxyToken::parse_global(raw, global.as_ref()) else {
+            return false;
         };
         token == expected
     }
 
+    const B_0: &str = r#"{{ {{ fp_id_1.custom.ach }} }}"#;
     const B_1: &str = r#"{ blah blah blah {{ id.ssn9 }} sdfsdf sd {{ custom.cc4 }} }} {{ blah { {{"#;
-    const B_2: &str = r#"{ blah blah blah {{ id.ssn9 }} sdfsdf sd {{}  }} }} {{ blah {{ custom.cc4 }} {{"#;
+    const B_2: &str = r#"{ blah blah blah {{ id.ssn9 }} sdfsdf sd {}  }} }} {{ blah {{ custom.cc4 }} {{"#;
     const B_3: &str = r#"{{ {{ {{ {{id.dob}} }}"#;
     const B_4: &str = r#"{{ custom.ach}"#;
     const B_5: &str =
         r#"{{ fp_id_x.custom.ach}} {{{fp_id_y.id.ssn9}} sdf {{ fp_id_z.custom.ach2}}} {{fp_id_y.id.ssn9}}"#;
     const B_6: &str = r#"{ { {{{ fp_id_1.custom.ach     }}"#;
 
+    #[test_case(B_0, None, &[
+        (tok1("fp_id_1", custom("ach")), 1),
+    ])]
     #[test_case(B_1, Some("fp_id_xyz"), &[
         (tok1("fp_id_xyz", DI::Id(IDK::Ssn9)), 1),
         (tok1("fp_id_xyz", custom("cc4")), 1)

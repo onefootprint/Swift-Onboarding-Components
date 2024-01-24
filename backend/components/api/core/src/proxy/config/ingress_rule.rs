@@ -40,7 +40,7 @@ impl IngressRule {
     }
 
     fn parse(fp_id: Option<FpId>, token_path: &str, target: &str) -> Result<Self, ApiError> {
-        let mut proxy_token = ProxyToken::parse_global(token_path, fp_id)?;
+        let mut proxy_token = ProxyToken::parse_global(token_path, fp_id.as_ref())?;
 
         if !proxy_token.filter_functions.is_empty() {
             return Err(VaultProxyError::BadIngressRule(

@@ -38,7 +38,7 @@ impl ProxyToken {
     /// parses a string into a single Proxy Token with support for a global footprint user id
     /// in the case where just an identifier is specified
     /// Supports `| filter_fn1 | filter_fn2| ..`
-    pub fn parse_global(raw: &str, global_fp_id: Option<FpId>) -> Result<Self, crate::Error> {
+    pub fn parse_global(raw: &str, global_fp_id: Option<&FpId>) -> Result<Self, crate::Error> {
         let raw = raw.trim();
         let components: Vec<&str> = raw.split('|').map(|s| s.trim()).collect::<Vec<_>>();
 
@@ -55,10 +55,10 @@ impl ProxyToken {
             (raw, vec![])
         };
 
-        if let (Some(fp_id), Ok(identifier)) = (global_fp_id.clone(), DataIdentifier::from_str(token)) {
+        if let (Some(fp_id), Ok(identifier)) = (global_fp_id, DataIdentifier::from_str(token)) {
             // accept the case where the token is just a data identifier but we have a global fp_id
             return Ok(Self {
-                fp_id,
+                fp_id: fp_id.clone(),
                 identifier,
                 filter_functions,
             });
@@ -74,7 +74,7 @@ impl ProxyToken {
 
         // don't support mixing FQPTs with a different globally set fp_id
         if let Some(global_fp_id) = global_fp_id {
-            if fp_id != global_fp_id {
+            if &fp_id != global_fp_id {
                 return Err(ProxyTokenError::CannotMixFullyQualifiedProxyTokens)?;
             }
         }
@@ -170,14 +170,14 @@ mod tests {
     ]))]
     fn test_proxy_parse_token(raw: &str, global: Option<&str>) -> ProxyToken {
         let global: Option<FpId> = global.map(|s| FpId::from(s.to_string()));
-        ProxyToken::parse_global(raw, global).expect("failed to parse proxy token")
+        ProxyToken::parse_global(raw, global.as_ref()).expect("failed to parse proxy token")
     }
 
     #[test_case("fp_id_abcd.id.ssn9", Some("fp_id_xyz") => false)]
     #[test_case("fp_id_abcd.id.dob", Some("fp_id_abcd") => true)]
     fn test_ok_proxy_parse_token(raw: &str, global: Option<&str>) -> bool {
         let global: Option<FpId> = global.map(|s| FpId::from(s.to_string()));
-        ProxyToken::parse_global(raw, global).is_ok()
+        ProxyToken::parse_global(raw, global.as_ref()).is_ok()
     }
 
     #[test_case("id.last_name")]
