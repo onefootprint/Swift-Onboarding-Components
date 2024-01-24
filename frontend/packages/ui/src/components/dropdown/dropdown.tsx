@@ -109,6 +109,16 @@ const StyledDropdownItem = styled(RadixDropdown.Item)<{
     :focus {
       ${createOverlayBackground('darken-1', 'primary')};
     }
+
+    &[data-disabled] {
+      user-select: none;
+      cursor: auto;
+      color: ${theme.color.quaternary};
+
+      &:hover {
+        background: none;
+      }
+    }
   `}
 `;
 
