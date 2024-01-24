@@ -1,3 +1,4 @@
+mod kyb;
 mod list;
 mod owners;
 mod post;
@@ -5,5 +6,9 @@ mod post;
 pub use api_core::*;
 
 pub fn routes(config: &mut web::ServiceConfig) {
-    config.service(owners::get).service(post::post).service(list::get);
+    config
+        .service(owners::get)
+        .service(post::post)
+        .service(list::get)
+        .service(kyb::post);
 }

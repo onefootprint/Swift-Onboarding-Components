@@ -5,6 +5,7 @@ mod auth_events;
 mod decisions;
 mod detail;
 mod documents;
+mod kyc;
 mod label;
 mod list;
 mod liveness;
@@ -29,6 +30,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(reonboard::post)
         .service(decisions::post)
         .service(detail::detail)
+        .service(kyc::post)
         .service(label::get)
         .service(label::post)
         .service(tags::get)
