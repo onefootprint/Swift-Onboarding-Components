@@ -34,6 +34,8 @@ url = "2.2.2"
 serde_with = "2.2.0"
 reqwest-middleware = "0.2.3"
 reqwest-retry = "0.3.0"
+reqwest-tracing = { workspace = true }
+task-local-extensions = "0.1.4"
 
 
 [dev-dependencies]
