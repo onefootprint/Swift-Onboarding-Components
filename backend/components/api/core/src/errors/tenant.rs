@@ -47,7 +47,7 @@ pub enum TenantError {
     CannotProvideBodyAndIdempotencyId,
     #[error("You are not configured to create production {0} playbooks. Feel free to continue in sandbox, or contact us to enable this feature.")]
     CannotCreateProdPlaybook(ObConfigurationKind),
-    #[error("Invalid onboarding configuration for Vault. The following fields need to be authorized for read access: {0}")]
+    #[error("Cannot run a playbook whose authorized scopes don't include all collected data. The following fields need to be authorized for read access: {0}")]
     MissingCanAccessCdos(Csv<CollectedDataOption>),
     #[error("Invalid onboarding configuration for Vault. {0}")]
     UnsupportedObcForNpv(String),

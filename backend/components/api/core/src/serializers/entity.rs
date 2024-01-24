@@ -110,6 +110,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
         // If the latest Workflow has an uncompleted review
         let requires_manual_review = !mrs.is_empty();
 
+        let can_reonboard = !wfs.is_empty(); // In reality, probably to make sure it is KYB or KYC wf
         let has_outstanding_doc_wf = wfs.iter().any(|(wf, _)| {
             wf.kind == WorkflowKind::Document && wf.completed_at.is_none() && wf.deactivated_at.is_none()
         });
@@ -135,6 +136,7 @@ impl<'a> DbToApi<EntityDetail<'a>> for api_wire_types::Entity {
             requires_manual_review,
             is_created_via_api,
             data,
+            can_reonboard,
             // Annoying: for now, document-only workflows are a really custom codepath. So we have
             // to check in another way if there are any outstanding doc-only workflows
             has_outstanding_workflow_request: has_outstanding_doc_wf || wr.is_some(),

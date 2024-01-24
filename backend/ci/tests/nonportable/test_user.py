@@ -68,7 +68,11 @@ def test_external_id(tenant, sandbox_tenant):
     "missing_can_access_data,missing_vault_data,expected_error",
     [
         ([], [], None),
-        (["dob"], [], "Invalid onboarding configuration for Vault"),
+        (
+            ["dob"],
+            [],
+            "Cannot run a playbook whose authorized scopes don't include all collected data.",
+        ),
         (
             [],
             ["id.ssn9"],

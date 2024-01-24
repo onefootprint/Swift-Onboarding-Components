@@ -107,6 +107,8 @@ pub async fn post(
                 .filter(|c| !obc.can_access_data.contains(c))
                 .collect();
             if !unaccessable_cdos.is_empty() {
+                // For now, require that all pieces of data are decryptable by the provided OBC.
+                // Otherwise, going through KYC will cause the tenant to lose read access
                 return Err(TenantError::MissingCanAccessCdos(unaccessable_cdos.into()).into());
             }
 

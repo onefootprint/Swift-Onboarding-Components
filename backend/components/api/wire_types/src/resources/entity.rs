@@ -41,6 +41,7 @@ pub struct Entity {
     pub insight_event: Option<InsightEvent>,
     pub requires_manual_review: bool,
     pub is_created_via_api: bool,
+    pub can_reonboard: bool,
     pub has_outstanding_workflow_request: bool,
     pub external_id: Option<ExternalId>,
     pub last_activity_at: DateTime<Utc>,
