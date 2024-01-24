@@ -9,6 +9,7 @@ lazy_static! {
     // simple regex just to make sure input is base-level clean
     // https://en.wikipedia.org/wiki/Postal_code#Alphanumeric_postal_codes
     pub static ref ZIP_CHARS: Regex = Regex::new(r"^([A-Za-z0-9\- ]*)$").unwrap();
+    pub static ref PO_BOX: Regex = Regex::new(r".*(?i)p\.?o\.?\s?+box.*$").unwrap();
 }
 
 pub(super) fn clean_and_validate_zip(input: PiiString) -> VResult<PiiString> {
@@ -78,5 +79,24 @@ pub(super) fn validate_state(
         parse_enum::<UsState>(value)
     } else {
         Ok(value)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::PO_BOX;
+    use test_case::test_case;
+
+    #[test_case("po box" => true; "lower")]
+    #[test_case("P.O. Box" => true)]
+    #[test_case("My P.O. Box" => true)]
+    #[test_case("   PO.     Box    " => true)]
+    #[test_case("to box" => false)]
+    #[test_case("Apt 1." => false)]
+    #[test_case("Apt P, Box    " => false)]
+    #[test_case("" => false)]
+    #[test_case("122344%%$^" => false)]
+    fn test_po_box_regex(s: &str) -> bool {
+        PO_BOX.is_match(s)
     }
 }

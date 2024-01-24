@@ -1,4 +1,4 @@
-use super::utils::{self, validate_state};
+use super::utils::{self, validate_state, PO_BOX};
 use super::{Error, VResult};
 use crate::{email::Email, NtResult, Validate};
 use crate::{
@@ -25,7 +25,7 @@ impl Validate for IDK {
             IDK::Dob => clean_and_validate_dob(value.as_string()?, args.for_bifrost)?,
             IDK::Ssn4 => clean_and_validate_ssn4(value.as_string()?)?,
             IDK::AddressLine1 => validate_address(value.as_string()?, args.for_bifrost)?,
-            IDK::AddressLine2 => value.as_string()?,
+            IDK::AddressLine2 => validate_address(value.as_string()?, args.for_bifrost)?,
             IDK::City => value.as_string()?,
             IDK::State => validate_state(value.as_string()?, all_data.get(&IDK::Country.into()))?,
             IDK::Zip => utils::clean_and_validate_zip(value.as_string()?)?,
@@ -102,7 +102,7 @@ fn validate_address(input: PiiString, for_bifrost: bool) -> VResult<PiiString> {
     }
 
     // eventually should maybe use a address verification/resolution service for this
-    if for_bifrost && input.leak().to_lowercase().starts_with("po box") {
+    if for_bifrost && PO_BOX.is_match(input.leak()) {
         return Err(Error::AddressIsPOBox);
     }
 
