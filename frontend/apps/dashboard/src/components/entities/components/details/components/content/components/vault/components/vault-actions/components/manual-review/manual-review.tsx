@@ -11,9 +11,10 @@ import ManualReviewTrigger from './components/manual-review-trigger';
 export type ManualReviewProps = {
   kind: EntityKind;
   status: EntityStatus;
+  disabled?: boolean;
 };
 
-const ManualReview = ({ kind, status }: ManualReviewProps) => {
+const ManualReview = ({ kind, status, disabled }: ManualReviewProps) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [reviewStatus, setReviewStatus] = useState<ReviewStatus | undefined>();
   const shouldShowDialog = dialogOpen && reviewStatus;
@@ -34,6 +35,7 @@ const ManualReview = ({ kind, status }: ManualReviewProps) => {
         status={status}
         kind={kind}
         onSelect={handleSelect}
+        disabled={disabled}
       />
       {shouldShowDialog && (
         <ManualReviewDialog

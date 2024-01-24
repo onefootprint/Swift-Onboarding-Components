@@ -8,12 +8,14 @@ type ManualReviewTriggerProps = {
   kind: EntityKind;
   status: EntityStatus;
   onSelect: (reviewStatus: ReviewStatus) => void;
+  disabled?: boolean;
 };
 
 const ManualReviewTrigger = ({
   kind,
   status,
   onSelect,
+  disabled,
 }: ManualReviewTriggerProps) => {
   const { t } = useTranslation('pages.entity.manual-review');
   const pass = t(`status.${ReviewStatus.pass}`);
@@ -21,7 +23,7 @@ const ManualReviewTrigger = ({
 
   return (
     <Dropdown.Root>
-      <DropdownTrigger asChild>
+      <DropdownTrigger asChild disabled={disabled}>
         <Button size="small">
           {kind === EntityKind.person
             ? t('button.review-person')

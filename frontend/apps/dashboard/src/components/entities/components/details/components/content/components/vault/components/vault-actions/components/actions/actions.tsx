@@ -1,8 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
-import { EntityKind } from '@onefootprint/types';
+import { EntityKind, RoleScopeKind } from '@onefootprint/types';
 import { Dropdown } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import PermissionGate from 'src/components/permission-gate';
 
 import type { WithEntityProps } from '../../../../../../../with-entity';
 import useEditControls from '../../hooks/use-edit-controls';
@@ -38,15 +39,30 @@ const Actions = ({ entity }: WithEntityProps) => {
           <IcoDotsHorizontal24 />
         </Dropdown.Trigger>
         <Dropdown.Content align="end" sideOffset={8}>
-          <Dropdown.Item onSelect={editControls.start}>
-            {t('edit-user.label')}
-          </Dropdown.Item>
-          <Dropdown.Item onSelect={handleOpenRetriggerKycDialog}>
-            {t('retrigger-kyc.label')}
-          </Dropdown.Item>
-          <Dropdown.Item onSelect={handleOpenAuthMethodsDialog}>
-            {t('update-auth-methods.label')}
-          </Dropdown.Item>
+          <PermissionGate
+            scopeKind={RoleScopeKind.writeEntities}
+            fallbackText={t('edit-user.not-allowed')}
+          >
+            <Dropdown.Item onSelect={editControls.start}>
+              {t('edit-user.label')}
+            </Dropdown.Item>
+          </PermissionGate>
+          <PermissionGate
+            scopeKind={RoleScopeKind.manualReview}
+            fallbackText={t('retrigger-kyc.not-allowed')}
+          >
+            <Dropdown.Item onSelect={handleOpenRetriggerKycDialog}>
+              {t('retrigger-kyc.label')}
+            </Dropdown.Item>
+          </PermissionGate>
+          <PermissionGate
+            scopeKind={RoleScopeKind.manualReview}
+            fallbackText={t('update-auth-methods.not-allowed')}
+          >
+            <Dropdown.Item onSelect={handleOpenAuthMethodsDialog}>
+              {t('update-auth-methods.label')}
+            </Dropdown.Item>
+          </PermissionGate>
         </Dropdown.Content>
       </Dropdown.Root>
       <RetriggerKYCDialog

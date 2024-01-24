@@ -1,9 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { EntityStatus } from '@onefootprint/types';
+import { EntityStatus, RoleScopeKind } from '@onefootprint/types';
 import { Button, Portal, Stack, Tooltip } from '@onefootprint/ui';
 import { SplitButton } from '@onefootprint/ui/src/components';
 import React from 'react';
 import useEntityVaultWithTransforms from 'src/components/entities/hooks/use-entity-vault-with-transforms';
+import PermissionGate from 'src/components/permission-gate';
 import { useEffectOnce } from 'usehooks-ts';
 
 import type { WithEntityProps } from '@/entity/components/with-entity';
@@ -85,7 +86,12 @@ const VaultActionsControls = ({ entity }: VaultActionsControlsProps) => {
             />
           </Tooltip>
           {shouldRenderManualReview && (
-            <ManualReview status={entityData.status} kind={entityData.kind} />
+            <PermissionGate
+              scopeKind={RoleScopeKind.manualReview}
+              fallbackText={t('manual-review-not-allowed')}
+            >
+              <ManualReview status={entityData.status} kind={entityData.kind} />
+            </PermissionGate>
           )}
           <Actions />
         </Stack>

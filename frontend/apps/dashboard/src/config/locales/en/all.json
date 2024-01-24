@@ -897,6 +897,7 @@
           "on-watchlist-business": "This business is on a watchlist"
         }
       },
+      "manual-review-not-allowed": "You're not allowed to manually review users",
       "fieldset": {
         "select-all": "Select all",
         "deselect-all": "Deselect all",
@@ -1190,11 +1191,13 @@
       "actions": {
         "cta": "Open actions",
         "edit-user": {
-          "label": "Edit user information"
+          "label": "Edit user information",
+          "not-allowed": "You're not allowed to edit user information"
         },
         "retrigger-kyc": {
           "label": "Request more information",
           "title": "Request more information",
+          "not-allowed": "You're not allowed to request additional information",
           "send-request": "Send request",
           "cancel": "Cancel",
           "prompt": "What would you like to request from user?",
@@ -1235,6 +1238,7 @@
           "label": "Allow updating login methods",
           "title": "Allowing updating login methods",
           "header": "Allow user to update authentication methods",
+          "not-allowed": "You are not allowed to perform this action",
           "share-this-link": "Share this link with the user. They will be asked to log in using one of their current auth methods and then will be able to:",
           "update-phone": "Update their phone number",
           "update-email": "Update their email address",

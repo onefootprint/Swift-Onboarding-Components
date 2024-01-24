@@ -1,5 +1,5 @@
 import withEntity from '@/entity/components/with-entity';
 
-import RetriggerKYC from './actions';
+import Actions from './actions';
 
-export default withEntity(RetriggerKYC);
+export default withEntity(Actions);

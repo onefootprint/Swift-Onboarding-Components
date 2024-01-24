@@ -9,6 +9,7 @@ import {
 import { OrgFrequentNoteKind } from '@onefootprint/types';
 import React from 'react';
 import { withFrequentNotes } from 'src/components/frequent-notes-text-area/frequent-notes-text-area.test.config';
+import { asAdminUser } from 'src/config/tests';
 
 import TestWrapper from '../../../utils/test-wrapper';
 import Actions from './actions';
@@ -42,6 +43,7 @@ describe('<Actions />', () => {
         id: entityId,
       },
     });
+    asAdminUser();
   });
 
   describe('when retriggering a KYC', () => {
