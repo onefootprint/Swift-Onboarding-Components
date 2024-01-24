@@ -13,6 +13,7 @@ export const entitiesFixture: Entity[] = [
   {
     id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
     isIdentifiable: true,
+    canReonboard: true,
     kind: EntityKind.person,
     data: [],
     attributes: [IdDI.firstName, IdDI.lastName, IdDI.email],
@@ -44,6 +45,7 @@ export const entitiesFixture: Entity[] = [
   {
     id: 'fp_id_tvfUNdGqmk2kJyyka9gX22',
     isIdentifiable: true,
+    canReonboard: true,
     kind: EntityKind.person,
     data: [],
     attributes: [IdDI.firstName, IdDI.lastName, IdDI.email],

@@ -65,6 +65,7 @@ export type Entity<TStatus = EntityStatus> = {
   id: string;
   insightEvent?: InsightEvent;
   isIdentifiable: boolean;
+  canReonboard: boolean;
   kind: EntityKind;
   label: EntityLabel | null;
   lastActivityAt: string;

@@ -16,6 +16,7 @@ describe('getGridTemplateAreas', () => {
     id: '123',
     data: [],
     isIdentifiable: true,
+    canReonboard: true,
     kind: EntityKind.person,
     requiresManualReview: false,
     startTimestamp: '2023-06-27',

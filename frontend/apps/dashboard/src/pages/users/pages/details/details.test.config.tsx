@@ -86,6 +86,7 @@ const entityDataFixture = decryptableAttributesFixture
 export const entityFixture: Entity = {
   id: 'fp_id_wL6XIWe26cRinucZrRK1yn',
   isIdentifiable: true,
+  canReonboard: true,
   kind: EntityKind.person,
   requiresManualReview: false,
   status: EntityStatus.pass,

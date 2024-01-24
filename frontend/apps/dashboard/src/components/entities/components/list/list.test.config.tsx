@@ -6,6 +6,7 @@ export const entitiesFixture: Entity[] = [
   {
     id: 'fp_bid_VXND11zUVRYQKKUxbUN3KD',
     isIdentifiable: true,
+    canReonboard: true,
     kind: EntityKind.business,
     attributes: [
       BusinessDI.city,

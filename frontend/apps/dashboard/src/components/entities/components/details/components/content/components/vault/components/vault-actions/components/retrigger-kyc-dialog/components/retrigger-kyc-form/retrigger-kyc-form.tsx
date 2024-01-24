@@ -1,7 +1,14 @@
 import { useTranslation } from '@onefootprint/hooks';
 import styled, { css } from '@onefootprint/styled';
 import { IdDI, OrgFrequentNoteKind, TriggerKind } from '@onefootprint/types';
-import { Checkbox, Divider, Radio, Stack, Typography } from '@onefootprint/ui';
+import {
+  Checkbox,
+  Divider,
+  Radio,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@onefootprint/ui';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import AnimatedContainer from 'src/components/animated-container';
@@ -27,6 +34,8 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
   const entityId = useEntityId();
   const entity = useEntity(entityId);
   const userHasPhone = entity.data?.attributes?.includes(IdDI.phoneNumber);
+  const shouldShowRetriggerKyc = entity.data?.canReonboard;
+
   const methods = useForm<RetriggerKYCFormData>();
   const {
     register,
@@ -85,12 +94,19 @@ const RetriggerKYCForm = ({ onSubmit, formId }: RetriggerKYCFormProps) => {
               />
             </div>
           )}
-          <Radio
-            value={TriggerKind.RedoKyc}
-            label={t('form.revise-kyc.title')}
-            hint={t('form.revise-kyc.description')}
-            {...register('kind', { required: true })}
-          />
+          <Tooltip
+            disabled={shouldShowRetriggerKyc}
+            position="left"
+            text={t('form.cannot-reonboard-user')}
+          >
+            <Radio
+              value={TriggerKind.RedoKyc}
+              label={t('form.revise-kyc.title')}
+              hint={t('form.revise-kyc.description')}
+              disabled={!shouldShowRetriggerKyc}
+              {...register('kind', { required: true })}
+            />
+          </Tooltip>
           {errors.kind && (
             <Typography variant="body-4" color="error">
               {t('form.error')}

@@ -20,7 +20,6 @@ const Actions = ({ entity }: WithEntityProps) => {
   const [openDialog, setOpenDialog] = useState<ActionDialog | null>(null);
 
   const shouldShowActionsDropdown = entity.kind === EntityKind.person;
-  const shouldShowRetriggerKyc = entity?.isIdentifiable;
 
   const handleCloseDialog = () => {
     setOpenDialog(null);
@@ -42,11 +41,9 @@ const Actions = ({ entity }: WithEntityProps) => {
           <Dropdown.Item onSelect={editControls.start}>
             {t('edit-user.label')}
           </Dropdown.Item>
-          {shouldShowRetriggerKyc && (
-            <Dropdown.Item onSelect={handleOpenRetriggerKycDialog}>
-              {t('retrigger-kyc.label')}
-            </Dropdown.Item>
-          )}
+          <Dropdown.Item onSelect={handleOpenRetriggerKycDialog}>
+            {t('retrigger-kyc.label')}
+          </Dropdown.Item>
           <Dropdown.Item onSelect={handleOpenAuthMethodsDialog}>
             {t('update-auth-methods.label')}
           </Dropdown.Item>

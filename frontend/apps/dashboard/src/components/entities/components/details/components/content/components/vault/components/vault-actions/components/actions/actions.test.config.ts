@@ -6,6 +6,7 @@ export const entityId = 'fp_id_yCZehsWNeywHnk5JqL20u';
 export const entityWithPhoneFixture: Entity = {
   id: entityId,
   isIdentifiable: true,
+  canReonboard: true,
   kind: EntityKind.person,
   data: [],
   attributes: [IdDI.phoneNumber],
@@ -23,6 +24,7 @@ export const entityWithPhoneFixture: Entity = {
 export const entityWithoutPhoneFixture: Entity = {
   id: entityId,
   isIdentifiable: true,
+  canReonboard: true,
   kind: EntityKind.person,
   data: [],
   attributes: [],
