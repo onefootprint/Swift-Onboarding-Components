@@ -39,6 +39,9 @@ pub fn save_final_decision(
         // don't portabalize vaults from no-phone onboardings
         // and don't portablize vaults from tenant-initiated flows via POST /kyc
         if !obc.is_no_phone_flow && wf.source != WorkflowSource::Tenant {
+            // We may decide to start portablizing data from tenant-initiated workflows, but leave
+            // the vaults un-identifiable.
+            // Make sure our product stats reflect this if we do so
             let seqno = vw.portablize_identity_data(conn)?;
             Some(seqno)
         } else {
