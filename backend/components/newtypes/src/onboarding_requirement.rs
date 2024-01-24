@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
-use crate::{CollectedDataOption, DocumentRequestId, IdDocKind, Iso3166TwoDigitCountryCode};
+use crate::{
+    CollectedDataOption, DocumentRequestId, DocumentUploadMode, IdDocKind, Iso3166TwoDigitCountryCode,
+};
 use chrono::{DateTime, Utc};
 use paperclip::actix::Apiv2Schema;
 
@@ -40,6 +42,7 @@ pub enum OnboardingRequirement {
         should_collect_selfie: bool,
         should_collect_consent: bool,
         supported_country_and_doc_types: HashMap<Iso3166TwoDigitCountryCode, Vec<IdDocKind>>,
+        upload_mode: DocumentUploadMode,
     },
     /// Uses the same struct as CollectDocument in practice
     CollectProofOfSsn,
@@ -113,6 +116,7 @@ impl OnboardingRequirement {
                 should_collect_consent: _,
                 should_collect_selfie: _,
                 supported_country_and_doc_types: _,
+                upload_mode: _,
             } => false,
             Self::CollectProofOfSsn => false,
             Self::CollectProofOfAddress => false,

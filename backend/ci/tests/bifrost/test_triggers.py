@@ -134,9 +134,11 @@ def test_recollect_document(trigger, sandbox_tenant):
 
     # re-run Bifrost with the token from the link we sent to user
     def pre_run(bifrost):
+        upload_mode = 'allow_upload' if trigger['kind'] == 'proof_of_address' else 'default'
         # Check that requirements are what we expect
         requirements = bifrost.get_status()["all_requirements"]
         assert requirements[0]["kind"] == "collect_document"
+        assert requirements[0]['upload_mode'] == upload_mode
         assert not requirements[0]["is_met"]
 
     complete_redo_flow(sandbox_user, initial_auth_token, pre_run)

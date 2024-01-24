@@ -16,9 +16,9 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    AlpacaKycState, AuthorizeFields, DocumentCdoInfo, DocumentRequestKind, IdentityDocumentStatus,
-    Iso3166TwoDigitCountryCode, KycState, LivenessSource, OnboardingRequirement, OnboardingRequirementKind,
-    Selfie, UsLegalStatus, VaultId, WorkflowState,
+    AlpacaKycState, AuthorizeFields, DocumentCdoInfo, DocumentRequestKind, DocumentUploadMode,
+    IdentityDocumentStatus, Iso3166TwoDigitCountryCode, KycState, LivenessSource, OnboardingRequirement,
+    OnboardingRequirementKind, Selfie, UsLegalStatus, VaultId, WorkflowState,
 };
 use newtypes::{
     CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind,
@@ -425,6 +425,7 @@ fn get_requirement_inner(
                     should_collect_selfie: dr.should_collect_selfie,
                     should_collect_consent: user_consent.is_none(),
                     supported_country_and_doc_types: supported_country_and_doc_types.0,
+                    upload_mode: DocumentUploadMode::Default,
                 })
             } else {
                 None
@@ -448,6 +449,7 @@ fn get_requirement_inner(
                     supported_country_and_doc_types: obc
                         .supported_countries_and_doc_types_for_proof_of_ssn()
                         .0,
+                    upload_mode: DocumentUploadMode::Default,
                 })
             } else {
                 None
@@ -471,6 +473,7 @@ fn get_requirement_inner(
                     supported_country_and_doc_types: obc
                         .supported_countries_and_doc_types_for_proof_of_address()
                         .0,
+                    upload_mode: DocumentUploadMode::AllowUpload,
                 })
             } else {
                 None
