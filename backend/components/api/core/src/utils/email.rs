@@ -215,19 +215,13 @@ impl SendgridClient {
             // Don't rate limit or send emails to the fixture email
             return Ok(());
         }
-        let res = RateLimit {
+        RateLimit {
             key: &to_email,
             period: Duration::seconds(state.config.time_s_between_challenges),
             scope: template_id,
         }
         .enforce_and_update(state)
-        .await;
-        if let Err(err) = res {
-            // For now, going to soft roll out the rate limit to make sure we don't have any
-            // codepaths in prod that are sneakily disobeying the rate limit
-            // TODO hard error when rate limit is exceeded
-            tracing::error!(?err, "Error in applying email rate limit");
-        }
+        .await?;
         let template_data = template_data
             .into_iter()
             .map(|(k, v)| (k, v.leak_to_string()))
