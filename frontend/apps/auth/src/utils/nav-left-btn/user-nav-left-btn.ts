@@ -13,7 +13,7 @@ const getUserLeftNavButton = (
   return [
     'emailChallenge',
     'passkeyChallenge',
-    'smsChallenge',
+    'phoneChallenge',
     'updateEmail',
     'updatePasskey',
     'updatePhone',

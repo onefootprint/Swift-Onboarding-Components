@@ -3,11 +3,25 @@ import { ChallengeKind } from '@onefootprint/types';
 import compose from 'lodash/fp/compose';
 import { assign, createMachine } from 'xstate';
 
+import {
+  assignEmail,
+  assignEmailChallenge,
+  assignEmailReplaceChallenge,
+  assignKindToChallenge,
+  assignPasskeyChallenge,
+  assignPhoneChallenge,
+  assignPhoneNumber,
+  assignPhoneReplaceChallenge,
+  assignUserDashboard,
+  assignUserFound,
+  assignVerifyToken,
+} from './assigners';
 import type { UserMachineContext, UserMachineEvents } from './types';
 
 type Ignore = unknown;
 type KindPayload = { payload: ChallengeKind };
 type IdentifyPayload = { payload: IdentifyResponse };
+
 export type UserMachineArgs = { authToken: string };
 
 const { sms, email, biometric } = ChallengeKind;
@@ -20,8 +34,6 @@ const getKindPayload = (_: Ignore, { payload }: KindPayload) => payload;
 const isPayloadEmail = compose(isEmail, getKindPayload);
 const isPayloadSms = compose(isSms, getKindPayload);
 const isPayloadPasskey = compose(isPasskey, getKindPayload);
-const asterisksToBullet = (str?: string): string =>
-  (str || '').replace(/\*/g, '•');
 
 const isNotEmptyArray = (x: unknown): boolean =>
   Array.isArray(x) && x.length > 0;
@@ -182,99 +194,21 @@ const createUserMachine = (args: UserMachineArgs) =>
     },
     {
       actions: {
-        assignEmail: assign((ctx, { payload }) => {
-          ctx.email = payload;
-          return ctx;
-        }),
-        assignEmailChallenge: assign((ctx, { payload }) => {
-          ctx.emailChallenge = payload;
-          return ctx;
-        }),
-        assignEmailReplaceChallenge: assign((ctx, { payload }) => {
-          ctx.emailReplaceChallenge = payload;
-          return ctx;
-        }),
-        assignKindToChallenge: assign((ctx, { payload }) => {
-          ctx.kindToChallenge = payload;
-          return ctx;
-        }),
-        assignPasskeyChallenge: assign((ctx, { payload }) => {
-          ctx.passkeyChallenge = payload;
-          return ctx;
-        }),
+        assignEmail: assign(assignEmail),
+        assignEmailChallenge: assign(assignEmailChallenge),
+        assignEmailReplaceChallenge: assign(assignEmailReplaceChallenge),
+        assignKindToChallenge: assign(assignKindToChallenge),
+        assignPasskeyChallenge: assign(assignPasskeyChallenge),
         // assignPasskeyReplaceChallenge: assign((ctx, { payload }) => {
         //   ctx.passkeyReplaceChallenge = payload;
         //   return ctx;
         // }),
-        assignPhoneChallenge: assign((ctx, { payload }) => {
-          if (ctx.userDashboard.phone) {
-            ctx.userDashboard = {
-              ...ctx.userDashboard,
-              phone: {
-                ...ctx.userDashboard.phone,
-                label: payload.scrubbedPhoneNumber,
-              },
-            };
-          }
-
-          ctx.phoneChallenge = payload;
-          return ctx;
-        }),
-        assignPhoneNumber: assign((ctx, { payload }) => {
-          ctx.phoneNumber = payload;
-          return ctx;
-        }),
-        assignPhoneReplaceChallenge: assign((ctx, { payload }) => {
-          ctx.phoneReplaceChallenge = payload;
-          return ctx;
-        }),
-        assignUserFound: assign((ctx, { payload }) => {
-          const dashboard = { ...ctx.userDashboard };
-          const kinds = payload.availableChallengeKinds;
-          const scrubbedEmail = asterisksToBullet(payload.scrubbedEmail);
-          const scrubbedPhone = asterisksToBullet(payload.scrubbedPhone);
-
-          if (kinds?.some(isSms)) {
-            dashboard.phone = { status: 'set', label: scrubbedPhone };
-          }
-          if (kinds?.some(isEmail)) {
-            dashboard.email = { status: 'set', label: scrubbedEmail };
-          }
-          if (kinds?.some(isPasskey)) {
-            dashboard.passkey = { ...dashboard.passkey, status: 'set' };
-          }
-
-          ctx.kindToChallenge = kinds?.at(0);
-          ctx.userDashboard = dashboard;
-          ctx.userFound = { ...payload, scrubbedEmail, scrubbedPhone };
-
-          return ctx;
-        }),
-        assignVerifyToken: assign((ctx, { payload }) => {
-          const { token, kind } = payload;
-          const userDashboard = {
-            ...ctx.userDashboard,
-            [kind]: {
-              ...ctx.userDashboard[kind],
-              status: 'verified',
-            },
-          };
-
-          ctx.userDashboard = userDashboard;
-          ctx.verifyToken = token; // The last one overrides the previous
-          return ctx;
-        }),
-        assignUserDashboard: assign((ctx, { payload }) => {
-          const { entry, kind } = payload;
-          ctx.userDashboard = {
-            ...ctx.userDashboard,
-            [kind]: {
-              ...ctx.userDashboard[kind],
-              ...entry,
-            },
-          };
-          return ctx;
-        }),
+        assignPhoneChallenge: assign(assignPhoneChallenge),
+        assignPhoneNumber: assign(assignPhoneNumber),
+        assignPhoneReplaceChallenge: assign(assignPhoneReplaceChallenge),
+        assignUserFound: assign(assignUserFound),
+        assignVerifyToken: assign(assignVerifyToken),
+        assignUserDashboard: assign(assignUserDashboard),
       },
     },
   );
