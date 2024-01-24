@@ -15,7 +15,7 @@ impl FootprintVendorHttpClient {
         let retry_policy = ExponentialBackoff::builder()
             .retry_bounds(Duration::from_millis(200), Duration::from_secs(3))
             .base(1)
-            .build_with_max_retries(1);
+            .build_with_max_retries(2);
         let client = ClientBuilder::new(reqwest::Client::new())
             .with(TracingMiddleware::default())
             .with(SoftTimeoutMiddleware)
