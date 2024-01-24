@@ -18,6 +18,8 @@ use newtypes::PiiString;
 use newtypes::ProxyToken;
 use std::collections::HashMap;
 
+const MAX_NUM_FP_IDS_PER_BATCH: usize = 10_000;
+
 /// turns tokens -> PII
 /// TODO: depending on usage this function can be optimized greatly:
 ///     - concurrent async (dispatch concurrent all per-fpid)
@@ -38,6 +40,13 @@ pub async fn detokenize(
         .into_group_map();
 
     let fp_ids = tokens.keys().cloned().collect_vec();
+    tracing::info!(num_fp_ids=%fp_ids.len(), "Detokenizing fp_ids");
+    if fp_ids.len() > MAX_NUM_FP_IDS_PER_BATCH {
+        tracing::error!("Attempting to detokenize more than max allowed fp_ids");
+    }
+    if fp_ids.len() > 5_000 {
+        tracing::error!("Attempting to detokenize more than max allowed fp_ids, lower limit");
+    }
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let vws: HashMap<FpId, TenantVw> = state
