@@ -16,7 +16,7 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
     // we clean up afterwards.
 
     use db_schema::schema::{
-        access_event, annotation, business_owner, contact_info, data_lifetime, decision_intent,
+        access_event, annotation, audit_event, business_owner, contact_info, data_lifetime, decision_intent,
         document_data, document_request, document_upload, fingerprint, fingerprint_visit_event,
         identity_document, incode_verification_session, incode_verification_session_event, liveness_event,
         manual_review, middesk_request, onboarding_decision,
@@ -103,6 +103,10 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
 
         deleted_rows += diesel::delete(access_event::table)
             .filter(access_event::scoped_vault_id.eq_any(su_ids.clone()))
+            .execute(conn.conn())?;
+
+        deleted_rows += diesel::delete(audit_event::table)
+            .filter(audit_event::scoped_vault_id.eq_any(su_ids.clone().nullable()))
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(annotation::table)
