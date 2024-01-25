@@ -13,7 +13,7 @@ const IcoLang16 = ({
   return (
     <svg
       width={16}
-      height={17}
+      height={16}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}

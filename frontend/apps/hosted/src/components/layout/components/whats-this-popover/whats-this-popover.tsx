@@ -67,6 +67,12 @@ const Trigger = styled(Popover.Trigger)`
     ${createFontStyles('caption-1')}
     color: ${theme.color.secondary};
     cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+      text-decoration-thickness: 1.5px;
+      display: inline-block;
+    }
   `}
 `;
 

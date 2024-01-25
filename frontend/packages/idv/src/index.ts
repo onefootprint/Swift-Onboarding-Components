@@ -1,5 +1,3 @@
-import './config/initializers/i18next';
-
 export type {
   NavigationHeaderLeftButtonProps,
   ProviderReturn,

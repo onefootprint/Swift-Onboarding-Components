@@ -3,18 +3,12 @@ import { SecuredByFootprint } from '@onefootprint/idv';
 import styled, { css } from '@onefootprint/styled';
 import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { media, Typography } from '@onefootprint/ui';
-import i18n from 'i18next';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import WhatsThisPopover from '../whats-this-popover';
-import type { Language } from './components/language-select';
 import LanguageSelect from './components/language-select';
-import {
-  languageBaseList,
-  LanguageCodes,
-} from './components/language-select/language-select-types';
 
 type Link = { label: string; href?: string; onClick?: () => void };
 
@@ -41,31 +35,20 @@ const Footer = ({ config }: FootprintFooterProps) => {
     },
   ];
 
-  const [activeLanguage, setActiveLanguage] = useState<Language>(
-    languageBaseList[0],
-  );
-
-  const handleChangeLanguage = () => {
-    const changeTo =
-      i18n.language === LanguageCodes.EN ? LanguageCodes.ES : LanguageCodes.EN;
-    // const allLanguages = i18n.languages; // TODO: uncomment to get all languages
-    i18n.changeLanguage(changeTo);
-    document.documentElement.setAttribute('lang', changeTo);
-    setActiveLanguage(languageBaseList.find(lang => lang.code === changeTo)!);
-  };
-
   return (
     <Container>
       <SecuredByFootprint />
       <LinksContainer>
-        <LanguageSelect
-          onLanguageChange={handleChangeLanguage}
-          activeLanguage={activeLanguage}
-        />
+        <LanguageSelect />
         {links.map(({ href, label }) =>
           href ? (
             <li key={label}>
-              <a href={href} target="_blank" rel="noreferrer">
+              <a
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                className="footer-link"
+              >
                 <Typography variant="caption-1" color="secondary" as="span">
                   {label}
                 </Typography>
@@ -109,13 +92,15 @@ const LinksContainer = styled.ul`
     justify-content: center;
     gap: ${theme.spacing[7]};
 
-    a {
+    .footer-link {
       text-decoration: none;
       color: ${theme.color.secondary};
 
       @media (hover: hover) {
         &:hover {
           text-decoration: underline;
+          text-decoration-thickness: 1.5px;
+          display: inline-block;
         }
       }
     }

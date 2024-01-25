@@ -2,41 +2,47 @@ import { IcoCheckSmall16, IcoLang16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, Typography } from '@onefootprint/ui';
 import * as Select from '@radix-ui/react-select';
+import i18n from 'i18next';
 import React from 'react';
 
-import type { LanguageSelectProps } from './language-select-types';
-import { languageBaseList } from './language-select-types';
+type SupportedLanguage = 'en' | 'es';
+const LanguageLabels: Record<SupportedLanguage, string> = {
+  en: 'English',
+  es: 'Español',
+};
 
-const LanguageSelect = ({
-  languageList = languageBaseList,
-  onLanguageChange,
-  activeLanguage,
-}: LanguageSelectProps) => {
-  const handleLanguageChange = (lang: string) => {
-    const selectedLanguage = languageList.find(
-      language => language.code === lang,
-    );
-    if (selectedLanguage) {
-      onLanguageChange(selectedLanguage);
+const LanguageSelect = () => {
+  // Add some basic safety to avoid breaking if we add a new language to the app
+  // without updating the language labels dictionary above
+  const allLanguages = Object.keys(LanguageLabels) as SupportedLanguage[];
+  const language = i18n.language as SupportedLanguage;
+  const label = LanguageLabels[language];
+  if (!label) {
+    return null;
+  }
+
+  const handleLanguageChange = (newValue: string) => {
+    if (newValue === language) {
+      // Performance optimization: No need to re-render the page if the lang didn't change
+      return;
     }
+    i18n.changeLanguage(newValue);
+    document.documentElement.setAttribute('lang', newValue);
   };
 
   return (
-    <Select.Root
-      onValueChange={handleLanguageChange}
-      value={activeLanguage.code}
-    >
+    <Select.Root value={language} onValueChange={handleLanguageChange}>
       <StyledTrigger>
         <IcoLang16 color="secondary" />
         <Typography variant="caption-1" color="secondary">
-          {activeLanguage.name}
+          {label}
         </Typography>
       </StyledTrigger>
       <StyledContent sideOffset={8} position="popper" align="center">
         <Select.Group>
-          {languageList.map(language => (
-            <StyledItem key={language.code} value={language.code}>
-              <Select.ItemText>{language.name}</Select.ItemText>
+          {allLanguages.map(lng => (
+            <StyledItem key={lng} value={lng}>
+              <Select.ItemText>{LanguageLabels[lng]}</Select.ItemText>
               <IndicatorContainer>
                 <IcoCheckSmall16 color="tertiary" />
               </IndicatorContainer>

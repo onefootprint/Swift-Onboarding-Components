@@ -7,28 +7,29 @@ import {
   Stack,
   Typography,
 } from '@onefootprint/ui';
+import i18n from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { Language } from '../language-select';
-import { languageBaseList } from '../language-select/language-select-types';
-
 type FooterActionsProps = {
   onWhatsThisClick?: () => void;
-  languageList?: Language[];
-  onLanguageChange: (language: Language) => void;
-  activeLanguage: Language;
 };
 
-const FooterActions = ({
-  onWhatsThisClick,
-  onLanguageChange,
-  languageList = languageBaseList,
-  activeLanguage,
-}: FooterActionsProps) => {
+const FooterActions = ({ onWhatsThisClick }: FooterActionsProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'global.components.layout',
   });
+
+  const handleLanguageChange = (newValue: string) => {
+    i18n.changeLanguage(newValue);
+  };
+
+  i18n.languages = ['en', 'es'];
+  const languageLabels = {
+    en: 'English',
+    es: 'Español',
+  };
+
   return (
     <Dropdown.Root>
       <DropdownTrigger>
@@ -54,15 +55,15 @@ const FooterActions = ({
           </Anchor>
         </Stack>
         <LanguageList direction="column" paddingTop={2}>
-          {languageList.map(language => (
+          {i18n.languages.map(language => (
             <StyledItem
-              key={language.code}
-              onClick={() => onLanguageChange(language)}
+              key={language}
+              onClick={() => handleLanguageChange(language)}
             >
               <Typography variant="caption-1" color="secondary" as="span">
-                {language.name}
+                {languageLabels[language as keyof typeof languageLabels]}
               </Typography>
-              {language.code === activeLanguage.code && (
+              {language === i18n.language && (
                 <Stack align="center" justify="center">
                   <IcoCheckSmall16 color="tertiary" />
                 </Stack>

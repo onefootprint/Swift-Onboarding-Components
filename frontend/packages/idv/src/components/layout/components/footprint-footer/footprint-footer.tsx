@@ -1,8 +1,7 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import styled, { css } from '@onefootprint/styled';
 import { media, Stack, Typography } from '@onefootprint/ui';
-import i18n from 'i18next';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useResizeObserver from 'use-resize-observer';
 
@@ -10,12 +9,7 @@ import { FOOTPRINT_FOOTER_ID } from '../../constants';
 import { useLayoutOptions } from '../layout-options-provider';
 import SecuredByFootprint from '../secured-by-footprint';
 import FooterActions from './components/footer-actions';
-import type { Language } from './components/language-select';
 import LanguageSelect from './components/language-select';
-import {
-  languageBaseList,
-  LanguageCodes,
-} from './components/language-select/language-select-types';
 
 type FootprintFooterProps = {
   hideOnDesktop?: boolean;
@@ -37,23 +31,11 @@ const FootprintFooter = ({
     box: 'border-box',
   });
 
-  const [activeLanguage, setActiveLanguage] = useState<Language>(
-    languageBaseList[0],
-  );
-
   useEffect(() => {
     if (!footerVisible) updateFooterOptions({ height: 0 });
     else updateFooterOptions({ height: height ?? 0 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [height]);
-
-  const handleChangeLanguage = () => {
-    const changeTo =
-      i18n.language === LanguageCodes.EN ? LanguageCodes.ES : LanguageCodes.EN;
-    i18n.changeLanguage(changeTo);
-    document.documentElement.setAttribute('lang', changeTo);
-    setActiveLanguage(languageBaseList.find(lang => lang.code === changeTo)!);
-  };
 
   return (
     <FootprintFooterContainer
@@ -66,13 +48,10 @@ const FootprintFooter = ({
       <SecuredByFootprint />
       <LinksContainer as="ul" align="center" justify="center" gap={3}>
         <li>
-          <LanguageSelect
-            onLanguageChange={handleChangeLanguage}
-            activeLanguage={activeLanguage}
-          />
+          <LanguageSelect />
         </li>
         <li>
-          <WhatsThisButton onClick={onWhatsThisClick}>
+          <WhatsThisButton onClick={onWhatsThisClick} className="footer-link">
             <Typography variant="caption-1" color="secondary" as="span">
               {t('whats-this')}
             </Typography>
@@ -83,6 +62,7 @@ const FootprintFooter = ({
             href={`${FRONTPAGE_BASE_URL}/privacy-policy`}
             target="_blank"
             rel="noreferrer"
+            className="footer-link"
           >
             <Typography variant="caption-1" color="secondary" as="span">
               {t('privacy')}
@@ -91,11 +71,7 @@ const FootprintFooter = ({
         </li>
       </LinksContainer>
       <ActionsWrapper>
-        <FooterActions
-          onWhatsThisClick={onWhatsThisClick}
-          onLanguageChange={handleChangeLanguage}
-          activeLanguage={activeLanguage}
-        />
+        <FooterActions onWhatsThisClick={onWhatsThisClick} />
       </ActionsWrapper>
     </FootprintFooterContainer>
   );
@@ -144,13 +120,15 @@ const LinksContainer = styled(Stack)`
       display: none;
     `}
 
-    a {
+    .footer-link {
       text-decoration: none;
       color: ${theme.color.secondary};
 
       @media (hover: hover) {
         &:hover {
           text-decoration: underline;
+          text-decoration-thickness: 1.5px;
+          display: inline-block;
         }
       }
     }

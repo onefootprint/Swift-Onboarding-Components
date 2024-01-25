@@ -1,5 +1,3 @@
-import './config/initializers/i18next';
-
 import type { L10n } from '@onefootprint/footprint-js';
 import { createGlobalStyle } from '@onefootprint/styled';
 import Script from 'next/script';
