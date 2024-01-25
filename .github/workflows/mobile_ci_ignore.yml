@@ -11,6 +11,8 @@ on:
       - 'mobile/**'
       - '.github/workflows/*.yml'
 
+# The names of these jobs are important since they're used in Github branch protections
+
 jobs:
   install-dependencies:
     runs-on: ${{ matrix.os }}
@@ -21,7 +23,7 @@ jobs:
     steps:
       - run: echo "Not required"
 
-  lint:
+  lint-mobile:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -30,7 +32,7 @@ jobs:
     steps:
       - run: echo "Not required"
 
-  typecheck:
+  typecheck-mobile:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -39,7 +41,7 @@ jobs:
     steps:
       - run: echo "Not required"
 
-  format:
+  format-mobile:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -47,7 +49,8 @@ jobs:
         os: [ubuntu-latest]
     steps:
       - run: echo "Not required"
-  test:
+
+  test-mobile:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:

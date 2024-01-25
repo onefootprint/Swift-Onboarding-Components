@@ -12,6 +12,8 @@ on:
     paths-ignore:
       - 'backend/**'
 
+# The names of these jobs are important since they're used in Github branch protections
+
 jobs:
   check_test:
     runs-on: ubuntu-latest

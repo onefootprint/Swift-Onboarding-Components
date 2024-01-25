@@ -20,6 +20,8 @@ env:
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
   API_BASE_URL: https://api.dev.onefootprint.com
 
+# The names of these jobs are important since they're used in Github branch protections
+
 jobs:
   install-dependencies:
     runs-on: ${{ matrix.os }}
@@ -47,7 +49,7 @@ jobs:
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile
 
-  lint:
+  lint-mobile:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -74,7 +76,7 @@ jobs:
         working-directory: ./mobile
         run: yarn lint:ci
 
-  format:
+  format-mobile:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -99,7 +101,7 @@ jobs:
         working-directory: ./mobile
         run: yarn format:ci
 
-  test:
+  test-mobile:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -124,7 +126,7 @@ jobs:
         working-directory: ./mobile
         run: yarn test:ci
 
-  typecheck:
+  typecheck-mobile:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:

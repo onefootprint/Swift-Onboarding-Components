@@ -11,6 +11,8 @@ on:
       - 'frontend/**'
       - '.github/workflows/frontend_ci_ignore.yml'
 
+# The names of these jobs are important since they're used in Github branch protections
+
 jobs:
   install-dependencies:
     runs-on: ${{ matrix.os }}

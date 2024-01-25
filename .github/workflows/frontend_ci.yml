@@ -19,6 +19,8 @@ env:
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
+# The names of these jobs are important since they're used in Github branch protections
+
 jobs:
   install-dependencies:
     strategy:
