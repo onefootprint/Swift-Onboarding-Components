@@ -2,15 +2,9 @@ name: Backend CI
 
 on:
   push:
-    paths:
-      - 'backend/**'
-
     branches:
       - master
-
   pull_request:
-    paths:
-      - 'backend/**'
 
 env:
   CARGO_TERM_COLOR: always
@@ -19,10 +13,24 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}-ci-check-test
   cancel-in-progress: true
 
-# The names of these jobs are important since they're used in Github branch protections
-
 jobs:
+  files-changed:
+    name: Determine if relevant files changed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@affb29871ab1f927ecad0ee68c0989584101408f
+        id: changes
+        with:
+          filters: | 
+            src:
+              - 'backend/**'
+    outputs:
+      filesChanged: ${{ steps.changes.outputs.src }}
+
   check_test:
+    needs: [files-changed]
+    if: needs.files-changed.outputs.filesChanged == 'true'
     runs-on: 16core
     environment: dev
     services:
@@ -83,7 +91,9 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost/postgres
 
-  integration_migration_tests:
+  integration_tests:
+    needs: [files-changed]
+    if: needs.files-changed.outputs.filesChanged == 'true'
     runs-on: 16core
     environment: dev
     strategy:
@@ -108,7 +118,6 @@ jobs:
       EXPECTED_SERVER_VERSION: ${{ github.sha }}
       IT_PHONE_NUMBERS: '["+1 202 952 1443", "+1 202 831 8398", "+1 202 946 3154", "+1 202 937 0987", "+1 202 759 2344", "+1 202 946 1521", "+1 202 998 5931", "+1 202 952 9077", "+1 202 740 9135", "+1 202 519 1954"]'
       ENVIRONMENT: ci
-    if: success()
     steps:
       - uses: actions/checkout@v3
 
@@ -208,6 +217,8 @@ jobs:
           fi
 
   clippy:
+    needs: [files-changed]
+    if: needs.files-changed.outputs.filesChanged == 'true'
     runs-on: 16core
 
     steps:
@@ -228,3 +239,17 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: --manifest-path ./backend/Cargo.toml -- -D warnings
           toolchain: 1.74.0
+
+  # Branch protections require this job to pass. If any of the `needs` fail, then this job will fail.
+  # Add all jobs in this workflow to this job's `needs`
+  backend-ci:
+    runs-on: ubuntu-latest
+    needs: [check_test, integration_tests, clippy]
+    if: always()
+    steps:
+      - name: Success
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: exit 0
+      - name: Fail
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1
