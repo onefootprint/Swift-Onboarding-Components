@@ -1,7 +1,7 @@
 {
   "side": {
     "front": "frente",
-    "back": "atrás"
+    "back": "dorso"
   },
   "di": {
     "id.name": "Nombre",
@@ -12,8 +12,8 @@
     "id.ssn9": "SSN (Completo)",
     "id.ssn4": "SSN (Últimos 4)",
     "id.dob": "Fecha de nacimiento",
-    "id.address_line1": "Línea de dirección 1",
-    "id.address_line2": "Línea de dirección 2",
+    "id.address_line1": "Dirección",
+    "id.address_line2": "Detalles adicionales",
     "id.city": "Ciudad",
     "id.country": "País",
     "id.state": "Estado",
@@ -25,7 +25,7 @@
     "passport": "Pasaporte",
     "visa": "Visa",
     "permit": "Permiso de trabajo / Tarjeta EAD",
-    "residence_document": "Tarjeta de residencia / Tarjeta verde"
+    "residence_document": "Tarjeta de residencia / Green card"
   },
   "cdo": {
     "name": "Nombre completo",
@@ -38,41 +38,41 @@
     "nationality": "Nacionalidad",
     "selfie": "Selfie",
     "document": "Documento de identidad",
-    "document_and_selfie": "Documento de identidad y Selfie",
+    "document_and_selfie": "Documento de identidad y selfie",
     "investor_profile": "Perfil de inversor"
   },
   "components": {
     "back-button": {
-      "cta": "Volver atrás"
+      "cta": "Volver"
     },
     "passkeys": {
       "register": {
-        "title": "Verificación de vida",
-        "subtitle": "Con una verificación de rostro o huella dactilar, aseguramos que tu cuenta siempre se acceda de manera segura por ti, manteniendo tus detalles personales privados y protegidos.",
+        "title": "Prueba de vida",
+        "subtitle": "Mediante una verificación biométrica o de huella dactilar (Passkeys), nos aseguramos de que solo tú puedas acceder a esta cuenta, manteniendo tus datos personales siempre protegidos.",
         "cta": "Iniciar verificación",
         "skip": "Hacerlo más tarde",
         "about": {
-          "cta": "Más sobre las contraseñas de acceso",
-          "title": "Acerca de las contraseñas de acceso",
-          "content": "Las contraseñas de acceso son nuestra forma de eliminar las contraseñas complicadas. Son una clave simple y segura para acceder a la aplicación, ¡y son únicas para ti! Di adiós a recordar y escribir contraseñas, tu contraseña de acceso lo hace todo con un toque.",
+          "cta": "Más sobre Passkeys",
+          "title": "Acerca de Paskeys",
+          "content": "Las Passkeys son una forma segura de evitar tener que recordar contraseñas complicadas. El dispositivo guarda una clave única que genera en base a tus datos biométricos, y la próxima vez que quieras ingresar vas a poder hacerlo solo escaneando tu cara o huella dactilar. Este método es completamente seguro y tus datos biométricos jamás se comparten con nadie ni salen de tu dispositivo en ningún momento.",
           "close": "Cerrar"
         }
       },
       "retry": {
         "title": "Por favor, inténtalo de nuevo",
-        "subtitle": "La verificación de rostro/huella dactilar falló. Inténtalo de nuevo o completa más tarde.",
+        "subtitle": "La verificación biométrica falló. Por favor, inténtalo de nuevo.",
         "cta": "Iniciar verificación",
         "skip": "Hacerlo más tarde"
       },
       "success": {
-        "title": "¡Autenticación biométrica exitosa!"
+        "title": "Verificación biométrica exitosa!"
       }
     }
   },
   "scan": {
     "doc-selection": {
-      "title": "Necesitamos una foto de tu identificación",
-      "subtitle": "Selecciona la opción que mejor te funcione",
+      "title": "Necesitamos una foto de tu tarjeta de identificación",
+      "subtitle": "Selecciona la opción que prefieras",
       "country-select": {
         "hint": "Solo se aceptan documentos emitidos por {{country}}"
       },
@@ -80,14 +80,14 @@
         "dl": "Licencia de conducir",
         "id": "Tarjeta de identificación",
         "passport": "Pasaporte",
-        "residence-document": "Tarjeta de residencia / Tarjeta verde",
+        "residence-document": "Tarjeta de residencia / Green Card",
         "voter-identification": "Identificación de votante",
         "permit": "Permiso de trabajo / Tarjeta EAD",
         "visa": "Visa"
       },
       "permissions-dialog": {
-        "title": "Permitir acceso a tu cámara",
-        "description": "Necesitaremos que tomes fotos de tu documento para verificar adecuadamente tu identidad.",
+        "title": "Permitir acceso a la cámara del teléfono",
+        "description": "Necesitaremos que tomes fotos de tu documento para verificar tu identidad.",
         "continue": "Continuar",
         "open-settings": "Abrir ajustes",
         "cta": "Continuar"
@@ -97,16 +97,16 @@
     "instructions": {
       "title": "Instrucciones",
       "bg": {
-        "title": "Encuentra un fondo con buen contraste",
-        "description": "Un alto contraste ayuda en la detección del documento, evitando errores."
+        "title": "Busca un fondo con buen contraste",
+        "description": "Un buen contraste con el fondo nos ayuda a captar mejor la imágen de tu documento."
       },
       "frame": {
-        "title": "Coloca el documento en el marco",
-        "description": "Asegúrate de que todo el documento esté posicionado según se indica en el marco."
+        "title": "Coloca el documento dentro del marco",
+        "description": "Asegúrate de que todo el documento esté posicionado dentro del rectángulo."
       },
       "hold": {
         "title": "Mantén la cámara estable",
-        "description": "Mantén la cámara estable para evitar desenfoques o reflejos."
+        "description": "Mantén la cámara lo más estable que puedas para evitar desenfoques o reflejos."
       },
       "auto": {
         "title": "La imagen se capturará automáticamente",
@@ -116,32 +116,32 @@
     "upload": {
       "errors": {
         "title": "No pudimos procesar tu imagen",
-        "cta": "Volver a tomar",
+        "cta": "Volver a capturar",
         "doc_type_mismatch": "El tipo de documento no coincide. Por favor, sube tu {{documentType}} de {{countryName}}.",
         "unknown_document_type": "No pudimos clasificar este documento. Por favor, sube tu {{documentType}} de {{countryName}}.",
-        "unsupported_document_type": "Lamentablemente, el tipo de documento subido no es compatible. Por favor, sube tu {{documentType}} de {{countryName}}.",
-        "wrong_document_side": "Parece que subiste el lado incorrecto de tu documento. Voltea tu identificación y sube el {{side}} de tu {{documentType}} de {{countryName}}.",
+        "unsupported_document_type": "Lamentablemente, el tipo de documento no es compatible. Por favor, sube tu {{documentType}} de {{countryName}}.",
+        "wrong_document_side": "Parece que capturaste el lado incorrecto de tu documento. Asegúrate de subir el {{side}} de tu {{documentType}} de {{countryName}}.",
         "wrong_one_sided_document": "Se detectó un tipo de documento incorrecto. Por favor, sube tu {{documentType}} de {{countryName}}.",
         "document_not_readable": "No se pudo leer tu documento. Por favor, inténtalo de nuevo.",
         "document_glare": "La imagen de tu documento tenía demasiado resplandor. Ajusta la iluminación e inténtalo de nuevo.",
-        "document_sharpness": "La imagen del documento estaba borrosa. Por favor, sube o captura una imagen más nítida.",
+        "document_sharpness": "La imagen del documento estaba borrosa. Por favor, captura una imagen más nítida.",
         "id_type_not_acceptable": "Se detectó un tipo de documento inválido. Por favor, sube tu {{documentType}} de {{countryName}}.",
-        "unable_to_align_document": "Uno o más bordes del documento no están dentro de los límites de la imagen. Coloca el documento en el centro del marco e inténtalo de nuevo.",
+        "unable_to_align_document": "Uno o más bordes del documento no están dentro del marco indicado. Coloca el documento en el centro del marco e inténtalo de nuevo.",
         "unknown_country_code": "No pudimos detectar el país emisor de tu documento. Por favor, sube tu {{documentType}} de {{countryName}}.",
-        "country_code_mismatch": "El país emisor de {{documentType}} no coincidió. Por favor, sube tu {{documentType}} de {{countryName}}.",
-        "selfie_face_not_found": "No pudimos detectar un rostro en la selfie. Por favor, inténtalo de nuevo y asegúrate de que tu rostro esté en el encuadre.",
+        "country_code_mismatch": "El país emisor de {{documentType}} no coincide. Por favor, sube tu {{documentType}} de {{countryName}}.",
+        "selfie_face_not_found": "No pudimos detectar un rostro en la selfie que subiste. Por favor, inténtalo de nuevo y asegúrate de que tu rostro esté visible.",
         "selfie_low_confidence": "No pudimos verificar tu selfie. Por favor, inténtalo de nuevo.",
-        "selfie_too_dark": "Tu imagen estaba demasiado oscura. Ajusta la iluminación e inténtalo de nuevo.",
-        "selfie_glare": "Tu selfie tenía demasiado resplandor. Ajusta la iluminación e inténtalo de nuevo.",
-        "selfie_has_lenses": "Detectamos gafas en tu selfie. Por favor, retira tus gafas e inténtalo de nuevo.",
-        "selfie_has_face_mask": "Detectamos una mascarilla facial en tu selfie. Por favor, quítate todas las cubiertas faciales y inténtalo de nuevo.",
+        "selfie_too_dark": "Tu imagen estaba demasiado oscura. Ajusta la iluminación de tu espacio e inténtalo de nuevo.",
+        "selfie_glare": "Tu selfie tenía demasiado resplandor. Ajusta la iluminación de tu espacio e inténtalo de nuevo.",
+        "selfie_has_lenses": "Detectamos gafas en tu selfie. Por favor, quítate las gafas e inténtalo de nuevo.",
+        "selfie_has_face_mask": "Detectamos una mascarilla facial en tu selfie. Por favor, quítatela e inténtalo de nuevo.",
         "selfie_blurry": "Tu selfie estaba demasiado borrosa. Por favor, inténtalo de nuevo.",
-        "selfie_image_size_unsupported": "La imagen de tu selfie era demasiado pequeña. Por favor, inténtalo de nuevo con una imagen de mayor resolución.",
-        "selfie_image_orientation_incorrect": "La imagen de tu selfie tiene la orientación incorrecta. Asegúrate de que la imagen enviada esté en formato vertical y inténtalo de nuevo.",
-        "selfie_bad_image_compression": "La imagen de tu selfie tiene una compresión incorrecta. Por favor, inténtalo de nuevo.",
-        "drivers_license_permit_not_allowed": "Los permisos de licencia de conducir no están permitidos. Por favor, inténtalo con una licencia de conducir completa o ponte en contacto con el negocio para obtener soporte.",
+        "selfie_image_size_unsupported": "La selfie que subiste tiene baja resolución. Por favor, inténtalo de nuevo con una imagen de mayor resolución.",
+        "selfie_image_orientation_incorrect": "La selfie no tiene la orientación correcta. Asegúrate de que la imagen enviada esté en formato vertical.",
+        "selfie_bad_image_compression": "Tu selfie tiene una compresión baja. Por favor, inténtalo de nuevo.",
+        "drivers_license_permit_not_allowed": "El permiso de licencia de conducir no es un documento válido. Por favor, inténtalo con una licencia de conducir.",
         "unknown_error": "Se produjo un error. Por favor, inténtalo de nuevo.",
-        "face_not_found": "No pudimos detectar un rostro en el documento proporcionado. Por favor, inténtalo de nuevo y asegúrate de que estás capturando una imagen clara."
+        "face_not_found": "No pudimos detectar un rostro en el documento. Por favor, inténtalo de nuevo y asegúrate de que estás capturando una imagen clara."
       },
       "loading": {
         "title": "Procesando imagen",
@@ -158,14 +158,14 @@
     "consent": {
       "title": "Consentimiento para el uso de tus imágenes",
       "subtitle": "Consentimiento y autorización por escrito para la recopilación, uso, divulgación y almacenamiento de datos personales (incluyendo información biométrica e identificadores)",
-      "description": "Al hacer clic en Aceptar y continuar y proporcionar a One Footprint, Inc. (en adelante referida como \"Empresa\") tus Datos Personales, incluyendo tu Información Biométrica e información de identificación gubernamental, consientes a la recopilación, almacenamiento, retención, uso y divulgación de dicha información por parte de la Empresa y Incode Technologies, Inc. (en adelante \"Incode\") para proporcionar los servicios de verificación de identidad, de acuerdo con el Aviso de Privacidad de la Empresa y los Términos de Uso que puedes encontrar en https://www.onefootprint.com/privacy-policy y https://www.onefootprint.com/terms-of-service. Incluso si consientes, puedes retirar tu consentimiento en cualquier momento.\n\nPara verificar que eres la persona representada en tu identificación emitida por el gobierno (\"Servicios\"), la Empresa utiliza tecnología de terceros de Incode para recopilar datos personales tuyos, incluyendo información biométrica e identificadores biométricos como tu huella facial (\"Información Biométrica\"), una selfie y tu identificación emitida por el gobierno, incluyendo información obtenida, por ejemplo y cuando corresponda, escaneando el código de barras (colectivamente con la Información Biométrica, \"Datos Personales\"). Específicamente, se te pedirá que tomes una selfie a través de la plataforma de Incode. Luego, Incode escaneará y mapeará tus rasgos faciales en comparación con la imagen en tu identificación emitida por el gobierno para permitirte crear y/o acceder a tu cuenta con la Empresa. Ten en cuenta que el procesamiento de tus Datos Personales, en particular de tu Información Biométrica por parte de Incode, incluirá una comparación de la imagen en tu documento de identificación con tu selfie (1:1), que luego se comparará con la base de datos de la Empresa con fines de prevención de fraudes (1:N). Para los Servicios, Incode también recopilará otra información que se encuentra en el frente y dorso de tu documentación de identificación, incluyendo donde exista y lo permita la ley, escaneando el código de barras y recopilando información derivada de él (por ejemplo, nombre, fecha de nacimiento, estatura). Incode utiliza esta información para verificar tu identidad y prevenir fraudes. Incode también puede, con tu consentimiento, utilizar esta información para mejorar sus productos y servicios. La Empresa o Incode en nombre de la Empresa, pueden compartir tus Datos Personales con proveedores de servicios de terceros o entidades gubernamentales que nos permitan proporcionar nuestros Servicios (por ejemplo, proveedores de alojamiento en la nube, base de datos de estafadores o el Departamento de Vehículos Motorizados si proporcionas una tarjeta de identificación de EE. UU.) y otros terceros cuando lo requiera la ley.\n\nUso de tus Datos Personales: Tus Datos Personales, incluyendo la Información Biométrica, pueden utilizarse para los siguientes fines (según corresponda según tu consentimiento), en cada caso como se describe con mayor detalle en la Política de Privacidad de la Empresa y/o la Política de Privacidad de Incode:\n\n• Para proporcionar los servicios para los cuales se solicitaron los Datos Personales;\n • Para mejorar o modificar los productos y servicios de Incode; y\n• Para cumplir con las obligaciones de la Empresa o Incode bajo la ley aplicable.\n\nPuedes solicitar la eliminación de tus Datos Personales y ejercer cualquier otro derecho bajo las leyes de protección de datos aplicables en cualquier momento enviando un correo electrónico a la Empresa a support@onefootprint.com o a Incode a dataprotection@incode.com. Si solicitas la eliminación de tus Datos Personales, no podremos recuperarlos en un momento posterior. La Empresa o Incode, según corresponda, eliminará permanentemente la Información Biométrica procesada (si la hubiera) para sus propios fines en el momento anterior de: (i) el momento en que se haya satisfecho el propósito para el cual se recopiló; o (ii) tres años desde el momento en que proporcionaste tu consentimiento. Incode hará lo mismo con la Información Biométrica que procesa en nombre de la Empresa y según las instrucciones de la misma.\n",
+      "description": "Al hacer clic en Aceptar y continuar y proporcionar a One Footprint, Inc. (en adelante referida como \"Empresa\") tus Datos Personales, incluyendo tu Información Biométrica e información de identificación gubernamental, das tu consentimiento para la recopilación, almacenamiento, retención, uso y divulgación de dicha información por parte de la Empresa y Incode Technologies, Inc. (en adelante \"Incode\") para proporcionar los servicios de verificación de identidad, de acuerdo con el Aviso de Privacidad de la Empresa y los Términos de Uso que puedes encontrar en https://www.onefootprint.com/privacy-policy y https://www.onefootprint.com/terms-of-service. Incluso habiendo dado tu consentimiento, puedes retirar tu consentimiento en cualquier momento.\n\nPara verificar que eres la persona representada en tu identificación emitida por el gobierno (\"Servicios\"), la Empresa utiliza tecnología de terceros de Incode para recopilar datos personales tuyos, incluyendo información biométrica e identificadores biométricos como tu huella facial (\"Información Biométrica\"), una selfie y tu identificación emitida por el gobierno, incluyendo información obtenida, por ejemplo y cuando corresponda, escaneando el código de barras (colectivamente con la Información Biométrica, \"Datos Personales\"). Específicamente, se te pedirá que tomes una selfie a través de la plataforma de Incode. Luego, Incode escaneará y mapeará tus rasgos faciales en comparación con la imagen en tu identificación emitida por el gobierno para permitirte crear y/o acceder a tu cuenta con la Empresa. Ten en cuenta que el procesamiento de tus Datos Personales, en particular de tu Información Biométrica por parte de Incode, incluirá una comparación de la imagen en tu documento de identificación con tu selfie (1:1), que luego se comparará con la base de datos de la Empresa con fines de prevención de fraudes (1:N). Para los Servicios, Incode también recopilará otra información que se encuentra en el frente y dorso de tu documentación de identificación, incluyendo donde exista y lo permita la ley, escaneando el código de barras y recopilando información derivada de él (por ejemplo, nombre, fecha de nacimiento, estatura). Incode utiliza esta información para verificar tu identidad y prevenir fraudes. Incode también puede, con tu consentimiento, utilizar esta información para mejorar sus productos y servicios. La Empresa o Incode en nombre de la Empresa, pueden compartir tus Datos Personales con proveedores de servicios de terceros o entidades gubernamentales que nos permitan proporcionar nuestros Servicios (por ejemplo, proveedores de alojamiento en la nube, base de datos de estafadores o el Departamento de Vehículos Motorizados si proporcionas una tarjeta de identificación de EE. UU.) y otros terceros cuando lo requiera la ley.\n\nUso de tus Datos Personales: Tus Datos Personales, incluyendo la Información Biométrica, pueden utilizarse para los siguientes fines (según corresponda según tu consentimiento), en cada caso como se describe con mayor detalle en la Política de Privacidad de la Empresa y/o la Política de Privacidad de Incode:\n\n• Para proporcionar los servicios para los cuales se solicitaron los Datos Personales;\n • Para mejorar o modificar los productos y servicios de Incode; y\n• Para cumplir con las obligaciones de la Empresa o Incode bajo la ley aplicable.\n\nPuedes solicitar la eliminación de tus Datos Personales y ejercer cualquier otro derecho bajo las leyes de protección de datos aplicables en cualquier momento enviando un correo electrónico a la Empresa a support@onefootprint.com o a Incode a dataprotection@incode.com. Si solicitas la eliminación de tus Datos Personales, no podremos recuperarlos en un momento posterior. La Empresa o Incode, según corresponda, eliminará permanentemente la Información Biométrica procesada (si la hubiera) para sus propios fines en el momento anterior de: (i) el momento en que se haya satisfecho el propósito para el cual se recopiló; o (ii) tres años desde el momento en que proporcionaste tu consentimiento. Incode hará lo mismo con la Información Biométrica que procesa en nombre de la Empresa y según las instrucciones de la misma.\n",
       "scroll-to-agree": "Desplázate para aceptar",
       "agree-and-continue": "Aceptar y continuar",
       "continue": "Continuar",
-      "third-party": "Opcional: Al marcar esta casilla y proporcionar a Incode tus Datos Personales, incluyendo tu Información Biométrica y tu información de identificación gubernamental, otorgas tu consentimiento y proporcionas una autorización por escrito a Incode para la recopilación, almacenamiento, retención, uso y divulgación de dicha información con el fin de mejorar, modificar o actualizar los productos o servicios de Incode (incluyendo su algoritmo), de acuerdo con su Aviso de Privacidad. Puedes ejercer tus derechos conforme a las leyes de privacidad aplicables, incluyendo la revocación de tu consentimiento, contactando a dataprotection@incode.com. IMPORTANTE: Tu consentimiento es voluntario, incluso si no das tu consentimiento, aún podrás acceder a los servicios de la Compañía.",
+      "third-party": "Opcional: Al marcar esta casilla, le das permiso a Incode para acceder a tus Datos Personales, incluyendo tu Información Biométrica y tu información de identificación gubernamental, para la recopilación, almacenamiento, retención, uso y divulgación de dicha información con el fin de mejorar, modificar o actualizar los productos o servicios de Incode (incluyendo su algoritmo), de acuerdo con su Aviso de Privacidad. Puedes ejercer tus derechos conforme a las leyes de privacidad aplicables, incluyendo la revocación de tu consentimiento, contactando a dataprotection@incode.com. IMPORTANTE: Tu consentimiento es voluntario, e incluso si no das tu consentimiento, aún podrás acceder a los servicios de la Compañía.",
       "consent-bottomsheet": {
         "submit-button": {
-          "disabled-title": "Desplázate para aceptar",
+          "disabled-title": "Lee todo el texto antes de aceptar",
           "enabled-title": "Aceptar y continuar"
         }
       }
@@ -241,16 +241,16 @@
     "selfie": {
       "title": "Selfie",
       "instructions": {
-        "title": "Coloca tu rostro aquí",
-        "description": "La escanearemos automáticamente"
+        "title": "Alinea tu rostro aquí",
+        "description": "Tomaremos la selfie automáticamente"
       }
     }
   },
   "screens": {
     "preview": {
-      "banner": "Modo demo",
+      "banner": "Modo de prueba",
       "about": {
-        "title": "Modo demo",
+        "title": "Modo de prueba",
         "content": "Para mantener las cosas seguras, esta experiencia utiliza datos ficticios para que puedas probar el flujo sin comprometer tu privacidad.",
         "cta": "Continuar"
       }
@@ -277,7 +277,7 @@
     "login": {
       "title": "¡Bienvenido de nuevo! 🎉",
       "tab": {
-        "aria-label": "Método de identificación"
+        "aria-label": "Tipo de identificación"
       },
       "sms": {
         "title": "SMS",
@@ -294,12 +294,12 @@
         }
       },
       "passkey": {
-        "title": "Clave de acceso",
-        "cta": "Iniciar clave de acceso",
-        "cta-retry": "Reintentar clave de acceso",
+        "title": "Passkeys",
+        "cta": "Iniciar verificación",
+        "cta-retry": "Reintentar verificación",
         "notifications": {
           "error": {
-            "title": "No pudimos autenticar mediante la clave de acceso"
+            "title": "No pudimos autenticar mediante Passkeys"
           }
         }
       }
@@ -310,20 +310,20 @@
     },
     "completed": {
       "title": "¡Éxito!",
-      "subtitle": "Ahora puedes continuar desde donde lo dejaste en la computadora de escritorio"
+      "subtitle": "Ahora puedes continuar desde tu computadora"
     },
     "completed-preview": {
       "title": "¡Éxito!",
       "subtitle": "Has completado con éxito nuestra demostración.",
-      "cta": "Reiniciar demo"
+      "cta": "Reiniciar"
     },
     "error": {
-      "title": "La sesión no es válida",
-      "subtitle": "Por favor, regresa a la página anterior."
+      "title": "Hay un error en tu sesión",
+      "subtitle": "Por favor, inténtalo de nuevo."
     },
     "expired": {
       "title": "Sesión expirada",
-      "subtitle": "Por razones de seguridad, esta sesión ha expirado. Por favor, regresa a la página anterior."
+      "subtitle": "Por razones de seguridad, esta sesión ha expirado. Por favor, intenta ingresando de nuevo."
     }
   }
 }
