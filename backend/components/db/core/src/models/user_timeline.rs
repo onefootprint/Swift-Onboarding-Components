@@ -17,6 +17,7 @@ use newtypes::AuthMethodUpdatedInfo;
 use newtypes::CollectedDataOption;
 use newtypes::DataIdentifier;
 use newtypes::DbUserTimelineEventKind;
+use newtypes::ExternalIntegrationInfo;
 use newtypes::{DbUserTimelineEvent, ScopedVaultId, UserTimelineId, VaultId};
 
 use super::annotation::AnnotationInfo;
@@ -76,6 +77,7 @@ pub enum SaturatedTimelineEvent {
     WorkflowStarted((Workflow, ObConfiguration)),
     AuthMethodUpdated((AuthMethodUpdatedInfo, AuthEvent, InsightEvent)),
     LabelAdded(ScopedVaultLabel),
+    ExternalIntegrationCalled(ExternalIntegrationInfo),
 }
 
 pub type IsFromOtherTenant = bool;
@@ -301,6 +303,9 @@ impl UserTimeline {
                     DbUserTimelineEvent::LabelAdded(ref e) => {
                         let label = labels.get(&e.id).ok_or(DbError::RelatedObjectNotFound)?.clone();
                         SaturatedTimelineEvent::LabelAdded(label)
+                    }
+                    DbUserTimelineEvent::ExternalIntegrationCalled(ref e) => {
+                        SaturatedTimelineEvent::ExternalIntegrationCalled(e.clone())
                     }
                 };
                 Ok(UserTimelineInfo(ut, saturated_event))

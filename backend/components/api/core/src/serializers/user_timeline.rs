@@ -5,7 +5,8 @@ use db::models::{
 };
 use itertools::Itertools;
 use newtypes::{
-    AuthMethodUpdatedInfo, DocumentRequestKind, TriggerKind, WorkflowConfig, WorkflowRequestConfig,
+    AuthMethodUpdatedInfo, DocumentRequestKind, ExternalIntegrationInfo, TriggerKind, WorkflowConfig,
+    WorkflowRequestConfig,
 };
 
 use crate::utils::db2api::DbToApi;
@@ -138,6 +139,18 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
             SaturatedTimelineEvent::LabelAdded(label) => {
                 let ScopedVaultLabel { kind, .. } = label;
                 Self::LabelAdded(api_wire_types::LabelAdded { kind })
+            }
+            SaturatedTimelineEvent::ExternalIntegrationCalled(e) => {
+                let ExternalIntegrationInfo {
+                    integration,
+                    successful,
+                    external_id,
+                } = e;
+                Self::ExternalIntegrationCalled(api_wire_types::ExternalIntegrationCalled {
+                    integration,
+                    successful,
+                    external_id,
+                })
             }
         }
     }

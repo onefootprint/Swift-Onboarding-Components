@@ -25,6 +25,7 @@ use api_wire_types::{AlpacaCipRequest, AlpacaCipResponse, DeprecatedAlpacaCipReq
 use chrono::{DateTime, Utc};
 use db::models::annotation::Annotation;
 use db::models::risk_signal::IncludeHidden;
+use db::models::user_timeline::UserTimeline;
 use db::{
     actor::{saturate_actors, SaturatedActor},
     models::{
@@ -36,9 +37,9 @@ use db::{
 use idv::ParsedResponse;
 use itertools::Itertools;
 use newtypes::{
-    format_pii, pii, DataIdentifier, DecisionStatus, DocumentKind, DocumentRequestKind, FootprintReasonCode,
-    FpId, IdDocKind, IdentityDataKind, MatchLevel, OcrDataKind, PiiJsonValue, PiiString, ReviewReason,
-    SignalScope, TenantId, Vendor, VendorAPI,
+    format_pii, pii, DataIdentifier, DecisionStatus, DocumentKind, DocumentRequestKind,
+    ExternalIntegrationInfo, ExternalIntegrationKind, FootprintReasonCode, FpId, IdDocKind, IdentityDataKind,
+    MatchLevel, OcrDataKind, PiiJsonValue, PiiString, ReviewReason, SignalScope, TenantId, Vendor, VendorAPI,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use std::collections::HashSet;
@@ -57,6 +58,7 @@ pub async fn post(
     request: Json<AlpacaCipRequest>,
     fp_id: FpIdPath,
 ) -> JsonApiResponse<AlpacaCipResponse> {
+    let auth = auth.check_guard(TenantGuard::CipIntegration)?;
     let AlpacaCipRequest {
         api_key,
         api_secret,
@@ -65,6 +67,8 @@ pub async fn post(
         account_id,
     } = request.into_inner();
     let fp_id = fp_id.into_inner();
+    let fp_id2 = fp_id.clone();
+    let alpaca_account_id = account_id.clone();
     let request = DeprecatedAlpacaCipRequest {
         fp_user_id: fp_id,
         api_key,
@@ -73,8 +77,29 @@ pub async fn post(
         hostname,
         account_id,
     };
-    let result = post_inner(state, auth, request).await?;
-    Ok(result)
+    let is_live = auth.is_live()?;
+    let tenant_id = auth.tenant().id.clone();
+    let tenant_id2 = tenant_id.clone();
+    let result = post_inner(&state, is_live, tenant_id, request).await;
+    let success = result.is_ok();
+
+    let info = ExternalIntegrationInfo {
+        integration: ExternalIntegrationKind::AlpacaCip,
+        successful: success,
+        external_id: Some(alpaca_account_id),
+    };
+
+    state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let sv = ScopedVault::get(conn, (&fp_id2, &tenant_id2, is_live))?;
+            UserTimeline::create(conn, info, sv.vault_id, sv.id)?;
+
+            Ok(())
+        })
+        .await?;
+
+    result
 }
 
 #[api_v2_operation(
@@ -87,19 +112,43 @@ pub async fn post_old(
     auth: SecretTenantAuthContext,
     request: Json<DeprecatedAlpacaCipRequest>,
 ) -> JsonApiResponse<AlpacaCipResponse> {
-    let result = post_inner(state, auth, request.into_inner()).await?;
-    Ok(result)
-}
-
-pub async fn post_inner(
-    state: web::Data<State>,
-    auth: SecretTenantAuthContext,
-    request: DeprecatedAlpacaCipRequest,
-) -> JsonApiResponse<AlpacaCipResponse> {
-    tracing::info!(%request.fp_user_id, %request.hostname, %request.account_id, "/integrations/alpaca/cip request");
     let auth = auth.check_guard(TenantGuard::CipIntegration)?;
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
+    let tenant_id2 = tenant_id.clone();
+    let r = request.into_inner();
+    let fp_id = r.fp_user_id.clone();
+    let alpaca_account_id = r.account_id.clone();
+
+    let result = post_inner(&state, is_live, tenant_id, r).await;
+
+    let success = result.is_ok();
+    let info = ExternalIntegrationInfo {
+        integration: ExternalIntegrationKind::AlpacaCip,
+        successful: success,
+        external_id: Some(alpaca_account_id),
+    };
+
+    state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let sv = ScopedVault::get(conn, (&fp_id, &tenant_id2, is_live))?;
+            UserTimeline::create(conn, info, sv.vault_id, sv.id)?;
+
+            Ok(())
+        })
+        .await?;
+
+    result
+}
+
+pub async fn post_inner(
+    state: &State,
+    is_live: bool,
+    tenant_id: TenantId,
+    request: DeprecatedAlpacaCipRequest,
+) -> JsonApiResponse<AlpacaCipResponse> {
+    tracing::info!(%request.fp_user_id, %request.hostname, %request.account_id, "/integrations/alpaca/cip request");
 
     // make the client
     let alpaca_client = alpaca::AlpacaCipClient::new(request.api_key, request.api_secret, &request.hostname)
@@ -107,7 +156,7 @@ pub async fn post_inner(
 
     // build the cip request
     let (cip_request, _) = create_cip_request(
-        &state,
+        state,
         request.default_approver,
         request.fp_user_id,
         tenant_id,

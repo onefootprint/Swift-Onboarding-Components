@@ -1,4 +1,4 @@
-use newtypes::{ActionKind, AuthMethodKind, CollectedDataOption, LabelKind};
+use newtypes::{ActionKind, AuthMethodKind, CollectedDataOption, ExternalIntegrationKind, LabelKind};
 
 use crate::{
     Actor, Annotation, Apiv2Schema, DateTime, IdentityDocumentTimelineEvent, InsightEvent, LivenessEvent,
@@ -34,6 +34,7 @@ pub enum UserTimelineEvent {
     WorkflowStarted(WorkflowStarted),
     AuthMethodUpdated(AuthMethodUpdated),
     LabelAdded(LabelAdded),
+    ExternalIntegrationCalled(ExternalIntegrationCalled),
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -78,4 +79,11 @@ pub enum WorkflowStartedEventKind {
 #[derive(Debug, Clone, Serialize)]
 pub struct LabelAdded {
     pub kind: LabelKind,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct ExternalIntegrationCalled {
+    pub integration: ExternalIntegrationKind,
+    pub successful: bool,
+    pub external_id: Option<String>,
 }

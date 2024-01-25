@@ -41,6 +41,7 @@ pub enum DbUserTimelineEvent {
     WorkflowStarted(WorkflowStartedInfo),
     AuthMethodUpdated(AuthMethodUpdatedInfo),
     LabelAdded(LabelAddedInfo),
+    ExternalIntegrationCalled(ExternalIntegrationInfo),
 }
 
 impl_enum_string_diesel!(DbUserTimelineEventKind);
@@ -108,6 +109,12 @@ impl From<AuthMethodUpdatedInfo> for DbUserTimelineEvent {
 impl From<LabelAddedInfo> for DbUserTimelineEvent {
     fn from(s: LabelAddedInfo) -> Self {
         Self::LabelAdded(s)
+    }
+}
+
+impl From<ExternalIntegrationInfo> for DbUserTimelineEvent {
+    fn from(s: ExternalIntegrationInfo) -> Self {
+        Self::ExternalIntegrationCalled(s)
     }
 }
 
@@ -188,4 +195,16 @@ pub struct AuthMethodUpdatedInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LabelAddedInfo {
     pub id: LabelId,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ExternalIntegrationKind {
+    AlpacaCip,
+}
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ExternalIntegrationInfo {
+    pub integration: ExternalIntegrationKind,
+    pub successful: bool,
+    pub external_id: Option<String>,
 }
