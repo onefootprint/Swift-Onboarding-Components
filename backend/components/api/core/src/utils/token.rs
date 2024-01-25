@@ -16,7 +16,7 @@ use db::{
     },
     TxnPgConn,
 };
-use newtypes::{ObConfigurationKey, SessionAuthToken, VaultKind};
+use newtypes::{AuthMethodKind, ObConfigurationKey, SessionAuthToken, VaultKind};
 
 pub struct CreateTokenArgs {
     pub sv: ScopedVault,
@@ -25,6 +25,7 @@ pub struct CreateTokenArgs {
     pub scopes: Vec<UserAuthScope>,
     pub auth_events: Vec<AssociatedAuthEvent>,
     pub is_implied_auth: bool,
+    pub limit_auth_methods: Option<Vec<AuthMethodKind>>,
 }
 
 pub struct CreateTokenResult {
@@ -47,6 +48,7 @@ pub fn create_token(
         scopes,
         auth_events,
         is_implied_auth,
+        limit_auth_methods,
     } = args;
 
     let vault = Vault::get(conn, &sv.vault_id)?;
@@ -54,20 +56,17 @@ pub fn create_token(
         return Err(ValidationError("Cannot create a token for a non-person vault").into());
     }
 
+    if key.is_some() && !kind.allow_obc_key() {
+        return Err(ValidationError("Cannot provide playbook key for this operation").into());
+    }
+    if limit_auth_methods.is_some() && !kind.allow_limit_auth_methods() {
+        return Err(ValidationError("Cannot provide limit_auth_methods for this operation").into());
+    }
+
     // Determine arguments for the auth token based on the requested operation
     let (purpose, obc_id, wfr) = match kind {
-        TokenOperationKind::User => {
-            if key.is_some() {
-                return Err(ValidationError("Cannot provide playbook key for operation of kind user").into());
-            }
-            (UserSessionPurpose::ApiUser, None, None)
-        }
+        TokenOperationKind::User => (UserSessionPurpose::ApiUser, None, None),
         TokenOperationKind::Inherit => {
-            if key.is_some() {
-                return Err(
-                    ValidationError("Cannot provide playbook key for operation of kind inherit").into(),
-                );
-            }
             // Inherit the WorkflowRequest
             let wfr = WorkflowRequest::get_active(conn, &sv.id)?
                 .ok_or(ValidationError("No outstanding info is requested from this user"))?;
@@ -77,11 +76,6 @@ pub fn create_token(
             (UserSessionPurpose::ApiInherit, Some(obc_id), Some(wfr))
         }
         TokenOperationKind::Reonboard => {
-            if key.is_some() {
-                return Err(
-                    ValidationError("Cannot provide playbook key for operation of kind reonboard").into(),
-                );
-            }
             let (_, obc) = Workflow::latest(conn, &sv.id, true)?.ok_or(ValidationError(
                 "Cannot reonboard user - user has no complete onboardings.",
             ))?;
@@ -97,6 +91,11 @@ pub fn create_token(
             }
             (UserSessionPurpose::ApiOnboard, Some(obc.id), None)
         }
+        TokenOperationKind::UpdateAuthMethods => (
+            UserSessionPurpose::ApiUpdateAuthMethods { limit_auth_methods },
+            None,
+            None,
+        ),
     };
 
     let context = NewUserSessionContext {

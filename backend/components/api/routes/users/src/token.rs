@@ -49,6 +49,7 @@ pub async fn post(
         kind,
         key,
         third_party_auth,
+        limit_auth_methods,
     } = request.0.unwrap_or_default();
     let third_party_auth = third_party_auth.unwrap_or(false);
     let kind = if let Some(kind) = kind {
@@ -168,6 +169,7 @@ pub async fn post(
                 scopes,
                 auth_events,
                 is_implied_auth,
+                limit_auth_methods,
             };
             let CreateTokenResult {
                 token,
@@ -178,11 +180,9 @@ pub async fn post(
         })
         .await?;
 
+    let link_kind = LinkKind::from_token_kind(&kind);
+    let link = state.config.service_config.generate_link(link_kind, &token);
     let expires_at = session.expires_at;
-    let link = state
-        .config
-        .service_config
-        .generate_link(LinkKind::VerifyUser, &token);
     let response = CreateTokenResponse {
         token,
         link,

@@ -312,10 +312,7 @@ def test_error_with_key(sandbox_tenant, sandbox_user, operation_kind):
         sandbox_tenant.sk.key,
         status_code=400,
     )
-    assert (
-        body["error"]["message"]
-        == f"Cannot provide playbook key for operation of kind {operation_kind}"
-    )
+    assert body["error"]["message"] == f"Cannot provide playbook key for this operation"
 
 
 def test_inherit_error_with_no_workflow_request(sandbox_tenant, sandbox_user):

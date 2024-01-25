@@ -16,17 +16,26 @@ pub struct CreateTokenRequest {
     // TODO make this non-optional once apiture has upgraded
     pub kind: Option<TokenOperationKind>,
 
-    /// When the kind is `onboard`, the publishable key of the playbook onto which you would like
-    /// this user to onboard. The user will be asked to provide any missing information required by
-    /// playbook. If you provide the key here, you can omit providing it in the frontend
+    /// Can only be provided when the kind is `onboard`.
+    /// Optionally, the publishable key of the playbook onto which you would like this user to
+    /// onboard.
+    /// The user will be asked to provide any missing information required by playbook.
+    /// If you provide the key here, you can omit providing it in the frontend
     /// Footprint.js SDK integration.
     pub key: Option<ObConfigurationKey>,
+
+    /// Can only be provided when the kind is `update_auth_methods`.
+    /// The set of auth methods that you would like to be allowed to be updated.
+    /// When not provided, the token allows updating any auth method.
+    pub limit_auth_methods: Option<Vec<AuthMethodKind>>,
 
     #[openapi(skip)]
     pub third_party_auth: Option<bool>,
 }
 
-#[derive(Display, EnumString, DeserializeFromStr, SerializeDisplay, Apiv2Schema, ::macros::SerdeAttr)]
+#[derive(
+    Display, Clone, Copy, EnumString, DeserializeFromStr, SerializeDisplay, Apiv2Schema, ::macros::SerdeAttr,
+)]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum TokenOperationKind {
@@ -39,28 +48,35 @@ pub enum TokenOperationKind {
     Inherit,
     /// Simply create a token for the user. A playbook key may be provided directly to the Footprint Verify SDK to trigger onboarding.
     User,
+    /// Generate a token and link that allows the user to update their contact info
+    UpdateAuthMethods,
+}
+
+impl TokenOperationKind {
+    /// Returns true if the TokenOperationKind supports providing a playbook `key`
+    pub fn allow_obc_key(&self) -> bool {
+        match self {
+            Self::Onboard => true,
+            Self::Reonboard | Self::Inherit | Self::User | Self::UpdateAuthMethods => false,
+        }
+    }
+
+    /// Returns true if the TokenOperationKind supports providing `limit_auth_methods`
+    pub fn allow_limit_auth_methods(&self) -> bool {
+        match self {
+            Self::UpdateAuthMethods => true,
+            Self::Onboard | Self::Reonboard | Self::Inherit | Self::User => false,
+        }
+    }
 }
 
 #[derive(Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct CreateEntityTokenRequest {
-    pub kind: EntityTokenOperationKind,
+    pub kind: TokenOperationKind,
     pub key: Option<ObConfigurationKey>,
     #[serde(default)]
     pub send_link: bool,
-}
-
-#[derive(Display, EnumString, DeserializeFromStr, SerializeDisplay, Apiv2Schema, ::macros::SerdeAttr)]
-#[strum(serialize_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
-/// Our dashboard-facing version of the token API creates a disjoint set of tokens to the
-/// tenant-facing version.
-/// These are the dashboard-facing token kinds
-pub enum EntityTokenOperationKind {
-    /// Same as TokenOperationKind
-    Inherit,
-    /// Generate a token and link that allows the user to update their contact info
-    UpdateAuthMethods,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Apiv2Schema)]

@@ -20,8 +20,6 @@ use api_core::utils::vault_wrapper::TenantVw;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_wire_types::CreateEntityTokenRequest;
 use api_wire_types::CreateEntityTokenResponse;
-use api_wire_types::EntityTokenOperationKind;
-use api_wire_types::TokenOperationKind;
 use chrono::Duration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::workflow_request::WorkflowRequest;
@@ -51,15 +49,6 @@ pub async fn post(
     let fp_id = fp_id.into_inner();
     let session_key = state.session_sealing_key.clone();
 
-    let token_kind = match kind {
-        EntityTokenOperationKind::Inherit => TokenOperationKind::Inherit,
-        EntityTokenOperationKind::UpdateAuthMethods => TokenOperationKind::User,
-    };
-    let link_kind = match kind {
-        EntityTokenOperationKind::Inherit => LinkKind::VerifyUser,
-        EntityTokenOperationKind::UpdateAuthMethods => LinkKind::UpdateAuth,
-    };
-
     let (res, vw) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -68,11 +57,12 @@ pub async fn post(
 
             let args = CreateTokenArgs {
                 sv,
-                kind: token_kind,
+                kind,
                 key,
                 scopes: vec![],
                 auth_events: vec![],
                 is_implied_auth: false,
+                limit_auth_methods: None,
             };
             let res = create_token(conn, &session_key, args, Duration::days(3))?;
 
@@ -80,6 +70,8 @@ pub async fn post(
         })
         .await?;
     let CreateTokenResult { token, session, wfr } = res;
+
+    let link_kind = LinkKind::from_token_kind(&kind);
     let link = state.config.service_config.generate_link(link_kind, &token);
 
     let delivery_method = if send_link {

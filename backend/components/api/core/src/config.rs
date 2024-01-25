@@ -1,3 +1,4 @@
+use api_wire_types::TokenOperationKind;
 use envconfig::Envconfig;
 use newtypes::{PiiString, SessionAuthToken};
 use rand::Rng;
@@ -225,6 +226,18 @@ pub enum LinkKind {
     VerifyBusinessOwner,
     /// Hosted auth to update login methods
     UpdateAuth,
+}
+
+impl LinkKind {
+    pub fn from_token_kind(kind: &TokenOperationKind) -> Self {
+        match kind {
+            TokenOperationKind::Inherit
+            | TokenOperationKind::Onboard
+            | TokenOperationKind::Reonboard
+            | TokenOperationKind::User => LinkKind::VerifyUser,
+            TokenOperationKind::UpdateAuthMethods => LinkKind::UpdateAuth,
+        }
+    }
 }
 
 impl ServiceEnvironmentConfig {
