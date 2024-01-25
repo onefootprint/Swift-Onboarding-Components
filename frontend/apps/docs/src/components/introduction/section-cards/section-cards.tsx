@@ -21,7 +21,9 @@ import VaultingIllustration from './illustrations/vaulting-illustration';
 import SectionCard from './section-card/section-card';
 
 const SectionCards = () => {
-  const { t } = useTranslation('pages.home.quickstart');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.home.quickstart',
+  });
   const kybHover = useRef(null);
   const kycHover = useRef(null);
   const vaultingHover = useRef(null);

@@ -6,13 +6,14 @@ import { useDesktopMachine } from '../../../components/desktop-machine-provider'
 import ProcessingBase from '../../../components/processing';
 import useHandleD2PStatusUpdate from '../../../hooks/desktop/use-handle-d2p-status-update';
 import useCancelD2P from '../../../hooks/use-cancel-d2p';
-import getRequirementsTitleTranslationKey from '../../../utils/get-requirements-title-translation-key';
+import useRequirementsTitle from '../../../hooks/use-requirements-title-translation-key';
 
 const Processing = () => {
   const [state, send] = useDesktopMachine();
   const { scopedAuthToken, missingRequirements } = state.context;
-  const { t } = useTranslation('idv');
-  const allTKey = getRequirementsTitleTranslationKey(missingRequirements);
+  const { t } = useTranslation('idv', {
+    keyPrefix: 'transfer.pages.desktop.processing',
+  });
   const cancelD2P = useCancelD2P({
     authToken: scopedAuthToken,
     onSuccess: () => {
@@ -35,9 +36,9 @@ const Processing = () => {
 
   return (
     <ProcessingBase
-      title={t(allTKey)}
-      subtitle={t('transfer.pages.desktop.processing.subtitle')}
-      cta={t('transfer.pages.desktop.processing.cancel')}
+      title={useRequirementsTitle(missingRequirements)}
+      subtitle={t('subtitle')}
+      cta={t('cancel')}
       onCancel={cancelD2P}
     />
   );

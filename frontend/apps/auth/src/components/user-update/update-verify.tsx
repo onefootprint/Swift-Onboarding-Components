@@ -40,7 +40,7 @@ const UpdateVerify = ({
   onChallengeVerificationSuccess,
 }: UpdateVerifyProps) => {
   const { authToken } = challengePayload;
-  const { t } = useTranslation('common', { keyPrefix: 'auth' });
+  const { t } = useTranslation('common');
   const toast = useToast();
   const mutUserChallenge = useUserChallenge({});
   const mutUserChallengeVerify = useUserChallengeVerify({});

@@ -32,7 +32,7 @@ const getPhonePasskeyEntry = (title: string) => ({
 });
 
 const ChallengeSelect = ({ children, Header }: ChallengeSelectProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'auth' });
+  const { t } = useTranslation('common');
   const [state, send] = useUserMachine();
   const { kindToChallenge, userFound } = state.context;
   const availableOptions = userFound?.availableChallengeKinds || [];

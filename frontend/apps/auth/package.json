@@ -4,7 +4,7 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "i18n:copy": "../../scripts/i18n/i18n-copy.sh -lng en -dep idv,ui",
+    "i18n:copy": "yarn i18n:copy-en",
     "i18n:copy-watch": "../../scripts/i18n/i18n-copy.sh --watch -lng en -dep idv,ui",
     "i18n:copy-en": "../../scripts/i18n/i18n-copy.sh -lng en -dep idv,ui",
     "i18n:clean": "rm -rf ./public/locales/",

@@ -18,7 +18,7 @@ type EmailChallengeProps = {
 };
 
 const EmailChallenge = ({ children, Header }: EmailChallengeProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'auth' });
+  const { t } = useTranslation('common');
   const [state, send] = useAuthMachine();
   const toast = useToast();
   const {

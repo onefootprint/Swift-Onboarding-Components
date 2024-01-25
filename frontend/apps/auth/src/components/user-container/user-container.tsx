@@ -24,7 +24,7 @@ const UserContainer = ({ variant }: AuthContainerProps): JSX.Element | null => {
   const searchParams = useSearchParams();
   const windowUrl = getWindowUrl();
   const authToken = getSdkArgsToken(windowUrl.split('#')[1]) ?? '';
-  const { t } = useTranslation('common', { keyPrefix: 'auth' });
+  const { t } = useTranslation('common');
   const confirmationDialog = useConfirmationDialog();
   const notification = !authToken
     ? {

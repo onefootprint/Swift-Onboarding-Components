@@ -37,7 +37,7 @@ const ChallengeVerifyPasskey = ({
   const [state] = useUserMachine();
   const { authToken } = state.context;
   const { t } = useTranslation('common', {
-    keyPrefix: 'auth.passkey-challenge',
+    keyPrefix: 'passkey-challenge',
   });
   const toast = useToast();
   const mutLoginChallenge = useLoginChallenge({});

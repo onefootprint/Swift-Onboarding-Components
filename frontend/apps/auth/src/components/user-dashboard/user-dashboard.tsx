@@ -29,7 +29,7 @@ const UserDashboard = ({
 }: UserDashboardProps) => {
   const [state, send] = useUserMachine();
   const { userDashboard, verifyToken } = state.context;
-  const { t } = useTranslation('common', { keyPrefix: 'auth' });
+  const { t } = useTranslation('common');
   const toast = useToast();
   const mutDecryptUser = useDecryptUser();
 

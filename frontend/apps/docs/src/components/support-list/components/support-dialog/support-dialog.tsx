@@ -111,7 +111,7 @@ const SupportDialog = ({
           {...register(FormField.name, {
             required: {
               value: true,
-              message: t('name.errors.required'),
+              message: t('form.name.errors.required'),
             },
           })}
         />
@@ -124,7 +124,7 @@ const SupportDialog = ({
           {...register(FormField.email, {
             required: {
               value: true,
-              message: t('email.errors.required'),
+              message: t('form.email.errors.required'),
             },
           })}
         />
@@ -136,7 +136,7 @@ const SupportDialog = ({
           {...register(FormField.message, {
             required: {
               value: true,
-              message: t('message.errors.required'),
+              message: t('form.message.errors.required'),
             },
           })}
         />

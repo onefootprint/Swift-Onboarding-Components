@@ -21,7 +21,7 @@ const ChallengeVerifyEmail = ({
 }: ChallengeVerifyEmailProps) => {
   const [state, send] = useUserMachine();
   const { email, emailChallenge } = state.context;
-  const { t } = useTranslation('common', { keyPrefix: 'auth' });
+  const { t } = useTranslation('common');
 
   const headerTitle = email
     ? t('email-challenge.prompt-with-email', { email })

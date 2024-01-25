@@ -12,7 +12,7 @@ import SmsButtonWithCountdown from '../../../components/sms-button-with-countdow
 import useDesktopMachine from '../../../hooks/desktop/use-desktop-machine';
 import useHandleD2PStatusUpdate from '../../../hooks/desktop/use-handle-d2p-status-update';
 import useGenerateScopedAuthToken from '../../../hooks/use-generate-scoped-auth-token';
-import getRequirementsTitleTranslationKey from '../../../utils/get-requirements-title-translation-key';
+import useRequirementsTitle from '../../../hooks/use-requirements-title-translation-key';
 import ContinueOnDesktop from './components/continue-on-desktop';
 
 const QR_CODE_SIZE = 130;
@@ -32,7 +32,7 @@ const QRRegister = () => {
     idDocOutcome,
   } = state.context;
   const l10n = useL10nContext();
-  const allTKey = getRequirementsTitleTranslationKey(missingRequirements);
+
   const url = useCreateHandoffUrl({
     authToken: scopedAuthToken,
     onboardingConfig: config,
@@ -74,7 +74,7 @@ const QRRegister = () => {
       <NavigationHeader leftButton={{ variant: 'close', confirmClose: true }} />
       <Grid.Container gap={7} textAlign="center">
         <HeaderTitle
-          title={t(allTKey)}
+          title={useRequirementsTitle(missingRequirements)}
           subtitle={t('transfer.pages.desktop.qr-register.subtitle')}
           icon={IcoSmartphone224}
         />

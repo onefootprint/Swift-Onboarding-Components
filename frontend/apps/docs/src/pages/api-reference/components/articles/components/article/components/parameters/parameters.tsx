@@ -1,5 +1,6 @@
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -16,7 +17,7 @@ const Parameters = ({ parameters }: { parameters: ParameterProps[] }) => {
     <Container>
       {sections.map(section => (
         <Parameter key={section.title}>
-          <Title>{t(section.title)}</Title>
+          <Title>{t(section.title as ParseKeys<'common'>)}</Title>
           <Schema schema={section.parameters} />
         </Parameter>
       ))}

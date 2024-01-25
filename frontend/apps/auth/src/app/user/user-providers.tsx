@@ -4,7 +4,7 @@ import { Logger } from '@onefootprint/idv';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 
-import configureI18n from '@/src/config/locales/configure-i18n';
+import configureI18n from '@/src/config/initializers/18next';
 import { useEffectOnceStrict } from '@/src/hooks';
 import AppearanceProvider from '@/src/package-appearance/provider';
 import type { AppearanceResponse } from '@/src/package-appearance/types';

@@ -16,7 +16,7 @@ type UpdateVerifyEmailProps = {
 const { logWarn, logError } = getLogger('update-verify-email');
 
 const UpdateVerifyEmail = ({ children, Header }: UpdateVerifyEmailProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'auth' });
+  const { t } = useTranslation('common');
   const [state, send] = useUserMachine();
   const { email, emailReplaceChallenge, verifyToken } = state.context;
   const headerTitle = email

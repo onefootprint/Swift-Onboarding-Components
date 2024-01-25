@@ -21,7 +21,7 @@ const StepEmail = ({ children, Header }: StepEmailProps) => {
     identify: { email, sandboxId },
     obConfigAuth,
   } = state.context;
-  const { t } = useTranslation('common', { keyPrefix: 'auth' });
+  const { t } = useTranslation('common');
   const mutIdentify = useIdentify({ obConfigAuth, sandboxId });
   const showRequestErrorToast = useRequestErrorToast();
 

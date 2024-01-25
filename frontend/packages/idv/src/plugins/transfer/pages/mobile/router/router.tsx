@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import useLogStateMachine from '../../../../../hooks/ui/use-log-state-machine';
 import MobileProcessing from '../../../components/mobile-processing';
 import useMobileMachine from '../../../hooks/mobile/use-mobile-machine';
-import getRequirementsTitleTranslationKey from '../../../utils/get-requirements-title-translation-key';
+import useRequirementsTitle from '../../../hooks/use-requirements-title-translation-key';
 import NewTabRequest from '../new-tab-request';
 import Sms from '../sms';
 
@@ -18,7 +18,7 @@ const Router = ({ onDone }: RouterProps) => {
   const isDone = state.matches('complete');
   useLogStateMachine('transfer-mobile', state);
   const { t } = useTranslation('idv');
-  const title = getRequirementsTitleTranslationKey(missingRequirements);
+  const title = useRequirementsTitle(missingRequirements);
 
   useEffect(() => {
     if (isDone) {

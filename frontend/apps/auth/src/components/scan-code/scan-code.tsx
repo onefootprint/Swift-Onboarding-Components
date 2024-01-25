@@ -11,7 +11,7 @@ type ScanCodeProps = {
 };
 
 const ScanCode = ({ children, Header }: ScanCodeProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'auth' });
+  const { t } = useTranslation('common');
 
   return (
     <>

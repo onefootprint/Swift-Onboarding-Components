@@ -49,7 +49,7 @@ const PinVerification = ({
     sandboxId,
   };
   const { t } = useTranslation('common', {
-    keyPrefix: 'auth.pin-verification',
+    keyPrefix: 'pin-verification',
   });
   const showRequestErrorToast = useRequestErrorToast();
   const mutLoginChallenge = useLoginChallenge(commonMutationProps);

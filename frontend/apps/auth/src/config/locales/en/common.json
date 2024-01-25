@@ -1,0 +1,125 @@
+{
+  "add-device": "Add device",
+  "add": "Add",
+  "additional-verifications": "Additional verifications",
+  "change": "Change",
+  "close": "Close",
+  "confirm-close-description": "Your changes may not be saved.",
+  "confirm-close-title": "Are you sure?",
+  "continue": "Continue",
+  "decrypt-error": "Error while decrypting user's phone and email",
+  "device-added": "Device added",
+  "edit-details-in-account": "You can edit the details in your account.",
+  "edit": "Edit",
+  "email-legal-footer": "By continuing, I agree to the <termsLink>Terms of Service</termsLink> and \n  acknowledge the <privacyPolicyLink>Privacy Policy</privacyPolicyLink>.",
+  "email-update-success": "You've updated your email address successfully.",
+  "enhance-security-advice": "To enhance the security of your account, we advise verifying the following information.",
+  "enter-email": "Enter your email address",
+  "enter-phone": "Enter your new phone number",
+  "fail-to-decrypt": "Failed to decrypt",
+  "invalid-kind-description": "It looks like you're using a non-auth Playbook. Please review and rectify the settings.",
+  "invalid-kind-title": "Invalid configuration",
+  "log-in-to-modify-details": "Log in to modify your account details",
+  "no": "No",
+  "passkey-update-success": "passkey update success",
+  "passkey": "Passkey",
+  "phone-update-success": "You've updated your phone number successfully.",
+  "revise-auth-details": "Revise your authentication details",
+  "scan-code-to-log-in": "Scan the code to log in",
+  "send-code-to": "Send code to",
+  "skip-and-finish": "Skip and finish",
+  "success": "Success",
+  "token-missing-error": "Token missing; unable to decrypt user's phone and email",
+  "use-camera-or-qr-reader": "Use your camera app or QR code reader on your mobile device and we`ll continue from there.",
+  "verified": "Verified",
+  "verify-identity": "Verify your identity",
+  "verify": "Verify",
+  "yes": "Yes",
+  "notification": {
+    "404-challenge-description": "Please verify the provided token and try again.",
+    "404-challenge-title": "Challenges not found",
+    "404-token-description": "Please verify the provided token and try again.",
+    "404-token-title": "Token not found",
+    "404-user-description": "The user was not found or the provided token has expired. Please check your credentials and try again.",
+    "404-user-title": "User not found / URL expired",
+    "invalid-config-subtitle": "It seems like the Verify with Footprint integration is using an invalid integration key. Please contact the owner of this product.",
+    "invalid-config-title": "Integration incorrectly configured",
+    "invalid-domain-description": "Sorry, you don't have permission to access this application. It seems that the domain associated with your account is not authorized. If you need assistance, feel free to contact technical support.",
+    "invalid-domain-title": "Invalid domain",
+    "invalid-kind-description": "It looks like you're using a non-auth Playbook. Please review and rectify the settings.",
+    "invalid-kind-title": "Invalid configuration",
+    "missing-args-description": "Oops! It seems like some required information is missing. Please navigate back in the process and make sure to provide all necessary details before proceeding.",
+    "missing-args-title": "Incomplete Information"
+  },
+  "sandbox": {
+    "description": "You can log into a previously created sandbox user by using the Test ID from that corresponding session.",
+    "hint": "Do not use special characters or spaces.",
+    "label": "Test ID",
+    "placeholder": "Enter test ID",
+    "errors": {
+      "required": "Test ID is required",
+      "invalid": "Test ID is invalid. Please remove spaces and special characters."
+    },
+    "button": {
+      "edit": "Edit",
+      "save": "Save",
+      "copy": "Copy",
+      "copy-confirmation": "Copied",
+      "reset": "Reset"
+    }
+  },
+  "email-step": {
+    "header": {
+      "title": "Hey there! 👋",
+      "subtitle": "Enter your email to get started."
+    },
+    "form": {
+      "input-label": "Email",
+      "input-placeholder": "jane.doe@acme.com",
+      "input-required": "Email is required"
+    }
+  },
+  "phone-step": {
+    "subtitle": "Enter your phone number to proceed.",
+    "title": "Hey there! 👋",
+    "form": {
+      "input-invalid": "Phone number is invalid",
+      "input-label": "Phone number",
+      "input-required": "Phone number cannot be empty"
+    }
+  },
+  "sms-step": {
+    "label": "SMS",
+    "prompt-with-phone": "Enter the 6-digit code sent to {{scrubbedPhoneNumber}}.",
+    "prompt-without-phone": "Enter the 6-digit code sent to your phone.",
+    "title": "Verify your phone number",
+    "welcome-back-title": "Welcome back! 🎉"
+  },
+  "pin-verification": {
+    "incorrect-code": "Incorrect code",
+    "new-code-sent-description": "We sent you a new code.",
+    "resend-countdown": "Please wait {{seconds}} seconds to resend it...",
+    "resend-cta": "Resend code",
+    "success": "Success!",
+    "verifying": "Verifying..."
+  },
+  "passkey-challenge": {
+    "cta": "Login with passkey",
+    "label": "Passkey",
+    "loading": "Waiting...",
+    "login-with-sms": "Login with SMS",
+    "success": "Success!",
+    "title": "Welcome back! 🎉",
+    "error": {
+      "title": "Something went wrong",
+      "description": "This might be because of your device permissions. Please try logging in with SMS instead."
+    }
+  },
+  "email-challenge": {
+    "label": "Email",
+    "prompt-with-email": "Enter the 6-digit code sent to {{email}}.",
+    "prompt-without-email": "Enter the 6-digit code sent to your email.",
+    "title": "Verify your email address",
+    "welcome-back-title": "Welcome back! 🎉"
+  }
+}

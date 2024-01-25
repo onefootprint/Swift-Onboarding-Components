@@ -21,7 +21,7 @@ const ChallengeVerifyPhone = ({
 }: ChallengeVerifyPhoneProps) => {
   const [state, send] = useUserMachine();
   const { phoneChallenge } = state.context;
-  const { t } = useTranslation('common', { keyPrefix: 'auth' });
+  const { t } = useTranslation('common');
   const scrubbedPhoneNumber = phoneChallenge?.scrubbedPhoneNumber;
   const headerTitle = scrubbedPhoneNumber
     ? t('sms-step.prompt-with-phone', { scrubbedPhoneNumber })

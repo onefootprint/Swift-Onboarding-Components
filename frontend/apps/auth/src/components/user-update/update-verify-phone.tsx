@@ -15,7 +15,7 @@ type UpdateVerifyPhoneProps = {
 const { logWarn, logError } = getLogger('update-verify-phone');
 
 const UpdateVerifyPhone = ({ children, Header }: UpdateVerifyPhoneProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'auth' });
+  const { t } = useTranslation('common');
   const [state, send] = useUserMachine();
   const { phoneNumber, phoneReplaceChallenge, verifyToken } = state.context;
   const headerTitle = phoneNumber

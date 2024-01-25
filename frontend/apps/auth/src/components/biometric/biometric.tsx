@@ -18,7 +18,7 @@ const Biometric = () => {
     obConfigAuth,
   } = state.context;
   const { t } = useTranslation('common', {
-    keyPrefix: 'auth.passkey-challenge',
+    keyPrefix: 'passkey-challenge',
   });
   const showRequestErrorToast = useRequestErrorToast();
   const toast = useToast();

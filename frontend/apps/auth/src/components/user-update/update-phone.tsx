@@ -19,7 +19,7 @@ const isSandbox = isTest || !isProd;
 const handlePhoneValidation = (s: string) => checkIsPhoneValid(s, isSandbox);
 
 const UpdatePhone = ({ children, Header, onSubmit }: UpdatePhoneProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'auth' });
+  const { t } = useTranslation('common');
   const handleFormSubmit = (formData: FormData) => {
     onSubmit(formData.phoneNumber);
   };

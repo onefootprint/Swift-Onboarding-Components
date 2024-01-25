@@ -26,7 +26,7 @@ const StepSms = ({ children, Header }: StepPhoneProps) => {
     identify,
   } = state.context;
   const { phoneNumber = '', successfulIdentifier } = identify;
-  const { t } = useTranslation('common', { keyPrefix: 'auth' });
+  const { t } = useTranslation('common');
   const toast = useToast();
 
   const getFormTitle = (): string => {

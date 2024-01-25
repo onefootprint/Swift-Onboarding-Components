@@ -11,10 +11,12 @@ const configureI18n = () => {
     .use(LanguageDetector)
     .use(initReactI18next)
     .init({
-      debug: process.env.NODE_ENV === 'development',
-      defaultNS: 'auth',
-      ns: ['auth'],
-      interpolation: { escapeValue: false },
+      debug: false,
+      defaultNS: 'common',
+      ns: ['common', 'ui', 'idv'],
+      interpolation: {
+        escapeValue: false,
+      },
       fallbackLng: 'en',
       supportedLngs: ['en', 'es'],
       backend: IS_BROWSER
@@ -28,8 +30,8 @@ const configureI18n = () => {
           }
         : undefined,
       detection: {
-        lookupQuerystring: 'lng',
         order: ['querystring', 'navigator'],
+        lookupQuerystring: 'lng',
       },
       react: {
         bindI18n: 'languageChanged',

@@ -105,7 +105,7 @@ const AuthContainer = ({
   } = props || voidObj;
   const fpProvider = useFootprintProvider();
 
-  const { t } = useTranslation('common', { keyPrefix: 'auth' });
+  const { t } = useTranslation('common');
   const confirmationDialog = useConfirmationDialog();
   const mutOnboardingValidate = useOnboardingValidate();
   const obConfigAuth = getOnboardConfigurationKey(publicKey);

@@ -39,7 +39,7 @@ const getHeader = (
 
 const UserRouter = ({ onDone }: UserRouterProps): JSX.Element | null => {
   const [state, send] = useUserMachine();
-  const { t } = useTranslation('common', { keyPrefix: 'auth' });
+  const { t } = useTranslation('common');
   const isDone = state.matches('success');
   const Header = getHeader(state.context, getUserLeftNavButton(state, send));
 

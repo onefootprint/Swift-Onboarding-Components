@@ -19,7 +19,7 @@ const PasskeyChallenge = ({
   onSmsButtonClick,
 }: StepPassKeyProps) => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'auth.passkey-challenge',
+    keyPrefix: 'passkey-challenge',
   });
 
   return (

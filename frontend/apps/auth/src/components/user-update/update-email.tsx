@@ -12,7 +12,7 @@ type ManagePhoneProps = {
 };
 
 const UpdateEmail = ({ children, Header, onSubmit }: ManagePhoneProps) => {
-  const { t } = useTranslation('common', { keyPrefix: 'auth' });
+  const { t } = useTranslation('common');
 
   const handleFormSubmit = (formData: { email: string }) => {
     onSubmit(formData.email);
