@@ -31,6 +31,10 @@ export const getStaticProps: GetStaticProps<
     return { notFound: true };
   }
   const navigation = await getNavigationByPage(article.data.page);
+  if (!navigation) {
+    return { notFound: true };
+  }
+
   return {
     props: {
       page: {

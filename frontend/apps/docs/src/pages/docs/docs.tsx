@@ -5,6 +5,7 @@ import Cmd from 'src/pages/docs/components/cmd/cmd';
 import type { Article } from 'src/types/article';
 import type { PageNavigation } from 'src/types/page';
 
+import Page404 from '../404/404';
 import AppHeader from './components/app-header';
 import DesktopNav from './components/nav/desktop-nav';
 import Sections from './components/sections';
@@ -15,20 +16,22 @@ type DocsProps = {
   navigation: PageNavigation;
 };
 
-const Docs = ({ children, navigation, article }: DocsProps) => (
-  <>
-    <AppHeader navigation={navigation} />
-    <MainContainer>
-      <DesktopNav navigation={navigation} />
-      <Content gridArea="content">{children}</Content>
-      <GridAssigner gridArea="sections">
-        <Sections sections={article.data.sections} />
-      </GridAssigner>
-    </MainContainer>
-    <Cmd navigation={navigation} />
-  </>
-);
-
+const Docs = ({ children, navigation, article }: DocsProps) =>
+  article ? (
+    <>
+      <AppHeader navigation={navigation} />
+      <MainContainer>
+        <DesktopNav navigation={navigation} />
+        <Content gridArea="content">{children}</Content>
+        <GridAssigner gridArea="sections">
+          <Sections sections={article.data.sections} />
+        </GridAssigner>
+      </MainContainer>
+      <Cmd navigation={navigation} />
+    </>
+  ) : (
+    <Page404 />
+  );
 const Content = styled.article<{ gridArea: 'nav' | 'content' | 'sections' }>`
   ${({ gridArea, theme }) => css`
     grid-area: ${gridArea};

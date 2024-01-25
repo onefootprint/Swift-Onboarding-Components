@@ -19,8 +19,8 @@ const Page404 = () => {
             renderHeader={() => (
               <Image
                 alt={t('image.alt')}
-                height={212.62}
                 src="/404.png"
+                height={212}
                 width={298}
                 priority
               />
