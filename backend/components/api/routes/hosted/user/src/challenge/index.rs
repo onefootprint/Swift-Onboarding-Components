@@ -2,6 +2,7 @@ use super::RegisterChallengeData;
 use crate::challenge::RegisterChallenge;
 use crate::State;
 use api_core::auth::session::user::AssociatedAuthEventKind;
+use api_core::auth::session::user::UserSessionPurpose;
 use api_core::auth::user::load_auth_events;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::user::UserAuthGuard;
@@ -56,7 +57,15 @@ pub async fn post(
         .unique()
         .collect_vec();
     if !allowed_challenge_kinds.contains(&kind) {
-        return ValidationError(&format!("Cannot initiate challenge of kind {}", kind,)).into();
+        return ValidationError(&format!("Cannot initiate challenge of kind {}", kind)).into();
+    }
+    if let Some(UserSessionPurpose::ApiUpdateAuthMethods {
+        limit_auth_methods: Some(limit_auth_methods),
+    }) = &user_auth.data.purpose
+    {
+        if !limit_auth_methods.contains(&kind) {
+            return ValidationError(&format!("Token cannot initiate challenge of kind {}", kind)).into();
+        }
     }
 
     let tenant = user_auth.tenant();

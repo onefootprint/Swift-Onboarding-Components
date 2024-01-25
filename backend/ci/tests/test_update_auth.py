@@ -34,7 +34,7 @@ def user_with_token(sandbox_tenant, auth_playbook):
     return get_auth_token_for_ci_update(user, auth_playbook)
 
 
-def get_auth_token_for_ci_update(user, auth_playbook):
+def get_auth_token_for_ci_update(user, auth_playbook, limit_auth_methods=None):
     def assert_cant_use_token(token, status_code, error_message):
         data = dict(
             kind="phone", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="replace"
@@ -60,10 +60,8 @@ def get_auth_token_for_ci_update(user, auth_playbook):
     )
 
     # Create a new auth token via API that _can_ initiate a challenge, after step up
-    data = dict(kind="update_auth_methods")
-    body = post(
-        f"entities/{user.fp_id}/token", data, *user.client.ob_config.tenant.db_auths
-    )
+    data = dict(kind="update_auth_methods", limit_auth_methods=limit_auth_methods)
+    body = post(f"users/{user.fp_id}/token", data, user.client.ob_config.tenant.sk.key)
     auth_token = FpAuth(body["token"])
 
     # Make sure we have to explicitly auth (and not use implied auth) to initiate a challenge AND
@@ -304,3 +302,26 @@ def test_add_passkey(sandbox_tenant, auth_playbook):
 
     # Make sure we can log in using the new passkey
     IdentifyClient.from_user(user, webauthn=webauthn_device).inherit(kind="biometric")
+
+
+def test_restrict_adding_email(sandbox_user, sandbox_tenant, auth_playbook):
+    _, auth_token = get_auth_token_for_ci_update(
+        sandbox_user, auth_playbook, limit_auth_methods=["email"]
+    )
+
+    # Assert can only update email, not phone
+    body = get("hosted/user/auth_methods", None, auth_token)
+    assert not next(i["can_update"] for i in body if i["kind"] == "phone")
+    assert next(i["can_update"] for i in body if i["kind"] == "email")
+
+    # Make sure we can't initiate a challenge to update phone
+    data = dict(kind="phone", phone_number=FIXTURE_PHONE_NUMBER2, action_kind="replace")
+    body = post("hosted/user/challenge", data, auth_token, status_code=400)
+    assert body["error"]["message"] == "Token cannot initiate challenge of kind phone"
+
+    # But we can initiate a challenge to replace email
+    data = dict(kind="email", email=FIXTURE_EMAIL2, action_kind="replace")
+    body = post("hosted/user/challenge", data, auth_token)
+    challenge_token = body["challenge_token"]
+    data = dict(challenge_token=challenge_token, challenge_response="000000")
+    post("hosted/user/challenge/verify", data, auth_token)
