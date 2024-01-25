@@ -348,6 +348,7 @@ impl LexisRequest {
         tenant_identifier: String,
         tbi: TenantBusinessInfo,
     ) -> Result<Self, ConversionError> {
+        let state_and_country = idv_data.state_and_country_for_vendors();
         let IdvData {
             first_name,
             middle_name,
@@ -355,7 +356,7 @@ impl LexisRequest {
             address_line1,
             address_line2,
             city,
-            state,
+            state: _,
             zip,
             country: _,
             ssn4,
@@ -468,7 +469,7 @@ impl LexisRequest {
                         street_address_1: address_line1,
                         street_address_2: address_line2,
                         city,
-                        state,
+                        state: state_and_country.state,
                         zip_5: zip,
                     },
                     ssn,
