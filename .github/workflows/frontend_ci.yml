@@ -138,3 +138,18 @@ jobs:
       - name: Typecheck
         working-directory: ./frontend
         run: yarn typecheck
+
+  audit:
+    strategy:
+      matrix:
+        node-version: [18.x]
+        os: [ubuntu-latest]
+    name: 'Audit'
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Audit for vulnerabilities
+        working-directory: ./frontend
+        run: npx audit-ci@^6 --config ./audit-ci.jsonc

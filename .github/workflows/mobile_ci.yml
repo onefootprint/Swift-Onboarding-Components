@@ -150,3 +150,18 @@ jobs:
       - name: Tests
         working-directory: ./mobile
         run: yarn typecheck
+
+  audit-mobile:
+    strategy:
+      matrix:
+        node-version: [18.x]
+        os: [ubuntu-latest]
+    name: 'Audit'
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Audit for vulnerabilities
+        working-directory: ./mobile
+        run: npx audit-ci@^6 --config ./audit-ci.jsonc

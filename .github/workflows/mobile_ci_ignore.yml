@@ -59,3 +59,12 @@ jobs:
     needs: install-dependencies
     steps:
       - run: echo "Not required"
+
+  audit-mobile:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [18.x]
+        os: [ubuntu-latest]
+    steps:
+      - run: echo "Not required"
