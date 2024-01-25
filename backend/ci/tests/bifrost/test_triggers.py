@@ -47,10 +47,11 @@ def send_trigger(fp_id, sandbox_tenant, trigger, expected_error=None):
 def complete_redo_flow_user(user, auth_token, pre_run=None):
     fp_id = user.fp_id
     obc = user.client.ob_config
-    return complete_redo_flow(auth_token, fp_id, obc, pre_run)
+    sandbox_id = user.client.sandbox_id
+    return complete_redo_flow(auth_token, fp_id, obc, sandbox_id, pre_run)
 
 
-def complete_redo_flow(auth_token, fp_id, obc, pre_run=None):
+def complete_redo_flow(auth_token, fp_id, obc, sandbox_id, pre_run=None):
     tenant = obc.tenant
     # Should start out with only one OBD timeline event
     timeline = get(f"entities/{fp_id}/timeline", None, *tenant.db_auths)
@@ -61,8 +62,7 @@ def complete_redo_flow(auth_token, fp_id, obc, pre_run=None):
     auth_token = IdentifyClient.from_token(auth_token).step_up(
         assert_had_no_scopes=True
     )
-    # Note: weirdly, the ob_config and sandbox_id here isn't really used
-    bifrost = BifrostClient.raw_auth(obc, auth_token, None)
+    bifrost = BifrostClient.raw_auth(obc, auth_token, sandbox_id)
     if pre_run:
         pre_run(bifrost)
     bifrost.run()
@@ -136,6 +136,7 @@ def test_redo_kyc_non_portable(sandbox_tenant, must_collect_data):
     }
     body = post("users/", vault_data, sandbox_tenant.sk.key)
     fp_id = body["id"]
+    sandbox_id = body["sandbox_id"]
 
     # Run KYC
     data = dict(onboarding_config_key=obc.key.value)
@@ -155,7 +156,7 @@ def test_redo_kyc_non_portable(sandbox_tenant, must_collect_data):
         data = {"id.ssn9": "999-99-9999"}
         patch("/hosted/user/vault", data, bifrost.auth_token)
 
-    complete_redo_flow(initial_auth_token, fp_id, obc, pre_run)
+    complete_redo_flow(initial_auth_token, fp_id, obc, sandbox_id, pre_run)
 
 
 @pytest.mark.parametrize(
@@ -177,11 +178,13 @@ def test_recollect_document(trigger, sandbox_tenant):
 
     # re-run Bifrost with the token from the link we sent to user
     def pre_run(bifrost):
-        upload_mode = 'allow_upload' if trigger['kind'] == 'proof_of_address' else 'default'
+        upload_mode = (
+            "allow_upload" if trigger["kind"] == "proof_of_address" else "default"
+        )
         # Check that requirements are what we expect
         requirements = bifrost.get_status()["all_requirements"]
         assert requirements[0]["kind"] == "collect_document"
-        assert requirements[0]['upload_mode'] == upload_mode
+        assert requirements[0]["upload_mode"] == upload_mode
         assert not requirements[0]["is_met"]
 
     complete_redo_flow_user(sandbox_user, initial_auth_token, pre_run)
