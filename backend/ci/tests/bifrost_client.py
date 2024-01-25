@@ -260,9 +260,9 @@ class BifrostClient:
         elif "ssn_card" in supported_doc_types:
             # Kind of a hack - we won't actually upload an ssn card image
             doc_kind = "ssn_card"
-        elif set(["lease", "utility_bill", "bank_statement"]).intersection(set(supported_doc_types)) != set():
-            # Kind of a hack - we won't actually upload an lease image
-            doc_kind = "lease"
+        elif set(["proof_of_address"]).intersection(set(supported_doc_types)) != set():
+            # Kind of a hack - we won't actually upload an PoA image
+            doc_kind = "proof_of_address"
         else:
             assert (
                 False

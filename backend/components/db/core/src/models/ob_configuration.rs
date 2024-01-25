@@ -280,9 +280,7 @@ impl SupportedCountriesForDocType for Findigs {
             IdDocKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::US],
             IdDocKind::VoterIdentification => vec![],
             IdDocKind::SsnCard => vec![],
-            IdDocKind::Lease => vec![],
-            IdDocKind::UtilityBill => vec![],
-            IdDocKind::BankStatement => vec![],
+            IdDocKind::ProofOfAddress => vec![],
         }
     }
     fn is_override(&self) -> bool {
@@ -301,9 +299,7 @@ impl SupportedCountriesForDocType for Coba {
             IdDocKind::ResidenceDocument => vec![Iso3166TwoDigitCountryCode::MX],
             IdDocKind::VoterIdentification => vec![Iso3166TwoDigitCountryCode::MX],
             IdDocKind::SsnCard => vec![],
-            IdDocKind::Lease => vec![],
-            IdDocKind::UtilityBill => vec![],
-            IdDocKind::BankStatement => vec![],
+            IdDocKind::ProofOfAddress => vec![],
         }
     }
     fn is_override(&self) -> bool {
@@ -323,9 +319,7 @@ impl SupportedCountriesForDocType for Default {
             IdDocKind::ResidenceDocument => all_us_and_territories,
             IdDocKind::VoterIdentification => all_us_and_territories,
             IdDocKind::SsnCard => vec![],
-            IdDocKind::Lease => vec![],
-            IdDocKind::UtilityBill => vec![],
-            IdDocKind::BankStatement => vec![],
+            IdDocKind::ProofOfAddress => vec![],
         }
     }
     fn is_override(&self) -> bool {

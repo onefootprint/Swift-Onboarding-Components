@@ -38,9 +38,8 @@ pub enum IdDocKind {
     // Proof of ssn
     SsnCard,
     // Proof of address
-    Lease,
-    UtilityBill,
-    BankStatement,
+    // For now, we'll only have a single PoA document per vault to make the FE UI more flexible to build
+    ProofOfAddress,
 }
 
 #[derive(Debug, Display, Clone, Copy, Eq, PartialEq)]
@@ -70,9 +69,7 @@ impl From<IdDocKind> for DocKind {
             IdDocKind::ResidenceDocument => Self::Identity,
             IdDocKind::VoterIdentification => Self::Identity,
             IdDocKind::SsnCard => Self::ProofOfSsn,
-            IdDocKind::Lease => Self::ProofOfAddress,
-            IdDocKind::UtilityBill => Self::ProofOfAddress,
-            IdDocKind::BankStatement => Self::ProofOfAddress,
+            IdDocKind::ProofOfAddress => Self::ProofOfAddress,
         }
     }
 }
@@ -92,9 +89,7 @@ impl IdDocKind {
             Self::ResidenceDocument => vec![DocumentSide::Front, DocumentSide::Back],
             Self::VoterIdentification => vec![DocumentSide::Front, DocumentSide::Back],
             Self::SsnCard => vec![DocumentSide::Front],
-            Self::Lease => vec![DocumentSide::Front],
-            Self::UtilityBill => vec![DocumentSide::Front],
-            Self::BankStatement => vec![DocumentSide::Front],
+            Self::ProofOfAddress => vec![DocumentSide::Front],
         }
     }
 
@@ -139,9 +134,7 @@ impl IdDocKind {
             IdDocKind::VoterIdentification => vec![ODK::FullName],
             // In actuality, We don't parse anything from these.
             IdDocKind::SsnCard => vec![],
-            IdDocKind::Lease => vec![],
-            IdDocKind::UtilityBill => vec![],
-            IdDocKind::BankStatement => vec![],
+            IdDocKind::ProofOfAddress => vec![],
         }
     }
 }
@@ -170,9 +163,7 @@ impl TryFrom<IdDocKind> for AlpacaDocumentType {
             IdDocKind::ResidenceDocument => Err(crate::Error::Custom(msg.into())),
             IdDocKind::VoterIdentification => Err(crate::Error::Custom(msg.into())),
             IdDocKind::SsnCard => Err(crate::Error::Custom(msg.into())),
-            IdDocKind::Lease => Ok(AlpacaDocumentType::ProofOfAddress),
-            IdDocKind::UtilityBill => Ok(AlpacaDocumentType::ProofOfAddress),
-            IdDocKind::BankStatement => Ok(AlpacaDocumentType::ProofOfAddress),
+            IdDocKind::ProofOfAddress => Ok(AlpacaDocumentType::ProofOfAddress),
         }
     }
 }
