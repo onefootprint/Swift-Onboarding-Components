@@ -1262,11 +1262,18 @@
             "header": "Success!",
             "description": "Link copied to clipboard"
           },
-          "done": "Done",
-          "send-via-sms": "Send via SMS"
+          "copy-link": "Copy link",
+          "send-link": "Send via SMS"
         },
         "share": {
           "label": "Share"
+        },
+        "send-link": {
+          "header": "Success!",
+          "description": {
+            "phone": "User will receive an SMS detailing the next steps shortly",
+            "email": "User will receive an email detailing the next steps shortly"
+          }
         }
       },
       "manual-note-entry-form": {

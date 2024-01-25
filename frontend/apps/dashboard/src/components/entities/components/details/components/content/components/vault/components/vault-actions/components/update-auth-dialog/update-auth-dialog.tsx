@@ -1,10 +1,8 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { IcoCopy16 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
 import { TokenKind } from '@onefootprint/types/src/api/create-token';
 import {
   Dialog,
-  IconButton,
   Shimmer,
   Stack,
   TextInput,
@@ -16,7 +14,8 @@ import { useTranslation } from 'react-i18next';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 
-import useGenerateTokenRequest from './hooks/use-generate-token';
+import useGenerateTokenRequest from '../../hooks/use-generate-token';
+import useSendTokenLinkMutation from '../../hooks/use-send-token-link';
 
 export type UpdateAuthDialogProps = {
   open: boolean;
@@ -28,6 +27,7 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
     keyPrefix: 'pages.entity.actions.update-auth-methods',
   });
   const generateTokenMutation = useGenerateTokenRequest();
+  const sendLinkMutation = useSendTokenLinkMutation();
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
   const entityId = useEntityId();
@@ -36,6 +36,14 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
     generateTokenMutation.reset();
     onClose();
   }, [generateTokenMutation, onClose]);
+
+  const handleSendLink = () => {
+    sendLinkMutation.mutate({
+      entityId,
+      kind: TokenKind.updateAuthMethods,
+      onDone: handleClose,
+    });
+  };
 
   useEffect(() => {
     const shouldGenerateToken =
@@ -47,6 +55,7 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
       {
         entityId,
         kind: TokenKind.updateAuthMethods,
+        sendLink: false,
       },
       {
         onError: (error: unknown) => {
@@ -72,8 +81,8 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
     toast.show({
       title: t('copied.header'),
       description: t('copied.description'),
-      variant: 'default',
     });
+    handleClose();
   };
 
   return (
@@ -83,54 +92,53 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
       onClose={handleClose}
       open={open}
       primaryButton={{
-        label: t('done'),
-        onClick: handleClose,
+        label: t('copy-link'),
+        onClick: handleCopyLink,
+        disabled: sendLinkMutation.isLoading || generateTokenMutation.isLoading,
       }}
-      /*
-      TODO add the ability to send via SMS, IF AND ONLY IF the entity has a phone number
       secondaryButton={{
-        label: t('send-via-sms'),
+        label: t('send-link'),
+        onClick: handleSendLink,
+        disabled: sendLinkMutation.isLoading || generateTokenMutation.isLoading,
+        loading: sendLinkMutation.isLoading,
       }}
-      */
     >
       <Stack gap={3} direction="column">
         <Typography variant="label-3">{t('header')}</Typography>
-        <Typography variant="body-3">{t('share-this-link')}</Typography>
+        <Typography variant="body-3" color="secondary">
+          {t('share-this-link')}
+        </Typography>
         <StyledLi>
-          <Typography variant="body-3" as="span">
+          <Typography variant="body-3" color="secondary" as="span">
             {t('update-phone')}
           </Typography>
         </StyledLi>
         <StyledLi>
-          <Typography variant="body-3" as="span">
+          <Typography variant="body-3" color="secondary" as="span">
             {t('update-email')}
           </Typography>
         </StyledLi>
         {/* TODO show this copy when passkey editing is fixed */}
         {/* <StyledLi>
-          <Typography variant="body-3" as="span">
+          <Typography variant="body-3" color="secondary" as="span">
             {t('update-passkey')}
           </Typography>
         </StyledLi> */}
-        <LinkContainer direction="row" gap={3} marginTop={2}>
-          {generateTokenMutation.isLoading ? (
-            <Shimmer sx={{ width: '100%' }} />
-          ) : (
-            <TextInput
-              placeholder="https://auth.onefootprint.com#tok_okj3nppo1zyj6d7uJ9l49iLxY1uc2N4riz"
-              value={generateTokenMutation.data?.link}
-              size="compact"
-              disabled
-            />
-          )}
-          <IconButton
-            disabled={generateTokenMutation.isLoading}
-            onClick={handleCopyLink}
-            aria-label="copy"
-          >
-            <IcoCopy16 />
-          </IconButton>
-        </LinkContainer>
+        {generateTokenMutation.isLoading ? (
+          <Shimmer sx={{ width: '100%', height: '32px' }} />
+        ) : (
+          <TextInput
+            placeholder="https://auth.onefootprint.com#tok_okj3nppo1zyj6d7uJ9l49iLxY1uc2N4riz"
+            value={generateTokenMutation.data?.link}
+            size="compact"
+            disabled
+            sx={{
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          />
+        )}
       </Stack>
     </Dialog>
   );
@@ -138,12 +146,6 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
 
 const StyledLi = styled.li`
   padding-inline-start: 1ch;
-`;
-
-const LinkContainer = styled(Stack)`
-  > .fp-input-container {
-    width: 100%;
-  }
 `;
 
 export default UpdateAuthDialog;

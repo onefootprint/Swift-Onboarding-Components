@@ -7,6 +7,7 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
+import { ContactInfoKind } from '@onefootprint/types/src/api/create-token';
 import React from 'react';
 
 import type { UpdateAuthDialogProps } from './update-auth-dialog';
@@ -47,19 +48,10 @@ describe('<UpdateAuthDialog />', () => {
     });
   });
 
-  it('should call close callback', async () => {
+  it('should copy link to clipboard and close', async () => {
+    const { writeTestMockFn } = createClipboardSpy();
     const onCloseMockFn = jest.fn();
     renderDialog({ onClose: onCloseMockFn });
-
-    const doneButton = screen.getByRole('button', { name: 'Done' });
-    await userEvent.click(doneButton);
-
-    expect(onCloseMockFn).toHaveBeenCalled();
-  });
-
-  it('can copy link to clipboard', async () => {
-    const { writeTestMockFn } = createClipboardSpy();
-    renderDialog({});
 
     await waitFor(() => {
       expect(
@@ -67,13 +59,14 @@ describe('<UpdateAuthDialog />', () => {
       ).toBeInTheDocument();
     });
 
-    const copyButton = screen.getByRole('button', { name: 'copy' });
+    const copyButton = screen.getByRole('button', { name: 'Copy link' });
     await userEvent.click(copyButton);
     await waitFor(() => {
       expect(writeTestMockFn).toHaveBeenCalledWith(
         'http://footprint.link/#tok_xxx',
       );
     });
+    expect(onCloseMockFn).toHaveBeenCalled();
   });
 
   it('closes on error creating token', async () => {
@@ -88,6 +81,38 @@ describe('<UpdateAuthDialog />', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Uh-oh!')).toBeInTheDocument();
+    });
+    expect(onCloseMockFn).toHaveBeenCalled();
+  });
+
+  it('closes after sending link via SMS', async () => {
+    const onCloseMockFn = jest.fn();
+    renderDialog({ onClose: onCloseMockFn });
+
+    await waitFor(() => {
+      expect(
+        screen.getByDisplayValue('http://footprint.link/#tok_xxx'),
+      ).toBeInTheDocument();
+    });
+
+    mockRequest({
+      method: 'post',
+      path: `/entities/${entityFixture.id}/token`,
+      statusCode: 200,
+      response: {
+        deliveryMethod: ContactInfoKind.phone,
+      },
+    });
+
+    const sendLinkButton = screen.getByRole('button', { name: 'Send via SMS' });
+    await userEvent.click(sendLinkButton);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          'User will receive an SMS detailing the next steps shortly',
+        ),
+      ).toBeInTheDocument();
     });
     expect(onCloseMockFn).toHaveBeenCalled();
   });
