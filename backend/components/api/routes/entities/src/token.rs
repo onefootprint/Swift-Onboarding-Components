@@ -235,6 +235,14 @@ impl<'a> From<TriggerMessage> for EmailMessage<'a> {
         } = value;
         let template_data = HashMap::from_iter(
             vec![
+                Some((
+                    "header".to_string(),
+                    PiiString::from(format!(
+                        "{} has requested you to re-verify your identity",
+                        org_name
+                    )),
+                )),
+                Some(("content".to_string(), PiiString::from("Some of the information you have provided may be missing or incorrect. Please take a moment to re-verify your identity."))),
                 Some(("org_name".to_string(), PiiString::from(org_name))),
                 note.map(|n| ("note".to_string(), PiiString::from(n))),
                 Some(("link".to_string(), link)),
