@@ -100,8 +100,7 @@
   "files.watcherExclude": {
     "**/target/**": true,
     "**/vscode-target/**": true,
-    "**/.git/objects/**": true,
-    "**/.git/subtree-cache/**": true,
+    "**/.git/**": true,
     "**/node_modules/*/**": true
   },
   "rust-analyzer.files.excludeDirs": [
