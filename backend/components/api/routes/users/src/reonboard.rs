@@ -6,6 +6,7 @@ use crate::State;
 use api_core::auth::session::user::NewUserSessionArgs;
 use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::UserSession;
+use api_core::auth::session::user::UserSessionPurpose;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::config::LinkKind;
 use api_core::errors::tenant::TenantError;
@@ -63,6 +64,7 @@ pub async fn post(
             };
             let args = NewUserSessionArgs {
                 user_vault_id: sv.vault_id,
+                purpose: Some(UserSessionPurpose::ApiReonboard),
                 context,
                 scopes: vec![],
                 auth_events: vec![],

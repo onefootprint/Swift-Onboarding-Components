@@ -1,5 +1,7 @@
 use newtypes::AuthEventId;
+use newtypes::AuthMethodKind;
 use newtypes::ContactInfoId;
+use newtypes::IdentifyScope;
 use newtypes::ObConfigurationId;
 use newtypes::ScopedVaultId;
 use newtypes::VaultId;
@@ -17,6 +19,10 @@ use super::AuthSessionData;
 // WARNING: changing this could break existing user auth sessions
 pub struct UserSession {
     pub user_vault_id: VaultId,
+    /// Context on the purpose for which this user session was created.
+    /// If a session is created by stepping up an old sesion, we'll keep the old purpose
+    /// TODO make this required
+    pub purpose: Option<UserSessionPurpose>,
     /// The tenant-scoped user for the auth session. Only null for my1fp
     pub su_id: Option<ScopedVaultId>,
     /// The scoped business for the auth session, if any
@@ -35,6 +41,7 @@ pub struct UserSession {
     pub auth_events: Vec<AssociatedAuthEvent>,
     /// When true, the auth token was initially issued as an unauthed, identified token.
     /// Also true for tokens created via step up of tokens made via API
+    /// TODO can remove this when we have purpose
     pub is_from_api: bool,
     /// When true, the auth events that occurred at this tenant were inherited to form this token,
     /// rather than proof of auth being exchanged physically
@@ -52,8 +59,51 @@ pub struct NewUserSessionContext {
     pub obc_id: Option<ObConfigurationId>,
     pub wf_id: Option<WorkflowId>,
     pub wfr_id: Option<WorkflowRequestId>,
+    // TODO rm
     pub is_from_api: bool,
     pub is_implied_auth: bool,
+}
+
+/// Enumerate all the possible places in which a user auth token can be created.
+/// This is essentially a union of IdentifyScope and UserTokenKind
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[serde(rename_all = "snake_case")]
+#[serde(tag = "kind")]
+pub enum UserSessionPurpose {
+    Auth,
+    Bifrost,
+    My1fp,
+    ApiOnboard,
+    ApiReonboard,
+    ApiInherit,
+    ApiUser,
+    ApiUpdateAuthMethods {
+        limit_auth_methods: Option<Vec<AuthMethodKind>>,
+    },
+}
+
+impl From<IdentifyScope> for UserSessionPurpose {
+    fn from(value: IdentifyScope) -> Self {
+        match value {
+            IdentifyScope::Auth => Self::Auth,
+            IdentifyScope::My1fp => Self::My1fp,
+            IdentifyScope::Onboarding => Self::Bifrost,
+        }
+    }
+}
+
+impl UserSessionPurpose {
+    /// When true, the purpose was created via API rather than via a hosted Footprint flow.
+    pub fn is_from_api(&self) -> bool {
+        match self {
+            Self::ApiOnboard
+            | Self::ApiReonboard
+            | Self::ApiInherit
+            | Self::ApiUser
+            | Self::ApiUpdateAuthMethods { .. } => true,
+            Self::Bifrost | Self::Auth | Self::My1fp => false,
+        }
+    }
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -91,6 +141,8 @@ impl AssociatedAuthEvent {
 pub struct NewUserSessionArgs {
     pub user_vault_id: VaultId,
     pub context: NewUserSessionContext,
+    // TODO make this required
+    pub purpose: Option<UserSessionPurpose>,
     pub scopes: Vec<UserAuthScope>,
     pub auth_events: Vec<AssociatedAuthEvent>,
 }
@@ -100,6 +152,7 @@ impl UserSession {
         let NewUserSessionArgs {
             user_vault_id,
             context,
+            purpose,
             scopes,
             auth_events,
         } = args;
@@ -120,6 +173,7 @@ impl UserSession {
         } = context;
         let session = AuthSessionData::User(Self {
             user_vault_id,
+            purpose,
             su_id,
             sb_id,
             obc_id,

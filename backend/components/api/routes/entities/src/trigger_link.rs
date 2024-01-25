@@ -7,6 +7,7 @@ use crate::State;
 use api_core::auth::session::user::NewUserSessionArgs;
 use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::UserSession;
+use api_core::auth::session::user::UserSessionPurpose;
 use api_core::config::LinkKind;
 use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
@@ -60,6 +61,7 @@ pub async fn post(
             };
             let args = NewUserSessionArgs {
                 user_vault_id: sv.vault_id,
+                purpose: Some(UserSessionPurpose::ApiInherit),
                 context,
                 scopes: vec![],
                 auth_events: vec![],

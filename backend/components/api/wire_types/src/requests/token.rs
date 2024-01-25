@@ -11,6 +11,7 @@ pub struct CreateTokenRequest {
     /// `reonboard` creates a token that reonboards the user onto the last playbook that they onboarded onto.
     /// `inherit` creates a token that inherits any operation previously requested via the dashboard.
     /// `user` simply create a token for the user. A playbook key may be provided directly to the Footprint Verify SDK to trigger onboarding.
+    /// `update_auth_methods` creates a token that allows the user to update their contact info using the Footprint Auth SDK.
     #[openapi(required)]
     // TODO make this non-optional once apiture has upgraded
     pub kind: Option<TokenOperationKind>,

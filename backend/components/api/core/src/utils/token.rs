@@ -1,5 +1,5 @@
 use super::session::AuthSession;
-use crate::auth::session::user::{AssociatedAuthEvent, NewUserSessionArgs};
+use crate::auth::session::user::{AssociatedAuthEvent, NewUserSessionArgs, UserSessionPurpose};
 use crate::auth::user::UserAuthScope;
 use crate::{
     auth::session::user::{NewUserSessionContext, UserSession},
@@ -55,12 +55,12 @@ pub fn create_token(
     }
 
     // Determine arguments for the auth token based on the requested operation
-    let (obc_id, wfr) = match kind {
+    let (purpose, obc_id, wfr) = match kind {
         TokenOperationKind::User => {
             if key.is_some() {
                 return Err(ValidationError("Cannot provide playbook key for operation of kind user").into());
             }
-            (None, None)
+            (UserSessionPurpose::ApiUser, None, None)
         }
         TokenOperationKind::Inherit => {
             if key.is_some() {
@@ -72,7 +72,9 @@ pub fn create_token(
             let wfr = WorkflowRequest::get_active(conn, &sv.id)?
                 .ok_or(ValidationError("No outstanding info is requested from this user"))?;
             // Do we want to replace the obc.id on the auth token?
-            (Some(wfr.ob_configuration_id.clone()), Some(wfr))
+
+            let obc_id = wfr.ob_configuration_id.clone();
+            (UserSessionPurpose::ApiInherit, Some(obc_id), Some(wfr))
         }
         TokenOperationKind::Reonboard => {
             if key.is_some() {
@@ -83,7 +85,7 @@ pub fn create_token(
             let (_, obc) = Workflow::latest(conn, &sv.id, true)?.ok_or(ValidationError(
                 "Cannot reonboard user - user has no complete onboardings.",
             ))?;
-            (Some(obc.id), None)
+            (UserSessionPurpose::ApiReonboard, Some(obc.id), None)
         }
         TokenOperationKind::Onboard => {
             let key = key.ok_or(ValidationError(
@@ -93,7 +95,7 @@ pub fn create_token(
             if !obc.kind.can_onboard() {
                 return Err(OnboardingError::CannotOnboardOntoPlaybook(obc.kind).into());
             }
-            (Some(obc.id), None)
+            (UserSessionPurpose::ApiOnboard, Some(obc.id), None)
         }
     };
 
@@ -107,6 +109,7 @@ pub fn create_token(
     };
     let args = NewUserSessionArgs {
         user_vault_id: sv.vault_id,
+        purpose: Some(purpose),
         context,
         scopes,
         auth_events,

@@ -19,7 +19,7 @@ use crate::{
         session::{
             user::{
                 AssociatedAuthEvent, AssociatedAuthEventKind, NewUserSessionArgs, NewUserSessionContext,
-                UserSession,
+                UserSession, UserSessionPurpose,
             },
             AllowSessionUpdate, AuthSessionData, ExtractableAuthSession, RequestInfo,
         },
@@ -34,6 +34,7 @@ use feature_flag::FeatureFlagClient;
 pub struct UserSessionContext {
     pub user: Vault,
     pub scopes: Vec<UserAuthScope>,
+    pub purpose: Option<UserSessionPurpose>,
     pub(super) obc: Option<ObConfiguration>,
     pub(super) tenant: Option<Tenant>,
     pub(super) scoped_user: Option<ScopedVault>,
@@ -98,6 +99,7 @@ impl UserSessionContext {
         let auth_events = self.auth_events.into_iter().chain(new_auth_event).collect();
         let args = NewUserSessionArgs {
             user_vault_id: self.user.id,
+            purpose: self.purpose,
             context,
             scopes,
             auth_events,
@@ -164,6 +166,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
             AuthSessionData::User(data) => {
                 let UserSession {
                     user_vault_id,
+                    purpose,
                     su_id,
                     sb_id,
                     wf_id,
@@ -207,6 +210,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                 // Merge auth event ids for backcompat for now
                 let data = UserSessionContext {
                     user: vault,
+                    purpose,
                     sb_id,
                     wf_id,
                     wfr_id,
