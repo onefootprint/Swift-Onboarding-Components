@@ -1,8 +1,8 @@
 use super::session::AuthSession;
-use crate::auth::session::user::AssociatedAuthEvent;
+use crate::auth::session::user::{AssociatedAuthEvent, NewUserSessionArgs};
 use crate::auth::user::UserAuthScope;
 use crate::{
-    auth::session::user::{UserSession, UserSessionArgs},
+    auth::session::user::{NewUserSessionContext, UserSession},
     errors::{onboarding::OnboardingError, ApiResult, ValidationError},
 };
 use api_wire_types::TokenOperationKind;
@@ -97,7 +97,7 @@ pub fn create_token(
         }
     };
 
-    let args = UserSessionArgs {
+    let context = NewUserSessionContext {
         su_id: Some(sv.id),
         obc_id,
         is_from_api: true,
@@ -105,7 +105,13 @@ pub fn create_token(
         wfr_id: wfr.as_ref().map(|wfr| wfr.id.clone()),
         ..Default::default()
     };
-    let data = UserSession::make(sv.vault_id, args, scopes, auth_events)?;
+    let args = NewUserSessionArgs {
+        user_vault_id: sv.vault_id,
+        context,
+        scopes,
+        auth_events,
+    };
+    let data = UserSession::make(args)?;
     let (token, session) = AuthSession::create_sync(conn, session_key, data, duration)?;
     let result = CreateTokenResult { token, session, wfr };
     Ok(result)

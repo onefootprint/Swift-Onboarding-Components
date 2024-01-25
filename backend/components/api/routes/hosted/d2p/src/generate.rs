@@ -6,7 +6,7 @@ use crate::types::response::ResponseData;
 use crate::utils::session::JsonSession;
 use crate::utils::session::{AuthSession, HandoffRecord};
 use crate::State;
-use api_core::auth::session::user::UserSessionArgs;
+use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::IsGuardMet;
 use api_core::errors::ApiResult;
 use api_wire_types::{D2pGenerateRequest, D2pGenerateResponse};
@@ -39,7 +39,7 @@ pub async fn handler(
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
             let expires_in = Duration::minutes(30);
-            let args = UserSessionArgs::default();
+            let args = NewUserSessionContext::default();
             let data = user_auth.data.update(args, vec![UserAuthScope::Handoff], None)?;
             let (auth_token, _) = AuthSession::create_sync(conn, &session_sealing_key, data, expires_in)?;
             // Also keep track of the status of the handoff session. We use a JsonSession keyed on

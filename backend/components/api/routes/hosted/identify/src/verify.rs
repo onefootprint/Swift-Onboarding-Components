@@ -2,7 +2,9 @@ use super::{BiometricChallengeState, PhoneEmailChallengeState};
 use crate::State;
 use crate::{ChallengeData, ChallengeState};
 use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::session::user::{AssociatedAuthEvent, UserSession, UserSessionArgs};
+use api_core::auth::session::user::{
+    AssociatedAuthEvent, NewUserSessionArgs, NewUserSessionContext, UserSession,
+};
 use api_core::auth::user::allowed_user_scopes;
 use api_core::auth::user::{CheckedUserAuthContext, UserAuthContext};
 use api_core::auth::Any;
@@ -88,7 +90,7 @@ pub async fn post(
             };
 
             // Determine which scopes to issue on the auth token
-            let (args, duration, su) = match scope {
+            let (context, duration, su) = match scope {
                 IdentifyScope::Auth => {
                     let obc = ob_pk_auth.as_ref().map(|a| a.ob_config());
                     let su = if let Some(obc) = obc {
@@ -106,12 +108,12 @@ pub async fn post(
                     };
 
                     let duration = Duration::hours(1);
-                    let args = UserSessionArgs {
+                    let context = NewUserSessionContext {
                         su_id: Some(su.id.clone()),
                         obc_id: obc.map(|obc| obc.id.clone()),
                         ..Default::default()
                     };
-                    (args, duration, Some(su))
+                    (context, duration, Some(su))
                 }
                 IdentifyScope::Onboarding => {
                     let bo = ob_pk_auth.as_ref().and_then(|a| a.business_owner());
@@ -140,19 +142,19 @@ pub async fn post(
                     // TODO we should migrate the BO tokens to use these new un-authed, identified tokens
                     let sb_id = bo.map(|bo| get_scoped_business_id(conn, &su, bo)).transpose()?;
                     let duration = Duration::hours(1); // Onboarding is shorter
-                    let args = UserSessionArgs {
+                    let context = NewUserSessionContext {
                         su_id: Some(su.id.clone()),
                         sb_id,
                         obc_id: obc.map(|obc| obc.id.clone()),
                         // wf_id will be added later in POST /hosted/onboarding
                         ..Default::default()
                     };
-                    (args, duration, Some(su))
+                    (context, duration, Some(su))
                 }
                 IdentifyScope::My1fp => {
                     let duration = Duration::hours(8); // Issue my1fp token for a long time
-                    let args = UserSessionArgs::default();
-                    (args, duration, None)
+                    let context = NewUserSessionContext::default();
+                    (context, duration, None)
                 }
             };
 
@@ -181,11 +183,17 @@ pub async fn post(
 
             let ae = AssociatedAuthEvent::explicit(event.id);
             let data = if let Some(user_auth) = user_auth {
-                // Add the new scopes and args to the existing scopes and args on the auth token
-                user_auth.data.clone().update(args, scopes, Some(ae))?
+                // Add the new scopes and args to the existing scopes and context on the auth token
+                user_auth.data.clone().update(context, scopes, Some(ae))?
             } else {
-                // Otherwise, create a new token with these scopes / args
-                UserSession::make(uv_id.clone(), args, scopes, vec![ae])?
+                // Otherwise, create a new token with these scopes / context
+                let args = NewUserSessionArgs {
+                    user_vault_id: uv_id.clone(),
+                    context,
+                    scopes,
+                    auth_events: vec![ae],
+                };
+                UserSession::make(args)?
             };
             let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
 

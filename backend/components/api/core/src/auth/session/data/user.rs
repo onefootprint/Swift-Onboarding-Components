@@ -44,6 +44,18 @@ pub struct UserSession {
     pub is_implied_auth: bool,
 }
 
+#[derive(Default)]
+/// The nullable options in UserSession
+pub struct NewUserSessionContext {
+    pub su_id: Option<ScopedVaultId>,
+    pub sb_id: Option<ScopedVaultId>,
+    pub obc_id: Option<ObConfigurationId>,
+    pub wf_id: Option<WorkflowId>,
+    pub wfr_id: Option<WorkflowRequestId>,
+    pub is_from_api: bool,
+    pub is_implied_auth: bool,
+}
+
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct AssociatedAuthEvent {
     pub id: AuthEventId,
@@ -76,31 +88,28 @@ impl AssociatedAuthEvent {
     }
 }
 
-#[derive(Default)]
-pub struct UserSessionArgs {
-    pub su_id: Option<ScopedVaultId>,
-    pub sb_id: Option<ScopedVaultId>,
-    pub obc_id: Option<ObConfigurationId>,
-    pub wf_id: Option<WorkflowId>,
-    pub wfr_id: Option<WorkflowRequestId>,
-    pub is_from_api: bool,
-    pub is_implied_auth: bool,
+pub struct NewUserSessionArgs {
+    pub user_vault_id: VaultId,
+    pub context: NewUserSessionContext,
+    pub scopes: Vec<UserAuthScope>,
+    pub auth_events: Vec<AssociatedAuthEvent>,
 }
 
 impl UserSession {
-    pub fn make(
-        user_vault_id: VaultId,
-        args: UserSessionArgs,
-        scopes: Vec<UserAuthScope>,
-        auth_events: Vec<AssociatedAuthEvent>,
-    ) -> ApiResult<AuthSessionData> {
-        if scopes.iter().any(|s| matches!(s, UserAuthScope::SignUp)) && args.su_id.is_none() {
+    pub fn make(args: NewUserSessionArgs) -> ApiResult<AuthSessionData> {
+        let NewUserSessionArgs {
+            user_vault_id,
+            context,
+            scopes,
+            auth_events,
+        } = args;
+        if scopes.iter().any(|s| matches!(s, UserAuthScope::SignUp)) && context.su_id.is_none() {
             return Err(UserError::InvalidAuthSession(
                 "Cannot create session with SignUp scope without su_id".into(),
             )
             .into());
         }
-        let UserSessionArgs {
+        let NewUserSessionContext {
             su_id,
             sb_id,
             obc_id,
@@ -108,7 +117,7 @@ impl UserSession {
             wfr_id,
             is_from_api,
             is_implied_auth,
-        } = args;
+        } = context;
         let session = AuthSessionData::User(Self {
             user_vault_id,
             su_id,

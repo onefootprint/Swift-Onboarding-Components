@@ -4,8 +4,9 @@ use crate::auth::tenant::TenantSessionAuth;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
+use api_core::auth::session::user::NewUserSessionArgs;
+use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::UserSession;
-use api_core::auth::session::user::UserSessionArgs;
 use api_core::config::LinkKind;
 use api_core::errors::ApiResult;
 use api_core::errors::ValidationError;
@@ -48,17 +49,22 @@ pub async fn post(
             }
             let (obc, _) = ObConfiguration::get(conn, &wfr.ob_configuration_id)?;
 
-            let auth_args = UserSessionArgs {
-                su_id: Some(sv.id.clone()),
+            // No scopes or auth factors - require the user to re-auth when using this token
+            let duration = Duration::days(3);
+            let context = NewUserSessionContext {
+                su_id: Some(sv.id),
                 obc_id: Some(obc.id),
                 wfr_id: Some(wfr.id),
                 is_from_api: true,
                 ..Default::default()
             };
-
-            // No scopes or auth factors - require the user to re-auth when using this token
-            let duration = Duration::days(3);
-            let data = UserSession::make(sv.vault_id, auth_args, vec![], vec![])?;
+            let args = NewUserSessionArgs {
+                user_vault_id: sv.vault_id,
+                context,
+                scopes: vec![],
+                auth_events: vec![],
+            };
+            let data = UserSession::make(args)?;
             let (auth_token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             // Create an auth token for this workflow that we will send to the user
             Ok(auth_token)

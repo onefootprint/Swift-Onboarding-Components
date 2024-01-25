@@ -3,8 +3,9 @@ use crate::auth::tenant::TenantGuard;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
+use api_core::auth::session::user::NewUserSessionArgs;
+use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::UserSession;
-use api_core::auth::session::user::UserSessionArgs;
 use api_core::auth::tenant::SecretTenantAuthContext;
 use api_core::config::LinkKind;
 use api_core::errors::tenant::TenantError;
@@ -53,15 +54,20 @@ pub async fn post(
 
             let (_, obc) = Workflow::latest(conn, &sv.id, true)?.ok_or(UserError::NoCompleteOnboardings)?;
 
-            let scopes = vec![];
             let duration = Duration::days(1);
-            let args = UserSessionArgs {
+            let context = NewUserSessionContext {
                 su_id: Some(sv.id),
                 obc_id: Some(obc.id),
                 is_from_api: true,
                 ..Default::default()
             };
-            let data = UserSession::make(sv.vault_id, args, scopes, vec![])?;
+            let args = NewUserSessionArgs {
+                user_vault_id: sv.vault_id,
+                context,
+                scopes: vec![],
+                auth_events: vec![],
+            };
+            let data = UserSession::make(args)?;
             let (auth_token, session) = AuthSession::create_sync(conn, &session_key, data, duration)?;
             Ok((auth_token, session))
         })

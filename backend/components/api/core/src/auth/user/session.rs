@@ -17,7 +17,10 @@ use super::UserAuthScope;
 use crate::{
     auth::{
         session::{
-            user::{AssociatedAuthEvent, AssociatedAuthEventKind, UserSession, UserSessionArgs},
+            user::{
+                AssociatedAuthEvent, AssociatedAuthEventKind, NewUserSessionArgs, NewUserSessionContext,
+                UserSession,
+            },
             AllowSessionUpdate, AuthSessionData, ExtractableAuthSession, RequestInfo,
         },
         user::UserAuth,
@@ -77,24 +80,29 @@ impl AllowSessionUpdate for UserSessionContext {}
 impl UserSessionContext {
     pub fn update(
         self,
-        new_args: UserSessionArgs,
+        new_ctx: NewUserSessionContext,
         new_scopes: Vec<UserAuthScope>,
         new_auth_event: Option<AssociatedAuthEvent>,
     ) -> ApiResult<AuthSessionData> {
-        // Merge args, scopes, and auth factors and create a new session with these merged fields
-        let new_scopes = self.scopes.into_iter().chain(new_scopes).unique().collect();
-
-        let args = UserSessionArgs {
-            su_id: new_args.su_id.or(self.scoped_user.map(|su| su.id)),
-            sb_id: new_args.sb_id.or(self.sb_id),
-            obc_id: new_args.obc_id.or(self.obc_id),
-            wf_id: new_args.wf_id.or(self.wf_id),
-            wfr_id: new_args.wfr_id.or(self.wfr_id),
-            is_from_api: new_args.is_from_api || self.is_from_api,
-            is_implied_auth: new_args.is_implied_auth || self.is_implied_auth,
+        // Merge context, scopes, and auth factors and create a new session with these merged fields
+        let context = NewUserSessionContext {
+            su_id: new_ctx.su_id.or(self.scoped_user.map(|su| su.id)),
+            sb_id: new_ctx.sb_id.or(self.sb_id),
+            obc_id: new_ctx.obc_id.or(self.obc_id),
+            wf_id: new_ctx.wf_id.or(self.wf_id),
+            wfr_id: new_ctx.wfr_id.or(self.wfr_id),
+            is_from_api: new_ctx.is_from_api || self.is_from_api,
+            is_implied_auth: new_ctx.is_implied_auth || self.is_implied_auth,
         };
-        let aes = self.auth_events.into_iter().chain(new_auth_event).collect();
-        UserSession::make(self.user.id, args, new_scopes, aes)
+        let scopes = self.scopes.into_iter().chain(new_scopes).unique().collect();
+        let auth_events = self.auth_events.into_iter().chain(new_auth_event).collect();
+        let args = NewUserSessionArgs {
+            user_vault_id: self.user.id,
+            context,
+            scopes,
+            auth_events,
+        };
+        UserSession::make(args)
     }
 
     pub fn scoped_user_id(&self) -> Option<ScopedVaultId> {

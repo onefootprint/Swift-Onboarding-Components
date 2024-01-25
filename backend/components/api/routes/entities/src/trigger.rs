@@ -5,8 +5,9 @@ use crate::token::send_communication;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
+use api_core::auth::session::user::NewUserSessionArgs;
+use api_core::auth::session::user::NewUserSessionContext;
 use api_core::auth::session::user::UserSession;
-use api_core::auth::session::user::UserSessionArgs;
 use api_core::config::LinkKind;
 use api_core::errors::tenant::TenantError;
 use api_core::errors::user::UserError;
@@ -76,25 +77,30 @@ pub async fn post(
                 note,
             };
             let wfr = WorkflowRequest::create(conn, wfr_args)?;
-            let auth_args = UserSessionArgs {
+            let context = NewUserSessionContext {
                 su_id: Some(sv.id.clone()),
                 obc_id: Some(obc.id.clone()),
                 wfr_id: Some(wfr.id.clone()),
                 is_from_api: true,
                 ..Default::default()
             };
+            // No scopes or auth factors - require the user to re-auth when using this token
+            let duration = Duration::days(3);
+            let args = NewUserSessionArgs {
+                user_vault_id: sv.vault_id.clone(),
+                context,
+                scopes: vec![],
+                auth_events: vec![],
+            };
+            let data = UserSession::make(args)?;
+            let (token, session) = AuthSession::create_sync(conn, &session_key, data, duration)?;
+            // Create a timeline event logging that the workflow was triggered
             let event = WorkflowTriggeredInfo {
                 workflow_id: None,
                 ob_config_id: Some(obc.id),
                 workflow_request_id: Some(wfr.id.clone()),
                 actor,
             };
-
-            // No scopes or auth factors - require the user to re-auth when using this token
-            let duration = Duration::days(3);
-            let data = UserSession::make(sv.vault_id.clone(), auth_args, vec![], vec![])?;
-            let (token, session) = AuthSession::create_sync(conn, &session_key, data, duration)?;
-            // Create a timeline event logging that the workflow was triggered
             UserTimeline::create(conn, event, sv.vault_id.clone(), sv.id.clone())?;
             // Create an auth token for this workflow that we will send to the user
             Ok((vw, token, session, wfr))

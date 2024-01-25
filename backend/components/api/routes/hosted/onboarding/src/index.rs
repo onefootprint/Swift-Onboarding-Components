@@ -9,7 +9,7 @@ use crate::types::response::ResponseData;
 use crate::utils::headers::InsightHeaders;
 use crate::State;
 use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::session::user::UserSessionArgs;
+use api_core::auth::session::user::NewUserSessionContext;
 use api_core::types::JsonApiResponse;
 use api_core::utils::db2api::DbToApi;
 use api_core::utils::onboarding::NewBusinessVaultArgs;
@@ -97,7 +97,7 @@ pub async fn post(
 
             // Update auth token with new identifiers
             // TODO should we issue a new token here for good measure?
-            let args = UserSessionArgs {
+            let args = NewUserSessionContext {
                 wf_id: user_auth.workflow_id().is_none().then_some(wf_id),
                 obc_id: user_auth
                     .ob_configuration_id()
