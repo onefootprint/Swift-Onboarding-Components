@@ -17,12 +17,12 @@ impl FootprintVendorHttpClient {
             .base(1)
             .build_with_max_retries(2);
         let client = ClientBuilder::new(reqwest::Client::new())
-            .with(TracingMiddleware::default())
-            .with(SoftTimeoutMiddleware)
             // Will only retry if:
             // * The status was 5XX (server error)
             // * The status was 408 (request timeout) or 429 (too many requests)
             .with(RetryTransientMiddleware::new_with_policy(retry_policy))
+            .with(SoftTimeoutMiddleware)
+            .with(TracingMiddleware::default())
             .build();
 
         Ok(Self { client })
@@ -50,6 +50,7 @@ impl Middleware for SoftTimeoutMiddleware {
         let start = Utc::now();
         let res = next.run(req, extensions).await;
         let elapsed = Utc::now() - start;
+        // TODO eventually implement the hard timeout with `.with_init` using a RequestInitialiser
         if elapsed.num_seconds() > 20 {
             tracing::warn!(num_seconds=%elapsed.num_seconds(), "Vendor request soft timeout exceeded");
         }
