@@ -1,9 +1,9 @@
 use std::time::Duration;
 
 use chrono::Utc;
-use reqwest_middleware::{ClientBuilder, ClientWithMiddleware, Extension, Middleware};
+use reqwest_middleware::{ClientBuilder, ClientWithMiddleware, Middleware};
 use reqwest_retry::{policies::ExponentialBackoff, RetryTransientMiddleware};
-use reqwest_tracing::{OtelPathNames, TracingMiddleware};
+use reqwest_tracing::{ReqwestOtelSpanBackend, TracingMiddleware};
 
 #[derive(Clone)]
 pub struct FootprintVendorHttpClient {
@@ -17,9 +17,6 @@ impl FootprintVendorHttpClient {
             .base(1)
             .build_with_max_retries(2);
 
-        let trace_url_routes = OtelPathNames::known_paths::<[&str; 0], &str>([])
-            .map_err(|_| crate::Error::AssertionError("Couldn't compile OtelPathNames".into()))?;
-
         // Note: the order of the middlewares matters
         let client = ClientBuilder::new(reqwest::Client::new())
             // Will only retry if:
@@ -28,10 +25,8 @@ impl FootprintVendorHttpClient {
             .with(RetryTransientMiddleware::new_with_policy(retry_policy))
             // Log when a soft timeout has been reached
             .with(SoftTimeoutMiddleware)
-            // Specify to TracingMiddleware that we want to log the URL path as the span name
-            .with_init(Extension(trace_url_routes))
             // Trace each individual API request
-            .with(TracingMiddleware::default())
+            .with(TracingMiddleware::<OtelPathSpanName>::new())
             .build();
 
         Ok(Self { client })
@@ -42,6 +37,31 @@ impl std::ops::Deref for FootprintVendorHttpClient {
     type Target = ClientWithMiddleware;
     fn deref(&self) -> &Self::Target {
         &self.client
+    }
+}
+
+/// An implementation of ReqwestOtelSpanBackend that uses the request method and request URL as
+/// the span name.
+struct OtelPathSpanName;
+
+impl ReqwestOtelSpanBackend for OtelPathSpanName {
+    fn on_request_start(req: &reqwest::Request, _: &mut task_local_extensions::Extensions) -> tracing::Span {
+        let name = format!(
+            "{} {} {}",
+            req.method(),
+            req.url().host_str().unwrap_or("-"),
+            req.url().path()
+        );
+        use reqwest_tracing::reqwest_otel_span;
+        reqwest_otel_span!(name = name, req)
+    }
+
+    fn on_request_end(
+        span: &tracing::Span,
+        outcome: &reqwest_middleware::Result<reqwest::Response>,
+        _: &mut task_local_extensions::Extensions,
+    ) {
+        reqwest_tracing::default_on_request_end(span, outcome)
     }
 }
 
