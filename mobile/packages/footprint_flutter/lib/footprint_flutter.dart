@@ -13,128 +13,105 @@ export './types/configuration.dart';
 bool _initialUriIsHandled = false;
 
 class Footprint {
+  Uri? latestUri;
+  Object? _err;
+  StreamSubscription? subscription;
+  bool isBrowserOpen = false;
+  late final MyChromeSafariBrowser browser;
+
+  Footprint() {
+    handleIncomingLinks();
+    handleInitialUri();
+
+    browser = MyChromeSafariBrowser(onBrowserClosed: () {
+      print("webview was closed");
+      isBrowserOpen = false;
+    });
+  }
+
   Future<void> init(FootprintConfiguration config, BuildContext context) async {
     var response = await sendSdkArgs(config);
-
     if (response.failed) {
+      print("failed");
       logError();
     } else {
       var token = response.data;
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => MyApp(sdkToken: token)),
+      print("isBrowserOpen ${isBrowserOpen}");
+      print("token ${token}");
+
+      if (!isBrowserOpen && token != null) {
+        openBrowser(token);
+      }
+    }
+  }
+
+  void openBrowser(String token) {
+    isBrowserOpen = true;
+    browser.open(
+        url: Uri.parse(
+            'https://id.onefootprint.com/?redirect_url=com.footprint.fluttersdk://example#$token'),
+        options: ChromeSafariBrowserClassOptions(
+            android: AndroidChromeCustomTabsOptions(
+                shareState: CustomTabsShareState.SHARE_STATE_OFF),
+            ios: IOSSafariOptions(
+                barCollapsingEnabled: true,
+                presentationStyle: IOSUIModalPresentationStyle.FORM_SHEET)));
+  }
+
+  void handleIncomingLinks() {
+    if (!kIsWeb) {
+      subscription = uriLinkStream.listen(
+        (Uri? uri) {
+          processUri(uri);
+        },
+        onError: (Object err) {
+          handleError(err);
+        },
       );
+    }
+  }
+
+  void processUri(Uri? uri) {
+    browser.close();
+    latestUri = uri;
+    _err = null;
+    isBrowserOpen = false;
+  }
+
+  void handleError(Object err) {
+    latestUri = null;
+    _err = err is FormatException ? err : null;
+  }
+
+  Future<void> handleInitialUri() async {
+    if (!_initialUriIsHandled) {
+      _initialUriIsHandled = true;
+      try {
+        final uri = await getInitialUri();
+        latestUri = uri;
+      } on PlatformException {
+        // Handle PlatformException
+      } on FormatException catch (err) {
+        handleError(err);
+      }
     }
   }
 }
 
 class MyChromeSafariBrowser extends ChromeSafariBrowser {
-  @override
-  void onOpened() {}
-  @override
-  void onCompletedInitialLoad() {}
-  @override
-  void onClosed() {}
-}
+  final VoidCallback onBrowserClosed;
 
-class MyApp extends StatefulWidget {
-  final String? sdkToken;
+  MyChromeSafariBrowser({required this.onBrowserClosed});
 
-  const MyApp({Key? key, this.sdkToken}) : super(key: key);
+  // @override
+  // void onOpened() {}
+
+  // @override
+  // void onCompletedInitialLoad() {}
 
   @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  Uri? _latestUri;
-  Object? _err;
-  StreamSubscription? _sub;
-  bool _isBrowserOpen = false;
-  final ChromeSafariBrowser browser = MyChromeSafariBrowser();
-
-  @override
-  void initState() {
-    super.initState();
-    _handleIncomingLinks();
-    _handleInitialUri();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_isBrowserOpen && _latestUri == null) {
-      _openBrowser();
-    }
-
-    return MaterialApp(
-      title: 'Flutter Custom Tabs Example',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        brightness: Brightness.light,
-      ),
-      darkTheme: ThemeData(
-        primarySwatch: Colors.blue,
-        brightness: Brightness.dark,
-      ),
-      home: Scaffold(),
-    );
-  }
-
-  void _openBrowser() {
-    browser.open(
-        url: Uri.parse(
-            'https://id.onefootprint.com/?redirect_url=com.footprint.fluttersdk://example#${widget.sdkToken}'),
-        options: ChromeSafariBrowserClassOptions(
-            android: AndroidChromeCustomTabsOptions(
-                shareState: CustomTabsShareState.SHARE_STATE_OFF),
-            ios: IOSSafariOptions(barCollapsingEnabled: true)));
-    _isBrowserOpen = true;
-  }
-
-  void _handleIncomingLinks() {
-    if (!kIsWeb) {
-      _sub = uriLinkStream.listen(
-        (Uri? uri) {
-          _processUri(uri);
-        },
-        onError: (Object err) {
-          _handleError(err);
-        },
-      );
-    }
-  }
-
-  void _processUri(Uri? uri) {
-    if (!mounted) return;
-    browser.close();
-    setState(() {
-      _latestUri = uri;
-      _err = null;
-      _isBrowserOpen = false;
-    });
-  }
-
-  void _handleError(Object err) {
-    if (!mounted) return;
-    setState(() {
-      _latestUri = null;
-      _err = err is FormatException ? err : null;
-    });
-  }
-
-  Future<void> _handleInitialUri() async {
-    if (!_initialUriIsHandled) {
-      _initialUriIsHandled = true;
-      try {
-        final uri = await getInitialUri();
-        if (!mounted) return;
-        setState(() => _latestUri = uri);
-      } on PlatformException {
-        // Handle PlatformException
-      } on FormatException catch (err) {
-        _handleError(err);
-      }
-    }
+  void onClosed() {
+    onBrowserClosed();
   }
 }
 
