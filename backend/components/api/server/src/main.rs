@@ -1,13 +1,24 @@
 #![warn(clippy::unwrap_used)]
 #![warn(clippy::expect_used)]
 
-use std::time::Duration;
-
 use actix_web::{dev::Service, http::KeepAlive};
 use api_core::{config::Config, *};
+use clap::{Parser, Subcommand};
 mod custom_migrations;
 use actix_web_opentelemetry::RequestMetricsBuilder;
 use paperclip::v2::models::{DefaultApiRaw, Info, Tag};
+
+#[derive(Parser)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    #[command(subcommand)]
+    command: Option<Command>,
+}
+#[derive(Subcommand)]
+enum Command {
+    ApiServer,
+    HelloWorld,
+}
 
 #[allow(clippy::expect_used)]
 fn main() -> std::io::Result<()> {
@@ -39,16 +50,25 @@ fn main() -> std::io::Result<()> {
 
     std::env::set_var("RUST_BACKTRACE", "full");
 
+    // Sentry initialization may not be compaible with #[tokio::main]
     let runtime = tokio::runtime::Builder::new_multi_thread().enable_all().build()?;
-    runtime.block_on(async move { run_server(config).await })
+    runtime.block_on(async move { run(config).await })
+}
+
+async fn run(config: Config) -> std::io::Result<()> {
+    let state: State = State::init_or_die(config.clone()).await;
+
+    let args = Args::parse();
+    match &args.command {
+        None | Some(Command::ApiServer) => run_api_server(config, state).await,
+        Some(Command::HelloWorld) => run_hello_world().await,
+    }
 }
 
 #[allow(clippy::expect_used)]
-async fn run_server(config: Config) -> std::io::Result<()> {
+async fn run_api_server(config: Config, state: State) -> std::io::Result<()> {
     // telemetry
     let _controller = telemetry::init(&config).expect("failed to init telemetry layers");
-
-    let state: State = State::init_or_die(config.clone()).await;
 
     // run custom migrations if needed
     custom_migrations::run(&state)
@@ -155,7 +175,7 @@ async fn run_server(config: Config) -> std::io::Result<()> {
     // Our loadbalancer has a keep alive idle timeout of 60s. To make sure that the target doesn't
     // time out while the loadbalancer is waiting for a response, increase the keep alive timeout
     // https://linear.app/footprint/issue/FP-3633/diagnose-502s
-    .keep_alive(KeepAlive::Timeout(Duration::from_secs(120)))
+    .keep_alive(KeepAlive::Timeout(std::time::Duration::from_secs(120)))
     .shutdown_timeout(30)
     .bind(("0.0.0.0", config.port))?
     .run()
@@ -188,4 +208,9 @@ async fn socure_reason_code_check(config: &Config) {
         }
         Err(err) => tracing::warn!(error=?err, "[Socure Reason Code check] Error"),
     }
+}
+
+async fn run_hello_world() -> std::io::Result<()> {
+    println!("hello world 🐧");
+    Ok(())
 }
