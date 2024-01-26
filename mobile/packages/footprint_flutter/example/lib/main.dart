@@ -27,16 +27,17 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
+        home: Builder(
+      builder: (_context) => Scaffold(
         appBar: AppBar(
           title: const Text('Footprint Flutter Demo'),
         ),
         body: Center(
           child: ElevatedButton(
               child: Text('Verify with Footprint'),
-              onPressed: () => {handlePress(context)}),
+              onPressed: () => {handlePress(_context)}),
         ),
       ),
-    );
+    ));
   }
 }
