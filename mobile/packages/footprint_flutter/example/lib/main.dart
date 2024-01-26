@@ -14,14 +14,14 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  void handlePress() {
+  void handlePress(BuildContext context) {
     var config = FootprintConfiguration(
       publicKey: "pb_test_RcDHxZgJO9q3vY72d7ZLXu",
       onCancel: () => print("onCancel"),
       onComplete: (String token) => print("onComplete $token"),
     );
 
-    footprint.init(config);
+    footprint.init(config, context);
   }
 
   @override
@@ -33,7 +33,8 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Center(
           child: ElevatedButton(
-              child: Text('Verify with Footprint'), onPressed: handlePress),
+              child: Text('Verify with Footprint'),
+              onPressed: () => {handlePress(context)}),
         ),
       ),
     );

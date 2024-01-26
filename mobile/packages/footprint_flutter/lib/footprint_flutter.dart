@@ -1,20 +1,21 @@
-import 'footprint_flutter_platform_interface.dart';
+library footprint_flutter;
 
-class FootprintConfiguration {
-  final String? publicKey;
-  final void Function()? onCancel;
-  final Function(String)? onComplete;
-
-  FootprintConfiguration({
-    this.publicKey,
-    this.onCancel,
-    this.onComplete,
-  });
-}
+import 'package:flutter/material.dart';
+import './types/configuration.dart';
+import './utils/send_sdk_args.dart';
+import './utils/logger.dart';
+export './types/configuration.dart';
 
 class Footprint {
-  void init(FootprintConfiguration config) {
-    print("init footprint ${config.publicKey}");
+  Future<void> init(FootprintConfiguration config, BuildContext context) async {
+    var response = await sendSdkArgs(config);
+
+    if (response.failed) {
+      // TODO: Log
+      logError();
+    } else {
+      print(response.data);
+    }
   }
 }
 
