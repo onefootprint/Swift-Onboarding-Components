@@ -47,6 +47,12 @@ pub async fn detokenize(
     if fp_ids.len() > 5_000 {
         tracing::error!("Attempting to detokenize more than max allowed fp_ids, lower limit");
     }
+
+    // Add some indication of the range of fp_ids handled by this request
+    let fp_id_min = fp_ids.iter().min().map(|id| id.to_string()).unwrap_or_default();
+    let fp_id_max = fp_ids.iter().max().map(|id| id.to_string()).unwrap_or_default();
+    tracing::info!(%fp_id_min, %fp_id_max, "Detokenizing for range of fp_ids");
+
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let vws: HashMap<FpId, TenantVw> = state

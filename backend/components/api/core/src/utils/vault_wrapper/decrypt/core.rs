@@ -82,6 +82,8 @@ impl<Type> VaultWrapper<Type> {
         enclave_client: &EnclaveClient,
         ops: Vec<EnclaveDecryptOperation>,
     ) -> ApiResult<DecryptUncheckedResult<Pii>> {
+        tracing::info!(dis=?Csv::from(ops.clone()), "Decrypting DIs");
+
         // Fetch each DI's underlying data from the vault wrapper's in-memory state
         let datas = self
             .decrypt_requests(ops)
@@ -117,8 +119,6 @@ impl<Type> VaultWrapper<Type> {
         &self,
         ops: Vec<EnclaveDecryptOperation>,
     ) -> Vec<VwDecryptRequest> {
-        tracing::info!(dis=?Csv::from(ops.clone()), "Decrypting DIs");
-
         // Fetch each DI's underlying data from the vault wrapper's in-memory state
         ops.into_iter()
             .flat_map(|op| {

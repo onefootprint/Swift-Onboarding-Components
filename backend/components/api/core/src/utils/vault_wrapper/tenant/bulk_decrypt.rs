@@ -7,7 +7,7 @@ use db::models::{
 };
 use itertools::Itertools;
 use newtypes::{
-    AccessEventKind, AccessEventPurpose, AuditEventDetail, DataIdentifier, DbActor, PiiJsonValue,
+    output::Csv, AccessEventKind, AccessEventPurpose, AuditEventDetail, DataIdentifier, DbActor, PiiJsonValue,
 };
 
 use crate::{
@@ -76,6 +76,8 @@ where
         .iter()
         .map(|(key, r)| (key.clone(), r.vw.scoped_vault.clone()))
         .collect();
+    let targets = requests.iter().flat_map(|(_, r)| &r.targets).unique().collect();
+    tracing::info!(targets=?Csv(targets), "Bulk decrypting, across potentially multiple VWs");
 
     let results = batch_execute_decrypt_requests(&state.enclave_client, decrypt_requests).await?;
 
