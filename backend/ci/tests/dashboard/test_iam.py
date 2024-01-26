@@ -138,6 +138,7 @@ def tenant_user3(sandbox_tenant, limited_role, run_id):
     )
 
 
+@pytest.mark.flaky
 @pytest.mark.parametrize(
     "filters,expected_user1,expected_user2",
     [

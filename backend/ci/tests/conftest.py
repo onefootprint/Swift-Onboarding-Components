@@ -27,7 +27,7 @@ from tests.utils import (
 
 @pytest.fixture(scope="session")
 def run_id():
-    pytest_run_id = os.environ.get("PYTEST_XDIST_TESTRUNUID") or ""
+    pytest_run_id = os.environ.get("PYTEST_XDIST_TESTRUNUID") or "run_id"
     random_num = _gen_random_n_digit_number(5)
     return f"{pytest_run_id}.{random_num}"
 
