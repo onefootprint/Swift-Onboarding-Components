@@ -5,6 +5,17 @@ import type { Article } from './media.types';
 const getStaticProps: GetStaticProps = () => {
   const articles: Article[] = [
     {
+      id: '12',
+      url: 'https://www.fintechinnovation50.com/',
+      website: 'Fintech Innovation 50',
+      imageUrl: '/media/fintech-innovation-50.png',
+      imageAlt: 'Fintech Innovation 50',
+      publishedAt: 'Jan 25, 2024',
+      title: 'Footprint is in the Fintech Innovation 50 list for 2023',
+      excerpt:
+        'GGV Capital U.S. is excited to unveil the Fintech Innovation 50, an annual list highlighting the most innovative emerging and established fintech companies.',
+    },
+    {
       id: '11',
       url: 'https://whyyoushouldjoin.substack.com/p/inside-q1-24',
       website: 'Why You Should Join: Inside Edition',
