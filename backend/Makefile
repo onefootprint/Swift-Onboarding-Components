@@ -1,5 +1,4 @@
 .PHONY: api-release api-debug
-.DEFAULT_GOAL := debug
 
 account := $(shell aws sts get-caller-identity --query "Account" --output text)
 branch := $(shell git rev-parse --abbrev-ref HEAD | sed -r 's/\//-/g' | sed -r 's/_/-/g')
@@ -52,9 +51,9 @@ run-enclave-debug: build-eif
 	@nitro-cli terminate-enclave --all
 	@echo "running enclave [debug mode]"
 	@nitro-cli run-enclave --eif-path ./out/enclave.eif --cpu-count 2 --memory 256 --enclave-cid 16 --debug-mode
-		
+
 run-enclave:
-	@echo "running enclave"	
+	@echo "running enclave"
 	@nitro-cli run-enclave --eif-path ./out/enclave.eif --cpu-count 2 --memory 256 --enclave-cid 16
 
 # Builds our enclave_proxy_binary
@@ -68,18 +67,18 @@ get-named-commit:
 
 get-friendly-branch-name:
 	@echo "$(branch)"
-	
-set-enclave-version:
-	@pulumi --cwd infra config set --path constants.containers.enclaveVersion $(commit)	
 
-package-enclave:	
+set-enclave-version:
+	@pulumi --cwd infra config set --path constants.containers.enclaveVersion $(commit)
+
+package-enclave:
 	@echo "using account $(account)"
 	@echo "create image tagged as $(commit)"
 	@docker build -t enclave_pkg:$(commit) -f enclave_eif_package.dockerfile .
 	@aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(account).dkr.ecr.us-east-1.amazonaws.com
 	@docker tag enclave_pkg:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:$(commit)
 	@docker tag enclave_pkg:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
-	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:$(commit) 
+	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:$(commit)
 	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
 
 set-api-version:
@@ -92,24 +91,28 @@ package-api: api-release
 	@aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(account).dkr.ecr.us-east-1.amazonaws.com
 	@docker tag api:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/api:$(commit)
 	@docker tag api:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/api:latest
-	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/api:$(commit) 	
+	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/api:$(commit)
 	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/api:latest
 
 
-stop-local:
-	@killall enclave || echo "no enclave running"
-	@killall enclave_proxy || echo "no enclave running"
-	@killall api_server || echo "no fpc running"
+run-enclave-local:
+	(trap 'kill 0' SIGINT EXIT; \
+		echo "starting enclave..." && cargo run -p enclave --features simulate & \
+		echo "starting enclave proxy..." && cargo run -p enclave_proxy \
+	)
 
-run-enclave-local: stop-local
-	@cargo run -p enclave --features simulate & echo "starting enclave..."
-	@cargo run -p enclave_proxy & echo "starting enclave proxy.."
+run-local:
+	(trap 'kill 0' SIGINT EXIT; \
+		make run-enclave-local & \
+		echo "starting api server..." && cargo run -p api_server \
+	)
 
-run-local: run-enclave-local
-	@cargo run -p api_server
-
-watch-local: run-enclave-local
+watch-local:
 	@cargo watch -x 'run -p api_server' -i ci -i vscode-target
+	(trap 'kill 0' SIGINT EXIT; \
+		make run-enclave-local & \
+		echo "starting api server and watching for changes..." && cargo watch -x 'run -p api_server' -i ci -i vscode-target \
+	)
 
 watch: watch-local
 
@@ -117,7 +120,7 @@ configure-aws:
 	@aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
 	@aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
 	@aws configure set default.region ${AWS_REGION}
-	
+
 update-dot-env:
 	@command -v rage || (echo "missing rage: installing" && cargo install rage)
 	@cat .env | rage -e -r age1u4858547zdlc7ncghc3wypqxamt7v5xh0kasysqjfk0dt6ahcdnqtprun4 -a -o .env.age
