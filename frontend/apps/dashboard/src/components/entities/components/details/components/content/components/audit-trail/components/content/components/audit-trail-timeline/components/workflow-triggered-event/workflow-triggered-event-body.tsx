@@ -1,11 +1,12 @@
 import { IcoInfo16 } from '@onefootprint/icons';
 import type { WorkflowTriggeredEventData } from '@onefootprint/types';
+import { TokenKind } from '@onefootprint/types/src/api/create-token';
 import { Box, LinkButton, Stack, Tooltip, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import useGenerateTokenRequest from '../../../../../../../vault/components/vault-actions/hooks/use-generate-token';
 import EventBodyEntry from '../event-body-entry';
-import useGenerateTriggerLink from './hooks/use-generate-trigger-link';
 
 type WorkflowTriggeredEventBodyProps = {
   data: WorkflowTriggeredEventData;
@@ -20,7 +21,7 @@ const WorkflowTriggeredEventBody = ({
   data,
   entityId,
 }: WorkflowTriggeredEventBodyProps) => {
-  const generateTriggerLink = useGenerateTriggerLink();
+  const generateTokenMutation = useGenerateTokenRequest();
   const [confirmationTooltipMessage, setConfirmationTooltipMessage] = useState<
     string | null
   >(null);
@@ -53,10 +54,11 @@ const WorkflowTriggeredEventBody = ({
     if (!triggerId) {
       return;
     }
-    generateTriggerLink.mutate(
+    generateTokenMutation.mutate(
       {
         entityId,
-        triggerId,
+        kind: TokenKind.inherit,
+        sendLink: false,
       },
       {
         onSuccess: ({ link }) => {
@@ -119,7 +121,7 @@ const WorkflowTriggeredEventBody = ({
                   <LinkButton
                     size="compact"
                     onClick={generateLinkAndCopyToClipboard}
-                    disabled={generateTriggerLink.isLoading}
+                    disabled={generateTokenMutation.isLoading}
                   >
                     {t('copy-link')}
                   </LinkButton>

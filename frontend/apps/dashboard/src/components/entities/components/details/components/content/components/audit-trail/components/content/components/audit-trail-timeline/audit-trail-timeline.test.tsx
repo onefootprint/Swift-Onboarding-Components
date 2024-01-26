@@ -139,7 +139,7 @@ describe('<AuditTrailTimeline />', () => {
         const { writeTestMockFn } = createClipboardSpy();
         mockRequest({
           method: 'post',
-          path: '/entities/fp_bid_VXND11zUVRYQKKUxbUN3KD/triggers/wfr_id/link',
+          path: '/entities/fp_bid_VXND11zUVRYQKKUxbUN3KD/token',
           response: { link: 'https://mylink' },
         });
 
@@ -186,7 +186,7 @@ describe('<AuditTrailTimeline />', () => {
         // Simulate an error generating the link
         mockRequest({
           method: 'post',
-          path: '/entities/fp_bid_VXND11zUVRYQKKUxbUN3KD/triggers/wfr_id/link',
+          path: '/entities/fp_bid_VXND11zUVRYQKKUxbUN3KD/token',
           statusCode: 400,
           response: {},
         });
