@@ -14,6 +14,7 @@ use db::models::scoped_vault::{ScopedVault, ScopedVaultPiiFilters};
 use db::models::tenant::{Tenant, UpdateTenant};
 use db::models::watchlist_check::WatchlistCheck;
 use db::models::workflow::Workflow;
+use futures::StreamExt;
 use newtypes::{AccessEventPurpose, BillingEventKind, StripeCustomerId, TenantId, VaultKind};
 use strum::IntoEnumIterator;
 
@@ -64,9 +65,14 @@ async fn post_all(
     let billing_date = request
         .and_then(|b| b.billing_date)
         .unwrap_or((Utc::now() - Duration::hours(8)).date_naive());
+
+    let mut tasks = futures::stream::FuturesUnordered::<
+        std::pin::Pin<Box<dyn std::future::Future<Output = ApiResult<()>>>>,
+    >::new();
     for t in tenants {
-        create_bill_for_tenant(&state, t, billing_date).await?;
+        tasks.push(Box::pin(create_bill_for_tenant(&state, t, billing_date)))
     }
+    while tasks.next().await.is_some() {}
 
     EmptyResponse::ok().json()
 }
@@ -99,17 +105,13 @@ pub async fn get_or_create_customer_id(state: &State, tenant: &Tenant) -> ApiRes
 #[tracing::instrument(skip_all, fields(tenant_id=%tenant.id, billing_date))]
 async fn create_bill_for_tenant(state: &State, tenant: Tenant, billing_date: NaiveDate) -> ApiResult<()> {
     let i = billing::interval::get_billing_interval(billing_date)?;
-    let t_id = tenant.id.clone();
 
-    let billing_profile = state
-        .db_pool
-        .db_query(move |conn| BillingProfile::get(conn, &t_id))
-        .await??;
     // Count the number of billable uses of each product for this tenant
     let t_id = tenant.id.clone();
     let (billing_profile, counts) = state
         .db_pool
         .db_query(move |conn| -> ApiResult<_> {
+            let billing_profile = BillingProfile::get(conn, &t_id)?;
             let bp = billing_profile.as_ref();
             // Fetch counts for most products regardless of whether the tenant is set up with
             // billing for them. We will error if any of these products have use when they haven't

@@ -20,6 +20,7 @@ actix-web = { workspace = true }
 tracing = { workspace = true }
 tokio = { workspace = true }
 serde = { workspace = true }
+futures = { workspace = true }
 
 strum = { workspace = true }
 aws-config = { workspace = true }
