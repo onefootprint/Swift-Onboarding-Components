@@ -98,10 +98,28 @@ pub(super) async fn send_communication(
     org_name: String,
     link: PiiString,
 ) -> ApiResult<Option<ContactInfoKind>> {
-    let msg = if let Some(wfr) = wfr {
-        TriggerMessage::for_wfr(wfr, org_name, link)
+    let (kind, note) = if let Some(wfr) = wfr {
+        let WorkflowRequest { note, config, .. } = wfr;
+        let kind = match config {
+            WorkflowRequestConfig::RedoKyc => TriggerMessageKind::RedoKyc,
+            WorkflowRequestConfig::IdDocument {
+                kind,
+                collect_selfie: _,
+            } => match kind {
+                DocumentRequestKind::Identity => TriggerMessageKind::IdentityDocument,
+                DocumentRequestKind::ProofOfAddress => TriggerMessageKind::ProofOfAddress,
+                DocumentRequestKind::ProofOfSsn => TriggerMessageKind::ProofOfSsn,
+            },
+        };
+        (kind, note)
     } else {
-        TriggerMessage::for_auth(org_name, link)
+        (TriggerMessageKind::Auth, None)
+    };
+    let msg = TriggerMessage {
+        note,
+        org_name,
+        kind,
+        link,
     };
 
     let method = if let Some(phone) = vw.decrypt_contact_info(state, ContactInfoKind::Phone).await? {
@@ -126,78 +144,89 @@ pub(super) async fn send_communication(
     Ok(method)
 }
 
-#[derive(Clone)]
 struct TriggerMessage {
     note: Option<String>,
     org_name: String,
-    context_message: String,
+    kind: TriggerMessageKind,
     link: PiiString,
 }
 
-impl TriggerMessage {
-    fn for_auth(org_name: String, link: PiiString) -> Self {
-        let context_message = format!(
-            "{} has sent you a link to update your login information.",
-            org_name
-        );
-        Self {
-            note: None,
-            org_name,
-            context_message,
-            link,
-        }
-    }
-
-    fn for_wfr(wfr: WorkflowRequest, org_name: String, link: PiiString) -> Self {
-        let WorkflowRequest { note, config, .. } = wfr;
-        let context_message = match config {
-            WorkflowRequestConfig::RedoKyc => {
-                format!("{} has requested you to re-verify your identity.", org_name)
-            }
-            WorkflowRequestConfig::IdDocument {
-                kind,
-                collect_selfie: _,
-            } => {
-                match kind {
-                    DocumentRequestKind::Identity => {
-                        format!("In order to verify your identity, {} has requested you provide a photo of your ID.", org_name)
-                    }
-                    DocumentRequestKind::ProofOfAddress => {
-                        format!(
-                            "In order to verify your address, {} has requested you provide proof of address.",
-                            org_name
-                        )
-                    }
-                    DocumentRequestKind::ProofOfSsn => {
-                        format!(
-                            "In order to verify your identity, {} has requested you provide proof of SSN.",
-                            org_name
-                        )
-                    }
-                }
-            }
-        };
-        Self {
-            note,
-            org_name,
-            context_message,
-            link,
-        }
-    }
+enum TriggerMessageKind {
+    Auth,
+    RedoKyc,
+    IdentityDocument,
+    ProofOfAddress,
+    ProofOfSsn,
 }
 
-impl TriggerMessage {
-    fn message_body(&self) -> PiiString {
-        PiiString::from(
-            vec![
-                self.note.as_ref(),
-                Some(&self.context_message),
-                Some(&format!("Continue here: {}", self.link.leak())),
-            ]
-            .into_iter()
-            .flatten()
-            .join("\n\n"),
-        )
+impl TriggerMessageKind {
+    fn sms_copy(&self, org_name: &str) -> String {
+        match self {
+            Self::Auth => {
+                format!(
+                    "{} has sent you a link to update your login information.",
+                    org_name
+                )
+            }
+            Self::RedoKyc => {
+                format!("{} has requested you to re-verify your identity.", org_name)
+            }
+            Self::IdentityDocument => {
+                format!(
+                    "In order to verify your identity, {} has requested you provide a photo of your ID.",
+                    org_name
+                )
+            }
+            Self::ProofOfAddress => {
+                format!(
+                    "In order to verify your address, {} has requested you provide proof of your address.",
+                    org_name
+                )
+            }
+            Self::ProofOfSsn => {
+                format!(
+                    "In order to verify your identity, {} has requested you provide proof of your SSN.",
+                    org_name
+                )
+            }
+        }
+    }
+
+    fn email_content(&self, org_name: &str) -> (String, String) {
+        match self {
+            Self::Auth => (
+                "Update your login information".into(),
+                format!(
+                    "{} has sent you a link to update your login information.",
+                    org_name
+                ),
+            ),
+            Self::RedoKyc => (
+                format!("{} has requested you to re-verify your identity", org_name),
+                "Some of the information you have provided may be missing or incorrect. Please take a moment to re-verify your identity.".into()
+            ),
+            Self::IdentityDocument => (
+                "Verify your identity".into(),
+                format!(
+                    "In order to verify your identity, {} has requested you provide a photo of your ID.",
+                    org_name
+                )
+            ),
+            Self::ProofOfAddress => (
+                "Verify your identity".into(),
+                format!(
+                    "In order to verify your address, {} has requested you provide proof of your address.",
+                    org_name
+                )
+            ),
+            Self::ProofOfSsn => (
+                "Verify your identity".into(),
+                format!(
+                    "In order to verify your identity, {} has requested you provide proof of your SSN.",
+                    org_name
+                )
+            )
+        }
     }
 }
 
@@ -213,8 +242,18 @@ pub struct EmailMessage<'a> {
 
 impl<'a> From<TriggerMessage> for SmsMessage<'a> {
     fn from(value: TriggerMessage) -> Self {
+        let message_body = PiiString::from(
+            vec![
+                value.note.as_ref(),
+                Some(&value.kind.sms_copy(&value.org_name)),
+                Some(&format!("Continue here: {}", value.link.leak())),
+            ]
+            .into_iter()
+            .flatten()
+            .join("\n\n"),
+        );
         SmsMessage {
-            message_body: value.message_body(),
+            message_body,
             rate_limit_scope: RateLimit::DASHBOARD_TRIGGER,
         }
     }
@@ -223,18 +262,16 @@ impl<'a> From<TriggerMessage> for SmsMessage<'a> {
 impl<'a> From<TriggerMessage> for EmailMessage<'a> {
     fn from(value: TriggerMessage) -> Self {
         let TriggerMessage {
-            org_name, note, link, ..
+            org_name,
+            note,
+            link,
+            kind,
         } = value;
+        let (header, content) = kind.email_content(&org_name);
         let template_data = HashMap::from_iter(
             vec![
-                Some((
-                    "header".to_string(),
-                    PiiString::from(format!(
-                        "{} has requested you to re-verify your identity",
-                        org_name
-                    )),
-                )),
-                Some(("content".to_string(), PiiString::from("Some of the information you have provided may be missing or incorrect. Please take a moment to re-verify your identity."))),
+                Some(("header".to_string(), PiiString::from(header))),
+                Some(("content".to_string(), PiiString::from(content))),
                 Some(("org_name".to_string(), PiiString::from(org_name))),
                 note.map(|n| ("note".to_string(), PiiString::from(n))),
                 Some(("link".to_string(), link)),
