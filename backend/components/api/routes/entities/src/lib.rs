@@ -14,7 +14,6 @@ mod rule_set_result;
 mod timeline;
 mod token;
 mod trigger;
-mod trigger_link;
 mod vault;
 
 pub fn routes(config: &mut web::ServiceConfig) {
@@ -35,7 +34,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(risk_signals::get)
         .service(match_signals::get)
         .service(trigger::post)
-        .service(trigger_link::post)
         .service(risk_signals::get_detail)
         .service(risk_signals::decrypt_aml_hits)
         .service(auth_events::get)

@@ -1766,53 +1766,6 @@
                 ]
             }
         },
-        "/entities/{fp_id}/triggers/{id}/link": {
-            "post": {
-                "tags": [
-                    "EntityDetails",
-                    "Entities",
-                    "Private"
-                ],
-                "description": "Trigger a workflow for the provided user.",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "fp_id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    },
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "style": "simple"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/TriggerLinkResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Dashboard Token": []
-                    }
-                ]
-            }
-        },
         "/entities/{fp_id}/vault": {
             "get": {
                 "tags": [
@@ -19911,17 +19864,6 @@
                     "name",
                     "role",
                     "status"
-                ]
-            },
-            "TriggerLinkResponse": {
-                "type": "object",
-                "properties": {
-                    "link": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "link"
                 ]
             },
             "TriggerRequest": {

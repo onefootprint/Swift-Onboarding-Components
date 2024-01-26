@@ -38,10 +38,10 @@ def send_trigger(fp_id, sandbox_tenant, trigger, expected_error=None):
     assert body["requires_additional_info"]
 
     # Re-generate a link as is done from the dashboard
-    body = post(
-        f"entities/{fp_id}/triggers/{t_id}/link", None, *sandbox_tenant.db_auths
-    )
-    return FpAuth(body["link"].split("#")[1])
+    data = dict(kind="inherit")
+    body = post(f"entities/{fp_id}/token", data, *sandbox_tenant.db_auths)
+    assert body["link"]
+    return FpAuth(body["token"])
 
 
 def complete_redo_flow_user(user, auth_token, pre_run=None):
