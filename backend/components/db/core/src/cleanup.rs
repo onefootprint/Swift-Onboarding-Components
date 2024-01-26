@@ -16,14 +16,14 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
     // we clean up afterwards.
 
     use db_schema::schema::{
-        access_event, annotation, audit_event, business_owner, contact_info, data_lifetime, decision_intent,
-        document_data, document_request, document_upload, fingerprint, fingerprint_visit_event,
-        identity_document, incode_verification_session, incode_verification_session_event, liveness_event,
-        manual_review, middesk_request, onboarding_decision,
-        onboarding_decision_verification_result_junction, risk_signal, risk_signal_group, scoped_vault,
-        socure_device_session, stytch_fingerprint_event, user_consent, user_timeline, vault, vault_data,
-        verification_request, verification_result, watchlist_check, webauthn_credential, workflow,
-        workflow_event, workflow_request,
+        access_event, annotation, audit_event, billing_event, business_owner, contact_info, data_lifetime,
+        decision_intent, document_data, document_request, document_upload, fingerprint,
+        fingerprint_visit_event, identity_document, incode_verification_session,
+        incode_verification_session_event, liveness_event, manual_review, middesk_request,
+        onboarding_decision, onboarding_decision_verification_result_junction, risk_signal,
+        risk_signal_group, scoped_vault, socure_device_session, stytch_fingerprint_event, user_consent,
+        user_timeline, vault, vault_data, verification_request, verification_result, watchlist_check,
+        webauthn_credential, workflow, workflow_event, workflow_request,
     };
     let mut deleted_rows = 0;
 
@@ -154,6 +154,10 @@ pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) ->
 
         deleted_rows += diesel::delete(document_request::table)
             .filter(document_request::scoped_vault_id.eq_any(su_ids.clone()))
+            .execute(conn.conn())?;
+
+        deleted_rows += diesel::delete(billing_event::table)
+            .filter(billing_event::scoped_vault_id.eq_any(su_ids.clone()))
             .execute(conn.conn())?;
 
         deleted_rows += diesel::delete(fingerprint_visit_event::table)
