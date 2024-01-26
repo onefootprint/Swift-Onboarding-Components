@@ -9,28 +9,43 @@ import { Region } from '@pulumi/aws';
 import { DatabaseOutput } from './db';
 import * as s3 from './s3';
 import * as assets from './asset_cdn';
+import * as sg from './sg';
 
 import { GetStackMetadata, StackEnvironment } from './stack_metadata';
+import { FPC_SERVICE_PORT } from './sg';
 
 const OTEL_PORT = 4317;
 
+// The path at which metrics are served.
+const METRICS_ENDPOINT_PATH = 'metrics';
+
+export type ContainersOutput = {
+  // Stringified container definitions.
+  // https://www.pulumi.com/registry/packages/aws/api-docs/ecs/taskdefinition/#containerdefinitions_nodejs
+  definitions: pulumi.Output<string>;
+  metricsEndpointPath: string;
+};
+
 export abstract class ServiceContainers {
-  static async apiMain(
-    appPort: number,
+  static async monolithMain(
     constants: Config,
     secretsStore: StaticSecrets,
     enclaveKeyDescriptor: EnclaveKeyDescriptor,
     signingKeyDescriptor: HmacSigningKeyDescriptor,
     region: Region,
-    parent: pulumi.Resource,
     database: DatabaseOutput,
     s3Buckets: s3.ServiceS3Buckets,
     assetsCdn: assets.AssetCdn,
-    metricsEndpointPath: string,
     nitroService: NitroServiceOutput,
-  ): Promise<pulumi.Output<string>> {
+    logGroupComponent: string,
+    containerArgs: string[],
+  ): Promise<ContainersOutput> {
     const otelCollectorContainerName = 'otelcollector';
     const serverContainerName = 'fpc';
+
+    // Note: The appPort may not be useful for cron tasks unless there are
+    // longer-lived crons that need metrics or a debug web interface.
+    const appPort = sg.FPC_SERVICE_PORT;
 
     const traceOtelCollector = ServiceContainers.createTraceOtelCollector(
       otelCollectorContainerName,
@@ -38,10 +53,10 @@ export abstract class ServiceContainers {
       constants,
       region,
       appPort,
-      metricsEndpointPath,
+      logGroupComponent,
     );
 
-    const apiServer = await ServiceContainers.createApiServer(
+    const monolith = await ServiceContainers.createMonolith(
       serverContainerName,
       otelCollectorContainerName,
       appPort,
@@ -53,23 +68,28 @@ export abstract class ServiceContainers {
       database,
       s3Buckets,
       assetsCdn,
-      metricsEndpointPath,
       nitroService,
+      logGroupComponent,
+      containerArgs,
     );
 
-    const containerDef = pulumi
-      .all([traceOtelCollector, apiServer])
-      .apply(([traceOtelCollector, apiServer]) => {
-        const def = [apiServer, traceOtelCollector];
+    const definitions = pulumi
+      .all([traceOtelCollector, monolith])
+      .apply(([traceOtelCollector, monolith]) => {
+        const def = [monolith, traceOtelCollector];
         return JSON.stringify(def);
       });
-    return containerDef;
+
+    return {
+      definitions,
+      metricsEndpointPath: METRICS_ENDPOINT_PATH,
+    };
   }
 
   /**
-   * Our main API server contianer
+   * Our main container definition used for the API server and crons.
    */
-  static async createApiServer(
+  static async createMonolith(
     name: string,
     traceOtelCollectorContainerName: string,
     appPort: number,
@@ -81,8 +101,9 @@ export abstract class ServiceContainers {
     database: DatabaseOutput,
     s3Buckets: s3.ServiceS3Buckets,
     assetsCdn: assets.AssetCdn,
-    metricsEndpointPath: string,
     nitroService: NitroServiceOutput,
+    logGroupComponent: string,
+    containerArgs: string[],
   ): Promise<pulumi.Output<aws.ecs.ContainerDefinition>> {
     let serviceEnvironment: string;
 
@@ -108,6 +129,7 @@ export abstract class ServiceContainers {
 
     const current = await aws.getCallerIdentity({});
 
+    // NB: "api" named image is used for all monolith flavors (API server, cron, etc.).
     const image = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/api:${constants.containers.apiVersion}`;
     return pulumi
       .all([
@@ -500,7 +522,7 @@ export abstract class ServiceContainers {
               },
               {
                 name: 'METRICS_ENDPOINT_PATH',
-                value: `${metricsEndpointPath}`,
+                value: `${METRICS_ENDPOINT_PATH}`,
               },
               {
                 name: 'ENCLAVE_PROXY_ENDPOINT',
@@ -531,7 +553,7 @@ export abstract class ServiceContainers {
             dependsOn: [
               {
                 containerName: traceOtelCollectorContainerName,
-                condition: 'START',
+                condition: 'HEALTHY',
               },
             ],
             portMappings: [
@@ -541,10 +563,13 @@ export abstract class ServiceContainers {
                 protocol: 'tcp',
               },
             ],
+            command: containerArgs,
             logConfiguration: {
               logDriver: 'awslogs',
               options: {
-                'awslogs-group': `/ecs/${name}-${metadata.shortStackName}-logs`,
+                'awslogs-group': `/ecs/${name}-${metadata.shortStackName}${
+                  logGroupComponent ? '-' + logGroupComponent : ''
+                }-logs`,
                 'awslogs-region': `${region}`,
                 'awslogs-create-group': 'true',
                 'awslogs-stream-prefix': 'ecs',
@@ -565,7 +590,7 @@ export abstract class ServiceContainers {
     constants: Config,
     region: Region,
     serverContainerPort: number,
-    metricsEndpointPath: string,
+    logGroupComponent: string,
   ): pulumi.Output<aws.ecs.ContainerDefinition> {
     const metadata = GetStackMetadata();
     const out = pulumi
@@ -579,14 +604,6 @@ export abstract class ServiceContainers {
         {
           name: 'AOT_CONFIG_CONTENT',
           valueFrom: config,
-        },
-        {
-          name: 'ELASTIC_APM_API_KEY',
-          valueFrom: apiKey,
-        },
-        {
-          name: 'GRAFANA_PROMETHEUS_PUSH_AUTH',
-          valueFrom: grafanaPrometheusPushAuth,
         },
         {
           name: 'HONEYCOMB_API_KEY',
@@ -608,22 +625,27 @@ export abstract class ServiceContainers {
           ],
           environment: [
             {
-              name: 'ELASTIC_APM_SERVER_ENDPOINT',
-              value: constants.elastic.apmEndpoint,
-            },
-            {
               name: 'API_SERVER_TARGET',
               value: `localhost:${serverContainerPort}`,
             },
             {
               name: 'API_SERVER_METRICS_ENDPOINT_PATH',
-              value: `${metricsEndpointPath}`,
+              value: `${METRICS_ENDPOINT_PATH}`,
             },
           ],
+          healthCheck: {
+            command: ['CMD', '/healthcheck'],
+            interval: 10,
+            retries: 5,
+            startPeriod: 30,
+            timeout: 10,
+          },
           logConfiguration: {
             logDriver: 'awslogs',
             options: {
-              'awslogs-group': `/ecs/otelcollect_logs/${metadata.shortStackName}`,
+              'awslogs-group': `/ecs/otelcollect_logs/${
+                metadata.shortStackName
+              }${logGroupComponent ? '-' + logGroupComponent : ''}`,
               'awslogs-region': `${region}`,
               'awslogs-create-group': 'true',
               'awslogs-stream-prefix': 'ecs',

@@ -5,7 +5,10 @@ import * as certs from './certs';
 import * as pulumi from '@pulumi/pulumi';
 import * as secrets from './secrets';
 import { Config } from './config';
-import * as svc from './service';
+import * as apiSvc from './api_service';
+import * as cron from './cron';
+import * as ecsCluster from './ecs_cluster';
+import * as ecsRoles from './ecs_roles';
 import * as enclaveKey from './enclave_key';
 import * as db from './db';
 import * as neon_db from './db_neon';
@@ -23,6 +26,8 @@ import * as airplane from './airplane';
 import * as assets from './asset_cdn';
 import { DatabaseOutput } from './db';
 import { ConfigureAlerts } from './alerts';
+import { ecs } from '@pulumi/awsx';
+import { ServiceContainers } from './containers';
 
 /**
  * Convenient type to pass shared global resources
@@ -179,6 +184,8 @@ export type CoreServiceOutputs = {
  * Launches our core services
  */
 async function createCoreService(g: GlobalState): Promise<CoreServiceOutputs> {
+  const region = g.region;
+
   // launch core services
   const cert = certs.CreateRegionalWildCertificateForDnsConfig({
     domain: g.dnsConfig.apiDomain,
@@ -189,8 +196,12 @@ async function createCoreService(g: GlobalState): Promise<CoreServiceOutputs> {
   // create the nitro service
   const nitroServiceOutput = await nitroService.CreateNitroService(g, cert);
 
+  // create shared ECS resources
+  const cluster = ecsCluster.CreateECSCluster(g);
+  const roles = await ecsRoles.CreateECSRoles(g);
+
   // create our ecs api service
-  const service = await svc.CreateApiService(
+  const apiService = await apiSvc.CreateApiService(
     g,
     {
       cpuUnits: g.constants.resources.cpuUnits,
@@ -201,15 +212,20 @@ async function createCoreService(g: GlobalState): Promise<CoreServiceOutputs> {
       targetMemoryUtilization: g.constants.resources.targetMemoryUtilization,
     },
     cert,
+    cluster,
+    roles,
     nitroServiceOutput,
   );
 
+  // create cron jobs
+  await cron.CreateScheduledTasks(g, cluster, roles, nitroServiceOutput);
+
   return {
     assetCdn: g.assetCdn.origin,
-    cdnDomainName: service.distribution.domainName,
-    externalDomain: service.cdnDomain,
-    loadBalancerCname: service.lbCname,
-    internalLoadBalancerDnsName: service.lb.loadBalancer.dnsName,
+    cdnDomainName: apiService.distribution.domainName,
+    externalDomain: apiService.cdnDomain,
+    loadBalancerCname: apiService.lbCname,
+    internalLoadBalancerDnsName: apiService.lb.loadBalancer.dnsName,
     nitroServiceEndpoint: nitroServiceOutput.serviceEndpoint,
   };
 }

@@ -1,5 +1,6 @@
 export interface Config {
   resources: Resources;
+  cronTasks: CronTask[];
   db: Database;
   domain: Domains;
   elastic: Elastic;
@@ -32,6 +33,14 @@ export interface Resources {
   maxInstances: number;
   targetCpuUtilization: number;
   targetMemoryUtilization: number;
+}
+
+export interface CronTask {
+  name: string;
+  memoryMB: number;
+  cpuUnits: number;
+  schedule: string;
+  args: string[];
 }
 
 export interface Database {

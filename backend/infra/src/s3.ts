@@ -1,8 +1,7 @@
 import { StackMetadata } from './stack_metadata';
 import * as aws from '@pulumi/aws';
 import { Config } from './config';
-import { AWSPolicyConfig } from './service';
-import { GlobalState } from './main';
+import { AWSPolicyConfig } from './ecs_roles';
 
 /**
  * Configure document Images bucket

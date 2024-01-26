@@ -128,6 +128,13 @@ export async function CreateDB(
           sourceSecurityGroupId: coreSecurityGroups.airplane.id,
           description: 'Allows inbound DB connections from the airplane-agent',
         },
+        {
+          protocol: '-1',
+          fromPort: 5432,
+          toPort: 5432,
+          sourceSecurityGroupId: coreSecurityGroups.cron.id,
+          description: 'Allows inbound DB connections from cron jobs',
+        },
       ],
     },
   );
@@ -586,7 +593,7 @@ chmod +x db_proxy.sh
 # setup db connect script
 cat <<'EOF' > connect_db.sh
 #!/bin/sh
-if [[ $* == *--write* ]] 
+if [[ $* == *--write* ]]
 then
   printf "\nWARNING: accessing Read/Write node\n"
   psql $(aws --region us-east-1 ssm get-parameter --name "${dbReadWriteUrlSecretName}" --with-decryption | jq -r ".Parameter.Value")

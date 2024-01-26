@@ -16,6 +16,7 @@ export const EGRESS_ALL: awsx.ec2.EgressSecurityGroupRuleArgs = {
 export type CoreSecurityGroups = {
   fpcServiceLoadBalancer: awsx.ec2.SecurityGroup;
   fpcService: awsx.ec2.SecurityGroup;
+  cron: awsx.ec2.SecurityGroup;
   jumpbox: awsx.ec2.SecurityGroup;
   jumpboxReadOnly: awsx.ec2.SecurityGroup;
   airplane: awsx.ec2.SecurityGroup;
@@ -58,6 +59,16 @@ export function CreateCoreSecurityGroups(
         },
       ],
 
+      egress: [EGRESS_ALL],
+    },
+    { provider },
+  );
+
+  const cron = new awsx.ec2.SecurityGroup(
+    `fpc-service-cron-sg-${stackMetadata.shortStackName}`,
+    {
+      vpc: vpc.vpc,
+      ingress: [],
       egress: [EGRESS_ALL],
     },
     { provider },
@@ -112,6 +123,7 @@ export function CreateCoreSecurityGroups(
   return {
     fpcServiceLoadBalancer,
     fpcService,
+    cron,
     jumpbox,
     jumpboxReadOnly,
     airplane,

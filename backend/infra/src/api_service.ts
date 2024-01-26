@@ -1,12 +1,12 @@
 import { GlobalState } from './main';
-import { NitroServiceOutput } from './nitro_service';
 import { StackMetadata } from './stack_metadata';
 import { route53 } from '@pulumi/aws';
 import * as awsx from '@pulumi/awsx';
 import * as aws from '@pulumi/aws';
 import * as pulumi from '@pulumi/pulumi';
 import { StaticSecrets } from './secrets';
-import { ServiceContainers } from './containers';
+import { ContainersOutput, ServiceContainers } from './containers';
+import { ECSRolesOutput } from './ecs_roles';
 import { EnclaveKeyDescriptor } from './enclave_key';
 import { HmacSigningKeyDescriptor } from './hmac_key';
 import * as s3 from './s3';
@@ -14,6 +14,7 @@ import { GetStackMetadata } from './stack_metadata';
 import * as appCdn from './app_cdn';
 import { FPC_SERVICE_PORT } from './sg';
 import { Certificate } from './certs';
+import { NitroServiceOutput } from './nitro_service';
 
 export type ServiceLoadBalancer = {
   lb: awsx.lb.LoadBalancer;
@@ -32,17 +33,10 @@ export type ServiceConfig = {
   targetMemoryUtilization: number;
 };
 
-export type AWSPolicyConfig = {
-  name: string;
-  policy: string;
-};
-
 /**
  * Constants
  */
 
-// The path at which metrics are served.
-const METRICS_ENDPOINT_PATH = 'metrics';
 // Our header name for securing auth between cloudfront and internal load balancers
 const CDN_PROTECTION_HEADER_NAME: string = 'X-Token-From-CloudFront';
 
@@ -53,72 +47,38 @@ export async function CreateApiService(
   g: GlobalState,
   serviceConfig: ServiceConfig,
   cert: Certificate,
+  cluster: awsx.ecs.Cluster,
+  roles: ECSRolesOutput,
   nitroService: NitroServiceOutput,
 ): Promise<ServiceLoadBalancer> {
-  const region = g.region;
-
   const stackMetadata = GetStackMetadata();
+  const region = g.region;
   const vpc = g.vpc.vpc;
   const provider = g.provider;
 
-  // Setup our load balancer and CloudFront
-  const lb = await createCdnFrontedLoadBalancer(
-    g,
-    cert,
-    METRICS_ENDPOINT_PATH,
-    stackMetadata,
-  );
-
-  // init our cluster
-  const clusterName = `cluster-${stackMetadata.shortStackName}`;
-  const cluster = new awsx.ecs.Cluster(
-    clusterName,
-    {
-      name: clusterName,
-      vpc,
-      settings: [
-        {
-          name: 'containerInsights',
-          value: 'enabled',
-        },
-      ],
-    },
-    { provider },
-  );
-
-  // declare the containers we want to run
-  const containerDefinitions = await ServiceContainers.apiMain(
-    FPC_SERVICE_PORT,
+  const containers = await ServiceContainers.monolithMain(
     g.constants,
     g.secretsStore,
     g.enclaveKeyConfig,
     g.hmacSigningKeyConfig,
     region,
-    cluster,
     g.database,
     g.buckets,
     g.assetCdn,
-    METRICS_ENDPOINT_PATH,
     nitroService,
+    '',
+    ['api-server'],
+  );
+
+  // Setup our load balancer and CloudFront
+  const lb = await createCdnFrontedLoadBalancer(
+    g,
+    cert,
+    containers.metricsEndpointPath,
+    stackMetadata,
   );
 
   // setup the task
-  const current = await aws.getCallerIdentity({});
-
-  const execRole = createTaskExecutionRole(
-    g.secretsStore,
-    stackMetadata.shortStackName,
-    g.database.databaseUrlSecretName,
-  );
-
-  const taskRoleRole = createTaskContainerRole(
-    (await aws.getCallerIdentity({})).accountId,
-    stackMetadata.shortStackName,
-    g.enclaveKeyConfig,
-    g.hmacSigningKeyConfig,
-    g.buckets,
-  );
-
   const taskDefinition = new aws.ecs.TaskDefinition(
     `task-${stackMetadata.shortStackName}`,
     {
@@ -126,10 +86,10 @@ export async function CreateApiService(
       cpu: `${serviceConfig.cpuUnits}`,
       networkMode: 'awsvpc',
       requiresCompatibilities: ['FARGATE'],
-      executionRoleArn: execRole.arn,
-      taskRoleArn: taskRoleRole.arn,
+      executionRoleArn: roles.executionRoleArn,
+      taskRoleArn: roles.taskRoleArn,
       family: `fpc-${stackMetadata.shortStackName}`,
-      containerDefinitions,
+      containerDefinitions: containers.definitions,
     },
     { provider, dependsOn: [cluster] },
   );
@@ -182,7 +142,9 @@ export async function CreateApiService(
     },
   );
 
-  const resourceId = `service/${clusterName}/${serviceName}`;
+  const resourceId = cluster.cluster.name.apply(
+    name => `service/${name}/${serviceName}`,
+  );
   const ecsTarget = new aws.appautoscaling.Target(
     `ecs-scaling-target-${stackMetadata.shortStackName}`,
     {
@@ -307,6 +269,7 @@ async function createCdnFrontedLoadBalancer(
   );
 
   // dont't allow external traffic to hit the disallowed endpoints
+  // TODO: consider listening on a dedicated port instead of blocking access at the ALB.
   web.addListenerRule(
     `fpc-lb-metrics-rules-${serviceName}`,
     {
@@ -408,164 +371,4 @@ async function createCdnFrontedLoadBalancer(
     lbCname: albDomainName,
     distribution,
   };
-}
-
-/**
- * Create the task execution role we need to setup the tasks in our ECS service
- * needs to create logs, assume ecs-tasks service, and access static secrets for the containers
- */
-function createTaskExecutionRole(
-  secretsStore: StaticSecrets,
-  serviceName: string,
-  dbSecretName: string,
-): aws.iam.Role {
-  const taskExecRole = new aws.iam.Role(`fpc-task-exec-role-${serviceName}`, {
-    assumeRolePolicy: {
-      Version: '2012-10-17',
-      Statement: [
-        {
-          Sid: '',
-          Effect: 'Allow',
-          Principal: {
-            Service: 'ecs-tasks.amazonaws.com',
-          },
-          Action: 'sts:AssumeRole',
-        },
-      ],
-    },
-    inlinePolicies: [
-      {
-        name: 'ecs_task_exec_logs',
-        policy: JSON.stringify({
-          Version: '2012-10-17',
-          Statement: [
-            {
-              Action: [
-                'logs:CreateLogGroup',
-                'logs:PutLogEvents',
-                'logs:DescribeLogStreams',
-                'logs:CreateLogStream',
-                'logs:PutLogEvents',
-              ],
-              Effect: 'Allow',
-              Resource: '*',
-            },
-          ],
-        }),
-      },
-      {
-        name: 'allow_db_connection_secret',
-        policy: JSON.stringify({
-          Version: '2012-10-17',
-          Statement: [
-            {
-              Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-              Effect: 'Allow',
-              Resource: `arn:aws:ssm:*:*:parameter${dbSecretName}`,
-            },
-          ],
-        }),
-      },
-    ],
-  });
-
-  const _taskExecRolePolicyAttachment = new aws.iam.RolePolicyAttachment(
-    `task-exec-${serviceName}-policy`,
-    {
-      role: taskExecRole.name,
-      policyArn:
-        'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy',
-    },
-  );
-
-  const _taskExecRolePolicyAttachmentSecrets = new aws.iam.RolePolicyAttachment(
-    `task-exec-${serviceName}-policy2`,
-    {
-      role: taskExecRole.name,
-      policyArn: secretsStore.secretsPolicyArn,
-    },
-  );
-
-  return taskExecRole;
-}
-
-/**
- * Create the task container role we need to run the tasks in our ECS service
- */
-function createTaskContainerRole(
-  account: string,
-  serviceName: string,
-  enclaveKeyDescriptor: EnclaveKeyDescriptor,
-  signingKeyDescriptor: HmacSigningKeyDescriptor,
-  s3Buckets: s3.ServiceS3Buckets,
-): pulumi.Output<aws.iam.Role> {
-  const s3Policies: AWSPolicyConfig[] = [
-    s3Buckets.documentImages.policy,
-    s3Buckets.assetsBucket.policy,
-  ];
-
-  const role = pulumi
-    .all([enclaveKeyDescriptor.rootKeyArn, signingKeyDescriptor.rootKeyArn])
-    .apply(([enclaveRootKeyArn, signingRootKeyArn]) => {
-      return new aws.iam.Role(`task-container-role-${serviceName}`, {
-        assumeRolePolicy: {
-          Version: '2012-10-17',
-          Statement: [
-            {
-              Sid: '',
-              Effect: 'Allow',
-              Principal: {
-                Service: 'ecs-tasks.amazonaws.com',
-              },
-              Action: 'sts:AssumeRole',
-              Condition: {
-                StringEquals: {
-                  'aws:SourceAccount': `${account}`,
-                },
-              },
-            },
-          ],
-        },
-        inlinePolicies: [
-          {
-            name: 'enclave_key_generate_encrypted_key',
-            policy: JSON.stringify({
-              Version: '2012-10-17',
-              Statement: [
-                {
-                  Action: [
-                    'kms:GenerateDataKeyPairWithoutPlaintext',
-                    'kms:GenerateDataKeyWithoutPlaintext',
-                    'kms:DescribeKey',
-                  ],
-                  Effect: 'Allow',
-                  Resource: enclaveRootKeyArn,
-                },
-                {
-                  Action: ['kms:GenerateMac', 'kms:VerifyMac'],
-                  Effect: 'Allow',
-                  Resource: signingRootKeyArn,
-                },
-              ],
-            }),
-          },
-          {
-            name: 'rekognition_textract_permissions',
-            policy: JSON.stringify({
-              Version: '2012-10-17',
-              Statement: [
-                {
-                  Action: ['rekognition:*', 'textract:*'],
-                  Effect: 'Allow',
-                  Resource: '*',
-                },
-              ],
-            }),
-          },
-          // Add in our s3 Policies to inlinePolicies
-        ].concat(s3Policies),
-      });
-    });
-
-  return role;
 }

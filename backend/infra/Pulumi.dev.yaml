@@ -120,6 +120,12 @@ config:
       minInstances: 2
       targetCpuUtilization: 60
       targetMemoryUtilization: 60
+    cronTasks:
+      - name: hello-world
+        memoryMB: 512
+        cpuUnits: 256
+        schedule: "rate(5 minutes)"
+        args: ["hello-world"]
     rpId: onefootprint.com
     s3:
       documentImagesBucketNamePrefix: opaque-documents
