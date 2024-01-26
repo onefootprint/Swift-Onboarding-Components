@@ -15,9 +15,11 @@ class FootprintL10n {
   FootprintL10n({this.locale, this.language});
 
   Map<String, dynamic> toJson() {
-    return {
+    var map = {
       'locale': locale?.name,
       'language': language?.name,
     };
+    map.removeWhere((key, value) => value == null);
+    return map;
   }
 }

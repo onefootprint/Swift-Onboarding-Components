@@ -7,8 +7,11 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:uni_links/uni_links.dart';
 import './types/configuration.dart';
 import './utils/send_sdk_args.dart';
+import './utils/create-url.dart';
 import './utils/logger.dart';
-export './types/configuration.dart';
+export 'types/footprint_types.dart';
+
+bool _initialUriIsHandled = false;
 
 bool _initialUriIsHandled = false;
 
@@ -24,32 +27,36 @@ class Footprint {
     handleInitialUri();
 
     browser = MyChromeSafariBrowser(onBrowserClosed: () {
-      print("webview was closed");
       isBrowserOpen = false;
     });
   }
 
   Future<void> init(FootprintConfiguration config, BuildContext context) async {
-    var response = await sendSdkArgs(config);
-    if (response.failed) {
-      print("failed");
-      logError();
-    } else {
+    try {
+      var response = await sendSdkArgs(config);
       var token = response.data;
-      print("isBrowserOpen ${isBrowserOpen}");
-      print("token ${token}");
-
-      if (!isBrowserOpen && token != null) {
-        openBrowser(token);
+      if (response.failed) {
+        logError();
       }
+      if (token != null && !isBrowserOpen) {
+        var url = createUrl(
+          token: token,
+          appearance: config.appearance,
+          // TODO: Fix tthis
+          redirectUrl: "com.footprint.fluttersdk://example",
+        );
+        openBrowser(url);
+      }
+    } catch (e) {
+      // Handle the error
+      print('An error occurred: $e');
     }
   }
 
-  void openBrowser(String token) {
+  void openBrowser(String url) {
     isBrowserOpen = true;
     browser.open(
-        url: Uri.parse(
-            'https://id.onefootprint.com/?redirect_url=com.footprint.fluttersdk://example#$token'),
+        url: Uri.parse(url),
         options: ChromeSafariBrowserClassOptions(
             android: AndroidChromeCustomTabsOptions(
                 shareState: CustomTabsShareState.SHARE_STATE_OFF),
@@ -102,12 +109,6 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
   final VoidCallback onBrowserClosed;
 
   MyChromeSafariBrowser({required this.onBrowserClosed});
-
-  // @override
-  // void onOpened() {}
-
-  // @override
-  // void onCompletedInitialLoad() {}
 
   @override
   void onClosed() {

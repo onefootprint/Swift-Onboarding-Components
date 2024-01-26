@@ -16,10 +16,11 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   void handlePress(BuildContext context) {
     var config = FootprintConfiguration(
-      publicKey: "pb_test_RcDHxZgJO9q3vY72d7ZLXu",
-      onCancel: () => print("onCancel"),
-      onComplete: (String token) => print("onComplete $token"),
-    );
+        publicKey: "pb_test_RcDHxZgJO9q3vY72d7ZLXu",
+        onCancel: () => print("onCancel"),
+        onComplete: (String token) => print("onComplete $token"),
+        appearance: FootprintAppearance(
+            variables: FootprintAppearanceVariables(buttonPrimaryBg: 'red')));
 
     footprint.init(config, context);
   }

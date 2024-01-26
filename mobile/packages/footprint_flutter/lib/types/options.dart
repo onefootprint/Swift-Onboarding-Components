@@ -8,9 +8,11 @@ class FootprintOptions {
   });
 
   Map<String, dynamic> toJson() {
-    return {
+    var map = {
       'show_completion_page': showCompletionPage,
       'show_logo': showLogo,
     };
+    map.removeWhere((key, value) => value == null);
+    return map;
   }
 }

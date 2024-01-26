@@ -1,6 +1,7 @@
 import './l10n.dart';
 import './user_data.dart';
 import './options.dart';
+import './appearance.dart';
 
 class FootprintConfiguration {
   final FootprintL10n? l10n;
@@ -10,6 +11,7 @@ class FootprintConfiguration {
   final String? authToken;
   final String? publicKey;
   final void Function()? onCancel;
+  final FootprintAppearance? appearance;
 
   FootprintConfiguration({
     this.authToken,
@@ -19,14 +21,18 @@ class FootprintConfiguration {
     this.options,
     this.publicKey,
     this.userData,
+    this.appearance,
   });
 
   Map<String, dynamic> toJson() {
-    return {
+    var map = {
       'l10n': l10n?.toJson(),
       'options': options?.toJson(),
       'public_key': publicKey,
       'user_data': userData?.toJson(),
+      'appearance': appearance?.toJson(),
     };
+    map.removeWhere((key, value) => value == null);
+    return map;
   }
 }

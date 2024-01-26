@@ -40,7 +40,7 @@ class FootprintUserData {
   });
 
   Map<String, dynamic> toJson() {
-    return {
+    var map = {
       'id.email': email,
       'id.phone_number': phoneNumber,
       'id.first_name': firstName,
@@ -60,5 +60,7 @@ class FootprintUserData {
       'id.visa_kind': visaKind,
       'id.visa_expiration_date': visaExpirationDate,
     };
+    map.removeWhere((key, value) => value == null);
+    return map;
   }
 }
