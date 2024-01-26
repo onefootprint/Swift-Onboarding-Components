@@ -66,6 +66,15 @@ pub struct AuthV1SdkArgs {
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
+pub struct UpdateAuthMethodsV1SdkArgs {
+    pub auth_token: PiiString,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub options: Option<AuthV1Options>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub l10n: Option<L10nV1>,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
 pub struct FormV1Options {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hide_buttons: Option<bool>,
@@ -101,8 +110,25 @@ pub struct RenderV1SdkArgs {
     pub show_hidden_toggle: Option<bool>,
 }
 
-impl VerifyV1SdkArgs {
-    pub fn validate(&self) -> ApiResult<()> {
+pub type ObConfigInfo = (
+    ObConfiguration,
+    Tenant,
+    Option<TenantClientConfig>,
+    Option<Appearance>,
+);
+
+pub trait ValidateSdkArgs {
+    /// Validate the contents of the SdkArgs
+    fn validate(&self) -> ApiResult<()>;
+
+    /// If pertinent, the ob config identified by these SDK args
+    fn ob_config(&self, _conn: &mut PgConn) -> ApiResult<Option<ObConfigInfo>> {
+        Ok(None)
+    }
+}
+
+impl ValidateSdkArgs for VerifyV1SdkArgs {
+    fn validate(&self) -> ApiResult<()> {
         let auth_token_hash = self
             .auth_token
             .as_ref()
@@ -120,7 +146,7 @@ impl VerifyV1SdkArgs {
         Ok(())
     }
 
-    pub fn ob_config(&self, conn: &mut PgConn) -> ApiResult<Option<ObConfigInfo>> {
+    fn ob_config(&self, conn: &mut PgConn) -> ApiResult<Option<ObConfigInfo>> {
         let obc = if let Some(key) = self.public_key.as_ref() {
             let (obc, tenant) = ObConfiguration::get_enabled(conn, key)?;
             let appearance = if let Some(appearance_id) = obc.appearance_id.as_ref() {
@@ -137,8 +163,8 @@ impl VerifyV1SdkArgs {
     }
 }
 
-impl AuthV1SdkArgs {
-    pub fn validate(&self) -> ApiResult<()> {
+impl ValidateSdkArgs for AuthV1SdkArgs {
+    fn validate(&self) -> ApiResult<()> {
         let public_key = self
             .public_key
             .as_ref()
@@ -151,7 +177,7 @@ impl AuthV1SdkArgs {
         Ok(())
     }
 
-    pub fn ob_config(&self, conn: &mut PgConn) -> ApiResult<Option<ObConfigInfo>> {
+    fn ob_config(&self, conn: &mut PgConn) -> ApiResult<Option<ObConfigInfo>> {
         let obc = if let Some(key) = self.public_key.as_ref() {
             let (obc, tenant) = ObConfiguration::get_enabled(conn, key)?;
             let appearance = if let Some(appearance_id) = obc.appearance_id.as_ref() {
@@ -168,8 +194,14 @@ impl AuthV1SdkArgs {
     }
 }
 
-impl FormV1SdkArgs {
-    pub fn validate(&self) -> ApiResult<()> {
+impl ValidateSdkArgs for UpdateAuthMethodsV1SdkArgs {
+    fn validate(&self) -> ApiResult<()> {
+        Ok(())
+    }
+}
+
+impl ValidateSdkArgs for FormV1SdkArgs {
+    fn validate(&self) -> ApiResult<()> {
         let auth_token_hash = self
             .auth_token
             .as_ref()
@@ -181,19 +213,11 @@ impl FormV1SdkArgs {
         }
         Ok(())
     }
-
-    pub fn ob_config(&self, _: &mut PgConn) -> ApiResult<Option<ObConfigInfo>> {
-        Ok(None)
-    }
 }
 
-impl RenderV1SdkArgs {
-    pub fn validate(&self) -> ApiResult<()> {
+impl ValidateSdkArgs for RenderV1SdkArgs {
+    fn validate(&self) -> ApiResult<()> {
         Ok(())
-    }
-
-    pub fn ob_config(&self, _: &mut PgConn) -> ApiResult<Option<ObConfigInfo>> {
-        Ok(None)
     }
 }
 
@@ -212,6 +236,7 @@ pub enum SdkArgs {
     VerifyV1(VerifyV1SdkArgs),
     FormV1(FormV1SdkArgs),
     AuthV1(AuthV1SdkArgs),
+    UpdateAuthMethodsV1(UpdateAuthMethodsV1SdkArgs),
     RenderV1(RenderV1SdkArgs),
 }
 
@@ -230,29 +255,24 @@ impl std::fmt::Debug for SdkArgsData {
     }
 }
 
-pub type ObConfigInfo = (
-    ObConfiguration,
-    Tenant,
-    Option<TenantClientConfig>,
-    Option<Appearance>,
-);
-
-impl SdkArgs {
-    pub fn validate(&self) -> ApiResult<()> {
+impl ValidateSdkArgs for SdkArgs {
+    fn validate(&self) -> ApiResult<()> {
         match self {
             Self::VerifyV1(args) => args.validate()?,
             Self::FormV1(args) => args.validate()?,
             Self::AuthV1(args) => args.validate()?,
+            Self::UpdateAuthMethodsV1(args) => args.validate()?,
             Self::RenderV1(args) => args.validate()?,
         }
         Ok(())
     }
 
-    pub fn ob_config(&self, conn: &mut PgConn) -> ApiResult<Option<ObConfigInfo>> {
+    fn ob_config(&self, conn: &mut PgConn) -> ApiResult<Option<ObConfigInfo>> {
         match self {
             Self::VerifyV1(args) => args.ob_config(conn),
             Self::FormV1(args) => args.ob_config(conn),
             Self::AuthV1(args) => args.ob_config(conn),
+            Self::UpdateAuthMethodsV1(args) => args.ob_config(conn),
             Self::RenderV1(args) => args.ob_config(conn),
         }
     }
@@ -262,6 +282,8 @@ impl SdkArgs {
 mod test {
     use serde_json::json;
     use test_case::test_case;
+
+    use crate::auth::session::sdk_args::ValidateSdkArgs;
 
     use super::SdkArgs;
 
@@ -277,6 +299,8 @@ mod test {
     #[test_case(json!({"kind": "auth_v1", "data": {"public_key": "ob_1234", "user_data": {"id.first_name": "Hayes"}, "options": {"show_logo": false}}}))]
     #[test_case(json!({"kind": "auth_v1", "data": {"public_key": "ob_1234", "user_data": {"id.first_name": "Hayes"}}}))]
     #[test_case(json!({"kind": "auth_v1", "data": {"public_key": "ob_1234"}}))]
+    #[test_case(json!({"kind": "update_auth_methods_v1", "data": {"auth_token": "tok_1234"}}))]
+    #[test_case(json!({"kind": "update_auth_methods_v1", "data": {"auth_token": "tok_1234", "options": {"show_logo": false}}}))]
     #[test_case(json!({"kind": "render_v1", "data": {"auth_token": "tok_1234", "id": "id.email"}}))]
     #[test_case(json!({"kind": "render_v1", "data": {"auth_token": "tok_1234", "id": "id.phone_number", "label": "Phone"}}))]
     #[test_case(json!({"kind": "render_v1", "data": {"auth_token": "tok_1234", "id": "id.phone_number", "label": "Phone 2", "can_copy": true}}))]

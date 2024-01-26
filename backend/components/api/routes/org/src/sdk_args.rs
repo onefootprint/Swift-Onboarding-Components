@@ -5,6 +5,7 @@ use api_core::auth::sdk_args::SdkArgsContext;
 use api_core::auth::session::sdk_args::SdkArgs;
 use api_core::auth::session::sdk_args::SdkArgsData;
 use api_core::auth::session::sdk_args::SdkArgsKind;
+use api_core::auth::session::sdk_args::ValidateSdkArgs;
 use api_core::errors::ApiResult;
 use api_core::telemetry::RootSpan;
 use api_core::utils::db2api::DbToApi;

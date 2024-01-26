@@ -28,6 +28,11 @@ def test_sdk_args_fail_validation():
     )
     post(
         "/org/sdk_args",
+        {"kind": "update_auth_methods_v1", "data": {}},
+        status_code=400,
+    )
+    post(
+        "/org/sdk_args",
         {"kind": "render_v1", "data": {}},
         status_code=400,
     )
@@ -131,6 +136,20 @@ def test_sdk_args(sandbox_tenant):
                     "id.email": "hayesvalley@onefootprint.com",
                     "id.phone_number": "incorrect phone number",
                 },
+                "options": {
+                    "show_logo": True,
+                },
+                "l10n": {"locale": "en-US"},
+            },
+        },
+        {
+            "kind": "update_auth_methods_v1",
+            "data": {"auth_token": "tok_1234"},
+        },
+        {
+            "kind": "update_auth_methods_v1",
+            "data": {
+                "auth_token": "tok_1234",
                 "options": {
                     "show_logo": True,
                 },
