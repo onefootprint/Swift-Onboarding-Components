@@ -1,14 +1,16 @@
+use std::collections::HashMap;
+
 use crate::auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth};
 use crate::errors::ApiResult;
 use crate::types::ResponseData;
 use crate::State;
 use api_core::decision;
-use api_wire_types::EvaluateRuleRequest;
+use api_wire_types::{Counts, EvaluateRuleRequest, RuleEvalResult, RuleEvalStats, RuleResultRuleAction};
 use db::models::ob_configuration::ObConfiguration;
 use db::models::rule_set_result::RuleSetResult;
 use db::DbError;
 use itertools::Itertools;
-use newtypes::ObConfigurationId;
+use newtypes::{ObConfigurationId, OnboardingStatus};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(
@@ -51,7 +53,51 @@ pub async fn evaluate_rule(
         })
         .collect();
 
-    // TODO: calculate stats
+    let stats = get_stats(&results);
+    ResponseData::ok(api_wire_types::RuleEvalResults { results, stats }).json()
+}
 
-    ResponseData::ok(api_wire_types::RuleEvalResults { results }).json()
+fn get_stats(results: &Vec<RuleEvalResult>) -> RuleEvalStats {
+    let mut cnts = results.iter().map(|r| r.backtest_rule_result).counts();
+    let counts = Counts {
+        triggered: cnts.remove(&true).unwrap_or(0),
+        not_triggered: cnts.remove(&false).unwrap_or(0),
+    };
+
+    let counts_by_current_status: HashMap<OnboardingStatus, Counts> = count_by(results, |r| {
+        r.current_status.unwrap_or(OnboardingStatus::Incomplete)
+    });
+
+    let counts_by_historical_action_triggered: HashMap<RuleResultRuleAction, Counts> =
+        count_by(results, |r| r.historical_action_triggered.into());
+
+    RuleEvalStats {
+        total: results.len(),
+        counts,
+        counts_by_current_status,
+        counts_by_historical_action_triggered,
+    }
+}
+
+fn count_by<K, F>(results: &[RuleEvalResult], key_fn: F) -> HashMap<K, Counts>
+where
+    K: std::hash::Hash + Eq + Clone,
+    F: Fn(&RuleEvalResult) -> K,
+{
+    results
+        .iter()
+        .map(|r| (key_fn(r), r.backtest_rule_result))
+        .group_by(|(s, _)| s.clone())
+        .into_iter()
+        .map(|(s, group)| {
+            let mut cnts = group.map(|(_, r)| r).counts();
+            (
+                s.clone(),
+                Counts {
+                    triggered: cnts.remove(&true).unwrap_or(0),
+                    not_triggered: cnts.remove(&false).unwrap_or(0),
+                },
+            )
+        })
+        .collect::<HashMap<_, Counts>>()
 }

@@ -23,6 +23,7 @@ use crate::DecisionStatus;
     EnumIter,
     EnumString,
     Display,
+    Hash,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
