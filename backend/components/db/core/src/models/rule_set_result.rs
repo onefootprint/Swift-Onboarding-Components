@@ -172,7 +172,10 @@ impl RuleSetResult {
             .limit(limit)
             .get_results(conn)?;
 
+        let rule_set_result_ids = res.iter().map(|(_, rsr)| rsr.id.clone()).collect_vec();
+
         let risk_signals: Vec<(RuleSetResultId, RiskSignal)> = rule_set_result::table
+            .filter(rule_set_result::id.eq_any(rule_set_result_ids))
             .inner_join(rule_set_result_risk_signal_junction::table)
             .inner_join(
                 risk_signal::table
