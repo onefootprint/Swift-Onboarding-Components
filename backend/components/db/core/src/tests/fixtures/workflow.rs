@@ -24,6 +24,6 @@ pub fn create(
         is_one_click: false,
         wfr: None,
     };
-    let (wf, _) = Workflow::get_or_create_onboarding(conn, args, false).unwrap();
+    let (wf, _) = Workflow::get_or_create_onboarding(conn, args, true).unwrap();
     wf
 }
