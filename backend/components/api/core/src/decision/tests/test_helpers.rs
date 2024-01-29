@@ -52,7 +52,6 @@ pub async fn create_user_and_onboarding(
     } else {
         None
     };
-    let ff_client = state.feature_flag_client.clone();
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -75,7 +74,7 @@ pub async fn create_user_and_onboarding(
                 actor: None,
                 maybe_prefill_data: None,
             };
-            let (wf_id, biz_wf) = utils::onboarding::get_or_start_onboarding(conn, ff_client, args).unwrap();
+            let (wf_id, biz_wf) = utils::onboarding::get_or_start_onboarding(conn, args).unwrap();
             if let Some(fixture_result) = kyc_fixture_result {
                 Workflow::update_fixture_result(conn, &wf_id, fixture_result).unwrap();
             }

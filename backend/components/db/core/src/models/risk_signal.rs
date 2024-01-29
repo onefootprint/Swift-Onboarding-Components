@@ -331,7 +331,6 @@ mod tests {
     use crate::test_helpers::assert_have_same_elements;
     use crate::tests::fixtures;
     use crate::tests::prelude::*;
-    use crate::tests::MockFFClient;
     use itertools::Itertools;
     use macros::db_test_case;
     use newtypes::DecisionIntentKind;
@@ -343,7 +342,7 @@ mod tests {
         let obc = fixtures::ob_configuration::create(conn, &t.id, true);
         let uv = fixtures::vault::create_person(conn, true).into_inner();
         let sv = fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
-        let wf = fixtures::workflow::create(conn, MockFFClient::new().into_mock(), &sv.id, &obc.id, None);
+        let wf = fixtures::workflow::create(conn, &sv.id, &obc.id, None);
         let di = crate::models::decision_intent::DecisionIntent::get_or_create_for_workflow(
             conn,
             &sv.id,

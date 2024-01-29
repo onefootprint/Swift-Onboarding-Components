@@ -90,7 +90,6 @@ pub async fn post(
     let decrypted_values = GetRequirementsArgs::get_decrypted_values(&state, &bvw).await?;
 
     let tenant_id = auth.tenant().id.clone();
-    let ff_client = state.feature_flag_client.clone();
     let biz_wf = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -123,7 +122,7 @@ pub async fn post(
                 is_one_click: false,
                 wfr: None,
             };
-            let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ff_client, ob_create_args, false)?;
+            let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, false)?;
 
             // Check requirements for this Business vault w.r.t the OBC
             let reqs = api_core::utils::requirements::get_requirements_inner(

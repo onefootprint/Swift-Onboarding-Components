@@ -97,7 +97,6 @@ pub async fn post(
     let decrypted_values = GetRequirementsArgs::get_decrypted_values(&state, &uvw).await?;
 
     let tenant_id = auth.tenant().id.clone();
-    let ff_client = state.feature_flag_client.clone();
     let actor = auth.actor();
     let wf = state
         .db_pool
@@ -132,7 +131,7 @@ pub async fn post(
                 actor: Some(actor),
                 maybe_prefill_data: None,
             };
-            let (wf_id, _) = api_core::utils::onboarding::get_or_start_onboarding(conn, ff_client, args)?;
+            let (wf_id, _) = api_core::utils::onboarding::get_or_start_onboarding(conn, args)?;
             if let Some(fixture_result) = fixture_result {
                 Workflow::update_fixture_result(conn, &wf_id, fixture_result.into())?;
             }

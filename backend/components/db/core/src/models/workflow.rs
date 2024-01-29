@@ -1,22 +1,3 @@
-use std::collections::HashMap;
-use std::sync::Arc;
-
-use chrono::{DateTime, Utc};
-use diesel::dsl::{count_star, not};
-use diesel::prelude::*;
-use feature_flag::FeatureFlagClient;
-use itertools::Itertools;
-use newtypes::{
-    AlpacaKycState, DbActor, DocumentState, FireWebhookArgs, InsightEventId, KybConfig, KybState, KycConfig,
-    ObConfigurationKind, OnboardingCompletedPayload, OnboardingStatus, OnboardingStatusChangedPayload,
-    TaskData, TenantId, TenantScope, VaultId, VaultKind, WebhookEvent, WorkflowFixtureResult, WorkflowSource,
-    WorkflowStartedInfo,
-};
-use newtypes::{DocumentConfig, WorkflowRequestConfig};
-use newtypes::{
-    Locked, ObConfigurationId, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState,
-};
-
 use super::insight_event::CreateInsightEvent;
 use super::manual_review::ManualReview;
 use super::ob_configuration::ObConfiguration;
@@ -31,8 +12,23 @@ use crate::errors::ValidationError;
 use crate::models::billing_event::BillingEvent;
 use crate::models::vault::Vault;
 use crate::{DbResult, PgConn, TxnPgConn};
+use chrono::{DateTime, Utc};
 use db_schema::schema::{ob_configuration, workflow};
+use diesel::dsl::{count_star, not};
+use diesel::prelude::*;
+use itertools::Itertools;
 use newtypes::KycState;
+use newtypes::{
+    AlpacaKycState, DbActor, DocumentState, FireWebhookArgs, InsightEventId, KybConfig, KybState, KycConfig,
+    ObConfigurationKind, OnboardingCompletedPayload, OnboardingStatus, OnboardingStatusChangedPayload,
+    TaskData, TenantId, TenantScope, VaultId, VaultKind, WebhookEvent, WorkflowFixtureResult, WorkflowSource,
+    WorkflowStartedInfo,
+};
+use newtypes::{DocumentConfig, WorkflowRequestConfig};
+use newtypes::{
+    Locked, ObConfigurationId, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState,
+};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Queryable, Identifiable, QueryableByName, Eq, PartialEq)]
 #[diesel(table_name = workflow)]
@@ -218,7 +214,6 @@ impl Workflow {
     #[tracing::instrument("Workflow::get_or_create_onboarding", skip_all)]
     pub fn get_or_create_onboarding(
         conn: &mut TxnPgConn,
-        _ff_client: Arc<dyn FeatureFlagClient>,
         args: OnboardingWorkflowArgs,
         force_create: bool,
     ) -> DbResult<(Self, IsNew)> {

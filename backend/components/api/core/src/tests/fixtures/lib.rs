@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use crate::utils::vault_wrapper::{Any, VaultWrapper};
 use db::models::ob_configuration::ObConfiguration;
 use db::models::scoped_vault::ScopedVault;
@@ -9,7 +7,6 @@ use db::models::workflow::{Workflow, WorkflowUpdate};
 use db::tests::fixtures;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use db::TxnPgConn;
-use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::{
     DataIdentifier, IdentityDataKind as IDK, KycState, Locked, OnboardingStatus, PiiString, WorkflowState,
@@ -73,7 +70,6 @@ pub fn create_user_and_populate_vault(
 
 pub fn create_user_and_onboarding(
     conn: &mut TxnPgConn,
-    ff_client: Arc<dyn FeatureFlagClient>,
     obc_opts: ObConfigurationOpts,
     onboarding_status: OnboardingStatus,
     idks: Vec<IDK>,
@@ -86,7 +82,7 @@ pub fn create_user_and_onboarding(
     let tenant_id = tenant.id.clone();
     let (uv, su) = create_user_and_populate_vault(conn, is_live, tenant_id, Some(ob_config), idks);
 
-    let wf = fixtures::workflow::create(conn, ff_client, &su.id, &obc_id, None);
+    let wf = fixtures::workflow::create(conn, &su.id, &obc_id, None);
     let wf = Workflow::lock(conn, &wf.id).unwrap();
     let update = WorkflowUpdate::set_status(onboarding_status);
     let wf = Workflow::update(wf, conn, update).unwrap();

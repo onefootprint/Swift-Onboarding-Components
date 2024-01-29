@@ -76,7 +76,6 @@ pub async fn post(
     let insight_event = CreateInsightEvent::from(insights);
     let session_key = state.session_sealing_key.clone();
     let obc = ob_config.clone();
-    let ff_client = state.feature_flag_client.clone();
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
@@ -92,8 +91,7 @@ pub async fn post(
                 actor: None,
                 maybe_prefill_data: Some(prefill_data),
             };
-            let (wf_id, biz_wf) =
-                api_core::utils::onboarding::get_or_start_onboarding(conn, ff_client, args)?;
+            let (wf_id, biz_wf) = api_core::utils::onboarding::get_or_start_onboarding(conn, args)?;
 
             // Update auth token with new identifiers
             // TODO should we issue a new token here for good measure?

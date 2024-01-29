@@ -14,12 +14,10 @@ use db::{
     },
     TxnPgConn,
 };
-use feature_flag::FeatureFlagClient;
 use newtypes::{
     CollectedDataOption, DocumentConfig, DocumentRequestKind, EncryptedVaultPrivateKey, Selfie, VaultKind,
     VaultPublicKey, WorkflowConfig, WorkflowId, WorkflowRequestId, WorkflowSource,
 };
-use std::sync::Arc;
 
 pub struct NewBusinessVaultArgs {
     pub public_key: VaultPublicKey,
@@ -43,7 +41,6 @@ pub struct NewOnboardingArgs<'a> {
 #[allow(clippy::too_many_arguments)]
 pub fn get_or_start_onboarding(
     conn: &mut TxnPgConn,
-    ff_client: Arc<dyn FeatureFlagClient>,
     args: NewOnboardingArgs,
 ) -> ApiResult<(WorkflowId, Option<Workflow>)> {
     let NewOnboardingArgs {
@@ -92,8 +89,7 @@ pub fn get_or_start_onboarding(
             is_one_click: is_first_wf && has_prefill_data,
             wfr: wfr.clone(),
         };
-        let (wf, is_new_ob) =
-            Workflow::get_or_create_onboarding(conn, ff_client.clone(), ob_create_args, force_create)?;
+        let (wf, is_new_ob) = Workflow::get_or_create_onboarding(conn, ob_create_args, force_create)?;
 
         if is_new_ob {
             create_doc_request_if_needed(conn, &wf, obc)?;
@@ -149,7 +145,7 @@ pub fn get_or_start_onboarding(
                 is_one_click: false,
                 wfr: None,
             };
-            let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ff_client, ob_create_args, false)?;
+            let (biz_wf, _) = Workflow::get_or_create_onboarding(conn, ob_create_args, false)?;
             biz_wf
         };
         Some(biz_wf)

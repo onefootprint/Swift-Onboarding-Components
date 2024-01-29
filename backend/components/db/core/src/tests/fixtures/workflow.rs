@@ -1,6 +1,3 @@
-use std::sync::Arc;
-
-use feature_flag::FeatureFlagClient;
 use newtypes::{ObConfigurationId, ScopedVaultId, WorkflowFixtureResult, WorkflowSource};
 
 use crate::{
@@ -13,7 +10,6 @@ use crate::{
 
 pub fn create(
     conn: &mut TxnPgConn,
-    ff_client: Arc<dyn FeatureFlagClient>,
     sv_id: &ScopedVaultId,
     obc_id: &ObConfigurationId,
     fixture_result: Option<WorkflowFixtureResult>,
@@ -28,6 +24,6 @@ pub fn create(
         is_one_click: false,
         wfr: None,
     };
-    let (wf, _) = Workflow::get_or_create_onboarding(conn, ff_client, args, false).unwrap();
+    let (wf, _) = Workflow::get_or_create_onboarding(conn, args, false).unwrap();
     wf
 }

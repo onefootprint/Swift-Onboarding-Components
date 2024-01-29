@@ -13,13 +13,11 @@ async fn test_handle_setup(state: &mut State) {
     // PROD
     //
     // create a live UV and ob_config
-    let ff_client = state.feature_flag_client.clone();
     let (tenant, vault, wf) = state
         .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
             let (tenant, vault, _, wf) = fixtures::lib::create_user_and_onboarding(
                 conn,
-                ff_client,
                 ObConfigurationOpts {
                     is_live: true,
                     ..Default::default()
@@ -43,13 +41,11 @@ async fn test_handle_setup(state: &mut State) {
 
     // create a live UV and ob_config
     // TODO: do we even need to make a new user here?
-    let ff_client = state.feature_flag_client.clone();
     let (tenant, vault, wf) = state
         .db_pool
         .db_transaction(move |conn| -> db::DbResult<_> {
             let (tenant, vault, _, wf) = fixtures::lib::create_user_and_onboarding(
                 conn,
-                ff_client,
                 ObConfigurationOpts {
                     is_live: true,
                     ..Default::default()

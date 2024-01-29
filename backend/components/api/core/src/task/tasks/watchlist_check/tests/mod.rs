@@ -63,7 +63,6 @@ async fn create_user_and_task(
     onboarding_status: OnboardingStatus,
     idks: Vec<IDK>,
 ) -> (ScopedVault, Task) {
-    let ff_client = state.feature_flag_client.clone();
     let (sv, task) = state
         .db_pool
         .db_transaction(move |conn| -> DbResult<_> {
@@ -78,7 +77,6 @@ async fn create_user_and_task(
                 VaultKind::Portable(enhanced_aml) => {
                     let (_, _, sv, _) = crate::tests::fixtures::lib::create_user_and_onboarding(
                         conn,
-                        ff_client,
                         ObConfigurationOpts {
                             is_live,
                             enhanced_aml,
