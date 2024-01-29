@@ -1194,6 +1194,9 @@
         },
         "upload-photo": {
           "title": "Subir foto"
+        },
+        "upload-file": {
+          "title": "Upload photo"
         }
       },
       "next-side": {

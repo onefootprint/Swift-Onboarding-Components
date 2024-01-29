@@ -91,7 +91,7 @@ const IdDocPhotoButtons = ({
           loading={isLoading && captureMethod === 'upload'}
           disabled={isLoading}
         >
-          {t('upload-photo.title')}
+          {t('upload-file.title')}
         </Button>
       )}
       <Button

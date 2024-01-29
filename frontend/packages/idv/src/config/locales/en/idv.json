@@ -1193,6 +1193,9 @@
         },
         "upload-photo": {
           "title": "Upload photo"
+        },
+        "upload-file": {
+          "title": "Upload file"
         }
       },
       "next-side": {
