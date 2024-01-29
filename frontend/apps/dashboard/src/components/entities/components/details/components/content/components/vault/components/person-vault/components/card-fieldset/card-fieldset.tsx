@@ -28,7 +28,9 @@ const Fieldset = ({
   title,
   iconComponent: IconComponent,
 }: FieldsetProps) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.fieldset',
+  });
   const decrypt = useDecryptControls();
   const decryptForm = useDecryptForm();
 
@@ -43,7 +45,7 @@ const Fieldset = ({
   const shouldShowSelectAll = decrypt.inProgress && selectableFields.length > 0;
 
   const getCardTitle = (count: number) =>
-    `${title} ${t('pages.entity.fieldset.cards.title', { count })}`;
+    `${title} ${t('cards.title', { count })}`;
 
   const handleSelectAll = () => {
     decryptForm.set(selectableFields, true);
@@ -107,9 +109,7 @@ const Fieldset = ({
               onClick={allSelected ? handleDeselectAll : handleSelectAll}
               size="compact"
             >
-              {allSelected
-                ? t('pages.entity.fieldset.deselect-all')
-                : t('pages.entity.fieldset.select-all')}
+              {allSelected ? t('deselect-all') : t('select-all')}
             </LinkButton>
           )}
         </Header>
