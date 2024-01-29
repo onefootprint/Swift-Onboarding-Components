@@ -12,8 +12,5 @@ if (SENTRY_DSN && IS_PROD) {
     release: COMMIT_SHA,
     tracesSampleRate: 1,
     debug: false,
-    replaysSessionSampleRate: 0.1,
-    replaysOnErrorSampleRate: 1.0,
-    integrations: [new Sentry.Replay()],
   });
 }
