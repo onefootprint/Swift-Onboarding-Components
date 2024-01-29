@@ -2,11 +2,16 @@ use super::data_lifetime::DataLifetime;
 use super::rule_instance::RuleInstance;
 use super::rule_result::NewRuleResult;
 use super::rule_result::RuleResult;
+use super::scoped_vault::ScopedVault;
 use crate::DbResult;
 use crate::PgConn;
 use crate::TxnPgConn;
+use chrono::Duration;
 use chrono::{DateTime, Utc};
+use db_schema::schema::scoped_vault;
+use db_schema::schema::workflow;
 use db_schema::schema::{rule_set_result, rule_set_result_risk_signal_junction};
+use diesel::dsl::not;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
@@ -136,18 +141,52 @@ impl RuleSetResult {
 
         Ok(Some((rule_set_result, rule_results)))
     }
+
+    /// Queries a sample of rule_set_results for use in a backtest
+    /// Takes the first rule_set_result (ie if 2 exist because step-up occured) from the latest
+    /// workflow (that is complete/has a rule_set_result and part of the passed in playbook) per vault
+    /// Takes up to `limit` rows from the past 4 weeks
+    #[tracing::instrument("RuleSetResult::sample_for_eval", skip_all)]
+    pub fn sample_for_eval(
+        conn: &mut PgConn,
+        obc_id: &ObConfigurationId,
+        limit: i64,
+    ) -> DbResult<Vec<(ScopedVault, RuleSetResult)>> {
+        let res: Vec<(ScopedVault, RuleSetResult)> = workflow::table
+            .inner_join(scoped_vault::table)
+            .inner_join(rule_set_result::table)
+            .filter(workflow::ob_configuration_id.eq(obc_id))
+            .filter(not(workflow::completed_at.is_null()))
+            .filter(workflow::completed_at.gt(Utc::now() - Duration::weeks(4)))
+            .distinct_on(workflow::scoped_vault_id)
+            .order((
+                workflow::scoped_vault_id,
+                workflow::completed_at.desc(),
+                rule_set_result::created_at.asc(),
+            ))
+            .select((scoped_vault::all_columns, rule_set_result::all_columns))
+            .limit(limit)
+            .get_results(conn)?;
+
+        Ok(res)
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::models::risk_signal::RiskSignal;
     use crate::models::rule_instance::RuleInstance;
+    use crate::models::scoped_vault::ScopedVault;
+    use crate::models::workflow::{Workflow, WorkflowUpdate};
+    use crate::models::{ob_configuration::ObConfiguration, risk_signal::RiskSignal};
     use crate::test_helpers::assert_have_same_elements;
     use crate::tests::prelude::*;
     use fixtures::ob_configuration::ObConfigurationOpts;
     use macros::db_test;
-    use newtypes::{DbActor, DecisionIntentKind, FootprintReasonCode as FRC, RiskSignalGroupKind, VendorAPI};
+    use newtypes::{
+        DbActor, DecisionIntentKind, DecisionStatus, FootprintReasonCode as FRC, KycState, Locked,
+        RiskSignalGroupKind, VendorAPI, WorkflowState,
+    };
 
     #[db_test]
     fn test_create(conn: &mut TestPgConn) {
@@ -258,6 +297,143 @@ mod tests {
         assert_have_same_elements(
             risk_signals.iter().map(|rs| rs.id.clone()).collect_vec(),
             risk_signal_junctions,
+        );
+    }
+
+    fn create_vault(conn: &mut TxnPgConn, obc: &ObConfiguration) -> (ScopedVault, Vec<RiskSignal>) {
+        let uv = tests::fixtures::vault::create_person(conn, obc.is_live);
+        let sv = tests::fixtures::scoped_vault::create(conn, &uv.id, &obc.id);
+
+        let di = crate::models::decision_intent::DecisionIntent::create(
+            conn,
+            DecisionIntentKind::OnboardingKyc,
+            &sv.id,
+            None,
+        )
+        .unwrap();
+        let vreq =
+            tests::fixtures::verification_request::create(conn, &sv.id, &di.id, VendorAPI::IdologyExpectId);
+        let vres = tests::fixtures::verification_result::create(conn, &vreq.id, false);
+        let risk_signals = RiskSignal::bulk_create(
+            conn,
+            &sv.id,
+            vec![(FRC::NameDoesNotMatch, vreq.vendor_api, vres.id.clone())],
+            RiskSignalGroupKind::Kyc,
+            false,
+        )
+        .unwrap();
+        (sv, risk_signals)
+    }
+
+    fn create_wf(
+        conn: &mut TxnPgConn,
+        sv: &ScopedVault,
+        obc_id: &ObConfigurationId,
+        decision_status: Option<DecisionStatus>,
+    ) -> Workflow {
+        let wf = tests::fixtures::workflow::create(conn, &sv.id, obc_id, None);
+        if let Some(decision_status) = decision_status {
+            let decision = crate::models::onboarding_decision::NewDecisionArgs {
+                vault_id: sv.vault_id.clone(),
+                logic_git_hash: "".to_string(),
+                status: decision_status,
+                result_ids: vec![],
+                annotation_id: None,
+                actor: DbActor::Footprint,
+                seqno: None,
+                create_manual_review_reasons: None,
+            };
+            let wf = Workflow::lock(conn, &wf.id).unwrap();
+            let update = WorkflowUpdate::set_decision(&wf, decision);
+            let wf = Workflow::update(wf, conn, update).unwrap();
+            Workflow::update_state(
+                conn,
+                Locked::new(wf.id.clone()),
+                wf.state,
+                WorkflowState::Kyc(KycState::Complete),
+            )
+            .unwrap()
+        } else {
+            wf
+        }
+    }
+
+    fn create_rule_set_result(
+        conn: &mut TxnPgConn,
+        obc_id: &ObConfigurationId,
+        sv_id: &ScopedVaultId,
+        wf_id: &WorkflowId,
+        risk_signals: &[RiskSignal],
+    ) -> RuleSetResult {
+        let (rule_set_result, _) = RuleSetResult::create(
+            conn,
+            NewRuleSetResultArgs {
+                ob_configuration_id: obc_id,
+                scoped_vault_id: sv_id,
+                workflow_id: Some(wf_id),
+                kind: RuleSetResultKind::WorkflowDecision,
+                action_triggered: Some(RuleAction::Fail),
+                rule_results: vec![],
+                risk_signal_ids: risk_signals.iter().map(|rs| &rs.id).collect_vec(),
+            },
+        )
+        .unwrap();
+        rule_set_result
+    }
+
+    #[db_test]
+    fn test_sample_for_eval(conn: &mut TestPgConn) {
+        let t = tests::fixtures::tenant::create(conn);
+        let obc = tests::fixtures::ob_configuration::create_with_opts(
+            conn,
+            &t.id,
+            ObConfigurationOpts {
+                is_live: true,
+                ..Default::default()
+            },
+        );
+
+        // Vault with 1 WF
+        let (sv, risk_signals) = create_vault(conn, &obc);
+        let wf = create_wf(conn, &sv, &obc.id, Some(DecisionStatus::Pass));
+        let rsr = create_rule_set_result(conn, &obc.id, &sv.id, &wf.id, &risk_signals);
+
+        // Vault with multiple WF
+        let (sv2, risk_signals2) = create_vault(conn, &obc);
+        let wf2a = create_wf(conn, &sv2, &obc.id, Some(DecisionStatus::Pass));
+        let _rsr2a = create_rule_set_result(conn, &obc.id, &sv2.id, &wf2a.id, &risk_signals2);
+        let wf2b = create_wf(conn, &sv2, &obc.id, Some(DecisionStatus::Pass));
+        let rsr2b = create_rule_set_result(conn, &obc.id, &sv2.id, &wf2b.id, &risk_signals2);
+
+        // Vault with multiple WF but some incomplete
+        let (sv3, risk_signals3) = create_vault(conn, &obc);
+        let wf3a = create_wf(conn, &sv3, &obc.id, None);
+        let _rsr3a = create_rule_set_result(conn, &obc.id, &sv3.id, &wf3a.id, &risk_signals3);
+        let wf3b = create_wf(conn, &sv3, &obc.id, Some(DecisionStatus::Pass));
+        let rsr3b = create_rule_set_result(conn, &obc.id, &sv3.id, &wf3b.id, &risk_signals3);
+        let wf3c = create_wf(conn, &sv3, &obc.id, None);
+        let _rsr3c = create_rule_set_result(conn, &obc.id, &sv3.id, &wf3c.id, &risk_signals3);
+
+        // Vault with 1 WF but multiple rule_set_result's
+        let (sv4, risk_signals4) = create_vault(conn, &obc);
+        let wf4 = create_wf(conn, &sv4, &obc.id, Some(DecisionStatus::Pass));
+        let rsr4a = create_rule_set_result(conn, &obc.id, &sv4.id, &wf4.id, &risk_signals4);
+        let _rsr4b = create_rule_set_result(conn, &obc.id, &sv4.id, &wf4.id, &risk_signals4);
+
+        // Vault with just 1 incomplete WF
+        let (sv5, risk_signals5) = create_vault(conn, &obc);
+        let wf5 = create_wf(conn, &sv5, &obc.id, None);
+        let _rsr5 = create_rule_set_result(conn, &obc.id, &sv5.id, &wf5.id, &risk_signals5);
+
+        let results = RuleSetResult::sample_for_eval(conn, &obc.id, 10).unwrap();
+        assert_have_same_elements(
+            vec![
+                (sv.id, rsr.id),
+                (sv2.id, rsr2b.id),
+                (sv3.id, rsr3b.id),
+                (sv4.id, rsr4a.id),
+            ],
+            results.into_iter().map(|(sv, rsr)| (sv.id, rsr.id)).collect_vec(),
         );
     }
 }

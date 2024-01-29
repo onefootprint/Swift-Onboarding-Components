@@ -13,3 +13,8 @@ pub struct UpdateRuleRequest {
     pub rule_expression: Option<RuleExpression>,
     pub is_shadow: Option<bool>,
 }
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+pub struct EvaluateRuleRequest {
+    pub rule_expression: RuleExpression,
+}

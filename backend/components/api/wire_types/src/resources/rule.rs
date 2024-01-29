@@ -24,3 +24,17 @@ pub struct RuleResult {
     pub rule: Rule,
     pub result: bool,
 }
+
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+pub struct RuleEvalResults {
+    pub results: Vec<RuleEvalResult>,
+    // TODO: stats
+}
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+pub struct RuleEvalResult {
+    pub fp_id: FpId,
+    pub current_status: Option<OnboardingStatus>,
+    pub historical_action_triggered: Option<RuleAction>,
+    // TODO:
+    // pub backtest_rule_result: bool,
+}
