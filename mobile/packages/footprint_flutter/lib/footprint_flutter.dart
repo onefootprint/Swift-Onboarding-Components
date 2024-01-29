@@ -13,25 +13,38 @@ export 'types/footprint_types.dart';
 
 bool _initialUriIsHandled = false;
 
-bool _initialUriIsHandled = false;
+enum ResultType { SUCCESS, CANCELED }
 
 class Footprint {
   Uri? latestUri;
   Object? _err;
   StreamSubscription? subscription;
   bool isBrowserOpen = false;
-  late final MyChromeSafariBrowser browser;
+  late MyChromeSafariBrowser browser;
+  void Function(String token)? handleComplete;
+  void Function()? handleCancel;
+  ResultType? result;
 
   Footprint() {
     handleIncomingLinks();
     handleInitialUri();
-
-    browser = MyChromeSafariBrowser(onBrowserClosed: () {
-      isBrowserOpen = false;
-    });
   }
 
   Future<void> init(FootprintConfiguration config, BuildContext context) async {
+    handleComplete = config.onComplete;
+    handleCancel = config.onCancel;
+    browser = MyChromeSafariBrowser(onBrowserClosed: () {
+      isBrowserOpen = false;
+      if (result == null) {
+        // User closed the browser without completing the flow
+        result = ResultType.CANCELED;
+        handleCancel?.call();
+      }
+    }, onBrowserOpened: () {
+      isBrowserOpen = true;
+      result = null; // reset result
+      latestUri = null; // reset latestUri
+    });
     try {
       var response = await sendSdkArgs(config);
       var token = response.data;
@@ -42,7 +55,7 @@ class Footprint {
         var url = createUrl(
           token: token,
           appearance: config.appearance,
-          // TODO: Fix tthis
+          // TODO: Fix this. This comes from the tenant
           redirectUrl: "com.footprint.fluttersdk://example",
         );
         openBrowser(url);
@@ -54,7 +67,6 @@ class Footprint {
   }
 
   void openBrowser(String url) {
-    isBrowserOpen = true;
     browser.open(
         url: Uri.parse(url),
         options: ChromeSafariBrowserClassOptions(
@@ -79,10 +91,19 @@ class Footprint {
   }
 
   void processUri(Uri? uri) {
-    browser.close();
+    if (uri == null || uri == latestUri) return;
     latestUri = uri;
+    uri.queryParameters.forEach((key, value) {
+      if (key == 'validation_token') {
+        result = ResultType.SUCCESS;
+        handleComplete?.call(value);
+      } else if (key == 'canceled') {
+        result = ResultType.CANCELED;
+        handleCancel?.call();
+      }
+    });
+    browser.close();
     _err = null;
-    isBrowserOpen = false;
   }
 
   void handleError(Object err) {
@@ -107,8 +128,15 @@ class Footprint {
 
 class MyChromeSafariBrowser extends ChromeSafariBrowser {
   final VoidCallback onBrowserClosed;
+  final VoidCallback onBrowserOpened;
 
-  MyChromeSafariBrowser({required this.onBrowserClosed});
+  MyChromeSafariBrowser(
+      {required this.onBrowserOpened, required this.onBrowserClosed});
+
+  @override
+  void onOpened() {
+    onBrowserOpened();
+  }
 
   @override
   void onClosed() {
