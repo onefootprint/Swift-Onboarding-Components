@@ -696,6 +696,7 @@ describe('<Idv />', () => {
           isMet: false,
           shouldCollectConsent: false,
           shouldCollectSelfie: false,
+          uploadMode: 'allow_upload',
           supportedCountryAndDocTypes: {
             us: [
               SupportedIdDocTypes.driversLicense,
@@ -758,6 +759,7 @@ describe('<Idv />', () => {
           isMet: false,
           shouldCollectConsent: false,
           shouldCollectSelfie: false,
+          uploadMode: 'allow_upload',
           supportedCountryAndDocTypes: {
             us: [
               SupportedIdDocTypes.driversLicense,

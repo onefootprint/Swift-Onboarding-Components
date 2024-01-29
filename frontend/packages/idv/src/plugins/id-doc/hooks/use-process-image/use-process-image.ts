@@ -141,6 +141,10 @@ const runProcessFileScript = async (
 ): Promise<ProcessedImageFile | undefined> => {
   logInfo(`Original file type | size: ${file.type} | ${file.size}`);
 
+  if (file.type === 'application/pdf') {
+    return { file, extraCompressed: false };
+  }
+
   const heicOutput = isHeicType(file.type)
     ? await stepHeicConversion(onError, imageProcessors, file)
     : file;
@@ -222,7 +226,7 @@ const processImageUrl = async (
   return output;
 };
 
-const useProcessImage = () => {
+const useProcessImage = (options?: { allowPdf?: boolean }) => {
   const toast = useToast();
   const imageProcessors = useImgProcessorsContext();
   const handleError = errorHandler(toast);
@@ -230,6 +234,9 @@ const useProcessImage = () => {
   const acceptedFileFormats = ['image/*'];
   if (imageProcessors?.heic) {
     acceptedFileFormats.push('.heic', '.heif');
+  }
+  if (options?.allowPdf) {
+    acceptedFileFormats.push('application/pdf');
   }
 
   return {

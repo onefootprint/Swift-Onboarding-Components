@@ -25,6 +25,7 @@ const IconByIdDocType: Record<SupportedIdDocTypes, JSX.Element> = {
   [SupportedIdDocTypes.lease]: <IcoWriting16 />,
   [SupportedIdDocTypes.bankStatement]: <IcoWriting16 />,
   [SupportedIdDocTypes.utilityBill]: <IcoWriting16 />,
+  [SupportedIdDocTypes.proofOfAddress]: <IcoWriting16 />,
 };
 
 type IdDocUploadedEventIconProps = {

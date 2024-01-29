@@ -15,6 +15,7 @@ import FrontPhotoCapture from '../front-photo-capture';
 import IdDocBackPhotoRetry from '../id-doc-back-photo-retry';
 import IdDocCountryAndType from '../id-doc-country-and-type';
 import IdDocFrontPhotoRetry from '../id-doc-front-photo-retry';
+import IdDocUploadFirstPrompt from '../id-doc-upload-first-prompt';
 import Processing from '../processing';
 import SelfiePhoto from '../selfie-photo';
 import SelfieRetryPrompt from '../selfie-retry-prompt';
@@ -40,6 +41,10 @@ const Router = ({ onDone }: RouterProps) => {
 
   if (state.matches('consentDesktop')) {
     return <DesktopConsent />;
+  }
+
+  if (state.matches('frontImageUploadFirstMobile')) {
+    return <IdDocUploadFirstPrompt />;
   }
 
   if (state.matches('frontImageCaptureMobile')) {

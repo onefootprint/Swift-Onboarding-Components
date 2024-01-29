@@ -14,6 +14,7 @@ export const requirement: IdDocRequirement = {
   isMet: false,
   shouldCollectSelfie: true,
   shouldCollectConsent: true,
+  uploadMode: 'default',
   supportedCountryAndDocTypes: {
     us: [
       SupportedIdDocTypes.driversLicense,

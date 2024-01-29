@@ -14,16 +14,22 @@ type IdDocPhotoButtonsProp = {
     extraCompressed: boolean,
     captureKind: CaptureKind,
   ) => void;
+  uploadFirst?: boolean;
 };
 
-const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
+const IdDocPhotoButtons = ({
+  onComplete,
+  uploadFirst,
+}: IdDocPhotoButtonsProp) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'id-doc.components.id-doc-photo-upload-buttons',
   });
   const [state, send] = useIdDocMachine();
   const { hasBadConnectivity } = state.context;
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
-  const { processImageFile, acceptedFileFormats } = useProcessImage();
+  const { processImageFile, acceptedFileFormats } = useProcessImage({
+    allowPdf: uploadFirst,
+  });
 
   const [isLoading, setIsLoading] = useState(false);
   const [captureMethod, setCaptureMethod] = useState<
@@ -77,18 +83,35 @@ const IdDocPhotoButtons = ({ onComplete }: IdDocPhotoButtonsProp) => {
 
   return (
     <ButtonsContainer>
-      <Button fullWidth onClick={handleTake}>
-        {t('take-photo.title')}
-      </Button>
+      {!!uploadFirst && (
+        <Button
+          fullWidth
+          variant="primary"
+          onClick={handleUpload}
+          loading={isLoading && captureMethod === 'upload'}
+          disabled={isLoading}
+        >
+          {t('upload-photo.title')}
+        </Button>
+      )}
       <Button
         fullWidth
-        variant="secondary"
-        onClick={handleUpload}
-        loading={isLoading && captureMethod === 'upload'}
-        disabled={isLoading}
+        onClick={handleTake}
+        variant={uploadFirst ? 'secondary' : 'primary'}
       >
-        {t('upload-photo.title')}
+        {t('take-photo.title')}
       </Button>
+      {!uploadFirst && (
+        <Button
+          fullWidth
+          variant="secondary"
+          onClick={handleUpload}
+          loading={isLoading && captureMethod === 'upload'}
+          disabled={isLoading}
+        >
+          {t('upload-photo.title')}
+        </Button>
+      )}
       <StyledInput
         ref={uploadPhotoRef as React.RefObject<HTMLInputElement>}
         type="file"

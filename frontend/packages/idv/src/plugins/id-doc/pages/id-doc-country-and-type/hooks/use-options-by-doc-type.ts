@@ -102,6 +102,13 @@ const useOptionsByDocType = (supportedDocumentTypes: SupportedIdDocTypes[]) => {
       value: SupportedIdDocTypes.utilityBill,
     };
   }
+  if (supportedDocumentTypes?.includes(SupportedIdDocTypes.proofOfAddress)) {
+    optionsByDocType[SupportedIdDocTypes.proofOfAddress] = {
+      title: t('form.type.proofOfAddress.title'),
+      IconComponent: IcoWriting24,
+      value: SupportedIdDocTypes.proofOfAddress,
+    };
+  }
 
   return optionsByDocType;
 };

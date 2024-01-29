@@ -12,6 +12,7 @@ const IdDocTypeToLabel: Record<SupportedIdDocTypes, string> = {
   [SupportedIdDocTypes.lease]: 'lease',
   [SupportedIdDocTypes.bankStatement]: 'bank statement',
   [SupportedIdDocTypes.utilityBill]: 'utility bill',
+  [SupportedIdDocTypes.proofOfAddress]: 'proof of address',
 };
 
 export default IdDocTypeToLabel;

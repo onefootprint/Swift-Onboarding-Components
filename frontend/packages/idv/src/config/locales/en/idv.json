@@ -280,6 +280,7 @@
           "lease": "Lease",
           "utilityBill": "Utility Bill",
           "bankStatement": "Bank Statement",
+          "proofOfAddress": "Proof of address",
           "selfie": "Selfie",
           "business-name": "Business name",
           "business-tin": "TIN",
@@ -1102,7 +1103,12 @@
       },
       "desktop-header": {
         "title": {
-          "id-doc": "{{type, capitalize}} · {{side, capitalize}}",
+          "doc-name": {
+            "id-doc": "{{type, capitalize}}"
+          },
+          "side-name": {
+            "id-doc": "{{side, capitalize}}"
+          },
           "selfie": "Selfie"
         },
         "subtitle": "Issued in {{country}}"
@@ -1128,14 +1134,14 @@
       },
       "loading": {
         "title": {
-          "process-front": "Processing image...",
-          "process-back": "Processing image...",
+          "process-front": "Processing...",
+          "process-back": "Processing...",
           "process-selfie": "Processing selfie...",
-          "upload-front": "Uploading image...",
-          "upload-back": "Uploading image...",
+          "upload-front": "Uploading...",
+          "upload-back": "Uploading...",
           "upload-selfie": "Uploading selfie...",
-          "analyze-front": "Analyzing image...",
-          "analyze-back": "Analyzing image...",
+          "analyze-front": "Analyzing...",
+          "analyze-back": "Analyzing...",
           "analyze-selfie": "Analyzing selfie..."
         },
         "subtitle": "Hang tight! It'll be done soon.",
@@ -1325,6 +1331,9 @@
             },
             "utilityBill": {
               "title": "Utility Bill (from last 30d)"
+            },
+            "proofOfAddress": {
+              "title": "Proof of address"
             }
           },
           "not-supported": "Sorry, we don't support IDs for your country yet.",
@@ -1341,7 +1350,8 @@
             "workPermit": "EAD card · FRONT",
             "residenceDocument": "Green card · FRONT",
             "voterIdentification": "Voter identification · FRONT",
-            "ssnCard": "SSN Card · FRONT"
+            "ssnCard": "SSN Card · FRONT",
+            "proofOfAddress": "Proof of address"
           },
           "preview": {
             "driversLicense": "Driver's license",
@@ -1351,7 +1361,8 @@
             "workPermit": "EAD card",
             "residenceDocument": "Green card",
             "voterIdentification": "Voter identification",
-            "ssnCard": "SSN Card"
+            "ssnCard": "SSN Card",
+            "proofOfAddress": "Proof of address"
           }
         },
         "subtitle": {
@@ -1367,7 +1378,9 @@
             "visa": "Visa · PHOTO PAGE",
             "workPermit": "EAD card · BACK",
             "residenceDocument": "Green card · BACK",
-            "voterIdentification": "Voter identification · BACK"
+            "voterIdentification": "Voter identification · BACK",
+            "ssnCard": "SSN Card · BACK",
+            "proofOfAddress": "Proof of address"
           },
           "preview": {
             "driversLicense": "Driver's license",
@@ -1376,7 +1389,9 @@
             "visa": "Visa",
             "workPermit": "EAD card",
             "residenceDocument": "Green card",
-            "voterIdentification": "Voter identification"
+            "voterIdentification": "Voter identification",
+            "ssnCard": "SSN Card",
+            "proofOfAddress": "Proof of address"
           }
         },
         "subtitle": {
@@ -1462,6 +1477,20 @@
       },
       "device-warning": {
         "warning": "This action can only be performed on a mobile phone. Please go back to the previous screen/tab and click the \"Cancel\" button to generate a new QR code with a new URL link. Open the new link on your phone."
+      },
+      "id-doc-upload-first-prompt": {
+        "proof_of_address": {
+          "title": "Upload a proof of address",
+          "description": "We need to verify your address. Please upload a document that shows your name and address.",
+          "guidelines": {
+            "gas-water-electricity-bill": "Recent gas, water or electricity bills",
+            "bank-credit-card-statement": "Recent bank or credit card statements",
+            "vehicle-voter-registration": "Vehicle or voter registration cards",
+            "rental-agreement": "Rental lease agreement",
+            "insurance": "Health or card insurance",
+            "phone-internet-bill": "Recent phone number or internet bills"
+          }
+        }
       }
     }
   }

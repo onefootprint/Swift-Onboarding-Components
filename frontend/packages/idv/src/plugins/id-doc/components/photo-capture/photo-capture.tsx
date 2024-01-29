@@ -79,8 +79,10 @@ const PhotoCapture = ({
   const {
     hasBadConnectivity,
     idDoc: { type: docType },
+    requirement: { uploadMode },
   } = state.context;
-  const { processImageUrl } = useProcessImage();
+  const allowPdf = uploadMode === 'allow_upload';
+  const { processImageUrl } = useProcessImage({ allowPdf });
   const [image, setImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [captureKind, setCaptureKind] = useState<CaptureKind>();
@@ -214,6 +216,7 @@ const PhotoCapture = ({
         outlineHeightRatio={outlineHeightRatio}
         outlineWidthRatio={outlineWidthRatio}
         setIsCaptured={setIsCaptured}
+        allowPdf={allowPdf}
       >
         {({
           canvasAutoCaptureRef,

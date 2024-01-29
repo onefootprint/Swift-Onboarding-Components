@@ -48,7 +48,8 @@
     "ssn_card": "SSN Card",
     "lease": "Lease",
     "utility_bill": "Utility Bill",
-    "bank_statement": "Bank Statement"
+    "bank_statement": "Bank Statement",
+    "proof_of_address": "Proof of Address"
   },
   "di": {
     "id": {
@@ -318,6 +319,13 @@
           "latest_upload": "Utility Bill",
           "mime_type": "Utility Bill MIME type"
         }
+      },
+      "proof_of_address": {
+        "front": {
+          "image": "Proof of Address",
+          "latest_upload": "Proof of Address",
+          "mime_type": "Proof of Address MIME type"
+        }
       }
     },
     "business": {
@@ -379,6 +387,7 @@
     "permit": "Work permit / EAD card",
     "residence_document": "Residence card / Green card",
     "voter_identification": "Voter identification",
+    "proof_of_address": "Proof of Address",
     "business_name": "Business name",
     "business_tin": "Taxpayer Identification Number (TIN)",
     "business_address": "Registered business address",
@@ -917,6 +926,7 @@
             "permit.title": "Work permit / EAD card and selfie",
             "visa.title": "Visa and selfie",
             "voter_identification.title": "Voter identification",
+            "proof_of_address.title": "Proof of Address",
             "ssn_card.title": "SSN Card",
             "session-selector": {
               "title": "Session",
@@ -973,7 +983,8 @@
                 "ssn_card": "SSN Card",
                 "lease": "Lease",
                 "bank_statement": "Bank Statement",
-                "utility_bill": "Utility Bill"
+                "utility_bill": "Utility Bill",
+                "proof_of_address": "Proof of Address"
               },
               "failure-reasons": {
                 "doc_type_mismatch": "Document type didn't match.",
@@ -2539,6 +2550,7 @@
               "residence_document": "Residence card",
               "work_permit": "Work permit",
               "voter_identification": "Voter identification",
+              "proof_of_address": "Proof of address",
               "info": "We might still need to ask some users to capture their ID document as part of our step-up verification flow.",
               "no-id-doc-selected": "You must select at least one ID document type."
             }

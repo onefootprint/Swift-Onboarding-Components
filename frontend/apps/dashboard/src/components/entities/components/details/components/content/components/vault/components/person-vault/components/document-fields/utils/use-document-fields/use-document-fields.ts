@@ -170,6 +170,11 @@ const useDocumentFields = () => {
       label: t(DocumentDI.latestUtilityBillFront),
       dis: [DocumentDI.latestUtilityBillFront],
     },
+    {
+      main: DocumentDI.latestProofOfAddressFront,
+      label: t(DocumentDI.latestProofOfAddressFront),
+      dis: [DocumentDI.latestProofOfAddressFront],
+    },
   ];
 
   return fields;

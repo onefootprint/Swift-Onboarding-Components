@@ -23,11 +23,16 @@ const DesktopHeader = ({ type, imageType, country }: DesktopHeaderProps) => {
 
   const typeLabel = type ? IdDocTypeToLabel[type] : '';
   const countryName = getCountryFromCode(country)?.label;
-
-  let title: string = t('title.id-doc', {
+  const docName = t('title.doc-name.id-doc', {
     type: typeLabel,
-    side,
   });
+  const sideName = side
+    ? ` · ${t('title.side-name.id-doc', {
+        side,
+      })}`
+    : '';
+
+  let title: string = `${docName}${sideName}`;
   if (imageType === IdDocImageTypes.selfie) {
     title = t('title.selfie');
   }

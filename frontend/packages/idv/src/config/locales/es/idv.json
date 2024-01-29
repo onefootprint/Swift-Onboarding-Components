@@ -280,6 +280,7 @@
           "lease": "Arrendamiento",
           "utilityBill": "Factura de servicios",
           "bankStatement": "Extracto de Cuenta",
+          "proofOfAddress": "Proof of address",
           "selfie": "Selfie",
           "business-name": "Nombre de la empresa",
           "business-tin": "TIN",
@@ -1103,7 +1104,12 @@
       },
       "desktop-header": {
         "title": {
-          "id-doc": "{{type, capitalize}} · {{side, capitalize}}",
+          "doc-name": {
+            "id-doc": "{{type, capitalize}}"
+          },
+          "side-name": {
+            "id-doc": "{{side, capitalize}}"
+          },
           "selfie": "Selfie"
         },
         "subtitle": "Emitido en {{country}}"
@@ -1326,6 +1332,9 @@
             },
             "utilityBill": {
               "title": "Factura de servicios (desde los últimos 30 días)"
+            },
+            "proofOfAddress": {
+              "title": "Proof of address"
             }
           },
           "not-supported": "Lo sentimos, por el momento no admitimos identificaciones de tu país.",
@@ -1342,7 +1351,8 @@
             "workPermit": "Tarjeta EAD · FRENTE",
             "residenceDocument": "Green Card · FRENTE",
             "voterIdentification": "Identificación de votante · FRENTE",
-            "ssnCard": "Tarjeta de SSN · FRENTE"
+            "ssnCard": "Tarjeta de SSN · FRENTE",
+            "proofOfAddress": "Proof of address"
           },
           "preview": {
             "driversLicense": "Licencia de conducir",
@@ -1352,7 +1362,8 @@
             "workPermit": "Tarjeta EAD",
             "residenceDocument": "Green Card",
             "voterIdentification": "Identificación de votante",
-            "ssnCard": "Tarjeta de SSN"
+            "ssnCard": "Tarjeta de SSN",
+            "proofOfAddress": "Proof of address"
           }
         },
         "subtitle": {
@@ -1368,7 +1379,9 @@
             "visa": "Visa · PÁGINA DE FOTO",
             "workPermit": "Tarjeta EAD · ATRÁS",
             "residenceDocument": "Green Card · ATRÁS",
-            "voterIdentification": "Identificación de votante · ATRÁS"
+            "voterIdentification": "Identificación de votante · ATRÁS",
+            "ssnCard": "SSN Card · BACK",
+            "proofOfAddress": "Proof of address"
           },
           "preview": {
             "driversLicense": "Licencia de conducir",
@@ -1377,7 +1390,9 @@
             "visa": "Visa",
             "workPermit": "Tarjeta EAD",
             "residenceDocument": "Green Card",
-            "voterIdentification": "Identificación de votante"
+            "voterIdentification": "Identificación de votante",
+            "ssnCard": "SSN Card",
+            "proofOfAddress": "Proof of address"
           }
         },
         "subtitle": {
@@ -1463,6 +1478,20 @@
       },
       "device-warning": {
         "warning": "Esta acción solo se puede realizar en un teléfono móvil. Por favor, regresa a la pantalla/pestaña anterior y haz clic en el botón \"Cancelar\" para generar un nuevo código QR. Escanea el código y abre el nuevo enlace en tu teléfono."
+      },
+      "id-doc-upload-first-prompt": {
+        "proof_of_address": {
+          "title": "Upload a proof of address",
+          "description": "We need to verify your address. Please upload a document that shows your name and address.",
+          "guidelines": {
+            "gas-water-electricity-bill": "Gas, water or electricity bills",
+            "bank-credit-card-statement": "Bank or credit card statements",
+            "vehicle-voter-registration": "Vehicle or voter registration cards",
+            "rental-agreement": "Rental lease agreement",
+            "insurance": "Health or card insurance",
+            "phone-internet-bill": "Recent phone number or internet bills"
+          }
+        }
       }
     }
   }

@@ -1,11 +1,9 @@
 import { IcoForbid40 } from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
 import type { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 import {
   IdDocImageProcessingError,
   IdDocImageUploadError,
 } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -13,6 +11,7 @@ import Logger from '../../../../utils/logger';
 import IdDocTypeToLabel from '../../constants/id-doc-type-labels';
 import getImageSideLabel from '../../utils/get-image-side-label';
 import type { IdDocImageErrorType } from '../../utils/state-machine';
+import PromptWithGuidelines from '../prompt-with-directions';
 
 type ErrorProps = {
   imageType: IdDocImageTypes;
@@ -45,75 +44,20 @@ const Error = ({ errors, imageType, docType, countryName }: ErrorProps) => {
   }
 
   return (
-    <Container>
-      <IcoForbid40 color="error" />
-      <ErrorMessage>
-        <Typography
-          variant="label-1"
-          color="error"
-          sx={{ textAlign: 'center' }}
-        >
-          {t(`title-${imageType}`)}
-        </Typography>
-        {cleanedErrors.length < 2 ? (
-          <Typography
-            variant="body-2"
-            color="secondary"
-            sx={{
-              textAlign: 'center',
-            }}
-          >
-            {t(`description.${cleanedErrors[0].errorType}`, {
-              documentType: IdDocTypeToLabel[docType],
-              side,
-              countryName,
-              errorInfo: cleanedErrors[0].errorInfo,
-            })}
-          </Typography>
-        ) : (
-          cleanedErrors.map(error => (
-            <Typography
-              key={error.errorType}
-              variant="body-2"
-              color="secondary"
-              as="li"
-              sx={{
-                textAlign: 'left',
-                width: '100%',
-              }}
-            >
-              {t(`description.${error.errorType}`, {
-                documentType: IdDocTypeToLabel[docType],
-                side,
-                countryName,
-                errorInfo: error.errorInfo,
-              })}
-            </Typography>
-          ))
-        )}
-      </ErrorMessage>
-    </Container>
+    <PromptWithGuidelines
+      icon={IcoForbid40}
+      guidelines={cleanedErrors.map(error =>
+        t(`description.${error.errorType}`, {
+          documentType: IdDocTypeToLabel[docType],
+          side,
+          countryName,
+          errorInfo: error.errorInfo,
+        }),
+      )}
+      title={t(`title-${imageType}`)}
+      variant="error"
+    />
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: ${theme.spacing[5]};
-  `}
-`;
-
-const ErrorMessage = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: ${theme.spacing[3]};
-  `}
-`;
 
 export default Error;

@@ -33,6 +33,14 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
           on: {
             receivedCountryAndType: [
               {
+                target: 'frontImageUploadFirstMobile',
+                cond: context =>
+                  context.device.type === 'mobile' &&
+                  !context.requirement.shouldCollectConsent &&
+                  context.requirement.uploadMode === 'allow_upload',
+                actions: ['assignCountryAndType', 'assignId', 'resetSide'],
+              },
+              {
                 target: 'frontImageCaptureMobile',
                 cond: context =>
                   context.device.type === 'mobile' &&
@@ -56,6 +64,13 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
               },
             ],
             consentReceived: [
+              {
+                target: 'frontImageUploadFirstMobile',
+                cond: context =>
+                  !!context.id &&
+                  context.requirement.uploadMode === 'allow_upload',
+                actions: 'assignConsent',
+              },
               {
                 target: 'frontImageCaptureMobile',
                 cond: context => !!context.id,
@@ -94,11 +109,32 @@ const createIdDocMachine = (args: MachineContext, initState?: string) =>
             },
           },
         },
-        frontImageCaptureMobile: {
+        frontImageUploadFirstMobile: {
           on: {
             navigatedToPrev: {
               target: 'countryAndType',
             },
+            startImageCapture: {
+              target: 'frontImageCaptureMobile',
+            },
+            receivedImage: {
+              target: 'processingMobile',
+              actions: 'assignImage',
+            },
+          },
+        },
+        frontImageCaptureMobile: {
+          on: {
+            navigatedToPrev: [
+              {
+                target: 'frontImageUploadFirstMobile',
+                cond: context =>
+                  context.requirement.uploadMode === 'allow_upload',
+              },
+              {
+                target: 'countryAndType',
+              },
+            ],
             cameraErrored: {
               target: 'countryAndType',
             },

@@ -43,6 +43,7 @@ export type IdDocRequirement = {
   shouldCollectSelfie: boolean;
   shouldCollectConsent: boolean;
   supportedCountryAndDocTypes: Record<string, SupportedIdDocTypes[]>;
+  uploadMode: 'default' | 'allow_upload';
 };
 
 export type RegisterPasskeyRequirement = {

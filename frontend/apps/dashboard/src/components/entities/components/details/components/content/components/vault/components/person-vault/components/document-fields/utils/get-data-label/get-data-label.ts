@@ -19,6 +19,7 @@ const getDataLabel = (
     .replace(`document.${SupportedIdDocTypes.lease}.`, '')
     .replace(`document.${SupportedIdDocTypes.bankStatement}.`, '')
     .replace(`document.${SupportedIdDocTypes.utilityBill}.`, '')
+    .replace(`document.${SupportedIdDocTypes.proofOfAddress}.`, '')
     .replace(`:${activeDocumentVersion}`, '');
 
 export default getDataLabel;

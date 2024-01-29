@@ -71,6 +71,7 @@ type CameraProps = {
   outlineHeightRatio: number; // with respect to the video width (not height since width is smaller)
   outlineWidthRatio: number; // with respect to the video width
   setIsCaptured: React.Dispatch<React.SetStateAction<boolean>>;
+  allowPdf: boolean;
 };
 
 const AUTOCAPTURE_TIMER_START_VAL = 3;
@@ -164,6 +165,7 @@ const Camera = ({
   outlineHeightRatio,
   outlineWidthRatio,
   setIsCaptured,
+  allowPdf,
 }: CameraProps) => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'id-doc.components.camera',
@@ -425,6 +427,7 @@ const Camera = ({
                 <UploadButton
                   onUploadBtnClick={onImageUpload}
                   onUploadChangeDone={onUploadComplete}
+                  allowPdf={allowPdf}
                 />
               )}
               {isTimerRunning ? (

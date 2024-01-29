@@ -20,6 +20,7 @@ const contextWithErrors: MachineContext = {
     kind: OnboardingRequirementKind.idDoc,
     shouldCollectSelfie: true,
     shouldCollectConsent: true,
+    uploadMode: 'default',
     supportedCountryAndDocTypes: {
       us: [
         SupportedIdDocTypes.driversLicense,

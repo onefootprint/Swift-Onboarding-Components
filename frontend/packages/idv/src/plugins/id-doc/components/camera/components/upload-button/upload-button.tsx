@@ -12,6 +12,7 @@ const BUTTON_RADIUS = 56;
 type UploadButtonProps = {
   onUploadBtnClick: () => void;
   onUploadChangeDone: () => void;
+  allowPdf: boolean;
 };
 
 const logWarn = (e: string) => Logger.warn(e, 'upload-button');
@@ -27,12 +28,15 @@ const logProcessedFile = (res: {
 const UploadButton = ({
   onUploadBtnClick,
   onUploadChangeDone,
+  allowPdf,
 }: UploadButtonProps) => {
   const [state, send] = useIdDocMachine();
   const { hasBadConnectivity } = state.context;
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
   const [isLoading, setIsLoading] = useState(false);
-  const { processImageFile, acceptedFileFormats } = useProcessImage();
+  const { processImageFile, acceptedFileFormats } = useProcessImage({
+    allowPdf,
+  });
   const toast = useToast();
 
   const onProcessingDone = () => {

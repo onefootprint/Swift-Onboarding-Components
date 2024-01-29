@@ -37,6 +37,9 @@ const getDocumentType = (di: DocumentDI) => {
   if (di.includes(SupportedIdDocTypes.utilityBill)) {
     return SupportedIdDocTypes.utilityBill;
   }
+  if (di.includes(SupportedIdDocTypes.proofOfAddress)) {
+    return SupportedIdDocTypes.proofOfAddress;
+  }
   return undefined;
 };
 

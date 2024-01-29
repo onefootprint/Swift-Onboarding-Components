@@ -11,6 +11,9 @@ const getImageSideLabel = (
   ) {
     return 'photo page';
   }
+  if (type === SupportedIdDocTypes.proofOfAddress) {
+    return '';
+  }
   return `${imageType} side`;
 };
 

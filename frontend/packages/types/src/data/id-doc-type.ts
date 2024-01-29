@@ -16,6 +16,7 @@ export enum SupportedIdDocTypes {
   lease = 'lease',
   bankStatement = 'bank_statement',
   utilityBill = 'utility_bill',
+  proofOfAddress = 'proof_of_address',
 }
 
 export enum IdDocRegionality {

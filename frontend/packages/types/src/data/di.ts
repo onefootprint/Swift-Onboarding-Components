@@ -170,6 +170,7 @@ export enum DocumentDI {
   latestLeaseFront = 'document.lease.front.image',
   latestBankStatementFront = 'document.bank_statement.front.image',
   latestUtilityBillFront = 'document.utility_bill.front.image',
+  latestProofOfAddressFront = 'document.proof_of_address.front.image',
 }
 
 export type VersionedDocumentDI<Version extends string = string> =

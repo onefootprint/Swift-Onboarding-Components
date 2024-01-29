@@ -19,6 +19,7 @@ export const initialContextAllDocTypes: MachineContext = {
     kind: OnboardingRequirementKind.idDoc,
     shouldCollectSelfie: true,
     shouldCollectConsent: true,
+    uploadMode: 'default',
     supportedCountryAndDocTypes: {
       us: [
         SupportedIdDocTypes.driversLicense,
@@ -70,6 +71,7 @@ export const initialContextSomeDocTypes: MachineContext = {
     kind: OnboardingRequirementKind.idDoc,
     shouldCollectSelfie: true,
     shouldCollectConsent: true,
+    uploadMode: 'default',
     supportedCountryAndDocTypes: {
       us: [
         SupportedIdDocTypes.driversLicense,
@@ -105,6 +107,7 @@ export const initialContextOnlyUS: MachineContext = {
     kind: OnboardingRequirementKind.idDoc,
     shouldCollectSelfie: true,
     shouldCollectConsent: true,
+    uploadMode: 'default',
     supportedCountryAndDocTypes: {
       us: [
         SupportedIdDocTypes.driversLicense,
@@ -138,6 +141,7 @@ export const initialContextBD: MachineContext = {
     kind: OnboardingRequirementKind.idDoc,
     shouldCollectSelfie: true,
     shouldCollectConsent: true,
+    uploadMode: 'default',
     supportedCountryAndDocTypes: {
       bd: [SupportedIdDocTypes.passport],
     },
@@ -163,6 +167,7 @@ export const initialContextNoSupportedDoc: MachineContext = {
     kind: OnboardingRequirementKind.idDoc,
     shouldCollectSelfie: true,
     shouldCollectConsent: true,
+    uploadMode: 'default',
     supportedCountryAndDocTypes: {
       us: [
         SupportedIdDocTypes.driversLicense,

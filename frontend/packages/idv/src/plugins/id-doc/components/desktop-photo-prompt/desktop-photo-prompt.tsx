@@ -44,9 +44,13 @@ const DesktopPhotoPrompt = ({
     keyPrefix: 'id-doc.components.desktop-photo-prompt',
   });
   const [state, send] = useIdDocMachine();
-  const { hasBadConnectivity } = state.context;
+  const { hasBadConnectivity, requirement } = state.context;
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
-  const { processImageFile, acceptedFileFormats } = useProcessImage();
+  const { uploadMode } = requirement;
+  const allowPdf = uploadMode === 'allow_upload';
+  const { processImageFile, acceptedFileFormats } = useProcessImage({
+    allowPdf,
+  });
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -120,6 +124,7 @@ const DesktopPhotoPrompt = ({
         isLoading={isLoading}
         hasError={hasError}
         onUploadError={handleUploadError}
+        allowPdf={allowPdf}
       >
         {isRetry && (
           <Box paddingLeft={6} paddingRight={6}>
@@ -148,9 +153,11 @@ const DesktopPhotoPrompt = ({
                 &nbsp;{t('drag-drop-text.line-1')}
               </Typography>
             </Stack>
-            <Typography variant="body-2" sx={{ color: 'quaternary' }}>
-              {t('drag-drop-text.line-2')}
-            </Typography>
+            {!allowPdf && (
+              <Typography variant="body-2" sx={{ color: 'quaternary' }}>
+                {t('drag-drop-text.line-2')}
+              </Typography>
+            )}
           </>
         )}
         <StyledInput

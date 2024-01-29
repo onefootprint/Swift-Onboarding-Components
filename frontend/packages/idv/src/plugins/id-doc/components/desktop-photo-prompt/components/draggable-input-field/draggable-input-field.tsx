@@ -13,6 +13,7 @@ type DraggableInputFieldProps = {
   onComplete: (image: File) => void;
   isLoading?: boolean;
   onUploadError: (errors: IdDocImageUploadError[]) => void;
+  allowPdf?: boolean;
 };
 
 const DraggableInputField = ({
@@ -22,10 +23,11 @@ const DraggableInputField = ({
   onComplete,
   isLoading,
   onUploadError,
+  allowPdf,
 }: DraggableInputFieldProps) => {
   const [dragActive, setDragActive] = useState(false);
   const uploadPhotoRef = useRef<HTMLInputElement | undefined>();
-  const { acceptedFileFormats } = useProcessImage();
+  const { acceptedFileFormats } = useProcessImage({ allowPdf });
 
   const handleFileDrop = (ev: React.DragEvent<HTMLDivElement>) => {
     ev.preventDefault();
@@ -42,6 +44,7 @@ const DraggableInputField = ({
         files,
         onSuccess: onComplete,
         onError: onUploadError,
+        allowPdf,
       });
     } else {
       onUploadError([IdDocImageUploadError.unknownUploadError]);
@@ -64,7 +67,12 @@ const DraggableInputField = ({
 
   const handleImageUpload = (ev: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = ev.target;
-    handleFileUpload({ files, onSuccess: onComplete, onError: onUploadError });
+    handleFileUpload({
+      files,
+      onSuccess: onComplete,
+      onError: onUploadError,
+      allowPdf,
+    });
   };
 
   const handleUpload = () => {
