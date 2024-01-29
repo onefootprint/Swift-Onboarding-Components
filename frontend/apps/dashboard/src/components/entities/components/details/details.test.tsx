@@ -27,6 +27,7 @@ import {
 } from './details.test.config';
 
 const useRouterSpy = createUseRouterSpy();
+const ENCRYPTED_TEXT = '••••••••••••';
 
 describe.skip('<Details />', () => {
   beforeEach(() => {
@@ -116,21 +117,21 @@ describe.skip('<Details />', () => {
 
           const name = getTextByRow({
             name: 'Name',
-            value: '•••••••••',
+            value: ENCRYPTED_TEXT,
             container,
           });
           expect(name).toBeInTheDocument();
 
           const dba = getTextByRow({
             name: 'Doing Business As',
-            value: '•••••••••',
+            value: ENCRYPTED_TEXT,
             container,
           });
           expect(dba).toBeInTheDocument();
 
           const tin = getTextByRow({
             name: 'Taxpayer Identification Number (TIN)',
-            value: '•••••••••',
+            value: ENCRYPTED_TEXT,
             container,
           });
           expect(tin).toBeInTheDocument();
@@ -184,7 +185,7 @@ describe.skip('<Details />', () => {
           await waitFor(() => {
             const addressLine1 = getTextByRow({
               name: 'Address line 1',
-              value: '•••••••••',
+              value: ENCRYPTED_TEXT,
               container,
             });
             expect(addressLine1).toBeInTheDocument();
@@ -202,7 +203,7 @@ describe.skip('<Details />', () => {
           await waitFor(() => {
             const city = getTextByRow({
               name: 'City',
-              value: '•••••••••',
+              value: ENCRYPTED_TEXT,
               container,
             });
             expect(city).toBeInTheDocument();
@@ -211,7 +212,7 @@ describe.skip('<Details />', () => {
           await waitFor(() => {
             const zipCode = getTextByRow({
               name: 'Zip code',
-              value: '•••••••••',
+              value: ENCRYPTED_TEXT,
               container,
             });
             expect(zipCode).toBeInTheDocument();
@@ -220,7 +221,7 @@ describe.skip('<Details />', () => {
           await waitFor(() => {
             const state = getTextByRow({
               name: 'State',
-              value: '•••••••••',
+              value: ENCRYPTED_TEXT,
               container,
             });
             expect(state).toBeInTheDocument();

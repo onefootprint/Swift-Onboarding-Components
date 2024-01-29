@@ -46,6 +46,7 @@ afterAll(() => {
 
 const useRouterSpy = createUseRouterSpy();
 const fileSaverSpy = createFileSaverSpy();
+const ENCRIPTED_TEXT = '••••••••••••';
 
 describe.skip('<Details />', () => {
   const fileSaverMock = fileSaverSpy();
@@ -131,7 +132,7 @@ describe.skip('<Details />', () => {
 
             const firstName = getTextByRow({
               name: 'First name',
-              value: '•••••••',
+              value: ENCRIPTED_TEXT,
               container,
             });
             expect(firstName).toBeInTheDocument();
@@ -145,21 +146,21 @@ describe.skip('<Details />', () => {
 
             const lastName = getTextByRow({
               name: 'Last name',
-              value: '•••••••',
+              value: ENCRIPTED_TEXT,
               container,
             });
             expect(lastName).toBeInTheDocument();
 
             const email = getTextByRow({
               name: 'Email',
-              value: '•••••••',
+              value: ENCRIPTED_TEXT,
               container,
             });
             expect(email).toBeInTheDocument();
 
             const phoneNumber = getTextByRow({
               name: 'Phone number',
-              value: '•••••••',
+              value: ENCRIPTED_TEXT,
               container,
             });
             expect(phoneNumber).toBeInTheDocument();
@@ -176,7 +177,7 @@ describe.skip('<Details />', () => {
               name: 'First name',
               container,
             });
-            expect(firstName).toHaveValue('•••••••••');
+            expect(firstName).toHaveValue(ENCRIPTED_TEXT);
 
             const middleName = getInputByRow({
               name: 'Middle name',
@@ -188,7 +189,7 @@ describe.skip('<Details />', () => {
               name: 'Last name',
               container,
             });
-            expect(lastName).toHaveValue('•••••••••');
+            expect(lastName).toHaveValue(ENCRIPTED_TEXT);
           });
         });
 
@@ -567,7 +568,7 @@ describe.skip('<Details />', () => {
           await waitFor(() => {
             const addressLine1 = getTextByRow({
               name: 'Address line 1',
-              value: '•••••••',
+              value: ENCRIPTED_TEXT,
               container,
             });
             expect(addressLine1).toBeInTheDocument();
@@ -585,7 +586,7 @@ describe.skip('<Details />', () => {
           await waitFor(() => {
             const city = getTextByRow({
               name: 'City',
-              value: '•••••••',
+              value: ENCRIPTED_TEXT,
               container,
             });
             expect(city).toBeInTheDocument();
@@ -594,7 +595,7 @@ describe.skip('<Details />', () => {
           await waitFor(() => {
             const zipCode = getTextByRow({
               name: 'Zip code',
-              value: '•••••••',
+              value: ENCRIPTED_TEXT,
               container,
             });
             expect(zipCode).toBeInTheDocument();
@@ -603,7 +604,7 @@ describe.skip('<Details />', () => {
           await waitFor(() => {
             const state = getTextByRow({
               name: 'State',
-              value: '•••••••',
+              value: ENCRIPTED_TEXT,
               container,
             });
             expect(state).toBeInTheDocument();
@@ -1140,35 +1141,35 @@ describe.skip('<Details />', () => {
 
           const number = getTextByRow({
             name: 'Number',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(number).toBeInTheDocument();
 
           const numberLast4 = getTextByRow({
             name: 'Number (Last 4)',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(numberLast4).toBeInTheDocument();
 
           const expiration = getTextByRow({
             name: 'Expiration',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(expiration).toBeInTheDocument();
 
           const cvc = getTextByRow({
             name: 'CVC',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(cvc).toBeInTheDocument();
 
           const issuer = getTextByRow({
             name: 'Issuer',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(issuer).toBeInTheDocument();
@@ -1232,21 +1233,21 @@ describe.skip('<Details />', () => {
 
           const ssn9 = getTextByRow({
             name: 'SSN (Full)',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(ssn9).toBeInTheDocument();
 
           const ssn4 = getTextByRow({
             name: 'SSN (Last 4)',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(ssn4).toBeInTheDocument();
 
           const dob = getTextByRow({
             name: 'Date of birth',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(dob).toBeInTheDocument();
@@ -1578,35 +1579,35 @@ describe.skip('<Details />', () => {
 
           const status = getTextByRow({
             name: 'Legal status',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(status).toBeInTheDocument();
 
           const nationality = getTextByRow({
             name: 'Country of birth',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(nationality).toBeInTheDocument();
 
           const citizenship = getTextByRow({
             name: 'Citizenship',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(citizenship).toBeInTheDocument();
 
           const visaType = getTextByRow({
             name: 'Visa type',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(visaType).toBeInTheDocument();
 
           const visaExpiration = getTextByRow({
             name: 'Visa expiration date',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(visaExpiration).toBeInTheDocument();
@@ -2396,56 +2397,56 @@ describe.skip('<Details />', () => {
 
           const occupation = getTextByRow({
             name: 'Occupation',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(occupation).toBeInTheDocument();
 
           const employmentStatus = getTextByRow({
             name: 'Employment status',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(employmentStatus).toBeInTheDocument();
 
           const annualIncome = getTextByRow({
             name: 'Annual income',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(annualIncome).toBeInTheDocument();
 
           const netWorth = getTextByRow({
             name: 'Net worth',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(netWorth).toBeInTheDocument();
 
           const investmentGoals = getTextByRow({
             name: 'Investment goals',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(investmentGoals).toBeInTheDocument();
 
           const riskTolerance = getTextByRow({
             name: 'Risk tolerance',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(riskTolerance).toBeInTheDocument();
 
           const declarations = getTextByRow({
             name: 'Declaration(s)',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(declarations).toBeInTheDocument();
 
           const finra = getTextByRow({
             name: 'Finra compliance letter',
-            value: '•••••••',
+            value: ENCRIPTED_TEXT,
             container,
           });
           expect(finra).toBeInTheDocument();

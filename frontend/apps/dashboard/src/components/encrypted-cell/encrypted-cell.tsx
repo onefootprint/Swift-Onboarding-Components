@@ -1,6 +1,6 @@
 import { IcoLock16 } from '@onefootprint/icons';
 import styled from '@onefootprint/styled';
-import { Stack } from '@onefootprint/ui';
+import { Grid } from '@onefootprint/ui';
 import React from 'react';
 
 type EncryptedCellProps = {
@@ -8,24 +8,32 @@ type EncryptedCellProps = {
 };
 
 const EncryptedCell = ({ prefix }: EncryptedCellProps) => (
-  <Container align="center" gap={3} width="fit-content">
-    <Stack align="center">
+  <Container
+    templateAreas={['icon value']}
+    columns={['16px', '1fr']}
+    rows={['1fr']}
+    alignItems="center"
+    justifyContent="flex-end"
+    width="fit-content"
+    gap={2}
+    minWidth="88px"
+    as="span"
+  >
+    <Grid.Item gridArea="icon" align="center" justify="center" as="span">
       <IcoLock16 />
-    </Stack>
-    <Stack fontStyle="body-3" color="primary" as="span">
-      {prefix ? (
-        <Stack as="span" width="11px">
-          {prefix}
-        </Stack>
-      ) : (
-        <Stack as="span">••</Stack>
-      )}
-      <Stack as="span">•••••••</Stack>
-    </Stack>
+    </Grid.Item>
+    <Grid.Item
+      fontStyle="body-3"
+      color="primary"
+      gridArea="value"
+      justify="right"
+    >
+      {`${prefix ? `${prefix}` : '••'}••••••••••`}
+    </Grid.Item>
   </Container>
 );
 
-const Container = styled(Stack)`
+const Container = styled(Grid.Container)`
   user-select: none;
   pointer-events: none;
 `;
