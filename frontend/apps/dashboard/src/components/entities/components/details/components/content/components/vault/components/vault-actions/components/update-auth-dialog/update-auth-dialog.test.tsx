@@ -100,17 +100,19 @@ describe('<UpdateAuthDialog />', () => {
       path: `/entities/${entityFixture.id}/token`,
       statusCode: 200,
       response: {
-        deliveryMethod: ContactInfoKind.phone,
+        deliveryMethod: ContactInfoKind.email,
       },
     });
 
-    const sendLinkButton = screen.getByRole('button', { name: 'Send via SMS' });
+    const sendLinkButton = screen.getByRole('button', {
+      name: 'Send via email',
+    });
     await userEvent.click(sendLinkButton);
 
     await waitFor(() => {
       expect(
         screen.getByText(
-          'User will receive an SMS detailing the next steps shortly',
+          'User will receive an email detailing the next steps shortly',
         ),
       ).toBeInTheDocument();
     });

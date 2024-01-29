@@ -1,5 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
+import { IdDI } from '@onefootprint/types';
 import { TokenKind } from '@onefootprint/types/src/api/create-token';
 import {
   Dialog,
@@ -11,6 +12,7 @@ import {
 } from '@onefootprint/ui';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import useEntity from 'src/components/entities/components/details/hooks/use-entity';
 
 import useEntityId from '@/entity/hooks/use-entity-id';
 
@@ -31,6 +33,9 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
   const entityId = useEntityId();
+  const userHasPhone = useEntity(entityId).data?.attributes?.includes(
+    IdDI.phoneNumber,
+  );
 
   const handleClose = useCallback(() => {
     generateTokenMutation.reset();
@@ -97,7 +102,7 @@ const UpdateAuthDialog = ({ open, onClose }: UpdateAuthDialogProps) => {
         disabled: sendLinkMutation.isLoading || generateTokenMutation.isLoading,
       }}
       secondaryButton={{
-        label: t('send-link'),
+        label: userHasPhone ? t('send-link-sms') : t('send-link-email'),
         onClick: handleSendLink,
         disabled: sendLinkMutation.isLoading || generateTokenMutation.isLoading,
         loading: sendLinkMutation.isLoading,

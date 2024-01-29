@@ -2,6 +2,7 @@ export type TriggerRequest = {
   entityId: string;
   trigger: Trigger;
   note?: string;
+  sendLink: boolean;
 };
 
 export type Trigger =
@@ -28,4 +29,8 @@ export enum TriggerKind {
   ProofOfAddress = 'proof_of_address',
 }
 
-export type TriggerResponse = {};
+export type TriggerResponse = {
+  token: string;
+  link: string;
+  expiresAt: string;
+};

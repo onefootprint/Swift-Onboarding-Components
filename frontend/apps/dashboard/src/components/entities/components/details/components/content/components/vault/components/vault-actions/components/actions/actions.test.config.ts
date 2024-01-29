@@ -52,7 +52,19 @@ export const withTrigger = () =>
     method: 'post',
     path: `/entities/${entityId}/triggers`,
     statusCode: 200,
-    response: {},
+    response: {
+      link: 'http://footprint.link/#tok_xxx',
+    },
+  });
+
+export const withTokenSendLink = (deliveryMethod: string) =>
+  mockRequest({
+    method: 'post',
+    path: `/entities/${entityId}/token`,
+    statusCode: 200,
+    response: {
+      deliveryMethod,
+    },
   });
 
 export const withTriggerError = () =>

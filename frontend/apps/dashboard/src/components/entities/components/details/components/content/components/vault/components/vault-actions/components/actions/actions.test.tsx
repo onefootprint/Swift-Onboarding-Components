@@ -18,6 +18,7 @@ import {
   entityWithoutPhoneFixture,
   entityWithPhoneFixture,
   withEntity,
+  withTokenSendLink,
   withTrigger,
   withTriggerError,
 } from './actions.test.config';
@@ -48,13 +49,11 @@ describe('<Actions />', () => {
 
   describe('when retriggering a KYC', () => {
     describe('when the request to trigger request succeeds', () => {
-      beforeEach(() => {
-        withTrigger();
-      });
-
       describe('when user does not have phone', () => {
         beforeEach(() => {
           withEntity(entityWithoutPhoneFixture);
+          withTrigger();
+          withTokenSendLink('email');
         });
 
         it('should close the dialog and show a confirmation message for email sent', async () => {
@@ -87,10 +86,19 @@ describe('<Actions />', () => {
             ),
           ).toBeInTheDocument();
 
-          const submitButton = screen.getByRole('button', {
-            name: 'Send request',
+          const nextButton = screen.getByRole('button', {
+            name: 'Next',
           });
-          await userEvent.click(submitButton);
+          await userEvent.click(nextButton);
+          await waitFor(() => {
+            expect(
+              screen.getByDisplayValue('http://footprint.link/#tok_xxx'),
+            ).toBeInTheDocument();
+          });
+          const sendButton = screen.getByRole('button', {
+            name: 'Send via email',
+          });
+          await userEvent.click(sendButton);
 
           await waitForElementToBeRemoved(dialog);
 
@@ -106,6 +114,8 @@ describe('<Actions />', () => {
       describe('when user has phone', () => {
         beforeEach(() => {
           withEntity(entityWithPhoneFixture);
+          withTrigger();
+          withTokenSendLink('phone');
         });
 
         it('should close the dialog and show a confirmation message for SMS sent', async () => {
@@ -138,10 +148,19 @@ describe('<Actions />', () => {
             ),
           ).toBeInTheDocument();
 
-          const submitButton = screen.getByRole('button', {
-            name: 'Send request',
+          const nextButton = screen.getByRole('button', {
+            name: 'Next',
           });
-          await userEvent.click(submitButton);
+          await userEvent.click(nextButton);
+          await waitFor(() => {
+            expect(
+              screen.getByDisplayValue('http://footprint.link/#tok_xxx'),
+            ).toBeInTheDocument();
+          });
+          const sendButton = screen.getByRole('button', {
+            name: 'Send via SMS',
+          });
+          await userEvent.click(sendButton);
 
           await waitForElementToBeRemoved(dialog);
 
@@ -177,10 +196,10 @@ describe('<Actions />', () => {
         });
         await userEvent.click(reuploadPhotoRadio);
 
-        const submitButton = screen.getByRole('button', {
-          name: 'Send request',
+        const nextButton = screen.getByRole('button', {
+          name: 'Next',
         });
-        await userEvent.click(submitButton);
+        await userEvent.click(nextButton);
 
         await waitFor(() => {
           const errorMessage = screen.getByText('Something went wrong');

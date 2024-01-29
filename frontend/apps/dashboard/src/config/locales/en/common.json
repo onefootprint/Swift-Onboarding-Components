@@ -1214,6 +1214,7 @@
           "title": "Request more information",
           "not-allowed": "You're not allowed to request additional information",
           "send-request": "Send request",
+          "next": "Next",
           "cancel": "Cancel",
           "prompt": "What would you like to request from user?",
           "form": {
@@ -1243,6 +1244,17 @@
             "description-email": "We'll send an email with a link with your request to the user's email address on file.",
             "error": "You need to select an option before requesting more information from a user."
           },
+          "link": {
+            "header": "Link generated!",
+            "share-this-link": "Share this link with the user. They will be asked to log in and securely provide the requested information.",
+            "copy-link": "Copy link",
+            "send-link-sms": "Send via SMS",
+            "send-link-email": "Send via email",
+            "copied": {
+              "header": "Success!",
+              "description": "Link copied to clipboard"
+            }
+          },
           "success-toast": {
             "description-phone": "User will receive an SMS detailing the next steps shortly",
             "description-email": "User will receive an email detailing the next steps shortly",
@@ -1263,7 +1275,8 @@
             "description": "Link copied to clipboard"
           },
           "copy-link": "Copy link",
-          "send-link": "Send via SMS"
+          "send-link-sms": "Send via SMS",
+          "send-link-email": "Send via email"
         },
         "share": {
           "label": "Share"
