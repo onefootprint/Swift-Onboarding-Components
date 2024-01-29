@@ -3,6 +3,8 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpBackend from 'i18next-http-backend';
 import { initReactI18next } from 'react-i18next';
 
+import { COMMIT_SHA } from '../constants';
+
 const IS_BROWSER = typeof window !== 'undefined';
 
 export const idv = 'idv';
@@ -25,7 +27,7 @@ const configureI18n = () => {
       supportedLngs: ['en', 'es'],
       backend: IS_BROWSER
         ? {
-            loadPath: '/locales/{{lng}}/{{ns}}.json',
+            loadPath: `/locales/{{lng}}/{{ns}}.json?v=${COMMIT_SHA}`,
             requestOptions: {
               cache: 'no-store',
               credentials: 'same-origin',
