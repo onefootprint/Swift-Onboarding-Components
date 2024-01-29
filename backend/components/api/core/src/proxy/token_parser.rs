@@ -162,12 +162,12 @@ where
                     detokenized_body.push_str(&current_token);
                 }
 
-                if next_char.is_some_and(|c| c == &DELIMITER_START[1]) {
-                    // We've encountered a `{{{`. Treat the first of the three `{` as not part of
-                    // the token.
+                while next_char.is_some_and(|c| c == &DELIMITER_START[1]) {
+                    // We've encountered more than two `{`. Treat the braces as not part of the token
                     detokenized_body.push(DELIMITER_START[0]);
                     // Proceed to the next character
                     chars.next();
+                    next_char = chars.peek();
                 }
 
                 current_token = Some(String::new());
@@ -197,7 +197,13 @@ where
         current_char = chars.next();
         next_char = chars.peek();
     }
+    if let Some(current_token) = current_token {
+        // We were in the middle of parsing what we thought was a token, add it to the end of the response
+        detokenized_body.push_str(&DELIMITER_START.iter().collect::<String>());
+        detokenized_body.push_str(&current_token);
+    }
     if let Some(current_char) = current_char {
+        // Add the last character to the response
         detokenized_body.push(current_char)
     }
     Ok(PiiString::new(detokenized_body))
@@ -374,6 +380,28 @@ mod tests {
             serde_json::from_str(detokenized.leak()).expect("failed json decode detokenized");
 
         assert_eq!(test, result);
+    }
+
+    #[test_case("{{id.first_name}}{" => "Hayes{"; "test1")]
+    #[test_case("{{{{id.first_name}}}}" => "{{Hayes}}"; "test2")]
+    #[test_case("{{{{{id.first_name}}}}}" => "{{{Hayes}}}"; "test3")]
+    #[test_case("{{{id.first_name}}}" => "{Hayes}"; "test4")]
+    #[test_case("}}{{id.first_name}}{{" => "}}Hayes{{"; "test5")]
+    #[test_case("{{id.first_name}} {}}" => "Hayes {}}"; "test6")]
+    #[test_case("{{id.first_name}} {}" => "Hayes {}"; "test7")]
+    #[test_case("{{id.first_name}} {{}" => "Hayes {{}"; "test8")]
+    #[test_case("{{id.first_name}}{{{{" => "Hayes{{{{"; "test9")]
+    #[test_case("{{id.first_name}}{{ id.first_name" => "Hayes{{ id.first_name"; "test10")]
+    #[test_case("{{id.first_name{{ id.first_name }}" => "{{id.first_nameHayes"; "test11")]
+    #[test_case("{{id.first_name{{ id.first_name " => "{{id.first_name{{ id.first_name "; "test12")]
+    fn test_detokenize_complex(body: &str) -> String {
+        let global = FpId::from("fp_id_abcd".to_string());
+        let result = ProxyTokenParser::parse(body, Some(global)).unwrap();
+        let detokens = HashMap::from_iter(vec![
+            (tok1("fp_id_abcd", DI::Id(IDK::FirstName)), PiiString::from("Hayes")),
+        ]);
+        let detokenized = result.detokenize_body(detokens).expect("detokenize");
+        detokenized.leak_to_string()
     }
 
     #[test_case("fp_id_abcd.id.ssn9", "fp_id_abcd", None , DI::Id(IDK::Ssn9) => true)]
