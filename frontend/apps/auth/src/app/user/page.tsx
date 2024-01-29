@@ -20,7 +20,7 @@ const UserContainer = dynamic(() => import('@/src/components/user-container'), {
 const UserPage = async (props: UserPageProps) => {
   const { searchParams } = props;
   const loadedStyle = await getCustomAppearanceFork({
-    strategy: ['queryParameters', 'obConfig'],
+    strategy: ['queryParameters'],
     obConfig: searchParams?.public_key,
     params: searchParams,
     variant,

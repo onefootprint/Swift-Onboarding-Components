@@ -1,6 +1,12 @@
 import type { Assigner } from 'xstate';
 
-import { isEmail, isObject, isPasskey, isSms, isString } from '@/src/utils';
+import {
+  isBiometricOrPasskey,
+  isEmail,
+  isObject,
+  isSmsOrPhone,
+  isString,
+} from '@/src/utils';
 
 import type { UserMachineContext, UserMachineEvents as Events } from './types';
 
@@ -101,13 +107,13 @@ const assignUserFound: IdentifyUserDone = (ctx, { payload }) => {
   const scrubbedEmail = asterisksToBullet(payload.scrubbedEmail);
   const scrubbedPhone = asterisksToBullet(payload.scrubbedPhone);
 
-  if (kinds?.some(isSms)) {
+  if (kinds?.some(isSmsOrPhone)) {
     dashboard.phone = { status: 'set', label: scrubbedPhone };
   }
   if (kinds?.some(isEmail)) {
     dashboard.email = { status: 'set', label: scrubbedEmail };
   }
-  if (kinds?.some(isPasskey)) {
+  if (kinds?.some(isBiometricOrPasskey)) {
     dashboard.passkey = { ...dashboard.passkey, status: 'set' };
   }
 
@@ -124,14 +130,15 @@ const assignVerifyToken: SetVerifyToken = (ctx, { payload }) => {
 };
 
 const assignUserDashboard: UpdateUserDashboard = (ctx, { payload }) => {
+  const dashboard = { ...ctx.userDashboard };
   const { entry, kind } = payload;
-  ctx.userDashboard = {
-    ...ctx.userDashboard,
-    [kind]: {
-      ...ctx.userDashboard[kind],
-      ...entry,
-    },
-  };
+
+  if (entry && kind) {
+    dashboard[kind] = { ...dashboard[kind], ...entry };
+  }
+
+  ctx.userDashboard = dashboard;
+
   return ctx;
 };
 

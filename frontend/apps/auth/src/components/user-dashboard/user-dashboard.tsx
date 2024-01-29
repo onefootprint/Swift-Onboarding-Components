@@ -15,7 +15,10 @@ import { getLogger } from '@/src/utils';
 
 import Component from './component';
 
-type MethodsMap = Record<Partial<UserChallengeKind>, { isVerified: boolean }>;
+type MethodsMap = Record<
+  Partial<UserChallengeKind>,
+  Pick<UserAuthMethodsResponse[0], 'isVerified'>
+>;
 type T = TFunction<'common', 'auth'>;
 type TComponentProps = ComponentProps<typeof Component>;
 type Texts = TComponentProps['texts'];
@@ -58,8 +61,10 @@ const getDecryptErrorTexts = (t: T): NextToast => ({
 
 const getUserAuthMethods = (list: UserAuthMethodsResponse): MethodsMap =>
   list.reduce<MethodsMap>((objRef, item) => {
-    const { kind, ...rest } = item;
-    objRef[kind] = rest; // eslint-disable-line no-param-reassign
+    const { kind, canUpdate, ...rest } = item;
+    if (canUpdate) {
+      objRef[kind] = rest; // eslint-disable-line no-param-reassign
+    }
     return objRef;
   }, Object.create(null));
 

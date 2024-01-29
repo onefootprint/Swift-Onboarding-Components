@@ -287,20 +287,6 @@ const getCustomAppearance = async ({
       }
     }
   }
-  // if (strategy.includes('styleParams')) {
-  //   if (authToken) {
-  //     const appearance = await getAppearanceFromStyleParams(authToken);
-  //     if (appearance) {
-  //       return {
-  //         appearance,
-  //         theme: createTheme(defaultTheme, appearance.variables),
-  //         rules: createRules(appearance.rules),
-  //         fontSrc: appearance.fontSrc || null,
-  //         variant: appearance.variant || variant,
-  //       };
-  //     }
-  //   }
-  // }
   if (strategy.includes('obConfig')) {
     const appearance = await getAppearanceFromObConfig({
       obConfig,

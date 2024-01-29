@@ -6,11 +6,15 @@ export { default as shouldRequestNewChallenge } from './should-request-challenge
 export { default as getErrorToastVariant } from './toast-error-variant';
 export {
   isAuth,
+  isBiometric,
+  isBiometricOrPasskey,
   isEmail,
   isNotEmptyArray,
   isObject,
   isPasskey,
+  isPhone,
   isSms,
+  isSmsOrPhone,
   isString,
 } from './type-guards';
 export { default as isSdkUrlAllowed } from './verify-allowed-domain';

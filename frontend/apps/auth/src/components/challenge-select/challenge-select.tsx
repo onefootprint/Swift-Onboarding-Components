@@ -5,6 +5,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useUserMachine } from '@/src/state';
+import { isBiometricOrPasskey, isSmsOrPhone } from '@/src/utils';
 
 import Component from './component';
 
@@ -54,10 +55,10 @@ const ChallengeSelect = ({ children, Header }: ChallengeSelectProps) => {
       isCtaDisabled={availableOptions.length === 0 || !kindToChallenge}
       isLoading={false}
       methodOptions={availableOptions.map(kind => {
-        if (kind === 'biometric') {
+        if (isBiometricOrPasskey(kind)) {
           return getPhonePasskeyEntry(t('passkey'));
         }
-        return kind === 'sms'
+        return isSmsOrPhone(kind)
           ? getPhoneEntry(phoneTitle)
           : getEmailEntry(emailTitle);
       })}

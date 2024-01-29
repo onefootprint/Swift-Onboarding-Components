@@ -2,7 +2,7 @@ import type { ChallengeKind, IdentifyResponse } from '@onefootprint/types';
 import compose from 'lodash/fp/compose';
 import { assign, createMachine } from 'xstate';
 
-import { isEmail, isNotEmptyArray, isPasskey, isSms } from '@/src/utils';
+import { isBiometric, isEmail, isNotEmptyArray, isSms } from '@/src/utils';
 
 import {
   assignDecryptedData,
@@ -31,7 +31,7 @@ const hasVerifyToken = (ctx: UserMachineContext) => Boolean(ctx.verifyToken);
 const getKindPayload = (_: Ignore, { payload }: KindPayload) => payload;
 const isPayloadEmail = compose(isEmail, getKindPayload);
 const isPayloadSms = compose(isSms, getKindPayload);
-const isPayloadPasskey = compose(isPasskey, getKindPayload);
+const isPayloadPasskey = compose(isBiometric, getKindPayload);
 
 const userOrChallengesNotFound = (_: Ignore, { payload }: IdentifyPayload) =>
   !payload.userFound || !isNotEmptyArray(payload.availableChallengeKinds);

@@ -7,6 +7,7 @@ import type { UserChallengeKind } from '@/src/types';
 import { isString } from '@/src/utils';
 
 export type UserAuthMethodsResponse = {
+  canUpdate: boolean;
   isVerified: boolean;
   kind: UserChallengeKind;
 }[];
