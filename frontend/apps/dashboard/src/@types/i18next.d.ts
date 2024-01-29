@@ -10,12 +10,6 @@ declare module 'i18next' {
   interface CustomTypeOptions {
     defaultNS: 'common';
     fallbackNS: 'common';
-    ui: 'ui';
-    common: 'common';
-    businesses: 'businesses';
-    'domain-restrictions': 'domain-restrictions';
-    internal: 'internal';
-    users: 'users';
     resources: {
       ui: typeof uiResource;
       common: typeof commonResource;

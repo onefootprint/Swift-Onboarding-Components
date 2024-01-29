@@ -21,7 +21,7 @@ const configureI18n = () => {
         ? {
             loadPath: '/locales/{{lng}}/{{ns}}.json',
             requestOptions: {
-              cache: 'default',
+              cache: 'no-store',
               credentials: 'same-origin',
               mode: 'no-cors',
             },

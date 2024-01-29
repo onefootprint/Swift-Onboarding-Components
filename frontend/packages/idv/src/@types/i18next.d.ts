@@ -6,7 +6,6 @@ declare module 'i18next' {
   interface CustomTypeOptions {
     defaultNS: 'idv';
     fallbackNS: 'idv';
-    ui: 'ui';
     resources: {
       idv: typeof idvResource;
       ui: typeof uiResource;

@@ -27,7 +27,7 @@ const configureI18n = () => {
         ? {
             loadPath: '/locales/{{lng}}/{{ns}}.json',
             requestOptions: {
-              cache: 'default',
+              cache: 'no-store',
               credentials: 'same-origin',
               mode: 'no-cors',
             },
@@ -42,6 +42,7 @@ const configureI18n = () => {
         bindI18nStore: '',
         useSuspense: false,
       },
+      returnNull: false,
     });
 
   i18next.services.formatter?.add(
