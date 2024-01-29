@@ -1753,7 +1753,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/CreateEntityTokenResponse"
+                                    "$ref": "#/components/schemas/CreateTokenResponse"
                                 }
                             }
                         }
@@ -7013,6 +7013,30 @@
                     "omit_email_invite",
                     "redirect_url",
                     "role_id"
+                ]
+            },
+            "CreateTokenResponse": {
+                "type": "object",
+                "properties": {
+                    "expires_at": {
+                        "description": "The time at which the token (and link) expire",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "link": {
+                        "example": "https://verify.onefootprint.com/?type=user#tok_ssPvNRjNGdk8Iq9qgf6lsO2iTVhALuR4Nt",
+                        "description": "A Footprint link embedding the `token` that can be sent to this user to allow them to complete the flow.",
+                        "type": "string"
+                    },
+                    "token": {
+                        "description": "A short-lived token that can be passed into the Verify SDK to allow the user to complete the flow.",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "expires_at",
+                    "link",
+                    "token"
                 ]
             },
             "DecisionRequest": {
@@ -19873,10 +19897,6 @@
                         "description": "Optional note with more context on what we're asking the user to do",
                         "type": "string"
                     },
-                    "send_link": {
-                        "description": "TODO: remove this when the client starts using POST /token to send the link",
-                        "type": "boolean"
-                    },
                     "trigger": {
                         "type": "string",
                         "enum": [
@@ -19887,7 +19907,6 @@
                     }
                 },
                 "required": [
-                    "send_link",
                     "trigger"
                 ]
             },

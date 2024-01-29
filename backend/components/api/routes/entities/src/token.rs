@@ -91,7 +91,7 @@ pub async fn post(
     ResponseData::ok(response).json()
 }
 
-pub(super) async fn send_communication(
+async fn send_communication(
     state: &State,
     vw: TenantVw<Any>,
     wfr: Option<WorkflowRequest>,

@@ -1,7 +1,6 @@
 use crate::auth::tenant::CheckTenantGuard;
 use crate::auth::tenant::TenantGuard;
 use crate::auth::tenant::TenantSessionAuth;
-use crate::token::send_communication;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::State;
@@ -15,13 +14,12 @@ use api_core::errors::user::UserError;
 use api_core::errors::ApiResult;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_core::utils::session::AuthSession;
-use api_core::utils::vault_wrapper::Any;
-use api_core::utils::vault_wrapper::VaultWrapper;
-use api_wire_types::CreateEntityTokenResponse;
+use api_wire_types::CreateTokenResponse;
 use api_wire_types::TriggerRequest;
 use chrono::Duration;
 use db::models::scoped_vault::ScopedVault;
 use db::models::user_timeline::UserTimeline;
+use db::models::vault::Vault;
 use db::models::workflow::Workflow;
 use db::models::workflow_request::NewWorkflowRequestArgs;
 use db::models::workflow_request::WorkflowRequest;
@@ -41,13 +39,9 @@ pub async fn post(
     fp_id: FpIdPath,
     request: web::Json<TriggerRequest>,
     auth: TenantSessionAuth,
-) -> JsonApiResponse<CreateEntityTokenResponse> {
+) -> JsonApiResponse<CreateTokenResponse> {
     let auth = auth.check_guard(TenantGuard::ManualReview)?;
-    let TriggerRequest {
-        trigger,
-        note,
-        send_link,
-    } = request.into_inner();
+    let TriggerRequest { trigger, note } = request.into_inner();
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let fp_id = fp_id.into_inner();
@@ -56,14 +50,14 @@ pub async fn post(
 
     // Generate an auth token for the user and send to their phone number on file
     let trigger_kind = (&trigger).into();
-    let (vw, token, session, wfr) = state
+    let (token, session) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv.id)?;
+            let vault = Vault::get(conn, &sv.id)?;
             validate(trigger_kind, &sv)?;
 
-            if vw.vault.kind != VaultKind::Person {
+            if vault.kind != VaultKind::Person {
                 return Err(TenantError::IncorrectVaultKindForRedoKyc.into());
             }
 
@@ -105,7 +99,7 @@ pub async fn post(
             };
             UserTimeline::create(conn, event, sv.vault_id.clone(), sv.id.clone())?;
             // Create an auth token for this workflow that we will send to the user
-            Ok((vw, token, session, wfr))
+            Ok((token, session))
         })
         .await?;
 
@@ -114,19 +108,11 @@ pub async fn post(
         .service_config
         .generate_link(LinkKind::VerifyUser, &token);
 
-    let delivery_method = if send_link {
-        let org_name = auth.tenant().name.clone();
-        send_communication(&state, vw, Some(wfr), org_name, link.clone()).await?
-    } else {
-        None
-    };
-
     let expires_at = session.expires_at;
-    let response = CreateEntityTokenResponse {
+    let response = CreateTokenResponse {
         token,
         link,
         expires_at,
-        delivery_method,
     };
     ResponseData::ok(response).json()
 }

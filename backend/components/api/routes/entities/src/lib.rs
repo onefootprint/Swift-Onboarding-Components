@@ -13,7 +13,7 @@ mod risk_signals;
 mod rule_set_result;
 mod timeline;
 mod token;
-mod trigger;
+mod triggers;
 mod vault;
 
 pub fn routes(config: &mut web::ServiceConfig) {
@@ -33,7 +33,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(timeline::get)
         .service(risk_signals::get)
         .service(match_signals::get)
-        .service(trigger::post)
+        .service(triggers::post)
         .service(risk_signals::get_detail)
         .service(risk_signals::decrypt_aml_hits)
         .service(auth_events::get)

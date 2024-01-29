@@ -1,18 +1,11 @@
 use crate::*;
 
-fn default_true() -> bool {
-    true
-}
-
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub struct TriggerRequest {
     pub trigger: TriggerInfo,
     /// Optional note with more context on what we're asking the user to do
     pub note: Option<String>,
-    /// TODO: remove this when the client starts using POST /token to send the link
-    #[serde(default = "default_true")]
-    pub send_link: bool,
 }
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
