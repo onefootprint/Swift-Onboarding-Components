@@ -6,7 +6,7 @@ use newtypes::{DataLifetimeId, PiiString, S3Url, SealedVaultBytes, VaultDataForm
 
 use crate::{models::data_lifetime::DataLifetime, DbError, DbResult};
 
-const LIFETIME_ID_CHUNK_SIZE: usize = 10_000;
+const LIFETIME_ID_CHUNK_SIZE: usize = 50_000;
 
 /// Defines common functionality required for pieces of data that belong to a user vault and
 /// have an associated DataLifetime.
@@ -30,7 +30,7 @@ pub trait HasLifetime {
             HashMap::from_iter(lifetimes.iter().map(|l| (l.id.clone(), l.vault_id.clone())));
 
         // Use the existing util to fetch all the rows for these lifetimes.
-        // Batch by chunks of 10k lifetime_ids at a time
+        // Batch by chunks of 50k lifetime_ids at a time
         let lifetime_ids: Vec<_> = lifetimes.iter().map(|l| l.id.clone()).sorted().collect();
         let results = lifetime_ids
             .into_iter()
