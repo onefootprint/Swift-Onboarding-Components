@@ -218,7 +218,10 @@ async function createCdnFrontedLoadBalancer(
       // Be careful changing this - we have to make sure it is not any higher than the application's
       // keep-alive timeout
       // https://linear.app/footprint/issue/FP-3633/diagnose-502s
-      idleTimeout: 60,
+      // And, for now, we're going to set this to be 1s less than Cloudfront's originReadTimeout
+      // so we always see a timeout from the ALB instead of from Cloudfront.
+      // Eventually, we'll have the server kill its work and return a nicer error than the ALBs
+      idleTimeout: 59,
       accessLogs: {
         bucket: g.buckets.accessLogBucketName,
         enabled: true,
