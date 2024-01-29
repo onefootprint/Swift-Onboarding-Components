@@ -174,6 +174,21 @@ describe('should pass the entire payload', () => {
     expect(result.passkeyChallenge).toEqual(data);
     expect(result.passkeyChallenge).toEqual(ctx.passkeyChallenge);
   });
+
+  it('assignVerifyToken', () => {
+    type Meta = Parameters<typeof assignVerifyToken>['2'];
+    const ctx = {} as UserMachineContext;
+    const meta = {} as Meta;
+
+    const result = assignVerifyToken(
+      ctx,
+      { type: 'setVerifyToken', payload: 'token' },
+      meta,
+    );
+
+    expect(result.verifyToken).toEqual('token');
+    expect(ctx.verifyToken).toEqual('token');
+  });
 });
 
 describe('machine assigners', () => {
@@ -212,34 +227,6 @@ describe('machine assigners', () => {
     });
     expect(result.phoneChallenge).toEqual(ctx.phoneChallenge);
     expect(result.userDashboard?.phone?.label).toEqual('1•••');
-  });
-
-  it('should assign verified token and dashboard status: assignVerifyToken', () => {
-    type Meta = Parameters<typeof assignVerifyToken>['2'];
-    const ctx = {
-      userDashboard: {
-        email: { status: 'empty' },
-        phone: { status: 'empty' },
-        passkey: { status: 'empty' },
-      },
-    } as UserMachineContext;
-    const meta = {} as Meta;
-
-    const result = assignVerifyToken(
-      ctx,
-      {
-        type: 'setVerifyToken',
-        payload: { kind: 'email', token: 'token' },
-      },
-      meta,
-    );
-
-    expect(result.verifyToken).toEqual('token');
-    expect(result.userDashboard).toEqual({
-      email: { status: 'verified' },
-      passkey: { status: 'empty' },
-      phone: { status: 'empty' },
-    });
   });
 
   it('should update dashboard entry: assignUserDashboard', () => {

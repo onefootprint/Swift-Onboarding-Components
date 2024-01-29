@@ -37,7 +37,7 @@ const UpdatePhone = ({ children, Header, onSubmit }: UpdatePhoneProps) => {
           texts={{
             cta: t('continue'),
             phoneInvalid: t('phone-step.form.input-invalid'),
-            phoneLabel: t('phone-step.form.input-label'),
+            phoneLabel: t('phone-number'),
             phoneRequired: t('phone-step.form.input-required'),
           }}
         />

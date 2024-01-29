@@ -7,7 +7,7 @@ import type {
 import { ChallengeKind } from '@onefootprint/types';
 import type { SXStyleProps } from '@onefootprint/ui';
 import { Button, Stack, Typography, useToast } from '@onefootprint/ui';
-import { noop } from 'lodash/fp';
+import noop from 'lodash/fp/noop';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

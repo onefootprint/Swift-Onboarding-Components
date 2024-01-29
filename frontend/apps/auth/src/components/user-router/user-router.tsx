@@ -71,10 +71,7 @@ const UserRouter = ({ onDone }: UserRouterProps): JSX.Element | null => {
       <ChallengeVerifyPasskey
         Header={Header}
         onChallengeVerificationSuccess={res =>
-          send({
-            type: 'setVerifyToken',
-            payload: { kind: 'passkey', token: res.authToken },
-          })
+          send({ type: 'setVerifyToken', payload: res.authToken })
         }
         onLoginChallengeSuccess={payload =>
           send({ type: 'setPasskeyChallenge', payload })

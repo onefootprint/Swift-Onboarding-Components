@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useEffectOnceStrict } from '@/src/hooks';
 import { useIdentifyVerify, useLoginChallenge } from '@/src/queries';
 import { useUserMachine } from '@/src/state';
-import type { HeaderProps, UserChallengeKind } from '@/src/types';
+import type { HeaderProps } from '@/src/types';
 import { getErrorToastVariant, shouldRequestNewChallenge } from '@/src/utils';
 
 import PinForm from '../pin-form';
@@ -30,11 +30,6 @@ type ChallengeVerifyInputProps = {
 
 const IS_TEST = typeof jest !== 'undefined';
 const SUCCESS_EVENT_DELAY_MS = IS_TEST ? 100 : 1500;
-
-const mapChallengeKind = (kind: `${ChallengeKind}`): UserChallengeKind => {
-  if (kind === 'sms') return 'phone';
-  return kind === 'biometric' ? 'passkey' : kind;
-};
 
 const ChallengeVerifyInput = ({
   challenge,
@@ -122,10 +117,7 @@ const ChallengeVerifyInput = ({
           }
 
           setTimeout(() => {
-            send({
-              type: 'setVerifyToken',
-              payload: { kind: mapChallengeKind(kind), token: res.authToken },
-            });
+            send({ type: 'setVerifyToken', payload: res.authToken });
           }, SUCCESS_EVENT_DELAY_MS);
         },
       },

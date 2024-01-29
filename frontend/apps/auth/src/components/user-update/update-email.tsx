@@ -29,7 +29,7 @@ const UpdateEmail = ({ children, Header, onSubmit }: ManagePhoneProps) => {
           texts={{
             cta: t('continue'),
             emailIsRequired: t('email-step.form.input-required'),
-            emailLabel: t('email-step.form.input-label'),
+            emailLabel: t('email'),
             emailPlaceholder: t('email-step.form.input-placeholder'),
           }}
         />

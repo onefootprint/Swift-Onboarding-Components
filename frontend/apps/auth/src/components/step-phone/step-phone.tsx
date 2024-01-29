@@ -3,6 +3,7 @@ import { useRequestErrorToast } from '@onefootprint/hooks';
 import { checkIsPhoneValid, EmailPreview, PhoneForm } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import { Stack } from '@onefootprint/ui';
+import noop from 'lodash/fp/noop';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,8 +15,6 @@ type StepPhoneProps = {
   children?: JSX.Element | null;
   Header: (props: HeaderProps) => JSX.Element;
 };
-
-const noop = () => undefined;
 
 const StepPhone = ({ children, Header }: StepPhoneProps) => {
   const [state, send] = useAuthMachine();
@@ -89,7 +88,7 @@ const StepPhone = ({ children, Header }: StepPhoneProps) => {
           texts={{
             cta: t('continue'),
             phoneInvalid: t('phone-step.form.input-invalid'),
-            phoneLabel: t('phone-step.form.input-label'),
+            phoneLabel: t('phone-number'),
             phoneRequired: t('phone-step.form.input-required'),
           }}
         />

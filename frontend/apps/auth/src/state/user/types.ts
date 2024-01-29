@@ -8,8 +8,7 @@ import type {
 import type { UserChallengeResponse } from '@/src/queries';
 import type { UserChallengeKind } from '@/src/types';
 
-type DashboardEntryStatus = 'empty' | 'set' | 'verified';
-type VerifyTokenPayload = { kind: `${UserChallengeKind}`; token: string };
+type DashboardEntryStatus = 'empty' | 'set';
 type UserDashboardPayload = {
   kind: `${UserChallengeKind}`;
   entry: DashboardEntry;
@@ -47,7 +46,7 @@ export type UserMachineEvents =
   | { type: 'setPhoneChallenge'; payload: ChallengeData }
   | { type: 'setPhoneNumber'; payload: string }
   | { type: 'setSmsReplaceChallenge'; payload: UserChallengeResponse }
-  | { type: 'setVerifyToken'; payload: VerifyTokenPayload }
+  | { type: 'setVerifyToken'; payload: string }
   | { type: 'updateEmail' }
   | { type: 'updatePasskey' }
   | { type: 'updatePhone' }

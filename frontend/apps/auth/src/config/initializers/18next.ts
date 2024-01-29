@@ -14,9 +14,7 @@ const configureI18n = () => {
       debug: false,
       defaultNS: 'common',
       ns: ['common', 'ui', 'idv'],
-      interpolation: {
-        escapeValue: false,
-      },
+      interpolation: { escapeValue: false },
       fallbackLng: 'en',
       supportedLngs: ['en', 'es'],
       backend: IS_BROWSER

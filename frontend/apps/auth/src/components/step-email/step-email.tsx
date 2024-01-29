@@ -1,6 +1,7 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import { EmailForm, LegalFooter } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
+import noop from 'lodash/fp/noop';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -12,8 +13,6 @@ type StepEmailProps = {
   children?: JSX.Element | null;
   Header: (props: HeaderProps) => JSX.Element;
 };
-
-const noop = () => undefined;
 
 const StepEmail = ({ children, Header }: StepEmailProps) => {
   const [state, send] = useAuthMachine();
@@ -68,11 +67,11 @@ const StepEmail = ({ children, Header }: StepEmailProps) => {
         texts={{
           cta: t('continue'),
           emailIsRequired: t('email-step.form.input-required'),
-          emailLabel: t('email-step.form.input-label'),
+          emailLabel: t('email'),
           emailPlaceholder: t('email-step.form.input-placeholder'),
         }}
       />
-      <LegalFooter descriptionKey="auth.email-legal-footer" />
+      <LegalFooter descriptionKey="common:email-legal-footer" />
       {children}
     </>
   );

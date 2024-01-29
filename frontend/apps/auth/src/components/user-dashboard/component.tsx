@@ -1,8 +1,12 @@
 import type { Spacings } from '@onefootprint/design-tokens';
-import { IcoEmail24, IcoFaceid16, IcoSmartphone24 } from '@onefootprint/icons';
+import {
+  IcoCheckSmall16,
+  IcoEmail24,
+  IcoFaceid16,
+  IcoSmartphone24,
+} from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Button, Shimmer, Stack, Typography } from '@onefootprint/ui';
-import anyPass from 'lodash/fp/anyPass';
 import type { ComponentProps } from 'react';
 import React from 'react';
 
@@ -16,12 +20,14 @@ type ComponentTexts = {
   edit: string;
   headerSubtitle: string;
   headerTitle: string;
+  verified: string;
 };
 
 type Entry = {
   isLoading: boolean;
+  isVerified: boolean;
   label: string;
-  status: 'empty' | 'set' | 'verified';
+  status: 'empty' | 'set';
   onClick: React.MouseEventHandler<HTMLButtonElement>;
 };
 
@@ -39,11 +45,16 @@ type ManageAccountComponentProps = {
   };
 };
 
-const isSet = (x: unknown): x is 'set' => x === 'set';
 const isEmpty = (x: unknown): x is 'empty' => x === 'empty';
-const isVerified = (x: unknown): x is 'verified' => x === 'verified';
-const isEditable = anyPass([isVerified, isSet]);
 const ButtonLoading = () => <Shimmer sx={{ width: 'auto', height: '48px' }} />;
+const Verified = ({ text }: { text: string }) => (
+  <>
+    <IcoCheckSmall16 color="quaternary" />
+    <Typography as="span" variant="label-4" color="quaternary">
+      {`${text} · `}
+    </Typography>
+  </>
+);
 
 const ManageAccountComponent = ({
   children,
@@ -69,9 +80,9 @@ const ManageAccountComponent = ({
             </Typography>
           </FlexRow>
           <FlexRow gap={2}>
+            {entryEmail.isVerified ? <Verified text={texts.verified} /> : null}
             <Typography as="span" variant="label-4" color="accent">
-              {isEmpty(entryEmail.status) ? texts.add : null}
-              {isEditable(entryEmail.status) ? texts.edit : null}
+              {isEmpty(entryEmail.status) ? texts.add : texts.edit}
             </Typography>
           </FlexRow>
         </ButtonTile>
@@ -87,13 +98,14 @@ const ManageAccountComponent = ({
             </Typography>
           </FlexRow>
           <FlexRow gap={2}>
+            {entryPhone.isVerified ? <Verified text={texts.verified} /> : null}
             <Typography as="span" variant="label-4" color="accent">
-              {isEmpty(entryPhone.status) ? texts.add : null}
-              {isEditable(entryPhone.status) ? texts.edit : null}
+              {isEmpty(entryPhone.status) ? texts.add : texts.edit}
             </Typography>
           </FlexRow>
         </ButtonTile>
       ) : null}
+
       {entryPasskey ? (
         <ButtonTile type="button" onClick={entryPasskey.onClick}>
           <FlexRow gap={3}>
@@ -104,9 +116,7 @@ const ManageAccountComponent = ({
           </FlexRow>
           <FlexRow gap={2}>
             <Typography as="span" variant="label-4" color="accent">
-              {isVerified(entryPasskey.status)
-                ? texts.deviceAdded
-                : texts.addDevice}
+              {entryPasskey.isVerified ? texts.deviceAdded : texts.addDevice}
             </Typography>
           </FlexRow>
         </ButtonTile>

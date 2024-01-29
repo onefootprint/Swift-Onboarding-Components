@@ -119,17 +119,7 @@ const assignUserFound: IdentifyUserDone = (ctx, { payload }) => {
 };
 
 const assignVerifyToken: SetVerifyToken = (ctx, { payload }) => {
-  const { token, kind } = payload;
-  const userDashboard = {
-    ...ctx.userDashboard,
-    [kind]: {
-      ...ctx.userDashboard[kind],
-      status: 'verified',
-    },
-  };
-
-  ctx.userDashboard = userDashboard;
-  ctx.verifyToken = token; // The last one overrides the previous
+  ctx.verifyToken = payload;
   return ctx;
 };
 

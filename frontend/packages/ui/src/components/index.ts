@@ -128,6 +128,7 @@ export type { TextInputProps } from './text-input';
 export { default as TextInput } from './text-input';
 export type { ThemeToggleProps } from './theme-toggle';
 export { default as ThemeToggle } from './theme-toggle';
+export type { NextToast, ToastProps } from './toast';
 export { useToast } from './toast';
 export { ToastProvider } from './toast';
 export type { ToggleProps } from './toggle';
