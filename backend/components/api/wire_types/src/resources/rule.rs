@@ -35,6 +35,5 @@ pub struct RuleEvalResult {
     pub fp_id: FpId,
     pub current_status: Option<OnboardingStatus>,
     pub historical_action_triggered: Option<RuleAction>,
-    // TODO:
-    // pub backtest_rule_result: bool,
+    pub backtest_rule_result: bool,
 }

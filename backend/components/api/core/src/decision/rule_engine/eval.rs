@@ -65,7 +65,7 @@ pub fn evaluate_rule_set<T: HasRule>(
     (rule_results, action_triggered)
 }
 
-fn evaluate_rule_expression(rule_expression: &RuleExpression, input: &[FootprintReasonCode]) -> bool {
+pub fn evaluate_rule_expression(rule_expression: &RuleExpression, input: &[FootprintReasonCode]) -> bool {
     // Conditions in a Rule are all AND'd together
     // Empty rule_expression's with no conditions shouldn't be possible (should fail validation), but should one of these sneak into existence (ie a bad manual PG fiddle) then we'd want to default to evaluate to false there, not true
     !rule_expression.0.is_empty() && rule_expression.0.iter().all(|c| evaluate_condition(c, input))

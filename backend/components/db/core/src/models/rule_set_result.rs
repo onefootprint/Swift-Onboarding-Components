@@ -1,4 +1,7 @@
+use std::collections::HashMap;
+
 use super::data_lifetime::DataLifetime;
+use super::risk_signal::RiskSignal;
 use super::rule_instance::RuleInstance;
 use super::rule_result::NewRuleResult;
 use super::rule_result::RuleResult;
@@ -8,6 +11,7 @@ use crate::PgConn;
 use crate::TxnPgConn;
 use chrono::Duration;
 use chrono::{DateTime, Utc};
+use db_schema::schema::risk_signal;
 use db_schema::schema::scoped_vault;
 use db_schema::schema::workflow;
 use db_schema::schema::{rule_set_result, rule_set_result_risk_signal_junction};
@@ -151,7 +155,7 @@ impl RuleSetResult {
         conn: &mut PgConn,
         obc_id: &ObConfigurationId,
         limit: i64,
-    ) -> DbResult<Vec<(ScopedVault, RuleSetResult)>> {
+    ) -> DbResult<Vec<(ScopedVault, RuleSetResult, Vec<RiskSignal>)>> {
         let res: Vec<(ScopedVault, RuleSetResult)> = workflow::table
             .inner_join(scoped_vault::table)
             .inner_join(rule_set_result::table)
@@ -167,6 +171,30 @@ impl RuleSetResult {
             .select((scoped_vault::all_columns, rule_set_result::all_columns))
             .limit(limit)
             .get_results(conn)?;
+
+        let risk_signals: Vec<(RuleSetResultId, RiskSignal)> = rule_set_result::table
+            .inner_join(rule_set_result_risk_signal_junction::table)
+            .inner_join(
+                risk_signal::table
+                    .on(rule_set_result_risk_signal_junction::risk_signal_id.eq(risk_signal::id)),
+            )
+            .select((rule_set_result::id, risk_signal::all_columns))
+            .get_results(conn)?;
+        let mut risk_signals: HashMap<RuleSetResultId, Vec<RiskSignal>> =
+            risk_signals
+                .into_iter()
+                .fold(HashMap::new(), |mut hm, (rsr_id, rs)| {
+                    hm.entry(rsr_id).or_default().push(rs);
+                    hm
+                });
+
+        let res = res
+            .into_iter()
+            .map(|(sv, rsr)| {
+                let rs = risk_signals.remove(&rsr.id).unwrap_or_default();
+                (sv, rsr, rs)
+            })
+            .collect();
 
         Ok(res)
     }
@@ -428,12 +456,19 @@ mod tests {
         let results = RuleSetResult::sample_for_eval(conn, &obc.id, 10).unwrap();
         assert_have_same_elements(
             vec![
-                (sv.id, rsr.id),
-                (sv2.id, rsr2b.id),
-                (sv3.id, rsr3b.id),
-                (sv4.id, rsr4a.id),
+                (sv.id, rsr.id, rs_ids(risk_signals)),
+                (sv2.id, rsr2b.id, rs_ids(risk_signals2)),
+                (sv3.id, rsr3b.id, rs_ids(risk_signals3)),
+                (sv4.id, rsr4a.id, rs_ids(risk_signals4)),
             ],
-            results.into_iter().map(|(sv, rsr)| (sv.id, rsr.id)).collect_vec(),
+            results
+                .into_iter()
+                .map(|(sv, rsr, rs)| (sv.id, rsr.id, rs_ids(rs)))
+                .collect_vec(),
         );
+    }
+
+    fn rs_ids(rs: Vec<RiskSignal>) -> Vec<RiskSignalId> {
+        rs.into_iter().map(|r| r.id).sorted().collect()
     }
 }
