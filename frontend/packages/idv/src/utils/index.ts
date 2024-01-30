@@ -5,10 +5,7 @@ export { default as checkIsSocialMediaBrowser } from './check-is-social-media-br
 export { FPCustomEvents, isCustomEvent, sendCustomEvent } from './custom-event';
 export type { BootstrapProps } from './design-system-provider';
 export { DesignSystemProvider } from './design-system-provider';
-export {
-  default as getBiometricChallengeResponse,
-  getBiometricChallengeResponseV2,
-} from './get-biometric-challenge-response';
+export { default as getBiometricChallengeResponse } from './get-biometric-challenge-response';
 export { default as getCanChallengeBiometrics } from './get-can-challenge-biometrics';
 export { default as getIdentifyBootstrapData } from './get-identify-bootstrap-data';
 export { default as getRandomID } from './get-random-id';

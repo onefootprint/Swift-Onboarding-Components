@@ -48,7 +48,6 @@ export {
   checkIsSocialMediaBrowser,
   DesignSystemProvider,
   getBiometricChallengeResponse,
-  getBiometricChallengeResponseV2,
   getCanChallengeBiometrics,
   getIdentifyBootstrapData,
   getRandomID,

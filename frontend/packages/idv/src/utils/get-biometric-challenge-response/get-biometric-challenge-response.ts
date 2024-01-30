@@ -1,46 +1,112 @@
 import type { BiometricLoginChallengeJson } from '@onefootprint/types';
 import base64url from 'base64url';
 
-const getPublicKeyCredential = async (challenge: string) => {
-  const challengeJson = JSON.parse(challenge) as BiometricLoginChallengeJson;
-  const { publicKey } = challengeJson;
-  publicKey.challenge = base64url.toBuffer(
-    publicKey.challenge as unknown as string,
-  );
-  publicKey.allowCredentials = publicKey.allowCredentials?.map(c => ({
-    ...c, // @ts-expect-error: fix-me Argument of type 'BufferSource' is not assignable to parameter of type 'string'...
-    id: base64url.toBuffer(c.id),
-  }));
-  const publicKeyCredential = (await window.navigator.credentials.get({
-    publicKey,
-  })) as PublicKeyCredential;
-  return publicKeyCredential;
+type Obj = Record<string, unknown>;
+
+const isError = (x: unknown): x is Error => x instanceof Error;
+const isObject = (x: unknown): x is Obj => typeof x === 'object' && !!x;
+const isString = (x: unknown): x is string => typeof x === 'string';
+const isWebAuthApiSupported = (): boolean =>
+  typeof PublicKeyCredential !== 'undefined' &&
+  typeof PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable ===
+    'function';
+
+const parseBiometricChallenge = (
+  str: string,
+): BiometricLoginChallengeJson | Error => {
+  try {
+    const has = Object.prototype.hasOwnProperty;
+    const parsedObj = JSON.parse(str);
+    const runTimeVerification =
+      isObject(parsedObj) &&
+      has.call(parsedObj, 'publicKey') &&
+      isObject(parsedObj.publicKey) &&
+      has.call(parsedObj.publicKey, 'allowCredentials') &&
+      has.call(parsedObj.publicKey, 'challenge');
+
+    return runTimeVerification
+      ? (parsedObj as BiometricLoginChallengeJson)
+      : new Error('Invalid biometric challenge structure');
+  } catch (err: unknown) {
+    return err instanceof Error
+      ? new Error(`Error parsing biometric challenge: ${err.message}`)
+      : new Error(`Error parsing biometric challenge`);
+  }
 };
 
-const getBiometricChallengeResponse = async (challengeJson: string) => {
-  const publicKeyCredential = await getPublicKeyCredential(challengeJson);
-  const signature = base64url.encode(
+const getPublicKeyCredential = async (
+  str: string,
+): Promise<PublicKeyCredential> => {
+  if (!isWebAuthApiSupported()) {
+    throw new Error('WebAuthn API is not fully supported in this browser.');
+  }
+
+  try {
+    const parsedChallenge = parseBiometricChallenge(str);
+    if (isError(parsedChallenge)) {
+      throw parsedChallenge;
+    }
+    const { publicKey } = parsedChallenge;
+
+    if (!isString(publicKey.challenge)) {
+      throw new Error('Invalid publicKey.challenge format');
+    }
+
+    publicKey.challenge = base64url.toBuffer(publicKey.challenge);
+
+    if (publicKey.allowCredentials) {
+      if (!Array.isArray(publicKey.allowCredentials)) {
+        throw new Error('Invalid allowCredentials format.');
+      }
+
+      publicKey.allowCredentials = publicKey.allowCredentials.map(c => ({
+        ...c,
+        id: isString(c.id) ? base64url.toBuffer(c.id) : c.id,
+      }));
+    }
+
+    const publicKeyCredential = (await window.navigator.credentials.get({
+      publicKey,
+    })) as PublicKeyCredential;
+
+    if (!publicKeyCredential) {
+      throw new Error('Failed to retrieve public key credential');
+    }
+
+    return publicKeyCredential;
+  } catch (err) {
+    throw err instanceof Error
+      ? new Error(`Error in getPublicKeyCredential: ${err.message}`)
+      : new Error('Error in getPublicKeyCredential');
+  }
+};
+
+const getBiometricChallengeResponse = async (str: string) => {
+  try {
+    const publicKeyCredential = await getPublicKeyCredential(str);
+    const { rawId, id, response } = publicKeyCredential;
     // @ts-expect-error: fix-me Property 'signature' does not exist on type 'AuthenticatorResponse'....
-    publicKeyCredential.response.signature as Buffer,
-  );
-  const authenticatorData = base64url.encode(
-    // @ts-expect-error: fix-me Property 'authenticatorData' does not exist on type 'AuthenticatorResponse'....
-    publicKeyCredential.response.authenticatorData as Buffer,
-  );
-  const clientDataJSON = base64url.encode(
-    publicKeyCredential.response.clientDataJSON as Buffer,
-  );
-  const pk = {
-    rawId: base64url.encode(publicKeyCredential.rawId as Buffer),
-    id: publicKeyCredential.id,
-    type: 'public-key',
-    response: {
-      clientDataJSON,
-      authenticatorData,
-      signature,
-    },
-  };
-  return JSON.stringify(pk);
+    const { signature, authenticatorData, clientDataJSON } = response;
+
+    const pk = {
+      id,
+      type: 'public-key',
+      // @ts-expect-error: Argument of type 'ArrayBuffer' is not assignable to parameter of type 'string | Buffer'.
+      rawId: base64url.encode(rawId),
+      response: {
+        authenticatorData: base64url.encode(authenticatorData),
+        // @ts-expect-error: Argument of type 'ArrayBuffer' is not assignable to parameter of type 'string | Buffer'.
+        clientDataJSON: base64url.encode(clientDataJSON),
+        signature: base64url.encode(signature),
+      },
+    };
+
+    return JSON.stringify(pk);
+  } catch (err) {
+    throw err instanceof Error
+      ? new Error(`Error in getBiometricChallengeResponse: ${err.message}`)
+      : new Error('Error in getBiometricChallengeResponse');
+  }
 };
 
 export default getBiometricChallengeResponse;

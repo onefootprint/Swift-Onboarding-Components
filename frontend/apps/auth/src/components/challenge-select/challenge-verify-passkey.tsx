@@ -1,5 +1,5 @@
 import { IcoFaceid24, IcoSmartphone24 } from '@onefootprint/icons';
-import { getBiometricChallengeResponseV2 } from '@onefootprint/idv';
+import { getBiometricChallengeResponse } from '@onefootprint/idv';
 import type {
   ChallengeData,
   IdentifyVerifyResponse,
@@ -54,9 +54,7 @@ const ChallengeVerifyPasskey = ({
 
     let pkResponse;
     try {
-      pkResponse = await getBiometricChallengeResponseV2(
-        biometricChallengeJson,
-      );
+      pkResponse = await getBiometricChallengeResponse(biometricChallengeJson);
     } catch (e) {
       logError('Unable to generate biometric challenge response', e);
       toast.show({
