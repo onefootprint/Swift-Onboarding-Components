@@ -7,7 +7,7 @@ use newtypes::{
 
 use crate::{
     decision,
-    errors::{onboarding::OnboardingError, ApiResult},
+    errors::{onboarding::OnboardingError, ApiResult, error_with_code::ErrorWithCode},
     utils::file_upload::FileUpload,
     State,
 };
@@ -166,7 +166,7 @@ pub async fn handle_document_upload(
 
     if id_doc.status != IdentityDocumentStatus::Pending {
         // Do not change this error - the frontend is relying upon it
-        return Err(OnboardingError::IdentityDocumentNotPending.into());
+        return Err(ErrorWithCode::IdentityDocumentNotPending.into());
     }
     // We support the flow
     let should_collect_selfie = doc_request.should_collect_selfie && !id_doc.should_skip_selfie();

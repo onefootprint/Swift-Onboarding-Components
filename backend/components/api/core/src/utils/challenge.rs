@@ -1,4 +1,4 @@
-use crate::errors::{challenge::ChallengeError, ApiError};
+use crate::errors::{error_with_code::ErrorWithCode, ApiError};
 use chrono::{DateTime, Duration, Utc};
 use crypto::aead::{AeadSealedBytes, ScopedSealingKey};
 use newtypes::{Base64Data, ChallengeToken};
@@ -33,7 +33,7 @@ impl<C: Serialize + DeserializeOwned + std::fmt::Debug> Challenge<C> {
         let unsealed: Self = key.unseal(sealed)?;
 
         if unsealed.expires_at < Utc::now() {
-            return Err(ChallengeError::ChallengeExpired.into());
+            return Err(ErrorWithCode::ChallengeExpired.into());
         }
         Ok(unsealed)
     }

@@ -108,7 +108,7 @@ def test_invalid_doc_upload(incomplete_client):
         files=multipart_file("example_txt.txt", "text/plain"),
         status_code=400,
     )
-    assert res["error"]["message"] == "Invalid file type: text/plain"
+    assert res["error"]["message"] == "Invalid file type"
 
 
 def test_valid_doc_upload(incomplete_client, sandbox_tenant):

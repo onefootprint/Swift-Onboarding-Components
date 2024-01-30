@@ -4,9 +4,7 @@ use db::{models::session::Session, DbResult, PgConn};
 use newtypes::{AuthTokenHash, HasSessionKind, SealedSessionBytes, SessionAuthToken};
 
 use crate::{
-    auth::{session::AuthSessionData, AuthError},
-    errors::ApiResult,
-    State,
+    auth::session::AuthSessionData, errors::error_with_code::ErrorWithCode, errors::ApiResult, State,
 };
 
 #[derive(Debug, Clone)]
@@ -24,11 +22,11 @@ impl AuthSession {
             .db_query(move |conn| Session::get(conn, key))
             .await?;
         let Some(session) = session else {
-            return Err(AuthError::NoSessionFound.into());
+            return Err(ErrorWithCode::NoSessionFound.into());
         };
         let data = AuthSessionData::unseal(&state.session_sealing_key, SealedSessionBytes(session.data));
         let data = if let Err(crypto::Error::Cbor(_)) = data {
-            return Err(AuthError::CouldNotParseSession.into());
+            return Err(ErrorWithCode::CouldNotParseSession.into());
         } else {
             data?
         };
@@ -38,7 +36,7 @@ impl AuthSession {
 
         // Check session expiration before returning it but after logging info
         if session.expires_at <= Utc::now() {
-            return Err(AuthError::SessionExpired.into());
+            return Err(ErrorWithCode::SessionExpired.into());
         }
 
         let session = Self {

@@ -2,7 +2,7 @@
 
 use api_core::{
     auth::{ob_config::ObConfigAuth, user::CheckedUserAuthContext},
-    errors::{challenge::ChallengeError, ApiResult},
+    errors::{error_with_code::ErrorWithCode, ApiResult},
     telemetry::RootSpan,
     utils::{
         identify::{get_user_challenge_context, UserChallengeContext},
@@ -105,7 +105,7 @@ async fn get_identify_challenge_context(
         // Identified via auth token
         (Some(auth), None) => (auth.user.clone().id, auth.scoped_user_id()),
         // Require one of user_auth or identifier
-        (None, None) | (Some(_), Some(_)) => return Err(ChallengeError::OnlyOneIdentifier.into()),
+        (None, None) | (Some(_), Some(_)) => return Err(ErrorWithCode::OnlyOneIdentifier.into()),
     };
 
     // Record some properties on the root span

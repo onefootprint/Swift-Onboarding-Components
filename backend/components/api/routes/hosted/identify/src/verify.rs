@@ -276,7 +276,7 @@ fn validate(
 ) -> Result<VaultId, ApiError> {
     let PhoneEmailChallengeState { h_code, vault_id } = challenge_state;
     if h_code != sha256(challenge_response.as_bytes()).to_vec() {
-        return Err(ChallengeError::IncorrectPin.into());
+        return Err(ErrorWithCode::IncorrectPin.into());
     };
 
     let existing_sv = if let Some(existing_su_id) = user_auth.and_then(|ua| ua.scoped_user_id()) {

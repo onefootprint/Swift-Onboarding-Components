@@ -1,4 +1,4 @@
-use crate::errors::{file_upload::FileUploadError, ApiResult};
+use crate::errors::{error_with_code::ErrorWithCode, ApiResult};
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
 use bytes::{BufMut, BytesMut};
@@ -57,44 +57,41 @@ pub async fn handle_file_upload(
     let request_content_length: usize =
         crate::utils::headers::get_required_header(CONTENT_LENGTH.as_str(), request.headers())?
             .parse()
-            .map_err(|_| FileUploadError::InvalidContentLength)?;
+            .map_err(|_| ErrorWithCode::InvalidContentLength)?;
 
     if request_content_length > max_allowed_file_size_in_bytes {
-        return Err(FileUploadError::FileTooLarge(max_allowed_file_size_in_bytes))?;
+        return Err(ErrorWithCode::FileTooLarge(max_allowed_file_size_in_bytes))?;
     }
 
     // extract the file contents from body
     let Some(item) = payload.next().await else {
-        return Err(FileUploadError::InvalidFileUploadMissing)?;
+        return Err(ErrorWithCode::InvalidFileUploadMissing)?;
     };
 
-    let mut item = item.map_err(FileUploadError::from)?;
+    let mut item = item.map_err(ErrorWithCode::from)?;
 
     let filename = item
         .content_disposition()
         .get_filename()
-        .ok_or(FileUploadError::MissingFilename)?
+        .ok_or(ErrorWithCode::MissingFilename)?
         .to_owned();
-    let mime = item
-        .content_type()
-        .ok_or(FileUploadError::MissingMimeType)?
-        .clone();
+    let mime = item.content_type().ok_or(ErrorWithCode::MissingMimeType)?.clone();
     let mime_type = mime.to_string();
 
     if let Some(allowed_mime_types) = restrict_to_mime_types {
         if !allowed_mime_types.contains(&mime) {
-            return Err(FileUploadError::InvalidMimeType(mime.to_string()).into());
+            return Err(ErrorWithCode::InvalidMimeType.into());
         }
     }
 
     let mut bytes = BytesMut::with_capacity(request_content_length);
 
     while let Some(chunk) = item.next().await {
-        let chunk = chunk.map_err(FileUploadError::from)?;
+        let chunk = chunk.map_err(ErrorWithCode::from)?;
         let chunk_size = chunk.len();
 
         if bytes.len() + chunk_size > request_content_length {
-            return Err(FileUploadError::FileTooLarge(max_allowed_file_size_in_bytes))?;
+            return Err(ErrorWithCode::FileTooLarge(max_allowed_file_size_in_bytes))?;
         }
 
         bytes.put(chunk);

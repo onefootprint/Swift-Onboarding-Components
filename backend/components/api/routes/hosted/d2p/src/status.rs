@@ -5,7 +5,7 @@ use crate::{
     utils::session::{HandoffRecord, JsonSession},
     State,
 };
-use api_core::auth::user::UserAuthGuard;
+use api_core::{auth::user::UserAuthGuard, errors::error_with_code::ErrorWithCode};
 use api_wire_types::{D2pStatusResponse, D2pUpdateStatusRequest};
 use paperclip::actix::{api_v2_operation, get, post, web, web::Json};
 
@@ -59,7 +59,7 @@ pub async fn post(
                 return Ok(());
             }
             if status.priority() <= session.data.status.priority() {
-                return Err(HandoffError::InvalidStatusTransition(status).into());
+                return Err(ErrorWithCode::InvalidStatusTransition.into());
             }
             let handoff_record = HandoffRecord {
                 status,

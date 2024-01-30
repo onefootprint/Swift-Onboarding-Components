@@ -26,9 +26,6 @@ pub enum OnboardingError {
     MissingAttributes(Csv<CollectedDataOption>),
     #[error("Onboarding is not in a terminal state")]
     NonTerminalState,
-    /// Do not change this error message - the frontend is relying upon it
-    #[error("Identity document is not pending upload")]
-    IdentityDocumentNotPending,
     #[error("Cannot create a document when no document request exists")]
     NoDocumentRequestFound,
     #[error("No playbook key provided")]
@@ -59,8 +56,6 @@ pub enum OnboardingError {
     CannotCreateFixtureResultForNonSandbox,
     #[error("User not allowed to set fixture_result=Real")]
     RealDocumentFixtureNotAllowed,
-    #[error("Cannot initiate a challenge of kind {0}")]
-    UnsupportedChallengeKind(String),
     #[error("Sandbox vaults must have a fixture result")]
     NoFixtureResultForSandboxUser,
     #[error("Workflow doesn't have an associated onboarding config")]

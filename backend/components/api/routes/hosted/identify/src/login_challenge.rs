@@ -5,7 +5,7 @@ use crate::{
 };
 use api_core::{
     auth::{ob_config::ObConfigAuth, user::UserAuthContext, Any},
-    errors::{challenge::ChallengeError, onboarding::OnboardingError, ApiError},
+    errors::{onboarding::OnboardingError, ApiError, error_with_code::ErrorWithCode},
     telemetry::RootSpan,
     types::{JsonApiResponse, ResponseData},
     utils::{
@@ -55,7 +55,7 @@ pub async fn post(
     };
     let Some(ctx) = crate::get_identify_challenge_context(&state, args).await? else {
         // The user vault doesn't exist. Just return that the user wasn't found
-        return Err(ChallengeError::LoginChallengeUserNotFound.into());
+        return Err(ErrorWithCode::LoginChallengeUserNotFound.into());
     };
     let IdentifyChallengeContext { ctx, tenant, sv: _ } = ctx;
     let UserChallengeContext {
@@ -84,7 +84,7 @@ pub async fn post(
         ck => ck,
     };
     if !available_challenge_kinds.contains(&challenge_kind) {
-        return Err(OnboardingError::UnsupportedChallengeKind(challenge_kind.to_string()).into());
+        return Err(ErrorWithCode::UnsupportedChallengeKind.into());
     }
 
     let (rx, challenge_state_data, time_before_retry_s, phone_number, biometric_challenge_json) =

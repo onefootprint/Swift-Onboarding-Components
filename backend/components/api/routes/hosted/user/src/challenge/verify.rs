@@ -6,7 +6,9 @@ use api_core::{
         user::{CheckedUserAuthContext, UserAuth, UserAuthContext, UserAuthGuard},
         IsGuardMet,
     },
-    errors::{challenge::ChallengeError, ApiResult, AssertionError, ValidationError},
+    errors::{
+        challenge::ChallengeError, error_with_code::ErrorWithCode, ApiResult, AssertionError, ValidationError,
+    },
     types::{response::ResponseData, EmptyResponse, JsonApiResponse},
     utils::{
         challenge::Challenge,
@@ -81,13 +83,13 @@ pub async fn post(
             phone_number: p,
         } => {
             if h_code != sha256(c_response.as_bytes()).to_vec() {
-                return Err(ChallengeError::IncorrectPin.into());
+                return Err(ErrorWithCode::IncorrectPin.into());
             };
             Action::replace_ci(&state, &user_auth, ContactInfoKind::Phone, p, &tenant.id).await?
         }
         RegisterChallengeData::Email { h_code, email } => {
             if h_code != sha256(c_response.as_bytes()).to_vec() {
-                return Err(ChallengeError::IncorrectPin.into());
+                return Err(ErrorWithCode::IncorrectPin.into());
             };
             Action::replace_ci(&state, &user_auth, ContactInfoKind::Email, email, &tenant.id).await?
         }

@@ -2,20 +2,20 @@ use actix_web::{
     error::{JsonPayloadError, QueryPayloadError, UrlencodedError},
     http::StatusCode,
 };
-
 use aws_sdk_pinpointsmsvoicev2::{
     error::SdkError as SmsSdkError, operation::send_text_message::SendTextMessageError,
 };
 use db::errors::DbError;
 use newtypes::{output::Csv, ContactInfoKind, DataIdentifier, ErrorMessage, FilterFunction, Uuid};
 use paperclip::actix::api_v2_errors;
+use strum::EnumMessage;
 use thiserror::Error;
 use webauthn_rs_core::error::WebauthnError;
 pub mod business;
 pub mod challenge;
 pub mod cip_error;
 pub mod enclave;
-pub mod file_upload;
+pub mod error_with_code;
 pub mod handoff;
 pub mod kms;
 pub mod onboarding;
@@ -36,7 +36,7 @@ use crate::{
 };
 use twilio::error::Error as TwilioError;
 
-use self::{challenge::ChallengeError, handoff::HandoffError};
+use self::{challenge::ChallengeError, error_with_code::ErrorWithCode, handoff::HandoffError};
 
 pub type ApiResult<T> = Result<T, ApiError>;
 
@@ -70,6 +70,8 @@ where
 
 #[derive(Debug, Error)]
 pub enum ApiErrorKind {
+    #[error("{0}")]
+    ErrorWithCode(#[from] ErrorWithCode)
     #[error("{0}")]
     AuthError(#[from] crate::auth::AuthError),
     #[error("{0}")]
@@ -162,8 +164,6 @@ pub enum ApiErrorKind {
     VaultProxyError(#[from] proxy::VaultProxyError),
     #[error("Decision error: {0}")]
     DecisionError(#[from] crate::decision::Error),
-    #[error("{0}")]
-    FileUploadError(#[from] file_upload::FileUploadError),
     #[error("Internal webhook error")]
     WebhooksError(#[from] webhooks::Error),
     #[error("MiddeskError: {0}")]
@@ -295,6 +295,7 @@ impl ApiError {
 impl actix_web::ResponseError for ApiError {
     fn status_code(&self) -> StatusCode {
         match self.0.as_ref() {
+            ApiErrorKind::ErrorWithCode(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::AuthError(_) => StatusCode::UNAUTHORIZED,
             ApiErrorKind::KmsError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::S3Error(_) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -366,7 +367,6 @@ impl actix_web::ResponseError for ApiError {
             ApiErrorKind::FeatureFlagError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::InvalidProxyBody => StatusCode::BAD_REQUEST,
             ApiErrorKind::VaultProxyError(_) => StatusCode::BAD_REQUEST,
-            ApiErrorKind::FileUploadError(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::InvalidBody(_) | ApiErrorKind::MissingRequiredHeader(_) => StatusCode::BAD_REQUEST,
             ApiErrorKind::WebhooksError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::MiddeskError(_) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -388,7 +388,18 @@ impl actix_web::ResponseError for ApiError {
         let support_id = Uuid::new_v4();
         let status_code = self.status_code().as_u16();
 
-        // in prod, omit 500 errors from the client
+        let error_code = if let ApiErrorKind::ErrorWithCode(error) = self.kind() {
+            Some(error.get_message().unwrap_or_default().to_string())
+        } else {
+            None
+        };
+
+        let message = if let ApiErrorKind::ErrorWithCode(error) = self.kind() {
+            ErrorMessage::String(error.to_string())
+        } else {
+            self.message()
+        };
+
         let message = if status_code == StatusCode::INTERNAL_SERVER_ERROR
             && crate::config::SERVICE_CONFIG.is_production()
         {
@@ -396,13 +407,14 @@ impl actix_web::ResponseError for ApiError {
             ErrorMessage::String("something went wrong".to_string())
         } else {
             tracing::info!(error=?self, support_id=support_id.to_string(), status_code, "returning api {}", status_code);
-            self.message()
+            message
         };
 
         let response = ApiResponseError {
             error: FpResponseErrorInfo {
                 status_code,
                 message,
+                error_code,
                 support_id,
             },
         };

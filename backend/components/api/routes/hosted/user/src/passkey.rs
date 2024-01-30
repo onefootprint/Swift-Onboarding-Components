@@ -1,6 +1,6 @@
 use crate::{
     auth::user::{UserAuth, UserAuthContext},
-    errors::{challenge::ChallengeError, ApiError},
+    errors::{error_with_code::ErrorWithCode, ApiError},
     types::{response::ResponseData, EmptyResponse},
     utils::{challenge::Challenge, headers::InsightHeaders},
     State,
@@ -55,7 +55,7 @@ pub async fn init_post(
             if !creds.is_empty() && !did_use_passkey {
                 // Don't allow replacing a passkey unless you logged in with a passkey.
                 // Otherwise could replace a passkey using a SIM swap
-                return Err(ChallengeError::CannotRegisterPasskey.into());
+                return Err(ErrorWithCode::CannotRegisterPasskey.into());
             }
             Ok(())
         })
@@ -123,7 +123,7 @@ pub async fn complete_post(
             if !creds.is_empty() && !did_use_passkey {
                 // Don't allow replacing a passkey unless you logged in with a passkey.
                 // Otherwise could replace a passkey using a SIM swap
-                return Err(ChallengeError::CannotRegisterPasskey.into());
+                return Err(ErrorWithCode::CannotRegisterPasskey.into());
             }
 
             let ie = CreateInsightEvent::from(insights).insert_with_conn(conn)?;

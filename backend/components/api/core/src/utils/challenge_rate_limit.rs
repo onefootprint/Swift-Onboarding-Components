@@ -1,6 +1,6 @@
 use super::session::{JsonSession, RateLimitRecord};
 use crate::{
-    errors::{challenge::ChallengeError, ApiResult},
+    errors::{error_with_code::ErrorWithCode, ApiResult},
     State,
 };
 use chrono::{Duration, Utc};
@@ -38,7 +38,7 @@ impl<'a> RateLimit<'a> {
                     if time_since_last_sent < period {
                         // num_seconds() only returns count of whole seconds, so we add one to avoid returning 0 seconds as time remaining
                         let time_remaining = (period - time_since_last_sent).num_seconds() + 1;
-                        return Err(ChallengeError::RateLimited(time_remaining).into());
+                        return Err(ErrorWithCode::RateLimited(time_remaining).into());
                     }
                 }
 
