@@ -2,6 +2,11 @@ name: Backend Build
 
 on:
   workflow_call:
+    inputs:
+      commitHash:
+        type: string
+        required: true
+
     secrets:
       AWS_REGION:
         required: true
@@ -32,8 +37,12 @@ jobs:
     steps:
       # Need to checkout before running the referenced sub-action
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.commitHash }}
       - uses: ./.github/actions/backend_extract_commit_hash
         id: constants
+        with:
+          commitHash: ${{ inputs.commitHash }}
 
   build_api:
     name: Build API server container
@@ -42,6 +51,8 @@ jobs:
     if: success()
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.commitHash }}
 
       - name: Cache docker cargo cache
         uses: actions/cache@v3
@@ -116,6 +127,8 @@ jobs:
           docker pull ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${{ needs.extract_commit.outputs.enclaveComponentVersion }} && docker tag ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${{ needs.extract_commit.outputs.enclaveComponentVersion }} enclave_proxy_pkg:${{ needs.extract_commit.outputs.enclaveComponentVersion }} || echo "Image not found"
 
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.commitHash }}
 
       - name: build enclave proxy
         working-directory: ./backend
@@ -129,7 +142,7 @@ jobs:
 
           # check cache or build
           docker inspect enclave_proxy_pkg:${componentVersion} && echo "Fetched from package cache"|| (echo "Cache miss, building..." && make build-enclave-proxy-release && docker build -t "enclave_proxy_pkg:${componentVersion}" -f enclave_proxy_package.dockerfile .)
-                  
+
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
           docker tag enclave_proxy_pkg:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${componentVersion}
           docker tag enclave_proxy_pkg:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:latest
@@ -156,6 +169,8 @@ jobs:
           docker pull ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${{ needs.extract_commit.outputs.enclaveComponentVersion }} && docker tag ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${{ needs.extract_commit.outputs.enclaveComponentVersion }} enclave_pkg:${{ needs.extract_commit.outputs.enclaveComponentVersion }} || echo "Image not found"
 
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.commitHash }}
 
       # install our signing credentials
       # build, sign, package and push the eif image

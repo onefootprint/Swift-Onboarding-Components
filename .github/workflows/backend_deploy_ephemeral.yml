@@ -57,6 +57,9 @@ jobs:
     name: build backend
     needs: [ephemeral_stack]
     uses: ./.github/workflows/backend_build.yml
+    with:
+      commitHash: ${{ github.event.pull_request.head.sha }}
+
     # don't run for dependabot changes and only run when labeled ephemeral or infra changes detected
     if: github.actor != 'dependabot[bot]' && (contains( github.event.pull_request.labels.*.name, 'FastEphemeral') || contains( github.event.pull_request.labels.*.name, 'FullEphemeral') || needs.ephemeral_stack.outputs.hasInfraChanges == 'true')
     secrets:

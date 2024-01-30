@@ -1,3 +1,4 @@
+# This appears to be unused. Can we delete it?
 name: Backend Build and Deploy Stack
 
 on:
@@ -236,7 +237,7 @@ jobs:
 
           # check cache or build
           docker inspect enclave_proxy_pkg:${componentVersion} && echo "Fetched from package cache"|| (echo "Cache miss, building..." && make build-enclave-proxy-release && docker build -t "enclave_proxy_pkg:${componentVersion}" -f enclave_proxy_package.dockerfile .)
-                  
+
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
           docker tag enclave_proxy_pkg:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:${componentVersion}
           docker tag enclave_proxy_pkg:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_proxy_pkg:latest
@@ -452,14 +453,14 @@ jobs:
               issue_number: context.issue.number,
             });
 
-            // Find any comment already made by the bot.                                                                                                    
+            // Find any comment already made by the bot.
             const botComment = comments.find(comment => comment.user.id === 41898282 && comment.body.includes('Deployed 🚀'));
             const commentBody = "**Deployed 🚀**\n\
             - URL: ${{ steps.pulumi_deploy.outputs.apiUrl }}\n\
             - Stack name: `${{ steps.pulumi_deploy.outputs.shortStackName }}`\n\
             - **api**: `${{ needs.extract_commit.outputs.apiComponentVersion }}`\n\
             - **enclave**: `${{ needs.extract_commit.outputs.enclaveComponentVersion }}`";
-                                                                  
+
             if (botComment) {
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
