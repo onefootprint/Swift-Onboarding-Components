@@ -167,11 +167,32 @@ jobs:
         working-directory: ./frontend
         run: npx audit-ci@^6 --config ./audit-ci.jsonc
 
+  bun-unit-tests:
+    needs: [files-changed]
+    if: needs.files-changed.outputs.filesChanged == 'true'
+    name: 'Unit tests'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: 1.0.23 # or "latest", "canary", 1.0.23 ,<sha>
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Bun install
+        working-directory: ./frontend
+        run: bun install
+
+      - name: Bun tests
+        working-directory: ./frontend
+        run: bun run test:ci:bun
+
   # Branch protections require this job to pass. If any of the `needs` fail, then this job will fail.
   # Add all jobs in this workflow to the `needs` here
   frontend-ci:
     runs-on: ubuntu-latest
-    needs: [files-changed, install-dependencies, lint, format, test, typecheck, audit]
+    needs: [files-changed, install-dependencies, lint, format, test, typecheck, audit, bun-unit-tests]
     if: always()
     steps:
       - name: Success
