@@ -22,6 +22,7 @@ use webauthn_rs_core::proto::{AuthenticationState, Base64UrlSafeData};
 
 #[allow(clippy::module_inception)]
 pub mod identify;
+mod kba;
 pub mod login_challenge;
 pub mod signup_challenge;
 pub mod verify;
@@ -46,6 +47,7 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(identify::post)
         .service(login_challenge::post)
         .service(signup_challenge::post)
+        .service(kba::post)
         .service(verify::post);
 }
 

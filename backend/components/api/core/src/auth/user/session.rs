@@ -9,7 +9,8 @@ use db::{
 };
 use itertools::Itertools;
 use newtypes::{
-    AuthEventKind, ObConfigurationId, ScopedVaultId, VaultId, VaultKind, WorkflowId, WorkflowRequestId,
+    AuthEventKind, DataIdentifier, ObConfigurationId, ScopedVaultId, VaultId, VaultKind, WorkflowId,
+    WorkflowRequestId,
 };
 use paperclip::actix::Apiv2Security;
 
@@ -46,6 +47,7 @@ pub struct UserSessionContext {
     pub auth_events: Vec<AssociatedAuthEvent>,
     /// When true, the auth token was initially issued as an unauthed, identified token
     pub is_from_api: bool,
+    pub kba: Vec<DataIdentifier>,
 }
 
 impl UserSessionContext {
@@ -94,6 +96,7 @@ impl UserSessionContext {
             wfr_id: new_ctx.wfr_id.or(self.wfr_id),
             is_from_api: new_ctx.is_from_api || self.is_from_api,
             is_implied_auth: new_ctx.is_implied_auth || self.is_implied_auth,
+            kba: new_ctx.kba.into_iter().chain(self.kba).unique().collect(),
         };
         let scopes = self.scopes.into_iter().chain(new_scopes).unique().collect();
         let auth_events = self.auth_events.into_iter().chain(new_auth_event).collect();
@@ -176,6 +179,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     is_from_api,
                     auth_events,
                     is_implied_auth,
+                    kba,
                 } = data;
                 let vault = Vault::get(conn, &user_vault_id)?;
                 if vault.kind != VaultKind::Person {
@@ -207,7 +211,6 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     }
                 }
 
-                // Merge auth event ids for backcompat for now
                 let data = UserSessionContext {
                     user: vault,
                     purpose,
@@ -222,6 +225,7 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     is_from_api,
                     auth_events,
                     is_implied_auth,
+                    kba,
                 };
                 Ok(ParsedUserSessionContext(data))
             }

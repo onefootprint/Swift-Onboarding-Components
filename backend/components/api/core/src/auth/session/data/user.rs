@@ -1,6 +1,7 @@
 use newtypes::AuthEventId;
 use newtypes::AuthMethodKind;
 use newtypes::ContactInfoId;
+use newtypes::DataIdentifier;
 use newtypes::IdentifyScope;
 use newtypes::ObConfigurationId;
 use newtypes::ScopedVaultId;
@@ -49,6 +50,9 @@ pub struct UserSession {
     #[serde(default)]
     #[allow(unused)]
     pub is_implied_auth: bool,
+    /// The list of DataIdentifiers whose knowledge has been proven during this session
+    #[serde(default)]
+    pub kba: Vec<DataIdentifier>,
 }
 
 #[derive(Default)]
@@ -62,6 +66,7 @@ pub struct NewUserSessionContext {
     // TODO rm
     pub is_from_api: bool,
     pub is_implied_auth: bool,
+    pub kba: Vec<DataIdentifier>,
 }
 
 /// Enumerate all the possible places in which a user auth token can be created.
@@ -170,6 +175,7 @@ impl UserSession {
             wfr_id,
             is_from_api,
             is_implied_auth,
+            kba,
         } = context;
         let session = AuthSessionData::User(Self {
             user_vault_id,
@@ -183,6 +189,7 @@ impl UserSession {
             is_from_api,
             auth_events,
             is_implied_auth,
+            kba,
         });
         Ok(session)
     }

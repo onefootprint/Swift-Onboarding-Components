@@ -244,3 +244,47 @@ def test_modern_flow(sandbox_user, sandbox_tenant, must_collect_data):
     # Finish onboarding onto this playbook using the auth token issued from the new flow
     bifrost = BifrostClient.raw_auth(obc, auth_token, sandbox_id)
     bifrost.run().fp_id
+
+
+@pytest.mark.parametrize(
+    "kba_data,expected_error",
+    [
+        ({"id.email": "sandbox@onefootprint.com"}, "KBA not allowed for id.email"),
+        ({"id.ssn4": "1234"}, "KBA not allowed for id.ssn4"),
+        (
+            {"id.phone_number": "Not a phone number"},
+            {"id.phone_number": "not a number"},
+        ),
+        (
+            {"id.phone_number": "+15555550111"},
+            "Incorrect KBA response for id.phone_number",
+        ),
+        ({"id.phone_number": FIXTURE_PHONE_NUMBER}, None),
+        # We should also support cleaning the user input phone number
+        ({"id.phone_number": "+1 (555) 555-0100"}, None),
+    ],
+)
+def test_kba(sandbox_user, sandbox_tenant, kba_data, expected_error):
+    """
+    Test performing KBA on an identified token
+    """
+    obc = sandbox_tenant.default_ob_config
+    sandbox_id = sandbox_user.client.sandbox_id
+    phone_number = sandbox_user.client.data["id.phone_number"]
+
+    # Identify the user, and get a token in exchange
+    sandbox_id_h = SandboxId(sandbox_id)
+    data = dict(identifier=dict(phone_number=phone_number), scope="onboarding")
+    body = post("/hosted/identify", data, sandbox_id_h, obc.key)
+    token = FpAuth(body["token"])
+
+    # Run KBA
+    expected_status = 400 if expected_error else 200
+    body = post("hosted/identify/kba", kba_data, token, status_code=expected_status)
+    if expected_error:
+        assert body["error"]["message"] == expected_error
+    else:
+        # Make sure the new token issued still has no scopes
+        new_token = FpAuth(body["token"])
+        body = get("/hosted/user/token", None, new_token)
+        assert not body["scopes"]

@@ -190,6 +190,42 @@
                 ]
             }
         },
+        "/hosted/identify/kba": {
+            "post": {
+                "tags": [
+                    "Identify",
+                    "Hosted"
+                ],
+                "description": "Respond to a KBA challenge to prove knowledge of existing data in the vault.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RawDataRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/KbaResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "User Token": []
+                    }
+                ]
+            }
+        },
         "/hosted/identify/login_challenge": {
             "post": {
                 "tags": [
@@ -3677,6 +3713,18 @@
                 },
                 "required": [
                     "auth_token"
+                ]
+            },
+            "KbaResponse": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "description": "An cryptographically generated auth token to authenticate a session",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "token"
                 ]
             },
             "LogBody": {
