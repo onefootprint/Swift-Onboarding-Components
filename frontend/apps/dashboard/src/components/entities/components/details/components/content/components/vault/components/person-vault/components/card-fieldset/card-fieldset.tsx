@@ -31,6 +31,8 @@ const Fieldset = ({
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.fieldset',
   });
+  const { t: tAll } = useTranslation('common');
+
   const decrypt = useDecryptControls();
   const decryptForm = useDecryptForm();
 
@@ -73,7 +75,7 @@ const Fieldset = ({
           key={di}
           di={di}
           entity={entity}
-          renderLabel={() => t(tKeyWithoutAlias as ParseKeys<'common'>)}
+          renderLabel={() => tAll(tKeyWithoutAlias as ParseKeys<'common'>)}
         />
       );
     }
@@ -82,7 +84,7 @@ const Fieldset = ({
         key={di}
         di={di}
         entity={entity}
-        renderLabel={() => t(tKeyWithoutAlias as ParseKeys<'common'>)}
+        renderLabel={() => tAll(tKeyWithoutAlias as ParseKeys<'common'>)}
       />
     );
   };
