@@ -14,12 +14,18 @@ pub enum IdentifyId {
 #[serde(rename_all = "snake_case")]
 pub struct IdentifyRequest {
     pub identifier: Option<IdentifyId>,
+    /// Determines which scopes the issued auth token will have. Request the correct scopes for
+    /// your use case in order to get the least permissions required
+    #[openapi(required)]
+    // TODO make required once all clients are updated
+    pub scope: Option<IdentifyScope>,
 }
 
 #[derive(Apiv2Schema, serde::Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub struct IdentifyResponse {
     pub user_found: bool,
+    pub token: Option<SessionAuthToken>,
     pub available_challenge_kinds: Option<Vec<ChallengeKind>>,
     pub auth_methods: Vec<IdentifyAuthMethod>,
     /// signals that one or more biometric credentials

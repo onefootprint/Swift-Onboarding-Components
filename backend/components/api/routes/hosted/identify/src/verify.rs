@@ -23,7 +23,7 @@ use api_core::utils::session::AuthSession;
 use api_core::utils::vault_wrapper::Person;
 use api_core::utils::vault_wrapper::VaultWrapper;
 use api_wire_types::{IdentifyVerifyRequest, IdentifyVerifyResponse};
-use chrono::{Duration, Utc};
+use chrono::Utc;
 use crypto::sha256;
 use db::errors::OptionalExtension;
 use db::models::auth_event::NewAuthEvent;
@@ -90,7 +90,7 @@ pub async fn post(
             };
 
             // Determine which scopes to issue on the auth token
-            let (context, duration, su) = match scope {
+            let (context, su) = match scope {
                 IdentifyScope::Auth => {
                     let obc = ob_pk_auth.as_ref().map(|a| a.ob_config());
                     let su = if let Some(obc) = obc {
@@ -107,13 +107,12 @@ pub async fn post(
                         su_from_token.clone()
                     };
 
-                    let duration = Duration::hours(1);
                     let context = NewUserSessionContext {
                         su_id: Some(su.id.clone()),
                         obc_id: obc.map(|obc| obc.id.clone()),
                         ..Default::default()
                     };
-                    (context, duration, Some(su))
+                    (context, Some(su))
                 }
                 IdentifyScope::Onboarding => {
                     let bo = ob_pk_auth.as_ref().and_then(|a| a.business_owner());
@@ -141,7 +140,6 @@ pub async fn post(
                     };
                     // TODO we should migrate the BO tokens to use these new un-authed, identified tokens
                     let sb_id = bo.map(|bo| get_scoped_business_id(conn, &su, bo)).transpose()?;
-                    let duration = Duration::hours(1); // Onboarding is shorter
                     let context = NewUserSessionContext {
                         su_id: Some(su.id.clone()),
                         sb_id,
@@ -149,12 +147,11 @@ pub async fn post(
                         // wf_id will be added later in POST /hosted/onboarding
                         ..Default::default()
                     };
-                    (context, duration, Some(su))
+                    (context, Some(su))
                 }
                 IdentifyScope::My1fp => {
-                    let duration = Duration::hours(8); // Issue my1fp token for a long time
                     let context = NewUserSessionContext::default();
-                    (context, duration, None)
+                    (context, None)
                 }
             };
 
@@ -196,6 +193,7 @@ pub async fn post(
                 };
                 UserSession::make(args)?
             };
+            let duration = scope.token_ttl();
             let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
 
             Ok(token)

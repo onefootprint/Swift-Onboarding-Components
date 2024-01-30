@@ -1,3 +1,4 @@
+use chrono::Duration;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use strum_macros::{Display, EnumString};
@@ -25,6 +26,16 @@ pub enum IdentifyScope {
     My1fp,
     Onboarding,
     Auth,
+}
+
+impl IdentifyScope {
+    pub fn token_ttl(&self) -> Duration {
+        match self {
+            IdentifyScope::My1fp => Duration::hours(8),
+            IdentifyScope::Auth => Duration::hours(1),
+            IdentifyScope::Onboarding => Duration::hours(1),
+        }
+    }
 }
 
 crate::util::impl_enum_string_diesel!(IdentifyScope);

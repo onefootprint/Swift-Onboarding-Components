@@ -3559,8 +3559,20 @@
                 "properties": {
                     "identifier": {
                         "type": "string"
+                    },
+                    "scope": {
+                        "description": "Determines which scopes the issued auth token will have. Request the correct scopes for\n your use case in order to get the least permissions required",
+                        "type": "string",
+                        "enum": [
+                            "my1fp",
+                            "onboarding",
+                            "auth"
+                        ]
                     }
-                }
+                },
+                "required": [
+                    "scope"
+                ]
             },
             "IdentifyResponse": {
                 "type": "object",
@@ -3612,6 +3624,10 @@
                     },
                     "scrubbed_phone": {
                         "description": "Populated only when identifying a user via auth token",
+                        "type": "string"
+                    },
+                    "token": {
+                        "description": "An cryptographically generated auth token to authenticate a session",
                         "type": "string"
                     },
                     "user_found": {

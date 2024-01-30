@@ -1,7 +1,7 @@
 import pytest
 from tests.bifrost_client import BifrostClient
 from tests.constants import FIXTURE_PHONE_NUMBER, FIXTURE_EMAIL
-from tests.utils import _gen_random_sandbox_id, create_ob_config, post
+from tests.utils import _gen_random_sandbox_id, create_ob_config, post, get
 from tests.identify_client import IdentifyClient
 from tests.headers import SandboxId, FpAuth, IsLive
 
@@ -209,3 +209,38 @@ def test_identify_with_non_portable_api_vault(
     data = dict(fields=["id.first_name"], reason="flerp")
     body = post(f"users/{fp_id}/vault/decrypt", data, tenant.s_sk)
     assert body["id.first_name"] == "From Tenant C"
+
+
+def test_modern_flow(sandbox_user, sandbox_tenant, must_collect_data):
+    """
+    The more modern version if the identify flow will issue a token after POST /hosted/identify.
+    Many of our clients are using the legacy version. When they migrate, we will update the rest
+    of the tests.
+    """
+    obc = create_ob_config(
+        sandbox_tenant, "flerp", must_collect_data, must_collect_data
+    )
+
+    sandbox_id = sandbox_user.client.sandbox_id
+    phone_number = sandbox_user.client.data["id.phone_number"]
+
+    # Identify the user, and get a token in exchange
+    sandbox_id_h = SandboxId(sandbox_id)
+    data = dict(identifier=dict(phone_number=phone_number), scope="onboarding")
+    body = post("/hosted/identify", data, sandbox_id_h, obc.key)
+    token = FpAuth(body["token"])
+    assert next(i["is_verified"] for i in body["auth_methods"] if i["kind"] == "phone")
+    assert not next(
+        i["is_verified"] for i in body["auth_methods"] if i["kind"] == "email"
+    )
+
+    # Make sure the token issued has no scopes
+    body = get("/hosted/user/token", None, token)
+    assert not body["scopes"]
+
+    # Now, we don't use the phone as an identifier - we just use the token that was given to us
+    auth_token = IdentifyClient.from_token(token).step_up(assert_had_no_scopes=True)
+
+    # Finish onboarding onto this playbook using the auth token issued from the new flow
+    bifrost = BifrostClient.raw_auth(obc, auth_token, sandbox_id)
+    bifrost.run().fp_id

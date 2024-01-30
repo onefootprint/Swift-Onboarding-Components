@@ -70,13 +70,19 @@ pub enum VaultIdentifier {
     AuthenticatedId(CheckedUserAuthContext),
 }
 
+pub struct IdentifyChallengeContext {
+    pub ctx: UserChallengeContext,
+    pub tenant: Option<Tenant>,
+    pub sv: Option<ScopedVault>,
+}
+
 #[tracing::instrument(skip(state, root_span))]
 async fn get_identify_challenge_context(
     state: &State,
     identifier: VaultIdentifier,
     obc: Option<ObConfigAuth>,
     root_span: RootSpan,
-) -> ApiResult<Option<(UserChallengeContext, Option<Tenant>)>> {
+) -> ApiResult<Option<IdentifyChallengeContext>> {
     // Look up existing user vault by identifier
     let t_id = obc.as_ref().map(|obc| &obc.tenant().id);
     let (existing_user_id, sv_id) = match identifier {
@@ -121,6 +127,8 @@ async fn get_identify_challenge_context(
             Ok((tenant, sv))
         })
         .await??;
-    let result = get_user_challenge_context(state, existing_user_id, sv.map(|sv| sv.id)).await?;
-    Ok(Some((result, tenant)))
+    let sv_id = sv.as_ref().map(|sv| sv.id.clone());
+    let ctx = get_user_challenge_context(state, existing_user_id, sv_id).await?;
+    let ctx = IdentifyChallengeContext { ctx, tenant, sv };
+    Ok(Some(ctx))
 }

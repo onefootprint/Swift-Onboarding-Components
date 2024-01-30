@@ -1,6 +1,7 @@
 use super::BiometricChallengeState;
 use crate::ChallengeData;
 use crate::ChallengeState;
+use crate::IdentifyChallengeContext;
 use crate::State;
 use crate::UserChallengeContext;
 use crate::VaultIdentifier;
@@ -66,12 +67,13 @@ pub async fn post(
     let twilio_client = &state.sms_client;
 
     // Look up existing user vault by identifier
-    let Some((ctx, tenant)) =
+    let Some(ctx) =
         crate::get_identify_challenge_context(&state, identifier, ob_context, root_span.clone()).await?
     else {
         // The user vault doesn't exist. Just return that the user wasn't found
         return Err(ChallengeError::LoginChallengeUserNotFound.into());
     };
+    let IdentifyChallengeContext { ctx, tenant, sv: _ } = ctx;
     let UserChallengeContext {
         vw,
         webauthn_creds: creds,
