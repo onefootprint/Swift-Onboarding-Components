@@ -1496,17 +1496,16 @@
             "user-created-by": "User created by "
           },
           "auth-method-updated": {
-            "replace": "Replaced the {{kind}} used as a Footprint login method",
-            "add_primary": "New {{kind}} added as a Footprint login method",
+            "replace": "Replaced <b>{{kind}}</b> used as a Footprint login method",
+            "add_primary": "New <b>{{kind}}</b> added as a Footprint login method",
             "method": {
-              "phone": "phone",
+              "phone": "phone number",
               "email": "email",
               "passkey": "passkey"
             }
           },
           "workflow-triggered-event": {
             "requested-user-to": "requested user to {{action}}",
-            "with-note": " with a note",
             "actions": {
               "id_document": "upload ID photo",
               "redo_kyc": "revise KYC data",

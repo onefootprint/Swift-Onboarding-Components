@@ -1,4 +1,5 @@
 import type {
+  ActorApiKey,
   Annotation,
   CollectedDataEventData,
   CombinedWatchlistChecksEvent,
@@ -18,8 +19,7 @@ import type {
   LabelAddedEventData,
   WorkflowStartedEventData,
 } from '@onefootprint/types/src/data/timeline';
-import { Typography } from '@onefootprint/ui';
-import type { ParseKeys } from 'i18next';
+import { LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TimelineItem } from 'src/components/timeline';
@@ -31,6 +31,7 @@ import {
 } from './components/abandoned-event';
 import Actor from './components/actor';
 import AnnotationNote from './components/annotation-note';
+import AuthMethodUpdatedEventHeader from './components/auth-method-updated-event';
 import DataCollectedEventHeader from './components/data-collected-event';
 import IdDocUploadedEventHeader from './components/id-doc-uploaded-event';
 import LabelAddedEventHeader from './components/label-added-event';
@@ -140,10 +141,9 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
         time,
         headerComponent: (
           <>
-            <Typography variant="label-3">
+            <Typography variant="body-3" color="tertiary">
               {t('timeline.free-form-note-event.note-added-by')}
             </Typography>
-            &nbsp;
             <Actor actor={eventData.source} />
           </>
         ),
@@ -155,11 +155,12 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
         time,
         headerComponent: (
           <>
-            <Typography variant="body-3">
+            <Typography variant="body-3" color="tertiary">
               {t('timeline.vault-created-event.user-created-by')}
             </Typography>
-            &nbsp;
-            <Actor actor={eventData.actor} />
+            <LinkButton href="/api-keys" size="compact">
+              {(eventData.actor as ActorApiKey).name}
+            </LinkButton>
           </>
         ),
       });
@@ -182,15 +183,7 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       const eventData = data as AuthMethodUpdatedData;
       items.push({
         time,
-        headerComponent: (
-          <Typography variant="body-3">
-            {t(`timeline.auth-method-updated.${eventData.action}`, {
-              kind: t(
-                `timeline.auth-method-updated.method.${eventData.kind}` as ParseKeys<'common'>,
-              ) as string,
-            })}
-          </Typography>
-        ),
+        headerComponent: <AuthMethodUpdatedEventHeader data={eventData} />,
       });
     }
   });

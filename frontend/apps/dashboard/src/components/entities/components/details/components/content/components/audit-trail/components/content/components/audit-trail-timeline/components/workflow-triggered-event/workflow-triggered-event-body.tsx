@@ -1,13 +1,15 @@
 import { IcoInfo16 } from '@onefootprint/icons';
-import {
-  TokenKind,
-  type WorkflowTriggeredEventData,
+import type {
+  Annotation,
+  WorkflowTriggeredEventData,
 } from '@onefootprint/types';
-import { Box, LinkButton, Stack, Tooltip, Typography } from '@onefootprint/ui';
+import { TokenKind } from '@onefootprint/types';
+import { LinkButton, Stack, Tooltip, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import useGenerateTokenRequest from '../../../../../../../vault/components/vault-actions/hooks/use-generate-token';
+import AnnotationNote from '../annotation-note';
 import EventBodyEntry from '../event-body-entry';
 
 type WorkflowTriggeredEventBodyProps = {
@@ -23,13 +25,14 @@ const WorkflowTriggeredEventBody = ({
   data,
   entityId,
 }: WorkflowTriggeredEventBodyProps) => {
-  const generateTokenMutation = useGenerateTokenRequest();
-  const [confirmationTooltipMessage, setConfirmationTooltipMessage] = useState<
-    string | null
-  >(null);
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.audit-trail.timeline.workflow-triggered-event',
   });
+  const generateTokenMutation = useGenerateTokenRequest();
+
+  const [confirmationTooltipMessage, setConfirmationTooltipMessage] = useState<
+    string | null
+  >(null);
   const shouldShowCopyButton = data.request?.isDeactivated === false;
 
   const clearTooltipTimeout = () => {
@@ -75,25 +78,19 @@ const WorkflowTriggeredEventBody = ({
   };
 
   return (
-    <Stack gap={3} direction="column">
+    <Stack direction="column">
       {data.note && (
-        <EventBodyEntry
-          testID="workflow-triggered-event-body-note"
-          iconComponent={null}
-          content={
-            <Box
-              backgroundColor="secondary"
-              borderRadius="default"
-              paddingLeft={3}
-              paddingRight={3}
-              paddingTop={2}
-              paddingBottom={2}
-            >
-              <Typography variant="body-3" color="secondary">
-                {`"${data.note}"`}
-              </Typography>
-            </Box>
+        <AnnotationNote
+          annotation={
+            {
+              id: '',
+              note: data.note,
+              isPinned: false,
+              source: data.actor,
+              timestamp: '',
+            } as Annotation
           }
+          hidePinToggle
         />
       )}
       <EventBodyEntry
@@ -101,7 +98,7 @@ const WorkflowTriggeredEventBody = ({
         testID="workflow-triggered-event-body"
         content={
           <Stack gap={2}>
-            <Typography variant="body-3" as="span" sx={{ marginRight: 1 }}>
+            <Typography variant="body-3" as="span">
               {t('link-sent')}
             </Typography>
             {shouldShowCopyButton && (
@@ -109,8 +106,8 @@ const WorkflowTriggeredEventBody = ({
                 <Stack
                   align="center"
                   justify="center"
-                  marginLeft={2}
-                  marginRight={2}
+                  marginLeft={1}
+                  marginRight={1}
                 >
                   ·
                 </Stack>

@@ -102,12 +102,7 @@ describe('<AuditTrailTimeline />', () => {
         screen.getByText('Piip Penguin (piip@onefootprint.com)'),
       ).toBeInTheDocument();
       expect(
-        screen.getByText('requested user to upload ID photo with a note'),
-      ).toBeInTheDocument();
-
-      const note = screen.getByTestId('workflow-triggered-event-body-note');
-      expect(
-        within(note).getByText('"Hello today, please upload your flerpderp"'),
+        screen.getByText('requested user to upload ID photo'),
       ).toBeInTheDocument();
 
       const body = screen.getByTestId('workflow-triggered-event-body');

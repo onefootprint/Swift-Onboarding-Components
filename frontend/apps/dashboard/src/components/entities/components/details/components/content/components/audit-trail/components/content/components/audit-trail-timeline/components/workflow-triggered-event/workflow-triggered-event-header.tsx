@@ -21,11 +21,10 @@ const WorkflowTriggeredEventHeader = ({
   return (
     <>
       <Actor actor={data.actor} />
-      <Typography variant="body-3">
+      <Typography variant="body-3" color="tertiary" sx={{ marginLeft: 2 }}>
         {t('requested-user-to', {
           action,
         })}
-        {data.note && t('with-note')}
       </Typography>
     </>
   );

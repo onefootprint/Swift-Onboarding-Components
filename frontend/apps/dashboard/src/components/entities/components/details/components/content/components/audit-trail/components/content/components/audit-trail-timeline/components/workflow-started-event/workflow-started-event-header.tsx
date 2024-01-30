@@ -22,14 +22,16 @@ const WorkflowStartedEventHeader = ({
   if (data.kind === WorkflowStartedEventKind.playbook) {
     return (
       <>
-        <Typography variant="body-3">{t('started-onboarding-onto')}</Typography>
+        <Typography variant="body-3" color="tertiary">
+          {t('started-onboarding-onto')}
+        </Typography>
         <PlaybookLink playbook={data.playbook} />
       </>
     );
   }
   if (data.kind === WorkflowStartedEventKind.document) {
     return (
-      <Typography variant="body-3">
+      <Typography variant="body-3" color="tertiary">
         {t('started-uploading-document')}
       </Typography>
     );
