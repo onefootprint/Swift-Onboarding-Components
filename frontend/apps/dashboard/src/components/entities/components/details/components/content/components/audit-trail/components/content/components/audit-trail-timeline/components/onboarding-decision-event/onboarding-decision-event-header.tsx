@@ -6,6 +6,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Actor from '../actor';
+import PlaybookLink from '../playbook-link';
 import Details from './components/details';
 
 type OnboardingDecisionEventHeaderProps = {
@@ -19,7 +20,7 @@ const OnboardingDecisionEventHeader = ({
     keyPrefix: 'pages.entity.audit-trail.timeline.onboarding-decision-event',
   });
   const {
-    decision: { source, status },
+    decision: { source, status, obConfiguration: playbook },
   } = data;
   const isVerified = status === DecisionStatus.pass;
   const color = isVerified ? 'success' : 'error';
@@ -30,13 +31,23 @@ const OnboardingDecisionEventHeader = ({
     source.kind === ActorKind.footprint;
   let text;
   if (isFootprintActor) {
-    text = isVerified ? t('verified-by') : t('could-not-be-verified-by');
+    text = (
+      <>
+        {isVerified ? t('verified-by') : t('not-verified-by')}
+        &nbsp;
+        <PlaybookLink playbook={playbook} />
+      </>
+    );
   } else {
     const decision = t(`decision-status.${status}` as ParseKeys<'common'>);
-    text = t('org-overwrite.title', { decision });
+    text = (
+      <>
+        {t('org-overwrite.title', { decision })}
+        &nbsp;
+        <Actor actor={source} />
+      </>
+    );
   }
-
-  const showDetails = !isVerified && source.kind === ActorKind.footprint;
 
   return (
     <Stack direction="row" gap={2}>
@@ -46,10 +57,8 @@ const OnboardingDecisionEventHeader = ({
         testID="onboarding-decision-event-header"
       >
         {text}
-        &nbsp;
-        <Actor actor={source} />
       </Typography>
-      {showDetails && <Details />}
+      {isFootprintActor && <Details />}
     </Stack>
   );
 };

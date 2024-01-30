@@ -1,7 +1,8 @@
 import type { LivenessEventData } from '@onefootprint/types';
+import { Typography } from '@onefootprint/ui';
+import capitalize from 'lodash/capitalize';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import createStringList from 'src/utils/create-string-list';
 
 import EventBodyEntry from '../event-body-entry';
 
@@ -18,20 +19,50 @@ const LivenessEventBody = ({ data }: LivenessEventBodyProps) => {
     attributes,
   } = data;
   const { issuers, device, os } = attributes ?? {};
-  const attestations =
-    issuers?.map(issuer => issuer.toUpperCase()).join(' & ') ?? '';
 
   return (
     <div data-test-id="liveness-event-body" data-private>
-      {attestations && (
-        <EventBodyEntry content={t('attested-by', { attestations })} />
+      {issuers && (
+        <EventBodyEntry
+          content={
+            <>
+              {t('attested-by')}
+              {issuers?.map((issuer, i) => (
+                <>
+                  <Typography variant="label-3" sx={{ marginX: 2 }}>
+                    {capitalize(issuer)}
+                  </Typography>
+                  {i === issuers.length - 1 ? '' : ' and '}
+                </>
+              ))}
+            </>
+          }
+        />
       )}
       {device && (
         <EventBodyEntry
-          content={createStringList([device, os ?? ''], ', ', ', ')}
+          content={
+            <>
+              {t('device-os')}
+              <Typography variant="label-3" sx={{ marginLeft: 2 }}>
+                {`${device} (${os ?? ''})`}
+              </Typography>
+            </>
+          }
         />
       )}
-      {ipAddress && <EventBodyEntry content={t('ip-address', { ipAddress })} />}
+      {ipAddress && (
+        <EventBodyEntry
+          content={
+            <>
+              {t('ip-address')}
+              <Typography variant="label-3" sx={{ marginLeft: 2 }}>
+                {ipAddress}
+              </Typography>
+            </>
+          }
+        />
+      )}
     </div>
   );
 };

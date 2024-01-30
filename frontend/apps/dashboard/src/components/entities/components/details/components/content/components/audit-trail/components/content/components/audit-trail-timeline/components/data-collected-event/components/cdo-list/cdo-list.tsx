@@ -6,16 +6,14 @@ import {
   CollectedKycDataOption,
   SupportedIdDocTypes,
 } from '@onefootprint/types';
-import { Tag, Typography } from '@onefootprint/ui';
+import { Typography } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import getCdos from './utils/get-cdos';
 
-type CdoTagListProps = {
-  label?: string;
-  testID?: string;
+type CdoListProps = {
   cdos: (CollectedDataOption | string)[];
   optionalCdos?: (CollectedDataOption | string)[];
   disableSort?: boolean;
@@ -50,16 +48,12 @@ const tagOrder: (CollectedDataOption | SupportedIdDocTypes | 'selfie')[] = [
   'selfie',
 ];
 
-const CdoTagList = ({
-  label,
-  testID,
+const CdoList = ({
   cdos,
-  // TODO: This is temporaly and not ideal, I'll refactor this component
-  // https://linear.app/footprint/issue/FP-5714/refactor-cdo-tag-list-components
   optionalCdos = [],
   disableSort,
   singleDocument,
-}: CdoTagListProps) => {
+}: CdoListProps) => {
   const { t } = useTranslation('common', { keyPrefix: 'cdo' });
   const allCdos = getCdos(cdos, !!singleDocument);
   const optionalCdosList = getCdos(optionalCdos, !!singleDocument);
@@ -78,25 +72,7 @@ const CdoTagList = ({
         attributeLabels.indexOf(a) - attributeLabels.indexOf(b),
     );
 
-  return (
-    <>
-      {label && (
-        <Typography
-          variant="label-4"
-          color="secondary"
-          sx={{ marginRight: 2, alignItems: 'center', display: 'flex' }}
-          data-testid={testID}
-        >
-          {label}
-        </Typography>
-      )}
-      {tagLabels.map((tag: string) => (
-        <Tag role="listitem" aria-label={tag} key={tag} data-testid={testID}>
-          {tag}
-        </Tag>
-      ))}
-    </>
-  );
+  return <Typography variant="label-3">{tagLabels.join(', ')}</Typography>;
 };
 
-export default CdoTagList;
+export default CdoList;

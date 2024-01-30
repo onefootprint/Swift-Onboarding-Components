@@ -1357,8 +1357,9 @@
           "liveness-event": {
             "success-title": "Liveness check succeeded",
             "skipped-title": "Liveness check skipped",
-            "attested-by": "Attested by {{attestations}}",
-            "ip-address": "{{ipAddress}} (IP Address)"
+            "attested-by": "Attested by ",
+            "device-os": "Device & OS: ",
+            "ip-address": "IP address: "
           },
           "id-doc-uploaded-event": {
             "title": {
@@ -1379,12 +1380,12 @@
             "title": "Collected",
             "title-prefill": "Prefilled",
             "title-from-other-org": "Collected (from other companies) ",
-            "title-edited": " edited"
+            "title-edited": " edited",
+            "end-prefill": "from user's existing data in Footprint"
           },
           "onboarding-decision-event": {
-            "verified-by": "Verified by",
-            "not-verified-by": "Verified by",
-            "could-not-be-verified-by": "Could not be verified by",
+            "verified-by": "Successfully completed",
+            "not-verified-by": "Did not complete",
             "verified": "Verified",
             "not-verified": "Failed",
             "onboarded-onto": "Onboarded onto",
@@ -1395,7 +1396,7 @@
             },
             "with": " with ",
             "org-overwrite": {
-              "title": "Marked as {{decision}} by",
+              "title": "Manually reviewed and marked as {{decision}} by",
               "see-details": "See details",
               "drawer": {
                 "title": "Review details",

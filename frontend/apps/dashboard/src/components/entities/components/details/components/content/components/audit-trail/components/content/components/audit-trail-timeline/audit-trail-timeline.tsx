@@ -1,11 +1,3 @@
-import {
-  IcoDownload16,
-  IcoFileText16,
-  IcoInfo16,
-  IcoLock16,
-  IcoWarning16,
-  IcoWriting16,
-} from '@onefootprint/icons';
 import type {
   Annotation,
   CollectedDataEventData,
@@ -39,29 +31,20 @@ import {
 } from './components/abandoned-event';
 import Actor from './components/actor';
 import AnnotationNote from './components/annotation-note';
-import {
-  DataCollectedEventHeader,
-  DataCollectedEventIcon,
-} from './components/data-collected-event';
-import {
-  IdDocUploadedEventHeader,
-  IdDocUploadedEventIcon,
-} from './components/id-doc-uploaded-event';
+import DataCollectedEventHeader from './components/data-collected-event';
+import IdDocUploadedEventHeader from './components/id-doc-uploaded-event';
 import LabelAddedEventHeader from './components/label-added-event';
 import {
   LivenessEventBody,
   LivenessEventHeader,
-  LivenessEventIcon,
 } from './components/liveness-event';
 import {
   OnboardingDecisionEventBody,
   OnboardingDecisionEventHeader,
-  OnboardingDecisionEventIcon,
 } from './components/onboarding-decision-event';
 import {
   WatchlistCheckEventBody,
   WatchlistCheckEventHeader,
-  WatchlistCheckEventIcon,
 } from './components/watchlist-check-event';
 import WorkflowStartedEventHeader from './components/workflow-started-event';
 import {
@@ -84,12 +67,19 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
 
   const items: TimelineItem[] = [];
   if (entity.status === EntityStatus.incomplete) {
-    // Prepend a custom timeline item for incomplete users with no timestamp
-    items.push({
-      iconComponent: <IcoWarning16 />,
-      headerComponent: <AbandonedEventHeader entity={entity} />,
-      bodyComponent: <AbandonedEventBody />,
-    });
+    // Prepend a custom timeline item for incomplete users
+    if (mergedTimeline.length) {
+      items.push({
+        time: mergedTimeline[0].time,
+        headerComponent: <AbandonedEventHeader entity={entity} />,
+        bodyComponent: <AbandonedEventBody />,
+      });
+    } else {
+      items.push({
+        headerComponent: <AbandonedEventHeader entity={entity} />,
+        bodyComponent: <AbandonedEventBody />,
+      });
+    }
   }
   mergedTimeline.forEach((event: AuditTrailTimelineEvent) => {
     const {
@@ -101,7 +91,6 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       const eventData = data as LivenessEventData;
       items.push({
         time,
-        iconComponent: <LivenessEventIcon data={eventData} />,
         headerComponent: <LivenessEventHeader data={eventData} />,
         bodyComponent: <LivenessEventBody data={eventData} />,
       });
@@ -109,7 +98,6 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       const eventData = data as LabelAddedEventData;
       items.push({
         time,
-        iconComponent: <IcoInfo16 />,
         headerComponent: <LabelAddedEventHeader data={eventData} />,
       });
     } else if (kind === TimelineEventKind.dataCollected) {
@@ -117,7 +105,6 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       if (eventData.attributes.length) {
         items.push({
           time,
-          iconComponent: <DataCollectedEventIcon data={eventData} />,
           headerComponent: <DataCollectedEventHeader data={eventData} />,
         });
       }
@@ -125,14 +112,12 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       const eventData = data as IdDocUploadedEventData;
       items.push({
         time,
-        iconComponent: <IdDocUploadedEventIcon data={eventData} />,
         headerComponent: <IdDocUploadedEventHeader data={eventData} />,
       });
     } else if (kind === TimelineEventKind.onboardingDecision) {
       const eventData = data as OnboardingDecisionEventData;
       items.push({
         time,
-        iconComponent: <OnboardingDecisionEventIcon data={eventData} />,
         headerComponent: <OnboardingDecisionEventHeader data={eventData} />,
         bodyComponent: <OnboardingDecisionEventBody data={eventData} />,
       });
@@ -144,7 +129,6 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
         .latestWatchlistEvent?.data as WatchlistCheckEventData;
       items.push({
         time,
-        iconComponent: <WatchlistCheckEventIcon />,
         headerComponent: <WatchlistCheckEventHeader data={eventData} />,
         bodyComponent: (
           <WatchlistCheckEventBody data={latestWatchlistEventData} />
@@ -154,7 +138,6 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       const eventData = data as Annotation;
       items.push({
         time,
-        iconComponent: <IcoFileText16 />,
         headerComponent: (
           <>
             <Typography variant="label-3">
@@ -170,7 +153,6 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       const eventData = data as VaultCreatedEventData;
       items.push({
         time,
-        iconComponent: <IcoDownload16 />,
         headerComponent: (
           <>
             <Typography variant="body-3">
@@ -185,7 +167,6 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       const eventData = data as WorkflowTriggeredEventData;
       items.push({
         time,
-        iconComponent: <IcoWriting16 />,
         headerComponent: <WorkflowTriggeredEventHeader data={eventData} />,
         bodyComponent: (
           <WorkflowTriggeredEventBody data={eventData} entityId={entity.id} />
@@ -195,14 +176,12 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       const eventData = data as WorkflowStartedEventData;
       items.push({
         time,
-        iconComponent: <IcoWriting16 />,
         headerComponent: <WorkflowStartedEventHeader data={eventData} />,
       });
     } else if (kind === TimelineEventKind.authMethodUpdated) {
       const eventData = data as AuthMethodUpdatedData;
       items.push({
         time,
-        iconComponent: <IcoLock16 />,
         headerComponent: (
           <Typography variant="body-3">
             {t(`timeline.auth-method-updated.${eventData.action}`, {

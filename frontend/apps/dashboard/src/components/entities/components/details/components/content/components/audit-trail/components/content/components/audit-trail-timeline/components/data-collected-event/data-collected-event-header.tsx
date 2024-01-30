@@ -3,9 +3,9 @@ import type { CollectedDataEventData } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import CdoTagList from 'src/components/cdo-tag-list';
 
 import Actor from '../actor';
+import CdoList from './components/cdo-list';
 
 type DataCollectedEventHeaderProps = {
   data: CollectedDataEventData;
@@ -17,24 +17,29 @@ const DataCollectedEventHeader = ({ data }: DataCollectedEventHeaderProps) => {
   });
   const { attributes } = data;
 
-  let title = <>{t('title')}</>;
-  if (data.isPrefill) {
-    title = <>{t('title-prefill')}</>;
-  } else if (data.actor) {
+  let title = (
+    <TertiaryColor>
+      {data.isPrefill ? t('title-prefill') : t('title')}
+    </TertiaryColor>
+  );
+  if (data.actor) {
     title = (
       <>
         <Actor actor={data.actor} />
-        {t('title-edited')}
+        <TertiaryColor>{t('title-edited')}</TertiaryColor>
       </>
     );
   }
 
   return (
     <Container data-testid="data-collected-event-header">
-      <Typography variant="label-3" color="primary" sx={{ marginRight: 1 }}>
-        {title}
-      </Typography>
-      <CdoTagList cdos={attributes} />
+      <Typography variant="body-3">{title}</Typography>
+      <CdoList cdos={attributes} />
+      {data.isPrefill && (
+        <Typography variant="body-3" color="tertiary">
+          {t('end-prefill')}
+        </Typography>
+      )}
     </Container>
   );
 };
@@ -47,6 +52,12 @@ const Container = styled.div`
     align-items: center;
     flex-wrap: wrap;
     gap: ${theme.spacing[2]};
+  `}
+`;
+
+const TertiaryColor = styled.span`
+  ${({ theme }) => css`
+    color: ${theme.color.tertiary};
   `}
 `;
 

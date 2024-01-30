@@ -1,3 +1,4 @@
+import { IcoDotSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
   Box,
@@ -61,18 +62,16 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
                 data-dashed={hasDashedBorder}
                 last={last}
               />
-              {iconComponent && (
-                <Icon
-                  align="center"
-                  justify="center"
-                  paddingTop={4}
-                  paddingBottom={4}
-                  backgroundColor="primary"
-                  minHeight="40px"
-                >
-                  {iconComponent}
-                </Icon>
-              )}
+              <Icon
+                align="center"
+                justify="center"
+                paddingTop={4}
+                paddingBottom={4}
+                backgroundColor="primary"
+                minHeight="40px"
+              >
+                {iconComponent ?? <IcoDotSmall16 />}
+              </Icon>
               <Content direction="column">
                 <Header
                   align="center"

@@ -1,8 +1,8 @@
 import type { Color } from '@onefootprint/design-tokens';
 import type { Icon } from '@onefootprint/icons';
-import { IcoCheck16 } from '@onefootprint/icons';
+import { IcoDotSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Stack } from '@onefootprint/ui';
+import { createFontStyles, Stack } from '@onefootprint/ui';
 import React from 'react';
 
 type EventBodyEntryProps = {
@@ -16,8 +16,8 @@ type EventBodyEntryProps = {
 const EventBodyEntry = ({
   content,
   testID,
-  iconComponent: IconComponent = IcoCheck16,
-  iconColor = 'neutral',
+  iconComponent: IconComponent = IcoDotSmall16,
+  iconColor = 'tertiary',
   lineHeight = 'large',
 }: EventBodyEntryProps) => (
   <Stack align="flex-start" justify="flex-start">
@@ -56,6 +56,8 @@ const Content = styled.div`
     align-items: center;
     justify-content: flex-start;
     margin-left: ${theme.spacing[3]};
+    ${createFontStyles('body-3')};
+    color: ${theme.color.tertiary};
 
     & > * {
       display: flex;

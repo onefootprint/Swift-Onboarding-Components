@@ -34,7 +34,7 @@ const Details = () => {
   return (
     <>
       <Stack align="center" justify="center" gap={2}>
-        <Stack align="center" justify="center" marginLeft={2} marginRight={2}>
+        <Stack align="center" justify="center" marginLeft={1} marginRight={1}>
           ·
         </Stack>
         <LinkButton
