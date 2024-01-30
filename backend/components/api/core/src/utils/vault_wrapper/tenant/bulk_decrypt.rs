@@ -44,6 +44,7 @@ pub enum DecryptAccessEventInfo {
 
 pub type DecryptedData = HashMap<EnclaveDecryptOperation, PiiJsonValue>;
 
+#[tracing::instrument(skip_all)]
 pub async fn bulk_decrypt<'a, TKey, T>(
     state: &State,
     requests: HashMap<TKey, BulkDecryptReq<'a, T>>,

@@ -98,6 +98,12 @@ def test_auth_methods(user_with_token):
     assert not next(i["is_verified"] for i in body if i["kind"] == "email")
     assert next(i["is_verified"] for i in body if i["kind"] == "phone")
 
+    body = post("hosted/identify", dict(identifier=None), auth_token)
+    auth_methods = body["auth_methods"]
+    assert next(i["is_verified"] for i in auth_methods if i["kind"] == "phone")
+    assert not next(i["is_verified"] for i in auth_methods if i["kind"] == "email")
+    assert next(i["is_verified"] for i in auth_methods if i["kind"] == "phone")
+
 
 @pytest.mark.parametrize(
     "challenge,di",

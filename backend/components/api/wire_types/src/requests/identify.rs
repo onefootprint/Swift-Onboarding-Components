@@ -2,7 +2,7 @@ use newtypes::email::Email;
 
 use crate::*;
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+#[derive(Debug, Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 /// An identifier for the identify flow that will uniquely identify a user
 pub enum IdentifyId {
@@ -10,17 +10,18 @@ pub enum IdentifyId {
     PhoneNumber(PhoneNumber),
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+#[derive(Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub struct IdentifyRequest {
     pub identifier: Option<IdentifyId>,
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, Default)]
+#[derive(Apiv2Schema, serde::Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub struct IdentifyResponse {
     pub user_found: bool,
     pub available_challenge_kinds: Option<Vec<ChallengeKind>>,
+    pub auth_methods: Vec<IdentifyAuthMethod>,
     /// signals that one or more biometric credentials
     /// support syncing and may be available to use on desktop/other devices
     pub has_syncable_pass_key: bool,
@@ -31,7 +32,13 @@ pub struct IdentifyResponse {
     pub scrubbed_email: Option<PiiString>,
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
+#[derive(Apiv2Schema, serde::Serialize)]
+pub struct IdentifyAuthMethod {
+    pub kind: AuthMethodKind,
+    pub is_verified: bool,
+}
+
+#[derive(Apiv2Schema, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
 pub struct UserChallengeData {
     pub challenge_kind: ChallengeKind,
@@ -42,31 +49,31 @@ pub struct UserChallengeData {
     pub time_before_retry_s: i64,
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+#[derive(Apiv2Schema, serde::Deserialize)]
 pub struct LoginChallengeRequest {
     pub identifier: Option<IdentifyId>,
     pub preferred_challenge_kind: ChallengeKind,
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
+#[derive(Apiv2Schema, serde::Serialize)]
 pub struct LoginChallengeResponse {
     pub challenge_data: UserChallengeData,
     pub error: Option<String>,
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+#[derive(Apiv2Schema, serde::Deserialize)]
 pub struct SignupChallengeRequest {
     pub phone_number: Option<PhoneNumber>,
     pub email: Option<Email>,
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
+#[derive(Apiv2Schema, serde::Serialize)]
 pub struct SignupChallengeResponse {
     pub challenge_data: UserChallengeData,
     pub error: Option<String>,
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+#[derive(Apiv2Schema, serde::Deserialize)]
 pub struct IdentifyVerifyRequest {
     /// Opaque challenge state token
     pub challenge_token: ChallengeToken,
@@ -76,7 +83,7 @@ pub struct IdentifyVerifyRequest {
     pub scope: IdentifyScope,
 }
 
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
+#[derive(Apiv2Schema, serde::Serialize)]
 pub struct IdentifyVerifyResponse {
     pub auth_token: SessionAuthToken,
 }

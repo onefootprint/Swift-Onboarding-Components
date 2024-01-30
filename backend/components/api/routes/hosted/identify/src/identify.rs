@@ -76,13 +76,23 @@ pub async fn post(
         webauthn_creds,
         available_challenge_kinds,
         is_vault_unverified,
+        auth_methods,
         ..
     } = ctx;
+
+    let auth_methods = auth_methods
+        .into_iter()
+        .map(|m| api_wire_types::IdentifyAuthMethod {
+            kind: m.kind,
+            is_verified: m.is_verified,
+        })
+        .collect();
 
     let has_syncable_pass_key = webauthn_creds.iter().any(|cred| cred.backup_state);
     let response = IdentifyResponse {
         is_unverified: is_vault_unverified,
         user_found: true,
+        auth_methods,
         available_challenge_kinds: Some(available_challenge_kinds),
         has_syncable_pass_key,
         scrubbed_phone,
