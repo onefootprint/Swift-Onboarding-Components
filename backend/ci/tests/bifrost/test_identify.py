@@ -243,7 +243,7 @@ def test_modern_flow(sandbox_user, sandbox_tenant, must_collect_data):
 
     # Finish onboarding onto this playbook using the auth token issued from the new flow
     bifrost = BifrostClient.raw_auth(obc, auth_token, sandbox_id)
-    bifrost.run().fp_id
+    bifrost.run()
 
 
 @pytest.mark.parametrize(

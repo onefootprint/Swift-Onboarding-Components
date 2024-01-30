@@ -2,7 +2,7 @@
 
 use api_core::{
     auth::{ob_config::ObConfigAuth, user::CheckedUserAuthContext},
-    errors::ApiResult,
+    errors::{challenge::ChallengeError, ApiResult},
     telemetry::RootSpan,
     utils::{
         identify::{get_user_challenge_context, UserChallengeContext},
@@ -65,11 +65,12 @@ pub enum ChallengeData {
     Email(PhoneEmailChallengeState),
 }
 
-#[allow(clippy::large_enum_variant)]
-#[derive(Debug)]
-pub enum VaultIdentifier {
-    IdentifyId(IdentifyId, Option<SandboxId>),
-    AuthenticatedId(CheckedUserAuthContext),
+pub struct GetIdentifyChallengeArgs {
+    pub user_auth: Option<CheckedUserAuthContext>,
+    pub identifier: Option<IdentifyId>,
+    pub sandbox_id: Option<SandboxId>,
+    pub obc: Option<ObConfigAuth>,
+    pub root_span: RootSpan,
 }
 
 pub struct IdentifyChallengeContext {
@@ -78,23 +79,33 @@ pub struct IdentifyChallengeContext {
     pub sv: Option<ScopedVault>,
 }
 
-#[tracing::instrument(skip(state, root_span))]
+#[tracing::instrument(skip_all)]
 async fn get_identify_challenge_context(
     state: &State,
-    identifier: VaultIdentifier,
-    obc: Option<ObConfigAuth>,
-    root_span: RootSpan,
+    args: GetIdentifyChallengeArgs,
 ) -> ApiResult<Option<IdentifyChallengeContext>> {
+    let GetIdentifyChallengeArgs {
+        user_auth,
+        identifier,
+        sandbox_id,
+        obc,
+        root_span,
+    } = args;
+
     // Look up existing user vault by identifier
     let t_id = obc.as_ref().map(|obc| &obc.tenant().id);
-    let (existing_user_id, sv_id) = match identifier {
-        VaultIdentifier::IdentifyId(id, sandbox_id) => {
+    let (existing_user_id, sv_id) = match (user_auth.as_ref(), identifier) {
+        // Identified via phone or email
+        (None, Some(id)) => {
             let Some(existing) = state.find_vault(id, sandbox_id, t_id).await? else {
                 return Ok(None);
             };
             existing
         }
-        VaultIdentifier::AuthenticatedId(auth) => (auth.user.clone().id, auth.scoped_user_id()),
+        // Identified via auth token
+        (Some(auth), None) => (auth.user.clone().id, auth.scoped_user_id()),
+        // Require one of user_auth or identifier
+        (None, None) | (Some(_), Some(_)) => return Err(ChallengeError::OnlyOneIdentifier.into()),
     };
 
     // Record some properties on the root span

@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::{IdentifyChallengeContext, UserChallengeContext, VaultIdentifier};
+use crate::{GetIdentifyChallengeArgs, IdentifyChallengeContext, UserChallengeContext};
 
 use api_core::{
     auth::{
@@ -9,7 +9,7 @@ use api_core::{
         user::UserAuthContext,
         Any,
     },
-    errors::{challenge::ChallengeError, ApiResult},
+    errors::ApiResult,
     telemetry::RootSpan,
     types::{JsonApiResponse, ResponseData},
     utils::{headers::SandboxId, session::AuthSession},
@@ -41,17 +41,15 @@ pub async fn post(
     let provided_token = user_auth.as_ref().map(|ua| ua.auth_token.clone());
     let is_from_api = user_auth.as_ref().is_some_and(|ua| ua.purpose.is_from_api());
 
-    // Require one of user_auth or identifier
-    let identifier = match (user_auth, identifier) {
-        (Some(user_auth), None) => VaultIdentifier::AuthenticatedId(user_auth),
-        (None, Some(id)) => VaultIdentifier::IdentifyId(id, sandbox_id.0),
-        (None, None) | (Some(_), Some(_)) => return Err(ChallengeError::OnlyOneIdentifier.into()),
-    };
-
     // Look up existing user vault by identifier
-    let Some(ctx) =
-        crate::get_identify_challenge_context(&state, identifier, ob_context.clone(), root_span).await?
-    else {
+    let args = GetIdentifyChallengeArgs {
+        user_auth,
+        identifier,
+        sandbox_id: sandbox_id.0,
+        obc: ob_context.clone(),
+        root_span,
+    };
+    let Some(ctx) = crate::get_identify_challenge_context(&state, args).await? else {
         // The user vault doesn't exist. Just return that the user wasn't found
         return ResponseData::ok(IdentifyResponse::default()).json();
     };

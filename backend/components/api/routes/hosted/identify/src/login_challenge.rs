@@ -1,10 +1,10 @@
 use super::BiometricChallengeState;
 use crate::ChallengeData;
 use crate::ChallengeState;
+use crate::GetIdentifyChallengeArgs;
 use crate::IdentifyChallengeContext;
 use crate::State;
 use crate::UserChallengeContext;
-use crate::VaultIdentifier;
 use api_core::auth::ob_config::ObConfigAuth;
 use api_core::auth::user::UserAuthContext;
 use api_core::auth::Any;
@@ -52,24 +52,17 @@ pub async fn post(
         identifier,
         preferred_challenge_kind,
     } = request.into_inner();
-
-    // Require one of user_auth or identifier
-    let identifier = match (user_auth, identifier) {
-        (Some(user_auth), None) => {
-            let user_auth = user_auth.check_guard(Any)?;
-            VaultIdentifier::AuthenticatedId(user_auth)
-        }
-        (None, Some(id)) => VaultIdentifier::IdentifyId(id, sandbox_id.0),
-        (None, None) | (Some(_), Some(_)) => return Err(ChallengeError::OnlyOneIdentifier.into()),
-    };
-
-    // Fall back to SMS if the user requested webauthn but doesn't have any creds
-    let twilio_client = &state.sms_client;
+    let user_auth = user_auth.map(|ua| ua.check_guard(Any)).transpose()?;
 
     // Look up existing user vault by identifier
-    let Some(ctx) =
-        crate::get_identify_challenge_context(&state, identifier, ob_context, root_span.clone()).await?
-    else {
+    let args = GetIdentifyChallengeArgs {
+        user_auth,
+        identifier,
+        sandbox_id: sandbox_id.0,
+        obc: ob_context.clone(),
+        root_span: root_span.clone(),
+    };
+    let Some(ctx) = crate::get_identify_challenge_context(&state, args).await? else {
         // The user vault doesn't exist. Just return that the user wasn't found
         return Err(ChallengeError::LoginChallengeUserNotFound.into());
     };
@@ -110,7 +103,8 @@ pub async fn post(
             ChallengeKind::Sms => {
                 let phone_number = vw.get_decrypted_phone(&state).await?;
                 let t = tenant.as_ref();
-                let (rx, challenge_state, time_before_retry_s) = twilio_client
+                let (rx, challenge_state, time_before_retry_s) = state
+                    .sms_client
                     .send_challenge_non_blocking(&state, t, &phone_number, vault_id, sandbox_id)
                     .await?;
                 let challenge_data = ChallengeData::Sms(challenge_state);
