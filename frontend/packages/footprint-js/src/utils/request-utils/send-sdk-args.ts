@@ -7,53 +7,41 @@ import type {
   VerifyDataProps,
 } from '../../types/components';
 import { ComponentKind } from '../../types/components';
-import type { SdkKind } from './constants';
+import { isAuthUpdateLoginMethods } from '../type-guards';
 import {
   API_BASE_URL,
   SDK_NAME,
   SDK_VERSION,
+  SdkKind,
   SdkKindByComponentKind,
 } from './constants';
 import transformKeys from './transform-keys';
 
 const NUM_RETRIES = 3;
 
+type SendSdkArgsResponse = { token: string; expires_at: string };
 type SendSdkArgsRequest =
-  | {
-      kind: SdkKind.VerifyV1;
-      data: VerifyDataProps;
-    }
-  | {
-      kind: SdkKind.AuthV1;
-      data: AuthDataProps;
-    }
-  | {
-      kind: SdkKind.FormV1;
-      data: FormDataProps;
-    }
-  | {
-      kind: SdkKind.RenderV1;
-      data: RenderDataProps;
-    }
-  | {
-      kind: SdkKind.VerifyButtonV1;
-      data: VerifyButtonDataProps;
-    };
+  | { kind: SdkKind.AuthV1; data: AuthDataProps }
+  | { kind: SdkKind.FormV1; data: FormDataProps }
+  | { kind: SdkKind.RenderV1; data: RenderDataProps }
+  | { kind: SdkKind.UpdateAuthMethodsV1; data: { authToken: string } }
+  | { kind: SdkKind.VerifyButtonV1; data: VerifyButtonDataProps }
+  | { kind: SdkKind.VerifyV1; data: VerifyDataProps };
 
-type SendSdkArgsResponse = {
-  token: string;
-  expires_at: string;
-};
-
-const getSdkArgsDataPayload = (
-  props: Props,
-):
-  | VerifyDataProps
+type ArgsDataPayload =
   | AuthDataProps
   | FormDataProps
   | RenderDataProps
   | VerifyButtonDataProps
-  | undefined => {
+  | VerifyDataProps
+  | undefined;
+
+const getSdkKind = (props: Props): SdkKind =>
+  isAuthUpdateLoginMethods(props)
+    ? SdkKind.UpdateAuthMethodsV1
+    : SdkKindByComponentKind[props.kind];
+
+const getSdkArgsDataPayload = (props: Props): ArgsDataPayload => {
   const { kind } = props;
 
   if (kind === ComponentKind.Verify) {
@@ -66,12 +54,20 @@ const getSdkArgsDataPayload = (
     } as VerifyDataProps;
   }
   if (kind === ComponentKind.Auth) {
-    return {
-      publicKey: props.publicKey,
-      userData: props.userData,
-      options: props.options,
-      l10n: props.l10n,
-    } as AuthDataProps;
+    return isAuthUpdateLoginMethods(props)
+      ? {
+          authToken: props.authToken,
+          updateLoginMethods: props.updateLoginMethods,
+          userData: props.userData,
+          options: props.options,
+          l10n: props.l10n,
+        }
+      : {
+          publicKey: props.publicKey,
+          userData: props.userData,
+          options: props.options,
+          l10n: props.l10n,
+        };
   }
   if (kind === ComponentKind.Form) {
     return {
@@ -132,11 +128,11 @@ const sendSdkArgs = async (props: Props): Promise<string | undefined> => {
   if (!data) {
     return undefined;
   }
-  const kind = SdkKindByComponentKind[props.kind];
+
   const result = await sendSdkArgsRecursive(
     {
       data: transformKeys(data),
-      kind,
+      kind: getSdkKind(props),
     },
     NUM_RETRIES,
   );

@@ -142,13 +142,13 @@ const initIframe = (rawProps: Props): Iframe => {
     isRendered = true;
     setLoading(container, true);
 
-    const token = await sendSdkArgs(props);
-    if (!token) {
+    const sdkArgsToken = await sendSdkArgs(props);
+    if (!sdkArgsToken) {
       handleError('Unable to get SDK args token.', true);
       return;
     }
 
-    const url = getURL(props, token || '');
+    const url = getURL(props, sdkArgsToken || '');
     try {
       parentApi = await new Postmate({
         classListArray: [
@@ -161,9 +161,10 @@ const initIframe = (rawProps: Props): Iframe => {
         allow:
           'otp-credentials; publickey-credentials-get *; camera *; clipboard-write;',
         model: {
+          authToken: props.authToken,
           initId,
-          sdkVersion: version || '',
           sdkUrl: getWindowUrl(),
+          sdkVersion: version || '',
         },
       });
     } catch (e) {

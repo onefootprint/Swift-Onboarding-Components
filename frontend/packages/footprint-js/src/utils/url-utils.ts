@@ -2,10 +2,11 @@ import type { Props } from '../types/components';
 import { ComponentKind } from '../types/components';
 import { getEncodedAppearance } from './appearance-utils';
 import { getDefaultVariantForKind } from './prop-utils';
-
-const isAuth = (x: unknown) => x === ComponentKind.Auth;
-const isVerify = (x: unknown) => x === ComponentKind.Verify;
-const isValidString = (x: unknown) => typeof x === 'string' && x.length > 0;
+import {
+  isAuthOrVerify,
+  isAuthUpdateLoginMethods,
+  isValidString,
+} from './type-guards';
 
 export const getWindowUrl = (): string =>
   typeof window !== 'undefined'
@@ -36,14 +37,16 @@ const getURL = (props: Props, token: string): string => {
       url = process.env.BIFROST_URL;
       break;
     case ComponentKind.Auth:
-      url = process.env.AUTH_URL;
+      url = isAuthUpdateLoginMethods(props)
+        ? `${process.env.AUTH_URL}/user`
+        : process.env.AUTH_URL;
       break;
     default:
       url = process.env.COMPONENTS_URL;
   }
 
   if (isValidString(url)) {
-    return isVerify(kind) || isAuth(kind)
+    return isAuthOrVerify(kind)
       ? `${url}?${getSearchParams(props, token)}`.trim()
       : `${url}/${kind}?${getSearchParams(props, token)}`.trim();
   }

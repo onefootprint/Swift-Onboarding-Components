@@ -136,18 +136,27 @@ export type FormDataProps = Pick<
   'authToken' | 'options' | 'title' | 'l10n'
 >;
 
-export type AuthProps = PropsBase & {
+type AuthPropsBase = PropsBase & {
   kind: ComponentKind.Auth;
   onCancel?: () => void;
   onClose?: () => void;
   onComplete?: (validationToken: string) => void;
   options?: Pick<Options, 'showLogo'>;
-  publicKey: string;
   userData?: Pick<UserData, 'id.email' | 'id.phone_number'>;
   variant?: 'modal' | 'drawer';
 };
 
+export type AuthProps = AuthPropsBase & {
+  publicKey?: string;
+  authToken?: string;
+  updateLoginMethods?: true;
+};
 export type AuthDataProps = Pick<
   AuthProps,
-  'publicKey' | 'userData' | 'options' | 'l10n'
+  | 'authToken'
+  | 'updateLoginMethods'
+  | 'publicKey'
+  | 'userData'
+  | 'l10n'
+  | 'options'
 >;
