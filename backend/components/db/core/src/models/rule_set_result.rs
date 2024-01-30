@@ -149,7 +149,7 @@ impl RuleSetResult {
     /// Queries a sample of rule_set_results for use in a backtest
     /// Takes the first rule_set_result (ie if 2 exist because step-up occured) from the latest
     /// workflow (that is complete/has a rule_set_result and part of the passed in playbook) per vault
-    /// Takes up to `limit` rows from the past 4 weeks
+    /// Takes up to `limit` rows from the past 8 weeks
     #[tracing::instrument("RuleSetResult::sample_for_eval", skip_all)]
     pub fn sample_for_eval(
         conn: &mut PgConn,
@@ -161,7 +161,7 @@ impl RuleSetResult {
             .inner_join(rule_set_result::table)
             .filter(workflow::ob_configuration_id.eq(obc_id))
             .filter(not(workflow::completed_at.is_null()))
-            .filter(workflow::completed_at.gt(Utc::now() - Duration::weeks(4)))
+            .filter(workflow::completed_at.gt(Utc::now() - Duration::weeks(8)))
             .distinct_on(workflow::scoped_vault_id)
             .order((
                 workflow::scoped_vault_id,

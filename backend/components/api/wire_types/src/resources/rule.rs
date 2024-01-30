@@ -42,7 +42,7 @@ pub struct RuleEvalResult {
     pub backtest_rule_result: bool,
 }
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema, PartialEq, Eq)]
 pub struct RuleEvalStats {
     pub total: usize,
     pub counts: Counts,
@@ -50,7 +50,7 @@ pub struct RuleEvalStats {
     pub counts_by_historical_action_triggered: HashMap<RuleResultRuleAction, Counts>,
 }
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema, PartialEq, Eq)]
 pub struct Counts {
     pub triggered: usize,
     pub not_triggered: usize,

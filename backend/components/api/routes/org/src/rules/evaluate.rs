@@ -87,17 +87,110 @@ where
     results
         .iter()
         .map(|r| (key_fn(r), r.backtest_rule_result))
-        .group_by(|(s, _)| s.clone())
+        .into_group_map()
         .into_iter()
-        .map(|(s, group)| {
-            let mut cnts = group.map(|(_, r)| r).counts();
+        .map(|(k, bt_results)| {
+            let (triggered, not_triggered): (Vec<_>, Vec<_>) = bt_results.into_iter().partition(|r| *r);
+            let triggered_cnt = triggered.len();
+            let not_triggered_cnt = not_triggered.len();
             (
-                s.clone(),
+                k.clone(),
                 Counts {
-                    triggered: cnts.remove(&true).unwrap_or(0),
-                    not_triggered: cnts.remove(&false).unwrap_or(0),
+                    triggered: triggered_cnt,
+                    not_triggered: not_triggered_cnt,
                 },
             )
         })
         .collect::<HashMap<_, Counts>>()
+}
+
+#[cfg(test)]
+mod tests {
+    use newtypes::{FpId, RuleAction};
+
+    use super::*;
+
+    #[test]
+    fn test_get_stats() {
+        let results = vec![
+            (Some(OnboardingStatus::Pass), Some(RuleAction::Fail), true),
+            (Some(OnboardingStatus::Pass), Some(RuleAction::Fail), false),
+            (Some(OnboardingStatus::Fail), Some(RuleAction::Fail), true),
+            (Some(OnboardingStatus::Fail), Some(RuleAction::Fail), false),
+            (Some(OnboardingStatus::Pass), Some(RuleAction::StepUp), false),
+            (Some(OnboardingStatus::Pass), Some(RuleAction::StepUp), false),
+            (None, Some(RuleAction::StepUp), false),
+            (None, Some(RuleAction::StepUp), false),
+            (Some(OnboardingStatus::Pass), None, true),
+            (Some(OnboardingStatus::Pass), None, true),
+        ]
+        .into_iter()
+        .map(make_rule_eval_result)
+        .collect_vec();
+        let stats = get_stats(&results);
+        let expected_stats = RuleEvalStats {
+            total: 10,
+            counts: Counts {
+                triggered: 4,
+                not_triggered: 6,
+            },
+            counts_by_current_status: HashMap::from_iter([
+                (
+                    OnboardingStatus::Pass,
+                    Counts {
+                        triggered: 3,
+                        not_triggered: 3,
+                    },
+                ),
+                (
+                    OnboardingStatus::Fail,
+                    Counts {
+                        triggered: 1,
+                        not_triggered: 1,
+                    },
+                ),
+                (
+                    OnboardingStatus::Incomplete,
+                    Counts {
+                        triggered: 0,
+                        not_triggered: 2,
+                    },
+                ),
+            ]),
+            counts_by_historical_action_triggered: HashMap::from_iter([
+                (
+                    RuleResultRuleAction::Fail,
+                    Counts {
+                        triggered: 2,
+                        not_triggered: 2,
+                    },
+                ),
+                (
+                    RuleResultRuleAction::StepUp,
+                    Counts {
+                        triggered: 0,
+                        not_triggered: 4,
+                    },
+                ),
+                (
+                    RuleResultRuleAction::Pass,
+                    Counts {
+                        triggered: 2,
+                        not_triggered: 0,
+                    },
+                ),
+            ]),
+        };
+        assert_eq!(expected_stats, stats)
+    }
+
+    fn make_rule_eval_result(t: (Option<OnboardingStatus>, Option<RuleAction>, bool)) -> RuleEvalResult {
+        let (current_status, historical_action_triggered, backtest_rule_result) = t;
+        RuleEvalResult {
+            fp_id: FpId::from("fp123".to_string()),
+            current_status,
+            historical_action_triggered,
+            backtest_rule_result,
+        }
+    }
 }
