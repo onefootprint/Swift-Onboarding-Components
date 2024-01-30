@@ -5,60 +5,68 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:uni_links/uni_links.dart';
-import './types/configuration.dart';
-import './utils/send_sdk_args.dart';
-import './utils/create-url.dart';
-import './utils/logger.dart';
-export 'types/footprint_types.dart';
+import 'dart:convert';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+part "config/constants.dart";
+part "types/appearance.dart";
+part 'types/configuration.dart';
+part 'types/l10n.dart';
+part "types/options.dart";
+part "types/user_data.dart";
+part "utils/create-url.dart";
+part "utils/send_sdk_args.dart";
+part "utils/logger.dart";
 
 bool _initialUriIsHandled = false;
 
-enum ResultType { SUCCESS, CANCELED }
+enum _ResultType { SUCCESS, CANCELED }
 
-class Footprint {
-  Uri? latestUri;
+class _Footprint {
+  Uri? _latestUri;
   Object? _err;
-  StreamSubscription? subscription;
-  bool isBrowserOpen = false;
-  late MyChromeSafariBrowser browser;
-  void Function(String token)? handleComplete;
-  void Function()? handleCancel;
-  ResultType? result;
+  StreamSubscription? _subscription;
+  bool _isBrowserOpen = false;
+  late _MyChromeSafariBrowser _browser;
+  void Function(String token)? _handleComplete;
+  void Function()? _handleCancel;
+  _ResultType? _result;
 
-  Footprint() {
-    handleIncomingLinks();
-    handleInitialUri();
+  _Footprint() {
+    _handleIncomingLinks();
+    _handleInitialUri();
   }
 
   Future<void> init(FootprintConfiguration config, BuildContext context) async {
-    handleComplete = config.onComplete;
-    handleCancel = config.onCancel;
-    browser = MyChromeSafariBrowser(onBrowserClosed: () {
-      isBrowserOpen = false;
-      if (result == null) {
+    _handleComplete = config.onComplete;
+    _handleCancel = config.onCancel;
+    _browser = _MyChromeSafariBrowser(onBrowserClosed: () {
+      _isBrowserOpen = false;
+      if (_result == null) {
         // User closed the browser without completing the flow
-        result = ResultType.CANCELED;
-        handleCancel?.call();
+        _result = _ResultType.CANCELED;
+        _handleCancel?.call();
       }
     }, onBrowserOpened: () {
-      isBrowserOpen = true;
-      result = null; // reset result
-      latestUri = null; // reset latestUri
+      _isBrowserOpen = true;
+      _result = null; // reset result
+      _latestUri = null; // reset latestUri
     });
     try {
-      var response = await sendSdkArgs(config);
+      var response = await _sendSdkArgs(config);
       var token = response.data;
       if (response.failed) {
-        logError();
+        _logError();
       }
-      if (token != null && !isBrowserOpen) {
-        var url = createUrl(
+      if (token != null && !_isBrowserOpen) {
+        var url = _createUrl(
           token: token,
           appearance: config.appearance,
           // TODO: Fix this. This comes from the tenant
           redirectUrl: "com.footprint.fluttersdk://example",
         );
-        openBrowser(url);
+        _openBrowser(url);
       }
     } catch (e) {
       // Handle the error
@@ -66,8 +74,8 @@ class Footprint {
     }
   }
 
-  void openBrowser(String url) {
-    browser.open(
+  void _openBrowser(String url) {
+    _browser.open(
         url: Uri.parse(url),
         options: ChromeSafariBrowserClassOptions(
             android: AndroidChromeCustomTabsOptions(
@@ -77,60 +85,60 @@ class Footprint {
                 presentationStyle: IOSUIModalPresentationStyle.FORM_SHEET)));
   }
 
-  void handleIncomingLinks() {
+  void _handleIncomingLinks() {
     if (!kIsWeb) {
-      subscription = uriLinkStream.listen(
+      _subscription = uriLinkStream.listen(
         (Uri? uri) {
-          processUri(uri);
+          _processUri(uri);
         },
         onError: (Object err) {
-          handleError(err);
+          _handleError(err);
         },
       );
     }
   }
 
-  void processUri(Uri? uri) {
-    if (uri == null || uri == latestUri) return;
-    latestUri = uri;
+  void _processUri(Uri? uri) {
+    if (uri == null || uri == _latestUri) return;
+    _latestUri = uri;
     uri.queryParameters.forEach((key, value) {
       if (key == 'validation_token') {
-        result = ResultType.SUCCESS;
-        handleComplete?.call(value);
+        _result = _ResultType.SUCCESS;
+        _handleComplete?.call(value);
       } else if (key == 'canceled') {
-        result = ResultType.CANCELED;
-        handleCancel?.call();
+        _result = _ResultType.CANCELED;
+        _handleCancel?.call();
       }
     });
-    browser.close();
+    _browser.close();
     _err = null;
   }
 
-  void handleError(Object err) {
-    latestUri = null;
+  void _handleError(Object err) {
+    _latestUri = null;
     _err = err is FormatException ? err : null;
   }
 
-  Future<void> handleInitialUri() async {
+  Future<void> _handleInitialUri() async {
     if (!_initialUriIsHandled) {
       _initialUriIsHandled = true;
       try {
         final uri = await getInitialUri();
-        latestUri = uri;
+        _latestUri = uri;
       } on PlatformException {
         // Handle PlatformException
       } on FormatException catch (err) {
-        handleError(err);
+        _handleError(err);
       }
     }
   }
 }
 
-class MyChromeSafariBrowser extends ChromeSafariBrowser {
+class _MyChromeSafariBrowser extends ChromeSafariBrowser {
   final VoidCallback onBrowserClosed;
   final VoidCallback onBrowserOpened;
 
-  MyChromeSafariBrowser(
+  _MyChromeSafariBrowser(
       {required this.onBrowserOpened, required this.onBrowserClosed});
 
   @override
@@ -144,4 +152,4 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
   }
 }
 
-final footprint = Footprint();
+final footprint = _Footprint();

@@ -1,3 +1,5 @@
+part of "../footprint_flutter.dart";
+
 class FootprintUserData {
   final String? email;
   final String? phoneNumber;
@@ -39,7 +41,7 @@ class FootprintUserData {
     this.visaExpirationDate,
   });
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> _toJson() {
     var map = {
       'id.email': email,
       'id.phone_number': phoneNumber,

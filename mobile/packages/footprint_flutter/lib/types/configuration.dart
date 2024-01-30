@@ -1,7 +1,4 @@
-import './l10n.dart';
-import './user_data.dart';
-import './options.dart';
-import './appearance.dart';
+part of "../footprint_flutter.dart";
 
 class FootprintConfiguration {
   final FootprintL10n? l10n;
@@ -24,13 +21,13 @@ class FootprintConfiguration {
     this.appearance,
   });
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> _toJson() {
     var map = {
-      'l10n': l10n?.toJson(),
-      'options': options?.toJson(),
+      'l10n': l10n?._toJson(),
+      'options': options?._toJson(),
       'public_key': publicKey,
-      'user_data': userData?.toJson(),
-      'appearance': appearance?.toJson(),
+      'user_data': userData?._toJson(),
+      'appearance': appearance?._toJson(),
     };
     map.removeWhere((key, value) => value == null);
     return map;

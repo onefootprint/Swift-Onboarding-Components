@@ -1,3 +1,5 @@
-void logWarn() {}
+part of "../footprint_flutter.dart";
 
-void logError() {}
+void _logWarn() {}
+
+void _logError() {}

@@ -1,3 +1,5 @@
+part of "../footprint_flutter.dart";
+
 enum FootprintAppearanceTheme { light, dark }
 
 class FootprintAppearanceVariables {
@@ -177,7 +179,7 @@ class FootprintAppearanceVariables {
     this.dropdownFooterBg,
   });
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> _toJson() {
     var map = {
       'borderRadius': borderRadius,
       'colorError': colorError,
@@ -310,7 +312,7 @@ class FootprintAppearanceRules {
     this.linkButtonActive,
   });
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> _toJson() {
     var map = {
       'button': button,
       'button:hover': buttonHover,
@@ -348,11 +350,11 @@ class FootprintAppearance {
     this.variables,
   });
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> _toJson() {
     var map = {
       'fontSrc': fontSrc,
-      'rules': rules?.toJson(),
-      'variables': variables?.toJson(),
+      'rules': rules?._toJson(),
+      'variables': variables?._toJson(),
     };
     map.removeWhere((key, value) => value == null);
     return map;

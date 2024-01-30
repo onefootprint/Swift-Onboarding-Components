@@ -1,7 +1,6 @@
-import 'dart:convert';
-import '../types/footprint_types.dart';
+part of "../footprint_flutter.dart";
 
-String createUrl({
+String _createUrl({
   FootprintAppearance? appearance,
   FootprintL10n? l10n,
   String? redirectUrl,
@@ -21,8 +20,8 @@ String createUrl({
   }
 
   if (appearance != null) {
-    var variables = encode(appearance.variables?.toJson());
-    var rules = encode(appearance.rules?.toJson());
+    var variables = _encode(appearance.variables?._toJson());
+    var rules = _encode(appearance.rules?._toJson());
 
     if (variables.isNotEmpty) {
       addParam('variables', variables);
@@ -38,7 +37,7 @@ String createUrl({
   return 'https://id.onefootprint.com?$searchParams#$token';
 }
 
-String encode(Map<String, dynamic>? obj) {
+String _encode(Map<String, dynamic>? obj) {
   return obj != null && obj.isNotEmpty
       ? Uri.encodeComponent(json.encode(obj))
       : '';

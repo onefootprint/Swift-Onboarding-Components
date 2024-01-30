@@ -1,24 +1,21 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../config/constants.dart';
-import '../types/configuration.dart';
+part of "../footprint_flutter.dart";
 
-class SdkArgsResponse {
+class _SdkArgsResponse {
   final String? data;
   final String? error;
 
-  SdkArgsResponse({this.data, this.error});
+  _SdkArgsResponse({this.data, this.error});
 
   bool get failed => data == null;
 }
 
-Future<SdkArgsResponse> sendSdkArgsRecursive(
+Future<_SdkArgsResponse> _sendSdkArgsRecursive(
     Map<String, dynamic> payload, int numRetries) async {
   try {
     var response = await http.post(
-      Uri.parse('$apiBaseUrl/org/sdk_args'),
+      Uri.parse('$_apiBaseUrl/org/sdk_args'),
       headers: {
-        'x-fp-client-version': '$sdkName $sdkVersion',
+        'x-fp-client-version': '$_sdkName $_sdkVersion',
         'Content-Type': 'application/json'
       },
       body: jsonEncode(payload),
@@ -26,21 +23,21 @@ Future<SdkArgsResponse> sendSdkArgsRecursive(
 
     if (response.statusCode == 200) {
       var data = jsonDecode(response.body);
-      return SdkArgsResponse(data: data['token']);
+      return _SdkArgsResponse(data: data['token']);
     } else {
       throw Exception('Failed to fetch token');
     }
   } catch (e) {
     if (numRetries > 0) {
-      return sendSdkArgsRecursive(payload, numRetries - 1);
+      return _sendSdkArgsRecursive(payload, numRetries - 1);
     }
-    return SdkArgsResponse(error: e.toString());
+    return _SdkArgsResponse(error: e.toString());
   }
 }
 
-Future<SdkArgsResponse> sendSdkArgs(FootprintConfiguration data) async {
-  return await sendSdkArgsRecursive({
-    'kind': sdkKind,
-    'data': data.toJson(),
-  }, numRetries);
+Future<_SdkArgsResponse> _sendSdkArgs(FootprintConfiguration data) async {
+  return await _sendSdkArgsRecursive({
+    'kind': _sdkKind,
+    'data': data._toJson(),
+  }, _numRetries);
 }
