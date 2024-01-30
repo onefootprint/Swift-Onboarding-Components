@@ -64,7 +64,29 @@ const securityHeaders = [
 
 const nextConfig = {
   async headers() {
-    return [{ source: '/:path*', headers: securityHeaders }];
+    return [
+      {
+        source: '/:path*',
+        headers: securityHeaders,
+      },
+      {
+        source: '/locales/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 's-maxage=1, stale-while-revalidate=59 must-revalidate',
+          },
+          {
+            key: 'CDN-Cache-Control',
+            value: 's-maxage=1, stale-while-revalidate=59 must-revalidate',
+          },
+          {
+            key: 'Vercel-CDN-Cache-Control',
+            value: 's-maxage=1, stale-while-revalidate=59 must-revalidate',
+          },
+        ],
+      },
+    ];
   },
 
   compiler: { styledComponents: true },
