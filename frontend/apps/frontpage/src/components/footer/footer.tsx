@@ -17,7 +17,7 @@ const currentYear = new Date().getFullYear();
 
 const productLinks = ['compare', 'pricing'];
 
-const companyLinks = ['about', 'blog', 'investor-updates', 'library'];
+const companyLinks = ['about', 'blog', 'investor-updates'];
 
 const resourcesLinks = [
   'terms-of-service',

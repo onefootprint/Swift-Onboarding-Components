@@ -146,11 +146,6 @@
               "text": "Investor Updates",
               "href": "/investor-updates",
               "subtext": "Updates we share with our investors"
-            },
-            "library": {
-              "text": "Library",
-              "href": "/library",
-              "subtext": "Learn about KYC, PII vaulting, and more"
             }
           }
         },
@@ -230,10 +225,6 @@
           "investor-updates": {
             "text": "Investor Updates",
             "href": "/investor-updates"
-          },
-          "library": {
-            "text": "Library",
-            "href": "/library"
           }
         },
         "resources": {
@@ -836,19 +827,6 @@
       "post": {
         "reading-time": "{{readingTime}} min. read",
         "update-index": " (Update #{{index}})"
-      }
-    },
-    "library": {
-      "html-title": "Footprint - Library",
-      "go-back": "Back",
-      "breadcrumb": {
-        "title": "Library",
-        "description": " | Learn about KYC, PII vaulting, and more",
-        "twitter": "Footprint on Twitter"
-      },
-      "read-more": "Read more",
-      "post": {
-        "reading-time": "{{readingTime}} min. read"
       }
     },
     "supported-id-documents": {

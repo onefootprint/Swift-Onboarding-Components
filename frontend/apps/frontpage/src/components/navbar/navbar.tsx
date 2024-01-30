@@ -1,7 +1,6 @@
 import { primitives } from '@onefootprint/design-tokens';
 import { useHasScroll, useToggle } from '@onefootprint/hooks';
 import {
-  IcoFileText24,
   IcoKey24,
   IcoMegaphone24,
   IcoShield24,
@@ -75,12 +74,6 @@ const Navbar = () => {
           href: t('entries.writing.links.investor-updates.href'),
           subtext: t('entries.writing.links.investor-updates.subtext'),
           iconComponent: IcoMegaphone24,
-        },
-        {
-          text: t('entries.writing.links.library.text'),
-          href: t('entries.writing.links.library.href'),
-          subtext: t('entries.writing.links.library.subtext'),
-          iconComponent: IcoFileText24,
         },
       ],
     },
