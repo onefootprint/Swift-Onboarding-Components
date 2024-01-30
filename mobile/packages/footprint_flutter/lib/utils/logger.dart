@@ -1,4 +1,3 @@
-import 'dart:convert';
 part of '../footprint_flutter.dart';
 
 enum LogLevel {
