@@ -58,7 +58,8 @@ pub struct UserChallengeData {
 #[derive(Apiv2Schema, serde::Deserialize)]
 pub struct LoginChallengeRequest {
     pub identifier: Option<IdentifyId>,
-    pub preferred_challenge_kind: ChallengeKind,
+    #[serde(alias = "preferred_challenge_kind")]
+    pub challenge_kind: ChallengeKind,
 }
 
 #[derive(Apiv2Schema, serde::Serialize)]

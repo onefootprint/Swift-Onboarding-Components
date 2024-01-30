@@ -19013,11 +19013,16 @@
                                     "triggered": {
                                         "type": "integer",
                                         "format": "int64"
+                                    },
+                                    "triggered_rate": {
+                                        "type": "number",
+                                        "format": "float"
                                     }
                                 },
                                 "required": [
                                     "not_triggered",
-                                    "triggered"
+                                    "triggered",
+                                    "triggered_rate"
                                 ]
                             },
                             "counts_by_current_status": {

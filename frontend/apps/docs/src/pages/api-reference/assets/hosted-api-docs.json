@@ -3249,6 +3249,15 @@
                                     "enabled"
                                 ]
                             },
+                            "support_email": {
+                                "type": "string"
+                            },
+                            "support_phone": {
+                                "type": "string"
+                            },
+                            "support_website": {
+                                "type": "string"
+                            },
                             "supported_countries": {
                                 "type": "array",
                                 "items": {
@@ -3757,20 +3766,20 @@
             "LoginChallengeRequest": {
                 "type": "object",
                 "properties": {
-                    "identifier": {
-                        "type": "string"
-                    },
-                    "preferred_challenge_kind": {
+                    "challenge_kind": {
                         "type": "string",
                         "enum": [
                             "sms",
                             "biometric",
                             "email"
                         ]
+                    },
+                    "identifier": {
+                        "type": "string"
                     }
                 },
                 "required": [
-                    "preferred_challenge_kind"
+                    "challenge_kind"
                 ]
             },
             "LoginChallengeResponse": {
@@ -3900,6 +3909,15 @@
                                     "disabled",
                                     "enabled"
                                 ]
+                            },
+                            "support_email": {
+                                "type": "string"
+                            },
+                            "support_phone": {
+                                "type": "string"
+                            },
+                            "support_website": {
+                                "type": "string"
                             },
                             "supported_countries": {
                                 "type": "array",
@@ -4283,6 +4301,15 @@
                                     "enabled"
                                 ]
                             },
+                            "support_email": {
+                                "type": "string"
+                            },
+                            "support_phone": {
+                                "type": "string"
+                            },
+                            "support_website": {
+                                "type": "string"
+                            },
                             "supported_countries": {
                                 "type": "array",
                                 "items": {
@@ -4663,6 +4690,15 @@
                             "disabled",
                             "enabled"
                         ]
+                    },
+                    "support_email": {
+                        "type": "string"
+                    },
+                    "support_phone": {
+                        "type": "string"
+                    },
+                    "support_website": {
+                        "type": "string"
                     },
                     "supported_countries": {
                         "type": "array",

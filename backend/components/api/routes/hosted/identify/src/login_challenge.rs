@@ -1,31 +1,22 @@
 use super::BiometricChallengeState;
-use crate::ChallengeData;
-use crate::ChallengeState;
-use crate::GetIdentifyChallengeArgs;
-use crate::IdentifyChallengeContext;
-use crate::State;
-use crate::UserChallengeContext;
-use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::user::UserAuthContext;
-use api_core::auth::Any;
-use api_core::errors::challenge::ChallengeError;
-use api_core::errors::onboarding::OnboardingError;
-use api_core::errors::ApiError;
-use api_core::telemetry::RootSpan;
-use api_core::types::JsonApiResponse;
-use api_core::types::ResponseData;
-use api_core::utils::challenge::Challenge;
-use api_core::utils::email::send_email_challenge_non_blocking;
-use api_core::utils::headers::SandboxId;
-use api_core::utils::passkey::WebauthnConfig;
-use api_core::utils::sms::rx_background_error;
-use api_wire_types::LoginChallengeRequest;
-use api_wire_types::LoginChallengeResponse;
-use api_wire_types::UserChallengeData;
+use crate::{
+    ChallengeData, ChallengeState, GetIdentifyChallengeArgs, IdentifyChallengeContext, State,
+    UserChallengeContext,
+};
+use api_core::{
+    auth::{ob_config::ObConfigAuth, user::UserAuthContext, Any},
+    errors::{challenge::ChallengeError, onboarding::OnboardingError, ApiError},
+    telemetry::RootSpan,
+    types::{JsonApiResponse, ResponseData},
+    utils::{
+        challenge::Challenge, email::send_email_challenge_non_blocking, headers::SandboxId,
+        passkey::WebauthnConfig, sms::rx_background_error,
+    },
+};
+use api_wire_types::{LoginChallengeRequest, LoginChallengeResponse, UserChallengeData};
 use crypto::serde_cbor;
 use db::models::webauthn_credential::WebauthnCredential;
-use newtypes::ChallengeKind;
-use newtypes::VaultId;
+use newtypes::{ChallengeKind, VaultId};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 use webauthn_rs_core::proto::{Base64UrlSafeData, Credential, ParsedAttestation, ParsedAttestationData};
 use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
@@ -50,7 +41,7 @@ pub async fn post(
 ) -> JsonApiResponse<LoginChallengeResponse> {
     let LoginChallengeRequest {
         identifier,
-        preferred_challenge_kind,
+        challenge_kind,
     } = request.into_inner();
     let user_auth = user_auth.map(|ua| ua.check_guard(Any)).transpose()?;
 
@@ -78,12 +69,15 @@ pub async fn post(
     let sandbox_id = vw.vault.sandbox_id.clone();
     let vault_id = vw.vault.id.clone();
 
-    let challenge_kind = match preferred_challenge_kind {
+    let challenge_kind = match challenge_kind {
         // Fall back to SMS if the user requested webauthn but doesn't have any creds
+        // TODO let's remove this weird fallback logic... I don't think anyone is ever using it
         ChallengeKind::Passkey => {
             if creds.is_empty() {
+                tracing::info!("Falling back to SMS");
                 ChallengeKind::Sms
             } else {
+                tracing::info!("Not falling back to SMS");
                 ChallengeKind::Passkey
             }
         }
