@@ -229,9 +229,9 @@ def test_modern_flow(sandbox_user, sandbox_tenant, must_collect_data):
     data = dict(identifier=dict(phone_number=phone_number), scope="onboarding")
     body = post("/hosted/identify", data, sandbox_id_h, obc.key)
     token = FpAuth(body["token"])
-    assert next(i["is_verified"] for i in body["auth_methods"] if i["kind"] == "phone")
-    assert not next(
-        i["is_verified"] for i in body["auth_methods"] if i["kind"] == "email"
+    assert all(i["is_verified"] for i in body["auth_methods"] if i["kind"] == "phone")
+    assert all(
+        not i["is_verified"] for i in body["auth_methods"] if i["kind"] == "email"
     )
 
     # Make sure the token issued has no scopes

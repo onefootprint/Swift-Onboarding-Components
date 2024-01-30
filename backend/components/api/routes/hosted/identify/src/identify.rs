@@ -66,9 +66,9 @@ pub async fn post(
     } = ctx;
 
     let v_id = vw.vault.id.clone();
-    let token = if let Some(token) = provided_token.as_ref() {
+    let token = if let Some(token) = provided_token {
         // Don't issue a new identified token
-        Some(token.clone())
+        Some(token)
     } else if let Some(scope) = scope {
         // In a newer verision of this API, we're going to start issuing an "identified" but
         // unauthed token as soon as the user is located.
