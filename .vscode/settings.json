@@ -107,7 +107,7 @@
     "**/target/**",
     "**/vscode-target/**"
   ],
-  "rust-analyzer.rustfmt.overrideCommand": null,
+  "rust-analyzer.rustfmt.extraArgs": ["+nightly"],
   "search.exclude": {
     "**/target/": true,
     "**/vscode-target/": true,

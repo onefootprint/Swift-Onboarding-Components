@@ -1,18 +1,21 @@
 #![recursion_limit = "256"]
 
-use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::user::CheckedUserAuthContext;
-use api_core::errors::ApiResult;
-use api_core::telemetry::RootSpan;
-use api_core::utils::identify::{get_user_challenge_context, UserChallengeContext};
-use api_core::utils::sms::PhoneEmailChallengeState;
-use api_core::State;
+use api_core::{
+    auth::{ob_config::ObConfigAuth, user::CheckedUserAuthContext},
+    errors::ApiResult,
+    telemetry::RootSpan,
+    utils::{
+        identify::{get_user_challenge_context, UserChallengeContext},
+        sms::PhoneEmailChallengeState,
+    },
+    State,
+};
 use api_wire_types::IdentifyId;
-use db::errors::OptionalExtension;
-use db::models::scoped_vault::ScopedVault;
-use db::models::tenant::Tenant;
-use newtypes::SandboxId;
-use newtypes::VaultId;
+use db::{
+    errors::OptionalExtension,
+    models::{scoped_vault::ScopedVault, tenant::Tenant},
+};
+use newtypes::{SandboxId, VaultId};
 use paperclip::actix::{web, Apiv2Schema};
 use strum::EnumDiscriminants;
 use webauthn_rs_core::proto::{AuthenticationState, Base64UrlSafeData};
