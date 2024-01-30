@@ -4,7 +4,10 @@ use crate::types::response::ResponseData;
 use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
 use crate::State;
 use api_core::auth::user::UserAuthGuard;
+use api_core::errors::user::UserError;
 use api_core::utils::vault_wrapper::Person;
+use api_core::ApiErrorKind;
+use newtypes::{ContactInfoKind, PhoneNumber};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -48,7 +51,19 @@ pub async fn handler(
         })
         .await??;
 
-    let phone_number = uvw.get_decrypted_verified_primary_phone(&state).await?;
+    let (phone_number, ci, _) = uvw
+        .decrypt_contact_info(&state, ContactInfoKind::Phone)
+        .await?
+        .ok_or(ApiErrorKind::ContactInfoKindNotInVault(ContactInfoKind::Phone))?;
+
+    if !ci.is_otp_verified {
+        // The d2p link we send out is authenticated as the user.
+        // So, we want to make sure a tenant can't update the user's phone number/email
+        // and then get an authenticated link. First, check that the phone number/email was
+        // verified by the user.
+        return Err(UserError::ContactInfoKindNotVerified(ContactInfoKind::Phone).into());
+    }
+    let phone_number = PhoneNumber::parse(phone_number)?;
 
     let time_before_retry_s = state
         .sms_client

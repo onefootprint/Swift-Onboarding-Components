@@ -108,7 +108,7 @@ pub async fn post(
                 (None, challenge_data, 0, None, Some(challenge.challenge_json))
             }
             ChallengeKind::Sms => {
-                let phone_number = vw.get_decrypted_verified_primary_phone(&state).await?;
+                let phone_number = vw.get_decrypted_phone(&state).await?;
                 let t = tenant.as_ref();
                 let (rx, challenge_state, time_before_retry_s) = twilio_client
                     .send_challenge_non_blocking(&state, t, &phone_number, vault_id, sandbox_id)
@@ -123,7 +123,7 @@ pub async fn post(
                 )
             }
             ChallengeKind::Email => {
-                let email = vw.get_decrypted_verified_email(&state).await?;
+                let email = vw.get_decrypted_email(&state).await?;
                 let tenant = tenant.ok_or(OnboardingError::NoTenantForEmailChallenge)?;
 
                 let challenge_data =

@@ -1,18 +1,21 @@
 use super::super::{Business, VaultWrapper};
-use crate::enclave_client::EnclaveClient;
-use crate::errors::business::BusinessError;
-use crate::errors::user::UserError;
-use crate::errors::ApiResult;
-use crate::{ApiError, ApiErrorKind, State};
-use db::models::business_owner::{BusinessOwner, UserData};
-use db::models::contact_info::ContactInfo;
-use db::models::data_lifetime::DataLifetime;
-use db::{DbError, DbPool};
-use newtypes::email::Email;
+use crate::{
+    enclave_client::EnclaveClient,
+    errors::{business::BusinessError, ApiResult},
+    ApiError, ApiErrorKind, State,
+};
+use db::{
+    models::{
+        business_owner::{BusinessOwner, UserData},
+        contact_info::ContactInfo,
+        data_lifetime::DataLifetime,
+    },
+    DbError, DbPool,
+};
 use newtypes::{
-    BusinessDataKind as BDK, BusinessOwnerData, BusinessOwnerKind, ContactInfoKind, DataIdentifier,
-    IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, KycedBusinessOwnerData, PhoneNumber, PiiString,
-    TenantId,
+    email::Email, BusinessDataKind as BDK, BusinessOwnerData, BusinessOwnerKind, ContactInfoKind,
+    DataIdentifier, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, KycedBusinessOwnerData, PhoneNumber,
+    PiiString, TenantId,
 };
 use std::str::FromStr;
 
@@ -39,41 +42,20 @@ impl<Type> VaultWrapper<Type> {
         }
     }
 
-    // TODO: can later have a function return whatever CI is available for the user and then have notification callsites support either
-    async fn decrypt_verified_contact_info(
-        &self,
-        state: &State,
-        kind: ContactInfoKind,
-    ) -> ApiResult<PiiString> {
-        let (data, ci, _) = self
-            .decrypt_contact_info(state, kind)
+    pub async fn get_decrypted_phone(&self, state: &State) -> ApiResult<PhoneNumber> {
+        let (data, _, _) = self
+            .decrypt_contact_info(state, ContactInfoKind::Phone)
             .await?
-            .ok_or(ApiErrorKind::ContactInfoKindNotInVault(kind))?;
-
-        // TODO we're moving away from needing to send things to verified contact info. Can we rm
-        // this check for vaults made via bifrost too?
-        let vault_made_via_bifrost = !self.vault.is_created_via_api;
-        if vault_made_via_bifrost && !ci.is_otp_verified {
-            // Many of the communications we send out give either OTPs or links that allow authing
-            // as the user. So, we want to make sure a tenant can't update the user's phone number/email
-            // and then send themselves OTPs. First, check that the phone number/email is verified to
-            // be owned by the user
-            Err(UserError::ContactInfoKindNotVerified(kind).into())
-        } else {
-            Ok(data)
-        }
+            .ok_or(ApiErrorKind::ContactInfoKindNotInVault(ContactInfoKind::Phone))?;
+        PhoneNumber::parse(data).map_err(ApiError::from)
     }
 
-    pub async fn get_decrypted_verified_primary_phone(&self, state: &State) -> ApiResult<PhoneNumber> {
-        self.decrypt_verified_contact_info(state, ContactInfoKind::Phone)
-            .await
-            .and_then(|p| PhoneNumber::parse(p).map_err(ApiError::from))
-    }
-
-    pub async fn get_decrypted_verified_email(&self, state: &State) -> ApiResult<Email> {
-        self.decrypt_verified_contact_info(state, ContactInfoKind::Email)
-            .await
-            .and_then(|e| Email::from_str(e.leak()).map_err(ApiError::from))
+    pub async fn get_decrypted_email(&self, state: &State) -> ApiResult<Email> {
+        let (data, _, _) = self
+            .decrypt_contact_info(state, ContactInfoKind::Email)
+            .await?
+            .ok_or(ApiErrorKind::ContactInfoKindNotInVault(ContactInfoKind::Email))?;
+        Email::from_str(data.leak()).map_err(ApiError::from)
     }
 
     pub async fn get_decrypted_country(
