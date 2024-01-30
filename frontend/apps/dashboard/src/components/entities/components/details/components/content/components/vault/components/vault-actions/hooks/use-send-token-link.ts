@@ -1,5 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import type { TokenKind } from '@onefootprint/types/src/api/create-token';
+import type { TokenKind } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useTranslation } from 'react-i18next';
 

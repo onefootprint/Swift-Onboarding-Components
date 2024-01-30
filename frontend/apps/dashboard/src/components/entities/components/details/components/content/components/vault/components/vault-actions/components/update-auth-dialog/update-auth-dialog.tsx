@@ -1,7 +1,6 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
 import styled from '@onefootprint/styled';
-import { IdDI } from '@onefootprint/types';
-import { TokenKind } from '@onefootprint/types/src/api/create-token';
+import { IdDI, TokenKind } from '@onefootprint/types';
 import {
   Dialog,
   Shimmer,

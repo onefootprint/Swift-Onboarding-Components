@@ -7,7 +7,7 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import { ContactInfoKind } from '@onefootprint/types/src/api/create-token';
+import { ContactInfoKind } from '@onefootprint/types';
 import React from 'react';
 
 import type { UpdateAuthDialogProps } from './update-auth-dialog';

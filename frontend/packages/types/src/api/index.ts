@@ -19,6 +19,7 @@ export type {
   CreateProxyConfigResponse,
 } from './create-proxy-config';
 export type { CreateTokenRequest, CreateTokenResponse } from './create-token';
+export { ContactInfoKind, TokenKind } from './create-token';
 export type { D2PGenerateRequest, D2PGenerateResponse } from './d2p-generate';
 export type { D2PSmsRequest, D2PSmsResponse } from './d2p-sms';
 export type { DecryptRequest, DecryptResponse } from './decrypt';

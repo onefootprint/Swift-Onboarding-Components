@@ -7,8 +7,7 @@ import {
   userEvent,
   waitFor,
 } from '@onefootprint/test-utils';
-import { OrgFrequentNoteKind } from '@onefootprint/types';
-import { ContactInfoKind } from '@onefootprint/types/src/api/create-token';
+import { ContactInfoKind, OrgFrequentNoteKind } from '@onefootprint/types';
 import React from 'react';
 import { withFrequentNotes } from 'src/components/frequent-notes-text-area/frequent-notes-text-area.test.config';
 

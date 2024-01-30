@@ -190,9 +190,11 @@ export type {
 export {
   ALLOW_EXTRA_FIELDS_HEADER,
   AUTH_HEADER,
+  ContactInfoKind,
   getRequirement,
   OnboardingRequirementKind,
   SANDBOX_ID_HEADER,
+  TokenKind,
   TriggerKind,
   UserTokenScope,
 } from './api';

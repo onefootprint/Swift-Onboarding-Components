@@ -1,6 +1,8 @@
 import { IcoInfo16 } from '@onefootprint/icons';
-import type { WorkflowTriggeredEventData } from '@onefootprint/types';
-import { TokenKind } from '@onefootprint/types/src/api/create-token';
+import {
+  TokenKind,
+  type WorkflowTriggeredEventData,
+} from '@onefootprint/types';
 import { Box, LinkButton, Stack, Tooltip, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -1,6 +1,5 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { IdDI, TriggerKind } from '@onefootprint/types';
-import { TokenKind } from '@onefootprint/types/src/api/create-token';
+import { IdDI, TokenKind, TriggerKind } from '@onefootprint/types';
 import type { DialogButton } from '@onefootprint/ui';
 import { Dialog, useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
