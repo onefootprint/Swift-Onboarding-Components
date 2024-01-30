@@ -61,6 +61,12 @@ pub struct Tenant {
     /// Certain preview APIs we want to restrict to only be visible by certain tenants.
     /// Eventually, we'll use this to hide inaccessible preview APIs from docs too
     pub allowed_preview_apis: Vec<PreviewApi>,
+    /// Email that shows in embedded support views
+    pub support_email: Option<String>,
+    /// Phone number that shows in embedded support views
+    pub support_phone: Option<String>,
+    /// Website that shows in embedded support views
+    pub support_website: Option<String>,
 }
 
 impl Tenant {

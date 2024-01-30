@@ -44,6 +44,9 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             privacy_policy_url,
             id: tenant_id,
             app_clip_experience_id,
+            support_email,
+            support_phone,
+            support_website,
             ..
         } = tenant;
         let appearance = appearance.map(|a| a.data);
@@ -84,6 +87,9 @@ impl DbToApi<ObConfigInfo> for api_wire_types::PublicOnboardingConfiguration {
             doc_scan_required_if_ssn_skipped,
             is_stepup_enabled,
             kind,
+            support_email,
+            support_phone,
+            support_website,
         }
     }
 }

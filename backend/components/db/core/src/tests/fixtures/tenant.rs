@@ -68,5 +68,8 @@ pub fn create_in_memory(public_key: VaultPublicKey, e_private_key: EncryptedVaul
         app_clip_experience_id: AppClipExperienceId::test_data("test".into()),
         domains: vec![],
         allowed_preview_apis: vec![],
+        support_email: Default::default(),
+        support_phone: Default::default(),
+        support_website: Default::default(),
     }
 }

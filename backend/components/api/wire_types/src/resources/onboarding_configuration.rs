@@ -61,4 +61,8 @@ pub struct PublicOnboardingConfiguration {
     pub allowed_origins: Option<Vec<String>>,
     pub is_stepup_enabled: bool,
     pub kind: ObConfigurationKind,
+
+    pub support_email: Option<String>,
+    pub support_phone: Option<String>,
+    pub support_website: Option<String>,
 }

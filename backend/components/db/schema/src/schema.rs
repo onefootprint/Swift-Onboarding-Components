@@ -903,6 +903,9 @@ table! {
         domains -> Array<Text>,
         is_prod_auth_playbook_restricted -> Bool,
         allowed_preview_apis -> Array<Text>,
+        support_email -> Nullable<Text>,
+        support_phone -> Nullable<Text>,
+        support_website -> Nullable<Text>,
     }
 }
 
