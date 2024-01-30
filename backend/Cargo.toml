@@ -22,6 +22,7 @@ members = [
     "components/api/routes/users",
     "components/api/routes/vault_proxy",
     "components/api/routes/webhooks",
+    "components/commands",
     "components/enclave/crypto",
     "components/enclave/enclave",
     "components/enclave/proxy",
@@ -159,3 +160,4 @@ enum_variant_type = "0.3.1"
 
 actix-multipart = "0.6.1"
 regex = "1.5"
+anyhow = "1.0.79"

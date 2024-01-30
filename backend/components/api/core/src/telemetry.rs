@@ -18,8 +18,9 @@ use tracing_subscriber::Registry;
 use crate::config::Config;
 use crate::utils::headers::InsightHeaders;
 use crate::utils::headers::TelemetryHeaders;
+use anyhow::Result;
 
-pub fn init(config: &Config) -> Result<Option<BasicController>, Box<dyn std::error::Error>> {
+pub fn init(config: &Config) -> Result<Option<BasicController>> {
     env_logger::init();
     let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
 

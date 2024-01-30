@@ -1,3 +1,4 @@
+use anyhow::Result;
 use api_wire_types::TokenOperationKind;
 use envconfig::Envconfig;
 use newtypes::{PiiString, SessionAuthToken};
@@ -137,17 +138,18 @@ pub struct Config {
     pub lexis_config: LexisConfig,
 }
 
-fn load_from_env<T: Envconfig>() -> Result<T, Box<dyn std::error::Error>> {
+fn load_from_env<T: Envconfig>() -> Result<T> {
     // for dev it's easier to load a .env
     let _dotenv = dotenv::dotenv()
-        .map(|p| eprintln!("load .env at: {}", p.as_path().display()))
-        .map_err(|e| eprintln!("error loading .env: {:?}", e));
+        .map(|p| eprintln!("loaded .env at: {}", p.as_path().display()))
+        .map_err(|e| eprintln!("proceeding without .env: {:?}", e)); // This is expected in
+                                                                     // production.
 
     Ok(T::init_from_env()?)
 }
 
 impl Config {
-    pub fn load_from_env() -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn load_from_env() -> Result<Self> {
         load_from_env()
     }
 }
@@ -241,7 +243,7 @@ impl LinkKind {
 }
 
 impl ServiceEnvironmentConfig {
-    pub fn load_from_env() -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn load_from_env() -> Result<Self> {
         load_from_env()
     }
 

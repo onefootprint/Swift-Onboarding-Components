@@ -24,7 +24,6 @@ pub fn configure(config: &mut web::ServiceConfig) {
         .service(risk::save_risk_signals_for_vres)
         .service(task::execute_tasks)
         .service(task::create_task)
-        .service(task::create_overdue_watchlist_check_tasks)
         .service(incode::rerun_machine)
         .service(workflow::proceed)
         .service(token_reveal::post)

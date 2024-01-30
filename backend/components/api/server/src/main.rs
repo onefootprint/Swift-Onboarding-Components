@@ -6,6 +6,7 @@ use api_core::{config::Config, *};
 use clap::{Parser, Subcommand};
 mod custom_migrations;
 use actix_web_opentelemetry::RequestMetricsBuilder;
+use anyhow::{Context, Result};
 use paperclip::v2::models::{DefaultApiRaw, Info, Tag};
 
 #[derive(Parser)]
@@ -17,12 +18,13 @@ struct Args {
 #[derive(Subcommand)]
 enum Command {
     ApiServer,
-    HelloWorld,
+    // Cron jobs
+    CreateOverdueWatchlistCheckTasks(commands::CreateOverdueWatchlistCheckTasks),
 }
 
 #[allow(clippy::expect_used)]
-fn main() -> std::io::Result<()> {
-    let config = config::Config::load_from_env().expect("failed to load config");
+fn main() -> Result<()> {
+    let config = config::Config::load_from_env().with_context(|| "failed to load config")?;
 
     // sentry
     let sample_rate: f32 = if config.service_config.is_local() {
@@ -55,21 +57,22 @@ fn main() -> std::io::Result<()> {
     runtime.block_on(async move { run(config).await })
 }
 
-async fn run(config: Config) -> std::io::Result<()> {
+async fn run(config: Config) -> Result<()> {
+    // telemetry
+    let _controller = telemetry::init(&config).with_context(|| "failed to init telemetry layers")?;
+
     let state: State = State::init_or_die(config.clone()).await;
 
     let args = Args::parse();
-    match &args.command {
-        None | Some(Command::ApiServer) => run_api_server(config, state).await,
-        Some(Command::HelloWorld) => run_hello_world().await,
-    }
+    match args.command {
+        None | Some(Command::ApiServer) => run_api_server(config, state).await?,
+        Some(Command::CreateOverdueWatchlistCheckTasks(subcommand)) => subcommand.run(config, state).await?,
+    };
+    Ok(())
 }
 
 #[allow(clippy::expect_used)]
-async fn run_api_server(config: Config, state: State) -> std::io::Result<()> {
-    // telemetry
-    let _controller = telemetry::init(&config).expect("failed to init telemetry layers");
-
+async fn run_api_server(config: Config, state: State) -> Result<(), std::io::Error> {
     // run custom migrations if needed
     custom_migrations::run(&state)
         .await
@@ -208,9 +211,4 @@ async fn socure_reason_code_check(config: &Config) {
         }
         Err(err) => tracing::warn!(error=?err, "[Socure Reason Code check] Error"),
     }
-}
-
-async fn run_hello_world() -> std::io::Result<()> {
-    println!("hello world 🐧");
-    Ok(())
 }
