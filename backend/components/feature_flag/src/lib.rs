@@ -20,9 +20,19 @@ pub enum Error {
     SerdeJson(#[from] serde_json::Error),
 }
 
+struct ManagedClient {
+    inner: launchdarkly_server_sdk::Client,
+}
+
+impl Drop for ManagedClient {
+    fn drop(&mut self) {
+        self.inner.close();
+    }
+}
+
 #[derive(Clone)]
 pub struct LaunchDarklyFeatureFlagClient {
-    pub launch_darkly_client: Option<Arc<launchdarkly_server_sdk::Client>>,
+    launch_darkly_client: Option<Arc<ManagedClient>>,
 }
 
 impl LaunchDarklyFeatureFlagClient {
@@ -41,12 +51,12 @@ impl LaunchDarklyFeatureFlagClient {
             Err("Client failed to successfully initialize".into())
         } else {
             Ok(Self {
-                launch_darkly_client: Some(Arc::new(client)),
+                launch_darkly_client: Some(Arc::new(ManagedClient { inner: client })),
             })
         }
     }
 
-    fn unwrap_client(&self) -> Result<&Arc<Client>, Error> {
+    fn unwrap_client(&self) -> Result<&Arc<ManagedClient>, Error> {
         let client = self
             .launch_darkly_client
             .as_ref()
@@ -60,7 +70,7 @@ impl LaunchDarklyFeatureFlagClient {
             .build()
             .map_err(Error::ContextBuilderError)?;
 
-        let client = self.unwrap_client()?;
+        let client = &self.unwrap_client()?.inner;
         let detail = client.bool_variation_detail(&context, &flag.flag_name(), flag.default());
         if let launchdarkly_server_sdk::Reason::Error { error } = detail.reason {
             return Err(Error::LdError(error));
@@ -107,7 +117,7 @@ impl LaunchDarklyFeatureFlagClient {
         let context = ContextBuilder::new(key)
             .build()
             .map_err(Error::ContextBuilderError)?;
-        let client = self.unwrap_client()?;
+        let client = &self.unwrap_client()?.inner;
         let detail = client.json_variation_detail(&context, &flag.flag_name(), flag.default());
         if let launchdarkly_server_sdk::Reason::Error { error } = detail.reason {
             return Err(Error::LdError(error));
