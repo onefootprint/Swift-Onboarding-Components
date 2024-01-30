@@ -21,7 +21,7 @@ use db::models::verification_result::VerificationResult;
 use db::{DbPool, TxnPgConn};
 use feature_flag::BoolFlag;
 use http::StatusCode;
-use idv::footprint_http_client::FootprintVendorHttpClient;
+use idv::footprint_http_client::{FootprintVendorHttpClient, FpVendorClientArgs};
 use idv::incode::client::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter};
 use idv::incode::doc::response::FetchScoresResponse;
 use idv::incode::doc::{IncodeFetchOCRRequest, IncodeFetchScoresRequest};
@@ -305,7 +305,7 @@ async fn run_aws_inner(
 }
 
 async fn mark_status_as_complete(credentials: IncodeCredentialsWithToken) -> ApiResult<reqwest::Response> {
-    let http_client = FootprintVendorHttpClient::new()?;
+    let http_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default())?;
     let client = IncodeClientAdapter::new(credentials.credentials).map_err(map_to_api_err)?;
     let authenticated_client =
         AuthenticatedIncodeClientAdapter::new(client, credentials.authentication_token)

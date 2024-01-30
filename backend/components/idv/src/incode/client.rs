@@ -8,6 +8,7 @@ use super::{
     response::OnboardingStartResponse,
     IncodeAPIResult,
 };
+use crate::footprint_http_client::FpVendorClientArgs;
 use crate::{footprint_http_client::FootprintVendorHttpClient, incode::error::Error as IncodeError};
 use newtypes::{
     vendor_credentials::IncodeCredentials, DocVData, IdDocKind, IncodeConfigurationId, IncodeSessionId,
@@ -127,7 +128,7 @@ impl IncodeClientAdapter {
 impl AuthenticatedIncodeClientAdapter {
     pub async fn add_document(
         &self,
-        footprint_http_client: &FootprintVendorHttpClient,
+        _: &FootprintVendorHttpClient,
         docv_data: DocVData,
         document_side: DocumentSide,
     ) -> Result<serde_json::Value, IncodeError> {
@@ -142,7 +143,13 @@ impl AuthenticatedIncodeClientAdapter {
             base_64_image: image_from_side(docv_data, document_side)?,
         };
 
-        let response = footprint_http_client
+        // There isn't a way to specify the max number of retries on a per request basis... without
+        // heavy surgery to the open-source reqwest-retry library.
+        // For now, just creating a new client here
+        let args = FpVendorClientArgs { num_retries: Some(1) };
+        let fp_client = FootprintVendorHttpClient::new(args)
+            .map_err(|_| IncodeError::AssertionError("Couldn't construct client".into()))?;
+        let response = fp_client
             .client
             .post(url)
             .headers(self.client_adapter.default_headers.clone())
@@ -545,7 +552,7 @@ mod tests {
     };
 
     use crate::{
-        footprint_http_client::FootprintVendorHttpClient,
+        footprint_http_client::{FootprintVendorHttpClient, FpVendorClientArgs},
         incode::{
             doc::request::DocumentSide,
             doc::response::{
@@ -573,7 +580,7 @@ mod tests {
 
     async fn get_authed_client() -> (FootprintVendorHttpClient, AuthenticatedIncodeClientAdapter) {
         let client = load_client();
-        let fp_client = FootprintVendorHttpClient::new().unwrap();
+        let fp_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default()).unwrap();
         // Start the session
         let config = IncodeConfigurationId::from(INCODE_SANDBOX_SELFIE_FLOW_ID.to_string());
         let res = client

@@ -18,7 +18,7 @@ use db::{
     DbError, DbResult,
 };
 use idv::{
-    footprint_http_client::FootprintVendorHttpClient,
+    footprint_http_client::{FootprintVendorHttpClient, FpVendorClientArgs},
     incode::{doc::response::FetchScoresResponse, IncodeAPIResult},
 };
 use macros::test_state_case;
@@ -46,7 +46,7 @@ use crate::{
 async fn test_run_machine(state: &State, is_selfie: bool) {
     // These tests are actually testing that our integration with incode works.
     // But in other cases, we'll mock responses so we don't actually make requests
-    let fp_client = FootprintVendorHttpClient::new().expect("client failed");
+    let fp_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default()).expect("client failed");
     state.set_incode_to_real_calls(fp_client);
     //
     // Set up
@@ -292,7 +292,7 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
 async fn test_fail(state: &State, is_selfie: bool) {
     // These tests are actually testing that our integration with incode works.
     // But in other cases, we'll mock responses so we don't actually make requests
-    let fp_client = FootprintVendorHttpClient::new().expect("client failed");
+    let fp_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default()).expect("client failed");
     state.set_incode_to_real_calls(fp_client);
     //
     // Set up

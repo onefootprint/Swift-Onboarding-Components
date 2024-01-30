@@ -10,12 +10,19 @@ pub struct FootprintVendorHttpClient {
     pub client: ClientWithMiddleware,
 }
 
+#[derive(Default)]
+pub struct FpVendorClientArgs {
+    pub num_retries: Option<u32>,
+}
+
 impl FootprintVendorHttpClient {
-    pub fn new() -> Result<Self, crate::Error> {
+    pub fn new(args: FpVendorClientArgs) -> Result<Self, crate::Error> {
+        let FpVendorClientArgs { num_retries } = args;
+        let num_retries = num_retries.unwrap_or(2);
         let retry_policy = ExponentialBackoff::builder()
             .retry_bounds(Duration::from_millis(200), Duration::from_secs(3))
             .base(1)
-            .build_with_max_retries(2);
+            .build_with_max_retries(num_retries);
 
         // Note: the order of the middlewares matters
         let client = ClientBuilder::new(reqwest::Client::new())

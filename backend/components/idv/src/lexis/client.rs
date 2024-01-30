@@ -64,6 +64,8 @@ pub async fn flex_id(
 
 #[cfg(test)]
 mod tests {
+    use crate::footprint_http_client::FpVendorClientArgs;
+
     use super::*;
     use dotenv;
 
@@ -74,7 +76,7 @@ mod tests {
     #[traced_test]
     #[tokio::test]
     async fn test_client() {
-        let client = FootprintVendorHttpClient::new().unwrap();
+        let client = FootprintVendorHttpClient::new(FpVendorClientArgs::default()).unwrap();
         let credentials = LexisCredentials {
             user_id: dotenv::var("LEXIS_TEST_USER_ID").unwrap().into(),
             password: dotenv::var("LEXIS_TEST_PASSWORD").unwrap().into(),

@@ -18,8 +18,11 @@ use crypto::aead::ScopedSealingKey;
 use db::DbPool;
 use feature_flag::{FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use idv::{
-    fingerprintjs::client::FingerprintJSClient, footprint_http_client::FootprintVendorHttpClient,
-    idology::client::IdologyClient, middesk::client::MiddeskClient, socure::client::SocureClient,
+    fingerprintjs::client::FingerprintJSClient,
+    footprint_http_client::{FootprintVendorHttpClient, FpVendorClientArgs},
+    idology::client::IdologyClient,
+    middesk::client::MiddeskClient,
+    socure::client::SocureClient,
     stytch::client::StytchClient,
 };
 
@@ -212,8 +215,8 @@ impl State {
             panic!("config.incode.base_url cannot end with /")
         }
 
-        let footprint_vendor_http_client =
-            FootprintVendorHttpClient::new().expect("failed to build vendor client");
+        let footprint_vendor_http_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default())
+            .expect("failed to build vendor client");
 
         // run migrations
         db::run_migrations(&config.database_url).expect("failed to run migrations");

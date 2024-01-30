@@ -22,7 +22,7 @@ mod test {
     use newtypes::{IdvData, PiiString};
 
     use crate::{
-        footprint_http_client::FootprintVendorHttpClient,
+        footprint_http_client::{FootprintVendorHttpClient, FpVendorClientArgs},
         idology::{expectid::response::Restriction, fixtures, standalone_pa},
     };
 
@@ -33,7 +33,7 @@ mod test {
     async fn test_standalone_pa() {
         let test_data = fixtures::test_data::ExpectIDTestData::load_passing_sandbox_data();
 
-        let client = FootprintVendorHttpClient::new().unwrap();
+        let client = FootprintVendorHttpClient::new(FpVendorClientArgs::default()).unwrap();
 
         let idv_data = IdvData {
             first_name: Some(PiiString::from(test_data.first_name.clone())),

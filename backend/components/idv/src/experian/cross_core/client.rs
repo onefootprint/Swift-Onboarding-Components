@@ -221,6 +221,8 @@ impl ExperianClientAdapter {
     ) -> Result<serde_json::Value, Error> {
         let retry_strategy = FixedInterval::from_millis(300).take(3);
 
+        // TODO the HTTP client already retries, so this could cause many retries
+        // Would be cool if we could pass in an Extension that had a lambda retry policy
         let response = RetryIf::spawn(
             retry_strategy,
             || self.send_precise_id_request(client, validated_idv_data.to_owned()),
@@ -320,7 +322,7 @@ impl ValidatedIdvData {
 /// CC requires a JWT auth token (TTL 30m), and these credentials are used in the request to get a token
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
- struct CrossCoreAuthTokenCredentials {
+struct CrossCoreAuthTokenCredentials {
     pub(super) username: PiiString,
     pub(super) password: PiiString,
     pub(super) client_id: PiiString,
@@ -331,7 +333,7 @@ impl ValidatedIdvData {
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
 
- struct CrossCoreRequestCredentials {
+struct CrossCoreRequestCredentials {
     pid_username: PiiString,
     pid_password: Base64EncodedString,
 }
@@ -362,7 +364,7 @@ mod tests {
             error::{Error, ValidationError},
             ExperianCrossCoreRequest,
         },
-        footprint_http_client::FootprintVendorHttpClient,
+        footprint_http_client::{FootprintVendorHttpClient, FpVendorClientArgs},
     };
     use newtypes::{vendor_credentials::ExperianCredentials, IdvData, PiiString};
     use test_case::test_case;
@@ -454,7 +456,7 @@ mod tests {
     #[ignore]
     #[tokio::test]
     async fn test_send_precise_id_request() {
-        let fp_client = FootprintVendorHttpClient::new().unwrap();
+        let fp_client = FootprintVendorHttpClient::new(FpVendorClientArgs::default()).unwrap();
         let credentials = load_sandbox_credentials();
         let idv_data = load_sandbox_data()[0].clone();
 
