@@ -288,3 +288,35 @@ def test_kba(sandbox_user, sandbox_tenant, kba_data, expected_error):
         new_token = FpAuth(body["token"])
         body = get("/hosted/user/token", None, new_token)
         assert not body["scopes"]
+
+
+def test_otp_unverified(sandbox_user, sandbox_tenant):
+    """
+    Test that we can only initiate an OTP challenge to an unverified email after performing KBA.
+    """
+    obc = sandbox_tenant.default_ob_config
+    sandbox_id = sandbox_user.client.sandbox_id
+    phone_number = sandbox_user.client.data["id.phone_number"]
+
+    # Identify the user, and get a token in exchange
+    sandbox_id_h = SandboxId(sandbox_id)
+    data = dict(identifier=dict(phone_number=phone_number), scope="onboarding")
+    body = post("/hosted/identify", data, sandbox_id_h, obc.key)
+    token = FpAuth(body["token"])
+
+    # Cannot initiate a login challenge
+    data = dict(preferred_challenge_kind="email")
+    body = post("/hosted/identify/login_challenge", data, token, status_code=400)
+    assert body["error"]["message"] == "Cannot initiate a challenge of kind email"
+
+    # Run KBA
+    kba_data = {"id.phone_number": phone_number}
+    body = post("hosted/identify/kba", kba_data, token)
+    new_token = FpAuth(body["token"])
+
+    # Now, we can initiate an email challenge
+    auth_token = IdentifyClient.from_token(new_token).step_up(
+        kind="email", assert_had_no_scopes=True
+    )
+    bifrost = BifrostClient.raw_auth(obc, auth_token, sandbox_id)
+    bifrost.run()
