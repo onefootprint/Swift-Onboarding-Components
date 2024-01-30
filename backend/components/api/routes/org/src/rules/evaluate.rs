@@ -59,10 +59,7 @@ pub async fn evaluate_rule(
 
 fn get_stats(results: &Vec<RuleEvalResult>) -> RuleEvalStats {
     let mut cnts = results.iter().map(|r| r.backtest_rule_result).counts();
-    let counts = Counts {
-        triggered: cnts.remove(&true).unwrap_or(0),
-        not_triggered: cnts.remove(&false).unwrap_or(0),
-    };
+    let counts = Counts::new(cnts.remove(&true).unwrap_or(0), cnts.remove(&false).unwrap_or(0));
 
     let counts_by_current_status: HashMap<OnboardingStatus, Counts> = count_by(results, |r| {
         r.current_status.unwrap_or(OnboardingStatus::Incomplete)
@@ -93,13 +90,7 @@ where
             let (triggered, not_triggered): (Vec<_>, Vec<_>) = bt_results.into_iter().partition(|r| *r);
             let triggered_cnt = triggered.len();
             let not_triggered_cnt = not_triggered.len();
-            (
-                k.clone(),
-                Counts {
-                    triggered: triggered_cnt,
-                    not_triggered: not_triggered_cnt,
-                },
-            )
+            (k.clone(), Counts::new(triggered_cnt, not_triggered_cnt))
         })
         .collect::<HashMap<_, Counts>>()
 }
@@ -133,6 +124,7 @@ mod tests {
             counts: Counts {
                 triggered: 4,
                 not_triggered: 6,
+                triggered_rate: 0.4,
             },
             counts_by_current_status: HashMap::from_iter([
                 (
@@ -140,6 +132,7 @@ mod tests {
                     Counts {
                         triggered: 3,
                         not_triggered: 3,
+                        triggered_rate: 0.5,
                     },
                 ),
                 (
@@ -147,6 +140,7 @@ mod tests {
                     Counts {
                         triggered: 1,
                         not_triggered: 1,
+                        triggered_rate: 0.5,
                     },
                 ),
                 (
@@ -154,6 +148,7 @@ mod tests {
                     Counts {
                         triggered: 0,
                         not_triggered: 2,
+                        triggered_rate: 0.0,
                     },
                 ),
             ]),
@@ -163,6 +158,7 @@ mod tests {
                     Counts {
                         triggered: 2,
                         not_triggered: 2,
+                        triggered_rate: 0.5,
                     },
                 ),
                 (
@@ -170,6 +166,7 @@ mod tests {
                     Counts {
                         triggered: 0,
                         not_triggered: 4,
+                        triggered_rate: 0.0,
                     },
                 ),
                 (
@@ -177,6 +174,7 @@ mod tests {
                     Counts {
                         triggered: 2,
                         not_triggered: 0,
+                        triggered_rate: 1.0,
                     },
                 ),
             ]),

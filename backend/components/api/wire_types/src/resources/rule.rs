@@ -50,10 +50,38 @@ pub struct RuleEvalStats {
     pub counts_by_historical_action_triggered: HashMap<RuleResultRuleAction, Counts>,
 }
 
-#[derive(Debug, Clone, Serialize, Apiv2Schema, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct Counts {
     pub triggered: usize,
     pub not_triggered: usize,
+    pub triggered_rate: f32,
+}
+
+impl Counts {
+    pub fn new(triggered: usize, not_triggered: usize) -> Self {
+        let total = triggered + not_triggered;
+        let triggered_rate = if total == 0 {
+            0.0
+        } else {
+            triggered as f32 / (triggered + not_triggered) as f32
+        };
+
+        Counts {
+            triggered,
+            not_triggered,
+            triggered_rate,
+        }
+    }
+}
+
+impl Eq for Counts {}
+// just implemented because f32 doesn't have a built in Eq impl
+impl PartialEq for Counts {
+    fn eq(&self, other: &Self) -> bool {
+        self.triggered == other.triggered
+            && self.not_triggered == other.not_triggered
+            && (self.triggered_rate - other.triggered_rate).abs() < f32::EPSILON
+    }
 }
 
 // TODO: use for RuleSetResult.action_triggered too probably
