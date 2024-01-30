@@ -35,7 +35,7 @@ use feature_flag::FeatureFlagClient;
 pub struct UserSessionContext {
     pub user: Vault,
     pub scopes: Vec<UserAuthScope>,
-    pub purpose: Option<UserSessionPurpose>,
+    pub purpose: UserSessionPurpose,
     pub(super) obc: Option<ObConfiguration>,
     pub(super) tenant: Option<Tenant>,
     pub(super) scoped_user: Option<ScopedVault>,
@@ -45,8 +45,6 @@ pub struct UserSessionContext {
     pub wfr_id: Option<WorkflowRequestId>,
     pub(super) is_implied_auth: bool,
     pub auth_events: Vec<AssociatedAuthEvent>,
-    /// When true, the auth token was initially issued as an unauthed, identified token
-    pub is_from_api: bool,
     pub kba: Vec<DataIdentifier>,
 }
 
@@ -94,7 +92,6 @@ impl UserSessionContext {
             obc_id: new_ctx.obc_id.or(self.obc_id),
             wf_id: new_ctx.wf_id.or(self.wf_id),
             wfr_id: new_ctx.wfr_id.or(self.wfr_id),
-            is_from_api: new_ctx.is_from_api || self.is_from_api,
             is_implied_auth: new_ctx.is_implied_auth || self.is_implied_auth,
             kba: new_ctx.kba.into_iter().chain(self.kba).unique().collect(),
         };
@@ -176,7 +173,6 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     wfr_id,
                     obc_id,
                     scopes,
-                    is_from_api,
                     auth_events,
                     is_implied_auth,
                     kba,
@@ -222,7 +218,6 @@ impl ExtractableAuthSession for ParsedUserSessionContext {
                     tenant,
                     obc_id,
                     scopes,
-                    is_from_api,
                     auth_events,
                     is_implied_auth,
                     kba,

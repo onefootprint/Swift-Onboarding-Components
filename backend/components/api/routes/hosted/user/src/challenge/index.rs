@@ -36,7 +36,7 @@ pub async fn post(
     user_auth: UserAuthContext,
 ) -> JsonApiResponse<UserChallengeResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::ExplicitAuth.and(UserAuthGuard::Auth))?;
-    if !user_auth.data.is_from_api {
+    if !user_auth.data.purpose.is_from_api() {
         return ValidationError("Can only update auth methods using auth issued via API").into();
     }
     let UserChallengeRequest {
@@ -59,9 +59,9 @@ pub async fn post(
     if !allowed_challenge_kinds.contains(&kind) {
         return ValidationError(&format!("Cannot initiate challenge of kind {}", kind)).into();
     }
-    if let Some(UserSessionPurpose::ApiUpdateAuthMethods {
+    if let UserSessionPurpose::ApiUpdateAuthMethods {
         limit_auth_methods: Some(limit_auth_methods),
-    }) = &user_auth.data.purpose
+    } = &user_auth.data.purpose
     {
         if !limit_auth_methods.contains(&kind) {
             return ValidationError(&format!("Token cannot initiate challenge of kind {}", kind)).into();

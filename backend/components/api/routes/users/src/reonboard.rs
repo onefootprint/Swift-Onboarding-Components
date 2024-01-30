@@ -59,12 +59,11 @@ pub async fn post(
             let context = NewUserSessionContext {
                 su_id: Some(sv.id),
                 obc_id: Some(obc.id),
-                is_from_api: true,
                 ..Default::default()
             };
             let args = NewUserSessionArgs {
                 user_vault_id: sv.vault_id,
-                purpose: Some(UserSessionPurpose::ApiReonboard),
+                purpose: UserSessionPurpose::ApiReonboard,
                 context,
                 scopes: vec![],
                 auth_events: vec![],

@@ -39,7 +39,7 @@ pub async fn post(
     let IdentifyRequest { identifier, scope } = request.into_inner();
     let user_auth = user_auth.map(|ua| ua.check_guard(Any)).transpose()?;
     let provided_token = user_auth.as_ref().map(|ua| ua.auth_token.clone());
-    let is_from_api = user_auth.as_ref().is_some_and(|ua| ua.is_from_api);
+    let is_from_api = user_auth.as_ref().is_some_and(|ua| ua.purpose.is_from_api());
 
     // Require one of user_auth or identifier
     let identifier = match (user_auth, identifier) {
@@ -84,7 +84,7 @@ pub async fn post(
                 };
                 let args = NewUserSessionArgs {
                     user_vault_id: v_id,
-                    purpose: Some(scope.into()),
+                    purpose: scope.into(),
                     context,
                     scopes: vec![],
                     auth_events: vec![],

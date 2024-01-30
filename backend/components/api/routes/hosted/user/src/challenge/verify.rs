@@ -61,7 +61,7 @@ pub async fn post(
     insights: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_guard(UserAuthGuard::ExplicitAuth.and(UserAuthGuard::Auth))?;
-    if !user_auth.data.is_from_api {
+    if !user_auth.data.purpose.is_from_api() {
         return ValidationError("Can only update auth methods using auth issued via API").into();
     }
     let sv_id = user_auth

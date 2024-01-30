@@ -101,14 +101,13 @@ pub fn create_token(
     let context = NewUserSessionContext {
         su_id: Some(sv.id),
         obc_id,
-        is_from_api: true,
         is_implied_auth,
         wfr_id: wfr.as_ref().map(|wfr| wfr.id.clone()),
         ..Default::default()
     };
     let args = NewUserSessionArgs {
         user_vault_id: sv.vault_id,
-        purpose: Some(purpose),
+        purpose,
         context,
         scopes,
         auth_events,

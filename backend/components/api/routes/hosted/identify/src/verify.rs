@@ -186,7 +186,7 @@ pub async fn post(
                 // Otherwise, create a new token with these scopes / context
                 let args = NewUserSessionArgs {
                     user_vault_id: uv_id.clone(),
-                    purpose: Some(scope.into()),
+                    purpose: scope.into(),
                     context,
                     scopes,
                     auth_events: vec![ae],

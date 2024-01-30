@@ -22,8 +22,7 @@ pub struct UserSession {
     pub user_vault_id: VaultId,
     /// Context on the purpose for which this user session was created.
     /// If a session is created by stepping up an old sesion, we'll keep the old purpose
-    /// TODO make this required
-    pub purpose: Option<UserSessionPurpose>,
+    pub purpose: UserSessionPurpose,
     /// The tenant-scoped user for the auth session. Only null for my1fp
     pub su_id: Option<ScopedVaultId>,
     /// The scoped business for the auth session, if any
@@ -40,10 +39,6 @@ pub struct UserSession {
     /// The auth events that give this token its permissions
     #[serde(default)]
     pub auth_events: Vec<AssociatedAuthEvent>,
-    /// When true, the auth token was initially issued as an unauthed, identified token.
-    /// Also true for tokens created via step up of tokens made via API
-    /// TODO can remove this when we have purpose
-    pub is_from_api: bool,
     /// When true, the auth events that occurred at this tenant were inherited to form this token,
     /// rather than proof of auth being exchanged physically
     /// rm?
@@ -63,8 +58,6 @@ pub struct NewUserSessionContext {
     pub obc_id: Option<ObConfigurationId>,
     pub wf_id: Option<WorkflowId>,
     pub wfr_id: Option<WorkflowRequestId>,
-    // TODO rm
-    pub is_from_api: bool,
     pub is_implied_auth: bool,
     pub kba: Vec<DataIdentifier>,
 }
@@ -146,8 +139,7 @@ impl AssociatedAuthEvent {
 pub struct NewUserSessionArgs {
     pub user_vault_id: VaultId,
     pub context: NewUserSessionContext,
-    // TODO make this required
-    pub purpose: Option<UserSessionPurpose>,
+    pub purpose: UserSessionPurpose,
     pub scopes: Vec<UserAuthScope>,
     pub auth_events: Vec<AssociatedAuthEvent>,
 }
@@ -173,7 +165,6 @@ impl UserSession {
             obc_id,
             wf_id,
             wfr_id,
-            is_from_api,
             is_implied_auth,
             kba,
         } = context;
@@ -186,7 +177,6 @@ impl UserSession {
             wf_id,
             wfr_id,
             scopes,
-            is_from_api,
             auth_events,
             is_implied_auth,
             kba,

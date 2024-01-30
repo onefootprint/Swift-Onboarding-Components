@@ -19,13 +19,12 @@ pub async fn get(
     let user_auth = user_auth.check_guard(UserAuthGuard::Auth)?;
     let v_id = user_auth.user_vault_id().clone();
     let ctx = get_user_challenge_context(&state, v_id, user_auth.scoped_user_id()).await?;
-    let limit_auth_methods = if let Some(UserSessionPurpose::ApiUpdateAuthMethods { limit_auth_methods }) =
-        &user_auth.data.purpose
-    {
-        limit_auth_methods.as_ref()
-    } else {
-        None
-    };
+    let limit_auth_methods =
+        if let UserSessionPurpose::ApiUpdateAuthMethods { limit_auth_methods } = &user_auth.data.purpose {
+            limit_auth_methods.as_ref()
+        } else {
+            None
+        };
     let auth_methods = ctx
         .auth_methods
         .into_iter()
