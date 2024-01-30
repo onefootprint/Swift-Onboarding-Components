@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:uni_links/uni_links.dart';
 import 'dart:convert';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 part "config/constants.dart";
@@ -21,7 +20,7 @@ part "utils/logger.dart";
 
 bool _initialUriIsHandled = false;
 
-enum _ResultType { SUCCESS, CANCELED }
+enum _ResultType { completed, canceled }
 
 class _Footprint {
   Uri? _latestUri;
@@ -45,7 +44,7 @@ class _Footprint {
       _isBrowserOpen = false;
       if (_result == null) {
         // User closed the browser without completing the flow
-        _result = _ResultType.CANCELED;
+        _result = _ResultType.canceled;
         _handleCancel?.call();
       }
     }, onBrowserOpened: () {
@@ -62,6 +61,7 @@ class _Footprint {
       if (token != null && !_isBrowserOpen) {
         var url = _createUrl(
           token: token,
+          l10n: config.l10n,
           appearance: config.appearance,
           // TODO: Fix this. This comes from the tenant
           redirectUrl: "com.footprint.fluttersdk://example",
@@ -103,10 +103,10 @@ class _Footprint {
     _latestUri = uri;
     uri.queryParameters.forEach((key, value) {
       if (key == 'validation_token') {
-        _result = _ResultType.SUCCESS;
+        _result = _ResultType.completed;
         _handleComplete?.call(value);
       } else if (key == 'canceled') {
-        _result = _ResultType.CANCELED;
+        _result = _ResultType.canceled;
         _handleCancel?.call();
       }
     });

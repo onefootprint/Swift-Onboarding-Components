@@ -19,6 +19,7 @@ class _MyAppState extends State<MyApp> {
         publicKey: "pb_test_RcDHxZgJO9q3vY72d7ZLXu",
         onCancel: () => print("onCancel"),
         onComplete: (String token) => print("onComplete $token"),
+        l10n: FootprintL10n(language: FootprintSupportedLanguage.es),
         appearance: FootprintAppearance(
             variables: FootprintAppearanceVariables(buttonPrimaryBg: 'red')));
 

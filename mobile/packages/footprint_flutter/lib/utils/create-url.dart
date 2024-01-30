@@ -33,6 +33,11 @@ String _createUrl({
       addParam('font_src', appearance.fontSrc!);
     }
   }
+  if (l10n != null) {
+    if (l10n.language != null) {
+      addParam('lng', l10n.language!.name);
+    }
+  }
 
   return 'https://id.onefootprint.com?$searchParams#$token';
 }
