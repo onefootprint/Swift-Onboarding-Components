@@ -2,7 +2,7 @@ part of "../footprint_flutter.dart";
 
 class _SdkArgsResponse {
   final String? data;
-  final String? error;
+  final Object? error;
 
   _SdkArgsResponse({this.data, this.error});
 
@@ -31,7 +31,7 @@ Future<_SdkArgsResponse> _sendSdkArgsRecursive(
     if (numRetries > 0) {
       return _sendSdkArgsRecursive(payload, numRetries - 1);
     }
-    return _SdkArgsResponse(error: e.toString());
+    return _SdkArgsResponse(error: e);
   }
 }
 

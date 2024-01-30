@@ -8,15 +8,16 @@ import 'package:uni_links/uni_links.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-part "config/constants.dart";
-part "types/appearance.dart";
+part 'config/constants.dart';
+part 'types/appearance.dart';
 part 'types/configuration.dart';
 part 'types/l10n.dart';
-part "types/options.dart";
-part "types/user_data.dart";
-part "utils/create-url.dart";
-part "utils/send_sdk_args.dart";
-part "utils/logger.dart";
+part 'types/options.dart';
+part 'types/user_data.dart';
+part 'utils/create_url.dart';
+part 'utils/send_sdk_args.dart';
+part 'utils/send_sdk_telemetry.dart';
+part 'utils/logger.dart';
 
 bool _initialUriIsHandled = false;
 
@@ -52,25 +53,23 @@ class _Footprint {
       _result = null; // reset result
       _latestUri = null; // reset latestUri
     });
-    try {
-      var response = await _sendSdkArgs(config);
-      var token = response.data;
-      if (response.failed) {
-        _logError();
-      }
-      if (token != null && !_isBrowserOpen) {
-        var url = _createUrl(
-          token: token,
-          l10n: config.l10n,
-          appearance: config.appearance,
-          // TODO: Fix this. This comes from the tenant
-          redirectUrl: "com.footprint.fluttersdk://example",
-        );
-        _openBrowser(url);
-      }
-    } catch (e) {
-      // Handle the error
-      print('An error occurred: $e');
+
+    var response = await _sendSdkArgs(config);
+
+    if (response.failed) {
+      _logError(response.error);
+    }
+
+    var token = response.data;
+    if (token != null && !_isBrowserOpen) {
+      var url = _createUrl(
+        token: token,
+        l10n: config.l10n,
+        appearance: config.appearance,
+        // TODO: Fix this. This comes from the tenant
+        redirectUrl: "com.footprint.fluttersdk://example",
+      );
+      _openBrowser(url);
     }
   }
 
