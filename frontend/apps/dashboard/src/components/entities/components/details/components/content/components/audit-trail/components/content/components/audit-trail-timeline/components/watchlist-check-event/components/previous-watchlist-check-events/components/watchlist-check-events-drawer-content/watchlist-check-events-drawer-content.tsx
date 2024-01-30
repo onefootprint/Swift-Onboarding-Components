@@ -1,4 +1,3 @@
-import styled from '@onefootprint/styled';
 import type {
   PreviousWatchlistChecksEventData,
   WatchlistCheckEventData,
@@ -27,9 +26,9 @@ const WatchlistCheckEventsDrawerContent = ({
 
     return {
       headerComponent: (
-        <HeaderContainer>
+        <Stack justify="space-between" align="center" width="100%">
           <Typography variant="label-3" testID="watchlist-check-event-header">
-            {t('title')}
+            {t('drawer-title')}
           </Typography>
           <Stack gap={2}>
             <Typography variant="body-4" color="tertiary">
@@ -46,10 +45,14 @@ const WatchlistCheckEventsDrawerContent = ({
               })}
             </Typography>
           </Stack>
-        </HeaderContainer>
+        </Stack>
       ),
       bodyComponent: (
-        <WatchlistCheckEventBody data={eventData} lineHeight="default" />
+        <WatchlistCheckEventBody
+          data={eventData}
+          lineHeight="default"
+          showIcons
+        />
       ),
       iconComponent: <WatchlistCheckEventIcon />,
     };
@@ -57,11 +60,5 @@ const WatchlistCheckEventsDrawerContent = ({
 
   return <Timeline items={timelineItems} />;
 };
-
-const HeaderContainer = styled.div`
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-`;
 
 export default WatchlistCheckEventsDrawerContent;

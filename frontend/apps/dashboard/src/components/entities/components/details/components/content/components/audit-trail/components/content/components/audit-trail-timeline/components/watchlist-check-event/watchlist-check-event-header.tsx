@@ -1,7 +1,8 @@
+import styled, { css } from '@onefootprint/styled';
 import type { PreviousWatchlistChecksEventData } from '@onefootprint/types';
-import { Typography } from '@onefootprint/ui';
+import { createFontStyles, Typography } from '@onefootprint/ui';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans } from 'react-i18next';
 
 import PreviousWatchlistCheckEvents from './components/previous-watchlist-check-events';
 
@@ -11,19 +12,29 @@ type WatchlistCheckEventHeaderProps = {
 
 const WatchlistCheckEventHeader = ({
   data,
-}: WatchlistCheckEventHeaderProps) => {
-  const { t } = useTranslation('common', {
-    keyPrefix: 'pages.entity.audit-trail.timeline.watchlist-check-event',
-  });
+}: WatchlistCheckEventHeaderProps) => (
+  <>
+    <Typography
+      variant="body-3"
+      color="tertiary"
+      testID="watchlist-check-event-header"
+    >
+      <Trans
+        i18nKey="pages.entity.audit-trail.timeline.watchlist-check-event.title"
+        components={{
+          b: <Bold />,
+        }}
+      />
+    </Typography>
+    <PreviousWatchlistCheckEvents data={data} />
+  </>
+);
 
-  return (
-    <>
-      <Typography variant="label-3" testID="watchlist-check-event-header">
-        {t('title')}
-      </Typography>
-      <PreviousWatchlistCheckEvents data={data} />
-    </>
-  );
-};
+const Bold = styled.b`
+  ${({ theme }) => css`
+    ${createFontStyles('label-3')};
+    color: ${theme.color.primary};
+  `}
+`;
 
 export default WatchlistCheckEventHeader;
