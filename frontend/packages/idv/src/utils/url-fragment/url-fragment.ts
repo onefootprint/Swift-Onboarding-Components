@@ -1,8 +1,10 @@
 const hasEncodedOpenBrackets = (str: string): boolean =>
   Boolean(str) && /%7B/g.test(str);
 
+// Specifically do NOT require that the string starts with tok_. Some tokens may have different
+// prefixes
 export const isValidTokenFormat = (str: string): boolean =>
-  Boolean(str) && /^tok_/.test(str);
+  Boolean(str) && /tok_/.test(str);
 
 export const getSdkArgsToken = (str: string): string =>
   isValidTokenFormat(str) ? str : '';
