@@ -17,7 +17,7 @@ use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
     AlpacaKycConfig, DecisionIntentKind, DecisionStatus, DocumentRequestKind, Locked, OnboardingStatus,
-    RiskSignalGroupKind, RuleSetResultKind, VendorAPI,
+    RiskSignalGroupKind, RuleAction, RuleSetResultKind, VendorAPI,
 };
 
 use crate::{
@@ -513,12 +513,14 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                 decision_status: DecisionStatus::Pass,
                 should_commit: true,
                 create_manual_review: false,
+                action: None,
             }
         } else {
             Decision {
                 decision_status: DecisionStatus::Fail,
                 should_commit: !is_sandbox, // To be consistent with the Kyc workflow which currently does not commit data if the decision is Fail
                 create_manual_review: true,
+                action: Some(RuleAction::Fail),
             }
         };
         let review_reasons = common::get_review_reasons_inner(

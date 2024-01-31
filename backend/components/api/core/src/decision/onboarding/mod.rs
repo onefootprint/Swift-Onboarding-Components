@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
 use enum_dispatch::enum_dispatch;
-use newtypes::{DecisionStatus, FootprintReasonCode, RuleName, VendorAPI};
+use newtypes::{DecisionStatus, FootprintReasonCode, RuleAction, RuleName, VendorAPI};
 use serde::Serialize;
 
 use crate::errors::ApiResult;
@@ -134,7 +134,9 @@ pub struct Decision {
     pub decision_status: DecisionStatus,
     pub should_commit: bool,
     pub create_manual_review: bool,
+    pub action: Option<RuleAction>,
 }
+
 pub trait FeatureVector {
     fn evaluate(&self) -> ApiResult<OnboardingRulesDecision>;
 }
@@ -228,12 +230,14 @@ mod tests {
             decision_status: d_args_1.0,
             should_commit: false,
             create_manual_review: d_args_1.1,
+            action: None,
         };
 
         let decision2 = Decision {
             decision_status: d_args_2.0,
             should_commit: false,
             create_manual_review: d_args_2.1,
+            action: None,
         };
 
         decision1.cmp(&decision2)

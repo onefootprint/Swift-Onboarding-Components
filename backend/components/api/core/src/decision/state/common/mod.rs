@@ -168,6 +168,7 @@ pub fn alpaca_kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> Ap
         decision_status,
         should_commit: false,
         create_manual_review: false,
+        action: None,
     };
     Ok(decision)
 }

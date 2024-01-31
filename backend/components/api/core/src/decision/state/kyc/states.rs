@@ -14,7 +14,7 @@ use feature_flag::FeatureFlagClient;
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
     DecisionStatus, DocumentRequestKind, EnhancedAmlOption, KycConfig, Locked, OnboardingStatus,
-    RiskSignalGroupKind, RuleSetResultKind, VerificationResultId,
+    RiskSignalGroupKind, RuleAction, RuleSetResultKind, VerificationResultId,
 };
 
 use super::{
@@ -369,17 +369,28 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
                 Ok(KycState::from(KycComplete))
             }
             DecisionStatus::StepUp => {
+                let mut doc_reqs: Vec<NewDocumentRequestArgs> = vec![];
+                if let Some(RuleAction::StepUp(kind)) = decision.action {
+                    let sv_id = self.sv_id.clone();
+                    let wf_id: newtypes::WorkflowId = self.wf_id.clone();
+                    let collect_selfie = true; // TODO: should come from config
+
+                    kind.to_doc_kinds().into_iter().for_each(|k| {
+                        let doc_req_kind = k.into();
+                        doc_reqs.push(NewDocumentRequestArgs {
+                            scoped_vault_id: sv_id.clone(),
+                            ref_id: None,
+                            workflow_id: wf_id.clone(),
+                            // TODO: should come from a config
+                            should_collect_selfie: collect_selfie,
+                            kind: doc_req_kind,
+                        })
+                    })
+                };
+                DocumentRequest::bulk_create(conn, doc_reqs)?;
+
                 let update = WorkflowUpdate::set_status(OnboardingStatus::Incomplete);
                 DbWorkflow::update(wf, conn, update)?;
-                let args = NewDocumentRequestArgs {
-                    scoped_vault_id: self.sv_id.clone(),
-                    ref_id: None,
-                    workflow_id: self.wf_id.clone(),
-                    // TODO: should come from a config
-                    should_collect_selfie: true,
-                    kind: DocumentRequestKind::Identity,
-                };
-                DocumentRequest::create(conn, args)?;
 
                 Ok(KycState::from(KycDocCollection {
                     wf_id: self.wf_id,

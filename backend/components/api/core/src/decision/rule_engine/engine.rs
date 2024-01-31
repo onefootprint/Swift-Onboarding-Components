@@ -71,6 +71,7 @@ pub fn evaluate_workflow_decision(
             .action_triggered
             .map(|ra| ra.should_create_review())
             .unwrap_or(false),
+        action: rule_set_result.action_triggered,
     })
 }
 

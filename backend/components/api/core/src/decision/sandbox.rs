@@ -11,8 +11,8 @@ use db::{
 };
 use idv::{incode::watchlist::response::WatchlistResultResponse, ParsedResponse, VendorResponse};
 use newtypes::{
-    CipKind, DecisionIntentId, DecisionStatus, FootprintReasonCode, ScopedVaultId, SignalSeverity, VaultKind,
-    VaultPublicKey, VendorAPI,
+    CipKind, DecisionIntentId, DecisionStatus, FootprintReasonCode, RuleAction, ScopedVaultId,
+    SignalSeverity, VaultKind, VaultPublicKey, VendorAPI,
 };
 use rand::{seq::SliceRandom, Rng};
 use strum::IntoEnumIterator;
@@ -253,11 +253,17 @@ pub fn get_fixture_aml_reason_codes(
 impl From<FixtureDecision> for OnboardingRulesDecisionOutput {
     fn from(value: FixtureDecision) -> Self {
         let (decision_status, create_manual_review) = value;
+        let action = match decision_status {
+            DecisionStatus::Fail => Some(RuleAction::Fail),
+            DecisionStatus::StepUp => Some(RuleAction::identity_stepup()),
+            DecisionStatus::Pass => None,
+        };
         OnboardingRulesDecisionOutput {
             decision: Decision {
                 decision_status,
                 should_commit: decision_status == DecisionStatus::Pass,
                 create_manual_review,
+                action,
             },
             rules_triggered: vec![],
             rules_not_triggered: vec![],
