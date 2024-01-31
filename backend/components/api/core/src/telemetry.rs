@@ -61,7 +61,7 @@ pub fn init(config: &Config) -> Result<Option<BasicController>> {
     // Initialize `tracing` using `opentelemetry-tracing` and configure logging
     let sub = Registry::default()
         .with(env_filter)
-        .with(tracing_subscriber::fmt::layer().with_ansi(false).pretty())
+        .with(tracing_subscriber::fmt::layer().json())
         .with(tracing_opentelemetry::layer().with_tracer(tracer))
         .with(sentry_layer);
 
