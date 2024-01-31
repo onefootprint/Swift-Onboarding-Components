@@ -1,19 +1,10 @@
 import { GlobalState } from './main';
 import { NitroServiceOutput } from './nitro_service';
-import { StackMetadata } from './stack_metadata';
-import { route53 } from '@pulumi/aws';
 import * as awsx from '@pulumi/awsx';
 import * as aws from '@pulumi/aws';
 import * as pulumi from '@pulumi/pulumi';
-import { StaticSecrets } from './secrets';
-import { ContainersOutput, ServiceContainers } from './containers';
-import { EnclaveKeyDescriptor } from './enclave_key';
-import { HmacSigningKeyDescriptor } from './hmac_key';
-import * as s3 from './s3';
+import { ServiceContainers } from './containers';
 import { GetStackMetadata } from './stack_metadata';
-import * as appCdn from './app_cdn';
-import { FPC_SERVICE_PORT } from './sg';
-import { Certificate } from './certs';
 import { ECSRolesOutput } from './ecs_roles';
 
 export async function CreateScheduledTasks(
@@ -45,7 +36,7 @@ export async function CreateScheduledTasks(
         cronTask.args,
       );
 
-      const taskSlug = `${stackMetadata.shortStackName}-cron-${cronTask.name}`;
+      const taskSlug = `cron-${cronTask.name}-${stackMetadata.shortStackName}`;
 
       const taskDefinition = new aws.ecs.TaskDefinition(
         `task-${taskSlug}`,
@@ -146,25 +137,28 @@ export async function CreateScheduledTasks(
 
   tasks.forEach(async ({ taskDefinition, cronTask }) => {
     // Set up the cron trigger.
-    const schedule = new aws.scheduler.Schedule('ex', {
-      groupName: scheduleGroup.name,
-      flexibleTimeWindow: {
-        mode: 'OFF',
-      },
-      scheduleExpression: cronTask.schedule,
-      target: {
-        arn: cluster.cluster.arn,
-        roleArn: invocationRole.arn,
-        ecsParameters: {
-          taskDefinitionArn: taskDefinition.arn,
-          launchType: 'FARGATE',
-          networkConfiguration: {
-            assignPublicIp: false,
-            subnets: vpc.privateSubnetIds,
-            securityGroups: [g.coreSecurityGroups.fpcService.id],
+    const schedule = new aws.scheduler.Schedule(
+      `cron-schedule-${cronTask.name}-${stackMetadata.shortStackName}`,
+      {
+        groupName: scheduleGroup.name,
+        flexibleTimeWindow: {
+          mode: 'OFF',
+        },
+        scheduleExpression: cronTask.schedule,
+        target: {
+          arn: cluster.cluster.arn,
+          roleArn: invocationRole.arn,
+          ecsParameters: {
+            taskDefinitionArn: taskDefinition.arn,
+            launchType: 'FARGATE',
+            networkConfiguration: {
+              assignPublicIp: false,
+              subnets: vpc.privateSubnetIds,
+              securityGroups: [g.coreSecurityGroups.cron.id],
+            },
           },
         },
       },
-    });
+    );
   });
 }

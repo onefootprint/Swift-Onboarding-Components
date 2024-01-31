@@ -121,7 +121,7 @@ config:
       targetCpuUtilization: 60
       targetMemoryUtilization: 60
     cronTasks:
-      - name: create-overdue-watchlist-check-tasks
+      - name: overdue-watchlist
         memoryMB: 512
         cpuUnits: 256
         schedule: "cron(0 17 * * ? *)" # Once per day at 17:00 UTC
