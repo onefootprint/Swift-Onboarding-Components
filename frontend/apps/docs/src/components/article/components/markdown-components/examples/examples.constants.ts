@@ -166,6 +166,15 @@ const mobile: Option = {
         width: 32,
       },
     },
+    {
+      name: 'Flutter',
+      href: 'https://github.com/onefootprint/examples/tree/master/idv/mobile-flutter',
+      img: {
+        src: '/examples/flutter.png',
+        height: 32,
+        width: 32,
+      },
+    },
   ],
 };
 
