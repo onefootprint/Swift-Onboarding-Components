@@ -8,7 +8,7 @@ class FootprintConfiguration {
   final Function(String)? onComplete;
   final String? authToken;
   final String? publicKey;
-  final String? redirectUrl;
+  final String redirectUrl;
   final void Function()? onCancel;
 
   FootprintConfiguration({
@@ -19,7 +19,7 @@ class FootprintConfiguration {
     this.onComplete,
     this.options,
     this.publicKey,
-    this.redirectUrl,
+    required this.redirectUrl,
     this.userData,
   });
 
