@@ -73,13 +73,14 @@ async fn process_id_inner(
     if let idv::incode::IncodeAPIResult::ResponseError(e) = &res {
         if e.message
             .as_ref()
-            .map(|m| m.contains("Id already processed"))
+            .map(|m| m.contains("Id already processed") || m.contains("NumberFormatException: Cannot parse null string"))
             .unwrap_or(false)
         {
             tracing::warn!(
                 ivs_id=%session.id,
                 sv_id=%ctx.sv_id,
-                "Received process_id response: Id already processed"
+                message=?e.message,
+                "Received expected error in process_id response"
             );
         } else {
             res.into_success().map_err(map_to_api_err)?;
