@@ -1,6 +1,7 @@
+import type { CustomChildAPI } from '@onefootprint/idv';
 import React, { createContext, useContext } from 'react';
 
-import type { CustomChildAPI, ProviderReturn } from './types';
+import type { ProviderReturn } from './types';
 
 type FootprintProviderProps = {
   children: React.ReactNode;

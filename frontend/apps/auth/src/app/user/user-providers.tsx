@@ -8,6 +8,8 @@ import configureI18n from '@/src/config/initializers/18next';
 import { useEffectOnceStrict } from '@/src/hooks';
 import AppearanceProvider from '@/src/package-appearance/provider';
 import type { AppearanceResponse } from '@/src/package-appearance/types';
+import FootprintProvider from '@/src/provider-footprint';
+import configureFootprint from '@/src/provider-footprint/adapters';
 
 type EditProvidersProps = {
   children: React.ReactNode;
@@ -15,6 +17,7 @@ type EditProvidersProps = {
 };
 
 configureI18n();
+const fpClient = configureFootprint();
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
 });
@@ -34,7 +37,9 @@ const UserProviders = ({ loadedStyle, children }: EditProvidersProps) => {
       rules={loadedStyle.rules || ''}
       theme={loadedStyle.theme}
     >
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <FootprintProvider client={fpClient}>{children}</FootprintProvider>
+      </QueryClientProvider>
     </AppearanceProvider>
   );
 };

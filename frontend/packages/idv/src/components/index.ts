@@ -3,7 +3,11 @@ export { default as AppErrorBoundary } from './app-error-boundary';
 export { default as DeviceSignals } from './device-signals';
 export { default as EmailForm } from './email-form';
 export { default as EmailPreview } from './email-preview';
-export type { CompletePayload, ProviderReturn } from './footprint-provider';
+export type {
+  CompletePayload,
+  CustomChildAPI,
+  ProviderReturn,
+} from './footprint-provider';
 export {
   default as FootprintProvider,
   useFootprintProvider,

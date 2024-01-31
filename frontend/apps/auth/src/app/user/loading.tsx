@@ -2,7 +2,9 @@ import '../../static/server-loading.css';
 
 import React from 'react';
 
-const Loading = () => (
+type LoadingProps = { isRoot?: boolean };
+
+const Content = ({ isRoot = false }) => (
   <div
     style={{
       flex: 'auto',
@@ -10,6 +12,8 @@ const Loading = () => (
       width: '100%',
       maxWidth: '480px',
       margin: 'auto',
+      paddingBottom: isRoot ? '34px' : '0',
+      background: isRoot ? '#fff' : 'transparent',
     }}
   >
     <div
@@ -78,5 +82,22 @@ const Loading = () => (
     />
   </div>
 );
+
+const Loading = ({ isRoot = false }: LoadingProps) =>
+  isRoot ? (
+    <div
+      style={{
+        display: 'flex',
+        height: '100%',
+        margin: '0 auto',
+        maxWidth: '480px',
+        flexBasis: '480px',
+      }}
+    >
+      <Content isRoot />
+    </div>
+  ) : (
+    <Content />
+  );
 
 export default Loading;

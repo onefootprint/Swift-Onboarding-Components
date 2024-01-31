@@ -14,7 +14,7 @@ type UserPageProps = {
 const variant = 'modal';
 const UserContainer = dynamic(() => import('@/src/components/user-container'), {
   ssr: false,
-  loading: () => <Loading />,
+  loading: () => <Loading isRoot />,
 });
 
 const UserPage = async (props: UserPageProps) => {
@@ -29,7 +29,7 @@ const UserPage = async (props: UserPageProps) => {
   return (
     <main id="__next" data-variant={loadedStyle.variant}>
       <UserProviders loadedStyle={loadedStyle}>
-        <UserContainer variant={variant} />
+        <UserContainer variant={variant} Loading={<Loading />} />
       </UserProviders>
     </main>
   );

@@ -1,12 +1,4 @@
-export type CustomChildAPI = Postmate.ChildAPI & {
-  child?: Record<string, unknown>; // Window type; child === window
-  parent?: Record<string, unknown>; // Window type
-  parentOrigin?: string;
-  model?: {
-    sdkUrl?: string;
-    sdkVersion?: string;
-  };
-};
+import type { CustomChildAPI } from '@onefootprint/idv';
 
 export type WebViewAdapterReturn = {
   getAdapterResponse: () => null;

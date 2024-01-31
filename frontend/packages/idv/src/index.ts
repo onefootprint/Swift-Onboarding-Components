@@ -1,4 +1,5 @@
 export type {
+  CustomChildAPI,
   NavigationHeaderLeftButtonProps,
   ProviderReturn,
 } from './components';

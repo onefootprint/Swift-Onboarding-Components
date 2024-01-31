@@ -1,8 +1,11 @@
 import { FootprintPrivateEvent } from '@onefootprint/footprint-js';
+import type { CustomChildAPI } from '@onefootprint/idv';
 import Postmate from '@onefootprint/postmate';
 
-import type { CustomChildAPI, IframeAdapterReturn } from '../types';
+import type { IframeAdapterReturn } from '../types';
 import generateEventEmitter from '../utils';
+
+const { started } = FootprintPrivateEvent;
 
 const generateIframeAdapter = (): IframeAdapterReturn => {
   let isAdapterLoaded: boolean = false;
@@ -18,12 +21,7 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
         return Promise.resolve(postmateChildApiRef);
       }
 
-      const { propsReceived, formSaved, started } = FootprintPrivateEvent;
-      const crossContextModel = {
-        [formSaved]: () => eventEmitter.emit(formSaved),
-        [propsReceived]: (data?: unknown) =>
-          eventEmitter.emit(propsReceived, data),
-      };
+      const crossContextModel = {};
 
       try {
         postmateChildApiRef = await new Postmate.Model(crossContextModel);

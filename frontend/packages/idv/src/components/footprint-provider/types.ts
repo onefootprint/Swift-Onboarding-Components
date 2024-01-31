@@ -6,6 +6,7 @@ export type CustomChildAPI = Postmate.ChildAPI & {
   parent?: Record<string, unknown>; // Window type
   parentOrigin?: string;
   model?: {
+    authToken?: string;
     initId?: string; // The initId is generated in the footprint-js application during iframe creation, it is the same id as the iframe.
     sdkUrl?: string;
     sdkVersion?: string;

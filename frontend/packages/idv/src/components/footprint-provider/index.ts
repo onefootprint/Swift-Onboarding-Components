@@ -1,2 +1,2 @@
 export { default, useFootprintProvider } from './footprint-js-provider';
-export type { CompletePayload, ProviderReturn } from './types';
+export type { CompletePayload, CustomChildAPI, ProviderReturn } from './types';

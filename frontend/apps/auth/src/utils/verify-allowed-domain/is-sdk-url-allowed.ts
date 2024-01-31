@@ -1,4 +1,5 @@
-import type { CustomChildAPI } from '../../provider-footprint/types';
+import type { CustomChildAPI } from '@onefootprint/idv';
+
 import isDomainAllowed from './verify-allowed-domain';
 
 type Client = { getAdapterResponse: () => CustomChildAPI | null };
