@@ -1,12 +1,14 @@
 part of "../footprint_flutter.dart";
 
 String _createUrl({
-  FootprintAppearance? appearance,
-  FootprintL10n? l10n,
+  FootprintConfiguration? config,
   String? redirectUrl,
   required String token,
 }) {
-  var searchParams = StringBuffer();
+  final l10n = config?.l10n;
+  final appearance = config?.appearance;
+  final redirectUrl = config?.redirectUrl;
+  final searchParams = StringBuffer();
 
   void addParam(String key, String value) {
     if (searchParams.isNotEmpty) {

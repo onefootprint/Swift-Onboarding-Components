@@ -62,13 +62,7 @@ class _Footprint {
 
     var token = response.data;
     if (token != null && !_isBrowserOpen) {
-      var url = _createUrl(
-        token: token,
-        l10n: config.l10n,
-        appearance: config.appearance,
-        // TODO: Fix this. This comes from the tenant
-        redirectUrl: "com.footprint.fluttersdk://example",
-      );
+      var url = _createUrl(token: token, config: config);
       _openBrowser(url);
     }
   }

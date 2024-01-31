@@ -1,24 +1,26 @@
 part of "../footprint_flutter.dart";
 
 class FootprintConfiguration {
+  final FootprintAppearance? appearance;
   final FootprintL10n? l10n;
   final FootprintOptions? options;
   final FootprintUserData? userData;
   final Function(String)? onComplete;
   final String? authToken;
   final String? publicKey;
+  final String? redirectUrl;
   final void Function()? onCancel;
-  final FootprintAppearance? appearance;
 
   FootprintConfiguration({
+    this.appearance,
     this.authToken,
     this.l10n,
     this.onCancel,
     this.onComplete,
     this.options,
     this.publicKey,
+    this.redirectUrl,
     this.userData,
-    this.appearance,
   });
 
   Map<String, dynamic> _toJson() {
