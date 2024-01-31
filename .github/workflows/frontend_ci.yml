@@ -170,7 +170,7 @@ jobs:
   bun-unit-tests:
     needs: [files-changed]
     if: needs.files-changed.outputs.filesChanged == 'true'
-    name: 'Unit tests'
+    name: 'bun-unit-tests'
     runs-on: ubuntu-latest
     steps:
       - uses: oven-sh/setup-bun@v1
