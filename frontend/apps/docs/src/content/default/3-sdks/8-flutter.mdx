@@ -38,38 +38,6 @@ After the installation, you need to link the InAppBrowser dependency. For iOS, m
 cd ios && pod install && cd ..
 ```
 
-## Requirements
-
-### Setting up deeplink to your app
-
-In order to integrate the verification flow using this plugin, you will need to provide a deep-link to your app. If you are using more granular paths, you need to provide a deep-link to the current screen of the app. This is to make sure that the browser screen closes automatically once the flow is complete and goes back to the screen on your app from which the flow was initiated. **Note that the scheme used in this link must be unique to your app and must be the same for both Android and iOS**.
-
-### Setting up deeplink for Android
-
-We suggest you use this Flutter Android deep linking tutorial](https://docs.flutter.dev/cookbook/navigation/set-up-app-links) to make sure that you own the scheme you will use for the app to ensure uniqueness. The process below gives you a simple shortcut way to get started but isn’t recommended for production.
-
-Provide a deep link to your app’s current activity (the activity from which you will start the onboarding flow). Create a deep link by adding an intent filter to your activity in the `AndroidManifest.xml` .
-
-```xml
-<intent-filter>
-       <action android:name="android.intent.action.VIEW" />
-       <category android:name="android.intent.category.DEFAULT" />
-       <category android:name="android.intent.category.BROWSABLE" />
-       <data android:scheme="com.footprint.fluttersdk"
-              android:host="example" />
-</intent-filter>
-```
-
-Use your preferred (or custom) scheme and host (optional). For the example above, the deeplink to the activity would be `com.footprint.fluttersdk://example` .
-
-### Setting up deeplink for iOS
-
-We suggest you use the associated domains suggested in this flutter [iOS deep linking tutorial](https://docs.flutter.dev/cookbook/navigation/set-up-app-links) to ensure uniqueness. The process below gives you a simple shortcut way to get started, but isn’t recommended for production.
-
-On iOS, add the URL scheme to URL types on XCode as follows:
-
-<img src="/sdks/flutter/ios.png" width={1000} height={680} alt="iOS xcode" />
-
 ## Integration
 
 1. Start by getting your Playbook public key, for instance, `pb_test_VMooXd04EUlnu3AvMYKjMW` from your [Footprint Dashboard](https://dashboard.onefootprint.com/playbooks).
