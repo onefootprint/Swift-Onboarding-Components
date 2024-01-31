@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
                 redirectActivityName = "com.example.footprint_android.MainActivity",
                 publicKey = "pb_test_aSzwnZecnXS4faoyhxrocW",
                 userData = userData,
-                options = FootprintOptions(showLogo = true),
+                options = FootprintOptions(showLogo = true, showCompletionPage = true),
                 l10n = FootprintL10n(locale = FootprintSupportedLocale.ES_MX),
                 appearance = FootprintAppearance(
                     theme = FootprintAppearanceTheme.DARK,
