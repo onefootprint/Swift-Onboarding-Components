@@ -1,4 +1,3 @@
-import { IcoUsers24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +12,7 @@ const IdentifyBos = () => {
     keyPrefix: 'pages.kyb.identify-bos',
   });
   return (
-    <TimelineLayout icon={IcoUsers24}>
+    <TimelineLayout iconSrc="/kyb/icons/ico-illustrated-ID-40.svg">
       <Content>
         <TimelineTitle
           title={t('title')}

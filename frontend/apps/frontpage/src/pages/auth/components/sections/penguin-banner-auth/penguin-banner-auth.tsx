@@ -11,6 +11,7 @@ import Image from 'next/image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ContactButtons from 'src/components/contact-buttons/contact-buttons';
+import SectionVerticalSpacer from 'src/components/section-vertical-spacer';
 
 const PenguinBannerAuth = () => {
   const { t } = useTranslation('common', {
@@ -24,6 +25,7 @@ const PenguinBannerAuth = () => {
         marginBottom: 12,
       }}
     >
+      <SectionVerticalSpacer />
       <Layout minHeight="320px">
         <Stack align="center" justify="center">
           <Image
@@ -57,6 +59,7 @@ const PenguinBannerAuth = () => {
           />
         </TextContainer>
       </Layout>
+      <SectionVerticalSpacer />
     </Container>
   );
 };

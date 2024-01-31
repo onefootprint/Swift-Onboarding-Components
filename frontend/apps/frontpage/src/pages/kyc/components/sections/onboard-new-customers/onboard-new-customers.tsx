@@ -1,4 +1,3 @@
-import { IcoUsers24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
@@ -27,7 +26,7 @@ const OnboardNewCustomers = () => {
         title={t('title')}
         subtitle={t('subtitle')}
         items={bulletPointContent}
-        icon={IcoUsers24}
+        iconSrc="/kyc/icons/ico-illustrated-users-40.svg"
       />
     </Section>
   );

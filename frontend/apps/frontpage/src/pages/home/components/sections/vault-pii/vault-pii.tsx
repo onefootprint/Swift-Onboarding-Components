@@ -1,7 +1,6 @@
 import { primitives } from '@onefootprint/design-tokens';
 import {
   IcoCreditcard16,
-  IcoDatabase24,
   IcoFileText16,
   IcoUserCircle16,
 } from '@onefootprint/icons';
@@ -27,7 +26,7 @@ const VaultPii = () => {
         title={t('title')}
         subtitle={t('subtitle')}
         cta={t('cta')}
-        icon={IcoDatabase24}
+        iconSrc="/home/vault-pii/ico-illustrated-safe-40.svg"
         isOnDarkSection
         href="/vaulting"
       />

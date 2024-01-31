@@ -1,4 +1,3 @@
-import { IcoSmartphone224 } from '@onefootprint/icons';
 import { Container } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,7 +17,7 @@ const EndlessBenefits = () => {
         }}
       >
         <Title
-          icon={IcoSmartphone224}
+          iconSrc="/auth/icons/ico-illustrated-heart-40.svg"
           title={t('title')}
           subtitle={t('subtitle')}
         />

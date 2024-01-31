@@ -1,26 +1,27 @@
-import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Container, Grid } from '@onefootprint/ui';
+import { Container, Grid, Stack } from '@onefootprint/ui';
+import Image from 'next/image';
 import React from 'react';
-import SectionIcon from 'src/components/section-icon';
 
 type TimelineLayoutProps = {
-  icon: Icon;
+  iconSrc?: string;
   children: React.ReactNode;
 };
 
-const TimelineLayout = ({ icon, children }: TimelineLayoutProps) => (
+const TimelineLayout = ({ iconSrc, children }: TimelineLayoutProps) => (
   <Container>
     <Grid.Container
-      columns={['40px', '1fr']}
-      gap={7}
+      columns={['48px', '1fr']}
+      gap={9}
       paddingBottom={7}
       templateAreas={['line content']}
     >
       <Line gridArea="line" align="flex-start" justify="center">
-        <SectionIcon icon={icon} />
+        <Stack backgroundColor="primary" borderRadius="full">
+          {iconSrc && <Image src={iconSrc} alt="" width={80} height={80} />}
+        </Stack>
       </Line>
-      <Grid.Item gridArea="content" direction="column" gap={7} maxWidth="100%">
+      <Grid.Item gridArea="content" direction="column" gap={9} maxWidth="100%">
         {children}
       </Grid.Item>
     </Grid.Container>

@@ -2,13 +2,13 @@ import {
   IcoChartUp16,
   IcoCode16,
   IcoFaceid16,
-  IcoIdCard24,
   IcoSparkles16,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import SectionVerticalSpacer from 'src/components/section-vertical-spacer';
 
 import FeatureCard from '../../../../../components/feature-card/feature-card';
 import MicroFeatureCard from '../../micro-feature-card/micro-feature-card';
@@ -22,10 +22,11 @@ const NewApproach = () => {
   });
   return (
     <>
+      <SectionVerticalSpacer />
       <SectionTitle
         title={t('title')}
         subtitle={t('subtitle')}
-        icon={IcoIdCard24}
+        iconSrc="/home/new-approach/ico-illustrated-users-alt-40.svg"
       />
       <Grid>
         <FeatureCard

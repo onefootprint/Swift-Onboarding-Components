@@ -1,4 +1,3 @@
-import { IcoSquareFrame24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
@@ -26,7 +25,7 @@ const AppClip = () => {
         title={t('title')}
         subtitle={t('subtitle')}
         items={bulletPointContent}
-        icon={IcoSquareFrame24}
+        iconSrc="/kyc/icons/ico-illustrated-app-clip-40.svg"
       />
     </Section>
   );

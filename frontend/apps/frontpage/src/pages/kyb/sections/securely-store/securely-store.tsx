@@ -1,4 +1,3 @@
-import { IcoDatabase24 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { media } from '@onefootprint/ui';
 import React from 'react';
@@ -14,7 +13,7 @@ const SecurelyStore = () => {
     keyPrefix: 'pages.kyb.securely-store',
   });
   return (
-    <TimelineLayout icon={IcoDatabase24}>
+    <TimelineLayout iconSrc="/kyb/icons/ico-illustrated-confidence-40.svg">
       <Content>
         <TimelineTitle title={t('title')} subtitle={t('subtitle')} />
         <DesktopIllustration />

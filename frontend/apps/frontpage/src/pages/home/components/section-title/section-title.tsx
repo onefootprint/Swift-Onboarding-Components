@@ -1,5 +1,4 @@
 import { primitives } from '@onefootprint/design-tokens';
-import type { Icon } from '@onefootprint/icons';
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import {
@@ -8,14 +7,13 @@ import {
   LinkButton,
   media,
 } from '@onefootprint/ui';
+import Image from 'next/image';
 import React from 'react';
-
-import SectionIcon from '../../../../components/section-icon';
 
 type SectionTitleProps = {
   title: string;
   subtitle: string;
-  icon?: Icon;
+  iconSrc?: string;
   cta?: string;
   href?: string;
   isOnDarkSection?: boolean;
@@ -24,15 +22,14 @@ type SectionTitleProps = {
 const SectionTitle = ({
   title,
   subtitle,
-  icon: Icon,
+  iconSrc,
   cta,
   href,
-
   isOnDarkSection,
 }: SectionTitleProps) => (
   <Container>
     <TitleContainer isOnDarkSection={isOnDarkSection}>
-      <SectionIcon icon={Icon} isOnDarkSection={isOnDarkSection} />
+      {iconSrc && <Image src={iconSrc} alt="" width={80} height={80} />}
       <TextContainer>
         <Title isOnDarkSection={isOnDarkSection}>{title}</Title>
         <Subtitle isOnDarkSection={isOnDarkSection}>{subtitle}</Subtitle>
@@ -76,6 +73,13 @@ const TitleContainer = styled.div<{ isOnDarkSection?: boolean }>`
     justify-content: flex-start;
     gap: ${theme.spacing[8]};
 
+    ${isOnDarkSection &&
+    css`
+      img {
+        filter: invert(100%);
+      }
+    `}
+
     && {
       width: fit-content;
       max-width: 600px;
@@ -83,12 +87,6 @@ const TitleContainer = styled.div<{ isOnDarkSection?: boolean }>`
       button,
       a {
         color: ${isOnDarkSection ? primitives.Purple300 : theme.color.accent};
-      }
-
-      svg {
-        path {
-          fill: ${isOnDarkSection && primitives.Purple300};
-        }
       }
     }
   `}

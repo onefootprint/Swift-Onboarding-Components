@@ -6,6 +6,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import ContactButtons from '../contact-buttons';
+import SectionVerticalSpacer from '../section-vertical-spacer';
 
 type PenguinBannerProps = {
   imgSrc?: string;
@@ -24,6 +25,7 @@ const PenguinBanner = ({
 
   return (
     <StyledContainer>
+      <SectionVerticalSpacer />
       <Stack direction="column" gap={10} align="center" justify="center">
         <Illustration
           src={imgSrc}
@@ -49,6 +51,7 @@ const PenguinBanner = ({
           />
         </Stack>
       </Stack>
+      <SectionVerticalSpacer />
     </StyledContainer>
   );
 };

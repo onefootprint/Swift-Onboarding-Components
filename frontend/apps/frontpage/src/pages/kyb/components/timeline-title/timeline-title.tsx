@@ -1,6 +1,6 @@
 import { IcoArrowRightSmall16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { createFontStyles, LinkButton, media } from '@onefootprint/ui/';
+import { createFontStyles, LinkButton, media, Stack } from '@onefootprint/ui/';
 import React from 'react';
 
 type TimelineTitleProps = {
@@ -11,7 +11,7 @@ type TimelineTitleProps = {
 };
 
 const TimelineTitle = ({ title, subtitle, cta, href }: TimelineTitleProps) => (
-  <Container>
+  <Stack direction="column" justify="center" gap={3} maxWidth="520px">
     <Title>{title}</Title>
     <Subtitle>{subtitle}</Subtitle>
     {cta && (
@@ -23,22 +23,8 @@ const TimelineTitle = ({ title, subtitle, cta, href }: TimelineTitleProps) => (
         {cta}
       </LinkButton>
     )}
-  </Container>
+  </Stack>
 );
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: ${theme.spacing[3]};
-    max-width: 520px;
-
-    ${media.greaterThan('md')`
-      gap: ${theme.spacing[5]};
-    `}
-  `}
-`;
 
 const Title = styled.h2`
   ${({ theme }) => css`

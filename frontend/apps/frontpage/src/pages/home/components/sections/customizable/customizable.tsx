@@ -3,12 +3,12 @@ import {
   IcoFileText16,
   IcoHeart16,
   IcoLayer0116,
-  IcoSparkles24,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import SectionVerticalSpacer from 'src/components/section-vertical-spacer';
 
 import SectionTitle from '../../section-title/section-title';
 import Card from './components/card';
@@ -48,11 +48,12 @@ const Customizable = () => {
 
   return (
     <>
+      <SectionVerticalSpacer />
       <SectionTitle
         title={t('title')}
         subtitle={t('subtitle')}
         cta={t('cta')}
-        icon={IcoSparkles24}
+        iconSrc="/home/customizable/ico-illustrated-customisation-40.svg"
         href="https://docs.onefootprint.com"
       />
       <Grid>
@@ -81,6 +82,7 @@ const Customizable = () => {
           illustration={HoverableWorldClassIllustration}
         />
       </Grid>
+      <SectionVerticalSpacer />
     </>
   );
 };

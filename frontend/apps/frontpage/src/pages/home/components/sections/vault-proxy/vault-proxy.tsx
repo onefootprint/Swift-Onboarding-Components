@@ -1,15 +1,11 @@
 import { primitives } from '@onefootprint/design-tokens';
-import {
-  IcoDollar16,
-  IcoEye16,
-  IcoLayer0124,
-  IcoShield16,
-} from '@onefootprint/icons';
+import { IcoDollar16, IcoEye16, IcoShield16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { Container, media } from '@onefootprint/ui';
 import dynamic from 'next/dynamic';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import SectionVerticalSpacer from 'src/components/section-vertical-spacer';
 
 import MicroFeatureCard from '../../micro-feature-card/micro-feature-card';
 import SectionTitle from '../../section-title/section-title';
@@ -37,7 +33,7 @@ const VaultProxy = () => {
         title={t('title')}
         subtitle={t('subtitle')}
         cta={t('cta')}
-        icon={IcoLayer0124}
+        iconSrc="/home/vault-proxy/ico-illustrated-servers-40.svg"
         isOnDarkSection
         href="/vaulting"
       />
@@ -66,6 +62,7 @@ const VaultProxy = () => {
           isDark
         />
       </Grid>
+      <SectionVerticalSpacer />
     </Background>
   );
 };

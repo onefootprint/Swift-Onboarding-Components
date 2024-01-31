@@ -1,25 +1,19 @@
-import type { Icon } from '@onefootprint/icons';
 import { IcoCheck16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
 import { createFontStyles, media, Typography } from '@onefootprint/ui';
+import Image from 'next/image';
 import React from 'react';
-import SectionIcon from 'src/components/section-icon';
 
 type SectionTextProps = {
   title: string;
   subtitle: string;
   items: string[];
-  icon: Icon;
+  iconSrc?: string;
 };
 
-const SectionText = ({
-  title,
-  subtitle,
-  items,
-  icon: Icon,
-}: SectionTextProps) => (
+const SectionText = ({ title, subtitle, items, iconSrc }: SectionTextProps) => (
   <Container>
-    <SectionIcon icon={Icon} />
+    {iconSrc && <Image src={iconSrc} alt="" width={80} height={80} />}
     <TitleContainer>
       <Title>{title}</Title>
       <Subtitle>{subtitle}</Subtitle>

@@ -1,4 +1,3 @@
-import { IcoSmartphone224 } from '@onefootprint/icons';
 import { Container, Stack } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
@@ -28,7 +27,7 @@ const Secure = () => {
       }}
     >
       <Title
-        icon={IcoSmartphone224}
+        iconSrc="/auth/icons/ico-illustrated-chip-40.svg"
         title={t('title')}
         subtitle={t('subtitle')}
       />

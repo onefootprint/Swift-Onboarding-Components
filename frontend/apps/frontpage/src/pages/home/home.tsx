@@ -1,5 +1,3 @@
-import styled from '@onefootprint/styled';
-import { media } from '@onefootprint/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -20,31 +18,17 @@ const Home = () => {
     <>
       <SEO title={t('html-title')} slug="/hero" />
       <Hero />
-      <SectionSpacer />
       <CustomersLogos />
-      <SectionSpacer />
       <NewApproach />
-      <SectionSpacer />
       <Customizable />
-      <SectionSpacer />
-      <SectionSpacer />
       <div id="dark-start" />
       <VaultPii />
       <VaultProxy />
       <div id="dark-end" />
-      <SectionSpacer />
       <MoreThanExpect />
       <PenguinBanner section="home" />
     </>
   );
 };
-
-const SectionSpacer = styled.div`
-  height: 80px;
-
-  ${media.greaterThan('lg')`
-    height: 156px;
-  `}
-`;
 
 export default Home;
