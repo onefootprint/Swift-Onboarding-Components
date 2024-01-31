@@ -348,7 +348,7 @@ pub(super) fn eval_rules(res: VendorResult, vw: &VaultWrapper, obc: &ObConfigura
         None => Action::Done,
         Some(ra) => match ra {
             RuleAction::PassWithManualReview => Action::Done,
-            RuleAction::ManualReview | RuleAction::StepUp | RuleAction::Fail => Action::TryNextVendor,
+            RuleAction::ManualReview | RuleAction::StepUp(_) | RuleAction::Fail => Action::TryNextVendor,
         },
     };
     Ok(action)

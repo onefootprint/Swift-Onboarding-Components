@@ -29,17 +29,17 @@ fn field_validation_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
                 }
             },
             name: RuleName::AddressDoesNotMatch,
-            action: RuleAction::StepUp,
+            action: RuleAction::identity_stepup(),
         },
         Rule {
             rule: { |f: &Vec<FootprintReasonCode>| !f.contains(&FootprintReasonCode::NameMatches) },
             name: RuleName::NameDoesNotMatch,
-            action: RuleAction::StepUp,
+            action: RuleAction::identity_stepup(),
         },
         Rule {
             rule: { |f: &Vec<FootprintReasonCode>| !f.contains(&FootprintReasonCode::DobMatches) },
             name: RuleName::DobDoesNotMatch,
-            action: RuleAction::StepUp,
+            action: RuleAction::identity_stepup(),
         },
     ]
 }
@@ -98,6 +98,6 @@ pub fn stepup_on_watchlist_hit_rules() -> Vec<Rule<Vec<FootprintReasonCode>>> {
             }
         },
         name: RuleName::WatchlistHitStepUp,
-        action: RuleAction::StepUp,
+        action: RuleAction::identity_stepup(),
     }]
 }

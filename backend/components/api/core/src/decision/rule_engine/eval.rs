@@ -54,7 +54,7 @@ pub fn evaluate_rule_set<T: HasRule>(
     let action_triggered = rule_results
         .iter()
         .filter_map(|(r, e)| {
-            if *e && (allow_stepup || !matches!(r.action(), RuleAction::StepUp)) {
+            if *e && (allow_stepup || !matches!(r.action(), RuleAction::StepUp(_))) {
                 Some(r.action())
             } else {
                 None
@@ -165,12 +165,12 @@ pub mod tests {
         field: FRC::SsnDoesNotMatch,
         op: BO::Equals,
         value: true,
-    }]), RA::StepUp)], vec![FRC::SsnDoesNotMatch], false  => (vec![true], None); "single trigger but StepUp not allowed")]
+    }]), RA::identity_stepup())], vec![FRC::SsnDoesNotMatch], false  => (vec![true], None); "single trigger but StepUp not allowed")]
     #[test_case(vec![TRule(RE(vec![REC::RiskSignal {
         field: FRC::SsnDoesNotMatch,
         op: BO::Equals,
         value: true,
-    }]), RA::StepUp), TRule(RE(vec![REC::RiskSignal {
+    }]), RA::identity_stepup()), TRule(RE(vec![REC::RiskSignal {
         field: FRC::NameDoesNotMatch,
         op: BO::Equals,
         value: true,

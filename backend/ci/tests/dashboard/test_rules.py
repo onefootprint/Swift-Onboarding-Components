@@ -23,6 +23,7 @@ def obc(sandbox_tenant, must_collect_data, can_access_data):
             rule_expression=[
                 {"field": "name_does_not_match", "op": "eq", "value": True}
             ],
+            # TODO: this is legacy step_up serialization, change when FE changes
             action="step_up",
         ),
         dict(
@@ -71,11 +72,11 @@ def test_list(sandbox_tenant, obc):
             f"/org/onboarding_configs/{obc.id}/rules",
             dict(
                 rule_expression=[{"field": "id_flagged", "op": "eq", "value": True}],
-                action="fail",
+                action="fail" if i % 2 == 0 else "step_up",
             ),
             *sandbox_tenant.db_auths,
         )
-        for _ in range(6)
+        for i in range(6)
     ]
 
     res = get(
@@ -174,7 +175,7 @@ def test_get_rule_set_result(sandbox_tenant, must_collect_data):
         dict(
             name="My awesome rule",
             rule_expression=[{"field": "id_flagged", "op": "not_eq", "value": True}],
-            action="manual_review",
+            action="step_up",
         ),
         *sandbox_tenant.db_auths,
     )
@@ -187,7 +188,7 @@ def test_get_rule_set_result(sandbox_tenant, must_collect_data):
     )
 
     assert rule_set_result["ob_configuration_id"] == obc.id
-    assert rule_set_result["action_triggered"] == "manual_review"
+    assert rule_set_result["action_triggered"] == "step_up"
     assert rule_set_result["rule_results"][-2]["rule"] == rule1
     assert rule_set_result["rule_results"][-2]["result"] == False
     assert rule_set_result["rule_results"][-1]["rule"] == rule2

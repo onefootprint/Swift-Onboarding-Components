@@ -111,10 +111,18 @@ mod tests {
             (Some(OnboardingStatus::Pass), Some(RuleAction::Fail), false),
             (Some(OnboardingStatus::Fail), Some(RuleAction::Fail), true),
             (Some(OnboardingStatus::Fail), Some(RuleAction::Fail), false),
-            (Some(OnboardingStatus::Pass), Some(RuleAction::StepUp), false),
-            (Some(OnboardingStatus::Pass), Some(RuleAction::StepUp), false),
-            (None, Some(RuleAction::StepUp), false),
-            (None, Some(RuleAction::StepUp), false),
+            (
+                Some(OnboardingStatus::Pass),
+                Some(RuleAction::identity_stepup()),
+                false,
+            ),
+            (
+                Some(OnboardingStatus::Pass),
+                Some(RuleAction::identity_stepup()),
+                false,
+            ),
+            (None, Some(RuleAction::identity_stepup()), false),
+            (None, Some(RuleAction::identity_stepup()), false),
             (Some(OnboardingStatus::Pass), None, true),
             (Some(OnboardingStatus::Pass), None, true),
         ]

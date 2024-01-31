@@ -238,6 +238,7 @@ mod tests {
     use crate::tests::prelude::*;
     use fixtures::ob_configuration::ObConfigurationOpts;
     use macros::db_test;
+    use newtypes::StepUpKind;
 
     #[db_test]
     fn test_update(conn: &mut TestPgConn) {
@@ -286,6 +287,55 @@ mod tests {
         assert_eq!(
             updated_rule.id,
             RuleInstance::get(conn, &rule.rule_id).unwrap().id
+        );
+    }
+
+    #[db_test]
+    pub fn test_rule_action_is_backwards_compatible(conn: &mut TestPgConn) {
+        let t = fixtures::tenant::create(conn);
+        let obc = fixtures::ob_configuration::create(conn, &t.id, true);
+
+        let rule1 = RuleInstance::create(
+            conn,
+            obc.id.clone(),
+            DbActor::Footprint,
+            Some("name1".to_owned()),
+            tests::fixtures::rule::example_rule_expression(),
+            RuleAction::StepUp(StepUpKind::Identity),
+        )
+        .unwrap();
+
+        let reloaded_rule1 = RuleInstance::get(conn, &rule1.rule_id).unwrap();
+        assert_eq!(reloaded_rule1.action, RuleAction::StepUp(StepUpKind::Identity));
+
+        let rule2 = RuleInstance::create(
+            conn,
+            obc.id.clone(),
+            DbActor::Footprint,
+            Some("name1".to_owned()),
+            tests::fixtures::rule::example_rule_expression(),
+            RuleAction::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress),
+        )
+        .unwrap();
+
+        let reloaded_rule2 = RuleInstance::get(conn, &rule2.rule_id).unwrap();
+        assert_eq!(
+            reloaded_rule2.action,
+            RuleAction::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress)
+        );
+
+        // Now check backwards compat for rule2
+        diesel::sql_query(format!(
+            "update rule_instance set action='step_up' where id = '{}';",
+            reloaded_rule2.id
+        ))
+        .execute(conn.conn())
+        .unwrap();
+
+        let reloaded_rule2_after_update = RuleInstance::get(conn, &rule2.rule_id).unwrap();
+        assert_eq!(
+            reloaded_rule2_after_update.action,
+            RuleAction::StepUp(StepUpKind::Identity)
         );
     }
 }

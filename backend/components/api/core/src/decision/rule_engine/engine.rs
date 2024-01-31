@@ -64,7 +64,6 @@ pub fn evaluate_workflow_decision(
         &risk_signals.iter().map(|rs| rs.reason_code.clone()).collect_vec(),
         !doc_collected,
     );
-
     Ok(Decision {
         decision_status: rule_set_result.action_triggered.into(),
         should_commit: !is_fixture && should_commit_action.is_none(),
@@ -157,7 +156,7 @@ mod tests {
             op: BO::Equals,
             value: true,
         }]),
-        RA::StepUp,
+        RA::identity_stepup(),
     )], vec![FRC::SsnDoesNotMatch, FRC::NameDoesNotMatch], false => Some(RA::Fail))]
     #[db_test_case(vec![TRule(
         RE(vec![REC::RiskSignal {
@@ -172,8 +171,8 @@ mod tests {
             op: BO::Equals,
             value: true,
         }]),
-        RA::StepUp,
-    )], vec![FRC::NameDoesNotMatch], false => Some(RA::StepUp))]
+        RA::identity_stepup(),
+    )], vec![FRC::NameDoesNotMatch], false => Some(RA::identity_stepup()))]
     #[db_test_case(vec![TRule(
         RE(vec![REC::RiskSignal {
             field: FRC::SsnDoesNotMatch,
@@ -187,7 +186,7 @@ mod tests {
             op: BO::Equals,
             value: true,
         }]),
-        RA::StepUp,
+        RA::identity_stepup(),
     )], vec![FRC::DocumentBarcodeContentDoesNotMatch], false => None)]
     fn test_evaluate_rules(
         conn: &mut TestPgConn,

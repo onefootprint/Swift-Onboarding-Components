@@ -52,7 +52,7 @@ pub fn test_ruleset_a() -> RuleSet<TestFeatures> {
     let length_rule: Rule<TestFeatures> = Rule {
         name: RuleName::Test("test.length_gt_3".into()),
         rule: { |t| t.name.len() > 3 },
-        action: RuleAction::StepUp,
+        action: RuleAction::identity_stepup(),
     };
 
     RuleSet {

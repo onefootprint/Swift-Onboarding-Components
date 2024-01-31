@@ -50,7 +50,7 @@ fn log_ruleset_evaluation(rule_set_result: &RuleSetResult, vendor_apis: Vec<Vend
         action=?rule_set_result.action,
         vendor_api=format!("{:?}", vendor_apis),
         rules_triggered_fail=%super::rules_to_string(&rule_set_result.rules_triggered.iter().filter_map(|r| (r.action == RuleAction::Fail).then_some(r.name.clone())).collect::<Vec<RuleName>>()),
-        rules_triggered_steup=%super::rules_to_string(&rule_set_result.rules_triggered.iter().filter_map(|r| (r.action == RuleAction::StepUp).then_some(r.name.clone())).collect::<Vec<RuleName>>()),
+        rules_triggered_steup=%super::rules_to_string(&rule_set_result.rules_triggered.iter().filter_map(|r| (matches!(r.action, RuleAction::StepUp(_))).then_some(r.name.clone())).collect::<Vec<RuleName>>()),
         rules_not_triggered=%super::rules_to_string(&rule_set_result.rules_not_triggered.iter().map(|r| r.name.clone()).collect::<Vec<RuleName>>()),
         RULE_LOG_LINE
     )

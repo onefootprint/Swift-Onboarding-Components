@@ -1173,7 +1173,7 @@ async fn add_stepup_aml_rule(state: &mut State, obc_id: ObConfigurationId) {
                         op: BooleanOperator::Equals,
                         value: true,
                     }]),
-                    action: RuleAction::StepUp,
+                    action: RuleAction::identity_stepup(),
                     name: None,
                 }],
             )

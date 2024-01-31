@@ -39,7 +39,7 @@ pub async fn create_rule(
         .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
             let (obc, _) = ObConfiguration::get(conn, (&ob_config_id.into_inner(), &tenant_id, is_live))?;
-            RuleInstance::create(conn, obc.id, actor.into(), name, rule_expression, action)
+            RuleInstance::create(conn, obc.id, actor.into(), name, rule_expression, action.into())
         })
         .await??;
 

@@ -58,10 +58,13 @@ pub fn base_doc_rules(always_review: bool) -> Vec<(RuleExpression, RuleAction)> 
 pub fn alpaca_kyc_field_validation_rules() -> Vec<(RuleExpression, RuleAction)> {
     vec![
         (if_not_risk_signal(FRC::SsnMatches), RA::Fail),
-        (if_not_risk_signal(FRC::NameMatches), RA::StepUp),
-        (if_not_risk_signal(FRC::DobMatches), RA::StepUp),
-        (if_risk_signal(FRC::AddressDoesNotMatch), RA::StepUp),
-        (if_risk_signal(FRC::AddressNewerRecordFound), RA::StepUp),
+        (if_not_risk_signal(FRC::NameMatches), RA::identity_stepup()),
+        (if_not_risk_signal(FRC::DobMatches), RA::identity_stepup()),
+        (if_risk_signal(FRC::AddressDoesNotMatch), RA::identity_stepup()),
+        (
+            if_risk_signal(FRC::AddressNewerRecordFound),
+            RA::identity_stepup(),
+        ),
     ]
 }
 
@@ -197,7 +200,7 @@ pub fn default_rules_for_obc(
                 .map(|ff| ff.flag(BoolFlag::StepUpOnAmlHit(&obc.key)))
                 .unwrap_or(false)
             {
-                rules.push((if_risk_signal(rs), RA::StepUp));
+                rules.push((if_risk_signal(rs), RA::identity_stepup()));
             }
         });
     }

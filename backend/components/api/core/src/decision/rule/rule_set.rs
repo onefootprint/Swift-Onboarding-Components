@@ -32,7 +32,7 @@ impl<T: Clone> RuleSet<T> {
 
         // overall action for the rule set
         let allowed_rule_actions = RuleAction::iter()
-            .filter(|r| allow_stepup || !matches!(r, RuleAction::StepUp))
+            .filter(|r| allow_stepup || !matches!(r, RuleAction::StepUp(_)))
             .collect_vec();
         let action_for_rule_set = rules_triggered
             .iter()
@@ -86,15 +86,15 @@ mod tests {
 
     #[test_case(test_ruleset_a(), TestFeatures::new("hello") =>  RuleSetResult {
             ruleset_name: test_ruleset_name(),
-            rules_triggered: vec![RuleEvaluationSummary {name: RuleName::Test("test.hello".into()), action: RuleAction::Fail, triggered: true}, RuleEvaluationSummary {name: RuleName::Test("test.length_gt_3".into()), action: RuleAction::StepUp, triggered: true}],
+            rules_triggered: vec![RuleEvaluationSummary {name: RuleName::Test("test.hello".into()), action: RuleAction::Fail, triggered: true}, RuleEvaluationSummary {name: RuleName::Test("test.length_gt_3".into()), action: RuleAction::identity_stepup(), triggered: true}],
             rules_not_triggered: vec![],
             action: Some(RuleAction::Fail),
         })]
     #[test_case(test_ruleset_a(), TestFeatures::new("world") =>  RuleSetResult {
             ruleset_name: test_ruleset_name(),
-            rules_triggered: vec![RuleEvaluationSummary {name: RuleName::Test("test.length_gt_3".into()), action: RuleAction::StepUp, triggered: true}],
+            rules_triggered: vec![RuleEvaluationSummary {name: RuleName::Test("test.length_gt_3".into()), action: RuleAction::identity_stepup(), triggered: true}],
             rules_not_triggered: vec![RuleEvaluationSummary {name: RuleName::Test("test.hello".into()), action: RuleAction::Fail, triggered: false}],
-            action: Some(RuleAction::StepUp),
+            action: Some(RuleAction::identity_stepup()),
         })]
     #[test_case(test_ruleset_b(), TestFeatures::new("goodbye") =>  RuleSetResult {
             ruleset_name: test_ruleset_other_name(),
@@ -106,10 +106,10 @@ mod tests {
         rule_set.evaluate(&input_data, true)
     }
 
-    #[test_case(RuleAction::StepUp, RuleAction::PassWithManualReview  => Ordering::Greater)]
+    #[test_case(RuleAction::identity_stepup(), RuleAction::PassWithManualReview  => Ordering::Greater)]
     #[test_case(RuleAction::ManualReview, RuleAction::PassWithManualReview  => Ordering::Greater)]
-    #[test_case(RuleAction::StepUp, RuleAction::ManualReview => Ordering::Greater)]
-    #[test_case(RuleAction::Fail, RuleAction::StepUp => Ordering::Greater)]
+    #[test_case(RuleAction::identity_stepup(), RuleAction::ManualReview => Ordering::Greater)]
+    #[test_case(RuleAction::Fail, RuleAction::identity_stepup() => Ordering::Greater)]
     fn test_cmp_action_ordering(s1: RuleAction, s2: RuleAction) -> Ordering {
         // Test ordering since we rely on it to extract minimum status
         s1.cmp(&s2)

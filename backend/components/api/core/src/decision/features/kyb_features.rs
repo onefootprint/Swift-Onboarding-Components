@@ -50,7 +50,7 @@ impl FeatureVector for KybFeatureVector {
 
         let (create_manual_review, decision_status) = match eval_result.triggered_action {
             Some(a) => match a {
-                RuleAction::StepUp => (true, DecisionStatus::Fail),
+                RuleAction::StepUp(_) => (true, DecisionStatus::Fail),
                 RuleAction::ManualReview => (true, DecisionStatus::Fail),
                 RuleAction::Fail => (true, DecisionStatus::Fail),
                 RuleAction::PassWithManualReview => (true, DecisionStatus::Pass),
