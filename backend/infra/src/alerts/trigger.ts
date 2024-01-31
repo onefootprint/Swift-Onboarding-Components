@@ -22,12 +22,16 @@ export interface Recipient {
   target: string;
 }
 
+export type TriggerQuery = Query & {
+  time_range: number;
+};
+
 /// https://docs.honeycomb.io/api/triggers/#fields-on-a-trigger
 export interface Trigger {
   name: string;
   description?: string;
   disabled?: boolean;
-  query?: Query;
+  query?: TriggerQuery;
   query_id?: string;
   threshold: Threshold;
   frequency: number; // Check frequency in seconds, between 60 and

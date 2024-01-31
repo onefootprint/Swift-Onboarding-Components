@@ -26,6 +26,7 @@ const LATENT_HTTP_ROUTES: string[] = [
 ];
 
 /// Note, add alert runbooks at: https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25
+/// Also note: each query is evaluated for the last 240s. Set your thresholds accordingly.
 const staticAlerts: Alert[] = [
   {
     name: 'HTTP 5xx Errors',
@@ -34,7 +35,6 @@ const staticAlerts: Alert[] = [
     runbookUrl:
       'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#f9974c9bdc4c4b62878cbdf6ef7c55dc',
     query: {
-      time_range: 240,
       breakdowns: [
         'http.method',
         'http.route',
@@ -77,7 +77,6 @@ const staticAlerts: Alert[] = [
     runbookUrl:
       'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#f078e5125efa4da187c90dfa8d2ec61a',
     query: {
-      time_range: 240,
       breakdowns: ['http.route'],
       calculations: [
         {
@@ -130,7 +129,6 @@ const staticAlerts: Alert[] = [
     runbookUrl:
       'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#1430bed953954300827cc3a07777a84f',
     query: {
-      time_range: 240,
       breakdowns: ['http.method', 'http.route', 'http.status_code'],
       calculations: [
         {
@@ -180,7 +178,6 @@ const staticAlerts: Alert[] = [
     runbookUrl:
       'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#1430bed953954300827cc3a07777a84f',
     query: {
-      time_range: 240,
       breakdowns: ['http.method', 'http.route', 'http.status_code'],
       calculations: [
         {
@@ -236,7 +233,6 @@ const staticAlerts: Alert[] = [
     runbookUrl:
       'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#b6d06909bf0e4a1689bbaaef62ebd8f0',
     query: {
-      time_range: 240,
       breakdowns: ['LoadBalancer'],
       calculations: [
         {
@@ -269,7 +265,6 @@ const staticAlerts: Alert[] = [
     runbookUrl:
       'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#b6d06909bf0e4a1689bbaaef62ebd8f0',
     query: {
-      time_range: 240,
       breakdowns: ['cs_uri_stem'],
       calculations: [
         {
@@ -300,7 +295,6 @@ const staticAlerts: Alert[] = [
       'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#06a4512609164a2e8fa42c6e41d13508',
     datasetName: 'aws',
     query: {
-      time_range: 240,
       breakdowns: ['ServiceName'],
       calculations: [
         {
@@ -331,7 +325,6 @@ const staticAlerts: Alert[] = [
       'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#57b457736a274484b3768d1e7e7b9b92',
     datasetName: 'aws',
     query: {
-      time_range: 240,
       breakdowns: ['ServiceName'],
       calculations: [
         {
@@ -362,7 +355,6 @@ const staticAlerts: Alert[] = [
       'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#ad0c4bebc4c44d3eab953d2e1aa10b55',
     datasetName: 'aws',
     query: {
-      time_range: 240,
       breakdowns: ['DBClusterIdentifier', 'Role'],
       calculations: [
         {
@@ -397,7 +389,6 @@ const staticAlerts: Alert[] = [
       'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#325f29c560a944a48a6d3cc0caad0ea4',
     datasetName: 'aws',
     query: {
-      time_range: 240,
       breakdowns: ['TargetGroup'],
       calculations: [
         {
@@ -440,7 +431,6 @@ export const generateAlerts = (g: GlobalState) => {
         'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#bb124f8285ab4d6880c1ff282f22b27b',
       datasetName: 'aws',
       query: {
-        time_range: 240,
         breakdowns: ['ClusterName', 'ServiceName'],
         calculations: [
           {

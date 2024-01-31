@@ -57,7 +57,7 @@ export interface Order {
 
 export interface Query {
   /// Time since now (in seconds) to look back
-  time_range: number;
+  time_range?: number;
   breakdowns: string[];
   calculations: Calculation[];
   filters: Filter[];
