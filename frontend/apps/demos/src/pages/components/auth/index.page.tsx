@@ -1,6 +1,6 @@
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import styled, { css } from '@onefootprint/styled';
-import { FootprintButton } from '@onefootprint/ui';
+import { Button } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -10,10 +10,19 @@ type RouterReturn = ReturnType<typeof useRouter>;
 const AcmeDevAuthKey = 'ob_test_2TwubGlrWdKaJnWsQQKQYl';
 const publicKeyEnv = process.env.NEXT_PUBLIC_TENANT_KEY || AcmeDevAuthKey;
 
-const getQueryArgs = (query: RouterReturn['query']) => {
+const isValidTokenFormat = (str: string): boolean =>
+  Boolean(str) && /tok_/.test(str);
+
+const getSdkArgsToken = (str: string): string =>
+  isValidTokenFormat(str) ? str : '';
+
+const getQueryArgs = (router: RouterReturn) => {
+  const { query, asPath } = router;
   const { ob_key: obKey, user_data: rawUserData } = query;
+  const authToken = getSdkArgsToken(asPath.split('#')[1]) ?? '';
   const publicKey = typeof obKey === 'string' ? obKey : publicKeyEnv;
   let userData = {};
+
   try {
     userData =
       typeof rawUserData === 'string'
@@ -22,23 +31,42 @@ const getQueryArgs = (query: RouterReturn['query']) => {
   } catch (_) {
     // do nothing
   }
-  return { userData, publicKey };
+  return { authToken, publicKey, userData };
 };
 
 const AuthDemo = () => {
   const router = useRouter();
-  const { userData, publicKey } = getQueryArgs(router.query);
+  const { authToken, publicKey, userData } = getQueryArgs(router);
 
-  const handleClick = () => {
+  const handleAuthenticateClick = () => {
     const component = footprint.init({
       kind: FootprintComponentKind.Auth,
-      variant: 'modal',
       onCancel: () => console.log('demo onCancel'),
       onClose: () => console.log('demo onClose'),
-      onComplete: (validationToken: string) => console.log(validationToken),
+      onComplete: (s: string) => console.log('demo onComplete', s),
       options: { showLogo: false },
       publicKey,
       userData,
+      variant: 'modal',
+    });
+    component.render();
+
+    return () => {
+      component.destroy();
+    };
+  };
+
+  const handleUpdateFlowClick = () => {
+    const component = footprint.init({
+      kind: FootprintComponentKind.Auth,
+      variant: 'modal',
+      authToken,
+      updateLoginMethods: true,
+      options: { showLogo: false },
+      userData,
+      onCancel: () => console.log('demo onCancel'),
+      onClose: () => console.log('demo onClose'),
+      onComplete: (s: string) => console.log('demo onComplete', s),
     });
     component.render();
 
@@ -53,10 +81,21 @@ const AuthDemo = () => {
         <title>Footprint Auth Demo</title>
       </Head>
       <Container>
-        <FootprintButton
-          onClick={handleClick}
-          text="Authenticate with Footprint"
-        />
+        <Button
+          onClick={handleAuthenticateClick}
+          size="compact"
+          variant="secondary"
+        >
+          Authenticate with Footprint
+        </Button>
+        <br />
+        <Button
+          onClick={handleUpdateFlowClick}
+          size="compact"
+          variant="secondary"
+        >
+          Update Authentication Methods with Footprint
+        </Button>
       </Container>
     </>
   );
