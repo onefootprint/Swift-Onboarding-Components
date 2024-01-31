@@ -229,6 +229,39 @@ const staticAlerts: Alert[] = [
     },
   },
   {
+    name: 'ALB 5xx Errors',
+    description:
+      'Elevated 5xx that originated from the loadbalancer. This specifically does not includes 5xx that originated from the loadbalancer target (the application)',
+    datasetName: 'aws',
+    runbookUrl:
+      'https://www.notion.so/onefootprint/Alert-Runbooks-17f53ed91bb64a09b446bf2c0eb1cb25?pvs=4#b6d06909bf0e4a1689bbaaef62ebd8f0',
+    query: {
+      time_range: 240,
+      breakdowns: ['LoadBalancer'],
+      calculations: [
+        {
+          op: 'SUM',
+          column: 'amazonaws.com/AWS/ApplicationELB/HTTPCode_ELB_5XX_Count.avg',
+        },
+      ],
+      filters: [
+        {
+          column: 'LoadBalancer',
+          op: 'exists',
+        },
+      ],
+      filter_combination: 'AND',
+    },
+    slackThreshold: {
+      op: '>',
+      value: 0,
+    },
+    pageThreshold: {
+      op: '>',
+      value: 10,
+    },
+  },
+  {
     name: 'Cloudfront 5xx Errors',
     description:
       'Elevated 5xx seen at cloudfront. This includes 5xxs from the application, ALB, and cloudfront.',
