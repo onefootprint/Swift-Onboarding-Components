@@ -30,8 +30,8 @@ impl<'a> From<&'a PiiString> for SessionAuthToken {
 }
 
 impl SessionAuthToken {
-    const PREFIX: &'static str = "tok_";
     const LEN_RANDOM_CHARS: usize = 34;
+    const PREFIX: &'static str = "tok_";
 
     /// generates a random new auth token
     pub fn generate() -> Self {

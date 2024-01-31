@@ -1,17 +1,12 @@
 use super::data_lifetime::DataLifetime;
-use crate::DbResult;
-use crate::PgConn;
-use crate::TxnPgConn;
+use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::ob_configuration;
-use db_schema::schema::rule_instance;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
-use newtypes::DataLifetimeSeqno;
-use newtypes::DbActor;
-use newtypes::RuleAction;
-use newtypes::RuleExpression;
-use newtypes::{ObConfigurationId, RuleId, RuleInstanceId, TenantId};
+use db_schema::schema::{ob_configuration, rule_instance};
+use diesel::{prelude::*, Insertable, Queryable};
+use newtypes::{
+    DataLifetimeSeqno, DbActor, ObConfigurationId, RuleAction, RuleExpression, RuleId, RuleInstanceId,
+    TenantId,
+};
 use rand::distributions::{Alphanumeric, DistString};
 
 #[derive(Debug, Clone, Queryable)]

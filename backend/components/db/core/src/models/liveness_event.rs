@@ -2,24 +2,17 @@ use std::collections::HashMap;
 
 use db_schema::schema;
 
-use crate::DbError;
-use crate::DbResult;
-use db_schema::schema::liveness_event;
-use db_schema::schema::scoped_vault;
+use crate::{DbError, DbResult};
+use db_schema::schema::{liveness_event, scoped_vault};
 
 use chrono::{DateTime, Utc};
 
 use crate::PgConn;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
+use diesel::{prelude::*, Insertable, Queryable};
 
-use newtypes::FpId;
-use newtypes::InsightEventId;
-use newtypes::LivenessAttributes;
+use newtypes::{FpId, InsightEventId, LivenessAttributes};
 
-use newtypes::TenantId;
-use newtypes::VaultId;
-use newtypes::{LivenessEventId, LivenessSource, ScopedVaultId};
+use newtypes::{LivenessEventId, LivenessSource, ScopedVaultId, TenantId, VaultId};
 
 use super::insight_event::InsightEvent;
 

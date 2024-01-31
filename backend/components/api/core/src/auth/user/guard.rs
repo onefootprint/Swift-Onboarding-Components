@@ -1,7 +1,5 @@
-use super::UserAuthGuard;
-use super::UserAuthScope;
-use crate::auth::CanDecrypt;
-use crate::auth::IsGuardMet;
+use super::{UserAuthGuard, UserAuthScope};
+use crate::auth::{CanDecrypt, IsGuardMet};
 use itertools::Itertools;
 use newtypes::{DataIdentifier, IdentityDataKind as IDK};
 

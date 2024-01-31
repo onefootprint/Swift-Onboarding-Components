@@ -1,7 +1,8 @@
 use super::vault_wrapper::{Any, PrefillData, TenantVw, VaultWrapper, WriteableVw};
-use crate::auth::tenant::AuthActor;
-use crate::errors::{onboarding::OnboardingError, ApiResult};
-use db::models::workflow_request::WorkflowRequest;
+use crate::{
+    auth::tenant::AuthActor,
+    errors::{onboarding::OnboardingError, ApiResult},
+};
 use db::{
     models::{
         business_owner::BusinessOwner,
@@ -11,6 +12,7 @@ use db::{
         scoped_vault::ScopedVault,
         vault::{NewVaultArgs, Vault},
         workflow::{OnboardingWorkflowArgs, Workflow},
+        workflow_request::WorkflowRequest,
     },
     TxnPgConn,
 };

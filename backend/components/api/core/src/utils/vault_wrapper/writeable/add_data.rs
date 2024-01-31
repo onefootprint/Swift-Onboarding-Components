@@ -1,23 +1,26 @@
-use super::validated_data_request::{SavedData, ValidatedDataRequest};
-use super::WriteableVw;
-use crate::auth::tenant::AuthActor;
-use crate::errors::{ApiResult, AssertionError};
-use crate::utils::file_upload::FileUpload;
-use crate::utils::vault_wrapper::Person;
-use crate::State;
+use super::{
+    validated_data_request::{SavedData, ValidatedDataRequest},
+    WriteableVw,
+};
+use crate::{
+    auth::tenant::AuthActor,
+    errors::{ApiResult, AssertionError},
+    utils::{file_upload::FileUpload, vault_wrapper::Person},
+    State,
+};
 use crypto::seal::SealedChaCha20Poly1305DataKey;
-use db::models::business_owner::BusinessOwner;
-use db::models::contact_info::ContactInfo;
-use db::models::data_lifetime::DataLifetime;
-use db::models::document_data::DocumentData;
-use db::models::user_timeline::UserTimeline;
-use db::models::vault::Vault;
-use db::TxnPgConn;
+use db::{
+    models::{
+        business_owner::BusinessOwner, contact_info::ContactInfo, data_lifetime::DataLifetime,
+        document_data::DocumentData, user_timeline::UserTimeline, vault::Vault,
+    },
+    TxnPgConn,
+};
 use itertools::Itertools;
-use newtypes::{BusinessDataKind as BDK, DataLifetimeSeqno, DataLifetimeSource, S3Url};
 use newtypes::{
-    CollectedDataOption, DataCollectedInfo, DataIdentifier, DataRequest, Fingerprints,
-    KycedBusinessOwnerData, PiiString, ScopedVaultId, SealedVaultDataKey, VaultId,
+    BusinessDataKind as BDK, CollectedDataOption, DataCollectedInfo, DataIdentifier, DataLifetimeSeqno,
+    DataLifetimeSource, DataRequest, Fingerprints, KycedBusinessOwnerData, PiiString, S3Url, ScopedVaultId,
+    SealedVaultDataKey, VaultId,
 };
 
 type NewContactInfo = (DataIdentifier, ContactInfo);

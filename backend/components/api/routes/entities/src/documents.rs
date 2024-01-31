@@ -1,20 +1,20 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantSessionAuth;
-use crate::types::response::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
-use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
-use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::vault_wrapper::Any;
-use api_core::utils::vault_wrapper::TenantVw;
-use api_core::utils::vault_wrapper::VaultWrapper;
-use db::models::identity_document::IdentityDocument;
-use db::models::scoped_vault::ScopedVault;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    types::response::ResponseData,
+    utils::db2api::DbToApi,
+    State,
+};
+use api_core::{
+    errors::ApiResult,
+    types::JsonApiResponse,
+    utils::{
+        fp_id_path::FpIdPath,
+        vault_wrapper::{Any, TenantVw, VaultWrapper},
+    },
+};
+use db::models::{identity_document::IdentityDocument, scoped_vault::ScopedVault};
 use itertools::Itertools;
-use newtypes::DataIdentifier;
-use newtypes::DocumentKind;
+use newtypes::{DataIdentifier, DocumentKind};
 use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(

@@ -3,13 +3,10 @@ pub use self::guards::*;
 mod workos;
 pub use self::workos::*;
 use async_trait::async_trait;
-use db::models::tenant::Tenant;
-use db::models::tenant_user::TenantUser;
+use db::models::{tenant::Tenant, tenant_user::TenantUser};
 
 mod secret_key;
-use newtypes::DataIdentifier;
-use newtypes::DataLifetimeSource;
-use newtypes::WorkosAuthMethod;
+use newtypes::{DataIdentifier, DataLifetimeSource, WorkosAuthMethod};
 pub use secret_key::*;
 mod tenant_rb;
 pub use self::tenant_rb::*;
@@ -20,17 +17,11 @@ pub use client::*;
 mod firm_employee;
 pub use firm_employee::*;
 
-use super::Any;
-use super::AuthError;
-use super::CanDecrypt;
-use super::Either;
-use super::IsGuardMet;
-use super::Or;
-use super::SessionContext;
-use crate::errors::ApiError;
-use crate::errors::ApiResult;
-use crate::errors::ValidationError;
-use crate::State;
+use super::{Any, AuthError, CanDecrypt, Either, IsGuardMet, Or, SessionContext};
+use crate::{
+    errors::{ApiError, ApiResult, ValidationError},
+    State,
+};
 use newtypes::{DbActor, TenantApiKeyId, TenantScope, TenantUserId};
 
 pub type TenantSessionAuth = Either<TenantRbAuthContext, FirmEmployeeAssumeAuthContext>;

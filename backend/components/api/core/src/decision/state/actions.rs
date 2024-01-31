@@ -2,8 +2,7 @@ use crate::auth::tenant::AuthActor;
 use api_wire_types::DecisionRequest;
 use paperclip::actix::Apiv2Schema;
 use serde_with::DeserializeFromStr;
-use strum_macros::EnumDiscriminants;
-use strum_macros::EnumString;
+use strum_macros::{EnumDiscriminants, EnumString};
 
 use super::StateError;
 

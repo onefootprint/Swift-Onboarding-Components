@@ -1,12 +1,13 @@
-use crate::auth::user::{UserAuth, UserAuthContext};
-use crate::errors::{ApiError, ApiResult};
-use crate::types::response::ResponseData;
-use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
-use crate::State;
-use api_core::auth::user::UserAuthGuard;
-use api_core::errors::user::UserError;
-use api_core::utils::vault_wrapper::Person;
-use api_core::ApiErrorKind;
+use crate::{
+    auth::user::{UserAuth, UserAuthContext},
+    errors::{ApiError, ApiResult},
+    types::response::ResponseData,
+    utils::vault_wrapper::{VaultWrapper, VwArgs},
+    State,
+};
+use api_core::{
+    auth::user::UserAuthGuard, errors::user::UserError, utils::vault_wrapper::Person, ApiErrorKind,
+};
 use newtypes::{ContactInfoKind, PhoneNumber};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 

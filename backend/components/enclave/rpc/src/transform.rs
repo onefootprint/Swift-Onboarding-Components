@@ -120,8 +120,7 @@ impl DataTransformer for DataTransforms {
 
 #[cfg(test)]
 mod tests {
-    use super::DataTransform::*;
-    use super::*;
+    use super::{DataTransform::*, *};
     use test_case::test_case;
 
     #[test_case(vec![], "Hi Hello 🎉" => "Hi Hello 🎉".to_string())]

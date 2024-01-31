@@ -1,16 +1,11 @@
-use crate::errors::ApiResult;
-use crate::State;
-use db::scoped_vault::AndFingerprintQuery;
-use db::scoped_vault::SearchQuery;
+use crate::{errors::ApiResult, State};
+use db::scoped_vault::{AndFingerprintQuery, SearchQuery};
 use itertools::Itertools;
-use newtypes::fingerprinter::FingerprintScope;
-use newtypes::fingerprinter::GlobalFingerprintKind;
-use newtypes::DataIdentifier;
-use newtypes::FpId;
-use newtypes::PhoneNumber;
-use newtypes::PiiString;
-use newtypes::TenantId;
-use newtypes::{BusinessDataKind as BDK, Fingerprinter, IdentityDataKind as IDK};
+use newtypes::{
+    fingerprinter::{FingerprintScope, GlobalFingerprintKind},
+    BusinessDataKind as BDK, DataIdentifier, Fingerprinter, FpId, IdentityDataKind as IDK, PhoneNumber,
+    PiiString, TenantId,
+};
 
 /// Given a search string and fp_id, parse into the list of FingerprintQueries and fp_id by which to query
 /// for ScopedVaults
@@ -19,8 +14,7 @@ pub async fn parse_search(
     search: Option<PiiString>,
     tenant_id: &TenantId,
 ) -> ApiResult<(Option<SearchQuery>, Option<FpId>)> {
-    use DataIdentifier::Business;
-    use DataIdentifier::Id;
+    use DataIdentifier::{Business, Id};
     let Some(search) = search else {
         return Ok((None, None));
     };

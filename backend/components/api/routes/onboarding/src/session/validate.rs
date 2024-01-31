@@ -1,23 +1,30 @@
-use crate::auth::session::AuthSessionData;
-use crate::auth::tenant::SecretTenantAuthContext;
-use crate::errors::onboarding::OnboardingError;
-use crate::types::response::ResponseData;
-use crate::utils::session::AuthSession;
-use crate::State;
-use api_core::auth::session::user::ValidateUserToken;
-use api_core::auth::tenant::{CheckTenantGuard, TenantGuard};
-use api_core::errors::ApiResult;
-use api_core::telemetry::RootSpan;
-use api_core::types::JsonApiResponse;
-use api_core::utils::db2api::DbToApi;
+use crate::{
+    auth::{session::AuthSessionData, tenant::SecretTenantAuthContext},
+    errors::onboarding::OnboardingError,
+    types::response::ResponseData,
+    utils::session::AuthSession,
+    State,
+};
+use api_core::{
+    auth::{
+        session::user::ValidateUserToken,
+        tenant::{CheckTenantGuard, TenantGuard},
+    },
+    errors::ApiResult,
+    telemetry::RootSpan,
+    types::JsonApiResponse,
+    utils::db2api::DbToApi,
+};
 use api_wire_types::{
     EntityValidateResponse, UserAuthResponse, ValidateAuthEvent, ValidateRequest, ValidateResponse,
 };
-use db::models::auth_event::AuthEvent;
-use db::models::manual_review::ManualReview;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::scoped_vault::ScopedVault;
-use db::models::workflow::{Workflow, WorkflowIdentifier};
+use db::models::{
+    auth_event::AuthEvent,
+    manual_review::ManualReview,
+    ob_configuration::ObConfiguration,
+    scoped_vault::ScopedVault,
+    workflow::{Workflow, WorkflowIdentifier},
+};
 use newtypes::{ObConfigurationKind, VaultKind};
 use paperclip::actix::{api_v2_operation, post, web};
 
@@ -37,7 +44,12 @@ pub async fn post(
     root_span.record("auth_token_hash", request.validation_token.id().to_string());
     let session = AuthSession::get(&state, &request.validation_token).await?.data;
 
-    let AuthSessionData::ValidateUserToken(ValidateUserToken { sv_id, wf_id, auth_event_ids }) = session else {
+    let AuthSessionData::ValidateUserToken(ValidateUserToken {
+        sv_id,
+        wf_id,
+        auth_event_ids,
+    }) = session
+    else {
         return Err(OnboardingError::ValidateTokenInvalid.into());
     };
 

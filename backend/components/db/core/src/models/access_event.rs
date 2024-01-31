@@ -1,14 +1,11 @@
-use crate::DbResult;
-use crate::PgConn;
+use crate::{DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::access_event;
-use diesel::dsl::count_distinct;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable, RunQueryDsl};
+use diesel::{dsl::count_distinct, prelude::*, Insertable, Queryable, RunQueryDsl};
 use itertools::Itertools;
-use newtypes::AccessEventPurpose;
 use newtypes::{
-    AccessEventId, AccessEventKind, DataIdentifier, DbActor, InsightEventId, ScopedVaultId, TenantId,
+    AccessEventId, AccessEventKind, AccessEventPurpose, DataIdentifier, DbActor, InsightEventId,
+    ScopedVaultId, TenantId,
 };
 
 use super::insight_event::CreateInsightEvent;

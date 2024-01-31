@@ -53,6 +53,7 @@ impl From<CardInfo> for DataIdentifier {
 
 impl TryFrom<DataIdentifier> for CardInfo {
     type Error = crate::Error;
+
     fn try_from(value: DataIdentifier) -> Result<Self, Self::Error> {
         match value {
             DataIdentifier::Card(info) => Ok(info),
@@ -72,6 +73,7 @@ impl IsDataIdentifierDiscriminant for CardInfo {
 /// We serialize DIs as `prefix.suffix`
 impl FromStr for CardInfo {
     type Err = EnumDotNotationError;
+
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let period_idx = s
             .find('.')

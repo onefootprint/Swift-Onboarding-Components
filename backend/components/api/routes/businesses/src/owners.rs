@@ -1,17 +1,17 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantSessionAuth;
-use crate::types::response::ResponseData;
-use crate::types::JsonApiResponse;
-use crate::State;
-use api_core::errors::ApiResult;
-use api_core::serializers::BusinessOwnerInfo;
-use api_core::utils::db2api::DbToApi;
-use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::vault_wrapper::Business;
-use api_core::utils::vault_wrapper::DecryptedBusinessOwners;
-use api_core::utils::vault_wrapper::TenantVw;
-use api_core::utils::vault_wrapper::VaultWrapper;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    types::{response::ResponseData, JsonApiResponse},
+    State,
+};
+use api_core::{
+    errors::ApiResult,
+    serializers::BusinessOwnerInfo,
+    utils::{
+        db2api::DbToApi,
+        fp_id_path::FpIdPath,
+        vault_wrapper::{Business, DecryptedBusinessOwners, TenantVw, VaultWrapper},
+    },
+};
 use api_wire_types::BusinessOwner as ApiBusinessOwner;
 use db::models::scoped_vault::ScopedVault;
 use paperclip::actix::{api_v2_operation, get, web};

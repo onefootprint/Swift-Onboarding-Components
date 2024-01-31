@@ -1,23 +1,17 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantSessionAuth;
-use crate::errors::ApiResult;
-use crate::types::JsonApiResponse;
-use crate::types::OffsetPaginatedResponse;
-use crate::types::OffsetPaginationRequest;
-use crate::types::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    errors::ApiResult,
+    types::{JsonApiResponse, OffsetPaginatedResponse, OffsetPaginationRequest, ResponseData},
+    utils::db2api::DbToApi,
+    State,
+};
 use api_wire_types::OrgRoleFilters;
-use db::models::tenant_role::TenantRole;
-use db::models::tenant_role::TenantRoleListFilters;
-use db::OffsetPagination;
-use newtypes::TenantRoleId;
-use newtypes::TenantRoleKind;
-use newtypes::TenantRoleKindDiscriminant;
-use newtypes::TenantScope;
-use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
+use db::{
+    models::tenant_role::{TenantRole, TenantRoleListFilters},
+    OffsetPagination,
+};
+use newtypes::{TenantRoleId, TenantRoleKind, TenantRoleKindDiscriminant, TenantScope};
+use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json, Apiv2Schema};
 
 type RolesResponse = Json<OffsetPaginatedResponse<api_wire_types::OrganizationRole>>;
 

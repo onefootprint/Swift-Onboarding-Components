@@ -1,14 +1,17 @@
 use std::collections::HashMap;
 
-use crate::auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth};
-use crate::errors::ApiResult;
-use crate::types::ResponseData;
-use crate::State;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    errors::ApiResult,
+    types::ResponseData,
+    State,
+};
 use api_core::decision;
 use api_wire_types::{Counts, EvaluateRuleRequest, RuleEvalResult, RuleEvalStats, RuleResultRuleAction};
-use db::models::ob_configuration::ObConfiguration;
-use db::models::rule_set_result::RuleSetResult;
-use db::DbError;
+use db::{
+    models::{ob_configuration::ObConfiguration, rule_set_result::RuleSetResult},
+    DbError,
+};
 use itertools::Itertools;
 use newtypes::{ObConfigurationId, OnboardingStatus};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};

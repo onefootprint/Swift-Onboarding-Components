@@ -1,17 +1,18 @@
-use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::{CheckTenantGuard, TenantSessionAuth};
-use crate::types::response::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
-use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
-use api_core::types::OffsetPaginatedResponse;
-use api_core::types::OffsetPaginationRequest;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    types::response::ResponseData,
+    utils::db2api::DbToApi,
+    State,
+};
+use api_core::{
+    errors::ApiResult,
+    types::{JsonApiResponse, OffsetPaginatedResponse, OffsetPaginationRequest},
+};
 use api_wire_types::OnboardingConfigFilters;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::ob_configuration::ObConfigurationQuery;
-use db::DbError;
-use db::OffsetPagination;
+use db::{
+    models::ob_configuration::{ObConfiguration, ObConfigurationQuery},
+    DbError, OffsetPagination,
+};
 use newtypes::ObConfigurationId;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 

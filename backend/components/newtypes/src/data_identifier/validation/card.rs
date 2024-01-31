@@ -1,9 +1,8 @@
 use super::{utils, Error, VResult};
 use crate::{
-    AliasId, AllData, CardDataKind as CDK, CardInfo as CI, DataIdentifier, PiiJsonValue, PiiString,
-    ValidateArgs,
+    AliasId, AllData, CardDataKind as CDK, CardInfo as CI, DataIdentifier, NtResult, PiiJsonValue, PiiString,
+    Validate, ValidateArgs,
 };
-use crate::{NtResult, Validate};
 use card_validate::Validate as CardValidate;
 use itertools::Itertools;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
@@ -241,6 +240,7 @@ impl Expiration {
         let _ = year.parse::<u32>()?;
         Ok(PiiString::from(year))
     }
+
     fn validate_month(month: &str) -> VResult<PiiString> {
         if month.parse::<u8>()? > 12 {
             return Err(Error::InvalidMonth);
@@ -294,10 +294,8 @@ fn validate_cc_cvc(value: PiiString, alias: &AliasId, all_data: &AllData) -> VRe
 mod test {
     use std::collections::HashMap;
 
-    use super::CDK::*;
-    use super::{CDK, CI};
-    use crate::{AliasId, PiiJsonValue, Validate};
-    use crate::{PiiString, ValidateArgs};
+    use super::{CDK, CDK::*, CI};
+    use crate::{AliasId, PiiJsonValue, PiiString, Validate, ValidateArgs};
     use test_case::test_case;
 
     // Invalid prefix

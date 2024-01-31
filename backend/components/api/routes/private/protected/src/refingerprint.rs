@@ -7,13 +7,15 @@ use api_core::{
     types::{JsonApiResponse, ResponseData},
 };
 use db::{
-    models::fingerprint::{Fingerprint, NewFingerprint},
+    models::{
+        data_lifetime::DataLifetime,
+        fingerprint::{Fingerprint, NewFingerprint},
+        scoped_vault::ScopedVault,
+        vault::Vault,
+        vault_data::VaultData,
+    },
     schema::{data_lifetime, fingerprint, scoped_vault, vault, vault_data},
-    DbError, PgConn,
-};
-use db::{
-    models::{data_lifetime::DataLifetime, scoped_vault::ScopedVault, vault::Vault, vault_data::VaultData},
-    TxnPgConn,
+    DbError, PgConn, TxnPgConn,
 };
 use diesel::{dsl::not, prelude::*};
 use itertools::Itertools;

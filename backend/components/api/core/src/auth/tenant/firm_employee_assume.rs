@@ -198,12 +198,15 @@ impl TenantAuth for SessionContext<FirmEmployeeAssumeAuth> {
 
 #[cfg(test)]
 mod test {
-    use super::super::CanCheckTenantGuard;
-    use super::{FirmEmployeeAssumeAuth, ParsedFirmEmployeeAssumeAuth};
-    use crate::auth::session::tenant::FirmEmployeeSession;
-    use crate::auth::{session::AuthSessionData, SessionContext};
-    use db::models::tenant_role::{ImmutableRoleKind, TenantRole};
-    use db::tests::prelude::*;
+    use super::{super::CanCheckTenantGuard, FirmEmployeeAssumeAuth, ParsedFirmEmployeeAssumeAuth};
+    use crate::auth::{
+        session::{tenant::FirmEmployeeSession, AuthSessionData},
+        SessionContext,
+    };
+    use db::{
+        models::tenant_role::{ImmutableRoleKind, TenantRole},
+        tests::prelude::*,
+    };
     use macros::db_test_case;
     use newtypes::{TenantRoleKind, TenantScope, WorkosAuthMethod};
 

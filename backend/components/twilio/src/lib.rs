@@ -1,10 +1,8 @@
-use crate::error::Error;
-use crate::response::message::Status;
+use crate::{error::Error, response::message::Status};
 use newtypes::PiiString;
 use request::send_message::SendMessage;
 use reqwest::{IntoUrl, Method};
-use reqwest_middleware::ClientWithMiddleware;
-use reqwest_middleware::RequestBuilder;
+use reqwest_middleware::{ClientWithMiddleware, RequestBuilder};
 use reqwest_tracing::TracingMiddleware;
 use response::{decode_response, lookup::LookupResponse, message::Message};
 use std::time::Duration;
@@ -13,9 +11,10 @@ pub mod error;
 pub mod request;
 pub mod response;
 
-use tokio_retry::strategy::jitter;
-use tokio_retry::strategy::FixedInterval;
-use tokio_retry::Retry;
+use tokio_retry::{
+    strategy::{jitter, FixedInterval},
+    Retry,
+};
 
 #[derive(Clone)]
 pub struct Client {

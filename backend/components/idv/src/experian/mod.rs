@@ -14,7 +14,7 @@ lazy_static::lazy_static! {
         Regex::new(r"[^a-zA-Z\s \-'\.]").unwrap();
     pub static ref NAME_VALIDATION: Regex =
         Regex::new(r"[^a-zA-Z \-'\s]").unwrap();
-        
+
 }
 pub struct ExperianCrossCoreRequest {
     pub idv_data: IdvData,
@@ -43,7 +43,6 @@ pub fn normalize_city(s: &str) -> String {
 pub fn normalize_name(s: &str) -> String {
     normalize_with_regex(s, &NAME_VALIDATION)
 }
-
 
 
 #[cfg(test)]

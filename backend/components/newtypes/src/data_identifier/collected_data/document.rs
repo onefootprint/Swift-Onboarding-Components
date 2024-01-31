@@ -23,6 +23,7 @@ impl std::fmt::Display for DocTypeRestriction {
 
 impl FromStr for DocTypeRestriction {
     type Err = ParseError;
+
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "none" => Ok(Self::None),
@@ -65,9 +66,11 @@ impl DocumentCdoInfo {
     pub fn doc_type_restriction(&self) -> DocTypeRestriction {
         self.0.clone()
     }
+
     pub fn country_restriction(&self) -> CountryRestriction {
         self.1.clone()
     }
+
     pub fn selfie(&self) -> Selfie {
         self.2
     }
@@ -103,6 +106,7 @@ impl std::fmt::Display for DocumentCdoInfo {
 
 impl FromStr for DocumentCdoInfo {
     type Err = ParseError;
+
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let res = match s {
             "document" => Self(DocTypeRestriction::None, CountryRestriction::None, Selfie::None),
@@ -133,8 +137,7 @@ mod test {
 
     use test_case::test_case;
 
-    use super::DocumentCdoInfo;
-    use super::{CountryRestriction, DocTypeRestriction, Selfie};
+    use super::{CountryRestriction, DocTypeRestriction, DocumentCdoInfo, Selfie};
     use crate::IdDocKind;
 
     #[test_case(

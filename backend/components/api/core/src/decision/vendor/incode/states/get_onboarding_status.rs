@@ -2,10 +2,14 @@ use super::{
     map_to_api_err, save_incode_verification_result, FetchScores, IncodeStateTransition,
     SaveVerificationResultArgs, VerificationSession,
 };
-use crate::decision::vendor::incode::state::IncodeState;
-use crate::decision::vendor::incode::{state::TransitionResult, IncodeContext};
-use crate::errors::ApiResult;
-use crate::vendor_clients::IncodeClients;
+use crate::{
+    decision::vendor::incode::{
+        state::{IncodeState, TransitionResult},
+        IncodeContext,
+    },
+    errors::ApiResult,
+    vendor_clients::IncodeClients,
+};
 use async_trait::async_trait;
 
 use db::{DbPool, TxnPgConn};

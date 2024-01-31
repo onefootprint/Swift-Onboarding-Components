@@ -2,22 +2,22 @@ use std::pin::Pin;
 
 use actix_web::FromRequest;
 use futures_util::Future;
-use opentelemetry::global;
-use opentelemetry::sdk::metrics::controllers::BasicController;
-use opentelemetry::sdk::metrics::selectors;
-use opentelemetry::sdk::propagation::TraceContextPropagator;
+use opentelemetry::{
+    global,
+    sdk::{
+        metrics::{controllers::BasicController, selectors},
+        propagation::TraceContextPropagator,
+    },
+};
 use opentelemetry_otlp::WithExportConfig;
 use tracing::Span;
-use tracing_actix_web::root_span;
-use tracing_actix_web::DefaultRootSpanBuilder;
-use tracing_actix_web::RootSpanBuilder;
-use tracing_subscriber::prelude::*;
-use tracing_subscriber::EnvFilter;
-use tracing_subscriber::Registry;
+use tracing_actix_web::{root_span, DefaultRootSpanBuilder, RootSpanBuilder};
+use tracing_subscriber::{prelude::*, EnvFilter, Registry};
 
-use crate::config::Config;
-use crate::utils::headers::InsightHeaders;
-use crate::utils::headers::TelemetryHeaders;
+use crate::{
+    config::Config,
+    utils::headers::{InsightHeaders, TelemetryHeaders},
+};
 use anyhow::Result;
 
 pub fn init(config: &Config) -> Result<Option<BasicController>> {
@@ -171,6 +171,7 @@ impl paperclip::v2::schema::Apiv2Schema for RootSpan {
     fn name() -> Option<String> {
         Some("RootSpan".to_string())
     }
+
     fn description() -> &'static str {
         "Wrapper around tracing_actix_web::RootSpan that also implements paperclip Apiv2Schema"
     }

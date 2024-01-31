@@ -1,12 +1,15 @@
-use crate::auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth};
-use crate::errors::ApiResult;
-use crate::types::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    errors::ApiResult,
+    types::ResponseData,
+    utils::db2api::DbToApi,
+    State,
+};
 use api_wire_types::CreateRuleRequest;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::rule_instance::RuleInstance;
-use db::DbError;
+use db::{
+    models::{ob_configuration::ObConfiguration, rule_instance::RuleInstance},
+    DbError,
+};
 use newtypes::ObConfigurationId;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 

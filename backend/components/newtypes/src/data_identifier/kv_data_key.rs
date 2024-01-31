@@ -16,6 +16,7 @@ impl Validate for KvDataKey {
 
 impl TryFrom<DataIdentifier> for KvDataKey {
     type Error = crate::Error;
+
     fn try_from(value: DataIdentifier) -> Result<Self, Self::Error> {
         match value {
             DataIdentifier::Custom(kv_key) => Ok(kv_key),

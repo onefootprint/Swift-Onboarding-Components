@@ -1,10 +1,10 @@
-use crate::auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth};
-use crate::types::JsonApiResponse;
-use crate::types::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
-use api_core::auth::tenant::AuthActor;
-use api_core::errors::tenant::TenantError;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    types::{JsonApiResponse, ResponseData},
+    utils::db2api::DbToApi,
+    State,
+};
+use api_core::{auth::tenant::AuthActor, errors::tenant::TenantError};
 use chrono::Utc;
 use db::models::tenant_api_key::TenantApiKey;
 use newtypes::TenantApiKeyId;

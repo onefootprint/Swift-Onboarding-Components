@@ -1,38 +1,40 @@
-use crate::decision::state::actions::{Authorize, MakeVendorCalls};
-use crate::decision::state::test_utils::{
-    mock_idology, mock_incode_doc_collection, mock_webhooks, query_data, query_risk_signals, setup_data,
-    DocumentCollectionKind, DocumentOutcome::*, ExpectedRequiresManualReview, ExpectedStatus,
-    OnboardingCompleted, OnboardingStatusChanged, UserKind, WithQualifier,
+use crate::{
+    decision::{
+        state::{
+            actions::{Authorize, MakeVendorCalls},
+            kyc,
+            test_utils::{
+                mock_idology, mock_incode_doc_collection, mock_webhooks, query_data, query_risk_signals,
+                setup_data, DocumentCollectionKind, DocumentOutcome::*, ExpectedRequiresManualReview,
+                ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, UserKind, WithQualifier,
+            },
+            MakeDecision, WorkflowActions, WorkflowKind, WorkflowWrapper,
+        },
+        tests::test_helpers,
+    },
+    State,
 };
-use crate::decision::state::MakeDecision;
-use crate::decision::state::WorkflowActions;
-use crate::decision::state::WorkflowKind;
-use crate::decision::state::WorkflowWrapper;
-use crate::decision::tests::test_helpers;
-use crate::{decision::state::kyc, State};
 use chrono::Utc;
-use db::models::onboarding_decision::OnboardingDecision;
-use db::models::risk_signal::RiskSignal;
-use db::models::rule_set_result::RuleSetResult;
-use db::models::workflow::Workflow;
-use db::models::workflow::Workflow as DbWorkflow;
-use db::models::workflow::{NewWorkflow, NewWorkflowArgs};
-use db::models::workflow_event::WorkflowEvent;
-use db::test_helpers::assert_have_same_elements;
-use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
-use db::tests::test_db_pool::TestDbPool;
-use db::tests::MockFFClient;
+use db::{
+    models::{
+        onboarding_decision::OnboardingDecision,
+        risk_signal::RiskSignal,
+        rule_set_result::RuleSetResult,
+        workflow::{NewWorkflow, NewWorkflowArgs, Workflow, Workflow as DbWorkflow},
+        workflow_event::WorkflowEvent,
+    },
+    test_helpers::assert_have_same_elements,
+    tests::{fixtures::ob_configuration::ObConfigurationOpts, test_db_pool::TestDbPool, MockFFClient},
+};
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use macros::test_state;
-use macros::test_state_case;
+use macros::{test_state, test_state_case};
 use newtypes::{
     CollectedDataOption as CDO, CountryRestriction, DbActor, DecisionStatus, DocTypeRestriction,
-    DocumentCdoInfo, FootprintReasonCode, ObConfigurationKey, RiskSignalGroupKind, Selfie, SignalSeverity,
-    TenantId, VendorAPI, WorkflowConfig, WorkflowSource,
+    DocumentCdoInfo, FootprintReasonCode, KycConfig, KycState, ObConfigurationKey, OnboardingStatus,
+    RiskSignalGroupKind, Selfie, SignalSeverity, TenantId, VendorAPI, WorkflowConfig, WorkflowFixtureResult,
+    WorkflowId, WorkflowSource, WorkflowState,
 };
-use newtypes::{KycConfig, OnboardingStatus};
-use newtypes::{KycState, WorkflowFixtureResult, WorkflowId, WorkflowState};
 
 async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
     let (_, _, _, sv, obc) = test_helpers::create_kyc_user_and_wf(

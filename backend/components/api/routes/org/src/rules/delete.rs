@@ -1,9 +1,15 @@
-use crate::auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth};
-use crate::State;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    State,
+};
 use api_core::types::{EmptyResponse, JsonApiResponse};
-use db::models::ob_configuration::ObConfiguration;
-use db::models::rule_instance::{RuleInstance, RuleInstanceUpdate};
-use db::DbResult;
+use db::{
+    models::{
+        ob_configuration::ObConfiguration,
+        rule_instance::{RuleInstance, RuleInstanceUpdate},
+    },
+    DbResult,
+};
 use newtypes::{ObConfigurationId, RuleId};
 use paperclip::actix::{self, api_v2_operation, web};
 

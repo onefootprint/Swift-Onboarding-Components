@@ -2,32 +2,38 @@
 
 use std::sync::Arc;
 
-use super::vendor_trait::VendorAPIResponse;
-use super::*;
+use super::{vendor_trait::VendorAPIResponse, *};
 
-use crate::config::Config;
-use crate::decision::state::actions::WorkflowActions;
-use crate::decision::state::{AsyncVendorCallsCompleted, WorkflowWrapper};
-use crate::enclave_client::EnclaveClient;
-use crate::errors::ApiError;
-use crate::vendor_clients::VendorClient;
-use crate::{decision, State};
-use db::models::decision_intent::DecisionIntent;
-use db::models::middesk_request::{MiddeskRequest, UpdateMiddeskRequest};
-use db::models::ob_configuration::ObConfiguration;
-use db::models::risk_signal::RiskSignal;
-use db::models::verification_result::VerificationResult;
-use db::models::workflow::{Workflow, WorkflowUpdate};
-use db::DbPool;
-use db::{models::verification_request::VerificationRequest, DbError};
+use crate::{
+    config::Config,
+    decision,
+    decision::state::{actions::WorkflowActions, AsyncVendorCallsCompleted, WorkflowWrapper},
+    enclave_client::EnclaveClient,
+    errors::ApiError,
+    vendor_clients::VendorClient,
+    State,
+};
+use db::{
+    models::{
+        decision_intent::DecisionIntent,
+        middesk_request::{MiddeskRequest, UpdateMiddeskRequest},
+        ob_configuration::ObConfiguration,
+        risk_signal::RiskSignal,
+        verification_request::VerificationRequest,
+        verification_result::VerificationResult,
+        workflow::{Workflow, WorkflowUpdate},
+    },
+    DbError, DbPool,
+};
 use feature_flag::{BoolFlag, FeatureFlagClient};
 
-use idv::middesk::response::business::BusinessResponse;
-use idv::middesk::response::webhook::{
-    MiddeskBusinessUpdateWebhookResponse, MiddeskTinRetriedWebhookResponse,
-};
 use idv::middesk::{
-    self, MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse, MiddeskGetBusinessRequest,
+    self,
+    response::{
+        business::BusinessResponse,
+        webhook::{MiddeskBusinessUpdateWebhookResponse, MiddeskTinRetriedWebhookResponse},
+    },
+    MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse, MiddeskGetBusinessRequest,
     MiddeskGetBusinessResponse,
 };
 

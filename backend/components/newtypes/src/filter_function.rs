@@ -1,10 +1,7 @@
 use crypto::hex::ToHex;
 use itertools::Itertools;
-use std::fmt::Display;
-use std::str::FromStr;
-use std::vec::IntoIter;
-use strum_macros::EnumDiscriminants;
-use strum_macros::EnumString;
+use std::{fmt::Display, str::FromStr, vec::IntoIter};
+use strum_macros::{EnumDiscriminants, EnumString};
 
 use crate::PiiBytes;
 
@@ -103,9 +100,11 @@ mod json_schema {
         fn name() -> Option<String> {
             Some("FilterFunction".to_string())
         }
+
         fn description() -> &'static str {
             "Represents a data transform to apply to underlying plaintext behind a data identifier. Specify only one of the following fields. See more here: https://docs.onefootprint.com/vault/proxy#filter-functions"
         }
+
         fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
             use paperclip::v2::models::{DataType, DefaultSchemaRaw};
             DefaultSchemaRaw {
@@ -174,6 +173,7 @@ impl FilterFunction {
 
 impl FromStr for FilterFunction {
     type Err = FilterFunctionParsingError;
+
     fn from_str(raw: &str) -> Result<Self, Self::Err> {
         let raw = raw.trim();
 
@@ -330,6 +330,7 @@ impl ArgParser {
             args: vec![].into_iter(),
         }
     }
+
     fn new(args: &str) -> Self {
         let mut args_list = vec![];
 
@@ -396,9 +397,7 @@ impl ArgParser {
 
 #[cfg(test)]
 mod tests {
-    use super::FilterFunction as FF;
-    use super::FilterFunctionParsingError::*;
-    use super::*;
+    use super::{FilterFunction as FF, FilterFunctionParsingError::*, *};
     use crypto::hex::FromHex;
     use test_case::test_case;
 

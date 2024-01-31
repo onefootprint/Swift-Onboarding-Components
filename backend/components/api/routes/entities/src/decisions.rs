@@ -1,23 +1,21 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantSessionAuth;
-use crate::types::EmptyResponse;
-use crate::types::JsonApiResponse;
-use crate::State;
-use api_core::decision;
-use api_core::decision::state::actions::WorkflowActions;
-use api_core::decision::state::ReviewCompleted;
-use api_core::decision::state::StateError;
-use api_core::decision::state::WorkflowWrapper;
-use api_core::errors::onboarding::OnboardingError;
-use api_core::errors::ApiResult;
-use api_core::task;
-use api_core::utils::fp_id_path::FpIdPath;
-use api_core::ApiErrorKind;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    types::{EmptyResponse, JsonApiResponse},
+    State,
+};
+use api_core::{
+    decision,
+    decision::state::{actions::WorkflowActions, ReviewCompleted, StateError, WorkflowWrapper},
+    errors::{onboarding::OnboardingError, ApiResult},
+    task,
+    utils::fp_id_path::FpIdPath,
+    ApiErrorKind,
+};
 use api_wire_types::DecisionRequest;
-use db::models::scoped_vault::ScopedVault;
-use db::models::workflow::Workflow;
-use db::DbResult;
+use db::{
+    models::{scoped_vault::ScopedVault, workflow::Workflow},
+    DbResult,
+};
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(

@@ -1,14 +1,11 @@
-use db_schema::schema::apple_device_attestation;
-use db_schema::schema::auth_event;
-use db_schema::schema::rule_result;
-use db_schema::schema::rule_set_result;
-use db_schema::schema::rule_set_result_risk_signal_junction;
+use db_schema::schema::{
+    apple_device_attestation, auth_event, rule_result, rule_set_result, rule_set_result_risk_signal_junction,
+};
 use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::VaultId;
 
-use crate::DbResult;
-use crate::TxnPgConn;
+use crate::{DbResult, TxnPgConn};
 
 #[tracing::instrument(skip_all)]
 pub fn private_cleanup_integration_tests(conn: &mut TxnPgConn, uvid: VaultId) -> DbResult<usize> {

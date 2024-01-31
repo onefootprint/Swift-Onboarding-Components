@@ -1,7 +1,7 @@
-use api_core::utils::fp_id_path::FpIdPath;
 use api_core::{
     auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
     types::{JsonApiResponse, ResponseData},
+    utils::fp_id_path::FpIdPath,
     State,
 };
 use api_wire_types::{
@@ -68,10 +68,11 @@ pub async fn post_inner(
     )
     .await?;
 
-    use newtypes::DataIdentifier::Id;
-    use newtypes::DataIdentifier::InvestorProfile as Ip;
-    use newtypes::IdentityDataKind::*;
-    use newtypes::InvestorProfileKind as IPK;
+    use newtypes::{
+        DataIdentifier::{Id, InvestorProfile as Ip},
+        IdentityDataKind::*,
+        InvestorProfileKind as IPK,
+    };
     use IPK::*;
 
     // decrypt a few additional attributes for our apex cip report

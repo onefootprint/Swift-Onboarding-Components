@@ -1,19 +1,19 @@
 use std::collections::HashMap;
 
-use crate::PgConn;
-use crate::{DbResult, TxnPgConn};
+use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{
     scoped_vault,
     tenant::{self, BoxedQuery},
 };
-use diesel::dsl::count_star;
-use diesel::insertable::CanInsertInSingleQuery;
-use diesel::pg::Pg;
-use diesel::prelude::*;
-use diesel::query_builder::QueryFragment;
-use diesel::query_builder::QueryId;
-use diesel::{Insertable, Queryable};
+use diesel::{
+    dsl::count_star,
+    insertable::CanInsertInSingleQuery,
+    pg::Pg,
+    prelude::*,
+    query_builder::{QueryFragment, QueryId},
+    Insertable, Queryable,
+};
 use itertools::Itertools;
 use newtypes::{
     AppClipExperienceId, CompanySize, EncryptedVaultPrivateKey, PreviewApi, ScopedVaultId, StripeCustomerId,
@@ -151,6 +151,7 @@ impl Tenant {
             }
         }
     }
+
     #[tracing::instrument("Tenant::lock", skip_all)]
     pub fn lock(conn: &mut TxnPgConn, id: &TenantId) -> DbResult<Self> {
         let tenant = tenant::table

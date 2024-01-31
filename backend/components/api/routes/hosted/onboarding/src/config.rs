@@ -1,12 +1,14 @@
-use crate::auth::ob_config::ObConfigAuth;
-use crate::auth::Either;
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
-use api_core::auth::user::UserAuthContext;
-use api_core::auth::Any;
-use api_core::errors::onboarding::OnboardingError;
+use crate::{
+    auth::{ob_config::ObConfigAuth, Either},
+    errors::ApiError,
+    types::response::ResponseData,
+    utils::db2api::DbToApi,
+    State,
+};
+use api_core::{
+    auth::{user::UserAuthContext, Any},
+    errors::onboarding::OnboardingError,
+};
 use db::{
     models::{appearance::Appearance, tenant_client_config::TenantClientConfig},
     DbResult,

@@ -14,8 +14,7 @@ use newtypes::{
     CipKind, DecisionIntentId, DecisionStatus, FootprintReasonCode, ScopedVaultId, SignalSeverity, VaultKind,
     VaultPublicKey, VendorAPI,
 };
-use rand::seq::SliceRandom;
-use rand::Rng;
+use rand::{seq::SliceRandom, Rng};
 use strum::IntoEnumIterator;
 
 use super::{

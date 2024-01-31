@@ -1,20 +1,24 @@
-use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext};
-use crate::errors::ApiResult;
-use crate::types::JsonApiResponse;
-use crate::utils::vault_wrapper::VaultWrapper;
-use crate::State;
-use api_core::types::ResponseData;
-use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::headers::InsightHeaders;
-use api_core::utils::vault_wrapper::{Any, WriteableVw};
-use db::models::access_event::NewAccessEvent;
-use db::models::insight_event::CreateInsightEvent;
-use db::models::scoped_vault::ScopedVault;
+use crate::{
+    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
+    errors::ApiResult,
+    types::JsonApiResponse,
+    utils::vault_wrapper::VaultWrapper,
+    State,
+};
+use api_core::{
+    types::ResponseData,
+    utils::{
+        fp_id_path::FpIdPath,
+        headers::InsightHeaders,
+        vault_wrapper::{Any, WriteableVw},
+    },
+};
+use db::models::{
+    access_event::NewAccessEvent, insight_event::CreateInsightEvent, scoped_vault::ScopedVault,
+};
 use macros::route_alias;
 use newtypes::{flat_api_object_map_type, AccessEventKind, AccessEventPurpose, DataIdentifier};
-use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 use serde::Deserialize;
 use std::collections::{HashMap, HashSet};
 

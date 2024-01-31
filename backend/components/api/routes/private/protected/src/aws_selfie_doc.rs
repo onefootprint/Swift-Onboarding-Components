@@ -4,12 +4,11 @@ use std::collections::HashMap;
 
 use crate::ProtectedAuth;
 use actix_web::{post, web};
-use api_core::State;
 use api_core::{
     errors::ApiResult,
     types::{JsonApiResponse, ResponseData},
     utils::vault_wrapper::{EnclaveDecryptOperation, Pii, VaultWrapper},
-    ApiErrorKind,
+    ApiErrorKind, State,
 };
 use db::models::scoped_vault::ScopedVault;
 use newtypes::{DataIdentifier, FpId};

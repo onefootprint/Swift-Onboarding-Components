@@ -1,19 +1,26 @@
-use crate::decision::vendor::build_request::build_docv_data_from_identity_doc;
-use crate::decision::vendor::incode::{get_config_id, IncodeContext, IncodeStateMachine};
-use crate::errors::AssertionError;
-use crate::errors::{ApiError, ApiResult};
-use crate::utils::vault_wrapper::{Person, VaultWrapper};
-use crate::State;
+use crate::{
+    decision::vendor::{
+        build_request::build_docv_data_from_identity_doc,
+        incode::{get_config_id, IncodeContext, IncodeStateMachine},
+    },
+    errors::{ApiError, ApiResult, AssertionError},
+    utils::vault_wrapper::{Person, VaultWrapper},
+    State,
+};
 use api_wire_types::{DocumentImageError, DocumentResponse};
-use db::models::document_request::DocumentRequest;
-use db::models::identity_document::{IdentityDocument, IdentityDocumentUpdate};
-use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
-use db::models::ob_configuration::ObConfiguration;
-use db::DbPool;
+use db::{
+    models::{
+        document_request::DocumentRequest,
+        identity_document::{IdentityDocument, IdentityDocumentUpdate},
+        incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession},
+        ob_configuration::ObConfiguration,
+    },
+    DbPool,
+};
 use feature_flag::FeatureFlagClient;
-use newtypes::IdentityDocumentStatus;
 use newtypes::{
-    DecisionIntentId, DocumentSide, IdentityDocumentId, IncodeVerificationSessionState, TenantId, WorkflowId,
+    DecisionIntentId, DocumentSide, IdentityDocumentId, IdentityDocumentStatus,
+    IncodeVerificationSessionState, TenantId, WorkflowId,
 };
 use std::sync::Arc;
 

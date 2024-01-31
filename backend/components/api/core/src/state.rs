@@ -89,8 +89,7 @@ impl State {
     #[cfg(test)]
     #[allow(clippy::expect_used)]
     pub async fn test_state() -> Self {
-        use crate::s3::MockS3Client;
-        use crate::utils::mock_enclave::MockEnclave;
+        use crate::{s3::MockS3Client, utils::mock_enclave::MockEnclave};
         use db::tests::MockFFClient;
         use webhooks::MockWebhookClient;
         let config = Config::load_from_env().expect("failed to load config");

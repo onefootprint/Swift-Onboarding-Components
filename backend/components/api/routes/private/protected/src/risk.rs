@@ -1,32 +1,32 @@
 use crate::ProtectedAuth;
-use actix_web::post;
-use actix_web::web::{self, Json};
-use api_core::decision::engine;
-use api_core::decision::features::risk_signals::{
-    fetch_latest_risk_signals_map, parse_reason_codes_from_vendor_result,
+use actix_web::{
+    post,
+    web::{self, Json},
 };
-use api_core::decision::onboarding::{Decision, OnboardingRulesDecisionOutput};
-use api_core::decision::vendor;
-use api_core::decision::vendor::tenant_vendor_control::TenantVendorControl;
-use api_core::decision::vendor::vendor_result::VendorResult;
-use api_core::errors::onboarding::OnboardingError;
-use api_core::errors::AssertionError;
-use api_core::errors::{ApiError, ApiResult};
-use api_core::types::response::ResponseData;
-use api_core::utils::db2api::DbToApi;
-use api_core::utils::vault_wrapper::{VaultWrapper, VwArgs};
-use api_core::{decision, State};
-use api_core::{task, ApiErrorKind};
+use api_core::{
+    decision,
+    decision::{
+        engine,
+        features::risk_signals::{fetch_latest_risk_signals_map, parse_reason_codes_from_vendor_result},
+        onboarding::{Decision, OnboardingRulesDecisionOutput},
+        vendor,
+        vendor::{tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
+    },
+    errors::{onboarding::OnboardingError, ApiError, ApiResult, AssertionError},
+    task,
+    types::response::ResponseData,
+    utils::{
+        db2api::DbToApi,
+        vault_wrapper::{VaultWrapper, VwArgs},
+    },
+    ApiErrorKind, State,
+};
 use chrono::Utc;
-use db::models::data_lifetime::DataLifetime;
-use db::models::decision_intent::DecisionIntent;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::risk_signal::RiskSignal;
-use db::models::rule_instance::RuleInstance;
-use db::models::scoped_vault::ScopedVault;
-use db::models::verification_request::VerificationRequest;
-use db::models::verification_result::VerificationResult;
-use db::models::workflow::Workflow;
+use db::models::{
+    data_lifetime::DataLifetime, decision_intent::DecisionIntent, ob_configuration::ObConfiguration,
+    risk_signal::RiskSignal, rule_instance::RuleInstance, scoped_vault::ScopedVault,
+    verification_request::VerificationRequest, verification_result::VerificationResult, workflow::Workflow,
+};
 use itertools::Itertools;
 use newtypes::{
     DecisionIntentId, DecisionStatus, FpId, RiskSignalGroupKind, RiskSignalId, RuleAction, RuleSetResultKind,

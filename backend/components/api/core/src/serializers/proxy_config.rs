@@ -33,7 +33,7 @@ impl DbToApi<ProxyConfig> for api_wire_types::ProxyConfigBasic {
             url,
             method,
             status,
-            deactivated_at
+            deactivated_at,
         }
     }
 }

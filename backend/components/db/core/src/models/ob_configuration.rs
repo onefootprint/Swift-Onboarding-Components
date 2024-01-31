@@ -1,31 +1,16 @@
 use std::collections::HashMap;
 
-use super::tenant::Tenant;
-use super::workflow::Workflow;
-use crate::actor;
-use crate::actor::SaturatedActor;
-use crate::NextPage;
-use crate::OffsetPagination;
-use crate::PgConn;
-use crate::TxnPgConn;
-use crate::{DbError, DbResult};
+use super::{tenant::Tenant, workflow::Workflow};
+use crate::{actor, actor::SaturatedActor, DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::ob_configuration::BoxedQuery;
-use db_schema::schema::{ob_configuration, tenant};
-use diesel::pg::Pg;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
+use db_schema::schema::{ob_configuration, ob_configuration::BoxedQuery, tenant};
+use diesel::{pg::Pg, prelude::*, Insertable, Queryable};
 use itertools::Itertools;
-use newtypes::AppearanceId;
-use newtypes::DocumentCdoInfo;
-use newtypes::EnhancedAmlOption;
-use newtypes::IdDocKind;
-use newtypes::Iso3166TwoDigitCountryCode;
-use newtypes::ObConfigurationKind;
-use newtypes::ScopedVaultId;
-use newtypes::WorkflowId;
-use newtypes::{ApiKeyStatus, CipKind, DataIdentifierDiscriminant, DbActor};
-use newtypes::{CollectedDataOption as CDO, ObConfigurationId, ObConfigurationKey, TenantId};
+use newtypes::{
+    ApiKeyStatus, AppearanceId, CipKind, CollectedDataOption as CDO, DataIdentifierDiscriminant, DbActor,
+    DocumentCdoInfo, EnhancedAmlOption, IdDocKind, Iso3166TwoDigitCountryCode, ObConfigurationId,
+    ObConfigurationKey, ObConfigurationKind, ScopedVaultId, TenantId, WorkflowId,
+};
 use strum::IntoEnumIterator;
 
 pub type IsLive = bool;
@@ -283,6 +268,7 @@ impl SupportedCountriesForDocType for Findigs {
             IdDocKind::ProofOfAddress => vec![],
         }
     }
+
     fn is_override(&self) -> bool {
         true
     }
@@ -302,6 +288,7 @@ impl SupportedCountriesForDocType for Coba {
             IdDocKind::ProofOfAddress => vec![],
         }
     }
+
     fn is_override(&self) -> bool {
         true
     }
@@ -322,6 +309,7 @@ impl SupportedCountriesForDocType for Default {
             IdDocKind::ProofOfAddress => vec![],
         }
     }
+
     fn is_override(&self) -> bool {
         false
     }
@@ -681,17 +669,17 @@ impl ObConfiguration {
 #[cfg(test)]
 mod tests {
     use super::ObConfiguration;
-    use crate::diesel::RunQueryDsl;
-    use crate::test_helpers::assert_have_same_elements;
-    use crate::tests::fixtures;
-    use crate::tests::fixtures::ob_configuration::ObConfigurationOpts;
-    use crate::tests::prelude::*;
+    use crate::{
+        diesel::RunQueryDsl,
+        test_helpers::assert_have_same_elements,
+        tests::{fixtures, fixtures::ob_configuration::ObConfigurationOpts, prelude::*},
+    };
     use chrono::Utc;
     use macros::db_test;
-    use newtypes::{AdverseMediaListKind, CipKind, ObConfigurationKind};
     use newtypes::{
-        ApiKeyStatus, CollectedDataOption, DocumentCdoInfo, EnhancedAmlOption, IdDocKind,
-        Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, TenantId,
+        AdverseMediaListKind, ApiKeyStatus, CipKind, CollectedDataOption, DocumentCdoInfo, EnhancedAmlOption,
+        IdDocKind, Iso3166TwoDigitCountryCode, ObConfigurationId, ObConfigurationKey, ObConfigurationKind,
+        TenantId,
     };
     use std::str::FromStr;
     use strum::IntoEnumIterator;

@@ -1,27 +1,28 @@
-use crate::auth::session::UpdateSession;
-use crate::auth::user::UserAuth;
-use crate::auth::user::UserAuthContext;
-use crate::auth::user::UserAuthGuard;
-use crate::auth::AuthError;
-use crate::errors::onboarding::OnboardingError;
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
-use crate::utils::headers::InsightHeaders;
-use crate::State;
-use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::session::user::NewUserSessionContext;
-use api_core::types::JsonApiResponse;
-use api_core::utils::db2api::DbToApi;
-use api_core::utils::onboarding::NewBusinessVaultArgs;
-use api_core::utils::onboarding::NewOnboardingArgs;
-use api_core::utils::vault_wrapper::Any;
-use api_core::utils::vault_wrapper::VaultWrapper;
+use crate::{
+    auth::{
+        session::UpdateSession,
+        user::{UserAuth, UserAuthContext, UserAuthGuard},
+        AuthError,
+    },
+    errors::{onboarding::OnboardingError, ApiError},
+    types::response::ResponseData,
+    utils::headers::InsightHeaders,
+    State,
+};
+use api_core::{
+    auth::{ob_config::ObConfigAuth, session::user::NewUserSessionContext},
+    types::JsonApiResponse,
+    utils::{
+        db2api::DbToApi,
+        onboarding::{NewBusinessVaultArgs, NewOnboardingArgs},
+        vault_wrapper::{Any, VaultWrapper},
+    },
+};
 use api_wire_types::hosted::onboarding::OnboardingResponse;
-use db::models::insight_event::CreateInsightEvent;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::scoped_vault::ScopedVault;
-use newtypes::ObConfigurationKind;
-use newtypes::WorkflowSource;
+use db::models::{
+    insight_event::CreateInsightEvent, ob_configuration::ObConfiguration, scoped_vault::ScopedVault,
+};
+use newtypes::{ObConfigurationKind, WorkflowSource};
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(

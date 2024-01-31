@@ -1,13 +1,8 @@
-use crate::DbResult;
-use crate::PgConn;
+use crate::{DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::contact_info;
-use diesel::prelude::*;
-use diesel::Queryable;
-use newtypes::ContactInfoPriority;
-use newtypes::DataIdentifier;
-use newtypes::VaultId;
-use newtypes::{ContactInfoId, DataLifetimeId};
+use diesel::{prelude::*, Queryable};
+use newtypes::{ContactInfoId, ContactInfoPriority, DataIdentifier, DataLifetimeId, VaultId};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = contact_info)]

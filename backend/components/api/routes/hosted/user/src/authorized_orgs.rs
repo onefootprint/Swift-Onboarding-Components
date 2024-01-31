@@ -1,7 +1,9 @@
-use crate::auth::user::{UserAuth, UserAuthContext, UserAuthGuard};
-use crate::types::response::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
+use crate::{
+    auth::user::{UserAuth, UserAuthContext, UserAuthGuard},
+    types::response::ResponseData,
+    utils::db2api::DbToApi,
+    State,
+};
 use api_core::types::JsonApiResponse;
 use db::models::scoped_vault::ScopedVault;
 use paperclip::actix::{self, api_v2_operation, web};

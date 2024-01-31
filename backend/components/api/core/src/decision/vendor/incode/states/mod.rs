@@ -1,13 +1,11 @@
-use std::str::FromStr;
-use std::sync::Arc;
+use std::{str::FromStr, sync::Arc};
 
 use chrono::Utc;
-use db::models::decision_intent::DecisionIntent;
-use db::models::document_upload::DocumentUpload;
-use db::models::identity_document::IdentityDocument;
-use db::models::incode_verification_session::IncodeVerificationSession;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::verification_request::VerificationRequest;
+use db::models::{
+    decision_intent::DecisionIntent, document_upload::DocumentUpload, identity_document::IdentityDocument,
+    incode_verification_session::IncodeVerificationSession, ob_configuration::ObConfiguration,
+    verification_request::VerificationRequest,
+};
 
 mod start_onboarding;
 
@@ -46,22 +44,26 @@ pub use get_onboarding_status::*;
 mod process_face;
 pub use process_face::*;
 
-use super::state::IncodeStateTransition;
-use super::{validate_doc_type_is_allowed, IncodeContext};
-use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
-use crate::decision::vendor;
-use crate::decision::vendor::verification_result::encrypt_verification_result_response;
-use crate::errors::{ApiResult, AssertionError};
-use crate::utils::vault_wrapper::VaultWrapper;
-use crate::{ApiError, State};
-use db::models::verification_result::{NewVerificationResult, VerificationResult};
-use db::DbPool;
+use super::{state::IncodeStateTransition, validate_doc_type_is_allowed, IncodeContext};
+use crate::{
+    decision::{
+        features::incode_docv::IncodeOcrComparisonDataFields, vendor,
+        vendor::verification_result::encrypt_verification_result_response,
+    },
+    errors::{ApiResult, AssertionError},
+    utils::vault_wrapper::VaultWrapper,
+    ApiError, State,
+};
+use db::{
+    models::verification_result::{NewVerificationResult, VerificationResult},
+    DbPool,
+};
 use idv::incode::{APIResponseToIncodeError, IncodeResponse};
-use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    DecisionIntentKind, IdDocKind, IncodeFailureReason, IncodeVerificationSessionId,
-    IncodeVerificationSessionKind, Iso3166ThreeDigitCountryCode, Iso3166TwoDigitCountryCode, PiiJsonValue,
-    ScopedVaultId, ScrubbedPiiJsonValue, ScrubbedPiiString, TenantId, VendorAPI, WorkflowId,
+    vendor_credentials::IncodeCredentialsWithToken, DecisionIntentKind, IdDocKind, IncodeFailureReason,
+    IncodeVerificationSessionId, IncodeVerificationSessionKind, Iso3166ThreeDigitCountryCode,
+    Iso3166TwoDigitCountryCode, PiiJsonValue, ScopedVaultId, ScrubbedPiiJsonValue, ScrubbedPiiString,
+    TenantId, VendorAPI, WorkflowId,
 };
 
 #[derive(Clone)]

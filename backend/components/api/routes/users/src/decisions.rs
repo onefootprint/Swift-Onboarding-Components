@@ -1,23 +1,18 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantGuard;
-use crate::types::EmptyResponse;
-use crate::types::JsonApiResponse;
-use crate::State;
-use api_core::auth::tenant::SecretTenantAuthContext;
-use api_core::decision;
-use api_core::errors::onboarding::OnboardingError;
-use api_core::errors::ApiResult;
-use api_core::errors::ValidationError;
-use api_core::task;
-use api_core::utils::fp_id_path::FpIdPath;
-use api_wire_types::CreateAnnotationRequest;
-use api_wire_types::CreateUserDecisionRequest;
-use api_wire_types::DecisionRequest;
-use db::models::scoped_vault::ScopedVault;
-use db::models::vault::Vault;
-use db::models::workflow::Workflow;
-use newtypes::PreviewApi;
-use newtypes::VaultKind;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard},
+    types::{EmptyResponse, JsonApiResponse},
+    State,
+};
+use api_core::{
+    auth::tenant::SecretTenantAuthContext,
+    decision,
+    errors::{onboarding::OnboardingError, ApiResult, ValidationError},
+    task,
+    utils::fp_id_path::FpIdPath,
+};
+use api_wire_types::{CreateAnnotationRequest, CreateUserDecisionRequest, DecisionRequest};
+use db::models::{scoped_vault::ScopedVault, vault::Vault, workflow::Workflow};
+use newtypes::{PreviewApi, VaultKind};
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(

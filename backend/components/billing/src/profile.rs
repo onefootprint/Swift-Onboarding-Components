@@ -83,7 +83,7 @@ async fn get_price(client: &stripe::Client, product_id: &str, price: &str) -> BR
             return false;
         }
         let Some(a) = p.unit_amount_decimal.as_ref() else {
-            return false
+            return false;
         };
         let Ok(a) = Decimal::from_str(a) else {
             return false;

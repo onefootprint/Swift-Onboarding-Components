@@ -1,13 +1,12 @@
-use crate::auth::user::UserAuthContext;
-use crate::errors::handoff::HandoffError;
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
-use crate::types::EmptyResponse;
-use crate::utils::session::{HandoffRecord, JsonSession};
-use crate::State;
+use crate::{
+    auth::user::UserAuthContext,
+    errors::{handoff::HandoffError, ApiError},
+    types::{response::ResponseData, EmptyResponse},
+    utils::session::{HandoffRecord, JsonSession},
+    State,
+};
 use api_core::auth::user::UserAuthGuard;
-use api_wire_types::D2pStatusResponse;
-use api_wire_types::D2pUpdateStatusRequest;
+use api_wire_types::{D2pStatusResponse, D2pUpdateStatusRequest};
 use paperclip::actix::{api_v2_operation, get, post, web, web::Json};
 
 #[api_v2_operation(

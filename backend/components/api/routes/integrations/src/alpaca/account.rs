@@ -4,12 +4,14 @@ use alpaca::{
     },
     AlpacaCip,
 };
-use api_core::utils::fp_id_path::FpIdPath;
 use api_core::{
     auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
     errors::{cip_error::CipError, ApiResult},
     types::{JsonApiResponse, ResponseData},
-    utils::vault_wrapper::{Person, TenantVw, VaultWrapper},
+    utils::{
+        fp_id_path::FpIdPath,
+        vault_wrapper::{Person, TenantVw, VaultWrapper},
+    },
     State,
 };
 use api_wire_types::{

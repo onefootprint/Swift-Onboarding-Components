@@ -1,26 +1,23 @@
-use crate::ChallengeData;
-use crate::ChallengeState;
-use crate::State;
-use api_core::auth::ob_config::ObConfigAuth;
-use api_core::errors::challenge::ChallengeError;
-use api_core::errors::ApiError;
-use api_core::errors::ValidationError;
-use api_core::errors::{ApiResult, AssertionError};
-use api_core::telemetry::RootSpan;
-use api_core::types::response::ResponseData;
-use api_core::types::JsonApiResponse;
-use api_core::utils::challenge::Challenge;
-use api_core::utils::email::send_email_challenge_non_blocking;
-use api_core::utils::headers::SandboxId;
-use api_core::utils::sms::rx_background_error;
-use api_core::utils::vault_wrapper::{InitialVaultData, VaultContext, VaultWrapper};
-use api_wire_types::SignupChallengeRequest;
-use api_wire_types::SignupChallengeResponse;
-use api_wire_types::UserChallengeData;
+use crate::{ChallengeData, ChallengeState, State};
+use api_core::{
+    auth::ob_config::ObConfigAuth,
+    errors::{challenge::ChallengeError, ApiError, ApiResult, AssertionError, ValidationError},
+    telemetry::RootSpan,
+    types::{response::ResponseData, JsonApiResponse},
+    utils::{
+        challenge::Challenge,
+        email::send_email_challenge_non_blocking,
+        headers::SandboxId,
+        sms::rx_background_error,
+        vault_wrapper::{InitialVaultData, VaultContext, VaultWrapper},
+    },
+};
+use api_wire_types::{SignupChallengeRequest, SignupChallengeResponse, UserChallengeData};
 use itertools::Itertools;
-use newtypes::fingerprinter::GlobalFingerprintKind;
-use newtypes::ChallengeKind;
-use newtypes::{DataIdentifier, Fingerprinter, IdentityDataKind as IDK, PiiString};
+use newtypes::{
+    fingerprinter::GlobalFingerprintKind, ChallengeKind, DataIdentifier, Fingerprinter,
+    IdentityDataKind as IDK, PiiString,
+};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(

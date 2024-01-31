@@ -1,5 +1,4 @@
-use crate::types::{response::ResponseData, StringResponse};
-use crate::types::{EmptyResponse, JsonApiResponse};
+use crate::types::{response::ResponseData, EmptyResponse, JsonApiResponse, StringResponse};
 use actix_web::HttpRequest;
 
 use paperclip::actix::{api_v2_operation, get};

@@ -1,23 +1,19 @@
-use crate::auth::session::user::EmailVerifySession;
-use crate::errors::user::UserError;
-use crate::errors::{ApiError, ApiErrorKind};
-use crate::State;
-use crate::{auth::session::AuthSessionData, errors::ApiResult};
+use crate::{
+    auth::session::{user::EmailVerifySession, AuthSessionData},
+    errors::{user::UserError, ApiError, ApiErrorKind, ApiResult},
+    State,
+};
 use chrono::Duration;
 use crypto::random::gen_random_alphanumeric_code;
 use db::models::tenant::Tenant;
 use feature_flag::BoolFlag;
-use newtypes::email::Email;
-use newtypes::{ContactInfoId, PiiString, SandboxId, TenantId, VaultId};
+use newtypes::{email::Email, ContactInfoId, PiiString, SandboxId, TenantId, VaultId};
 use paperclip::actix::web;
 use reqwest::StatusCode;
-use std::collections::HashMap;
-use std::str::FromStr;
+use std::{collections::HashMap, str::FromStr};
 use tracing::Instrument;
 
-use super::challenge_rate_limit::RateLimit;
-use super::session::AuthSession;
-use super::sms::PhoneEmailChallengeState;
+use super::{challenge_rate_limit::RateLimit, session::AuthSession, sms::PhoneEmailChallengeState};
 
 #[derive(Debug, Clone)]
 pub struct SendgridClient {
@@ -84,13 +80,12 @@ pub struct BoInviteEmailInfo<'a> {
 impl SendgridClient {
     const DASHBOARD_INVITE_TEMPLATE_ID: &'static str = "d-74de0508a7834a2494c499d2a70c41ba";
     const EMAIL_VERIFY_TEMPLATE_ID: &'static str = "d-c558e640dad04726a31e6710c7ffc57c";
-    const MAGIC_LINK_TEMPLATE_ID: &'static str = "d-a631e0eb72984e28a39940aa8f3bbe60";
-    const KYC_BUSINESS_OWNER_TEMPLATE_ID: &'static str = "d-104270bd3b7c4c62a6ed95e295c7822b";
-    pub const TRIGGER_TEMPLATE_ID: &'static str = "d-d1319538747c4a86a9ad28ff35767896";
-    const OTP_VERIFY_TEMPLATE_ID: &'static str = "d-d4707e4a976449e1af1753de5f05289d";
-
     const FROM_EMAIL: &'static str = "noreply@noreply.onefootprint.com";
     const FROM_NAME: &'static str = "Footprint";
+    const KYC_BUSINESS_OWNER_TEMPLATE_ID: &'static str = "d-104270bd3b7c4c62a6ed95e295c7822b";
+    const MAGIC_LINK_TEMPLATE_ID: &'static str = "d-a631e0eb72984e28a39940aa8f3bbe60";
+    const OTP_VERIFY_TEMPLATE_ID: &'static str = "d-d4707e4a976449e1af1753de5f05289d";
+    pub const TRIGGER_TEMPLATE_ID: &'static str = "d-d1319538747c4a86a9ad28ff35767896";
 
     pub fn new(api_key: String) -> Self {
         let client = reqwest::Client::new();

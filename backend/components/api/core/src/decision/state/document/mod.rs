@@ -21,10 +21,10 @@ pub enum DocumentState {
 impl DocumentState {
     pub async fn init(state: &State, workflow: DbWorkflow) -> ApiResult<Self> {
         let newtypes::WorkflowState::Document(s) = workflow.state else {
-            return Err(StateError::UnexpectedStateForWorkflow(workflow.state, workflow.id).into())
+            return Err(StateError::UnexpectedStateForWorkflow(workflow.state, workflow.id).into());
         };
         let newtypes::WorkflowConfig::Document(c) = workflow.config.clone() else {
-            return Err(StateError::UnexpectedConfigForWorkflow(workflow.config, workflow.id).into())
+            return Err(StateError::UnexpectedConfigForWorkflow(workflow.config, workflow.id).into());
         };
         // TODO could get rid of this with enum_dispatch
         match s {

@@ -8,8 +8,7 @@ use api_core::{
     errors::{ApiResult, ValidationError},
     types::{EmptyResponse, JsonApiResponse, ResponseData},
 };
-use db::models::tenant::NewTenant;
-use db::models::tenant::Tenant;
+use db::models::tenant::{NewTenant, Tenant};
 
 #[derive(serde::Deserialize)]
 pub struct SandboxTenantRequest {

@@ -179,23 +179,23 @@ pub fn save_vres(
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::decision::vendor::vendor_trait::VendorAPIResponse;
     use crate::{
         decision::{
             tests::test_helpers::create_kyc_user_and_wf,
-            vendor::vendor_trait::{MockVendorAPICall, VendorAPICall},
+            vendor::vendor_trait::{MockVendorAPICall, VendorAPICall, VendorAPIResponse},
         },
         State,
     };
-    use db::models::decision_intent::DecisionIntent;
-    use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
-    use db::tests::test_db_pool::TestDbPool;
-    use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
-    use idv::stytch::StytchLookupRequest;
-    use idv::stytch::StytchLookupResponse;
+    use db::{
+        models::decision_intent::DecisionIntent,
+        tests::{fixtures::ob_configuration::ObConfigurationOpts, test_db_pool::TestDbPool},
+    };
+    use idv::{
+        idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
+        stytch::{StytchLookupRequest, StytchLookupResponse},
+    };
     use macros::test_state;
-    use newtypes::{vendor_credentials::IdologyCredentials, DecisionIntentKind, IdvData};
-    use newtypes::{Vendor, VendorAPI};
+    use newtypes::{vendor_credentials::IdologyCredentials, DecisionIntentKind, IdvData, Vendor, VendorAPI};
     use serde_json::json;
 
     async fn test_save_vreq_and_vres<T, U, E>(

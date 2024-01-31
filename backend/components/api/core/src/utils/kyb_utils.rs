@@ -1,23 +1,24 @@
-use std::collections::HashMap;
-use std::pin::Pin;
+use std::{collections::HashMap, pin::Pin};
 
-use crate::auth::session::ob_config::BoSession;
-use crate::config::LinkKind;
-use crate::decision::state::{Authorize, BoKycCompleted, WorkflowActions, WorkflowWrapper};
-use crate::errors::business::BusinessError;
-use crate::errors::onboarding::OnboardingError;
-use crate::errors::ApiResult;
-use crate::utils::email::BoInviteEmailInfo;
-use crate::utils::session::AuthSession;
-use crate::utils::sms::BoSessionSmsInfo;
-use crate::utils::vault_wrapper::{Business, DecryptedBusinessOwners, TenantVw, VaultWrapper};
-use crate::State;
-use db::models::business_owner::BusinessOwner;
-use db::models::tenant::Tenant;
-use db::models::workflow::Workflow;
+use crate::{
+    auth::session::ob_config::BoSession,
+    config::LinkKind,
+    decision::state::{Authorize, BoKycCompleted, WorkflowActions, WorkflowWrapper},
+    errors::{business::BusinessError, onboarding::OnboardingError, ApiResult},
+    utils::{
+        email::BoInviteEmailInfo,
+        session::AuthSession,
+        sms::BoSessionSmsInfo,
+        vault_wrapper::{Business, DecryptedBusinessOwners, TenantVw, VaultWrapper},
+    },
+    State,
+};
+use db::models::{business_owner::BusinessOwner, tenant::Tenant, workflow::Workflow};
 use futures::FutureExt;
-use newtypes::{BoLinkId, BusinessDataKind as BDK, KybState, WorkflowState};
-use newtypes::{BusinessOwnerKind, KycedBusinessOwnerData, OnboardingStatus, PiiString};
+use newtypes::{
+    BoLinkId, BusinessDataKind as BDK, BusinessOwnerKind, KybState, KycedBusinessOwnerData, OnboardingStatus,
+    PiiString, WorkflowState,
+};
 
 pub struct BasicBusinessInfo {
     pub business_name: PiiString,

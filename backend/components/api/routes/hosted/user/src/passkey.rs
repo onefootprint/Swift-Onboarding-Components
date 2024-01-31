@@ -14,8 +14,9 @@ use chrono::{Duration, Utc};
 use db::models::{
     auth_event::{AuthEvent, NewAuthEvent},
     insight_event::CreateInsightEvent,
+    vault::Vault,
+    webauthn_credential::WebauthnCredential,
 };
-use db::models::{vault::Vault, webauthn_credential::WebauthnCredential};
 use macros::route_alias;
 use newtypes::{AuthEventKind, ChallengeToken};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};

@@ -1,28 +1,30 @@
 use std::str::FromStr;
 
-use crate::utils::vault_wrapper::{VaultWrapper, VwArgs};
 use crate::{
-    auth::user::CheckUserWfAuthContext, errors::ApiResult, utils::vault_wrapper::DecryptUncheckedResult,
+    auth::user::CheckUserWfAuthContext,
+    errors::ApiResult,
+    utils::vault_wrapper::{DecryptUncheckedResult, VaultWrapper, VwArgs},
     State,
 };
-use db::models::workflow::WorkflowIdentifier;
 use db::{
     models::{
-        document_request::DocumentRequest, identity_document::IdentityDocument,
-        liveness_event::LivenessEvent, ob_configuration::ObConfiguration, user_consent::UserConsent,
-        webauthn_credential::WebauthnCredential, workflow::Workflow,
+        document_request::DocumentRequest,
+        identity_document::IdentityDocument,
+        liveness_event::LivenessEvent,
+        ob_configuration::ObConfiguration,
+        user_consent::UserConsent,
+        webauthn_credential::WebauthnCredential,
+        workflow::{Workflow, WorkflowIdentifier},
     },
     PgConn,
 };
 use itertools::Itertools;
 use newtypes::{
-    AlpacaKycState, AuthorizeFields, DocumentCdoInfo, DocumentRequestKind, DocumentUploadMode,
-    IdentityDocumentStatus, Iso3166TwoDigitCountryCode, KycState, LivenessSource, OnboardingRequirement,
-    OnboardingRequirementKind, Selfie, UsLegalStatus, VaultId, WorkflowState,
-};
-use newtypes::{
-    CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration, DocumentKind,
-    IdentityDataKind as IDK, InvestorProfileKind as IPK, ScopedVaultId,
+    AlpacaKycState, AuthorizeFields, CollectedDataOption, DataIdentifierDiscriminant as DID, Declaration,
+    DocumentCdoInfo, DocumentKind, DocumentRequestKind, DocumentUploadMode, IdentityDataKind as IDK,
+    IdentityDocumentStatus, InvestorProfileKind as IPK, Iso3166TwoDigitCountryCode, KycState, LivenessSource,
+    OnboardingRequirement, OnboardingRequirementKind, ScopedVaultId, Selfie, UsLegalStatus, VaultId,
+    WorkflowState,
 };
 
 use super::vault_wrapper::Any;

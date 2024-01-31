@@ -4,17 +4,15 @@ use idv::{
     footprint_http_client::FootprintVendorHttpClient,
     incode::{
         client::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter},
-        doc::response::{
-            AddConsentResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse, ProcessIdResponse,
-        },
         doc::{
             request::DocumentSide,
-            response::{AddSelfieResponse, GetOnboardingStatusResponse, ProcessFaceResponse},
-            IncodeAddSelfieRequest, IncodeGetOnboardingStatusRequest, IncodeProcessFaceRequest,
-        },
-        doc::{
+            response::{
+                AddConsentResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse,
+                FetchScoresResponse, GetOnboardingStatusResponse, ProcessFaceResponse, ProcessIdResponse,
+            },
             IncodeAddBackRequest, IncodeAddFrontRequest, IncodeAddMLConsentRequest,
-            IncodeAddPrivacyConsentRequest, IncodeFetchOCRRequest, IncodeFetchScoresRequest,
+            IncodeAddPrivacyConsentRequest, IncodeAddSelfieRequest, IncodeFetchOCRRequest,
+            IncodeFetchScoresRequest, IncodeGetOnboardingStatusRequest, IncodeProcessFaceRequest,
             IncodeProcessIdRequest,
         },
         error::Error as IncodeError,

@@ -1,27 +1,29 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
-use crate::errors::ApiResult;
+use crate::{
+    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext},
+    errors::ApiResult,
+};
 
-use crate::proxy;
-use crate::proxy::config::ProxyConfig;
-use crate::proxy::net_client;
-use crate::proxy::pii_parser;
-use crate::proxy::pii_parser::TokenizedIngress;
-use crate::proxy::token_parser::ProxyTokenParser;
+use crate::{
+    proxy,
+    proxy::{
+        config::ProxyConfig, net_client, pii_parser, pii_parser::TokenizedIngress,
+        token_parser::ProxyTokenParser,
+    },
+};
 
-use crate::proxy::tokenize;
-use crate::utils::headers::InsightHeaders;
-use crate::State;
+use crate::{proxy::tokenize, utils::headers::InsightHeaders, State};
 use api_core::ApiErrorKind;
 
-use api_core::auth::tenant::TenantAuth;
-use api_core::proxy::config::JitProxyHeaderParams;
-use api_core::proxy::config::ProxyHeaderParams;
-use api_core::utils::body_bytes::BodyBytes;
-use newtypes::AccessEventPurpose;
-use newtypes::InvokeVaultProxyPermission;
-use newtypes::ProxyConfigId;
-use paperclip::actix::{api_v2_operation, post, web, web::HttpRequest, web::HttpResponse};
+use api_core::{
+    auth::tenant::TenantAuth,
+    proxy::config::{JitProxyHeaderParams, ProxyHeaderParams},
+    utils::body_bytes::BodyBytes,
+};
+use newtypes::{AccessEventPurpose, InvokeVaultProxyPermission, ProxyConfigId};
+use paperclip::actix::{
+    api_v2_operation, post, web,
+    web::{HttpRequest, HttpResponse},
+};
 
 /// Limit the body payload to 5MB
 const FIVE_MB: usize = 5 * 1024 * 1024;

@@ -1,11 +1,12 @@
-use crate::auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth};
-use crate::errors::tenant::TenantError;
-use crate::types::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    errors::tenant::TenantError,
+    types::ResponseData,
+    utils::db2api::DbToApi,
+    State,
+};
 use api_core::types::{EmptyResponse, JsonApiResponse};
-use db::models::tenant_frequent_note::TenantFrequentNote;
-use db::DbResult;
+use db::{models::tenant_frequent_note::TenantFrequentNote, DbResult};
 use newtypes::TenantFrequentNoteId;
 use paperclip::actix::{self, api_v2_operation, web};
 

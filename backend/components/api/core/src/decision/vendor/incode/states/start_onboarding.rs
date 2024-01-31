@@ -2,14 +2,13 @@ use super::{
     map_to_api_err, save_incode_verification_result, AddFront, IncodeStateTransition,
     SaveVerificationResultArgs,
 };
-use crate::decision::vendor::incode::IncodeContext;
-use crate::errors::ApiResult;
-use crate::State;
+use crate::{decision::vendor::incode::IncodeContext, errors::ApiResult, State};
 use db::models::incode_verification_session::{IncodeVerificationSession, UpdateIncodeVerificationSession};
-use idv::incode::request::OnboardingStartCustomNameFields;
-use idv::incode::IncodeStartOnboardingRequest;
-use newtypes::vendor_credentials::IncodeCredentials;
-use newtypes::{IncodeAuthorizationToken, IncodeConfigurationId, IncodeSessionId, VendorAPI};
+use idv::incode::{request::OnboardingStartCustomNameFields, IncodeStartOnboardingRequest};
+use newtypes::{
+    vendor_credentials::IncodeCredentials, IncodeAuthorizationToken, IncodeConfigurationId, IncodeSessionId,
+    VendorAPI,
+};
 
 /// This is weird - it's not a real state like all of the others. Just groups together some logic
 /// to initialize the state machine

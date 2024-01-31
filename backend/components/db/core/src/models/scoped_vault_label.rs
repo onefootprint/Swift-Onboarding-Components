@@ -1,23 +1,15 @@
 use std::collections::HashMap;
 
 use db_schema::schema::scoped_vault_label;
-use newtypes::DataLifetimeSeqno;
-use newtypes::LabelAddedInfo;
-use newtypes::LabelId;
+use newtypes::{DataLifetimeSeqno, LabelAddedInfo, LabelId};
 
 use chrono::{DateTime, Utc};
-use newtypes::LabelKind;
-use newtypes::ScopedVaultId;
+use newtypes::{LabelKind, ScopedVaultId};
 
-use crate::DbResult;
-use crate::PgConn;
-use crate::TxnPgConn;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
+use crate::{DbResult, PgConn, TxnPgConn};
+use diesel::{prelude::*, Insertable, Queryable};
 
-use super::data_lifetime::DataLifetime;
-use super::scoped_vault::ScopedVault;
-use super::user_timeline::UserTimeline;
+use super::{data_lifetime::DataLifetime, scoped_vault::ScopedVault, user_timeline::UserTimeline};
 
 #[derive(Debug, Clone, Queryable, Insertable, Default)]
 #[diesel(table_name = scoped_vault_label)]

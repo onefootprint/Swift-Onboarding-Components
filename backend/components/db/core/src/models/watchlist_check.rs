@@ -2,11 +2,9 @@ use std::collections::HashMap;
 
 use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Duration, Utc};
-use db_schema::schema::{ob_configuration, workflow};
-use db_schema::schema::{scoped_vault, task, vault, watchlist_check};
-use diesel::dsl::max;
+use db_schema::schema::{ob_configuration, scoped_vault, task, vault, watchlist_check, workflow};
 use diesel::{
-    dsl::{count, count_star, not},
+    dsl::{count, count_star, max, not},
     prelude::*,
 };
 use newtypes::{

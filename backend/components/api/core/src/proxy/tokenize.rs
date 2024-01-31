@@ -1,36 +1,25 @@
-use super::get_transformer;
-use super::IngressRule;
-use crate::auth::tenant::TenantAuth;
-use crate::errors::ApiResult;
-use crate::utils;
-use crate::utils::headers::InsightHeaders;
-use crate::utils::vault_wrapper::Any;
-use crate::utils::vault_wrapper::Person;
-use crate::utils::vault_wrapper::VaultWrapper;
-use crate::ApiError;
-use crate::State;
-use db::models::access_event::NewAccessEvent;
-use db::models::insight_event::CreateInsightEvent;
-use db::models::scoped_vault::ScopedVault;
-use db::models::vault::Vault;
+use super::{get_transformer, IngressRule};
+use crate::{
+    auth::tenant::TenantAuth,
+    errors::ApiResult,
+    utils,
+    utils::{
+        headers::InsightHeaders,
+        vault_wrapper::{Any, Person, VaultWrapper},
+    },
+    ApiError, State,
+};
+use db::models::{
+    access_event::NewAccessEvent, insight_event::CreateInsightEvent, scoped_vault::ScopedVault, vault::Vault,
+};
 use either::Either;
-use enclave_proxy::DataTransformer;
-use enclave_proxy::DataTransforms;
+use enclave_proxy::{DataTransformer, DataTransforms};
 use futures::future::try_join_all;
 use itertools::Itertools;
-use newtypes::AccessEventKind;
-use newtypes::AccessEventPurpose;
-use newtypes::DataIdentifier;
-use newtypes::DataRequest;
-use newtypes::DocumentKind;
-use newtypes::FpId;
-use newtypes::PiiBytes;
-use newtypes::PiiString;
-use newtypes::S3Url;
-use newtypes::SealedVaultDataKey;
-use newtypes::StorageType;
-use newtypes::TenantId;
-use newtypes::ValidateArgs;
+use newtypes::{
+    AccessEventKind, AccessEventPurpose, DataIdentifier, DataRequest, DocumentKind, FpId, PiiBytes,
+    PiiString, S3Url, SealedVaultDataKey, StorageType, TenantId, ValidateArgs,
+};
 use std::collections::HashMap;
 
 /// Vaults PII values

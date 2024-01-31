@@ -18,8 +18,7 @@ use newtypes::{
     EncryptedVaultPrivateKey, FilterFunction, Fingerprint, PiiBytes, PiiString, S3Url, SealedVaultBytes,
     SealedVaultDataKey, VaultPublicKey,
 };
-use std::hash::Hash;
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::HashMap, hash::Hash, sync::Arc};
 
 use crate::{
     config::Config, errors::enclave::EnclaveError, proxy::to_data_transforms, s3::S3Client, ApiError,

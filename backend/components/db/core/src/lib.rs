@@ -23,8 +23,7 @@ use std::time::Duration;
 pub use crate::errors::DbError;
 use deadpool::managed::{Hook, HookError};
 use deadpool_diesel::postgres::Runtime;
-use diesel::pg::PgConnection as DieselPgConnection;
-use diesel::prelude::*;
+use diesel::{pg::PgConnection as DieselPgConnection, prelude::*};
 use errors::TransactionError;
 
 pub mod access_event;

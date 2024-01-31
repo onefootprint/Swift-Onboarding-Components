@@ -2,16 +2,19 @@ use super::{
     map_to_api_err, save_incode_verification_result, AddConsent, AddSelfie, AddSideResponseHelper,
     IncodeStateTransition, SaveVerificationResultArgs, VerificationSession,
 };
-use crate::decision::vendor::incode::state::{IncodeState, TransitionResult};
-use crate::decision::vendor::incode::IncodeContext;
-use crate::errors::ApiResult;
-use crate::vendor_clients::IncodeClients;
+use crate::{
+    decision::vendor::incode::{
+        state::{IncodeState, TransitionResult},
+        IncodeContext,
+    },
+    errors::ApiResult,
+    vendor_clients::IncodeClients,
+};
 use async_trait::async_trait;
 use db::{DbPool, TxnPgConn};
 use either::Either;
 use idv::incode::doc::IncodeAddBackRequest;
-use newtypes::{DocVData, VendorAPI};
-use newtypes::{DocumentSide, IncodeFailureReason};
+use newtypes::{DocVData, DocumentSide, IncodeFailureReason, VendorAPI};
 
 pub struct AddBack {
     add_side_response_helper: AddSideResponseHelper,

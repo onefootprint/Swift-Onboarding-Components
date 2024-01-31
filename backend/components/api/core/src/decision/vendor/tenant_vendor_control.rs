@@ -99,6 +99,7 @@ impl TenantVendorControl {
             tenant_identifier: self.tenant_identifier(),
         }
     }
+
     pub fn build_experian_request(&self, idv_data: IdvData) -> ExperianCrossCoreRequest {
         ExperianCrossCoreRequest {
             idv_data,

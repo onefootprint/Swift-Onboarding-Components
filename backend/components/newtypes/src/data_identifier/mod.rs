@@ -28,9 +28,16 @@ mod kv_data_key;
 mod validation;
 
 pub use self::{
-    business_data_kind::*, card_data_kind::*, collected_data::*, contact_info_kind::*,
-    decryptable_identifier::*, document_kind::*, id_doc_kind::*, identity_data_kind::*,
-    investor_profile_kind::*, validation::Error as ValidationError, validation::*,
+    business_data_kind::*,
+    card_data_kind::*,
+    collected_data::*,
+    contact_info_kind::*,
+    decryptable_identifier::*,
+    document_kind::*,
+    id_doc_kind::*,
+    identity_data_kind::*,
+    investor_profile_kind::*,
+    validation::{Error as ValidationError, *},
 };
 use crate::{
     fingerprinter::GlobalFingerprintKind, util::impl_enum_string_diesel, AliasId, EnumDotNotationError,
@@ -40,8 +47,7 @@ use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use itertools::Itertools;
 use paperclip::v2::models::DataType;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
-use std::hash::Hash;
-use std::str::FromStr;
+use std::{hash::Hash, str::FromStr};
 use strum::IntoEnumIterator;
 use strum_macros::{AsRefStr, EnumDiscriminants};
 
@@ -226,6 +232,7 @@ impl paperclip::actix::OperationModifier for DataIdentifier {}
 /// We serialize DIs as `prefix.suffix`
 impl FromStr for DataIdentifier {
     type Err = EnumDotNotationError;
+
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let period_idx = s
             .find('.')

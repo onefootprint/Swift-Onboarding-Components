@@ -1,17 +1,16 @@
-use super::super::VaultWrapper;
-use super::{DecryptUncheckedResult, EnclaveDecryptOperation, Pii};
-use crate::enclave_client::{DecryptReq, EnclaveClient};
-use crate::errors::enclave::EnclaveError;
-use crate::errors::ApiResult;
-use crate::proxy::get_transformer;
+use super::{super::VaultWrapper, DecryptUncheckedResult, EnclaveDecryptOperation, Pii};
+use crate::{
+    enclave_client::{DecryptReq, EnclaveClient},
+    errors::{enclave::EnclaveError, ApiResult},
+    proxy::get_transformer,
+};
 use db::VaultedData;
 use either::Either;
 use enclave_proxy::DataTransformer;
 use futures_util::StreamExt;
 use itertools::Itertools;
-use newtypes::output::Csv;
 use newtypes::{
-    DataIdentifier, DocumentKind, EncryptedVaultPrivateKey, PiiBytes, PiiJsonValue, PiiString,
+    output::Csv, DataIdentifier, DocumentKind, EncryptedVaultPrivateKey, PiiBytes, PiiJsonValue, PiiString,
     VaultDataFormat,
 };
 use std::collections::HashMap;

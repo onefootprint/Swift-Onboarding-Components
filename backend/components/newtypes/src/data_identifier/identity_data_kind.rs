@@ -36,6 +36,7 @@ impl From<IdentityDataKind> for DataIdentifier {
 
 impl TryFrom<DataIdentifier> for IdentityDataKind {
     type Error = crate::Error;
+
     fn try_from(value: DataIdentifier) -> Result<Self, Self::Error> {
         match value {
             DataIdentifier::Id(idk) => Ok(idk),

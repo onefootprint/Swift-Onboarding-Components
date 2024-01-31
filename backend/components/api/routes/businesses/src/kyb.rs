@@ -1,35 +1,33 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
-use crate::auth::tenant::TenantGuard;
-use crate::types::response::ResponseData;
-use crate::types::JsonApiResponse;
-use crate::State;
-use api_core::errors::onboarding::OnboardingError;
-use api_core::errors::tenant::TenantError;
-use api_core::errors::ApiResult;
-use api_core::errors::ValidationError;
-use api_core::task;
-use api_core::telemetry::RootSpan;
-use api_core::utils::db2api::DbToApi;
-use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::requirements::GetRequirementsArgs;
-use api_core::utils::vault_wrapper::Any;
-use api_core::utils::vault_wrapper::VaultWrapper;
-use api_core::utils::vault_wrapper::VwArgs;
-use api_wire_types::EntityValidateResponse;
-use api_wire_types::TriggerKybRequest;
-use db::models::manual_review::ManualReview;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::scoped_vault::ScopedVault;
-use db::models::workflow::OnboardingWorkflowArgs;
-use db::models::workflow::Workflow;
-use db::DbError;
+use crate::{
+    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
+    types::{response::ResponseData, JsonApiResponse},
+    State,
+};
+use api_core::{
+    errors::{onboarding::OnboardingError, tenant::TenantError, ApiResult, ValidationError},
+    task,
+    telemetry::RootSpan,
+    utils::{
+        db2api::DbToApi,
+        fp_id_path::FpIdPath,
+        requirements::GetRequirementsArgs,
+        vault_wrapper::{Any, VaultWrapper, VwArgs},
+    },
+};
+use api_wire_types::{EntityValidateResponse, TriggerKybRequest};
+use db::{
+    models::{
+        manual_review::ManualReview,
+        ob_configuration::ObConfiguration,
+        scoped_vault::ScopedVault,
+        workflow::{OnboardingWorkflowArgs, Workflow},
+    },
+    DbError,
+};
 use itertools::Itertools;
-use newtypes::ObConfigurationKind;
-use newtypes::OnboardingRequirement;
-use newtypes::VaultKind;
-use newtypes::WorkflowFixtureResult;
-use newtypes::WorkflowSource;
+use newtypes::{
+    ObConfigurationKind, OnboardingRequirement, VaultKind, WorkflowFixtureResult, WorkflowSource,
+};
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(

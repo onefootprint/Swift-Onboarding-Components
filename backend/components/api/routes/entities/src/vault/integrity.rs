@@ -1,18 +1,19 @@
-use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext};
-use crate::types::JsonApiResponse;
-use crate::State;
-use api_core::telemetry::RootSpan;
-use api_core::types::ResponseData;
-use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::headers::InsightHeaders;
+use crate::{
+    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
+    types::JsonApiResponse,
+    State,
+};
+use api_core::{
+    telemetry::RootSpan,
+    types::ResponseData,
+    utils::{fp_id_path::FpIdPath, headers::InsightHeaders},
+};
 use macros::route_alias;
 use newtypes::{
     flat_api_object_map_type, FilterFunction, HmacSha256Args, IntegritySigningKey, PiiBytes, PiiJsonValue,
     PreviewApi, VersionedDataIdentifier,
 };
-use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 

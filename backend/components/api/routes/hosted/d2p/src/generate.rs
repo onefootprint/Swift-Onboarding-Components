@@ -1,14 +1,17 @@
-use crate::auth::user::UserAuthContext;
-use crate::auth::user::{UserAuthGuard, UserAuthScope};
-use crate::auth::AuthError;
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
-use crate::utils::session::JsonSession;
-use crate::utils::session::{AuthSession, HandoffRecord};
-use crate::State;
-use api_core::auth::session::user::NewUserSessionContext;
-use api_core::auth::IsGuardMet;
-use api_core::errors::ApiResult;
+use crate::{
+    auth::{
+        user::{UserAuthContext, UserAuthGuard, UserAuthScope},
+        AuthError,
+    },
+    errors::ApiError,
+    types::response::ResponseData,
+    utils::session::{AuthSession, HandoffRecord, JsonSession},
+    State,
+};
+use api_core::{
+    auth::{session::user::NewUserSessionContext, IsGuardMet},
+    errors::ApiResult,
+};
 use api_wire_types::{D2pGenerateRequest, D2pGenerateResponse};
 use chrono::{Duration, Utc};
 use newtypes::D2pSessionStatus;

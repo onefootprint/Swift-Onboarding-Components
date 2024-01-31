@@ -1,8 +1,9 @@
 #![allow(unused_imports)]
 use crate::decision::vendor::vendor_result::VendorResult;
-use db::models::verification_request::VerificationRequest;
-use db::models::verification_result::VerificationResult;
-use db::tests::prelude::*;
+use db::{
+    models::{verification_request::VerificationRequest, verification_result::VerificationResult},
+    tests::prelude::*,
+};
 use macros::db_test;
 use newtypes::{PiiJsonValue, SealedVaultBytes, VendorAPI};
 use std::str::FromStr;

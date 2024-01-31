@@ -36,8 +36,7 @@ mod tests {
     use db::tests::test_db_pool::TestDbPool;
     use macros::test_db_pool;
 
-    use db::tests::fixtures;
-    use db::DbResult;
+    use db::{tests::fixtures, DbResult};
     use newtypes::{
         OnboardingCompletedPayload as NTOnboardingCompletedPayload, OnboardingStatus,
         WebhookEvent as NTWebhookEvent,

@@ -1,16 +1,15 @@
-use crate::DbResult;
-use crate::PgConn;
-use crate::TxnPgConn;
+use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::document_upload;
-use diesel::dsl::count_star;
-use diesel::dsl::not;
-use diesel::prelude::*;
-use diesel::Queryable;
-use newtypes::DataLifetimeSeqno;
-use newtypes::IncodeFailureReason;
-use newtypes::S3Url;
-use newtypes::{DocumentSide, DocumentUploadId, IdentityDocumentId, SealedVaultDataKey};
+use diesel::{
+    dsl::{count_star, not},
+    prelude::*,
+    Queryable,
+};
+use newtypes::{
+    DataLifetimeSeqno, DocumentSide, DocumentUploadId, IdentityDocumentId, IncodeFailureReason, S3Url,
+    SealedVaultDataKey,
+};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = identity_document_upload)]
@@ -81,9 +80,9 @@ pub struct NewDocumentUploadArgs {
 }
 
 impl DocumentUpload {
+    pub const MAX_ATTEMPTS_BEFORE_DROPPING_GLARE_CHECK: i64 = 2;
     /// Max number attempts to upload a given side before we fail the document request
     pub const MAX_ATTEMPTS_PER_SIDE: i64 = 3;
-    pub const MAX_ATTEMPTS_BEFORE_DROPPING_GLARE_CHECK: i64 = 2;
 
     #[tracing::instrument("DocumentUpload::create", skip_all)]
     pub fn create(conn: &mut TxnPgConn, args: NewDocumentUploadArgs) -> DbResult<Self> {

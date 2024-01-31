@@ -181,6 +181,7 @@ impl ScrubbedPiiJsonValue {
         let val = serde_json::to_value(s)?;
         Ok(Self(val))
     }
+
     pub fn inner(self) -> serde_json::Value {
         self.0
     }

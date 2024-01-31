@@ -1,28 +1,29 @@
 use std::str::FromStr;
 
-use crate::auth::session::AuthSessionData;
-use crate::errors::tenant::TenantError;
-use crate::errors::workos::WorkOsError;
-use crate::errors::ApiResult;
-use crate::utils::db2api::DbToApi;
-use crate::utils::email_domain;
-use crate::utils::session::AuthSession;
-use crate::State;
-use crate::{errors::ApiError, types::response::ResponseData};
+use crate::{
+    auth::session::AuthSessionData,
+    errors::{tenant::TenantError, workos::WorkOsError, ApiError, ApiResult},
+    types::response::ResponseData,
+    utils::{db2api::DbToApi, email_domain, session::AuthSession},
+    State,
+};
 use api_core::auth::session::tenant::{TenantRbSession, WorkOsSession};
-use api_wire_types::{OrgLoginRequest, OrgLoginResponse};
-use api_wire_types::{Organization, OrganizationMember};
+use api_wire_types::{OrgLoginRequest, OrgLoginResponse, Organization, OrganizationMember};
 use chrono::Duration;
-use db::models::tenant::{NewTenant, Tenant};
-use db::models::tenant_rolebinding::TenantRolebinding;
-use db::models::tenant_user::TenantUser;
+use db::models::{
+    tenant::{NewTenant, Tenant},
+    tenant_rolebinding::TenantRolebinding,
+    tenant_user::TenantUser,
+};
 use newtypes::{OrgMemberEmail, TenantScope, WorkosAuthMethod};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
-use workos::sso::{
-    AuthorizationCode, ClientId, ConnectionType, GetProfileAndToken, GetProfileAndTokenParams,
-    GetProfileAndTokenResponse, Profile,
+use workos::{
+    sso::{
+        AuthorizationCode, ClientId, ConnectionType, GetProfileAndToken, GetProfileAndTokenParams,
+        GetProfileAndTokenResponse, Profile,
+    },
+    KnownOrUnknown,
 };
-use workos::KnownOrUnknown;
 
 fn get_auth_method(connection_type: &KnownOrUnknown<ConnectionType, String>) -> ApiResult<WorkosAuthMethod> {
     // To protect against MagcicLink becoming a known type, check based on the string representation

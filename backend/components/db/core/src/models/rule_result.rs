@@ -1,14 +1,8 @@
-use crate::DbResult;
-use crate::PgConn;
-use crate::TxnPgConn;
+use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::rule_instance;
-use db_schema::schema::rule_result;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
-use newtypes::RuleInstanceId;
-use newtypes::RuleResultId;
-use newtypes::RuleSetResultId;
+use db_schema::schema::{rule_instance, rule_result};
+use diesel::{prelude::*, Insertable, Queryable};
+use newtypes::{RuleInstanceId, RuleResultId, RuleSetResultId};
 
 use super::rule_instance::RuleInstance;
 

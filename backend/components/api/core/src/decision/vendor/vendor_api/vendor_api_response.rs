@@ -1,6 +1,5 @@
 use db::models::{verification_request::VerificationRequest, verification_result::VerificationResult};
-use idv::lexis::response::FlexIdResponse;
-use idv::stytch;
+use idv::{lexis::response::FlexIdResponse, stytch};
 use newtypes::{
     EncryptedVaultPrivateKey, PiiJsonValue, ScrubbedPiiJsonValue, SealedVaultBytes, VendorAPI,
     VerificationRequestId, VerificationResultId,
@@ -9,31 +8,37 @@ use serde::Serialize;
 
 use crate::{enclave_client::EnclaveClient, errors::ApiResult};
 
-use idv::socure::response::SocureIDPlusResponse;
 use idv::{
     experian::cross_core::response::CrossCoreAPIResponse, idology::expectid::response::ExpectIDResponse,
+    socure::response::SocureIDPlusResponse,
 };
 
-use idv::idology::pa::response::PaResponse;
-use idv::incode::doc::response::{
-    AddConsentResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse,
-    GetOnboardingStatusResponse, ProcessFaceResponse, ProcessIdResponse,
-};
-use idv::incode::response::OnboardingStartResponse;
-use idv::incode::watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse};
-use idv::middesk::response::business::BusinessResponse;
-use idv::middesk::response::webhook::{
-    MiddeskBusinessUpdateWebhookResponse, MiddeskTinRetriedWebhookResponse,
+use idv::{
+    idology::pa::response::PaResponse,
+    incode::{
+        doc::response::{
+            AddConsentResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse,
+            GetOnboardingStatusResponse, ProcessFaceResponse, ProcessIdResponse,
+        },
+        response::OnboardingStartResponse,
+        watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
+    },
+    middesk::response::{
+        business::BusinessResponse,
+        webhook::{MiddeskBusinessUpdateWebhookResponse, MiddeskTinRetriedWebhookResponse},
+    },
 };
 use serde::de::DeserializeOwned;
 
 use twilio::response::lookup::LookupV2Response;
 use typedmap::{TypedMap, TypedMapKey};
 
-use crate::decision::vendor::{
-    vendor_result::VendorResult, verification_result::decrypt_verification_result_response,
+use crate::{
+    decision::vendor::{
+        vendor_result::VendorResult, verification_result::decrypt_verification_result_response,
+    },
+    ApiError,
 };
-use crate::ApiError;
 
 use super::vendor_api_struct::*;
 

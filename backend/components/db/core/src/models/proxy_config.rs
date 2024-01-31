@@ -1,12 +1,10 @@
-use crate::PgConn;
-use crate::{DbResult, TxnPgConn};
+use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{
     proxy_config, proxy_config_header, proxy_config_ingress_rule, proxy_config_secret_header,
     proxy_config_server_cert,
 };
-use diesel::prelude::*;
-use diesel::{Identifiable, Insertable, Queryable};
+use diesel::{prelude::*, Identifiable, Insertable, Queryable};
 use newtypes::{
     ApiKeyStatus, ProxyConfigId, ProxyConfigIngressRuleId, ProxyConfigItemId, ProxyConfigSecretHeaderId,
     ProxyIngressContentType, SealedVaultBytes, TenantId,

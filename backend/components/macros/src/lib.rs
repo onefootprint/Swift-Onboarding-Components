@@ -1,8 +1,6 @@
 use proc_macro::TokenStream;
 use quote::{format_ident, quote, ToTokens};
-use syn::spanned::Spanned;
-use syn::{parse_macro_input, ItemFn, Meta, NestedMeta};
-use syn::{parse_quote, AttributeArgs};
+use syn::{parse_macro_input, parse_quote, spanned::Spanned, AttributeArgs, ItemFn, Meta, NestedMeta};
 use test_case_core::TestCase;
 
 extern crate proc_macro;
@@ -427,14 +425,14 @@ pub fn route_alias(
         match meta {
             Meta::Path(path) => {
                 let Some(ident) = path.get_ident() else {
-                    return false
+                    return false;
                 };
                 let method_str = ident.to_string().to_lowercase();
                 disallowed.contains(&method_str.as_str())
             }
             Meta::List(list) => {
                 let Some(last) = list.path.segments.last() else {
-                    return false
+                    return false;
                 };
                 let method_str = last.ident.to_string().to_lowercase();
                 disallowed.contains(&method_str.as_str())
@@ -448,7 +446,7 @@ pub fn route_alias(
         .into_iter()
         .filter(|attr| {
             let Some(meta) = attr.parse_meta().ok() else {
-                return true
+                return true;
             };
             !filter_attrs(
                 &meta,

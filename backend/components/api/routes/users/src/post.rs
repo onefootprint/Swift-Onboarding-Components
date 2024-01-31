@@ -1,13 +1,16 @@
-use crate::auth::tenant::SecretTenantAuthContext;
-use crate::errors::ApiResult;
-use crate::types::ResponseData;
-use crate::utils::headers::InsightHeaders;
-use crate::State;
-use api_core::utils::headers::{ExternalId, IdempotencyId, SandboxId};
-use api_core::vault::create_non_portable_vault;
-use api_core::{telemetry::RootSpan, utils::actix::OptionalJson};
-use newtypes::put_data_request::RawDataRequest;
-use newtypes::VaultKind;
+use crate::{
+    auth::tenant::SecretTenantAuthContext, errors::ApiResult, types::ResponseData,
+    utils::headers::InsightHeaders, State,
+};
+use api_core::{
+    telemetry::RootSpan,
+    utils::{
+        actix::OptionalJson,
+        headers::{ExternalId, IdempotencyId, SandboxId},
+    },
+    vault::create_non_portable_vault,
+};
+use newtypes::{put_data_request::RawDataRequest, VaultKind};
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[allow(clippy::too_many_arguments)]

@@ -2,8 +2,7 @@ use std::pin::Pin;
 
 use crate::utils::headers::get_bool_header;
 
-use actix_web::http::header::HeaderMap;
-use actix_web::FromRequest;
+use actix_web::{http::header::HeaderMap, FromRequest};
 use futures_util::Future;
 use paperclip::actix::Apiv2Schema;
 
@@ -18,11 +17,11 @@ pub struct MetaHeaders {
 }
 
 impl MetaHeaders {
-    const IS_INSTANT_APP_HEADER_NAME: &'static str = "x-fp-is-instant-app";
     const IS_APP_CLIP_HEADER_NAME: &'static str = "x-fp-is-app-clip";
+    const IS_EXTRA_COMPRESSED: &'static str = "x-fp-is-extra-compressed";
+    const IS_INSTANT_APP_HEADER_NAME: &'static str = "x-fp-is-instant-app";
     const IS_MANUAL_HEADER_NAME: &'static str = "x-fp-is-manual";
     const PROCESS_SEPARATELY_HEADER_NAME: &'static str = "x-fp-process-separately";
-    const IS_EXTRA_COMPRESSED: &'static str = "x-fp-is-extra-compressed";
 
     pub fn parse_from_request(headers: &HeaderMap) -> Self {
         let is_instant_app = get_bool_header(Self::IS_INSTANT_APP_HEADER_NAME, headers);

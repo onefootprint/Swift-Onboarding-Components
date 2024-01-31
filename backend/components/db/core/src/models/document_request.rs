@@ -1,12 +1,8 @@
-use crate::DbResult;
-use crate::PgConn;
-use crate::TxnPgConn;
+use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::document_request;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
-use newtypes::WorkflowId;
-use newtypes::{DocumentRequestId, DocumentRequestKind, ScopedVaultId};
+use diesel::{prelude::*, Insertable, Queryable};
+use newtypes::{DocumentRequestId, DocumentRequestKind, ScopedVaultId, WorkflowId};
 
 pub type DocRefId = String;
 

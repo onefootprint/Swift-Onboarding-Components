@@ -1,15 +1,18 @@
 use actix_multipart::Multipart;
-use api_core::errors::file_upload::FileUploadError;
-use api_core::utils::file_upload::mime_type_to_extension;
+use api_core::{errors::file_upload::FileUploadError, utils::file_upload::mime_type_to_extension};
 use db::models::tenant::{Tenant, UpdateTenant};
-use paperclip::actix::{self, api_v2_operation, web, web::HttpRequest, web::Json};
+use paperclip::actix::{
+    self, api_v2_operation, web,
+    web::{HttpRequest, Json},
+};
 
 use crate::auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth};
 
-use crate::types::{JsonApiResponse, ResponseData};
-use crate::utils::db2api::DbToApi;
-use crate::utils::file_upload;
-use crate::State;
+use crate::{
+    types::{JsonApiResponse, ResponseData},
+    utils::{db2api::DbToApi, file_upload},
+    State,
+};
 
 const MAX_IMAGE_SIZE_BYTES: usize = 1_048_576;
 

@@ -21,6 +21,7 @@ impl FeatureSet for IDologyFeatures {
     fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode> {
         self.footprint_reason_codes.clone()
     }
+
     fn vendor_apis(&self) -> Vec<newtypes::VendorAPI> {
         vec![VendorAPI::IdologyExpectId]
     }

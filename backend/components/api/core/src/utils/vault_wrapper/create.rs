@@ -1,23 +1,24 @@
 use std::str::FromStr;
 
 use super::{Any, PatchDataResult, Person, VaultWrapper};
-use crate::enclave_client::VaultKeyPair;
-use crate::errors::onboarding::OnboardingError;
-use crate::errors::user::UserError;
-use crate::errors::{ApiResult, AssertionError};
-use crate::telemetry::RootSpan;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::scoped_vault::{ScopedVault, ScopedVaultUpdate};
-use db::models::vault::NewVaultArgs;
-use db::models::vault::Vault;
-use db::TxnPgConn;
-use newtypes::email::Email;
-use newtypes::{
-    DataIdentifier as DI, DataLifetimeSource, DataRequest, Fingerprint, FingerprintRequest,
-    FingerprintScopeKind, OnboardingStatus, PhoneNumber, PiiString, SandboxId,
+use crate::{
+    enclave_client::VaultKeyPair,
+    errors::{onboarding::OnboardingError, user::UserError, ApiResult, AssertionError},
+    telemetry::RootSpan,
 };
-use newtypes::{IdentityDataKind as IDK, VaultKind};
-use newtypes::{Locked, ValidateArgs};
+use db::{
+    models::{
+        ob_configuration::ObConfiguration,
+        scoped_vault::{ScopedVault, ScopedVaultUpdate},
+        vault::{NewVaultArgs, Vault},
+    },
+    TxnPgConn,
+};
+use newtypes::{
+    email::Email, DataIdentifier as DI, DataLifetimeSource, DataRequest, Fingerprint, FingerprintRequest,
+    FingerprintScopeKind, IdentityDataKind as IDK, Locked, OnboardingStatus, PhoneNumber, PiiString,
+    SandboxId, ValidateArgs, VaultKind,
+};
 
 pub struct VaultContext {
     pub data: Vec<InitialVaultData>,

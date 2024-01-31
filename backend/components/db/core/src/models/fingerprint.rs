@@ -3,11 +3,11 @@ use std::collections::HashMap;
 use crate::PgConn;
 use chrono::{DateTime, Utc};
 use db_schema::schema::fingerprint;
-use diesel::prelude::*;
-use diesel::Queryable;
-use newtypes::FingerprintScopeKind;
-use newtypes::FingerprintVersion;
-use newtypes::{DataIdentifier, DataLifetimeId, Fingerprint as FingerprintData, FingerprintId};
+use diesel::{prelude::*, Queryable};
+use newtypes::{
+    DataIdentifier, DataLifetimeId, Fingerprint as FingerprintData, FingerprintId, FingerprintScopeKind,
+    FingerprintVersion,
+};
 
 use crate::{DbResult, TxnPgConn};
 

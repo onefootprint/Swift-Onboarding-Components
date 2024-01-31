@@ -1,6 +1,5 @@
 use super::fixtures;
-use crate::models::data_lifetime::DataLifetime;
-use crate::tests::prelude::*;
+use crate::{models::data_lifetime::DataLifetime, tests::prelude::*};
 use itertools::Itertools;
 use macros::db_test;
 use newtypes::{

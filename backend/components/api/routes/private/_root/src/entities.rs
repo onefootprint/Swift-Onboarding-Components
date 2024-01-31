@@ -1,10 +1,12 @@
 use actix_web::{get, web};
-use api_core::auth::tenant::{FirmEmployeeAuthContext, FirmEmployeeGuard};
-use api_core::errors::ApiResult;
-use api_core::telemetry::RootSpan;
-use api_core::types::{JsonApiResponse, ResponseData};
-use api_core::utils::db2api::DbToApi;
-use api_core::State;
+use api_core::{
+    auth::tenant::{FirmEmployeeAuthContext, FirmEmployeeGuard},
+    errors::ApiResult,
+    telemetry::RootSpan,
+    types::{JsonApiResponse, ResponseData},
+    utils::db2api::DbToApi,
+    State,
+};
 use db::models::scoped_vault::{ScopedVault, ScopedVaultIdentifier};
 
 #[get("/private/entities/{id}")]

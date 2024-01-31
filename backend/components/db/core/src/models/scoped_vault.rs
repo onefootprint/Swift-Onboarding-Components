@@ -1,24 +1,25 @@
 use std::collections::HashMap;
 
-use super::insight_event::InsightEvent;
-use super::manual_review::ManualReview;
-use super::ob_configuration::{IsLive, ObConfiguration};
-use super::scoped_vault_label::ScopedVaultLabel;
-use super::tenant::Tenant;
-use super::user_timeline::UserTimeline;
-use super::vault::NewVaultArgs;
-use super::vault::Vault;
-use super::watchlist_check::WatchlistCheck;
-use super::workflow::Workflow;
-use super::workflow_request::WorkflowRequest;
-use crate::models::data_lifetime::DataLifetime;
-use crate::PgConn;
-use crate::{DbError, DbResult, TxnPgConn};
+use super::{
+    insight_event::InsightEvent,
+    manual_review::ManualReview,
+    ob_configuration::{IsLive, ObConfiguration},
+    scoped_vault_label::ScopedVaultLabel,
+    tenant::Tenant,
+    user_timeline::UserTimeline,
+    vault::{NewVaultArgs, Vault},
+    watchlist_check::WatchlistCheck,
+    workflow::Workflow,
+    workflow_request::WorkflowRequest,
+};
+use crate::{models::data_lifetime::DataLifetime, DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Duration, Utc};
 use db_schema::schema::scoped_vault::{self};
-use diesel::dsl::{count_distinct, not};
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
+use diesel::{
+    dsl::{count_distinct, not},
+    prelude::*,
+    Insertable, Queryable,
+};
 use itertools::Itertools;
 use newtypes::{
     DataLifetimeSeqno, DbActor, ExternalId, FpId, IdempotencyId, Locked, ObConfigurationId, OnboardingStatus,

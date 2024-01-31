@@ -1496,8 +1496,7 @@ vendor_reason_code_enum! {
 
 #[cfg(test)]
 mod tests {
-    use crate::db_types::FootprintReasonCode;
-    use crate::reason_code::socure::SocureReasonCode;
+    use crate::{db_types::FootprintReasonCode, reason_code::socure::SocureReasonCode};
 
     #[test]
     fn test_vendor_reason_code_enum_use() {

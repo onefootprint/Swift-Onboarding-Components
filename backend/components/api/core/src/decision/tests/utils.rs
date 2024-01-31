@@ -1,8 +1,8 @@
-use crate::decision::utils;
-use crate::tests::fixtures;
-use crate::State;
-use db::tests::{fixtures::ob_configuration::ObConfigurationOpts, test_db_pool::TestDbPool};
-use db::DbResult;
+use crate::{decision::utils, tests::fixtures, State};
+use db::{
+    tests::{fixtures::ob_configuration::ObConfigurationOpts, test_db_pool::TestDbPool},
+    DbResult,
+};
 use feature_flag::BoolFlag;
 use macros::test_state;
 use newtypes::{DecisionStatus, OnboardingStatus};

@@ -7,9 +7,7 @@ pub use ob_public_key::*;
 pub use ob_session::*;
 
 use super::Either;
-use db::models::{
-    business_owner::BusinessOwner, ob_configuration::ObConfiguration, tenant::Tenant,
-};
+use db::models::{business_owner::BusinessOwner, ob_configuration::ObConfiguration, tenant::Tenant};
 
 /// Auth extractor for any header that uniquely identifies an onboarding configuration
 pub type ObConfigAuth = Either<PublicOnboardingContext, Either<ObPkSessionAuth, BoSessionAuth>>;

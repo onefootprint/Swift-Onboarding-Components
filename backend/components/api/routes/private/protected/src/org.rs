@@ -1,16 +1,15 @@
 use crate::{ProtectedAuth, State};
-use actix_web::web;
-use actix_web::web::Json;
-use actix_web::{get, patch};
-use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
-use api_core::types::{EmptyResponse, ResponseData};
-use api_core::utils;
-use db::models::tenant::Tenant;
-use db::models::tenant_business_info::NewBusinessInfo;
-use db::models::tenant_business_info::TenantBusinessInfo;
-use newtypes::PiiString;
-use newtypes::TenantId;
+use actix_web::{get, patch, web, web::Json};
+use api_core::{
+    errors::ApiResult,
+    types::{EmptyResponse, JsonApiResponse, ResponseData},
+    utils,
+};
+use db::models::{
+    tenant::Tenant,
+    tenant_business_info::{NewBusinessInfo, TenantBusinessInfo},
+};
+use newtypes::{PiiString, TenantId};
 
 #[derive(serde::Deserialize)]
 pub struct UpdateBusinessInfoRequest {

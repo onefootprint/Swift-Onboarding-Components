@@ -1,15 +1,15 @@
-use crate::auth::tenant::AuthActor;
-use crate::errors::ApiResult;
-use api_wire_types::CreateAnnotationRequest;
-use api_wire_types::DecisionRequest;
-use db::models::annotation::Annotation;
-use db::models::onboarding_decision::NewDecisionArgs;
-use db::models::scoped_vault::ScopedVault;
-use db::models::workflow::Workflow;
-use db::models::workflow::WorkflowUpdate;
-use db::TxnPgConn;
-use newtypes::DbActor;
-use newtypes::Locked;
+use crate::{auth::tenant::AuthActor, errors::ApiResult};
+use api_wire_types::{CreateAnnotationRequest, DecisionRequest};
+use db::{
+    models::{
+        annotation::Annotation,
+        onboarding_decision::NewDecisionArgs,
+        scoped_vault::ScopedVault,
+        workflow::{Workflow, WorkflowUpdate},
+    },
+    TxnPgConn,
+};
+use newtypes::{DbActor, Locked};
 
 pub fn save_review_decision(
     conn: &mut TxnPgConn,

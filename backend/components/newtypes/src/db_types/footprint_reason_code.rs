@@ -1443,9 +1443,7 @@ pub fn export_reason_codes() {
 mod tests {
     use test_case::test_case;
 
-    use super::FootprintReasonCode;
-    use super::SignalScope;
-    use super::SignalSeverity;
+    use super::{FootprintReasonCode, SignalScope, SignalSeverity};
     use std::cmp::Ordering;
     use strum::IntoEnumIterator;
 

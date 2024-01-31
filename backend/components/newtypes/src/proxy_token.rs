@@ -137,10 +137,8 @@ pub enum ProxyTokenError {
 
 #[cfg(test)]
 mod tests {
-    use super::FilterFunction::*;
-    use super::*;
-    use crate::CountArgs;
-    use crate::{DataIdentifier, FpId, IdentityDataKind as IDK};
+    use super::{FilterFunction::*, *};
+    use crate::{CountArgs, DataIdentifier, FpId, IdentityDataKind as IDK};
     use test_case::test_case;
 
     fn tok<D: Into<DataIdentifier>>(

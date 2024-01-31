@@ -1,12 +1,14 @@
 //! Adapted from https://github.com/nlopes/actix-web-prom
 
-use std::collections::HashMap;
-use std::future::{ready, Future, Ready};
-use std::marker::PhantomData;
-use std::pin::Pin;
-use std::sync::Arc;
-use std::task::{Context, Poll};
-use std::time::Instant;
+use std::{
+    collections::HashMap,
+    future::{ready, Future, Ready},
+    marker::PhantomData,
+    pin::Pin,
+    sync::Arc,
+    task::{Context, Poll},
+    time::Instant,
+};
 
 use actix_web::{
     body::{BodySize, EitherBody, MessageBody},
@@ -175,11 +177,11 @@ impl<S, B> Transform<S, ServiceRequest> for PrometheusMetrics
 where
     S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
 {
-    type Response = ServiceResponse<EitherBody<StreamLog<B>, StreamLog<String>>>;
     type Error = Error;
-    type InitError = ();
-    type Transform = PrometheusMetricsMiddleware<S>;
     type Future = Ready<Result<Self::Transform, Self::InitError>>;
+    type InitError = ();
+    type Response = ServiceResponse<EitherBody<StreamLog<B>, StreamLog<String>>>;
+    type Transform = PrometheusMetricsMiddleware<S>;
 
     fn new_transform(&self, service: S) -> Self::Future {
         ready(Ok(PrometheusMetricsMiddleware {
@@ -271,9 +273,9 @@ impl<S, B> Service<ServiceRequest> for PrometheusMetricsMiddleware<S>
 where
     S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
 {
-    type Response = ServiceResponse<EitherBody<StreamLog<B>, StreamLog<String>>>;
     type Error = S::Error;
     type Future = LoggerResponse<S>;
+    type Response = ServiceResponse<EitherBody<StreamLog<B>, StreamLog<String>>>;
 
     dev::forward_ready!(service);
 

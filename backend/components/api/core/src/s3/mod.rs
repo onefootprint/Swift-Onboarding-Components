@@ -1,14 +1,15 @@
 use async_trait::async_trait;
-use aws_sdk_s3::operation::abort_multipart_upload::AbortMultipartUploadError;
-use aws_sdk_s3::operation::complete_multipart_upload::CompleteMultipartUploadError;
-use aws_sdk_s3::operation::create_multipart_upload::CreateMultipartUploadError;
-use aws_sdk_s3::operation::delete_objects::DeleteObjectsError;
-use aws_sdk_s3::operation::get_object::GetObjectError;
-use aws_sdk_s3::operation::list_buckets::ListBucketsError;
-use aws_sdk_s3::operation::put_object::PutObjectError;
-use aws_sdk_s3::operation::upload_part::UploadPartError;
-use aws_sdk_s3::primitives::ByteStream;
-use aws_sdk_s3::types::{CompletedMultipartUpload, CompletedPart};
+use aws_sdk_s3::{
+    operation::{
+        abort_multipart_upload::AbortMultipartUploadError,
+        complete_multipart_upload::CompleteMultipartUploadError,
+        create_multipart_upload::CreateMultipartUploadError, delete_objects::DeleteObjectsError,
+        get_object::GetObjectError, list_buckets::ListBucketsError, put_object::PutObjectError,
+        upload_part::UploadPartError,
+    },
+    primitives::ByteStream,
+    types::{CompletedMultipartUpload, CompletedPart},
+};
 use bytes::{Bytes, BytesMut};
 use futures::StreamExt;
 #[cfg(test)]
@@ -61,6 +62,7 @@ impl S3Client for AwsS3Client {
     async fn get_object_from_s3_url(&self, url: &str) -> Result<actix_web::web::Bytes, S3Error> {
         self.get_object_from_s3_url(url).await
     }
+
     async fn get_object(&self, bucket: String, object: String) -> Result<actix_web::web::Bytes, S3Error> {
         self.get_object(bucket, object).await
     }
@@ -224,6 +226,7 @@ impl AwsS3Client {
 
         Ok(obj)
     }
+
     #[tracing::instrument(skip(self))]
     /// Get an object in S3 from the path specified by an s3 url
     pub async fn get_object_from_s3_url(&self, url: &str) -> Result<actix_web::web::Bytes, S3Error> {

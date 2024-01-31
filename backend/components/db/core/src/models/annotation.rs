@@ -1,11 +1,9 @@
 use std::collections::HashMap;
 
-use crate::PgConn;
-use crate::{actor, actor::SaturatedActor, models::scoped_vault::ScopedVault, DbError, DbResult};
+use crate::{actor, actor::SaturatedActor, models::scoped_vault::ScopedVault, DbError, DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{annotation, scoped_vault, user_timeline};
-use diesel::dsl::not;
-use diesel::prelude::*;
+use diesel::{dsl::not, prelude::*};
 use newtypes::{
     AnnotationId, DbActor, DbUserTimelineEvent, FpId, OnboardingDecisionId, ScopedVaultId, TenantId,
 };

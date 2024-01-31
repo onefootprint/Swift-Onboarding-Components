@@ -1,16 +1,23 @@
-use crate::decision::vendor::incode_watchlist::WatchlistCheckKind;
-use crate::decision::vendor::vendor_result::VendorResult;
-use crate::decision::{self};
-use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
-use crate::State;
+use crate::{
+    decision::{
+        vendor::{incode_watchlist::WatchlistCheckKind, vendor_result::VendorResult},
+        {self},
+    },
+    errors::ApiResult,
+    utils::vault_wrapper::{Person, VaultWrapper, VwArgs},
+    State,
+};
 use chrono::{Duration, Utc};
-use db::models::decision_intent::DecisionIntent;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::risk_signal::NewRiskSignalInfo;
-use db::models::verification_request::{RequestAndResult, VerificationRequest};
-use db::models::verification_result::VerificationResult;
-use db::DbResult;
+use db::{
+    models::{
+        decision_intent::DecisionIntent,
+        ob_configuration::ObConfiguration,
+        risk_signal::NewRiskSignalInfo,
+        verification_request::{RequestAndResult, VerificationRequest},
+        verification_result::VerificationResult,
+    },
+    DbResult,
+};
 use idv::ParsedResponse;
 use newtypes::{
     DataIdentifier as DI, DecisionIntentId, EncryptedVaultPrivateKey, IdentityDataKind as IDK,

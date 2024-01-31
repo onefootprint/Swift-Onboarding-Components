@@ -94,8 +94,7 @@ fn auth_event_to_scopes(k: &AuthEventKind) -> Vec<UserAuthScope> {
 #[cfg(test)]
 mod test {
     use super::UserAuthScope;
-    use newtypes::AuthEventKind;
-    use newtypes::IdentifyScope;
+    use newtypes::{AuthEventKind, IdentifyScope};
     use test_case::test_case;
 
     #[test]

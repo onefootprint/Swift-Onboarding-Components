@@ -3,33 +3,46 @@ use super::{
     CompleteArgs, IncodeStateTransition, NewRiskSignal, PreCompleteArgs, SaveVerificationResultArgs,
     VerificationSession,
 };
-use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
-use crate::decision::vendor::incode::state::IncodeState;
-use crate::decision::vendor::incode::{state::TransitionResult, IncodeContext};
-use crate::decision::vendor::verification_result::save_vreq_and_vres;
-use crate::decision::vendor::VendorAPIError;
-use crate::enclave_client::EnclaveClient;
-use crate::errors::{ApiResult, AssertionError};
-use crate::utils::vault_wrapper::{Any, EnclaveDecryptOperation, Pii, VaultWrapper};
-use crate::vendor_clients::IncodeClients;
-use crate::ApiErrorKind;
+use crate::{
+    decision::{
+        features::incode_docv::IncodeOcrComparisonDataFields,
+        vendor::{
+            incode::{
+                state::{IncodeState, TransitionResult},
+                IncodeContext,
+            },
+            verification_result::save_vreq_and_vres,
+            VendorAPIError,
+        },
+    },
+    enclave_client::EnclaveClient,
+    errors::{ApiResult, AssertionError},
+    utils::vault_wrapper::{Any, EnclaveDecryptOperation, Pii, VaultWrapper},
+    vendor_clients::IncodeClients,
+    ApiErrorKind,
+};
 use async_trait::async_trait;
-use db::models::decision_intent::DecisionIntent;
-use db::models::identity_document::IdentityDocument;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::verification_result::VerificationResult;
-use db::{DbPool, TxnPgConn};
+use db::{
+    models::{
+        decision_intent::DecisionIntent, identity_document::IdentityDocument,
+        ob_configuration::ObConfiguration, verification_result::VerificationResult,
+    },
+    DbPool, TxnPgConn,
+};
 use feature_flag::BoolFlag;
 use http::StatusCode;
-use idv::footprint_http_client::{FootprintVendorHttpClient, FpVendorClientArgs};
-use idv::incode::client::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter};
-use idv::incode::doc::response::FetchScoresResponse;
-use idv::incode::doc::{IncodeFetchOCRRequest, IncodeFetchScoresRequest};
-use idv::{ParsedResponse, VendorResponse};
-use newtypes::vendor_credentials::IncodeCredentialsWithToken;
+use idv::{
+    footprint_http_client::{FootprintVendorHttpClient, FpVendorClientArgs},
+    incode::{
+        client::{AuthenticatedIncodeClientAdapter, IncodeClientAdapter},
+        doc::{response::FetchScoresResponse, IncodeFetchOCRRequest, IncodeFetchScoresRequest},
+    },
+    ParsedResponse, VendorResponse,
+};
 use newtypes::{
-    DataIdentifier, DataRequest, DecisionIntentKind, DocumentKind, DocumentSide, Fingerprints, IdDocKind,
-    IdentityDocumentId, PiiJsonValue, ScopedVaultId, VendorAPI, WorkflowId,
+    vendor_credentials::IncodeCredentialsWithToken, DataIdentifier, DataRequest, DecisionIntentKind,
+    DocumentKind, DocumentSide, Fingerprints, IdDocKind, IdentityDocumentId, PiiJsonValue, ScopedVaultId,
+    VendorAPI, WorkflowId,
 };
 use selfie_doc::{compare::CompareFacesResponse, AwsSelfieDocClient};
 use tracing::Instrument;

@@ -1,10 +1,8 @@
-use crate::auth::session::UpdateSession;
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
-use api_core::auth::session::tenant::TenantRbSession;
-use api_core::auth::tenant::AnyTenantSessionAuth;
+use crate::{
+    auth::session::UpdateSession, errors::ApiError, types::response::ResponseData, utils::db2api::DbToApi,
+    State,
+};
+use api_core::auth::{session::tenant::TenantRbSession, tenant::AnyTenantSessionAuth};
 use api_wire_types::{AssumeRoleRequest, AssumeRoleResponse, Organization, OrganizationMember};
 use db::models::tenant_rolebinding::TenantRolebinding;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};

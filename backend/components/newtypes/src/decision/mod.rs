@@ -57,8 +57,7 @@ mod tests {
     use std::cmp::Ordering;
     use test_case::test_case;
 
-    use super::MatchLevel;
-    use super::MatchLevel::*;
+    use super::{MatchLevel, MatchLevel::*};
 
     #[test_case(NoMatch, CouldNotMatch => Ordering::Less)]
     #[test_case(NoMatch, Partial => Ordering::Less)]

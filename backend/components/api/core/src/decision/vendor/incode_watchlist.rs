@@ -1,38 +1,50 @@
-use db::models::billing_event::BillingEvent;
-use db::models::decision_intent::DecisionIntent;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::scoped_vault::ScopedVault;
-use db::models::verification_request::RequestAndMaybeResult;
-use db::models::{verification_request::VerificationRequest, verification_result::VerificationResult};
-use db::DbPool;
+use db::{
+    models::{
+        billing_event::BillingEvent,
+        decision_intent::DecisionIntent,
+        ob_configuration::ObConfiguration,
+        scoped_vault::ScopedVault,
+        verification_request::{RequestAndMaybeResult, VerificationRequest},
+        verification_result::VerificationResult,
+    },
+    DbPool,
+};
 use either::Either;
 use feature_flag::BoolFlag;
-use idv::incode::watchlist::response::WatchlistResultResponse;
-use idv::incode::watchlist::IncodeUpdatedWatchlistResultRequest;
-use idv::incode::APIResponseToIncodeError;
-use idv::incode::{
-    response::OnboardingStartResponse, watchlist::IncodeWatchlistCheckRequest, IncodeResponse,
-    IncodeStartOnboardingRequest,
+use idv::{
+    incode::{
+        response::OnboardingStartResponse,
+        watchlist::{
+            response::WatchlistResultResponse, IncodeUpdatedWatchlistResultRequest,
+            IncodeWatchlistCheckRequest,
+        },
+        APIResponseToIncodeError, IncodeResponse, IncodeStartOnboardingRequest,
+    },
+    ParsedResponse, VendorResponse,
 };
-use idv::{ParsedResponse, VendorResponse};
 use newtypes::{
-    vendor_credentials::IncodeCredentialsWithToken, DecisionIntentId, IdvData, IncodeConfigurationId,
-    ScopedVaultId, VendorAPI,
-};
-use newtypes::{
-    BillingEventKind::ContinuousMonitoringPerYear, EncryptedVaultPrivateKey, IncodeEnvironment,
-    IncodeWatchlistResultRef, ObConfigurationKey, PiiJsonValue, VaultPublicKey, VerificationRequestId,
-    VerificationResultId,
+    vendor_credentials::IncodeCredentialsWithToken, BillingEventKind::ContinuousMonitoringPerYear,
+    DecisionIntentId, EncryptedVaultPrivateKey, IdvData, IncodeConfigurationId, IncodeEnvironment,
+    IncodeWatchlistResultRef, ObConfigurationKey, PiiJsonValue, ScopedVaultId, VaultPublicKey, VendorAPI,
+    VerificationRequestId, VerificationResultId,
 };
 
-use super::vendor_api::vendor_api_response::build_vendor_response_map_from_vendor_results;
-use super::vendor_api::vendor_api_struct::{IncodeUpdatedWatchlistResult, IncodeWatchlistCheck};
-use super::vendor_result::VendorResult;
-use super::verification_result;
-use super::{build_request, tenant_vendor_control::TenantVendorControl};
-use crate::enclave_client::EnclaveClient;
-use crate::utils::vault_wrapper::{Any, VaultWrapper, VwArgs};
-use crate::{errors::ApiResult, ApiError, State};
+use super::{
+    build_request,
+    tenant_vendor_control::TenantVendorControl,
+    vendor_api::{
+        vendor_api_response::build_vendor_response_map_from_vendor_results,
+        vendor_api_struct::{IncodeUpdatedWatchlistResult, IncodeWatchlistCheck},
+    },
+    vendor_result::VendorResult,
+    verification_result,
+};
+use crate::{
+    enclave_client::EnclaveClient,
+    errors::ApiResult,
+    utils::vault_wrapper::{Any, VaultWrapper, VwArgs},
+    ApiError, State,
+};
 
 // TODO: similar to what incode state machine does, would be nice to code share more here
 #[tracing::instrument(skip(db_pool, res, user_vault_public_key, api_or_vreq_id))]

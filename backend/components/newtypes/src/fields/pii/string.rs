@@ -71,6 +71,7 @@ where
 
 impl FromStr for PiiString {
     type Err = crate::Error;
+
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(Self(s.to_owned()))
     }

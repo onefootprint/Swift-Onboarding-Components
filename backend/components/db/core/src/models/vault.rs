@@ -1,18 +1,14 @@
-use crate::{DbError, PgConn};
-use crate::{DbResult, TxnPgConn};
+use crate::{DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::scoped_vault;
-use db_schema::schema::vault::{self, BoxedQuery};
-use diesel::dsl::not;
-use diesel::pg::Pg;
-use diesel::prelude::*;
-use diesel::upsert::on_constraint;
-use diesel::{Insertable, QueryDsl, Queryable};
+use db_schema::schema::{
+    scoped_vault,
+    vault::{self, BoxedQuery},
+};
+use diesel::{dsl::not, pg::Pg, prelude::*, upsert::on_constraint, Insertable, QueryDsl, Queryable};
 use itertools::Itertools;
-use newtypes::output::Csv;
 use newtypes::{
-    DataIdentifier, EncryptedVaultPrivateKey, Fingerprint, FpId, IdempotencyId, Locked, SandboxId,
-    ScopedVaultId, TenantId, VaultId, VaultKind, VaultPublicKey,
+    output::Csv, DataIdentifier, EncryptedVaultPrivateKey, Fingerprint, FpId, IdempotencyId, Locked,
+    SandboxId, ScopedVaultId, TenantId, VaultId, VaultKind, VaultPublicKey,
 };
 
 use super::ob_configuration::IsLive;

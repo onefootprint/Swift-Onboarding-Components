@@ -1,9 +1,8 @@
 use crate::{
-    util::impl_enum_string_diesel, AnnotationId, CollectedDataOption, IdentityDocumentId, LivenessEventId,
-    OnboardingDecisionId, WatchlistCheckId, WebauthnCredentialId, WorkflowRequestId,
-};
-use crate::{
-    ActionKind, AuthEventId, AuthMethodKind, DataIdentifier, DbActor, LabelId, ObConfigurationId, WorkflowId,
+    util::impl_enum_string_diesel, ActionKind, AnnotationId, AuthEventId, AuthMethodKind,
+    CollectedDataOption, DataIdentifier, DbActor, IdentityDocumentId, LabelId, LivenessEventId,
+    ObConfigurationId, OnboardingDecisionId, WatchlistCheckId, WebauthnCredentialId, WorkflowId,
+    WorkflowRequestId,
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
@@ -11,8 +10,7 @@ use paperclip::actix::Apiv2Schema;
 
 use serde::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
-use strum::Display;
-use strum::EnumDiscriminants;
+use strum::{Display, EnumDiscriminants};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb, EnumDiscriminants)]
 #[strum_discriminants(name(DbUserTimelineEventKind))]

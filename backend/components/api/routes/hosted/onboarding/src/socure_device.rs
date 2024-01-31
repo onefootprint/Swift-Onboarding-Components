@@ -1,7 +1,9 @@
-use crate::auth::user::UserAuthGuard;
-use crate::errors::ApiError;
-use crate::types::{EmptyResponse, JsonApiResponse};
-use crate::State;
+use crate::{
+    auth::user::UserAuthGuard,
+    errors::ApiError,
+    types::{EmptyResponse, JsonApiResponse},
+    State,
+};
 use actix_web::web::Json;
 use api_core::auth::user::UserWfAuthContext;
 use api_wire_types::hosted::socure_device::SocureDeviceSessionIdRequest;

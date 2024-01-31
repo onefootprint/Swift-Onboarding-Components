@@ -1,23 +1,21 @@
-use crate::config::Config;
 use crate::{
     auth::user::{CheckedUserAuthContext, UserAuth},
+    config::Config,
     errors::ApiResult,
 };
-use db::models::webauthn_credential::WebauthnCredential;
 use db::{
     models::{
-        liveness_event::NewLivenessEvent, user_timeline::UserTimeline,
-        webauthn_credential::NewWebauthnCredential,
+        liveness_event::NewLivenessEvent,
+        user_timeline::UserTimeline,
+        webauthn_credential::{NewWebauthnCredential, WebauthnCredential},
     },
     TxnPgConn,
 };
 use newtypes::{AttestationType, InsightEventId, LivenessAttributes, LivenessInfo, LivenessIssuer, VaultId};
 use serde::{Deserialize, Serialize};
-use webauthn_rs_core::proto::Credential;
-use webauthn_rs_core::WebauthnCore;
 use webauthn_rs_core::{
-    proto::{AttestationCaList, AttestationMetadata, RegistrationState},
-    AttestationFormat,
+    proto::{AttestationCaList, AttestationMetadata, Credential, RegistrationState},
+    AttestationFormat, WebauthnCore,
 };
 use webauthn_rs_proto::{
     AttestationConveyancePreference, AuthenticatorAttachment, COSEAlgorithm, CreationChallengeResponse,

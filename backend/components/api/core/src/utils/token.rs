@@ -1,18 +1,20 @@
 use super::session::AuthSession;
-use crate::auth::session::user::{AssociatedAuthEvent, NewUserSessionArgs, UserSessionPurpose};
-use crate::auth::user::UserAuthScope;
 use crate::{
-    auth::session::user::{NewUserSessionContext, UserSession},
+    auth::{
+        session::user::{
+            AssociatedAuthEvent, NewUserSessionArgs, NewUserSessionContext, UserSession, UserSessionPurpose,
+        },
+        user::UserAuthScope,
+    },
     errors::{onboarding::OnboardingError, ApiResult, ValidationError},
 };
 use api_wire_types::TokenOperationKind;
 use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
-use db::models::vault::Vault;
 use db::{
     models::{
-        ob_configuration::ObConfiguration, scoped_vault::ScopedVault, session::Session, workflow::Workflow,
-        workflow_request::WorkflowRequest,
+        ob_configuration::ObConfiguration, scoped_vault::ScopedVault, session::Session, vault::Vault,
+        workflow::Workflow, workflow_request::WorkflowRequest,
     },
     TxnPgConn,
 };

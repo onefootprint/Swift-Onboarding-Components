@@ -1,11 +1,8 @@
-use crate::PgConn;
-use crate::{DbResult, TxnPgConn};
+use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{document_request, document_upload, identity_document};
 
-use diesel::dsl::count_star;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
+use diesel::{dsl::count_star, prelude::*, Insertable, Queryable};
 use std::collections::HashMap;
 
 use newtypes::{
@@ -14,8 +11,7 @@ use newtypes::{
     ScopedVaultId, TenantId, WorkflowId,
 };
 
-use super::document_request::DocumentRequest;
-use super::document_upload::DocumentUpload;
+use super::{document_request::DocumentRequest, document_upload::DocumentUpload};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = identity_document)]

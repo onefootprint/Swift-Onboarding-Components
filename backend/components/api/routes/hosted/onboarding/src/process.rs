@@ -1,37 +1,28 @@
-use crate::auth::user::UserAuthGuard;
-use crate::decision;
-use crate::errors::onboarding::OnboardingError;
-use crate::types::response::ResponseData;
-use crate::State;
-use api_core::auth::user::CheckUserWfAuthContext;
-use api_core::auth::user::UserWfAuthContext;
-use api_core::decision::state::actions::WorkflowActions;
-use api_core::decision::state::alpaca_kyc::AlpacaKycState;
-use api_core::decision::state::document::DocumentState;
-use api_core::decision::state::kyc::KycState;
-use api_core::decision::state::DocCollected;
-use api_core::decision::state::RunIncodeMachineAndWorkflowResult;
-use api_core::decision::state::WorkflowKind;
-use api_core::decision::state::WorkflowWrapper;
-use api_core::errors::workflow::WorkflowError;
-use api_core::errors::ApiResult;
-use api_core::types::EmptyResponse;
-use api_core::types::JsonApiResponse;
-use api_core::utils::actix::OptionalJson;
-use api_core::utils::requirements::GetRequirementsArgs;
+use crate::{
+    auth::user::UserAuthGuard, decision, errors::onboarding::OnboardingError, types::response::ResponseData,
+    State,
+};
+use api_core::{
+    auth::user::{CheckUserWfAuthContext, UserWfAuthContext},
+    decision::state::{
+        actions::WorkflowActions, alpaca_kyc::AlpacaKycState, document::DocumentState, kyc::KycState,
+        DocCollected, RunIncodeMachineAndWorkflowResult, WorkflowKind, WorkflowWrapper,
+    },
+    errors::{workflow::WorkflowError, ApiResult},
+    types::{EmptyResponse, JsonApiResponse},
+    utils::{actix::OptionalJson, requirements::GetRequirementsArgs},
+};
 use api_wire_types::ProcessRequest;
-use chrono::Duration;
-use chrono::Utc;
-use db::models::task::Task;
-use db::models::workflow::Workflow as DbWorkflow;
-use db::DbPool;
+use chrono::{Duration, Utc};
+use db::{
+    models::{task::Task, workflow::Workflow as DbWorkflow},
+    DbPool,
+};
 use decision::state::Authorize;
 use itertools::Itertools;
-use newtypes::OnboardingRequirement;
-use newtypes::RunIncodeStuckWorkflowArgs;
-use newtypes::TaskData;
-use newtypes::WorkflowFixtureResult;
-use newtypes::WorkflowId;
+use newtypes::{
+    OnboardingRequirement, RunIncodeStuckWorkflowArgs, TaskData, WorkflowFixtureResult, WorkflowId,
+};
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(

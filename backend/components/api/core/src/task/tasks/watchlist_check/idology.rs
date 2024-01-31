@@ -1,20 +1,30 @@
-use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
-use crate::decision::vendor::vendor_api::vendor_api_response::{
-    VendorAPIResponseIdentifiersMap, VendorAPIResponseMap,
+use crate::{
+    decision::{
+        vendor::{
+            tenant_vendor_control::TenantVendorControl,
+            vendor_api::{
+                vendor_api_response::{VendorAPIResponseIdentifiersMap, VendorAPIResponseMap},
+                vendor_api_struct::IdologyPa,
+            },
+            vendor_trait::VendorAPIResponse,
+            verification_result, VendorAPIError,
+        },
+        {self},
+    },
+    errors::ApiResult,
+    ApiError, State,
 };
-use crate::decision::vendor::vendor_api::vendor_api_struct::IdologyPa;
-use crate::decision::vendor::vendor_trait::VendorAPIResponse;
-use crate::decision::vendor::{verification_result, VendorAPIError};
-use crate::decision::{self};
-use crate::errors::ApiResult;
-use crate::{ApiError, State};
-use db::models::risk_signal::NewRiskSignalInfo;
-use db::models::vault::Vault;
-use db::models::verification_request::VerificationRequest;
-use db::models::verification_result::VerificationResult;
-use idv::idology::expectid::response::PaWatchlistHit;
-use idv::idology::pa::response::PaResponse;
-use idv::{idology::pa::IdologyPaAPIResponse, VendorResponse};
+use db::models::{
+    risk_signal::NewRiskSignalInfo, vault::Vault, verification_request::VerificationRequest,
+    verification_result::VerificationResult,
+};
+use idv::{
+    idology::{
+        expectid::response::PaWatchlistHit,
+        pa::{response::PaResponse, IdologyPaAPIResponse},
+    },
+    VendorResponse,
+};
 use newtypes::{DecisionIntentId, FootprintReasonCode, ScopedVaultId, TenantId, VendorAPI};
 
 pub async fn complete_vendor_call(

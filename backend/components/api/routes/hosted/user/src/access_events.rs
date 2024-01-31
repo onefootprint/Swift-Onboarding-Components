@@ -1,8 +1,7 @@
-use crate::auth::user::UserAuthContext;
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
+use crate::{
+    auth::user::UserAuthContext, errors::ApiError, types::response::ResponseData, utils::db2api::DbToApi,
+    State,
+};
 use api_core::auth::user::{UserAuth, UserAuthGuard};
 use db::access_event::AccessEventListItemForUser;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};

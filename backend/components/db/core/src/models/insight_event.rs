@@ -1,11 +1,7 @@
-use crate::DbError;
-use crate::DbResult;
-use crate::PgConn;
+use crate::{DbError, DbResult, PgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::insight_event;
-use db_schema::schema::workflow;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable, RunQueryDsl};
+use db_schema::schema::{insight_event, workflow};
+use diesel::{prelude::*, Insertable, Queryable, RunQueryDsl};
 use newtypes::{InsightEventId, WorkflowId};
 
 #[derive(Debug, Clone, Queryable, Insertable)]

@@ -1,32 +1,24 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantSessionAuth;
-use crate::types::response::ResponseData;
-use crate::types::JsonApiResponse;
-use crate::State;
-use api_core::auth::session::user::NewUserSessionArgs;
-use api_core::auth::session::user::NewUserSessionContext;
-use api_core::auth::session::user::UserSession;
-use api_core::auth::session::user::UserSessionPurpose;
-use api_core::config::LinkKind;
-use api_core::errors::tenant::TenantError;
-use api_core::errors::user::UserError;
-use api_core::errors::ApiResult;
-use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::session::AuthSession;
-use api_wire_types::CreateTokenResponse;
-use api_wire_types::TriggerRequest;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    types::{response::ResponseData, JsonApiResponse},
+    State,
+};
+use api_core::{
+    auth::session::user::{NewUserSessionArgs, NewUserSessionContext, UserSession, UserSessionPurpose},
+    config::LinkKind,
+    errors::{tenant::TenantError, user::UserError, ApiResult},
+    utils::{fp_id_path::FpIdPath, session::AuthSession},
+};
+use api_wire_types::{CreateTokenResponse, TriggerRequest};
 use chrono::Duration;
-use db::models::scoped_vault::ScopedVault;
-use db::models::user_timeline::UserTimeline;
-use db::models::vault::Vault;
-use db::models::workflow::Workflow;
-use db::models::workflow_request::NewWorkflowRequestArgs;
-use db::models::workflow_request::WorkflowRequest;
-use newtypes::DbActor;
-use newtypes::TriggerKind;
-use newtypes::VaultKind;
-use newtypes::WorkflowTriggeredInfo;
+use db::models::{
+    scoped_vault::ScopedVault,
+    user_timeline::UserTimeline,
+    vault::Vault,
+    workflow::Workflow,
+    workflow_request::{NewWorkflowRequestArgs, WorkflowRequest},
+};
+use newtypes::{DbActor, TriggerKind, VaultKind, WorkflowTriggeredInfo};
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(

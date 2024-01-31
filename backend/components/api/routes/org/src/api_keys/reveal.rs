@@ -1,12 +1,12 @@
-use crate::auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth};
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
-use crate::types::JsonApiResponse;
-use crate::utils::db2api::DbToApi;
-use crate::State;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    errors::ApiError,
+    types::{response::ResponseData, JsonApiResponse},
+    utils::db2api::DbToApi,
+    State,
+};
 use db::models::tenant_api_key::TenantApiKey;
-use newtypes::secret_api_key::SecretApiKey;
-use newtypes::TenantApiKeyId;
+use newtypes::{secret_api_key::SecretApiKey, TenantApiKeyId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]

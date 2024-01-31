@@ -1,8 +1,7 @@
 use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::custom_migration;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
+use diesel::{prelude::*, Insertable, Queryable};
 #[derive(Debug, Clone, Insertable, Queryable)]
 #[diesel(table_name = custom_migration)]
 pub struct CustomMigration {

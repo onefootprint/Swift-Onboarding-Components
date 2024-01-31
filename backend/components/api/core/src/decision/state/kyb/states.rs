@@ -4,27 +4,32 @@ use super::{
     KybAwaitingAsyncVendors, KybAwaitingBoKyc, KybComplete, KybDataCollection, KybDecisioning, KybState,
     KybVendorCalls,
 };
-use crate::decision::onboarding::rules::evaluate_kyb_rules;
-use crate::decision::onboarding::{
-    FinalAndAdditionalDecisions, KybOnboardingRulesDecisionOutput, OnboardingRulesDecision,
-    OnboardingRulesDecisionOutput,
-};
-use crate::decision::utils::FixtureDecision;
-use crate::decision::RuleError;
-use crate::decision::{
-    self,
-    state::{
-        actions::{Authorize, WorkflowActions},
-        common, AsyncVendorCallsCompleted, BoKycCompleted, MakeDecision, MakeVendorCalls, WorkflowState,
+use crate::{
+    decision::{
+        self,
+        onboarding::{
+            rules::evaluate_kyb_rules, FinalAndAdditionalDecisions, KybOnboardingRulesDecisionOutput,
+            OnboardingRulesDecision, OnboardingRulesDecisionOutput,
+        },
+        state::{
+            actions::{Authorize, WorkflowActions},
+            common, AsyncVendorCallsCompleted, BoKycCompleted, MakeDecision, MakeVendorCalls, OnAction,
+            WorkflowState,
+        },
+        utils::FixtureDecision,
+        RuleError,
     },
+    errors::ApiResult,
+    State,
 };
-use crate::{decision::state::OnAction, errors::ApiResult, State};
 use async_trait::async_trait;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::onboarding_decision::OnboardingDecision;
-use db::models::scoped_vault::ScopedVault;
-use db::models::vault::Vault;
-use db::models::workflow::{Workflow as DbWorkflow, WorkflowUpdate};
+use db::models::{
+    ob_configuration::ObConfiguration,
+    onboarding_decision::OnboardingDecision,
+    scoped_vault::ScopedVault,
+    vault::Vault,
+    workflow::{Workflow as DbWorkflow, WorkflowUpdate},
+};
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::{KybConfig, Locked, OnboardingStatus};

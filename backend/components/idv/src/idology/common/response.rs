@@ -102,6 +102,7 @@ where
 
 impl TryFrom<IdologyInteger> for ScrubbedPiiString {
     type Error = Infallible;
+
     fn try_from(i: IdologyInteger) -> Result<Self, Self::Error> {
         match i {
             IdologyInteger::Str(s) => Ok(ScrubbedPiiString::new(PiiString::from(s))),
@@ -112,6 +113,7 @@ impl TryFrom<IdologyInteger> for ScrubbedPiiString {
 
 impl TryFrom<IdologyInteger> for String {
     type Error = Infallible;
+
     fn try_from(i: IdologyInteger) -> Result<Self, Self::Error> {
         match i {
             IdologyInteger::Str(s) => Ok(s),

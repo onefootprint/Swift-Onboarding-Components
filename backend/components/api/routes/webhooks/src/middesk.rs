@@ -1,12 +1,14 @@
 use actix_web::{web, FromRequest};
-use api_core::auth::AuthError;
-use api_core::decision::vendor::middesk::{MiddeskError, MiddeskStatesKind};
-use api_core::types::{EmptyResponse, JsonApiResponse};
-use api_core::{decision, ApiErrorKind, State};
+use api_core::{
+    auth::AuthError,
+    decision,
+    decision::vendor::middesk::{MiddeskError, MiddeskStatesKind},
+    types::{EmptyResponse, JsonApiResponse},
+    ApiErrorKind, State,
+};
 use crypto::hex;
 use futures_util::Future;
-use paperclip::actix::Apiv2Header;
-use paperclip::actix::{api_v2_operation, post};
+use paperclip::actix::{api_v2_operation, post, Apiv2Header};
 use std::pin::Pin;
 
 #[api_v2_operation(description = "Handles Middesk webhooks.", tags(Webhooks, Private))]

@@ -1,14 +1,20 @@
-use crate::types::{JsonApiResponse, ResponseData};
-use crate::utils::vault_wrapper::VaultWrapper;
-use crate::{errors::ApiError, State};
-use api_core::auth::user::{UserAuth, UserAuthContext};
-use api_core::auth::{Any, CanDecrypt};
-use api_core::utils::vault_wrapper::VwArgs;
+use crate::{
+    errors::ApiError,
+    types::{JsonApiResponse, ResponseData},
+    utils::vault_wrapper::VaultWrapper,
+    State,
+};
+use api_core::{
+    auth::{
+        user::{UserAuth, UserAuthContext},
+        Any, CanDecrypt,
+    },
+    utils::vault_wrapper::VwArgs,
+};
 use api_wire_types::DecryptResponse;
 use itertools::Itertools;
 use newtypes::DataIdentifier;
-use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{self, api_v2_operation, web, web::Json};
+use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 use std::collections::{HashMap, HashSet};
 
 #[derive(serde::Deserialize, Apiv2Schema)]

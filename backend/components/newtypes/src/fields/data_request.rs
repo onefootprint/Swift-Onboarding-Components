@@ -1,14 +1,15 @@
-use crate::data_identifier::ValidationError;
-use crate::fingerprinter::{FingerprintScope, Fingerprinter, GlobalFingerprintKind};
 use crate::{
-    CollectedDataOption, DataIdentifier, Error, Fingerprint, FingerprintScopeKind, PiiJsonValue, PiiString,
-    StorageType, TenantId, Validate, VaultKind,
+    data_identifier::ValidationError,
+    fingerprinter::{FingerprintScope, Fingerprinter, GlobalFingerprintKind},
+    CollectedDataOption, DataIdentifier, DataValidationError, Error, Fingerprint, FingerprintScopeKind,
+    NtResult, PiiJsonValue, PiiString, StorageType, TenantId, Validate, VaultKind,
 };
-use crate::{DataValidationError, NtResult};
 use either::Either::{Left, Right};
 use itertools::Itertools;
-use std::clone::Clone;
-use std::collections::{HashMap, HashSet};
+use std::{
+    clone::Clone,
+    collections::{HashMap, HashSet},
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FingerprintRequest {

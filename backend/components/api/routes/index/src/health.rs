@@ -1,6 +1,8 @@
-use crate::types::{ResponseData, StringResponse};
-use crate::State;
-use crate::{auth::custodian::CustodianAuthContext, types::JsonApiResponse};
+use crate::{
+    auth::custodian::CustodianAuthContext,
+    types::{JsonApiResponse, ResponseData, StringResponse},
+    State,
+};
 
 use actix_web::cookie::time::Instant;
 use api_core::errors::AssertionError;

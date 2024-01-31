@@ -1,17 +1,10 @@
 use chrono::{DateTime, Utc};
-use diesel::prelude::*;
-use diesel::sql_types::Int8;
-use newtypes::DataIdentifier;
-use newtypes::DataLifetimeSeqno;
-use newtypes::DataLifetimeSource;
-use newtypes::DbActor;
-use newtypes::ScopedVaultId;
-use newtypes::{DataLifetimeId, VaultId};
+use diesel::{prelude::*, sql_types::Int8};
+use newtypes::{
+    DataIdentifier, DataLifetimeId, DataLifetimeSeqno, DataLifetimeSource, DbActor, ScopedVaultId, VaultId,
+};
 
-use crate::nextval;
-use crate::PgConn;
-use crate::TxnPgConn;
-use crate::{DbError, DbResult};
+use crate::{nextval, DbError, DbResult, PgConn, TxnPgConn};
 use db_schema::schema::data_lifetime;
 
 #[derive(Debug, Clone, Queryable)]

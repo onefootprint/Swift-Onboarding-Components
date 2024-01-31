@@ -1,12 +1,15 @@
 use actix_web::{post, web, web::Json};
-use api_core::auth::session::tenant::FirmEmployeeSession;
-use api_core::auth::session::{AuthSessionData, UpdateSession};
-use api_core::auth::tenant::{FirmEmployeeAuthContext, FirmEmployeeGuard};
-use api_core::auth::AuthError;
-use api_core::errors::ApiResult;
-use api_core::types::{JsonApiResponse, ResponseData};
-use api_core::utils::db2api::DbToApi;
-use api_core::State;
+use api_core::{
+    auth::{
+        session::{tenant::FirmEmployeeSession, AuthSessionData, UpdateSession},
+        tenant::{FirmEmployeeAuthContext, FirmEmployeeGuard},
+        AuthError,
+    },
+    errors::ApiResult,
+    types::{JsonApiResponse, ResponseData},
+    utils::db2api::DbToApi,
+    State,
+};
 use db::models::tenant::Tenant;
 use newtypes::TenantId;
 

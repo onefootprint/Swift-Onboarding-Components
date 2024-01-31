@@ -1,17 +1,13 @@
-use crate::auth::user::UserAuthGuard;
-use crate::types::response::ResponseData;
-use crate::{decision, State};
+use crate::{auth::user::UserAuthGuard, decision, types::response::ResponseData, State};
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
-use api_core::auth::user::UserWfAuthContext;
-use api_core::decision::document::meta_headers::MetaHeaders;
-use api_core::telemetry::RootSpan;
-use api_core::types::JsonApiResponse;
-use api_core::utils::file_upload::handle_file_upload;
+use api_core::{
+    auth::user::UserWfAuthContext, decision::document::meta_headers::MetaHeaders, telemetry::RootSpan,
+    types::JsonApiResponse, utils::file_upload::handle_file_upload,
+};
 use api_wire_types::DocumentResponse;
 
-use newtypes::WorkflowGuard;
-use newtypes::{DocumentSide, IdentityDocumentId};
+use newtypes::{DocumentSide, IdentityDocumentId, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(

@@ -1,8 +1,10 @@
 use crate::errors::ApiError;
-use actix_web::dev::Payload;
-use actix_web::error::Error as ActixError;
-use actix_web::{error::JsonPayloadError, HttpRequest};
-use actix_web::{web::JsonBody, FromRequest};
+use actix_web::{
+    dev::Payload,
+    error::{Error as ActixError, JsonPayloadError},
+    web::JsonBody,
+    FromRequest, HttpRequest,
+};
 use futures::Future;
 use paperclip::v2::schema::Apiv2Schema;
 use serde::de::DeserializeOwned;

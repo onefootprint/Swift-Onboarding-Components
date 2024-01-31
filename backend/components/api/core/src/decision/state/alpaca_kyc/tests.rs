@@ -1,19 +1,24 @@
-use crate::auth::tenant::AuthActor;
-use crate::decision::state::actions::{Authorize, MakeVendorCalls};
-use crate::decision::state::test_utils::{
-    mock_idology, mock_incode, mock_incode_doc_collection, mock_webhooks, query_data, query_risk_signals,
-    setup_data, AmlKind, ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted,
-    OnboardingStatusChanged, UserKind, WithHit, WithQualifier,
+use crate::{
+    auth::tenant::AuthActor,
+    decision::state::{
+        actions::{Authorize, MakeVendorCalls},
+        test_utils::{
+            mock_idology, mock_incode, mock_incode_doc_collection, mock_webhooks, query_data,
+            query_risk_signals, setup_data, AmlKind, ExpectedRequiresManualReview, ExpectedStatus,
+            OnboardingCompleted, OnboardingStatusChanged, UserKind, WithHit, WithQualifier,
+        },
+        MakeDecision, MakeWatchlistCheckCall, WorkflowActions, WorkflowWrapper,
+    },
 };
-use crate::decision::state::MakeDecision;
-use crate::decision::state::MakeWatchlistCheckCall;
-use crate::decision::state::WorkflowActions;
-use crate::decision::state::WorkflowWrapper;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::rule_instance::{NewRule, RuleInstance};
-use db::models::tenant::Tenant;
-use db::models::tenant_user::TenantUser;
-use db::tests::MockFFClient;
+use db::{
+    models::{
+        ob_configuration::ObConfiguration,
+        rule_instance::{NewRule, RuleInstance},
+        tenant::Tenant,
+        tenant_user::TenantUser,
+    },
+    tests::MockFFClient,
+};
 use diesel::prelude::*;
 
 use crate::{decision::state::alpaca_kyc::*, State};
@@ -32,12 +37,11 @@ use feature_flag::BoolFlag;
 use itertools::Itertools;
 use macros::test_state_case;
 use newtypes::{
-    AlpacaKycConfig, AlpacaKycState, BooleanOperator, CipKind, DbActor, DecisionStatus, KycConfig, KycState,
-    ObConfigurationId, ReviewReason, RuleAction, RuleExpression, RuleExpressionCondition, VendorAPI,
-    WorkflowSource,
+    AlpacaKycConfig, AlpacaKycState, BooleanOperator, CipKind, DbActor, DecisionStatus, EnhancedAmlOption,
+    FootprintReasonCode as FRC, KycConfig, KycState, ObConfigurationId, OnboardingStatus, ReviewReason,
+    RiskSignalGroupKind, RuleAction, RuleExpression, RuleExpressionCondition, VendorAPI,
+    WorkflowFixtureResult, WorkflowSource,
 };
-use newtypes::{EnhancedAmlOption, OnboardingStatus};
-use newtypes::{FootprintReasonCode as FRC, RiskSignalGroupKind, WorkflowFixtureResult};
 
 use newtypes::WorkflowState;
 

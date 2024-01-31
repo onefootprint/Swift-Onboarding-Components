@@ -1,14 +1,11 @@
 use db_schema::schema::scoped_vault_tag;
-use newtypes::DataLifetimeSeqno;
-use newtypes::TagId;
+use newtypes::{DataLifetimeSeqno, TagId};
 
 use chrono::{DateTime, Utc};
 use newtypes::ScopedVaultId;
 
-use crate::DbError;
-use crate::PgConn;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
+use crate::{DbError, PgConn};
+use diesel::{prelude::*, Insertable, Queryable};
 
 use super::data_lifetime::DataLifetime;
 

@@ -1,8 +1,12 @@
-use crate::idology::common::response::{IDologyQualifiers, IdologyResponseHelpers};
-use crate::idology::error as IdologyError;
-use crate::idology::expectid::response::{IdNumber, Restriction};
-use crate::idology::IdologyError::RequestError;
-use crate::ParsedResponse;
+use crate::{
+    idology::{
+        common::response::{IDologyQualifiers, IdologyResponseHelpers},
+        error as IdologyError,
+        expectid::response::{IdNumber, Restriction},
+        IdologyError::RequestError,
+    },
+    ParsedResponse,
+};
 
 pub fn parse_response(value: serde_json::Value) -> Result<PaResponse, IdologyError::Error> {
     let response: PaResponse = serde_json::value::from_value(value)?;
@@ -16,6 +20,7 @@ pub struct PaResponse {
 
 impl TryFrom<ParsedResponse> for PaResponse {
     type Error = crate::Error;
+
     fn try_from(value: ParsedResponse) -> Result<Self, Self::Error> {
         match value {
             ParsedResponse::IDologyPa(res) => Ok(res),

@@ -42,6 +42,7 @@ impl FootprintVendorHttpClient {
 
 impl std::ops::Deref for FootprintVendorHttpClient {
     type Target = ClientWithMiddleware;
+
     fn deref(&self) -> &Self::Target {
         &self.client
     }

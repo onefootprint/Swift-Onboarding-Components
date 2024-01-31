@@ -21,24 +21,25 @@ use super::{
     KycComplete, KycDataCollection, KycDecisioning, KycDocCollection, KycState, KycVendorCalls, MakeDecision,
     MakeVendorCalls,
 };
-use crate::decision::{
-    features::{
-        self,
-        risk_signals::{
-            fetch_latest_risk_signals_map, parse_reason_codes_from_vendor_result,
-            risk_signal_group_struct::{Aml, Kyc},
-            save_risk_signals, RiskSignalGroupStruct,
-        },
-    },
-    state::{
-        actions::{Authorize, WorkflowActions},
-        common::{self},
-        DocCollected, WorkflowState,
-    },
-    utils::should_execute_rules_for_document_only,
-};
 use crate::{
-    decision::{self, state::OnAction, vendor::vendor_result::VendorResult},
+    decision::{
+        self,
+        features::{
+            self,
+            risk_signals::{
+                fetch_latest_risk_signals_map, parse_reason_codes_from_vendor_result,
+                risk_signal_group_struct::{Aml, Kyc},
+                save_risk_signals, RiskSignalGroupStruct,
+            },
+        },
+        state::{
+            actions::{Authorize, WorkflowActions},
+            common::{self},
+            DocCollected, OnAction, WorkflowState,
+        },
+        utils::should_execute_rules_for_document_only,
+        vendor::vendor_result::VendorResult,
+    },
     errors::ApiResult,
     State,
 };

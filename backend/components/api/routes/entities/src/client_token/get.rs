@@ -1,7 +1,11 @@
 use crate::types::response::ResponseData;
-use api_core::auth::tenant::{ClientTenantAuthContext, ClientTenantScope};
-use api_core::auth::Any;
-use api_core::types::JsonApiResponse;
+use api_core::{
+    auth::{
+        tenant::{ClientTenantAuthContext, ClientTenantScope},
+        Any,
+    },
+    types::JsonApiResponse,
+};
 use api_wire_types::{GetClientTokenResponse, GetClientTokenResponseTenant};
 use paperclip::actix::{self, api_v2_operation, web::Json};
 

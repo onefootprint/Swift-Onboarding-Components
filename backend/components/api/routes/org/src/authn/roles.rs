@@ -1,7 +1,4 @@
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
+use crate::{errors::ApiError, types::response::ResponseData, utils::db2api::DbToApi, State};
 use api_core::{auth::tenant::AnyTenantSessionAuth, serializers::IsAuthMethodSupported};
 use api_wire_types::Organization;
 use db::models::tenant_rolebinding::TenantRolebinding;

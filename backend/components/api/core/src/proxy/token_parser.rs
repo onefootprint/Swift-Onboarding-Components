@@ -8,9 +8,7 @@ use crate::errors::ApiResult;
 
 use itertools::Itertools;
 
-use newtypes::FpId;
-use newtypes::PiiString;
-use newtypes::ProxyToken;
+use newtypes::{FpId, PiiString, ProxyToken};
 
 /// The Proxy Token Parser finds proxy tokens in a body
 /// and stores the string matches for future replacement
@@ -266,21 +264,22 @@ mod tests {
         let expected_non_token_str = 
             "*** This is a nice string. }} It has *** some tokens inside of it. And {*** another token. And also ***} some {{ text-before-an-extra-opening-brace {*** more tokens.{{ ***";
         let token_replacement = PiiString::new("***".into());
-        let non_token_str = process_tokens(
-            raw,
-            |token| -> ApiResult<Option<&PiiString>> {
-                tokens.push(token.to_string());
-                Ok(Some(&token_replacement))
-            },
-        ).unwrap();
-        assert_eq!(tokens, vec![
-            "token1",
-            " with-spaces     ",
-            " extra-opening-brace  ",
-            " extra-closing-brace  ",
-            " double-opening-braces-is-minimal ",
-            " end-of-string-is-token ",
-        ]);
+        let non_token_str = process_tokens(raw, |token| -> ApiResult<Option<&PiiString>> {
+            tokens.push(token.to_string());
+            Ok(Some(&token_replacement))
+        })
+        .unwrap();
+        assert_eq!(
+            tokens,
+            vec![
+                "token1",
+                " with-spaces     ",
+                " extra-opening-brace  ",
+                " extra-closing-brace  ",
+                " double-opening-braces-is-minimal ",
+                " end-of-string-is-token ",
+            ]
+        );
         // And all the remaining characters are left
         assert_eq!(non_token_str.leak(), expected_non_token_str);
     }
@@ -397,9 +396,10 @@ mod tests {
     fn test_detokenize_complex(body: &str) -> String {
         let global = FpId::from("fp_id_abcd".to_string());
         let result = ProxyTokenParser::parse(body, Some(global)).unwrap();
-        let detokens = HashMap::from_iter(vec![
-            (tok1("fp_id_abcd", DI::Id(IDK::FirstName)), PiiString::from("Hayes")),
-        ]);
+        let detokens = HashMap::from_iter(vec![(
+            tok1("fp_id_abcd", DI::Id(IDK::FirstName)),
+            PiiString::from("Hayes"),
+        )]);
         let detokenized = result.detokenize_body(detokens).expect("detokenize");
         detokenized.leak_to_string()
     }

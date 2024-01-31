@@ -1,7 +1,5 @@
-use db::models::workflow::Workflow;
-use db::models::workflow_request::WorkflowRequest;
-use newtypes::TriggerKind;
-use newtypes::WorkflowKind;
+use db::models::{workflow::Workflow, workflow_request::WorkflowRequest};
+use newtypes::{TriggerKind, WorkflowKind};
 
 use crate::utils::db2api::DbToApi;
 

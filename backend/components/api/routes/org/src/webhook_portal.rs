@@ -1,12 +1,10 @@
-use crate::types::JsonApiResponse;
-use crate::types::ResponseData;
-use crate::State;
-use api_core::auth::tenant::CheckTenantGuard;
-use api_core::auth::tenant::TenantGuard;
-use api_core::auth::tenant::TenantSessionAuth;
+use crate::{
+    types::{JsonApiResponse, ResponseData},
+    State,
+};
+use api_core::auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth};
 use paperclip::actix::{api_v2_operation, get, web};
-use webhooks::PortalResponse;
-use webhooks::WebhookApp;
+use webhooks::{PortalResponse, WebhookApp};
 
 #[api_v2_operation(tags(OrgSettings, Private), description = "Returns the webhook portal url.")]
 #[get("/org/webhook_portal")]

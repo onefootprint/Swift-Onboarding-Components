@@ -1,8 +1,11 @@
-use crate::errors::{ApiError, ApiResult};
-use crate::ApiErrorKind;
+use crate::{
+    errors::{ApiError, ApiResult},
+    ApiErrorKind,
+};
 use derive_more::{Deref, DerefMut};
-use newtypes::output::Csv;
-use newtypes::{DataIdentifier, FilterFunction, PiiBytes, PiiJsonValue, PiiString, VaultDataFormat};
+use newtypes::{
+    output::Csv, DataIdentifier, FilterFunction, PiiBytes, PiiJsonValue, PiiString, VaultDataFormat,
+};
 use std::collections::HashMap;
 
 pub enum Pii {

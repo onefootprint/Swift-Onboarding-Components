@@ -1,12 +1,10 @@
 use std::collections::HashMap;
 
 use super::ob_configuration::IsLive;
-use crate::PgConn;
-use crate::{DbError, DbResult, NextPage, OffsetPagination, TxnPgConn};
+use crate::{DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::tenant_role::{self, BoxedQuery};
-use diesel::{dsl::count_star, prelude::*};
-use diesel::{Insertable, Queryable};
+use diesel::{dsl::count_star, prelude::*, Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
     ApiKeyStatus, InvokeVaultProxyPermission, Locked, TenantId, TenantRoleId, TenantRoleKind,

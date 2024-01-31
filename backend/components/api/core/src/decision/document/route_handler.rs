@@ -1,28 +1,34 @@
-use newtypes::{TenantId, WorkflowId, ScopedVaultId, DocKind, IdDocKind, Iso3166TwoDigitCountryCode, DocumentScanDeviceType, IdentityDocumentId, IdentityDocumentFixtureResult, IdentityDocumentStatus, DocumentSide, DataIdentifier, DocumentKind, DecisionIntentKind, S3Url, SealedVaultDataKey, DataLifetimeSource, DocumentRequestKind};
+use newtypes::{
+    DataIdentifier, DataLifetimeSource, DecisionIntentKind, DocKind, DocumentKind, DocumentRequestKind,
+    DocumentScanDeviceType, DocumentSide, IdDocKind, IdentityDocumentFixtureResult, IdentityDocumentId,
+    IdentityDocumentStatus, Iso3166TwoDigitCountryCode, S3Url, ScopedVaultId, SealedVaultDataKey, TenantId,
+    WorkflowId,
+};
 
-use crate::{decision, errors::ApiResult, State};
-use crate::errors::onboarding::OnboardingError;
-use crate::utils::file_upload::FileUpload;
+use crate::{
+    decision,
+    errors::{onboarding::OnboardingError, ApiResult},
+    utils::file_upload::FileUpload,
+    State,
+};
 
-use crate::utils::vault_wrapper::{VaultWrapper, Person, VwArgs, seal_file_and_upload_to_s3};
+use crate::utils::vault_wrapper::{seal_file_and_upload_to_s3, Person, VaultWrapper, VwArgs};
 use api_wire_types::{CreateIdentityDocumentRequest, DocumentResponse};
 use feature_flag::BoolFlag;
 
 use crate::decision::vendor::incode::states::vault_complete_images;
 use db::{
     models::{
-        document_upload::DocumentUpload,
-        identity_document::IdentityDocumentUpdate,
-        user_timeline::UserTimeline,
         decision_intent::DecisionIntent,
-        document_upload::NewDocumentUploadArgs,
-        incode_verification_session::IncodeVerificationSession,
-        user_consent::UserConsent,
-        workflow::Workflow,
         document_request::DocumentRequest as DbDocumentRequest,
-        identity_document::{IdentityDocument, NewIdentityDocumentArgs},
+        document_upload::{DocumentUpload, NewDocumentUploadArgs},
+        identity_document::{IdentityDocument, IdentityDocumentUpdate, NewIdentityDocumentArgs},
+        incode_verification_session::IncodeVerificationSession,
         ob_configuration::ObConfiguration,
-        vault::Vault
+        user_consent::UserConsent,
+        user_timeline::UserTimeline,
+        vault::Vault,
+        workflow::Workflow,
     },
     TxnPgConn,
 };
@@ -30,7 +36,13 @@ use db::{
 use super::meta_headers::MetaHeaders;
 
 /// Route handler for "/hosted/user/documents"
-pub async fn handle_document_create(state: &State, create_identity_document_request: CreateIdentityDocumentRequest, tenant_id: TenantId, sv_id: ScopedVaultId, wf_id: WorkflowId) -> ApiResult<IdentityDocumentId> {
+pub async fn handle_document_create(
+    state: &State,
+    create_identity_document_request: CreateIdentityDocumentRequest,
+    tenant_id: TenantId,
+    sv_id: ScopedVaultId,
+    wf_id: WorkflowId,
+) -> ApiResult<IdentityDocumentId> {
     let CreateIdentityDocumentRequest {
         document_type,
         country_code,
@@ -45,8 +57,10 @@ pub async fn handle_document_create(state: &State, create_identity_document_requ
 
     // Handle proof of SSN, which doesn't involve a lot of other checks (at this time)
     if !doc_kind.is_identity() {
-        let id_doc_id = handle_non_identity_document(state, wf_id, document_type, country_code, device_type, doc_kind).await?;
-        return Ok(id_doc_id)
+        let id_doc_id =
+            handle_non_identity_document(state, wf_id, document_type, country_code, device_type, doc_kind)
+                .await?;
+        return Ok(id_doc_id);
     }
 
     let uvw = state
@@ -127,13 +141,13 @@ pub async fn handle_document_create(state: &State, create_identity_document_requ
 /// Route handler for "/hosted/user/documents/{id}/upload/{side}"
 #[allow(clippy::too_many_arguments)]
 pub async fn handle_document_upload(
-    state: &State, 
-    workflow: Workflow, 
-    sv_id: ScopedVaultId, 
-    meta: MetaHeaders, 
-    file: FileUpload, 
-    document_id: IdentityDocumentId, 
-    side: DocumentSide
+    state: &State,
+    workflow: Workflow,
+    sv_id: ScopedVaultId,
+    meta: MetaHeaders,
+    file: FileUpload,
+    document_id: IdentityDocumentId,
+    side: DocumentSide,
 ) -> ApiResult<Option<DocumentResponse>> {
     let wf_id = workflow.id.clone();
     let wf_id2 = wf_id.clone();
@@ -172,7 +186,8 @@ pub async fn handle_document_upload(
     // Create uploads for the document
     // Check if we should be initiating requests (e.g. check if we are testing)
     let should_initiate_reqs =
-        crate::decision::utils::should_initiate_requests_for_document(&uvw.vault, id_doc.fixture_result).await?
+        crate::decision::utils::should_initiate_requests_for_document(&uvw.vault, id_doc.fixture_result)
+            .await?
             && doc_kind.should_initiate_incode_requests();
 
     let missing_sides = state
@@ -228,7 +243,13 @@ pub async fn handle_document_upload(
 
 /// Route handler for /hosted/user/documents/{id}/process
 /// TODO: appclip special logic
-pub async fn handle_document_process(state: &State, sv_id: ScopedVaultId,wf_id: WorkflowId, tenant_id: TenantId, doc_id: IdentityDocumentId) -> ApiResult<DocumentResponse> {
+pub async fn handle_document_process(
+    state: &State,
+    sv_id: ScopedVaultId,
+    wf_id: WorkflowId,
+    tenant_id: TenantId,
+    doc_id: IdentityDocumentId,
+) -> ApiResult<DocumentResponse> {
     let su_id = sv_id.clone();
     let wf_id2 = wf_id.clone();
     let wf_id3 = wf_id.clone();
@@ -269,7 +290,8 @@ pub async fn handle_document_process(state: &State, sv_id: ScopedVaultId,wf_id: 
     let doc_kind: DocKind = id_doc.document_type.into();
     let is_non_identity_document = !doc_kind.is_identity();
     let should_initiate_reqs =
-        crate::decision::utils::should_initiate_requests_for_document(&uvw.vault, id_doc.fixture_result).await?
+        crate::decision::utils::should_initiate_requests_for_document(&uvw.vault, id_doc.fixture_result)
+            .await?
             && doc_kind.should_initiate_incode_requests();
 
     let response = if should_initiate_reqs {
@@ -358,13 +380,20 @@ pub async fn complete_non_identity_document(
     Ok(())
 }
 
-async fn handle_non_identity_document(state: &State, workflow_id: WorkflowId, document_type: IdDocKind, country_code: Iso3166TwoDigitCountryCode, device_type: Option<DocumentScanDeviceType>, doc_kind: DocKind) -> ApiResult<IdentityDocumentId> {
+async fn handle_non_identity_document(
+    state: &State,
+    workflow_id: WorkflowId,
+    document_type: IdDocKind,
+    country_code: Iso3166TwoDigitCountryCode,
+    device_type: Option<DocumentScanDeviceType>,
+    doc_kind: DocKind,
+) -> ApiResult<IdentityDocumentId> {
     state
-    .db_pool
-    .db_transaction(move |conn| -> ApiResult<_> {
-        // If there's no doc request, nothing to do here
-        let doc_request =
-            DbDocumentRequest::get(conn, &workflow_id, doc_kind.into())?.ok_or(OnboardingError::NoDocumentRequestFound)?;
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            // If there's no doc request, nothing to do here
+            let doc_request = DbDocumentRequest::get(conn, &workflow_id, doc_kind.into())?
+                .ok_or(OnboardingError::NoDocumentRequestFound)?;
 
 
             let args = NewIdentityDocumentArgs {
@@ -373,12 +402,13 @@ async fn handle_non_identity_document(state: &State, workflow_id: WorkflowId, do
                 country_code,
                 fixture_result: None,
                 skip_selfie: None,
-                device_type
+                device_type,
             };
-            
+
             let id_doc = IdentityDocument::get_or_create(conn, args)?;
             Ok(id_doc.id)
-        }).await
+        })
+        .await
 }
 
 #[allow(clippy::too_many_arguments)]

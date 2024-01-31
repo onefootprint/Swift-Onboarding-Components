@@ -139,6 +139,7 @@ pub enum ReasonCode {
 
 impl FromStr for ReasonCode {
     type Err = crate::Error;
+
     fn from_str(value: &str) -> Result<Self, Self::Err> {
         Self::try_from(value)
     }
@@ -146,6 +147,7 @@ impl FromStr for ReasonCode {
 
 impl TryFrom<&str> for ReasonCode {
     type Error = crate::Error;
+
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let value = if let Ok(value) = IDologyReasonCode::from_str(value) {
             ReasonCode::IDology(value)

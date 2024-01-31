@@ -1,8 +1,9 @@
-use crate::auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth};
-use crate::types::{EmptyResponse, JsonApiResponse};
-use crate::State;
-use db::models::proxy_config::ProxyConfig;
-use db::DbError;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    types::{EmptyResponse, JsonApiResponse},
+    State,
+};
+use db::{models::proxy_config::ProxyConfig, DbError};
 use newtypes::ProxyConfigId;
 use paperclip::actix::{self, api_v2_operation, web};
 

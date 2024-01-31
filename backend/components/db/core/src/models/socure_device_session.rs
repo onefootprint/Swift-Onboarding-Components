@@ -1,9 +1,7 @@
-use crate::PgConn;
-use crate::{DbError, DbResult};
+use crate::{DbError, DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::socure_device_session;
-use diesel::prelude::*;
-use diesel::Insertable;
+use diesel::{prelude::*, Insertable};
 use newtypes::{SocureDeviceSessionId, WorkflowId};
 
 #[derive(Debug, Clone, Queryable)]

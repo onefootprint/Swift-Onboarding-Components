@@ -1,10 +1,11 @@
-use crate::errors::challenge::ChallengeError;
-use crate::types::response::ResponseData;
-use crate::types::EmptyResponse;
-use crate::{auth::session::AuthSessionData, utils::session::AuthSession};
+use crate::{
+    auth::session::AuthSessionData,
+    errors::challenge::ChallengeError,
+    types::{response::ResponseData, EmptyResponse},
+    utils::session::AuthSession,
+};
 
-use crate::errors::ApiError;
-use crate::State;
+use crate::{errors::ApiError, State};
 use db::models::contact_info::{ContactInfo, VerificationLevel};
 use newtypes::SessionAuthToken;
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};

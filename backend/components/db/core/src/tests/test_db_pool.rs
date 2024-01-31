@@ -4,10 +4,11 @@ use std::ops::Deref;
 use diesel::PgConnection;
 use macros::test_db_pool;
 
-use crate::diesel::Connection;
-use crate::diesel::RunQueryDsl;
-use crate::test_helpers::db_url;
-use crate::DbPool;
+use crate::{
+    diesel::{Connection, RunQueryDsl},
+    test_helpers::db_url,
+    DbPool,
+};
 
 pub struct TestDbPool {
     db_pool: DbPool,

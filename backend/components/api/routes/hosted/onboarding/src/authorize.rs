@@ -1,15 +1,15 @@
-use crate::auth::user::UserAuthGuard;
-use crate::errors::onboarding::OnboardingError;
-use crate::errors::ApiResult;
-use crate::types::response::ResponseData;
-use crate::State;
-use api_core::auth::user::UserWfAuthContext;
-use api_core::types::EmptyResponse;
-use api_core::types::JsonApiResponse;
-use api_core::utils::requirements::get_requirements_for_person_and_maybe_business;
-use api_core::utils::requirements::GetRequirementsArgs;
-use db::models::workflow::Workflow;
-use db::models::workflow::WorkflowUpdate;
+use crate::{
+    auth::user::UserAuthGuard,
+    errors::{onboarding::OnboardingError, ApiResult},
+    types::response::ResponseData,
+    State,
+};
+use api_core::{
+    auth::user::UserWfAuthContext,
+    types::{EmptyResponse, JsonApiResponse},
+    utils::requirements::{get_requirements_for_person_and_maybe_business, GetRequirementsArgs},
+};
+use db::models::workflow::{Workflow, WorkflowUpdate};
 use itertools::Itertools;
 use newtypes::OnboardingRequirement;
 use paperclip::actix::{self, api_v2_operation, web};

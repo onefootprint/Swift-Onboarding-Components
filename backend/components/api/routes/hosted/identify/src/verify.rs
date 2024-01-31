@@ -1,38 +1,38 @@
 use super::{BiometricChallengeState, PhoneEmailChallengeState};
-use crate::State;
-use crate::{ChallengeData, ChallengeState};
-use api_core::auth::ob_config::ObConfigAuth;
-use api_core::auth::session::user::{
-    AssociatedAuthEvent, NewUserSessionArgs, NewUserSessionContext, UserSession,
+use crate::{ChallengeData, ChallengeState, State};
+use api_core::{
+    auth::{
+        ob_config::ObConfigAuth,
+        session::user::{AssociatedAuthEvent, NewUserSessionArgs, NewUserSessionContext, UserSession},
+        user::{allowed_user_scopes, CheckedUserAuthContext, UserAuthContext},
+        Any,
+    },
+    config::Config,
+    errors::{
+        business::BusinessError, challenge::ChallengeError, user::UserError, ApiError, ApiResult,
+        ValidationError,
+    },
+    telemetry::RootSpan,
+    types::{response::ResponseData, JsonApiResponse},
+    utils::{
+        challenge::Challenge,
+        headers::InsightHeaders,
+        passkey::WebauthnConfig,
+        session::AuthSession,
+        vault_wrapper::{Person, VaultWrapper},
+    },
 };
-use api_core::auth::user::allowed_user_scopes;
-use api_core::auth::user::{CheckedUserAuthContext, UserAuthContext};
-use api_core::auth::Any;
-use api_core::config::Config;
-use api_core::errors::business::BusinessError;
-use api_core::errors::challenge::ChallengeError;
-use api_core::errors::user::UserError;
-use api_core::errors::{ApiError, ApiResult, ValidationError};
-use api_core::telemetry::RootSpan;
-use api_core::types::response::ResponseData;
-use api_core::types::JsonApiResponse;
-use api_core::utils::challenge::Challenge;
-use api_core::utils::headers::InsightHeaders;
-use api_core::utils::passkey::WebauthnConfig;
-use api_core::utils::session::AuthSession;
-use api_core::utils::vault_wrapper::Person;
-use api_core::utils::vault_wrapper::VaultWrapper;
 use api_wire_types::{IdentifyVerifyRequest, IdentifyVerifyResponse};
 use chrono::Utc;
 use crypto::sha256;
-use db::errors::OptionalExtension;
-use db::models::auth_event::NewAuthEvent;
-use db::models::business_owner::BusinessOwner;
-use db::models::insight_event::CreateInsightEvent;
-use db::models::scoped_vault::ScopedVault;
-use db::models::vault::Vault;
-use db::models::webauthn_credential::WebauthnCredential;
-use db::TxnPgConn;
+use db::{
+    errors::OptionalExtension,
+    models::{
+        auth_event::NewAuthEvent, business_owner::BusinessOwner, insight_event::CreateInsightEvent,
+        scoped_vault::ScopedVault, vault::Vault, webauthn_credential::WebauthnCredential,
+    },
+    TxnPgConn,
+};
 use newtypes::{
     AuthEventKind, DataIdentifier, IdentifyScope, IdentityDataKind as IDK, ObConfigurationKind,
     ScopedVaultId, VaultId, WebauthnCredentialId,

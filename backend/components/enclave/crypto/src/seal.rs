@@ -1,17 +1,13 @@
-use aes_gcm::aead::Payload;
-use aes_gcm::{Aes256Gcm, Key, Nonce};
-use p256::elliptic_curve::sec1::ToEncodedPoint;
-use p256::{ecdh::EphemeralSecret, EncodedPoint};
+use aes_gcm::{aead::Payload, Aes256Gcm, Key, Nonce};
+use p256::{ecdh::EphemeralSecret, elliptic_curve::sec1::ToEncodedPoint, EncodedPoint};
 use rand_core::{OsRng, RngCore};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use std::fmt::Debug;
-use std::str::FromStr;
+use std::{fmt::Debug, str::FromStr};
 
 use crate::aead::{generate_chacha20_poly1305_key_bytes, AeadSealedBytes, ScopedSealingKey, SealingKey};
 
-pub use self::seal::seal_ecies_p256_x963_sha256_aes_gcm;
-pub use self::unseal::unseal_ecies_p256_x963_sha256_aes_gcm;
+pub use self::{seal::seal_ecies_p256_x963_sha256_aes_gcm, unseal::unseal_ecies_p256_x963_sha256_aes_gcm};
 
 #[derive(Serialize, Debug, Deserialize, Clone)]
 /// ECDH sealed data
@@ -39,10 +35,9 @@ impl FromStr for EciesP256Sha256AesGcmSealed {
 }
 
 impl EciesP256Sha256AesGcmSealed {
+    const BASE64_CONFIG: base64::Config = base64::URL_SAFE_NO_PAD;
     /// Protocol Version
     pub const VERSION: u8 = 1;
-
-    const BASE64_CONFIG: base64::Config = base64::URL_SAFE_NO_PAD;
 
     pub fn to_string(&self) -> Result<String, crate::Error> {
         let encoded = serde_cbor::to_vec(&self)?;

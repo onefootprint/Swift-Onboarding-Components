@@ -1,6 +1,7 @@
-use rand::distributions::Alphanumeric;
-use rand::distributions::Uniform;
-use rand::prelude::*;
+use rand::{
+    distributions::{Alphanumeric, Uniform},
+    prelude::*,
+};
 
 const NUMBERS: [char; 10] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 

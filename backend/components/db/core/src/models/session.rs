@@ -1,9 +1,7 @@
-use crate::DbResult;
-use crate::PgConn;
+use crate::{DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::session;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
+use diesel::{prelude::*, Insertable, Queryable};
 use newtypes::{AuthTokenHash, SessionKind};
 
 #[derive(Debug, Clone, Queryable, Insertable)]

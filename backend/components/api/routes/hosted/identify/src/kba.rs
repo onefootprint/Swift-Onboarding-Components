@@ -1,22 +1,21 @@
 use crate::State;
-use api_core::auth::session::user::NewUserSessionContext;
-use api_core::auth::user::UserAuth;
-use api_core::auth::user::UserAuthContext;
-use api_core::auth::Any;
-use api_core::errors::ApiResult;
-use api_core::errors::ValidationError;
-use api_core::types::JsonApiResponse;
-use api_core::types::ResponseData;
-use api_core::utils::session::AuthSession;
-use api_core::utils::vault_wrapper::VaultWrapper;
-use api_core::utils::vault_wrapper::VwArgs;
+use api_core::{
+    auth::{
+        session::user::NewUserSessionContext,
+        user::{UserAuth, UserAuthContext},
+        Any,
+    },
+    errors::{ApiResult, ValidationError},
+    types::{JsonApiResponse, ResponseData},
+    utils::{
+        session::AuthSession,
+        vault_wrapper::{VaultWrapper, VwArgs},
+    },
+};
 use api_wire_types::KbaResponse;
 use chrono::Duration;
 use itertools::Itertools;
-use newtypes::put_data_request::RawDataRequest;
-use newtypes::DataIdentifier;
-use newtypes::IdentityDataKind as IDK;
-use newtypes::ValidateArgs;
+use newtypes::{put_data_request::RawDataRequest, DataIdentifier, IdentityDataKind as IDK, ValidateArgs};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(

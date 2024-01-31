@@ -1,19 +1,25 @@
 use crate::ProtectedAuth;
-use actix_web::post;
-use actix_web::web::{self};
-use api_core::errors::ApiResult;
-use api_core::types::{EmptyResponse, JsonApiResponse};
-use api_core::State;
+use actix_web::{
+    post,
+    web::{self},
+};
+use api_core::{
+    errors::ApiResult,
+    types::{EmptyResponse, JsonApiResponse},
+    State,
+};
 use billing::{BillingCounts, BillingInfo};
 use chrono::{Duration, NaiveDate, Utc};
-use db::models::access_event::AccessEvent;
-use db::models::billing_event::BillingEvent;
-use db::models::billing_profile::BillingProfile;
-use db::models::identity_document::IdentityDocument;
-use db::models::scoped_vault::{ScopedVault, ScopedVaultPiiFilters};
-use db::models::tenant::{Tenant, UpdateTenant};
-use db::models::watchlist_check::WatchlistCheck;
-use db::models::workflow::Workflow;
+use db::models::{
+    access_event::AccessEvent,
+    billing_event::BillingEvent,
+    billing_profile::BillingProfile,
+    identity_document::IdentityDocument,
+    scoped_vault::{ScopedVault, ScopedVaultPiiFilters},
+    tenant::{Tenant, UpdateTenant},
+    watchlist_check::WatchlistCheck,
+    workflow::Workflow,
+};
 use futures::StreamExt;
 use newtypes::{AccessEventPurpose, BillingEventKind, StripeCustomerId, TenantId, VaultKind};
 use strum::IntoEnumIterator;

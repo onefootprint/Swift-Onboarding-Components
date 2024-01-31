@@ -31,6 +31,7 @@ pub struct KvDataKey(pub(in crate::id) String);
 
 impl FromStr for KvDataKey {
     type Err = ValidationError;
+
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.is_empty() {
             return Err(ValidationError::InvalidLength);
@@ -88,6 +89,7 @@ pub struct AliasId(pub(in crate::id) String);
 
 impl FromStr for AliasId {
     type Err = ValidationError;
+
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.is_empty() {
             return Err(ValidationError::InvalidLength);

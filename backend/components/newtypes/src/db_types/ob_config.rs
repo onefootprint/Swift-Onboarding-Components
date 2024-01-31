@@ -1,5 +1,4 @@
-use crate::util::impl_enum_str_diesel;
-use crate::CollectedDataOption as CDO;
+use crate::{util::impl_enum_str_diesel, CollectedDataOption as CDO};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;

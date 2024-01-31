@@ -1,27 +1,19 @@
 use chrono::Duration;
 use db_schema::schema;
 
-use newtypes::AuthEventId;
-use newtypes::AuthEventKind;
-use newtypes::IdentifyScope;
-use newtypes::WebauthnCredentialId;
-use crate::DbError;
-use crate::DbResult;
-use crate::NextPage;
-use crate::OffsetPagination;
-use db_schema::schema::auth_event;
+use crate::{DbError, DbResult, NextPage, OffsetPagination, PgConn};
 use chrono::{DateTime, Utc};
-use crate::PgConn;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
+use db_schema::schema::auth_event;
+use diesel::{prelude::*, Insertable, Queryable};
+use newtypes::{AuthEventId, AuthEventKind, IdentifyScope, WebauthnCredentialId};
 
-use newtypes::InsightEventId;
-use newtypes::ScopedVaultId;
+use newtypes::{InsightEventId, ScopedVaultId};
 
+use super::{
+    apple_device_attest::AppleDeviceAttestation, google_device_attest::GoogleDeviceAttestation,
+    insight_event::InsightEvent,
+};
 use newtypes::VaultId;
-use super::apple_device_attest::AppleDeviceAttestation;
-use super::google_device_attest::GoogleDeviceAttestation;
-use super::insight_event::InsightEvent;
 
 use std::collections::HashMap;
 
@@ -60,7 +52,10 @@ impl NewAuthEvent {
             IdentifyScope::Onboarding | IdentifyScope::Auth => {
                 // We depend upon this in the validate API
                 if self.scoped_vault_id.is_none() {
-                    return Err(DbError::ValidationError(format!("Auth event of type {} must have a scoped_vault_id", self.scope)));
+                    return Err(DbError::ValidationError(format!(
+                        "Auth event of type {} must have a scoped_vault_id",
+                        self.scope
+                    )));
                 }
             }
         }
@@ -73,13 +68,13 @@ impl NewAuthEvent {
 
 pub struct LoadedAuthEvent {
     pub event: AuthEvent,
-    pub insight: Option<InsightEvent>,    
+    pub insight: Option<InsightEvent>,
     pub attested_devices: Option<LinkedDeviceAttestation>,
 }
 
 pub struct LinkedDeviceAttestation {
     pub ios_devices: Vec<AppleDeviceAttestation>,
-    pub android_devices: Vec<GoogleDeviceAttestation>
+    pub android_devices: Vec<GoogleDeviceAttestation>,
 }
 
 impl AuthEvent {
@@ -98,12 +93,9 @@ impl AuthEvent {
         Ok(results)
     }
 
-
     #[tracing::instrument("AuthEvent::get", skip_all)]
     pub fn get(conn: &mut PgConn, id: &AuthEventId) -> DbResult<Self> {
-        let result = auth_event::table
-            .filter(auth_event::id.eq(id))
-            .get_result(conn)?;
+        let result = auth_event::table.filter(auth_event::id.eq(id)).get_result(conn)?;
         Ok(result)
     }
 

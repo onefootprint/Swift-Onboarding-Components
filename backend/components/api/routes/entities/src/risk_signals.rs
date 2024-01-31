@@ -1,54 +1,46 @@
 use std::collections::HashMap;
 
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
-use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantSessionAuth;
-use crate::auth::Either;
-use crate::types::response::ResponseData;
-use crate::types::JsonApiResponse;
-use api_core::auth::CanDecrypt;
-use api_core::utils::headers::InsightHeaders;
-use db::models::access_event::NewAccessEvent;
-use db::models::insight_event::CreateInsightEvent;
-use newtypes::AccessEventKind;
-use newtypes::AccessEventPurpose;
-use newtypes::DataIdentifier;
-use newtypes::IdentityDataKind as IDK;
+use crate::{
+    auth::{
+        tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard, TenantSessionAuth},
+        Either,
+    },
+    types::{response::ResponseData, JsonApiResponse},
+};
+use api_core::{auth::CanDecrypt, utils::headers::InsightHeaders};
+use db::models::{access_event::NewAccessEvent, insight_event::CreateInsightEvent};
+use newtypes::{AccessEventKind, AccessEventPurpose, DataIdentifier, IdentityDataKind as IDK};
 
-use crate::utils::db2api::DbToApi;
-use crate::State;
+use crate::{utils::db2api::DbToApi, State};
 
-use api_core::decision;
-use api_core::decision::vendor::vendor_result::VendorResult;
-use api_core::errors::ApiResult;
-use api_core::errors::AssertionError;
-use api_core::telemetry::RootSpan;
-use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::vault_wrapper::Any;
-use api_core::utils::vault_wrapper::VaultWrapper;
-use api_core::utils::vault_wrapper::VwArgs;
-use api_wire_types::AmlHit;
-use api_wire_types::AmlHitMedia;
-use api_wire_types::RiskSignalFilters;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::risk_signal::IncludeHidden;
-use db::models::risk_signal::RiskSignal;
-use db::models::scoped_vault::ScopedVault;
-use db::models::vault::Vault;
-use db::models::verification_request::RequestAndResult;
-use db::models::verification_request::VerificationRequest;
-use db::models::verification_result::VerificationResult;
-use db::DbResult;
+use api_core::{
+    decision,
+    decision::vendor::vendor_result::VendorResult,
+    errors::{ApiResult, AssertionError},
+    telemetry::RootSpan,
+    utils::{
+        fp_id_path::FpIdPath,
+        vault_wrapper::{Any, VaultWrapper, VwArgs},
+    },
+};
+use api_wire_types::{AmlHit, AmlHitMedia, RiskSignalFilters};
+use db::{
+    models::{
+        ob_configuration::ObConfiguration,
+        risk_signal::{IncludeHidden, RiskSignal},
+        scoped_vault::ScopedVault,
+        vault::Vault,
+        verification_request::{RequestAndResult, VerificationRequest},
+        verification_result::VerificationResult,
+    },
+    DbResult,
+};
 use idv::ParsedResponse;
 use itertools::Itertools;
-use newtypes::EncryptedVaultPrivateKey;
-use newtypes::EnhancedAmlOption;
-use newtypes::FootprintReasonCode;
-use newtypes::FpId;
-use newtypes::PiiJsonValue;
-use newtypes::RiskSignalId;
-use newtypes::TenantId;
+use newtypes::{
+    EncryptedVaultPrivateKey, EnhancedAmlOption, FootprintReasonCode, FpId, PiiJsonValue, RiskSignalId,
+    TenantId,
+};
 use paperclip::actix::{api_v2_operation, get, post, web};
 
 type RiskSignalsListResponse = Vec<api_wire_types::RiskSignal>;

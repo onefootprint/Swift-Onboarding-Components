@@ -1,5 +1,4 @@
-use crate::auth::AuthError;
-use crate::{errors::ApiError, State};
+use crate::{auth::AuthError, errors::ApiError, State};
 use actix_web::{web, FromRequest};
 use chrono::Utc;
 use db::models::session::Session;

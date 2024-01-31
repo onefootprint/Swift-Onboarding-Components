@@ -309,6 +309,7 @@ impl enclave_proxy::StreamConfig for EnclaveConfig {
             }
         }
     }
+
     #[cfg(not(feature = "vsock"))]
     fn stream_type(&self) -> enclave_proxy::StreamType {
         enclave_proxy::StreamType::Tcp {

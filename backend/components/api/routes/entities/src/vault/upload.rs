@@ -1,21 +1,26 @@
-use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext};
-use crate::errors::ApiResult;
-use crate::types::{EmptyResponse, JsonApiResponse};
-use crate::utils::headers::InsightHeaders;
-use crate::utils::vault_wrapper::VaultWrapper;
-use crate::State;
-use api_core::api_headers_schema;
-use api_core::auth::tenant::{ClientTenantAuthContext, TenantAuth};
-use api_core::auth::CanVault;
-use api_core::utils::body_bytes::BodyBytes;
-use api_core::utils::file_upload::FileUpload;
-use api_core::utils::vault_wrapper::NewDocument;
-use api_core::utils::{self};
-use db::models::access_event::NewAccessEvent;
-use db::models::insight_event::CreateInsightEvent;
-use db::models::scoped_vault::ScopedVault;
-use db::models::vault::Vault;
+use crate::{
+    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
+    errors::ApiResult,
+    types::{EmptyResponse, JsonApiResponse},
+    utils::{headers::InsightHeaders, vault_wrapper::VaultWrapper},
+    State,
+};
+use api_core::{
+    api_headers_schema,
+    auth::{
+        tenant::{ClientTenantAuthContext, TenantAuth},
+        CanVault,
+    },
+    utils::{
+        body_bytes::BodyBytes,
+        file_upload::FileUpload,
+        vault_wrapper::NewDocument,
+        {self},
+    },
+};
+use db::models::{
+    access_event::NewAccessEvent, insight_event::CreateInsightEvent, scoped_vault::ScopedVault, vault::Vault,
+};
 use macros::route_alias;
 use newtypes::{AccessEventKind, AccessEventPurpose, DataIdentifier, DocumentKind, FpId, PiiBytes};
 use paperclip::actix::{self, api_v2_operation, web, web::Path};

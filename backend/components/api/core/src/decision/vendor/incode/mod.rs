@@ -50,7 +50,12 @@ pub fn validate_doc_type_is_allowed(
     let document_to_country_mapping = obc.supported_country_mapping_for_document(residential_country);
     let Some(allowed_doc_types) = document_to_country_mapping.get(&country_code) else {
         // this country is not in our available countries
-        return Err(OnboardingError::UnsupportedDocumentCountryForDocumentType(Csv::from(document_to_country_mapping.keys().cloned().collect::<Vec<_>>())).into())
+        return Err(
+            OnboardingError::UnsupportedDocumentCountryForDocumentType(Csv::from(
+                document_to_country_mapping.keys().cloned().collect::<Vec<_>>(),
+            ))
+            .into(),
+        );
     };
 
     // Validate that we support this doc type for the given country

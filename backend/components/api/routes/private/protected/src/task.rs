@@ -1,12 +1,13 @@
 use crate::ProtectedAuth;
 use actix_web::{post, web, web::Json};
-use api_core::errors::ApiError;
-use api_core::types::response::ResponseData;
-use api_core::types::{EmptyResponse, JsonApiResponse};
-use api_core::{task, State};
+use api_core::{
+    errors::ApiError,
+    task,
+    types::{response::ResponseData, EmptyResponse, JsonApiResponse},
+    State,
+};
 use chrono::Utc;
-use db::models::task::Task;
-use db::DbError;
+use db::{models::task::Task, DbError};
 use newtypes::{TaskData, TaskId};
 
 #[derive(Debug, Clone, serde::Deserialize)]

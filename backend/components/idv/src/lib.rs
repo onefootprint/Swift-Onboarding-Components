@@ -4,17 +4,20 @@ use std::fmt::Debug;
 
 use ::twilio::response::lookup::LookupV2Response;
 use experian::cross_core::response::CrossCoreAPIResponse;
-use idology::expectid::response::ExpectIDResponse;
-use idology::pa::response::PaResponse;
-use incode::doc::response::{
-    AddConsentResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse,
-    GetOnboardingStatusResponse, ProcessFaceResponse, ProcessIdResponse,
+use idology::{expectid::response::ExpectIDResponse, pa::response::PaResponse};
+use incode::{
+    doc::response::{
+        AddConsentResponse, AddSelfieResponse, AddSideResponse, FetchOCRResponse, FetchScoresResponse,
+        GetOnboardingStatusResponse, ProcessFaceResponse, ProcessIdResponse,
+    },
+    response::OnboardingStartResponse,
+    watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},
 };
-use incode::response::OnboardingStartResponse;
-use incode::watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse};
 use lexis::response::FlexIdResponse;
-use middesk::response::business::BusinessResponse;
-use middesk::response::webhook::{MiddeskBusinessUpdateWebhookResponse, MiddeskTinRetriedWebhookResponse};
+use middesk::response::{
+    business::BusinessResponse,
+    webhook::{MiddeskBusinessUpdateWebhookResponse, MiddeskTinRetriedWebhookResponse},
+};
 use newtypes::{PiiJsonValue, VendorAPI};
 use socure::response::SocureIDPlusResponse;
 
@@ -191,6 +194,7 @@ impl ParsedResponse {
         let parsed: GetOnboardingStatusResponse = serde_json::value::from_value(raw_response)?;
         Ok(Self::IncodeGetOnboardingStatus(parsed))
     }
+
     // We should never need this
     pub fn from_incode_process_face(raw_response: serde_json::Value) -> Result<Self, crate::Error> {
         let parsed: ProcessFaceResponse = serde_json::value::from_value(raw_response)?;

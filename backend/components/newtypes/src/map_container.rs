@@ -12,8 +12,8 @@ pub mod declare_map_container {
             }
 
             impl IntoIterator for $name {
-                type Item = ($key, $value);
                 type IntoIter = std::collections::hash_map::IntoIter<$key, $value>;
+                type Item = ($key, $value);
 
                 fn into_iter(self) -> Self::IntoIter {
                     self.map.into_iter()

@@ -1,36 +1,37 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use db::models::data_lifetime::DataLifetime;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::onboarding_decision::NewDecisionArgs;
-use db::models::scoped_vault::ScopedVault;
-use db::models::vault::Vault;
-use db::models::workflow::{Workflow as DbWorkflow, WorkflowUpdate as DbWorkflowUpdate};
-use db::TxnPgConn;
+use db::{
+    models::{
+        data_lifetime::DataLifetime,
+        ob_configuration::ObConfiguration,
+        onboarding_decision::NewDecisionArgs,
+        scoped_vault::ScopedVault,
+        vault::Vault,
+        workflow::{Workflow as DbWorkflow, WorkflowUpdate as DbWorkflowUpdate},
+    },
+    TxnPgConn,
+};
 
 use feature_flag::FeatureFlagClient;
 use newtypes::{
     DataLifetimeSeqno, DbActor, DecisionStatus, DocumentConfig, DocumentRequestKind, Locked,
-    OnboardingStatus, ReviewReason, RuleSetResultKind, WorkflowConfig,
+    OnboardingStatus, ReviewReason, RuleSetResultKind, ScopedVaultId, TenantId, WorkflowConfig, WorkflowId,
 };
-use newtypes::{ScopedVaultId, TenantId, WorkflowId};
 
 use super::{DocumentState, MakeDecision};
-use crate::decision::features::risk_signals::fetch_latest_risk_signals_map;
-use crate::decision::state::{
-    actions::{DocCollected, WorkflowActions},
-    common, WorkflowState,
-};
-use crate::decision::utils::should_execute_rules_for_document_only;
-use crate::errors::AssertionError;
 use crate::{
     decision::{
         self,
-        state::OnAction,
+        features::risk_signals::fetch_latest_risk_signals_map,
+        state::{
+            actions::{DocCollected, WorkflowActions},
+            common, OnAction, WorkflowState,
+        },
+        utils::should_execute_rules_for_document_only,
         vendor::{tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
     },
-    errors::ApiResult,
+    errors::{ApiResult, AssertionError},
     State,
 };
 

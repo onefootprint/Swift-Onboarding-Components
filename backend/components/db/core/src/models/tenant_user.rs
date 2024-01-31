@@ -1,9 +1,7 @@
-use crate::PgConn;
-use crate::{DbError, DbResult, TxnPgConn};
+use crate::{DbError, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::tenant_user;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
+use diesel::{prelude::*, Insertable, Queryable};
 use newtypes::{Locked, OrgMemberEmail, PiiString, TenantUserId};
 
 #[derive(Debug, Clone, Queryable)]

@@ -1,16 +1,13 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantSessionAuth;
-use crate::types::request::CursorPaginationRequest;
-use crate::types::response::CursorPaginatedResponse;
-use crate::utils::db2api::DbToApi;
-use crate::State;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    types::{request::CursorPaginationRequest, response::CursorPaginatedResponse},
+    utils::db2api::DbToApi,
+    State,
+};
 use api_core::types::CursorPaginatedResponseInner;
 use chrono::{DateTime, Utc};
 use db::access_event::{AccessEventListItemForTenant, AccessEventListQueryParams};
-use newtypes::input::deserialize_stringified_list;
-use newtypes::AccessEventKind;
-use newtypes::DataIdentifier;
+use newtypes::{input::deserialize_stringified_list, AccessEventKind, DataIdentifier};
 use paperclip::actix::{api_v2_operation, get, web, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]

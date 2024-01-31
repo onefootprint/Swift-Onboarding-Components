@@ -1,8 +1,7 @@
 use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::tenant_client_config;
-use diesel::ExpressionMethods;
-use diesel::{Insertable, OptionalExtension, QueryDsl, Queryable, RunQueryDsl};
+use diesel::{ExpressionMethods, Insertable, OptionalExtension, QueryDsl, Queryable, RunQueryDsl};
 use newtypes::{TenantClientConfigId, TenantId};
 
 #[derive(Debug, Clone, Queryable, PartialEq, Eq)]

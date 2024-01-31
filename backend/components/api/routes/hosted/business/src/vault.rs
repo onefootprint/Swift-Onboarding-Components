@@ -1,25 +1,25 @@
 use std::str::FromStr;
 
-use crate::auth::user::UserAuthGuard;
-use crate::errors::ApiResult;
-use crate::types::{EmptyResponse, JsonApiResponse};
-use crate::utils::vault_wrapper::{Business, VaultWrapper};
-use crate::State;
-use api_core::auth::user::UserWfAuthContext;
-use api_core::auth::AuthError;
-use api_core::errors::business::BusinessError;
-use api_core::errors::AssertionError;
-use api_core::types::ResponseData;
-use api_core::utils::vault_wrapper::{Person, TenantVw};
-use api_core::ApiErrorKind;
-use db::models::business_owner::BusinessOwner;
-use db::models::scoped_vault::ScopedVault;
-use newtypes::put_data_request::{PatchDataRequest, RawDataRequest};
-use newtypes::{
-    BusinessDataKind as BDK, BusinessOwnerKind, DataLifetimeSource, PiiJsonValue, ScopedVaultId,
-    WorkflowGuard,
+use crate::{
+    auth::user::UserAuthGuard,
+    errors::ApiResult,
+    types::{EmptyResponse, JsonApiResponse},
+    utils::vault_wrapper::{Business, VaultWrapper},
+    State,
 };
-use newtypes::{KycedBusinessOwnerData, ValidateArgs};
+use api_core::{
+    auth::{user::UserWfAuthContext, AuthError},
+    errors::{business::BusinessError, AssertionError},
+    types::ResponseData,
+    utils::vault_wrapper::{Person, TenantVw},
+    ApiErrorKind,
+};
+use db::models::{business_owner::BusinessOwner, scoped_vault::ScopedVault};
+use newtypes::{
+    put_data_request::{PatchDataRequest, RawDataRequest},
+    BusinessDataKind as BDK, BusinessOwnerKind, DataLifetimeSource, KycedBusinessOwnerData, PiiJsonValue,
+    ScopedVaultId, ValidateArgs, WorkflowGuard,
+};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(

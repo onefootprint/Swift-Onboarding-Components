@@ -1,7 +1,6 @@
 use actix_web::Responder;
-use paperclip::actix::web::Json;
 use paperclip::{
-    actix::Apiv2Schema,
+    actix::{web::Json, Apiv2Schema},
     v2::{models::DataType, schema::TypedData},
 };
 use serde::Serialize;

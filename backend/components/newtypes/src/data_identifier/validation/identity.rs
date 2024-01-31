@@ -1,9 +1,10 @@
-use super::utils::{self, validate_state, PO_BOX};
-use super::{Error, VResult};
-use crate::{email::Email, NtResult, Validate};
+use super::{
+    utils::{self, validate_state, PO_BOX},
+    Error, VResult,
+};
 use crate::{
-    AllData, DataIdentifier, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, PhoneNumber, PiiJsonValue,
-    PiiString, ValidateArgs, DATE_FORMAT,
+    email::Email, AllData, DataIdentifier, IdentityDataKind as IDK, Iso3166TwoDigitCountryCode, NtResult,
+    PhoneNumber, PiiJsonValue, PiiString, Validate, ValidateArgs, DATE_FORMAT,
 };
 use chrono::{Datelike, NaiveDate, Utc};
 use serde_with::DeserializeFromStr;
@@ -159,10 +160,7 @@ mod test {
     use std::collections::HashMap;
 
     use super::IDK::*;
-    use crate::IdentityDataKind as IDK;
-    use crate::PiiJsonValue;
-    use crate::Validate;
-    use crate::ValidateArgs;
+    use crate::{IdentityDataKind as IDK, PiiJsonValue, Validate, ValidateArgs};
     use test_case::test_case;
 
     #[test_case(FirstName, "flerpBlerp" => Some("flerpBlerp".to_owned()))]

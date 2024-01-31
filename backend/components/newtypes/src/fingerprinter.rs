@@ -4,12 +4,11 @@
 //! - Tenant: given a unique `data` we produce `n` fingerprints, one for each tenant.
 //! The key difference is that if someone were to leak the database the fingerprints should be minimaly revealing.
 use async_trait::async_trait;
-use strum::EnumIter;
-use strum::IntoEnumIterator;
+use strum::{EnumIter, IntoEnumIterator};
 
-use crate::FingerprintScopeKind;
 use crate::{
-    BusinessDataKind as BDK, DataIdentifier, Fingerprint, IdentityDataKind as IDK, PiiString, TenantId,
+    BusinessDataKind as BDK, DataIdentifier, Fingerprint, FingerprintScopeKind, IdentityDataKind as IDK,
+    PiiString, TenantId,
 };
 
 /// The scope to which we will fingerprint data

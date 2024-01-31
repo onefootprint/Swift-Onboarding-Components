@@ -1,8 +1,10 @@
 use super::{AllowSessionUpdate, ExtractableAuthSession, GetSessionForUpdate};
-use crate::auth::tenant::InvalidateAuth;
-use crate::auth::AuthError;
-use crate::errors::ApiResult;
-use crate::{errors::ApiError, utils::session::AuthSession, State};
+use crate::{
+    auth::{tenant::InvalidateAuth, AuthError},
+    errors::{ApiError, ApiResult},
+    utils::session::AuthSession,
+    State,
+};
 use actix_web::{http::header::HeaderMap, web, FromRequest};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
@@ -11,9 +13,13 @@ use derive_more::Deref;
 use futures_util::Future;
 use http::Method;
 use newtypes::{PiiString, SessionAuthToken};
-use paperclip::actix::OperationModifier;
-use paperclip::v2::models::{DefaultSchemaRaw, Parameter, SecurityScheme};
-use paperclip::v2::schema::Apiv2Schema;
+use paperclip::{
+    actix::OperationModifier,
+    v2::{
+        models::{DefaultSchemaRaw, Parameter, SecurityScheme},
+        schema::Apiv2Schema,
+    },
+};
 use std::{marker::PhantomData, pin::Pin};
 use tracing_actix_web::RootSpan;
 

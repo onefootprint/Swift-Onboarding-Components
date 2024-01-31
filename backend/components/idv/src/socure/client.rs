@@ -1,11 +1,12 @@
-use crate::socure::conversion::SocureRequest;
-use crate::socure::SocureReqwestError;
+use crate::socure::{conversion::SocureRequest, SocureReqwestError};
 
 use newtypes::{IdvData, PiiString};
 use reqwest::header;
 use std::time::Duration;
-use tokio_retry::strategy::{jitter, ExponentialBackoff};
-use tokio_retry::Retry;
+use tokio_retry::{
+    strategy::{jitter, ExponentialBackoff},
+    Retry,
+};
 
 use super::{decode_response, requirements};
 

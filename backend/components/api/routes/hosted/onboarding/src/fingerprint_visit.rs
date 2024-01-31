@@ -1,8 +1,10 @@
-use crate::auth::user::{UserAuth, UserAuthContext, UserAuthGuard};
-use crate::errors::ApiError;
-use crate::types::{EmptyResponse, JsonApiResponse};
-use crate::utils::headers::TelemetryHeaders;
-use crate::State;
+use crate::{
+    auth::user::{UserAuth, UserAuthContext, UserAuthGuard},
+    errors::ApiError,
+    types::{EmptyResponse, JsonApiResponse},
+    utils::headers::TelemetryHeaders,
+    State,
+};
 use actix_web::web::Json;
 use api_wire_types::hosted::fingerprint_visit::FingerprintVisitRequest;
 use db::models::fingerprint_visit_event::FingerprintVisitEvent;

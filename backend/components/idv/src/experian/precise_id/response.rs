@@ -369,8 +369,7 @@ pub(crate) fn log_unknown_match_code(code: &str, attribute: &str) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::experian::error::Error as ExperianError;
-    use crate::test_fixtures::experian_precise_id_response;
+    use crate::{experian::error::Error as ExperianError, test_fixtures::experian_precise_id_response};
     use test_case::test_case;
 
     #[test_case("656" => PreciseIDParsedScore::Score(656))]

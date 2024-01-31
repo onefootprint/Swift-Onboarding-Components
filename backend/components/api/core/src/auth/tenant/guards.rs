@@ -155,8 +155,10 @@ where
 #[cfg(test)]
 mod test {
     use super::{CanDecrypt, TenantGuard as TG};
-    use crate::auth::tenant::{IsGuardMet, TenantGuardDsl};
-    use crate::auth::Any;
+    use crate::auth::{
+        tenant::{IsGuardMet, TenantGuardDsl},
+        Any,
+    };
     use newtypes::{
         BusinessDataKind as BDK, CollectedDataOption as CDO, DataIdentifier as DI, DocumentKind,
         DocumentSide, IdDocKind, IdentityDataKind as IDK, KvDataKey, TenantScope as TS,

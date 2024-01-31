@@ -1,15 +1,12 @@
-use crate::DbResult;
-use crate::PgConn;
+use crate::{DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::audit_event;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
+use diesel::{prelude::*, Insertable, Queryable};
 use itertools::Itertools;
-use newtypes::AuditEventDetail;
-use newtypes::CommonAuditEventDetail;
 use newtypes::{
-    AuditEventId, AuditEventMetadata, AuditEventName, DbActor, DocumentDataId, InsightEventId,
-    ObConfigurationId, ScopedVaultId, TenantApiKeyId, TenantId, TenantRoleId, TenantUserId,
+    AuditEventDetail, AuditEventId, AuditEventMetadata, AuditEventName, CommonAuditEventDetail, DbActor,
+    DocumentDataId, InsightEventId, ObConfigurationId, ScopedVaultId, TenantApiKeyId, TenantId, TenantRoleId,
+    TenantUserId,
 };
 
 #[derive(Debug, Clone, Queryable)]

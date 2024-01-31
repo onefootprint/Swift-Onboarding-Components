@@ -1,34 +1,27 @@
 use std::collections::HashMap;
 
-use crate::auth::tenant::CheckTenantGuard;
-use crate::types::response::ResponseData;
-use crate::types::JsonApiResponse;
-use crate::State;
-use api_core::auth::tenant::TenantGuard;
-use api_core::auth::tenant::TenantSessionAuth;
-use api_core::config::LinkKind;
-use api_core::errors::user::UserError;
-use api_core::errors::ApiResult;
-use api_core::utils::challenge_rate_limit::RateLimit;
-use api_core::utils::email::SendgridClient;
-use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::token::create_token;
-use api_core::utils::token::CreateTokenArgs;
-use api_core::utils::token::CreateTokenResult;
-use api_core::utils::vault_wrapper::Any;
-use api_core::utils::vault_wrapper::TenantVw;
-use api_core::utils::vault_wrapper::VaultWrapper;
-use api_wire_types::CreateEntityTokenRequest;
-use api_wire_types::CreateEntityTokenResponse;
+use crate::{
+    auth::tenant::CheckTenantGuard,
+    types::{response::ResponseData, JsonApiResponse},
+    State,
+};
+use api_core::{
+    auth::tenant::{TenantGuard, TenantSessionAuth},
+    config::LinkKind,
+    errors::{user::UserError, ApiResult},
+    utils::{
+        challenge_rate_limit::RateLimit,
+        email::SendgridClient,
+        fp_id_path::FpIdPath,
+        token::{create_token, CreateTokenArgs, CreateTokenResult},
+        vault_wrapper::{Any, TenantVw, VaultWrapper},
+    },
+};
+use api_wire_types::{CreateEntityTokenRequest, CreateEntityTokenResponse};
 use chrono::Duration;
-use db::models::scoped_vault::ScopedVault;
-use db::models::workflow_request::WorkflowRequest;
+use db::models::{scoped_vault::ScopedVault, workflow_request::WorkflowRequest};
 use itertools::Itertools;
-use newtypes::ContactInfoKind;
-use newtypes::DocumentRequestKind;
-use newtypes::PhoneNumber;
-use newtypes::PiiString;
-use newtypes::WorkflowRequestConfig;
+use newtypes::{ContactInfoKind, DocumentRequestKind, PhoneNumber, PiiString, WorkflowRequestConfig};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
 #[api_v2_operation(

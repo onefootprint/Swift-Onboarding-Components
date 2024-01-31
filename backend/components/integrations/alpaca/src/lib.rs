@@ -1,19 +1,19 @@
-use std::fmt::Display;
-use std::time::Duration;
+use std::{fmt::Display, time::Duration};
 
 use async_trait::async_trait;
 use macros::HiddenDebug;
 use newtypes::PiiString;
 use reqwest::Method;
 use serde::Serialize;
-use tokio_retry::strategy::{jitter, ExponentialBackoff};
-use tokio_retry::Retry;
+use tokio_retry::{
+    strategy::{jitter, ExponentialBackoff},
+    Retry,
+};
 use types::account::CreateAccountRequest;
 mod error;
 pub mod types;
 
-pub use self::error::Error;
-pub use self::types::cip::*;
+pub use self::{error::Error, types::cip::*};
 
 pub type AlpacaResult<T> = Result<T, error::Error>;
 

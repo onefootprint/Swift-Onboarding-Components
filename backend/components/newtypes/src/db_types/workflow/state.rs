@@ -1,13 +1,10 @@
-use crate::util::impl_enum_string_diesel;
-use crate::EnumDotNotationError;
+use crate::{util::impl_enum_string_diesel, EnumDotNotationError};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::str::FromStr;
-use strum::Display;
-use strum::EnumDiscriminants;
-use strum_macros::AsRefStr;
-use strum_macros::EnumString;
+use strum::{Display, EnumDiscriminants};
+use strum_macros::{AsRefStr, EnumString};
 
 // TODO: maybe move this to new `state` crate?
 #[derive(
@@ -79,6 +76,7 @@ impl std::fmt::Display for WorkflowState {
 // TODO: code share w/ DataIdentifier instead of copypaste
 impl FromStr for WorkflowState {
     type Err = EnumDotNotationError;
+
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let period_idx = s
             .find('.')

@@ -1,18 +1,19 @@
-use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard};
-use crate::auth::{tenant::TenantSessionAuth, Either};
-use crate::types::{JsonApiResponse, ResponseData};
-use crate::utils::vault_wrapper::VaultWrapper;
-use crate::{errors::ApiError, State};
+use crate::{
+    auth::{
+        tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard, TenantSessionAuth},
+        Either,
+    },
+    errors::ApiError,
+    types::{JsonApiResponse, ResponseData},
+    utils::vault_wrapper::VaultWrapper,
+    State,
+};
 use actix_web::web::Query;
-use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::vault_wrapper::TenantVw;
+use api_core::utils::{fp_id_path::FpIdPath, vault_wrapper::TenantVw};
 use db::models::scoped_vault::ScopedVault;
 use macros::route_alias;
-use newtypes::flat_api_object_map_type;
-use newtypes::input::Csv;
-use newtypes::DataIdentifier;
-use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{self, api_v2_operation, web};
+use newtypes::{flat_api_object_map_type, input::Csv, DataIdentifier};
+use paperclip::actix::{self, api_v2_operation, web, Apiv2Schema};
 use serde::Deserialize;
 use std::collections::HashMap;
 

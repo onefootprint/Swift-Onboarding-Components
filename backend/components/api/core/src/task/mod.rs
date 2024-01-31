@@ -167,8 +167,7 @@ mod task_tests {
 
     use super::*;
     use chrono::Utc;
-    use db::test_helpers::have_same_elements;
-    use db::tests::test_db_pool::TestDbPool;
+    use db::{test_helpers::have_same_elements, tests::test_db_pool::TestDbPool};
     use macros::test_state;
     use newtypes::{LogMessageTaskArgs, TaskData};
 

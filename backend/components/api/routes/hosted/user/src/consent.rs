@@ -1,14 +1,14 @@
-use crate::auth::user::UserAuthGuard;
-use crate::errors::{ApiError, ApiResult};
-use crate::types::response::ResponseData;
-use crate::types::EmptyResponse;
-use crate::utils::headers::InsightHeaders;
-use crate::State;
+use crate::{
+    auth::user::UserAuthGuard,
+    errors::{ApiError, ApiResult},
+    types::{response::ResponseData, EmptyResponse},
+    utils::headers::InsightHeaders,
+    State,
+};
 use api_core::auth::user::UserWfAuthContext;
 use api_wire_types::hosted::consent::ConsentRequest;
 use chrono::Utc;
-use db::models::insight_event::CreateInsightEvent;
-use db::models::user_consent::UserConsent;
+use db::models::{insight_event::CreateInsightEvent, user_consent::UserConsent};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(

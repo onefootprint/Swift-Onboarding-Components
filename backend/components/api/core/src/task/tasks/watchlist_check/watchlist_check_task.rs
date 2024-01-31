@@ -1,21 +1,27 @@
-use crate::decision::vendor;
-use crate::decision::vendor::vendor_result::VendorResult;
-use crate::errors::AssertionError;
-use crate::task::{ExecuteTask, TaskError};
-use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
-use crate::{task, ApiError, State};
+use crate::{
+    decision::{vendor, vendor::vendor_result::VendorResult},
+    errors::AssertionError,
+    task,
+    task::{ExecuteTask, TaskError},
+    utils::vault_wrapper::{Person, VaultWrapper, VwArgs},
+    ApiError, State,
+};
 use async_trait::async_trait;
 use chrono::Utc;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::risk_signal::{NewRiskSignalInfo, RiskSignal};
-use db::models::scoped_vault::ScopedVault;
-use db::models::tenant::Tenant;
-use db::models::user_timeline::UserTimeline;
-use db::models::{
-    decision_intent::DecisionIntent, task::Task, verification_request::VerificationRequest,
-    watchlist_check::WatchlistCheck,
+use db::{
+    models::{
+        decision_intent::DecisionIntent,
+        ob_configuration::ObConfiguration,
+        risk_signal::{NewRiskSignalInfo, RiskSignal},
+        scoped_vault::ScopedVault,
+        task::Task,
+        tenant::Tenant,
+        user_timeline::UserTimeline,
+        verification_request::VerificationRequest,
+        watchlist_check::WatchlistCheck,
+    },
+    DbResult, TxnPgConn,
 };
-use db::{DbResult, TxnPgConn};
 use newtypes::{
     DecisionIntentKind, EnhancedAmlOption, FireWebhookArgs, OnboardingStatus, RiskSignalGroupKind,
     ScopedVaultId, TaskData, TaskId, VendorAPI, WatchlistCheckArgs, WatchlistCheckCompletedPayload,

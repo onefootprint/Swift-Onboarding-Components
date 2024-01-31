@@ -13,8 +13,7 @@ use crypto::sha256;
 use db::models::tenant::Tenant;
 use feature_flag::{BoolFlag, FeatureFlagClient, LaunchDarklyFeatureFlagClient};
 use itertools::Itertools;
-use newtypes::SandboxId;
-use newtypes::{Base64Data, PhoneNumber, PiiString, VaultId};
+use newtypes::{Base64Data, PhoneNumber, PiiString, SandboxId, VaultId};
 
 use super::challenge_rate_limit::RateLimit;
 

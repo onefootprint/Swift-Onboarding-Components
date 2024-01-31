@@ -1,7 +1,8 @@
-use crate::idology::common::response::{IDologyQualifiers, KeyResponse};
-use crate::idology::expectid::response::{ExpectIDResponse, Response};
-use crate::idology::pa;
-use crate::idology::IdologyExpectIDAPIResponse;
+use crate::idology::{
+    common::response::{IDologyQualifiers, KeyResponse},
+    expectid::response::{ExpectIDResponse, Response},
+    pa, IdologyExpectIDAPIResponse,
+};
 use newtypes::PiiJsonValue;
 use serde_json::json;
 

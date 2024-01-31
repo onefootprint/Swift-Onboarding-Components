@@ -33,6 +33,7 @@ impl From<InvestorProfileKind> for DataIdentifier {
 
 impl TryFrom<DataIdentifier> for InvestorProfileKind {
     type Error = crate::Error;
+
     fn try_from(value: DataIdentifier) -> Result<Self, Self::Error> {
         match value {
             DataIdentifier::InvestorProfile(ipk) => Ok(ipk),

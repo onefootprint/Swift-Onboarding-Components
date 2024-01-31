@@ -1,15 +1,12 @@
-use super::TenantVw;
-use super::VaultWrapper;
-use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::VwArgs;
-use db::models::data_lifetime::DataLifetime;
-use db::models::document_data::DocumentData;
-use db::models::scoped_vault::ScopedVault;
-use db::models::vault::Vault;
-use db::models::vault_data::VaultData;
-use db::models::workflow::Workflow;
-use db::HasLifetime;
-use db::PgConn;
+use super::{TenantVw, VaultWrapper};
+use crate::{errors::ApiResult, utils::vault_wrapper::VwArgs};
+use db::{
+    models::{
+        data_lifetime::DataLifetime, document_data::DocumentData, scoped_vault::ScopedVault, vault::Vault,
+        vault_data::VaultData, workflow::Workflow,
+    },
+    HasLifetime, PgConn,
+};
 use itertools::Itertools;
 use newtypes::{DataLifetimeSeqno, ScopedVaultId};
 use std::collections::HashMap;

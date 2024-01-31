@@ -17,9 +17,9 @@ pub struct TelemetryHeaders {
 }
 
 impl TelemetryHeaders {
-    pub const SESSION_HEADER_NAME: &'static str = "x-fp-session-id";
     const CLIENT_VERSION_HEADER_NAME: &'static str = "x-fp-client-version";
     const INTEGRATION_TESTS_HEADER_NAME: &'static str = "x-fp-integration-test";
+    pub const SESSION_HEADER_NAME: &'static str = "x-fp-session-id";
 
     pub fn parse_from_request(headers: &HeaderMap) -> Self {
         let session_id = get_header(Self::SESSION_HEADER_NAME, headers)

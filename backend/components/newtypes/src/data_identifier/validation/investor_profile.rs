@@ -1,11 +1,8 @@
-use super::utils;
-use super::Error;
-use crate::AllData;
-use crate::DataIdentifier;
-use crate::NtResult;
-use crate::Validate;
-use crate::ValidateArgs;
-use crate::{InvestorProfileKind as IPK, PiiJsonValue, PiiString};
+use super::{utils, Error};
+use crate::{
+    AllData, DataIdentifier, InvestorProfileKind as IPK, NtResult, PiiJsonValue, PiiString, Validate,
+    ValidateArgs,
+};
 use itertools::Itertools;
 use serde_with::DeserializeFromStr;
 use strum_macros::EnumString;

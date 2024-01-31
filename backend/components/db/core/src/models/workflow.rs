@@ -1,32 +1,33 @@
-use super::insight_event::CreateInsightEvent;
-use super::manual_review::ManualReview;
-use super::ob_configuration::ObConfiguration;
-use super::onboarding_decision::{NewDecisionArgs, OnboardingDecision};
-use super::scoped_vault::{ScopedVault, ScopedVaultUpdate};
-use super::task::Task;
-use super::tenant::Tenant;
-use super::user_timeline::UserTimeline;
-use super::workflow_event::WorkflowEvent;
-use super::workflow_request::WorkflowRequest;
-use crate::errors::ValidationError;
-use crate::models::billing_event::BillingEvent;
-use crate::models::vault::Vault;
-use crate::{DbResult, PgConn, TxnPgConn};
+use super::{
+    insight_event::CreateInsightEvent,
+    manual_review::ManualReview,
+    ob_configuration::ObConfiguration,
+    onboarding_decision::{NewDecisionArgs, OnboardingDecision},
+    scoped_vault::{ScopedVault, ScopedVaultUpdate},
+    task::Task,
+    tenant::Tenant,
+    user_timeline::UserTimeline,
+    workflow_event::WorkflowEvent,
+    workflow_request::WorkflowRequest,
+};
+use crate::{
+    errors::ValidationError,
+    models::{billing_event::BillingEvent, vault::Vault},
+    DbResult, PgConn, TxnPgConn,
+};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{ob_configuration, workflow};
-use diesel::dsl::{count_star, not};
-use diesel::prelude::*;
-use itertools::Itertools;
-use newtypes::KycState;
-use newtypes::{
-    AlpacaKycState, DbActor, DocumentState, FireWebhookArgs, InsightEventId, KybConfig, KybState, KycConfig,
-    ObConfigurationKind, OnboardingCompletedPayload, OnboardingStatus, OnboardingStatusChangedPayload,
-    TaskData, TenantId, TenantScope, VaultId, VaultKind, WebhookEvent, WorkflowFixtureResult, WorkflowSource,
-    WorkflowStartedInfo,
+use diesel::{
+    dsl::{count_star, not},
+    prelude::*,
 };
-use newtypes::{DocumentConfig, WorkflowRequestConfig};
+use itertools::Itertools;
 use newtypes::{
-    Locked, ObConfigurationId, ScopedVaultId, WorkflowConfig, WorkflowId, WorkflowKind, WorkflowState,
+    AlpacaKycState, DbActor, DocumentConfig, DocumentState, FireWebhookArgs, InsightEventId, KybConfig,
+    KybState, KycConfig, KycState, Locked, ObConfigurationId, ObConfigurationKind,
+    OnboardingCompletedPayload, OnboardingStatus, OnboardingStatusChangedPayload, ScopedVaultId, TaskData,
+    TenantId, TenantScope, VaultId, VaultKind, WebhookEvent, WorkflowConfig, WorkflowFixtureResult,
+    WorkflowId, WorkflowKind, WorkflowRequestConfig, WorkflowSource, WorkflowStartedInfo, WorkflowState,
 };
 use std::collections::HashMap;
 
@@ -769,9 +770,7 @@ mod tests {
     use super::*;
     use crate::{models::workflow_event::WorkflowEvent, tests::prelude::*};
     use macros::db_test;
-    use newtypes::KycConfig;
-    use newtypes::KycState;
-    use newtypes::WorkflowSource;
+    use newtypes::{KycConfig, KycState, WorkflowSource};
     use std::str::FromStr;
 
     #[db_test]

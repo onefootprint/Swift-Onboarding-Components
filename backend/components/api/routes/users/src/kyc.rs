@@ -1,44 +1,36 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
-use crate::auth::tenant::TenantGuard;
-use crate::types::response::ResponseData;
-use crate::types::JsonApiResponse;
-use crate::State;
-use api_core::decision::state::actions::WorkflowActions;
-use api_core::decision::state::kyc::KycState;
-use api_core::decision::state::Authorize;
-use api_core::decision::state::WorkflowKind;
-use api_core::decision::state::WorkflowWrapper;
-use api_core::errors::onboarding::OnboardingError;
-use api_core::errors::tenant::TenantError;
-use api_core::errors::ApiResult;
-use api_core::errors::ValidationError;
-use api_core::task;
-use api_core::telemetry::RootSpan;
-use api_core::utils::db2api::DbToApi;
-use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::onboarding::NewOnboardingArgs;
-use api_core::utils::requirements::get_requirements_inner;
-use api_core::utils::requirements::GetRequirementsArgs;
-use api_core::utils::vault_wrapper::Any;
-use api_core::utils::vault_wrapper::VaultWrapper;
-use api_core::utils::vault_wrapper::VwArgs;
-use api_wire_types::EntityValidateResponse;
-use api_wire_types::SimpleFixtureResult;
-use api_wire_types::TriggerKycRequest;
-use db::models::liveness_event::NewLivenessEvent;
-use db::models::manual_review::ManualReview;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::scoped_vault::ScopedVault;
-use db::models::workflow::Workflow;
-use db::models::workflow::WorkflowUpdate;
-use db::DbError;
+use crate::{
+    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
+    types::{response::ResponseData, JsonApiResponse},
+    State,
+};
+use api_core::{
+    decision::state::{actions::WorkflowActions, kyc::KycState, Authorize, WorkflowKind, WorkflowWrapper},
+    errors::{onboarding::OnboardingError, tenant::TenantError, ApiResult, ValidationError},
+    task,
+    telemetry::RootSpan,
+    utils::{
+        db2api::DbToApi,
+        fp_id_path::FpIdPath,
+        onboarding::NewOnboardingArgs,
+        requirements::{get_requirements_inner, GetRequirementsArgs},
+        vault_wrapper::{Any, VaultWrapper, VwArgs},
+    },
+};
+use api_wire_types::{EntityValidateResponse, SimpleFixtureResult, TriggerKycRequest};
+use db::{
+    models::{
+        liveness_event::NewLivenessEvent,
+        manual_review::ManualReview,
+        ob_configuration::ObConfiguration,
+        scoped_vault::ScopedVault,
+        workflow::{Workflow, WorkflowUpdate},
+    },
+    DbError,
+};
 use itertools::Itertools;
-use newtypes::DataIdentifierDiscriminant as DID;
-use newtypes::ObConfigurationKind;
-use newtypes::OnboardingRequirement;
-use newtypes::VaultKind;
-use newtypes::WorkflowSource;
+use newtypes::{
+    DataIdentifierDiscriminant as DID, ObConfigurationKind, OnboardingRequirement, VaultKind, WorkflowSource,
+};
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(description = "Trigger KYC on the provided user.", tags(Users, Preview))]

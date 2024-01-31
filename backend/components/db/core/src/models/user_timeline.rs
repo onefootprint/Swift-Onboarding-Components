@@ -1,37 +1,32 @@
 use std::collections::HashMap;
 
-use crate::actor::saturate_actors;
-use crate::actor::SaturatedActor;
-use crate::models::annotation::Annotation;
-use crate::models::liveness_event::LivenessEvent;
-use crate::models::scoped_vault::ScopedVault;
-use crate::DbError;
-use crate::DbResult;
-use crate::PgConn;
-use crate::TxnPgConn;
+use crate::{
+    actor::{saturate_actors, SaturatedActor},
+    models::{annotation::Annotation, liveness_event::LivenessEvent, scoped_vault::ScopedVault},
+    DbError, DbResult, PgConn, TxnPgConn,
+};
 use chrono::{DateTime, Utc};
 use db_schema::schema::user_timeline;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
-use newtypes::AuthMethodUpdatedInfo;
-use newtypes::CollectedDataOption;
-use newtypes::DataIdentifier;
-use newtypes::DbUserTimelineEventKind;
-use newtypes::ExternalIntegrationInfo;
-use newtypes::{DbUserTimelineEvent, ScopedVaultId, UserTimelineId, VaultId};
+use diesel::{prelude::*, Insertable, Queryable};
+use newtypes::{
+    AuthMethodUpdatedInfo, CollectedDataOption, DataIdentifier, DbUserTimelineEvent, DbUserTimelineEventKind,
+    ExternalIntegrationInfo, ScopedVaultId, UserTimelineId, VaultId,
+};
 
-use super::annotation::AnnotationInfo;
-use super::auth_event::AuthEvent;
-use super::document_request::DocumentRequest;
-use super::identity_document::IdentityDocument;
-use super::insight_event::InsightEvent;
-use super::ob_configuration::ObConfiguration;
-use super::onboarding_decision::{OnboardingDecision, SaturatedOnboardingDecisionInfo};
-use super::scoped_vault::ScopedVaultIdentifier;
-use super::scoped_vault_label::ScopedVaultLabel;
-use super::watchlist_check::WatchlistCheck;
-use super::workflow::Workflow;
-use super::workflow_request::WorkflowRequest;
+use super::{
+    annotation::AnnotationInfo,
+    auth_event::AuthEvent,
+    document_request::DocumentRequest,
+    identity_document::IdentityDocument,
+    insight_event::InsightEvent,
+    ob_configuration::ObConfiguration,
+    onboarding_decision::{OnboardingDecision, SaturatedOnboardingDecisionInfo},
+    scoped_vault::ScopedVaultIdentifier,
+    scoped_vault_label::ScopedVaultLabel,
+    watchlist_check::WatchlistCheck,
+    workflow::Workflow,
+    workflow_request::WorkflowRequest,
+};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = user_timeline)]
@@ -340,13 +335,13 @@ mod tests {
     use newtypes::DbActor;
 
     use super::*;
-    use crate::actor::SaturatedActor;
-    use crate::tests::prelude::*;
+    use crate::{actor::SaturatedActor, tests::prelude::*};
     // TODO modernize utils
-    use crate::models::tenant_role::{ImmutableRoleKind, TenantRole};
-    use crate::test::{test_annotation, test_tenant_api_key, test_tenant_user};
-    use crate::tests::fixtures;
-    use crate::tests::prelude::TestPgConn;
+    use crate::{
+        models::tenant_role::{ImmutableRoleKind, TenantRole},
+        test::{test_annotation, test_tenant_api_key, test_tenant_user},
+        tests::{fixtures, prelude::TestPgConn},
+    };
     use macros::db_test;
     use newtypes::TenantRoleKind;
 

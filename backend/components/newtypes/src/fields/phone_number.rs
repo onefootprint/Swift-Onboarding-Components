@@ -1,9 +1,7 @@
-use crate::api_schema_helper::string_api_data_type_alias;
-use crate::{NtResult, PiiString};
+use crate::{api_schema_helper::string_api_data_type_alias, NtResult, PiiString};
 
 use serde_with::DeserializeFromStr;
-use std::fmt::Debug;
-use std::str::FromStr;
+use std::{fmt::Debug, str::FromStr};
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {

@@ -173,9 +173,7 @@ const SCORE_THRESHOLD_FOR_HIT: f32 = 10.0;
 pub fn type_to_frc(s: String) -> Option<FootprintReasonCode> {
     let watchlist_type = IncodeWatchlistType::try_from(s.trim());
     match watchlist_type {
-        Ok(t) => {
-            Into::<Option<FootprintReasonCode>>::into(&t)
-        }
+        Ok(t) => Into::<Option<FootprintReasonCode>>::into(&t),
         Err(err) => {
             tracing::error!(?err, s = s, "Could not parse IncodeWatchlistType");
             None
@@ -319,11 +317,18 @@ mod test {
     #[test_case(vec![(1.7, vec!["adverse-media-v2-terrorism"], vec!["unknown"]), (1.8, vec!["sanction"], vec!["name_exact"])] => vec![FootprintReasonCode::WatchlistHitOfac])]
     #[test_case(vec![(1.7, vec!["adverse-media-v2-terrorism"], vec!["unknown"]), (1.8, vec!["sanction"], vec!["equivalent_name"])] => Vec::<FootprintReasonCode>::new())]
     #[test_case(vec![(1.7, vec!["warning", "fitness-probity"], vec!["name_exact"])] => Vec::<FootprintReasonCode>::new())]
-    fn test_reason_codes_from_watchlist_result<'a>(hits: Vec<(f32, Vec<&'a str>, Vec<&'a str>)>) -> Vec<FootprintReasonCode> {
+    fn test_reason_codes_from_watchlist_result<'a>(
+        hits: Vec<(f32, Vec<&'a str>, Vec<&'a str>)>,
+    ) -> Vec<FootprintReasonCode> {
         let hits = hits
-        .into_iter()
-        .map(|h| TestHit{score:h.0, types: h.1, match_types: h.2, name: "Bob Boberto"})
-        .collect();
+            .into_iter()
+            .map(|h| TestHit {
+                score: h.0,
+                types: h.1,
+                match_types: h.2,
+                name: "Bob Boberto",
+            })
+            .collect();
         let res = make_watchlist_res("Bob Boberto", hits);
         reason_codes_from_watchlist_result(
             &res,
@@ -353,7 +358,12 @@ mod test {
     ) -> Vec<FootprintReasonCode> {
         let hits = hits
             .into_iter()
-            .map(|h| TestHit{score:1.3, types: h, match_types: vec!["name_exact"], name: "Bob Boberto"})
+            .map(|h| TestHit {
+                score: 1.3,
+                types: h,
+                match_types: vec!["name_exact"],
+                name: "Bob Boberto",
+            })
             .collect();
         let res = make_watchlist_res("Bob Boberto", hits);
         reason_codes_from_watchlist_result(&res, &enhanced_aml)
@@ -364,11 +374,19 @@ mod test {
     #[test_case("Bob Boberto", vec![("Boberto Bob", "sanction")] => Vec::<FootprintReasonCode>::new())]
     #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction")] => Vec::<FootprintReasonCode>::new())]
     #[test_case("Bob Boberto", vec![("Bob Boberto Lee", "sanction"), ("Bob Boberto", "pep-class-3")] => vec![FootprintReasonCode::WatchlistHitPep])]
-    fn test_reason_codes_from_watchlist_result_exact_name_matching(search_term: &str, hit_name_types: Vec<(&str, &str)>) -> Vec<FootprintReasonCode> {
+    fn test_reason_codes_from_watchlist_result_exact_name_matching(
+        search_term: &str,
+        hit_name_types: Vec<(&str, &str)>,
+    ) -> Vec<FootprintReasonCode> {
         let hits = hit_name_types
-        .into_iter()
-        .map(|(name, typ)| TestHit{score:1.3, types: vec![typ], match_types: vec!["name_exact"], name})
-        .collect();
+            .into_iter()
+            .map(|(name, typ)| TestHit {
+                score: 1.3,
+                types: vec![typ],
+                match_types: vec!["name_exact"],
+                name,
+            })
+            .collect();
         let res = make_watchlist_res(search_term, hits);
         reason_codes_from_watchlist_result(
             &res,
@@ -382,9 +400,9 @@ mod test {
         )
     }
 
-    struct TestHit<'a>{
-        score: f32, 
-        types: Vec<&'a str>, 
+    struct TestHit<'a> {
+        score: f32,
+        types: Vec<&'a str>,
         match_types: Vec<&'a str>,
         name: &'a str,
     }

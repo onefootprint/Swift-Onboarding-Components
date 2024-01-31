@@ -21,13 +21,11 @@ pub trait ApiKeyFingerprinter {
 }
 
 impl SecretApiKey {
+    const LENGTH: usize = 34;
     /// prefixed on LIVE keys
     pub const LIVE_PREFIX: &'static str = "sk_live";
-
     /// prefix on sandbox keys
     pub const SANDBOX_PREFIX: &'static str = "sk_test";
-
-    const LENGTH: usize = 34;
 
     /// generate a random new secret api key
     pub fn generate(is_live: bool) -> Self {

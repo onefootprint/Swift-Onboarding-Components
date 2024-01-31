@@ -1,7 +1,5 @@
-use aws_sdk_kms::error::SdkError;
-use aws_sdk_kms::operation::decrypt::DecryptError;
-use aws_types::region::Region;
-use aws_types::SdkConfig;
+use aws_sdk_kms::{error::SdkError, operation::decrypt::DecryptError};
+use aws_types::{region::Region, SdkConfig};
 use thiserror::Error;
 
 use crate::KmsCredentials;

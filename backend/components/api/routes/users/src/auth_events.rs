@@ -1,15 +1,18 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantGuard;
-use crate::utils::db2api::DbToApi;
-use crate::State;
-use api_core::auth::tenant::SecretTenantAuthContext;
-use api_core::errors::ApiResult;
-use api_core::types::OffsetPaginatedResponse;
-use api_core::types::OffsetPaginationRequest;
-use api_core::utils::fp_id_path::FpIdPath;
-use db::models::auth_event::AuthEvent;
-use db::models::scoped_vault::ScopedVault;
-use db::OffsetPagination;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard},
+    utils::db2api::DbToApi,
+    State,
+};
+use api_core::{
+    auth::tenant::SecretTenantAuthContext,
+    errors::ApiResult,
+    types::{OffsetPaginatedResponse, OffsetPaginationRequest},
+    utils::fp_id_path::FpIdPath,
+};
+use db::{
+    models::{auth_event::AuthEvent, scoped_vault::ScopedVault},
+    OffsetPagination,
+};
 use newtypes::PreviewApi;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 

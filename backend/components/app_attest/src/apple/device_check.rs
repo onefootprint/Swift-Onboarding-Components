@@ -1,16 +1,19 @@
-use std::collections::HashMap;
-use std::num::ParseIntError;
+use std::{collections::HashMap, num::ParseIntError};
 
 use super::{AppleAppAttestationVerifier, Config};
 use crate::error::AttestationError;
 use chrono::{DateTime, Utc};
 use jwt_simple::prelude::*;
-use openssl::bn::BigNumContext;
-use openssl::cms::CMSOptions;
-use openssl::ec::PointConversionForm;
-use openssl::pkey::Id;
-use openssl::x509::store::{X509Store, X509StoreBuilder};
-use openssl::x509::X509;
+use openssl::{
+    bn::BigNumContext,
+    cms::CMSOptions,
+    ec::PointConversionForm,
+    pkey::Id,
+    x509::{
+        store::{X509Store, X509StoreBuilder},
+        X509,
+    },
+};
 use reqwest::{Method, RequestBuilder, Response};
 use thiserror::Error;
 

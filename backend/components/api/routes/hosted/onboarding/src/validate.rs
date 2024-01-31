@@ -1,7 +1,6 @@
-use crate::auth::user::UserAuthGuard;
-use crate::errors::onboarding::OnboardingError;
-use crate::types::response::ResponseData;
-use crate::State;
+use crate::{
+    auth::user::UserAuthGuard, errors::onboarding::OnboardingError, types::response::ResponseData, State,
+};
 use api_core::{
     auth::{
         session::{user::ValidateUserToken, AuthSessionData},

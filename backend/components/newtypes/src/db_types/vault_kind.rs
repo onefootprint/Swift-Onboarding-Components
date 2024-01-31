@@ -5,8 +5,7 @@ use paperclip::actix::Apiv2Schema;
 use serde_json;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::AsRefStr;
-use strum_macros::Display;
-use strum_macros::EnumString;
+use strum_macros::{Display, EnumString};
 
 #[derive(
     Display,

@@ -1,25 +1,23 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantSessionAuth;
-use crate::errors::tenant::TenantError;
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
-use crate::types::EmptyResponse;
-use crate::types::JsonApiResponse;
-use crate::utils::db2api::DbToApi;
-use crate::State;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    errors::{tenant::TenantError, ApiError},
+    types::{response::ResponseData, EmptyResponse, JsonApiResponse},
+    utils::db2api::DbToApi,
+    State,
+};
 use actix_web::web::Json;
 use api_core::utils::fp_id_path::FpIdPath;
 use api_wire_types::{AnnotationFilters, CreateAnnotationRequest, UpdateAnnotationRequest};
-use db::models::annotation::Annotation;
-use db::models::annotation::AnnotationInfo;
-use db::models::scoped_vault::ScopedVault;
-use db::models::user_timeline::UserTimeline;
-use db::DbError;
-use newtypes::AnnotationId;
-use newtypes::FpId;
-use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{api_v2_operation, get, patch, post, web};
+use db::{
+    models::{
+        annotation::{Annotation, AnnotationInfo},
+        scoped_vault::ScopedVault,
+        user_timeline::UserTimeline,
+    },
+    DbError,
+};
+use newtypes::{AnnotationId, FpId};
+use paperclip::actix::{api_v2_operation, get, patch, post, web, Apiv2Schema};
 
 type AnnotationsListResponse = Vec<api_wire_types::Annotation>;
 

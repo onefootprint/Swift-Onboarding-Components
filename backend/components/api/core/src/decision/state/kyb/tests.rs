@@ -1,34 +1,32 @@
-use crate::decision::onboarding::Decision;
-use crate::decision::state::actions::WorkflowActions;
-use crate::decision::state::test_utils::{mock_middesk, query_data};
-use crate::decision::state::test_utils::{
-    mock_webhooks, ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged,
+use crate::{
+    decision::{
+        onboarding::Decision,
+        state::{
+            actions::WorkflowActions,
+            kyb,
+            test_utils::{
+                mock_middesk, mock_webhooks, query_data, ExpectedRequiresManualReview, ExpectedStatus,
+                OnboardingCompleted, OnboardingStatusChanged,
+            },
+            Authorize, BoKycCompleted, MakeDecision, MakeVendorCalls, WorkflowKind, WorkflowWrapper,
+        },
+        tests::test_helpers,
+    },
+    errors::ApiResult,
+    State,
 };
-use crate::decision::state::Authorize;
-use crate::decision::state::BoKycCompleted;
-use crate::decision::state::MakeVendorCalls;
-use crate::decision::state::WorkflowKind;
-use crate::decision::state::WorkflowWrapper;
-use crate::decision::state::{kyb, MakeDecision};
-use crate::errors::ApiResult;
-use crate::{decision::tests::test_helpers, State};
 use api_wire_types::TerminalDecisionStatus;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::tenant::Tenant;
-use db::models::workflow::Workflow as DbWorkflow;
-use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
-use db::tests::test_db_pool::TestDbPool;
-use db::tests::MockFFClient;
+use db::{
+    models::{ob_configuration::ObConfiguration, tenant::Tenant, workflow::Workflow as DbWorkflow},
+    tests::{fixtures::ob_configuration::ObConfigurationOpts, test_db_pool::TestDbPool, MockFFClient},
+};
 use feature_flag::BoolFlag;
 use itertools::Itertools;
 use macros::{test_state, test_state_case};
-use newtypes::OnboardingStatus;
-use newtypes::SignalSeverity;
-use newtypes::VendorAPI;
-use newtypes::WorkflowFixtureResult;
-use newtypes::WorkflowState;
-use newtypes::{CollectedDataOption as CDO, KybState};
-use newtypes::{DecisionStatus, FootprintReasonCode};
+use newtypes::{
+    CollectedDataOption as CDO, DecisionStatus, FootprintReasonCode, KybState, OnboardingStatus,
+    SignalSeverity, VendorAPI, WorkflowFixtureResult, WorkflowState,
+};
 
 async fn setup(
     state: &State,

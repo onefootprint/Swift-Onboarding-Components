@@ -12,6 +12,7 @@ pub(crate) struct ExperianSandboxTestCase {
 
 impl std::ops::Deref for ExperianSandboxTestCase {
     type Target = IdvData;
+
     fn deref(&self) -> &Self::Target {
         &self.idv_data
     }

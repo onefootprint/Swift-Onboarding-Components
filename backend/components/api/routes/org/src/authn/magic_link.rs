@@ -1,7 +1,9 @@
-use crate::types::response::ResponseData;
-use crate::utils::magic_link::create_magic_link;
-use crate::State;
-use crate::{errors::ApiError, types::EmptyResponse};
+use crate::{
+    errors::ApiError,
+    types::{response::ResponseData, EmptyResponse},
+    utils::magic_link::create_magic_link,
+    State,
+};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]

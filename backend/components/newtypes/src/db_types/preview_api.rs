@@ -28,6 +28,7 @@ impl_enum_string_diesel!(PreviewApi);
 // Manually implement conversions from string so we can have a save catch-all
 impl ::core::str::FromStr for PreviewApi {
     type Err = ::strum::ParseError;
+
     fn from_str(s: &str) -> ::core::result::Result<PreviewApi, <Self as ::core::str::FromStr>::Err> {
         if let Some(v) = Self::iter().find(|v| v.to_string() == s) {
             Ok(v)
@@ -40,6 +41,7 @@ impl ::core::str::FromStr for PreviewApi {
 
 impl ::core::convert::TryFrom<&str> for PreviewApi {
     type Error = ::strum::ParseError;
+
     fn try_from(
         s: &str,
     ) -> ::core::result::Result<PreviewApi, <Self as ::core::convert::TryFrom<&str>>::Error> {

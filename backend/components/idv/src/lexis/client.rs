@@ -1,8 +1,8 @@
-use crate::footprint_http_client::FootprintVendorHttpClient;
-use crate::lexis::request::LexisRequest;
-use crate::lexis::{self, ReqwestError};
-use newtypes::vendor_credentials::LexisCredentials;
-use newtypes::{IdvData, PiiJsonValue, TenantBusinessInfo};
+use crate::{
+    footprint_http_client::FootprintVendorHttpClient,
+    lexis::{self, request::LexisRequest, ReqwestError},
+};
+use newtypes::{vendor_credentials::LexisCredentials, IdvData, PiiJsonValue, TenantBusinessInfo};
 use reqwest::header;
 use std::time::Duration;
 

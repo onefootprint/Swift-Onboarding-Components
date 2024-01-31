@@ -1,28 +1,23 @@
 use std::collections::HashMap;
 
-use super::data_lifetime::DataLifetime;
-use super::risk_signal::RiskSignal;
-use super::rule_instance::RuleInstance;
-use super::rule_result::NewRuleResult;
-use super::rule_result::RuleResult;
-use super::scoped_vault::ScopedVault;
-use crate::DbResult;
-use crate::PgConn;
-use crate::TxnPgConn;
-use chrono::Duration;
-use chrono::{DateTime, Utc};
-use db_schema::schema::risk_signal;
-use db_schema::schema::scoped_vault;
-use db_schema::schema::workflow;
-use db_schema::schema::{rule_set_result, rule_set_result_risk_signal_junction};
-use diesel::dsl::not;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
+use super::{
+    data_lifetime::DataLifetime,
+    risk_signal::RiskSignal,
+    rule_instance::RuleInstance,
+    rule_result::{NewRuleResult, RuleResult},
+    scoped_vault::ScopedVault,
+};
+use crate::{DbResult, PgConn, TxnPgConn};
+use chrono::{DateTime, Duration, Utc};
+use db_schema::schema::{
+    risk_signal, rule_set_result, rule_set_result_risk_signal_junction, scoped_vault, workflow,
+};
+use diesel::{dsl::not, prelude::*, Insertable, Queryable};
 use itertools::Itertools;
-use newtypes::RuleInstanceId;
-use newtypes::RuleSetResultKind;
-use newtypes::ScopedVaultId;
-use newtypes::{DataLifetimeSeqno, ObConfigurationId, RiskSignalId, RuleAction, RuleSetResultId, WorkflowId};
+use newtypes::{
+    DataLifetimeSeqno, ObConfigurationId, RiskSignalId, RuleAction, RuleInstanceId, RuleSetResultId,
+    RuleSetResultKind, ScopedVaultId, WorkflowId,
+};
 
 #[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = rule_set_result)]
@@ -206,12 +201,17 @@ impl RuleSetResult {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::models::rule_instance::RuleInstance;
-    use crate::models::scoped_vault::ScopedVault;
-    use crate::models::workflow::{Workflow, WorkflowUpdate};
-    use crate::models::{ob_configuration::ObConfiguration, risk_signal::RiskSignal};
-    use crate::test_helpers::assert_have_same_elements;
-    use crate::tests::prelude::*;
+    use crate::{
+        models::{
+            ob_configuration::ObConfiguration,
+            risk_signal::RiskSignal,
+            rule_instance::RuleInstance,
+            scoped_vault::ScopedVault,
+            workflow::{Workflow, WorkflowUpdate},
+        },
+        test_helpers::assert_have_same_elements,
+        tests::prelude::*,
+    };
     use fixtures::ob_configuration::ObConfigurationOpts;
     use macros::db_test;
     use newtypes::{

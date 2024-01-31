@@ -1,20 +1,26 @@
-use crate::errors::ApiResult;
-use crate::types::{EmptyResponse, JsonApiResponse};
-use crate::utils::email::send_email_challenge;
-use crate::utils::headers::AllowExtraFieldsHeaders;
-use crate::utils::vault_wrapper::VaultWrapper;
-use crate::State;
-use api_core::auth::user::{UserAuthContext, UserAuthGuard, UserWfAuthContext};
-use api_core::auth::AuthError;
-use api_core::utils::vault_wrapper::{Any, Person, VwArgs};
-use db::models::document_request::{DocumentRequest, NewDocumentRequestArgs};
-use db::models::ob_configuration::ObConfiguration;
-use db::models::tenant::Tenant;
-use db::models::vault::Vault;
-use db::models::workflow::Workflow;
-use newtypes::email::Email;
-use newtypes::put_data_request::{PatchDataRequest, RawDataRequest};
+use crate::{
+    errors::ApiResult,
+    types::{EmptyResponse, JsonApiResponse},
+    utils::{email::send_email_challenge, headers::AllowExtraFieldsHeaders, vault_wrapper::VaultWrapper},
+    State,
+};
+use api_core::{
+    auth::{
+        user::{UserAuthContext, UserAuthGuard, UserWfAuthContext},
+        AuthError,
+    },
+    utils::vault_wrapper::{Any, Person, VwArgs},
+};
+use db::models::{
+    document_request::{DocumentRequest, NewDocumentRequestArgs},
+    ob_configuration::ObConfiguration,
+    tenant::Tenant,
+    vault::Vault,
+    workflow::Workflow,
+};
 use newtypes::{
+    email::Email,
+    put_data_request::{PatchDataRequest, RawDataRequest},
     DataIdentifier, DataLifetimeSource, DocumentRequestKind, IdentityDataKind as IDK,
     Iso3166TwoDigitCountryCode, ScopedVaultId, ValidateArgs, WorkflowGuard, WorkflowId,
 };

@@ -1,8 +1,6 @@
-use crate::auth::user::UserAuthGuard;
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
+use crate::{
+    auth::user::UserAuthGuard, errors::ApiError, types::response::ResponseData, utils::db2api::DbToApi, State,
+};
 use api_core::{auth::user::UserWfAuthContext, utils::requirements::GetRequirementsArgs};
 use api_wire_types::hosted::onboarding_status::{ApiOnboardingRequirement, OnboardingStatusResponse};
 use itertools::Itertools;

@@ -1,20 +1,13 @@
-use crate::{DbError, DbResult, OffsetPagination, TxnPgConn};
-use crate::{NextPage, PgConn};
+use crate::{DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::tenant_api_key;
-use db_schema::schema::tenant_api_key::BoxedQuery;
-use db_schema::schema::tenant_role;
-use diesel::pg::Pg;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
+use db_schema::schema::{tenant_api_key, tenant_api_key::BoxedQuery, tenant_role};
+use diesel::{pg::Pg, prelude::*, Insertable, Queryable};
 use newtypes::{
     ApiKeyStatus, Fingerprint, SealedVaultBytes, TenantApiKeyId, TenantId, TenantRoleId,
     TenantRoleKindDiscriminant,
 };
 
-use super::ob_configuration::IsLive;
-use super::tenant::Tenant;
-use super::tenant_role::TenantRole;
+use super::{ob_configuration::IsLive, tenant::Tenant, tenant_role::TenantRole};
 
 #[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = tenant_api_key)]

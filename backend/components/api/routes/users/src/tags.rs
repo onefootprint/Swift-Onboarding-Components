@@ -1,22 +1,24 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantGuard;
-use crate::State;
-use api_core::auth::tenant::SecretTenantAuthContext;
-use api_core::errors::ApiResult;
-use api_core::types::EmptyResponse;
-use api_core::types::JsonApiResponse;
-use api_core::types::ResponseData;
-use api_core::utils::db2api::DbToApi;
-use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::fp_id_path::FpIdPathPlus;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard},
+    State,
+};
+use api_core::{
+    auth::tenant::SecretTenantAuthContext,
+    errors::ApiResult,
+    types::{EmptyResponse, JsonApiResponse, ResponseData},
+    utils::{
+        db2api::DbToApi,
+        fp_id_path::{FpIdPath, FpIdPathPlus},
+    },
+};
 use api_wire_types::CreateTagRequest;
 use chrono::Utc;
-use db::models::data_lifetime::DataLifetime;
-use db::models::scoped_vault::ScopedVault;
-use db::models::scoped_vault_tag::NewScopedVaultTag;
-use db::models::scoped_vault_tag::ScopedVaultTag;
-use newtypes::PreviewApi;
-use newtypes::TagId;
+use db::models::{
+    data_lifetime::DataLifetime,
+    scoped_vault::ScopedVault,
+    scoped_vault_tag::{NewScopedVaultTag, ScopedVaultTag},
+};
+use newtypes::{PreviewApi, TagId};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(description = "Tag a user", tags(Users, Preview))]

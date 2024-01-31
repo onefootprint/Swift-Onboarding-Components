@@ -3,28 +3,26 @@ use std::sync::Arc;
 
 use super::tenant_vendor_control::TenantVendorControl;
 
-use super::vendor_trait::VendorAPIResponse;
-use super::*;
-use crate::vendor_clients::VendorClient;
-use crate::{errors::ApiError, State};
-use db::models::vault::Vault;
-use db::models::verification_result::VerificationResult;
+use super::{vendor_trait::VendorAPIResponse, *};
+use crate::{errors::ApiError, vendor_clients::VendorClient, State};
 use db::{
     models::{
         insight_event::InsightEvent, ob_configuration::ObConfiguration,
-        socure_device_session::SocureDeviceSession, verification_request::VerificationRequest,
+        socure_device_session::SocureDeviceSession, vault::Vault, verification_request::VerificationRequest,
+        verification_result::VerificationResult,
     },
     DbError,
 };
 use feature_flag::{BoolFlag, FeatureFlagClient};
-use idv::experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse};
-use idv::idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest};
-use idv::lexis::client::{LexisFlexIdRequest, LexisFlexIdResponse};
-use idv::socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest};
-use idv::twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request};
-use idv::{idology::expectid::response::ExpectIDResponse, ParsedResponse, VendorResponse};
+use idv::{
+    experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse},
+    idology::{expectid::response::ExpectIDResponse, IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
+    lexis::client::{LexisFlexIdRequest, LexisFlexIdResponse},
+    socure::{SocureIDPlusAPIResponse, SocureIDPlusRequest},
+    twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
+    ParsedResponse, VendorResponse,
+};
 use newtypes::{IdvData, ObConfigurationKey, PiiString, VendorAPI, WorkflowId};
-
 
 
 // For a given vendor_api, saves a vreq, populates IdvData from user's vault, makes the API call, and returns the success or error response
@@ -36,15 +34,13 @@ pub async fn make_idv_vendor_call_save_vreq_vres(
     di_id: &DecisionIntentId,
     ob_configuration_key: ObConfigurationKey,
     vendor_api: VendorAPI,
-) -> ApiResult<(VerificationRequest, VerificationResult, Result<VendorResponse, VendorAPIError>)> {
-    let (vreq, vendor_result) = make_idv_vendor_call_save_vreq(
-        state,
-        tvc,
-        sv_id,
-        di_id,
-        ob_configuration_key,
-        vendor_api,
-    ).await?;
+) -> ApiResult<(
+    VerificationRequest,
+    VerificationResult,
+    Result<VendorResponse, VendorAPIError>,
+)> {
+    let (vreq, vendor_result) =
+        make_idv_vendor_call_save_vreq(state, tvc, sv_id, di_id, ob_configuration_key, vendor_api).await?;
 
     if let Err(err) = vendor_result.as_ref() {
         tracing::error!(?err, "Error making vendor call");
@@ -52,16 +48,14 @@ pub async fn make_idv_vendor_call_save_vreq_vres(
 
     let sv_id = sv_id.clone();
     let v_req: VerificationRequest = vreq.clone();
-    let (vres, vendor_result) = state.db_pool.db_query(move |conn| -> ApiResult<_>{
-        let uv = Vault::get(conn, &sv_id)?;
-        let vres = verification_result::save_vres(
-            conn,
-            &uv.public_key,
-            &vendor_result,
-            &v_req,
-        )?;
-        Ok((vres, vendor_result))
-    }).await??;
+    let (vres, vendor_result) = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            let uv = Vault::get(conn, &sv_id)?;
+            let vres = verification_result::save_vres(conn, &uv.public_key, &vendor_result, &v_req)?;
+            Ok((vres, vendor_result))
+        })
+        .await??;
 
     Ok((vreq, vres, vendor_result))
 }
@@ -78,31 +72,35 @@ pub async fn make_idv_vendor_call_save_vreq(
 ) -> ApiResult<(VerificationRequest, Result<VendorResponse, VendorAPIError>)> {
     let sv_id = sv_id.clone();
     let di_id = di_id.clone();
-    let vreq = state.db_pool.db_query(move |conn| {
-        VerificationRequest::create(
-            conn,
-            &sv_id,
-            &di_id,
-            vendor_api,
-        )
-    }).await??;
+    let vreq = state
+        .db_pool
+        .db_query(move |conn| VerificationRequest::create(conn, &sv_id, &di_id, vendor_api))
+        .await??;
 
     let idv_data = build_request::build_idv_data_from_verification_request(
         &state.db_pool,
         &state.enclave_client,
         vreq.clone(),
-    ).await?;
+    )
+    .await?;
 
-    let socure_data = SocureData {device_session_id: None, ip_address: None }; // TODO: rm socure from send_idv_request- we aren't using any more and SocureData is annoying
+    let socure_data = SocureData {
+        device_session_id: None,
+        ip_address: None,
+    }; // TODO: rm socure from send_idv_request- we aren't using any more and SocureData is annoying
 
-    Ok((vreq, send_idv_request(
-        state,
-        tvc,
-        vendor_api,
-        idv_data,
-        socure_data,
-        ob_configuration_key,
-    ).await))
+    Ok((
+        vreq,
+        send_idv_request(
+            state,
+            tvc,
+            vendor_api,
+            idv_data,
+            socure_data,
+            ob_configuration_key,
+        )
+        .await,
+    ))
 }
 
 #[tracing::instrument(skip(state, tvc, idv_data, socure_data))]
@@ -128,7 +126,9 @@ pub async fn send_idv_request(
             )
             .await
         }
-        VendorAPI::TwilioLookupV2 => send_twilio_lookupv2_request(idv_data, state.vendor_clients.twilio_lookup_v2.clone()).await,
+        VendorAPI::TwilioLookupV2 => {
+            send_twilio_lookupv2_request(idv_data, state.vendor_clients.twilio_lookup_v2.clone()).await
+        }
         VendorAPI::SocureIdPlus => {
             send_socure_idv_request(
                 idv_data,
@@ -155,14 +155,23 @@ pub async fn send_idv_request(
             let credentials = tvc.lexis_credentials();
             if let Some(tbi) = tvc.tenant_business_info() {
                 send_lexis_flex_id_request(
-                    LexisFlexIdRequest { idv_data, credentials, tenant_identifier: tvc.tenant_identifier(), tbi },
+                    LexisFlexIdRequest {
+                        idv_data,
+                        credentials,
+                        tenant_identifier: tvc.tenant_identifier(),
+                        tbi,
+                    },
                     is_production,
                     ob_configuration_key,
                     state.vendor_clients.lexis_flex_id.clone(),
                     state.feature_flag_client.clone(),
-                ).await
-            } else { // shouldn't be possible since we check tvc.enabled_vendor_apis before attempting this function and that takes the presence of TBI into account
-                Err(idv::Error::AssertionError("Missing tenant_business_info".to_owned()))
+                )
+                .await
+            } else {
+                // shouldn't be possible since we check tvc.enabled_vendor_apis before attempting this function and that takes the presence of TBI into account
+                Err(idv::Error::AssertionError(
+                    "Missing tenant_business_info".to_owned(),
+                ))
             }
         }
         api => {
@@ -170,10 +179,7 @@ pub async fn send_idv_request(
             Err(idv::Error::AssertionError(err))
         }
     }
-    .map_err(|e| VendorAPIError {
-        vendor_api,
-        error: e,
-    })
+    .map_err(|e| VendorAPIError { vendor_api, error: e })
 }
 
 
@@ -324,11 +330,7 @@ pub async fn send_lexis_flex_id_request(
     request: LexisFlexIdRequest,
     is_production: bool,
     ob_configuration_key: ObConfigurationKey,
-    client: VendorClient<
-        LexisFlexIdRequest,
-        LexisFlexIdResponse,
-        idv::lexis::Error,
-    >,
+    client: VendorClient<LexisFlexIdRequest, LexisFlexIdResponse, idv::lexis::Error>,
     ff_client: Arc<dyn FeatureFlagClient>,
 ) -> Result<VendorResponse, idv::Error> {
     if is_production || ff_client.flag(BoolFlag::EnableLexisInNonProd(&ob_configuration_key)) {
@@ -356,7 +358,8 @@ pub async fn send_lexis_flex_id_request(
 
 /// Make our requests to a vendor, building data from the cached VerificationRequest
 #[tracing::instrument(skip_all)]
-pub async fn make_idv_request( // TODO: really no need to have this and send_idv_request
+pub async fn make_idv_request(
+    // TODO: really no need to have this and send_idv_request
     state: &State,
     tvc: &TenantVendorControl,
     vendor_api: VendorAPI,
@@ -403,15 +406,16 @@ pub async fn make_vendor_requests(
 
     let wfid = wf_id.clone();
 
-    let (socure_device_session_id, ip_address, obc_key) = state.db_pool
+    let (socure_device_session_id, ip_address, obc_key) = state
+        .db_pool
         .db_query(
             move |conn| -> Result<(Option<String>, Option<PiiString>, ObConfigurationKey), DbError> {
                 let socure_device_session_id =
                     SocureDeviceSession::latest(conn, &wfid)?.map(|d| d.device_session_id);
 
                 // TODO this is stale
-                let ip_address = InsightEvent::get(conn, &wfid)?
-                    .and_then(|ie| ie.ip_address.map(PiiString::from));
+                let ip_address =
+                    InsightEvent::get(conn, &wfid)?.and_then(|ie| ie.ip_address.map(PiiString::from));
 
                 let obc_key = ObConfiguration::get(conn, &wfid)?.0.key;
 
@@ -427,7 +431,13 @@ pub async fn make_vendor_requests(
         (
             r.clone(),
             make_idv_request(
-                state, &tvc, r.vendor_api, data, socure_data.clone(), obc_key.clone(), wf_id
+                state,
+                &tvc,
+                r.vendor_api,
+                data,
+                socure_data.clone(),
+                obc_key.clone(),
+                wf_id,
             ),
         )
     });
@@ -466,7 +476,7 @@ mod tests {
     use crate::decision::vendor::vendor_trait::MockVendorAPICall;
     use db::tests::MockFFClient;
     use idv::idology::{
-        expectid::{response::ExpectIDResponse, response::Response},
+        expectid::response::{ExpectIDResponse, Response},
         IdologyExpectIDAPIResponse,
     };
     use newtypes::PiiJsonValue;
@@ -495,8 +505,8 @@ mod tests {
         let ob_config_key = ob_configuration_key.clone();
         mock_ff_client.mock(|c| {
             c.expect_flag()
-            .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
-            .return_once(move |_| flag_value);
+                .withf(move |f| *f == BoolFlag::EnableIdologyInNonProd(&ob_config_key))
+                .return_once(move |_| flag_value);
         });
 
         if expect_api_call {

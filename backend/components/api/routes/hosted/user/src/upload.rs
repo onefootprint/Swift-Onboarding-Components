@@ -1,9 +1,10 @@
-use crate::auth::user::UserAuthGuard;
-use crate::errors::{ApiError, ApiResult};
-use crate::types::response::{EmptyResponse, ResponseData};
-use crate::utils::vault_wrapper::VaultWrapper;
-use crate::utils::{self, file_upload};
-use crate::State;
+use crate::{
+    auth::user::UserAuthGuard,
+    errors::{ApiError, ApiResult},
+    types::response::{EmptyResponse, ResponseData},
+    utils::{self, file_upload, vault_wrapper::VaultWrapper},
+    State,
+};
 use actix_multipart::Multipart;
 use actix_web::HttpRequest;
 use api_core::auth::user::UserWfAuthContext;

@@ -1,8 +1,7 @@
 use crate::{DbError, DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::tenant_frequent_note;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
+use diesel::{prelude::*, Insertable, Queryable};
 use newtypes::{DbActor, TenantFrequentNoteId, TenantFrequentNoteKind, TenantId};
 
 #[derive(Debug, Clone, Queryable)]

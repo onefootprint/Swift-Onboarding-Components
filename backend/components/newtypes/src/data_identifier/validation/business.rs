@@ -1,11 +1,11 @@
-use super::utils::{self, validate_state};
-use super::{Error, VResult};
-use crate::email::Email;
-use crate::{
-    AllData, BoLinkId, BusinessDataKind as BDK, BusinessOwnerKind, DataIdentifier, PhoneNumber, PiiJsonValue,
-    PiiString, ValidateArgs,
+use super::{
+    utils::{self, validate_state},
+    Error, VResult,
 };
-use crate::{NtResult, Validate};
+use crate::{
+    email::Email, AllData, BoLinkId, BusinessDataKind as BDK, BusinessOwnerKind, DataIdentifier, NtResult,
+    PhoneNumber, PiiJsonValue, PiiString, Validate, ValidateArgs,
+};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use serde_with::DeserializeFromStr;
@@ -182,12 +182,8 @@ fn clean_and_validate_website(input: PiiString) -> VResult<PiiString> {
 mod test {
     use std::collections::HashMap;
 
-    use super::KycedBusinessOwnerData;
-    use super::BDK::*;
-    use crate::BusinessDataKind as BDK;
-    use crate::PiiJsonValue;
-    use crate::Validate;
-    use crate::ValidateArgs;
+    use super::{KycedBusinessOwnerData, BDK::*};
+    use crate::{BusinessDataKind as BDK, PiiJsonValue, Validate, ValidateArgs};
     use serde_json::json;
     use test_case::test_case;
 

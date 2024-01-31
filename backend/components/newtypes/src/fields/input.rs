@@ -1,10 +1,10 @@
-use crate::api_schema_helper::string_api_data_type_alias;
-use crate::{DataIdentifier, TenantRoleId, TenantScope};
+use crate::{api_schema_helper::string_api_data_type_alias, DataIdentifier, TenantRoleId, TenantScope};
 use derive_more::Deref;
 
-use serde::de::IntoDeserializer;
-use serde::de::{self, DeserializeOwned};
-use serde::Deserialize;
+use serde::{
+    de::{self, DeserializeOwned, IntoDeserializer},
+    Deserialize,
+};
 
 /// Represents a comma-separated list of type `T` with a Deserialize implementation.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Deserialize, Default, Deref)]
@@ -13,9 +13,8 @@ where
     T: DeserializeOwned;
 
 impl<T: DeserializeOwned> IntoIterator for Csv<T> {
-    type Item = T;
-
     type IntoIter = std::vec::IntoIter<T>;
+    type Item = T;
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter()
@@ -50,8 +49,7 @@ where
 mod tests {
     use super::Csv;
 
-    use crate::DataIdentifier;
-    use crate::IdentityDataKind as IDK;
+    use crate::{DataIdentifier, IdentityDataKind as IDK};
     #[test]
     fn test_data_kinds() {
         #[derive(serde::Deserialize)]

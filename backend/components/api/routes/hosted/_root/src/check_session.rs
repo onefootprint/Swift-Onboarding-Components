@@ -1,5 +1,4 @@
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
+use crate::{errors::ApiError, types::response::ResponseData};
 
 use crate::State;
 use api_core::auth::session::check::CheckSessionContext;

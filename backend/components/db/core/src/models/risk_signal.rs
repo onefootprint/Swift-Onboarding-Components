@@ -1,19 +1,12 @@
-use crate::DbResult;
-use crate::PgConn;
-use crate::TxnPgConn;
+use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::risk_signal;
-use db_schema::schema::risk_signal_group;
-use db_schema::schema::scoped_vault;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
+use db_schema::schema::{risk_signal, risk_signal_group, scoped_vault};
+use diesel::{prelude::*, Insertable, Queryable};
 use itertools::Itertools;
-use newtypes::RiskSignalGroupId;
-use newtypes::RiskSignalGroupKind;
-use newtypes::ScopedVaultId;
-use newtypes::VendorAPI;
-use newtypes::VerificationResultId;
-use newtypes::{FootprintReasonCode, FpId, OnboardingDecisionId, RiskSignalId, TenantId};
+use newtypes::{
+    FootprintReasonCode, FpId, OnboardingDecisionId, RiskSignalGroupId, RiskSignalGroupKind, RiskSignalId,
+    ScopedVaultId, TenantId, VendorAPI, VerificationResultId,
+};
 use std::collections::HashMap;
 #[cfg(test)]
 use std::str::FromStr;
@@ -320,21 +313,21 @@ enum NewRiskSignals {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::models::decision_intent::DecisionIntent;
-    use crate::models::onboarding_decision::NewDecisionArgs;
-    use crate::models::onboarding_decision::OnboardingDecision;
-    use crate::models::scoped_vault::ScopedVault;
-    use crate::models::verification_request::VerificationRequest;
-    use crate::models::verification_result::VerificationResult;
-    use crate::models::workflow::Workflow;
-    use crate::models::workflow::WorkflowUpdate;
-    use crate::test_helpers::assert_have_same_elements;
-    use crate::tests::fixtures;
-    use crate::tests::prelude::*;
+    use crate::{
+        models::{
+            decision_intent::DecisionIntent,
+            onboarding_decision::{NewDecisionArgs, OnboardingDecision},
+            scoped_vault::ScopedVault,
+            verification_request::VerificationRequest,
+            verification_result::VerificationResult,
+            workflow::{Workflow, WorkflowUpdate},
+        },
+        test_helpers::assert_have_same_elements,
+        tests::{fixtures, prelude::*},
+    };
     use itertools::Itertools;
     use macros::db_test_case;
-    use newtypes::DecisionIntentKind;
-    use newtypes::{DbActor, DecisionIntentId, DecisionStatus, ScopedVaultId};
+    use newtypes::{DbActor, DecisionIntentId, DecisionIntentKind, DecisionStatus, ScopedVaultId};
     use serde_json::json;
 
     fn setup(conn: &mut TestPgConn) -> (ScopedVault, DecisionIntent, Workflow) {

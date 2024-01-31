@@ -1,6 +1,8 @@
-use crate::auth::user::{UserAuthContext, UserAuthGuard};
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
+use crate::{
+    auth::user::{UserAuthContext, UserAuthGuard},
+    errors::ApiError,
+    types::response::ResponseData,
+};
 use api_core::auth::Any;
 use chrono::{DateTime, Utc};
 use paperclip::actix::{self, api_v2_operation, web::Json, Apiv2Schema};

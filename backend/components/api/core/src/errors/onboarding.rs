@@ -1,6 +1,6 @@
-use newtypes::{output::Csv, CollectedDataOption};
 use newtypes::{
-    IdDocKind, Iso3166TwoDigitCountryCode, ObConfigurationKind, OnboardingRequirementKind, WorkflowId,
+    output::Csv, CollectedDataOption, IdDocKind, Iso3166TwoDigitCountryCode, ObConfigurationKind,
+    OnboardingRequirementKind, WorkflowId,
 };
 use thiserror::Error;
 

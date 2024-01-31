@@ -1,9 +1,5 @@
-use crate::auth::user::UserAuthGuard;
-use crate::types::response::ResponseData;
-use api_core::auth::user::UserWfAuthContext;
-use api_core::decision;
-use api_core::types::JsonApiResponse;
-use api_core::State;
+use crate::{auth::user::UserAuthGuard, types::response::ResponseData};
+use api_core::{auth::user::UserWfAuthContext, decision, types::JsonApiResponse, State};
 use api_wire_types::DocumentResponse;
 use newtypes::{IdentityDocumentId, WorkflowGuard};
 use paperclip::actix::{self, api_v2_operation, web};

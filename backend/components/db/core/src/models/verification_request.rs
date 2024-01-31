@@ -1,17 +1,13 @@
-use crate::DbResult;
-use crate::PgConn;
+use crate::{DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{scoped_vault, vault, verification_request, verification_result};
-use diesel::prelude::*;
-use diesel::Insertable;
+use diesel::{prelude::*, Insertable};
 use newtypes::{
     DataLifetimeSeqno, DecisionIntentId, IdentityDocumentId, ScopedVaultId, Vendor, VendorAPI,
     VerificationRequestId,
 };
 
-use super::data_lifetime::DataLifetime;
-use super::vault::Vault;
-use super::verification_result::VerificationResult;
+use super::{data_lifetime::DataLifetime, vault::Vault, verification_result::VerificationResult};
 
 #[derive(Debug, Clone, Queryable, Identifiable)]
 #[diesel(table_name = verification_request)]
@@ -225,12 +221,11 @@ impl VerificationRequest {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::models::decision_intent::DecisionIntent;
-    use crate::test_helpers::assert_have_same_elements;
-    use crate::tests::prelude::*;
+    use crate::{
+        models::decision_intent::DecisionIntent, test_helpers::assert_have_same_elements, tests::prelude::*,
+    };
     use macros::db_test_case;
-    use newtypes::DecisionIntentKind;
-    use newtypes::VerificationResultId;
+    use newtypes::{DecisionIntentKind, VerificationResultId};
     use std::str::FromStr;
 
     enum VresType {

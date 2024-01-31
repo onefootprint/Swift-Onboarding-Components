@@ -1,19 +1,11 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext};
 
 use crate::errors::ApiResult;
 
-use crate::proxy;
-use crate::proxy::token_parser::ProxyTokenParser;
-use crate::utils::headers::InsightHeaders;
-use crate::State;
+use crate::{proxy, proxy::token_parser::ProxyTokenParser, utils::headers::InsightHeaders, State};
 
-use api_core::api_headers_schema;
-use api_core::auth::CanDecrypt;
-use api_core::utils::body_bytes::BodyBytes;
-use api_core::ApiErrorKind;
-use newtypes::AccessEventPurpose;
-use newtypes::FpId;
+use api_core::{api_headers_schema, auth::CanDecrypt, utils::body_bytes::BodyBytes, ApiErrorKind};
+use newtypes::{AccessEventPurpose, FpId};
 use paperclip::actix::{api_v2_operation, post, web, web::HttpResponse};
 use reqwest::StatusCode;
 

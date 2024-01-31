@@ -1,13 +1,16 @@
 use std::collections::HashMap;
 
-use crate::decision::vendor::{
-    get_vendor_apis_for_verification_requests, kyc, make_request,
-    tenant_vendor_control::TenantVendorControl,
-    vendor_result::{HydratedVerificationResult, RequestAndMaybeHydratedResult, VendorResult},
-    VendorAPIError,
-};
 use crate::{
-    decision::{self, rule_engine::eval::Rule},
+    decision::{
+        self,
+        rule_engine::eval::Rule,
+        vendor::{
+            get_vendor_apis_for_verification_requests, kyc, make_request,
+            tenant_vendor_control::TenantVendorControl,
+            vendor_result::{HydratedVerificationResult, RequestAndMaybeHydratedResult, VendorResult},
+            VendorAPIError,
+        },
+    },
     errors::ApiResult,
     utils::vault_wrapper::{Any, VaultWrapper, VwArgs},
     ApiErrorKind, State,
@@ -364,15 +367,14 @@ enum WaterfallRuleConfig {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::decision::state::test_utils;
-    use crate::decision::state::test_utils::WithSsnResultCode;
-    use db::models::tenant_vendor::TenantVendorControl as DbTenantVendorControl;
-    use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
-    use db::tests::MockFFClient;
+    use crate::decision::state::{test_utils, test_utils::WithSsnResultCode};
+    use db::{
+        models::tenant_vendor::TenantVendorControl as DbTenantVendorControl,
+        tests::{fixtures::ob_configuration::ObConfigurationOpts, MockFFClient},
+    };
     use idv::ParsedResponse;
     use macros::test_state_case;
-    use newtypes::DecisionIntentKind;
-    use newtypes::Vendor;
+    use newtypes::{DecisionIntentKind, Vendor};
 
     struct ExperianEnabled(bool);
     struct IdologyEnabled(bool);

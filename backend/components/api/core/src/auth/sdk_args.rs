@@ -3,11 +3,13 @@ use std::sync::Arc;
 use db::PgConn;
 use paperclip::actix::Apiv2Security;
 
-use crate::auth::{
-    session::{AuthSessionData, ExtractableAuthSession, RequestInfo},
-    SessionContext,
+use crate::{
+    auth::{
+        session::{AuthSessionData, ExtractableAuthSession, RequestInfo},
+        AuthError, SessionContext,
+    },
+    errors::ApiError,
 };
-use crate::{auth::AuthError, errors::ApiError};
 use feature_flag::FeatureFlagClient;
 
 use super::session::sdk_args::SdkArgsData;

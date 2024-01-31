@@ -35,6 +35,7 @@ impl From<BusinessDataKind> for DataIdentifier {
 
 impl TryFrom<DataIdentifier> for BusinessDataKind {
     type Error = crate::Error;
+
     fn try_from(value: DataIdentifier) -> Result<Self, Self::Error> {
         match value {
             DataIdentifier::Business(bdk) => Ok(bdk),

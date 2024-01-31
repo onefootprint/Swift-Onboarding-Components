@@ -1,27 +1,21 @@
 use super::{Any, Business, VaultWrapper, WriteableVw};
-use crate::utils::vault_wrapper::Person;
-use crate::utils::vault_wrapper::VwArgs;
-use db::models::data_lifetime::DataLifetime;
-use db::models::user_timeline::UserTimeline;
-use db::models::vault_data::NewVaultData;
-use db::models::vault_data::VaultData;
-use db::tests::fixtures;
-use db::tests::prelude::*;
+use crate::utils::vault_wrapper::{Person, VwArgs};
+use db::{
+    models::{
+        data_lifetime::DataLifetime,
+        user_timeline::UserTimeline,
+        vault_data::{NewVaultData, VaultData},
+    },
+    tests::{fixtures, prelude::*},
+};
 use itertools::Itertools;
 use macros::db_test;
-use newtypes::DataIdentifier;
-use newtypes::DataLifetimeSource;
-use newtypes::DocumentKind;
-use newtypes::IdentityDataKind as IDK;
-use newtypes::KvDataKey;
-use newtypes::PiiString;
-use newtypes::S3Url;
-use newtypes::VaultDataFormat;
 use newtypes::{
-    BusinessDataKind as BDK, DocumentSide, IdDocKind, InvestorProfileKind as IPK, SealedVaultBytes,
+    BusinessDataKind as BDK, DataIdentifier, DataLifetimeSource, DocumentKind, DocumentSide, IdDocKind,
+    IdentityDataKind as IDK, InvestorProfileKind as IPK, KvDataKey, PiiString, S3Url, SealedVaultBytes,
+    VaultDataFormat,
 };
-use std::collections::HashSet;
-use std::str::FromStr;
+use std::{collections::HashSet, str::FromStr};
 
 #[db_test]
 fn test_build_user_vault_wrapper(conn: &mut TestPgConn) {

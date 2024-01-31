@@ -1,8 +1,11 @@
-use crate::enclave_client::EnclaveClient;
-use crate::{config::Config, decision::vendor::tenant_vendor_control::TenantVendorControl, State};
-use db::tests::test_db_pool::TestDbPool;
-use db::DbResult;
-use db::{models::tenant_vendor::TenantVendorControl as DbTenantVendorControl, DbPool};
+use crate::{
+    config::Config, decision::vendor::tenant_vendor_control::TenantVendorControl,
+    enclave_client::EnclaveClient, State,
+};
+use db::{
+    models::tenant_vendor::TenantVendorControl as DbTenantVendorControl, tests::test_db_pool::TestDbPool,
+    DbPool, DbResult,
+};
 use macros::test_state;
 use newtypes::{
     vendor_credentials::{ExperianCredentialBuilder, ExperianCredentials, IdologyCredentials},

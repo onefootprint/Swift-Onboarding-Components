@@ -1,10 +1,10 @@
 use crate::{ProtectedAuth, State};
-use actix_web::patch;
-use actix_web::web;
-use api_core::decision::rule_engine;
-use api_core::errors::ApiResult;
-use api_core::types::EmptyResponse;
-use api_core::types::JsonApiResponse;
+use actix_web::{patch, web};
+use api_core::{
+    decision::rule_engine,
+    errors::ApiResult,
+    types::{EmptyResponse, JsonApiResponse},
+};
 use db::models::ob_configuration::ObConfiguration;
 use newtypes::ObConfigurationId;
 

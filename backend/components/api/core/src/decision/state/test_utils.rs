@@ -1,46 +1,52 @@
 use std::sync::Arc;
 
-use crate::decision::features::risk_signals::risk_signal_group_struct::Doc;
-use crate::decision::features::risk_signals::{save_risk_signals, RiskSignalGroupStruct};
-use crate::decision::vendor;
-use crate::decision::vendor::vendor_trait::MockVendorAPICall;
-use crate::errors::ApiResult;
-use crate::ApiError;
-use crate::{decision::tests::test_helpers, State};
-use db::models::decision_intent::DecisionIntent;
-use db::models::document_request::{DocumentRequest, NewDocumentRequestArgs};
-use db::models::manual_review::ManualReview;
-use db::models::onboarding_decision::OnboardingDecision;
-use db::models::risk_signal::{IncludeHidden, RiskSignal};
-use db::models::vault::Vault;
-use db::models::verification_request::VerificationRequest;
-use db::models::verification_result::VerificationResult;
-use db::models::workflow_event::WorkflowEvent;
-use db::models::{
-    ob_configuration::ObConfiguration, tenant::Tenant, tenant_user::TenantUser,
-    tenant_vendor::TenantVendorControl, workflow::Workflow,
+use crate::{
+    decision::{
+        features::risk_signals::{risk_signal_group_struct::Doc, save_risk_signals, RiskSignalGroupStruct},
+        tests::test_helpers,
+        vendor,
+        vendor::vendor_trait::MockVendorAPICall,
+    },
+    errors::ApiResult,
+    ApiError, State,
 };
-use db::tests::fixtures;
-use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
-use db::TxnPgConn;
-use idv::experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse};
-use idv::idology::IdologyExpectIDAPIResponse;
-use idv::idology::IdologyExpectIDRequest;
-use idv::incode::response::OnboardingStartResponse;
+use db::{
+    models::{
+        decision_intent::DecisionIntent,
+        document_request::{DocumentRequest, NewDocumentRequestArgs},
+        manual_review::ManualReview,
+        ob_configuration::ObConfiguration,
+        onboarding_decision::OnboardingDecision,
+        risk_signal::{IncludeHidden, RiskSignal},
+        tenant::Tenant,
+        tenant_user::TenantUser,
+        tenant_vendor::TenantVendorControl,
+        vault::Vault,
+        verification_request::VerificationRequest,
+        verification_result::VerificationResult,
+        workflow::Workflow,
+        workflow_event::WorkflowEvent,
+    },
+    tests::{fixtures, fixtures::ob_configuration::ObConfigurationOpts},
+    TxnPgConn,
+};
+use idv::{
+    experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse},
+    idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
+    incode::response::OnboardingStartResponse,
+};
 
-use idv::incode::IncodeResponse;
-use idv::incode::IncodeStartOnboardingRequest;
-use idv::middesk::{MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse};
-use idv::twilio::TwilioLookupV2APIResponse;
-use idv::twilio::TwilioLookupV2Request;
-use newtypes::{
-    DecisionIntentKind, DocumentRequestKind, FootprintReasonCode, RiskSignalGroupKind, ScopedVaultId,
-    VendorAPI, WorkflowFixtureResult, WorkflowId,
+use idv::{
+    incode::{IncodeResponse, IncodeStartOnboardingRequest},
+    middesk::{MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse},
+    twilio::{TwilioLookupV2APIResponse, TwilioLookupV2Request},
 };
-use newtypes::{OnboardingStatus, PiiJsonValue};
+use newtypes::{
+    DecisionIntentKind, DocumentRequestKind, FootprintReasonCode, OnboardingStatus, PiiJsonValue,
+    RiskSignalGroupKind, ScopedVaultId, VendorAPI, WorkflowFixtureResult, WorkflowId,
+};
 use strum_macros::EnumIter;
-use webhooks::events::WebhookEvent;
-use webhooks::MockWebhookClient;
+use webhooks::{events::WebhookEvent, MockWebhookClient};
 
 #[derive(Clone, Copy, Debug)]
 pub enum UserKind {
@@ -101,6 +107,7 @@ impl DocumentOutcome {
             DocumentOutcome::PassWithManualReview => OnboardingStatus::Pass,
         }
     }
+
     pub fn expect_manual_review(&self) -> bool {
         match self {
             DocumentOutcome::Success => false,

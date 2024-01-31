@@ -1,14 +1,12 @@
-use super::tenant::Tenant;
-use super::tenant_role::{ImmutableRoleKind, TenantRole};
-use super::tenant_user::TenantUser;
-use crate::PgConn;
-use crate::{DbError, NextPage, OffsetPagination};
-use crate::{DbResult, TxnPgConn};
+use super::{
+    tenant::Tenant,
+    tenant_role::{ImmutableRoleKind, TenantRole},
+    tenant_user::TenantUser,
+};
+use crate::{DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{tenant_role, tenant_rolebinding, tenant_user};
-use diesel::dsl::not;
-use diesel::prelude::*;
-use diesel::Queryable;
+use diesel::{dsl::not, prelude::*, Queryable};
 use newtypes::{
     TenantId, TenantRoleId, TenantRoleKind, TenantRoleKindDiscriminant, TenantRolebindingId, TenantUserId,
 };

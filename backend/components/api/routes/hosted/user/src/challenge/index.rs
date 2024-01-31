@@ -1,28 +1,21 @@
 use super::RegisterChallengeData;
-use crate::challenge::RegisterChallenge;
-use crate::State;
-use api_core::auth::session::user::AssociatedAuthEventKind;
-use api_core::auth::session::user::UserSessionPurpose;
-use api_core::auth::user::load_auth_events;
-use api_core::auth::user::UserAuthContext;
-use api_core::auth::user::UserAuthGuard;
-use api_core::auth::IsGuardMet;
-use api_core::errors::AssertionError;
-use api_core::errors::JsonError;
-use api_core::errors::ValidationError;
-use api_core::types::response::ResponseData;
-use api_core::types::JsonApiResponse;
-use api_core::utils::challenge::Challenge;
-use api_core::utils::email::send_email_challenge_non_blocking;
-use api_core::utils::passkey::WebauthnConfig;
-use api_core::utils::sms::rx_background_error;
-use api_wire_types::ErrorChallengeResponse;
-use api_wire_types::UserChallengeRequest;
-use api_wire_types::UserChallengeResponse;
+use crate::{challenge::RegisterChallenge, State};
+use api_core::{
+    auth::{
+        session::user::{AssociatedAuthEventKind, UserSessionPurpose},
+        user::{load_auth_events, UserAuthContext, UserAuthGuard},
+        IsGuardMet,
+    },
+    errors::{AssertionError, JsonError, ValidationError},
+    types::{response::ResponseData, JsonApiResponse},
+    utils::{
+        challenge::Challenge, email::send_email_challenge_non_blocking, passkey::WebauthnConfig,
+        sms::rx_background_error,
+    },
+};
+use api_wire_types::{ErrorChallengeResponse, UserChallengeRequest, UserChallengeResponse};
 use itertools::Itertools;
-use newtypes::ActionKind;
-use newtypes::AuthEventKind;
-use newtypes::AuthMethodKind;
+use newtypes::{ActionKind, AuthEventKind, AuthMethodKind};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(

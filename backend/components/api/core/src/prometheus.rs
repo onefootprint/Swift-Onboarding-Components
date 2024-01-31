@@ -19,7 +19,7 @@ pub fn init(config: &Config) -> PrometheusMetrics {
             gethostname().into_string().expect("Cannot extract host name"),
         ),
     ]);
-    
+
     PrometheusMetricsBuilder::new("api")
         .endpoint(&format!("/{}", &config.service_config.metrics_endpoint_path))
         .const_labels(labels)

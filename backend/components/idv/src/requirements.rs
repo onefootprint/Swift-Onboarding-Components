@@ -1,6 +1,5 @@
 use crate::socure::requirements::meets_requirements_for_idplus_request;
-use newtypes::IdentityDataKind;
-use newtypes::VendorAPI;
+use newtypes::{IdentityDataKind, VendorAPI};
 use strum::IntoEnumIterator;
 
 /// This struct represents the minimum requirements for sending a request to a specific VendorAPI

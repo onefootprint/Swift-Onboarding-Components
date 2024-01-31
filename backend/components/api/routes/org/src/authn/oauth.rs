@@ -1,6 +1,7 @@
-use crate::errors::workos::WorkOsError;
-use crate::errors::ApiError;
-use crate::State;
+use crate::{
+    errors::{workos::WorkOsError, ApiError},
+    State,
+};
 use actix_web::HttpResponseBuilder;
 use paperclip::actix::{api_v2_operation, get, web, web::HttpResponse, Apiv2Schema};
 use reqwest::redirect;

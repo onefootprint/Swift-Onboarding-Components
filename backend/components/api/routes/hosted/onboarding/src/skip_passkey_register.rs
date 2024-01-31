@@ -1,11 +1,12 @@
-use crate::auth::user::UserAuthGuard;
-use crate::errors::ApiError;
-use crate::types::{EmptyResponse, JsonApiResponse};
-use crate::utils::headers::InsightHeaders;
-use crate::State;
+use crate::{
+    auth::user::UserAuthGuard,
+    errors::ApiError,
+    types::{EmptyResponse, JsonApiResponse},
+    utils::headers::InsightHeaders,
+    State,
+};
 use api_core::auth::user::UserWfAuthContext;
-use db::models::insight_event::CreateInsightEvent;
-use db::models::liveness_event::NewLivenessEvent;
+use db::models::{insight_event::CreateInsightEvent, liveness_event::NewLivenessEvent};
 use macros::route_alias;
 use newtypes::WorkflowGuard;
 use paperclip::actix::{api_v2_operation, post, web};

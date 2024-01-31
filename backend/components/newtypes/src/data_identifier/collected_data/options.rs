@@ -1,15 +1,13 @@
 use crate::{
     BusinessDataKind as BDK, CollectedData, DataIdentifier, DocumentCdoInfo, DocumentKind as DK,
-    IdentityDataKind as IDK, InvestorProfileKind as IPK,
+    IdentityDataKind as IDK, InvestorProfileKind as IPK, Selfie, TenantScope,
 };
-use crate::{Selfie, TenantScope};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use itertools::Itertools;
 use paperclip::actix::Apiv2Schema;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::collections::HashSet;
-use strum::EnumDiscriminants;
-use strum::IntoEnumIterator;
+use strum::{EnumDiscriminants, IntoEnumIterator};
 use strum_macros::{Display, EnumString};
 
 #[derive(
@@ -76,6 +74,7 @@ impl std::fmt::Display for CollectedDataOption {
 #[allow(clippy::use_self)]
 impl std::str::FromStr for CollectedDataOption {
     type Err = strum::ParseError;
+
     fn from_str(s: &str) -> Result<CollectedDataOption, Self::Err> {
         let res = match CollectedDataOptionKind::from_str(s) {
             Err(_) | Ok(CollectedDataOptionKind::Document) => Self::Document(DocumentCdoInfo::from_str(s)?),
@@ -88,6 +87,7 @@ impl std::str::FromStr for CollectedDataOption {
 // Boiling plate
 impl TryFrom<CollectedDataOptionKind> for CollectedDataOption {
     type Error = crate::Error;
+
     fn try_from(value: CollectedDataOptionKind) -> Result<Self, Self::Error> {
         let v = match value {
             CollectedDataOptionKind::Name => Self::Name,

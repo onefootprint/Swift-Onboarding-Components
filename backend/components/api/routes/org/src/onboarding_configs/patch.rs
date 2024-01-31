@@ -1,15 +1,14 @@
-use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::{CheckTenantGuard, TenantSessionAuth};
-use crate::errors::ApiError;
-use crate::types::response::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    errors::ApiError,
+    types::response::ResponseData,
+    utils::db2api::DbToApi,
+    State,
+};
 use api_core::errors::ApiResult;
 use db::models::ob_configuration::ObConfiguration;
-use newtypes::ApiKeyStatus;
-use newtypes::ObConfigurationId;
-use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{api_v2_operation, patch, web, web::Json};
+use newtypes::{ApiKeyStatus, ObConfigurationId};
+use paperclip::actix::{api_v2_operation, patch, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 struct UpdateObConfigPath {

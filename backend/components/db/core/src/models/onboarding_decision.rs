@@ -1,29 +1,16 @@
 use std::collections::HashMap;
 
-use super::manual_review::ManualReview;
-use super::ob_configuration::ObConfiguration;
-use super::user_timeline::UserTimeline;
-use crate::actor::SaturatedActor;
-use crate::models::workflow::Workflow;
-use crate::PgConn;
-use crate::TxnPgConn;
-use crate::{actor, DbResult};
+use super::{manual_review::ManualReview, ob_configuration::ObConfiguration, user_timeline::UserTimeline};
+use crate::{actor, actor::SaturatedActor, models::workflow::Workflow, DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
-use db_schema::schema::manual_review;
-use db_schema::schema::scoped_vault;
-use db_schema::schema::workflow;
-use db_schema::schema::{onboarding_decision, onboarding_decision_verification_result_junction};
-use diesel::dsl::not;
-use diesel::prelude::*;
-use diesel::{Insertable, Queryable};
-use newtypes::FpId;
-use newtypes::ReviewReason;
-use newtypes::ScopedVaultId;
-use newtypes::TenantId;
-use newtypes::WorkflowId;
+use db_schema::schema::{
+    manual_review, onboarding_decision, onboarding_decision_verification_result_junction, scoped_vault,
+    workflow,
+};
+use diesel::{dsl::not, prelude::*, Insertable, Queryable};
 use newtypes::{
-    AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, OnboardingDecisionId, OnboardingDecisionInfo,
-    VaultId, VerificationResultId,
+    AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, FpId, OnboardingDecisionId,
+    OnboardingDecisionInfo, ReviewReason, ScopedVaultId, TenantId, VaultId, VerificationResultId, WorkflowId,
 };
 
 #[derive(Debug, Clone, Queryable)]

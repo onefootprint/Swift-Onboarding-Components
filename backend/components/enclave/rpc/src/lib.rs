@@ -13,9 +13,7 @@ pub use transform::*;
 
 mod types;
 
-pub use self::request::*;
-pub use self::response::*;
-pub use self::types::*;
+pub use self::{request::*, response::*, types::*};
 
 #[derive(Debug, Clone)]
 pub struct WireMessage {

@@ -16,9 +16,9 @@ use crate::{
 
 use self::{
     certificates::{ParsedClientCertificate, PinnedServerCertificates},
-    ingress_rule::IngressRule,
+    fwd_headers::ForwardProxyHeaders,
+    ingress_rule::{IngressRule, ParsedIngressRules},
 };
-use self::{fwd_headers::ForwardProxyHeaders, ingress_rule::ParsedIngressRules};
 
 mod certificates;
 pub use self::certificates::ClientCertificateKey;

@@ -2,16 +2,19 @@ use super::{
     map_to_api_err, save_incode_verification_result, AddConsent, IncodeStateTransition,
     SaveVerificationResultArgs, VerificationSession,
 };
-use crate::decision::vendor::incode::state::{IncodeState, TransitionResult};
-use crate::decision::vendor::incode::IncodeContext;
-use crate::errors::ApiResult;
-use crate::vendor_clients::IncodeClients;
+use crate::{
+    decision::vendor::incode::{
+        state::{IncodeState, TransitionResult},
+        IncodeContext,
+    },
+    errors::ApiResult,
+    vendor_clients::IncodeClients,
+};
 use async_trait::async_trait;
 use db::{DbPool, TxnPgConn};
 use either::Either;
 use idv::incode::doc::IncodeAddSelfieRequest;
-use newtypes::{DocVData, PiiString, VendorAPI};
-use newtypes::{DocumentSide, IncodeFailureReason};
+use newtypes::{DocVData, DocumentSide, IncodeFailureReason, PiiString, VendorAPI};
 
 pub struct AddSelfie {
     failure_reasons: Vec<IncodeFailureReason>,

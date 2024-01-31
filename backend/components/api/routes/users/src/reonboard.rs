@@ -1,27 +1,25 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantGuard;
-use crate::types::response::ResponseData;
-use crate::types::JsonApiResponse;
-use crate::State;
-use api_core::auth::session::user::NewUserSessionArgs;
-use api_core::auth::session::user::NewUserSessionContext;
-use api_core::auth::session::user::UserSession;
-use api_core::auth::session::user::UserSessionPurpose;
-use api_core::auth::tenant::SecretTenantAuthContext;
-use api_core::config::LinkKind;
-use api_core::errors::tenant::TenantError;
-use api_core::errors::user::UserError;
-use api_core::errors::ApiResult;
-use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::session::AuthSession;
-use api_core::utils::vault_wrapper::Any;
-use api_core::utils::vault_wrapper::VaultWrapper;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard},
+    types::{response::ResponseData, JsonApiResponse},
+    State,
+};
+use api_core::{
+    auth::{
+        session::user::{NewUserSessionArgs, NewUserSessionContext, UserSession, UserSessionPurpose},
+        tenant::SecretTenantAuthContext,
+    },
+    config::LinkKind,
+    errors::{tenant::TenantError, user::UserError, ApiResult},
+    utils::{
+        fp_id_path::FpIdPath,
+        session::AuthSession,
+        vault_wrapper::{Any, VaultWrapper},
+    },
+};
 use api_wire_types::ReonboardResponse;
 use chrono::Duration;
-use db::models::scoped_vault::ScopedVault;
-use db::models::workflow::Workflow;
-use newtypes::PreviewApi;
-use newtypes::VaultKind;
+use db::models::{scoped_vault::ScopedVault, workflow::Workflow};
+use newtypes::{PreviewApi, VaultKind};
 use paperclip::actix::{api_v2_operation, post, web};
 
 // TODO rm after findigs stops using it

@@ -6,8 +6,7 @@ use itertools::Itertools;
 use mime::Mime;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::IntoEnumIterator;
-use strum_macros::AsRefStr;
-use strum_macros::{Display, EnumDiscriminants, EnumIter, EnumString};
+use strum_macros::{AsRefStr, Display, EnumDiscriminants, EnumIter, EnumString};
 /// test2
 #[derive(
     Debug,
@@ -82,6 +81,7 @@ impl From<DocumentKind> for DataIdentifier {
 
 impl TryFrom<DataIdentifier> for DocumentKind {
     type Error = crate::Error;
+
     fn try_from(value: DataIdentifier) -> Result<Self, Self::Error> {
         match value {
             DataIdentifier::Document(dk) => Ok(dk),
@@ -151,6 +151,7 @@ impl DocumentKind {
 
 impl TryFrom<DocumentKindDiscriminant> for DocumentKind {
     type Error = strum::ParseError;
+
     fn try_from(value: DocumentKindDiscriminant) -> Result<Self, Self::Error> {
         let v = match value {
             DocumentKindDiscriminant::FinraComplianceLetter => DocumentKind::FinraComplianceLetter,
@@ -169,6 +170,7 @@ impl TryFrom<DocumentKindDiscriminant> for DocumentKind {
 // data and images
 impl std::str::FromStr for DocumentKind {
     type Err = strum::ParseError;
+
     fn from_str(s: &str) -> Result<DocumentKind, <Self as std::str::FromStr>::Err> {
         let parts = s.split('.').collect_vec();
         let suffix = parts.last().ok_or(strum::ParseError::VariantNotFound)?;

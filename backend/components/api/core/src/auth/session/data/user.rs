@@ -1,17 +1,12 @@
-use newtypes::AuthEventId;
-use newtypes::AuthMethodKind;
-use newtypes::ContactInfoId;
-use newtypes::DataIdentifier;
-use newtypes::IdentifyScope;
-use newtypes::ObConfigurationId;
-use newtypes::ScopedVaultId;
-use newtypes::VaultId;
-use newtypes::WorkflowId;
-use newtypes::WorkflowRequestId;
+use newtypes::{
+    AuthEventId, AuthMethodKind, ContactInfoId, DataIdentifier, IdentifyScope, ObConfigurationId,
+    ScopedVaultId, VaultId, WorkflowId, WorkflowRequestId,
+};
 
-use crate::auth::user::UserAuthScope;
-use crate::errors::user::UserError;
-use crate::errors::ApiResult;
+use crate::{
+    auth::user::UserAuthScope,
+    errors::{user::UserError, ApiResult},
+};
 
 use super::AuthSessionData;
 

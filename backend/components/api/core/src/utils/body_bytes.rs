@@ -1,10 +1,9 @@
-use actix_web::dev::Payload;
-use actix_web::FromRequest;
-use actix_web::HttpRequest;
+use actix_web::{dev::Payload, FromRequest, HttpRequest};
 use futures::Future;
-use paperclip::actix::web;
-use paperclip::v2::models::DataTypeFormat;
-use paperclip::v2::schema::Apiv2Schema;
+use paperclip::{
+    actix::web,
+    v2::{models::DataTypeFormat, schema::Apiv2Schema},
+};
 use std::{
     pin::Pin,
     task::{ready, Context, Poll},

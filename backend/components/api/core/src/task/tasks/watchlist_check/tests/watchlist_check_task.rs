@@ -1,22 +1,17 @@
-use crate::task::tasks::watchlist_check::tests::*;
-use crate::task::TaskError;
-use crate::utils::vault_wrapper::Any;
-use crate::utils::vault_wrapper::VaultWrapper;
-use crate::State;
-use chrono::Duration;
-use chrono::Utc;
-use db::test_helpers::assert_have_same_elements;
-use db::tests::MockFFClient;
+use crate::{
+    task::{tasks::watchlist_check::tests::*, TaskError},
+    utils::vault_wrapper::{Any, VaultWrapper},
+    State,
+};
+use chrono::{Duration, Utc};
+use db::{test_helpers::assert_have_same_elements, tests::MockFFClient};
 use db_schema::schema::verification_result;
 use diesel::prelude::*;
 use macros::test_state_case;
-use newtypes::FootprintReasonCode;
-use newtypes::PiiString;
-use newtypes::VendorAPI;
-use newtypes::WatchlistCheckError;
-use newtypes::WatchlistCheckNotNeededReason;
-use newtypes::WatchlistCheckStatus;
-use newtypes::{IdentityDataKind as IDK, OnboardingStatus, WatchlistCheckStatusKind};
+use newtypes::{
+    FootprintReasonCode, IdentityDataKind as IDK, OnboardingStatus, PiiString, VendorAPI,
+    WatchlistCheckError, WatchlistCheckNotNeededReason, WatchlistCheckStatus, WatchlistCheckStatusKind,
+};
 
 #[test_state_case(
     true,

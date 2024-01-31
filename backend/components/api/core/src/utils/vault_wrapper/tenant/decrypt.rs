@@ -1,8 +1,10 @@
 use super::TenantVw;
-use crate::utils::vault_wrapper::decrypt::{EnclaveDecryptOperation, Pii};
-use crate::{errors::ApiResult, State};
-use db::models::access_event::NewAccessEvent;
-use db::models::insight_event::CreateInsightEvent;
+use crate::{
+    errors::ApiResult,
+    utils::vault_wrapper::decrypt::{EnclaveDecryptOperation, Pii},
+    State,
+};
+use db::models::{access_event::NewAccessEvent, insight_event::CreateInsightEvent};
 use itertools::Itertools;
 use newtypes::{AccessEventKind, AccessEventPurpose, DbActor};
 use std::collections::HashMap;

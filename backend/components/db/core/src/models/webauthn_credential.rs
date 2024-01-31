@@ -1,6 +1,4 @@
-use crate::diesel::ExpressionMethods;
-use crate::DbResult;
-use crate::PgConn;
+use crate::{diesel::ExpressionMethods, DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{self, webauthn_credential};
 use diesel::{Insertable, QueryDsl, Queryable, RunQueryDsl};

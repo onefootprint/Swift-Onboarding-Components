@@ -1,33 +1,27 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
-use crate::auth::tenant::TenantGuard;
-use crate::errors::tenant::TenantError;
-use crate::errors::ApiResult;
-use crate::errors::ValidationError;
-use crate::telemetry::RootSpan;
-use crate::types::ResponseData;
-use crate::utils::actix::OptionalJson;
-use crate::utils::db2api::DbToApi;
-use crate::utils::headers::ExternalId;
-use crate::utils::headers::IdempotencyId;
-use crate::utils::headers::InsightHeaders;
-use crate::utils::vault_wrapper::Any;
-use crate::utils::vault_wrapper::VaultWrapper;
-use crate::State;
+use crate::{
+    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
+    errors::{tenant::TenantError, ApiResult, ValidationError},
+    telemetry::RootSpan,
+    types::ResponseData,
+    utils::{
+        actix::OptionalJson,
+        db2api::DbToApi,
+        headers::{ExternalId, IdempotencyId, InsightHeaders},
+        vault_wrapper::{Any, VaultWrapper},
+    },
+    State,
+};
 
 use crate::utils::headers::SandboxId as SandboxIdHeader;
-use db::models::access_event::NewAccessEvent;
-use db::models::insight_event::CreateInsightEvent;
-use db::models::scoped_vault::ScopedVault;
-use db::models::vault::NewVaultArgs;
+use db::models::{
+    access_event::NewAccessEvent, insight_event::CreateInsightEvent, scoped_vault::ScopedVault,
+    vault::NewVaultArgs,
+};
 use itertools::Itertools;
-use newtypes::put_data_request::PatchDataRequest;
-use newtypes::put_data_request::RawDataRequest;
-use newtypes::AccessEventKind;
-use newtypes::AccessEventPurpose;
-use newtypes::SandboxId;
-use newtypes::ValidateArgs;
-use newtypes::VaultKind;
+use newtypes::{
+    put_data_request::{PatchDataRequest, RawDataRequest},
+    AccessEventKind, AccessEventPurpose, SandboxId, ValidateArgs, VaultKind,
+};
 use paperclip::actix::web;
 
 #[allow(clippy::unwrap_or_default)]

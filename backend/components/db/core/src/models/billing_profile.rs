@@ -1,8 +1,7 @@
 use crate::{DbResult, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::billing_profile;
-use diesel::prelude::*;
-use diesel::Queryable;
+use diesel::{prelude::*, Queryable};
 use newtypes::{BillingProfileId, TenantId};
 
 #[derive(Debug, Clone, Queryable)]

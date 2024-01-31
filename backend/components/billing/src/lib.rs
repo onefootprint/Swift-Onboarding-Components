@@ -1,6 +1,5 @@
 use crate::counts::LineItem;
-use db::models::billing_profile::BillingProfile as DbBillingProfile;
-use db::models::tenant::Tenant;
+use db::models::{billing_profile::BillingProfile as DbBillingProfile, tenant::Tenant};
 use interval::BillingInterval;
 use newtypes::{PiiString, StripeCustomerId, TenantId};
 use profile::BillingProfile;

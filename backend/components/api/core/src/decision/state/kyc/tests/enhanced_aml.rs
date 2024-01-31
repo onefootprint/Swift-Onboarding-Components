@@ -1,18 +1,20 @@
-use crate::decision::state::actions::Authorize;
-use crate::decision::state::test_utils::{mock_idology_pa_hit, mock_incode, AmlKind, WithHit};
-use crate::decision::state::test_utils::{
-    query_data, setup_data,
-    UserKind::{self},
+use crate::{
+    decision::state::{
+        actions::Authorize,
+        test_utils::{
+            mock_idology_pa_hit, mock_incode, query_data, setup_data, AmlKind,
+            UserKind::{self},
+            WithHit,
+        },
+        WorkflowActions, WorkflowWrapper,
+    },
+    State,
 };
-use crate::decision::state::{WorkflowActions, WorkflowWrapper};
-use crate::State;
-use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
-use db::tests::MockFFClient;
+use db::tests::{fixtures::ob_configuration::ObConfigurationOpts, MockFFClient};
 use feature_flag::BoolFlag;
 use macros::test_state_case;
-use newtypes::VendorAPI;
 use newtypes::{
-    DecisionStatus, EnhancedAmlOption, KycState, OnboardingStatus,
+    DecisionStatus, EnhancedAmlOption, KycState, OnboardingStatus, VendorAPI,
     VendorAPI::{IdologyExpectId, IncodeWatchlistCheck},
     WorkflowState,
 };

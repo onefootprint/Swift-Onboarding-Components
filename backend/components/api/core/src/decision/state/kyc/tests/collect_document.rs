@@ -1,35 +1,36 @@
-use crate::decision::state::actions::{Authorize, MakeVendorCalls};
-use crate::decision::state::test_utils::{
-    mock_idology, mock_incode_doc_collection, mock_webhooks, query_data, query_risk_signals, setup_data,
-    DocumentOutcome::{self, *},
-    ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, UserKind,
-    WithQualifier,
+use crate::decision::state::{
+    actions::{Authorize, MakeVendorCalls},
+    test_utils::{
+        mock_idology, mock_incode_doc_collection, mock_webhooks, query_data, query_risk_signals, setup_data,
+        DocumentOutcome::{self, *},
+        ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, UserKind,
+        WithQualifier,
+    },
+    WorkflowActions,
 };
-use crate::decision::state::WorkflowActions;
 
-use crate::decision::state::WorkflowWrapper;
-use crate::decision::state::{DocCollected, MakeDecision};
+use crate::decision::state::{DocCollected, MakeDecision, WorkflowWrapper};
 
-use crate::errors::ApiResult;
-use crate::State;
-use db::models::onboarding_decision::OnboardingDecision;
-use db::models::risk_signal::RiskSignal;
-use db::models::rule_instance::RuleInstance;
-use db::models::workflow::{NewWorkflowArgs, Workflow};
-use db::test_helpers::assert_have_same_elements;
-use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
-use db::tests::MockFFClient;
+use crate::{errors::ApiResult, State};
+use db::{
+    models::{
+        onboarding_decision::OnboardingDecision,
+        risk_signal::RiskSignal,
+        rule_instance::RuleInstance,
+        workflow::{NewWorkflowArgs, Workflow},
+    },
+    test_helpers::assert_have_same_elements,
+    tests::{fixtures::ob_configuration::ObConfigurationOpts, MockFFClient},
+};
 use feature_flag::BoolFlag;
 use itertools::Itertools;
 use macros::test_state_case;
 use newtypes::{
     BooleanOperator, CollectedDataOption as CDO, CountryRestriction, DbActor, DecisionStatus,
-    DocTypeRestriction, DocumentCdoInfo, DocumentConfig, DocumentRequestKind, FootprintReasonCode,
-    RiskSignalGroupKind, RuleAction, RuleExpression, RuleExpressionCondition, Selfie, TenantId, VendorAPI,
-    WorkflowSource,
+    DocTypeRestriction, DocumentCdoInfo, DocumentConfig, DocumentRequestKind, FootprintReasonCode, KycState,
+    OnboardingStatus, RiskSignalGroupKind, RuleAction, RuleExpression, RuleExpressionCondition, Selfie,
+    TenantId, VendorAPI, WorkflowFixtureResult, WorkflowSource, WorkflowState,
 };
-use newtypes::{KycState, WorkflowState};
-use newtypes::{OnboardingStatus, WorkflowFixtureResult};
 
 #[test_state_case(UserKind::Live, Failure)]
 #[test_state_case(UserKind::Live, DocUploadFailed)]

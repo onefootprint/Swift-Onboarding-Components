@@ -3,19 +3,19 @@
 
 use std::marker::PhantomData;
 
-use diesel::backend::Backend;
-use diesel::connection::{
-    AnsiTransactionManager, Connection, DefaultLoadingMode, LoadRowIter, SimpleConnection,
+use diesel::{
+    backend::Backend,
+    connection::{
+        AnsiTransactionManager, Connection, ConnectionGatWorkaround, DefaultLoadingMode, LoadConnection,
+        LoadRowIter, SimpleConnection, TransactionManager,
+    },
+    deserialize::Queryable,
+    expression::QueryMetadata,
+    pg::{GetPgMetadataCache, Pg, PgConnection, PgRowByRowLoadingMode},
+    query_builder::{Query, QueryBuilder, QueryFragment, QueryId},
+    result::{ConnectionError, ConnectionResult, QueryResult},
+    select, RunQueryDsl,
 };
-use diesel::connection::{ConnectionGatWorkaround, LoadConnection, TransactionManager};
-use diesel::deserialize::Queryable;
-use diesel::expression::QueryMetadata;
-use diesel::pg::{GetPgMetadataCache, Pg, PgConnection, PgRowByRowLoadingMode};
-use diesel::query_builder::QueryBuilder;
-use diesel::query_builder::{Query, QueryFragment, QueryId};
-use diesel::result::{ConnectionError, ConnectionResult, QueryResult};
-use diesel::select;
-use diesel::RunQueryDsl;
 use tracing::{debug, field, instrument};
 
 // https://www.postgresql.org/docs/12/functions-info.html

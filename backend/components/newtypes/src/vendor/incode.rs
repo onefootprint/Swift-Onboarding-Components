@@ -349,6 +349,7 @@ pub enum IncodeDocumentType {
 
 impl<'a> TryFrom<&'a IncodeDocumentType> for IdDocKind {
     type Error = crate::Error;
+
     fn try_from(value: &'a IncodeDocumentType) -> Result<Self, Self::Error> {
         match value {
             IncodeDocumentType::Passport => Ok(Self::Passport),

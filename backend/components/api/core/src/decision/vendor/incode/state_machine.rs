@@ -1,28 +1,35 @@
 use std::sync::Arc;
 
-use super::state::{IncodeState, IncodeStateTransition, RunTransition, StepResult};
-use super::{get_config_id, states::*};
-use crate::decision::vendor::build_request::build_docv_data_from_identity_doc;
-use crate::decision::vendor::incode::states::VerificationSession;
-use crate::decision::vendor::tenant_vendor_control::TenantVendorControl;
-use crate::enclave_client::EnclaveClient;
-use crate::errors::user::UserError;
-use crate::errors::{ApiResult, AssertionError};
-use crate::utils::vault_wrapper::{Person, VaultWrapper, VwArgs};
-use crate::vendor_clients::IncodeClients;
-use crate::{ApiError, State};
-use db::models::decision_intent::DecisionIntent;
-use db::models::identity_document::IdentityDocument;
-use db::models::incode_verification_session::IncodeVerificationSession;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::vault::Vault;
-use db::DbPool;
+use super::{
+    get_config_id,
+    state::{IncodeState, IncodeStateTransition, RunTransition, StepResult},
+    states::*,
+};
+use crate::{
+    decision::vendor::{
+        build_request::build_docv_data_from_identity_doc, incode::states::VerificationSession,
+        tenant_vendor_control::TenantVendorControl,
+    },
+    enclave_client::EnclaveClient,
+    errors::{user::UserError, ApiResult, AssertionError},
+    utils::vault_wrapper::{Person, VaultWrapper, VwArgs},
+    vendor_clients::IncodeClients,
+    ApiError, State,
+};
+use db::{
+    models::{
+        decision_intent::DecisionIntent, identity_document::IdentityDocument,
+        incode_verification_session::IncodeVerificationSession, ob_configuration::ObConfiguration,
+        vault::Vault,
+    },
+    DbPool,
+};
 use feature_flag::FeatureFlagClient;
-use newtypes::vendor_credentials::IncodeCredentialsWithToken;
 use newtypes::{
-    DecisionIntentId, DecisionIntentKind, DocVData, DocumentRequestId, IdentityDocumentId,
-    IncodeConfigurationId, IncodeEnvironment, IncodeFailureReason, IncodeVerificationSessionKind,
-    IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, ScopedVaultId, TenantId, WorkflowId,
+    vendor_credentials::IncodeCredentialsWithToken, DecisionIntentId, DecisionIntentKind, DocVData,
+    DocumentRequestId, IdentityDocumentId, IncodeConfigurationId, IncodeEnvironment, IncodeFailureReason,
+    IncodeVerificationSessionKind, IncodeVerificationSessionState, Iso3166TwoDigitCountryCode, ScopedVaultId,
+    TenantId, WorkflowId,
 };
 use selfie_doc::AwsSelfieDocClient;
 

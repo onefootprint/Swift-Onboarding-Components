@@ -1,17 +1,24 @@
 use chrono::Utc;
-use newtypes::experian::ProductOptions;
-use newtypes::vendor_credentials::ExperianCredentials;
-use newtypes::{IdvData, PiiString, Uuid, VerificationRequestId};
+use newtypes::{
+    experian::ProductOptions, vendor_credentials::ExperianCredentials, IdvData, PiiString, Uuid,
+    VerificationRequestId,
+};
 use tokio_retry::strategy::FixedInterval;
 
-use crate::experian::auth::{self, response::JwtTokenResponse};
-use crate::experian::error::{EnvironmentMismatchError, Error, ValidationError};
-use crate::footprint_http_client::FootprintVendorHttpClient;
+use crate::{
+    experian::{
+        auth::{self, response::JwtTokenResponse},
+        error::{EnvironmentMismatchError, Error, ValidationError},
+    },
+    footprint_http_client::FootprintVendorHttpClient,
+};
 use newtypes::{Base64Data, Base64EncodedString};
 
-use super::request::{ControlOption, CrossCoreAPIRequest, PreciseIDRequestConfig};
-use super::response::{CCErrorResponse, CrossCoreAPIResponse};
-use super::validation;
+use super::{
+    request::{ControlOption, CrossCoreAPIRequest, PreciseIDRequestConfig},
+    response::{CCErrorResponse, CrossCoreAPIResponse},
+    validation,
+};
 
 const REQUIRED_X_USER_DOMAIN_HEADER_VAL: &str = "onefootprint.com";
 
@@ -78,6 +85,7 @@ impl ExperianClientAdapter {
     fn is_production(auth_username: &PiiString) -> bool {
         auth_username.leak() == "crosscore2.prod@onefootprint.com"
     }
+
     fn is_sandbox(auth_username: &PiiString) -> bool {
         auth_username.leak() == "crosscore2.uat@onefootprint.com"
     }

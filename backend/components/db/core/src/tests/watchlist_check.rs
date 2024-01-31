@@ -1,28 +1,19 @@
-use crate::models::onboarding_decision::NewDecisionArgs;
-use crate::models::task::NewTask;
-use crate::models::task::Task;
-use crate::models::watchlist_check::NewWatchlistCheck;
-use crate::models::watchlist_check::WatchlistCheck;
-use crate::models::workflow::Workflow;
-use crate::models::workflow::WorkflowUpdate;
-use crate::test_helpers::assert_have_same_elements;
-use crate::tests::fixtures;
-use crate::tests::prelude::*;
-use chrono::DateTime;
-use chrono::Duration;
-use chrono::Utc;
+use crate::{
+    models::{
+        onboarding_decision::NewDecisionArgs,
+        task::{NewTask, Task},
+        watchlist_check::{NewWatchlistCheck, WatchlistCheck},
+        workflow::{Workflow, WorkflowUpdate},
+    },
+    test_helpers::assert_have_same_elements,
+    tests::{fixtures, prelude::*},
+};
+use chrono::{DateTime, Duration, Utc};
 use macros::db_test;
-use newtypes::DbActor;
-use newtypes::DecisionStatus;
-use newtypes::EnhancedAmlOption;
-use newtypes::ScopedVaultId;
-use newtypes::TaskData;
-use newtypes::TaskStatus;
-use newtypes::TenantId;
-use newtypes::VaultKind;
-use newtypes::WatchlistCheckArgs;
-use newtypes::WatchlistCheckStatus;
-use newtypes::WatchlistCheckStatusKind;
+use newtypes::{
+    DbActor, DecisionStatus, EnhancedAmlOption, ScopedVaultId, TaskData, TaskStatus, TenantId, VaultKind,
+    WatchlistCheckArgs, WatchlistCheckStatus, WatchlistCheckStatusKind,
+};
 
 use super::fixtures::ob_configuration::ObConfigurationOpts;
 

@@ -199,12 +199,12 @@ impl Task {
 #[allow(unused_must_use)]
 mod tests {
     use super::*;
-    use crate::test_helpers::assert_have_same_elements;
-    use crate::test_helpers::have_same_elements;
-    use crate::tests::prelude::*;
+    use crate::{
+        test_helpers::{assert_have_same_elements, have_same_elements},
+        tests::prelude::*,
+    };
     use macros::db_test;
-    use newtypes::LogMessageTaskArgs;
-    use newtypes::LogNumTenantApiKeysArgs;
+    use newtypes::{LogMessageTaskArgs, LogNumTenantApiKeysArgs};
     use std::str::FromStr;
 
     fn task_data() -> TaskData {

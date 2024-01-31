@@ -1,19 +1,16 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantSessionAuth;
-use crate::errors::ApiError;
-use crate::get::search::decrypt_visible_attrs;
-use crate::get::EntityDetailResponse;
-use crate::types::JsonApiResponse;
-use crate::types::ResponseData;
-use crate::utils::vault_wrapper::VaultWrapper;
-use crate::State;
-use api_core::utils::db2api::DbToApi;
-use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::vault_wrapper::TenantVw;
-use api_core::ApiErrorKind;
-use db::models::scoped_vault::ScopedVault;
-use db::scoped_vault::ScopedVaultListQueryParams;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    errors::ApiError,
+    get::{search::decrypt_visible_attrs, EntityDetailResponse},
+    types::{JsonApiResponse, ResponseData},
+    utils::vault_wrapper::VaultWrapper,
+    State,
+};
+use api_core::{
+    utils::{db2api::DbToApi, fp_id_path::FpIdPath, vault_wrapper::TenantVw},
+    ApiErrorKind,
+};
+use db::{models::scoped_vault::ScopedVault, scoped_vault::ScopedVaultListQueryParams};
 use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(

@@ -1,17 +1,15 @@
+use crate::{
+    decision::{features::incode_utils::*, onboarding::FeatureSet},
+    enclave_client::EnclaveClient,
+    errors::ApiResult,
+    utils::vault_wrapper::{DecryptUncheckedResult, VaultWrapper},
+};
 use chrono::{NaiveDateTime, Utc};
-use idv::incode::doc::response::{FetchScoresResponse, FetchOCRResponse, IncodeOcrFixtureResponseFields};
+use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse, IncodeOcrFixtureResponseFields};
 use newtypes::{
     incode::{IncodeRCH, IncodeStatus, IncodeTest},
-    FootprintReasonCode, VendorAPI, PiiString, VerificationResultId, DataIdentifier, IdentityDataKind, IdDocKind
-};
-use crate::{
-    decision::{
-        onboarding::FeatureSet,
-        features::incode_utils::*
-    }, 
-    enclave_client::EnclaveClient, 
-    utils::vault_wrapper::{VaultWrapper, DecryptUncheckedResult}, 
-    errors::ApiResult
+    DataIdentifier, FootprintReasonCode, IdDocKind, IdentityDataKind, PiiString, VendorAPI,
+    VerificationResultId,
 };
 
 #[derive(Default, Clone, PartialEq, Eq)]
@@ -28,13 +26,23 @@ pub struct IncodeOcrComparisonDataFields {
     pub middle_name: Option<PiiString>,
     pub last_name: Option<PiiString>,
     pub dob: Option<PiiString>,
-    pub address: IncodeOcrAddress
+    pub address: IncodeOcrAddress,
 }
 
 impl From<IncodeOcrComparisonDataFields> for IncodeOcrFixtureResponseFields {
     fn from(value: IncodeOcrComparisonDataFields) -> Self {
-        let IncodeOcrComparisonDataFields { first_name, middle_name:_ , last_name, dob, address: _ } = value;
-        Self { first_name, last_name, dob}
+        let IncodeOcrComparisonDataFields {
+            first_name,
+            middle_name: _,
+            last_name,
+            dob,
+            address: _,
+        } = value;
+        Self {
+            first_name,
+            last_name,
+            dob,
+        }
     }
 }
 
@@ -48,7 +56,6 @@ impl IncodeOcrComparisonDataFields {
             DataIdentifier::Id(IdentityDataKind::State),
             DataIdentifier::Id(IdentityDataKind::Zip),
             DataIdentifier::Id(IdentityDataKind::AddressLine1),
-            
         ];
         let vd = vw.decrypt_unchecked(enclave_client, fields).await?;
         let result = Self::from_decrypted_values(&vd);
@@ -67,7 +74,7 @@ impl IncodeOcrComparisonDataFields {
             middle_name: vd.get_di(IdentityDataKind::MiddleName).ok(),
             last_name: vd.get_di(IdentityDataKind::LastName).ok(),
             dob: vd.get_di(IdentityDataKind::Dob).ok(),
-            address
+            address,
         }
     }
 }
@@ -83,8 +90,9 @@ impl FeatureSet for IncodeDocumentFeatures {
     fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode> {
         self.footprint_reason_codes.clone()
     }
+
     fn vendor_apis(&self) -> Vec<newtypes::VendorAPI> {
-        // TODO: Not quite right, but that's fine since this won't be used. 
+        // TODO: Not quite right, but that's fine since this won't be used.
         // eventually should move this to some sort of vendor api struct
         vec![VendorAPI::IncodeFetchScores, VendorAPI::IncodeFetchOcr]
     }
@@ -97,7 +105,7 @@ pub fn footprint_reason_codes(
     vault_data: IncodeOcrComparisonDataFields,
     // not all documents collect will have selfie
     expect_selfie: bool,
-    dk: IdDocKind
+    dk: IdDocKind,
 ) -> Result<Vec<FootprintReasonCode>, idv::Error> {
     let score_reason_codes = reason_codes_from_score_response(&scores, &ocr, expect_selfie, dk);
     let ocr_reason_codes = pii_matching_reason_codes_from_ocr_response(&ocr, vault_data);
@@ -105,78 +113,87 @@ pub fn footprint_reason_codes(
     Ok(score_reason_codes.into_iter().chain(ocr_reason_codes).collect())
 }
 
-pub fn reason_codes_from_score_response(scores_res: &FetchScoresResponse, ocr_res: &FetchOCRResponse, expect_selfie: bool, dk: IdDocKind) -> Vec<FootprintReasonCode> {
+pub fn reason_codes_from_score_response(
+    scores_res: &FetchScoresResponse,
+    ocr_res: &FetchOCRResponse,
+    expect_selfie: bool,
+    dk: IdDocKind,
+) -> Vec<FootprintReasonCode> {
     // Overall score
-    // 
+    //
     // We check for the existence of this at the vendor call layer, but our decisioning relies most heavily on the score (for now)
     // and we should not proceed if we don't have it
-    let document_score_code = match scores_res
-        .document_score().1 {
-            Some(s) => if s == IncodeStatus::Fail {
+    let document_score_code = match scores_res.document_score().1 {
+        Some(s) => {
+            if s == IncodeStatus::Fail {
                 vec![FootprintReasonCode::DocumentNotVerified]
             } else {
                 vec![FootprintReasonCode::DocumentVerified]
-            },
-            None => {
-                tracing::error!("missing incode score");
-                vec![FootprintReasonCode::DocumentNotVerified]
             }
-
-        };
+        }
+        None => {
+            tracing::error!("missing incode score");
+            vec![FootprintReasonCode::DocumentNotVerified]
+        }
+    };
 
     let liveness_score_code = if expect_selfie {
-        match scores_res
-        .liveness_score().1 {
-            Some(s) => if s == IncodeStatus::Fail {
-                vec![FootprintReasonCode::DocumentSelfieNotLiveImage]
-            } else {
-                vec![]
-            },
+        match scores_res.liveness_score().1 {
+            Some(s) => {
+                if s == IncodeStatus::Fail {
+                    vec![FootprintReasonCode::DocumentSelfieNotLiveImage]
+                } else {
+                    vec![]
+                }
+            }
             None => {
                 tracing::error!("missing incode liveness score");
                 vec![]
             }
+        }
+    } else {
+        vec![]
+    };
 
-        }} else {
-            vec![]
-        };
-        
     // only populate reason code if we collected a selfie
     let selfie_code = if expect_selfie {
         match scores_res.selfie_match().1 {
-            Some(s) => if s == IncodeStatus::Fail {
-                vec![FootprintReasonCode::DocumentSelfieDoesNotMatch]
-            } else {
-                vec![FootprintReasonCode::DocumentSelfieMatches]
-            },
+            Some(s) => {
+                if s == IncodeStatus::Fail {
+                    vec![FootprintReasonCode::DocumentSelfieDoesNotMatch]
+                } else {
+                    vec![FootprintReasonCode::DocumentSelfieMatches]
+                }
+            }
             None => {
                 tracing::warn!("missing incode selfie score");
                 vec![FootprintReasonCode::DocumentSelfieDoesNotMatch]
             }
-        }    
+        }
     } else {
         vec![]
     };
-    
+
     let doc_expired_code = if let Some(expired_frc) = doc_expired_reason_code(ocr_res) {
         vec![expired_frc]
     } else {
         vec![]
     };
 
-    let ocr_successful_code =  if ocr_was_successful(scores_res, ocr_res, dk) {
+    let ocr_successful_code = if ocr_was_successful(scores_res, ocr_res, dk) {
         vec![FootprintReasonCode::DocumentOcrSuccessful]
     } else {
         vec![FootprintReasonCode::DocumentOcrNotSuccessful]
     };
 
     // ID Tests => FRC
-    let (id_test_frcs, barcode_crosscheck_results): (Vec<FootprintReasonCode>, Vec<(bool, bool)>) = scores_res
-        .get_id_tests()
-        .iter()
-        .filter_map(get_frc_from_test)
-        .unzip();
-    let barcode_check_failed = barcode_crosscheck_results.iter().any(|(fail,_)| *fail);
+    let (id_test_frcs, barcode_crosscheck_results): (Vec<FootprintReasonCode>, Vec<(bool, bool)>) =
+        scores_res
+            .get_id_tests()
+            .iter()
+            .filter_map(get_frc_from_test)
+            .unzip();
+    let barcode_check_failed = barcode_crosscheck_results.iter().any(|(fail, _)| *fail);
     let barcode_check_passed = barcode_crosscheck_results.iter().any(|(_, pass)| *pass);
     let barcode_decoded = id_test_frcs.contains(&FootprintReasonCode::DocumentBarcodeCouldBeRead);
     let barcode_checks_ran = (barcode_check_passed || barcode_check_failed) && barcode_decoded;
@@ -194,11 +211,16 @@ pub fn reason_codes_from_score_response(scores_res: &FetchScoresResponse, ocr_re
     // Face tests => FRC
     let (glasses_check, mask_check) = scores_res.get_face_test_results();
     let face_codes: Vec<FootprintReasonCode> = [
-        glasses_check.and_then(|has_glasses| has_glasses.then_some(FootprintReasonCode::DocumentSelfieGlasses)),
-        mask_check.and_then(|has_glasses| has_glasses.then_some(FootprintReasonCode::DocumentSelfieMask))
-    ].into_iter().flatten().collect();
+        glasses_check
+            .and_then(|has_glasses| has_glasses.then_some(FootprintReasonCode::DocumentSelfieGlasses)),
+        mask_check.and_then(|has_glasses| has_glasses.then_some(FootprintReasonCode::DocumentSelfieMask)),
+    ]
+    .into_iter()
+    .flatten()
+    .collect();
 
-    document_score_code.into_iter()
+    document_score_code
+        .into_iter()
         .chain(selfie_code)
         .chain(doc_expired_code)
         .chain(ocr_successful_code)
@@ -209,21 +231,32 @@ pub fn reason_codes_from_score_response(scores_res: &FetchScoresResponse, ocr_re
         .collect()
 }
 
-    
-pub fn pii_matching_reason_codes_from_ocr_response(res: &FetchOCRResponse, vault_data: IncodeOcrComparisonDataFields) -> Vec<FootprintReasonCode> {
+
+pub fn pii_matching_reason_codes_from_ocr_response(
+    res: &FetchOCRResponse,
+    vault_data: IncodeOcrComparisonDataFields,
+) -> Vec<FootprintReasonCode> {
     let parsed_names = ParsedIncodeNames::from_fetch_ocr_res(res);
     let parsed_address = ParsedIncodeAddress::from_fetch_ocr_res(res);
-    
+
     let fn_matches = first_name_matches(&parsed_names, &vault_data);
     let ln_matches = last_name_matches(&parsed_names, &vault_data);
     let reason_codes: Vec<FootprintReasonCode> = [
         reason_codes_from_match_field(IncodeMatchField::FirstName, fn_matches),
         reason_codes_from_match_field(IncodeMatchField::LastName, ln_matches),
         reason_codes_from_match_field(IncodeMatchField::Dob, dob_matches(res, &vault_data)),
-        reason_codes_from_match_field(IncodeMatchField::Name, fn_matches.and_then(|x| ln_matches.map(|y| x && y))),
-        reason_codes_from_match_field(IncodeMatchField::Address, address_matches(&parsed_address, &vault_data.address).matched()),
-
-    ].into_iter().flatten().collect();
+        reason_codes_from_match_field(
+            IncodeMatchField::Name,
+            fn_matches.and_then(|x| ln_matches.map(|y| x && y)),
+        ),
+        reason_codes_from_match_field(
+            IncodeMatchField::Address,
+            address_matches(&parsed_address, &vault_data.address).matched(),
+        ),
+    ]
+    .into_iter()
+    .flatten()
+    .collect();
 
     reason_codes
 }
@@ -232,30 +265,33 @@ pub fn pii_matching_reason_codes_from_ocr_response(res: &FetchOCRResponse, vault
 pub fn drivers_license_features_from_ocr_response(res: &FetchOCRResponse) -> Vec<FootprintReasonCode> {
     let mut frc = vec![];
     if res.is_permit_or_provisional_license().unwrap_or(false) {
-      frc.push(FootprintReasonCode::DocumentIsPermitOrProvisionalLicense)
-    } 
+        frc.push(FootprintReasonCode::DocumentIsPermitOrProvisionalLicense)
+    }
 
     frc
 }
 
 const OCR_CONFIDENCE_SCORE_THRESHOLD: f32 = 0.70;
- 
+
 fn ocr_was_successful(scores_res: &FetchScoresResponse, ocr_res: &FetchOCRResponse, dk: IdDocKind) -> bool {
     let parsed_odks: Vec<ParsedIncodeField> = ParsedIncodeFields::from_fetch_ocr_res(ocr_res).0;
-    let all_expected_fields_present_and_high_confidence = dk.expected_ciritical_ocr_data_kinds().into_iter().all(|odk| {
-        let pif = parsed_odks.iter().find(|p| p.odk == odk);
-        if let Some(pif) = pif {
-            // we don't have a lot of confidence (no pun intended) on Incode's consistency with producing these scores and for some fields its a little ambiguous which of several
-            // possible options should/could be used as the correct measure of confidence. So given this, if the confidence score is None, we treat this as passing OCR. (for now anyway)
-            pif.confidence.map(|c| c > OCR_CONFIDENCE_SCORE_THRESHOLD).unwrap_or(true)
-        } else {
-            // if the data was not parsed, then ocr was not successful
-            false 
-        }
-    });
+    let all_expected_fields_present_and_high_confidence =
+        dk.expected_ciritical_ocr_data_kinds().into_iter().all(|odk| {
+            let pif = parsed_odks.iter().find(|p| p.odk == odk);
+            if let Some(pif) = pif {
+                // we don't have a lot of confidence (no pun intended) on Incode's consistency with producing these scores and for some fields its a little ambiguous which of several
+                // possible options should/could be used as the correct measure of confidence. So given this, if the confidence score is None, we treat this as passing OCR. (for now anyway)
+                pif.confidence
+                    .map(|c| c > OCR_CONFIDENCE_SCORE_THRESHOLD)
+                    .unwrap_or(true)
+            } else {
+                // if the data was not parsed, then ocr was not successful
+                false
+            }
+        });
 
     let ocr_overall_confidence_passed = match scores_res.id_ocr_confidence().1 {
-       Some(s) => s != IncodeStatus::Fail,
+        Some(s) => s != IncodeStatus::Fail,
         None => {
             tracing::warn!("missing incode ocr score");
             false
@@ -267,11 +303,17 @@ fn ocr_was_successful(scores_res: &FetchScoresResponse, ocr_res: &FetchOCRRespon
 }
 
 fn doc_expired_reason_code(res: &FetchOCRResponse) -> Option<FootprintReasonCode> {
-    res.expire_at.as_ref().and_then(|e| e.leak().parse::<i64>().ok()).and_then(|d| NaiveDateTime::from_timestamp_opt(d/1000,0)).map(|d| if Utc::now().naive_utc() > d {
-        FootprintReasonCode::DocumentExpired
-    } else {
-        FootprintReasonCode::DocumentNotExpired
-    })
+    res.expire_at
+        .as_ref()
+        .and_then(|e| e.leak().parse::<i64>().ok())
+        .and_then(|d| NaiveDateTime::from_timestamp_opt(d / 1000, 0))
+        .map(|d| {
+            if Utc::now().naive_utc() > d {
+                FootprintReasonCode::DocumentExpired
+            } else {
+                FootprintReasonCode::DocumentNotExpired
+            }
+        })
 }
 
 fn get_frc_from_test(value: (&IncodeTest, &IncodeStatus)) -> Option<(FootprintReasonCode, (bool, bool))> {
@@ -281,7 +323,7 @@ fn get_frc_from_test(value: (&IncodeTest, &IncodeStatus)) -> Option<(FootprintRe
         if s == &IncodeStatus::Fail {
             f.fail_code.map(|c| (c, (t.is_crosscheck(), false)))
         } else {
-            f.ok_code.map(|c| (c,  (false, t.is_crosscheck())))
+            f.ok_code.map(|c| (c, (false, t.is_crosscheck())))
         }
     })
 }
@@ -289,16 +331,19 @@ fn get_frc_from_test(value: (&IncodeTest, &IncodeStatus)) -> Option<(FootprintRe
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-    use newtypes::{ScrubbedPiiString, ScrubbedPiiLong, PiiLong};
+    use super::*;
     use db::test_helpers::assert_have_same_elements;
-    use idv::{incode::doc::response::{FetchScoresResponse, OCRName, OcrDataConfidence}, test_fixtures::{DocTestOpts, OcrTestOpts, self}};
+    use idv::{
+        incode::doc::response::{FetchScoresResponse, OCRName, OcrDataConfidence},
+        test_fixtures::{self, DocTestOpts, OcrTestOpts},
+    };
     use newtypes::{
         incode::IncodeStatus::*,
         FootprintReasonCode::{self, *},
+        PiiLong, ScrubbedPiiLong, ScrubbedPiiString,
     };
+    use std::collections::HashMap;
     use test_case::test_case;
-    use super::*;
 
     #[test_case(
         ("Rob", "Roberto", "1990-01-01"), 
@@ -370,27 +415,34 @@ mod tests {
         (Some("Bob".into()),Some("Boberto Jones".into()),Some("1990-01-01".into())),
         vec![DocumentOcrNameMatches, DocumentOcrFirstNameMatches, DocumentOcrLastNameMatches, DocumentOcrDobMatches, DocumentOcrAddressCouldNotMatch, DocumentOcrAddressDoesNotMatch,]; "hyphen"
     )]
-    fn test_reason_codes_from_ocr_response(raw_ocr: (&str, &str, &str), raw_vault_data: (Option<PiiString>, Option<PiiString>, Option<PiiString>), expected: Vec<FootprintReasonCode>) {
+    fn test_reason_codes_from_ocr_response(
+        raw_ocr: (&str, &str, &str),
+        raw_vault_data: (Option<PiiString>, Option<PiiString>, Option<PiiString>),
+        expected: Vec<FootprintReasonCode>,
+    ) {
         let (first_ocr, last_ocr, dob_ocr) = raw_ocr;
         let ocr_opts = OcrTestOpts {
             first_name: first_ocr.into(),
             paternal_last_name: last_ocr.into(),
             dob: dob_ocr.into(),
         };
-        
+
         let (first, last, dob) = raw_vault_data;
-        
+
         let vault_data = IncodeOcrComparisonDataFields {
             first_name: first,
             middle_name: None,
             last_name: last,
             dob,
-            address: IncodeOcrAddress::default()
+            address: IncodeOcrAddress::default(),
         };
         let raw = test_fixtures::incode_fetch_ocr_response(Some(ocr_opts));
         let parsed: FetchOCRResponse = serde_json::from_value(raw).unwrap();
 
-        assert_have_same_elements(pii_matching_reason_codes_from_ocr_response(&parsed, vault_data), expected)
+        assert_have_same_elements(
+            pii_matching_reason_codes_from_ocr_response(&parsed, vault_data),
+            expected,
+        )
     }
 
     #[test_case(
@@ -418,7 +470,7 @@ mod tests {
             DocumentBarcodeContentMatches,
             DocumentNotExpired
         ], true; "everything passes")]
-        #[test_case(
+    #[test_case(
             DocTestOpts {
                 screen: Fail,
                 paper: Fail,
@@ -460,7 +512,7 @@ mod tests {
                 DocumentNumberCrosscheckDoesNotMatch, // barcode stuff is weird here
                 DocumentNotExpired
             ], true; "everything fails")]
-        #[test_case(
+    #[test_case(
             DocTestOpts {
                 screen: Ok,
                 paper: Ok,
@@ -499,7 +551,7 @@ mod tests {
                 DocumentNumberCrosscheckMatches,
                 DocumentNotExpired
             ], true; "mix of things")]
-            #[test_case(
+    #[test_case(
                 DocTestOpts::default(),
                 vec![
                     DocumentPhotoIsNotScreenCapture,
@@ -523,15 +575,27 @@ mod tests {
                     DocumentBarcodeContentMatches,
                     DocumentNotExpired
                     // no selfie code
-                ], false; "everything passes, but selfie isn't collected")]  
-    fn test_reason_codes_from_score_response(doc_opts: DocTestOpts, expected: Vec<FootprintReasonCode>, expect_selfie: bool) {
+                ], false; "everything passes, but selfie isn't collected")]
+    fn test_reason_codes_from_score_response(
+        doc_opts: DocTestOpts,
+        expected: Vec<FootprintReasonCode>,
+        expect_selfie: bool,
+    ) {
         let raw_response = idv::test_fixtures::incode_fetch_scores_response(doc_opts);
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
 
         let ocr_raw_response = idv::test_fixtures::incode_fetch_ocr_response(None);
         let ocr_parsed: FetchOCRResponse = serde_json::from_value(ocr_raw_response).unwrap();
 
-        assert_have_same_elements(super::reason_codes_from_score_response(&parsed, &ocr_parsed, expect_selfie, IdDocKind::DriversLicense), expected)
+        assert_have_same_elements(
+            super::reason_codes_from_score_response(
+                &parsed,
+                &ocr_parsed,
+                expect_selfie,
+                IdDocKind::DriversLicense,
+            ),
+            expected,
+        )
     }
 
     #[test]
@@ -542,46 +606,73 @@ mod tests {
         let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts::default());
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
         let id_test_results = only_id_tests_for_ones_that_have_frcs_from_parsed(parsed.clone());
-        id_test_results.iter().for_each(|(test, status)| if test.is_crosscheck() {
-            assert_eq!(status, &IncodeStatus::Ok)
+        id_test_results.iter().for_each(|(test, status)| {
+            if test.is_crosscheck() {
+                assert_eq!(status, &IncodeStatus::Ok)
+            }
         });
-        let frcs = super::reason_codes_from_score_response(&parsed,&ocr_parsed, false, IdDocKind::DriversLicense);
+        let frcs =
+            super::reason_codes_from_score_response(&parsed, &ocr_parsed, false, IdDocKind::DriversLicense);
         assert!(frcs.contains(&FootprintReasonCode::DocumentBarcodeContentMatches));
 
         // partial fail
-        let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts {barcode_content: Fail, barcode: Ok, cross_checks: Ok, ..Default::default()});
+        let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts {
+            barcode_content: Fail,
+            barcode: Ok,
+            cross_checks: Ok,
+            ..Default::default()
+        });
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
-        let frcs = super::reason_codes_from_score_response(&parsed,&ocr_parsed, false, IdDocKind::DriversLicense);
+        let frcs =
+            super::reason_codes_from_score_response(&parsed, &ocr_parsed, false, IdDocKind::DriversLicense);
         assert!(!frcs.contains(&FootprintReasonCode::DocumentBarcodeContentMatches));
         assert!(!frcs.contains(&FootprintReasonCode::DocumentBarcodeContentDoesNotMatch));
 
         // read ok, but cross checks fail
-        let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts {barcode_content: Ok, barcode: Ok, cross_checks: Fail, ..Default::default()});
+        let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts {
+            barcode_content: Ok,
+            barcode: Ok,
+            cross_checks: Fail,
+            ..Default::default()
+        });
         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
-        let frcs = super::reason_codes_from_score_response(&parsed,&ocr_parsed, false, IdDocKind::DriversLicense);
+        let frcs =
+            super::reason_codes_from_score_response(&parsed, &ocr_parsed, false, IdDocKind::DriversLicense);
         assert!(frcs.contains(&FootprintReasonCode::DocumentBarcodeContentDoesNotMatch));
 
-         // wasn't read
-         let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts {barcode_content: Fail, barcode: Fail, cross_checks: Fail, ..Default::default()});
-         let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
-         let frcs = super::reason_codes_from_score_response(&parsed, &ocr_parsed,false, IdDocKind::DriversLicense);
-         assert!(!frcs.contains(&FootprintReasonCode::DocumentBarcodeContentDoesNotMatch));
-         assert!(!frcs.contains(&FootprintReasonCode::DocumentBarcodeContentMatches));
+        // wasn't read
+        let raw_response = idv::test_fixtures::incode_fetch_scores_response(DocTestOpts {
+            barcode_content: Fail,
+            barcode: Fail,
+            cross_checks: Fail,
+            ..Default::default()
+        });
+        let parsed: FetchScoresResponse = serde_json::from_value(raw_response).unwrap();
+        let frcs =
+            super::reason_codes_from_score_response(&parsed, &ocr_parsed, false, IdDocKind::DriversLicense);
+        assert!(!frcs.contains(&FootprintReasonCode::DocumentBarcodeContentDoesNotMatch));
+        assert!(!frcs.contains(&FootprintReasonCode::DocumentBarcodeContentMatches));
     }
 
-    fn only_id_tests_for_ones_that_have_frcs_from_parsed(parsed: FetchScoresResponse) -> HashMap<IncodeTest, IncodeStatus> {
-        parsed.get_id_tests().into_iter().filter(|(t, _)| {
-            let frc_helper: Option<IncodeRCH> = t.into(); // filter to only
-            frc_helper.is_some()
-        }).collect()
+    fn only_id_tests_for_ones_that_have_frcs_from_parsed(
+        parsed: FetchScoresResponse,
+    ) -> HashMap<IncodeTest, IncodeStatus> {
+        parsed
+            .get_id_tests()
+            .into_iter()
+            .filter(|(t, _)| {
+                let frc_helper: Option<IncodeRCH> = t.into(); // filter to only
+                frc_helper.is_some()
+            })
+            .collect()
     }
-    
+
 
     #[test_case(FetchOCRResponse { ..Default::default()} => None)]
     #[test_case(FetchOCRResponse { expire_at: Some(ScrubbedPiiString::from("1663459200000")), ..Default::default()} => Some(FootprintReasonCode::DocumentExpired))]
     #[test_case(FetchOCRResponse { expire_at: Some(ScrubbedPiiString::from("2663459200000")), ..Default::default()} => Some(FootprintReasonCode::DocumentNotExpired))]
     fn test_doc_expired_reason_code(res: FetchOCRResponse) -> Option<FootprintReasonCode> {
-        doc_expired_reason_code(&res) 
+        doc_expired_reason_code(&res)
     }
 
     #[test_case(
@@ -701,7 +792,8 @@ mod tests {
         } 
         => false)]
     fn test_ocr_was_successful(dk: IdDocKind, score_opts: DocTestOpts, ocr_res: FetchOCRResponse) -> bool {
-        let scores_res: FetchScoresResponse = serde_json::from_value(idv::test_fixtures::incode_fetch_scores_response(score_opts)).unwrap();
+        let scores_res: FetchScoresResponse =
+            serde_json::from_value(idv::test_fixtures::incode_fetch_scores_response(score_opts)).unwrap();
         ocr_was_successful(&scores_res, &ocr_res, dk)
     }
 
@@ -712,11 +804,19 @@ mod tests {
     #[test_case("C", "GEORGIA", "DriversLicense", vec![]; "full driver class passes")]
     #[test_case("A", "GEORGIA", "DriversLicense", vec![]; "full commercial driver class passes")]
     #[test_case("D", "NEW YORK", "DriversLicense", vec![])]
-    fn test_drivers_license_features(class: &str, issuing_state: &str, type_of_id: &str, expected: Vec<FootprintReasonCode>) {
-        let raw = test_fixtures::incode_fetch_ocr_response_for_drivers_license(class, issuing_state, type_of_id);
+    fn test_drivers_license_features(
+        class: &str,
+        issuing_state: &str,
+        type_of_id: &str,
+        expected: Vec<FootprintReasonCode>,
+    ) {
+        let raw =
+            test_fixtures::incode_fetch_ocr_response_for_drivers_license(class, issuing_state, type_of_id);
         let parsed: FetchOCRResponse = serde_json::from_value(raw).unwrap();
 
-        assert_have_same_elements(super::drivers_license_features_from_ocr_response(&parsed), expected)
+        assert_have_same_elements(
+            super::drivers_license_features_from_ocr_response(&parsed),
+            expected,
+        )
     }
-
 }

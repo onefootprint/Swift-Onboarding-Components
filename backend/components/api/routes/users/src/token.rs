@@ -1,35 +1,32 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::types::response::ResponseData;
-use crate::types::JsonApiResponse;
-use crate::State;
-use api_core::auth::session::user::AssociatedAuthEvent;
-use api_core::auth::tenant::SecretTenantAuthContext;
-use api_core::auth::tenant::TenantGuard;
-use api_core::auth::user::allowed_user_scopes;
-use api_core::config::LinkKind;
-use api_core::errors::ApiResult;
-use api_core::errors::ValidationError;
-use api_core::utils::actix::OptionalJson;
-use api_core::utils::fp_id_path::FpIdPath;
-use api_core::utils::token::create_token;
-use api_core::utils::token::CreateTokenArgs;
-use api_core::utils::token::CreateTokenResult;
-use api_core::utils::vault_wrapper::Any;
-use api_core::utils::vault_wrapper::TenantVw;
-use api_core::utils::vault_wrapper::VaultWrapper;
-use api_wire_types::CreateTokenRequest;
-use api_wire_types::CreateTokenResponse;
-use api_wire_types::TokenOperationKind;
-use chrono::Duration;
-use chrono::Utc;
-use db::models::auth_event::AuthEvent;
-use db::models::auth_event::NewAuthEvent;
-use db::models::scoped_vault::ScopedVault;
+use crate::{
+    auth::tenant::CheckTenantGuard,
+    types::{response::ResponseData, JsonApiResponse},
+    State,
+};
+use api_core::{
+    auth::{
+        session::user::AssociatedAuthEvent,
+        tenant::{SecretTenantAuthContext, TenantGuard},
+        user::allowed_user_scopes,
+    },
+    config::LinkKind,
+    errors::{ApiResult, ValidationError},
+    utils::{
+        actix::OptionalJson,
+        fp_id_path::FpIdPath,
+        token::{create_token, CreateTokenArgs, CreateTokenResult},
+        vault_wrapper::{Any, TenantVw, VaultWrapper},
+    },
+};
+use api_wire_types::{CreateTokenRequest, CreateTokenResponse, TokenOperationKind};
+use chrono::{Duration, Utc};
+use db::models::{
+    auth_event::{AuthEvent, NewAuthEvent},
+    scoped_vault::ScopedVault,
+};
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use newtypes::AuthEventKind;
-use newtypes::IdentifyScope;
-use newtypes::PreviewApi;
+use newtypes::{AuthEventKind, IdentifyScope, PreviewApi};
 use paperclip::actix::{api_v2_operation, post, web};
 
 #[api_v2_operation(

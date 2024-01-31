@@ -1,18 +1,18 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::SecretTenantAuthContext;
-use crate::auth::tenant::TenantGuard;
-use crate::types::response::ResponseData;
-use crate::types::JsonApiResponse;
-use crate::State;
-use api_core::decision::field_validations::create_field_validation_results;
-use api_core::utils::fp_id_path::FpIdPath;
+use crate::{
+    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
+    types::{response::ResponseData, JsonApiResponse},
+    State,
+};
+use api_core::{decision::field_validations::create_field_validation_results, utils::fp_id_path::FpIdPath};
 use api_wire_types::GetFieldValidationResponse;
-use db::models::risk_signal::IncludeHidden;
-use db::models::risk_signal::RiskSignal;
-use db::models::scoped_vault::ScopedVault;
-use db::DbResult;
-use newtypes::PreviewApi;
-use newtypes::SignalScope;
+use db::{
+    models::{
+        risk_signal::{IncludeHidden, RiskSignal},
+        scoped_vault::ScopedVault,
+    },
+    DbResult,
+};
+use newtypes::{PreviewApi, SignalScope};
 use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(

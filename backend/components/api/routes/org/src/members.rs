@@ -1,30 +1,21 @@
-use crate::auth::tenant::AuthActor;
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantSessionAuth;
-use crate::errors::tenant::TenantError;
-use crate::errors::ApiResult;
-use crate::types::EmptyResponse;
-use crate::types::JsonApiResponse;
-use crate::types::OffsetPaginatedResponse;
-use crate::types::OffsetPaginationRequest;
-use crate::types::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::utils::magic_link::create_magic_link;
-use crate::State;
+use crate::{
+    auth::tenant::{AuthActor, CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    errors::{tenant::TenantError, ApiResult},
+    types::{EmptyResponse, JsonApiResponse, OffsetPaginatedResponse, OffsetPaginationRequest, ResponseData},
+    utils::{db2api::DbToApi, magic_link::create_magic_link},
+    State,
+};
 use api_wire_types::OrgMemberFilters;
 use chrono::Utc;
-use db::models::tenant_rolebinding::TenantRolebinding;
-use db::models::tenant_rolebinding::TenantRolebindingFilters;
-use db::models::tenant_rolebinding::TenantRolebindingUpdate;
-use db::models::tenant_user::TenantUser;
-use db::OffsetPagination;
-use newtypes::email::Email;
-use newtypes::OrgMemberEmail;
-use newtypes::TenantRoleId;
-use newtypes::TenantUserId;
-use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
+use db::{
+    models::{
+        tenant_rolebinding::{TenantRolebinding, TenantRolebindingFilters, TenantRolebindingUpdate},
+        tenant_user::TenantUser,
+    },
+    OffsetPagination,
+};
+use newtypes::{email::Email, OrgMemberEmail, TenantRoleId, TenantUserId};
+use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json, Apiv2Schema};
 
 #[api_v2_operation(
     tags(Members, OrgSettings, Private),

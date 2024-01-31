@@ -1,21 +1,16 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantSessionAuth;
+use crate::auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth};
 
 use crate::types::JsonApiResponse;
 
 use crate::types::ResponseData;
 
 use crate::State;
-use api_core::auth::tenant::TenantAuth;
-use api_core::errors::tenant::TenantError;
+use api_core::{auth::tenant::TenantAuth, errors::tenant::TenantError};
 use api_wire_types::OrgClientSecurityConfig;
 
-use db::models::tenant_client_config::TenantClientConfig;
-use db::models::tenant_client_config::UpdateTenantClientConfig;
+use db::models::tenant_client_config::{TenantClientConfig, UpdateTenantClientConfig};
 
-use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{api_v2_operation, get, patch, web};
+use paperclip::actix::{api_v2_operation, get, patch, web, Apiv2Schema};
 
 #[api_v2_operation(
     tags(SecurityConfig, Organization, Private),

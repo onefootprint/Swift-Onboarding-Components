@@ -1,14 +1,14 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::TenantSessionAuth;
-use crate::types::response::ResponseData;
-use crate::types::JsonApiResponse;
-use crate::utils::db2api::DbToApi;
-use crate::State;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    types::{response::ResponseData, JsonApiResponse},
+    utils::db2api::DbToApi,
+    State,
+};
 use api_core::utils::fp_id_path::FpIdPath;
-use db::models::rule_set_result::RuleSetResult;
-use db::models::scoped_vault::ScopedVault;
-use db::DbResult;
+use db::{
+    models::{rule_set_result::RuleSetResult, scoped_vault::ScopedVault},
+    DbResult,
+};
 use paperclip::actix::{api_v2_operation, get, web};
 
 #[api_v2_operation(

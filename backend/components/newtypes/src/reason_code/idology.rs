@@ -529,9 +529,9 @@ impl serde::Serialize for IDologyReasonCode {
 mod tests {
     use strum::IntoEnumIterator;
 
-    use crate::db_types::FootprintReasonCode;
-    use crate::idology_match_codes;
-    use crate::reason_code::idology::IDologyReasonCode;
+    use crate::{
+        db_types::FootprintReasonCode, idology_match_codes, reason_code::idology::IDologyReasonCode,
+    };
 
     #[test]
     fn test_vendor_reason_code_enum_use() {

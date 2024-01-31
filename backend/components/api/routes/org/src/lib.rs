@@ -19,8 +19,7 @@ mod sdk_telemetry;
 mod webhook_portal;
 
 // Temporary glob imports until api core is disbanded.
-pub use api_core::auth;
-pub use api_core::*;
+pub use api_core::{auth, *};
 
 pub fn routes(config: &mut web::ServiceConfig) {
     config

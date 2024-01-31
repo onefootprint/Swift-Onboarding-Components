@@ -1,9 +1,13 @@
 use std::time::Duration;
 
 use super::fixtures;
-use crate::models::vault::Priority;
-use crate::models::{data_lifetime::DataLifetime, vault::Vault};
-use crate::tests::prelude::*;
+use crate::{
+    models::{
+        data_lifetime::DataLifetime,
+        vault::{Priority, Vault},
+    },
+    tests::prelude::*,
+};
 use chrono::{DateTime, Utc};
 use macros::db_test_case;
 use newtypes::{Fingerprint, FingerprintScopeKind, IdentityDataKind as IDK, SandboxId};

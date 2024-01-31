@@ -3,9 +3,7 @@ use std::collections::HashMap;
 use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::billing_event;
-use diesel::dsl::count_star;
-use diesel::prelude::*;
-use diesel::Queryable;
+use diesel::{dsl::count_star, prelude::*, Queryable};
 use newtypes::{BillingEventId, BillingEventKind, ObConfigurationId, ScopedVaultId, TenantId};
 
 use super::scoped_vault::ScopedVault;

@@ -1,11 +1,10 @@
-use crate::auth::tenant::CheckTenantGuard;
-use crate::auth::tenant::TenantGuard;
-use crate::types::response::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
-use api_core::auth::tenant::SecretTenantAuthContext;
-use api_core::types::JsonApiResponse;
-use api_core::utils::fp_id_path::FpIdPath;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard},
+    types::response::ResponseData,
+    utils::db2api::DbToApi,
+    State,
+};
+use api_core::{auth::tenant::SecretTenantAuthContext, types::JsonApiResponse, utils::fp_id_path::FpIdPath};
 use db::models::liveness_event::LivenessEvent;
 use newtypes::PreviewApi;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};

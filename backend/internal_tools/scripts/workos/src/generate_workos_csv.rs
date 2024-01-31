@@ -1,6 +1,4 @@
-use std::env;
-use std::fs::File;
-use std::io::prelude::*;
+use std::{env, fs::File, io::prelude::*};
 use workos::{
     organizations::{ListOrganizations, ListOrganizationsParams},
     ApiKey, PaginationOrder, PaginationParams, WorkOs,

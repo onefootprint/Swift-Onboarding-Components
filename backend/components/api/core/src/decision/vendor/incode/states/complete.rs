@@ -1,57 +1,45 @@
-use super::IncodeStateTransition;
-use super::VerificationSession;
-use crate::decision::features::incode_docv;
-use crate::decision::features::incode_docv::IncodeOcrComparisonDataFields;
-use crate::decision::features::incode_utils::ParsedIncodeFields;
-use crate::decision::features::incode_utils::ParsedIncodeNames;
-use crate::decision::vendor::incode::state::IncodeState;
-use crate::decision::vendor::incode::state::TransitionResult;
-use crate::decision::vendor::incode::state_machine::IncodeContext;
-use crate::enclave_client::EnclaveClient;
-use crate::errors::ApiErrorKind;
-use crate::errors::ApiResult;
-use crate::errors::AssertionError;
-use crate::utils::file_upload::mime_type_to_extension;
-use crate::utils::vault_wrapper::NewDocument;
-use crate::utils::vault_wrapper::Person;
-use crate::utils::vault_wrapper::VaultWrapper;
-use crate::utils::vault_wrapper::WriteableVw;
-use crate::vendor_clients::IncodeClients;
+use super::{IncodeStateTransition, VerificationSession};
+use crate::{
+    decision::{
+        features::{
+            incode_docv,
+            incode_docv::IncodeOcrComparisonDataFields,
+            incode_utils::{ParsedIncodeFields, ParsedIncodeNames},
+        },
+        vendor::incode::{
+            state::{IncodeState, TransitionResult},
+            state_machine::IncodeContext,
+        },
+    },
+    enclave_client::EnclaveClient,
+    errors::{ApiErrorKind, ApiResult, AssertionError},
+    utils::{
+        file_upload::mime_type_to_extension,
+        vault_wrapper::{NewDocument, Person, VaultWrapper, WriteableVw},
+    },
+    vendor_clients::IncodeClients,
+};
 use async_trait::async_trait;
-use db::models::data_lifetime::DataLifetime;
-use db::models::document_data::DocumentData;
-use db::models::identity_document::IdentityDocument;
-use db::models::identity_document::IdentityDocumentUpdate;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::risk_signal::RiskSignal;
-use db::models::user_timeline::UserTimeline;
-use db::models::vault::Vault;
-use db::DbPool;
-use db::TxnPgConn;
-use idv::incode::doc::response::FetchOCRResponse;
-use idv::incode::doc::response::FetchScoresResponse;
+use db::{
+    models::{
+        data_lifetime::DataLifetime,
+        document_data::DocumentData,
+        identity_document::{IdentityDocument, IdentityDocumentUpdate},
+        ob_configuration::ObConfiguration,
+        risk_signal::RiskSignal,
+        user_timeline::UserTimeline,
+        vault::Vault,
+    },
+    DbPool, TxnPgConn,
+};
+use idv::incode::doc::response::{FetchOCRResponse, FetchScoresResponse};
 use itertools::Itertools;
-use newtypes::DataIdentifier;
-use newtypes::DataLifetimeSeqno;
-use newtypes::DataLifetimeSource;
-use newtypes::DataRequest;
-use newtypes::DocumentKind;
-use newtypes::Fingerprints;
-use newtypes::FootprintReasonCode;
-use newtypes::IdDocKind;
-use newtypes::IdentityDataKind as IDK;
-use newtypes::IdentityDocumentId;
-use newtypes::IdentityDocumentStatus;
-use newtypes::IncodeFailureReason;
-use newtypes::OcrDataKind as ODK;
-use newtypes::PiiJsonValue;
-use newtypes::PiiString;
-use newtypes::ScopedVaultId;
-use newtypes::ScrubbedPiiString;
-use newtypes::Validate;
-use newtypes::ValidateArgs;
-use newtypes::VendorAPI;
-use newtypes::VerificationResultId;
+use newtypes::{
+    DataIdentifier, DataLifetimeSeqno, DataLifetimeSource, DataRequest, DocumentKind, Fingerprints,
+    FootprintReasonCode, IdDocKind, IdentityDataKind as IDK, IdentityDocumentId, IdentityDocumentStatus,
+    IncodeFailureReason, OcrDataKind as ODK, PiiJsonValue, PiiString, ScopedVaultId, ScrubbedPiiString,
+    Validate, ValidateArgs, VendorAPI, VerificationResultId,
+};
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
 

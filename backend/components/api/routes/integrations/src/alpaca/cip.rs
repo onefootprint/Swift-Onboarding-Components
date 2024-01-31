@@ -1,7 +1,6 @@
 use alpaca::{
     AlpacaCip, CipRequest, CipResult, DataComparsionBreakDown, ImageIntegrityBreakdown, VisualAuthenticity,
 };
-use api_core::utils::fp_id_path::FpIdPath;
 use api_core::{
     auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
     decision::{
@@ -18,20 +17,28 @@ use api_core::{
     },
     errors::{cip_error::CipError, ApiResult},
     types::{JsonApiResponse, ResponseData},
-    utils::vault_wrapper::{DecryptUncheckedResult, TenantVw, VaultWrapper},
+    utils::{
+        fp_id_path::FpIdPath,
+        vault_wrapper::{DecryptUncheckedResult, TenantVw, VaultWrapper},
+    },
     ApiErrorKind, State,
 };
 use api_wire_types::{AlpacaCipRequest, AlpacaCipResponse, DeprecatedAlpacaCipRequest};
 use chrono::{DateTime, Utc};
-use db::models::annotation::Annotation;
-use db::models::risk_signal::IncludeHidden;
-use db::models::user_timeline::UserTimeline;
 use db::{
     actor::{saturate_actors, SaturatedActor},
     models::{
-        document_request::DocumentRequest, insight_event::InsightEvent, manual_review::ManualReview,
-        ob_configuration::ObConfiguration, onboarding_decision::OnboardingDecision, risk_signal::RiskSignal,
-        scoped_vault::ScopedVault, verification_request::VerificationRequest, workflow::Workflow,
+        annotation::Annotation,
+        document_request::DocumentRequest,
+        insight_event::InsightEvent,
+        manual_review::ManualReview,
+        ob_configuration::ObConfiguration,
+        onboarding_decision::OnboardingDecision,
+        risk_signal::{IncludeHidden, RiskSignal},
+        scoped_vault::ScopedVault,
+        user_timeline::UserTimeline,
+        verification_request::VerificationRequest,
+        workflow::Workflow,
     },
 };
 use idv::ParsedResponse;

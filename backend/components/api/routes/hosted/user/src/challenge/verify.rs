@@ -1,50 +1,39 @@
 use std::collections::HashMap;
 
-use crate::challenge::RegisterChallenge;
-use crate::State;
-use api_core::auth::user::CheckedUserAuthContext;
-use api_core::auth::user::UserAuth;
-use api_core::auth::user::UserAuthContext;
-use api_core::auth::user::UserAuthGuard;
-use api_core::auth::IsGuardMet;
-use api_core::errors::challenge::ChallengeError;
-use api_core::errors::ApiResult;
-use api_core::errors::AssertionError;
-use api_core::errors::ValidationError;
-use api_core::types::response::ResponseData;
-use api_core::types::EmptyResponse;
-use api_core::types::JsonApiResponse;
-use api_core::utils::challenge::Challenge;
-use api_core::utils::headers::InsightHeaders;
-use api_core::utils::passkey::VerifyChallengeResult;
-use api_core::utils::passkey::WebauthnConfig;
-use api_core::utils::vault_wrapper::Any;
-use api_core::utils::vault_wrapper::VaultWrapper;
+use crate::{challenge::RegisterChallenge, State};
+use api_core::{
+    auth::{
+        user::{CheckedUserAuthContext, UserAuth, UserAuthContext, UserAuthGuard},
+        IsGuardMet,
+    },
+    errors::{challenge::ChallengeError, ApiResult, AssertionError, ValidationError},
+    types::{response::ResponseData, EmptyResponse, JsonApiResponse},
+    utils::{
+        challenge::Challenge,
+        headers::InsightHeaders,
+        passkey::{VerifyChallengeResult, WebauthnConfig},
+        vault_wrapper::{Any, VaultWrapper},
+    },
+};
 use api_wire_types::UserChallengeVerifyRequest;
 use chrono::Utc;
 use crypto::sha256;
-use db::models::auth_event::AuthEvent;
-use db::models::auth_event::NewAuthEvent;
-use db::models::contact_info::ContactInfo;
-use db::models::insight_event::CreateInsightEvent;
-use db::models::user_timeline::UserTimeline;
-use db::models::webauthn_credential::WebauthnCredential;
-use db::TxnPgConn;
+use db::{
+    models::{
+        auth_event::{AuthEvent, NewAuthEvent},
+        contact_info::ContactInfo,
+        insight_event::CreateInsightEvent,
+        user_timeline::UserTimeline,
+        webauthn_credential::WebauthnCredential,
+    },
+    TxnPgConn,
+};
 use itertools::Itertools;
-use newtypes::ActionKind;
-use newtypes::AuthEventKind;
-use newtypes::AuthMethodKind;
-use newtypes::AuthMethodUpdatedInfo;
-use newtypes::ContactInfoKind;
-use newtypes::DataLifetimeSource;
-use newtypes::DataRequest;
-use newtypes::Fingerprints;
-use newtypes::InsightEventId;
-use newtypes::PiiString;
-use newtypes::ScopedVaultId;
-use newtypes::TenantId;
-use newtypes::ValidateArgs;
-use newtypes::WebauthnCredentialId;
+use newtypes::{
+    ActionKind, AuthEventKind, AuthMethodKind, AuthMethodUpdatedInfo, ContactInfoKind, DataLifetimeSource,
+    DataRequest, Fingerprints, InsightEventId, PiiString, ScopedVaultId, TenantId, ValidateArgs,
+    WebauthnCredentialId,
+};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 use super::RegisterChallengeData;

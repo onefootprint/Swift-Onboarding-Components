@@ -3,8 +3,7 @@ use std::str::FromStr;
 use actix_web::http::header::HeaderMap;
 use newtypes::PiiString;
 
-use reqwest::header::HeaderName;
-use reqwest::header::HeaderValue;
+use reqwest::header::{HeaderName, HeaderValue};
 
 use crate::errors::{proxy::VaultProxyError, ApiError, ApiResult};
 

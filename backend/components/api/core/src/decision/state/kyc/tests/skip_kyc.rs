@@ -1,20 +1,21 @@
-use crate::decision::state::actions::Authorize;
-use crate::decision::state::test_utils::{
-    mock_incode_doc_collection, mock_webhooks, query_data, setup_data, DocumentOutcome as Doc,
-    ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged,
-    UserKind::{self, *},
+use crate::{
+    decision::state::{
+        actions::Authorize,
+        test_utils::{
+            mock_incode_doc_collection, mock_webhooks, query_data, setup_data, DocumentOutcome as Doc,
+            ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged,
+            UserKind::{self, *},
+        },
+        WorkflowActions, WorkflowWrapper,
+    },
+    State,
 };
-use crate::decision::state::{WorkflowActions, WorkflowWrapper};
-use crate::State;
 use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
 use macros::test_state_case;
 use newtypes::{
-    CollectedDataOption as CDO, DocumentCdoInfo,
+    CollectedDataOption as CDO, CountryRestriction, DocTypeRestriction, DocumentCdoInfo, KycState,
     OnboardingStatus::{self, *},
-    SignalScope,
-};
-use newtypes::{
-    CountryRestriction, DocTypeRestriction, KycState, Selfie, WorkflowFixtureResult as Fixture, WorkflowState,
+    Selfie, SignalScope, WorkflowFixtureResult as Fixture, WorkflowState,
 };
 
 struct Review(bool);

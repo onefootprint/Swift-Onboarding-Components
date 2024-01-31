@@ -1,11 +1,9 @@
-use crate::DbResult;
-use crate::{DbError, TxnPgConn};
+use crate::{DbError, DbResult, TxnPgConn};
 use db_schema::schema::{manual_review, onboarding_decision};
 
 use crate::PgConn;
 use chrono::{DateTime, Utc};
-use diesel::dsl::not;
-use diesel::prelude::*;
+use diesel::{dsl::not, prelude::*};
 use newtypes::{DbActor, ManualReviewId, OnboardingDecisionId, ReviewReason, ScopedVaultId, WorkflowId};
 use serde::{Deserialize, Serialize};
 

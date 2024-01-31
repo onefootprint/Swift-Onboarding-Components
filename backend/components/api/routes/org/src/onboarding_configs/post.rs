@@ -1,25 +1,24 @@
-use crate::auth::tenant::TenantGuard;
-use crate::auth::tenant::{CheckTenantGuard, TenantSessionAuth};
-use crate::errors::tenant::TenantError;
-use crate::errors::ApiError;
-use crate::errors::ApiResult;
-use crate::types::response::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
-use api_core::decision::rule_engine;
-use api_core::errors::{AssertionError, ValidationError};
-use api_core::telemetry::RootSpan;
+use crate::{
+    auth::tenant::{CheckTenantGuard, TenantGuard, TenantSessionAuth},
+    errors::{tenant::TenantError, ApiError, ApiResult},
+    types::response::ResponseData,
+    utils::db2api::DbToApi,
+    State,
+};
+use api_core::{
+    decision::rule_engine,
+    errors::{AssertionError, ValidationError},
+    telemetry::RootSpan,
+};
 use db::models::ob_configuration::ObConfiguration;
 use feature_flag::BoolFlag;
 use itertools::Itertools;
-use newtypes::output::Csv;
 use newtypes::{
-    AdverseMediaListKind, CipKind, DataIdentifierDiscriminant, EnhancedAml, ObConfigurationKind, TenantId,
+    output::Csv, AdverseMediaListKind, CipKind, CollectedData as CD, CollectedDataOption as CDO,
+    CollectedDataOptionKind as CDOK, DataIdentifierDiscriminant, EnhancedAml, EnhancedAmlOption,
+    Iso3166TwoDigitCountryCode, ObConfigurationKind, TenantId,
 };
-use newtypes::{CollectedData as CD, Iso3166TwoDigitCountryCode};
-use newtypes::{CollectedDataOption as CDO, CollectedDataOptionKind as CDOK, EnhancedAmlOption};
-use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{api_v2_operation, post, web, web::Json};
+use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
 
@@ -53,6 +52,7 @@ pub struct CreateOnboardingConfigurationRequest {
 
 impl CreateOnboardingConfigurationRequest {
     const ALLOWED_OPTIONAL_FIELDS: [CDO; 2] = [CDO::Ssn4, CDO::Ssn9];
+
     /// Core validation business logic, separated from checking simple required fields
     fn validate_inner(&self) -> ApiResult<()> {
         let group_by_parent = |cdos: Vec<CDO>| {

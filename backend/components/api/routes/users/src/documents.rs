@@ -1,12 +1,11 @@
-use crate::auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard};
-use crate::types::response::ResponseData;
-use crate::utils::db2api::DbToApi;
-use crate::State;
-use api_core::errors::ApiResult;
-use api_core::types::JsonApiResponse;
-use api_core::utils::fp_id_path::FpIdPath;
-use db::models::identity_document::IdentityDocument;
-use db::models::scoped_vault::ScopedVault;
+use crate::{
+    auth::tenant::{CheckTenantGuard, SecretTenantAuthContext, TenantGuard},
+    types::response::ResponseData,
+    utils::db2api::DbToApi,
+    State,
+};
+use api_core::{errors::ApiResult, types::JsonApiResponse, utils::fp_id_path::FpIdPath};
+use db::models::{identity_document::IdentityDocument, scoped_vault::ScopedVault};
 use itertools::Itertools;
 use newtypes::PreviewApi;
 use paperclip::actix::{api_v2_operation, get, web};

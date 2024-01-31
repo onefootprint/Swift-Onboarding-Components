@@ -1,19 +1,18 @@
 use super::WriteableVw;
-use crate::errors::ApiResult;
-use crate::utils::vault_wrapper::{Person, TenantVw, VaultWrapper};
-use crate::State;
-use db::models::ob_configuration::ObConfiguration;
-use db::models::scoped_vault::ScopedVault;
-use db::test_helpers::assert_have_same_elements;
-use db::tests::fixtures::ob_configuration::ObConfigurationOpts;
-use db::tests::test_db_pool::TestDbPool;
-use db::TxnPgConn;
+use crate::{
+    errors::ApiResult,
+    utils::vault_wrapper::{Person, TenantVw, VaultWrapper},
+    State,
+};
+use db::{
+    models::{ob_configuration::ObConfiguration, scoped_vault::ScopedVault},
+    test_helpers::assert_have_same_elements,
+    tests::{fixtures::ob_configuration::ObConfigurationOpts, test_db_pool::TestDbPool},
+    TxnPgConn,
+};
 use itertools::Itertools;
 use macros::test_state;
-use newtypes::CollectedDataOption as CDO;
-use newtypes::FingerprintScopeKind;
-use newtypes::IdentityDataKind as IDK;
-use newtypes::PiiString;
+use newtypes::{CollectedDataOption as CDO, FingerprintScopeKind, IdentityDataKind as IDK, PiiString};
 
 struct TestData {
     su1: ScopedVault,

@@ -1,24 +1,22 @@
-use super::doc::request::{
-    AddDocumentSideRequest, AddMLConsent, AddPrivacyConsent, AddSelfieRequest, DocumentSide,
-};
-use super::doc::response::GetOnboardingStatusResponse;
-use super::watchlist::request::WatchlistResultRequest;
 use super::{
+    doc::{
+        request::{AddDocumentSideRequest, AddMLConsent, AddPrivacyConsent, AddSelfieRequest, DocumentSide},
+        response::GetOnboardingStatusResponse,
+    },
     request::{OnboardingStartCustomNameFields, OnboardingStartRequest},
     response::OnboardingStartResponse,
+    watchlist::request::WatchlistResultRequest,
     IncodeAPIResult,
 };
 use crate::footprint_http_client::FpVendorClientArgs;
 use crate::{footprint_http_client::FootprintVendorHttpClient, incode::error::Error as IncodeError};
 use newtypes::{
     vendor_credentials::IncodeCredentials, DocVData, IdDocKind, IncodeConfigurationId, IncodeSessionId,
-    PiiString,
+    IncodeVerificationSessionId, IncodeVerificationSessionKind, IncodeWatchlistResultRef, PiiString,
 };
-use newtypes::{IncodeVerificationSessionId, IncodeVerificationSessionKind, IncodeWatchlistResultRef};
 use reqwest::header;
 
-use tokio_retry::strategy::FixedInterval;
-use tokio_retry::RetryIf;
+use tokio_retry::{strategy::FixedInterval, RetryIf};
 
 #[derive(Clone)]
 pub struct IncodeClientAdapter {
@@ -554,10 +552,12 @@ mod tests {
     use crate::{
         footprint_http_client::{FootprintVendorHttpClient, FpVendorClientArgs},
         incode::{
-            doc::request::DocumentSide,
-            doc::response::{
-                AddSideResponse, FetchOCRResponse, FetchScoresResponse, ProcessFaceResponse,
-                ProcessIdResponse,
+            doc::{
+                request::DocumentSide,
+                response::{
+                    AddSideResponse, FetchOCRResponse, FetchScoresResponse, ProcessFaceResponse,
+                    ProcessIdResponse,
+                },
             },
             response::OnboardingStartResponse,
             watchlist::response::{UpdatedWatchlistResultResponse, WatchlistResultResponse},

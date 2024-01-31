@@ -561,6 +561,7 @@ impl Iso3166TwoDigitCountryCode {
     pub fn is_us_including_territories(&self) -> bool {
         self.is_us() || self.is_us_territory()
     }
+
     pub fn is_us_territory(&self) -> bool {
         matches!(
             self,

@@ -1,25 +1,16 @@
-use crate::models::scoped_vault::ScopedVault;
-use crate::models::vault::Vault;
-use crate::DbResult;
-use crate::PgConn;
+use crate::{
+    models::{scoped_vault::ScopedVault, vault::Vault},
+    DbResult, PgConn,
+};
 use chrono::{DateTime, Utc};
 use db_schema::schema;
-use diesel::dsl::not;
-use diesel::prelude::*;
+use diesel::{dsl::not, prelude::*};
 use itertools::Itertools;
-use newtypes::output::Csv;
-use newtypes::ExternalId;
-use newtypes::LabelKind;
-use newtypes::ObConfigurationId;
-use newtypes::OnboardingStatus;
-use newtypes::OnboardingStatusFilter;
-use newtypes::PiiString;
-use newtypes::ScopedVaultCursor;
-use newtypes::ScopedVaultCursorKind;
-use newtypes::ScopedVaultId;
-use newtypes::VaultKind;
-use newtypes::WatchlistCheckStatusKind;
-use newtypes::{Fingerprint, FpId, TenantId, WorkflowKind};
+use newtypes::{
+    output::Csv, ExternalId, Fingerprint, FpId, LabelKind, ObConfigurationId, OnboardingStatus,
+    OnboardingStatusFilter, PiiString, ScopedVaultCursor, ScopedVaultCursorKind, ScopedVaultId, TenantId,
+    VaultKind, WatchlistCheckStatusKind, WorkflowKind,
+};
 use std::collections::HashMap;
 use tracing::instrument;
 

@@ -1,10 +1,14 @@
 use std::str::FromStr;
 
-use crate::models::annotation::{Annotation, AnnotationInfo};
-use crate::models::tenant_api_key::TenantApiKey;
-use crate::models::tenant_user::TenantUser;
-use crate::models::user_timeline::UserTimeline;
-use crate::TxnPgConn;
+use crate::{
+    models::{
+        annotation::{Annotation, AnnotationInfo},
+        tenant_api_key::TenantApiKey,
+        tenant_user::TenantUser,
+        user_timeline::UserTimeline,
+    },
+    TxnPgConn,
+};
 
 use newtypes::{
     DbActor, Fingerprint, OrgMemberEmail, ScopedVaultId, SealedVaultBytes, TenantId, TenantRoleId, VaultId,
@@ -74,10 +78,11 @@ pub(crate) fn test_tenant_api_key(
 #[allow(clippy::module_inception)]
 #[cfg(test)]
 mod test {
-    use crate::models::{tenant::Tenant, vault::Vault};
-    use crate::{test_helpers, DbResult};
-    use diesel::sql_types::Text;
-    use diesel::{sql_query, RunQueryDsl};
+    use crate::{
+        models::{tenant::Tenant, vault::Vault},
+        test_helpers, DbResult,
+    };
+    use diesel::{sql_query, sql_types::Text, RunQueryDsl};
     use newtypes::{EncryptedVaultPrivateKey, SandboxId, VaultKind, VaultPublicKey};
 
     #[actix_rt::test]

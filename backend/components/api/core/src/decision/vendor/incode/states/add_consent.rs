@@ -2,14 +2,22 @@ use super::{
     map_to_api_err, save_incode_verification_result, IncodeStateTransition, ProcessId,
     SaveVerificationResultArgs, VerificationSession,
 };
-use crate::decision::vendor::incode::state::{IncodeState, TransitionResult};
-use crate::decision::vendor::incode::IncodeContext;
-use crate::errors::{ApiResult, AssertionError};
-use crate::vendor_clients::IncodeClients;
+use crate::{
+    decision::vendor::incode::{
+        state::{IncodeState, TransitionResult},
+        IncodeContext,
+    },
+    errors::{ApiResult, AssertionError},
+    vendor_clients::IncodeClients,
+};
 use async_trait::async_trait;
-use db::models::identity_document::{IdentityDocument, IdentityDocumentUpdate};
-use db::models::user_consent::UserConsent;
-use db::{DbPool, TxnPgConn};
+use db::{
+    models::{
+        identity_document::{IdentityDocument, IdentityDocumentUpdate},
+        user_consent::UserConsent,
+    },
+    DbPool, TxnPgConn,
+};
 use idv::incode::doc::{IncodeAddMLConsentRequest, IncodeAddPrivacyConsentRequest};
 use newtypes::{IdentityDocumentId, IdentityDocumentStatus, VendorAPI};
 
