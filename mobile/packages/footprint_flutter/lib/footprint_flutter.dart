@@ -25,8 +25,6 @@ enum _ResultType { completed, canceled }
 
 class _Footprint {
   Uri? _latestUri;
-  Object? _err;
-  StreamSubscription? _subscription;
   bool _isBrowserOpen = false;
   late _MyChromeSafariBrowser _browser;
   void Function(String token)? _handleComplete;
@@ -80,7 +78,7 @@ class _Footprint {
 
   void _handleIncomingLinks() {
     if (!kIsWeb) {
-      _subscription = uriLinkStream.listen(
+      uriLinkStream.listen(
         (Uri? uri) {
           _processUri(uri);
         },
@@ -104,12 +102,10 @@ class _Footprint {
       }
     });
     _browser.close();
-    _err = null;
   }
 
   void _handleError(Object err) {
     _latestUri = null;
-    _err = err is FormatException ? err : null;
   }
 
   Future<void> _handleInitialUri() async {
