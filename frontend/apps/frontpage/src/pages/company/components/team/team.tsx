@@ -88,9 +88,15 @@ const Item = styled.li`
 const AvatarContainer = styled.div`
   ${({ theme }) => css`
     margin-bottom: ${theme.spacing[7]};
+    border-radius: ${theme.borderRadius.default};
+    overflow: hidden;
+    width: 160px;
+    height: 160px;
 
     img {
-      border-radius: ${theme.borderRadius.default};
+      width: 100%;
+      height: auto;
+      object-fit: cover;
     }
   `}
 `;

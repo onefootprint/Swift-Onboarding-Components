@@ -57,6 +57,7 @@ const Company = () => {
       iconComponent: IcoShield40,
     },
   ];
+
   const team = [
     {
       name: 'Alex Grinman',
@@ -118,6 +119,12 @@ const Company = () => {
       role: 'Engineering',
       linkedin: 'https://www.linkedin.com/in/elliott-forde-18454b124/',
       twitter: 'https://twitter.com/elliottvforde',
+    },
+    {
+      name: 'Ethan Lowman',
+      avatarSrc: '/team/member-ethan.png',
+      role: 'Engineering',
+      linkedin: 'https://www.linkedin.com/in/ethan-lowman/',
     },
     {
       name: 'Keagan Long',
