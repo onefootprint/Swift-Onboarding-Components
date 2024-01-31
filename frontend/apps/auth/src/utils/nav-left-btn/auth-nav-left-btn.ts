@@ -28,6 +28,12 @@ const getAuthLeftNavButton = (
   if (state.matches('biometricChallenge')) {
     return bootstrapData?.email || bootstrapData?.phoneNumber ? CLOSE : BACK;
   }
+  if (state.matches('phoneIdentification')) {
+    return bootstrapData?.email || bootstrapData?.phoneNumber ? BACK : CLOSE;
+  }
+  if (state.matches('emailIdentification')) {
+    return CLOSE;
+  }
 
   return BACK;
 };
