@@ -14,7 +14,7 @@ on:
         required: false
 
       isPR:
-        description: 'is this a PR?'
+        description: 'is this a PR? Only used for ephemeral'
         type: boolean
         default: false
         required: false
@@ -61,7 +61,7 @@ jobs:
       IT_TWILIO_SECRET_AUTH_TOKEN: ${{ secrets.IT_TWILIO_SECRET_AUTH_TOKEN }}
       DITTO_URL: 'https://ditto.footprint.dev'
       SVIX_AUTH_TOKEN: ${{ secrets.SVIX_AUTH_TOKEN }}
-      ENVIRONMENT: ${{inputs.environment}}
+      ENVIRONMENT: ${{ inputs.isPr && 'ephemeral' || inputs.environment }}
 
     steps:
       - uses: actions/checkout@v3

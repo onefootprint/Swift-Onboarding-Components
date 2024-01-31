@@ -13,6 +13,7 @@ def test_environment():
         "local",
         "ci",
         "dev",
+        "ephemeral",
         "production",
     }, f"Unknown environment: {ENVIRONMENT}"
 
