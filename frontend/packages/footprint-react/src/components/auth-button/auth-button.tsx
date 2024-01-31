@@ -2,32 +2,59 @@ import type { FootprintAuthProps } from '@onefootprint/footprint-js';
 import footprint, { FootprintComponentKind } from '@onefootprint/footprint-js';
 import React, { forwardRef } from 'react';
 
+type WithPublicKey = {
+  publicKey: string;
+  authToken?: never;
+  updateLoginMethods?: never;
+};
+type WithAuthToken = {
+  publicKey?: never;
+  authToken: string;
+  updateLoginMethods: true;
+};
+
 export type AuthButtonProps = Omit<FootprintAuthProps, 'kind' | 'variant'> & {
   dialogVariant?: 'modal' | 'drawer';
   label?: string;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   testID?: string;
-};
+} & (WithPublicKey | WithAuthToken);
 
 const AuthButton = (
   {
     appearance,
     dialogVariant,
     l10n,
-    label = 'Auth with Footprint',
+    label = 'Authenticate with Footprint',
     onCancel,
     onClick,
     onClose,
     onComplete,
     options,
-    publicKey,
+    publicKey = undefined,
+    authToken = undefined,
+    updateLoginMethods = undefined,
     testID,
     userData,
   }: AuthButtonProps,
   ref?: React.Ref<HTMLButtonElement>,
 ) => {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onClick?.(event);
+
+    let tokenProps = {};
+    if (authToken && updateLoginMethods) {
+      tokenProps = { authToken, updateLoginMethods };
+    } else if (publicKey) {
+      tokenProps = { publicKey };
+    } else {
+      throw new TypeError(
+        'Missing parameter. Please add "authToken" with "updateLoginMethods" or "publicKey".',
+      );
+    }
+
     const config: FootprintAuthProps = {
+      ...tokenProps,
       kind: FootprintComponentKind.Auth,
       appearance,
       l10n,
@@ -35,13 +62,11 @@ const AuthButton = (
       onClose,
       onComplete,
       options,
-      publicKey,
       userData,
       variant: dialogVariant,
     };
     const component = footprint.init(config);
     component.render();
-    onClick?.(event);
   };
 
   return (
