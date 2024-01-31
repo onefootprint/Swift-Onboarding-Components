@@ -24,7 +24,6 @@ use strum_macros::{Display, EnumIter, EnumString};
     Apiv2Schema,
     macros::SerdeAttr,
 )]
-#[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum RuleAction {
     /// ORDERING MATTERS!!!

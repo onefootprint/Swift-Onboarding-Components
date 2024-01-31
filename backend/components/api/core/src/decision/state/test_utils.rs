@@ -12,24 +12,13 @@ use crate::{
 };
 use db::{
     models::{
-        decision_intent::DecisionIntent,
-        document_request::{DocumentRequest, NewDocumentRequestArgs},
-        manual_review::ManualReview,
-        ob_configuration::ObConfiguration,
-        onboarding_decision::OnboardingDecision,
-        risk_signal::{IncludeHidden, RiskSignal},
-        tenant::Tenant,
-        tenant_user::TenantUser,
-        tenant_vendor::TenantVendorControl,
-        vault::Vault,
-        verification_request::VerificationRequest,
-        verification_result::VerificationResult,
-        workflow::Workflow,
-        workflow_event::WorkflowEvent,
+        decision_intent::DecisionIntent, document_request::{DocumentRequest, NewDocumentRequestArgs}, manual_review::ManualReview, ob_configuration::ObConfiguration, onboarding_decision::OnboardingDecision, risk_signal::{IncludeHidden, RiskSignal}, rule_instance::RuleInstance, rule_result::RuleResult, rule_set_result::RuleSetResult, tenant::Tenant, tenant_user::TenantUser, tenant_vendor::TenantVendorControl, vault::Vault, verification_request::VerificationRequest, verification_result::VerificationResult, workflow::Workflow, workflow_event::WorkflowEvent
     },
+    
     tests::{fixtures, fixtures::ob_configuration::ObConfigurationOpts},
     TxnPgConn,
 };
+use db_schema::schema::document_request;
 use idv::{
     experian::{ExperianCrossCoreRequest, ExperianCrossCoreResponse},
     idology::{IdologyExpectIDAPIResponse, IdologyExpectIDRequest},
@@ -47,6 +36,7 @@ use newtypes::{
 };
 use strum_macros::EnumIter;
 use webhooks::{events::WebhookEvent, MockWebhookClient};
+use diesel::prelude::*;
 
 #[derive(Clone, Copy, Debug)]
 pub enum UserKind {
@@ -208,6 +198,27 @@ pub async fn query_risk_signals(
         .unwrap()
 }
 
+pub async fn query_doc_requests(state: &State, wf_id: &WorkflowId) -> Vec<DocumentRequest> {
+    let w = wf_id.clone();
+    state
+        .db_pool
+        .db_query(move |conn| {
+            document_request::table
+            .filter(document_request::workflow_id.eq(w))
+            .get_results(conn).unwrap()
+        }).await
+        .unwrap()
+}
+
+pub async fn query_rule_set_result(state: &State, sv_id: &ScopedVaultId) -> Option<(RuleSetResult, Vec<(RuleResult, RuleInstance)>)> {
+    let s = sv_id.clone();
+    state
+        .db_pool
+        .db_query(move |conn| {
+           RuleSetResult::latest_workflow_decision(conn, &s).unwrap()
+        }).await
+        .unwrap()
+}
 pub struct WithHit(pub Vec<AmlKind>);
 pub fn mock_incode(state: &mut State, with_hit: WithHit) {
     let lists: Vec<String> = with_hit
