@@ -5,7 +5,7 @@ use crate::{
 };
 use api_core::{
     auth::{ob_config::ObConfigAuth, user::UserAuthContext, Any},
-    errors::{onboarding::OnboardingError, ApiError, error_with_code::ErrorWithCode},
+    errors::{error_with_code::ErrorWithCode, onboarding::OnboardingError, ApiError},
     telemetry::RootSpan,
     types::{JsonApiResponse, ResponseData},
     utils::{
@@ -84,7 +84,7 @@ pub async fn post(
         ck => ck,
     };
     if !available_challenge_kinds.contains(&challenge_kind) {
-        return Err(ErrorWithCode::UnsupportedChallengeKind.into());
+        return Err(ErrorWithCode::UnsupportedChallengeKind(challenge_kind.to_string()).into());
     }
 
     let (rx, challenge_state_data, time_before_retry_s, phone_number, biometric_challenge_json) =

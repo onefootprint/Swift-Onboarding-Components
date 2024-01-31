@@ -36,7 +36,7 @@ use crate::{
 };
 use twilio::error::Error as TwilioError;
 
-use self::{challenge::ChallengeError, error_with_code::ErrorWithCode, handoff::HandoffError};
+use self::{challenge::ChallengeError, handoff::HandoffError};
 
 pub type ApiResult<T> = Result<T, ApiError>;
 
@@ -71,7 +71,7 @@ where
 #[derive(Debug, Error)]
 pub enum ApiErrorKind {
     #[error("{0}")]
-    ErrorWithCode(#[from] ErrorWithCode)
+    ErrorWithCode(#[from] error_with_code::ErrorWithCode),
     #[error("{0}")]
     AuthError(#[from] crate::auth::AuthError),
     #[error("{0}")]
@@ -388,16 +388,13 @@ impl actix_web::ResponseError for ApiError {
         let support_id = Uuid::new_v4();
         let status_code = self.status_code().as_u16();
 
-        let error_code = if let ApiErrorKind::ErrorWithCode(error) = self.kind() {
-            Some(error.get_message().unwrap_or_default().to_string())
+        let (error_code, error_context, message) = if let ApiErrorKind::ErrorWithCode(error) = self.kind() {
+            let error_code = Some(error.get_message().unwrap_or_default().to_string());
+            let error_context = error.context();
+            let message = ErrorMessage::String(error.to_string());
+            (error_code, error_context, message)
         } else {
-            None
-        };
-
-        let message = if let ApiErrorKind::ErrorWithCode(error) = self.kind() {
-            ErrorMessage::String(error.to_string())
-        } else {
-            self.message()
+            (None, None, self.message())
         };
 
         let message = if status_code == StatusCode::INTERNAL_SERVER_ERROR
@@ -415,6 +412,7 @@ impl actix_web::ResponseError for ApiError {
                 status_code,
                 message,
                 error_code,
+                error_context,
                 support_id,
             },
         };

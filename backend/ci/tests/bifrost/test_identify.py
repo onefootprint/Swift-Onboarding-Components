@@ -307,7 +307,7 @@ def test_otp_unverified(sandbox_user, sandbox_tenant):
     # Cannot initiate a login challenge
     data = dict(preferred_challenge_kind="email")
     body = post("/hosted/identify/login_challenge", data, token, status_code=400)
-    assert body["error"]["message"] == "Cannot initiate a challenge of kind email"
+    assert body["error"]["message"] == "Cannot initiate a challenge of requested kind"
 
     # Run KBA
     kba_data = {"id.phone_number": phone_number}

@@ -68,7 +68,7 @@ pub async fn handle_file_upload(
         return Err(ErrorWithCode::InvalidFileUploadMissing)?;
     };
 
-    let mut item = item.map_err(ErrorWithCode::from)?;
+    let mut item = item.map_err(|_| ErrorWithCode::MultipartError)?;
 
     let filename = item
         .content_disposition()
@@ -80,14 +80,14 @@ pub async fn handle_file_upload(
 
     if let Some(allowed_mime_types) = restrict_to_mime_types {
         if !allowed_mime_types.contains(&mime) {
-            return Err(ErrorWithCode::InvalidMimeType.into());
+            return Err(ErrorWithCode::InvalidMimeType(mime.to_string()).into());
         }
     }
 
     let mut bytes = BytesMut::with_capacity(request_content_length);
 
     while let Some(chunk) = item.next().await {
-        let chunk = chunk.map_err(ErrorWithCode::from)?;
+        let chunk = chunk.map_err(|_| ErrorWithCode::MultipartError)?;
         let chunk_size = chunk.len();
 
         if bytes.len() + chunk_size > request_content_length {
