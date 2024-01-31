@@ -6,9 +6,7 @@ use api_core::{
         user::{CheckedUserAuthContext, UserAuth, UserAuthContext, UserAuthGuard},
         IsGuardMet,
     },
-    errors::{
-        challenge::ChallengeError, error_with_code::ErrorWithCode, ApiResult, AssertionError, ValidationError,
-    },
+    errors::{error_with_code::ErrorWithCode, ApiResult, AssertionError, ValidationError},
     types::{response::ResponseData, EmptyResponse, JsonApiResponse},
     utils::{
         challenge::Challenge,

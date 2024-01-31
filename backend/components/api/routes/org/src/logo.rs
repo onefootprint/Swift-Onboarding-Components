@@ -1,8 +1,5 @@
 use actix_multipart::Multipart;
-use api_core::{
-    error_with_code::ErrorWithCode, errors::file_upload::FileUploadError,
-    utils::file_upload::mime_type_to_extension,
-};
+use api_core::{errors::error_with_code::ErrorWithCode, utils::file_upload::mime_type_to_extension};
 use db::models::tenant::{Tenant, UpdateTenant};
 use paperclip::actix::{
     self, api_v2_operation, web,

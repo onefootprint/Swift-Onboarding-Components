@@ -388,6 +388,7 @@ impl actix_web::ResponseError for ApiError {
         let support_id = Uuid::new_v4();
         let status_code = self.status_code().as_u16();
 
+        // in prod, omit 500 errors from the client
         let (error_code, error_context, message) = if let ApiErrorKind::ErrorWithCode(error) = self.kind() {
             let error_code = Some(error.get_message().unwrap_or_default().to_string());
             let error_context = error.context();

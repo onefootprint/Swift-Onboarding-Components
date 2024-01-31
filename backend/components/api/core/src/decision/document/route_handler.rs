@@ -165,7 +165,6 @@ pub async fn handle_document_upload(
     let doc_kind: DocKind = id_doc.document_type.into();
 
     if id_doc.status != IdentityDocumentStatus::Pending {
-        // Do not change this error - the frontend is relying upon it
         return Err(ErrorWithCode::IdentityDocumentNotPending.into());
     }
     // We support the flow

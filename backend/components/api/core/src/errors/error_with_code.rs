@@ -94,17 +94,16 @@ impl std::fmt::Display for ErrorWithCode {
 #[cfg(test)]
 mod tests {
     use super::ErrorWithCode;
-    use std::collections::HashSet;
+    use itertools::Itertools;
     use strum::{EnumMessage, IntoEnumIterator};
 
     #[test]
     fn test_unique_error_codes() {
-        let codes: HashSet<_> = ErrorWithCode::iter().filter_map(|e| e.get_message()).collect();
-
-        let total = ErrorWithCode::iter()
-            .filter(|e| e.get_message().is_some())
+        let codes = ErrorWithCode::iter()
+            .filter_map(|e| e.get_message())
+            .unique()
             .count();
-
-        assert_eq!(codes.len(), total, "Duplicate or missing error codes");
+        let total = ErrorWithCode::iter().count();
+        assert_eq!(codes, total, "Duplicate or missing error codes");
     }
 }

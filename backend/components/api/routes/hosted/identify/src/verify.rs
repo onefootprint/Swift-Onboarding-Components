@@ -9,8 +9,8 @@ use api_core::{
     },
     config::Config,
     errors::{
-        business::BusinessError, challenge::ChallengeError, user::UserError, ApiError, ApiResult,
-        ValidationError,
+        business::BusinessError, challenge::ChallengeError, error_with_code::ErrorWithCode, user::UserError,
+        ApiError, ApiResult, ValidationError,
     },
     telemetry::RootSpan,
     types::{response::ResponseData, JsonApiResponse},
