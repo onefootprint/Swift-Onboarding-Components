@@ -5,32 +5,32 @@ use stripe::PriceId;
 use crate::BResult;
 use strum_macros::{Display, EnumIter};
 
-#[derive(Debug, Hash, PartialEq, Eq, Clone, Copy, EnumIter, Display)]
+#[derive(Debug, Hash, PartialEq, Eq, Clone, Copy, EnumIter, Display, Ord, PartialOrd)]
 pub enum Product {
-    /// Total number user vaults with billable PII - either an authorized workflow OR created via API
-    Pii,
     /// Number of KYC verifications ran this month
     Kyc,
-    /// Number of KYB verifications ran this month
-    Kyb,
-    /// Number of Complete IdentityDocuments this month. We'll end up charging for users who don't finish onboarding
-    IdDocs,
-    /// Number of watchlist checks ran this month
-    WatchlistChecks,
-    /// Number of vaults with decrypts this month
-    HotVaults,
-    /// Number of vaults with proxy decrypts this month
-    HotProxyVaults,
-    /// Number of vaults with non-card and non-custom data
-    VaultsWithNonPci,
-    /// Number of vaults with card or custom data
-    VaultsWithPci,
     /// Number of completed workflows onto playbooks that include adverse media checks.
     /// Adverse media checks are billing per onboarding even though we run them monthly???
     AdverseMediaPerOnboarding,
     /// Instead of watchlist_checks, billing for incode continuos monitoring. We bill on a per year
     /// basis, but run the checks monthly
     ContinuousMonitoringPerYear,
+    /// Number of KYB verifications ran this month
+    Kyb,
+    /// Number of Complete IdentityDocuments this month. We'll end up charging for users who don't finish onboarding
+    IdDocs,
+    /// Number of watchlist checks ran this month
+    WatchlistChecks,
+    /// Total number user vaults with billable PII - either an authorized workflow OR created via API
+    Pii,
+    /// Number of vaults with non-card and non-custom data
+    VaultsWithNonPci,
+    /// Number of vaults with card or custom data
+    VaultsWithPci,
+    /// Number of vaults with decrypts this month
+    HotVaults,
+    /// Number of vaults with proxy decrypts this month
+    HotProxyVaults,
 }
 
 impl Product {

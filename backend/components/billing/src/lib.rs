@@ -4,6 +4,7 @@ use db::{
     DbError,
 };
 use interval::BillingInterval;
+use itertools::Itertools;
 use newtypes::{PiiString, StripeCustomerId, TenantId};
 use profile::BillingProfile;
 use std::{collections::HashMap, str::FromStr};
@@ -191,19 +192,19 @@ impl BillingClient {
 
         // Create the invoice items, unassociated with any invoice, for all the items we'll be charging
         let prices = BillingProfile::get_for(&self.client, info.billing_profile).await?;
-        let items_fut = info
+
+        let mut items = HashMap::new();
+        for l in info
             .counts
             .line_items(prices)?
             .into_iter()
-            .map(|l| self.get_or_create_invoice_item(customer_id.clone(), l));
-        let items: HashMap<_, _> = futures::future::join_all(items_fut)
-            .await
-            .into_iter()
-            .collect::<BResult<Vec<_>>>()?
-            .into_iter()
-            .flatten()
-            .map(|i| (i.id.clone(), i))
-            .collect();
+            .sorted_by_key(|l| l.product)
+        {
+            let Some(i) = self.get_or_create_invoice_item(customer_id.clone(), l).await? else {
+                continue;
+            };
+            items.insert(i.id.clone(), i);
+        }
 
         // Create the invoice, which will automatically include these billing items
         let extra_metadata = [("billing-interval".to_owned(), info.interval.label)];

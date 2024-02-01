@@ -2291,6 +2291,7 @@ dependencies = [
  "db",
  "feature_flag",
  "futures",
+ "itertools",
  "newtypes",
  "rust_decimal",
  "serde",
