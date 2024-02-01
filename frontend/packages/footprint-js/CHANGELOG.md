@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 3.9.0
+
+### Minor Changes
+
+- a2434a483: Add auth update flow support
+
 ## 3.8.3
 
 ### Patch Changes

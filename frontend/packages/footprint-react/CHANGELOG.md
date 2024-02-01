@@ -1,5 +1,16 @@
 # @onefootprint/footprint-react
 
+## 6.2.1
+
+### Minor Changes
+
+- a2434a483: Add auth update flow support
+
+### Patch Changes
+
+- Updated dependencies [a2434a483]
+  - @onefootprint/footprint-js@3.9.0
+
 ## 6.1.1
 
 ### Patch Changes
