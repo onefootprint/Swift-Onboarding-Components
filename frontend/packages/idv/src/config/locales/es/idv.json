@@ -1135,14 +1135,14 @@
       },
       "loading": {
         "title": {
-          "process-front": "Procesando imagen...",
-          "process-back": "Procesando imagen...",
+          "process-front": "Procesando...",
+          "process-back": "Procesando...",
           "process-selfie": "Procesando selfie...",
-          "upload-front": "Subiendo imagen...",
-          "upload-back": "Subiendo imagen...",
+          "upload-front": "Subiendo...",
+          "upload-back": "Subiendo...",
           "upload-selfie": "Subiendo selfie...",
-          "analyze-front": "Analizando imagen...",
-          "analyze-back": "Analizando imagen...",
+          "analyze-front": "Analizando...",
+          "analyze-back": "Analizando...",
           "analyze-selfie": "Analizando selfie..."
         },
         "subtitle": "Aguarda unos instantes. Estamos procesando tu imagen.",
@@ -1196,7 +1196,7 @@
           "title": "Subir foto"
         },
         "upload-file": {
-          "title": "Upload photo"
+          "title": "Subir archivo"
         }
       },
       "next-side": {
@@ -1337,7 +1337,7 @@
               "title": "Factura de servicios (desde los últimos 30 días)"
             },
             "proofOfAddress": {
-              "title": "Proof of address"
+              "title": "Comprobante de domicilio"
             }
           },
           "not-supported": "Lo sentimos, por el momento no admitimos identificaciones de tu país.",
@@ -1355,7 +1355,7 @@
             "residenceDocument": "Green Card · FRENTE",
             "voterIdentification": "Identificación de votante · FRENTE",
             "ssnCard": "Tarjeta de SSN · FRENTE",
-            "proofOfAddress": "Proof of address"
+            "proofOfAddress": "Comprobante de domicilio"
           },
           "preview": {
             "driversLicense": "Licencia de conducir",
@@ -1366,7 +1366,7 @@
             "residenceDocument": "Green Card",
             "voterIdentification": "Identificación de votante",
             "ssnCard": "Tarjeta de SSN",
-            "proofOfAddress": "Proof of address"
+            "proofOfAddress": "Comprobante de domicilio"
           }
         },
         "subtitle": {
@@ -1484,15 +1484,15 @@
       },
       "id-doc-upload-first-prompt": {
         "proof_of_address": {
-          "title": "Upload a proof of address",
-          "description": "We need to verify your address. Please upload a document that shows your name and address.",
+          "title": "Sube un comprobante de domicilio",
+          "description": "Necesitamos verificar tu dirección. Por favor, carga un documento que muestre tu nombre y dirección.",
           "guidelines": {
-            "gas-water-electricity-bill": "Gas, water or electricity bills",
-            "bank-credit-card-statement": "Bank or credit card statements",
-            "vehicle-voter-registration": "Vehicle or voter registration cards",
-            "rental-agreement": "Rental lease agreement",
-            "insurance": "Health or card insurance",
-            "phone-internet-bill": "Recent phone number or internet bills"
+            "gas-water-electricity-bill": "Facturas de gas, agua o electricidad",
+            "bank-credit-card-statement": "Extractos bancarios o de tarjetas de crédito",
+            "vehicle-voter-registration": "Tarjetas de registro de vehículo o de votante",
+            "rental-agreement": "Contrato de arrendamiento",
+            "insurance": "Tarjeta de seguro médico",
+            "phone-internet-bill": "Facturas recientes de teléfono o internet"
           }
         }
       }
