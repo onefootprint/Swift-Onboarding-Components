@@ -60,7 +60,7 @@ pub async fn post(
     let (to_refingerprint, next) = state
         .db_pool
         .db_query(move |conn| get_dls_to_refingerprint(conn, cursor, limit))
-        .await??;
+        .await?;
 
     let data_to_fp = to_refingerprint
         .iter()

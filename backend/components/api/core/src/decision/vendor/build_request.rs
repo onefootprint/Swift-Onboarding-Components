@@ -36,7 +36,7 @@ pub async fn build_idv_data_from_verification_request(
                 VwArgs::Historical(&request.scoped_vault_id, request.uvw_snapshot_seqno),
             )
         })
-        .await??;
+        .await?;
 
     let all_idks: Vec<_> = IDK::iter().map(DataIdentifier::from).collect();
     let mut decrypted_values = uvw.decrypt_unchecked(enclave_client, &all_idks).await?;
@@ -118,7 +118,7 @@ pub async fn build_docv_data_from_identity_doc(
             let uvw: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &dr.scoped_vault_id)?;
             Ok((doc, images, uvw))
         })
-        .await??;
+        .await?;
 
     let name_idks = vec![
         DataIdentifier::from(IDK::FirstName),
@@ -166,7 +166,7 @@ async fn build_docv_for_scan_verify_results(
             let (_, ref_id) = IdentityDocument::get(conn, &identity_doc_id)?;
             Ok(ref_id.ref_id)
         })
-        .await??;
+        .await?;
     let parsed_reference_id = parse_reference_id_for_scan_verify(ref_id)?;
 
     Ok(DocVData {
@@ -196,7 +196,7 @@ pub async fn build_business_data_from_verification_request(
 
             Ok((sv, bvw))
         })
-        .await??;
+        .await?;
 
     // Get FirstName + LastName for BO's. For Single-KYC, we get this from the JSON VaultData. For Multi_KYC, we get this from each BO's Vault
     let dbo = bvw
@@ -238,7 +238,7 @@ pub async fn build_business_data_from_verification_request(
 
             let vws: HashMap<ScopedVaultId, TenantVw> = db_pool
                 .db_query(move |conn| VaultWrapper::multi_get_for_tenant(conn, vaults, Some(seqno)))
-                .await??;
+                .await?;
             // Future optimization would be to bulk decrypt multiple vaults data in one enclave call
             let decrypt_futs = vws.into_values().map(|vw| async move {
                 let dis = &[IDK::FirstName.into(), IDK::LastName.into()];

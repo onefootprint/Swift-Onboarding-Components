@@ -4,28 +4,41 @@ use crate::{
             actions::{Authorize, MakeVendorCalls},
             kyc,
             test_utils::{
-                mock_idology, mock_incode_doc_collection, mock_webhooks, query_data, query_doc_requests, query_risk_signals, 
-                query_rule_set_result, setup_data, DocumentCollectionKind, DocumentOutcome::*, ExpectedRequiresManualReview,
-                ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, UserKind, WithQualifier,
+                mock_idology, mock_incode_doc_collection, mock_webhooks, query_data, query_doc_requests,
+                query_risk_signals, query_rule_set_result, setup_data, DocumentCollectionKind,
+                DocumentOutcome::*, ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted,
+                OnboardingStatusChanged, UserKind, WithQualifier,
             },
             MakeDecision, WorkflowActions, WorkflowKind, WorkflowWrapper,
         },
         tests::test_helpers,
-    }, errors::ApiResult, State
+    },
+    errors::ApiResult,
+    State,
 };
 use chrono::Utc;
 use db::{
     models::{
-        onboarding_decision::OnboardingDecision, risk_signal::RiskSignal, rule_instance::RuleInstance, rule_set_result::RuleSetResult, workflow::{NewWorkflow, NewWorkflowArgs, Workflow, Workflow as DbWorkflow}, workflow_event::WorkflowEvent
+        onboarding_decision::OnboardingDecision,
+        risk_signal::RiskSignal,
+        rule_instance::RuleInstance,
+        rule_set_result::RuleSetResult,
+        workflow::{NewWorkflow, NewWorkflowArgs, Workflow, Workflow as DbWorkflow},
+        workflow_event::WorkflowEvent,
     },
     test_helpers::assert_have_same_elements,
     tests::{fixtures::ob_configuration::ObConfigurationOpts, test_db_pool::TestDbPool, MockFFClient},
+    DbResult,
 };
 use feature_flag::BoolFlag;
 use itertools::Itertools;
 use macros::{test_state, test_state_case};
 use newtypes::{
-    BooleanOperator, CollectedDataOption as CDO, CountryRestriction, DbActor, DecisionStatus, DocTypeRestriction, DocumentCdoInfo, FootprintReasonCode, KycConfig, KycState, ObConfigurationKey, OnboardingStatus, RiskSignalGroupKind, RuleAction, RuleExpression, RuleExpressionCondition, Selfie, SignalSeverity, StepUpKind, TenantId, VendorAPI, WorkflowConfig, WorkflowFixtureResult, WorkflowId, WorkflowSource, WorkflowState
+    BooleanOperator, CollectedDataOption as CDO, CountryRestriction, DbActor, DecisionStatus,
+    DocTypeRestriction, DocumentCdoInfo, FootprintReasonCode, KycConfig, KycState, ObConfigurationKey,
+    OnboardingStatus, RiskSignalGroupKind, RuleAction, RuleExpression, RuleExpressionCondition, Selfie,
+    SignalSeverity, StepUpKind, TenantId, VendorAPI, WorkflowConfig, WorkflowFixtureResult, WorkflowId,
+    WorkflowSource, WorkflowState,
 };
 
 async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
@@ -67,10 +80,10 @@ async fn create_wf(state: &State, s: newtypes::WorkflowState) -> DbWorkflow {
 async fn get_wf(state: &State, wfid: WorkflowId) -> (DbWorkflow, Vec<WorkflowEvent>) {
     state
         .db_pool
-        .db_query(move |conn| {
-            let wf = DbWorkflow::get(conn, &wfid).unwrap();
-            let wfe = WorkflowEvent::list_for_workflow(conn, &wfid).unwrap();
-            (wf, wfe)
+        .db_query(move |conn| -> DbResult<_> {
+            let wf = DbWorkflow::get(conn, &wfid)?;
+            let wfe = WorkflowEvent::list_for_workflow(conn, &wfid)?;
+            Ok((wf, wfe))
         })
         .await
         .unwrap()
@@ -317,7 +330,6 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
         .db_pool
         .db_query(move |conn| RuleSetResult::latest_workflow_decision(conn, &svid))
         .await
-        .unwrap()
         .unwrap()
         .unwrap();
 }
@@ -689,10 +701,17 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
     // We have the correct pending doc requests
     assert_have_same_elements(
         doc_requests.into_iter().map(|d| d.kind).collect(),
-        step_up_kind.to_doc_kinds().into_iter().map(|k| k.into()).collect(),
+        step_up_kind
+            .to_doc_kinds()
+            .into_iter()
+            .map(|k| k.into())
+            .collect(),
     );
     // assert correct action was applied
-    assert_eq!(rule_set_result.action_triggered.unwrap(), RuleAction::StepUp(step_up_kind))
+    assert_eq!(
+        rule_set_result.action_triggered.unwrap(),
+        RuleAction::StepUp(step_up_kind)
+    )
 }
 
 #[allow(clippy::too_many_arguments)]

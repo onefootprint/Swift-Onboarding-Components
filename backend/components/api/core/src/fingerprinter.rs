@@ -149,7 +149,7 @@ impl State {
                     .map(|sv| sv.id);
                 Ok(Some((vault.id, sv_id)))
             })
-            .await??;
+            .await?;
 
         Ok(result)
     }

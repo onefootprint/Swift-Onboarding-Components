@@ -96,7 +96,7 @@ async fn post_inner(
             uvw.validate_request(conn, updates, Some(actor), false)?;
             Ok(())
         })
-        .await??;
+        .await?;
 
     EmptyResponse::ok().json()
 }

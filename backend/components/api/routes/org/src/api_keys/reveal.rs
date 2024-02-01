@@ -36,7 +36,7 @@ async fn post(
             let (key, role) = TenantApiKey::get(conn, (&request.id, &tenant_id, is_live))?;
             Ok((key, role))
         })
-        .await??;
+        .await?;
 
     let tenant = auth.tenant();
     let decrypted_secret_key = state

@@ -85,7 +85,7 @@ pub async fn save_fixture_vendor_result(
                 verification_request_id: vreq.id,
             })
         })
-        .await?
+        .await
 }
 
 // TODO: get_fixture_kyb_reason_codes

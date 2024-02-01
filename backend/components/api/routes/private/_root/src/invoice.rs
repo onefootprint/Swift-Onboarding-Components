@@ -35,7 +35,7 @@ async fn post(
     let tenant = state
         .db_pool
         .db_query(move |conn| Tenant::get(conn, &tenant_id))
-        .await??;
+        .await?;
 
     create_bill_for_tenant(&state.billing_client, &state.db_pool, tenant, billing_date).await?;
 
@@ -54,7 +54,7 @@ async fn post_all(
     request: Option<web::Json<CreateInvoicesRequest>>,
     _: ProtectedAuth,
 ) -> JsonApiResponse<EmptyResponse> {
-    let tenants = state.db_pool.db_query(Tenant::list_billable).await??;
+    let tenants = state.db_pool.db_query(Tenant::list_billable).await?;
 
     // Subtract 8 hours so we always generate the invoice for last month
     let billing_date = request

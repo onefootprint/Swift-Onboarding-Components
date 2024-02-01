@@ -89,7 +89,7 @@ async fn make_vendor_calls(
     let (wf, sv) = state
         .db_pool
         .db_query(move |conn| Workflow::get_all(conn, &wf_id))
-        .await??;
+        .await?;
     let tid = sv.tenant_id.clone();
     let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config, &state.enclave_client).await?;
     let tvc2 = tvc.clone();
@@ -227,7 +227,7 @@ async fn shadow_run(
     let (wf, sv) = state
         .db_pool
         .db_query(move |conn| Workflow::get_all(conn, &wf_id))
-        .await??;
+        .await?;
     let tid = sv.tenant_id.clone();
     let tvc = TenantVendorControl::new(tid, &state.db_pool, &state.config, &state.enclave_client).await?;
     let wfid = wf.id.clone();
@@ -336,7 +336,7 @@ async fn save_risk_signals_for_vres(
             )?;
             Ok((vreq_vres, vw))
         })
-        .await??;
+        .await?;
 
     let svid = vreq_vres.0.scoped_vault_id.clone();
     let vendor_result =

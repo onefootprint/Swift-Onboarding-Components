@@ -56,7 +56,7 @@ pub async fn handler(
             JsonSession::update_or_create(conn, &auth_token, &handoff_record, now + expires_in)?;
             Ok(auth_token)
         })
-        .await??;
+        .await?;
 
     Ok(Json(ResponseData {
         data: D2pGenerateResponse { auth_token },

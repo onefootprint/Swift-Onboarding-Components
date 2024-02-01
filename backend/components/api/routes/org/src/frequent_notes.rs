@@ -28,7 +28,7 @@ pub async fn get(
     let list = state
         .db_pool
         .db_query(move |conn| -> DbResult<_> { TenantFrequentNote::list(conn, &tenant_id, kind) })
-        .await??
+        .await?
         .into_iter()
         .map(api_wire_types::OrgFrequentNote::from_db)
         .collect();
@@ -60,7 +60,7 @@ pub async fn post(
         .db_query(move |conn| -> DbResult<_> {
             TenantFrequentNote::create(conn, tenant_id, actor, kind, content)
         })
-        .await??;
+        .await?;
     ResponseData::ok(api_wire_types::OrgFrequentNote::from_db(new_freq_note)).json()
 }
 
@@ -82,7 +82,7 @@ pub async fn delete(
     state
         .db_pool
         .db_query(move |conn| -> DbResult<_> { TenantFrequentNote::deactivate(conn, &tenant_id, &fn_id) })
-        .await??;
+        .await?;
 
     EmptyResponse::ok().json()
 }

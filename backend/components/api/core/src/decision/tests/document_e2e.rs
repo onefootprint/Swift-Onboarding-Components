@@ -283,12 +283,12 @@ async fn assertions(
 
         state
             .db_pool
-            .db_query(move |conn| {
-                let (id_doc, _) = IdentityDocument::get(conn, &document_id).unwrap();
+            .db_query(move |conn| -> DbResult<_> {
+                let (id_doc, _) = IdentityDocument::get(conn, &document_id)?;
                 assert_eq!(id_doc.status, IdentityDocumentStatus::Complete);
 
                 // Assert the state machine visited all states we expect
-                let events = IncodeVerificationSessionEvent::get_for_session_id(conn, &ivs.id).unwrap();
+                let events = IncodeVerificationSessionEvent::get_for_session_id(conn, &ivs.id)?;
                 let states = events
                     .into_iter()
                     .map(|i| i.incode_verification_session_state)
@@ -317,6 +317,7 @@ async fn assertions(
                 .flatten()
                 .collect();
                 assert_have_same_elements(states, expected_states);
+                Ok(())
             })
             .await
             .unwrap();
@@ -339,7 +340,6 @@ async fn assert_ivs_in_state(
             Ok(ivs)
         })
         .await
-        .unwrap()
         .unwrap()
 }
 

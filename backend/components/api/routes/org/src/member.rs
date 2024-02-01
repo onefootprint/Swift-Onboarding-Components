@@ -34,7 +34,7 @@ async fn get(
     let user = state
         .db_pool
         .db_query(move |conn| TenantUser::get(conn, &user_id))
-        .await??;
+        .await?;
 
     let result = api_wire_types::AuthOrgMember::from_db((user, rb, tenant, scopes));
     ResponseData::ok(result).json()

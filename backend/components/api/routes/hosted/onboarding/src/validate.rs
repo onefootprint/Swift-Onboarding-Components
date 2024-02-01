@@ -69,7 +69,7 @@ pub async fn post(
         let vw = state
             .db_pool
             .db_query(move |conn| VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv_id2)))
-            .await??;
+            .await?;
         let args = DecryptUncheckedResultForReqs::for_auth();
         let progress = get_data_collection_progress(&vw, ob_config, DataIdentifierDiscriminant::Id, &args);
         if !progress.missing_attributes.is_empty() {
@@ -113,7 +113,7 @@ pub async fn post(
             tracing::info!(%auth_token_hash, "Created validation token");
             Ok(validation_token)
         })
-        .await??;
+        .await?;
 
     ResponseData::ok(HostedValidateResponse { validation_token }).json()
 }

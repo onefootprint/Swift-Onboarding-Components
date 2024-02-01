@@ -77,7 +77,7 @@ pub async fn post(
             let uvw = VaultWrapper::<Any>::build(conn, VwArgs::Tenant(&sv.id))?;
             Ok((uvw, sv))
         })
-        .await??;
+        .await?;
 
     if uvw.vault.kind != VaultKind::Person {
         return Err(TenantError::IncorrectVaultKindForKyc.into());
@@ -183,7 +183,7 @@ pub async fn post(
             let mr = ManualReview::get_active(conn, &wf.id)?;
             Ok((wf, sv, mr))
         })
-        .await??;
+        .await?;
 
     let status = wf.status.ok_or(OnboardingError::NoStatusForWorkflow)?;
     ResponseData::ok(api_wire_types::EntityValidateResponse::from_db((status, sv, mr))).json()

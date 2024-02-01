@@ -605,12 +605,7 @@ mod test {
     }
 
     pub async fn some_db_stuff(state: &State) {
-        let tenants = state
-            .db_pool
-            .db_query(Tenant::list_billable)
-            .await
-            .unwrap()
-            .unwrap();
+        let tenants = state.db_pool.db_query(Tenant::list_billable).await.unwrap();
         println!("some_db_stuff, tenants: {:?}", tenants);
     }
 

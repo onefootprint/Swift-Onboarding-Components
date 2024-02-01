@@ -43,7 +43,7 @@ pub async fn post(
     let auth_events = state
         .db_pool
         .db_query(move |conn| load_auth_events(conn, &auth_events))
-        .await??;
+        .await?;
     let allowed_challenge_kinds = auth_events
         .iter()
         .flat_map(|(ae, kind)| allowed_challenge_kinds(action_kind, ae.kind, *kind))

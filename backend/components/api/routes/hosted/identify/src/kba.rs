@@ -54,7 +54,7 @@ pub async fn post(
             let vw = VaultWrapper::<Any>::build(conn, args)?;
             Ok(vw)
         })
-        .await??;
+        .await?;
     let dis = data.keys().cloned().collect_vec();
     let decrypted = vw.decrypt_unchecked(&state.enclave_client, &dis).await?;
 

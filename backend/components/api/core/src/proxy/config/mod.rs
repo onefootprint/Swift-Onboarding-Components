@@ -189,7 +189,7 @@ impl ProxyConfig {
             .db_query(move |conn| {
                 db::models::proxy_config::ProxyConfig::find(conn, &tenant_id, is_live, proxy_id)
             })
-            .await??;
+            .await?;
 
         // do not allow using a disabled proxy configuration
         if db_config.status != ApiKeyStatus::Enabled {

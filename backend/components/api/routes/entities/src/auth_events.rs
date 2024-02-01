@@ -36,7 +36,7 @@ pub async fn get(
             let (events, _) = AuthEvent::list(conn, &sv.id, None)?;
             Ok(events)
         })
-        .await??;
+        .await?;
 
     let response = events
         .into_iter()

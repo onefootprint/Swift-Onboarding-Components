@@ -50,7 +50,7 @@ impl FromRequest for PublicOnboardingContext {
             let (ob_config, tenant) = state
                 .db_pool
                 .db_query(move |conn| -> DbResult<_> { ObConfiguration::get_enabled(conn, &key) })
-                .await?
+                .await
                 .map_err(|e| -> Self::Error {
                     if e.is_not_found() {
                         // Slightly more informative error message when we can't find an ObConfig with this key

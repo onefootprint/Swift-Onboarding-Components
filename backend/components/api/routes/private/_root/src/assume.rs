@@ -50,7 +50,7 @@ async fn post(
             auth.update_session(conn, &session_sealing_key, AuthSessionData::FirmEmployee(session))?;
             Ok(tenant)
         })
-        .await??;
+        .await?;
 
     Ok(Json(ResponseData::ok(api_wire_types::Organization::from_db(
         tenant,

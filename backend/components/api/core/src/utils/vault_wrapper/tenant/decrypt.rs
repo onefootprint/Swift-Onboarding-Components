@@ -52,7 +52,7 @@ impl<Type> TenantVw<Type> {
             targets: results.decrypted_dis.into_iter().map(|t| t.identifier).collect(),
             purpose,
         };
-        state.db_pool.db_query(|conn| event.create(conn)).await??;
+        state.db_pool.db_query(|conn| event.create(conn)).await?;
         Ok(results.results)
     }
 }

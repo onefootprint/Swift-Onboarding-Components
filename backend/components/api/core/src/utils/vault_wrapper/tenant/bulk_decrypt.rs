@@ -169,7 +169,7 @@ where
                 }
                 Ok(())
             })
-            .await??;
+            .await?;
     }
 
     Ok(decrypted_results)

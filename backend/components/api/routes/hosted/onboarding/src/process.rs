@@ -118,7 +118,7 @@ async fn enqueue_run_incode_stuck_workflow_task(db_pool: &DbPool, workflow_id: &
             let scheduled_for = Utc::now() + Duration::seconds(30);
             Task::create(conn, scheduled_for, task_data)
         })
-        .await??;
+        .await?;
     Ok(())
 }
 
@@ -133,7 +133,7 @@ async fn run_kyb_if_needed(
     let biz_wf = state
         .db_pool
         .db_query(move |conn| user_auth.business_workflow(conn))
-        .await??;
+        .await?;
 
     if let Some(biz_wf) = biz_wf {
         if let Some(r) = fixture_result {

@@ -41,7 +41,7 @@ pub async fn get(
     let annotations = state
         .db_pool
         .db_query(move |conn| Annotation::list(conn, fp_id, tenant_id, is_live, query.is_pinned))
-        .await??;
+        .await?;
     let annotations = annotations
         .into_iter()
         .map(api_wire_types::Annotation::from_db)
@@ -76,7 +76,7 @@ async fn patch(
     let _result = state
         .db_pool
         .db_query(move |conn| Annotation::update(conn, annotation_id, tenant_id, fp_id, is_live, is_pinned))
-        .await??;
+        .await?;
 
     EmptyResponse::ok().json()
 }

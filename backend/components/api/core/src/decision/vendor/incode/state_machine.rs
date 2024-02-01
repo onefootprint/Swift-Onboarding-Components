@@ -167,7 +167,7 @@ impl IncodeStateMachine {
         let session = state
             .db_pool
             .db_query(move |conn| IncodeVerificationSession::get(conn, &id_doc_id))
-            .await??
+            .await?
             .ok_or(AssertionError("missing session"))?;
         let v_session = {
             let token = session

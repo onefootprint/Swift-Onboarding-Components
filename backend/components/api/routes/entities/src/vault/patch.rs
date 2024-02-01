@@ -113,7 +113,7 @@ async fn patch_inner(
                 let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv.id)?;
                 Ok(vw)
             })
-            .await??;
+            .await?;
         if uvw.get(ssn4.clone()).is_some() {
             let existing_ssn4 = uvw
                 .decrypt_unchecked_single(&state.enclave_client, ssn4.clone())

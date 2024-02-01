@@ -83,7 +83,7 @@ pub async fn post(
             };
             Ok((sv, auth_events, wf, biz_wf))
         })
-        .await??;
+        .await?;
 
     // Some logging metadata
     root_span.record("fp_id", sv.fp_id.to_string());
@@ -156,7 +156,7 @@ pub async fn post(
         state
             .db_pool
             .db_query(move |conn| Workflow::set_session_validated_at(conn, &wf_id))
-            .await??;
+            .await?;
     }
 
     let response = ValidateResponse {

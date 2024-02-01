@@ -12,11 +12,26 @@ use crate::{
 };
 use db::{
     models::{
-        decision_intent::DecisionIntent, document_request::{DocumentRequest, NewDocumentRequestArgs}, manual_review::ManualReview, ob_configuration::ObConfiguration, onboarding_decision::OnboardingDecision, risk_signal::{IncludeHidden, RiskSignal}, rule_instance::RuleInstance, rule_result::RuleResult, rule_set_result::RuleSetResult, tenant::Tenant, tenant_user::TenantUser, tenant_vendor::TenantVendorControl, vault::Vault, verification_request::VerificationRequest, verification_result::VerificationResult, workflow::Workflow, workflow_event::WorkflowEvent
+        decision_intent::DecisionIntent,
+        document_request::{DocumentRequest, NewDocumentRequestArgs},
+        manual_review::ManualReview,
+        ob_configuration::ObConfiguration,
+        onboarding_decision::OnboardingDecision,
+        risk_signal::{IncludeHidden, RiskSignal},
+        rule_instance::RuleInstance,
+        rule_result::RuleResult,
+        rule_set_result::RuleSetResult,
+        tenant::Tenant,
+        tenant_user::TenantUser,
+        tenant_vendor::TenantVendorControl,
+        vault::Vault,
+        verification_request::VerificationRequest,
+        verification_result::VerificationResult,
+        workflow::Workflow,
+        workflow_event::WorkflowEvent,
     },
-    
     tests::{fixtures, fixtures::ob_configuration::ObConfigurationOpts},
-    TxnPgConn,
+    DbError, DbResult, TxnPgConn,
 };
 use db_schema::schema::document_request;
 use idv::{
@@ -25,6 +40,7 @@ use idv::{
     incode::response::OnboardingStartResponse,
 };
 
+use diesel::prelude::*;
 use idv::{
     incode::{IncodeResponse, IncodeStartOnboardingRequest},
     middesk::{MiddeskCreateBusinessRequest, MiddeskCreateBusinessResponse},
@@ -36,7 +52,6 @@ use newtypes::{
 };
 use strum_macros::EnumIter;
 use webhooks::{events::WebhookEvent, MockWebhookClient};
-use diesel::prelude::*;
 
 #[derive(Clone, Copy, Debug)]
 pub enum UserKind {
@@ -167,19 +182,19 @@ pub async fn query_data(
     let wfid = wf_id.clone();
     state
         .db_pool
-        .db_query(move |conn| {
+        .db_query(move |conn| -> ApiResult<_> {
             let rs = RiskSignal::latest_by_risk_signal_group_kinds(conn, &svid, IncludeHidden(false))
                 .unwrap()
                 .into_iter()
                 .map(|(_, rs)| rs)
                 .collect();
 
-            let wf = Workflow::get(conn, &wfid).unwrap();
-            let obd = OnboardingDecision::get_active(conn, &wfid).unwrap();
-            let mr = ManualReview::get_active(conn, &wfid).unwrap();
-            let wfe = WorkflowEvent::list_for_workflow(conn, &wfid).unwrap();
+            let wf = Workflow::get(conn, &wfid)?;
+            let obd = OnboardingDecision::get_active(conn, &wfid)?;
+            let mr = ManualReview::get_active(conn, &wfid)?;
+            let wfe = WorkflowEvent::list_for_workflow(conn, &wfid)?;
 
-            (wf, wfe, mr, obd, rs)
+            Ok((wf, wfe, mr, obd, rs))
         })
         .await
         .unwrap()
@@ -193,7 +208,9 @@ pub async fn query_risk_signals(
     let s = sv_id.clone();
     state
         .db_pool
-        .db_query(move |conn| RiskSignal::latest_by_risk_signal_group_kind(conn, &s, kind).unwrap())
+        .db_query(move |conn| -> ApiResult<_> {
+            Ok(RiskSignal::latest_by_risk_signal_group_kind(conn, &s, kind)?)
+        })
         .await
         .unwrap()
 }
@@ -202,21 +219,25 @@ pub async fn query_doc_requests(state: &State, wf_id: &WorkflowId) -> Vec<Docume
     let w = wf_id.clone();
     state
         .db_pool
-        .db_query(move |conn| {
+        .db_query(move |conn| -> DbResult<_> {
             document_request::table
-            .filter(document_request::workflow_id.eq(w))
-            .get_results(conn).unwrap()
-        }).await
+                .filter(document_request::workflow_id.eq(w))
+                .get_results(conn)
+                .map_err(DbError::from)
+        })
+        .await
         .unwrap()
 }
 
-pub async fn query_rule_set_result(state: &State, sv_id: &ScopedVaultId) -> Option<(RuleSetResult, Vec<(RuleResult, RuleInstance)>)> {
+pub async fn query_rule_set_result(
+    state: &State,
+    sv_id: &ScopedVaultId,
+) -> Option<(RuleSetResult, Vec<(RuleResult, RuleInstance)>)> {
     let s = sv_id.clone();
     state
         .db_pool
-        .db_query(move |conn| {
-           RuleSetResult::latest_workflow_decision(conn, &s).unwrap()
-        }).await
+        .db_query(move |conn| RuleSetResult::latest_workflow_decision(conn, &s).map_err(DbError::from))
+        .await
         .unwrap()
 }
 pub struct WithHit(pub Vec<AmlKind>);

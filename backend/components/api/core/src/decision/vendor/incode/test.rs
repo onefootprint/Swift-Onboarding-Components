@@ -153,7 +153,6 @@ async fn test_run_machine(state: &State, is_selfie: bool) {
             Ok(())
         })
         .await
-        .unwrap()
         .unwrap();
 
     //
@@ -527,7 +526,6 @@ async fn test_fail(state: &State, is_selfie: bool) {
             Ok(())
         })
         .await
-        .unwrap()
         .unwrap();
 
     // Clean up

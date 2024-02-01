@@ -22,7 +22,7 @@ impl AuthSession {
         let session: Option<Session> = state
             .db_pool
             .db_query(move |conn| Session::get(conn, key))
-            .await??;
+            .await?;
         let Some(session) = session else {
             return Err(AuthError::NoSessionFound.into());
         };
@@ -58,7 +58,7 @@ impl AuthSession {
         let (auth_token, _) = state
             .db_pool
             .db_query(move |conn| Self::create_sync(conn, &key, data, expires_in))
-            .await??;
+            .await?;
 
         Ok(auth_token)
     }

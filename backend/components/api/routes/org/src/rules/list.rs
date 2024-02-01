@@ -29,7 +29,7 @@ pub async fn list_rules_for_playbook(
         .db_query(move |conn| -> Result<_, DbError> {
             RuleInstance::list(conn, &tenant_id, is_live, &ob_config_id)
         })
-        .await??;
+        .await?;
 
     ResponseData::ok(rules.into_iter().map(api_wire_types::Rule::from_db).collect_vec()).json()
 }

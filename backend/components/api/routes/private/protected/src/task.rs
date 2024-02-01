@@ -47,7 +47,7 @@ async fn create_task(
     let task = state
         .db_pool
         .db_query(move |conn| -> Result<Task, DbError> { Task::create(conn, Utc::now(), task_data) })
-        .await??;
+        .await?;
 
     Ok(Json(ResponseData::ok(CreateTasksResponse { task_id: task.id })))
 }

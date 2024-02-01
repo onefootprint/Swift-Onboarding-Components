@@ -91,10 +91,10 @@ pub async fn get_latest_verification_requests_and_results(
             // Importantly, this allows us to save VerificationRequests elsewhere in code and execute them here
             VerificationRequest::get_latest_requests_and_maybe_successful_results_for_scoped_user(conn, suid)
         })
-        .await??;
+        .await?;
 
     let su_id = scoped_user_id.clone();
-    let uv = db_pool.db_query(move |conn| Vault::get(conn, &su_id)).await??;
+    let uv = db_pool.db_query(move |conn| Vault::get(conn, &su_id)).await?;
 
     let previous_results = vendor::vendor_result::VendorResult::from_verification_results_for_onboarding(
         requests_and_results.clone(),

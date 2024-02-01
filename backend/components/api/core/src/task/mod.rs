@@ -190,7 +190,6 @@ mod task_tests {
                 ])
             })
             .await
-            .unwrap()
             .unwrap();
 
         // Test

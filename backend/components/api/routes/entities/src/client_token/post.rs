@@ -184,7 +184,7 @@ pub async fn post(
             let (auth_token, session) = AuthSession::create_sync(conn, &session_key, data.into(), duration)?;
             Ok((auth_token, session))
         })
-        .await??;
+        .await?;
 
     let expires_at = session.expires_at;
     ResponseData::ok(CreateClientTokenResponse {

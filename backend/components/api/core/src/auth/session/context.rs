@@ -133,11 +133,9 @@ where
 
             let parsed_session_data = state
                 .db_pool
-                .db_query(move |conn| {
-                    T::try_load_session(raw_session_data, conn, ff_client, req)
-                        .map_err(|e| AuthError::ErrorLoadingSession(allowed_headers, e.to_string()))
-                })
-                .await??;
+                .db_query(move |conn| T::try_load_session(raw_session_data, conn, ff_client, req))
+                .await
+                .map_err(|e| AuthError::ErrorLoadingSession(allowed_headers, e.to_string()))?;
             parsed_session_data.log_authed_principal(root_span);
 
             Ok(Self {
@@ -203,7 +201,7 @@ where
         Ok(state
             .db_pool
             .db_query(move |conn| Session::invalidate(key, conn))
-            .await??)
+            .await?)
     }
 }
 

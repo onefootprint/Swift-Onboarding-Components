@@ -27,7 +27,6 @@ impl GenerateInvoices {
             .db_pool
             .db_query(Tenant::list_billable)
             .await
-            .map_err(|e| anyhow!("{}", e))?
             .map_err(|e| anyhow!("{}", e))?;
 
 

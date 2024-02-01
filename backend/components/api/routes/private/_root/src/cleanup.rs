@@ -63,7 +63,7 @@ async fn post(
                 let uvw = state
                     .db_pool
                     .db_query(move |conn| VaultWrapper::<Any>::build_portable(conn, &uv_id))
-                    .await??;
+                    .await?;
                 let phone = uvw
                     .decrypt_contact_info(&state, newtypes::ContactInfoKind::Phone)
                     .await?;

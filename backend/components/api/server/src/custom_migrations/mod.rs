@@ -49,7 +49,7 @@ where
                     .is_none(),
             )
         })
-        .await??;
+        .await?;
 
     if !pre_flight_should_run {
         tracing::info!("skipping custom migration (preflight)");

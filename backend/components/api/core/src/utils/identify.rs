@@ -64,7 +64,7 @@ pub async fn get_user_challenge_context(
 
             Ok((uvw, passkeys, cis))
         })
-        .await??;
+        .await?;
 
     let is_all_ci_unverified = cis.iter().all(|(_, ci, _)| !ci.is_otp_verified);
     let is_vault_unverified = is_all_ci_unverified && uvw.vault.is_created_via_api;

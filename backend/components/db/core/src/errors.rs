@@ -8,6 +8,18 @@ pub enum TransactionError<E> {
     ApplicationError(E),
 }
 
+impl<E> From<DbError> for TransactionError<E>
+where
+    E: From<DbError>,
+{
+    fn from(value: DbError) -> Self {
+        match value {
+            DbError::DbError(e) => Self::DbError(e),
+            e => Self::ApplicationError(E::from(e)),
+        }
+    }
+}
+
 #[derive(Debug, Error)]
 /// Note: the error messages here are publicly visible to the API
 pub enum DbError {

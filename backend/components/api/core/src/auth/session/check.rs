@@ -49,7 +49,7 @@ impl FromRequest for CheckSessionContext {
             let session = state
                 .db_pool
                 .db_query(move |conn| Session::get(conn, key))
-                .await??;
+                .await?;
             let result = if let Some(session) = session {
                 if session.expires_at < Utc::now() {
                     Self::Expired

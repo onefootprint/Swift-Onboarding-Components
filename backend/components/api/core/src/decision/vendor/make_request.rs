@@ -55,7 +55,7 @@ pub async fn make_idv_vendor_call_save_vreq_vres(
             let vres = verification_result::save_vres(conn, &uv.public_key, &vendor_result, &v_req)?;
             Ok((vres, vendor_result))
         })
-        .await??;
+        .await?;
 
     Ok((vreq, vres, vendor_result))
 }
@@ -75,7 +75,7 @@ pub async fn make_idv_vendor_call_save_vreq(
     let vreq = state
         .db_pool
         .db_query(move |conn| VerificationRequest::create(conn, &sv_id, &di_id, vendor_api))
-        .await??;
+        .await?;
 
     let idv_data = build_request::build_idv_data_from_verification_request(
         &state.db_pool,
@@ -422,7 +422,7 @@ pub async fn make_vendor_requests(
                 Ok((socure_device_session_id, ip_address, obc_key))
             },
         )
-        .await??;
+        .await?;
     let socure_data = SocureData {
         device_session_id: socure_device_session_id,
         ip_address,

@@ -38,7 +38,7 @@ pub async fn get(
                 .collect();
             Ok(id_docs)
         })
-        .await??;
+        .await?;
 
     let response = id_docs
         .into_iter()

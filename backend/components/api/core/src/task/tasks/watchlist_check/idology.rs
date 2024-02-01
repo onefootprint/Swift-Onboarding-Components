@@ -67,7 +67,7 @@ async fn make_vendor_call(
     let vreq = state
         .db_pool
         .db_query(move |conn| VerificationRequest::create(conn, &svid, &diid, vendor_api))
-        .await??;
+        .await?;
     let idv_data = decision::vendor::build_request::build_idv_data_from_verification_request(
         &state.db_pool,
         &state.enclave_client,
@@ -109,7 +109,7 @@ async fn make_vendor_call(
             let vres = verification_result::save_vres(conn, &uv.public_key, &res, &vreq)?;
             Ok((res, vres))
         })
-        .await??;
+        .await?;
 
     Ok((res?, vres))
 }

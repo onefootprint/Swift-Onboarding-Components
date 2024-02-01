@@ -38,7 +38,7 @@ async fn proceed(
     let wf = state
         .db_pool
         .db_query(move |conn| Workflow::get(conn, &wf_id))
-        .await??;
+        .await?;
 
     let ww = WorkflowWrapper::init(&state, wf.clone()).await?;
 

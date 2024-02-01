@@ -45,7 +45,7 @@ pub async fn complete_vendor_call(
 
             Ok((di, latest_watchlist_check_vres))
         })
-        .await??;
+        .await?;
 
     // TODO: check 365 days
     // TODO: check if vault data has changed
@@ -129,7 +129,7 @@ async fn has_data_changed_since_vres(
     let uvw_for_vres = state
         .db_pool
         .db_query(move |conn| VaultWrapper::<Person>::build(conn, VwArgs::Historical(&svid, seqno)))
-        .await??;
+        .await?;
 
     let idks = vec![DI::Id(IDK::FirstName), DI::Id(IDK::LastName), DI::Id(IDK::Dob)];
     let current_decrypted = current_uvw

@@ -39,7 +39,7 @@ impl ExecuteTask<LogNumTenantApiKeysArgs> for LogNumTenantApiKeysTask {
                 let count = TenantApiKey::count(conn, &filters)?;
                 Ok(count)
             })
-            .await??;
+            .await?;
 
         let log = format!(
             "[LogNumTenantApiKeysTask] tenant_id: {}, is_live: {}, num api keys = {}",

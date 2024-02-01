@@ -58,7 +58,7 @@ pub async fn get(
 
             Ok((entity, vw))
         })
-        .await??;
+        .await?;
 
     let decrypted_results = decrypt_visible_attrs(&state, &auth, vec![&vw])
         .await?

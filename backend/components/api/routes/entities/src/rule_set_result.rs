@@ -32,7 +32,7 @@ pub async fn get(
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             RuleSetResult::latest_workflow_decision(conn, &sv.id)
         })
-        .await??
+        .await?
         .map(api_wire_types::RuleSetResult::from_db);
 
     ResponseData::ok(result).json()

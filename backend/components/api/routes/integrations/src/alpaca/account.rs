@@ -124,7 +124,7 @@ async fn create_create_account_request(
             let uvw = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             Ok((uvw, doc))
         })
-        .await??;
+        .await?;
 
     tracing::info!(?doc, "create_create_account_request");
 

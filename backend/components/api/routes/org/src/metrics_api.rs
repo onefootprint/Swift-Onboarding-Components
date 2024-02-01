@@ -78,7 +78,7 @@ async fn get(
             };
             Ok(result)
         })
-        .await??;
+        .await?;
 
     ResponseData::ok(result).json()
 }

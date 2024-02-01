@@ -32,7 +32,7 @@ pub async fn get(
     let events = state
         .db_pool
         .db_query(move |conn| UserTimeline::list(conn, (&fp_id, &tenant_id, is_live), kinds))
-        .await??;
+        .await?;
     let events = events
         .into_iter()
         .map(api_wire_types::UserTimeline::from_db)

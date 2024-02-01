@@ -41,7 +41,7 @@ pub async fn get(
             let vw: TenantVw<Business> = VaultWrapper::build_for_tenant(conn, &sv.id)?;
             Ok((vw, sv))
         })
-        .await??;
+        .await?;
 
     let decrypted_bos = vw
         .decrypt_business_owners(&state.db_pool, &state.enclave_client, &sv.tenant_id)

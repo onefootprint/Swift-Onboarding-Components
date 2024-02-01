@@ -43,7 +43,7 @@ pub async fn get(
             let count = AuthEvent::count(conn, &sv.id)?;
             Ok((events, next_page, count))
         })
-        .await??;
+        .await?;
 
     let results = events
         .into_iter()

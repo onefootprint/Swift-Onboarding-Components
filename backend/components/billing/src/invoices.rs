@@ -92,7 +92,7 @@ pub async fn create_bill_for_tenant(
             };
             Ok((billing_profile, counts))
         })
-        .await??;
+        .await?;
 
     // Generate the invoice in stripe
     let customer_id = get_or_create_customer_id(client, db_pool, &tenant).await?;
@@ -129,7 +129,7 @@ async fn get_or_create_customer_id(
         };
         db_pool
             .db_query(move |conn| Tenant::update(conn, &tenant_id, update))
-            .await??;
+            .await?;
         customer_id
     };
     Ok(customer_id)

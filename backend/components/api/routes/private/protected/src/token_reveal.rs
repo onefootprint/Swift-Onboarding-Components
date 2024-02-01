@@ -49,7 +49,7 @@ pub async fn post(
     let session = state
         .db_pool
         .db_query(move |conn| Session::get(conn, token_hash))
-        .await??;
+        .await?;
 
     let Some(session) = session else {
         return Err(ApiErrorKind::ResourceNotFound)?;

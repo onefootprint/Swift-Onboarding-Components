@@ -26,7 +26,7 @@ pub async fn get(
     let is_domain_already_claimed = state
         .db_pool
         .db_query(move |conn| Tenant::is_domain_already_claimed(conn, domains))
-        .await??;
+        .await?;
 
     Ok(Json(ResponseData::ok(api_wire_types::Organization::from_db((
         tenant,
@@ -74,7 +74,7 @@ async fn patch(
     let updated_tenant = state
         .db_pool
         .db_query(move |conn| Tenant::update(conn, &tenant_id, update_tenant))
-        .await??;
+        .await?;
 
     Ok(Json(ResponseData::ok(api_wire_types::Organization::from_db(
         updated_tenant,

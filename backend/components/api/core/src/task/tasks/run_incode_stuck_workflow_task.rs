@@ -29,7 +29,7 @@ impl ExecuteTask<RunIncodeStuckWorkflowArgs> for RunIncodeStuckWorkflowTask {
             .state
             .db_pool
             .db_query(move |conn| Workflow::get(conn, &wfid))
-            .await??;
+            .await?;
         let ww = WorkflowWrapper::init(&self.state, wf).await?;
         let run = decision::state::run_incode_machine_and_workflow(&self.state, ww).await?;
         match run {

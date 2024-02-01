@@ -69,7 +69,7 @@ pub async fn handle_document_create(
             let uvw: VaultWrapper<_> = VaultWrapper::<Person>::build(conn, VwArgs::Tenant(&su_id2))?;
             Ok(uvw)
         })
-        .await??;
+        .await?;
 
     let residential_country = uvw.get_decrypted_country(state).await?;
 
@@ -160,7 +160,7 @@ pub async fn handle_document_upload(
             let user_consent = UserConsent::get_for_workflow(conn, &wf_id)?;
             Ok((id_doc, doc_request, uvw, user_consent))
         })
-        .await??;
+        .await?;
     let meta2 = meta.clone();
     let doc_kind: DocKind = id_doc.document_type.into();
 

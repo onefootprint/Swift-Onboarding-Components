@@ -111,7 +111,7 @@ impl IncodeStateTransition for FetchScores {
                 let (id_doc, _) = IdentityDocument::get(conn, &id_doc_id)?;
                 Ok((obc, vw, id_doc))
             })
-            .await??;
+            .await?;
 
         // If the ID data already exists in the vault, extract it so we can use it to generate
         // OCR data risk signals
@@ -249,7 +249,7 @@ async fn run_aws_inner(
             let vw = VaultWrapper::<Any>::build_for_tenant(conn, &sv_id2)?;
             Ok((id_doc, vw))
         })
-        .await??;
+        .await?;
 
     // At this point, until we reach `Complete`, we have not vaulted the images under the DocumentKind::Image DIs
     let doc_id_op: EnclaveDecryptOperation = DataIdentifier::Document(DocumentKind::LatestUpload(
@@ -312,7 +312,7 @@ async fn run_aws_inner(
 
             Ok(vres)
         })
-        .await??;
+        .await?;
 
     Ok(result.map(|r| (r, vres)))
 }

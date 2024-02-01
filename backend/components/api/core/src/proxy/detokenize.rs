@@ -59,7 +59,7 @@ pub async fn detokenize(
             let vws = VaultWrapper::multi_get_for_tenant(conn, svs, None)?;
             Ok(vws)
         })
-        .await??
+        .await?
         .into_values()
         .map(|vw| (vw.scoped_vault.fp_id.clone(), vw))
         .collect();

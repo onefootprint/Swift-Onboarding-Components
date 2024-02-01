@@ -85,7 +85,7 @@ pub async fn run_kyc_waterfall(
 
             Ok((latest_results, sv.tenant_id, vw, obc))
         })
-        .await??;
+        .await?;
     let ob_configuration_key = obc.key.clone();
     let tvc = TenantVendorControl::new(
         tenant_id.clone(),
@@ -667,7 +667,7 @@ mod tests {
         let vresid = vr.verification_result_id.clone();
         let (vreq, vres) = state
             .db_pool
-            .db_query(move |conn| VerificationResult::get(conn, &vresid).unwrap())
+            .db_query(move |conn| VerificationResult::get(conn, &vresid))
             .await
             .unwrap();
 

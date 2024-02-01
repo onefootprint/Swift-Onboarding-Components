@@ -113,7 +113,7 @@ pub async fn post(
             let entities = ScopedVault::bulk_get_serializable_info(conn, scoped_vault_ids)?;
             Ok((svs, entities, vws, count))
         })
-        .await??;
+        .await?;
 
     // Always decrypt name and first letter of last name
     let mut decrypted_results = decrypt_visible_attrs(&state, &auth, vws.values().collect()).await?;

@@ -67,7 +67,7 @@ pub async fn get(
             let uvw: TenantVw = VaultWrapper::build_for_tenant(conn, &scoped_user.id)?;
             Ok(uvw)
         })
-        .await??;
+        .await?;
 
     let populated = uvw.populated_dis();
     let keys = if let Some(fields) = fields {

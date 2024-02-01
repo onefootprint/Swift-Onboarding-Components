@@ -30,7 +30,7 @@ impl<Type> VaultWrapper<Type> {
             let ci = state
                 .db_pool
                 .db_query(move |conn| ContactInfo::get(conn, &dl_id))
-                .await??;
+                .await?;
 
             let data = self
                 .decrypt_unchecked_single(&state.enclave_client, kind.into())
@@ -109,7 +109,7 @@ impl VaultWrapper<Business> {
         let tid = tenant_id.clone();
         let mut bos = db_pool
             .db_query(move |conn| BusinessOwner::list(conn, &vid, &tid))
-            .await??;
+            .await?;
 
         let dis = &[BDK::BeneficialOwners.into(), BDK::KycedBeneficialOwners.into()];
         let mut decrypted = self.decrypt_unchecked(enclave_client, dis).await?;

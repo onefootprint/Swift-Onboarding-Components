@@ -18,6 +18,7 @@ use db::{
         tenant_user::TenantUser,
     },
     tests::MockFFClient,
+    DbError,
 };
 use diesel::prelude::*;
 
@@ -80,7 +81,7 @@ async fn set_workflow_to_alpaca_kyc_kind(state: &State, wf: Workflow) -> Workflo
                     })),
                 ))
                 .get_result(conn)
-                .unwrap()
+                .map_err(DbError::from)
         })
         .await
         .unwrap()

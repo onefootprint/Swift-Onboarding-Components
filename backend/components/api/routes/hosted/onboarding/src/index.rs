@@ -54,7 +54,7 @@ pub async fn post(
             let vw = VaultWrapper::<Any>::build_portable(conn, &su.vault_id)?;
             Ok((su, ob_config, tenant, vw))
         })
-        .await??;
+        .await?;
 
     // TODO don't always create a new business vault - once we have portable businesses,
     // we should display to the client an ability to select the business they want to use

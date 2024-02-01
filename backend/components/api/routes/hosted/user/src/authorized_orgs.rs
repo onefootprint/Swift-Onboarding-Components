@@ -25,7 +25,7 @@ pub async fn get(
     let obs = state
         .db_pool
         .db_query(move |conn| ScopedVault::list_authorized(conn, user_auth.user_vault_id()))
-        .await??;
+        .await?;
     let results = obs
         .into_iter()
         .map(api_wire_types::AuthorizedOrg::from_db)

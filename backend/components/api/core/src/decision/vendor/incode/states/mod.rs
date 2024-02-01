@@ -186,7 +186,7 @@ pub async fn save_incode_fixtures(
     let vw = state
         .db_pool
         .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &suid))
-        .await??;
+        .await?;
     let ocr_comparison_fields = if !obc.is_doc_first {
         let ocr_comparison_fields =
             IncodeOcrComparisonDataFields::compose(&state.enclave_client, &vw).await?;

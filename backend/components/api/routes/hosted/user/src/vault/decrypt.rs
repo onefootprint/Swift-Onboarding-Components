@@ -52,7 +52,7 @@ pub async fn post(
             let uvw = VaultWrapper::<Any>::build(conn, args)?;
             Ok(uvw)
         })
-        .await??;
+        .await?;
 
     let mut results = uvw
         .decrypt_unchecked_value(&state.enclave_client, &fields)

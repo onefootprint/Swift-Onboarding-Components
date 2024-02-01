@@ -23,7 +23,7 @@ pub async fn get_bo_obds(
             let bvw = VaultWrapper::<Business>::build_for_tenant(conn, &sv.id)?;
             Ok((wf, sv, bvw))
         })
-        .await??;
+        .await?;
 
     let dbo = bvw
         .decrypt_business_owners(db_pool, enclave_client, &sv.tenant_id)
@@ -66,7 +66,7 @@ pub async fn get_bo_obds(
     let obc_id = wf.ob_configuration_id.ok_or(OnboardingError::NoObcForWorkflow)?;
     let wfs = db_pool
         .db_query(move |conn| Workflow::get_with_decisions(conn, sv_ids, &obc_id))
-        .await??;
+        .await?;
     let wfs_without_decision: Vec<_> = wfs
         .iter()
         .filter(|(_, obd)| obd.is_none())

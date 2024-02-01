@@ -4,7 +4,7 @@ use crate::{
     State,
 };
 use chrono::{Duration, Utc};
-use db::{test_helpers::assert_have_same_elements, tests::MockFFClient};
+use db::{test_helpers::assert_have_same_elements, tests::MockFFClient, DbError};
 use db_schema::schema::verification_result;
 use diesel::prelude::*;
 use macros::test_state_case;
@@ -267,7 +267,7 @@ async fn incode_new_search_needed(state: &mut State, case: ExistingSearchCase) {
                         .filter(verification_result::id.eq(vres.id))
                         .set(verification_result::timestamp.eq(Utc::now() - Duration::days(366)))
                         .execute(conn)
-                        .unwrap();
+                        .map_err(DbError::from)
                 })
                 .await
                 .unwrap();

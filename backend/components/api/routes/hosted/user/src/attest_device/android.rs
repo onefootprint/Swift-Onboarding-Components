@@ -65,7 +65,7 @@ pub(super) async fn attest(
     let creds = state
         .db_pool
         .db_query(move |conn| WebauthnCredential::list(conn, &vault_id_copy))
-        .await??;
+        .await?;
 
     let new_attestation = attest_inner(vault_id, &verifier, challenge, attestation, creds).await?;
 

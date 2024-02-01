@@ -139,7 +139,7 @@ async fn get_identify_challenge_context(
             };
             Ok((tenant, sv))
         })
-        .await??;
+        .await?;
     let sv_id = sv.as_ref().map(|sv| sv.id.clone());
     let ctx = get_user_challenge_context(state, existing_user_id, sv_id, user_auth).await?;
     let ctx = IdentifyChallengeContext { ctx, tenant, sv };

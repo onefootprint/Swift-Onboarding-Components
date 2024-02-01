@@ -79,7 +79,7 @@ pub async fn put(
     let updated_tenant = state
         .db_pool
         .db_query(move |conn| Tenant::update(conn, &tenant_id, update_tenant))
-        .await??;
+        .await?;
 
     Ok(Json(ResponseData::ok(api_wire_types::Organization::from_db(
         updated_tenant,

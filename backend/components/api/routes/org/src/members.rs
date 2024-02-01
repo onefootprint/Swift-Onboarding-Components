@@ -56,7 +56,7 @@ async fn get(
             let count = TenantRolebinding::count(conn, &filters)?;
             Ok((results, next_page, count))
         })
-        .await??;
+        .await?;
 
     let results = results
         .into_iter()

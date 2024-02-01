@@ -26,7 +26,7 @@ async fn get(state: web::Data<State>, auth: TenantSessionAuth) -> JsonApiRespons
     let config = state
         .db_pool
         .db_query(move |conn| TenantClientConfig::get(conn, &tenant_id, is_live))
-        .await??
+        .await?
         .map(
             |TenantClientConfig {
                  is_live,

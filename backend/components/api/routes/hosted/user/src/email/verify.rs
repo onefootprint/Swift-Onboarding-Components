@@ -37,7 +37,7 @@ pub async fn post(
         .db_query(move |conn| {
             ContactInfo::mark_verified(conn, &data.email_id, VerificationLevel::NonOtpVerified)
         })
-        .await??;
+        .await?;
 
     Ok(Json(ResponseData::ok(EmptyResponse {})))
 }

@@ -8,8 +8,10 @@ use super::{
     watchlist::request::WatchlistResultRequest,
     IncodeAPIResult,
 };
-use crate::footprint_http_client::FpVendorClientArgs;
-use crate::{footprint_http_client::FootprintVendorHttpClient, incode::error::Error as IncodeError};
+use crate::{
+    footprint_http_client::{FootprintVendorHttpClient, FpVendorClientArgs},
+    incode::error::Error as IncodeError,
+};
 use newtypes::{
     vendor_credentials::IncodeCredentials, DocVData, IdDocKind, IncodeConfigurationId, IncodeSessionId,
     IncodeVerificationSessionId, IncodeVerificationSessionKind, IncodeWatchlistResultRef, PiiString,

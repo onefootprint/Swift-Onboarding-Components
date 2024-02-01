@@ -254,7 +254,7 @@ impl AlpacaKycDecisioning {
         let risk_signals = state
             .db_pool
             .db_query(move |conn| fetch_latest_kyc_risk_signals(conn, &svid))
-            .await??;
+            .await?;
 
         Ok(AlpacaKycDecisioning {
             wf_id: workflow.id,

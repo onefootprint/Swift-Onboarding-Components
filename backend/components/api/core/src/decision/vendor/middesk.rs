@@ -125,7 +125,7 @@ impl MiddeskStates {
         let di_id = middesk_request.decision_intent_id.clone();
         let all_vreq_vres = db_pool
             .db_query(move |conn| VerificationRequest::list(conn, &di_id))
-            .await??;
+            .await?;
 
         let mut middesk_vreq_vres: Vec<_> = all_vreq_vres
             .into_iter()
@@ -229,7 +229,7 @@ impl MiddeskState<PendingCreateBusinessCall> {
 
         let ob_configuration_key = db_pool
             .db_query(move |conn| ObConfiguration::get(conn, &wf_id))
-            .await??
+            .await?
             .0
             .key;
 
@@ -284,7 +284,7 @@ impl MiddeskState<PendingCreateBusinessCall> {
                 )?;
                 Ok((udpated_middesk_request, business_update_webhook_vreq))
             })
-            .await??;
+            .await?;
 
         Ok(MiddeskState {
             middesk_request: udpated_middesk_request,
@@ -435,7 +435,7 @@ impl MiddeskState<PendingGetBusinessCall> {
 
         let (wf, sv) = db_pool
             .db_query(move |conn| Workflow::get_all(conn, &wfid))
-            .await??;
+            .await?;
         let tvc = TenantVendorControl::new(sv.tenant_id, db_pool, config, enclave_client).await?;
         let get_business_res = middesk_client
             .make_request(MiddeskGetBusinessRequest {
@@ -465,7 +465,7 @@ impl MiddeskState<PendingGetBusinessCall> {
 
                 Ok((updated_middesk_request, vres))
             })
-            .await??;
+            .await?;
 
         Ok(MiddeskStates::Complete(MiddeskState {
             middesk_request: updated_middesk_request,
@@ -487,7 +487,7 @@ impl MiddeskState<Complete> {
                 let (wf, sv) = Workflow::get_all(conn, &wfid)?;
                 Ok((v, sv, wf))
             })
-            .await??;
+            .await?;
         // TODO: make a version of this method for a single vreq/vres
         let vendor_result = vendor_result::VendorResult::from_verification_results_for_onboarding(
             vec![(
@@ -587,7 +587,7 @@ pub async fn handle_middesk_webhook(state: &State, res: serde_json::Value) -> Re
     let middesk_request = state
         .db_pool
         .db_query(|conn| MiddeskRequest::get_by_business_id(conn, business_id))
-        .await??;
+        .await?;
     let mid_state = MiddeskStates::init(&state.db_pool, middesk_request).await?;
 
     let next_state = match (mid_state, webhook_res) {

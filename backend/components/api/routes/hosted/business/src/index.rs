@@ -27,7 +27,7 @@ pub async fn get(state: web::Data<State>, business_auth: BoSessionAuth) -> JsonA
             let bvw = VaultWrapper::build_for_tenant(conn, &sb.id)?;
             Ok(bvw)
         })
-        .await??;
+        .await?;
 
     let BasicBusinessInfo {
         business_name,

@@ -24,7 +24,7 @@ pub async fn get(
     let session = state
         .db_pool
         .db_query(move |conn| JsonSession::<HandoffRecord>::get(conn, &user_auth.auth_token))
-        .await??
+        .await?
         .ok_or(HandoffError::HandoffSessionNotFound)?;
     Ok(Json(ResponseData {
         data: D2pStatusResponse {
@@ -69,7 +69,7 @@ pub async fn post(
             JsonSession::update_or_create(conn, &user_auth.auth_token, &handoff_record, session.expires_at)?;
             Ok(())
         })
-        .await??;
+        .await?;
 
     Ok(Json(EmptyResponse::ok()))
 }

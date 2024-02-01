@@ -50,7 +50,7 @@ async fn get(
             let count = TenantRole::count_active(conn, &filters)?;
             Ok((results, next_page, count))
         })
-        .await??;
+        .await?;
 
     let results = results
         .into_iter()
@@ -89,7 +89,7 @@ async fn post(
     let result = state
         .db_pool
         .db_query(move |conn| TenantRole::create(conn, tenant_id, name, scopes, false, kind))
-        .await??;
+        .await?;
 
     let result = api_wire_types::OrganizationRole::from_db(result);
     ResponseData::ok(result).json()

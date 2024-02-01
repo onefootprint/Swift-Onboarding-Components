@@ -38,7 +38,7 @@ pub async fn evaluate_rule(
             let (obc, _) = ObConfiguration::get(conn, (&ob_config_id.into_inner(), &tenant_id, is_live))?;
             RuleSetResult::sample_for_eval(conn, &obc.id, 100)
         })
-        .await??;
+        .await?;
 
     let results = historical_results
         .into_iter()

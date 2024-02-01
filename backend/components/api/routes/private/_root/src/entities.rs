@@ -26,7 +26,7 @@ async fn get(
             let sv = ScopedVault::get(conn, id)?;
             Ok(sv)
         })
-        .await??;
+        .await?;
     root_span.record("fp_id", sv.fp_id.to_string());
 
     ResponseData::ok(api_wire_types::SuperAdminEntity::from_db(sv)).json()

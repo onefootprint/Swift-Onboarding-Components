@@ -63,7 +63,7 @@ pub async fn get(
             )?;
             Ok((svs, count))
         })
-        .await??;
+        .await?;
 
     let cursor = pagination.cursor_item(&state, &svs).map(|(sv, _)| sv.ordering_id);
 
@@ -114,7 +114,7 @@ pub async fn post_search(
             )?;
             Ok((svs, count))
         })
-        .await??;
+        .await?;
 
     let cursor = pagination
         .cursor_item(&state, &svs)

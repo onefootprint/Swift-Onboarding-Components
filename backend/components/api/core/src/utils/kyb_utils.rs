@@ -153,7 +153,7 @@ pub async fn should_run_kyb(state: &State, biz_wf: &Workflow, tenant: &Tenant) -
     let bvw = state
         .db_pool
         .db_query(move |conn| VaultWrapper::<Business>::build_for_tenant(conn, &svid))
-        .await??;
+        .await?;
 
     let dbo = bvw
         .decrypt_business_owners(&state.db_pool, &state.enclave_client, &tenant.id)
@@ -231,7 +231,7 @@ pub async fn run_kyb(state: &State, tenant: &Tenant, biz_wf: Workflow) -> ApiRes
     let biz_wf = state
         .db_pool
         .db_query(move |conn| Workflow::get(conn, &wf_id))
-        .await??;
+        .await?;
     let should_run_kyb = should_run_kyb(state, &biz_wf, tenant).await?;
     tracing::info!(should_run_kyb, "should_run_kyb");
     if should_run_kyb {

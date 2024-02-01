@@ -48,7 +48,7 @@ pub async fn post(
             )?;
             VaultWrapper::<api_core::utils::vault_wrapper::Any>::build_for_tenant(conn, &sv.id)
         })
-        .await??;
+        .await?;
 
     let doc_id_op: EnclaveDecryptOperation = document_id.into();
     let selfie_id_op: EnclaveDecryptOperation = selfie_id.into();

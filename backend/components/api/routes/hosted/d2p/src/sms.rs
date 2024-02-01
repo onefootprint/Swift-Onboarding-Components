@@ -50,7 +50,7 @@ pub async fn handler(
             let uvw = VaultWrapper::<Person>::build(conn, args)?;
             Ok(uvw)
         })
-        .await??;
+        .await?;
 
     let (phone_number, ci, _) = uvw
         .decrypt_contact_info(&state, ContactInfoKind::Phone)

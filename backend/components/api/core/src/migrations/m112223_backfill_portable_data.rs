@@ -59,7 +59,7 @@ pub async fn run(
             let vault_ids: Vec<VaultId> = query.get_results(conn).map_err(DbError::from)?;
             Ok(vault_ids)
         })
-        .await??;
+        .await?;
     tracing::info!(num_vaults=%vault_ids.len(), "Found vaults to maybe backfill");
     let mut rewritten = vec![];
     // Backfill each user in a separate transaction so we don't have a large, long-running txn

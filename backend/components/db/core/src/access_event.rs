@@ -100,7 +100,7 @@ impl AccessEventListItemForTenant {
 
                 Ok(results)
             })
-            .await??;
+            .await?;
 
         Ok(list_items)
     }
@@ -142,7 +142,7 @@ impl AccessEventListItemForUser {
                     .collect();
                 Ok(results)
             })
-            .await??;
+            .await?;
 
         Ok(list_items)
     }

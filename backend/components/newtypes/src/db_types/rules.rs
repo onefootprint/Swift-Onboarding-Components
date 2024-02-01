@@ -1,10 +1,8 @@
-use crate::DocKind;
-use crate::{util::impl_enum_str_diesel, DecisionStatus};
+use crate::{util::impl_enum_str_diesel, DecisionStatus, DocKind};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
-use strum::AsRefStr;
-use strum::ParseError;
+use strum::{AsRefStr, ParseError};
 use strum_macros::{Display, EnumIter, EnumString};
 
 #[derive(
@@ -108,6 +106,7 @@ impl std::fmt::Display for RuleAction {
 
 impl std::str::FromStr for RuleAction {
     type Err = ParseError;
+
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "pass_with_manual_review" => Ok(RuleAction::PassWithManualReview),

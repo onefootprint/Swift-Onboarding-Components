@@ -52,7 +52,7 @@ async fn parse_auth(
         let tenant = state
             .db_pool
             .db_query(move |conn| Tenant::get(conn, &su_id2))
-            .await??;
+            .await?;
         let wf_info = None;
         (user, su_id, tenant, wf_info)
     };
@@ -89,7 +89,7 @@ pub async fn post_validate(
             vw.validate_request(conn, updates, None, false)?;
             Ok(())
         })
-        .await??;
+        .await?;
 
     EmptyResponse::ok().json()
 }

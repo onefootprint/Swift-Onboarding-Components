@@ -35,7 +35,7 @@ fn post(
     state
         .db_pool
         .db_query(move |conn| tenant_auth.update_session(conn, &session_sealing_key, session_data))
-        .await??;
+        .await?;
 
     let data = AssumeRoleResponse {
         user: OrganizationMember::from_db((tenant_user, rb, tenant_role)),

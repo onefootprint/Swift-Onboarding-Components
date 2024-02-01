@@ -135,7 +135,7 @@ impl<Type> VaultWrapper<Type> {
                     })
                     .collect()
             })
-            .await??;
+            .await?;
 
         let data = data
             .into_iter()

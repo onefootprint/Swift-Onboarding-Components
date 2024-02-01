@@ -20,7 +20,7 @@ fn get(
     let tenants = state
         .db_pool
         .db_query(move |conn| TenantRolebinding::list_by_user(conn, &tu_id))
-        .await??
+        .await?
         .into_iter()
         .map(|(_, tenant)| tenant);
 

@@ -173,7 +173,7 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tena
         let tenant = state
             .db_pool
             .db_query(move |conn| Tenant::get_tenant_by_domains(conn, vec![domain]))
-            .await??;
+            .await?;
         if let Some(tenant) = tenant {
             return Ok((tenant, false));
         }

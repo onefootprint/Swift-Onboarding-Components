@@ -46,7 +46,6 @@ impl CreateOverdueWatchlistCheckTasks {
                 Task::bulk_create(conn, task_args)
             })
             .await
-            .map_err(|err| anyhow!("{}", err))?
             .map_err(|err| anyhow!("{}", err))?;
 
         let created_task_ids: Vec<TaskId> = new_tasks.into_iter().map(|t| t.id).collect();

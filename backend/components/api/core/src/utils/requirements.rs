@@ -115,7 +115,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
             };
             Ok((uvw, bvw))
         })
-        .await??;
+        .await?;
     let person_decrypted_values = GetRequirementsArgs::get_decrypted_values(state, &uvw).await?;
     // technically not needed, but safer mb
     let bvw_wf_decrypted_values = if let Some((bvw, biz_wf)) = bvw_wf {
@@ -150,7 +150,7 @@ pub async fn get_requirements_for_person_and_maybe_business(
                 .chain(person_requirements.into_iter())
                 .collect())
         })
-        .await??;
+        .await?;
     Ok(requirements)
 }
 

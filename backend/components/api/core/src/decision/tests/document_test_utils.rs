@@ -232,11 +232,10 @@ pub async fn mock_enclave_s3_client(
     let (data_keys, s3_urls): (Vec<SealedVaultBytes>, Vec<S3Url>) = state
         .db_pool
         .db_query(move |conn| -> DbResult<_> {
-            let (identity_document, _) = IdentityDocument::get(conn, &document_id).unwrap();
+            let (identity_document, _) = IdentityDocument::get(conn, &document_id)?;
             identity_document.images(conn, true)
         })
         .await
-        .unwrap()
         .unwrap()
         .iter()
         .map(|du| (SealedVaultBytes(du.e_data_key.0.clone()), du.s3_url.clone()))
@@ -326,9 +325,7 @@ pub async fn save_document_request(
 
     state
         .db_pool
-        .db_query(move |conn| {
-            DocumentRequest::create(conn, args).unwrap();
-        })
+        .db_query(move |conn| DocumentRequest::create(conn, args))
         .await
-        .unwrap()
+        .unwrap();
 }

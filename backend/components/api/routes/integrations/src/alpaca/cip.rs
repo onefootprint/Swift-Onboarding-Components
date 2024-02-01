@@ -273,7 +273,7 @@ pub(crate) async fn create_cip_request(
                 collected_document,
             ))
         })
-        .await??;
+        .await?;
 
     tracing::info!(
         ?wf,

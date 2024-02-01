@@ -50,7 +50,7 @@ impl TenantVendorControl {
 
                 Ok((t, tvc, tbi))
             })
-            .await??;
+            .await?;
 
         Self::new_internal(vendor_control, config, enclave_client, tenant, tbi).await
     }

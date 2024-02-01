@@ -142,7 +142,7 @@ async fn call_watchlist_result(
     let vreq = state
         .db_pool
         .db_query(move |conn| VerificationRequest::create(conn, &svid, &diid, vendor_api))
-        .await??;
+        .await?;
     let vreq_id = vreq.id.clone();
 
     // TODO: we're moving towards a paradigm where we write the Vreq + Vres at the same time after making the call, but build_idv_data

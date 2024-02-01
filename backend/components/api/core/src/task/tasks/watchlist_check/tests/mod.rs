@@ -1,5 +1,6 @@
 use crate::{
     decision::vendor::vendor_trait::MockVendorAPICall,
+    errors::ApiResult,
     task::{tasks::watchlist_check::watchlist_check_task::WatchlistCheckTask, ExecuteTask, TaskError},
     State,
 };
@@ -112,7 +113,7 @@ async fn save_existing_watchlist_check_vres(state: &mut State, sv_id: &ScopedVau
     });
     state
         .db_pool
-        .db_query(move |conn| {
+        .db_query(move |conn| -> ApiResult<VerificationResult> {
             let v = Vault::get(conn, &sv_id).unwrap();
             let di = DecisionIntent::create(conn, DecisionIntentKind::OnboardingKyc, &sv_id, None).unwrap();
             let (_vreq, vres) = crate::decision::vendor::verification_result::save_vreq_and_vres(
@@ -121,9 +122,8 @@ async fn save_existing_watchlist_check_vres(state: &mut State, sv_id: &ScopedVau
                 &sv_id,
                 &di.id,
                 vr,
-            )
-            .unwrap();
-            vres
+            )?;
+            Ok(vres)
         })
         .await
         .unwrap()
@@ -140,22 +140,21 @@ async fn get_data(
     Vec<RiskSignal>,
 ) {
     db_pool
-        .db_query(move |conn| {
-            let wc = WatchlistCheck::_get_by_svid(conn, &svid).unwrap();
-            let ut = UserTimeline::get_by_event_data_id(conn, &svid, wc.id.to_string()).unwrap();
+        .db_query(move |conn| -> DbResult<_> {
+            let wc = WatchlistCheck::_get_by_svid(conn, &svid)?;
+            let ut = UserTimeline::get_by_event_data_id(conn, &svid, wc.id.to_string())?;
 
             let (di, vreqs) = if let Some(di_id) = wc.decision_intent_id.as_ref() {
-                let di = DecisionIntent::get(conn, di_id).unwrap();
-                let vreqs = VerificationRequest::list(conn, di_id).unwrap();
+                let di = DecisionIntent::get(conn, di_id)?;
+                let vreqs = VerificationRequest::list(conn, di_id)?;
                 (Some(di), vreqs)
             } else {
                 (None, vec![])
             };
 
-            let aml_rs =
-                RiskSignal::latest_by_risk_signal_group_kind(conn, &svid, RiskSignalGroupKind::Aml).unwrap();
+            let aml_rs = RiskSignal::latest_by_risk_signal_group_kind(conn, &svid, RiskSignalGroupKind::Aml)?;
 
-            (wc, di, vreqs, ut, aml_rs)
+            Ok((wc, di, vreqs, ut, aml_rs))
         })
         .await
         .unwrap()

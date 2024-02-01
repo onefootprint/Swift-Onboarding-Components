@@ -191,7 +191,7 @@ impl OnAction<MakeVendorCalls, KybState> for KybVendorCalls {
         let (wf, v) = state
             .db_pool
             .db_query(move |conn| DbWorkflow::get_with_vault(conn, &wf_id))
-            .await??;
+            .await?;
         let fixture_decision = decision::utils::get_fixture_data_decision(
             state.feature_flag_client.clone(),
             &v,

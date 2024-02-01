@@ -31,7 +31,7 @@ pub async fn get(
         .db_query(move |conn| {
             db::models::liveness_event::LivenessEvent::get_for_scoped_user(conn, &fp_id, &tenant_id, is_live)
         })
-        .await??;
+        .await?;
 
     let response = liveness_events
         .into_iter()

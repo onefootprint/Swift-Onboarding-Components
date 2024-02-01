@@ -59,7 +59,7 @@ pub async fn get(
             let count = TenantApiKey::count(conn, &query)?;
             Ok((keys, next_page, count))
         })
-        .await??;
+        .await?;
 
     let results = keys
         .into_iter()

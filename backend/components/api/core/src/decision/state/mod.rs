@@ -139,7 +139,7 @@ pub async fn run_incode_machine_and_workflow(
         .db_pool
         // TODO this doesn't have to be a latest - there's only one active per workflow
         .db_query(move |conn| IncodeVerificationSession::latest_for_workflow(conn, &wfid))
-        .await??;
+        .await?;
 
     if let Some(ivs) = ivs {
         if !ivs.state.is_terminal() {

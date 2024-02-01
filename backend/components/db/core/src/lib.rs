@@ -57,23 +57,25 @@ pub type Pool = deadpool::managed::Pool<Manager, deadpool::managed::Object<Manag
 pub struct DbPool(Pool);
 
 impl DbPool {
-    pub async fn db_query<F, R>(&self, f: F) -> Result<R, DbError>
+    pub async fn db_query<F, R, E>(&self, f: F) -> Result<R, E>
     where
-        F: FnOnce(&mut PgConn) -> R + Send + 'static,
+        F: FnOnce(&mut PgConn) -> Result<R, E> + Send + 'static,
+        E: From<DbError> + Send + 'static + std::fmt::Debug,
         R: Send + 'static,
     {
         let current_span = tracing::info_span!("db_query::interact");
         let result = self
             .0
             .get()
-            .await?
+            .await
+            .map_err(DbError::from)?
             .interact(move |conn| {
                 // Without adding a span inside here, none of the traces inside f will appear...
                 let _guard = current_span.enter();
                 f(conn)
             })
             .await
-            .map_err(DbError::from)?;
+            .map_err(DbError::from)??;
         Ok(result)
     }
 
@@ -85,13 +87,13 @@ impl DbPool {
     {
         let result = self
             .db_query(|c: &mut PgConn| {
-                c.transaction(|conn| -> Result<_, TransactionError<E>> {
+                c.transaction(|conn| -> Result<R, TransactionError<E>> {
                     // Any error returned by f() is an ApplicationError
                     let mut conn = TxnPgConn::new(conn);
                     f(&mut conn).map_err(|e| TransactionError::ApplicationError(e))
                 })
             })
-            .await?;
+            .await;
         if let Err(e) = &result {
             tracing::info!(e=?e, "Rolling back transaction due to error");
         }
@@ -178,8 +180,8 @@ pub fn run_migrations(url: &str) -> Result<(), DbError> {
 }
 
 pub async fn health_check(pool: &DbPool) -> Result<(), DbError> {
-    pool.db_query(move |conn| diesel::sql_query("SELECT 1").execute(conn))
-        .await??;
+    pool.db_query(move |conn| diesel::sql_query("SELECT 1").execute(conn).map_err(DbError::from))
+        .await?;
 
     Ok(())
 }

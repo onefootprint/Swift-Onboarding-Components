@@ -41,7 +41,7 @@ pub async fn detail(
             };
             Ok((sv, mrs, wfr))
         })
-        .await??;
+        .await?;
 
     let result = api_wire_types::User::from_db((sv, mrs, wfr));
     ResponseData::ok(result).json()

@@ -4,10 +4,12 @@
 ///
 /// Should compile. We can unwrap a Locked<T> into T and return T.
 /// ```
-/// use db::DbPool;
+/// use db::{DbPool, DbResult};
 /// use newtypes::Locked;
 /// pub fn test_run_query(pool: &DbPool) {
-///     pool.db_query(move |conn| Locked::new(1).into_inner());
+///     pool.db_query(move |conn| -> DbResult<_> {
+///         Ok(Locked::new(1).into_inner())
+///     });
 /// }
 /// ```
 ///
@@ -16,7 +18,9 @@
 /// use db::DbPool;
 /// use newtypes::Locked;
 /// pub fn test_run_query(pool: &DbPool) {
-///     pool.db_query(move |conn| Locked::new(1));
+///     pool.db_query(move |conn| -> DbResult<_> {
+///         Ok(Locked::new(1))
+///     });
 /// }
 /// ```
 pub struct TestCannotReturnLockedTFromDbQuery;

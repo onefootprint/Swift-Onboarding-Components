@@ -59,7 +59,7 @@ pub async fn init_post(
             }
             Ok(())
         })
-        .await??;
+        .await?;
 
     // generate the challenge and return it
     let webauthn = WebauthnConfig::new(&state.config);

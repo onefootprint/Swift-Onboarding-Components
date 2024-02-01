@@ -69,7 +69,7 @@ async fn post(
                 Ok((auth_token, session))
             }
         })
-        .await??;
+        .await?;
 
     let expires_at = session.expires_at;
     ResponseData::ok(CreateSdkArgsTokenResponse { token, expires_at }).json()
@@ -100,7 +100,7 @@ async fn get(
             let obc = args.ob_config(conn)?;
             Ok((obc, args))
         })
-        .await??;
+        .await?;
     if let Some((obc, _, _, _)) = obc.as_ref() {
         root_span.record("tenant_id", obc.tenant_id.to_string());
         root_span.record("is_live", obc.is_live.to_string());

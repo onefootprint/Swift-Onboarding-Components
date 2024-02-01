@@ -40,9 +40,7 @@ use crate::{
 #[tracing::instrument(skip(db_pool))]
 pub async fn get_sv_for_workflow(db_pool: &DbPool, workflow: &Workflow) -> DbResult<ScopedVault> {
     let svid = workflow.scoped_vault_id.clone();
-    db_pool
-        .db_query(move |conn| ScopedVault::get(conn, &svid))
-        .await?
+    db_pool.db_query(move |conn| ScopedVault::get(conn, &svid)).await
 }
 
 #[tracing::instrument(skip(conn))]
@@ -226,7 +224,7 @@ pub async fn maybe_generate_ocr_reason_codes(
     let (obc, _) = state
         .db_pool
         .db_query(move |conn| ObConfiguration::get(conn, &wf_id))
-        .await??;
+        .await?;
 
     if !obc.is_doc_first {
         return Ok(None);

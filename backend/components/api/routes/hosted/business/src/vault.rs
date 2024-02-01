@@ -53,7 +53,7 @@ pub async fn post_validate(
             bvw.validate_request(conn, updates, None, false)?;
             Ok(())
         })
-        .await??;
+        .await?;
 
     EmptyResponse::ok().json()
 }
@@ -123,7 +123,7 @@ async fn augment_bos(
             let vw = VaultWrapper::<Person>::build_for_tenant(conn, &primary_bo_sv.0.id)?;
             Ok(vw)
         })
-        .await??;
+        .await?;
 
     // Decrypt the phone and email from the primary BO's vault and strip their sandbox suffix
     let dis = vec![IDK::PhoneNumber.into(), IDK::Email.into()];

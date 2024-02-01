@@ -45,7 +45,7 @@ pub async fn post(
             let wf = Workflow::get_active(conn, &sv.id)?;
             Ok(wf)
         })
-        .await??;
+        .await?;
     let wf = wf.ok_or(OnboardingError::NoWorkflow)?;
 
     let wf_id = wf.id.clone();

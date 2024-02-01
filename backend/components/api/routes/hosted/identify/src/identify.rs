@@ -92,7 +92,7 @@ pub async fn post(
                 let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
                 Ok(token)
             })
-            .await??;
+            .await?;
         Some(token)
     } else {
         None

@@ -40,7 +40,7 @@ async fn get(
             let counts = Tenant::private_user_counts(conn)?;
             Ok((orgs, counts))
         })
-        .await??;
+        .await?;
 
     let count = orgs.len();
     let page = pagination.page;

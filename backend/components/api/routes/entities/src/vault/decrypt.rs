@@ -181,7 +181,7 @@ pub(super) async fn post_inner(
                 .collect::<ApiResult<_>>()?;
             Ok(vws)
         })
-        .await??;
+        .await?;
 
     let reqs = version_to_targets
         .clone()

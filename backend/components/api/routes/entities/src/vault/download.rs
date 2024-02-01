@@ -63,7 +63,7 @@ pub async fn get(
             let vw: TenantVw<Any> = VaultWrapper::build_for_tenant(conn, &scoped_vault.id)?;
             Ok(vw)
         })
-        .await??;
+        .await?;
 
     let op = EnclaveDecryptOperation {
         identifier: di.clone(),

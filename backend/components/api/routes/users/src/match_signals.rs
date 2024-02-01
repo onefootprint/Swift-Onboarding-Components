@@ -37,7 +37,7 @@ pub async fn get(
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, IncludeHidden(false))
         })
-        .await??
+        .await?
         .into_iter()
         .map(|(_, rs)| rs.reason_code)
         .collect();

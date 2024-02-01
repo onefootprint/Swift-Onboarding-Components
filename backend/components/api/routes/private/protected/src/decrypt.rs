@@ -41,7 +41,7 @@ pub async fn post(
 
             Ok((vres, uv))
         })
-        .await??;
+        .await?;
 
     let decrypted_e_response = vendor::verification_result::decrypt_verification_result_response(
         &state.enclave_client,

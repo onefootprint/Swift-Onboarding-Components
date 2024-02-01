@@ -75,7 +75,7 @@ pub async fn get(
             let sv = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
             RiskSignal::latest_by_risk_signal_group_kinds(conn, &sv.id, IncludeHidden(false))
         })
-        .await??
+        .await?
         .into_iter()
         .filter(|(_, rs)| !rs.reason_code.to_be_deprecated())
         .filter_map(|(_, rs)| {
@@ -189,7 +189,7 @@ pub async fn decrypt_aml_hits(
                 VwArgs::Historical(&vreq.scoped_vault_id, vreq.uvw_snapshot_seqno),
             )
         })
-        .await??;
+        .await?;
     let mut dis_searched: Vec<DataIdentifier> = vec![
         IDK::FirstName.into(),
         IDK::MiddleName.into(),
@@ -215,7 +215,7 @@ pub async fn decrypt_aml_hits(
         targets: dis_searched,
         purpose: AccessEventPurpose::Api,
     };
-    state.db_pool.db_query(|conn| event.create(conn)).await??;
+    state.db_pool.db_query(|conn| event.create(conn)).await?;
 
     ResponseData::ok(aml_detail).json()
 }
@@ -250,7 +250,7 @@ async fn get_risk_signal_and_maybe_aml_detail(
 
             Ok((rs, vreq_vres_key))
         })
-        .await??;
+        .await?;
 
     let aml_detail = if let Some((vreq_vres, key, obc)) = vreq_vres_key_obc {
         get_aml_hits(state, &obc.enhanced_aml(), vreq_vres.clone(), key)

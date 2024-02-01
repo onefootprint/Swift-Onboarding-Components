@@ -47,7 +47,7 @@ impl<'a> RateLimit<'a> {
 
                 Ok(())
             })
-            .await??;
+            .await?;
 
         Ok(())
     }

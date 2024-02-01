@@ -47,7 +47,7 @@ async fn get_list(
             let count = ObConfiguration::count(conn, &query)?;
             Ok((results, next_page, count))
         })
-        .await??;
+        .await?;
 
     let results = results
         .into_iter()
@@ -80,7 +80,7 @@ async fn get_detail(
             let (obc, actor) = db::actor::saturate_actor_nullable(conn, obc)?;
             Ok((obc, actor))
         })
-        .await??;
+        .await?;
 
     let result =
         api_wire_types::OnboardingConfiguration::from_db((obc, actor, state.feature_flag_client.clone()));

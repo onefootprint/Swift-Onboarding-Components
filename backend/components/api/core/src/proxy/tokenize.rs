@@ -230,7 +230,7 @@ async fn encrypt_document(
             let vault = Vault::get(conn, &scoped_vault.id)?;
             Ok((vault, scoped_vault))
         })
-        .await??;
+        .await?;
 
     let file_data = file_data.try_decode_base64().map_err(crypto::Error::from)?;
 

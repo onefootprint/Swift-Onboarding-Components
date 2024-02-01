@@ -44,7 +44,7 @@ pub async fn get(
             let res = ProxyConfig::list(conn, filters)?;
             Ok(res)
         })
-        .await??;
+        .await?;
 
     let configs = configs
         .into_iter()
@@ -74,7 +74,7 @@ pub async fn get_detail(
         .db_query(move |conn| -> Result<_, DbError> {
             ProxyConfig::find(conn, &tenant_id, is_live, proxy_config_id)
         })
-        .await??;
+        .await?;
 
     ResponseData::ok(api_wire_types::ProxyConfigDetailed::from_db(config)).json()
 }

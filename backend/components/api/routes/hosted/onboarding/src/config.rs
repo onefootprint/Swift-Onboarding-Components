@@ -64,7 +64,7 @@ pub fn get(
 
             Ok((appearance, client_config))
         })
-        .await??;
+        .await?;
 
     let ff_client = state.feature_flag_client.clone();
 
