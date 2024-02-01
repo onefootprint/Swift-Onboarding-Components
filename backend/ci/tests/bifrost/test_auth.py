@@ -178,3 +178,19 @@ def test_multi_tenant_auth(sandbox_user, foo_sandbox_tenant, must_collect_data):
         "id.first_name",
         "id.address_line1",
     }
+
+    # And make sure the timeline events show we prefilled phone + email and then later prefilled
+    # the rest
+    body = get(f"entities/{fp_id}/timeline", None, *foo_sandbox_tenant.db_auths)
+    prefill_events = [
+        i["event"]["data"]
+        for i in body
+        if i["event"]["kind"] == "data_collected" and i["event"]["data"]["is_prefill"]
+    ]
+    assert set(prefill_events[0]["attributes"]) == {
+        "full_address",
+        "name",
+        "dob",
+        "ssn9",
+    }
+    assert set(prefill_events[1]["attributes"]) == {"phone_number", "email"}

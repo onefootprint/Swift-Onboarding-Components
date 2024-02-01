@@ -18,6 +18,7 @@ struct TestData {
     su1: ScopedVault,
     su2: ScopedVault,
     pb1: ObConfiguration,
+    auth_pb2: ObConfiguration,
     pb2: ObConfiguration,
 }
 
@@ -140,8 +141,8 @@ async fn test_prefill_data(state: &mut State) {
             let vw2: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2_id).unwrap();
             vw2.prefill_portable_data(conn, prefill_data, None).unwrap();
 
-            let vw1: TenantVw<Person> = VaultWrapper::build_owned(conn, &su1_id).unwrap();
-            let vw2: TenantVw<Person> = VaultWrapper::build_owned(conn, &su2_id).unwrap();
+            let vw1: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &su1_id).unwrap();
+            let vw2: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &su2_id).unwrap();
 
             Ok((vw1, vw2))
         })
@@ -200,7 +201,7 @@ async fn test_prefill_data(state: &mut State) {
             let vw2: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2_id).unwrap();
             vw2.portablize_identity_data(conn).unwrap();
 
-            let vw2: TenantVw<Person> = VaultWrapper::build_owned(conn, &su2_id).unwrap();
+            let vw2: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &su2_id).unwrap();
             Ok(vw2)
         })
         .await
@@ -215,6 +216,87 @@ async fn test_prefill_data(state: &mut State) {
     let vw2_data = vw2.all_data.iter().flat_map(|(_, d)| d).collect_vec();
     assert_have_same_elements(vw2.all_data.keys().cloned().collect(), expected_vw2_data);
     assert!(vw2_data.iter().all(|d| !d.is_portable()));
+}
+
+/// Follows the journey of a user who one-click auths using an auth playbook onto tenant 2 and then
+/// one-click onboards onto a KYC playbook
+#[test_state]
+async fn test_prefill_data_auth_then_kyc(state: &mut State) {
+    //
+    // User starts onboarding onto tenant 1
+    //
+    let (data, vw) = state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let test_data = create_test_data(conn);
+            let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &test_data.su1.id).unwrap();
+            let data = vec![
+                (IDK::Dob.into(), PiiString::new("1990-01-01".into())),
+                (IDK::Ssn9.into(), PiiString::new("123-12-1234".into())),
+                (IDK::FirstName.into(), PiiString::new("Hayes".into())),
+                (IDK::LastName.into(), PiiString::new("Valley".into())),
+            ];
+            vw.patch_data_test(conn, data, true).unwrap();
+            let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &test_data.su1.id).unwrap();
+            vw.portablize_identity_data(conn).unwrap();
+
+            let vw = VaultWrapper::<Person>::build_portable(conn, &test_data.su1.vault_id).unwrap();
+            Ok((test_data, vw))
+        })
+        .await
+        .unwrap();
+
+    // We should only prefill phone and email from this auth playbook
+    let prefill_data = vw
+        .get_data_to_prefill(state, &data.su2, &data.auth_pb2)
+        .await
+        .unwrap();
+    assert_have_same_elements(
+        prefill_data.data.iter().map(|d| d.kind.clone()).collect(),
+        vec![IDK::Email.into(), IDK::PhoneNumber.into()],
+    );
+
+    // User finishes auth onto tenant2
+    let su2 = data.su2.clone();
+    let vw = state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let vw2: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
+            vw2.prefill_portable_data(conn, prefill_data, None).unwrap();
+
+            let vw = VaultWrapper::<Person>::build_portable(conn, &su2.vault_id).unwrap();
+            Ok(vw)
+        })
+        .await
+        .unwrap();
+
+    // Then, prefill data for KYC playbook shouldn't prefill phone and email again
+    let prefill_data = vw.get_data_to_prefill(state, &data.su2, &data.pb2).await.unwrap();
+    assert_have_same_elements(
+        prefill_data.data.iter().map(|d| d.kind.clone()).collect(),
+        vec![IDK::FirstName.into(), IDK::LastName.into(), IDK::Ssn4.into()],
+    );
+
+    // User finishes KYC onto tenant 2
+    let su2 = data.su2.clone();
+    let vw2 = state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let vw2: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su2.id).unwrap();
+            vw2.prefill_portable_data(conn, prefill_data, None).unwrap();
+            let vw2: TenantVw<Person> = VaultWrapper::build_for_tenant(conn, &su2.id).unwrap();
+            Ok(vw2)
+        })
+        .await
+        .unwrap();
+    let expected_vw2_data = vec![
+        IDK::Email.into(),
+        IDK::PhoneNumber.into(),
+        IDK::FirstName.into(),
+        IDK::LastName.into(),
+        IDK::Ssn4.into(),
+    ];
+    assert_have_same_elements(vw2.all_data.keys().cloned().collect(), expected_vw2_data);
 }
 
 fn create_test_data(conn: &mut TxnPgConn) -> TestData {
@@ -233,6 +315,12 @@ fn create_test_data(conn: &mut TxnPgConn) -> TestData {
         ..Default::default()
     };
     let pb2 = db::tests::fixtures::ob_configuration::create_with_opts(conn, &tenant2.id, pb2_opts);
+    let auth_pb2_opts = ObConfigurationOpts {
+        must_collect_data: vec![CDO::PhoneNumber, CDO::Email],
+        is_live: true,
+        ..Default::default()
+    };
+    let auth_pb2 = db::tests::fixtures::ob_configuration::create_with_opts(conn, &tenant2.id, auth_pb2_opts);
 
     let uv = db::tests::fixtures::vault::create_person(conn, true);
     let su1 = db::tests::fixtures::scoped_vault::create(conn, &uv.id, &pb1.id);
@@ -248,5 +336,11 @@ fn create_test_data(conn: &mut TxnPgConn) -> TestData {
     let vw: WriteableVw<Person> = VaultWrapper::lock_for_onboarding(conn, &su1.id).unwrap();
     vw.on_otp_verified(conn, IDK::PhoneNumber.into()).unwrap();
 
-    TestData { su1, su2, pb1, pb2 }
+    TestData {
+        su1,
+        su2,
+        pb1,
+        auth_pb2,
+        pb2,
+    }
 }

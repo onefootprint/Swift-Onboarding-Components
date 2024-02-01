@@ -2,7 +2,7 @@ use super::{PatchDataResult, WriteableVw};
 use crate::{
     auth::tenant::AuthActor,
     errors::{ApiResult, AssertionError},
-    utils::vault_wrapper::{PieceOfData, VaultWrapper},
+    utils::vault_wrapper::{Any, PieceOfData, TenantVw, VaultWrapper},
     State,
 };
 use db::{
@@ -55,18 +55,29 @@ impl<Type> VaultWrapper<Type> {
             return Err(AssertionError("Can't prefill business vaults").into());
         }
 
+        let sv_id = destination_sv.id.clone();
+        let destination_vw: TenantVw<Any> = state
+            .db_pool
+            .db_query(move |conn| VaultWrapper::build_for_tenant(conn, &sv_id))
+            .await?;
+
         // Collect all of the portable data that we can prefill
         let data = self
             .populated_dis()
             .into_iter()
             .filter_map(|di| self.data(&di))
             .filter(|d| d.is_portable())
-            // Don't prefill data into a tenant that's already exists on that tenant.
+            // Don't prefill data into a tenant that is already owned by the tenant.
             // For ex, will prevent us from prefilling PhoneNumber and Email that were just recently
             // added at this tenant
             // TODO this won't always no-op like we want if the data was portablized at another tenant
             // but is the same data
             .filter(|d| d.lifetime.scoped_vault_id != destination_sv.id)
+            // Don't prefill data into this tenant if the exact same data has already been prefilled
+            .filter(|d| {
+                let existing_dl = destination_vw.get_lifetime(d.lifetime.kind.clone());
+                !existing_dl.and_then(|dl| dl.origin_id.as_ref()).is_some_and(|id| &d.lifetime.id == id)
+            })
             // Only autofill data into the that must be collected by the tenant's playbook
             .filter(|d| pb.must_collect_data.iter().any(|cdo| cdo.data_identifiers().unwrap_or_default().contains(&d.lifetime.kind)))
             // Note: this won't support portable documents

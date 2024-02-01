@@ -25,12 +25,6 @@ impl<Type> VaultWrapper<Type> {
         Self::build_inner(conn, sv_id, version)
     }
 
-    /// New view of a tenant's VW that only includes data owned by this tenant.
-    /// This will one day replace build_for_tenant
-    pub fn build_owned(conn: &mut PgConn, sv_id: &ScopedVaultId) -> ApiResult<TenantVw<Type>> {
-        Self::build_inner(conn, sv_id, None)
-    }
-
     pub fn build_inner(
         conn: &mut PgConn,
         sv_id: &ScopedVaultId,
