@@ -1,4 +1,5 @@
 import { ChallengeKind } from '@onefootprint/types';
+import { describe, expect, it } from 'bun:test';
 
 import {
   assignDecryptedData,
@@ -31,7 +32,7 @@ describe('should pass the entire payload', () => {
     );
 
     expect(result.email).toEqual('email');
-    expect(result.email).toEqual(ctx.email);
+    expect(result.email).toEqual(ctx.email!);
   });
 
   it('assignPhoneNumber', () => {
@@ -46,7 +47,7 @@ describe('should pass the entire payload', () => {
     );
 
     expect(result.phoneNumber).toEqual('phone');
-    expect(result.phoneNumber).toEqual(ctx.phoneNumber);
+    expect(result.phoneNumber).toEqual(ctx.phoneNumber!);
   });
 
   it('assignPhoneReplaceChallenge', () => {
@@ -75,7 +76,7 @@ describe('should pass the entire payload', () => {
     expect(phoneReplaceChallenge?.timeBeforeRetryS).toEqual(
       data.timeBeforeRetryS,
     );
-    expect(phoneReplaceChallenge).toEqual(ctx.phoneReplaceChallenge);
+    expect(phoneReplaceChallenge).toEqual(ctx.phoneReplaceChallenge!);
   });
 
   it('assignEmailChallenge', () => {
@@ -83,7 +84,7 @@ describe('should pass the entire payload', () => {
     const ctx = {} as UserMachineContext;
     const data = {
       challengeToken: 'token',
-      challengeKind: 'email',
+      challengeKind: ChallengeKind.email,
       scrubbedPhoneNumber: 'string',
       biometricChallengeJson: '',
       timeBeforeRetryS: 1,
@@ -106,7 +107,7 @@ describe('should pass the entire payload', () => {
     );
 
     expect(result.emailChallenge).toEqual(data);
-    expect(result.emailChallenge).toEqual(ctx.emailChallenge);
+    expect(result.emailChallenge).toEqual(ctx.emailChallenge!);
   });
 
   it('assignEmailReplaceChallenge', () => {
@@ -135,7 +136,7 @@ describe('should pass the entire payload', () => {
     expect(emailReplaceChallenge?.timeBeforeRetryS).toEqual(
       data.timeBeforeRetryS,
     );
-    expect(emailReplaceChallenge).toEqual(ctx.emailReplaceChallenge);
+    expect(emailReplaceChallenge).toEqual(ctx.emailReplaceChallenge!);
   });
 
   it('assignKindToChallenge', () => {
@@ -149,8 +150,8 @@ describe('should pass the entire payload', () => {
       meta,
     );
 
-    expect(result.kindToChallenge).toEqual('sms');
-    expect(result.kindToChallenge).toEqual(ctx.kindToChallenge);
+    expect(result.kindToChallenge).toEqual(ChallengeKind.sms);
+    expect(result.kindToChallenge).toEqual(ctx.kindToChallenge!);
   });
 
   it('assignPasskeyChallenge', () => {
@@ -172,7 +173,7 @@ describe('should pass the entire payload', () => {
     );
 
     expect(result.passkeyChallenge).toEqual(data);
-    expect(result.passkeyChallenge).toEqual(ctx.passkeyChallenge);
+    expect(result.passkeyChallenge).toEqual(ctx.passkeyChallenge!);
   });
 
   it('assignVerifyToken', () => {
@@ -220,12 +221,12 @@ describe('machine assigners', () => {
 
     expect(result.phoneChallenge).toEqual({
       biometricChallengeJson: '',
-      challengeKind: 'sms',
+      challengeKind: ChallengeKind.sms,
       challengeToken: 'token',
       scrubbedPhoneNumber: '1•••',
       timeBeforeRetryS: 1,
     });
-    expect(result.phoneChallenge).toEqual(ctx.phoneChallenge);
+    expect(result.phoneChallenge).toEqual(ctx.phoneChallenge!);
     expect(result.userDashboard?.phone?.label).toEqual('1•••');
   });
 
@@ -318,7 +319,7 @@ describe('machine assigners', () => {
         meta,
       );
 
-      expect(result.kindToChallenge).toEqual('sms');
+      expect(result.kindToChallenge).toEqual(ChallengeKind.sms);
       expect(result.userDashboard?.email).toEqual({
         status: 'set',
         label: 'a•.g•.com',
@@ -332,11 +333,15 @@ describe('machine assigners', () => {
         userFound: false,
         isUnverified: false,
         hasSyncablePassKey: false,
-        availableChallengeKinds: ['sms', 'email', 'biometric'],
+        availableChallengeKinds: [
+          ChallengeKind.sms,
+          ChallengeKind.email,
+          ChallengeKind.biometric,
+        ],
         scrubbedEmail: 'a•.g•.com',
         scrubbedPhone: '+49••',
       });
-      expect(result.userFound).toEqual(ctx.userFound);
+      expect(result.userFound).toEqual(ctx.userFound!);
     });
 
     it('should not assign phone when challenge is not available', () => {
@@ -367,7 +372,7 @@ describe('machine assigners', () => {
         meta,
       );
 
-      expect(result.kindToChallenge).toEqual('email');
+      expect(result.kindToChallenge).toEqual(ChallengeKind.email);
       expect(result.userDashboard?.email).toEqual({
         status: 'set',
         label: 'a•.g•.com',

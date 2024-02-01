@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'bun:test';
+
 import type { Props } from '../../types/components';
 import { isAuthOrVerify, isAuthUpdateLoginMethods, isValidString } from '.';
 

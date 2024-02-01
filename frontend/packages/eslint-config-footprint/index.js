@@ -35,6 +35,7 @@ module.exports = {
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     'no-console': ['error', { allow: ['warn', 'error'] }],
     'no-restricted-exports': 'off',
+    'import/no-unresolved': ["error", { "ignore": ["^bun:test$"] }],
     'no-restricted-syntax': [
       'error',
       {

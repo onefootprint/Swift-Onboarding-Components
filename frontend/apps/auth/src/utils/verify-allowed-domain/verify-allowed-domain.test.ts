@@ -1,7 +1,9 @@
+import { describe, expect, it } from 'bun:test';
+
 import isDomainAllowed from './verify-allowed-domain';
 
 describe('isDomainAllowed', () => {
-  test.each([
+  it.each([
     {
       url: 'http://localhost:3002/route?param=1',
       list: ['https://localhost:3002'],

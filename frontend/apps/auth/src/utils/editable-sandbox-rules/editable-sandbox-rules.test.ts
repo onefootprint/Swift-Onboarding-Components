@@ -1,7 +1,9 @@
+import { describe, expect, test as it } from 'bun:test';
+
 import sandboxIdEditRules from './editable-sandbox-rules';
 
 describe('sandboxIdEditRules', () => {
-  test.each([
+  it.each([
     { obj: {}, step: 'emailIdentification', x: true },
     { obj: { 'id.email': 'x' }, step: 'emailIdentification', x: false },
     {
