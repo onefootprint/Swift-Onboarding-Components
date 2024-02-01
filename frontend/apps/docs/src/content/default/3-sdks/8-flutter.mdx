@@ -45,6 +45,8 @@ cd ios && pod install && cd ..
 3. The package exposes a `footprint` object. In order to initialize the flow, simply call `init` method on the `footprint` object. As arguments to the init method, you must pass a `FootprintConfiguration` object and `BuildContext` of your widget builder. The `FootprintConfiguration` must contain the `publicKey` and `redirectUrl`. Additionally you can pass `onComplete` and `onCancel` callbacks and a number of optional parameters to customize the flow.
 
 ```dart
+import 'package:footprint_flutter/footprint_flutter.dart';
+
 var config = FootprintConfiguration(
   publicKey: "pb_test_RcDHxZgJO9q3vY72d7ZLXu",
   onCancel: () => print("onCancel"),
@@ -63,6 +65,8 @@ For a complete example, click [here](https://github.com/onefootprint/examples/tr
 Utilize the `userData` field in `FootprintConfiguration` to pre-fill any available data and bypass completed pages for your users. You can click [here](https://docs.onefootprint.com/integrate/user-data) to find out more about the formatting and validation requirements we have for these inputs.
 
 ```dart
+import 'package:footprint_flutter/footprint_flutter.dart';
+
 var config = FootprintConfiguration(
   publicKey: "pb_test_RcDHxZgJO9q3vY72d7ZLXu",
   onCancel: () => print("onCancel"),
@@ -97,6 +101,8 @@ footprint.init(config, context);
 Take advantage of the `appearance` option to extend the default styles. You can utilize the same variables and rules as in the [web integration](https://docs.onefootprint.com/integrate/customization). You will need to pass values that are valid CSS styles.
 
 ```dart
+import 'package:footprint_flutter/footprint_flutter.dart';
+
 var config = FootprintConfiguration(
   publicKey: "pb_test_RcDHxZgJO9q3vY72d7ZLXu",
   appearance: FootprintAppearance(
@@ -121,6 +127,8 @@ footprint.init(config, context);
 You can also add your company logo at the top of the modal by passing the boolean field `showLogo` to `FootprintOptions` which is passed as `options` to `FootprintConfiguration`.
 
 ```dart
+import 'package:footprint_flutter/footprint_flutter.dart';
+
 var config = FootprintConfiguration(
   publicKey: "pb_test_RcDHxZgJO9q3vY72d7ZLXu",
   onCancel: () => print("onCancel"),
@@ -140,6 +148,8 @@ Create a `FootprintL10n` object passing the desired locale and language. Current
 For example, if your audience is in Mexico, you can set the locale as follows:
 
 ```dart
+import 'package:footprint_flutter/footprint_flutter.dart';
+
 var config = FootprintConfiguration(
   publicKey: "pb_test_RcDHxZgJO9q3vY72d7ZLXu",
   onCancel: () => print("onCancel"),
