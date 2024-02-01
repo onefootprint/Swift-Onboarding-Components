@@ -17,4 +17,4 @@ export const isAuthUpdateLoginMethods = (obj: Props): boolean =>
   isAuth(obj.kind) &&
   Boolean('updateLoginMethods' in obj && obj.updateLoginMethods) &&
   !!obj.authToken &&
-  /^tok_/.test(obj.authToken);
+  /tok_/.test(obj.authToken);

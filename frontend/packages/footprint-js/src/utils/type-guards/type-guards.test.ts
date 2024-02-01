@@ -28,6 +28,10 @@ describe('isValidString', () => {
 describe('isAuthUpdateLoginMethods', () => {
   it.each([
     {
+      obj: { kind: 'auth', updateLoginMethods: true, authToken: 'utok_' },
+      x: true,
+    },
+    {
       obj: { kind: 'auth', updateLoginMethods: true, authToken: 'tok_' },
       x: true,
     },
