@@ -121,6 +121,7 @@ config:
       targetCpuUtilization: 60
       targetMemoryUtilization: 60
     cronTasks:
+      # Note: some cron tasks are not applicable in dev
       - name: overdue-watchlist
         memoryMB: 512
         cpuUnits: 256

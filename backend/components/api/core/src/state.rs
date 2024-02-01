@@ -186,7 +186,10 @@ impl State {
             vec![&GIT_HASH, &config.service_config.environment],
         );
 
-        let billing_client = billing::BillingClient::new(config.stripe.api_key.clone());
+        let billing_client = billing::BillingClient::new(
+            config.stripe.api_key.clone(),
+            config.service_config.environment.clone(),
+        );
 
         let fingerprintjs_client = FingerprintJSClient::new(config.fingerprintjs_sdk_key.clone().into())
             .expect("failed to build fingerprint client");

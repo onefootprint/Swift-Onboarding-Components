@@ -17,7 +17,6 @@ export interface Alert {
 /// Endpoints whose latency we never want to alert on
 const IGNORE_LATENT_HTTP_ROUTES: string[] = [
   '/hosted/user/documents/{id}/upload/{side}', // Latency can be a function of user network connection :/
-  '/private/invoices',
 ];
 /// Generally higher-latency HTTP requests that we want to have a higher alert threshold
 const LATENT_HTTP_ROUTES: string[] = [
@@ -192,11 +191,6 @@ const staticAlerts: Alert[] = [
         {
           column: 'http.route',
           op: 'exists',
-        },
-        {
-          column: 'http.route',
-          op: '!=',
-          value: '/private/invoices',
         },
         {
           column: 'duration_ms',

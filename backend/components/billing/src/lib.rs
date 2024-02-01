@@ -1,5 +1,8 @@
 use crate::counts::LineItem;
-use db::models::{billing_profile::BillingProfile as DbBillingProfile, tenant::Tenant};
+use db::{
+    models::{billing_profile::BillingProfile as DbBillingProfile, tenant::Tenant},
+    DbError,
+};
 use interval::BillingInterval;
 use newtypes::{PiiString, StripeCustomerId, TenantId};
 use profile::BillingProfile;
@@ -16,6 +19,8 @@ pub type BResult<T> = Result<T, Error>;
 mod counts;
 pub use counts::BillingCounts;
 pub mod interval;
+mod invoices;
+pub use invoices::*;
 mod product;
 mod profile;
 
@@ -41,25 +46,37 @@ pub enum Error {
     FeatureFlagError(#[from] feature_flag::Error),
     #[error("{0}")]
     DecimalError(#[from] rust_decimal::Error),
+    #[error("{0}")]
+    Database(Box<DbError>),
 }
+
+macro_rules! box_from_error_impl {
+    ($var:ident, $typ:ty) => {
+        impl From<$typ> for Error {
+            #[inline]
+            fn from(value: $typ) -> Self {
+                Error::$var(Box::new(value))
+            }
+        }
+    };
+}
+
+box_from_error_impl!(Database, DbError);
 
 #[derive(Clone)]
 pub struct BillingClient {
     client: Client,
+    environment: String,
 }
 
 impl BillingClient {
-    pub fn new(secret_key: PiiString) -> Self {
+    pub fn new(secret_key: PiiString, environment: String) -> Self {
         let client = Client::new(secret_key.leak_to_string());
-        Self { client }
+        Self { client, environment }
     }
 
     #[tracing::instrument(skip(self))]
-    pub async fn get_or_create_customer(
-        &self,
-        tenant: &Tenant,
-        environment: String,
-    ) -> BResult<StripeCustomerId> {
+    pub async fn get_or_create_customer(&self, tenant: &Tenant) -> BResult<StripeCustomerId> {
         // TODO use search API instead of paginating
         let params = ListCustomers {
             limit: Some(100),
@@ -68,14 +85,14 @@ impl BillingClient {
         let existing_customers = Customer::list(&self.client, &params).await?;
         let existing_customer = existing_customers.data.into_iter().find(|c| {
             c.metadata.get("tenant.id") == Some(&tenant.id)
-                && c.metadata.get("environment") == Some(&environment)
+                && c.metadata.get("environment") == Some(&self.environment)
         });
         let customer = if let Some(c) = existing_customer {
             c
         } else {
             let extra_metadata = [
                 ("tenant.id".to_string(), tenant.id.to_string()),
-                ("environment".to_string(), environment),
+                ("environment".to_string(), self.environment.clone()),
                 ("org_name".to_string(), tenant.name.clone()),
             ];
             let metadata = extra_metadata.into_iter().chain(managed_metadata()).collect();

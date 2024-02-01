@@ -2758,10 +2758,12 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "api_core",
+ "billing",
  "chrono",
  "clap",
  "db",
  "db_schema",
+ "futures",
  "newtypes",
  "tracing",
 ]

@@ -20,6 +20,7 @@ enum Command {
     ApiServer,
     // Cron jobs
     CreateOverdueWatchlistCheckTasks(commands::CreateOverdueWatchlistCheckTasks),
+    GenerateInvoices(commands::GenerateInvoices),
 }
 
 #[allow(clippy::expect_used)]
@@ -67,6 +68,7 @@ async fn run(config: Config) -> Result<()> {
     match args.command {
         None | Some(Command::ApiServer) => run_api_server(config, state).await?,
         Some(Command::CreateOverdueWatchlistCheckTasks(subcommand)) => subcommand.run(config, state).await?,
+        Some(Command::GenerateInvoices(subcommand)) => subcommand.run(config, state).await?,
     };
     Ok(())
 }
