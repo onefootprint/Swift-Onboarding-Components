@@ -1,7 +1,8 @@
 import type { IdentifyRequest } from '../../types/identify';
 import type { FootprintUserData } from '../../types/user-data';
 
-const baseUrl = process.env.API_BASE_URL ?? '';
+const isTest = process.env.NODE_ENV === 'test';
+const baseUrl = process.env.API_BASE_URL ?? isTest ? 'http://test' : '';
 
 const identifyUserRequest = async (payload: IdentifyRequest) => {
   const response = await fetch(`${baseUrl}/hosted/identify`, {

@@ -1,110 +1,109 @@
-import fetchMock from 'jest-fetch-mock';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'bun:test';
+// @ts-ignore: Module '"msw"' has no exported member 'http'.
+import { http } from 'msw';
+import { setupServer } from 'msw/node';
 
 import identifyUser from './identify-user';
 
+const isFoundEmail = (x: unknown) => x === 'userfound@email.com';
+const isFoundPhone = (x: unknown) => x === '+1-202-555-0130';
+
+async function* streamReader(reader: ReadableStreamDefaultReader<Uint8Array>) {
+  let result;
+  do {
+    result = await reader.read(); // eslint-disable-line no-await-in-loop
+    yield result;
+  } while (!result.done);
+}
+
+const convertStreamToObject = async (
+  reader?: ReadableStreamDefaultReader<Uint8Array>,
+) => {
+  let jsonStr = '';
+  if (!reader) return {};
+
+  try {
+    for await (const { done, value } of streamReader(reader)) {
+      if (!done) {
+        const chunkData = new TextDecoder().decode(value);
+        jsonStr += chunkData;
+      }
+    }
+
+    const parsedObject = JSON.parse(jsonStr);
+    return parsedObject;
+  } finally {
+    reader.releaseLock();
+  }
+};
+
+const isTest = process.env.NODE_ENV === 'test';
+const baseUrl = process.env.API_BASE_URL ?? isTest ? 'http://test' : '';
+const handlers = [
+  // @ts-ignore: Parameter 'res' implicitly has an 'any' type.
+  http.post(`${baseUrl}/hosted/identify`, async res => {
+    const bodyStream = res.request.body?.getReader();
+    const body = await convertStreamToObject(bodyStream);
+
+    return new Response(
+      JSON.stringify({
+        available_challenge_kinds: ['sms', 'biometric'],
+        has_syncable_pass_key: true,
+        is_unverified: true,
+        scrubbed_email: 'Lorem ipsum dolor',
+        scrubbed_phone: 'Lorem ipsum dolor',
+        user_found:
+          isFoundEmail(body.identifier.email) ||
+          isFoundPhone(body.identifier.phone_number),
+      }),
+    );
+  }),
+];
+const server = setupServer(...handlers);
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+
 describe('identifyUser', () => {
-  beforeAll(() => {
-    fetchMock.enableMocks();
+  it('should throw an exception when nothing is passed', async () => {
+    await expect(identifyUser()).rejects.toEqual(
+      new Error('User data must be passed in order to identify an user'),
+    );
   });
 
-  beforeEach(() => {
-    fetchMock.resetMocks();
+  it('should be true when only email is passed and user is found', async () => {
+    await expect(
+      identifyUser({ 'id.email': 'userfound@email.com' }),
+    ).resolves.toEqual(true);
   });
 
-  describe('when nothing is passed', () => {
-    it('should throw an exception', async () => {
-      await expect(() => identifyUser()).rejects.toThrow();
-    });
+  it('should be true when only phoneNumber is passed and user is found', async () => {
+    await expect(
+      identifyUser({ 'id.phone_number': '+1-202-555-0130' }),
+    ).resolves.toEqual(true);
   });
 
-  describe('when only email is passed and user is found', () => {
-    beforeEach(() => {
-      fetchMock.mockResponseOnce(
-        JSON.stringify({
-          available_challenge_kinds: ['sms'],
-          user_found: true,
-        }),
-      );
-    });
-
-    it('should return true', async () => {
-      await expect(
-        identifyUser({ 'id.email': 'jane.doe@acme.com' }),
-      ).resolves.toEqual(true);
-    });
+  it('should be true when email and phoneNumber are passed, and user is found with the phoneNumber', async () => {
+    await expect(
+      identifyUser({
+        'id.email': 'jane.doe@acme.com',
+        'id.phone_number': '+1-202-555-0130',
+      }),
+    ).resolves.toEqual(true);
   });
 
-  describe('when only phoneNumber is passed and user is found', () => {
-    beforeEach(() => {
-      fetchMock.mockResponseOnce(
-        JSON.stringify({
-          available_challenge_kinds: ['sms'],
-          user_found: true,
-        }),
-      );
-    });
-
-    it('should return true', async () => {
-      await expect(
-        identifyUser({ 'id.phone_number': '+1-202-555-0130' }),
-      ).resolves.toEqual(true);
-    });
+  it('should be false when only email is passed and user is not found', async () => {
+    await expect(
+      identifyUser({ 'id.email': 'jane.doe@acme.com' }),
+    ).resolves.toEqual(false);
   });
 
-  describe('when email and phoneNumber are passed, and user is found with the phoneNumber', () => {
-    beforeEach(() => {
-      fetchMock.mockResponseOnce(
-        JSON.stringify({ available_challenge_kinds: null, user_found: false }),
-      );
-      fetchMock.mockResponseOnce(
-        JSON.stringify({
-          available_challenge_kinds: ['sms'],
-          user_found: true,
-        }),
-      );
-    });
-
-    it('should return true', async () => {
-      await expect(
-        identifyUser({
-          'id.email': 'jane.doe@acme.com',
-          'id.phone_number': '+1-202-555-0130',
-        }),
-      ).resolves.toEqual(true);
-    });
-  });
-
-  describe('when only email is passed and user is not found', () => {
-    beforeEach(() => {
-      fetchMock.mockResponseOnce(
-        JSON.stringify({ available_challenge_kinds: null, user_found: false }),
-      );
-    });
-
-    it('should return false', async () => {
-      await expect(
-        identifyUser({ 'id.email': 'jane.doe@acme.com' }),
-      ).resolves.toEqual(false);
-    });
-  });
-
-  describe('when email and phoneNumber are passed and user is not found', () => {
-    beforeEach(() => {
-      fetchMock.mockResponseOnce(
-        JSON.stringify({ available_challenge_kinds: null, user_found: false }),
-      );
-      fetchMock.mockResponseOnce(
-        JSON.stringify({ available_challenge_kinds: null, user_found: false }),
-      );
-    });
-
-    it('should return false', async () => {
-      await expect(
-        identifyUser({
-          'id.email': 'jane.doe@acme.com',
-          'id.phone_number': '+1-202-555-0130',
-        }),
-      ).resolves.toEqual(false);
-    });
+  it('should return false when email and phoneNumber are passed and user is not found', async () => {
+    await expect(
+      identifyUser({
+        'id.email': 'jane.doe@acme.com',
+        'id.phone_number': '+1-202-555-9999',
+      }),
+    ).resolves.toEqual(false);
   });
 });

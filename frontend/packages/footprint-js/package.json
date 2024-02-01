@@ -18,9 +18,9 @@
     "identity verification"
   ],
   "scripts": {
-    "test": "jest",
-    "test:ci": "jest --ci --bail --runInBand",
-    "test:watch": "jest --watch",
+    "test": "bun test --bail",
+    "test:ci:bun": "bun test --bail",
+    "test:watch": "bun test --watch",
     "dev": "tsup --watch",
     "build": "tsup",
     "lint": "eslint src --fix",
@@ -33,18 +33,15 @@
     "@onefootprint/postmate": "2.1.0"
   },
   "devDependencies": {
-    "@onefootprint/jest-presets": "*",
+    "bun-types": "^1.0.25",
     "csstype": "^3.1.2",
     "eslint-config-footprint": "*",
+    "msw": "^2.1.2",
     "tsconfig": "*",
     "tsup": "^6.5.0",
-    "typescript": "4.9.5",
-    "jest-fetch-mock": "^3.0.3"
+    "typescript": "4.9.5"
   },
   "publishConfig": {
     "access": "public"
-  },
-  "jest": {
-    "preset": "@onefootprint/jest-presets/jest/web"
   }
 }

@@ -1,8 +1,6 @@
-import type {
-  AuthProps,
-  Variant,
-  VerifyButtonProps,
-} from '../../types/components';
+import { describe, expect, mock, test } from 'bun:test';
+
+import type { Variant, VerifyButtonProps } from '../../types/components';
 import { ComponentKind } from '../../types/components';
 import {
   getCallbackProps,
@@ -12,12 +10,14 @@ import {
   validateComponentVariant,
 } from './prop-utils';
 
+const noop = () => undefined;
+
 describe('getCallbackProps', () => {
-  it('should call every possible callbacks for kind Auth', () => {
-    const onDestroy = jest.fn();
-    const onCancel = jest.fn();
-    const onClose = jest.fn();
-    const onComplete = jest.fn();
+  test('should call every possible callbacks for kind Auth', () => {
+    const onDestroy = mock(noop);
+    const onCancel = mock(noop);
+    const onClose = mock(noop);
+    const onComplete = mock(noop);
     const result = getCallbackProps(
       {
         kind: ComponentKind.Auth,
@@ -25,14 +25,13 @@ describe('getCallbackProps', () => {
         onCancel,
         onClose,
         onComplete,
-      } as AuthProps,
+      },
       onDestroy,
     );
-
     expect(result).toMatchObject({
-      canceled: expect.any(Function),
-      closed: expect.any(Function),
-      completed: expect.any(Function),
+      canceled: Function,
+      closed: Function,
+      completed: Function,
     });
 
     result.closed?.();
@@ -47,13 +46,13 @@ describe('getCallbackProps', () => {
     expect(onComplete).toHaveBeenNthCalledWith(1, 'token');
   });
 
-  it('should transform verify button into verify and call onLaunchChild', () => {
-    const onDestroy = jest.fn();
-    const onLaunchChild = jest.fn();
-    const onCancel = jest.fn();
-    const onClose = jest.fn();
-    const onComplete = jest.fn();
-    const onClick = jest.fn();
+  test('should transform verify button into verify and call onLaunchChild', () => {
+    const onDestroy = mock(noop);
+    const onLaunchChild = mock(noop);
+    const onCancel = mock(noop);
+    const onClose = mock(noop);
+    const onComplete = mock(noop);
+    const onClick = mock(noop);
     const result = getCallbackProps(
       {
         kind: ComponentKind.VerifyButton,
@@ -71,10 +70,10 @@ describe('getCallbackProps', () => {
     );
 
     expect(result).toMatchObject({
-      canceled: expect.any(Function),
-      clicked: expect.any(Function),
-      closed: expect.any(Function),
-      completed: expect.any(Function),
+      canceled: Function,
+      clicked: Function,
+      closed: Function,
+      completed: Function,
     });
 
     result.clicked?.('test-event');
@@ -90,19 +89,17 @@ describe('getCallbackProps', () => {
 });
 
 describe('getDefaultVariantForKind', () => {
-  it.each`
-    kind               | output
-    ${'auth'}          | ${'modal'}
-    ${'form'}          | ${'inline'}
-    ${'render'}        | ${'inline'}
-    ${'verify-button'} | ${'inline'}
-    ${'verify'}        | ${'modal'}
-  `(`should be $output for $kind`, ({ kind, output }) => {
-    const result = getDefaultVariantForKind(kind);
-    expect(result).toBe(output);
+  test.each([
+    { kind: ComponentKind.Auth, x: 'modal' },
+    { kind: ComponentKind.Form, x: 'inline' },
+    { kind: ComponentKind.Render, x: 'inline' },
+    { kind: ComponentKind.Verify, x: 'modal' },
+    { kind: ComponentKind.VerifyButton, x: 'inline' },
+  ])('.', ({ kind, x }) => {
+    expect(getDefaultVariantForKind(kind)).toBe(x as Variant);
   });
 
-  it('should throw an exception when an invalid kind is provided', () => {
+  test('should throw an exception when an invalid kind is provided', () => {
     const fn = () =>
       getDefaultVariantForKind('banana' as unknown as ComponentKind);
     expect(fn).toThrow('Invalid kind: banana');
@@ -110,28 +107,26 @@ describe('getDefaultVariantForKind', () => {
 });
 
 describe('validateComponentVariant', () => {
-  it.each`
-    kind               | variant     | output
-    ${'auth'}          | ${''}       | ${undefined}
-    ${'auth'}          | ${'drawer'} | ${undefined}
-    ${'auth'}          | ${'modal'}  | ${undefined}
-    ${'form'}          | ${''}       | ${undefined}
-    ${'form'}          | ${'drawer'} | ${undefined}
-    ${'form'}          | ${'inline'} | ${undefined}
-    ${'form'}          | ${'modal'}  | ${undefined}
-    ${'render'}        | ${''}       | ${undefined}
-    ${'render'}        | ${'inline'} | ${undefined}
-    ${'verify-button'} | ${''}       | ${undefined}
-    ${'verify-button'} | ${'inline'} | ${undefined}
-    ${'verify'}        | ${''}       | ${undefined}
-    ${'verify'}        | ${'drawer'} | ${undefined}
-    ${'verify'}        | ${'modal'}  | ${undefined}
-  `(`should work for $kind`, ({ kind, variant, output }) => {
-    const result = validateComponentVariant(kind, variant);
-    expect(result).toBe(output);
+  test.each([
+    { kind: ComponentKind.Auth, variant: '', x: undefined },
+    { kind: ComponentKind.Auth, variant: 'drawer', x: undefined },
+    { kind: ComponentKind.Auth, variant: 'modal', x: undefined },
+    { kind: ComponentKind.Form, variant: '', x: undefined },
+    { kind: ComponentKind.Form, variant: 'drawer', x: undefined },
+    { kind: ComponentKind.Form, variant: 'inline', x: undefined },
+    { kind: ComponentKind.Form, variant: 'modal', x: undefined },
+    { kind: ComponentKind.Render, variant: '', x: undefined },
+    { kind: ComponentKind.Render, variant: 'inline', x: undefined },
+    { kind: ComponentKind.Verify, variant: '', x: undefined },
+    { kind: ComponentKind.Verify, variant: 'drawer', x: undefined },
+    { kind: ComponentKind.Verify, variant: 'modal', x: undefined },
+    { kind: ComponentKind.VerifyButton, variant: '', x: undefined },
+    { kind: ComponentKind.VerifyButton, variant: 'inline', x: undefined },
+  ])('.', ({ kind, variant, x }) => {
+    expect(validateComponentVariant(kind, variant as Variant)).toBe(x);
   });
 
-  it('should throw an exception', () => {
+  test('should throw an exception', () => {
     const fn = () =>
       validateComponentVariant(
         ComponentKind.Verify,
@@ -144,19 +139,17 @@ describe('validateComponentVariant', () => {
 });
 
 describe('validateComponentKind', () => {
-  it.each`
-    kind               | output
-    ${'auth'}          | ${undefined}
-    ${'form'}          | ${undefined}
-    ${'render'}        | ${undefined}
-    ${'verify-button'} | ${undefined}
-    ${'verify'}        | ${undefined}
-  `(`should work for $kind`, ({ kind, output }) => {
-    const result = validateComponentKind(kind);
-    expect(result).toBe(output);
+  test.each([
+    { kind: ComponentKind.Auth, x: undefined },
+    { kind: ComponentKind.Form, x: undefined },
+    { kind: ComponentKind.Render, x: undefined },
+    { kind: ComponentKind.Verify, x: undefined },
+    { kind: ComponentKind.VerifyButton, x: undefined },
+  ])('.', ({ kind, x }) => {
+    expect(validateComponentKind(kind)).toBe(x);
   });
 
-  it('should throw an exception when an invalid kind is provided', () => {
+  test('should throw an exception when an invalid kind is provided', () => {
     const fn1 = () => validateComponentKind(null as unknown as ComponentKind);
     expect(fn1).toThrow('Kind is required');
 
@@ -169,28 +162,28 @@ describe('validateComponentKind', () => {
 });
 
 describe('transformVerifyButtonProps', () => {
-  it('should be undefined when kind is not "verify-button"', () => {
+  test('should be undefined when kind is not "verify-button"', () => {
     expect(
       transformVerifyButtonProps({
         kind: ComponentKind.Form,
         authToken: 'token',
       }),
-    ).toEqual(undefined);
+    ).toBeUndefined();
     expect(
       transformVerifyButtonProps({
         kind: ComponentKind.Verify,
         publicKey: 'key',
       }),
-    ).toEqual(undefined);
+    ).toBeUndefined();
     expect(
       transformVerifyButtonProps({
         kind: ComponentKind.Auth,
         publicKey: 'key',
       }),
-    ).toEqual(undefined);
+    ).toBeUndefined();
   });
 
-  it('should replace "verify-button" to "verify" and omit some properties', () => {
+  test('should replace "verify-button" to "verify" and omit some properties', () => {
     expect(
       transformVerifyButtonProps({
         kind: ComponentKind.VerifyButton,
@@ -200,7 +193,7 @@ describe('transformVerifyButtonProps', () => {
         dialogVariant: 'drawer',
       }),
     ).toEqual({
-      kind: 'verify',
+      kind: ComponentKind.Verify,
       publicKey: 'publicKey',
       variant: 'drawer',
     });

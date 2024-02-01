@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'bun:test';
+
 import initIframeManager, { getIframeKey } from './iframe-manager';
 
 type Props = Parameters<typeof getIframeKey>[0];
