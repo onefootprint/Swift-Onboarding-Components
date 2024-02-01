@@ -7,6 +7,7 @@ import * as secrets from './secrets';
 import { Config } from './config';
 import * as apiSvc from './api_service';
 import * as cron from './cron';
+import * as worker from './worker';
 import * as ecsCluster from './ecs_cluster';
 import * as ecsRoles from './ecs_roles';
 import * as enclaveKey from './enclave_key';
@@ -219,6 +220,9 @@ async function createCoreService(g: GlobalState): Promise<CoreServiceOutputs> {
 
   // create cron jobs
   await cron.CreateScheduledTasks(g, cluster, roles, nitroServiceOutput);
+
+  // create worker jobs
+  await worker.CreateWorkerTasks(g, cluster, roles, nitroServiceOutput);
 
   return {
     assetCdn: g.assetCdn.origin,
