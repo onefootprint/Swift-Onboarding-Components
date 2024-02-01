@@ -207,9 +207,10 @@ impl ObConfiguration {
 
     pub fn supported_countries_and_doc_types_for_proof_of_address(
         &self,
+        country: Option<Iso3166TwoDigitCountryCode>,
     ) -> SupportedDocumentAndCountryMapping {
         SupportedDocumentAndCountryMapping(HashMap::from_iter(vec![(
-            Iso3166TwoDigitCountryCode::US,
+            country.unwrap_or(Iso3166TwoDigitCountryCode::US),
             IdDocKind::proof_of_address_docs(),
         )]))
     }

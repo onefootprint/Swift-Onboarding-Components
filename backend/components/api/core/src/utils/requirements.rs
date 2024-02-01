@@ -461,6 +461,9 @@ fn get_requirement_inner(
             let dr = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::ProofOfAddress)?;
             if let Some(dr) = dr {
                 let id_doc = IdentityDocument::list_by_request_id(conn, &dr.id)?;
+                let country = decrypted_values
+                    .get(&IDK::Country.into())
+                    .and_then(|a| Iso3166TwoDigitCountryCode::from_str(a.leak()).ok());
                 // Show a CollectDocument requirement if there's no id_document or the existing
                 // id_document is still Pending
                 let should_render = id_doc.is_empty()
@@ -473,7 +476,7 @@ fn get_requirement_inner(
                     should_collect_selfie: false,
                     should_collect_consent: false,
                     supported_country_and_doc_types: obc
-                        .supported_countries_and_doc_types_for_proof_of_address()
+                        .supported_countries_and_doc_types_for_proof_of_address(country)
                         .0,
                     upload_mode: DocumentUploadMode::AllowUpload,
                 })
