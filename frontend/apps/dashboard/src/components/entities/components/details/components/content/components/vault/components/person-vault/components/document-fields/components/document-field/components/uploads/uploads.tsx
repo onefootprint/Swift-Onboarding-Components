@@ -7,7 +7,7 @@ import type {
   DocumentUpload,
   EntityVault,
 } from '@onefootprint/types';
-import { IdDocImageTypes } from '@onefootprint/types';
+import { IdDocImageTypes, SupportedIdDocTypes } from '@onefootprint/types';
 import { createFontStyles, Tooltip, Typography } from '@onefootprint/ui';
 import type { ParseKeys } from 'i18next';
 import React from 'react';
@@ -53,10 +53,16 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
         relevantUpload.failureReasons.length ? 'failed' : 'success',
       )}`;
     }
-    // "Front ID successfully uploaded"
-    return `${t(`${relevantUpload.side}`)} ${t(
-      `document-types.${kind}` as ParseKeys<'common'>,
-    )} ${t(relevantUpload.failureReasons.length ? 'failed' : 'success')}`;
+    // "Proof of Address successfully uploaded"
+    if (kind === SupportedIdDocTypes.proofOfAddress) {
+      return `${t(`document-types.${kind}` as ParseKeys<'common'>)} ${t(
+        relevantUpload.failureReasons.length ? 'failed' : 'success',
+      )}`;
+    }
+    // "ID (FRONT) successfully uploaded"
+    return `${t(`document-types.${kind}` as ParseKeys<'common'>)} (${t(
+      `${relevantUpload.side}`,
+    )}) ${t(relevantUpload.failureReasons.length ? 'failed' : 'success')}`;
   };
 
   const { uploadSource } = currentDocument;
@@ -130,6 +136,9 @@ const Uploads = ({ vault, currentDocument }: UploadsProps) => {
             <HoverableImage
               isSuccess={upload.failureReasons.length === 0}
               src={getSrc(upload.side, upload.version.toString())}
+              documentName={t(
+                `document-types.${currentDocument.kind}` as ParseKeys<'common'>,
+              )}
             />
           </Content>
         </Row>

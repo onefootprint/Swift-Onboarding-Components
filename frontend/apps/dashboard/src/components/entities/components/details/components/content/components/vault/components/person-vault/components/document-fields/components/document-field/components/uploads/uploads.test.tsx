@@ -23,10 +23,10 @@ describe('<Uploads />', () => {
     });
 
     expect(
-      screen.getByText('Front ID successfully uploaded'),
+      screen.getByText('ID (FRONT) successfully uploaded'),
     ).toBeInTheDocument();
     expect(
-      screen.getByText('Back ID successfully uploaded'),
+      screen.getByText('ID (BACK) successfully uploaded'),
     ).toBeInTheDocument();
     expect(
       screen.getByText('Selfie successfully uploaded'),
@@ -39,8 +39,8 @@ describe('<Uploads />', () => {
       currentDocument: failedIdCardDocument,
     });
 
-    expect(screen.getByText('Front ID upload failed')).toBeInTheDocument();
-    expect(screen.getByText('Back ID upload failed')).toBeInTheDocument();
+    expect(screen.getByText('ID (FRONT) upload failed')).toBeInTheDocument();
+    expect(screen.getByText('ID (BACK) upload failed')).toBeInTheDocument();
     expect(screen.getByText('Selfie upload failed')).toBeInTheDocument();
   });
 

@@ -5,48 +5,59 @@ import {
   IcoMinimize24,
 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
+import { Stack } from '@onefootprint/ui';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import PdfThumbnail from './components/pdf-thumbnail';
+import PdfViewer from './components/pdf-viewer';
+
 type HoverableImageProps = {
   src: string;
   isSuccess: boolean;
+  documentName: string;
 };
 
-const HoverableImage = ({ src, isSuccess }: HoverableImageProps) => {
+const HoverableImage = ({
+  src,
+  isSuccess,
+  documentName,
+}: HoverableImageProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.entity.fieldset.document.drawer.uploads',
   });
   const [isExpanded, setExpanded] = useState(false);
-  const isPDF = src.startsWith('data:application/pdf;base64');
 
   const handleToggleExpanded = () => {
     setExpanded(!isExpanded);
   };
 
-  return (
+  const isPDF = src.startsWith('data:application/pdf;base64');
+
+  return isPDF ? (
+    <Stack direction="column" gap={5}>
+      <PdfThumbnail src={src} />
+      <PdfViewer src={src} documentName={documentName} />
+    </Stack>
+  ) : (
     <ImageContainer
       animate={{ width: isExpanded ? '100%' : '50%' }}
       transition={{ duration: 0.2, ease: 'easeInOut' }}
       initial={{ width: '50%' }}
     >
-      {isPDF ? (
-        <IframeEmbedContainer>
-          <Embed src={src} width="100%" height="100%" type="application/pdf" />
-        </IframeEmbedContainer>
-      ) : (
-        <StyledImage src={src} width={0} height={0} alt={t('image-alt')} />
-      )}
-      <ToggleContainer onClick={handleToggleExpanded} className="toggle">
-        {isExpanded ? (
-          <IcoMinimize24 color="primary" />
-        ) : (
-          <IcoMaximize24 color="primary" />
-        )}
-      </ToggleContainer>
-      <HoverImageMask onClick={handleToggleExpanded} />
+      <StyledImage src={src} width={0} height={0} alt={t('image-alt')} />
+      <>
+        <ToggleContainer onClick={handleToggleExpanded} className="toggle">
+          {isExpanded ? (
+            <IcoMinimize24 color="primary" />
+          ) : (
+            <IcoMaximize24 color="primary" />
+          )}
+        </ToggleContainer>
+        <HoverImageMask onClick={handleToggleExpanded} />
+      </>
       <IconContainer data-success={isSuccess}>
         {isSuccess ? (
           <IcoCheckSmall16 color="quinary" />
@@ -59,29 +70,20 @@ const HoverableImage = ({ src, isSuccess }: HoverableImageProps) => {
 };
 
 const ImageContainer = styled(motion.div)`
-  position: relative;
-  .toggle {
-    opacity: 0;
-  }
-  :hover {
-    .toggle {
-      opacity: 1;
-    }
-  }
-`;
-
-const IframeEmbedContainer = styled.div`
   ${({ theme }) => css`
     position: relative;
-    width: 100%;
-    height: 100%;
     border-radius: ${theme.borderRadius.default};
-    border: none;
-  `};
-`;
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
 
-const Embed = styled.embed`
-  border: none;
+    .toggle {
+      opacity: 0;
+    }
+    :hover {
+      .toggle {
+        opacity: 1;
+      }
+    }
+  `};
 `;
 
 const StyledImage = styled(Image)`

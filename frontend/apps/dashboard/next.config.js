@@ -125,6 +125,10 @@ const getNextConfig = () => {
         },
       ];
     },
+    webpack: config => {
+      config.resolve.alias.canvas = false;
+      return config;
+    },
   };
 
   if (SHOULD_SHOW_ANALYZE) {

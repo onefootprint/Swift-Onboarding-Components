@@ -958,9 +958,13 @@
             },
             "uploads": {
               "title": "Uploads",
-              "front": "Front",
-              "back": "Back",
+              "front": "FRONT",
+              "back": "BACK",
               "selfie": "Selfie",
+              "pdf-viewer": {
+                "expand": "View in full screen",
+                "page": "Page"
+              },
               "success": "successfully uploaded",
               "failed": "upload failed",
               "image-alt": "Upload image",
@@ -974,12 +978,12 @@
               },
               "document-types": {
                 "id_card": "ID",
-                "drivers_license": "driver's license",
-                "passport": "passport",
+                "drivers_license": "Driver's License",
+                "passport": "Passport",
                 "residence_document": "Residence card / Green card",
                 "permit": "Work permit / EAD card",
                 "visa": "Visa",
-                "voter_identification": "Voter identification",
+                "voter_identification": "Voter Identification",
                 "ssn_card": "SSN Card",
                 "lease": "Lease",
                 "bank_statement": "Bank Statement",
