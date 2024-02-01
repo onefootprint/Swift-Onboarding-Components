@@ -1,7 +1,7 @@
 import pytest
 import typing
 from tests.identify_client import IdentifyClient
-from tests.utils import post, get, _gen_random_sandbox_id
+from tests.utils import create_ob_config, post, get, _gen_random_sandbox_id
 from tests.bifrost_client import BifrostClient
 from tests.headers import SandboxId, FpAuth
 
@@ -57,6 +57,7 @@ def test_onboarding_authed_user(authed_user, sandbox_tenant):
     # Should immediately have onboarding scopes because auth was implied
     body = get("hosted/user/token", None, auth_token)
     assert set(body["scopes"]) >= {"sign_up"}
+    assert not "explicit_auth" in body["scopes"]
 
     # Start onboarding with public key here
     post("hosted/onboarding", None, auth_token, sandbox_tenant.default_ob_config.key)
@@ -104,3 +105,76 @@ def test_auth_onto_onboarded_user(sandbox_user, auth_playbook, sandbox_tenant):
     assert auth_events[0]["kind"] == "passkey"
     # Not provided for non-onboarding validation
     assert "user" not in validate_response
+
+    # Make sure we didn't prefill the phone and email back into the same tenant
+    body = get(f"entities/{fp_id}", None, *sandbox_tenant.db_auths)
+    assert not any(i["source"] == "prefill" for i in body["data"])
+
+
+def test_multi_tenant_auth(sandbox_user, foo_sandbox_tenant, must_collect_data):
+    """
+    Test onboarding onto a second tenant via an auth playbook
+    """
+    auth_playbook = create_ob_config(
+        foo_sandbox_tenant,
+        "Auth playbook",
+        ["phone_number", "email"],
+        ["phone_number", "email"],
+        kind="auth",
+    )
+    playbook = create_ob_config(
+        foo_sandbox_tenant, "My product", must_collect_data, must_collect_data
+    )
+
+    #
+    # First, onboard the user onto an auth playbook at Foo tenant
+    #
+
+    auth_token = IdentifyClient.from_user(
+        sandbox_user,
+        playbook_key=auth_playbook.key,
+    ).inherit(kind="biometric", scope="auth")
+    body = post("/hosted/onboarding/validate", None, auth_token)
+
+    # And validate it via the backend API
+    validate_response = post(
+        "/onboarding/session/validate", body, foo_sandbox_tenant.sk.key
+    )
+    fp_id = validate_response["user_auth"]["fp_id"]
+    assert fp_id != sandbox_user.fp_id
+
+    # Make sure we prefilled phone and email when this user one-click authed
+    body = get(f"entities/{fp_id}", None, *foo_sandbox_tenant.db_auths)
+    assert body["status"] is None
+    assert set(i["identifier"] for i in body["data"] if i["source"] == "prefill") == {
+        "id.phone_number",
+        "id.email",
+    }
+
+    #
+    # Now, onboard the user onto a KYC playbook at the new tenant at Foo tenant
+    #
+
+    data = dict(kind="onboard", key=playbook.key.value)
+    body = post(f"users/{fp_id}/token", data, foo_sandbox_tenant.sk.key)
+    auth_token = FpAuth(body["token"])
+
+    # For now, we won't have implicit auth here because the user token has permission to see
+    # portable data at other tenants that foo_sandbox_tenant does not havej
+    auth_token = IdentifyClient.from_token(auth_token).step_up(
+        assert_had_no_scopes=True
+    )
+    bifrost = BifrostClient.raw_auth(
+        playbook, auth_token, sandbox_user.client.sandbox_id
+    )
+    bifrost.run()
+
+    # Make sure we prefill the remaining data when they onboard
+    body = get(f"entities/{fp_id}", None, *foo_sandbox_tenant.db_auths)
+    assert body["status"] == "pass"
+    assert set(i["identifier"] for i in body["data"] if i["source"] == "prefill") >= {
+        "id.phone_number",
+        "id.email",
+        "id.first_name",
+        "id.address_line1",
+    }

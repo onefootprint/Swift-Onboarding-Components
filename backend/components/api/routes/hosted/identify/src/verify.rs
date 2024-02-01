@@ -19,7 +19,7 @@ use api_core::{
         headers::InsightHeaders,
         passkey::WebauthnConfig,
         session::AuthSession,
-        vault_wrapper::{Person, VaultWrapper},
+        vault_wrapper::{Person, VaultWrapper, WriteableVw},
     },
 };
 use api_wire_types::{IdentifyVerifyRequest, IdentifyVerifyResponse};
@@ -69,7 +69,7 @@ pub async fn post(
 
     let config = state.config.clone();
     let session_key = state.session_sealing_key.clone();
-    let auth_token = state
+    let (auth_token, vw, su, obc) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
             let obc_auth = ob_pk_auth.as_ref();
@@ -90,10 +90,10 @@ pub async fn post(
             };
 
             // Determine which scopes to issue on the auth token
-            let (context, su) = match scope {
+            let (context, su, obc) = match scope {
                 IdentifyScope::Auth => {
-                    let obc = ob_pk_auth.as_ref().map(|a| a.ob_config());
-                    let su = if let Some(obc) = obc {
+                    let obc = ob_pk_auth.as_ref().map(|a| a.ob_config()).cloned();
+                    let su = if let Some(obc) = obc.as_ref() {
                         if obc.kind != ObConfigurationKind::Auth {
                             return Err(ChallengeError::IncorrectPlaybookKind(obc.kind, scope).into());
                         }
@@ -109,21 +109,21 @@ pub async fn post(
 
                     let context = NewUserSessionContext {
                         su_id: Some(su.id.clone()),
-                        obc_id: obc.map(|obc| obc.id.clone()),
+                        obc_id: obc.as_ref().map(|obc| obc.id.clone()),
                         ..Default::default()
                     };
-                    (context, Some(su))
+                    (context, Some(su), obc)
                 }
                 IdentifyScope::Onboarding => {
                     let bo = ob_pk_auth.as_ref().and_then(|a| a.business_owner());
                     let user_auth_obc = user_auth.as_ref().and_then(|a| a.ob_config());
                     let ob_pk_obc = ob_pk_auth.as_ref().map(|a| a.ob_config());
-                    let obc = user_auth_obc.or(ob_pk_obc);
+                    let obc = user_auth_obc.or(ob_pk_obc).cloned();
                     let su_id = user_auth.as_ref().and_then(|ua| ua.scoped_user_id());
                     let su = if let Some(su_id) = su_id {
                         // We are stepping up an existing token already attached to a SU
                         ScopedVault::get(conn, &su_id)?
-                    } else if let Some(obc) = obc {
+                    } else if let Some(obc) = obc.as_ref() {
                         // We are making a new auth token or adding the SU to a token that doesn't have it
                         if obc.kind == ObConfigurationKind::Auth {
                             return Err(ChallengeError::IncorrectPlaybookKind(obc.kind, scope).into());
@@ -143,15 +143,15 @@ pub async fn post(
                     let context = NewUserSessionContext {
                         su_id: Some(su.id.clone()),
                         sb_id,
-                        obc_id: obc.map(|obc| obc.id.clone()),
+                        obc_id: obc.as_ref().map(|obc| obc.id.clone()),
                         // wf_id will be added later in POST /hosted/onboarding
                         ..Default::default()
                     };
-                    (context, Some(su))
+                    (context, Some(su), obc)
                 }
                 IdentifyScope::My1fp => {
                     let context = NewUserSessionContext::default();
-                    (context, None)
+                    (context, None, None)
                 }
             };
 
@@ -167,7 +167,7 @@ pub async fn post(
             let insight = CreateInsightEvent::from(insight_headers).insert_with_conn(conn)?;
             let event = NewAuthEvent {
                 vault_id: uv_id.clone(),
-                scoped_vault_id: su.map(|su| su.id),
+                scoped_vault_id: su.as_ref().map(|su| su.id.clone()),
                 insight_event_id: Some(insight.id),
                 kind: event_kind,
                 webauthn_credential_id: passkey_cred_id,
@@ -195,10 +195,26 @@ pub async fn post(
             };
             let duration = scope.token_ttl();
             let (token, _) = AuthSession::create_sync(conn, &session_key, data, duration)?;
+            let vw = VaultWrapper::<Any>::build_portable(conn, &uv_id)?;
 
-            Ok(token)
+            Ok((token, vw, su, obc))
         })
         .await?;
+
+    if let Some((su, obc)) = su.zip(obc) {
+        if obc.kind == ObConfigurationKind::Auth {
+            // If we're onboarding onto an auth playbook at a new tenant, prefill data (usually phone and email)
+            let prefill_data = vw.get_data_to_prefill(&state, &su, &obc).await?;
+            state
+                .db_pool
+                .db_transaction(move |conn| -> ApiResult<_> {
+                    let tenant_vw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &su.id)?;
+                    tenant_vw.prefill_portable_data(conn, prefill_data, None)?;
+                    Ok(())
+                })
+                .await?;
+        }
+    }
 
     ResponseData::ok(IdentifyVerifyResponse { auth_token }).json()
 }
