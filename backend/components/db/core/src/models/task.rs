@@ -201,9 +201,9 @@ mod tests {
     use super::*;
     use crate::{
         test_helpers::{assert_have_same_elements, have_same_elements},
-        tests::prelude::*,
+        tests::test_db_pool::TestDbPool,
     };
-    use macros::db_test;
+    use macros::test_db_pool;
     use newtypes::{LogMessageTaskArgs, LogNumTenantApiKeysArgs};
     use std::str::FromStr;
 
@@ -213,75 +213,92 @@ mod tests {
         })
     }
 
-    #[db_test]
-    fn create_and_poll(conn: &mut TestPgConn) {
-        let task1 = Task::create(conn, Utc::now(), task_data()).unwrap();
-        let task2 = Task::create(conn, Utc::now(), task_data()).unwrap();
-        let _task3 = Task::create(conn, Utc::now(), task_data()).unwrap();
-        let _task4 = Task::create(conn, Utc::now(), task_data()).unwrap();
+    #[test_db_pool]
+    async fn create_and_poll(db_pool: TestDbPool) {
+        db_pool
+            .db_transaction(|conn| -> DbResult<()> {
+                let task1 = Task::create(conn, Utc::now(), task_data())?;
+                let task2 = Task::create(conn, Utc::now(), task_data())?;
+                let _task3 = Task::create(conn, Utc::now(), task_data())?;
+                let _task4 = Task::create(conn, Utc::now(), task_data())?;
 
-        let tasks = Task::poll(conn, 2, None).unwrap();
-        // The oldest 2 scheduled tasks and returned + their status has changed to Running and their num_attempts is incremented
-        assert!(have_same_elements(
-            vec![
-                (&task1.id, TaskStatus::Running, 1, &task1.id, 1),
-                (&task2.id, TaskStatus::Running, 1, &task2.id, 1),
-            ],
-            tasks
-                .iter()
-                .map(|(t, te)| (&t.id, t.status, t.num_attempts, &te.task_id, te.attempt_num))
-                .collect(),
-        ));
+                let tasks = Task::poll(conn, 2, None)?;
+                // The oldest 2 scheduled tasks and returned + their status has changed to Running and their num_attempts is incremented
+                assert!(have_same_elements(
+                    vec![
+                        (&task1.id, TaskStatus::Running, 1, &task1.id, 1),
+                        (&task2.id, TaskStatus::Running, 1, &task2.id, 1),
+                    ],
+                    tasks
+                        .iter()
+                        .map(|(t, te)| (&t.id, t.status, t.num_attempts, &te.task_id, te.attempt_num))
+                        .collect(),
+                ));
+                Ok(())
+            })
+            .await
+            .unwrap();
     }
 
-    #[db_test]
-    fn only_pending_tasks_are_retrieved(conn: &mut TestPgConn) {
-        let task1 = Task::create(conn, Utc::now(), task_data()).unwrap();
-        Task::_update_for_test(conn, &task1.id, TaskStatus::Running);
-        let task2 = Task::create(conn, Utc::now(), task_data()).unwrap();
-        Task::_update_for_test(conn, &task2.id, TaskStatus::Completed);
-        let task3 = Task::create(conn, Utc::now(), task_data()).unwrap();
-        Task::_update_for_test(conn, &task3.id, TaskStatus::Failed);
-        let task4 = Task::create(conn, Utc::now(), task_data()).unwrap();
+    #[test_db_pool]
+    async fn only_pending_tasks_are_retrieved(db_pool: TestDbPool) {
+        db_pool
+            .db_transaction(|conn| -> DbResult<()> {
+                let task1 = Task::create(conn, Utc::now(), task_data())?;
+                Task::_update_for_test(conn, &task1.id, TaskStatus::Running);
+                let task2 = Task::create(conn, Utc::now(), task_data())?;
+                Task::_update_for_test(conn, &task2.id, TaskStatus::Completed);
+                let task3 = Task::create(conn, Utc::now(), task_data())?;
+                Task::_update_for_test(conn, &task3.id, TaskStatus::Failed);
+                let task4 = Task::create(conn, Utc::now(), task_data())?;
 
-        let tasks = Task::poll(conn, 4, None).unwrap();
-        assert_eq!(1, tasks.len());
-        assert_eq!(tasks[0].0.id, task4.id);
+                let tasks = Task::poll(conn, 4, None).unwrap();
+
+                assert_eq!(1, tasks.len());
+                assert_eq!(tasks[0].0.id, task4.id);
+                Ok(())
+            })
+            .await
+            .unwrap();
     }
 
-    #[db_test]
-    fn filter_to_kind(conn: &mut TestPgConn) {
-        let task1 = Task::create(conn, Utc::now(), task_data()).unwrap();
-        let _task2 = Task::create(
-            conn,
-            Utc::now(),
-            TaskData::LogNumTenantApiKeys(LogNumTenantApiKeysArgs {
-                tenant_id: newtypes::TenantId::from_str("t123").unwrap(),
-                is_live: true,
-            }),
-        )
-        .unwrap();
-        let task3 = Task::create(conn, Utc::now(), task_data()).unwrap();
-        let _task4 = Task::create(
-            conn,
-            Utc::now(),
-            TaskData::LogNumTenantApiKeys(LogNumTenantApiKeysArgs {
-                tenant_id: newtypes::TenantId::from_str("t456").unwrap(),
-                is_live: true,
-            }),
-        )
-        .unwrap();
+    #[test_db_pool]
+    async fn filter_to_kind(db_pool: TestDbPool) {
+        db_pool
+            .db_transaction(|conn| -> DbResult<()> {
+                let task1 = Task::create(conn, Utc::now(), task_data())?;
+                let _task2 = Task::create(
+                    conn,
+                    Utc::now(),
+                    TaskData::LogNumTenantApiKeys(LogNumTenantApiKeysArgs {
+                        tenant_id: newtypes::TenantId::from_str("t123").unwrap(),
+                        is_live: true,
+                    }),
+                )?;
+                let task3 = Task::create(conn, Utc::now(), task_data())?;
+                let _task4 = Task::create(
+                    conn,
+                    Utc::now(),
+                    TaskData::LogNumTenantApiKeys(LogNumTenantApiKeysArgs {
+                        tenant_id: newtypes::TenantId::from_str("t456").unwrap(),
+                        is_live: true,
+                    }),
+                )?;
 
-        let tasks = Task::poll(conn, 2, Some(TaskKind::LogMessage)).unwrap();
-        assert_have_same_elements(
-            vec![
-                (&task1.id, TaskStatus::Running, 1),
-                (&task3.id, TaskStatus::Running, 1),
-            ],
-            tasks
-                .iter()
-                .map(|(t, _)| (&t.id, t.status, t.num_attempts))
-                .collect(),
-        );
+                let tasks = Task::poll(conn, 2, Some(TaskKind::LogMessage))?;
+                assert_have_same_elements(
+                    vec![
+                        (&task1.id, TaskStatus::Running, 1),
+                        (&task3.id, TaskStatus::Running, 1),
+                    ],
+                    tasks
+                        .iter()
+                        .map(|(t, _)| (&t.id, t.status, t.num_attempts))
+                        .collect(),
+                );
+                Ok(())
+            })
+            .await
+            .unwrap();
     }
 }
