@@ -245,16 +245,17 @@ Click [here](https://github.com/onefootprint/examples/tree/master/auth/frontend-
 
 ### Available FootprintAuthButton Props
 
-| Variable     | Description                                                                                                                                                                          |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `publicKey`  | Optional. Onboarding configuration public key.                                                                                                                                       |
-| `authToken`  | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. One of publicKey or authToken must be provided.           |
-| `onComplete` | Triggered after completing the onboarding flow. You'll receive a `validationToken`, and from there you can post to your backend                                                      |
-| `onError`    | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                 |
-| `onCancel`   | Triggered when the user abandons the flow. This can be triggered when the user clicks on the close button inside our iframe                                                          |
-| `onClose`    | Triggered when the user closes the flow (either completed or canceled).                                                                                                              |
-| `userData`   | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/integrate/user-data). |
-| `options`    | Optional. An options object that customizes the flow, can accept `showLogo`. More info [here](https://docs.onefootprint.com/integrate/customization#available-options)               |
-| `appearance` | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                |
-| `variant`    | Optional. One of `modal` or `drawer`. Specifies how the flow will be rendered.                                                                                                       |
-| `l10n`       | Optional. Specifies the desired localization. More information [here](https://docs.onefootprint.com/integrate/customization#localization-configuration).                             |
+| Variable             | Description                                                                                                                                                                                  |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `publicKey`          | Optional. Onboarding configuration public key.                                                                                                                                               |
+| `authToken`          | Optional. A valid string authentication token generated using the Secret API Key, Footprint User ID and fields to collect. One of publicKey or authToken must be provided.                   |
+| `updateLoginMethods` | Optional. When set to `true` and provided with authToken, it enables the user to initiate the update authentication flow. This allows users to modify their authentication methods securely. |
+| `onComplete`         | Triggered after completing the onboarding flow. You'll receive a `validationToken`, and from there you can post to your backend                                                              |
+| `onError`            | Optional. A function that is called there was an unrecoverable error while initializing the onboarding flow. It takes in an error string argument with more details.                         |
+| `onCancel`           | Triggered when the user abandons the flow. This can be triggered when the user clicks on the close button inside our iframe                                                                  |
+| `onClose`            | Triggered when the user closes the flow (either completed or canceled).                                                                                                                      |
+| `userData`           | Optional. An object that contains previously collected user data that can bootstrap the onboarding flow. More information [here](https://docs.onefootprint.com/integrate/user-data).         |
+| `options`            | Optional. An options object that customizes the flow, can accept `showLogo`. More info [here](https://docs.onefootprint.com/integrate/customization#available-options)                       |
+| `appearance`         | Optional. A `FootprintAppearance` object that customizes the look of your integration                                                                                                        |
+| `variant`            | Optional. One of `modal` or `drawer`. Specifies how the flow will be rendered.                                                                                                               |
+| `l10n`               | Optional. Specifies the desired localization. More information [here](https://docs.onefootprint.com/integrate/customization#localization-configuration).                                     |
