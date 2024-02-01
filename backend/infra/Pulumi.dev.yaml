@@ -127,6 +127,11 @@ config:
         cpuUnits: 256
         schedule: "cron(0 17 * * ? *)" # Once per day at 17:00 UTC
         args: ["create-overdue-watchlist-check-tasks", "--limit=1000"]
+    workerTasks:
+      - name: execute-tasks
+        memoryMB: 512
+        cpuUnits: 256
+        args: ["execute-tasks", "--batch-size=100", "--poll-period-ms=1000"]
     rpId: onefootprint.com
     s3:
       documentImagesBucketNamePrefix: opaque-documents

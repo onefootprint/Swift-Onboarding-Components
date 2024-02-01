@@ -21,7 +21,6 @@ pub fn configure(config: &mut web::ServiceConfig) {
         .service(risk::make_decision)
         .service(risk::shadow_run)
         .service(risk::save_risk_signals_for_vres)
-        .service(task::execute_tasks)
         .service(task::create_task)
         .service(incode::rerun_machine)
         .service(workflow::proceed)

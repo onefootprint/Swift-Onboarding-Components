@@ -1,6 +1,7 @@
 export interface Config {
   resources: Resources;
   cronTasks: CronTask[];
+  workerTasks: WorkerTask[];
   db: Database;
   domain: Domains;
   elastic: Elastic;
@@ -40,6 +41,13 @@ export interface CronTask {
   memoryMB: number;
   cpuUnits: number;
   schedule: string;
+  args: string[];
+}
+
+export interface WorkerTask {
+  name: string;
+  memoryMB: number;
+  cpuUnits: number;
   args: string[];
 }
 

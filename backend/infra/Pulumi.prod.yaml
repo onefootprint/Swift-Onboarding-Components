@@ -129,6 +129,11 @@ config:
         cpuUnits: 256
         schedule: "cron(0 * * * ? *)" # Hourly
         args: ["generate-invoices"]
+    workerTasks:
+      - name: execute-tasks
+        memoryMB: 512
+        cpuUnits: 256
+        args: ["execute-tasks", "--batch-size=100", "--poll-period-ms=1000"]
     rpId: onefootprint.com
     s3:
       documentImagesBucketNamePrefix: opaque-documents

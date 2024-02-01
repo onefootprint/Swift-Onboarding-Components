@@ -87,7 +87,7 @@ impl Task {
     #[tracing::instrument("Task::poll", skip_all)]
     pub fn poll(
         conn: &mut TxnPgConn,
-        limit: i64,
+        limit: u32,
         kind: Option<TaskKind>,
     ) -> DbResult<Vec<(Task, TaskExecution)>> {
         // TODO: cannot for the life of me get this to compile in diesel
@@ -110,7 +110,7 @@ impl Task {
         .bind::<Text, _>(TaskStatus::Running)
         .bind::<Text, _>(TaskStatus::Pending)
         .bind::<Timestamptz, _>(Utc::now())
-        .bind::<BigInt, _>(limit)
+        .bind::<BigInt, _>(i64::from(limit))
         .get_results::<Task>(conn.conn())?;
 
         let task_execution_args: Vec<TaskExecutionCreateArgs> = tasks

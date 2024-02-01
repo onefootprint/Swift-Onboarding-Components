@@ -12,7 +12,7 @@ use newtypes::{TaskData, TaskId};
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct ExecuteTasksRequest {
-    pub num_tasks: i64,
+    pub num_tasks: u32,
 }
 
 #[post("/private/protected/task/execute_tasks")]
