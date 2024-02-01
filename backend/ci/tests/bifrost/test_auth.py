@@ -41,6 +41,7 @@ def authed_user(auth_playbook, sandbox_tenant):
     # Check that this is the same user
     body = get(f"entities/{fp_id}", None, *sandbox_tenant.db_auths)
     assert body["sandbox_id"] == sandbox_id
+    assert body["status"] is None
     return User(fp_id, sandbox_id, validate_response)
 
 
@@ -60,6 +61,10 @@ def test_onboarding_authed_user(authed_user, sandbox_tenant):
     # Start onboarding with public key here
     post("hosted/onboarding", None, auth_token, sandbox_tenant.default_ob_config.key)
 
+    # Check that the status is incomplete (aka in progress)
+    body = get(f"entities/{authed_user.fp_id}", None, *sandbox_tenant.db_auths)
+    assert body["status"] == "in_progress"
+
     bifrost = BifrostClient.raw_auth(
         sandbox_tenant.default_ob_config, auth_token, authed_user.sandbox_id
     )
@@ -70,6 +75,10 @@ def test_onboarding_authed_user(authed_user, sandbox_tenant):
         user.client.validate_response["user_auth"]
         == authed_user.validate_response["user_auth"]
     )
+
+    # Check that the status is incomplete (aka in progress)
+    body = get(f"entities/{authed_user.fp_id}", None, *sandbox_tenant.db_auths)
+    assert body["status"] == "pass"
 
 
 def test_auth_onto_onboarded_user(sandbox_user, auth_playbook, sandbox_tenant):

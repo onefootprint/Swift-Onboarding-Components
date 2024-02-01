@@ -16,8 +16,8 @@ use db::{
 };
 use newtypes::{
     email::Email, DataIdentifier as DI, DataLifetimeSource, DataRequest, Fingerprint, FingerprintRequest,
-    FingerprintScopeKind, IdentityDataKind as IDK, Locked, OnboardingStatus, PhoneNumber, PiiString,
-    SandboxId, ValidateArgs, VaultKind,
+    FingerprintScopeKind, IdentityDataKind as IDK, Locked, ObConfigurationKind, OnboardingStatus,
+    PhoneNumber, PiiString, SandboxId, ValidateArgs, VaultKind,
 };
 
 pub struct VaultContext {
@@ -97,10 +97,18 @@ impl VaultWrapper<Person> {
         };
         let uv = Vault::create(conn, new_user_vault)?;
         let su = ScopedVault::get_or_create(conn, &uv, obc.id)?;
-        // Since this vault is created for the first time here, it starts as billable, incomplete, and hidden from search
+
+        // Since this vault is created for the first time here, it starts as billable and hidden from search
+        let status = match obc.kind {
+            // For now, when auth playbooks are super lightweight, just mark them as no status
+            ObConfigurationKind::Auth => None,
+            ObConfigurationKind::Kyb | ObConfigurationKind::Kyc | ObConfigurationKind::Document => {
+                Some(OnboardingStatus::Incomplete)
+            }
+        };
         let update = ScopedVaultUpdate {
             is_billable: Some(true),
-            status: Some(OnboardingStatus::Incomplete),
+            status,
             show_in_search: Some(false),
             last_activity_at: None,
         };
