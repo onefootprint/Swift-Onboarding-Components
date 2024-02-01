@@ -13,7 +13,7 @@ import useCollectKybDataMachine from '../../../../hooks/use-collect-kyb-data-mac
 import BasicData from '../../../basic-data';
 
 const BasicDataSection = () => {
-  const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages.confirm' });
+  const { t } = useTranslation('idv', { keyPrefix: 'kyb.pages' });
   const [state] = useCollectKybDataMachine();
   const { data } = state.context;
   const [editing, setEditing] = useState(false);
@@ -23,7 +23,7 @@ const BasicDataSection = () => {
   const name = data[BusinessDI.name];
   if (name) {
     basicInfo.push({
-      text: t('basic-data.business-name'),
+      text: t('confirm.basic-data.business-name'),
       subtext: name,
     });
   }
@@ -31,7 +31,7 @@ const BasicDataSection = () => {
   const doingBusinessAs = data[BusinessDI.doingBusinessAs];
   if (doingBusinessAs) {
     basicInfo.push({
-      text: t('basic-data.doing-business-as'),
+      text: t('confirm.basic-data.doing-business-as'),
       subtext: doingBusinessAs,
     });
   }
@@ -39,7 +39,7 @@ const BasicDataSection = () => {
   const tin = data[BusinessDI.tin];
   if (tin) {
     basicInfo.push({
-      text: t('basic-data.tin'),
+      text: t('confirm.basic-data.tin'),
       subtext: tin,
     });
   }
@@ -47,9 +47,9 @@ const BasicDataSection = () => {
   const corporationType = data[BusinessDI.corporationType];
   if (corporationType) {
     basicInfo.push({
-      text: t('basic-data.corporation-type'),
+      text: t('confirm.basic-data.corporation-type'),
       subtext: t(
-        `kyb.pages.basic-data.form.corporation-type.mapping.${corporationType}` as unknown as TemplateStringsArray,
+        `basic-data.form.corporation-type.mapping.${corporationType}` as unknown as TemplateStringsArray,
       ),
     });
   }
@@ -57,7 +57,7 @@ const BasicDataSection = () => {
   const website = data[BusinessDI.website];
   if (website) {
     basicInfo.push({
-      text: t('basic-data.website'),
+      text: t('confirm.basic-data.website'),
       subtext: website,
     });
   }
@@ -65,7 +65,7 @@ const BasicDataSection = () => {
   const phone = data[BusinessDI.phoneNumber];
   if (phone) {
     basicInfo.push({
-      text: t('basic-data.phone-number'),
+      text: t('confirm.basic-data.phone-number'),
       subtext: phone,
     });
   }
@@ -97,7 +97,7 @@ const BasicDataSection = () => {
     return (
       <BasicData
         hideHeader
-        ctaLabel={t('summary.save')}
+        ctaLabel={t('confirm.summary.save')}
         onComplete={stopEditing}
         onCancel={stopEditing}
       />
@@ -107,7 +107,7 @@ const BasicDataSection = () => {
   const actions: SectionAction[] = [];
   if (!editing) {
     actions.push({
-      label: t('summary.edit'),
+      label: t('confirm.summary.edit'),
       onClick: () => setEditing(true),
     });
   }
@@ -115,7 +115,7 @@ const BasicDataSection = () => {
   return (
     <Section
       testID="basic-data"
-      title={t('basic-data.title')}
+      title={t('confirm.basic-data.title')}
       actions={actions}
       IconComponent={IcoFileText24}
       content={getSectionContent()}
