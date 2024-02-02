@@ -117,9 +117,9 @@ curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/token \
   -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
 ```
 
-## Step 3: Pass auth token into Footprint SDKs
+## Step 3: Pass auth token into the Footprint SDK
 
-You can provide this auth token to the Footprint SDK. This will ask the user to authenticate and then will launch them into the flow specified by the token kind and/or playbook. Check out the specific documentation for the SDK you're using.
+You will provide this auth token to the Footprint SDK. This will ask the user to authenticate and then will launch them into the flow specified by the token kind and/or playbook. Check out the specific documentation for the SDK you're using, and review the documentation for the token kinds above to see which component to invoke.
 
 For example, if you are launching the user into a KYC onboarding flow using our React integration, you would pass the `authToken` as a prop into the `FootprintVerifyButton` component like so:
 
