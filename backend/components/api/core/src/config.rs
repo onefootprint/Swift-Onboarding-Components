@@ -27,8 +27,14 @@ pub struct Config {
     #[envconfig(from = "AWS_REGION")]
     pub aws_region: String,
 
-    #[envconfig(from = "DISABLE_OTEL")]
-    pub disable_otel: Option<String>,
+    #[envconfig(from = "PRETTY_LOGS")]
+    pub pretty_logs: Option<String>,
+
+    #[envconfig(from = "DISABLE_TRACES")]
+    pub disable_traces: Option<String>,
+
+    #[envconfig(from = "DISABLE_METRICS")]
+    pub disable_metrics: Option<String>,
 
     #[envconfig(from = "OTEL_ENDPOINT")]
     pub otel_endpoint: Option<String>,
@@ -76,6 +82,9 @@ pub struct Config {
 
     #[envconfig(from = "SENDGRID_API_KEY")]
     pub sendgrid_api_key: String,
+
+    #[envconfig(from = "DISABLE_SENTRY")]
+    pub disable_sentry: Option<String>,
 
     #[envconfig(from = "SENTRY_URL")]
     pub sentry_url: String,

@@ -32,6 +32,8 @@ export async function CreateScheduledTasks(
         g.buckets,
         g.assetCdn,
         nitroService,
+        'fpc-cron',
+        [`cron.name:${cronTask.name}`],
         cronTask.name,
         cronTask.args,
       );

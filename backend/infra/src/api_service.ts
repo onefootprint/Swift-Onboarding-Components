@@ -66,6 +66,8 @@ export async function CreateApiService(
     g.buckets,
     g.assetCdn,
     nitroService,
+    'fpc-api',
+    [],
     '',
     ['api-server'],
   );

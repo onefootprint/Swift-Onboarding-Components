@@ -72,6 +72,8 @@ async fn run(config: Config) -> Result<()> {
         Some(Command::GenerateInvoices(subcommand)) => subcommand.run(config, state).await?,
         Some(Command::ExecuteTasks(subcommand)) => subcommand.run(config, state).await?,
     };
+
+    telemetry::shutdown();
     Ok(())
 }
 
@@ -88,7 +90,6 @@ async fn run_api_server(config: Config, state: State) -> Result<(), std::io::Err
     let meter = opentelemetry_api::global::meter("actix_web");
     let request_metrics = RequestMetricsBuilder::new().build(meter);
 
-    // telemetry::shutdown();
     HttpServer::new(move || {
         let cors: actix_cors::Cors = actix_cors::Cors::default()
             .allow_any_origin()

@@ -37,6 +37,8 @@ export abstract class ServiceContainers {
     s3Buckets: s3.ServiceS3Buckets,
     assetsCdn: assets.AssetCdn,
     nitroService: NitroServiceOutput,
+    otelServiceName: string,
+    otelExtraAttributes: string[],
     logGroupComponent: string,
     containerArgs: string[],
   ): Promise<ContainersOutput> {
@@ -69,6 +71,8 @@ export abstract class ServiceContainers {
       s3Buckets,
       assetsCdn,
       nitroService,
+      otelServiceName,
+      otelExtraAttributes,
       logGroupComponent,
       containerArgs,
     );
@@ -102,6 +106,8 @@ export abstract class ServiceContainers {
     s3Buckets: s3.ServiceS3Buckets,
     assetsCdn: assets.AssetCdn,
     nitroService: NitroServiceOutput,
+    otelServiceName: string,
+    otelExtraAttributes: string[],
     logGroupComponent: string,
     containerArgs: string[],
   ): Promise<pulumi.Output<aws.ecs.ContainerDefinition>> {
@@ -470,7 +476,12 @@ export abstract class ServiceContainers {
               },
               {
                 name: 'OTEL_RESOURCE_ATTRIBUTES',
-                value: `service.name=fpc-api,service.version=1.0,deployment.environment=${pulumi.getStack()}`,
+                value: [
+                  `service.name=${otelServiceName}`,
+                  `service.version=1.0`,
+                  `deployment.environment=${pulumi.getStack()}`,
+                  ...otelExtraAttributes,
+                ].join(','),
               },
               {
                 name: 'WORKOS_CLIENT_ID',

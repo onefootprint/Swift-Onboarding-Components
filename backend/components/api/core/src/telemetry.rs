@@ -12,7 +12,7 @@ use opentelemetry::{
 use opentelemetry_otlp::WithExportConfig;
 use tracing::Span;
 use tracing_actix_web::{root_span, DefaultRootSpanBuilder, RootSpanBuilder};
-use tracing_subscriber::{prelude::*, EnvFilter, Registry};
+use tracing_subscriber::{prelude::*, EnvFilter, Layer, Registry};
 
 use crate::{
     config::Config,
@@ -20,20 +20,19 @@ use crate::{
 };
 use anyhow::Result;
 
+// Initialize `tracing` using `opentelemetry-tracing` and configure logging
 pub fn init(config: &Config) -> Result<Option<BasicController>> {
     env_logger::init();
     let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
 
     global::set_text_map_propagator(TraceContextPropagator::new());
 
-    // don't setup the exporter
-    if config.disable_otel.is_some() {
-        let sub = Registry::default()
-            .with(env_filter)
-            .with(tracing_subscriber::fmt::layer().with_ansi(true).pretty());
+    let mut layers = vec![];
 
-        tracing::subscriber::set_global_default(sub)?;
-        return Ok(None);
+    if config.pretty_logs.is_some() {
+        layers.push(tracing_subscriber::fmt::layer().with_ansi(true).pretty().boxed());
+    } else {
+        layers.push(tracing_subscriber::fmt::layer().json().boxed());
     }
 
     let exporter = || {
@@ -46,38 +45,44 @@ pub fn init(config: &Config) -> Result<Option<BasicController>> {
         }
     };
 
-    let tracer = opentelemetry_otlp::new_pipeline()
-        .tracing()
-        .with_exporter(exporter())
-        .install_batch(opentelemetry::runtime::Tokio)?;
+    if config.disable_traces.is_none() {
+        let tracer = opentelemetry_otlp::new_pipeline()
+            .tracing()
+            .with_exporter(exporter())
+            .install_batch(opentelemetry::runtime::Tokio)?;
+
+        layers.push(tracing_opentelemetry::layer().with_tracer(tracer).boxed());
+    }
 
     // sentry layer
-    let sentry_layer = sentry_tracing::layer().event_filter(|md| match *md.level() {
-        tracing::Level::ERROR => sentry_tracing::EventFilter::Exception,
-        tracing::Level::INFO | tracing::Level::DEBUG => sentry_tracing::EventFilter::Breadcrumb,
-        _ => sentry_tracing::EventFilter::Ignore,
-    });
+    if config.disable_sentry.is_none() {
+        let sentry_layer = sentry_tracing::layer().event_filter(|md| match *md.level() {
+            tracing::Level::ERROR => sentry_tracing::EventFilter::Exception,
+            tracing::Level::INFO | tracing::Level::DEBUG => sentry_tracing::EventFilter::Breadcrumb,
+            _ => sentry_tracing::EventFilter::Ignore,
+        });
 
-    // Initialize `tracing` using `opentelemetry-tracing` and configure logging
-    let sub = Registry::default()
-        .with(env_filter)
-        .with(tracing_subscriber::fmt::layer().json())
-        .with(tracing_opentelemetry::layer().with_tracer(tracer))
-        .with(sentry_layer);
+        layers.push(sentry_layer.boxed());
+    }
 
+    // n.b.: env_filter needs to go first for level filtering to work correctly.
+    let sub = Registry::default().with(env_filter).with(layers);
     tracing::subscriber::set_global_default(sub)?;
 
     // init metrics
-    let metrics = opentelemetry_otlp::new_pipeline()
-        .metrics(
-            selectors::simple::inexpensive(),
-            opentelemetry::sdk::export::metrics::aggregation::stateless_temporality_selector(),
-            opentelemetry::runtime::Tokio,
-        )
-        .with_exporter(exporter())
-        .build()?;
-
-    Ok(Some(metrics))
+    if config.disable_metrics.is_none() {
+        let metrics = opentelemetry_otlp::new_pipeline()
+            .metrics(
+                selectors::simple::inexpensive(),
+                opentelemetry::sdk::export::metrics::aggregation::stateless_temporality_selector(),
+                opentelemetry::runtime::Tokio,
+            )
+            .with_exporter(exporter())
+            .build()?;
+        Ok(Some(metrics))
+    } else {
+        Ok(None)
+    }
 }
 
 #[allow(unused)]

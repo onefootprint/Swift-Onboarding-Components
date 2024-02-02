@@ -267,8 +267,14 @@ pip3 install -r ci/requirements.txt
 TEST_URL="http://localhost:8000" pytest -x ci/tests
 ```
 
-## Accessing Logs & Metrics
+## Testing Tracing Locally
 
-We run a side car that exports logs, telemtry, and tracing to elastic cloud.
-Link: https://onefootprint.kb.us-east-2.aws.elastic-cloud.com:9243/app/discover
-(Ask @agrinman for access if you need it, login via google SSO @onefootprint.com)
+Run the following command to start a local OpenTelemetry collector in the background:
+```
+make run-jaeger
+```
+
+Comment out `DISABLE_TRACES=1` in your `.env` file. Run the API server with `make run-local` or crons/workers using `cargo run -p api_server -- <command>`.
+
+Navigate to the Jaeger web UI at http://localhost:16686/ to explore traces from your local process.
+
