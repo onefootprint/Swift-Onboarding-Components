@@ -5,7 +5,7 @@ use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::IntoEnumIterator;
 use strum_macros::{Display, EnumIter, EnumString};
 
-use crate::{DocumentSide, OcrDataKind as ODK};
+use crate::{DocumentRequestKind, DocumentSide, OcrDataKind as ODK};
 
 #[derive(
     Debug,
@@ -75,6 +75,16 @@ impl From<IdDocKind> for DocKind {
     }
 }
 
+
+impl From<DocumentRequestKind> for DocKind {
+    fn from(value: DocumentRequestKind) -> DocKind {
+        match value {
+            DocumentRequestKind::Identity => Self::Identity,
+            DocumentRequestKind::ProofOfSsn => Self::ProofOfSsn,
+            DocumentRequestKind::ProofOfAddress => Self::ProofOfAddress,
+        }
+    }
+}
 crate::util::impl_enum_string_diesel!(IdDocKind);
 
 impl IdDocKind {

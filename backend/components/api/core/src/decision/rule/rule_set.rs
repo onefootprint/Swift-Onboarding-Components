@@ -1,7 +1,6 @@
 use super::RuleSetName;
 use itertools::Itertools;
 use newtypes::{RuleAction, RuleName};
-use strum::IntoEnumIterator;
 
 /// A rule is just a named wrapper around a fn that takes a T and returns a bool
 #[derive(Clone)]
@@ -31,7 +30,9 @@ impl<T: Clone> RuleSet<T> {
         let (rules_triggered, rules_not_triggered): (Vec<_>, Vec<_>) = evaluated.partition(|r| r.triggered);
 
         // overall action for the rule set
-        let allowed_rule_actions = RuleAction::iter()
+        // TODO: migrate this to RuleEvalConfig
+        let allowed_rule_actions = RuleAction::all_rule_actions()
+            .into_iter()
             .filter(|r| allow_stepup || !matches!(r, RuleAction::StepUp(_)))
             .collect_vec();
         let action_for_rule_set = rules_triggered

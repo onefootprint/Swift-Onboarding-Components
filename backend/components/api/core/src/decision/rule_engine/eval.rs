@@ -1,6 +1,10 @@
 use db::models::rule_instance::RuleInstance;
 use itertools::Itertools;
-use newtypes::{BooleanOperator, FootprintReasonCode, RuleAction, RuleExpression, RuleExpressionCondition};
+use newtypes::{
+    BooleanOperator, DocKind, FootprintReasonCode, RuleAction, RuleExpression, RuleExpressionCondition,
+    StepUpKind,
+};
+use strum::IntoEnumIterator;
 
 // pub struct Rule(pub RuleExpression, pub RuleAction);
 
@@ -35,12 +39,56 @@ impl HasRule for RuleInstance {
     }
 }
 
+// Interface to help map from what we've collected (documents) to the appropriate rules we should evaluate
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub struct RuleEvalConfig {
+    allowed_rule_actions: Vec<RuleAction>,
+}
+impl RuleEvalConfig {
+    pub fn new(doc_kinds_collected: Vec<DocKind>) -> Self {
+        let excluded_rule_actions = Self::excluded_rule_actions(doc_kinds_collected);
+        let allowed_rule_actions = RuleAction::all_rule_actions()
+            .into_iter()
+            .filter(|ra| !excluded_rule_actions.contains(ra))
+            .collect();
+
+        Self { allowed_rule_actions }
+    }
+
+    // convenience method for use in rule eval
+    pub fn action_is_allowed(&self, ra: &RuleAction) -> bool {
+        self.allowed_rule_actions.contains(ra)
+    }
+
+    // see what eligible risk actions we can take from a set of documents we already collected
+    fn excluded_rule_actions(doc_kinds_collected: Vec<DocKind>) -> Vec<RuleAction> {
+        StepUpKind::iter()
+            .filter(|suk| {
+                let doc_kinds_from_suk = suk.to_doc_kinds();
+                // only allow stepups to doc kinds we haven't collected yet
+                doc_kinds_collected
+                    .iter()
+                    .any(|ex| doc_kinds_from_suk.contains(ex))
+            })
+            .map(RuleAction::StepUp)
+            .collect()
+    }
+}
+
+impl Default for RuleEvalConfig {
+    fn default() -> Self {
+        let allowed_rule_actions = RuleAction::all_rule_actions();
+
+        Self { allowed_rule_actions }
+    }
+}
+
 pub fn evaluate_rule_set<T: HasRule>(
     rules: Vec<T>,
     input: &[FootprintReasonCode],
     // a bit annoying to have to put this here, but this is our one case currently where a ruleset is evaluated but a particular action is not allowed. If we have already collected a document or already step'd up, we want to ensure that we don't chose that action again
     // maybe soon we'll put StepUp rules in a separate group and evaluate those separately and then can remove this from here
-    allow_stepup: bool,
+    rule_config: RuleEvalConfig,
 ) -> (Vec<(T, bool)>, Option<RuleAction>) {
     let rule_results = rules
         .into_iter()
@@ -54,7 +102,7 @@ pub fn evaluate_rule_set<T: HasRule>(
     let action_triggered = rule_results
         .iter()
         .filter_map(|(r, e)| {
-            if *e && (allow_stepup || !matches!(r.action(), RuleAction::StepUp(_))) {
+            if *e && (rule_config.action_is_allowed(&r.action())) {
                 Some(r.action())
             } else {
                 None
@@ -180,7 +228,13 @@ pub mod tests {
         input: Vec<FRC>,
         allow_stepup: bool,
     ) -> (Vec<bool>, Option<RuleAction>) {
-        let (rule_results, action) = evaluate_rule_set(rules, &input, allow_stepup);
+        let docs_collected = if allow_stepup {
+            vec![]
+        } else {
+            vec![DocKind::Identity]
+        };
+        let config = RuleEvalConfig::new(docs_collected);
+        let (rule_results, action) = evaluate_rule_set(rules, &input, config);
         (rule_results.into_iter().map(|(_, e)| e).collect_vec(), action)
     }
 
@@ -272,5 +326,45 @@ pub mod tests {
     }, vec![]  => false)]
     pub fn test_evaluate_condition(cond: REC, input: Vec<FRC>) -> bool {
         evaluate_condition(&cond, &input)
+    }
+
+
+    #[test_case(
+        vec![DocKind::Identity], 
+        vec![
+            RA::StepUp(StepUpKind::Identity), 
+            RA::StepUp(StepUpKind::IdentityProofOfAddress), 
+            RA::StepUp(StepUpKind::IdentityProofOfSsn), 
+            RA::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress)
+        ])]
+    #[test_case(
+        vec![DocKind::Identity, DocKind::ProofOfAddress], 
+        vec![
+            RA::StepUp(StepUpKind::Identity), 
+            RA::StepUp(StepUpKind::IdentityProofOfAddress), 
+            RA::StepUp(StepUpKind::IdentityProofOfSsn), 
+            RA::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress),
+            RA::StepUp(StepUpKind::ProofOfAddress),
+            RA::StepUp(StepUpKind::ProofOfSsnProofOfAddress),
+        ])]
+    #[test_case(vec![], vec![])]
+    #[test_case(
+        vec![DocKind::ProofOfSsn], 
+        vec![
+            RA::StepUp(StepUpKind::IdentityProofOfSsn), 
+            RA::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress),
+            RA::StepUp(StepUpKind::ProofOfSsn),
+            RA::StepUp(StepUpKind::ProofOfSsnProofOfAddress),
+        ])]
+    fn test_rule_eval_config(doc_kinds: Vec<DocKind>, expected_disallowed_rule_actions: Vec<RuleAction>) {
+        let rc = RuleEvalConfig::new(doc_kinds);
+        expected_disallowed_rule_actions
+            .iter()
+            .for_each(|a| assert!(!rc.action_is_allowed(a)));
+
+        // check all others are allowed
+        RuleAction::all_rule_actions().iter().filter(|ra| !expected_disallowed_rule_actions.contains(ra))
+            .for_each(|a| assert!(rc.action_is_allowed(a)));
+        
     }
 }

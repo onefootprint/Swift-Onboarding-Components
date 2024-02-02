@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::{
     decision::{
         self,
-        rule_engine::eval::Rule,
+        rule_engine::eval::{Rule, RuleEvalConfig},
         vendor::{
             get_vendor_apis_for_verification_requests, kyc, make_request,
             tenant_vendor_control::TenantVendorControl,
@@ -330,7 +330,7 @@ pub(super) fn eval_rules(res: VendorResult, vw: &VaultWrapper, obc: &ObConfigura
     })
     .collect();
     let (rule_results, action_triggered) =
-        decision::rule_engine::eval::evaluate_rule_set(rules, &reason_codes, true);
+        decision::rule_engine::eval::evaluate_rule_set(rules, &reason_codes, RuleEvalConfig::default());
 
     tracing::info!(
         %vendor_api,

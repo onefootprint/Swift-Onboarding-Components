@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use super::{
     default_rules::base_kyc_rules,
-    eval::{self, Rule},
+    eval::{self, Rule, RuleEvalConfig},
 };
 use crate::{
     decision::{onboarding::Decision, RuleError},
@@ -10,12 +10,19 @@ use crate::{
 };
 use db::{
     models::{
-        document_request::DocumentRequest, ob_configuration::ObConfiguration, risk_signal::RiskSignal, rule_instance::RuleInstance, rule_result::RuleResult, rule_set_result::{NewRuleResultArgs, NewRuleSetResultArgs, RuleSetResult}
+        document_request::DocumentRequest,
+        ob_configuration::ObConfiguration,
+        risk_signal::RiskSignal,
+        rule_instance::RuleInstance,
+        rule_result::RuleResult,
+        rule_set_result::{NewRuleResultArgs, NewRuleSetResultArgs, RuleSetResult},
     },
     TxnPgConn,
 };
 use itertools::Itertools;
-use newtypes::{DocumentRequestKind, ObConfigurationId, RiskSignalGroupKind, RuleSetResultKind, ScopedVaultId, WorkflowId};
+use newtypes::{
+    DocumentRequestKind, ObConfigurationId, RiskSignalGroupKind, RuleSetResultKind, ScopedVaultId, WorkflowId,
+};
 
 #[allow(clippy::too_many_arguments)]
 #[tracing::instrument(skip_all)]
@@ -29,7 +36,10 @@ pub fn evaluate_workflow_decision(
     is_fixture: bool,
 ) -> ApiResult<Decision> {
     let doc_reqs = DocumentRequest::get_all(conn, wf_id)?;
-    let doc_collected = doc_reqs.iter().any(|dr| matches!(dr.kind, DocumentRequestKind::Identity));
+    let doc_collected = doc_reqs
+        .iter()
+        .any(|dr| matches!(dr.kind, DocumentRequestKind::Identity));
+    let rule_eval_config = RuleEvalConfig::new(doc_reqs.into_iter().map(|dr| dr.kind.into()).collect());
 
     if doc_collected
         && !risk_signals
@@ -39,15 +49,22 @@ pub fn evaluate_workflow_decision(
     {
         return Err(crate::decision::Error::from(RuleError::MissingInputForDocRules).into());
     }
-    
+
     let risk_signals: Vec<_> = risk_signals
         .iter()
         // current logic is that we do not evaluate Doc rules if a doc was not collected stricly as part of the current workflow
         // TODO: maybe we should just generally only evaluate rules on risk signals generated during the current workflow? 🤔 lots of inter-workflow/inter-playbooks/inter-play thingies to figure out
         .filter(|(k, _)| doc_collected || !matches!(k, RiskSignalGroupKind::Doc)).flat_map(|(_, v)| v.clone()).collect();
 
-    let (rule_set_result, _rule_results) =
-        evaluate_rules(conn, sv_id, obc_id, Some(wf_id), kind, &risk_signals, doc_collected)?;
+    let (rule_set_result, _rule_results) = evaluate_rules(
+        conn,
+        sv_id,
+        obc_id,
+        Some(wf_id),
+        kind,
+        &risk_signals,
+        rule_eval_config.clone(),
+    )?;
 
     let should_commit_rules: Vec<_> = [base_kyc_rules(), super::default_rules::ssn_rules()]
         .concat()
@@ -60,7 +77,7 @@ pub fn evaluate_workflow_decision(
     let (_, should_commit_action) = eval::evaluate_rule_set(
         should_commit_rules,
         &risk_signals.iter().map(|rs| rs.reason_code.clone()).collect_vec(),
-        !doc_collected,
+        rule_eval_config,
     );
     Ok(Decision {
         decision_status: rule_set_result.action_triggered.into(),
@@ -81,7 +98,7 @@ pub fn evaluate_rules(
     wf_id: Option<&WorkflowId>,
     kind: RuleSetResultKind,
     risk_signals: &[RiskSignal],
-    doc_collected: bool, // could maybe query for DocReq in here and not need to pass this in
+    rule_eval_config: RuleEvalConfig, // could maybe query for DocReq in here and not need to pass this in
 ) -> ApiResult<(RuleSetResult, Vec<RuleResult>)> {
     let (obc, _) = ObConfiguration::get(conn, obc_id)?;
     let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, obc_id)?;
@@ -92,7 +109,7 @@ pub fn evaluate_rules(
     let (rule_results, action_triggered) = eval::evaluate_rule_set(
         rules,
         &risk_signals.iter().map(|rs| rs.reason_code.clone()).collect_vec(),
-        !doc_collected,
+        rule_eval_config,
     );
 
     let rule_set_result = RuleSetResult::create(
@@ -129,9 +146,9 @@ mod tests {
     use eval::tests::TRule;
     use macros::db_test_case;
     use newtypes::{
-        BooleanOperator as BO, DbActor, DecisionIntentKind, FootprintReasonCode as FRC, RiskSignalGroupKind,
-        RiskSignalId, RuleAction, RuleAction as RA, RuleExpression as RE, RuleExpressionCondition as REC,
-        VendorAPI,
+        BooleanOperator as BO, DbActor, DecisionIntentKind, DocKind, FootprintReasonCode as FRC,
+        RiskSignalGroupKind, RiskSignalId, RuleAction, RuleAction as RA, RuleExpression as RE,
+        RuleExpressionCondition as REC, VendorAPI,
     };
 
     #[db_test_case(vec![TRule(
@@ -202,6 +219,12 @@ mod tests {
         let risk_signals = make_risk_signals(conn, &sv.id, risk_signals);
 
         // Eval
+        let docs_collected = if doc_collected {
+            vec![DocKind::Identity]
+        } else {
+            vec![]
+        };
+        let config = RuleEvalConfig::new(docs_collected);
         let (rule_set_result, rule_results) = evaluate_rules(
             conn,
             &sv.id,
@@ -209,7 +232,7 @@ mod tests {
             None,
             RuleSetResultKind::Adhoc,
             &risk_signals,
-            doc_collected,
+            config,
         )
         .unwrap();
 

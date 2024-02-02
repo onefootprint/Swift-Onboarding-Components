@@ -5,7 +5,7 @@ use crate::{
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
-use strum::{AsRefStr, ParseError};
+use strum::{AsRefStr, IntoEnumIterator, ParseError};
 use strum_macros::{Display, EnumIter, EnumString};
 
 #[derive(
@@ -21,8 +21,9 @@ use strum_macros::{Display, EnumIter, EnumString};
     Hash,
     Ord,
     PartialOrd,
-    EnumIter,
     Apiv2Schema,
+    // TODO(argoff): come back and fix this somehow. not good to have around
+    EnumIter,
     macros::SerdeAttr,
 )]
 #[diesel(sql_type = Text)]
@@ -37,6 +38,18 @@ pub enum RuleAction {
 impl RuleAction {
     pub fn identity_stepup() -> Self {
         Self::StepUp(StepUpKind::Identity)
+    }
+
+    // Strum doesn't handle nested enums very well, so we can't use EnumIter
+    pub fn all_rule_actions() -> Vec<Self> {
+        vec![
+            RuleAction::PassWithManualReview,
+            RuleAction::ManualReview,
+            RuleAction::Fail,
+        ]
+        .into_iter()
+        .chain(StepUpKind::iter().map(RuleAction::StepUp))
+        .collect()
     }
 }
 
@@ -54,6 +67,7 @@ impl RuleAction {
     AsRefStr,
     Default,
     PartialOrd,
+    EnumIter,
     Ord,
 )]
 #[strum(serialize_all = "snake_case")]
@@ -249,5 +263,21 @@ mod tests {
             RuleAction::from_str("step_up").unwrap(),
             RuleAction::StepUp(StepUpKind::Identity)
         )
+    }
+
+    #[test]
+    fn test_all_rule_actions() {
+        // If this fails, please do 3 things:
+        // 1) Make sure you are adding the right ordering
+        // 2) add new RuleAction to `all_rule_actions`. <-- Use this in application code
+        // 3) Please don't use RuleAction::iter()!!!
+        let ra_iter_len = RuleAction::iter().len() - 1; // -1 because this includes StepUpKind::default already
+        let suk_iter_len = StepUpKind::iter().len();
+        let all_action_len = RuleAction::all_rule_actions().len();
+        let expected = ra_iter_len + suk_iter_len;
+
+
+        assert_eq!(all_action_len, 10);
+        assert_eq!(all_action_len, expected);
     }
 }
