@@ -70,7 +70,7 @@ impl AuthSession {
         data: AuthSessionData,
         expires_in: Duration,
     ) -> DbResult<(SessionAuthToken, Session)> {
-        let token = SessionAuthToken::generate();
+        let token = SessionAuthToken::generate((&data).into());
         let auth_token_hash = token.id();
         tracing::info!(%auth_token_hash, "Token created");
         let expires_at = Utc::now() + expires_in;

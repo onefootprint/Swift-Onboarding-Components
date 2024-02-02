@@ -4,7 +4,7 @@ pub mod tenant;
 pub mod user;
 
 use crypto::aead::ScopedSealingKey;
-use newtypes::{HasSessionKind, SealedSessionBytes, SessionKind};
+use newtypes::{HasSessionKind, SealedSessionBytes, SessionAuthTokenKind, SessionKind};
 use serde::{Deserialize, Serialize};
 
 impl AuthSessionData {
@@ -51,6 +51,24 @@ pub enum AuthSessionData {
 
     /// Used to pass information into bifrost from the Footprint.js SDK
     SdkArgs(sdk_args::SdkArgsData),
+}
+
+// Would be nice to not have to have this, but SessionAuthTokenKind is needed in newtypes...
+impl<'a> From<&'a AuthSessionData> for SessionAuthTokenKind {
+    fn from(value: &'a AuthSessionData) -> Self {
+        match value {
+            AuthSessionData::WorkOs(_) => Self::WorkOs,
+            AuthSessionData::TenantRb(_) => Self::TenantRb,
+            AuthSessionData::FirmEmployee(_) => Self::FirmEmployee,
+            AuthSessionData::ClientTenant(_) => Self::ClientTenant,
+            AuthSessionData::User(_) => Self::User,
+            AuthSessionData::EmailVerify(_) => Self::EmailVerify,
+            AuthSessionData::ValidateUserToken(_) => Self::ValidateUserToken,
+            AuthSessionData::OnboardingSession(_) => Self::OnboardingSession,
+            AuthSessionData::BusinessOwner(_) => Self::BusinessOwner,
+            AuthSessionData::SdkArgs(_) => Self::SdkArgs,
+        }
+    }
 }
 
 impl From<ob_config::BoSession> for AuthSessionData {
