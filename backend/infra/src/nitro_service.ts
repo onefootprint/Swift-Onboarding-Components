@@ -53,7 +53,21 @@ export async function CreateNitroService(
           fromPort: 443,
           toPort: 443,
           sourceSecurityGroupId: g.coreSecurityGroups.fpcService.id,
-          description: 'this limits ingress just from the fpc service',
+          description: 'allow ingress from the API',
+        },
+        {
+          protocol: 'tcp',
+          fromPort: 443,
+          toPort: 443,
+          sourceSecurityGroupId: g.coreSecurityGroups.cron.id,
+          description: 'allow ingress from cron jobs',
+        },
+        {
+          protocol: 'tcp',
+          fromPort: 443,
+          toPort: 443,
+          sourceSecurityGroupId: g.coreSecurityGroups.worker.id,
+          description: 'allow ingress from workers',
         },
       ],
       egress: [EGRESS_ALL],
@@ -556,7 +570,7 @@ do
         echo "restarting enclave"
         sudo nitro-cli run-enclave --eif-path /eif/enclave.eif --cpu-count ${resources.cpus} --memory ${actualEnclaveMemory} --enclave-cid ${resources.cid}
         sleep 5
-    fi	 
+    fi
 done
 EOF
 
@@ -586,7 +600,7 @@ sudo echo "ENCLAVE_PROXY_SECRET=$(aws --region us-east-1 ssm get-parameter --nam
 sudo echo "RUST_LOG=info" >> /enclave_proxy_environment
 touch /var/log/enclave_proxy.log
 
-cat <<'EOF' > /etc/rsyslog.d/enclave_proxy.conf 
+cat <<'EOF' > /etc/rsyslog.d/enclave_proxy.conf
 if $programname == 'enclave_proxy' then /var/log/enclave_proxy.log
 & stop
 EOF
