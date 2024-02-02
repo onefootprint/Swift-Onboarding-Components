@@ -60,6 +60,7 @@ impl ProxyHttpClient {
     }
 
     /// send/recieve response from the proxy
+    #[tracing::instrument(skip_all, fields(request_id=%request.id))]
     async fn send_request_inner(
         &self,
         request: RpcRequest,
@@ -91,9 +92,23 @@ impl ProxyHttpClient {
             response = make_request().await;
             retries_left -= 1;
         }
-
-        let response: ProxyPayloadResponse = response?.json().await?;
-        Ok(response.response)
+        match response {
+            Err(e) => {
+                tracing::error!(e=?e, "Enclave proxy client error");
+                Err(crate::Error::from(e))
+            }
+            Ok(r) if !r.status().is_success() => {
+                let status = r.status().as_u16();
+                let response = r.text().await?;
+                // TODO one day don't log the entire response?
+                tracing::error!(resp = %response, "Enclave proxy HTTP error");
+                Err(crate::Error::HttpError(status))
+            }
+            Ok(r) => {
+                let response: ProxyPayloadResponse = r.json().await?;
+                Ok(response.response)
+            }
+        }
     }
 }
 

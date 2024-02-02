@@ -27,20 +27,22 @@ use tokio_vsock::VsockStream;
 
 #[derive(Error, Debug)]
 pub enum Error {
-    #[error("enclave {0}")]
+    #[error("Enclave {0}")]
     EnclaveRpc(#[from] rpc::Error),
-    #[error("io {0}")]
+    #[error("IO {0}")]
     Io(#[from] std::io::Error),
-    #[error("unexpected enclave response payload")]
+    #[error("Unexpected enclave response payload")]
     UnexpectedEnclaveResponse,
-    #[error("no enclave response")]
+    #[error("No enclave response")]
     MissingEnclaveResponse,
-    #[error("no enclave response")]
+    #[error("No enclave response")]
     InvalidEnclaveResponse,
-    #[error("http reqwest: {0}")]
+    #[error("Http reqwest: {0}")]
     HttpClient(#[from] reqwest::Error),
-    #[error("http reqwest middleware: {0}")]
+    #[error("Http reqwest middleware: {0}")]
     HttpClientMiddleware(#[from] reqwest_middleware::Error),
+    #[error("Invalid HTTP response {0}")]
+    HttpError(u16),
 }
 
 #[derive(Debug, Clone)]
