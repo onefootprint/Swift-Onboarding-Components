@@ -97,7 +97,6 @@ pub fn evaluate_rule_set<T: HasRule>(
             (r, eval)
         })
         .collect_vec();
-
     // take the most punitive action coming from some rule that evaluated to true
     let action_triggered = rule_results
         .iter()

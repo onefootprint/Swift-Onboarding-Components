@@ -129,6 +129,7 @@ impl RuleSetResult {
             .filter(rule_set_result::scoped_vault_id.eq(sv_id))
             .filter(rule_set_result::kind.eq(RuleSetResultKind::WorkflowDecision))
             .order_by(rule_set_result::created_seqno.desc())
+            .then_order_by(rule_set_result::_created_at.desc())
             .first(conn)
             .optional()?;
 
