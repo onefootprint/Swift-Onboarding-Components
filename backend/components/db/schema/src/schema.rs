@@ -1,4 +1,6 @@
-table! {
+// @generated automatically by Diesel CLI.
+
+diesel::table! {
     use diesel::sql_types::*;
 
     access_event (id) {
@@ -12,14 +14,14 @@ table! {
         principal -> Jsonb,
         ordering_id -> Int8,
         kind -> Text,
-        targets -> Array<Text>,
+        targets -> Array<Nullable<Text>>,
         tenant_id -> Text,
         is_live -> Bool,
         purpose -> Text,
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     annotation (id) {
@@ -34,7 +36,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     appearance (id) {
@@ -46,7 +48,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     apple_device_attestation (id) {
@@ -73,7 +75,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     audit_event (id) {
@@ -96,7 +98,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     auth_event (id) {
@@ -113,7 +115,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     billing_event (id) {
@@ -128,7 +130,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     billing_profile (id) {
@@ -150,7 +152,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     business_owner (id) {
@@ -164,7 +166,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     contact_info (id) {
@@ -178,7 +180,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     custom_migration (version) {
@@ -187,7 +189,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     data_lifetime (id) {
@@ -209,7 +211,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     decision_intent (id) {
@@ -223,7 +225,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     document_data (id) {
@@ -239,7 +241,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     document_request (id) {
@@ -255,7 +257,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     document_upload (id) {
@@ -269,7 +271,7 @@ table! {
         created_at -> Timestamptz,
         deactivated_at -> Nullable<Timestamptz>,
         created_seqno -> Int8,
-        failure_reasons -> Array<Text>,
+        failure_reasons -> Array<Nullable<Text>>,
         is_instant_app -> Nullable<Bool>,
         is_app_clip -> Nullable<Bool>,
         is_manual -> Nullable<Bool>,
@@ -277,7 +279,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     fingerprint (id) {
@@ -292,7 +294,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     fingerprint_visit_event (id) {
@@ -310,7 +312,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     google_device_attestation (id) {
@@ -336,7 +338,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     identity_document (id) {
@@ -359,7 +361,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     identity_document_backup (id) {
@@ -378,7 +380,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     incode_verification_session (id) {
@@ -394,15 +396,15 @@ table! {
         state -> Text,
         completed_at -> Nullable<Timestamptz>,
         kind -> Text,
-        latest_failure_reasons -> Array<Text>,
-        ignored_failure_reasons -> Array<Text>,
+        latest_failure_reasons -> Array<Nullable<Text>>,
+        ignored_failure_reasons -> Array<Nullable<Text>>,
         deactivated_at -> Nullable<Timestamptz>,
         incode_environment -> Nullable<Text>,
         latest_hard_error -> Nullable<Text>,
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     incode_verification_session_event (id) {
@@ -414,12 +416,12 @@ table! {
         incode_verification_session_state -> Text,
         identity_document_id -> Text,
         kind -> Text,
-        latest_failure_reasons -> Array<Text>,
-        ignored_failure_reasons -> Array<Text>,
+        latest_failure_reasons -> Array<Nullable<Text>>,
+        ignored_failure_reasons -> Array<Nullable<Text>>,
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     insight_event (id) {
@@ -454,7 +456,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     liveness_event (id) {
@@ -469,7 +471,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     manual_review (id) {
@@ -480,13 +482,13 @@ table! {
         completed_at -> Nullable<Timestamptz>,
         completed_by_decision_id -> Nullable<Text>,
         completed_by_actor -> Nullable<Jsonb>,
-        review_reasons -> Array<Text>,
+        review_reasons -> Array<Nullable<Text>>,
         workflow_id -> Text,
         scoped_vault_id -> Text,
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     middesk_request (id) {
@@ -502,7 +504,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     ob_configuration (id) {
@@ -515,15 +517,15 @@ table! {
         is_live -> Bool,
         status -> Text,
         created_at -> Timestamptz,
-        must_collect_data -> Array<Text>,
-        can_access_data -> Array<Text>,
+        must_collect_data -> Array<Nullable<Text>>,
+        can_access_data -> Array<Nullable<Text>>,
         appearance_id -> Nullable<Text>,
         cip_kind -> Nullable<Text>,
-        optional_data -> Array<Text>,
+        optional_data -> Array<Nullable<Text>>,
         is_no_phone_flow -> Bool,
         is_doc_first -> Bool,
         allow_international_residents -> Bool,
-        international_country_restrictions -> Nullable<Array<Text>>,
+        international_country_restrictions -> Nullable<Array<Nullable<Text>>>,
         author -> Nullable<Jsonb>,
         skip_kyc -> Bool,
         doc_scan_for_optional_ssn -> Nullable<Text>,
@@ -536,7 +538,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     onboarding_decision (id) {
@@ -553,7 +555,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     onboarding_decision_verification_result_junction (id) {
@@ -563,7 +565,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     proxy_config (id) {
@@ -585,7 +587,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     proxy_config_header (id) {
@@ -596,7 +598,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     proxy_config_ingress_rule (id) {
@@ -607,7 +609,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     proxy_config_secret_header (id) {
@@ -618,7 +620,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     proxy_config_server_cert (id) {
@@ -629,7 +631,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     proxy_request_log (id) {
@@ -647,7 +649,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     risk_signal (id) {
@@ -665,7 +667,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     risk_signal_group (id) {
@@ -678,7 +680,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     rule_instance (id) {
@@ -699,7 +701,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     rule_result (id) {
@@ -713,7 +715,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     rule_set_result (id) {
@@ -730,7 +732,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     rule_set_result_risk_signal_junction (id) {
@@ -743,7 +745,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     scoped_vault (id) {
@@ -766,7 +768,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     scoped_vault_label (id) {
@@ -782,7 +784,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     scoped_vault_tag (id) {
@@ -798,7 +800,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     session (key) {
@@ -811,7 +813,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     socure_device_session (id) {
@@ -824,7 +826,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     stytch_fingerprint_event (id) {
@@ -845,7 +847,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     task (id) {
@@ -860,7 +862,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     task_execution (id) {
@@ -876,7 +878,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     tenant (id) {
@@ -897,19 +899,19 @@ table! {
         pinned_api_version -> Nullable<Int4>,
         is_prod_ob_config_restricted -> Bool,
         allow_domain_access -> Bool,
-        supported_auth_methods -> Nullable<Array<Text>>,
+        supported_auth_methods -> Nullable<Array<Nullable<Text>>>,
         app_clip_experience_id -> Text,
         is_prod_kyb_playbook_restricted -> Bool,
-        domains -> Array<Text>,
+        domains -> Array<Nullable<Text>>,
         is_prod_auth_playbook_restricted -> Bool,
-        allowed_preview_apis -> Array<Text>,
+        allowed_preview_apis -> Array<Nullable<Text>>,
         support_email -> Nullable<Text>,
         support_phone -> Nullable<Text>,
         support_website -> Nullable<Text>,
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     tenant_api_key (id) {
@@ -929,7 +931,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     tenant_business_info (id) {
@@ -950,7 +952,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     tenant_client_config (id) {
@@ -958,11 +960,11 @@ table! {
         tenant_id -> Text,
         is_live -> Bool,
         deactivated_at -> Nullable<Timestamptz>,
-        allowed_origins -> Array<Text>,
+        allowed_origins -> Array<Nullable<Text>>,
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     tenant_frequent_note (id) {
@@ -978,7 +980,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     tenant_role (id) {
@@ -990,13 +992,13 @@ table! {
         created_at -> Timestamptz,
         deactivated_at -> Nullable<Timestamptz>,
         is_immutable -> Bool,
-        scopes -> Array<Jsonb>,
+        scopes -> Array<Nullable<Jsonb>>,
         kind -> Text,
         is_live -> Nullable<Bool>,
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     tenant_rolebinding (id) {
@@ -1012,7 +1014,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     tenant_user (id) {
@@ -1027,7 +1029,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     tenant_vendor_control (id) {
@@ -1044,7 +1046,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     user_consent (id) {
@@ -1059,7 +1061,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     user_timeline (id) {
@@ -1074,7 +1076,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     vault (id) {
@@ -1096,7 +1098,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     vault_data (id) {
@@ -1111,7 +1113,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     verification_request (id) {
@@ -1128,7 +1130,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     verification_result (id) {
@@ -1143,7 +1145,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     watchlist_check (id) {
@@ -1156,14 +1158,14 @@ table! {
         decision_intent_id -> Nullable<Text>,
         status -> Text,
         logic_git_hash -> Nullable<Text>,
-        reason_codes -> Nullable<Array<Text>>,
+        reason_codes -> Nullable<Array<Nullable<Text>>>,
         completed_at -> Nullable<Timestamptz>,
         status_details -> Jsonb,
         deactivated_at -> Nullable<Timestamptz>,
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     webauthn_credential (id) {
@@ -1183,7 +1185,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     workflow (id) {
@@ -1209,7 +1211,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     workflow_event (id) {
@@ -1223,7 +1225,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     workflow_request (id) {
@@ -1241,7 +1243,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     use diesel::sql_types::*;
 
     zip_code (code) {
@@ -1254,119 +1256,119 @@ table! {
     }
 }
 
-joinable!(access_event -> insight_event (insight_event_id));
-joinable!(access_event -> scoped_vault (scoped_vault_id));
-joinable!(access_event -> tenant (tenant_id));
-joinable!(annotation -> scoped_vault (scoped_vault_id));
-joinable!(appearance -> tenant (tenant_id));
-joinable!(apple_device_attestation -> vault (vault_id));
-joinable!(apple_device_attestation -> webauthn_credential (webauthn_credential_id));
-joinable!(audit_event -> document_data (document_data_id));
-joinable!(audit_event -> insight_event (insight_event_id));
-joinable!(audit_event -> ob_configuration (ob_configuration_id));
-joinable!(audit_event -> scoped_vault (scoped_vault_id));
-joinable!(audit_event -> tenant (tenant_id));
-joinable!(audit_event -> tenant_api_key (tenant_api_key_id));
-joinable!(audit_event -> tenant_role (tenant_role_id));
-joinable!(audit_event -> tenant_user (tenant_user_id));
-joinable!(auth_event -> insight_event (insight_event_id));
-joinable!(auth_event -> scoped_vault (scoped_vault_id));
-joinable!(auth_event -> vault (vault_id));
-joinable!(auth_event -> webauthn_credential (webauthn_credential_id));
-joinable!(billing_event -> ob_configuration (ob_configuration_id));
-joinable!(billing_event -> scoped_vault (scoped_vault_id));
-joinable!(billing_profile -> tenant (tenant_id));
-joinable!(contact_info -> data_lifetime (lifetime_id));
-joinable!(data_lifetime -> scoped_vault (scoped_vault_id));
-joinable!(data_lifetime -> vault (vault_id));
-joinable!(decision_intent -> scoped_vault (scoped_vault_id));
-joinable!(decision_intent -> workflow (workflow_id));
-joinable!(document_data -> data_lifetime (lifetime_id));
-joinable!(document_request -> scoped_vault (scoped_vault_id));
-joinable!(document_request -> workflow (workflow_id));
-joinable!(document_upload -> identity_document (document_id));
-joinable!(fingerprint -> data_lifetime (lifetime_id));
-joinable!(fingerprint_visit_event -> scoped_vault (scoped_vault_id));
-joinable!(fingerprint_visit_event -> vault (vault_id));
-joinable!(google_device_attestation -> vault (vault_id));
-joinable!(google_device_attestation -> webauthn_credential (webauthn_credential_id));
-joinable!(identity_document -> document_request (request_id));
-joinable!(incode_verification_session -> identity_document (identity_document_id));
-joinable!(incode_verification_session_event -> identity_document (identity_document_id));
-joinable!(incode_verification_session_event -> incode_verification_session (incode_verification_session_id));
-joinable!(liveness_event -> insight_event (insight_event_id));
-joinable!(liveness_event -> scoped_vault (scoped_vault_id));
-joinable!(manual_review -> onboarding_decision (completed_by_decision_id));
-joinable!(manual_review -> scoped_vault (scoped_vault_id));
-joinable!(manual_review -> workflow (workflow_id));
-joinable!(middesk_request -> decision_intent (decision_intent_id));
-joinable!(middesk_request -> workflow (workflow_id));
-joinable!(ob_configuration -> appearance (appearance_id));
-joinable!(ob_configuration -> tenant (tenant_id));
-joinable!(onboarding_decision -> workflow (workflow_id));
-joinable!(onboarding_decision_verification_result_junction -> onboarding_decision (onboarding_decision_id));
-joinable!(onboarding_decision_verification_result_junction -> verification_result (verification_result_id));
-joinable!(proxy_config -> tenant (tenant_id));
-joinable!(proxy_config_header -> proxy_config (config_id));
-joinable!(proxy_config_ingress_rule -> proxy_config (config_id));
-joinable!(proxy_config_secret_header -> proxy_config (config_id));
-joinable!(proxy_config_server_cert -> proxy_config (config_id));
-joinable!(proxy_request_log -> proxy_config (config_id));
-joinable!(proxy_request_log -> tenant (tenant_id));
-joinable!(risk_signal -> onboarding_decision (onboarding_decision_id));
-joinable!(risk_signal -> risk_signal_group (risk_signal_group_id));
-joinable!(risk_signal -> verification_result (verification_result_id));
-joinable!(risk_signal_group -> scoped_vault (scoped_vault_id));
-joinable!(rule_instance -> ob_configuration (ob_configuration_id));
-joinable!(rule_result -> rule_instance (rule_instance_id));
-joinable!(rule_result -> rule_set_result (rule_set_result_id));
-joinable!(rule_set_result -> ob_configuration (ob_configuration_id));
-joinable!(rule_set_result -> scoped_vault (scoped_vault_id));
-joinable!(rule_set_result -> workflow (workflow_id));
-joinable!(rule_set_result_risk_signal_junction -> risk_signal (risk_signal_id));
-joinable!(rule_set_result_risk_signal_junction -> rule_set_result (rule_set_result_id));
-joinable!(scoped_vault -> tenant (tenant_id));
-joinable!(scoped_vault -> vault (vault_id));
-joinable!(scoped_vault_label -> scoped_vault (scoped_vault_id));
-joinable!(scoped_vault_tag -> scoped_vault (scoped_vault_id));
-joinable!(socure_device_session -> workflow (workflow_id));
-joinable!(stytch_fingerprint_event -> scoped_vault (scoped_vault_id));
-joinable!(stytch_fingerprint_event -> vault (vault_id));
-joinable!(stytch_fingerprint_event -> verification_result (verification_result_id));
-joinable!(task_execution -> task (task_id));
-joinable!(tenant_api_key -> tenant (tenant_id));
-joinable!(tenant_api_key -> tenant_role (role_id));
-joinable!(tenant_business_info -> tenant (tenant_id));
-joinable!(tenant_client_config -> tenant (tenant_id));
-joinable!(tenant_frequent_note -> tenant (tenant_id));
-joinable!(tenant_role -> tenant (tenant_id));
-joinable!(tenant_rolebinding -> tenant (tenant_id));
-joinable!(tenant_rolebinding -> tenant_role (tenant_role_id));
-joinable!(tenant_rolebinding -> tenant_user (tenant_user_id));
-joinable!(tenant_vendor_control -> tenant (tenant_id));
-joinable!(user_consent -> insight_event (insight_event_id));
-joinable!(user_consent -> workflow (workflow_id));
-joinable!(user_timeline -> scoped_vault (scoped_vault_id));
-joinable!(user_timeline -> vault (vault_id));
-joinable!(vault_data -> data_lifetime (lifetime_id));
-joinable!(verification_request -> decision_intent (decision_intent_id));
-joinable!(verification_request -> identity_document (identity_document_id));
-joinable!(verification_request -> scoped_vault (scoped_vault_id));
-joinable!(verification_result -> verification_request (request_id));
-joinable!(watchlist_check -> decision_intent (decision_intent_id));
-joinable!(watchlist_check -> scoped_vault (scoped_vault_id));
-joinable!(watchlist_check -> task (task_id));
-joinable!(webauthn_credential -> insight_event (insight_event_id));
-joinable!(webauthn_credential -> vault (vault_id));
-joinable!(workflow -> insight_event (insight_event_id));
-joinable!(workflow -> ob_configuration (ob_configuration_id));
-joinable!(workflow -> scoped_vault (scoped_vault_id));
-joinable!(workflow_event -> workflow (workflow_id));
-joinable!(workflow_request -> ob_configuration (ob_configuration_id));
-joinable!(workflow_request -> scoped_vault (scoped_vault_id));
-joinable!(workflow_request -> workflow (workflow_id));
+diesel::joinable!(access_event -> insight_event (insight_event_id));
+diesel::joinable!(access_event -> scoped_vault (scoped_vault_id));
+diesel::joinable!(access_event -> tenant (tenant_id));
+diesel::joinable!(annotation -> scoped_vault (scoped_vault_id));
+diesel::joinable!(appearance -> tenant (tenant_id));
+diesel::joinable!(apple_device_attestation -> vault (vault_id));
+diesel::joinable!(apple_device_attestation -> webauthn_credential (webauthn_credential_id));
+diesel::joinable!(audit_event -> document_data (document_data_id));
+diesel::joinable!(audit_event -> insight_event (insight_event_id));
+diesel::joinable!(audit_event -> ob_configuration (ob_configuration_id));
+diesel::joinable!(audit_event -> scoped_vault (scoped_vault_id));
+diesel::joinable!(audit_event -> tenant (tenant_id));
+diesel::joinable!(audit_event -> tenant_api_key (tenant_api_key_id));
+diesel::joinable!(audit_event -> tenant_role (tenant_role_id));
+diesel::joinable!(audit_event -> tenant_user (tenant_user_id));
+diesel::joinable!(auth_event -> insight_event (insight_event_id));
+diesel::joinable!(auth_event -> scoped_vault (scoped_vault_id));
+diesel::joinable!(auth_event -> vault (vault_id));
+diesel::joinable!(auth_event -> webauthn_credential (webauthn_credential_id));
+diesel::joinable!(billing_event -> ob_configuration (ob_configuration_id));
+diesel::joinable!(billing_event -> scoped_vault (scoped_vault_id));
+diesel::joinable!(billing_profile -> tenant (tenant_id));
+diesel::joinable!(contact_info -> data_lifetime (lifetime_id));
+diesel::joinable!(data_lifetime -> scoped_vault (scoped_vault_id));
+diesel::joinable!(data_lifetime -> vault (vault_id));
+diesel::joinable!(decision_intent -> scoped_vault (scoped_vault_id));
+diesel::joinable!(decision_intent -> workflow (workflow_id));
+diesel::joinable!(document_data -> data_lifetime (lifetime_id));
+diesel::joinable!(document_request -> scoped_vault (scoped_vault_id));
+diesel::joinable!(document_request -> workflow (workflow_id));
+diesel::joinable!(document_upload -> identity_document (document_id));
+diesel::joinable!(fingerprint -> data_lifetime (lifetime_id));
+diesel::joinable!(fingerprint_visit_event -> scoped_vault (scoped_vault_id));
+diesel::joinable!(fingerprint_visit_event -> vault (vault_id));
+diesel::joinable!(google_device_attestation -> vault (vault_id));
+diesel::joinable!(google_device_attestation -> webauthn_credential (webauthn_credential_id));
+diesel::joinable!(identity_document -> document_request (request_id));
+diesel::joinable!(incode_verification_session -> identity_document (identity_document_id));
+diesel::joinable!(incode_verification_session_event -> identity_document (identity_document_id));
+diesel::joinable!(incode_verification_session_event -> incode_verification_session (incode_verification_session_id));
+diesel::joinable!(liveness_event -> insight_event (insight_event_id));
+diesel::joinable!(liveness_event -> scoped_vault (scoped_vault_id));
+diesel::joinable!(manual_review -> onboarding_decision (completed_by_decision_id));
+diesel::joinable!(manual_review -> scoped_vault (scoped_vault_id));
+diesel::joinable!(manual_review -> workflow (workflow_id));
+diesel::joinable!(middesk_request -> decision_intent (decision_intent_id));
+diesel::joinable!(middesk_request -> workflow (workflow_id));
+diesel::joinable!(ob_configuration -> appearance (appearance_id));
+diesel::joinable!(ob_configuration -> tenant (tenant_id));
+diesel::joinable!(onboarding_decision -> workflow (workflow_id));
+diesel::joinable!(onboarding_decision_verification_result_junction -> onboarding_decision (onboarding_decision_id));
+diesel::joinable!(onboarding_decision_verification_result_junction -> verification_result (verification_result_id));
+diesel::joinable!(proxy_config -> tenant (tenant_id));
+diesel::joinable!(proxy_config_header -> proxy_config (config_id));
+diesel::joinable!(proxy_config_ingress_rule -> proxy_config (config_id));
+diesel::joinable!(proxy_config_secret_header -> proxy_config (config_id));
+diesel::joinable!(proxy_config_server_cert -> proxy_config (config_id));
+diesel::joinable!(proxy_request_log -> proxy_config (config_id));
+diesel::joinable!(proxy_request_log -> tenant (tenant_id));
+diesel::joinable!(risk_signal -> onboarding_decision (onboarding_decision_id));
+diesel::joinable!(risk_signal -> risk_signal_group (risk_signal_group_id));
+diesel::joinable!(risk_signal -> verification_result (verification_result_id));
+diesel::joinable!(risk_signal_group -> scoped_vault (scoped_vault_id));
+diesel::joinable!(rule_instance -> ob_configuration (ob_configuration_id));
+diesel::joinable!(rule_result -> rule_instance (rule_instance_id));
+diesel::joinable!(rule_result -> rule_set_result (rule_set_result_id));
+diesel::joinable!(rule_set_result -> ob_configuration (ob_configuration_id));
+diesel::joinable!(rule_set_result -> scoped_vault (scoped_vault_id));
+diesel::joinable!(rule_set_result -> workflow (workflow_id));
+diesel::joinable!(rule_set_result_risk_signal_junction -> risk_signal (risk_signal_id));
+diesel::joinable!(rule_set_result_risk_signal_junction -> rule_set_result (rule_set_result_id));
+diesel::joinable!(scoped_vault -> tenant (tenant_id));
+diesel::joinable!(scoped_vault -> vault (vault_id));
+diesel::joinable!(scoped_vault_label -> scoped_vault (scoped_vault_id));
+diesel::joinable!(scoped_vault_tag -> scoped_vault (scoped_vault_id));
+diesel::joinable!(socure_device_session -> workflow (workflow_id));
+diesel::joinable!(stytch_fingerprint_event -> scoped_vault (scoped_vault_id));
+diesel::joinable!(stytch_fingerprint_event -> vault (vault_id));
+diesel::joinable!(stytch_fingerprint_event -> verification_result (verification_result_id));
+diesel::joinable!(task_execution -> task (task_id));
+diesel::joinable!(tenant_api_key -> tenant (tenant_id));
+diesel::joinable!(tenant_api_key -> tenant_role (role_id));
+diesel::joinable!(tenant_business_info -> tenant (tenant_id));
+diesel::joinable!(tenant_client_config -> tenant (tenant_id));
+diesel::joinable!(tenant_frequent_note -> tenant (tenant_id));
+diesel::joinable!(tenant_role -> tenant (tenant_id));
+diesel::joinable!(tenant_rolebinding -> tenant (tenant_id));
+diesel::joinable!(tenant_rolebinding -> tenant_role (tenant_role_id));
+diesel::joinable!(tenant_rolebinding -> tenant_user (tenant_user_id));
+diesel::joinable!(tenant_vendor_control -> tenant (tenant_id));
+diesel::joinable!(user_consent -> insight_event (insight_event_id));
+diesel::joinable!(user_consent -> workflow (workflow_id));
+diesel::joinable!(user_timeline -> scoped_vault (scoped_vault_id));
+diesel::joinable!(user_timeline -> vault (vault_id));
+diesel::joinable!(vault_data -> data_lifetime (lifetime_id));
+diesel::joinable!(verification_request -> decision_intent (decision_intent_id));
+diesel::joinable!(verification_request -> identity_document (identity_document_id));
+diesel::joinable!(verification_request -> scoped_vault (scoped_vault_id));
+diesel::joinable!(verification_result -> verification_request (request_id));
+diesel::joinable!(watchlist_check -> decision_intent (decision_intent_id));
+diesel::joinable!(watchlist_check -> scoped_vault (scoped_vault_id));
+diesel::joinable!(watchlist_check -> task (task_id));
+diesel::joinable!(webauthn_credential -> insight_event (insight_event_id));
+diesel::joinable!(webauthn_credential -> vault (vault_id));
+diesel::joinable!(workflow -> insight_event (insight_event_id));
+diesel::joinable!(workflow -> ob_configuration (ob_configuration_id));
+diesel::joinable!(workflow -> scoped_vault (scoped_vault_id));
+diesel::joinable!(workflow_event -> workflow (workflow_id));
+diesel::joinable!(workflow_request -> ob_configuration (ob_configuration_id));
+diesel::joinable!(workflow_request -> scoped_vault (scoped_vault_id));
+diesel::joinable!(workflow_request -> workflow (workflow_id));
 
-allow_tables_to_appear_in_same_query!(
+diesel::allow_tables_to_appear_in_same_query!(
     access_event,
     annotation,
     appearance,

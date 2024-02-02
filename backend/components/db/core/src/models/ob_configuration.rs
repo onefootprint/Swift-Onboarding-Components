@@ -1,7 +1,8 @@
-use std::collections::HashMap;
-
 use super::{tenant::Tenant, workflow::Workflow};
-use crate::{actor, actor::SaturatedActor, DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn};
+use crate::{
+    actor, actor::SaturatedActor, DbError, DbResult, NextPage, NonNullVec, OffsetPagination,
+    OptionalNonNullVec, PgConn, TxnPgConn,
+};
 use chrono::{DateTime, Utc};
 use db_schema::schema::{ob_configuration, ob_configuration::BoxedQuery, tenant};
 use diesel::{pg::Pg, prelude::*, Insertable, Queryable};
@@ -11,6 +12,7 @@ use newtypes::{
     DocumentCdoInfo, EnhancedAmlOption, IdDocKind, Iso3166TwoDigitCountryCode, ObConfigurationId,
     ObConfigurationKey, ObConfigurationKind, ScopedVaultId, TenantId, WorkflowId,
 };
+use std::collections::HashMap;
 use strum::IntoEnumIterator;
 
 pub type IsLive = bool;
@@ -27,15 +29,19 @@ pub struct ObConfiguration {
     pub is_live: IsLive,
     pub status: ApiKeyStatus,
     pub created_at: DateTime<Utc>,
+    #[diesel(deserialize_as = NonNullVec<CDO>)]
     pub must_collect_data: Vec<CDO>,
+    #[diesel(deserialize_as = NonNullVec<CDO>)]
     pub can_access_data: Vec<CDO>,
     pub appearance_id: Option<AppearanceId>,
     pub cip_kind: Option<CipKind>,
+    #[diesel(deserialize_as = NonNullVec<CDO>)]
     pub optional_data: Vec<CDO>,
     // DO NOT REORDER THESE FIELDS
     pub is_no_phone_flow: bool,
     pub is_doc_first: bool,
     pub allow_international_residents: bool,
+    #[diesel(deserialize_as = OptionalNonNullVec<Iso3166TwoDigitCountryCode>)]
     pub international_country_restrictions: Option<Vec<Iso3166TwoDigitCountryCode>>,
     pub author: Option<DbActor>,
     pub skip_kyc: bool,

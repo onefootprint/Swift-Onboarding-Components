@@ -185,7 +185,7 @@ $ ./add_secret.sh
 First, install diesel CLI:
 
 - Note that we specifically need version 1.4.1. Newer versions will make strange changes to some of the postgres types.
-  `$ cargo install diesel_cli --no-default-features --features postgres --version 1.4.1`
+  `$ cargo install diesel_cli --no-default-features --features postgres --version 2.0.0`
 
 Next, to generate a new migration:
 

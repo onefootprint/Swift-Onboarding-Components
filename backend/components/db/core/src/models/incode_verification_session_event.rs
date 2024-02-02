@@ -1,4 +1,4 @@
-use crate::{DbResult, PgConn, TxnPgConn};
+use crate::{DbResult, NonNullVec, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::incode_verification_session_event;
 use diesel::prelude::*;
@@ -19,7 +19,9 @@ pub struct IncodeVerificationSessionEvent {
     pub identity_document_id: IdentityDocumentId,
     pub kind: IncodeVerificationSessionKind,
     /// Not used by application code anywhere, just used for debugging
+    #[diesel(deserialize_as = NonNullVec<IncodeFailureReason>)]
     pub latest_failure_reasons: Vec<IncodeFailureReason>,
+    #[diesel(deserialize_as = NonNullVec<IncodeFailureReason>)]
     pub ignored_failure_reasons: Vec<IncodeFailureReason>,
 }
 

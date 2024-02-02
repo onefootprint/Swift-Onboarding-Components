@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use super::ob_configuration::IsLive;
-use crate::{DbError, DbResult, NextPage, OffsetPagination, PgConn, TxnPgConn};
+use crate::{DbError, DbResult, NextPage, NonNullVec, OffsetPagination, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::tenant_role::{self, BoxedQuery};
 use diesel::{dsl::count_star, prelude::*, Insertable, Queryable};
@@ -35,6 +35,7 @@ pub struct TenantRole {
     /// Each Tenant will have an immutable read-only and immutable admin role
     pub is_immutable: IsImmutable,
     /// The list of scopes that are granted to every user in this role
+    #[diesel(deserialize_as = NonNullVec<TenantScope>)]
     pub scopes: Vec<TenantScope>,
     pub kind: TenantRoleKindDiscriminant,
     // For ApiKey roles, is_live must be set

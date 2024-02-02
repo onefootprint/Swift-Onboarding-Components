@@ -52,7 +52,7 @@ rustup component add clippy
 
 cargo install cargo-expand
 cargo install cargo-edit
-cargo install diesel_cli --no-default-features --features postgres
+cargo install diesel_cli --no-default-features --features postgres --version 2.0.0
 
 # install a faster linker: mold
 dir=$(pwd)

@@ -1,4 +1,4 @@
-use crate::{DbResult, PgConn, TxnPgConn};
+use crate::{DbResult, NonNullVec, PgConn, TxnPgConn};
 use chrono::{DateTime, Duration, Utc};
 use db_schema::schema::{
     document_request, identity_document,
@@ -32,7 +32,9 @@ pub struct IncodeVerificationSession {
     pub completed_at: Option<DateTime<Utc>>,
     pub kind: IncodeVerificationSessionKind,
     /// Not used by application code anywhere, just used for debugging
+    #[diesel(deserialize_as = NonNullVec<IncodeFailureReason>)]
     pub latest_failure_reasons: Vec<IncodeFailureReason>,
+    #[diesel(deserialize_as = NonNullVec<IncodeFailureReason>)]
     pub ignored_failure_reasons: Vec<IncodeFailureReason>,
     // When set, this IVS was replaced with a re-run via the manual private endpoint
     pub deactivated_at: Option<DateTime<Utc>>,

@@ -1,8 +1,6 @@
-use crate::{DbError, DbResult, TxnPgConn};
-use db_schema::schema::{manual_review, onboarding_decision};
-
-use crate::PgConn;
+use crate::{DbError, DbResult, NonNullVec, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
+use db_schema::schema::{manual_review, onboarding_decision};
 use diesel::{dsl::not, prelude::*};
 use newtypes::{DbActor, ManualReviewId, OnboardingDecisionId, ReviewReason, ScopedVaultId, WorkflowId};
 use serde::{Deserialize, Serialize};
@@ -23,6 +21,7 @@ pub struct ManualReview {
     pub completed_by_decision_id: Option<OnboardingDecisionId>,
     /// If the ManualReview was completed by a tenant dashboard user, linked here
     pub completed_by_actor: Option<DbActor>,
+    #[diesel(deserialize_as = NonNullVec<ReviewReason>)]
     pub review_reasons: Vec<ReviewReason>,
     pub workflow_id: WorkflowId,
     pub scoped_vault_id: ScopedVaultId,

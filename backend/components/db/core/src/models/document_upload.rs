@@ -1,4 +1,4 @@
-use crate::{DbResult, PgConn, TxnPgConn};
+use crate::{DbResult, NonNullVec, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::document_upload;
 use diesel::{
@@ -27,6 +27,7 @@ pub struct DocumentUpload {
     /// The seqno at which the image was uploaded to the vault
     pub created_seqno: DataLifetimeSeqno,
     /// When non-empty, the reasons why the image could not be verified
+    #[diesel(deserialize_as = NonNullVec<IncodeFailureReason>)]
     pub failure_reasons: Vec<IncodeFailureReason>,
     /// Client-provided (so cannot always be trusted) flag that tells if the upload was captured
     /// via Android instant app

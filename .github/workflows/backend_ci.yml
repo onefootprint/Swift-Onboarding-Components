@@ -189,7 +189,7 @@ jobs:
           edit-mode: replace
 
       - name: Install diesel cli
-        run: cargo install diesel_cli --version 1.4.1 --no-default-features --features postgres
+        run: cargo install diesel_cli --version 2.0.0 --no-default-features --features postgres
 
       - name: Check valid db migrations
         working-directory: ./backend/components/db/schema

@@ -37,6 +37,9 @@ pub use db_schema::schema;
 mod cleanup;
 pub use cleanup::*;
 
+mod non_null_array;
+pub use non_null_array::*;
+
 // Old tests
 #[cfg(test)]
 mod test;

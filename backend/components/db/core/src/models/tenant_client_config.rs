@@ -1,4 +1,4 @@
-use crate::{DbResult, PgConn, TxnPgConn};
+use crate::{DbResult, NonNullVec, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::tenant_client_config;
 use diesel::{ExpressionMethods, Insertable, OptionalExtension, QueryDsl, Queryable, RunQueryDsl};
@@ -11,6 +11,7 @@ pub struct TenantClientConfig {
     pub tenant_id: TenantId,
     pub is_live: bool,
     pub deactivated_at: Option<DateTime<Utc>>,
+    #[diesel(deserialize_as = NonNullVec<String>)]
     pub allowed_origins: Vec<String>,
 }
 

@@ -12,5 +12,5 @@ testing = []
 
 [dependencies]
 # i-implement-a-third-party-backend-and-opt-into-breaking-changes only needed for our InstrumentedPgConnection
-diesel = { workspace = true, features = ["extras", "uuid", "postgres", "i-implement-a-third-party-backend-and-opt-into-breaking-changes" ] }
+diesel = { workspace = true }
 diesel_migrations = { workspace = true }

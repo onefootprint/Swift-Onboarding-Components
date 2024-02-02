@@ -1,4 +1,4 @@
-use crate::{DbResult, PgConn};
+use crate::{DbResult, NonNullVec, PgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::access_event;
 use diesel::{dsl::count_distinct, prelude::*, Insertable, Queryable, RunQueryDsl};
@@ -24,6 +24,7 @@ pub struct AccessEvent {
     pub principal: DbActor,
     pub ordering_id: i64,
     pub kind: AccessEventKind,
+    #[diesel(deserialize_as = NonNullVec<DataIdentifier>)]
     pub targets: Vec<DataIdentifier>,
     /// Denormalized from scoped_vault for faster querying
     pub tenant_id: TenantId,

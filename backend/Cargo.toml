@@ -80,7 +80,7 @@ rust_decimal = "1.32"
 uuid = { version = "1.1.2", features = ["serde", "v4"] }
 
 # diesel
-diesel = { version = "2.0.2", features = ["extras", "uuid", "postgres"] }
+diesel = { version = "2.0.2", features = ["extras", "uuid", "postgres", "i-implement-a-third-party-backend-and-opt-into-breaking-changes"] }
 diesel-derive-newtype = "2.0.0-rc.0"
 diesel_migrations = "2.0.0"
 

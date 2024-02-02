@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{DbResult, PgConn, TxnPgConn};
+use crate::{DbResult, OptionalNonNullVec, PgConn, TxnPgConn};
 use chrono::{DateTime, Duration, Utc};
 use db_schema::schema::{ob_configuration, scoped_vault, task, vault, watchlist_check, workflow};
 use diesel::{
@@ -25,6 +25,7 @@ pub struct WatchlistCheck {
     pub decision_intent_id: Option<DecisionIntentId>,
     pub status: WatchlistCheckStatusKind,
     pub logic_git_hash: Option<String>, // written when status is updated to Pass, Fail, or Error
+    #[diesel(deserialize_as = OptionalNonNullVec<FootprintReasonCode>)]
     pub reason_codes: Option<Vec<FootprintReasonCode>>,
     pub completed_at: Option<DateTime<Utc>>,
     pub status_details: WatchlistCheckStatus,
