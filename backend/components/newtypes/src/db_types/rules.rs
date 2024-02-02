@@ -1,4 +1,7 @@
-use crate::{util::impl_enum_str_diesel, DecisionStatus, DocKind};
+use crate::{
+    util::{impl_enum_str_diesel, impl_enum_string_diesel},
+    DecisionStatus, DocKind,
+};
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
@@ -33,17 +36,7 @@ pub enum RuleAction {
 
 impl RuleAction {
     pub fn identity_stepup() -> Self {
-        Self::StepUp(StepUpKind::default())
-    }
-}
-
-// We need to manually implement AsRef<str> since diesel uses this
-// and strum doesn't actually use our custom Display impl if we derive AsRefStr
-impl AsRef<str> for RuleAction {
-    fn as_ref(&self) -> &str {
-        let s = self.to_string();
-
-        s.leak()
+        Self::StepUp(StepUpKind::Identity)
     }
 }
 
@@ -123,7 +116,7 @@ impl std::str::FromStr for RuleAction {
     }
 }
 
-impl_enum_str_diesel!(RuleAction);
+impl_enum_string_diesel!(RuleAction);
 
 impl From<&RuleAction> for DecisionStatus {
     fn from(value: &RuleAction) -> Self {
