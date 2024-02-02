@@ -30,8 +30,10 @@ export async function CreateWorkerTasks(
         g.buckets,
         g.assetCdn,
         nitroService,
-        'fpc-worker',
-        [`worker.name:${worker.name}`],
+        new Map([
+          ['component', 'worker'],
+          ['worker.name', worker.name],
+        ]),
         worker.name,
         worker.args,
       );

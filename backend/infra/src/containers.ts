@@ -37,8 +37,7 @@ export abstract class ServiceContainers {
     s3Buckets: s3.ServiceS3Buckets,
     assetsCdn: assets.AssetCdn,
     nitroService: NitroServiceOutput,
-    otelServiceName: string,
-    otelExtraAttributes: string[],
+    otelExtraAttributes: Map<string, string>,
     logGroupComponent: string,
     containerArgs: string[],
   ): Promise<ContainersOutput> {
@@ -71,7 +70,6 @@ export abstract class ServiceContainers {
       s3Buckets,
       assetsCdn,
       nitroService,
-      otelServiceName,
       otelExtraAttributes,
       logGroupComponent,
       containerArgs,
@@ -106,8 +104,7 @@ export abstract class ServiceContainers {
     s3Buckets: s3.ServiceS3Buckets,
     assetsCdn: assets.AssetCdn,
     nitroService: NitroServiceOutput,
-    otelServiceName: string,
-    otelExtraAttributes: string[],
+    otelExtraAttributes: Map<string, string>,
     logGroupComponent: string,
     containerArgs: string[],
   ): Promise<pulumi.Output<aws.ecs.ContainerDefinition>> {
@@ -477,10 +474,14 @@ export abstract class ServiceContainers {
               {
                 name: 'OTEL_RESOURCE_ATTRIBUTES',
                 value: [
-                  `service.name=${otelServiceName}`,
+                  // Using fpc-api as the service name for crons and workers
+                  // too so they are grouped under the same Honeycomb dataset.
+                  `service.name=fpc-api`,
                   `service.version=1.0`,
                   `deployment.environment=${pulumi.getStack()}`,
-                  ...otelExtraAttributes,
+                  ...Array.from(otelExtraAttributes.entries()).map(
+                    ([k, v]) => `${k}=${v}`,
+                  ),
                 ].join(','),
               },
               {
