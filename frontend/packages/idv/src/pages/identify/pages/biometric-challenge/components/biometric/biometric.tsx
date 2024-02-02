@@ -1,4 +1,3 @@
-import { useRequestErrorToast } from '@onefootprint/hooks';
 import { IcoFaceid24 } from '@onefootprint/icons';
 import { getErrorMessage } from '@onefootprint/request';
 import type { Identifier, LoginChallengeResponse } from '@onefootprint/types';
@@ -9,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 import useIdentifyVerify from '../../../../../../hooks/api/hosted/identify/use-identify-verify';
 import useLoginChallenge from '../../../../../../hooks/api/hosted/identify/use-login-challenge';
+import useIdvRequestErrorToast from '../../../../../../hooks/ui/use-idv-request-error-toast';
 import getBiometricChallengeResponse from '../../../../../../utils/get-biometric-challenge-response';
 import Logger from '../../../../../../utils/logger';
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
@@ -22,7 +22,7 @@ const Biometric = () => {
     identify: { successfulIdentifier, sandboxId },
     obConfigAuth,
   } = state.context;
-  const showRequestErrorToast = useRequestErrorToast();
+  const showRequestErrorToast = useIdvRequestErrorToast();
   const toast = useToast();
   const loginChallengeMutation = useLoginChallenge();
   const identifyVerifyMutation = useIdentifyVerify();

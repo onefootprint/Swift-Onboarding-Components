@@ -1,4 +1,4 @@
-import { getErrorMessage } from '@onefootprint/request';
+import { useRequestError } from '@onefootprint/request';
 import type { IdDocImageTypes, ProcessDocResponse } from '@onefootprint/types';
 import { IdDocImageProcessingError } from '@onefootprint/types';
 import { Box, Typography } from '@onefootprint/ui';
@@ -12,16 +12,14 @@ import Loading from '../../components/loading';
 import NextSide from '../../components/next-side';
 import RetryLimitExceeded from '../../components/retry-limit-exceeded';
 import Success from '../../components/success';
-import {
-  NOT_PENDING_UPLOAD_ERROR,
-  SLOW_CONNECTION_MESSAGE_TIMEOUT,
-} from '../../constants/processing.constants';
+import SLOW_CONNECTION_MESSAGE_TIMEOUT from '../../constants/processing.constants';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import useProcessDoc from '../../hooks/use-process-doc';
 import useSubmitDoc from '../../hooks/use-submit-doc';
 
 const Processing = () => {
   const { t } = useTranslation('idv', { keyPrefix: 'id-doc.pages.processing' });
+  const { getErrorMessage, getErrorCode } = useRequestError();
   const [state, send] = useIdDocMachine();
   const submitDocMutation = useSubmitDoc();
   const processDocMutation = useProcessDoc();
@@ -95,13 +93,14 @@ const Processing = () => {
 
   const handleSubmitDocError = (error: unknown) => {
     const errorMessage = getErrorMessage(error);
+    const errorCode = getErrorCode(error);
 
     // This part of code may seem a little counter-intuitive
     // Sometimes the processing request might erroneously fail although BE successfully processes it
     // In those case we ask the user to upload the doc again which fails with the following error message
     // In reality the user completed the flow and should be able to move on in such cases
     // This piece of code ensures that
-    if (errorMessage === NOT_PENDING_UPLOAD_ERROR) {
+    if (errorCode === 'E109') {
       setNextSide(undefined);
       setMode('success');
       return;

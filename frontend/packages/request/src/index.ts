@@ -1,2 +1,16 @@
+export { default as enRequestJson } from './config/locales/en/request.json';
+export type {
+  FootprintServerError,
+  PaginatedRequestResponse,
+  RequestError,
+} from './request';
 export { default } from './request';
-export * from './request';
+export {
+  getErrorMessage,
+  isFootprintError,
+  isFootprintServerError,
+  isLogoutError,
+  isUnhandledError,
+  requestWithoutCaseConverter,
+  useRequestError,
+} from './request';

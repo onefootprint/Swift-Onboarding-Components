@@ -1,4 +1,3 @@
-import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import { Button } from '@onefootprint/ui';
@@ -8,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
 import { LAYOUT_CONTAINER_ID } from '../../../../components/layout/constants';
+import useIdvRequestErrorToast from '../../../../hooks/ui/use-idv-request-error-toast';
 import Logger from '../../../../utils/logger';
 import type { ImageConsentHandler } from '../../components/image-consent';
 import ImageConsent from '../../components/image-consent';
@@ -21,7 +21,7 @@ const DesktopConsent = () => {
   const [state, send] = useIdDocMachine();
   const { authToken } = state.context;
   const consentMutation = useConsent();
-  const requestErrorToast = useRequestErrorToast();
+  const requestErrorToast = useIdvRequestErrorToast();
   const consentRef = useRef<ImageConsentHandler>(null);
   const [fullyScrolled, setFullyScrolled] = useState(false);
 

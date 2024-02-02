@@ -1,3 +1,4 @@
+import type { enRequestJson as requestResource } from '@onefootprint/request';
 import type { enUiJson as uiResource } from '@onefootprint/ui';
 
 import type businessesResource from '../config/locales/en/businesses.json';
@@ -17,6 +18,7 @@ declare module 'i18next' {
       'domain-restrictions': typeof domainRestrictionsResource;
       internal: typeof internalResource;
       users: typeof usersResource;
+      request: typeof requestResource;
     };
   }
 }

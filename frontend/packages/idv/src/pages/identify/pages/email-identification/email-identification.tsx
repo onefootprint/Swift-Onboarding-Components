@@ -1,4 +1,3 @@
-import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { IdentifyResponse } from '@onefootprint/types';
 import React from 'react';
@@ -6,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { EmailForm, LegalFooter, StepHeader } from '../../../../components';
 import useIdentify from '../../../../hooks/api/hosted/identify/use-identify';
+import useIdvRequestErrorToast from '../../../../hooks/ui/use-idv-request-error-toast';
 import Logger from '../../../../utils/logger';
 import { useIdentifyMachine } from '../../components/machine-provider';
 import SandboxOutcomeFooter from '../../components/sandbox-outcome-footer';
@@ -28,7 +28,7 @@ const EmailIdentification = () => {
   } = state.context;
   const identifyMutation = useIdentify();
   const { isLoading } = identifyMutation;
-  const showRequestErrorToast = useRequestErrorToast();
+  const showRequestErrorToast = useIdvRequestErrorToast();
 
   const handleSubmit = (formData: FormData) => {
     const { email: emailFromForm } = formData;

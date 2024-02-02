@@ -8,9 +8,9 @@
   "license": "MIT",
   "scripts": {
     "i18n:sync": "../../scripts/i18n/i18n-sync.sh",
-    "i18n:copy": "../../scripts/i18n/i18n-copy.sh -dep ui",
-    "i18n:copy-watch": "../../scripts/i18n/i18n-copy.sh --watch -dep ui",
-    "i18n:copy-en": "../../scripts/i18n/i18n-copy.sh -lng en -dep ui",
+    "i18n:copy": "../../scripts/i18n/i18n-copy.sh -dep ui,request",
+    "i18n:copy-watch": "../../scripts/i18n/i18n-copy.sh --watch -dep ui,request",
+    "i18n:copy-en": "../../scripts/i18n/i18n-copy.sh -lng en -dep ui,request",
     "i18n:clean": "rm -rf ./public/locales/",
     "test": "jest --coverage --passWithNoTests",
     "test:ci": "jest --ci --bail --runInBand",

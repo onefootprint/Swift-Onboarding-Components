@@ -1,4 +1,3 @@
-import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { IdDI } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
@@ -6,6 +5,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ConfirmCollectedData } from '../../../../components/confirm-collected-data';
+import useIdvRequestErrorToast from '../../../../hooks/ui/use-idv-request-error-toast';
 import Logger from '../../../../utils/logger';
 import getCurrentStepFromMissingAttributes from '../../components/navigation-header/utils/current-step-from-missing-attributes';
 import useCollectKycDataMachine from '../../hooks/use-collect-kyc-data-machine';
@@ -21,7 +21,7 @@ import LegalStatusSection from './components/legal-status-section';
 
 const Confirm = () => {
   const { t } = useTranslation('idv', { keyPrefix: 'kyc.pages.confirm' });
-  const showRequestErrorToast = useRequestErrorToast();
+  const showRequestErrorToast = useIdvRequestErrorToast();
   const [state, send] = useCollectKycDataMachine();
   const { authToken, data, requirement, initialData } = state.context;
   const { mutation: syncDataMutation, syncData } = useSyncData();

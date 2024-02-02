@@ -1,6 +1,9 @@
 {
   "global": {
     "errors": {
+      "error-toast": {
+        "title": "¡Ay, no!"
+      },
       "uncaught-error": {
         "title": "¡Ups! Ha ocurrido un error.",
         "description": "Lo sentimos. Por favor, vuelva a intentarlo.",

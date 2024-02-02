@@ -33,7 +33,7 @@ const useUpdateAllowedDomains = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(['allowed-domains']);
     },
-    onError: showError,
+    onError: err => showError(err),
   });
 };
 

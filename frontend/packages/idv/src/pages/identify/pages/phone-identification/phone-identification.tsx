@@ -1,5 +1,4 @@
 import { COUNTRIES } from '@onefootprint/global-constants';
-import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { CountryCode, IdentifyResponse } from '@onefootprint/types';
 import { Stack } from '@onefootprint/ui';
@@ -10,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { EmailPreview, PhoneForm, StepHeader } from '../../../../components';
 import { useL10nContext } from '../../../../components/l10n-provider';
 import useIdentify from '../../../../hooks/api/hosted/identify/use-identify';
+import useIdvRequestErrorToast from '../../../../hooks/ui/use-idv-request-error-toast';
 import checkIsPhoneValid from '../../../../utils/check-is-phone-valid';
 import { useIdentifyMachine } from '../../components/machine-provider';
 import SandboxOutcomeFooter from '../../components/sandbox-outcome-footer';
@@ -28,7 +28,7 @@ const PhoneIdentification = () => {
     config: { logoUrl, orgName, isLive },
   } = state.context;
   const identifyMutation = useIdentify();
-  const showRequestErrorToast = useRequestErrorToast();
+  const showRequestErrorToast = useIdvRequestErrorToast();
   const { t } = useTranslation('idv', {
     keyPrefix: 'identify.pages.phone-identification',
   });

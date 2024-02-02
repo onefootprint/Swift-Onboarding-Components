@@ -1,6 +1,5 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
 import { COUNTRIES, DEFAULT_COUNTRY } from '@onefootprint/global-constants';
-import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import type { CountryCode, SubmitDocTypeResponse } from '@onefootprint/types';
@@ -23,6 +22,7 @@ import { useL10nContext } from '../../../../../components/l10n-provider';
 import HeaderTitle from '../../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../../components/layout/components/navigation-header';
 import StickyBottomBox from '../../../../../components/layout/components/sticky-bottom-box/sticky-bottom-box';
+import useIdvRequestErrorToast from '../../../../../hooks/ui/use-idv-request-error-toast';
 import Logger from '../../../../../utils/logger';
 import ConsentMobile from '../../../components/id-doc-photo-prompt/components/consent-mobile';
 import { useIdDocMachine } from '../../../components/machine-provider';
@@ -89,7 +89,7 @@ const IdDocCountryAndTypeContainer = ({
   );
   const { type: deviceType } = device;
 
-  const requestErrorToast = useRequestErrorToast();
+  const requestErrorToast = useIdvRequestErrorToast();
   const [country, setCountry] = useState<CountryRecord>(
     getCountryFromCode(defaultCountry) ?? defaultSupportedCountry,
   );

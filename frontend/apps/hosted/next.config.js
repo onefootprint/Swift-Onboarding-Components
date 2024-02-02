@@ -109,15 +109,18 @@ module.exports = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 's-maxage=1, stale-while-revalidate=59 must-revalidate',
+            value:
+              'public, maxage=1, s-maxage=1, stale-while-revalidate=59 must-revalidate',
           },
           {
             key: 'CDN-Cache-Control',
-            value: 's-maxage=1, stale-while-revalidate=59 must-revalidate',
+            value:
+              'public, maxage=1, s-maxage=1, stale-while-revalidate=59 must-revalidate',
           },
           {
             key: 'Vercel-CDN-Cache-Control',
-            value: 's-maxage=1, stale-while-revalidate=59 must-revalidate',
+            value:
+              'public, maxage=1, s-maxage=1, stale-while-revalidate=59 must-revalidate',
           },
         ],
       },

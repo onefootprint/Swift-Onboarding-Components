@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "i18n:copy": "yarn i18n:copy-en",
-    "i18n:copy-watch": "../../scripts/i18n/i18n-copy.sh --watch -lng en -dep ui",
-    "i18n:copy-en": "../../scripts/i18n/i18n-copy.sh -lng en -dep ui",
+    "i18n:copy-watch": "../../scripts/i18n/i18n-copy.sh --watch -lng en -dep ui,request",
+    "i18n:copy-en": "../../scripts/i18n/i18n-copy.sh -lng en -dep ui,request",
     "i18n:clean": "rm -rf ./public/locales/",
     "dev": "yarn i18n:copy-watch & next dev -p 3002",
     "build": "next build",

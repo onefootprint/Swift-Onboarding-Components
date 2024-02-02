@@ -1,7 +1,7 @@
-import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 
 import { useUserEmail } from '../../../hooks';
+import useIdvRequestErrorToast from '../../../hooks/ui/use-idv-request-error-toast';
 import Logger from '../../../utils/logger';
 
 type SyncEmailArgs = {
@@ -14,7 +14,7 @@ type SyncEmailArgs = {
 
 const useSyncEmail = () => {
   const userEmailMutation = useUserEmail();
-  const showRequestErrorToast = useRequestErrorToast();
+  const showRequestErrorToast = useIdvRequestErrorToast();
 
   const syncEmail = ({
     authToken,

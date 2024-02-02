@@ -1,4 +1,4 @@
-import { getErrorMessage } from '@onefootprint/request';
+import { useRequestError } from '@onefootprint/request';
 import styled, { css } from '@onefootprint/styled';
 import type { IdDocImageTypes, ProcessDocResponse } from '@onefootprint/types';
 import { IdDocImageProcessingError } from '@onefootprint/types';
@@ -16,10 +16,7 @@ import Loading from '../../components/loading';
 import RetryLimitExceeded from '../../components/retry-limit-exceeded';
 import Success from '../../components/success';
 import DESKTOP_INTERACTION_BOX_HEIGHT from '../../constants/desktop-interaction-box.constants';
-import {
-  NOT_PENDING_UPLOAD_ERROR,
-  SLOW_CONNECTION_MESSAGE_TIMEOUT,
-} from '../../constants/processing.constants';
+import SLOW_CONNECTION_MESSAGE_TIMEOUT from '../../constants/processing.constants';
 import useIdDocMachine from '../../hooks/use-id-doc-machine';
 import useProcessDoc from '../../hooks/use-process-doc';
 import useSubmitDoc from '../../hooks/use-submit-doc';
@@ -28,6 +25,7 @@ const DeskTopProcessing = () => {
   const { t } = useTranslation('idv', {
     keyPrefix: 'id-doc.pages.desktop-processing',
   });
+  const { getErrorMessage, getErrorCode } = useRequestError();
   const [state, send] = useIdDocMachine();
   const submitDocMutation = useSubmitDoc();
   const processDocMutation = useProcessDoc();
@@ -100,6 +98,7 @@ const DeskTopProcessing = () => {
   };
 
   const handleSubmitDocError = (error: unknown) => {
+    const errorCode = getErrorCode(error);
     const errorMessage = getErrorMessage(error);
 
     // This part of code may seem a little counter-intuitive
@@ -107,7 +106,7 @@ const DeskTopProcessing = () => {
     // In those case we ask the user to upload the doc again which fails with the following error message
     // In reality the user completed the flow and should be able to move on in such cases
     // This piece of code ensures that
-    if (errorMessage === NOT_PENDING_UPLOAD_ERROR) {
+    if (errorCode === 'E109') {
       setNextSide(undefined);
       setMode('success');
       return;

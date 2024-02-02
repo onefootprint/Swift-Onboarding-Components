@@ -14,7 +14,7 @@ const configureReactI18next = () => {
     },
     lng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'ui'],
+    ns: ['common', 'ui', 'request'],
     returnNull: false,
     interpolation: {
       escapeValue: false,

@@ -1,4 +1,3 @@
-import { useRequestErrorToast } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type {
   ChallengeData,
@@ -17,6 +16,7 @@ import { useEffectOnce } from 'usehooks-ts';
 import useIdentifyVerify from '../../../../hooks/api/hosted/identify/use-identify-verify';
 import useLoginChallenge from '../../../../hooks/api/hosted/identify/use-login-challenge';
 import useSignupChallenge from '../../../../hooks/api/hosted/identify/use-signup-challenge';
+import useIdvRequestErrorToast from '../../../../hooks/ui/use-idv-request-error-toast';
 import Logger from '../../../../utils/logger';
 import { useIdentifyMachine } from '../machine-provider';
 import Form from './components/form';
@@ -53,7 +53,7 @@ const PinVerification = ({
     obConfigAuth,
   } = state.context;
   const toast = useToast();
-  const showRequestErrorToast = useRequestErrorToast();
+  const showRequestErrorToast = useIdvRequestErrorToast();
 
   const loginChallengeMutation = useLoginChallenge();
   const signupChallengeMutation = useSignupChallenge();

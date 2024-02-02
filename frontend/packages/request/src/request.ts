@@ -3,7 +3,10 @@ import { DataIdentifierKeys } from '@onefootprint/types';
 import type { AxiosError, AxiosRequestConfig } from 'axios';
 import axios from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
+import { useTranslation } from 'react-i18next';
 
+const LOGOUT_ERROR_CODES = ['E117', 'E118', 'E119'];
+// TODO (belce): retire matching on exact error string
 const LOGOUT_ERRORS = [
   'Session does not exist',
   'Session is expired',
@@ -12,6 +15,8 @@ const LOGOUT_ERRORS = [
 
 export type FootprintServerError = {
   message: string;
+  errorCode?: string; // Translation code for resolving the erorr to the correct language
+  errorContext?: Record<string, string>; // Additional data needed to resolve the error string
   statusCode: number;
   supportId: string;
 };
@@ -47,10 +52,16 @@ export const isFootprintServerError = (
 
 export const isLogoutError = (error: unknown) => {
   const serverError = isFootprintServerError(error);
-  return !!(
-    serverError?.statusCode === 401 &&
-    LOGOUT_ERRORS.some(e => serverError?.message?.includes(e))
+  if (serverError?.statusCode !== 401) {
+    return false;
+  }
+  const codeMatches = LOGOUT_ERROR_CODES.some(
+    code => serverError?.errorCode === code,
   );
+  const messageMatches = LOGOUT_ERRORS.some(
+    e => serverError?.message?.includes(e),
+  );
+  return codeMatches || messageMatches;
 };
 
 export const getErrorMessage = (error?: unknown | Error): string => {
@@ -66,6 +77,57 @@ export const getErrorMessage = (error?: unknown | Error): string => {
     return error.message;
   }
   return 'Something went wrong';
+};
+
+export const useRequestError = () => {
+  const { t, i18n } = useTranslation('request', {
+    keyPrefix: 'errors',
+  });
+
+  const isValidErrorCode = (code?: string) =>
+    !!code?.match(/^E[0-9]+$/g) && i18n.exists(`request:errors.${code}`);
+
+  const getMessage = (error?: unknown | Error): string => {
+    if (typeof error === 'string') {
+      return error;
+    }
+    const unknownError = t('unknown');
+    if (isFootprintError(error)) {
+      const data = error?.response?.data?.error;
+      const errorCode = data?.errorCode;
+      const errorContext = data?.errorContext;
+      const errorMessage = data?.message;
+
+      if (!errorCode || !isValidErrorCode(errorCode)) {
+        return errorMessage ?? unknownError;
+      }
+      if (!errorContext) {
+        // @ts-ignore:next-line
+        return t(errorCode) ?? unknownError;
+      }
+      // @ts-ignore:next-line
+      return t(errorCode, errorContext) ?? unknownError;
+    }
+
+    if (isUnhandledError(error)) {
+      return error.message;
+    }
+    return unknownError;
+  };
+
+  const getCode = (error?: unknown | Error): string | undefined => {
+    if (!error || !isFootprintError(error)) {
+      return undefined;
+    }
+    const data = error?.response?.data?.error;
+    const errorCode = data?.errorCode;
+    if (errorCode && isValidErrorCode(errorCode)) {
+      return errorCode;
+    }
+    return undefined;
+  };
+
+  return { getErrorMessage: getMessage, getErrorCode: getCode };
 };
 
 const getRequestOptions = (
