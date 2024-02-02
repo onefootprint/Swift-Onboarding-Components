@@ -74,11 +74,8 @@ impl RuleAction {
 pub enum StepUpKind {
     #[default]
     Identity,
-    ProofOfSsn,
     ProofOfAddress,
     IdentityProofOfSsn,
-    IdentityProofOfAddress,
-    ProofOfSsnProofOfAddress,
     IdentityProofOfSsnProofOfAddress,
 }
 
@@ -86,11 +83,8 @@ impl StepUpKind {
     pub fn to_doc_kinds(&self) -> Vec<DocKind> {
         match self {
             StepUpKind::Identity => vec![DocKind::Identity],
-            StepUpKind::ProofOfSsn => vec![DocKind::ProofOfSsn],
             StepUpKind::ProofOfAddress => vec![DocKind::ProofOfAddress],
             StepUpKind::IdentityProofOfSsn => vec![DocKind::Identity, DocKind::ProofOfSsn],
-            StepUpKind::IdentityProofOfAddress => vec![DocKind::Identity, DocKind::ProofOfAddress],
-            StepUpKind::ProofOfSsnProofOfAddress => vec![DocKind::ProofOfSsn, DocKind::ProofOfAddress],
             StepUpKind::IdentityProofOfSsnProofOfAddress => {
                 vec![DocKind::Identity, DocKind::ProofOfSsn, DocKind::ProofOfAddress]
             }
@@ -232,19 +226,18 @@ crate::util::impl_enum_string_diesel!(RuleSetResultKind);
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::str::FromStr;
+    use std::{cmp::Ordering, str::FromStr};
     use test_case::test_case;
 
     #[test_case(RuleAction::Fail, "fail")]
     #[test_case(RuleAction::ManualReview, "manual_review")]
     #[test_case(RuleAction::PassWithManualReview, "pass_with_manual_review")]
     #[test_case(RuleAction::StepUp(StepUpKind::default()), "step_up.identity")]
-    #[test_case(
-        RuleAction::StepUp(StepUpKind::IdentityProofOfAddress),
-        "step_up.identity_proof_of_address"
-    )]
     #[test_case(RuleAction::StepUp(StepUpKind::ProofOfAddress), "step_up.proof_of_address")]
-    #[test_case(RuleAction::StepUp(StepUpKind::ProofOfSsn), "step_up.proof_of_ssn")]
+    #[test_case(
+        RuleAction::StepUp(StepUpKind::IdentityProofOfSsn),
+        "step_up.identity_proof_of_ssn"
+    )]
     #[test_case(
         RuleAction::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress),
         "step_up.identity_proof_of_ssn_proof_of_address"
@@ -277,7 +270,20 @@ mod tests {
         let expected = ra_iter_len + suk_iter_len;
 
 
-        assert_eq!(all_action_len, 10);
+        assert_eq!(all_action_len, 7);
         assert_eq!(all_action_len, expected);
+    }
+
+    // We take the max for rule eval
+    #[test_case(RuleAction::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress), RuleAction::StepUp(StepUpKind::IdentityProofOfSsn) => Ordering::Greater)]
+    #[test_case(RuleAction::StepUp(StepUpKind::IdentityProofOfSsn), RuleAction::StepUp(StepUpKind::ProofOfAddress) => Ordering::Greater)]
+    #[test_case(RuleAction::StepUp(StepUpKind::ProofOfAddress), RuleAction::StepUp(StepUpKind::Identity) => Ordering::Greater)]
+    #[test_case(RuleAction::Fail, RuleAction::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress) => Ordering::Greater)]
+    #[test_case(RuleAction::identity_stepup(), RuleAction::PassWithManualReview  => Ordering::Greater)]
+    #[test_case(RuleAction::ManualReview, RuleAction::PassWithManualReview  => Ordering::Greater)]
+    #[test_case(RuleAction::identity_stepup(), RuleAction::ManualReview => Ordering::Greater)]
+    #[test_case(RuleAction::Fail, RuleAction::identity_stepup() => Ordering::Greater)]
+    fn test_ra_cmp(ra1: RuleAction, ra2: RuleAction) -> Ordering {
+        ra1.cmp(&ra2)
     }
 }

@@ -592,7 +592,6 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
 #[test_state_case(StepUpKind::Identity)]
 #[test_state_case(StepUpKind::IdentityProofOfSsn)]
 #[test_state_case(StepUpKind::IdentityProofOfSsnProofOfAddress)]
-#[test_state_case(StepUpKind::ProofOfSsnProofOfAddress)]
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind) {
     // DATA SETUP

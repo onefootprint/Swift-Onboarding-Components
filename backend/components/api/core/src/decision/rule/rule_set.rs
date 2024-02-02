@@ -82,7 +82,6 @@ pub struct RulesResult {}
 mod tests {
     use super::*;
     use crate::decision::rule::test_fixtures::*;
-    use std::cmp::Ordering;
     use test_case::test_case;
 
     #[test_case(test_ruleset_a(), TestFeatures::new("hello") =>  RuleSetResult {
@@ -105,14 +104,5 @@ mod tests {
         })]
     fn test_rule_set(rule_set: RuleSet<TestFeatures>, input_data: TestFeatures) -> RuleSetResult {
         rule_set.evaluate(&input_data, true)
-    }
-
-    #[test_case(RuleAction::identity_stepup(), RuleAction::PassWithManualReview  => Ordering::Greater)]
-    #[test_case(RuleAction::ManualReview, RuleAction::PassWithManualReview  => Ordering::Greater)]
-    #[test_case(RuleAction::identity_stepup(), RuleAction::ManualReview => Ordering::Greater)]
-    #[test_case(RuleAction::Fail, RuleAction::identity_stepup() => Ordering::Greater)]
-    fn test_cmp_action_ordering(s1: RuleAction, s2: RuleAction) -> Ordering {
-        // Test ordering since we rely on it to extract minimum status
-        s1.cmp(&s2)
     }
 }

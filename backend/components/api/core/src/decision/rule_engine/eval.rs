@@ -333,7 +333,6 @@ pub mod tests {
         vec![DocKind::Identity], 
         vec![
             RA::StepUp(StepUpKind::Identity), 
-            RA::StepUp(StepUpKind::IdentityProofOfAddress), 
             RA::StepUp(StepUpKind::IdentityProofOfSsn), 
             RA::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress)
         ])]
@@ -341,11 +340,9 @@ pub mod tests {
         vec![DocKind::Identity, DocKind::ProofOfAddress], 
         vec![
             RA::StepUp(StepUpKind::Identity), 
-            RA::StepUp(StepUpKind::IdentityProofOfAddress), 
             RA::StepUp(StepUpKind::IdentityProofOfSsn), 
             RA::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress),
             RA::StepUp(StepUpKind::ProofOfAddress),
-            RA::StepUp(StepUpKind::ProofOfSsnProofOfAddress),
         ])]
     #[test_case(vec![], vec![])]
     #[test_case(
@@ -353,8 +350,6 @@ pub mod tests {
         vec![
             RA::StepUp(StepUpKind::IdentityProofOfSsn), 
             RA::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress),
-            RA::StepUp(StepUpKind::ProofOfSsn),
-            RA::StepUp(StepUpKind::ProofOfSsnProofOfAddress),
         ])]
     fn test_rule_eval_config(doc_kinds: Vec<DocKind>, expected_disallowed_rule_actions: Vec<RuleAction>) {
         let rc = RuleEvalConfig::new(doc_kinds);
