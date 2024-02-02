@@ -1,6 +1,6 @@
 use db::{
     models::{
-        decision_intent::DecisionIntent, document_request::DocumentRequest,
+        decision_intent::DecisionIntent,
         ob_configuration::ObConfiguration, risk_signal::NewRiskSignalInfo, scoped_vault::ScopedVault,
         workflow::Workflow,
     },
@@ -8,7 +8,7 @@ use db::{
 };
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
-    CipKind, DecisionIntentKind, DecisionStatus, DocumentRequestKind, FootprintReasonCode, ReviewReason,
+    CipKind, DecisionIntentKind, DecisionStatus, FootprintReasonCode, ReviewReason,
     RuleSetResultKind, ScopedVaultId, TenantId, VendorAPI, VerificationResultId, WorkflowId,
 };
 
@@ -180,16 +180,14 @@ pub fn evaluate_rules(
     rule_result_kind: RuleSetResultKind,
 ) -> ApiResult<Decision> {
     let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
-    let doc_collected = DocumentRequest::get(conn, &wf.id, DocumentRequestKind::Identity)?.is_some();
 
     rule_engine::engine::evaluate_workflow_decision(
         conn,
         &wf.scoped_vault_id,
         &obc.id,
-        Some(&wf.id),
+        &wf.id,
         rule_result_kind,
         risk_signals.risk_signals,
-        doc_collected,
         is_fixture,
     )
 }

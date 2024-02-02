@@ -82,6 +82,14 @@ impl DocumentRequest {
             .optional()?;
         Ok(result)
     }
+    
+    #[tracing::instrument("DocumentRequest::get_all", skip_all)]
+    pub fn get_all(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Vec<Self>> {
+        let result = document_request::table
+            .filter(document_request::workflow_id.eq(wf_id))
+            .get_results(conn)?;
+        Ok(result)
+    }
 
     #[tracing::instrument("DocumentRequest::get_or_create", skip_all)]
     pub fn get_or_create(conn: &mut TxnPgConn, args: NewDocumentRequestArgs) -> DbResult<Self> {
@@ -92,7 +100,10 @@ impl DocumentRequest {
             Self::create(conn, args)
         }
     }
+
+   
 }
+
 
 #[derive(Debug, Clone)]
 pub struct NewDocumentRequestArgs {

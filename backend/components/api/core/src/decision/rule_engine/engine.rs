@@ -10,16 +10,12 @@ use crate::{
 };
 use db::{
     models::{
-        ob_configuration::ObConfiguration,
-        risk_signal::RiskSignal,
-        rule_instance::RuleInstance,
-        rule_result::RuleResult,
-        rule_set_result::{NewRuleResultArgs, NewRuleSetResultArgs, RuleSetResult},
+        document_request::DocumentRequest, ob_configuration::ObConfiguration, risk_signal::RiskSignal, rule_instance::RuleInstance, rule_result::RuleResult, rule_set_result::{NewRuleResultArgs, NewRuleSetResultArgs, RuleSetResult}
     },
     TxnPgConn,
 };
 use itertools::Itertools;
-use newtypes::{ObConfigurationId, RiskSignalGroupKind, RuleSetResultKind, ScopedVaultId, WorkflowId};
+use newtypes::{DocumentRequestKind, ObConfigurationId, RiskSignalGroupKind, RuleSetResultKind, ScopedVaultId, WorkflowId};
 
 #[allow(clippy::too_many_arguments)]
 #[tracing::instrument(skip_all)]
@@ -27,12 +23,14 @@ pub fn evaluate_workflow_decision(
     conn: &mut TxnPgConn,
     sv_id: &ScopedVaultId,
     obc_id: &ObConfigurationId,
-    wf_id: Option<&WorkflowId>,
+    wf_id: &WorkflowId,
     kind: RuleSetResultKind,
     risk_signals: HashMap<RiskSignalGroupKind, Vec<RiskSignal>>,
-    doc_collected: bool, // could maybe query for DocReq in here and not need to pass this in
     is_fixture: bool,
 ) -> ApiResult<Decision> {
+    let doc_reqs = DocumentRequest::get_all(conn, wf_id)?;
+    let doc_collected = doc_reqs.iter().any(|dr| matches!(dr.kind, DocumentRequestKind::Identity));
+
     if doc_collected
         && !risk_signals
             .get(&RiskSignalGroupKind::Doc)
@@ -41,7 +39,7 @@ pub fn evaluate_workflow_decision(
     {
         return Err(crate::decision::Error::from(RuleError::MissingInputForDocRules).into());
     }
-
+    
     let risk_signals: Vec<_> = risk_signals
         .iter()
         // current logic is that we do not evaluate Doc rules if a doc was not collected stricly as part of the current workflow
@@ -49,7 +47,7 @@ pub fn evaluate_workflow_decision(
         .filter(|(k, _)| doc_collected || !matches!(k, RiskSignalGroupKind::Doc)).flat_map(|(_, v)| v.clone()).collect();
 
     let (rule_set_result, _rule_results) =
-        evaluate_rules(conn, sv_id, obc_id, wf_id, kind, &risk_signals, doc_collected)?;
+        evaluate_rules(conn, sv_id, obc_id, Some(wf_id), kind, &risk_signals, doc_collected)?;
 
     let should_commit_rules: Vec<_> = [base_kyc_rules(), super::default_rules::ssn_rules()]
         .concat()
