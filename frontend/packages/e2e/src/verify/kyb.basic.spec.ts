@@ -117,7 +117,7 @@ test('E2E.KYB.flow #ci', async ({ browser, browserName, page, isMobile }) => {
 
   const dobField = frame.getByLabel('Date of Birth').first();
   await dobField.waitFor({ state: 'attached', timeout: 3000 });
-  await dobField.type(dob, { delay: 100 });
+  await dobField.fill(dob, { timeout: 200 });
 
   await clickOnContinue({ frame });
   await page.waitForLoadState();

@@ -98,7 +98,7 @@ export const fillPhoneNumber = async (
   const field = frame.getByLabel('Phone number').first();
   return field
     .waitFor(attachedState)
-    .then(() => field.type(payload.phoneNumber, { delay: 100 }))
+    .then(() => field.fill(payload.phoneNumber, { timeout: 200 }))
     .then(() => true)
     .catch(() => false);
 };
@@ -136,7 +136,7 @@ export const fillNameAndDoB = async (
   await frame
     .getByLabel('Date of Birth')
     .first()
-    .type(payload.dob, { delay: 100 });
+    .fill(payload.dob, { timeout: 200 });
 };
 
 export const fillBasicDataKYB = async (
@@ -155,7 +155,7 @@ export const fillBasicDataKYB = async (
   await frame
     .getByLabel('Taxpayer Identification Number (TIN)')
     .first()
-    .type(payload.userTIN, { delay: 100 });
+    .fill(payload.userTIN, { timeout: 200 });
 };
 
 export const fillAddress = async (
@@ -211,7 +211,7 @@ export const fillBeneficialOwners = async (
     .locator('input[name="beneficialOwners.0.ownership_stake"]')
     .first();
   await share0.clear();
-  await share0.type('50', { delay: 100 });
+  await share0.fill('50', { timeout: 200 });
 
   await frame.getByRole('button', { name: 'Add more' }).first().click();
 
@@ -230,19 +230,24 @@ export const fillBeneficialOwners = async (
   await frame
     .locator('input[name="beneficialOwners.1.phone_number"]')
     .first()
-    .type(payload.beneficialOwner1Phone, { delay: 100 });
+    .fill(payload.beneficialOwner1Phone, { timeout: 200 });
   const share1 = frame
     .locator('input[name="beneficialOwners.1.ownership_stake"]')
     .first();
   await share1.clear();
-  await share1.type('50', { delay: 100 });
+  await share1.fill('50', { timeout: 200 });
 };
 
 export const fillSSN = async (
   { frame }: WithFrame,
   payload: { ssn: string },
 ) => {
-  await frame.getByLabel('SSN').first().type(payload.ssn, { delay: 100 });
+  const field = frame.getByLabel('SSN').first();
+  await field
+    .waitFor(attachedState)
+    .then(() => field.fill(payload.ssn, { timeout: 200 }))
+    .then(() => true)
+    .catch(() => false);
 };
 
 export const confirmData = async (
