@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS vault_sandbox_id ON vault(sandbox_id) WHERE sandbox_id IS NOT NULL;

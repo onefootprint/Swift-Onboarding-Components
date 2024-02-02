@@ -400,6 +400,9 @@ impl Vault {
             .max_by_key(|(p, _)| *p)
             .map(|(_, v)| v);
 
+        if let Some(id) = highest_priority.as_ref().map(|v| &v.id) {
+            tracing::info!(vault_id=%id, "Found match");
+        }
         Ok(highest_priority)
     }
 }
