@@ -117,12 +117,8 @@ const Container = styled(Markdown)`
     }
 
     ol {
-      padding-left: ${theme.spacing[5]};
+      padding-left: ${theme.spacing[7]};
       list-style: octal;
-
-      ul {
-        margin-left: ${theme.spacing[7]};
-      }
 
       > li {
         margin-bottom: ${theme.spacing[7]};
@@ -136,6 +132,7 @@ const Container = styled(Markdown)`
 
     ul {
       list-style: disc;
+      padding-left: ${theme.spacing[7]};
     }
 
     pre > div {

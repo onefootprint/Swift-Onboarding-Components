@@ -75,7 +75,7 @@ curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/client_toke
 ```json
 {
   "expires_at": "2023-05-24T14:15:22Z",
-  "token": "tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0"
+  "token": "ctok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0"
 }
 ```
 
@@ -90,7 +90,7 @@ From your client-side app, vault the data directly to footprint:
 ```bash
 curl https://api.onefootprint.com/users/vault \
 	-X PATCH \
-    -H 'x-fp-authorization: tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0' \
+    -H 'x-fp-authorization: ctok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0' \
     -d '{
             "card.primary.number": "4242424242424242",
             "card.primary.cvc": "424",
@@ -135,7 +135,7 @@ curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/client_toke
 ```json
 {
   "expires_at": "2023-07-31T14:15:22Z",
-  "token": "tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0"
+  "token": "ctok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0"
 }
 ```
 
@@ -144,7 +144,7 @@ On your client, you can make a request to the decrypt endpoint using the token g
 ```bash
 curl https://api.onefootprint.com/users/vault/decrypt \
     -X POST \
-    -H 'x-fp-authorization: tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0' \
+    -H 'x-fp-authorization: ctok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0' \
     -d '{
         "fields": ["id.ssn9", "card.primary.number"]
       }'
@@ -182,12 +182,12 @@ curl https://api.onefootprint.com/users/fp_id_K0q6Eh6Rr3WOOfFBLPiHsr/client_toke
 ```json
 {
   "expires_at": "2023-07-31T14:15:22Z",
-  "token": "tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0"
+  "token": "ctok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0"
 }
 ```
 
 Now, the client can decrypt and download this object with a simple GET request. The response body will entirely comprise the contents of the object specified in `fields` above. This can easily be used by your frontend to download the contents directly to the user's device.
 
 ```bash
-curl https://api.onefootprint.com/users/vault/decrypt/tok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0
+curl https://api.onefootprint.com/users/vault/decrypt/ctok_vJK5Ze2N5fQ1GtE5V770BH8CZtQwXHF1hxowB9Nowh0
 ```
