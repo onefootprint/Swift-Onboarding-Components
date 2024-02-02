@@ -1,17 +1,15 @@
 import type { Icon } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { Typography } from '@onefootprint/ui';
-import { motion } from 'framer-motion';
-import React from 'react';
+import { Stack, Typography } from '@onefootprint/ui';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
 import { useTimeout } from 'usehooks-ts';
 
-import FeedbackIcon from './components/feedback-icon';
 import {
-  checkIconVariants,
-  firstIconContainerVariants,
-  firstTextContainerVariants,
-  secondIconContainerVariants,
-  secondTextContainerVariants,
+  firstIconVariantTransition,
+  firstTextVariantTransition,
+  secondIconVariantTransition,
+  secondTextVariantTransition,
 } from './transitions';
 
 type GenericTransitionProps = {
@@ -22,8 +20,10 @@ type GenericTransitionProps = {
   timeout: number;
   onAnimationEnd: () => void;
   isSecondaryBackground?: boolean;
-  showFeedbackIcon?: boolean;
 };
+
+const FIRST_ICON_DELAY = 2000;
+const SECOND_ICON_DELAY = 3500;
 
 const GenericTransition = ({
   firstText,
@@ -33,74 +33,94 @@ const GenericTransition = ({
   timeout,
   onAnimationEnd,
   isSecondaryBackground,
-  showFeedbackIcon,
 }: GenericTransitionProps) => {
-  const renderedFirstIcon = <IconFirst />;
-  const renderedSecondIcon = <IconSecond />;
-
   useTimeout(onAnimationEnd, timeout);
 
+  const [renderFirstIcon, setRenderFirstIcon] = useState(true);
+  const [renderSecondIcon, setRenderSecondIcon] = useState(false);
+
+  useEffect(() => {
+    const firstIconTimeout = setTimeout(() => {
+      setRenderFirstIcon(false);
+      setRenderSecondIcon(true);
+    }, FIRST_ICON_DELAY);
+
+    const secondIconTimeout = setTimeout(() => {
+      setRenderSecondIcon(false);
+      onAnimationEnd();
+    }, FIRST_ICON_DELAY + SECOND_ICON_DELAY);
+
+    return () => {
+      clearTimeout(firstIconTimeout);
+      clearTimeout(secondIconTimeout);
+    };
+  }, [onAnimationEnd]);
+
   return (
-    <AnimationWrapper isSecondaryBackground={isSecondaryBackground}>
-      <Icons>
-        <IconContainer
-          variants={firstIconContainerVariants}
-          initial="initial"
-          animate="animate"
-        >
-          {renderedFirstIcon}
-        </IconContainer>
-        {showFeedbackIcon && (
-          <FeedbackIconContainer
-            isSecondaryBackground={isSecondaryBackground}
-            variants={checkIconVariants}
-            initial="initial"
-            animate="animate"
-          >
-            <FeedbackIcon variant="success" />
-          </FeedbackIconContainer>
-        )}
-        <IconContainer
-          variants={secondIconContainerVariants}
-          initial="initial"
-          animate="animate"
-        >
-          {renderedSecondIcon}
-        </IconContainer>
-      </Icons>
-      <Text>
-        <TextContainer
-          variants={firstTextContainerVariants}
-          initial="initial"
-          animate="animate"
-        >
-          <Typography variant="label-2">{firstText}</Typography>
-        </TextContainer>
-        <TextContainer
-          variants={secondTextContainerVariants}
-          initial="initial"
-          animate="animate"
-        >
-          <Typography variant="label-2">{secondText}</Typography>
-        </TextContainer>
-      </Text>
+    <AnimationWrapper
+      gap={3}
+      direction="column"
+      align="center"
+      justify="center"
+      isSecondaryBackground={isSecondaryBackground}
+      height="100%"
+    >
+      <Stack height="60px" width="60px" display="column">
+        <AnimatePresence>
+          {renderFirstIcon ? (
+            <FeedbackIconContainer
+              key="first-icon-container"
+              variants={firstIconVariantTransition}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              isSecondaryBackground={isSecondaryBackground}
+            >
+              <IconFirst />
+            </FeedbackIconContainer>
+          ) : null}
+          {renderSecondIcon ? (
+            <FeedbackIconContainer
+              key="second-icon-container"
+              variants={secondIconVariantTransition}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              isSecondaryBackground={isSecondaryBackground}
+            >
+              <IconSecond />
+            </FeedbackIconContainer>
+          ) : null}
+        </AnimatePresence>
+      </Stack>
+      <Stack
+        minHeight="60px"
+        width="100%"
+        textAlign="center"
+        direction="column"
+      >
+        {renderFirstIcon ? (
+          <Stack as={motion.div} variants={firstTextVariantTransition}>
+            <Typography variant="label-1">{firstText}</Typography>
+          </Stack>
+        ) : null}
+        {renderSecondIcon ? (
+          <Stack as={motion.div} variants={secondTextVariantTransition}>
+            <Typography variant="label-1">{secondText}</Typography>
+          </Stack>
+        ) : null}
+      </Stack>
     </AnimationWrapper>
   );
 };
 
-const AnimationWrapper = styled(motion.div)<{
+const AnimationWrapper = styled(Stack)<{
   isSecondaryBackground?: boolean;
 }>`
   ${({ theme, isSecondaryBackground }) => css`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 100%;
-    gap: ${theme.spacing[4]};
-    padding: ${theme.spacing[3]};
-    padding-top: ${theme.spacing[9]};
-    align-items: center;
     overflow: hidden;
+    padding: ${theme.spacing[11]} ${theme.spacing[3]} ${theme.spacing[3]}
+      ${theme.spacing[3]};
     background-color: ${isSecondaryBackground
       ? theme.backgroundColor.secondary
       : theme.backgroundColor.primary};
@@ -111,11 +131,6 @@ const FeedbackIconContainer = styled(motion.div)<{
   isSecondaryBackground?: boolean;
 }>`
   ${({ theme, isSecondaryBackground }) => css`
-    position: absolute;
-    bottom: 2px;
-    right: -6px;
-    transform: translate(-50%, -50%);
-    z-index: 1;
     background-color: ${isSecondaryBackground
       ? theme.backgroundColor.secondary
       : theme.backgroundColor.primary};
@@ -125,47 +140,6 @@ const FeedbackIconContainer = styled(motion.div)<{
         ? theme.backgroundColor.secondary
         : theme.backgroundColor.primary};
   `}
-`;
-
-const Icons = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  isolation: isolate;
-  width: 60px;
-  height: 60px;
-`;
-
-const IconContainer = styled(motion.div)`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-
-  svg {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-`;
-
-const TextContainer = styled(motion.div)`
-  height: fit-content;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-`;
-
-const Text = styled.div`
-  width: 100%;
-  height: 24px;
-  position: relative;
-  text-align: center;
 `;
 
 export default GenericTransition;

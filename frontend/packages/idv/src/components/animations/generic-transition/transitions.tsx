@@ -1,78 +1,25 @@
-const STEP_DURATION = 1.5;
-const TRANSITION_DURATION = 0.2;
+import { easeIn, easeInOut } from 'framer-motion';
 
-export const firstIconContainerVariants = {
-  initial: {
-    opacity: 1,
-    y: 0,
-  },
-  animate: {
-    opacity: 0,
-    y: -10,
-    transition: {
-      delay: STEP_DURATION,
-      duration: TRANSITION_DURATION,
-      ease: 'easeOut',
-    },
-  },
+export const firstIconVariantTransition = {
+  initial: { y: 10, opacity: 1 },
+  animate: { y: 0, opacity: 1, duration: 0.1 },
+  exit: { y: -10, opacity: 0 },
 };
 
-export const checkIconVariants = {
-  initial: {
-    opacity: 0,
-    scale: 0.8,
-  },
-  animate: {
-    opacity: [0, 1, 1, 1, 0],
-    scale: [1, 0.8],
-    transition: {
-      duration: STEP_DURATION,
-      ease: 'easeIn',
-    },
-  },
+export const firstTextVariantTransition = {
+  initial: { y: 10, opacity: 1 },
+  animate: { y: -10, opacity: 1, duration: 0.1 },
+  exit: { y: 10, opacity: 0 },
 };
 
-export const secondIconContainerVariants = {
-  initial: {
-    opacity: 0,
-  },
-  animate: {
-    opacity: 1,
-    transition: {
-      delay: STEP_DURATION,
-      duration: TRANSITION_DURATION,
-      ease: 'easeInOut',
-    },
-  },
+export const secondIconVariantTransition = {
+  initial: { y: 10, opacity: 0 },
+  animate: { y: 0, opacity: 1, transition: { easeIn, delay: 0.5 } },
+  exit: { y: -10, opacity: 0 },
 };
 
-export const firstTextContainerVariants = {
-  initial: {
-    opacity: 1,
-    y: 0,
-  },
-  animate: {
-    opacity: 0,
-    y: -10,
-    transition: {
-      delay: STEP_DURATION,
-      duration: TRANSITION_DURATION,
-      ease: 'easeInOut',
-    },
-  },
-};
-
-export const secondTextContainerVariants = {
-  initial: {
-    opacity: 0,
-    y: 10,
-  },
-  animate: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: STEP_DURATION + 0.1,
-      duration: 0.2,
-    },
-  },
+export const secondTextVariantTransition = {
+  initial: { y: 10, opacity: 0 },
+  animate: { y: 0, opacity: 1, transition: { easeInOut, delay: 0.1 } },
+  exit: { y: -10, opacity: 0 },
 };

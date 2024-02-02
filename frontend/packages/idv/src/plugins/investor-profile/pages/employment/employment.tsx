@@ -57,7 +57,6 @@ const Employment = () => {
         )}
         timeout={4000}
         onAnimationEnd={() => setShowAnimation(false)}
-        showFeedbackIcon
       />
     </AnimationContainer>
   ) : (
