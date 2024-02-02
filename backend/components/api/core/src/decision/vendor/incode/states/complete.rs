@@ -154,7 +154,8 @@ pub(super) fn compute_risk_signals<'a>(
         ..
     } = args;
     if fetch_ocr_response.age().ok().is_some_and(|a| a < 18) {
-        tracing::error!("document submitted with age under 18");
+        // TODO: add RS
+        tracing::warn!("document submitted with age under 18");
     }
 
     let score_reason_codes =
