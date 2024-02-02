@@ -153,26 +153,38 @@ pub mod tests {
         }
     }
 
+    fn id_doc_collected() -> Vec<DocKind> {
+        vec![DocKind::Identity]
+    }
+
+    fn poa_doc_collected() -> Vec<DocKind> {
+        vec![DocKind::ProofOfAddress]
+    }
+
+    fn id_poa_collected() -> Vec<DocKind> {
+        vec![DocKind::Identity, DocKind::ProofOfAddress]
+    }
+
     #[test_case(vec![TRule(RE(vec![REC::RiskSignal {
         field: FRC::SsnDoesNotMatch,
         op: BO::Equals,
         value: true,
-    }]), RA::Fail)], vec![FRC::SsnDoesNotMatch], true  => (vec![true], Some(RA::Fail)); "single trigger, Fail")]
+    }]), RA::Fail)], vec![FRC::SsnDoesNotMatch], vec![] => (vec![true], Some(RA::Fail)); "single trigger, Fail")]
     #[test_case(vec![TRule(RE(vec![REC::RiskSignal {
         field: FRC::SsnDoesNotMatch,
         op: BO::Equals,
         value: true,
-    }]), RA::ManualReview)], vec![FRC::SsnDoesNotMatch], true  => (vec![true], Some(RA::ManualReview)); "single trigger, ManualReview")]
+    }]), RA::ManualReview)], vec![FRC::SsnDoesNotMatch], vec![] => (vec![true], Some(RA::ManualReview)); "single trigger, ManualReview")]
     #[test_case(vec![TRule(RE(vec![REC::RiskSignal {
         field: FRC::SsnDoesNotMatch,
         op: BO::Equals,
         value: true,
-    }]), RA::ManualReview)], vec![], true  => (vec![false], None); "empty input FRCs")]
+    }]), RA::ManualReview)], vec![], vec![] => (vec![false], None); "empty input FRCs")]
     #[test_case(vec![TRule(RE(vec![REC::RiskSignal {
         field: FRC::SsnDoesNotMatch,
         op: BO::Equals,
         value: true,
-    }]), RA::Fail)], vec![FRC::NameDoesNotMatch], true  => (vec![false], None); "non-matching FRC")]
+    }]), RA::Fail)], vec![FRC::NameDoesNotMatch], vec![] => (vec![false], None); "non-matching FRC")]
     #[test_case(vec![TRule(RE(vec![REC::RiskSignal {
         field: FRC::SsnDoesNotMatch,
         op: BO::Equals,
@@ -181,7 +193,7 @@ pub mod tests {
         field: FRC::NameDoesNotMatch,
         op: BO::Equals,
         value: true,
-    }]), RA::Fail)], vec![FRC::NameDoesNotMatch], true  => (vec![false, true], Some(RA::Fail)); "2 rules, 1 trigger")]
+    }]), RA::Fail)], vec![FRC::NameDoesNotMatch], vec![] => (vec![false, true], Some(RA::Fail)); "2 rules, 1 trigger")]
     #[test_case(vec![TRule(RE(vec![REC::RiskSignal {
         field: FRC::SsnDoesNotMatch,
         op: BO::Equals,
@@ -190,7 +202,7 @@ pub mod tests {
         field: FRC::NameDoesNotMatch,
         op: BO::Equals,
         value: true,
-    }]), RA::Fail)], vec![FRC::SsnDoesNotMatch, FRC::NameDoesNotMatch], true  => (vec![true, true], Some(RA::Fail)); "2 rules trigger")]
+    }]), RA::Fail)], vec![FRC::SsnDoesNotMatch, FRC::NameDoesNotMatch], vec![] => (vec![true, true], Some(RA::Fail)); "2 rules trigger")]
     #[test_case(vec![TRule(RE(vec![REC::RiskSignal {
         field: FRC::SsnDoesNotMatch,
         op: BO::Equals,
@@ -199,7 +211,7 @@ pub mod tests {
         field: FRC::NameDoesNotMatch,
         op: BO::Equals,
         value: true,
-    }]), RA::Fail)], vec![FRC::SsnDoesNotMatch, FRC::NameDoesNotMatch], true  => (vec![true, true], Some(RA::Fail)); "2 rules trigger, different actions")]
+    }]), RA::Fail)], vec![FRC::SsnDoesNotMatch, FRC::NameDoesNotMatch], vec![] => (vec![true, true], Some(RA::Fail)); "2 rules trigger, different actions")]
     #[test_case(vec![TRule(RE(vec![REC::RiskSignal {
         field: FRC::SsnDoesNotMatch,
         op: BO::Equals,
@@ -208,12 +220,12 @@ pub mod tests {
         field: FRC::NameDoesNotMatch,
         op: BO::Equals,
         value: true,
-    }]), RA::ManualReview)], vec![FRC::SsnDoesNotMatch, FRC::NameDoesNotMatch], true  => (vec![true, true], Some(RA::Fail)); "2 rules trigger, different actions reversed")]
+    }]), RA::ManualReview)], vec![FRC::SsnDoesNotMatch, FRC::NameDoesNotMatch], vec![] => (vec![true, true], Some(RA::Fail)); "2 rules trigger, different actions reversed")]
     #[test_case(vec![TRule(RE(vec![REC::RiskSignal {
         field: FRC::SsnDoesNotMatch,
         op: BO::Equals,
         value: true,
-    }]), RA::identity_stepup())], vec![FRC::SsnDoesNotMatch], false  => (vec![true], None); "single trigger but StepUp not allowed")]
+    }]), RA::identity_stepup())], vec![FRC::SsnDoesNotMatch], id_doc_collected() => (vec![true], None); "single trigger but StepUp not allowed")]
     #[test_case(vec![TRule(RE(vec![REC::RiskSignal {
         field: FRC::SsnDoesNotMatch,
         op: BO::Equals,
@@ -222,17 +234,48 @@ pub mod tests {
         field: FRC::NameDoesNotMatch,
         op: BO::Equals,
         value: true,
-    }]), RA::ManualReview)], vec![FRC::SsnDoesNotMatch, FRC::NameDoesNotMatch], false  => (vec![true, true], Some(RA::ManualReview)); "2 rules trigger, StepUp not allowed")]
+    }]), RA::ManualReview)], vec![FRC::SsnDoesNotMatch, FRC::NameDoesNotMatch], id_doc_collected() => (vec![true, true], Some(RA::ManualReview)); "2 rules trigger, StepUp not allowed")]
+    #[test_case(vec![TRule(RE(vec![REC::RiskSignal {
+        field: FRC::SsnDoesNotMatch,
+        op: BO::Equals,
+        value: true,
+    }]), RA::StepUp(StepUpKind::Identity)), TRule(RE(vec![REC::RiskSignal {
+        field: FRC::NameDoesNotMatch,
+        op: BO::Equals,
+        value: true,
+    }]), RA::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress))], vec![FRC::SsnDoesNotMatch, FRC::NameDoesNotMatch], vec![] => (vec![true, true], Some(RA::StepUp(StepUpKind::IdentityProofOfSsnProofOfAddress))); "2 rules trigger, different stepup actions, we choose the one with more documents")]
+    #[test_case(vec![TRule(RE(vec![REC::RiskSignal {
+        field: FRC::SsnDoesNotMatch,
+        op: BO::Equals,
+        value: true,
+    }]), RA::StepUp(StepUpKind::Identity)), TRule(RE(vec![REC::RiskSignal {
+        field: FRC::NameDoesNotMatch,
+        op: BO::Equals,
+        value: true,
+    }]), RA::StepUp(StepUpKind::ProofOfAddress))], vec![FRC::SsnDoesNotMatch, FRC::NameDoesNotMatch], vec![] => (vec![true, true], Some(RA::StepUp(StepUpKind::ProofOfAddress))); "2 rules trigger, different stepup actions, we choose the max StepUpKind")]
+    #[test_case(vec![TRule(RE(vec![REC::RiskSignal {
+        field: FRC::SsnDoesNotMatch,
+        op: BO::Equals,
+        value: true,
+    }]), RA::StepUp(StepUpKind::Identity)), TRule(RE(vec![REC::RiskSignal {
+        field: FRC::NameDoesNotMatch,
+        op: BO::Equals,
+        value: true,
+    }]), RA::StepUp(StepUpKind::ProofOfAddress))], vec![FRC::SsnDoesNotMatch, FRC::NameDoesNotMatch], poa_doc_collected() => (vec![true, true], Some(RA::StepUp(StepUpKind::Identity))); "2 rules trigger, different stepup actions, but we've already collected proof of address")]
+    #[test_case(vec![TRule(RE(vec![REC::RiskSignal {
+        field: FRC::SsnDoesNotMatch,
+        op: BO::Equals,
+        value: true,
+    }]), RA::StepUp(StepUpKind::Identity)), TRule(RE(vec![REC::RiskSignal {
+        field: FRC::NameDoesNotMatch,
+        op: BO::Equals,
+        value: true,
+    }]), RA::StepUp(StepUpKind::ProofOfAddress))], vec![FRC::SsnDoesNotMatch, FRC::NameDoesNotMatch], id_poa_collected() => (vec![true, true], None); "2 rules trigger, different stepup actions, but we've already collected both docs so we pass")]
     pub fn test_evaluate_rule_set(
         rules: Vec<TRule>,
         input: Vec<FRC>,
-        allow_stepup: bool,
+        docs_collected: Vec<DocKind>,
     ) -> (Vec<bool>, Option<RuleAction>) {
-        let docs_collected = if allow_stepup {
-            vec![]
-        } else {
-            vec![DocKind::Identity]
-        };
         let config = RuleEvalConfig::new(docs_collected);
         let (rule_results, action) = evaluate_rule_set(rules, &input, config);
         (rule_results.into_iter().map(|(_, e)| e).collect_vec(), action)
@@ -359,7 +402,6 @@ pub mod tests {
 
         // check all others are allowed
         RuleAction::all_rule_actions().iter().filter(|ra| !expected_disallowed_rule_actions.contains(ra))
-            .for_each(|a| assert!(rc.action_is_allowed(a)));
-        
+            .for_each(|a| assert!(rc.action_is_allowed(a)));  
     }
 }
