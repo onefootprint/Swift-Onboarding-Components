@@ -28,6 +28,7 @@ export enum TimelineEventKind {
   workflowTriggered = 'workflow_triggered',
   workflowStarted = 'workflow_started',
   authMethodUpdated = 'auth_method_updated',
+  externalIntegrationCalled = 'external_integration_called',
 }
 
 export type LabelAddedEvent = {
@@ -158,6 +159,20 @@ export enum AuthMethodAction {
   replace = 'replace',
 }
 
+export enum ExternalIntegrationKind {
+  alpacaCip = 'alpaca_cip',
+}
+export type ExternalIntegrationCalledData = {
+  integration: ExternalIntegrationKind;
+  successful: boolean;
+  externalId?: string;
+};
+
+export type ExternalIntegrationCalledEvent = {
+  kind: TimelineEventKind.externalIntegrationCalled;
+  data: ExternalIntegrationCalledData;
+};
+
 export enum WatchlistCheckReasonCode {
   watchlistHitOfac = 'watchlist_hit_ofac',
   watchlistHitPep = 'watchlist_hit_pep',
@@ -200,7 +215,8 @@ export type TimelineEvent = {
     | VaultCreatedEvent
     | WorkflowTriggeredEvent
     | WorkflowStartedEvent
-    | AuthMethodUpdatedEvent;
+    | AuthMethodUpdatedEvent
+    | ExternalIntegrationCalledEvent;
   timestamp: string;
 };
 

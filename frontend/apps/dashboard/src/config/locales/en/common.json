@@ -1505,6 +1505,11 @@
               "passkey": "passkey"
             }
           },
+          "external-integration-called": {
+            "true": "Successfully submitted {{external_id}} to {{kind}} ",
+            "false": "Unsuccessfully submitted {{external_id}} to {{kind}} ",
+            "alpaca_cip": "Alpaca CIP"
+          },
           "workflow-triggered-event": {
             "requested-user-to": "requested user to {{action}}",
             "actions": {

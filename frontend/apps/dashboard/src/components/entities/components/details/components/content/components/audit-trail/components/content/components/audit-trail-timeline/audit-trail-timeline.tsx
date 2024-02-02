@@ -16,6 +16,7 @@ import type {
 import { EntityStatus, TimelineEventKind } from '@onefootprint/types';
 import type {
   AuthMethodUpdatedData,
+  ExternalIntegrationCalledData,
   LabelAddedEventData,
   WorkflowStartedEventData,
 } from '@onefootprint/types/src/data/timeline';
@@ -184,6 +185,22 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       items.push({
         time,
         headerComponent: <AuthMethodUpdatedEventHeader data={eventData} />,
+      });
+    } else if (kind === TimelineEventKind.externalIntegrationCalled) {
+      const eventData = data as ExternalIntegrationCalledData;
+
+      items.push({
+        time,
+        headerComponent: (
+          <Typography variant="body-3">
+            {t(`timeline.external-integration-called.${eventData.successful}`, {
+              kind: t(
+                `timeline.external-integration-called.${eventData.integration}`,
+              ),
+              external_id: eventData.externalId,
+            })}
+          </Typography>
+        ),
       });
     }
   });
