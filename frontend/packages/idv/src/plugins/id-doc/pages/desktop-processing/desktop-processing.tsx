@@ -3,9 +3,9 @@ import styled, { css } from '@onefootprint/styled';
 import type { IdDocImageTypes, ProcessDocResponse } from '@onefootprint/types';
 import { IdDocImageProcessingError } from '@onefootprint/types';
 import { Button, media, Typography } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useEffectOnce, useTimeout } from 'usehooks-ts';
+import { useEffectOnce } from 'usehooks-ts';
 
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import StickyBottomBox from '../../../../components/layout/components/sticky-bottom-box';
@@ -38,6 +38,7 @@ const DeskTopProcessing = () => {
   const [retryLimitExceeded, setRetryLimitExceeded] = useState(false);
   const [isMissingRequirements, setIsMissingRequirements] = useState(false);
   const [step, setStep] = useState<'upload' | 'analyze'>('upload');
+  const slowConnectionTimer = useRef<NodeJS.Timer | null>(null); // we only time the doc upload
 
   const {
     idDoc: { type, country },
@@ -151,6 +152,15 @@ const DeskTopProcessing = () => {
       return;
     }
 
+    if (!slowConnectionTimer.current) {
+      slowConnectionTimer.current = setTimeout(() => {
+        if (submitDocMutation.isSuccess) {
+          return;
+        }
+        setShowSlowConnectionMessage(true);
+      }, SLOW_CONNECTION_MESSAGE_TIMEOUT);
+    }
+
     const { imageFile, extraCompressed, captureKind } = image;
     submitDocMutation.mutate(
       {
@@ -167,21 +177,15 @@ const DeskTopProcessing = () => {
       {
         onSuccess: handleSubmitDocSuccess,
         onError: handleSubmitDocError,
+        onSettled: () => {
+          if (slowConnectionTimer.current) {
+            clearTimeout(slowConnectionTimer.current);
+            setShowSlowConnectionMessage(false);
+          }
+        },
       },
     );
   });
-
-  const isLoading = submitDocMutation.isLoading || processDocMutation.isLoading;
-  const isSuccess = submitDocMutation.isSuccess && processDocMutation.isSuccess;
-  useTimeout(
-    () => {
-      if (isSuccess) {
-        return;
-      }
-      setShowSlowConnectionMessage(true);
-    },
-    isLoading ? SLOW_CONNECTION_MESSAGE_TIMEOUT : null,
-  );
 
   const handleNextStep = () => {
     send({

@@ -2,9 +2,9 @@ import { getErrorMessage } from '@onefootprint/request';
 import type { IdDocImageTypes, ProcessDocResponse } from '@onefootprint/types';
 import { IdDocImageProcessingError } from '@onefootprint/types';
 import { Box, Typography } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useEffectOnce, useTimeout } from 'usehooks-ts';
+import { useEffectOnce } from 'usehooks-ts';
 
 import Logger from '../../../../utils/logger';
 import IdDocAnimation from '../../components/id-doc-animation';
@@ -32,6 +32,7 @@ const Processing = () => {
     useState(false);
   const [isMissingRequirements, setIsMissingRequirements] = useState(false);
   const [step, setStep] = useState<'upload' | 'analyze'>('upload');
+  const slowConnectionTimer = useRef<NodeJS.Timer | null>(null); // we only time the doc upload
 
   const {
     idDoc: { type, country },
@@ -145,6 +146,15 @@ const Processing = () => {
       return;
     }
 
+    if (!slowConnectionTimer.current) {
+      slowConnectionTimer.current = setTimeout(() => {
+        if (submitDocMutation.isSuccess) {
+          return;
+        }
+        setShowSlowConnectionMessage(true);
+      }, SLOW_CONNECTION_MESSAGE_TIMEOUT);
+    }
+
     const { imageFile, extraCompressed, captureKind } = image;
     Logger.info(
       `Processing: size of the file to be sent in POST request is ${imageFile.size}, file type ${imageFile.type}`,
@@ -164,21 +174,15 @@ const Processing = () => {
       {
         onSuccess: handleSubmitDocSuccess,
         onError: handleSubmitDocError,
+        onSettled: () => {
+          if (slowConnectionTimer.current) {
+            clearTimeout(slowConnectionTimer.current);
+            setShowSlowConnectionMessage(false);
+          }
+        },
       },
     );
   });
-
-  const isLoading = submitDocMutation.isLoading || processDocMutation.isLoading;
-  const isSuccess = submitDocMutation.isSuccess && processDocMutation.isSuccess;
-  useTimeout(
-    () => {
-      if (isSuccess) {
-        return;
-      }
-      setShowSlowConnectionMessage(true);
-    },
-    isLoading ? SLOW_CONNECTION_MESSAGE_TIMEOUT : null,
-  );
 
   const onSuccessComplete = () => {
     send({
