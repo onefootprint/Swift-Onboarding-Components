@@ -1,7 +1,9 @@
+import json
 import arrow
 import pytest
 from tests.headers import IsLive
 from tests.utils import (
+    HttpError,
     get,
     post,
     patch,
@@ -22,6 +24,18 @@ def test_deactivate_old_roles_and_members(sandbox_tenant, limited_role):
     Deactivate roles at this tenant that were created by previous integration testing runs.
     Otherwise, the users you want to see end up on the second page...
     """
+
+    def try_no_error(fn):
+        try:
+            fn()
+        except HttpError as e:
+            # Allow errors if this object has already been deactivated by another
+            # concurrent test run
+            if e.status_code >= 500:
+                raise e
+
+    db_auths = sandbox_tenant.db_auths
+
     for is_live in ["true", "false"]:
         is_live = IsLive(is_live)
         body = get(
@@ -38,13 +52,11 @@ def test_deactivate_old_roles_and_members(sandbox_tenant, limited_role):
         for r in roles_to_deactivate:
             # Deactivate members using this role
             r_id = r["id"]
-            members = get(f"org/members", dict(role_ids=r_id), *sandbox_tenant.db_auths)
+            members = get(f"org/members", dict(role_ids=r_id), *db_auths)
             for m in members["data"]:
                 m_id = m["id"]
-                post(
-                    f"org/members/{m_id}/deactivate",
-                    None,
-                    *sandbox_tenant.db_auths,
+                try_no_error(
+                    lambda: post(f"org/members/{m_id}/deactivate", None, *db_auths)
                 )
             # Deactivate api keys using this role
             data = dict(role_ids=r_id, status="enabled")
@@ -58,7 +70,7 @@ def test_deactivate_old_roles_and_members(sandbox_tenant, limited_role):
                     is_live,
                 )
             # Deactivate the role
-            post(f"org/roles/{r_id}/deactivate", None, *sandbox_tenant.db_auths)
+            try_no_error(lambda: post(f"org/roles/{r_id}/deactivate", None, *db_auths))
 
         body = get(
             f"org/members", dict(page_size=100), sandbox_tenant.auth_token, is_live
@@ -71,10 +83,8 @@ def test_deactivate_old_roles_and_members(sandbox_tenant, limited_role):
         )
         for m in users_to_deactivate:
             m_id = m["id"]
-            post(
-                f"org/members/{m_id}/deactivate",
-                None,
-                *sandbox_tenant.db_auths,
+            try_no_error(
+                lambda: post(f"org/members/{m_id}/deactivate", None, *db_auths)
             )
 
 
