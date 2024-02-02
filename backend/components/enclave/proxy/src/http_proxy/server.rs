@@ -49,9 +49,15 @@ pub async fn build_server(config: Config) -> std::io::Result<(Server, u16)> {
     log::info!("Starting enclave_parent on port {}", port);
 
     let server = HttpServer::new(move || {
+        // Support a larger payload size for a handful of large VReses that are decrypted in the
+        // enclave.
+        // We should instead switch to a model where each VRes is decrypting using a
+        // public/e_private keypair like documents
+        let json_cfg = web::JsonConfig::default().limit(3_145_728); // 3 MB
         App::new()
             .app_data(state.clone())
             .wrap(Logger::default().log_target("http_actix"))
+            .app_data(json_cfg)
             .service(health)
             .service(proxy)
     })
