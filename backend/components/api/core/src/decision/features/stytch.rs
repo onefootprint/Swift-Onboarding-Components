@@ -36,6 +36,10 @@ fn reason_to_footprint_reason_code(value: &Reason) -> Option<FootprintReasonCode
         Reason::PossibleTamperingDetected => Some(FootprintReasonCode::BrowserTampering),
         Reason::GcpDatacenterIp => Some(FootprintReasonCode::IpAlertDataCenter),
         Reason::Arm8_32BitAndroidOld => None,
+        Reason::PossibleBrowserAutomation => Some(FootprintReasonCode::BrowserAutomation),
+        Reason::Arm7_32BitAndroidOld => None,
+        Reason::PythonDetected => None, // maybe BrowserAutomation?
+        Reason::UnauthorizedRequestOrigin => None,
     }
 }
 

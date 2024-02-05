@@ -99,6 +99,7 @@ pub enum Reason {
     KnownTorExitNode,
     BannedIpAddress,
     UserAgentDeception,
+    PossibleBrowserAutomation,
     IpRateLimitExceededCritical,
     TuningRuleMatch,
     AwsDatacenterIp,
@@ -108,6 +109,9 @@ pub enum Reason {
     PossibleTamperingDetected,
     GcpDatacenterIp,
     Arm8_32BitAndroidOld,
+    Arm7_32BitAndroidOld,
+    PythonDetected,
+    UnauthorizedRequestOrigin,
 }
 
 #[cfg(test)]
