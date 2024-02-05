@@ -386,7 +386,7 @@ const staticAlerts: Alert[] = [
       breakdowns: ['TargetGroup'],
       calculations: [
         {
-          op: 'SUM',
+          op: 'MAX',
           column: 'amazonaws.com/AWS/ApplicationELB/UnHealthyHostCount.max',
         },
       ],
@@ -400,16 +400,16 @@ const staticAlerts: Alert[] = [
     },
     slackThreshold: {
       op: '>',
-      value: 0,
-      // Only trigger alert after it's hit 3 times consecutively. This will hopefully help absorb
-      // some noise during enclave deploys
-      exceeded_limit: 3,
+      // ASG rolling update allows for 20% of hosts to be unhealthy (see config
+      // for exact number), but under normal operation only one host is
+      // unhealthy at a time.
+      value: 1,
+      exceeded_limit: 1,
     },
     pageThreshold: {
       op: '>',
+      // Sustained unavailablity that doesn't look like an ASG rolling update.
       value: 2,
-      // Only trigger alert after it's hit 3 times consecutively. This will hopefully help absorb
-      // some noise during enclave deploys
       exceeded_limit: 3,
     },
   },
