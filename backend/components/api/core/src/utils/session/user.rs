@@ -4,7 +4,9 @@ use db::{models::session::Session, DbResult, PgConn};
 use newtypes::{AuthTokenHash, HasSessionKind, SealedSessionBytes, SessionAuthToken};
 
 use crate::{
-    auth::session::AuthSessionData, errors::error_with_code::ErrorWithCode, errors::ApiResult, State,
+    auth::session::AuthSessionData,
+    errors::{error_with_code::ErrorWithCode, ApiResult},
+    State,
 };
 
 #[derive(Debug, Clone)]
@@ -25,8 +27,16 @@ impl AuthSession {
             return Err(ErrorWithCode::NoSessionFound.into());
         };
         let data = AuthSessionData::unseal(&state.session_sealing_key, SealedSessionBytes(session.data));
-        let data = if let Err(crypto::Error::Cbor(_)) = data {
-            return Err(ErrorWithCode::CouldNotParseSession.into());
+        let data = if let Err(crypto::Error::Cbor(e)) = data {
+            tracing::info!(e=?e, "Couldn't parse auth session");
+            if session.expires_at <= Utc::now() {
+                // We want to special case still show the "expired" message if we're trying to
+                // deserialize an old session. No reason to error that the session is invalid when
+                // the session is actually expired
+                return Err(ErrorWithCode::SessionExpired.into());
+            } else {
+                return Err(ErrorWithCode::CouldNotParseSession.into());
+            }
         } else {
             data?
         };
