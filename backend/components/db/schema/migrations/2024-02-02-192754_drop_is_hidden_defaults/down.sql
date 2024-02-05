@@ -1,0 +1,2 @@
+ALTER TABLE fingerprint ALTER COLUMN is_hidden SET DEFAULT 'f';
+ALTER TABLE vault ALTER COLUMN is_hidden SET DEFAULT 'f';
