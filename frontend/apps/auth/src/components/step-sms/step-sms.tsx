@@ -68,13 +68,12 @@ const StepSms = ({ children, Header }: StepPhoneProps) => {
 
   return (
     <Container>
-      <Header data-private title={headerTitle} />
+      <Header data-private title={headerTitle} subtitle={formTitle} />
       <PinVerification
         identifier={successfulIdentifier ?? { phoneNumber }}
         onChallengeSucceed={handleChallengeSucceed}
         onNewChallengeRequested={handleNewChallengeRequested}
         preferredChallengeKind={ChallengeKind.sms}
-        title={formTitle}
       />
       {children}
     </Container>

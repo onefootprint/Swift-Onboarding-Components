@@ -50,13 +50,12 @@ const EmailChallenge = ({ children, Header }: EmailChallengeProps) => {
 
   return (
     <Container>
-      <Header title={title} />
+      <Header title={title} subtitle={formTitle} />
       <PinVerification
         identifier={successfulIdentifier ?? { email }}
         onChallengeSucceed={handleChallengeSucceed}
         onNewChallengeRequested={handleNewChallengeRequested}
         preferredChallengeKind={ChallengeKind.email}
-        title={formTitle}
       />
       {children}
     </Container>

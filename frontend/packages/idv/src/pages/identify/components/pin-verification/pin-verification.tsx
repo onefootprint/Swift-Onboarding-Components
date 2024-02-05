@@ -22,7 +22,7 @@ import { useIdentifyMachine } from '../machine-provider';
 import Form from './components/form';
 
 type PinVerificationProps = {
-  title: string;
+  title?: string;
   onChallengeSucceed: (authToken: string) => void;
   preferredChallengeKind: ChallengeKind;
   identifier: Identifier;

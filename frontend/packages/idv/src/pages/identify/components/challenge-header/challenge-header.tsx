@@ -8,10 +8,15 @@ import { useIdentifyMachine } from '../machine-provider';
 
 type ChallengeHeaderProps = {
   title: string;
+  subtitle?: string;
   shouldShowBack?: boolean;
 };
 
-const ChallengeHeader = ({ title, shouldShowBack }: ChallengeHeaderProps) => {
+const ChallengeHeader = ({
+  title,
+  subtitle,
+  shouldShowBack,
+}: ChallengeHeaderProps) => {
   const [state, send] = useIdentifyMachine();
   const {
     config: { logoUrl, orgName },
@@ -37,7 +42,7 @@ const ChallengeHeader = ({ title, shouldShowBack }: ChallengeHeaderProps) => {
         {showLogo && orgName && (
           <Logo orgName={orgName} logoUrl={logoUrl ?? undefined} />
         )}
-        <HeaderTitle data-private title={title} />
+        <HeaderTitle data-private title={title} subtitle={subtitle} />
       </ContentHeader>
     </>
   );

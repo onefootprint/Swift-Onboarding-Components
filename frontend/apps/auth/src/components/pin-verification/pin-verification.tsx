@@ -27,7 +27,7 @@ type PinVerificationProps = {
   onChallengeSucceed: (authToken: string) => void;
   onNewChallengeRequested: () => void;
   preferredChallengeKind: ChallengeKind;
-  title: string;
+  title?: string;
 };
 
 const PinVerification = ({

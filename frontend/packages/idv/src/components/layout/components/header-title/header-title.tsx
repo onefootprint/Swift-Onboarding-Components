@@ -30,31 +30,35 @@ const HeaderTitle = ({
     sx={{ ...sx }}
   >
     {Icon && (
-      <IconContainer>
+      <IconContainer align="center" justify="center">
         <Icon />
       </IconContainer>
     )}
-    <Typography as="h2" color="primary" variant="heading-3" id={titleElementId}>
-      {title}
-    </Typography>
-    {subtitle && (
-      <Typography variant="body-2" color="secondary" as="h3">
-        {subtitle}
+    <Stack direction="column" align="center" gap={3}>
+      <Typography
+        as="h2"
+        color="primary"
+        variant="heading-3"
+        id={titleElementId}
+      >
+        {title}
       </Typography>
-    )}
+      {subtitle && (
+        <Typography variant="body-2" color="secondary" as="h3">
+          {subtitle}
+        </Typography>
+      )}
+    </Stack>
   </Stack>
 );
 
-const IconContainer = styled.div`
+const IconContainer = styled(Stack)`
   ${({ theme }) => css`
     height: ${theme.spacing[8]};
     width: ${theme.spacing[8]};
     border: 1.5px solid ${theme.color.secondary};
     border-radius: ${theme.borderRadius.full};
-    display: flex;
-    justify-content: center;
     background-color: ${theme.backgroundColor.secondary};
-    align-items: center;
     background-color: ${theme.backgroundColor.secondary};
   `}
 `;

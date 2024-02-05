@@ -53,9 +53,12 @@ const EmailChallenge = () => {
 
   return (
     <Container>
-      <ChallengeHeader shouldShowBack={!isBootstrap} title={title} />
+      <ChallengeHeader
+        shouldShowBack={!isBootstrap}
+        title={title}
+        subtitle={formTitle}
+      />
       <PinVerification
-        title={formTitle}
         onChallengeSucceed={handleChallengeSucceed}
         preferredChallengeKind={ChallengeKind.email}
         identifier={successfulIdentifier ?? { email }}

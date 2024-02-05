@@ -1,5 +1,5 @@
-import styled, { css } from '@onefootprint/styled';
 import { ChallengeKind } from '@onefootprint/types';
+import { Stack } from '@onefootprint/ui';
 import { useFlags } from 'launchdarkly-react-client-sdk';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -81,10 +81,13 @@ const SmsChallenge = () => {
     );
 
   return (
-    <Container>
-      <ChallengeHeader shouldShowBack={shouldShowBack} title={title} />
+    <Stack direction="column" justify="center" align="center" gap={7}>
+      <ChallengeHeader
+        shouldShowBack={shouldShowBack}
+        title={title}
+        subtitle={formTitle}
+      />
       <PinVerification
-        title={formTitle}
         onChallengeSucceed={handleChallengeSucceed}
         preferredChallengeKind={ChallengeKind.sms}
         identifier={successfulIdentifier ?? { phoneNumber }}
@@ -92,18 +95,8 @@ const SmsChallenge = () => {
       {loginWithDifferent && (
         <DifferentAccount onClick={handleLoginWithDifferent} />
       )}
-    </Container>
+    </Stack>
   );
 };
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: ${theme.spacing[7]};
-  `}
-`;
 
 export default SmsChallenge;
