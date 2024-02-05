@@ -7,7 +7,8 @@ use db::models::{
 };
 use itertools::Itertools;
 use newtypes::{
-    output::Csv, AccessEventKind, AccessEventPurpose, AuditEventDetail, DataIdentifier, DbActor, PiiJsonValue,
+    output::Csv, AccessEventKind, AccessEventPurpose, AuditEventDetail, AuditEventId, DataIdentifier,
+    DbActor, PiiJsonValue,
 };
 
 use crate::{
@@ -129,7 +130,9 @@ where
                         let targets: Vec<DataIdentifier> = targets.into_iter().flatten().unique().collect();
                         // NOTE: If we add any more fields to the access event, we might have to lower
                         // the chunk size below or we'll hit a max size for an insert statement.
+                        let aeid = AuditEventId::generate();
                         let access_event = NewAccessEventRow {
+                            id: aeid.clone().into_correlated_access_event_id(),
                             scoped_vault_id: sv.id.clone(),
                             tenant_id: sv.tenant_id.clone(),
                             is_live: sv.is_live,
@@ -143,6 +146,7 @@ where
                         };
 
                         let audit_event = NewAuditEvent {
+                            id: aeid,
                             tenant_id: sv.tenant_id,
                             principal_actor: Some(principal.clone()),
                             insight_event_id: insight.id.clone(),

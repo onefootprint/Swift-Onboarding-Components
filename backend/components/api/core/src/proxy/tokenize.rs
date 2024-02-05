@@ -18,8 +18,9 @@ use enclave_proxy::{DataTransformer, DataTransforms};
 use futures::future::try_join_all;
 use itertools::Itertools;
 use newtypes::{
-    AccessEventKind, AccessEventPurpose, AuditEventDetail, DataIdentifier, DataRequest, DbActor,
-    DocumentKind, FpId, PiiBytes, PiiString, S3Url, SealedVaultDataKey, StorageType, TenantId, ValidateArgs,
+    AccessEventKind, AccessEventPurpose, AuditEventDetail, AuditEventId, DataIdentifier, DataRequest,
+    DbActor, DocumentKind, FpId, PiiBytes, PiiString, S3Url, SealedVaultDataKey, StorageType, TenantId,
+    ValidateArgs,
 };
 use std::collections::HashMap;
 
@@ -144,7 +145,9 @@ pub async fn vault_pii(
                     .chain(documents.iter().map(|d| DataIdentifier::Document(d.kind)))
                     .collect();
 
+                let aeid = AuditEventId::generate();
                 NewAccessEventRow {
+                    id: aeid.clone().into_correlated_access_event_id(),
                     scoped_vault_id: scoped_vault.id.clone(),
                     tenant_id: scoped_vault.tenant_id.clone(),
                     is_live: scoped_vault.is_live,
@@ -158,6 +161,7 @@ pub async fn vault_pii(
                 .create(conn)?;
 
                 NewAuditEvent {
+                    id: aeid,
                     tenant_id,
                     principal_actor: Some(principal),
                     insight_event_id,

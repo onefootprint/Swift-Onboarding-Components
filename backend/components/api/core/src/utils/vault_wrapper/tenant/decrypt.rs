@@ -8,7 +8,9 @@ use db::models::{
     access_event::NewAccessEventRow, audit_event::NewAuditEvent, insight_event::CreateInsightEvent,
 };
 use itertools::Itertools;
-use newtypes::{AccessEventKind, AccessEventPurpose, AuditEventDetail, DataIdentifier, DbActor};
+use newtypes::{
+    AccessEventKind, AccessEventPurpose, AuditEventDetail, AuditEventId, DataIdentifier, DbActor,
+};
 use std::collections::HashMap;
 
 impl<Type> TenantVw<Type> {
@@ -54,7 +56,9 @@ impl<Type> TenantVw<Type> {
                 let targets: Vec<DataIdentifier> =
                     results.decrypted_dis.into_iter().map(|t| t.identifier).collect();
 
+                let aeid = AuditEventId::generate();
                 NewAccessEventRow {
+                    id: aeid.clone().into_correlated_access_event_id(),
                     scoped_vault_id: scoped_vault_id.clone(),
                     tenant_id: tenant_id.clone(),
                     is_live,
@@ -69,6 +73,7 @@ impl<Type> TenantVw<Type> {
                 .create(conn)?;
 
                 NewAuditEvent {
+                    id: aeid,
                     tenant_id,
                     principal_actor: Some(principal),
                     insight_event_id,

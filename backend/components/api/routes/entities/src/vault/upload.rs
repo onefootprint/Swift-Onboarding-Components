@@ -24,8 +24,8 @@ use db::models::{
 };
 use macros::route_alias;
 use newtypes::{
-    AccessEventKind, AccessEventPurpose, AuditEventDetail, DataIdentifier, DbActor, DocumentKind, FpId,
-    PiiBytes,
+    AccessEventKind, AccessEventPurpose, AuditEventDetail, AuditEventId, DataIdentifier, DbActor,
+    DocumentKind, FpId, PiiBytes,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Path};
 
@@ -174,7 +174,9 @@ async fn post_upload_inner(
             let insight_event_id = insight.insert_with_conn(conn)?.id;
 
             // Create an access event to show data was added
+            let aeid = AuditEventId::generate();
             NewAccessEventRow {
+                id: aeid.clone().into_correlated_access_event_id(),
                 scoped_vault_id: scoped_vault.id.clone(),
                 tenant_id: scoped_vault.tenant_id.clone(),
                 is_live: scoped_vault.is_live,
@@ -188,6 +190,7 @@ async fn post_upload_inner(
             .create(conn)?;
 
             NewAuditEvent {
+                id: aeid,
                 tenant_id: scoped_vault.tenant_id,
                 principal_actor: Some(principal),
                 insight_event_id,

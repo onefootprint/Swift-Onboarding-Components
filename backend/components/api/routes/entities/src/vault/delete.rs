@@ -19,7 +19,8 @@ use db::models::{
 };
 use macros::route_alias;
 use newtypes::{
-    flat_api_object_map_type, AccessEventKind, AccessEventPurpose, AuditEventDetail, DataIdentifier, DbActor,
+    flat_api_object_map_type, AccessEventKind, AccessEventPurpose, AuditEventDetail, AuditEventId,
+    DataIdentifier, DbActor,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 use serde::Deserialize;
@@ -80,7 +81,9 @@ pub async fn delete(
             let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
             let actor: DbActor = actor.into();
 
+            let aeid = AuditEventId::generate();
             NewAccessEventRow {
+                id: aeid.clone().into_correlated_access_event_id(),
                 scoped_vault_id: scoped_vault.id.clone(),
                 tenant_id: scoped_vault.tenant_id.clone(),
                 is_live: scoped_vault.is_live,
@@ -94,6 +97,7 @@ pub async fn delete(
             .create(conn)?;
 
             NewAuditEvent {
+                id: aeid,
                 tenant_id: scoped_vault.tenant_id,
                 principal_actor: Some(actor),
                 insight_event_id,

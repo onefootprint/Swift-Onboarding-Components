@@ -21,7 +21,7 @@ use itertools::Itertools;
 use macros::route_alias;
 use newtypes::{
     put_data_request::{PatchDataRequest, RawDataRequest},
-    AccessEventKind, AccessEventPurpose, AuditEventDetail, DbActor, FpId, ValidateArgs,
+    AccessEventKind, AccessEventPurpose, AuditEventDetail, AuditEventId, DbActor, FpId, ValidateArgs,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -158,7 +158,9 @@ async fn patch_inner(
 
             // Create access events to show data was added/deleted
             if !updated_dis.is_empty() {
+                let aeid = AuditEventId::generate();
                 NewAccessEventRow {
+                    id: aeid.clone().into_correlated_access_event_id(),
                     scoped_vault_id: scoped_vault.id.clone(),
                     tenant_id: scoped_vault.tenant_id.clone(),
                     is_live: scoped_vault.is_live,
@@ -172,6 +174,7 @@ async fn patch_inner(
                 .create(conn)?;
 
                 NewAuditEvent {
+                    id: aeid,
                     tenant_id: scoped_vault.tenant_id.clone(),
                     principal_actor: Some(principal.clone()),
                     insight_event_id: insight_event_id.clone(),
@@ -184,7 +187,9 @@ async fn patch_inner(
                 .create(conn)?;
             }
             if !deleted_dis.is_empty() {
+                let aeid = AuditEventId::generate();
                 NewAccessEventRow {
+                    id: aeid.clone().into_correlated_access_event_id(),
                     scoped_vault_id: scoped_vault.id.clone(),
                     tenant_id: scoped_vault.tenant_id.clone(),
                     is_live: scoped_vault.is_live,
@@ -198,6 +203,7 @@ async fn patch_inner(
                 .create(conn)?;
 
                 NewAuditEvent {
+                    id: aeid,
                     tenant_id: scoped_vault.tenant_id,
                     principal_actor: Some(principal),
                     insight_event_id,

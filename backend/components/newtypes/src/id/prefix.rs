@@ -1,6 +1,6 @@
 use crate::{
-    BoLinkId, BusinessOwnerKind, FpId, NtResult, ObConfigurationKey, ScopedVaultId, TenantId, VaultId,
-    VaultKind,
+    AccessEventId, AuditEventId, BoLinkId, BusinessOwnerKind, FpId, NtResult, ObConfigurationKey,
+    ScopedVaultId, TenantId, VaultId, VaultKind,
 };
 
 fn generate_random_id(prefix: &str, length: usize) -> String {
@@ -100,6 +100,18 @@ impl BoLinkId {
             // protection against accidentally changing the BOs
             BusinessOwnerKind::Secondary => Self(generate_random_id(Self::PREFIX, Self::LENGTH)),
         }
+    }
+}
+
+impl AuditEventId {
+    const LENGTH: usize = 22;
+
+    pub fn generate() -> Self {
+        Self(generate_random_id("ae", Self::LENGTH))
+    }
+
+    pub fn into_correlated_access_event_id(self) -> AccessEventId {
+        AccessEventId::from(self.0)
     }
 }
 

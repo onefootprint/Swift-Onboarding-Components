@@ -12,8 +12,7 @@ use crate::{
     State,
 };
 use db::models::audit_event::NewAuditEvent;
-use newtypes::AuditEventDetail;
-use newtypes::DbActor;
+use newtypes::{AuditEventDetail, AuditEventId, DbActor};
 
 use crate::utils::headers::SandboxId as SandboxIdHeader;
 use db::models::{
@@ -113,7 +112,9 @@ pub async fn create_non_portable_vault(
                 let insight_event_id = insight.insert_with_conn(conn)?.id;
 
                 // Create an access event to show data was added
+                let aeid = AuditEventId::generate();
                 NewAccessEventRow {
+                    id: aeid.clone().into_correlated_access_event_id(),
                     scoped_vault_id: su.id.clone(),
                     tenant_id: su.tenant_id.clone(),
                     is_live: su.is_live,
@@ -127,6 +128,7 @@ pub async fn create_non_portable_vault(
                 .create(conn)?;
 
                 NewAuditEvent {
+                    id: aeid,
                     tenant_id: su.tenant_id.clone(),
                     principal_actor: Some(db_actor),
                     insight_event_id,

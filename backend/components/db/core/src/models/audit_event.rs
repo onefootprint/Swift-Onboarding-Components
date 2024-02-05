@@ -35,6 +35,7 @@ pub struct AuditEvent {
 #[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = audit_event)]
 struct NewAuditEventRow {
+    id: AuditEventId,
     timestamp: DateTime<Utc>,
     tenant_id: TenantId,
     name: AuditEventName,
@@ -66,6 +67,7 @@ pub struct AuditEventRowDetailFields {
 
 #[derive(Debug, Clone)]
 pub struct NewAuditEvent {
+    pub id: AuditEventId,
     pub tenant_id: TenantId,
     pub principal_actor: Option<DbActor>,
     pub insight_event_id: InsightEventId,
@@ -86,6 +88,7 @@ impl AuditEvent {
             .into_iter()
             .map(|event| {
                 let NewAuditEvent {
+                    id,
                     tenant_id,
                     principal_actor,
                     insight_event_id,
@@ -102,6 +105,7 @@ impl AuditEvent {
                     is_live,
                 } = detail.into();
                 NewAuditEventRow {
+                    id,
                     timestamp: Utc::now(),
                     tenant_id,
                     name: AuditEventName::from(&metadata),
@@ -147,6 +151,7 @@ mod tests {
         let insight_event = tests::fixtures::insight_event::create(conn);
 
         NewAuditEvent {
+            id: AuditEventId::generate(),
             tenant_id: tenant.id.clone(),
             principal_actor: Some(DbActor::Footprint),
             insight_event_id: insight_event.id,

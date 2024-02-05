@@ -12,7 +12,8 @@ use db::models::{
     access_event::NewAccessEventRow, audit_event::NewAuditEvent, insight_event::CreateInsightEvent,
 };
 use newtypes::{
-    AccessEventKind, AccessEventPurpose, AuditEventDetail, DataIdentifier, DbActor, IdentityDataKind as IDK,
+    AccessEventKind, AccessEventPurpose, AuditEventDetail, AuditEventId, DataIdentifier, DbActor,
+    IdentityDataKind as IDK,
 };
 
 use crate::{utils::db2api::DbToApi, State};
@@ -214,7 +215,9 @@ pub async fn decrypt_aml_hits(
             let insight_event_id = insight.insert_with_conn(conn)?.id;
             let reason = DECRYPT_AML_HITS_ACCESS_EVENT_REASON.to_owned();
 
+            let aeid = AuditEventId::generate();
             NewAccessEventRow {
+                id: aeid.clone().into_correlated_access_event_id(),
                 scoped_vault_id: sv_id.clone(),
                 tenant_id: tenant_id.clone(),
                 is_live,
@@ -228,6 +231,7 @@ pub async fn decrypt_aml_hits(
             .create(conn)?;
 
             NewAuditEvent {
+                id: aeid,
                 tenant_id,
                 principal_actor: Some(principal),
                 insight_event_id,

@@ -35,6 +35,7 @@ pub struct AccessEvent {
 #[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = access_event)]
 pub struct NewAccessEventRow {
+    pub id: AccessEventId,
     pub scoped_vault_id: ScopedVaultId,
     pub insight_event_id: InsightEventId,
     pub reason: Option<String>,
