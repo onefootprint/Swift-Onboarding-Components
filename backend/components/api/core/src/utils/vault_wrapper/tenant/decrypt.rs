@@ -4,9 +4,11 @@ use crate::{
     utils::vault_wrapper::decrypt::{EnclaveDecryptOperation, Pii},
     State,
 };
-use db::models::{access_event::NewAccessEvent, insight_event::CreateInsightEvent};
+use db::models::{
+    access_event::NewAccessEventRow, audit_event::NewAuditEvent, insight_event::CreateInsightEvent,
+};
 use itertools::Itertools;
-use newtypes::{AccessEventKind, AccessEventPurpose, DbActor};
+use newtypes::{AccessEventKind, AccessEventPurpose, AuditEventDetail, DataIdentifier, DbActor};
 use std::collections::HashMap;
 
 impl<Type> TenantVw<Type> {
@@ -40,19 +42,48 @@ impl<Type> TenantVw<Type> {
             .fn_decrypt_unchecked_raw(&state.enclave_client, targets)
             .await?;
 
-        let event = NewAccessEvent {
-            scoped_vault_id: self.scoped_vault.id.clone(),
-            tenant_id: self.scoped_vault.tenant_id.clone(),
-            is_live: self.scoped_vault.is_live,
-            reason: Some(reason),
-            principal,
-            insight,
-            kind: AccessEventKind::Decrypt,
-            // TODO: also store the transforms!
-            targets: results.decrypted_dis.into_iter().map(|t| t.identifier).collect(),
-            purpose,
-        };
-        state.db_pool.db_query(|conn| event.create(conn)).await?;
+        let scoped_vault_id = self.scoped_vault.id.clone();
+        let tenant_id = self.scoped_vault.tenant_id.clone();
+        let is_live = self.scoped_vault.is_live;
+
+        state
+            .db_pool
+            .db_transaction(move |conn| -> ApiResult<_> {
+                let insight_event_id = insight.insert_with_conn(conn)?.id;
+
+                let targets: Vec<DataIdentifier> =
+                    results.decrypted_dis.into_iter().map(|t| t.identifier).collect();
+
+                NewAccessEventRow {
+                    scoped_vault_id: scoped_vault_id.clone(),
+                    tenant_id: tenant_id.clone(),
+                    is_live,
+                    reason: Some(reason.clone()),
+                    principal: principal.clone(),
+                    insight_event_id: insight_event_id.clone(),
+                    kind: AccessEventKind::Decrypt,
+                    // TODO: also store the transforms!
+                    targets: targets.clone(),
+                    purpose,
+                }
+                .create(conn)?;
+
+                NewAuditEvent {
+                    tenant_id,
+                    principal_actor: Some(principal),
+                    insight_event_id,
+                    detail: AuditEventDetail::DecryptUserData {
+                        is_live,
+                        scoped_vault_id,
+                        reason,
+                        decrypted_fields: targets,
+                    },
+                }
+                .create(conn)?;
+
+                Ok(())
+            })
+            .await?;
         Ok(results.results)
     }
 }

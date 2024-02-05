@@ -19,10 +19,14 @@ use api_core::{
     },
 };
 use db::models::{
-    access_event::NewAccessEvent, insight_event::CreateInsightEvent, scoped_vault::ScopedVault, vault::Vault,
+    access_event::NewAccessEventRow, audit_event::NewAuditEvent, insight_event::CreateInsightEvent,
+    scoped_vault::ScopedVault, vault::Vault,
 };
 use macros::route_alias;
-use newtypes::{AccessEventKind, AccessEventPurpose, DataIdentifier, DocumentKind, FpId, PiiBytes};
+use newtypes::{
+    AccessEventKind, AccessEventPurpose, AuditEventDetail, DataIdentifier, DbActor, DocumentKind, FpId,
+    PiiBytes,
+};
 use paperclip::actix::{self, api_v2_operation, web, web::Path};
 
 api_headers_schema! {
@@ -107,7 +111,7 @@ async fn post_upload_inner(
     let insight = CreateInsightEvent::from(insight);
     let tenant_id: newtypes::TenantId = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
-    let principal = auth.actor().into();
+    let principal: DbActor = auth.actor().into();
     let source = auth.source();
 
     // temporarily: block non custom/document objects
@@ -167,17 +171,31 @@ async fn post_upload_inner(
             let docs = vec![Some(doc), derived_doc].into_iter().flatten().collect();
             let doc = uvw.put_documents_unsafe(conn, docs, Some(actor))?;
 
+            let insight_event_id = insight.insert_with_conn(conn)?.id;
+
             // Create an access event to show data was added
-            NewAccessEvent {
-                scoped_vault_id: scoped_vault.id,
-                tenant_id: scoped_vault.tenant_id,
+            NewAccessEventRow {
+                scoped_vault_id: scoped_vault.id.clone(),
+                tenant_id: scoped_vault.tenant_id.clone(),
                 is_live: scoped_vault.is_live,
                 reason: None,
-                principal,
-                insight,
+                principal: principal.clone(),
+                insight_event_id: insight_event_id.clone(),
                 kind: AccessEventKind::Update,
-                targets: vec![di],
+                targets: vec![di.clone()],
                 purpose: AccessEventPurpose::Api,
+            }
+            .create(conn)?;
+
+            NewAuditEvent {
+                tenant_id: scoped_vault.tenant_id,
+                principal_actor: Some(principal),
+                insight_event_id,
+                detail: AuditEventDetail::UpdateUserData {
+                    is_live: scoped_vault.is_live,
+                    scoped_vault_id: scoped_vault.id,
+                    updated_fields: vec![di],
+                },
             }
             .create(conn)?;
 

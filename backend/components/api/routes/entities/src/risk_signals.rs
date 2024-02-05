@@ -8,8 +8,12 @@ use crate::{
     types::{response::ResponseData, JsonApiResponse},
 };
 use api_core::{auth::CanDecrypt, utils::headers::InsightHeaders};
-use db::models::{access_event::NewAccessEvent, insight_event::CreateInsightEvent};
-use newtypes::{AccessEventKind, AccessEventPurpose, DataIdentifier, IdentityDataKind as IDK};
+use db::models::{
+    access_event::NewAccessEventRow, audit_event::NewAuditEvent, insight_event::CreateInsightEvent,
+};
+use newtypes::{
+    AccessEventKind, AccessEventPurpose, AuditEventDetail, DataIdentifier, DbActor, IdentityDataKind as IDK,
+};
 
 use crate::{utils::db2api::DbToApi, State};
 
@@ -202,20 +206,43 @@ pub async fn decrypt_aml_hits(
     let auth = auth.check_guard(CanDecrypt::new(dis_searched.clone()))?;
 
     // write an AccessEvent
-    let principal = auth.actor().into();
+    let principal: DbActor = auth.actor().into();
     let insight = CreateInsightEvent::from(insights);
-    let event = NewAccessEvent {
-        scoped_vault_id: sv_id,
-        tenant_id,
-        is_live,
-        reason: Some(DECRYPT_AML_HITS_ACCESS_EVENT_REASON.to_owned()),
-        principal,
-        insight,
-        kind: AccessEventKind::Decrypt,
-        targets: dis_searched,
-        purpose: AccessEventPurpose::Api,
-    };
-    state.db_pool.db_query(|conn| event.create(conn)).await?;
+    state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let insight_event_id = insight.insert_with_conn(conn)?.id;
+            let reason = DECRYPT_AML_HITS_ACCESS_EVENT_REASON.to_owned();
+
+            NewAccessEventRow {
+                scoped_vault_id: sv_id.clone(),
+                tenant_id: tenant_id.clone(),
+                is_live,
+                reason: Some(reason.clone()),
+                principal: principal.clone(),
+                insight_event_id: insight_event_id.clone(),
+                kind: AccessEventKind::Decrypt,
+                targets: dis_searched.clone(),
+                purpose: AccessEventPurpose::Api,
+            }
+            .create(conn)?;
+
+            NewAuditEvent {
+                tenant_id,
+                principal_actor: Some(principal),
+                insight_event_id,
+                detail: AuditEventDetail::DecryptUserData {
+                    is_live,
+                    scoped_vault_id: sv_id,
+                    reason,
+                    decrypted_fields: dis_searched,
+                },
+            }
+            .create(conn)?;
+
+            Ok(())
+        })
+        .await?;
 
     ResponseData::ok(aml_detail).json()
 }

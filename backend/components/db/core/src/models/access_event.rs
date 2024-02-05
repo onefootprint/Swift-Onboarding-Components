@@ -8,8 +8,6 @@ use newtypes::{
     ScopedVaultId, TenantId,
 };
 
-use super::insight_event::CreateInsightEvent;
-
 #[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = access_event)]
 pub struct AccessEvent {
@@ -34,19 +32,6 @@ pub struct AccessEvent {
     pub purpose: AccessEventPurpose,
 }
 
-#[derive(Debug, Clone)]
-pub struct NewAccessEvent {
-    pub scoped_vault_id: ScopedVaultId,
-    pub tenant_id: TenantId,
-    pub is_live: bool,
-    pub reason: Option<String>,
-    pub principal: DbActor,
-    pub insight: CreateInsightEvent,
-    pub kind: AccessEventKind,
-    pub targets: Vec<DataIdentifier>,
-    pub purpose: AccessEventPurpose,
-}
-
 #[derive(Debug, Clone, Queryable, Insertable)]
 #[diesel(table_name = access_event)]
 pub struct NewAccessEventRow {
@@ -61,27 +46,10 @@ pub struct NewAccessEventRow {
     pub purpose: AccessEventPurpose,
 }
 
-impl NewAccessEvent {
-    #[tracing::instrument("NewAccessEvent::create", skip_all)]
+impl NewAccessEventRow {
+    #[tracing::instrument("NewAccessEventRow::create", skip_all)]
     pub fn create(self, conn: &mut PgConn) -> DbResult<()> {
-        let insight_ev = self.insight.insert_with_conn(conn)?;
-        let event = NewAccessEventRow {
-            scoped_vault_id: self.scoped_vault_id,
-            insight_event_id: insight_ev.id,
-            reason: self.reason,
-            principal: self.principal,
-            kind: self.kind,
-            targets: self.targets,
-            tenant_id: self.tenant_id,
-            is_live: self.is_live,
-            purpose: self.purpose,
-        };
-
-        diesel::insert_into(access_event::table)
-            .values(event)
-            .execute(conn)?;
-
-        Ok(())
+        AccessEvent::bulk_create(conn, vec![self])
     }
 }
 

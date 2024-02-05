@@ -116,7 +116,7 @@ where
     {
         state
             .db_pool
-            .db_query(move |conn| -> ApiResult<_> {
+            .db_transaction(move |conn| -> ApiResult<_> {
                 let insight = insight.insert_with_conn(conn)?;
 
                 let access_and_audit_events = access_events

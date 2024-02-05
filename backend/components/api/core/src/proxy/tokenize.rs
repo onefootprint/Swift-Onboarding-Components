@@ -10,15 +10,16 @@ use crate::{
     ApiError, State,
 };
 use db::models::{
-    access_event::NewAccessEvent, insight_event::CreateInsightEvent, scoped_vault::ScopedVault, vault::Vault,
+    access_event::NewAccessEventRow, audit_event::NewAuditEvent, insight_event::CreateInsightEvent,
+    scoped_vault::ScopedVault, vault::Vault,
 };
 use either::Either;
 use enclave_proxy::{DataTransformer, DataTransforms};
 use futures::future::try_join_all;
 use itertools::Itertools;
 use newtypes::{
-    AccessEventKind, AccessEventPurpose, DataIdentifier, DataRequest, DocumentKind, FpId, PiiBytes,
-    PiiString, S3Url, SealedVaultDataKey, StorageType, TenantId, ValidateArgs,
+    AccessEventKind, AccessEventPurpose, AuditEventDetail, DataIdentifier, DataRequest, DbActor,
+    DocumentKind, FpId, PiiBytes, PiiString, S3Url, SealedVaultDataKey, StorageType, TenantId, ValidateArgs,
 };
 use std::collections::HashMap;
 
@@ -48,7 +49,7 @@ pub async fn vault_pii(
     for (fp_id, values) in values_by_user {
         let tenant_id = auth.tenant().id.clone();
         let is_live = auth.is_live()?;
-        let principal = auth.actor().into();
+        let principal: DbActor = auth.actor().into();
         let insight = CreateInsightEvent::from(insights.clone());
 
         // extract our mime types
@@ -135,20 +136,36 @@ pub async fn vault_pii(
                 let scoped_vault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
                 let vault = Vault::get(conn, &scoped_vault.id)?;
 
-                NewAccessEvent {
+                let insight_event_id = insight.insert_with_conn(conn)?.id;
+
+                let targets: Vec<DataIdentifier> = data
+                    .keys()
+                    .cloned()
+                    .chain(documents.iter().map(|d| DataIdentifier::Document(d.kind)))
+                    .collect();
+
+                NewAccessEventRow {
                     scoped_vault_id: scoped_vault.id.clone(),
                     tenant_id: scoped_vault.tenant_id.clone(),
                     is_live: scoped_vault.is_live,
                     reason: None,
-                    principal,
-                    insight,
+                    principal: principal.clone(),
+                    insight_event_id: insight_event_id.clone(),
                     kind: AccessEventKind::Update,
-                    targets: data
-                        .keys()
-                        .cloned()
-                        .chain(documents.iter().map(|d| DataIdentifier::Document(d.kind)))
-                        .collect(),
+                    targets: targets.clone(),
                     purpose: AccessEventPurpose::VaultProxy,
+                }
+                .create(conn)?;
+
+                NewAuditEvent {
+                    tenant_id,
+                    principal_actor: Some(principal),
+                    insight_event_id,
+                    detail: AuditEventDetail::UpdateUserData {
+                        is_live: scoped_vault.is_live,
+                        scoped_vault_id: scoped_vault.id.clone(),
+                        updated_fields: targets,
+                    },
                 }
                 .create(conn)?;
 

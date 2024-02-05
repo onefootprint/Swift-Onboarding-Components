@@ -14,10 +14,13 @@ use api_core::{
     },
 };
 use db::models::{
-    access_event::NewAccessEvent, insight_event::CreateInsightEvent, scoped_vault::ScopedVault,
+    access_event::NewAccessEventRow, audit_event::NewAuditEvent, insight_event::CreateInsightEvent,
+    scoped_vault::ScopedVault,
 };
 use macros::route_alias;
-use newtypes::{flat_api_object_map_type, AccessEventKind, AccessEventPurpose, DataIdentifier};
+use newtypes::{
+    flat_api_object_map_type, AccessEventKind, AccessEventPurpose, AuditEventDetail, DataIdentifier, DbActor,
+};
 use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 use serde::Deserialize;
 use std::collections::{HashMap, HashSet};
@@ -70,20 +73,35 @@ pub async fn delete(
     let deleted_dis = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<HashSet<_>> {
-            let scoped_user = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
-            let uvw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &scoped_user.id)?;
+            let scoped_vault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let uvw: WriteableVw<Any> = VaultWrapper::lock_for_onboarding(conn, &scoped_vault.id)?;
             let dis = uvw.soft_delete_vault_data(conn, fields.to_vec())?;
 
-            NewAccessEvent {
-                scoped_vault_id: scoped_user.id,
-                tenant_id: scoped_user.tenant_id,
-                is_live: scoped_user.is_live,
+            let insight_event_id = CreateInsightEvent::from(insight).insert_with_conn(conn)?.id;
+            let actor: DbActor = actor.into();
+
+            NewAccessEventRow {
+                scoped_vault_id: scoped_vault.id.clone(),
+                tenant_id: scoped_vault.tenant_id.clone(),
+                is_live: scoped_vault.is_live,
                 reason: None,
-                principal: actor.into(),
-                insight: CreateInsightEvent::from(insight),
+                principal: actor.clone(),
+                insight_event_id: insight_event_id.clone(),
                 kind: AccessEventKind::Delete,
                 targets: dis.clone(),
                 purpose: AccessEventPurpose::Api,
+            }
+            .create(conn)?;
+
+            NewAuditEvent {
+                tenant_id: scoped_vault.tenant_id,
+                principal_actor: Some(actor),
+                insight_event_id,
+                detail: AuditEventDetail::DeleteUserData {
+                    is_live: scoped_vault.is_live,
+                    scoped_vault_id: scoped_vault.id,
+                    deleted_fields: dis.clone(),
+                },
             }
             .create(conn)?;
 

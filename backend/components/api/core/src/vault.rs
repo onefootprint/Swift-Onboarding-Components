@@ -11,10 +11,13 @@ use crate::{
     },
     State,
 };
+use db::models::audit_event::NewAuditEvent;
+use newtypes::AuditEventDetail;
+use newtypes::DbActor;
 
 use crate::utils::headers::SandboxId as SandboxIdHeader;
 use db::models::{
-    access_event::NewAccessEvent, insight_event::CreateInsightEvent, scoped_vault::ScopedVault,
+    access_event::NewAccessEventRow, insight_event::CreateInsightEvent, scoped_vault::ScopedVault,
     vault::NewVaultArgs,
 };
 use itertools::Itertools;
@@ -39,7 +42,6 @@ pub async fn create_non_portable_vault(
 ) -> ApiResult<ResponseData<api_wire_types::LiteUser>> {
     let auth = auth.check_guard(TenantGuard::WriteEntities)?;
     let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
-    let principal = auth.actor().into();
     let insight = CreateInsightEvent::from(insight);
 
     let tenant_id = auth.tenant().id.clone();
@@ -93,31 +95,46 @@ pub async fn create_non_portable_vault(
         .db_transaction(move |conn| -> ApiResult<_> {
             let idempotency_id = idempotency_id.0;
             let external_id = external_id.0;
-            let db_actor = actor.clone().into();
+            let db_actor: DbActor = actor.clone().into();
             let (su, vault) = ScopedVault::get_or_create_non_portable(
                 conn,
                 new_user,
                 tenant_id,
                 idempotency_id,
                 external_id,
-                db_actor,
+                db_actor.clone(),
             )?;
 
             if let Some((targets, request)) = request_info {
                 // If any initial request data was provided, add it to the vault
                 let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &su.id)?;
                 uvw.patch_data(conn, request, source, Some(actor))?;
+
+                let insight_event_id = insight.insert_with_conn(conn)?.id;
+
                 // Create an access event to show data was added
-                NewAccessEvent {
+                NewAccessEventRow {
                     scoped_vault_id: su.id.clone(),
                     tenant_id: su.tenant_id.clone(),
                     is_live: su.is_live,
                     reason: None,
-                    principal,
-                    insight,
+                    principal: db_actor.clone(),
+                    insight_event_id: insight_event_id.clone(),
                     kind: AccessEventKind::Update,
-                    targets,
+                    targets: targets.clone(),
                     purpose: AccessEventPurpose::Api,
+                }
+                .create(conn)?;
+
+                NewAuditEvent {
+                    tenant_id: su.tenant_id.clone(),
+                    principal_actor: Some(db_actor),
+                    insight_event_id,
+                    detail: AuditEventDetail::UpdateUserData {
+                        is_live: su.is_live,
+                        scoped_vault_id: su.id.clone(),
+                        updated_fields: targets,
+                    },
                 }
                 .create(conn)?;
             }

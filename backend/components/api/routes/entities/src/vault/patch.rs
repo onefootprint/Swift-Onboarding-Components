@@ -14,13 +14,14 @@ use api_core::{
     utils::{fp_id_path::FpIdPath, headers::IgnoreLuhnValidation, vault_wrapper::Any},
 };
 use db::models::{
-    access_event::NewAccessEvent, insight_event::CreateInsightEvent, scoped_vault::ScopedVault,
+    access_event::NewAccessEventRow, audit_event::NewAuditEvent, insight_event::CreateInsightEvent,
+    scoped_vault::ScopedVault,
 };
 use itertools::Itertools;
 use macros::route_alias;
 use newtypes::{
     put_data_request::{PatchDataRequest, RawDataRequest},
-    AccessEventKind, AccessEventPurpose, FpId, ValidateArgs,
+    AccessEventKind, AccessEventPurpose, AuditEventDetail, DbActor, FpId, ValidateArgs,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -95,7 +96,6 @@ async fn patch_inner(
 
     let tenant_id: newtypes::TenantId = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
-    let principal = auth.actor().into();
 
     // If the initial request has an ssn4, see if the vault already has the same ssn4 and if so no-op
     // TODO we'll probably want to generalize this logic for all pieces of info later. Could store
@@ -144,41 +144,68 @@ async fn patch_inner(
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let scoped_user: ScopedVault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
+            let scoped_vault: ScopedVault = ScopedVault::get(conn, (&fp_id, &tenant_id, is_live))?;
 
-            let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &scoped_user.id)?;
+            let uvw = VaultWrapper::<Any>::lock_for_onboarding(conn, &scoped_vault.id)?;
             // TODO one day, delete in `patch_data` below and make a more informative timeline
             // event with context on what was updated, deleted, and added
             let deleted_dis = uvw.soft_delete_vault_data(conn, deletions)?;
             let updated_dis = updates.keys().cloned().collect_vec();
             uvw.patch_data(conn, updates, source, Some(actor.clone()))?;
 
+            let insight_event_id = insight.insert_with_conn(conn)?.id;
+            let principal: DbActor = actor.into();
+
             // Create access events to show data was added/deleted
             if !updated_dis.is_empty() {
-                NewAccessEvent {
-                    scoped_vault_id: scoped_user.id.clone(),
-                    tenant_id: scoped_user.tenant_id.clone(),
-                    is_live: scoped_user.is_live,
+                NewAccessEventRow {
+                    scoped_vault_id: scoped_vault.id.clone(),
+                    tenant_id: scoped_vault.tenant_id.clone(),
+                    is_live: scoped_vault.is_live,
                     reason: None,
-                    principal,
-                    insight: insight.clone(),
+                    principal: principal.clone(),
+                    insight_event_id: insight_event_id.clone(),
                     kind: AccessEventKind::Update,
-                    targets: updated_dis,
+                    targets: updated_dis.clone(),
                     purpose: AccessEventPurpose::Api,
+                }
+                .create(conn)?;
+
+                NewAuditEvent {
+                    tenant_id: scoped_vault.tenant_id.clone(),
+                    principal_actor: Some(principal.clone()),
+                    insight_event_id: insight_event_id.clone(),
+                    detail: AuditEventDetail::UpdateUserData {
+                        is_live: scoped_vault.is_live,
+                        scoped_vault_id: scoped_vault.id.clone(),
+                        updated_fields: updated_dis,
+                    },
                 }
                 .create(conn)?;
             }
             if !deleted_dis.is_empty() {
-                NewAccessEvent {
-                    scoped_vault_id: scoped_user.id,
-                    tenant_id: scoped_user.tenant_id,
-                    is_live: scoped_user.is_live,
+                NewAccessEventRow {
+                    scoped_vault_id: scoped_vault.id.clone(),
+                    tenant_id: scoped_vault.tenant_id.clone(),
+                    is_live: scoped_vault.is_live,
                     reason: None,
-                    principal: actor.into(),
-                    insight,
+                    principal: principal.clone(),
+                    insight_event_id: insight_event_id.clone(),
                     kind: AccessEventKind::Delete,
-                    targets: deleted_dis,
+                    targets: deleted_dis.clone(),
                     purpose: AccessEventPurpose::Api,
+                }
+                .create(conn)?;
+
+                NewAuditEvent {
+                    tenant_id: scoped_vault.tenant_id,
+                    principal_actor: Some(principal),
+                    insight_event_id,
+                    detail: AuditEventDetail::DeleteUserData {
+                        is_live: scoped_vault.is_live,
+                        scoped_vault_id: scoped_vault.id,
+                        deleted_fields: deleted_dis,
+                    },
                 }
                 .create(conn)?;
             }

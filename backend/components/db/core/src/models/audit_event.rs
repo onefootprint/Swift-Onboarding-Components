@@ -72,12 +72,14 @@ pub struct NewAuditEvent {
     pub detail: AuditEventDetail,
 }
 
-impl AuditEvent {
-    #[tracing::instrument("AuditEvent::create", skip_all)]
-    pub fn create(conn: &mut PgConn, event: NewAuditEvent) -> DbResult<()> {
-        AuditEvent::bulk_create(conn, vec![event])
+impl NewAuditEvent {
+    #[tracing::instrument("NewAuditEvent::create", skip_all)]
+    pub fn create(self, conn: &mut PgConn) -> DbResult<()> {
+        AuditEvent::bulk_create(conn, vec![self])
     }
+}
 
+impl AuditEvent {
     #[tracing::instrument("AuditEvent::bulk_create", skip_all)]
     pub fn bulk_create(conn: &mut PgConn, events: Vec<NewAuditEvent>) -> DbResult<()> {
         let rows = events
@@ -144,7 +146,7 @@ mod tests {
         let scoped_vault = tests::fixtures::scoped_vault::create(conn, &vault.id, &obc.id);
         let insight_event = tests::fixtures::insight_event::create(conn);
 
-        let new_event = NewAuditEvent {
+        NewAuditEvent {
             tenant_id: tenant.id.clone(),
             principal_actor: Some(DbActor::Footprint),
             insight_event_id: insight_event.id,
@@ -153,9 +155,9 @@ mod tests {
                 scoped_vault_id: scoped_vault.id.clone(),
                 created_fields: vec![DataIdentifier::Id(newtypes::IdentityDataKind::Dob)],
             },
-        };
-
-        AuditEvent::create(conn, new_event).unwrap();
+        }
+        .create(conn)
+        .unwrap();
 
         let events: Vec<AuditEvent> = audit_event::table
             .filter(audit_event::tenant_id.eq(&tenant.id))

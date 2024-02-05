@@ -24,6 +24,11 @@ pub enum AuditEventDetail {
         scoped_vault_id: ScopedVaultId,
         updated_fields: Vec<DataIdentifier>,
     },
+    DeleteUserData {
+        is_live: bool,
+        scoped_vault_id: ScopedVaultId,
+        deleted_fields: Vec<DataIdentifier>,
+    },
     DecryptUserData {
         is_live: bool,
         scoped_vault_id: ScopedVaultId,
@@ -91,6 +96,22 @@ impl From<AuditEventDetail> for CommonAuditEventDetail {
             } => Self {
                 metadata: AuditEventMetadata::UpdateUserData {
                     fields: updated_fields,
+                },
+                scoped_vault_id: Some(scoped_vault_id),
+                ob_configuration_id: None,
+                document_data_id: None,
+                tenant_api_key_id: None,
+                tenant_user_id: None,
+                tenant_role_id: None,
+                is_live: Some(is_live),
+            },
+            AuditEventDetail::DeleteUserData {
+                is_live,
+                scoped_vault_id,
+                deleted_fields,
+            } => Self {
+                metadata: AuditEventMetadata::DeleteUserData {
+                    fields: deleted_fields,
                 },
                 scoped_vault_id: Some(scoped_vault_id),
                 ob_configuration_id: None,
@@ -179,6 +200,9 @@ pub enum AuditEventMetadata {
         fields: Vec<DataIdentifier>,
     },
     UpdateUserData {
+        fields: Vec<DataIdentifier>,
+    },
+    DeleteUserData {
         fields: Vec<DataIdentifier>,
     },
     DecryptUserData {
