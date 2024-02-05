@@ -295,7 +295,7 @@ impl ApiError {
 impl actix_web::ResponseError for ApiError {
     fn status_code(&self) -> StatusCode {
         match self.0.as_ref() {
-            ApiErrorKind::ErrorWithCode(_) => StatusCode::BAD_REQUEST,
+            ApiErrorKind::ErrorWithCode(e) => e.status_code(),
             ApiErrorKind::AuthError(_) => StatusCode::UNAUTHORIZED,
             ApiErrorKind::KmsError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiErrorKind::S3Error(_) => StatusCode::INTERNAL_SERVER_ERROR,

@@ -1,3 +1,4 @@
+use http::StatusCode;
 use serde_json::{json, Value};
 use strum::EnumMessage;
 use strum_macros;
@@ -57,6 +58,32 @@ pub enum ErrorWithCode {
     SessionExpired,
     #[strum(message = "E119", detailed_message = "Session invalid")]
     CouldNotParseSession,
+}
+
+impl ErrorWithCode {
+    pub fn status_code(&self) -> StatusCode {
+        match self {
+            Self::InvalidStatusTransition => StatusCode::BAD_REQUEST,
+            Self::IncorrectPin => StatusCode::BAD_REQUEST,
+            Self::ChallengeExpired => StatusCode::BAD_REQUEST,
+            Self::RateLimited(_) => StatusCode::TOO_MANY_REQUESTS,
+            Self::UnsupportedChallengeKind(_) => StatusCode::BAD_REQUEST,
+            Self::CannotRegisterPasskey => StatusCode::BAD_REQUEST,
+            Self::LoginChallengeUserNotFound => StatusCode::BAD_REQUEST,
+            Self::OnlyOneIdentifier => StatusCode::BAD_REQUEST,
+            Self::IdentityDocumentNotPending => StatusCode::BAD_REQUEST,
+            Self::InvalidFileUploadMissing => StatusCode::BAD_REQUEST,
+            Self::MissingMimeType => StatusCode::BAD_REQUEST,
+            Self::InvalidMimeType(_) => StatusCode::BAD_REQUEST,
+            Self::MultipartError => StatusCode::BAD_REQUEST,
+            Self::FileTooLarge(_) => StatusCode::BAD_REQUEST,
+            Self::InvalidContentLength => StatusCode::BAD_REQUEST,
+            Self::MissingFilename => StatusCode::BAD_REQUEST,
+            Self::NoSessionFound => StatusCode::UNAUTHORIZED,
+            Self::SessionExpired => StatusCode::UNAUTHORIZED,
+            Self::CouldNotParseSession => StatusCode::UNAUTHORIZED,
+        }
+    }
 }
 
 macro_rules! context_macro {
