@@ -55,6 +55,9 @@ async fn patch(
         logo_url,
         privacy_policy_url,
         allow_domain_access,
+        support_email,
+        support_phone,
+        support_website,
     } = request.into_inner();
 
     if allow_domain_access == Some(true) && tenant.domains.is_empty() {
@@ -68,8 +71,11 @@ async fn patch(
         website_url,
         company_size,
         privacy_policy_url,
-        stripe_customer_id: None,
         allow_domain_access,
+        support_email,
+        support_phone,
+        support_website,
+        stripe_customer_id: None,
     };
     let updated_tenant = state
         .db_pool

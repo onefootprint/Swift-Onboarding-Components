@@ -10,6 +10,9 @@ pub struct UpdateTenantRequest {
     pub logo_url: Option<String>,
     pub privacy_policy_url: Option<String>,
     pub allow_domain_access: Option<bool>,
+    pub support_email: Option<String>,
+    pub support_phone: Option<String>,
+    pub support_website: Option<String>,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]

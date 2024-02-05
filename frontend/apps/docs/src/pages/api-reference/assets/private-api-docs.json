@@ -5114,6 +5114,15 @@
                             "name": {
                                 "type": "string"
                             },
+                            "support_email": {
+                                "type": "string"
+                            },
+                            "support_phone": {
+                                "type": "string"
+                            },
+                            "support_website": {
+                                "type": "string"
+                            },
                             "website_url": {
                                 "type": "string"
                             }
@@ -5453,6 +5462,15 @@
                                 "type": "string"
                             },
                             "name": {
+                                "type": "string"
+                            },
+                            "support_email": {
+                                "type": "string"
+                            },
+                            "support_phone": {
+                                "type": "string"
+                            },
+                            "support_website": {
                                 "type": "string"
                             },
                             "website_url": {
@@ -16711,6 +16729,15 @@
                             "name": {
                                 "type": "string"
                             },
+                            "support_email": {
+                                "type": "string"
+                            },
+                            "support_phone": {
+                                "type": "string"
+                            },
+                            "support_website": {
+                                "type": "string"
+                            },
                             "website_url": {
                                 "type": "string"
                             }
@@ -16928,6 +16955,15 @@
                         "type": "string"
                     },
                     "name": {
+                        "type": "string"
+                    },
+                    "support_email": {
+                        "type": "string"
+                    },
+                    "support_phone": {
+                        "type": "string"
+                    },
+                    "support_website": {
                         "type": "string"
                     },
                     "website_url": {
@@ -19357,6 +19393,15 @@
                         "type": "string"
                     },
                     "privacy_policy_url": {
+                        "type": "string"
+                    },
+                    "support_email": {
+                        "type": "string"
+                    },
+                    "support_phone": {
+                        "type": "string"
+                    },
+                    "support_website": {
                         "type": "string"
                     },
                     "website_url": {

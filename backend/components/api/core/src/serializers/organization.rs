@@ -49,6 +49,9 @@ impl
             is_prod_ob_config_restricted,
             is_prod_kyb_playbook_restricted,
             is_prod_auth_playbook_restricted,
+            support_email,
+            support_phone,
+            support_website,
             ..
         } = t;
         Self {
@@ -66,6 +69,9 @@ impl
             is_prod_kyc_playbook_restricted: is_prod_ob_config_restricted,
             is_prod_kyb_playbook_restricted,
             is_prod_auth_playbook_restricted,
+            support_email,
+            support_phone,
+            support_website,
         }
     }
 }

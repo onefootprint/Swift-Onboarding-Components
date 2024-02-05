@@ -344,4 +344,7 @@ pub struct UpdateTenant {
     pub privacy_policy_url: Option<String>,
     pub stripe_customer_id: Option<StripeCustomerId>,
     pub allow_domain_access: Option<bool>,
+    pub support_email: Option<String>,
+    pub support_phone: Option<String>,
+    pub support_website: Option<String>,
 }
