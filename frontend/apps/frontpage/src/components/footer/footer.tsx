@@ -19,6 +19,8 @@ const productLinks = ['compare', 'pricing'];
 
 const companyLinks = ['about', 'blog', 'investor-updates'];
 
+const SUPPORT_EMAIL_ADDRESS = 'support@onefootprint.com';
+
 const resourcesLinks = [
   'terms-of-service',
   'privacy-policy',
@@ -45,6 +47,11 @@ const Footer = () => {
               <Typography variant="body-3" color="tertiary">
                 © {currentYear} {t('copyright')}
               </Typography>
+              <Link href={`mailto:${SUPPORT_EMAIL_ADDRESS}`}>
+                <Typography variant="body-3" color="tertiary">
+                  {SUPPORT_EMAIL_ADDRESS}
+                </Typography>
+              </Link>
               <Typography variant="body-3" color="tertiary">
                 {t('phone-number')}
               </Typography>
@@ -207,6 +214,11 @@ const TopLeftLinks = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[5]};
+    align-items: flex-start;
+
+    a {
+      text-decoration: none;
+    }
 
     ${media.greaterThan('lg')`
       width: 300px;
