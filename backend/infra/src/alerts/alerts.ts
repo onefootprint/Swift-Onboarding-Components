@@ -293,7 +293,7 @@ const staticAlerts: Alert[] = [
       calculations: [
         {
           op: 'MAX',
-          column: 'amazonaws.com/AWS/ECS/CPUUtilization.max',
+          column: 'amazonaws.com/AWS/ECS/CPUUtilization.avg',
         },
       ],
       filters: [
