@@ -100,8 +100,7 @@ def reactNativeArchitectures() {
 
 android {
     ndkVersion rootProject.ext.ndkVersion
-
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdk 34
 
     namespace "com.onefootprint.my"
     defaultConfig {
@@ -148,6 +147,7 @@ android {
             shrinkResources (findProperty('android.enableShrinkResourcesInReleaseBuilds')?.toBoolean() ?: false)
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            matchingFallbacks = ['release', 'debug']
         }
     }
 
@@ -174,10 +174,11 @@ dependencies {
     implementation("com.google.android.gms:play-services-instantapps:18.0.1")
 
     // Instant app manual linking
-    implementation project(':vision-camera-plugin-document')
-    implementation project(':vision-camera-plugin-face-detection')
+//    implementation project(':vision-camera-plugin-document')
+//    implementation project(':vision-camera-plugin-face-detection')
     implementation project(':shopify_flash-list')
     implementation project(':react-native-vision-camera')
+    implementation project(':react-native-worklets-core')
     implementation project(':react-native-svg')
     implementation project(':react-native-screens')
     implementation project(':react-native-safe-area-context')
@@ -185,7 +186,7 @@ dependencies {
     implementation project(':react-native-passkey')
     implementation project(':react-native-community_masked-view')
     implementation project(':react-native-async-storage_async-storage')
-    implementation project(':bam.tech_react-native-image-resizer')
+    implementation project(':mixpanel-react-native')
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {

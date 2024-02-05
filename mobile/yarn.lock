@@ -8704,7 +8704,7 @@ minizlib@^2.1.1:
     minipass "^3.0.0"
     yallist "^4.0.0"
 
-mixpanel-react-native@^2.3.1:
+mixpanel-react-native@^2.4.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/mixpanel-react-native/-/mixpanel-react-native-2.4.0.tgz#058032fa89c67e8167c03933864236878750221d"
   integrity sha512-pq7USOLMSo8edTogY3EQFQo9b9m72PTCUT2Hhu7i/LlFhksI+NBwpXwMZjcCj+QnFzi52qzlcaQ36GFkEHGZ3w==

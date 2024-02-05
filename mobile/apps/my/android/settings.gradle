@@ -7,4 +7,7 @@ apply from: new File(["node", "--print", "require.resolve('@react-native-communi
 applyNativeModulesSettingsGradle(settings)
 
 include ':app', ':appInstant'
-includeBuild('../node_modules/@react-native/gradle-plugin')
+include ':vision-camera-plugin-document'
+include ':vision-camera-plugin-face-detection'
+include ':bam.tech_react-native-image-resizer'
+includeBuild('../../../node_modules/react-native-gradle-plugin')

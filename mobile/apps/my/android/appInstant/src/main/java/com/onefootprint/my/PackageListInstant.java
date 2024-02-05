@@ -11,9 +11,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 // Manual package linking
+import com.mixpanel.reactnative.MixpanelReactNativePackage;
 import com.mrousavy.camera.CameraPackage;
-import com.visioncameraplugindocument.VisionCameraPluginDocumentPackage;
-import com.visioncamerafacedetection.VisionCameraFaceDetectionPackage;
+//import com.visioncameraplugindocument.VisionCameraPluginDocumentPackage;
+//import com.visioncamerafacedetection.VisionCameraFaceDetectionPackage;
 import com.shopify.reactnative.flash_list.ReactNativeFlashListPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
@@ -22,8 +23,9 @@ import com.reactnativepasskey.PasskeyPackage;
 import org.reactnative.maskedview.RNCMaskedViewPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.swmansion.reanimated.ReanimatedPackage;
+import com.worklets.WorkletsPackage;
+
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
-import com.reactnativeimageresizer.ImageResizerPackage;
 
 public class PackageListInstant {
     private Application application;
@@ -69,8 +71,8 @@ public class PackageListInstant {
         return new ArrayList<>(Arrays.<ReactPackage>asList(
                 new MainReactPackage(mConfig),
                 new CameraPackage(),
-                new VisionCameraPluginDocumentPackage(),
-                new VisionCameraFaceDetectionPackage(),
+//                new VisionCameraPluginDocumentPackage(),
+//                new VisionCameraFaceDetectionPackage(),
                 new ReactNativeFlashListPackage(),
                 new SafeAreaContextPackage(),
                 new RNScreensPackage(),
@@ -80,7 +82,8 @@ public class PackageListInstant {
                 new AsyncStoragePackage(),
                 new ReanimatedPackage(),
                 new SplashScreenReactPackage(),
-                new ImageResizerPackage()
+                new WorkletsPackage(),
+                new MixpanelReactNativePackage()
         ));
     }
 }
