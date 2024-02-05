@@ -3,7 +3,7 @@ use reqwest::StatusCode;
 
 #[derive(Debug, thiserror::Error)]
 pub enum CipError {
-    #[error("The entity must have an onboarding decision")]
+    #[error("The entity did not complete onboarding via Footprint")]
     EntityDecisionDoesNotExist,
 
     #[error("The entity must have an approved decision status")]
