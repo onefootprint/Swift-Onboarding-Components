@@ -15,6 +15,9 @@ type RouterProps = {
 
 const Router = ({ authToken, onDone }: RouterProps) => {
   const [state, send] = useMachine(() => createMachine());
+  const {
+    remainingRequirements: { idDoc },
+  } = state.context;
   const attestDeviceMutation = useAttestDevice();
 
   useEffect(() => {
@@ -53,9 +56,9 @@ const Router = ({ authToken, onDone }: RouterProps) => {
           }}
         />
       )}
-      {state.matches('idDoc') && (
+      {state.matches('idDoc') && idDoc && (
         <IdDoc
-          requirement={state.context.remainingRequirements.idDoc}
+          requirement={idDoc}
           authToken={authToken}
           onDone={() => send({ type: 'requirementCompleted' })}
         />

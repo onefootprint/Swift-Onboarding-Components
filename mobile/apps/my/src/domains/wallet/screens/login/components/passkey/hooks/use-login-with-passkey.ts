@@ -1,4 +1,4 @@
-import request, { getErrorMessage } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import type {
   BiometricLoginChallengeJson,
   Identifier,
@@ -12,6 +12,7 @@ import { useMutation } from '@tanstack/react-query';
 import base64url from 'base64url';
 import { Passkey } from 'react-native-passkey';
 
+import useRequestError from '@/hooks/use-request-error';
 import useTranslation from '@/hooks/use-translation';
 
 import hasUserCancelledPasskey from '../utils/has-user-canceled-passkey';
@@ -76,6 +77,7 @@ const loginWithPasskey = async (identifier: Identifier) => {
 
 const useLoginWithPasskey = () => {
   const { t } = useTranslation('screens.login.passkey.notifications');
+  const { getErrorMessage } = useRequestError();
   const toast = useToast();
 
   return useMutation({

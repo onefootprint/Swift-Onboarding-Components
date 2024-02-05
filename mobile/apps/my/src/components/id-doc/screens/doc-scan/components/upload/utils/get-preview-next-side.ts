@@ -3,7 +3,7 @@ import { SupportedIdDocTypes, UploadDocumentSide } from '@onefootprint/types';
 const getPreviewNextSide = (
   side: UploadDocumentSide,
   type: SupportedIdDocTypes,
-) => {
+): UploadDocumentSide | null => {
   if (side === UploadDocumentSide.Selfie) {
     return null;
   }

@@ -1,8 +1,8 @@
-import styled, { css } from 'styled-components/native';
 import { Box, Button, Checkbox, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { Modal, ScrollView } from 'react-native';
+import styled, { css } from 'styled-components/native';
 
 import useTranslation from '@/hooks/use-translation';
 

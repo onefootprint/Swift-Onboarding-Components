@@ -1,5 +1,4 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
-import { getErrorMessage } from '@onefootprint/request';
 import type {
   SupportedIdDocTypes,
   UploadDocumentSide,
@@ -8,6 +7,7 @@ import { Container } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
 import { PREVIEW_AUTH_TOKEN } from '@/config/constants';
+import useRequestError from '@/hooks/use-request-error';
 import useTranslation from '@/hooks/use-translation';
 import { Events, useAnalytics } from '@/utils/analytics';
 
@@ -25,7 +25,7 @@ export type UploadProps = {
   authToken: string;
   docId: string;
   onRetryLimitExceeded: () => void;
-  onSuccess: (nextSideToCollect: UploadDocumentSide) => void;
+  onSuccess: (nextSideToCollect: UploadDocumentSide | null) => void;
   side: UploadDocumentSide;
   type: SupportedIdDocTypes;
 };
@@ -42,9 +42,10 @@ const Upload = ({
 }: UploadProps) => {
   const { t, allT } = useTranslation('scan.upload');
   const mutation = useUploadDoc();
+  const { getErrorMessage } = useRequestError();
   const analytics = useAnalytics();
   const isPreview = PREVIEW_AUTH_TOKEN === authToken;
-  const [document, setDocument] = useState<Document>(null);
+  const [document, setDocument] = useState<Document | null>(null);
   const [errors, setErrors] = useState([]);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showRetryExceeded, setShowRetryExceeded] = useState(false);
@@ -72,7 +73,7 @@ const Upload = ({
       const file = {
         name: 'file.jpg',
         type: 'image/jpeg',
-        uri: photo.path,
+        uri: photo?.path,
       };
       // @ts-ignore
       data.append('file', file);
@@ -81,7 +82,7 @@ const Upload = ({
           authToken,
           data,
           docId,
-          meta: photo.metadata,
+          meta: photo?.metadata ?? {},
           side,
         },
         {

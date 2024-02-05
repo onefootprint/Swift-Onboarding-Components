@@ -1,8 +1,8 @@
 import { IcoChevronLeftBig24, IcoInfo24 } from '@onefootprint/icons';
-import styled, { css } from 'styled-components/native';
 import { Box, Pressable, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import styled, { css } from 'styled-components/native';
 
 import InstructionsModal from './components/instructions-modal';
 

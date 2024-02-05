@@ -1,5 +1,4 @@
 import { IcoFaceid40 } from '@onefootprint/icons';
-import { getErrorMessage } from '@onefootprint/request';
 import {
   Box,
   Button,
@@ -10,6 +9,7 @@ import {
 import React, { useEffect } from 'react';
 import { Passkey } from 'react-native-passkey';
 
+import useRequestError from '@/hooks/use-request-error';
 import useTranslation from '@/hooks/use-translation';
 import { Events, useAnalytics } from '@/utils/analytics';
 
@@ -26,6 +26,7 @@ export type RegisterProps = {
 
 const Register = ({ authToken, onSkip, onSuccess, onError }: RegisterProps) => {
   const { t } = useTranslation('components.passkeys.register');
+  const { getErrorMessage } = useRequestError();
   const registerMutation = useRegisterPasskeys();
   const skipMutation = useSkipPasskeys();
   const analytics = useAnalytics();
@@ -37,13 +38,13 @@ const Register = ({ authToken, onSkip, onSuccess, onError }: RegisterProps) => {
       onSuccess: deviceResponseJson => {
         analytics.track(Events.PasskeyRegistrationSucceeded);
         analytics.track(Events.FPasskeyCompleted, { result: 'success' });
-        onSuccess(deviceResponseJson);
+        onSuccess?.(deviceResponseJson);
       },
       onError: (error: unknown) => {
         analytics.track(Events.PasskeyRegistrationFailed, {
           message: getErrorMessage(error),
         });
-        onError(error);
+        onError?.(error);
       },
     });
   };

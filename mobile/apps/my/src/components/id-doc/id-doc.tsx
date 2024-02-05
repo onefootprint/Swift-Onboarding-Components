@@ -22,12 +22,13 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
   const [state, send] = useMachine(() => createMachine(requirement));
   const { currentSide, collectingDocumentMeta } = state.context;
   const { shouldCollectConsent, supportedCountryAndDocTypes } =
-    state.context.requirement;
+    state.context.requirement || {};
 
   const analytics = useAnalytics();
-  const country = getCountryFromCode(
-    collectingDocumentMeta?.countryCode ?? DEFAULT_COUNTRY.value,
-  );
+  const country =
+    getCountryFromCode(
+      collectingDocumentMeta?.countryCode ?? DEFAULT_COUNTRY.value,
+    ) ?? DEFAULT_COUNTRY;
 
   useEffect(() => {
     if (state.done) {
@@ -44,7 +45,7 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
       <DocSelection
         authToken={authToken}
         defaultCountry={country}
-        defaultType={collectingDocumentMeta.type}
+        defaultType={collectingDocumentMeta?.type}
         onConsentCompleted={() => {
           analytics.track(Events.DocConsentAccepted);
           send('consentCompleted');
@@ -54,10 +55,15 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
             payload: { countryCode, documentType, docId },
           });
         }}
-        shouldCollectConsent={shouldCollectConsent}
+        shouldCollectConsent={!!shouldCollectConsent}
         supportedCountryAndDocTypes={supportedCountryAndDocTypes}
       />
     );
+  }
+
+  const { docId, type } = collectingDocumentMeta || {};
+  if (!docId || !type || !currentSide) {
+    return null;
   }
 
   if (
@@ -69,7 +75,7 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
       <DocScan
         authToken={authToken}
         country={country}
-        docId={collectingDocumentMeta.docId}
+        docId={docId}
         key={currentSide}
         onBack={() => {
           send('backButtonTapped');
@@ -81,7 +87,7 @@ const IdDoc = ({ authToken, requirement, onDone }: IdDocProps) => {
           send('retryLimitExceeded');
         }}
         side={currentSide}
-        type={collectingDocumentMeta.type}
+        type={type}
       />
     );
   }

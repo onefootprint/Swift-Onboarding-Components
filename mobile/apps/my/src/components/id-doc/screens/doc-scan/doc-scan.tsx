@@ -13,7 +13,7 @@ export type DocScanProps = {
   country: CountryRecord;
   docId: string;
   onBack?: () => void;
-  onDone: (nextSideToCollect: UploadDocumentSide) => void;
+  onDone: (nextSideToCollect: UploadDocumentSide | null) => void;
   onRetryLimitExceeded: () => void;
   side: UploadDocumentSide;
   type: SupportedIdDocTypes;

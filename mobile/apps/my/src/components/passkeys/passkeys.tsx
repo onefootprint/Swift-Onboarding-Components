@@ -18,11 +18,11 @@ const Passkeys = ({ authToken, onDone }: PasskeysProps) => {
   };
 
   const handleSuccess = (deviceResponseJson: string) => {
-    onDone(deviceResponseJson);
+    onDone?.(deviceResponseJson);
   };
 
   const handleSkip = () => {
-    onDone(null);
+    onDone?.(null);
   };
 
   return (

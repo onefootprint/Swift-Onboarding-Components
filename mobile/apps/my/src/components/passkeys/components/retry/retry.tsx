@@ -1,8 +1,8 @@
 import { IcoFaceid40 } from '@onefootprint/icons';
-import { getErrorMessage } from '@onefootprint/request';
 import { Box, Button, Container, Typography } from '@onefootprint/ui';
 import React from 'react';
 
+import useRequestError from '@/hooks/use-request-error';
 import useTranslation from '@/hooks/use-translation';
 import { Events, useAnalytics } from '@/utils/analytics';
 
@@ -18,6 +18,7 @@ export type RetryProps = {
 
 const Retry = ({ authToken, onSkip, onSuccess }: RetryProps) => {
   const { t } = useTranslation('components.passkeys.retry');
+  const { getErrorMessage } = useRequestError();
   const registerBiometric = useRegisterPasskeys();
   const skipMutation = useSkipPasskeys();
   const analytics = useAnalytics();
@@ -34,7 +35,7 @@ const Retry = ({ authToken, onSkip, onSuccess }: RetryProps) => {
       onSuccess: deviceResponseJson => {
         analytics.track(Events.PasskeyRegistrationSucceeded);
         analytics.track(Events.FPasskeyCompleted, { result: 'success' });
-        onSuccess(deviceResponseJson);
+        onSuccess?.(deviceResponseJson);
       },
       onError: (error: unknown) => {
         analytics.track(Events.PasskeyRegistrationRetriedFailed, {

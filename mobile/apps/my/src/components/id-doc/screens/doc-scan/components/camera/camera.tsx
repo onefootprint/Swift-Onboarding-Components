@@ -1,9 +1,9 @@
-import styled, { css } from 'styled-components/native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Camera as VisionCamera,
   useCameraDevice,
 } from 'react-native-vision-camera';
+import styled, { css } from 'styled-components/native';
 import { useTimeout } from 'usehooks-ts';
 
 import haptic from '@/utils/haptic';

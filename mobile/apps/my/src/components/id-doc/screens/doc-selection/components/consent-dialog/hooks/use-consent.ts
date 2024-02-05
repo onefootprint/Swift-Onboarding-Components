@@ -1,9 +1,10 @@
-import request, { getErrorMessage } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import type { ConsentRequest, ConsentResponse } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import { useMutation } from '@tanstack/react-query';
 
 import { AUTH_HEADER } from '@/config/constants';
+import useRequestError from '@/hooks/use-request-error';
 import useTranslation from '@/hooks/use-translation';
 
 const consent = async ({ consentLanguageText, authToken }: ConsentRequest) => {
@@ -22,6 +23,7 @@ const consent = async ({ consentLanguageText, authToken }: ConsentRequest) => {
 
 const useConsent = () => {
   const { t } = useTranslation('scan.selfie.consent');
+  const { getErrorMessage } = useRequestError();
   const toast = useToast();
 
   return useMutation({

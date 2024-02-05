@@ -39,7 +39,7 @@ const generateDeviceResponse = async ({
   const result = (await Passkey.register({
     challenge: base64url.toBase64(publicKey.challenge as unknown as string),
     rp: {
-      id: publicKey.rp.id,
+      id: publicKey.rp.id as string,
       name: publicKey.rp.name,
     },
     user: {
@@ -64,7 +64,15 @@ const generateDeviceResponse = async ({
   return JSON.stringify(response);
 };
 
-const register = async ({ authToken, deviceResponseJson, challengeToken }) => {
+const register = async ({
+  authToken,
+  deviceResponseJson,
+  challengeToken,
+}: {
+  authToken: string;
+  deviceResponseJson: unknown;
+  challengeToken: string;
+}) => {
   const response = await request<BiometricRegisterResponse>({
     method: 'POST',
     url: '/hosted/user/passkey',
@@ -80,7 +88,7 @@ const register = async ({ authToken, deviceResponseJson, challengeToken }) => {
   return response;
 };
 
-const registerBiometric = async (authToken: string) => {
+const registerPasskeys = async (authToken: string) => {
   const { challengeToken, challengeJson } = await biometricInit(authToken);
   const challenge = JSON.parse(challengeJson) as BiometricRegisterChallengeJson;
   const deviceResponseJson = await generateDeviceResponse(challenge);
@@ -92,6 +100,6 @@ const registerBiometric = async (authToken: string) => {
   return deviceResponseJson;
 };
 
-const useBiometricInit = () => useMutation(registerBiometric);
+const useRegisterPasskeys = () => useMutation(registerPasskeys);
 
-export default useBiometricInit;
+export default useRegisterPasskeys;

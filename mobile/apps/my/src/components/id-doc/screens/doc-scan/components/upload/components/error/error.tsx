@@ -23,9 +23,13 @@ const Error = ({ errors, onReset }: ErrorProps) => {
           <Typography variant="label-1" color="error">
             {t('title')}
           </Typography>
-          <Typography variant="body-2" color="secondary" center>
-            {errors.join(' ')}
-          </Typography>
+          {errors.map(e => {
+            return (
+              <Typography key={e} variant="body-2" color="secondary" center>
+                • {e}
+              </Typography>
+            );
+          })}
         </Box>
       </Box>
       <Button onPress={onReset}>{t('cta')}</Button>

@@ -1,6 +1,5 @@
 import type { CountryRecord } from '@onefootprint/global-constants';
 import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
-import { getErrorMessage } from '@onefootprint/request';
 import type { CountryCode, SupportedIdDocTypes } from '@onefootprint/types';
 import type { SelectOption } from '@onefootprint/ui';
 import {
@@ -16,6 +15,7 @@ import React, { useState } from 'react';
 import ScrollLayout from '@/components/scroll-layout';
 import { PREVIEW_AUTH_TOKEN } from '@/config/constants';
 import useApp from '@/domains/idv/hooks/use-app';
+import useRequestError from '@/hooks/use-request-error';
 import useTranslation from '@/hooks/use-translation';
 import { Events, useAnalytics } from '@/utils/analytics';
 
@@ -49,6 +49,7 @@ const DocSelection = ({
   shouldCollectConsent,
   supportedCountryAndDocTypes,
 }: DocSelectionProps) => {
+  const { getErrorMessage } = useRequestError();
   const { t } = useTranslation('scan.doc-selection');
   const [showConsent, setShowConsent] = useState(false);
   const app = useApp();
@@ -76,8 +77,9 @@ const DocSelection = ({
       supportedCountryAndDocTypes,
       newCountry.value,
     );
-    if (docs) {
-      setDocType(docs.at(0));
+    const firstDoc = docs?.at(0);
+    if (firstDoc) {
+      setDocType(firstDoc);
     }
   };
 
@@ -95,7 +97,7 @@ const DocSelection = ({
           authToken,
           documentType: docType,
           countryCode: country.value,
-          fixtureResult: app?.sandboxIdDocOutcome,
+          fixtureResult: app?.sandboxIdDocOutcome ?? undefined,
         },
         {
           onSuccess(response) {
