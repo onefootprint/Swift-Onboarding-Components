@@ -133,7 +133,7 @@ config:
       - name: execute-tasks
         memoryMB: 2048
         cpuUnits: 1024
-        args: ["execute-tasks", "--batch-size=100", "--poll-period-ms=1000"]
+        args: ["execute-tasks", "--batch-size=50", "--poll-period-ms=500"]
     rpId: onefootprint.com
     s3:
       documentImagesBucketNamePrefix: opaque-documents

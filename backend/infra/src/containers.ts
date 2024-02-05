@@ -575,6 +575,7 @@ export abstract class ServiceContainers {
                 protocol: 'tcp',
               },
             ],
+            stopTimeout: 60, // How many seconds to wait for graceful shutdown.
             command: containerArgs,
             logConfiguration: {
               logDriver: 'awslogs',

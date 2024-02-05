@@ -6,7 +6,7 @@ use tokio::{
     time::{self, Duration},
 };
 
-use tracing::info;
+use tracing::{error, info};
 
 // Test by running:
 //   cargo run -p api_server -- execute-tasks --batch-size 100 --poll-period-ms 1000
@@ -31,6 +31,21 @@ impl ExecuteTasks {
             "starting execute-tasks worker...",
         );
 
+        let (shutdown_send, mut shutdown_recv) = tokio::sync::mpsc::channel(1);
+        tokio::spawn(async move {
+            match signal::ctrl_c().await {
+                Ok(_) => {
+                    info!("received shutdown signal, will shut down after the current batch is complete...");
+                    if let Err(err) = shutdown_send.send(()).await {
+                        error!(?err, "failed to send to shutdown channel");
+                    }
+                }
+                Err(err) => {
+                    error!(?err, "failed to receive shutdown signal");
+                }
+            }
+        });
+
 
         let mut interval = time::interval(poll_period);
         // If there's a batch that takes longer than the poll_period, the max task throughput will
@@ -39,12 +54,15 @@ impl ExecuteTasks {
 
         loop {
             select! {
-                _ = interval.tick() => {
-                    self.run_batch(&state).await?;
-                }
-                _ = signal::ctrl_c() => {
+                // Shutdown on the next poll if a ctrl-c signal has been received.
+                // This is subject to the ECS stopTimeout before the task is forcefullly killed.
+                biased;
+                _ = shutdown_recv.recv() => {
                     info!("shutting down worker");
                     break;
+                }
+                _ = interval.tick() => {
+                    self.run_batch(&state).await?;
                 }
             }
         }
