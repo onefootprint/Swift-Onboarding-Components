@@ -1,5 +1,5 @@
 use crate::{
-    models::fingerprint::{Fingerprint, NewFingerprint},
+    models::fingerprint::{Fingerprint, NewFingerprintArgs},
     tests::prelude::TestPgConn,
 };
 use newtypes::{
@@ -13,7 +13,7 @@ pub fn create(
     kind: DataIdentifier,
     scope: FingerprintScopeKind,
 ) {
-    let fingerprint = NewFingerprint {
+    let fingerprint = NewFingerprintArgs {
         sh_data,
         kind,
         lifetime_id,

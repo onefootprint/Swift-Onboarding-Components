@@ -46,6 +46,9 @@ pub struct Vault {
     pub created_at: DateTime<Utc>,
     /// True if the user can be found in /identify
     pub is_identifiable: bool,
+    /// True if we want to hide this user from identify requests.
+    /// This is only set manually through a dbshell
+    pub is_hidden: bool,
 }
 
 pub enum VaultIdentifier<'a> {
@@ -210,6 +213,7 @@ impl Vault {
             // Only identifiable if created via bifrost
             is_identifiable: !is_created_via_api,
             created_at: Utc::now(),
+            is_hidden: false,
         };
 
         let vault = diesel::insert_into(vault::table)
@@ -307,6 +311,7 @@ impl Vault {
         let mut query = vault::table
             .inner_join(data_lifetime::table.inner_join(fingerprint::table))
             .filter(fingerprint::sh_data.eq_any(sh_data))
+            .filter(fingerprint::is_hidden.eq(false))
             .filter(not(data_lifetime::portablized_seqno.is_null()))
             // When we allow replacing contact info, we might want to support finding the vault on
             // deactivated fingerprints in case the portable data is replaced by tenant-specific data
@@ -316,6 +321,7 @@ impl Vault {
             // Never allow identifying a user that is not marked as identifiable.
             // API-only vaults start as non-identifiable until they become PIDs
             .filter(vault::is_identifiable.eq(true))
+            .filter(vault::is_hidden.eq(false))
             .select(vault::all_columns)
             .into_boxed();
 
@@ -333,12 +339,14 @@ impl Vault {
                 .inner_join(data_lifetime::table.inner_join(fingerprint::table))
                 .inner_join(vault::table)
                 .filter(fingerprint::sh_data.eq_any(sh_data))
+                .filter(fingerprint::is_hidden.eq(false))
                 .filter(data_lifetime::portablized_seqno.is_null())
                 .filter(data_lifetime::deactivated_seqno.is_null())
                 // Un-verified vaults owned by this tenant
                 .filter(scoped_vault::tenant_id.eq(tenant_id))
                 .filter(vault::is_verified.eq(false))
                 .filter(vault::is_identifiable.eq(false))
+                .filter(vault::is_hidden.eq(false))
                 .select(vault::all_columns)
                 .into_boxed();
             query = if let Some(sandbox_id) = sandbox_id.as_ref() {
@@ -423,6 +431,7 @@ struct NewVaultRow {
     is_verified: bool,
     created_at: DateTime<Utc>,
     is_identifiable: bool,
+    is_hidden: bool,
 }
 
 pub struct NewVaultArgs {

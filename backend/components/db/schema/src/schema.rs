@@ -291,6 +291,7 @@ diesel::table! {
         lifetime_id -> Text,
         version -> Text,
         scope -> Text,
+        is_hidden -> Bool,
     }
 }
 
@@ -1095,6 +1096,7 @@ diesel::table! {
         is_verified -> Bool,
         created_at -> Timestamptz,
         is_identifiable -> Bool,
+        is_hidden -> Bool,
     }
 }
 

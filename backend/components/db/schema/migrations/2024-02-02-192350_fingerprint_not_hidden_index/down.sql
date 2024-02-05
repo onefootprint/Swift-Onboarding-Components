@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY IF EXISTS fingerprint_sh_data_lifetime_id_not_hidden;

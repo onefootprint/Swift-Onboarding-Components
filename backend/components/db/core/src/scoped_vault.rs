@@ -300,6 +300,7 @@ fn vaults_matching_search(
             .filter(scoped_vault::tenant_id.eq(tenant_id))
             // Matching filter
             .filter(fingerprint::sh_data.eq_any(all_fps.clone()))
+            .filter(fingerprint::is_hidden.eq(false))
             .select((fingerprint::sh_data, data_lifetime::scoped_vault_id))
             .get_results::<(Fingerprint, ScopedVaultId)>(conn)?
             .into_iter()

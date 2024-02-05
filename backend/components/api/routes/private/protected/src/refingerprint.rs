@@ -9,7 +9,7 @@ use api_core::{
 use db::{
     models::{
         data_lifetime::DataLifetime,
-        fingerprint::{Fingerprint, NewFingerprint},
+        fingerprint::{Fingerprint, NewFingerprintArgs},
         scoped_vault::ScopedVault,
         vault::Vault,
         vault_data::VaultData,
@@ -75,7 +75,7 @@ pub async fn post(
             .batch_fingerprint_sealed(key, data_to_fp)
             .await?;
         for ((kind, dl_id, scope), sh_data) in fingerprints {
-            fingerprints_to_create.push(NewFingerprint {
+            fingerprints_to_create.push(NewFingerprintArgs {
                 kind,
                 sh_data,
                 lifetime_id: dl_id,
@@ -236,7 +236,7 @@ fn get_dls_to_refingerprint(
 }
 
 #[tracing::instrument(skip_all)]
-fn backfill(conn: &mut TxnPgConn, fps: Vec<NewFingerprint>, dry_run: bool) -> DryRunResult<()> {
+fn backfill(conn: &mut TxnPgConn, fps: Vec<NewFingerprintArgs>, dry_run: bool) -> DryRunResult<()> {
     Fingerprint::bulk_create(conn, fps)?;
     DryRunResult::ok_or_rollback((), dry_run)
 }

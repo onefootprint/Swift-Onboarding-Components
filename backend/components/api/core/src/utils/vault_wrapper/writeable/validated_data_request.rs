@@ -7,7 +7,7 @@ use db::{
     models::{
         contact_info::{ContactInfo, NewContactInfoArgs},
         data_lifetime::DataLifetime,
-        fingerprint::{Fingerprint, NewFingerprint},
+        fingerprint::{Fingerprint, NewFingerprintArgs},
         vault_data::{NewVaultData, VaultData},
     },
     PgConn, TxnPgConn,
@@ -270,7 +270,7 @@ impl ValidatedDataRequest {
                     .find(|vd| vd.kind == kind)
                     .ok_or(AssertionError(&format!("No lifetime id found for {}", kind)))?;
 
-                Ok(NewFingerprint {
+                Ok(NewFingerprintArgs {
                     kind: kind.clone(),
                     sh_data: fingerprint,
                     lifetime_id: vd.lifetime_id.clone(),
