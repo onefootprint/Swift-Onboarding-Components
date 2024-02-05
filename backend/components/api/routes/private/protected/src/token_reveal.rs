@@ -30,6 +30,7 @@ pub struct RevealResponse {
 #[serde(rename_all = "snake_case")]
 pub enum SessionKind {
     Sealed,
+    SealedLegacy,
     Json,
 }
 
@@ -59,10 +60,10 @@ pub async fn post(
     let data: Result<serde_json::Value, _> = serde_json::from_slice(session.data.as_ref());
     let (data, kind) = if let Ok(data) = data {
         (data, SessionKind::Json)
-    } else {
-        // Then try decrypting the session and json deserializing
-        let data = AuthSessionData::unseal(&state.session_sealing_key, SealedSessionBytes(session.data))?;
-
+    } else if let Ok(data) = AuthSessionData::unseal(
+        &state.session_sealing_key,
+        SealedSessionBytes(session.data.clone()),
+    ) {
         let data = if let AuthSessionData::SdkArgs(data) = data {
             // SDK args are also encyrypted to another specific key, let's decrypt it
             let SdkArgsData {
@@ -79,6 +80,14 @@ pub async fn post(
             serde_json::value::to_value(data)?
         };
         (data, SessionKind::Sealed)
+    } else {
+        // It's possible this is a legacy token and we can't deserialize it as a known type.
+        // So, just return its raw value
+        let data = state
+            .session_sealing_key
+            .unseal(SealedSessionBytes(session.data).into())?;
+        let data = serde_json::Value::String(data);
+        (data, SessionKind::SealedLegacy)
     };
     let response = RevealResponse {
         data,

@@ -231,12 +231,11 @@ impl State {
         // our session key
         let (challenge_sealing_key, session_sealing_key) = {
             // take here removes it from the config
-            let key = if let Some(hex_key) = config.cookie_session_key_hex.take() {
-                crypto::hex::decode(hex_key).expect("invalid session cookie key")
-            } else {
-                log::error!("WARNING GENERATING RANDOM SESSION KEY");
-                crypto::random::random_cookie_session_key_bytes()
-            };
+            let hex_key = config
+                .cookie_session_key_hex
+                .take()
+                .expect("No cookie_session_key_hex provided");
+            let key = crypto::hex::decode(hex_key).expect("invalid session cookie key");
             (
                 ScopedSealingKey::new(key.clone(), "CHALLENGE_SEALING").expect("invalid master session key"),
                 ScopedSealingKey::new(key, "SESSION_SEALING").expect("invalid master session key"),
