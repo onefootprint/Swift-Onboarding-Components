@@ -23,8 +23,15 @@ def obc(sandbox_tenant, must_collect_data, can_access_data):
             rule_expression=[
                 {"field": "name_does_not_match", "op": "eq", "value": True}
             ],
-            # TODO: this is legacy step_up serialization, change when FE changes
+            # TODO: this is legacy step_up serialization, rm when FE changes
             action="step_up",
+        ),
+         dict(
+            name="My awesome rule",
+            rule_expression=[
+                {"field": "name_does_not_match", "op": "eq", "value": True}
+            ],
+            action="step_up.identity",
         ),
         dict(
             name="My awesome rule",
@@ -61,8 +68,12 @@ def test_create(sandbox_tenant, data):
     assert res["created_at"] is not None
     assert res["name"] == data["name"]
     assert res["rule_expression"] == data["rule_expression"]
-    assert res["action"] == data["action"]
     assert res["is_shadow"] == False
+    # we create the rule w/ parameterized stepup, but in the response we get back the non-parameterized view
+    if data["action"].startswith("step_up"):
+        assert res["action"] == "step_up" # temp until FE changes
+    else:
+        assert res["action"] == data["action"]
 
 
 def test_list(sandbox_tenant, obc):
