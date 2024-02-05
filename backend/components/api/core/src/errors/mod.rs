@@ -412,9 +412,12 @@ impl actix_web::ResponseError for ApiError {
             error: FpResponseErrorInfo {
                 status_code,
                 message,
+                code: error_code.clone(),
+                context: error_context.clone(),
+                support_id,
+                // TODO deprecate
                 error_code,
                 error_context,
-                support_id,
             },
         };
         actix_web::HttpResponse::build(self.status_code()).json(response)
