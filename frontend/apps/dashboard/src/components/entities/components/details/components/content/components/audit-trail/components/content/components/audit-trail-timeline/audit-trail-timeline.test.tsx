@@ -65,7 +65,7 @@ describe('<AuditTrailTimeline />', () => {
       expect(headers.length).toEqual(2);
 
       const header = headers[1];
-      expect(within(header).getByText('Did not complete')).toBeInTheDocument();
+      expect(within(header).getByText('Completed')).toBeInTheDocument();
       expect(within(header).getByText('My Playbook')).toBeInTheDocument();
 
       const bodies = screen.getAllByTestId('onboarding-decision-event-body');

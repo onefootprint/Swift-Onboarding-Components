@@ -104,18 +104,15 @@ const Timeline = ({ items, isLoading }: TimelineProps) => {
 };
 
 const StepContainer = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    grid-template-columns: 150px 16px 1fr;
-    grid-template-rows: auto;
-    grid-template-areas:
-      'time icon content'
-      'empty line content';
-    gap: ${theme.spacing[2]};
-    align-items: start;
-    justify-content: start;
-    overflow: hidden;
-  `}
+  display: grid;
+  grid-template-columns: 150px 16px 1fr;
+  grid-template-rows: auto;
+  grid-template-areas:
+    'time icon content'
+    'empty line content';
+  align-items: start;
+  justify-content: start;
+  overflow: hidden;
 `;
 
 const Content = styled(Grid.Item)`

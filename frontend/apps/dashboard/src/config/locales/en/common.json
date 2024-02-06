@@ -1389,7 +1389,7 @@
           },
           "onboarding-decision-event": {
             "verified-by": "Successfully completed",
-            "not-verified-by": "Did not complete",
+            "not-verified-by": "Completed",
             "verified": "Verified",
             "not-verified": "Failed",
             "onboarded-onto": "Onboarded onto",

@@ -50,7 +50,7 @@ const OnboardingDecisionEventHeader = ({
   }
 
   return (
-    <Stack direction="row" gap={2}>
+    <Stack direction="row" align="center" gap={2}>
       <Typography
         variant="label-3"
         color={color}
