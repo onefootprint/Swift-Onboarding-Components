@@ -40,8 +40,6 @@ pub enum OnboardingError {
     MissingBoOnboarding,
     #[error("Expected 1 or more BO's to have an OnboardingDecision but it was not found: {0}")]
     MissingBoOnboardingDecision(Csv<WorkflowId>),
-    #[error("Need to provide onboarding public key auth in order to start a sign-up session")]
-    MissingObPkAuth,
     #[error(
         "Need to provide onboarding public key or identified auth in order to initiate an email challenge"
     )]

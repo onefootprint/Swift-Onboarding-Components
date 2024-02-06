@@ -41,18 +41,14 @@ pub async fn post(
     // if the user is found, associate the newly created user with the old one
 
     let initial_data = vec![
-        email
-            .as_ref()
-            .map(|e| (false, IDK::Email.into(), e.to_piistring())),
-        phone_number
-            .as_ref()
-            .map(|p| (false, IDK::PhoneNumber.into(), p.e164())),
+        email.as_ref().map(|e| (IDK::Email.into(), e.to_piistring())),
+        phone_number.as_ref().map(|p| (IDK::PhoneNumber.into(), p.e164())),
     ]
     .into_iter()
     .flatten()
     .collect();
     let sandbox_id = sandbox_id.0;
-    let ctx = make_vault_context(&state, Some(&ob_context), initial_data, sandbox_id.clone()).await?;
+    let ctx = make_vault_context(&state, &ob_context, initial_data, sandbox_id.clone()).await?;
     let (uv, root_span) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
@@ -131,36 +127,30 @@ pub async fn post(
     ResponseData::ok(response).json()
 }
 
-type IsVerified = bool;
-
 async fn make_vault_context(
     state: &State,
-    ob_pk_auth: Option<&ObConfigAuth>,
-    initial_data: Vec<(IsVerified, DataIdentifier, PiiString)>,
+    ob_pk_auth: &ObConfigAuth,
+    initial_data: Vec<(DataIdentifier, PiiString)>,
     sandbox_id: Option<newtypes::SandboxId>,
 ) -> ApiResult<VaultContext> {
     let keypair = state.enclave_client.generate_sealed_keypair().await?;
 
     let global_sh_data = initial_data
         .iter()
-        .map(|(_, di, v)| -> ApiResult<_> { Ok((di.clone(), GlobalFingerprintKind::try_from(di)?, v)) })
+        .map(|(di, v)| -> ApiResult<_> { Ok((di.clone(), GlobalFingerprintKind::try_from(di)?, v)) })
         .collect::<ApiResult<Vec<_>>>()?;
     let global_sh = state.enclave_client.compute_fingerprints(global_sh_data).await?;
 
-    let tenant_sh = if let Some(ob_pk_auth) = ob_pk_auth.as_ref() {
-        let tenant_sh_data = initial_data
-            .iter()
-            .map(|(_, di, v)| (di.clone(), (di, &ob_pk_auth.tenant().id), v))
-            .collect_vec();
-        // If we are in identify for a specific tenant, also compute tenant-scoped FP
-        state.enclave_client.compute_fingerprints(tenant_sh_data).await?
-    } else {
-        vec![]
-    };
+    let tenant_sh_data = initial_data
+        .iter()
+        .map(|(di, v)| (di.clone(), (di, &ob_pk_auth.tenant().id), v))
+        .collect_vec();
+    // If we are in identify for a specific tenant, also compute tenant-scoped FP
+    let tenant_sh = state.enclave_client.compute_fingerprints(tenant_sh_data).await?;
 
     let data = initial_data
         .into_iter()
-        .map(|(is_verified, di, value)| -> ApiResult<_> {
+        .map(|(di, value)| -> ApiResult<_> {
             Ok(InitialVaultData {
                 global_sh: global_sh
                     .iter()
@@ -171,7 +161,6 @@ async fn make_vault_context(
                     .iter()
                     .filter_map(|(x, fp)| (x == &di).then_some(fp.clone()))
                     .next(),
-                is_verified,
                 di,
                 value,
             })
@@ -181,6 +170,6 @@ async fn make_vault_context(
         data,
         keypair,
         sandbox_id,
-        obc: ob_pk_auth.map(|obc| obc.ob_config().clone()),
+        obc: ob_pk_auth.ob_config().clone(),
     })
 }

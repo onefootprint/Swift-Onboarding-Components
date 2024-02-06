@@ -3,7 +3,7 @@ use std::str::FromStr;
 use super::{Any, PatchDataResult, Person, VaultWrapper};
 use crate::{
     enclave_client::VaultKeyPair,
-    errors::{onboarding::OnboardingError, user::UserError, ApiResult, AssertionError},
+    errors::{user::UserError, ApiResult, AssertionError},
     telemetry::RootSpan,
 };
 use db::{
@@ -24,12 +24,11 @@ pub struct VaultContext {
     pub data: Vec<InitialVaultData>,
     pub keypair: VaultKeyPair,
     pub sandbox_id: Option<SandboxId>,
-    pub obc: Option<ObConfiguration>,
+    pub obc: ObConfiguration,
 }
 
 /// Represents pieces of data that will be added to the vault upon its creation
 pub struct InitialVaultData {
-    pub is_verified: bool,
     pub di: DI,
     pub value: PiiString,
     pub global_sh: Fingerprint,
@@ -62,8 +61,6 @@ impl VaultWrapper<Person> {
             sandbox_id,
             obc,
         } = ctx;
-        // Must have ob_info to create a new user vault
-        let obc = obc.ok_or(OnboardingError::MissingObPkAuth)?;
         // Verify that the ob config is_live matches the user vault
         if obc.is_live != sandbox_id.is_none() {
             return Err(UserError::SandboxMismatch.into());
