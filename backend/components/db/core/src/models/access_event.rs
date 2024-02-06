@@ -73,17 +73,15 @@ impl AccessEvent {
         end_date: DateTime<Utc>,
         purposes: Vec<AccessEventPurpose>,
     ) -> DbResult<i64> {
-        use db_schema::schema::scoped_vault;
         let count = access_event::table
-            .inner_join(scoped_vault::table)
             // Cookie-cutter filters for all billable events
-            .filter(scoped_vault::is_live.eq(true))
-            .filter(scoped_vault::tenant_id.eq(t_id))
+            .filter(access_event::is_live.eq(true))
+            .filter(access_event::tenant_id.eq(t_id))
             // Filter for access events made during this billing period
             .filter(access_event::timestamp.ge(start_date))
             .filter(access_event::timestamp.lt(end_date))
             .filter(access_event::purpose.eq_any(purposes))
-            .select(count_distinct(scoped_vault::id))
+            .select(count_distinct(access_event::scoped_vault_id))
             .get_result(conn)?;
         Ok(count)
     }
