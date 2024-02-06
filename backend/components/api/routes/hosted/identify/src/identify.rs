@@ -15,7 +15,7 @@ use api_core::{
     utils::{headers::SandboxId, session::AuthSession},
     State,
 };
-use api_wire_types::{IdentifyRequest, IdentifyResponse};
+use api_wire_types::{IdentifiedUser, IdentifyRequest, IdentifyResponse};
 use newtypes::{email::Email, DataIdentifier, IdentityDataKind as IDK, PhoneNumber};
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -127,15 +127,24 @@ pub async fn post(
         .collect();
 
     let has_syncable_pass_key = webauthn_creds.iter().any(|cred| cred.backup_state);
-    let response = IdentifyResponse {
-        is_unverified: is_vault_unverified,
+    let user = IdentifiedUser {
         token,
-        user_found: true,
+        available_challenge_kinds,
         auth_methods,
-        available_challenge_kinds: Some(available_challenge_kinds),
         has_syncable_pass_key,
+        is_unverified: is_vault_unverified,
         scrubbed_phone,
         scrubbed_email,
+    };
+    let response = IdentifyResponse {
+        user_found: true,
+        user: Some(user.clone()),
+        // TODO deprecate these fields - they are derived from the `user` above
+        is_unverified: user.is_unverified,
+        available_challenge_kinds: Some(user.available_challenge_kinds),
+        has_syncable_pass_key: user.has_syncable_pass_key,
+        scrubbed_phone: user.scrubbed_phone,
+        scrubbed_email: user.scrubbed_email,
     };
     ResponseData::ok(response).json()
 }

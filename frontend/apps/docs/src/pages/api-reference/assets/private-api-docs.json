@@ -6718,10 +6718,10 @@
                     "action": {
                         "type": "string",
                         "enum": [
-                            "pass_with_manual_review",
-                            "manual_review",
-                            "step_up",
-                            "fail"
+                            "PassWithManualReview",
+                            "ManualReview",
+                            "StepUp",
+                            "Fail"
                         ]
                     },
                     "name": {
@@ -18963,10 +18963,10 @@
                     "action": {
                         "type": "string",
                         "enum": [
-                            "pass_with_manual_review",
-                            "manual_review",
-                            "step_up",
-                            "fail"
+                            "PassWithManualReview",
+                            "ManualReview",
+                            "StepUp",
+                            "Fail"
                         ]
                     },
                     "created_at": {
@@ -19023,10 +19023,9 @@
                                 "historical_action_triggered": {
                                     "type": "string",
                                     "enum": [
-                                        "pass_with_manual_review",
-                                        "manual_review",
-                                        "step_up",
-                                        "fail"
+                                        "PassWithManualReview",
+                                        "ManualReview",
+                                        "Fail"
                                     ]
                                 }
                             },
@@ -19091,10 +19090,10 @@
                     "action_triggered": {
                         "type": "string",
                         "enum": [
-                            "pass_with_manual_review",
-                            "manual_review",
-                            "step_up",
-                            "fail"
+                            "PassWithManualReview",
+                            "ManualReview",
+                            "StepUp",
+                            "Fail"
                         ]
                     },
                     "created_at": {
@@ -19118,10 +19117,10 @@
                                         "action": {
                                             "type": "string",
                                             "enum": [
-                                                "pass_with_manual_review",
-                                                "manual_review",
-                                                "step_up",
-                                                "fail"
+                                                "PassWithManualReview",
+                                                "ManualReview",
+                                                "StepUp",
+                                                "Fail"
                                             ]
                                         },
                                         "created_at": {

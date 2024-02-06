@@ -3622,67 +3622,77 @@
             "IdentifyResponse": {
                 "type": "object",
                 "properties": {
-                    "auth_methods": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "is_verified": {
-                                    "type": "boolean"
-                                },
-                                "kind": {
+                    "user": {
+                        "description": "When user_found is true, all of the context on the identified user",
+                        "type": "object",
+                        "properties": {
+                            "auth_methods": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "is_verified": {
+                                            "type": "boolean"
+                                        },
+                                        "kind": {
+                                            "type": "string",
+                                            "enum": [
+                                                "phone",
+                                                "passkey",
+                                                "email"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "is_verified",
+                                        "kind"
+                                    ]
+                                }
+                            },
+                            "available_challenge_kinds": {
+                                "type": "array",
+                                "items": {
                                     "type": "string",
                                     "enum": [
-                                        "phone",
-                                        "passkey",
+                                        "sms",
+                                        "biometric",
                                         "email"
                                     ]
                                 }
                             },
-                            "required": [
-                                "is_verified",
-                                "kind"
-                            ]
-                        }
-                    },
-                    "available_challenge_kinds": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "enum": [
-                                "sms",
-                                "biometric",
-                                "email"
-                            ]
-                        }
-                    },
-                    "has_syncable_pass_key": {
-                        "description": "signals that one or more biometric credentials\n support syncing and may be available to use on desktop/other devices",
-                        "type": "boolean"
-                    },
-                    "is_unverified": {
-                        "type": "boolean"
-                    },
-                    "scrubbed_email": {
-                        "description": "Populated only when identifying a user via auth token",
-                        "type": "string"
-                    },
-                    "scrubbed_phone": {
-                        "description": "Populated only when identifying a user via auth token",
-                        "type": "string"
-                    },
-                    "token": {
-                        "description": "An cryptographically generated auth token to authenticate a session",
-                        "type": "string"
+                            "has_syncable_pass_key": {
+                                "description": "signals that one or more biometric credentials\n support syncing and may be available to use on desktop/other devices",
+                                "type": "boolean"
+                            },
+                            "is_unverified": {
+                                "type": "boolean"
+                            },
+                            "scrubbed_email": {
+                                "description": "Populated only when identifying a user via auth token that was created by the tenant",
+                                "type": "string"
+                            },
+                            "scrubbed_phone": {
+                                "description": "Populated only when identifying a user via auth token that was created by the tenant",
+                                "type": "string"
+                            },
+                            "token": {
+                                "description": "An cryptographically generated auth token to authenticate a session",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "auth_methods",
+                            "available_challenge_kinds",
+                            "has_syncable_pass_key",
+                            "is_unverified",
+                            "token"
+                        ]
                     },
                     "user_found": {
                         "type": "boolean"
                     }
                 },
                 "required": [
-                    "auth_methods",
-                    "has_syncable_pass_key",
-                    "is_unverified",
                     "user_found"
                 ]
             },

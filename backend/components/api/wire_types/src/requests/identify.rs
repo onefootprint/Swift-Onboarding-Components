@@ -25,20 +25,44 @@ pub struct IdentifyRequest {
 #[serde(rename_all = "snake_case")]
 pub struct IdentifyResponse {
     pub user_found: bool,
-    pub token: Option<SessionAuthToken>,
+    /// When user_found is true, all of the context on the identified user
+    pub user: Option<IdentifiedUser>,
+
+    #[openapi(skip)]
     pub available_challenge_kinds: Option<Vec<ChallengeKind>>,
+    /// signals that one or more biometric credentials
+    /// support syncing and may be available to use on desktop/other devices
+    #[openapi(skip)]
+    pub has_syncable_pass_key: bool,
+    #[openapi(skip)]
+    pub is_unverified: bool,
+    /// Populated only when identifying a user via auth token
+    #[openapi(skip)]
+    pub scrubbed_phone: Option<PiiString>,
+    /// Populated only when identifying a user via auth token
+    #[openapi(skip)]
+    pub scrubbed_email: Option<PiiString>,
+}
+
+#[derive(Apiv2Schema, serde::Serialize, Clone)]
+pub struct IdentifiedUser {
+    // TODO make this non-optional when the client starts providing `scope` in the request
+    #[openapi(required)]
+    pub token: Option<SessionAuthToken>,
+    pub available_challenge_kinds: Vec<ChallengeKind>,
     pub auth_methods: Vec<IdentifyAuthMethod>,
     /// signals that one or more biometric credentials
     /// support syncing and may be available to use on desktop/other devices
     pub has_syncable_pass_key: bool,
     pub is_unverified: bool,
-    /// Populated only when identifying a user via auth token
+
+    /// Populated only when identifying a user via auth token that was created by the tenant
     pub scrubbed_phone: Option<PiiString>,
-    /// Populated only when identifying a user via auth token
+    /// Populated only when identifying a user via auth token that was created by the tenant
     pub scrubbed_email: Option<PiiString>,
 }
 
-#[derive(Apiv2Schema, serde::Serialize)]
+#[derive(Apiv2Schema, serde::Serialize, Clone)]
 pub struct IdentifyAuthMethod {
     pub kind: AuthMethodKind,
     pub is_verified: bool,

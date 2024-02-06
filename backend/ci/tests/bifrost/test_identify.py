@@ -228,10 +228,11 @@ def test_modern_flow(sandbox_user, sandbox_tenant, must_collect_data):
     sandbox_id_h = SandboxId(sandbox_id)
     data = dict(identifier=dict(phone_number=phone_number), scope="onboarding")
     body = post("/hosted/identify", data, sandbox_id_h, obc.key)
-    token = FpAuth(body["token"])
-    assert all(i["is_verified"] for i in body["auth_methods"] if i["kind"] == "phone")
+    user = body["user"]
+    token = FpAuth(user["token"])
+    assert all(i["is_verified"] for i in user["auth_methods"] if i["kind"] == "phone")
     assert all(
-        not i["is_verified"] for i in body["auth_methods"] if i["kind"] == "email"
+        not i["is_verified"] for i in user["auth_methods"] if i["kind"] == "email"
     )
 
     # Make sure the token issued has no scopes
@@ -276,7 +277,7 @@ def test_kba(sandbox_user, sandbox_tenant, kba_data, expected_error):
     sandbox_id_h = SandboxId(sandbox_id)
     data = dict(identifier=dict(phone_number=phone_number), scope="onboarding")
     body = post("/hosted/identify", data, sandbox_id_h, obc.key)
-    token = FpAuth(body["token"])
+    token = FpAuth(body["user"]["token"])
 
     # Run KBA
     expected_status = 400 if expected_error else 200
@@ -302,7 +303,7 @@ def test_otp_unverified(sandbox_user, sandbox_tenant):
     sandbox_id_h = SandboxId(sandbox_id)
     data = dict(identifier=dict(phone_number=phone_number), scope="onboarding")
     body = post("/hosted/identify", data, sandbox_id_h, obc.key)
-    token = FpAuth(body["token"])
+    token = FpAuth(body["user"]["token"])
 
     # Cannot initiate a login challenge
     data = dict(preferred_challenge_kind="email")

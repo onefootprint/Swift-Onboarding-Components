@@ -87,8 +87,8 @@ def test_scrubbed_phone_email(sandbox_user, sandbox_tenant):
     auth_token = FpAuth(body["token"])
 
     body = post("hosted/identify", dict(identifier=None), auth_token)
-    assert body["scrubbed_phone"] == "+1 (***) ***-**00"
-    assert body["scrubbed_email"] == "s******@o***********.com"
+    assert body["user"]["scrubbed_phone"] == "+1 (***) ***-**00"
+    assert body["user"]["scrubbed_email"] == "s******@o***********.com"
 
 
 def test_auth_methods(user_with_token):
@@ -99,7 +99,7 @@ def test_auth_methods(user_with_token):
     assert next(i["is_verified"] for i in body if i["kind"] == "phone")
 
     body = post("hosted/identify", dict(identifier=None), auth_token)
-    auth_methods = body["auth_methods"]
+    auth_methods = body["user"]["auth_methods"]
     assert next(i["is_verified"] for i in auth_methods if i["kind"] == "phone")
     assert not next(i["is_verified"] for i in auth_methods if i["kind"] == "email")
     assert next(i["is_verified"] for i in auth_methods if i["kind"] == "phone")
