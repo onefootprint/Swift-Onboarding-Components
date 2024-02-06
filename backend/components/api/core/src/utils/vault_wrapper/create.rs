@@ -17,7 +17,7 @@ use db::{
 use newtypes::{
     email::Email, DataIdentifier as DI, DataLifetimeSource, DataRequest, Fingerprint, FingerprintRequest,
     FingerprintScopeKind, IdentityDataKind as IDK, Locked, ObConfigurationKind, OnboardingStatus,
-    PhoneNumber, PiiString, SandboxId, ValidateArgs, VaultKind,
+    PhoneNumber, PiiString, SandboxId, ValidateArgs, VaultId, VaultKind,
 };
 
 pub struct VaultContext {
@@ -54,6 +54,7 @@ impl VaultWrapper<Person> {
         conn: &mut TxnPgConn,
         ctx: VaultContext,
         root_span: &RootSpan,
+        duplicate_of_id: Option<VaultId>,
     ) -> ApiResult<(Locked<Vault>, ScopedVault, PatchDataResult)> {
         let VaultContext {
             data: initial_data,
@@ -81,6 +82,12 @@ impl VaultWrapper<Person> {
             );
         }
 
+        if let Some(duplicate_of_id) = duplicate_of_id.as_ref() {
+            if !obc.tenant_id.is_integration_test_tenant() {
+                tracing::error!(%duplicate_of_id, "Duplicate vault created");
+            }
+        }
+
         // Create the UV and SU
         let (public_key, e_private_key) = keypair;
         let new_user_vault = NewVaultArgs {
@@ -91,6 +98,7 @@ impl VaultWrapper<Person> {
             is_fixture: is_fixture_data,
             sandbox_id,
             is_created_via_api: false,
+            duplicate_of_id,
         };
         let uv = Vault::create(conn, new_user_vault)?;
         let su = ScopedVault::get_or_create(conn, &uv, obc.id)?;

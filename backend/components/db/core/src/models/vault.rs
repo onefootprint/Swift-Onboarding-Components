@@ -49,6 +49,9 @@ pub struct Vault {
     /// True if we want to hide this user from identify requests.
     /// This is only set manually through a dbshell
     pub is_hidden: bool,
+    /// When non-null, this vault was a duplicate of another but the client initiated a signup
+    /// challenge instead of a login challenge
+    pub duplicate_of_id: Option<VaultId>,
 }
 
 pub enum VaultIdentifier<'a> {
@@ -194,6 +197,7 @@ impl Vault {
             is_fixture,
             sandbox_id,
             is_created_via_api,
+            duplicate_of_id,
         } = new_user;
         let new_user = NewVaultRow {
             id: VaultId::generate(kind),
@@ -214,6 +218,7 @@ impl Vault {
             is_identifiable: !is_created_via_api,
             created_at: Utc::now(),
             is_hidden: false,
+            duplicate_of_id,
         };
 
         let vault = diesel::insert_into(vault::table)
@@ -432,6 +437,7 @@ struct NewVaultRow {
     created_at: DateTime<Utc>,
     is_identifiable: bool,
     is_hidden: bool,
+    duplicate_of_id: Option<VaultId>,
 }
 
 pub struct NewVaultArgs {
@@ -442,4 +448,5 @@ pub struct NewVaultArgs {
     pub is_fixture: IsFixture,
     pub sandbox_id: Option<SandboxId>,
     pub is_created_via_api: bool,
+    pub duplicate_of_id: Option<VaultId>,
 }

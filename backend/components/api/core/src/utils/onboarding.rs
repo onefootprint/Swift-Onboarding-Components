@@ -133,6 +133,7 @@ pub fn get_or_start_onboarding(
                 is_fixture: false,
                 sandbox_id: user_vault.sandbox_id.clone(), // Use the same sandbox ID for business vault
                 is_created_via_api: false,
+                duplicate_of_id: None,
             };
             let business_vault = Vault::create(conn, args)?;
             BusinessOwner::create_primary(conn, user_vault.id.clone(), business_vault.id.clone())?;

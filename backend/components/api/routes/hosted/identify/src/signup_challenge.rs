@@ -1,4 +1,4 @@
-use crate::{ChallengeData, ChallengeState, State};
+use crate::{ChallengeData, ChallengeState, GetIdentifyChallengeArgs, State};
 use api_core::{
     auth::ob_config::ObConfigAuth,
     errors::{challenge::ChallengeError, ApiError, ApiResult, AssertionError, ValidationError},
@@ -12,11 +12,11 @@ use api_core::{
         vault_wrapper::{InitialVaultData, VaultContext, VaultWrapper},
     },
 };
-use api_wire_types::{SignupChallengeRequest, SignupChallengeResponse, UserChallengeData};
+use api_wire_types::{IdentifyId, SignupChallengeRequest, SignupChallengeResponse, UserChallengeData};
 use itertools::Itertools;
 use newtypes::{
     fingerprinter::GlobalFingerprintKind, ChallengeKind, DataIdentifier, Fingerprinter,
-    IdentityDataKind as IDK, PiiString,
+    IdentityDataKind as IDK,
 };
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
@@ -35,24 +35,38 @@ pub async fn post(
     root_span: RootSpan,
 ) -> JsonApiResponse<SignupChallengeResponse> {
     let SignupChallengeRequest { phone_number, email } = request.into_inner();
-    // TODO get identify challenge context. but using BOTH phone and email fingerprints.
-    // enforce can_initiate_signup_challenge if the user is found.
-    // - but make sure this doesn't consider unverified vaults from duplicate signup challenges?
-    // if the user is found, associate the newly created user with the old one
+    let sandbox_id = sandbox_id.0;
 
-    let initial_data = vec![
-        email.as_ref().map(|e| (IDK::Email.into(), e.to_piistring())),
-        phone_number.as_ref().map(|p| (IDK::PhoneNumber.into(), p.e164())),
+    let identifiers = vec![
+        email.as_ref().map(|e| IdentifyId::Email(e.clone())),
+        phone_number.as_ref().map(|e| IdentifyId::PhoneNumber(e.clone())),
     ]
     .into_iter()
     .flatten()
-    .collect();
-    let sandbox_id = sandbox_id.0;
-    let ctx = make_vault_context(&state, &ob_context, initial_data, sandbox_id.clone()).await?;
+    .collect_vec();
+    let args = GetIdentifyChallengeArgs {
+        user_auth: None,
+        identifiers: identifiers.clone(),
+        sandbox_id: sandbox_id.clone(),
+        obc: Some(ob_context.clone()),
+        root_span: root_span.clone(),
+    };
+    let ctx = crate::get_identify_challenge_context(&state, args).await?;
+    // TODO: one day, don't allow duplicate unverified vaults either
+    /*
+    TODO enforce this once the client can handle this error
+    if ctx.as_ref().is_some_and(|ctx| !ctx.can_initiate_signup_challenge) {
+        return Err(ErrorWithCode::ExistingVault.into());
+    }
+    */
+    let duplicate_of_id = ctx.map(|ctx| ctx.ctx.vw.vault.id);
+
+    // Create the new vault
+    let ctx = make_vault_context(&state, &ob_context, identifiers, sandbox_id.clone()).await?;
     let (uv, root_span) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let (uv, _, _) = VaultWrapper::create_unverified(conn, ctx, &root_span)?;
+            let (uv, _, _) = VaultWrapper::create_unverified(conn, ctx, &root_span, duplicate_of_id)?;
             Ok((uv.into_inner(), root_span))
         })
         .await?;
@@ -130,10 +144,17 @@ pub async fn post(
 async fn make_vault_context(
     state: &State,
     ob_pk_auth: &ObConfigAuth,
-    initial_data: Vec<(DataIdentifier, PiiString)>,
+    initial_data: Vec<IdentifyId>,
     sandbox_id: Option<newtypes::SandboxId>,
 ) -> ApiResult<VaultContext> {
     let keypair = state.enclave_client.generate_sealed_keypair().await?;
+    let initial_data = initial_data
+        .into_iter()
+        .map(|id| match id {
+            IdentifyId::Email(e) => (IDK::Email.into(), e.email),
+            IdentifyId::PhoneNumber(e) => (IDK::PhoneNumber.into(), e.e164()),
+        })
+        .collect::<Vec<(DataIdentifier, _)>>();
 
     let global_sh_data = initial_data
         .iter()

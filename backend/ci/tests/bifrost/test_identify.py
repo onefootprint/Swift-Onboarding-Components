@@ -323,16 +323,18 @@ def test_otp_unverified(sandbox_user, sandbox_tenant):
     bifrost.run()
 
 
-def test_create_duplicate_vault(sandbox_user, sandbox_tenant, foo_sandbox_tenant):
+def test_cannot_make_duplicate(sandbox_user, sandbox_tenant):
     """
-    Test whether we are allowed to create a duplicate vault even when the user is found in identify
+    Don't allow making a duplicate vault when a vault already exists at this tenant
     """
     sandbox_id = sandbox_user.client.sandbox_id
     phone_number = sandbox_user.client.data["id.phone_number"]
-
-    # Identify the user, and get a token in exchange
     sandbox_id_h = SandboxId(sandbox_id)
     data = dict(identifier=dict(phone_number=phone_number), scope="onboarding")
+
+    # Shouldn't be able to initiate a new signup challenge when no playbook key is provided
+    body = post("/hosted/identify", data, sandbox_id_h)
+    assert not body["user"]["can_initiate_signup_challenge"]
 
     # Shouldn't be able to initiate a new signup challenge when there's already a SV at this tenant
     body = post(
@@ -340,12 +342,53 @@ def test_create_duplicate_vault(sandbox_user, sandbox_tenant, foo_sandbox_tenant
     )
     assert not body["user"]["can_initiate_signup_challenge"]
 
-    # Should be able to initiate a new signup challenge when there isn't a SV at this tenant
+    # We should block making the signup challenge for this tenant
+    """
+    data = dict(phone_number=phone_number)
     body = post(
-        "/hosted/identify", data, sandbox_id_h, foo_sandbox_tenant.default_ob_config.key
+        "/hosted/identify/signup_challenge",
+        data,
+        sandbox_id_h,
+        sandbox_tenant.default_ob_config.key,
+        status_code=400,
     )
+    assert body["error"]["message"] == "Please log into your existing account"
+    assert body["error"]["error_code"] == "E120"
+    """
+
+
+def test_create_duplicate_vault(sandbox_user, foo_sandbox_tenant):
+    """
+    Allow creating a duplicate vault when the user doesn't exist at this tenant
+    """
+    sandbox_id = sandbox_user.client.sandbox_id
+    phone_number = sandbox_user.client.data["id.phone_number"]
+
+    sandbox_id_h = SandboxId(sandbox_id)
+    data = dict(identifier=dict(phone_number=phone_number), scope="onboarding")
+    obc = foo_sandbox_tenant.default_ob_config
+    body = post("/hosted/identify", data, sandbox_id_h, obc.key)
     assert body["user"]["can_initiate_signup_challenge"]
 
-    # Shouldn't be able to initiate a new signup challenge when no playbook key is provided
-    body = post("/hosted/identify", data, sandbox_id_h)
-    assert not body["user"]["can_initiate_signup_challenge"]
+    data = dict(phone_number=phone_number, email=FIXTURE_EMAIL)
+    body = post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)
+    data = {
+        "challenge_response": "000000",
+        "challenge_token": body["challenge_data"]["challenge_token"],
+        "scope": "onboarding",
+    }
+    post("hosted/identify/verify", data, obc.key)
+
+
+def test_double_signup_challenge(sandbox_tenant):
+    """
+    Test that we can initiate the same signup challenge twice in a row.
+    Per implementation detail, this actually creates a duplicate vault, but the first one becomes
+    orphaned.
+    """
+    sandbox_id = _gen_random_sandbox_id()
+    sandbox_id_h = SandboxId(sandbox_id)
+    obc = sandbox_tenant.default_ob_config
+    data = dict(phone_number=FIXTURE_PHONE_NUMBER)
+    post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)
+    post("/hosted/identify/signup_challenge", data, sandbox_id_h, obc.key)

@@ -120,6 +120,7 @@ mod test {
             is_fixture: false,
             sandbox_id: Some(SandboxId::new()),
             is_created_via_api: false,
+            duplicate_of_id: None,
         };
         pool.db_transaction(|conn| -> DbResult<_> {
             let result = Vault::create(conn, new_user)?.into_inner();

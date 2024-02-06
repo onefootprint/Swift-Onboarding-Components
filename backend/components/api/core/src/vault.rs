@@ -64,6 +64,7 @@ pub async fn create_non_portable_vault(
         is_fixture: false,
         sandbox_id,
         is_created_via_api: true,
+        duplicate_of_id: None,
     };
 
     // Parse optional request

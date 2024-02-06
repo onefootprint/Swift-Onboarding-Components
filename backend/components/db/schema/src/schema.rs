@@ -1097,6 +1097,7 @@ diesel::table! {
         created_at -> Timestamptz,
         is_identifiable -> Bool,
         is_hidden -> Bool,
+        duplicate_of_id -> Nullable<Text>,
     }
 }
 

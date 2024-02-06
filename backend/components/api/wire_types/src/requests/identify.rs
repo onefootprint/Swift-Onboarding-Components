@@ -2,7 +2,7 @@ use newtypes::email::Email;
 
 use crate::*;
 
-#[derive(Debug, Apiv2Schema, serde::Deserialize)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 /// An identifier for the identify flow that will uniquely identify a user
 pub enum IdentifyId {

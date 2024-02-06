@@ -25,6 +25,7 @@ pub fn new_vault_args(kind: VaultKind, sandbox_id: Option<String>, is_portable: 
         kind,
         is_fixture: false,
         is_created_via_api: !is_portable,
+        duplicate_of_id: None,
     }
 }
 
