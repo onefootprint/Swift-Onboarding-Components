@@ -117,7 +117,13 @@ const UserDashboard = ({
               status: userDashboard.email?.status || 'empty',
               onClick: () => send({ type: 'updateEmail' }),
             }
-          : undefined
+          : {
+              isLoading: false,
+              isVerified: false,
+              label: t('email'),
+              status: 'empty',
+              onClick: () => send({ type: 'updateEmail' }),
+            }
       }
       entryPhone={
         methodsMap.phone
@@ -128,7 +134,13 @@ const UserDashboard = ({
               status: userDashboard.phone?.status || 'empty',
               onClick: () => send({ type: 'updatePhone' }),
             }
-          : undefined
+          : {
+              isLoading: false,
+              isVerified: false,
+              label: t('phone-number'),
+              status: 'empty',
+              onClick: () => send({ type: 'updatePhone' }),
+            }
       }
       entryPasskey={
         methodsMap.passkey && isPassKeyFeatureReady
