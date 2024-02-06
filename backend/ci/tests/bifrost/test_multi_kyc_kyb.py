@@ -32,7 +32,8 @@ def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data):
 @pytest.fixture(scope="session")
 def primary_bo(kyb_sandbox_ob_config):
     bifrost = BifrostClient.new(kyb_sandbox_ob_config)
-    user = bifrost.run()
+    # We could get rate limited in POST /hosted/onboarding/process
+    user = try_until_success(lambda: bifrost.run(), 60)
     assert bifrost.validate_response["user"]["status"] == "pass"
     assert bifrost.validate_response["business"]["status"] == "incomplete"
     assert user.fp_id
@@ -162,20 +163,21 @@ def test_one_click_bos(ob_config2, kyb_sandbox_ob_config, twilio):
     try:
         time.sleep(5)
         primary_bo = bifrost.run()
+        # Can only do this check if we passed on the first try and weren't rate limited, otherwise
+        # the retry will clear out `handled_requirements`
+        # Assert we only had business requirements to satisfy - identity data filled out in previous
+        # onboarding
+        # No Authorize since they already onboarded at this tenant
+        assert [r["kind"] for r in primary_bo.client.handled_requirements] == [
+            "collect_business_data",
+            "process",
+        ]
     except:
-        try_until_success(bifrost.handle_authorize, 20, 5)
-        primary_bo = bifrost.run()
+        primary_bo = try_until_success(lambda: bifrost.run(), 60)
     assert primary_bo.fp_id
     assert primary_bo.fp_bid
     assert bifrost.validate_response["user"]["status"] == "pass"
     assert bifrost.validate_response["business"]["status"] == "incomplete"
-    # Assert we only had business requirements to satisfy - identity data filled out in previous
-    # onboarding
-    # No Authorize since they already onboarded at this tenant
-    assert [r["kind"] for r in primary_bo.client.handled_requirements] == [
-        "collect_business_data",
-        "process",
-    ]
 
     bos = primary_bo.client.data["business.kyced_beneficial_owners"]
     business_name = primary_bo.client.data["business.name"]
@@ -188,7 +190,6 @@ def test_one_click_bos(ob_config2, kyb_sandbox_ob_config, twilio):
     secondary_bo_token = BusinessOwnerAuth(token)
 
     # Then, onboard the secondary_bo as a BO of primary_bo's business
-    phone_number = secondary_bo.client.data["id.phone_number"]
     sandbox_id = secondary_bo.client.sandbox_id
     bifrost = BifrostClient.inherit(
         kyb_sandbox_ob_config,
