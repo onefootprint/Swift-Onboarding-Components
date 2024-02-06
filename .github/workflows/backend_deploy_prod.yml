@@ -68,25 +68,6 @@ jobs:
       IMG_CACHE_AWS_ACCESS_KEY_ID: ${{ secrets.IMG_CACHE_AWS_ACCESS_KEY_ID }}
       IMG_CACHE_AWS_SECRET_ACCESS_KEY: ${{ secrets.IMG_CACHE_AWS_SECRET_ACCESS_KEY }}
 
-  sentry_release:
-    name: 'Sentry Release Integration'
-    runs-on: ubuntu-latest
-    if: success()
-    needs: [extract_commit_hash, deploy_stack_prod]
-    environment: production
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          ref: ${{ needs.extract_commit_hash.outputs.commitHashToDeploy }}
-      - name: Create Sentry release
-        uses: getsentry/action-release@v1
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: onefootprint
-          SENTRY_PROJECT: backend
-        with:
-          environment: production
-
   run_tests:
     name: 'integration tests'
     needs: [deploy_stack_prod, extract_commit_hash]
