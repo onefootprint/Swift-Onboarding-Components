@@ -24,23 +24,30 @@ pub struct IdentifyRequest {
 #[derive(Apiv2Schema, serde::Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub struct IdentifyResponse {
+    /// Deprecated
+    #[openapi(skip)]
     pub user_found: bool,
     /// When user_found is true, all of the context on the identified user
     pub user: Option<IdentifiedUser>,
 
     #[openapi(skip)]
+    /// Deprecated
     pub available_challenge_kinds: Option<Vec<ChallengeKind>>,
     /// signals that one or more biometric credentials
     /// support syncing and may be available to use on desktop/other devices
     #[openapi(skip)]
+    /// Deprecated
     pub has_syncable_pass_key: bool,
     #[openapi(skip)]
+    /// Deprecated
     pub is_unverified: bool,
     /// Populated only when identifying a user via auth token
     #[openapi(skip)]
+    /// Deprecated
     pub scrubbed_phone: Option<PiiString>,
     /// Populated only when identifying a user via auth token
     #[openapi(skip)]
+    /// Deprecated
     pub scrubbed_email: Option<PiiString>,
 }
 
@@ -53,7 +60,7 @@ pub struct IdentifiedUser {
     pub auth_methods: Vec<IdentifyAuthMethod>,
     /// signals that one or more biometric credentials
     /// support syncing and may be available to use on desktop/other devices
-    pub has_syncable_pass_key: bool,
+    pub has_syncable_passkey: bool,
     pub is_unverified: bool,
     /// When true, allowed to create a new user via a signup challenge even when there's already
     /// an existing user with this contact info.

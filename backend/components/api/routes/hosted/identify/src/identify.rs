@@ -131,12 +131,12 @@ pub async fn post(
         })
         .collect();
 
-    let has_syncable_pass_key = webauthn_creds.iter().any(|cred| cred.backup_state);
+    let has_syncable_passkey = webauthn_creds.iter().any(|cred| cred.backup_state);
     let user = IdentifiedUser {
         token,
         available_challenge_kinds,
         auth_methods,
-        has_syncable_pass_key,
+        has_syncable_passkey,
         is_unverified: is_vault_unverified,
         can_initiate_signup_challenge,
         scrubbed_phone,
@@ -148,7 +148,7 @@ pub async fn post(
         // TODO deprecate these fields - they are derived from the `user` above
         is_unverified: user.is_unverified,
         available_challenge_kinds: Some(user.available_challenge_kinds),
-        has_syncable_pass_key: user.has_syncable_pass_key,
+        has_syncable_pass_key: user.has_syncable_passkey,
         scrubbed_phone: user.scrubbed_phone,
         scrubbed_email: user.scrubbed_email,
     };
