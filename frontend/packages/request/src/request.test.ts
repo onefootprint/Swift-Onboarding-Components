@@ -32,7 +32,7 @@ describe('@onefootprint/request', () => {
           data: {
             error: {
               message: 'error message',
-              errorCode: 'E101',
+              code: 'E101',
             },
           },
         },
@@ -56,11 +56,11 @@ describe('@onefootprint/request', () => {
       expect(getErrorMessage({})).toEqual('Something went wrong');
 
       expect(
-        getErrorCode({ response: { data: { error: { errorCode: 'blah' } } } }),
+        getErrorCode({ response: { data: { error: { code: 'blah' } } } }),
       ).toEqual(undefined);
       expect(
         getErrorMessage({
-          response: { data: { error: { errorCode: 'blah' } } },
+          response: { data: { error: { code: 'blah' } } },
         }),
       ).toEqual('Something went wrong');
     });
@@ -71,8 +71,8 @@ describe('@onefootprint/request', () => {
           data: {
             error: {
               message: 'error message',
-              errorCode: 'E104',
-              errorContext: { seconds: 4 },
+              code: 'E104',
+              context: { seconds: 4 },
             },
           },
         },

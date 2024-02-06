@@ -5,8 +5,8 @@ import applyCaseMiddleware from 'axios-case-converter';
 
 export type FootprintServerError = {
   message: string;
-  errorCode?: string; // Translation code for resolving the erorr to the correct language
-  errorContext?: Record<string, string>; // Additional data needed to resolve the error string
+  code?: string; // Translation code for resolving the erorr to the correct language
+  context?: Record<string, string>; // Additional data needed to resolve the error string
   statusCode: number;
   supportId: string;
 };

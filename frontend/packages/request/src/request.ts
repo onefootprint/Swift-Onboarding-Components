@@ -15,8 +15,8 @@ const LOGOUT_ERRORS = [
 
 export type FootprintServerError = {
   message: string;
-  errorCode?: string; // Translation code for resolving the erorr to the correct language
-  errorContext?: Record<string, string>; // Additional data needed to resolve the error string
+  code?: string; // Translation code for resolving the erorr to the correct language
+  context?: Record<string, string>; // Additional data needed to resolve the error string
   statusCode: number;
   supportId: string;
 };
@@ -56,7 +56,7 @@ export const isLogoutError = (error: unknown) => {
     return false;
   }
   const codeMatches = LOGOUT_ERROR_CODES.some(
-    code => serverError?.errorCode === code,
+    code => serverError?.code === code,
   );
   const messageMatches = LOGOUT_ERRORS.some(
     e => serverError?.message?.includes(e),
@@ -94,8 +94,8 @@ export const useRequestError = () => {
     const unknownError = t('unknown');
     if (isFootprintError(error)) {
       const data = error?.response?.data?.error;
-      const errorCode = data?.errorCode;
-      const errorContext = data?.errorContext;
+      const errorCode = data?.code;
+      const errorContext = data?.context;
       const errorMessage = data?.message;
 
       if (!errorCode || !isValidErrorCode(errorCode)) {
@@ -120,7 +120,7 @@ export const useRequestError = () => {
       return undefined;
     }
     const data = error?.response?.data?.error;
-    const errorCode = data?.errorCode;
+    const errorCode = data?.code;
     if (errorCode && isValidErrorCode(errorCode)) {
       return errorCode;
     }
