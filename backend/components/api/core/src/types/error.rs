@@ -8,10 +8,6 @@ pub struct FpResponseErrorInfo {
     pub context: Option<Value>, // any context needed for composing an error message from error_code
     pub status_code: u16,
     pub support_id: Uuid,
-    /// Deprecated
-    pub error_code: Option<String>, // frontend will use to generate translated error messages
-    /// Deprecated
-    pub error_context: Option<Value>, // any context needed for composing an error message from error_code
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
