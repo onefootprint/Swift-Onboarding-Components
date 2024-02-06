@@ -77,6 +77,11 @@ pub struct IdentifyChallengeContext {
     pub ctx: UserChallengeContext,
     pub tenant: Option<Tenant>,
     pub sv: Option<ScopedVault>,
+    /// When true, allowed to create a new user via a signup challenge even when there's already
+    /// an existing user with this contact info.
+    /// Generally, a user can make a new vault IF they're not in a context logging into a tenant
+    /// that they've already onboarded onto
+    pub can_initiate_signup_challenge: bool,
 }
 
 #[tracing::instrument(skip_all)]
@@ -142,6 +147,12 @@ async fn get_identify_challenge_context(
         .await?;
     let sv_id = sv.as_ref().map(|sv| sv.id.clone());
     let ctx = get_user_challenge_context(state, existing_user_id, sv_id, user_auth).await?;
-    let ctx = IdentifyChallengeContext { ctx, tenant, sv };
+    let can_initiate_signup_challenge = tenant.is_some() && sv.is_none();
+    let ctx = IdentifyChallengeContext {
+        ctx,
+        tenant,
+        sv,
+        can_initiate_signup_challenge,
+    };
     Ok(Some(ctx))
 }

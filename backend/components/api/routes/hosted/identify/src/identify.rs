@@ -54,7 +54,12 @@ pub async fn post(
         return ResponseData::ok(IdentifyResponse::default()).json();
     };
 
-    let IdentifyChallengeContext { ctx, tenant: _, sv } = ctx;
+    let IdentifyChallengeContext {
+        ctx,
+        tenant: _,
+        sv,
+        can_initiate_signup_challenge,
+    } = ctx;
     let UserChallengeContext {
         webauthn_creds,
         available_challenge_kinds,
@@ -133,6 +138,7 @@ pub async fn post(
         auth_methods,
         has_syncable_pass_key,
         is_unverified: is_vault_unverified,
+        can_initiate_signup_challenge,
         scrubbed_phone,
         scrubbed_email,
     };

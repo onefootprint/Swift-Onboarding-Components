@@ -57,7 +57,7 @@ pub async fn post(
         // The user vault doesn't exist. Just return that the user wasn't found
         return Err(ErrorWithCode::LoginChallengeUserNotFound.into());
     };
-    let IdentifyChallengeContext { ctx, tenant, sv: _ } = ctx;
+    let IdentifyChallengeContext { ctx, tenant, .. } = ctx;
     let UserChallengeContext {
         vw,
         webauthn_creds: creds,

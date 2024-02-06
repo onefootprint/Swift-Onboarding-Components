@@ -55,6 +55,11 @@ pub struct IdentifiedUser {
     /// support syncing and may be available to use on desktop/other devices
     pub has_syncable_pass_key: bool,
     pub is_unverified: bool,
+    /// When true, allowed to create a new user via a signup challenge even when there's already
+    /// an existing user with this contact info.
+    /// Generally, a user can make a new vault IF they're not in a context logging into a tenant
+    /// that they've already onboarded onto
+    pub can_initiate_signup_challenge: bool,
 
     /// Populated only when identifying a user via auth token that was created by the tenant
     pub scrubbed_phone: Option<PiiString>,

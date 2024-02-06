@@ -321,3 +321,31 @@ def test_otp_unverified(sandbox_user, sandbox_tenant):
     )
     bifrost = BifrostClient.raw_auth(obc, auth_token, sandbox_id)
     bifrost.run()
+
+
+def test_create_duplicate_vault(sandbox_user, sandbox_tenant, foo_sandbox_tenant):
+    """
+    Test whether we are allowed to create a duplicate vault even when the user is found in identify
+    """
+    sandbox_id = sandbox_user.client.sandbox_id
+    phone_number = sandbox_user.client.data["id.phone_number"]
+
+    # Identify the user, and get a token in exchange
+    sandbox_id_h = SandboxId(sandbox_id)
+    data = dict(identifier=dict(phone_number=phone_number), scope="onboarding")
+
+    # Shouldn't be able to initiate a new signup challenge when there's already a SV at this tenant
+    body = post(
+        "/hosted/identify", data, sandbox_id_h, sandbox_tenant.default_ob_config.key
+    )
+    assert not body["user"]["can_initiate_signup_challenge"]
+
+    # Should be able to initiate a new signup challenge when there isn't a SV at this tenant
+    body = post(
+        "/hosted/identify", data, sandbox_id_h, foo_sandbox_tenant.default_ob_config.key
+    )
+    assert body["user"]["can_initiate_signup_challenge"]
+
+    # Shouldn't be able to initiate a new signup challenge when no playbook key is provided
+    body = post("/hosted/identify", data, sandbox_id_h)
+    assert not body["user"]["can_initiate_signup_challenge"]
