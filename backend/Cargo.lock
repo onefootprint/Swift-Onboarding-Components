@@ -1216,6 +1216,7 @@ dependencies = [
  "newtypes",
  "selfie_doc",
  "serde",
+ "serde_cbor",
  "serde_json",
  "strum",
  "strum_macros",

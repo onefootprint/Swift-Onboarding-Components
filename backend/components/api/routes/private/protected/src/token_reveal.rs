@@ -20,8 +20,15 @@ pub struct RevealRequest {
 }
 
 #[derive(Debug, serde::Serialize)]
+#[serde(untagged)]
+pub enum UnsealedData {
+    Json(serde_json::Value),
+    Cbor(serde_cbor::Value),
+}
+
+#[derive(Debug, serde::Serialize)]
 pub struct RevealResponse {
-    data: serde_json::Value,
+    data: UnsealedData,
     kind: SessionKind,
     expires_at: DateTime<Utc>,
 }
@@ -59,7 +66,7 @@ pub async fn post(
     // First try just decrypting the session, as some sessions aren't stored encrypted
     let data: Result<serde_json::Value, _> = serde_json::from_slice(session.data.as_ref());
     let (data, kind) = if let Ok(data) = data {
-        (data, SessionKind::Json)
+        (UnsealedData::Json(data), SessionKind::Json)
     } else if let Ok(data) = AuthSessionData::unseal(
         &state.session_sealing_key,
         SealedSessionBytes(session.data.clone()),
@@ -79,15 +86,14 @@ pub async fn post(
         } else {
             serde_json::value::to_value(data)?
         };
-        (data, SessionKind::Sealed)
+        (UnsealedData::Json(data), SessionKind::Sealed)
     } else {
         // It's possible this is a legacy token and we can't deserialize it as a known type.
         // So, just return its raw value
-        let data = state
+        let raw_data: serde_cbor::Value = state
             .session_sealing_key
             .unseal(SealedSessionBytes(session.data).into())?;
-        let data = serde_json::Value::String(data);
-        (data, SessionKind::SealedLegacy)
+        (UnsealedData::Cbor(raw_data), SessionKind::SealedLegacy)
     };
     let response = RevealResponse {
         data,

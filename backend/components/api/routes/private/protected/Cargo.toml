@@ -29,5 +29,6 @@ aws-sdk-s3 = { workspace = true }
 aws-sdk-kms = { workspace = true }
 
 serde_json = { workspace = true }
+serde_cbor = { workspace = true }
 chrono = { workspace = true }
 itertools = { workspace = true }
