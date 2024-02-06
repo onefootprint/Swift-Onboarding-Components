@@ -32,7 +32,7 @@ def kyb_sandbox_ob_config(sandbox_tenant, must_collect_data, can_access_data):
 @pytest.fixture(scope="session")
 def primary_bo(kyb_sandbox_ob_config):
     bifrost = BifrostClient.new(kyb_sandbox_ob_config)
-    # We could get rate limited in POST /hosted/onboarding/process
+    # We could get rate limited sending the SMS to the secondary BO in POST /hosted/onboarding/process
     user = try_until_success(lambda: bifrost.run(), 60)
     assert bifrost.validate_response["user"]["status"] == "pass"
     assert bifrost.validate_response["business"]["status"] == "incomplete"
@@ -173,6 +173,7 @@ def test_one_click_bos(ob_config2, kyb_sandbox_ob_config, twilio):
             "process",
         ]
     except:
+        # We could get rate limited sending the SMS to the secondary BO in POST /hosted/onboarding/process
         primary_bo = try_until_success(lambda: bifrost.run(), 60)
     assert primary_bo.fp_id
     assert primary_bo.fp_bid
