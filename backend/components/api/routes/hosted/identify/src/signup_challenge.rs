@@ -1,7 +1,10 @@
 use crate::{ChallengeData, ChallengeState, GetIdentifyChallengeArgs, State};
 use api_core::{
     auth::ob_config::ObConfigAuth,
-    errors::{challenge::ChallengeError, ApiError, ApiResult, AssertionError, ValidationError},
+    errors::{
+        challenge::ChallengeError, error_with_code::ErrorWithCode, ApiError, ApiResult, AssertionError,
+        ValidationError,
+    },
     telemetry::RootSpan,
     types::{response::ResponseData, JsonApiResponse},
     utils::{
@@ -53,12 +56,9 @@ pub async fn post(
     };
     let ctx = crate::get_identify_challenge_context(&state, args).await?;
     // TODO: one day, don't allow duplicate unverified vaults either
-    /*
-    TODO enforce this once the client can handle this error
     if ctx.as_ref().is_some_and(|ctx| !ctx.can_initiate_signup_challenge) {
         return Err(ErrorWithCode::ExistingVault.into());
     }
-    */
     let duplicate_of_id = ctx.map(|ctx| ctx.ctx.vw.vault.id);
 
     // Create the new vault

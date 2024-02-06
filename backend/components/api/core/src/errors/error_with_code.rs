@@ -58,6 +58,8 @@ pub enum ErrorWithCode {
     SessionExpired,
     #[strum(message = "E119", detailed_message = "Session invalid")]
     CouldNotParseSession,
+    #[strum(message = "E120", detailed_message = "Please log into your existing account")]
+    ExistingVault,
 }
 
 impl ErrorWithCode {
@@ -82,6 +84,7 @@ impl ErrorWithCode {
             Self::NoSessionFound => StatusCode::UNAUTHORIZED,
             Self::SessionExpired => StatusCode::UNAUTHORIZED,
             Self::CouldNotParseSession => StatusCode::UNAUTHORIZED,
+            Self::ExistingVault => StatusCode::BAD_REQUEST,
         }
     }
 }

@@ -21,6 +21,7 @@ import ResendButton from './components/resend-button';
 import Success from './components/success';
 import Verifying from './components/verifying';
 import getScrubbedPhoneNumber from './utils/get-scrubbed-phone-number';
+import useRequestError from '@/hooks/use-request-error';
 
 export type SmsChallengeProps = {
   identify?: IdentifyData;
@@ -41,6 +42,7 @@ const SmsChallenge = ({
   const { t } = useTranslation('pages.sms-challenge');
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
+  const requestError = useRequestError();
   const signupChallengeMutation = useSignupChallenge();
   const identifyVerifyMutation = useIdentifyVerify();
   const { email, phoneNumber, successfulIdentifier } =
@@ -138,6 +140,13 @@ const SmsChallenge = ({
       {
         onSuccess: handleRequestChallengeSuccess,
         onError: (error: unknown) => {
+          if (requestError.getErrorCode(error) === 'E120') {
+            console.error(
+              'Entered signup challenge when the user already has a vault. Initiating login challenge',
+            );
+            // TODO perform login challenge
+            return;
+          }
           showRequestErrorToast(error);
         },
       },

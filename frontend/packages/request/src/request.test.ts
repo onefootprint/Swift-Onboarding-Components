@@ -56,8 +56,8 @@ describe('@onefootprint/request', () => {
       expect(getErrorMessage({})).toEqual('Something went wrong');
 
       expect(
-        getErrorCode({ response: { data: { error: { code: 'blah' } } } }),
-      ).toEqual(undefined);
+        getErrorCode({ response: { data: { error: { code: 'A100' } } } }),
+      ).toEqual('A100');
       expect(
         getErrorMessage({
           response: { data: { error: { code: 'blah' } } },

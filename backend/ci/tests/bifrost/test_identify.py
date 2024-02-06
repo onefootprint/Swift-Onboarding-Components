@@ -94,10 +94,14 @@ def vault2(sandbox_id, sandbox_tenant):
 @pytest.fixture(scope="function")
 def vault3(sandbox_id, sandbox_tenant):
     """
-    Tenant A - vault made via bifrost and OTP verified with no other info
-    Should never be identified.
+    Tenant A - vault made via API but not OTP verified.
     """
-    IdentifyClient(sandbox_tenant.default_ob_config.key, sandbox_id).create_user()
+    data = {
+        "id.phone_number": FIXTURE_PHONE_NUMBER,
+        "id.email": FIXTURE_EMAIL,
+    }
+    sandbox_id_h = SandboxId(sandbox_id)
+    post("users", data, sandbox_id_h, sandbox_tenant.sk.key)
 
 
 @pytest.fixture(scope="function")
@@ -343,7 +347,6 @@ def test_cannot_make_duplicate(sandbox_user, sandbox_tenant):
     assert not body["user"]["can_initiate_signup_challenge"]
 
     # We should block making the signup challenge for this tenant
-    """
     data = dict(phone_number=phone_number)
     body = post(
         "/hosted/identify/signup_challenge",
@@ -353,8 +356,7 @@ def test_cannot_make_duplicate(sandbox_user, sandbox_tenant):
         status_code=400,
     )
     assert body["error"]["message"] == "Please log into your existing account"
-    assert body["error"]["error_code"] == "E120"
-    """
+    assert body["error"]["code"] == "E120"
 
 
 def test_create_duplicate_vault(sandbox_user, foo_sandbox_tenant):

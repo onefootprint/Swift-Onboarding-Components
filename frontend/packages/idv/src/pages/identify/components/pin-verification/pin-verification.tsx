@@ -1,4 +1,4 @@
-import { getErrorMessage } from '@onefootprint/request';
+import { getErrorMessage, useRequestError } from '@onefootprint/request';
 import type {
   ChallengeData,
   ChallengeKind,
@@ -46,6 +46,7 @@ const PinVerification = ({
   const { t } = useTranslation('idv', {
     keyPrefix: 'identify.components.pin-verification',
   });
+  const requestError = useRequestError();
   const [state, send] = useIdentifyMachine();
   const {
     identify: { email, sandboxId, userFound },
@@ -178,6 +179,14 @@ const PinVerification = ({
       {
         onSuccess: handleRequestChallengeSuccess,
         onError: (error: unknown) => {
+          if (requestError.getErrorCode(error) === 'E120') {
+            Logger.error(
+              'Entered signup challenge when the user already has a vault. Initiating login challenge',
+              'pin-verification',
+            );
+            initiateLoginChallenge();
+            return;
+          }
           Logger.error(
             `Failed to initiate signup challenge: ${getErrorMessage(error)}`,
             'pin-verification',

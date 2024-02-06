@@ -121,7 +121,7 @@ export const useRequestError = () => {
     }
     const data = error?.response?.data?.error;
     const errorCode = data?.code;
-    if (errorCode && isValidErrorCode(errorCode)) {
+    if (errorCode) {
       return errorCode;
     }
     return undefined;
