@@ -35,6 +35,10 @@ pub async fn post(
     root_span: RootSpan,
 ) -> JsonApiResponse<SignupChallengeResponse> {
     let SignupChallengeRequest { phone_number, email } = request.into_inner();
+    // TODO get identify challenge context. but using BOTH phone and email fingerprints.
+    // enforce can_initiate_signup_challenge if the user is found.
+    // - but make sure this doesn't consider unverified vaults from duplicate signup challenges?
+    // if the user is found, associate the newly created user with the old one
 
     let initial_data = vec![
         email
@@ -135,7 +139,6 @@ async fn make_vault_context(
     initial_data: Vec<(IsVerified, DataIdentifier, PiiString)>,
     sandbox_id: Option<newtypes::SandboxId>,
 ) -> ApiResult<VaultContext> {
-    // TODO this keypair won't always be used... but helps to generate this proactively.
     let keypair = state.enclave_client.generate_sealed_keypair().await?;
 
     let global_sh_data = initial_data

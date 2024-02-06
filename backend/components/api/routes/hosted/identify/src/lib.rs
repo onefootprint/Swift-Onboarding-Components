@@ -67,7 +67,7 @@ pub enum ChallengeData {
 
 pub struct GetIdentifyChallengeArgs {
     pub user_auth: Option<CheckedUserAuthContext>,
-    pub identifier: Option<IdentifyId>,
+    pub identifiers: Vec<IdentifyId>,
     pub sandbox_id: Option<SandboxId>,
     pub obc: Option<ObConfigAuth>,
     pub root_span: RootSpan,
@@ -91,7 +91,7 @@ async fn get_identify_challenge_context(
 ) -> ApiResult<Option<IdentifyChallengeContext>> {
     let GetIdentifyChallengeArgs {
         user_auth,
-        identifier,
+        identifiers,
         sandbox_id,
         obc,
         root_span,
@@ -99,18 +99,18 @@ async fn get_identify_challenge_context(
 
     // Look up existing user vault by identifier
     let t_id = obc.as_ref().map(|obc| &obc.tenant().id);
-    let (existing_user_id, sv_id) = match (user_auth.as_ref(), identifier) {
+    let (existing_user_id, sv_id) = match (user_auth.as_ref(), identifiers) {
         // Identified via phone or email
-        (None, Some(id)) => {
-            let Some(existing) = state.find_vault(id, sandbox_id, t_id).await? else {
+        (None, ids) if !ids.is_empty() => {
+            let Some(existing) = state.find_vault(ids, sandbox_id, t_id).await? else {
                 return Ok(None);
             };
             existing
         }
         // Identified via auth token
-        (Some(auth), None) => (auth.user.clone().id, auth.scoped_user_id()),
+        (Some(auth), ids) if ids.is_empty() => (auth.user.clone().id, auth.scoped_user_id()),
         // Require one of user_auth or identifier
-        (None, None) | (Some(_), Some(_)) => return Err(ErrorWithCode::OnlyOneIdentifier.into()),
+        (_, _) => return Err(ErrorWithCode::OnlyOneIdentifier.into()),
     };
 
     // Record some properties on the root span

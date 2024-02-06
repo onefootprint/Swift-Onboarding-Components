@@ -99,33 +99,36 @@ impl State {
     #[tracing::instrument(skip(self))]
     pub async fn find_vault(
         &self,
-        id: IdentifyId,
+        ids: Vec<IdentifyId>,
         sandbox_id: Option<SandboxId>,
         t_id: Option<&TenantId>,
     ) -> ApiResult<Option<(VaultId, Option<ScopedVaultId>)>> {
         // Search via fingerprint
-        let (scopes, data) = match id {
-            IdentifyId::PhoneNumber(phone_number) => (
-                vec![
-                    Some(GlobalFingerprintKind::PhoneNumber.scope()),
-                    t_id.map(|id| FingerprintScope::Tenant(&DataIdentifier::Id(IDK::PhoneNumber), id)),
-                ],
-                phone_number.e164(),
-            ),
-            IdentifyId::Email(email) => (
-                vec![
-                    Some(GlobalFingerprintKind::Email.scope()),
-                    t_id.map(|id| FingerprintScope::Tenant(&DataIdentifier::Id(IDK::Email), id)),
-                ],
-                email.email,
-            ),
-        };
-        let fps: Vec<_> = scopes
+        let fps = ids
             .into_iter()
-            .flatten()
-            .zip(std::iter::repeat(&data))
-            .map(|(s, v)| ((), s, v))
-            .collect();
+            .flat_map(|id| {
+                let (scopes, data) = match id {
+                    IdentifyId::PhoneNumber(phone_number) => (
+                        vec![
+                            Some(GlobalFingerprintKind::PhoneNumber.scope()),
+                            t_id.map(|id| {
+                                FingerprintScope::Tenant(&DataIdentifier::Id(IDK::PhoneNumber), id)
+                            }),
+                        ],
+                        phone_number.e164(),
+                    ),
+                    IdentifyId::Email(email) => (
+                        vec![
+                            Some(GlobalFingerprintKind::Email.scope()),
+                            t_id.map(|id| FingerprintScope::Tenant(&DataIdentifier::Id(IDK::Email), id)),
+                        ],
+                        email.email,
+                    ),
+                };
+                scopes.into_iter().flatten().zip(std::iter::repeat(data.clone()))
+            })
+            .collect_vec();
+        let fps = fps.iter().map(|(s, d)| ((), s.clone(), d)).collect_vec();
         let sh_datas = self
             .enclave_client
             .compute_fingerprints(fps)

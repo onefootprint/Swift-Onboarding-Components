@@ -44,7 +44,7 @@ pub async fn post(
     // Look up existing user vault by identifier
     let args = GetIdentifyChallengeArgs {
         user_auth,
-        identifier,
+        identifiers: identifier.into_iter().collect(),
         sandbox_id: sandbox_id.0,
         obc: ob_context.clone(),
         root_span,
