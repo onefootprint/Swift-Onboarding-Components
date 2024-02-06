@@ -2,8 +2,8 @@ use crate::{ChallengeData, ChallengeState, GetIdentifyChallengeArgs, State};
 use api_core::{
     auth::ob_config::ObConfigAuth,
     errors::{
-        challenge::ChallengeError, error_with_code::ErrorWithCode, ApiError, ApiResult, AssertionError,
-        ValidationError,
+        challenge::ChallengeError, error_with_code::ErrorWithCode, user::UserError, ApiError, ApiResult,
+        AssertionError, ValidationError,
     },
     telemetry::RootSpan,
     types::{response::ResponseData, JsonApiResponse},
@@ -39,6 +39,11 @@ pub async fn post(
 ) -> JsonApiResponse<SignupChallengeResponse> {
     let SignupChallengeRequest { phone_number, email } = request.into_inner();
     let sandbox_id = sandbox_id.0;
+    let is_fixture = phone_number.as_ref().is_some_and(|p| p.is_fixture_phone_number())
+        || email.as_ref().is_some_and(|e| e.is_fixture());
+    if ob_context.ob_config().is_live && is_fixture {
+        return Err(UserError::FixtureCIInLive.into());
+    }
 
     let identifiers = vec![
         email.as_ref().map(|e| IdentifyId::Email(e.clone())),

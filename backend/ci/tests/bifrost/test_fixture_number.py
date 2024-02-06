@@ -119,3 +119,14 @@ def test_identify_fixture_non_sandbox(sandbox_tenant, identifier, skip_phone_obc
         body["error"]["message"]
         == "Cannot use fixture email or phone number in non-sandbox mode."
     )
+    body = post(
+        "hosted/identify/signup_challenge",
+        identifier,
+        live_obc.key,
+        SandboxId(sandbox_id),
+        status_code=400,
+    )
+    assert (
+        body["error"]["message"]
+        == "Cannot use fixture email or phone number in non-sandbox mode."
+    )
