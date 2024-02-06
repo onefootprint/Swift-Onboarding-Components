@@ -3,6 +3,7 @@ In this file, we test functions that are publicly exposed in our documentation. 
 tests breaks, you are probably making a breaking change to our public API and need to either not
 do it OR do it VERY carefully.
 """
+
 from tests.utils import get, post, patch
 
 
@@ -11,7 +12,8 @@ def test_get_users(sandbox_user, sandbox_tenant):
     assert body["data"][0]["id"]
 
     email = sandbox_user.client.data["id.email"].split("#")[0]
-    body = post("/users/search", dict(search=email), sandbox_tenant.sk.key)
+    data = dict(search=email, pagination=dict(page_size=100))
+    body = post("/users/search", data, sandbox_tenant.sk.key)
     assert any(i["id"] == sandbox_user.fp_id for i in body["data"])
 
 
