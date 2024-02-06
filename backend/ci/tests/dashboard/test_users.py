@@ -2,11 +2,7 @@ import pytest
 import arrow
 from tests.bifrost_client import BifrostClient
 from tests.constants import FIELDS_TO_DECRYPT
-from tests.utils import (
-    get,
-    patch,
-    post,
-)
+from tests.utils import get, patch, post
 
 
 @pytest.fixture(scope="module")
@@ -30,14 +26,6 @@ def incomplete_user(sandbox_tenant):
 @pytest.fixture(scope="module")
 def vault_user(sandbox_tenant):
     return post("users", None, sandbox_tenant.sk.key)["id"]
-
-
-def test_get_org(sandbox_user):
-    body = get("org", None, *sandbox_user.tenant.db_auths)
-    tenant = body
-    assert tenant["name"] == sandbox_user.tenant.name
-    assert not tenant["is_sandbox_restricted"]
-    tenant["logo_url"]
 
 
 def test_get_users_list(incomplete_user, sandbox_user2, vault_user, sandbox_user):

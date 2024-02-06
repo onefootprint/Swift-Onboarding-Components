@@ -13,6 +13,12 @@ pub struct UpdateTenantRequest {
     pub support_email: Option<String>,
     pub support_phone: Option<String>,
     pub support_website: Option<String>,
+    /// Used to set support_email to null
+    pub clear_support_email: Option<bool>,
+    /// Used to set support_phone to null
+    pub clear_support_phone: Option<bool>,
+    /// Used to set support_website to null
+    pub clear_support_website: Option<bool>,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]

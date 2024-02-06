@@ -3660,6 +3660,10 @@
                                     ]
                                 }
                             },
+                            "can_initiate_signup_challenge": {
+                                "description": "When true, allowed to create a new user via a signup challenge even when there's already\n an existing user with this contact info.\n Generally, a user can make a new vault IF they're not in a context logging into a tenant\n that they've already onboarded onto",
+                                "type": "boolean"
+                            },
                             "has_syncable_pass_key": {
                                 "description": "signals that one or more biometric credentials\n support syncing and may be available to use on desktop/other devices",
                                 "type": "boolean"
@@ -3683,6 +3687,7 @@
                         "required": [
                             "auth_methods",
                             "available_challenge_kinds",
+                            "can_initiate_signup_challenge",
                             "has_syncable_pass_key",
                             "is_unverified",
                             "token"

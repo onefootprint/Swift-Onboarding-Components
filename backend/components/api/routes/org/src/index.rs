@@ -58,11 +58,23 @@ async fn patch(
         support_email,
         support_phone,
         support_website,
+        clear_support_email,
+        clear_support_phone,
+        clear_support_website,
     } = request.into_inner();
 
     if allow_domain_access == Some(true) && tenant.domains.is_empty() {
         return Err(TenantError::ValidationError("Tenant has no associated domain".to_string()).into());
     }
+
+    // Compute whether we are clearing, setting, or no-oping
+    let clear_or_set = |clear: Option<bool>, new_v: Option<String>| {
+        clear.is_some_and(|v| v).then_some(None).or(new_v.map(Some))
+    };
+
+    let support_email = clear_or_set(clear_support_email, support_email);
+    let support_phone = clear_or_set(clear_support_phone, support_phone);
+    let support_website = clear_or_set(clear_support_website, support_website);
 
     // Note: Tenant domain uniqueness constraint protects us from having multiple tenants with the same domain and allow_domain_access true
     let update_tenant = UpdateTenant {

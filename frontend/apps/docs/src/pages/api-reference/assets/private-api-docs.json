@@ -6720,7 +6720,6 @@
                         "enum": [
                             "PassWithManualReview",
                             "ManualReview",
-                            "StepUp",
                             "Fail"
                         ]
                     },
@@ -19373,6 +19372,18 @@
                 "type": "object",
                 "properties": {
                     "allow_domain_access": {
+                        "type": "boolean"
+                    },
+                    "clear_support_email": {
+                        "description": "Used to set support_email to null",
+                        "type": "boolean"
+                    },
+                    "clear_support_phone": {
+                        "description": "Used to set support_phone to null",
+                        "type": "boolean"
+                    },
+                    "clear_support_website": {
+                        "description": "Used to set support_website to null",
                         "type": "boolean"
                     },
                     "company_size": {
