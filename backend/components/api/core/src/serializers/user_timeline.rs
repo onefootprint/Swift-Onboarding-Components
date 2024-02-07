@@ -1,4 +1,4 @@
-use api_wire_types::WorkflowStartedEventKind;
+use api_wire_types::{DocumentRequest, WorkflowStartedEventKind};
 use db::models::{
     scoped_vault_label::ScopedVaultLabel,
     user_timeline::{SaturatedDataCollectedEvent, SaturatedTimelineEvent, UserTimeline, UserTimelineInfo},
@@ -153,7 +153,10 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                 })
             }
             SaturatedTimelineEvent::StepUp(e) => {
-                Self::StepUp(e.into_iter().map(|dr| dr.kind).sorted().collect())
+                Self::StepUp(e.into_iter().sorted_by_key(|dr| dr.kind).map(|dr| DocumentRequest {
+                    kind: dr.kind,
+                    rule_set_result_id: dr.rule_set_result_id,
+                }).collect())
             },
         }
     }

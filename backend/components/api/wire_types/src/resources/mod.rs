@@ -120,3 +120,6 @@ pub use user_tag::*;
 
 mod auth_method;
 pub use auth_method::*;
+
+mod document_request;
+pub use document_request::*;

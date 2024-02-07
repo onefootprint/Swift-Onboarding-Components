@@ -1,9 +1,7 @@
-use newtypes::{ActionKind, AuthMethodKind, CollectedDataOption, DocumentRequestKind, ExternalIntegrationKind, LabelKind};
+use newtypes::{ActionKind, AuthMethodKind, CollectedDataOption, ExternalIntegrationKind, LabelKind};
 
 use crate::{
-    Actor, Annotation, Apiv2Schema, DateTime, IdentityDocumentTimelineEvent, InsightEvent, LivenessEvent,
-    OnboardingDecision, Serialize, TimelinePlaybook, TriggeredWorkflow, Utc, VaultCreated, WatchlistCheck,
-    WorkflowRequest,
+    Actor, Annotation, Apiv2Schema, DateTime, DocumentRequest, IdentityDocumentTimelineEvent, InsightEvent, LivenessEvent, OnboardingDecision, Serialize, TimelinePlaybook, TriggeredWorkflow, Utc, VaultCreated, WatchlistCheck, WorkflowRequest
 };
 
 /// Describes a liveness event that took place
@@ -35,7 +33,7 @@ pub enum UserTimelineEvent {
     AuthMethodUpdated(AuthMethodUpdated),
     LabelAdded(LabelAdded),
     ExternalIntegrationCalled(ExternalIntegrationCalled),
-    StepUp(Vec<DocumentRequestKind>) // TODO: rule_result_id here as well? need a way to link doc reqs + rule_results tho..
+    StepUp(Vec<DocumentRequest>)
 }
 
 #[derive(Debug, Clone, Serialize)]

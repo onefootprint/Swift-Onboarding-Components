@@ -1,4 +1,5 @@
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use paperclip::actix::Apiv2Schema;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum_macros::Display;
 
@@ -21,6 +22,7 @@ use crate::DocKind;
     SerializeDisplay,
     DeserializeFromStr,
     macros::SerdeAttr,
+    Apiv2Schema
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
