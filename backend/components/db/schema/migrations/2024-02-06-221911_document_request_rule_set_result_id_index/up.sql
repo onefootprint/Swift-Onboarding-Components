@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS document_request_rule_set_result_id ON document_request(rule_set_result_id);

@@ -4,7 +4,7 @@ use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::document_request;
 use diesel::{prelude::*, Insertable, Queryable};
-use newtypes::{DocumentRequestId, DocumentRequestKind, ScopedVaultId, WorkflowId};
+use newtypes::{DocumentRequestId, DocumentRequestKind, RuleSetResultId, ScopedVaultId, WorkflowId};
 
 pub type DocRefId = String;
 
@@ -21,6 +21,9 @@ pub struct DocumentRequest {
     pub should_collect_selfie: bool,
     pub workflow_id: WorkflowId,
     pub kind: DocumentRequestKind,
+    // If docreq was created as a result of a stepup rule, then this would be the id of that rule_result
+    // Note: Not currently backfilled for all historical docreqs!
+    pub rule_set_result_id: Option<RuleSetResultId>,
 }
 
 impl DocumentRequest {
@@ -32,6 +35,7 @@ impl DocumentRequest {
             workflow_id,
             should_collect_selfie,
             kind,
+            rule_set_result_id,
         } = args;
         let new = NewDocumentRequestRow {
             scoped_vault_id,
@@ -40,6 +44,7 @@ impl DocumentRequest {
             should_collect_selfie,
             workflow_id,
             kind,
+            rule_set_result_id,
         };
         let result = diesel::insert_into(document_request::table)
             .values(new)
@@ -58,6 +63,7 @@ impl DocumentRequest {
                     workflow_id,
                     should_collect_selfie,
                     kind,
+                    rule_set_result_id,
                 } = a;
                 NewDocumentRequestRow {
                     scoped_vault_id,
@@ -66,6 +72,7 @@ impl DocumentRequest {
                     should_collect_selfie,
                     workflow_id,
                     kind,
+                    rule_set_result_id,
                 }
             })
             .collect();
@@ -125,6 +132,7 @@ pub struct NewDocumentRequestArgs {
     pub should_collect_selfie: bool,
     pub workflow_id: WorkflowId,
     pub kind: DocumentRequestKind,
+    pub rule_set_result_id: Option<RuleSetResultId>,
 }
 
 #[derive(Debug, Clone, Queryable, Insertable)]
@@ -136,4 +144,5 @@ struct NewDocumentRequestRow {
     should_collect_selfie: bool,
     workflow_id: WorkflowId,
     kind: DocumentRequestKind,
+    rule_set_result_id: Option<RuleSetResultId>,
 }

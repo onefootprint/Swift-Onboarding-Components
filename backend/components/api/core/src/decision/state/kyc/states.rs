@@ -377,6 +377,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
                             workflow_id: wf_id.clone(),
                             should_collect_selfie,
                             kind: doc_req_kind,
+                            rule_set_result_id: Some(rule_set_result.id.clone())
                         })
                     })
                 };

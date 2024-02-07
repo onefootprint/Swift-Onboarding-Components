@@ -128,6 +128,9 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
     let doc_requests = query_doc_requests(state, &wfid).await;
     let (rule_set_result, _) = query_rule_set_result(state, &wf.scoped_vault_id).await.unwrap();
 
+    // docreqs have correct rule_set_result_id
+    assert!(doc_requests.iter().all(|dr| dr.rule_set_result_id.clone().unwrap() == rule_set_result.id));
+
     // We're in stepup
     assert_eq!(WorkflowState::Kyc(KycState::DocCollection), wf.state);
     // We have the correct pending doc requests
@@ -187,7 +190,7 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
     let (wf, _, _, obd, _) = query_data(state, &svid, &wfid).await;
     let (rule_set_result, _) = query_rule_set_result(state, &wf.scoped_vault_id).await.unwrap();
     assert!(rule_set_result.action_triggered.is_none());
-
+    
     // We're in stepup
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     assert_eq!(obd.unwrap().status, DecisionStatus::Pass)
@@ -330,6 +333,9 @@ async fn test_multi_stage_step_up(state: &mut State) {
     let identity_dr = &doc_requests[0];
     assert_eq!(identity_dr.kind, DocumentRequestKind::Identity);
     let (rule_set_result, _) = query_rule_set_result(state, &wf.scoped_vault_id).await.unwrap();
+    
+    // docreqs have correct rule_set_result_id
+    assert!(doc_requests.iter().all(|dr| dr.rule_set_result_id.clone().unwrap() == rule_set_result.id));
 
     // We're in stepup
     assert_eq!(WorkflowState::Kyc(KycState::DocCollection), wf.state);
@@ -388,6 +394,9 @@ async fn test_multi_stage_step_up(state: &mut State) {
         rule_set_result.action_triggered.unwrap(),
         RuleAction::StepUp(proof_of_address_stepup)
     );
+    
+    // docreqs have correct rule_set_result_id
+    assert!(new_doc_request.iter().all(|dr| dr.rule_set_result_id.clone().unwrap() == rule_set_result.id));
 
     // We're in stepup
     assert_eq!(WorkflowState::Kyc(KycState::DocCollection), wf.state);

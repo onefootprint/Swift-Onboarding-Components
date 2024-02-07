@@ -345,6 +345,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                     // TODO: should come from a config
                     should_collect_selfie: true,
                     kind: DocumentRequestKind::Identity,
+                    rule_set_result_id: None,
                 };
                 DocumentRequest::create(conn, args)?;
 

@@ -192,6 +192,7 @@ fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObCon
             workflow_id: wf.id.clone(),
             should_collect_selfie,
             kind: DocumentRequestKind::Identity,
+            rule_set_result_id: None,
         }],
         DocumentRequestKind::ProofOfSsn => vec![
             NewDocumentRequestArgs {
@@ -200,6 +201,7 @@ fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObCon
                 workflow_id: wf.id.clone(),
                 should_collect_selfie: false,
                 kind: DocumentRequestKind::ProofOfSsn,
+                rule_set_result_id: None,
             },
             NewDocumentRequestArgs {
                 scoped_vault_id: wf.scoped_vault_id.clone(),
@@ -207,6 +209,7 @@ fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObCon
                 workflow_id: wf.id.clone(),
                 should_collect_selfie: true,
                 kind: DocumentRequestKind::Identity,
+                rule_set_result_id: None,
             },
         ],
         DocumentRequestKind::ProofOfAddress => vec![NewDocumentRequestArgs {
@@ -215,6 +218,7 @@ fn create_doc_request_if_needed(conn: &mut TxnPgConn, wf: &Workflow, obc: &ObCon
             workflow_id: wf.id.clone(),
             should_collect_selfie: false,
             kind: DocumentRequestKind::ProofOfAddress,
+            rule_set_result_id: None,
         }],
     };
 

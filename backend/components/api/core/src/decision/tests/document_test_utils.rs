@@ -321,6 +321,7 @@ pub async fn save_document_request(
         workflow_id: wf_id,
         should_collect_selfie,
         kind,
+        rule_set_result_id: None
     };
 
     state

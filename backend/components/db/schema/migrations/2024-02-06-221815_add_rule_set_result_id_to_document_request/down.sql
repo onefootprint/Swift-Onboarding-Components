@@ -1,0 +1,1 @@
+ALTER TABLE document_request DROP COLUMN rule_set_result_id;

@@ -517,6 +517,7 @@ pub async fn mock_incode_doc_collection(
                     workflow_id: wf_id.clone(),
                     should_collect_selfie: false,
                     kind: DocumentRequestKind::Identity,
+                    rule_set_result_id: None,
                 };
                 DocumentRequest::create(conn, args).unwrap();
             }

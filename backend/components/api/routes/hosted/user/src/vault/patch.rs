@@ -163,7 +163,7 @@ pub async fn patch(
             {
                 tracing::info!(scoped_vault_id=%sv_id2, wf_id=%wf.id, "creating doc request for international onboarding");
 
-                let args = default_stepup_doc_args(&sv_id2, true, &wf.id);
+                let args = default_identity_doc_args(&sv_id2, true, &wf.id);
                 // TODO: FP-5895 handle 1 click case where address doesn't change (we won't hit this endpoint)
                 state
                     .db_pool
@@ -197,7 +197,7 @@ async fn handle_ssn_skipped(
             let ssn_optional_and_missing = api_core::decision::features::user_input::ssn_optional_and_missing(&vw, &obc);
 
             if ssn_optional_and_missing {
-                let doc_req_args = default_stepup_doc_args(&sv_id, doc_info.requires_selfie(), &workflow_id);
+                let doc_req_args = default_identity_doc_args(&sv_id, doc_info.requires_selfie(), &workflow_id);
 
                 tracing::info!(scoped_vault_id=%sv_id, wf_id=%workflow_id, "creating doc request for ssn skipped");
                 DocumentRequest::get_or_create(conn, doc_req_args)?;
@@ -210,7 +210,7 @@ async fn handle_ssn_skipped(
     Ok(())
 }
 
-fn default_stepup_doc_args(
+fn default_identity_doc_args(
     sv_id: &ScopedVaultId,
     should_collect_selfie: bool,
     workflow_id: &WorkflowId,
@@ -221,5 +221,6 @@ fn default_stepup_doc_args(
         workflow_id: workflow_id.clone(),
         should_collect_selfie,
         kind: DocumentRequestKind::Identity,
+        rule_set_result_id: None,
     }
 }

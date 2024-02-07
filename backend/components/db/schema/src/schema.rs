@@ -254,6 +254,7 @@ diesel::table! {
         should_collect_selfie -> Bool,
         workflow_id -> Text,
         kind -> Text,
+        rule_set_result_id -> Nullable<Text>,
     }
 }
 
@@ -1288,6 +1289,7 @@ diesel::joinable!(data_lifetime -> vault (vault_id));
 diesel::joinable!(decision_intent -> scoped_vault (scoped_vault_id));
 diesel::joinable!(decision_intent -> workflow (workflow_id));
 diesel::joinable!(document_data -> data_lifetime (lifetime_id));
+diesel::joinable!(document_request -> rule_set_result (rule_set_result_id));
 diesel::joinable!(document_request -> scoped_vault (scoped_vault_id));
 diesel::joinable!(document_request -> workflow (workflow_id));
 diesel::joinable!(document_upload -> identity_document (document_id));
