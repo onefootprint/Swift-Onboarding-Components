@@ -50,7 +50,10 @@ const generateDeviceResponse = async ({
     pubKeyCredParams: publicKey.pubKeyCredParams,
     timeout: publicKey.timeout,
     attestation: publicKey.attestation,
-    authenticatorSelection: publicKey.authenticatorSelection,
+    authenticatorSelection: {
+      ...publicKey.authenticatorSelection,
+      requireResidentKey: true,
+    },
   })) as RegisterResponse;
   const response = {
     rawId: base64url.toBase64(result.rawId),
