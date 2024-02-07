@@ -1,8 +1,7 @@
-use newtypes::{FpId, ObConfigurationId, OnboardingStatus, RuleAction, RuleExpression, RuleId, StepUpKind};
+use newtypes::{FpId, ObConfigurationId, OnboardingStatus, RuleAction, RuleExpression, RuleId};
 use std::collections::HashMap;
 
 use serde_with::SerializeDisplay;
-use strum_macros::EnumString;
 
 use crate::*;
 
@@ -13,8 +12,7 @@ pub struct Rule {
     // pub actor: Actor, // TODO: add later, gotta do the saturate nonsense
     pub name: Option<String>,
     pub rule_expression: RuleExpression,
-    // As of 2023-01-31, FE is still on legacy serialization of `step_up`, so we convert from internal RA to RSRA
-    pub action: BackwardsCompatibleRuleAction,
+    pub action: RuleAction,
     pub is_shadow: bool,
 }
 
@@ -23,7 +21,7 @@ pub struct RuleSetResult {
     pub created_at: DateTime<Utc>,
     pub ob_configuration_id: ObConfigurationId,
     // As of 2023-01-31, FE is still on legacy serialization of `step_up`, so we convert from internal RA to RSRA
-    pub action_triggered: Option<BackwardsCompatibleRuleAction>,
+    pub action_triggered: Option<RuleAction>,
     pub rule_results: Vec<RuleResult>,
 }
 
@@ -109,49 +107,6 @@ impl From<Option<RuleAction>> for RuleResultRuleAction {
                 RuleAction::Fail => Self::Fail,
             },
             None => RuleResultRuleAction::Pass,
-        }
-    }
-}
-
-// Temporary enum to help with migrating to new step up serialization
-#[derive(
-    Debug,
-    Display,
-    SerializeDisplay,
-    Apiv2Schema,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    serde_with::DeserializeFromStr,
-    EnumString,
-)]
-#[strum(serialize_all = "snake_case")]
-pub enum BackwardsCompatibleRuleAction {
-    PassWithManualReview,
-    ManualReview,
-    StepUp,
-    Fail,
-}
-
-impl From<RuleAction> for BackwardsCompatibleRuleAction {
-    fn from(value: RuleAction) -> Self {
-        match value {
-            RuleAction::PassWithManualReview => Self::PassWithManualReview,
-            RuleAction::ManualReview => Self::ManualReview,
-            RuleAction::StepUp(_) => Self::StepUp,
-            RuleAction::Fail => Self::Fail,
-        }
-    }
-}
-
-impl From<BackwardsCompatibleRuleAction> for RuleAction {
-    fn from(value: BackwardsCompatibleRuleAction) -> Self {
-        match value {
-            BackwardsCompatibleRuleAction::PassWithManualReview => RuleAction::PassWithManualReview,
-            BackwardsCompatibleRuleAction::ManualReview => RuleAction::ManualReview,
-            BackwardsCompatibleRuleAction::StepUp => RuleAction::StepUp(StepUpKind::Identity),
-            BackwardsCompatibleRuleAction::Fail => RuleAction::Fail,
         }
     }
 }

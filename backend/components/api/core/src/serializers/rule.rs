@@ -19,7 +19,7 @@ impl DbToApi<RuleInstance> for api_wire_types::Rule {
             created_at,
             name,
             rule_expression,
-            action: action.into(), // TODO: move FE to RA
+            action,
             is_shadow,
         }
     }
@@ -39,7 +39,7 @@ impl DbToApi<(RuleSetResult, Vec<(RuleResult, RuleInstance)>)> for api_wire_type
         Self {
             created_at,
             ob_configuration_id,
-            action_triggered: action_triggered.map(|ra| ra.into()),
+            action_triggered,
             rule_results: rule_results
                 .into_iter()
                 .map(api_wire_types::RuleResult::from_db)

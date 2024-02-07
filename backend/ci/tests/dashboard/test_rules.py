@@ -18,14 +18,6 @@ def obc(sandbox_tenant, must_collect_data, can_access_data):
             rule_expression=[{"field": "id_flagged", "op": "not_eq", "value": True}],
             action="pass_with_manual_review",
         ),
-        dict(
-            name="My awesome rule",
-            rule_expression=[
-                {"field": "name_does_not_match", "op": "eq", "value": True}
-            ],
-            # TODO: this is legacy step_up serialization, rm when FE changes
-            action="step_up",
-        ),
          dict(
             name="My awesome rule",
             rule_expression=[
@@ -69,11 +61,7 @@ def test_create(sandbox_tenant, data):
     assert res["name"] == data["name"]
     assert res["rule_expression"] == data["rule_expression"]
     assert res["is_shadow"] == False
-    # we create the rule w/ parameterized stepup, but in the response we get back the non-parameterized view
-    if data["action"].startswith("step_up"):
-        assert res["action"] == "step_up" # temp until FE changes
-    else:
-        assert res["action"] == data["action"]
+    assert res["action"] == data["action"]
 
 
 def test_list(sandbox_tenant, obc):
@@ -186,7 +174,7 @@ def test_get_rule_set_result(sandbox_tenant, must_collect_data):
         dict(
             name="My awesome rule",
             rule_expression=[{"field": "id_flagged", "op": "not_eq", "value": True}],
-            action="step_up",
+            action="step_up.identity",
         ),
         *sandbox_tenant.db_auths,
     )
@@ -199,7 +187,7 @@ def test_get_rule_set_result(sandbox_tenant, must_collect_data):
     )
 
     assert rule_set_result["ob_configuration_id"] == obc.id
-    assert rule_set_result["action_triggered"] == "step_up"
+    assert rule_set_result["action_triggered"] == "step_up.identity"
     assert rule_set_result["rule_results"][-2]["rule"] == rule1
     assert rule_set_result["rule_results"][-2]["result"] == False
     assert rule_set_result["rule_results"][-1]["rule"] == rule2
