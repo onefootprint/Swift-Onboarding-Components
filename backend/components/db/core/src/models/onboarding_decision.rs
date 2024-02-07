@@ -9,8 +9,7 @@ use db_schema::schema::{
 };
 use diesel::{dsl::not, prelude::*, Insertable, Queryable};
 use newtypes::{
-    AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, FpId, OnboardingDecisionId,
-    OnboardingDecisionInfo, ReviewReason, ScopedVaultId, TenantId, VaultId, VerificationResultId, WorkflowId,
+    AnnotationId, DataLifetimeSeqno, DbActor, DecisionStatus, FpId, OnboardingDecisionId, OnboardingDecisionInfo, ReviewReason, RuleSetResultId, ScopedVaultId, TenantId, VaultId, VerificationResultId, WorkflowId
 };
 
 #[derive(Debug, Clone, Queryable)]
@@ -27,6 +26,9 @@ pub struct OnboardingDecision {
     // Only non-null for pass decisions made by footprint
     pub seqno: Option<DataLifetimeSeqno>,
     pub workflow_id: WorkflowId,
+    // If this is an OBD from a workflow, this will be the corresponding rule result making that decision
+    // Note: this is NOT currently backfilled so will be null for historical workflows 
+    pub rule_set_result_id: Option<RuleSetResultId>, 
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -38,6 +40,7 @@ struct NewOnboardingDecisionRow {
     actor: DbActor,
     seqno: Option<DataLifetimeSeqno>,
     workflow_id: WorkflowId,
+    rule_set_result_id: Option<RuleSetResultId>, 
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -58,6 +61,7 @@ pub struct NewDecisionArgs {
     pub seqno: Option<DataLifetimeSeqno>,
     /// When non-null, create a manual review with the provided reasons
     pub create_manual_review_reasons: Option<Vec<ReviewReason>>,
+    pub rule_set_result_id: Option<RuleSetResultId>,
 }
 
 pub type SaturatedOnboardingDecisionInfo = (
@@ -85,6 +89,7 @@ impl OnboardingDecision {
             actor: args.actor,
             seqno: args.seqno,
             workflow_id: wf.id.clone(),
+            rule_set_result_id: args.rule_set_result_id
         };
         let result = diesel::insert_into(onboarding_decision::table)
             .values(new)

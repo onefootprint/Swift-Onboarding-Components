@@ -43,6 +43,7 @@ pub fn save_review_decision(
         actor: DbActor::from(actor),
         seqno: None,
         create_manual_review_reasons: None,
+        rule_set_result_id: None,
     };
 
     // NOTE: must do this after completing the manual review

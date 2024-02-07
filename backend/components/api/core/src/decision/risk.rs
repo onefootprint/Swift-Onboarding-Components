@@ -1,4 +1,4 @@
-use newtypes::{DbActor, ReviewReason, VerificationResultId, WorkflowId, WorkflowSource};
+use newtypes::{DbActor, ReviewReason, RuleSetResultId, VerificationResultId, WorkflowId, WorkflowSource};
 
 use db::{
     models::{
@@ -24,6 +24,7 @@ pub fn save_final_decision(
     wf_id: WorkflowId,
     verification_result_ids: Vec<VerificationResultId>,
     decision: &Decision,
+    rule_set_result_id: Option<&RuleSetResultId>, // TODO: mb just pass in RuleSetResult at this point and then get Decision from that? just need to pull should_commit out of Decision
     // TODO make this non-null soon
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
@@ -60,6 +61,7 @@ pub fn save_final_decision(
         actor: DbActor::Footprint,
         seqno,
         create_manual_review_reasons: decision.create_manual_review.then_some(review_reasons),
+        rule_set_result_id: rule_set_result_id.cloned()
     };
 
     // TODO: Make a billable event here

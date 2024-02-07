@@ -1,15 +1,12 @@
 use db::{
     models::{
-        decision_intent::DecisionIntent,
-        ob_configuration::ObConfiguration, risk_signal::NewRiskSignalInfo, scoped_vault::ScopedVault,
-        workflow::Workflow,
+        decision_intent::DecisionIntent, ob_configuration::ObConfiguration, risk_signal::NewRiskSignalInfo, rule_set_result::RuleSetResult, scoped_vault::ScopedVault, workflow::Workflow
     },
     DbPool, DbResult, TxnPgConn,
 };
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
-    CipKind, DecisionIntentKind, DecisionStatus, FootprintReasonCode, ReviewReason,
-    RuleSetResultKind, ScopedVaultId, TenantId, VendorAPI, VerificationResultId, WorkflowId,
+    CipKind, DecisionIntentKind, DecisionStatus, FootprintReasonCode, ReviewReason, RuleSetResultId, RuleSetResultKind, ScopedVaultId, TenantId, VendorAPI, VerificationResultId, WorkflowId
 };
 
 use crate::{
@@ -178,7 +175,7 @@ pub fn evaluate_rules(
     wf: &Workflow,
     is_fixture: bool,
     rule_result_kind: RuleSetResultKind,
-) -> ApiResult<Decision> {
+) -> ApiResult<(RuleSetResult, Decision)> {
     let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
 
     rule_engine::engine::evaluate_workflow_decision(
@@ -200,12 +197,14 @@ pub fn save_kyc_decision(
     workflow: &Workflow,
     verification_result_ids: Vec<VerificationResultId>,
     rules_output: Decision,
+    rule_set_result_id: Option<&RuleSetResultId>, // TODO: can remove Option here once we merge PR to use rules engine for KYB and once we nuke alpaca_kyc for real
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
     engine::save_onboarding_decision(
         conn,
         workflow,
         rules_output,
+        rule_set_result_id,
         verification_result_ids,
         review_reasons,
     )?;

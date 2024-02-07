@@ -553,6 +553,7 @@ diesel::table! {
         actor -> Jsonb,
         seqno -> Nullable<Int8>,
         workflow_id -> Text,
+        rule_set_result_id -> Nullable<Text>,
     }
 }
 
@@ -1308,6 +1309,7 @@ diesel::joinable!(middesk_request -> decision_intent (decision_intent_id));
 diesel::joinable!(middesk_request -> workflow (workflow_id));
 diesel::joinable!(ob_configuration -> appearance (appearance_id));
 diesel::joinable!(ob_configuration -> tenant (tenant_id));
+diesel::joinable!(onboarding_decision -> rule_set_result (rule_set_result_id));
 diesel::joinable!(onboarding_decision -> workflow (workflow_id));
 diesel::joinable!(onboarding_decision_verification_result_junction -> onboarding_decision (onboarding_decision_id));
 diesel::joinable!(onboarding_decision_verification_result_junction -> verification_result (verification_result_id));

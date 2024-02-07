@@ -28,7 +28,7 @@ use either::Either;
 
 use itertools::Itertools;
 use newtypes::{
-    PiiJsonValue, ReviewReason, ScopedVaultId, VerificationRequestId, VerificationResultId, WorkflowId,
+    PiiJsonValue, ReviewReason, RuleSetResultId, ScopedVaultId, VerificationRequestId, VerificationResultId, WorkflowId
 };
 
 pub async fn save_vendor_responses(
@@ -239,6 +239,7 @@ pub fn save_onboarding_decision(
     conn: &mut TxnPgConn,
     workflow: &Workflow,
     final_decision: Decision,
+    rule_set_result_id: Option<&RuleSetResultId>,
     verification_result_ids: Vec<VerificationResultId>,
     review_reasons: Vec<ReviewReason>,
 ) -> ApiResult<()> {
@@ -248,6 +249,7 @@ pub fn save_onboarding_decision(
         workflow.id.clone(),
         verification_result_ids,
         &final_decision,
+        rule_set_result_id,
         review_reasons,
     )?;
 

@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS onboarding_decision_rule_set_result_id ON onboarding_decision(rule_set_result_id);

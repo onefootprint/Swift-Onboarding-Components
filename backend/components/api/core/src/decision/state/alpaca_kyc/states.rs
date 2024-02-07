@@ -294,7 +294,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
             decision::utils::get_fixture_data_decision(ff_client.clone(), &v, &wf, &self.t_id)?;
         // TODO: reason_codes are produced in `MakeVendorCalls` on_commit, so untangle this from the util
         // TODO: load risk signals here, and use that to evaluate the rules
-        let decision = common::evaluate_rules(
+        let (rule_set_result, decision) = common::evaluate_rules(
             conn,
             self.risk_signals.clone(),
             &wf,
@@ -319,6 +319,7 @@ impl OnAction<MakeDecision, AlpacaKycState> for AlpacaKycDecisioning {
                         .map(|vr| vr.verification_result_id.clone())
                         .collect(),
                     decision,
+                    Some(&rule_set_result.id),
                     vec![],
                 )?;
                 Ok(AlpacaKycState::from(AlpacaKycComplete))
@@ -537,6 +538,7 @@ impl OnAction<MakeWatchlistCheckCall, AlpacaKycState> for AlpacaKycWatchlistChec
                 .map(|vr| vr.verification_result_id.clone()) // TODO: a little funky- we maybe dont need the OBD<>VRes junction table anymore 
                 .collect(),
             final_decision.clone(),
+            None,
             review_reasons,
         )?;
 

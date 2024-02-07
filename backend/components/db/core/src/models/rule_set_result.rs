@@ -374,6 +374,7 @@ mod tests {
                 actor: DbActor::Footprint,
                 seqno: None,
                 create_manual_review_reasons: None,
+                rule_set_result_id: None,
             };
             let wf = Workflow::lock(conn, &wf.id).unwrap();
             let update = WorkflowUpdate::set_decision(&wf, decision);

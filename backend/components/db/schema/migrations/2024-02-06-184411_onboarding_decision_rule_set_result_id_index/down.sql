@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY IF EXISTS onboarding_decision_rule_set_result_id;

@@ -423,6 +423,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
             &wf,
             vres_ids,
             decision.final_decision_and_additional_evaluated()?.decision,
+            None,
             vec![],
         )?;
 

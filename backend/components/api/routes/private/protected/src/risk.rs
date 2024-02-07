@@ -183,7 +183,7 @@ async fn make_decision(
 
             let risk_signals = fetch_latest_risk_signals_map(conn, &sv.id)?;
             let vres_ids = risk_signals.verification_result_ids();
-            let decision = decision::state::common::evaluate_rules(
+            let (rule_set_result, decision) = decision::state::common::evaluate_rules(
                 conn,
                 risk_signals,
                 &wf,
@@ -196,7 +196,7 @@ async fn make_decision(
             ) {
                 return Err(AssertionError("decision was StepUp, erroring").into());
             }
-            engine::save_onboarding_decision(conn, &wf, decision.clone(), vres_ids, vec![])?;
+            engine::save_onboarding_decision(conn, &wf, decision.clone(), Some(&rule_set_result.id), vres_ids, vec![])?;
             Ok(decision)
         })
         .await?;

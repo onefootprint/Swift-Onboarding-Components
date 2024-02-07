@@ -1,0 +1,1 @@
+ALTER TABLE onboarding_decision DROP COLUMN rule_set_result_id;

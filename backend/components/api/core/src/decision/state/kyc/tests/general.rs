@@ -283,7 +283,8 @@ async fn pass(state: &mut State, user_kind: UserKind, doc_collection_kind: Docum
     let (wf, _, mr, obd, rs) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyc(KycState::Complete), wf.state);
     assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
-    assert!(obd.unwrap().seqno.is_some());
+    assert!(obd.as_ref().unwrap().seqno.is_some());
+    assert!(obd.unwrap().rule_set_result_id.is_some());
     assert!(mr.is_none());
 
     match user_kind {
@@ -506,6 +507,7 @@ async fn kyc_fail(state: &mut State, user_kind: UserKind, doc_collection_kind: D
     assert!(obd.status == DecisionStatus::Fail);
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert!(obd.seqno.is_none());
+    assert!(obd.rule_set_result_id.is_some());
     assert_eq!(OnboardingStatus::Fail, wf.status.unwrap());
     if expect_review {
         assert!(mr.is_some());
@@ -678,6 +680,7 @@ async fn redo_and_pass(
     assert!(obd.id != prior_obd.id);
     assert!(obd.status == DecisionStatus::Pass);
     assert!(obd.seqno.is_some());
+    assert!(obd.rule_set_result_id.is_some());
     assert!(matches!(obd.actor, DbActor::Footprint));
     assert_eq!(OnboardingStatus::Pass, wf.status.unwrap());
 

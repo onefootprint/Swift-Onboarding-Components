@@ -2,13 +2,10 @@ use crate::{
     decision::{
         onboarding::Decision,
         state::{
-            actions::WorkflowActions,
-            kyb,
-            test_utils::{
+            actions::WorkflowActions, common, kyb, test_utils::{
                 mock_middesk, mock_webhooks, query_data, ExpectedRequiresManualReview, ExpectedStatus,
                 OnboardingCompleted, OnboardingStatusChanged,
-            },
-            Authorize, BoKycCompleted, MakeDecision, MakeVendorCalls, WorkflowKind, WorkflowWrapper,
+            }, Authorize, BoKycCompleted, MakeDecision, MakeVendorCalls, WorkflowKind, WorkflowWrapper
         },
         tests::test_helpers,
     },
@@ -67,20 +64,23 @@ async fn kyc_bo(state: &mut State, person_wf: &DbWorkflow) {
         )],
     );
 
-    let wfid = person_wf.id.clone();
+    let wf = person_wf.clone();
+    let svid = person_wf.scoped_vault_id.clone();
     state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            crate::decision::risk::save_final_decision(
+            common::save_kyc_decision(
                 conn,
-                wfid,
+                &svid,
+                &wf,
                 vec![],
-                &Decision {
+                Decision {
                     decision_status: DecisionStatus::Pass,
                     should_commit: false,
                     create_manual_review: false,
                     action: None,
                 },
+                None,
                 vec![],
             )
         })

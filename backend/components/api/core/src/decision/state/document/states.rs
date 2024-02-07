@@ -184,7 +184,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
                 should_execute_rules_for_document_only(&v, &wf)?;
             let risk_signals = fetch_latest_risk_signals_map(conn, &self.sv_id)?;
             // TODO: what's the review strategy for this case?
-            let decision = common::evaluate_rules(
+            let (rule_set_result, decision) = common::evaluate_rules(
                 conn,
                 risk_signals,
                 &wf,
@@ -210,6 +210,7 @@ impl OnAction<MakeDecision, DocumentState> for DocumentDecisioning {
                     .map(|vr| vr.verification_result_id)
                     .collect(),
                 decision,
+                Some(&rule_set_result.id),
                 vec![],
             )?;
         }
@@ -270,6 +271,7 @@ fn handle_non_identity_document(
         actor: DbActor::Footprint,
         seqno,
         create_manual_review_reasons: review_reasons,
+        rule_set_result_id: None,
     };
     let update = DbWorkflowUpdate::set_decision(&wf, decision);
     // TODO: figure out a strategy for users already in MR to push the fact that there's a MR for SSN Upload now

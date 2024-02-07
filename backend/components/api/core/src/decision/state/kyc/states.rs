@@ -330,7 +330,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
         let vres_ids = risk_signals.verification_result_ids();
 
         // Always execute real Rules, even in sandbox. But below we just use the sandbox fixture decision instead of the decision from these real Rules
-        let decision = common::evaluate_rules(
+        let (rule_set_result, decision) = common::evaluate_rules(
             conn,
             risk_signals,
             &wf,
@@ -359,7 +359,7 @@ impl OnAction<MakeDecision, KycState> for KycDecisioning {
 
         match decision.decision_status {
             DecisionStatus::Fail | DecisionStatus::Pass => {
-                common::save_kyc_decision(conn, &self.sv_id, &wf, vres_ids, decision, review_reasons)?;
+                common::save_kyc_decision(conn, &self.sv_id, &wf, vres_ids, decision, Some(&rule_set_result.id), review_reasons)?;
                 Ok(KycState::from(KycComplete))
             }
             DecisionStatus::StepUp => {
