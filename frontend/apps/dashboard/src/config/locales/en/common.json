@@ -1506,9 +1506,10 @@
             }
           },
           "external-integration-called": {
-            "true": "Successfully submitted {{external_id}} to {{kind}} ",
-            "false": "Unsuccessfully submitted {{external_id}} to {{kind}} ",
-            "alpaca_cip": "Alpaca CIP"
+            "true": "Successfully submitted user to {{kind}} ",
+            "false": "Unsuccessfully submitted user to {{kind}} ",
+            "alpaca_cip": "Alpaca CIP",
+            "uuid": "UUID: "
           },
           "workflow-triggered-event": {
             "requested-user-to": "requested user to {{action}}",

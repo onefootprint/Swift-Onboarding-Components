@@ -1,0 +1,26 @@
+import type { ExternalIntegrationCalledData } from '@onefootprint/types';
+import { Typography } from '@onefootprint/ui';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+
+type ExternalIntegrationCalledEventHeaderProps = {
+  data: ExternalIntegrationCalledData;
+};
+
+const ExternalIntegrationCalledEventHeader = ({
+  data,
+}: ExternalIntegrationCalledEventHeaderProps) => {
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.entity.audit-trail.timeline.external-integration-called',
+  });
+
+  return (
+    <Typography variant="body-3">
+      {t(`${data.successful}`, {
+        kind: t(data.integration),
+      })}
+    </Typography>
+  );
+};
+
+export default ExternalIntegrationCalledEventHeader;

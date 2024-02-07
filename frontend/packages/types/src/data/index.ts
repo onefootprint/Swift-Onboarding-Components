@@ -177,6 +177,8 @@ export type {
   CollectedDataEvent,
   CollectedDataEventData,
   CombinedWatchlistChecksEvent,
+  ExternalIntegrationCalledData,
+  ExternalIntegrationCalledEvent,
   FreeFormNoteEvent,
   IdDocUploadedEvent,
   IdDocUploadedEventData,

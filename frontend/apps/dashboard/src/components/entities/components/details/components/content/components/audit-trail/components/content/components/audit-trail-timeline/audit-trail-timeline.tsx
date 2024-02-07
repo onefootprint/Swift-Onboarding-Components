@@ -4,6 +4,7 @@ import type {
   CollectedDataEventData,
   CombinedWatchlistChecksEvent,
   Entity,
+  ExternalIntegrationCalledData,
   IdDocUploadedEventData,
   LivenessEventData,
   OnboardingDecisionEventData,
@@ -16,7 +17,6 @@ import type {
 import { EntityStatus, TimelineEventKind } from '@onefootprint/types';
 import type {
   AuthMethodUpdatedData,
-  ExternalIntegrationCalledData,
   LabelAddedEventData,
   WorkflowStartedEventData,
 } from '@onefootprint/types/src/data/timeline';
@@ -34,6 +34,10 @@ import Actor from './components/actor';
 import AnnotationNote from './components/annotation-note';
 import AuthMethodUpdatedEventHeader from './components/auth-method-updated-event';
 import DataCollectedEventHeader from './components/data-collected-event';
+import {
+  ExternalIntegrationCalledEventBody,
+  ExternalIntegrationCalledEventHeader,
+} from './components/external-integration-called-event';
 import IdDocUploadedEventHeader from './components/id-doc-uploaded-event';
 import LabelAddedEventHeader from './components/label-added-event';
 import {
@@ -188,19 +192,12 @@ const AuditTrailTimeline = ({ entity, timeline }: AuditTrailTimelineProps) => {
       });
     } else if (kind === TimelineEventKind.externalIntegrationCalled) {
       const eventData = data as ExternalIntegrationCalledData;
-
       items.push({
         time,
         headerComponent: (
-          <Typography variant="body-3">
-            {t(`timeline.external-integration-called.${eventData.successful}`, {
-              kind: t(
-                `timeline.external-integration-called.${eventData.integration}`,
-              ),
-              external_id: eventData.externalId,
-            })}
-          </Typography>
+          <ExternalIntegrationCalledEventHeader data={eventData} />
         ),
+        bodyComponent: <ExternalIntegrationCalledEventBody data={eventData} />,
       });
     }
   });

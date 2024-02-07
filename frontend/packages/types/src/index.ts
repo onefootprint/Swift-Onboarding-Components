@@ -244,6 +244,8 @@ export type {
   Entity,
   EntityCard,
   EntityVault,
+  ExternalIntegrationCalledData,
+  ExternalIntegrationCalledEvent,
   FootprintAppearance,
   FreeFormNoteEvent,
   IdDIData,
