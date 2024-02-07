@@ -6,6 +6,7 @@ export const buttonHeights = {
 };
 
 export const inputHeights = {
+  tiny: '24px',
   default: '40px',
   compact: '32px',
   textArea: '140px',

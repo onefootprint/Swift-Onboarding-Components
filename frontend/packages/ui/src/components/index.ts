@@ -109,6 +109,8 @@ export type { SegmentedControlProps } from './segmented-control';
 export { default as SegmentedControl } from './segmented-control';
 export type { SelectOption, SelectProps } from './select';
 export { default as Select } from './select';
+export type { SelectNewProps } from './select-new';
+export { default as SelectNew } from './select-new';
 export type { ShimmerProps } from './shimmer';
 export { default as Shimmer } from './shimmer';
 export type { SplitButtonProps } from './split-button';
