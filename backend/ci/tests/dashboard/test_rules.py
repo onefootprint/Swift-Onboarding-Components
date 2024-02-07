@@ -18,7 +18,7 @@ def obc(sandbox_tenant, must_collect_data, can_access_data):
             rule_expression=[{"field": "id_flagged", "op": "not_eq", "value": True}],
             action="pass_with_manual_review",
         ),
-         dict(
+        dict(
             name="My awesome rule",
             rule_expression=[
                 {"field": "name_does_not_match", "op": "eq", "value": True}
@@ -165,7 +165,7 @@ def test_get_rule_set_result(sandbox_tenant, must_collect_data):
             rule_expression=[
                 {"field": "ssn_does_not_match", "op": "eq", "value": True}
             ],
-            action="fail",
+            action="manual_review",
         ),
         *sandbox_tenant.db_auths,
     )
@@ -174,7 +174,7 @@ def test_get_rule_set_result(sandbox_tenant, must_collect_data):
         dict(
             name="My awesome rule",
             rule_expression=[{"field": "id_flagged", "op": "not_eq", "value": True}],
-            action="step_up.identity",
+            action="fail",
         ),
         *sandbox_tenant.db_auths,
     )
@@ -182,16 +182,26 @@ def test_get_rule_set_result(sandbox_tenant, must_collect_data):
     bifrost = BifrostClient.new(obc)
     user = bifrost.run()
 
-    rule_set_result = get(
-        f"entities/{user.fp_id}/rule_set_result", None, *sandbox_tenant.db_auths
-    )
+    timeline = get(f"entities/{user.fp_id}/timeline", None, *sandbox_tenant.db_auths)
+    stepup_event = [
+        i for i in timeline if i["event"]["kind"] == "onboarding_decision"
+    ].pop()
 
-    assert rule_set_result["ob_configuration_id"] == obc.id
-    assert rule_set_result["action_triggered"] == "step_up.identity"
-    assert rule_set_result["rule_results"][-2]["rule"] == rule1
-    assert rule_set_result["rule_results"][-2]["result"] == False
-    assert rule_set_result["rule_results"][-1]["rule"] == rule2
-    assert rule_set_result["rule_results"][-1]["result"] == True
+    # We currently have 2 API's for retrieving rule_set_results. The latter will be deprecated in favor of the former but in the meantime we'll test both
+    rsr1 = get(
+        f"entities/{user.fp_id}/rule_set_result/{stepup_event['event']['data']['decision']['rule_set_result_id']}",
+        None,
+        *sandbox_tenant.db_auths,
+    )
+    rsr2 = get(f"entities/{user.fp_id}/rule_set_result", None, *sandbox_tenant.db_auths)
+
+    for rsr in [rsr1, rsr2]:
+        assert rsr["ob_configuration_id"] == obc.id
+        assert rsr["action_triggered"] == "fail"
+        assert rsr["rule_results"][-2]["rule"] == rule1
+        assert rsr["rule_results"][-2]["result"] == False
+        assert rsr["rule_results"][-1]["rule"] == rule2
+        assert rsr["rule_results"][-1]["result"] == True
 
 
 def test_delete(sandbox_tenant, obc):

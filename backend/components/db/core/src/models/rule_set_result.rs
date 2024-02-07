@@ -142,6 +142,16 @@ impl RuleSetResult {
         Ok(Some((rule_set_result, rule_results)))
     }
 
+    #[tracing::instrument("RuleSetResult::get", skip_all)]
+    pub fn get(conn: &mut PgConn, rsr_id: &RuleSetResultId) -> DbResult<(RuleSetResult, Vec<(RuleResult, RuleInstance)>)> {
+        let rsr: RuleSetResult = rule_set_result::table
+            .filter(rule_set_result::id.eq(rsr_id))
+            .get_result(conn)?;
+
+        let rule_results = RuleResult::list(conn, &rsr.id)?;
+        Ok((rsr, rule_results))
+    }
+
     /// Queries a sample of rule_set_results for use in a backtest
     /// Takes the first rule_set_result (ie if 2 exist because step-up occured) from the latest
     /// workflow (that is complete/has a rule_set_result and part of the passed in playbook) per vault
