@@ -95,7 +95,7 @@
                 ]
             }
         },
-        "/businesses/{fp_id}/kyb": {
+        "/businesses/{fp_bid}/kyb": {
             "post": {
                 "tags": [
                     "Businesses",
@@ -105,7 +105,7 @@
                 "parameters": [
                     {
                         "in": "path",
-                        "name": "fp_id",
+                        "name": "fp_bid",
                         "required": true,
                         "schema": {
                             "type": "string"

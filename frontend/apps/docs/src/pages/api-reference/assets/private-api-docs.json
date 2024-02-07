@@ -1567,7 +1567,8 @@
                                     "WorkflowStarted",
                                     "AuthMethodUpdated",
                                     "LabelAdded",
-                                    "ExternalIntegrationCalled"
+                                    "ExternalIntegrationCalled",
+                                    "StepUp"
                                 ]
                             }
                         },
@@ -17240,7 +17241,7 @@
                         }
                     },
                     "ingress_settings": {
-                        "description": "Ingress configuration    \n omit to not change, set to null to remove",
+                        "description": "Ingress configuration\n omit to not change, set to null to remove",
                         "type": "object",
                         "properties": {
                             "content_type": {
@@ -18964,7 +18965,6 @@
                         "enum": [
                             "PassWithManualReview",
                             "ManualReview",
-                            "StepUp",
                             "Fail"
                         ]
                     },
@@ -19091,7 +19091,6 @@
                         "enum": [
                             "PassWithManualReview",
                             "ManualReview",
-                            "StepUp",
                             "Fail"
                         ]
                     },
@@ -19118,7 +19117,6 @@
                                             "enum": [
                                                 "PassWithManualReview",
                                                 "ManualReview",
-                                                "StepUp",
                                                 "Fail"
                                             ]
                                         },

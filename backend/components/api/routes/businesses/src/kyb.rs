@@ -34,7 +34,7 @@ use paperclip::actix::{api_v2_operation, post, web};
     description = "Triggers KYB on the provided business. KYB can only be run once per Business vault.",
     tags(Businesses, Preview)
 )]
-#[post("/businesses/{fp_id}/kyb")]
+#[post("/businesses/{fp_bid}/kyb")]
 pub async fn post(
     state: web::Data<State>,
     fp_id: FpIdPath,
