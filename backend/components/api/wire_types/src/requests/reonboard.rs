@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::PiiString;
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]

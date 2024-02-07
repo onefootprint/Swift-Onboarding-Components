@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::ReviewReason;
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 

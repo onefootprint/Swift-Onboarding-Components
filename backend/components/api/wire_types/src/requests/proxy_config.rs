@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::{ApiKeyStatus, DataIdentifier, PiiString, ProxyConfigSecretHeaderId, ProxyIngressContentType};
 
 /// Create a new proxy configuration
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -129,7 +130,7 @@ pub struct PatchProxyConfigRequest {
     /// access reason to use during proxy decryptions
     pub access_reason: Option<String>,
 
-    /// Ingress configuration    
+    /// Ingress configuration
     /// omit to not change, set to null to remove
     pub ingress_settings: Option<Option<IngressSettings>>,
 }

@@ -1,3 +1,4 @@
+use newtypes::{DataIdentifier, SessionAuthToken};
 use std::collections::HashSet;
 
 use crate::*;

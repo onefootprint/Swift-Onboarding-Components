@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::{RuleAction, RuleExpression};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct CreateRuleRequest {

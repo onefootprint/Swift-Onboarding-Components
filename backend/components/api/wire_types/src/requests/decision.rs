@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::{DecisionStatus, OnboardingStatus};
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]

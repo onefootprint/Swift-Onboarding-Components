@@ -1,4 +1,6 @@
-use newtypes::input::deserialize_stringified_list;
+use newtypes::{
+    input::deserialize_stringified_list, ExternalId, LabelKind, OnboardingStatusFilter, PiiString, VaultKind,
+};
 
 use crate::*;
 

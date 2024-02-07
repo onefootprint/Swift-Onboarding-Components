@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::TenantId;
 
 #[derive(serde::Deserialize, Apiv2Schema)]
 pub struct AssumeRoleRequest {

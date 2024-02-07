@@ -1,4 +1,5 @@
 use alpaca::types::account::{AccountType, Agreement, AssetClass, Disclosures, TrustedContact};
+use newtypes::{FpId, PiiJsonValue, PiiString};
 
 use crate::*;
 

@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::PiiString;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 pub struct HostedBusiness {

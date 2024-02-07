@@ -1,4 +1,7 @@
-use newtypes::email::Email;
+use newtypes::{
+    email::Email, AuthMethodKind, ChallengeKind, ChallengeToken, IdentifyScope, PhoneNumber, PiiString,
+    SessionAuthToken,
+};
 
 use crate::*;
 

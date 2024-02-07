@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::{ObConfigurationKey, PiiString, TriggerInfo, WorkflowFixtureResult};
 
 #[derive(Debug, Clone, Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]

@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::{DataLifetimeSeqno, DocumentScanDeviceType, DocumentSide, IdDocKind, IdentityDocumentStatus};
 
 use serde_with::SerializeDisplay;
 pub use strum_macros::Display;

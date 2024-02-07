@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::{TenantRoleId, TenantRoleKindDiscriminant, TenantScope};
 
 /// IAM Role for an Org
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

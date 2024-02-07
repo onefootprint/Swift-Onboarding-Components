@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::{TenantId, WorkosAuthMethod};
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 pub struct PrivateTenantFilters {

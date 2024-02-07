@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::{LivenessAttributes, LivenessSource};
 
 /// Describes a liveness event that took place
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

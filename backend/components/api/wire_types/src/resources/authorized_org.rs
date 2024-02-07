@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::CollectedDataOption;
 
 #[derive(serde::Serialize, Apiv2Schema)]
 pub struct AuthorizedOrg {

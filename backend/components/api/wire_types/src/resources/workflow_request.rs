@@ -1,6 +1,6 @@
-use newtypes::WorkflowRequestId;
+use newtypes::{TriggerKind, WorkflowRequestId};
 
-use crate::{Apiv2Schema, Serialize, TriggerKind};
+use crate::{Apiv2Schema, Serialize};
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct WorkflowRequest {

@@ -1,4 +1,4 @@
-use newtypes::decision::MatchLevel;
+use newtypes::{decision::MatchLevel, FootprintReasonCode, SignalSeverity};
 
 use crate::*;
 

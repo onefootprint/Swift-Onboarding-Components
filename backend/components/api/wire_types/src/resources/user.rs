@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::{ExternalId, FpId, OnboardingStatus, SandboxId};
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 pub struct LiteUser {

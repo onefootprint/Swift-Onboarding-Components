@@ -1,4 +1,8 @@
 use crate::*;
+use newtypes::{
+    ApiKeyStatus, AppClipExperienceId, CollectedDataOption, EnhancedAml, Iso3166TwoDigitCountryCode,
+    ObConfigurationId, ObConfigurationKey, ObConfigurationKind, TenantId,
+};
 
 /// OnboardingConfiguration that was created
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]

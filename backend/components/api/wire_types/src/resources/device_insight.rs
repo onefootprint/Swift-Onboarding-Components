@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::{AuthEventKind, ModernAuthEventKind};
 
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
 

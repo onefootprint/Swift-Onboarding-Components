@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::{TenantScope, TenantUserId};
 
 fn is_false(b: &bool) -> bool {
     !(*b)

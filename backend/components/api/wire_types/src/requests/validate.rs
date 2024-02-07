@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::{FpId, ModernAuthEventKind, ObConfigurationId, OnboardingStatus, SessionAuthToken};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, Apiv2Schema)]
 pub struct ValidateRequest {

@@ -1,4 +1,5 @@
 use crate::*;
+use newtypes::{ApiKeyStatus, ProxyConfigId, ProxyConfigSecretHeaderId, ProxyIngressContentType};
 
 /// Proxy configuration
 #[derive(Debug, Clone, Serialize, Apiv2Schema)]
