@@ -1,4 +1,4 @@
-use newtypes::{ActionKind, AuthMethodKind, CollectedDataOption, ExternalIntegrationKind, LabelKind};
+use newtypes::{ActionKind, AuthMethodKind, CollectedDataOption, DocumentRequestKind, ExternalIntegrationKind, LabelKind};
 
 use crate::{
     Actor, Annotation, Apiv2Schema, DateTime, IdentityDocumentTimelineEvent, InsightEvent, LivenessEvent,
@@ -35,6 +35,7 @@ pub enum UserTimelineEvent {
     AuthMethodUpdated(AuthMethodUpdated),
     LabelAdded(LabelAdded),
     ExternalIntegrationCalled(ExternalIntegrationCalled),
+    StepUp(Vec<DocumentRequestKind>) // TODO: rule_result_id here as well? need a way to link doc reqs + rule_results tho..
 }
 
 #[derive(Debug, Clone, Serialize)]

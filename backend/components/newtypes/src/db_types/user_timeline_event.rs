@@ -1,8 +1,5 @@
 use crate::{
-    util::impl_enum_string_diesel, ActionKind, AnnotationId, AuthEventId, AuthMethodKind,
-    CollectedDataOption, DataIdentifier, DbActor, IdentityDocumentId, LabelId, LivenessEventId,
-    ObConfigurationId, OnboardingDecisionId, WatchlistCheckId, WebauthnCredentialId, WorkflowId,
-    WorkflowRequestId,
+    util::impl_enum_string_diesel, ActionKind, AnnotationId, AuthEventId, AuthMethodKind, CollectedDataOption, DataIdentifier, DbActor, DocumentRequestId, IdentityDocumentId, LabelId, LivenessEventId, ObConfigurationId, OnboardingDecisionId, WatchlistCheckId, WebauthnCredentialId, WorkflowId, WorkflowRequestId
 };
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
@@ -40,6 +37,7 @@ pub enum DbUserTimelineEvent {
     AuthMethodUpdated(AuthMethodUpdatedInfo),
     LabelAdded(LabelAddedInfo),
     ExternalIntegrationCalled(ExternalIntegrationInfo),
+    StepUp(StepUpInfo),
 }
 
 impl_enum_string_diesel!(DbUserTimelineEventKind);
@@ -113,6 +111,12 @@ impl From<LabelAddedInfo> for DbUserTimelineEvent {
 impl From<ExternalIntegrationInfo> for DbUserTimelineEvent {
     fn from(s: ExternalIntegrationInfo) -> Self {
         Self::ExternalIntegrationCalled(s)
+    }
+}
+
+impl From<StepUpInfo> for DbUserTimelineEvent {
+    fn from(s: StepUpInfo) -> Self {
+        Self::StepUp(s)
     }
 }
 
@@ -205,4 +209,9 @@ pub struct ExternalIntegrationInfo {
     pub integration: ExternalIntegrationKind,
     pub successful: bool,
     pub external_id: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StepUpInfo {
+    pub document_request_ids: Vec<DocumentRequestId>
 }

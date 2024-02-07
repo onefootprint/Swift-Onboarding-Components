@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{DbResult, PgConn, TxnPgConn};
 use chrono::{DateTime, Utc};
 use db_schema::schema::document_request;
@@ -101,6 +103,17 @@ impl DocumentRequest {
         }
     }
 
+
+    #[tracing::instrument("DocumentRequest::get_bulk", skip_all)]
+    pub fn get_bulk(conn: &mut PgConn, ids: Vec<DocumentRequestId>) -> DbResult<HashMap<DocumentRequestId, DocumentRequest>> {
+        let results = document_request::table
+            .filter(document_request::id.eq_any(ids))
+            .get_results::<Self>(conn)?
+            .into_iter()
+            .map(|l| (l.id.clone(), l))
+            .collect();
+        Ok(results)
+    }
    
 }
 

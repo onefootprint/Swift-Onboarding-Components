@@ -152,6 +152,9 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                     external_id,
                 })
             }
+            SaturatedTimelineEvent::StepUp(e) => {
+                Self::StepUp(e.into_iter().map(|dr| dr.kind).sorted().collect())
+            },
         }
     }
 }

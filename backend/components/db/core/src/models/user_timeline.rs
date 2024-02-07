@@ -73,6 +73,7 @@ pub enum SaturatedTimelineEvent {
     AuthMethodUpdated((AuthMethodUpdatedInfo, AuthEvent, InsightEvent)),
     LabelAdded(ScopedVaultLabel),
     ExternalIntegrationCalled(ExternalIntegrationInfo),
+    StepUp(Vec<DocumentRequest>),
 }
 
 pub type IsFromOtherTenant = bool;
@@ -177,6 +178,10 @@ impl UserTimeline {
             DbUserTimelineEvent::LabelAdded(ref e) => Some(e.id.clone()),
             _ => None,
         });
+        let doc_req_ids = results.iter().flat_map(|ut| match ut.event {
+            DbUserTimelineEvent::StepUp(ref e) => Some(e.document_request_ids.clone()),
+            _ => None,
+        }).flatten();
 
         let decisions = OnboardingDecision::get_bulk(conn, decision_ids.collect())?;
         let annotations = Annotation::get_bulk(conn, annotation_ids.collect())?;
@@ -190,6 +195,7 @@ impl UserTimeline {
         let wfrs = WorkflowRequest::get_bulk(conn, wfr_ids.collect())?;
         let auth_events = AuthEvent::get_bulk_for_timeline(conn, auth_event_ids.collect())?;
         let labels = ScopedVaultLabel::get_bulk(conn, label_ids.collect())?;
+        let doc_reqs = DocumentRequest::get_bulk(conn, doc_req_ids.collect())?;
 
         // Join the UserTimeline events with the saturated info we fetched from different tables
         let results = results
@@ -301,6 +307,10 @@ impl UserTimeline {
                     }
                     DbUserTimelineEvent::ExternalIntegrationCalled(ref e) => {
                         SaturatedTimelineEvent::ExternalIntegrationCalled(e.clone())
+                    }
+                    DbUserTimelineEvent::StepUp(ref e) => {
+                        let drs = e.document_request_ids.iter().map(|dr_id| doc_reqs.get(dr_id).ok_or(DbError::RelatedObjectNotFound)).collect::<Result<Vec<_>, _>>()?.into_iter().cloned().collect();
+                        SaturatedTimelineEvent::StepUp(drs)
                     }
                 };
                 Ok(UserTimelineInfo(ut, saturated_event))

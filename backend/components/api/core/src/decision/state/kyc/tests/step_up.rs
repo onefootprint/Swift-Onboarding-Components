@@ -2,9 +2,7 @@ use crate::{
     decision::state::{
         actions::{Authorize, MakeVendorCalls},
         test_utils::{
-            mock_idology, mock_incode_doc_collection, mock_webhooks, query_data, query_doc_requests,
-            query_rule_set_result, setup_data, ExpectedRequiresManualReview, ExpectedStatus,
-            OnboardingCompleted, OnboardingStatusChanged, WithQualifier,
+            mock_idology, mock_incode_doc_collection, mock_webhooks, query_data, query_doc_requests, query_rule_set_result, query_timeline_events, setup_data, ExpectedRequiresManualReview, ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged, WithQualifier
         },
         MakeDecision, WorkflowActions, WorkflowWrapper,
     },
@@ -21,9 +19,7 @@ use feature_flag::BoolFlag;
 
 use macros::{test_state, test_state_case};
 use newtypes::{
-    BooleanOperator, CollectedDataOption as CDO, DbActor, DecisionStatus, DocumentRequestKind,
-    FootprintReasonCode, FootprintReasonCode as FRC, KycState, OnboardingStatus, RuleAction, RuleExpression,
-    RuleExpressionCondition, StepUpKind, WorkflowState,
+    BooleanOperator, CollectedDataOption as CDO, DbActor, DbUserTimelineEvent, DbUserTimelineEventKind, DecisionStatus, DocumentRequestKind, KycState, OnboardingStatus, RuleAction, RuleExpression, RuleExpressionCondition, StepUpKind, WorkflowState, FootprintReasonCode, FootprintReasonCode as FRC
 };
 
 #[test_state_case(StepUpKind::Identity)]
@@ -136,7 +132,7 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
     assert_eq!(WorkflowState::Kyc(KycState::DocCollection), wf.state);
     // We have the correct pending doc requests
     assert_have_same_elements(
-        doc_requests.into_iter().map(|d| d.kind).collect(),
+        doc_requests.iter().map(|d| d.kind).collect(),
         step_up_kind
             .to_doc_kinds()
             .into_iter()
@@ -148,6 +144,13 @@ async fn test_stepup_with_multiple_docs(state: &State, step_up_kind: StepUpKind)
         rule_set_result.action_triggered.unwrap(),
         RuleAction::StepUp(step_up_kind)
     );
+    // user timeline event was created
+    let mut uts = query_timeline_events(state, &svid, vec![DbUserTimelineEventKind::StepUp]).await;
+    assert_eq!(1, uts.len());
+    let DbUserTimelineEvent::StepUp(e) = uts.pop().unwrap().0.event else {
+        panic!("Wrong timeline event created");
+    };
+    assert_have_same_elements(doc_requests.iter().map(|dr| dr.id.clone()).collect(), e.document_request_ids);
 
     // Now mock document being collected
     // TODO: not quite right since we need to not let wf run to completion if there's still doc requests pending
@@ -335,6 +338,13 @@ async fn test_multi_stage_step_up(state: &mut State) {
         rule_set_result.action_triggered.unwrap(),
         RuleAction::StepUp(identity_stepup)
     );
+    // user timeline event was created
+    let mut uts = query_timeline_events(state, &svid, vec![DbUserTimelineEventKind::StepUp]).await;
+    assert_eq!(1, uts.len());
+    let DbUserTimelineEvent::StepUp(e) = uts.pop().unwrap().0.event else {
+        panic!("Wrong timeline event created");
+    };
+    assert_have_same_elements(doc_requests.iter().map(|dr| dr.id.clone()).collect(), e.document_request_ids);
 
     // Now mock document being collected
     mock_incode_doc_collection(
@@ -381,6 +391,13 @@ async fn test_multi_stage_step_up(state: &mut State) {
 
     // We're in stepup
     assert_eq!(WorkflowState::Kyc(KycState::DocCollection), wf.state);
+    // user timeline event was created
+    let mut uts = query_timeline_events(state, &svid, vec![DbUserTimelineEventKind::StepUp]).await;
+    assert_eq!(2, uts.len());
+    let DbUserTimelineEvent::StepUp(e) = uts.remove(0).0.event else {
+        panic!("Wrong timeline event created");
+    };
+    assert_have_same_elements(new_doc_request.iter().map(|dr| dr.id.clone()).collect(), e.document_request_ids);
 
     // Expect Webhooks
     mock_webhooks(
