@@ -118,19 +118,19 @@ vendor_reason_codes_enum! {
         //
         // Exact match to Phone, No match to Name, Exact match to Address
         #[ser = "EK"]
-        #[footprint_reason_codes = PhRCH::new(Exact, FullNameSimple(NoMatch), FullAddressSimple(Exact)).into()]
+        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(NoMatch), FullAddressSimple(Exact)).into()]
         EK,
         // Exact match to Phone, Partial match to Name, Close match to Address
         #[ser = "EM"]
-        #[footprint_reason_codes = PhRCH::new(Exact, FullNameSimple(Partial), FullAddressSimple(Partial)).into()]
+        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(Partial), FullAddressSimple(Partial)).into()]
         EM,
         // Exact match to Phone, Partial match to Name, Partial match to Address
         #[ser = "ER"]
-        #[footprint_reason_codes = PhRCH::new(Exact, FullNameSimple(Partial), FullAddressSimple(Partial)).into()]
+        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(Partial), FullAddressSimple(Partial)).into()]
         ER,
         // Exact match to Phone, Partial match to Name, Low confidence match to Address
         #[ser = "ET"]
-        #[footprint_reason_codes = PhRCH::new(Exact, FullNameSimple(Partial), FullAddressSimple(Partial)).into()]
+        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(Partial), FullAddressSimple(Partial)).into()]
         ET,
         // Close match to Phone, Partial match to Name, Exact match to Address
         #[ser = "CI"]
@@ -159,26 +159,26 @@ vendor_reason_codes_enum! {
 
         // Partial match to Phone, Close match to Name, Low confidence match to Address
         #[ser = "PN"]
-        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(Partial), FullAddressSimple(Partial)).into()]
+        #[footprint_reason_codes = PhRCH::new(NoMatch, FullNameSimple(Partial), FullAddressSimple(Partial)).into()]
         PN,
         // Partial match to Phone, Close match to Name, No match to Address
         #[ser = "PO"]
-        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(Partial), FullAddressSimple(NoMatch)).into()]
+        #[footprint_reason_codes = PhRCH::new(NoMatch, FullNameSimple(Partial), FullAddressSimple(NoMatch)).into()]
         PO,
         //
         // L2
         //
         // Exact match to Phone, No match to Name, Close match to Address
         #[ser = "EQ"]
-        #[footprint_reason_codes = PhRCH::new(Exact, FullNameSimple(NoMatch), FullAddressSimple(Partial)).into()]
+        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(NoMatch), FullAddressSimple(Partial)).into()]
         EQ,
         // Exact match to Phone, Partial match to Name, No match to Address
         #[ser = "EU"]
-        #[footprint_reason_codes = PhRCH::new(Exact, FullNameSimple(Partial), FullAddressSimple(NoMatch)).into()]
+        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(Partial), FullAddressSimple(NoMatch)).into()]
         EU,
         // Exact match to Phone, No match to Name, Partial match to Address
         #[ser = "EW"]
-        #[footprint_reason_codes = PhRCH::new(Exact, FullNameSimple(NoMatch), FullAddressSimple(Partial)).into()]
+        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(NoMatch), FullAddressSimple(Partial)).into()]
         EW,
         // Close match to Phone, No match to Name, Exact match to Address
         #[ser = "CK"]
@@ -198,19 +198,19 @@ vendor_reason_codes_enum! {
         CT,
         // Partial match to Phone, No match to Name, Exact match to Address
         #[ser = "PK"]
-        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(NoMatch), FullAddressSimple(Exact)).into()]
+        #[footprint_reason_codes = PhRCH::new(NoMatch, FullNameSimple(NoMatch), FullAddressSimple(Exact)).into()]
         PK,
         // Partial match to Phone, Partial match to Name, Close match to Address
         #[ser = "PM"]
-        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(Partial), FullAddressSimple(Partial)).into()]
+        #[footprint_reason_codes = PhRCH::new(NoMatch, FullNameSimple(Partial), FullAddressSimple(Partial)).into()]
         PM,
         // Partial match to Phone, Partial match to Name, Partial match to Address
         #[ser = "PR"]
-        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(Partial), FullAddressSimple(Partial)).into()]
+        #[footprint_reason_codes = PhRCH::new(NoMatch, FullNameSimple(Partial), FullAddressSimple(Partial)).into()]
         PR,
         // Partial match to Phone, Partial match to Name, Low confidence match to Address
         #[ser = "PT"]
-        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(Partial), FullAddressSimple(NoMatch)).into()]
+        #[footprint_reason_codes = PhRCH::new(NoMatch, FullNameSimple(Partial), FullAddressSimple(NoMatch)).into()]
         PT,
 
 
@@ -219,11 +219,11 @@ vendor_reason_codes_enum! {
         //
         // Exact match to Phone, No match to Name, Low confidence match to Address
         #[ser = "EY"]
-        #[footprint_reason_codes = PhRCH::new(Exact, FullNameSimple(NoMatch), FullAddressSimple(NoMatch)).into()]
+        #[footprint_reason_codes = PhRCH::new(NoMatch, FullNameSimple(NoMatch), FullAddressSimple(NoMatch)).into()]
         EY,
         // Exact match to Phone, No match to Name, No match to Address
         #[ser = "EZ"]
-        #[footprint_reason_codes = PhRCH::new(Exact, FullNameSimple(NoMatch), FullAddressSimple(NoMatch)).into()]
+        #[footprint_reason_codes = PhRCH::new(NoMatch, FullNameSimple(NoMatch), FullAddressSimple(NoMatch)).into()]
         EZ,
         // Close match to Phone, No match to Name, Close match to Address
         #[ser = "CQ"]
@@ -231,19 +231,19 @@ vendor_reason_codes_enum! {
         CQ,
         // Close match to Phone, Partial match to Name, No match to Address
         #[ser = "CU"]
-        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(Partial), FullAddressSimple(NoMatch)).into()]
+        #[footprint_reason_codes = PhRCH::new(NoMatch, FullNameSimple(Partial), FullAddressSimple(NoMatch)).into()]
         CU,
         // Close match to Phone, No match to Name, Partial match to Address
         #[ser = "CW"]
-        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(NoMatch), FullAddressSimple(Partial)).into()]
+        #[footprint_reason_codes = PhRCH::new(NoMatch, FullNameSimple(NoMatch), FullAddressSimple(Partial)).into()]
         CW,
         // Close match to Phone, No match to Name, Low confidence match to Address
         #[ser = "CY"]
-        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(NoMatch), FullAddressSimple(NoMatch)).into()]
+        #[footprint_reason_codes = PhRCH::new(NoMatch, FullNameSimple(NoMatch), FullAddressSimple(NoMatch)).into()]
         CY,
         // Close match to Phone, No match to Name, No match to Address
         #[ser = "CZ"]
-        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(NoMatch), FullAddressSimple(NoMatch)).into()]
+        #[footprint_reason_codes = PhRCH::new(NoMatch, FullNameSimple(NoMatch), FullAddressSimple(NoMatch)).into()]
         CZ,
 
         // Phone number is missing
@@ -252,23 +252,23 @@ vendor_reason_codes_enum! {
         MX,
         // Partial match to Phone, No match to Name, Close match to Address
         #[ser = "PQ"]
-        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(NoMatch), FullAddressSimple(Partial)).into()]
+        #[footprint_reason_codes = PhRCH::new(NoMatch, FullNameSimple(NoMatch), FullAddressSimple(Partial)).into()]
         PQ,
         // Partial match to Phone, Partial match to Name, No match to Address
         #[ser = "PU"]
-        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(Partial), FullAddressSimple(NoMatch)).into()]
+        #[footprint_reason_codes = PhRCH::new(NoMatch, FullNameSimple(Partial), FullAddressSimple(NoMatch)).into()]
         PU,
         // Partial match to Phone, No match to Name, Partial match to Address
         #[ser = "PW"]
-        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(NoMatch), FullAddressSimple(Partial)).into()]
+        #[footprint_reason_codes = PhRCH::new(NoMatch, FullNameSimple(NoMatch), FullAddressSimple(Partial)).into()]
         PW,
         // Partial match to Phone, No match to Name, Low confidence match to Address
         #[ser = "PY"]
-        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(NoMatch), FullAddressSimple(NoMatch)).into()]
+        #[footprint_reason_codes = PhRCH::new(NoMatch, FullNameSimple(NoMatch), FullAddressSimple(NoMatch)).into()]
         PY,
         // Partial match to Phone, No match to Name, No match to Address
         #[ser = "PZ"]
-        #[footprint_reason_codes = PhRCH::new(Partial, FullNameSimple(NoMatch), FullAddressSimple(NoMatch)).into()]
+        #[footprint_reason_codes = PhRCH::new(NoMatch, FullNameSimple(NoMatch), FullAddressSimple(NoMatch)).into()]
         PZ,
         // Default no match
         #[ser = "NX"]
@@ -286,8 +286,8 @@ mod tests {
 
     #[test_case(ExperianPhoneMatchReasonCodes::EA => vec![PhoneLocatedMatches])]
     #[test_case(ExperianPhoneMatchReasonCodes::NX => vec![PhoneLocatedDoesNotMatch])]
-    #[test_case(ExperianPhoneMatchReasonCodes::CZ => vec![PhoneLocatedPartiallyMatches])]
-    #[test_case(ExperianPhoneMatchReasonCodes::PZ => vec![PhoneLocatedPartiallyMatches])]
+    #[test_case(ExperianPhoneMatchReasonCodes::CZ => vec![PhoneLocatedDoesNotMatch])]
+    #[test_case(ExperianPhoneMatchReasonCodes::PZ => vec![PhoneLocatedDoesNotMatch])]
     fn test_phone_codes(reason_code: ExperianPhoneMatchReasonCodes) -> Vec<FootprintReasonCode> {
         (&reason_code).into()
     }
