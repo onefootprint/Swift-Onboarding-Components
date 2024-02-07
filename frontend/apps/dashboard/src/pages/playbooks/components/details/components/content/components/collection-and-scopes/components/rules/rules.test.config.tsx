@@ -197,6 +197,19 @@ export const rulesFixture: Rule[] = [
     ],
     isShadow: false,
   },
+  {
+    ruleId: 'rule_wcvtmwTlJRDG7y8kKt0ME5',
+    action: RuleAction.stepUpIdentitySsn,
+    createdAt: '2020-12-06T23:37:22.943740Z',
+    ruleExpression: [
+      {
+        field: 'address_alert_single_address_in_file',
+        op: RuleOp.eq,
+        value: true,
+      },
+    ],
+    isShadow: false,
+  },
   manualReviewRuleFixture,
   passRuleFixture,
 ];

@@ -12,7 +12,7 @@ export type RulesProps = {
     string,
     | boolean
     | string
-    | Record<RuleAction, Record<string, boolean | Rule[]>>
+    | Partial<Record<RuleAction, Record<string, boolean | Rule[]>>>
     | null
   >;
   isLoading: boolean;

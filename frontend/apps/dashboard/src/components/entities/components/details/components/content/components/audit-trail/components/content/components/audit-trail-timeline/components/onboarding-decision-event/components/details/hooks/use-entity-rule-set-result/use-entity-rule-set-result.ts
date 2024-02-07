@@ -45,9 +45,24 @@ const useEntityRuleSetResult = ({ id }: UseEntityRuleSetResultProps) => {
           RuleAction,
           Record<string, Rule[] | boolean>
         >;
+        const newStepUpActions = [
+          RuleAction.stepUpIdentity,
+          RuleAction.stepUpPoA,
+          RuleAction.stepUpIdentitySsn,
+        ];
+
         Object.values(RuleAction).forEach(action => {
+          if (newStepUpActions.includes(action)) {
+            return;
+          }
+
+          let isOutcome = response.actionTriggered === action;
+          if (action === RuleAction.stepUp && !isOutcome) {
+            isOutcome = newStepUpActions.includes(action);
+          }
+
           formattedRuleResults[action] = {
-            isOutcome: response.actionTriggered === action,
+            isOutcome,
             triggered: [],
             notTriggered: [],
           };
@@ -57,12 +72,13 @@ const useEntityRuleSetResult = ({ id }: UseEntityRuleSetResultProps) => {
           a.rule.createdAt > b.rule.createdAt ? 1 : -1,
         );
         sortedRuleResults.forEach(({ result, rule }) => {
+          const action = newStepUpActions.includes(rule.action)
+            ? RuleAction.stepUp
+            : rule.action;
           if (result) {
-            (formattedRuleResults[rule.action].triggered as Rule[]).push(rule);
+            (formattedRuleResults[action].triggered as Rule[]).push(rule);
           } else {
-            (formattedRuleResults[rule.action].notTriggered as Rule[]).push(
-              rule,
-            );
+            (formattedRuleResults[action].notTriggered as Rule[]).push(rule);
           }
         });
         return {

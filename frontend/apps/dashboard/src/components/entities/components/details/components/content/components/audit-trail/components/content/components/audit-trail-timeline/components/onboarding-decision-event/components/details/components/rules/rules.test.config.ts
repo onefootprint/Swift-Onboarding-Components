@@ -6,7 +6,9 @@ export const obcIdFixure = 'ob_config_id_LZuy8k6ch31LcTEZvyk7YX';
 
 export const ruleResultResponseFixture: Record<
   string,
-  boolean | string | Record<RuleAction, Record<string, boolean | Rule[]>>
+  | boolean
+  | string
+  | Partial<Record<RuleAction, Record<string, boolean | Rule[]>>>
 > = {
   hasRuleResults: true,
   obConfigurationId: obcIdFixure,
