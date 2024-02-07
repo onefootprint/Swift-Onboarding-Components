@@ -26,13 +26,17 @@ use async_trait::async_trait;
 use db::models::{
     ob_configuration::ObConfiguration,
     onboarding_decision::OnboardingDecision,
+    risk_signal::RiskSignal,
+    risk_signal_group::RiskSignalGroup,
     scoped_vault::ScopedVault,
     vault::Vault,
     workflow::{Workflow as DbWorkflow, WorkflowUpdate},
 };
 use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
-use newtypes::{KybConfig, Locked, OnboardingStatus};
+use newtypes::{
+    DecisionStatus, FootprintReasonCode, KybConfig, Locked, OnboardingStatus, RiskSignalGroupKind,
+};
 
 /////////////////////
 /// DataCollection
@@ -109,7 +113,7 @@ impl KybAwaitingBoKyc {
 
 #[async_trait]
 impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
-    type AsyncRes = ();
+    type AsyncRes = Vec<OnboardingDecision>;
 
     #[tracing::instrument(
         "KybAwaitingBoKyc#OnAction<BoKycCompleted, KybState>::execute_async_idempotent_actions",
@@ -118,19 +122,49 @@ impl OnAction<BoKycCompleted, KybState> for KybAwaitingBoKyc {
     async fn execute_async_idempotent_actions(
         &self,
         _action: BoKycCompleted,
-        _state: &State,
+        state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        Ok(())
+        let bo_obds =
+            decision::biz_risk::get_bo_obds(&state.db_pool, &state.enclave_client, &self.wf_id).await?;
+        Ok(bo_obds)
     }
 
     #[tracing::instrument("KybAwaitingBoKyc#OnAction<BoKycCompleted, KybState>::on_commit", skip_all)]
     fn on_commit(
         self,
         wf: Locked<DbWorkflow>,
-        _async_res: (),
+        async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<KybState> {
         let (obc, _) = ObConfiguration::get(conn, &wf.id)?;
+        let bo_obds = async_res;
+        if bo_obds.iter().any(|o| o.status != DecisionStatus::Pass) {
+            // Add risk signal for BO failing KYC
+            // TODO: one of these days we need to drop the non-null vres constraint
+            if let Some(bo_risk_signal) = bo_obds
+                .first()
+                .and_then(|obd| DbWorkflow::get(conn, &obd.workflow_id).ok())
+                .and_then(|wf| {
+                    RiskSignal::latest_by_risk_signal_group_kind(
+                        conn,
+                        &wf.scoped_vault_id,
+                        RiskSignalGroupKind::Kyc,
+                    )
+                    .ok()
+                })
+                .and_then(|mut rs| rs.pop())
+            {
+                let bo_rs = (
+                    FootprintReasonCode::BeneficialOwnerFailedKyc,
+                    bo_risk_signal.vendor_api,
+                    bo_risk_signal.verification_result_id.clone(),
+                );
+
+                let rsg =
+                    RiskSignalGroup::get_or_create(conn, &wf.scoped_vault_id, RiskSignalGroupKind::Kyb)?;
+                RiskSignal::bulk_add(conn, vec![bo_rs], false, rsg.id)?;
+            };
+        }
 
         if obc.skip_kyb {
             // Handling skip_kyb flow

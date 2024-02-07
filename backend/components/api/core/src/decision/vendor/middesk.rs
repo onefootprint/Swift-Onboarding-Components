@@ -18,7 +18,8 @@ use db::{
         decision_intent::DecisionIntent,
         middesk_request::{MiddeskRequest, UpdateMiddeskRequest},
         ob_configuration::ObConfiguration,
-        risk_signal::RiskSignal,
+        risk_signal::{NewRiskSignalInfo, RiskSignal},
+        risk_signal_group::RiskSignalGroup,
         verification_request::VerificationRequest,
         verification_result::VerificationResult,
         workflow::{Workflow, WorkflowUpdate},
@@ -488,6 +489,8 @@ impl MiddeskState<Complete> {
                 Ok((v, sv, wf))
             })
             .await?;
+
+
         // TODO: make a version of this method for a single vreq/vres
         let vendor_result = vendor_result::VendorResult::from_verification_results_for_onboarding(
             vec![(
@@ -511,14 +514,17 @@ impl MiddeskState<Complete> {
             _ => Err(MiddeskError::AssertionError("Unexpected VendorResult".into())),
         }?;
 
-        let risk_signals = decision::features::middesk::reason_codes(&business_response)
-            .into_iter()
-            .map(|rc| (rc, vendor_api, vendor_result.verification_result_id.clone()))
-            .collect();
+        let risk_signals: Vec<NewRiskSignalInfo> =
+            decision::features::middesk::reason_codes(&business_response)
+                .into_iter()
+                .map(|rc| (rc, vendor_api, vendor_result.verification_result_id.clone()))
+                .collect();
+
         state
             .db_pool
             .db_transaction(move |conn| {
-                RiskSignal::bulk_create(conn, &sv.id, risk_signals, RiskSignalGroupKind::Kyb, false)
+                let rsg = RiskSignalGroup::get_or_create(conn, &sv.id, RiskSignalGroupKind::Kyb)?;
+                RiskSignal::bulk_add(conn, risk_signals, false, rsg.id)
             })
             .await?;
 
