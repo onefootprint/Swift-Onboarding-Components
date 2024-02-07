@@ -1,16 +1,11 @@
-import type { Spacings } from '@onefootprint/design-tokens';
-import {
-  IcoCheckSmall16,
-  IcoEmail24,
-  IcoFaceid16,
-  IcoSmartphone24,
-} from '@onefootprint/icons';
-import styled, { css } from '@onefootprint/styled';
-import { Button, Shimmer, Stack, Typography } from '@onefootprint/ui';
+import { IcoEmail24, IcoFaceid16, IcoSmartphone24 } from '@onefootprint/icons';
+import { Button, Shimmer, Stack } from '@onefootprint/ui';
 import type { ComponentProps } from 'react';
 import React from 'react';
 
 import type { HeaderProps } from '@/src/types';
+
+import EditDataButton from './components/edit-data-button/edit-data-button';
 
 type ComponentTexts = {
   add: string;
@@ -47,14 +42,6 @@ type ManageAccountComponentProps = {
 
 const isEmpty = (x: unknown): x is 'empty' => x === 'empty';
 const ButtonLoading = () => <Shimmer sx={{ width: 'auto', height: '48px' }} />;
-const Verified = ({ text }: { text: string }) => (
-  <>
-    <IcoCheckSmall16 color="quaternary" />
-    <Typography as="span" variant="label-4" color="quaternary">
-      {`${text} · `}
-    </Typography>
-  </>
-);
 
 const ManageAccountComponent = ({
   children,
@@ -72,54 +59,37 @@ const ManageAccountComponent = ({
     <Stack direction="column" gap={5} marginBottom={7}>
       {entryEmail && entryEmail.isLoading ? <ButtonLoading /> : null}
       {entryEmail && !entryEmail.isLoading ? (
-        <ButtonTile type="button" onClick={entryEmail.onClick}>
-          <FlexRow gap={3}>
-            <IcoEmail24 />
-            <Typography as="span" variant="label-3" color="primary">
-              {entryEmail.label}
-            </Typography>
-          </FlexRow>
-          <FlexRow gap={2}>
-            {entryEmail.isVerified ? <Verified text={texts.verified} /> : null}
-            <Typography as="span" variant="label-4" color="accent">
-              {isEmpty(entryEmail.status) ? texts.add : texts.edit}
-            </Typography>
-          </FlexRow>
-        </ButtonTile>
+        <EditDataButton
+          label={entryEmail.label}
+          icon={IcoEmail24}
+          onClick={entryEmail.onClick}
+          isVerified={entryEmail.isVerified}
+          isEmpty={isEmpty(entryEmail.status)}
+          texts={texts}
+        />
       ) : null}
 
       {entryPhone && entryPhone.isLoading ? <ButtonLoading /> : null}
       {entryPhone && !entryPhone.isLoading ? (
-        <ButtonTile type="button" onClick={entryPhone.onClick}>
-          <FlexRow gap={3}>
-            <IcoSmartphone24 />
-            <Typography as="span" variant="label-3" color="primary">
-              {entryPhone.label}
-            </Typography>
-          </FlexRow>
-          <FlexRow gap={2}>
-            {entryPhone.isVerified ? <Verified text={texts.verified} /> : null}
-            <Typography as="span" variant="label-4" color="accent">
-              {isEmpty(entryPhone.status) ? texts.add : texts.edit}
-            </Typography>
-          </FlexRow>
-        </ButtonTile>
+        <EditDataButton
+          label={entryPhone.label}
+          icon={IcoSmartphone24}
+          onClick={entryPhone.onClick}
+          isVerified={entryPhone.isVerified}
+          isEmpty={isEmpty(entryPhone.status)}
+          texts={texts}
+        />
       ) : null}
 
       {entryPasskey ? (
-        <ButtonTile type="button" onClick={entryPasskey.onClick}>
-          <FlexRow gap={3}>
-            <IcoFaceid16 />
-            <Typography as="span" variant="label-3" color="primary">
-              {entryPasskey.label}
-            </Typography>
-          </FlexRow>
-          <FlexRow gap={2}>
-            <Typography as="span" variant="label-4" color="accent">
-              {entryPasskey.isVerified ? texts.deviceAdded : texts.addDevice}
-            </Typography>
-          </FlexRow>
-        </ButtonTile>
+        <EditDataButton
+          label={entryPasskey.label}
+          icon={IcoFaceid16}
+          onClick={entryPasskey.onClick}
+          isVerified={entryPasskey.isVerified}
+          isEmpty={isEmpty(entryPasskey.status)}
+          texts={texts}
+        />
       ) : null}
     </Stack>
     <Button
@@ -136,28 +106,3 @@ const ManageAccountComponent = ({
 );
 
 export default ManageAccountComponent;
-
-const ButtonTile = styled.button`
-  ${({ theme }) => css`
-    border: none;
-    cursor: pointer;
-    user-select: none;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    min-height: 48px;
-    padding: ${theme.spacing[4]} ${theme.spacing[5]};
-    border-radius: ${theme.borderRadius.default};
-    background-color: ${theme.backgroundColor.secondary};
-  `}
-`;
-
-const FlexRow = styled.div<{ gap: keyof Spacings }>`
-  ${({ theme, gap }) => css`
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: ${theme.spacing[gap]};
-  `}
-`;
