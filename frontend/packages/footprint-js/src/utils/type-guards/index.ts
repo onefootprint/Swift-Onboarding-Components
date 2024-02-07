@@ -1,5 +1,6 @@
 export {
-  isAuthOrVerify,
+  isAuthOrVerifyOrUpdateLogin,
   isAuthUpdateLoginMethods,
+  isUpdateLoginMethods,
   isValidString,
 } from './type-guards';

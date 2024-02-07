@@ -1,17 +1,23 @@
 import { describe, expect, it } from 'bun:test';
 
 import type { Props } from '../../types/components';
-import { isAuthOrVerify, isAuthUpdateLoginMethods, isValidString } from '.';
+import {
+  isAuthOrVerifyOrUpdateLogin,
+  isAuthUpdateLoginMethods,
+  isUpdateLoginMethods,
+  isValidString,
+} from '.';
 
-describe('isAuthOrVerify', () => {
+describe('isAuthOrVerifyOrUpdateLogin', () => {
   it.each([
     { kind: 'auth', x: true },
     { kind: 'form', x: false },
     { kind: 'render', x: false },
+    { kind: 'update_login_methods', x: true },
     { kind: 'verify-button', x: false },
     { kind: 'verify', x: true },
   ])('case %#', ({ kind, x }) => {
-    expect(isAuthOrVerify(kind)).toEqual(x);
+    expect(isAuthOrVerifyOrUpdateLogin(kind)).toEqual(x);
   });
 });
 
@@ -27,8 +33,8 @@ describe('isValidString', () => {
   });
 });
 
-describe('isAuthUpdateLoginMethods', () => {
-  it.each([
+describe('isAuthUpdateLoginMethods / isUpdateLoginMethods', () => {
+  const cases = [
     {
       obj: { kind: 'auth', updateLoginMethods: true, authToken: 'utok_' },
       x: true,
@@ -53,7 +59,27 @@ describe('isAuthUpdateLoginMethods', () => {
       obj: { kind: 'auth', updateLoginMethods: true, publicKey: 'publicKey' },
       x: false,
     },
-  ])('case %#', ({ obj, x }) => {
+  ];
+
+  it.each(cases)('isAuthUpdateLoginMethods %#', ({ obj, x }) => {
     expect(isAuthUpdateLoginMethods(obj as Props)).toEqual(x);
+  });
+
+  it.each([
+    ...cases,
+    {
+      obj: { kind: 'update_login_methods', publicKey: 'publicKey' },
+      x: false,
+    },
+    {
+      obj: { kind: 'update_login_methods', authToken: '_kot' },
+      x: false,
+    },
+    {
+      obj: { kind: 'update_login_methods', authToken: 'utok_' },
+      x: true,
+    },
+  ])('isUpdateLoginMethods %#', ({ obj, x }) => {
+    expect(isUpdateLoginMethods(obj as Props)).toEqual(x);
   });
 });

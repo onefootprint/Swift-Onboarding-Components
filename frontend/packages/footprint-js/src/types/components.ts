@@ -1,91 +1,76 @@
 import type { Appearance } from './appearance';
 import type { FootprintUserData as UserData } from './user-data';
 
-export type Footprint = {
-  init: (props: Props) => Component;
-};
-
-export type Component = {
-  destroy: () => void;
-  render: () => Promise<void>;
-};
-
-export type SupportedLocale = 'en-US' | 'es-MX';
-export type SupportedLanguage = 'en' | 'es';
-export type L10n = { locale?: SupportedLocale; language?: SupportedLanguage };
-export type Variant = 'modal' | 'drawer' | 'inline';
-export type Props =
-  | AuthProps
-  | FormProps
-  | RenderProps
-  | VerifyButtonProps
-  | VerifyProps;
-
 export enum ComponentKind {
   Auth = 'auth',
   Form = 'form',
   Render = 'render',
+  UpdateLoginMethods = 'update_login_methods',
   Verify = 'verify',
   VerifyButton = 'verify-button',
 }
+
+export type SupportedLocale = 'en-US' | 'es-MX';
+export type SupportedLanguage = 'en' | 'es';
+export type L10n = { locale?: SupportedLocale; language?: SupportedLanguage };
+export type Options = { showCompletionPage?: boolean; showLogo?: boolean };
+export type Variant = 'modal' | 'drawer' | 'inline';
+
+export type Component = { destroy: () => void; render: () => Promise<void> };
+export type Footprint = { init: (props: Props) => Component };
+
+export type Props =
+  | AuthProps
+  | FormProps
+  | RenderProps
+  | UpdateLoginMethodsProps
+  | VerifyButtonProps
+  | VerifyProps;
 
 export type PropsBase = {
   appearance?: Appearance;
   containerId?: string;
   kind: ComponentKind;
   l10n?: L10n;
-  variant?: Variant;
   onError?: (error: string) => void;
+  variant?: Variant;
 };
 
-export type Options = {
-  showCompletionPage?: boolean;
-  showLogo?: boolean;
-};
-
-export type VerifyAuthToken = {
-  authToken: string;
-  publicKey?: never;
-};
-
-export type VerifyPublicKey = {
-  publicKey: string;
-  authToken?: never;
-};
-
-export type VerifySharedProps = (VerifyAuthToken | VerifyPublicKey) & {
+/** verify */
+export type VerifyAuthToken = { authToken: string; publicKey?: never };
+export type VerifyPublicKey = { publicKey: string; authToken?: never };
+type VerifyVariant = 'modal' | 'drawer';
+type VerifyPropsBase = PropsBase & {
   onCancel?: () => void;
   onClose?: () => void;
   onComplete?: (validationToken: string) => void;
   options?: Options;
-  publicKey: string;
   userData?: UserData;
-};
+} & (VerifyAuthToken | VerifyPublicKey);
 
-export type VerifyProps = PropsBase &
-  VerifySharedProps & {
-    kind: ComponentKind.Verify;
-    variant?: 'modal' | 'drawer';
-  };
+export type VerifyProps = VerifyPropsBase & {
+  kind: ComponentKind.Verify;
+  variant?: VerifyVariant;
+};
 
 export type VerifyDataProps = Pick<
   VerifyProps,
   'publicKey' | 'userData' | 'options' | 'authToken' | 'l10n'
 >;
 
-export type VerifyButtonProps = PropsBase &
-  Partial<VerifySharedProps> & {
-    containerId: string;
-    dialogVariant?: 'modal' | 'drawer';
-    kind: ComponentKind.VerifyButton;
-    label?: string;
-    onClick?: () => void;
-    variant: 'inline';
-  };
-
+/** verify-button */
+export type VerifyButtonProps = VerifyPropsBase & {
+  containerId: string;
+  dialogVariant?: VerifyVariant;
+  kind: ComponentKind.VerifyButton;
+  label?: string;
+  onClick?: () => void;
+  variant: 'inline';
+};
 export type VerifyButtonDataProps = Pick<VerifyButtonProps, 'label'> &
   VerifyDataProps;
 
+/** render */
 export type RenderProps = PropsBase & {
   authToken: string;
   canCopy?: boolean;
@@ -108,14 +93,12 @@ export type RenderDataProps = Pick<
   | 'showHiddenToggle'
 >;
 
+/** form */
+export type FormRef = { save: () => Promise<void> };
 export type FormOptions = {
   hideButtons?: boolean;
   hideCancelButton?: boolean;
   hideFootprintLogo?: boolean;
-};
-
-export type FormRef = {
-  save: () => Promise<void>;
 };
 
 export type FormProps = PropsBase & {
@@ -136,6 +119,7 @@ export type FormDataProps = Pick<
   'authToken' | 'options' | 'title' | 'l10n'
 >;
 
+/** auth */
 type AuthPropsBase = PropsBase & {
   kind: ComponentKind.Auth;
   onCancel?: () => void;
@@ -149,6 +133,9 @@ type AuthPropsBase = PropsBase & {
 export type AuthProps = AuthPropsBase & {
   publicKey?: string;
   authToken?: string;
+  /**
+   * @deprecated after version 3.9.0
+   */
   updateLoginMethods?: true;
 };
 export type AuthDataProps = Pick<
@@ -159,4 +146,21 @@ export type AuthDataProps = Pick<
   | 'userData'
   | 'l10n'
   | 'options'
+>;
+
+/** update_login_methods */
+export type UpdateLoginMethodsProps = PropsBase & {
+  kind: ComponentKind.UpdateLoginMethods;
+  onCancel?: () => void;
+  onClose?: () => void;
+  onComplete?: (validationToken: string) => void;
+  options?: Pick<Options, 'showLogo'>;
+  userData?: Pick<UserData, 'id.email' | 'id.phone_number'>;
+  variant?: 'modal' | 'drawer';
+  authToken?: string;
+};
+
+export type UpdateLoginMethodsDataProps = Pick<
+  AuthProps,
+  'authToken' | 'userData' | 'l10n' | 'options'
 >;

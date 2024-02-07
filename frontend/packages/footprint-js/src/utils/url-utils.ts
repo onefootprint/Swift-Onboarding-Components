@@ -3,8 +3,8 @@ import { ComponentKind } from '../types/components';
 import { getEncodedAppearance } from './appearance-utils';
 import { getDefaultVariantForKind } from './prop-utils';
 import {
-  isAuthOrVerify,
-  isAuthUpdateLoginMethods,
+  isAuthOrVerifyOrUpdateLogin,
+  isUpdateLoginMethods,
   isValidString,
 } from './type-guards';
 
@@ -37,7 +37,7 @@ const getURL = (props: Props, token: string): string => {
       url = process.env.BIFROST_URL;
       break;
     case ComponentKind.Auth:
-      url = isAuthUpdateLoginMethods(props)
+      url = isUpdateLoginMethods(props)
         ? `${process.env.AUTH_URL}/user`
         : process.env.AUTH_URL;
       break;
@@ -46,7 +46,7 @@ const getURL = (props: Props, token: string): string => {
   }
 
   if (isValidString(url)) {
-    return isAuthOrVerify(kind)
+    return isAuthOrVerifyOrUpdateLogin(kind)
       ? `${url}?${getSearchParams(props, token)}`.trim()
       : `${url}/${kind}?${getSearchParams(props, token)}`.trim();
   }

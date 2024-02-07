@@ -27,6 +27,7 @@ const VariantsByKind: Record<ComponentKind, Variant[]> = {
   [ComponentKind.Auth]: ['modal', 'drawer'],
   [ComponentKind.Form]: ['inline', 'modal', 'drawer'],
   [ComponentKind.Render]: ['inline'],
+  [ComponentKind.UpdateLoginMethods]: ['modal', 'drawer'],
   [ComponentKind.Verify]: ['modal', 'drawer'],
   [ComponentKind.VerifyButton]: ['inline'],
 };

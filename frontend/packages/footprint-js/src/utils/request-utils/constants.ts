@@ -18,6 +18,7 @@ export const SdkKindByComponentKind: Record<ComponentKind, SdkKind> = {
   [ComponentKind.Auth]: SdkKind.AuthV1,
   [ComponentKind.Form]: SdkKind.FormV1,
   [ComponentKind.Render]: SdkKind.RenderV1,
+  [ComponentKind.UpdateLoginMethods]: SdkKind.UpdateAuthMethodsV1,
   [ComponentKind.Verify]: SdkKind.VerifyV1,
   [ComponentKind.VerifyButton]: SdkKind.VerifyButtonV1,
 };

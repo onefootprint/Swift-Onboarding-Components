@@ -64,6 +64,7 @@ describe('getCallbackProps', () => {
         variant: 'inline',
         label: 'Veriy with Footprint',
         containerId: 'myElement',
+        publicKey: 'publicKey',
       } as VerifyButtonProps,
       onDestroy,
       onLaunchChild,
@@ -83,6 +84,7 @@ describe('getCallbackProps', () => {
       onCancel,
       onClose,
       onComplete,
+      publicKey: 'publicKey',
       variant: 'modal',
     });
   });
@@ -93,6 +95,7 @@ describe('getDefaultVariantForKind', () => {
     { kind: ComponentKind.Auth, x: 'modal' },
     { kind: ComponentKind.Form, x: 'inline' },
     { kind: ComponentKind.Render, x: 'inline' },
+    { kind: ComponentKind.UpdateLoginMethods, x: 'modal' },
     { kind: ComponentKind.Verify, x: 'modal' },
     { kind: ComponentKind.VerifyButton, x: 'inline' },
   ])('.', ({ kind, x }) => {
@@ -156,7 +159,7 @@ describe('validateComponentKind', () => {
     const fn2 = () =>
       validateComponentKind('banana' as unknown as ComponentKind);
     expect(fn2).toThrow(
-      'Invalid kind: banana. Valid kinds are: auth, form, render, verify, verify-button',
+      'Invalid kind: banana. Valid kinds are: auth, form, render, update_login_methods, verify, verify-button',
     );
   });
 });

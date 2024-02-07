@@ -3,11 +3,12 @@ import type {
   FormDataProps,
   Props,
   RenderDataProps,
+  UpdateLoginMethodsDataProps,
   VerifyButtonDataProps,
   VerifyDataProps,
 } from '../../types/components';
 import { ComponentKind } from '../../types/components';
-import { isAuthUpdateLoginMethods } from '../type-guards';
+import { isAuthUpdateLoginMethods, isUpdateLoginMethods } from '../type-guards';
 import {
   API_BASE_URL,
   SDK_NAME,
@@ -32,12 +33,13 @@ type ArgsDataPayload =
   | AuthDataProps
   | FormDataProps
   | RenderDataProps
+  | UpdateLoginMethodsDataProps
   | VerifyButtonDataProps
   | VerifyDataProps
   | undefined;
 
 const getSdkKind = (props: Props): SdkKind =>
-  isAuthUpdateLoginMethods(props)
+  isUpdateLoginMethods(props)
     ? SdkKind.UpdateAuthMethodsV1
     : SdkKindByComponentKind[props.kind];
 
@@ -52,6 +54,14 @@ const getSdkArgsDataPayload = (props: Props): ArgsDataPayload => {
       options: props.options,
       l10n: props.l10n,
     } as VerifyDataProps;
+  }
+  if (kind === ComponentKind.UpdateLoginMethods) {
+    return {
+      authToken: props.authToken,
+      userData: props.userData,
+      options: props.options,
+      l10n: props.l10n,
+    };
   }
   if (kind === ComponentKind.Auth) {
     return isAuthUpdateLoginMethods(props)

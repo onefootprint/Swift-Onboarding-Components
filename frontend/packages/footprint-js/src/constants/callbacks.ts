@@ -12,6 +12,11 @@ export const ComponentCallbacksByEvent: Record<
     [PublicEvent.closed]: 'onClose',
     [PublicEvent.completed]: 'onComplete',
   },
+  [ComponentKind.UpdateLoginMethods]: {
+    [PublicEvent.canceled]: 'onCancel',
+    [PublicEvent.closed]: 'onClose',
+    [PublicEvent.completed]: 'onComplete',
+  },
   [ComponentKind.Form]: {
     [PublicEvent.canceled]: 'onCancel',
     [PublicEvent.closed]: 'onClose',
@@ -35,6 +40,7 @@ export const RequiredCallbacksByComponent: Record<ComponentKind, string[]> = {
   [ComponentKind.Auth]: [],
   [ComponentKind.Form]: [],
   [ComponentKind.Render]: [],
+  [ComponentKind.UpdateLoginMethods]: [],
   [ComponentKind.Verify]: [],
   [ComponentKind.VerifyButton]: [],
 };
