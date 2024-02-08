@@ -25,6 +25,7 @@ export {
 } from './components';
 export { FullHeightContainer } from './components/layout';
 export { default as enIdvJson } from './config/locales/en/idv.json';
+export { default as esIdvJson } from './config/locales/es/idv.json';
 export type { DeviceInfo } from './hooks';
 export {
   useDeviceInfo,

@@ -1,4 +1,5 @@
 export { default as enRequestJson } from './config/locales/en/request.json';
+export { default as esRequestJson } from './config/locales/es/request.json';
 export type {
   FootprintServerError,
   PaginatedRequestResponse,

@@ -145,6 +145,7 @@ export {
   useToast,
 } from './components';
 export { default as enUiJson } from './config/locales/en/ui.json';
+export { default as esUiJson } from './config/locales/es/ui.json';
 export type {
   BaseStyleProps,
   CustomStyleProps,
