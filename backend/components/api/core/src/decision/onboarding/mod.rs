@@ -6,7 +6,6 @@ use serde::Serialize;
 
 use crate::errors::ApiResult;
 
-pub mod rules;
 
 #[derive(Eq, Debug, Clone)]
 pub struct OnboardingRulesDecisionOutput {

@@ -91,7 +91,7 @@ impl DocumentRequest {
             .optional()?;
         Ok(result)
     }
-    
+
     #[tracing::instrument("DocumentRequest::get_all", skip_all)]
     pub fn get_all(conn: &mut PgConn, wf_id: &WorkflowId) -> DbResult<Vec<Self>> {
         let result = document_request::table
@@ -110,9 +110,11 @@ impl DocumentRequest {
         }
     }
 
-
     #[tracing::instrument("DocumentRequest::get_bulk", skip_all)]
-    pub fn get_bulk(conn: &mut PgConn, ids: Vec<DocumentRequestId>) -> DbResult<HashMap<DocumentRequestId, DocumentRequest>> {
+    pub fn get_bulk(
+        conn: &mut PgConn,
+        ids: Vec<DocumentRequestId>,
+    ) -> DbResult<HashMap<DocumentRequestId, DocumentRequest>> {
         let results = document_request::table
             .filter(document_request::id.eq_any(ids))
             .get_results::<Self>(conn)?
@@ -121,7 +123,6 @@ impl DocumentRequest {
             .collect();
         Ok(results)
     }
-   
 }
 
 

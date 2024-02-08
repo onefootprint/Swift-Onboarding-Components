@@ -2,10 +2,13 @@ use crate::{
     decision::{
         onboarding::Decision,
         state::{
-            actions::WorkflowActions, common, kyb, test_utils::{
-                mock_middesk, mock_webhooks, query_data, ExpectedRequiresManualReview, ExpectedStatus,
-                OnboardingCompleted, OnboardingStatusChanged,
-            }, Authorize, BoKycCompleted, MakeDecision, MakeVendorCalls, WorkflowKind, WorkflowWrapper
+            actions::WorkflowActions,
+            common, kyb,
+            test_utils::{
+                mock_middesk, mock_webhooks, query_data, query_rule_set_result, ExpectedRequiresManualReview,
+                ExpectedStatus, OnboardingCompleted, OnboardingStatusChanged,
+            },
+            Authorize, BoKycCompleted, MakeDecision, MakeVendorCalls, WorkflowKind, WorkflowWrapper,
         },
         tests::test_helpers,
     },
@@ -21,7 +24,7 @@ use feature_flag::BoolFlag;
 use itertools::Itertools;
 use macros::{test_state, test_state_case};
 use newtypes::{
-    CollectedDataOption as CDO, DecisionStatus, FootprintReasonCode, KybState, OnboardingStatus,
+    CollectedDataOption as CDO, DecisionStatus, FootprintReasonCode, KybState, OnboardingStatus, RuleAction,
     SignalSeverity, VendorAPI, WorkflowFixtureResult, WorkflowState,
 };
 
@@ -201,6 +204,7 @@ async fn sandbox(state: &mut State, fixture_result: WorkflowFixtureResult) {
 
     let (wf, _, mr, _, _) = query_data(state, &svid, &wfid).await;
     assert_eq!(WorkflowState::Kyb(KybState::Complete), wf.state);
+
     assert!(mr.is_none());
     assert_eq!(expected_status, wf.status.unwrap());
 }
@@ -279,6 +283,11 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
     assert!(rs.is_empty());
 
     // Simulate Middesk webhook incoming. Middesk state machine should complete and then call the KYB workflow
+    let expected_rule_action = match terminal_status {
+        // We simulate a wl hit when terminal status = Fail for these tests
+        TerminalDecisionStatus::Fail => Some(RuleAction::ManualReview),
+        TerminalDecisionStatus::Pass => None,
+    };
     let expected_status = terminal_status.into();
     let expected_manual_review = matches!(terminal_status, TerminalDecisionStatus::Fail);
     mock_webhooks(
@@ -304,6 +313,8 @@ async fn live(state: &mut State, terminal_status: TerminalDecisionStatus) {
     .unwrap();
 
     let (wf, _, mr, _, rs) = query_data(state, &svid, &wfid).await;
+    let (rule_set_result, _) = query_rule_set_result(state, &wf.scoped_vault_id).await.unwrap();
+    assert_eq!(rule_set_result.action_triggered, expected_rule_action);
     assert_eq!(WorkflowState::Kyb(KybState::Complete), wf.state);
 
     let mut expected_rs = vec![

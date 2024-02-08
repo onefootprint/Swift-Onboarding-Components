@@ -7,10 +7,8 @@ use super::{
 use crate::{
     decision::{
         self,
-        onboarding::{
-            rules::evaluate_kyb_rules, FinalAndAdditionalDecisions, KybOnboardingRulesDecisionOutput,
-            OnboardingRulesDecision, OnboardingRulesDecisionOutput,
-        },
+        onboarding::{Decision, OnboardingRulesDecisionOutput},
+        rule_engine::eval::RuleEvalConfig,
         state::{
             actions::{Authorize, WorkflowActions},
             common, AsyncVendorCallsCompleted, BoKycCompleted, MakeDecision, MakeVendorCalls, OnAction,
@@ -36,6 +34,7 @@ use feature_flag::FeatureFlagClient;
 use itertools::Itertools;
 use newtypes::{
     DecisionStatus, FootprintReasonCode, KybConfig, Locked, OnboardingStatus, RiskSignalGroupKind,
+    RuleSetResultKind,
 };
 
 /////////////////////
@@ -368,7 +367,7 @@ impl KybDecisioning {
 
 #[async_trait]
 impl OnAction<MakeDecision, KybState> for KybDecisioning {
-    type AsyncRes = (Arc<dyn FeatureFlagClient>, Vec<OnboardingDecision>);
+    type AsyncRes = Arc<dyn FeatureFlagClient>;
 
     #[tracing::instrument(
         "KybDecisioning#OnAction<MakeDecision, KybState>::execute_async_idempotent_actions",
@@ -379,9 +378,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         _action: MakeDecision,
         state: &State,
     ) -> ApiResult<Self::AsyncRes> {
-        let bo_obds =
-            decision::biz_risk::get_bo_obds(&state.db_pool, &state.enclave_client, &self.wf_id).await?;
-        Ok((state.feature_flag_client.clone(), bo_obds))
+        Ok(state.feature_flag_client.clone())
     }
 
     #[tracing::instrument("KybDecisioning#OnAction<MakeDecision, KybState>::on_commit", skip_all)]
@@ -391,9 +388,10 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
         async_res: Self::AsyncRes,
         conn: &mut db::TxnPgConn,
     ) -> ApiResult<KybState> {
-        let (ff_client, bo_obds) = async_res;
+        let ff_client = async_res;
         let v = Vault::get(conn, &wf.scoped_vault_id)?;
         let fixture_decision = decision::utils::get_fixture_data_decision(ff_client, &v, &wf, &self.t_id)?;
+        let obc = ObConfiguration::get(conn, &self.wf_id)?.0;
 
         let sv = ScopedVault::get(conn, &self.wf_id)?;
         let rsfd = decision::features::risk_signals::fetch_latest_risk_signals_map(conn, &sv.id)?;
@@ -409,23 +407,38 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
             .unique()
             .collect();
 
-        let decision = if let Some(fixture_decision) = fixture_decision {
-            OnboardingRulesDecision::Kyb(KybOnboardingRulesDecisionOutput::new(
-                OnboardingRulesDecisionOutput::from(fixture_decision),
-            ))
+        let (decision, rsr_id) = if let Some(fixture_decision) = fixture_decision {
+            (
+                OnboardingRulesDecisionOutput::from(fixture_decision).decision,
+                None,
+            )
         } else {
-            evaluate_kyb_rules(kyb_rsg, bo_obds)?
+            let kyb_rs: Vec<RiskSignal> = rsfd.risk_signals.into_iter().flat_map(|(_, v)| v).collect();
+
+            let (rsr, _) = decision::rule_engine::engine::evaluate_rules(
+                conn,
+                &sv.id,
+                &obc.id,
+                Some(&self.wf_id),
+                RuleSetResultKind::WorkflowDecision,
+                &kyb_rs,
+                RuleEvalConfig::default(),
+            )?;
+            (
+                Decision {
+                    decision_status: rsr.action_triggered.into(),
+                    should_commit: false, // never commit business data for now
+                    create_manual_review: rsr
+                        .action_triggered
+                        .map(|r| r.should_create_review())
+                        .unwrap_or(false),
+                    action: rsr.action_triggered,
+                },
+                Some(rsr.id),
+            )
         };
 
-        common::save_kyc_decision(
-            conn,
-            &sv.id,
-            &wf,
-            vres_ids,
-            decision.final_decision_and_additional_evaluated()?.decision,
-            None,
-            vec![],
-        )?;
+        common::save_kyc_decision(conn, &sv.id, &wf, vres_ids, decision, rsr_id.as_ref(), vec![])?;
 
         Ok(KybState::from(KybComplete {}))
     }

@@ -28,7 +28,8 @@ use either::Either;
 
 use itertools::Itertools;
 use newtypes::{
-    PiiJsonValue, ReviewReason, RuleSetResultId, ScopedVaultId, VerificationRequestId, VerificationResultId, WorkflowId
+    PiiJsonValue, ReviewReason, RuleSetResultId, ScopedVaultId, VerificationRequestId, VerificationResultId,
+    WorkflowId,
 };
 
 pub async fn save_vendor_responses(
