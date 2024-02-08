@@ -36,11 +36,10 @@ test('E2E.KYC.DriverDocOnly #ci', async ({
   // eslint-disable-next-line playwright/no-conditional-in-test
   if (isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
   test.setTimeout(120000);
-  const context = await browser.newContext();
+  const context = await browser.newContext({ permissions: ['camera'] });
   const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
   const key = 'ob_test_0DNRM31nSBCSqHLJQTeWi9';
 
-  await context.grantPermissions(['camera']);
   await page.route('**/*.{png,jpg,jpeg,woff,woff2}', route => route.abort());
   await page.goto(`/e2e?ob_key=${key}&flow=${flowId}`);
   await page.waitForLoadState();

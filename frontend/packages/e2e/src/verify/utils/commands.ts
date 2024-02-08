@@ -1,5 +1,5 @@
 import type { Browser, FrameLocator, Page } from '@playwright/test';
-import { expect } from '@playwright/test';
+import { expect, devices } from '@playwright/test';
 import path from 'path';
 
 type WithFrame = { frame: FrameLocator | Page };
@@ -339,17 +339,26 @@ export const doTransferFromSocialMediaBrowser = async ({
   const handoffUrl = request.postDataJSON().url;
   expect(handoffUrl).toBeDefined();
 
-  const handoffPage = await browser.newPage();
+  const iPhone = devices['iPhone 13'];
+  const context = await browser.newContext({
+    ...iPhone,
+  });
+  const handoffPage = await context.newPage();
   await handoffPage.goto(handoffUrl);
   await handoffPage.waitForLoadState();
 
-  const handoffHeader = handoffPage.getByText(/liveness check/i).first();
+  const handoffHeader = handoffPage.getByText(/continue/i).first();
   await handoffHeader
     .waitFor({ state: 'attached', timeout: 10000 })
     .then(() => true)
     .catch(() => false);
-  await clickOn(/launch verification/i, { frame: handoffPage });
-  await clickOn(/do it later/i, { frame: handoffPage });
+
+  await handoffPage.waitForLoadState();
+  await clickOnContinue({ frame: handoffPage });
+  await handoffPage
+    .getByText(/Optional/i)
+    .first()
+    .scrollIntoViewIfNeeded();
 
   return handoffPage;
 };
@@ -395,6 +404,12 @@ export const skipTransferOnDesktop = async ({
 }: {
   frame: FrameLocator;
 }) => {
-  await clickOn(/continue on desktop/i, { frame });
-  await clickOn(/continue on desktop/i, { frame });
+  let success = await clickOn(/continue on desktop/i, { frame });
+  if (!success) {
+    await clickOn(/continue on desktop/i, { frame });
+  }
+  success = await clickOn(/continue on desktop/i, { frame });
+  if (!success) {
+    await clickOn(/continue on desktop/i, { frame });
+  }
 };

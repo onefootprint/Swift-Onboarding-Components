@@ -21,8 +21,8 @@ const SOCIAL_MEDIA_BROWSER_USER_AGENTS = [
 ];
 
 for (const { label, userAgent } of SOCIAL_MEDIA_BROWSER_USER_AGENTS) {
-  test.use({ userAgent });
-  test(`reverse-doc.social-media-browser.${label}`, async ({
+  test.use({ userAgent, isMobile: true });
+  test(`reverse-doc.social-media-browser.${label} #ci`, async ({
     browserName,
     browser,
     page,
@@ -31,7 +31,10 @@ for (const { label, userAgent } of SOCIAL_MEDIA_BROWSER_USER_AGENTS) {
     // eslint-disable-next-line playwright/no-conditional-in-test
     if (!isMobile) test.skip(); // eslint-disable-line playwright/no-skipped-test
     test.setTimeout(120000);
-    const context = await browser.newContext({ userAgent });
+    const context = await browser.newContext({
+      userAgent,
+      permissions: ['camera'],
+    });
     const flowId = `${browserName}-${Math.floor(Math.random() * 100000) + 1}`;
     const key = 'pb_test_ZeSUWIlEteLWZByDjLITUL';
 
@@ -66,6 +69,8 @@ for (const { label, userAgent } of SOCIAL_MEDIA_BROWSER_USER_AGENTS) {
       page,
       browser,
     });
+    await handoffPage.waitForLoadState();
+
     await handoffPage.close();
     await context.close();
 
