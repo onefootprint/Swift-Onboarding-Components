@@ -93,6 +93,7 @@ describe('Onboarding Requirements Machine Tests', () => {
           device: {
             type: 'mobile',
             hasSupportForWebauthn: true,
+            osName: 'unknown',
           },
           userFound: true,
           authToken: 'token',
@@ -114,6 +115,7 @@ describe('Onboarding Requirements Machine Tests', () => {
         device: {
           type: 'mobile',
           hasSupportForWebauthn: true,
+          osName: 'unknown',
         },
         userFound: true,
         authToken: 'token',
@@ -138,6 +140,7 @@ describe('Onboarding Requirements Machine Tests', () => {
           device: {
             type: 'mobile',
             hasSupportForWebauthn: true,
+            osName: 'unknown',
           },
           userFound: false,
           authToken: 'token',
@@ -221,6 +224,7 @@ describe('Onboarding Requirements Machine Tests', () => {
           device: {
             type: 'mobile',
             hasSupportForWebauthn: true,
+            osName: 'unknown',
           },
           userFound: false,
           authToken: 'token',

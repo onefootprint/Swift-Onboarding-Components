@@ -4,6 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import HeaderTitle from '../../../../components/layout/components/header-title';
+import { useIdDocMachine } from '../machine-provider';
 
 export type MissingPermissionsSheetProps = {
   open: boolean;
@@ -17,13 +18,32 @@ const MissingPermissionsSheet = ({
   const { t } = useTranslation('idv', {
     keyPrefix: 'id-doc.components.missing-permissions',
   });
+  const [state] = useIdDocMachine();
+  const {
+    context: {
+      device: { osName, type: deviceType },
+    },
+  } = state;
+
+  const getTranslation = () => {
+    if (deviceType === 'mobile') {
+      if (osName === 'iOS') {
+        return t('cta-ios');
+      }
+      if (osName === 'Android') {
+        return t('cta-android');
+      }
+      return t('cta-mobile');
+    }
+    return t('cta-desktop');
+  };
 
   return (
     <BottomSheet open={open} onClose={onClose}>
       <Container>
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <Typography variant="body-2" sx={{ textAlign: 'center', marginTop: 9 }}>
-          {t('cta')}
+          {getTranslation()}
         </Typography>
       </Container>
     </BottomSheet>

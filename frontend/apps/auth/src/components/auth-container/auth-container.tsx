@@ -39,7 +39,11 @@ type AuthDataPropsWithToken = FootprintAuthDataProps & { authToken?: string };
 type AuthContainerProps = { fallback: JSX.Element; variant?: Variant | null };
 
 const voidObj: Record<string, never> = {};
-const initialDevice = { hasSupportForWebauthn: false, type: 'unknown' };
+const initialDevice = {
+  hasSupportForWebauthn: false,
+  type: 'unknown',
+  osName: 'unknown',
+};
 const { canceled, closed, completed } = FootprintPublicEvent;
 
 const RenderNull = (): null => null;

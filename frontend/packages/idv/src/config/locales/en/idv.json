@@ -1072,7 +1072,11 @@
       "missing-permissions": {
         "title": "Allow access to your camera",
         "subtitle": "We will need you to take photos of your document to properly verify your identity.",
-        "cta": "Open settings to give camera permissions"
+        "cta": "Open Settings to give camera permissions",
+        "cta-ios": "Open Settings to grant camera permissions to your mobile browser.",
+        "cta-android": "Grant camera permissions via your browser and/or device settings.",
+        "cta-mobile": "Adjust your device and/or browser settings to grant camera permissions.",
+        "cta-desktop": "Open your browser settings to grant camera permissions."
       },
       "id-doc-photo-prompt": {
         "title": "Scan or upload the {{side}} of your {{type}} ({{country}})",

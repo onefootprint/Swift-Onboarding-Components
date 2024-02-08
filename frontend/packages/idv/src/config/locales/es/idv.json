@@ -1073,7 +1073,8 @@
       "missing-permissions": {
         "title": "Solicitud de acceso a la cámara del dispositivo",
         "subtitle": "Necesitaremos que tomes fotos de tu documento para verificar tu identidad correctamente, y para ellos, necesitamos que le permitas el uso de tu cámara de fotos en este dispositivo.",
-        "cta": "Abrir ajustes para dar permisos a la cámara"
+        "cta": "Abrir ajustes para dar permisos a la cámara",
+        "cta-webview": "Abre ajutes para dar permisos a la cámara a tu navegador móvil - Safari, Chrome, etc."
       },
       "id-doc-photo-prompt": {
         "title": "Escanear o subir {{side}} de tu {{type}} ({{country}})",
