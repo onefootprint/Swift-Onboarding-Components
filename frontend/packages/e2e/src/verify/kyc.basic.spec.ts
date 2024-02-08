@@ -13,6 +13,7 @@ import {
   waitForVerifyButton,
   clickOnVerifyWithSms,
   doTransferFromDesktop,
+  checkSupport,
 } from './utils/commands';
 
 const firstName = 'Jane';
@@ -44,8 +45,8 @@ test('KYC for env.NEXT_PUBLIC_E2E_TENANT_PK #ci', async ({
   await page.waitForLoadState();
 
   const frame = page.frameLocator('iframe[name^="footprint-iframe-"]');
-
   await selectOutcomeOptional({ frame }, 'Success');
+  await checkSupport({ frame });
   await clickOnContinue({ frame });
   await page.waitForLoadState();
 

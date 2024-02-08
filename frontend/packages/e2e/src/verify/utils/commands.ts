@@ -32,6 +32,19 @@ export const clickOnConfirm = clickOn.bind(null, /confirm/i);
 export const clickOnCancel = clickOn.bind(null, /cancel/i);
 export const clickOnYes = clickOn.bind(null, /yes/i);
 
+export const checkSupport = async ({ frame }: WithFrame) => {
+  const supportButton = frame
+    .getByRole('button', {
+      name: 'Support',
+    })
+    .first();
+
+  return supportButton
+    .waitFor({ state: 'attached', timeout: 15000 })
+    .then(() => true)
+    .catch(() => false);
+};
+
 export const selectOutcomeOptional = async (
   { frame }: WithFrame,
   outcome: Outcome,
