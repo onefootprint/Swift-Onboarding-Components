@@ -103,24 +103,24 @@ pub async fn post(
         None
     };
 
-    let (scrubbed_phone, scrubbed_email) = if is_from_api {
+    let dis = vec![
+        DataIdentifier::Id(IDK::PhoneNumber),
+        DataIdentifier::Id(IDK::Email),
+    ];
+    let values = vw.decrypt_unchecked(&state.enclave_client, &dis).await?;
+    let phone = values.get_di(IDK::PhoneNumber).ok();
+    let scrubbed_phone = phone
+        .and_then(|p| PhoneNumber::parse(p).ok())
+        .map(|p| p.scrubbed());
+    let scrubbed_email = if is_from_api {
         // When we are identifying a user via API-created auth token, provide the scrubbed phone and email
-        let dis = vec![
-            DataIdentifier::Id(IDK::PhoneNumber),
-            DataIdentifier::Id(IDK::Email),
-        ];
-        let values = vw.decrypt_unchecked(&state.enclave_client, &dis).await?;
-        let phone = values.get_di(IDK::PhoneNumber).ok();
-        let scrubbed_phone = phone
-            .and_then(|p| PhoneNumber::parse(p).ok())
-            .map(|p| p.scrubbed());
         let email = values.get_di(IDK::Email).ok();
         let scrubbed_email = email
             .and_then(|p| Email::from_str(p.leak()).ok())
             .map(|email| email.scrubbed());
-        (scrubbed_phone, scrubbed_email)
+        scrubbed_email
     } else {
-        (None, None)
+        None
     };
 
     let auth_methods = auth_methods

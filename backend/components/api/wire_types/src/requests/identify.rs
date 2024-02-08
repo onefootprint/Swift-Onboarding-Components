@@ -71,7 +71,6 @@ pub struct IdentifiedUser {
     /// that they've already onboarded onto
     pub can_initiate_signup_challenge: bool,
 
-    /// Populated only when identifying a user via auth token that was created by the tenant
     pub scrubbed_phone: Option<PiiString>,
     /// Populated only when identifying a user via auth token that was created by the tenant
     pub scrubbed_email: Option<PiiString>,
