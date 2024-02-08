@@ -1879,6 +1879,11 @@
         "theme": "Theme"
       },
       "business-profile": {
+        "dialog": {
+          "save": "Save",
+          "cancel": "Cancel",
+          "delete": "Delete"
+        },
         "header": {
           "title": "Business profile",
           "subtitle": "Manage your business details"
@@ -1907,7 +1912,45 @@
           "form": {
             "placeholder": "https://acme.com",
             "errors": {
-              "required": "Please enter a website"
+              "required": "Please enter a website",
+              "invalid": "Please enter a valid website"
+            }
+          }
+        },
+        "support-links": {
+          "title": "Support links",
+          "subtitle": "Links will be accessible to users during onboarding.",
+          "more-details": "More details.",
+          "dialog": {
+            "title": "Support links",
+            "body": "When available, support links help users get in touch with your support team. By including a support email, website, or phone number, these contact options will be visible to users during the onboarding process.",
+            "img-alt": "Bifrost footer with support links"
+          }
+        },
+        "support-email": {
+          "label": "Support email",
+          "form": {
+            "placeholder": "support@acme.com",
+            "errors": {
+              "required": "Please enter a valid email address"
+            }
+          }
+        },
+        "support-website": {
+          "label": "Support website",
+          "form": {
+            "placeholder": "https://acme.com/support",
+            "errors": {
+              "required": "Please enter a valid website"
+            }
+          }
+        },
+        "support-phone": {
+          "label": "Support phone",
+          "form": {
+            "placeholder": "+1 123 456 7890",
+            "errors": {
+              "required": "Please enter a valid phone number"
             }
           }
         }

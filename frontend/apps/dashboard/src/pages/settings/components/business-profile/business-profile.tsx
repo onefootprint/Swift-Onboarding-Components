@@ -17,7 +17,7 @@ const BusinessProfile = () => {
   const { isLoading, error, data } = useOrg();
 
   return (
-    <section data-testid="business-profile-section">
+    <section>
       <SectionHeader
         title={t('header.title')}
         subtitle={t('header.subtitle')}

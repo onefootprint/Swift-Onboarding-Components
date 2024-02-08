@@ -42,7 +42,7 @@ describe('<Fieldset />', () => {
       renderFieldset({ label: 'Company name', value: null });
 
       expect(
-        screen.getByRole('button', { name: 'Add Company name' }),
+        screen.getByRole('button', { name: 'Add company name' }),
       ).toBeInTheDocument();
     });
 
@@ -52,7 +52,7 @@ describe('<Fieldset />', () => {
 
         await userEvent.click(
           screen.getByRole('button', {
-            name: 'Add Company name',
+            name: 'Add company name',
           }),
         );
 
@@ -66,7 +66,7 @@ describe('<Fieldset />', () => {
       renderFieldset({ label: 'Company name', value: 'Footprint' });
 
       expect(
-        screen.getByRole('button', { name: 'Edit Company name' }),
+        screen.getByRole('button', { name: 'Edit company name' }),
       ).toBeInTheDocument();
     });
 
@@ -76,7 +76,7 @@ describe('<Fieldset />', () => {
 
         await userEvent.click(
           screen.getByRole('button', {
-            name: 'Edit Company name',
+            name: 'Edit company name',
           }),
         );
 

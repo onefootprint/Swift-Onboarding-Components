@@ -3,39 +3,39 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-export type WebsiteProps = {
+export type FormProps = {
   id: string;
-  onSubmit: (newWebsiteUrl: string) => void;
-  value?: string | null;
+  onSubmit: (newSupportEmail: string) => void;
+  value?: string;
 };
 
 type FormData = {
-  websiteUrl: string;
+  supportEmail: string;
 };
 
-const Form = ({ id, value, onSubmit }: WebsiteProps) => {
+const Form = ({ id, value, onSubmit }: FormProps) => {
   const { t } = useTranslation('common', {
-    keyPrefix: 'pages.settings.business-profile.website',
+    keyPrefix: 'pages.settings.business-profile.support-email',
   });
   const { register, handleSubmit, formState } = useForm<FormData>({
     defaultValues: {
-      websiteUrl: value || '',
+      supportEmail: value,
     },
   });
-  const handleFormSubmit = async (formData: FormData) => {
-    onSubmit(formData.websiteUrl);
+
+  const handleFormSubmit = (formData: FormData) => {
+    onSubmit(formData.supportEmail);
   };
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} id={id}>
       <TextInput
         autoFocus
-        hasError={!!formState.errors.websiteUrl}
-        hint={formState.errors.websiteUrl?.message}
+        hasError={!!formState.errors.supportEmail}
+        hint={formState.errors.supportEmail?.message}
         label={t('label')}
         placeholder={t('form.placeholder')}
-        type="url"
-        {...register('websiteUrl', {
+        {...register('supportEmail', {
           required: {
             value: true,
             message: t('form.errors.required'),

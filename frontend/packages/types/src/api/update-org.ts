@@ -6,6 +6,9 @@ export type UpdateOrgRequest = Partial<{
   websiteUrl: string | null;
   companySize: OrganizationSize | null;
   allowDomainAccess: boolean | null;
+  supportEmail: string | null;
+  supportPhone: string | null;
+  supportWebsite: string | null;
 }>;
 
 export type UpdateOrgResponse = Organization;

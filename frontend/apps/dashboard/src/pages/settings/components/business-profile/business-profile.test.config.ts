@@ -5,8 +5,11 @@ export const organizationFixture: Organization = {
   id: 'org_9L42CAdpXhDeSmi1DI8Qks',
   name: 'Acme',
   logoUrl: 'https://acme.com/logo.png',
-  isSandboxRestricted: false,
   websiteUrl: 'https://acme.com',
+  supportEmail: 'support@acme.com',
+  supportPhone: '123-456-7890',
+  supportWebsite: 'https://support.acme.com',
+  isSandboxRestricted: false,
   companySize: null,
   domains: [],
   allowDomainAccess: false,
@@ -14,6 +17,15 @@ export const organizationFixture: Organization = {
   isProdKybPlaybookRestricted: false,
   isProdKycPlaybookRestricted: false,
 };
+
+export const organizationDataLabels = [
+  'Company name',
+  'Website',
+  'Organization id',
+  'Support email',
+  'Support phone',
+  'Support website',
+];
 
 export const withOrganization = (organization?: Partial<Organization>) =>
   mockRequest({

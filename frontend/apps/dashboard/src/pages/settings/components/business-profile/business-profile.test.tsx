@@ -11,6 +11,7 @@ import { asAdminUser, resetUser } from 'src/config/tests';
 
 import BusinessProfile from './business-profile';
 import {
+  organizationDataLabels,
   withOrganization,
   withOrganizationError,
   withUpdateOrg,
@@ -37,10 +38,14 @@ describe('<BusinessProfile />', () => {
 
   const renderBusinessProfileAndWaitData = async () => {
     customRender(<BusinessProfile />);
-    await waitFor(() => {
-      const data = screen.getByTestId('business-profile-data');
-      expect(data).toBeInTheDocument();
-    });
+    await Promise.all(
+      organizationDataLabels.map(label =>
+        waitFor(() => {
+          const data = screen.getByText(label);
+          expect(data).toBeInTheDocument();
+        }),
+      ),
+    );
   };
 
   describe('when the request fails', () => {
@@ -110,12 +115,12 @@ describe('<BusinessProfile />', () => {
           expect(prevName).toBeInTheDocument();
 
           const editDialogTrigger = screen.getByRole('button', {
-            name: 'Edit Company name',
+            name: 'Edit company name',
           });
           await userEvent.click(editDialogTrigger);
 
           const editDialog = screen.getByRole('dialog', {
-            name: 'Edit Company name',
+            name: 'Edit company name',
           });
           expect(editDialog).toBeInTheDocument();
 
@@ -127,7 +132,7 @@ describe('<BusinessProfile />', () => {
 
           await waitForElementToBeRemoved(() =>
             screen.queryByRole('dialog', {
-              name: 'Edit Company name',
+              name: 'Edit company name',
             }),
           );
 
@@ -150,12 +155,12 @@ describe('<BusinessProfile />', () => {
           expect(prevName).toBeInTheDocument();
 
           const editDialogTrigger = screen.getByRole('button', {
-            name: 'Edit Company name',
+            name: 'Edit company name',
           });
           await userEvent.click(editDialogTrigger);
 
           const editDialog = screen.getByRole('dialog', {
-            name: 'Edit Company name',
+            name: 'Edit company name',
           });
           expect(editDialog).toBeInTheDocument();
 
@@ -190,12 +195,12 @@ describe('<BusinessProfile />', () => {
           expect(prevWebsite).toBeInTheDocument();
 
           const editDialogTrigger = screen.getByRole('button', {
-            name: 'Edit Website',
+            name: 'Edit website',
           });
           await userEvent.click(editDialogTrigger);
 
           const editDialog = screen.getByRole('dialog', {
-            name: 'Edit Website',
+            name: 'Edit website',
           });
           expect(editDialog).toBeInTheDocument();
 
@@ -207,7 +212,7 @@ describe('<BusinessProfile />', () => {
 
           await waitForElementToBeRemoved(() =>
             screen.queryByRole('dialog', {
-              name: 'Edit Website',
+              name: 'Edit website',
             }),
           );
 
@@ -230,12 +235,12 @@ describe('<BusinessProfile />', () => {
           expect(prevWebsite).toBeInTheDocument();
 
           const editDialogTrigger = screen.getByRole('button', {
-            name: 'Edit Website',
+            name: 'Edit website',
           });
           await userEvent.click(editDialogTrigger);
 
           const editDialog = screen.getByRole('dialog', {
-            name: 'Edit Website',
+            name: 'Edit website',
           });
           expect(editDialog).toBeInTheDocument();
 

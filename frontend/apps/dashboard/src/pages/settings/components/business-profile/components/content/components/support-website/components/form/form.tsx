@@ -3,7 +3,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-export type WebsiteProps = {
+export type NameProps = {
   id: string;
   onSubmit: (newWebsiteUrl: string) => void;
   value?: string | null;
@@ -13,16 +13,17 @@ type FormData = {
   websiteUrl: string;
 };
 
-const Form = ({ id, value, onSubmit }: WebsiteProps) => {
+const Form = ({ id, value, onSubmit }: NameProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.settings.business-profile.website',
   });
-  const { register, handleSubmit, formState } = useForm<FormData>({
+  const { register, handleSubmit } = useForm<FormData>({
     defaultValues: {
       websiteUrl: value || '',
     },
   });
-  const handleFormSubmit = async (formData: FormData) => {
+
+  const handleFormSubmit = (formData: FormData) => {
     onSubmit(formData.websiteUrl);
   };
 
@@ -30,8 +31,6 @@ const Form = ({ id, value, onSubmit }: WebsiteProps) => {
     <form onSubmit={handleSubmit(handleFormSubmit)} id={id}>
       <TextInput
         autoFocus
-        hasError={!!formState.errors.websiteUrl}
-        hint={formState.errors.websiteUrl?.message}
         label={t('label')}
         placeholder={t('form.placeholder')}
         type="url"

@@ -18,4 +18,7 @@ export type Organization = {
   isDomainAlreadyClaimed: boolean | null;
   isProdKycPlaybookRestricted: boolean;
   isProdKybPlaybookRestricted: boolean;
+  supportEmail?: string | null;
+  supportPhone?: string | null;
+  supportWebsite?: string | null;
 };

@@ -7,6 +7,7 @@ export type FormDialogProps = {
   id: string;
   loading?: boolean;
   onClose: () => void;
+  onDeleteData?: () => void;
   open: boolean;
   title: string;
 };
@@ -16,10 +17,13 @@ const FormDialog = ({
   id,
   loading,
   onClose,
+  onDeleteData,
   open,
   title,
 }: FormDialogProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('common', {
+    keyPrefix: 'pages.settings.business-profile.dialog',
+  });
 
   return (
     <Dialog
@@ -38,6 +42,15 @@ const FormDialog = ({
         label: t('cancel'),
         onClick: onClose,
       }}
+      linkButton={
+        onDeleteData
+          ? {
+              disabled: loading,
+              label: t('delete'),
+              onClick: onDeleteData,
+            }
+          : undefined
+      }
     >
       {children}
     </Dialog>

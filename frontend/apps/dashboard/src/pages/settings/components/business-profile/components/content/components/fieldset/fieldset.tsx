@@ -4,6 +4,7 @@ import React, { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useUpdateOrg from 'src/hooks/use-update-org';
 
+import type { DeleteKeyProps } from '../../content.types';
 import FormDialog from '../form-dialog';
 import Label from './components/label';
 import Value from './components/value';
@@ -15,17 +16,18 @@ export type FieldsetProps = {
   }) => React.ReactNode;
   label: string;
   value?: string | null;
+  deleteKey?: DeleteKeyProps;
 };
 
-const Fieldset = ({ children, label, value }: FieldsetProps) => {
+const Fieldset = ({ children, label, value, deleteKey }: FieldsetProps) => {
   const { t } = useTranslation('common', {
     keyPrefix: 'pages.settings.business-profile',
   });
   const id = useId();
   const [open, setOpen] = useState(false);
   const updateOrgMutation = useUpdateOrg();
-  const addText = t('add', { label });
-  const editText = t('edit', { label });
+  const addText = t('add', { label: label.toLowerCase() });
+  const editText = t('edit', { label: label.toLowerCase() });
 
   const handleSubmit = (payload: UpdateOrgRequest) => {
     updateOrgMutation.mutate(payload, { onSuccess: closeDialog });
@@ -37,6 +39,13 @@ const Fieldset = ({ children, label, value }: FieldsetProps) => {
 
   const closeDialog = () => {
     setOpen(false);
+  };
+
+  const handleDeleteData = () => {
+    if (deleteKey) {
+      const payload = { [deleteKey]: true };
+      updateOrgMutation.mutate(payload, { onSuccess: closeDialog });
+    }
   };
 
   return (
@@ -51,10 +60,12 @@ const Fieldset = ({ children, label, value }: FieldsetProps) => {
         onClose={closeDialog}
         open={open}
         title={value ? editText : addText}
+        onDeleteData={deleteKey ? handleDeleteData : undefined}
       >
         {children({ id, handleSubmit })}
       </FormDialog>
     </Stack>
   );
 };
+
 export default Fieldset;
