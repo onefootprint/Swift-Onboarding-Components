@@ -98,7 +98,6 @@ const Select = <T extends BaseOption = BaseOption<string>>(
           backgroundColor={active || disabled ? 'secondary' : 'primary'}
           borderColor="primary"
           borderRadius="default"
-          borderStyle="solid"
           borderWidth={1}
           flexDirection="row"
           height={48}

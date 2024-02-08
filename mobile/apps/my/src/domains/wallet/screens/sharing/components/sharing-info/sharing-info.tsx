@@ -15,12 +15,7 @@ const SharingInfo = ({ name, logo, fields }: SharingInfoProps) => {
   const { t } = useTranslation('cdo');
 
   return (
-    <Box
-      borderRadius="default"
-      borderWidth={1}
-      borderColor="tertiary"
-      borderStyle="solid"
-    >
+    <Box borderRadius="default" borderWidth={1} borderColor="tertiary">
       <Box margin={5}>
         <Logo source={{ uri: logo }} />
         <Typography variant="label-2" marginBottom={3}>

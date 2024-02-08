@@ -24,7 +24,6 @@ const Checkbox = ({ label, value, onValueChange }: CheckboxProps) => {
           backgroundColor={value ? 'tertiary' : 'primary'}
           borderColor={value ? 'transparent' : 'primary'}
           borderRadius="default"
-          borderStyle="solid"
           borderWidth={1}
           center
           height={16}

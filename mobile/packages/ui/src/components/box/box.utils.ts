@@ -1,62 +1,93 @@
-import type { BoxProps } from './box.types';
+import type { ViewProps } from 'react-native';
 
-const filterStyleProps = (props: BoxProps): Partial<BoxProps> => {
-  const allowedProps = [
-    'gap',
-    'rowGap',
-    'margin',
-    'marginBottom',
-    'marginEnd',
-    'marginHorizontal',
-    'marginLeft',
-    'marginRight',
-    'marginStart',
-    'marginTop',
-    'marginVertical',
-    'padding',
-    'paddingBottom',
-    'paddingEnd',
-    'paddingHorizontal',
-    'paddingLeft',
-    'paddingRight',
-    'paddingStart',
-    'paddingTop',
-    'paddingVertical',
-    'backgroundColor',
-    'borderBottomColor',
-    'borderRadius',
-    'borderBottomEndRadius',
-    'borderBottomLeftRadius',
-    'borderBottomRightRadius',
-    'borderBottomStartRadius',
-    'borderColor',
-    'borderEndColor',
-    'borderLeftColor',
-    'borderRightColor',
-    'borderStartColor',
-    'borderTopColor',
-    'borderTopEndRadius',
-    'borderTopLeftRadius',
-    'borderTopRightRadius',
-    'borderTopStartRadius',
-    'transform',
-    'transformMatrix',
-    'rotation',
-    'scaleX',
-    'scaleY',
-    'translateX',
-    'translateY',
-    'elevation',
-  ];
+import type { BoxProps, BoxStyleProps } from './box.types';
 
-  const filteredProps: Partial<BoxProps> = {};
+const styleKeyProps = [
+  'alignItems',
+  'justifyContent',
+  'alignSelf',
+  'aspectRatio',
+  'borderBottomWidth',
+  'display',
+  'end',
+  'flex',
+  'flexBasis',
+  'flexDirection',
+  'flexGrow',
+  'flexShrink',
+  'flexWrap',
+  'height',
+  'left',
+  'overflow',
+  'position',
+  'right',
+  'top',
+  'visibility',
+  'width',
+  'zIndex',
+  'opacity',
+  'gap',
+  'rowGap',
+  'margin',
+  'marginBottom',
+  'marginEnd',
+  'marginHorizontal',
+  'marginLeft',
+  'marginRight',
+  'marginStart',
+  'marginTop',
+  'marginVertical',
+  'padding',
+  'paddingBottom',
+  'paddingEnd',
+  'paddingHorizontal',
+  'paddingLeft',
+  'paddingRight',
+  'paddingStart',
+  'paddingTop',
+  'paddingVertical',
+  'backgroundColor',
+  'borderBottomColor',
+  'borderRadius',
+  'borderBottomEndRadius',
+  'borderBottomLeftRadius',
+  'borderBottomRightRadius',
+  'borderBottomStartRadius',
+  'borderColor',
+  'borderEndColor',
+  'borderLeftColor',
+  'borderRightColor',
+  'borderStartColor',
+  'borderTopColor',
+  'borderTopEndRadius',
+  'borderTopLeftRadius',
+  'borderTopRightRadius',
+  'borderTopStartRadius',
+  'transform',
+  'transformMatrix',
+  'rotation',
+  'scaleX',
+  'scaleY',
+  'translateX',
+  'translateY',
+  'elevation',
+];
+
+const filterProps = (props: BoxProps) => {
+  const styleProps: Partial<BoxStyleProps> = {};
+  const viewProps: Partial<ViewProps> = {};
+
   Object.keys(props).forEach(key => {
-    if (allowedProps.includes(key as keyof BoxProps)) {
+    if (styleKeyProps.includes(key)) {
       // @ts-ignore
-      filteredProps[key as keyof BoxProps] = props[key as keyof BoxProps];
+      styleProps[key as keyof BoxStyleProps] =
+        props[key as keyof BoxStyleProps];
+    } else {
+      // @ts-ignore
+      viewProps[key as keyof ViewProps] = props[key as keyof ViewProps];
     }
   });
-  return filteredProps;
+  return { styleProps, viewProps };
 };
 
-export default filterStyleProps;
+export default filterProps;

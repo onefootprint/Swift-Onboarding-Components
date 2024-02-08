@@ -13,7 +13,6 @@ const Tag = ({ children }: TagProps) => {
       aria-label={children}
       borderColor="primary"
       borderRadius="large"
-      borderStyle="solid"
       borderWidth={1}
       paddingHorizontal={3}
       paddingVertical={2}

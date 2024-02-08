@@ -17,7 +17,6 @@ const Fieldset = ({
     <Box
       borderColor="tertiary"
       borderRadius="default"
-      borderStyle="solid"
       borderWidth={1}
       paddingHorizontal={5}
       paddingVertical={7}

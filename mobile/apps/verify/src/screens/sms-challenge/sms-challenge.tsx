@@ -12,6 +12,7 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import Header from '@/components/header';
 import useIdentifyVerify from '@/hooks/use-identify-verify';
+import useRequestError from '@/hooks/use-request-error';
 import useRequestErrorToast from '@/hooks/use-request-error-toast';
 import useSignupChallenge from '@/hooks/use-signup-challenge';
 import useTranslation from '@/hooks/use-translation';
@@ -21,7 +22,6 @@ import ResendButton from './components/resend-button';
 import Success from './components/success';
 import Verifying from './components/verifying';
 import getScrubbedPhoneNumber from './utils/get-scrubbed-phone-number';
-import useRequestError from '@/hooks/use-request-error';
 
 export type SmsChallengeProps = {
   identify?: IdentifyData;

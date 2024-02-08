@@ -26,7 +26,6 @@ const Table = ({ options }: TableProps) => (
         backgroundColor="primary"
         borderColor="primary"
         borderRadius="default"
-        borderStyle="solid"
         borderWidth={1}
         key={group.label}
         role="list"
