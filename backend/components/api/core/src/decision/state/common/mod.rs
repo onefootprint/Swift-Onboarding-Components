@@ -18,7 +18,7 @@ use crate::{
             incode_docv::{self, IncodeOcrComparisonDataFields},
             risk_signals::{risk_signal_group_struct::Aml, RiskSignalGroupStruct, RiskSignalsForDecision},
         },
-        onboarding::{Decision, WaterfallOnboardingRulesDecisionOutput},
+        onboarding::Decision,
         rule_engine,
         utils::FixtureDecision,
         vendor::{
@@ -137,11 +137,6 @@ pub async fn get_latest_vendor_results(state: &State, sv_id: &ScopedVaultId) -> 
     .await
     .map(|r| r.completed_requests)
 }
-
-pub type KycDecision = (
-    WaterfallOnboardingRulesDecisionOutput,
-    Vec<(FootprintReasonCode, VendorAPI, VerificationResultId)>,
-);
 
 pub fn kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> ApiResult<Decision> {
     let decision = Decision::from(fixture_decision);

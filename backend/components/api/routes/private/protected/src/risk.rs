@@ -8,7 +8,7 @@ use api_core::{
     decision::{
         engine,
         features::risk_signals::{fetch_latest_risk_signals_map, parse_reason_codes_from_vendor_result},
-        onboarding::{Decision, OnboardingRulesDecisionOutput},
+        onboarding::Decision,
         rule_engine::eval::RuleEvalConfig,
         vendor,
         vendor::{tenant_vendor_control::TenantVendorControl, vendor_result::VendorResult},
@@ -47,37 +47,6 @@ pub struct MakeVendorCallsResponse {
     new_vendor_result_ids: Vec<VerificationResultId>,
     rule_results: Vec<(api_wire_types::Rule, bool)>,
     action_triggered: Option<RuleAction>,
-}
-
-#[derive(Debug, Clone, serde::Serialize)]
-struct DecisionOutput {
-    pub decision_status: DecisionStatus,
-    pub create_manual_review: bool,
-    pub rules_triggered: String,
-    pub rules_not_triggered: String,
-}
-
-impl From<OnboardingRulesDecisionOutput> for DecisionOutput {
-    fn from(d: OnboardingRulesDecisionOutput) -> Self {
-        let OnboardingRulesDecisionOutput {
-            decision:
-                Decision {
-                    decision_status,
-                    create_manual_review,
-                    should_commit: _,
-                    action: _,
-                },
-            rules_triggered,
-            rules_not_triggered,
-        } = d;
-
-        Self {
-            decision_status,
-            create_manual_review,
-            rules_triggered: api_core::decision::rule::rules_to_string(&rules_triggered),
-            rules_not_triggered: api_core::decision::rule::rules_to_string(&rules_not_triggered),
-        }
-    }
 }
 
 #[actix_web::post("/private/protected/risk/make_vendor_calls")]
