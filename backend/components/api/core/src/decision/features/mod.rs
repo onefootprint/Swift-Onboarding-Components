@@ -5,7 +5,6 @@ pub mod idology_expectid;
 pub mod incode_docv;
 pub mod incode_utils;
 pub mod incode_watchlist;
-pub mod kyb_features;
 pub mod lexis;
 pub mod middesk;
 pub mod risk_signals;

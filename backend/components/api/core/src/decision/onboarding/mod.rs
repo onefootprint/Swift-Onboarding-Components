@@ -136,10 +136,6 @@ pub struct Decision {
     pub action: Option<RuleAction>,
 }
 
-pub trait FeatureVector {
-    fn evaluate(&self) -> ApiResult<OnboardingRulesDecision>;
-}
-
 pub trait FeatureSet {
     fn footprint_reason_codes(&self) -> Vec<FootprintReasonCode>;
     fn vendor_apis(&self) -> Vec<VendorAPI>;
