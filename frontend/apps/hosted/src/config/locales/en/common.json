@@ -4,9 +4,37 @@
       "sandbox-banner": "Sandbox Mode",
       "app-footer": {
         "links": {
-          "terms": "Terms of Service",
-          "privacy": "Privacy Policy",
-          "what-is-this": "What's this?"
+          "terms": "Terms",
+          "privacy": "Privacy",
+          "what-is-this": "About",
+          "support": {
+            "label": "Support",
+            "email": {
+              "label": "Email us",
+              "toast-error": {
+                "title": "Error",
+                "description": "Could not open email client"
+              }
+            },
+            "website": {
+              "label": "Support website",
+              "toast-error": {
+                "title": "Error",
+                "description": "Could not open website"
+              }
+            },
+            "phone": {
+              "label": "Call us",
+              "toast-success": {
+                "title": "Copied!",
+                "description": "Phone number copied to clipboard"
+              },
+              "toast-error": {
+                "title": "Error",
+                "description": "Could not copy phone number"
+              }
+            }
+          }
         }
       }
     }

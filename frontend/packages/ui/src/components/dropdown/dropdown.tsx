@@ -63,7 +63,7 @@ const StyledDropdownTrigger = styled(RadixDropdown.Trigger)<{
       width: 24px;
 
       &[data-state='open'] {
-        background-color: ${theme.backgroundColor.secondary};
+        background-color: ${theme.backgroundColor.senary};
       }
 
       &:enabled:hover {
@@ -78,13 +78,15 @@ const StyledDropdownTrigger = styled(RadixDropdown.Trigger)<{
   }}
 `;
 
-const StyledDropdownContent = styled(RadixDropdown.Content)`
-  ${({ theme }) => css`
+const StyledDropdownContent = styled(RadixDropdown.Content)<{
+  $minWidth?: string;
+}>`
+  ${({ theme, $minWidth }) => css`
     background: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius.default};
     border: 1px solid ${theme.borderColor.tertiary};
     box-shadow: ${theme.elevation[2]};
-    min-width: 200px;
+    min-width: ${$minWidth || '200px'};
     padding: ${theme.spacing[2]};
     z-index: ${theme.zIndex.dropdown};
   `}
@@ -92,8 +94,9 @@ const StyledDropdownContent = styled(RadixDropdown.Content)`
 
 const StyledDropdownItem = styled(RadixDropdown.Item)<{
   variant?: 'default' | 'destructive';
+  size?: 'default' | 'compact' | 'tiny';
 }>`
-  ${({ theme, variant }) => css`
+  ${({ theme, variant, size }) => css`
     ${createFontStyles('body-3')};
     cursor: pointer;
     color: ${theme.color[variant === 'destructive' ? 'error' : 'primary']};
@@ -119,12 +122,82 @@ const StyledDropdownItem = styled(RadixDropdown.Item)<{
         background: none;
       }
     }
+
+    ${size === 'compact' &&
+    css`
+      padding: ${theme.spacing[2]} ${theme.spacing[3]};
+      ${createFontStyles('caption-4')};
+    `}
+
+    ${size === 'tiny' &&
+    css`
+      padding: ${theme.spacing[2]} ${theme.spacing[2]} ${theme.spacing[2]}
+        ${theme.spacing[3]};
+      ${createFontStyles('caption-1')};
+    `}
   `}
 `;
 
 const StyledDivider = styled(Divider)`
   ${({ theme }) => css`
     margin: ${theme.spacing[2]} 0;
+  `}
+`;
+
+const StyledSubContent = styled(RadixDropdown.SubContent)`
+  ${({ theme }) => css`
+    background: ${theme.backgroundColor.primary};
+    border-radius: ${theme.borderRadius.default};
+    border: 1px solid ${theme.borderColor.tertiary};
+    box-shadow: ${theme.elevation[3]};
+    padding: ${theme.spacing[2]};
+    z-index: ${theme.zIndex.dropdown};
+  `}
+`;
+
+const StyledSubTrigger = styled(RadixDropdown.SubTrigger)<{
+  variant?: 'default' | 'destructive';
+  size?: 'default' | 'compact' | 'tiny';
+}>`
+  ${({ theme, variant, size }) => css`
+    ${createFontStyles('body-3')};
+    cursor: pointer;
+    color: ${theme.color[variant === 'destructive' ? 'error' : 'primary']};
+    padding: ${theme.spacing[2]} ${theme.spacing[5]};
+    outline: none;
+    border-radius: calc(${theme.borderRadius.default} - ${theme.spacing[2]});
+
+    @media (hover: hover) {
+      :hover {
+        ${createOverlayBackground('darken-1', 'primary')};
+      }
+    }
+    :focus {
+      ${createOverlayBackground('darken-1', 'primary')};
+    }
+
+    &[data-disabled] {
+      user-select: none;
+      cursor: auto;
+      color: ${theme.color.quaternary};
+
+      &:hover {
+        background: none;
+      }
+    }
+
+    ${size === 'compact' &&
+    css`
+      padding: ${theme.spacing[2]} ${theme.spacing[3]};
+      ${createFontStyles('caption-4')};
+    `}
+
+    ${size === 'tiny' &&
+    css`
+      padding: ${theme.spacing[2]} ${theme.spacing[2]} ${theme.spacing[2]}
+        ${theme.spacing[3]};
+      ${createFontStyles('caption-1')};
+    `}
   `}
 `;
 
@@ -135,6 +208,10 @@ const Dropdown = {
   Portal: RadixDropdown.Portal,
   Item: StyledDropdownItem,
   Divider: StyledDivider,
+  Sub: RadixDropdown.Sub,
+  SubTrigger: StyledSubTrigger,
+  SubContent: StyledSubContent,
+  Indicator: RadixDropdown.ItemIndicator,
 };
 
 export default Dropdown;

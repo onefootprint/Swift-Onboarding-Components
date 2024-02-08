@@ -1,5 +1,6 @@
 import { FRONTPAGE_BASE_URL } from '@onefootprint/global-constants';
 import styled, { css } from '@onefootprint/styled';
+import type { PublicOnboardingConfig } from '@onefootprint/types';
 import { media, Stack, Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,15 +11,18 @@ import { useLayoutOptions } from '../layout-options-provider';
 import SecuredByFootprint from '../secured-by-footprint';
 import FooterActions from './components/footer-actions';
 import LanguageSelect from './components/language-select';
+import SupportLinksSelect from './components/support-links-select';
 
 type FootprintFooterProps = {
   hideOnDesktop?: boolean;
   onWhatsThisClick?: () => void;
+  config?: PublicOnboardingConfig;
 };
 
 const FootprintFooter = ({
   hideOnDesktop,
   onWhatsThisClick,
+  config,
 }: FootprintFooterProps) => {
   const { t /* i18n */ } = useTranslation('idv', {
     keyPrefix: 'global.components.layout',
@@ -47,16 +51,12 @@ const FootprintFooter = ({
     >
       <SecuredByFootprint />
       <LinksContainer as="ul" align="center" justify="center" gap={3}>
-        <li>
-          <LanguageSelect />
-        </li>
-        <li>
-          <WhatsThisButton onClick={onWhatsThisClick} className="footer-link">
-            <Typography variant="caption-1" color="secondary" as="span">
-              {t('whats-this')}
-            </Typography>
-          </WhatsThisButton>
-        </li>
+        <SupportLinksSelect config={config} />
+        <WhatsThisButton onClick={onWhatsThisClick} className="footer-link">
+          <Typography variant="caption-1" color="secondary" as="span">
+            {t('whats-this')}
+          </Typography>
+        </WhatsThisButton>
         <li>
           <a
             href={`${FRONTPAGE_BASE_URL}/privacy-policy`}
@@ -69,9 +69,10 @@ const FootprintFooter = ({
             </Typography>
           </a>
         </li>
+        <LanguageSelect />
       </LinksContainer>
       <ActionsWrapper>
-        <FooterActions onWhatsThisClick={onWhatsThisClick} />
+        <FooterActions onWhatsThisClick={onWhatsThisClick} config={config} />
       </ActionsWrapper>
     </FootprintFooterContainer>
   );

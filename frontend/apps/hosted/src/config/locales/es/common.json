@@ -6,7 +6,35 @@
         "links": {
           "terms": "Términos de Servicio",
           "privacy": "Política de Privacidad",
-          "what-is-this": "¿Qué es esto?"
+          "what-is-this": "¿Qué es esto?",
+          "support": {
+            "label": "Soporte",
+            "email": {
+              "label": "Mándanos un email",
+              "toast-error": {
+                "title": "Error",
+                "description": "No pudimos abrir tu cliente de correo electrónico"
+              }
+            },
+            "website": {
+              "label": "Ir a sitio de soporte",
+              "toast-error": {
+                "title": "Error",
+                "description": "No pudimos abrir el sitio web de soporte"
+              }
+            },
+            "phone": {
+              "label": "Llámanos",
+              "toast-success": {
+                "title": "Copiado!",
+                "description": "El número de teléfono ha sido copiado al portapapeles"
+              },
+              "toast-error": {
+                "title": "Error",
+                "description": "No se pudo copiar el número de teléfono en el portapapeles"
+              }
+            }
+          }
         }
       }
     }

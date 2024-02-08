@@ -35,7 +35,7 @@ const LanguageSelect = () => {
       <StyledTrigger>
         <IcoLang16 color="secondary" />
         <Typography variant="caption-1" color="secondary">
-          {label}
+          {language.toUpperCase()}
         </Typography>
       </StyledTrigger>
       <StyledContent sideOffset={8} position="popper" align="center">

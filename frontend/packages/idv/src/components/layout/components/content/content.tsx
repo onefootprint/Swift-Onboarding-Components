@@ -102,6 +102,7 @@ const Content = ({ children, isSandbox, config }: ContentProps) => {
       <FootprintFooter
         hideOnDesktop={hideDesktopFooter}
         onWhatsThisClick={() => setIsSheetOpen(true)}
+        config={config}
       />
     </Stack>
   );

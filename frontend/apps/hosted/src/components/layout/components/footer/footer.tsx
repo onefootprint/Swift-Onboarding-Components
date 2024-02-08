@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 
 import WhatsThisPopover from '../whats-this-popover';
 import LanguageSelect from './components/language-select';
+import SupportLinksSelect from './components/support-links-select/support-links-select';
 
 type Link = { label: string; href?: string; onClick?: () => void };
 
@@ -23,9 +24,6 @@ const Footer = ({ config }: FootprintFooterProps) => {
 
   const links: Link[] = [
     {
-      label: t('links.what-is-this'),
-    },
-    {
       label: t('links.privacy'),
       href: `${FRONTPAGE_BASE_URL}/privacy-policy`,
     },
@@ -39,25 +37,23 @@ const Footer = ({ config }: FootprintFooterProps) => {
     <Container>
       <SecuredByFootprint />
       <LinksContainer>
+        <SupportLinksSelect config={config} />
+        <WhatsThisPopover config={config} />
+        {links.map(({ href, label }) => (
+          <li key={label}>
+            <a
+              href={href}
+              target="_blank"
+              rel="noreferrer"
+              className="footer-link"
+            >
+              <Typography variant="caption-1" color="secondary" as="span">
+                {label}
+              </Typography>
+            </a>
+          </li>
+        ))}
         <LanguageSelect />
-        {links.map(({ href, label }) =>
-          href ? (
-            <li key={label}>
-              <a
-                href={href}
-                target="_blank"
-                rel="noreferrer"
-                className="footer-link"
-              >
-                <Typography variant="caption-1" color="secondary" as="span">
-                  {label}
-                </Typography>
-              </a>
-            </li>
-          ) : (
-            <WhatsThisPopover config={config} label={label} key={label} />
-          ),
-        )}
         <li>
           <Image
             src="/footer/soc-2-badge.png"

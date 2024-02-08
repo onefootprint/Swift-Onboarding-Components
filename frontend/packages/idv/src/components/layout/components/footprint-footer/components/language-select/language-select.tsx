@@ -1,6 +1,6 @@
 import { IcoCheckSmall16, IcoLang16 } from '@onefootprint/icons';
 import styled, { css } from '@onefootprint/styled';
-import { createFontStyles, Typography } from '@onefootprint/ui';
+import { createFontStyles, Stack, Typography } from '@onefootprint/ui';
 import * as Select from '@radix-ui/react-select';
 import i18n from 'i18next';
 import React from 'react';
@@ -35,17 +35,23 @@ const LanguageSelect = () => {
       <StyledTrigger>
         <IcoLang16 color="secondary" />
         <Typography variant="caption-1" color="secondary">
-          {label}
+          {language.toUpperCase()}
         </Typography>
       </StyledTrigger>
       <StyledContent sideOffset={8} position="popper" align="center">
         <Select.Group>
           {allLanguages.map(lng => (
-            <StyledItem key={lng} value={lng}>
+            <StyledItem
+              key={lng}
+              value={lng}
+              onSelect={() => handleLanguageChange(lng)}
+            >
               <Select.ItemText>{LanguageLabels[lng]}</Select.ItemText>
-              <IndicatorContainer>
-                <IcoCheckSmall16 color="tertiary" />
-              </IndicatorContainer>
+              {lng === language && (
+                <Stack align="center" justify="center" as="span">
+                  <IcoCheckSmall16 color="tertiary" />
+                </Stack>
+              )}
             </StyledItem>
           ))}
         </Select.Group>
@@ -116,12 +122,6 @@ const StyledContent = styled(Select.Content)`
     z-index: ${theme.zIndex.sticky};
     padding: ${theme.spacing[2]};
   `}
-`;
-
-const IndicatorContainer = styled(Select.ItemIndicator)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
 `;
 
 export default LanguageSelect;
