@@ -8,7 +8,6 @@ pub mod field_validations;
 pub mod onboarding;
 pub mod review;
 pub mod risk;
-pub mod rule;
 pub mod rule_engine;
 pub mod sandbox;
 pub mod state;
