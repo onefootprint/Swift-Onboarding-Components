@@ -1,12 +1,14 @@
 use db::{
     models::{
-        decision_intent::DecisionIntent, ob_configuration::ObConfiguration, risk_signal::NewRiskSignalInfo, rule_set_result::RuleSetResult, scoped_vault::ScopedVault, workflow::Workflow
+        decision_intent::DecisionIntent, ob_configuration::ObConfiguration, risk_signal::NewRiskSignalInfo,
+        rule_set_result::RuleSetResult, scoped_vault::ScopedVault, workflow::Workflow,
     },
     DbPool, DbResult, TxnPgConn,
 };
 use idv::incode::watchlist::response::WatchlistResultResponse;
 use newtypes::{
-    CipKind, DecisionIntentKind, DecisionStatus, FootprintReasonCode, ReviewReason, RuleSetResultId, RuleSetResultKind, ScopedVaultId, TenantId, VendorAPI, VerificationResultId, WorkflowId
+    CipKind, DecisionIntentKind, DecisionStatus, FootprintReasonCode, ReviewReason, RuleSetResultId,
+    RuleSetResultKind, ScopedVaultId, TenantId, VendorAPI, VerificationResultId, WorkflowId,
 };
 
 use crate::{
@@ -16,7 +18,7 @@ use crate::{
             incode_docv::{self, IncodeOcrComparisonDataFields},
             risk_signals::{risk_signal_group_struct::Aml, RiskSignalGroupStruct, RiskSignalsForDecision},
         },
-        onboarding::{Decision, OnboardingRulesDecisionOutput, WaterfallOnboardingRulesDecisionOutput},
+        onboarding::{Decision, WaterfallOnboardingRulesDecisionOutput},
         rule_engine,
         utils::FixtureDecision,
         vendor::{
@@ -142,8 +144,8 @@ pub type KycDecision = (
 );
 
 pub fn kyc_decision_from_fixture(fixture_decision: FixtureDecision) -> ApiResult<Decision> {
-    let rules_output = OnboardingRulesDecisionOutput::from(fixture_decision);
-    Ok(rules_output.decision)
+    let decision = Decision::from(fixture_decision);
+    Ok(decision)
 }
 
 #[tracing::instrument(skip_all)]

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use super::{
-    onboarding::{Decision, OnboardingRulesDecisionOutput},
+    onboarding::Decision,
     vendor::{
         make_request::{VerificationRequestWithVendorError, VerificationRequestWithVendorResponse},
         tenant_vendor_control::TenantVendorControl,
@@ -255,17 +255,4 @@ pub fn save_onboarding_decision(
     )?;
 
     Ok(())
-}
-
-pub fn log_rule_evaluation(wf: &Workflow, rule_output: &OnboardingRulesDecisionOutput, msg: &str) {
-    tracing::info!(
-       rules_triggered=%rule::rules_to_string(&rule_output.rules_triggered),
-       rules_not_triggered=%rule::rules_to_string(&rule_output.rules_not_triggered),
-       create_manual_review=%rule_output.decision.create_manual_review,
-       decision=%rule_output.decision.decision_status,
-       workflow_id=%wf.id,
-       scoped_user_id=%wf.scoped_vault_id,
-       msg
-       // TODO: differentiate KYB vs KYC here
-    );
 }

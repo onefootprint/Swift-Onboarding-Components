@@ -18,7 +18,7 @@ use rand::{seq::SliceRandom, Rng};
 use strum::IntoEnumIterator;
 
 use super::{
-    onboarding::{Decision, OnboardingRulesDecisionOutput},
+    onboarding::Decision,
     utils::FixtureDecision,
     vendor::{self, vendor_result::VendorResult},
     Error,
@@ -250,7 +250,7 @@ pub fn get_fixture_aml_reason_codes(
     }
 }
 
-impl From<FixtureDecision> for OnboardingRulesDecisionOutput {
+impl From<FixtureDecision> for Decision {
     fn from(value: FixtureDecision) -> Self {
         let (decision_status, create_manual_review) = value;
         let action = match decision_status {
@@ -258,15 +258,12 @@ impl From<FixtureDecision> for OnboardingRulesDecisionOutput {
             DecisionStatus::StepUp => Some(RuleAction::identity_stepup()),
             DecisionStatus::Pass => None,
         };
-        OnboardingRulesDecisionOutput {
-            decision: Decision {
-                decision_status,
-                should_commit: decision_status == DecisionStatus::Pass,
-                create_manual_review,
-                action,
-            },
-            rules_triggered: vec![],
-            rules_not_triggered: vec![],
+
+        Decision {
+            decision_status,
+            should_commit: decision_status == DecisionStatus::Pass,
+            create_manual_review,
+            action,
         }
     }
 }

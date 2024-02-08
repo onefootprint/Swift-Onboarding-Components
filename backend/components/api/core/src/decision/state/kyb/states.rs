@@ -7,7 +7,7 @@ use super::{
 use crate::{
     decision::{
         self,
-        onboarding::{Decision, OnboardingRulesDecisionOutput},
+        onboarding::Decision,
         rule_engine::eval::RuleEvalConfig,
         state::{
             actions::{Authorize, WorkflowActions},
@@ -408,10 +408,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
             .collect();
 
         let (decision, rsr_id) = if let Some(fixture_decision) = fixture_decision {
-            (
-                OnboardingRulesDecisionOutput::from(fixture_decision).decision,
-                None,
-            )
+            (Decision::from(fixture_decision), None)
         } else {
             let kyb_rs: Vec<RiskSignal> = rsfd.risk_signals.into_iter().flat_map(|(_, v)| v).collect();
 
