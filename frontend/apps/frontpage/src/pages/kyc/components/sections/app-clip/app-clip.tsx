@@ -25,7 +25,7 @@ const AppClip = () => {
         title={t('title')}
         subtitle={t('subtitle')}
         items={bulletPointContent}
-        iconSrc="/kyc/icons/ico-illustrated-app-clip-40.svg"
+        iconSrc="/kyc/icons/ico-illustrated-app-clip-40.png"
       />
     </Section>
   );
