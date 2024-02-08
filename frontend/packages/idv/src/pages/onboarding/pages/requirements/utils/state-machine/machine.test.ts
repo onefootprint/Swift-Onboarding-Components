@@ -177,18 +177,6 @@ describe('Onboarding Requirements Machine Tests', () => {
         authorizeRequirement,
       ]);
 
-      expect(state.value).toBe('transfer');
-
-      state = machine.send({
-        type: 'requirementCompleted',
-      });
-      expect(state.value).toBe('checkRequirements');
-
-      state = machine.send({
-        type: 'onboardingRequirementsReceived',
-        payload: [livenessRequirement, authorizeRequirement],
-      });
-
       expect(state.value).toBe('liveness');
 
       state = machine.send({

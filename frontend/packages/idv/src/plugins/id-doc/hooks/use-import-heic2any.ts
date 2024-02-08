@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 
 import type { Heic2AnyModule } from '../types';
 
+const IS_TEST = typeof jest !== 'undefined';
+
 const loadHeic2AnyModule = async (retryCount = 0): Promise<Heic2AnyModule> => {
   try {
     const heic2any = (await import('heic2any')).default;
@@ -20,6 +22,10 @@ const useImportHeic2Any = (): [boolean, Heic2AnyModule | undefined] => {
   const ref = useRef<Heic2AnyModule | undefined>();
 
   useEffect(() => {
+    if (IS_TEST) {
+      return;
+    }
+
     loadHeic2AnyModule()
       .then(module => {
         ref.current = module;

@@ -1,6 +1,7 @@
 import { OnboardingRequirementKind } from '@onefootprint/types';
 import type { TransitionConfig, TransitionsConfig } from 'xstate';
 
+import { checkIsInIframe } from '../../../../../../utils';
 import type { MachineContext, MachineEvents } from './types';
 
 export const RequirementCompletedTransition: TransitionsConfig<
@@ -107,6 +108,7 @@ const shouldRunTransfer = (context: MachineContext): boolean => {
     requirements,
     isTransferOnDesktopDisabled,
   } = context;
+  if (!checkIsInIframe()) return false;
   if (isTransferOnDesktopDisabled) return false;
   if (didRunTransfer || isNoPhoneFlow) return false;
   if (isTransfer) return false;
