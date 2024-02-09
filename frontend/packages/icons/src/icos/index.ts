@@ -235,6 +235,8 @@ export { default as IcoPassport16 } from './ico-passport-16';
 export { default as IcoPassport161 } from './ico-passport-16-1';
 export { default as IcoPassport24 } from './ico-passport-24';
 export { default as IcoPassport241 } from './ico-passport-24-1';
+export { default as IcoPassportCard16 } from './ico-passport-card-16';
+export { default as IcoPassportCard24 } from './ico-passport-card-24';
 export { default as IcoPencil16 } from './ico-pencil-16';
 export { default as IcoPencil24 } from './ico-pencil-24';
 export { default as IcoPhone16 } from './ico-phone-16';
