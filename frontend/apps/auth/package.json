@@ -61,7 +61,7 @@
     "i18next-locales-sync": "^2.0.1",
     "next": "13.5.3",
     "tsconfig": "*",
-    "typescript": "4.9.5"
+    "typescript": "^5.3.3"
   },
   "browser": {
     "fs": false

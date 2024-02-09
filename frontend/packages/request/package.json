@@ -20,12 +20,12 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
-    "@testing-library/react": "^13.3.0",
-    "@testing-library/react-hooks": "^8.0.1",
     "@onefootprint/design-tokens": "*",
     "@onefootprint/dev-tools": "*",
     "@onefootprint/jest-presets": "*",
     "@onefootprint/types": "*",
+    "@testing-library/react": "^13.3.0",
+    "@testing-library/react-hooks": "^8.0.1",
     "axios": "^1.6.5",
     "axios-case-converter": "^1.1.0",
     "eslint-config-footprint": "*",
@@ -33,7 +33,7 @@
     "i18next-locales-sync": "^2.0.1",
     "react-i18next": "^14.0.0",
     "tsconfig": "*",
-    "typescript": "4.9.5"
+    "typescript": "^5.3.3"
   },
   "peerDependencies": {
     "axios": "^1.6.5",

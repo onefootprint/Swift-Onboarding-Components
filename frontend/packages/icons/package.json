@@ -19,8 +19,8 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
-    "@onefootprint/jest-presets": "*",
     "@onefootprint/design-tokens": "*",
+    "@onefootprint/jest-presets": "*",
     "@onefootprint/styled": "*",
     "@svgr/core": "^6.2.1",
     "@svgr/plugin-jsx": "^6.2.1",
@@ -32,10 +32,10 @@
     "eslint-config-footprint": "*",
     "glob": "^8.0.3",
     "lodash": "^4.17.21",
-    "react-dom": "18.2.0",
     "react": "18.2.0",
+    "react-dom": "18.2.0",
     "tsconfig": "*",
-    "typescript": "4.9.5"
+    "typescript": "^5.3.3"
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web"

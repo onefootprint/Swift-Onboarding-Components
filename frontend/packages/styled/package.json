@@ -11,11 +11,11 @@
   "devDependencies": {
     "@types/react-dom": "^18.0.10",
     "tsconfig": "*",
-    "typescript": "^4.9.5"
+    "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@types/styled-components": "^5.1.26",
     "@onefootprint/design-tokens": "*",
+    "@types/styled-components": "^5.1.26",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "styled-components": "^5.3.8"

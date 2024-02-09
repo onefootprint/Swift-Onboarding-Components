@@ -44,7 +44,6 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "i18next-locales-sync": "^2.0.1",
     "@next/bundle-analyzer": "^13.4.19",
     "@onefootprint/jest-presets": "*",
     "@onefootprint/test-utils": "*",
@@ -60,13 +59,14 @@
     "i18next": "^23.7.16",
     "i18next-browser-languagedetector": "^7.2.0",
     "i18next-http-backend": "^2.4.2",
+    "i18next-locales-sync": "^2.0.1",
     "lodash": "^4.17.21",
     "next": "13.5.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-i18next": "^14.0.0",
     "tsconfig": "*",
-    "typescript": "4.9.5",
+    "typescript": "^5.3.3",
     "xstate": "^4.37.1"
   },
   "jest": {
