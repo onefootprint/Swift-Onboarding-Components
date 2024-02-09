@@ -111,7 +111,7 @@ describe('<Idv />', () => {
   describe('When onboarding with an existing user vault', () => {
     const config = getKycOnboardingConfig(true);
     const validationToken = 'validation-token';
-    const closeDelay = 6000;
+    const delay = 6000;
 
     beforeEach(() => {
       withOnboarding(config);
@@ -139,10 +139,12 @@ describe('<Idv />', () => {
           });
 
           await waitFor(() => {
-            expect(onComplete).toHaveBeenCalledWith(
+            expect(onComplete).toHaveBeenCalledWith({
               validationToken,
-              closeDelay,
-            );
+              delay,
+              deviceResponseJson: undefined,
+              authToken: 'token',
+            });
           });
           await checkComplete();
 

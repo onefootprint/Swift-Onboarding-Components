@@ -7,6 +7,17 @@ import type {
 } from '@onefootprint/types';
 
 import type { DeviceInfo } from '../../hooks';
+import type {
+  AuthTokenPayload,
+  DeviceResponseJsonPayload,
+} from './utils/custom-listener';
+
+export type CompletePayload = {
+  validationToken?: string;
+  delay?: number;
+  authToken?: string; // auth token used for onboarding flow
+  deviceResponseJson?: string; // from passkey registration
+};
 
 export type MachineContext = {
   // Inputs
@@ -23,8 +34,9 @@ export type MachineContext = {
   idDocOutcome?: IdDocOutcome;
   sandboxId?: string;
   overallOutcome?: OverallOutcome;
+  deviceResponseJson?: string;
   onClose?: () => void;
-  onComplete?: (validationToken?: string, delay?: number) => void; // Generated
+  onComplete?: (payload: CompletePayload) => void; // Generated
 };
 
 export type MachineEvents =
@@ -67,7 +79,5 @@ export type MachineEvents =
   | {
       type: 'expireSession';
     }
-  | {
-      type: 'authTokenChanged';
-      payload: { authToken: string };
-    };
+  | AuthTokenPayload
+  | DeviceResponseJsonPayload;

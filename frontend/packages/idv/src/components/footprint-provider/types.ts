@@ -1,6 +1,11 @@
 import type { FootprintPrivateEvent } from '@onefootprint/footprint-js';
 
-export type CompletePayload = { validationToken: string; closeDelay?: number };
+export type CompletePayload = {
+  validationToken: string;
+  delay?: number;
+  authToken?: string;
+  deviceResponseJson?: string;
+};
 export type CustomChildAPI = Postmate.ChildAPI & {
   child?: Record<string, unknown>; // Window type; child === window
   parent?: Record<string, unknown>; // Window type
@@ -34,7 +39,7 @@ export type EmptyAdapterReturn = {
 export type WebViewAdapterReturn = {
   cancel: () => void;
   close: () => void;
-  complete: ({ validationToken }: CompletePayload) => void;
+  complete: (completePayload: CompletePayload) => void;
   load: () => Promise<void>;
   on: () => () => void;
 };

@@ -67,7 +67,8 @@ const biometricInit = async (payload: BiometricRegisterRequest) => {
       [AUTH_HEADER]: authToken,
     },
   });
-  return response.data;
+
+  return { response: response.data, deviceResponseJson };
 };
 
 const useBiometricInit = () => useMutation(biometricInit);

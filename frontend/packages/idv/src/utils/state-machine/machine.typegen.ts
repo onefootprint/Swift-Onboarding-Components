@@ -14,6 +14,7 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     assignAuthToken: 'authTokenChanged' | 'identifyCompleted';
+    assignDeviceResponseJson: 'receivedDeviceResponseJson';
     assignEmail: 'identifyCompleted';
     assignInitContext: 'initContextUpdated';
     assignPhoneNumber: 'identifyCompleted';

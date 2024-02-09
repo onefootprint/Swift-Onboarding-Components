@@ -42,13 +42,15 @@ export {
   useUpdateD2PStatus,
 } from './hooks';
 export { default } from './idv';
-export type { IdvProps } from './types';
-export type { BootstrapProps } from './utils';
+export type { IdvCompletePayload, IdvProps } from './types';
+export type { BootstrapProps, DeviceResponseJsonPayload } from './utils';
 export {
   checkIsInIframe,
   checkIsPhoneValid,
   checkIsSocialMediaBrowser,
+  createReceivedDeviceResponseJsonPayload,
   DesignSystemProvider,
+  FPCustomEvents,
   getBiometricChallengeResponse,
   getCanChallengeBiometrics,
   getIdentifyBootstrapData,

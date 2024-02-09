@@ -12,6 +12,8 @@ export { default as getScrubbedPhoneNumber } from './get-scrubbed-phone-number';
 export { default as Logger } from './logger';
 export { default } from './media';
 export { default as shouldChallengeEmail } from './should-challenge-email';
+export type { DeviceResponseJsonPayload } from './state-machine/utils/custom-listener';
+export { createReceivedDeviceResponseJsonPayload } from './state-machine/utils/custom-listener';
 export {
   getSdkArgsToken,
   hasInvalidHashFragment,

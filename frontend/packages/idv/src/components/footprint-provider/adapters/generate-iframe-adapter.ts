@@ -78,7 +78,7 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
     }
   };
 
-  const complete = ({ validationToken, closeDelay = 0 }: CompletePayload) => {
+  const complete = ({ validationToken, delay = 0 }: CompletePayload) => {
     Logger.info('Completing footprint from iframe adapter');
     sendEvent(completed, validationToken);
     setTimeout(() => {
@@ -86,7 +86,7 @@ const generateIframeAdapter = (): IframeAdapterReturn => {
         'Closing footprint after complete timeout from iframe adapter',
       );
       close();
-    }, closeDelay);
+    }, delay);
   };
 
   return {

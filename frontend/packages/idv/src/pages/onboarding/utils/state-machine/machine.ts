@@ -21,7 +21,6 @@ export type OnboardingMachineArgs = {
   idDocOutcome?: IdDocOutcome;
   overallOutcome?: OverallOutcome;
   onClose?: () => void;
-  onComplete?: (validationToken?: string, delay?: number) => void;
 };
 
 const createOnboardingMachine = (
@@ -35,7 +34,6 @@ const createOnboardingMachine = (
     idDocOutcome,
     overallOutcome,
     onClose,
-    onComplete,
   }: OnboardingMachineArgs,
   l10n?: L10n,
 ) =>
@@ -60,7 +58,6 @@ const createOnboardingMachine = (
         idDocOutcome,
         overallOutcome,
         onClose,
-        onComplete,
       },
       states: {
         requirements: {

@@ -6,7 +6,7 @@ import type {
 import { IdDI } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
-import type { MachineContext, MachineEvents } from './types';
+import type { CompletePayload, MachineContext, MachineEvents } from './types';
 import isContextReady from './utils/is-context-ready';
 import shouldShowIdentify from './utils/should-show-identify';
 import shouldShowSandbox from './utils/should-show-sandbox';
@@ -20,7 +20,7 @@ export type IdvMachineArgs = {
   idDocOutcome?: IdDocOutcome;
   showLogo?: boolean;
   onClose?: () => void;
-  onComplete?: (validationToken?: string, delay?: number) => void;
+  onComplete?: (payload: CompletePayload) => void;
 };
 
 const createIdvMachine = (args: IdvMachineArgs) =>
@@ -48,6 +48,9 @@ const createIdvMachine = (args: IdvMachineArgs) =>
         },
         authTokenChanged: {
           actions: ['assignAuthToken'],
+        },
+        receivedDeviceResponseJson: {
+          actions: ['assignDeviceResponseJson'],
         },
       },
       states: {
@@ -188,6 +191,10 @@ const createIdvMachine = (args: IdvMachineArgs) =>
         assignValidationToken: assign((context, event) => ({
           ...context,
           validationToken: event.payload.validationToken,
+        })),
+        assignDeviceResponseJson: assign((context, event) => ({
+          ...context,
+          deviceResponseJson: event.payload.deviceResponseJson,
         })),
       },
     },

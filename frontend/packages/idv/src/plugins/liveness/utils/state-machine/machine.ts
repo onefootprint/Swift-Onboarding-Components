@@ -1,5 +1,6 @@
 import { assign, createMachine } from 'xstate';
 
+import checkIsIframe from '../../../../utils/check-is-in-iframe';
 import type { MachineContext, MachineEvents } from './types';
 
 export const createLivenessMachine = () =>
@@ -28,7 +29,9 @@ export const createLivenessMachine = () =>
                     device: { type, hasSupportForWebauthn },
                   } = event.payload;
                   return (
-                    !!isTransfer && type === 'mobile' && !!hasSupportForWebauthn
+                    (isTransfer || !checkIsIframe()) &&
+                    type === 'mobile' &&
+                    !!hasSupportForWebauthn
                   );
                 },
               },

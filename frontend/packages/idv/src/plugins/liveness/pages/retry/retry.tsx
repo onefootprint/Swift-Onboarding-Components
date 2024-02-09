@@ -7,6 +7,10 @@ import { useTranslation } from 'react-i18next';
 import HeaderTitle from '../../../../components/layout/components/header-title';
 import NavigationHeader from '../../../../components/layout/components/navigation-header';
 import { useSkipLiveness } from '../../../../hooks';
+import {
+  FPCustomEvents,
+  sendCustomEvent,
+} from '../../../../utils/custom-event';
 import Logger from '../../../../utils/logger';
 import LivenessSuccess from '../../components/liveness-success';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
@@ -50,8 +54,11 @@ const Retry = () => {
     biometricInitMutation.mutate(
       { authToken },
       {
-        onSuccess() {
+        onSuccess({ deviceResponseJson }) {
           setTimeout(() => {
+            sendCustomEvent(FPCustomEvents.receivedDeviceResponseJson, {
+              deviceResponseJson,
+            });
             send({ type: 'succeeded' });
           }, SUCCESS_TRANSITION_DELAY_MS);
         },

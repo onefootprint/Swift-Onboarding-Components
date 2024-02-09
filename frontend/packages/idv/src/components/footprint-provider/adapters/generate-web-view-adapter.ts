@@ -33,9 +33,26 @@ const generateWebViewAdapter = (): WebViewAdapterReturn => {
 
   const on = () => () => {};
 
-  const complete = ({ validationToken }: CompletePayload): void => {
+  const complete = ({
+    validationToken,
+    delay = 0,
+    authToken,
+    deviceResponseJson,
+  }: CompletePayload): void => {
     Logger.info('Completing footprint from web view adapter');
-    setLocation({ validation_token: validationToken });
+    const location: Record<string, string> = {
+      validation_token: validationToken,
+    };
+    if (authToken && deviceResponseJson) {
+      location.auth_token = authToken;
+      location.device_response = deviceResponseJson;
+    }
+    setTimeout(() => {
+      Logger.info(
+        'Closing footprint after complete timeout from web view adapter',
+      );
+      setLocation(location);
+    }, delay);
   };
 
   return {

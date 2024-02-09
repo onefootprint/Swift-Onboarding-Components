@@ -2,6 +2,7 @@ import getCustomAppearance from '@onefootprint/appearance';
 import { useObserveCollector } from '@onefootprint/dev-tools';
 import type { FootprintVariant } from '@onefootprint/footprint-js';
 import { LAUNCH_DARKLY_CLIENT_SIDE_ID } from '@onefootprint/global-constants';
+import type { IdvCompletePayload } from '@onefootprint/idv';
 import Idv, {
   AppErrorBoundary,
   Logger,
@@ -49,14 +50,21 @@ const Root = ({ variant }: RootProps) => {
     });
   });
 
-  const handleComplete = (validationToken?: string, delay?: number) => {
+  const handleComplete = ({
+    validationToken,
+    delay,
+    authToken: idvAuthToken,
+    deviceResponseJson,
+  }: IdvCompletePayload) => {
     Logger.info(
       'IDV flow is complete, sending validation token back to the tenant',
     );
     if (validationToken) {
       fpProvider.complete({
         validationToken,
-        closeDelay: delay,
+        deviceResponseJson,
+        authToken: idvAuthToken,
+        delay,
       });
     }
   };

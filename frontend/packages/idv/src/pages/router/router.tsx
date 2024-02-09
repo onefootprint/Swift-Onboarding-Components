@@ -2,12 +2,16 @@ import type { L10n } from '@onefootprint/footprint-js';
 import { getErrorMessage } from '@onefootprint/request';
 import { SessionStatus } from '@onefootprint/types';
 import React, { useEffect } from 'react';
+import { useEffectOnce } from 'usehooks-ts';
 
 import { AppErrorBoundary, SessionExpired } from '../../components';
 import { useIdvMachine, useLogStateMachine } from '../../hooks';
 import useValidateSession from '../../hooks/ui/use-validate-session';
 import { FPCustomEvents, getIdentifyBootstrapData, Logger } from '../../utils';
-import createAuthTokenChangedPayload from '../../utils/state-machine/utils/custom-listener';
+import {
+  createAuthTokenChangedPayload,
+  createReceivedDeviceResponseJsonPayload,
+} from '../../utils/state-machine/utils/custom-listener';
 import Complete from '../complete';
 import ConfigInvalid from '../config-invalid';
 import Identify from '../identify';
@@ -36,6 +40,7 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
     sandboxId,
     onClose,
     onComplete,
+    deviceResponseJson,
   } = state.context;
   const isDone = state.matches('complete');
   const shouldShowComplete =
@@ -68,30 +73,54 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
     }
 
     if (isTransfer) {
-      onComplete?.();
+      onComplete?.({});
       return;
     }
 
     if (showCompletionPage) {
-      onComplete?.(validationToken, AUTO_CLOSE_DELAY);
+      onComplete?.({
+        validationToken,
+        delay: AUTO_CLOSE_DELAY,
+        authToken,
+        deviceResponseJson,
+      });
       return;
     }
 
-    onComplete?.(validationToken);
+    onComplete?.({ validationToken, authToken, deviceResponseJson });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDone]);
 
-  useEffect(() => {
-    const listener = (e: Event) => {
+  useEffectOnce(() => {
+    const authTokenListener = (e: Event) => {
       const payload = createAuthTokenChangedPayload(e);
       if (payload) send(payload);
     };
-
-    document.addEventListener(FPCustomEvents.stepUpCompleted, listener);
-    return function cleanup() {
-      document.removeEventListener(FPCustomEvents.stepUpCompleted, listener);
+    const deviceResponseJsonListener = (e: Event) => {
+      const payload = createReceivedDeviceResponseJsonPayload(e);
+      if (payload) send(payload);
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    document.addEventListener(
+      FPCustomEvents.stepUpCompleted,
+      authTokenListener,
+    );
+    document.addEventListener(
+      FPCustomEvents.receivedDeviceResponseJson,
+      deviceResponseJsonListener,
+    );
+
+    return function cleanup() {
+      document.removeEventListener(
+        FPCustomEvents.stepUpCompleted,
+        authTokenListener,
+      );
+      document.removeEventListener(
+        FPCustomEvents.receivedDeviceResponseJson,
+        deviceResponseJsonListener,
+      );
+    };
+  });
 
   return (
     <AppErrorBoundary onReset={() => send({ type: 'reset' })}>
@@ -121,7 +150,6 @@ const Router = ({ l10n }: { l10n?: L10n }) => {
           overallOutcome={overallOutcome}
           idDocOutcome={idDocOutcome}
           onClose={onClose}
-          onComplete={onComplete}
           onDone={payload => send({ type: 'onboardingCompleted', payload })}
           l10n={l10n}
         />
