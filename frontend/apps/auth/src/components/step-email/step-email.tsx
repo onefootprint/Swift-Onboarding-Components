@@ -41,12 +41,9 @@ const StepEmail = ({ children, Header }: StepEmailProps) => {
           send({
             type: 'identified',
             payload: {
-              availableChallengeKinds: res.user?.availableChallengeKinds,
+              user: res.user,
               email: emailFromForm,
-              hasSyncablePassKey: res.user?.hasSyncablePasskey,
-              isUnverified: !!res.user?.isUnverified,
               successfulIdentifier: { email: emailFromForm },
-              userFound: !!res.user,
             },
           });
         },

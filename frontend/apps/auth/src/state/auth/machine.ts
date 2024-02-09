@@ -1,18 +1,23 @@
 import type { DeviceInfo } from '@onefootprint/idv';
-import { getCanChallengeBiometrics } from '@onefootprint/idv';
 import type { ObConfigAuth, PublicOnboardingConfig } from '@onefootprint/types';
+import { ChallengeKind } from '@onefootprint/types';
+import compose from 'lodash/fp/compose';
 import { assign, createMachine } from 'xstate';
+
+import { isEmail, isSms } from '@/src/utils';
 
 import {
   hasBootstrapTruthyValue,
   hasEmailAndPhoneNumber,
-  isBiometricChallengeAllowed,
-  isEmailChallengePossible,
   isNoPhoneFlow,
-  isUserNotFoundOrHasPhoneNumber,
-  isUserNotFoundOrNoChallengesAvailable,
+  isUserFoundWithMultipleChallenges,
+  isUserFoundWithSingleChallenge,
 } from './predicates';
-import type { AuthMachineContext, AuthMachineEvents } from './types';
+import type {
+  AuthMachineContext,
+  AuthMachineEvents,
+  IdentifiedEvent,
+} from './types';
 
 export type AuthMachineArgs = {
   authToken?: string;
@@ -23,6 +28,34 @@ export type AuthMachineArgs = {
   sandboxId?: string;
   showLogo?: boolean;
 };
+
+type Ignore = unknown;
+type KindPayload = { payload: ChallengeKind };
+const getKindPayload = (_: Ignore, { payload }: KindPayload) => payload;
+const isPayloadEmail = compose(isEmail, getKindPayload);
+const isPayloadSms = compose(isSms, getKindPayload);
+
+const CHALLENGE_SELECTION_TRANSITIONS = [
+  {
+    cond: (_: AuthMachineContext, event: IdentifiedEvent) =>
+      isUserFoundWithSingleChallenge(event.payload.user, ChallengeKind.email),
+    target: 'emailChallenge',
+    actions: ['assignIdentifySuccessResult'],
+  },
+  {
+    cond: (_: AuthMachineContext, event: IdentifiedEvent) =>
+      isUserFoundWithSingleChallenge(event.payload.user, ChallengeKind.sms),
+    target: 'smsChallenge',
+    actions: ['assignIdentifySuccessResult'],
+  },
+  // If there are multiple available challenge kinds or there's only biometric, go to the selector screen
+  {
+    cond: (_: AuthMachineContext, event: IdentifiedEvent) =>
+      isUserFoundWithMultipleChallenges(event.payload.user),
+    target: 'challengeSelectOrPasskey',
+    actions: ['assignIdentifySuccessResult'],
+  },
+];
 
 export const getMachineArgs = ({
   authToken,
@@ -46,6 +79,9 @@ export const getMachineArgs = ({
       }
     : ({} as AuthMachineContext);
 
+// TODO rename to identify machine
+// TODO these "back" transitions are super error prone. Would be much better to maintain a history
+// of states
 const createAuthMachine = (args: AuthMachineArgs) =>
   createMachine(
     {
@@ -92,50 +128,29 @@ const createAuthMachine = (args: AuthMachineArgs) =>
                 actions: ['assignPhone'],
               },
               {
-                cond: (c, event) => !event.payload.phoneNumber,
+                cond: (_, event) => !event.payload.phoneNumber,
                 target: 'phoneIdentification',
                 actions: ['assignEmail'],
               },
             ],
-            identified: [
-              {
-                cond: isEmailChallengePossible,
-                target: 'emailChallenge',
-                actions: ['assignIdentifySuccessResult'],
-              },
-              {
-                cond: isBiometricChallengeAllowed,
-                target: 'biometricChallenge',
-                actions: ['assignIdentifySuccessResult'],
-              },
-              {
-                target: 'smsChallenge',
-                actions: ['assignIdentifySuccessResult'],
-              },
-            ],
+            identified: CHALLENGE_SELECTION_TRANSITIONS,
           },
         },
         emailIdentification: {
           on: {
             identified: [
+              // Login to existing vault with any available challenge method. If there is only
+              // one available, go directly to that challenge
+              ...CHALLENGE_SELECTION_TRANSITIONS,
+              // If in a no-phone flow, create a new vault with only the email
               {
-                cond: isEmailChallengePossible,
+                cond: c => isNoPhoneFlow(c),
                 target: 'emailChallenge',
                 actions: ['assignIdentifySuccessResult'],
               },
+              // Otherwise, proceed to see if we can find the user by phone
               {
-                cond: (_, event) =>
-                  isUserNotFoundOrNoChallengesAvailable(event.payload),
                 target: 'phoneIdentification',
-                actions: ['assignIdentifySuccessResult'],
-              },
-              {
-                cond: isBiometricChallengeAllowed,
-                target: 'biometricChallenge',
-                actions: ['assignIdentifySuccessResult'],
-              },
-              {
-                target: 'smsChallenge',
                 actions: ['assignIdentifySuccessResult'],
               },
             ],
@@ -148,27 +163,50 @@ const createAuthMachine = (args: AuthMachineArgs) =>
           on: {
             navigatedToPrevPage: {
               target: 'emailIdentification',
+              actions: ['resetPhone', 'resetIdentifyState'],
             },
             identifyReset: {
               target: 'emailIdentification',
               actions: ['reset'],
             },
             identified: [
-              {
-                cond: isEmailChallengePossible,
-                target: 'emailChallenge',
-                actions: ['assignIdentifySuccessResult'],
-              },
-              {
-                cond: isBiometricChallengeAllowed,
-                target: 'biometricChallenge',
-                actions: ['assignIdentifySuccessResult'],
-              },
+              // Login to existing vault with any available challenge method. If there is only
+              // one available, go directly to that challenge
+              ...CHALLENGE_SELECTION_TRANSITIONS,
+              // Otherwise, initiate a signup challenge via SMS
               {
                 target: 'smsChallenge',
                 actions: ['assignIdentifySuccessResult'],
               },
             ],
+          },
+        },
+        challengeSelectOrPasskey: {
+          on: {
+            navigatedToPrevPage: [
+              // User was identified via email, so go back to the email page
+              {
+                cond: ctx => !!ctx.identify.successfulIdentifier?.email,
+                target: 'emailIdentification',
+                actions: ['resetIdentifyState'],
+              },
+              {
+                target: 'phoneIdentification',
+                actions: ['resetIdentifyState'],
+              },
+            ],
+            identifyReset: {
+              target: 'emailIdentification',
+              actions: ['reset'],
+            },
+            goToChallenge: [
+              { cond: isPayloadEmail, target: 'emailChallenge' },
+              { cond: isPayloadSms, target: 'smsChallenge' },
+            ],
+            challengeSucceeded: {
+              target: 'success',
+              actions: ['assignAuthToken'],
+            },
           },
         },
         smsChallenge: {
@@ -185,53 +223,36 @@ const createAuthMachine = (args: AuthMachineArgs) =>
               actions: ['reset'],
             },
             navigatedToPrevPage: [
+              // If the user had only one available challenge kind, we should go back to the identification screen.
+              // If they were identified by email, go back to the email screen
               {
-                target: 'biometricChallenge',
-                cond: context => {
-                  const {
-                    device,
-                    challenge: { availableChallengeKinds, hasSyncablePassKey },
-                  } = context;
-                  return !!getCanChallengeBiometrics(
-                    availableChallengeKinds,
-                    hasSyncablePassKey,
-                    device,
-                  );
-                },
-              },
-              {
-                cond: isUserNotFoundOrHasPhoneNumber,
-                target: 'phoneIdentification',
-              },
-              {
+                cond: c =>
+                  isUserFoundWithSingleChallenge(
+                    c.identify.user,
+                    ChallengeKind.sms,
+                  ) && 'email' in (c.identify.successfulIdentifier || {}),
                 target: 'emailIdentification',
+                actions: ['resetIdentifyState'],
               },
-            ],
-          },
-        },
-        biometricChallenge: {
-          on: {
-            challengeReceived: {
-              actions: ['assignChallengeData'],
-            },
-            challengeSucceeded: {
-              target: 'success',
-              actions: ['assignAuthToken'],
-            },
-            identifyReset: {
-              target: 'emailIdentification',
-              actions: ['reset'],
-            },
-            changeChallengeToSms: {
-              target: 'smsChallenge',
-            },
-            navigatedToPrevPage: [
+              // If the user had only one available challenge kind, go back to the phone input screen
               {
-                cond: isUserNotFoundOrHasPhoneNumber,
+                cond: c =>
+                  isUserFoundWithSingleChallenge(
+                    c.identify.user,
+                    ChallengeKind.sms,
+                  ) && 'phoneNumber' in (c.identify.successfulIdentifier || {}),
                 target: 'phoneIdentification',
+                actions: ['resetIdentifyState'],
               },
+              // If we were logging into an existing user and had multiple challenge kinds, go to the challenge select screen
               {
-                target: 'emailIdentification',
+                cond: c => !!c.identify.user,
+                target: 'challengeSelectOrPasskey',
+              },
+              // Otherwise, we were making a new vault. Just go back to the phone input screen
+              {
+                target: 'phoneIdentification',
+                actions: ['resetIdentifyState'],
               },
             ],
           },
@@ -249,9 +270,28 @@ const createAuthMachine = (args: AuthMachineArgs) =>
               target: 'emailIdentification',
               actions: ['reset'],
             },
-            navigatedToPrevPage: {
-              target: 'emailIdentification',
-            },
+            navigatedToPrevPage: [
+              // If the user had only email as an available challenge kind, go back to the email input screen
+              {
+                cond: c =>
+                  isUserFoundWithSingleChallenge(
+                    c.identify.user,
+                    ChallengeKind.email,
+                  ),
+                target: 'emailIdentification',
+                actions: ['resetIdentifyState'],
+              },
+              // If we were logging into an existing user and had multiple challenge kinds, go to the challenge select screen
+              {
+                cond: c => !!c.identify.user,
+                target: 'challengeSelectOrPasskey',
+              },
+              // Otherwise, go back to email input
+              {
+                target: 'emailIdentification',
+                actions: ['resetIdentifyState'],
+              },
+            ],
           },
         },
         success: {
@@ -268,6 +308,7 @@ const createAuthMachine = (args: AuthMachineArgs) =>
           }
           const isEmailChanged = email && context.identify.email !== email;
           if (isEmailChanged) {
+            // Only clear the challenge data if the email has changed, otherwise old data could still be valid
             context.challenge.challengeData = undefined;
           }
           context.identify.email = email;
@@ -281,24 +322,25 @@ const createAuthMachine = (args: AuthMachineArgs) =>
           const isPhoneChanged =
             phoneNumber && context.identify.phoneNumber !== phoneNumber;
           if (isPhoneChanged) {
+            // Only clear the challenge data if the phone has changed, otherwise old data could still be valid
             context.challenge.challengeData = undefined;
           }
           context.identify.phoneNumber = phoneNumber;
           return context;
         }),
+        resetPhone: assign(context => {
+          context.identify.phoneNumber = undefined;
+          return context;
+        }),
+        resetIdentifyState: assign(context => {
+          context.identify.successfulIdentifier = undefined;
+          context.identify.user = undefined;
+          return context;
+        }),
         assignIdentifySuccessResult: assign((context, event) => {
-          const {
-            email,
-            phoneNumber,
-            userFound,
-            isUnverified,
-            availableChallengeKinds,
-            successfulIdentifier,
-            hasSyncablePassKey,
-          } = event.payload;
-          context.challenge.hasSyncablePassKey = hasSyncablePassKey;
-          context.identify.userFound = userFound;
-          context.identify.isUnverified = isUnverified;
+          const { email, phoneNumber, user, successfulIdentifier } =
+            event.payload;
+          context.identify.user = user;
           const isEmailChanged = email && context.identify.email !== email;
           const isPhoneChanged =
             phoneNumber && context.identify.phoneNumber !== phoneNumber;
@@ -310,9 +352,6 @@ const createAuthMachine = (args: AuthMachineArgs) =>
           }
           if (phoneNumber) {
             context.identify.phoneNumber = phoneNumber;
-          }
-          if (availableChallengeKinds) {
-            context.challenge.availableChallengeKinds = availableChallengeKinds;
           }
           if (successfulIdentifier) {
             context.identify.successfulIdentifier = successfulIdentifier;

@@ -44,7 +44,8 @@ const StepSms = ({ children, Header }: StepPhoneProps) => {
   };
 
   const getStepTitle = (): string => {
-    const shouldShowWelcomeBack = identify.userFound && !identify.isUnverified;
+    const shouldShowWelcomeBack =
+      !!identify.user && !identify.user?.isUnverified;
     return shouldShowWelcomeBack
       ? t('sms-step.welcome-back-title')
       : t('sms-step.title');

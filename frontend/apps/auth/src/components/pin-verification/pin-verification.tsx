@@ -40,7 +40,7 @@ const PinVerification = ({
   const [state, send] = useAuthMachine();
   const {
     challenge: { challengeData: data },
-    identify: { email, phoneNumber, sandboxId, userFound },
+    identify: { email, phoneNumber, sandboxId, user },
     obConfigAuth,
   } = state.context;
   const commonMutationProps = {
@@ -65,11 +65,6 @@ const PinVerification = ({
   const isLoading = mutLoginChallenge.isLoading || mutSignupChallenge.isLoading;
   const isPending = isLoading || !challengeData;
   const isVerifying = mutIdentifyVerify.isLoading;
-
-  const isPinFormSuccess = (): boolean => {
-    if (!mutIdentifyVerify.isSuccess) return false;
-    return userFound || 'email' in identifier || !!email;
-  };
 
   const handlePinValidationSucceeded = ({
     authToken,
@@ -189,7 +184,7 @@ const PinVerification = ({
       return;
     }
 
-    if (userFound) {
+    if (user) {
       initiateLoginChallenge();
     } else {
       initiateSignupChallenge();
@@ -222,7 +217,7 @@ const PinVerification = ({
       hasError={mutIdentifyVerify.isError}
       isPending={isPending}
       isResendLoading={isLoading}
-      isSuccess={isPinFormSuccess()}
+      isSuccess={mutIdentifyVerify.isSuccess}
       isVerifying={isVerifying}
       onComplete={verifyPin}
       onResend={handleResend}

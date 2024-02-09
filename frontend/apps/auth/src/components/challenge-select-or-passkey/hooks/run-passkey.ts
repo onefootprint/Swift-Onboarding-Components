@@ -1,18 +1,21 @@
 import { useRequestErrorToast } from '@onefootprint/hooks';
-import { IcoFaceid24 } from '@onefootprint/icons';
 import { getBiometricChallengeResponse } from '@onefootprint/idv';
 import { getErrorMessage } from '@onefootprint/request';
 import type { LoginChallengeResponse } from '@onefootprint/types';
 import { ChallengeKind } from '@onefootprint/types';
-import { Button, Typography, useToast } from '@onefootprint/ui';
-import React, { useState } from 'react';
+import { useToast } from '@onefootprint/ui';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useIdentifyVerify, useLoginChallenge } from '@/src/queries';
 import { useAuthMachine } from '@/src/state';
 
-const Biometric = () => {
-  const [state, send] = useAuthMachine();
+type UseRunPasskeyArgs = {
+  onSuccess: (_: { authToken: string }) => void;
+};
+
+const useRunPasskey = ({ onSuccess }: UseRunPasskeyArgs) => {
+  const [state] = useAuthMachine();
   const {
     identify: { successfulIdentifier, sandboxId },
     obConfigAuth,
@@ -27,7 +30,7 @@ const Biometric = () => {
   const [isRunningWebauthn, setIsRunningWebauthn] = useState(false);
   const isWaiting = isRunningWebauthn || mutIdentifyVerify.isLoading;
 
-  const handleComplete = () => {
+  const initiatePasskeyChallenge = () => {
     if (!successfulIdentifier) {
       console.error(
         'No successful identifier found while initiating login biometric challenge',
@@ -108,9 +111,7 @@ const Biometric = () => {
         challengeToken,
       },
       {
-        onSuccess: ({ authToken }) => {
-          send({ type: 'challengeSucceeded', payload: { authToken } });
-        },
+        onSuccess,
         onError: (error: unknown) => {
           console.error(
             `Error while verifying biometric challenge: ${getErrorMessage(
@@ -125,24 +126,10 @@ const Biometric = () => {
     );
   };
 
-  if (isWaiting) {
-    return (
-      <Typography variant="label-3" color="secondary" sx={{ marginBottom: 6 }}>
-        {t('loading')}
-      </Typography>
-    );
-  }
-
-  return (
-    <Button
-      fullWidth
-      loading={mutLoginChallenge.isLoading}
-      onClick={handleComplete}
-      prefixIcon={IcoFaceid24}
-    >
-      {t('cta')}
-    </Button>
-  );
+  return {
+    isWaiting,
+    initiatePasskeyChallenge,
+  };
 };
 
-export default Biometric;
+export default useRunPasskey;

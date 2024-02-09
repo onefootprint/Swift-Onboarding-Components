@@ -54,12 +54,9 @@ const StepPhone = ({ children, Header }: StepPhoneProps) => {
           send({
             type: 'identified',
             payload: {
-              availableChallengeKinds: res.user?.availableChallengeKinds,
-              hasSyncablePassKey: res.user?.hasSyncablePasskey,
-              isUnverified: !!res.user?.isUnverified,
+              user: res.user,
               phoneNumber: phoneFromForm,
               successfulIdentifier: { phoneNumber: phoneFromForm },
-              userFound: !!res.user,
             },
           });
         },

@@ -38,7 +38,10 @@ const StepBootstrap = ({ children }: StepBootstrapProps) => {
     }
 
     const identifyResult = await memo.identify(email, phoneNumber);
-    if (!identifyResult || !identifyResult.availableChallengeKinds?.length) {
+    if (
+      !identifyResult ||
+      !identifyResult.user?.availableChallengeKinds?.length
+    ) {
       send({ type: 'identifyFailed', payload: { email, phoneNumber } });
       return;
     }
@@ -46,13 +49,10 @@ const StepBootstrap = ({ children }: StepBootstrapProps) => {
     send({
       type: 'identified',
       payload: {
-        userFound: true,
-        isUnverified: identifyResult.isUnverified || false,
+        user: identifyResult.user,
         email,
         phoneNumber,
         successfulIdentifier: identifyResult.successfulIdentifier,
-        availableChallengeKinds: identifyResult.availableChallengeKinds,
-        hasSyncablePassKey: identifyResult.hasSyncablePassKey,
       },
     });
   };

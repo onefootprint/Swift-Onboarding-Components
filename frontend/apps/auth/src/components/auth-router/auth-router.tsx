@@ -7,9 +7,9 @@ import { useAuthMachine } from '@/src/state';
 import type { DoneArgs, HeaderProps } from '@/src/types';
 import { getAuthLeftNavButton } from '@/src/utils';
 
+import ChallengeSelectOrPasskey from '../challenge-select-or-passkey';
 import EmailChallenge from '../email-challenge';
 import BaseLoading from '../loading/base-loading';
-import PasskeyChallenge from '../passkey-challenge';
 import StepBootstrap from '../step-bootstrap';
 import StepEmail from '../step-email';
 import StepPhone from '../step-phone';
@@ -74,19 +74,12 @@ const AuthRouter = ({
       </StepPhone>
     );
   }
+  if (state.matches('challengeSelectOrPasskey')) {
+    return <ChallengeSelectOrPasskey Header={Header} />;
+  }
   if (state.matches('smsChallenge')) {
     return (
       <StepSms Header={Header}>{children?.('smsChallenge', send)}</StepSms>
-    );
-  }
-  if (state.matches('biometricChallenge')) {
-    return (
-      <PasskeyChallenge
-        Header={Header}
-        onSmsButtonClick={() => send({ type: 'changeChallengeToSms' })}
-      >
-        {children?.('biometricChallenge', send)}
-      </PasskeyChallenge>
     );
   }
   if (state.matches('emailChallenge')) {

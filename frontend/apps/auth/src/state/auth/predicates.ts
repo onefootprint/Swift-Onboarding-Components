@@ -1,13 +1,10 @@
-import {
-  getCanChallengeBiometrics,
-  shouldChallengeEmail,
-} from '@onefootprint/idv';
+import { shouldChallengeEmail } from '@onefootprint/idv';
+import type { ChallengeKind } from '@onefootprint/types';
+import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
 
 import type { EmailAndOrPhone } from '@/src/types';
 
 import type { AuthMachineContext, IdentifiedEvent } from './types';
-
-type IdentifiedPayload = IdentifiedEvent['payload'];
 
 export const hasBootstrapTruthyValue = (c: AuthMachineContext): boolean =>
   Object.values(c.bootstrapData).some(Boolean);
@@ -18,32 +15,26 @@ export const isNoPhoneFlow = (c: AuthMachineContext): boolean =>
 export const hasEmailAndPhoneNumber = (x: EmailAndOrPhone): boolean =>
   !!x.email && !!x.phoneNumber;
 
-export const isUserNotFoundOrNoChallengesAvailable = (
-  x: IdentifiedPayload,
-): boolean =>
-  !x.userFound ||
-  !x.availableChallengeKinds ||
-  x.availableChallengeKinds.length === 0;
+export const isUserFound = (user: IdentifiedUser | undefined): boolean =>
+  !!user;
 
-export const isUserNotFoundOrHasPhoneNumber = (
-  c: AuthMachineContext,
-): boolean => !c.identify.userFound || !!c.identify.phoneNumber;
+export const isUserFoundWithMultipleChallenges = (
+  user: IdentifiedUser | undefined,
+): boolean => !!user && user?.availableChallengeKinds?.length > 1;
+
+export const isUserFoundWithSingleChallenge = (
+  user: IdentifiedUser | undefined,
+  kind: ChallengeKind,
+): boolean =>
+  !!user &&
+  user?.availableChallengeKinds?.length === 1 &&
+  user?.availableChallengeKinds[0] === kind;
 
 export const isEmailChallengePossible = (
   c: AuthMachineContext,
   e: IdentifiedEvent,
 ): boolean =>
-  shouldChallengeEmail(isNoPhoneFlow(c), e.payload.availableChallengeKinds);
-
-export const isBiometricChallengeAllowed = (
-  c: AuthMachineContext,
-  e: IdentifiedEvent,
-): boolean => {
-  const { device } = c;
-  const { availableChallengeKinds, hasSyncablePassKey } = e.payload;
-  return !!getCanChallengeBiometrics(
-    availableChallengeKinds,
-    hasSyncablePassKey,
-    device,
+  shouldChallengeEmail(
+    isNoPhoneFlow(c),
+    e.payload.user?.availableChallengeKinds,
   );
-};

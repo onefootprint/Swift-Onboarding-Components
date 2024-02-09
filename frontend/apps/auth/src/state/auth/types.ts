@@ -7,6 +7,7 @@ import type {
   OverallOutcome,
   PublicOnboardingConfig,
 } from '@onefootprint/types';
+import type { IdentifiedUser } from '@onefootprint/types/src/api/identify';
 
 import type { EmailAndOrPhone } from '@/src/types';
 
@@ -23,36 +24,26 @@ export type AuthMachineContext = {
 };
 
 export type IdentifyResult = {
-  email?: string;
-  isUnverified?: boolean;
-  phoneNumber?: string;
-  sandboxId?: string;
+  user?: IdentifiedUser;
   successfulIdentifier?: EmailAndOrPhone;
-  userFound?: boolean;
+  sandboxId?: string;
+  email?: string;
+  phoneNumber?: string;
 };
 
 export type MachineChallengeContext = {
   authToken?: string;
-  availableChallengeKinds?: ChallengeKind[];
   challengeData?: ChallengeData;
-  hasSyncablePassKey?: boolean;
 };
 
 export type IdentifiedEvent = {
   type: 'identified';
-  payload: {
-    email?: string;
-    phoneNumber?: string;
-    successfulIdentifier?: EmailAndOrPhone;
-    userFound: boolean;
-    isUnverified: boolean;
-    availableChallengeKinds?: ChallengeKind[];
-    hasSyncablePassKey?: boolean;
-  };
+  payload: IdentifyResult;
 };
 
 export type AuthMachineEvents =
   | IdentifiedEvent
+  | { type: 'goToChallenge'; payload: ChallengeKind }
   | { type: 'authTokenInvalid' }
   | { type: 'bootstrapDataInvalid' }
   | { type: 'challengeReceived'; payload: ChallengeData }

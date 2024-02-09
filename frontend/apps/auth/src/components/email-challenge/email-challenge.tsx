@@ -22,9 +22,9 @@ const EmailChallenge = ({ children, Header }: EmailChallengeProps) => {
   const [state, send] = useAuthMachine();
   const toast = useToast();
   const {
-    identify: { userFound, email = '', isUnverified, successfulIdentifier },
+    identify: { email = '', successfulIdentifier, user },
   } = state.context;
-  const shouldShowWelcomeBack = userFound && !isUnverified;
+  const shouldShowWelcomeBack = !!user && !user?.isUnverified;
   const title = shouldShowWelcomeBack
     ? t('email-challenge.welcome-back-title')
     : t('email-challenge.title');

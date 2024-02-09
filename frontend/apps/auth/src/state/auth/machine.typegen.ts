@@ -20,12 +20,14 @@ export interface Typegen0 {
     assignPhone: 'identifyFailed';
     assignSandboxId: 'sandboxIdChanged';
     reset: 'bootstrapDataInvalid' | 'identifyReset';
+    resetIdentifyState: 'navigatedToPrevPage';
+    resetPhone: 'navigatedToPrevPage';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
   matchesStates:
-    | 'biometricChallenge'
+    | 'challengeSelectOrPasskey'
     | 'emailChallenge'
     | 'emailIdentification'
     | 'init'
