@@ -1,5 +1,6 @@
 import styled, { css } from '@onefootprint/styled';
 import { Select, Stack, Typography } from '@onefootprint/ui';
+import type { ParseKeys } from 'i18next';
 import Head from 'next/head';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,7 +28,7 @@ const Home = () => {
   };
 
   const dateRangeOptions = Object.values(OrgMetricsDateRange).map(value => ({
-    label: t(`onboarding-metrics.filters.${value}`),
+    label: t(`onboarding-metrics.filters.${value}` as ParseKeys<'common'>),
     value,
   }));
 
@@ -61,6 +62,16 @@ const Home = () => {
           </Typography>
           <Stack gap={4}>
             <div style={{ width: '210px' }}>
+              <Select
+                size="compact"
+                options={dateRangeOptions}
+                onChange={newDateRange =>
+                  handleDateFilterChange(newDateRange.value)
+                }
+                value={dateFilterValue}
+              />
+            </div>
+            <div style={{ width: '210px' }}>
               {playbooksData && playbooksData.length > 1 && (
                 <Select
                   size="compact"
@@ -71,16 +82,6 @@ const Home = () => {
                   value={playbooksFilterValue}
                 />
               )}
-            </div>
-            <div style={{ width: '210px' }}>
-              <Select
-                size="compact"
-                options={dateRangeOptions}
-                onChange={newDateRange =>
-                  handleDateFilterChange(newDateRange.value)
-                }
-                value={dateFilterValue}
-              />
             </div>
           </Stack>
         </SectionTitle>
