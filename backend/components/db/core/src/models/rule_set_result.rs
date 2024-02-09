@@ -7,7 +7,7 @@ use super::{
     rule_result::{NewRuleResult, RuleResult},
     scoped_vault::ScopedVault,
 };
-use crate::{DbResult, PgConn, TxnPgConn};
+use crate::{DbResult, OptionalNonNullVec, PgConn, TxnPgConn};
 use chrono::{DateTime, Duration, Utc};
 use db_schema::schema::{
     risk_signal, rule_set_result, rule_set_result_risk_signal_junction, scoped_vault, workflow,
@@ -32,6 +32,11 @@ pub struct RuleSetResult {
     pub workflow_id: Option<WorkflowId>, // set if the rule evaluation was done within the context of a particular Workflow decision. This would be None for other cases like adhoc rule execution via internal endpoints or backtesting
     pub kind: RuleSetResultKind, // indicates the general purpose or insertion point for this evaluation of rules. Enables us to differentiate rule evalution done as part of the Kyc waterfall vs the final workflow decision vs stuff like backtesting/adhoc evaluations
     pub action_triggered: Option<RuleAction>, // the final chosen action based on the evaluation of all rules. None would indicate that no rules evaluated to true
+    // which actions were actually considered when picking the finaly `action_triggered`. eg: if we have already StepUp'd to an Identity doc for the current workflow
+    // then we can't repeat that action, so triggered rules with that action wouldn't actually cause the final rsr.action_triggered to be that repeated action
+    // Note: Not backfilled for all historical rules. `None` for historical non-backfilled cases.
+    #[diesel(deserialize_as = OptionalNonNullVec<RuleAction>)]
+    pub allowed_actions: Option<Vec<RuleAction>>,
 }
 
 #[derive(Debug, Clone, Insertable)]
@@ -44,6 +49,7 @@ struct NewRuleSetResult {
     pub workflow_id: Option<WorkflowId>,
     pub kind: RuleSetResultKind,
     pub action_triggered: Option<RuleAction>,
+    pub allowed_actions: Option<Vec<RuleAction>>
 }
 
 #[derive(Debug, Clone)]
@@ -55,6 +61,7 @@ pub struct NewRuleSetResultArgs<'a> {
     pub action_triggered: Option<RuleAction>,
     pub rule_results: Vec<NewRuleResultArgs<'a>>,
     pub risk_signal_ids: Vec<&'a RiskSignalId>,
+    pub allowed_actions: Vec<RuleAction>
 }
 
 #[derive(Debug, Clone)]
@@ -84,6 +91,7 @@ impl RuleSetResult {
             workflow_id: args.workflow_id.cloned(),
             kind: args.kind,
             action_triggered: args.action_triggered,
+            allowed_actions: Some(args.allowed_actions)
         };
 
         let rule_set_result = diesel::insert_into(rule_set_result::table)
@@ -313,6 +321,7 @@ mod tests {
                     },
                 ],
                 risk_signal_ids: risk_signals.iter().map(|rs| &rs.id).collect_vec(),
+                allowed_actions: RuleAction::all_rule_actions()
             },
         )
         .unwrap();
@@ -322,6 +331,7 @@ mod tests {
         assert_eq!(None, rule_set_result.workflow_id);
         assert_eq!(RuleSetResultKind::Adhoc, rule_set_result.kind);
         assert_eq!(Some(RuleAction::ManualReview), rule_set_result.action_triggered);
+        assert!(!rule_set_result.allowed_actions.unwrap().is_empty());
 
         assert_have_same_elements(
             vec![(rule1.id, true), (rule2.id, false), (rule3.id, true)],
@@ -418,6 +428,7 @@ mod tests {
                 action_triggered: Some(RuleAction::Fail),
                 rule_results: vec![],
                 risk_signal_ids: risk_signals.iter().map(|rs| &rs.id).collect_vec(),
+                allowed_actions: RuleAction::all_rule_actions()
             },
         )
         .unwrap();

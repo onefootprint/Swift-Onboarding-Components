@@ -63,7 +63,7 @@ pub fn evaluate_workflow_decision(
         Some(wf_id),
         kind,
         &risk_signals,
-        rule_eval_config.clone(),
+        &rule_eval_config,
     )?;
 
     let should_commit_rules: Vec<_> = [base_kyc_rules(), super::default_rules::ssn_rules()]
@@ -77,7 +77,7 @@ pub fn evaluate_workflow_decision(
     let (_, should_commit_action) = eval::evaluate_rule_set(
         should_commit_rules,
         &risk_signals.iter().map(|rs| rs.reason_code.clone()).collect_vec(),
-        rule_eval_config,
+        &rule_eval_config,
     );
     let decision = Decision {
         decision_status: rule_set_result.action_triggered.into(),
@@ -99,7 +99,7 @@ pub fn evaluate_rules(
     wf_id: Option<&WorkflowId>,
     kind: RuleSetResultKind,
     risk_signals: &[RiskSignal],
-    rule_eval_config: RuleEvalConfig, // could maybe query for DocReq in here and not need to pass this in
+    rule_eval_config: &RuleEvalConfig, // could maybe query for DocReq in here and not need to pass this in
 ) -> ApiResult<(RuleSetResult, Vec<RuleResult>)> {
     let (obc, _) = ObConfiguration::get(conn, obc_id)?;
     let rules = RuleInstance::list(conn, &obc.tenant_id, obc.is_live, obc_id)?;
@@ -129,6 +129,7 @@ pub fn evaluate_rules(
                 })
                 .collect_vec(),
             risk_signal_ids: risk_signals.iter().map(|rs| &rs.id).collect_vec(),
+            allowed_actions: rule_eval_config.allowed_rule_actions.clone()
         },
     )?;
 
@@ -233,7 +234,7 @@ mod tests {
             None,
             RuleSetResultKind::Adhoc,
             &risk_signals,
-            config,
+            &config,
         )
         .unwrap();
 

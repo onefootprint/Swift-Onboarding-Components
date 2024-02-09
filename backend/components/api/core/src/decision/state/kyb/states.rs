@@ -419,7 +419,7 @@ impl OnAction<MakeDecision, KybState> for KybDecisioning {
                 Some(&self.wf_id),
                 RuleSetResultKind::WorkflowDecision,
                 &kyb_rs,
-                RuleEvalConfig::default(),
+                &RuleEvalConfig::default(),
             )?;
             (
                 Decision {

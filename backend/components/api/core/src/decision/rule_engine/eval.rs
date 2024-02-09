@@ -42,7 +42,7 @@ impl HasRule for RuleInstance {
 // Interface to help map from what we've collected (documents) to the appropriate rules we should evaluate
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct RuleEvalConfig {
-    allowed_rule_actions: Vec<RuleAction>,
+    pub allowed_rule_actions: Vec<RuleAction>,
 }
 impl RuleEvalConfig {
     pub fn new(doc_kinds_collected: Vec<DocKind>) -> Self {
@@ -88,7 +88,7 @@ pub fn evaluate_rule_set<T: HasRule>(
     input: &[FootprintReasonCode],
     // a bit annoying to have to put this here, but this is our one case currently where a ruleset is evaluated but a particular action is not allowed. If we have already collected a document or already step'd up, we want to ensure that we don't chose that action again
     // maybe soon we'll put StepUp rules in a separate group and evaluate those separately and then can remove this from here
-    rule_config: RuleEvalConfig,
+    rule_config: &RuleEvalConfig,
 ) -> (Vec<(T, bool)>, Option<RuleAction>) {
     let rule_results = rules
         .into_iter()
@@ -276,7 +276,7 @@ pub mod tests {
         docs_collected: Vec<DocKind>,
     ) -> (Vec<bool>, Option<RuleAction>) {
         let config = RuleEvalConfig::new(docs_collected);
-        let (rule_results, action) = evaluate_rule_set(rules, &input, config);
+        let (rule_results, action) = evaluate_rule_set(rules, &input, &config);
         (rule_results.into_iter().map(|(_, e)| e).collect_vec(), action)
     }
 

@@ -732,6 +732,7 @@ diesel::table! {
         workflow_id -> Nullable<Text>,
         kind -> Text,
         action_triggered -> Nullable<Text>,
+        allowed_actions -> Nullable<Array<Nullable<Text>>>,
     }
 }
 

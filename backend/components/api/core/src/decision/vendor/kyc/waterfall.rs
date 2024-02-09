@@ -330,7 +330,7 @@ pub(super) fn eval_rules(res: VendorResult, vw: &VaultWrapper, obc: &ObConfigura
     })
     .collect();
     let (rule_results, action_triggered) =
-        decision::rule_engine::eval::evaluate_rule_set(rules, &reason_codes, RuleEvalConfig::default());
+        decision::rule_engine::eval::evaluate_rule_set(rules, &reason_codes, &RuleEvalConfig::default());
 
     tracing::info!(
         %vendor_api,

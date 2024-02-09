@@ -110,7 +110,7 @@ async fn make_vendor_calls(
             .map(|(frc, _, _)| frc)
             .collect_vec();
     let (rule_results, action_triggered) =
-        decision::rule_engine::eval::evaluate_rule_set(rules, &reason_codes, RuleEvalConfig::default());
+        decision::rule_engine::eval::evaluate_rule_set(rules, &reason_codes, &RuleEvalConfig::default());
 
     Ok(Json(ResponseData::ok(MakeVendorCallsResponse {
         new_vendor_request_ids: vec![vendor_result.verification_request_id],
@@ -265,7 +265,7 @@ async fn shadow_run(
             .map(|(frc, _, _)| frc)
             .collect_vec();
     let (_, action_triggered) =
-        decision::rule_engine::eval::evaluate_rule_set(rules, &reason_codes, RuleEvalConfig::default());
+        decision::rule_engine::eval::evaluate_rule_set(rules, &reason_codes, &RuleEvalConfig::default());
 
     Ok(Json(ResponseData::ok(ShadowRunResult {
         decision_status: action_triggered.into(),
