@@ -1,4 +1,5 @@
 import { ChallengeKind } from '@onefootprint/types';
+import { AuthMethodKind } from '@onefootprint/types/src/data';
 import { describe, expect, it } from 'bun:test';
 
 import {
@@ -288,7 +289,7 @@ describe('machine assigners', () => {
   });
 
   describe('assignUserFound', () => {
-    it('should set values for kind, user dashboard and user found', () => {
+    it('should handle user not found', () => {
       type Meta = Parameters<typeof assignUserFound>['2'];
       const ctx = {
         userDashboard: {
@@ -304,21 +305,53 @@ describe('machine assigners', () => {
         {
           type: 'identifyUserDone',
           payload: {
-            userFound: false,
-            isUnverified: false,
-            hasSyncablePassKey: false,
-            availableChallengeKinds: [
-              ChallengeKind.sms,
-              ChallengeKind.email,
-              ChallengeKind.biometric,
-            ],
-            scrubbedEmail: 'a*.g*.com',
-            scrubbedPhone: '+49**',
+            user: undefined,
           },
         },
         meta,
       );
 
+      expect(result.userFound).toEqual({
+        user: undefined,
+      });
+      expect(result.userFound).toEqual(ctx.userFound!);
+    });
+
+    it('should set values for kind, user dashboard', () => {
+      type Meta = Parameters<typeof assignUserFound>['2'];
+      const ctx = {
+        userDashboard: {
+          email: { status: 'empty' },
+          phone: { status: 'empty' },
+          passkey: { status: 'empty' },
+        },
+      } as UserMachineContext;
+      const meta = {} as Meta;
+      const result = assignUserFound(
+        ctx,
+        {
+          type: 'identifyUserDone',
+          payload: {
+            user: {
+              isUnverified: false,
+              hasSyncablePasskey: false,
+              availableChallengeKinds: [
+                ChallengeKind.sms,
+                ChallengeKind.email,
+                ChallengeKind.biometric,
+              ],
+              authMethods: [
+                { kind: AuthMethodKind.phone, isVerified: true },
+                { kind: AuthMethodKind.email, isVerified: false },
+                { kind: AuthMethodKind.passkey, isVerified: true },
+              ],
+              scrubbedEmail: 'a*.g*.com',
+              scrubbedPhone: '+49**',
+            },
+          },
+        },
+        meta,
+      );
       expect(result.kindToChallenge).toEqual(ChallengeKind.sms);
       expect(result.userDashboard?.email).toEqual({
         status: 'set',
@@ -329,19 +362,6 @@ describe('machine assigners', () => {
         label: '+49••',
       });
       expect(result.userDashboard?.passkey).toEqual({ status: 'set' });
-      expect(result.userFound).toEqual({
-        userFound: false,
-        isUnverified: false,
-        hasSyncablePassKey: false,
-        availableChallengeKinds: [
-          ChallengeKind.sms,
-          ChallengeKind.email,
-          ChallengeKind.biometric,
-        ],
-        scrubbedEmail: 'a•.g•.com',
-        scrubbedPhone: '+49••',
-      });
-      expect(result.userFound).toEqual(ctx.userFound!);
     });
 
     it('should not assign phone when challenge is not available', () => {
@@ -361,12 +381,14 @@ describe('machine assigners', () => {
         {
           type: 'identifyUserDone',
           payload: {
-            userFound: false,
-            isUnverified: false,
-            hasSyncablePassKey: false,
-            availableChallengeKinds: [ChallengeKind.email],
-            scrubbedEmail: 'a*.g*.com',
-            scrubbedPhone: '+49**',
+            user: {
+              isUnverified: false,
+              hasSyncablePasskey: false,
+              availableChallengeKinds: [ChallengeKind.email],
+              authMethods: [{ kind: AuthMethodKind.email, isVerified: true }],
+              scrubbedEmail: 'a*.g*.com',
+              scrubbedPhone: '+49**',
+            },
           },
         },
         meta,

@@ -103,9 +103,9 @@ const assignPhoneChallenge: SetPhoneChallenge = (ctx, { payload }) => {
 
 const assignUserFound: IdentifyUserDone = (ctx, { payload }) => {
   const dashboard = { ...ctx.userDashboard };
-  const kinds = payload.availableChallengeKinds;
-  const scrubbedEmail = asterisksToBullet(payload.scrubbedEmail);
-  const scrubbedPhone = asterisksToBullet(payload.scrubbedPhone);
+  const kinds = payload.user?.availableChallengeKinds;
+  const scrubbedEmail = asterisksToBullet(payload.user?.scrubbedEmail);
+  const scrubbedPhone = asterisksToBullet(payload.user?.scrubbedPhone);
 
   if (kinds?.some(isSmsOrPhone)) {
     dashboard.phone = { status: 'set', label: scrubbedPhone };
@@ -119,7 +119,7 @@ const assignUserFound: IdentifyUserDone = (ctx, { payload }) => {
 
   ctx.kindToChallenge = kinds?.at(0);
   ctx.userDashboard = dashboard;
-  ctx.userFound = { ...payload, scrubbedEmail, scrubbedPhone };
+  ctx.userFound = { ...payload };
 
   return ctx;
 };

@@ -21,19 +21,7 @@ const identifyRequest = async (payload: IdentifyRequest) => {
     data,
     headers,
   });
-  const {
-    userFound,
-    availableChallengeKinds,
-    hasSyncablePassKey,
-    isUnverified,
-  } = response.data;
-
-  return {
-    userFound,
-    isUnverified,
-    availableChallengeKinds,
-    hasSyncablePassKey,
-  };
+  return response.data;
 };
 
 const useIdentify = () => useMutation(identifyRequest);

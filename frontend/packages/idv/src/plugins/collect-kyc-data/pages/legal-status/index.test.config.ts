@@ -2,16 +2,17 @@ import { mockRequest } from '@onefootprint/test-utils';
 
 export const withIdentify = (
   availableChallengeKinds?: string[],
-  hasSyncablePassKey?: boolean,
+  hasSyncablePasskey?: boolean,
 ) =>
   mockRequest({
     method: 'post',
     path: '/hosted/identify',
     response: {
-      userFound: true,
-      isUnverified: false,
-      availableChallengeKinds,
-      hasSyncablePassKey,
+      user: {
+        isUnverified: false,
+        availableChallengeKinds,
+        hasSyncablePasskey,
+      },
     },
   });
 

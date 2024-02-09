@@ -23,26 +23,20 @@ const InitAuthToken = ({ authToken }: InitAuthTokenProps) => {
     // Identify the user via auth token and then move to the login challenge
     const identifier = { authToken };
     try {
-      const authTokenIdentify = await identifyMutation.mutateAsync({
+      const { user } = await identifyMutation.mutateAsync({
         obConfigAuth,
         sandboxId,
         identifier,
       });
-      const {
-        userFound,
-        isUnverified,
-        availableChallengeKinds,
-        hasSyncablePassKey = false,
-      } = authTokenIdentify || {};
-      if (userFound) {
+      if (user) {
         send({
           type: 'identified',
           payload: {
-            userFound,
-            isUnverified,
+            userFound: true,
+            isUnverified: user?.isUnverified,
             successfulIdentifier: identifier,
-            availableChallengeKinds,
-            hasSyncablePassKey,
+            availableChallengeKinds: user?.availableChallengeKinds,
+            hasSyncablePassKey: user?.hasSyncablePasskey,
           },
         });
         return;

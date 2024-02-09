@@ -17,19 +17,7 @@ const identifyRequest = async (payload: IdentifyRequest) => {
       [AUTH_HEADER]: authToken,
     },
   });
-  const {
-    userFound,
-    availableChallengeKinds,
-    hasSyncablePassKey,
-    isUnverified,
-  } = response.data;
-
-  return {
-    isUnverified,
-    userFound,
-    availableChallengeKinds,
-    hasSyncablePassKey,
-  };
+  return response.data;
 };
 
 const useIdentify = () => useMutation(identifyRequest);

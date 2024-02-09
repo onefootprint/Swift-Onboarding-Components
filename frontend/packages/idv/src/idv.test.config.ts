@@ -138,10 +138,11 @@ export const withIdentify = (userFound?: boolean) =>
     method: 'post',
     path: '/hosted/identify',
     response: {
-      userFound,
-      isUnverified: false,
-      availableChallengeKinds: [ChallengeKind.biometric],
-      hasSyncablePassKey: true,
+      user: userFound && {
+        isUnverified: false,
+        availableChallengeKinds: [ChallengeKind.biometric],
+        hasSyncablePasskey: true,
+      },
     },
   });
 

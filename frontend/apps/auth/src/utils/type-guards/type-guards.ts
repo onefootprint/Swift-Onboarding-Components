@@ -20,15 +20,11 @@ const isString = (x: unknown): x is string => typeof x === 'string';
 
 const isObject = (x: unknown): x is Obj => typeof x === 'object' && !!x;
 
-const isNotEmptyArray = (x: unknown): boolean =>
-  Array.isArray(x) && x.length > 0;
-
 export {
   isAuth,
   isBiometric,
   isBiometricOrPasskey,
   isEmail,
-  isNotEmptyArray,
   isObject,
   isPasskey,
   isPhone,

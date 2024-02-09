@@ -1,6 +1,7 @@
 import type { TriggerKind } from '../api/trigger';
 import type { Actor } from './actor';
 import type { Annotation } from './annotation';
+import type AuthMethodKind from './auth-method';
 import type {
   CollectedInvestorProfileDataOption,
   CollectedKybDataOption,
@@ -147,12 +148,6 @@ export type AuthMethodUpdatedEvent = {
   kind: TimelineEventKind.authMethodUpdated;
   data: AuthMethodUpdatedData;
 };
-
-export enum AuthMethodKind {
-  phone = 'phone',
-  email = 'email',
-  passkey = 'passkey',
-}
 
 export enum AuthMethodAction {
   add_primary = 'add_primary',

@@ -34,18 +34,13 @@ const InitBootstrap = () => {
         );
       });
 
-    const {
-      userFound,
-      isUnverified,
-      hasSyncablePassKey = false,
-      availableChallengeKinds,
-    } = identifyResult || {};
-    if (userFound) {
+    const { user } = identifyResult || {};
+    if (user) {
       return {
-        isUnverified,
+        isUnverified: user?.isUnverified,
         successfulIdentifier: identifier,
-        hasSyncablePassKey,
-        availableChallengeKinds,
+        hasSyncablePassKey: user?.hasSyncablePasskey,
+        availableChallengeKinds: user?.availableChallengeKinds,
       };
     }
 

@@ -1,4 +1,9 @@
-import type { ChallengeKind, Identifier, ObConfigAuth } from '../data';
+import type {
+  AuthMethodKind,
+  ChallengeKind,
+  Identifier,
+  ObConfigAuth,
+} from '../data';
 
 export const SANDBOX_ID_HEADER = 'X-Sandbox-id';
 export const AUTH_HEADER = 'X-Fp-Authorization';
@@ -12,20 +17,29 @@ export type IdentifyRequest = {
   sandboxId?: string;
 };
 
-export type IdentifyResponse = {
-  // Whether there is a footprint user vault
-  userFound: boolean;
+export type IdentifiedAuthMethod = {
+  kind: AuthMethodKind;
+  isVerified: boolean;
+};
+
+export type IdentifiedUser = {
+  token?: string;
+  authMethods: IdentifiedAuthMethod[];
+  /// Should deprecate this soon in favor of authMethods
+  availableChallengeKinds: ChallengeKind[];
+  // Whether the passkeys were registered with device on a up-to-date version
+  // that can sync passkeys across devices
+  hasSyncablePasskey: boolean;
   // Whether the user has verified credentials, likely indicating whether vault was created by API
   // Will be true if challenge kinds is empty, user vault is not portable and the user has phone number stored
   isUnverified: boolean;
-  // Whether the passkeys were registered with device on a up-to-date version
-  // that can sync passkeys across devices
-  hasSyncablePassKey?: boolean;
-  // Email included only if no-phone user, otherwise phone is included by default.
-  // Passkey included only if registered by user
-  availableChallengeKinds?: ChallengeKind[];
   scrubbedEmail?: string;
   scrubbedPhone?: string;
+};
+
+export type IdentifyResponse = {
+  /// Populated when the user is found
+  user?: IdentifiedUser;
 };
 
 /*
@@ -33,19 +47,23 @@ export type IdentifyResponse = {
   
     First time user: 
       userFound = false, 
-      isUnverified = false, 
-      availableChallengeKinds: [], 
-      hasSyncablePassKey = false
+      user = null,
     
     Returning user (with passkeys registered on up-to-date iOS): 
       userFound = true, 
-      isUnverified = false, 
-      availableChallengeKinds: ['sms', 'biometric'], 
-      hasSyncablePassKey = true
+      user = {
+        token = 'utok_xxx',
+        isUnverified = false, 
+        authMethods: [{kind: 'phone', isVerified: true}, {kind: 'passkey', isVerified: true}], 
+        hasSyncablePassKey = true
+      }
 
     API only user: 
       userFound = true, 
-      isUnverified = true,  
-      availableChallengeKinds: [], 
-      hasSyncablePassKey = false
+      user = {
+        token = 'utok_xxx',
+        isUnverified = true, 
+        authMethods: [{kind: 'phone', isVerified: false}],
+        hasSyncablePassKey = true
+      }
 */

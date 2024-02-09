@@ -26,11 +26,11 @@ export const identifyMutationCaller = async (
   mutation
     .mutateAsync({ identifier })
     .then(res =>
-      res.userFound
+      res.user
         ? {
-            isUnverified: res.isUnverified,
-            availableChallengeKinds: res.availableChallengeKinds,
-            hasSyncablePassKey: res.hasSyncablePassKey ?? false,
+            isUnverified: res.user.isUnverified,
+            availableChallengeKinds: res.user?.availableChallengeKinds,
+            hasSyncablePassKey: res.user.hasSyncablePasskey,
             successfulIdentifier: identifier,
           }
         : undefined,

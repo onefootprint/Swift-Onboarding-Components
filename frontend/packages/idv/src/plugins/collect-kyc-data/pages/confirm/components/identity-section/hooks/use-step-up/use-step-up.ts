@@ -20,18 +20,17 @@ type UseStepUpArgs = {
   onError?: (error: unknown) => void;
 };
 
-type StepUpScope = Pick<
-  IdentifyResponse,
-  'availableChallengeKinds' | 'hasSyncablePassKey'
->;
-
 const isStepUpPossible = (
   { type, hasSupportForWebauthn }: DeviceInfo,
-  { availableChallengeKinds, hasSyncablePassKey }: StepUpScope = {},
+  response: IdentifyResponse | undefined,
 ): boolean => {
-  const serverSide = availableChallengeKinds?.includes(ChallengeKind.biometric);
+  const serverSide = response?.user?.availableChallengeKinds.includes(
+    ChallengeKind.biometric,
+  );
   const clientSide =
-    hasSupportForWebauthn && type === 'desktop' ? hasSyncablePassKey : true;
+    hasSupportForWebauthn && type === 'desktop'
+      ? response?.user?.hasSyncablePasskey
+      : true;
 
   return Boolean(serverSide) && Boolean(clientSide);
 };

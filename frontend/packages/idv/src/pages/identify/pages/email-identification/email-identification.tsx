@@ -43,21 +43,16 @@ const EmailIdentification = () => {
         sandboxId,
       },
       {
-        onSuccess: ({
-          userFound,
-          isUnverified,
-          availableChallengeKinds,
-          hasSyncablePassKey,
-        }: IdentifyResponse) => {
+        onSuccess: ({ user }: IdentifyResponse) => {
           send({
             type: 'identified',
             payload: {
-              userFound,
-              isUnverified,
+              userFound: !!user,
+              isUnverified: !!user?.isUnverified,
               email: emailFromForm,
               successfulIdentifier: { email: emailFromForm },
-              hasSyncablePassKey,
-              availableChallengeKinds,
+              hasSyncablePassKey: user?.hasSyncablePasskey,
+              availableChallengeKinds: user?.availableChallengeKinds,
             },
           });
         },

@@ -36,9 +36,13 @@ const ChallengeSelect = ({ children, Header }: ChallengeSelectProps) => {
   const { t } = useTranslation('common');
   const [state, send] = useUserMachine();
   const { kindToChallenge, userFound } = state.context;
-  const availableOptions = userFound?.availableChallengeKinds || [];
-  const phoneTitle = `${t('send-code-to')} ${userFound?.scrubbedPhone || ''}`;
-  const emailTitle = `${t('send-code-to')} ${userFound?.scrubbedEmail || ''}`;
+  const availableOptions = userFound?.user?.availableChallengeKinds || [];
+  const phoneTitle = `${t('send-code-to')} ${
+    userFound?.user?.scrubbedPhone || ''
+  }`;
+  const emailTitle = `${t('send-code-to')} ${
+    userFound?.user?.scrubbedEmail || ''
+  }`;
 
   const handleOnChange = (str: string) =>
     send({ type: 'setChallengeKind', payload: str as ChallengeKind });

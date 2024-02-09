@@ -13,6 +13,7 @@ export { ActorKind } from './actor';
 export type { AmlDetail, AmlHit, AmlHitMedia } from './aml-detail';
 export type { Annotation, AnnotationSource } from './annotation';
 export type { ApiKey } from './api-key';
+export { default as AuthMethodKind } from './auth-method';
 export type { BeneficialOwner } from './beneficial-owner';
 export { BeneficialOwnerDataAttribute } from './beneficial-owner';
 export type { BiometricLoginChallengeJson } from './biometric-login-challenge-json';

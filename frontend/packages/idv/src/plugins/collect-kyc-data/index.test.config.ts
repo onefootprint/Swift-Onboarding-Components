@@ -60,10 +60,11 @@ export const withIdentify = () =>
     method: 'post',
     path: '/hosted/identify',
     response: {
-      userFound: true,
-      isUnverified: false,
-      availableChallengeKinds: [ChallengeKind.biometric],
-      hasSyncablePassKey: true,
+      user: {
+        isUnverified: false,
+        availableChallengeKinds: [ChallengeKind.biometric],
+        hasSyncablePasskey: true,
+      },
     },
   });
 

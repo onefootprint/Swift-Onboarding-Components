@@ -57,21 +57,16 @@ const PhoneIdentification = () => {
         sandboxId,
       },
       {
-        onSuccess: ({
-          userFound,
-          isUnverified,
-          availableChallengeKinds,
-          hasSyncablePassKey,
-        }: IdentifyResponse) => {
+        onSuccess: ({ user }: IdentifyResponse) => {
           send({
             type: 'identified',
             payload: {
               phoneNumber: phoneFromForm,
-              userFound,
-              isUnverified,
+              userFound: !!user,
+              isUnverified: !!user?.isUnverified,
               successfulIdentifier: { phoneNumber: phoneFromForm },
-              availableChallengeKinds,
-              hasSyncablePassKey,
+              availableChallengeKinds: user?.availableChallengeKinds,
+              hasSyncablePassKey: user?.hasSyncablePasskey,
             },
           });
         },

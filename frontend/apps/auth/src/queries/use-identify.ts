@@ -28,6 +28,15 @@ const requestFn = async ({
     headers,
   });
 
+  if (response.data.user?.scrubbedEmail) {
+    response.data.user.scrubbedEmail =
+      response.data.user.scrubbedEmail.replaceAll('*', '•');
+  }
+  if (response.data.user?.scrubbedPhone) {
+    response.data.user.scrubbedPhone =
+      response.data.user.scrubbedPhone.replaceAll('*', '•');
+  }
+
   return response.data;
 };
 
