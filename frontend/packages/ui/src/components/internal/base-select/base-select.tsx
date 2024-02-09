@@ -79,7 +79,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
     strategy: 'fixed',
     modifiers,
   });
-  const isSearchable = options.length > 7;
+  const isSearchable = options.length > 10;
   const containerRef = useRef<HTMLDivElement>(null);
   const handleClickOutside = () => {
     closeDropdown();

@@ -22,6 +22,8 @@ const defaultOptions = [
   { value: 'option 7', label: 'option 7' },
   { value: 'option 8', label: 'option 8' },
   { value: 'option 9', label: 'option 9' },
+  { value: 'option 10', label: 'option 10' },
+  { value: 'option 11', label: 'option 11' },
 ];
 
 describe('<Select />', () => {
@@ -157,7 +159,7 @@ describe('<Select />', () => {
       it('should filter the results', async () => {
         renderSelect({});
         const trigger = screen.getByRole('button', { name: 'Select' });
-        await selectEvents.search(trigger, 'option 1');
+        await selectEvents.search(trigger, 'option 2');
         expect(screen.queryAllByRole('option').length).toEqual(1);
       });
 
