@@ -32,6 +32,7 @@ describe('Onboarding Machine Tests', () => {
   const testDevice: DeviceInfo = {
     type: 'mobile',
     hasSupportForWebauthn: true,
+    osName: 'iOS',
   };
 
   const createMachine = ({

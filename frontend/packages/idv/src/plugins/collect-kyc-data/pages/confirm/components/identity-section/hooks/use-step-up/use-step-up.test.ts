@@ -29,6 +29,7 @@ describe.skip('useStepUp', () => {
     const device = {
       type: 'mobile',
       hasSupportForWebauthn: true,
+      osName: 'iOS',
     };
     const authToken = 'token';
     const onSuccess = jest.fn();
@@ -66,6 +67,7 @@ describe.skip('useStepUp', () => {
       const device = {
         type: 'mobile',
         hasSupportForWebauthn: true,
+        osName: 'iOS',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();
@@ -87,6 +89,7 @@ describe.skip('useStepUp', () => {
       const device = {
         type: 'mobile',
         hasSupportForWebauthn: true,
+        osName: 'iOS',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();
@@ -109,6 +112,7 @@ describe.skip('useStepUp', () => {
       const device = {
         type: 'mobile',
         hasSupportForWebauthn: true,
+        osName: 'iOS',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();
@@ -134,6 +138,7 @@ describe.skip('useStepUp', () => {
       const device = {
         type: 'mobile',
         hasSupportForWebauthn: true,
+        osName: 'iOS',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();
@@ -160,6 +165,7 @@ describe.skip('useStepUp', () => {
       const device = {
         type: 'mobile',
         hasSupportForWebauthn: true,
+        osName: 'iOS',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();
@@ -181,6 +187,7 @@ describe.skip('useStepUp', () => {
       const device = {
         type: 'desktop',
         hasSupportForWebauthn: true,
+        osName: 'iOS',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();
@@ -202,6 +209,7 @@ describe.skip('useStepUp', () => {
       const device = {
         type: 'desktop',
         hasSupportForWebauthn: true,
+        osName: 'iOS',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();
@@ -229,6 +237,7 @@ describe.skip('useStepUp', () => {
       const device = {
         type: 'desktop',
         hasSupportForWebauthn: false,
+        osName: 'iOS',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();
@@ -256,6 +265,7 @@ describe.skip('useStepUp', () => {
       const device = {
         type: 'mobile',
         hasSupportForWebauthn: true,
+        osName: 'iOS',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();
@@ -283,6 +293,7 @@ describe.skip('useStepUp', () => {
       const device = {
         type: 'mobile',
         hasSupportForWebauthn: true,
+        osName: 'iOS',
       };
       const authToken = 'token';
       const onSuccess = jest.fn();

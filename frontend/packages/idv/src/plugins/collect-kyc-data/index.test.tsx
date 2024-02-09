@@ -122,6 +122,7 @@ describe('<CollectKycData />', () => {
     device: {
       type: 'mobile',
       hasSupportForWebauthn: true,
+      osName: 'iOS',
     },
   });
 

@@ -26,6 +26,7 @@ const getRegularArgs = () => ({
   device: {
     type: 'desktop',
     hasSupportForWebauthn: false,
+    osName: 'Windows',
   },
   missingRequirements: {
     liveness: getLivenessReq(),
@@ -42,6 +43,7 @@ describe('Transfer machine tests', () => {
         device: {
           type: 'mobile',
           hasSupportForWebauthn: true,
+          osName: 'iOS',
         },
         missingRequirements: {
           liveness: getLivenessReq(),

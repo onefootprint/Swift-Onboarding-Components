@@ -38,6 +38,7 @@ describe('Collect KYB Data Machine Tests', () => {
     device: DeviceInfo = {
       type: 'desktop',
       hasSupportForWebauthn: false,
+      osName: 'Windows',
     },
   ) => {
     const initialContext: MachineContext = {

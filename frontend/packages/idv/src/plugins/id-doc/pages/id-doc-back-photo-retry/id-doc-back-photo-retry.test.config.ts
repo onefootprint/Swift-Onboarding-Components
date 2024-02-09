@@ -13,6 +13,7 @@ const contextWithErrors: MachineContext = {
   device: {
     type: 'mobile',
     hasSupportForWebauthn: true,
+    osName: 'iOS',
   },
   currSide: IdDocImageTypes.front,
   requirement: {

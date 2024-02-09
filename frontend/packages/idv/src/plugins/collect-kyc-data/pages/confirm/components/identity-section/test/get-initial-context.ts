@@ -24,6 +24,7 @@ const getInitialContext = ({
   device: device ?? {
     type: 'mobile',
     hasSupportForWebauthn: true,
+    osName: 'iOS',
   },
   config: getOnboardingConfig(),
   userFound: true,

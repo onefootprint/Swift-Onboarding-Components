@@ -69,6 +69,7 @@ describe('<Identify />', () => {
             device={{
               type: 'mobile',
               hasSupportForWebauthn: true,
+              osName: 'iOS',
             }}
             obConfigAuth={{ [CLIENT_PUBLIC_KEY_HEADER]: 'pk' }}
             bootstrapData={bootstrapData ?? {}}

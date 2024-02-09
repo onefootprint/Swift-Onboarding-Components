@@ -12,6 +12,7 @@ export const initialContextAllDocTypes: MachineContext = {
   device: {
     type: 'mobile',
     hasSupportForWebauthn: true,
+    osName: 'iOS',
   },
   currSide: IdDocImageTypes.front,
   requirement: {
@@ -64,6 +65,7 @@ export const initialContextSomeDocTypes: MachineContext = {
   device: {
     type: 'mobile',
     hasSupportForWebauthn: true,
+    osName: 'iOS',
   },
   currSide: IdDocImageTypes.front,
   requirement: {
@@ -100,6 +102,7 @@ export const initialContextOnlyUS: MachineContext = {
   device: {
     type: 'mobile',
     hasSupportForWebauthn: true,
+    osName: 'iOS',
   },
   currSide: IdDocImageTypes.front,
   requirement: {
@@ -134,6 +137,7 @@ export const initialContextBD: MachineContext = {
   device: {
     type: 'mobile',
     hasSupportForWebauthn: true,
+    osName: 'iOS',
   },
   currSide: IdDocImageTypes.front,
   requirement: {
@@ -160,6 +164,7 @@ export const initialContextNoSupportedDoc: MachineContext = {
   device: {
     type: 'mobile',
     hasSupportForWebauthn: true,
+    osName: 'iOS',
   },
   currSide: IdDocImageTypes.front,
   requirement: {

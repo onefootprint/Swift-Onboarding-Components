@@ -15,6 +15,7 @@ export const getInitialContext = (data: KycData): MachineContext => ({
   device: {
     type: 'mobile',
     hasSupportForWebauthn: true,
+    osName: 'iOS',
   },
   config: {
     isLive: true,

@@ -272,6 +272,7 @@ describe('IdentitySection', () => {
     const device = {
       type: 'mobile',
       hasSupportForWebauthn: false,
+      osName: 'iOS',
     };
     const initialContext = getInitialContext({ device });
     renderIdentitySection(initialContext);

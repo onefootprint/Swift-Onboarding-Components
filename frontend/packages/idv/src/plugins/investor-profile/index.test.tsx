@@ -60,6 +60,7 @@ describe('<InvestorProfile />', () => {
     device: {
       type: 'mobile',
       hasSupportForWebauthn: true,
+      osName: 'iOS',
     },
   });
 

@@ -34,6 +34,7 @@ describe('Identify Machine Tests', () => {
   const getDevice = (): DeviceInfo => ({
     type: 'mobile',
     hasSupportForWebauthn: true,
+    osName: 'iOS',
   });
 
   const createMachine = (bootstrapData?: IdentifyBootstrapData) => {
@@ -58,6 +59,7 @@ describe('Identify Machine Tests', () => {
       expect(state.context.device).toEqual({
         type: 'mobile',
         hasSupportForWebauthn: true,
+        osName: 'iOS',
       });
 
       state = machine.send({
@@ -92,6 +94,7 @@ describe('Identify Machine Tests', () => {
       expect(state.context.device).toEqual({
         type: 'mobile',
         hasSupportForWebauthn: true,
+        osName: 'iOS',
       });
 
       state = machine.send({
@@ -143,6 +146,7 @@ describe('Identify Machine Tests', () => {
       expect(state.context.device).toEqual({
         type: 'mobile',
         hasSupportForWebauthn: true,
+        osName: 'iOS',
       });
 
       state = machine.send({
@@ -209,6 +213,7 @@ describe('Identify Machine Tests', () => {
       expect(state.context.device).toEqual({
         type: 'mobile',
         hasSupportForWebauthn: true,
+        osName: 'iOS',
       });
 
       state = machine.send({
@@ -269,6 +274,7 @@ describe('Identify Machine Tests', () => {
       expect(state.context.device).toEqual({
         type: 'mobile',
         hasSupportForWebauthn: true,
+        osName: 'iOS',
       });
 
       state = machine.send({

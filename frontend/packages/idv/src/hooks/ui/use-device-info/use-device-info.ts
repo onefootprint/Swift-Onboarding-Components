@@ -4,7 +4,7 @@ import { useEffectOnce } from 'usehooks-ts';
 export type DeviceInfo = {
   hasSupportForWebauthn: boolean;
   type: string;
-  osName?: string;
+  osName: string;
 };
 
 // UAParser device type can have an undefined type, because

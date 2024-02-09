@@ -34,6 +34,7 @@ export const argsRegularMobile: MachineContext = {
   device: {
     hasSupportForWebauthn: true,
     type: 'mobile',
+    osName: 'iOS',
   },
   currSide: IdDocImageTypes.front,
   requirement: JSON.parse(JSON.stringify(requirement)),
@@ -60,6 +61,7 @@ export const argsRegularDesktop: MachineContext = {
   device: {
     hasSupportForWebauthn: true,
     type: 'desktop',
+    osName: 'Windows',
   },
   currSide: IdDocImageTypes.front,
   requirement: JSON.parse(JSON.stringify(requirement)),

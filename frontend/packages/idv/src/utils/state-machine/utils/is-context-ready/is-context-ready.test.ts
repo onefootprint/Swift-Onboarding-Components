@@ -32,6 +32,7 @@ describe('isContextReady', () => {
         device: {
           type: 'mobile',
           hasSupportForWebauthn: true,
+          osName: 'iOS',
         },
         config: { ...testOnboardingConfig },
         obConfigAuth: { [CLIENT_PUBLIC_KEY_HEADER]: 'token' },
@@ -54,6 +55,7 @@ describe('isContextReady', () => {
           device: {
             type: 'mobile',
             hasSupportForWebauthn: true,
+            osName: 'iOS',
           },
         },
       };
@@ -70,6 +72,7 @@ describe('isContextReady', () => {
           device: {
             type: 'mobile',
             hasSupportForWebauthn: true,
+            osName: 'iOS',
           },
         },
       };
