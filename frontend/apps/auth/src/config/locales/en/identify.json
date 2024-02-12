@@ -6,6 +6,9 @@
   "enter-email": "Enter your email address",
   "enter-phone": "Enter your new phone number",
   "success": "Success",
+  "email-update-success": "You've updated your email address successfully.",
+  "passkey-update-success": "passkey update success",
+  "phone-update-success": "You've updated your phone number successfully.",
   "notification": {
     "404-token-title": "Token not found",
     "404-user-description": "The user was not found or the provided token has expired. Please contact the business that sent you this link.",
