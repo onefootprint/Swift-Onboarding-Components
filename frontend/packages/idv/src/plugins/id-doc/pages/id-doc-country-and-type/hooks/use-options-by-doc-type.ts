@@ -3,6 +3,7 @@ import {
   IcoGreenCard24,
   IcoIdCard24,
   IcoPassport24,
+  IcoPassportCard24,
   IcoSsnCard24,
   IcoVisaPassport24,
   IcoVoter24,
@@ -107,6 +108,13 @@ const useOptionsByDocType = (supportedDocumentTypes: SupportedIdDocTypes[]) => {
       title: t('form.type.proofOfAddress.title'),
       IconComponent: IcoWriting24,
       value: SupportedIdDocTypes.proofOfAddress,
+    };
+  }
+  if (supportedDocumentTypes?.includes(SupportedIdDocTypes.passportCard)) {
+    optionsByDocType[SupportedIdDocTypes.passportCard] = {
+      title: t('form.type.passportCard.title'),
+      IconComponent: IcoPassportCard24,
+      value: SupportedIdDocTypes.passportCard,
     };
   }
 

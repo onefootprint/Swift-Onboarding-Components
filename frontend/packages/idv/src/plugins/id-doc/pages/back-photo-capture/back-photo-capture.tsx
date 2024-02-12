@@ -22,6 +22,7 @@ const translationIndex: { [key in SupportedIdDocTypes]: string } = {
   [SupportedIdDocTypes.bankStatement]: 'bankStatement',
   [SupportedIdDocTypes.utilityBill]: 'utilityBill',
   [SupportedIdDocTypes.proofOfAddress]: 'proofOfAddress',
+  [SupportedIdDocTypes.passportCard]: 'passportCard',
 };
 
 const BackPhotoCapture = () => {

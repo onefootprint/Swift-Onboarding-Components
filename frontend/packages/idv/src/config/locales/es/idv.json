@@ -312,7 +312,8 @@
           "lease": "Arrendamiento",
           "utilityBill": "Factura de servicios",
           "bankStatement": "Extracto de Cuenta",
-          "proofOfAddress": "Proof of address",
+          "proofOfAddress": "Comprobante de domicilio",
+          "passportCard": "Tarjeta de pasaporte",
           "selfie": "Selfie",
           "business-name": "Nombre de la empresa",
           "business-tin": "TIN",
@@ -1374,6 +1375,9 @@
             },
             "proofOfAddress": {
               "title": "Comprobante de domicilio"
+            },
+            "passportCard": {
+              "title": "Tarjeta de pasaporte"
             }
           },
           "not-supported": "Lo sentimos, por el momento no admitimos identificaciones de tu país.",
@@ -1391,7 +1395,8 @@
             "residenceDocument": "Green Card · FRENTE",
             "voterIdentification": "Identificación de votante · FRENTE",
             "ssnCard": "Tarjeta de SSN · FRENTE",
-            "proofOfAddress": "Comprobante de domicilio"
+            "proofOfAddress": "Comprobante de domicilio",
+            "passportCard": "Tarjeta de pasaporte · FRENTE"
           },
           "preview": {
             "driversLicense": "Licencia de conducir",
@@ -1402,7 +1407,8 @@
             "residenceDocument": "Green Card",
             "voterIdentification": "Identificación de votante",
             "ssnCard": "Tarjeta de SSN",
-            "proofOfAddress": "Comprobante de domicilio"
+            "proofOfAddress": "Comprobante de domicilio",
+            "passportCard": "Tarjeta de pasaporte"
           }
         },
         "subtitle": {
@@ -1420,7 +1426,8 @@
             "residenceDocument": "Green Card · ATRÁS",
             "voterIdentification": "Identificación de votante · ATRÁS",
             "ssnCard": "SSN Card · BACK",
-            "proofOfAddress": "Proof of address"
+            "proofOfAddress": "Comprobante de domicilio",
+            "passportCard": "Tarjeta de pasaporte · ATRÁS"
           },
           "preview": {
             "driversLicense": "Licencia de conducir",
@@ -1431,7 +1438,8 @@
             "residenceDocument": "Green Card",
             "voterIdentification": "Identificación de votante",
             "ssnCard": "SSN Card",
-            "proofOfAddress": "Proof of address"
+            "proofOfAddress": "Comprobante de domicilio",
+            "passportCard": "Tarjeta de pasaporte"
           }
         },
         "subtitle": {

@@ -20,6 +20,7 @@ const getDataLabel = (
     .replace(`document.${SupportedIdDocTypes.bankStatement}.`, '')
     .replace(`document.${SupportedIdDocTypes.utilityBill}.`, '')
     .replace(`document.${SupportedIdDocTypes.proofOfAddress}.`, '')
+    .replace(`document.${SupportedIdDocTypes.passportCard}.`, '')
     .replace(`:${activeDocumentVersion}`, '');
 
 export default getDataLabel;

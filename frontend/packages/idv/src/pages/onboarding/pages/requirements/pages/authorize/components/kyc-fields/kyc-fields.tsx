@@ -11,6 +11,7 @@ import {
   IcoGreenCard24,
   IcoIdCard24,
   IcoPassport24,
+  IcoPassportCard24,
   IcoPhone24,
   IcoSelfie24,
   IcoSsnCard24,
@@ -59,6 +60,7 @@ const IconByIdDocType: Record<SupportedIdDocTypes, Icon> = {
   [SupportedIdDocTypes.bankStatement]: IcoWriting24,
   [SupportedIdDocTypes.utilityBill]: IcoWriting24,
   [SupportedIdDocTypes.proofOfAddress]: IcoWriting24,
+  [SupportedIdDocTypes.passportCard]: IcoPassportCard24,
 };
 
 type KycFieldsProps = {
@@ -104,6 +106,7 @@ const KycFields = ({ data, documentTypes, showTitle }: KycFieldsProps) => {
     [SupportedIdDocTypes.bankStatement]: t('data-labels.bankStatement'),
     [SupportedIdDocTypes.utilityBill]: t('data-labels.utilityBill'),
     [SupportedIdDocTypes.proofOfAddress]: t('data-labels.proofOfAddress'),
+    [SupportedIdDocTypes.passportCard]: t('data-labels.passportCard'),
   };
 
   const fields: FieldProps[] = [];

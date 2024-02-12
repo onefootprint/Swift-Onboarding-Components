@@ -301,18 +301,19 @@
           "address-partial": "Country & Zip Code",
           "nationality": "Nationality",
           "us-legal-status": "U.S. Legal Status",
-          "id-card": "ID Card",
+          "id-card": "ID card",
           "passport": "Passport",
-          "driversLicense": "Driver's License",
+          "driversLicense": "Driver's license",
           "residence-document": "Residence card",
           "work-permit": "Work permit",
           "visa": "Visa",
           "voterIdentification": "Voter identification",
-          "ssnCard": "SSN Card",
+          "ssnCard": "SSN card",
           "lease": "Lease",
-          "utilityBill": "Utility Bill",
-          "bankStatement": "Bank Statement",
+          "utilityBill": "Utility bill",
+          "bankStatement": "Bank statement",
           "proofOfAddress": "Proof of address",
+          "passportCard": "Passport card",
           "selfie": "Selfie",
           "business-name": "Business name",
           "business-tin": "TIN",
@@ -1373,6 +1374,9 @@
             },
             "proofOfAddress": {
               "title": "Proof of address"
+            },
+            "passportCard": {
+              "title": "Passport card"
             }
           },
           "not-supported": "Sorry, we don't support IDs for your country yet.",
@@ -1390,7 +1394,8 @@
             "residenceDocument": "Green card · FRONT",
             "voterIdentification": "Voter identification · FRONT",
             "ssnCard": "SSN Card · FRONT",
-            "proofOfAddress": "Proof of address"
+            "proofOfAddress": "Proof of address",
+            "passportCard": "Passport card · FRONT"
           },
           "preview": {
             "driversLicense": "Driver's license",
@@ -1401,7 +1406,8 @@
             "residenceDocument": "Green card",
             "voterIdentification": "Voter identification",
             "ssnCard": "SSN Card",
-            "proofOfAddress": "Proof of address"
+            "proofOfAddress": "Proof of address",
+            "passportCard": "Passport card"
           }
         },
         "subtitle": {
@@ -1419,7 +1425,8 @@
             "residenceDocument": "Green card · BACK",
             "voterIdentification": "Voter identification · BACK",
             "ssnCard": "SSN Card · BACK",
-            "proofOfAddress": "Proof of address"
+            "proofOfAddress": "Proof of address",
+            "passportCard": "Passport card · BACK"
           },
           "preview": {
             "driversLicense": "Driver's license",
@@ -1430,7 +1437,8 @@
             "residenceDocument": "Green card",
             "voterIdentification": "Voter identification",
             "ssnCard": "SSN Card",
-            "proofOfAddress": "Proof of address"
+            "proofOfAddress": "Proof of address",
+            "passportCard": "Passport card"
           }
         },
         "subtitle": {

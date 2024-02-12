@@ -49,7 +49,8 @@
     "lease": "Lease",
     "utility_bill": "Utility Bill",
     "bank_statement": "Bank Statement",
-    "proof_of_address": "Proof of Address"
+    "proof_of_address": "Proof of Address",
+    "passport_card": "Passport card"
   },
   "di": {
     "id": {
@@ -292,6 +293,36 @@
         "ref_number": "Voter identification reference number",
         "nationality": "Voter identification nationality"
       },
+      "passport_card": {
+        "front": {
+          "image": "Passport card",
+          "latest_upload": "Passport card",
+          "mime_type": "Passport card MIME type"
+        },
+        "back": {
+          "image": "Passport card back",
+          "latest_upload": "Passport card back",
+          "mime_type": "Passport card back MIME type"
+        },
+        "selfie": {
+          "image": "Selfie",
+          "latest_upload": "Selfie",
+          "mime_type": "Selfie MIME type"
+        },
+        "number": "Passport card number",
+        "expiration": "Passport card expiration",
+        "dob": "Passport card DOB",
+        "issuing_state": "Passport card issuing state",
+        "issuing_country": "Passport card issuing country",
+        "expires_at": "Passport card expires at",
+        "issued_at": "Passport card issued at",
+        "full_address": "Passport card full address",
+        "gender": "Passport card gender",
+        "full_name": "Passport card full name",
+        "document_number": "Passport card document number",
+        "ref_number": "Passport card reference number",
+        "nationality": "Passport card nationality"
+      },
       "ssn_card": {
         "front": {
           "image": "SSN Card",
@@ -388,6 +419,7 @@
     "residence_document": "Residence card / Green card",
     "voter_identification": "Voter identification",
     "proof_of_address": "Proof of Address",
+    "passport_card": "Passport card",
     "business_name": "Business name",
     "business_tin": "Taxpayer Identification Number (TIN)",
     "business_address": "Registered business address",
@@ -927,6 +959,7 @@
             "visa.title": "Visa and selfie",
             "voter_identification.title": "Voter identification",
             "proof_of_address.title": "Proof of Address",
+            "passport_card.title": "Passport card and selfie",
             "ssn_card.title": "SSN Card",
             "session-selector": {
               "title": "Session",
@@ -988,7 +1021,8 @@
                 "lease": "Lease",
                 "bank_statement": "Bank Statement",
                 "utility_bill": "Utility Bill",
-                "proof_of_address": "Proof of Address"
+                "proof_of_address": "Proof of Address",
+                "passport_card": "Passport card"
               },
               "failure-reasons": {
                 "doc_type_mismatch": "Document type didn't match.",
@@ -2608,6 +2642,7 @@
               "work_permit": "Work permit",
               "voter_identification": "Voter identification",
               "proof_of_address": "Proof of address",
+              "passport_card": "Passport card",
               "info": "We might still need to ask some users to capture their ID document as part of our step-up verification flow.",
               "no-id-doc-selected": "You must select at least one ID document type."
             }
@@ -2729,6 +2764,8 @@
         "visa": "Visa",
         "residence-document": "Residence card",
         "voter-identification": "Voter identification",
+        "proof-of-address": "Proof of address",
+        "passport-card": "Passport card",
         "permit": "Work permit",
         "ssn": "SSN",
         "ssn4": "Last 4",

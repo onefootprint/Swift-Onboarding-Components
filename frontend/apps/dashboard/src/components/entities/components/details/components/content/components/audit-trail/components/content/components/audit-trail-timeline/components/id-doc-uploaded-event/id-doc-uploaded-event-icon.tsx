@@ -4,6 +4,7 @@ import {
   IcoHome16,
   IcoIdCard16,
   IcoPassport16,
+  IcoPassportCard16,
   IcoSsnCard16,
   IcoVoter16,
   IcoWriting16,
@@ -26,6 +27,7 @@ const IconByIdDocType: Record<SupportedIdDocTypes, JSX.Element> = {
   [SupportedIdDocTypes.bankStatement]: <IcoWriting16 />,
   [SupportedIdDocTypes.utilityBill]: <IcoWriting16 />,
   [SupportedIdDocTypes.proofOfAddress]: <IcoWriting16 />,
+  [SupportedIdDocTypes.passportCard]: <IcoPassportCard16 />,
 };
 
 type IdDocUploadedEventIconProps = {

@@ -40,6 +40,9 @@ const getDocumentType = (di: DocumentDI) => {
   if (di.includes(SupportedIdDocTypes.proofOfAddress)) {
     return SupportedIdDocTypes.proofOfAddress;
   }
+  if (di.includes(SupportedIdDocTypes.passportCard)) {
+    return SupportedIdDocTypes.passportCard;
+  }
   return undefined;
 };
 

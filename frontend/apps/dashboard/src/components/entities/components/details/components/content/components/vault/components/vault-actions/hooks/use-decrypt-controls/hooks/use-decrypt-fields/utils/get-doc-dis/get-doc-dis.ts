@@ -22,6 +22,7 @@ const mainDIs: Partial<Record<DocumentDI, SupportedIdDocTypes>> = {
   [DocumentDI.latestBankStatementFront]: SupportedIdDocTypes.bankStatement,
   [DocumentDI.latestUtilityBillFront]: SupportedIdDocTypes.utilityBill,
   [DocumentDI.latestProofOfAddressFront]: SupportedIdDocTypes.proofOfAddress,
+  [DocumentDI.latestPassportCardFront]: SupportedIdDocTypes.passportCard,
 };
 
 const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
@@ -122,6 +123,20 @@ const extractedDIsBase: Partial<Record<SupportedIdDocTypes, DocumentDI[]>> = {
     DocumentDI.voterIdentificationRefNumber,
     DocumentDI.voterIdentificationNationality,
     DocumentDI.voterIdentificationClassifiedDocumentType,
+  ],
+  [SupportedIdDocTypes.passportCard]: [
+    DocumentDI.passportCardFullName,
+    DocumentDI.passportCardDOB,
+    DocumentDI.passportCardGender,
+    DocumentDI.passportCardFullAddress,
+    DocumentDI.passportCardDocumentNumber,
+    DocumentDI.passportCardIssuedAt,
+    DocumentDI.passportCardExpiresAt,
+    DocumentDI.passportCardIssuingState,
+    DocumentDI.passportCardIssuingCountry,
+    DocumentDI.passportCardRefNumber,
+    DocumentDI.passportCardNationality,
+    DocumentDI.passportCardClassifiedDocumentType,
   ],
 };
 
