@@ -15,7 +15,7 @@ import { useUserMachine } from '@/src/state';
 import type { HeaderProps } from '@/src/types';
 import { getErrorToastVariant, shouldRequestNewChallenge } from '@/src/utils';
 
-import PinForm from '../pin-form';
+import PinForm from '../identify/components/pin-form';
 
 type ChallengeVerifyInputProps = {
   challenge: ChallengeData | undefined;
